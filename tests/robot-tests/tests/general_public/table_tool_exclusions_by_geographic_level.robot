@@ -11,7 +11,7 @@ Go to Table Tool page
     [Tags]  HappyPath
     environment variable should be set  PUBLIC_URL
     user goes to url  %{PUBLIC_URL}/data-tables
-    user waits until page contains heading 1  Create your own tables online
+    user waits until h1 is visible  Create your own tables online
     user waits for page to finish loading
 
 Select Exclusions publication
@@ -20,14 +20,14 @@ Select Exclusions publication
     user opens details dropdown    Exclusions
     user clicks radio      Permanent and fixed-period exclusions in England
     user clicks element    css:#publicationForm-submit
-    user waits until page contains heading 2  Choose a subject
+    user waits until h2 is visible  Choose a subject
     user checks previous table tool step contains  1   Publication   Permanent and fixed-period exclusions in England
 
 Select subject "Exclusions by geographic level"
     [Tags]  HappyPath
     user clicks radio   Exclusions by geographic level
     user clicks element   css:#publicationSubjectForm-submit
-    user waits until page contains heading 2  Choose locations
+    user waits until h2 is visible  Choose locations
     user checks previous table tool step contains  2    Subject     Exclusions by geographic level
 
 Select Locations LA, Bury, Sheffield, York
@@ -38,7 +38,7 @@ Select Locations LA, Bury, Sheffield, York
     user clicks checkbox    York
     user clicks element     css:#locationFiltersForm-submit
     # Extra timeout until EES-315/316
-    user waits until page contains heading 2  Choose time period
+    user waits until h2 is visible  Choose time period
     user checks previous table tool step contains  3    Local Authority    Bury
     user checks previous table tool step contains  3    Local Authority    Sheffield
     user checks previous table tool step contains  3    Local Authority    York
@@ -48,7 +48,7 @@ Select Start date and End date
     user selects from list by label  id:timePeriodForm-start   2006/07
     user selects from list by label  id:timePeriodForm-end     2008/09
     user clicks element     css:#timePeriodForm-submit
-    user waits until page contains heading 2  Choose your filters
+    user waits until h2 is visible  Choose your filters
     user waits until page contains element   id:filtersForm-indicators
     user checks previous table tool step contains  4    Start date    2006/07
     user checks previous table tool step contains  4    End date      2008/09
@@ -107,7 +107,7 @@ User validates permanent link works correctly
     [Tags]   HappyPath
     user clicks link   View permanent link
     select window    NEW
-    user waits until page contains heading 1  'Exclusions by geographic level' from 'Permanent and fixed-period exclusions in England'
+    user waits until h1 is visible  'Exclusions by geographic level' from 'Permanent and fixed-period exclusions in England'
 
 User validates permalink contains correct date
     [Tags]  HappyPath

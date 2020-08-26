@@ -11,12 +11,12 @@ Go to Table Tool page
     [Tags]  HappyPath
     environment variable should be set  PUBLIC_URL
     user goes to url  %{PUBLIC_URL}/data-tables
-    user waits until page contains heading 1  Create your own tables online
+    user waits until h1 is visible  Create your own tables online
 
 Go to permalink
     [Tags]  HappyPath
     user goes to url  %{PUBLIC_URL}/data-tables/permalink/edfe9f83-d1f0-40fc-8dce-9467a250c61b
-    user waits until page contains heading 1   'Exclusions by characteristic' from 'Permanent and fixed-period exclusions in England'
+    user waits until h1 is visible   'Exclusions by characteristic' from 'Permanent and fixed-period exclusions in England'
 
 Validate breadcrumbs
     [Tags]  HappyPath
@@ -69,7 +69,7 @@ Validate download files
 
 Use Create tables button
     [Tags]  HappyPath
-    user waits until page contains heading 2  Create your own tables online
+    user waits until h2 is visible  Create your own tables online
     user clicks link    Create tables
 
-    user waits until page contains heading 1  Create your own tables online
+    user waits until h1 is visible  Create your own tables online

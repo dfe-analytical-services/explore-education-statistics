@@ -11,9 +11,9 @@ Navigate to /download-data page
     [Tags]  HappyPath
     environment variable should be set   PUBLIC_URL
     user goes to url   %{PUBLIC_URL}
-    user waits until page contains heading 1   Choose how to explore our statistics and data
+    user waits until h1 is visible   Choose how to explore our statistics and data
     user clicks link   Download latest data files
-    user waits until page contains heading 1   Download latest data files
+    user waits until h1 is visible   Download latest data files
     user checks url contains   %{PUBLIC_URL}/download-latest-data
 
 Validate Pupils and schools contains Pupil absence files

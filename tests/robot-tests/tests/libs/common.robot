@@ -277,15 +277,15 @@ user checks page contains tag
     [Arguments]   ${text}
     user checks page contains element  xpath://*[contains(@class, "govuk-tag")][text()="${text}"]
 
-user waits until page contains heading 1
+user waits until h1 is visible
     [Arguments]   ${text}  ${wait}=${timeout}
     user waits until element is visible  xpath://h1[text()="${text}"]  ${wait}
 
-user waits until page contains heading 2
+user waits until h2 is visible
     [Arguments]   ${text}  ${wait}=${timeout}
     user waits until element is visible  xpath://h2[text()="${text}"]  ${wait}
 
-user waits until page contains heading 3
+user waits until h3 is visible
     [Arguments]   ${text}  ${wait}=${timeout}
     user waits until element is visible  xpath://h3[text()="${text}"]  ${wait}
 

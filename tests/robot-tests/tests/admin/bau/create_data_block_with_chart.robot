@@ -37,7 +37,7 @@ Create release
 
 Upload subject
     [Tags]  HappyPath
-    user waits until page contains heading 2    Release summary
+    user waits until h2 is visible    Release summary
     user checks summary list contains  Publication title  ${PUBLICATION_NAME}
     user clicks link  Manage data
     user enters text into element  id:dataFileUploadForm-subjectTitle   UI test subject
@@ -45,7 +45,7 @@ Upload subject
     user chooses file   id:dataFileUploadForm-metadataFile   ${CURDIR}${/}files${/}upload-file-test.meta.csv
     user clicks button  Upload data files
 
-    user waits until page contains heading 2  Uploaded data files
+    user waits until h2 is visible  Uploaded data files
     user waits until page contains accordion section   UI test subject
     user opens accordion section   UI test subject
     user checks page contains element   xpath://dt[text()="Subject title"]/../dd/h4[text()="UI test subject"]
@@ -54,14 +54,14 @@ Upload subject
 Navigate to Manage data blocks tab
     [Tags]  HappyPath
     user clicks link    Manage data blocks
-    user waits until page contains heading 2   Choose a subject
+    user waits until h2 is visible   Choose a subject
 
 Select subject "UI test subject"
     [Tags]  HappyPath
     user waits until page contains   UI test subject
     user clicks radio    UI test subject
     user clicks element   id:publicationSubjectForm-submit
-    user waits until page contains heading 2  Choose locations    90
+    user waits until h2 is visible  Choose locations    90
     user checks previous table tool step contains  1    Subject     UI test subject
 
 Select locations
@@ -75,7 +75,7 @@ Select locations
     user clicks checkbox   Nailsea Youngwood
     user clicks checkbox   Syon
     user clicks element     id:locationFiltersForm-submit
-    user waits until page contains heading 2  Choose time period  90
+    user waits until h2 is visible  Choose time period  90
 
 Select time period
     [Tags]   HappyPath
@@ -88,7 +88,7 @@ Select time period
     user selects from list by label  id:timePeriodForm-start  2005
     user selects from list by label  id:timePeriodForm-end  2020
     user clicks element     id:timePeriodForm-submit
-    user waits until page contains heading 2  Choose your filters
+    user waits until h2 is visible  Choose your filters
     user checks previous table tool step contains  3    Start date    2005
     user checks previous table tool step contains  3    End date      2020
 
@@ -173,7 +173,7 @@ Save data block
 Embed data block into release content
     [Tags]  HappyPath
     user clicks link  Manage content
-    user waits until page contains heading 2  ${PUBLICATION_NAME}
+    user waits until h2 is visible  ${PUBLICATION_NAME}
     user clicks button  Add new section
     user changes accordion section title  1   ${CONTENT_SECTION_NAME}
     user clicks button   Add data block
@@ -249,10 +249,10 @@ Navigate to Chart tab
     [Tags]  HappyPath
     user clicks link  Manage data blocks
     user selects from list by label  id:selectedDataBlock  ${DATABLOCK_NAME}
-    user waits until page contains heading 2  ${DATABLOCK_NAME}
+    user waits until h2 is visible  ${DATABLOCK_NAME}
     user waits until page does not contain loading spinner
     user clicks link   Chart
-    user waits until page contains heading 3  Choose chart type
+    user waits until h3 is visible  Choose chart type
 
 Configure basic line chart
     [Tags]  HappyPath
@@ -261,7 +261,7 @@ Configure basic line chart
     user enters text into element  id:chartConfigurationForm-alt        Test chart alt
 
     user clicks link  Data sets
-    user waits until page contains heading 3  Add data sets to the chart
+    user waits until h3 is visible  Add data sets to the chart
     user selects from list by label  id:chartDataSelectorForm-location  Nailsea Youngwood
     user clicks button  Add data
 
@@ -302,7 +302,7 @@ Save and validate line chart embeds correctly
     user waits until button is enabled  Save chart options
 
     user clicks link  Manage content
-    user waits until page contains heading 2  ${PUBLICATION_NAME}
+    user waits until h2 is visible  ${PUBLICATION_NAME}
     user opens accordion section  ${CONTENT_SECTION_NAME}
 
     ${datablock}=  set variable  css:[data-testid="Data block - ${DATABLOCK_NAME}"]
@@ -338,10 +338,10 @@ Configure basic vertical bar chart
     [Tags]  HappyPath
     user clicks link  Manage data blocks
     user selects from list by label  id:selectedDataBlock  ${DATABLOCK_NAME}
-    user waits until page contains heading 2  ${DATABLOCK_NAME}
+    user waits until h2 is visible  ${DATABLOCK_NAME}
     user waits until page does not contain loading spinner
     user clicks link  Chart
-    user waits until page contains heading 3  Choose chart type
+    user waits until h3 is visible  Choose chart type
     user clicks button  Vertical bar
 
 Validate basic vertical bar chart preview
@@ -383,7 +383,7 @@ Save and validate vertical bar chart embeds correctly
     user waits until button is enabled  Save chart options
 
     user clicks link  Manage content
-    user waits until page contains heading 2  ${PUBLICATION_NAME}
+    user waits until h2 is visible  ${PUBLICATION_NAME}
     user opens accordion section  ${CONTENT_SECTION_NAME}
 
     ${datablock}=  set variable  css:[data-testid="Data block - ${DATABLOCK_NAME}"]
@@ -420,10 +420,10 @@ Configure basic horizontal bar chart
     [Tags]  HappyPath
     user clicks link  Manage data blocks
     user selects from list by label  id:selectedDataBlock  ${DATABLOCK_NAME}
-    user waits until page contains heading 2  ${DATABLOCK_NAME}
+    user waits until h2 is visible  ${DATABLOCK_NAME}
     user waits until page does not contain loading spinner
     user clicks link  Chart
-    user waits until page contains heading 3  Choose chart type
+    user waits until h3 is visible  Choose chart type
     user clicks button  Horizontal bar
     # Make sure chart has updated
     sleep  0.3s
@@ -466,7 +466,7 @@ Save and validate horizontal bar chart embeds correctly
     user waits until button is enabled  Save chart options
 
     user clicks link  Manage content
-    user waits until page contains heading 2  ${PUBLICATION_NAME}
+    user waits until h2 is visible  ${PUBLICATION_NAME}
     user opens accordion section  ${CONTENT_SECTION_NAME}
 
     ${datablock}=  set variable  css:[data-testid="Data block - ${DATABLOCK_NAME}"]
@@ -502,10 +502,10 @@ Configure basic geographic chart
     [Tags]  HappyPath
     user clicks link  Manage data blocks
     user selects from list by label  id:selectedDataBlock  ${DATABLOCK_NAME}
-    user waits until page contains heading 2  ${DATABLOCK_NAME}
+    user waits until h2 is visible  ${DATABLOCK_NAME}
     user waits until page does not contain loading spinner
     user clicks link  Chart
-    user waits until page contains heading 3  Choose chart type
+    user waits until h3 is visible  Choose chart type
     user clicks button  Geographic
 
 Validate basic geographic chart preview
@@ -536,7 +536,7 @@ Save and validate geographic chart embeds correctly
     user waits until button is enabled  Save chart options
 
     user clicks link  Manage content
-    user waits until page contains heading 2  ${PUBLICATION_NAME}
+    user waits until h2 is visible  ${PUBLICATION_NAME}
     user opens accordion section  ${CONTENT_SECTION_NAME}
 
     ${datablock}=  set variable  css:[data-testid="Data block - ${DATABLOCK_NAME}"]
@@ -563,10 +563,10 @@ Configure basic infographic chart
     [Tags]  HappyPath
     user clicks link  Manage data blocks
     user selects from list by label  id:selectedDataBlock  ${DATABLOCK_NAME}
-    user waits until page contains heading 2  ${DATABLOCK_NAME}
+    user waits until h2 is visible  ${DATABLOCK_NAME}
     user waits until page does not contain loading spinner
     user clicks link  Chart
-    user waits until page contains heading 3  Choose chart type
+    user waits until h3 is visible  Choose chart type
     user clicks button  Choose an infographic as alternative
     user chooses file  id:chartConfigurationForm-file  ${CURDIR}${/}files${/}test-infographic.png
 
@@ -582,7 +582,7 @@ Save and validate infographic chart embeds correctly
     user waits until button is enabled  Save chart options
 
     user clicks link  Manage content
-    user waits until page contains heading 2  ${PUBLICATION_NAME}
+    user waits until h2 is visible  ${PUBLICATION_NAME}
     user opens accordion section  ${CONTENT_SECTION_NAME}
 
     ${datablock}=  set variable  css:[data-testid="Data block - ${DATABLOCK_NAME}"]
@@ -598,7 +598,7 @@ Delete chart from data block
     [Tags]  HappyPath
     user clicks link  Manage data blocks
     user selects from list by label  id:selectedDataBlock  ${DATABLOCK_NAME}
-    user waits until page contains heading 2  ${DATABLOCK_NAME}
+    user waits until h2 is visible  ${DATABLOCK_NAME}
     user waits until page does not contain loading spinner
     user clicks link  Chart
     user clicks button  Delete chart
@@ -610,4 +610,4 @@ Delete data block
     user clicks button  Delete this data block
     user waits until page does not contain loading spinner
     user clicks button  Confirm
-    user waits until page contains heading 2  Create new data block
+    user waits until h2 is visible  Create new data block

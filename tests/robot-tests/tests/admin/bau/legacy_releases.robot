@@ -14,11 +14,11 @@ ${PUBLICATION_NAME}  UI tests - legacy releases %{RUN_IDENTIFIER}
 user creates legacy release
     [Arguments]  ${description}  ${url}
     user clicks link  Create legacy release
-    user waits until page contains heading 1  Create legacy release
+    user waits until h1 is visible  Create legacy release
     user enters text into element  id:legacyReleaseForm-description  ${description}
     user enters text into element  id:legacyReleaseForm-url  ${url}
     user clicks button  Save legacy release
-    user waits until page contains heading 1  Legacy releases
+    user waits until h1 is visible  Legacy releases
 
 *** Test Cases ***
 Create new publication for topic
@@ -39,21 +39,21 @@ Go to legacy releases page
     [Tags]  HappyPath
     user opens accordion section  ${PUBLICATION_NAME}
     user clicks element  css:[data-testid="Legacy releases link for ${PUBLICATION_NAME}"]
-    user waits until page contains heading 1  Legacy releases
+    user waits until h1 is visible  Legacy releases
     user waits until element contains  css:[data-testid="page-title-caption"]  ${PUBLICATION_NAME}
     user checks page does not contain element  css:table
 
 Create legacy release
     [Tags]  HappyPath
     user clicks link  Create legacy release
-    user waits until page contains heading 1  Create legacy release
+    user waits until h1 is visible  Create legacy release
     user enters text into element  id:legacyReleaseForm-description  Test collection
     user enters text into element  id:legacyReleaseForm-url  http://test.com
     user clicks button  Save legacy release
 
 Validate created legacy release
     [Tags]  HappyPath
-    user waits until page contains heading 1  Legacy releases
+    user waits until h1 is visible  Legacy releases
     user checks element count is x  css:tbody tr  1
     user checks results table cell contains  1  1  1
     user checks results table cell contains  1  2  Test collection
@@ -62,7 +62,7 @@ Validate created legacy release
 Update legacy release
     [Tags]  HappyPath
     user clicks element  xpath://tr[1]//*[text()="Edit release"]
-    user waits until page contains heading 1  Edit legacy release
+    user waits until h1 is visible  Edit legacy release
     user enters text into element  id:legacyReleaseForm-description  Test collection 2
     user enters text into element  id:legacyReleaseForm-url  http://test-2.com
     user enters text into element  id:legacyReleaseForm-order  2
@@ -70,7 +70,7 @@ Update legacy release
 
 Validate updated legacy release
     [Tags]  HappyPath
-    user waits until page contains heading 1  Legacy releases
+    user waits until h1 is visible  Legacy releases
     user checks element count is x  css:tbody tr  1
     # Changing order to 2 should not actually change it to 2
     # as there isn't another release to swap the order with.

@@ -11,7 +11,7 @@ Navigate to /methodology page
     [Tags]  HappyPath
     environment variable should be set  PUBLIC_URL
     user goes to url   %{PUBLIC_URL}/methodology
-    user waits until page contains heading 1   Methodologies
+    user waits until h1 is visible   Methodologies
     user waits for page to finish loading
 
 Validate page contents

@@ -21,7 +21,7 @@ user checks topic is in correct position
 Go to 'Manage themes and topics'
     [Tags]  HappyPath
     user clicks link  manage themes and topics
-    user waits until page contains heading 1  Manage themes and topics
+    user waits until h1 is visible  Manage themes and topics
 
 Verify existing theme and topics
     [Tags]  HappyPath
@@ -38,14 +38,14 @@ Verify existing theme and topics
 Create theme
     [Tags]  HappyPath
     user clicks link    Create theme
-    user waits until page contains heading 1  Create theme
+    user waits until h1 is visible  Create theme
     user enters text into element  id:themeForm-title   ${THEME_NAME_CREATED}
     user enters text into element  id:themeForm-summary  Created summary
     user clicks button  Save theme
 
 Verify created theme
     [Tags]  HappyPath
-    user waits until page contains heading 1  Manage themes and topics
+    user waits until h1 is visible  Manage themes and topics
     user waits until page contains accordion section  ${THEME_NAME_CREATED}
     user checks testid element contains  Summary for ${THEME_NAME_CREATED}  Created summary
     user checks element is visible  xpath://*[@data-testid="Topics for ${THEME_NAME_CREATED}"]//*[text()="No topics for this theme"]
@@ -53,14 +53,14 @@ Verify created theme
 Edit theme
     [Tags]  HappyPath
     user clicks testid element  Edit link for ${THEME_NAME_CREATED}
-    user waits until page contains heading 1  Edit theme
+    user waits until h1 is visible  Edit theme
     user waits until page contains element   id:themeForm-title
     user checks input field contains  id:themeForm-title   ${THEME_NAME_CREATED}
     user checks input field contains  id:themeForm-summary   Created summary
     user enters text into element  id:themeForm-title   ${THEME_NAME}
     user enters text into element  id:themeForm-summary  Updated summary
     user clicks button  Save theme
-    user waits until page contains heading 1  Manage themes and topics
+    user waits until h1 is visible  Manage themes and topics
 
 Verify updated theme
     [Tags]  HappyPath
@@ -72,13 +72,13 @@ Create topic
     [Tags]  HappyPath
     user clicks testid element  Create topic link for ${THEME_NAME}
     user waits until page contains title caption  ${THEME_NAME}
-    user waits until page contains heading 1  Create topic
+    user waits until h1 is visible  Create topic
     user enters text into element  id:topicForm-title   ${TOPIC_NAME_CREATED}
     user clicks button  Save topic
 
 Verify created topic
     [Tags]  HappyPath
-    user waits until page contains heading 1  Manage themes and topics
+    user waits until h1 is visible  Manage themes and topics
     user waits until page contains accordion section  ${THEME_NAME}
     user checks topic is in correct position  ${THEME_NAME}  1  ${TOPIC_NAME_CREATED}
 
@@ -86,7 +86,7 @@ Edit topic
     [Tags]  HappyPath
     user clicks testid element  Edit ${TOPIC_NAME_CREATED} topic link for ${THEME_NAME}
     user waits until page contains title caption  ${THEME_NAME}
-    user waits until page contains heading 1  Edit topic
+    user waits until h1 is visible  Edit topic
     user waits until page contains element   id:topicForm-title
     user checks input field contains  id:topicForm-title   ${TOPIC_NAME_CREATED}
     user enters text into element  id:topicForm-title   ${TOPIC_NAME}
@@ -94,7 +94,7 @@ Edit topic
 
 Verify updated topic
     [Tags]  HappyPath
-    user waits until page contains heading 1  Manage themes and topics
+    user waits until h1 is visible  Manage themes and topics
     user waits until page contains accordion section  ${THEME_NAME}
     user checks topic is in correct position  ${THEME_NAME}  1  ${TOPIC_NAME}
 

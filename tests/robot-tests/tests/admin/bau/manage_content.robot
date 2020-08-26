@@ -35,8 +35,8 @@ Create release
 Navigate to Manage content tab
     [Tags]  HappyPath
     user clicks link   Manage content
-    user waits until page contains heading 1  ${PUBLICATION_NAME}
-    user waits until page contains heading 2  ${PUBLICATION_NAME}
+    user waits until h1 is visible  ${PUBLICATION_NAME}
+    user waits until h2 is visible  ${PUBLICATION_NAME}
 
 Add summary content to release
     [Tags]  HappyPath
