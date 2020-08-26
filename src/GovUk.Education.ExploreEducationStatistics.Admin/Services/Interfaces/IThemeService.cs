@@ -1,7 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Threading.Tasks;
-using GovUk.Education.ExploreEducationStatistics.Admin.Controllers.Api;
 using GovUk.Education.ExploreEducationStatistics.Admin.ViewModels;
 using GovUk.Education.ExploreEducationStatistics.Common.Model;
 using GovUk.Education.ExploreEducationStatistics.Content.Model;
@@ -11,12 +10,14 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Services.Interfaces
 {
     public interface IThemeService
     {
-        Task<Either<ActionResult, ThemeViewModel>> CreateTheme(CreateThemeRequest request);
+        Task<Either<ActionResult, ThemeViewModel>> CreateTheme(SaveThemeViewModel createdTheme);
 
-        Task<Either<ActionResult, ThemeViewModel>> Get(Guid id);
+        Task<Either<ActionResult, ThemeViewModel>> UpdateTheme(Guid id, SaveThemeViewModel updatedTheme);
 
-        Task<Either<ActionResult, List<Theme>>> GetMyThemes();
+        Task<Either<ActionResult, ThemeViewModel>> GetTheme(Guid id);
 
-        Task<Either<ActionResult, TitleAndIdViewModel>> GetSummary(Guid id);
+        Task<Either<ActionResult, List<ThemeViewModel>>> GetThemes();
+
+        Task<Either<ActionResult, Unit>> DeleteTheme(Guid themeId);
     }
 }

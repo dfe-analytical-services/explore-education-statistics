@@ -14,8 +14,6 @@ import { AdminDashboardPublication } from '@admin/services/dashboardService';
 import releaseService, { Release } from '@admin/services/releaseService';
 import ButtonGroup from '@common/components/ButtonGroup';
 import ModalConfirm from '@common/components/ModalConfirm';
-import SummaryList from '@common/components/SummaryList';
-import SummaryListItem from '@common/components/SummaryListItem';
 import React, { useState } from 'react';
 import { generatePath, useHistory } from 'react-router';
 import CancelAmendmentModal from './CancelAmendmentModal';
@@ -52,149 +50,177 @@ const PublicationSummary = ({ publication, onChangePublication }: Props) => {
 
   return (
     <>
-      <SummaryList>
-        <SummaryListItem
-          term="Team"
-          actions={
-            permissions.canUpdatePublication && (
-              <Link
-                data-testid={`Edit publication link for ${publication.title}`}
-                unvisited
-                to={generatePath<PublicationRouteParams>(
-                  publicationEditRoute.path,
-                  {
-                    publicationId: publication.id,
-                  },
-                )}
+      <table>
+        <tbody>
+          <tr>
+            <th className="govuk-!-width-one-quarter">Team</th>
+            <td className="govuk-!-width-one-half">
+              <p
+                className="govuk-!-margin-bottom-1"
+                data-testid={`Team name for ${publication.title}`}
               >
-                Change <span className="govuk-visually-hidden">team</span>
-              </Link>
-            )
-          }
-        >
-          <p>{contact?.teamName || 'No team name'}</p>
+                {contact?.teamName || 'No team name'}
+              </p>
 
-          {contact?.teamEmail && (
-            <p>
-              <a href={`mailto:${contact.teamEmail}`}>{contact.teamEmail}</a>
-            </p>
-          )}
-        </SummaryListItem>
-        <SummaryListItem
-          term="Contact"
-          actions={
-            permissions.canUpdatePublication && (
-              <Link
-                data-testid={`Edit publication link for ${publication.title}`}
-                unvisited
-                to={generatePath<PublicationRouteParams>(
-                  publicationEditRoute.path,
-                  {
-                    publicationId: publication.id,
-                  },
-                )}
-              >
-                Change <span className="govuk-visually-hidden">contact</span>
-              </Link>
-            )
-          }
-        >
-          <p>{contact?.contactName || 'No contact name'}</p>
-
-          {contact?.contactTelNo && (
-            <p>
-              <a href={`tel:${contact.contactTelNo}`}>{contact.contactTelNo}</a>
-            </p>
-          )}
-        </SummaryListItem>
-        <SummaryListItem
-          term="Methodology"
-          actions={
-            permissions.canUpdatePublication && (
-              <Link
-                data-testid={`Edit publication link for ${publication.title}`}
-                unvisited
-                to={generatePath<PublicationRouteParams>(
-                  publicationEditRoute.path,
-                  {
-                    publicationId: publication.id,
-                  },
-                )}
-              >
-                Change{' '}
-                <span className="govuk-visually-hidden">methodology</span>
-              </Link>
-            )
-          }
-        >
-          {methodology ? (
-            <Link to={`/methodologies/${methodology.id}`}>
-              {methodology.title}
-            </Link>
-          ) : (
-            <>
-              {externalMethodology?.url ? (
-                <>
-                  {externalMethodology.title} (
+              {contact?.teamEmail && (
+                <p className="govuk-!-margin-bottom-0">
                   <a
-                    href={externalMethodology.url}
-                    target="_blank"
-                    rel="noopener noreferrer"
+                    href={`mailto:${contact.teamEmail}`}
+                    data-testid={`Team email for ${publication.title}`}
                   >
-                    {externalMethodology.url}
+                    {contact.teamEmail}
                   </a>
-                  )
-                </>
-              ) : (
-                'No methodology assigned'
+                </p>
               )}
-            </>
-          )}
-        </SummaryListItem>
-        <SummaryListItem
-          term="Releases"
-          actions={permissions.canUpdatePublication && <></>}
-        >
-          <ul className="govuk-list">
-            {releases.filter(noAmendmentInProgressFilter).map(release => (
-              <li key={release.id}>
-                <NonScheduledReleaseSummary
-                  onClickAmendRelease={
-                    showAmendmentButton() ? setAmendReleaseId : undefined
-                  }
-                  onClickCancelAmendment={setCancelAmendmentReleaseId}
-                  release={release}
-                />
-              </li>
-            ))}
-            {releases.length < 1 && <>No releases created</>}
-          </ul>
+            </td>
+            <td className="dfe-align--right govuk-!-width-one-quarter">
+              {permissions.canUpdatePublication && (
+                <Link
+                  data-testid={`Edit publication link for ${publication.title}`}
+                  unvisited
+                  to={generatePath<PublicationRouteParams>(
+                    publicationEditRoute.path,
+                    {
+                      publicationId: publication.id,
+                    },
+                  )}
+                >
+                  Change <span className="govuk-visually-hidden">team</span>
+                </Link>
+              )}
+            </td>
+          </tr>
+          <tr>
+            <th>Contact</th>
+            <td>
+              <p
+                className="govuk-!-margin-bottom-1"
+                data-testid={`Contact name for ${publication.title}`}
+              >
+                {contact?.contactName || 'No contact name'}
+              </p>
 
-          <ButtonGroup className="govuk-!-margin-bottom-2">
-            {permissions.canCreateReleases && (
-              <ButtonLink
-                to={generatePath(releaseCreateRoute.path, {
-                  publicationId: id,
-                })}
-                testId={`Create new release link for ${title}`}
-              >
-                Create new release
-              </ButtonLink>
-            )}
-            {permissions.canUpdatePublication && (
-              <ButtonLink
-                to={generatePath(legacyReleasesRoute.path, {
-                  publicationId: id,
-                })}
-                variant="secondary"
-                testId={`Legacy releases link for ${title}`}
-              >
-                Manage legacy releases
-              </ButtonLink>
-            )}
-          </ButtonGroup>
-        </SummaryListItem>
-      </SummaryList>
+              {contact?.contactTelNo && (
+                <p className="govuk-!-margin-bottom-0">
+                  <a
+                    href={`tel:${contact.contactTelNo}`}
+                    data-testid={`Contact phone number for ${publication.title}`}
+                  >
+                    {contact.contactTelNo}
+                  </a>
+                </p>
+              )}
+            </td>
+            <td className="dfe-align--right">
+              {permissions.canUpdatePublication && (
+                <Link
+                  data-testid={`Edit publication link for ${publication.title}`}
+                  unvisited
+                  to={generatePath<PublicationRouteParams>(
+                    publicationEditRoute.path,
+                    {
+                      publicationId: publication.id,
+                    },
+                  )}
+                >
+                  Change <span className="govuk-visually-hidden">contact</span>
+                </Link>
+              )}
+            </td>
+          </tr>
+          <tr>
+            <th>Methodology</th>
+            <td data-testid={`Methodology for ${publication.title}`}>
+              {methodology ? (
+                <Link to={`/methodologies/${methodology.id}`}>
+                  {methodology.title}
+                </Link>
+              ) : (
+                <>
+                  {externalMethodology?.url ? (
+                    <>
+                      {externalMethodology.title} (
+                      <a
+                        href={externalMethodology.url}
+                        target="_blank"
+                        rel="noopener noreferrer"
+                      >
+                        {externalMethodology.url}
+                      </a>
+                      )
+                    </>
+                  ) : (
+                    'No methodology assigned'
+                  )}
+                </>
+              )}
+            </td>
+            <td className="dfe-align--right">
+              {permissions.canUpdatePublication && (
+                <Link
+                  data-testid={`Edit publication link for ${publication.title}`}
+                  unvisited
+                  to={generatePath<PublicationRouteParams>(
+                    publicationEditRoute.path,
+                    {
+                      publicationId: publication.id,
+                    },
+                  )}
+                >
+                  Change{' '}
+                  <span className="govuk-visually-hidden">methodology</span>
+                </Link>
+              )}
+            </td>
+          </tr>
+          <tr>
+            <th>Releases</th>
+            <td colSpan={2} data-testid={`Releases for ${publication.title}`}>
+              {releases.length > 0 ? (
+                <ul className="govuk-list">
+                  {releases.filter(noAmendmentInProgressFilter).map(release => (
+                    <li key={release.id}>
+                      <NonScheduledReleaseSummary
+                        onClickAmendRelease={
+                          showAmendmentButton() ? setAmendReleaseId : undefined
+                        }
+                        onClickCancelAmendment={setCancelAmendmentReleaseId}
+                        release={release}
+                      />
+                    </li>
+                  ))}
+                </ul>
+              ) : (
+                <p>No releases created</p>
+              )}
+
+              <ButtonGroup className="govuk-!-margin-bottom-2">
+                {permissions.canCreateReleases && (
+                  <ButtonLink
+                    to={generatePath(releaseCreateRoute.path, {
+                      publicationId: id,
+                    })}
+                    data-testid={`Create new release link for ${title}`}
+                  >
+                    Create new release
+                  </ButtonLink>
+                )}
+                {permissions.canUpdatePublication && (
+                  <ButtonLink
+                    to={generatePath(legacyReleasesRoute.path, {
+                      publicationId: id,
+                    })}
+                    variant="secondary"
+                    data-testid={`Legacy releases link for ${title}`}
+                  >
+                    Manage legacy releases
+                  </ButtonLink>
+                )}
+              </ButtonGroup>
+            </td>
+          </tr>
+        </tbody>
+      </table>
 
       {amendReleaseId && (
         <ModalConfirm

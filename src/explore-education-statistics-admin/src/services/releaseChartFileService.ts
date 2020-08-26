@@ -2,6 +2,7 @@ import client from '@admin/services/utils/service';
 import { FileInfo } from './types/file';
 
 export interface ChartFile {
+  id: string;
   title: string;
   filename: string;
   fileSize: {
@@ -18,6 +19,7 @@ function mapFile(file: FileInfo): ChartFile {
   const [size, unit] = file.size.split(' ');
 
   return {
+    id: file.id,
     title: file.name,
     filename: file.fileName,
     fileSize: {
@@ -28,14 +30,6 @@ function mapFile(file: FileInfo): ChartFile {
 }
 
 const releaseChartFileService = {
-  async getChartFiles(releaseId: string): Promise<ChartFile[]> {
-    const response = await client.get<FileInfo[]>(
-      `/release/${releaseId}/chart`,
-    );
-
-    return response.map(mapFile);
-  },
-
   async uploadChartFile(
     releaseId: string,
     request: UploadChartFileRequest,
@@ -51,18 +45,12 @@ const releaseChartFileService = {
     return mapFile(file);
   },
 
-  async deleteChartFile(
-    releaseId: string,
-    subjectName: string,
-    fileName: string,
-  ): Promise<void> {
-    return client.delete<void>(
-      `/release/${releaseId}/chart/${subjectName}/${fileName}`,
-    );
+  async deleteChartFile(releaseId: string, id: string): Promise<void> {
+    return client.delete<void>(`/release/${releaseId}/chart/${id}`);
   },
 
-  getChartFile(releaseId: string, fileName: string): Promise<Blob> {
-    return client.get<Blob>(`/release/${releaseId}/chart/${fileName}`, {
+  getChartFile(releaseId: string, id: string): Promise<Blob> {
+    return client.get<Blob>(`/release/${releaseId}/chart/${id}`, {
       responseType: 'blob',
     });
   },

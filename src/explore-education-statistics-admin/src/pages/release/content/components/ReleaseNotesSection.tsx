@@ -208,49 +208,54 @@ const ReleaseNotesSection = ({ release }: Props) => {
       <>
         <dl className="dfe-meta-content">
           <dt className="govuk-caption-m">Last updated: </dt>
-          <dd data-testid="last-updated">
+          <dd id="releaseLastUpdated">
             <strong>
               <FormattedDate>{releaseNotes[0]?.on}</FormattedDate>
             </strong>
-            <Details summary={`See all ${releaseNotes.length} updates`}>
-              {releaseNotes.map((elem, index) => (
-                <React.Fragment key={elem.id}>
-                  {isEditing &&
-                  editFormOpen &&
-                  selectedReleaseNote.id === elem.id ? (
-                    renderEditForm()
-                  ) : (
-                    <div data-testid="last-updated-element" key={elem.id}>
-                      <FormattedDate className="govuk-body govuk-!-font-weight-bold">
-                        {elem.on}
-                      </FormattedDate>
-                      <p>{elem.reason}</p>
+            <Details
+              summary={`See all ${releaseNotes.length} updates`}
+              id="releaseNotes"
+            >
+              <ol className="govuk-list">
+                {releaseNotes.map(elem => (
+                  <li key={elem.id}>
+                    {isEditing &&
+                    editFormOpen &&
+                    selectedReleaseNote.id === elem.id ? (
+                      renderEditForm()
+                    ) : (
+                      <>
+                        <FormattedDate className="govuk-body govuk-!-font-weight-bold">
+                          {elem.on}
+                        </FormattedDate>
+                        <p>{elem.reason}</p>
 
-                      {isEditing && (
-                        <ButtonGroup>
-                          <Button
-                            variant="secondary"
-                            onClick={() => openEditForm(elem)}
-                          >
-                            Edit
-                          </Button>
-                          <Button
-                            variant="warning"
-                            onClick={() => setDeletedReleaseNote(elem)}
-                          >
-                            Remove
-                          </Button>
-                        </ButtonGroup>
-                      )}
-                    </div>
-                  )}
-                  {index < releaseNotes.length - 1 && <hr />}
-                </React.Fragment>
-              ))}
+                        {isEditing && (
+                          <ButtonGroup>
+                            <Button
+                              variant="secondary"
+                              onClick={() => openEditForm(elem)}
+                            >
+                              Edit
+                            </Button>
+                            <Button
+                              variant="warning"
+                              onClick={() => setDeletedReleaseNote(elem)}
+                            >
+                              Remove
+                            </Button>
+                          </ButtonGroup>
+                        )}
+                      </>
+                    )}
+                  </li>
+                ))}
+              </ol>
             </Details>
           </dd>
           {isEditing && renderAddForm()}
         </dl>
+
         <ModalConfirm
           mounted={deletedReleaseNote.id.length > 0}
           title="Confirm deletion of release note"

@@ -12,7 +12,7 @@ using GovUk.Education.ExploreEducationStatistics.Common.Model;
 using GovUk.Education.ExploreEducationStatistics.Content.Model;
 using PublicationViewModel = GovUk.Education.ExploreEducationStatistics.Admin.ViewModels.PublicationViewModel;
 using ReleaseStatus = GovUk.Education.ExploreEducationStatistics.Publisher.Model.ReleaseStatus;
-using ReleaseViewModel = GovUk.Education.ExploreEducationStatistics.Admin.Models.Api.ReleaseViewModel;
+using ReleaseViewModel = GovUk.Education.ExploreEducationStatistics.Admin.ViewModels.ReleaseViewModel;
 
 namespace GovUk.Education.ExploreEducationStatistics.Admin.Mappings
 {
@@ -36,7 +36,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Mappings
                 .ForMember(model => model.PublishScheduled,
                     m => m.MapFrom(model =>
                         model.PublishScheduled.HasValue
-                            ? model.PublishScheduled.Value.ConvertTimeFromUtcToGmt()
+                            ? model.PublishScheduled.Value.ConvertUtcToUkTimeZone()
                             : (DateTime?) null));
 
             CreateMap<Release, MyReleaseViewModel>()
@@ -52,7 +52,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Mappings
                 .ForMember(model => model.PublishScheduled,
                     m => m.MapFrom(model =>
                         model.PublishScheduled.HasValue
-                            ? model.PublishScheduled.Value.ConvertTimeFromUtcToGmt()
+                            ? model.PublishScheduled.Value.ConvertUtcToUkTimeZone()
                             : (DateTime?) null))
                 .ForMember(dest => dest.Permissions, exp => exp.MapFrom<IMyReleasePermissionSetPropertyResolver>());
 
@@ -60,7 +60,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Mappings
                 .ForMember(model => model.PublishScheduled,
                     m => m.MapFrom(model =>
                         model.PublishScheduled.HasValue
-                            ? model.PublishScheduled.Value.ConvertTimeFromUtcToGmt()
+                            ? model.PublishScheduled.Value.ConvertUtcToUkTimeZone()
                             : (DateTime?) null));
 
             CreateMap<CreateReleaseViewModel, Release>()
@@ -104,7 +104,8 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Mappings
             CreateMap<CreateDataBlockViewModel, DataBlock>();
             CreateMap<UpdateDataBlockViewModel, DataBlock>();
 
-            CreateMap<Theme, ViewModels.ThemeViewModel>();
+            CreateMap<Theme, ThemeViewModel>()
+                .ForMember(theme => theme.Topics, m => m.MapFrom(t => t.Topics.OrderBy(topic => topic.Title)));
             CreateMap<Topic, TopicViewModel>();
 
             CreateMap<ContentSection, ContentSectionViewModel>().ForMember(dest => dest.Content,
@@ -177,7 +178,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Mappings
                 .ForMember(model => model.PublishScheduled,
                     m => m.MapFrom(model =>
                         model.PublishScheduled.HasValue
-                            ? model.PublishScheduled.Value.ConvertTimeFromUtcToGmt()
+                            ? model.PublishScheduled.Value.ConvertUtcToUkTimeZone()
                             : (DateTime?) null));
 
             CreateMap<Update, ReleaseNoteViewModel>();

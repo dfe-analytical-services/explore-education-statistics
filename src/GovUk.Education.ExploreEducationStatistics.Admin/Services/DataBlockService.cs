@@ -13,7 +13,6 @@ using GovUk.Education.ExploreEducationStatistics.Common.Utils;
 using GovUk.Education.ExploreEducationStatistics.Content.Model;
 using GovUk.Education.ExploreEducationStatistics.Content.Model.Database;
 using GovUk.Education.ExploreEducationStatistics.Data.Model;
-using GovUk.Education.ExploreEducationStatistics.Data.Model.Services.Interfaces;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
 using Newtonsoft.Json;
@@ -28,21 +27,18 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Services
         private readonly IPersistenceHelper<ContentDbContext> _persistenceHelper;
         private readonly IUserService _userService;
         private readonly IReleaseFilesService _releaseFilesService;
-        private readonly ISubjectService _subjectService;
 
         public DataBlockService(
             ContentDbContext context,
-            IMapper mapper, IPersistenceHelper<ContentDbContext> persistenceHelper, 
+            IMapper mapper, IPersistenceHelper<ContentDbContext> persistenceHelper,
             IUserService userService,
-            IReleaseFilesService releaseFilesService,
-            ISubjectService subjectService)
+            IReleaseFilesService releaseFilesService)
         {
             _context = context;
             _mapper = mapper;
             _persistenceHelper = persistenceHelper;
             _userService = userService;
             _releaseFilesService = releaseFilesService;
-            _subjectService = subjectService;
         }
 
         public async Task<Either<ActionResult, DataBlockViewModel>> CreateAsync(Guid releaseId, CreateDataBlockViewModel createDataBlock)
@@ -53,12 +49,12 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Services
                 .OnSuccess(async release =>
                 {
                     var dataBlock = _mapper.Map<DataBlock>(createDataBlock);
-                    
+
                     var added = (await _context.DataBlocks.AddAsync(dataBlock)).Entity;
 
                     release.AddContentBlock(added);
                     _context.Releases.Update(release);
-            
+
                     await _context.SaveChangesAsync();
 
                     return await GetAsync(added.Id);
@@ -77,7 +73,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Services
                     return true;
                 }));
         }
-        
+
         public async Task<Either<ActionResult, bool>> DeleteDataBlocks(DeleteDataBlockPlan deletePlan)
         {
             await DeleteDependentDataBlocks(deletePlan);
@@ -85,14 +81,12 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Services
             return true;
         }
 
-        public async Task<Either<ActionResult, bool>> RemoveChartFile(Guid releaseId, string subjectName,
-            string fileName)
+        public async Task<Either<ActionResult, bool>> RemoveChartFile(Guid releaseId, Guid id)
         {
-            return await RemoveInfographicChartFromDataBlock(releaseId, subjectName, fileName)
-                .OnSuccessDo(() =>
-                    _releaseFilesService.DeleteNonDataFileAsync(releaseId, ReleaseFileTypes.Chart, fileName));
+            return await RemoveInfographicChartFromDataBlock(releaseId, id)
+                .OnSuccess(async () => await _releaseFilesService.DeleteChartFileAsync(releaseId, id));
         }
-        
+
         public async Task<DataBlockViewModel> GetAsync(Guid id)
         {
             var dataBlock = await _context.DataBlocks.FirstOrDefaultAsync(block => block.Id.Equals(id));
@@ -123,21 +117,21 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Services
                     // TODO EES-753 Alter this when multiple charts are supported
                     var infographicChart = existing.Charts.OfType<InfographicChart>().FirstOrDefault();
                     var updatedInfographicChart = updateDataBlock.Charts.OfType<InfographicChart>().FirstOrDefault();
-                    
+
                     if (infographicChart != null && infographicChart.FileId != updatedInfographicChart?.FileId)
                     {
-                        // TODO EES-960 While this problem exists this could be deleting a file which is used elsewhere causing an error
                         var release = GetReleaseForDataBlock(existing.Id);
-                        await _releaseFilesService.DeleteNonDataFileAsync(
-                            release.Id, 
-                            ReleaseFileTypes.Chart,
-                            infographicChart.FileId
+                        await _releaseFilesService.DeleteChartFileAsync(
+                            release.Id,
+                            new Guid(infographicChart.FileId)
                         );
                     }
 
-                    _context.DataBlocks.Update(existing);
                     _mapper.Map(updateDataBlock, existing);
+
+                    _context.DataBlocks.Update(existing);
                     await _context.SaveChangesAsync();
+
                     return await GetAsync(id);
                 });
         }
@@ -148,42 +142,57 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Services
                 .CheckEntityExists<DataBlock>(id)
                 .OnSuccess(CheckCanUpdateReleaseForDataBlock)
                 .OnSuccess(block => GetDataBlock(releaseId, block.Id))
-                .OnSuccess(block => new DeleteDataBlockPlan
+                .OnSuccess(async block => new DeleteDataBlockPlan
                 {
                     ReleaseId = releaseId,
                     DependentDataBlocks = new List<DependentDataBlock>()
                     {
-                        CreateDependentDataBlock(block)
+                        await CreateDependentDataBlock(block)
                     }
                 });
         }
-        
-        public DeleteDataBlockPlan GetDeleteDataBlockPlan(Guid releaseId, Subject subject)
+
+        public async Task<DeleteDataBlockPlan> GetDeleteDataBlockPlan(Guid releaseId, Subject subject)
         {
+            var blocks = (subject == null ? new List<DataBlock>() : GetDataBlocks(releaseId, subject.Id));
+            var dependentBlocks = new List<DependentDataBlock>();
+            foreach (var block in blocks)
+            {
+                dependentBlocks.Add(await CreateDependentDataBlock(block));
+            }
+
             return new DeleteDataBlockPlan()
             {
                 ReleaseId = releaseId,
-                DependentDataBlocks =
-                    (subject == null ? new List<DataBlock>() : GetDataBlocks(releaseId, subject.Id)).Select(
-                        CreateDependentDataBlock).ToList()
+                DependentDataBlocks = dependentBlocks
             };
         }
 
-        private DependentDataBlock CreateDependentDataBlock(DataBlock block)
+        private async Task<DependentDataBlock> CreateDependentDataBlock(DataBlock block)
         {
+            var fileIds = block
+                .Charts
+                .OfType<InfographicChart>()
+                .Select(chart => new Guid(chart.FileId))
+                .ToList();
+
+            var releaseFileReferences = await _context.ReleaseFileReferences
+                .Where(rfr => fileIds.Contains(rfr.Id))
+                .ToListAsync();
+
             return new DependentDataBlock
             {
                 Id = block.Id,
                 Name = block.Name,
                 ContentSectionHeading = GetContentSectionHeading(block),
-                InfographicFilenames = block
-                    .Charts
-                    .OfType<InfographicChart>()
-                    .Select(chart => chart.FileId)
-                    .ToList(),
+                InfographicFilesInfo = releaseFileReferences.Select(rfr => new InfographicFileInfo
+                {
+                    Id = rfr.Id,
+                    Filename = rfr.Filename
+                }).ToList()
             };
         }
-        
+
         private string GetContentSectionHeading(DataBlock block)
         {
             var section = block.ContentSection;
@@ -203,15 +212,10 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Services
                 default: return block.ContentSection.Type.ToString();
             }
         }
-        
-        private async Task<Either<ActionResult, bool>> RemoveInfographicChartFromDataBlock(Guid releaseId,
-            string subjectName, string fileName)
+
+        private async Task<Either<ActionResult, bool>> RemoveInfographicChartFromDataBlock(Guid releaseId, Guid id)
         {
-            // TODO EES-960 - Using Subject here doesn't find datablocks in the same Release but for a different Subject
-            // that include the same infographic file.
-            // They are left untouched but the file is eventually removed causing an error.
-            var subject = await _subjectService.GetAsync(releaseId, subjectName);
-            var blocks = GetDataBlocks(releaseId, subject.Id);
+            var blocks = GetDataBlocks(releaseId);
 
             foreach (var block in blocks)
             {
@@ -220,15 +224,11 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Services
                     .OfType<InfographicChart>()
                     .FirstOrDefault();
 
-                // TODO EES-960 - This isn't guaranteed to delete the requested infographic causing an error
-                // It could be the same filename but in a different datablock that uses the same subject
-                if (infoGraphicChart != null && infoGraphicChart.FileId == fileName)
+                if (infoGraphicChart != null && infoGraphicChart.FileId == id.ToString())
                 {
                     block.Charts.Remove(infoGraphicChart);
                     _context.DataBlocks.Update(block);
                     await _context.SaveChangesAsync();
-                    // TODO EES-960 - Returning here leaves infographic files of the same filename on other datablocks
-                    // The file is eventually deleted from Storage causing an error.
                     return true;
                 }
             }
@@ -237,10 +237,10 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Services
 
         private async Task RemoveChartFileReleaseLinks(DeleteDataBlockPlan deletePlan)
         {
-            var chartFilenames = deletePlan.DependentDataBlocks.SelectMany(block => block.InfographicFilenames);
+            var chartFileIds = deletePlan.DependentDataBlocks.SelectMany(
+                block => block.InfographicFilesInfo.Select((f => f.Id)));
 
-            await _releaseFilesService.DeleteNonDataFilesAsync(deletePlan.ReleaseId, ReleaseFileTypes.Chart,
-                chartFilenames);
+            await _releaseFilesService.DeleteChartFilesAsync(deletePlan.ReleaseId, chartFileIds);
         }
 
         private async Task DeleteDependentDataBlocks(DeleteDataBlockPlan deletePlan)
@@ -248,16 +248,16 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Services
             var blockIdsToDelete = deletePlan
                 .DependentDataBlocks
                 .Select(block => block.Id);
-            
+
             var dependentDataBlocks = _context
                 .DataBlocks
                 .Where(block => blockIdsToDelete.Contains(block.Id));
-            
+
             _context.ContentBlocks.RemoveRange(dependentDataBlocks);
             await _context.SaveChangesAsync();
         }
 
-        private List<DataBlock> GetDataBlocks(Guid releaseId, Guid subjectId)
+        private List<DataBlock> GetDataBlocks(Guid releaseId, Guid? subjectId = null)
         {
             return _context
                 .ReleaseContentBlocks
@@ -267,10 +267,10 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Services
                 .ToList()
                 .Select(join => join.ContentBlock)
                 .OfType<DataBlock>()
-                .Where(block => block.Query.SubjectId == subjectId)
+                .Where(block => subjectId == null || block.Query.SubjectId == subjectId)
                 .ToList();
         }
-        
+
         private DataBlock GetDataBlock(Guid releaseId, Guid id)
         {
             return _context
@@ -301,24 +301,26 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Services
                 .OnSuccess(_ => dataBlock);
         }
     }
-    
+
     public class DependentDataBlock
     {
         [JsonIgnore]
         public Guid Id { get; set; }
-        
         public string Name { get; set; }
-        
         public string? ContentSectionHeading { get; set; }
-        
-        public List<string> InfographicFilenames { get; set; }
+        public List<InfographicFileInfo> InfographicFilesInfo { get; set; }
     }
-    
+
+    public class InfographicFileInfo
+    {
+        public Guid Id { get; set; }
+        public string Filename { get; set; }
+    }
+
     public class DeleteDataBlockPlan
     {
         [JsonIgnore]
         public Guid ReleaseId { get; set; }
-        
         public List<DependentDataBlock> DependentDataBlocks { get; set; }
     }
 }

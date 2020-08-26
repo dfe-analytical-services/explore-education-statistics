@@ -327,19 +327,11 @@ describe('PublicationForm', () => {
       screen.getByLabelText('Pupil absence in schools in England'),
     );
 
-    expect(container.querySelectorAll('details[open]')).toHaveLength(2);
+    const details = container.querySelectorAll('details[open]');
 
-    const details1 = screen.getByTestId(
-      'publicationForm-theme-ee1855ca-d1e1-4f04-a795-cbd61d326a1f',
-    );
-    expect(details1).toHaveAttribute('open');
-    expect(details1).toHaveTextContent('Pupils and schools');
-
-    const details2 = screen.getByTestId(
-      'publicationForm-topic-67c249de-1cca-446e-8ccb-dcdac542f460',
-    );
-    expect(details2).toHaveAttribute('open');
-    expect(details2).toHaveTextContent('Pupil absence');
+    expect(details).toHaveLength(2);
+    expect(details[0]).toHaveTextContent('Pupils and schools');
+    expect(details[1]).toHaveTextContent('Pupil absence');
   });
 
   test('renders read-only view with initial `publicationId` when step is not active', () => {

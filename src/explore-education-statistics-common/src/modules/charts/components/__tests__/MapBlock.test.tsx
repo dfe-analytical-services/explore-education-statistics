@@ -14,6 +14,7 @@ describe('MapBlock', () => {
   const fullTable = mapFullTable(testMapTableData);
   const props: MapBlockProps = {
     ...testMapConfiguration,
+    id: 'testMap',
     axes: testMapConfiguration.axes as MapBlockProps['axes'],
     meta: fullTable.subjectMeta,
     data: fullTable.results,
@@ -38,7 +39,7 @@ describe('MapBlock', () => {
     expect(paths[2]).toHaveAttribute('fill', '#86bcff');
     expect(paths[3]).toHaveAttribute('fill', '#1c2742');
 
-    const legendItems = getAllByTestId('mapLegendItem');
+    const legendItems = getAllByTestId('mapBlock-legend-item');
 
     expect(legendItems[0]).toHaveTextContent('3% to 3.03%');
     expect(legendItems[1]).toHaveTextContent('3.03% to 3.05%');
@@ -46,7 +47,7 @@ describe('MapBlock', () => {
     expect(legendItems[3]).toHaveTextContent('3.08% to 3.1%');
     expect(legendItems[4]).toHaveTextContent('3.1% to 3.13%');
 
-    const legendColours = getAllByTestId('mapLegendItem-colour');
+    const legendColours = getAllByTestId('mapBlock-legend-colour');
 
     expect(legendColours[0].style.backgroundColor).toBe('rgb(134, 188, 255)');
     expect(legendColours[1].style.backgroundColor).toBe('rgb(108, 150, 251)');
@@ -120,7 +121,7 @@ describe('MapBlock', () => {
     expect(paths[2]).toHaveAttribute('fill', '#ffff98');
     expect(paths[3]).toHaveAttribute('fill', '#624120');
 
-    const legendItems = getAllByTestId('mapLegendItem');
+    const legendItems = getAllByTestId('mapBlock-legend-item');
 
     expect(legendItems[0]).toHaveTextContent('4.6% to 4.73%');
     expect(legendItems[1]).toHaveTextContent('4.73% to 4.85%');
@@ -128,7 +129,7 @@ describe('MapBlock', () => {
     expect(legendItems[3]).toHaveTextContent('4.98% to 5.1%');
     expect(legendItems[4]).toHaveTextContent('5.1% to 5.23%');
 
-    const legendColours = getAllByTestId('mapLegendItem-colour');
+    const legendColours = getAllByTestId('mapBlock-legend-colour');
 
     expect(legendColours[0].style.backgroundColor).toBe('rgb(255, 255, 152)');
     expect(legendColours[1].style.backgroundColor).toBe('rgb(255, 250, 122)');
@@ -180,25 +181,25 @@ describe('MapBlock', () => {
       },
     });
 
-    const tiles = getAllByTestId('mapBlock-indicator');
+    const indicators = getAllByTestId('mapBlock-indicator');
 
-    expect(tiles).toHaveLength(2);
+    expect(indicators).toHaveLength(2);
 
-    const tile1 = within(tiles[0]);
+    const tile1 = within(indicators[0]);
 
-    expect(tile1.getByTestId('mapBlock-indicator-title')).toHaveTextContent(
+    expect(tile1.getByTestId('mapBlock-indicatorTile-title')).toHaveTextContent(
       'Authorised absence rate (2016/17)',
     );
-    expect(tile1.getByTestId('mapBlock-indicator-value')).toHaveTextContent(
+    expect(tile1.getByTestId('mapBlock-indicatorTile-value')).toHaveTextContent(
       '3%',
     );
 
-    const tile2 = within(tiles[1]);
+    const tile2 = within(indicators[1]);
 
-    expect(tile2.getByTestId('mapBlock-indicator-title')).toHaveTextContent(
+    expect(tile2.getByTestId('mapBlock-indicatorTile-title')).toHaveTextContent(
       'Overall absence rate (2016/17)',
     );
-    expect(tile2.getByTestId('mapBlock-indicator-value')).toHaveTextContent(
+    expect(tile2.getByTestId('mapBlock-indicatorTile-value')).toHaveTextContent(
       '4.7%',
     );
   });

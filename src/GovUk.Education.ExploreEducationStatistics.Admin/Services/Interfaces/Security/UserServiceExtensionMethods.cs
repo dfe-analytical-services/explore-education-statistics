@@ -9,48 +9,48 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Services.Interfaces.S
 {
     public static class UserServiceExtensionMethods
     {
-        public static Task<Either<ActionResult, bool>> CheckCanAccessSystem(this IUserService userService)
+        public static Task<Either<ActionResult, Unit>> CheckCanAccessSystem(this IUserService userService)
         {
             return userService.DoCheck(SecurityPolicies.CanAccessSystem);
         }
-        
-        public static Task<Either<ActionResult, bool>> CheckCanAccessAnalystPages(this IUserService userService)
+
+        public static Task<Either<ActionResult, Unit>> CheckCanAccessAnalystPages(this IUserService userService)
         {
             return userService.DoCheck(SecurityPolicies.CanAccessAnalystPages);
         }
-        
-        public static Task<Either<ActionResult, bool>> CheckCanAccessPrereleasePages(this IUserService userService)
+
+        public static Task<Either<ActionResult, Unit>> CheckCanAccessPrereleasePages(this IUserService userService)
         {
             return userService.DoCheck(SecurityPolicies.CanAccessPrereleasePages);
         }
-        
-        public static Task<Either<ActionResult, bool>> CheckCanManageAllUsers(this IUserService userService)
+
+        public static Task<Either<ActionResult, Unit>> CheckCanManageAllUsers(this IUserService userService)
         {
             return userService.DoCheck(SecurityPolicies.CanManageUsersOnSystem);
         }
-        
-        public static Task<Either<ActionResult, bool>> CheckCanManageAllMethodologies(this IUserService userService)
+
+        public static Task<Either<ActionResult, Unit>> CheckCanManageAllMethodologies(this IUserService userService)
         {
             return userService.DoCheck(SecurityPolicies.CanManageMethodologiesOnSystem);
         }
-        
-        public static Task<Either<ActionResult, bool>> CheckCanViewAllMethodologies(this IUserService userService)
+
+        public static Task<Either<ActionResult, Unit>> CheckCanViewAllMethodologies(this IUserService userService)
         {
             return userService.DoCheck(SecurityPolicies.CanViewAllMethodologies);
         }
-        
-        public static Task<Either<ActionResult, bool>> CheckCanCreateMethodology(
+
+        public static Task<Either<ActionResult, Unit>> CheckCanCreateMethodology(
             this IUserService userService)
         {
             return userService.DoCheck(SecurityPolicies.CanCreateMethodologies);
         }
-        
+
         public static Task<Either<ActionResult, Methodology>> CheckCanViewMethodology(
             this IUserService userService, Methodology methodology)
         {
             return userService.DoCheck(methodology, SecurityPolicies.CanViewSpecificMethodology);
         }
-        
+
         public static Task<Either<ActionResult, Methodology>> CheckCanUpdateMethodology(
             this IUserService userService, Methodology methodology)
         {
@@ -69,16 +69,16 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Services.Interfaces.S
             return userService.DoCheck(methodology, SecurityPolicies.CanApproveSpecificMethodology);
         }
 
-        public static Task<Either<ActionResult, bool>> CheckCanViewAllTopics(this IUserService userService)
+        public static Task<Either<ActionResult, Unit>> CheckCanViewAllTopics(this IUserService userService)
         {
             return userService.DoCheck(SecurityPolicies.CanViewAllTopics);
         }
-        
-        public static Task<Either<ActionResult, bool>> CheckCanViewAllReleases(this IUserService userService)
+
+        public static Task<Either<ActionResult, Unit>> CheckCanViewAllReleases(this IUserService userService)
         {
             return userService.DoCheck(SecurityPolicies.CanViewAllReleases);
         }
-        
+
         public static Task<Either<ActionResult, Theme>> CheckCanViewTheme(
             this IUserService userService, Theme theme)
         {
@@ -91,12 +91,12 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Services.Interfaces.S
             return userService.DoCheck(topic, SecurityPolicies.CanViewSpecificTopic);
         }
 
-        public static Task<Either<ActionResult, bool>> CheckCanManageAllTaxonomy(this IUserService userService)
+        public static Task<Either<ActionResult, Unit>> CheckCanManageAllTaxonomy(this IUserService userService)
         {
             return userService.DoCheck(SecurityPolicies.CanManageAllTaxonomy);
         }
 
-        // Publication 
+        // Publication
 
         public static Task<Either<ActionResult, Topic>> CheckCanCreatePublicationForTopic(
             this IUserService userService, Topic topic)
@@ -109,31 +109,31 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Services.Interfaces.S
         {
             return userService.DoCheck(publication, SecurityPolicies.CanUpdatePublication);
         }
-        
+
         public static Task<Either<ActionResult, Publication>> CheckCanCreateReleaseForPublication(
             this IUserService userService, Publication publication)
         {
             return userService.DoCheck(publication, SecurityPolicies.CanCreateReleaseForSpecificPublication);
         }
-        
+
         public static Task<Either<ActionResult, Publication>> CheckCanViewPublication(
             this IUserService userService, Publication publication)
         {
             return userService.DoCheck(publication, SecurityPolicies.CanViewSpecificPublication);
         }
-        
+
         public static Task<Either<ActionResult, Release>> CheckCanViewRelease(
             this IUserService userService, Release release)
         {
             return userService.DoCheck(release, SecurityPolicies.CanViewSpecificRelease);
         }
-        
+
         public static Task<Either<ActionResult, Release>> CheckCanUpdateRelease(
             this IUserService userService, Release release)
         {
             return userService.DoCheck(release, SecurityPolicies.CanUpdateSpecificRelease);
         }
-        
+
         public static Task<Either<ActionResult, Release>> CheckCanDeleteRelease(
             this IUserService userService, Release release)
         {
@@ -175,31 +175,31 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Services.Interfaces.S
         {
             return userService.DoCheck(release, SecurityPolicies.CanSubmitSpecificReleaseToHigherReview);
         }
-        
+
         public static Task<Either<ActionResult, Release>> CheckCanApproveRelease(
             this IUserService userService, Release release)
         {
             return userService.DoCheck(release, SecurityPolicies.CanApproveSpecificRelease);
         }
-        
+
         public static Task<Either<ActionResult, Release>> CheckCanMakeAmendmentOfRelease(
             this IUserService userService, Release release)
         {
             return userService.DoCheck(release, SecurityPolicies.CanMakeAmendmentOfSpecificRelease);
         }
-        
+
         public static Task<Either<ActionResult, Release>> CheckCanRunReleaseMigrations(
             this IUserService userService, Release release)
         {
             return userService.DoCheck(release, SecurityPolicies.CanRunReleaseMigrations);
         }
-        
-        public static Task<Either<ActionResult, bool>> CheckCanViewPrereleaseContactsList(
+
+        public static Task<Either<ActionResult, Unit>> CheckCanViewPrereleaseContactsList(
             this IUserService userService)
         {
             return userService.DoCheck(SecurityPolicies.CanViewPrereleaseContacts);
         }
-        
+
         public static Task<Either<ActionResult, Release>> CheckCanAssignPrereleaseContactsToRelease(
             this IUserService userService, Release release)
         {
@@ -217,7 +217,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Services.Interfaces.S
         {
             return userService.DoCheck(release, SecurityPolicies.CanPublishSpecificRelease);
         }
-        
+
         public static Task<Either<ActionResult, Comment>> CheckCanUpdateComment(
             this IUserService userService, Comment comment)
         {
@@ -235,29 +235,29 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Services.Interfaces.S
         {
             return userService.DoCheck(legacyRelease, SecurityPolicies.CanViewLegacyRelease);
         }
-        
+
         public static Task<Either<ActionResult, LegacyRelease>> CheckCanUpdateLegacyRelease(
             this IUserService userService, LegacyRelease legacyRelease)
         {
             return userService.DoCheck(legacyRelease, SecurityPolicies.CanUpdateLegacyRelease);
         }
-        
+
         public static Task<Either<ActionResult, LegacyRelease>> CheckCanDeleteLegacyRelease(
             this IUserService userService, LegacyRelease legacyRelease)
         {
             return userService.DoCheck(legacyRelease, SecurityPolicies.CanDeleteLegacyRelease);
         }
 
-        private static async Task<Either<ActionResult, T>> DoCheck<T>(this IUserService userService, T resource, SecurityPolicies policy) 
+        private static async Task<Either<ActionResult, T>> DoCheck<T>(this IUserService userService, T resource, SecurityPolicies policy)
         {
             var result = await userService.MatchesPolicy(resource, policy);
             return result ? new Either<ActionResult, T>(resource) : new ForbidResult();
         }
-        
-        private static async Task<Either<ActionResult, bool>> DoCheck(this IUserService userService, SecurityPolicies policy) 
+
+        private static async Task<Either<ActionResult, Unit>> DoCheck(this IUserService userService, SecurityPolicies policy)
         {
             var result = await userService.MatchesPolicy(policy);
-            return result ? new Either<ActionResult, bool>(true) : new ForbidResult();
+            return result ? new Either<ActionResult, Unit>(Unit.Instance) : new ForbidResult();
         }
     }
 }

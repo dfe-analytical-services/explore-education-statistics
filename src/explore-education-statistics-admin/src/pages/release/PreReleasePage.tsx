@@ -1,7 +1,8 @@
 import Page from '@admin/components/Page';
+import PageTitle from '@admin/components/PageTitle';
 import { useAuthContext } from '@admin/contexts/AuthContext';
 import useConfig from '@admin/hooks/useConfig';
-import ReleaseContentSection from '@admin/pages/release/content/components/ReleaseContentSection';
+import ReleaseContent from '@admin/pages/release/content/components/ReleaseContent';
 import { ReleaseContentProvider } from '@admin/pages/release/content/contexts/ReleaseContentContext';
 import permissionService, {
   PreReleaseWindowStatus,
@@ -10,7 +11,7 @@ import preReleaseService, {
   PreReleaseSummary,
 } from '@admin/services/preReleaseService';
 import releaseContentService, {
-  ReleaseContent,
+  ReleaseContent as ReleaseContentModel,
 } from '@admin/services/releaseContentService';
 import { useErrorControl } from '@common/contexts/ErrorControlContext';
 import useAsyncRetry from '@common/hooks/useAsyncRetry';
@@ -20,7 +21,7 @@ import { RouteComponentProps } from 'react-router';
 
 interface Model {
   preReleaseWindowStatus: PreReleaseWindowStatus;
-  content?: ReleaseContent;
+  content?: ReleaseContentModel;
   preReleaseSummary?: PreReleaseSummary;
 }
 
@@ -89,7 +90,12 @@ const PreReleasePage = ({ match }: RouteComponentProps<MatchProps>) => {
             unresolvedComments: [],
           }}
         >
-          <ReleaseContentSection />
+          <PageTitle
+            caption={content.release.title}
+            title={content.release.publication.title}
+          />
+
+          <ReleaseContent />
         </ReleaseContentProvider>
       )}
 

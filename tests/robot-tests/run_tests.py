@@ -22,10 +22,21 @@ from pabot.pabot import main as pabot_run_cli
 from robot import run_cli as robot_run_cli
 
 import scripts.keyword_profile as kp
-from scripts.get_auth_tokens import get_identity_info
+from tests.libs.setup_auth_variables import setup_auth_variables
 
 current_dir = Path(__file__).absolute().parent
 os.chdir(current_dir)
+
+# This is super awkward but we have to explicitly
+# add the current directory to PYTHONPATH otherwise
+# the subprocesses started by pabot will not be able
+# to locate lib modules correctly for some reason.
+pythonpath = os.getenv('PYTHONPATH')
+
+if pythonpath:
+    os.environ['PYTHONPATH'] += f':{str(current_dir)}'
+else:
+    os.environ['PYTHONPATH'] = str(current_dir)
 
 # Parse arguments
 parser = argparse.ArgumentParser(prog="pipenv run python run_tests.py",
@@ -74,6 +85,11 @@ parser.add_argument("--chromedriver",
                     dest="chromedriver_version",
                     metavar="{version}",
                     help="specify which version of chromedriver to use")
+parser.add_argument("--disable-teardown",
+                    dest="disable_teardown",
+                    help="disable tearing down of any test data after completion",
+                    action='store_true')
+
 """
 NOTE(mark): The admin and analyst passwords to access the admin app are stored in the CI pipeline 
             as secret variables, which means they cannot be accessed like normal 
@@ -132,122 +148,106 @@ else:
     assert os.getenv('ADMIN_EMAIL') is not None
     assert os.getenv('ADMIN_PASSWORD') is not None
 
-# Auth not required with general_public tests
-if args.tests and "general_public" not in args.tests:
-    def authenticate_user(user, email, password, clear_existing=True):
-        assert user and email and password
 
-        local_storage_name = f'IDENTITY_LOCAL_STORAGE_{user}'
-        cookie_name = f'IDENTITY_COOKIE_{user}'
+def admin_request(method, endpoint, body=None):
+    assert method and endpoint
+    assert os.getenv('ADMIN_URL') is not None
+    assert os.getenv('IDENTITY_LOCAL_STORAGE_ADMIN') is not None
 
-        local_storage_file = Path(f'{local_storage_name}.json')
-        cookie_file = Path(f'{cookie_name}.json')
+    if method == 'POST':
+        assert body is not None, 'POST requests require a body'
 
-        if clear_existing:
-            local_storage_file.unlink(True)
-            cookie_file.unlink(True)
+    # To prevent InsecureRequestWarning
+    requests.packages.urllib3.disable_warnings()
 
-        if local_storage_file.exists() and cookie_file.exists():
-            print(f'Getting {user} authentication information from local files... ', flush=True)
+    jwt_token = json.loads(os.getenv('IDENTITY_LOCAL_STORAGE_ADMIN'))['access_token']
+    headers = {
+        'Content-Type': 'application/json',
+        'Authorization': f'Bearer {jwt_token}',
+    }
+    response = requests.request(
+        method,
+        url=f'{os.getenv("ADMIN_URL")}{endpoint}',
+        headers=headers,
+        json=body,
+        verify=False
+    )
 
-            os.environ[local_storage_name] = local_storage_file.read_text()
-            os.environ[cookie_name] = cookie_file.read_text()
-        else:
-            print(f'Logging in to obtain {user} authentication information... ', flush=True)
+    if response.status_code in {401, 403}:
+        print('Attempting re-authentication...', flush=True)
 
-            os.environ[local_storage_name], os.environ[cookie_name] = get_identity_info(
-                url=os.getenv('ADMIN_URL'),
-                email=email,
-                password=password,
-                chromedriver_version=args.chromedriver_version
-            )
-
-            # Cache auth info to files for efficiency
-            local_storage_file.write_text(os.environ[local_storage_name])
-            cookie_file.write_text(os.environ[cookie_name])
-
-            print('Done!', flush=True)
-
-        assert os.getenv(local_storage_name) is not None
-        assert os.getenv(cookie_name) is not None
-
-
-    def setup_authentication(clear_existing=False):
-        # Don't need BAU user if running general_public tests
-        if "general_public" not in args.tests:
-            authenticate_user(
-                user='BAU',
-                email=os.getenv('ADMIN_EMAIL'),
-                password=os.getenv('ADMIN_PASSWORD'),
-                clear_existing=clear_existing
-            )
-
-        # Don't need analyst user if running admin/bau or admin_and_public/bau tests
-        if f"{os.sep}bau" not in args.tests:
-            authenticate_user(
-                user='ANALYST',
-                email=os.getenv('ANALYST_EMAIL'),
-                password=os.getenv('ANALYST_PASSWORD'),
-                clear_existing=clear_existing
-            )
-
-
-    def admin_request(method, endpoint, body=None):
-        assert method and endpoint
-        assert os.getenv('IDENTITY_LOCAL_STORAGE_BAU') is not None
-        if method == 'POST':
-            assert body is not None, 'POST requests require a body'
-
-        # To prevent InsecureRequestWarning
-        requests.packages.urllib3.disable_warnings()
-
-        jwt_token = json.loads(os.getenv('IDENTITY_LOCAL_STORAGE_BAU'))['access_token']
-        headers = {
-            'Content-Type': 'application/json',
-            'Authorization': f'Bearer {jwt_token}',
-        }
-        response = requests.request(method, endpoint, headers=headers, json=body, verify=False)
-        if response.status_code in {401, 403}:
-            print('Attempting re-authentication...', flush=True)
-
-            # Delete identify files and re-attempt to fetch them
-            setup_authentication(clear_existing=True)
-            jwt_token = json.loads(os.environ['IDENTITY_LOCAL_STORAGE_BAU'])['access_token']
-            headers = {
+        # Delete identify files and re-attempt to fetch them
+        setup_authentication(clear_existing=True)
+        jwt_token = json.loads(os.environ['IDENTITY_LOCAL_STORAGE_ADMIN'])['access_token']
+        response = requests.request(
+            method,
+            url=f'{os.getenv("ADMIN_URL")}{endpoint}',
+            headers={
                 'Content-Type': 'application/json',
                 'Authorization': f'Bearer {jwt_token}',
-            }
-            response = requests.request(method, endpoint, headers=headers, json=body, verify=False)
+            },
+            json=body,
+            verify=False
+        )
 
-            assert response.status_code not in {401, 403}, \
-                'Failed to reauthenticate.'
-        assert response.status_code == 200, 'Admin request status_code wasn\'t 200!'
-        return response
+        assert response.status_code not in {401, 403}, \
+            'Failed to reauthenticate.'
 
-    def get_test_themes():
-        assert os.getenv('ADMIN_URL') is not None
-
-        get_themes_endpoint = f'{os.getenv("ADMIN_URL")}/api/me/themes'
-        return admin_request('GET', get_themes_endpoint)
+    assert response.status_code < 300, f'Admin request responded with {response.status_code} and {response.text}'
+    return response
 
 
-    def create_test_theme():
-        assert os.getenv('ADMIN_URL') is not None
-
-        create_theme_endpoint = f'{os.getenv("ADMIN_URL")}/api/theme'
-        body = {'title': 'Test theme', 'summary': 'Test theme summary'}
-        return admin_request('POST', create_theme_endpoint, body)
+def get_test_themes():
+    return admin_request('GET', '/api/themes')
 
 
-    def create_test_topic(theme_id):
-        assert theme_id
-        assert os.getenv('ADMIN_URL') is not None
-        assert os.getenv('RUN_IDENTIFIER') is not None
+def create_test_theme():
+    return admin_request('POST', '/api/themes', {
+        'title': 'Test theme',
+        'summary': 'Test theme summary'
+    })
 
-        create_topic_endpoint = f'{os.getenv("ADMIN_URL")}/api/theme/{theme_id}/topics'
-        body = {'title': f'UI test topic {os.getenv("RUN_IDENTIFIER")}'}
-        return admin_request('POST', create_topic_endpoint, body)
 
+def create_test_topic():
+    assert os.getenv('TEST_THEME_ID') is not None
+
+    topic_name = f'UI test topic {os.getenv("RUN_IDENTIFIER")}'
+    resp = admin_request('POST', '/api/topics', {
+        'title': topic_name,
+        'themeId': os.getenv('TEST_THEME_ID')
+    })
+
+    os.environ['TEST_TOPIC_NAME'] = topic_name
+    os.environ['TEST_TOPIC_ID'] = resp.json()['id']
+
+
+def delete_test_topic():
+    if os.getenv('TEST_TOPIC_ID') is not None:
+        admin_request('DELETE', f'/api/topics/{os.getenv("TEST_TOPIC_ID")}')
+
+
+def setup_authentication(clear_existing=False):
+    # Don't need BAU user if running general_public tests
+    if "general_public" not in args.tests:
+        setup_auth_variables(
+            user='ADMIN',
+            email=os.getenv('ADMIN_EMAIL'),
+            password=os.getenv('ADMIN_PASSWORD'),
+            clear_existing=clear_existing
+        )
+
+    # Don't need analyst user if running admin/bau or admin_and_public/bau tests
+    if f"{os.sep}bau" not in args.tests:
+        setup_auth_variables(
+            user='ANALYST',
+            email=os.getenv('ANALYST_EMAIL'),
+            password=os.getenv('ANALYST_PASSWORD'),
+            clear_existing=clear_existing
+        )
+
+
+# Auth not required with general_public tests
+if args.tests and "general_public" not in args.tests:
     setup_authentication()
 
     # NOTE(mark): Tests that alter data only occur on local and dev environments
@@ -258,17 +258,19 @@ if args.tests and "general_public" not in args.tests:
         print(f'Starting tests with RUN_IDENTIFIER: {runIdentifier}')
 
         get_themes_resp = get_test_themes()
-        test_theme_guid = None
+        test_theme_id = None
+
         for theme in get_themes_resp.json():
             if theme['title'] == 'Test theme':
-                test_theme_guid = theme['id']
+                test_theme_id = theme['id']
                 break
-        if not test_theme_guid:
+        if not test_theme_id:
             create_theme_resp = create_test_theme()
-            test_theme_guid = create_theme_resp.json()['id']
-        assert test_theme_guid is not None, 'test_theme_guid hasn\'t been set!'
+            test_theme_id = create_theme_resp.json()['id']
 
-        create_test_topic(test_theme_guid)
+        os.environ['TEST_THEME_ID'] = test_theme_id
+
+        create_test_topic()
 
 if args.env == 'local':
     robotArgs += ['--include', 'Local']
@@ -300,43 +302,50 @@ robotArgs += [args.tests]
 if Path('test-results').exists():
     shutil.rmtree("test-results")
 
-# Run tests
-if args.interp == "robot":
-    if args.profile:
-        # Python profiling
-        cProfile.run('robot_run_cli(robotArgs)', 'profile-data')
-        stream = open('test-results/python-profiling-results.log', 'w')
-        p = pstats.Stats('profile-data', stream=stream)
-        p.sort_stats('time')
-        # p.sort_stats('cumulative')
-        p.print_stats()
-        os.remove('profile-data')
+try:
+    # Run tests
+    if args.interp == "robot":
+        if args.profile:
+            # Python profiling
+            cProfile.run('robot_run_cli(robotArgs)', 'profile-data')
+            stream = open('test-results/python-profiling-results.log', 'w')
+            p = pstats.Stats('profile-data', stream=stream)
+            p.sort_stats('time')
+            # p.sort_stats('cumulative')
+            p.print_stats()
+            os.remove('profile-data')
 
-        # Keyword profiling
-        kp.run_keyword_profile('test-results/output.xml',
-                               printresults=False,
-                               writepath='test-results/keyword-profiling-results.log')
-        print("\nProfiling logs created in test-results/", flush=True)
-    else:
-        robot_run_cli(robotArgs)
-elif args.interp == "pabot":
-    if args.processes:
-        robotArgs = ["--processes", args.processes] + robotArgs
+            # Keyword profiling
+            kp.run_keyword_profile('test-results/output.xml',
+                                   printresults=False,
+                                   writepath='test-results/keyword-profiling-results.log')
+            print("\nProfiling logs created in test-results/", flush=True)
+        else:
+            robot_run_cli(robotArgs)
+    elif args.interp == "pabot":
+        if args.processes:
+            robotArgs = ["--processes", args.processes] + robotArgs
 
-    if args.profile:
-        # Python profiling
-        cProfile.run('pabot_run_cli(robotArgs)', 'profile-data')
-        stream = open('test-results/python-profiling-results.log', 'w')
-        p = pstats.Stats('profile-data', stream=stream)
-        p.sort_stats('time')
-        # p.sort_stats('cumulative')
-        p.print_stats()
-        os.remove('profile-data')
+        if args.profile:
+            # Python profiling
+            cProfile.run('pabot_run_cli(robotArgs)', 'profile-data')
+            stream = open('test-results/python-profiling-results.log', 'w')
+            p = pstats.Stats('profile-data', stream=stream)
+            p.sort_stats('time')
+            # p.sort_stats('cumulative')
+            p.print_stats()
+            os.remove('profile-data')
 
-        # Keyword profiling
-        kp.run_keyword_profile('test-results/output.xml',
-                               printresults=False,
-                               writepath='test-results/keyword-profiling-results.log')
-        print("\nProfiling logs created in test-results/", flush=True)
-    else:
-        pabot_run_cli(robotArgs)
+            # Keyword profiling
+            kp.run_keyword_profile('test-results/output.xml',
+                                   printresults=False,
+                                   writepath='test-results/keyword-profiling-results.log')
+            print("\nProfiling logs created in test-results/", flush=True)
+        else:
+            pabot_run_cli(robotArgs)
+finally:
+    if args.disable_teardown is not True:
+        print("Tearing down tests...", flush=True)
+        delete_test_topic()
+
+    print("Tests finished!")

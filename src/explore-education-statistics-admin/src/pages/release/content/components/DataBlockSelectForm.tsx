@@ -8,6 +8,7 @@ import DataBlockTabs from '@common/modules/find-statistics/components/DataBlockT
 import React, { useState } from 'react';
 
 interface Props {
+  id: string;
   releaseId: string;
   onSelect: (selectedDataBlockId: string) => void;
   onCancel?: () => void;
@@ -16,6 +17,7 @@ interface Props {
 }
 
 const DataBlockSelectForm = ({
+  id,
   releaseId,
   onSelect,
   onCancel = () => {},
@@ -37,14 +39,11 @@ const DataBlockSelectForm = ({
           className="govuk-!-margin-top-3"
           summary="Data block preview"
           open
-          onToggle={() => {}}
         >
           <DataBlockTabs
             releaseId={releaseId}
             dataBlock={selectedDataBlock}
-            id={`dataBlockSelectForm-${
-              selectedDataBlock ? `${selectedDataBlock.id}-tabs` : 'tabs'
-            }`}
+            id={`${id}-dataBlockPreview`}
             getInfographic={getChartFile}
           />
         </Details>
@@ -53,11 +52,11 @@ const DataBlockSelectForm = ({
   };
 
   return (
-    <div className="dfe-align--left">
+    <form className="dfe-align--left" id={id}>
       <FormSelect
         className="govuk-!-margin-right-1"
-        id="id"
-        name="datablock_select"
+        id={`${id}-selectedDataBlock`}
+        name="selectedDataBlock"
         label={label}
         value={selectedDataBlockId}
         onChange={e => setSelectedDataBlockId(e.target.value)}
@@ -74,7 +73,7 @@ const DataBlockSelectForm = ({
         ]}
       />
 
-      <Button className="govuk-button--secondary" onClick={onCancel}>
+      <Button variant="secondary" onClick={onCancel}>
         Cancel
       </Button>
 
@@ -84,13 +83,13 @@ const DataBlockSelectForm = ({
         <ButtonGroup>
           <Button onClick={() => onSelect(selectedDataBlockId)}>Embed</Button>
           {!hideCancel && (
-            <Button className="govuk-button--secondary" onClick={onCancel}>
+            <Button variant="secondary" onClick={onCancel}>
               Cancel
             </Button>
           )}
         </ButtonGroup>
       )}
-    </div>
+    </form>
   );
 };
 

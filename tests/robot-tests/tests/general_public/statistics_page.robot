@@ -11,7 +11,7 @@ Navigate to Find Statistics page
     [Tags]  HappyPath
     environment variable should be set   PUBLIC_URL
     user goes to url   %{PUBLIC_URL}/find-statistics
-    user waits until page contains heading  Find statistics and data
+    user waits until page contains heading 1  Find statistics and data
     user waits for page to finish loading
 
 # TODO: User uses search
@@ -49,15 +49,15 @@ Validate "Pupil absence" details component
     [Tags]  HappyPath
     user opens details dropdown  Pupil absence
 
-    user checks details dropdown contains publication   Pupil absence   Pupil absence in schools in England
+    user waits until details dropdown contains publication   Pupil absence   Pupil absence in schools in England
     user checks publication bullet contains link   Pupil absence in schools in England    View statistics and data
     user checks publication bullet contains link   Pupil absence in schools in England    Create your own tables online
     user checks publication bullet does not contain link  Pupil absence in schools in England   Statistics at DfE
 
-    user checks details dropdown contains publication   Pupil absence   Pupil absence in schools in England: autumn and spring
+    user waits until details dropdown contains publication   Pupil absence   Pupil absence in schools in England: autumn and spring
     #user checks publication bullet contains link  Pupil absence in schools in England: autumn and spring    Statistics at DfE
     #user checks publication bullet does not contain link  Pupil absence in schools in England: autumn and spring   View statistics and data
 
-    user checks details dropdown contains publication   Pupil absence   Pupil absence in schools in England: autumn term
+    user waits until details dropdown contains publication   Pupil absence   Pupil absence in schools in England: autumn term
     #user checks publication bullet contains link  Pupil absence in schools in England: autumn term   Statistics at DfE
     #user checks publication bullet does not contain link  Pupil absence in schools in England: autumn term   View statistics and data

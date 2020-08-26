@@ -1,18 +1,17 @@
 using System;
-using System.Collections.Generic;
-using System.Threading.Tasks;
+using AutoMapper;
 using GovUk.Education.ExploreEducationStatistics.Admin.Security;
 using GovUk.Education.ExploreEducationStatistics.Admin.Services;
 using GovUk.Education.ExploreEducationStatistics.Admin.Services.Interfaces;
-using GovUk.Education.ExploreEducationStatistics.Common.Model;
+using GovUk.Education.ExploreEducationStatistics.Admin.ViewModels;
 using GovUk.Education.ExploreEducationStatistics.Common.Services.Interfaces.Security;
 using GovUk.Education.ExploreEducationStatistics.Common.Utils;
 using GovUk.Education.ExploreEducationStatistics.Content.Model;
 using GovUk.Education.ExploreEducationStatistics.Content.Model.Database;
-using Microsoft.AspNetCore.Mvc;
 using Moq;
 using Xunit;
 using static GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services.MapperUtils;
+using static GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services.PermissionTestUtil;
 
 namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
 {
@@ -22,133 +21,221 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
         {
             Id = Guid.NewGuid()
         };
-        
-        [Fact]
-        public async void GetMyThemes_CanViewAllTopics()
-        {
-            var (contentDbContext, userService, repository, persistenceHelper) = Mocks();
 
-            var themeList = new List<Theme>
+        [Fact]
+        public async void GetThemes_CanViewAllTopics()
+        {
+            var contextId = Guid.NewGuid().ToString();
+
+            await using (var context = DbUtils.InMemoryApplicationDbContext(contextId))
             {
-                new Theme
-                {
-                    Id = Guid.NewGuid()
-                }
-            };
+                context.Add(
+                    new Theme
+                    {
+                        Title = "Test theme"
+                    }
+                );
 
-            userService
-                .Setup(s => s.MatchesPolicy(SecurityPolicies.CanViewAllTopics))
-                .ReturnsAsync(true);
+                await context.SaveChangesAsync();
+            }
 
-            repository
-                .Setup(s => s.GetAllThemesAsync())
-                .ReturnsAsync(themeList);
-            
-            var service = new ThemeService(contentDbContext.Object, AdminMapper(), userService.Object, repository.Object, persistenceHelper.Object);
+            PolicyCheckBuilder()
+                .ExpectCheck(SecurityPolicies.CanAccessSystem)
+                .ExpectCheck(SecurityPolicies.CanViewAllTopics)
+                .AssertSuccess(
+                    async userService =>
+                    {
+                        await using var context = DbUtils.InMemoryApplicationDbContext(contextId);
 
-            var result = await service.GetMyThemes();
-            Assert.Equal(themeList, result.Right);
-            
-            userService.Verify(s => s.MatchesPolicy(SecurityPolicies.CanAccessSystem));
-            userService.Verify(s => s.MatchesPolicy(SecurityPolicies.CanViewAllTopics));
-            userService.VerifyNoOtherCalls();
+                        var service = SetupThemeService(userService: userService.Object, context: context);
+                        var result = await service.GetThemes();
 
-            repository.Verify(s => s.GetAllThemesAsync());
-            repository.VerifyNoOtherCalls();
+                        Assert.Single(result.Right);
+                        Assert.Equal("Test theme", result.Right[0].Title);
+
+                        return result;
+                    }
+                );
         }
-        
-        [Fact]
-        public async void GetMyThemes_CanViewLinkedTopics()
-        {
-            var (contentDbContext, userService, repository, persistenceHelper) = Mocks();
 
+        [Fact]
+        public async void GetThemes_CanViewLinkedTopics()
+        {
             var userId = Guid.NewGuid();
 
-            var themeList = new List<Theme>
+            var contextId = Guid.NewGuid().ToString();
+
+            await using (var context = DbUtils.InMemoryApplicationDbContext(contextId))
             {
-                new Theme
-                {
-                    Id = Guid.NewGuid()
-                }
-            };
+                await context.AddRangeAsync(
+                    new UserReleaseRole
+                    {
+                        Release = new Release
+                        {
+                            Publication = new Publication
+                            {
+                                Topic = new Topic
+                                {
+                                    Title = "Another topic",
+                                    Theme = new Theme
+                                    {
+                                        Title = "Another theme"
+                                    }
+                                }
+                            }
+                        }
+                    },
+                    new UserReleaseRole
+                    {
+                        UserId = userId,
+                        Release = new Release
+                        {
+                            Publication = new Publication
+                            {
+                                Topic = new Topic
+                                {
+                                    Title = "Expected topic",
+                                    Theme = new Theme
+                                    {
+                                        Title = "Expected theme"
+                                    }
+                                }
+                            }
+                        }
+                    }
+                );
 
-            userService
-                .Setup(s => s.MatchesPolicy(SecurityPolicies.CanViewAllTopics))
-                .ReturnsAsync(false);
+                await context.SaveChangesAsync();
+            }
 
-            userService
-                .Setup(s => s.GetUserId())
-                .Returns(userId);
+            PolicyCheckBuilder()
+                .ExpectCheck(SecurityPolicies.CanAccessSystem)
+                .ExpectCheck(SecurityPolicies.CanViewAllTopics, false)
+                .AssertSuccess(
+                    async userService =>
+                    {
+                        await using var context = DbUtils.InMemoryApplicationDbContext(contextId);
 
-            repository
-                .Setup(s => s.GetThemesRelatedToUserAsync(userId))
-                .ReturnsAsync(themeList);
-            
-            var service = new ThemeService(contentDbContext.Object, AdminMapper(), userService.Object, repository.Object, persistenceHelper.Object);
+                        userService
+                            .Setup(s => s.GetUserId())
+                            .Returns(userId);
 
-            var result = await service.GetMyThemes();
-            Assert.Equal(themeList, result.Right);
-            
-            userService.Verify(s => s.MatchesPolicy(SecurityPolicies.CanAccessSystem));
-            userService.Verify(s => s.MatchesPolicy(SecurityPolicies.CanViewAllTopics));
-            userService.Verify(s => s.GetUserId());
-            userService.VerifyNoOtherCalls();
+                        var service = SetupThemeService(userService: userService.Object, context: context);
+                        var result = await service.GetThemes();
 
-            repository.Verify(s => s.GetThemesRelatedToUserAsync(userId));
-            repository.VerifyNoOtherCalls();
+                        Assert.Single(result.Right);
+                        Assert.Equal("Expected theme", result.Right[0].Title);
+
+                        Assert.Single(result.Right[0].Topics);
+                        Assert.Equal("Expected topic", result.Right[0].Topics[0].Title);
+
+                        return result;
+                    }
+                );
         }
-        
+
         [Fact]
-        public async void GetMyThemes_NoAccessToSystem()
+        public void GetMyThemes_NoAccessToSystem()
         {
-            var (contentDbContext, userService, repository, persistenceHelper) = Mocks();
+            PolicyCheckBuilder()
+                .ExpectCheck(SecurityPolicies.CanAccessSystem, false)
+                .AssertForbidden(
+                    async userService =>
+                    {
+                        var service = SetupThemeService(userService: userService.Object);
 
-            userService
-                .Setup(s => s.MatchesPolicy(SecurityPolicies.CanAccessSystem))
-                .ReturnsAsync(false);
-
-            var service = new ThemeService(contentDbContext.Object, AdminMapper(), userService.Object, repository.Object, persistenceHelper.Object);
-
-            var result = await service.GetMyThemes();
-            Assert.IsAssignableFrom<ForbidResult>(result.Left);
-            
-            userService.Verify(s => s.MatchesPolicy(SecurityPolicies.CanAccessSystem));
-            userService.VerifyNoOtherCalls();
-
-            repository.VerifyNoOtherCalls();
+                        return await service.GetThemes();
+                    }
+                );
         }
-        
+
         [Fact]
-        public void GetSummaryAsync()
+        public void CreateTheme()
         {
-            AssertSecurityPoliciesChecked(service => 
-                    service.GetSummary(_theme.Id),  
-                _theme,
-                SecurityPolicies.CanViewSpecificTheme);
-        }
-        
-        private void AssertSecurityPoliciesChecked<T, TEntity>(
-            Func<ThemeService, Task<Either<ActionResult, T>>> protectedAction, TEntity protectedEntity, params SecurityPolicies[] policies)
-            where TEntity : class
-        {
-            var (contentDbContext, userService, repository, persistenceHelper) = Mocks();
+            PolicyCheckBuilder()
+                .ExpectCheck(SecurityPolicies.CanManageAllTaxonomy, false)
+                .AssertForbidden(
+                    async userService =>
+                    {
+                        var service = SetupThemeService(userService: userService.Object);
 
-            var service = new ThemeService(contentDbContext.Object, AdminMapper(), userService.Object, repository.Object, persistenceHelper.Object);
-
-            PermissionTestUtil.AssertSecurityPoliciesChecked(protectedAction, protectedEntity, userService, service, policies);
+                        return await service.CreateTheme(
+                            new SaveThemeViewModel
+                            {
+                                Title = "Test title",
+                                Summary = "Test summary"
+                            }
+                        );
+                    }
+                );
         }
-        
-        private (
-            Mock<ContentDbContext>,
-            Mock<IUserService>,
-            Mock<IThemeRepository>,
-            Mock<IPersistenceHelper<ContentDbContext>>) Mocks()
+
+        [Fact]
+        public void UpdateTheme()
         {
-            return (
-                new Mock<ContentDbContext>(),
-                MockUtils.AlwaysTrueUserService(),
-                new Mock<IThemeRepository>(), 
-                MockUtils.MockPersistenceHelper<ContentDbContext, Theme>(_theme.Id, _theme));
+            PolicyCheckBuilder()
+                .ExpectCheck(SecurityPolicies.CanManageAllTaxonomy, false)
+                .AssertForbidden(
+                    async userService =>
+                    {
+                        var service = SetupThemeService(userService: userService.Object);
+
+                        return await service.UpdateTheme(
+                            _theme.Id,
+                            new SaveThemeViewModel
+                            {
+                                Title = "Test title",
+                                Summary = "Test summary"
+                            }
+                        );
+                    }
+                );
+        }
+
+        [Fact]
+        public void GetTheme()
+        {
+            PolicyCheckBuilder()
+                .ExpectResourceCheck(_theme, SecurityPolicies.CanViewSpecificTheme, false)
+                .AssertForbidden(
+                    async userService =>
+                    {
+                        var service = SetupThemeService(userService: userService.Object);
+
+                        return await service.GetTheme(_theme.Id);
+                    }
+                );
+        }
+
+        [Fact]
+        public void DeleteTheme()
+        {
+            PolicyCheckBuilder()
+                .ExpectCheck(SecurityPolicies.CanManageAllTaxonomy, false)
+                .AssertForbidden(
+                    async userService =>
+                    {
+                        var service = SetupThemeService(userService: userService.Object);
+
+                        return await service.DeleteTheme(_theme.Id);
+                    }
+                );
+        }
+
+        private ThemeService SetupThemeService(
+            ContentDbContext context = null,
+            IMapper mapper = null,
+            PersistenceHelper<ContentDbContext> persistenceHelper = null,
+            IUserService userService = null,
+            ITopicService topicService = null)
+        {
+            return new ThemeService(
+                context ?? new Mock<ContentDbContext>().Object,
+                mapper ?? AdminMapper(),
+                persistenceHelper ?? MockUtils.MockPersistenceHelper<ContentDbContext, Theme>(_theme.Id, _theme).Object,
+                userService ?? MockUtils.AlwaysTrueUserService().Object,
+                topicService ?? new Mock<ITopicService>().Object
+            );
         }
     }
 }

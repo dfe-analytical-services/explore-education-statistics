@@ -7,13 +7,12 @@ Suite Setup       user signs in as bau1
 Suite Teardown    user closes the browser
 
 *** Variables ***
-${TOPIC_NAME}        UI test topic %{RUN_IDENTIFIER}
+${TOPIC_NAME}        %{TEST_TOPIC_NAME}
 ${PUBLICATION_NAME}  UI tests - publish data %{RUN_IDENTIFIER}
 
 *** Test Cases ***
 Create new publication for "UI tests topic" topic
     [Tags]  HappyPath
-    environment variable should be set   RUN_IDENTIFIER
     user selects theme "Test theme" and topic "${TOPIC_NAME}" from the admin dashboard
     user waits until page contains link    Create new publication
     user checks page does not contain button   ${PUBLICATION_NAME}
@@ -35,7 +34,7 @@ Verify release summary
     [Tags]  HappyPath
     user checks page contains element   xpath://li/a[text()="Release summary" and contains(@aria-current, 'page')]
     user waits until page contains heading 2  Release summary
-    user checks summary list item "Publication title" should be "${PUBLICATION_NAME}"
+    user checks summary list contains  Publication title  ${PUBLICATION_NAME}
 
 Upload subject
     [Tags]  HappyPath
@@ -60,12 +59,12 @@ Navigate to Manage data blocks tab
 Select subject "UI test subject"
     [Tags]  HappyPath
     user waits until page contains   UI test subject
-    user selects radio    UI test subject
+    user clicks radio    UI test subject
     user clicks element   css:#publicationSubjectForm-submit
 
 Select locations
     [Tags]   HappyPath
-    user waits until element is visible  xpath://h2[text()="Choose locations"]     90
+    user waits until page contains heading 2  Choose locations
     user opens details dropdown   Opportunity Area
     user clicks checkbox   Bolton 001 (E02000984)
     user clicks checkbox   Bolton 001 (E05000364)
@@ -78,14 +77,14 @@ Select locations
 
 Select time period
     [Tags]   HappyPath
-    user waits until element is visible  xpath://h2[text()="Choose time period"]   90
-    user selects start date    2005
-    user selects end date      2020
+    user waits until page contains heading 2  Choose time period
+    user selects from list by label  id:timePeriodForm-start  2005
+    user selects from list by label  id:timePeriodForm-end  2020
     user clicks element     css:#timePeriodForm-submit
 
 Select indicators
     [Tags]  HappyPath
-    user waits until element is visible  xpath://h2[text()="Choose your filters"]
+    user waits until page contains heading 2  Choose your filters
     user clicks indicator checkbox    Admission Numbers
 
 Create table
@@ -138,8 +137,8 @@ Wait for release process status to be Complete
     [Tags]  HappyPath
     # EES-1007 - Release process status doesn't automatically update
     user waits until page contains heading 2  Release status
-    user checks summary list item "Current status" should be "Approved"
-    user checks summary list item "Scheduled release" should be "${PUBLISH_DATE_DAY} ${PUBLISH_DATE_MONTH_WORD} ${PUBLISH_DATE_YEAR}"
+    user checks summary list contains  Current status  Approved
+    user checks summary list contains  Scheduled release  ${PUBLISH_DATE_DAY} ${PUBLISH_DATE_MONTH_WORD} ${PUBLISH_DATE_YEAR}
     user waits for release process status to be  Complete    900
     user checks page does not contain button  Edit release status
 
@@ -147,7 +146,7 @@ User goes to public Find Statistics page
     [Tags]  HappyPath
     environment variable should be set   PUBLIC_URL
     user goes to url   %{PUBLIC_URL}/find-statistics
-    user waits until page contains heading  Find statistics and data
+    user waits until page contains heading 1  Find statistics and data
     user waits for page to finish loading
 
 Verify newly published release is on Find Statistics page
@@ -157,7 +156,7 @@ Verify newly published release is on Find Statistics page
     user checks accordion section contains text   Test theme   ${TOPIC_NAME}
 
     user opens details dropdown  ${TOPIC_NAME}
-    user checks details dropdown contains publication    ${TOPIC_NAME}  ${PUBLICATION_NAME}
+    user waits until details dropdown contains publication    ${TOPIC_NAME}  ${PUBLICATION_NAME}
     user checks publication bullet contains link   ${PUBLICATION_NAME}  View statistics and data
     user checks publication bullet contains link   ${PUBLICATION_NAME}  Create your own tables online
     user checks publication bullet does not contain link  ${PUBLICATION_NAME}   Statistics at DfE
@@ -165,24 +164,24 @@ Verify newly published release is on Find Statistics page
 Go to Table Tool page
     [Tags]  HappyPath
     user goes to url  %{PUBLIC_URL}/data-tables
-    user waits until page contains heading  Create your own tables online
+    user waits until page contains heading 1  Create your own tables online
     user waits for page to finish loading
 
 Select publication in table tool
     [Tags]  HappyPath
     user opens details dropdown    Test theme
     user opens details dropdown    ${TOPIC_NAME}
-    user selects radio      ${PUBLICATION_NAME}
+    user clicks radio      ${PUBLICATION_NAME}
     user clicks element    css:#publicationForm-submit
-    user waits until element is visible   xpath://h2[text()="Choose a subject"]
+    user waits until page contains heading 2   Choose a subject
     user checks previous table tool step contains  1    Publication    ${PUBLICATION_NAME}
 
 Select subject "UI test subject" in table tool
     [Tags]  HappyPath
     user waits until page contains   UI test subject
-    user selects radio    UI test subject
+    user clicks radio    UI test subject
     user clicks element   css:#publicationSubjectForm-submit
-    user waits until element is visible  xpath://h2[text()="Choose locations"]     90
+    user waits until page contains heading 2  Choose locations
     user checks previous table tool step contains  2    Subject    UI test subject
 
 Select locations in table tool
@@ -191,48 +190,45 @@ Select locations in table tool
     user clicks checkbox   Barnsley
     user clicks checkbox   Birmingham
     user clicks element     css:#locationFiltersForm-submit
-    user waits until element is visible  xpath://h2[text()="Choose time period"]   90
+    user waits until page contains heading 2  Choose time period
     user checks previous table tool step contains  3   Local Authority    Barnsley
     user checks previous table tool step contains  3   Local Authority    Birmingham
 
 Select time period in table tool
     [Tags]   HappyPath
-    user selects start date    2014
-    user selects end date      2018
+    user selects from list by label  id:timePeriodForm-start  2014
+    user selects from list by label  id:timePeriodForm-end    2018
     user clicks element     css:#timePeriodForm-submit
 
 Select indicators in table tool
     [Tags]  HappyPath
-    user waits until element is visible  xpath://h2[text()="Choose your filters"]
+    user waits until page contains heading 2  Choose your filters
     user clicks indicator checkbox    Admission Numbers
     user clicks element   css:#filtersForm-submit
 
-Validate table column headings
+Validate table
     [Tags]  HappyPath
+    ${table}=  set variable  css:table
     user waits until results table appears  180
-    user checks results table column heading contains  css:table  1  1  2014
-    user checks results table column heading contains  css:table  1  2  2015
-    user checks results table column heading contains  css:table  1  3  2016
-    user checks results table column heading contains  css:table  1  4  2017
-    user checks results table column heading contains  css:table  1  5  2018
+    user checks table column heading contains   ${table}  1  1  2014
+    user checks table column heading contains   ${table}  1  2  2015
+    user checks table column heading contains   ${table}  1  3  2016
+    user checks table column heading contains   ${table}  1  4  2017
+    user checks table column heading contains   ${table}  1  5  2018
 
-Validate table rows for Barnsley
-    [Tags]  HappyPath
-    ${row}=  user gets row number with heading  Barnsley
-    user checks results table cell in offset row contains  ${row}  0  1  9,854
-    user checks results table cell in offset row contains  ${row}  0  2  1,134
-    user checks results table cell in offset row contains  ${row}  0  3  7,419
-    user checks results table cell in offset row contains  ${row}  0  4  5,032
-    user checks results table cell in offset row contains  ${row}  0  5  8,123
+    ${row}=  user gets row number with heading  ${table}  Barnsley
+    user checks table cell in offset row contains  ${table}  ${row}  0  1  9,854
+    user checks table cell in offset row contains  ${table}  ${row}  0  2  1,134
+    user checks table cell in offset row contains  ${table}  ${row}  0  3  7,419
+    user checks table cell in offset row contains  ${table}  ${row}  0  4  5,032
+    user checks table cell in offset row contains  ${table}  ${row}  0  5  8,123
 
-Validate table rows for Birmingham
-    [Tags]  HappyPath
-    ${row}=  user gets row number with heading   Birmingham
-    user checks results table cell in offset row contains  ${row}  0  1  3,708
-    user checks results table cell in offset row contains  ${row}  0  2  9,303
-    user checks results table cell in offset row contains  ${row}  0  3  8,856
-    user checks results table cell in offset row contains  ${row}  0  4  8,530
-    user checks results table cell in offset row contains  ${row}  0  5  3,962
+    ${row}=  user gets row number with heading   ${table}  Birmingham
+    user checks table cell in offset row contains  ${table}  ${row}  0  1  3,708
+    user checks table cell in offset row contains  ${table}  ${row}  0  2  9,303
+    user checks table cell in offset row contains  ${table}  ${row}  0  3  8,856
+    user checks table cell in offset row contains  ${table}  ${row}  0  4  8,530
+    user checks table cell in offset row contains  ${table}  ${row}  0  5  3,962
 
 Select table highlight from subjects step
     [Tags]  HappyPath
@@ -247,70 +243,62 @@ Select table highlight from subjects step
 
 Validate table column headings for table highlight
     [Tags]  HappyPath
-    user checks results table column heading contains  css:table  1  1  Admission Numbers
+    user checks table column heading contains  css:table  1  1  Admission Numbers
 
 Validate table rows for Bolton 001 (E02000984)
     [Tags]  HappyPath
-    ${row}=  user gets row number with heading  Bolton 001 (E02000984)
-    user checks results table heading in offset row contains  ${row}  0  2  2019
+    ${table}=  set variable  css:table
 
-    user checks results table cell in offset row contains  ${row}  0  1  8,533
+    ${row}=  user gets row number with heading  ${table}  Bolton 001 (E02000984)
+    user checks table heading in offset row contains  ${table}  ${row}  0  2  2019
 
-Validate table rows for Bolton 001 (E05000364)
-    [Tags]  HappyPath
-    ${row}=  user gets row number with heading   Bolton 001 (E05000364)
-    user checks results table heading in offset row contains  ${row}  0  2  2009
-    user checks results table heading in offset row contains  ${row}  1  1  2010
-    user checks results table heading in offset row contains  ${row}  2  1  2017
+    user checks table cell in offset row contains  ${table}  ${row}  0  1  8,533
 
-    user checks results table cell in offset row contains  ${row}  0  1  5,815
-    user checks results table cell in offset row contains  ${row}  1  1  5,595
-    user checks results table cell in offset row contains  ${row}  2  1  6,373
+    ${row}=  user gets row number with heading   ${table}  Bolton 001 (E05000364)
+    user checks table heading in offset row contains  ${table}  ${row}  0  2  2009
+    user checks table heading in offset row contains  ${table}  ${row}  1  1  2010
+    user checks table heading in offset row contains  ${table}  ${row}  2  1  2017
 
-Validate table rows for Bolton 004 (E02000987)
-    [Tags]  HappyPath
-    ${row}=  user gets row number with heading   Bolton 004 (E02000987)
-    user checks results table heading in offset row contains  ${row}  0  2  2020
+    user checks table cell in offset row contains  ${table}  ${row}  0  1  5,815
+    user checks table cell in offset row contains  ${table}  ${row}  1  1  5,595
+    user checks table cell in offset row contains  ${table}  ${row}  2  1  6,373
 
-    user checks results table cell in offset row contains  ${row}  0  1  6,031
+    ${row}=  user gets row number with heading   ${table}  Bolton 004 (E02000987)
+    user checks table heading in offset row contains  ${table}  ${row}  0  2  2020
 
-Validate table rows for Bolton 004 (E05010450)
-    [Tags]  HappyPath
-    ${row}=  user gets row number with heading   Bolton 004 (E05010450)
-    user checks results table heading in offset row contains  ${row}  0  2  2005
-    user checks results table heading in offset row contains  ${row}  1  1  2017
-    user checks results table heading in offset row contains  ${row}  2  1  2018
+    user checks table cell in offset row contains  ${table}  ${row}  0  1  6,031
 
-    user checks results table cell in offset row contains  ${row}  0  1  8,557
-    user checks results table cell in offset row contains  ${row}  1  1  3,481
-    user checks results table cell in offset row contains  ${row}  2  1  8,630
+    ${row}=  user gets row number with heading   ${table}  Bolton 004 (E05010450)
+    user checks table heading in offset row contains  ${table}  ${row}  0  2  2005
+    user checks table heading in offset row contains  ${table}  ${row}  1  1  2017
+    user checks table heading in offset row contains  ${table}  ${row}  2  1  2018
 
-Validate table rows for Nailsea Youngwood
-    [Tags]  HappyPath
-    ${row}=  user gets row number with heading   Nailsea Youngwood
-    user checks results table heading in offset row contains  ${row}  0  2  2005
-    user checks results table heading in offset row contains  ${row}  1  1  2010
-    user checks results table heading in offset row contains  ${row}  2  1  2011
-    user checks results table heading in offset row contains  ${row}  3  1  2012
-    user checks results table heading in offset row contains  ${row}  4  1  2016
+    user checks table cell in offset row contains  ${table}  ${row}  0  1  8,557
+    user checks table cell in offset row contains  ${table}  ${row}  1  1  3,481
+    user checks table cell in offset row contains  ${table}  ${row}  2  1  8,630
 
-    user checks results table cell in offset row contains  ${row}  0  1  3,612
-    user checks results table cell in offset row contains  ${row}  1  1  9,304
-    user checks results table cell in offset row contains  ${row}  2  1  9,603
-    user checks results table cell in offset row contains  ${row}  3  1  8,150
-    user checks results table cell in offset row contains  ${row}  4  1  4,198
+    ${row}=  user gets row number with heading   ${table}  Nailsea Youngwood
+    user checks table heading in offset row contains  ${table}  ${row}  0  2  2005
+    user checks table heading in offset row contains  ${table}  ${row}  1  1  2010
+    user checks table heading in offset row contains  ${table}  ${row}  2  1  2011
+    user checks table heading in offset row contains  ${table}  ${row}  3  1  2012
+    user checks table heading in offset row contains  ${table}  ${row}  4  1  2016
 
-Validate table rows for Syon
-    [Tags]  HappyPath
-    ${row}=  user gets row number with heading   Syon
-    user checks results table heading in offset row contains  ${row}  0  2  2007
-    user checks results table heading in offset row contains  ${row}  1  1  2008
-    user checks results table heading in offset row contains  ${row}  2  1  2010
-    user checks results table heading in offset row contains  ${row}  3  1  2012
-    user checks results table heading in offset row contains  ${row}  4  1  2017
+    user checks table cell in offset row contains  ${table}  ${row}  0  1  3,612
+    user checks table cell in offset row contains  ${table}  ${row}  1  1  9,304
+    user checks table cell in offset row contains  ${table}  ${row}  2  1  9,603
+    user checks table cell in offset row contains  ${table}  ${row}  3  1  8,150
+    user checks table cell in offset row contains  ${table}  ${row}  4  1  4,198
 
-    user checks results table cell in offset row contains  ${row}  0  1  9,914
-    user checks results table cell in offset row contains  ${row}  1  1  5,505
-    user checks results table cell in offset row contains  ${row}  2  1  6,060
-    user checks results table cell in offset row contains  ${row}  3  1  1,109
-    user checks results table cell in offset row contains  ${row}  4  1  1,959
+    ${row}=  user gets row number with heading   ${table}  Syon
+    user checks table heading in offset row contains  ${table}  ${row}  0  2  2007
+    user checks table heading in offset row contains  ${table}  ${row}  1  1  2008
+    user checks table heading in offset row contains  ${table}  ${row}  2  1  2010
+    user checks table heading in offset row contains  ${table}  ${row}  3  1  2012
+    user checks table heading in offset row contains  ${table}  ${row}  4  1  2017
+
+    user checks table cell in offset row contains  ${table}  ${row}  0  1  9,914
+    user checks table cell in offset row contains  ${table}  ${row}  1  1  5,505
+    user checks table cell in offset row contains  ${table}  ${row}  2  1  6,060
+    user checks table cell in offset row contains  ${table}  ${row}  3  1  1,109
+    user checks table cell in offset row contains  ${table}  ${row}  4  1  1,959

@@ -179,7 +179,7 @@ const FootnoteForm = ({
                           <fieldset
                             key={subjectMetaId}
                             className="govuk-fieldset"
-                            datatest-id={`footnote-subject ${subjectMeta.subjectName}`}
+                            data-testid={`footnote-subject ${subjectMeta.subjectName}`}
                           >
                             <legend className="govuk-heading-m">
                               Subject: {subjectMeta.subjectName}

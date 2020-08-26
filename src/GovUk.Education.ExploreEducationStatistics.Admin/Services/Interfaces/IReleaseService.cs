@@ -1,7 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Threading.Tasks;
-using GovUk.Education.ExploreEducationStatistics.Admin.Controllers.Api;
 using GovUk.Education.ExploreEducationStatistics.Admin.Models.Api;
 using GovUk.Education.ExploreEducationStatistics.Admin.ViewModels;
 using GovUk.Education.ExploreEducationStatistics.Common.Model;
@@ -19,12 +18,12 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Services.Interfaces
         Task<Either<ActionResult, ReleaseViewModel>> CreateReleaseAmendmentAsync(Guid releaseId);
 
         Task<Either<ActionResult, ReleaseViewModel>> GetReleaseForIdAsync(Guid id);
-        
+
         Task<Either<ActionResult, ReleaseSummaryViewModel>> GetReleaseSummaryAsync(Guid releaseId);
-        
+
         Task<Either<ActionResult, ReleasePublicationStatusViewModel>> GetReleasePublicationStatusAsync(Guid releaseId);
-        
-        Task<Either<ActionResult, ReleaseViewModel>> UpdateRelease(Guid releaseId, UpdateReleaseRequest request);
+
+        Task<Either<ActionResult, ReleaseViewModel>> UpdateRelease(Guid releaseId, UpdateReleaseViewModel request);
 
         Task<Either<ActionResult, TitleAndIdViewModel>> GetLatestReleaseAsync(Guid publicationId);
 
@@ -33,7 +32,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Services.Interfaces
         Task<Either<ActionResult, List<MyReleaseViewModel>>> GetMyScheduledReleasesAsync();
 
         Task<Either<ActionResult, DeleteDataFilePlan>> GetDeleteDataFilePlan(Guid releaseId, string dataFileName, string subjectTitle);
-        
+
         Task<Either<ActionResult, bool>>  RemoveDataFilesAsync(Guid releaseId, string fileName, string subjectTitle);
 
         Task<Either<ActionResult, ImportStatus>> GetDataFileImportStatus(Guid releaseId, string dataFileName);

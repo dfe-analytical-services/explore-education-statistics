@@ -4,7 +4,6 @@ import useGetChartFile from '@common/modules/charts/hooks/useGetChartFile';
 import ContentBlockRenderer from '@common/modules/find-statistics/components/ContentBlockRenderer';
 import DataBlockTabs from '@common/modules/find-statistics/components/DataBlockTabs';
 import KeyStat, {
-  KeyStatColumn,
   KeyStatContainer,
 } from '@common/modules/find-statistics/components/KeyStat';
 import { Release } from '@common/services/publicationService';
@@ -29,7 +28,7 @@ const PublicationReleaseHeadlinesSection = ({
   const getChartFile = useGetChartFile(publication.slug, slug);
 
   const summaryTab = (
-    <TabsSection title="Summary">
+    <TabsSection title="Summary" id="releaseHeadlines-summary">
       <KeyStatContainer>
         {keyStatisticsSection.content.map(block => {
           if (block.type !== 'DataBlock') {
@@ -37,19 +36,18 @@ const PublicationReleaseHeadlinesSection = ({
           }
 
           return (
-            <KeyStatColumn key={block.id}>
-              <KeyStat
-                query={{
-                  releaseId: id,
-                  ...block.query,
-                }}
-                summary={block.summary}
-                queryOptions={{
-                  dataLastPublished,
-                  expiresIn: 60 * 60 * 24,
-                }}
-              />
-            </KeyStatColumn>
+            <KeyStat
+              key={block.id}
+              query={{
+                releaseId: id,
+                ...block.query,
+              }}
+              summary={block.summary}
+              queryOptions={{
+                dataLastPublished,
+                expiresIn: 60 * 60 * 24,
+              }}
+            />
           );
         })}
       </KeyStatContainer>
@@ -61,13 +59,13 @@ const PublicationReleaseHeadlinesSection = ({
   );
 
   if (!keyStatisticsSecondarySection.content.length) {
-    return <Tabs id="releaseHeadlines-dataBlock">{summaryTab}</Tabs>;
+    return <Tabs id="releaseHeadlines">{summaryTab}</Tabs>;
   }
 
   return (
     <DataBlockTabs
+      id="releaseHeadlines"
       releaseId={id}
-      id="releaseHeadlines-dataBlock"
       getInfographic={getChartFile}
       dataBlock={keyStatisticsSecondarySection.content[0]}
       firstTabs={summaryTab}

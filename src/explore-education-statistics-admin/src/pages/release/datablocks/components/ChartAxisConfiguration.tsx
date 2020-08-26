@@ -1,9 +1,8 @@
 import styles from '@admin/pages/release/datablocks/components/ChartAxisConfiguration.module.scss';
 import { ChartBuilderForm } from '@admin/pages/release/datablocks/components/ChartBuilder';
-import ChartBuilderSaveButton from '@admin/pages/release/datablocks/components/ChartBuilderSaveButton';
+import ChartBuilderSaveActions from '@admin/pages/release/datablocks/components/ChartBuilderSaveActions';
 import { FormState } from '@admin/pages/release/datablocks/reducers/chartBuilderReducer';
 import Button from '@common/components/Button';
-import ButtonGroup from '@common/components/ButtonGroup';
 import Effect from '@common/components/Effect';
 import {
   Form,
@@ -48,6 +47,7 @@ interface Props {
   defaultDataType?: AxisGroupBy;
   forms: Dictionary<ChartBuilderForm>;
   hasSubmittedChart: boolean;
+  isSaving?: boolean;
   id: string;
   type: AxisType;
   configuration: AxisConfiguration;
@@ -66,6 +66,7 @@ const ChartAxisConfiguration = ({
   definition,
   forms,
   hasSubmittedChart,
+  isSaving,
   id,
   data,
   meta,
@@ -218,8 +219,7 @@ const ChartAxisConfiguration = ({
     let schema: ObjectSchema<FormValues> = Yup.object({
       size: Yup.number()
         .required('Enter size of axis')
-        .positive('Size of axis must be positive')
-        .max(100, 'Size of axis must be less than 100px'),
+        .positive('Size of axis must be positive'),
       tickConfig: Yup.string().oneOf(
         ['default', 'startEnd', 'custom'],
         'Select a valid tick display type',
@@ -345,7 +345,6 @@ const ChartAxisConfiguration = ({
                     id={`${id}-size`}
                     name="size"
                     min={0}
-                    max={100}
                     label="Size of axis (px)"
                     width={3}
                   />
@@ -637,17 +636,16 @@ const ChartAxisConfiguration = ({
             </table>
           )}
 
-          <ButtonGroup>
-            <ChartBuilderSaveButton
-              formId={id}
-              forms={forms}
-              showSubmitError={
-                form.isValid && form.submitCount > 0 && !canSaveChart
-              }
-            />
-
+          <ChartBuilderSaveActions
+            disabled={isSaving}
+            formId={id}
+            forms={forms}
+            showSubmitError={
+              form.isValid && form.submitCount > 0 && !canSaveChart
+            }
+          >
             {buttons}
-          </ButtonGroup>
+          </ChartBuilderSaveActions>
         </Form>
       )}
     </Formik>

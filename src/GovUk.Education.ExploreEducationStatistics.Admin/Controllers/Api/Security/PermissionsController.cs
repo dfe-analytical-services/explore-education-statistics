@@ -1,4 +1,3 @@
-using System.Collections.Generic;
 using System;
 using System.Threading.Tasks;
 using GovUk.Education.ExploreEducationStatistics.Admin.Models;
@@ -26,8 +25,8 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Controllers.Api.Secur
         private readonly IPreReleaseService _preReleaseService;
 
         public PermissionsController(
-            IUserService userService, 
-            IPersistenceHelper<ContentDbContext> persistenceHelper, 
+            IUserService userService,
+            IPersistenceHelper<ContentDbContext> persistenceHelper,
             IPreReleaseService preReleaseService)
         {
             _userService = userService;
@@ -42,6 +41,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Controllers.Api.Secur
             public bool CanAccessAnalystPages { get; set; }
             public bool CanAccessUserAdministrationPages { get; set; }
             public bool CanAccessMethodologyAdministrationPages { get; set; }
+            public bool CanManageAllTaxonomy { get; set; }
         }
 
         [HttpGet("access")]
@@ -53,7 +53,8 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Controllers.Api.Secur
                 CanAccessAnalystPages = _userService.CheckCanAccessAnalystPages().Result.IsRight,
                 CanAccessPrereleasePages = _userService.CheckCanAccessPrereleasePages().Result.IsRight,
                 CanAccessUserAdministrationPages = _userService.CheckCanManageAllUsers().Result.IsRight,
-                CanAccessMethodologyAdministrationPages = _userService.CheckCanManageAllMethodologies().Result.IsRight
+                CanAccessMethodologyAdministrationPages = _userService.CheckCanManageAllMethodologies().Result.IsRight,
+                CanManageAllTaxonomy = _userService.CheckCanManageAllTaxonomy().Result.IsRight
             };
         }
 
@@ -110,7 +111,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Controllers.Api.Secur
                 .OnSuccess(release => _preReleaseService.GetPreReleaseWindowStatus(release, UtcNow))
                 .HandleFailuresOrOk();
         }
-        
+
         [HttpGet("methodology/{methodologyId}/update")]
         public Task<ActionResult<bool>> CanUpdateMethodology(Guid methodologyId)
         {

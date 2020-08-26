@@ -1,10 +1,9 @@
 import { ChartBuilderForm } from '@admin/pages/release/datablocks/components/ChartBuilder';
-import ChartBuilderSaveButton from '@admin/pages/release/datablocks/components/ChartBuilderSaveButton';
+import ChartBuilderSaveActions from '@admin/pages/release/datablocks/components/ChartBuilderSaveActions';
 import ChartDataConfiguration from '@admin/pages/release/datablocks/components/ChartDataConfiguration';
 import styles from '@admin/pages/release/datablocks/components/ChartDataSelector.module.scss';
 import { FormState } from '@admin/pages/release/datablocks/reducers/chartBuilderReducer';
 import Button from '@common/components/Button';
-import ButtonGroup from '@common/components/ButtonGroup';
 import Details from '@common/components/Details';
 import { Form, FormFieldSelect } from '@common/components/form';
 import { ChartDefinition } from '@common/modules/charts/types/chart';
@@ -38,6 +37,7 @@ interface Props {
   dataSets?: DataSetConfiguration[];
   definition: ChartDefinition;
   forms: Dictionary<ChartBuilderForm>;
+  isSaving?: boolean;
   meta: FullTableMeta;
   onDataAdded?: (data: DataSetConfiguration) => void;
   onDataRemoved?: (data: DataSetConfiguration, index: number) => void;
@@ -55,6 +55,7 @@ const formId = 'chartDataSelectorForm';
 const ChartDataSelector = ({
   buttons,
   canSaveChart,
+  isSaving,
   forms,
   meta,
   dataSets = [],
@@ -239,7 +240,7 @@ const ChartDataSelector = ({
                   label="Time period"
                   formGroupClass={styles.formSelectGroup}
                   className="govuk-!-width-full"
-                  placeholder="Any time period"
+                  placeholder="All time periods"
                   options={meta.timePeriodRange}
                   order={[]}
                 />
@@ -307,22 +308,21 @@ const ChartDataSelector = ({
                 })}
               </ul>
 
-              <ButtonGroup>
-                <ChartBuilderSaveButton
-                  formId={formId}
-                  forms={forms}
-                  showSubmitError={submitCount > 0 && !canSaveChart}
-                  onClick={() => {
-                    setSubmitCount(submitCount + 1);
+              <ChartBuilderSaveActions
+                disabled={isSaving}
+                formId={formId}
+                forms={forms}
+                showSubmitError={submitCount > 0 && !canSaveChart}
+                onClick={() => {
+                  setSubmitCount(submitCount + 1);
 
-                    if (canSaveChart) {
-                      onSubmit(dataSetConfigs);
-                    }
-                  }}
-                />
-
+                  if (canSaveChart) {
+                    onSubmit(dataSetConfigs);
+                  }
+                }}
+              >
                 {buttons}
-              </ButtonGroup>
+              </ChartBuilderSaveActions>
             </>
           )}
         </>

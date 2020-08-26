@@ -43,8 +43,8 @@ Validate homepage
     user checks page contains element  xpath://h3[text()="Contact Us"]
     user checks page contains link with text and url  explore.statistics@education.gov.uk   mailto:explore.statistics@education.gov.uk
 
-    user checks element count is x      css:[data-testid="breadcrumbs--list"] li     1
-    user checks element should contain  css:[data-testid="breadcrumbs--list"] li:nth-child(1)   Home
+    user checks breadcrumb count should be  1
+    user checks nth breadcrumb contains     1   Home
 
     user checks page contains link with text and url   Open Government Licence v3.0  https://www.nationalarchives.gov.uk/doc/open-government-licence/version/3/
     user checks page contains link with text and url   © Crown copyright   https://www.nationalarchives.gov.uk/information-management/re-using-public-sector-information/uk-government-licensing-framework/crown-copyright/
@@ -52,12 +52,12 @@ Validate homepage
 Validate Cookies page
     [Tags]  HappyPath
     user clicks link   Cookies
-    user waits until page contains heading   Cookies on Explore education statistics
+    user waits until page contains heading 1   Cookies on Explore education statistics
     user checks url contains   %{PUBLIC_URL}/cookies
 
-    user checks element count is x  css:[data-testid="breadcrumbs--list"] li     2
-    user checks element should contain  css:[data-testid="breadcrumbs--list"] li:nth-child(1)   Home
-    user checks element should contain  css:[data-testid="breadcrumbs--list"] li:nth-child(2)   Cookies
+    user checks breadcrumb count should be  2
+    user checks nth breadcrumb contains  1   Home
+    user checks nth breadcrumb contains  2   Cookies
 
 Disable google analytics
     [Tags]  HappyPath   NotAgainstLocal
@@ -73,7 +73,7 @@ Enable google analytics
     user reloads page
 
     user checks page does not contain  Your cookie settings were saved
-    user waits until page contains heading   Cookies on Explore education statistics
+    user waits until page contains heading 1   Cookies on Explore education statistics
 
     sleep  1   # NOTE(mark): Without the wait, the click doesn't select the radio despite the DOM being loaded
     user clicks element   css:#googleAnalytics-on
@@ -86,27 +86,27 @@ Enable google analytics
 Validate Cookies Details page
     [Tags]  HappyPath
     user clicks link   Find out more about cookies on Explore education statistics
-    user waits until page contains heading   Details about cookies
+    user waits until page contains heading 1   Details about cookies
     user checks url contains   %{PUBLIC_URL}/cookies/details
 
-    user checks element count is x  css:[data-testid="breadcrumbs--list"] li     3
-    user checks element should contain  css:[data-testid="breadcrumbs--list"] li:nth-child(1)   Home
-    user checks element should contain  css:[data-testid="breadcrumbs--list"] li:nth-child(2)   Cookies
-    user checks element should contain  css:[data-testid="breadcrumbs--list"] li:nth-child(3)   Details about cookies
+    user checks breadcrumb count should be  3
+    user checks nth breadcrumb contains  1   Home
+    user checks nth breadcrumb contains  2   Cookies
+    user checks nth breadcrumb contains  3   Details about cookies
 
     cookie names should be on page
 
 Validate Privacy notice page
     [Tags]  HappyPath
     user clicks link   Privacy notice
-    user waits until page contains heading  Privacy notice
+    user waits until page contains heading 1  Privacy notice
     user waits until page contains  The Explore education statistics service is operated by the Department for Education
 
     user checks url contains  %{PUBLIC_URL}/privacy-notice
 
-    user checks element count is x  css:[data-testid="breadcrumbs--list"] li     2
-    user checks element should contain  css:[data-testid="breadcrumbs--list"] li:nth-child(1)   Home
-    user checks element should contain  css:[data-testid="breadcrumbs--list"] li:nth-child(2)   Privacy notice
+    user checks breadcrumb count should be  2
+    user checks nth breadcrumb contains  1   Home
+    user checks nth breadcrumb contains  2   Privacy notice
 
 Validate Contact page
     [Tags]  HappyPath
@@ -119,32 +119,32 @@ Validate Contact page
 
     user checks url contains    %{PUBLIC_URL}/contact-us
 
-    user checks element count is x  css:[data-testid="breadcrumbs--list"] li     2
-    user checks element should contain  css:[data-testid="breadcrumbs--list"] li:nth-child(1)   Home
-    user checks element should contain  css:[data-testid="breadcrumbs--list"] li:nth-child(2)   Contact
+    user checks breadcrumb count should be  2
+    user checks nth breadcrumb contains  1   Home
+    user checks nth breadcrumb contains  2   Contact
 
 Validate Accessibility statement page
     [Tags]  HappyPath
     user clicks link  Accessibility statement
-    user waits until page contains heading  Accessibility statement for Explore education statistics
+    user waits until page contains heading 1  Accessibility statement for Explore education statistics
     user waits until page contains heading 2  What we’re doing to improve accessibility
 
     user checks url contains  %{PUBLIC_URL}/accessibility-statement
 
-    user checks element count is x  css:[data-testid="breadcrumbs--list"] li     2
-    user checks element should contain  css:[data-testid="breadcrumbs--list"] li:nth-child(1)   Home
-    user checks element should contain  css:[data-testid="breadcrumbs--list"] li:nth-child(2)   Accessibility statement
+    user checks breadcrumb count should be  2
+    user checks nth breadcrumb contains  1   Home
+    user checks nth breadcrumb contains  2   Accessibility statement
 
 Validate Help and support page
     [Tags]  HappyPath
     user clicks link    Help and support
-    user waits until page contains heading  Help and support
+    user waits until page contains heading 1  Help and support
 
     user checks url contains    %{PUBLIC_URL}/help-support
 
-    user checks element count is x  css:[data-testid="breadcrumbs--list"] li     2
-    user checks element should contain  css:[data-testid="breadcrumbs--list"] li:nth-child(1)   Home
-    user checks element should contain  css:[data-testid="breadcrumbs--list"] li:nth-child(2)   Help and support
+    user checks breadcrumb count should be  2
+    user checks nth breadcrumb contains  1   Home
+    user checks nth breadcrumb contains  2   Help and support
 
 Validate Feedback page
     [Documentation]  EES-942

@@ -178,6 +178,7 @@ const ReleaseContentAccordionSection = ({
         <>
           {showDataBlockForm && (
             <DataBlockSelectForm
+              id={`dataBlockSelectForm-${sectionId}`}
               releaseId={release.id}
               onSelect={async selectedDataBlockId => {
                 await attachDataBlock(selectedDataBlockId);

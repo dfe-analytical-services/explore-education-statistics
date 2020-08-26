@@ -49,10 +49,10 @@ const RelatedInformationSection = ({ release }: Props) => {
       <Formik<Omit<BasicLink, 'id'>>
         initialValues={{ description: '', url: '' }}
         validationSchema={Yup.object({
-          description: Yup.string().required('Link title must be provided'),
+          description: Yup.string().required('Enter a link title'),
           url: Yup.string()
-            .url()
-            .required('Link url must be provided'),
+            .url('Enter a valid link url')
+            .required('Enter a link url'),
         })}
         onSubmit={link =>
           addLink(link).then(() => {

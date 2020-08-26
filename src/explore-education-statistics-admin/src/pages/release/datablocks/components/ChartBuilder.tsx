@@ -25,8 +25,10 @@ import {
   lineChartBlockDefinition,
   LineChartProps,
 } from '@common/modules/charts/components/LineChartBlock';
-import { mapBlockDefinition } from '@common/modules/charts/components/MapBlock';
-import { MapBlockInternalProps } from '@common/modules/charts/components/MapBlockInternal';
+import {
+  mapBlockDefinition,
+  MapBlockProps,
+} from '@common/modules/charts/components/MapBlock';
 import {
   verticalBarBlockDefinition,
   VerticalBarProps,
@@ -129,6 +131,9 @@ const ChartBuilder = ({
   const [isDataLoading, setDataLoading] = useState(false);
   const [shouldSave, setShouldSave] = useState(false);
 
+  const [isSaving, setSaving] = useState(false);
+  const [isDeleting, setDeleting] = useState(false);
+
   const { state: chartBuilderState, actions } = useChartBuilderReducer(
     initialConfiguration,
   );
@@ -208,7 +213,7 @@ const ChartBuilder = ({
         };
       case 'map':
         return {
-          ...(baseProps as MapBlockInternalProps),
+          ...(baseProps as MapBlockProps),
           type: 'map',
         };
       default:
@@ -238,13 +243,19 @@ const ChartBuilder = ({
       });
     }
 
-    onChartSave(filterChartProps(chartProps), chartProps.file).catch(error => {
-      if (isServerValidationError(error) && error.response?.data) {
-        setSubmitError(error.response.data);
-      } else {
-        throw error;
-      }
-    });
+    setSaving(true);
+
+    onChartSave(filterChartProps(chartProps), chartProps.file)
+      .catch(error => {
+        if (isServerValidationError(error) && error.response?.data) {
+          setSubmitError(error.response.data);
+        } else {
+          throw error;
+        }
+      })
+      .finally(() => {
+        setSaving(false);
+      });
   }, [canSaveChart, chartProps, onChartSave, shouldSave]);
 
   const handleChartDelete = useCallback(async () => {
@@ -254,9 +265,15 @@ const ChartBuilder = ({
       return;
     }
 
-    await onChartDelete(filterChartProps(chartProps));
+    setDeleting(true);
 
-    actions.resetState();
+    try {
+      await onChartDelete(filterChartProps(chartProps));
+
+      actions.resetState();
+    } finally {
+      setDeleting(false);
+    }
   }, [actions, chartProps, onChartDelete, toggleDeleteModal]);
 
   const handleChartDefinitionChange = useCallback(
@@ -325,11 +342,15 @@ const ChartBuilder = ({
 
   const deleteButton = useMemo(
     () => (
-      <Button variant="warning" onClick={toggleDeleteModal.on}>
+      <Button
+        variant="warning"
+        onClick={toggleDeleteModal.on}
+        disabled={isDeleting}
+      >
         Delete chart
       </Button>
     ),
-    [toggleDeleteModal.on],
+    [isDeleting, toggleDeleteModal.on],
   );
 
   return (
@@ -361,6 +382,7 @@ const ChartBuilder = ({
               buttons={deleteButton}
               canSaveChart={canSaveChart}
               hasSubmittedChart={hasSubmittedChart}
+              isSaving={isSaving}
               submitError={submitError}
               forms={forms}
               definition={definition}
@@ -376,12 +398,13 @@ const ChartBuilder = ({
           {definition.data.length > 0 && (
             <TabsSection
               title="Data sets"
-              headingTitle="Choose data to add to the chart"
+              headingTitle="Add data sets to the chart"
               id={forms.data.id}
             >
               <ChartDataSelector
                 buttons={deleteButton}
                 canSaveChart={canSaveChart}
+                isSaving={isSaving}
                 forms={forms}
                 meta={meta}
                 dataSets={axes.major?.dataSets}
@@ -415,6 +438,7 @@ const ChartBuilder = ({
                     buttons={deleteButton}
                     canSaveChart={canSaveChart}
                     hasSubmittedChart={hasSubmittedChart}
+                    isSaving={isSaving}
                     forms={forms}
                     id={`chartAxisConfiguration-${type}`}
                     type={type as AxisType}

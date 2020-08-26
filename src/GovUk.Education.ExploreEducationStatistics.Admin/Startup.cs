@@ -72,7 +72,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin
         public void ConfigureServices(IServiceCollection services)
         {
             services.AddApplicationInsightsTelemetry();
-            
+
             services.Configure<CookiePolicyOptions>(options =>
             {
                 // This lambda determines whether user consent for non-essential cookies is needed for a given request.
@@ -166,7 +166,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin
                 // this Claim is renamed via the DefaultInboundClaimTypeMap earlier in the login process).
                 //
                 // It doesn't seem to be possible to remove the renaming (via
-                // JwtSecurityTokenHandler.DefaultInboundClaimTypeMap.Remove("sub")) because some mechanism earlier in the 
+                // JwtSecurityTokenHandler.DefaultInboundClaimTypeMap.Remove("sub")) because some mechanism earlier in the
                 // authentication process requires it to be in the Claim named
                 // "http://schemas.xmlsoap.org/ws/2005/05/identity/claims/nameidentifier" rather than "sub".
                 options.ClaimsIdentity.UserIdClaimType = ClaimTypes.NameIdentifier;
@@ -182,7 +182,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin
             StartupSecurityConfiguration.ConfigureAuthorizationPolicies(services);
 
             services.Configure<RouteOptions>(options => options.LowercaseUrls = true);
-            
+
             services.AddAutoMapper(AppDomain.CurrentDomain.GetAssemblies());
             services.AddTransient<IMyReleasePermissionSetPropertyResolver, MyReleasePermissionSetPropertyResolver>();
             services.AddTransient<IMyPublicationPermissionSetPropertyResolver, MyPublicationPermissionSetPropertyResolver>();
@@ -212,19 +212,18 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin
                     new StorageQueueService(Configuration.GetValue<string>("PublisherStorage")),
                     provider.GetService<IUserService>(),
                     provider.GetRequiredService<ILogger<PublishingService>>()));
-            services.AddTransient<IReleaseStatusService, ReleaseStatusService>(s => 
+            services.AddTransient<IReleaseStatusService, ReleaseStatusService>(s =>
                 new ReleaseStatusService(
                     s.GetService<IMapper>(),
                     s.GetService<IUserService>(),
                     s.GetService<IPersistenceHelper<ContentDbContext>>(),
                     new TableStorageService(Configuration.GetValue<string>("PublisherStorage"))));
-            services.AddTransient<IReleaseStatusRepository, ReleaseStatusRepository>(s => 
+            services.AddTransient<IReleaseStatusRepository, ReleaseStatusRepository>(s =>
                 new ReleaseStatusRepository(
                     new TableStorageService(Configuration.GetValue<string>("PublisherStorage"))
                 )
             );
             services.AddTransient<IThemeService, ThemeService>();
-            services.AddTransient<IThemeRepository, ThemeRepository>();
             services.AddTransient<ITopicService, TopicService>();
             services.AddTransient<IPublicationService, PublicationService>();
             services.AddTransient<IPublicationRepository, PublicationRepository>();
@@ -248,22 +247,22 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin
             services.AddTransient<INotificationClient>(s =>
             {
                 var notifyApiKey = Configuration.GetValue<string>("NotifyApiKey");
-                
+
                 if (!HostingEnvironment.IsDevelopment())
                 {
                     return new NotificationClient(notifyApiKey);
                 }
-                
+
                 if (notifyApiKey != null && notifyApiKey != "change-me")
                 {
                     return new NotificationClient(notifyApiKey);
                 }
-                
+
                 var logger = s.GetRequiredService<ILogger<LoggingNotificationClient>>();
                 return new LoggingNotificationClient(logger);
             });
             services.AddTransient<IEmailService, EmailService>();
-            
+
             services.AddTransient<IBoundaryLevelService, BoundaryLevelService>();
             services.AddTransient<ITableBuilderService, TableBuilderService>();
             services.AddTransient<IFilterService, FilterService>();
@@ -293,19 +292,20 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin
             services.AddTransient<IFileUploadsValidatorService, FileUploadsValidatorService>();
             services.AddTransient<ITableStorageService, TableStorageService>(s =>
                 new TableStorageService(Configuration.GetValue<string>("CoreStorage")));
-            // EES-1115 This can be removed once subject ids are fixed in all envs
-            services.AddTransient<IAmendmentMigrationService, AmendmentMigrationService>();
             services.AddSingleton<IGuidGenerator, SequentialGuidGenerator>();
             AddPersistenceHelper<ContentDbContext>(services);
             AddPersistenceHelper<StatisticsDbContext>(services);
 
             // This service handles the generation of the JWTs for users after they log in
             services.AddTransient<IProfileService, ApplicationUserProfileService>();
-            
+
             // These services allow us to check our Policies within Controllers and Services
             StartupSecurityConfiguration.ConfigureResourceBasedAuthorization(services);
 
             services.AddTransient<IFileTypeService, FileTypeService>();
+
+            // Temp service for EES-960
+            services.AddTransient<IUpdateChartFilesService, UpdateChartFilesService>();
 
             services.AddSwaggerGen(c =>
             {
@@ -406,7 +406,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin
             app.UseAuthentication();
             app.UseIdentityServer();
             app.UseAuthorization();
-            
+
             // deny access to all Identity routes other than /Identity/Account/Login and
             // /Identity/Account/ExternalLogin
             var options = new RewriteOptions()
@@ -423,7 +423,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin
                     name: "default",
                     template: "{controller}/{action=Index}/{id?}");
             });
-            
+
             app.UseSpa(spa =>
             {
                 if (env.IsDevelopment())

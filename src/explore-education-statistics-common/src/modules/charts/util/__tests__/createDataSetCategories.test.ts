@@ -326,7 +326,6 @@ describe('createDataSetCategories', () => {
         level: 'localAuthority',
         value: 'barnet',
       },
-      timePeriod: '2014_AY',
     });
 
     expect(dataSet1.value).toBe(2613);
@@ -1120,7 +1119,6 @@ describe('createDataSetCategories', () => {
     expect(JSON.parse(dataSet4Key)).toEqual({
       indicator: 'authorised-absence-sessions',
       filters: ['ethnicity-major-chinese', 'state-funded-primary'],
-      timePeriod: '2015_AY',
       location: {
         level: 'localAuthority',
         value: 'barnsley',

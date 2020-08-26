@@ -381,6 +381,21 @@
       }
     },
 
+    "preReleaseMinutesBeforeStart": {
+      "type": "int",
+      "defaultValue": 870,
+      "metadata": {
+        "description": "Prerelease start time as number of minutes before a release is scheduled to be published"
+      }
+    },
+    "preReleaseMinutesBeforeEnd": {
+      "type": "int",
+      "defaultValue": 1,
+      "metadata": {
+        "description": "Prerelease end time as number of minutes before a release is scheduled to be published"
+      }
+    },
+
     "publisherClientId": {
       "type": "string",
       "metadata": {
@@ -1054,6 +1069,8 @@
         "OpenIdConnect:ClientSecret": "[concat('@Microsoft.KeyVault(SecretUri=', reference(variables('ees-openidconnect-clientsecret'), '2018-02-14').secretUriWithVersion, ')')]",
         "CoreStorage": "[concat('@Microsoft.KeyVault(SecretUri=', reference(variables('ees-storage-core'), '2018-02-14').secretUriWithVersion, ')')]",
         "PublisherStorage": "[concat('@Microsoft.KeyVault(SecretUri=', reference(variables('ees-storage-publisher'), '2018-02-14').secretUriWithVersion, ')')]",
+        "PreReleaseAccess:AccessWindow:MinutesBeforeReleaseTimeStart": "[parameters('preReleaseMinutesBeforeStart')]",
+        "PreReleaseAccess:AccessWindow:MinutesBeforeReleaseTimeEnd": "[parameters('preReleaseMinutesBeforeEnd')]",
         "enableSwagger": "[parameters('enableSwagger')]"
       }
     },

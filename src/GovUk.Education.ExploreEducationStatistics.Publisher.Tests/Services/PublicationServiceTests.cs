@@ -30,7 +30,6 @@ namespace GovUk.Education.ExploreEducationStatistics.Publisher.Tests.Services
             Title = "Topic A",
             ThemeId = Theme.Id,
             Slug = "topic-a",
-            Summary = "The first topic"
         };
 
         private static readonly Contact Contact1 = new Contact
@@ -67,7 +66,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Publisher.Tests.Services
             Slug = "methodology-slug",
             Summary = "methodology summary",
             Published = new DateTime(2020, 2, 10),
-            LastUpdated = new DateTime(2020, 2, 11)
+            Updated = new DateTime(2020, 2, 11)
         };
 
         private static readonly Publication PublicationA = new Publication
@@ -142,7 +141,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Publisher.Tests.Services
         {
             PublicationA, PublicationB, PublicationC
         };
-        
+
         private static readonly Release PublicationARelease1V0 = new Release
         {
             Id = new Guid("240ca03c-6c22-4b9d-9f15-40fc9017890e"),
@@ -155,7 +154,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Publisher.Tests.Services
             Version = 0,
             PreviousVersionId = new Guid("240ca03c-6c22-4b9d-9f15-40fc9017890e")
         };
-        
+
         private static readonly Release PublicationARelease1V1Deleted = new Release
         {
             Id = new Guid("cf02f125-91da-4606-bf80-c2058092a653"),
@@ -169,7 +168,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Publisher.Tests.Services
             PreviousVersionId = new Guid("240ca03c-6c22-4b9d-9f15-40fc9017890e"),
             SoftDeleted = true
         };
-        
+
         private static readonly Release PublicationARelease1V1 = new Release
         {
             Id = new Guid("9da67d6d-a75f-424d-8b8b-975f151292a4"),
@@ -348,12 +347,12 @@ namespace GovUk.Education.ExploreEducationStatistics.Publisher.Tests.Services
                 Assert.Equal("first contact tel no", contact.ContactTelNo);
                 Assert.Equal("first@contact.com", contact.TeamEmail);
                 Assert.Equal("first contact team name", contact.TeamName);
-                
+
                 Assert.NotNull(viewModel.ExternalMethodology);
                 var externalMethodology = viewModel.ExternalMethodology;
                 Assert.Equal("external methodology title", externalMethodology.Title);
                 Assert.Equal("http://external.methodology/", externalMethodology.Url);
-                
+
                 Assert.NotNull(viewModel.LegacyReleases);
                 var legacyReleases = viewModel.LegacyReleases;
                 Assert.Equal(3, legacyReleases.Count);
@@ -370,7 +369,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Publisher.Tests.Services
                 Assert.Equal("methodology-slug", methodology.Slug);
                 Assert.Equal("methodology summary", methodology.Summary);
                 Assert.Equal("methodology title", methodology.Title);
-                
+
                 Assert.NotNull(viewModel.Releases);
                 var releases = viewModel.Releases;
                 Assert.Equal(3, releases.Count);

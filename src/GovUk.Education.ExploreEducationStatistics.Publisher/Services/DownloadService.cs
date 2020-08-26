@@ -26,7 +26,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Publisher.Services
         }
 
         public IEnumerable<ThemeTree<PublicationDownloadTreeNode>> GetTree(IEnumerable<Guid> includedReleaseIds)
-        { 
+        {
             return _context.Themes
                 .Include(theme => theme.Topics)
                 .ThenInclude(topic => topic.Publications)
@@ -59,7 +59,6 @@ namespace GovUk.Education.ExploreEducationStatistics.Publisher.Services
             {
                 Id = topic.Id,
                 Title = topic.Title,
-                Summary = topic.Summary,
                 Publications = topic.Publications
                     .Where(publication => IsPublicationPublished(publication, includedReleaseIds))
                     .Select(publication => BuildPublicationNode(publication, includedReleaseIds))

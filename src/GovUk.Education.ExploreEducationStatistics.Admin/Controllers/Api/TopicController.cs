@@ -19,13 +19,23 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Controllers.Api
         {
             _topicService = topicService;
         }
-        
-        [HttpPost("theme/{themeId}/topics")]
+
+        [HttpPost("topics")]
         public async Task<ActionResult<TopicViewModel>> CreateTopic(
-            CreateTopicRequest topic, Guid themeId)
+            SaveTopicViewModel topic)
         {
             return await _topicService
-                .CreateTopic(themeId, topic)
+                .CreateTopic(topic)
+                .HandleFailuresOrOk();
+        }
+
+        [HttpPut("topics/{topicId}")]
+        public async Task<ActionResult<TopicViewModel>> UpdateTopic(
+            Guid topicId,
+            SaveTopicViewModel topic)
+        {
+            return await _topicService
+                .UpdateTopic(topicId, topic)
                 .HandleFailuresOrOk();
         }
 
@@ -35,6 +45,14 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Controllers.Api
             return await _topicService
                 .GetTopic(topicId)
                 .HandleFailuresOrOk();
+        }
+
+        [HttpDelete("topics/{topicId}")]
+        public async Task<ActionResult> DeleteTopic(Guid topicId)
+        {
+            return await _topicService
+                .DeleteTopic(topicId)
+                .HandleFailuresOrNoContent();
         }
     }
 }

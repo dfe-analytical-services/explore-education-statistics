@@ -30,7 +30,6 @@ namespace GovUk.Education.ExploreEducationStatistics.Publisher.Tests.Services
             Title = "Topic A",
             ThemeId = Theme.Id,
             Slug = "topic-a",
-            Summary = "The first topic"
         };
 
         private static readonly Methodology MethodologyA = new Methodology
@@ -40,7 +39,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Publisher.Tests.Services
             Title = "Methodology A",
             Summary = "first methodology",
             Published = new DateTime(2019, 1, 01),
-            LastUpdated = new DateTime(2019, 1, 15),
+            Updated = new DateTime(2019, 1, 15),
             Annexes = new List<ContentSection>(),
             Content = new List<ContentSection>()
         };
@@ -52,7 +51,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Publisher.Tests.Services
             Title = "Methodology B",
             Summary = "second methodology",
             Published = new DateTime(2019, 3, 01),
-            LastUpdated = new DateTime(2019, 3, 15),
+            Updated = new DateTime(2019, 3, 15),
             Annexes = new List<ContentSection>(),
             Content = new List<ContentSection>()
         };
@@ -64,7 +63,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Publisher.Tests.Services
             Title = "Methodology C",
             Summary = "third methodology",
             Published = null,
-            LastUpdated = new DateTime(2019, 6, 15),
+            Updated = new DateTime(2019, 6, 15),
             Annexes = new List<ContentSection>(),
             Content = new List<ContentSection>()
         };
@@ -186,7 +185,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Publisher.Tests.Services
                 Assert.Equal(MethodologyA.Id, result.Id);
                 Assert.Equal("Methodology A", result.Title);
                 Assert.Equal(new DateTime(2019, 1, 01), result.Published);
-                Assert.Equal(new DateTime(2019, 1, 15), result.LastUpdated);
+                Assert.Equal(new DateTime(2019, 1, 15), result.Updated);
                 Assert.Equal("first methodology", result.Summary);
 
                 var annexes = result.Annexes;
@@ -222,7 +221,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Publisher.Tests.Services
                 Assert.Equal(MethodologyC.Id, result.Id);
                 Assert.Equal("Methodology C", result.Title);
                 Assert.Equal(context.Published, result.Published);
-                Assert.Equal(new DateTime(2019, 6, 15), result.LastUpdated);
+                Assert.Equal(new DateTime(2019, 6, 15), result.Updated);
                 Assert.Equal("third methodology", result.Summary);
 
                 var annexes = result.Annexes;

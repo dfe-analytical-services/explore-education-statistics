@@ -1,18 +1,120 @@
 import json
 import time
-from datetime import datetime
+import re
+import datetime
 from logging import warn
+
+from SeleniumLibrary.utils import is_noney
 from robot.libraries.BuiltIn import BuiltIn
+from SeleniumLibrary import ElementFinder
+from SeleniumLibrary.errors import ElementNotFound
+from SeleniumLibrary.keywords.waiting import WaitingKeywords
 from selenium.webdriver.common.keys import Keys
 from selenium.common.exceptions import NoSuchElementException
 import os
 
 sl = BuiltIn().get_library_instance('SeleniumLibrary')
+element_finder = ElementFinder(sl)
+waiting = WaitingKeywords(sl)
 
 
 def raise_assertion_error(err_msg):
-    sl.capture_page_screenshot()
+    sl.failure_occurred()
     raise AssertionError(err_msg)
+
+
+def user_waits_until_parent_contains_element(parent_locator: str, child_locator: str,
+                                             timeout: int = None, error: str = None,
+                                             limit: int = None):
+    try:
+        sl.wait_until_page_contains_element(parent_locator, timeout=timeout, error=error,
+                                            limit=limit)
+
+        def parent_contains_matching_element() -> bool:
+            parent_el = sl.find_element(parent_locator)
+            return element_finder.find(child_locator, required=False, parent=parent_el) is not None
+
+        if is_noney(limit):
+            return waiting._wait_until(
+                parent_contains_matching_element,
+                "Parent '%s' did not contain '%s' in <TIMEOUT>." % (parent_locator, child_locator),
+                timeout, error
+            )
+
+        limit = int(limit)
+
+        def parent_contains_matching_elements() -> bool:
+            parent_el = sl.find_element(parent_locator)
+            return len(sl.find_elements(child_locator, parent=parent_el)) == limit
+
+        waiting._wait_until(
+            parent_contains_matching_elements,
+            "Parent '%s' did not contain %s '%s' element(s) within <TIMEOUT>." % (
+                parent_locator, limit, child_locator),
+            timeout, error
+        )
+    except Exception as err:
+        raise_assertion_error(err)
+
+
+def user_waits_until_parent_does_not_contain_element(parent_locator: str, child_locator: str,
+                                                     timeout: int = None, error: str = None,
+                                                     limit: int = None):
+    try:
+        sl.wait_until_page_contains_element(parent_locator, timeout=timeout, error=error,
+                                            limit=limit)
+
+        def parent_does_not_contain_matching_element() -> bool:
+            parent_el = sl.find_element(parent_locator)
+            return element_finder.find(child_locator, required=False, parent=parent_el) is None
+
+        if is_noney(limit):
+            return waiting._wait_until(
+                parent_does_not_contain_matching_element,
+                "Parent '%s' should not have contained '%s' in <TIMEOUT>." % (
+                parent_locator, child_locator),
+                timeout, error
+            )
+
+        limit = int(limit)
+
+        def parent_does_not_contain_matching_elements() -> bool:
+            parent_el = sl.find_element(parent_locator)
+            return len(sl.find_elements(child_locator, parent=parent_el)) != limit
+
+        waiting._wait_until(
+            parent_does_not_contain_matching_elements,
+            "Parent '%s' should not have contained %s '%s' element(s) within <TIMEOUT>." % (
+                parent_locator, limit, child_locator),
+            timeout, error
+        )
+    except Exception as err:
+        raise_assertion_error(err)
+
+
+def get_child_element(parent_locator: str, child_locator: str):
+    parent_el = None
+
+    try:
+        parent_el = sl.find_element(parent_locator)
+    except Exception as err:
+        raise_assertion_error(err)
+
+    try:
+        return sl.find_element(child_locator, parent=parent_el)
+    except ElementNotFound:
+        raise_assertion_error(
+            f"Could not find child '{child_locator}' within parent '{parent_locator}'")
+    except Exception as err:
+        raise_assertion_error(err)
+
+
+def get_child_elements(parent_locator: str, child_locator: str):
+    try:
+        parent_el = sl.find_element(parent_locator)
+        return sl.find_elements(child_locator, parent=parent_el)
+    except Exception as err:
+        raise_assertion_error(err)
 
 
 def user_waits_for_page_to_finish_loading():
@@ -28,6 +130,10 @@ def user_sets_focus_to_element(selector):
     sl.set_focus_to_element(selector)
 
 
+def set_to_local_storage(key: str, value: str):
+    sl.execute_javascript(f"localStorage.setItem('{key}', '{value}');")
+
+
 def set_cookie_from_json(cookie_json):
     cookie_dict = json.loads(cookie_json)
     del cookie_dict['domain']
@@ -35,8 +141,8 @@ def set_cookie_from_json(cookie_json):
     sl.driver.add_cookie(cookie_dict)
 
 
-def get_datetime(strf):
-    now = datetime.now()
+def get_datetime(strf, days=0):
+    now = datetime.datetime.now() + datetime.timedelta(days=days)
     return now.strftime(strf).lstrip('0')
 
 
@@ -89,6 +195,8 @@ def user_verifies_accordion_is_open(section_text):
 
 
 def user_verifies_accordion_is_closed(section_text):
+    sl.wait_until_page_contains_element(
+        f'xpath://*[@class="govuk-accordion__section-button" and text()="{section_text}"]')
     try:
         sl.driver \
             .find_element_by_xpath(
@@ -105,105 +213,70 @@ def user_verifies_accordion_is_closed(section_text):
             f'Accordion section "{section_text}" should have attribute aria-expanded="false"')
 
 
-def user_opens_accordion_section(exact_section_text):
+def user_opens_accordion_section(section_text):
     sl.wait_until_page_contains_element(
-        f'xpath://*[@class="govuk-accordion__section-button" and text()="{exact_section_text}"]')
+        f'xpath://*[@class="govuk-accordion__section-button" and text()="{section_text}"]')
 
-    try:
-        elem = sl.driver \
-            .find_element_by_xpath(
-            f'//*[@class="govuk-accordion__section-button" and text()="{exact_section_text}" and @aria-expanded="false"]')
-    except NoSuchElementException:
-        BuiltIn().log_to_console(f'WARNING: Accordion section "{exact_section_text}" already open!')
-        return
-
+    elem = user_gets_accordion_button_element(section_text)
+    if elem.get_attribute('aria-expanded') == "true":
+        raise_assertion_error(f'Accordion section "{section_text}" already open!')
     sl.set_focus_to_element(elem)
     sl.wait_until_element_is_enabled(elem)
+    sl.click_element(elem)
+    if elem.get_attribute('aria-expanded') == "false":
+        raise_assertion_error(f'Accordion section "{section_text}" should be open!')
 
-    try:
-        elem.click()
-    except:
-        raise_assertion_error(f'Cannot click accordion section header {exact_section_text}')
 
+def user_closes_accordion_section(section_text):
+    elem = user_gets_accordion_button_element(section_text)
+    if elem.get_attribute('aria-expanded') == "false":
+        raise_assertion_error(f'Accordion section "{section_text}" already closed!')
+    sl.click_element(elem)
+    if elem.get_attribute('aria-expanded') == "true":
+        raise_assertion_error(f'Accordion section "{section_text}" should be open!')
+
+
+def user_checks_accordion_section_contains_text(accordion_section_text, text):
+    elem = user_gets_accordion_content_element(accordion_section_text)
+    user_waits_until_parent_contains_element(elem, f'xpath://*[text()="{text}"]')
+
+
+def user_gets_accordion_button_element(accordion_text):
     sl.wait_until_page_contains_element(
-        f'xpath://*[@class="govuk-accordion__section-button" and text()="{exact_section_text}" and @aria-expanded="true"]')
+        f'xpath://button[@class="govuk-accordion__section-button" and text()="{accordion_text}"]')
+    return sl.get_webelement(
+        f'xpath://button[@class="govuk-accordion__section-button" and text()="{accordion_text}"]')
 
 
-def user_closes_accordion_section(exact_section_text):
-    try:
-        sl.driver \
-            .find_element_by_xpath(
-            f'//*[@class="govuk-accordion__section-button" and text()="{exact_section_text}"]') \
-            .click()
-    except NoSuchElementException:
-        raise_assertion_error(f'Cannot find accordion with header {exact_section_text}')
-
-    try:
-        sl.driver \
-            .find_element_by_xpath(
-            f'//*[@class="govuk-accordion__section-button" and text()="{exact_section_text}" and @aria-expanded="false"]')
-    except NoSuchElementException:
-        raise_assertion_error(f'Accordion "{exact_section_text}" not collapsed!')
+def user_gets_accordion_section_element(accordion_text):
+    accordion_button = user_gets_accordion_button_element(accordion_text)
+    heading_id = accordion_button.get_attribute("id")
+    accordion_id = heading_id[:-len('-heading')]
+    return sl.get_webelement(f'css:#{accordion_id}')
 
 
-def user_checks_accordion_section_contains_text(accordion_section, details_component):
-    try:
-        sl.driver.find_element_by_xpath(
-            f'//*[@class="govuk-accordion__section-button" and text()="{accordion_section}"]')
-    except:
-        raise_assertion_error(f'Cannot find accordion section "{accordion_section}"')
-
-    try:
-        sl.driver.find_element_by_xpath(
-            f'//*[@class="govuk-accordion__section-button" and text()="{accordion_section}"]/../../..//*[text()="{details_component}"]')
-    except:
-        raise_assertion_error(
-            f'Details component "{details_component}" not found in accordion section "{accordion_section}"')
+def user_gets_accordion_content_element(accordion_text):
+    accordion_button = user_gets_accordion_button_element(accordion_text)
+    heading_id = accordion_button.get_attribute("id")
+    return sl.get_webelement(f'xpath://*[@aria-labelledby="{heading_id}"]')
 
 
-def user_opens_details_dropdown(exact_details_text):
-    sl.scroll_element_into_view(
-        f'xpath://details/summary//*[text()="{exact_details_text}"]')
-    try:
-        elem = sl.driver.find_element_by_xpath(
-            f'//details/summary//*[text()="{exact_details_text}"]')
-    except NoSuchElementException:
-        raise_assertion_error(f'No such detail component "{exact_details_text}" found')
-
-    sl.wait_until_element_is_enabled(elem)
-
-    elem.click()
-
-    if elem.find_element_by_xpath('..').get_attribute("aria-expanded") == "false":
-        raise_assertion_error(f'Details component "{exact_details_text}" not expanded!')
+def user_gets_child_details_element(parent, details_text):
+    user_waits_until_parent_contains_element(parent,
+                                             f'xpath:.//details/summary/*[text()="{details_text}"]/../..')
+    return get_child_element(parent, f'xpath:.//details/summary/*[text()="{details_text}"]/../..')
 
 
-def user_closes_details_dropdown(exact_details_text):
-    try:
-        elem = sl.driver.find_element_by_xpath(
-            f'//details/summary//*[text()="{exact_details_text}"]')
-    except:
-        raise_assertion_error(f'Cannot find details component "{exact_details_text}"')
+def user_verifies_details_is_open(details_elem):
+    if details_elem.find_element_by_xpath('..').get_attribute("aria-expanded") == "false":
+        raise_assertion_error(f'Details component "{details_text}" not expanded!')
 
-    elem.click()
 
+def user_closes_details_dropdown(details_text):
+    elem = sl.get_webelement(f'xpath://details/summary/*[text()="{details_text}"]')
+    sl.click_element(elem)
     if elem.find_element_by_xpath('..').get_attribute("aria-expanded") == "true":
-        raise_assertion_error(f'Details component "{exact_details_text}" is still expanded!')
-
-
-def user_selects_radio(radio_label):
-    sl.driver.find_element_by_xpath(f'//label[text()="{radio_label}"]').click()
-
-
-def user_checks_radio_is_checked(radio_label):
-    try:
-        sl.driver.find_element_by_css_selector(f'input[data-testid="{radio_label}"][checked]')
-    except NoSuchElementException:
-        raise_assertion_error('Unable to find checked radio!')
-
-
-def user_clicks_checkbox(checkbox_label):
-    sl.driver.find_element_by_xpath(f'//label[text()="{checkbox_label}" or strong[text()="{checkbox_label}"]]').click()
+        raise_assertion_error(f'Details component "{details_text}" is still expanded!')
 
 
 def capture_large_screenshot():
@@ -220,91 +293,38 @@ def capture_large_screenshot():
     sl.set_window_size(page_width, original_height)
 
 
-def user_checks_previous_table_tool_step_contains(step, key, value):
+def user_checks_previous_table_tool_step_contains(step, key, value, timeout=10):
     try:
         sl.wait_until_page_contains_element(
-            f'xpath://*[@id="tableToolWizard-step-{step}"]//*[text()="Go to this step"]')
+            f'xpath://*[@id="tableToolWizard-step-{step}"]//*[text()="Go to this step"]',
+            timeout=timeout)
     except:
         raise_assertion_error(f'Previous step wasn\'t found!')
 
     try:
         sl.wait_until_page_contains_element(
-            f'xpath://*[@id="tableToolWizard-step-{step}"]//dt[text()="{key}"]/..//*[text()="{value}"]')
+            f'xpath://*[@id="tableToolWizard-step-{step}"]//dt[text()="{key}"]/..//*[text()="{value}"]',
+            timeout=timeout)
     except:
         raise_assertion_error(
             f'Element "#tableToolWizard-step-{step}" containing "{key}" and "{value}" not found!')
 
 
-def user_selects_start_date(start_date):
-    sl.select_from_list_by_label('css:#timePeriodForm-start', start_date)
+def user_checks_table_column_heading_contains(table_selector, row, column, expected,
+                                              timeout=30):
+    user_waits_until_parent_contains_element(
+        table_selector,
+        f'xpath://thead/tr[{row}]/th[{column}][text()="{expected}"]',
+        timeout=timeout)
 
 
-def user_selects_end_date(end_date):
-    sl.select_from_list_by_label('css:#timePeriodForm-end', end_date)
+def user_gets_table_row_with_heading(table_selector, heading: str):
+    return get_child_element(table_selector, f'xpath:.//tbody/tr/th[text()="{heading}"]/..')
 
 
-def user_clicks_indicator_checkbox(indicator_label):
-    sl.wait_until_page_contains_element(
-        f'xpath://*[@id="filtersForm-indicators"]//label[contains(text(),"{indicator_label}")]')
-    sl.driver.find_element_by_xpath(
-        f'//*[@id="filtersForm-indicators"]//label[contains(text(),"{indicator_label}")]').click()
-
-
-def user_clicks_subheaded_indicator_checkbox(subheading_label, indicator_label):
-    sl.driver.find_element_by_xpath(
-        f'//*[@id="filtersForm-indicators"]//legend[text()="{subheading_label}"]/..//label[text()="{indicator_label}"]').click()
-
-
-def user_checks_indicator_checkbox_is_selected(indicator_label):
-    sl.checkbox_should_be_selected(
-        f'xpath://*[@id="filtersForm-indicators"]//label[contains(text(), "{indicator_label}")]/../input')
-
-
-def user_checks_subheaded_indicator_checkbox_is_selected(subheading_label, indicator_label):
-    sl.checkbox_should_be_selected(
-        f'xpath://*[@id="filtersForm-indicators"]//legend[text()="{subheading_label}"]/..//label[text()="{indicator_label}"]/../input')
-
-
-def user_clicks_category_checkbox(subheading_label, category_label):
-    sl.driver.find_element_by_xpath(
-        f'//legend[text()="{subheading_label}"]/..//label[text()="{category_label}"]').click()
-
-
-def user_checks_category_checkbox_is_selected(subheading_label, category_label):
-    sl.checkbox_should_be_selected(
-        f'xpath://legend[text()="{subheading_label}"]/..//label[text()="{category_label}"]/../input')
-
-
-def user_clicks_select_all_for_category(category_label):
-    sl.driver.find_element_by_xpath(
-        f'//legend[text()="{category_label}"]/..//button[contains(text(),"Select")]').click()
-
-
-def user_checks_results_table_column_heading_contains(table_selector, row, column, expected,
-                                                      timeout=30):
-    table_elem = sl.get_webelement(table_selector)
-
-    max_time = time.time() + timeout
-    while time.time() < max_time:
-        try:
-            table_elem.find_element_by_xpath(
-                f'.//thead/tr[{row}]/th[{column}][text()="{expected}"]')
-            return
-        except:
-            time.sleep(0.5)
-
-        raise_assertion_error(
-            f'"{expected}" not found in th tag in results table thead row {row}, column {column}.')
-
-
-def user_gets_row_with_heading(heading):
-    elem = sl.driver.find_element_by_xpath(f'//table/tbody/tr/th[text()="{heading}"]/..')
-    return elem
-
-
-def user_gets_row_number_with_heading(heading):
-    elem = sl.driver.find_element_by_xpath(f'//table/tbody/tr/th[text()="{heading}"]/..')
-    rows = sl.driver.find_elements_by_xpath('//table/tbody/tr')
+def user_gets_row_number_with_heading(table_locator: str, heading: str):
+    elem = get_child_element(table_locator, f'xpath:.//tbody/tr/th[text()="{heading}"]/..')
+    rows = get_child_elements(table_locator, 'css:tbody tr')
 
     return rows.index(elem) + 1
 
@@ -312,7 +332,7 @@ def user_gets_row_number_with_heading(heading):
 def user_gets_row_with_group_and_indicator(table_selector, group, indicator):
     table_elem = sl.get_webelement(table_selector)
     elems = table_elem.find_elements_by_xpath(
-        f'.//tbody/tr/th[text()="{group}"]/../self::tr | //table/tbody/tr/th[text()="{group}"]/../following-sibling::tr')
+        f'.//tbody/tr/th[text()="{group}"]/../self::tr | .//tbody/tr/th[text()="{group}"]/../following-sibling::tr')
     for elem in elems:
         try:
             elem.find_element_by_xpath(f'.//th[text()="{indicator}"]/..')
@@ -347,9 +367,11 @@ def user_checks_results_table_row_heading_contains(row, column, expected):
             f'"{expected}" not found in th tag in results table tbody row {row}, column {column}. Found text "{elem.text}".')
 
 
-def user_checks_results_table_heading_in_offset_row_contains(row, offset, column, expected):
+def user_checks_table_heading_in_offset_row_contains(table_locator: str, row: int,
+                                                     offset: int, column: int,
+                                                     expected: str):
     offset_row = int(row) + int(offset)
-    elem = sl.driver.find_element_by_xpath(f'//table/tbody/tr[{offset_row}]/th[{column}]')
+    elem = get_child_element(table_locator, f'xpath://tbody/tr[{offset_row}]/th[{column}]')
 
     if expected not in elem.text:
         raise_assertion_error(
@@ -363,9 +385,10 @@ def user_checks_results_table_cell_contains(row, column, expected):
             f'"{expected}" not found in td tag in results table tbody row {row}, column {column}. Found text "{elem.text}".')
 
 
-def user_checks_results_table_cell_in_offset_row_contains(row, offset, column, expected):
+def user_checks_table_cell_in_offset_row_contains(table_locator: str, row: int, offset: int,
+                                                  column: int, expected: str):
     offset_row = int(row) + int(offset)
-    elem = sl.driver.find_element_by_xpath(f'//table/tbody/tr[{offset_row}]/td[{column}]')
+    elem = get_child_element(table_locator, f'xpath://tbody/tr[{offset_row}]/td[{column}]')
 
     if expected not in elem.text:
         raise_assertion_error(
@@ -402,22 +425,15 @@ def user_checks_selected_list_label(list_locator, label):
     selected_label = sl.get_selected_list_label(list_locator)
     if selected_label != label:
         raise_assertion_error(
-            f'Selected label "{selected_label}" didn\'t match label "{label}" for list "{list_Locator}"')
+            f'Selected label "{selected_label}" didn\'t match label "{label}" for list "{list_locator}"')
 
 
-def user_checks_details_dropdown_contains_publication(details_heading, publication_name):
-    try:
-        sl.driver.find_element_by_xpath(
-            f'//*[contains(@class,"govuk-details__summary-text") and text()="{details_heading}"]')
-    except:
-        raise_assertion_error(f'Cannot find details component "{details_heading}"')
-
-    try:
-        sl.driver.find_element_by_xpath(
-            f'//*[contains(@class,"govuk-details__summary-text") and text()="{details_heading}"]/../..//*[text()="{publication_name}"]')
-    except:
-        raise_assertion_error(
-            f'Cannot find publication "{publication_name}" inside details component "{details_heading}"')
+def user_waits_until_details_dropdown_contains_publication(details_heading, publication_name,
+                                                           timeout=3):
+    sl.wait_until_page_contains_element(f'xpath://details/summary[.="{details_heading}"]',
+                                        timeout=timeout)
+    sl.wait_until_page_contains_element(
+        f'xpath://details/summary[.="{details_heading}"]/../..//*[text()="{publication_name}"]')
 
 
 def user_checks_details_dropdown_contains_download_link(details_heading, download_link):
@@ -434,3 +450,8 @@ def user_checks_details_dropdown_contains_download_link(details_heading, downloa
         raise_assertion_error(f'Cannot find link "{download_link}" in "{details_heading}"')
 
 
+def remove_substring_from_right_of_string(string, substring):
+    if string.endswith(substring):
+        return string[:-len(substring)]
+    else:
+        raise_assertion_error(f'String "{string}" doesn\'t end with substring "{substring}"')

@@ -88,6 +88,20 @@ public class Either<Tl, Tr> {
             return result.Left;
         }
 
+        public static async Task<Either<Tl, Unit>> OnSuccess<Tl, Tr>(this Task<Either<Tl, Tr>> task, Func<Task> func)
+        {
+            var firstResult = await task;
+
+            if (firstResult.IsLeft)
+            {
+                return firstResult.Left;
+            }
+
+            await func();
+
+            return Unit.Instance;
+        }
+
         public static async Task<Either<Tl, T>> OnSuccess<Tl, Tr, T>(this Task<Either<Tl, Tr>> task, Func<Task<T>> func)
         {
             var firstResult = await task;
@@ -110,6 +124,20 @@ public class Either<Tl, Tr> {
             }
 
             return await func();
+        }
+
+        public static async Task<Either<Tl, Unit>> OnSuccess<Tl, Tr>(this Task<Either<Tl, Tr>> task, Func<Tr, Task> func)
+        {
+            var firstResult = await task;
+
+            if (firstResult.IsLeft)
+            {
+                return firstResult.Left;
+            }
+
+            await func(firstResult.Right);
+
+            return Unit.Instance;
         }
 
         public static async Task<Either<Tl, T>> OnSuccess<Tl, Tr, T>(this Task<Either<Tl, Tr>> task, Func<Tr, T> func)
@@ -157,6 +185,11 @@ public class Either<Tl, Tr> {
 
             await failureTask(firstResult.Left);
             return firstResult.Left;
+        }
+
+        public static async Task<Either<Tl, Tr>> OnFailureFailWith<Tl, Tr>(this Task<Either<Tl, Tr>> task, Func<Tl> failureTask)
+        {
+            return await task.OnFailureFailWith(async _ => await Task.FromResult(failureTask()));
         }
 
         /**

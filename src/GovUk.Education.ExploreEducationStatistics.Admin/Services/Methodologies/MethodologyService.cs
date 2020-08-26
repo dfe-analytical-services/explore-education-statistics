@@ -98,19 +98,31 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Services.Methodologie
         public async Task<Either<ActionResult, MethodologySummaryViewModel>> UpdateMethodologyAsync(Guid id,
             UpdateMethodologyRequest request)
         {
-            var slug = SlugFromTitle(request.Title);
             return await _persistenceHelper.CheckEntityExists<Methodology>(id)
                 .OnSuccess(methodology => CheckCanUpdateMethodologyStatus(methodology, request.Status))
-                .OnSuccess(methodology => _userService.CheckCanUpdateMethodology(methodology))
-                .OnSuccessDo(() => ValidateMethodologySlugUniqueForUpdate(id, slug))
+                .OnSuccess(_userService.CheckCanUpdateMethodology)
                 .OnSuccess(async methodology =>
                 {
-                    _context.Methodologies.Update(methodology);
+                    if (methodology.Live)
+                    {
+                        // Leave slug
+                        return methodology;
+                    }
+                    var slug = SlugFromTitle(request.Title);
+                    return (await ValidateMethodologySlugUniqueForUpdate(methodology.Id, slug)).Map(_ =>
+                    {
+                        methodology.Slug = slug;
+                        return methodology;
+                    });
+                })
+                .OnSuccess(async methodology =>
+                {
                     methodology.InternalReleaseNote = request.InternalReleaseNote ?? methodology.InternalReleaseNote;
                     methodology.Status = request.Status;
                     methodology.Title = request.Title;
-                    methodology.Slug = slug;
+                    methodology.Updated = DateTime.UtcNow;
 
+                    _context.Methodologies.Update(methodology);
                     await _context.SaveChangesAsync();
 
                     if (methodology.Status == MethodologyStatus.Approved && methodology.Live)
@@ -139,24 +151,24 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Services.Methodologie
             };
         }
 
-        private async Task<Either<ActionResult, bool>> ValidateMethodologySlugUnique(string slug)
+        private async Task<Either<ActionResult, Unit>> ValidateMethodologySlugUnique(string slug)
         {
             if (await _context.Methodologies.AnyAsync(methodology => methodology.Slug == slug))
             {
                 return ValidationActionResult(SlugNotUnique);
             }
 
-            return true;
+            return Unit.Instance;
         }
 
-        private async Task<Either<ActionResult, bool>> ValidateMethodologySlugUniqueForUpdate(Guid id, string slug)
+        private async Task<Either<ActionResult, Unit>> ValidateMethodologySlugUniqueForUpdate(Guid id, string slug)
         {
             if (await _context.Methodologies.AnyAsync(methodology => methodology.Slug == slug && methodology.Id != id))
             {
                 return ValidationActionResult(SlugNotUnique);
             }
 
-            return true;
+            return Unit.Instance;
         }
     }
 }

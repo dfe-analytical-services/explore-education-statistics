@@ -15,7 +15,7 @@ const KeyStatTile = ({
   value,
 }: Props) => {
   return (
-    <div className={styles.tile} data-testid={testId}>
+    <div className={styles.tile}>
       <h3 className="govuk-heading-s" data-testid={`${testId}-title`}>
         {title}
       </h3>

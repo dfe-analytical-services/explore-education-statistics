@@ -188,6 +188,7 @@
       "jsx",
       "node"
     ],
+    "resetMocks": true,
     "snapshotSerializers": [
       "jest-serializer-html"
     ],

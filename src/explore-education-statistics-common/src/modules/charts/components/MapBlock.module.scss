@@ -21,6 +21,19 @@
   }
 }
 
+.tooltipList {
+  list-style: none;
+  margin-bottom: 0;
+  padding-left: 0;
+
+  li {
+    align-items: center;
+    display: flex;
+    font-size: 0.9rem;
+    margin-bottom: 0;
+  }
+}
+
 .legend {
   align-items: center;
   display: flex;

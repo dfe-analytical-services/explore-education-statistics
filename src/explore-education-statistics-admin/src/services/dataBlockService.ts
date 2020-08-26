@@ -13,7 +13,12 @@ export type CreateReleaseDataBlock = OmitStrict<
 export interface DependentDataBlock {
   name: string;
   contentSectionHeading?: string;
-  infographicFilenames: string[];
+  infographicFilesInfo: InfographicFileInfo[];
+}
+
+export interface InfographicFileInfo {
+  id: string;
+  filename: string;
 }
 
 export interface DeleteDataBlockPlan {

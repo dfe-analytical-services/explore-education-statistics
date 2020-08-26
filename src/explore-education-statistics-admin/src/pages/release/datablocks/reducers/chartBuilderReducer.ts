@@ -100,7 +100,6 @@ const updateAxis = (
       (axisDefinition.defaults ?? {}) as Partial<AxisConfiguration>,
       current,
       next,
-      (axisDefinition.constants ?? {}) as Partial<AxisConfiguration>,
       {
         // Ensure `type` will not be unset
         // by one of the previous objects.
@@ -196,7 +195,6 @@ export const chartBuilderReducer: Reducer<
         ...defaultOptions,
         ...(action.payload.options.defaults ?? {}),
         ...draft.options,
-        ...(action.payload.options.constants ?? {}),
       };
 
       draft.axes = mapValues(
@@ -253,7 +251,6 @@ export const chartBuilderReducer: Reducer<
         ...(draft?.definition?.options.defaults ?? {}),
         ...draft.options,
         ...action.payload,
-        ...(draft?.definition?.options.constants ?? {}),
       };
 
       break;

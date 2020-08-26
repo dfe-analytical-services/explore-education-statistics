@@ -31,7 +31,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Publisher.Functions
 
             var context = new PublishContext(DateTime.UtcNow, false);
 
-            await _contentService.UpdatePublication(context, message.PublicationId, message.OldSlug);
+            await _contentService.UpdatePublication(context, message.PublicationId);
 
             logger.LogInformation($"{executionContext.FunctionName} completed");
         }

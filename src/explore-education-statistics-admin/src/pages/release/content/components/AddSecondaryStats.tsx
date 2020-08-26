@@ -36,7 +36,7 @@ const AddSecondaryStats = ({ release, updating = false }: Props) => {
             setIsFormOpen(true);
           }}
         >
-          {updating ? 'Change' : 'Add'} Secondary Stats
+          {`${updating ? 'Change' : 'Add'} secondary stats`}
         </Button>
         {updating && (
           <Button
@@ -87,6 +87,7 @@ const AddSecondaryStats = ({ release, updating = false }: Props) => {
   return (
     <>
       <DataBlockSelectForm
+        id="secondaryStats-dataBlockSelectForm"
         releaseId={release.id}
         label="Select a data block to show alongside the headline facts and figures as secondary headline statistics."
         onSelect={async selectedDataBlockId => {

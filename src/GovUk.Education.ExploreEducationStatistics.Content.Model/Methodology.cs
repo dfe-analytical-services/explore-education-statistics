@@ -27,7 +27,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Content.Model
 
         public DateTime? Published { get; set; }
 
-        public DateTime? LastUpdated { get; set; }
+        public DateTime? Updated { get; set; }
 
         public List<ContentSection> Content { get; set; }
 

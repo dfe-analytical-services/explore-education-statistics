@@ -126,7 +126,9 @@ export class Login extends Component {
       );
     }
     return (
-      (state && state.returnUrl) || fromQuery || `${window.location.origin}/`
+      (state && state.returnUrl) ||
+      fromQuery ||
+      `${window.location.origin}${ApplicationPaths.DefaultLoginRedirectPath}`
     );
   }
 

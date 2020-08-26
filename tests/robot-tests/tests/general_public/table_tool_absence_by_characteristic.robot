@@ -11,23 +11,23 @@ Go to Table Tool page
     [Tags]  HappyPath
     environment variable should be set  PUBLIC_URL
     user goes to url  %{PUBLIC_URL}/data-tables
-    user waits until page contains heading  Create your own tables online
+    user waits until page contains heading 1  Create your own tables online
     user waits for page to finish loading
 
 Select "Pupil absence" publication
     [Tags]  HappyPath
     user opens details dropdown    Pupils and schools
     user opens details dropdown    Pupil absence
-    user selects radio      Pupil absence in schools in England
+    user clicks radio      Pupil absence in schools in England
     user clicks element    css:#publicationForm-submit
-    user waits until element is visible  xpath://h2[text()="Choose a subject"]
+    user waits until page contains heading 2  Choose a subject
     user checks previous table tool step contains  1   Publication   Pupil absence in schools in England
 
 Select subject "Absence by characteristic"
     [Tags]  HappyPath
-    user selects radio   Absence by characteristic
+    user clicks radio   Absence by characteristic
     user clicks element   css:#publicationSubjectForm-submit
-    user waits until element is visible  xpath://h2[text()="Choose locations"]
+    user waits until page contains heading 2  Choose locations
     user checks previous table tool step contains  2    Subject     Absence by characteristic
 
 Select Location Country, England
@@ -36,23 +36,33 @@ Select Location Country, England
     user clicks checkbox    England
     user clicks element     css:#locationFiltersForm-submit
     # Extra timeout until EES-315/316
-    user waits until element is visible  xpath://h2[text()="Choose time period"]   90
+    user waits until page contains heading 2  Choose time period
     user checks previous table tool step contains  3    National    England
 
 Select Start date and End date
     [Tags]  HappyPath
-    user selects start date     2012/13
-    user selects end date       2015/16
+    user selects from list by label  id:timePeriodForm-start   2012/13
+    user selects from list by label  id:timePeriodForm-end   2015/16
     user clicks element     css:#timePeriodForm-submit
-    user waits until element is visible  xpath://h2[text()="Choose your filters"]
+    user waits until page contains heading 2  Choose your filters
+    user waits until page contains element   id:filtersForm-indicators
     user checks previous table tool step contains  4    Start date    2012/13
     user checks previous table tool step contains  4    End date      2015/16
 
-Select Indicators
+Select Indicators - Authorised absence rate
     [Tags]  HappyPath
-    user clicks subheaded indicator checkbox   Absence fields        Authorised absence rate
-    user clicks subheaded indicator checkbox   Absence fields        Overall absence rate
-    user clicks subheaded indicator checkbox   Absence fields        Unauthorised absence rate
+    user clicks subheaded indicator checkbox                Absence fields    Authorised absence rate
+    user checks subheaded indicator checkbox is checked     Absence fields    Authorised absence rate
+
+Select Indicators - Overall absence rate
+    [Tags]  HappyPath
+    user clicks subheaded indicator checkbox                Absence fields    Overall absence rate
+    user checks subheaded indicator checkbox is checked     Absence fields    Overall absence rate
+
+Select Indicators - Unauthorised absence rate
+    [Tags]  HappyPath
+    user clicks subheaded indicator checkbox                Absence fields    Unauthorised absence rate
+    user checks subheaded indicator checkbox is checked     Absence fields    Unauthorised absence rate
 
 Select Characteristics
     [Tags]   HappyPath
@@ -67,10 +77,10 @@ Create table
 
 Validate results table column headings
     [Tags]  HappyPath
-    user checks results table column heading contains  css:table  1   1   2012/13
-    user checks results table column heading contains  css:table  1   2   2013/14
-    user checks results table column heading contains  css:table  1   3   2014/15
-    user checks results table column heading contains  css:table  1   4   2015/16
+    user checks table column heading contains  css:table  1   1   2012/13
+    user checks table column heading contains  css:table  1   2   2013/14
+    user checks table column heading contains  css:table  1   3   2014/15
+    user checks table column heading contains  css:table  1   4   2015/16
 
 Validate Gender male Authorised absence rate row
     [Tags]  HappyPath
@@ -129,6 +139,7 @@ Validate Gender female Unauthorised absence rate row
 Reorder Gender to be column group
     [Tags]  HappyPath
     user opens details dropdown     Re-order table headers
+    user scrolls to element     xpath://button[text()="Re-order table"]   # Column group needs to be inside the viewport
     user sets focus to element  xpath://legend[text()="Row group 1"]/../../..
     user presses keys    ${SPACE}
     user presses keys    ARROW_DOWN
@@ -175,16 +186,16 @@ Click Re-order table button
 
 Validate results table column headings after reordering
     [Tags]  HappyPath
-    user checks results table column heading contains  css:table  1   1   Gender female
-    user checks results table column heading contains  css:table  1   2   Gender male
-    user checks results table column heading contains  css:table  2   1   2013/14
-    user checks results table column heading contains  css:table  2   2   2014/15
-    user checks results table column heading contains  css:table  2   3   2015/16
-    user checks results table column heading contains  css:table  2   4   2012/13
-    user checks results table column heading contains  css:table  2   5   2013/14
-    user checks results table column heading contains  css:table  2   6   2014/15
-    user checks results table column heading contains  css:table  2   7   2015/16
-    user checks results table column heading contains  css:table  2   8   2012/13
+    user checks table column heading contains  css:table  1   1   Gender female
+    user checks table column heading contains  css:table  1   2   Gender male
+    user checks table column heading contains  css:table  2   1   2013/14
+    user checks table column heading contains  css:table  2   2   2014/15
+    user checks table column heading contains  css:table  2   3   2015/16
+    user checks table column heading contains  css:table  2   4   2012/13
+    user checks table column heading contains  css:table  2   5   2013/14
+    user checks table column heading contains  css:table  2   6   2014/15
+    user checks table column heading contains  css:table  2   7   2015/16
+    user checks table column heading contains  css:table  2   8   2012/13
 
 Validate results table row headings after reordering
     [Tags]  HappyPath
@@ -234,20 +245,20 @@ User validates permanent link works correctly
     [Tags]   HappyPath
     user clicks link   View permanent link
     select window    NEW
-    user waits until page contains heading  'Absence by characteristic' from 'Pupil absence in schools in England'
+    user waits until page contains heading 1  'Absence by characteristic' from 'Pupil absence in schools in England'
 
 User validates permalink table
     [Tags]   HappyPath
-    user checks results table column heading contains  css:table  1   1   Gender female
-    user checks results table column heading contains  css:table  1   2   Gender male
-    user checks results table column heading contains  css:table  2   1   2013/14
-    user checks results table column heading contains  css:table  2   2   2014/15
-    user checks results table column heading contains  css:table  2   3   2015/16
-    user checks results table column heading contains  css:table  2   4   2012/13
-    user checks results table column heading contains  css:table  2   5   2013/14
-    user checks results table column heading contains  css:table  2   6   2014/15
-    user checks results table column heading contains  css:table  2   7   2015/16
-    user checks results table column heading contains  css:table  2   8   2012/13
+    user checks table column heading contains  css:table  1   1   Gender female
+    user checks table column heading contains  css:table  1   2   Gender male
+    user checks table column heading contains  css:table  2   1   2013/14
+    user checks table column heading contains  css:table  2   2   2014/15
+    user checks table column heading contains  css:table  2   3   2015/16
+    user checks table column heading contains  css:table  2   4   2012/13
+    user checks table column heading contains  css:table  2   5   2013/14
+    user checks table column heading contains  css:table  2   6   2014/15
+    user checks table column heading contains  css:table  2   7   2015/16
+    user checks table column heading contains  css:table  2   8   2012/13
 
     user checks results table row heading contains  1    1      Overall absence rate
     user checks results table row heading contains  2    1      Unauthorised absence rate

@@ -19,48 +19,6 @@ do this on failure
   capture large screenshot
   set selenium timeout  3
 
-set to local storage
-  [Arguments]    ${key}   ${value}
-  execute javascript  localStorage.setItem('${key}', '${value}');
-
-user signs in
-
-user signs in as bau1
-  user opens the browser
-
-  environment variable should be set   ADMIN_URL
-  user goes to url  %{ADMIN_URL}
-  user waits until page contains heading     Sign in
-
-  environment variable should be set   IDENTITY_LOCAL_STORAGE_BAU
-  set to local storage   GovUk.Education.ExploreEducationStatistics.Adminuser:%{ADMIN_URL}:GovUk.Education.ExploreEducationStatistics.Admin   %{IDENTITY_LOCAL_STORAGE_BAU}
-  environment variable should be set   IDENTITY_COOKIE_BAU
-  set cookie from json   %{IDENTITY_COOKIE_BAU}
-
-  user goes to url  %{ADMIN_URL}
-  user waits until page contains heading   Bau1
-  user waits until page contains element   css:#selectTheme   180
-  user checks element should contain    css:[data-testid="breadcrumbs--list"] li:nth-child(1)     Home
-  user checks element should contain    css:[data-testid="breadcrumbs--list"] li:nth-child(2)     Administrator dashboard
-
-user signs in as analyst1
-  user opens the browser
-
-  environment variable should be set   ADMIN_URL
-  user goes to url  %{ADMIN_URL}
-  user waits until page contains heading     Sign in
-
-  environment variable should be set   IDENTITY_LOCAL_STORAGE_ANALYST
-  set to local storage   GovUk.Education.ExploreEducationStatistics.Adminuser:%{ADMIN_URL}:GovUk.Education.ExploreEducationStatistics.Admin   %{IDENTITY_LOCAL_STORAGE_ANALYST}
-  environment variable should be set   IDENTITY_COOKIE_ANALYST
-  set cookie from json   %{IDENTITY_COOKIE_ANALYST}
-
-  user goes to url  %{ADMIN_URL}
-  user waits until page contains heading   Analyst1
-  user waits until page contains element   css:#selectTheme   180
-  user checks element should contain    css:[data-testid="breadcrumbs--list"] li:nth-child(1)     Home
-  user checks element should contain    css:[data-testid="breadcrumbs--list"] li:nth-child(2)     Administrator dashboard
-
 user opens the browser
   run keyword if    "${browser}" == "chrome"    user opens chrome
   run keyword if    "${browser}" == "firefox"   user opens firefox
@@ -144,13 +102,17 @@ user scrolls to element
   [Arguments]  ${element}
   scroll element into view  ${element}
 
+user mouses over element
+    [Arguments]  ${element}
+    mouse over  ${element}
+
 user waits until page contains
-  [Arguments]    ${pageText}
-  wait until page contains   ${pageText}
+  [Arguments]    ${pageText}    ${wait}=${timeout}
+  wait until page contains   ${pageText}    timeout=${wait}
 
 user waits until page contains element
-  [Arguments]    ${element}        ${wait}=${timeout}
-  wait until page contains element  ${element}   timeout=${wait}
+  [Arguments]    ${element}  ${wait}=${timeout}  ${limit}=None
+  wait until page contains element  ${element}  timeout=${wait}  limit=${limit}
 
 user waits until page does not contain
   [Arguments]    ${pageText}
@@ -168,10 +130,6 @@ user waits until page contains link
   [Arguments]    ${link_text}   ${wait}=${timeout}
   wait until page contains element  xpath://a[text()="${link_text}"]   timeout=${wait}
 
-user waits until page contains heading
-  [Arguments]   ${text}    ${wait}=${timeout}
-  wait until page contains element   xpath://h1[contains(.,"${text}")]   timeout=${wait}
-
 user waits until page contains accordion section
   [Arguments]   ${section_title}     ${wait}=${timeout}
   user waits until page contains element  xpath://*[contains(@class,"govuk-accordion__section-button") and text()="${section_title}"]    ${wait}
@@ -184,6 +142,14 @@ user checks element contains
   [Arguments]   ${element}    ${text}
   wait until element contains  ${element}    ${text}
   element should contain    ${element}    ${text}
+
+user waits until page contains testid
+    [Arguments]  ${id}   ${wait}=${timeout}
+    user waits until page contains element   css:[data-testid="${id}"]   ${wait}
+
+user checks testid element contains
+    [Arguments]  ${id}  ${text}
+    user checks element contains  css:[data-testid="${id}"]   ${text}
 
 user checks element does not contain
   [Arguments]   ${element}    ${text}
@@ -200,14 +166,6 @@ user checks element is visible
 user checks element is not visible
   [Arguments]   ${element}
   element should not be visible   ${element}
-
-user checks checkbox is selected
-  [Arguments]    ${checkbox}
-  checkbox should be selected   ${checkbox}
-
-user checks checkbox is not selected
-  [Arguments]    ${checkbox}
-  checkbox should not be selected   ${checkbox}
 
 user waits until element is enabled
   [Arguments]   ${element}
@@ -229,6 +187,11 @@ user checks element should not contain
   [Arguments]   ${element}  ${text}
   element should not contain  ${element}    ${text}
 
+user checks input field contains
+    [Arguments]  ${element}  ${text}
+    page should contain textfield  ${element}
+    textfield value should be  ${element}  ${text}
+
 user checks page contains
   [Arguments]   ${text}
   page should contain   ${text}
@@ -246,23 +209,28 @@ user checks page does not contain element
   page should not contain element  ${element}
 
 user clicks element
-  [Arguments]     ${elementToClick}
-  wait until page contains element  ${elementToClick}
-  set focus to element    ${elementToClick}
-  wait until element is enabled   ${elementToClick}
-  click element   ${elementToClick}
+    [Arguments]     ${element}
+    wait until page contains element  ${element}
+    user scrolls to element  ${element}
+    wait until element is enabled   ${element}
+    click element   ${element}
+
+user clicks testid element
+    [Arguments]  ${id}
+    user clicks element  css:[data-testid="${id}"]
 
 user clicks link
   [Arguments]   ${text}
-  wait until page contains element   link:${text}
-  scroll element into view  link:${text}
+  user scrolls to element  link:${text}
+  wait until element is visible   link:${text}
   wait until element is enabled  link:${text}
   click link  ${text}
 
 user clicks button
-  [Arguments]   ${text}
-  user waits until element is enabled  xpath://button[text()="${text}"]
-  click button  ${text}
+  [Arguments]   ${text}  ${parent}=css:body
+  user waits until parent contains element  ${parent}  xpath:.//button[text()="${text}"]
+  ${button}=  get child element  ${parent}  xpath:.//button[text()="${text}"]
+  user clicks element  ${button}
 
 user waits until page contains button
   [Arguments]  ${text}
@@ -272,21 +240,33 @@ user checks page does not contain button
   [Arguments]  ${text}
   user checks page does not contain element  xpath://button[text()="${text}"]
 
+user waits until button is enabled
+  [Arguments]   ${text}
+  user waits until element is enabled  xpath://button[text()="${text}"]
+
 user checks page contains tag
   [Arguments]   ${text}
-  user checks page contains element  xpath://span[contains(@class, "govuk-tag")][text()="${text}"]
+  user checks page contains element  xpath://*[contains(@class, "govuk-tag")][text()="${text}"]
 
 user waits until page contains heading 1
-  [Arguments]   ${text}
-  user waits until page contains element  xpath://h1[text()="${text}"]
+  [Arguments]   ${text}  ${wait}=${timeout}
+  user waits until element is visible  xpath://h1[text()="${text}"]  ${wait}
 
 user waits until page contains heading 2
-  [Arguments]   ${text}
-  user waits until page contains element  xpath://h2[text()="${text}"]
+  [Arguments]   ${text}  ${wait}=${timeout}
+  user waits until element is visible  xpath://h2[text()="${text}"]  ${wait}
 
 user waits until page contains heading 3
-  [Arguments]   ${text}
-  user waits until page contains element  xpath://h3[text()="${text}"]
+  [Arguments]   ${text}  ${wait}=${timeout}
+  user waits until element is visible  xpath://h3[text()="${text}"]  ${wait}
+
+user waits until page contains title
+  [Arguments]   ${text}  ${wait}=${timeout}
+  user waits until page contains element   xpath://h1[@data-testid="page-title" and text()="${text}"]   ${wait}
+
+user waits until page contains title caption
+  [Arguments]  ${text}  ${wait}=${timeout}
+  user waits until page contains element  xpath://span[@data-testid="page-title-caption" and text()="${text}"]  ${wait}
 
 user selects newly opened window
   select window   NEW
@@ -298,12 +278,21 @@ user checks element attribute value should be
 user checks radio option for "${radiogroupId}" should be "${expectedLabelText}"
   user checks page contains element  css:#${radiogroupId} [data-testid="${expectedLabelText}"]:checked
 
-user checks summary list item "${dtText}" should be "${ddText}"
-  user waits until page contains element  xpath://dl[//dt[contains(text(),"${dtText}")] and (//dd[contains(text(), "${ddText}")] or //dd//*[contains(text(), "${ddText}")])]
+user checks summary list contains
+    [Arguments]  ${term}    ${description}   ${wait}=${timeout}  ${parent}=css:body
+    user waits until parent contains element  ${parent}  xpath:.//dl//dt[contains(text(), "${term}")]/following-sibling::dd[contains(., "${description}")]    timeout=${wait}
+    ${element}=  get child element  ${parent}  xpath:.//dl//dt[contains(text(), "${term}")]/following-sibling::dd[contains(., "${description}")]
+    user waits until element is visible  ${element}
 
 user selects from list by label
   [Arguments]   ${locator}   ${label}
+  user waits until element is visible  ${locator}
   select from list by label   ${locator}   ${label}
+
+user chooses file
+    [Arguments]  ${locator}  ${file_path}
+    user waits until element is visible  ${locator}
+    choose file  ${locator}  ${file_path}
 
 user clears element text
   [Arguments]   ${locator}
@@ -318,6 +307,7 @@ user presses keys
 user enters text into element
   [Arguments]   ${selector}   ${text}
   user waits until page contains element  ${selector}
+  user waits until element is visible   ${selector}
   user clears element text  ${selector}
   user clicks element   ${selector}
   user presses keys  ${text}
@@ -335,41 +325,19 @@ user checks page contains link with text and url
   [Arguments]  ${text}  ${href}
   user checks page contains element  xpath://a[@href="${href}" and text()="${text}"]
 
-user checks page contains details section
-  [Arguments]  ${text}
-  user checks page contains element  css:[data-testid="Expand Details Section ${text}"]
-
-user opens details section
-  [Arguments]  ${text}
-  user clicks element    css:[data-testid="Expand Details Section ${text}"]
+user opens details dropdown
+  [Arguments]  ${text}  ${parent}=css:body
+  user waits until parent contains element  ${parent}  xpath:.//details/summary[contains(., "${text}")]
+  ${elem}=  get child element  ${parent}  xpath:.//details/summary[contains(., "${text}")]
+  user waits until element is visible  ${elem}
+  user clicks element  ${elem}
+  user waits until parent contains element  ${parent}  xpath:.//details/summary[@aria-expanded="true" and contains(., "${text}")]
 
 user waits until results table appears
   # Extra timeout until EES-234
   [Arguments]   ${wait_time}
   user waits until page contains element   css:table thead th    ${wait_time}
   user waits until page does not contain element  css:[class^="dfe-LoadingSpinner"]
-
-user logs into microsoft online
-  [Arguments]  ${email}   ${password}
-  user waits until page contains element  xpath://div[text()="Sign in"]
-  sleep  1
-  user presses keys     ${email}
-  user waits until page contains element    css:input[value="Next"]
-  wait until element is enabled   css:input[value="Next"]
-  user clicks element   css:input[value="Next"]
-
-  user waits until page contains element  xpath://div[text()="Enter password"]
-  sleep  1
-  user presses keys     ${password}
-  user waits until page contains element    css:input[value="Sign in"]
-  wait until element is enabled   css:input[value="Sign in"]
-  user clicks element   css:input[value="Sign in"]
-
-  user waits until page contains element  xpath://div[text()="Stay signed in?"]
-  user waits until page contains element    css:input[value="No"]
-  wait until element is enabled   css:input[value="No"]
-  sleep  1
-  user clicks element   css:input[value="No"]
 
 user checks publication bullet contains link
   [Arguments]   ${publication}   ${link}
@@ -383,3 +351,68 @@ user waits until page contains key stat tile
   [Arguments]  ${title}   ${value}   ${wait}=${timeout}
   user waits until page contains element   xpath://*[@data-testid="keyStatTile-title" and text()="${title}"]/../*[@data-testid="keyStatTile-value" and text()="${value}"]    ${wait}
 
+user clicks radio
+    [Arguments]  ${label}
+    user clicks element  xpath://label[text()="${label}"]/../input[@type="radio"]
+
+user checks radio is checked
+    [Arguments]  ${label}
+    user checks page contains element  xpath://label[text()="${label}"]/../input[@type="radio" and @checked]
+
+user clicks checkbox
+    [Arguments]  ${label}
+    user clicks element  xpath://label[text()="${label}" or strong[text()="${label}"]]/../input[@type="checkbox"]
+
+user checks checkbox is checked
+    [Arguments]    ${label}
+    user checks checkbox input is checked  xpath://label[text()="${label}" or strong[text()="${label}"]]/../input[@type="checkbox"]
+
+user checks checkbox is not checked
+    [Arguments]    ${label}
+    user checks checkbox input is not checked  xpath://label[text()="${label}" or strong[text()="${label}"]]/../input[@type="checkbox"]
+
+user checks checkbox input is checked
+    [Arguments]    ${selector}
+    user waits until page contains element  ${selector}
+    checkbox should be selected   ${selector}
+
+user checks checkbox input is not checked
+    [Arguments]    ${selector}
+    user waits until page contains element  ${selector}
+    checkbox should not be selected   ${selector}
+
+user clicks indicator checkbox
+    [Arguments]  ${indicator_label}
+    user clicks element  xpath://*[@id="filtersForm-indicators"]//label[text()="${indicator_label}"]
+
+user checks indicator checkbox is checked
+    [Arguments]  ${indicator_label}
+    user checks checkbox input is checked  xpath://*[@id="filtersForm-indicators"]//label[contains(text(), "${indicator_label}")]/../input[@type="checkbox"]
+
+user clicks subheaded indicator checkbox
+    [Arguments]  ${subheading_label}   ${indicator_label}
+    user clicks element  xpath://*[@id="filtersForm-indicators"]//legend[text()="${subheading_label}"]/..//label[text()="${indicator_label}"]/../input[@type="checkbox"]
+
+user checks subheaded indicator checkbox is checked
+    [Arguments]  ${subheading_label}  ${indicator_label}
+    user checks checkbox input is checked  xpath://*[@id="filtersForm-indicators"]//legend[text()="${subheading_label}"]/..//label[text()="${indicator_label}"]/../input[@type="checkbox"]
+
+user clicks category checkbox
+    [Arguments]  ${subheading_label}  ${category_label}
+    user clicks element  xpath://legend[text()="${subheading_label}"]/..//label[text()="${category_label}"]/../input[@type="checkbox"]
+
+user checks category checkbox is checked
+    [Arguments]  ${subheading_label}  ${category_label}
+    user checks checkbox input is checked  xpath://legend[text()="${subheading_label}"]/..//label[text()="${category_label}"]/../input[@type="checkbox"]
+
+user clicks select all for category
+    [Arguments]  ${category_label}
+    user clicks element  xpath://legend[text()="{category_label}"]/..//button[contains(text(), "Select")]
+
+user checks breadcrumb count should be
+    [Arguments]  ${count}
+    user waits until page contains element  css:[data-testid="breadcrumbs--list"] li   limit=${count}
+
+user checks nth breadcrumb contains
+    [Arguments]   ${num}   ${text}
+    user checks element should contain   css:[data-testid="breadcrumbs--list"] li:nth-child(${num})   ${text}

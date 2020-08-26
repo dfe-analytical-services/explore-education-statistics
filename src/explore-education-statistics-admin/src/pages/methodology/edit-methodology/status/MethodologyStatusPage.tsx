@@ -44,14 +44,16 @@ const MethodologyStatusPage = ({
     setState: setModel,
     isLoading,
   } = useAsyncRetry(async () => {
-    const [summary, canApprove] = await Promise.all([
+    const [summary, canApprove, canMarkAsDraft] = await Promise.all([
       methodologyService.getMethodology(methodologyId),
       permissionService.canApproveMethodology(methodologyId),
+      permissionService.canMarkMethodologyAsDraft(methodologyId),
     ]);
 
     return {
       summary,
       canApprove,
+      canMarkAsDraft,
     };
   }, [methodologyId]);
 
@@ -83,17 +85,18 @@ const MethodologyStatusPage = ({
     toggleForm.off();
   });
 
-  const isEditable = model?.canApprove && model?.summary.status !== 'Approved';
+  const isEditable = model?.canApprove || model?.canMarkAsDraft;
+  const isPublished = model?.summary.published;
 
   return (
     <>
-      <h2>Methodology status</h2>
-
       <LoadingSpinner loading={isLoading}>
         {model ? (
           <>
             {!showForm ? (
               <>
+                <h2>Methodology status</h2>
+
                 <div className="govuk-!-margin-bottom-6">
                   The current methodology status is:{' '}
                   <StatusBlock text={statusMap[model.summary.status]} />
@@ -104,7 +107,7 @@ const MethodologyStatusPage = ({
                     className="govuk-!-margin-top-2"
                     onClick={toggleForm.on}
                   >
-                    Update status
+                    Edit status
                   </Button>
                 )}
               </>
@@ -128,9 +131,14 @@ const MethodologyStatusPage = ({
                 {form => {
                   return (
                     <Form id={formId}>
+                      <h2>Edit methodology status</h2>
+
                       <FormFieldRadioGroup<FormValues, MethodologyStatus>
                         legend="Status"
-                        hint="Once approved, the status cannot be reverted."
+                        hint={
+                          isPublished &&
+                          'Once approved, changes will be available to the public immediately.'
+                        }
                         name="status"
                         id={`${formId}-status`}
                         options={[

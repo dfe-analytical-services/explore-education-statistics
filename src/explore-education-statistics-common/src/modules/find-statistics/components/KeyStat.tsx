@@ -1,30 +1,33 @@
 import Details from '@common/components/Details';
 import LoadingSpinner from '@common/components/LoadingSpinner';
 import KeyStatTile from '@common/modules/find-statistics/components/KeyStatTile';
-import useTableQuery, {
-  TableQueryOptions,
-} from '@common/modules/find-statistics/hooks/useTableQuery';
+import useKeyStatQuery from '@common/modules/find-statistics/hooks/useKeyStatQuery';
+import { TableQueryOptions } from '@common/modules/find-statistics/hooks/useTableQuery';
 import { ReleaseTableDataQuery } from '@common/services/tableBuilderService';
 import { Summary } from '@common/services/types/blocks';
-import formatPretty from '@common/utils/number/formatPretty';
-import React, { FC, ReactNode, useMemo } from 'react';
+import React, { ReactNode } from 'react';
 import ReactMarkdown from 'react-markdown';
 import styles from './KeyStat.module.scss';
 
 interface KeyStatContainerProps {
   children: ReactNode;
-  tag?: keyof JSX.IntrinsicElements;
 }
 
-export const KeyStatContainer = ({
-  children,
-  tag: ElementTag = 'div',
-}: KeyStatContainerProps) => {
-  return <ElementTag className={styles.container}>{children}</ElementTag>;
+export const KeyStatContainer = ({ children }: KeyStatContainerProps) => {
+  return <div className={styles.container}>{children}</div>;
 };
 
-export const KeyStatColumn: FC = ({ children }) => {
-  return <div className={styles.column}>{children}</div>;
+interface KeyStatColumnProps {
+  children: ReactNode;
+  testId?: string;
+}
+
+export const KeyStatColumn = ({ children, testId }: KeyStatColumnProps) => {
+  return (
+    <div className={styles.column} data-testid={testId}>
+      {children}
+    </div>
+  );
 };
 
 export interface KeyStatProps {
@@ -32,6 +35,7 @@ export interface KeyStatProps {
   query: ReleaseTableDataQuery;
   queryOptions?: TableQueryOptions;
   summary?: Summary;
+  testId?: string;
   renderDataSummary?: ReactNode;
 }
 
@@ -40,9 +44,9 @@ const KeyStat = ({
   query,
   queryOptions,
   summary,
-  renderDataSummary,
+  testId = 'keyStat',
 }: KeyStatProps) => {
-  const { value: tableData, isLoading, error } = useTableQuery(
+  const { value: keyStat, isLoading, error } = useKeyStatQuery(
     {
       ...query,
       includeGeoJson: false,
@@ -50,52 +54,43 @@ const KeyStat = ({
     queryOptions,
   );
 
-  const resultValue = useMemo<string>(() => {
-    if (tableData) {
-      const [indicator] = tableData.subjectMeta.indicators;
-
-      return formatPretty(
-        tableData.results[0].measures[indicator.value],
-        indicator.unit,
-        indicator.decimalPlaces,
-      );
-    }
-
-    return '';
-  }, [tableData]);
-
-  const indicator = tableData?.subjectMeta?.indicators[0];
-
   if (error) {
     return null;
   }
 
   return (
-    <LoadingSpinner loading={isLoading}>
-      {indicator && tableData && resultValue && (
-        <>
-          <KeyStatTile title={indicator.label} value={resultValue}>
-            {renderDataSummary ||
-              (summary?.dataSummary && (
-                <p className="govuk-body-s">{summary.dataSummary}</p>
-              ))}
-          </KeyStatTile>
-
-          {summary?.dataDefinition?.[0] && (
-            <Details
-              summary={summary?.dataDefinitionTitle || 'Help'}
-              className={styles.definition}
+    <KeyStatColumn testId={testId}>
+      <LoadingSpinner loading={isLoading}>
+        {keyStat && (
+          <>
+            <KeyStatTile
+              title={keyStat.title}
+              value={keyStat.value}
+              testId={testId}
             >
-              {summary.dataDefinition.map(data => (
-                <ReactMarkdown key={data}>{data}</ReactMarkdown>
-              ))}
-            </Details>
-          )}
+              {summary?.dataSummary && (
+                <p className="govuk-body-s" data-testid={`${testId}-summary`}>
+                  {summary.dataSummary}
+                </p>
+              )}
+            </KeyStatTile>
 
-          {children}
-        </>
-      )}
-    </LoadingSpinner>
+            {summary?.dataDefinition?.[0] && (
+              <Details
+                summary={summary?.dataDefinitionTitle || 'Help'}
+                className={styles.definition}
+              >
+                {summary.dataDefinition.map(data => (
+                  <ReactMarkdown key={data}>{data}</ReactMarkdown>
+                ))}
+              </Details>
+            )}
+
+            {children}
+          </>
+        )}
+      </LoadingSpinner>
+    </KeyStatColumn>
   );
 };
 

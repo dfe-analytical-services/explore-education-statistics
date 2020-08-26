@@ -26,7 +26,7 @@ export interface DataBlockTabsProps {
   firstTabs?: ReactNode;
   lastTabs?: ReactNode;
   getInfographic?: GetInfographic;
-  id: string;
+  id?: string;
   releaseId?: string;
   queryOptions?: TableQueryOptions;
   onToggle?: (section: { id: string; title: string }) => void;
@@ -38,7 +38,7 @@ const DataBlockTabs = ({
   firstTabs,
   lastTabs,
   getInfographic,
-  id,
+  id = `dataBlock-${dataBlock.id}`,
   releaseId,
   queryOptions,
   onToggle,
@@ -65,7 +65,11 @@ const DataBlockTabs = ({
 
   return (
     <LoadingSpinner loading={isLoading}>
-      <Tabs id={id} onToggle={onToggle}>
+      <Tabs
+        id={id}
+        testId={`Data block - ${dataBlock.name}`}
+        onToggle={onToggle}
+      >
         {firstTabs}
 
         {dataBlock.charts?.length && (
@@ -104,6 +108,7 @@ const DataBlockTabs = ({
                       <ChartRenderer
                         {...chart}
                         key={key}
+                        id={`${id}-chart`}
                         axes={axes}
                         data={fullTable?.results}
                         meta={fullTable?.subjectMeta}
@@ -117,6 +122,7 @@ const DataBlockTabs = ({
                     <ChartRenderer
                       {...chart}
                       key={key}
+                      id={`${id}-chart`}
                       axes={axes}
                       data={fullTable?.results}
                       meta={fullTable?.subjectMeta}

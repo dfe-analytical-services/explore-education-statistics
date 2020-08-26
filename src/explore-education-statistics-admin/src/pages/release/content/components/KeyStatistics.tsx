@@ -4,10 +4,7 @@ import useReleaseContentActions from '@admin/pages/release/content/contexts/useR
 import { EditableContentBlock } from '@admin/services/types/content';
 import Button from '@common/components/Button';
 import WarningMessage from '@common/components/WarningMessage';
-import {
-  KeyStatColumn,
-  KeyStatContainer,
-} from '@common/modules/find-statistics/components/KeyStat';
+import { KeyStatContainer } from '@common/modules/find-statistics/components/KeyStat';
 import { Release } from '@common/services/publicationService';
 import React, { useCallback, useState } from 'react';
 
@@ -40,35 +37,34 @@ const KeyStatistics = ({ release, isEditing }: KeyStatisticsProps) => {
         {release.keyStatisticsSection.content
           .filter(block => block.type === 'DataBlock')
           .map(block => (
-            <KeyStatColumn key={block.id}>
-              <EditableKeyStat
-                id={block.id}
-                name={block.name}
-                query={{
-                  ...block.query,
+            <EditableKeyStat
+              key={block.id}
+              id={block.id}
+              name={block.name}
+              query={{
+                ...block.query,
+                releaseId: release.id,
+              }}
+              summary={block.summary}
+              isEditing={isEditing}
+              onRemove={async () => {
+                await deleteContentSectionBlock({
                   releaseId: release.id,
-                }}
-                summary={block.summary}
-                isEditing={isEditing}
-                onRemove={async () => {
-                  await deleteContentSectionBlock({
-                    releaseId: release.id,
-                    sectionId: release.keyStatisticsSection.id,
-                    blockId: block.id,
-                    sectionKey: 'keyStatisticsSection',
-                  });
-                }}
-                onSubmit={async values => {
-                  await updateContentSectionDataBlock({
-                    releaseId: release.id,
-                    sectionId: release.keyStatisticsSection.id,
-                    blockId: block.id,
-                    sectionKey: 'keyStatisticsSection',
-                    values,
-                  });
-                }}
-              />
-            </KeyStatColumn>
+                  sectionId: release.keyStatisticsSection.id,
+                  blockId: block.id,
+                  sectionKey: 'keyStatisticsSection',
+                });
+              }}
+              onSubmit={async values => {
+                await updateContentSectionDataBlock({
+                  releaseId: release.id,
+                  sectionId: release.keyStatisticsSection.id,
+                  blockId: block.id,
+                  sectionKey: 'keyStatisticsSection',
+                  values,
+                });
+              }}
+            />
           ))}
       </KeyStatContainer>
     </>

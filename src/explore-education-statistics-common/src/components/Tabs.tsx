@@ -21,9 +21,10 @@ interface Props {
   id: string;
   onToggle?: (section: { id: string; title: string }) => void;
   openId?: string;
+  testId?: string;
 }
 
-const Tabs = ({ children, id, modifyHash = true, onToggle }: Props) => {
+const Tabs = ({ children, id, modifyHash = true, testId, onToggle }: Props) => {
   const [loadedSections, setLoadedSections] = useState(new Set<number>());
   const [selectedTabIndex, setSelectedTabIndex] = useState(0);
 
@@ -94,7 +95,11 @@ const Tabs = ({ children, id, modifyHash = true, onToggle }: Props) => {
   }, [sections, selectTab]);
 
   return (
-    <div className={classNames('govuk-tabs', styles.tabs)} id={id}>
+    <div
+      className={classNames('govuk-tabs', styles.tabs)}
+      id={id}
+      data-testid={testId}
+    >
       <ul className="govuk-tabs__list" role="tablist">
         {sections.map(({ props }, index) => {
           const sectionId = props.id || `${id}-${index + 1}`;

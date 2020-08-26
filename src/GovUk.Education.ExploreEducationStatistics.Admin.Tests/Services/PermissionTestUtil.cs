@@ -4,7 +4,7 @@ using System.Reflection;
 using System.Threading.Tasks;
 using Castle.Core.Internal;
 using GovUk.Education.ExploreEducationStatistics.Admin.Security;
-using GovUk.Education.ExploreEducationStatistics.Admin.Services.Interfaces.Security;
+using GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services.Utils;
 using GovUk.Education.ExploreEducationStatistics.Common.Model;
 using GovUk.Education.ExploreEducationStatistics.Common.Services.Interfaces.Security;
 using Microsoft.AspNetCore.Authorization;
@@ -16,6 +16,12 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
 {
     public static class PermissionTestUtil
     {
+        public static SecurityPolicyCheckBuilder PolicyCheckBuilder()
+        {
+            return new SecurityPolicyCheckBuilder();
+        }
+
+        [Obsolete("Use SecurityPolicyCheckBuilder class or PolicyCheckBuilder method")]
         public static async void AssertSecurityPoliciesChecked<TProtectedResource, TReturn, TService>(
             Func<TService, Task<Either<ActionResult, TReturn>>> protectedAction,
             TProtectedResource resource,
@@ -46,7 +52,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
             publicMethods.ToList().ForEach(method => Assert.Null(method.GetAttribute<AuthorizeAttribute>()));
         }
 
-        private static void AssertForbidden<T>(Either<ActionResult,T> result)
+        public static void AssertForbidden<T>(Either<ActionResult,T> result)
         {
             Assert.NotNull(result);
             Assert.True(result.IsLeft);

@@ -1,4 +1,5 @@
 using System;
+using GovUk.Education.ExploreEducationStatistics.Admin.ViewModels;
 
 namespace GovUk.Education.ExploreEducationStatistics.Admin.Models.Api
 {
