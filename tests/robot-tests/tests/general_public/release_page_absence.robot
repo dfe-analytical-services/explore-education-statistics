@@ -20,8 +20,8 @@ Navigate to Absence publication
 
     user opens accordion section  Pupils and schools
     user opens details dropdown   Pupil absence
-    user clicks element   css:[data-testid="view-stats-pupil-absence-in-schools-in-england"]
-    user waits until page contains element   xpath://h1[text()="Pupil absence in schools in England"]
+    user clicks testid element  View stats link for Pupil absence in schools in England
+    user waits until h1 is visible  Pupil absence in schools in England
 
 Validate URL
     [Documentation]  DFE-325
