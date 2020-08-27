@@ -1,8 +1,9 @@
 import { DeleteDataBlockPlan } from '@admin/services/dataBlockService';
 import { FileInfo } from '@admin/services/types/file';
 import client from '@admin/services/utils/service';
-import getFileNameFromPath from './utils/file/getFileNameFromPath';
+import { Overwrite } from '@common/types';
 import downloadFile from './utils/file/downloadFile';
+import getFileNameFromPath from './utils/file/getFileNameFromPath';
 
 interface DataFileInfo extends FileInfo {
   metaFileName: string;
@@ -35,6 +36,27 @@ interface UploadDataFilesRequest {
   subjectTitle: string;
   dataFile: File;
   metadataFile: File;
+}
+
+export type ImportStatusCode =
+  | 'COMPLETE'
+  | 'QUEUED'
+  | 'UPLOADING'
+  | 'RUNNING_PHASE_1'
+  | 'RUNNING_PHASE_2'
+  | 'RUNNING_PHASE_3'
+  | 'NOT_FOUND'
+  | 'FAILED';
+
+export interface Errors {
+  Message: string;
+}
+
+export interface DataFileImportStatus {
+  status: ImportStatusCode;
+  percentageComplete?: string;
+  errors?: Errors[];
+  numberOfRows: number;
 }
 
 function mapFile(file: DataFileInfo): DataFile {
@@ -76,6 +98,28 @@ const releaseDataFileService = {
       `/release/${releaseId}/data?name=${request.subjectTitle}`,
       data,
     );
+  },
+  getDataFileImportStatus(
+    releaseId: string,
+    dataFileName: string,
+  ): Promise<DataFileImportStatus> {
+    return client
+      .get<
+        Overwrite<
+          DataFileImportStatus,
+          {
+            errors?: string;
+          }
+        >
+      >(`/release/${releaseId}/data/${dataFileName}/import/status`)
+      .then(importStatus => {
+        return {
+          ...importStatus,
+          errors: JSON.parse(importStatus.errors || '[]').map(
+            ({ Message }: Errors) => Message,
+          ),
+        };
+      });
   },
   getDeleteDataFilePlan(
     releaseId: string,

@@ -1,9 +1,9 @@
 import styles from '@admin/pages/release/data/components/ReleaseDataUploadsSection.module.scss';
-import { DataFile } from '@admin/services/releaseDataFileService';
-import importStatusService, {
-  ImportStatus,
+import releaseDataFileService, {
+  DataFile,
+  DataFileImportStatus,
   ImportStatusCode,
-} from '@admin/services/importService';
+} from '@admin/services/releaseDataFileService';
 import Details from '@common/components/Details';
 import LoadingSpinner from '@common/components/LoadingSpinner';
 import SummaryListItem from '@common/components/SummaryListItem';
@@ -99,8 +99,8 @@ class ImporterStatus extends Component<Props> {
     // when the timer is canceled. This prevents setState being called after
     // the component has unmounted.
 
-    importStatusService
-      .getImportStatus(releaseId, dataFile.filename)
+    releaseDataFileService
+      .getDataFileImportStatus(releaseId, dataFile.filename)
       .then(
         importStatus =>
           this.intervalId &&
@@ -123,7 +123,7 @@ class ImporterStatus extends Component<Props> {
       )
       .finally(() => {
         const { current } = this.state;
-        const currentStatus: ImportStatus = (current as unknown) as ImportStatus;
+        const currentStatus: DataFileImportStatus = (current as unknown) as DataFileImportStatus;
         onStatusChangeHandler(dataFile, currentStatus.status);
       });
   }
@@ -143,7 +143,7 @@ class ImporterStatus extends Component<Props> {
 
   public render() {
     const { current, running } = this.state;
-    const currentStatus: ImportStatus = (current as unknown) as ImportStatus;
+    const currentStatus: DataFileImportStatus = (current as unknown) as DataFileImportStatus;
 
     return (
       <SummaryListItem term="Status">
