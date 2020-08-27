@@ -4,7 +4,7 @@ import isEqual from 'lodash/isEqual';
 interface Props<T> {
   value: T;
   onMount?: (value: T) => void;
-  onChange?: (value: T) => void;
+  onChange?: (value: T, previousValue: T) => void;
 }
 
 const Effect = <T extends unknown>({ onChange, onMount, value }: Props<T>) => {
@@ -28,7 +28,7 @@ const Effect = <T extends unknown>({ onChange, onMount, value }: Props<T>) => {
     }
 
     if (onChange) {
-      onChange(value);
+      onChange(value, previousValue.current);
       previousValue.current = value;
     }
   }, [onChange, onMount, value]);
