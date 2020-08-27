@@ -14,14 +14,14 @@ Navigate to publication release page
 
 Click fast track link for 'Pupil absence rates' data block
     [Tags]  HappyPath
-    user waits until page contains heading 1  Pupil absence in schools in England
+    user waits until h1 is visible  Pupil absence in schools in England
     user opens accordion section  Pupil absence rates
-    user waits until page contains heading 3  Explore and edit this data online
+    user waits until h3 is visible  Explore and edit this data online
     user clicks link  Explore data
 
 Validate selected step options
     [Tags]  HappyPath
-    user waits until page contains heading 1  Create your own tables online
+    user waits until h1 is visible  Create your own tables online
     user waits until page contains element    css:table
 
     user checks previous table tool step contains  1    Publication     Pupil absence in schools in England

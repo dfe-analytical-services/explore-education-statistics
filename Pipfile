@@ -13,6 +13,7 @@ requests = "==2.21.0"
 python-dotenv = "==0.13.0"
 robotframework-pabot = "~=1.8"
 pyderman = "~=2.0"
+pytz = "~=2020.1"
 
 [requires]
 python_version = "3.8"

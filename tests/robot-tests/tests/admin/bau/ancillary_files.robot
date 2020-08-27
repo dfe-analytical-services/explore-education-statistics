@@ -21,10 +21,10 @@ Create Manage content test publication
 
 Verify Manage content test publication is created
     [Tags]  HappyPath
-    user checks page contains accordion  ${PUBLICATION_NAME}
+    user waits until page contains accordion section  ${PUBLICATION_NAME}
     user opens accordion section  ${PUBLICATION_NAME}
-    user checks accordion section contains text  ${PUBLICATION_NAME}    Methodology
-    user checks accordion section contains text  ${PUBLICATION_NAME}    Releases
+    user waits until accordion section contains text  ${PUBLICATION_NAME}    Methodology
+    user waits until accordion section contains text  ${PUBLICATION_NAME}    Releases
 
 Create release
     [Tags]  HappyPath
@@ -36,7 +36,7 @@ Navigate to Manage data tab
     [Tags]  HappyPath
     user waits until page contains link   Manage data
     user clicks link  Manage data
-    user waits until page contains heading 1  ${PUBLICATION_NAME}
+    user waits until h1 is visible  ${PUBLICATION_NAME}
 
 Navigate to File uploads tab
     [Tags]  HappyPath
@@ -56,7 +56,7 @@ Upload file
 Delete file
     [Tags]  HappyPath
     user clicks button   Delete file
-    user waits until page contains heading 1   Confirm deletion of file
+    user waits until h1 is visible   Confirm deletion of file
     user clicks button  Confirm
     user waits until page does not contain accordion section   dfe logo
     user checks page contains  File uploads

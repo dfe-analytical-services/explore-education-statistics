@@ -70,13 +70,13 @@ namespace GovUk.Education.ExploreEducationStatistics.Publisher.Services
 
             var referencedReleaseVersions = copyReleaseFilesCommand.ReleaseFileReferences
                 .Select(rfr => rfr.ReleaseId).Distinct();
-            
+
             var allFilesTransferred = new List<CloudBlockBlob>();
 
             foreach (var version in referencedReleaseVersions)
             {
                 var files = await CopyDirectoryAsync(
-                    AdminReleaseDirectoryPath(version), 
+                    AdminReleaseDirectoryPath(version),
                     destinationDirectoryPath, privateContainer,
                     publicContainer, copyReleaseFilesCommand,
                     (source, destination) =>
@@ -84,13 +84,13 @@ namespace GovUk.Education.ExploreEducationStatistics.Publisher.Services
                             source,
                             version,
                             copyReleaseFilesCommand.ReleaseFileReferences));
-                
+
                 allFilesTransferred.AddRange(files);
             }
 
             await ZipFiles(publicContainer, allFilesTransferred, destinationDirectoryPath, copyReleaseFilesCommand);
         }
-        
+
         public async Task DeleteDownloadFilesForPreviousVersion(Release release)
         {
             if (release.Slug != release.PreviousVersion.Slug)
@@ -115,7 +115,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Publisher.Services
         }
 
         public async Task DeletePublicBlob(string blobName)
-        {    
+        {
             var publicContainer = await GetCloudBlobContainerAsync(_publicStorageConnectionString, PublicContentContainerName);
             await DeleteBlobAsync(publicContainer, blobName);
         }
@@ -236,8 +236,8 @@ namespace GovUk.Education.ExploreEducationStatistics.Publisher.Services
             }
 
             var name = Path.GetFileName(item.Name);
-            
-            if (!releaseFileReferences.Exists(rfr => rfr.ReleaseId == releaseId && rfr.Filename == name))
+
+            if (!releaseFileReferences.Exists(rfr => rfr.ReleaseId == releaseId && rfr.BlobStorageName == name))
             {
                 _logger.LogError($"No release file reference found for releaseId {releaseId} and name: {name}");
                 return false;

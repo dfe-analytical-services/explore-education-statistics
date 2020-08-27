@@ -17,14 +17,13 @@ Go to Create publication page for "UI tests topic" topic
     user waits until page contains link    Create new publication
     user checks page does not contain button   ${PUBLICATION_NAME}
     user clicks link  Create new publication
-    user waits until page contains heading 1  Create new publication
+    user waits until h1 is visible  Create new publication
     user creates publication    ${PUBLICATION_NAME}
 
 Verify that new publication has been created
     [Tags]  HappyPath
     user selects theme "Test theme" and topic "${TOPIC_NAME}" from the admin dashboard
-    user waits until page contains button   ${PUBLICATION_NAME}
-    user checks page contains accordion   ${PUBLICATION_NAME}
+    user waits until page contains accordion section   ${PUBLICATION_NAME}
     user opens accordion section  ${PUBLICATION_NAME}
     user checks testid element contains  Methodology for ${PUBLICATION_NAME}  No methodology assigned
     user checks testid element contains  Releases for ${PUBLICATION_NAME}  No releases created
@@ -32,7 +31,7 @@ Verify that new publication has been created
 Create new release
     [Tags]   HappyPath
     user clicks element  css:[data-testid="Create new release link for ${PUBLICATION_NAME}"]
-    user waits until page contains heading 1  Create new release
+    user waits until h1 is visible  Create new release
 
 User fills in form
     [Tags]  HappyPath
@@ -45,12 +44,12 @@ Click Create new release button
     [Tags]   HappyPath
     user clicks button   Create new release
     user waits until page contains title caption  Edit release
-    user waits until page contains heading 1  ${PUBLICATION_NAME}
+    user waits until h1 is visible  ${PUBLICATION_NAME}
 
 Verify Release summary
     [Tags]  HappyPath
     user checks page contains element   xpath://li/a[text()="Release summary" and contains(@aria-current, 'page')]
-    user waits until page contains heading 2    Release summary
+    user waits until h2 is visible    Release summary
     user checks summary list contains  Publication title  ${PUBLICATION_NAME}
     user checks summary list contains  Time period  Tax Year
     user checks summary list contains  Release period  2020-21
@@ -75,7 +74,7 @@ Upload subject
 Navigate to Footnotes tab
     [Tags]  HappyPath
     user clicks link  Footnotes
-    user waits until page contains heading 2  Footnotes
+    user waits until h2 is visible  Footnotes
 
 Create subject footnote for new subject
     [Tags]  HappyPath
@@ -119,14 +118,14 @@ Create Random Filter Select all footnote for new subject
 Navigate to Manage data blocks tab
     [Tags]  HappyPath
     user clicks link    Manage data blocks
-    user waits until page contains heading 2   Choose a subject
+    user waits until h2 is visible   Choose a subject
 
 Select subject "UI test subject"
     [Tags]  HappyPath
     user waits until page contains   UI test subject
     user clicks radio    UI test subject
     user clicks element   id:publicationSubjectForm-submit
-    user waits until page contains heading 2   Choose locations
+    user waits until h2 is visible   Choose locations
     user checks previous table tool step contains  1    Subject     UI test subject
 
 Select locations
@@ -137,7 +136,7 @@ Select locations
     user clicks checkbox   Nailsea Youngwood
     user clicks checkbox   Syon
     user clicks element     id:locationFiltersForm-submit
-    user waits until page contains heading 2  Choose time period
+    user waits until h2 is visible  Choose time period
 
 Select time period
     [Tags]   HappyPath
@@ -146,7 +145,7 @@ Select time period
     user selects from list by label  id:timePeriodForm-start  2019
     user selects from list by label  id:timePeriodForm-end  2019
     user clicks element     id:timePeriodForm-submit
-    user waits until page contains heading 2  Choose your filters
+    user waits until h2 is visible  Choose your filters
 
 Select indicators
     [Tags]  HappyPath
@@ -188,7 +187,7 @@ Delete UI test subject
     user waits until page contains accordion section  UI test subject
     user opens accordion section   UI test subject
     user clicks button   Delete files
-    user waits until page contains heading 1   Confirm deletion of selected data files
+    user waits until h1 is visible   Confirm deletion of selected data files
     user checks page contains   4 footnotes will be removed or updated.
     user checks page contains   The following data blocks will also be deleted:
     user checks page contains   UI test table name

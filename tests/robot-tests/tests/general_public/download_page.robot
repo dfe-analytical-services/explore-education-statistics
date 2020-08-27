@@ -11,19 +11,19 @@ Navigate to /download-data page
     [Tags]  HappyPath
     environment variable should be set   PUBLIC_URL
     user goes to url   %{PUBLIC_URL}
-    user waits until page contains heading 1   Choose how to explore our statistics and data
+    user waits until h1 is visible   Choose how to explore our statistics and data
     user clicks link   Download latest data files
-    user waits until page contains heading 1   Download latest data files
+    user waits until h1 is visible   Download latest data files
     user checks url contains   %{PUBLIC_URL}/download-latest-data
 
 Validate Pupils and schools contains Pupil absence files
     [Documentation]  EES-562
     [Tags]  HappyPath   NotAgainstLocal
-    user checks page contains accordion   Pupils and schools
+    user waits until page contains accordion section   Pupils and schools
     user waits for page to finish loading
     user opens accordion section   Pupils and schools
 
-    user checks accordion section contains text  Pupils and schools   Pupil absence
+    user waits until accordion section contains text  Pupils and schools   Pupil absence
 
 Validate Pupil absence data downloads are available
     [Documentation]  EES-562
@@ -69,7 +69,7 @@ Download All files ZIP
 
 Validate Pupil and schools contains Exclusions files
     [Tags]  HappyPath   NotAgainstLocal
-    user checks accordion section contains text  Pupils and schools   Exclusions
+    user waits until accordion section contains text  Pupils and schools   Exclusions
 
 Validate Exclusions data downloads are available
     [Documentation]  EES-562

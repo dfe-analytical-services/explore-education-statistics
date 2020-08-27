@@ -11,7 +11,7 @@ Go to Table Tool page
     [Tags]  HappyPath
     environment variable should be set  PUBLIC_URL
     user goes to url  %{PUBLIC_URL}/data-tables
-    user waits until page contains heading 1  Create your own tables online
+    user waits until h1 is visible  Create your own tables online
     user waits for page to finish loading
 
 Select "Pupil absence" publication
@@ -20,14 +20,14 @@ Select "Pupil absence" publication
     user opens details dropdown    Pupil absence
     user clicks radio      Pupil absence in schools in England
     user clicks element    css:#publicationForm-submit
-    user waits until page contains heading 2  Choose a subject
+    user waits until h2 is visible  Choose a subject
     user checks previous table tool step contains  1   Publication   Pupil absence in schools in England
 
 Select subject "Absence in prus"
     [Tags]  HappyPath
     user clicks radio   Absence in prus
     user clicks element   css:#publicationSubjectForm-submit
-    user waits until page contains heading 2  Choose locations
+    user waits until h2 is visible  Choose locations
     user checks previous table tool step contains  2    Subject     Absence in prus
 
 Select Location Country, England
@@ -35,7 +35,7 @@ Select Location Country, England
     user opens details dropdown     National
     user clicks checkbox    England
     user clicks element     css:#locationFiltersForm-submit
-    user waits until page contains heading 2  Choose time period
+    user waits until h2 is visible  Choose time period
     user checks previous table tool step contains  3   National     England
 
 Select Start date and End date
@@ -43,7 +43,7 @@ Select Start date and End date
     user selects from list by label  id:timePeriodForm-start   2013/14
     user selects from list by label  id:timePeriodForm-end     2016/17
     user clicks element     css:#timePeriodForm-submit
-    user waits until page contains heading 2  Choose your filters
+    user waits until h2 is visible  Choose your filters
     user waits until page contains element   id:filtersForm-indicators
     user checks previous table tool step contains  4    Start date    2013/14
     user checks previous table tool step contains  4    End date      2016/17
@@ -99,7 +99,7 @@ Select locations LAs Barnet, Barnsley, Bedford
     user clicks checkbox            Bedford
 
     user clicks element   css:#locationFiltersForm-submit
-    user waits until page contains heading 2  Choose time period
+    user waits until h2 is visible  Choose time period
     user checks previous table tool step contains  3    Local Authority    Barnet
     user checks previous table tool step contains  3    Local Authority    Barnsley
     user checks previous table tool step contains  3    Local Authority    Bedford
@@ -109,7 +109,7 @@ Select new start and end date
     user selects from list by label  id:timePeriodForm-start   2014/15
     user selects from list by label  id:timePeriodForm-end     2015/16
     user clicks element     css:#timePeriodForm-submit
-    user waits until page contains heading 2  Choose your filters
+    user waits until h2 is visible  Choose your filters
     user waits until page contains element   id:filtersForm-indicators
     user checks previous table tool step contains  4    Start date    2014/15
     user checks previous table tool step contains  4    End date      2015/16
