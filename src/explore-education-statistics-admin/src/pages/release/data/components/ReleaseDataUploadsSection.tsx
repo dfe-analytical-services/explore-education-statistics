@@ -1,7 +1,6 @@
 import ImporterStatus from '@admin/components/ImporterStatus';
 import useFormSubmit from '@admin/hooks/useFormSubmit';
 import { ImportStatusCode } from '@admin/services/importService';
-import permissionService from '@admin/services/permissionService';
 import releaseDataFileService, {
   DataFile,
   DeleteDataFilePlan,
@@ -19,12 +18,13 @@ import LoadingSpinner from '@common/components/LoadingSpinner';
 import ModalConfirm from '@common/components/ModalConfirm';
 import SummaryList from '@common/components/SummaryList';
 import SummaryListItem from '@common/components/SummaryListItem';
+import useAsyncHandledRetry from '@common/hooks/useAsyncHandledRetry';
 import { mapFieldErrors } from '@common/validation/serverValidations';
 import Yup from '@common/validation/yup';
 import { format } from 'date-fns';
 import { Formik, FormikHelpers, FormikProps } from 'formik';
 import remove from 'lodash/remove';
-import React, { useEffect, useState } from 'react';
+import React, { useState } from 'react';
 
 interface FormValues {
   subjectTitle: string;
@@ -93,8 +93,8 @@ const errorMappings = [
 ];
 
 interface Props {
-  publicationId: string;
   releaseId: string;
+  canUpdateRelease: boolean;
 }
 
 interface DeleteDataFile {
@@ -104,22 +104,20 @@ interface DeleteDataFile {
 
 const formId = 'dataFileUploadForm';
 
-const ReleaseDataUploadsSection = ({ publicationId, releaseId }: Props) => {
-  const [dataFiles, setDataFiles] = useState<DataFile[]>([]);
+const ReleaseDataUploadsSection = ({ releaseId, canUpdateRelease }: Props) => {
   const [deleteDataFile, setDeleteDataFile] = useState<DeleteDataFile>();
-  const [canUpdateRelease, setCanUpdateRelease] = useState<boolean>();
   const [openedAccordions, setOpenedAccordions] = useState<string[]>([]);
   const [isUploading, setIsUploading] = useState(false);
 
-  useEffect(() => {
-    Promise.all([
-      releaseDataFileService.getReleaseDataFiles(releaseId),
-      permissionService.canUpdateRelease(releaseId),
-    ]).then(([releaseDataFiles, canUpdateReleaseResponse]) => {
-      setDataFiles(releaseDataFiles);
-      setCanUpdateRelease(canUpdateReleaseResponse);
-    });
-  }, [publicationId, releaseId]);
+  const {
+    value: dataFiles = [],
+    setState: setDataFiles,
+    retry: fetchDataFiles,
+    isLoading,
+  } = useAsyncHandledRetry(
+    () => releaseDataFileService.getReleaseDataFiles(releaseId),
+    [releaseId],
+  );
 
   const resetPage = async ({ resetForm }: FormikHelpers<FormValues>) => {
     resetForm();
@@ -131,13 +129,12 @@ const ReleaseDataUploadsSection = ({ publicationId, releaseId }: Props) => {
         fileInput.value = '';
       });
 
-    const files = await releaseDataFileService.getReleaseDataFiles(releaseId);
-    setDataFiles(files);
+    await fetchDataFiles();
   };
 
   const setDeleting = (dataFile: DeleteDataFile, deleting: boolean) => {
-    setDataFiles(
-      dataFiles.map(file =>
+    setDataFiles({
+      value: dataFiles.map(file =>
         file.filename !== dataFile.file.filename
           ? file
           : {
@@ -145,44 +142,43 @@ const ReleaseDataUploadsSection = ({ publicationId, releaseId }: Props) => {
               isDeleting: deleting,
             },
       ),
-    );
+    });
   };
 
   const statusChangeHandler = async (
     dataFile: DataFile,
-    importstatusCode: ImportStatusCode,
+    statusCode: ImportStatusCode,
   ) => {
-    setDataFiles(
-      dataFiles.map(file =>
+    setDataFiles({
+      value: dataFiles.map(file =>
         file.filename !== dataFile.filename
           ? file
           : {
               ...file,
               canDelete:
-                importstatusCode &&
-                (importstatusCode === 'NOT_FOUND' ||
-                  importstatusCode === 'COMPLETE' ||
-                  importstatusCode === 'FAILED'),
+                statusCode &&
+                (statusCode === 'NOT_FOUND' ||
+                  statusCode === 'COMPLETE' ||
+                  statusCode === 'FAILED'),
             },
       ),
-    );
+    });
   };
 
   const handleSubmit = useFormSubmit<FormValues>(async (values, actions) => {
     setIsUploading(true);
-    await releaseDataFileService
-      .uploadDataFiles(releaseId, {
+
+    try {
+      await releaseDataFileService.uploadDataFiles(releaseId, {
         subjectTitle: values.subjectTitle,
         dataFile: values.dataFile as File,
         metadataFile: values.metadataFile as File,
-      })
-      .then(() => {
-        setIsUploading(false);
-        resetPage(actions);
-      })
-      .finally(() => {
-        setIsUploading(false);
       });
+      setIsUploading(false);
+      await resetPage(actions);
+    } finally {
+      setIsUploading(false);
+    }
   }, errorMappings);
 
   const handleDelete = async (
@@ -191,15 +187,17 @@ const ReleaseDataUploadsSection = ({ publicationId, releaseId }: Props) => {
   ) => {
     setDeleting(dataFileToDelete, true);
     setDeleteDataFile(undefined);
-    await releaseDataFileService
-      .deleteDataFiles(releaseId, (deleteDataFile as DeleteDataFile).file)
-      .then(() => {
-        setDeleting(dataFileToDelete, false);
-        resetPage(form);
-      })
-      .finally(() => {
-        setDeleting(dataFileToDelete, false);
-      });
+
+    try {
+      await releaseDataFileService.deleteDataFiles(
+        releaseId,
+        (deleteDataFile as DeleteDataFile).file,
+      );
+      setDeleting(dataFileToDelete, false);
+      await resetPage(form);
+    } finally {
+      setDeleting(dataFileToDelete, false);
+    }
   };
 
   return (
@@ -230,78 +228,74 @@ const ReleaseDataUploadsSection = ({ publicationId, releaseId }: Props) => {
         metadataFile: Yup.mixed().required('Choose a metadata file'),
       })}
     >
-      {form => {
-        return (
-          <Form id={formId}>
-            {canUpdateRelease && (
-              <>
-                {isUploading && (
-                  <LoadingSpinner text="Uploading files" overlay />
-                )}
-                <FormFieldset
-                  id={`${formId}-allFieldsFieldset`}
-                  legend="Add new data to release"
-                >
-                  <div className="govuk-inset-text">
-                    <h2 className="govuk-heading-m">Before you start</h2>
-                    <div className="govuk-list--bullet">
-                      <li>
-                        make sure your data has passed the screening checks in
-                        our{' '}
-                        <a href="https://github.com/dfe-analytical-services/ees-data-screener">
-                          R Project
-                        </a>{' '}
-                      </li>
-                      <li>
-                        if your data doesn’t meet these standards, you won’t be
-                        able to upload it to your release
-                      </li>
-                      <li>
-                        if you have any issues uploading data and files, or
-                        questions about data standards contact:{' '}
-                        <a href="mailto:explore.statistics@education.gov.uk">
-                          explore.statistics@education.gov.uk
-                        </a>
-                      </li>
-                    </div>
+      {form => (
+        <Form id={formId}>
+          {canUpdateRelease && (
+            <>
+              {isUploading && <LoadingSpinner text="Uploading files" overlay />}
+              <FormFieldset
+                id={`${formId}-allFieldsFieldset`}
+                legend="Add new data to release"
+              >
+                <div className="govuk-inset-text">
+                  <h2>Before you start</h2>
+
+                  <div className="govuk-list--bullet">
+                    <li>
+                      make sure your data has passed the screening checks in our{' '}
+                      <a href="https://github.com/dfe-analytical-services/ees-data-screener">
+                        R Project
+                      </a>{' '}
+                    </li>
+                    <li>
+                      if your data doesn’t meet these standards, you won’t be
+                      able to upload it to your release
+                    </li>
+                    <li>
+                      if you have any issues uploading data and files, or
+                      questions about data standards contact:{' '}
+                      <a href="mailto:explore.statistics@education.gov.uk">
+                        explore.statistics@education.gov.uk
+                      </a>
+                    </li>
                   </div>
+                </div>
 
-                  <FormFieldTextInput<FormValues>
-                    id={`${formId}-subjectTitle`}
-                    name="subjectTitle"
-                    label="Subject title"
-                    width={20}
-                  />
+                <FormFieldTextInput<FormValues>
+                  id={`${formId}-subjectTitle`}
+                  name="subjectTitle"
+                  label="Subject title"
+                  width={20}
+                />
 
-                  <FormFieldFileInput<FormValues>
-                    id={`${formId}-dataFile`}
-                    name="dataFile"
-                    label="Upload data file"
-                    formGroupClass="govuk-!-margin-top-6"
-                  />
+                <FormFieldFileInput<FormValues>
+                  id={`${formId}-dataFile`}
+                  name="dataFile"
+                  label="Upload data file"
+                  formGroupClass="govuk-!-margin-top-6"
+                />
 
-                  <FormFieldFileInput<FormValues>
-                    id={`${formId}-metadataFile`}
-                    name="metadataFile"
-                    label="Upload metadata file"
-                  />
-                </FormFieldset>
+                <FormFieldFileInput<FormValues>
+                  id={`${formId}-metadataFile`}
+                  name="metadataFile"
+                  label="Upload metadata file"
+                />
+              </FormFieldset>
 
-                <ButtonGroup>
-                  <Button type="submit" id="upload-data-files-button">
-                    Upload data files
-                  </Button>
-                  <ButtonText onClick={() => resetPage(form)}>
-                    Cancel
-                  </ButtonText>
-                </ButtonGroup>
-              </>
-            )}
+              <ButtonGroup>
+                <Button type="submit" id="upload-data-files-button">
+                  Upload data files
+                </Button>
+                <ButtonText onClick={() => resetPage(form)}>Cancel</ButtonText>
+              </ButtonGroup>
+            </>
+          )}
 
-            {typeof canUpdateRelease !== 'undefined' &&
-              !canUpdateRelease &&
-              'This release has been approved, and can no longer be updated.'}
+          {typeof canUpdateRelease !== 'undefined' &&
+            !canUpdateRelease &&
+            'This release has been approved, and can no longer be updated.'}
 
+          <LoadingSpinner loading={isLoading}>
             {dataFiles.length > 0 && (
               <>
                 <hr />
@@ -427,65 +421,67 @@ const ReleaseDataUploadsSection = ({ publicationId, releaseId }: Props) => {
                 </Accordion>
               </>
             )}
+          </LoadingSpinner>
 
-            {deleteDataFile && (
-              <ModalConfirm
-                mounted
-                title="Confirm deletion of selected data files"
-                onExit={() => setDeleteDataFile(undefined)}
-                onCancel={() => setDeleteDataFile(undefined)}
-                onConfirm={() => handleDelete(deleteDataFile, form)}
-              >
+          {deleteDataFile && (
+            <ModalConfirm
+              mounted
+              title="Confirm deletion of selected data files"
+              onExit={() => setDeleteDataFile(undefined)}
+              onCancel={() => setDeleteDataFile(undefined)}
+              onConfirm={() => handleDelete(deleteDataFile, form)}
+            >
+              <p>
+                This data will no longer be available for use in this release.
+              </p>
+
+              {deleteDataFile.plan.deleteDataBlockPlan.dependentDataBlocks
+                .length > 0 && (
+                <>
+                  <p>The following data blocks will also be deleted:</p>
+
+                  <ul>
+                    {deleteDataFile.plan.deleteDataBlockPlan.dependentDataBlocks.map(
+                      block => (
+                        <li key={block.name}>
+                          <p>{block.name}</p>
+                          {block.contentSectionHeading && (
+                            <p>
+                              {`It will also be removed from the "${block.contentSectionHeading}" content section.`}
+                            </p>
+                          )}
+                          {block.infographicFilesInfo.length > 0 && (
+                            <p>
+                              The following infographic files will also be
+                              removed:
+                              <ul>
+                                {block.infographicFilesInfo.map(fileInfo => (
+                                  <li key={fileInfo.filename}>
+                                    <p>{fileInfo.filename}</p>
+                                  </li>
+                                ))}
+                              </ul>
+                            </p>
+                          )}
+                        </li>
+                      ),
+                    )}
+                  </ul>
+                </>
+              )}
+              {deleteDataFile.plan.footnoteIds.length > 0 && (
                 <p>
-                  This data will no longer be available for use in this release.
+                  {`${deleteDataFile.plan.footnoteIds.length} ${
+                    deleteDataFile.plan.footnoteIds.length > 1
+                      ? 'footnotes'
+                      : 'footnote'
+                  } will be removed or updated.`}
                 </p>
-                {deleteDataFile.plan.deleteDataBlockPlan.dependentDataBlocks
-                  .length > 0 && (
-                  <p>
-                    The following data blocks will also be deleted:
-                    <ul>
-                      {deleteDataFile.plan.deleteDataBlockPlan.dependentDataBlocks.map(
-                        block => (
-                          <li key={block.name}>
-                            <p>{block.name}</p>
-                            {block.contentSectionHeading && (
-                              <p>
-                                {`It will also be removed from the "${block.contentSectionHeading}" content section.`}
-                              </p>
-                            )}
-                            {block.infographicFilesInfo.length > 0 && (
-                              <p>
-                                The following infographic files will also be
-                                removed:
-                                <ul>
-                                  {block.infographicFilesInfo.map(finfo => (
-                                    <li key={finfo.filename}>
-                                      <p>{finfo.filename}</p>
-                                    </li>
-                                  ))}
-                                </ul>
-                              </p>
-                            )}
-                          </li>
-                        ),
-                      )}
-                    </ul>
-                  </p>
-                )}
-                {deleteDataFile.plan.footnoteIds.length > 0 && (
-                  <p>
-                    {`${deleteDataFile.plan.footnoteIds.length} ${
-                      deleteDataFile.plan.footnoteIds.length > 1
-                        ? 'footnotes'
-                        : 'footnote'
-                    } will be removed or updated.`}
-                  </p>
-                )}
-              </ModalConfirm>
-            )}
-          </Form>
-        );
-      }}
+              )}
+            </ModalConfirm>
+          )}
+        </Form>
+      )}
     </Formik>
   );
 };
