@@ -67,7 +67,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Services
                         referencedReleaseVersions));
         }
 
-        public Task<Either<ActionResult, bool>> UploadDataFilesAsync(Guid releaseId,
+        public Task<Either<ActionResult, DataFileInfo>> UploadDataFilesAsync(Guid releaseId,
             IFormFile dataFile, IFormFile metadataFile, string name, string userName)
         {
             return _persistenceHelper
@@ -85,18 +85,35 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Services
                         .OnSuccess(async () => await _importService.CreateImportTableRow(releaseId, dataFile.FileName.ToLower()))
                         .OnSuccess(async () =>
                         {
-                            await CreateOrUpdateFileReference(dataFile.FileName.ToLower(), releaseId, ReleaseFileTypes.Data);
+                            var fileReference =  await CreateOrUpdateFileReference(dataFile.FileName.ToLower(), releaseId, ReleaseFileTypes.Data);
                             await CreateOrUpdateFileReference(metadataFile.FileName.ToLower(), releaseId,ReleaseFileTypes.Metadata);
                             await _context.SaveChangesAsync();
                             await UploadFileToStorageAsync(blobContainer, releaseId, dataFile, ReleaseFileTypes.Data, dataInfo);
                             await UploadFileToStorageAsync(blobContainer, releaseId, metadataFile,ReleaseFileTypes.Metadata, metaDataInfo);
-                            await _importService.Import(releaseId, dataFile.FileName.ToLower(), 
+                            await _importService.Import(releaseId, dataFile.FileName.ToLower(),
                                 metadataFile.FileName.ToLower(), dataFile, false);
-                            return true;
+
+                            var file = blobContainer.GetBlockBlobReference(
+                                AdminReleasePathWithFileReference(fileReference)
+                            );
+                            await file.FetchAttributesAsync();
+
+                            return new DataFileInfo
+                            {
+                                Id = fileReference.Id,
+                                Extension = GetExtension(file),
+                                Name = GetName(file),
+                                Path = file.Name,
+                                Size = GetSize(file),
+                                MetaFileName = GetMetaFileName(file),
+                                Rows = GetNumberOfRows(file),
+                                UserName = GetUserName(file),
+                                Created = file.Properties.Created
+                            };
                         });
                 });
         }
-        
+
         public Task<Either<ActionResult, bool>> UploadDataFilesAsZipAsync(Guid releaseId,
             IFormFile zipFile, string name, string userName)
         {
@@ -123,7 +140,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Services
                                     await CreateOrUpdateFileReference(metadataFile.Name.ToLower(), releaseId,ReleaseFileTypes.Metadata, null ,source);
                                     await _context.SaveChangesAsync();
                                     await UploadFileToStorageAsync(blobContainer, releaseId, zipFile, ReleaseFileTypes.DataZip, dataInfo);
-                                    await _importService.Import(releaseId, dataFile.Name.ToLower(), 
+                                    await _importService.Import(releaseId, dataFile.Name.ToLower(),
                                         metadataFile.Name.ToLower(), zipFile, true);                                    return true;
                                 });
                         });
@@ -325,12 +342,12 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Services
                     var blobContainer = await GetCloudBlobContainer();
                     var files = await GetReleaseFiles(releaseId, ReleaseFileTypes.Data, ReleaseFileTypes.Metadata);
                     var fileList = new List<DataFileInfo>();
-                    
+
                     foreach (var fileLink in files)
                     {
                         fileList.Add(await GetDataFileInfo(releaseId, fileLink, blobContainer));
                     }
-                    
+
                     return fileList
                         .OrderBy(file => file.Name)
                         .AsEnumerable();
