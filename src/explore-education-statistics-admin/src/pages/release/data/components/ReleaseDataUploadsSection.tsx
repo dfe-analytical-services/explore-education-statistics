@@ -1,9 +1,9 @@
 import ImporterStatus from '@admin/components/ImporterStatus';
 import useFormSubmit from '@admin/hooks/useFormSubmit';
-import { ImportStatusCode } from '@admin/services/importService';
 import releaseDataFileService, {
   DataFile,
   DeleteDataFilePlan,
+  ImportStatusCode,
 } from '@admin/services/releaseDataFileService';
 import releaseMetaFileService from '@admin/services/releaseMetaFileService';
 import Accordion from '@common/components/Accordion';
@@ -11,19 +11,21 @@ import AccordionSection from '@common/components/AccordionSection';
 import Button from '@common/components/Button';
 import ButtonGroup from '@common/components/ButtonGroup';
 import ButtonText from '@common/components/ButtonText';
-import { Form, FormFieldset } from '@common/components/form';
+import { Form } from '@common/components/form';
 import FormFieldFileInput from '@common/components/form/FormFieldFileInput';
 import FormFieldTextInput from '@common/components/form/FormFieldTextInput';
 import LoadingSpinner from '@common/components/LoadingSpinner';
 import ModalConfirm from '@common/components/ModalConfirm';
 import SummaryList from '@common/components/SummaryList';
 import SummaryListItem from '@common/components/SummaryListItem';
+import WarningMessage from '@common/components/WarningMessage';
 import useAsyncHandledRetry from '@common/hooks/useAsyncHandledRetry';
+import logger from '@common/services/logger';
+import delay from '@common/utils/delay';
 import { mapFieldErrors } from '@common/validation/serverValidations';
 import Yup from '@common/validation/yup';
 import { format } from 'date-fns';
-import { Formik, FormikHelpers, FormikProps } from 'formik';
-import remove from 'lodash/remove';
+import { Formik } from 'formik';
 import React, { useState } from 'react';
 
 interface FormValues {
@@ -106,33 +108,18 @@ const formId = 'dataFileUploadForm';
 
 const ReleaseDataUploadsSection = ({ releaseId, canUpdateRelease }: Props) => {
   const [deleteDataFile, setDeleteDataFile] = useState<DeleteDataFile>();
-  const [openedAccordions, setOpenedAccordions] = useState<string[]>([]);
   const [isUploading, setIsUploading] = useState(false);
 
   const {
     value: dataFiles = [],
     setState: setDataFiles,
-    retry: fetchDataFiles,
     isLoading,
   } = useAsyncHandledRetry(
     () => releaseDataFileService.getReleaseDataFiles(releaseId),
     [releaseId],
   );
 
-  const resetPage = async ({ resetForm }: FormikHelpers<FormValues>) => {
-    resetForm();
-
-    document
-      .querySelectorAll(`#${formId} input[type='file']`)
-      .forEach(input => {
-        const fileInput = input as HTMLInputElement;
-        fileInput.value = '';
-      });
-
-    await fetchDataFiles();
-  };
-
-  const setDeleting = (dataFile: DeleteDataFile, deleting: boolean) => {
+  const setFileDeleting = (dataFile: DeleteDataFile, deleting: boolean) => {
     setDataFiles({
       value: dataFiles.map(file =>
         file.filename !== dataFile.file.filename
@@ -145,7 +132,7 @@ const ReleaseDataUploadsSection = ({ releaseId, canUpdateRelease }: Props) => {
     });
   };
 
-  const statusChangeHandler = async (
+  const handleStatusChange = async (
     dataFile: DataFile,
     statusCode: ImportStatusCode,
   ) => {
@@ -169,36 +156,21 @@ const ReleaseDataUploadsSection = ({ releaseId, canUpdateRelease }: Props) => {
     setIsUploading(true);
 
     try {
-      await releaseDataFileService.uploadDataFiles(releaseId, {
+      const file = await releaseDataFileService.uploadDataFiles(releaseId, {
         subjectTitle: values.subjectTitle,
         dataFile: values.dataFile as File,
         metadataFile: values.metadataFile as File,
       });
-      setIsUploading(false);
-      await resetPage(actions);
+
+      actions.resetForm();
+
+      setDataFiles({
+        value: [...dataFiles, file],
+      });
     } finally {
       setIsUploading(false);
     }
   }, errorMappings);
-
-  const handleDelete = async (
-    dataFileToDelete: DeleteDataFile,
-    form: FormikProps<FormValues>,
-  ) => {
-    setDeleting(dataFileToDelete, true);
-    setDeleteDataFile(undefined);
-
-    try {
-      await releaseDataFileService.deleteDataFiles(
-        releaseId,
-        (deleteDataFile as DeleteDataFile).file,
-      );
-      setDeleting(dataFileToDelete, false);
-      await resetPage(form);
-    } finally {
-      setDeleting(dataFileToDelete, false);
-    }
-  };
 
   return (
     <Formik<FormValues>
@@ -208,58 +180,70 @@ const ReleaseDataUploadsSection = ({ releaseId, canUpdateRelease }: Props) => {
         dataFile: null,
         metadataFile: null,
       }}
+      onReset={() => {
+        document
+          .querySelectorAll(`#${formId} input[type='file']`)
+          .forEach(input => {
+            const fileInput = input as HTMLInputElement;
+            fileInput.value = '';
+          });
+      }}
       onSubmit={handleSubmit}
       validationSchema={Yup.object<FormValues>({
         subjectTitle: Yup.string()
           .required('Enter a subject title')
-          .test('unique', 'Subject title must be unique', function unique(
-            value: string,
-          ) {
-            if (!value) {
-              return true;
-            }
-            return (
-              dataFiles.find(
-                f => f.title.toUpperCase() === value.toUpperCase(),
-              ) === undefined
-            );
+          .test({
+            name: 'unique',
+            message: 'Enter a unique subject title',
+            test(value: string) {
+              if (!value) {
+                return true;
+              }
+              return (
+                dataFiles.find(
+                  f => f.title.toUpperCase() === value.toUpperCase(),
+                ) === undefined
+              );
+            },
           }),
-        dataFile: Yup.mixed().required('Choose a data file'),
-        metadataFile: Yup.mixed().required('Choose a metadata file'),
+        dataFile: Yup.file().required('Choose a data file'),
+        metadataFile: Yup.file().required('Choose a metadata file'),
       })}
     >
       {form => (
-        <Form id={formId}>
-          {canUpdateRelease && (
-            <>
-              {isUploading && <LoadingSpinner text="Uploading files" overlay />}
-              <FormFieldset
-                id={`${formId}-allFieldsFieldset`}
-                legend="Add new data to release"
-              >
-                <div className="govuk-inset-text">
-                  <h2>Before you start</h2>
+        <>
+          <h2>Add data file to release</h2>
 
-                  <div className="govuk-list--bullet">
-                    <li>
-                      make sure your data has passed the screening checks in our{' '}
-                      <a href="https://github.com/dfe-analytical-services/ees-data-screener">
-                        R Project
-                      </a>{' '}
-                    </li>
-                    <li>
-                      if your data doesn’t meet these standards, you won’t be
-                      able to upload it to your release
-                    </li>
-                    <li>
-                      if you have any issues uploading data and files, or
-                      questions about data standards contact:{' '}
-                      <a href="mailto:explore.statistics@education.gov.uk">
-                        explore.statistics@education.gov.uk
-                      </a>
-                    </li>
-                  </div>
-                </div>
+          <div className="govuk-inset-text">
+            <h3>Before you start</h3>
+
+            <ul>
+              <li>
+                make sure your data has passed the screening checks in our{' '}
+                <a href="https://github.com/dfe-analytical-services/ees-data-screener">
+                  R Project
+                </a>{' '}
+              </li>
+              <li>
+                if your data does not meet these standards, you won’t be able to
+                upload it to your release
+              </li>
+              <li>
+                if you have any issues uploading data and files, or questions
+                about data standards contact:{' '}
+                <a href="mailto:explore.statistics@education.gov.uk">
+                  explore.statistics@education.gov.uk
+                </a>
+              </li>
+            </ul>
+          </div>
+
+          {canUpdateRelease ? (
+            <Form id={formId}>
+              <div style={{ position: 'relative' }}>
+                {isUploading && (
+                  <LoadingSpinner text="Uploading files" overlay />
+                )}
 
                 <FormFieldTextInput<FormValues>
                   id={`${formId}-subjectTitle`}
@@ -272,7 +256,6 @@ const ReleaseDataUploadsSection = ({ releaseId, canUpdateRelease }: Props) => {
                   id={`${formId}-dataFile`}
                   name="dataFile"
                   label="Upload data file"
-                  formGroupClass="govuk-!-margin-top-6"
                 />
 
                 <FormFieldFileInput<FormValues>
@@ -280,146 +263,125 @@ const ReleaseDataUploadsSection = ({ releaseId, canUpdateRelease }: Props) => {
                   name="metadataFile"
                   label="Upload metadata file"
                 />
-              </FormFieldset>
 
-              <ButtonGroup>
-                <Button type="submit" id="upload-data-files-button">
-                  Upload data files
-                </Button>
-                <ButtonText onClick={() => resetPage(form)}>Cancel</ButtonText>
-              </ButtonGroup>
-            </>
+                <ButtonGroup>
+                  <Button type="submit" disabled={form.isSubmitting}>
+                    Upload data files
+                  </Button>
+
+                  <ButtonText
+                    disabled={form.isSubmitting}
+                    onClick={() => {
+                      form.resetForm();
+                    }}
+                  >
+                    Cancel
+                  </ButtonText>
+                </ButtonGroup>
+              </div>
+            </Form>
+          ) : (
+            <WarningMessage>
+              This release has been approved, and can no longer be updated.
+            </WarningMessage>
           )}
 
-          {typeof canUpdateRelease !== 'undefined' &&
-            !canUpdateRelease &&
-            'This release has been approved, and can no longer be updated.'}
+          <hr className="govuk-!-margin-top-6 govuk-!-margin-bottom-6" />
+
+          <h2>Uploaded data files</h2>
 
           <LoadingSpinner loading={isLoading}>
-            {dataFiles.length > 0 && (
-              <>
-                <hr />
-                <h2 className="govuk-heading-m">Uploaded data files</h2>
-                <Accordion
-                  id="uploaded-files"
-                  onToggleAll={openAll => {
-                    if (openAll) {
-                      setOpenedAccordions(
-                        dataFiles.map((dataFile, index) => {
-                          return `${dataFile.title}-${index}`;
-                        }),
-                      );
-                    } else {
-                      setOpenedAccordions([]);
-                    }
-                  }}
-                >
-                  {dataFiles.map((dataFile, index) => {
-                    const accId = `${dataFile.title}-${index}`;
-                    return (
-                      <AccordionSection
-                        key={accId}
-                        heading={dataFile.title}
-                        onToggle={() => {
-                          if (openedAccordions.includes(accId)) {
-                            setOpenedAccordions(
-                              remove(openedAccordions, (item: string) => {
-                                return item !== accId;
-                              }),
-                            );
-                          } else {
-                            setOpenedAccordions([...openedAccordions, accId]);
-                          }
-                        }}
-                        open={openedAccordions.includes(accId)}
-                      >
-                        {dataFile.isDeleting && (
-                          <LoadingSpinner text="Deleting files" overlay />
-                        )}
-                        <SummaryList
-                          key={dataFile.filename}
-                          className="govuk-!-margin-bottom-9"
-                        >
-                          <SummaryListItem term="Subject title">
-                            <h4 className="govuk-heading-m">
-                              {dataFile.title}
-                            </h4>
-                          </SummaryListItem>
-                          <SummaryListItem term="Data file">
-                            <ButtonText
-                              onClick={() =>
-                                releaseDataFileService.downloadDataFile(
-                                  releaseId,
-                                  dataFile.filename,
-                                )
-                              }
-                            >
-                              {dataFile.filename}
-                            </ButtonText>
-                          </SummaryListItem>
-                          <SummaryListItem term="Metadata file">
-                            <ButtonText
-                              onClick={() =>
-                                releaseMetaFileService.downloadDataMetadataFile(
-                                  releaseId,
-                                  dataFile.metadataFilename,
-                                )
-                              }
-                            >
-                              {dataFile.metadataFilename}
-                            </ButtonText>
-                          </SummaryListItem>
-                          <SummaryListItem term="Data file size">
-                            {dataFile.fileSize.size.toLocaleString()}{' '}
-                            {dataFile.fileSize.unit}
-                          </SummaryListItem>
-                          <SummaryListItem term="Number of rows">
-                            {dataFile.rows.toLocaleString()}
-                          </SummaryListItem>
+            {dataFiles.length > 0 ? (
+              <Accordion id="uploadedDataFiles">
+                {dataFiles.map(dataFile => (
+                  <AccordionSection
+                    key={dataFile.title}
+                    heading={dataFile.title}
+                    headingTag="h3"
+                  >
+                    <div style={{ position: 'relative' }}>
+                      {dataFile.isDeleting && (
+                        <LoadingSpinner text="Deleting files" overlay />
+                      )}
+                      <SummaryList>
+                        <SummaryListItem term="Subject title">
+                          {dataFile.title}
+                        </SummaryListItem>
+                        <SummaryListItem term="Data file">
+                          <ButtonText
+                            onClick={() =>
+                              releaseDataFileService.downloadDataFile(
+                                releaseId,
+                                dataFile.filename,
+                              )
+                            }
+                          >
+                            {dataFile.filename}
+                          </ButtonText>
+                        </SummaryListItem>
+                        <SummaryListItem term="Metadata file">
+                          <ButtonText
+                            onClick={() =>
+                              releaseMetaFileService.downloadDataMetadataFile(
+                                releaseId,
+                                dataFile.metadataFilename,
+                              )
+                            }
+                          >
+                            {dataFile.metadataFilename}
+                          </ButtonText>
+                        </SummaryListItem>
+                        <SummaryListItem term="Data file size">
+                          {dataFile.fileSize.size.toLocaleString()}{' '}
+                          {dataFile.fileSize.unit}
+                        </SummaryListItem>
+                        <SummaryListItem term="Number of rows">
+                          {dataFile.rows.toLocaleString()}
+                        </SummaryListItem>
 
-                          <ImporterStatus
-                            releaseId={releaseId}
-                            dataFile={dataFile}
-                            onStatusChangeHandler={statusChangeHandler}
+                        <ImporterStatus
+                          releaseId={releaseId}
+                          dataFile={dataFile}
+                          onStatusChangeHandler={handleStatusChange}
+                        />
+                        <SummaryListItem term="Uploaded by">
+                          <a href={`mailto:${dataFile.userName}`}>
+                            {dataFile.userName}
+                          </a>
+                        </SummaryListItem>
+                        <SummaryListItem term="Date uploaded">
+                          {format(dataFile.created, 'd MMMM yyyy HH:mm')}
+                        </SummaryListItem>
+                        {canUpdateRelease && dataFile.canDelete && (
+                          <SummaryListItem
+                            term="Actions"
+                            actions={
+                              <ButtonText
+                                onClick={() =>
+                                  releaseDataFileService
+                                    .getDeleteDataFilePlan(releaseId, dataFile)
+                                    .then(plan => {
+                                      setDeleteDataFile({
+                                        plan,
+                                        file: dataFile,
+                                      });
+                                    })
+                                }
+                              >
+                                Delete files
+                              </ButtonText>
+                            }
                           />
-                          <SummaryListItem term="Uploaded by">
-                            <a href={`mailto:${dataFile.userName}`}>
-                              {dataFile.userName}
-                            </a>
-                          </SummaryListItem>
-                          <SummaryListItem term="Date uploaded">
-                            {format(dataFile.created, 'd/M/yyyy HH:mm')}
-                          </SummaryListItem>
-                          {canUpdateRelease && dataFile.canDelete && (
-                            <SummaryListItem
-                              term="Actions"
-                              actions={
-                                <ButtonText
-                                  onClick={() =>
-                                    releaseDataFileService
-                                      .getDeleteDataFilePlan(
-                                        releaseId,
-                                        dataFile,
-                                      )
-                                      .then(plan => {
-                                        setDeleteDataFile({
-                                          plan,
-                                          file: dataFile,
-                                        });
-                                      })
-                                  }
-                                >
-                                  Delete files
-                                </ButtonText>
-                              }
-                            />
-                          )}
-                        </SummaryList>
-                      </AccordionSection>
-                    );
-                  })}
-                </Accordion>
-              </>
+                        )}
+                      </SummaryList>
+                    </div>
+                  </AccordionSection>
+                ))}
+              </Accordion>
+            ) : (
+              <p className="govuk-inset-text">
+                No data files have been uploaded.
+              </p>
             )}
           </LoadingSpinner>
 
@@ -429,7 +391,23 @@ const ReleaseDataUploadsSection = ({ releaseId, canUpdateRelease }: Props) => {
               title="Confirm deletion of selected data files"
               onExit={() => setDeleteDataFile(undefined)}
               onCancel={() => setDeleteDataFile(undefined)}
-              onConfirm={() => handleDelete(deleteDataFile, form)}
+              onConfirm={async () => {
+                const { file } = deleteDataFile;
+
+                setDeleteDataFile(undefined);
+                setFileDeleting(deleteDataFile, true);
+
+                try {
+                  await releaseDataFileService.deleteDataFiles(releaseId, file);
+
+                  setDataFiles({
+                    value: dataFiles.filter(dataFile => dataFile !== file),
+                  });
+                } catch (err) {
+                  logger.error(err);
+                  setFileDeleting(deleteDataFile, false);
+                }
+              }}
             >
               <p>
                 This data will no longer be available for use in this release.
@@ -480,7 +458,7 @@ const ReleaseDataUploadsSection = ({ releaseId, canUpdateRelease }: Props) => {
               )}
             </ModalConfirm>
           )}
-        </Form>
+        </>
       )}
     </Formik>
   );

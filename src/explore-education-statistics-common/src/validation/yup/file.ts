@@ -3,7 +3,7 @@ import { mixed } from 'yup';
 const MixedSchema = mixed;
 
 class FileSchema extends MixedSchema {
-  private isNullable = false;
+  private isNullable = true;
 
   constructor() {
     super({ type: 'file' });

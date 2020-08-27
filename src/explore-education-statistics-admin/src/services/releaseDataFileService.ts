@@ -32,7 +32,7 @@ export interface DataFile {
   isDeleting?: boolean;
 }
 
-interface UploadDataFilesRequest {
+export interface UploadDataFilesRequest {
   subjectTitle: string;
   dataFile: File;
   metadataFile: File;
@@ -86,18 +86,20 @@ const releaseDataFileService = {
         return dataFiles.map(mapFile);
       });
   },
-  uploadDataFiles(
+  async uploadDataFiles(
     releaseId: string,
     request: UploadDataFilesRequest,
-  ): Promise<boolean> {
+  ): Promise<DataFile> {
     const data = new FormData();
     data.append('file', request.dataFile);
     data.append('metaFile', request.metadataFile);
 
-    return client.post<boolean>(
+    const file = await client.post<DataFileInfo>(
       `/release/${releaseId}/data?name=${request.subjectTitle}`,
       data,
     );
+
+    return mapFile(file);
   },
   getDataFileImportStatus(
     releaseId: string,
