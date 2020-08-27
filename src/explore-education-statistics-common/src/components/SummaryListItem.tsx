@@ -7,16 +7,12 @@ interface Props {
   testId?: string;
 }
 
-const SummaryListItem = ({ actions, children, term, testId }: Props) => {
+const SummaryListItem = ({ actions, children, term, testId = term }: Props) => {
   return (
-    <div className="govuk-summary-list__row">
+    <div className="govuk-summary-list__row" data-testid={testId}>
       <dt className="govuk-summary-list__key">{term}</dt>
 
-      {children && (
-        <dd className="govuk-summary-list__value" data-testid={testId}>
-          {children}
-        </dd>
-      )}
+      {children && <dd className="govuk-summary-list__value">{children}</dd>}
       {actions && <dd className="govuk-summary-list__actions">{actions}</dd>}
     </div>
   );
