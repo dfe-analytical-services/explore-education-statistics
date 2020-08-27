@@ -180,7 +180,23 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Controllers.Api
                 .UploadDataFilesAsync(releaseId, file, metaFile, name, user.Email)
                 .HandleFailuresOrOk();
         }
+        
+        [HttpPost("release/{releaseId}/zdata")]
+        [Produces("application/json")]
+        [ProducesResponseType(200)]
+        [ProducesResponseType(404)]
+        [RequestSizeLimit(int.MaxValue)]
+        [RequestFormLimits(ValueLengthLimit = int.MaxValue, MultipartBodyLengthLimit = int.MaxValue)]
+        public async Task<ActionResult<bool>> AddDataFilesAsync(Guid releaseId,
+            [FromQuery(Name = "name"), Required] string name, IFormFile zipFile)
+        {
+            var user = await _userManager.GetUserAsync(User);
 
+            return await _releaseFilesService
+                .UploadDataFilesAsZipAsync(releaseId, zipFile, name, user.Email)
+                .HandleFailuresOrOk();
+        }
+        
         [HttpGet("releases/{releaseId}")]
         public async Task<ActionResult<ReleaseViewModel>> GetReleaseAsync(Guid releaseId)
         {

@@ -1,6 +1,7 @@
 using System;
 using System.Collections.Generic;
 using System.IO;
+using System.IO.Compression;
 using System.Linq;
 using System.Text.RegularExpressions;
 using System.Threading.Tasks;
@@ -27,6 +28,10 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Services
         public static readonly Regex[] AllowedCsvMimeTypes = {
             new Regex(@"^(application|text)/csv$"),
             new Regex(@"text/plain$")
+        };
+        
+        public static readonly Regex[] AllowedZipMimeTypes = {
+            new Regex(@"^(application)/zip$")
         };
         
         public static readonly string[] CsvEncodingTypes = {
@@ -60,72 +65,41 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Services
         // We cannot rely on the normal upload validation as we want this to be an atomic operation for both files.
         public async Task<Either<ActionResult, bool>> ValidateDataFilesForUpload(Guid releaseId, IFormFile dataFile, IFormFile metaFile, string name)
         {
-            if (string.Equals(dataFile.FileName.ToLower(), metaFile.FileName.ToLower(), OrdinalIgnoreCase))
+            return await ValidateDataFileNames(releaseId, dataFile.FileName, metaFile.FileName)
+                .OnSuccess(async _ => await ValidateDataFileSizes(dataFile.Length, metaFile.Length))
+                .OnSuccess(async _ => await ValidateSubjectName(releaseId, name))
+                .OnSuccess(async _ => await ValidateDataFileTypes(releaseId, dataFile, metaFile));
+        }
+
+        public async Task<Either<ActionResult, bool>> ValidateZippedDataFileForUpload(Guid releaseId, IFormFile zipFile, string name)
+        {
+            if (!IsZipFile(zipFile))
             {
-                return ValidationActionResult(DataAndMetadataFilesCannotHaveTheSameName);
+                return ValidationActionResult(DataFileMustBeZipFile);
             }
 
-            if (dataFile.Length == 0)
-            {
-                return ValidationActionResult(DataFileCannotBeEmpty);
-            }
-
-            if (metaFile.Length == 0)
-            {
-                return ValidationActionResult(MetadataFileCannotBeEmpty);
-            }
-
-            if (dataFile.FileName.IndexOf(" ", Ordinal) > -1 || 
-                dataFile.FileName.IndexOfAny(Path.GetInvalidFileNameChars()) > -1)
-            {
-                return ValidationActionResult(DataFilenameCannotContainSpacesOrSpecialCharacters);
-            }
+            using var stream = zipFile.OpenReadStream();
+            using var archive = new ZipArchive(stream);
             
-            if (FileContainsSpacesOrSpecialChars(dataFile))
+            if (archive.Entries.Count != 2)
             {
-                return ValidationActionResult(FilenameCannotContainSpacesOrSpecialCharacters);
-            }
-            
-            if (metaFile.FileName.IndexOf(" ", Ordinal) > -1 || 
-                metaFile.FileName.IndexOfAny(Path.GetInvalidFileNameChars()) > -1)
-            {
-                return ValidationActionResult(MetaFilenameCannotContainSpacesOrSpecialCharacters);
+                return ValidationActionResult(DataZipFileCanOnlyContainTwoFiles);
             }
 
-            if (FileContainsSpacesOrSpecialChars(metaFile))
+            var file1 = archive.Entries[0];
+            var file2 = archive.Entries[1];
+                
+            if (!file1.FullName.EndsWith(".csv") || !file2.FullName.EndsWith(".csv"))
             {
-                return ValidationActionResult(FilenameCannotContainSpacesOrSpecialCharacters);
+                return ValidationActionResult(DataZipFileDoesNotContainCsvFiles);
             }
 
-            if (IsFileExisting(releaseId, ReleaseFileTypes.Data, dataFile.FileName))
-            {
-                return ValidationActionResult(CannotOverwriteDataFile);
-            }
+            var dataFile = file1.Name.Contains(".meta.") ? file2 : file1;
+            var metaFile = file1.Name.Contains(".meta.") ? file1 : file2;
 
-            if (IsFileExisting(releaseId, ReleaseFileTypes.Metadata, metaFile.FileName))
-            {
-                return ValidationActionResult(CannotOverwriteMetadataFile);
-            }
-
-            var dataFilePath = AdminReleasePath(releaseId, ReleaseFileTypes.Data, dataFile.FileName.ToLower());
-            var metadataFilePath = AdminReleasePath(releaseId, ReleaseFileTypes.Data, metaFile.FileName.ToLower());
-
-            if (!IsCsvFile(dataFilePath, dataFile))
-            {
-                return ValidationActionResult(DataFileMustBeCsvFile);
-            }
-
-            if (!IsCsvFile(metadataFilePath, metaFile))
-            {
-                return ValidationActionResult(MetaFileMustBeCsvFile);
-            }
-
-            if (await _subjectService.GetAsync(releaseId, name) != null)
-            {
-                return ValidationActionResult(SubjectTitleMustBeUnique);
-            }
-
-            return true;
+            return await ValidateDataFileNames(releaseId, dataFile.Name, metaFile.Name)
+                .OnSuccess(async _ => await ValidateDataFileSizes(dataFile.Length, metaFile.Length))
+                .OnSuccess(async _ => await ValidateSubjectName(releaseId, name));
         }
 
         public async Task<Either<ActionResult, bool>> ValidateFileForUpload(Guid releaseId, IFormFile file, ReleaseFileTypes type, bool overwrite)
@@ -136,7 +110,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Services
                 return ValidationActionResult(FileCannotBeEmpty);
             }
             
-            if (FileContainsSpacesOrSpecialChars(file))
+            if (FileContainsSpacesOrSpecialChars(file.FileName))
             {
                 return ValidationActionResult(FilenameCannotContainSpacesOrSpecialCharacters);
             }
@@ -179,10 +153,21 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Services
                    && _fileTypeService.HasMatchingEncodingType(file, CsvEncodingTypes);
         }
         
-        private bool FileContainsSpacesOrSpecialChars(IFormFile file)
+        private bool IsZipFile(IFormFile file)
         {
-            return file.FileName.IndexOf(" ", Ordinal) > -1 || 
-                   file.FileName.IndexOfAny(Path.GetInvalidFileNameChars()) > -1;
+            if (!file.FileName.ToLower().EndsWith(".zip"))
+            {
+                return false;
+            }
+            
+            return _fileTypeService.HasMatchingMimeType(file, AllowedMimeTypesByFileType[ReleaseFileTypes.DataZip]) 
+                   && _fileTypeService.HasMatchingEncodingType(file, CsvEncodingTypes);
+        }
+        
+        private bool FileContainsSpacesOrSpecialChars(string filename)
+        {
+            return filename.IndexOf(" ", Ordinal) > -1 || 
+                   filename.IndexOfAny(Path.GetInvalidFileNameChars()) > -1;
         }
 
         private bool IsFileExisting(Guid releaseId, ReleaseFileTypes type, string name)
@@ -195,7 +180,97 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Services
                 .Any(rf => String.Equals(rf.ReleaseFileReference.Filename, name, CurrentCultureIgnoreCase)
                 && rf.ReleaseFileReference.ReleaseFileType == type);
         }
+
+        private async Task<Either<ActionResult, bool>> ValidateDataFileNames(Guid releaseId, string dataFileName, string metaFileName)
+        {
+            if (string.Equals(dataFileName.ToLower(), metaFileName.ToLower(), OrdinalIgnoreCase))
+            {
+                return ValidationActionResult(DataAndMetadataFilesCannotHaveTheSameName);
+            }
+            
+            if (dataFileName.IndexOf(" ", Ordinal) > -1 || 
+                dataFileName.IndexOfAny(Path.GetInvalidFileNameChars()) > -1)
+            {
+                return ValidationActionResult(DataFilenameCannotContainSpacesOrSpecialCharacters);
+            }
+            
+            if (FileContainsSpacesOrSpecialChars(dataFileName))
+            {
+                return ValidationActionResult(FilenameCannotContainSpacesOrSpecialCharacters);
+            }
+            
+            if (metaFileName.IndexOf(" ", Ordinal) > -1 || 
+                metaFileName.IndexOfAny(Path.GetInvalidFileNameChars()) > -1)
+            {
+                return ValidationActionResult(MetaFilenameCannotContainSpacesOrSpecialCharacters);
+            }
+
+            if (FileContainsSpacesOrSpecialChars(metaFileName))
+            {
+                return ValidationActionResult(FilenameCannotContainSpacesOrSpecialCharacters);
+            }
+            
+            if (!metaFileName.ToLower().Contains(".meta."))
+            {
+                return ValidationActionResult(MetaFileIsIncorrectlyNamed);
+            }
+
+            if (IsFileExisting(releaseId, ReleaseFileTypes.Data, dataFileName))
+            {
+                return ValidationActionResult(CannotOverwriteDataFile);
+            }
+
+            if (IsFileExisting(releaseId, ReleaseFileTypes.Metadata, metaFileName))
+            {
+                return ValidationActionResult(CannotOverwriteMetadataFile);
+            }
+
+            return true;
+        }
+
+        private async Task<Either<ActionResult, bool>> ValidateDataFileSizes(long dataFileLength, long metaFileLength)
+        {
+            if (dataFileLength == 0)
+            {
+                return ValidationActionResult(DataFileCannotBeEmpty);
+            }
+
+            if (metaFileLength == 0)
+            {
+                return ValidationActionResult(MetadataFileCannotBeEmpty);
+            }
+
+            return true;
+        }
         
+        private async Task<Either<ActionResult, bool>> ValidateDataFileTypes(Guid releaseId, IFormFile dataFile, IFormFile metaFile)
+        {
+            var dataFilePath = AdminReleasePath(releaseId, ReleaseFileTypes.Data, dataFile.FileName.ToLower());
+            var metadataFilePath = AdminReleasePath(releaseId, ReleaseFileTypes.Data, metaFile.FileName.ToLower());
+
+            if (!IsCsvFile(dataFilePath, dataFile))
+            {
+                return ValidationActionResult(DataFileMustBeCsvFile);
+            }
+
+            if (!IsCsvFile(metadataFilePath, metaFile))
+            {
+                return ValidationActionResult(MetaFileMustBeCsvFile);
+            }
+
+            return true;
+        }
+        
+        private async Task<Either<ActionResult, bool>> ValidateSubjectName(Guid releaseId, string name)
+        {
+            if (await _subjectService.GetAsync(releaseId, name) != null)
+            {
+                return ValidationActionResult(SubjectTitleMustBeUnique);
+            }
+
+            return true;
+        }
+
         public static readonly Dictionary<ReleaseFileTypes, IEnumerable<Regex>> AllowedMimeTypesByFileType = 
             new Dictionary<ReleaseFileTypes, IEnumerable<Regex>>
             {

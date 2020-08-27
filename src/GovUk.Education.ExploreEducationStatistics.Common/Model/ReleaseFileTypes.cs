@@ -6,6 +6,8 @@ namespace GovUk.Education.ExploreEducationStatistics.Common.Model
     {
         [EnumLabelValue("data")]
         Data,
+        [EnumLabelValue("zip")]
+        DataZip,
         [EnumLabelValue("metadata")]
         Metadata,
         [EnumLabelValue("ancillary")]

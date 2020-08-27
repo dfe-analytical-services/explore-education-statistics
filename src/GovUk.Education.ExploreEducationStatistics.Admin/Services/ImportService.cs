@@ -77,7 +77,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Services
             
             if (result.Result != null)
             {
-                return ValidationActionResult(DatafileAlreadyUploaded);
+                return ValidationActionResult(DataFileAlreadyUploaded);
             }
 
             await _tableStorageService.CreateOrUpdateEntity(DatafileImportsTableName,

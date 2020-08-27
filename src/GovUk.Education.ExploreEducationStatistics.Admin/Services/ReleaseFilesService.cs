@@ -96,6 +96,23 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Services
                         });
                 });
         }
+        
+        public Task<Either<ActionResult, bool>> UploadDataFilesAsZipAsync(Guid releaseId,
+            IFormFile zipFile, string name, string userName)
+        {
+            return _persistenceHelper
+                .CheckEntityExists<Release>(releaseId)
+                .OnSuccess(_userService.CheckCanUpdateRelease)
+                .OnSuccess(async release =>
+                {
+                    return await _fileUploadsValidatorService
+                        .ValidateZippedDataFileForUpload(releaseId, zipFile, name)
+                        .OnSuccess(async () =>
+                        {
+                            return true;
+                        });
+                });
+        }
 
         public Task<Either<ActionResult, bool>> DeleteDataFilesAsync(Guid releaseId, string dataFileName)
         {
