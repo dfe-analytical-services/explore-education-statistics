@@ -29,8 +29,7 @@ def user_waits_until_parent_contains_element(parent_locator: str, child_locator:
                                              timeout: int = None, error: str = None,
                                              limit: int = None):
     try:
-        sl.wait_until_page_contains_element(parent_locator, timeout=timeout, error=error,
-                                            limit=limit)
+        sl.wait_until_page_contains_element(parent_locator, timeout=timeout, error=error)
 
         def parent_contains_matching_element() -> bool:
             parent_el = sl.find_element(parent_locator)
@@ -178,24 +177,6 @@ def user_checks_accordion_is_in_position(header_starts_with, position):
             f'Accordion in position {position} expected start with text "{header_starts_with}". Actual found text: "{elem.text}"')
 
 
-def user_gets_child_details_element(parent, details_text):
-    user_waits_until_parent_contains_element(parent,
-                                             f'xpath:.//details/summary/*[text()="{details_text}"]/../..')
-    return get_child_element(parent, f'xpath:.//details/summary/*[text()="{details_text}"]/../..')
-
-
-def user_verifies_details_is_open(details_elem):
-    if details_elem.find_element_by_xpath('..').get_attribute("aria-expanded") == "false":
-        raise_assertion_error(f'Details component "{details_text}" not expanded!')
-
-
-def user_closes_details_dropdown(details_text):
-    elem = sl.get_webelement(f'xpath://details/summary/*[text()="{details_text}"]')
-    sl.click_element(elem)
-    if elem.find_element_by_xpath('..').get_attribute("aria-expanded") == "true":
-        raise_assertion_error(f'Details component "{details_text}" is still expanded!')
-
-
 def capture_large_screenshot():
     currentWindow = sl.get_window_size()
     page_height = sl.driver.execute_script(
@@ -280,20 +261,6 @@ def user_waits_until_details_dropdown_contains_publication(details_heading, publ
                                         timeout=timeout)
     sl.wait_until_page_contains_element(
         f'xpath://details/summary[.="{details_heading}"]/../..//*[text()="{publication_name}"]')
-
-
-def user_checks_details_dropdown_contains_download_link(details_heading, download_link):
-    try:
-        sl.wait_until_page_contains_element(
-            f'//*[contains(@class,"govuk-details__summary-text") and text()="{details_heading}"]')
-    except:
-        raise_assertion_error(f'Cannot find details component "{details_heading}"')
-
-    try:
-        sl.wait_until_page_contains_element(
-                f'//*[contains(@class,"govuk-details__summary-text") and text()="{details_heading}"]/../..//li/a[text()="{download_link}"]')
-    except:
-        raise_assertion_error(f'Cannot find link "{download_link}" in "{details_heading}"')
 
 
 def remove_substring_from_right_of_string(string, substring):

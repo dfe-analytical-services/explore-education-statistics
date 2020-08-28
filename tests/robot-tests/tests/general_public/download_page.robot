@@ -31,22 +31,22 @@ Validate Pupil absence data downloads are available
     environment variable should be set   DATA_API_URL
 
     user opens details dropdown  Pupil absence
-    user checks details dropdown contains download link  Pupil absence  Absence by characteristic, 2016/17
-    user checks page contains link with text and url  Absence by characteristic, 2016/17   %{DATA_API_URL}/download/pupil-absence-in-schools-in-england/2016-17/data/absence_by_characteristic.csv
-    user checks details dropdown contains download link  Pupil absence  Absence by geographic level, 2016/17
-    user checks page contains link with text and url  Absence by geographic level, 2016/17   %{DATA_API_URL}/download/pupil-absence-in-schools-in-england/2016-17/data/absence_by_geographic_level.csv
-    user checks details dropdown contains download link  Pupil absence  Absence by term, 2016/17
-    user checks page contains link with text and url  Absence by term, 2016/17   %{DATA_API_URL}/download/pupil-absence-in-schools-in-england/2016-17/data/absence_by_term.csv
-    user checks details dropdown contains download link  Pupil absence  Absence for four year olds, 2016/17
-    user checks page contains link with text and url  Absence for four year olds, 2016/17   %{DATA_API_URL}/download/pupil-absence-in-schools-in-england/2016-17/data/absence_for_four_year_olds.csv
-    user checks details dropdown contains download link  Pupil absence  Absence in prus, 2016/17
-    user checks page contains link with text and url  Absence in prus, 2016/17   %{DATA_API_URL}/download/pupil-absence-in-schools-in-england/2016-17/data/absence_in_prus.csv
-    user checks details dropdown contains download link  Pupil absence  Absence number missing at least one session by reason, 2016/17
-    user checks page contains link with text and url  Absence number missing at least one session by reason, 2016/17   %{DATA_API_URL}/download/pupil-absence-in-schools-in-england/2016-17/data/absence_number_missing_at_least_one_session_by_reason.csv
-    user checks details dropdown contains download link  Pupil absence  Absence rate percent bands, 2016/17
-    user checks page contains link with text and url  Absence rate percent bands, 2016/17   %{DATA_API_URL}/download/pupil-absence-in-schools-in-england/2016-17/data/absence_rate_percent_bands.csv
-    user checks details dropdown contains download link  Pupil absence  All files, 2016/17
-    user checks page contains link with text and url  All files, 2016/17   %{DATA_API_URL}/download/pupil-absence-in-schools-in-england/2016-17/ancillary/pupil-absence-in-schools-in-england_2016-17.zip
+    user waits until details contains link  Pupil absence  Absence by characteristic, 2016/17
+    user checks link has url  Absence by characteristic, 2016/17   %{DATA_API_URL}/download/pupil-absence-in-schools-in-england/2016-17/data/absence_by_characteristic.csv
+    user waits until details contains link  Pupil absence  Absence by geographic level, 2016/17
+    user checks link has url  Absence by geographic level, 2016/17   %{DATA_API_URL}/download/pupil-absence-in-schools-in-england/2016-17/data/absence_by_geographic_level.csv
+    user waits until details contains link  Pupil absence  Absence by term, 2016/17
+    user checks link has url  Absence by term, 2016/17   %{DATA_API_URL}/download/pupil-absence-in-schools-in-england/2016-17/data/absence_by_term.csv
+    user waits until details contains link  Pupil absence  Absence for four year olds, 2016/17
+    user checks link has url  Absence for four year olds, 2016/17   %{DATA_API_URL}/download/pupil-absence-in-schools-in-england/2016-17/data/absence_for_four_year_olds.csv
+    user waits until details contains link  Pupil absence  Absence in prus, 2016/17
+    user checks link has url  Absence in prus, 2016/17   %{DATA_API_URL}/download/pupil-absence-in-schools-in-england/2016-17/data/absence_in_prus.csv
+    user waits until details contains link  Pupil absence  Absence number missing at least one session by reason, 2016/17
+    user checks link has url  Absence number missing at least one session by reason, 2016/17   %{DATA_API_URL}/download/pupil-absence-in-schools-in-england/2016-17/data/absence_number_missing_at_least_one_session_by_reason.csv
+    user waits until details contains link  Pupil absence  Absence rate percent bands, 2016/17
+    user checks link has url  Absence rate percent bands, 2016/17   %{DATA_API_URL}/download/pupil-absence-in-schools-in-england/2016-17/data/absence_rate_percent_bands.csv
+    user waits until details contains link  Pupil absence  All files, 2016/17
+    user checks link has url  All files, 2016/17   %{DATA_API_URL}/download/pupil-absence-in-schools-in-england/2016-17/ancillary/pupil-absence-in-schools-in-england_2016-17.zip
 
 Download Absence in prus CSV
     [Tags]  HappyPath   NotAgainstLocal
@@ -75,18 +75,18 @@ Validate Exclusions data downloads are available
     [Documentation]  EES-562
     [Tags]  HappyPath   NotAgainstLocal
     user opens details dropdown  Exclusions
-    user checks details dropdown contains download link  Exclusions  Duration of fixed exclusions, 2016/17
-    user checks page contains link with text and url  Duration of fixed exclusions, 2016/17   %{DATA_API_URL}/download/permanent-and-fixed-period-exclusions-in-england/2016-17/data/exclusions_duration_of_fixed_exclusions.csv
-    user checks details dropdown contains download link  Exclusions  Exclusions by characteristic, 2016/17
-    user checks page contains link with text and url  Exclusions by characteristic, 2016/17   %{DATA_API_URL}/download/permanent-and-fixed-period-exclusions-in-england/2016-17/data/exclusions_by_characteristic.csv
-    user checks details dropdown contains download link  Exclusions  Exclusions by geographic level, 2016/17
-    user checks page contains link with text and url  Exclusions by geographic level, 2016/17   %{DATA_API_URL}/download/permanent-and-fixed-period-exclusions-in-england/2016-17/data/exclusions_by_geographic_level.csv
-    user checks details dropdown contains download link  Exclusions  Exclusions by reason, 2016/17
-    user checks page contains link with text and url  Exclusions by reason, 2016/17    %{DATA_API_URL}/download/permanent-and-fixed-period-exclusions-in-england/2016-17/data/exclusions_by_reason.csv
-    user checks details dropdown contains download link  Exclusions  Number of fixed exclusions, 2016/17
-    user checks page contains link with text and url  Number of fixed exclusions, 2016/17    %{DATA_API_URL}/download/permanent-and-fixed-period-exclusions-in-england/2016-17/data/exclusions_number_of_fixed_exclusions.csv
-    user checks details dropdown contains download link  Exclusions  Total days missed due to fixed period exclusions, 2016/17
-    user checks page contains link with text and url  Total days missed due to fixed period exclusions, 2016/17    %{DATA_API_URL}/download/permanent-and-fixed-period-exclusions-in-england/2016-17/data/exclusions_total_days_missed_fixed_exclusions.csv
-    user checks details dropdown contains download link  Exclusions  All files, 2016/17
-    user checks page contains link with text and url  All files, 2016/17   %{DATA_API_URL}/download/permanent-and-fixed-period-exclusions-in-england/2016-17/ancillary/permanent-and-fixed-period-exclusions-in-england_2016-17.zip
+    user waits until details contains link  Exclusions  Duration of fixed exclusions, 2016/17
+    user checks link has url  Duration of fixed exclusions, 2016/17   %{DATA_API_URL}/download/permanent-and-fixed-period-exclusions-in-england/2016-17/data/exclusions_duration_of_fixed_exclusions.csv
+    user waits until details contains link  Exclusions  Exclusions by characteristic, 2016/17
+    user checks link has url  Exclusions by characteristic, 2016/17   %{DATA_API_URL}/download/permanent-and-fixed-period-exclusions-in-england/2016-17/data/exclusions_by_characteristic.csv
+    user waits until details contains link  Exclusions  Exclusions by geographic level, 2016/17
+    user checks link has url  Exclusions by geographic level, 2016/17   %{DATA_API_URL}/download/permanent-and-fixed-period-exclusions-in-england/2016-17/data/exclusions_by_geographic_level.csv
+    user waits until details contains link  Exclusions  Exclusions by reason, 2016/17
+    user checks link has url  Exclusions by reason, 2016/17    %{DATA_API_URL}/download/permanent-and-fixed-period-exclusions-in-england/2016-17/data/exclusions_by_reason.csv
+    user waits until details contains link  Exclusions  Number of fixed exclusions, 2016/17
+    user checks link has url  Number of fixed exclusions, 2016/17    %{DATA_API_URL}/download/permanent-and-fixed-period-exclusions-in-england/2016-17/data/exclusions_number_of_fixed_exclusions.csv
+    user waits until details contains link  Exclusions  Total days missed due to fixed period exclusions, 2016/17
+    user checks link has url  Total days missed due to fixed period exclusions, 2016/17    %{DATA_API_URL}/download/permanent-and-fixed-period-exclusions-in-england/2016-17/data/exclusions_total_days_missed_fixed_exclusions.csv
+    user waits until details contains link  Exclusions  All files, 2016/17
+    user checks link has url  All files, 2016/17   %{DATA_API_URL}/download/permanent-and-fixed-period-exclusions-in-england/2016-17/ancillary/permanent-and-fixed-period-exclusions-in-england_2016-17.zip
     user closes details dropdown  Exclusions

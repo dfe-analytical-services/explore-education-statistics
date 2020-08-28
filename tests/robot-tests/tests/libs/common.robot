@@ -147,6 +147,10 @@ user waits until page contains link
     [Arguments]    ${link_text}   ${wait}=${timeout}
     wait until page contains element  xpath://a[text()="${link_text}"]   timeout=${wait}
 
+user waits until element contains link
+    [Arguments]  ${element}  ${link_text}  ${wait}=${timeout}
+    user waits until parent contains element  ${element}  link:${link_text}  timeout=${wait}
+
 user waits until page contains accordion section
     [Arguments]   ${section_title}     ${wait}=${timeout}
     user waits until page contains element  xpath://*[contains(@class,"govuk-accordion__section-button") and text()="${section_title}"]    ${wait}
@@ -164,9 +168,8 @@ user verifies accordion is closed
     user waits until page contains element   xpath://*[@class="govuk-accordion__section-button" and text()="${section_text}" and @aria-expanded="false"]
 
 user checks there are x accordion sections
-    [Arguments]  ${num}
-    # NOTE(mark): When nth-child won't do, you need to do the unholy equivalent of css .class in xpath...
-    page should contain element    xpath:.//*[contains(concat(" ", normalize-space(@class), " "), " govuk-accordion__section ")]       limit=${num}
+    [Arguments]  ${num}  ${parent}=css:body
+    user waits until parent contains element  ${parent}  css:[data-testid="accordionSection"]  limit=${num}
 
 user waits until accordion section contains text
     [Arguments]  ${section_text}   ${text}
@@ -175,7 +178,7 @@ user waits until accordion section contains text
 
 user gets accordion header button element
     [Arguments]  ${heading_text}  ${parent}=css:[data-testid="accordion"]
-    ${button}=  user gets button element  ${heading_text}  ${parent}
+    ${button}=  get child element  ${parent}  xpath:.//button[@aria-expanded and contains(., "${heading_text}")]
     [Return]  ${button}
 
 user opens accordion section
@@ -385,13 +388,44 @@ user checks page contains link with text and url
     [Arguments]  ${text}  ${href}
     user checks page contains element  xpath://a[@href="${href}" and text()="${text}"]
 
+user checks link has url
+    [Arguments]  ${link}  ${url}  ${parent}=css:body
+    user waits until parent contains element  ${parent}  xpath://a[@href="${url}" and text()="${link}"]
+
 user opens details dropdown
     [Arguments]  ${text}  ${parent}=css:body
+    user waits until parent contains element  ${parent}  xpath:.//details/summary[contains(., "${text}") and @aria-expanded]
+    ${summary}=  get child element  ${parent}  xpath:.//details/summary[contains(., "${text}")]
+    user waits until element is visible  ${summary}
+    ${is_expanded}=  get element attribute  ${summary}  aria-expanded
+    run keyword if  '${is_expanded}' != 'true'  user clicks element  ${summary}
+    user checks element attribute value should be  ${summary}  aria-expanded  true
+
+user closes details dropdown
+    [Arguments]  ${text}  ${parent}=css:body
+    user waits until parent contains element  ${parent}  xpath:.//details/summary[contains(., "${text}") and @aria-expanded]
+    ${summary}=  get child element  ${parent}  xpath:.//details/summary[contains(., "${text}")]
+    user waits until element is visible  ${summary}
+    ${is_expanded}=  get element attribute  ${summary}  aria-expanded
+    run keyword if  '${is_expanded}' != 'false'  user clicks element  ${summary}
+    user checks element attribute value should be  ${summary}  aria-expanded  false
+
+user gets details content element
+    [Arguments]  ${text}  ${parent}=css:body
     user waits until parent contains element  ${parent}  xpath:.//details/summary[contains(., "${text}")]
-    ${elem}=  get child element  ${parent}  xpath:.//details/summary[contains(., "${text}")]
-    user waits until element is visible  ${elem}
-    user clicks element  ${elem}
-    user waits until parent contains element  ${parent}  xpath:.//details/summary[@aria-expanded="true" and contains(., "${text}")]
+    ${summary}=  get child element  ${parent}  xpath:.//details/summary[contains(., "${text}")]
+    ${content_id}=  get element attribute  ${summary}  aria-controls
+    ${content}=  get child element  ${parent}  id:${content_id}
+    [Return]  ${content}
+
+user waits until details contains element
+    [Arguments]  ${text}  ${element}  ${parent}=css:body
+    ${details}=  user gets details content element  ${text}  ${parent}
+    user waits until parent contains element  ${details}  ${element}
+
+user waits until details contains link
+    [Arguments]  ${text}  ${link}  ${parent}=css:body
+    user waits until details contains element  ${text}  link:${link}  ${parent}
 
 user checks publication bullet contains link
     [Arguments]   ${publication}   ${link}

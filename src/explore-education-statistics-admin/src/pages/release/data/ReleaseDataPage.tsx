@@ -65,7 +65,7 @@ const ReleaseDataPage = () => {
         }}
         id="dataUploadTab"
       >
-        <TabsSection id="data-upload" title="Data uploads">
+        <TabsSection id="data-uploads" title="Data uploads">
           <ReleaseDataUploadsSection
             releaseId={releaseId}
             canUpdateRelease={canUpdateRelease}
@@ -82,7 +82,7 @@ const ReleaseDataPage = () => {
             }}
           />
         </TabsSection>
-        <TabsSection id="file-upload" title="File uploads">
+        <TabsSection id="file-uploads" title="File uploads">
           <ReleaseFileUploadsSection
             releaseId={releaseId}
             canUpdateRelease={canUpdateRelease}
