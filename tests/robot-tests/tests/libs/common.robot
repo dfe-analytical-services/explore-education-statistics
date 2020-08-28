@@ -173,7 +173,7 @@ user checks there are x accordion sections
 
 user waits until accordion section contains text
     [Arguments]  ${section_text}   ${text}
-    ${section}=  user gets accordion content element  ${section_text}
+    ${section}=  user gets accordion section content element  ${section_text}
     user waits until parent contains element   ${section}   xpath://*[text()="${text}"]
 
 user gets accordion header button element
@@ -195,12 +195,17 @@ user closes accordion section
     run keyword if  '${is_expanded}' != 'false'  user clicks element  ${header_button}
     user checks element attribute value should be  ${header_button}  aria-expanded  false
 
-user gets accordion content element
+user gets accordion section content element
     [Arguments]  ${heading_text}  ${parent}=css:[data-testid="accordion"]
     ${header_button}=  user gets accordion header button element  ${heading_text}  ${parent}
     ${content_id}=  get element attribute  ${header_button}  id
     ${content}=  get child element  ${parent}  css:[aria-labelledby="${content_id}"]
     [Return]  ${content}
+
+user scrolls to accordion section content
+    [Arguments]  ${heading_text}  ${parent}=css:[data-testid="accordion"]
+    ${content}=  user gets accordion section content element  ${heading_text}  ${parent}
+    user scrolls to element  ${content}
 
 user waits until page contains testid
     [Arguments]  ${id}   ${wait}=${timeout}

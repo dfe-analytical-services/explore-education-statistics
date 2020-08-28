@@ -239,6 +239,7 @@ Validate Regional and local authority (LA) breakdown table
 Validate Regional and local authority (LA) breakdown chart
     [Tags]  HappyPath
     user opens accordion section  Regional and local authority (LA) breakdown
+    user scrolls to accordion section content  Regional and local authority (LA) breakdown
 
     ${datablock}=  set variable  css:[data-testid="Data block - Generic data block - LA"]
     user waits until element contains map chart  ${datablock}

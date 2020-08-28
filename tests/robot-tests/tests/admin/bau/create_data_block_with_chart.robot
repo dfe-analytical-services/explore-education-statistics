@@ -49,7 +49,7 @@ Upload subject
     user waits until page contains accordion section   UI test subject
     user opens accordion section   UI test subject
 
-    ${section}=  user gets accordion content element  UI test subject
+    ${section}=  user gets accordion section content element  UI test subject
     user checks summary list contains  Subject title    UI test subject  ${section}
     user checks summary list contains  Data file        upload-file-test.csv  ${section}
     user checks summary list contains  Metadata file    upload-file-test.meta.csv  ${section}

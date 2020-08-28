@@ -58,7 +58,7 @@ Upload subject
     user waits until page contains accordion section   ${SUBJECT_NAME}
     user opens accordion section   ${SUBJECT_NAME}
 
-    ${section}=  user gets accordion content element  ${SUBJECT_NAME}
+    ${section}=  user gets accordion section content element  ${SUBJECT_NAME}
     user checks summary list contains  Subject title    ${SUBJECT_NAME}  ${section}
     user checks summary list contains  Data file        dates.csv  ${section}
     user checks summary list contains  Metadata file    dates.meta.csv  ${section}

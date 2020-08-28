@@ -131,7 +131,7 @@ Create amendment
     user waits until page contains accordion section  ${PUBLICATION_NAME}
 
     user opens accordion section  ${PUBLICATION_NAME}
-    ${accordion_section}=  user gets accordion content element  ${PUBLICATION_NAME}
+    ${accordion_section}=  user gets accordion section content element  ${PUBLICATION_NAME}
 
     user opens details dropdown  Financial Year 3000-01 (Live - Latest release)  ${accordion_section}
     ${details_elem}=  user gets details content element  Financial Year 3000-01 (Live - Latest release)  ${accordion_section}
@@ -158,7 +158,7 @@ Upload subject
     user waits until page contains accordion section   Dates test subject
     user opens accordion section   Dates test subject
 
-    ${section}=  user gets accordion content element  Dates test subject
+    ${section}=  user gets accordion section content element  Dates test subject
     user checks summary list contains  Subject title    Dates test subject  ${section}
     user checks summary list contains  Data file        dates.csv  ${section}
     user checks summary list contains  Metadata file    dates.meta.csv  ${section}
@@ -180,7 +180,7 @@ Add ancillary files
     user waits until page contains accordion section   test ancillary file 1
     user opens accordion section   test ancillary file 1   id:file-uploads
 
-    ${section_1}=  user gets accordion content element  test ancillary file 1  id:file-uploads
+    ${section_1}=  user gets accordion section content element  test ancillary file 1  id:file-uploads
     user checks summary list contains  Name         test ancillary file 1  ${section_1}
     user checks summary list contains  File         test-file-1.txt     ${section_1}
     user checks summary list contains  File size    12 B                ${section_1}
@@ -192,7 +192,7 @@ Add ancillary files
     user waits until page contains accordion section   test ancillary file 2
     user opens accordion section   test ancillary file 2  id:file-uploads
 
-    ${section_2}=  user gets accordion content element  test ancillary file 2  id:file-uploads
+    ${section_2}=  user gets accordion section content element  test ancillary file 2  id:file-uploads
     user checks summary list contains  Name         test ancillary file 2  ${section_2}
     user checks summary list contains  File         test-file-2.txt     ${section_2}
     user checks summary list contains  File size    24 B                ${section_2}
@@ -375,7 +375,7 @@ Verify amendment accordions are correct
 Verify Dates data block accordion section
     [Tags]  HappyPath
     user opens accordion section  Dates data block
-    ${section}=  user gets accordion content element  Dates data block
+    ${section}=  user gets accordion section content element  Dates data block
 
     user checks chart title contains  ${section}  Sample title
     user checks infographic chart contains alt  ${section}  Sample alt text
