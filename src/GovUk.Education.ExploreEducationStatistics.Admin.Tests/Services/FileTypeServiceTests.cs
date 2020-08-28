@@ -4,9 +4,11 @@ using System.Linq;
 using System.Reflection;
 using System.Text.RegularExpressions;
 using GovUk.Education.ExploreEducationStatistics.Admin.Services;
+using GovUk.Education.ExploreEducationStatistics.Admin.Validators;
 using Microsoft.AspNetCore.Http;
 using Moq;
 using Xunit;
+using static GovUk.Education.ExploreEducationStatistics.Admin.Validators.FileTypeValidationUtils;
 
 namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
 {
@@ -174,7 +176,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
             AllTypes.ForEach(type =>
             {
                 var expectedToSucceed = ImageTypes.Contains(type);
-                AssertHasMatchingMimeType(type, FileUploadsValidatorService.AllowedChartFileTypes.ToList(), expectedToSucceed);
+                AssertHasMatchingMimeType(type, FileTypeValidationUtils.AllowedChartFileTypes.ToList(), expectedToSucceed);
             });
         }
         
@@ -184,7 +186,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
             // check that all types are valid for ancillary file uploads
             AllTypes.ForEach(type =>
             {
-                AssertHasMatchingMimeType(type, FileUploadsValidatorService.AllowedAncillaryFileTypes.ToList(), true);
+                AssertHasMatchingMimeType(type, AllowedAncillaryFileTypes.ToList(), true);
             });
         }
         
@@ -196,7 +198,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
             AllTypes.ForEach(type =>
             {
                 var expectedToSucceed = CsvTypes.Contains(type);
-                AssertHasMatchingMimeType(type, FileUploadsValidatorService.AllowedCsvMimeTypes.ToList(), expectedToSucceed);
+                AssertHasMatchingMimeType(type, AllowedCsvMimeTypes.ToList(), expectedToSucceed);
             });
         }
         

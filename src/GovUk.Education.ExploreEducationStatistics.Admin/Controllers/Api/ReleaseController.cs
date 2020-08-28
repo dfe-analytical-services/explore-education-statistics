@@ -187,7 +187,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Controllers.Api
         [ProducesResponseType(404)]
         [RequestSizeLimit(int.MaxValue)]
         [RequestFormLimits(ValueLengthLimit = int.MaxValue, MultipartBodyLengthLimit = int.MaxValue)]
-        public async Task<ActionResult<bool>> AddDataFilesAsync(Guid releaseId,
+        public async Task<ActionResult<bool>> AddDataZipFileAsync(Guid releaseId,
             [FromQuery(Name = "name"), Required] string name, IFormFile zipFile)
         {
             var user = await _userManager.GetUserAsync(User);

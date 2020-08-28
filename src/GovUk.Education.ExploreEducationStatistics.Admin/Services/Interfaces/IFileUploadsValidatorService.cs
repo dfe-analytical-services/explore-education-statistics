@@ -1,9 +1,9 @@
 using System;
+using System.IO.Compression;
 using System.Threading.Tasks;
 using GovUk.Education.ExploreEducationStatistics.Common.Model;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
-using Microsoft.Azure.Storage.Blob;
 
 namespace GovUk.Education.ExploreEducationStatistics.Admin.Services.Interfaces
 {
@@ -11,7 +11,8 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Services.Interfaces
     {
         Task<Either<ActionResult, bool>> ValidateFileForUpload(Guid releaseId, IFormFile file, ReleaseFileTypes type, bool overwrite);
         Task<Either<ActionResult, bool>> ValidateDataFilesForUpload(Guid releaseId, IFormFile dataFile, IFormFile metaFile, string name);
-        Task<Either<ActionResult, bool>> ValidateZippedDataFileForUpload(Guid releaseId, IFormFile zipFile, string name);
+        Task<Either<ActionResult, bool>> ValidateZippedDataFileForUpload(Guid releaseId, ZipArchiveEntry dataFile,
+            ZipArchiveEntry metaFile, string name);
         Task<Either<ActionResult, bool>> ValidateUploadFileType(IFormFile file, ReleaseFileTypes type);
     }
 }

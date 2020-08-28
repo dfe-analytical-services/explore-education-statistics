@@ -1,9 +1,7 @@
 using System;
-using System.Collections.Generic;
 using System.IO;
 using System.IO.Compression;
 using System.Linq;
-using System.Text.RegularExpressions;
 using System.Threading.Tasks;
 using GovUk.Education.ExploreEducationStatistics.Admin.Services.Interfaces;
 using GovUk.Education.ExploreEducationStatistics.Common.Model;
@@ -14,6 +12,7 @@ using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
 using static GovUk.Education.ExploreEducationStatistics.Admin.Validators.ValidationErrorMessages;
 using static GovUk.Education.ExploreEducationStatistics.Admin.Validators.ValidationUtils;
+using static GovUk.Education.ExploreEducationStatistics.Admin.Validators.FileTypeValidationUtils;
 using static GovUk.Education.ExploreEducationStatistics.Common.Services.FileStoragePathUtils;
 using static System.StringComparison;
 
@@ -24,36 +23,6 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Services
         private readonly ISubjectService _subjectService;
         private readonly IFileTypeService _fileTypeService;
         private readonly ContentDbContext _context;
-
-        public static readonly Regex[] AllowedCsvMimeTypes = {
-            new Regex(@"^(application|text)/csv$"),
-            new Regex(@"text/plain$")
-        };
-        
-        public static readonly Regex[] AllowedZipMimeTypes = {
-            new Regex(@"^(application)/zip$")
-        };
-        
-        public static readonly string[] CsvEncodingTypes = {
-            "us-ascii",
-            "utf-8"
-        };
-        
-        public static readonly Regex[] AllowedChartFileTypes = {
-            new Regex(@"^image/.*") 
-        };
-        
-        public static readonly Regex[] AllowedAncillaryFileTypes = {
-            new Regex(@"^image/.*"),
-            new Regex(@"^(application|text)/csv$"),
-            new Regex(@"^text/plain$"),
-            new Regex(@"^application/pdf$"),
-            new Regex(@"^application/msword$"),
-            new Regex(@"^application/vnd.ms-excel$"),
-            new Regex(@"^application/vnd.openxmlformats(.*)$"),
-            new Regex(@"^application/vnd.oasis.opendocument(.*)$"),
-            new Regex(@"^application/CDFV2$"), 
-        };
 
         public FileUploadsValidatorService(ISubjectService subjectService, IFileTypeService fileTypeService, ContentDbContext context)
         {
@@ -71,32 +40,8 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Services
                 .OnSuccess(async _ => await ValidateDataFileTypes(releaseId, dataFile, metaFile));
         }
 
-        public async Task<Either<ActionResult, bool>> ValidateZippedDataFileForUpload(Guid releaseId, IFormFile zipFile, string name)
+        public async Task<Either<ActionResult, bool>> ValidateZippedDataFileForUpload(Guid releaseId, ZipArchiveEntry dataFile, ZipArchiveEntry metaFile, string name)
         {
-            if (!IsZipFile(zipFile))
-            {
-                return ValidationActionResult(DataFileMustBeZipFile);
-            }
-
-            using var stream = zipFile.OpenReadStream();
-            using var archive = new ZipArchive(stream);
-            
-            if (archive.Entries.Count != 2)
-            {
-                return ValidationActionResult(DataZipFileCanOnlyContainTwoFiles);
-            }
-
-            var file1 = archive.Entries[0];
-            var file2 = archive.Entries[1];
-                
-            if (!file1.FullName.EndsWith(".csv") || !file2.FullName.EndsWith(".csv"))
-            {
-                return ValidationActionResult(DataZipFileDoesNotContainCsvFiles);
-            }
-
-            var dataFile = file1.Name.Contains(".meta.") ? file2 : file1;
-            var metaFile = file1.Name.Contains(".meta.") ? file1 : file2;
-
             return await ValidateDataFileNames(releaseId, dataFile.Name, metaFile.Name)
                 .OnSuccess(async _ => await ValidateDataFileSizes(dataFile.Length, metaFile.Length))
                 .OnSuccess(async _ => await ValidateSubjectName(releaseId, name));
@@ -152,18 +97,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Services
             return _fileTypeService.HasMatchingMimeType(file, AllowedMimeTypesByFileType[ReleaseFileTypes.Data]) 
                    && _fileTypeService.HasMatchingEncodingType(file, CsvEncodingTypes);
         }
-        
-        private bool IsZipFile(IFormFile file)
-        {
-            if (!file.FileName.ToLower().EndsWith(".zip"))
-            {
-                return false;
-            }
-            
-            return _fileTypeService.HasMatchingMimeType(file, AllowedMimeTypesByFileType[ReleaseFileTypes.DataZip]) 
-                   && _fileTypeService.HasMatchingEncodingType(file, CsvEncodingTypes);
-        }
-        
+
         private bool FileContainsSpacesOrSpecialChars(string filename)
         {
             return filename.IndexOf(" ", Ordinal) > -1 || 
@@ -270,13 +204,5 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Services
 
             return true;
         }
-
-        public static readonly Dictionary<ReleaseFileTypes, IEnumerable<Regex>> AllowedMimeTypesByFileType = 
-            new Dictionary<ReleaseFileTypes, IEnumerable<Regex>>
-            {
-                { ReleaseFileTypes.Ancillary, AllowedAncillaryFileTypes },
-                { ReleaseFileTypes.Chart, AllowedChartFileTypes },
-                { ReleaseFileTypes.Data, AllowedCsvMimeTypes }
-            };
     }
 }

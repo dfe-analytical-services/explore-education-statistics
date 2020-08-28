@@ -37,13 +37,14 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Services
         private readonly IImportService _importService;
         private readonly IFileUploadsValidatorService _fileUploadsValidatorService;
         private readonly ISubjectService _subjectService;
+        private readonly IDataZipArchiveService _dataZipArchiveService;
 
         private const string NameKey = "name";
 
         public ReleaseFilesService(IConfiguration config, IUserService userService,
             IPersistenceHelper<ContentDbContext> persistenceHelper, ContentDbContext context,
             IImportService importService, IFileUploadsValidatorService fileUploadsValidatorService,
-            ISubjectService subjectService)
+            ISubjectService subjectService, IDataZipArchiveService dataZipArchiveService)
         {
             _storageConnectionString = config.GetValue<string>("CoreStorage");
             _userService = userService;
@@ -52,6 +53,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Services
             _importService = importService;
             _fileUploadsValidatorService = fileUploadsValidatorService;
             _subjectService = subjectService;
+            _dataZipArchiveService = dataZipArchiveService;
         }
 
         public async Task<Either<ActionResult, IEnumerable<FileInfo>>> ListPublicFilesPreview(Guid releaseId,
@@ -74,10 +76,8 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Services
                 .OnSuccess(async release =>
                 {
                     var blobContainer = await GetCloudBlobContainer();
-                    var dataInfo = new Dictionary<string, string>
-                        {{NameKey, name}, {MetaFileKey, metadataFile.FileName.ToLower()}, {UserName, userName}};
-                    var metaDataInfo = new Dictionary<string, string>
-                        {{DataFileKey, dataFile.FileName.ToLower()}, {UserName, userName}};
+                    var dataInfo = new Dictionary<string, string>{{NameKey, name}, {MetaFileKey, metadataFile.FileName.ToLower()}, {UserName, userName}};
+                    var metaDataInfo = new Dictionary<string, string>{{DataFileKey, dataFile.FileName.ToLower()}, {UserName, userName}};
 
                     return await _fileUploadsValidatorService
                         .ValidateDataFilesForUpload(releaseId, dataFile, metadataFile, name)
@@ -90,8 +90,8 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Services
                             await _context.SaveChangesAsync();
                             await UploadFileToStorageAsync(blobContainer, releaseId, dataFile, ReleaseFileTypes.Data, dataInfo);
                             await UploadFileToStorageAsync(blobContainer, releaseId, metadataFile,ReleaseFileTypes.Metadata, metaDataInfo);
-                            await _importService.Import(dataFile.FileName.ToLower(), metadataFile.FileName.ToLower(),
-                                    releaseId, dataFile);
+                            await _importService.Import(releaseId, dataFile.FileName.ToLower(), 
+                                metadataFile.FileName.ToLower(), dataFile, false);
                             return true;
                         });
                 });
@@ -105,12 +105,28 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Services
                 .OnSuccess(_userService.CheckCanUpdateRelease)
                 .OnSuccess(async release =>
                 {
-                    return await _fileUploadsValidatorService
-                        .ValidateZippedDataFileForUpload(releaseId, zipFile, name)
-                        .OnSuccess(async () =>
+                    var blobContainer = await GetCloudBlobContainer();
+
+                    return await _dataZipArchiveService.GetArchiveEntries(blobContainer, releaseId, zipFile)
+                        .OnSuccess(async dataFiles =>
                         {
-                            return true;
+                            var dataFile = dataFiles.Item1;
+                            var metadataFile = dataFiles.Item2;
+                            var dataInfo = new Dictionary<string, string>{{NameKey, name}, {MetaFileKey, metadataFile.Name.ToLower()}, {UserName, userName}};
+
+                            return await _fileUploadsValidatorService.ValidateZippedDataFileForUpload(releaseId, dataFile, metadataFile, name)
+                                .OnSuccess(async () => await _importService.CreateImportTableRow(releaseId, dataFile.Name.ToLower()))
+                                .OnSuccess(async () =>
+                                {
+                                    await CreateOrUpdateFileReference(dataFile.Name.ToLower(), releaseId, ReleaseFileTypes.Data);
+                                    await CreateOrUpdateFileReference(metadataFile.Name.ToLower(), releaseId,ReleaseFileTypes.Metadata);
+                                    await _context.SaveChangesAsync();
+                                    await UploadFileToStorageAsync(blobContainer, releaseId, zipFile, ReleaseFileTypes.DataZip, dataInfo);
+                                    await _importService.Import(releaseId, dataFile.Name.ToLower(), 
+                                        metadataFile.Name.ToLower(), zipFile, true);                                    return true;
+                                });
                         });
+
                 });
         }
 

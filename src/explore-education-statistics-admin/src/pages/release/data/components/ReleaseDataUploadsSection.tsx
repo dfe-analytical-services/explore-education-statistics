@@ -68,6 +68,8 @@ const errorMappings = [
   //         'Data zip file can only contain two files',
   //     DATA_ZIP_FILE_DOES_NOT_CONTAIN_CSV_FILES:
   //         'Data zip file does not contain csv files',
+  //     DATA_ZIP_FILE_ALREADY_EXISTS:
+  //         'Data zip file already exists',
   //     CANNOT_OVERWRITE_DATA_FILE: 'Choose a unique data file name',
   //     DATA_AND_METADATA_FILES_CANNOT_HAVE_THE_SAME_NAME:
   //         'Choose a different file name for data and metadata files',

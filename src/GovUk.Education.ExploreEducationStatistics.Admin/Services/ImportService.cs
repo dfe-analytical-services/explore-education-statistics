@@ -47,7 +47,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Services
             _guidGenerator = guidGenerator;
         }
 
-        public async Task Import(string dataFileName, string metaFileName, Guid releaseId, IFormFile dataFile)
+        public async Task Import(Guid releaseId, string dataFileName, string metaFileName, IFormFile dataFile, bool isZip)
         {
             var storageAccount = CloudStorageAccount.Parse(_storageConnectionString);
             var client = storageAccount.CreateCloudQueueClient();
@@ -56,8 +56,9 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Services
 
             pQueue.CreateIfNotExists();
             aQueue.CreateIfNotExists();
-            var numRows = FileStorageUtils.CalculateNumberOfRows(dataFile.OpenReadStream());
-            var message = BuildMessage(dataFileName, metaFileName, releaseId);
+            // TODO - EES-1250
+            var numRows = isZip ? 0 : FileStorageUtils.CalculateNumberOfRows(dataFile.OpenReadStream());
+            var message = BuildMessage(dataFileName, metaFileName, releaseId, isZip ? dataFile.FileName : "");
             
             await UpdateImportTableRow(
                 releaseId,
@@ -69,7 +70,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Services
 
             _logger.LogInformation($"Sent import message for data file: {dataFileName}, releaseId: {releaseId}");
         }
-        
+
         public async Task<Either<ActionResult, bool>> CreateImportTableRow(Guid releaseId, string dataFileName)
         {
             var result = await _tableStorageService.RetrieveEntity(DatafileImportsTableName,
@@ -105,7 +106,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Services
                     JsonConvert.SerializeObject(message), IStatus.QUEUED));
         }
 
-        private ImportMessage BuildMessage(string dataFileName, string metaFileName, Guid releaseId)
+        private ImportMessage BuildMessage(string dataFileName, string metaFileName, Guid releaseId, string zipFileName)
         {
             var release = _context.Releases
                 .Where(r => r.Id.Equals(releaseId))
@@ -124,7 +125,8 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Services
                 MetaFileName = metaFileName,
                 Release = importMessageRelease,
                 NumBatches = 1,
-                BatchNo = 1
+                BatchNo = 1,
+                ZipFileName = zipFileName
             };
         }
     }

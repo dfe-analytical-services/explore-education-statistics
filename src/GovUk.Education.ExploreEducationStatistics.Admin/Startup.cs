@@ -303,9 +303,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin
             StartupSecurityConfiguration.ConfigureResourceBasedAuthorization(services);
 
             services.AddTransient<IFileTypeService, FileTypeService>();
-
-            // Temp service for EES-960
-            services.AddTransient<IUpdateChartFilesService, UpdateChartFilesService>();
+            services.AddTransient<IDataZipArchiveService, DataZipArchiveService>();
 
             services.AddSwaggerGen(c =>
             {
