@@ -118,15 +118,15 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Services
                                 .OnSuccess(async () => await _importService.CreateImportTableRow(releaseId, dataFile.Name.ToLower()))
                                 .OnSuccess(async () =>
                                 {
-                                    await CreateOrUpdateFileReference(dataFile.Name.ToLower(), releaseId, ReleaseFileTypes.Data);
-                                    await CreateOrUpdateFileReference(metadataFile.Name.ToLower(), releaseId,ReleaseFileTypes.Metadata);
+                                    var source = await CreateOrUpdateFileReference(zipFile.FileName.ToLower(), releaseId, ReleaseFileTypes.DataZip);
+                                    await CreateOrUpdateFileReference(dataFile.Name.ToLower(), releaseId, ReleaseFileTypes.Data, null, source);
+                                    await CreateOrUpdateFileReference(metadataFile.Name.ToLower(), releaseId,ReleaseFileTypes.Metadata, null ,source);
                                     await _context.SaveChangesAsync();
                                     await UploadFileToStorageAsync(blobContainer, releaseId, zipFile, ReleaseFileTypes.DataZip, dataInfo);
                                     await _importService.Import(releaseId, dataFile.Name.ToLower(), 
                                         metadataFile.Name.ToLower(), zipFile, true);                                    return true;
                                 });
                         });
-
                 });
         }
 
@@ -469,9 +469,10 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Services
             };
         }
 
-        private async Task<ReleaseFileReference> CreateOrUpdateFileReference(string filename, Guid releaseId, ReleaseFileTypes type, Guid? id = null)
+        private async Task<ReleaseFileReference> CreateOrUpdateFileReference(string filename, Guid releaseId,
+            ReleaseFileTypes type, Guid? id = null, ReleaseFileReference? source = null)
         {
-            // If updating existing then check if existing reference if for this release - if not then create new ref
+            // If updating existing then check if existing reference is for this release - if not then create new ref
             if (id != null)
             {
                 var releaseFileReference = await _context.ReleaseFileReferences.Where(rfr => rfr.Id == id).FirstAsync();
@@ -488,7 +489,8 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Services
                 {
                     ReleaseId = releaseId,
                     Filename = filename,
-                    ReleaseFileType = type
+                    ReleaseFileType = type,
+                    Source = source
                 }
             };
 
