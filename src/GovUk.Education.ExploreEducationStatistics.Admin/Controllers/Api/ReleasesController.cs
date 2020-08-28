@@ -17,7 +17,6 @@ using Microsoft.AspNetCore.Mvc;
 
 namespace GovUk.Education.ExploreEducationStatistics.Admin.Controllers.Api
 {
-    // TODO rename to Releases once the current Crud releases controller is removed
     [Route("api")]
     [ApiController]
     [Authorize]
@@ -26,6 +25,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Controllers.Api
         private readonly IReleaseService _releaseService;
         private readonly IReleaseFilesService _releaseFilesService;
         private readonly IReleaseStatusService _releaseStatusService;
+        private readonly IReplacementService _replacementService;
         private readonly UserManager<ApplicationUser> _userManager;
         private readonly IDataBlockService _dataBlockService;
 
@@ -33,6 +33,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Controllers.Api
             IReleaseService releaseService,
             IReleaseFilesService releaseFilesService,
             IReleaseStatusService releaseStatusService,
+            IReplacementService replacementService,
             UserManager<ApplicationUser> userManager,
             IDataBlockService dataBlockService
             )
@@ -40,6 +41,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Controllers.Api
             _releaseService = releaseService;
             _releaseFilesService = releaseFilesService;
             _releaseStatusService = releaseStatusService;
+            _replacementService = replacementService;
             _userManager = userManager;
             _dataBlockService = dataBlockService;
         }
@@ -254,6 +256,20 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Controllers.Api
         {
             return await _releaseService
                 .GetDeleteDataFilePlan(releaseId, fileName, subjectTitle)
+                .HandleFailuresOrOk();
+        }
+
+        [HttpGet("release/data/replacement-plan")]
+        [AllowAnonymous]
+        public async Task<ActionResult<ReplacementPlan>> GetReplacementPlan()
+        {
+            //var releaseId = new Guid("6a0e101a-b69f-4daf-a5dc-08d849c07f00");
+
+            var original = new Guid("624CE37E-1760-4EF8-A5DD-08D849C07F00");
+            var replacement = new Guid("711FFF20-BF5D-45F2-A5DE-08D849C07F00");
+
+            return await _replacementService
+                .GetReplacementPlan(original, replacement)
                 .HandleFailuresOrOk();
         }
 

@@ -118,6 +118,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Validators
         CannotRemoveDataFilesUntilImportComplete,
         CannotRemoveDataFilesOnceReleaseApproved,
         AllDatafilesUploadedMustBeComplete,
+        ReplacementDataFileMustBeForSameRelease,
 
         // Meta file
         CannotOverwriteMetadataFile,
