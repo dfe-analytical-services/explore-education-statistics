@@ -19,6 +19,8 @@ using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
 using static GovUk.Education.ExploreEducationStatistics.Admin.Validators.ValidationErrorMessages;
 using static GovUk.Education.ExploreEducationStatistics.Admin.Validators.ValidationUtils;
+using static GovUk.Education.ExploreEducationStatistics.Common.Services.EnumUtil;
+using static GovUk.Education.ExploreEducationStatistics.Data.Model.Services.LocationService;
 using IFootnoteService = GovUk.Education.ExploreEducationStatistics.Data.Model.Services.Interfaces.IFootnoteService;
 
 namespace GovUk.Education.ExploreEducationStatistics.Admin.Services
@@ -231,15 +233,14 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Services
             DataBlock dataBlock,
             ReplacementSubjectMeta replacementSubjectMeta)
         {
-            return new Dictionary<string, ObservationalUnitReplacementViewModel>
-            {
-                {
-                    "Country",
-                    ValidateObservationalUnitsForReplacement(dataBlock.Query.Locations,
-                        GeographicLevel.Country,
-                        replacementSubjectMeta)
-                }
-            };
+            return GetEnumValues<GeographicLevel>()
+                .Where(geographicLevel => !IgnoredLevels.Contains(geographicLevel))
+                .ToDictionary(geographicLevel => geographicLevel.ToString(),
+                    geographicLevel =>
+                        ValidateObservationalUnitsForReplacement(dataBlock.Query.Locations,
+                            geographicLevel,
+                            replacementSubjectMeta)
+                );
         }
 
         private static TimePeriodReplacementViewModel ValidateTimePeriodsForDataBlock(DataBlock dataBlock,
@@ -311,12 +312,14 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Services
                 throw new ArgumentException(
                     $"{nameof(LocationQuery)} does not have a property {geographicLevel.ToString()} with get method");
             }
-            
-            var originalCodes = queryProperty.GetMethod.Invoke(locationQuery, new object[] { }) as IEnumerable<string>;
 
-            var replacementCodes = replacementSubjectMeta.ObservationalUnits[geographicLevel]
-                .Select(unit => unit.Code)
-                .ToList();
+            var originalCodes =
+                queryProperty.GetMethod.Invoke(locationQuery, new object[] { }) as IEnumerable<string> ??
+                new List<string>();
+
+            var replacementCodes = replacementSubjectMeta.ObservationalUnits.GetValueOrDefault(geographicLevel)
+                ?.Select(unit => unit.Code)
+                .ToList() ?? new List<string>();
 
             return new ObservationalUnitReplacementViewModel
             {
