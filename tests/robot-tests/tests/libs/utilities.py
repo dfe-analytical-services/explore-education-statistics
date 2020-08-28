@@ -178,48 +178,6 @@ def user_checks_accordion_is_in_position(header_starts_with, position):
             f'Accordion in position {position} expected start with text "{header_starts_with}". Actual found text: "{elem.text}"')
 
 
-def user_opens_accordion_section(section_text):
-    sl.wait_until_page_contains_element(
-        f'xpath://*[@class="govuk-accordion__section-button" and text()="{section_text}"]')
-    elem = user_gets_accordion_button_element(section_text)
-    if elem.get_attribute('aria-expanded') == "true":
-        raise_assertion_error(f'Accordion section "{section_text}" already open!')
-    sl.set_focus_to_element(elem)
-    sl.wait_until_element_is_enabled(elem)
-    sl.click_element(elem)
-    if elem.get_attribute('aria-expanded') == "false":
-        raise_assertion_error(f'Accordion section "{section_text}" should be open!')
-
-
-def user_closes_accordion_section(section_text):
-    elem = user_gets_accordion_button_element(section_text)
-    if elem.get_attribute('aria-expanded') == "false":
-        raise_assertion_error(f'Accordion section "{section_text}" already closed!')
-    sl.click_element(elem)
-    if elem.get_attribute('aria-expanded') == "true":
-        raise_assertion_error(f'Accordion section "{section_text}" should be open!')
-
-
-def user_gets_accordion_button_element(accordion_text):
-    sl.wait_until_page_contains_element(
-        f'xpath://button[@class="govuk-accordion__section-button" and text()="{accordion_text}"]')
-    return sl.get_webelement(
-        f'xpath://button[@class="govuk-accordion__section-button" and text()="{accordion_text}"]')
-
-
-def user_gets_accordion_section_element(accordion_text):
-    accordion_button = user_gets_accordion_button_element(accordion_text)
-    heading_id = accordion_button.get_attribute("id")
-    accordion_id = heading_id[:-len('-heading')]
-    return sl.get_webelement(f'css:#{accordion_id}')
-
-
-def user_gets_accordion_content_element(accordion_text):
-    accordion_button = user_gets_accordion_button_element(accordion_text)
-    heading_id = accordion_button.get_attribute("id")
-    return sl.get_webelement(f'xpath://*[@aria-labelledby="{heading_id}"]')
-
-
 def user_gets_child_details_element(parent, details_text):
     user_waits_until_parent_contains_element(parent,
                                              f'xpath:.//details/summary/*[text()="{details_text}"]/../..')

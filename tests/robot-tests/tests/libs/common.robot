@@ -173,6 +173,32 @@ user waits until accordion section contains text
     ${section}=  user gets accordion content element  ${section_text}
     user waits until parent contains element   ${section}   xpath://*[text()="${text}"]
 
+user gets accordion header button element
+    [Arguments]  ${heading_text}  ${parent}=css:[data-testid="accordion"]
+    ${button}=  user gets button element  ${heading_text}  ${parent}
+    [Return]  ${button}
+
+user opens accordion section
+    [Arguments]  ${heading_text}  ${parent}=css:[data-testid="accordion"]
+    ${header_button}=  user gets accordion header button element  ${heading_text}  ${parent}
+    ${is_expanded}=  get element attribute  ${header_button}  aria-expanded
+    run keyword if  '${is_expanded}' != 'true'  user clicks element  ${header_button}
+    user checks element attribute value should be  ${header_button}  aria-expanded  true
+
+user closes accordion section
+    [Arguments]  ${heading_text}  ${parent}=css:[data-testid="accordion"]
+    ${header_button}=  user gets accordion header button element  ${heading_text}  ${parent}
+    ${is_expanded}=  get element attribute  ${header_button}  aria-expanded
+    run keyword if  '${is_expanded}' != 'false'  user clicks element  ${header_button}
+    user checks element attribute value should be  ${header_button}  aria-expanded  false
+
+user gets accordion content element
+    [Arguments]  ${heading_text}  ${parent}=css:[data-testid="accordion"]
+    ${header_button}=  user gets accordion header button element  ${heading_text}  ${parent}
+    ${content_id}=  get element attribute  ${header_button}  id
+    ${content}=  get child element  ${parent}  css:[aria-labelledby="${content_id}"]
+    [Return]  ${content}
+
 user waits until page contains testid
     [Arguments]  ${id}   ${wait}=${timeout}
     user waits until page contains element   css:[data-testid="${id}"]   ${wait}
@@ -257,8 +283,7 @@ user clicks link
 
 user clicks button
     [Arguments]   ${text}  ${parent}=css:body
-    user waits until parent contains element  ${parent}  xpath:.//button[text()="${text}"]
-    ${button}=  get child element  ${parent}  xpath:.//button[text()="${text}"]
+    ${button}=  user gets button element  ${text}  ${parent}
     user clicks element  ${button}
 
 user waits until page contains button
@@ -272,6 +297,12 @@ user checks page does not contain button
 user waits until button is enabled
     [Arguments]   ${text}
     user waits until element is enabled  xpath://button[text()="${text}"]
+
+user gets button element
+    [Arguments]   ${text}  ${parent}=css:body
+     user waits until parent contains element  ${parent}  xpath:.//button[text()="${text}"]
+     ${button}=  get child element  ${parent}  xpath:.//button[text()="${text}"]
+     [Return]  ${button}
 
 user checks page contains tag
     [Arguments]   ${text}
