@@ -181,7 +181,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Controllers.Api
                 .HandleFailuresOrOk();
         }
 
-        [HttpPost("release/{releaseId}/zdata")]
+        [HttpPost("release/{releaseId}/zip-data")]
         [Produces("application/json")]
         [ProducesResponseType(200)]
         [ProducesResponseType(404)]

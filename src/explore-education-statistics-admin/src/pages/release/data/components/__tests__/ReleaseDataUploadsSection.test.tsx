@@ -3,6 +3,7 @@ import _releaseDataFileService, {
   DataFile,
   DataFileImportStatus,
   UploadDataFilesRequest,
+  UploadZipDataFileRequest,
 } from '@admin/services/releaseDataFileService';
 import {
   fireEvent,
@@ -325,6 +326,19 @@ describe('ReleaseDataUploadsSection', () => {
   });
 
   describe('uploading data file', () => {
+    const testUploadedDataFile: DataFile = {
+      title: 'Test title',
+      userName: 'user1@test.com',
+      filename: 'test-data.csv',
+      metadataFilename: 'test-data.meta.csv',
+      rows: 300,
+      fileSize: {
+        size: 150,
+        unit: 'Kb',
+      },
+      created: new Date('2020-08-18T12:00:00'),
+    };
+
     beforeEach(() => {
       releaseDataFileService.getReleaseDataFiles.mockResolvedValue(
         testDataFiles,
@@ -393,6 +407,48 @@ describe('ReleaseDataUploadsSection', () => {
       });
     });
 
+    test('shows validation message when data file is not a CSV', async () => {
+      render(
+        <ReleaseDataUploadsSection releaseId="release-1" canUpdateRelease />,
+      );
+
+      const file = new File(['test'], 'test.txt', {
+        type: 'text/plain',
+      });
+
+      userEvent.upload(screen.getByLabelText('Upload data file'), file);
+      userEvent.tab();
+
+      await waitFor(() => {
+        expect(
+          screen.getByText('Data file must be a CSV with UTF-8 encoding', {
+            selector: '#dataFileUploadForm-dataFile-error',
+          }),
+        ).toBeInTheDocument();
+      });
+    });
+
+    test('shows validation message when data file is not empty', async () => {
+      render(
+        <ReleaseDataUploadsSection releaseId="release-1" canUpdateRelease />,
+      );
+
+      const file = new File([], 'test.csv', {
+        type: 'text/csv',
+      });
+
+      userEvent.upload(screen.getByLabelText('Upload data file'), file);
+      userEvent.tab();
+
+      await waitFor(() => {
+        expect(
+          screen.getByText('Choose a data file that is not empty', {
+            selector: '#dataFileUploadForm-dataFile-error',
+          }),
+        ).toBeInTheDocument();
+      });
+    });
+
     test('shows validation message when no meta data file selected', async () => {
       render(
         <ReleaseDataUploadsSection releaseId="release-1" canUpdateRelease />,
@@ -413,7 +469,114 @@ describe('ReleaseDataUploadsSection', () => {
       });
     });
 
-    test('cannot submit with invalid values', async () => {
+    test('shows validation message when metadata file is not a CSV', async () => {
+      render(
+        <ReleaseDataUploadsSection releaseId="release-1" canUpdateRelease />,
+      );
+
+      const file = new File(['test'], 'test.txt', {
+        type: 'text/plain',
+      });
+
+      userEvent.upload(screen.getByLabelText('Upload metadata file'), file);
+      userEvent.tab();
+
+      await waitFor(() => {
+        expect(
+          screen.getByText('Metadata file must be a CSV with UTF-8 encoding', {
+            selector: '#dataFileUploadForm-metadataFile-error',
+          }),
+        ).toBeInTheDocument();
+      });
+    });
+
+    test('shows validation message when metadata file is not empty', async () => {
+      render(
+        <ReleaseDataUploadsSection releaseId="release-1" canUpdateRelease />,
+      );
+
+      const file = new File([], 'test.csv', {
+        type: 'text/csv',
+      });
+
+      userEvent.upload(screen.getByLabelText('Upload metadata file'), file);
+      userEvent.tab();
+
+      await waitFor(() => {
+        expect(
+          screen.getByText('Choose a metadata file that is not empty', {
+            selector: '#dataFileUploadForm-metadataFile-error',
+          }),
+        ).toBeInTheDocument();
+      });
+    });
+
+    test('shows validation message when no ZIP file selected', async () => {
+      render(
+        <ReleaseDataUploadsSection releaseId="release-1" canUpdateRelease />,
+      );
+
+      userEvent.click(screen.getByLabelText('ZIP file'));
+      userEvent.click(screen.getByLabelText('Upload ZIP file'));
+      fireEvent.change(screen.getByLabelText('Upload ZIP file'), {
+        target: { value: null },
+      });
+      userEvent.tab();
+
+      await waitFor(() => {
+        expect(
+          screen.getByText('Choose a zip file', {
+            selector: '#dataFileUploadForm-zipFile-error',
+          }),
+        ).toBeInTheDocument();
+      });
+    });
+
+    test('shows validation message when ZIP file is not valid', async () => {
+      render(
+        <ReleaseDataUploadsSection releaseId="release-1" canUpdateRelease />,
+      );
+
+      const file = new File(['test'], 'test.txt', {
+        type: 'text/plain',
+      });
+
+      userEvent.click(screen.getByLabelText('ZIP file'));
+      userEvent.upload(screen.getByLabelText('Upload ZIP file'), file);
+      userEvent.tab();
+
+      await waitFor(() => {
+        expect(
+          screen.getByText('Choose a valid ZIP file', {
+            selector: '#dataFileUploadForm-zipFile-error',
+          }),
+        ).toBeInTheDocument();
+      });
+    });
+
+    test('shows validation message when ZIP file is empty', async () => {
+      render(
+        <ReleaseDataUploadsSection releaseId="release-1" canUpdateRelease />,
+      );
+
+      const file = new File([], 'test.zip', {
+        type: 'application/zip',
+      });
+
+      userEvent.click(screen.getByLabelText('ZIP file'));
+      userEvent.upload(screen.getByLabelText('Upload ZIP file'), file);
+      userEvent.tab();
+
+      await waitFor(() => {
+        expect(
+          screen.getByText('Choose a ZIP file that is not empty', {
+            selector: '#dataFileUploadForm-zipFile-error',
+          }),
+        ).toBeInTheDocument();
+      });
+    });
+
+    test('cannot submit with invalid values when trying to upload CSV files', async () => {
       render(
         <ReleaseDataUploadsSection releaseId="release-1" canUpdateRelease />,
       );
@@ -443,16 +606,69 @@ describe('ReleaseDataUploadsSection', () => {
             selector: '#dataFileUploadForm-metadataFile-error',
           }),
         ).toBeInTheDocument();
+        expect(
+          screen.queryByText('Choose a zip file', {
+            selector: '#dataFileUploadForm-metadataFile-error',
+          }),
+        ).not.toBeInTheDocument();
       });
     });
 
-    test('can submit with valid values', async () => {
+    test('cannot submit with invalid values when trying to upload ZIP file', async () => {
       render(
         <ReleaseDataUploadsSection releaseId="release-1" canUpdateRelease />,
       );
 
-      const dataFile = new File([''], 'test-data.csv');
-      const metadataFile = new File([''], 'test-data.meta.csv');
+      userEvent.click(screen.getByLabelText('ZIP file'));
+      userEvent.click(
+        screen.getByRole('button', {
+          name: 'Upload data files',
+        }),
+      );
+
+      await waitFor(() => {
+        expect(releaseDataFileService.uploadDataFiles).not.toHaveBeenCalled();
+
+        expect(
+          screen.getByText('Enter a subject title', {
+            selector: '#dataFileUploadForm-subjectTitle-error',
+          }),
+        ).toBeInTheDocument();
+
+        expect(
+          screen.queryByText('Choose a data file', {
+            selector: '#dataFileUploadForm-dataFile-error',
+          }),
+        ).not.toBeInTheDocument();
+        expect(
+          screen.queryByText('Choose a metadata file', {
+            selector: '#dataFileUploadForm-metadataFile-error',
+          }),
+        ).not.toBeInTheDocument();
+
+        expect(
+          screen.getByText('Choose a zip file', {
+            selector: '#dataFileUploadForm-zipFile-error',
+          }),
+        ).toBeInTheDocument();
+      });
+    });
+
+    test('successful submit with CSV files renders with uploaded data file appended to list', async () => {
+      releaseDataFileService.uploadDataFiles.mockResolvedValue(
+        testUploadedDataFile,
+      );
+
+      render(
+        <ReleaseDataUploadsSection releaseId="release-1" canUpdateRelease />,
+      );
+
+      const dataFile = new File(['test'], 'test-data.csv', {
+        type: 'text/csv',
+      });
+      const metadataFile = new File(['test'], 'test-data.meta.csv', {
+        type: 'text/csv',
+      });
 
       await userEvent.type(
         screen.getByLabelText('Subject title'),
@@ -474,45 +690,83 @@ describe('ReleaseDataUploadsSection', () => {
         expect(releaseDataFileService.uploadDataFiles).toHaveBeenCalledWith(
           'release-1',
           {
-            subjectTitle: 'Test title',
+            name: 'Test title',
             dataFile,
             metadataFile,
           } as UploadDataFilesRequest,
         );
+
+        const sections = screen.getAllByTestId('accordionSection');
+
+        expect(sections).toHaveLength(3);
+
+        const section1 = within(sections[0]);
+
+        expect(
+          section1.getByRole('button', { name: 'Test data 1' }),
+        ).toBeInTheDocument();
+
+        const section2 = within(sections[1]);
+
+        expect(
+          section2.getByRole('button', { name: 'Test data 2' }),
+        ).toBeInTheDocument();
+
+        expect(section2.getByTestId('Subject title')).toHaveTextContent(
+          'Test data 2',
+        );
+
+        const section3 = within(sections[2]);
+
+        expect(
+          section3.getByRole('button', { name: 'Test title' }),
+        ).toBeInTheDocument();
+
+        expect(section3.getByTestId('Subject title')).toHaveTextContent(
+          'Test title',
+        );
+
+        expect(section3.getByTestId('Data file')).toHaveTextContent(
+          'test-data.csv',
+        );
+        expect(section3.getByTestId('Metadata file')).toHaveTextContent(
+          'test-data.meta.csv',
+        );
+        expect(section3.getByTestId('Data file size')).toHaveTextContent(
+          '150 Kb',
+        );
+        expect(section3.getByTestId('Number of rows')).toHaveTextContent('300');
+        expect(section3.getByTestId('Status')).toHaveTextContent('Queued');
+        expect(section3.getByTestId('Uploaded by')).toHaveTextContent(
+          'user1@test.com',
+        );
+        expect(section3.getByTestId('Date uploaded')).toHaveTextContent(
+          '18 August 2020 12:00',
+        );
       });
     });
 
-    test('renders with uploaded data file appended to list of data files', async () => {
-      releaseDataFileService.uploadDataFiles.mockResolvedValue({
-        title: 'Test title',
-        userName: 'user1@test.com',
-        filename: 'test-data.csv',
-        metadataFilename: 'test-data.meta.csv',
-        rows: 300,
-        fileSize: {
-          size: 150,
-          unit: 'Kb',
-        },
-        created: new Date('2020-08-18T12:00:00'),
-      });
+    test('successful submit with ZIP file renders with uploaded data file appended to list', async () => {
+      releaseDataFileService.uploadZipDataFile.mockResolvedValue(
+        testUploadedDataFile,
+      );
 
       render(
         <ReleaseDataUploadsSection releaseId="release-1" canUpdateRelease />,
       );
 
-      const dataFile = new File([''], 'test-data.csv');
-      const metadataFile = new File([''], 'test-data.meta.csv');
+      const zipFile = new File(['test'], 'test-data.zip', {
+        type: 'application/zip',
+      });
 
       await userEvent.type(
         screen.getByLabelText('Subject title'),
         'Test title',
       );
 
-      userEvent.upload(screen.getByLabelText('Upload data file'), dataFile);
-      userEvent.upload(
-        screen.getByLabelText('Upload metadata file'),
-        metadataFile,
-      );
+      userEvent.click(screen.getByLabelText('ZIP file'));
+
+      userEvent.upload(screen.getByLabelText('Upload ZIP file'), zipFile);
       userEvent.click(
         screen.getByRole('button', {
           name: 'Upload data files',
@@ -520,13 +774,12 @@ describe('ReleaseDataUploadsSection', () => {
       );
 
       await waitFor(() => {
-        expect(releaseDataFileService.uploadDataFiles).toHaveBeenCalledWith(
+        expect(releaseDataFileService.uploadZipDataFile).toHaveBeenCalledWith(
           'release-1',
           {
-            subjectTitle: 'Test title',
-            dataFile,
-            metadataFile,
-          } as UploadDataFilesRequest,
+            name: 'Test title',
+            zipFile,
+          } as UploadZipDataFileRequest,
         );
 
         const sections = screen.getAllByTestId('accordionSection');

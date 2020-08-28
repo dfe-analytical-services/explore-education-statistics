@@ -34,6 +34,10 @@ class FileSchema extends MixedSchema {
     return clone;
   }
 
+  public required(message: string): FileSchema {
+    return super.required(message) as this;
+  }
+
   public mimeType(allowedTypes: string[], message: string): FileSchema {
     return this.test({
       name: 'mimeType',

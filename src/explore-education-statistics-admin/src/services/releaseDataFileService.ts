@@ -33,9 +33,14 @@ export interface DataFile {
 }
 
 export interface UploadDataFilesRequest {
-  subjectTitle: string;
+  name: string;
   dataFile: File;
   metadataFile: File;
+}
+
+export interface UploadZipDataFileRequest {
+  name: string;
+  zipFile: File;
 }
 
 export type ImportStatusCode =
@@ -95,7 +100,21 @@ const releaseDataFileService = {
     data.append('metaFile', request.metadataFile);
 
     const file = await client.post<DataFileInfo>(
-      `/release/${releaseId}/data?name=${request.subjectTitle}`,
+      `/release/${releaseId}/data?name=${request.name}`,
+      data,
+    );
+
+    return mapFile(file);
+  },
+  async uploadZipDataFile(
+    releaseId: string,
+    request: UploadZipDataFileRequest,
+  ): Promise<DataFile> {
+    const data = new FormData();
+    data.append('zipFile', request.zipFile);
+
+    const file = await client.post<DataFileInfo>(
+      `/release/${releaseId}/zip-data?name=${request.name}`,
       data,
     );
 
@@ -123,6 +142,7 @@ const releaseDataFileService = {
         };
       });
   },
+
   getDeleteDataFilePlan(
     releaseId: string,
     dataFile: DataFile,

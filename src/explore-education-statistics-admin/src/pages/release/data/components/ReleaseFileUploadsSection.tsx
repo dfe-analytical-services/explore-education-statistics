@@ -17,7 +17,6 @@ import SummaryListItem from '@common/components/SummaryListItem';
 import WarningMessage from '@common/components/WarningMessage';
 import useAsyncHandledRetry from '@common/hooks/useAsyncHandledRetry';
 import logger from '@common/services/logger';
-import delay from '@common/utils/delay';
 import { mapFieldErrors } from '@common/validation/serverValidations';
 import Yup from '@common/validation/yup';
 import { Formik } from 'formik';

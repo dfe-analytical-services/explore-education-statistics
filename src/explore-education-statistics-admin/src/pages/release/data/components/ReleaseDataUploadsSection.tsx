@@ -11,7 +11,7 @@ import AccordionSection from '@common/components/AccordionSection';
 import Button from '@common/components/Button';
 import ButtonGroup from '@common/components/ButtonGroup';
 import ButtonText from '@common/components/ButtonText';
-import { Form } from '@common/components/form';
+import { Form, FormFieldRadioGroup } from '@common/components/form';
 import FormFieldFileInput from '@common/components/form/FormFieldFileInput';
 import FormFieldTextInput from '@common/components/form/FormFieldTextInput';
 import LoadingSpinner from '@common/components/LoadingSpinner';
@@ -21,7 +21,6 @@ import SummaryListItem from '@common/components/SummaryListItem';
 import WarningMessage from '@common/components/WarningMessage';
 import useAsyncHandledRetry from '@common/hooks/useAsyncHandledRetry';
 import logger from '@common/services/logger';
-import delay from '@common/utils/delay';
 import { mapFieldErrors } from '@common/validation/serverValidations';
 import Yup from '@common/validation/yup';
 import { format } from 'date-fns';
@@ -30,8 +29,10 @@ import React, { useState } from 'react';
 
 interface FormValues {
   subjectTitle: string;
+  uploadType: 'csv' | 'zip';
   dataFile: File | null;
   metadataFile: File | null;
+  zipFile: File | null;
 }
 
 const errorMappings = [
@@ -42,8 +43,7 @@ const errorMappings = [
       DATA_AND_METADATA_FILES_CANNOT_HAVE_THE_SAME_NAME:
         'Choose a different file name for data and metadata files',
       DATA_FILE_CANNOT_BE_EMPTY: 'Choose a data file that is not empty',
-      DATA_FILE_MUST_BE_CSV_FILE:
-        'Data file must be a csv file with UTF-8 encoding',
+      DATA_FILE_MUST_BE_CSV_FILE: 'Data file must be a CSV with UTF-8 encoding',
       DATA_FILENAME_CANNOT_CONTAIN_SPACES_OR_SPECIAL_CHARACTERS:
         'Data filename cannot contain spaces or special characters',
       DATA_FILE_ALREADY_UPLOADED: 'Data file has already been uploaded',
@@ -55,37 +55,36 @@ const errorMappings = [
       CANNOT_OVERWRITE_METADATA_FILE: 'Choose a unique metadata file name',
       METADATA_FILE_CANNOT_BE_EMPTY: 'Choose a metadata file that is not empty',
       META_FILE_MUST_BE_CSV_FILE:
-        'Meta file must be a csv file with UTF-8 encoding',
+        'Metadata file must be a CSV with UTF-8 encoding',
       META_FILENAME_CANNOT_CONTAIN_SPACES_OR_SPECIAL_CHARACTERS:
-        'Meta filename cannot contain spaces or special characters',
-      META_FILE_IS_INCORRECTLY_NAMED: 'Meta filename is incorrectly named',
+        'Metadata filename cannot contain spaces or special characters',
+      META_FILE_IS_INCORRECTLY_NAMED: 'Metadata filename is incorrectly named',
     },
   }),
-  // mapFieldErrors<FormValues>({
-  //   target: 'zipFile',
-  //   messages: {
-  //     DATA_FILE_MUST_BE_ZIP_FILE:
-  //         'Data file must be a zip file',
-  //     DATA_ZIP_FILE_CAN_ONLY_CONTAIN_TWO_FILES:
-  //         'Data zip file can only contain two files',
-  //     DATA_ZIP_FILE_DOES_NOT_CONTAIN_CSV_FILES:
-  //         'Data zip file does not contain csv files',
-  //     DATA_ZIP_FILE_ALREADY_EXISTS:
-  //         'Data zip file already exists',
-  //     CANNOT_OVERWRITE_DATA_FILE: 'Choose a unique data file name',
-  //     DATA_AND_METADATA_FILES_CANNOT_HAVE_THE_SAME_NAME:
-  //         'Choose a different file name for data and metadata files',
-  //     DATA_FILE_CANNOT_BE_EMPTY: 'Choose a data file that is not empty',
-  //     DATA_FILENAME_CANNOT_CONTAIN_SPACES_OR_SPECIAL_CHARACTERS:
-  //         'Data filename cannot contain spaces or special characters',
-  //     CANNOT_OVERWRITE_METADATA_FILE: 'Choose a unique metadata file name',
-  //     METADATA_FILE_CANNOT_BE_EMPTY: 'Choose a metadata file that is not empty',
-  //     META_FILENAME_CANNOT_CONTAIN_SPACES_OR_SPECIAL_CHARACTERS:
-  //         'Meta filename cannot contain spaces or special characters',
-  //     META_FILE_IS_INCORRECTLY_NAMED:
-  //         'Meta filename is incorrectly named',
-  //   },
-  // }),
+  mapFieldErrors<FormValues>({
+    target: 'zipFile',
+    messages: {
+      DATA_FILE_MUST_BE_ZIP_FILE: 'Choose a valid ZIP file',
+      DATA_ZIP_FILE_CAN_ONLY_CONTAIN_TWO_FILES:
+        'ZIP file can only contain two CSV files',
+      DATA_ZIP_FILE_DOES_NOT_CONTAIN_CSV_FILES:
+        'ZIP file does not contain any CSV files',
+      DATA_ZIP_FILE_ALREADY_EXISTS: 'ZIP file already exists',
+      CANNOT_OVERWRITE_DATA_FILE: 'Choose a unique ZIP data file name',
+      DATA_AND_METADATA_FILES_CANNOT_HAVE_THE_SAME_NAME:
+        'ZIP data and metadata filenames cannot be the same',
+      DATA_FILE_CANNOT_BE_EMPTY: 'Choose a ZIP data file that is not empty',
+      DATA_FILENAME_CANNOT_CONTAIN_SPACES_OR_SPECIAL_CHARACTERS:
+        'ZIP data filename cannot contain spaces or special characters',
+      CANNOT_OVERWRITE_METADATA_FILE: 'Choose a unique ZIP metadata file name',
+      METADATA_FILE_CANNOT_BE_EMPTY:
+        'Choose a ZIP metadata file that is not empty',
+      META_FILENAME_CANNOT_CONTAIN_SPACES_OR_SPECIAL_CHARACTERS:
+        'ZIP metadata filename cannot contain spaces or special characters',
+      META_FILE_IS_INCORRECTLY_NAMED:
+        'ZIP metadata filename must end with .meta',
+    },
+  }),
   mapFieldErrors<FormValues>({
     target: 'subjectTitle',
     messages: {
@@ -155,12 +154,21 @@ const ReleaseDataUploadsSection = ({ releaseId, canUpdateRelease }: Props) => {
   const handleSubmit = useFormSubmit<FormValues>(async (values, actions) => {
     setIsUploading(true);
 
+    let file: DataFile;
+
     try {
-      const file = await releaseDataFileService.uploadDataFiles(releaseId, {
-        subjectTitle: values.subjectTitle,
-        dataFile: values.dataFile as File,
-        metadataFile: values.metadataFile as File,
-      });
+      if (values.uploadType === 'csv') {
+        file = await releaseDataFileService.uploadDataFiles(releaseId, {
+          name: values.subjectTitle,
+          dataFile: values.dataFile as File,
+          metadataFile: values.metadataFile as File,
+        });
+      } else {
+        file = await releaseDataFileService.uploadZipDataFile(releaseId, {
+          name: values.subjectTitle,
+          zipFile: values.zipFile as File,
+        });
+      }
 
       actions.resetForm();
 
@@ -177,8 +185,10 @@ const ReleaseDataUploadsSection = ({ releaseId, canUpdateRelease }: Props) => {
       enableReinitialize
       initialValues={{
         subjectTitle: '',
+        uploadType: 'csv',
         dataFile: null,
         metadataFile: null,
+        zipFile: null,
       }}
       onReset={() => {
         document
@@ -199,6 +209,7 @@ const ReleaseDataUploadsSection = ({ releaseId, canUpdateRelease }: Props) => {
               if (!value) {
                 return true;
               }
+
               return (
                 dataFiles.find(
                   f => f.title.toUpperCase() === value.toUpperCase(),
@@ -206,8 +217,34 @@ const ReleaseDataUploadsSection = ({ releaseId, canUpdateRelease }: Props) => {
               );
             },
           }),
-        dataFile: Yup.file().required('Choose a data file'),
-        metadataFile: Yup.file().required('Choose a metadata file'),
+        uploadType: Yup.mixed<FormValues['uploadType']>().oneOf(['csv', 'zip']),
+        dataFile: Yup.file().when('uploadType', {
+          is: 'csv',
+          then: Yup.file()
+            .required('Choose a data file')
+            .mimeType(
+              ['text/csv'],
+              'Data file must be a CSV with UTF-8 encoding',
+            )
+            .minSize(0, 'Choose a data file that is not empty'),
+        }),
+        metadataFile: Yup.file().when('uploadType', {
+          is: 'csv',
+          then: Yup.file()
+            .required('Choose a metadata file')
+            .mimeType(
+              ['text/csv'],
+              'Metadata file must be a CSV with UTF-8 encoding',
+            )
+            .minSize(0, 'Choose a metadata file that is not empty'),
+        }),
+        zipFile: Yup.file().when('uploadType', {
+          is: 'zip',
+          then: Yup.file()
+            .required('Choose a zip file')
+            .mimeType(['application/zip'], 'Choose a valid ZIP file')
+            .minSize(0, 'Choose a ZIP file that is not empty'),
+        }),
       })}
     >
       {form => (
@@ -252,16 +289,47 @@ const ReleaseDataUploadsSection = ({ releaseId, canUpdateRelease }: Props) => {
                   width={20}
                 />
 
-                <FormFieldFileInput<FormValues>
-                  id={`${formId}-dataFile`}
-                  name="dataFile"
-                  label="Upload data file"
-                />
+                <FormFieldRadioGroup<FormValues>
+                  id={`${formId}-uploadType`}
+                  name="uploadType"
+                  legend="Choose upload method"
+                  options={[
+                    {
+                      label: 'CSV files',
+                      value: 'csv',
+                      conditional: (
+                        <>
+                          <FormFieldFileInput<FormValues>
+                            id={`${formId}-dataFile`}
+                            name="dataFile"
+                            label="Upload data file"
+                            accept=".csv"
+                          />
 
-                <FormFieldFileInput<FormValues>
-                  id={`${formId}-metadataFile`}
-                  name="metadataFile"
-                  label="Upload metadata file"
+                          <FormFieldFileInput<FormValues>
+                            id={`${formId}-metadataFile`}
+                            name="metadataFile"
+                            label="Upload metadata file"
+                            accept=".csv"
+                          />
+                        </>
+                      ),
+                    },
+                    {
+                      label: 'ZIP file',
+                      hint: 'Recommended for larger data files',
+                      value: 'zip',
+                      conditional: (
+                        <FormFieldFileInput<FormValues>
+                          id={`${formId}-zipFile`}
+                          hint="Must contain both the data and metadata CSV files"
+                          name="zipFile"
+                          label="Upload ZIP file"
+                          accept=".zip"
+                        />
+                      ),
+                    },
+                  ]}
                 />
 
                 <ButtonGroup>
