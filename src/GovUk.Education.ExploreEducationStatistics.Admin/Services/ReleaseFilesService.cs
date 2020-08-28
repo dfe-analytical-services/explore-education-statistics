@@ -328,57 +328,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Services
                     
                     foreach (var fileLink in files)
                     {
-                        var fileReference = fileLink.ReleaseFileReference;
-                        var blobPath = AdminReleasePathWithFileReference(fileReference);
-
-                        // Files should exists in storage but if not then allow user to delete
-                        if (!blobContainer.GetBlockBlobReference(blobPath).Exists())
-                        {
-                            // Fail the import if this was a datafile upload
-                            await _importService.FailImport(releaseId,
-                                    fileReference.ReleaseFileType == ReleaseFileTypes.Data
-                                        ? fileReference.Filename
-                                        : await GetFilenameAssociatedToType(releaseId, fileReference.Filename,
-                                            ReleaseFileTypes.Metadata, ReleaseFileTypes.Data),
-                                    new List<ValidationError>
-                                            {
-                                                new ValidationError("Files not uploaded correctly. Please delete and retry")
-                                            }.AsEnumerable());
-
-                            fileList.Add(new DataFileInfo
-                            {
-                                Id = fileReference.Id,
-                                Extension = Path.GetExtension(fileReference.Filename),
-                                Name = await GetSubjectName(releaseId, fileReference.Filename,
-                                    fileReference.ReleaseFileType),
-                                Path = fileReference.Filename,
-                                Size = "0.00 B",
-                                MetaFileName = fileReference.ReleaseFileType == ReleaseFileTypes.Data
-                                    ? await GetFilenameAssociatedToType(releaseId, fileReference.Filename,
-                                        ReleaseFileTypes.Data, ReleaseFileTypes.Metadata)
-                                    : "",
-                                Rows = 0,
-                                UserName = "",
-                                Created = DateTimeOffset.UtcNow,
-                            });
-                        }
-                        else
-                        {
-                            var file = blobContainer.GetBlockBlobReference(blobPath);
-                            await file.FetchAttributesAsync();
-                            fileList.Add(new DataFileInfo
-                            {
-                                Id = fileReference.Id,
-                                Extension = GetExtension(file),
-                                Name = GetName(file),
-                                Path = file.Name,
-                                Size = GetSize(file),
-                                MetaFileName = GetMetaFileName(file),
-                                Rows = GetNumberOfRows(file),
-                                UserName = GetUserName(file),
-                                Created = file.Properties.Created
-                            });
-                        }
+                        fileList.Add(await GetDataFileInfo(releaseId, fileLink, blobContainer));
                     }
                     
                     return fileList
@@ -472,31 +422,118 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Services
         private async Task<ReleaseFileReference> CreateOrUpdateFileReference(string filename, Guid releaseId,
             ReleaseFileTypes type, Guid? id = null, ReleaseFileReference? source = null)
         {
+            ReleaseFileReference releaseFileReference;
+            
             // If updating existing then check if existing reference is for this release - if not then create new ref
             if (id != null)
             {
-                var releaseFileReference = await _context.ReleaseFileReferences.Where(rfr => rfr.Id == id).FirstAsync();
+                releaseFileReference = await _context.ReleaseFileReferences.Where(rfr => rfr.Id == id).FirstAsync();
                 if (releaseFileReference.ReleaseId == releaseId)
                 {
                     return await UpdateFileReference(filename, id.Value);
                 }
             }
 
-            var fileLink = new ReleaseFile
+            releaseFileReference = new ReleaseFileReference
             {
                 ReleaseId = releaseId,
-                ReleaseFileReference = new ReleaseFileReference
+                Filename = filename,
+                ReleaseFileType = type,
+                Source = source
+            };
+            
+            var entry = await _context.ReleaseFileReferences.AddAsync(releaseFileReference);  
+
+            // No ReleaseFileLink required for the zip file source reference
+            if (type != ReleaseFileTypes.DataZip)
+            {
+                var fileLink = new ReleaseFile
                 {
                     ReleaseId = releaseId,
-                    Filename = filename,
-                    ReleaseFileType = type,
-                    Source = source
+                    ReleaseFileReference = releaseFileReference
+                };
+
+                await _context.ReleaseFiles.AddAsync(fileLink);
+            }
+            
+            return entry.Entity;
+        }
+
+        private async Task<DataFileInfo> GetDataFileInfo(Guid releaseId, ReleaseFile fileLink, CloudBlobContainer blobContainer)
+        {
+            var fileReference = fileLink.ReleaseFileReference;
+            var blobPath = AdminReleasePathWithFileReference(fileReference);
+
+            // Files should exists in storage but if not then allow user to delete
+            if (!blobContainer.GetBlockBlobReference(blobPath).Exists())
+            {
+                // Try to get the name from the zip file if existing
+                if (fileReference.SourceId != null)
+                {
+                    var source = await GetReleaseFileReference(fileReference.SourceId.Value);
+                    blobPath = AdminReleasePathWithFileReference(source);
+                    if (blobContainer.GetBlockBlobReference(blobPath).Exists())
+                    {
+                        var zipFile = blobContainer.GetBlockBlobReference(blobPath);
+                        await zipFile.FetchAttributesAsync();
+                        return new DataFileInfo
+                        {
+                            Id = fileReference.Id,
+                            Extension = Path.GetExtension(fileReference.Filename),
+                            Name = GetName(zipFile),
+                            Path = fileLink.ReleaseFileReference.Filename,
+                            Size = GetSize(zipFile),
+                            MetaFileName = fileLink.ReleaseFileReference.ReleaseFileType == ReleaseFileTypes.Data ? GetMetaFileName(zipFile) : "",
+                            Rows = 0,
+                            UserName = GetUserName(zipFile),
+                            Created = zipFile.Properties.Created
+                        };
+                    }
                 }
+
+                // Fail the import if this was a datafile upload
+                await _importService.FailImport(releaseId,
+                    fileReference.ReleaseFileType == ReleaseFileTypes.Data
+                        ? fileReference.Filename
+                        : await GetFilenameAssociatedToType(releaseId, fileReference.Filename,
+                            ReleaseFileTypes.Metadata, ReleaseFileTypes.Data),
+                    new List<ValidationError>
+                    {
+                        new ValidationError("Files not uploaded correctly. Please delete and retry")
+                    }.AsEnumerable());
+
+                return new DataFileInfo
+                {
+                    Id = fileReference.Id,
+                    Extension = Path.GetExtension(fileReference.Filename),
+                    Name = await GetSubjectName(releaseId, fileReference.Filename,
+                        fileReference.ReleaseFileType),
+                    Path = fileReference.Filename,
+                    Size = "0.00 B",
+                    MetaFileName = fileReference.ReleaseFileType == ReleaseFileTypes.Data
+                        ? await GetFilenameAssociatedToType(releaseId, fileReference.Filename,
+                            ReleaseFileTypes.Data, ReleaseFileTypes.Metadata)
+                        : "",
+                    Rows = 0,
+                    UserName = "",
+                    Created = DateTimeOffset.UtcNow,
+                };
+            }
+
+            var file = blobContainer.GetBlockBlobReference(blobPath);
+            await file.FetchAttributesAsync();
+            return new DataFileInfo
+            {
+                Id = fileReference.Id,
+                Extension = GetExtension(file),
+                Name = GetName(file),
+                Path = file.Name,
+                Size = GetSize(file),
+                MetaFileName = GetMetaFileName(file),
+                Rows = GetNumberOfRows(file),
+                UserName = GetUserName(file),
+                Created = file.Properties.Created
             };
-
-            var entry = await _context.ReleaseFiles.AddAsync(fileLink);
-
-            return entry.Entity.ReleaseFileReference;
         }
 
         private async Task<ReleaseFileReference> UpdateFileReference(string filename, Guid id)
@@ -530,7 +567,14 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Services
                 .Where(f => f.ReleaseId == releaseId && types.Contains(f.ReleaseFileReference.ReleaseFileType))
                 .ToListAsync();
         }
-
+        
+        private async Task<ReleaseFileReference> GetReleaseFileReference(Guid id)
+        {
+            return await _context
+                .ReleaseFileReferences
+                .SingleAsync(rfr => rfr.Id == id);
+        }
+        
         private async Task<ReleaseFile> GetReleaseFileLinkAsync(Guid releaseId, string filename, ReleaseFileTypes type)
         {
             var releaseFileLinks = await _context

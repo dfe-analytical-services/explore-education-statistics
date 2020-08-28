@@ -34,7 +34,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Content.Model
                 return Filename;
             }
         }
-        
+        public Guid? SourceId { get; set; }
         public ReleaseFileReference? Source { get; set; }
     }
 }
