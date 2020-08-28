@@ -57,8 +57,14 @@ Upload subject
     user waits until h2 is visible  Uploaded data files
     user waits until page contains accordion section   ${SUBJECT_NAME}
     user opens accordion section   ${SUBJECT_NAME}
-    user checks page contains element   xpath://dt[text()="Subject title"]/../dd/h4[text()="${SUBJECT_NAME}"]
-    user waits until page contains element  xpath://dt[text()="Status"]/../dd//strong[text()="Complete"]     180
+
+    ${section}=  user gets accordion content element  ${SUBJECT_NAME}
+    user checks summary list contains  Subject title    ${SUBJECT_NAME}  ${section}
+    user checks summary list contains  Data file        dates.csv  ${section}
+    user checks summary list contains  Metadata file    dates.meta.csv  ${section}
+    user checks summary list contains  Number of rows   119  ${section}
+    user checks summary list contains  Data file size   17 Kb  ${section}
+    user checks summary list contains  Status           Complete  ${section}  180
 
 Open footnotes tab
     [Tags]  HappyPath

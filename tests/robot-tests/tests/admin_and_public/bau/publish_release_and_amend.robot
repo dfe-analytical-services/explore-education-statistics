@@ -157,8 +157,14 @@ Upload subject
     user waits until h2 is visible  Uploaded data files
     user waits until page contains accordion section   Dates test subject
     user opens accordion section   Dates test subject
-    user checks summary list contains   Subject title    Dates test subject
-    user checks summary list contains   Status           Complete             180
+
+    ${section}=  user gets accordion content element  Dates test subject
+    user checks summary list contains  Subject title    Dates test subject  ${section}
+    user checks summary list contains  Data file        dates.csv  ${section}
+    user checks summary list contains  Metadata file    dates.meta.csv  ${section}
+    user checks summary list contains  Number of rows   119  ${section}
+    user checks summary list contains  Data file size   17 Kb  ${section}
+    user checks summary list contains  Status           Complete  ${section}  180
 
 # TODO: Add footnotes
 # TODO: Add ancillary file

@@ -60,9 +60,9 @@ Upload multiple files
     user opens accordion section   test 1
 
     ${section_1}=  user gets accordion content element  test 1
-    user checks summary list contains  Name         test 1              parent=${section_1}
-    user checks summary list contains  File         test-file-1.txt     parent=${section_1}
-    user checks summary list contains  File size    12 B                parent=${section_1}
+    user checks summary list contains  Name         test 1              ${section_1}
+    user checks summary list contains  File         test-file-1.txt     ${section_1}
+    user checks summary list contains  File size    12 B                ${section_1}
 
     user enters text into element  id:fileUploadForm-name   Test 2
     user chooses file   id:fileUploadForm-file      ${CURDIR}${/}files${/}test-file-2.txt
@@ -72,9 +72,9 @@ Upload multiple files
     user opens accordion section   test 2
 
     ${section_2}=  user gets accordion content element  test 2
-    user checks summary list contains  Name         test 2              parent=${section_2}
-    user checks summary list contains  File         test-file-2.txt     parent=${section_2}
-    user checks summary list contains  File size    24 B                parent=${section_2}
+    user checks summary list contains  Name         test 2              ${section_2}
+    user checks summary list contains  File         test-file-2.txt     ${section_2}
+    user checks summary list contains  File size    24 B                ${section_2}
 
     user checks there are x accordion sections  2
 
