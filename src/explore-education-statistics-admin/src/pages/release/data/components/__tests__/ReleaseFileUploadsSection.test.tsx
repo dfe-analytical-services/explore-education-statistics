@@ -244,6 +244,27 @@ describe('ReleaseFileUploadsSection', () => {
       });
     });
 
+    test('shows validation message when file is empty', async () => {
+      render(
+        <ReleaseFileUploadsSection releaseId="release-1" canUpdateRelease />,
+      );
+
+      const file = new File([''], 'test.txt', {
+        type: 'text/plain',
+      });
+
+      userEvent.upload(screen.getByLabelText('Upload file'), file);
+      userEvent.tab();
+
+      await waitFor(() => {
+        expect(
+          screen.getByText('Choose a file that is not empty', {
+            selector: '#fileUploadForm-file-error',
+          }),
+        ).toBeInTheDocument();
+      });
+    });
+
     test('cannot submit with invalid values', async () => {
       render(
         <ReleaseFileUploadsSection releaseId="release-1" canUpdateRelease />,
@@ -275,11 +296,20 @@ describe('ReleaseFileUploadsSection', () => {
     });
 
     test('can submit with valid values', async () => {
+      releaseAncillaryFileService.uploadAncillaryFile.mockResolvedValue({
+        title: 'Test name',
+        filename: 'test-file.docx',
+        fileSize: {
+          size: 150,
+          unit: 'Kb',
+        },
+      });
+
       render(
         <ReleaseFileUploadsSection releaseId="release-1" canUpdateRelease />,
       );
 
-      const file = new File([''], 'test-file.txt');
+      const file = new File(['test'], 'test-file.txt');
 
       await userEvent.type(screen.getByLabelText('Name'), 'Test title');
 
@@ -314,7 +344,7 @@ describe('ReleaseFileUploadsSection', () => {
         <ReleaseFileUploadsSection releaseId="release-1" canUpdateRelease />,
       );
 
-      const file = new File([''], 'test-file.docx');
+      const file = new File(['test'], 'test-file.docx');
 
       await userEvent.type(screen.getByLabelText('Name'), 'Test name');
       userEvent.upload(screen.getByLabelText('Upload file'), file);

@@ -127,7 +127,9 @@ const ReleaseFileUploadsSection = ({ releaseId, canUpdateRelease }: Props) => {
               );
             },
           }),
-        file: Yup.file().required('Choose a file'),
+        file: Yup.file()
+          .required('Choose a file')
+          .minSize(0, 'Choose a file that is not empty'),
       })}
     >
       {form => (
