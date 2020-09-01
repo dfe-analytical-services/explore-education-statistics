@@ -158,6 +158,7 @@ Create table
     user waits until results table appears     180
     user waits until element contains   id:dataTableCaption
     ...  Table showing Admission Numbers for 'UI test subject' from '${PUBLICATION_NAME}' in Bolton 001 for 2019
+    sleep  1   # Because otherwise the "Set as table highlight" checkbox gets checked on CI pipeline?!?!
     user enters text into element  id:dataBlockDetailsForm-name         UI test table name
     user enters text into element  id:dataBlockDetailsForm-heading      UI test table title
     user enters text into element  id:dataBlockDetailsForm-source       UI test source
@@ -167,6 +168,7 @@ Create table
 Navigate to Create chart tab
     [Tags]  HappyPath
     user waits until page contains link  Chart
+    user waits until page does not contain loading spinner
     user clicks link  Chart
     user clicks button  Choose an infographic as alternative
     choose file   id:chartConfigurationForm-file       ${CURDIR}${/}files${/}dfe-logo.jpg
