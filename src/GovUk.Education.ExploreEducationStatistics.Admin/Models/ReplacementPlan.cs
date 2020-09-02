@@ -7,11 +7,11 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Models
 {
     public class ReplacementPlan
     {
-        public IEnumerable<DataBlockInfo> DataBlocks { get; set; }
-        public IEnumerable<FootnoteInfo> Footnotes { get; set; }
+        public IEnumerable<DataBlockReplacementPlan> DataBlocks { get; set; }
+        public IEnumerable<FootnoteReplacementPlan> Footnotes { get; set; }
 
-        public ReplacementPlan(IEnumerable<DataBlockInfo> dataBlocks,
-            IEnumerable<FootnoteInfo> footnotes)
+        public ReplacementPlan(IEnumerable<DataBlockReplacementPlan> dataBlocks,
+            IEnumerable<FootnoteReplacementPlan> footnotes)
         {
             DataBlocks = dataBlocks;
             Footnotes = footnotes;
@@ -21,7 +21,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Models
                              && Footnotes.All(info => info.Valid);
     }
 
-    public class DataBlockInfo
+    public class DataBlockReplacementPlan
     {
         public Guid Id { get; set; }
         public string Name { get; set; }
@@ -30,7 +30,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Models
         public Dictionary<string, ObservationalUnitReplacementViewModel> ObservationalUnits { get; set; }
         public TimePeriodReplacementViewModel TimePeriods { get; set; }
 
-        public DataBlockInfo(Guid id,
+        public DataBlockReplacementPlan(Guid id,
             string name,
             IEnumerable<FilterItemReplacementViewModel> filterItems,
             IEnumerable<IndicatorReplacementViewModel> indicators,
@@ -51,7 +51,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Models
                              && TimePeriods.Valid;
     }
 
-    public class FootnoteInfo
+    public class FootnoteReplacementPlan
     {
         public Guid Id { get; set; }
         public string Content { get; set; }
@@ -60,7 +60,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Models
         public IEnumerable<FilterItemReplacementViewModel> FilterItems { get; set; }
         public IEnumerable<IndicatorReplacementViewModel> Indicators { get; set; }
 
-        public FootnoteInfo(Guid id,
+        public FootnoteReplacementPlan(Guid id,
             string content,
             IEnumerable<FilterReplacementViewModel> filters,
             IEnumerable<FilterGroupReplacementViewModel> filterGroups,

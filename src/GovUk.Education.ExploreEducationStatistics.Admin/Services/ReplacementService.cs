@@ -122,7 +122,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Services
             };
         }
 
-        private List<DataBlockInfo> ValidateDataBlocks(Guid releaseId, Guid subjectId,
+        private List<DataBlockReplacementPlan> ValidateDataBlocks(Guid releaseId, Guid subjectId,
             ReplacementSubjectMeta replacementSubjectMeta)
         {
             return _contentDbContext
@@ -137,14 +137,14 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Services
                 .ToList();
         }
 
-        private DataBlockInfo ValidateDataBlock(DataBlock dataBlock, ReplacementSubjectMeta replacementSubjectMeta)
+        private DataBlockReplacementPlan ValidateDataBlock(DataBlock dataBlock, ReplacementSubjectMeta replacementSubjectMeta)
         {
             var filterItems = ValidateFilterItemsForDataBlock(dataBlock, replacementSubjectMeta);
             var indicators = ValidateIndicatorsForDataBlock(dataBlock, replacementSubjectMeta);
             var observationalUnits = ValidateObservationalUnitsForDataBlock(dataBlock, replacementSubjectMeta);
             var timePeriods = ValidateTimePeriodsForDataBlock(dataBlock, replacementSubjectMeta);
 
-            return new DataBlockInfo(dataBlock.Id,
+            return new DataBlockReplacementPlan(dataBlock.Id,
                 dataBlock.Name,
                 filterItems,
                 indicators,
@@ -152,7 +152,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Services
                 timePeriods);
         }
 
-        private List<FootnoteInfo> ValidateFootnotes(Guid releaseId, Guid subjectId,
+        private List<FootnoteReplacementPlan> ValidateFootnotes(Guid releaseId, Guid subjectId,
             ReplacementSubjectMeta replacementSubjectMeta)
         {
             return _footnoteService.GetFootnotes(releaseId, subjectId)
@@ -160,14 +160,14 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Services
                 .ToList();
         }
 
-        private static FootnoteInfo ValidateFootnote(Footnote footnote, ReplacementSubjectMeta replacementSubjectMeta)
+        private static FootnoteReplacementPlan ValidateFootnote(Footnote footnote, ReplacementSubjectMeta replacementSubjectMeta)
         {
             var filters = ValidateFiltersForFootnote(footnote, replacementSubjectMeta);
             var filterGroups = ValidateFilterGroupsForFootnote(footnote, replacementSubjectMeta);
             var filterItems = ValidateFilterItemsForFootnote(footnote, replacementSubjectMeta);
             var indicators = ValidateIndicatorsForFootnote(footnote, replacementSubjectMeta);
 
-            return new FootnoteInfo(footnote.Id,
+            return new FootnoteReplacementPlan(footnote.Id,
                 footnote.Content,
                 filters,
                 filterGroups,
@@ -257,47 +257,55 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Services
         private static FilterReplacementViewModel ValidateFilterForReplacement(Filter filter,
             ReplacementSubjectMeta replacementSubjectMeta)
         {
+            Guid? target = replacementSubjectMeta.Filters.GetValueOrDefault(filter.Name);
+            target = target == Guid.Empty ? null : target;
             return new FilterReplacementViewModel
             {
                 Id = filter.Id,
                 Name = filter.Name,
                 Label = filter.Label,
-                Target = replacementSubjectMeta.Filters.GetValueOrDefault(filter.Name)
+                Target = target
             };
         }
 
         private static FilterGroupReplacementViewModel ValidateFilterGroupForReplacement(FilterGroup filterGroup,
             ReplacementSubjectMeta replacementSubjectMeta)
         {
+            Guid? target = replacementSubjectMeta.FilterGroups.GetValueOrDefault(filterGroup.Label);
+            target = target == Guid.Empty ? null : target;
             return new FilterGroupReplacementViewModel
             {
                 Id = filterGroup.Id,
                 Label = filterGroup.Label,
                 FilterLabel = filterGroup.Filter.Label,
-                Target = replacementSubjectMeta.FilterGroups.GetValueOrDefault(filterGroup.Label)
+                Target = target
             };
         }
 
         private static FilterItemReplacementViewModel ValidateFilterItemForReplacement(FilterItem filterItem,
             ReplacementSubjectMeta replacementSubjectMeta)
         {
+            Guid? target = replacementSubjectMeta.FilterItems.GetValueOrDefault(filterItem.Label);
+            target = target == Guid.Empty ? null : target;
             return new FilterItemReplacementViewModel
             {
                 Id = filterItem.Id,
                 Label = filterItem.Label,
-                Target = replacementSubjectMeta.FilterItems.GetValueOrDefault(filterItem.Label)
+                Target = target
             };
         }
 
         private static IndicatorReplacementViewModel ValidateIndicatorForReplacement(Indicator indicator,
             ReplacementSubjectMeta replacementSubjectMeta)
         {
+            Guid? target = replacementSubjectMeta.Indicators.GetValueOrDefault(indicator.Name);
+            target = target == Guid.Empty ? null : target;
             return new IndicatorReplacementViewModel
             {
                 Id = indicator.Id,
                 Name = indicator.Name,
                 Label = indicator.Label,
-                Target = replacementSubjectMeta.Indicators.GetValueOrDefault(indicator.Name)
+                Target = target
             };
         }
 
