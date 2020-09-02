@@ -4,6 +4,7 @@ using System.Linq;
 using System.Threading.Tasks;
 using GovUk.Education.ExploreEducationStatistics.Admin.Models;
 using GovUk.Education.ExploreEducationStatistics.Admin.Services.Interfaces;
+using GovUk.Education.ExploreEducationStatistics.Admin.ViewModels;
 using GovUk.Education.ExploreEducationStatistics.Common.Model;
 using GovUk.Education.ExploreEducationStatistics.Common.Model.Data;
 using GovUk.Education.ExploreEducationStatistics.Common.Model.Data.Query;
@@ -55,7 +56,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Services
             _persistenceHelper = persistenceHelper;
         }
 
-        public async Task<Either<ActionResult, ReplacementPlan>> GetReplacementPlan(Guid originalSubjectId,
+        public async Task<Either<ActionResult, ReplacementPlanViewModel>> GetReplacementPlan(Guid originalSubjectId,
             Guid replacementSubjectId)
         {
             return await _persistenceHelper
@@ -69,7 +70,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Services
                     var dataBlocks = ValidateDataBlocks(releaseId, originalSubjectId, replacementSubjectMeta);
                     var footnotes = ValidateFootnotes(releaseId, originalSubjectId, replacementSubjectMeta);
 
-                    return new ReplacementPlan(dataBlocks, footnotes);
+                    return new ReplacementPlanViewModel(dataBlocks, footnotes);
                 });
         }
 
@@ -122,7 +123,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Services
             };
         }
 
-        private List<DataBlockReplacementPlan> ValidateDataBlocks(Guid releaseId, Guid subjectId,
+        private List<DataBlockReplacementPlanViewModel> ValidateDataBlocks(Guid releaseId, Guid subjectId,
             ReplacementSubjectMeta replacementSubjectMeta)
         {
             return _contentDbContext
@@ -137,14 +138,14 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Services
                 .ToList();
         }
 
-        private DataBlockReplacementPlan ValidateDataBlock(DataBlock dataBlock, ReplacementSubjectMeta replacementSubjectMeta)
+        private DataBlockReplacementPlanViewModel ValidateDataBlock(DataBlock dataBlock, ReplacementSubjectMeta replacementSubjectMeta)
         {
             var filterItems = ValidateFilterItemsForDataBlock(dataBlock, replacementSubjectMeta);
             var indicators = ValidateIndicatorsForDataBlock(dataBlock, replacementSubjectMeta);
             var observationalUnits = ValidateObservationalUnitsForDataBlock(dataBlock, replacementSubjectMeta);
             var timePeriods = ValidateTimePeriodsForDataBlock(dataBlock, replacementSubjectMeta);
 
-            return new DataBlockReplacementPlan(dataBlock.Id,
+            return new DataBlockReplacementPlanViewModel(dataBlock.Id,
                 dataBlock.Name,
                 filterItems,
                 indicators,
@@ -152,7 +153,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Services
                 timePeriods);
         }
 
-        private List<FootnoteReplacementPlan> ValidateFootnotes(Guid releaseId, Guid subjectId,
+        private List<FootnoteReplacementPlanViewModel> ValidateFootnotes(Guid releaseId, Guid subjectId,
             ReplacementSubjectMeta replacementSubjectMeta)
         {
             return _footnoteService.GetFootnotes(releaseId, subjectId)
@@ -160,14 +161,14 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Services
                 .ToList();
         }
 
-        private static FootnoteReplacementPlan ValidateFootnote(Footnote footnote, ReplacementSubjectMeta replacementSubjectMeta)
+        private static FootnoteReplacementPlanViewModel ValidateFootnote(Footnote footnote, ReplacementSubjectMeta replacementSubjectMeta)
         {
             var filters = ValidateFiltersForFootnote(footnote, replacementSubjectMeta);
             var filterGroups = ValidateFilterGroupsForFootnote(footnote, replacementSubjectMeta);
             var filterItems = ValidateFilterItemsForFootnote(footnote, replacementSubjectMeta);
             var indicators = ValidateIndicatorsForFootnote(footnote, replacementSubjectMeta);
 
-            return new FootnoteReplacementPlan(footnote.Id,
+            return new FootnoteReplacementPlanViewModel(footnote.Id,
                 footnote.Content,
                 filters,
                 filterGroups,

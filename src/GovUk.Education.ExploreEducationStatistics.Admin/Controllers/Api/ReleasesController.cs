@@ -259,17 +259,11 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Controllers.Api
                 .HandleFailuresOrOk();
         }
 
-        [HttpGet("release/data/replacement-plan")]
-        [AllowAnonymous]
-        public async Task<ActionResult<ReplacementPlan>> GetReplacementPlan()
+        [HttpPost("release/data/replacement-plan")]
+        public async Task<ActionResult<ReplacementPlanViewModel>> GetReplacementPlan(ReplacementPlanRequest request)
         {
-            //var releaseId = new Guid("6a0e101a-b69f-4daf-a5dc-08d849c07f00");
-
-            var original = new Guid("624CE37E-1760-4EF8-A5DD-08D849C07F00");
-            var replacement = new Guid("711FFF20-BF5D-45F2-A5DE-08D849C07F00");
-
             return await _replacementService
-                .GetReplacementPlan(original, replacement)
+                .GetReplacementPlan(request.OriginalSubjectId.Value, request.ReplacementSubjectId.Value)
                 .HandleFailuresOrOk();
         }
 

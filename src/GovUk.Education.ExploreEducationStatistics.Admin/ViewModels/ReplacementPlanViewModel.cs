@@ -3,15 +3,15 @@ using System.Collections.Generic;
 using System.Linq;
 using GovUk.Education.ExploreEducationStatistics.Common.Model.Data.Query;
 
-namespace GovUk.Education.ExploreEducationStatistics.Admin.Models
+namespace GovUk.Education.ExploreEducationStatistics.Admin.ViewModels
 {
-    public class ReplacementPlan
+    public class ReplacementPlanViewModel
     {
-        public IEnumerable<DataBlockReplacementPlan> DataBlocks { get; set; }
-        public IEnumerable<FootnoteReplacementPlan> Footnotes { get; set; }
+        public IEnumerable<DataBlockReplacementPlanViewModel> DataBlocks { get; }
+        public IEnumerable<FootnoteReplacementPlanViewModel> Footnotes { get; }
 
-        public ReplacementPlan(IEnumerable<DataBlockReplacementPlan> dataBlocks,
-            IEnumerable<FootnoteReplacementPlan> footnotes)
+        public ReplacementPlanViewModel(IEnumerable<DataBlockReplacementPlanViewModel> dataBlocks,
+            IEnumerable<FootnoteReplacementPlanViewModel> footnotes)
         {
             DataBlocks = dataBlocks;
             Footnotes = footnotes;
@@ -21,16 +21,16 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Models
                              && Footnotes.All(info => info.Valid);
     }
 
-    public class DataBlockReplacementPlan
+    public class DataBlockReplacementPlanViewModel
     {
-        public Guid Id { get; set; }
-        public string Name { get; set; }
-        public IEnumerable<FilterItemReplacementViewModel> FilterItems { get; set; }
-        public IEnumerable<IndicatorReplacementViewModel> Indicators { get; set; }
-        public Dictionary<string, ObservationalUnitReplacementViewModel> ObservationalUnits { get; set; }
-        public TimePeriodReplacementViewModel TimePeriods { get; set; }
+        public Guid Id { get; }
+        public string Name { get; }
+        public IEnumerable<FilterItemReplacementViewModel> FilterItems { get; }
+        public IEnumerable<IndicatorReplacementViewModel> Indicators { get; }
+        public Dictionary<string, ObservationalUnitReplacementViewModel> ObservationalUnits { get; }
+        public TimePeriodReplacementViewModel TimePeriods { get; }
 
-        public DataBlockReplacementPlan(Guid id,
+        public DataBlockReplacementPlanViewModel(Guid id,
             string name,
             IEnumerable<FilterItemReplacementViewModel> filterItems,
             IEnumerable<IndicatorReplacementViewModel> indicators,
@@ -51,16 +51,16 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Models
                              && TimePeriods.Valid;
     }
 
-    public class FootnoteReplacementPlan
+    public class FootnoteReplacementPlanViewModel
     {
-        public Guid Id { get; set; }
-        public string Content { get; set; }
-        public IEnumerable<FilterReplacementViewModel> Filters { get; set; }
-        public IEnumerable<FilterGroupReplacementViewModel> FilterGroups { get; set; }
-        public IEnumerable<FilterItemReplacementViewModel> FilterItems { get; set; }
-        public IEnumerable<IndicatorReplacementViewModel> Indicators { get; set; }
+        public Guid Id { get; }
+        public string Content { get; }
+        public IEnumerable<FilterReplacementViewModel> Filters { get; }
+        public IEnumerable<FilterGroupReplacementViewModel> FilterGroups { get; }
+        public IEnumerable<FilterItemReplacementViewModel> FilterItems { get; }
+        public IEnumerable<IndicatorReplacementViewModel> Indicators { get; }
 
-        public FootnoteReplacementPlan(Guid id,
+        public FootnoteReplacementPlanViewModel(Guid id,
             string content,
             IEnumerable<FilterReplacementViewModel> filters,
             IEnumerable<FilterGroupReplacementViewModel> filterGroups,
