@@ -13,7 +13,7 @@ using GovUk.Education.ExploreEducationStatistics.Publisher.Models;
 using GovUk.Education.ExploreEducationStatistics.Publisher.Services.Interfaces;
 using Microsoft.EntityFrameworkCore;
 using IReleaseService = GovUk.Education.ExploreEducationStatistics.Publisher.Services.Interfaces.IReleaseService;
-using static GovUk.Education.ExploreEducationStatistics.Publisher.utils.PublisherUtils;
+using static GovUk.Education.ExploreEducationStatistics.Publisher.Utils.PublisherUtils;
 
 namespace GovUk.Education.ExploreEducationStatistics.Publisher.Services
 {

@@ -8,7 +8,7 @@ using GovUk.Education.ExploreEducationStatistics.Content.Model.Database;
 using GovUk.Education.ExploreEducationStatistics.Publisher.Model.ViewModels;
 using GovUk.Education.ExploreEducationStatistics.Publisher.Services.Interfaces;
 using Microsoft.EntityFrameworkCore;
-using static GovUk.Education.ExploreEducationStatistics.Publisher.utils.PublisherUtils;
+using static GovUk.Education.ExploreEducationStatistics.Publisher.Utils.PublisherUtils;
 
 namespace GovUk.Education.ExploreEducationStatistics.Publisher.Services
 {

@@ -13,13 +13,12 @@ namespace GovUk.Education.ExploreEducationStatistics.Publisher.Utils
             var environment = Environment.GetEnvironmentVariable("AZURE_FUNCTIONS_ENVIRONMENT");
             return environment?.Equals(EnvironmentName.Development) ?? false;
         }
-
-        public static bool IsLatestVersionOfRelease(IEnumerable<Release> releases, Guid releaseId,
-            IEnumerable<Guid> includedReleaseIds)
+        
+        public static bool IsLatestVersionOfRelease(IEnumerable<Release> releases, Guid releaseId, IEnumerable<Guid> includedReleaseIds)
         {
             return !releases.Any(r => r.PreviousVersionId == releaseId && IsReleasePublished(r, includedReleaseIds) && r.Id != releaseId);
         }
-
+        
         public static bool IsReleasePublished(Release release, IEnumerable<Guid> includedReleaseIds)
         {
             return release.Live || includedReleaseIds.Contains(release.Id);
