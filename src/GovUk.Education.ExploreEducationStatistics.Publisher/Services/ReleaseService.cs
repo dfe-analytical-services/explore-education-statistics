@@ -137,10 +137,10 @@ namespace GovUk.Education.ExploreEducationStatistics.Publisher.Services
             contentRelease.Published ??= published;
             contentRelease.DataLastPublished = DateTime.UtcNow;
 
-            // Update the Publication date if it's the first time it's published
-            contentRelease.Publication.Published ??= published;
-            
-            // Update the Methodology date if it's the first time it's published
+            // Update the Publication published date since we always generate the Publication when generating Release Content
+            contentRelease.Publication.Published = published;
+
+            // Update the Methodology published date if it's the first time it's published
             var methodology = contentRelease.Publication.Methodology;
             if (methodology != null)
             {

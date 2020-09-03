@@ -107,12 +107,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Publisher.Services
 
             foreach (var publication in publications)
             {
-                // Only include the Publication if it's not already published
-                if (!publication.Published.HasValue)
-                {
-                    await CachePublication(publication.Id, context, releaseIds);
-                }
-
+                await CachePublication(publication.Id, context, releaseIds);
                 await CacheLatestRelease(publication, context, releaseIds);
                 foreach (var release in releases)
                 {
