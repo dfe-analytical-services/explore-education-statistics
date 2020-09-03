@@ -50,10 +50,10 @@ namespace GovUk.Education.ExploreEducationStatistics.Publisher.Tests.Utils
 
             var includedReleaseIds = new Guid[] { };
 
-            Assert.False(IsLatestVersionOfRelease(releases, release1Version1.Id, includedReleaseIds));
-            Assert.True(IsLatestVersionOfRelease(releases, release1Version2.Id, includedReleaseIds));
-            Assert.False(IsLatestVersionOfRelease(releases, release1Version3.Id, includedReleaseIds));
-            Assert.True(IsLatestVersionOfRelease(releases, release2Version1.Id, includedReleaseIds));
+            Assert.False(IsLatestVersionOfRelease(releases, release1Version1, includedReleaseIds));
+            Assert.True(IsLatestVersionOfRelease(releases, release1Version2, includedReleaseIds));
+            Assert.False(IsLatestVersionOfRelease(releases, release1Version3, includedReleaseIds));
+            Assert.True(IsLatestVersionOfRelease(releases, release2Version1, includedReleaseIds));
         }
 
         [Fact]
@@ -106,11 +106,11 @@ namespace GovUk.Education.ExploreEducationStatistics.Publisher.Tests.Utils
 
             var includedReleaseIds = new[] {release1Version3.Id};
 
-            Assert.False(IsLatestVersionOfRelease(releases, release1Version1.Id, includedReleaseIds));
-            Assert.False(IsLatestVersionOfRelease(releases, release1Version2.Id, includedReleaseIds));
-            Assert.True(IsLatestVersionOfRelease(releases, release1Version3.Id, includedReleaseIds));
-            Assert.False(IsLatestVersionOfRelease(releases, release1Version4.Id, includedReleaseIds));
-            Assert.True(IsLatestVersionOfRelease(releases, release2Version1.Id, includedReleaseIds));
+            Assert.False(IsLatestVersionOfRelease(releases, release1Version1, includedReleaseIds));
+            Assert.False(IsLatestVersionOfRelease(releases, release1Version2, includedReleaseIds));
+            Assert.True(IsLatestVersionOfRelease(releases, release1Version3, includedReleaseIds));
+            Assert.False(IsLatestVersionOfRelease(releases, release1Version4, includedReleaseIds));
+            Assert.True(IsLatestVersionOfRelease(releases, release2Version1, includedReleaseIds));
         }
 
         [Fact]
