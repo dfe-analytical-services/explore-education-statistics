@@ -13,7 +13,7 @@ using GovUk.Education.ExploreEducationStatistics.Publisher.Models;
 using GovUk.Education.ExploreEducationStatistics.Publisher.Services.Interfaces;
 using Microsoft.EntityFrameworkCore;
 using IReleaseService = GovUk.Education.ExploreEducationStatistics.Publisher.Services.Interfaces.IReleaseService;
-using static GovUk.Education.ExploreEducationStatistics.Publisher.utils.PublisherUtils;
+using static GovUk.Education.ExploreEducationStatistics.Publisher.Utils.PublisherUtils;
 
 namespace GovUk.Education.ExploreEducationStatistics.Publisher.Services
 {
@@ -91,8 +91,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Publisher.Services
                 .Include(r => r.Publication)
                 .Where(release => release.PublicationId == publicationId)
                 .ToList()
-                .Where(release => IsReleasePublished(release, includedReleaseIds) &&
-                                  IsLatestVersionOfRelease(release.Publication.Releases, release.Id, includedReleaseIds))
+                .Where(release => IsLatestVersionOfRelease(release.Publication.Releases, release, includedReleaseIds))
                 .OrderBy(release => release.Year)
                 .ThenBy(release => release.TimePeriodCoverage)
                 .LastOrDefault();
@@ -137,10 +136,10 @@ namespace GovUk.Education.ExploreEducationStatistics.Publisher.Services
             contentRelease.Published ??= published;
             contentRelease.DataLastPublished = DateTime.UtcNow;
 
-            // Update the Publication date if it's the first time it's published
-            contentRelease.Publication.Published ??= published;
-            
-            // Update the Methodology date if it's the first time it's published
+            // Update the Publication published date since we always generate the Publication when generating Release Content
+            contentRelease.Publication.Published = published;
+
+            // Update the Methodology published date if it's the first time it's published
             var methodology = contentRelease.Publication.Methodology;
             if (methodology != null)
             {

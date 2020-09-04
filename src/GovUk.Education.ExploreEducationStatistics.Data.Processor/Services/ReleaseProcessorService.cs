@@ -138,7 +138,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Processor.Services
                     Publication = CreateOrUpdatePublication(message, statisticsDbContext),
                     TimeIdentifier = message.Release.TimeIdentifier,
                     Year = message.Release.Year,
-                    PreviousVersionId = message.Release.Id
+                    PreviousVersionId = message.Release.PreviousVersionId
                 };
 
                 release = statisticsDbContext.Release.Add(release).Entity;
