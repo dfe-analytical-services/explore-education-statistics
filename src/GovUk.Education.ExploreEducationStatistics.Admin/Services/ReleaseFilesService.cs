@@ -13,6 +13,7 @@ using GovUk.Education.ExploreEducationStatistics.Common.Utils;
 using GovUk.Education.ExploreEducationStatistics.Content.Model;
 using GovUk.Education.ExploreEducationStatistics.Content.Model.Database;
 using GovUk.Education.ExploreEducationStatistics.Data.Model.Services.Interfaces;
+using IdentityServer4.Extensions;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.Azure.Storage.Blob;
@@ -114,7 +115,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Services
                 });
         }
 
-        public Task<Either<ActionResult, bool>> UploadDataFilesAsZipAsync(Guid releaseId,
+        public Task<Either<ActionResult, DataFileInfo>> UploadDataFilesAsZipAsync(Guid releaseId,
             IFormFile zipFile, string name, string userName)
         {
             return _persistenceHelper
@@ -142,7 +143,24 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Services
                                     await UploadFileToStorageAsync(blobContainer, releaseId, zipFile, ReleaseFileTypes.DataZip, dataInfo);
                                     await _importService.Import(releaseId, dataFile.Name.ToLower(), 
                                         metadataFile.Name.ToLower(), zipFile, true);
-                                    return true;
+
+                                    var file = blobContainer.GetBlockBlobReference(
+                                        AdminReleasePathWithFileReference(source)
+                                    );
+                                    await file.FetchAttributesAsync();
+                                    
+                                    return new DataFileInfo
+                                    {
+                                        Id = source.Id,
+                                        Extension = GetExtension(file),
+                                        Name = GetName(file),
+                                        Path = file.Name,
+                                        Size = GetSize(file),
+                                        MetaFileName = GetMetaFileName(file),
+                                        Rows = GetNumberOfRows(file),
+                                        UserName = GetUserName(file),
+                                        Created = file.Properties.Created
+                                    };
                                 });
                         });
                 });
@@ -483,7 +501,14 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Services
             var blobPath = AdminReleasePathWithFileReference(fileReference);
 
             // Files should exists in storage but if not then allow user to delete
-            if (!blobContainer.GetBlockBlobReference(blobPath).Exists())
+            var file = blobContainer.GetBlockBlobReference(blobPath);
+            if (file.Exists())
+            {
+                await file.FetchAttributesAsync();
+            }
+            
+            // If the file exists then it could possibly be partially uploaded so make sure meta data exists for it
+            if (!file.Exists() || GetUserName(file).IsNullOrEmpty())
             {
                 // Try to get the name from the zip file if existing
                 if (fileReference.SourceId != null)
@@ -538,8 +563,6 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Services
                 };
             }
 
-            var file = blobContainer.GetBlockBlobReference(blobPath);
-            await file.FetchAttributesAsync();
             return new DataFileInfo
             {
                 Id = fileReference.Id,

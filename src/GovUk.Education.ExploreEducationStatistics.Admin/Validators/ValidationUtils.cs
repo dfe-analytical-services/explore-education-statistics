@@ -139,6 +139,6 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Validators
         PublishedReleaseCannotBeUnapproved,
         
         // Subject
-        SubjectTitleCannotContainSpacesOrSpecialCharacters,
+        SubjectTitleCannotContainSpecialCharacters,
     }
 }

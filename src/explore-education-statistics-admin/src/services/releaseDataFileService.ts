@@ -47,6 +47,7 @@ export type ImportStatusCode =
   | 'COMPLETE'
   | 'QUEUED'
   | 'UPLOADING'
+  | 'PROCESSING_ARCHIVE_FILE'
   | 'RUNNING_PHASE_1'
   | 'RUNNING_PHASE_2'
   | 'RUNNING_PHASE_3'

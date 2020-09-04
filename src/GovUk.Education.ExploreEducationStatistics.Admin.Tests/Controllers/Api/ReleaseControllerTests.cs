@@ -109,15 +109,23 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Controllers.Api
             var mocks = Mocks();
             var dataFile = MockFile("datafile.csv");
             var metaFile = MockFile("metafile.csv");
+
+            var dataFileInfo = new DataFileInfo
+            {
+                Name = "Subject name",
+                Path = "datafile.csv"
+            };
             
             mocks.FileStorageService
                 .Setup(service => service.UploadDataFilesAsync(_releaseId, dataFile, metaFile, "Subject name", "test user"))
-                .ReturnsAsync(true);
+                .ReturnsAsync(dataFileInfo);
 
             // Call the method under test
             var controller = ReleasesControllerWithMocks(mocks);
             var result = await controller.AddDataFilesAsync(_releaseId, "Subject name", dataFile, metaFile);
-            Assert.True(result.Value);
+            var dataFileInfoResult = AssertOkResult(result);
+            Assert.Equal("Subject name", dataFileInfoResult.Name);
+            Assert.Equal("datafile.csv", dataFileInfoResult.Path);
         }
 
         [Fact(Skip="Needs principal setting")]

@@ -206,7 +206,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Common.Services
 
         public static string GetUserName(CloudBlob blob)
         {
-            return blob.Metadata.TryGetValue(UserName, out var name) ? name : "";
+            return blob.Metadata.TryGetValue(UserName, out var name) ? name : string.Empty;
         }
 
         public static string GetSize(CloudBlob blob)

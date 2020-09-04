@@ -25,6 +25,8 @@ export const getImportStatusLabel = (importstatusCode: ImportStatusCode) => {
       return 'Uploading';
     case 'QUEUED':
       return 'Queued';
+    case 'PROCESSING_ARCHIVE_FILE':
+      return 'Processing archive file';
     case 'RUNNING_PHASE_1':
       return 'Validating';
     case 'RUNNING_PHASE_2':
@@ -69,6 +71,8 @@ class ImporterStatus extends Component<Props> {
         return [styles.ragStatusAmber];
       case 'QUEUED':
         return [styles.ragStatusAmber];
+      case 'PROCESSING_ARCHIVE_FILE':
+        return [styles.ragStatusAmber];
       case 'RUNNING_PHASE_1':
         return [styles.ragStatusAmber];
       case 'RUNNING_PHASE_2':
@@ -107,7 +111,7 @@ class ImporterStatus extends Component<Props> {
           this.setState({
             current: importStatus,
             isFetching: false,
-            running: 'UPLOADING,QUEUED,RUNNING_PHASE_1, RUNNING_PHASE_2, RUNNING_PHASE_3'.match(
+            running: 'UPLOADING,QUEUED,PROCESSING_ARCHIVE_FILE,RUNNING_PHASE_1, RUNNING_PHASE_2, RUNNING_PHASE_3'.match(
               importStatus.status,
             ),
           }),

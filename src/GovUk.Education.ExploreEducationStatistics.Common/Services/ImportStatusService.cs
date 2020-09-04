@@ -13,7 +13,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Common.Services
     {
         UPLOADING,
         QUEUED,
-        EXTRACTING_ZIP_FILE,
+        PROCESSING_ARCHIVE_FILE,
         RUNNING_PHASE_1,
         RUNNING_PHASE_2,
         RUNNING_PHASE_3,

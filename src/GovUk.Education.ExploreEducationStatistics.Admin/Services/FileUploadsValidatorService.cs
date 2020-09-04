@@ -101,7 +101,12 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Services
         private bool FileContainsSpacesOrSpecialChars(string filename)
         {
             return filename.IndexOf(" ", Ordinal) > -1 ||
-                   filename.IndexOf("&", Ordinal) > -1 ||
+                   FileContainsSpecialChars(filename);
+        }
+        
+        private bool FileContainsSpecialChars(string filename)
+        {
+            return filename.IndexOf("&", Ordinal) > -1 ||
                    filename.IndexOfAny(Path.GetInvalidFileNameChars()) > -1;
         }
 
@@ -186,9 +191,9 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Services
         
         private async Task<Either<ActionResult, Unit>> ValidateSubjectName(Guid releaseId, string name)
         {
-            if (FileContainsSpacesOrSpecialChars(name))
+            if (FileContainsSpecialChars(name))
             {
-                return ValidationActionResult(SubjectTitleCannotContainSpacesOrSpecialCharacters);
+                return ValidationActionResult(SubjectTitleCannotContainSpecialCharacters);
             }
             
             if (await _subjectService.GetAsync(releaseId, name) != null)

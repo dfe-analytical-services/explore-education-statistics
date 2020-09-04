@@ -65,7 +65,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Processor.Functions
 
             if (message.ArchiveFileName != "")
             {
-                await _batchService.UpdateStatus(message.Release.Id.ToString(), message.DataFileName, IStatus.EXTRACTING_ZIP_FILE);
+                await _batchService.UpdateStatus(message.Release.Id.ToString(), message.DataFileName, IStatus.PROCESSING_ARCHIVE_FILE);
                 await _dataArchiveService.ExtractDataFiles(message.Release.Id, message.ArchiveFileName);
             }
 

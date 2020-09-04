@@ -89,7 +89,7 @@ const errorMappings = [
     target: 'subjectTitle',
     messages: {
       SUBJECT_TITLE_MUST_BE_UNIQUE: 'Subject title must be unique',
-      SUBJECT_TITLE_CANNOT_CONTAIN_SPACES_OR_SPECIAL_CHARACTERS:
+      SUBJECT_TITLE_CANNOT_CONTAIN_SPECIAL_CHARACTERS:
         'Subject title cannot contain spaces or special characters',
     },
   }),
@@ -244,7 +244,10 @@ const ReleaseDataUploadsSection = ({ releaseId, canUpdateRelease }: Props) => {
           is: 'zip',
           then: Yup.file()
             .required('Choose a zip file')
-            .mimeType(['application/zip'], 'Choose a valid ZIP file')
+            .mimeType(
+              ['application/zip', 'application/x-zip-compressed'],
+              'Choose a valid ZIP file',
+            )
             .minSize(0, 'Choose a ZIP file that is not empty'),
         }),
       })}
