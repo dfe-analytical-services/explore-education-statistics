@@ -72,7 +72,9 @@ def delete_theme(theme_id: str):
 def get_theme_id_from_url():
     url = sl.get_location()
     assert '/themes/' in url, 'URL does not contain /themes'
-    return url.lstrip(os.getenv('ADMIN_URL')).split('/')[1]
+    result = url[len(os.getenv('ADMIN_URL')):].lstrip('/').split('/')
+    assert result[0] == 'themes', 'String "themes" should be 1st element in list'
+    return result[1]
 
 
 def get_release_guid_from_release_status_page_url(url):
