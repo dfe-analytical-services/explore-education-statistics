@@ -27,7 +27,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
     public class ReleaseServiceAmendmentTests
     {
         private readonly Guid _userId = Guid.NewGuid();
-        
+
        [Fact]
        public void CreateReleaseAmendmentAsync()
         {
@@ -82,10 +82,10 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
                 Id = Guid.NewGuid(),
                 Name = "Data Block 2"
             };
-            
+
             var release = new Release
             {
-                
+
                 Id = releaseId,
                 Type = releaseType,
                 TypeId = releaseType.Id,
@@ -264,7 +264,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
                 Release = release,
                 ReleaseId = releaseId
             };
-            
+
             var userReleaseRoles = new List<UserReleaseRole>
             {
                 approverReleaseRole,
@@ -279,7 +279,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
                 ReleaseId = releaseId,
                 SubjectId = Guid.NewGuid()
             };
-            
+
             var dataFileReference2 = new ReleaseFileReference
             {
                 Id = Guid.NewGuid(),
@@ -308,13 +308,13 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
                     ReleaseFileReferenceId = dataFileReference2.Id
                 }
             };
-            
+
             var subject1 = new Subject
             {
                 Id = Guid.NewGuid(),
                 Name = "Subject 1"
             };
-            
+
             var subject2 = new Subject
             {
                 Id = Guid.NewGuid(),
@@ -361,7 +361,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
                 });
 
                 statisticsDbContext.Subject.AddRange(subject1, subject2);
-                
+
                 statisticsDbContext.ReleaseSubject.AddRange(
                     new ReleaseSubject
                     {
@@ -379,7 +379,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
             }
 
             var newReleaseId = Guid.Empty;
-            
+
             using (var contentDbContext = InMemoryApplicationDbContext("CreateReleaseAmendment"))
             {
                 using (var statisticsDbContext = InMemoryStatisticsDbContext("CreateReleaseAmendment"))
@@ -392,14 +392,14 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
                         importStatusService.Object, footnoteService.Object, statisticsDbContext,
                         dataBlockService.Object, releaseSubjectService.Object, new SequentialGuidGenerator());
 
-                    // Method under test 
+                    // Method under test
                     var amendmentViewModel = releaseService.CreateReleaseAmendmentAsync(releaseId).Result.Right;
                     Assert.NotEqual(release.Id, amendmentViewModel.Id);
                     Assert.NotEqual(Guid.Empty, amendmentViewModel.Id);
                     newReleaseId = amendmentViewModel.Id;
                 }
             }
-            
+
             using (var contentDbContext = InMemoryApplicationDbContext("CreateReleaseAmendment"))
             {
                 var amendment = contentDbContext
@@ -424,7 +424,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
                 Assert.Null( amendment.Published);
                 Assert.Equal(release.Version + 1, amendment.Version);
                 Assert.Equal(ReleaseStatus.Draft, amendment.Status);
-                Assert.Equal(release.Id, amendment.PreviousVersion.Id);
+                Assert.Equal(release.Id, amendment.PreviousVersion?.Id);
                 Assert.Equal(release.Id, amendment.PreviousVersionId);
                 Assert.Equal(_userId, amendment.CreatedBy.Id);
                 Assert.Equal(_userId, amendment.CreatedById);
@@ -433,11 +433,11 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
 
                 Assert.Equal(releaseType, amendment.Type);
                 Assert.Equal(releaseType.Id, amendment.TypeId);
-                Assert.Equal(nextReleaseDate, amendment.NextReleaseDate); 
+                Assert.Equal(nextReleaseDate, amendment.NextReleaseDate);
                 Assert.Equal(releaseName, amendment.ReleaseName);
                 Assert.Equal(timePeriodCoverage, amendment.TimePeriodCoverage);
                 Assert.Equal(publicationId, amendment.PublicationId);
-                
+
                 Assert.Equal(release.RelatedInformation.Count, amendment.RelatedInformation.Count);
                 amendment.RelatedInformation.ForEach(amended =>
                 {
@@ -445,7 +445,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
                     var previous = release.RelatedInformation[index];
                     AssertAmendedLinkCorrect(amended, previous);
                 });
-                
+
                 Assert.Equal(release.Updates.Count, amendment.Updates.Count);
                 amendment.Updates.ForEach(amended =>
                 {
@@ -453,7 +453,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
                     var previous = release.Updates[index];
                     AssertAmendedUpdateCorrect(amended, previous, amendment);
                 });
-             
+
                 Assert.Equal(release.Content.Count, amendment.Content.Count);
                 amendment.Content.ForEach(amended =>
                 {
@@ -461,21 +461,21 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
                     var previous = release.Content[index];
                     AssertAmendedContentSectionCorrect(amendment, amended, previous);
                 });
-                
+
                 Assert.Equal(release.ContentBlocks.Count, amendment.ContentBlocks.Count);
                 var amendmentContentBlock1 = amendment.ContentBlocks[0].ContentBlock;
                 var amendmentContentBlock2 = amendment.ContentBlocks[1].ContentBlock;
                 var amendmentContentBlock1InContent = amendment.Content[0].ContentSection.Content[0];
 
                 // Check that the DataBlock that is included in this Release amendment's Content is successfully
-                // identified as the exact same DataBlock that is attached to the Release amendment through the 
+                // identified as the exact same DataBlock that is attached to the Release amendment through the
                 // additional "Release.ContentBlocks" relationship (which is used to determine which Data Blocks
-                // belong to which Release when a Data Block has not yet been - or is removed from - the Release's 
+                // belong to which Release when a Data Block has not yet been - or is removed from - the Release's
                 // Content
                 Assert.NotEqual(dataBlock1.Id, amendmentContentBlock1.Id);
                 Assert.Equal(amendmentContentBlock1, amendmentContentBlock1InContent);
-                
-                // and check that the Data Block that is not yet included in any content is copied across OK still 
+
+                // and check that the Data Block that is not yet included in any content is copied across OK still
                 Assert.NotEqual(dataBlock2.Id, amendmentContentBlock2.Id);
                 Assert.Equal((amendmentContentBlock2 as DataBlock).Name, dataBlock2.Name);
 
@@ -483,7 +483,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
                     .UserReleaseRoles
                     .Where(r => r.ReleaseId == amendment.Id)
                     .ToList();
-                
+
                 Assert.Equal(userReleaseRoles.Count, amendmentReleaseRoles.Count);
                 var approverAmendmentRole = amendmentReleaseRoles.First(r => r.Role == ReleaseRole.Approver);
                 AssertAmendedReleaseRoleCorrect(approverReleaseRole, approverAmendmentRole, amendment);
@@ -497,7 +497,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
                     .Include(f => f.ReleaseFileReference)
                     .Where(f => f.ReleaseId == amendment.Id)
                     .ToList();
-                
+
                 Assert.Equal(releaseFiles.Count, amendmentDataFiles.Count);
 
                 var amendmentDataFile = amendmentDataFiles[0];
@@ -519,7 +519,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
                     .ReleaseSubject
                     .Where(r => r.ReleaseId == newReleaseId)
                     .ToList();
-                
+
                 Assert.Equal(2, releaseSubjectLinks.Count);
                 Assert.Contains(subject1.Id, releaseSubjectLinks.Select(r => r.SubjectId));
                 Assert.Contains(subject2.Id, releaseSubjectLinks.Select(r => r.SubjectId));
@@ -592,19 +592,19 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
 
        private static void AssertAmendedReleaseFileCorrect(ReleaseFile originalFile, ReleaseFile amendmentDataFile, Release amendment)
        {
-           // assert it's a new link table entry between the Release amendment and the data file reference 
+           // assert it's a new link table entry between the Release amendment and the data file reference
            Assert.NotEqual(originalFile.Id, amendmentDataFile.Id);
            Assert.Equal(amendment, amendmentDataFile.Release);
            Assert.Equal(amendment.Id, amendmentDataFile.ReleaseId);
-           
+
            // and assert that the file referenced is the SAME file reference as linked from the original Release's
            // link table entry
            Assert.Equal(originalFile.ReleaseFileReference.Id, amendmentDataFile.ReleaseFileReference.Id);
        }
 
        private (
-            Mock<IUserService>, 
-            Mock<IPersistenceHelper<ContentDbContext>>, 
+            Mock<IUserService>,
+            Mock<IPersistenceHelper<ContentDbContext>>,
             Mock<IPublishingService>,
             Mock<IReleaseRepository>,
             Mock<ISubjectService>,
@@ -625,14 +625,14 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
             var persistenceHelper = MockUtils.MockPersistenceHelper<ContentDbContext>();
             MockUtils.SetupCall<ContentDbContext, Release>(persistenceHelper);
             MockUtils.SetupCall<ContentDbContext, Publication>(persistenceHelper);
-            
+
             return (
-                userService, 
-                persistenceHelper, 
-                new Mock<IPublishingService>(), 
+                userService,
+                persistenceHelper,
+                new Mock<IPublishingService>(),
                 new Mock<IReleaseRepository>(),
-                new Mock<ISubjectService>(), 
-                new Mock<ITableStorageService>(), 
+                new Mock<ISubjectService>(),
+                new Mock<ITableStorageService>(),
                 new Mock<IReleaseFilesService>(),
                 new Mock<IImportStatusService>(),
                 new Mock<IFootnoteService>(),

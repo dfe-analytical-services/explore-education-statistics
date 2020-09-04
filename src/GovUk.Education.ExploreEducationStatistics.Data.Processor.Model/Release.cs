@@ -10,7 +10,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Processor.Model
         public Publication Publication { get; set; }
         public TimeIdentifier TimeIdentifier { get; set; }
         public int Year { get; set; }
-        public Guid PreviousVersionId { get; set; }
+        public Guid? PreviousVersionId { get; set; }
 
         public override string ToString()
         {

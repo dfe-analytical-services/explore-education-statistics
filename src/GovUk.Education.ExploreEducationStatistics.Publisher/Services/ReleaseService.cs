@@ -60,7 +60,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Publisher.Services
             return await _contentDbContext.Releases
                 .Include(r => r.PreviousVersion)
                 .Include(r => r.Publication)
-                .Where(r => releaseIds.Contains(r.Id) && r.PreviousVersionId != r.Id)
+                .Where(r => releaseIds.Contains(r.Id) && r.PreviousVersionId != null)
                 .ToListAsync();
         }
 
@@ -156,7 +156,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Publisher.Services
                 await _statisticsDbContext.SaveChangesAsync();
             }
         }
-        
+
         public List<ReleaseFileReference> GetReleaseFileReferences(Guid releaseId, params ReleaseFileTypes[] types)
         {
             return _contentDbContext
@@ -171,7 +171,10 @@ namespace GovUk.Education.ExploreEducationStatistics.Publisher.Services
         public async Task DeletePreviousVersionsStatisticalData(params Guid[] releaseIds)
         {
             var releases = await GetAmendedReleases(releaseIds);
-            var previousVersions = releases.Select(r => r.PreviousVersionId).ToList();
+            var previousVersions = releases.Select(r => r.PreviousVersionId)
+                .Where(id => id.HasValue)
+                .Cast<Guid>()
+                .ToList();
 
             foreach (var previousVersion in previousVersions)
             {
@@ -189,7 +192,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Publisher.Services
             var releases = await _statisticsDbContext.Release
                 .Where(r => releaseIds.Contains(r.Id))
                 .ToListAsync();
-            
+
             _statisticsDbContext.Release.RemoveRange(releases);
         }
     }
