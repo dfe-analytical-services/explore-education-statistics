@@ -151,10 +151,12 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Services
                                     
                                     return new DataFileInfo
                                     {
+                                        // TODO size and rows are for zip file but they need to be for 
+                                        // the datafile which isn't extracted yet
                                         Id = source.Id,
                                         Extension = GetExtension(file),
                                         Name = GetName(file),
-                                        Path = file.Name,
+                                        Path = dataFile.Name.ToLower(),
                                         Size = GetSize(file),
                                         MetaFileName = GetMetaFileName(file),
                                         Rows = GetNumberOfRows(file),
@@ -181,8 +183,18 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Services
                         await _importService.RemoveImportTableRowIfExists(releaseId, dataFileName);
                         await DeleteFileFromStorageAsync(blobContainer, AdminReleasePath(releaseId, ReleaseFileTypes.Data, dataFileName));
                         await DeleteFileFromStorageAsync(blobContainer, AdminReleasePath(releaseId, ReleaseFileTypes.Metadata, metaFilename));
+                        var dataFileRef = await GetReleaseFileLinkAsync(releaseId, dataFileName, ReleaseFileTypes.Data);
+                        var sourceId = dataFileRef.ReleaseFileReference.SourceId;
                         await DeleteFileReference(releaseId, dataFileName, ReleaseFileTypes.Data);
                         await DeleteFileReference(releaseId, metaFilename, ReleaseFileTypes.Metadata);
+
+                        if (sourceId != null)
+                        {
+                            var sourceRef = await GetReleaseFileReference(sourceId.Value);
+                            await DeleteFileFromStorageAsync(blobContainer, AdminReleasePath(releaseId, ReleaseFileTypes.DataZip, sourceRef.Filename));
+                            // N.B. Not ReleaseFies row for source links
+                            _context.ReleaseFileReferences.Remove(sourceRef);
+                        }
                     }
                     else
                     {
