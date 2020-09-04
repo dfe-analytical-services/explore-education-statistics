@@ -14,7 +14,8 @@ namespace GovUk.Education.ExploreEducationStatistics.Publisher.Tests.Utils
             var release1Version1 = new Release
             {
                 Id = Guid.NewGuid(),
-                Published = DateTime.UtcNow.AddSeconds(-1)
+                Published = DateTime.UtcNow.AddSeconds(-1),
+                PreviousVersionId = null
             };
 
             var release1Version2 = new Release
@@ -23,7 +24,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Publisher.Tests.Utils
                 Published = DateTime.UtcNow.AddSeconds(-1),
                 PreviousVersionId = release1Version1.Id
             };
-            
+
             var release1Version3 = new Release
             {
                 Id = Guid.NewGuid(),
@@ -34,11 +35,9 @@ namespace GovUk.Education.ExploreEducationStatistics.Publisher.Tests.Utils
             var release2Version1 = new Release
             {
                 Id = Guid.NewGuid(),
-                Published = DateTime.UtcNow.AddSeconds(-1)
+                Published = DateTime.UtcNow.AddSeconds(-1),
+                PreviousVersionId = null
             };
-
-            // TODO EES-1145 Don't need to do this when PreviousVersionId is made optional
-            SelfReferenceOnlyVersions(release1Version1, release2Version1);
 
             var releases = new List<Release>
             {
@@ -62,7 +61,8 @@ namespace GovUk.Education.ExploreEducationStatistics.Publisher.Tests.Utils
             var release1Version1 = new Release
             {
                 Id = Guid.NewGuid(),
-                Published = DateTime.UtcNow.AddSeconds(-1)
+                Published = DateTime.UtcNow.AddSeconds(-1),
+                PreviousVersionId = null
             };
 
             var release1Version2 = new Release
@@ -89,11 +89,9 @@ namespace GovUk.Education.ExploreEducationStatistics.Publisher.Tests.Utils
             var release2Version1 = new Release
             {
                 Id = Guid.NewGuid(),
-                Published = DateTime.UtcNow.AddSeconds(-1)
+                Published = DateTime.UtcNow.AddSeconds(-1),
+                PreviousVersionId = null
             };
-
-            // TODO EES-1145 Don't need to do this when PreviousVersionId is made optional
-            SelfReferenceOnlyVersions(release1Version1, release2Version1);
 
             var releases = new List<Release>
             {
@@ -150,18 +148,6 @@ namespace GovUk.Education.ExploreEducationStatistics.Publisher.Tests.Utils
             {
                 release.Id
             }));
-        }
-
-        /// <summary>
-        /// TODO EES-1145 Remove this when PreviousVersionId is made optional
-        /// </summary>
-        /// <param name="releases"></param>
-        private static void SelfReferenceOnlyVersions(params Release[] releases)
-        {
-            foreach (var release in releases)
-            {
-                release.PreviousVersionId = release.Id;
-            }
         }
     }
 }
