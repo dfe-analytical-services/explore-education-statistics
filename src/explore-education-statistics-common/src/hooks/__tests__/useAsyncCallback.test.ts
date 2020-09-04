@@ -1,4 +1,6 @@
-import useAsyncCallback from '@common/hooks/useAsyncCallback';
+import useAsyncCallback, {
+  AsyncStateSetterParam,
+} from '@common/hooks/useAsyncCallback';
 import { renderHook } from '@testing-library/react-hooks';
 
 describe('useAsyncCallback', () => {
@@ -66,8 +68,28 @@ describe('useAsyncCallback', () => {
     expect(state.error).toEqual(new Error('some error'));
   });
 
-  test('can manually set loading state using setter', async () => {
-    const { result, wait } = renderHook(() =>
+  test('can manually set `isLoading` state using setter', async () => {
+    const { result, waitFor } = renderHook(() =>
+      useAsyncCallback(() => Promise.resolve('some value')),
+    );
+
+    let [state] = result.current;
+
+    state.setState({
+      isLoading: false,
+    });
+
+    await waitFor(() => {
+      [state] = result.current;
+
+      expect(state.isLoading).toBe(false);
+      expect(state.value).toBeUndefined();
+      expect(state.error).toBeUndefined();
+    });
+  });
+
+  test('setting `isLoading` state as true always unsets `value`', async () => {
+    const { result, waitFor } = renderHook(() =>
       useAsyncCallback(() => Promise.resolve('some value')),
     );
 
@@ -75,9 +97,10 @@ describe('useAsyncCallback', () => {
 
     state.setState({
       isLoading: true,
-    });
+      value: 'a custom value',
+    } as AsyncStateSetterParam<string>);
 
-    await wait(() => {
+    await waitFor(() => {
       [state] = result.current;
 
       expect(state.isLoading).toBe(true);
@@ -86,19 +109,41 @@ describe('useAsyncCallback', () => {
     });
   });
 
-  test('can manually set value state using setter', async () => {
-    const { result, wait } = renderHook(() =>
+  test('setting `isLoading` state as true always unsets `error`', async () => {
+    const { result, waitFor } = renderHook(() =>
+      useAsyncCallback<string>(() =>
+        Promise.reject(new Error('initial error')),
+      ),
+    );
+
+    let [state] = result.current;
+
+    state.setState({
+      isLoading: true,
+      error: new Error('some error'),
+    } as AsyncStateSetterParam<string>);
+
+    await waitFor(() => {
+      [state] = result.current;
+
+      expect(state.isLoading).toBe(true);
+      expect(state.value).toBeUndefined();
+      expect(state.error).toBeUndefined();
+    });
+  });
+
+  test('can manually set `value` state using setter', async () => {
+    const { result, waitFor } = renderHook(() =>
       useAsyncCallback(() => Promise.resolve('some value')),
     );
 
     let [state] = result.current;
 
     state.setState({
-      isLoading: false,
       value: 'a custom value',
     });
 
-    await wait(() => {
+    await waitFor(() => {
       [state] = result.current;
 
       expect(state.isLoading).toBe(false);
@@ -107,19 +152,18 @@ describe('useAsyncCallback', () => {
     });
   });
 
-  test('can manually set error state using setter', async () => {
-    const { result, wait } = renderHook(() =>
+  test('can manually set `error` state using setter', async () => {
+    const { result, waitFor } = renderHook(() =>
       useAsyncCallback(() => Promise.resolve('some value')),
     );
 
     let [state] = result.current;
 
     state.setState({
-      isLoading: false,
       error: new Error('some error'),
     });
 
-    await wait(() => {
+    await waitFor(() => {
       [state] = result.current;
 
       expect(state.isLoading).toBe(false);

@@ -25,7 +25,7 @@ export interface TableQueryOptions {
 export default function useTableQuery(
   query: ReleaseTableDataQuery,
   options: TableQueryOptions = {},
-): AsyncRetryState<FullTable | undefined> {
+): AsyncRetryState<FullTable> {
   const optionsRef = useRef<TableQueryOptions>(options);
   optionsRef.current = options;
 

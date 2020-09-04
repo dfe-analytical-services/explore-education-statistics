@@ -110,7 +110,7 @@ Go to View scheduled releases tab
 
 Invite users to prerelease for scheduled release
     [Tags]  HappyPath
-    ${details}=  user gets child details element  css:[data-testid="releaseByStatusTab ${PUBLICATION_NAME}"]  Calendar Year 2000 (not Live)
+    ${details}=  user gets details content element  Calendar Year 2000 (not Live)  css:[data-testid="releaseByStatusTab ${PUBLICATION_NAME}"]
     user opens details dropdown  Calendar Year 2000 (not Live)  css:[data-testid="releaseByStatusTab ${PUBLICATION_NAME}"]
     user waits until parent contains element   ${details}   xpath:.//*[text()="Manage pre release access"]
 

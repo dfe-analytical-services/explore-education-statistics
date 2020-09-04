@@ -1,5 +1,12 @@
 import logger from '@common/services/logger';
-import { DependencyList, useCallback, useMemo, useRef, useState } from 'react';
+import {
+  DependencyList,
+  SetStateAction,
+  useCallback,
+  useMemo,
+  useRef,
+  useState,
+} from 'react';
 
 export interface AsyncState<T> {
   isLoading: boolean;
@@ -7,21 +14,22 @@ export interface AsyncState<T> {
   error?: Error;
 }
 
-export type AsyncStateSetter<T> =
+export type AsyncStateSetterParam<T> = SetStateAction<
   | {
       isLoading: boolean;
     }
   | {
-      isLoading: false;
+      isLoading?: false;
       value: T;
     }
   | {
-      isLoading: false;
+      isLoading?: false;
       error: Error;
-    };
+    }
+>;
 
 export interface AsyncCallbackState<T> extends AsyncState<T> {
-  setState: (state: AsyncStateSetter<T>) => void;
+  setState: (state: AsyncStateSetterParam<T>) => void;
 }
 
 export type AsyncCallback<Args extends unknown[]> = (...args: Args) => void;
@@ -33,12 +41,14 @@ export type AsyncCallback<Args extends unknown[]> = (...args: Args) => void;
 export default function useAsyncCallback<Value, Args extends unknown[] = []>(
   callback: (...args: Args) => Promise<Value>,
   deps: DependencyList = [],
-  initialState: AsyncState<Value> = {
+  initialState: AsyncStateSetterParam<Value> = {
     isLoading: false,
   },
 ): [AsyncCallbackState<Value>, AsyncCallback<Args>] {
   const previousCall = useRef(0);
-  const [state, setState] = useState<AsyncState<Value>>(initialState);
+  const [state, setState] = useState<AsyncState<Value>>(
+    initialState as AsyncState<Value>,
+  );
 
   const run = useCallback(async (...args: Args) => {
     previousCall.current += 1;
@@ -77,12 +87,28 @@ export default function useAsyncCallback<Value, Args extends unknown[] = []>(
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, deps);
 
+  const stateSetter = useCallback(
+    (setter: AsyncStateSetterParam<Value>) => {
+      const nextState = typeof setter === 'function' ? setter(state) : setter;
+
+      if (nextState.isLoading) {
+        setState({ isLoading: true });
+      } else {
+        setState({
+          ...nextState,
+          isLoading: false,
+        });
+      }
+    },
+    [state],
+  );
+
   const stateReturn: AsyncCallbackState<Value> = useMemo(() => {
     return {
       ...state,
-      setState,
+      setState: stateSetter,
     };
-  }, [state]);
+  }, [state, stateSetter]);
 
   return [stateReturn, run];
 }

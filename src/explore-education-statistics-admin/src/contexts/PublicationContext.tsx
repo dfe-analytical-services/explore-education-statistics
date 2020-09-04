@@ -4,7 +4,6 @@ import publicationService, {
 import useAsyncHandledRetry, {
   AsyncHandledRetryState,
 } from '@common/hooks/useAsyncHandledRetry';
-import { AsyncRetryState } from '@common/hooks/useAsyncRetry';
 import React, { createContext, ReactNode, useContext } from 'react';
 
 const PublicationContext = createContext<
@@ -14,7 +13,7 @@ const PublicationContext = createContext<
 interface PublicationContextProviderProps {
   children:
     | ReactNode
-    | ((state: AsyncRetryState<BasicPublicationDetails>) => ReactNode);
+    | ((state: AsyncHandledRetryState<BasicPublicationDetails>) => ReactNode);
   publicationId: string;
 }
 

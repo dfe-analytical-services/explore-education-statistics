@@ -154,6 +154,7 @@ const Accordion = ({
       id={id}
       ref={ref}
       role="none"
+      data-testid="accordion"
     >
       {isMounted && typeof openAll !== 'boolean' && (
         <div className="govuk-accordion__controls">

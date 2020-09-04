@@ -62,4 +62,59 @@ describe('useAsyncHandledRetry', () => {
     expect(result.current.isLoading).toBe(false);
     expect(result.current.value).toBe('some value');
   });
+
+  test('cannot set error via initial state', async () => {
+    const wrapper: FunctionComponent = ({ children }) => (
+      <ErrorControlContextProvider
+        value={{
+          handleApiErrors: noop,
+          handleManualErrors: {
+            forbidden: noop,
+          },
+        }}
+      >
+        {children}
+      </ErrorControlContextProvider>
+    );
+
+    const { result, waitForValueToChange } = renderHook(
+      () =>
+        useAsyncHandledRetry(() => Promise.resolve(), [], {
+          error: new Error('Test error'),
+        } as never),
+      { wrapper },
+    );
+
+    await waitForValueToChange(() => result.current);
+
+    expect(result.current.isLoading).toBe(false);
+    expect(result.current.value).toBeUndefined();
+    expect((result.current as { error?: Error }).error).not.toBeDefined();
+  });
+
+  test('cannot set error via setter', async () => {
+    const wrapper: FunctionComponent = ({ children }) => (
+      <ErrorControlContextProvider
+        value={{
+          handleApiErrors: noop,
+          handleManualErrors: {
+            forbidden: noop,
+          },
+        }}
+      >
+        {children}
+      </ErrorControlContextProvider>
+    );
+
+    const { result, waitForNextUpdate } = renderHook(
+      () => useAsyncHandledRetry(() => Promise.resolve()),
+      { wrapper },
+    );
+
+    result.current.setState({ error: new Error('test') } as never);
+
+    await waitForNextUpdate();
+
+    expect((result.current as { error?: Error }).error).not.toBeDefined();
+  });
 });

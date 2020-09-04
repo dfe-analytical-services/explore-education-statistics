@@ -147,6 +147,10 @@ user waits until page contains link
     [Arguments]    ${link_text}   ${wait}=${timeout}
     wait until page contains element  xpath://a[text()="${link_text}"]   timeout=${wait}
 
+user waits until element contains link
+    [Arguments]  ${element}  ${link_text}  ${wait}=${timeout}
+    user waits until parent contains element  ${element}  link:${link_text}  timeout=${wait}
+
 user waits until page contains accordion section
     [Arguments]   ${section_title}     ${wait}=${timeout}
     user waits until page contains element  xpath://*[contains(@class,"govuk-accordion__section-button") and text()="${section_title}"]    ${wait}
@@ -164,14 +168,44 @@ user verifies accordion is closed
     user waits until page contains element   xpath://*[@class="govuk-accordion__section-button" and text()="${section_text}" and @aria-expanded="false"]
 
 user checks there are x accordion sections
-    [Arguments]  ${num}
-    # NOTE(mark): When nth-child won't do, you need to do the unholy equivalent of css .class in xpath...
-    page should contain element    xpath:.//*[contains(concat(" ", normalize-space(@class), " "), " govuk-accordion__section ")]       limit=${num}
+    [Arguments]  ${num}  ${parent}=css:body
+    user waits until parent contains element  ${parent}  css:[data-testid="accordionSection"]  limit=${num}
 
 user waits until accordion section contains text
     [Arguments]  ${section_text}   ${text}
-    ${section}=  user gets accordion content element  ${section_text}
+    ${section}=  user gets accordion section content element  ${section_text}
     user waits until parent contains element   ${section}   xpath://*[text()="${text}"]
+
+user gets accordion header button element
+    [Arguments]  ${heading_text}  ${parent}=css:[data-testid="accordion"]
+    ${button}=  get child element  ${parent}  xpath:.//button[@aria-expanded and contains(., "${heading_text}")]
+    [Return]  ${button}
+
+user opens accordion section
+    [Arguments]  ${heading_text}  ${parent}=css:[data-testid="accordion"]
+    ${header_button}=  user gets accordion header button element  ${heading_text}  ${parent}
+    ${is_expanded}=  get element attribute  ${header_button}  aria-expanded
+    run keyword if  '${is_expanded}' != 'true'  user clicks element  ${header_button}
+    user checks element attribute value should be  ${header_button}  aria-expanded  true
+
+user closes accordion section
+    [Arguments]  ${heading_text}  ${parent}=css:[data-testid="accordion"]
+    ${header_button}=  user gets accordion header button element  ${heading_text}  ${parent}
+    ${is_expanded}=  get element attribute  ${header_button}  aria-expanded
+    run keyword if  '${is_expanded}' != 'false'  user clicks element  ${header_button}
+    user checks element attribute value should be  ${header_button}  aria-expanded  false
+
+user gets accordion section content element
+    [Arguments]  ${heading_text}  ${parent}=css:[data-testid="accordion"]
+    ${header_button}=  user gets accordion header button element  ${heading_text}  ${parent}
+    ${content_id}=  get element attribute  ${header_button}  id
+    ${content}=  get child element  ${parent}  css:[aria-labelledby="${content_id}"]
+    [Return]  ${content}
+
+user scrolls to accordion section content
+    [Arguments]  ${heading_text}  ${parent}=css:[data-testid="accordion"]
+    ${content}=  user gets accordion section content element  ${heading_text}  ${parent}
+    user scrolls to element  ${content}
 
 user waits until page contains testid
     [Arguments]  ${id}   ${wait}=${timeout}
@@ -257,8 +291,7 @@ user clicks link
 
 user clicks button
     [Arguments]   ${text}  ${parent}=css:body
-    user waits until parent contains element  ${parent}  xpath:.//button[text()="${text}"]
-    ${button}=  get child element  ${parent}  xpath:.//button[text()="${text}"]
+    ${button}=  user gets button element  ${text}  ${parent}
     user clicks element  ${button}
 
 user waits until page contains button
@@ -272,6 +305,12 @@ user checks page does not contain button
 user waits until button is enabled
     [Arguments]   ${text}
     user waits until element is enabled  xpath://button[text()="${text}"]
+
+user gets button element
+    [Arguments]   ${text}  ${parent}=css:body
+     user waits until parent contains element  ${parent}  xpath:.//button[text()="${text}"]
+     ${button}=  get child element  ${parent}  xpath:.//button[text()="${text}"]
+     [Return]  ${button}
 
 user checks page contains tag
     [Arguments]   ${text}
@@ -308,7 +347,7 @@ user checks radio option for "${radiogroupId}" should be "${expectedLabelText}"
     user checks page contains element  css:#${radiogroupId} [data-testid="${expectedLabelText}"]:checked
 
 user checks summary list contains
-    [Arguments]  ${term}    ${description}   ${wait}=${timeout}  ${parent}=css:body
+    [Arguments]  ${term}    ${description}   ${parent}=css:body  ${wait}=${timeout}
     user waits until parent contains element  ${parent}  xpath:.//dl//dt[contains(text(), "${term}")]/following-sibling::dd[contains(., "${description}")]    timeout=${wait}
     ${element}=  get child element  ${parent}  xpath:.//dl//dt[contains(text(), "${term}")]/following-sibling::dd[contains(., "${description}")]
     user waits until element is visible  ${element}
@@ -354,13 +393,44 @@ user checks page contains link with text and url
     [Arguments]  ${text}  ${href}
     user checks page contains element  xpath://a[@href="${href}" and text()="${text}"]
 
+user checks link has url
+    [Arguments]  ${link}  ${url}  ${parent}=css:body
+    user waits until parent contains element  ${parent}  xpath://a[@href="${url}" and text()="${link}"]
+
 user opens details dropdown
     [Arguments]  ${text}  ${parent}=css:body
+    user waits until parent contains element  ${parent}  xpath:.//details/summary[contains(., "${text}") and @aria-expanded]
+    ${summary}=  get child element  ${parent}  xpath:.//details/summary[contains(., "${text}")]
+    user waits until element is visible  ${summary}
+    ${is_expanded}=  get element attribute  ${summary}  aria-expanded
+    run keyword if  '${is_expanded}' != 'true'  user clicks element  ${summary}
+    user checks element attribute value should be  ${summary}  aria-expanded  true
+
+user closes details dropdown
+    [Arguments]  ${text}  ${parent}=css:body
+    user waits until parent contains element  ${parent}  xpath:.//details/summary[contains(., "${text}") and @aria-expanded]
+    ${summary}=  get child element  ${parent}  xpath:.//details/summary[contains(., "${text}")]
+    user waits until element is visible  ${summary}
+    ${is_expanded}=  get element attribute  ${summary}  aria-expanded
+    run keyword if  '${is_expanded}' != 'false'  user clicks element  ${summary}
+    user checks element attribute value should be  ${summary}  aria-expanded  false
+
+user gets details content element
+    [Arguments]  ${text}  ${parent}=css:body
     user waits until parent contains element  ${parent}  xpath:.//details/summary[contains(., "${text}")]
-    ${elem}=  get child element  ${parent}  xpath:.//details/summary[contains(., "${text}")]
-    user waits until element is visible  ${elem}
-    user clicks element  ${elem}
-    user waits until parent contains element  ${parent}  xpath:.//details/summary[@aria-expanded="true" and contains(., "${text}")]
+    ${summary}=  get child element  ${parent}  xpath:.//details/summary[contains(., "${text}")]
+    ${content_id}=  get element attribute  ${summary}  aria-controls
+    ${content}=  get child element  ${parent}  id:${content_id}
+    [Return]  ${content}
+
+user waits until details contains element
+    [Arguments]  ${text}  ${element}  ${parent}=css:body
+    ${details}=  user gets details content element  ${text}  ${parent}
+    user waits until parent contains element  ${details}  ${element}
+
+user waits until details contains link
+    [Arguments]  ${text}  ${link}  ${parent}=css:body
+    user waits until details contains element  ${text}  link:${link}  ${parent}
 
 user checks publication bullet contains link
     [Arguments]   ${publication}   ${link}
