@@ -58,7 +58,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Services
             aQueue.CreateIfNotExists();
             // TODO - EES-1250
             var numRows = isZip ? 0 : FileStorageUtils.CalculateNumberOfRows(dataFile.OpenReadStream());
-            var message = BuildMessage(dataFileName, metaFileName, releaseId, isZip ? dataFile.FileName : "");
+            var message = BuildMessage(dataFileName, metaFileName, releaseId, isZip ? dataFile.FileName.ToLower() : "");
             
             await UpdateImportTableRow(
                 releaseId,
@@ -126,7 +126,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Services
                 Release = importMessageRelease,
                 NumBatches = 1,
                 BatchNo = 1,
-                ZipFileName = zipFileName
+                ArchiveFileName = zipFileName
             };
         }
     }

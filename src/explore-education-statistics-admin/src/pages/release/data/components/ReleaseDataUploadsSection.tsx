@@ -88,6 +88,8 @@ const errorMappings = [
     target: 'subjectTitle',
     messages: {
       SUBJECT_TITLE_MUST_BE_UNIQUE: 'Subject title must be unique',
+      SUBJECT_TITLE_CANNOT_CONTAIN_SPACES_OR_SPECIAL_CHARACTERS:
+        'Subject title cannot contain spaces or special characters',
     },
   }),
 ];

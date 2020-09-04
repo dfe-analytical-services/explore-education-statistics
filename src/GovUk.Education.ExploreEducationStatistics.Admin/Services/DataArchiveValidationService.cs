@@ -11,27 +11,26 @@ using Microsoft.Azure.Storage.Blob;
 using static GovUk.Education.ExploreEducationStatistics.Admin.Validators.ValidationErrorMessages;
 using static GovUk.Education.ExploreEducationStatistics.Admin.Validators.ValidationUtils;
 using static GovUk.Education.ExploreEducationStatistics.Admin.Validators.FileTypeValidationUtils;
-using static GovUk.Education.ExploreEducationStatistics.Common.BlobContainerNames;
 using static GovUk.Education.ExploreEducationStatistics.Common.Services.FileStoragePathUtils;
 
 namespace GovUk.Education.ExploreEducationStatistics.Admin.Services
 {
-    public class DataZipArchiveService : IDataZipArchiveService
+    public class DataArchiveValidationService : IDataArchiveValidationService
     {
         private readonly IFileTypeService _fileTypeService;
-
+        
         private static readonly Dictionary<ReleaseFileTypes, IEnumerable<Regex>> AllowedMimeTypesByFileType = 
             new Dictionary<ReleaseFileTypes, IEnumerable<Regex>>
             {
                 { ReleaseFileTypes.DataZip, AllowedZipMimeTypes }
             };
         
-        public DataZipArchiveService(IFileTypeService fileTypeService)
+        public DataArchiveValidationService(IFileTypeService fileTypeService)
         {
             _fileTypeService = fileTypeService;
         }
 
-        public async Task<Either<ActionResult, Tuple<ZipArchiveEntry, ZipArchiveEntry>>> GetArchiveEntries(
+        public async Task<Either<ActionResult, Tuple<ZipArchiveEntry, ZipArchiveEntry>>> ValidateArchiveEntries(
             CloudBlobContainer blobContainer, Guid releaseId, IFormFile zipFile)
         {
             if (!IsZipFile(zipFile))

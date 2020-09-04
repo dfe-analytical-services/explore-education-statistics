@@ -137,5 +137,8 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Validators
         ReleaseNotApproved,
         ApprovedReleaseMustHavePublishScheduledDate,
         PublishedReleaseCannotBeUnapproved,
+        
+        // Subject
+        SubjectTitleCannotContainSpacesOrSpecialCharacters,
     }
 }

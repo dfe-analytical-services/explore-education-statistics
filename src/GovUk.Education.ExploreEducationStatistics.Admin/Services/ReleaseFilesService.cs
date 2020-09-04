@@ -37,14 +37,14 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Services
         private readonly IImportService _importService;
         private readonly IFileUploadsValidatorService _fileUploadsValidatorService;
         private readonly ISubjectService _subjectService;
-        private readonly IDataZipArchiveService _dataZipArchiveService;
+        private readonly IDataArchiveValidationService _dataArchiveValidationService;
 
         private const string NameKey = "name";
 
         public ReleaseFilesService(IConfiguration config, IUserService userService,
             IPersistenceHelper<ContentDbContext> persistenceHelper, ContentDbContext context,
             IImportService importService, IFileUploadsValidatorService fileUploadsValidatorService,
-            ISubjectService subjectService, IDataZipArchiveService dataZipArchiveService)
+            ISubjectService subjectService, IDataArchiveValidationService dataArchiveValidationService)
         {
             _storageConnectionString = config.GetValue<string>("CoreStorage");
             _userService = userService;
@@ -53,7 +53,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Services
             _importService = importService;
             _fileUploadsValidatorService = fileUploadsValidatorService;
             _subjectService = subjectService;
-            _dataZipArchiveService = dataZipArchiveService;
+            _dataArchiveValidationService = dataArchiveValidationService;
         }
 
         public async Task<Either<ActionResult, IEnumerable<FileInfo>>> ListPublicFilesPreview(Guid releaseId,
@@ -107,7 +107,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Services
                 {
                     var blobContainer = await GetCloudBlobContainer();
 
-                    return await _dataZipArchiveService.GetArchiveEntries(blobContainer, releaseId, zipFile)
+                    return await _dataArchiveValidationService.ValidateArchiveEntries(blobContainer, releaseId, zipFile)
                         .OnSuccess(async dataFiles =>
                         {
                             var dataFile = dataFiles.Item1;
@@ -124,7 +124,8 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Services
                                     await _context.SaveChangesAsync();
                                     await UploadFileToStorageAsync(blobContainer, releaseId, zipFile, ReleaseFileTypes.DataZip, dataInfo);
                                     await _importService.Import(releaseId, dataFile.Name.ToLower(), 
-                                        metadataFile.Name.ToLower(), zipFile, true);                                    return true;
+                                        metadataFile.Name.ToLower(), zipFile, true);
+                                    return true;
                                 });
                         });
                 });
@@ -656,26 +657,6 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Services
         {
             return blob.Metadata.TryGetValue(NumberOfRows, out var numberOfRows) &&
                    int.TryParse(numberOfRows, out var numberOfRowsValue) ? numberOfRowsValue : 0;
-        }
-
-        private static string GetUserName(CloudBlob blob)
-        {
-            return blob.Metadata.TryGetValue(UserName, out var name) ? name : "";
-        }
-
-        private static async Task AddMetaValuesAsync(CloudBlob blob, IDictionary<string, string> values)
-        {
-            foreach (var (key, value) in values)
-            {
-                if (blob.Metadata.ContainsKey(key))
-                {
-                    blob.Metadata.Remove(key);
-                }
-
-                blob.Metadata.Add(key, value);
-            }
-
-            await blob.SetMetadataAsync();
         }
 
         private async Task<bool> DeletionWillOrphanFileAsync(Guid releaseId, string filename,

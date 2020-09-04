@@ -303,7 +303,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin
             StartupSecurityConfiguration.ConfigureResourceBasedAuthorization(services);
 
             services.AddTransient<IFileTypeService, FileTypeService>();
-            services.AddTransient<IDataZipArchiveService, DataZipArchiveService>();
+            services.AddTransient<IDataArchiveValidationService, DataArchiveValidationService>();
 
             services.AddSwaggerGen(c =>
             {

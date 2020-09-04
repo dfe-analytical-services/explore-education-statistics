@@ -9,10 +9,10 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Services.Interfaces
 {
     public interface IFileUploadsValidatorService
     {
-        Task<Either<ActionResult, bool>> ValidateFileForUpload(Guid releaseId, IFormFile file, ReleaseFileTypes type, bool overwrite);
-        Task<Either<ActionResult, bool>> ValidateDataFilesForUpload(Guid releaseId, IFormFile dataFile, IFormFile metaFile, string name);
-        Task<Either<ActionResult, bool>> ValidateZippedDataFileForUpload(Guid releaseId, ZipArchiveEntry dataFile,
+        Task<Either<ActionResult, Unit>> ValidateFileForUpload(Guid releaseId, IFormFile file, ReleaseFileTypes type, bool overwrite);
+        Task<Either<ActionResult, Unit>> ValidateDataFilesForUpload(Guid releaseId, IFormFile dataFile, IFormFile metaFile, string name);
+        Task<Either<ActionResult, Unit>> ValidateZippedDataFileForUpload(Guid releaseId, ZipArchiveEntry dataFile,
             ZipArchiveEntry metaFile, string name);
-        Task<Either<ActionResult, bool>> ValidateUploadFileType(IFormFile file, ReleaseFileTypes type);
+        Task<Either<ActionResult, Unit>> ValidateUploadFileType(IFormFile file, ReleaseFileTypes type);
     }
 }

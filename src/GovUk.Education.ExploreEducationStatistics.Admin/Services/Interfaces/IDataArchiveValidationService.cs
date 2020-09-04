@@ -8,9 +8,9 @@ using Microsoft.Azure.Storage.Blob;
 
 namespace GovUk.Education.ExploreEducationStatistics.Admin.Services.Interfaces
 {
-    public interface IDataZipArchiveService
+    public interface IDataArchiveValidationService
     {
-        Task<Either<ActionResult, Tuple<ZipArchiveEntry, ZipArchiveEntry>>> GetArchiveEntries(CloudBlobContainer blobContainer,
+        Task<Either<ActionResult, Tuple<ZipArchiveEntry, ZipArchiveEntry>>> ValidateArchiveEntries(CloudBlobContainer blobContainer,
             Guid releaseId, IFormFile zipFile);
     }
 }
