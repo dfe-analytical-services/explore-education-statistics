@@ -42,7 +42,7 @@ Create new release
 Verify release summary
     [Tags]  HappyPath
     user checks page contains element   xpath://li/a[text()="Release summary" and contains(@aria-current, 'page')]
-    user waits until page contains heading 2  Release summary
+    user waits until h2 is visible  Release summary
     user checks summary list contains  Publication title  ${PUBLICATION_NAME}
 
 Upload subject
@@ -54,7 +54,7 @@ Upload subject
     user chooses file   css:#dataFileUploadForm-metadataFile   ${CURDIR}${/}files${/}${DATA_FILE_NAME}.meta.csv
     user clicks button  Upload data files
 
-    user waits until page contains heading 2  Uploaded data files
+    user waits until h2 is visible  Uploaded data files
     user waits until page contains accordion section   ${SUBJECT_NAME}
     user opens accordion section   ${SUBJECT_NAME}
     user checks page contains element   xpath://dt[text()="Subject title"]/../dd/h4[text()="${SUBJECT_NAME}"]
@@ -100,7 +100,7 @@ Open Manage data blocks tab
 Navigate to Manage data blocks tab
     [Tags]  HappyPath
     user clicks link    Manage data blocks
-    user waits until page contains heading 2   Choose a subject
+    user waits until h2 is visible   Choose a subject
 
 Select subject "${SUBJECT_NAME}" (data block)
     [Tags]  HappyPath
@@ -110,21 +110,21 @@ Select subject "${SUBJECT_NAME}" (data block)
 
 Select locations (data block)
     [Tags]   HappyPath
-    user waits until page contains heading 2  Choose locations
+    user waits until h2 is visible  Choose locations
     user opens details dropdown   National
     user clicks checkbox   England
     user clicks element     css:#locationFiltersForm-submit
 
 Select time period
     [Tags]   HappyPath
-    user waits until page contains heading 2  Choose time period
+    user waits until h2 is visible  Choose time period
     user selects from list by label  id:timePeriodForm-start    2020 Week 13
     user selects from list by label  id:timePeriodForm-end      2021 Week 24
     user clicks element     css:#timePeriodForm-submit
 
 Select indicators (data block)
     [Tags]  HappyPath
-    user waits until page contains heading 2  Choose your filters
+    user waits until h2 is visible  Choose your filters
     user clicks button  Select all 2 subgroup options
 
 Select category filters (data block)
@@ -166,9 +166,9 @@ Add data block to release
     user clicks button  Add secondary stats
     user waits until page contains element  secondaryStats-dataBlockSelectForm-selectedDataBlock
     user selects from list by label  secondaryStats-dataBlockSelectForm-selectedDataBlock  ${FOOTNOTE_DATABLOCK_NAME}
+    user waits until page contains element    css:table
     user clicks button  Embed
-    user waits until page contains link  Table
-    user clicks link  Table
+    user clicks element   id:releaseHeadlines-dataBlock-tables-tab
     user checks page contains  ${FOOTNOTE_TEXT_2}
     user checks page does not contain  ${FOOTNOTE_TEXT_1}
 
@@ -207,22 +207,22 @@ Check footnote in Preview content mode
 Go to "Release status" tab
     [Tags]  HappyPath
     user clicks link   Release status
-    user waits until page contains heading 2  Release status
+    user waits until h2 is visible  Release status
     user waits until page contains button  Edit release status
 
 Approve release
     [Tags]  HappyPath
-    ${PUBLISH_DATE_DAY}=  get datetime  %d
-    ${PUBLISH_DATE_MONTH}=  get datetime  %m
-    ${PUBLISH_DATE_MONTH_WORD}=  get datetime  %B
-    ${PUBLISH_DATE_YEAR}=  get datetime  %Y
+    ${PUBLISH_DATE_DAY}=  get current datetime  %-d
+    ${PUBLISH_DATE_MONTH}=  get current datetime  %-m
+    ${PUBLISH_DATE_MONTH_WORD}=  get current datetime  %B
+    ${PUBLISH_DATE_YEAR}=  get current datetime  %Y
     set suite variable  ${PUBLISH_DATE_DAY}
     set suite variable  ${PUBLISH_DATE_MONTH}
     set suite variable  ${PUBLISH_DATE_MONTH_WORD}
     set suite variable  ${PUBLISH_DATE_YEAR}
 
     user clicks button  Edit release status
-    user waits until page contains heading 2  Edit release status
+    user waits until h2 is visible  Edit release status
 
     user clicks element   css:input[data-testid="Approved for publication"]
     user enters text into element  id:releaseStatusForm-internalReleaseNote  Approved by UI tests
@@ -234,7 +234,7 @@ Approve release
 
 Verify release is scheduled
     [Tags]  HappyPath
-    user waits until page contains heading 2  Release status
+    user waits until h2 is visible  Release status
     user checks summary list contains  Current status  Approved
     user checks summary list contains  Scheduled release  ${PUBLISH_DATE_DAY} ${PUBLISH_DATE_MONTH_WORD} ${PUBLISH_DATE_YEAR}
     user checks summary list contains  Next release expected  December 3001
@@ -249,14 +249,14 @@ User goes to public Find Statistics page
     [Tags]  HappyPath
     environment variable should be set   PUBLIC_URL
     user goes to url   %{PUBLIC_URL}/find-statistics
-    user waits until page contains heading 1  Find statistics and data
+    user waits until h1 is visible  Find statistics and data
     user waits for page to finish loading
 
 Verify newly published release is on Find Statistics page
     [Tags]  HappyPath
-    user checks page contains accordion   Test theme
+    user waits until page contains accordion section   Test theme
     user opens accordion section  Test theme
-    user checks accordion section contains text   Test theme   ${TOPIC_NAME}
+    user waits until accordion section contains text   Test theme   ${TOPIC_NAME}
 
     user opens details dropdown  ${TOPIC_NAME}
     user waits until details dropdown contains publication    ${TOPIC_NAME}  ${PUBLICATION_NAME}   10
@@ -266,8 +266,8 @@ Verify newly published release is on Find Statistics page
 
 Navigate to newly published release page
     [Tags]  HappyPath
-    user clicks element   css:[data-testid="view-stats-ui-tests-footnotes-%{RUN_IDENTIFIER}"]
-    user waits until page contains heading 1  ${PUBLICATION_NAME}  90
+    user clicks testid element  View stats link for ${PUBLICATION_NAME}
+    user waits until h1 is visible  ${PUBLICATION_NAME}  90
 
 Check footnote on data block
     [Tags]  HappyPath
@@ -299,21 +299,21 @@ Choose subject (table tool)
 
 Select locations (table tool)
     [Tags]   HappyPath
-    user waits until page contains heading 2  Choose locations
+    user waits until h2 is visible  Choose locations
     user opens details dropdown   National
     user clicks checkbox   England
     user clicks element     css:#locationFiltersForm-submit
 
 Select time period (table tool)
     [Tags]   HappyPath
-    user waits until page contains heading 2  Choose time period
+    user waits until h2 is visible  Choose time period
     user selects from list by label  id:timePeriodForm-start    2020 Week 13
     user selects from list by label  id:timePeriodForm-end      2021 Week 24
     user clicks element     css:#timePeriodForm-submit
 
 Select indicators (table tool)
     [Tags]  HappyPath
-    user waits until page contains heading 2  Choose your filters
+    user waits until h2 is visible  Choose your filters
     user clicks button  Select all 2 subgroup options
 
 Select category filters (table tool)

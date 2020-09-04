@@ -33,13 +33,13 @@ Create new release
 Verify release summary
     [Tags]  HappyPath
     user checks page contains element   xpath://li/a[text()="Release summary" and contains(@aria-current, 'page')]
-    user waits until page contains heading 2  Release summary
+    user waits until h2 is visible  Release summary
     user checks summary list contains  Publication title  ${PUBLICATION_NAME}
 
 Go to "Release status" tab
     [Tags]  HappyPath
     user clicks link   Release status
-    user waits until page contains heading 2  Release status
+    user waits until h2 is visible  Release status
     user waits until page contains button  Edit release status
 
 Submit release for Higher Review
@@ -53,7 +53,7 @@ Submit release for Higher Review
 
 Verify release status is Higher Review
     [Tags]  HappyPath
-    user waits until page contains heading 2  Release status
+    user waits until h2 is visible  Release status
     user checks summary list contains  Current status  Awaiting higher review
     user checks summary list contains  Scheduled release  Not scheduled
     user checks summary list contains  Next release expected  December 3001
@@ -61,7 +61,7 @@ Verify release status is Higher Review
 Approve release
     [Tags]  HappyPath
     user clicks button  Edit release status
-    user waits until page contains heading 2  Edit release status
+    user waits until h2 is visible  Edit release status
 
     user clicks radio   Approved for publication
     user enters text into element   id:releaseStatusForm-internalReleaseNote    Approved for release
@@ -78,7 +78,7 @@ Approve release
 
 Verify release status is Approved
     [Tags]  HappyPath
-    user waits until page contains heading 2  Release status
+    user waits until h2 is visible  Release status
     user checks summary list contains  Current status  Approved
     user checks summary list contains  Scheduled release  1 December 3000
     user checks summary list contains  Next release expected  March 3002
@@ -98,7 +98,7 @@ Move release status back to Draft
 
 Verify release status is Draft
     [Tags]  HappyPath
-    user waits until page contains heading 2  Release status
+    user waits until h2 is visible  Release status
     user checks summary list contains  Current status  Draft
     user checks summary list contains  Scheduled release  Not scheduled
     user checks summary list contains  Next release expected  January 3001

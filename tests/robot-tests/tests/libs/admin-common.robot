@@ -8,10 +8,10 @@ user signs in as bau1
     run keyword if  ${open_browser}  user opens the browser
     environment variable should be set   ADMIN_URL
     user goes to url  %{ADMIN_URL}
-    user waits until page contains heading 1    Sign in
+    user waits until h1 is visible    Sign in
     user signs in as  ADMIN
 
-    user waits until page contains heading 1   Dashboard
+    user waits until h1 is visible   Dashboard
     user waits until page contains title caption  Welcome Bau1
     user waits until page contains element   css:#selectTheme   180
 
@@ -24,10 +24,10 @@ user signs in as analyst1
     run keyword if  ${open_browser}  user opens the browser
     environment variable should be set   ADMIN_URL
     user goes to url  %{ADMIN_URL}
-    user waits until page contains heading 1    Sign in
+    user waits until h1 is visible    Sign in
     user signs in as  ANALYST
 
-    user waits until page contains heading 1  Dashboard
+    user waits until h1 is visible  Dashboard
     user waits until page contains title caption  Welcome Analyst1
     user waits until page contains element   css:#selectTheme   180
 
@@ -45,23 +45,23 @@ user changes to analyst1
 
 user signs out
     user clicks link  Sign out
-    user waits until page contains heading 1  Signed out
+    user waits until h1 is visible  Signed out
     user waits until page contains  You have successfully signed out
 
 user selects theme "${theme}" and topic "${topic}" from the admin dashboard
     user waits until page contains element  id:my-publications-tab   60
     user clicks element   id:my-publications-tab
     user waits until page contains element   id:selectTheme
-    user checks element contains  id:my-publications-tab  Manage publications and releases
+    user waits until element contains  id:my-publications-tab  Manage publications and releases
     user selects from list by label  id:selectTheme  ${theme}
     user waits until page contains element   id:selectTopic
     user selects from list by label  id:selectTopic  ${topic}
-    user waits until page contains heading 2  ${theme}
-    user waits until page contains heading 3  ${topic}
+    user waits until h2 is visible  ${theme}
+    user waits until h3 is visible  ${topic}
 
 user creates publication
     [Arguments]   ${title}
-    user waits until page contains heading 1  Create new publication
+    user waits until h1 is visible  Create new publication
     user waits until page contains element  id:publicationForm-title
     user enters text into element  id:publicationForm-title   ${title}
     user clicks radio     No methodology
@@ -70,19 +70,19 @@ user creates publication
     user enters text into element  id:publicationForm-contactName     Tingting Shu
     user enters text into element  id:publicationForm-contactTelNo    0123456789
     user clicks button   Save publication
-    user waits until page contains heading 1  Dashboard
+    user waits until h1 is visible  Dashboard
 
 user creates release for publication
     [Arguments]  ${publication}  ${time_period_coverage}  ${start_year}
     user waits until page contains title caption  ${publication}
-    user waits until page contains heading 1  Create new release
+    user waits until h1 is visible  Create new release
     user waits until page contains element  id:releaseSummaryForm-timePeriodCoverage
     user selects from list by label  id:releaseSummaryForm-timePeriodCoverage  ${time_period_coverage}
     user enters text into element  id:releaseSummaryForm-timePeriodCoverageStartYear  ${start_year}
     user clicks radio   National Statistics
     user clicks button  Create new release
     user waits until page contains element  xpath://span[text()="Edit release"]
-    user waits until page contains heading 2  Release summary
+    user waits until h2 is visible  Release summary
 
 user adds basic release content
     [Arguments]  ${publication}
@@ -109,7 +109,7 @@ user adds basic release content
 
 user creates approved methodology
     [Arguments]  ${title}
-    user waits until page contains heading 1  Manage methodologies
+    user waits until h1 is visible  Manage methodologies
     user waits until page contains element  id:approved-methodologies-tab
     user clicks element  id:approved-methodologies-tab
     ${is_approved}=  run keyword and return status  user checks page contains element  xpath://section[@id="approved-methodologies"]//a[text()="${title}"]
@@ -125,28 +125,28 @@ user creates approved methodology
 
 user creates methodology
     [Arguments]  ${title}
-    user waits until page contains heading 1  Manage methodologies
+    user waits until h1 is visible  Manage methodologies
     user waits until page contains element  id:live-methodologies-tab
     user clicks element  id:live-methodologies-tab
     user clicks link  Create new methodology
-    user waits until page contains heading 1  Create new methodology
+    user waits until h1 is visible  Create new methodology
     user enters text into element  id:createMethodologyForm-title   ${title}
     user clicks button  Create methodology
     user waits until page contains title caption  Edit methodology
-    user waits until page contains heading 1  ${title}
+    user waits until h1 is visible  ${title}
 
 user approves methodology
     [Arguments]  ${title}
     user waits until page contains title caption  Edit methodology
-    user waits until page contains heading 1  ${title}
+    user waits until h1 is visible  ${title}
     user clicks link  Release status
     user clicks button  Edit status
-    user waits until page contains heading 2  Edit methodology status
+    user waits until h2 is visible  Edit methodology status
     user clicks radio  Approved for publication
     user enters text into element  id:methodologyStatusForm-internalReleaseNote  Test release note
     user clicks button  Update status
 
-    user waits until page contains heading 2  Methodology status
+    user waits until h2 is visible  Methodology status
     user checks page contains tag  Approved
 
 user checks draft releases tab contains publication
@@ -240,7 +240,7 @@ user checks accordion section text block contains
     [Arguments]  ${section_name}  ${block_num}  ${content}
     ${section}=  user gets accordion content element  ${section_name}
     ${block}=  get child element  ${section}  css:[data-testid="editableSectionBlock"]:nth-of-type(${block_num})
-    user checks element contains  ${block}  ${content}
+    user waits until element contains  ${block}  ${content}
 
 user deletes editable accordion section content block
     [Arguments]  ${section_name}  ${block_num}

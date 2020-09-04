@@ -11,7 +11,7 @@ Navigate to Pupil absence in schools in England methodology page
     [Tags]  HappyPath
     environment variable should be set  PUBLIC_URL
     user goes to url   %{PUBLIC_URL}/methodology
-    user waits until page contains heading 1   Methodologies
+    user waits until h1 is visible   Methodologies
     user waits for page to finish loading
 
     user opens accordion section  Pupils and schools
@@ -21,11 +21,11 @@ User navigates to absence methodology page
     [Tags]  HappyPath
     user checks page contains methodology link   Pupil absence   Pupil absence in schools in England     /methodology/pupil-absence-in-schools-in-england
     user clicks methodology link   Pupil absence   Pupil absence in schools in England
-    user waits until page contains heading 1   Pupil absence statistics: methodology
+    user waits until h1 is visible   Pupil absence statistics: methodology
 
 Validate Published date, Last updated date
     [Tags]  HappyPath
-    user checks element contains   css:[data-testid="published-date"]   22 March 2018
+    user waits until element contains   css:[data-testid="published-date"]   22 March 2018
 
 Validate accordion sections order
     [Tags]  HappyPath

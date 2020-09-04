@@ -218,7 +218,7 @@ export const lineChartBlockDefinition: ChartDefinition = {
   options: {
     defaults: {
       height: 300,
-      legend: 'top',
+      legend: 'bottom',
     },
   },
   data: [

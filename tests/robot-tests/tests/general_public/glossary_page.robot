@@ -11,10 +11,10 @@ Navigate to glossary page
     [Tags]  HappyPath
     environment variable should be set   PUBLIC_URL
     user goes to url   %{PUBLIC_URL}
-    user waits until page contains heading 1  Choose how to explore our statistics and data
+    user waits until h1 is visible  Choose how to explore our statistics and data
 
     user clicks link   Education statistics: glossary
-    user waits until page contains heading 1   Glossary
+    user waits until h1 is visible   Glossary
     user checks url contains  %{PUBLIC_URL}/glossary
 
 Validate glossary accordion sections
@@ -32,7 +32,7 @@ Search for Pupil referral unit
     user clicks element   css:#pageSearchForm-input
     element should be focused  css:#pageSearchForm-input
     user presses keys  Pupil referral unit
-    user checks element contains   xpath://*[@id="pageSearchForm-resultsLabel"]   Found 1 result
+    user waits until element contains   xpath://*[@id="pageSearchForm-resultsLabel"]   Found 1 result
     user clicks element   css:#pageSearchForm-option-0
 
     user verifies accordion is open  P

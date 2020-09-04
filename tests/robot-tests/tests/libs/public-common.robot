@@ -6,9 +6,9 @@ Library     public-utilities.py
 user checks key stat contents
     [Arguments]   ${tile}  ${title}  ${value}  ${summary}
     user waits until element is visible  css:[data-testid="keyStat"]:nth-of-type(${tile}) [data-testid="keyStat-title"]  90
-    user checks element contains  css:[data-testid="keyStat"]:nth-of-type(${tile}) [data-testid="keyStat-title"]  ${title}
-    user checks element contains  css:[data-testid="keyStat"]:nth-of-type(${tile}) [data-testid="keyStat-value"]  ${value}
-    user checks element contains  css:[data-testid="keyStat"]:nth-of-type(${tile}) [data-testid="keyStat-summary"]  ${summary}
+    user waits until element contains  css:[data-testid="keyStat"]:nth-of-type(${tile}) [data-testid="keyStat-title"]  ${title}
+    user waits until element contains  css:[data-testid="keyStat"]:nth-of-type(${tile}) [data-testid="keyStat-value"]  ${value}
+    user waits until element contains  css:[data-testid="keyStat"]:nth-of-type(${tile}) [data-testid="keyStat-summary"]  ${summary}
 
 user checks headline summary contains
     [Arguments]  ${text}
@@ -21,5 +21,5 @@ user checks number of release updates
 
 user checks release update
     [Arguments]  ${number}  ${date}  ${text}
-    user checks element contains  css:#releaseNotes li:nth-of-type(${number}) time  ${date}
-    user checks element contains  css:#releaseNotes li:nth-of-type(${number}) p     ${text}
+    user waits until element contains  css:#releaseNotes li:nth-of-type(${number}) time  ${date}
+    user waits until element contains  css:#releaseNotes li:nth-of-type(${number}) p     ${text}

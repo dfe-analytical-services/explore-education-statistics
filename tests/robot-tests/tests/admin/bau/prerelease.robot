@@ -34,28 +34,28 @@ Create new release
 Verify release summary
     [Tags]  HappyPath
     user checks page contains element   xpath://li/a[text()="Release summary" and contains(@aria-current, 'page')]
-    user waits until page contains heading 2  Release summary
+    user waits until h2 is visible  Release summary
     user checks summary list contains  Publication title  ${PUBLICATION_NAME}
 
 Add basic release content
     [Tags]  HappyPath
     user clicks link  Manage content
-    user waits until page contains heading 1  ${PUBLICATION_NAME}
-    user waits until page contains heading 2  ${PUBLICATION_NAME}
+    user waits until h1 is visible  ${PUBLICATION_NAME}
+    user waits until h2 is visible  ${PUBLICATION_NAME}
     user adds basic release content  ${PUBLICATION_NAME}
 
 Go to "Release status" tab
     [Tags]  HappyPath
     user clicks link   Release status
-    user waits until page contains heading 2  Release status
+    user waits until h2 is visible  Release status
     user waits until page contains button  Edit release status
 
 Approve release and wait for it to be Scheduled
     [Tags]  HappyPath
-    ${day}=         get datetime  %d  2
-    ${month}=       get datetime  %m  2
-    ${month_word}=  get datetime  %B  2
-    ${year}=        get datetime  %Y  2
+    ${day}=         get current datetime  %-d  2
+    ${month}=       get current datetime  %-m  2
+    ${month_word}=  get current datetime  %B  2
+    ${year}=        get current datetime  %Y  2
 
     user clicks button  Edit release status
     user clicks radio   Approved for publication
@@ -70,7 +70,7 @@ Approve release and wait for it to be Scheduled
     user enters text into element  id:releaseStatusForm-nextReleaseDate-year    2001
     user clicks button   Update status
 
-    user waits until page contains heading 2  Release status
+    user waits until h2 is visible  Release status
     user checks summary list contains  Current status  Approved
     user checks summary list contains  Scheduled release  ${day} ${month_word} ${year}
     user checks summary list contains  Next release expected  January 2001
@@ -85,19 +85,22 @@ Navigate to prerelease page
 
 Validate prerelease has not started
     [Tags]  HappyPath
-    user waits until page contains heading 1  Pre Release access is not yet available
+    user waits until h1 is visible  Pre Release access is not yet available
     user checks breadcrumb count should be   2
     user checks nth breadcrumb contains   1    Home
     user checks nth breadcrumb contains   2    Pre Release access
-    ${day}=         get datetime  %d  1
-    ${month_word}=  get datetime  %B  1
-    ${year}=        get datetime  %Y  1
-    user checks page contains   Pre Release access will be available from ${day} ${month_word} ${year} at 00:00 until ${day} ${month_word} ${year} at 23:59.
+
+    ${day}=         get current datetime  %d   1
+    ${month}=       get current datetime  %m   1
+    ${year}=        get current datetime  %Y   1
+    ${time_start}=  format uk to local datetime  ${year}-${month}-${day}T00:00:00  %-d %B %Y at %H:%M
+    ${time_end}=    format uk to local datetime  ${year}-${month}-${day}T23:59:00  %-d %B %Y at %H:%M
+    user checks page contains   Pre Release access will be available from ${time_start} until ${time_end}.
 
 Navigate to Admin dashboard
     [Tags]  HappyPath
     user goes to url  %{ADMIN_URL}
-    user waits until page contains heading 1  Dashboard
+    user waits until h1 is visible  Dashboard
 
 Go to View scheduled releases tab
     [Tags]  HappyPath
@@ -127,23 +130,25 @@ Validate prerelease has not started for Analyst user
     user changes to analyst1
     user goes to url   ${RELEASE_URL}/prerelease
 
-    user waits until page contains heading 1  Pre Release access is not yet available
+    user waits until h1 is visible  Pre Release access is not yet available
     user checks breadcrumb count should be   2
     user checks nth breadcrumb contains   1    Home
     user checks nth breadcrumb contains   2    Pre Release access
 
-    ${day}=         get datetime  %d  1
-    ${month_word}=  get datetime  %B  1
-    ${year}=        get datetime  %Y  1
-    user checks page contains   Pre Release access will be available from ${day} ${month_word} ${year} at 00:00 until ${day} ${month_word} ${year} at 23:59.
+    ${day}=         get current datetime  %d   1
+    ${month}=       get current datetime  %m   1
+    ${year}=        get current datetime  %Y   1
+    ${time_start}=  format uk to local datetime  ${year}-${month}-${day}T00:00:00  %-d %B %Y at %H:%M
+    ${time_end}=    format uk to local datetime  ${year}-${month}-${day}T23:59:00  %-d %B %Y at %H:%M
+    user checks page contains   Pre Release access will be available from ${time_start} until ${time_end}.
 
 Start prerelease
     [Tags]  HappyPath
     user changes to bau1
-    ${day}=         get datetime  %d  1
-    ${month}=       get datetime  %m  1
-    ${month_word}=  get datetime  %B  1
-    ${year}=        get datetime  %Y  1
+    ${day}=         get current datetime  %-d  1
+    ${month}=       get current datetime  %-m  1
+    ${month_word}=  get current datetime  %B  1
+    ${year}=        get current datetime  %Y  1
     user goes to url  ${RELEASE_URL}/status
     user clicks button  Edit release status
     user enters text into element  id:releaseStatusForm-publishScheduled-day    ${day}
@@ -151,7 +156,7 @@ Start prerelease
     user enters text into element  id:releaseStatusForm-publishScheduled-year   ${year}
     user clicks button   Update status
 
-    user waits until page contains heading 2  Release status
+    user waits until h2 is visible  Release status
     user checks summary list contains  Current status  Approved
     user checks summary list contains  Scheduled release  ${day} ${month_word} ${year}
     user waits for release process status to be  Scheduled  90
@@ -168,7 +173,7 @@ Validate prerelease has started
     user checks nth breadcrumb contains   2    Pre Release access
 
     user waits until page contains title caption  Calendar Year 2000
-    user waits until page contains heading 1  ${PUBLICATION_NAME}
+    user waits until h1 is visible  ${PUBLICATION_NAME}
 
     user waits until element contains  id:releaseSummary  Test summary text for ${PUBLICATION_NAME}
     user waits until element contains  id:releaseHeadlines  Test headlines summary text for ${PUBLICATION_NAME}
@@ -183,7 +188,7 @@ Validate prerelease has started for Analyst user
     user checks nth breadcrumb contains   2    Pre Release access
 
     user waits until page contains title caption  Calendar Year 2000
-    user waits until page contains heading 1  ${PUBLICATION_NAME}
+    user waits until h1 is visible  ${PUBLICATION_NAME}
 
     user waits until element contains  id:releaseSummary  Test summary text for ${PUBLICATION_NAME}
     user waits until element contains  id:releaseHeadlines  Test headlines summary text for ${PUBLICATION_NAME}
