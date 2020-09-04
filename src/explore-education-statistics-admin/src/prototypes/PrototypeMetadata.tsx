@@ -6,6 +6,7 @@ import RelatedAside from '@common/components/RelatedAside';
 import TabsSection from '@common/components/TabsSection';
 import NavBar from './components/PrototypeNavBar';
 import CreateMeta from './components/PrototypeMetaCreate';
+import DataReplace from './components/PrototypeDataReplace';
 
 const PrototypeMetadata = () => {
   return (
@@ -34,7 +35,7 @@ const PrototypeMetadata = () => {
 
       <Tabs id="test">
         <TabsSection title="Data uploads">
-          This is the content for tab 1
+          <DataReplace />
         </TabsSection>
         <TabsSection title="Footnotes">
           This is the content for tab 2
