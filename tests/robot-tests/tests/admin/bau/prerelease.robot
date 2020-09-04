@@ -114,6 +114,7 @@ Invite users to prerelease for scheduled release
     user waits until page contains   Manage pre release access
     ${details}=  user gets child details element  css:[data-testid="releaseByStatusTab ${PUBLICATION_NAME}"]  Calendar Year 2000 (not Live)
 
+    user waits until parent contains element   ${details}   css:input[name="email"]
     ${invite_input}=  get child element   ${details}   css:input[name="email"]
 
     # This is GOV.UK Notify's test email address
