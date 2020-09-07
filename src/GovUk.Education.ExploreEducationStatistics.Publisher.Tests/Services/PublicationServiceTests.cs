@@ -152,7 +152,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Publisher.Tests.Services
             Slug = "publication-a-release-2018-q1",
             Status = Approved,
             Version = 0,
-            PreviousVersionId = new Guid("240ca03c-6c22-4b9d-9f15-40fc9017890e")
+            PreviousVersionId = null
         };
 
         private static readonly Release PublicationARelease1V1Deleted = new Release
@@ -192,7 +192,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Publisher.Tests.Services
             Slug = "publication-a-release-2018-q2",
             Status = Approved,
             Version = 0,
-            PreviousVersionId = new Guid("874d4e4f-5568-482f-a5a4-d41e5bf6632a")
+            PreviousVersionId = null
         };
 
         private static readonly Release PublicationARelease3 = new Release
@@ -205,7 +205,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Publisher.Tests.Services
             Slug = "publication-a-release-2017-q4",
             Status = Approved,
             Version = 0,
-            PreviousVersionId = new Guid("676ff979-9b1d-4bd2-a3f1-f126c4e2e8d4")
+            PreviousVersionId = null
         };
 
         private static readonly Release PublicationBRelease1 = new Release
@@ -218,7 +218,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Publisher.Tests.Services
             Slug = "publication-b-release-2018-q1",
             Status = Draft,
             Version = 0,
-            PreviousVersionId = new Guid("e66247d7-b350-4d81-a223-3080edc55623")
+            PreviousVersionId = null
         };
 
         private static readonly List<Release> Releases = new List<Release>
@@ -238,7 +238,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Publisher.Tests.Services
                 Slug = "publication-a-release-2018-q3",
                 Status = Draft,
                 Version = 0,
-                PreviousVersionId = new Guid("3c7b1338-4c41-43b4-b4ae-67c21c8734fb")
+                PreviousVersionId = null
             },
             PublicationBRelease1
         };

@@ -13,7 +13,7 @@ using static GovUk.Education.ExploreEducationStatistics.Common.Model.PartialDate
 
 namespace GovUk.Education.ExploreEducationStatistics.Content.Model
 {
-    public class Release : Versioned<Release>
+    public class Release : Versioned
     {
         public Guid Id { get; set; }
 
@@ -68,14 +68,16 @@ namespace GovUk.Education.ExploreEducationStatistics.Content.Model
 
         [JsonIgnore]
         public List<ReleaseContentBlock> ContentBlocks { get; set; }
-        
+
+        public Release? PreviousVersion { get; set; }
+
         public bool SoftDeleted { get; set; }
 
         [NotMapped]
         [JsonProperty("Content")]
         public IEnumerable<ContentSection> GenericContent
         {
-            get 
+            get
             {
                 if (Content == null)
                 {
@@ -83,14 +85,14 @@ namespace GovUk.Education.ExploreEducationStatistics.Content.Model
                 }
 
                 return Content
-                    .Select(join => join.ContentSection)    
+                    .Select(join => join.ContentSection)
                     .ToList()
                     .FindAll(section => section.Type == ContentSectionType.Generic)
-                    .ToImmutableList(); 
+                    .ToImmutableList();
             }
             set => ReplaceContentSectionsOfType(ContentSectionType.Generic, value);
         }
-        
+
         public void AddGenericContentSection(ContentSection section)
         {
             Content.Add(new ReleaseContentSection
@@ -99,19 +101,19 @@ namespace GovUk.Education.ExploreEducationStatistics.Content.Model
                 ContentSection = section
             });
         }
-        
+
         public void RemoveGenericContentSection(ContentSection section)
         {
             Content.Remove(Content.Find(join => join.ContentSection == section));
         }
-        
+
         public void AddContentBlock(ContentBlock contentBlock)
         {
             if (ContentBlocks == null)
             {
                 ContentBlocks = new List<ReleaseContentBlock>();
             }
-            
+
             ContentBlocks.Add(new ReleaseContentBlock
             {
                 Release = this,
@@ -153,20 +155,20 @@ namespace GovUk.Education.ExploreEducationStatistics.Content.Model
             {
                 Content = new List<ReleaseContentSection>();
             }
-            
+
             return Content
                 .Select(join => join.ContentSection)
                 .ToList()
                 .Find(section => section.Type == type);
         }
-        
+
         private void ReplaceContentSectionsOfType(ContentSectionType type, IEnumerable<ContentSection> replacementSections)
         {
             if (Content == null)
             {
                 Content = new List<ReleaseContentSection>();
             }
-            
+
             Content.RemoveAll(join => join.ContentSection.Type == type);
             Content.AddRange(replacementSections.Select(section => new ReleaseContentSection
             {
@@ -183,7 +185,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Content.Model
         public TimeIdentifier TimePeriodCoverage { get; set; }
 
         public ReleaseStatus Status { get; set; }
-        
+
         public string InternalReleaseNote { get; set; }
 
         private PartialDate _nextReleaseDate;
@@ -203,16 +205,16 @@ namespace GovUk.Education.ExploreEducationStatistics.Content.Model
                 }
             }
         }
-        
+
         public List<Link> RelatedInformation { get; set; }
-        
+
         public DateTime? DataLastPublished { get; set; }
 
         public Release CreateReleaseAmendment(DateTime createdDate, Guid createdByUserId)
         {
             var amendment = MemberwiseClone() as Release;
 
-            // set new values for fields that should be altered in the amended Release rather than copied from the 
+            // set new values for fields that should be altered in the amended Release rather than copied from the
             // original Release
             amendment.Id = Guid.NewGuid();
             amendment.Published = null;
@@ -223,7 +225,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Content.Model
             amendment.Version = Version + 1;
             amendment.PreviousVersionId = Id;
             amendment.InternalReleaseNote = null;
-            
+
             var ctx = new CreateClonedContext(amendment);
 
             amendment.Content = amendment
@@ -240,25 +242,25 @@ namespace GovUk.Education.ExploreEducationStatistics.Content.Model
                     return copy;
                 })
                 .ToList();
-            
+
             amendment.Updates = amendment
                 .Updates?
                 .Select(update => update.Clone(ctx))
                 .ToList();
-            
+
             amendment.ContentBlocks = amendment
                 .ContentBlocks?
                 .Select(releaseContentBlock => releaseContentBlock.Clone(ctx))
                 .ToList();
-            
+
             return amendment;
         }
-        
+
         public void CreateGenericContentFromTemplate(Release newRelease)
         {
             var ctx = new CreateClonedContext(newRelease);
             newRelease.Content = Content.Where(c => c.ContentSection.Type == ContentSectionType.Generic).ToList();
-            
+
             newRelease.Content = newRelease
                 .Content?
                 .Select(content => content.Clone(ctx))

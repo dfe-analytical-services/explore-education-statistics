@@ -13,7 +13,7 @@ using GovUk.Education.ExploreEducationStatistics.Publisher.Models;
 using GovUk.Education.ExploreEducationStatistics.Publisher.Services.Interfaces;
 using Microsoft.EntityFrameworkCore;
 using IReleaseService = GovUk.Education.ExploreEducationStatistics.Publisher.Services.Interfaces.IReleaseService;
-using static GovUk.Education.ExploreEducationStatistics.Publisher.utils.PublisherUtils;
+using static GovUk.Education.ExploreEducationStatistics.Publisher.Utils.PublisherUtils;
 
 namespace GovUk.Education.ExploreEducationStatistics.Publisher.Services
 {
@@ -60,7 +60,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Publisher.Services
             return await _contentDbContext.Releases
                 .Include(r => r.PreviousVersion)
                 .Include(r => r.Publication)
-                .Where(r => releaseIds.Contains(r.Id) && r.PreviousVersionId != r.Id)
+                .Where(r => releaseIds.Contains(r.Id) && r.PreviousVersionId != null)
                 .ToListAsync();
         }
 
@@ -91,8 +91,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Publisher.Services
                 .Include(r => r.Publication)
                 .Where(release => release.PublicationId == publicationId)
                 .ToList()
-                .Where(release => IsReleasePublished(release, includedReleaseIds) &&
-                                  IsLatestVersionOfRelease(release.Publication.Releases, release.Id, includedReleaseIds))
+                .Where(release => IsLatestVersionOfRelease(release.Publication.Releases, release, includedReleaseIds))
                 .OrderBy(release => release.Year)
                 .ThenBy(release => release.TimePeriodCoverage)
                 .LastOrDefault();
@@ -137,10 +136,10 @@ namespace GovUk.Education.ExploreEducationStatistics.Publisher.Services
             contentRelease.Published ??= published;
             contentRelease.DataLastPublished = DateTime.UtcNow;
 
-            // Update the Publication date if it's the first time it's published
-            contentRelease.Publication.Published ??= published;
-            
-            // Update the Methodology date if it's the first time it's published
+            // Update the Publication published date since we always generate the Publication when generating Release Content
+            contentRelease.Publication.Published = published;
+
+            // Update the Methodology published date if it's the first time it's published
             var methodology = contentRelease.Publication.Methodology;
             if (methodology != null)
             {
@@ -157,7 +156,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Publisher.Services
                 await _statisticsDbContext.SaveChangesAsync();
             }
         }
-        
+
         public List<ReleaseFileReference> GetReleaseFileReferences(Guid releaseId, params ReleaseFileTypes[] types)
         {
             return _contentDbContext
@@ -172,7 +171,10 @@ namespace GovUk.Education.ExploreEducationStatistics.Publisher.Services
         public async Task DeletePreviousVersionsStatisticalData(params Guid[] releaseIds)
         {
             var releases = await GetAmendedReleases(releaseIds);
-            var previousVersions = releases.Select(r => r.PreviousVersionId).ToList();
+            var previousVersions = releases.Select(r => r.PreviousVersionId)
+                .Where(id => id.HasValue)
+                .Cast<Guid>()
+                .ToList();
 
             foreach (var previousVersion in previousVersions)
             {
@@ -190,7 +192,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Publisher.Services
             var releases = await _statisticsDbContext.Release
                 .Where(r => releaseIds.Contains(r.Id))
                 .ToListAsync();
-            
+
             _statisticsDbContext.Release.RemoveRange(releases);
         }
     }

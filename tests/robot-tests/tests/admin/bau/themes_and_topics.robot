@@ -101,6 +101,7 @@ Verify updated topic
 Delete test theme
     [Tags]  HappyPath
     user clicks testid element  Edit link for ${THEME_NAME}
+    user waits until h1 is visible  Edit theme
     ${theme_id}=  get theme id from url
     delete theme  ${theme_id}
     user closes the browser

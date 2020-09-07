@@ -22,14 +22,14 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Model
         // TODO by the PublishReleaseContentFunction. See method PublishingService.PublishReleaseContentAsync
         // TODO where the Published date on a Release is set in the Content db for the same Live check there.
         public bool Live => Published.HasValue && Compare(UtcNow, Published.Value) > 0;
-        public Guid PreviousVersionId { get; set; }
-        
-        public Release CreateReleaseAmendment(Guid contentReleaseAmendmentId, Guid previousReleaseAmendment)
+        public Guid? PreviousVersionId { get; set; }
+
+        public Release CreateReleaseAmendment(Guid contentAmendmentId, Guid? amendmentPreviousVersionId)
         {
             var copy = MemberwiseClone() as Release;
-            copy.Id = contentReleaseAmendmentId;
+            copy.Id = contentAmendmentId;
             copy.Published = null;
-            copy.PreviousVersionId = previousReleaseAmendment;
+            copy.PreviousVersionId = amendmentPreviousVersionId;
             return copy;
         }
     }

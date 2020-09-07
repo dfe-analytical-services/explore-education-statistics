@@ -43,17 +43,23 @@ namespace GovUk.Education.ExploreEducationStatistics.Publisher.Services
 
             foreach (var release in releases)
             {
-                await _fastTrackService.DeleteAllFastTracksByRelease(release.PreviousVersionId);
+                if (release.PreviousVersion == null)
+                {
+                    break;
+                }
+
+                await _fastTrackService.DeleteAllFastTracksByRelease(release.PreviousVersion.Id);
 
                 // Delete content which hasn't been overwritten because the Slug has changed
                 if (release.Slug != release.PreviousVersion.Slug)
                 {
                     await _fileStorageService.DeletePublicBlob(
-                        PublicContentReleasePath(release.Publication.Slug, release.PreviousVersion.Slug));
+                        PublicContentReleasePath(release.Publication.Slug, release.PreviousVersion.Slug)
+                    );
                 }
             }
         }
-        
+
         public async Task DeletePreviousVersionsDownloadFiles(params Guid[] releaseIds)
         {
             var releases = await _releaseService.GetAsync(releaseIds);
@@ -107,12 +113,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Publisher.Services
 
             foreach (var publication in publications)
             {
-                // Only include the Publication if it's not already published
-                if (!publication.Published.HasValue)
-                {
-                    await CachePublication(publication.Id, context, releaseIds);
-                }
-
+                await CachePublication(publication.Id, context, releaseIds);
                 await CacheLatestRelease(publication, context, releaseIds);
                 foreach (var release in releases)
                 {
@@ -162,7 +163,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Publisher.Services
             await _fastTrackService.DeleteAllReleaseFastTracks();
             await _fileStorageService.DeleteAllContentAsyncExcludingStaging();
         }
-        
+
         private async Task CacheDownloadTree(PublishContext context, params Guid[] includedReleaseIds)
         {
             // This assumes the files have been copied first
@@ -174,7 +175,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Publisher.Services
         {
             await _fastTrackService.CreateAllByRelease(release.Id, context);
         }
-        
+
         private async Task CacheMethodologyTree(PublishContext context, params Guid[] includedReleaseIds)
         {
             var tree = _methodologyService.GetTree(includedReleaseIds);

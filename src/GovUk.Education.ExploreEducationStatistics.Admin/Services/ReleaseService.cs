@@ -131,7 +131,6 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Services
                     };
                     release.Created = DateTime.UtcNow;
                     release.CreatedById = _userService.GetUserId();
-                    release.PreviousVersionId = release.Id;
 
                     _context.Releases.Add(release);
                     await _context.SaveChangesAsync();

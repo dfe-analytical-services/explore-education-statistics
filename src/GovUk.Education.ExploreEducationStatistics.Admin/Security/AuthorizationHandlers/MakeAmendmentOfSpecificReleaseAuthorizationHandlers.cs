@@ -12,14 +12,14 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Security.Authorizatio
 {
     public class MakeAmendmentOfSpecificReleaseRequirement : IAuthorizationRequirement
     {}
-    
+
     public class MakeAmendmentOfSpecificReleaseAuthorizationHandler : CompoundAuthorizationHandler<MakeAmendmentOfSpecificReleaseRequirement, Release>
     {
         public MakeAmendmentOfSpecificReleaseAuthorizationHandler(ContentDbContext context) : base(
             new CanMakeAmendmentOfAllReleasesAuthorizationHandler(context),
             new HasEditorRoleOnReleaseAuthorizationHandler(context))
         {
-            
+
         }
 
         public class CanMakeAmendmentOfAllReleasesAuthorizationHandler :
@@ -45,13 +45,10 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Security.Authorizatio
 
         private static bool IsLatestVersionOfRelease(ContentDbContext context, Release release)
         {
-            var releases = context.Releases.AsNoTracking().Where(r => r.PublicationId == release.PublicationId);
-            return IsLatestVersionOfRelease(releases, release.Id);
-        }
+            var releases = context.Releases.AsNoTracking()
+                .Where(r => r.PublicationId == release.PublicationId && r.Id != release.Id);
 
-        private static bool IsLatestVersionOfRelease(IEnumerable<Release> releases, Guid releaseId)
-        {
-            return !releases.Any(r => r.PreviousVersionId == releaseId && r.Id != releaseId);
+            return !releases.Any(r => r.PreviousVersionId == release.Id);
         }
     }
 }
