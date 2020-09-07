@@ -2,7 +2,7 @@ using System.Collections.Generic;
 using System.Text.RegularExpressions;
 using GovUk.Education.ExploreEducationStatistics.Common.Model;
 
-namespace GovUk.Education.ExploreEducationStatistics.Admin.Validators
+namespace GovUk.Education.ExploreEducationStatistics.Common.Validators
 {
     public class FileTypeValidationUtils
     {
@@ -33,10 +33,12 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Validators
             new Regex(@"^application/vnd.ms-excel$"),
             new Regex(@"^application/vnd.openxmlformats(.*)$"),
             new Regex(@"^application/vnd.oasis.opendocument(.*)$"),
-            new Regex(@"^application/CDFV2$"), 
+            new Regex(@"^application/CDFV2$"),
+            new Regex(@"^(application)/zip$"),
+            new Regex(@"^(application)/x-compressed$")
         };
 
-        public static readonly Regex[] AllowedZipMimeTypes = {
+        public static readonly Regex[] AllowedArchiveMimeTypes = {
             new Regex(@"^(application)/zip$"),
             new Regex(@"^(application)/x-compressed$")
         };
@@ -47,7 +49,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Validators
                 { ReleaseFileTypes.Ancillary, AllowedAncillaryFileTypes },
                 { ReleaseFileTypes.Chart, AllowedChartFileTypes },
                 { ReleaseFileTypes.Data, AllowedCsvMimeTypes },
-                { ReleaseFileTypes.DataZip, AllowedZipMimeTypes }
+                { ReleaseFileTypes.DataZip, AllowedArchiveMimeTypes }
             };
     }
 }

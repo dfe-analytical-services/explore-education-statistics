@@ -3,14 +3,14 @@ using System.IO;
 using System.Linq;
 using System.Reflection;
 using System.Text.RegularExpressions;
-using GovUk.Education.ExploreEducationStatistics.Admin.Services;
-using GovUk.Education.ExploreEducationStatistics.Admin.Validators;
+using GovUk.Education.ExploreEducationStatistics.Common.Services;
+using GovUk.Education.ExploreEducationStatistics.Common.Validators;
 using Microsoft.AspNetCore.Http;
 using Moq;
 using Xunit;
-using static GovUk.Education.ExploreEducationStatistics.Admin.Validators.FileTypeValidationUtils;
+using static GovUk.Education.ExploreEducationStatistics.Common.Validators.FileTypeValidationUtils;
 
-namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
+namespace GovUk.Education.ExploreEducationStatistics.Common.Tests.Services
 {
     class FileInfo
     {
@@ -52,7 +52,8 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
         private static readonly FileInfo Gif = new FileInfo("test.gif", "image/gif");
         private static readonly FileInfo Jpg = new FileInfo("test.jpg", "image/jpeg");
         private static readonly FileInfo Png = new FileInfo("test.png", "image/png");
-
+        private static readonly FileInfo Zip = new FileInfo("test.zip", "application/x-compressed");
+        
         private static readonly List<FileInfo> ImageTypes = new List<FileInfo>
         {
             Bmp,
@@ -65,6 +66,11 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
         {
             Csv,
             Txt,
+        };
+        
+        private static readonly List<FileInfo> ArchiveTypes = new List<FileInfo>
+        {
+            Zip,
         };
         
         private static readonly List<FileInfo> AllTypes = new List<FileInfo>
@@ -82,7 +88,8 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
             Bmp,
             Gif,
             Jpg,
-            Png
+            Png,
+            Zip
         };
         
         [Fact]
@@ -202,6 +209,16 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
             });
         }
         
+        [Fact]
+        public void ValidArchiveFileUploads()
+        {
+            AllTypes.ForEach(type =>
+            {
+                var expectedToSucceed = ArchiveTypes.Contains(type);
+                AssertHasMatchingMimeType(type, AllowedArchiveMimeTypes.ToList(), expectedToSucceed);
+            });
+        }
+        
         private static void AssertMimeTypeCorrect(FileInfo fileInfo)
         {
             var service = new FileTypeService();
@@ -214,7 +231,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
                 .Setup(f => f.OpenReadStream())
                 .Returns(() => File.OpenRead(filePath));
             
-            var result = service.GetMimeType(formFile.Object);
+            var result = service.GetMimeType(formFile.Object).Result;
             
             Assert.True(fileInfo.ExpectedMimeTypes.Contains(result), 
                 "Expected " + result + " to be contained in the expected mime types list");
@@ -233,7 +250,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
                 .Setup(f => f.OpenReadStream())
                 .Returns(() => File.OpenRead(filePath));
             
-            var result = service.HasMatchingMimeType(formFile.Object, availableMimeTypes);
+            var result = service.HasMatchingMimeType(formFile.Object, availableMimeTypes).Result;
             
             Assert.Equal(expectedToSucceed, result);
         }

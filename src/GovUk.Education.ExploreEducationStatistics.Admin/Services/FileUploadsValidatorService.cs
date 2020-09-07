@@ -5,6 +5,7 @@ using System.Linq;
 using System.Threading.Tasks;
 using GovUk.Education.ExploreEducationStatistics.Admin.Services.Interfaces;
 using GovUk.Education.ExploreEducationStatistics.Common.Model;
+using GovUk.Education.ExploreEducationStatistics.Common.Services.Interfaces;
 using GovUk.Education.ExploreEducationStatistics.Content.Model.Database;
 using GovUk.Education.ExploreEducationStatistics.Data.Model.Services.Interfaces;
 using Microsoft.AspNetCore.Http;
@@ -12,7 +13,7 @@ using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
 using static GovUk.Education.ExploreEducationStatistics.Admin.Validators.ValidationErrorMessages;
 using static GovUk.Education.ExploreEducationStatistics.Admin.Validators.ValidationUtils;
-using static GovUk.Education.ExploreEducationStatistics.Admin.Validators.FileTypeValidationUtils;
+using static GovUk.Education.ExploreEducationStatistics.Common.Validators.FileTypeValidationUtils;
 using static GovUk.Education.ExploreEducationStatistics.Common.Services.FileStoragePathUtils;
 using static System.StringComparison;
 
@@ -74,7 +75,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Services
         {
             var allowedMimeTypes = AllowedMimeTypesByFileType[type];
             
-            if (!_fileTypeService.HasMatchingMimeType(file, allowedMimeTypes))
+            if (!await _fileTypeService.HasMatchingMimeType(file, allowedMimeTypes))
             {
                 return ValidationActionResult(FileTypeInvalid);
             }
@@ -87,14 +88,14 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Services
             return Unit.Instance;
         }
 
-        private bool IsCsvFile(string filePath, IFormFile file)
+        private async Task<bool> IsCsvFile(string filePath, IFormFile file)
         {
             if (!filePath.EndsWith(".csv"))
             {
                 return false;
             }
             
-            return _fileTypeService.HasMatchingMimeType(file, AllowedMimeTypesByFileType[ReleaseFileTypes.Data]) 
+            return await _fileTypeService.HasMatchingMimeType(file, AllowedMimeTypesByFileType[ReleaseFileTypes.Data]) 
                    && _fileTypeService.HasMatchingEncodingType(file, CsvEncodingTypes);
         }
 
@@ -176,12 +177,12 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Services
             var dataFilePath = AdminReleasePath(releaseId, ReleaseFileTypes.Data, dataFile.FileName.ToLower());
             var metadataFilePath = AdminReleasePath(releaseId, ReleaseFileTypes.Data, metaFile.FileName.ToLower());
 
-            if (!IsCsvFile(dataFilePath, dataFile))
+            if (!await IsCsvFile(dataFilePath, dataFile))
             {
                 return ValidationActionResult(DataFileMustBeCsvFile);
             }
 
-            if (!IsCsvFile(metadataFilePath, metaFile))
+            if (!await IsCsvFile(metadataFilePath, metaFile))
             {
                 return ValidationActionResult(MetaFileMustBeCsvFile);
             }

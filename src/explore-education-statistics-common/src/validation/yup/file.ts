@@ -52,7 +52,6 @@ class FileSchema extends MixedSchema {
 
         return allowedTypes.some(type => {
           return true;
-          //return value.type.startsWith(type);
         });
       },
     });

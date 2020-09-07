@@ -302,7 +302,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin
             // These services allow us to check our Policies within Controllers and Services
             StartupSecurityConfiguration.ConfigureResourceBasedAuthorization(services);
 
-            services.AddTransient<IFileTypeService, FileTypeService>();
+            services.AddSingleton<IFileTypeService, FileTypeService>();
             services.AddTransient<IDataArchiveValidationService, DataArchiveValidationService>();
 
             services.AddSwaggerGen(c =>

@@ -5,12 +5,13 @@ using System.Text.RegularExpressions;
 using System.Threading.Tasks;
 using GovUk.Education.ExploreEducationStatistics.Admin.Services.Interfaces;
 using GovUk.Education.ExploreEducationStatistics.Common.Model;
+using GovUk.Education.ExploreEducationStatistics.Common.Services.Interfaces;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.Azure.Storage.Blob;
 using static GovUk.Education.ExploreEducationStatistics.Admin.Validators.ValidationErrorMessages;
 using static GovUk.Education.ExploreEducationStatistics.Admin.Validators.ValidationUtils;
-using static GovUk.Education.ExploreEducationStatistics.Admin.Validators.FileTypeValidationUtils;
+using static GovUk.Education.ExploreEducationStatistics.Common.Validators.FileTypeValidationUtils;
 using static GovUk.Education.ExploreEducationStatistics.Common.Services.FileStoragePathUtils;
 
 namespace GovUk.Education.ExploreEducationStatistics.Admin.Services
@@ -22,7 +23,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Services
         private static readonly Dictionary<ReleaseFileTypes, IEnumerable<Regex>> AllowedMimeTypesByFileType = 
             new Dictionary<ReleaseFileTypes, IEnumerable<Regex>>
             {
-                { ReleaseFileTypes.DataZip, AllowedZipMimeTypes }
+                { ReleaseFileTypes.DataZip, AllowedArchiveMimeTypes }
             };
         
         public DataArchiveValidationService(IFileTypeService fileTypeService)
@@ -33,12 +34,12 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Services
         public async Task<Either<ActionResult, Tuple<ZipArchiveEntry, ZipArchiveEntry>>> ValidateArchiveEntries(
             CloudBlobContainer blobContainer, Guid releaseId, IFormFile zipFile)
         {
-            if (!IsZipFile(zipFile))
+            if (!await IsZipFile(zipFile))
             {
                 return ValidationActionResult(DataFileMustBeZipFile);
             }
             
-            var path = AdminReleasePath(releaseId, ReleaseFileTypes.Chart, zipFile.FileName);
+            var path = AdminReleasePath(releaseId, ReleaseFileTypes.DataZip, zipFile.FileName);
 
             if (blobContainer.GetBlockBlobReference(path).Exists())
             {
@@ -67,14 +68,14 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Services
             return new Tuple<ZipArchiveEntry, ZipArchiveEntry>(dataFile, metaFile);
         }
 
-        private bool IsZipFile(IFormFile file)
+        private async Task<bool> IsZipFile(IFormFile file)
         {
             if (!file.FileName.ToLower().EndsWith(".zip"))
             {
                 return false;
             }
             
-            return _fileTypeService.HasMatchingMimeType(file, AllowedMimeTypesByFileType[ReleaseFileTypes.DataZip]) 
+            return await _fileTypeService.HasMatchingMimeType(file, AllowedMimeTypesByFileType[ReleaseFileTypes.DataZip]) 
                    && _fileTypeService.HasMatchingEncodingType(file, ZipEncodingTypes);
         }
     }

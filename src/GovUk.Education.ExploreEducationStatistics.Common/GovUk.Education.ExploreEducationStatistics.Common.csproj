@@ -16,6 +16,8 @@
         <PackageReference Include="Microsoft.Azure.Storage.Blob" Version="11.1.7" />
         <PackageReference Include="Microsoft.Azure.Storage.Queue" Version="11.1.7" />
         <PackageReference Include="System.Net.NameResolution" Version="4.3.0" />
+        <PackageReference Include="Mime" Version="3.1.0" />
+        <PackageReference Include="Mime-Detective" Version="0.0.6-beta5" />
     </ItemGroup>
 
 </Project>

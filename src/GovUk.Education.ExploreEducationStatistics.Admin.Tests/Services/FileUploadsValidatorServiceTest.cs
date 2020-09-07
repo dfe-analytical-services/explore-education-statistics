@@ -4,8 +4,8 @@ using System.IO;
 using System.Linq;
 using System.Text.RegularExpressions;
 using GovUk.Education.ExploreEducationStatistics.Admin.Services;
-using GovUk.Education.ExploreEducationStatistics.Admin.Services.Interfaces;
 using GovUk.Education.ExploreEducationStatistics.Common.Model;
+using GovUk.Education.ExploreEducationStatistics.Common.Services.Interfaces;
 using GovUk.Education.ExploreEducationStatistics.Content.Model;
 using GovUk.Education.ExploreEducationStatistics.Data.Model.Services.Interfaces;
 using Microsoft.AspNetCore.Http;
@@ -127,7 +127,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
 
                 fileTypeService
                     .Setup(s => s.HasMatchingMimeType(file, It.IsAny<IEnumerable<Regex>>()))
-                    .Returns(() => true);
+                    .ReturnsAsync(() => true);
                 var result = service.ValidateUploadFileType(file, Common.Model.ReleaseFileTypes.Ancillary).Result;
 
                 Assert.True(result.IsRight);
@@ -148,7 +148,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
 
                 fileTypeService
                     .Setup(s => s.HasMatchingMimeType(file, It.IsAny<IEnumerable<Regex>>()))
-                    .Returns(() => false);
+                    .ReturnsAsync(() => false);
                 var result = service.ValidateUploadFileType(file, Common.Model.ReleaseFileTypes.Ancillary).Result;
 
                 Assert.True(result.IsLeft);
@@ -172,7 +172,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
 
                 fileTypeService
                     .Setup(s => s.HasMatchingMimeType(file, It.IsAny<IEnumerable<Regex>>()))
-                    .Returns(() => true);
+                    .ReturnsAsync(() => true);
                 var result = service.ValidateUploadFileType(file, Common.Model.ReleaseFileTypes.Data).Result;
 
                 Assert.True(result.IsLeft);
