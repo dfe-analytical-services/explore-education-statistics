@@ -101,7 +101,7 @@ const FormEditor = ({
     [],
   );
 
-  const isReadOnly = isBrowser('IE');
+  const isReadOnly = isBrowser('IE') || process.env.NODE_ENV === 'test';
 
   return (
     <>

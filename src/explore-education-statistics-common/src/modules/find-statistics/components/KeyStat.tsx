@@ -36,7 +36,6 @@ export interface KeyStatProps {
   queryOptions?: TableQueryOptions;
   summary?: Summary;
   testId?: string;
-  renderDataSummary?: ReactNode;
 }
 
 const KeyStat = ({
@@ -68,21 +67,23 @@ const KeyStat = ({
               value={keyStat.value}
               testId={testId}
             >
-              {summary?.dataSummary && (
+              {summary?.dataSummary[0] && (
                 <p className="govuk-body-s" data-testid={`${testId}-summary`}>
-                  {summary.dataSummary}
+                  {summary.dataSummary[0]}
                 </p>
               )}
             </KeyStatTile>
 
-            {summary?.dataDefinition?.[0] && (
+            {summary?.dataDefinition[0] && (
               <Details
-                summary={summary?.dataDefinitionTitle || 'Help'}
+                summary={summary?.dataDefinitionTitle[0] || 'Help'}
                 className={styles.definition}
               >
-                {summary.dataDefinition.map(data => (
-                  <ReactMarkdown key={data}>{data}</ReactMarkdown>
-                ))}
+                <div data-testid={`${testId}-definition`}>
+                  {summary.dataDefinition.map(data => (
+                    <ReactMarkdown key={data}>{data}</ReactMarkdown>
+                  ))}
+                </div>
               </Details>
             )}
 

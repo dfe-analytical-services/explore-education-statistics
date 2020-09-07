@@ -37,10 +37,20 @@ export default function useKeyStatQuery(
     if (tableData) {
       const [indicator] = tableData.subjectMeta.indicators;
 
+      if (!indicator) {
+        return;
+      }
+
+      const indicatorValue = tableData.results[0]?.measures[indicator.value];
+
+      if (!indicatorValue) {
+        return;
+      }
+
       setValue({
         title: indicator.label,
         value: formatPretty(
-          tableData.results[0].measures[indicator.value],
+          indicatorValue,
           indicator.unit,
           indicator.decimalPlaces,
         ),

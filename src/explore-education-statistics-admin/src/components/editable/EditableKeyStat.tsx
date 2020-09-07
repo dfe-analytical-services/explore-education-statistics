@@ -4,6 +4,7 @@ import toHtml from '@admin/utils/markdown/toHtml';
 import toMarkdown from '@admin/utils/markdown/toMarkdown';
 import Button from '@common/components/Button';
 import ButtonGroup from '@common/components/ButtonGroup';
+import Details from '@common/components/Details';
 import { Form, FormFieldTextInput } from '@common/components/form';
 import LoadingSpinner from '@common/components/LoadingSpinner';
 import useToggle from '@common/hooks/useToggle';
@@ -16,6 +17,7 @@ import KeyStatTile from '@common/modules/find-statistics/components/KeyStatTile'
 import useKeyStatQuery from '@common/modules/find-statistics/hooks/useKeyStatQuery';
 import { Formik } from 'formik';
 import React from 'react';
+import ReactMarkdown from 'react-markdown';
 
 export interface KeyStatsFormValues {
   dataSummary: string;
@@ -80,7 +82,12 @@ const EditableKeyStat = ({
                   <Form id={`key-stats-form-${id}`}>
                     <h3 className="govuk-heading-s">{name}</h3>
 
-                    <KeyStatTile title={keyStat.title} value={keyStat.value}>
+                    <KeyStatTile
+                      title={keyStat.title}
+                      titleTag="h4"
+                      testId={testId}
+                      value={keyStat.value}
+                    >
                       <FormFieldTextInput<KeyStatsFormValues>
                         id={`key-stat-dataSummary-${id}`}
                         name="dataSummary"
@@ -119,7 +126,33 @@ const EditableKeyStat = ({
               </Formik>
             ) : (
               <>
-                <KeyStatTile title={keyStat.title} value={keyStat.value} />
+                <KeyStatTile
+                  title={keyStat.title}
+                  value={keyStat.value}
+                  testId={testId}
+                >
+                  {summary?.dataSummary[0] && (
+                    <p
+                      className="govuk-body-s"
+                      data-testid={`${testId}-summary`}
+                    >
+                      {summary.dataSummary[0]}
+                    </p>
+                  )}
+                </KeyStatTile>
+
+                {summary?.dataDefinition[0] && (
+                  <Details
+                    summary={summary?.dataDefinitionTitle[0] || 'Help'}
+                    className={styles.definition}
+                  >
+                    <div data-testid={`${testId}-definition`}>
+                      {summary.dataDefinition.map(data => (
+                        <ReactMarkdown key={data}>{data}</ReactMarkdown>
+                      ))}
+                    </div>
+                  </Details>
+                )}
 
                 {isEditing && (
                   <ButtonGroup className="govuk-!-margin-top-2">

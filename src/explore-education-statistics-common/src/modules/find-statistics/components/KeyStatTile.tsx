@@ -5,20 +5,22 @@ interface Props {
   children?: ReactNode;
   testId?: string;
   title: string;
+  titleTag?: 'h3' | 'h4';
   value: string;
 }
 
 const KeyStatTile = ({
   children,
   testId = 'keyStatTile',
+  titleTag: TitleElement = 'h3',
   title,
   value,
 }: Props) => {
   return (
     <div className={styles.tile}>
-      <h3 className="govuk-heading-s" data-testid={`${testId}-title`}>
+      <TitleElement className="govuk-heading-s" data-testid={`${testId}-title`}>
         {title}
-      </h3>
+      </TitleElement>
 
       <p className="govuk-heading-xl" data-testid={`${testId}-value`}>
         {value}
