@@ -243,6 +243,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin
             services.AddTransient<IManageContentPageService, ManageContentPageService>();
             services.AddTransient<IContentService, ContentService>();
             services.AddTransient<IRelatedInformationService, RelatedInformationService>();
+            services.AddTransient<IReplacementService, ReplacementService>();
 
             services.AddTransient<INotificationClient>(s =>
             {
