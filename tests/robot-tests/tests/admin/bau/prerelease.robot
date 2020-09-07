@@ -112,7 +112,7 @@ Invite users to prerelease for scheduled release
     [Tags]  HappyPath
     user opens details dropdown  Calendar Year 2000 (not Live)  css:[data-testid="releaseByStatusTab ${PUBLICATION_NAME}"]
     user waits until page contains   Manage pre release access
-    ${details}=  user gets child details element  css:[data-testid="releaseByStatusTab ${PUBLICATION_NAME}"]  Calendar Year 2000 (not Live)
+    ${details}=  user gets details content element  Calendar Year 2000 (not Live)  css:[data-testid="releaseByStatusTab ${PUBLICATION_NAME}"]
 
     user waits until parent contains element   ${details}   css:input[name="email"]
     ${invite_input}=  get child element   ${details}   css:input[name="email"]
