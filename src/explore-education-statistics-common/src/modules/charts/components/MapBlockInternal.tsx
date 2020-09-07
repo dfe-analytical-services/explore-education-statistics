@@ -441,7 +441,7 @@ export const MapBlockInternal = ({
               }}
               className={classNames(styles.map, 'dfe-print-break-avoid')}
               center={position}
-              zoom={6.5}
+              zoom={5}
             >
               <GeoJSON data={ukGeometry} className={styles.uk} ref={ukRef} />
 
