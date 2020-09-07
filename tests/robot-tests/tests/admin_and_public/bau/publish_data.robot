@@ -49,7 +49,7 @@ Upload subject
     user waits until page contains accordion section   UI test subject
     user opens accordion section   UI test subject
     user checks page contains element   xpath://dt[text()="Subject title"]/../dd/h4[text()="UI test subject"]
-    user waits until page contains element  xpath://dt[text()="Status"]/../dd//strong[text()="Complete"]     180
+    user waits until page contains element  xpath://dt[text()="Status"]/../dd//strong[text()="Complete"]     360
 
 Navigate to Manage data blocks tab
     [Tags]  HappyPath
