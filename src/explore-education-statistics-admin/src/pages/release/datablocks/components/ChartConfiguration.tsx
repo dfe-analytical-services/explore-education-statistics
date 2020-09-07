@@ -129,7 +129,6 @@ const ChartConfiguration = ({
             is: value => !value,
             then: Yup.file().required('Select an infographic file to upload'),
           })
-          .mimeType(['image'], 'The infographic must be an image')
           .minSize(0, 'The infographic cannot be an empty file'),
       });
     }

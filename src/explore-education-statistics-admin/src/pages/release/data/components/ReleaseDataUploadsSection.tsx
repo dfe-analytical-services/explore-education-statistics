@@ -224,30 +224,18 @@ const ReleaseDataUploadsSection = ({ releaseId, canUpdateRelease }: Props) => {
           is: 'csv',
           then: Yup.file()
             .required('Choose a data file')
-            .mimeType(
-              ['text/csv', 'application/csv'],
-              'Data file must be a CSV with UTF-8 encoding',
-            )
             .minSize(0, 'Choose a data file that is not empty'),
         }),
         metadataFile: Yup.file().when('uploadType', {
           is: 'csv',
           then: Yup.file()
             .required('Choose a metadata file')
-            .mimeType(
-              ['text/csv', 'application/csv'],
-              'Metadata file must be a CSV with UTF-8 encoding',
-            )
             .minSize(0, 'Choose a metadata file that is not empty'),
         }),
         zipFile: Yup.file().when('uploadType', {
           is: 'zip',
           then: Yup.file()
             .required('Choose a zip file')
-            .mimeType(
-              ['application/zip', 'application/x-zip-compressed'],
-              'Choose a valid ZIP file',
-            )
             .minSize(0, 'Choose a ZIP file that is not empty'),
         }),
       })}

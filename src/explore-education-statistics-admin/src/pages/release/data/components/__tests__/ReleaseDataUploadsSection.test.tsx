@@ -407,27 +407,6 @@ describe('ReleaseDataUploadsSection', () => {
       });
     });
 
-    test('shows validation message when data file is not a CSV', async () => {
-      render(
-        <ReleaseDataUploadsSection releaseId="release-1" canUpdateRelease />,
-      );
-
-      const file = new File(['test'], 'test.txt', {
-        type: 'text/plain',
-      });
-
-      userEvent.upload(screen.getByLabelText('Upload data file'), file);
-      userEvent.tab();
-
-      await waitFor(() => {
-        expect(
-          screen.getByText('Data file must be a CSV with UTF-8 encoding', {
-            selector: '#dataFileUploadForm-dataFile-error',
-          }),
-        ).toBeInTheDocument();
-      });
-    });
-
     test('shows validation message when data file is not empty', async () => {
       render(
         <ReleaseDataUploadsSection releaseId="release-1" canUpdateRelease />,
@@ -463,27 +442,6 @@ describe('ReleaseDataUploadsSection', () => {
       await waitFor(() => {
         expect(
           screen.getByText('Choose a metadata file', {
-            selector: '#dataFileUploadForm-metadataFile-error',
-          }),
-        ).toBeInTheDocument();
-      });
-    });
-
-    test('shows validation message when metadata file is not a CSV', async () => {
-      render(
-        <ReleaseDataUploadsSection releaseId="release-1" canUpdateRelease />,
-      );
-
-      const file = new File(['test'], 'test.txt', {
-        type: 'text/plain',
-      });
-
-      userEvent.upload(screen.getByLabelText('Upload metadata file'), file);
-      userEvent.tab();
-
-      await waitFor(() => {
-        expect(
-          screen.getByText('Metadata file must be a CSV with UTF-8 encoding', {
             selector: '#dataFileUploadForm-metadataFile-error',
           }),
         ).toBeInTheDocument();
@@ -526,28 +484,6 @@ describe('ReleaseDataUploadsSection', () => {
       await waitFor(() => {
         expect(
           screen.getByText('Choose a zip file', {
-            selector: '#dataFileUploadForm-zipFile-error',
-          }),
-        ).toBeInTheDocument();
-      });
-    });
-
-    test('shows validation message when ZIP file is not valid', async () => {
-      render(
-        <ReleaseDataUploadsSection releaseId="release-1" canUpdateRelease />,
-      );
-
-      const file = new File(['test'], 'test.txt', {
-        type: 'text/plain',
-      });
-
-      userEvent.click(screen.getByLabelText('ZIP file'));
-      userEvent.upload(screen.getByLabelText('Upload ZIP file'), file);
-      userEvent.tab();
-
-      await waitFor(() => {
-        expect(
-          screen.getByText('Choose a valid ZIP file', {
             selector: '#dataFileUploadForm-zipFile-error',
           }),
         ).toBeInTheDocument();
