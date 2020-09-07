@@ -103,8 +103,6 @@ const LineChartBlock = ({
   const yAxisWidth = parseNumber(axes.minor.size);
   const xAxisHeight = parseNumber(axes.major.size);
 
-  const formatter = (tick: any) => {};
-
   return (
     <ChartContainer
       height={height || 300}
