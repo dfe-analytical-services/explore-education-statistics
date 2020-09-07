@@ -5,10 +5,27 @@
   margin-bottom: govuk-spacing(2);
 
   :global(.ck.ck-editor) {
-    border: 2px solid govuk-colour('black');
+    border: $govuk-border-width-form-element solid $govuk-input-border-colour;
   }
 
   :global(.ck-focused) {
     border-color: $govuk-input-border-colour !important;
+  }
+}
+
+.readOnlyEditor {
+  background: govuk-colour('light-grey');
+  border: $govuk-border-width-form-element solid $govuk-input-border-colour;
+  cursor: not-allowed;
+  padding: govuk-spacing(2);
+
+  &:focus {
+    box-shadow: inset 0 0 0 $govuk-border-width-form-element;
+    outline: $govuk-focus-width solid $govuk-focus-colour;
+    outline-offset: 0;
+
+    @include govuk-if-ie8 {
+      border-width: $govuk-border-width-form-element * 2;
+    }
   }
 }

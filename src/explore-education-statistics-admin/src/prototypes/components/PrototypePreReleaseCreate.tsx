@@ -79,7 +79,6 @@ const PrototypeCreatePreRelease = () => {
             <div className="govuk-!-margin-bottom-7">
               <FormEditor
                 id="description"
-                name="description"
                 label="Public access list details"
                 value={editPreRelease ? formText : formIntro}
                 onChange={() => setAddNewPreRelease(true)}

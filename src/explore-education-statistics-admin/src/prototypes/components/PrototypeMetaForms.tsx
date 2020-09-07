@@ -62,7 +62,6 @@ const PrototypeCreateMetaForms = ({
         <div className="govuk-!-margin-bottom-7">
           <FormEditor
             id="description"
-            name="description"
             label="Public metadata introduction"
             value={formExample.descriptionPlaceholder.text}
             onChange={() => {}}
