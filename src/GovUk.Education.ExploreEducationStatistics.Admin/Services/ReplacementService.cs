@@ -2,7 +2,6 @@
 using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
-using GovUk.Education.ExploreEducationStatistics.Admin.Models;
 using GovUk.Education.ExploreEducationStatistics.Admin.Services.Interfaces;
 using GovUk.Education.ExploreEducationStatistics.Admin.ViewModels;
 using GovUk.Education.ExploreEducationStatistics.Common.Model;
@@ -76,18 +75,27 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Services
 
         private async Task<Either<ActionResult, Guid>> GetReleaseId(Guid originalSubjectId, Guid replacementSubjectId)
         {
-            var originalReleaseSubject = await _statisticsDbContext.ReleaseSubject
-                .FirstAsync(releaseSubject => releaseSubject.SubjectId == originalSubjectId);
+            // Get the latest Release referencing the original Subject 
+            var originalReleaseSubjectId = await (
+                    from releaseSubject in _statisticsDbContext.ReleaseSubject
+                    join newerVersion in _statisticsDbContext.Release on releaseSubject.ReleaseId equals newerVersion
+                        .PreviousVersionId into newerVersionGroup
+                    from newerVersion in newerVersionGroup.DefaultIfEmpty()
+                    where releaseSubject.SubjectId == originalSubjectId && newerVersion == null
+                    select releaseSubject.ReleaseId)
+                .SingleAsync();
 
-            var replacementReleaseSubject = await _statisticsDbContext.ReleaseSubject
-                .FirstAsync(releaseSubject => releaseSubject.SubjectId == replacementSubjectId);
+            // Get the only Release which should be referencing the replacement Subject
+            var replacementReleaseId = (await _statisticsDbContext.ReleaseSubject
+                    .SingleAsync(releaseSubject => releaseSubject.SubjectId == replacementSubjectId))
+                .ReleaseId;
 
-            if (originalReleaseSubject.ReleaseId != replacementReleaseSubject.ReleaseId)
+            if (originalReleaseSubjectId != replacementReleaseId)
             {
                 return ValidationActionResult(ReplacementDataFileMustBeForSameRelease);
             }
 
-            return originalReleaseSubject.ReleaseId;
+            return originalReleaseSubjectId;
         }
 
         private ReplacementSubjectMeta GetReplacementSubjectMeta(Guid subjectId)

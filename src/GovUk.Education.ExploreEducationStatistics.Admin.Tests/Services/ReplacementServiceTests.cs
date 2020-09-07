@@ -31,7 +31,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
     public class ReplacementServiceTests
     {
         [Fact]
-        public async Task GetReplacementPlan_SubjectsBelongToDifferentReleases()
+        public async Task GetReplacementPlan_OriginalSubjectBelongsToDifferentRelease()
         {
             var originalSubject = new Subject
             {
@@ -43,29 +43,51 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
                 Id = Guid.NewGuid()
             };
 
-            var contentRelease1 = new Content.Model.Release
+            var contentRelease1Version1 = new Content.Model.Release
             {
-                Id = Guid.NewGuid()
+                Id = Guid.NewGuid(),
+                PreviousVersionId = null
             };
 
+            var contentRelease1Version2 = new Content.Model.Release
+            {
+                Id = Guid.NewGuid(),
+                PreviousVersionId = contentRelease1Version1.Id
+            };
+            
             var contentRelease2 = new Content.Model.Release
             {
-                Id = Guid.NewGuid()
+                Id = Guid.NewGuid(),
+                PreviousVersionId = null
             };
 
-            var statsRelease1 = new Release
+            var statsRelease1Version1 = new Release
             {
-                Id = contentRelease1.Id
+                Id = contentRelease1Version1.Id,
+                PreviousVersionId = contentRelease1Version1.PreviousVersionId
+            };
+
+            var statsRelease1Version2 = new Release
+            {
+                Id = contentRelease1Version2.Id,
+                PreviousVersionId = contentRelease1Version2.PreviousVersionId
             };
 
             var statsRelease2 = new Release
             {
-                Id = contentRelease2.Id
+                Id = contentRelease2.Id,
+                PreviousVersionId = contentRelease2.PreviousVersionId
             };
 
-            var originalReleaseSubject = new ReleaseSubject
+            var originalReleaseSubject1 = new ReleaseSubject
             {
-                Release = statsRelease1,
+                Release = statsRelease1Version1,
+                Subject = originalSubject
+            };
+
+            var originalReleaseSubject2 = new ReleaseSubject
+            {
+                Release = statsRelease1Version2,
                 Subject = originalSubject
             };
 
@@ -82,15 +104,15 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
 
             await using (var contentDbContext = InMemoryApplicationDbContext(contentDbContextId))
             {
-                await contentDbContext.AddRangeAsync(contentRelease1, contentRelease2);
+                await contentDbContext.AddRangeAsync(contentRelease1Version1, contentRelease1Version2, contentRelease2);
                 await contentDbContext.SaveChangesAsync();
             }
 
             await using (var statisticsDbContext = InMemoryStatisticsDbContext(statisticsDbContextId))
             {
-                await statisticsDbContext.AddRangeAsync(statsRelease1, statsRelease2);
+                await statisticsDbContext.AddRangeAsync(statsRelease1Version1, statsRelease1Version2, statsRelease2);
                 await statisticsDbContext.AddRangeAsync(originalSubject, replacementSubject);
-                await statisticsDbContext.AddRangeAsync(originalReleaseSubject, replacementReleaseSubject);
+                await statisticsDbContext.AddRangeAsync(originalReleaseSubject1, originalReleaseSubject2, replacementReleaseSubject);
                 await statisticsDbContext.SaveChangesAsync();
             }
 
@@ -119,27 +141,45 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
                 Id = Guid.NewGuid()
             };
 
-            var releaseId = Guid.NewGuid();
-
-            var contentRelease = new Content.Model.Release
+            var contentReleaseVersion1 = new Content.Model.Release
             {
-                Id = releaseId
+                Id = Guid.NewGuid(),
+                PreviousVersionId = null
+            };
+            
+            var contentReleaseVersion2 = new Content.Model.Release
+            {
+                Id = Guid.NewGuid(),
+                PreviousVersionId = contentReleaseVersion1.Id
             };
 
-            var statsRelease = new Release
+            var statsReleaseVersion1 = new Release
             {
-                Id = releaseId
+                Id = contentReleaseVersion1.Id,
+                PreviousVersionId = contentReleaseVersion1.PreviousVersionId
+            };
+            
+            var statsReleaseVersion2 = new Release
+            {
+                Id = contentReleaseVersion2.Id,
+                PreviousVersionId = contentReleaseVersion2.PreviousVersionId
             };
 
-            var originalReleaseSubject = new ReleaseSubject
+            var originalReleaseSubject1 = new ReleaseSubject
             {
-                Release = statsRelease,
+                Release = statsReleaseVersion1,
                 Subject = originalSubject
             };
 
+            var originalReleaseSubject2 = new ReleaseSubject
+            {
+                Release = statsReleaseVersion2,
+                Subject = originalSubject
+            };
+            
             var replacementReleaseSubject = new ReleaseSubject
             {
-                Release = statsRelease,
+                Release = statsReleaseVersion2,
                 Subject = replacementSubject
             };
 
@@ -150,15 +190,15 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
 
             await using (var contentDbContext = InMemoryApplicationDbContext(contentDbContextId))
             {
-                await contentDbContext.AddAsync(contentRelease);
+                await contentDbContext.AddRangeAsync(contentReleaseVersion1, contentReleaseVersion2);
                 await contentDbContext.SaveChangesAsync();
             }
 
             await using (var statisticsDbContext = InMemoryStatisticsDbContext(statisticsDbContextId))
             {
-                await statisticsDbContext.AddRangeAsync(statsRelease);
+                await statisticsDbContext.AddRangeAsync(statsReleaseVersion1, statsReleaseVersion2);
                 await statisticsDbContext.AddRangeAsync(originalSubject, replacementSubject);
-                await statisticsDbContext.AddRangeAsync(originalReleaseSubject, replacementReleaseSubject);
+                await statisticsDbContext.AddRangeAsync(originalReleaseSubject1, originalReleaseSubject2, replacementReleaseSubject);
                 await statisticsDbContext.SaveChangesAsync();
             }
 
@@ -187,33 +227,51 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
 
             var replacementSubject = new Subject
             {
+                Id = Guid.NewGuid()
+            };
+
+            var contentReleaseVersion1 = new Content.Model.Release
+            {
                 Id = Guid.NewGuid(),
+                PreviousVersionId = null
+            };
+            
+            var contentReleaseVersion2 = new Content.Model.Release
+            {
+                Id = Guid.NewGuid(),
+                PreviousVersionId = contentReleaseVersion1.Id
             };
 
-            var releaseId = Guid.NewGuid();
-
-            var contentRelease = new Content.Model.Release
+            var statsReleaseVersion1 = new Release
             {
-                Id = releaseId
+                Id = contentReleaseVersion1.Id,
+                PreviousVersionId = contentReleaseVersion1.PreviousVersionId
+            };
+            
+            var statsReleaseVersion2 = new Release
+            {
+                Id = contentReleaseVersion2.Id,
+                PreviousVersionId = contentReleaseVersion2.PreviousVersionId
             };
 
-            var statsRelease = new Release
+            var originalReleaseSubject1 = new ReleaseSubject
             {
-                Id = releaseId
+                Release = statsReleaseVersion1,
+                Subject = originalSubject
             };
 
-            var originalReleaseSubject = new ReleaseSubject
+            var originalReleaseSubject2 = new ReleaseSubject
             {
-                Release = statsRelease,
+                Release = statsReleaseVersion2,
                 Subject = originalSubject
             };
 
             var replacementReleaseSubject = new ReleaseSubject
             {
-                Release = statsRelease,
+                Release = statsReleaseVersion2,
                 Subject = replacementSubject
             };
-
+            
             var originalFilterItem = new FilterItem
             {
                 Id = Guid.NewGuid(),
@@ -333,11 +391,11 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
 
             var releaseContentBlock = new ReleaseContentBlock
             {
-                Release = contentRelease,
+                Release = contentReleaseVersion2,
                 ContentBlock = dataBlock
             };
 
-            var originalFootnoteForFilter = CreateFootnote(statsRelease,
+            var originalFootnoteForFilter = CreateFootnote(statsReleaseVersion2,
                 "Test footnote for Filter",
                 filterFootnotes: new List<FilterFootnote>
                 {
@@ -347,7 +405,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
                     }
                 });
 
-            var originalFootnoteForFilterGroup = CreateFootnote(statsRelease,
+            var originalFootnoteForFilterGroup = CreateFootnote(statsReleaseVersion2,
                 "Test footnote for Filter group",
                 filterGroupFootnotes: new List<FilterGroupFootnote>
                 {
@@ -357,7 +415,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
                     }
                 });
 
-            var originalFootnoteForFilterItem = CreateFootnote(statsRelease,
+            var originalFootnoteForFilterItem = CreateFootnote(statsReleaseVersion2,
                 "Test footnote for Filter item",
                 filterItemFootnotes: new List<FilterItemFootnote>
                 {
@@ -367,7 +425,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
                     }
                 });
 
-            var originalFootnoteForIndicator = CreateFootnote(statsRelease,
+            var originalFootnoteForIndicator = CreateFootnote(statsReleaseVersion2,
                 "Test footnote for Filter item",
                 indicatorFootnotes: new List<IndicatorFootnote>
                 {
@@ -390,7 +448,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
 
             await using (var contentDbContext = InMemoryApplicationDbContext(contentDbContextId))
             {
-                await contentDbContext.AddAsync(contentRelease);
+                await contentDbContext.AddAsync(contentReleaseVersion2);
                 await contentDbContext.AddAsync(dataBlock);
                 await contentDbContext.AddRangeAsync(releaseContentBlock);
                 await contentDbContext.SaveChangesAsync();
@@ -398,9 +456,9 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
 
             await using (var statisticsDbContext = InMemoryStatisticsDbContext(statisticsDbContextId))
             {
-                await statisticsDbContext.AddRangeAsync(statsRelease);
+                await statisticsDbContext.AddRangeAsync(statsReleaseVersion1, statsReleaseVersion2);
                 await statisticsDbContext.AddRangeAsync(originalSubject, replacementSubject);
-                await statisticsDbContext.AddRangeAsync(originalReleaseSubject, replacementReleaseSubject);
+                await statisticsDbContext.AddRangeAsync(originalReleaseSubject1, originalReleaseSubject2, replacementReleaseSubject);
                 await statisticsDbContext.AddRangeAsync(originalFilter, replacementFilter);
                 await statisticsDbContext.AddRangeAsync(originalIndicatorGroup, replacementIndicatorGroup);
                 await statisticsDbContext.AddRangeAsync(originalFootnoteForFilter, originalFootnoteForFilterGroup,
@@ -547,30 +605,48 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
 
             var replacementSubject = new Subject
             {
+                Id = Guid.NewGuid()
+            };
+
+            var contentReleaseVersion1 = new Content.Model.Release
+            {
                 Id = Guid.NewGuid(),
+                PreviousVersionId = null
+            };
+            
+            var contentReleaseVersion2 = new Content.Model.Release
+            {
+                Id = Guid.NewGuid(),
+                PreviousVersionId = contentReleaseVersion1.Id
             };
 
-            var releaseId = Guid.NewGuid();
-
-            var contentRelease = new Content.Model.Release
+            var statsReleaseVersion1 = new Release
             {
-                Id = releaseId
+                Id = contentReleaseVersion1.Id,
+                PreviousVersionId = contentReleaseVersion1.PreviousVersionId
+            };
+            
+            var statsReleaseVersion2 = new Release
+            {
+                Id = contentReleaseVersion2.Id,
+                PreviousVersionId = contentReleaseVersion2.PreviousVersionId
             };
 
-            var statsRelease = new Release
+            var originalReleaseSubject1 = new ReleaseSubject
             {
-                Id = releaseId
+                Release = statsReleaseVersion1,
+                Subject = originalSubject
             };
 
-            var originalReleaseSubject = new ReleaseSubject
+            var originalReleaseSubject2 = new ReleaseSubject
             {
-                Release = statsRelease,
+                Release = statsReleaseVersion2,
                 Subject = originalSubject
             };
 
             var replacementReleaseSubject = new ReleaseSubject
             {
-                Release = statsRelease,
+                Release = statsReleaseVersion2,
                 Subject = replacementSubject
             };
 
@@ -693,11 +769,11 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
 
             var releaseContentBlock = new ReleaseContentBlock
             {
-                Release = contentRelease,
+                Release = contentReleaseVersion2,
                 ContentBlock = dataBlock
             };
 
-            var originalFootnoteForFilter = CreateFootnote(statsRelease,
+            var originalFootnoteForFilter = CreateFootnote(statsReleaseVersion2,
                 "Test footnote for Filter",
                 filterFootnotes: new List<FilterFootnote>
                 {
@@ -707,7 +783,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
                     }
                 });
 
-            var originalFootnoteForFilterGroup = CreateFootnote(statsRelease,
+            var originalFootnoteForFilterGroup = CreateFootnote(statsReleaseVersion2,
                 "Test footnote for Filter group",
                 filterGroupFootnotes: new List<FilterGroupFootnote>
                 {
@@ -717,7 +793,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
                     }
                 });
 
-            var originalFootnoteForFilterItem = CreateFootnote(statsRelease,
+            var originalFootnoteForFilterItem = CreateFootnote(statsReleaseVersion2,
                 "Test footnote for Filter item",
                 filterItemFootnotes: new List<FilterItemFootnote>
                 {
@@ -727,7 +803,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
                     }
                 });
 
-            var originalFootnoteForIndicator = CreateFootnote(statsRelease,
+            var originalFootnoteForIndicator = CreateFootnote(statsReleaseVersion2,
                 "Test footnote for Filter item",
                 indicatorFootnotes: new List<IndicatorFootnote>
                 {
@@ -763,7 +839,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
 
             await using (var contentDbContext = InMemoryApplicationDbContext(contentDbContextId))
             {
-                await contentDbContext.AddAsync(contentRelease);
+                await contentDbContext.AddRangeAsync(contentReleaseVersion1, contentReleaseVersion2);
                 await contentDbContext.AddAsync(dataBlock);
                 await contentDbContext.AddRangeAsync(releaseContentBlock);
                 await contentDbContext.SaveChangesAsync();
@@ -771,9 +847,9 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
 
             await using (var statisticsDbContext = InMemoryStatisticsDbContext(statisticsDbContextId))
             {
-                await statisticsDbContext.AddRangeAsync(statsRelease);
+                await statisticsDbContext.AddRangeAsync(statsReleaseVersion1, statsReleaseVersion2);
                 await statisticsDbContext.AddRangeAsync(originalSubject, replacementSubject);
-                await statisticsDbContext.AddRangeAsync(originalReleaseSubject, replacementReleaseSubject);
+                await statisticsDbContext.AddRangeAsync(originalReleaseSubject1, originalReleaseSubject2, replacementReleaseSubject);
                 await statisticsDbContext.AddRangeAsync(originalFilter, replacementFilter);
                 await statisticsDbContext.AddRangeAsync(originalIndicatorGroup, replacementIndicatorGroup);
                 await statisticsDbContext.AddRangeAsync(originalFootnoteForFilter, originalFootnoteForFilterGroup,
