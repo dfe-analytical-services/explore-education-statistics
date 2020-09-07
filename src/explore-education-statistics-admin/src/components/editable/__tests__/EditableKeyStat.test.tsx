@@ -256,6 +256,43 @@ describe('EditableKeyStat', () => {
     );
   });
 
+  test('clicking Remove button calls the `onRemove` callback prop', async () => {
+    const handleRemove = jest.fn();
+
+    tableBuilderService.getTableData.mockResolvedValue(testTableDataResponse);
+
+    render(
+      <EditableKeyStat
+        isEditing
+        id="test-id-1"
+        name="Key Stat 1"
+        onRemove={handleRemove}
+        onSubmit={noop}
+        query={testQuery}
+        summary={{
+          dataSummary: ['Down from 620,330 in 2017'],
+          dataDefinitionTitle: ['What is the number of applications received?'],
+          dataDefinition: [
+            'Total number of applications received for places at primary and secondary schools.',
+          ],
+          dataKeys: [],
+        }}
+      />,
+    );
+
+    await waitFor(() => {
+      expect(screen.getByTestId('editableKeyStat-title')).toHaveTextContent(
+        'Number of applications received',
+      );
+    });
+
+    expect(handleRemove).not.toHaveBeenCalled();
+
+    userEvent.click(screen.getByRole('button', { name: 'Remove' }));
+
+    expect(handleRemove).toHaveBeenCalled();
+  });
+
   test('clicking Cancel button shows read-only summary again', async () => {
     tableBuilderService.getTableData.mockResolvedValue(testTableDataResponse);
 
@@ -369,7 +406,7 @@ describe('EditableKeyStat', () => {
     });
   });
 
-  test('does not render if there was an error fetching the table data', async () => {
+  test('renders correctly if there was an error fetching the table data', async () => {
     tableBuilderService.getTableData.mockRejectedValue(
       new Error('Something went wrong'),
     );
@@ -378,6 +415,7 @@ describe('EditableKeyStat', () => {
       <EditableKeyStat
         id="test-id-1"
         name="Key Stat 1"
+        onRemove={noop}
         onSubmit={noop}
         query={testQuery}
         summary={{
@@ -393,17 +431,24 @@ describe('EditableKeyStat', () => {
 
     await waitFor(() => {
       expect(tableBuilderService.getTableData).toHaveBeenCalledTimes(1);
+      expect(screen.getByText('Could not load key stat')).toBeInTheDocument();
+      expect(
+        screen.getByRole('button', { name: 'Remove' }),
+      ).toBeInTheDocument();
+
       expect(screen.queryByTestId('keyStat-title')).not.toBeInTheDocument();
       expect(screen.queryByTestId('keyStat-value')).not.toBeInTheDocument();
       expect(screen.queryByTestId('keyStat-summary')).not.toBeInTheDocument();
-      expect(screen.queryByRole('button')).not.toBeInTheDocument();
+      expect(
+        screen.queryByRole('button', { name: 'Edit' }),
+      ).not.toBeInTheDocument();
       expect(
         screen.queryByTestId('keyStat-definition'),
       ).not.toBeInTheDocument();
     });
   });
 
-  test('does not render if there is no matching result in the response', async () => {
+  test('renders correctly if there is no matching result in the response', async () => {
     tableBuilderService.getTableData.mockResolvedValue({
       ...testTableDataResponse,
       subjectMeta: {
@@ -424,6 +469,7 @@ describe('EditableKeyStat', () => {
       <EditableKeyStat
         id="test-id-1"
         name="Key Stat 1"
+        onRemove={noop}
         onSubmit={noop}
         query={testQuery}
         summary={{
@@ -439,13 +485,58 @@ describe('EditableKeyStat', () => {
 
     await waitFor(() => {
       expect(tableBuilderService.getTableData).toHaveBeenCalledTimes(1);
+      expect(screen.getByText('Could not load key stat')).toBeInTheDocument();
+      expect(
+        screen.getByRole('button', { name: 'Remove' }),
+      ).toBeInTheDocument();
+
       expect(screen.queryByTestId('keyStat-title')).not.toBeInTheDocument();
       expect(screen.queryByTestId('keyStat-value')).not.toBeInTheDocument();
       expect(screen.queryByTestId('keyStat-summary')).not.toBeInTheDocument();
-      expect(screen.queryByRole('button')).not.toBeInTheDocument();
+      expect(
+        screen.queryByRole('button', { name: 'Edit' }),
+      ).not.toBeInTheDocument();
       expect(
         screen.queryByTestId('keyStat-definition'),
       ).not.toBeInTheDocument();
     });
+  });
+
+  test('clicking Remove button when there has been an error calls the `onRemove` callback prop', async () => {
+    const handleRemove = jest.fn();
+
+    tableBuilderService.getTableData.mockRejectedValue(
+      new Error('Something went wrong'),
+    );
+
+    render(
+      <EditableKeyStat
+        id="test-id-1"
+        name="Key Stat 1"
+        onRemove={handleRemove}
+        onSubmit={noop}
+        query={testQuery}
+        summary={{
+          dataSummary: ['Down from 620,330 in 2017'],
+          dataDefinitionTitle: ['What is the number of applications received?'],
+          dataDefinition: [
+            'Total number of applications received for places at primary and secondary schools.',
+          ],
+          dataKeys: [],
+        }}
+      />,
+    );
+
+    await waitFor(() => {
+      expect(
+        screen.getByRole('button', { name: 'Remove' }),
+      ).toBeInTheDocument();
+    });
+
+    expect(handleRemove).not.toHaveBeenCalled();
+
+    userEvent.click(screen.getByRole('button', { name: 'Remove' }));
+
+    expect(handleRemove).toHaveBeenCalled();
   });
 });
