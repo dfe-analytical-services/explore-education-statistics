@@ -21,7 +21,10 @@ import SummaryListItem from '@common/components/SummaryListItem';
 import WarningMessage from '@common/components/WarningMessage';
 import useAsyncHandledRetry from '@common/hooks/useAsyncHandledRetry';
 import logger from '@common/services/logger';
-import { mapFieldErrors } from '@common/validation/serverValidations';
+import {
+  FieldMessageMapper,
+  mapFieldErrors,
+} from '@common/validation/serverValidations';
 import Yup from '@common/validation/yup';
 import { format } from 'date-fns';
 import { Formik } from 'formik';
@@ -35,65 +38,83 @@ interface FormValues {
   zipFile: File | null;
 }
 
-const errorMappings = [
-  mapFieldErrors<FormValues>({
-    target: 'dataFile',
-    messages: {
-      CANNOT_OVERWRITE_DATA_FILE: 'Choose a unique data file name',
-      DATA_AND_METADATA_FILES_CANNOT_HAVE_THE_SAME_NAME:
-        'Choose a different file name for data and metadata files',
-      DATA_FILE_CANNOT_BE_EMPTY: 'Choose a data file that is not empty',
-      DATA_FILE_MUST_BE_CSV_FILE: 'Data file must be a CSV with UTF-8 encoding',
-      DATA_FILENAME_CANNOT_CONTAIN_SPACES_OR_SPECIAL_CHARACTERS:
-        'Data filename cannot contain spaces or special characters',
-      DATA_FILE_ALREADY_UPLOADED: 'Data file has already been uploaded',
-    },
-  }),
-  mapFieldErrors<FormValues>({
-    target: 'metadataFile',
-    messages: {
-      CANNOT_OVERWRITE_METADATA_FILE: 'Choose a unique metadata file name',
-      METADATA_FILE_CANNOT_BE_EMPTY: 'Choose a metadata file that is not empty',
-      META_FILE_MUST_BE_CSV_FILE:
-        'Metadata file must be a CSV with UTF-8 encoding',
-      META_FILENAME_CANNOT_CONTAIN_SPACES_OR_SPECIAL_CHARACTERS:
-        'Metadata filename cannot contain spaces or special characters',
-      META_FILE_IS_INCORRECTLY_NAMED: 'Metadata filename is incorrectly named',
-    },
-  }),
-  mapFieldErrors<FormValues>({
-    target: 'zipFile',
-    messages: {
-      DATA_FILE_MUST_BE_ZIP_FILE: 'Choose a valid ZIP file',
-      DATA_ZIP_FILE_CAN_ONLY_CONTAIN_TWO_FILES:
-        'ZIP file can only contain two CSV files',
-      DATA_ZIP_FILE_DOES_NOT_CONTAIN_CSV_FILES:
-        'ZIP file does not contain any CSV files',
-      DATA_ZIP_FILE_ALREADY_EXISTS: 'ZIP file already exists',
-      CANNOT_OVERWRITE_DATA_FILE: 'Choose a unique ZIP data file name',
-      DATA_AND_METADATA_FILES_CANNOT_HAVE_THE_SAME_NAME:
-        'ZIP data and metadata filenames cannot be the same',
-      DATA_FILE_CANNOT_BE_EMPTY: 'Choose a ZIP data file that is not empty',
-      DATA_FILENAME_CANNOT_CONTAIN_SPACES_OR_SPECIAL_CHARACTERS:
-        'ZIP data filename cannot contain spaces or special characters',
-      CANNOT_OVERWRITE_METADATA_FILE: 'Choose a unique ZIP metadata file name',
-      METADATA_FILE_CANNOT_BE_EMPTY:
-        'Choose a ZIP metadata file that is not empty',
-      META_FILENAME_CANNOT_CONTAIN_SPACES_OR_SPECIAL_CHARACTERS:
-        'ZIP metadata filename cannot contain spaces or special characters',
-      META_FILE_IS_INCORRECTLY_NAMED:
-        'ZIP metadata filename must end with .meta',
-    },
-  }),
-  mapFieldErrors<FormValues>({
-    target: 'subjectTitle',
-    messages: {
-      SUBJECT_TITLE_MUST_BE_UNIQUE: 'Subject title must be unique',
-      SUBJECT_TITLE_CANNOT_CONTAIN_SPECIAL_CHARACTERS:
-        'Subject title cannot contain spaces or special characters',
-    },
-  }),
-];
+const errorMappings = (
+  values: FormValues,
+): FieldMessageMapper<FormValues>[] => {
+  const baseMappings = [
+    mapFieldErrors<FormValues>({
+      target: 'subjectTitle',
+      messages: {
+        SUBJECT_TITLE_MUST_BE_UNIQUE: 'Subject title must be unique',
+        SUBJECT_TITLE_CANNOT_CONTAIN_SPECIAL_CHARACTERS:
+          'Subject title cannot contain spaces or special characters',
+      },
+    }),
+  ];
+
+  if (values.uploadType === 'zip') {
+    return [
+      ...baseMappings,
+      mapFieldErrors<FormValues>({
+        target: 'zipFile',
+        messages: {
+          DATA_FILE_MUST_BE_ZIP_FILE: 'Choose a valid ZIP file',
+          DATA_ZIP_FILE_CAN_ONLY_CONTAIN_TWO_FILES:
+            'ZIP file can only contain two CSV files',
+          DATA_ZIP_FILE_DOES_NOT_CONTAIN_CSV_FILES:
+            'ZIP file does not contain any CSV files',
+          DATA_ZIP_FILE_ALREADY_EXISTS: 'ZIP file already exists',
+          CANNOT_OVERWRITE_DATA_FILE: 'Choose a unique ZIP data file name',
+          DATA_AND_METADATA_FILES_CANNOT_HAVE_THE_SAME_NAME:
+            'ZIP data and metadata filenames cannot be the same',
+          DATA_FILE_CANNOT_BE_EMPTY: 'Choose a ZIP data file that is not empty',
+          DATA_FILENAME_CANNOT_CONTAIN_SPACES_OR_SPECIAL_CHARACTERS:
+            'ZIP data filename cannot contain spaces or special characters',
+          CANNOT_OVERWRITE_METADATA_FILE:
+            'Choose a unique ZIP metadata file name',
+          METADATA_FILE_CANNOT_BE_EMPTY:
+            'Choose a ZIP metadata file that is not empty',
+          META_FILENAME_CANNOT_CONTAIN_SPACES_OR_SPECIAL_CHARACTERS:
+            'ZIP metadata filename cannot contain spaces or special characters',
+          META_FILE_IS_INCORRECTLY_NAMED:
+            'ZIP metadata filename must end with .meta',
+        },
+      }),
+    ];
+  }
+
+  return [
+    ...baseMappings,
+    mapFieldErrors<FormValues>({
+      target: 'dataFile',
+      messages: {
+        CANNOT_OVERWRITE_DATA_FILE: 'Choose a unique data file name',
+        DATA_AND_METADATA_FILES_CANNOT_HAVE_THE_SAME_NAME:
+          'Choose a different file name for data and metadata files',
+        DATA_FILE_CANNOT_BE_EMPTY: 'Choose a data file that is not empty',
+        DATA_FILE_MUST_BE_CSV_FILE:
+          'Data file must be a CSV with UTF-8 encoding',
+        DATA_FILENAME_CANNOT_CONTAIN_SPACES_OR_SPECIAL_CHARACTERS:
+          'Data filename cannot contain spaces or special characters',
+        DATA_FILE_ALREADY_UPLOADED: 'Data file has already been uploaded',
+      },
+    }),
+    mapFieldErrors<FormValues>({
+      target: 'metadataFile',
+      messages: {
+        CANNOT_OVERWRITE_METADATA_FILE: 'Choose a unique metadata file name',
+        METADATA_FILE_CANNOT_BE_EMPTY:
+          'Choose a metadata file that is not empty',
+        META_FILE_MUST_BE_CSV_FILE:
+          'Metadata file must be a CSV with UTF-8 encoding',
+        META_FILENAME_CANNOT_CONTAIN_SPACES_OR_SPECIAL_CHARACTERS:
+          'Metadata filename cannot contain spaces or special characters',
+        META_FILE_IS_INCORRECTLY_NAMED:
+          'Metadata filename is incorrectly named',
+      },
+    }),
+  ];
+};
 
 interface Props {
   releaseId: string;
