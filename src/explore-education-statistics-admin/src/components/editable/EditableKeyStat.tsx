@@ -52,6 +52,8 @@ const EditableKeyStat = ({
     includeGeoJson: false,
   });
 
+  const formId = `editableKeyStatForm-${id}`;
+
   const renderInner = () => {
     if (error || !keyStat) {
       return (
@@ -95,7 +97,7 @@ const EditableKeyStat = ({
           }}
         >
           {form => (
-            <Form id={`key-stats-form-${id}`}>
+            <Form id={formId}>
               <h3 className="govuk-heading-s">{name}</h3>
 
               <KeyStatTile
@@ -105,7 +107,7 @@ const EditableKeyStat = ({
                 value={keyStat.value}
               >
                 <FormFieldTextInput<KeyStatsFormValues>
-                  id={`key-stat-dataSummary-${id}`}
+                  id={`${formId}-dataSummary`}
                   name="dataSummary"
                   label={<span className={styles.trendText}>Trend</span>}
                 />
@@ -113,7 +115,7 @@ const EditableKeyStat = ({
 
               <FormFieldTextInput<KeyStatsFormValues>
                 formGroupClass="govuk-!-margin-top-2"
-                id={`key-stat-dataDefinitionTitle-${id}`}
+                id={`${formId}-dataDefinitionTitle`}
                 name="dataDefinitionTitle"
                 label="Guidance title"
               />
@@ -121,7 +123,7 @@ const EditableKeyStat = ({
               <FormFieldEditor<KeyStatsFormValues>
                 name="dataDefinition"
                 toolbarConfig={toolbarConfigs.reduced}
-                id={`key-stat-dataDefinition-${id}`}
+                id={`${formId}-dataDefinition`}
                 label="Guidance text"
               />
 
