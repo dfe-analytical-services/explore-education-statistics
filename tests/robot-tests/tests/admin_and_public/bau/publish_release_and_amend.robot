@@ -207,7 +207,8 @@ Save data block
 Navigate to Create chart tab
     [Tags]  HappyPath
     user waits until page contains link  Chart
-    user clicks link  Chart
+    user waits until page does not contain loading spinner
+    user clicks element   id:manageDataBlocks-chart-tab
     user clicks button  Choose an infographic as alternative
     user chooses file  id:chartConfigurationForm-file       ${CURDIR}${/}files${/}test-infographic.png
     user enters text into element  id:chartConfigurationForm-title  Sample title
