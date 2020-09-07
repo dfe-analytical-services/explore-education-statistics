@@ -103,6 +103,9 @@ const VerticalBarBlock = ({
             type="number"
             hide={!axes.minor.visible}
             unit={axes.minor.unit}
+            tickFormatter={tick => {
+              return tick.toLocaleString();
+            }}
             width={parseNumber(axes.minor.size)}
           />
 
