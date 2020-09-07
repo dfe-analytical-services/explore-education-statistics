@@ -29,6 +29,7 @@ import {
   XAxis,
   YAxis,
 } from 'recharts';
+import formatPretty from '@common/utils/number/formatPretty';
 
 export interface VerticalBarProps extends StackedBarProps {
   axes: {
@@ -103,9 +104,7 @@ const VerticalBarBlock = ({
             type="number"
             hide={!axes.minor.visible}
             unit={axes.minor.unit}
-            tickFormatter={tick => {
-              return tick.toLocaleString();
-            }}
+            tickFormatter={tick => formatPretty(tick)}
             width={parseNumber(axes.minor.size)}
           />
 

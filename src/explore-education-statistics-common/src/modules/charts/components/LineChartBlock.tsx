@@ -34,6 +34,7 @@ import {
   XAxis,
   YAxis,
 } from 'recharts';
+import formatPretty from '@common/utils/number/formatPretty';
 import getCategoryDataSetConfigurations from '../util/getCategoryDataSetConfigurations';
 
 const lineStyles: Dictionary<string> = {
@@ -144,9 +145,7 @@ const LineChartBlock = ({
             hide={!axes.minor.visible}
             unit={axes.minor.unit}
             width={yAxisWidth}
-            tickFormatter={tick => {
-              return tick.toLocaleString();
-            }}
+            tickFormatter={tick => formatPretty(tick)}
           />
 
           <XAxis

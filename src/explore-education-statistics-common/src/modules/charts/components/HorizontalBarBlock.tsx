@@ -29,6 +29,7 @@ import {
   XAxis,
   YAxis,
 } from 'recharts';
+import formatPretty from '@common/utils/number/formatPretty';
 
 export interface HorizontalBarProps extends StackedBarProps {
   axes: {
@@ -108,9 +109,7 @@ const HorizontalBarBlock = ({
             height={xAxisHeight}
             padding={{ left: 20, right: 20 }}
             tickMargin={10}
-            tickFormatter={tick => {
-              return tick.toLocaleString();
-            }}
+            tickFormatter={tick => formatPretty(tick)}
           />
 
           <YAxis
