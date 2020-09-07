@@ -108,6 +108,9 @@ const HorizontalBarBlock = ({
             height={xAxisHeight}
             padding={{ left: 20, right: 20 }}
             tickMargin={10}
+            tickFormatter={tick => {
+              return tick.toLocaleString();
+            }}
           />
 
           <YAxis
