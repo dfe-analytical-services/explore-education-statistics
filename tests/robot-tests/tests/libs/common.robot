@@ -440,9 +440,18 @@ user checks publication bullet does not contain link
     [Arguments]   ${publication}   ${link}
     user checks page does not contain element  xpath://details[@open]//*[text()="${publication}"]/..//a[text()="${link}"]
 
-user waits until page contains key stat tile
-    [Arguments]  ${title}   ${value}   ${wait}=${timeout}
-    user waits until page contains element   xpath://*[@data-testid="keyStatTile-title" and text()="${title}"]/../*[@data-testid="keyStatTile-value" and text()="${value}"]    ${wait}
+user checks key stat contents
+    [Arguments]   ${tile}  ${title}  ${value}  ${summary}  ${wait}=${timeout}
+    user waits until element is visible  css:[data-testid="keyStat"]:nth-of-type(${tile}) [data-testid="keyStat-title"]  ${wait}
+    user waits until element contains  css:[data-testid="keyStat"]:nth-of-type(${tile}) [data-testid="keyStat-title"]  ${title}
+    user waits until element contains  css:[data-testid="keyStat"]:nth-of-type(${tile}) [data-testid="keyStat-value"]  ${value}
+    user waits until element contains  css:[data-testid="keyStat"]:nth-of-type(${tile}) [data-testid="keyStat-summary"]  ${summary}
+
+user checks key stat definition
+    [Arguments]   ${tile}  ${definition_summary}  ${definition}
+    user opens details dropdown  ${definition_summary}  css:[data-testid="keyStat"]:nth-of-type(${tile})
+    user waits until element is visible  css:[data-testid="keyStat"]:nth-of-type(${tile}) [data-testid="keyStat-definition"]
+    user checks element should contain  css:[data-testid="keyStat"]:nth-of-type(${tile}) [data-testid="keyStat-definition"]  ${definition}
 
 user clicks radio
     [Arguments]  ${label}

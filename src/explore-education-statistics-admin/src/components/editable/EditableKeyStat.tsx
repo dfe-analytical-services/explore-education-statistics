@@ -40,7 +40,7 @@ const EditableKeyStat = ({
   name,
   query,
   summary,
-  testId = 'editableKeyStat',
+  testId = 'keyStat',
   onRemove,
   onSubmit,
 }: EditableKeyStatProps) => {

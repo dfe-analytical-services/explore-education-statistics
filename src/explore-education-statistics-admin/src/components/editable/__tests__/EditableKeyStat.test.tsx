@@ -114,15 +114,13 @@ describe('EditableKeyStat', () => {
     await waitFor(() => {
       expect(tableBuilderService.getTableData).toHaveBeenCalledTimes(1);
 
-      expect(screen.getByTestId('editableKeyStat-title')).toHaveTextContent(
+      expect(screen.getByTestId('keyStat-title')).toHaveTextContent(
         'Number of applications received',
       );
 
-      expect(screen.getByTestId('editableKeyStat-value')).toHaveTextContent(
-        '608,180',
-      );
+      expect(screen.getByTestId('keyStat-value')).toHaveTextContent('608,180');
 
-      expect(screen.getByTestId('editableKeyStat-summary')).toHaveTextContent(
+      expect(screen.getByTestId('keyStat-summary')).toHaveTextContent(
         'Down from 620,330 in 2017',
       );
 
@@ -132,9 +130,7 @@ describe('EditableKeyStat', () => {
         }),
       ).toBeInTheDocument();
 
-      expect(
-        screen.getByTestId('editableKeyStat-definition'),
-      ).toHaveTextContent(
+      expect(screen.getByTestId('keyStat-definition')).toHaveTextContent(
         'Total number of applications received for places at primary and secondary schools.',
       );
     });
@@ -155,19 +151,15 @@ describe('EditableKeyStat', () => {
     await waitFor(() => {
       expect(tableBuilderService.getTableData).toHaveBeenCalledTimes(1);
 
-      expect(screen.getByTestId('editableKeyStat-title')).toHaveTextContent(
+      expect(screen.getByTestId('keyStat-title')).toHaveTextContent(
         'Number of applications received',
       );
 
-      expect(screen.getByTestId('editableKeyStat-value')).toHaveTextContent(
-        '608,180',
-      );
+      expect(screen.getByTestId('keyStat-value')).toHaveTextContent('608,180');
 
+      expect(screen.queryByTestId('keyStat-summary')).not.toBeInTheDocument();
       expect(
-        screen.queryByTestId('editableKeyStat-summary'),
-      ).not.toBeInTheDocument();
-      expect(
-        screen.queryByTestId('editableKeyStat-definition'),
+        screen.queryByTestId('keyStat-definition'),
       ).not.toBeInTheDocument();
     });
   });
@@ -186,7 +178,7 @@ describe('EditableKeyStat', () => {
     );
 
     await waitFor(() => {
-      expect(screen.getByTestId('editableKeyStat-title')).toHaveTextContent(
+      expect(screen.getByTestId('keyStat-title')).toHaveTextContent(
         'Number of applications received',
       );
     });
@@ -196,12 +188,10 @@ describe('EditableKeyStat', () => {
     expect(
       screen.getByText('Key Stat 1', { selector: 'h3' }),
     ).toBeInTheDocument();
-    expect(screen.getByTestId('editableKeyStat-title')).toHaveTextContent(
+    expect(screen.getByTestId('keyStat-title')).toHaveTextContent(
       'Number of applications received',
     );
-    expect(screen.getByTestId('editableKeyStat-value')).toHaveTextContent(
-      '608,180',
-    );
+    expect(screen.getByTestId('keyStat-value')).toHaveTextContent('608,180');
     expect(screen.getByLabelText('Trend')).toHaveValue('');
     expect(screen.getByLabelText('Guidance title')).toHaveValue('Help');
     expect(screen.getByLabelText('Guidance text')).toHaveTextContent('');
@@ -229,7 +219,7 @@ describe('EditableKeyStat', () => {
     );
 
     await waitFor(() => {
-      expect(screen.getByTestId('editableKeyStat-title')).toHaveTextContent(
+      expect(screen.getByTestId('keyStat-title')).toHaveTextContent(
         'Number of applications received',
       );
     });
@@ -239,12 +229,10 @@ describe('EditableKeyStat', () => {
     expect(
       screen.getByText('Key Stat 1', { selector: 'h3' }),
     ).toBeInTheDocument();
-    expect(screen.getByTestId('editableKeyStat-title')).toHaveTextContent(
+    expect(screen.getByTestId('keyStat-title')).toHaveTextContent(
       'Number of applications received',
     );
-    expect(screen.getByTestId('editableKeyStat-value')).toHaveTextContent(
-      '608,180',
-    );
+    expect(screen.getByTestId('keyStat-value')).toHaveTextContent('608,180');
     expect(screen.getByLabelText('Trend')).toHaveValue(
       'Down from 620,330 in 2017',
     );
@@ -281,7 +269,7 @@ describe('EditableKeyStat', () => {
     );
 
     await waitFor(() => {
-      expect(screen.getByTestId('editableKeyStat-title')).toHaveTextContent(
+      expect(screen.getByTestId('keyStat-title')).toHaveTextContent(
         'Number of applications received',
       );
     });
@@ -315,7 +303,7 @@ describe('EditableKeyStat', () => {
     );
 
     await waitFor(() => {
-      expect(screen.getByTestId('editableKeyStat-title')).toHaveTextContent(
+      expect(screen.getByTestId('keyStat-title')).toHaveTextContent(
         'Number of applications received',
       );
     });
@@ -334,15 +322,13 @@ describe('EditableKeyStat', () => {
     expect(screen.queryByLabelText('Guidance title')).not.toBeInTheDocument();
     expect(screen.queryByLabelText('Guidance text')).not.toBeInTheDocument();
 
-    expect(screen.getByTestId('editableKeyStat-title')).toHaveTextContent(
+    expect(screen.getByTestId('keyStat-title')).toHaveTextContent(
       'Number of applications received',
     );
 
-    expect(screen.getByTestId('editableKeyStat-value')).toHaveTextContent(
-      '608,180',
-    );
+    expect(screen.getByTestId('keyStat-value')).toHaveTextContent('608,180');
 
-    expect(screen.getByTestId('editableKeyStat-summary')).toHaveTextContent(
+    expect(screen.getByTestId('keyStat-summary')).toHaveTextContent(
       'Down from 620,330 in 2017',
     );
 
@@ -352,7 +338,7 @@ describe('EditableKeyStat', () => {
       }),
     ).toBeInTheDocument();
 
-    expect(screen.getByTestId('editableKeyStat-definition')).toHaveTextContent(
+    expect(screen.getByTestId('keyStat-definition')).toHaveTextContent(
       'Total number of applications received for places at primary and secondary schools.',
     );
   });
@@ -373,7 +359,7 @@ describe('EditableKeyStat', () => {
     );
 
     await waitFor(() => {
-      expect(screen.getByTestId('editableKeyStat-title')).toHaveTextContent(
+      expect(screen.getByTestId('keyStat-title')).toHaveTextContent(
         'Number of applications received',
       );
     });
