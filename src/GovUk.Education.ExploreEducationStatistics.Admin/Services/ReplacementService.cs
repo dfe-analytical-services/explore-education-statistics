@@ -504,23 +504,26 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Services
                 f.FootnoteId == footnoteId && f.FilterId == plan.Id
             );
 
-            _statisticsDbContext.Update(filterFootnote);
-            filterFootnote.FilterId = plan.TargetValue;
+            _statisticsDbContext.Remove(filterFootnote);
+            await _statisticsDbContext.FilterFootnote.AddAsync(new FilterFootnote
+            {
+                FootnoteId = footnoteId,
+                FilterId = plan.TargetValue
+            });
         }
 
         private async Task ReplaceFootnoteFilterGroup(Guid footnoteId, TargetableReplacementViewModel plan)
         {
-            if (!plan.Target.HasValue)
-            {
-                throw new ArgumentException($"{nameof(plan)} does not have a target replacement value");
-            }
-
             var filterGroupFootnote = await _statisticsDbContext.FilterGroupFootnote.SingleAsync(f =>
                 f.FootnoteId == footnoteId && f.FilterGroupId == plan.Id
             );
 
-            _statisticsDbContext.Update(filterGroupFootnote);
-            filterGroupFootnote.FilterGroupId = plan.TargetValue;
+            _statisticsDbContext.Remove(filterGroupFootnote);
+            await _statisticsDbContext.FilterGroupFootnote.AddAsync(new FilterGroupFootnote
+            {
+                FootnoteId = footnoteId,
+                FilterGroupId = plan.TargetValue
+            });
         }
 
         private async Task ReplaceFootnoteFilterItem(Guid footnoteId, TargetableReplacementViewModel plan)
@@ -529,8 +532,12 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Services
                 f.FootnoteId == footnoteId && f.FilterItemId == plan.Id
             );
 
-            _statisticsDbContext.Update(filterItemFootnote);
-            filterItemFootnote.FilterItemId = plan.TargetValue;
+            _statisticsDbContext.Remove(filterItemFootnote);
+            await _statisticsDbContext.FilterItemFootnote.AddAsync(new FilterItemFootnote
+            {
+                FootnoteId = footnoteId,
+                FilterItemId = plan.TargetValue
+            });
         }
 
         private async Task ReplaceIndicatorFootnote(Guid footnoteId, TargetableReplacementViewModel plan)
@@ -539,8 +546,12 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Services
                 f.FootnoteId == footnoteId && f.IndicatorId == plan.Id
             );
 
-            _statisticsDbContext.Update(indicatorFootnote);
-            indicatorFootnote.IndicatorId = plan.TargetValue;
+            _statisticsDbContext.Remove(indicatorFootnote);
+            await _statisticsDbContext.IndicatorFootnote.AddAsync(new IndicatorFootnote
+            {
+                FootnoteId = footnoteId,
+                IndicatorId = plan.TargetValue
+            });
         }
 
         private class ReplacementSubjectMeta
