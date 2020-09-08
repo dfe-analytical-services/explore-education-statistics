@@ -9,6 +9,7 @@ using GovUk.Education.ExploreEducationStatistics.Common.Database;
 using GovUk.Education.ExploreEducationStatistics.Common.Extensions;
 using GovUk.Education.ExploreEducationStatistics.Common.Model;
 using GovUk.Education.ExploreEducationStatistics.Common.Services;
+using GovUk.Education.ExploreEducationStatistics.Common.Services.Interfaces;
 using GovUk.Education.ExploreEducationStatistics.Data.Importer.Services;
 using GovUk.Education.ExploreEducationStatistics.Data.Processor.Extensions;
 using GovUk.Education.ExploreEducationStatistics.Data.Processor.Model;
@@ -19,6 +20,7 @@ using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.Logging;
 using Microsoft.Azure.Storage.Blob;
 using static GovUk.Education.ExploreEducationStatistics.Data.Processor.Services.ValidationErrorMessages;
+using static GovUk.Education.ExploreEducationStatistics.Common.Validators.FileTypeValidationUtils;
 
 namespace GovUk.Education.ExploreEducationStatistics.Data.Processor.Services
 {
@@ -32,12 +34,18 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Processor.Services
 
         [EnumLabelValue("Metafile has invalid number of columns")]
         MetaFileHasInvalidNumberOfColumns,
+        
+        [EnumLabelValue("Metafile must be a csv file")]
+        MetaFileMustBeCsvFile,
 
         [EnumLabelValue("Datafile is missing expected column")]
         DataFileMissingExpectedColumn,
         
         [EnumLabelValue("Datafile has invalid number of columns")]
         DataFileHasInvalidNumberOfColumns,
+        
+        [EnumLabelValue("Datafile must be a csv file")]
+        DataFileMustBeCsvFile,
         
         [EnumLabelValue("Only first 100 errors are shown")]
         FirstOneHundredErrors
@@ -46,6 +54,13 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Processor.Services
     public class ValidatorService : IValidatorService
     {
         private readonly ILogger<IValidatorService> _logger;
+        private readonly IFileTypeService _fileTypeService;
+
+        public ValidatorService(ILogger<IValidatorService> logger, IFileTypeService fileTypeService)
+        {
+            _logger = logger;
+            _fileTypeService = fileTypeService;
+        }
 
         public ValidatorService(ILogger<IValidatorService> logger)
         {
@@ -65,7 +80,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Processor.Services
             _logger.LogInformation($"Validating Datafile: {message.OrigDataFileName}");
 
             return await ValidateCsvFile(subjectData.DataBlob, false)
-                .OnSuccess(() => ValidateCsvFile(subjectData.MetaBlob, true)
+                .OnSuccess(async () => await ValidateCsvFile(subjectData.MetaBlob, true)
                 .OnSuccess(() =>
                 {
                     var csvTable = subjectData.GetCsvTable();
@@ -85,37 +100,46 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Processor.Services
                 }));
         }
         
-        private static async Task<Either<IEnumerable<ValidationError>, bool>> ValidateCsvFile(CloudBlob blob, bool isMetaFile)
+        private async Task<Either<IEnumerable<ValidationError>, Unit>> ValidateCsvFile(CloudBlob blob, bool isMetaFile)
         {
             var errors = new List<ValidationError>();
-            using var reader = new StreamReader(await blob.OpenReadAsync());
-            using var csv = new CsvReader(reader, CultureInfo.InvariantCulture);
-            csv.Configuration.HasHeaderRecord = false;
-            using var dr = new CsvDataReader(csv);
-            var colCount = -1;
-            var idx = 0;
-   
-            while (dr.Read())
-            {
-                idx++;
-                if (colCount >= 0 && dr.FieldCount != colCount)
-                {
-                    errors.Add(isMetaFile ? new ValidationError($"error at row {idx}: {MetaFileHasInvalidNumberOfColumns.GetEnumLabel()}") :
-                        new ValidationError($"error at row {idx}: {DataFileHasInvalidNumberOfColumns.GetEnumLabel()}"));
-                    break;
-                }
-                colCount = dr.FieldCount;
-            }
             
+            if (!await IsCsvFile(blob))
+            {
+                errors.Add(isMetaFile ? new ValidationError($"{MetaFileMustBeCsvFile.GetEnumLabel()}") :
+                    new ValidationError($"{DataFileMustBeCsvFile.GetEnumLabel()}"));
+            }
+            else
+            {
+                using var reader = new StreamReader(await blob.OpenReadAsync());
+                using var csv = new CsvReader(reader, CultureInfo.InvariantCulture);
+                csv.Configuration.HasHeaderRecord = false;
+                using var dr = new CsvDataReader(csv);
+                var colCount = -1;
+                var idx = 0;
+       
+                while (dr.Read())
+                {
+                    idx++;
+                    if (colCount >= 0 && dr.FieldCount != colCount)
+                    {
+                        errors.Add(isMetaFile ? new ValidationError($"error at row {idx}: {MetaFileHasInvalidNumberOfColumns.GetEnumLabel()}") :
+                            new ValidationError($"error at row {idx}: {DataFileHasInvalidNumberOfColumns.GetEnumLabel()}"));
+                        break;
+                    }
+                    colCount = dr.FieldCount;
+                }
+            }
+
             if (errors.Count > 0)
             {
                 return errors;
             }
 
-            return true;
+            return Unit.Instance;
         }
 
-        private static async Task<Either<IEnumerable<ValidationError>, bool>> ValidateMetaHeader(DataColumnCollection header)
+        private static async Task<Either<IEnumerable<ValidationError>, Unit>> ValidateMetaHeader(DataColumnCollection header)
         {
             var errors = new List<ValidationError>();
             // Check for unexpected column names
@@ -132,10 +156,10 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Processor.Services
                 return errors;
             }
 
-            return true;
+            return Unit.Instance;
         }
 
-        private static async Task<Either<IEnumerable<ValidationError>, bool>> ValidateMetaRows(
+        private static async Task<Either<IEnumerable<ValidationError>, Unit>> ValidateMetaRows(
             DataColumnCollection cols, DataRowCollection rows)
         {
             var errors = new List<ValidationError>();
@@ -159,10 +183,10 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Processor.Services
                 return errors;
             }
 
-            return true;
+            return Unit.Instance;
         }
         
-        private static async Task<Either<IEnumerable<ValidationError>, bool>> ValidateObservationHeaders(DataColumnCollection cols)
+        private static async Task<Either<IEnumerable<ValidationError>, Unit>> ValidateObservationHeaders(DataColumnCollection cols)
         {
             var errors = new List<ValidationError>();
             
@@ -185,7 +209,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Processor.Services
                 return errors;
             }
 
-            return true;
+            return Unit.Instance;
         }
 
         private static async Task<Either<IEnumerable<ValidationError>, ProcessorStatistics>>
@@ -255,6 +279,12 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Processor.Services
                 .AddJsonFile("local.settings.json", true, true)
                 .AddEnvironmentVariables()
                 .Build();
+        }
+        
+        private async Task<bool> IsCsvFile(CloudBlob blob)
+        {
+            return await _fileTypeService.HasMatchingMimeType(blob, AllowedMimeTypesByFileType[ReleaseFileTypes.Data]) 
+                   && await _fileTypeService.HasMatchingEncodingType(blob, CsvEncodingTypes);
         }
     }
 }

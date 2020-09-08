@@ -27,6 +27,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Processor.Functions
         private readonly IReleaseProcessorService _releaseProcessorService;
         private readonly ISplitFileService _splitFileService;
         private readonly IValidatorService _validatorService;
+        private readonly IDataArchiveService _dataArchiveService;
 
         public Processor(
             IFileImportService fileImportService,
@@ -35,7 +36,8 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Processor.Functions
             ISplitFileService splitFileService,
             IImporterService importerService,
             IBatchService batchService,
-            IValidatorService validatorService
+            IValidatorService validatorService,
+            IDataArchiveService dataArchiveService
         )
         {
             _fileImportService = fileImportService;
@@ -45,6 +47,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Processor.Functions
             _importerService = importerService;
             _batchService = batchService;
             _validatorService = validatorService;
+            _dataArchiveService = dataArchiveService;
         }
 
         [FunctionName("ProcessUploads")]
@@ -58,6 +61,12 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Processor.Functions
             if (message.Seeding)
             {
                 await _batchService.CreateImport(message.Release.Id.ToString(), message.DataFileName, 0, message);
+            }
+
+            if (message.ArchiveFileName != "")
+            {
+                await _batchService.UpdateStatus(message.Release.Id.ToString(), message.DataFileName, IStatus.PROCESSING_ARCHIVE_FILE);
+                await _dataArchiveService.ExtractDataFiles(message.Release.Id, message.ArchiveFileName);
             }
 
             await _batchService.UpdateStatus(message.Release.Id.ToString(), message.DataFileName, IStatus.RUNNING_PHASE_1);

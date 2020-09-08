@@ -116,11 +116,13 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
         {
             var (configuration, userService, releaseHelper,
                 contentDbContext, importService,
-                fileUploadsValidatorService, subjectService) = Mocks();
+                fileUploadsValidatorService, subjectService,
+                dataArchiveValidationService) = Mocks();
 
             var service = new ReleaseFilesService(configuration.Object,
                 userService.Object, releaseHelper.Object, contentDbContext.Object,
-                importService.Object, fileUploadsValidatorService.Object, subjectService.Object);
+                importService.Object, fileUploadsValidatorService.Object, subjectService.Object,
+                dataArchiveValidationService.Object);
 
             PermissionTestUtil.AssertSecurityPoliciesChecked(protectedAction, _release, userService, service, policies);
         }
@@ -132,7 +134,8 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
             Mock<ContentDbContext>,
             Mock<IImportService>,
             Mock<IFileUploadsValidatorService>,
-            Mock<ISubjectService>
+            Mock<ISubjectService>,
+            Mock<IDataArchiveValidationService>
             ) Mocks()
         {
             var mockConf= new Mock<IConfiguration>();
@@ -145,7 +148,9 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
                 new Mock<ContentDbContext>(),
                 new Mock<IImportService>(),
                 new Mock<IFileUploadsValidatorService>(),
-                new Mock<ISubjectService>());
+                new Mock<ISubjectService>(),
+                new Mock<IDataArchiveValidationService>()
+                );
         }
     }
 }

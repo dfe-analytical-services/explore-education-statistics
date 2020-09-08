@@ -14,7 +14,9 @@ export type UseFormSubmit<FormValues> = (
 
 function useFormSubmit<FormValues>(
   onSubmit: UseFormSubmit<FormValues>,
-  errorMappers: FieldMessageMapper<FormValues>[] = [],
+  errorMappers:
+    | FieldMessageMapper<FormValues>[]
+    | ((values: FormValues) => FieldMessageMapper<FormValues>[]) = [],
 ) {
   const { handleApiErrors } = useErrorControl();
 
@@ -26,7 +28,9 @@ function useFormSubmit<FormValues>(
         if (isServerValidationError(error) && error.response?.data) {
           const errors = convertServerFieldErrors(
             error.response?.data,
-            errorMappers,
+            typeof errorMappers === 'function'
+              ? errorMappers(values)
+              : errorMappers,
           );
 
           if (Object.values(errors).length) {

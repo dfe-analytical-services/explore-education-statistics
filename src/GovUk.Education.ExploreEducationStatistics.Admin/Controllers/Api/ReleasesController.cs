@@ -173,13 +173,29 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Controllers.Api
         [ProducesResponseType(404)]
         [RequestSizeLimit(int.MaxValue)]
         [RequestFormLimits(ValueLengthLimit = int.MaxValue, MultipartBodyLengthLimit = int.MaxValue)]
-        public async Task<ActionResult<bool>> AddDataFilesAsync(Guid releaseId,
+        public async Task<ActionResult<DataFileInfo>> AddDataFilesAsync(Guid releaseId,
             [FromQuery(Name = "name"), Required] string name, IFormFile file, IFormFile metaFile)
         {
             var user = await _userManager.GetUserAsync(User);
 
             return await _releaseFilesService
                 .UploadDataFilesAsync(releaseId, file, metaFile, name, user.Email)
+                .HandleFailuresOrOk();
+        }
+
+        [HttpPost("release/{releaseId}/zip-data")]
+        [Produces("application/json")]
+        [ProducesResponseType(200)]
+        [ProducesResponseType(404)]
+        [RequestSizeLimit(int.MaxValue)]
+        [RequestFormLimits(ValueLengthLimit = int.MaxValue, MultipartBodyLengthLimit = int.MaxValue)]
+        public async Task<ActionResult<DataFileInfo>> AddDataZipFileAsync(Guid releaseId,
+            [FromQuery(Name = "name"), Required] string name, IFormFile zipFile)
+        {
+            var user = await _userManager.GetUserAsync(User);
+
+            return await _releaseFilesService
+                .UploadDataFilesAsZipAsync(releaseId, zipFile, name, user.Email)
                 .HandleFailuresOrOk();
         }
 

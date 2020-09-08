@@ -499,7 +499,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Services
                     var fileLink = _context
                             .ReleaseFiles
                             .Include(f => f.ReleaseFileReference)
-                            .First(f => f.ReleaseId == releaseId && f.ReleaseFileReference.Filename == dataFileName);
+                            .FirstOrDefault(f => f.ReleaseId == releaseId && f.ReleaseFileReference.Filename == dataFileName);
 
                     if (fileLink == null)
                     {

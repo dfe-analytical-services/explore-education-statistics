@@ -1,9 +1,9 @@
 import styles from '@admin/pages/release/data/components/ReleaseDataUploadsSection.module.scss';
-import { DataFile } from '@admin/services/releaseDataFileService';
-import importStatusService, {
-  ImportStatus,
+import releaseDataFileService, {
+  DataFile,
+  DataFileImportStatus,
   ImportStatusCode,
-} from '@admin/services/importService';
+} from '@admin/services/releaseDataFileService';
 import Details from '@common/components/Details';
 import LoadingSpinner from '@common/components/LoadingSpinner';
 import SummaryListItem from '@common/components/SummaryListItem';
@@ -25,6 +25,8 @@ export const getImportStatusLabel = (importstatusCode: ImportStatusCode) => {
       return 'Uploading';
     case 'QUEUED':
       return 'Queued';
+    case 'PROCESSING_ARCHIVE_FILE':
+      return 'Processing archive file';
     case 'RUNNING_PHASE_1':
       return 'Validating';
     case 'RUNNING_PHASE_2':
@@ -69,6 +71,8 @@ class ImporterStatus extends Component<Props> {
         return [styles.ragStatusAmber];
       case 'QUEUED':
         return [styles.ragStatusAmber];
+      case 'PROCESSING_ARCHIVE_FILE':
+        return [styles.ragStatusAmber];
       case 'RUNNING_PHASE_1':
         return [styles.ragStatusAmber];
       case 'RUNNING_PHASE_2':
@@ -99,15 +103,15 @@ class ImporterStatus extends Component<Props> {
     // when the timer is canceled. This prevents setState being called after
     // the component has unmounted.
 
-    importStatusService
-      .getImportStatus(releaseId, dataFile.filename)
+    releaseDataFileService
+      .getDataFileImportStatus(releaseId, dataFile.filename)
       .then(
         importStatus =>
           this.intervalId &&
           this.setState({
             current: importStatus,
             isFetching: false,
-            running: 'UPLOADING,QUEUED,RUNNING_PHASE_1, RUNNING_PHASE_2, RUNNING_PHASE_3'.match(
+            running: 'UPLOADING,QUEUED,PROCESSING_ARCHIVE_FILE,RUNNING_PHASE_1, RUNNING_PHASE_2, RUNNING_PHASE_3'.match(
               importStatus.status,
             ),
           }),
@@ -123,7 +127,7 @@ class ImporterStatus extends Component<Props> {
       )
       .finally(() => {
         const { current } = this.state;
-        const currentStatus: ImportStatus = (current as unknown) as ImportStatus;
+        const currentStatus: DataFileImportStatus = (current as unknown) as DataFileImportStatus;
         onStatusChangeHandler(dataFile, currentStatus.status);
       });
   }
@@ -143,7 +147,7 @@ class ImporterStatus extends Component<Props> {
 
   public render() {
     const { current, running } = this.state;
-    const currentStatus: ImportStatus = (current as unknown) as ImportStatus;
+    const currentStatus: DataFileImportStatus = (current as unknown) as DataFileImportStatus;
 
     return (
       <SummaryListItem term="Status">

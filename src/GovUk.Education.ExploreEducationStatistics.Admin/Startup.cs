@@ -303,10 +303,8 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin
             // These services allow us to check our Policies within Controllers and Services
             StartupSecurityConfiguration.ConfigureResourceBasedAuthorization(services);
 
-            services.AddTransient<IFileTypeService, FileTypeService>();
-
-            // Temp service for EES-960
-            services.AddTransient<IUpdateChartFilesService, UpdateChartFilesService>();
+            services.AddSingleton<IFileTypeService, FileTypeService>();
+            services.AddTransient<IDataArchiveValidationService, DataArchiveValidationService>();
 
             services.AddSwaggerGen(c =>
             {

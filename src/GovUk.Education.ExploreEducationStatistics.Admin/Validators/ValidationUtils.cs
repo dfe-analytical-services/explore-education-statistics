@@ -113,11 +113,18 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Validators
         DataAndMetadataFilesCannotHaveTheSameName,
         DataFileCannotBeEmpty,
         DataFileMustBeCsvFile,
-        DatafileAlreadyUploaded,
+        DataFileAlreadyUploaded,
         DataFilenameCannotContainSpacesOrSpecialCharacters,
         CannotRemoveDataFilesUntilImportComplete,
         CannotRemoveDataFilesOnceReleaseApproved,
         AllDatafilesUploadedMustBeComplete,
+        
+        // Data zip file
+        DataFileMustBeZipFile,
+        DataZipFileCanOnlyContainTwoFiles,
+        DataZipFileDoesNotContainCsvFiles,
+        DataZipFileAlreadyExists,
+        
         ReplacementDataFileMustBeForSameRelease,
 
         // Meta file
@@ -126,11 +133,14 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Validators
         MetaFileMustBeCsvFile,
         UnableToFindMetadataFileToDelete,
         MetaFilenameCannotContainSpacesOrSpecialCharacters,
+        MetaFileIsIncorrectlyNamed,
 
         // Release
         ReleaseNotApproved,
         ApprovedReleaseMustHavePublishScheduledDate,
         PublishedReleaseCannotBeUnapproved,
-
+        
+        // Subject
+        SubjectTitleCannotContainSpecialCharacters,
     }
 }

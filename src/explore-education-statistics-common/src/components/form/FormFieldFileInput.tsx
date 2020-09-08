@@ -1,3 +1,4 @@
+import Effect from '@common/components/Effect';
 import FormField, {
   FormFieldComponentProps,
 } from '@common/components/form/FormField';
@@ -15,46 +16,62 @@ type Props<FormValues> = FormFieldComponentProps<
 const FormFieldFileInput = <FormValues extends {}>(
   props: Props<FormValues>,
 ) => {
-  const [fileHasBeenSelected, toggleFileHasBeenSelected] = useToggle(false);
-  const [inputValue, setInputValue] = useState<File | null>(null);
+  // Have to do additional tracking as file inputs have
+  // weird quirks that mean we get a weird validation
+  // experience due to:
+  // 1. `onBlur` triggering immediately upon clicking
+  //     (should be after selecting file or cancelling)
+  // 2. `onChange` not triggering if nothing is selected
+  const [isClicked, toggleClicked] = useToggle(false);
+  // undefined is the initial state, null is unselected state
+  const [inputValue, setInputValue] = useState<File | null | undefined>();
 
   return (
     <FormField<File | null> {...props}>
-      {({ field, helpers }) => (
-        <FormFileInput
-          {...props}
-          {...field}
-          onChange={event => {
-            toggleFileHasBeenSelected();
+      {({ field, helpers, meta }) => (
+        <>
+          <Effect
+            value={meta.touched}
+            onChange={(touched, previousTouched) => {
+              // Form has been reset
+              if (previousTouched && !touched) {
+                toggleClicked.off();
+                setInputValue(undefined);
+              }
+            }}
+          />
 
-            if (props.onChange) {
-              props.onChange(event);
-            }
+          <FormFileInput
+            {...props}
+            {...field}
+            onClick={toggleClicked.on}
+            onChange={event => {
+              if (props.onChange) {
+                props.onChange(event);
+              }
 
-            if (event.isDefaultPrevented()) {
-              return;
-            }
+              if (event.isDefaultPrevented()) {
+                return;
+              }
 
-            const file =
-              event.target.files && event.target.files.length > 0
-                ? event.target.files[0]
-                : null;
+              const file =
+                event.target.files && event.target.files.length > 0
+                  ? event.target.files[0]
+                  : null;
 
-            setInputValue(file);
-            helpers.setValue(file);
-          }}
-          onBlur={event => {
-            if (inputValue !== field.value) {
-              // formField value was outside of the input (e.g form reset)
-              // reset field touched state
-              helpers.setTouched(false);
-              toggleFileHasBeenSelected(false);
-            } else if (fileHasBeenSelected) {
-              // only allow field validation if a file has been previously selected
+              setInputValue(file);
+              helpers.setValue(file);
+            }}
+            onBlur={event => {
+              if (isClicked && typeof inputValue === 'undefined') {
+                toggleClicked.off();
+                return;
+              }
+
               field.onBlur(event);
-            }
-          }}
-        />
+            }}
+          />
+        </>
       )}
     </FormField>
   );

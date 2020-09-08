@@ -9,7 +9,6 @@ using System.Threading.Tasks;
 using GovUk.Education.ExploreEducationStatistics.Common.Model;
 using Microsoft.Azure.Storage;
 using Microsoft.Azure.Storage.Blob;
-using Microsoft.Azure.Storage.RetryPolicies;
 using static GovUk.Education.ExploreEducationStatistics.Common.Services.FileStoragePathUtils;
 using FileInfo = GovUk.Education.ExploreEducationStatistics.Common.Model.FileInfo;
 
@@ -133,6 +132,21 @@ namespace GovUk.Education.ExploreEducationStatistics.Common.Services
                 .OfType<CloudBlockBlob>();
         }
         
+        public static async Task AddMetaValuesAsync(CloudBlob blob, IDictionary<string, string> values)
+        {
+            foreach (var (key, value) in values)
+            {
+                if (blob.Metadata.ContainsKey(key))
+                {
+                    blob.Metadata.Remove(key);
+                }
+
+                blob.Metadata.Add(key, value);
+            }
+
+            await blob.SetMetadataAsync();
+        }
+        
         private static IEnumerable<FileInfo> ListFiles(string storageConnectionString, string containerName,
             string prefix, bool releasedFilesOnly)
         {
@@ -188,6 +202,11 @@ namespace GovUk.Education.ExploreEducationStatistics.Common.Services
         public static string GetName(CloudBlob blob)
         {
             return blob.Metadata.TryGetValue(NameKey, out var name) ? name : string.Empty;
+        }
+
+        public static string GetUserName(CloudBlob blob)
+        {
+            return blob.Metadata.TryGetValue(UserName, out var name) ? name : string.Empty;
         }
 
         public static string GetSize(CloudBlob blob)
