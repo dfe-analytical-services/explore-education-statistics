@@ -1,6 +1,7 @@
 import ReleaseContentPage from '@admin/pages/release/content/ReleaseContentPage';
 import ReleaseDataPage from '@admin/pages/release/data/ReleaseDataPage';
 import ReleaseDataBlocksPage from '@admin/pages/release/datablocks/ReleaseDataBlocksPage';
+import ReleasePreReleaseAccessPage from '@admin/pages/release/ReleasePreReleaseAccessPage';
 import ReleasePublishStatusPage from '@admin/pages/release/ReleaseStatusPage';
 import ReleaseSummaryEditPage from '@admin/pages/release/ReleaseSummaryEditPage';
 import ReleaseSummaryPage from '@admin/pages/release/ReleaseSummaryPage';
@@ -55,4 +56,10 @@ export const releaseStatusRoute: ReleaseRouteProps = {
   path: '/publication/:publicationId/release/:releaseId/status',
   title: 'Release status',
   component: ReleasePublishStatusPage,
+};
+
+export const releasePreReleaseAccessRoute: ReleaseRouteProps = {
+  path: '/publication/:publicationId/release/:releaseId/prerelease-access',
+  title: 'Pre-release access',
+  component: ReleasePreReleaseAccessPage,
 };

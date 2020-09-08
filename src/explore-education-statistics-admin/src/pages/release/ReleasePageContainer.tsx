@@ -13,6 +13,7 @@ import {
   releaseStatusRoute,
   releaseSummaryEditRoute,
   releaseSummaryRoute,
+  releasePreReleaseAccessRoute,
 } from '@admin/routes/releaseRoutes';
 import publicationService, {
   BasicPublicationDetails,
@@ -33,6 +34,7 @@ const navRoutes = [
   releaseDataBlocksRoute,
   releaseContentRoute,
   releaseStatusRoute,
+  releasePreReleaseAccessRoute,
 ];
 
 const routes = [...navRoutes, releaseSummaryEditRoute];
