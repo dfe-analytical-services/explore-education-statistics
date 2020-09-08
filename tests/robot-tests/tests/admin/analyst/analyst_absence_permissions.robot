@@ -61,10 +61,17 @@ Validate Analyst1 can see 'Manage content' page key stats
     [Tags]  HappyPath
     user waits until page contains element  id:releaseHeadlines
     user scrolls to element  id:releaseHeadlines
-    user waits until page contains key stat tile   Overall absence rate        4.7%    60
-    user waits until page contains key stat tile   Authorised absence rate     3.4%
-    user waits until page contains key stat tile   Unauthorised absence rate   1.3%
-    user checks element count is x    css:[data-testid="keyStatTile-title"]   3
+
+    user checks key stat contents    1  Overall absence rate         4.7%   Up from 4.6% in 2015/16   90
+    user checks key stat definition  1  What is overall absence?  Total number of all authorised and unauthorised absences from possible school sessions for all pupils.
+
+    user checks key stat contents    2  Authorised absence rate      3.4%   Similar to previous years
+    user checks key stat definition  2  What is authorized absence rate?  Number of authorised absences as a percentage of the overall school population.
+
+    user checks key stat contents    3  Unauthorised absence rate    1.3%   Up from 1.1% in 2015/16
+    user checks key stat definition  3  What is unauthorized absence rate?  Number of unauthorised absences as a percentage of the overall school population.
+
+    user checks element count is x    css:[data-testid="keyStat"]   3
 
 Validate Analyst1 can see 'Manage content' page accordion sections
     [Tags]  HappyPath

@@ -11,7 +11,7 @@ import React, { useCallback, useState } from 'react';
 import styles from './EditableContentBlock.module.scss';
 
 interface EditableContentBlockProps
-  extends OmitStrict<FormEditorProps, 'onChange' | 'name'> {
+  extends OmitStrict<FormEditorProps, 'onChange'> {
   editable?: boolean;
   id: string;
   onSave: (value: string) => void;
@@ -65,7 +65,6 @@ const EditableContentBlock = ({
       <>
         <FormEditor
           {...props}
-          name="content"
           hideLabel={hideLabel}
           value={content}
           onChange={setContent}
