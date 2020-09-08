@@ -169,7 +169,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Services
 
         public IEnumerable<Footnote> GetFootnotes(Guid releaseId, Guid subjectId)
         {
-            return _commonFootnoteService.GetFootnotes(releaseId, new List<Guid>(){subjectId});
+            return _commonFootnoteService.GetFootnotes(releaseId, subjectId);
         }
 
         private void CreateSubjectLinks(Footnote footnote, IEnumerable<Guid> subjectIds)

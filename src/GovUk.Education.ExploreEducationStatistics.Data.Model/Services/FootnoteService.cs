@@ -47,7 +47,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Model.Services
 
         public async Task DeleteAllFootnotesBySubject(Guid releaseId, Guid subjectId)
         {
-            var footnotesLinkedToSubject = GetFootnotes(releaseId, new List<Guid> {subjectId});
+            var footnotesLinkedToSubject = GetFootnotes(releaseId, subjectId);
 
             foreach (var footnote in footnotesLinkedToSubject)
             {
@@ -104,12 +104,12 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Model.Services
         {
             var subjectsIdsForRelease = _context.ReleaseSubject
                 .Where(rs => rs.ReleaseId == releaseId)
-                .Select(rs => rs.SubjectId).ToList();
+                .Select(rs => rs.SubjectId).ToArray();
 
             return GetFootnotes(releaseId, subjectsIdsForRelease);
         }
 
-        public IEnumerable<Footnote> GetFootnotes(Guid releaseId, List<Guid> subjects)
+        public IEnumerable<Footnote> GetFootnotes(Guid releaseId, params Guid[] subjects)
         {
             return _context.Footnote
                     .Include(footnote => footnote.Filters)

@@ -17,7 +17,6 @@ using Microsoft.AspNetCore.Mvc;
 
 namespace GovUk.Education.ExploreEducationStatistics.Admin.Controllers.Api
 {
-    // TODO rename to Releases once the current Crud releases controller is removed
     [Route("api")]
     [ApiController]
     [Authorize]
@@ -26,6 +25,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Controllers.Api
         private readonly IReleaseService _releaseService;
         private readonly IReleaseFilesService _releaseFilesService;
         private readonly IReleaseStatusService _releaseStatusService;
+        private readonly IReplacementService _replacementService;
         private readonly UserManager<ApplicationUser> _userManager;
         private readonly IDataBlockService _dataBlockService;
 
@@ -33,6 +33,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Controllers.Api
             IReleaseService releaseService,
             IReleaseFilesService releaseFilesService,
             IReleaseStatusService releaseStatusService,
+            IReplacementService replacementService,
             UserManager<ApplicationUser> userManager,
             IDataBlockService dataBlockService
             )
@@ -40,6 +41,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Controllers.Api
             _releaseService = releaseService;
             _releaseFilesService = releaseFilesService;
             _releaseStatusService = releaseStatusService;
+            _replacementService = replacementService;
             _userManager = userManager;
             _dataBlockService = dataBlockService;
         }
@@ -270,6 +272,14 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Controllers.Api
         {
             return await _releaseService
                 .GetDeleteDataFilePlan(releaseId, fileName, subjectTitle)
+                .HandleFailuresOrOk();
+        }
+
+        [HttpPost("release/data/replacement-plan")]
+        public async Task<ActionResult<ReplacementPlanViewModel>> GetReplacementPlan(ReplacementPlanRequest request)
+        {
+            return await _replacementService
+                .GetReplacementPlan(request.OriginalSubjectId.Value, request.ReplacementSubjectId.Value)
                 .HandleFailuresOrOk();
         }
 
