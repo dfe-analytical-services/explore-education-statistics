@@ -85,8 +85,10 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Services
                         return ValidationActionResult(ReplacementMustBeValid);
                     }
 
-                    await replacementPlan.DataBlocks.ForEachAsync(plan => ReplaceLinksForDataBlock(plan, replacementSubjectId));
-                    await replacementPlan.Footnotes.ForEachAsync(ReplaceLinksForFootnote);
+                    await replacementPlan.DataBlocks.ForEachAsync(plan =>
+                        ReplaceLinksForDataBlock(plan, replacementSubjectId));
+                    await replacementPlan.Footnotes.ForEachAsync(plan =>
+                        ReplaceLinksForFootnote(plan, originalSubjectId, replacementSubjectId));
 
                     await _contentDbContext.SaveChangesAsync();
                     await _statisticsDbContext.SaveChangesAsync();
@@ -369,14 +371,15 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Services
             };
         }
 
-        private async Task ReplaceLinksForDataBlock(DataBlockReplacementPlanViewModel replacementPlan, Guid replacementSubjectId)
+        private async Task ReplaceLinksForDataBlock(DataBlockReplacementPlanViewModel replacementPlan,
+            Guid replacementSubjectId)
         {
             var dataBlock = await _contentDbContext.ContentBlocks
                 .OfType<DataBlock>()
                 .SingleAsync(block => block.Id == replacementPlan.Id);
 
             _contentDbContext.Update(dataBlock);
-            
+
             dataBlock.Query.SubjectId = replacementSubjectId;
             ReplaceDataBlockQueryFilters(replacementPlan, dataBlock);
             ReplaceDataBlockQueryIndicators(replacementPlan, dataBlock);
@@ -393,7 +396,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Services
                 filterItems.Remove(plan.Id);
                 filterItems.Add(plan.TargetValue);
             });
-            
+
             dataBlock.Query.Filters = filterItems;
         }
 
@@ -401,16 +404,16 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Services
             DataBlock dataBlock)
         {
             var indicators = dataBlock.Query.Indicators.ToList();
-            
+
             replacementPlan.Indicators.ToList().ForEach(plan =>
             {
                 indicators.Remove(plan.Id);
                 indicators.Add(plan.TargetValue);
             });
-            
+
             dataBlock.Query.Indicators = indicators;
         }
-        
+
         private static void ReplaceDataBlockTableHeaders(DataBlockReplacementPlanViewModel replacementPlan,
             DataBlock dataBlock)
         {
@@ -432,11 +435,11 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Services
 
             dataBlock.Table.TableHeaders.Columns = tableHeaderColumns;
             dataBlock.Table.TableHeaders.Rows = tableHeaderRows;
-            
-            // TODO EES- ColGroups
-            // TODO RowGroups
+
+            // TODO EES-1292 ColGroups
+            // TODO EES-1292 RowGroups
         }
-        
+
         private static void ReplaceDataBlockTableHeaders(List<TableHeader> tableHeaders, DataBlock dataBlock,
             IReadOnlyDictionary<Guid, Guid> targets)
         {
@@ -450,31 +453,51 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Services
                     }
                     else
                     {
-                        throw new InvalidOperationException($"Expected target replacement value for dataBlock ${dataBlock.Id} ${tableHeader.Type} table header value: ${idAsGuid}");
+                        throw new InvalidOperationException(
+                            $"Expected target replacement value for dataBlock ${dataBlock.Id} ${tableHeader.Type} table header value: ${idAsGuid}");
                     }
                 }
                 else
                 {
-                    throw new InvalidOperationException($"Expected Guid for dataBlock ${dataBlock.Id} ${tableHeader.Type} table header value but found: ${tableHeader.Value}");
-                }   
+                    throw new InvalidOperationException(
+                        $"Expected Guid for dataBlock ${dataBlock.Id} ${tableHeader.Type} table header value but found: ${tableHeader.Value}");
+                }
             }
-        }  
+        }
 
-        private async Task ReplaceLinksForFootnote(FootnoteReplacementPlanViewModel replacementPlan)
+        private async Task ReplaceLinksForFootnote(FootnoteReplacementPlanViewModel replacementPlan, Guid originalSubjectId, Guid replacementSubjectId)
         {
+            await ReplaceFootnoteSubject(replacementPlan.Id, originalSubjectId, replacementSubjectId);
+            
             await replacementPlan.Filters.ForEachAsync(async plan =>
                 await ReplaceFootnoteFilter(replacementPlan.Id, plan));
-
+            
             await replacementPlan.FilterGroups.ForEachAsync(async plan =>
                 await ReplaceFootnoteFilterGroup(replacementPlan.Id, plan));
-
+            
             await replacementPlan.FilterItems.ForEachAsync(async plan =>
                 await ReplaceFootnoteFilterItem(replacementPlan.Id, plan));
-
+            
             await replacementPlan.Indicators.ForEachAsync(async plan =>
                 await ReplaceIndicatorFootnote(replacementPlan.Id, plan));
         }
 
+        private async Task ReplaceFootnoteSubject(Guid footnoteId, Guid originalSubjectId, Guid replacementSubjectId)
+        {
+            var subjectFootnote = await _statisticsDbContext.SubjectFootnote.Where(f =>
+                f.FootnoteId == footnoteId && f.SubjectId == originalSubjectId).SingleOrDefaultAsync();
+
+            if (subjectFootnote != null)
+            {
+                _statisticsDbContext.Remove(subjectFootnote);
+                await _statisticsDbContext.SubjectFootnote.AddAsync(new SubjectFootnote
+                {
+                    FootnoteId = footnoteId,
+                    SubjectId = replacementSubjectId
+                });
+            }
+        }
+        
         private async Task ReplaceFootnoteFilter(Guid footnoteId, TargetableReplacementViewModel plan)
         {
             var filterFootnote = await _statisticsDbContext.FilterFootnote.SingleAsync(f =>
