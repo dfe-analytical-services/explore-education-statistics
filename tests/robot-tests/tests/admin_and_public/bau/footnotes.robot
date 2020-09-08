@@ -58,7 +58,7 @@ Upload subject
     user waits until page contains accordion section   ${SUBJECT_NAME}
     user opens accordion section   ${SUBJECT_NAME}
     user checks page contains element   xpath://dt[text()="Subject title"]/../dd/h4[text()="${SUBJECT_NAME}"]
-    user waits until page contains element  xpath://dt[text()="Status"]/../dd//strong[text()="Complete"]     180
+    user waits until page contains element  xpath://dt[text()="Status"]/../dd//strong[text()="Complete"]     360
 
 Open footnotes tab
     [Tags]  HappyPath
