@@ -268,3 +268,7 @@ def remove_substring_from_right_of_string(string, substring):
         return string[:-len(substring)]
     else:
         raise_assertion_error(f'String "{string}" doesn\'t end with substring "{substring}"')
+
+def user_clicks_element_if_exists(selector):
+    if element_finder.find(selector, required=False) is not None:
+        sl.click_element(selector)
