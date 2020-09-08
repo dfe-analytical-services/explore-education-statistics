@@ -127,6 +127,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Validators
         DataZipFileAlreadyExists,
         
         ReplacementDataFileMustBeForSameRelease,
+        ReplacementMustBeValid,
 
         // Meta file
         CannotOverwriteMetadataFile,

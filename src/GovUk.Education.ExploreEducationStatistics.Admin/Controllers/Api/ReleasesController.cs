@@ -283,6 +283,14 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Controllers.Api
                 .HandleFailuresOrOk();
         }
 
+        [HttpPost("release/data/replace")]
+        public async Task<ActionResult<Unit>> Replace(ReplacementPlanRequest request)
+        {
+            return await _replacementService
+                .Replace(request.OriginalSubjectId.Value, request.ReplacementSubjectId.Value)
+                .HandleFailuresOrOk();
+        }
+
         [HttpDelete("release/{releaseId}/data/{fileName}")]
         public async Task<ActionResult> DeleteDataFiles(Guid releaseId,
             string fileName,

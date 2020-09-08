@@ -2,6 +2,7 @@
 using System.Collections.Generic;
 using System.Linq;
 using GovUk.Education.ExploreEducationStatistics.Common.Model.Data.Query;
+using Newtonsoft.Json;
 
 namespace GovUk.Education.ExploreEducationStatistics.Admin.ViewModels
 {
@@ -118,6 +119,19 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.ViewModels
         public string Label { get; set; }
         public Guid? Target { get; set; }
         public bool Valid => Target.HasValue;
+
+        [JsonIgnore]
+        public Guid TargetValue
+        {
+            get
+            {
+                if (!Target.HasValue)
+                {
+                    throw new InvalidOperationException ($"{nameof(Target)} does not have a value");
+                }
+                return Target.Value;
+            }
+        }
     }
 
     public abstract class ReplacementViewModel
