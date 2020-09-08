@@ -64,7 +64,7 @@ Upload subject
     user checks summary list contains  Metadata file    dates.meta.csv  ${section}
     user checks summary list contains  Number of rows   119  ${section}
     user checks summary list contains  Data file size   17 Kb  ${section}
-    user checks summary list contains  Status           Complete  ${section}  180
+    user checks summary list contains  Status           Complete  ${section}  360
 
 Open footnotes tab
     [Tags]  HappyPath

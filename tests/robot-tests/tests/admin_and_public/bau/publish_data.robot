@@ -55,7 +55,7 @@ Upload subject
     user checks summary list contains  Metadata file    upload-file-test.meta.csv  ${section}
     user checks summary list contains  Number of rows   159  ${section}
     user checks summary list contains  Data file size   15 Kb  ${section}
-    user checks summary list contains  Status           Complete  ${section}  180
+    user checks summary list contains  Status           Complete  ${section}  360
 
 Navigate to Manage data blocks tab
     [Tags]  HappyPath
