@@ -132,7 +132,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Services
                             var metadataFile = dataFiles.Item2;
                             var dataInfo = new Dictionary<string, string>{{NameKey, name}, {MetaFileKey, metadataFile.Name.ToLower()}, {UserName, userName}};
 
-                            return await _fileUploadsValidatorService.ValidateZippedDataFileForUpload(releaseId, dataFile, metadataFile, name)
+                            return await _fileUploadsValidatorService.ValidateDataArchiveEntriesForUpload(releaseId, dataFile, metadataFile, name)
                                 .OnSuccess(async () => await _importService.CreateImportTableRow(releaseId, dataFile.Name.ToLower()))
                                 .OnSuccess(async () =>
                                 {

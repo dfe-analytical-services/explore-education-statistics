@@ -41,7 +41,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Services
                 .OnSuccess(async _ => await ValidateDataFileTypes(releaseId, dataFile, metaFile));
         }
 
-        public async Task<Either<ActionResult, Unit>> ValidateZippedDataFileForUpload(Guid releaseId, ZipArchiveEntry dataFile, ZipArchiveEntry metaFile, string name)
+        public async Task<Either<ActionResult, Unit>> ValidateDataArchiveEntriesForUpload(Guid releaseId, ZipArchiveEntry dataFile, ZipArchiveEntry metaFile, string name)
         {
             return await ValidateDataFileNames(releaseId, dataFile.Name, metaFile.Name)
                 .OnSuccess(async _ => await ValidateDataFileSizes(dataFile.Length, metaFile.Length))
@@ -90,11 +90,6 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Services
 
         private async Task<bool> IsCsvFile(string filePath, IFormFile file)
         {
-            if (!filePath.EndsWith(".csv"))
-            {
-                return false;
-            }
-            
             return await _fileTypeService.HasMatchingMimeType(file, AllowedMimeTypesByFileType[ReleaseFileTypes.Data]) 
                    && _fileTypeService.HasMatchingEncodingType(file, CsvEncodingTypes);
         }
@@ -144,6 +139,16 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Services
                 return ValidationActionResult(MetaFileIsIncorrectlyNamed);
             }
 
+            if (!ValidateFileExtension(dataFileName, ".csv"))
+            {
+                return ValidationActionResult(DataFileMustBeCsvFile);
+            }
+
+            if (!ValidateFileExtension(metaFileName, ".csv"))
+            {
+                return ValidationActionResult(MetaFileMustBeCsvFile);
+            }
+            
             if (IsFileExisting(releaseId, ReleaseFileTypes.Data, dataFileName))
             {
                 return ValidationActionResult(CannotOverwriteDataFile);
@@ -188,6 +193,11 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Services
             }
 
             return Unit.Instance;
+        }
+        
+        private bool ValidateFileExtension(string fileName, string requiredExtension)
+        {
+            return fileName.EndsWith(requiredExtension);
         }
         
         private async Task<Either<ActionResult, Unit>> ValidateSubjectName(Guid releaseId, string name)
