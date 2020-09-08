@@ -31,7 +31,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Services
             _fileTypeService = fileTypeService;
         }
 
-        public async Task<Either<ActionResult, Tuple<ZipArchiveEntry, ZipArchiveEntry>>> ValidateArchiveEntries(
+        public async Task<Either<ActionResult, Tuple<ZipArchiveEntry, ZipArchiveEntry>>> ValidateDataArchiveFile(
             CloudBlobContainer blobContainer, Guid releaseId, IFormFile zipFile)
         {
             if (!await IsZipFile(zipFile))

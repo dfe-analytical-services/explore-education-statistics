@@ -125,7 +125,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Services
                 {
                     var blobContainer = await GetCloudBlobContainer();
 
-                    return await _dataArchiveValidationService.ValidateArchiveEntries(blobContainer, releaseId, zipFile)
+                    return await _dataArchiveValidationService.ValidateDataArchiveFile(blobContainer, releaseId, zipFile)
                         .OnSuccess(async dataFiles =>
                         {
                             var dataFile = dataFiles.Item1;

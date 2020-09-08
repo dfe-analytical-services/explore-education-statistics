@@ -10,7 +10,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Services.Interfaces
 {
     public interface IDataArchiveValidationService
     {
-        Task<Either<ActionResult, Tuple<ZipArchiveEntry, ZipArchiveEntry>>> ValidateArchiveEntries(CloudBlobContainer blobContainer,
+        Task<Either<ActionResult, Tuple<ZipArchiveEntry, ZipArchiveEntry>>> ValidateDataArchiveFile(CloudBlobContainer blobContainer,
             Guid releaseId, IFormFile zipFile);
     }
 }
