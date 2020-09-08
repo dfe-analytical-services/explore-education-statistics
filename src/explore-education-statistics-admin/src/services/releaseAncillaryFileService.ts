@@ -51,7 +51,9 @@ const releaseAncillaryFileService = {
     data.append('file', request.file);
 
     const file = await client.post<AncillaryFileInfo>(
-      `/release/${releaseId}/ancillary?name=${request.name}`,
+      `/release/${releaseId}/ancillary?name=${encodeURIComponent(
+        request.name,
+      )}`,
       data,
     );
 

@@ -101,7 +101,7 @@ const releaseDataFileService = {
     data.append('metaFile', request.metadataFile);
 
     const file = await client.post<DataFileInfo>(
-      `/release/${releaseId}/data?name=${request.name}`,
+      `/release/${releaseId}/data?name=${encodeURIComponent(request.name)}`,
       data,
     );
 
@@ -115,7 +115,7 @@ const releaseDataFileService = {
     data.append('zipFile', request.zipFile);
 
     const file = await client.post<DataFileInfo>(
-      `/release/${releaseId}/zip-data?name=${request.name}`,
+      `/release/${releaseId}/zip-data?name=${encodeURIComponent(request.name)}`,
       data,
     );
 

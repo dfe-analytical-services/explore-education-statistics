@@ -218,7 +218,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Services
                 {
                     var blobContainer = await GetCloudBlobContainer();
                     var info = new Dictionary<string, string> {{NameKey, name.ToLower()}};
-                    return await _fileUploadsValidatorService.ValidateFileForUpload(releaseId, file, type, overwrite)
+                    return await _fileUploadsValidatorService.ValidateFileForUpload(releaseId, file, type, overwrite, name)
                             .OnSuccess(async () =>
                             {
                                 var releaseFileReference = await CreateOrUpdateFileReference(file.FileName.ToLower(), releaseId, type);
