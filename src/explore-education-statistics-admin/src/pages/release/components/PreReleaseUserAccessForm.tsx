@@ -22,7 +22,7 @@ const errorMappings = [
   mapFieldErrors<FormValues>({
     target: 'email',
     messages: {
-      USER_ALREADY_EXISTS: 'User already exists',
+      USER_ALREADY_EXISTS: 'User with this email already exists',
     },
   }),
 ];
@@ -46,12 +46,14 @@ const PreReleaseUserAccessForm = ({ releaseId }: Props) => {
   ]);
 
   const handleSubmit = useFormSubmit<FormValues>(async (values, actions) => {
-    const nextUsers = await preReleaseUserService.inviteUser(
+    const newUser = await preReleaseUserService.inviteUser(
       releaseId,
       values.email,
     );
 
-    setUsers({ value: nextUsers });
+    setUsers({
+      value: [...users, newUser],
+    });
 
     actions.resetForm();
   }, errorMappings);
@@ -112,12 +114,14 @@ const PreReleaseUserAccessForm = ({ releaseId }: Props) => {
                     onClick={async () => {
                       toggleRemoving.on();
 
-                      const nextUsers = await preReleaseUserService.removeUser(
+                      await preReleaseUserService.removeUser(
                         releaseId,
                         user.email,
                       );
 
-                      setUsers({ value: nextUsers });
+                      setUsers({
+                        value: users.filter(u => u.email !== user.email),
+                      });
                       toggleRemoving.off();
                     }}
                   >

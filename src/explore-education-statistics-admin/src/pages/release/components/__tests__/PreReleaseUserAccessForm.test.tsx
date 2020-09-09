@@ -165,13 +165,10 @@ describe('PreReleaseUserAccessForm', () => {
         'test3@test.com',
       );
 
-      preReleaseUserService.inviteUser.mockResolvedValue([
-        ...testUsers,
-        {
-          email: 'test3@test.com',
-          invited: true,
-        },
-      ]);
+      preReleaseUserService.inviteUser.mockResolvedValue({
+        email: 'test3@test.com',
+        invited: true,
+      });
 
       userEvent.click(screen.getByRole('button', { name: 'Invite new user' }));
 
@@ -209,8 +206,6 @@ describe('PreReleaseUserAccessForm', () => {
 
       let rows = screen.getAllByRole('row');
       expect(rows).toHaveLength(3);
-
-      preReleaseUserService.removeUser.mockResolvedValue([testUsers[0]]);
 
       userEvent.click(within(rows[2]).getByRole('button', { name: 'Remove' }));
 
