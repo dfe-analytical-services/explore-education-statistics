@@ -19,24 +19,65 @@ Create new publication for "UI tests topic" topic
     user clicks link  Create new publication
     user creates publication   ${PUBLICATION_NAME}
 
-Verify new publication
+Verify publication
     [Tags]  HappyPath
     user selects theme "Test theme" and topic "${TOPIC_NAME}" from the admin dashboard
     user waits until page contains button  ${PUBLICATION_NAME}
 
-Create new release
+Create release
     [Tags]  HappyPath
     user opens accordion section  ${PUBLICATION_NAME}
     user clicks element  css:[data-testid="Create new release link for ${PUBLICATION_NAME}"]
-    user creates release for publication  ${PUBLICATION_NAME}  Financial Year  3000
+    user creates release for publication  ${PUBLICATION_NAME}  Financial Year   3000
 
-Verify release summary
+Go to "Release status" tab
+    [Tags]  HappyPath
+    user clicks link   Release status
+    user waits until h2 is visible  Release status
+    user waits until page contains button  Edit release status
+
+Approve release
+    [Tags]  HappyPath
+    user clicks button  Edit release status
+    user waits until h2 is visible  Edit release status
+
+    user clicks element   css:input[data-testid="Approved for publication"]
+    user enters text into element  id:releaseStatusForm-internalReleaseNote  Approved by UI tests - latest release
+    user clicks element  css:input[data-testid="As soon as possible"]
+
+    user clicks button   Update status
+
+Verify release is scheduled
+    [Tags]  HappyPath
+    user waits until h2 is visible  Release status
+    user checks summary list contains  Current status  Approved
+
+Wait for release process status to be Complete
+    [Tags]  HappyPath
+    # EES-1007 - Release process status doesn't automatically update
+    user waits for release process status to be  Complete    900
+    user checks page does not contain button  Edit release status
+
+Return to Admin Dashboard
+    [Tags]  HappyPath
+    user goes to url    %{ADMIN_URL}
+    user waits until h1 is visible   Dashboard
+    user waits until page contains element   css:#selectTheme    180
+
+Create another release for the same publication
+    [Tags]  HappyPath
+    user selects theme "Test theme" and topic "${TOPIC_NAME}" from the admin dashboard
+    user opens accordion section   ${PUBLICATION_NAME}
+    user clicks element  css:[data-testid="Create new release link for ${PUBLICATION_NAME}"]
+    user creates release for publication  ${PUBLICATION_NAME}  Financial Year  3001
+
+Verify new release summary
     [Tags]  HappyPath
     user checks page contains element   xpath://li/a[text()="Release summary" and contains(@aria-current, 'page')]
     user waits until h2 is visible  Release summary
     user checks summary list contains  Publication title  ${PUBLICATION_NAME}
 
-Upload subject
+Upload subject to new release
     [Tags]  HappyPath
     user clicks link  Manage data
     user waits until page contains element  css:#dataFileUploadForm-subjectTitle
@@ -111,13 +152,13 @@ Save data block as a highlight
     user clicks button   Save data block
     user waits until page contains    Delete this data block
 
-Go to "Release status" tab
+Go to "Release status" tab for new release
     [Tags]  HappyPath
     user clicks link   Release status
     user waits until h2 is visible  Release status
     user waits until page contains button  Edit release status
 
-Approve release
+Approve new release
     [Tags]  HappyPath
     ${PUBLISH_DATE_DAY}=  get current datetime  %-d
     ${PUBLISH_DATE_MONTH}=  get current datetime  %-m
@@ -139,7 +180,7 @@ Approve release
 
     user clicks button   Update status
 
-Wait for release process status to be Complete
+Wait for release process status for new release to be Complete
     [Tags]  HappyPath
     # EES-1007 - Release process status doesn't automatically update
     user waits until h2 is visible  Release status
@@ -166,6 +207,31 @@ Verify newly published release is on Find Statistics page
     user checks publication bullet contains link   ${PUBLICATION_NAME}  View statistics and data
     user checks publication bullet contains link   ${PUBLICATION_NAME}  Create your own tables online
     user checks publication bullet does not contain link  ${PUBLICATION_NAME}   Statistics at DfE
+
+Navigate to published release page
+    [Tags]  HappyPath
+    user clicks testid element   View stats link for ${PUBLICATION_NAME}
+    user waits until h1 is visible   ${PUBLICATION_NAME}  90
+
+Check latest release is correct
+    [Tags]  HappyPath
+    user checks testid element contains  page-title-caption    Financial Year 3001-02
+    user checks page contains   This is the latest data
+    user checks page contains   See 1 other releases
+
+    user opens details dropdown  See 1 other releases
+    user checks page contains other release   Financial Year 3000-01
+    user checks page does not contain other release   Financial Year 3001-02
+
+    user clicks link   Financial Year 3000-01
+
+Check other release is correct
+    [Tags]  HappyPath
+    user checks testid element contains   page-title-caption   Financial Year 3000-01
+    user waits until page contains link    View latest data: Financial Year 3001-02
+    user checks page contains   See 1 other releases
+    user checks page contains other release    Financial Year 3001-02
+    user checks page does not contain other release   Financial Year 3000-01
 
 Go to Table Tool page
     [Tags]  HappyPath
