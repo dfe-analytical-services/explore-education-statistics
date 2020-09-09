@@ -29,3 +29,24 @@ export function useConfig(): Config {
 
   return config;
 }
+
+// Config provider for testing
+
+const defaultTestConfig: Config = {
+  AppInsightsKey: '',
+  PublicAppUrl: 'http://localhost',
+};
+
+interface TestConfigContextProps {
+  children: ReactNode;
+  config?: Config;
+}
+
+export const TestConfigContextProvider = ({
+  children,
+  config = defaultTestConfig,
+}: TestConfigContextProps) => {
+  return (
+    <ConfigContext.Provider value={config}>{children}</ConfigContext.Provider>
+  );
+};

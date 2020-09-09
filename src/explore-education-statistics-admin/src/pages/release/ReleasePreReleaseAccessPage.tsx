@@ -1,5 +1,6 @@
 import Link from '@admin/components/Link';
 import PreReleaseUserAccessForm from '@admin/pages/release/components/PreReleaseUserAccessForm';
+import PublicPreReleaseAccessForm from '@admin/pages/release/components/PublicPreReleaseAccessForm';
 import { useManageReleaseContext } from '@admin/pages/release/contexts/ManageReleaseContext';
 import {
   ReleaseRouteParams,
@@ -17,10 +18,13 @@ import { generatePath } from 'react-router';
 const ReleasePreReleaseAccessPage = () => {
   const { releaseId } = useManageReleaseContext();
 
-  const { value: release, isLoading } = useAsyncHandledRetry(
-    () => releaseService.getRelease(releaseId),
-    [releaseId],
-  );
+  const {
+    value: release,
+    isLoading,
+    setState: setRelease,
+  } = useAsyncHandledRetry(() => releaseService.getRelease(releaseId), [
+    releaseId,
+  ]);
 
   return (
     <LoadingSpinner loading={isLoading}>
@@ -49,6 +53,34 @@ const ReleasePreReleaseAccessPage = () => {
             ) : (
               <PreReleaseUserAccessForm releaseId={release.id} />
             )}
+          </TabsSection>
+          <TabsSection
+            id="preReleaseAccess-publicList"
+            title="Public pre-release list"
+          >
+            <h2>Public pre-release access list</h2>
+
+            <PublicPreReleaseAccessForm
+              publicationId={release.publicationId}
+              publicationSlug={release.publicationSlug}
+              releaseId={release.id}
+              releaseSlug={release.slug}
+              preReleaseAccessList={release.preReleaseAccessList}
+              onSubmit={async ({ preReleaseAccessList }) => {
+                const updatedRelease = await releaseService.updateRelease(
+                  release.id,
+                  {
+                    ...release,
+                    typeId: release.type.id,
+                    preReleaseAccessList,
+                  },
+                );
+
+                setRelease({
+                  value: updatedRelease,
+                });
+              }}
+            />
           </TabsSection>
         </Tabs>
       )}
