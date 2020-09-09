@@ -5,6 +5,7 @@ import ClassicEditor from '@ckeditor/ckeditor5-build-classic';
 // @ts-ignore
 import CKEditor from '@ckeditor/ckeditor5-react';
 import ErrorMessage from '@common/components/ErrorMessage';
+import FormLabel from '@common/components/form/FormLabel';
 import SanitizeHtml from '@common/components/SanitizeHtml';
 import isBrowser from '@common/utils/isBrowser';
 import classNames from 'classnames';
@@ -19,6 +20,7 @@ export interface FormEditorProps {
   label: string;
   toolbarConfig?: string[];
   value: string;
+  onBlur?: () => void;
   onChange: (content: string) => void;
 }
 
@@ -51,6 +53,7 @@ const FormEditor = ({
   label,
   toolbarConfig = toolbarConfigs.full,
   value,
+  onBlur,
   onChange,
 }: FormEditorProps) => {
   const config = useMemo(
@@ -101,18 +104,22 @@ const FormEditor = ({
     [],
   );
 
-  const isReadOnly = isBrowser('IE') || process.env.NODE_ENV === 'test';
+  const isReadOnly = isBrowser('IE');
 
   return (
     <>
-      <span
-        id={`${id}-label`}
-        className={classNames('govuk-label', {
-          'govuk-visually-hidden': hideLabel,
-        })}
-      >
-        {label}
-      </span>
+      {process.env.NODE_ENV !== 'test' ? (
+        <span
+          id={`${id}-label`}
+          className={classNames('govuk-label', {
+            'govuk-visually-hidden': hideLabel,
+          })}
+        >
+          {label}
+        </span>
+      ) : (
+        <FormLabel id={id} label={label} />
+      )}
 
       {hint && (
         <span id={`${id}-hint`} className="govuk-hint">
@@ -124,13 +131,31 @@ const FormEditor = ({
 
       {!isReadOnly ? (
         <div className={styles.editor}>
-          <CKEditor
-            editor={ClassicEditor}
-            config={config}
-            data={value}
-            onChange={handleChange}
-            onInit={handleInit}
-          />
+          {process.env.NODE_ENV !== 'test' ? (
+            <CKEditor
+              editor={ClassicEditor}
+              config={config}
+              data={value}
+              onChange={handleChange}
+              onBlur={() => {
+                if (onBlur) {
+                  onBlur();
+                }
+              }}
+              onInit={handleInit}
+            />
+          ) : (
+            <textarea
+              id={id}
+              value={value}
+              onBlur={() => {
+                if (onBlur) {
+                  onBlur();
+                }
+              }}
+              onChange={event => onChange(event.target.value)}
+            />
+          )}
         </div>
       ) : (
         <div
