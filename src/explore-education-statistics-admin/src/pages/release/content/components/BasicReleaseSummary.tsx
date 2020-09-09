@@ -11,7 +11,6 @@ import {
 } from '@common/utils/date/partialDate';
 import { parseISO } from 'date-fns';
 import React, { useEffect, useState } from 'react';
-import styles from './BasicReleaseSummary.module.scss';
 
 interface ReleaseTypeIcon {
   url: string;
@@ -55,11 +54,7 @@ const BasicReleaseSummary = ({ release }: Props) => {
       {releaseTypeIdsToIcons && (
         <>
           <div className="govuk-grid-column-three-quarters">
-            {release.prerelease ? (
-              <Tag className={`${styles.ragStatusRed}`}>Pre Release</Tag>
-            ) : (
-              <Tag>{getReleaseStatusLabel(release.status)}</Tag>
-            )}
+            <Tag>{getReleaseStatusLabel(release.status)}</Tag>
 
             <dl className="dfe-meta-content">
               <dt className="govuk-caption-m">Publish date: </dt>
