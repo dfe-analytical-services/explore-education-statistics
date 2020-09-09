@@ -128,6 +128,7 @@ export interface Release<
     path: string;
     size: string;
   }[];
+  preReleaseAccessList: string;
   dataLastPublished: string;
 }
 

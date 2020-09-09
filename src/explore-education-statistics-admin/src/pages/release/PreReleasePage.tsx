@@ -77,7 +77,7 @@ const PreReleasePage = ({ match }: RouteComponentProps<MatchProps>) => {
       wide
       breadcrumbs={
         user && user.permissions.canAccessAnalystPages
-          ? [{ name: 'Pre Release access' }]
+          ? [{ name: 'Pre-release access' }]
           : []
       }
       homePath={user?.permissions.canAccessAnalystPages ? '/' : ''}
