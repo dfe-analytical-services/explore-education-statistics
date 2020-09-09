@@ -1,7 +1,7 @@
 import Page from '@admin/components/Page';
 import PageTitle from '@admin/components/PageTitle';
 import { useAuthContext } from '@admin/contexts/AuthContext';
-import useConfig from '@admin/hooks/useConfig';
+import { useConfig } from '@admin/contexts/ConfigContext';
 import ReleaseContent from '@admin/pages/release/content/components/ReleaseContent';
 import { ReleaseContentProvider } from '@admin/pages/release/content/contexts/ReleaseContentContext';
 import permissionService, {
@@ -32,7 +32,7 @@ interface MatchProps {
 const PreReleasePage = ({ match }: RouteComponentProps<MatchProps>) => {
   const { releaseId } = match.params;
 
-  const { value: config } = useConfig();
+  const config = useConfig();
   const { handleManualErrors, handleApiErrors } = useErrorControl();
   const { user } = useAuthContext();
 

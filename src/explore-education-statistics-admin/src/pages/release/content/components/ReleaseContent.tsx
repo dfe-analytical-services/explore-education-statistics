@@ -2,8 +2,8 @@ import { CommentsChangeHandler } from '@admin/components/editable/Comments';
 import EditableSectionBlocks from '@admin/components/editable/EditableSectionBlocks';
 import Link from '@admin/components/Link';
 import PrintThisPage from '@admin/components/PrintThisPage';
+import { useConfig } from '@admin/contexts/ConfigContext';
 import { useEditingContext } from '@admin/contexts/EditingContext';
-import useConfig from '@admin/hooks/useConfig';
 import BasicReleaseSummary from '@admin/pages/release/content/components/BasicReleaseSummary';
 import RelatedInformationSection from '@admin/pages/release/content/components/RelatedInformationSection';
 import ReleaseContentAccordion from '@admin/pages/release/content/components/ReleaseContentAccordion';
@@ -21,7 +21,7 @@ import RelatedAside from '@common/components/RelatedAside';
 import React, { useCallback, useMemo } from 'react';
 
 const ReleaseContent = () => {
-  const { value: config } = useConfig();
+  const config = useConfig();
   const { isEditing } = useEditingContext();
   const { release } = useReleaseContentState();
   const actions = useReleaseContentActions();
