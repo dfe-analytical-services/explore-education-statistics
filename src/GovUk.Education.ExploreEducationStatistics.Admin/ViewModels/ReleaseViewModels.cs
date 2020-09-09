@@ -46,6 +46,8 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.ViewModels
         [JsonConverter(typeof(TimeIdentifierJsonConverter))]
         public TimeIdentifier? TimePeriodCoverage { get; set; }
 
+        public string PreReleaseAccessList { get; set; } = "";
+
         public bool LatestRelease { get; set; }
 
         public ReleaseType Type { get; set; }
@@ -117,6 +119,8 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.ViewModels
         [JsonConverter(typeof(TimeIdentifierJsonConverter))]
         [Required]
         public TimeIdentifier TimePeriodCoverage { get; set; }
+
+        public string PreReleaseAccessList { get; set; }
 
         [JsonConverter(typeof(StringEnumConverter))]
         public ReleaseStatus Status { get; set; }

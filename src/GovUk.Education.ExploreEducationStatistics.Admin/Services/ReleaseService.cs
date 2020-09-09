@@ -295,6 +295,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Services
                     release.TypeId = request.TypeId;
                     release.ReleaseName = request.ReleaseName;
                     release.TimePeriodCoverage = request.TimePeriodCoverage;
+                    release.PreReleaseAccessList = request.PreReleaseAccessList;
 
                     var oldStatus = release.Status;
 

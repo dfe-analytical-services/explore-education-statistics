@@ -336,6 +336,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
                 {
                     Day = "15", Month = "6", Year = "2039"
                 },
+                PreReleaseAccessList = "Old access list",
                 Version = 0,
                 PreviousVersionId = releaseId
             };
@@ -371,7 +372,9 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
                             NextReleaseDate = nextReleaseDateEdited,
                             TypeId = officialStatisticsReleaseType.Id,
                             ReleaseName = "2035",
-                            TimePeriodCoverage = TimeIdentifier.March
+                            TimePeriodCoverage = TimeIdentifier.March,
+                            PreReleaseAccessList = "New access list",
+
                         }
                     );
 
@@ -383,6 +386,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
                 Assert.Equal(officialStatisticsReleaseType, result.Right.Type);
                 Assert.Equal("2035", result.Right.ReleaseName);
                 Assert.Equal(TimeIdentifier.March, result.Right.TimePeriodCoverage);
+                Assert.Equal("New access list", result.Right.PreReleaseAccessList);
 
                 var saved = await context.Releases.FindAsync(result.Right.Id);
 
@@ -393,6 +397,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
                 Assert.Equal("2035-march", saved.Slug);
                 Assert.Equal("2035", saved.ReleaseName);
                 Assert.Equal(TimeIdentifier.March, saved.TimePeriodCoverage);
+                Assert.Equal("New access list", saved.PreReleaseAccessList);
             }
         }
 
@@ -897,7 +902,8 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
                 ReleaseName = "2035",
                 Slug = "2035-1",
                 Version = 0,
-                InternalReleaseNote = "Test release note"
+                InternalReleaseNote = "Test release note",
+                PreReleaseAccessList = "Test access list",
             };
 
             var publication = new Publication
@@ -936,6 +942,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
                 Assert.Equal("Test release note", viewModel.InternalReleaseNote);
                 Assert.Equal(DateTime.Parse("2020-06-29T01:00:00.00"), viewModel.PublishScheduled);
                 Assert.Equal(DateTime.Parse("2020-06-29T02:00:00.00Z"), viewModel.Published);
+                Assert.Equal("Test access list", viewModel.PreReleaseAccessList);
                 Assert.Equal(nextReleaseDate, viewModel.NextReleaseDate);
                 Assert.Equal(adHocReleaseType, viewModel.Type);
                 Assert.Equal(TimeIdentifier.January, viewModel.TimePeriodCoverage);
