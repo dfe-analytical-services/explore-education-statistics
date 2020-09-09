@@ -4,8 +4,10 @@ using System.Threading.Tasks;
 using AutoMapper;
 using GovUk.Education.ExploreEducationStatistics.Admin.Services.Interfaces;
 using GovUk.Education.ExploreEducationStatistics.Admin.Services.Interfaces.ManageContent;
+using GovUk.Education.ExploreEducationStatistics.Admin.Services.Interfaces.Security;
 using GovUk.Education.ExploreEducationStatistics.Admin.ViewModels.ManageContent;
 using GovUk.Education.ExploreEducationStatistics.Common.Model;
+using GovUk.Education.ExploreEducationStatistics.Common.Services.Interfaces.Security;
 using GovUk.Education.ExploreEducationStatistics.Common.Utils;
 using GovUk.Education.ExploreEducationStatistics.Content.Model;
 using GovUk.Education.ExploreEducationStatistics.Content.Model.Database;
@@ -21,19 +23,22 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Services.ManageConten
         private readonly IContentService _contentService;
         private readonly IReleaseService _releaseService;
         private readonly IPersistenceHelper<ContentDbContext> _persistenceHelper;
+        private readonly IUserService _userService;
 
         public ManageContentPageService(
             IMapper mapper,
-            IReleaseFilesService releaseFilesService, 
+            IReleaseFilesService releaseFilesService,
             IContentService contentService,
             IReleaseService releaseService,
-            IPersistenceHelper<ContentDbContext> persistenceHelper)
+            IPersistenceHelper<ContentDbContext> persistenceHelper,
+            IUserService userService)
         {
             _mapper = mapper;
             _releaseFilesService = releaseFilesService;
             _contentService = contentService;
             _releaseService = releaseService;
             _persistenceHelper = persistenceHelper;
+            _userService = userService;
         }
 
         public async Task<Either<ActionResult, ManageContentPageViewModel>> GetManageContentPageViewModelAsync(
@@ -41,6 +46,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Services.ManageConten
         {
             return await _persistenceHelper
                 .CheckEntityExists<Release>(releaseId, HydrateReleaseForReleaseViewModel)
+                .OnSuccess(_userService.CheckCanViewRelease)
                 .OnSuccess(release => _contentService.GetUnattachedContentBlocksAsync<DataBlock>(releaseId)
                 .OnSuccess(blocks => _releaseFilesService.ListPublicFilesPreview(
                         releaseId, _releaseService.GetReferencedReleaseFileVersions(releaseId, ReleaseFileTypes.Data, ReleaseFileTypes.Ancillary))
@@ -56,7 +62,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Services.ManageConten
                     };
                 })));
         }
-        
+
         private static IQueryable<Release> HydrateReleaseForReleaseViewModel(IQueryable<Release> values)
         {
             return values
