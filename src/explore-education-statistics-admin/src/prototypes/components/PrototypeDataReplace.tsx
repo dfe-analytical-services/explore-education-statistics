@@ -1,26 +1,15 @@
-import PageTitle from '@admin/components/PageTitle';
 import React, { useState } from 'react';
 import Accordion from '@common/components/Accordion';
 import AccordionSection from '@common/components/AccordionSection';
 import Button from '@common/components/Button';
 import ButtonGroup from '@common/components/ButtonGroup';
 import ButtonText from '@common/components/ButtonText';
-import SanitizeHtml from '@common/components/SanitizeHtml';
+import Details from '@common/components/Details';
 import SummaryList from '@common/components/SummaryList';
 import SummaryListItem from '@common/components/SummaryListItem';
 import WarningMessage from '@common/components/WarningMessage';
-import {
-  Form,
-  FormFieldset,
-  FormGroup,
-  FormTextInput,
-} from '@common/components/form';
-import FormFieldFileInput from '@common/components/form/FormFieldFileInput';
-import FormFileInput, {
-  FormFileInputProps,
-} from '@common/components/form/FormFileInput';
-import FormFieldTextInput from '@common/components/form/FormFieldTextInput';
-import MetaVariables from './PrototypeMetaVariables';
+import { FormGroup, FormTextInput } from '@common/components/form';
+import FormFileInput from '@common/components/form/FormFileInput';
 
 const PrototypeMetaPreview = () => {
   const [originalData, setOriginalData] = useState(true);
@@ -137,52 +126,229 @@ const PrototypeMetaPreview = () => {
                     </span>
                     <WarningMessage>
                       Before confirming the data replacement please check the
-                      information below. Making this update could affect
-                      existing datablocks and footnotes that use this existing
-                      data.
+                      information below. Making this change could affect
+                      existing datablocks and footnotes.
                     </WarningMessage>
-                    <ul className="govuk-list govuk-list--bullet">
-                      <li>
-                        <strong className="govuk-tag govuk-tag--green">
-                          Footnotes: OK
-                        </strong>
-                        , still valid no action needed
-                      </li>
-                      <li>
-                        <strong className="govuk-tag govuk-tag--green">
-                          Datablocks: OK
-                        </strong>
-                        , still valid no action needed
-                      </li>
-                    </ul>
-                    <ul className="govuk-list govuk-list--bullet">
-                      <li>
-                        <strong className="govuk-tag govuk-tag--yellow">
-                          Filter or indicator mismatch
-                        </strong>{' '}
-                        , review as may need amending after the replacement
-                      </li>
-                      <li>
-                        Can we display list of mismatatched filters / indicators
-                        here?
-                      </li>
-                    </ul>
-                    <ul className="govuk-list govuk-list--bullet">
-                      <li>
-                        <strong className="govuk-tag govuk-tag--red">
-                          Footnote: Warning
-                        </strong>
-                        , remove or amend this footnote before confirming the
-                        data replacement
-                      </li>
-                      <li>
-                        <strong className="govuk-tag govuk-tag--red">
-                          Datablock: Warning
-                        </strong>
-                        , remove or amend this datablock before confirming the
-                        data replacement
-                      </li>
-                    </ul>
+
+                    <h2 className="govuk-heading-m">
+                      <span className="govuk-tag govuk-tag--green">
+                        Data blocks: All OK
+                      </span>
+                    </h2>
+                    <p>
+                      All data blocks are still valid, no action is required
+                    </p>
+
+                    <Details
+                      summary="Example datablock 1: OK"
+                      className="govuk-!-margin-bottom-0"
+                    >
+                      <SummaryList className="govuk-!-margin-bottom-6">
+                        <SummaryListItem term="Filter items">
+                          Male
+                        </SummaryListItem>
+                        <SummaryListItem term="Indicator">
+                          Number of pupil enrolements
+                        </SummaryListItem>
+                        <SummaryListItem term="Location">
+                          Local authority, West Minster
+                        </SummaryListItem>
+                        <SummaryListItem term="Time periods">
+                          Academic year 2016/17
+                        </SummaryListItem>
+                      </SummaryList>
+                    </Details>
+
+                    <Details summary="Example datablock 2: OK">
+                      <SummaryList className="govuk-!-margin-bottom-6">
+                        <SummaryListItem term="Filter items">
+                          Female
+                        </SummaryListItem>
+                        <SummaryListItem term="Indicator">
+                          Number of pupil enrolements
+                        </SummaryListItem>
+                        <SummaryListItem term="Location">
+                          Local authority, West Minster
+                        </SummaryListItem>
+                        <SummaryListItem term="Time periods">
+                          Academic year 2016/17
+                        </SummaryListItem>
+                      </SummaryList>
+                    </Details>
+
+                    <h2 className="govuk-heading-m">
+                      <span className="govuk-tag govuk-tag--green">
+                        Footnotes: All OK
+                      </span>
+                    </h2>
+                    <p>All footnotes are still valid, no action is required</p>
+                    <Details
+                      summary="Example footnote 1: OK"
+                      className="govuk-!-margin-bottom-0"
+                    >
+                      <SummaryList className="govuk-!-margin-bottom-6">
+                        <SummaryListItem term="Filters">
+                          Characteristics
+                        </SummaryListItem>
+                        <SummaryListItem term="Filter groups">
+                          Gender
+                        </SummaryListItem>
+                        <SummaryListItem term="Filter items">
+                          Male
+                        </SummaryListItem>
+                        <SummaryListItem term="Indicators">
+                          Number of pupil enrolements
+                        </SummaryListItem>
+                      </SummaryList>
+                    </Details>
+                    <Details
+                      summary="Example footnote 2: OK"
+                      className="govuk-!-margin-bottom-0"
+                    >
+                      <SummaryList className="govuk-!-margin-bottom-6">
+                        <SummaryListItem term="Filters">
+                          Characteristics
+                        </SummaryListItem>
+                        <SummaryListItem term="Filter groups">
+                          Gender
+                        </SummaryListItem>
+                        <SummaryListItem term="Filter items">
+                          Female
+                        </SummaryListItem>
+                        <SummaryListItem term="Indicators">
+                          Number of pupil enrolements
+                        </SummaryListItem>
+                      </SummaryList>
+                    </Details>
+
+                    <hr className="govuk-section-break govuk-section-break--xl govuk-section-break--visible" />
+
+                    <h2 className="govuk-heading-m">
+                      <span className="govuk-tag govuk-tag--red">
+                        Data blocks: Warning
+                      </span>
+                    </h2>
+                    <p>
+                      One or more data blocks will be invalidated by this data
+                      replacement. The list below shows the affected data
+                      blocks, you can either delete or edit these if you wish to
+                      continue with this data replacement.{' '}
+                    </p>
+
+                    <Details
+                      summary="Example datablock 1: OK"
+                      className="govuk-!-margin-bottom-0"
+                    >
+                      <SummaryList className="govuk-!-margin-bottom-6">
+                        <SummaryListItem term="Filter items">
+                          Male
+                        </SummaryListItem>
+                        <SummaryListItem term="Indicator">
+                          Number of pupil enrolements
+                        </SummaryListItem>
+                        <SummaryListItem term="Location">
+                          Local authority, West Minster
+                        </SummaryListItem>
+                        <SummaryListItem term="Time periods">
+                          Academic year 2016/17
+                        </SummaryListItem>
+                      </SummaryList>
+                    </Details>
+
+                    <Details summary="Example datablock 2: WARNING">
+                      <SummaryList className="govuk-!-margin-bottom-6">
+                        <SummaryListItem term="Filter items">
+                          Female
+                        </SummaryListItem>
+                        <SummaryListItem term="Indicator">
+                          Number of pupil enrolements <br />
+                          <span className="govuk-tag govuk-tag--red">
+                            Not present
+                          </span>
+                        </SummaryListItem>
+                        <SummaryListItem term="Location">
+                          Local authority, West Minster
+                        </SummaryListItem>
+                        <SummaryListItem term="Time periods">
+                          Academic year 2016/17
+                        </SummaryListItem>
+                        <SummaryListItem term="Actions">
+                          <Button className="govuk-!-margin-right-3">
+                            Delete
+                          </Button>
+                          <Button className="govuk-button--secondary">
+                            Edit
+                          </Button>
+                        </SummaryListItem>
+                      </SummaryList>
+                    </Details>
+
+                    <h2 className="govuk-heading-m">
+                      <span className="govuk-tag govuk-tag--red">
+                        Footnotes: Warning
+                      </span>
+                    </h2>
+                    <p>
+                      One or more footnotes will be invalidated by this data
+                      replacement. The list below shows the affected footnotes,
+                      you can either delete or edit these if you wish to
+                      continue with this data replacement.{' '}
+                    </p>
+                    <Details
+                      summary="Example footnote 1: OK"
+                      className="govuk-!-margin-bottom-0"
+                    >
+                      <SummaryList className="govuk-!-margin-bottom-6">
+                        <SummaryListItem term="Filters">
+                          Characteristics
+                        </SummaryListItem>
+                        <SummaryListItem term="Filter groups">
+                          Gender
+                        </SummaryListItem>
+                        <SummaryListItem term="Filter items">
+                          Male
+                        </SummaryListItem>
+                        <SummaryListItem term="Indicators">
+                          Number of pupil enrolements
+                        </SummaryListItem>
+                      </SummaryList>
+                    </Details>
+                    <Details
+                      summary="Example footnote 2: WARNING"
+                      className="govuk-!-margin-bottom-0"
+                    >
+                      <SummaryList className="govuk-!-margin-bottom-6">
+                        <SummaryListItem term="Filters">
+                          Characteristics <br />
+                          <span className="govuk-tag govuk-tag--red">
+                            Not present
+                          </span>
+                        </SummaryListItem>
+                        <SummaryListItem term="Filter groups">
+                          Gender
+                        </SummaryListItem>
+                        <SummaryListItem term="Filter items">
+                          Male
+                        </SummaryListItem>
+                        <SummaryListItem term="Indicators">
+                          Number of pupil enrolements <br />
+                          <span className="govuk-tag govuk-tag--red">
+                            Not present
+                          </span>
+                        </SummaryListItem>
+                        <SummaryListItem term="Actions">
+                          <Button className="govuk-!-margin-right-3">
+                            Delete
+                          </Button>
+                          <Button className="govuk-button--secondary">
+                            Edit
+                          </Button>
+                        </SummaryListItem>
+                      </SummaryList>
+                    </Details>
+
+                    <hr className="govuk-section-break govuk-section-break--xl govuk-section-break--visible" />
+
                     <ButtonGroup className="govuk-!-margin-top-9 govuk-!-margin-bottom-9">
                       <Button
                         onClick={() => {
@@ -217,7 +383,9 @@ const PrototypeMetaPreview = () => {
                       {(originalData || updatedData) && 'Replace data files'}
                       {replaceInProgress && 'Revert back to orginal data files'}
                     </ButtonText>{' '}
-                    <ButtonText>Delete files</ButtonText>
+                    {!replaceInProgress && (
+                      <ButtonText>Delete files</ButtonText>
+                    )}
                   </>
                 }
               />

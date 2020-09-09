@@ -1,5 +1,6 @@
 import { RouteProps } from 'react-router';
 import PrototypeExamplePage from './PrototypeExamplePage';
+import PrototypeReplaceData from './PrototypeReplaceData';
 import PrototypeMetadata from './PrototypeMetadata';
 import PrototypePublicMetadata from './PrototypePublicMetadata';
 import PrototypeBauGlossary from './PrototypeBauGlossary';
@@ -16,6 +17,11 @@ const prototypeRoutes: PrototypeRoute[] = [
     name: 'Example prototype',
     path: '/prototypes/example',
     component: PrototypeExamplePage,
+  },
+  {
+    name: 'Replace existing data',
+    path: '/prototypes/replaceData',
+    component: PrototypeReplaceData,
   },
   {
     name: 'Create Public metadata',
