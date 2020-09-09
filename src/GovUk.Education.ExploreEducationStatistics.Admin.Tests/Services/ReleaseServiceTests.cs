@@ -1,5 +1,6 @@
 using System;
 using System.Collections.Generic;
+using System.Globalization;
 using System.Linq;
 using GovUk.Education.ExploreEducationStatistics.Admin.Services;
 using GovUk.Education.ExploreEducationStatistics.Admin.Services.Interfaces;
@@ -285,7 +286,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
             await using (var context = InMemoryApplicationDbContext(contextId))
             {
                 var releaseService = BuildReleaseService(context, mocks);
-                var notLatest = (await releaseService.GetReleaseForIdAsync(notLatestRelease.Id)).Right;
+                var notLatest = (await releaseService.GetRelease(notLatestRelease.Id)).Right;
 
                 Assert.Equal(notLatestRelease.Id, notLatest.Id);
                 Assert.False(notLatest.LatestRelease);
@@ -294,7 +295,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
             await using (var context = InMemoryApplicationDbContext(contextId))
             {
                 var releaseService = BuildReleaseService(context, mocks);
-                var latest = (await releaseService.GetReleaseForIdAsync(latestRelease.Id)).Right;
+                var latest = (await releaseService.GetRelease(latestRelease.Id)).Right;
 
                 Assert.Equal(latestRelease.Id, latest.Id);
                 Assert.True(latest.LatestRelease);
@@ -871,6 +872,79 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
                 var badRequestResult = Assert.IsType<BadRequestObjectResult>(result.Left);
                 var details = Assert.IsType<ValidationProblemDetails>(badRequestResult.Value);
                 Assert.Equal("APPROVED_RELEASE_MUST_HAVE_PUBLISH_SCHEDULED_DATE", details.Errors[""].First());
+            }
+        }
+
+        [Fact]
+        public async void GetRelease()
+        {
+            var adHocReleaseType = new ReleaseType
+            {
+                Title = "Ad Hoc"
+            };
+
+            var releaseId = Guid.NewGuid();
+            var nextReleaseDate = new PartialDate {Day = "1", Month = "1", Year = "2040"};
+
+            var release = new Release
+            {
+                Id = releaseId,
+                Type = adHocReleaseType,
+                TimePeriodCoverage = TimeIdentifier.January,
+                PublishScheduled = DateTime.Parse("2020-06-29T00:00:00.00Z", styles: DateTimeStyles.AdjustToUniversal),
+                Published = DateTime.Parse("2020-06-29T02:00:00.00Z"),
+                NextReleaseDate = nextReleaseDate,
+                ReleaseName = "2035",
+                Slug = "2035-1",
+                Version = 0,
+                InternalReleaseNote = "Test release note"
+            };
+
+            var publication = new Publication
+            {
+                Id = new Guid("f7da23e2-304a-4b47-a8f5-dba28a554de9"),
+                Title = "Test publication",
+                Slug = "test-publication",
+                Releases = new List<Release>
+                {
+                    release
+                }
+            };
+
+            var contextId = Guid.NewGuid().ToString();
+
+            await using (var context = InMemoryApplicationDbContext(contextId))
+            {
+                context.Add(publication);
+                await context.SaveChangesAsync();
+            }
+
+            await using (var context = InMemoryApplicationDbContext(contextId))
+            {
+                var mocks = Mocks();
+                var releaseService = BuildReleaseService(context, mocks);
+
+                var result = await releaseService.GetRelease(releaseId);
+
+                var viewModel = result.Right;
+
+                Assert.Equal("2035", viewModel.ReleaseName);
+                Assert.Equal("2035-1", viewModel.Slug);
+                Assert.Equal(publication.Id, viewModel.PublicationId);
+                Assert.Equal("Test publication", viewModel.PublicationTitle);
+                Assert.Equal("test-publication", viewModel.PublicationSlug);
+                Assert.Equal("Test release note", viewModel.InternalReleaseNote);
+                Assert.Equal(DateTime.Parse("2020-06-29T01:00:00.00"), viewModel.PublishScheduled);
+                Assert.Equal(DateTime.Parse("2020-06-29T02:00:00.00Z"), viewModel.Published);
+                Assert.Equal(nextReleaseDate, viewModel.NextReleaseDate);
+                Assert.Equal(adHocReleaseType, viewModel.Type);
+                Assert.Equal(TimeIdentifier.January, viewModel.TimePeriodCoverage);
+                Assert.Equal("2035", viewModel.YearTitle);
+
+                Assert.Null(viewModel.PreviousVersionId);
+                Assert.True(viewModel.LatestRelease);
+                Assert.True(viewModel.Live);
+                Assert.False(viewModel.Amendment);
             }
         }
 

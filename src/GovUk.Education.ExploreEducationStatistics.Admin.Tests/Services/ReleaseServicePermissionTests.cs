@@ -40,7 +40,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
         private readonly Guid _userId = Guid.NewGuid();
 
         [Fact]
-        public void GetReleaseForIdAsync()
+        public void GetRelease()
         {
             PermissionTestUtil.PolicyCheckBuilder()
                 .ExpectResourceCheckToFail(_release, CanViewSpecificRelease)
@@ -48,7 +48,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
                     userService =>
                     {
                         var service = BuildReleaseService(userService: userService.Object);
-                        return service.GetReleaseForIdAsync(_release.Id);
+                        return service.GetRelease(_release.Id);
                     }
                 );
         }
