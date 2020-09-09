@@ -1,3 +1,4 @@
+import { OmitStrict } from '@common/types';
 import classNames from 'classnames';
 import RouterLink, { LinkProps as RouterLinkProps } from 'next/link';
 import React, { AnchorHTMLAttributes, ReactNode } from 'react';
@@ -11,9 +12,9 @@ export type LinkProps = {
   children: ReactNode;
   className?: string;
   prefetch?: boolean;
-  to?: RouterLinkProps['href'];
+  to: RouterLinkProps['href'];
   unvisited?: boolean;
-} & AnchorHTMLAttributes<HTMLAnchorElement> &
+} & OmitStrict<AnchorHTMLAttributes<HTMLAnchorElement>, 'href'> &
   AnalyticProps;
 
 const Link = ({
@@ -22,7 +23,6 @@ const Link = ({
   className,
   prefetch,
   to,
-  href,
   analytics,
   unvisited = false,
   ...props
@@ -37,32 +37,41 @@ const Link = ({
     }
   };
 
-  /* eslint-disable jsx-a11y/no-static-element-interactions */
-  return (
-    <RouterLink href={href ?? to ?? ''} as={as} prefetch={prefetch}>
-      <a
-        {...props}
-        className={classNames(
-          'govuk-link',
-          {
-            'govuk-link--no-visited-state': unvisited,
-          },
-          className,
-        )}
-        onClick={() => {
+  const isAbsolute = typeof to === 'string' && to.startsWith('http');
+
+  const link = (
+    <a
+      {...props}
+      href={isAbsolute ? (to as string) : undefined}
+      className={classNames(
+        'govuk-link',
+        {
+          'govuk-link--no-visited-state': unvisited,
+        },
+        className,
+      )}
+      onClick={() => {
+        handleAnalytics();
+      }}
+      onKeyDown={event => {
+        if (event.key === 'Enter' || event.key === ' ') {
           handleAnalytics();
-        }}
-        onKeyDown={event => {
-          if (event.key === 'Enter' || event.key === ' ') {
-            handleAnalytics();
-          }
-        }}
-      >
-        {children}
-      </a>
+        }
+      }}
+    >
+      {children}
+    </a>
+  );
+
+  if (isAbsolute) {
+    return link;
+  }
+
+  return (
+    <RouterLink href={to} as={as} prefetch={prefetch} passHref>
+      {link}
     </RouterLink>
   );
-  /* eslint-enable jsx-a11y/no-static-element-interactions */
 };
 
 export default Link;
