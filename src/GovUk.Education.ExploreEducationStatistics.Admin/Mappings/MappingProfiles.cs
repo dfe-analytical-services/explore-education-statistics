@@ -60,13 +60,6 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Mappings
                             : (DateTime?) null))
                 .ForMember(dest => dest.Permissions, exp => exp.MapFrom<IMyReleasePermissionSetPropertyResolver>());
 
-            CreateMap<Release, ReleaseSummaryViewModel>()
-                .ForMember(model => model.PublishScheduled,
-                    m => m.MapFrom(model =>
-                        model.PublishScheduled.HasValue
-                            ? model.PublishScheduled.Value.ConvertUtcToUkTimeZone()
-                            : (DateTime?) null));
-
             CreateMap<CreateReleaseViewModel, Release>()
                 .ForMember(dest => dest.PublishScheduled, m => m.MapFrom(model =>
                     model.PublishScheduledDate));

@@ -4,7 +4,6 @@ using System.IO;
 using System.Threading.Tasks;
 using GovUk.Education.ExploreEducationStatistics.Admin.Controllers.Api;
 using GovUk.Education.ExploreEducationStatistics.Admin.Models;
-using GovUk.Education.ExploreEducationStatistics.Admin.Models.Api;
 using GovUk.Education.ExploreEducationStatistics.Admin.Services.Interfaces;
 using GovUk.Education.ExploreEducationStatistics.Admin.ViewModels;
 using GovUk.Education.ExploreEducationStatistics.Common.Model;
@@ -115,7 +114,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Controllers.Api
                 Name = "Subject name",
                 Path = "datafile.csv"
             };
-            
+
             mocks.FileStorageService
                 .Setup(service => service.UploadDataFilesAsync(_releaseId, dataFile, metaFile, "Subject name", "test user"))
                 .ReturnsAsync(dataFileInfo);
@@ -228,22 +227,6 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Controllers.Api
             var result = await controller.UpdateRelease(new UpdateReleaseViewModel(), _releaseId);
             var unboxed = AssertOkResult(result);
             Assert.Equal(_releaseId, unboxed.Id);
-        }
-
-        [Fact]
-        public async void Get_Release_Summary_Returns_Ok()
-        {
-            var mocks = Mocks();
-            mocks.ReleaseService
-                .Setup(s => s.GetReleaseSummaryAsync(It.IsAny<Guid>()))
-                .Returns<Guid>(id => Task.FromResult(
-                    new Either<ActionResult, ReleaseSummaryViewModel>(new ReleaseSummaryViewModel {Id = id})));
-            var controller = ReleasesControllerWithMocks(mocks);
-
-            // Method under test
-            var result = await controller.GetReleaseSummaryAsync(_releaseId);
-            var unboxed = AssertOkResult(result);
-            Assert.Equal(unboxed.Id, _releaseId);
         }
 
         [Fact]

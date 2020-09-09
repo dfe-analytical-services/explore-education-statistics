@@ -257,16 +257,6 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Services
             return newRelease;
         }
 
-        public Task<Either<ActionResult, ReleaseSummaryViewModel>> GetReleaseSummaryAsync(Guid releaseId)
-        {
-            return _persistenceHelper
-                .CheckEntityExists<Release>(releaseId,
-                    releases => releases.Include(r => r.Type)
-                )
-                .OnSuccess(_userService.CheckCanViewRelease)
-                .OnSuccess(_mapper.Map<ReleaseSummaryViewModel>);
-        }
-
         public Task<Either<ActionResult, ReleasePublicationStatusViewModel>> GetReleasePublicationStatusAsync(Guid releaseId)
         {
             return _persistenceHelper

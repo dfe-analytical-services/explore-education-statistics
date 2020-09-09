@@ -54,20 +54,6 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
         }
 
         [Fact]
-        public void GetReleaseSummaryAsync()
-        {
-            PermissionTestUtil.PolicyCheckBuilder()
-                .ExpectResourceCheckToFail(_release, CanViewSpecificRelease)
-                .AssertForbidden(
-                    userService =>
-                    {
-                        var service = BuildReleaseService(userService: userService.Object);
-                        return service.GetReleaseSummaryAsync(_release.Id);
-                    }
-                );
-        }
-
-        [Fact]
         public void CreateReleaseAsync()
         {
             PermissionTestUtil.PolicyCheckBuilder()
