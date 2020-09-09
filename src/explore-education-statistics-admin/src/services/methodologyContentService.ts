@@ -40,8 +40,13 @@ const methodologyContentService = {
         order,
       });
     return client.post(
-      `/methodology/${methodologyId}/content/sections/add?type=${sectionKey}`,
+      `/methodology/${methodologyId}/content/sections/add`,
       { order },
+      {
+        params: {
+          type: sectionKey,
+        },
+      },
     );
   },
 
@@ -63,8 +68,13 @@ const methodologyContentService = {
       );
 
     return client.put(
-      `/methodology/${methodologyId}/content/section/${sectionId}/heading?type=${sectionKey}`,
+      `/methodology/${methodologyId}/content/section/${sectionId}/heading`,
       { heading },
+      {
+        params: {
+          type: sectionKey,
+        },
+      },
     );
   },
 
@@ -84,8 +94,13 @@ const methodologyContentService = {
       );
 
     return client.put(
-      `/methodology/${methodologyId}/content/sections/order?type=${sectionKey}`,
+      `/methodology/${methodologyId}/content/sections/order`,
       order,
+      {
+        params: {
+          type: sectionKey,
+        },
+      },
     );
   },
 
@@ -104,7 +119,12 @@ const methodologyContentService = {
       );
 
     return client.delete(
-      `/methodology/${methodologyId}/content/section/${sectionId}?type=${sectionKey}`,
+      `/methodology/${methodologyId}/content/section/${sectionId}`,
+      {
+        params: {
+          type: sectionKey,
+        },
+      },
     );
   },
 
@@ -126,8 +146,13 @@ const methodologyContentService = {
       );
 
     return client.post<EditableContentBlock>(
-      `/methodology/${methodologyId}/content/section/${sectionId}/blocks/add?type=${sectionKey}`,
+      `/methodology/${methodologyId}/content/section/${sectionId}/blocks/add`,
       block,
+      {
+        params: {
+          type: sectionKey,
+        },
+      },
     );
   },
 
@@ -148,7 +173,12 @@ const methodologyContentService = {
       );
 
     return client.delete(
-      `/methodology/${methodologyId}/content/section/${sectionId}/block/${blockId}?type=${sectionKey}`,
+      `/methodology/${methodologyId}/content/section/${sectionId}/block/${blockId}`,
+      {
+        params: {
+          type: sectionKey,
+        },
+      },
     );
   },
 
@@ -172,8 +202,13 @@ const methodologyContentService = {
       );
 
     return client.put(
-      `/methodology/${methodologyId}/content/section/${sectionId}/block/${blockId}?type=${sectionKey}`,
+      `/methodology/${methodologyId}/content/section/${sectionId}/block/${blockId}`,
       block,
+      {
+        params: {
+          type: sectionKey,
+        },
+      },
     );
   },
 
@@ -195,8 +230,13 @@ const methodologyContentService = {
       );
 
     return client.put<EditableContentBlock[]>(
-      `/methodology/${methodologyId}/content/section/${sectionId}/blocks/order?type=${sectionKey}`,
+      `/methodology/${methodologyId}/content/section/${sectionId}/blocks/order`,
       order,
+      {
+        params: {
+          type: sectionKey,
+        },
+      },
     );
   },
 };
