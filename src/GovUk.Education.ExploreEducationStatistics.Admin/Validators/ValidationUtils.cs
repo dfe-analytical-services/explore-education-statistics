@@ -104,6 +104,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Validators
         FileCannotBeEmpty,
         FileTypeInvalid,
         FilenameCannotContainSpacesOrSpecialCharacters,
+        FileUploadNameCannotContainSpecialCharacters,
 
         // Data file
         SubjectTitleMustBeUnique,

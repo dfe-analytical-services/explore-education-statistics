@@ -48,7 +48,8 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Services
                 .OnSuccess(async _ => await ValidateSubjectName(releaseId, name));
         }
 
-        public async Task<Either<ActionResult, Unit>> ValidateFileForUpload(Guid releaseId, IFormFile file, ReleaseFileTypes type, bool overwrite)
+        public async Task<Either<ActionResult, Unit>> ValidateFileForUpload(Guid releaseId, IFormFile file,
+            ReleaseFileTypes type, bool overwrite)
         {
             // Check that it is not an empty file because this causes issues downstream
             if (file.Length == 0)
@@ -64,6 +65,16 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Services
             if (!overwrite && IsFileExisting(releaseId, type, file.FileName))
             {
                 return ValidationActionResult(CannotOverwriteFile);
+            }
+
+            return Unit.Instance;
+        }
+        
+        public async Task<Either<ActionResult, Unit>> ValidateFileUploadName(string name)
+        {
+            if (FileContainsSpecialChars(name))
+            {
+                return ValidationActionResult(FileUploadNameCannotContainSpecialCharacters);
             }
 
             return Unit.Instance;

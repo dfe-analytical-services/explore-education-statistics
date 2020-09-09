@@ -29,6 +29,13 @@ interface FormValues {
 
 const errorMappings = [
   mapFieldErrors<FormValues>({
+    target: 'name',
+    messages: {
+      FILE_UPLOAD_NAME_CANNOT_CONTAIN_SPECIAL_CHARACTERS:
+        'File upload name cannot contain special characters',
+    },
+  }),
+  mapFieldErrors<FormValues>({
     target: 'file',
     messages: {
       CANNOT_OVERWRITE_FILE: 'Choose a unique file name',

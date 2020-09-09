@@ -118,7 +118,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Processor.Services
 
         public static async Task<CloudBlobContainer> GetOrCreateBlobContainer(string storageConnectionString)
         {
-            return await FileStorageUtils.GetCloudBlobContainerAsync(storageConnectionString, PrivateFilesContainerName,
+            return await GetCloudBlobContainerAsync(storageConnectionString, PrivateFilesContainerName,
                 new BlobContainerPermissions
                 {
                     PublicAccess = BlobContainerPublicAccessType.Blob

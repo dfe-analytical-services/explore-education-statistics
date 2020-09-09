@@ -101,8 +101,13 @@ const releaseDataFileService = {
     data.append('metaFile', request.metadataFile);
 
     const file = await client.post<DataFileInfo>(
-      `/release/${releaseId}/data?name=${request.name}`,
+      `/release/${releaseId}/data`,
       data,
+      {
+        params: {
+          name: request.name,
+        },
+      },
     );
 
     return mapFile(file);
@@ -115,8 +120,13 @@ const releaseDataFileService = {
     data.append('zipFile', request.zipFile);
 
     const file = await client.post<DataFileInfo>(
-      `/release/${releaseId}/zip-data?name=${request.name}`,
+      `/release/${releaseId}/zip-data`,
       data,
+      {
+        params: {
+          name: request.name,
+        },
+      },
     );
 
     return mapFile(file);
@@ -149,12 +159,22 @@ const releaseDataFileService = {
     dataFile: DataFile,
   ): Promise<DeleteDataFilePlan> {
     return client.get<DeleteDataFilePlan>(
-      `/release/${releaseId}/data/${dataFile.filename}/delete-plan?name=${dataFile.title}`,
+      `/release/${releaseId}/data/${dataFile.filename}/delete-plan`,
+      {
+        params: {
+          name: dataFile.title,
+        },
+      },
     );
   },
   deleteDataFiles(releaseId: string, dataFile: DataFile): Promise<void> {
     return client.delete<void>(
-      `/release/${releaseId}/data/${dataFile.filename}?name=${dataFile.title}`,
+      `/release/${releaseId}/data/${dataFile.filename}`,
+      {
+        params: {
+          name: dataFile.title,
+        },
+      },
     );
   },
   downloadDataFile(releaseId: string, fileName: string): Promise<void> {
