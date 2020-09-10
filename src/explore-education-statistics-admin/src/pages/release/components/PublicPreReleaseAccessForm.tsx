@@ -108,11 +108,14 @@ const PublicPreReleaseAccessForm = ({
 
           {preReleaseAccessList && (
             <>
-              <h3 className="govuk-heading-m">Public access list preview</h3>
+              <h3 className="govuk-heading-m">
+                Public pre-release access list preview
+              </h3>
 
               <SanitizeHtml
                 className={styles.preview}
                 dirtyHtml={preReleaseAccessList}
+                testId="publicPreReleaseAccessListPreview"
               />
             </>
           )}

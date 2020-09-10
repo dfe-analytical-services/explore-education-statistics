@@ -59,7 +59,7 @@ const ReleasePreReleaseAccessPage = () => {
           </TabsSection>
           <TabsSection
             id="preReleaseAccess-publicList"
-            title="Public pre-release list"
+            title="Public access list"
           >
             <h2>Public pre-release access list</h2>
 

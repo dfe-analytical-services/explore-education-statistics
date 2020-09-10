@@ -85,63 +85,74 @@ Navigate to prerelease page
 
 Validate prerelease has not started
     [Tags]  HappyPath
-    user waits until h1 is visible  Pre Release access is not yet available
+    user waits until h1 is visible  Pre-release access is not yet available
     user checks breadcrumb count should be   2
     user checks nth breadcrumb contains   1    Home
-    user checks nth breadcrumb contains   2    Pre Release access
+    user checks nth breadcrumb contains   2    Pre-release access
 
     ${day}=         get current datetime  %d   1
     ${month}=       get current datetime  %m   1
     ${year}=        get current datetime  %Y   1
     ${time_start}=  format uk to local datetime  ${year}-${month}-${day}T00:00:00  %-d %B %Y at %H:%M
     ${time_end}=    format uk to local datetime  ${year}-${month}-${day}T23:59:00  %-d %B %Y at %H:%M
-    user checks page contains   Pre Release access will be available from ${time_start} until ${time_end}.
+    user checks page contains   Pre-release access will be available from ${time_start} until ${time_end}.
 
-Navigate to Admin dashboard
+Go to prerelease access page
     [Tags]  HappyPath
-    user goes to url  %{ADMIN_URL}
-    user waits until h1 is visible  Dashboard
-
-Go to View scheduled releases tab
-    [Tags]  HappyPath
-    user waits until page contains element  id:scheduled-releases-tab    60
-    user clicks element   id:scheduled-releases-tab
-    user waits until page contains element   xpath://*[@id="scheduled-releases-tab" and @aria-selected="true"]
+    user goes to url   ${RELEASE_URL}/prerelease-access
+    user waits until h2 is visible  Manage pre-release user access
 
 Invite users to prerelease for scheduled release
     [Tags]  HappyPath
-    user opens details dropdown  Calendar Year 2000 (not Live)  css:[data-testid="releaseByStatusTab ${PUBLICATION_NAME}"]
-    user waits until page contains   Manage pre release access
-    ${details}=  user gets details content element  Calendar Year 2000 (not Live)  css:[data-testid="releaseByStatusTab ${PUBLICATION_NAME}"]
-
-    user waits until parent contains element   ${details}   css:input[name="email"]
-    ${invite_input}=  get child element   ${details}   css:input[name="email"]
-
     # This is GOV.UK Notify's test email address
-    user enters text into element  ${invite_input}  simulate-delivered@notifications.service.gov.uk
-    user clicks button  Invite new user  ${details}
-    user checks summary list contains  Pre release access  simulate-delivered@notifications.service.gov.uk (invited)  parent=${details}
+    user enters text into element  css:input[name="email"]  simulate-delivered@notifications.service.gov.uk
+    user clicks button  Invite new user
 
-    user enters text into element  ${invite_input}  analyst1@example.com
-    user clicks button  Invite new user  ${details}
-    user checks summary list contains  Pre release access  analyst1@example.com  parent=${details}
+    user checks table column heading contains  css:table  1  1  User email
+    user checks table column heading contains  css:table  1  2  Invited?
+
+    user checks results table cell contains  1  1  simulate-delivered@notifications.service.gov.uk
+    user checks results table cell contains  1  2  Yes
+
+    user enters text into element  css:input[name="email"]  analyst1@example.com
+    user clicks button  Invite new user
+    user checks results table cell contains  2  1  analyst1@example.com
+    user checks results table cell contains  2  2  No
+
+Add public prerelease access list
+    [Tags]  HappyPath
+    user clicks link  Public access list
+    user waits until h2 is visible  Public pre-release access list
+    user clicks button   Create public pre-release access list
+    user presses keys  CTRL+a+BACKSPACE
+    user presses keys  Initial test public access list
+    user clicks button  Save access list
+    user waits until element contains  css:[data-testid="publicPreReleaseAccessListPreview"]  Initial test public access list
+
+Update public prerelease access list
+    [Tags]  HappyPath
+    user clicks button   Edit public pre-release access list
+    user presses keys  CTRL+a+BACKSPACE
+    user presses keys  Updated test public access list
+    user clicks button  Save access list
+    user waits until element contains  css:[data-testid="publicPreReleaseAccessListPreview"]  Updated test public access list
 
 Validate prerelease has not started for Analyst user
     [Tags]  HappyPath
     user changes to analyst1
     user goes to url   ${RELEASE_URL}/prerelease
 
-    user waits until h1 is visible  Pre Release access is not yet available
+    user waits until h1 is visible  Pre-release access is not yet available
     user checks breadcrumb count should be   2
     user checks nth breadcrumb contains   1    Home
-    user checks nth breadcrumb contains   2    Pre Release access
+    user checks nth breadcrumb contains   2    Pre-release access
 
     ${day}=         get current datetime  %d   1
     ${month}=       get current datetime  %m   1
     ${year}=        get current datetime  %Y   1
     ${time_start}=  format uk to local datetime  ${year}-${month}-${day}T00:00:00  %-d %B %Y at %H:%M
     ${time_end}=    format uk to local datetime  ${year}-${month}-${day}T23:59:00  %-d %B %Y at %H:%M
-    user checks page contains   Pre Release access will be available from ${time_start} until ${time_end}.
+    user checks page contains   Pre-release access will be available from ${time_start} until ${time_end}.
 
 Start prerelease
     [Tags]  HappyPath
@@ -171,13 +182,39 @@ Validate prerelease has started
 
     user checks breadcrumb count should be   2
     user checks nth breadcrumb contains   1    Home
-    user checks nth breadcrumb contains   2    Pre Release access
+    user checks nth breadcrumb contains   2    Pre-release access
 
     user waits until page contains title caption  Calendar Year 2000
     user waits until h1 is visible  ${PUBLICATION_NAME}
 
     user waits until element contains  id:releaseSummary  Test summary text for ${PUBLICATION_NAME}
     user waits until element contains  id:releaseHeadlines  Test headlines summary text for ${PUBLICATION_NAME}
+
+Validate public prerelease access list
+    [Tags]  HappyPath
+    user opens details dropdown  Download associated files
+    user clicks link  Pre-release access list
+
+    user checks breadcrumb count should be   2
+    user checks nth breadcrumb contains   1    Home
+    user checks nth breadcrumb contains   2    Pre-release access list
+
+    user waits until page contains title caption  Calendar Year 2000
+    user waits until h1 is visible  ${PUBLICATION_NAME}
+
+    user waits until h2 is visible  Pre-release access list
+    user waits until page contains  Updated test public access list
+
+Go back to prerelease page
+    [Tags]  HappyPath
+    user clicks link  Back
+
+    user checks breadcrumb count should be   2
+    user checks nth breadcrumb contains   1    Home
+    user checks nth breadcrumb contains   2    Pre-release access
+
+    user waits until page contains title caption  Calendar Year 2000
+    user waits until h1 is visible  ${PUBLICATION_NAME}
 
 Validate prerelease has started for Analyst user
     [Tags]  HappyPath
@@ -186,10 +223,36 @@ Validate prerelease has started for Analyst user
 
     user checks breadcrumb count should be   2
     user checks nth breadcrumb contains   1    Home
-    user checks nth breadcrumb contains   2    Pre Release access
+    user checks nth breadcrumb contains   2    Pre-release access
 
     user waits until page contains title caption  Calendar Year 2000
     user waits until h1 is visible  ${PUBLICATION_NAME}
 
     user waits until element contains  id:releaseSummary  Test summary text for ${PUBLICATION_NAME}
     user waits until element contains  id:releaseHeadlines  Test headlines summary text for ${PUBLICATION_NAME}
+
+Validate public prerelease access list for Analyst user
+    [Tags]  HappyPath
+    user opens details dropdown  Download associated files
+    user clicks link  Pre-release access list
+
+    user checks breadcrumb count should be   2
+    user checks nth breadcrumb contains   1    Home
+    user checks nth breadcrumb contains   2    Pre-release access list
+
+    user waits until page contains title caption  Calendar Year 2000
+    user waits until h1 is visible  ${PUBLICATION_NAME}
+
+    user waits until h2 is visible  Pre-release access list
+    user waits until page contains  Updated test public access list
+
+Go back to prerelease page for Analyst user
+    [Tags]  HappyPath
+    user clicks link  Back
+
+    user checks breadcrumb count should be   2
+    user checks nth breadcrumb contains   1    Home
+    user checks nth breadcrumb contains   2    Pre-release access
+
+    user waits until page contains title caption  Calendar Year 2000
+    user waits until h1 is visible  ${PUBLICATION_NAME}
