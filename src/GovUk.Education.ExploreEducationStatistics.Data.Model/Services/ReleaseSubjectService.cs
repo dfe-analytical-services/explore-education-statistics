@@ -83,7 +83,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Model.Services
         private bool CanDeleteSubject(Subject subject)
         {
             return subject != null
-                   && _statisticsDbContext.ReleaseSubject.Count(rs => rs.SubjectId == subject.Id) == 0;
+                   && _statisticsDbContext.ReleaseSubject.Count(rs => rs.SubjectId == subject.Id) < 2;
         }
     }
 }
