@@ -38,25 +38,6 @@ class FileSchema extends MixedSchema {
     return super.required(message) as this;
   }
 
-  public mimeType(allowedTypes: string[], message: string): FileSchema {
-    return this.test({
-      name: 'mimeType',
-      message,
-      params: {
-        allowedTypes,
-      },
-      test(value?: File) {
-        if (!value) {
-          return true;
-        }
-
-        return allowedTypes.some(type => {
-          return true;
-        });
-      },
-    });
-  }
-
   public minSize(minBytes: number, message: string): FileSchema {
     return this.test({
       name: 'minSize',

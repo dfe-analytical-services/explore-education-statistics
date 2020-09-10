@@ -1,8 +1,5 @@
-import NavLink from '@admin/components/NavLink';
 import ButtonText from '@common/components/ButtonText';
-import classNames from 'classnames';
 import React, { useState } from 'react';
-import styles from '@admin/components/NavBar.module.scss';
 
 const Feedback = () => {
   const [initialView, setInitialView] = useState(true);
