@@ -418,26 +418,37 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Services
             DataBlock dataBlock)
         {
             var tableHeaders = dataBlock.Table.TableHeaders;
-            var tableHeaderColumns = tableHeaders.Columns.ToList();
-            var tableHeaderRows = tableHeaders.Rows.ToList();
 
             var filterItemTargets = replacementPlan.FilterItems.ToDictionary(plan => plan.Id, plan => plan.TargetValue);
             var indicatorTargets = replacementPlan.Indicators.ToDictionary(plan => plan.Id, plan => plan.TargetValue);
 
             ReplaceDataBlockTableHeaders(
-                tableHeaderColumns.FilterByType(TableHeaderType.Filter), dataBlock, filterItemTargets);
+                tableHeaders.Columns.FilterByType(TableHeaderType.Filter), dataBlock, filterItemTargets);
             ReplaceDataBlockTableHeaders(
-                tableHeaderRows.FilterByType(TableHeaderType.Filter), dataBlock, filterItemTargets);
-            ReplaceDataBlockTableHeaders(
-                tableHeaderColumns.FilterByType(TableHeaderType.Indicator), dataBlock, indicatorTargets);
-            ReplaceDataBlockTableHeaders(
-                tableHeaderRows.FilterByType(TableHeaderType.Indicator), dataBlock, indicatorTargets);
+                tableHeaders.Columns.FilterByType(TableHeaderType.Indicator), dataBlock, indicatorTargets);
 
-            dataBlock.Table.TableHeaders.Columns = tableHeaderColumns;
-            dataBlock.Table.TableHeaders.Rows = tableHeaderRows;
+            ReplaceDataBlockTableHeaders(
+                tableHeaders.Rows.FilterByType(TableHeaderType.Filter), dataBlock, filterItemTargets);
+            ReplaceDataBlockTableHeaders(
+                tableHeaders.Rows.FilterByType(TableHeaderType.Indicator), dataBlock, indicatorTargets);
 
-            // TODO EES-1292 ColGroups
-            // TODO EES-1292 RowGroups
+            foreach (var group in tableHeaders.ColumnGroups)
+            {
+                ReplaceDataBlockTableHeaders(
+                    group.FilterByType(TableHeaderType.Filter), dataBlock, filterItemTargets);
+
+                ReplaceDataBlockTableHeaders(
+                    group.FilterByType(TableHeaderType.Indicator), dataBlock, indicatorTargets);
+            }
+
+            foreach (var group in tableHeaders.RowGroups)
+            {
+                ReplaceDataBlockTableHeaders(
+                    group.FilterByType(TableHeaderType.Filter), dataBlock, filterItemTargets);
+
+                ReplaceDataBlockTableHeaders(
+                    group.FilterByType(TableHeaderType.Indicator), dataBlock, indicatorTargets);
+            }
         }
 
         private static void ReplaceDataBlockTableHeaders(List<TableHeader> tableHeaders, DataBlock dataBlock,
@@ -454,13 +465,13 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Services
                     else
                     {
                         throw new InvalidOperationException(
-                            $"Expected target replacement value for dataBlock ${dataBlock.Id} ${tableHeader.Type} table header value: ${idAsGuid}");
+                            $"Expected target replacement value for dataBlock {dataBlock.Id} {tableHeader.Type} table header value: {idAsGuid}");
                     }
                 }
                 else
                 {
                     throw new InvalidOperationException(
-                        $"Expected Guid for dataBlock ${dataBlock.Id} ${tableHeader.Type} table header value but found: ${tableHeader.Value}");
+                        $"Expected Guid for dataBlock {dataBlock.Id} {tableHeader.Type} table header value but found: {tableHeader.Value}");
                 }
             }
         }
