@@ -33,7 +33,12 @@ const ReleasePreReleaseAccessPage = () => {
           <TabsSection id="preReleaseAccess-users" title="Pre-release users">
             <h2>Manage pre-release user access</h2>
 
-            {release.status !== 'Approved' ? (
+            {release.status === 'Approved' ? (
+              <PreReleaseUserAccessForm
+                releaseId={release.id}
+                isReleaseLive={release.live}
+              />
+            ) : (
               <WarningMessage>
                 Before you can invite users for pre-release access, the release
                 status must be approved. This can be done in the{' '}
@@ -46,12 +51,10 @@ const ReleasePreReleaseAccessPage = () => {
                     },
                   )}
                 >
-                  release status page
+                  release status
                 </Link>
-                .
+                page.
               </WarningMessage>
-            ) : (
-              <PreReleaseUserAccessForm releaseId={release.id} />
             )}
           </TabsSection>
           <TabsSection
@@ -65,6 +68,7 @@ const ReleasePreReleaseAccessPage = () => {
               publicationSlug={release.publicationSlug}
               releaseId={release.id}
               releaseSlug={release.slug}
+              isReleaseLive={release.live}
               preReleaseAccessList={release.preReleaseAccessList}
               onSubmit={async ({ preReleaseAccessList }) => {
                 const updatedRelease = await releaseService.updateRelease(

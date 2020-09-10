@@ -5,6 +5,7 @@ import ButtonGroup from '@common/components/ButtonGroup';
 import ButtonText from '@common/components/ButtonText';
 import Form from '@common/components/form/Form';
 import FormFieldTextInput from '@common/components/form/FormFieldTextInput';
+import Gate from '@common/components/Gate';
 import LoadingSpinner from '@common/components/LoadingSpinner';
 import WarningMessage from '@common/components/WarningMessage';
 import useAsyncRetry from '@common/hooks/useAsyncRetry';
@@ -29,11 +30,15 @@ const errorMappings = [
 
 interface Props {
   releaseId: string;
+  isReleaseLive?: boolean;
 }
 
 const formId = 'preReleaseUserAccessForm';
 
-const PreReleaseUserAccessForm = ({ releaseId }: Props) => {
+const PreReleaseUserAccessForm = ({
+  releaseId,
+  isReleaseLive = false,
+}: Props) => {
   const [isRemoving, toggleRemoving] = useToggle(false);
 
   const {
@@ -64,35 +69,47 @@ const PreReleaseUserAccessForm = ({ releaseId }: Props) => {
 
   return (
     <LoadingSpinner loading={isLoading}>
-      <Formik<FormValues>
-        enableReinitialize
-        initialValues={{
-          email: '',
-        }}
-        validationSchema={Yup.object<FormValues>({
-          email: Yup.string()
-            .required('Enter an email address')
-            .email('Enter a valid email address'),
-        })}
-        onSubmit={handleSubmit}
+      <Gate
+        condition={!isReleaseLive}
+        fallback={
+          <WarningMessage>
+            This release has been published and can no longer be updated.
+          </WarningMessage>
+        }
       >
-        {form => (
-          <Form id={formId}>
-            <FormFieldTextInput<FormValues>
-              id={`${formId}-email`}
-              label="Invite new user by email"
-              name="email"
-              className="govuk-!-width-one-third"
-            />
+        <Formik<FormValues>
+          enableReinitialize
+          initialValues={{
+            email: '',
+          }}
+          validationSchema={Yup.object<FormValues>({
+            email: Yup.string()
+              .required('Enter an email address')
+              .email('Enter a valid email address'),
+          })}
+          onSubmit={handleSubmit}
+        >
+          {form => (
+            <Form id={formId}>
+              <FormFieldTextInput<FormValues>
+                id={`${formId}-email`}
+                label="Invite new user by email"
+                name="email"
+                className="govuk-!-width-one-third"
+              />
 
-            <ButtonGroup>
-              <Button type="submit" disabled={form.isSubmitting || isRemoving}>
-                {form.isSubmitting ? 'Inviting new user' : 'Invite new user'}
-              </Button>
-            </ButtonGroup>
-          </Form>
-        )}
-      </Formik>
+              <ButtonGroup>
+                <Button
+                  type="submit"
+                  disabled={form.isSubmitting || isRemoving}
+                >
+                  {form.isSubmitting ? 'Inviting new user' : 'Invite new user'}
+                </Button>
+              </ButtonGroup>
+            </Form>
+          )}
+        </Formik>
+      </Gate>
 
       {users.length > 0 ? (
         <table>
@@ -100,7 +117,7 @@ const PreReleaseUserAccessForm = ({ releaseId }: Props) => {
             <tr>
               <th>User email</th>
               <th>Invited?</th>
-              <th />
+              {!isReleaseLive && <th />}
             </tr>
           </thead>
           <tbody>
@@ -108,33 +125,36 @@ const PreReleaseUserAccessForm = ({ releaseId }: Props) => {
               <tr key={user.email}>
                 <td>{user.email}</td>
                 <td>{user.invited ? 'Yes' : 'No'}</td>
-                <td className="dfe-align--right">
-                  <ButtonText
-                    disabled={isRemoving}
-                    onClick={async () => {
-                      toggleRemoving.on();
 
-                      await preReleaseUserService.removeUser(
-                        releaseId,
-                        user.email,
-                      );
+                {!isReleaseLive && (
+                  <td className="dfe-align--right">
+                    <ButtonText
+                      disabled={isRemoving}
+                      onClick={async () => {
+                        toggleRemoving.on();
 
-                      setUsers({
-                        value: users.filter(u => u.email !== user.email),
-                      });
-                      toggleRemoving.off();
-                    }}
-                  >
-                    Remove
-                  </ButtonText>
-                </td>
+                        await preReleaseUserService.removeUser(
+                          releaseId,
+                          user.email,
+                        );
+
+                        setUsers({
+                          value: users.filter(u => u.email !== user.email),
+                        });
+                        toggleRemoving.off();
+                      }}
+                    >
+                      Remove
+                    </ButtonText>
+                  </td>
+                )}
               </tr>
             ))}
           </tbody>
         </table>
       ) : (
         <p className="govuk-inset-text">
-          No pre-release users have been invited yet.
+          No pre-release users have been invited.
         </p>
       )}
     </LoadingSpinner>

@@ -49,7 +49,7 @@ describe('PreReleaseUserAccessForm', () => {
     });
   });
 
-  test('renders empty message when there are no contacts', async () => {
+  test('renders empty message when there are no users', async () => {
     preReleaseUserService.getUsers.mockResolvedValue([]);
 
     render(<PreReleaseUserAccessForm releaseId="release-1" />);
@@ -57,12 +57,37 @@ describe('PreReleaseUserAccessForm', () => {
     await waitFor(() => {
       expect(screen.queryByRole('table')).not.toBeInTheDocument();
       expect(
-        screen.getByText('No pre-release users have been invited yet.'),
+        screen.getByText('No pre-release users have been invited.'),
       ).toBeInTheDocument();
     });
   });
 
-  test('renders error message if contacts could not be loaded', async () => {
+  test('renders correctly when the release is live', async () => {
+    preReleaseUserService.getUsers.mockResolvedValue(testUsers);
+
+    render(<PreReleaseUserAccessForm releaseId="release-1" isReleaseLive />);
+
+    await waitFor(() => {
+      expect(
+        screen.getByText(
+          'This release has been published and can no longer be updated.',
+        ),
+      ).toBeInTheDocument();
+
+      expect(
+        screen.queryByLabelText('Invite new user by email'),
+      ).not.toBeInTheDocument();
+
+      const rows = screen.getAllByRole('row');
+      expect(rows).toHaveLength(3);
+
+      expect(
+        screen.queryByRole('button', { name: 'Remove' }),
+      ).not.toBeInTheDocument();
+    });
+  });
+
+  test('renders error message if users could not be loaded', async () => {
     preReleaseUserService.getUsers.mockRejectedValue(
       new Error('Something went wrong'),
     );

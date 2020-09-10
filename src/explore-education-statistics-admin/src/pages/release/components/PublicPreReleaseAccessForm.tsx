@@ -9,6 +9,7 @@ import ButtonGroup from '@common/components/ButtonGroup';
 import { Form } from '@common/components/form';
 import SanitizeHtml from '@common/components/SanitizeHtml';
 import UrlContainer from '@common/components/UrlContainer';
+import WarningMessage from '@common/components/WarningMessage';
 import useToggle from '@common/hooks/useToggle';
 import { Formik } from 'formik';
 import React from 'react';
@@ -34,6 +35,7 @@ interface Props {
   publicationSlug: string;
   releaseId: string;
   releaseSlug: string;
+  isReleaseLive?: boolean;
   preReleaseAccessList: string;
   onSubmit: (values: FormValues) => void;
 }
@@ -43,6 +45,7 @@ const PublicPreReleaseAccessForm = ({
   publicationSlug,
   releaseId,
   releaseSlug,
+  isReleaseLive = false,
   preReleaseAccessList,
   onSubmit,
 }: Props) => {
@@ -56,20 +59,22 @@ const PublicPreReleaseAccessForm = ({
 
   return (
     <>
-      <div className="govuk-inset-text">
-        <h3 className="govuk-heading-m">Before you start</h3>
+      {!isReleaseLive && (
+        <div className="govuk-inset-text">
+          <h3 className="govuk-heading-m">Before you start</h3>
 
-        <ul>
-          <li>
-            you can add a list of roles who have been granted pre-release access
-            to this release
-          </li>
-          <li>
-            this list will become publicly facing when the publication is
-            released
-          </li>
-        </ul>
-      </div>
+          <ul>
+            <li>
+              you can add a list of roles who have been granted pre-release
+              access to this release
+            </li>
+            <li>
+              this list will become publicly facing when the publication is
+              released
+            </li>
+          </ul>
+        </div>
+      )}
 
       {showForm ? (
         <Formik<FormValues>
@@ -95,6 +100,12 @@ const PublicPreReleaseAccessForm = ({
         </Formik>
       ) : (
         <>
+          {isReleaseLive && (
+            <WarningMessage>
+              This release has been published and can no longer be updated.
+            </WarningMessage>
+          )}
+
           {preReleaseAccessList && (
             <>
               <h3 className="govuk-heading-m">Public access list preview</h3>
@@ -106,46 +117,49 @@ const PublicPreReleaseAccessForm = ({
             </>
           )}
 
-          <Button onClick={toggleForm}>
-            {`${
-              preReleaseAccessList ? 'Edit' : 'Create'
-            } public pre-release access list`}
-          </Button>
-
-          {preReleaseAccessList && PublicAppUrl && (
-            <>
-              <hr />
-
-              <h3>How to access the release and pre-release</h3>
-
-              <p>
-                The <strong>pre-release</strong> will be accessible at:
-              </p>
-
-              <p>
-                <UrlContainer
-                  url={`${window.location.origin}${generatePath<
-                    ReleaseRouteParams
-                  >(preReleaseRoute.path, {
-                    publicationId,
-                    releaseId,
-                  })}`}
-                />
-              </p>
-
-              <p>
-                The <strong>public release</strong> will be accessible at:
-              </p>
-
-              <p>
-                <UrlContainer
-                  url={`${PublicAppUrl}/find-statistics/${publicationSlug}/${releaseSlug}`}
-                />
-              </p>
-            </>
+          {!isReleaseLive && (
+            <Button onClick={toggleForm}>
+              {`${
+                preReleaseAccessList ? 'Edit' : 'Create'
+              } public pre-release access list`}
+            </Button>
           )}
         </>
       )}
+
+      <hr />
+
+      <h3>How to access the release</h3>
+
+      {!isReleaseLive && (
+        <>
+          <p>
+            The <strong>pre-release</strong> will be accessible at:
+          </p>
+
+          <p>
+            <UrlContainer
+              url={`${window.location.origin}${generatePath<ReleaseRouteParams>(
+                preReleaseRoute.path,
+                {
+                  publicationId,
+                  releaseId,
+                },
+              )}`}
+            />
+          </p>
+        </>
+      )}
+
+      <p>
+        The <strong>public release</strong> will be accessible at:
+      </p>
+
+      <p>
+        <UrlContainer
+          url={`${PublicAppUrl}/find-statistics/${publicationSlug}/${releaseSlug}`}
+        />
+      </p>
     </>
   );
 };

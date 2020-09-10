@@ -77,6 +77,57 @@ describe('PublicPreReleaseAccessForm', () => {
     );
   });
 
+  test(`renders with existing access list correctly`, async () => {
+    const testAccessList = `
+<p>Test pre-release access list</p>
+<ul>
+    <li>Test person 1</li>
+    <li>Test person 2</li>
+</ul>
+`;
+
+    render(
+      <TestConfigContextProvider>
+        <PublicPreReleaseAccessForm
+          publicationId="publication-1"
+          publicationSlug="test-publication"
+          releaseId="release-1"
+          releaseSlug="test-release"
+          isReleaseLive
+          preReleaseAccessList={testAccessList}
+          onSubmit={noop}
+        />
+      </TestConfigContextProvider>,
+    );
+
+    expect(
+      screen.getByText(
+        'This release has been published and can no longer be updated.',
+      ),
+    ).toBeInTheDocument();
+
+    expect(
+      screen.getByText('Test pre-release access list', { selector: 'p' }),
+    ).toBeInTheDocument();
+    expect(
+      screen.getByText('Test person 1', { selector: 'li' }),
+    ).toBeInTheDocument();
+    expect(
+      screen.getByText('Test person 2', { selector: 'li' }),
+    ).toBeInTheDocument();
+
+    expect(
+      screen.queryByText(
+        'http://localhost/publication/publication-1/release/release-1/prerelease',
+      ),
+    ).not.toBeInTheDocument();
+    expect(
+      screen.getByText(
+        'http://localhost/find-statistics/test-publication/test-release',
+      ),
+    ).toBeInTheDocument();
+  });
+
   test('submitting form hides the form', async () => {
     render(
       <TestConfigContextProvider>
