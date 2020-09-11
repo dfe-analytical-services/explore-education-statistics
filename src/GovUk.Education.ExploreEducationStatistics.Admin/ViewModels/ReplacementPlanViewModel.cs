@@ -1,7 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Linq;
-using GovUk.Education.ExploreEducationStatistics.Common.Model.Data;
 using GovUk.Education.ExploreEducationStatistics.Common.Model.Data.Query;
 using Newtonsoft.Json;
 
@@ -104,11 +103,12 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.ViewModels
 
     public class LocationReplacementViewModel : ReplacementViewModel
     {
-        [JsonIgnore]
-        public GeographicLevel GeographicLevel { get; set; }
         public IEnumerable<string> Matched { get; set; }
         public IEnumerable<string> Unmatched { get; set; }
         public new bool Valid => !Unmatched.Any();
+
+        [JsonIgnore]
+        public bool Any => Matched.Any() || Unmatched.Any();
     }
 
     public class TimePeriodReplacementViewModel : ReplacementViewModel

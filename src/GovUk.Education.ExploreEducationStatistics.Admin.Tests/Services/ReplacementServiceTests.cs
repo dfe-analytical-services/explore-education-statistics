@@ -22,8 +22,6 @@ using static GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services.DbU
 using static GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services.ValidationTestUtil;
 using static GovUk.Education.ExploreEducationStatistics.Admin.Validators.ValidationErrorMessages;
 using static GovUk.Education.ExploreEducationStatistics.Common.Model.TimeIdentifier;
-using static GovUk.Education.ExploreEducationStatistics.Common.Services.EnumUtil;
-using static GovUk.Education.ExploreEducationStatistics.Data.Model.Services.LocationService;
 using FootnoteService = GovUk.Education.ExploreEducationStatistics.Data.Model.Services.FootnoteService;
 using Release = GovUk.Education.ExploreEducationStatistics.Data.Model.Release;
 
@@ -538,25 +536,13 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
                 Assert.False(dataBlockFilterItemPlan.Valid);
 
                 Assert.NotNull(dataBlockPlan.Locations);
-                var allGeographicLevels = GetGeographicLevelsAsStrings();
-                Assert.Equal(allGeographicLevels.Count, dataBlockPlan.Locations.Count);
-                Assert.False(allGeographicLevels.Except(dataBlockPlan.Locations.Keys).Any());
-
+                Assert.Single(dataBlockPlan.Locations);
+                Assert.True(dataBlockPlan.Locations.ContainsKey(GeographicLevel.Country.ToString()));
                 Assert.Empty(dataBlockPlan.Locations[GeographicLevel.Country.ToString()].Matched);
                 Assert.Single(dataBlockPlan.Locations[GeographicLevel.Country.ToString()].Unmatched);
                 Assert.Equal(dataBlock.Query.Locations.Country,
                     dataBlockPlan.Locations[GeographicLevel.Country.ToString()].Unmatched);
                 Assert.False(dataBlockPlan.Locations[GeographicLevel.Country.ToString()].Valid);
-
-                allGeographicLevels.ForEach(level =>
-                {
-                    if (level != GeographicLevel.Country.ToString())
-                    {
-                        Assert.Empty(dataBlockPlan.Locations[level].Matched);
-                        Assert.Empty(dataBlockPlan.Locations[level].Unmatched);
-                        Assert.True(dataBlockPlan.Locations[level].Valid);
-                    }
-                });
 
                 Assert.NotNull(dataBlockPlan.TimePeriods);
                 Assert.Equal(timePeriod, dataBlockPlan.TimePeriods.Query);
@@ -878,7 +864,6 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
                         new List<TableHeader>
                         {
                             new TableHeader(originalFilterItem1.Id.ToString(), TableHeaderType.Filter)
-                            // TODO include more than 1 filter here?
                         }
                     },
                     Rows = new List<TableHeader>
@@ -1033,25 +1018,13 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
                 Assert.True(dataBlockFilterItemPlan.Valid);
 
                 Assert.NotNull(dataBlockPlan.Locations);
-                var allGeographicLevels = GetGeographicLevelsAsStrings();
-                Assert.Equal(allGeographicLevels.Count, dataBlockPlan.Locations.Count);
-                Assert.False(allGeographicLevels.Except(dataBlockPlan.Locations.Keys).Any());
-
+                Assert.Single(dataBlockPlan.Locations);
+                Assert.True(dataBlockPlan.Locations.ContainsKey(GeographicLevel.Country.ToString()));
                 Assert.Single(dataBlockPlan.Locations[GeographicLevel.Country.ToString()].Matched);
                 Assert.Equal(dataBlock.Query.Locations.Country,
                     dataBlockPlan.Locations[GeographicLevel.Country.ToString()].Matched);
                 Assert.Empty(dataBlockPlan.Locations[GeographicLevel.Country.ToString()].Unmatched);
                 Assert.True(dataBlockPlan.Locations[GeographicLevel.Country.ToString()].Valid);
-
-                allGeographicLevels.ForEach(level =>
-                {
-                    if (level != GeographicLevel.Country.ToString())
-                    {
-                        Assert.Empty(dataBlockPlan.Locations[level].Matched);
-                        Assert.Empty(dataBlockPlan.Locations[level].Unmatched);
-                        Assert.True(dataBlockPlan.Locations[level].Valid);
-                    }
-                });
 
                 Assert.NotNull(dataBlockPlan.TimePeriods);
                 Assert.Equal(timePeriod, dataBlockPlan.TimePeriods.Query);
@@ -1550,7 +1523,6 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
                         new List<TableHeader>
                         {
                             new TableHeader(originalFilterItem1.Id.ToString(), TableHeaderType.Filter)
-                            // TODO include more than 1 filter here?
                         }
                     },
                     Rows = new List<TableHeader>
@@ -1843,14 +1815,6 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
                 .Include(footnote => footnote.Subjects)
                 .ThenInclude(subjectFootnote => subjectFootnote.Subject)
                 .SingleAsync(footnote => footnote.Id == id);
-        }
-
-        private static List<string> GetGeographicLevelsAsStrings()
-        {
-            return GetEnumValues<GeographicLevel>()
-                .Where(geographicLevel => !IgnoredLevels.Contains(geographicLevel))
-                .Select(level => level.ToString())
-                .ToList();
         }
 
         private static ReplacementService BuildReplacementService(

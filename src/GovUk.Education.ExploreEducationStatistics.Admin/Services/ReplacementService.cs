@@ -267,8 +267,8 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Services
                     geographicLevel =>
                         ValidateLocationsForReplacement(dataBlock.Query.Locations,
                             geographicLevel,
-                            replacementSubjectMeta)
-                );
+                            replacementSubjectMeta))
+                .Filter(pair => pair.Value.Any);
         }
 
         private static TimePeriodReplacementViewModel ValidateTimePeriodsForDataBlock(DataBlock dataBlock,
