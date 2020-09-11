@@ -16,26 +16,36 @@ const ButtonLink = ({
   className,
   disabled = false,
   to,
-  href,
   prefetch,
   ...props
 }: Props) => {
+  const isAbsolute = typeof to === 'string' && to.startsWith('http');
+
+  const link = (
+    <a
+      {...props}
+      href={isAbsolute ? (to as string) : undefined}
+      className={classNames(
+        'govuk-button',
+        {
+          'govuk-button--disabled': disabled,
+        },
+        className,
+      )}
+      role="button"
+      aria-disabled={disabled}
+    >
+      {children}
+    </a>
+  );
+
+  if (isAbsolute) {
+    return link;
+  }
+
   return (
-    <Link {...props} prefetch={prefetch} href={href ?? to ?? ''}>
-      <a
-        {...props}
-        className={classNames(
-          'govuk-button',
-          {
-            'govuk-button--disabled': disabled,
-          },
-          className,
-        )}
-        role="button"
-        aria-disabled={disabled}
-      >
-        {children}
-      </a>
+    <Link {...props} prefetch={prefetch} href={to} passHref>
+      {link}
     </Link>
   );
 };

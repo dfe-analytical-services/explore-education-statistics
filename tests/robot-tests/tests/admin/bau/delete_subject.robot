@@ -61,15 +61,22 @@ Verify Release summary
 Upload subject
     [Tags]  HappyPath
     user clicks link  Manage data
+    user waits until h2 is visible  Add data file to release
     user enters text into element  id:dataFileUploadForm-subjectTitle   UI test subject
-    choose file   id:dataFileUploadForm-dataFile       ${CURDIR}${/}files${/}upload-file-test-with-filter.csv
-    choose file   id:dataFileUploadForm-metadataFile   ${CURDIR}${/}files${/}upload-file-test-with-filter.meta.csv
+    user chooses file  id:dataFileUploadForm-dataFile       ${CURDIR}${/}files${/}upload-file-test-with-filter.csv
+    user chooses file  id:dataFileUploadForm-metadataFile   ${CURDIR}${/}files${/}upload-file-test-with-filter.meta.csv
     user clicks button  Upload data files
-    user waits until page contains element   xpath://h2[text()="Uploaded data files"]
+    user waits until h2 is visible  Uploaded data files
     user waits until page contains accordion section   UI test subject
     user opens accordion section   UI test subject
-    user checks page contains element   xpath://dt[text()="Subject title"]/../dd/h4[text()="UI test subject"]
-    user waits until page contains element  xpath://dt[text()="Status"]/../dd//strong[text()="Complete"]     180
+
+    ${section}=  user gets accordion section content element  UI test subject
+    user checks summary list contains  Subject title    UI test subject  ${section}
+    user checks summary list contains  Data file        upload-file-test-with-filter.csv  ${section}
+    user checks summary list contains  Metadata file    upload-file-test-with-filter.meta.csv  ${section}
+    user checks summary list contains  Number of rows   159  ${section}
+    user checks summary list contains  Data file size   16 Kb  ${section}
+    user checks summary list contains  Status           Complete  ${section}  180
 
 Navigate to Footnotes tab
     [Tags]  HappyPath
@@ -185,10 +192,11 @@ Navigate back to Manage data tab
 Delete UI test subject
     [Tags]  HappyPath
     user clicks link  Data uploads
-    user waits until page contains element  xpath://legend[text()="Add new data to release"]
+    user waits until h2 is visible  Add data file to release
     user waits until page contains accordion section  UI test subject
     user opens accordion section   UI test subject
     user clicks button   Delete files
+
     user waits until h1 is visible   Confirm deletion of selected data files
     user checks page contains   4 footnotes will be removed or updated.
     user checks page contains   The following data blocks will also be deleted:
@@ -196,5 +204,6 @@ Delete UI test subject
     user checks page contains   The following infographic files will also be removed:
     user checks page contains   dfe-logo.jpg
     user clicks button  Confirm
+
     user waits until page does not contain accordion section   UI test subject
-    user checks page contains element  xpath://legend[text()="Add new data to release"]
+    user waits until h2 is visible  Add data file to release

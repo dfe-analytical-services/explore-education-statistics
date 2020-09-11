@@ -129,14 +129,15 @@ const PublicationReleasePage: NextPage<Props> = ({ data }) => {
           {data.downloadFiles && (
             <Details
               summary="Download associated files"
-              onToggle={(open: boolean) =>
-                open &&
-                logEvent(
-                  'Downloads',
-                  'Release page download associated files dropdown opened',
-                  window.location.pathname,
-                )
-              }
+              onToggle={open => {
+                if (open) {
+                  logEvent(
+                    'Downloads',
+                    'Release page download associated files dropdown opened',
+                    window.location.pathname,
+                  );
+                }
+              }}
             >
               <ul className="govuk-list govuk-list--bullet">
                 {data.downloadFiles.map(({ extension, name, path, size }) => (
@@ -151,9 +152,28 @@ const PublicationReleasePage: NextPage<Props> = ({ data }) => {
                     >
                       {name}
                     </Link>
+
                     {` (${extension}, ${size})`}
                   </li>
                 ))}
+                {data.preReleaseAccessList && (
+                  <li>
+                    <Link
+                      to={
+                        data.latestRelease
+                          ? '/find-statistics/[publication]/prerelease-access-list'
+                          : '/find-statistics/[publication]/[release]/prerelease-access-list'
+                      }
+                      as={
+                        data.latestRelease
+                          ? `/find-statistics/${data.publication.slug}/prerelease-access-list`
+                          : `/find-statistics/${data.publication.slug}/${data.slug}/prerelease-access-list`
+                      }
+                    >
+                      Pre-release access list
+                    </Link>
+                  </li>
+                )}
               </ul>
             </Details>
           )}

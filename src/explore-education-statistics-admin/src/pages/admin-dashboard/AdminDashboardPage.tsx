@@ -4,7 +4,6 @@ import Page from '@admin/components/Page';
 import PageTitle from '@admin/components/PageTitle';
 import { useAuthContext } from '@admin/contexts/AuthContext';
 import DraftReleasesTab from '@admin/pages/admin-dashboard/components/DraftReleasesTab';
-import PrereleaseAccessManagement from '@admin/pages/admin-dashboard/components/PrereleaseAccessManagement';
 import ReleasesTab from '@admin/pages/admin-dashboard/components/ReleasesByStatusTab';
 import ReleaseSummary from '@admin/pages/admin-dashboard/components/ReleaseSummary';
 import {
@@ -143,14 +142,10 @@ const AdminDashboardPage = () => {
                         },
                       )}
                     >
-                      Preview release
+                      View release
                     </ButtonLink>
                   }
-                >
-                  {release.permissions.canAddPrereleaseUsers && (
-                    <PrereleaseAccessManagement release={release} />
-                  )}
-                </ReleaseSummary>
+                />
               )}
             />
           </TabsSection>

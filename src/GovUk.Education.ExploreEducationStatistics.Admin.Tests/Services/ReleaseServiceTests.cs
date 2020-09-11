@@ -1,5 +1,6 @@
 using System;
 using System.Collections.Generic;
+using System.Globalization;
 using System.Linq;
 using GovUk.Education.ExploreEducationStatistics.Admin.Services;
 using GovUk.Education.ExploreEducationStatistics.Admin.Services.Interfaces;
@@ -285,7 +286,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
             await using (var context = InMemoryApplicationDbContext(contextId))
             {
                 var releaseService = BuildReleaseService(context, mocks);
-                var notLatest = (await releaseService.GetReleaseForIdAsync(notLatestRelease.Id)).Right;
+                var notLatest = (await releaseService.GetRelease(notLatestRelease.Id)).Right;
 
                 Assert.Equal(notLatestRelease.Id, notLatest.Id);
                 Assert.False(notLatest.LatestRelease);
@@ -294,7 +295,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
             await using (var context = InMemoryApplicationDbContext(contextId))
             {
                 var releaseService = BuildReleaseService(context, mocks);
-                var latest = (await releaseService.GetReleaseForIdAsync(latestRelease.Id)).Right;
+                var latest = (await releaseService.GetRelease(latestRelease.Id)).Right;
 
                 Assert.Equal(latestRelease.Id, latest.Id);
                 Assert.True(latest.LatestRelease);
@@ -335,6 +336,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
                 {
                     Day = "15", Month = "6", Year = "2039"
                 },
+                PreReleaseAccessList = "Old access list",
                 Version = 0,
                 PreviousVersionId = releaseId
             };
@@ -370,7 +372,9 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
                             NextReleaseDate = nextReleaseDateEdited,
                             TypeId = officialStatisticsReleaseType.Id,
                             ReleaseName = "2035",
-                            TimePeriodCoverage = TimeIdentifier.March
+                            TimePeriodCoverage = TimeIdentifier.March,
+                            PreReleaseAccessList = "New access list",
+
                         }
                     );
 
@@ -382,6 +386,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
                 Assert.Equal(officialStatisticsReleaseType, result.Right.Type);
                 Assert.Equal("2035", result.Right.ReleaseName);
                 Assert.Equal(TimeIdentifier.March, result.Right.TimePeriodCoverage);
+                Assert.Equal("New access list", result.Right.PreReleaseAccessList);
 
                 var saved = await context.Releases.FindAsync(result.Right.Id);
 
@@ -392,6 +397,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
                 Assert.Equal("2035-march", saved.Slug);
                 Assert.Equal("2035", saved.ReleaseName);
                 Assert.Equal(TimeIdentifier.March, saved.TimePeriodCoverage);
+                Assert.Equal("New access list", saved.PreReleaseAccessList);
             }
         }
 
@@ -875,53 +881,48 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
         }
 
         [Fact]
-        public async void GetReleaseSummaryAsync()
+        public async void GetRelease()
         {
-            var releaseId = new Guid("5cf345d4-7f7b-425c-8267-de785cfc040b");
-
-            var adhocReleaseType = new ReleaseType
+            var adHocReleaseType = new ReleaseType
             {
-                Id = new Guid("19b024dc-339c-4e2c-b2ca-b55e5c509ad2"),
                 Title = "Ad Hoc"
             };
 
-            var publishScheduled = new DateTime(2020, 6, 29, 0, 0, 0).AsStartOfDayUtcForTimeZone();
+            var releaseId = Guid.NewGuid();
             var nextReleaseDate = new PartialDate {Day = "1", Month = "1", Year = "2040"};
-            const string releaseName = "2035";
-            const TimeIdentifier timePeriodCoverage = TimeIdentifier.January;
+
+            var release = new Release
+            {
+                Id = releaseId,
+                Type = adHocReleaseType,
+                TimePeriodCoverage = TimeIdentifier.January,
+                PublishScheduled = DateTime.Parse("2020-06-29T00:00:00.00Z", styles: DateTimeStyles.AdjustToUniversal),
+                Published = DateTime.Parse("2020-06-29T02:00:00.00Z"),
+                NextReleaseDate = nextReleaseDate,
+                ReleaseName = "2035",
+                Slug = "2035-1",
+                Version = 0,
+                InternalReleaseNote = "Test release note",
+                PreReleaseAccessList = "Test access list",
+            };
+
+            var publication = new Publication
+            {
+                Id = new Guid("f7da23e2-304a-4b47-a8f5-dba28a554de9"),
+                Title = "Test publication",
+                Slug = "test-publication",
+                Releases = new List<Release>
+                {
+                    release
+                }
+            };
 
             var contextId = Guid.NewGuid().ToString();
 
             await using (var context = InMemoryApplicationDbContext(contextId))
             {
-                context.AddRange(
-                    new List<ReleaseType>
-                    {
-                        adhocReleaseType,
-                    }
-                );
-                context.Add(
-                    new Publication
-                    {
-                        Id = new Guid("f7da23e2-304a-4b47-a8f5-dba28a554de9"),
-                        Releases = new List<Release>
-                        {
-                            new Release
-                            {
-                                Id = releaseId,
-                                TypeId = adhocReleaseType.Id,
-                                Type = adhocReleaseType,
-                                TimePeriodCoverage = TimeIdentifier.January,
-                                PublishScheduled = publishScheduled,
-                                NextReleaseDate = nextReleaseDate,
-                                ReleaseName = releaseName,
-                                Version = 0,
-                                PreviousVersionId = releaseId
-                            }
-                        }
-                    }
-                );
-                context.SaveChanges();
+                context.Add(publication);
+                await context.SaveChangesAsync();
             }
 
             await using (var context = InMemoryApplicationDbContext(contextId))
@@ -929,18 +930,29 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
                 var mocks = Mocks();
                 var releaseService = BuildReleaseService(context, mocks);
 
-                // Method under test
-                var summaryResult = await releaseService.GetReleaseSummaryAsync(releaseId);
+                var result = await releaseService.GetRelease(releaseId);
 
-                var summary = summaryResult.Right;
-                Assert.Equal(new DateTime(2020, 6, 29, 0, 0, 0), summary.PublishScheduled);
-                Assert.Equal(nextReleaseDate, summary.NextReleaseDate);
-                Assert.Equal(adhocReleaseType, summary.Type);
-                Assert.Equal(releaseName, summary.ReleaseName);
-                Assert.Equal(timePeriodCoverage, summary.TimePeriodCoverage);
-                Assert.Equal("2035", summary.YearTitle);
+                var viewModel = result.Right;
+
+                Assert.Equal("2035", viewModel.ReleaseName);
+                Assert.Equal("2035-1", viewModel.Slug);
+                Assert.Equal(publication.Id, viewModel.PublicationId);
+                Assert.Equal("Test publication", viewModel.PublicationTitle);
+                Assert.Equal("test-publication", viewModel.PublicationSlug);
+                Assert.Equal("Test release note", viewModel.InternalReleaseNote);
+                Assert.Equal(DateTime.Parse("2020-06-29T01:00:00.00"), viewModel.PublishScheduled);
+                Assert.Equal(DateTime.Parse("2020-06-29T02:00:00.00Z"), viewModel.Published);
+                Assert.Equal("Test access list", viewModel.PreReleaseAccessList);
+                Assert.Equal(nextReleaseDate, viewModel.NextReleaseDate);
+                Assert.Equal(adHocReleaseType, viewModel.Type);
+                Assert.Equal(TimeIdentifier.January, viewModel.TimePeriodCoverage);
+                Assert.Equal("2035", viewModel.YearTitle);
+
+                Assert.Null(viewModel.PreviousVersionId);
+                Assert.True(viewModel.LatestRelease);
+                Assert.True(viewModel.Live);
+                Assert.False(viewModel.Amendment);
             }
-
         }
 
         [Fact]

@@ -200,18 +200,10 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Controllers.Api
         }
 
         [HttpGet("releases/{releaseId}")]
-        public async Task<ActionResult<ReleaseViewModel>> GetReleaseAsync(Guid releaseId)
+        public async Task<ActionResult<ReleaseViewModel>> GetRelease(Guid releaseId)
         {
             return await _releaseService
-                .GetReleaseForIdAsync(releaseId)
-                .HandleFailuresOrOk();
-        }
-
-        [HttpGet("releases/{releaseId}/summary")]
-        public async Task<ActionResult<ReleaseSummaryViewModel>> GetReleaseSummaryAsync(Guid releaseId)
-        {
-            return await _releaseService
-                .GetReleaseSummaryAsync(releaseId)
+                .GetRelease(releaseId)
                 .HandleFailuresOrOk();
         }
 

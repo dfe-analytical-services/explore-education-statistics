@@ -279,6 +279,19 @@ Add test text to second accordion section
     user adds text block to editable accordion section   Test text
     user adds content to accordion section text block  Test text   1    Some test text!
 
+Add public prerelease access list
+    [Tags]  HappyPath
+    user clicks link  Pre-release access
+    user waits until h2 is visible  Manage pre-release user access
+
+    user clicks link  Public access list
+    user waits until h2 is visible  Public pre-release access list
+    user clicks button   Create public pre-release access list
+    user presses keys  CTRL+a+BACKSPACE
+    user presses keys  Test public access list
+    user clicks button  Save access list
+    user waits until element contains  css:[data-testid="publicPreReleaseAccessListPreview"]  Test public access list
+
 Go to "Release status" tab again
     [Tags]  HappyPath
     user clicks link   Release status
@@ -328,12 +341,16 @@ Verify amendment is on Find Statistics page again
 Navigate to amendment release page
     [Tags]  HappyPath
     user clicks testid element  View stats link for ${PUBLICATION_NAME}
-    user waits until h1 is visible  ${PUBLICATION_NAME}  90
 
-Verify amendment URL and page caption
-    [Tags]  HappyPath
+    user waits until h1 is visible  ${PUBLICATION_NAME}  90
+    user waits until page contains title caption  Financial Year 3000-01
+
     user checks url contains  %{PUBLIC_URL}/find-statistics/ui-tests-publish-release-${RUN_IDENTIFIER}
-    user waits until element contains  css:[data-testid="page-title-caption"]  Financial Year 3000-01
+
+    user checks breadcrumb count should be   3
+    user checks nth breadcrumb contains   1    Home
+    user checks nth breadcrumb contains   2    Find statistics and data
+    user checks nth breadcrumb contains   3    ${PUBLICATION_NAME}
 
 Verify amendment is displayed as the latest release
     [Tags]  HappyPath   Failing
@@ -365,6 +382,34 @@ Verify amendment files
     user checks element should contain  ${downloads}  test ancillary file 2 (txt, 24 B)
     user waits until element contains link  ${downloads}  test ancillary file 2
     user checks link has url  test ancillary file 2  %{DATA_API_URL}/download/ui-tests-publish-release-${RUN_IDENTIFIER}/3000-01/ancillary/test-file-2.txt   ${downloads}
+
+Verify public pre-release access list
+    [Tags]  HappyPath
+    user clicks link  Pre-release access list
+
+    user checks breadcrumb count should be   4
+    user checks nth breadcrumb contains   1    Home
+    user checks nth breadcrumb contains   2    Find statistics and data
+    user checks nth breadcrumb contains   3    ${PUBLICATION_NAME}
+    user checks nth breadcrumb contains   4    Pre-release access list
+
+    user waits until page contains title caption  Financial Year 3000-01
+    user waits until h1 is visible  ${PUBLICATION_NAME}
+
+    user waits until h2 is visible  Pre-release access list
+    user waits until page contains  Published ${PUBLISH_DATE_DAY} ${PUBLISH_DATE_MONTH} ${PUBLISH_DATE_YEAR}
+    user waits until page contains  Test public access list
+
+Navigate back to amendment release page
+    user clicks link  ${PUBLICATION_NAME}
+
+    user checks breadcrumb count should be   3
+    user checks nth breadcrumb contains   1    Home
+    user checks nth breadcrumb contains   2    Find statistics and data
+    user checks nth breadcrumb contains   3    ${PUBLICATION_NAME}
+
+    user waits until h1 is visible  ${PUBLICATION_NAME}
+    user waits until page contains title caption  Financial Year 3000-01
 
 Verify amendment accordions are correct
     [Tags]  HappyPath

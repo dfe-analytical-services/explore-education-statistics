@@ -15,21 +15,21 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Controllers.Api
     [Authorize]
     public class PreReleaseController : ControllerBase
     {
-        private readonly IPreReleaseContactsService _preReleaseContactsService;
+        private readonly IPreReleaseUserService _preReleaseUserService;
         private readonly IPreReleaseSummaryService _preReleaseSummaryService;
 
-        public PreReleaseController(IPreReleaseContactsService preReleaseContactsService,
+        public PreReleaseController(IPreReleaseUserService preReleaseUserService,
             IPreReleaseSummaryService preReleaseSummaryService)
         {
-            _preReleaseContactsService = preReleaseContactsService;
+            _preReleaseUserService = preReleaseUserService;
             _preReleaseSummaryService = preReleaseSummaryService;
         }
 
-        [HttpGet("release/{releaseId}/prerelease-contacts")]
-        public async Task<ActionResult<List<PrereleaseCandidateViewModel>>> GetPreReleaseContactsForRelease(Guid releaseId)
+        [HttpGet("release/{releaseId}/prerelease-users")]
+        public async Task<ActionResult<List<PreReleaseUserViewModel>>> GetPreReleaseUsers(Guid releaseId)
         {
-            return await _preReleaseContactsService
-                .GetPreReleaseContactsForReleaseAsync(releaseId)
+            return await _preReleaseUserService
+                .GetPreReleaseUsers(releaseId)
                 .HandleFailuresOrOk();
         }
 
@@ -41,26 +41,26 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Controllers.Api
                 .HandleFailuresOrOk();
         }
 
-        [HttpPost("release/{releaseId}/prerelease-contact")]
-        public async Task<ActionResult<List<PrereleaseCandidateViewModel>>> AddPreReleaseContactToRelease(
-            Guid releaseId, [FromBody] PrereleaseAccessRequest request)
+        [HttpPost("release/{releaseId}/prerelease-users")]
+        public async Task<ActionResult<PreReleaseUserViewModel>> InvitePreReleaseUser(
+            Guid releaseId, [FromBody] PreReleaseAccessRequest request)
         {
-            return await _preReleaseContactsService
-                .AddPreReleaseContactToReleaseAsync(releaseId, request.Email)
+            return await _preReleaseUserService
+                .AddPreReleaseUser(releaseId, request.Email)
                 .HandleFailuresOrOk();
         }
 
-        [HttpDelete("release/{releaseId}/prerelease-contact")]
-        public async Task<ActionResult<List<PrereleaseCandidateViewModel>>> RemovePreReleaseContactFromRelease(
-            Guid releaseId, [FromBody] PrereleaseAccessRequest request)
+        [HttpDelete("release/{releaseId}/prerelease-users")]
+        public async Task<ActionResult> RemovePreReleaseUser(
+            Guid releaseId, [FromBody] PreReleaseAccessRequest request)
         {
-            return await _preReleaseContactsService
-                .RemovePreReleaseContactFromReleaseAsync(releaseId, request.Email)
-                .HandleFailuresOrOk();
+            return await _preReleaseUserService
+                .RemovePreReleaseUser(releaseId, request.Email)
+                .HandleFailuresOrNoContent();
         }
     }
 
-    public class PrereleaseAccessRequest
+    public class PreReleaseAccessRequest
     {
         public string Email { get; set; }
     }

@@ -17,9 +17,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Services.Interfaces
 
         Task<Either<ActionResult, ReleaseViewModel>> CreateReleaseAmendmentAsync(Guid releaseId);
 
-        Task<Either<ActionResult, ReleaseViewModel>> GetReleaseForIdAsync(Guid id);
-
-        Task<Either<ActionResult, ReleaseSummaryViewModel>> GetReleaseSummaryAsync(Guid releaseId);
+        Task<Either<ActionResult, ReleaseViewModel>> GetRelease(Guid id);
 
         Task<Either<ActionResult, ReleasePublicationStatusViewModel>> GetReleasePublicationStatusAsync(Guid releaseId);
 

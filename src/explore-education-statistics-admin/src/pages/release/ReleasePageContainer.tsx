@@ -9,6 +9,7 @@ import {
   releaseContentRoute,
   releaseDataBlocksRoute,
   releaseDataRoute,
+  releasePreReleaseAccessRoute,
   ReleaseRouteParams,
   releaseStatusRoute,
   releaseSummaryEditRoute,
@@ -23,7 +24,7 @@ import releaseService, {
 import LoadingSpinner from '@common/components/LoadingSpinner';
 import RelatedInformation from '@common/components/RelatedInformation';
 import Tag from '@common/components/Tag';
-import useAsyncRetry from '@common/hooks/useAsyncRetry';
+import useAsyncHandledRetry from '@common/hooks/useAsyncHandledRetry';
 import React from 'react';
 import { generatePath, Route, RouteComponentProps } from 'react-router';
 
@@ -33,6 +34,7 @@ const navRoutes = [
   releaseDataBlocksRoute,
   releaseContentRoute,
   releaseStatusRoute,
+  releasePreReleaseAccessRoute,
 ];
 
 const routes = [...navRoutes, releaseSummaryEditRoute];
@@ -52,7 +54,7 @@ const ReleasePageContainer = ({
     value = [],
     isLoading: loadingRelease,
     retry: reloadRelease,
-  } = useAsyncRetry(
+  } = useAsyncHandledRetry(
     () =>
       Promise.all([
         publicationService.getPublication(publicationId),
