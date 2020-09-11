@@ -128,17 +128,10 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Services
                 .ToList();
 
             var filters = filtersIncludingItems
-                .ToDictionary(filter => filter.Name, filter => filter.Id);
-
-            var filterGroups = filtersIncludingItems.SelectMany(filter => filter.FilterGroups)
-                .ToDictionary(filterGroup => filterGroup.Label, filterGroup => filterGroup.Id);
-
-            var filterItems = filtersIncludingItems.SelectMany(filter => filter.FilterGroups)
-                .SelectMany(group => group.FilterItems)
-                .ToDictionary(filterItem => filterItem.Label, filterItem => filterItem.Id);
+                .ToDictionary(filter => filter.Name, filter => filter);
 
             var indicators = _indicatorService.GetIndicators(subjectId)
-                .ToDictionary(filterItem => filterItem.Name, filterItem => filterItem.Id);
+                .ToDictionary(filterItem => filterItem.Name, filterItem => filterItem);
 
             var observationalUnits = _locationService.GetObservationalUnits(subjectId);
 
@@ -147,8 +140,6 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Services
             return new ReplacementSubjectMeta
             {
                 Filters = filters,
-                FilterGroups = filterGroups,
-                FilterItems = filterItems,
                 Indicators = indicators,
                 ObservationalUnits = observationalUnits,
                 TimePeriods = timePeriods
@@ -251,6 +242,8 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Services
         {
             return _statisticsDbContext.FilterItem
                 .Where(filterItem => dataBlock.Query.Filters.Contains(filterItem.Id))
+                .Include(filterItem => filterItem.FilterGroup)
+                .ThenInclude(filterGroup => filterGroup.Filter)
                 .Select(filterItem => ValidateFilterItemForReplacement(filterItem, replacementSubjectMeta))
                 .ToList();
         }
@@ -292,55 +285,54 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Services
         private static FilterReplacementViewModel ValidateFilterForReplacement(Filter filter,
             ReplacementSubjectMeta replacementSubjectMeta)
         {
-            Guid? target = replacementSubjectMeta.Filters.GetValueOrDefault(filter.Name);
-            target = target == Guid.Empty ? null : target;
             return new FilterReplacementViewModel
             {
                 Id = filter.Id,
                 Name = filter.Name,
                 Label = filter.Label,
-                Target = target
+                Target = FindReplacementFilter(replacementSubjectMeta,
+                    filter.Name)?.Id
             };
         }
 
         private static FilterGroupReplacementViewModel ValidateFilterGroupForReplacement(FilterGroup filterGroup,
             ReplacementSubjectMeta replacementSubjectMeta)
         {
-            Guid? target = replacementSubjectMeta.FilterGroups.GetValueOrDefault(filterGroup.Label);
-            target = target == Guid.Empty ? null : target;
             return new FilterGroupReplacementViewModel
             {
                 Id = filterGroup.Id,
                 Label = filterGroup.Label,
                 FilterLabel = filterGroup.Filter.Label,
-                Target = target
+                Target = FindReplacementFilterGroup(replacementSubjectMeta,
+                    filterGroup.Filter.Name,
+                    filterGroup.Label)?.Id
             };
         }
 
         private static FilterItemReplacementViewModel ValidateFilterItemForReplacement(FilterItem filterItem,
             ReplacementSubjectMeta replacementSubjectMeta)
         {
-            Guid? target = replacementSubjectMeta.FilterItems.GetValueOrDefault(filterItem.Label);
-            target = target == Guid.Empty ? null : target;
             return new FilterItemReplacementViewModel
             {
                 Id = filterItem.Id,
                 Label = filterItem.Label,
-                Target = target
+                Target = FindReplacementFilterItem(replacementSubjectMeta,
+                        filterItem.FilterGroup.Filter.Name,
+                        filterItem.FilterGroup.Label,
+                        filterItem.Label)?.Id
             };
         }
 
         private static IndicatorReplacementViewModel ValidateIndicatorForReplacement(Indicator indicator,
             ReplacementSubjectMeta replacementSubjectMeta)
         {
-            Guid? target = replacementSubjectMeta.Indicators.GetValueOrDefault(indicator.Name);
-            target = target == Guid.Empty ? null : target;
             return new IndicatorReplacementViewModel
             {
                 Id = indicator.Id,
                 Name = indicator.Name,
                 Label = indicator.Label,
-                Target = target
+                Target = FindReplacementIndicator(replacementSubjectMeta,
+                    indicator.Name)
             };
         }
 
@@ -369,6 +361,37 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Services
                 Matched = originalCodes.Intersect(replacementCodes),
                 Unmatched = originalCodes.Except(replacementCodes),
             };
+        }
+
+        private static Filter FindReplacementFilter(ReplacementSubjectMeta replacementSubjectMeta,
+            string filterName)
+        {
+            return replacementSubjectMeta.Filters.GetValueOrDefault(filterName);
+        }
+
+        private static FilterGroup FindReplacementFilterGroup(ReplacementSubjectMeta replacementSubjectMeta,
+            string filterName,
+            string filterGroupLabel)
+        {
+            var replacementFilter = FindReplacementFilter(replacementSubjectMeta, filterName);
+            return replacementFilter?.FilterGroups.SingleOrDefault(filterGroup =>
+                filterGroup.Label == filterGroupLabel);
+        }
+
+        private static FilterItem FindReplacementFilterItem(ReplacementSubjectMeta replacementSubjectMeta,
+            string filterName,
+            string filterGroupLabel,
+            string filterItemLabel)
+        {
+            var replacementFilterGroup = FindReplacementFilterGroup(replacementSubjectMeta, filterName, filterGroupLabel);
+            return replacementFilterGroup?.FilterItems.SingleOrDefault(filterItem =>
+                filterItem.Label == filterItemLabel);
+        }
+
+        private static Guid? FindReplacementIndicator(ReplacementSubjectMeta replacementSubjectMeta,
+            string indicatorName)
+        {
+            return replacementSubjectMeta.Indicators.GetValueOrDefault(indicatorName)?.Id;
         }
 
         private async Task ReplaceLinksForDataBlock(DataBlockReplacementPlanViewModel replacementPlan,
@@ -567,10 +590,8 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Services
 
         private class ReplacementSubjectMeta
         {
-            public Dictionary<string, Guid> Filters { get; set; }
-            public Dictionary<string, Guid> FilterGroups { get; set; }
-            public Dictionary<string, Guid> FilterItems { get; set; }
-            public Dictionary<string, Guid> Indicators { get; set; }
+            public Dictionary<string, Filter> Filters { get; set; }
+            public Dictionary<string, Indicator> Indicators { get; set; }
             public Dictionary<GeographicLevel, IEnumerable<IObservationalUnit>> ObservationalUnits { get; set; }
             public IEnumerable<(int Year, TimeIdentifier TimeIdentifier)> TimePeriods { get; set; }
         }

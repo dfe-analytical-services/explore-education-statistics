@@ -31,6 +31,8 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
 {
     public class ReplacementServiceTests
     {
+        private const string CountryCodeEngland = "E92000001";
+
         [Fact]
         public async Task GetReplacementPlan_OriginalSubjectBelongsToDifferentRelease()
         {
@@ -379,7 +381,13 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
             {
                 TableHeaders = new TableHeaders
                 {
-                    ColumnGroups = new List<List<TableHeader>>(),
+                    ColumnGroups = new List<List<TableHeader>>
+                    {
+                        new List<TableHeader>
+                        {
+                            TableHeader.NewLocationHeader(GeographicLevel.Country, CountryCodeEngland)
+                        }
+                    },
                     Columns = new List<TableHeader>
                     {
                         new TableHeader("2019_CY", TableHeaderType.TimePeriod),
@@ -390,8 +398,6 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
                         new List<TableHeader>
                         {
                             new TableHeader(originalFilterItem.Id.ToString(), TableHeaderType.Filter)
-                            // TODO can this be a col group?
-                            //TableHeader.NewLocationHeader(GeographicLevel.Country, "E92000001")
                         }
                     },
                     Rows = new List<TableHeader>
@@ -412,7 +418,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
                     Indicators = new[] {originalIndicator.Id},
                     Locations = new LocationQuery
                     {
-                        Country = new[] {"E92000001"}
+                        Country = new[] {CountryCodeEngland}
                     },
                     TimePeriod = timePeriod
                 },
@@ -759,31 +765,51 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
                 }
             };
 
-            var originalFilter = new Filter
+            var originalFilter1 = new Filter
             {
                 Id = Guid.NewGuid(),
-                Label = "Test filter - not changing",
-                Name = "test_filter_not_changing",
+                Label = "Test filter 1 - not changing",
+                Name = "test_filter_1_not_changing",
                 Subject = originalSubject,
                 FilterGroups = new List<FilterGroup>
                 {
-                    originalFilterGroup1,
-                    // TODO
-                    //originalFilterGroup2
+                    originalFilterGroup1
                 }
             };
 
-            var replacementFilter = new Filter
+            var originalFilter2 = new Filter
             {
                 Id = Guid.NewGuid(),
-                Label = "Test filter - not changing",
-                Name = "test_filter_not_changing",
+                Label = "Test filter 2 - not changing",
+                Name = "test_filter_2_not_changing",
+                Subject = originalSubject,
+                FilterGroups = new List<FilterGroup>
+                {
+                    originalFilterGroup2
+                }
+            };
+
+            var replacementFilter1 = new Filter
+            {
+                Id = Guid.NewGuid(),
+                Label = "Test filter 1 - not changing",
+                Name = "test_filter_1_not_changing",
                 Subject = replacementSubject,
                 FilterGroups = new List<FilterGroup>
                 {
-                    replacementFilterGroup1,
-                    // TODO
-                    //replacementFilterGroup2
+                    replacementFilterGroup1
+                }
+            };
+
+            var replacementFilter2 = new Filter
+            {
+                Id = Guid.NewGuid(),
+                Label = "Test filter 2 - not changing",
+                Name = "test_filter_2_not_changing",
+                Subject = replacementSubject,
+                FilterGroups = new List<FilterGroup>
+                {
+                    replacementFilterGroup2
                 }
             };
 
@@ -835,7 +861,13 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
             {
                 TableHeaders = new TableHeaders
                 {
-                    ColumnGroups = new List<List<TableHeader>>(),
+                    ColumnGroups = new List<List<TableHeader>>
+                    {
+                        new List<TableHeader>
+                        {
+                            TableHeader.NewLocationHeader(GeographicLevel.Country, CountryCodeEngland)
+                        }
+                    },
                     Columns = new List<TableHeader>
                     {
                         new TableHeader("2019_CY", TableHeaderType.TimePeriod),
@@ -847,8 +879,6 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
                         {
                             new TableHeader(originalFilterItem1.Id.ToString(), TableHeaderType.Filter)
                             // TODO include more than 1 filter here?
-                            // TODO can this be a col group?
-                            //TableHeader.NewLocationHeader(GeographicLevel.Country, "E92000001")
                         }
                     },
                     Rows = new List<TableHeader>
@@ -869,7 +899,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
                     Indicators = new[] {originalIndicator.Id},
                     Locations = new LocationQuery
                     {
-                        Country = new[] {"E92000001"}
+                        Country = new[] {CountryCodeEngland}
                     },
                     TimePeriod = timePeriod
                 },
@@ -888,7 +918,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
                 {
                     new FilterFootnote
                     {
-                        Filter = originalFilter
+                        Filter = originalFilter1
                     }
                 });
 
@@ -935,7 +965,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
                         GeographicLevel.Country,
                         new List<Country>
                         {
-                            new Country("E92000001", "England")
+                            new Country(CountryCodeEngland, "England")
                         }
                     }
                 });
@@ -964,7 +994,8 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
                 await statisticsDbContext.AddRangeAsync(originalSubject, replacementSubject);
                 await statisticsDbContext.AddRangeAsync(originalReleaseSubject1, originalReleaseSubject2,
                     replacementReleaseSubject);
-                await statisticsDbContext.AddRangeAsync(originalFilter, replacementFilter);
+                await statisticsDbContext.AddRangeAsync(originalFilter1, originalFilter2,
+                    replacementFilter1, replacementFilter2);
                 await statisticsDbContext.AddRangeAsync(originalIndicatorGroup, replacementIndicatorGroup);
                 await statisticsDbContext.AddRangeAsync(footnoteForFilter, footnoteForFilterGroup,
                     footnoteForFilterItem, footnoteForIndicator, footnoteForSubject);
@@ -1039,10 +1070,10 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
                 Assert.Empty(footnoteForFilterPlan.Indicators);
 
                 var footnoteForFilterFilterPlan = footnoteForFilterPlan.Filters.First();
-                Assert.Equal(originalFilter.Id, footnoteForFilterFilterPlan.Id);
-                Assert.Equal(originalFilter.Label, footnoteForFilterFilterPlan.Label);
-                Assert.Equal(originalFilter.Name, footnoteForFilterFilterPlan.Name);
-                Assert.Equal(replacementFilter.Id, footnoteForFilterFilterPlan.Target);
+                Assert.Equal(originalFilter1.Id, footnoteForFilterFilterPlan.Id);
+                Assert.Equal(originalFilter1.Label, footnoteForFilterFilterPlan.Label);
+                Assert.Equal(originalFilter1.Name, footnoteForFilterFilterPlan.Name);
+                Assert.Equal(replacementFilter1.Id, footnoteForFilterFilterPlan.Target);
                 Assert.True(footnoteForFilterFilterPlan.Valid);
 
                 Assert.True(footnoteForFilterPlan.Valid);
@@ -1215,7 +1246,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
                     {
                         new List<TableHeader>
                         {
-                            TableHeader.NewLocationHeader(GeographicLevel.Country, "E92000001")
+                            TableHeader.NewLocationHeader(GeographicLevel.Country, CountryCodeEngland)
                         }
                     },
                     Rows = new List<TableHeader>()
@@ -1233,7 +1264,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
                     Indicators = new Guid[] { },
                     Locations = new LocationQuery
                     {
-                        Country = new[] {"E92000001"}
+                        Country = new[] {CountryCodeEngland}
                     },
                     TimePeriod = timePeriod
                 },
@@ -1406,31 +1437,51 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
                 }
             };
 
-            var originalFilter = new Filter
+            var originalFilter1 = new Filter
             {
                 Id = Guid.NewGuid(),
-                Label = "Test filter - not changing",
-                Name = "test_filter_not_changing",
+                Label = "Test filter 1 - not changing",
+                Name = "test_filter_1_not_changing",
                 Subject = originalSubject,
                 FilterGroups = new List<FilterGroup>
                 {
-                    originalFilterGroup1,
-                    // TODO
-                    //originalFilterGroup2
+                    originalFilterGroup1
                 }
             };
 
-            var replacementFilter = new Filter
+            var originalFilter2 = new Filter
             {
                 Id = Guid.NewGuid(),
-                Label = "Test filter - not changing",
-                Name = "test_filter_not_changing",
+                Label = "Test filter 2 - not changing",
+                Name = "test_filter_2_not_changing",
+                Subject = originalSubject,
+                FilterGroups = new List<FilterGroup>
+                {
+                    originalFilterGroup2
+                }
+            };
+
+            var replacementFilter1 = new Filter
+            {
+                Id = Guid.NewGuid(),
+                Label = "Test filter 1 - not changing",
+                Name = "test_filter_1_not_changing",
                 Subject = replacementSubject,
                 FilterGroups = new List<FilterGroup>
                 {
-                    replacementFilterGroup1,
-                    // TODO
-                    //replacementFilterGroup2
+                    replacementFilterGroup1
+                }
+            };
+
+            var replacementFilter2 = new Filter
+            {
+                Id = Guid.NewGuid(),
+                Label = "Test filter 2 - not changing",
+                Name = "test_filter_2_not_changing",
+                Subject = replacementSubject,
+                FilterGroups = new List<FilterGroup>
+                {
+                    replacementFilterGroup2
                 }
             };
 
@@ -1482,7 +1533,13 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
             {
                 TableHeaders = new TableHeaders
                 {
-                    ColumnGroups = new List<List<TableHeader>>(),
+                    ColumnGroups = new List<List<TableHeader>>
+                    {
+                        new List<TableHeader>
+                        {
+                            TableHeader.NewLocationHeader(GeographicLevel.Country, CountryCodeEngland)
+                        }
+                    },
                     Columns = new List<TableHeader>
                     {
                         new TableHeader("2019_CY", TableHeaderType.TimePeriod),
@@ -1494,8 +1551,6 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
                         {
                             new TableHeader(originalFilterItem1.Id.ToString(), TableHeaderType.Filter)
                             // TODO include more than 1 filter here?
-                            // TODO can this be a col group?
-                            //TableHeader.NewLocationHeader(GeographicLevel.Country, "E92000001")
                         }
                     },
                     Rows = new List<TableHeader>
@@ -1516,7 +1571,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
                     Indicators = new[] {originalIndicator.Id},
                     Locations = new LocationQuery
                     {
-                        Country = new[] {"E92000001"}
+                        Country = new[] {CountryCodeEngland}
                     },
                     TimePeriod = timePeriod
                 },
@@ -1535,7 +1590,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
                 {
                     new FilterFootnote
                     {
-                        Filter = originalFilter
+                        Filter = originalFilter1
                     }
                 });
 
@@ -1582,7 +1637,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
                         GeographicLevel.Country,
                         new List<Country>
                         {
-                            new Country("E92000001", "England")
+                            new Country(CountryCodeEngland, "England")
                         }
                     }
                 });
@@ -1611,7 +1666,8 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
                 await statisticsDbContext.AddRangeAsync(originalSubject, replacementSubject);
                 await statisticsDbContext.AddRangeAsync(originalReleaseSubject1, originalReleaseSubject2,
                     replacementReleaseSubject);
-                await statisticsDbContext.AddRangeAsync(originalFilter, replacementFilter);
+                await statisticsDbContext.AddRangeAsync(originalFilter1, originalFilter2,
+                    replacementFilter1, replacementFilter2);
                 await statisticsDbContext.AddRangeAsync(originalIndicatorGroup, replacementIndicatorGroup);
                 await statisticsDbContext.AddRangeAsync(footnoteForFilter, footnoteForFilterGroup,
                     footnoteForFilterItem, footnoteForIndicator, footnoteForSubject);
@@ -1647,16 +1703,25 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
                 Assert.Equal(2, replacedDataBlock.Table.TableHeaders.Columns.Count());
                 Assert.Equal(TableHeaderType.TimePeriod, replacedDataBlock.Table.TableHeaders.Columns.First().Type);
                 Assert.Equal("2019_CY", replacedDataBlock.Table.TableHeaders.Columns.First().Value);
-                Assert.Equal(TableHeaderType.TimePeriod, replacedDataBlock.Table.TableHeaders.Columns.ElementAt(1).Type);
+                Assert.Equal(TableHeaderType.TimePeriod,
+                    replacedDataBlock.Table.TableHeaders.Columns.ElementAt(1).Type);
                 Assert.Equal("2020_CY", replacedDataBlock.Table.TableHeaders.Columns.ElementAt(1).Value);
-                Assert.Empty(replacedDataBlock.Table.TableHeaders.ColumnGroups);
+                Assert.Single(replacedDataBlock.Table.TableHeaders.ColumnGroups);
+                Assert.Single(replacedDataBlock.Table.TableHeaders.ColumnGroups.First());
+                Assert.Equal(TableHeaderType.Location,
+                    replacedDataBlock.Table.TableHeaders.ColumnGroups.First().First().Type);
+                Assert.Equal(CountryCodeEngland,
+                    replacedDataBlock.Table.TableHeaders.ColumnGroups.First().First().Value);
                 Assert.Single(replacedDataBlock.Table.TableHeaders.Rows);
                 Assert.Equal(TableHeaderType.Indicator, replacedDataBlock.Table.TableHeaders.Rows.First().Type);
-                Assert.Equal(replacementIndicator.Id.ToString(), replacedDataBlock.Table.TableHeaders.Rows.First().Value);
+                Assert.Equal(replacementIndicator.Id.ToString(),
+                    replacedDataBlock.Table.TableHeaders.Rows.First().Value);
                 Assert.Single(replacedDataBlock.Table.TableHeaders.RowGroups);
                 Assert.Single(replacedDataBlock.Table.TableHeaders.RowGroups.First());
-                Assert.Equal(TableHeaderType.Filter, replacedDataBlock.Table.TableHeaders.RowGroups.First().First().Type);
-                Assert.Equal(replacementFilterItem1.Id.ToString(), replacedDataBlock.Table.TableHeaders.RowGroups.First().First().Value);
+                Assert.Equal(TableHeaderType.Filter,
+                    replacedDataBlock.Table.TableHeaders.RowGroups.First().First().Type);
+                Assert.Equal(replacementFilterItem1.Id.ToString(),
+                    replacedDataBlock.Table.TableHeaders.RowGroups.First().First().Value);
 
                 var replacedFootnoteForFilter = await GetFootnoteById(statisticsDbContext, footnoteForFilter.Id);
                 Assert.NotNull(replacedFootnoteForFilter);
@@ -1667,9 +1732,9 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
                 Assert.Empty(replacedFootnoteForFilter.Indicators);
                 Assert.Empty(replacedFootnoteForFilter.Subjects);
 
-                Assert.Equal(replacementFilter.Id, replacedFootnoteForFilter.Filters.First().Filter.Id);
-                Assert.Equal(replacementFilter.Label, replacedFootnoteForFilter.Filters.First().Filter.Label);
-                Assert.Equal(replacementFilter.Name, replacedFootnoteForFilter.Filters.First().Filter.Name);
+                Assert.Equal(replacementFilter1.Id, replacedFootnoteForFilter.Filters.First().Filter.Id);
+                Assert.Equal(replacementFilter1.Label, replacedFootnoteForFilter.Filters.First().Filter.Label);
+                Assert.Equal(replacementFilter1.Name, replacedFootnoteForFilter.Filters.First().Filter.Name);
 
                 var replacedFootnoteForFilterGroup =
                     await GetFootnoteById(statisticsDbContext, footnoteForFilterGroup.Id);
@@ -1724,7 +1789,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
                 Assert.Empty(replacedFootnoteForSubject.FilterItems);
                 Assert.Empty(replacedFootnoteForSubject.Indicators);
                 Assert.Single(replacedFootnoteForSubject.Subjects);
-                
+
                 Assert.Equal(replacementSubject.Id, replacedFootnoteForSubject.Subjects.First().Subject.Id);
             }
         }
@@ -1745,13 +1810,15 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
                 FilterGroups = filterGroupFootnotes,
                 FilterItems = filterItemFootnotes,
                 Indicators = indicatorFootnotes,
-                Subjects = subject != null ? new List<SubjectFootnote>
-                {
-                   new SubjectFootnote
-                   {
-                       Subject = subject
-                   }
-                } : new List<SubjectFootnote>(),
+                Subjects = subject != null
+                    ? new List<SubjectFootnote>
+                    {
+                        new SubjectFootnote
+                        {
+                            Subject = subject
+                        }
+                    }
+                    : new List<SubjectFootnote>(),
                 Releases = new List<ReleaseFootnote>
                 {
                     new ReleaseFootnote
