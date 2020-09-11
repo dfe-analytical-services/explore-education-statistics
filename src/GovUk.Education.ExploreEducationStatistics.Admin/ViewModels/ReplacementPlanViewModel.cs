@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Linq;
+using GovUk.Education.ExploreEducationStatistics.Common.Model.Data;
 using GovUk.Education.ExploreEducationStatistics.Common.Model.Data.Query;
 using Newtonsoft.Json;
 
@@ -28,27 +29,27 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.ViewModels
         public string Name { get; }
         public IEnumerable<FilterItemReplacementViewModel> FilterItems { get; }
         public IEnumerable<IndicatorReplacementViewModel> Indicators { get; }
-        public Dictionary<string, ObservationalUnitReplacementViewModel> ObservationalUnits { get; }
+        public Dictionary<string, LocationReplacementViewModel> Locations { get; }
         public TimePeriodReplacementViewModel TimePeriods { get; }
 
         public DataBlockReplacementPlanViewModel(Guid id,
             string name,
             IEnumerable<FilterItemReplacementViewModel> filterItems,
             IEnumerable<IndicatorReplacementViewModel> indicators,
-            Dictionary<string, ObservationalUnitReplacementViewModel> observationalUnits,
+            Dictionary<string, LocationReplacementViewModel> locations,
             TimePeriodReplacementViewModel timePeriods)
         {
             Id = id;
             Name = name;
             FilterItems = filterItems;
             Indicators = indicators;
-            ObservationalUnits = observationalUnits;
+            Locations = locations;
             TimePeriods = timePeriods;
         }
 
         public bool Valid => FilterItems.All(model => model.Valid)
                              && Indicators.All(model => model.Valid)
-                             && ObservationalUnits.Values.All((model => model.Valid))
+                             && Locations.Values.All((model => model.Valid))
                              && TimePeriods.Valid;
     }
 
@@ -101,8 +102,10 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.ViewModels
         public string Name { get; set; }
     }
 
-    public class ObservationalUnitReplacementViewModel : ReplacementViewModel
+    public class LocationReplacementViewModel : ReplacementViewModel
     {
+        [JsonIgnore]
+        public GeographicLevel GeographicLevel { get; set; }
         public IEnumerable<string> Matched { get; set; }
         public IEnumerable<string> Unmatched { get; set; }
         public new bool Valid => !Unmatched.Any();

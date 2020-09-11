@@ -175,14 +175,14 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Services
         {
             var filterItems = ValidateFilterItemsForDataBlock(dataBlock, replacementSubjectMeta);
             var indicators = ValidateIndicatorsForDataBlock(dataBlock, replacementSubjectMeta);
-            var observationalUnits = ValidateObservationalUnitsForDataBlock(dataBlock, replacementSubjectMeta);
+            var locations = ValidateLocationsForDataBlock(dataBlock, replacementSubjectMeta);
             var timePeriods = ValidateTimePeriodsForDataBlock(dataBlock, replacementSubjectMeta);
 
             return new DataBlockReplacementPlanViewModel(dataBlock.Id,
                 dataBlock.Name,
                 filterItems,
                 indicators,
-                observationalUnits,
+                locations,
                 timePeriods);
         }
 
@@ -264,7 +264,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Services
                 .ToList();
         }
 
-        private static Dictionary<string, ObservationalUnitReplacementViewModel> ValidateObservationalUnitsForDataBlock(
+        private static Dictionary<string, LocationReplacementViewModel> ValidateLocationsForDataBlock(
             DataBlock dataBlock,
             ReplacementSubjectMeta replacementSubjectMeta)
         {
@@ -272,7 +272,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Services
                 .Where(geographicLevel => !IgnoredLevels.Contains(geographicLevel))
                 .ToDictionary(geographicLevel => geographicLevel.ToString(),
                     geographicLevel =>
-                        ValidateObservationalUnitsForReplacement(dataBlock.Query.Locations,
+                        ValidateLocationsForReplacement(dataBlock.Query.Locations,
                             geographicLevel,
                             replacementSubjectMeta)
                 );
@@ -344,7 +344,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Services
             };
         }
 
-        private static ObservationalUnitReplacementViewModel ValidateObservationalUnitsForReplacement(
+        private static LocationReplacementViewModel ValidateLocationsForReplacement(
             LocationQuery locationQuery,
             GeographicLevel geographicLevel,
             ReplacementSubjectMeta replacementSubjectMeta)
@@ -364,7 +364,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Services
                 ?.Select(unit => unit.Code)
                 .ToList() ?? new List<string>();
 
-            return new ObservationalUnitReplacementViewModel
+            return new LocationReplacementViewModel
             {
                 Matched = originalCodes.Intersect(replacementCodes),
                 Unmatched = originalCodes.Except(replacementCodes),

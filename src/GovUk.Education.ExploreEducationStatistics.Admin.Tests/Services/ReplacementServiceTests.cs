@@ -531,24 +531,24 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
                 Assert.Null(dataBlockFilterItemPlan.Target);
                 Assert.False(dataBlockFilterItemPlan.Valid);
 
-                Assert.NotNull(dataBlockPlan.ObservationalUnits);
+                Assert.NotNull(dataBlockPlan.Locations);
                 var allGeographicLevels = GetGeographicLevelsAsStrings();
-                Assert.Equal(allGeographicLevels.Count, dataBlockPlan.ObservationalUnits.Count);
-                Assert.False(allGeographicLevels.Except(dataBlockPlan.ObservationalUnits.Keys).Any());
+                Assert.Equal(allGeographicLevels.Count, dataBlockPlan.Locations.Count);
+                Assert.False(allGeographicLevels.Except(dataBlockPlan.Locations.Keys).Any());
 
-                Assert.Empty(dataBlockPlan.ObservationalUnits[GeographicLevel.Country.ToString()].Matched);
-                Assert.Single(dataBlockPlan.ObservationalUnits[GeographicLevel.Country.ToString()].Unmatched);
+                Assert.Empty(dataBlockPlan.Locations[GeographicLevel.Country.ToString()].Matched);
+                Assert.Single(dataBlockPlan.Locations[GeographicLevel.Country.ToString()].Unmatched);
                 Assert.Equal(dataBlock.Query.Locations.Country,
-                    dataBlockPlan.ObservationalUnits[GeographicLevel.Country.ToString()].Unmatched);
-                Assert.False(dataBlockPlan.ObservationalUnits[GeographicLevel.Country.ToString()].Valid);
+                    dataBlockPlan.Locations[GeographicLevel.Country.ToString()].Unmatched);
+                Assert.False(dataBlockPlan.Locations[GeographicLevel.Country.ToString()].Valid);
 
                 allGeographicLevels.ForEach(level =>
                 {
                     if (level != GeographicLevel.Country.ToString())
                     {
-                        Assert.Empty(dataBlockPlan.ObservationalUnits[level].Matched);
-                        Assert.Empty(dataBlockPlan.ObservationalUnits[level].Unmatched);
-                        Assert.True(dataBlockPlan.ObservationalUnits[level].Valid);
+                        Assert.Empty(dataBlockPlan.Locations[level].Matched);
+                        Assert.Empty(dataBlockPlan.Locations[level].Unmatched);
+                        Assert.True(dataBlockPlan.Locations[level].Valid);
                     }
                 });
 
@@ -1001,24 +1001,24 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
                 Assert.Equal(replacementFilterItem1.Id, dataBlockFilterItemPlan.Target);
                 Assert.True(dataBlockFilterItemPlan.Valid);
 
-                Assert.NotNull(dataBlockPlan.ObservationalUnits);
+                Assert.NotNull(dataBlockPlan.Locations);
                 var allGeographicLevels = GetGeographicLevelsAsStrings();
-                Assert.Equal(allGeographicLevels.Count, dataBlockPlan.ObservationalUnits.Count);
-                Assert.False(allGeographicLevels.Except(dataBlockPlan.ObservationalUnits.Keys).Any());
+                Assert.Equal(allGeographicLevels.Count, dataBlockPlan.Locations.Count);
+                Assert.False(allGeographicLevels.Except(dataBlockPlan.Locations.Keys).Any());
 
-                Assert.Single(dataBlockPlan.ObservationalUnits[GeographicLevel.Country.ToString()].Matched);
+                Assert.Single(dataBlockPlan.Locations[GeographicLevel.Country.ToString()].Matched);
                 Assert.Equal(dataBlock.Query.Locations.Country,
-                    dataBlockPlan.ObservationalUnits[GeographicLevel.Country.ToString()].Matched);
-                Assert.Empty(dataBlockPlan.ObservationalUnits[GeographicLevel.Country.ToString()].Unmatched);
-                Assert.True(dataBlockPlan.ObservationalUnits[GeographicLevel.Country.ToString()].Valid);
+                    dataBlockPlan.Locations[GeographicLevel.Country.ToString()].Matched);
+                Assert.Empty(dataBlockPlan.Locations[GeographicLevel.Country.ToString()].Unmatched);
+                Assert.True(dataBlockPlan.Locations[GeographicLevel.Country.ToString()].Valid);
 
                 allGeographicLevels.ForEach(level =>
                 {
                     if (level != GeographicLevel.Country.ToString())
                     {
-                        Assert.Empty(dataBlockPlan.ObservationalUnits[level].Matched);
-                        Assert.Empty(dataBlockPlan.ObservationalUnits[level].Unmatched);
-                        Assert.True(dataBlockPlan.ObservationalUnits[level].Valid);
+                        Assert.Empty(dataBlockPlan.Locations[level].Matched);
+                        Assert.Empty(dataBlockPlan.Locations[level].Unmatched);
+                        Assert.True(dataBlockPlan.Locations[level].Valid);
                     }
                 });
 
