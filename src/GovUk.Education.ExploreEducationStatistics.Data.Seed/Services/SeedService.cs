@@ -22,7 +22,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Seed.Services
         private readonly IMapper _mapper;
         private readonly string _storageConnectionString;
         private readonly IFileStorageService _fileStorageService;
-        
+
         public SeedService(
             ILogger<SeedService> logger,
             IMapper mapper,
@@ -42,20 +42,20 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Seed.Services
             {
                 var subject = subjectAndRelease.Key;
                 var release = subjectAndRelease.Value;
-                
+
                 _logger.LogInformation($"Processing subject {subject.Id}");
                 var file = SamplePublications.SubjectFiles[subject.Id];
                 StoreFilesAndSeed(release, file, subject);
             }
         }
-        
+
         private void StoreFilesAndSeed(Release release, DataCsvFile file, Subject subject)
         {
             var dataFile = CreateFormFile(file.GetCsvLines(), file + ".csv", "file");
             var metaFile = CreateFormFile(file.GetMetaCsvLines(), file + ".meta.csv", "metaFile");
 
             _logger.LogInformation("Uploading files for \"{subjectName}\"", subject.Name);
-            var result = _fileStorageService.UploadDataFilesAsync(release.Id, dataFile, metaFile, subject.Name, true).Result;
+            _fileStorageService.UploadDataFilesAsync(release.Id, dataFile, metaFile, subject.Name, true).Wait();
             Seed(subject.Id,file + ".csv", release);
         }
 

@@ -1,16 +1,17 @@
 ﻿using System;
+using System.Collections;
 using System.Collections.Generic;
 using System.Diagnostics.CodeAnalysis;
 using System.Globalization;
 using System.IO;
-using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
+using GovUk.Education.ExploreEducationStatistics.Common.Extensions;
 using GovUk.Education.ExploreEducationStatistics.Common.Model;
+using GovUk.Education.ExploreEducationStatistics.Common.Utils;
 using Microsoft.Azure.Storage;
 using Microsoft.Azure.Storage.Blob;
 using static GovUk.Education.ExploreEducationStatistics.Common.Services.FileStoragePathUtils;
-using FileInfo = GovUk.Education.ExploreEducationStatistics.Common.Model.FileInfo;
 
 namespace GovUk.Education.ExploreEducationStatistics.Common.Services
 {
@@ -26,39 +27,34 @@ namespace GovUk.Education.ExploreEducationStatistics.Common.Services
             Tb
         }
 
-        private const string NameKey = "name";
-        
-        public const string NumberOfRows = "NumberOfRows";
-
-        public const string UserName = "userName";
-        
-        /**
-         * Property key on a metadata file to point at the data file
-         */
-        public const string DataFileKey = "datafile";
-        
-        /**
-         * Property key on a data file to point at the metadata file
-         */
-        public const string MetaFileKey = "metafile";
-        
-        public static Task<string> DownloadTextAsync(string storageConnectionString, string containerName, string blobName)
+        public static IDictionary<string, string> GetDataFileMetaValues(
+            string name,
+            string metaFileName,
+            string userName,
+            int numberOfRows)
         {
-            return GetBlockBlob(storageConnectionString, containerName, blobName).DownloadTextAsync();
+            return new Dictionary<string, string>
+            {
+                {BlobInfoExtensions.NameKey, name},
+                {BlobInfoExtensions.MetaFileKey, metaFileName.ToLower()},
+                {BlobInfoExtensions.UserNameKey, userName},
+                {BlobInfoExtensions.NumberOfRowsKey, numberOfRows.ToString()}
+            };
         }
 
-        public static CloudBlob GetBlob(string storageConnectionString, string containerName, string blobName)
+        public static IDictionary<string, string> GetMetaDataFileMetaValues(
+            string dataFileName,
+            string userName,
+            int numberOfRows)
         {
-            var blobContainer = GetCloudBlobContainer(storageConnectionString, containerName);
-            return blobContainer.GetBlobReference(blobName);
+            return new Dictionary<string, string>
+            {
+                {BlobInfoExtensions.DataFileKey, dataFileName.ToLower()},
+                {BlobInfoExtensions.UserNameKey, userName},
+                {BlobInfoExtensions.NumberOfRowsKey, numberOfRows.ToString()}
+            };
         }
-        
-        public static CloudBlockBlob GetBlockBlob(string storageConnectionString, string containerName, string blobName)
-        {
-            var blobContainer = GetCloudBlobContainer(storageConnectionString, containerName);
-            return blobContainer.GetBlockBlobReference(blobName);
-        }
-        
+
         public static async Task<CloudBlobContainer> GetCloudBlobContainerAsync(string storageConnectionString,
             string containerName, BlobContainerPermissions permissions = null, BlobRequestOptions requestOptions = null)
         {
@@ -81,101 +77,6 @@ namespace GovUk.Education.ExploreEducationStatistics.Common.Services
             return blobContainer;
         }
 
-        public static FileInfo GetFileInfo(Guid id, CloudBlob blob)
-        {
-            blob.FetchAttributes();
-            return new FileInfo
-            {
-                Id = id,
-                Extension = GetExtension(blob),
-                Name = GetName(blob),
-                Path = blob.Name,
-                Size = GetSize(blob)
-            };
-        }
-
-        public static IEnumerable<FileInfo> ListPublicFilesPreview(string storageConnectionString, string containerName,
-            IEnumerable<Guid> referencedReleaseVersions)
-        {
-            var files = new List<FileInfo>();
-
-            foreach (var version in referencedReleaseVersions)
-            {
-                files.AddRange(ListFiles(storageConnectionString, containerName,
-                    AdminReleaseDirectoryPath(version, ReleaseFileTypes.Data), false));
-
-                files.AddRange(ListFiles(storageConnectionString, containerName,
-                    AdminReleaseDirectoryPath(version, ReleaseFileTypes.Ancillary), false)); 
-            }
-
-            return files.OrderBy(f => f.Name);
-        }
-
-        public static IEnumerable<FileInfo> ListPublicFiles(string storageConnectionString, string containerName,
-            string publication, string release)
-        {
-            var files = new List<FileInfo>();
-
-            files.AddRange(ListFiles(storageConnectionString, containerName,
-                PublicReleaseDirectoryPath(publication, release, ReleaseFileTypes.Data), true));
-
-            files.AddRange(ListFiles(storageConnectionString, containerName,
-                PublicReleaseDirectoryPath(publication, release, ReleaseFileTypes.Ancillary), true));
-
-            return files.OrderBy(f => f.Name);
-        }
-
-        public static IEnumerable<CloudBlockBlob> ListBlobs(string storageConnectionString, string containerName, string prefix = null)
-        {
-            var blobContainer = GetCloudBlobContainer(storageConnectionString, containerName);
-            return blobContainer.ListBlobs(prefix, true, BlobListingDetails.Metadata)
-                .OfType<CloudBlockBlob>();
-        }
-        
-        public static async Task AddMetaValuesAsync(CloudBlob blob, IDictionary<string, string> values)
-        {
-            foreach (var (key, value) in values)
-            {
-                if (blob.Metadata.ContainsKey(key))
-                {
-                    blob.Metadata.Remove(key);
-                }
-
-                blob.Metadata.Add(key, value);
-            }
-
-            await blob.SetMetadataAsync();
-        }
-        
-        private static IEnumerable<FileInfo> ListFiles(string storageConnectionString, string containerName,
-            string prefix, bool releasedFilesOnly)
-        {
-            return ListBlobs(storageConnectionString, containerName, prefix)
-                .Where(blob => !IsMetaDataFile(blob) && (!releasedFilesOnly || IsFileReleased(blob)))
-                .Select(file => new FileInfo
-                {
-                    Extension = GetExtension(file),
-                    Name = GetName(file),
-                    Path = file.Name,
-                    Size = GetSize(file)
-                })
-                .OrderBy(info => info.Name).ToList();
-        }
-        
-        public static async Task AppendFromStreamAsync(string storageConnectionString, string containerName,
-            string blobName, string contentType, string content)
-        {
-            var blobContainer = await GetCloudBlobContainerAsync(storageConnectionString, containerName);
-
-            var blob = blobContainer.GetAppendBlobReference(blobName);
-            blob.Properties.ContentType = contentType;
-
-            using (Stream stream = new MemoryStream(Encoding.UTF8.GetBytes(content)))
-            {
-                await blob.AppendFromStreamAsync(stream);
-            }
-        }
-        
         public static async Task<CloudBlockBlob> UploadFromStreamAsync(string storageConnectionString, string containerName,
             string blobName, string contentType, string content, BlobRequestOptions requestOptions = null)
         {
@@ -194,21 +95,6 @@ namespace GovUk.Education.ExploreEducationStatistics.Common.Services
             return blob;
         }
 
-        public static string GetExtension(CloudBlob blob)
-        {
-            return Path.GetExtension(blob.Name).TrimStart('.');
-        }
-
-        public static string GetName(CloudBlob blob)
-        {
-            return blob.Metadata.TryGetValue(NameKey, out var name) ? name : string.Empty;
-        }
-
-        public static string GetUserName(CloudBlob blob)
-        {
-            return blob.Metadata.TryGetValue(UserName, out var name) ? name : string.Empty;
-        }
-
         public static string GetSize(CloudBlob blob)
         {
             var fileSize = blob.Properties.Length;
@@ -222,52 +108,6 @@ namespace GovUk.Education.ExploreEducationStatistics.Common.Services
             return $"{fileSize:0.##} {unit}";
         }
 
-        /**
-         * Storage Emulator doesn't support AppendBlob. This method checks if AppendBlob can be used by either checking
-         * for its presence or creating a new one.
-         */
-        public static async Task<bool> TryGetOrCreateAppendBlobAsync(string storageConnectionString, string containerName,
-            string blobName)
-        {
-            var blobContainer = await GetCloudBlobContainerAsync(storageConnectionString, containerName);
-            var blob = blobContainer.GetAppendBlobReference(blobName);
-
-            if (blob.Exists())
-            {
-                return true;
-            }
-
-            try
-            {
-                await blob.CreateOrReplaceAsync();
-                return true;
-            }
-            catch (StorageException e)
-            {
-                if (e.Message.Contains("Storage Emulator"))
-                {
-                    // Storage Emulator doesn't support AppendBlob
-                    return false;
-                }
-                throw;
-            }
-        }
-
-        public static bool IsFileReleased(CloudBlob blob)
-        {
-            if (!blob.Exists())
-            {
-                throw new ArgumentException("File not found: {filename}", blob.Name);
-            }
-
-            if (blob.Metadata.TryGetValue("releasedatetime", out var releaseDateTime))
-            {
-                return DateTime.Compare(ParseDateTime(releaseDateTime), DateTime.Now) <= 0;
-            }
-
-            return false;
-        }
-
         public static bool IsBatchedDataFile(IListBlobItem blobItem, Guid releaseId)
         {
             return blobItem.Parent.Prefix.Equals(AdminReleaseBatchesDirectoryPath(releaseId));
@@ -276,7 +116,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Common.Services
         public static bool IsMetaDataFile(CloudBlob blob)
         {
             // The meta data file contains a metadata attribute referencing it's corresponding data file
-            return blob.Metadata.ContainsKey(DataFileKey);
+            return blob.Metadata.ContainsKey(BlobInfoExtensions.DataFileKey);
         }
 
         public static int CalculateNumberOfRows(Stream fileStream)
@@ -292,31 +132,10 @@ namespace GovUk.Education.ExploreEducationStatistics.Common.Services
                 return numberOfLines;
             }
         }
-        
+
         public static int GetNumBatches(int rows, int rowsPerBatch)
         {
             return (int) Math.Ceiling(rows / (double) rowsPerBatch);
-        }
-        
-        private static CloudBlobContainer GetCloudBlobContainer(string storageConnectionString, string containerName,
-            BlobContainerPermissions permissions = null)
-        {
-            var storageAccount = CloudStorageAccount.Parse(storageConnectionString);
-            var blobClient = storageAccount.CreateCloudBlobClient();
-            var blobContainer = blobClient.GetContainerReference(containerName);
-            blobContainer.CreateIfNotExists();
-
-            if (permissions != null)
-            {
-                blobContainer.SetPermissions(permissions);
-            }
-
-            return blobContainer;
-        }
-
-        private static DateTime ParseDateTime(string dateTime)
-        {
-            return DateTime.ParseExact(dateTime, "o", CultureInfo.InvariantCulture, DateTimeStyles.None);
         }
     }
 }

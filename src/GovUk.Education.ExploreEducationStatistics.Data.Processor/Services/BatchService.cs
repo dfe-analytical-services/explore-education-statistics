@@ -11,6 +11,7 @@ using Microsoft.Azure.Cosmos.Table;
 using Microsoft.Extensions.Logging;
 using Newtonsoft.Json;
 using static GovUk.Education.ExploreEducationStatistics.Common.TableStorageTableNames;
+using IFileStorageService = GovUk.Education.ExploreEducationStatistics.Data.Processor.Services.Interfaces.IFileStorageService;
 
 namespace GovUk.Education.ExploreEducationStatistics.Data.Processor.Services
 {
@@ -36,14 +37,16 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Processor.Services
 
             if (message.NumBatches > 1)
             {
-                _fileStorageService.DeleteBatchFile(releaseId, message.DataFileName);
+                await _fileStorageService.DeleteBatchFile(releaseId, message.DataFileName);
             }
-            
+
+            var numBatchesRemaining = await _fileStorageService.GetNumBatchesRemaining(releaseId, message.OrigDataFileName);
+
             if (import.Status.Equals(IStatus.RUNNING_PHASE_3)
-            && (message.NumBatches == 1 || _fileStorageService.GetNumBatchesRemaining(releaseId, message.OrigDataFileName) == 0))
+                && (message.NumBatches == 1 || numBatchesRemaining == 0))
             {
                 var observationCount = context.Observation.Count(o => o.SubjectId.Equals(message.SubjectId));
-                
+
                 if (!observationCount.Equals(message.TotalRows))
                 {
                     await FailImport(releaseId, message.OrigDataFileName,
@@ -81,14 +84,14 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Processor.Services
 
             return true;
         }
-        
+
         public async Task UpdateStoredMessage(ImportMessage message)
         {
             var import = await GetImport(message.Release.Id.ToString(), message.OrigDataFileName);
             import.Message = JsonConvert.SerializeObject(message);
             await _table.ExecuteAsync(TableOperation.InsertOrReplace(import));
         }
-        
+
         public async Task<IStatus> GetStatus(string releaseId, string origDataFileName)
         {
             var import = await GetImport(releaseId, origDataFileName);
@@ -105,7 +108,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Processor.Services
                 await _table.ExecuteAsync(TableOperation.InsertOrReplace(import));
             }
         }
-        
+
         public async Task CreateImport(string releaseId, string dataFileName, int numberOfRows, ImportMessage message)
         {
             await _table.ExecuteAsync(TableOperation.InsertOrReplace(

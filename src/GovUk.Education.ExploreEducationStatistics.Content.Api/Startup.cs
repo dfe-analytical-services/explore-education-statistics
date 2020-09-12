@@ -1,7 +1,6 @@
 ﻿using System.Diagnostics.CodeAnalysis;
 using GovUk.Education.ExploreEducationStatistics.Common.Services;
-using GovUk.Education.ExploreEducationStatistics.Content.Api.Services;
-using GovUk.Education.ExploreEducationStatistics.Content.Api.Services.Interfaces;
+using GovUk.Education.ExploreEducationStatistics.Common.Services.Interfaces;
 using GovUk.Education.ExploreEducationStatistics.Publisher.Model;
 using Microsoft.AspNetCore.Builder;
 using Microsoft.AspNetCore.Hosting;
@@ -39,7 +38,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Content.Api
 
             // Adds Brotli and Gzip compressing
             services.AddResponseCompression();
-            
+
             // Register the Swagger generator, defining 1 or more Swagger documents
             services.AddSwaggerGen(swag =>
             {
@@ -48,7 +47,12 @@ namespace GovUk.Education.ExploreEducationStatistics.Content.Api
             });
 
             services.AddCors();
-            services.AddTransient<IFileStorageService, FileStorageService>(s => new FileStorageService(Configuration.GetValue<string>("PublicStorage")));
+            services.AddTransient<IBlobStorageService, BlobStorageService>(
+                s => new BlobStorageService(
+                    Configuration.GetValue<string>("PublicStorage"),
+                    s.GetRequiredService<ILogger<BlobStorageService>>()
+                )
+            );
         }
 
         // This method gets called by the runtime. Use this method to configure the HTTP request pipeline.
@@ -59,7 +63,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Content.Api
             if (env.IsDevelopment())
             {
                 app.UseDeveloperExceptionPage();
-                
+
                 PublishAllContent(logger);
             }
             else
@@ -85,7 +89,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Content.Api
             app.UseCors(options => options.WithOrigins("http://localhost:3000", "http://localhost:3001","https://localhost:3000","https://localhost:3001").AllowAnyMethod().AllowAnyHeader());
             app.UseMvc();
         }
-        
+
         /**
          * Add a message to the queue to publish all content.
          * This should only be used in development!

@@ -1,13 +1,10 @@
 using System;
 using System.Collections.Generic;
 using System.ComponentModel.DataAnnotations;
-using System.Diagnostics.CodeAnalysis;
-using System.IO;
 using System.Threading.Tasks;
 using GovUk.Education.ExploreEducationStatistics.Common.Model;
+using GovUk.Education.ExploreEducationStatistics.Common.Services.Interfaces;
 using Microsoft.AspNetCore.Http;
-using Microsoft.Azure.Storage.Blob;
-using Microsoft.Extensions.Configuration;
 using static GovUk.Education.ExploreEducationStatistics.Data.Seed.ValidationErrorMessages;
 using static GovUk.Education.ExploreEducationStatistics.Data.Seed.ValidationUtils;
 using static GovUk.Education.ExploreEducationStatistics.Common.Services.FileStorageUtils;
@@ -18,47 +15,41 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Seed.Services
 {
     public class FileStorageService : IFileStorageService
     {
-        private readonly string _storageConnectionString;
+        private readonly IBlobStorageService _blobStorageService;
 
-        private const string NameKey = "name";
-
-        [SuppressMessage("ReSharper", "UnusedMember.Local")]
-        private enum FileSizeUnit : byte
+        public FileStorageService(IBlobStorageService blobStorageService)
         {
-            B,
-            Kb,
-            Mb,
-            Gb,
-            Tb
+            _blobStorageService = blobStorageService;
         }
 
-        public FileStorageService(IConfiguration config)
-        {
-            _storageConnectionString = config.GetConnectionString("CoreStorage");
-        }
-
-        public async Task<Either<ValidationResult, Either<ValidationResult, bool>>> UploadDataFilesAsync(Guid releaseId,
+        public async Task<Either<ValidationResult, Either<ValidationResult, Unit>>> UploadDataFilesAsync(Guid releaseId,
             IFormFile dataFile, IFormFile metadataFile, string name, bool overwrite)
         {
-            var blobContainer = await GetCloudBlobContainerAsync(_storageConnectionString, PrivateFilesContainerName);
-            var dataInfo = new Dictionary<string, string>
-            {
-                {NameKey, name},
-                {MetaFileKey, metadataFile.FileName},
-                {NumberOfRows, CalculateNumberOfRows(dataFile.OpenReadStream()).ToString()}
-            };
-            var metaDataInfo = new Dictionary<string, string> {{DataFileKey, dataFile.FileName}};
-            return await ValidateDataFilesForUpload(blobContainer, releaseId, dataFile, metadataFile, overwrite)
+            var dataInfo = GetDataFileMetaValues(
+                name: name,
+                metaFileName: metadataFile.Name,
+                userName: string.Empty,
+                numberOfRows: CalculateNumberOfRows(dataFile.OpenReadStream())
+            );
+            var metaDataInfo = GetMetaDataFileMetaValues(
+                dataFileName: dataFile.FileName,
+                userName: string.Empty,
+                numberOfRows: CalculateNumberOfRows(metadataFile.OpenReadStream())
+            );
+
+            return await ValidateDataFilesForUpload(releaseId, dataFile, metadataFile, overwrite)
                 .OnSuccess(() =>
-                    UploadFileAsync(blobContainer, releaseId, dataFile, ReleaseFileTypes.Data, dataInfo, overwrite))
-                .OnSuccess(() => UploadFileAsync(blobContainer, releaseId, metadataFile, ReleaseFileTypes.Data,
+                    UploadFileAsync(releaseId, dataFile, ReleaseFileTypes.Data, dataInfo, overwrite))
+                .OnSuccess(() => UploadFileAsync(releaseId, metadataFile, ReleaseFileTypes.Data,
                     metaDataInfo, overwrite));
         }
 
         // We cannot rely on the normal upload validation as we want this to be an atomic operation for both files.
-        private static async Task<Either<ValidationResult, bool>> ValidateDataFilesForUpload(
-            CloudBlobContainer blobContainer, Guid releaseId,
-            IFormFile dataFile, IFormFile metaFile, bool overwrite)
+        private async Task<Either<ValidationResult, Unit>> ValidateDataFilesForUpload(
+            Guid releaseId,
+            IFormFile dataFile,
+            IFormFile metaFile,
+            bool overwrite)
         {
             if (string.Equals(dataFile.FileName, metaFile.FileName, StringComparison.OrdinalIgnoreCase))
             {
@@ -77,25 +68,28 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Seed.Services
 
             var dataFilePath = AdminReleasePath(releaseId, ReleaseFileTypes.Data, dataFile.FileName);
             var metadataFilePath = AdminReleasePath(releaseId, ReleaseFileTypes.Data, metaFile.FileName);
-            if (!overwrite && blobContainer.GetBlockBlobReference(dataFilePath).Exists())
+            if (!overwrite && CheckBlobExists(dataFilePath))
             {
                 return ValidationResult(CannotOverwriteDataFile);
             }
 
-            if (!overwrite && blobContainer.GetBlockBlobReference(metadataFilePath).Exists())
+            if (!overwrite && CheckBlobExists(metadataFilePath))
             {
                 return ValidationResult(CannotOverwriteMetadataFile);
             }
 
-            return true;
+            return Unit.Instance;
         }
 
-        private static async Task<Either<ValidationResult, bool>> UploadFileAsync(CloudBlobContainer blobContainer,
-            Guid releaseId, IFormFile file, ReleaseFileTypes type, IDictionary<string, string> metaValues,
+        private async Task<Either<ValidationResult, Unit>> UploadFileAsync(
+            Guid releaseId,
+            IFormFile file,
+            ReleaseFileTypes type,
+            IDictionary<string, string> metaValues,
             bool overwrite)
         {
-            var blob = blobContainer.GetBlockBlobReference(AdminReleasePath(releaseId, type, file.FileName));
-            if (!overwrite && blob.Exists())
+            var path = AdminReleasePath(releaseId, type, file.FileName);
+            if (!overwrite && CheckBlobExists(path))
             {
                 return ValidationResult(CannotOverwriteFile);
             }
@@ -106,40 +100,17 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Seed.Services
                 return ValidationResult(FileCannotBeEmpty);
             }
 
-            blob.Properties.ContentType = file.ContentType;
-            var path = await UploadToTemporaryFile(file);
-            await blob.UploadFromFileAsync(path);
-            await AddMetaValuesAsync(blob, metaValues);
-            return true;
+            await _blobStorageService.UploadFile(PrivateFilesContainerName, path, file, new IBlobStorageService.UploadFileOptions
+            {
+                MetaValues = metaValues
+            });
+
+            return Unit.Instance;
         }
 
-        private static async Task<string> UploadToTemporaryFile(IFormFile file)
+        private bool CheckBlobExists(string path)
         {
-            var path = Path.GetTempFileName();
-            if (file.Length > 0)
-            {
-                using (var stream = new FileStream(path, FileMode.Create))
-                {
-                    await file.CopyToAsync(stream);
-                }
-            }
-
-            return path;
-        }
-
-        private static async Task AddMetaValuesAsync(CloudBlob blob, IDictionary<string, string> values)
-        {
-            foreach (var (key, value) in values)
-            {
-                if (blob.Metadata.ContainsKey(key))
-                {
-                    blob.Metadata.Remove(key);
-                }
-
-                blob.Metadata.Add(key, value);
-            }
-
-            await blob.SetMetadataAsync();
+            return _blobStorageService.CheckBlobExists(PrivateFilesContainerName, path).Result;
         }
     }
 }

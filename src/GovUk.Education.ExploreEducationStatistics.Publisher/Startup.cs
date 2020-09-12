@@ -15,6 +15,8 @@ using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Logging;
+using FileStorageService = GovUk.Education.ExploreEducationStatistics.Publisher.Services.FileStorageService;
+using IFileStorageService = GovUk.Education.ExploreEducationStatistics.Publisher.Services.Interfaces.IFileStorageService;
 using IReleaseService = GovUk.Education.ExploreEducationStatistics.Publisher.Services.Interfaces.IReleaseService;
 using ReleaseService = GovUk.Education.ExploreEducationStatistics.Publisher.Services.ReleaseService;
 
@@ -33,7 +35,23 @@ namespace GovUk.Education.ExploreEducationStatistics.Publisher
                     options.UseSqlServer(ConnectionUtils.GetAzureSqlConnectionString("ContentDb")))
                 .AddDbContext<StatisticsDbContext>(options =>
                     options.UseSqlServer(ConnectionUtils.GetAzureSqlConnectionString("StatisticsDb")))
-                .AddScoped<IFileStorageService, FileStorageService>()
+                .AddScoped<IFileStorageService, FileStorageService>(
+                    provider =>
+                    {
+                        var privateBlobStorageService = new BlobStorageService(
+                            GetConfigurationValue(provider, "CoreStorage"),
+                            provider.GetRequiredService<ILogger<BlobStorageService>>());
+                        var publicBlobStorageService = new BlobStorageService(
+                            GetConfigurationValue(provider, "PublicStorage"),
+                            provider.GetRequiredService<ILogger<BlobStorageService>>());
+
+                        return new FileStorageService(
+                            privateBlobStorageService,
+                            publicBlobStorageService,
+                            GetConfigurationValue(provider, "PublicStorage"),
+                            GetConfigurationValue(provider, "PublisherStorage"),
+                            provider.GetRequiredService<ILogger<FileStorageService>>());
+                    })
                 .AddScoped<IPublishingService, PublishingService>()
                 .AddScoped<IContentService, ContentService>()
                 .AddScoped<IReleaseService, ReleaseService>()
@@ -41,7 +59,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Publisher
                     new TableStorageService(GetConfigurationValue(provider, "PublisherStorage")))
                 .AddScoped<IPublicationService, PublicationService>()
                 .AddScoped<IDownloadService, DownloadService>()
-                .AddScoped<IFastTrackService, FastTrackService>(provider => 
+                .AddScoped<IFastTrackService, FastTrackService>(provider =>
                     new FastTrackService(provider.GetService<ContentDbContext>(),
                         provider.GetService<IFileStorageService>(),
                         new TableStorageService(GetConfigurationValue(provider, "PublicStorage"))))

@@ -1,11 +1,11 @@
 using System;
+using System.Linq;
 using GovUk.Education.ExploreEducationStatistics.Common.Model;
 using GovUk.Education.ExploreEducationStatistics.Common.Services;
 using GovUk.Education.ExploreEducationStatistics.Data.Processor.Model;
-using GovUk.Education.ExploreEducationStatistics.Data.Processor.Services;
+using GovUk.Education.ExploreEducationStatistics.Data.Processor.Services.Interfaces;
 using Microsoft.Azure.Cosmos.Table;
 using Microsoft.Azure.Storage.Queue;
-using Microsoft.EntityFrameworkCore.Internal;
 using Newtonsoft.Json;
 using static GovUk.Education.ExploreEducationStatistics.Common.TableStorageTableNames;
 
@@ -13,11 +13,13 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Processor
 {
     public static class FailedImportsHandler
     {
-        public static void CheckIncompleteImports(string storageConnectionString)
+        public static void CheckIncompleteImports(
+            string tableStorageConnectionString,
+            IFileStorageService fileStorageService)
         {
-            var tblStorageAccount = CloudStorageAccount.Parse(storageConnectionString);
-            var storageAccount = Microsoft.Azure.Storage.CloudStorageAccount.Parse(storageConnectionString);
-            var container = FileStorageService.GetOrCreateBlobContainer(storageConnectionString).Result;
+            var tblStorageAccount = CloudStorageAccount.Parse(tableStorageConnectionString);
+            var storageAccount = Microsoft.Azure.Storage.CloudStorageAccount.Parse(tableStorageConnectionString);
+
             var tableClient = tblStorageAccount.CreateCloudTableClient();
             var queueClient = storageAccount.CreateCloudQueueClient();
             var availableQueue = queueClient.GetQueueReference("imports-available");
@@ -51,7 +53,9 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Processor
                     else
                     {
                         var m = JsonConvert.DeserializeObject<ImportMessage>(entity.Message);
-                        var batches = FileStorageService.GetBatchesRemaining(entity.PartitionKey, container, m.OrigDataFileName);
+                        var batches = fileStorageService.GetBatchesRemaining(entity.PartitionKey, m.OrigDataFileName)
+                            .Result
+                            .ToList();
 
                         // If no batches then assume it didn't get passed initial validation stage
                         if (!batches.Any())
@@ -59,52 +63,52 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Processor
                             pendingQueue.AddMessage(new CloudQueueMessage(entity.Message));
                             return;
                         }
-                        
+
                         foreach (var folderAndFilename in batches)
                         {
-                            availableQueue.AddMessage(new CloudQueueMessage(BuildMessage(m, folderAndFilename)));
+                            availableQueue.AddMessage(new CloudQueueMessage(BuildMessage(m, folderAndFilename.Path)));
                         }
                     }
                 }
             } while (token != null);
         }
-        
+
         private static TableQuery<DatafileImport> BuildQuery()
         {
             var combineFilters = TableQuery.CombineFilters(
-                TableQuery.GenerateFilterCondition("Status", 
+                TableQuery.GenerateFilterCondition("Status",
                     QueryComparisons.Equal, IStatus.QUEUED.ToString())
-                , TableOperators.Or, 
-                TableQuery.GenerateFilterCondition("Status", 
+                , TableOperators.Or,
+                TableQuery.GenerateFilterCondition("Status",
                     QueryComparisons.Equal, IStatus.RUNNING_PHASE_1.ToString()));
 
             combineFilters = TableQuery.CombineFilters(
-                combineFilters, 
-                TableOperators.Or, 
-                TableQuery.GenerateFilterCondition("Status", 
+                combineFilters,
+                TableOperators.Or,
+                TableQuery.GenerateFilterCondition("Status",
                     QueryComparisons.Equal, IStatus.RUNNING_PHASE_2.ToString()));
 
             combineFilters = TableQuery.CombineFilters(
-                combineFilters, 
-                TableOperators.Or, 
-                TableQuery.GenerateFilterCondition("Status", 
+                combineFilters,
+                TableOperators.Or,
+                TableQuery.GenerateFilterCondition("Status",
                     QueryComparisons.Equal, IStatus.PROCESSING_ARCHIVE_FILE.ToString()));
-            
+
             return new TableQuery<DatafileImport>()
                 .Where(TableQuery.CombineFilters(
-                    combineFilters, 
-                    TableOperators.Or, 
-                    TableQuery.GenerateFilterCondition("Status", 
+                    combineFilters,
+                    TableOperators.Or,
+                    TableQuery.GenerateFilterCondition("Status",
                     QueryComparisons.Equal, IStatus.RUNNING_PHASE_3.ToString())));
         }
-        
+
         private static string BuildMessage(ImportMessage message, string folderAndFilename)
         {
             var fileName = folderAndFilename.Split(FileStoragePathUtils.BatchesDir + "/")[1];
             var batchNo = Int16.Parse(fileName.Substring(fileName.Length-6));
-            
+
             Console.WriteLine($"Recreating message queue for {fileName}");
-            
+
             var iMessage = new ImportMessage
             {
                 SubjectId = message.SubjectId,

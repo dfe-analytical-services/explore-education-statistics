@@ -1,5 +1,6 @@
 using System.Collections.Generic;
 using System.Threading.Tasks;
+using GovUk.Education.ExploreEducationStatistics.Common.Model;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.Azure.Storage.Blob;
 
@@ -7,20 +8,22 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Api.Services.Interface
 {
     public interface IFileStorageService
     {
-        Task AppendFromStreamAsync(string containerName, string blobName, string contentType, string content);
-        
-        Task<string> DownloadTextAsync(string containerName, string blobName);
+        Task AppendFromStreamAsync(string containerName, string path, string contentType, string content);
 
-        bool FileExistsAndIsReleased(string containerName, string blobName);
+        Task<string> GetBlobText(string containerName, string path);
 
-        CloudBlob GetBlob(string containerName, string blobName);
-        
-        IEnumerable<CloudBlockBlob> ListBlobs(string containerName);
+        Task<bool> IsBlobReleased(string containerName, string path);
 
-        Task<bool> TryGetOrCreateAppendBlobAsync(string containerName, string blobName);
+        Task<bool> CheckBlobExists(string containerName, string path);
 
-        Task<FileStreamResult> StreamFile(string containerName, string blobName, string fileName);
+        Task<BlobInfo> GetBlob(string containerName, string path);
 
-        Task UploadFromStreamAsync(string containerName, string blobName, string contentType, string content);
+        Task<IEnumerable<BlobInfo>> ListBlobs(string containerName);
+
+        Task<bool> IsAppendSupported(string containerName, string path);
+
+        Task<FileStreamResult> StreamFile(string containerName, string path);
+
+        Task UploadText(string containerName, string path, string contentType, string content);
     }
 }

@@ -291,6 +291,11 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin
             services.AddSingleton<DataServiceMemoryCache<GeoJson>, DataServiceMemoryCache<GeoJson>>();
             services.AddTransient<IUserManagementService, UserManagementService>();
             services.AddTransient<IFileUploadsValidatorService, FileUploadsValidatorService>();
+            services.AddTransient<IBlobStorageService, BlobStorageService>(s =>
+                new BlobStorageService(
+                    Configuration.GetValue<string>("CoreStorage"),
+                    s.GetRequiredService<ILogger<BlobStorageService>>()
+                ));
             services.AddTransient<ITableStorageService, TableStorageService>(s =>
                 new TableStorageService(Configuration.GetValue<string>("CoreStorage")));
             services.AddSingleton<IGuidGenerator, SequentialGuidGenerator>();

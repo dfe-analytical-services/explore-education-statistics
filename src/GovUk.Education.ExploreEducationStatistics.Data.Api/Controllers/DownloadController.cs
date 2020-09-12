@@ -1,4 +1,5 @@
 using System;
+using System.IO;
 using System.Threading.Tasks;
 using GovUk.Education.ExploreEducationStatistics.Common.Model;
 using GovUk.Education.ExploreEducationStatistics.Data.Api.Services.Interfaces;
@@ -40,14 +41,27 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Api.Controllers
         private async Task<ActionResult> GetFile(string publication, string release, ReleaseFileTypes type,
             string filename)
         {
-            if (!_fileStorageService.FileExistsAndIsReleased(PublicFilesContainerName,
-                PublicReleasePath(publication, release, type, filename)))
+            var isReleased = await _fileStorageService.IsBlobReleased(
+                containerName: PublicFilesContainerName,
+                path: PublicReleasePath(publication, release, type, filename)
+            );
+
+            if (!isReleased)
             {
                 return NotFound();
             }
 
-            return await _fileStorageService.StreamFile(PublicFilesContainerName,
-                PublicReleasePath(publication, release, type, filename), filename);
+            try
+            {
+                return await _fileStorageService.StreamFile(
+                    containerName: PublicFilesContainerName,
+                    path: PublicReleasePath(publication, release, type, filename)
+                );
+            }
+            catch (FileNotFoundException e)
+            {
+                return NotFound();
+            }
         }
     }
 }

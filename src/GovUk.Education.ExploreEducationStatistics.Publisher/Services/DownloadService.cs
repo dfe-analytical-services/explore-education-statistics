@@ -83,7 +83,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Publisher.Services
         private IEnumerable<FileInfo> GetDownloadFiles(Publication publication, IEnumerable<Guid> includedReleaseIds)
         {
             var latestRelease = _releaseService.GetLatestRelease(publication.Id, includedReleaseIds);
-            return _fileStorageService.ListPublicFiles(publication.Slug, latestRelease.Slug);
+            return _fileStorageService.ListPublicFiles(publication.Slug, latestRelease.Slug).Result;
         }
 
         private static bool IsThemePublished(Theme theme, IEnumerable<Guid> includedReleaseIds)

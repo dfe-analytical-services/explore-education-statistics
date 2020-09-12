@@ -1,11 +1,12 @@
 ﻿using System;
 using System.Linq;
+using GovUk.Education.ExploreEducationStatistics.Common.Services.Interfaces;
 using GovUk.Education.ExploreEducationStatistics.Content.Api.Controllers;
-using GovUk.Education.ExploreEducationStatistics.Content.Api.Services.Interfaces;
 using GovUk.Education.ExploreEducationStatistics.Publisher.Model.ViewModels;
 using Microsoft.AspNetCore.Mvc;
 using Moq;
 using Xunit;
+using static GovUk.Education.ExploreEducationStatistics.Common.BlobContainerNames;
 
 namespace GovUk.Education.ExploreEducationStatistics.Content.Api.Tests.Controllers
 {
@@ -60,8 +61,14 @@ namespace GovUk.Education.ExploreEducationStatistics.Content.Api.Tests.Controlle
         [Fact]
         public void Get_PublicationTree_Returns_Ok()
         {
-            var fileStorageService = new Mock<IFileStorageService>();
-            fileStorageService.Setup(s => s.DownloadTextAsync("publications/tree.json")).ReturnsAsync(@"
+            var fileStorageService = new Mock<IBlobStorageService>();
+            fileStorageService.Setup(
+                s => s.DownloadBlobText(
+                    PublicContentContainerName,
+                    "publications/tree.json"
+                )
+            ).ReturnsAsync(
+                @"
             [
             {
                 ""id"": ""e6117db8-a641-46b4-9ef9-254180696298"",
@@ -84,7 +91,8 @@ namespace GovUk.Education.ExploreEducationStatistics.Content.Api.Tests.Controlle
                 }
             ]
         }
-        ]");
+        ]"
+            );
 
             var controller = new PublicationController(fileStorageService.Object);
 
@@ -100,7 +108,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Content.Api.Tests.Controlle
         [Fact]
         public void Get_PublicationTree_Returns_NoContent()
         {
-            var fileStorageService = new Mock<IFileStorageService>();
+            var fileStorageService = new Mock<IBlobStorageService>();
             var controller = new PublicationController(fileStorageService.Object);
             var result = controller.GetPublicationTree();
             Assert.IsAssignableFrom<NoContentResult>(result.Result.Result);
@@ -109,8 +117,13 @@ namespace GovUk.Education.ExploreEducationStatistics.Content.Api.Tests.Controlle
         [Fact]
         public void Get_PublicationTitle_Returns_Ok()
         {
-            var fileStorageService = new Mock<IFileStorageService>();
-            fileStorageService.Setup(s => s.DownloadTextAsync("publications/publication-a/publication.json"))
+            var fileStorageService = new Mock<IBlobStorageService>();
+            fileStorageService.Setup(
+                    s => s.DownloadBlobText(
+                        PublicContentContainerName,
+                        "publications/publication-a/publication.json"
+                    )
+                )
                 .ReturnsAsync(PublicationJson);
 
             var controller = new PublicationController(fileStorageService.Object);
@@ -123,7 +136,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Content.Api.Tests.Controlle
         [Fact]
         public void Get_PublicationTitle_Returns_NotFound()
         {
-            var fileStorageService = new Mock<IFileStorageService>();
+            var fileStorageService = new Mock<IBlobStorageService>();
             var controller = new PublicationController(fileStorageService.Object);
             var result = controller.GetPublicationTitle("missing-publication");
             Assert.IsAssignableFrom<NotFoundResult>(result.Result.Result);
@@ -132,8 +145,13 @@ namespace GovUk.Education.ExploreEducationStatistics.Content.Api.Tests.Controlle
         [Fact]
         public void Get_PublicationMethodology_Returns_Ok()
         {
-            var fileStorageService = new Mock<IFileStorageService>();
-            fileStorageService.Setup(s => s.DownloadTextAsync("publications/publication-a/publication.json"))
+            var fileStorageService = new Mock<IBlobStorageService>();
+            fileStorageService.Setup(
+                    s => s.DownloadBlobText(
+                        PublicContentContainerName,
+                        "publications/publication-a/publication.json"
+                    )
+                )
                 .ReturnsAsync(PublicationJson);
 
             var controller = new PublicationController(fileStorageService.Object);
@@ -141,7 +159,10 @@ namespace GovUk.Education.ExploreEducationStatistics.Content.Api.Tests.Controlle
             var publicationMethodologyViewModel = controller.GetPublicationMethodology("publication-a").Result.Value;
             Assert.Equal("externalMethodologyTitle", publicationMethodologyViewModel.ExternalMethodology.Title);
             Assert.Equal("externalMethodologyUrl", publicationMethodologyViewModel.ExternalMethodology.Url);
-            Assert.Equal(new Guid("d18931ca-a801-4184-b43a-f48d95c23d2a"), publicationMethodologyViewModel.Methodology.Id);
+            Assert.Equal(
+                new Guid("d18931ca-a801-4184-b43a-f48d95c23d2a"),
+                publicationMethodologyViewModel.Methodology.Id
+            );
             Assert.Equal("methodologySlug", publicationMethodologyViewModel.Methodology.Slug);
             Assert.Equal("methodologySummary", publicationMethodologyViewModel.Methodology.Summary);
             Assert.Equal("methodologyTitle", publicationMethodologyViewModel.Methodology.Title);
@@ -150,7 +171,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Content.Api.Tests.Controlle
         [Fact]
         public void Get_PublicationMethodology_Returns_NotFound()
         {
-            var fileStorageService = new Mock<IFileStorageService>();
+            var fileStorageService = new Mock<IBlobStorageService>();
             var controller = new PublicationController(fileStorageService.Object);
             var result = controller.GetPublicationMethodology("missing-publication");
             Assert.IsAssignableFrom<NotFoundResult>(result.Result.Result);

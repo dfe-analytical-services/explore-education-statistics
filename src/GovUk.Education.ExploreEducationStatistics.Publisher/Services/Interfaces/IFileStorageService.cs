@@ -18,14 +18,14 @@ namespace GovUk.Education.ExploreEducationStatistics.Publisher.Services.Interfac
 
         Task DeletePublicBlobs(string directoryPath, string excludePattern = null);
 
-        Task DeletePublicBlob(string blobName);
+        Task DeletePublicBlob(string path);
 
         Task<(CloudBlockBlob blob, string id)> AcquireLease(string blobName);
 
-        IEnumerable<FileInfo> ListPublicFiles(string publication, string release);
+        Task<IEnumerable<FileInfo>> ListPublicFiles(string publication, string release);
 
         Task MovePublicDirectory(string containerName, string sourceDirectoryPath, string destinationDirectoryPath);
 
-        Task UploadAsJson(string blobName, object value, JsonSerializerSettings settings = null);
+        Task UploadAsJson(string filePath, object value, JsonSerializerSettings settings = null);
     }
 }
