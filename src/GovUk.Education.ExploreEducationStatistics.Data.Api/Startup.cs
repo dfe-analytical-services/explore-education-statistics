@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Diagnostics.CodeAnalysis;
 using AutoMapper;
+using Azure.Storage.Blobs;
 using GovUk.Education.ExploreEducationStatistics.Common.Model.Data;
 using GovUk.Education.ExploreEducationStatistics.Common.Services;
 using GovUk.Education.ExploreEducationStatistics.Common.Services.Interfaces;
@@ -92,16 +93,18 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Api
             services.AddTransient<IThemeMetaService, ThemeMetaService>();
             services.AddTransient<IResultSubjectMetaService, ResultSubjectMetaService>();
             services.AddTransient<ISubjectMetaService, SubjectMetaService>();
-            services.AddTransient<IFileStorageService, FileStorageService>(
-                s =>
+            services.AddSingleton<IBlobStorageService, BlobStorageService>(provider =>
                 {
-                    var blobStorageService = new BlobStorageService(
-                        Configuration.GetValue<string>("PublicStorage"),
-                        s.GetRequiredService<ILogger<BlobStorageService>>()
+                    var connectionString = Configuration.GetValue<string>("PublicStorage");
+
+                    return new BlobStorageService(
+                        connectionString,
+                        new BlobServiceClient(connectionString),
+                        provider.GetRequiredService<ILogger<BlobStorageService>>()
                     );
-                    return new FileStorageService(blobStorageService);
                 }
             );
+            services.AddSingleton<IFileStorageService, FileStorageService>();
             services.AddTransient<IFilterGroupService, FilterGroupService>();
             services.AddTransient<IFilterItemService, FilterItemService>();
             services.AddTransient<IFilterService, FilterService>();

@@ -162,9 +162,8 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Processor.Functions
 
             var subject = _releaseProcessorService.CreateOrUpdateRelease(subjectData, message, statisticsDbContext, contentDbContext);
 
-            var metaFileTable = DataTableUtils.CreateFromStream(
-                await _fileStorageService.StreamBlob(subjectData.MetaBlob)
-            );
+            await using var metaFileStream = await _fileStorageService.StreamBlob(subjectData.MetaBlob);
+            var metaFileTable = DataTableUtils.CreateFromStream(metaFileStream);
 
             _importerService.ImportMeta(metaFileTable, subject, statisticsDbContext);
 

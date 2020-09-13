@@ -188,7 +188,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Api.Services
 
             var blob = await _fileStorageService.GetBlob(_containerName, _migrationId);
 
-            return blob.Length > 0;
+            return blob.ContentLength > 0;
         }
 
         public Task WriteHistory(string message)
@@ -215,7 +215,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Api.Services
         private Task AppendMigrationHistory(string message)
         {
             var now = DateTime.UtcNow.ToString("o", CultureInfo.InvariantCulture);
-            return _fileStorageService.AppendFromStreamAsync(
+            return _fileStorageService.AppendText(
                 containerName: _containerName,
                 path: _migrationId,
                 contentType: MediaTypeNames.Text.Plain,

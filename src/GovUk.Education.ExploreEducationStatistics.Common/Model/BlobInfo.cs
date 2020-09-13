@@ -14,7 +14,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Common.Model
 
         public readonly string Size;
 
-        public readonly long Length;
+        public readonly long ContentLength;
 
         public readonly IDictionary<string, string> Meta;
 
@@ -24,14 +24,14 @@ namespace GovUk.Education.ExploreEducationStatistics.Common.Model
             string path,
             string size,
             string contentType,
-            long length,
+            long contentLength,
             IDictionary<string, string> meta,
             DateTimeOffset? created = null)
         {
             Path = path;
             Size = size;
             ContentType = contentType;
-            Length = length;
+            ContentLength = contentLength;
             Meta = meta;
             Created = created;
         }

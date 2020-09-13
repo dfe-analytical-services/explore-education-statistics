@@ -8,7 +8,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Api.Services.Interface
 {
     public interface IFileStorageService
     {
-        Task AppendFromStreamAsync(string containerName, string path, string contentType, string content);
+        Task AppendText(string containerName, string path, string contentType, string content);
 
         Task<string> GetBlobText(string containerName, string path);
 

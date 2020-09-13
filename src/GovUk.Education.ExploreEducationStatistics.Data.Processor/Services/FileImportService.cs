@@ -42,12 +42,11 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Processor.Services
                 var subjectData = await _fileStorageService.GetSubjectData(message);
                 var releaseSubject = GetReleaseSubjectLink(message, subjectData.Name, context);
 
-                var dataFileTable = DataTableUtils.CreateFromStream(
-                    await _fileStorageService.StreamBlob(subjectData.DataBlob)
-                );
-                var metaFileTable = DataTableUtils.CreateFromStream(
-                    await _fileStorageService.StreamBlob(subjectData.MetaBlob)
-                );
+                await using var datafileStream = await _fileStorageService.StreamBlob(subjectData.DataBlob);
+                var dataFileTable = DataTableUtils.CreateFromStream(datafileStream);
+
+                await using var metaFileStream = await _fileStorageService.StreamBlob(subjectData.MetaBlob);
+                var metaFileTable = DataTableUtils.CreateFromStream(metaFileStream);
 
                 context.Database.CreateExecutionStrategy().Execute(() =>
                 {
@@ -79,12 +78,11 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Processor.Services
             var subjectData = _fileStorageService.GetSubjectData(message).Result;
             var releaseSubject = GetReleaseSubjectLink(message, subjectData.Name, context);
 
-            var dataFileTable = DataTableUtils.CreateFromStream(
-                await _fileStorageService.StreamBlob(subjectData.DataBlob)
-            );
-            var metaFileTable = DataTableUtils.CreateFromStream(
-                await _fileStorageService.StreamBlob(subjectData.MetaBlob)
-            );
+            await using var dataFileStream = await _fileStorageService.StreamBlob(subjectData.DataBlob);
+            var dataFileTable = DataTableUtils.CreateFromStream(dataFileStream);
+
+            await using var metaFileStream = await _fileStorageService.StreamBlob(subjectData.MetaBlob);
+            var metaFileTable = DataTableUtils.CreateFromStream(metaFileStream);
 
             _importerService.ImportFiltersLocationsAndSchools(
                 dataFileTable.Columns,

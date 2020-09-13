@@ -56,19 +56,32 @@ namespace GovUk.Education.ExploreEducationStatistics.Common.Services.Interfaces
 
         public Task<bool> IsAppendSupported(string containerName, string path);
 
-        public class AppendTextOptions
-        {
-            public IDictionary<string, string> MetaValues { get; set; }
-        }
+        public Task AppendText(string containerName, string path, string content);
 
-        public Task AppendText(
-            string containerName,
-            string path,
-            string content,
-            string contentType = null,
-            AppendTextOptions options = null);
+        /// <summary>
+        /// Download the entirety of a blob to a target stream.
+        /// </summary>
+        /// <param name="containerName">name of the blob container</param>
+        /// <param name="path">path to the blob within the container</param>
+        /// <param name="stream">stream to output blob to</param>
+        /// <returns>the blob stream</returns>
+        public Task<Stream> DownloadToStream(string containerName, string path, Stream stream);
 
-        public Task<Stream> StreamBlob(string containerName, string path);
+        /// <summary>
+        /// Stream a blob in chunks.
+        /// </summary>
+        /// <remarks>
+        /// <para>
+        /// This differs from <see cref="DownloadToStream">DownloadToStream</see> in
+        /// that it does not download the entirety of the blob beforehand. This causes
+        /// differences in how the outputted stream behaves that you may or may not want.
+        /// </para>
+        /// </remarks>
+        /// <param name="containerName">name of the blob container</param>
+        /// <param name="path">path to the blob within the container</param>
+        /// <param name="bufferSize">size of the stream buffer</param>
+        /// <returns>the chunked blob stream</returns>
+        public Task<Stream> StreamBlob(string containerName, string path, int? bufferSize = null);
 
         public Task<string> DownloadBlobText(string containerName, string path);
 

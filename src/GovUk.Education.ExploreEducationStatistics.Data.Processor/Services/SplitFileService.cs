@@ -47,7 +47,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Processor.Services
             ImportMessage message,
             SubjectData subjectData)
         {
-            var dataFileStream = await _fileStorageService.StreamBlob(subjectData.DataBlob);
+            await using var dataFileStream = await _fileStorageService.StreamBlob(subjectData.DataBlob);
             var dataFileTable = DataTableUtils.CreateFromStream(dataFileStream);
 
             if (dataFileTable.Rows.Count > message.RowsPerBatch)

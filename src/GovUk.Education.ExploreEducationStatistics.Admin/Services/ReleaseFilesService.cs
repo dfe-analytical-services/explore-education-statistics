@@ -524,7 +524,8 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Services
             var path = AdminReleasePathWithFileReference(fileLink.ReleaseFileReference);
             var blob = await _blobStorageService.GetBlob(PrivateFilesContainerName, path);
 
-            await using var stream = await _blobStorageService.StreamBlob(PrivateFilesContainerName, path);
+            var stream = new MemoryStream();
+            await _blobStorageService.DownloadToStream(PrivateFilesContainerName, path, stream);
 
             return new FileStreamResult(stream, blob.ContentType)
             {

@@ -1,10 +1,13 @@
 using System.Collections.Generic;
 using System.IO;
-using System.Linq;
+using System.Text;
 using System.Text.RegularExpressions;
 using System.Threading.Tasks;
+using Azure;
+using Azure.Storage.Blobs;
+using Azure.Storage.Blobs.Models;
+using Azure.Storage.Blobs.Specialized;
 using GovUk.Education.ExploreEducationStatistics.Common.Extensions;
-using GovUk.Education.ExploreEducationStatistics.Common.Model;
 using GovUk.Education.ExploreEducationStatistics.Common.Services.Interfaces;
 using Microsoft.AspNetCore.Http;
 using Microsoft.Azure.Storage;
@@ -12,6 +15,7 @@ using Microsoft.Azure.Storage.Blob;
 using Microsoft.Azure.Storage.DataMovement;
 using Microsoft.Extensions.Logging;
 using static GovUk.Education.ExploreEducationStatistics.Common.Services.FileStorageUtils;
+using BlobInfo = GovUk.Education.ExploreEducationStatistics.Common.Model.BlobInfo;
 
 namespace GovUk.Education.ExploreEducationStatistics.Common.Services
 {
@@ -27,118 +31,134 @@ namespace GovUk.Education.ExploreEducationStatistics.Common.Services
     /// </summary>
     public class BlobStorageService : IBlobStorageService
     {
-        private readonly string _storageConnectionString;
-        private readonly ILogger<BlobStorageService> _logger;
+        private readonly string _connectionString;
+        private readonly BlobServiceClient _client;
+        private readonly ILogger<IBlobStorageService> _logger;
 
-        public BlobStorageService(string storageConnectionString, ILogger<BlobStorageService> logger)
+        public BlobStorageService(string connectionString, BlobServiceClient client, ILogger<IBlobStorageService> logger)
         {
-            _storageConnectionString =  storageConnectionString;
+            _connectionString = connectionString;
+            _client = client;
             _logger = logger;
         }
 
         public async Task<IEnumerable<BlobInfo>> ListBlobs(string containerName, string path)
         {
-            var blobContainer = await GetCloudBlobContainer(containerName);
+            var blobContainer = await GetBlobContainer(containerName);
+            var blobInfos = new List<BlobInfo>();
 
-            return blobContainer
-                .ListBlobs(path, true, BlobListingDetails.Metadata)
-                .OfType<CloudBlockBlob>()
-                .Select(
-                    blob => new BlobInfo(
-                        path: blob.Name,
-                        size: GetSize(blob),
-                        contentType: blob.Properties.ContentType,
-                        length: blob.Properties.Length,
-                        meta: blob.Metadata,
-                        created: blob.Properties.Created
-                    )
-                );
+            string continuationToken = null;
+
+            do
+            {
+                var blobPages = blobContainer.GetBlobsAsync(BlobTraits.Metadata, prefix: path)
+                    .AsPages(continuationToken);
+
+                await foreach (Page<BlobItem> page in blobPages)
+                {
+                    foreach (var blob in page.Values)
+                    {
+                        if (blob == null)
+                        {
+                            break;
+                        }
+
+                        blobInfos.Add(
+                            new BlobInfo(
+                                path: blob.Name,
+                                size: GetSize(blob.Properties.ContentLength ?? 0),
+                                contentType: blob.Properties.ContentType,
+                                contentLength: blob.Properties.ContentLength ?? 0,
+                                meta: blob.Metadata,
+                                created: blob.Properties.CreatedOn
+                            )
+                        );
+                    }
+
+                    continuationToken = page.ContinuationToken;
+                }
+            } while (continuationToken != string.Empty);
+
+            return blobInfos;
         }
 
         public async Task<bool> CheckBlobExists(string containerName, string path)
         {
-            var blobContainer = await GetCloudBlobContainer(containerName);
-            var blob = blobContainer.GetBlockBlobReference(path);
-           return blob.Exists();
+            var blobContainer = await GetBlobContainer(containerName);
+            return await blobContainer.GetBlobClient(path).ExistsAsync();
         }
 
         public async Task<BlobInfo> GetBlob(string containerName, string path)
         {
-            var blobContainer = await GetCloudBlobContainer(containerName);
-            var blob = blobContainer.GetBlockBlobReference(path);
-
-            await blob.FetchAttributesAsync();
+            var blobContainer = await GetBlobContainer(containerName);
+            var blob = blobContainer.GetBlobClient(path);
+            var properties = (await blob.GetPropertiesAsync()).Value;
 
             return new BlobInfo(
                 path: blob.Name,
-                size: GetSize(blob),
-                contentType: blob.Properties.ContentType,
-                length: blob.Properties.Length,
-                meta: blob.Metadata,
-                created: blob.Properties.Created
+                size: GetSize(properties.ContentLength),
+                contentType: properties.ContentType,
+                contentLength: properties.ContentLength,
+                meta: properties.Metadata,
+                created: properties.CreatedOn
             );
         }
 
         public async Task DeleteBlobs(string containerName, string directoryPath, string excludePattern = null)
         {
-            var container = await GetCloudBlobContainer(containerName);
+            var prefix = directoryPath.AppendTrailingSlash();
 
-            directoryPath = directoryPath.AppendTrailingSlash();
-            _logger.LogInformation($"Deleting blobs from {container.Name} directory {directoryPath}");
+            var blobContainer = await GetBlobContainer(containerName);
 
-            var token = new BlobContinuationToken();
+            _logger.LogInformation($"Deleting blobs from {blobContainer.Name}/{directoryPath}");
+
+            string continuationToken = null;
+
             do
             {
-                var result = await container.ListBlobsSegmentedAsync(
-                    directoryPath,
-                    true,
-                    BlobListingDetails.None,
-                    null,
-                    token,
-                    null,
-                    null
-                );
+                var blobPages = blobContainer.GetBlobsAsync(prefix: prefix)
+                    .AsPages(continuationToken);
 
-                token = result.ContinuationToken;
+                var deleteTasks = new List<Task>();
 
-                var items = result.Results
-                    .Select(item => item as CloudBlob)
-                    .Where(
-                        item =>
+                await foreach (Page<BlobItem> page in blobPages)
+                {
+                    foreach (var blob in page.Values)
+                    {
+                        if (blob == null)
                         {
-                            if (item == null)
-                            {
-                                return false;
-                            }
-
-                            var excluded = excludePattern != null &&
-                                           Regex.IsMatch(item.Name, excludePattern, RegexOptions.IgnoreCase);
-                            if (excluded)
-                            {
-                                _logger.LogInformation($"Ignoring {item.Name}");
-                            }
-
-                            return !excluded;
+                            break;
                         }
-                    );
 
-                await Task.WhenAll(
-                    items
-                        .Select(
-                            item =>
-                            {
-                                _logger.LogInformation($"Deleting {item.Name}");
-                                return item.DeleteIfExistsAsync();
-                            }
-                        )
-                );
-            } while (token != null);
+                        var excluded = excludePattern != null &&
+                                       Regex.IsMatch(blob.Name, excludePattern, RegexOptions.IgnoreCase);
+
+                        if (excluded)
+                        {
+                            _logger.LogInformation($"Ignoring blob {blobContainer.Name}/{blob.Name}");
+                            break;
+                        }
+
+                        _logger.LogInformation($"Deleting blob {blobContainer.Name}/{blob.Name}");
+
+                        deleteTasks.Add(blobContainer.DeleteBlobIfExistsAsync(blob.Name));
+                    }
+
+                    continuationToken = page.ContinuationToken;
+                }
+
+                await Task.WhenAll(deleteTasks);
+            } while (continuationToken != string.Empty);
         }
 
-        public async Task DeleteBlob(string containerName, string fullPath)
+        public async Task DeleteBlob(string containerName, string path)
         {
-            var blobContainer = await GetCloudBlobContainer(containerName);
-            await blobContainer.GetBlockBlobReference(fullPath).DeleteIfExistsAsync();
+            var blobContainer = await GetBlobContainer(containerName);
+            var blob = blobContainer.GetBlobClient(path);
+
+            _logger.LogInformation($"Deleting blob {containerName}/{path}");
+
+            await blob.DeleteIfExistsAsync();
         }
 
         public async Task UploadFile(
@@ -147,18 +167,21 @@ namespace GovUk.Education.ExploreEducationStatistics.Common.Services
             IFormFile file,
             IBlobStorageService.UploadFileOptions options = null)
         {
-            var blobContainer = await GetCloudBlobContainer(containerName);
-            var blob = blobContainer.GetBlockBlobReference(path);
-
-            blob.Properties.ContentType = file.ContentType;
-
-            if (options?.MetaValues != null)
-            {
-                AssignMetaValues(blob, options.MetaValues);
-            }
+            var blobContainer = await GetBlobContainer(containerName);
+            var blob = blobContainer.GetBlobClient(path);
 
             var tempFilePath = await UploadToTemporaryFile(file);
-            await blob.UploadFromFileAsync(tempFilePath);
+
+            _logger.LogInformation($"Uploading file to blob {containerName}/{path}");
+
+            await blob.UploadAsync(
+                tempFilePath,
+                new BlobHttpHeaders
+                {
+                    ContentType = file.ContentType,
+                },
+                options?.MetaValues
+            );
         }
 
         private static async Task<string> UploadToTemporaryFile(IFormFile file)
@@ -181,17 +204,24 @@ namespace GovUk.Education.ExploreEducationStatistics.Common.Services
             string contentType,
             IBlobStorageService.UploadStreamOptions options = null)
         {
-            var blobContainer = await GetCloudBlobContainer(containerName);
-            var blob = blobContainer.GetBlockBlobReference(path);
+            var blobContainer = await GetBlobContainer(containerName);
+            var blob = blobContainer.GetBlockBlobClient(path);
 
-            blob.Properties.ContentType = contentType;
+            _logger.LogInformation($"Uploading stream to blob {containerName}/{path}");
 
-            if (options?.MetaValues != null)
+            if (stream.CanSeek)
             {
-                AssignMetaValues(blob, options.MetaValues);
+                stream.Seek(0, SeekOrigin.Begin);
             }
 
-            await TransferManager.UploadAsync(stream, blob, new UploadOptions(), new SingleTransferContext());
+            await blob.UploadAsync(
+                stream,
+                new BlobHttpHeaders
+                {
+                    ContentType = contentType,
+                },
+                options?.MetaValues
+            );
         }
 
         public async Task UploadText(
@@ -201,17 +231,21 @@ namespace GovUk.Education.ExploreEducationStatistics.Common.Services
             string contentType,
             IBlobStorageService.UploadTextOptions options = null)
         {
-            var blobContainer = await GetCloudBlobContainer(containerName);
-            var blob = blobContainer.GetBlockBlobReference(path);
+            var blobContainer = await GetBlobContainer(containerName);
+            var blob = blobContainer.GetBlockBlobClient(path);
 
-            blob.Properties.ContentType = contentType;
+            _logger.LogInformation($"Uploading text to blob {containerName}/{path}");
 
-            if (options?.MetaValues != null)
-            {
-                AssignMetaValues(blob, options.MetaValues);
-            }
+            await using var stream = new MemoryStream(Encoding.UTF8.GetBytes(content));
 
-            await blob.UploadTextAsync(content);
+            await blob.UploadAsync(
+                stream,
+                new BlobHttpHeaders
+                {
+                    ContentType = contentType,
+                },
+                options?.MetaValues
+            );
         }
 
         /**
@@ -220,17 +254,17 @@ namespace GovUk.Education.ExploreEducationStatistics.Common.Services
          */
         public async Task<bool> IsAppendSupported(string containerName, string path)
         {
-            var blobContainer = await GetCloudBlobContainer(containerName);
-            var blob = blobContainer.GetAppendBlobReference(path);
+            var blobContainer = await GetBlobContainer(containerName);
+            var blob = blobContainer.GetAppendBlobClient(path);
 
-            if (blob.Exists())
+            if (await blob.ExistsAsync())
             {
                 return true;
             }
 
             try
             {
-                await blob.CreateOrReplaceAsync();
+                await blob.CreateIfNotExistsAsync();
                 return true;
             }
             catch (StorageException e)
@@ -240,68 +274,78 @@ namespace GovUk.Education.ExploreEducationStatistics.Common.Services
                     // Storage Emulator doesn't support AppendBlob
                     return false;
                 }
+
                 throw;
             }
         }
 
 
-        public async Task AppendText(
-            string containerName,
-            string path,
-            string content,
-            string contentType = null,
-            IBlobStorageService.AppendTextOptions options = null)
+        public async Task AppendText(string containerName, string path, string content)
         {
-            var blobContainer = await GetCloudBlobContainer(containerName);
-            var blob = blobContainer.GetAppendBlobReference(path);
+            var blobContainer = await GetBlobContainer(containerName);
+            var blob = blobContainer.GetAppendBlobClient(path);
 
-            blob.Properties.ContentType = contentType;
-
-            if (options?.MetaValues != null)
-            {
-                AssignMetaValues(blob, options.MetaValues);
-            }
-
-            await blob.AppendTextAsync(content);
+            await using var stream = new MemoryStream(Encoding.UTF8.GetBytes(content));
+            await blob.AppendBlockAsync(stream);
         }
 
-        private static void AssignMetaValues(CloudBlob blob, IDictionary<string, string> metaValues)
+        public async Task<Stream> DownloadToStream(string containerName, string path, Stream targetStream)
         {
-            foreach (var (key, value) in metaValues)
-            {
-                blob.Metadata[key] = value;
-            }
-        }
+            var blobContainer = await GetBlobContainer(containerName);
+            var blob = blobContainer.GetAppendBlobClient(path);
 
-        public async Task<Stream> StreamBlob(string containerName, string path)
-        {
-            var blobContainer = await GetCloudBlobContainer(containerName);
-            var blob = blobContainer.GetBlockBlobReference(path);
-
-            if (!blob.Exists())
+            if (!await blob.ExistsAsync())
             {
                 throw new FileNotFoundException($"Could not find file at {containerName}/{path}");
             }
 
-            var stream = new MemoryStream();
+            await blob.DownloadToAsync(targetStream);
 
-            await blob.DownloadToStreamAsync(stream);
-            stream.Seek(0, SeekOrigin.Begin);
+            if (targetStream.CanSeek)
+            {
+                targetStream.Seek(0, SeekOrigin.Begin);
+            }
 
-            return stream;
+            return targetStream;
+        }
+
+        public async Task<Stream> StreamBlob(string containerName, string path, int? bufferSize = null)
+        {
+            // Azure SDK v12 isn't compatible with how we want to use file
+            // streams i.e. they need to be seekable. This is particularly
+            // a problem for MIME type validation.
+            // See: https://github.com/Azure/azure-sdk-for-net/pull/15032
+            // TODO: Change to v12 implementation when possible
+            var blobContainer = await GetCloudBlobContainer(containerName);
+            var blob = blobContainer.GetBlockBlobReference(path);
+
+            if (!await blob.ExistsAsync())
+            {
+                throw new FileNotFoundException($"Could not find file at {containerName}/{path}");
+            }
+
+            if (bufferSize != null)
+            {
+                blob.StreamMinimumReadSizeInBytes = (int) bufferSize;
+            }
+
+            return await blob.OpenReadAsync();
         }
 
         public async Task<string> DownloadBlobText(string containerName, string path)
         {
-            var blobContainer = await GetCloudBlobContainer(containerName);
-            var blob = blobContainer.GetBlockBlobReference(path);
+            var blobContainer = await GetBlobContainer(containerName);
+            var blob = blobContainer.GetBlobClient(path);
 
-            if (!blob.Exists())
+            if (!await blob.ExistsAsync())
             {
                 throw new FileNotFoundException($"Could not find file at {containerName}/{path}");
             }
 
-            return await blob.DownloadTextAsync();
+            await using var stream = await blob.OpenReadAsync();
+            var streamReader = new StreamReader(stream);
+
+            return await streamReader.ReadToEndAsync();
         }
 
         public async Task<List<BlobInfo>> CopyDirectory(
@@ -311,10 +355,19 @@ namespace GovUk.Education.ExploreEducationStatistics.Common.Services
             string destinationDirectoryPath,
             IBlobStorageService.CopyDirectoryOptions options = null)
         {
+            _logger.LogInformation(
+                "Copying directory from {0}/{1} to {2}/{3}",
+                sourceContainerName,
+                sourceDirectoryPath,
+                destinationContainerName,
+                destinationDirectoryPath
+            );
+
             var sourceContainer = await GetCloudBlobContainer(sourceContainerName);
-            var destinationContainer = options?.DestinationConnectionString != null
-                ? await GetCloudBlobContainerAsync(options?.DestinationConnectionString, destinationContainerName)
-                : await GetCloudBlobContainer(destinationContainerName);
+            var destinationContainer = await GetCloudBlobContainer(
+                destinationContainerName,
+                connectionString: options?.DestinationConnectionString
+            );
 
             var sourceDirectory = sourceContainer.GetDirectoryReference(sourceDirectoryPath);
             var destinationDirectory = destinationContainer.GetDirectoryReference(destinationDirectoryPath);
@@ -376,14 +429,16 @@ namespace GovUk.Education.ExploreEducationStatistics.Common.Services
             var source = (CloudBlockBlob) e.Source;
             var destination = (CloudBlockBlob) e.Destination;
 
-            allFilesStream.Add(new BlobInfo(
-                path: destination.Name,
-                size: GetSize(source),
-                contentType: source.Properties.ContentType,
-                length: source.Properties.Length,
-                meta: source.Metadata,
-                created: source.Properties.Created
-            ));
+            allFilesStream.Add(
+                new BlobInfo(
+                    path: destination.Name,
+                    size: GetSize(source.Properties.Length),
+                    contentType: source.Properties.ContentType,
+                    contentLength: source.Properties.Length,
+                    meta: source.Metadata,
+                    created: source.Properties.Created
+                )
+            );
 
             _logger.LogInformation(
                 "Transferred {0}/{1} -> {2}/{3}",
@@ -400,7 +455,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Common.Services
             var destination = (CloudBlockBlob) e.Destination;
 
             _logger.LogInformation(
-                "Failed to transfer {0}/{1} -> {2}. Error message: {3}",
+                "Failed to transfer {0}/{1} -> {2}/{3}. Error message: {4}",
                 source.Container.Name,
                 source.Name,
                 destination.Container.Name,
@@ -423,17 +478,31 @@ namespace GovUk.Education.ExploreEducationStatistics.Common.Services
             );
         }
 
+        /**
+         * We still need to use the older CloudBlobContainer implementation as we
+         * need to interop with DataMovement.TransferManager which hasn't been
+         * updated to work with Azure SDK 12 yet.
+         */
         private async Task<CloudBlobContainer> GetCloudBlobContainer(
             string containerName,
-            BlobContainerPermissions permissions = null,
-            BlobRequestOptions requestOptions = null)
+            string connectionString = null)
         {
-            return await GetCloudBlobContainerAsync(
-                _storageConnectionString,
-                containerName,
-                permissions,
-                requestOptions
-            );
+            var storageAccount = CloudStorageAccount.Parse(connectionString ?? _connectionString);
+            var blobClient = storageAccount.CreateCloudBlobClient();
+
+            var blobContainer = blobClient.GetContainerReference(containerName);
+            await blobContainer.CreateIfNotExistsAsync();
+
+            return blobContainer;
+        }
+
+        private async Task<BlobContainerClient> GetBlobContainer(string containerName)
+        {
+            var container = _client.GetBlobContainerClient(containerName);
+
+            await container.CreateIfNotExistsAsync();
+
+            return container;
         }
     }
 }

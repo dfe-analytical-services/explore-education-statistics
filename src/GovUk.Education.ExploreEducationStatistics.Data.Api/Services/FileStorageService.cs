@@ -1,10 +1,9 @@
 using System.Collections.Generic;
+using System.IO;
 using System.Threading.Tasks;
 using GovUk.Education.ExploreEducationStatistics.Common.Extensions;
 using GovUk.Education.ExploreEducationStatistics.Common.Model;
-using GovUk.Education.ExploreEducationStatistics.Common.Services;
 using GovUk.Education.ExploreEducationStatistics.Common.Services.Interfaces;
-using GovUk.Education.ExploreEducationStatistics.Common.Utils;
 using GovUk.Education.ExploreEducationStatistics.Data.Api.Services.Interfaces;
 using Microsoft.AspNetCore.Mvc;
 
@@ -51,7 +50,8 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Api.Services
         {
             var blob = await _blobStorageService.GetBlob(containerName, path);
 
-            await using var stream = await _blobStorageService.StreamBlob(containerName, path);
+            var stream = new MemoryStream();
+            await _blobStorageService.DownloadToStream(containerName, path, stream);
 
             return new FileStreamResult(stream, blob.ContentType)
             {
@@ -59,7 +59,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Api.Services
             };
         }
 
-        public Task AppendFromStreamAsync(
+        public Task AppendText(
             string containerName,
             string path,
             string contentType,
@@ -68,8 +68,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Api.Services
             return _blobStorageService.AppendText(
                 containerName: containerName,
                 path: path,
-                content: content,
-                contentType: contentType
+                content: content
             );
         }
 

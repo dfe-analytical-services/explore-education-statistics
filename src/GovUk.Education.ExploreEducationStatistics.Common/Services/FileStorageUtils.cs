@@ -1,14 +1,10 @@
 ﻿using System;
-using System.Collections;
 using System.Collections.Generic;
 using System.Diagnostics.CodeAnalysis;
-using System.Globalization;
 using System.IO;
 using System.Text;
 using System.Threading.Tasks;
 using GovUk.Education.ExploreEducationStatistics.Common.Extensions;
-using GovUk.Education.ExploreEducationStatistics.Common.Model;
-using GovUk.Education.ExploreEducationStatistics.Common.Utils;
 using Microsoft.Azure.Storage;
 using Microsoft.Azure.Storage.Blob;
 using static GovUk.Education.ExploreEducationStatistics.Common.Services.FileStoragePathUtils;
@@ -95,9 +91,9 @@ namespace GovUk.Education.ExploreEducationStatistics.Common.Services
             return blob;
         }
 
-        public static string GetSize(CloudBlob blob)
+        public static string GetSize(long contentLength)
         {
-            var fileSize = blob.Properties.Length;
+            var fileSize = contentLength;
             var unit = FileSizeUnit.B;
             while (fileSize >= 1024 && unit < FileSizeUnit.Tb)
             {

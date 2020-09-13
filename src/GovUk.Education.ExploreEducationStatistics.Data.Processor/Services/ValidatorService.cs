@@ -88,13 +88,11 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Processor.Services
                 .OnSuccess(
                     async () =>
                     {
-                        var dataFileTable = DataTableUtils.CreateFromStream(
-                            await _fileStorageService.StreamBlob(subjectData.DataBlob)
-                        );
+                        await using var dataFileStream = await _fileStorageService.StreamBlob(subjectData.DataBlob);
+                        var dataFileTable = DataTableUtils.CreateFromStream(dataFileStream);
 
-                        var metaFileTable = DataTableUtils.CreateFromStream(
-                            await _fileStorageService.StreamBlob(subjectData.MetaBlob)
-                        );
+                        await using var metaFileStream = await _fileStorageService.StreamBlob(subjectData.MetaBlob);
+                        var metaFileTable = DataTableUtils.CreateFromStream(metaFileStream);
 
                         return await ValidateMetaHeader(metaFileTable.Columns)
                             .OnSuccess(() => ValidateMetaRows(metaFileTable.Columns, metaFileTable.Rows))
@@ -126,7 +124,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Processor.Services
             }
             else
             {
-                var stream = await _fileStorageService.StreamBlob(blob);
+                await using var stream = await _fileStorageService.StreamBlob(blob);
 
                 using var reader = new StreamReader(stream);
                 using var csv = new CsvReader(reader, CultureInfo.InvariantCulture);
@@ -300,15 +298,21 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Processor.Services
 
         private async Task<bool> IsCsvFile(BlobInfo blob)
         {
+            await using var mimeTypeStream = await _fileStorageService.StreamBlob(blob);
+
             var hasMatchingMimeType = await _fileTypeService.HasMatchingMimeType(
-                await _fileStorageService.StreamBlob(blob),
+                mimeTypeStream,
                 AllowedMimeTypesByFileType[ReleaseFileTypes.Data]
             );
 
-            return hasMatchingMimeType && _fileTypeService.HasMatchingEncodingType(
-                await _fileStorageService.StreamBlob(blob),
-                CsvEncodingTypes
-            );
+            if (!hasMatchingMimeType)
+            {
+                return false;
+            }
+
+            await using var encodingStream = await _fileStorageService.StreamBlob(blob);
+
+            return _fileTypeService.HasMatchingEncodingType(encodingStream, CsvEncodingTypes);
         }
     }
 }

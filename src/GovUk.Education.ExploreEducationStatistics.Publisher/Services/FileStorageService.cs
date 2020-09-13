@@ -248,8 +248,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Publisher.Services
                 var zipEntry = new ZipEntry(file.FileName);
                 zipOutputStream.PutNextEntry(zipEntry);
 
-                await using var blobStream = await _publicBlobStorageService.StreamBlob(containerName, file.Path);
-                await blobStream.CopyToAsync(zipOutputStream);
+                await _publicBlobStorageService.DownloadToStream(containerName, file.Path, zipOutputStream);
             }
 
             zipOutputStream.Finish();

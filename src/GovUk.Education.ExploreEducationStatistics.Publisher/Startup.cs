@@ -1,5 +1,6 @@
 ﻿using System;
 using AutoMapper;
+using Azure.Storage.Blobs;
 using GovUk.Education.ExploreEducationStatistics.Common.Functions;
 using GovUk.Education.ExploreEducationStatistics.Common.Services;
 using GovUk.Education.ExploreEducationStatistics.Common.Services.Interfaces;
@@ -35,22 +36,29 @@ namespace GovUk.Education.ExploreEducationStatistics.Publisher
                     options.UseSqlServer(ConnectionUtils.GetAzureSqlConnectionString("ContentDb")))
                 .AddDbContext<StatisticsDbContext>(options =>
                     options.UseSqlServer(ConnectionUtils.GetAzureSqlConnectionString("StatisticsDb")))
-                .AddScoped<IFileStorageService, FileStorageService>(
+                .AddSingleton<IFileStorageService, FileStorageService>(
                     provider =>
                     {
+                        var privateStorageConnectionString = GetConfigurationValue(provider, "CoreStorage");
+                        var publicStorageConnectionString = GetConfigurationValue(provider, "PublicStorage");
+                        var publisherStorageConnectionString = GetConfigurationValue(provider, "PublisherStorage");
+
                         var privateBlobStorageService = new BlobStorageService(
-                            GetConfigurationValue(provider, "CoreStorage"),
+                            privateStorageConnectionString,
+                            new BlobServiceClient(privateStorageConnectionString),
                             provider.GetRequiredService<ILogger<BlobStorageService>>());
+
                         var publicBlobStorageService = new BlobStorageService(
-                            GetConfigurationValue(provider, "PublicStorage"),
+                            publicStorageConnectionString,
+                            new BlobServiceClient(publicStorageConnectionString),
                             provider.GetRequiredService<ILogger<BlobStorageService>>());
 
                         return new FileStorageService(
                             privateBlobStorageService,
                             publicBlobStorageService,
-                            GetConfigurationValue(provider, "PublicStorage"),
-                            GetConfigurationValue(provider, "PublisherStorage"),
-                            provider.GetRequiredService<ILogger<FileStorageService>>());
+                            publicStorageConnectionString: publicStorageConnectionString,
+                            publisherStorageConnectionString: publisherStorageConnectionString,
+                            logger: provider.GetRequiredService<ILogger<FileStorageService>>());
                     })
                 .AddScoped<IPublishingService, PublishingService>()
                 .AddScoped<IContentService, ContentService>()

@@ -1,5 +1,6 @@
 ﻿using System;
 using AutoMapper;
+using Azure.Storage.Blobs;
 using GovUk.Education.ExploreEducationStatistics.Common.Services;
 using GovUk.Education.ExploreEducationStatistics.Common.Services.Interfaces;
 using GovUk.Education.ExploreEducationStatistics.Data.Importer.Services;
@@ -25,12 +26,18 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Processor
             var serviceProvider = builder.Services
                 .AddAutoMapper(typeof(Startup).Assembly)
                 .AddSingleton<IBlobStorageService, BlobStorageService>(
-                    provider => new BlobStorageService(
-                        GetConfigurationValue(provider, "CoreStorage"),
-                        provider.GetRequiredService<ILogger<BlobStorageService>>()
-                    )
-                )
-                .AddTransient<IFileStorageService, FileStorageService>()
+                    provider =>
+                    {
+                        var connectionString = GetConfigurationValue(provider, "CoreStorage");
+
+                        var blobStorageService = new BlobStorageService(
+                            connectionString,
+                            new BlobServiceClient(connectionString),
+                            provider.GetRequiredService<ILogger<IBlobStorageService>>()
+                        );
+                        return blobStorageService;
+                    })
+                .AddSingleton<IFileStorageService, FileStorageService>()
                 .AddTransient<IFileImportService, FileImportService>()
                 .AddTransient<IImporterService, ImporterService>()
                 .AddTransient<ISplitFileService, SplitFileService>()

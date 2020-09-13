@@ -1,4 +1,5 @@
 ﻿using System.Diagnostics.CodeAnalysis;
+using Azure.Storage.Blobs;
 using GovUk.Education.ExploreEducationStatistics.Common.Services;
 using GovUk.Education.ExploreEducationStatistics.Common.Services.Interfaces;
 using GovUk.Education.ExploreEducationStatistics.Publisher.Model;
@@ -6,6 +7,7 @@ using Microsoft.AspNetCore.Builder;
 using Microsoft.AspNetCore.Hosting;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Rewrite;
+using Microsoft.Extensions.Azure;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Hosting;
@@ -47,11 +49,16 @@ namespace GovUk.Education.ExploreEducationStatistics.Content.Api
             });
 
             services.AddCors();
-            services.AddTransient<IBlobStorageService, BlobStorageService>(
-                s => new BlobStorageService(
-                    Configuration.GetValue<string>("PublicStorage"),
-                    s.GetRequiredService<ILogger<BlobStorageService>>()
-                )
+            services.AddSingleton<IBlobStorageService, BlobStorageService>(provider =>
+                {
+                    var connectionString = Configuration.GetValue<string>("PublicStorage");
+
+                    return new BlobStorageService(
+                        connectionString,
+                        new BlobServiceClient(connectionString),
+                        provider.GetRequiredService<ILogger<BlobStorageService>>()
+                    );
+                }
             );
         }
 
