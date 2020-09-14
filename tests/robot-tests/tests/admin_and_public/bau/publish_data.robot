@@ -41,7 +41,7 @@ Approve release
     user clicks button  Edit release status
     user waits until h2 is visible  Edit release status
 
-    user clicks element   css:input[data-testid="Approved for publication"]
+    user clicks radio   Approved for publication
     user enters text into element  id:releaseStatusForm-internalReleaseNote  Approved by UI tests - latest release
     user clicks element  css:input[data-testid="As soon as possible"]
 
@@ -172,7 +172,7 @@ Approve new release
     user clicks button  Edit release status
     user waits until h2 is visible  Edit release status
 
-    user clicks element   css:input[data-testid="Approved for publication"]
+    user clicks radio   Approved for publication
     user enters text into element  id:releaseStatusForm-internalReleaseNote  Approved by UI tests
     user clicks element  css:input[data-testid="As soon as possible"]
     user enters text into element  id:releaseStatusForm-nextReleaseDate-month   12
