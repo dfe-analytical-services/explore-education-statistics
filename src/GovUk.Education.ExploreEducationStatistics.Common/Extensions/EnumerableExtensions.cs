@@ -99,10 +99,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Common.Extensions
 
         public static async Task ForEachAsync<T>(this IEnumerable<T> list, Func<T, Task> func)
         {
-            foreach (var item in list)
-            {
-                await func(item);
-            }
+            await Task.WhenAll(list.Select(func));
         }
 
         public static IEnumerable<(T item, int index)> WithIndex<T>(this IEnumerable<T> self) =>
