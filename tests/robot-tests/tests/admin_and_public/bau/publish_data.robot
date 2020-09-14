@@ -27,7 +27,7 @@ Verify publication
 Create release
     [Tags]  HappyPath
     user opens accordion section  ${PUBLICATION_NAME}
-    user clicks element  css:[data-testid="Create new release link for ${PUBLICATION_NAME}"]
+    user clicks testid element   Create new release link for ${PUBLICATION_NAME}
     user creates release for publication  ${PUBLICATION_NAME}  Financial Year   3000
 
 Go to "Release status" tab
@@ -68,7 +68,7 @@ Create another release for the same publication
     [Tags]  HappyPath
     user selects theme "Test theme" and topic "${TOPIC_NAME}" from the admin dashboard
     user opens accordion section   ${PUBLICATION_NAME}
-    user clicks element  css:[data-testid="Create new release link for ${PUBLICATION_NAME}"]
+    user clicks testid element   Create new release link for ${PUBLICATION_NAME}
     user creates release for publication  ${PUBLICATION_NAME}  Financial Year  3001
 
 Verify new release summary
@@ -305,7 +305,7 @@ Validate table
 
 Select table highlight from subjects step
     [Tags]  HappyPath
-    user clicks element  css:[data-testid="wizardStep-2-goToButton"]
+    user clicks testid element  wizardStep-2-goToButton
     user waits until h1 is visible  Go back to previous step
     user clicks button  Confirm
 

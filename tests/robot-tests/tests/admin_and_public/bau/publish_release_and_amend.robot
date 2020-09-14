@@ -30,7 +30,7 @@ Verify new publication
 Create new release
     [Tags]  HappyPath
     user opens accordion section  ${PUBLICATION_NAME}
-    user clicks element  css:[data-testid="Create new release link for ${PUBLICATION_NAME}"]
+    user clicks testid element   Create new release link for ${PUBLICATION_NAME}
     user creates release for publication  ${PUBLICATION_NAME}  Financial Year  3000
 
 Verify release summary
@@ -109,7 +109,7 @@ Verify release URL and page caption
 
 Verify publish and update dates
     [Tags]  HappyPath
-    user waits until element contains  css:[data-testid="published-date"]   ${PUBLISH_DATE_DAY} ${PUBLISH_DATE_MONTH} ${PUBLISH_DATE_YEAR}
+    user checks testid element contains   published-date   ${PUBLISH_DATE_DAY} ${PUBLISH_DATE_MONTH} ${PUBLISH_DATE_YEAR}
     user waits until element contains  css:[data-testid="next-update"] time   December 3001
 
 Verify accordions are correct
@@ -360,7 +360,7 @@ Verify amendment is displayed as the latest release
 
 Verify amendment publish and update dates
     [Tags]  HappyPath
-    user waits until element contains  css:[data-testid="published-date"]   ${PUBLISH_DATE_DAY} ${PUBLISH_DATE_MONTH} ${PUBLISH_DATE_YEAR}
+    user checks testid element contains    published-date   ${PUBLISH_DATE_DAY} ${PUBLISH_DATE_MONTH} ${PUBLISH_DATE_YEAR}
     user waits until element contains  css:[data-testid="next-update"] time   January 3002
 
 Verify amendment files

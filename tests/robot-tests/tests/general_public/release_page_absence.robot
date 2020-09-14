@@ -30,11 +30,11 @@ Validate URL
 
 Validate Published date
     [Tags]     HappyPath    NotAgainstPreProd    Failing
-    user waits until element contains  css:[data-testid="published-date"]   25 April 2018
+    user checks testid element contains   published-date   25 April 2018
 
 Validate Next update date
     [Tags]     HappyPath    NotAgainstPreProd
-    user waits until element contains  css:[data-testid="next-update"]      22 March 2019
+    user checks testid element contains   next-update      22 March 2019
 
 Validate Email alerts link
     [Tags]     HappyPath
@@ -43,7 +43,7 @@ Validate Email alerts link
 Validate "About these statistics" -- "For Academic Year:"
     [Documentation]  DFE-197 DFE-845
     [Tags]  HappyPath
-    user waits until element contains  css:[data-testid="release-name"]    2016/17
+    user checks testid element contains   release-name    2016/17
 
 Validate "About these statistics" -- Number of other releases
     [Tags]  HappyPath
