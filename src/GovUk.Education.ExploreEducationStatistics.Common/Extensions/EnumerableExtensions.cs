@@ -20,6 +20,7 @@
 using System;
 using System.Collections.Generic;
 using System.Linq;
+using System.Threading.Tasks;
 
 namespace GovUk.Education.ExploreEducationStatistics.Common.Extensions
 {
@@ -94,6 +95,11 @@ namespace GovUk.Education.ExploreEducationStatistics.Common.Extensions
                     yield return resultSelector(bucket);
                 }
             }
+        }
+
+        public static async Task ForEachAsync<T>(this IEnumerable<T> list, Func<T, Task> func)
+        {
+            await Task.WhenAll(list.Select(func));
         }
 
         public static IEnumerable<(T item, int index)> WithIndex<T>(this IEnumerable<T> self) =>

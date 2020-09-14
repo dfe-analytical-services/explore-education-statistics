@@ -11,5 +11,9 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Services.Interfaces
         Task<Either<ActionResult, ReplacementPlanViewModel>> GetReplacementPlan(
             Guid originalSubjectId,
             Guid replacementSubjectId);
+        
+        Task<Either<ActionResult, Unit>> Replace(
+            Guid originalSubjectId,
+            Guid replacementSubjectId);
     }
 }
