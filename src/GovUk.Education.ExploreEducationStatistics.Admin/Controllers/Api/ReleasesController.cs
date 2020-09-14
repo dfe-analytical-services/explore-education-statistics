@@ -270,16 +270,18 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Controllers.Api
         [HttpPost("release/data/replacement-plan")]
         public async Task<ActionResult<ReplacementPlanViewModel>> GetReplacementPlan(ReplacementPlanRequest request)
         {
-            return await _replacementService
-                .GetReplacementPlan(request.OriginalSubjectId.Value, request.ReplacementSubjectId.Value)
+            return await _replacementService.GetReplacementPlan(
+                    request.OriginalReleaseFileReferenceId.Value,
+                    request.ReplacementReleaseFileReferenceId.Value)
                 .HandleFailuresOrOk();
         }
 
         [HttpPost("release/data/replace")]
         public async Task<ActionResult<Unit>> Replace(ReplacementPlanRequest request)
         {
-            return await _replacementService
-                .Replace(request.OriginalSubjectId.Value, request.ReplacementSubjectId.Value)
+            return await _replacementService.Replace(
+                    request.OriginalReleaseFileReferenceId.Value,
+                    request.ReplacementReleaseFileReferenceId.Value)
                 .HandleFailuresOrOk();
         }
 

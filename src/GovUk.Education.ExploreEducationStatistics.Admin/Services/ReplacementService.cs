@@ -23,6 +23,7 @@ using static GovUk.Education.ExploreEducationStatistics.Admin.Validators.Validat
 using static GovUk.Education.ExploreEducationStatistics.Common.Services.EnumUtil;
 using static GovUk.Education.ExploreEducationStatistics.Data.Model.Services.LocationService;
 using IFootnoteService = GovUk.Education.ExploreEducationStatistics.Data.Model.Services.Interfaces.IFootnoteService;
+using IReleaseService = GovUk.Education.ExploreEducationStatistics.Admin.Services.Interfaces.IReleaseService;
 using Unit = GovUk.Education.ExploreEducationStatistics.Common.Model.Unit;
 
 namespace GovUk.Education.ExploreEducationStatistics.Admin.Services
@@ -35,8 +36,9 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Services
         private readonly IIndicatorService _indicatorService;
         private readonly ILocationService _locationService;
         private readonly IFootnoteService _footnoteService;
+        private readonly IReleaseService _releaseService;
         private readonly ITimePeriodService _timePeriodService;
-        private readonly IPersistenceHelper<StatisticsDbContext> _persistenceHelper;
+        private readonly IPersistenceHelper<ContentDbContext> _contentPersistenceHelper;
 
         public ReplacementService(ContentDbContext contentDbContext,
             StatisticsDbContext statisticsDbContext,
@@ -44,8 +46,9 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Services
             IIndicatorService indicatorService,
             ILocationService locationService,
             IFootnoteService footnoteService,
+            IReleaseService releaseService,
             ITimePeriodService timePeriodService,
-            IPersistenceHelper<StatisticsDbContext> persistenceHelper)
+            IPersistenceHelper<ContentDbContext> contentPersistenceHelper)
         {
             _contentDbContext = contentDbContext;
             _statisticsDbContext = statisticsDbContext;
@@ -53,31 +56,43 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Services
             _indicatorService = indicatorService;
             _locationService = locationService;
             _footnoteService = footnoteService;
+            _releaseService = releaseService;
             _timePeriodService = timePeriodService;
-            _persistenceHelper = persistenceHelper;
+            _contentPersistenceHelper = contentPersistenceHelper;
         }
 
-        public async Task<Either<ActionResult, ReplacementPlanViewModel>> GetReplacementPlan(Guid originalSubjectId,
-            Guid replacementSubjectId)
+        public async Task<Either<ActionResult, ReplacementPlanViewModel>> GetReplacementPlan(
+            Guid originalReleaseFileReferenceId,
+            Guid replacementReleaseFileReferenceId)
         {
-            return await _persistenceHelper
-                .CheckEntityExists<Subject>(originalSubjectId)
-                .OnSuccessDo(() => _persistenceHelper.CheckEntityExists<Subject>(replacementSubjectId))
-                .OnSuccess(() => GetReleaseId(originalSubjectId, replacementSubjectId))
-                .OnSuccess(releaseId =>
+            return await CheckReleaseFileReferenceExists(originalReleaseFileReferenceId)
+                .OnSuccess(async originalReleaseFileReference =>
                 {
-                    var replacementSubjectMeta = GetReplacementSubjectMeta(replacementSubjectId);
+                    return await CheckReleaseFileReferenceExists(replacementReleaseFileReferenceId)
+                        .OnSuccessDo(replacementReleaseFileReference =>
+                            CheckFilesAreForRelatedReleases(originalReleaseFileReference,
+                                replacementReleaseFileReference))
+                        .OnSuccess(replacementReleaseFileReference =>
+                        {
+                            var releaseId = replacementReleaseFileReference.ReleaseId;
+                            var originalSubjectId = originalReleaseFileReference.SubjectId.Value;
+                            var replacementSubjectId = replacementReleaseFileReference.SubjectId.Value;
 
-                    var dataBlocks = ValidateDataBlocks(releaseId, originalSubjectId, replacementSubjectMeta);
-                    var footnotes = ValidateFootnotes(releaseId, originalSubjectId, replacementSubjectMeta);
+                            var replacementSubjectMeta = GetReplacementSubjectMeta(replacementSubjectId);
 
-                    return new ReplacementPlanViewModel(dataBlocks, footnotes);
+                            var dataBlocks = ValidateDataBlocks(releaseId, originalSubjectId, replacementSubjectMeta);
+                            var footnotes = ValidateFootnotes(releaseId, originalSubjectId, replacementSubjectMeta);
+
+                            return new ReplacementPlanViewModel(dataBlocks, footnotes, originalSubjectId,
+                                replacementSubjectId);
+                        });
                 });
         }
 
-        public async Task<Either<ActionResult, Unit>> Replace(Guid originalSubjectId, Guid replacementSubjectId)
+        public async Task<Either<ActionResult, Unit>> Replace(Guid originalReleaseFileReferenceId,
+            Guid replacementReleaseFileReferenceId)
         {
-            return await GetReplacementPlan(originalSubjectId, replacementSubjectId)
+            return await GetReplacementPlan(originalReleaseFileReferenceId, replacementReleaseFileReferenceId)
                 .OnSuccess(async replacementPlan =>
                 {
                     if (!replacementPlan.Valid)
@@ -86,9 +101,9 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Services
                     }
 
                     await replacementPlan.DataBlocks.ForEachAsync(plan =>
-                        ReplaceLinksForDataBlock(plan, replacementSubjectId));
+                        ReplaceLinksForDataBlock(plan, replacementPlan.ReplacementSubjectId));
                     await replacementPlan.Footnotes.ForEachAsync(plan =>
-                        ReplaceLinksForFootnote(plan, originalSubjectId, replacementSubjectId));
+                        ReplaceLinksForFootnote(plan, replacementPlan.OriginalSubjectId, replacementPlan.ReplacementSubjectId));
 
                     await _contentDbContext.SaveChangesAsync();
                     await _statisticsDbContext.SaveChangesAsync();
@@ -97,29 +112,35 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Services
                 });
         }
 
-        private async Task<Either<ActionResult, Guid>> GetReleaseId(Guid originalSubjectId, Guid replacementSubjectId)
+        private async Task<Either<ActionResult, ReleaseFileReference>> CheckReleaseFileReferenceExists(Guid id)
         {
-            // Get the latest Release referencing the original Subject 
-            var originalReleaseSubjectId = await (
-                    from releaseSubject in _statisticsDbContext.ReleaseSubject
-                    join newerVersion in _statisticsDbContext.Release on releaseSubject.ReleaseId equals newerVersion
+            return await _contentPersistenceHelper.CheckEntityExists<ReleaseFileReference>(id)
+                .OnSuccess(releaseFileReference => releaseFileReference.ReleaseFileType != ReleaseFileTypes.Data
+                    ? new Either<ActionResult, ReleaseFileReference>(
+                        ValidationActionResult(ReplacementFileTypesMustBeData))
+                    : releaseFileReference);
+        }
+        
+        private async Task<Either<ActionResult, Unit>> CheckFilesAreForRelatedReleases(ReleaseFileReference originalReleaseFileReference,
+            ReleaseFileReference replacementReleaseFileReference)
+        {
+            // Get the latest Release referencing the original ReleaseFileReference
+            var originalReleaseId = await (
+                    from releaseFile in _contentDbContext.ReleaseFiles
+                    join newerVersion in _contentDbContext.Releases on releaseFile.ReleaseId equals newerVersion
                         .PreviousVersionId into newerVersionGroup
                     from newerVersion in newerVersionGroup.DefaultIfEmpty()
-                    where releaseSubject.SubjectId == originalSubjectId && newerVersion == null
-                    select releaseSubject.ReleaseId)
+                    where releaseFile.ReleaseFileReferenceId == originalReleaseFileReference.Id && newerVersion == null
+                    select releaseFile.ReleaseId)
                 .SingleAsync();
 
-            // Get the only Release which should be referencing the replacement Subject
-            var replacementReleaseId = (await _statisticsDbContext.ReleaseSubject
-                    .SingleAsync(releaseSubject => releaseSubject.SubjectId == replacementSubjectId))
-                .ReleaseId;
-
-            if (originalReleaseSubjectId != replacementReleaseId)
+            // Check the replacement is for the same Release
+            if (replacementReleaseFileReference.ReleaseId != originalReleaseId)
             {
-                return ValidationActionResult(ReplacementDataFileMustBeForSameRelease);
+                return ValidationActionResult(ReplacementDataFileMustBeForRelatedRelease);
             }
 
-            return originalReleaseSubjectId;
+            return Unit.Instance;
         }
 
         private ReplacementSubjectMeta GetReplacementSubjectMeta(Guid subjectId)

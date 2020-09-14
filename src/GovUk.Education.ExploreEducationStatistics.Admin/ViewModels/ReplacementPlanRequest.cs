@@ -6,9 +6,9 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.ViewModels
     public class ReplacementPlanRequest
     {
         [Required]
-        public Guid? OriginalSubjectId { get; set; }
+        public Guid? OriginalReleaseFileReferenceId { get; set; }
         
         [Required]
-        public Guid? ReplacementSubjectId { get; set; }
+        public Guid? ReplacementReleaseFileReferenceId { get; set; }
     }
 }

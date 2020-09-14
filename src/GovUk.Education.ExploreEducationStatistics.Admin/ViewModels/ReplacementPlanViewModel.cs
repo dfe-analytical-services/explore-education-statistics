@@ -10,12 +10,18 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.ViewModels
     {
         public IEnumerable<DataBlockReplacementPlanViewModel> DataBlocks { get; }
         public IEnumerable<FootnoteReplacementPlanViewModel> Footnotes { get; }
+        public Guid OriginalSubjectId { get; }
+        public Guid ReplacementSubjectId { get; }
 
         public ReplacementPlanViewModel(IEnumerable<DataBlockReplacementPlanViewModel> dataBlocks,
-            IEnumerable<FootnoteReplacementPlanViewModel> footnotes)
+            IEnumerable<FootnoteReplacementPlanViewModel> footnotes,
+            Guid originalSubjectId,
+            Guid replacementSubjectId)
         {
             DataBlocks = dataBlocks;
             Footnotes = footnotes;
+            OriginalSubjectId = originalSubjectId;
+            ReplacementSubjectId = replacementSubjectId;
         }
 
         public bool Valid => DataBlocks.All(info => info.Valid)
