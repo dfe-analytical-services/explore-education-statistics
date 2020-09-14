@@ -232,7 +232,7 @@ Approve release
 
     user clicks radio   Approved for publication
     user enters text into element  id:releaseStatusForm-internalReleaseNote  Approved by UI tests
-    user clicks element  css:input[data-testid="As soon as possible"]
+    user clicks radio   As soon as possible
     user enters text into element  id:releaseStatusForm-nextReleaseDate-month   12
     user enters text into element  id:releaseStatusForm-nextReleaseDate-year    3001
 
