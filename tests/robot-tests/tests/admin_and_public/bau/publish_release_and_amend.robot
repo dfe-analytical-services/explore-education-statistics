@@ -105,7 +105,7 @@ Navigate to newly published release page
 Verify release URL and page caption
     [Tags]  HappyPath
     user checks url contains  %{PUBLIC_URL}/find-statistics/ui-tests-publish-release-${RUN_IDENTIFIER}
-    user waits until element contains  css:[data-testid="page-title-caption"]  Financial Year 3000-01
+    user waits until page contains title caption  Financial Year 3000-01
 
 Verify publish and update dates
     [Tags]  HappyPath
@@ -143,7 +143,7 @@ Create amendment
     user waits until h1 is visible  Confirm you want to amend this live release
     user clicks button   Confirm
     user waits until h1 is visible  ${PUBLICATION_NAME}
-    user waits until page contains element   xpath://*[@data-testid="page-title-caption" and text()="Amend release"]
+    user waits until page contains title caption  Amend release
 
 Upload subject
     [Tags]  HappyPath

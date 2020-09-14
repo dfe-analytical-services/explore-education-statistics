@@ -215,7 +215,7 @@ Navigate to published release page
 
 Check latest release is correct
     [Tags]  HappyPath
-    user checks testid element contains  page-title-caption    Financial Year 3001-02
+    user waits until page contains title caption  Financial Year 3001-02
     user checks page contains   This is the latest data
     user checks page contains   See 1 other releases
 
@@ -227,7 +227,8 @@ Check latest release is correct
 
 Check other release is correct
     [Tags]  HappyPath
-    user checks testid element contains   page-title-caption   Financial Year 3000-01
+    user waits until page contains title caption  Financial Year 3000-01
+
     user waits until page contains link    View latest data: Financial Year 3001-02
     user checks page contains   See 1 other releases
     user checks page contains other release    Financial Year 3001-02
