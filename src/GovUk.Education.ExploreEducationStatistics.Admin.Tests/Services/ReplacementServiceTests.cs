@@ -1890,9 +1890,8 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
                     }
                 });
 
-            mocks.ReleaseService.Setup(service =>
-                    service.RemoveDataFilesAsync(contentReleaseVersion1.Id, originalReleaseFileReference.Filename,
-                        originalSubject.Name))
+            mocks.ReleaseService.Setup(service => service.RemoveDataFilesAsync(
+                    contentReleaseVersion2.Id, originalReleaseFileReference.Filename, originalSubject.Name))
                 .ReturnsAsync(Unit.Instance);
 
             mocks.TimePeriodService.Setup(service => service.GetTimePeriods(replacementSubject.Id))
@@ -1937,7 +1936,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
                     replacementReleaseFileReference.Id);
 
                 mocks.ReleaseService.Verify(
-                    mock => mock.RemoveDataFilesAsync(contentReleaseVersion1.Id, originalReleaseFileReference.Filename,
+                    mock => mock.RemoveDataFilesAsync(contentReleaseVersion2.Id, originalReleaseFileReference.Filename,
                         originalSubject.Name), Times.Once());
 
                 mocks.ReleaseService.VerifyNoOtherCalls();

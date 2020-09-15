@@ -103,19 +103,18 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Services
                     await replacementPlan.DataBlocks.ForEachAsync(plan =>
                         ReplaceLinksForDataBlock(plan, replacementPlan.ReplacementSubjectId));
                     await replacementPlan.Footnotes.ForEachAsync(plan =>
-                        ReplaceLinksForFootnote(plan, replacementPlan.OriginalSubjectId, replacementPlan.ReplacementSubjectId));
+                        ReplaceLinksForFootnote(plan, replacementPlan.OriginalSubjectId,
+                            replacementPlan.ReplacementSubjectId));
 
                     await _contentDbContext.SaveChangesAsync();
                     await _statisticsDbContext.SaveChangesAsync();
 
-                    var originalFileReference = await _contentDbContext.ReleaseFileReferences
-                        .FindAsync(originalReleaseFileReferenceId);
+                    // This Release Id can be found on the ReplacementFileReference
+                    var releaseId = (await _contentDbContext.ReleaseFileReferences
+                        .FindAsync(replacementReleaseFileReferenceId)).ReleaseId;
 
-                    var originalSubject =
-                        await _statisticsDbContext.Subject.FindAsync(replacementPlan.OriginalSubjectId);
-
-                    return await _releaseService.RemoveDataFilesAsync(originalFileReference.ReleaseId,
-                        originalFileReference.Filename, originalSubject.Name);
+                    return await RemoveSubjectAndFileFromRelease(releaseId, replacementPlan.OriginalSubjectId,
+                        originalReleaseFileReferenceId);
                 });
         }
 
@@ -127,8 +126,9 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Services
                         ValidationActionResult(ReplacementFileTypesMustBeData))
                     : releaseFileReference);
         }
-        
-        private async Task<Either<ActionResult, Unit>> CheckFilesAreForRelatedReleases(ReleaseFileReference originalReleaseFileReference,
+
+        private async Task<Either<ActionResult, Unit>> CheckFilesAreForRelatedReleases(
+            ReleaseFileReference originalReleaseFileReference,
             ReleaseFileReference replacementReleaseFileReference)
         {
             // Get the latest Release referencing the original ReleaseFileReference
@@ -345,9 +345,9 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Services
                 Id = filterItem.Id,
                 Label = filterItem.Label,
                 Target = FindReplacementFilterItem(replacementSubjectMeta,
-                        filterItem.FilterGroup.Filter.Name,
-                        filterItem.FilterGroup.Label,
-                        filterItem.Label)?.Id
+                    filterItem.FilterGroup.Filter.Name,
+                    filterItem.FilterGroup.Label,
+                    filterItem.Label)?.Id
             };
         }
 
@@ -411,7 +411,8 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Services
             string filterGroupLabel,
             string filterItemLabel)
         {
-            var replacementFilterGroup = FindReplacementFilterGroup(replacementSubjectMeta, filterName, filterGroupLabel);
+            var replacementFilterGroup =
+                FindReplacementFilterGroup(replacementSubjectMeta, filterName, filterGroupLabel);
             return replacementFilterGroup?.FilterItems.SingleOrDefault(filterItem =>
                 filterItem.Label == filterItemLabel);
         }
@@ -527,19 +528,21 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Services
             }
         }
 
-        private async Task ReplaceLinksForFootnote(FootnoteReplacementPlanViewModel replacementPlan, Guid originalSubjectId, Guid replacementSubjectId)
+        private async Task ReplaceLinksForFootnote(FootnoteReplacementPlanViewModel replacementPlan,
+            Guid originalSubjectId,
+            Guid replacementSubjectId)
         {
             await ReplaceFootnoteSubject(replacementPlan.Id, originalSubjectId, replacementSubjectId);
-            
+
             await replacementPlan.Filters.ForEachAsync(async plan =>
                 await ReplaceFootnoteFilter(replacementPlan.Id, plan));
-            
+
             await replacementPlan.FilterGroups.ForEachAsync(async plan =>
                 await ReplaceFootnoteFilterGroup(replacementPlan.Id, plan));
-            
+
             await replacementPlan.FilterItems.ForEachAsync(async plan =>
                 await ReplaceFootnoteFilterItem(replacementPlan.Id, plan));
-            
+
             await replacementPlan.Indicators.ForEachAsync(async plan =>
                 await ReplaceIndicatorFootnote(replacementPlan.Id, plan));
         }
@@ -559,7 +562,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Services
                 });
             }
         }
-        
+
         private async Task ReplaceFootnoteFilter(Guid footnoteId, TargetableReplacementViewModel plan)
         {
             var filterFootnote = await _statisticsDbContext.FilterFootnote.SingleAsync(f =>
@@ -614,6 +617,20 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Services
                 FootnoteId = footnoteId,
                 IndicatorId = plan.TargetValue
             });
+        }
+
+        private async Task<Either<ActionResult, Unit>> RemoveSubjectAndFileFromRelease(Guid releaseId,
+            Guid subjectId,
+            Guid releaseFileReferenceId)
+        {
+            var releaseFileReference = await _contentDbContext.ReleaseFileReferences
+                .FindAsync(releaseFileReferenceId);
+
+            var originalSubject =
+                await _statisticsDbContext.Subject.FindAsync(subjectId);
+
+            return await _releaseService.RemoveDataFilesAsync(releaseId,
+                releaseFileReference.Filename, originalSubject.Name);
         }
 
         private class ReplacementSubjectMeta
