@@ -56,10 +56,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Processor
                 .AddSingleton<IGuidGenerator, SequentialGuidGenerator>()
                 .BuildServiceProvider();
 
-            FailedImportsHandler.CheckIncompleteImports(
-                GetConfigurationValue(serviceProvider, "CoreStorage"),
-                serviceProvider.GetService<IFileStorageService>()
-            );
+            FailedImportsHandler.CheckIncompleteImports(GetConfigurationValue(serviceProvider, "CoreStorage"));
         }
 
         private static string GetConfigurationValue(IServiceProvider provider, string key)
