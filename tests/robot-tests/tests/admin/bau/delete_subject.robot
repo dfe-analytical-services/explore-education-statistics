@@ -30,7 +30,7 @@ Verify that new publication has been created
 
 Create new release
     [Tags]   HappyPath
-    user clicks element  css:[data-testid="Create new release link for ${PUBLICATION_NAME}"]
+    user clicks testid element  Create new release link for ${PUBLICATION_NAME}
     user waits until h1 is visible  Create new release
 
 User fills in form

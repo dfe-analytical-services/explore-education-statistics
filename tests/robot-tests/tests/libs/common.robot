@@ -145,7 +145,7 @@ user waits until element contains
 
 user waits until page contains link
     [Arguments]    ${link_text}   ${wait}=${timeout}
-    wait until page contains element  xpath://a[text()="${link_text}"]   timeout=${wait}
+    wait until page contains element  xpath://a[.="${link_text}"]   timeout=${wait}
 
 user waits until element contains link
     [Arguments]  ${element}  ${link_text}  ${wait}=${timeout}
@@ -491,3 +491,11 @@ user checks breadcrumb count should be
 user checks nth breadcrumb contains
     [Arguments]   ${num}   ${text}
     user checks element should contain   css:[data-testid="breadcrumbs--list"] li:nth-child(${num})   ${text}
+
+user checks page contains other release
+    [Arguments]   ${other_release_title}
+    user checks page contains element   xpath://li[@data-testid="other-release-item"]/a[text()="${other_release_title}"]
+
+user checks page does not contain other release
+    [Arguments]   ${other_release_title}
+    user checks page does not contain element   xpath://li[@data-testid="other-release-item"]/a[text()="${other_release_title}"]

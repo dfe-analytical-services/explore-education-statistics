@@ -38,9 +38,9 @@ Verify new publication
 Go to legacy releases page
     [Tags]  HappyPath
     user opens accordion section  ${PUBLICATION_NAME}
-    user clicks element  css:[data-testid="Legacy releases link for ${PUBLICATION_NAME}"]
+    user clicks testid element  Legacy releases link for ${PUBLICATION_NAME}
     user waits until h1 is visible  Legacy releases
-    user waits until element contains  css:[data-testid="page-title-caption"]  ${PUBLICATION_NAME}
+    user waits until page contains title caption  ${PUBLICATION_NAME}
     user checks page does not contain element  css:table
 
 Create legacy release
