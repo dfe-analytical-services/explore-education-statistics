@@ -1,0 +1,360 @@
+{
+  "$schema": "http://schema.management.azure.com/schemas/2015-01-01/deploymentTemplate.json#",
+  "contentVersion": "1.0.0.0",
+  "parameters": {
+    "factoryName": {
+      "type": "string",
+      "metadata": {
+        "description": "Data Factory name"
+      }
+    },
+    "keyVaultName": {
+      "type": "string",
+      "metadata": {
+        "description": "The name of the key vault"
+      }
+    }
+  },
+  "variables": {
+    "factoryId": "[concat('Microsoft.DataFactory/factories/', parameters('factoryName'))]",
+    "fragmentationPercentage": "70",
+    "fragmentationTables": "Observation,ObservationFilterItem"
+  },
+  "resources": [
+    {
+      "name": "[concat(parameters('factoryName'), '/ls_sql_statistics')]",
+      "type": "Microsoft.DataFactory/factories/linkedServices",
+      "apiVersion": "2018-06-01",
+      "properties": {
+        "annotations": [],
+        "type": "AzureSqlDatabase",
+        "typeProperties": {
+          "connectionString": {
+            "type": "AzureKeyVaultSecret",
+            "store": {
+              "referenceName": "AzureKeyVault",
+              "type": "LinkedServiceReference"
+            },
+            "secretName": "ees-sql-admin-datafactory-connectionstring"
+          }
+        }
+      },
+      "dependsOn": [
+        "[concat(variables('factoryId'), '/linkedServices/AzureKeyVault')]"
+      ]
+    },
+    {
+      "name": "[concat(parameters('factoryName'), '/ls_sql_public_statistics')]",
+      "type": "Microsoft.DataFactory/factories/linkedServices",
+      "apiVersion": "2018-06-01",
+      "properties": {
+        "annotations": [],
+        "type": "AzureSqlDatabase",
+        "typeProperties": {
+          "connectionString": {
+            "type": "AzureKeyVaultSecret",
+            "store": {
+              "referenceName": "AzureKeyVault",
+              "type": "LinkedServiceReference"
+            },
+            "secretName": "ees-sql-public-datafactory-connectionstring"
+          }
+        }
+      },
+      "dependsOn": [
+        "[concat(variables('factoryId'), '/linkedServices/AzureKeyVault')]"
+      ]
+    },
+    {
+      "name": "[concat(parameters('factoryName'), '/AzureKeyVault')]",
+      "type": "Microsoft.DataFactory/factories/linkedServices",
+      "apiVersion": "2018-06-01",
+      "properties": {
+        "annotations": [],
+        "type": "AzureKeyVault",
+        "typeProperties": {
+          "baseUrl": "[concat('https://', parameters('keyVaultName'), '.vault.azure.net/')]"
+        }
+      },
+      "dependsOn": []
+    },
+    {
+      "name": "[concat(parameters('factoryName'), '/pl_rebuild_statistics_indexes')]",
+      "type": "Microsoft.DataFactory/factories/pipelines",
+      "apiVersion": "2018-06-01",
+      "properties": {
+        "activities": [
+          {
+            "name": "sp_rebuild_indexes",
+            "type": "SqlServerStoredProcedure",
+            "dependsOn": [],
+            "policy": {
+              "timeout": "7.00:00:00",
+              "retry": 0,
+              "retryIntervalInSeconds": 30,
+              "secureOutput": false,
+              "secureInput": false
+            },
+            "userProperties": [],
+            "typeProperties": {
+              "storedProcedureName": "[[dbo].[RebuildIndexes]",
+              "storedProcedureParameters": {
+                "Percent": {
+                  "value": {
+                    "value": "@pipeline().parameters.Percentage",
+                    "type": "Expression"
+                  },
+                  "type": "Int32"
+                },
+                "Tables": {
+                  "value": {
+                    "value": "@pipeline().parameters.Tables",
+                    "type": "Expression"
+                  },
+                  "type": "String"
+                }
+              }
+            },
+            "linkedServiceName": {
+              "referenceName": "ls_sql_statistics",
+              "type": "LinkedServiceReference"
+            }
+          }
+        ],
+        "parameters": {
+          "Percentage": {
+            "type": "int",
+            "defaultValue": 70
+          },
+          "Tables": {
+            "type": "string",
+            "defaultValue": "Observation,ObservationFilterItem"
+          }
+        },
+        "annotations": [],
+        "lastPublishTime": "2020-09-14T16:47:14Z"
+      },
+      "dependsOn": [
+        "[concat(variables('factoryId'), '/linkedServices/ls_sql_statistics')]"
+      ]
+    },
+    {
+      "name": "[concat(parameters('factoryName'), '/pl_rebuild_public_statistics_indexes')]",
+      "type": "Microsoft.DataFactory/factories/pipelines",
+      "apiVersion": "2018-06-01",
+      "properties": {
+        "activities": [
+          {
+            "name": "sp_rebuild_indexes",
+            "type": "SqlServerStoredProcedure",
+            "dependsOn": [],
+            "policy": {
+              "timeout": "7.00:00:00",
+              "retry": 0,
+              "retryIntervalInSeconds": 30,
+              "secureOutput": false,
+              "secureInput": false
+            },
+            "userProperties": [],
+            "typeProperties": {
+              "storedProcedureName": "[[dbo].[RebuildIndexes]",
+              "storedProcedureParameters": {
+                "Percent": {
+                  "value": {
+                    "value": "@pipeline().parameters.Percentage",
+                    "type": "Expression"
+                  },
+                  "type": "Int32"
+                },
+                "Tables": {
+                  "value": {
+                    "value": "@pipeline().parameters.Tables",
+                    "type": "Expression"
+                  },
+                  "type": "String"
+                }
+              }
+            },
+            "linkedServiceName": {
+              "referenceName": "ls_sql_public_statistics",
+              "type": "LinkedServiceReference"
+            }
+          }
+        ],
+        "parameters": {
+          "Percentage": {
+            "type": "int",
+            "defaultValue": 70
+          },
+          "Tables": {
+            "type": "string",
+            "defaultValue": "Observation,ObservationFilterItem"
+          }
+        },
+        "annotations": [],
+        "lastPublishTime": "2020-09-14T16:47:15Z"
+      },
+      "dependsOn": [
+        "[concat(variables('factoryId'), '/linkedServices/ls_sql_public_statistics')]"
+      ]
+    },
+    {
+      "name": "[concat(parameters('factoryName'), '/pl_purge_subjects_public_statistics')]",
+      "type": "Microsoft.DataFactory/factories/pipelines",
+      "apiVersion": "2018-06-01",
+      "properties": {
+        "activities": [
+          {
+            "name": "sp_remove_soft_deleted_subjects",
+            "type": "SqlServerStoredProcedure",
+            "dependsOn": [],
+            "policy": {
+              "timeout": "7.00:00:00",
+              "retry": 0,
+              "retryIntervalInSeconds": 30,
+              "secureOutput": false,
+              "secureInput": false
+            },
+            "userProperties": [],
+            "typeProperties": {
+              "storedProcedureName": "[[dbo].[RemoveSoftDeletedSubjects]"
+            },
+            "linkedServiceName": {
+              "referenceName": "ls_sql_public_statistics",
+              "type": "LinkedServiceReference"
+            }
+          }
+        ],
+        "annotations": []
+      },
+      "dependsOn": [
+        "[concat(variables('factoryId'), '/linkedServices/ls_sql_public_statistics')]"
+      ]
+    },
+    {
+      "name": "[concat(parameters('factoryName'), '/pl_purge_subjects_statistics')]",
+      "type": "Microsoft.DataFactory/factories/pipelines",
+      "apiVersion": "2018-06-01",
+      "properties": {
+        "activities": [
+          {
+            "name": "sp_remove_soft_deleted_subjects",
+            "type": "SqlServerStoredProcedure",
+            "dependsOn": [],
+            "policy": {
+              "timeout": "7.00:00:00",
+              "retry": 0,
+              "retryIntervalInSeconds": 30,
+              "secureOutput": false,
+              "secureInput": false
+            },
+            "userProperties": [],
+            "typeProperties": {
+              "storedProcedureName": "[[dbo].[RemoveSoftDeletedSubjects]"
+            },
+            "linkedServiceName": {
+              "referenceName": "ls_sql_statistics",
+              "type": "LinkedServiceReference"
+            }
+          }
+        ],
+        "annotations": []
+      },
+      "dependsOn": [
+        "[concat(variables('factoryId'), '/linkedServices/ls_sql_statistics')]"
+      ]
+    },
+    {
+      "name": "[concat(parameters('factoryName'), '/purge_soft_deleted_subjects_trigger')]",
+      "type": "Microsoft.DataFactory/factories/triggers",
+      "apiVersion": "2018-06-01",
+      "properties": {
+        "annotations": [],
+        "runtimeState": "Started",
+        "pipelines": [
+          {
+            "pipelineReference": {
+              "referenceName": "pl_purge_subjects_statistics",
+              "type": "PipelineReference"
+            },
+            "parameters": {}
+          },
+          {
+            "pipelineReference": {
+              "referenceName": "pl_purge_subjects_public_statistics",
+              "type": "PipelineReference"
+            },
+            "parameters": {}
+          }
+        ],
+        "type": "ScheduleTrigger",
+        "typeProperties": {
+          "recurrence": {
+            "frequency": "Week",
+            "interval": 1,
+            "startTime": "2020-09-19T23:00:00.000Z",
+            "timeZone": "UTC",
+            "schedule": {
+              "weekDays": [
+                "Saturday"
+              ]
+            }
+          }
+        }
+      },
+      "dependsOn": [
+        "[concat(variables('factoryId'), '/pipelines/pl_purge_subjects_statistics')]",
+        "[concat(variables('factoryId'), '/pipelines/pl_purge_subjects_public_statistics')]"
+      ]
+    },
+    {
+      "name": "[concat(parameters('factoryName'), '/rebuild_indexes_trigger')]",
+      "type": "Microsoft.DataFactory/factories/triggers",
+      "apiVersion": "2018-06-01",
+      "properties": {
+        "annotations": [],
+        "runtimeState": "Started",
+        "pipelines": [
+          {
+            "pipelineReference": {
+              "referenceName": "pl_rebuild_statistics_indexes",
+              "type": "PipelineReference"
+            },
+            "parameters": {
+              "Percentage": "[variables('fragmentationPercentage')]",
+              "Tables": "[variables('fragmentationTables')]"
+            }
+          },
+          {
+            "pipelineReference": {
+              "referenceName": "pl_rebuild_public_statistics_indexes",
+              "type": "PipelineReference"
+            },
+            "parameters": {
+              "Percentage": "[variables('fragmentationPercentage')]",
+              "Tables": "[variables('fragmentationTables')]"
+            }
+          }
+        ],
+        "type": "ScheduleTrigger",
+        "typeProperties": {
+          "recurrence": {
+            "frequency": "Week",
+            "interval": 1,
+            "startTime": "2020-09-18T12:00:00.000Z",
+            "timeZone": "UTC",
+            "schedule": {
+              "weekDays": [
+                "Friday"
+              ]
+            }
+          }
+        }
+      },
+      "dependsOn": [
+        "[concat(variables('factoryId'), '/pipelines/pl_rebuild_statistics_indexes')]",
+        "[concat(variables('factoryId'), '/pipelines/pl_rebuild_public_statistics_indexes')]"
+      ]
+    }
+  ]
+}
