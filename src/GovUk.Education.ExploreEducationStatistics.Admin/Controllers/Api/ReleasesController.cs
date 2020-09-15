@@ -105,6 +105,17 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Controllers.Api
                 .HandleFailuresOrOk();
         }
 
+        [HttpGet("release/{releaseId}/data/{fileId}")]
+        [Produces("application/json")]
+        [ProducesResponseType(200)]
+        [ProducesResponseType(404)]
+        public async Task<ActionResult<DataFileInfo>> GetDataFile(Guid releaseId, Guid fileId)
+        {
+            return await _releaseFilesService
+                .GetDataFile(releaseId, fileId)
+                .HandleFailuresOrOk();
+        }
+
         [HttpGet("release/{releaseId}/data")]
         [Produces("application/json")]
         [ProducesResponseType(200)]

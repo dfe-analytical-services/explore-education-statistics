@@ -24,6 +24,8 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Services.Interfaces
         Task<Either<ActionResult, IEnumerable<FileInfo>>> ListPublicFilesPreview(Guid releaseId,
             IEnumerable<Guid> referencedReleaseVersions);
 
+        Task<Either<ActionResult, DataFileInfo>> GetDataFile(Guid releaseId, Guid fileReferenceId);
+
         Task<Either<ActionResult, FileInfo>> UploadFile(Guid releaseId, IFormFile file, string name,
             ReleaseFileTypes type, bool overwrite);
 
