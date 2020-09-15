@@ -626,11 +626,11 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Services
             var releaseFileReference = await _contentDbContext.ReleaseFileReferences
                 .FindAsync(releaseFileReferenceId);
 
-            var originalSubject =
+            var subject =
                 await _statisticsDbContext.Subject.FindAsync(subjectId);
 
             return await _releaseService.RemoveDataFilesAsync(releaseId,
-                releaseFileReference.Filename, originalSubject.Name);
+                releaseFileReference.Filename, subject.Name);
         }
 
         private class ReplacementSubjectMeta
