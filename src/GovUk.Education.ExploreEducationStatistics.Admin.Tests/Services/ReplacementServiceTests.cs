@@ -25,6 +25,7 @@ using static GovUk.Education.ExploreEducationStatistics.Common.Model.TimeIdentif
 using FootnoteService = GovUk.Education.ExploreEducationStatistics.Data.Model.Services.FootnoteService;
 using IReleaseService = GovUk.Education.ExploreEducationStatistics.Admin.Services.Interfaces.IReleaseService;
 using Release = GovUk.Education.ExploreEducationStatistics.Data.Model.Release;
+using Unit = GovUk.Education.ExploreEducationStatistics.Common.Model.Unit;
 
 namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
 {
@@ -37,12 +38,14 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
         {
             var originalSubject = new Subject
             {
-                Id = Guid.NewGuid()
+                Id = Guid.NewGuid(),
+                Name = "Original subject"
             };
 
             var replacementSubject = new Subject
             {
-                Id = Guid.NewGuid()
+                Id = Guid.NewGuid(),
+                Name = "Replacement subject"
             };
 
             var contentReleaseVersion1 = new Content.Model.Release
@@ -75,7 +78,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
                 Id = Guid.NewGuid(),
                 Filename = "original.csv",
                 ReleaseFileType = ReleaseFileTypes.Ancillary,
-                Release = contentReleaseVersion1, 
+                Release = contentReleaseVersion1,
                 SubjectId = originalSubject.Id
             };
 
@@ -84,7 +87,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
                 Id = Guid.NewGuid(),
                 Filename = "replacement.csv",
                 ReleaseFileType = ReleaseFileTypes.Data,
-                Release = contentReleaseVersion2, 
+                Release = contentReleaseVersion2,
                 SubjectId = replacementSubject.Id
             };
 
@@ -118,7 +121,8 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
             {
                 await contentDbContext.AddRangeAsync(contentReleaseVersion1, contentReleaseVersion2);
                 await contentDbContext.AddRangeAsync(originalReleaseFileReference, replacementReleaseFileReference);
-                await contentDbContext.AddRangeAsync(originalReleaseFile1, originalReleaseFile2, replacementReleaseFile);
+                await contentDbContext.AddRangeAsync(originalReleaseFile1, originalReleaseFile2,
+                    replacementReleaseFile);
                 await contentDbContext.SaveChangesAsync();
             }
 
@@ -134,7 +138,8 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
             {
                 var replacementService = BuildReplacementService(contentDbContext, statisticsDbContext, mocks);
 
-                var result = await replacementService.GetReplacementPlan(originalReleaseFileReference.Id, replacementReleaseFileReference.Id);
+                var result = await replacementService.GetReplacementPlan(originalReleaseFileReference.Id,
+                    replacementReleaseFileReference.Id);
 
                 Assert.True(result.IsLeft);
                 AssertValidationProblem(result.Left, ReplacementFileTypesMustBeData);
@@ -146,12 +151,14 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
         {
             var originalSubject = new Subject
             {
-                Id = Guid.NewGuid()
+                Id = Guid.NewGuid(),
+                Name = "Original subject"
             };
 
             var replacementSubject = new Subject
             {
-                Id = Guid.NewGuid()
+                Id = Guid.NewGuid(),
+                Name = "Replacement subject"
             };
 
             var contentRelease1Version1 = new Content.Model.Release
@@ -196,7 +203,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
                 Id = Guid.NewGuid(),
                 Filename = "original.csv",
                 ReleaseFileType = ReleaseFileTypes.Data,
-                Release = contentRelease1Version1, 
+                Release = contentRelease1Version1,
                 SubjectId = originalSubject.Id
             };
 
@@ -205,7 +212,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
                 Id = Guid.NewGuid(),
                 Filename = "replacement.csv",
                 ReleaseFileType = ReleaseFileTypes.Data,
-                Release = contentRelease2, 
+                Release = contentRelease2,
                 SubjectId = replacementSubject.Id
             };
 
@@ -240,7 +247,8 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
             {
                 await contentDbContext.AddRangeAsync(contentRelease1Version1, contentRelease1Version2, contentRelease2);
                 await contentDbContext.AddRangeAsync(originalReleaseFileReference, replacementReleaseFileReference);
-                await contentDbContext.AddRangeAsync(originalReleaseFile1, originalReleaseFile2, replacementReleaseFile);
+                await contentDbContext.AddRangeAsync(originalReleaseFile1, originalReleaseFile2,
+                    replacementReleaseFile);
                 await contentDbContext.SaveChangesAsync();
             }
 
@@ -256,7 +264,8 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
             {
                 var replacementService = BuildReplacementService(contentDbContext, statisticsDbContext, mocks);
 
-                var result = await replacementService.GetReplacementPlan(originalReleaseFileReference.Id, replacementReleaseFileReference.Id);
+                var result = await replacementService.GetReplacementPlan(originalReleaseFileReference.Id,
+                    replacementReleaseFileReference.Id);
 
                 Assert.True(result.IsLeft);
                 AssertValidationProblem(result.Left, ReplacementDataFileMustBeForRelatedRelease);
@@ -268,12 +277,14 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
         {
             var originalSubject = new Subject
             {
-                Id = Guid.NewGuid()
+                Id = Guid.NewGuid(),
+                Name = "Original subject"
             };
 
             var replacementSubject = new Subject
             {
-                Id = Guid.NewGuid()
+                Id = Guid.NewGuid(),
+                Name = "Replacement subject"
             };
 
             var contentReleaseVersion1 = new Content.Model.Release
@@ -299,13 +310,13 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
                 Id = contentReleaseVersion2.Id,
                 PreviousVersionId = contentReleaseVersion2.PreviousVersionId
             };
-            
+
             var originalReleaseFileReference = new ReleaseFileReference
             {
                 Id = Guid.NewGuid(),
                 Filename = "original.csv",
                 ReleaseFileType = ReleaseFileTypes.Data,
-                Release = contentReleaseVersion1, 
+                Release = contentReleaseVersion1,
                 SubjectId = originalSubject.Id
             };
 
@@ -314,7 +325,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
                 Id = Guid.NewGuid(),
                 Filename = "replacement.csv",
                 ReleaseFileType = ReleaseFileTypes.Data,
-                Release = contentReleaseVersion2, 
+                Release = contentReleaseVersion2,
                 SubjectId = replacementSubject.Id
             };
 
@@ -348,7 +359,8 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
             {
                 await contentDbContext.AddRangeAsync(contentReleaseVersion1, contentReleaseVersion2);
                 await contentDbContext.AddRangeAsync(originalReleaseFileReference, replacementReleaseFileReference);
-                await contentDbContext.AddRangeAsync(originalReleaseFile1, originalReleaseFile2, replacementReleaseFile);
+                await contentDbContext.AddRangeAsync(originalReleaseFile1, originalReleaseFile2,
+                    replacementReleaseFile);
                 await contentDbContext.SaveChangesAsync();
             }
 
@@ -364,7 +376,8 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
             {
                 var replacementService = BuildReplacementService(contentDbContext, statisticsDbContext, mocks);
 
-                var result = await replacementService.GetReplacementPlan(originalReleaseFileReference.Id, replacementReleaseFileReference.Id);
+                var result = await replacementService.GetReplacementPlan(originalReleaseFileReference.Id,
+                    replacementReleaseFileReference.Id);
 
                 Assert.True(result.IsRight);
                 var replacementPlan = result.Right;
@@ -383,12 +396,14 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
         {
             var originalSubject = new Subject
             {
-                Id = Guid.NewGuid()
+                Id = Guid.NewGuid(),
+                Name = "Original subject"
             };
 
             var replacementSubject = new Subject
             {
-                Id = Guid.NewGuid()
+                Id = Guid.NewGuid(),
+                Name = "Replacement subject"
             };
 
             var contentReleaseVersion1 = new Content.Model.Release
@@ -420,7 +435,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
                 Id = Guid.NewGuid(),
                 Filename = "original.csv",
                 ReleaseFileType = ReleaseFileTypes.Data,
-                Release = contentReleaseVersion1, 
+                Release = contentReleaseVersion1,
                 SubjectId = originalSubject.Id
             };
 
@@ -429,7 +444,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
                 Id = Guid.NewGuid(),
                 Filename = "replacement.csv",
                 ReleaseFileType = ReleaseFileTypes.Data,
-                Release = contentReleaseVersion2, 
+                Release = contentReleaseVersion2,
                 SubjectId = replacementSubject.Id
             };
 
@@ -667,7 +682,8 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
             {
                 await contentDbContext.AddRangeAsync(contentReleaseVersion1, contentReleaseVersion2);
                 await contentDbContext.AddRangeAsync(originalReleaseFileReference, replacementReleaseFileReference);
-                await contentDbContext.AddRangeAsync(originalReleaseFile1, originalReleaseFile2, replacementReleaseFile);
+                await contentDbContext.AddRangeAsync(originalReleaseFile1, originalReleaseFile2,
+                    replacementReleaseFile);
                 await contentDbContext.AddAsync(dataBlock);
                 await contentDbContext.AddRangeAsync(releaseContentBlock);
                 await contentDbContext.SaveChangesAsync();
@@ -689,14 +705,15 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
             {
                 var replacementService = BuildReplacementService(contentDbContext, statisticsDbContext, mocks);
 
-                var result = await replacementService.GetReplacementPlan(originalReleaseFileReference.Id, replacementReleaseFileReference.Id);
+                var result = await replacementService.GetReplacementPlan(originalReleaseFileReference.Id,
+                    replacementReleaseFileReference.Id);
 
                 Assert.True(result.IsRight);
                 var replacementPlan = result.Right;
 
                 Assert.Equal(originalSubject.Id, replacementPlan.OriginalSubjectId);
                 Assert.Equal(replacementSubject.Id, replacementPlan.ReplacementSubjectId);
-                
+
                 Assert.Single(replacementPlan.DataBlocks);
                 var dataBlockPlan = replacementPlan.DataBlocks.First();
                 Assert.Equal(dataBlock.Id, dataBlockPlan.Id);
@@ -819,12 +836,14 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
         {
             var originalSubject = new Subject
             {
-                Id = Guid.NewGuid()
+                Id = Guid.NewGuid(),
+                Name = "Original subject"
             };
 
             var replacementSubject = new Subject
             {
-                Id = Guid.NewGuid()
+                Id = Guid.NewGuid(),
+                Name = "Replacement subject"
             };
 
             var contentReleaseVersion1 = new Content.Model.Release
@@ -856,7 +875,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
                 Id = Guid.NewGuid(),
                 Filename = "original.csv",
                 ReleaseFileType = ReleaseFileTypes.Data,
-                Release = contentReleaseVersion1, 
+                Release = contentReleaseVersion1,
                 SubjectId = originalSubject.Id
             };
 
@@ -865,7 +884,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
                 Id = Guid.NewGuid(),
                 Filename = "replacement.csv",
                 ReleaseFileType = ReleaseFileTypes.Data,
-                Release = contentReleaseVersion2, 
+                Release = contentReleaseVersion2,
                 SubjectId = replacementSubject.Id
             };
 
@@ -1172,7 +1191,8 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
             {
                 await contentDbContext.AddRangeAsync(contentReleaseVersion1, contentReleaseVersion2);
                 await contentDbContext.AddRangeAsync(originalReleaseFileReference, replacementReleaseFileReference);
-                await contentDbContext.AddRangeAsync(originalReleaseFile1, originalReleaseFile2, replacementReleaseFile);
+                await contentDbContext.AddRangeAsync(originalReleaseFile1, originalReleaseFile2,
+                    replacementReleaseFile);
                 await contentDbContext.AddAsync(dataBlock);
                 await contentDbContext.AddRangeAsync(releaseContentBlock);
                 await contentDbContext.SaveChangesAsync();
@@ -1195,7 +1215,8 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
             {
                 var replacementService = BuildReplacementService(contentDbContext, statisticsDbContext, mocks);
 
-                var result = await replacementService.GetReplacementPlan(originalReleaseFileReference.Id, replacementReleaseFileReference.Id);
+                var result = await replacementService.GetReplacementPlan(originalReleaseFileReference.Id,
+                    replacementReleaseFileReference.Id);
 
                 Assert.True(result.IsRight);
                 var replacementPlan = result.Right;
@@ -1325,12 +1346,14 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
         {
             var originalSubject = new Subject
             {
-                Id = Guid.NewGuid()
+                Id = Guid.NewGuid(),
+                Name = "Original subject"
             };
 
             var replacementSubject = new Subject
             {
-                Id = Guid.NewGuid()
+                Id = Guid.NewGuid(),
+                Name = "Replacement subject"
             };
 
             var contentRelease = new Content.Model.Release
@@ -1350,7 +1373,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
                 Id = Guid.NewGuid(),
                 Filename = "original.csv",
                 ReleaseFileType = ReleaseFileTypes.Data,
-                Release = contentRelease, 
+                Release = contentRelease,
                 SubjectId = originalSubject.Id
             };
 
@@ -1359,7 +1382,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
                 Id = Guid.NewGuid(),
                 Filename = "replacement.csv",
                 ReleaseFileType = ReleaseFileTypes.Data,
-                Release = contentRelease, 
+                Release = contentRelease,
                 SubjectId = replacementSubject.Id
             };
 
@@ -1511,8 +1534,11 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
             {
                 var replacementService = BuildReplacementService(contentDbContext, statisticsDbContext, mocks);
 
-                var result = await replacementService.Replace(originalReleaseFileReference.Id, replacementReleaseFileReference.Id);
+                var result = await replacementService.Replace(originalReleaseFileReference.Id,
+                    replacementReleaseFileReference.Id);
 
+                mocks.ReleaseService.VerifyNoOtherCalls();
+                
                 Assert.True(result.IsLeft);
                 AssertValidationProblem(result.Left, ReplacementMustBeValid);
             }
@@ -1523,12 +1549,14 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
         {
             var originalSubject = new Subject
             {
-                Id = Guid.NewGuid()
+                Id = Guid.NewGuid(),
+                Name = "Original subject"
             };
 
             var replacementSubject = new Subject
             {
-                Id = Guid.NewGuid()
+                Id = Guid.NewGuid(),
+                Name = "Replacement subject"
             };
 
             var contentReleaseVersion1 = new Content.Model.Release
@@ -1554,13 +1582,13 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
                 Id = contentReleaseVersion2.Id,
                 PreviousVersionId = contentReleaseVersion2.PreviousVersionId
             };
-            
+
             var originalReleaseFileReference = new ReleaseFileReference
             {
                 Id = Guid.NewGuid(),
                 Filename = "original.csv",
                 ReleaseFileType = ReleaseFileTypes.Data,
-                Release = contentReleaseVersion1, 
+                Release = contentReleaseVersion1,
                 SubjectId = originalSubject.Id
             };
 
@@ -1569,7 +1597,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
                 Id = Guid.NewGuid(),
                 Filename = "replacement.csv",
                 ReleaseFileType = ReleaseFileTypes.Data,
-                Release = contentReleaseVersion2, 
+                Release = contentReleaseVersion2,
                 SubjectId = replacementSubject.Id
             };
 
@@ -1862,6 +1890,11 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
                     }
                 });
 
+            mocks.ReleaseService.Setup(service =>
+                    service.RemoveDataFilesAsync(contentReleaseVersion1.Id, originalReleaseFileReference.Filename,
+                        originalSubject.Name))
+                .ReturnsAsync(Unit.Instance);
+
             mocks.TimePeriodService.Setup(service => service.GetTimePeriods(replacementSubject.Id))
                 .Returns(new List<(int Year, TimeIdentifier TimeIdentifier)>
                 {
@@ -1876,7 +1909,8 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
             {
                 await contentDbContext.AddRangeAsync(contentReleaseVersion1, contentReleaseVersion2);
                 await contentDbContext.AddRangeAsync(originalReleaseFileReference, replacementReleaseFileReference);
-                await contentDbContext.AddRangeAsync(originalReleaseFile1, originalReleaseFile2, replacementReleaseFile);
+                await contentDbContext.AddRangeAsync(originalReleaseFile1, originalReleaseFile2,
+                    replacementReleaseFile);
                 await contentDbContext.AddAsync(dataBlock);
                 await contentDbContext.AddRangeAsync(releaseContentBlock);
                 await contentDbContext.SaveChangesAsync();
@@ -1899,7 +1933,14 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
             {
                 var replacementService = BuildReplacementService(contentDbContext, statisticsDbContext, mocks);
 
-                var result = await replacementService.Replace(originalReleaseFileReference.Id, replacementReleaseFileReference.Id);
+                var result = await replacementService.Replace(originalReleaseFileReference.Id,
+                    replacementReleaseFileReference.Id);
+
+                mocks.ReleaseService.Verify(
+                    mock => mock.RemoveDataFilesAsync(contentReleaseVersion1.Id, originalReleaseFileReference.Filename,
+                        originalSubject.Name), Times.Once());
+
+                mocks.ReleaseService.VerifyNoOtherCalls();
 
                 Assert.True(result.IsRight);
 

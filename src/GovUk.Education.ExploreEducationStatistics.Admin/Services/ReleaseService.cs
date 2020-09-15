@@ -451,7 +451,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Services
                 });
         }
 
-        public async Task<Either<ActionResult, bool>> RemoveDataFilesAsync(Guid releaseId, string fileName, string subjectTitle)
+        public async Task<Either<ActionResult, Unit>> RemoveDataFilesAsync(Guid releaseId, string fileName, string subjectTitle)
         {
             return await _persistenceHelper
                 .CheckEntityExists<Release>(releaseId)
@@ -466,7 +466,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Services
                     await _releaseFilesService
                         .DeleteDataFilesAsync(releaseId, fileName)
                         .OnSuccess(async () => await RemoveFileImportEntryIfOrphaned(deletePlan));
-                    return true;
+                    return Unit.Instance;
                 });
         }
 

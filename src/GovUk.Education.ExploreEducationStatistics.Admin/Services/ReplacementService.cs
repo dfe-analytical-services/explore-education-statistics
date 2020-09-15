@@ -108,7 +108,14 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Services
                     await _contentDbContext.SaveChangesAsync();
                     await _statisticsDbContext.SaveChangesAsync();
 
-                    return new Either<ActionResult, Unit>(Unit.Instance);
+                    var originalFileReference = await _contentDbContext.ReleaseFileReferences
+                        .FindAsync(originalReleaseFileReferenceId);
+
+                    var originalSubject =
+                        await _statisticsDbContext.Subject.FindAsync(replacementPlan.OriginalSubjectId);
+
+                    return await _releaseService.RemoveDataFilesAsync(originalFileReference.ReleaseId,
+                        originalFileReference.Filename, originalSubject.Name);
                 });
         }
 
