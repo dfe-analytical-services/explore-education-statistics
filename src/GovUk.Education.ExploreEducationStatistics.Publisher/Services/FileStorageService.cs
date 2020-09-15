@@ -4,8 +4,11 @@ using System.Globalization;
 using System.IO;
 using System.Linq;
 using System.Net.Mime;
-using System.Text.RegularExpressions;
+using System.Text;
 using System.Threading.Tasks;
+using Azure.Core;
+using Azure.Storage.Blobs;
+using Azure.Storage.Blobs.Specialized;
 using GovUk.Education.ExploreEducationStatistics.Common.Extensions;
 using GovUk.Education.ExploreEducationStatistics.Common.Model;
 using GovUk.Education.ExploreEducationStatistics.Common.Services.Interfaces;
@@ -14,8 +17,6 @@ using GovUk.Education.ExploreEducationStatistics.Publisher.Models;
 using GovUk.Education.ExploreEducationStatistics.Publisher.Services.Interfaces;
 using ICSharpCode.SharpZipLib.Zip;
 using Microsoft.Azure.Storage.Blob;
-using Microsoft.Azure.Storage.DataMovement;
-using Microsoft.Azure.Storage.RetryPolicies;
 using Microsoft.Extensions.Logging;
 using Newtonsoft.Json;
 using static GovUk.Education.ExploreEducationStatistics.Common.Model.ReleaseFileTypes;
@@ -50,16 +51,33 @@ namespace GovUk.Education.ExploreEducationStatistics.Publisher.Services
             _logger = logger;
         }
 
-        public async Task<(CloudBlockBlob blob, string id)> AcquireLease(string blobName)
+        public async Task<BlobLease> AcquireLease(string blobName)
         {
-            var options = new BlobRequestOptions
+            // Ideally we should refactor BlobStorageService to do this, but it doesn't
+            // really fit well with our interface. Additionally, we hope to completely scrap
+            // table storage in favour of a database table, so we won't need this leasing
+            // mechanism in the near future anyway.
+            // TODO: Remove this in favour of database table for locking (EES-1232)
+            var client = new BlobServiceClient(_publisherStorageConnectionString, new BlobClientOptions
             {
-                RetryPolicy = new LinearRetry(TimeSpan.FromSeconds(5), 5)
-            };
-            var blob = await UploadFromStreamAsync(_publisherStorageConnectionString, PublisherLeasesContainerName,
-                $"{blobName}.lck", MediaTypeNames.Text.Plain, string.Empty, options);
-            var leaseId = blob.AcquireLease(TimeSpan.FromSeconds(30), Guid.NewGuid().ToString());
-            return (blob, leaseId);
+                Retry =
+                {
+                    Mode = RetryMode.Fixed,
+                    Delay = TimeSpan.FromSeconds(5),
+                    MaxRetries = 5
+                }
+            });
+
+            var blobContainer = client.GetBlobContainerClient(PublisherLeasesContainerName);
+            await blobContainer.CreateIfNotExistsAsync();
+
+            await using var stream = new MemoryStream(Encoding.UTF8.GetBytes(string.Empty));
+            await blobContainer.UploadBlobAsync(blobName, stream);
+
+            var leaseClient = blobContainer.GetBlobClient(blobName).GetBlobLeaseClient();
+            await leaseClient.AcquireAsync(TimeSpan.FromSeconds(30));
+
+            return new BlobLease(leaseClient);
         }
 
         public async Task CopyReleaseFilesToPublicContainer(CopyReleaseFilesCommand copyReleaseFilesCommand)

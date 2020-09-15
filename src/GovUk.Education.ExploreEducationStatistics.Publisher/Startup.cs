@@ -53,9 +53,14 @@ namespace GovUk.Education.ExploreEducationStatistics.Publisher
                             new BlobServiceClient(publicStorageConnectionString),
                             provider.GetRequiredService<ILogger<BlobStorageService>>());
 
+                        var publisherBlobStorageService = new BlobStorageService(
+                            publicStorageConnectionString,
+                            new BlobServiceClient(publisherStorageConnectionString),
+                            provider.GetRequiredService<ILogger<BlobStorageService>>());
+
                         return new FileStorageService(
-                            privateBlobStorageService,
-                            publicBlobStorageService,
+                            privateBlobStorageService: privateBlobStorageService,
+                            publicBlobStorageService: publicBlobStorageService,
                             publicStorageConnectionString: publicStorageConnectionString,
                             publisherStorageConnectionString: publisherStorageConnectionString,
                             logger: provider.GetRequiredService<ILogger<FileStorageService>>());
