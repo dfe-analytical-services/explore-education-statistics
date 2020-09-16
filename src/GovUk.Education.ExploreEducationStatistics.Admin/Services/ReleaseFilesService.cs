@@ -699,7 +699,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Services
                     return new DataFileInfo
                     {
                         Id = fileReference.Id,
-                        Extension = Path.GetExtension(fileReference.Filename),
+                        Extension = Path.GetExtension(fileReference.Filename)?.TrimStart('.') ?? string.Empty,
                         Name = zipBlob.Name,
                         Path = fileReference.Filename,
                         Size = zipBlob.Size,
@@ -731,8 +731,8 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Services
             return new DataFileInfo
             {
                 Id = fileReference.Id,
-                Extension = Path.GetExtension(fileReference.Filename),
                 Name = await GetSubjectName(fileReference),
+                Extension = Path.GetExtension(fileReference.Filename)?.TrimStart('.') ?? string.Empty,
                 Path = fileReference.Filename,
                 Size = "0.00 B",
                 MetaFileName = fileReference.ReleaseFileType == ReleaseFileTypes.Data
