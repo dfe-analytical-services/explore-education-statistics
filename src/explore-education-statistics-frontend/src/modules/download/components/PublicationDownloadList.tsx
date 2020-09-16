@@ -49,6 +49,11 @@ function PublicationList({ publications }: Props) {
                     to={`${process.env.DATA_API_BASE_URL}/download/${path}`}
                     className="govuk-link"
                     data-testid={`download-stats-${path}`}
+                    analytics={{
+                      category: 'Downloads',
+                      action: `Download latest data page ${name} file downloaded`,
+                      label: `File URL: /api/download/${path}`,
+                    }}
                   >
                     {`${name}${getPublicationDate(path)}`}
                   </Link>
