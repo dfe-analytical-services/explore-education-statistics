@@ -577,76 +577,22 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Services
         {
             var fileReference = fileLink.ReleaseFileReference;
             var blobPath = AdminReleasePathWithFileReference(fileReference);
-            var blob = await _blobStorageService.GetBlob(PrivateFilesContainerName, blobPath);
 
             // Files should exists in storage but if not then allow user to delete
             var blobExists = await _blobStorageService.CheckBlobExists(PrivateFilesContainerName, blobPath);
 
-            // If the file does not exist then it could possibly be
-            // partially uploaded so make sure meta data exists for it
-            if (!blobExists || blob.GetUserName().IsNullOrEmpty())
+            if (!blobExists)
             {
-                // Try to get the name from the zip file if existing
-                if (fileReference.SourceId != null)
-                {
-                    var source = await GetReleaseFileReference(fileReference.SourceId.Value);
-                    var sourceBlobPath = AdminReleasePathWithFileReference(source);
+                return await GetFallbackDataFileInfo(releaseId, fileLink.ReleaseFileReference);
+            }
 
-                    if (await _blobStorageService.CheckBlobExists(PrivateFilesContainerName, sourceBlobPath))
-                    {
-                        var zipBlob = await _blobStorageService.GetBlob(PrivateFilesContainerName, sourceBlobPath);
+            var blob = await _blobStorageService.GetBlob(PrivateFilesContainerName, blobPath);
 
-                        return new DataFileInfo
-                        {
-                            Id = fileReference.Id,
-                            Extension = Path.GetExtension(fileReference.Filename),
-                            Name = zipBlob.Name,
-                            Path = fileLink.ReleaseFileReference.Filename,
-                            Size = zipBlob.Size,
-                            MetaFileName =
-                                fileLink.ReleaseFileReference.ReleaseFileType == ReleaseFileTypes.Data
-                                    ? zipBlob.GetMetaFileName() : string.Empty,
-                            Rows = 0,
-                            UserName = zipBlob.GetUserName(),
-                            Created = zipBlob.Created
-                        };
-                    }
-                }
-
-                var dataFileName = fileReference.ReleaseFileType == ReleaseFileTypes.Data
-                    ? fileReference.Filename
-                    : await GetFilenameAssociatedToType(
-                        releaseId,
-                        fileReference.Filename,
-                        ReleaseFileTypes.Metadata,
-                        ReleaseFileTypes.Data
-                    );
-
-                // Fail the import if this was a datafile upload
-                await _importService.FailImport(
-                    releaseId,
-                    dataFileName,
-                    new List<ValidationError>
-                    {
-                        new ValidationError("Files not uploaded correctly. Please delete and retry")
-                    }.AsEnumerable());
-
-                return new DataFileInfo
-                {
-                    Id = fileReference.Id,
-                    Extension = Path.GetExtension(fileReference.Filename),
-                    Name = await GetSubjectName(releaseId, fileReference.Filename,
-                        fileReference.ReleaseFileType),
-                    Path = fileReference.Filename,
-                    Size = "0.00 B",
-                    MetaFileName = fileReference.ReleaseFileType == ReleaseFileTypes.Data
-                        ? await GetFilenameAssociatedToType(releaseId, fileReference.Filename,
-                            ReleaseFileTypes.Data, ReleaseFileTypes.Metadata)
-                        : "",
-                    Rows = 0,
-                    UserName = "",
-                    Created = DateTimeOffset.UtcNow,
-                };
+            // If the file does exist then it could possibly be
+            // partially uploaded so make sure meta data exists for it
+            if (blob.GetUserName().IsNullOrEmpty())
+            {
+                return await GetFallbackDataFileInfo(releaseId, fileLink.ReleaseFileReference);
             }
 
             return new DataFileInfo
@@ -660,6 +606,80 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Services
                 Rows = blob.GetNumberOfRows(),
                 UserName = blob.GetUserName(),
                 Created = blob.Created
+            };
+        }
+
+        private async Task<DataFileInfo> GetFallbackDataFileInfo(Guid releaseId, ReleaseFileReference fileReference)
+        {
+            // Try to get the name from the zip file if existing
+            if (fileReference.SourceId != null)
+            {
+                var source = await GetReleaseFileReference(fileReference.SourceId.Value);
+                var sourceBlobPath = AdminReleasePathWithFileReference(source);
+
+                if (await _blobStorageService.CheckBlobExists(PrivateFilesContainerName, sourceBlobPath))
+                {
+                    var zipBlob = await _blobStorageService.GetBlob(PrivateFilesContainerName, sourceBlobPath);
+
+                    return new DataFileInfo
+                    {
+                        Id = fileReference.Id,
+                        Extension = Path.GetExtension(fileReference.Filename),
+                        Name = zipBlob.Name,
+                        Path = fileReference.Filename,
+                        Size = zipBlob.Size,
+                        MetaFileName =
+                            fileReference.ReleaseFileType == ReleaseFileTypes.Data
+                                ? zipBlob.GetMetaFileName()
+                                : string.Empty,
+                        Rows = 0,
+                        UserName = zipBlob.GetUserName(),
+                        Created = zipBlob.Created
+                    };
+                }
+            }
+
+            var dataFileName = fileReference.ReleaseFileType == ReleaseFileTypes.Data
+                ? fileReference.Filename
+                : await GetFilenameAssociatedToType(
+                    releaseId,
+                    fileReference.Filename,
+                    ReleaseFileTypes.Metadata,
+                    ReleaseFileTypes.Data
+                );
+
+            // Fail the import if this was a datafile upload
+            await _importService.FailImport(
+                releaseId,
+                dataFileName,
+                new List<ValidationError>
+                {
+                    new ValidationError("Files not uploaded correctly. Please delete and retry")
+                }.AsEnumerable()
+            );
+
+            return new DataFileInfo
+            {
+                Id = fileReference.Id,
+                Extension = Path.GetExtension(fileReference.Filename),
+                Name = await GetSubjectName(
+                    releaseId,
+                    fileReference.Filename,
+                    fileReference.ReleaseFileType
+                ),
+                Path = fileReference.Filename,
+                Size = "0.00 B",
+                MetaFileName = fileReference.ReleaseFileType == ReleaseFileTypes.Data
+                    ? await GetFilenameAssociatedToType(
+                        releaseId,
+                        fileReference.Filename,
+                        ReleaseFileTypes.Data,
+                        ReleaseFileTypes.Metadata
+                    )
+                    : "",
+                Rows = 0,
+                UserName = "",
+                Created = DateTimeOffset.UtcNow,
             };
         }
 
