@@ -75,7 +75,6 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
             // Use a ReleaseFileType that is not Data
             var originalReleaseFileReference = new ReleaseFileReference
             {
-                Id = Guid.NewGuid(),
                 Filename = "original.csv",
                 ReleaseFileType = ReleaseFileTypes.Ancillary,
                 Release = contentReleaseVersion1,
@@ -84,7 +83,6 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
 
             var replacementReleaseFileReference = new ReleaseFileReference
             {
-                Id = Guid.NewGuid(),
                 Filename = "replacement.csv",
                 ReleaseFileType = ReleaseFileTypes.Data,
                 Release = contentReleaseVersion2,
@@ -93,21 +91,18 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
 
             var originalReleaseFile1 = new ReleaseFile
             {
-                Id = Guid.NewGuid(),
                 Release = contentReleaseVersion1,
                 ReleaseFileReference = originalReleaseFileReference
             };
 
             var originalReleaseFile2 = new ReleaseFile
             {
-                Id = Guid.NewGuid(),
                 Release = contentReleaseVersion2,
                 ReleaseFileReference = originalReleaseFileReference
             };
 
             var replacementReleaseFile = new ReleaseFile
             {
-                Id = Guid.NewGuid(),
                 Release = contentReleaseVersion2,
                 ReleaseFileReference = replacementReleaseFileReference
             };
@@ -200,7 +195,6 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
 
             var originalReleaseFileReference = new ReleaseFileReference
             {
-                Id = Guid.NewGuid(),
                 Filename = "original.csv",
                 ReleaseFileType = ReleaseFileTypes.Data,
                 Release = contentRelease1Version1,
@@ -209,7 +203,6 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
 
             var replacementReleaseFileReference = new ReleaseFileReference
             {
-                Id = Guid.NewGuid(),
                 Filename = "replacement.csv",
                 ReleaseFileType = ReleaseFileTypes.Data,
                 Release = contentRelease2,
@@ -218,14 +211,12 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
 
             var originalReleaseFile1 = new ReleaseFile
             {
-                Id = Guid.NewGuid(),
                 Release = contentRelease1Version1,
                 ReleaseFileReference = originalReleaseFileReference
             };
 
             var originalReleaseFile2 = new ReleaseFile
             {
-                Id = Guid.NewGuid(),
                 Release = contentRelease1Version2,
                 ReleaseFileReference = originalReleaseFileReference
             };
@@ -233,7 +224,6 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
             // Link the replacement to the unrelated Release
             var replacementReleaseFile = new ReleaseFile
             {
-                Id = Guid.NewGuid(),
                 Release = contentRelease2,
                 ReleaseFileReference = replacementReleaseFileReference
             };
@@ -313,7 +303,6 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
 
             var originalReleaseFileReference = new ReleaseFileReference
             {
-                Id = Guid.NewGuid(),
                 Filename = "original.csv",
                 ReleaseFileType = ReleaseFileTypes.Data,
                 Release = contentReleaseVersion1,
@@ -322,7 +311,6 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
 
             var replacementReleaseFileReference = new ReleaseFileReference
             {
-                Id = Guid.NewGuid(),
                 Filename = "replacement.csv",
                 ReleaseFileType = ReleaseFileTypes.Data,
                 Release = contentReleaseVersion2,
@@ -331,21 +319,18 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
 
             var originalReleaseFile1 = new ReleaseFile
             {
-                Id = Guid.NewGuid(),
                 Release = contentReleaseVersion1,
                 ReleaseFileReference = originalReleaseFileReference
             };
 
             var originalReleaseFile2 = new ReleaseFile
             {
-                Id = Guid.NewGuid(),
                 Release = contentReleaseVersion2,
                 ReleaseFileReference = originalReleaseFileReference
             };
 
             var replacementReleaseFile = new ReleaseFile
             {
-                Id = Guid.NewGuid(),
                 Release = contentReleaseVersion2,
                 ReleaseFileReference = replacementReleaseFileReference
             };
@@ -432,7 +417,6 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
 
             var originalReleaseFileReference = new ReleaseFileReference
             {
-                Id = Guid.NewGuid(),
                 Filename = "original.csv",
                 ReleaseFileType = ReleaseFileTypes.Data,
                 Release = contentReleaseVersion1,
@@ -441,7 +425,6 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
 
             var replacementReleaseFileReference = new ReleaseFileReference
             {
-                Id = Guid.NewGuid(),
                 Filename = "replacement.csv",
                 ReleaseFileType = ReleaseFileTypes.Data,
                 Release = contentReleaseVersion2,
@@ -450,21 +433,18 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
 
             var originalReleaseFile1 = new ReleaseFile
             {
-                Id = Guid.NewGuid(),
                 Release = contentReleaseVersion1,
                 ReleaseFileReference = originalReleaseFileReference
             };
 
             var originalReleaseFile2 = new ReleaseFile
             {
-                Id = Guid.NewGuid(),
                 Release = contentReleaseVersion2,
                 ReleaseFileReference = originalReleaseFileReference
             };
 
             var replacementReleaseFile = new ReleaseFile
             {
-                Id = Guid.NewGuid(),
                 Release = contentReleaseVersion2,
                 ReleaseFileReference = replacementReleaseFileReference
             };
@@ -477,13 +457,11 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
 
             var replacementFilterItem = new FilterItem
             {
-                Id = Guid.NewGuid(),
                 Label = "Replacement Test filter item"
             };
 
             var originalFilterGroup = new FilterGroup
             {
-                Id = Guid.NewGuid(),
                 Label = "Original Default group",
                 FilterItems = new List<FilterItem>
                 {
@@ -493,7 +471,6 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
 
             var replacementFilterGroup = new FilterGroup
             {
-                Id = Guid.NewGuid(),
                 Label = "Replacement Default group",
                 FilterItems = new List<FilterItem>
                 {
@@ -503,7 +480,6 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
 
             var originalFilter = new Filter
             {
-                Id = Guid.NewGuid(),
                 Label = "Original Test filter",
                 Name = "original_test_filter",
                 Subject = originalSubject,
@@ -515,7 +491,6 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
 
             var replacementFilter = new Filter
             {
-                Id = Guid.NewGuid(),
                 Label = "Replacement Test filter",
                 Name = "replacement_test_filter",
                 Subject = replacementSubject,
@@ -534,14 +509,12 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
 
             var replacementIndicator = new Indicator
             {
-                Id = Guid.NewGuid(),
                 Label = "Replacement Indicator",
                 Name = "replacement_indicator"
             };
 
             var originalIndicatorGroup = new IndicatorGroup
             {
-                Id = Guid.NewGuid(),
                 Label = "Original Default group",
                 Subject = originalSubject,
                 Indicators = new List<Indicator>
@@ -552,7 +525,6 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
 
             var replacementIndicatorGroup = new IndicatorGroup
             {
-                Id = Guid.NewGuid(),
                 Label = "Replacement Default group",
                 Subject = replacementSubject,
                 Indicators = new List<Indicator>
@@ -601,7 +573,6 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
 
             var dataBlock = new DataBlock
             {
-                Id = Guid.NewGuid(),
                 Name = "Test DataBlock",
                 Query = new ObservationQueryContext
                 {
@@ -685,7 +656,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
                 await contentDbContext.AddRangeAsync(originalReleaseFile1, originalReleaseFile2,
                     replacementReleaseFile);
                 await contentDbContext.AddAsync(dataBlock);
-                await contentDbContext.AddRangeAsync(releaseContentBlock);
+                await contentDbContext.AddAsync(releaseContentBlock);
                 await contentDbContext.SaveChangesAsync();
             }
 
@@ -872,7 +843,6 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
 
             var originalReleaseFileReference = new ReleaseFileReference
             {
-                Id = Guid.NewGuid(),
                 Filename = "original.csv",
                 ReleaseFileType = ReleaseFileTypes.Data,
                 Release = contentReleaseVersion1,
@@ -881,7 +851,6 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
 
             var replacementReleaseFileReference = new ReleaseFileReference
             {
-                Id = Guid.NewGuid(),
                 Filename = "replacement.csv",
                 ReleaseFileType = ReleaseFileTypes.Data,
                 Release = contentReleaseVersion2,
@@ -890,21 +859,18 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
 
             var originalReleaseFile1 = new ReleaseFile
             {
-                Id = Guid.NewGuid(),
                 Release = contentReleaseVersion1,
                 ReleaseFileReference = originalReleaseFileReference
             };
 
             var originalReleaseFile2 = new ReleaseFile
             {
-                Id = Guid.NewGuid(),
                 Release = contentReleaseVersion2,
                 ReleaseFileReference = originalReleaseFileReference
             };
 
             var replacementReleaseFile = new ReleaseFile
             {
-                Id = Guid.NewGuid(),
                 Release = contentReleaseVersion2,
                 ReleaseFileReference = replacementReleaseFileReference
             };
@@ -917,25 +883,21 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
 
             var originalFilterItem2 = new FilterItem
             {
-                Id = Guid.NewGuid(),
                 Label = "Test filter item - not changing"
             };
 
             var replacementFilterItem1 = new FilterItem
             {
-                Id = Guid.NewGuid(),
                 Label = "Test filter item - not changing"
             };
 
             var replacementFilterItem2 = new FilterItem
             {
-                Id = Guid.NewGuid(),
                 Label = "Test filter item - not changing"
             };
 
             var originalFilterGroup1 = new FilterGroup
             {
-                Id = Guid.NewGuid(),
                 Label = "Default group - not changing",
                 FilterItems = new List<FilterItem>
                 {
@@ -945,7 +907,6 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
 
             var originalFilterGroup2 = new FilterGroup
             {
-                Id = Guid.NewGuid(),
                 Label = "Default group - not changing",
                 FilterItems = new List<FilterItem>
                 {
@@ -955,7 +916,6 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
 
             var replacementFilterGroup1 = new FilterGroup
             {
-                Id = Guid.NewGuid(),
                 Label = "Default group - not changing",
                 FilterItems = new List<FilterItem>
                 {
@@ -965,7 +925,6 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
 
             var replacementFilterGroup2 = new FilterGroup
             {
-                Id = Guid.NewGuid(),
                 Label = "Default group - not changing",
                 FilterItems = new List<FilterItem>
                 {
@@ -975,7 +934,6 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
 
             var originalFilter1 = new Filter
             {
-                Id = Guid.NewGuid(),
                 Label = "Test filter 1 - not changing",
                 Name = "test_filter_1_not_changing",
                 Subject = originalSubject,
@@ -987,7 +945,6 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
 
             var originalFilter2 = new Filter
             {
-                Id = Guid.NewGuid(),
                 Label = "Test filter 2 - not changing",
                 Name = "test_filter_2_not_changing",
                 Subject = originalSubject,
@@ -999,7 +956,6 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
 
             var replacementFilter1 = new Filter
             {
-                Id = Guid.NewGuid(),
                 Label = "Test filter 1 - not changing",
                 Name = "test_filter_1_not_changing",
                 Subject = replacementSubject,
@@ -1011,7 +967,6 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
 
             var replacementFilter2 = new Filter
             {
-                Id = Guid.NewGuid(),
                 Label = "Test filter 2 - not changing",
                 Name = "test_filter_2_not_changing",
                 Subject = replacementSubject,
@@ -1030,14 +985,12 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
 
             var replacementIndicator = new Indicator
             {
-                Id = Guid.NewGuid(),
                 Label = "Indicator - not changing",
                 Name = "indicator_not_changing"
             };
 
             var originalIndicatorGroup = new IndicatorGroup
             {
-                Id = Guid.NewGuid(),
                 Label = "Default group - not changing",
                 Subject = originalSubject,
                 Indicators = new List<Indicator>
@@ -1048,7 +1001,6 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
 
             var replacementIndicatorGroup = new IndicatorGroup
             {
-                Id = Guid.NewGuid(),
                 Label = "Default group - not changing",
                 Subject = replacementSubject,
                 Indicators = new List<Indicator>
@@ -1097,7 +1049,6 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
 
             var dataBlock = new DataBlock
             {
-                Id = Guid.NewGuid(),
                 Name = "Test DataBlock",
                 Query = new ObservationQueryContext
                 {
@@ -1194,7 +1145,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
                 await contentDbContext.AddRangeAsync(originalReleaseFile1, originalReleaseFile2,
                     replacementReleaseFile);
                 await contentDbContext.AddAsync(dataBlock);
-                await contentDbContext.AddRangeAsync(releaseContentBlock);
+                await contentDbContext.AddAsync(releaseContentBlock);
                 await contentDbContext.SaveChangesAsync();
             }
 
@@ -1370,7 +1321,6 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
 
             var originalReleaseFileReference = new ReleaseFileReference
             {
-                Id = Guid.NewGuid(),
                 Filename = "original.csv",
                 ReleaseFileType = ReleaseFileTypes.Data,
                 Release = contentRelease,
@@ -1379,7 +1329,6 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
 
             var replacementReleaseFileReference = new ReleaseFileReference
             {
-                Id = Guid.NewGuid(),
                 Filename = "replacement.csv",
                 ReleaseFileType = ReleaseFileTypes.Data,
                 Release = contentRelease,
@@ -1388,62 +1337,14 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
 
             var originalReleaseFile = new ReleaseFile
             {
-                Id = Guid.NewGuid(),
                 Release = contentRelease,
                 ReleaseFileReference = originalReleaseFileReference
             };
 
             var replacementReleaseFile = new ReleaseFile
             {
-                Id = Guid.NewGuid(),
                 Release = contentRelease,
                 ReleaseFileReference = replacementReleaseFileReference
-            };
-
-            var originalFilterItem = new FilterItem
-            {
-                Id = Guid.NewGuid(),
-                Label = "Original Test filter item"
-            };
-
-            var originalFilterGroup = new FilterGroup
-            {
-                Id = Guid.NewGuid(),
-                Label = "Original Default group",
-                FilterItems = new List<FilterItem>
-                {
-                    originalFilterItem
-                }
-            };
-
-            var originalFilter = new Filter
-            {
-                Id = Guid.NewGuid(),
-                Label = "Original Test filter",
-                Name = "original_test_filter",
-                Subject = originalSubject,
-                FilterGroups = new List<FilterGroup>
-                {
-                    originalFilterGroup
-                }
-            };
-
-            var originalIndicator = new Indicator
-            {
-                Id = Guid.NewGuid(),
-                Label = "Original Indicator",
-                Name = "original_indicator"
-            };
-
-            var originalIndicatorGroup = new IndicatorGroup
-            {
-                Id = Guid.NewGuid(),
-                Label = "Original Default group",
-                Subject = originalSubject,
-                Indicators = new List<Indicator>
-                {
-                    originalIndicator
-                }
             };
 
             var timePeriod = new TimePeriodQuery
@@ -1477,7 +1378,6 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
 
             var dataBlock = new DataBlock
             {
-                Id = Guid.NewGuid(),
                 Name = "Test DataBlock",
                 Query = new ObservationQueryContext
                 {
@@ -1516,7 +1416,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
                 await contentDbContext.AddRangeAsync(originalReleaseFileReference, replacementReleaseFileReference);
                 await contentDbContext.AddRangeAsync(originalReleaseFile, replacementReleaseFile);
                 await contentDbContext.AddAsync(dataBlock);
-                await contentDbContext.AddRangeAsync(releaseContentBlock);
+                await contentDbContext.AddAsync(releaseContentBlock);
                 await contentDbContext.SaveChangesAsync();
             }
 
@@ -1524,8 +1424,6 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
             {
                 await statisticsDbContext.AddRangeAsync(statsRelease);
                 await statisticsDbContext.AddRangeAsync(originalSubject, replacementSubject);
-                await statisticsDbContext.AddRangeAsync(originalFilter);
-                await statisticsDbContext.AddRangeAsync(originalIndicatorGroup);
                 await statisticsDbContext.SaveChangesAsync();
             }
 
@@ -1585,7 +1483,6 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
 
             var originalReleaseFileReference = new ReleaseFileReference
             {
-                Id = Guid.NewGuid(),
                 Filename = "original.csv",
                 ReleaseFileType = ReleaseFileTypes.Data,
                 Release = contentReleaseVersion1,
@@ -1594,7 +1491,6 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
 
             var replacementReleaseFileReference = new ReleaseFileReference
             {
-                Id = Guid.NewGuid(),
                 Filename = "replacement.csv",
                 ReleaseFileType = ReleaseFileTypes.Data,
                 Release = contentReleaseVersion2,
@@ -1603,7 +1499,6 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
 
             var originalReleaseFile1 = new ReleaseFile
             {
-                Id = Guid.NewGuid(),
                 Release = contentReleaseVersion1,
                 ReleaseFileReference = originalReleaseFileReference
             };
@@ -1617,7 +1512,6 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
 
             var replacementReleaseFile = new ReleaseFile
             {
-                Id = Guid.NewGuid(),
                 Release = contentReleaseVersion2,
                 ReleaseFileReference = replacementReleaseFileReference
             };
@@ -1630,25 +1524,21 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
 
             var originalFilterItem2 = new FilterItem
             {
-                Id = Guid.NewGuid(),
                 Label = "Test filter item - not changing"
             };
 
             var replacementFilterItem1 = new FilterItem
             {
-                Id = Guid.NewGuid(),
                 Label = "Test filter item - not changing"
             };
 
             var replacementFilterItem2 = new FilterItem
             {
-                Id = Guid.NewGuid(),
                 Label = "Test filter item - not changing"
             };
 
             var originalFilterGroup1 = new FilterGroup
             {
-                Id = Guid.NewGuid(),
                 Label = "Default group - not changing",
                 FilterItems = new List<FilterItem>
                 {
@@ -1658,7 +1548,6 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
 
             var originalFilterGroup2 = new FilterGroup
             {
-                Id = Guid.NewGuid(),
                 Label = "Default group - not changing",
                 FilterItems = new List<FilterItem>
                 {
@@ -1668,7 +1557,6 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
 
             var replacementFilterGroup1 = new FilterGroup
             {
-                Id = Guid.NewGuid(),
                 Label = "Default group - not changing",
                 FilterItems = new List<FilterItem>
                 {
@@ -1678,7 +1566,6 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
 
             var replacementFilterGroup2 = new FilterGroup
             {
-                Id = Guid.NewGuid(),
                 Label = "Default group - not changing",
                 FilterItems = new List<FilterItem>
                 {
@@ -1688,7 +1575,6 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
 
             var originalFilter1 = new Filter
             {
-                Id = Guid.NewGuid(),
                 Label = "Test filter 1 - not changing",
                 Name = "test_filter_1_not_changing",
                 Subject = originalSubject,
@@ -1700,7 +1586,6 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
 
             var originalFilter2 = new Filter
             {
-                Id = Guid.NewGuid(),
                 Label = "Test filter 2 - not changing",
                 Name = "test_filter_2_not_changing",
                 Subject = originalSubject,
@@ -1712,7 +1597,6 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
 
             var replacementFilter1 = new Filter
             {
-                Id = Guid.NewGuid(),
                 Label = "Test filter 1 - not changing",
                 Name = "test_filter_1_not_changing",
                 Subject = replacementSubject,
@@ -1724,7 +1608,6 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
 
             var replacementFilter2 = new Filter
             {
-                Id = Guid.NewGuid(),
                 Label = "Test filter 2 - not changing",
                 Name = "test_filter_2_not_changing",
                 Subject = replacementSubject,
@@ -1743,14 +1626,12 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
 
             var replacementIndicator = new Indicator
             {
-                Id = Guid.NewGuid(),
                 Label = "Indicator - not changing",
                 Name = "indicator_not_changing"
             };
 
             var originalIndicatorGroup = new IndicatorGroup
             {
-                Id = Guid.NewGuid(),
                 Label = "Default group - not changing",
                 Subject = originalSubject,
                 Indicators = new List<Indicator>
@@ -1761,7 +1642,6 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
 
             var replacementIndicatorGroup = new IndicatorGroup
             {
-                Id = Guid.NewGuid(),
                 Label = "Default group - not changing",
                 Subject = replacementSubject,
                 Indicators = new List<Indicator>
@@ -1810,7 +1690,6 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
 
             var dataBlock = new DataBlock
             {
-                Id = Guid.NewGuid(),
                 Name = "Test DataBlock",
                 Query = new ObservationQueryContext
                 {
@@ -1911,7 +1790,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
                 await contentDbContext.AddRangeAsync(originalReleaseFile1, originalReleaseFile2,
                     replacementReleaseFile);
                 await contentDbContext.AddAsync(dataBlock);
-                await contentDbContext.AddRangeAsync(releaseContentBlock);
+                await contentDbContext.AddAsync(releaseContentBlock);
                 await contentDbContext.SaveChangesAsync();
             }
 
@@ -2064,7 +1943,6 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
         {
             return new Footnote
             {
-                Id = Guid.NewGuid(),
                 Content = content,
                 Filters = filterFootnotes,
                 FilterGroups = filterGroupFootnotes,
