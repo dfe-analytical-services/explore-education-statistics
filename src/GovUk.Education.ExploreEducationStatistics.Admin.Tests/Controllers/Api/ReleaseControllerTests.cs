@@ -187,7 +187,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Controllers.Api
 
             mocks.ReleaseService
                 .Setup(service => service.RemoveDataFilesAsync(_releaseId, "datafilename", "subject title"))
-                .ReturnsAsync(new Either<ActionResult, bool>(true));
+                .ReturnsAsync(Unit.Instance);
             var controller = ReleasesControllerWithMocks(mocks);
 
             // Call the method under test
