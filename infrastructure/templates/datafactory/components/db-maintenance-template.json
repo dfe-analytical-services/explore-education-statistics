@@ -294,11 +294,7 @@
             "interval": 1,
             "startTime": "2020-09-19T23:00:00.000Z",
             "timeZone": "UTC",
-            "schedule": {
-              "weekDays": [
-                "Saturday"
-              ]
-            }
+            "schedule": {}
           }
         }
       },
@@ -343,11 +339,7 @@
             "interval": 1,
             "startTime": "2020-09-18T12:00:00.000Z",
             "timeZone": "UTC",
-            "schedule": {
-              "weekDays": [
-                "Friday"
-              ]
-            }
+            "schedule": {}
           }
         }
       },
