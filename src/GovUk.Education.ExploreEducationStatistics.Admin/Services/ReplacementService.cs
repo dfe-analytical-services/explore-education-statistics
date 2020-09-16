@@ -132,13 +132,16 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Services
             ReleaseFileReference replacementReleaseFileReference)
         {
             // Get the latest Release referencing the original ReleaseFileReference
-            var originalReleaseId = await (
-                    from releaseFile in _contentDbContext.ReleaseFiles
-                    join newerVersion in _contentDbContext.Releases on releaseFile.ReleaseId equals newerVersion
-                        .PreviousVersionId into newerVersionGroup
-                    from newerVersion in newerVersionGroup.DefaultIfEmpty()
-                    where releaseFile.ReleaseFileReferenceId == originalReleaseFileReference.Id && newerVersion == null
-                    select releaseFile.ReleaseId)
+            var originalReleaseId = await _contentDbContext.ReleaseFiles
+                .GroupJoin(_contentDbContext.Releases, releaseFile => releaseFile.ReleaseId,
+                    newerVersion => newerVersion.PreviousVersionId,
+                    (releaseFile, newerVersionGroup) => new {releaseFile, newerVersionGroup})
+                .SelectMany(tuple => tuple.newerVersionGroup.DefaultIfEmpty(),
+                    (tuple, newerVersion) => new {tuple.releaseFile, newerVersion})
+                .Where(tuple =>
+                    tuple.releaseFile.ReleaseFileReferenceId == originalReleaseFileReference.Id
+                    && tuple.newerVersion == null)
+                .Select(tuple => tuple.releaseFile.ReleaseId)
                 .SingleAsync();
 
             // Check the replacement is for the same Release
