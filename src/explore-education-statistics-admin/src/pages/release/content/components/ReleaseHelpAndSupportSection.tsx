@@ -64,7 +64,7 @@ const ReleaseHelpAndSupportSection = ({
         <AccordionSection heading="Contact us" headingTag="h3">
           <ContactUsSection
             publicationContact={publication.contact}
-            themeTitle={publication.topic.theme.title}
+            publicationTitle={publication.title}
           />
         </AccordionSection>
       </Accordion>
