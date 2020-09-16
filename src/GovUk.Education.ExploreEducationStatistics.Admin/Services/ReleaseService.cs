@@ -463,21 +463,18 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Services
                     await _dataBlockService.DeleteDataBlocks(deletePlan.DeleteDataBlockPlan);
                     await _releaseSubjectService.SoftDeleteSubjectOrBreakReleaseLink(releaseId, deletePlan.SubjectId);
 
-                    await _releaseFilesService
+                    return await _releaseFilesService
                         .DeleteDataFilesAsync(releaseId, fileName)
                         .OnSuccess(async () => await RemoveFileImportEntryIfOrphaned(deletePlan));
-                    return Unit.Instance;
                 });
         }
 
-        private async Task<bool> RemoveFileImportEntryIfOrphaned(DeleteDataFilePlan deletePlan)
+        private async Task RemoveFileImportEntryIfOrphaned(DeleteDataFilePlan deletePlan)
         {
             if (await _subjectService.GetAsync(deletePlan.SubjectId) == null)
             {
-                return await _coreTableStorageService.DeleteEntityAsync(DatafileImportsTableName, deletePlan.TableStorageItem);
+                await _coreTableStorageService.DeleteEntityAsync(DatafileImportsTableName, deletePlan.TableStorageItem);
             }
-
-            return false;
         }
 
         public async Task<Either<ActionResult, ImportStatus>> GetDataFileImportStatus(Guid releaseId, string dataFileName)
