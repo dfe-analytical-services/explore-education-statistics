@@ -1,6 +1,7 @@
 using System;
 using System.Collections.Generic;
 using System.IO;
+using System.IO.Compression;
 using System.Linq;
 using System.Threading.Tasks;
 using GovUk.Education.ExploreEducationStatistics.Common.Model;
@@ -11,6 +12,8 @@ using GovUk.Education.ExploreEducationStatistics.Data.Processor.Services.Interfa
 using GovUk.Education.ExploreEducationStatistics.Data.Processor.Utils;
 using Microsoft.Azure.Storage.Blob;
 using static GovUk.Education.ExploreEducationStatistics.Common.BlobContainerNames;
+using static GovUk.Education.ExploreEducationStatistics.Common.Services.FileStoragePathUtils;
+using static GovUk.Education.ExploreEducationStatistics.Common.Services.FileStorageUtils;
 
 namespace GovUk.Education.ExploreEducationStatistics.Data.Processor.Services
 {
@@ -60,7 +63,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Processor.Services
 
         public void DeleteBatchFile(string releaseId, string dataFileName)
         {
-            GetBlobReference(FileStoragePathUtils.AdminReleaseDirectoryPath(releaseId, ReleaseFileTypes.Data) + dataFileName).DeleteIfExists();
+            GetBlobReference(AdminReleaseDirectoryPath(releaseId, ReleaseFileTypes.Data) + dataFileName).DeleteIfExists();
         }
 
         public int GetNumBatchesRemaining(string releaseId, string origDataFileName)
@@ -82,7 +85,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Processor.Services
                 .OfType<CloudBlockBlob>().Where(blob => blob.Name.Contains(origDataFileName)).Select(blob => blob.Name);
         }
         
-        private CloudBlockBlob GetBlobReference(string fullPath)
+        public CloudBlockBlob GetBlobReference(string fullPath)
         {
             return _blobContainer.GetBlockBlobReference(fullPath);
         }
@@ -115,11 +118,23 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Processor.Services
 
         public static async Task<CloudBlobContainer> GetOrCreateBlobContainer(string storageConnectionString)
         {
-            return await FileStorageUtils.GetCloudBlobContainerAsync(storageConnectionString, PrivateFilesContainerName,
+            return await GetCloudBlobContainerAsync(storageConnectionString, PrivateFilesContainerName,
                 new BlobContainerPermissions
                 {
                     PublicAccess = BlobContainerPublicAccessType.Blob
                 });
+        }
+        
+        public async Task UploadFileToStorageAsync(Guid releaseId, ZipArchiveEntry file, ReleaseFileTypes type, IDictionary<string, string> metaValues)
+        {
+            var blob = _blobContainer.GetBlockBlobReference(AdminReleasePath(releaseId, type, file.Name.ToLower()));
+            using (var stream = file.Open())
+            {
+                await blob.UploadFromStreamAsync(stream);
+                //blob.Properties.ContentType = file.ContentType;
+                metaValues["NumberOfRows"] = CalculateNumberOfRows(file.Open()).ToString();
+                await AddMetaValuesAsync(blob, metaValues);
+            }
         }
     }
 }

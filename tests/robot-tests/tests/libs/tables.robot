@@ -15,13 +15,11 @@ user checks row contains heading
 
 user checks results table row heading contains
     [Arguments]   ${row}  ${column}  ${expected}
-    element should contain   xpath://table/tbody/tr[${row}]/th[${column}]   ${expected}
-    ...  message="${expected}" not found in th tag in results table tbody row ${row}, column ${column}.
+    user waits until element contains  xpath://table/tbody/tr[${row}]/th[${column}]   ${expected}
 
 user checks results table cell contains
     [Arguments]   ${row}  ${column}  ${expected}
-    element should contain   xpath://table/tbody/tr[${row}]/td[${column}]   ${expected}
-    ...  message="${expected}" not found in td tag in results table tbody row ${row}, column ${column}.
+    user waits until element contains  xpath://table/tbody/tr[${row}]/td[${column}]   ${expected}
 
 user checks table heading in offset row contains
     [Arguments]  ${table_locator}   ${row}   ${offset}   ${column}   ${expected}

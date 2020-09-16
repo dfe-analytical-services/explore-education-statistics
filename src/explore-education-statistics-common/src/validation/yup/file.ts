@@ -3,7 +3,7 @@ import { mixed } from 'yup';
 const MixedSchema = mixed;
 
 class FileSchema extends MixedSchema {
-  private isNullable = false;
+  private isNullable = true;
 
   constructor() {
     super({ type: 'file' });
@@ -34,23 +34,8 @@ class FileSchema extends MixedSchema {
     return clone;
   }
 
-  public mimeType(allowedTypes: string[], message: string): FileSchema {
-    return this.test({
-      name: 'mimeType',
-      message,
-      params: {
-        allowedTypes,
-      },
-      test(value?: File) {
-        if (!value) {
-          return true;
-        }
-
-        return allowedTypes.some(type => {
-          return value.type.startsWith(type);
-        });
-      },
-    });
+  public required(message: string): FileSchema {
+    return super.required(message) as this;
   }
 
   public minSize(minBytes: number, message: string): FileSchema {

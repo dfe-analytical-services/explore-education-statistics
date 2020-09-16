@@ -1,7 +1,6 @@
 using System;
 using System.Collections.Generic;
 using System.Linq;
-using GovUk.Education.ExploreEducationStatistics.Common.Model;
 using GovUk.Education.ExploreEducationStatistics.Common.Model.Data;
 using GovUk.Education.ExploreEducationStatistics.Data.Model.Database;
 using GovUk.Education.ExploreEducationStatistics.Data.Model.Services.Interfaces;
@@ -11,7 +10,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Model.Services
 {
     public class LocationService : AbstractRepository<Location, Guid>, ILocationService
     {
-        private static readonly List<GeographicLevel> IgnoredLevels = new List<GeographicLevel>
+        public static readonly List<GeographicLevel> IgnoredLevels = new List<GeographicLevel>
         {
             GeographicLevel.School,
             GeographicLevel.Provider

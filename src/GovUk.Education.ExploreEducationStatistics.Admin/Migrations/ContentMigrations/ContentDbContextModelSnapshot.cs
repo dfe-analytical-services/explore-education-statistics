@@ -346,7 +346,10 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Migrations.ContentMig
                     b.Property<string>("NextReleaseDate")
                         .HasColumnType("nvarchar(max)");
 
-                    b.Property<Guid>("PreviousVersionId")
+                    b.Property<string>("PreReleaseAccessList")
+                        .HasColumnType("nvarchar(max)");
+
+                    b.Property<Guid?>("PreviousVersionId")
                         .HasColumnType("uniqueidentifier");
 
                     b.Property<Guid>("PublicationId")
@@ -404,7 +407,6 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Migrations.ContentMig
                             Created = new DateTime(2017, 8, 1, 23, 59, 54, 0, DateTimeKind.Utc),
                             CreatedById = new Guid("b99e8358-9a5e-4a3a-9288-6f94c7e1e3dd"),
                             NextReleaseDate = "{\"Year\":\"2019\",\"Month\":\"3\",\"Day\":\"22\"}",
-                            PreviousVersionId = new Guid("4fa4fe8e-9a15-46bb-823f-49bf8e0cdec5"),
                             PublicationId = new Guid("cbbd299f-8297-44bc-92ac-558bcf51f8ad"),
                             PublishScheduled = new DateTime(2018, 4, 25, 0, 0, 0, 0, DateTimeKind.Unspecified),
                             Published = new DateTime(2018, 4, 25, 9, 30, 0, 0, DateTimeKind.Unspecified),
@@ -530,12 +532,17 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Migrations.ContentMig
                     b.Property<Guid>("ReleaseId")
                         .HasColumnType("uniqueidentifier");
 
+                    b.Property<Guid?>("SourceId")
+                        .HasColumnType("uniqueidentifier");
+
                     b.Property<Guid?>("SubjectId")
                         .HasColumnType("uniqueidentifier");
 
                     b.HasKey("Id");
 
                     b.HasIndex("ReleaseId");
+
+                    b.HasIndex("SourceId");
 
                     b.ToTable("ReleaseFileReferences");
                 });
@@ -999,8 +1006,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Migrations.ContentMig
                     b.HasOne("GovUk.Education.ExploreEducationStatistics.Content.Model.Release", "PreviousVersion")
                         .WithMany()
                         .HasForeignKey("PreviousVersionId")
-                        .OnDelete(DeleteBehavior.NoAction)
-                        .IsRequired();
+                        .OnDelete(DeleteBehavior.NoAction);
 
                     b.HasOne("GovUk.Education.ExploreEducationStatistics.Content.Model.Publication", "Publication")
                         .WithMany("Releases")
@@ -1065,6 +1071,10 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Migrations.ContentMig
                         .HasForeignKey("ReleaseId")
                         .OnDelete(DeleteBehavior.Cascade)
                         .IsRequired();
+
+                    b.HasOne("GovUk.Education.ExploreEducationStatistics.Content.Model.ReleaseFileReference", "Source")
+                        .WithMany()
+                        .HasForeignKey("SourceId");
                 });
 
             modelBuilder.Entity("GovUk.Education.ExploreEducationStatistics.Content.Model.Topic", b =>

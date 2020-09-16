@@ -79,6 +79,7 @@ user creates release for publication
     user waits until page contains element  id:releaseSummaryForm-timePeriodCoverage
     user selects from list by label  id:releaseSummaryForm-timePeriodCoverage  ${time_period_coverage}
     user enters text into element  id:releaseSummaryForm-timePeriodCoverageStartYear  ${start_year}
+    user clicks element if exists   css:[data-testid="Create new template"]
     user clicks radio   National Statistics
     user clicks button  Create new release
     user waits until page contains element  xpath://span[text()="Edit release"]
@@ -208,19 +209,19 @@ user changes accordion section title
 
 user checks accordion section contains x blocks
     [Arguments]  ${section_name}  ${num_blocks}
-    ${section}=  user gets accordion content element  ${section_name}
+    ${section}=  user gets accordion section content element  ${section_name}
     ${blocks}=  get child elements  ${section}  css:[data-testid="editableSectionBlock"]
     length should be  ${blocks}  ${num_blocks}
 
 user adds text block to editable accordion section
     [Arguments]  ${section_name}
-    ${section}=  user gets accordion content element  ${section_name}
+    ${section}=  user gets accordion section content element  ${section_name}
     user clicks button  Add text block  ${section}
     user waits until element contains  ${section}  This section is empty
 
 user adds data block to editable accordion section
     [Arguments]   ${section_name}   ${block_name}
-    ${section}=  user gets accordion content element  ${section_name}
+    ${section}=  user gets accordion section content element  ${section_name}
     user clicks button  Add data block   ${section}
     ${block_list}=  get child element  ${section}  css:select[name="selectedDataBlock"]
     user selects from list by label  ${block_list}  Dates data block name
@@ -229,7 +230,7 @@ user adds data block to editable accordion section
 
 user adds content to accordion section text block
     [Arguments]  ${section_name}  ${block_num}  ${content}
-    ${section}=  user gets accordion content element  ${section_name}
+    ${section}=  user gets accordion section content element  ${section_name}
     ${block}=  get child element  ${section}  css:[data-testid="editableSectionBlock"]:nth-of-type(${block_num})
     user clicks button  Edit block  ${block}
     user presses keys  ${content}
@@ -238,13 +239,13 @@ user adds content to accordion section text block
 
 user checks accordion section text block contains
     [Arguments]  ${section_name}  ${block_num}  ${content}
-    ${section}=  user gets accordion content element  ${section_name}
+    ${section}=  user gets accordion section content element  ${section_name}
     ${block}=  get child element  ${section}  css:[data-testid="editableSectionBlock"]:nth-of-type(${block_num})
     user waits until element contains  ${block}  ${content}
 
 user deletes editable accordion section content block
     [Arguments]  ${section_name}  ${block_num}
-    ${section}=  user gets accordion content element  ${section_name}
+    ${section}=  user gets accordion section content element  ${section_name}
     ${block}=  get child element  ${section}  css:[data-testid="editableSectionBlock"]:nth-of-type(${block_num})
     user clicks button  Remove block  ${block}
     user clicks button  Confirm

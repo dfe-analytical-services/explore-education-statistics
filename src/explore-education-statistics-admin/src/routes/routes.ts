@@ -7,6 +7,7 @@ import MethodologiesPage from '@admin/pages/methodology/MethodologiesPage';
 import MethodologyCreatePage from '@admin/pages/methodology/MethodologyCreatePage';
 import PublicationCreatePage from '@admin/pages/publication/PublicationCreatePage';
 import PublicationEditPage from '@admin/pages/publication/PublicationEditPage';
+import PreReleaseAccessListPage from '@admin/pages/release/PreReleaseAccessListPage';
 import PreReleasePage from '@admin/pages/release/PreReleasePage';
 import ReleaseCreatePage from '@admin/pages/release/ReleaseCreatePage';
 import ReleasePageContainer from '@admin/pages/release/ReleasePageContainer';
@@ -147,6 +148,13 @@ export const preReleaseRoute: ProtectedRouteProps = {
   exact: true,
 };
 
+export const preReleaseAccessListRoute: ProtectedRouteProps = {
+  path: '/publication/:publicationId/release/:releaseId/prerelease-access-list',
+  component: PreReleaseAccessListPage,
+  protectionAction: user => user.permissions.canAccessPrereleasePages,
+  exact: true,
+};
+
 const routes = {
   ...administrationRoutes,
   ...documentationRoutes,
@@ -164,6 +172,7 @@ const routes = {
   methodologyCreateRoute,
   methodologyRoute,
   preReleaseRoute,
+  preReleaseAccessListRoute,
   releaseRoute,
   releaseCreateRoute,
   legacyReleasesRoute,

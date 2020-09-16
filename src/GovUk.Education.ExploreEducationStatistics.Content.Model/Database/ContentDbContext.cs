@@ -382,7 +382,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Content.Model.Database
                     TypeId = new Guid("9d333457-9132-4e55-ae78-c55cb3673d7c"),
                     Created = new DateTime(2017, 8, 1, 23, 59, 54, DateTimeKind.Utc),
                     CreatedById = bauMvcUser1Id,
-                    PreviousVersionId = absenceReleaseId
+                    PreviousVersionId = null
                 }
             );
 

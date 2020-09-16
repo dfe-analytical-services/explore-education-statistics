@@ -28,35 +28,63 @@ Verify Manage content test publication is created
 
 Create release
     [Tags]  HappyPath
-    user clicks element  css:[data-testid="Create new release link for ${PUBLICATION_NAME}"]
+    user clicks testid element   Create new release link for ${PUBLICATION_NAME}
     user creates release for publication  ${PUBLICATION_NAME}  Academic Year  2025
     user checks summary list contains  Publication title  ${PUBLICATION_NAME}
 
 Navigate to Manage data tab
     [Tags]  HappyPath
-    user waits until page contains link   Manage data
     user clicks link  Manage data
     user waits until h1 is visible  ${PUBLICATION_NAME}
 
 Navigate to File uploads tab
     [Tags]  HappyPath
-    user waits until page contains link   File uploads
     user clicks link  File uploads
-    user waits until page contains element  xpath://legend[text()="Upload file"]
+    user waits until h2 is visible  Add file to release
+    user waits until page contains  No files have been uploaded
 
-Upload file
+Validate cannot upload empty file
     [Tags]  HappyPath
-    user enters text into element  id:fileUploadForm-name   dfe logo
-    choose file   id:fileUploadForm-file      ${CURDIR}${/}files${/}dfe-logo.jpg
+    user enters text into element  id:fileUploadForm-name   Empty test
+    user chooses file   id:fileUploadForm-file      ${CURDIR}${/}files${/}empty-file.txt
     user clicks button  Upload file
-    user waits until page contains accordion section   dfe logo
-    user opens accordion section   dfe logo
-    user checks page contains element   xpath://dt[text()="Name"]/../dd/h4[text()="dfe logo"]
+    user waits until page contains  Choose a file that is not empty
+
+Upload multiple files
+    [Tags]  HappyPath
+    user enters text into element  id:fileUploadForm-name   Test 1
+    user chooses file   id:fileUploadForm-file      ${CURDIR}${/}files${/}test-file-1.txt
+    user clicks button  Upload file
+
+    user waits until page contains accordion section   test 1
+    user opens accordion section   test 1  id:file-uploads
+
+    ${section_1}=  user gets accordion section content element  test 1  id:file-uploads
+    user checks summary list contains  Name         test 1              ${section_1}
+    user checks summary list contains  File         test-file-1.txt     ${section_1}
+    user checks summary list contains  File size    12 B                ${section_1}
+
+    user enters text into element  id:fileUploadForm-name   Test 2
+    user chooses file   id:fileUploadForm-file      ${CURDIR}${/}files${/}test-file-2.txt
+    user clicks button  Upload file
+
+    user waits until page contains accordion section   test 2
+    user opens accordion section   test 2  id:file-uploads
+
+    ${section_2}=  user gets accordion section content element  test 2  id:file-uploads
+    user checks summary list contains  Name         test 2              ${section_2}
+    user checks summary list contains  File         test-file-2.txt     ${section_2}
+    user checks summary list contains  File size    24 B                ${section_2}
+
+    user checks there are x accordion sections  2  id:file-uploads
 
 Delete file
     [Tags]  HappyPath
-    user clicks button   Delete file
+    ${file_2_section}=  user gets accordion section content element  test 2  id:file-uploads
+    user clicks button   Delete file  ${file_2_section}
     user waits until h1 is visible   Confirm deletion of file
     user clicks button  Confirm
-    user waits until page does not contain accordion section   dfe logo
-    user checks page contains  File uploads
+
+    user waits until page does not contain accordion section   test 2
+    user waits until page contains accordion section  test 1
+    user checks there are x accordion sections  1

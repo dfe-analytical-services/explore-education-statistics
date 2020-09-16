@@ -30,11 +30,11 @@ Validate URL
 
 Validate Published date
     [Tags]     HappyPath    NotAgainstPreProd    Failing
-    user waits until element contains  css:[data-testid="published-date"]   25 April 2018
+    user checks testid element contains   published-date   25 April 2018
 
 Validate Next update date
     [Tags]     HappyPath    NotAgainstPreProd
-    user waits until element contains  css:[data-testid="next-update"]      22 March 2019
+    user checks testid element contains   next-update      22 March 2019
 
 Validate Email alerts link
     [Tags]     HappyPath
@@ -43,7 +43,7 @@ Validate Email alerts link
 Validate "About these statistics" -- "For Academic Year:"
     [Documentation]  DFE-197 DFE-845
     [Tags]  HappyPath
-    user waits until element contains  css:[data-testid="release-name"]    2016/17
+    user checks testid element contains   release-name    2016/17
 
 Validate "About these statistics" -- Number of other releases
     [Tags]  HappyPath
@@ -91,9 +91,14 @@ Validate absence_in_prus.csv file can be downloaded
 Validate headlines -- Summary tab key stats
     [Documentation]  DFE-915   EES-806   EES-1508
     [Tags]  HappyPath
-    user checks key stat contents   1  Overall absence rate         4.7%   Up from 4.6% in 2015/16
-    user checks key stat contents   2  Authorised absence rate      3.4%   Similar to previous years
-    user checks key stat contents   3  Unauthorised absence rate    1.3%   Up from 1.1% in 2015/16
+    user checks key stat contents    1  Overall absence rate         4.7%   Up from 4.6% in 2015/16   90
+    user checks key stat definition  1  What is overall absence?  Total number of all authorised and unauthorised absences from possible school sessions for all pupils.
+
+    user checks key stat contents    2  Authorised absence rate      3.4%   Similar to previous years
+    user checks key stat definition  2  What is authorized absence rate?  Number of authorised absences as a percentage of the overall school population.
+
+    user checks key stat contents    3  Unauthorised absence rate    1.3%   Up from 1.1% in 2015/16
+    user checks key stat definition  3  What is unauthorized absence rate?  Number of unauthorised absences as a percentage of the overall school population.
 
 Validate headlines -- Summary tab content
     [Documentation]    EES-718
@@ -239,6 +244,7 @@ Validate Regional and local authority (LA) breakdown table
 Validate Regional and local authority (LA) breakdown chart
     [Tags]  HappyPath
     user opens accordion section  Regional and local authority (LA) breakdown
+    user scrolls to accordion section content  Regional and local authority (LA) breakdown
 
     ${datablock}=  set variable  css:[data-testid="Data block - Generic data block - LA"]
     user waits until element contains map chart  ${datablock}

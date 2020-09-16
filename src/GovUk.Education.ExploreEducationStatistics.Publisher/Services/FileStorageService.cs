@@ -93,7 +93,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Publisher.Services
 
         public async Task DeleteDownloadFilesForPreviousVersion(Release release)
         {
-            if (release.Slug != release.PreviousVersion.Slug)
+            if (release.PreviousVersion != null && release.Slug != release.PreviousVersion.Slug)
             {
                 var directoryPath = PublicReleaseDirectoryPath(release.Publication.Slug, release.PreviousVersion.Slug);
                 var publicContainer = await GetCloudBlobContainerAsync(_publicStorageConnectionString, PublicFilesContainerName);

@@ -29,10 +29,10 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Controllers.Api
             AssertOkResult(result);
         }
 
-        private static (Mock<IPreReleaseContactsService> PreReleaseContactsService,
+        private static (Mock<IPreReleaseUserService> PreReleaseContactsService,
             Mock<IPreReleaseSummaryService> PreReleaseSummaryService) Mocks()
         {
-            return (new Mock<IPreReleaseContactsService>(),
+            return (new Mock<IPreReleaseUserService>(),
                 new Mock<IPreReleaseSummaryService>());
         }
 

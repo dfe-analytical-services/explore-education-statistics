@@ -27,8 +27,10 @@ import pick from 'lodash/pick';
 import React, { ChangeEvent, ReactNode, useCallback, useMemo } from 'react';
 import { ObjectSchema, Schema } from 'yup';
 
+type FormValues = Partial<ChartOptions>;
+
 export const errorMappings = [
-  mapFieldErrors<ChartOptions>({
+  mapFieldErrors<FormValues>({
     target: 'file',
     messages: {
       FILE_TYPE_INVALID: 'The infographic must be an image',
@@ -44,8 +46,6 @@ const replaceNewLines = (event: ChangeEvent<HTMLTextAreaElement>) => {
   // eslint-disable-next-line no-param-reassign
   event.target.value = event.target.value.replace(/\n/g, ' ');
 };
-
-type FormValues = Partial<ChartOptions>;
 
 interface Props {
   buttons?: ReactNode;
@@ -129,7 +129,6 @@ const ChartConfiguration = ({
             is: value => !value,
             then: Yup.file().required('Select an infographic file to upload'),
           })
-          .mimeType(['image'], 'The infographic must be an image')
           .minSize(0, 'The infographic cannot be an empty file'),
       });
     }
@@ -170,7 +169,7 @@ const ChartConfiguration = ({
       enableReinitialize
       initialErrors={
         submitError
-          ? convertServerFieldErrors(submitError, errorMappings)
+          ? convertServerFieldErrors<FormValues>(submitError, errorMappings)
           : undefined
       }
       initialValues={initialValues}

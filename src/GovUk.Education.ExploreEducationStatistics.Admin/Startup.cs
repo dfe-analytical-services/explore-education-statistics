@@ -236,13 +236,14 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin
             services.AddTransient<IMethodologyService, MethodologyService>();
             services.AddTransient<IMethodologyContentService, MethodologyContentService>();
             services.AddTransient<IDataBlockService, DataBlockService>();
-            services.AddTransient<IPreReleaseContactsService, PreReleaseContactsService>();
+            services.AddTransient<IPreReleaseUserService, PreReleaseUserService>();
             services.AddTransient<IPreReleaseService, PreReleaseService>();
             services.AddTransient<IPreReleaseSummaryService, PreReleaseSummaryService>();
 
             services.AddTransient<IManageContentPageService, ManageContentPageService>();
             services.AddTransient<IContentService, ContentService>();
             services.AddTransient<IRelatedInformationService, RelatedInformationService>();
+            services.AddTransient<IReplacementService, ReplacementService>();
 
             services.AddTransient<INotificationClient>(s =>
             {
@@ -302,10 +303,8 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin
             // These services allow us to check our Policies within Controllers and Services
             StartupSecurityConfiguration.ConfigureResourceBasedAuthorization(services);
 
-            services.AddTransient<IFileTypeService, FileTypeService>();
-
-            // Temp service for EES-960
-            services.AddTransient<IUpdateChartFilesService, UpdateChartFilesService>();
+            services.AddSingleton<IFileTypeService, FileTypeService>();
+            services.AddTransient<IDataArchiveValidationService, DataArchiveValidationService>();
 
             services.AddSwaggerGen(c =>
             {

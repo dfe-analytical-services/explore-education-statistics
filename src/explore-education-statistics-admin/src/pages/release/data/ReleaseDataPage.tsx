@@ -10,8 +10,10 @@ import footnotesService, {
   FootnoteMeta,
 } from '@admin/services/footnoteService';
 import permissionService from '@admin/services/permissionService';
+import LoadingSpinner from '@common/components/LoadingSpinner';
 import Tabs from '@common/components/Tabs';
 import TabsSection from '@common/components/TabsSection';
+import useAsyncHandledRetry from '@common/hooks/useAsyncHandledRetry';
 import React, { useCallback, useEffect, useState } from 'react';
 
 export interface FootnotesData {
@@ -27,26 +29,33 @@ const ReleaseDataPage = () => {
   const [footnotesData, setFootnotesData] = useState<FootnotesData>();
   const [activeTab, setActiveTab] = useState<string>('');
 
+  const {
+    value: canUpdateRelease = false,
+    isLoading,
+  } = useAsyncHandledRetry(
+    () => permissionService.canUpdateRelease(releaseId),
+    [releaseId],
+  );
+
   const getFootnoteData = useCallback(() => {
-    Promise.all([
-      footnotesService.getReleaseFootnoteData(releaseId),
-      permissionService.canUpdateRelease(releaseId),
-    ]).then(([{ meta, footnotes: footnotesList }, canUpdateRelease]) => {
-      setFootnotesData({
-        footnoteMeta: meta,
-        footnotes: footnotesList,
-        footnoteMetaGetters: generateFootnoteMetaMap(meta),
-        canUpdateRelease,
-      });
-    });
-  }, [releaseId]);
+    Promise.all([footnotesService.getReleaseFootnoteData(releaseId)]).then(
+      ([{ meta, footnotes: footnotesList }]) => {
+        setFootnotesData({
+          footnoteMeta: meta,
+          footnotes: footnotesList,
+          footnoteMetaGetters: generateFootnoteMetaMap(meta),
+          canUpdateRelease,
+        });
+      },
+    );
+  }, [canUpdateRelease, releaseId]);
 
   useEffect(() => {
     getFootnoteData();
   }, [activeTab, getFootnoteData]);
 
   return (
-    <>
+    <LoadingSpinner loading={isLoading}>
       <Tabs
         onToggle={tab => {
           if (tab.id === 'footnotes') {
@@ -56,31 +65,31 @@ const ReleaseDataPage = () => {
         }}
         id="dataUploadTab"
       >
-        <TabsSection id="data-upload" title="Data uploads">
+        <TabsSection id="data-uploads" title="Data uploads">
           <ReleaseDataUploadsSection
-            publicationId={publication.id}
             releaseId={releaseId}
+            canUpdateRelease={canUpdateRelease}
           />
         </TabsSection>
         <TabsSection id="footnotes" title="Footnotes">
           <ReleaseFootnotesSection
-            onDelete={getFootnoteData}
             publicationId={publication.id}
             releaseId={releaseId}
             footnotesData={footnotesData}
+            onDelete={getFootnoteData}
             onSubmit={(footnotesDataCallback: FootnotesData) => {
               setFootnotesData(footnotesDataCallback);
             }}
           />
         </TabsSection>
-        <TabsSection id="file-upload" title="File uploads">
+        <TabsSection id="file-uploads" title="File uploads">
           <ReleaseFileUploadsSection
-            publicationId={publication.id}
             releaseId={releaseId}
+            canUpdateRelease={canUpdateRelease}
           />
         </TabsSection>
       </Tabs>
-    </>
+    </LoadingSpinner>
   );
 };
 

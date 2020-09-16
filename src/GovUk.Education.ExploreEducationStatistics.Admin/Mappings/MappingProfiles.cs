@@ -33,6 +33,8 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Mappings
                     m => m.MapFrom(r => r.Publication.Title))
                 .ForMember(dest => dest.PublicationId,
                     m => m.MapFrom(r => r.Publication.Id))
+                .ForMember(dest => dest.PublicationSlug,
+                    m => m.MapFrom(r => r.Publication.Slug))
                 .ForMember(model => model.PublishScheduled,
                     m => m.MapFrom(model =>
                         model.PublishScheduled.HasValue
@@ -49,19 +51,14 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Mappings
                     m => m.MapFrom(r => r.Publication.Title))
                 .ForMember(dest => dest.PublicationId,
                     m => m.MapFrom(r => r.Publication.Id))
+                .ForMember(dest => dest.PublicationSlug,
+                    m => m.MapFrom(r => r.Publication.Slug))
                 .ForMember(model => model.PublishScheduled,
                     m => m.MapFrom(model =>
                         model.PublishScheduled.HasValue
                             ? model.PublishScheduled.Value.ConvertUtcToUkTimeZone()
                             : (DateTime?) null))
                 .ForMember(dest => dest.Permissions, exp => exp.MapFrom<IMyReleasePermissionSetPropertyResolver>());
-
-            CreateMap<Release, ReleaseSummaryViewModel>()
-                .ForMember(model => model.PublishScheduled,
-                    m => m.MapFrom(model =>
-                        model.PublishScheduled.HasValue
-                            ? model.PublishScheduled.Value.ConvertUtcToUkTimeZone()
-                            : (DateTime?) null));
 
             CreateMap<CreateReleaseViewModel, Release>()
                 .ForMember(dest => dest.PublishScheduled, m => m.MapFrom(model =>

@@ -30,7 +30,7 @@ Verify new publication
 Create new release
     [Tags]  HappyPath
     user opens accordion section  ${PUBLICATION_NAME}
-    user clicks element  css:[data-testid="Create new release link for ${PUBLICATION_NAME}"]
+    user clicks testid element   Create new release link for ${PUBLICATION_NAME}
     user creates release for publication  ${PUBLICATION_NAME}  Financial Year  3000
 
 Verify release summary
@@ -57,9 +57,9 @@ Approve release
     user clicks button  Edit release status
     user waits until h2 is visible  Edit release status
 
-    user clicks element   css:input[data-testid="Approved for publication"]
+    user clicks radio   Approved for publication
     user enters text into element  id:releaseStatusForm-internalReleaseNote  Approved by UI tests - publish release and amend
-    user clicks element  css:input[data-testid="As soon as possible"]
+    user clicks radio  As soon as possible
     user enters text into element  id:releaseStatusForm-nextReleaseDate-month   12
     user enters text into element  id:releaseStatusForm-nextReleaseDate-year    3001
 
@@ -105,11 +105,11 @@ Navigate to newly published release page
 Verify release URL and page caption
     [Tags]  HappyPath
     user checks url contains  %{PUBLIC_URL}/find-statistics/ui-tests-publish-release-${RUN_IDENTIFIER}
-    user waits until element contains  css:[data-testid="page-title-caption"]  Financial Year 3000-01
+    user waits until page contains title caption  Financial Year 3000-01
 
 Verify publish and update dates
     [Tags]  HappyPath
-    user waits until element contains  css:[data-testid="published-date"]   ${PUBLISH_DATE_DAY} ${PUBLISH_DATE_MONTH} ${PUBLISH_DATE_YEAR}
+    user checks testid element contains   published-date   ${PUBLISH_DATE_DAY} ${PUBLISH_DATE_MONTH} ${PUBLISH_DATE_YEAR}
     user waits until element contains  css:[data-testid="next-update"] time   December 3001
 
 Verify accordions are correct
@@ -131,11 +131,11 @@ Create amendment
     user waits until page contains accordion section  ${PUBLICATION_NAME}
 
     user opens accordion section  ${PUBLICATION_NAME}
-    ${accordion_section}=  user gets accordion content element  ${PUBLICATION_NAME}
-    ${details_elem}=  user gets child details element  ${accordion_section}   Financial Year 3000-01 (Live - Latest release)
+    ${accordion_section}=  user gets accordion section content element  ${PUBLICATION_NAME}
 
-    user clicks element   ${details_elem}
-    user verifies details is open  ${details_elem}
+    user opens details dropdown  Financial Year 3000-01 (Live - Latest release)  ${accordion_section}
+    ${details_elem}=  user gets details content element  Financial Year 3000-01 (Live - Latest release)  ${accordion_section}
+
     user waits until parent contains element  ${details_elem}   xpath:.//button[text()="Amend this release"]
     ${amend_button}=  get child element  ${details_elem}   xpath:.//button[text()="Amend this release"]
 
@@ -143,7 +143,7 @@ Create amendment
     user waits until h1 is visible  Confirm you want to amend this live release
     user clicks button   Confirm
     user waits until h1 is visible  ${PUBLICATION_NAME}
-    user waits until page contains element   xpath://*[@data-testid="page-title-caption" and text()="Amend release"]
+    user waits until page contains title caption  Amend release
 
 Upload subject
     [Tags]  HappyPath
@@ -157,11 +157,47 @@ Upload subject
     user waits until h2 is visible  Uploaded data files
     user waits until page contains accordion section   Dates test subject
     user opens accordion section   Dates test subject
-    user checks summary list contains   Subject title    Dates test subject
-    user checks summary list contains   Status           Complete             180
+
+    ${section}=  user gets accordion section content element  Dates test subject
+    user checks summary list contains  Subject title    Dates test subject  ${section}
+    user checks summary list contains  Data file        dates.csv  ${section}
+    user checks summary list contains  Metadata file    dates.meta.csv  ${section}
+    user checks summary list contains  Number of rows   119  ${section}
+    user checks summary list contains  Data file size   17 Kb  ${section}
+    user checks summary list contains  Status           Complete  ${section}  180
 
 # TODO: Add footnotes
-# TODO: Add ancillary file
+
+Add ancillary files
+    [Tags]  HappyPath
+    user clicks link  File uploads
+    user waits until h2 is visible  Add file to release
+
+    user enters text into element  id:fileUploadForm-name   Test ancillary file 1
+    user chooses file   id:fileUploadForm-file      ${CURDIR}${/}files${/}test-file-1.txt
+    user clicks button  Upload file
+
+    user waits until page contains accordion section   test ancillary file 1
+    user opens accordion section   test ancillary file 1   id:file-uploads
+
+    ${section_1}=  user gets accordion section content element  test ancillary file 1  id:file-uploads
+    user checks summary list contains  Name         test ancillary file 1  ${section_1}
+    user checks summary list contains  File         test-file-1.txt     ${section_1}
+    user checks summary list contains  File size    12 B                ${section_1}
+
+    user enters text into element  id:fileUploadForm-name   Test ancillary file 2
+    user chooses file   id:fileUploadForm-file      ${CURDIR}${/}files${/}test-file-2.txt
+    user clicks button  Upload file
+
+    user waits until page contains accordion section   test ancillary file 2
+    user opens accordion section   test ancillary file 2  id:file-uploads
+
+    ${section_2}=  user gets accordion section content element  test ancillary file 2  id:file-uploads
+    user checks summary list contains  Name         test ancillary file 2  ${section_2}
+    user checks summary list contains  File         test-file-2.txt     ${section_2}
+    user checks summary list contains  File size    24 B                ${section_2}
+
+    user checks there are x accordion sections  2  id:file-uploads
 
 Create data block table
     [Tags]  HappyPath
@@ -207,7 +243,8 @@ Save data block
 Navigate to Create chart tab
     [Tags]  HappyPath
     user waits until page contains link  Chart
-    user clicks link  Chart
+    user waits until page does not contain loading spinner
+    user clicks element   id:manageDataBlocks-chart-tab
     user clicks button  Choose an infographic as alternative
     user chooses file  id:chartConfigurationForm-file       ${CURDIR}${/}files${/}test-infographic.png
     user enters text into element  id:chartConfigurationForm-title  Sample title
@@ -242,6 +279,19 @@ Add test text to second accordion section
     user adds text block to editable accordion section   Test text
     user adds content to accordion section text block  Test text   1    Some test text!
 
+Add public prerelease access list
+    [Tags]  HappyPath
+    user clicks link  Pre-release access
+    user waits until h2 is visible  Manage pre-release user access
+
+    user clicks link  Public access list
+    user waits until h2 is visible  Public pre-release access list
+    user clicks button   Create public pre-release access list
+    user presses keys  CTRL+a+BACKSPACE
+    user presses keys  Test public access list
+    user clicks button  Save access list
+    user waits until element contains  css:[data-testid="publicPreReleaseAccessListPreview"]  Test public access list
+
 Go to "Release status" tab again
     [Tags]  HappyPath
     user clicks link   Release status
@@ -253,9 +303,9 @@ Approve for immediate release
     user clicks button   Edit release status
     user waits until h2 is visible  Edit release status
 
-    user clicks element   css:input[data-testid="Approved for publication"]
+    user clicks radio   Approved for publication
     user enters text into element  id:releaseStatusForm-internalReleaseNote  Amendment approved by UI tests
-    user clicks element  css:input[data-testid="As soon as possible"]
+    user clicks radio  As soon as possible
     user enters text into element  id:releaseStatusForm-nextReleaseDate-month   1
     user enters text into element  id:releaseStatusForm-nextReleaseDate-year    3002
 
@@ -291,12 +341,16 @@ Verify amendment is on Find Statistics page again
 Navigate to amendment release page
     [Tags]  HappyPath
     user clicks testid element  View stats link for ${PUBLICATION_NAME}
-    user waits until h1 is visible  ${PUBLICATION_NAME}  90
 
-Verify amendment URL and page caption
-    [Tags]  HappyPath
+    user waits until h1 is visible  ${PUBLICATION_NAME}  90
+    user waits until page contains title caption  Financial Year 3000-01
+
     user checks url contains  %{PUBLIC_URL}/find-statistics/ui-tests-publish-release-${RUN_IDENTIFIER}
-    user waits until element contains  css:[data-testid="page-title-caption"]  Financial Year 3000-01
+
+    user checks breadcrumb count should be   3
+    user checks nth breadcrumb contains   1    Home
+    user checks nth breadcrumb contains   2    Find statistics and data
+    user checks nth breadcrumb contains   3    ${PUBLICATION_NAME}
 
 Verify amendment is displayed as the latest release
     [Tags]  HappyPath   Failing
@@ -306,8 +360,56 @@ Verify amendment is displayed as the latest release
 
 Verify amendment publish and update dates
     [Tags]  HappyPath
-    user waits until element contains  css:[data-testid="published-date"]   ${PUBLISH_DATE_DAY} ${PUBLISH_DATE_MONTH} ${PUBLISH_DATE_YEAR}
+    user checks testid element contains    published-date   ${PUBLISH_DATE_DAY} ${PUBLISH_DATE_MONTH} ${PUBLISH_DATE_YEAR}
     user waits until element contains  css:[data-testid="next-update"] time   January 3002
+
+Verify amendment files
+    [Tags]  HappyPath
+    user opens details dropdown     Download associated files
+    ${downloads}=  user gets details content element  Download associated files
+    user checks element should contain  ${downloads}  All files (zip, 3 Kb)
+    user waits until element contains link  ${downloads}  All files
+    user checks link has url  All files  %{DATA_API_URL}/download/ui-tests-publish-release-${RUN_IDENTIFIER}/3000-01/ancillary/ui-tests-publish-release-${RUN_IDENTIFIER}_3000-01.zip   ${downloads}
+
+    user checks element should contain  ${downloads}  Dates test subject (csv, 17 Kb)
+    user waits until element contains link  ${downloads}  Dates test subject
+    user checks link has url  Dates test subject  %{DATA_API_URL}/download/ui-tests-publish-release-${RUN_IDENTIFIER}/3000-01/data/dates.csv   ${downloads}
+
+    user checks element should contain  ${downloads}  test ancillary file 1 (txt, 12 B)
+    user waits until element contains link  ${downloads}  test ancillary file 1
+    user checks link has url  test ancillary file 1  %{DATA_API_URL}/download/ui-tests-publish-release-${RUN_IDENTIFIER}/3000-01/ancillary/test-file-1.txt   ${downloads}
+
+    user checks element should contain  ${downloads}  test ancillary file 2 (txt, 24 B)
+    user waits until element contains link  ${downloads}  test ancillary file 2
+    user checks link has url  test ancillary file 2  %{DATA_API_URL}/download/ui-tests-publish-release-${RUN_IDENTIFIER}/3000-01/ancillary/test-file-2.txt   ${downloads}
+
+Verify public pre-release access list
+    [Tags]  HappyPath
+    user clicks link  Pre-release access list
+
+    user checks breadcrumb count should be   4
+    user checks nth breadcrumb contains   1    Home
+    user checks nth breadcrumb contains   2    Find statistics and data
+    user checks nth breadcrumb contains   3    ${PUBLICATION_NAME}
+    user checks nth breadcrumb contains   4    Pre-release access list
+
+    user waits until page contains title caption  Financial Year 3000-01
+    user waits until h1 is visible  ${PUBLICATION_NAME}
+
+    user waits until h2 is visible  Pre-release access list
+    user waits until page contains  Published ${PUBLISH_DATE_DAY} ${PUBLISH_DATE_MONTH} ${PUBLISH_DATE_YEAR}
+    user waits until page contains  Test public access list
+
+Navigate back to amendment release page
+    user clicks link  ${PUBLICATION_NAME}
+
+    user checks breadcrumb count should be   3
+    user checks nth breadcrumb contains   1    Home
+    user checks nth breadcrumb contains   2    Find statistics and data
+    user checks nth breadcrumb contains   3    ${PUBLICATION_NAME}
+
+    user waits until h1 is visible  ${PUBLICATION_NAME}
+    user waits until page contains title caption  Financial Year 3000-01
 
 Verify amendment accordions are correct
     [Tags]  HappyPath
@@ -319,7 +421,7 @@ Verify amendment accordions are correct
 Verify Dates data block accordion section
     [Tags]  HappyPath
     user opens accordion section  Dates data block
-    ${section}=  user gets accordion content element  Dates data block
+    ${section}=  user gets accordion section content element  Dates data block
 
     user checks chart title contains  ${section}  Sample title
     user checks infographic chart contains alt  ${section}  Sample alt text

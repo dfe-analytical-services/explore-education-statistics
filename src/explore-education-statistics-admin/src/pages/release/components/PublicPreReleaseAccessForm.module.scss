@@ -1,0 +1,8 @@
+@import 'src/styles/govuk-base';
+
+.preview {
+  background: govuk-colour('light-grey');
+  border: 1px solid $govuk-border-colour;
+  margin-bottom: govuk-spacing(6);
+  padding: govuk-spacing(4);
+}

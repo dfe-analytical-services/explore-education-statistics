@@ -19,7 +19,7 @@ export interface AncillaryFile {
   isDeleting?: boolean;
 }
 
-interface UploadAncillaryFileRequest {
+export interface UploadAncillaryFileRequest {
   name: string;
   file: File;
 }
@@ -43,16 +43,24 @@ const releaseAncillaryFileService = {
       .get<AncillaryFileInfo[]>(`/release/${releaseId}/ancillary`)
       .then(response => response.map(mapFile));
   },
-  uploadAncillaryFile(
+  async uploadAncillaryFile(
     releaseId: string,
     request: UploadAncillaryFileRequest,
   ): Promise<AncillaryFile> {
     const data = new FormData();
     data.append('file', request.file);
-    return client.post<AncillaryFile>(
-      `/release/${releaseId}/ancillary?name=${request.name}`,
+
+    const file = await client.post<AncillaryFileInfo>(
+      `/release/${releaseId}/ancillary`,
       data,
+      {
+        params: {
+          name: request.name,
+        },
+      },
     );
+
+    return mapFile(file);
   },
   deleteAncillaryFile(releaseId: string, fileName: string): Promise<void> {
     return client.delete<void>(`/release/${releaseId}/ancillary/${fileName}`);

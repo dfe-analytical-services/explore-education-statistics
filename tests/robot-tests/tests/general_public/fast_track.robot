@@ -16,6 +16,7 @@ Click fast track link for 'Pupil absence rates' data block
     [Tags]  HappyPath
     user waits until h1 is visible  Pupil absence in schools in England
     user opens accordion section  Pupil absence rates
+    user scrolls to accordion section content  Pupil absence rates
     user waits until h3 is visible  Explore and edit this data online
     user clicks link  Explore data
 

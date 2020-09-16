@@ -34,6 +34,9 @@ const FormFieldEditor = <T extends {}>({
             <FormEditor
               {...props}
               {...field}
+              onBlur={() => {
+                form.setFieldTouched(name as string, true);
+              }}
               onChange={value => {
                 form.setFieldValue(name as string, value);
               }}

@@ -36,7 +36,7 @@ Verify new publication
 Create new release
     [Tags]  HappyPath
     user opens accordion section  ${PUBLICATION_NAME}
-    user clicks element  css:[data-testid="Create new release link for ${PUBLICATION_NAME}"]
+    user clicks testid element  Create new release link for ${PUBLICATION_NAME}
     user creates release for publication  ${PUBLICATION_NAME}  Financial Year  3000
 
 Verify release summary
@@ -57,8 +57,14 @@ Upload subject
     user waits until h2 is visible  Uploaded data files
     user waits until page contains accordion section   ${SUBJECT_NAME}
     user opens accordion section   ${SUBJECT_NAME}
-    user checks page contains element   xpath://dt[text()="Subject title"]/../dd/h4[text()="${SUBJECT_NAME}"]
-    user waits until page contains element  xpath://dt[text()="Status"]/../dd//strong[text()="Complete"]     180
+
+    ${section}=  user gets accordion section content element  ${SUBJECT_NAME}
+    user checks summary list contains  Subject title    ${SUBJECT_NAME}  ${section}
+    user checks summary list contains  Data file        dates.csv  ${section}
+    user checks summary list contains  Metadata file    dates.meta.csv  ${section}
+    user checks summary list contains  Number of rows   119  ${section}
+    user checks summary list contains  Data file size   17 Kb  ${section}
+    user checks summary list contains  Status           Complete  ${section}  360
 
 Open footnotes tab
     [Tags]  HappyPath
@@ -224,9 +230,9 @@ Approve release
     user clicks button  Edit release status
     user waits until h2 is visible  Edit release status
 
-    user clicks element   css:input[data-testid="Approved for publication"]
+    user clicks radio   Approved for publication
     user enters text into element  id:releaseStatusForm-internalReleaseNote  Approved by UI tests
-    user clicks element  css:input[data-testid="As soon as possible"]
+    user clicks radio   As soon as possible
     user enters text into element  id:releaseStatusForm-nextReleaseDate-month   12
     user enters text into element  id:releaseStatusForm-nextReleaseDate-year    3001
 

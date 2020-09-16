@@ -10,7 +10,8 @@ namespace GovUk.Education.ExploreEducationStatistics.Publisher.Model.ViewModels
         {
         }
 
-        protected CachedReleaseViewModel(Guid id,
+        protected CachedReleaseViewModel(
+            Guid id,
             string title,
             string yearTitle,
             string coverageTitle,
@@ -26,6 +27,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Publisher.Model.ViewModels
             ContentSectionViewModel keyStatisticsSection,
             ContentSectionViewModel keyStatisticsSecondarySection,
             List<FileInfo> downloadFiles,
+            string preReleaseAccessList,
             List<LinkViewModel> relatedInformation,
             DateTime? dataLastPublished)
         {
@@ -45,6 +47,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Publisher.Model.ViewModels
             KeyStatisticsSection = keyStatisticsSection;
             KeyStatisticsSecondarySection = keyStatisticsSecondarySection;
             DownloadFiles = downloadFiles;
+            PreReleaseAccessList = preReleaseAccessList;
             RelatedInformation = relatedInformation;
             DataLastPublished = dataLastPublished;
         }
@@ -81,10 +84,12 @@ namespace GovUk.Education.ExploreEducationStatistics.Publisher.Model.ViewModels
 
         public List<FileInfo> DownloadFiles { get; set; }
 
+        public string PreReleaseAccessList { get; set; }
+
         public List<LinkViewModel> RelatedInformation { get; set; }
 
         private DateTime? _dataLastPublished;
-        
+
         public DateTime? DataLastPublished
         {
             get => _dataLastPublished;

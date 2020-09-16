@@ -1,4 +1,4 @@
-import useConfig from '@admin/hooks/useConfig';
+import { useConfig } from '@admin/contexts/ConfigContext';
 import ReleaseDataBlocksPageTabs from '@admin/pages/release/datablocks/components/ReleaseDataBlocksPageTabs';
 import {
   releaseDataBlocksRoute,
@@ -29,7 +29,7 @@ const ReleaseDataBlocksPageInternal = ({
 
   const pageRef = useRef<HTMLDivElement>(null);
 
-  const { value: config } = useConfig();
+  const config = useConfig();
 
   const [deletePlan, setDeletePlan] = useState<DeleteDataBlockPlan>();
 

@@ -87,7 +87,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Services
             _guidGenerator = guidGenerator;
         }
 
-        public async Task<Either<ActionResult, ReleaseViewModel>> GetReleaseForIdAsync(Guid id)
+        public async Task<Either<ActionResult, ReleaseViewModel>> GetRelease(Guid id)
         {
             return await _persistenceHelper
                 .CheckEntityExists<Release>(id, HydrateReleaseForReleaseViewModel)
@@ -131,11 +131,10 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Services
                     };
                     release.Created = DateTime.UtcNow;
                     release.CreatedById = _userService.GetUserId();
-                    release.PreviousVersionId = release.Id;
 
                     _context.Releases.Add(release);
                     await _context.SaveChangesAsync();
-                    return await GetReleaseForIdAsync(release.Id);
+                    return await GetRelease(release.Id);
                 });
         }
 
@@ -165,7 +164,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Services
                     _context.UpdateRange(invites);
 
                     await _context.SaveChangesAsync();
-                    
+
                     await _releaseSubjectService.SoftDeleteAllSubjectsOrBreakReleaseLinks(releaseId);
 
                     return true;
@@ -182,7 +181,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Services
                     .OnSuccess(CreateStatisticsReleaseRecord)
                     .OnSuccess(amendment => CopyReleaseTeam(releaseId, amendment))
                     .OnSuccess(amendment => CopyFileLinks(originalRelease, amendment))
-                    .OnSuccess(amendment => GetReleaseForIdAsync(amendment.Id)));
+                    .OnSuccess(amendment => GetRelease(amendment.Id)));
         }
 
         private async Task<Either<ActionResult, Release>> CreateStatisticsReleaseRecord(Release amendment)
@@ -258,16 +257,6 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Services
             return newRelease;
         }
 
-        public Task<Either<ActionResult, ReleaseSummaryViewModel>> GetReleaseSummaryAsync(Guid releaseId)
-        {
-            return _persistenceHelper
-                .CheckEntityExists<Release>(releaseId,
-                    releases => releases.Include(r => r.Type)
-                )
-                .OnSuccess(_userService.CheckCanViewRelease)
-                .OnSuccess(_mapper.Map<ReleaseSummaryViewModel>);
-        }
-
         public Task<Either<ActionResult, ReleasePublicationStatusViewModel>> GetReleasePublicationStatusAsync(Guid releaseId)
         {
             return _persistenceHelper
@@ -306,6 +295,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Services
                     release.TypeId = request.TypeId;
                     release.ReleaseName = request.ReleaseName;
                     release.TimePeriodCoverage = request.TimePeriodCoverage;
+                    release.PreReleaseAccessList = request.PreReleaseAccessList;
 
                     var oldStatus = release.Status;
 
@@ -330,7 +320,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Services
                     _context.Update(release);
                     await _context.SaveChangesAsync();
 
-                    return await GetReleaseForIdAsync(releaseId);
+                    return await GetRelease(releaseId);
                 });
         }
 
@@ -500,7 +490,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Services
                     var fileLink = _context
                             .ReleaseFiles
                             .Include(f => f.ReleaseFileReference)
-                            .First(f => f.ReleaseId == releaseId && f.ReleaseFileReference.Filename == dataFileName);
+                            .FirstOrDefault(f => f.ReleaseId == releaseId && f.ReleaseFileReference.Filename == dataFileName);
 
                     if (fileLink == null)
                     {

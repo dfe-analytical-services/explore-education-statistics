@@ -2,8 +2,8 @@ import { CommentsChangeHandler } from '@admin/components/editable/Comments';
 import EditableSectionBlocks from '@admin/components/editable/EditableSectionBlocks';
 import Link from '@admin/components/Link';
 import PrintThisPage from '@admin/components/PrintThisPage';
+import { useConfig } from '@admin/contexts/ConfigContext';
 import { useEditingContext } from '@admin/contexts/EditingContext';
-import useConfig from '@admin/hooks/useConfig';
 import BasicReleaseSummary from '@admin/pages/release/content/components/BasicReleaseSummary';
 import RelatedInformationSection from '@admin/pages/release/content/components/RelatedInformationSection';
 import ReleaseContentAccordion from '@admin/pages/release/content/components/ReleaseContentAccordion';
@@ -12,6 +12,8 @@ import ReleaseHelpAndSupportSection from '@admin/pages/release/content/component
 import ReleaseNotesSection from '@admin/pages/release/content/components/ReleaseNotesSection';
 import { useReleaseContentState } from '@admin/pages/release/content/contexts/ReleaseContentContext';
 import useReleaseContentActions from '@admin/pages/release/content/contexts/useReleaseContentActions';
+import { ReleaseRouteParams } from '@admin/routes/releaseRoutes';
+import { preReleaseAccessListRoute } from '@admin/routes/routes';
 import releaseDataFileService from '@admin/services/releaseDataFileService';
 import Button from '@common/components/Button';
 import ButtonText from '@common/components/ButtonText';
@@ -19,9 +21,12 @@ import Details from '@common/components/Details';
 import PageSearchForm from '@common/components/PageSearchForm';
 import RelatedAside from '@common/components/RelatedAside';
 import React, { useCallback, useMemo } from 'react';
+import { generatePath, useLocation } from 'react-router';
 
 const ReleaseContent = () => {
-  const { value: config } = useConfig();
+  const config = useConfig();
+  const location = useLocation();
+
   const { isEditing } = useEditingContext();
   const { release } = useReleaseContentState();
   const actions = useReleaseContentActions();
@@ -124,27 +129,49 @@ const ReleaseContent = () => {
             )}
           </div>
 
-          {release.downloadFiles && !isEditing && (
-            <Details summary="Download associated files">
-              <ul className="govuk-list govuk-list--bullet">
-                {release.downloadFiles.map(
-                  ({ extension, name, path, size }) => (
-                    <li key={path}>
-                      <ButtonText
-                        onClick={() =>
-                          releaseDataFileService.downloadFile(path)
-                        }
-                        className="govuk-link"
+          {(release.downloadFiles || release.preReleaseAccessList) &&
+            !isEditing && (
+              <Details summary="Download associated files">
+                <ul className="govuk-list govuk-list--bullet">
+                  {release.downloadFiles.map(
+                    ({ extension, name, path, size }) => (
+                      <li key={path}>
+                        <ButtonText
+                          onClick={() =>
+                            releaseDataFileService.downloadFile(path)
+                          }
+                          className="govuk-link"
+                        >
+                          {name}
+                        </ButtonText>
+                        {` (${extension}, ${size})`}
+                      </li>
+                    ),
+                  )}
+                  {release.preReleaseAccessList && (
+                    <li>
+                      <Link
+                        to={{
+                          pathname: generatePath<ReleaseRouteParams>(
+                            preReleaseAccessListRoute.path,
+                            {
+                              publicationId: release.publication.id,
+                              releaseId: release.id,
+                            },
+                          ),
+                          state: {
+                            backLink: location.pathname,
+                          },
+                        }}
                       >
-                        {name}
-                      </ButtonText>
-                      {` (${extension}, ${size})`}
+                        Pre-release access list
+                      </Link>
                     </li>
-                  ),
-                )}
-              </ul>
-            </Details>
-          )}
+                  )}
+                </ul>
+              </Details>
+            )}
+
           {!isEditing && (
             <PageSearchForm
               id="search-form"

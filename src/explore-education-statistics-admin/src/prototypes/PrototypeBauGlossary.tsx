@@ -94,7 +94,6 @@ const PrototypeBauGlossary = () => {
             </FormGroup>
             <FormEditor
               id="description"
-              name="description"
               label="Item description"
               value={glossaryDescription || ''}
               onChange={() => {

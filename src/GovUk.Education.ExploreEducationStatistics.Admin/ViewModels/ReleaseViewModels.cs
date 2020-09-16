@@ -20,9 +20,13 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.ViewModels
 
         public string Title { get; set; }
 
+        public string Slug { get; set;  }
+
         public Guid PublicationId { get; set; }
 
         public string PublicationTitle { get; set; }
+
+        public string PublicationSlug { get; set; }
 
         public string ReleaseName { get; set; }
 
@@ -42,6 +46,8 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.ViewModels
         [JsonConverter(typeof(TimeIdentifierJsonConverter))]
         public TimeIdentifier? TimePeriodCoverage { get; set; }
 
+        public string PreReleaseAccessList { get; set; } = "";
+
         public bool LatestRelease { get; set; }
 
         public ReleaseType Type { get; set; }
@@ -55,7 +61,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.ViewModels
 
         public bool Amendment { get; set; }
 
-        public Guid PreviousVersionId { get; set; }
+        public Guid? PreviousVersionId { get; set; }
     }
 
     public class CreateReleaseViewModel
@@ -113,6 +119,8 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.ViewModels
         [JsonConverter(typeof(TimeIdentifierJsonConverter))]
         [Required]
         public TimeIdentifier TimePeriodCoverage { get; set; }
+
+        public string PreReleaseAccessList { get; set; }
 
         [JsonConverter(typeof(StringEnumConverter))]
         public ReleaseStatus Status { get; set; }

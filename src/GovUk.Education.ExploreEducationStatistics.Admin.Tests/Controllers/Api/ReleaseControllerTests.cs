@@ -4,7 +4,6 @@ using System.IO;
 using System.Threading.Tasks;
 using GovUk.Education.ExploreEducationStatistics.Admin.Controllers.Api;
 using GovUk.Education.ExploreEducationStatistics.Admin.Models;
-using GovUk.Education.ExploreEducationStatistics.Admin.Models.Api;
 using GovUk.Education.ExploreEducationStatistics.Admin.Services.Interfaces;
 using GovUk.Education.ExploreEducationStatistics.Admin.ViewModels;
 using GovUk.Education.ExploreEducationStatistics.Common.Model;
@@ -52,12 +51,12 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Controllers.Api
         public async Task AddAncillaryFilesAsync_UploadsTheFiles_Returns_Ok()
         {
             var testFile = new FileInfo
-                            {
-                                Extension = "doc",
-                                Name = "File name",
-                                Path = "ancillaryFile.doc",
-                                Size = "1 Kb"
-                            };
+            {
+                Extension = "doc",
+                Name = "File name",
+                Path = "ancillaryFile.doc",
+                Size = "1 Kb"
+            };
 
             var mocks = Mocks();
             var ancillaryFile = MockFile("ancillaryFile.doc");
@@ -97,43 +96,51 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Controllers.Api
             mocks.FileStorageService.Setup(s => s.ListFilesAsync(_releaseId, ReleaseFileTypes.Ancillary))
                 .ReturnsAsync(new Either<ActionResult, IEnumerable<FileInfo>>(testFiles));
             var controller = ReleasesControllerWithMocks(mocks);
-            
+
             // Call the method under test
             var result = await controller.GetAncillaryFilesAsync(_releaseId);
             AssertOkResult(result);
         }
 
-        [Fact(Skip="Needs principal setting")]
+        [Fact(Skip = "Needs principal setting")]
         public async Task AddDataFilesAsync_UploadsTheFiles_Returns_Ok()
         {
             var mocks = Mocks();
             var dataFile = MockFile("datafile.csv");
             var metaFile = MockFile("metafile.csv");
-            
+
+            var dataFileInfo = new DataFileInfo
+            {
+                Name = "Subject name",
+                Path = "datafile.csv"
+            };
+
             mocks.FileStorageService
                 .Setup(service => service.UploadDataFilesAsync(_releaseId, dataFile, metaFile, "Subject name", "test user"))
-                .ReturnsAsync(true);
+                .ReturnsAsync(dataFileInfo);
 
             // Call the method under test
             var controller = ReleasesControllerWithMocks(mocks);
             var result = await controller.AddDataFilesAsync(_releaseId, "Subject name", dataFile, metaFile);
-            Assert.True(result.Value);
+            var dataFileInfoResult = AssertOkResult(result);
+            Assert.Equal("Subject name", dataFileInfoResult.Name);
+            Assert.Equal("datafile.csv", dataFileInfoResult.Path);
         }
 
-        [Fact(Skip="Needs principal setting")]
+        [Fact(Skip = "Needs principal setting")]
         public async Task AddDataFilesAsync_UploadsTheFiles_Returns_ValidationProblem()
         {
             var mocks = Mocks();
             var dataFile = MockFile("datafile.csv");
             var metaFile = MockFile("metafile.csv");
-            
+
             mocks.FileStorageService
                 .Setup(service => service.UploadDataFilesAsync(_releaseId, dataFile, metaFile, "Subject name",
                     "test user"))
                 .ReturnsAsync(new BadRequestObjectResult(CannotOverwriteFile));
 
             var controller = ReleasesControllerWithMocks(mocks);
-            
+
             // Call the method under test
             var result = await controller.AddDataFilesAsync(_releaseId, "Subject name", dataFile, metaFile);
             AssertValidationProblem(result.Result, CannotOverwriteFile);
@@ -161,7 +168,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Controllers.Api
             };
 
             var mocks = Mocks();
-            
+
             mocks.FileStorageService.Setup(s => s.ListDataFilesAsync(_releaseId))
                 .ReturnsAsync(new Either<ActionResult, IEnumerable<DataFileInfo>>(testFiles));
             var controller = ReleasesControllerWithMocks(mocks);
@@ -177,14 +184,14 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Controllers.Api
         public async Task DeleteDataFilesAsync_Returns_OK()
         {
             var mocks = Mocks();
-            
+
             mocks.ReleaseService
                 .Setup(service => service.RemoveDataFilesAsync(_releaseId, "datafilename", "subject title"))
                 .ReturnsAsync(new Either<ActionResult, bool>(true));
             var controller = ReleasesControllerWithMocks(mocks);
 
             // Call the method under test
-            var result = await controller.DeleteDataFiles(_releaseId, "datafilename","subject title");
+            var result = await controller.DeleteDataFiles(_releaseId, "datafilename", "subject title");
             Assert.IsAssignableFrom<NoContentResult>(result);
         }
 
@@ -192,14 +199,14 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Controllers.Api
         public async Task DeleteDataFilesAsync_Returns_ValidationProblem()
         {
             var mocks = Mocks();
-            
+
             mocks.ReleaseService
                 .Setup(service => service.RemoveDataFilesAsync(_releaseId, "datafilename", "subject title"))
                 .ReturnsAsync(ValidationActionResult(UnableToFindMetadataFileToDelete));
             var controller = ReleasesControllerWithMocks(mocks);
 
             // Call the method under test
-            var result = await controller.DeleteDataFiles(_releaseId, "datafilename","subject title");
+            var result = await controller.DeleteDataFiles(_releaseId, "datafilename", "subject title");
             AssertValidationProblem(result, UnableToFindMetadataFileToDelete);
         }
 
@@ -207,10 +214,10 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Controllers.Api
         public async void UpdateRelease_Returns_Ok()
         {
             var mocks = Mocks();
-            
+
             mocks.ReleaseService
                 .Setup(s => s.UpdateRelease(
-                    It.Is<Guid>(id => id.Equals(_releaseId)), 
+                    It.Is<Guid>(id => id.Equals(_releaseId)),
                     It.IsAny<UpdateReleaseViewModel>())
                 )
                 .ReturnsAsync(new ReleaseViewModel {Id = _releaseId});
@@ -220,21 +227,6 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Controllers.Api
             var result = await controller.UpdateRelease(new UpdateReleaseViewModel(), _releaseId);
             var unboxed = AssertOkResult(result);
             Assert.Equal(_releaseId, unboxed.Id);
-        }
-
-        [Fact]
-        public async void Get_Release_Summary_Returns_Ok()
-        {
-            var mocks = Mocks();
-            mocks.ReleaseService
-                .Setup(s => s.GetReleaseSummaryAsync(It.IsAny<Guid>()))
-                .Returns<Guid>(id => Task.FromResult(new Either<ActionResult, ReleaseSummaryViewModel>(new ReleaseSummaryViewModel {Id = id})));
-            var controller = ReleasesControllerWithMocks(mocks);
-
-            // Method under test
-            var result = await controller.GetReleaseSummaryAsync(_releaseId);
-            var unboxed = AssertOkResult(result);
-            Assert.Equal(unboxed.Id, _releaseId);
         }
 
         [Fact]
@@ -278,12 +270,14 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Controllers.Api
             Mock<IReleaseService> ReleaseService,
             Mock<IReleaseFilesService> FileStorageService,
             Mock<IReleaseStatusService> ReleaseStatusService,
+            Mock<IReplacementService> ReplacementService,
             Mock<UserManager<ApplicationUser>> UserManager,
             Mock<IDataBlockService> DataBlockService) Mocks()
         {
             return (new Mock<IReleaseService>(),
                     new Mock<IReleaseFilesService>(),
                     new Mock<IReleaseStatusService>(),
+                    new Mock<IReplacementService>(),
                     MockUserManager(Users),
                     new Mock<IDataBlockService>()
                 );
@@ -293,6 +287,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Controllers.Api
             Mock<IReleaseService> ReleaseService,
             Mock<IReleaseFilesService> FileStorageService,
             Mock<IReleaseStatusService> ReleaseStatusService,
+            Mock<IReplacementService> ReplacementService,
             Mock<UserManager<ApplicationUser>> UserManager,
             Mock<IDataBlockService> DataBlockService
             ) mocks)
@@ -301,10 +296,11 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Controllers.Api
                 mocks.ReleaseService.Object,
                 mocks.FileStorageService.Object,
                 mocks.ReleaseStatusService.Object,
+                mocks.ReplacementService.Object,
                 mocks.UserManager.Object,
                 mocks.DataBlockService.Object);
         }
-        
+
         private static Mock<UserManager<TUser>> MockUserManager<TUser>(List<TUser> ls) where TUser : class
         {
             var store = new Mock<IUserStore<TUser>>();
@@ -313,7 +309,8 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Controllers.Api
             mgr.Object.PasswordValidators.Add(new PasswordValidator<TUser>());
 
             mgr.Setup(x => x.DeleteAsync(It.IsAny<TUser>())).ReturnsAsync(IdentityResult.Success);
-            mgr.Setup(x => x.CreateAsync(It.IsAny<TUser>(), It.IsAny<string>())).ReturnsAsync(IdentityResult.Success).Callback<TUser, string>((x, y) => ls.Add(x));
+            mgr.Setup(x => x.CreateAsync(It.IsAny<TUser>(), It.IsAny<string>()))
+                .ReturnsAsync(IdentityResult.Success).Callback<TUser, string>((x, y) => ls.Add(x));
             mgr.Setup(x => x.UpdateAsync(It.IsAny<TUser>())).ReturnsAsync(IdentityResult.Success);
 
             return mgr;

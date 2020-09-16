@@ -1,8 +1,9 @@
 import { DeleteDataBlockPlan } from '@admin/services/dataBlockService';
 import { FileInfo } from '@admin/services/types/file';
 import client from '@admin/services/utils/service';
-import getFileNameFromPath from './utils/file/getFileNameFromPath';
+import { Overwrite } from '@common/types';
 import downloadFile from './utils/file/downloadFile';
+import getFileNameFromPath from './utils/file/getFileNameFromPath';
 
 interface DataFileInfo extends FileInfo {
   metaFileName: string;
@@ -31,10 +32,37 @@ export interface DataFile {
   isDeleting?: boolean;
 }
 
-interface UploadDataFilesRequest {
-  subjectTitle: string;
+export interface UploadDataFilesRequest {
+  name: string;
   dataFile: File;
   metadataFile: File;
+}
+
+export interface UploadZipDataFileRequest {
+  name: string;
+  zipFile: File;
+}
+
+export type ImportStatusCode =
+  | 'COMPLETE'
+  | 'QUEUED'
+  | 'UPLOADING'
+  | 'PROCESSING_ARCHIVE_FILE'
+  | 'RUNNING_PHASE_1'
+  | 'RUNNING_PHASE_2'
+  | 'RUNNING_PHASE_3'
+  | 'NOT_FOUND'
+  | 'FAILED';
+
+export interface Errors {
+  Message: string;
+}
+
+export interface DataFileImportStatus {
+  status: ImportStatusCode;
+  percentageComplete?: string;
+  errors?: Errors[];
+  numberOfRows: number;
 }
 
 function mapFile(file: DataFileInfo): DataFile {
@@ -64,30 +92,89 @@ const releaseDataFileService = {
         return dataFiles.map(mapFile);
       });
   },
-  uploadDataFiles(
+  async uploadDataFiles(
     releaseId: string,
     request: UploadDataFilesRequest,
-  ): Promise<boolean> {
+  ): Promise<DataFile> {
     const data = new FormData();
     data.append('file', request.dataFile);
     data.append('metaFile', request.metadataFile);
 
-    return client.post<boolean>(
-      `/release/${releaseId}/data?name=${request.subjectTitle}`,
+    const file = await client.post<DataFileInfo>(
+      `/release/${releaseId}/data`,
       data,
+      {
+        params: {
+          name: request.name,
+        },
+      },
     );
+
+    return mapFile(file);
   },
+  async uploadZipDataFile(
+    releaseId: string,
+    request: UploadZipDataFileRequest,
+  ): Promise<DataFile> {
+    const data = new FormData();
+    data.append('zipFile', request.zipFile);
+
+    const file = await client.post<DataFileInfo>(
+      `/release/${releaseId}/zip-data`,
+      data,
+      {
+        params: {
+          name: request.name,
+        },
+      },
+    );
+
+    return mapFile(file);
+  },
+  getDataFileImportStatus(
+    releaseId: string,
+    dataFileName: string,
+  ): Promise<DataFileImportStatus> {
+    return client
+      .get<
+        Overwrite<
+          DataFileImportStatus,
+          {
+            errors?: string;
+          }
+        >
+      >(`/release/${releaseId}/data/${dataFileName}/import/status`)
+      .then(importStatus => {
+        return {
+          ...importStatus,
+          errors: JSON.parse(importStatus.errors || '[]').map(
+            ({ Message }: Errors) => Message,
+          ),
+        };
+      });
+  },
+
   getDeleteDataFilePlan(
     releaseId: string,
     dataFile: DataFile,
   ): Promise<DeleteDataFilePlan> {
     return client.get<DeleteDataFilePlan>(
-      `/release/${releaseId}/data/${dataFile.filename}/delete-plan?name=${dataFile.title}`,
+      `/release/${releaseId}/data/${dataFile.filename}/delete-plan`,
+      {
+        params: {
+          name: dataFile.title,
+        },
+      },
     );
   },
   deleteDataFiles(releaseId: string, dataFile: DataFile): Promise<void> {
     return client.delete<void>(
-      `/release/${releaseId}/data/${dataFile.filename}?name=${dataFile.title}`,
+      `/release/${releaseId}/data/${dataFile.filename}`,
+      {
+        params: {
+          name: dataFile.title,
+        },
+      },
     );
   },
   downloadDataFile(releaseId: string, fileName: string): Promise<void> {

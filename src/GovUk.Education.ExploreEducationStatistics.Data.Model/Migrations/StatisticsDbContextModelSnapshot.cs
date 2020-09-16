@@ -359,7 +359,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Model.Migrations
                         .ValueGeneratedOnAdd()
                         .HasColumnType("uniqueidentifier");
 
-                    b.Property<Guid>("PreviousVersionId")
+                    b.Property<Guid?>("PreviousVersionId")
                         .HasColumnType("uniqueidentifier");
 
                     b.Property<Guid>("PublicationId")

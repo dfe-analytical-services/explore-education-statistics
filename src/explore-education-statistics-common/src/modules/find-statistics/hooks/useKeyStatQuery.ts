@@ -1,10 +1,14 @@
+import {
+  AsyncState,
+  AsyncStateSetterParam,
+} from '@common/hooks/useAsyncCallback';
 import { AsyncRetryState } from '@common/hooks/useAsyncRetry';
 import useTableQuery, {
   TableQueryOptions,
 } from '@common/modules/find-statistics/hooks/useTableQuery';
 import { ReleaseTableDataQuery } from '@common/services/tableBuilderService';
 import formatPretty from '@common/utils/number/formatPretty';
-import { useMemo } from 'react';
+import { useCallback, useEffect, useMemo, useState } from 'react';
 
 interface KeyStatResult {
   title: string;
@@ -15,7 +19,11 @@ export default function useKeyStatQuery(
   query: ReleaseTableDataQuery,
   options: TableQueryOptions = {},
 ): AsyncRetryState<KeyStatResult> {
-  const { value: tableData, ...state } = useTableQuery(
+  const {
+    value: tableData,
+    setState: setTableQueryState,
+    ...tableQueryState
+  } = useTableQuery(
     {
       ...query,
       includeGeoJson: false,
@@ -23,25 +31,52 @@ export default function useKeyStatQuery(
     options,
   );
 
-  const value = useMemo<KeyStatResult | undefined>(() => {
+  const [value, setValue] = useState<KeyStatResult>();
+
+  useEffect(() => {
     if (tableData) {
       const [indicator] = tableData.subjectMeta.indicators;
 
-      return {
+      if (!indicator) {
+        return;
+      }
+
+      const indicatorValue = tableData.results[0]?.measures[indicator.value];
+
+      if (!indicatorValue) {
+        return;
+      }
+
+      setValue({
         title: indicator.label,
         value: formatPretty(
-          tableData.results[0].measures[indicator.value],
+          indicatorValue,
           indicator.unit,
           indicator.decimalPlaces,
         ),
-      };
+      });
     }
-
-    return undefined;
   }, [tableData]);
 
-  return {
-    value,
-    ...state,
-  };
+  const setState = useCallback(
+    (state: AsyncStateSetterParam<KeyStatResult>) => {
+      const typedState = state as AsyncState<KeyStatResult>;
+
+      if (typeof typedState.value !== 'undefined') {
+        setValue(typedState.value);
+        setTableQueryState({ isLoading: false, value: tableData });
+      } else {
+        setTableQueryState(typedState);
+      }
+    },
+    [setTableQueryState, tableData],
+  );
+
+  return useMemo(() => {
+    return {
+      ...tableQueryState,
+      value,
+      setState,
+    };
+  }, [setState, tableQueryState, value]);
 }

@@ -4,8 +4,8 @@ import './App.scss';
 import apiAuthorizationRouteList from '@admin/components/api-authorization/ApiAuthorizationRoutes';
 import PageErrorBoundary from '@admin/components/PageErrorBoundary';
 import ProtectedRoute from '@admin/components/ProtectedRoute';
-import { getConfig } from '@admin/config';
 import { AuthContextProvider } from '@admin/contexts/AuthContext';
+import { ConfigContextProvider } from '@admin/contexts/ConfigContext';
 import ServiceProblemsPage from '@admin/pages/errors/ServiceProblemsPage';
 import routes from '@admin/routes/routes';
 import {
@@ -62,43 +62,47 @@ function PrototypesEntry() {
 
 function App() {
   return (
-    <ApplicationInsightsContextProvider
-      instrumentationKey={getConfig().then(config => config.AppInsightsKey)}
-    >
-      <BrowserRouter>
-        <ApplicationInsightsTracking />
+    <ConfigContextProvider>
+      {config => (
+        <ApplicationInsightsContextProvider
+          instrumentationKey={config.AppInsightsKey}
+        >
+          <BrowserRouter>
+            <ApplicationInsightsTracking />
 
-        <AuthContextProvider>
-          <PageErrorBoundary>
-            <Switch>
-              {Object.entries(apiAuthorizationRouteList).map(
-                ([key, authRoute]) => (
-                  <Route exact key={key} {...authRoute} />
-                ),
-              )}
+            <AuthContextProvider>
+              <PageErrorBoundary>
+                <Switch>
+                  {Object.entries(apiAuthorizationRouteList).map(
+                    ([key, authRoute]) => (
+                      <Route exact key={key} {...authRoute} />
+                    ),
+                  )}
 
-              {Object.entries(routes).map(([key, route]) => (
-                <ProtectedRoute key={key} {...route} />
-              ))}
+                  {Object.entries(routes).map(([key, route]) => (
+                    <ProtectedRoute key={key} {...route} />
+                  ))}
 
-              <ProtectedRoute
-                path="/prototypes"
-                protectionAction={user =>
-                  user.permissions.canAccessUserAdministrationPages
-                }
-                component={PrototypesEntry}
-              />
+                  <ProtectedRoute
+                    path="/prototypes"
+                    protectionAction={user =>
+                      user.permissions.canAccessUserAdministrationPages
+                    }
+                    component={PrototypesEntry}
+                  />
 
-              <ProtectedRoute
-                path="*"
-                allowAnonymousUsers
-                component={PageNotFoundPage}
-              />
-            </Switch>
-          </PageErrorBoundary>
-        </AuthContextProvider>
-      </BrowserRouter>
-    </ApplicationInsightsContextProvider>
+                  <ProtectedRoute
+                    path="*"
+                    allowAnonymousUsers
+                    component={PageNotFoundPage}
+                  />
+                </Switch>
+              </PageErrorBoundary>
+            </AuthContextProvider>
+          </BrowserRouter>
+        </ApplicationInsightsContextProvider>
+      )}
+    </ConfigContextProvider>
   );
 }
 

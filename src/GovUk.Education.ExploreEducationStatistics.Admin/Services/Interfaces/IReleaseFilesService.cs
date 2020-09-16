@@ -10,8 +10,10 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Services.Interfaces
 {
     public interface IReleaseFilesService
     {
-        Task<Common.Model.Either<ActionResult, bool>> UploadDataFilesAsync(Guid releaseId,
+        Task<Either<ActionResult, DataFileInfo>> UploadDataFilesAsync(Guid releaseId,
             IFormFile dataFile, IFormFile metaFile, string name, string userName);
+
+        Task<Either<ActionResult, DataFileInfo>>  UploadDataFilesAsZipAsync(Guid releaseId, IFormFile zipFile, string name, string userEmail);
 
         Task<Either<ActionResult, IEnumerable<FileInfo>>> ListFilesAsync(Guid releaseId, params ReleaseFileTypes[] types);
 

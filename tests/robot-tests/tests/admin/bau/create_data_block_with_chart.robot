@@ -48,8 +48,14 @@ Upload subject
     user waits until h2 is visible  Uploaded data files
     user waits until page contains accordion section   UI test subject
     user opens accordion section   UI test subject
-    user checks page contains element   xpath://dt[text()="Subject title"]/../dd/h4[text()="UI test subject"]
-    user waits until page contains element  xpath://dt[text()="Status"]/../dd//strong[text()="Complete"]     180
+
+    ${section}=  user gets accordion section content element  UI test subject
+    user checks summary list contains  Subject title    UI test subject  ${section}
+    user checks summary list contains  Data file        upload-file-test.csv  ${section}
+    user checks summary list contains  Metadata file    upload-file-test.meta.csv  ${section}
+    user checks summary list contains  Number of rows   159  ${section}
+    user checks summary list contains  Data file size   15 Kb  ${section}
+    user checks summary list contains  Status           Complete  ${section}  180
 
 Navigate to Manage data blocks tab
     [Tags]  HappyPath
@@ -272,7 +278,7 @@ Validate basic line chart preview
     user checks chart title contains  id:chartBuilderPreview  Test chart title
     user checks chart legend item contains  id:chartBuilderPreview  1  Admission Numbers (Nailsea Youngwood)
 
-    user checks chart y axis ticks  id:chartBuilderPreview  0     2500  5000  7500  10000
+    user checks chart y axis ticks  id:chartBuilderPreview  0     2,500  5,000  7,500  10,000
     user checks chart x axis ticks  id:chartBuilderPreview  2005  2010  2011  2012  2016
 
     user mouses over line chart point  id:chartBuilderPreview  1  1
@@ -311,7 +317,7 @@ Save and validate line chart embeds correctly
     user checks chart title contains  ${datablock}  Test chart title
     user checks chart legend item contains  ${datablock}  1  Admission Numbers (Nailsea Youngwood)
 
-    user checks chart y axis ticks  ${datablock}  0     2500  5000  7500  10000
+    user checks chart y axis ticks  ${datablock}  0     2,500  5,000  7,500  10,000
     user checks chart x axis ticks  ${datablock}  2005  2010  2011  2012  2016
 
     user mouses over line chart point  ${datablock}  1  1
@@ -353,7 +359,7 @@ Validate basic vertical bar chart preview
     user checks chart title contains  ${preview}  Test chart title
     user checks chart legend item contains  ${preview}  1  Admission Numbers (Nailsea Youngwood)
 
-    user checks chart y axis ticks  ${preview}  0     2500  5000  7500  10000
+    user checks chart y axis ticks  ${preview}  0     2,500  5,000  7,500  10,000
     user checks chart x axis ticks  ${preview}  2005  2010  2011  2012  2016
 
     user mouses over chart bar  ${preview}  1
@@ -393,7 +399,7 @@ Save and validate vertical bar chart embeds correctly
     user checks chart title contains  ${datablock}  Test chart title
     user checks chart legend item contains  ${datablock}  1  Admission Numbers (Nailsea Youngwood)
 
-    user checks chart y axis ticks  ${datablock}  0     2500  5000  7500  10000
+    user checks chart y axis ticks  ${datablock}  0     2,500  5,000  7,500  10,000
     user checks chart x axis ticks  ${datablock}  2005  2010  2011  2012  2016
 
     user mouses over chart bar  ${datablock}  1
@@ -436,7 +442,7 @@ Validate basic horizontal bar chart preview
     user checks chart title contains  ${preview}  Test chart title
     user checks chart legend item contains  ${preview}  1  Admission Numbers (Nailsea Youngwood)
 
-    user checks chart x axis ticks  ${preview}  0     2500  5000  7500  10000
+    user checks chart x axis ticks  ${preview}  0     2,500  5,000  7,500  10,000
     user checks chart y axis ticks  ${preview}  2005  2010  2011  2012  2016
 
     user mouses over chart bar  ${preview}  1
@@ -475,7 +481,7 @@ Save and validate horizontal bar chart embeds correctly
     user checks chart title contains  ${datablock}  Test chart title
     user checks chart legend item contains  ${datablock}  1  Admission Numbers (Nailsea Youngwood)
 
-    user checks chart x axis ticks  ${datablock}  0     2500  5000  7500  10000
+    user checks chart x axis ticks  ${datablock}  0     2,500  5,000  7,500  10,000
     user checks chart y axis ticks  ${datablock}  2005  2010  2011  2012  2016
 
     user mouses over chart bar  ${datablock}  1

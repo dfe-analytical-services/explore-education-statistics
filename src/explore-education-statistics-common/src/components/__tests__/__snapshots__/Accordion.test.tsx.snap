@@ -4,6 +4,7 @@ exports[`Accordion renders with hidden content by default 1`] = `
 <div>
   <div
     class="govuk-accordion accordion"
+    data-testid="accordion"
     id="test-sections"
     role="none"
   >
@@ -77,6 +78,7 @@ exports[`Accordion renders with visible content when \`open\` is true 1`] = `
 <div>
   <div
     class="govuk-accordion accordion"
+    data-testid="accordion"
     id="test-sections"
     role="none"
   >
