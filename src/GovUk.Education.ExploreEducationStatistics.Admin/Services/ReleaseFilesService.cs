@@ -678,8 +678,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Services
                     )
                     : "",
                 Rows = 0,
-                UserName = "",
-                Created = DateTimeOffset.UtcNow,
+                UserName = ""
             };
         }
 
