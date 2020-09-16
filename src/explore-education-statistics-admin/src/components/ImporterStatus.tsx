@@ -11,14 +11,8 @@ import Tag from '@common/components/Tag';
 import classNames from 'classnames';
 import React, { Component } from 'react';
 
-interface Props {
-  releaseId: string;
-  dataFile: DataFile;
-  onStatusChangeHandler: (datafile: DataFile, status: ImportStatusCode) => void;
-}
-
-export const getImportStatusLabel = (importstatusCode: ImportStatusCode) => {
-  switch (importstatusCode) {
+export const getImportStatusLabel = (statusCode: ImportStatusCode) => {
+  switch (statusCode) {
     case 'NOT_FOUND':
       return 'Not Found';
     case 'UPLOADING':
@@ -42,7 +36,18 @@ export const getImportStatusLabel = (importstatusCode: ImportStatusCode) => {
   }
 };
 
-class ImporterStatus extends Component<Props> {
+export type ImportStatusChangeHandler = (
+  dataFile: DataFile,
+  status: ImportStatusCode,
+) => void;
+
+interface ImportStatusProps {
+  releaseId: string;
+  dataFile: DataFile;
+  onStatusChange: ImportStatusChangeHandler;
+}
+
+class ImporterStatus extends Component<ImportStatusProps> {
   private static refreshPeriod = 5000;
 
   public state = {
@@ -62,8 +67,8 @@ class ImporterStatus extends Component<Props> {
     this.cancelTimer();
   }
 
-  private getImportStatusClass = (importstatusCode: ImportStatusCode) => {
-    switch (importstatusCode) {
+  private getImportStatusClass = (statusCode: ImportStatusCode) => {
+    switch (statusCode) {
       case 'NOT_FOUND':
         this.cancelTimer();
         return [styles.ragStatusAmber];
@@ -91,7 +96,7 @@ class ImporterStatus extends Component<Props> {
   };
 
   private fetchImportStatus() {
-    const { dataFile, releaseId, onStatusChangeHandler } = this.props;
+    const { dataFile, releaseId, onStatusChange } = this.props;
 
     // Do check to avoid an extra render on mount.
     const { isFetching } = this.state;
@@ -128,7 +133,7 @@ class ImporterStatus extends Component<Props> {
       .finally(() => {
         const { current } = this.state;
         const currentStatus: DataFileImportStatus = (current as unknown) as DataFileImportStatus;
-        onStatusChangeHandler(dataFile, currentStatus.status);
+        onStatusChange(dataFile, currentStatus.status);
       });
   }
 

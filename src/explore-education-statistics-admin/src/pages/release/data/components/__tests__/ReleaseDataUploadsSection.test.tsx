@@ -5,13 +5,7 @@ import _releaseDataFileService, {
   UploadDataFilesRequest,
   UploadZipDataFileRequest,
 } from '@admin/services/releaseDataFileService';
-import {
-  fireEvent,
-  render,
-  screen,
-  waitFor,
-  within,
-} from '@testing-library/react';
+import { render, screen, waitFor, within } from '@testing-library/react';
 import userEvent from '@testing-library/user-event';
 import React from 'react';
 
@@ -383,133 +377,6 @@ describe('ReleaseDataUploadsSection', () => {
         expect(
           screen.getByText('Enter a unique subject title', {
             selector: '#dataFileUploadForm-subjectTitle-error',
-          }),
-        ).toBeInTheDocument();
-      });
-    });
-
-    test('shows validation message when no data file selected', async () => {
-      render(
-        <ReleaseDataUploadsSection releaseId="release-1" canUpdateRelease />,
-      );
-
-      userEvent.click(screen.getByLabelText('Upload data file'));
-      fireEvent.change(screen.getByLabelText('Upload data file'), {
-        target: {
-          value: null,
-        },
-      });
-      userEvent.tab();
-
-      await waitFor(() => {
-        expect(
-          screen.getByText('Choose a data file', {
-            selector: '#dataFileUploadForm-dataFile-error',
-          }),
-        ).toBeInTheDocument();
-      });
-    });
-
-    test('shows validation message when data file is not empty', async () => {
-      render(
-        <ReleaseDataUploadsSection releaseId="release-1" canUpdateRelease />,
-      );
-
-      const file = new File([], 'test.csv', {
-        type: 'text/csv',
-      });
-
-      userEvent.upload(screen.getByLabelText('Upload data file'), file);
-      userEvent.tab();
-
-      await waitFor(() => {
-        expect(
-          screen.getByText('Choose a data file that is not empty', {
-            selector: '#dataFileUploadForm-dataFile-error',
-          }),
-        ).toBeInTheDocument();
-      });
-    });
-
-    test('shows validation message when no meta data file selected', async () => {
-      render(
-        <ReleaseDataUploadsSection releaseId="release-1" canUpdateRelease />,
-      );
-
-      userEvent.click(screen.getByLabelText('Upload metadata file'));
-      fireEvent.change(screen.getByLabelText('Upload metadata file'), {
-        target: { value: null },
-      });
-      userEvent.tab();
-
-      await waitFor(() => {
-        expect(
-          screen.getByText('Choose a metadata file', {
-            selector: '#dataFileUploadForm-metadataFile-error',
-          }),
-        ).toBeInTheDocument();
-      });
-    });
-
-    test('shows validation message when metadata file is not empty', async () => {
-      render(
-        <ReleaseDataUploadsSection releaseId="release-1" canUpdateRelease />,
-      );
-
-      const file = new File([], 'test.csv', {
-        type: 'text/csv',
-      });
-
-      userEvent.upload(screen.getByLabelText('Upload metadata file'), file);
-      userEvent.tab();
-
-      await waitFor(() => {
-        expect(
-          screen.getByText('Choose a metadata file that is not empty', {
-            selector: '#dataFileUploadForm-metadataFile-error',
-          }),
-        ).toBeInTheDocument();
-      });
-    });
-
-    test('shows validation message when no ZIP file selected', async () => {
-      render(
-        <ReleaseDataUploadsSection releaseId="release-1" canUpdateRelease />,
-      );
-
-      userEvent.click(screen.getByLabelText('ZIP file'));
-      userEvent.click(screen.getByLabelText('Upload ZIP file'));
-      fireEvent.change(screen.getByLabelText('Upload ZIP file'), {
-        target: { value: null },
-      });
-      userEvent.tab();
-
-      await waitFor(() => {
-        expect(
-          screen.getByText('Choose a zip file', {
-            selector: '#dataFileUploadForm-zipFile-error',
-          }),
-        ).toBeInTheDocument();
-      });
-    });
-
-    test('shows validation message when ZIP file is empty', async () => {
-      render(
-        <ReleaseDataUploadsSection releaseId="release-1" canUpdateRelease />,
-      );
-
-      const file = new File([], 'test.zip', {
-        type: 'application/zip',
-      });
-
-      userEvent.click(screen.getByLabelText('ZIP file'));
-      userEvent.upload(screen.getByLabelText('Upload ZIP file'), file);
-      userEvent.tab();
-
-      await waitFor(() => {
-        expect(
-          screen.getByText('Choose a ZIP file that is not empty', {
-            selector: '#dataFileUploadForm-zipFile-error',
           }),
         ).toBeInTheDocument();
       });
