@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Diagnostics.CodeAnalysis;
 using AutoMapper;
+using Azure.Storage.Blobs;
 using GovUk.Education.ExploreEducationStatistics.Common.Model.Data;
 using GovUk.Education.ExploreEducationStatistics.Common.Services;
 using GovUk.Education.ExploreEducationStatistics.Common.Services.Interfaces;
@@ -29,13 +30,16 @@ using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Hosting;
+using Microsoft.Extensions.Logging;
 using Microsoft.OpenApi.Models;
 using Newtonsoft.Json;
+using FileStorageService = GovUk.Education.ExploreEducationStatistics.Data.Api.Services.FileStorageService;
+using IFileStorageService = GovUk.Education.ExploreEducationStatistics.Data.Api.Services.Interfaces.IFileStorageService;
 using IHostingEnvironment = Microsoft.Extensions.Hosting.IHostingEnvironment;
 
 namespace GovUk.Education.ExploreEducationStatistics.Data.Api
 {
-    [ExcludeFromCodeCoverage] 
+    [ExcludeFromCodeCoverage]
     public class Startup
     {
         public Startup(IConfiguration configuration, IHostingEnvironment hostingEnvironment)
@@ -58,7 +62,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Api
                 options.ReturnHttpNotAcceptable = true;
                 options.Conventions.Add(new CommaSeparatedQueryStringConvention());
                 options.EnableEndpointRouting = false;
-                
+
             })
                 .SetCompatibilityVersion(CompatibilityVersion.Version_3_0)
                 .AddNewtonsoftJson(options => {
@@ -89,7 +93,18 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Api
             services.AddTransient<IThemeMetaService, ThemeMetaService>();
             services.AddTransient<IResultSubjectMetaService, ResultSubjectMetaService>();
             services.AddTransient<ISubjectMetaService, SubjectMetaService>();
-            services.AddTransient<IFileStorageService, FileStorageService>(s => new FileStorageService(Configuration.GetValue<string>("PublicStorage")));
+            services.AddSingleton<IBlobStorageService, BlobStorageService>(provider =>
+                {
+                    var connectionString = Configuration.GetValue<string>("PublicStorage");
+
+                    return new BlobStorageService(
+                        connectionString,
+                        new BlobServiceClient(connectionString),
+                        provider.GetRequiredService<ILogger<BlobStorageService>>()
+                    );
+                }
+            );
+            services.AddSingleton<IFileStorageService, FileStorageService>();
             services.AddTransient<IFilterGroupService, FilterGroupService>();
             services.AddTransient<IFilterItemService, FilterItemService>();
             services.AddTransient<IFilterService, FilterService>();
@@ -129,7 +144,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Api
 
             services.AddCors();
             services.AddAutoMapper(AppDomain.CurrentDomain.GetAssemblies());
-            
+
             AddPersistenceHelper<StatisticsDbContext>(services);
         }
 
@@ -161,7 +176,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Api
                 option.AddRedirect("^$", "docs");
                 app.UseRewriter(option);
             }
-            
+
             // ReSharper disable once CommentTypo
             // Adds Brotli and Gzip compressing
             app.UseResponseCompression();
@@ -180,7 +195,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Api
                     return new PersistenceHelper<TDbContext>(dbContext);
                 });
         }
-        
+
         private static void UpdateDatabase(IApplicationBuilder app)
         {
             using (var serviceScope = app.ApplicationServices.GetRequiredService<IServiceScopeFactory>()

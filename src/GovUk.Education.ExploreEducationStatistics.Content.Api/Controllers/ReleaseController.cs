@@ -1,11 +1,12 @@
 using System;
 using System.Net.Mime;
 using System.Threading.Tasks;
+using GovUk.Education.ExploreEducationStatistics.Common.Services.Interfaces;
 using GovUk.Education.ExploreEducationStatistics.Content.Api.Models;
-using GovUk.Education.ExploreEducationStatistics.Content.Api.Services.Interfaces;
 using GovUk.Education.ExploreEducationStatistics.Publisher.Model.ViewModels;
 using Microsoft.AspNetCore.Mvc;
 using Newtonsoft.Json;
+using static GovUk.Education.ExploreEducationStatistics.Common.BlobContainerNames;
 using static GovUk.Education.ExploreEducationStatistics.Common.Services.FileStoragePathUtils;
 
 namespace GovUk.Education.ExploreEducationStatistics.Content.Api.Controllers
@@ -14,59 +15,78 @@ namespace GovUk.Education.ExploreEducationStatistics.Content.Api.Controllers
     [Produces(MediaTypeNames.Application.Json)]
     public class ReleaseController : ControllerBase
     {
-        private readonly IFileStorageService _fileStorageService;
+        private readonly IBlobStorageService _blobStorageService;
 
-        public ReleaseController(IFileStorageService fileStorageService)
+        public ReleaseController(IBlobStorageService blobStorageService)
         {
-            _fileStorageService = fileStorageService;
+            _blobStorageService = blobStorageService;
         }
 
         [HttpGet("publication/{publicationSlug}/latest")]
         public async Task<ActionResult<ReleaseViewModel>> GetLatestRelease(string publicationSlug)
         {
-            return await GetReleaseViewModel(PublicContentPublicationPath(publicationSlug),
-                PublicContentLatestReleasePath(publicationSlug));
+            return await GetReleaseViewModel(
+                PublicContentPublicationPath(publicationSlug),
+                PublicContentLatestReleasePath(publicationSlug)
+            );
         }
 
         [HttpGet("publication/{publicationSlug}/{releaseSlug}")]
         public async Task<ActionResult<ReleaseViewModel>> GetRelease(string publicationSlug, string releaseSlug)
         {
-            return await GetReleaseViewModel(PublicContentPublicationPath(publicationSlug),
-                PublicContentReleasePath(publicationSlug, releaseSlug));
+            return await GetReleaseViewModel(
+                PublicContentPublicationPath(publicationSlug),
+                PublicContentReleasePath(publicationSlug, releaseSlug)
+            );
         }
 
-        private async Task<ActionResult<ReleaseViewModel>> GetReleaseViewModel(string publicationPath,
+        private async Task<ActionResult<ReleaseViewModel>> GetReleaseViewModel(
+            string publicationPath,
             string releasePath)
         {
-            var publicationTask = Task.Run(async () =>
-            {
-                var text = await _fileStorageService.DownloadTextAsync(publicationPath);
-                if (string.IsNullOrWhiteSpace(text))
+            var publicationTask = Task.Run(
+                async () =>
                 {
-                    throw new ArgumentException();
-                }
-
-                return JsonConvert.DeserializeObject<CachedPublicationViewModel>(text,
-                    new JsonSerializerSettings
+                    var text = await _blobStorageService.DownloadBlobText(
+                        PublicContentContainerName,
+                        publicationPath
+                    );
+                    if (string.IsNullOrWhiteSpace(text))
                     {
-                        TypeNameHandling = TypeNameHandling.Auto
-                    });
-            });
+                        throw new ArgumentException();
+                    }
 
-            var releaseTask = Task.Run(async () =>
-            {
-                var text = await _fileStorageService.DownloadTextAsync(releasePath);
-                if (string.IsNullOrWhiteSpace(text))
+                    return JsonConvert.DeserializeObject<CachedPublicationViewModel>(
+                        text,
+                        new JsonSerializerSettings
+                        {
+                            TypeNameHandling = TypeNameHandling.Auto
+                        }
+                    );
+                }
+            );
+
+            var releaseTask = Task.Run(
+                async () =>
                 {
-                    throw new ArgumentException();
-                }
-
-                return JsonConvert.DeserializeObject<CachedReleaseViewModel>(text,
-                    new JsonSerializerSettings
+                    var text = await _blobStorageService.DownloadBlobText(
+                        PublicContentContainerName,
+                        releasePath
+                    );
+                    if (string.IsNullOrWhiteSpace(text))
                     {
-                        TypeNameHandling = TypeNameHandling.Auto
-                    });
-            });
+                        throw new ArgumentException();
+                    }
+
+                    return JsonConvert.DeserializeObject<CachedReleaseViewModel>(
+                        text,
+                        new JsonSerializerSettings
+                        {
+                            TypeNameHandling = TypeNameHandling.Auto
+                        }
+                    );
+                }
+            );
 
             var continuation = Task.WhenAll(publicationTask, releaseTask);
 

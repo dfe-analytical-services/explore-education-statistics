@@ -1,10 +1,11 @@
 using System.Linq;
+using GovUk.Education.ExploreEducationStatistics.Common.Services.Interfaces;
 using GovUk.Education.ExploreEducationStatistics.Content.Api.Controllers;
-using GovUk.Education.ExploreEducationStatistics.Content.Api.Services.Interfaces;
 using GovUk.Education.ExploreEducationStatistics.Publisher.Model.ViewModels;
 using Microsoft.AspNetCore.Mvc;
 using Moq;
 using Xunit;
+using static GovUk.Education.ExploreEducationStatistics.Common.BlobContainerNames;
 
 namespace GovUk.Education.ExploreEducationStatistics.Content.Api.Tests.Controllers
 {
@@ -13,9 +14,15 @@ namespace GovUk.Education.ExploreEducationStatistics.Content.Api.Tests.Controlle
         [Fact]
         public void Get_DownloadTree_Returns_Ok()
         {
-            var fileStorageService = new Mock<IFileStorageService>();
+            var fileStorageService = new Mock<IBlobStorageService>();
 
-            fileStorageService.Setup(s => s.DownloadTextAsync("download/tree.json")).ReturnsAsync(@"
+            fileStorageService.Setup(
+                s => s.DownloadBlobText(
+                    PublicContentContainerName,
+                    "download/tree.json"
+                )
+            ).ReturnsAsync(
+                @"
             [
             {
                 ""id"": ""057bfc2f-2e23-4775-be1d-de9700569183"",
@@ -45,7 +52,8 @@ namespace GovUk.Education.ExploreEducationStatistics.Content.Api.Tests.Controlle
                 }
                 ]
             }
-            ]");
+            ]"
+            );
 
             var controller = new DownloadController(fileStorageService.Object);
             var result = controller.GetDownloadTree();
@@ -62,7 +70,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Content.Api.Tests.Controlle
         [Fact]
         public void Get_DownloadTree_Returns_NoContent()
         {
-            var fileStorageService = new Mock<IFileStorageService>();
+            var fileStorageService = new Mock<IBlobStorageService>();
 
             var controller = new DownloadController(fileStorageService.Object);
 

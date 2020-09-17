@@ -24,7 +24,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
         [Fact]
         public void AncillaryFileCannotBeEmpty()
         {
-            var (subjectService, fileTypeService, cloudBlobContainer) = Mocks();
+            var (subjectService, fileTypeService) = Mocks();
             var service = new FileUploadsValidatorService(subjectService.Object, fileTypeService.Object, null);
 
             var lines = new List<string>().AsEnumerable();
@@ -42,7 +42,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
         [Fact]
         public void AncillaryFileIsValid()
         {
-            var (subjectService, fileTypeService, cloudBlobContainer) = Mocks();
+            var (subjectService, fileTypeService) = Mocks();
 
             using (var context = InMemoryApplicationDbContext())
             {
@@ -61,7 +61,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
         [Fact]
         public void AncillaryFilenameIsInvalid()
         {
-            var (subjectService, fileTypeService, cloudBlobContainer) = Mocks();
+            var (subjectService, fileTypeService) = Mocks();
 
             using (var context = InMemoryApplicationDbContext())
             {
@@ -82,14 +82,14 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
         [Fact]
         public void AncillaryCannotBeOverwritten()
         {
-            var (subjectService, fileTypeService, cloudBlobContainer) = Mocks();
+            var (subjectService, fileTypeService) = Mocks();
             using (var context = InMemoryApplicationDbContext())
             {
                 var releaseId = Guid.NewGuid();
-                
+
                 context.Add(new ReleaseFile
                 {
-                    
+
                     ReleaseId = releaseId,
                     ReleaseFileReference = new ReleaseFileReference()
                     {
@@ -99,7 +99,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
                     }
                 });
                 context.SaveChanges();
-                
+
                 var service = new FileUploadsValidatorService(subjectService.Object, fileTypeService.Object, context);
 
                 var lines = new List<string> {"line1"}.AsEnumerable();
@@ -114,11 +114,11 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
                 Assert.Equal("CANNOT_OVERWRITE_FILE", details.Errors[""].First());
             }
         }
-        
+
         [Fact]
         public void AncillaryFileTypeIsValid()
         {
-            var (subjectService, fileTypeService, cloudBlobContainer) = Mocks();
+            var (subjectService, fileTypeService) = Mocks();
 
             using (var context = InMemoryApplicationDbContext())
             {
@@ -139,7 +139,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
         [Fact]
         public void AncillaryFileTypeIsInvalid()
         {
-            var (subjectService, fileTypeService, cloudBlobContainer) = Mocks();
+            var (subjectService, fileTypeService) = Mocks();
 
             using (var context = InMemoryApplicationDbContext())
             {
@@ -159,11 +159,11 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
                 Assert.Equal("FILE_TYPE_INVALID", details.Errors[""].First());
             }
         }
-        
+
         [Fact]
         public void UploadedDatafilesAreValid()
         {
-            var (subjectService, fileTypeService, cloudBlobContainer) = Mocks();
+            var (subjectService, fileTypeService) = Mocks();
 
             using (var context = InMemoryApplicationDbContext())
             {
@@ -186,17 +186,17 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
                 fileTypeService
                     .Setup(s => s.HasMatchingEncodingType(metaFile, It.IsAny<IEnumerable<string>>()))
                     .Returns(() => true);
-                
+
                 var result = service.ValidateDataFilesForUpload(Guid.NewGuid(), dataFile, metaFile, subjectTitle).Result;
 
                 Assert.True(result.IsRight);
             }
         }
-        
+
         [Fact]
         public void UploadedDatafilesAreInvalid()
         {
-            var (subjectService, fileTypeService, cloudBlobContainer) = Mocks();
+            var (subjectService, fileTypeService) = Mocks();
 
             using (var context = InMemoryApplicationDbContext())
             {
@@ -219,7 +219,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
                 fileTypeService
                     .Setup(s => s.HasMatchingEncodingType(metaFile, It.IsAny<IEnumerable<string>>()))
                     .Returns(() => true);
-                
+
                 var result = service.ValidateDataFilesForUpload(Guid.NewGuid(), dataFile, metaFile, subjectTitle).Result;
 
                 Assert.True(result.IsLeft);
@@ -228,11 +228,11 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
                 Assert.Equal("SUBJECT_TITLE_CANNOT_CONTAIN_SPECIAL_CHARACTERS", details.Errors[""].First());
             }
         }
-        
+
         [Fact]
         public void UploadedZippedDatafileIsValid()
         {
-            var (subjectService, fileTypeService, cloudBlobContainer) = Mocks();
+            var (subjectService, fileTypeService) = Mocks();
 
             using (var context = InMemoryApplicationDbContext())
             {
@@ -242,21 +242,21 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
                 var entries = GetArchiveEntries("data-zip-valid.zip");
 
                 fileTypeService
-                    .Setup(s => s.HasMatchingMimeType(It.IsAny<CloudBlob>(), 
+                    .Setup(s => s.HasMatchingMimeType(It.IsAny<Stream>(),
                         It.IsAny<IEnumerable<Regex>>()))
                     .ReturnsAsync(() => true);
-                
-                var result = service.ValidateDataArchiveEntriesForUpload(Guid.NewGuid(), 
+
+                var result = service.ValidateDataArchiveEntriesForUpload(Guid.NewGuid(),
                     entries.Item1,entries.Item2, subjectTitle).Result;
 
                 Assert.True(result.IsRight);
             }
         }
-        
+
         [Fact]
         public void UploadedZippedDatafileIsInvalid()
         {
-            var (subjectService, fileTypeService, cloudBlobContainer) = Mocks();
+            var (subjectService, fileTypeService) = Mocks();
 
             using (var context = InMemoryApplicationDbContext())
             {
@@ -266,11 +266,11 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
                 var entries = GetArchiveEntries("data-zip-invalid.zip");
 
                 fileTypeService
-                    .Setup(s => s.HasMatchingMimeType(It.IsAny<CloudBlob>(), 
+                    .Setup(s => s.HasMatchingMimeType(It.IsAny<Stream>(),
                         It.IsAny<IEnumerable<Regex>>()))
                     .ReturnsAsync(() => true);
-                
-                var result = service.ValidateDataArchiveEntriesForUpload(Guid.NewGuid(), 
+
+                var result = service.ValidateDataArchiveEntriesForUpload(Guid.NewGuid(),
                     entries.Item1,entries.Item2, subjectTitle).Result;
 
                 Assert.True(result.IsLeft);
@@ -279,23 +279,13 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
                 Assert.Equal("DATA_FILE_MUST_BE_CSV_FILE", details.Errors[""].First());
             }
         }
-        
-        private (Mock<ISubjectService>, Mock<IFileTypeService>, Mock<CloudBlobContainer>) Mocks()
+
+        private (Mock<ISubjectService>, Mock<IFileTypeService>) Mocks()
         {
             return (
                 new Mock<ISubjectService>(),
-                new Mock<IFileTypeService>(),
-                SetupMockedContainer());
-        }
-
-        private Mock<CloudBlobContainer> SetupMockedContainer()
-        {
-            var blobMock = new Mock<CloudBlockBlob>(new Uri("http://storageaccount/container/blob"));
-            blobMock.Setup(b => b.Exists(null, null)).Returns(true);
-            var containerMock = new Mock<CloudBlobContainer>(new Uri("http://storageaccount/container"));
-            containerMock.Setup(c => c.GetBlockBlobReference(It.IsAny<string>()))
-                .Returns(blobMock.Object);
-            return containerMock;
+                new Mock<IFileTypeService>()
+            );
         }
 
         private static IFormFile CreateFormFile(IEnumerable<string> lines, string fileName, string name)
@@ -317,20 +307,20 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
             };
             return f;
         }
-        
+
         private static Tuple<ZipArchiveEntry, ZipArchiveEntry> GetArchiveEntries(string archiveFileName)
         {
             var archiveFile = CreateFormFileFromResource(archiveFileName);
-            
+
             using var stream = archiveFile.OpenReadStream();
             using var archive = new ZipArchive(stream);
-            
+
             var file1 = archive.Entries[0];
             var file2 = archive.Entries[1];
-            
+
             var dataFile = file1.Name.Contains(".meta.") ? file2 : file1;
             var metaFile = file1.Name.Contains(".meta.") ? file1 : file2;
-            
+
             return new Tuple<ZipArchiveEntry, ZipArchiveEntry>(dataFile, metaFile);
         }
 
@@ -338,7 +328,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
         {
             var filePath = Path.Combine(Path.GetDirectoryName(Assembly.GetExecutingAssembly().Location),
                 "Resources" + Path.DirectorySeparatorChar + fileName);
-            
+
             var formFile = new Mock<IFormFile>();
             formFile
                 .Setup(f => f.OpenReadStream())

@@ -42,7 +42,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Api.Services
         {
             try
             {
-                var text = await _fileStorageService.DownloadTextAsync(PublicPermalinkContainerName, id.ToString());
+                var text = await _fileStorageService.GetBlobText(PublicPermalinkContainerName, id.ToString());
                 var permalink = JsonConvert.DeserializeObject<Permalink>(text);
                 return BuildViewModel(permalink);
             }
@@ -67,7 +67,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Api.Services
             return await _tableBuilderService.Query(releaseId, request.Query).OnSuccess(async result =>
             {
                 var permalink = new Permalink(request.Configuration, result, request.Query);
-                await _fileStorageService.UploadFromStreamAsync(PublicPermalinkContainerName, permalink.Id.ToString(),
+                await _fileStorageService.UploadText(PublicPermalinkContainerName, permalink.Id.ToString(),
                     MediaTypeNames.Application.Json,
                     JsonConvert.SerializeObject(permalink));
                 return BuildViewModel(permalink);

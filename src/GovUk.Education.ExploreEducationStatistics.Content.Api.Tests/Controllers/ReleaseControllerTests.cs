@@ -1,11 +1,12 @@
 using System;
 using System.Linq;
+using GovUk.Education.ExploreEducationStatistics.Common.Services.Interfaces;
 using GovUk.Education.ExploreEducationStatistics.Content.Api.Controllers;
-using GovUk.Education.ExploreEducationStatistics.Content.Api.Services.Interfaces;
 using GovUk.Education.ExploreEducationStatistics.Publisher.Model.ViewModels;
 using Microsoft.AspNetCore.Mvc;
 using Moq;
 using Xunit;
+using static GovUk.Education.ExploreEducationStatistics.Common.BlobContainerNames;
 
 namespace GovUk.Education.ExploreEducationStatistics.Content.Api.Tests.Controllers
 {
@@ -179,10 +180,20 @@ namespace GovUk.Education.ExploreEducationStatistics.Content.Api.Tests.Controlle
         [Fact]
         public void Get_LatestRelease_Returns_Ok()
         {
-            var fileStorageService = new Mock<IFileStorageService>();
-            fileStorageService.Setup(s => s.DownloadTextAsync("publications/publication-a/publication.json"))
+            var fileStorageService = new Mock<IBlobStorageService>();
+            fileStorageService.Setup(
+                    s => s.DownloadBlobText(
+                        PublicContentContainerName,
+                        "publications/publication-a/publication.json"
+                    )
+                )
                 .ReturnsAsync(PublicationJson);
-            fileStorageService.Setup(s => s.DownloadTextAsync("publications/publication-a/latest-release.json"))
+            fileStorageService.Setup(
+                    s => s.DownloadBlobText(
+                        PublicContentContainerName,
+                        "publications/publication-a/latest-release.json"
+                    )
+                )
                 .ReturnsAsync(ReleaseJson);
 
             var controller = new ReleaseController(fileStorageService.Object);
@@ -219,7 +230,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Content.Api.Tests.Controlle
         [Fact]
         public void Get_LatestRelease_Returns_NotFound()
         {
-            var fileStorageService = new Mock<IFileStorageService>();
+            var fileStorageService = new Mock<IBlobStorageService>();
             var controller = new ReleaseController(fileStorageService.Object);
             var result = controller.GetLatestRelease("publication-a");
             Assert.IsAssignableFrom<NotFoundResult>(result.Result.Result);
@@ -228,10 +239,20 @@ namespace GovUk.Education.ExploreEducationStatistics.Content.Api.Tests.Controlle
         [Fact]
         public void Get_Release_Returns_Ok()
         {
-            var fileStorageService = new Mock<IFileStorageService>();
-            fileStorageService.Setup(s => s.DownloadTextAsync("publications/publication-a/publication.json"))
+            var fileStorageService = new Mock<IBlobStorageService>();
+            fileStorageService.Setup(
+                    s => s.DownloadBlobText(
+                        PublicContentContainerName,
+                        "publications/publication-a/publication.json"
+                    )
+                )
                 .ReturnsAsync(PublicationJson);
-            fileStorageService.Setup(s => s.DownloadTextAsync("publications/publication-a/releases/2016.json"))
+            fileStorageService.Setup(
+                    s => s.DownloadBlobText(
+                        PublicContentContainerName,
+                        "publications/publication-a/releases/2016.json"
+                    )
+                )
                 .ReturnsAsync(ReleaseJson);
 
             var controller = new ReleaseController(fileStorageService.Object);
@@ -268,7 +289,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Content.Api.Tests.Controlle
         [Fact]
         public void Get_Release_Returns_NotFound()
         {
-            var fileStorageService = new Mock<IFileStorageService>();
+            var fileStorageService = new Mock<IBlobStorageService>();
             var controller = new ReleaseController(fileStorageService.Object);
             var result = controller.GetRelease("publication-a", "2000");
             Assert.IsAssignableFrom<NotFoundResult>(result.Result.Result);

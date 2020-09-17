@@ -1,3 +1,4 @@
+using System;
 using System.Collections.Generic;
 using System.Threading.Tasks;
 using GovUk.Education.ExploreEducationStatistics.Common.Model;
@@ -9,6 +10,10 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Processor.Services.Int
 {
     public interface IValidatorService
     {
-        Task<Either<IEnumerable<ValidationError>, ProcessorStatistics>> Validate(SubjectData subjectData, ExecutionContext executionContext, ImportMessage message);
+        Task<Either<IEnumerable<ValidationError>, ProcessorStatistics>> Validate(
+            Guid releaseId,
+            SubjectData subjectData,
+            ExecutionContext executionContext,
+            ImportMessage message);
     }
 }

@@ -1,23 +1,37 @@
 using System;
+using System.Collections.Generic;
+using System.Linq;
+using System.Threading.Tasks;
+using Azure;
+using Azure.Storage.Blobs;
+using Azure.Storage.Blobs.Models;
 using GovUk.Education.ExploreEducationStatistics.Common.Model;
 using GovUk.Education.ExploreEducationStatistics.Common.Services;
 using GovUk.Education.ExploreEducationStatistics.Data.Processor.Model;
-using GovUk.Education.ExploreEducationStatistics.Data.Processor.Services;
 using Microsoft.Azure.Cosmos.Table;
 using Microsoft.Azure.Storage.Queue;
-using Microsoft.EntityFrameworkCore.Internal;
 using Newtonsoft.Json;
+using static GovUk.Education.ExploreEducationStatistics.Common.BlobContainerNames;
+using static GovUk.Education.ExploreEducationStatistics.Common.Services.FileStoragePathUtils;
 using static GovUk.Education.ExploreEducationStatistics.Common.TableStorageTableNames;
 
 namespace GovUk.Education.ExploreEducationStatistics.Data.Processor
 {
     public static class FailedImportsHandler
     {
-        public static void CheckIncompleteImports(string storageConnectionString)
+        public static void CheckIncompleteImports(string connectionString)
         {
-            var tblStorageAccount = CloudStorageAccount.Parse(storageConnectionString);
-            var storageAccount = Microsoft.Azure.Storage.CloudStorageAccount.Parse(storageConnectionString);
-            var container = FileStorageService.GetOrCreateBlobContainer(storageConnectionString).Result;
+            var tblStorageAccount = CloudStorageAccount.Parse(connectionString);
+            var storageAccount = Microsoft.Azure.Storage.CloudStorageAccount.Parse(connectionString);
+
+            // Not ideal. We manually create the blob clients as we can't inject
+            // FileStorageService at this point in the application lifecycle.
+            // This would require re-architecting this code into something like a
+            // cron function, which may or may not be possible as there
+            // are a number of intricacies and potential pitfalls (ask Si).
+            var blobServiceClient = new BlobServiceClient(connectionString);
+            var blobContainer = blobServiceClient.GetBlobContainerClient(PrivateFilesContainerName);
+
             var tableClient = tblStorageAccount.CreateCloudTableClient();
             var queueClient = storageAccount.CreateCloudQueueClient();
             var availableQueue = queueClient.GetQueueReference("imports-available");
@@ -51,7 +65,8 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Processor
                     else
                     {
                         var m = JsonConvert.DeserializeObject<ImportMessage>(entity.Message);
-                        var batches = FileStorageService.GetBatchesRemaining(entity.PartitionKey, container, m.OrigDataFileName);
+                        var batches = GetBatchesRemaining(blobContainer, entity.PartitionKey, m.OrigDataFileName)
+                            .Result;
 
                         // If no batches then assume it didn't get passed initial validation stage
                         if (!batches.Any())
@@ -59,56 +74,102 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Processor
                             pendingQueue.AddMessage(new CloudQueueMessage(entity.Message));
                             return;
                         }
-                        
+
                         foreach (var folderAndFilename in batches)
                         {
-                            availableQueue.AddMessage(new CloudQueueMessage(BuildMessage(m, folderAndFilename)));
+                            availableQueue.AddMessage(new CloudQueueMessage(BuildMessage(m, folderAndFilename.Name)));
                         }
                     }
                 }
             } while (token != null);
         }
-        
+
         private static TableQuery<DatafileImport> BuildQuery()
         {
             var combineFilters = TableQuery.CombineFilters(
-                TableQuery.GenerateFilterCondition("Status", 
+                TableQuery.GenerateFilterCondition("Status",
                     QueryComparisons.Equal, IStatus.QUEUED.ToString())
-                , TableOperators.Or, 
-                TableQuery.GenerateFilterCondition("Status", 
+                , TableOperators.Or,
+                TableQuery.GenerateFilterCondition("Status",
                     QueryComparisons.Equal, IStatus.RUNNING_PHASE_1.ToString()));
 
             combineFilters = TableQuery.CombineFilters(
-                combineFilters, 
-                TableOperators.Or, 
-                TableQuery.GenerateFilterCondition("Status", 
+                combineFilters,
+                TableOperators.Or,
+                TableQuery.GenerateFilterCondition("Status",
                     QueryComparisons.Equal, IStatus.RUNNING_PHASE_2.ToString()));
 
             combineFilters = TableQuery.CombineFilters(
-                combineFilters, 
-                TableOperators.Or, 
-                TableQuery.GenerateFilterCondition("Status", 
+                combineFilters,
+                TableOperators.Or,
+                TableQuery.GenerateFilterCondition("Status",
                     QueryComparisons.Equal, IStatus.PROCESSING_ARCHIVE_FILE.ToString()));
-            
+
             return new TableQuery<DatafileImport>()
                 .Where(TableQuery.CombineFilters(
-                    combineFilters, 
-                    TableOperators.Or, 
-                    TableQuery.GenerateFilterCondition("Status", 
+                    combineFilters,
+                    TableOperators.Or,
+                    TableQuery.GenerateFilterCondition("Status",
                     QueryComparisons.Equal, IStatus.RUNNING_PHASE_3.ToString())));
         }
-        
+
+        private static async Task<List<BlobItem>> GetBatchesRemaining(
+            BlobContainerClient blobContainer,
+            string releaseId,
+            string origDataFileName)
+        {
+            var batchBlobs = new List<BlobItem>();
+
+            string continuationToken = null;
+
+            do
+            {
+                var blobPages = blobContainer.GetBlobsAsync(
+                        BlobTraits.Metadata,
+                        prefix: AdminReleaseDirectoryPath(releaseId, ReleaseFileTypes.Data)
+                    )
+                    .AsPages(continuationToken);
+
+                await foreach (Page<BlobItem> page in blobPages)
+                {
+                    foreach (var blob in page.Values)
+                    {
+                        if (blob == null)
+                        {
+                            break;
+                        }
+
+                        if (IsBatchFile(blob.Name, releaseId) && blob.Name.Contains(origDataFileName))
+                        {
+                            batchBlobs.Add(blob);
+                        }
+
+                        batchBlobs.Add(blob);
+                    }
+
+                    continuationToken = page.ContinuationToken;
+                }
+            } while (continuationToken != string.Empty);
+
+            return batchBlobs;
+        }
+
+        private static bool IsBatchFile(string path, string releaseId)
+        {
+            return path.StartsWith(AdminReleaseBatchesDirectoryPath(releaseId));
+        }
+
         private static string BuildMessage(ImportMessage message, string folderAndFilename)
         {
-            var fileName = folderAndFilename.Split(FileStoragePathUtils.BatchesDir + "/")[1];
+            var fileName = folderAndFilename.Split(BatchesDir + "/")[1];
             var batchNo = Int16.Parse(fileName.Substring(fileName.Length-6));
-            
+
             Console.WriteLine($"Recreating message queue for {fileName}");
-            
+
             var iMessage = new ImportMessage
             {
                 SubjectId = message.SubjectId,
-                DataFileName = $"{FileStoragePathUtils.BatchesDir}/{fileName}",
+                DataFileName = $"{BatchesDir}/{fileName}",
                 OrigDataFileName = message.DataFileName,
                 Release = message.Release,
                 BatchNo = batchNo,

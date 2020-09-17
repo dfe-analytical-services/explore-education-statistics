@@ -8,6 +8,6 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Processor.Services.Int
     {
         Task ImportObservations(ImportMessage message, StatisticsDbContext context);
 
-        void ImportFiltersLocationsAndSchools(ImportMessage message, StatisticsDbContext context);
+        Task ImportFiltersLocationsAndSchools(ImportMessage message, StatisticsDbContext context);
     }
 }

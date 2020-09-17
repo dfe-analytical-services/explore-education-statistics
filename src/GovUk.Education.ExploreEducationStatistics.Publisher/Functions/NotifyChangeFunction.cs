@@ -3,8 +3,6 @@ using System.Threading.Tasks;
 using GovUk.Education.ExploreEducationStatistics.Common.Model;
 using GovUk.Education.ExploreEducationStatistics.Publisher.Model;
 using GovUk.Education.ExploreEducationStatistics.Publisher.Services.Interfaces;
-using Microsoft.Azure.Storage;
-using Microsoft.Azure.Storage.Blob;
 using Microsoft.Azure.WebJobs;
 using Microsoft.Extensions.Logging;
 using static GovUk.Education.ExploreEducationStatistics.Publisher.Model.PublisherQueues;
@@ -31,7 +29,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Publisher.Functions
             _releaseStatusService = releaseStatusService;
             _validationService = validationService;
         }
-        
+
         /// <summary>
         /// Azure function which validates that a Release is in a state to be published.
         /// Creates a ReleaseStatus entry scheduling its publication or triggers publishing files if immediate.
@@ -81,7 +79,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Publisher.Functions
             }
             finally
             {
-                ReleaseLease(lease);
+                await lease.Release();
             }
 
             logger.LogInformation($"{executionContext.FunctionName} completed");
@@ -102,11 +100,6 @@ namespace GovUk.Education.ExploreEducationStatistics.Publisher.Functions
             {
                 await _releaseStatusService.UpdateStateAsync(message.ReleaseId, releaseStatus.Id, SupersededState);
             }
-        }
-        
-        private static void ReleaseLease((CloudBlockBlob blob, string id) lease)
-        {
-            lease.blob.ReleaseLease(AccessCondition.GenerateLeaseCondition(lease.id));
         }
     }
 }

@@ -32,8 +32,8 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Api.Services
             Func<T, Task<Either<string, Permalink>>> transformFunc)
         {
             var migrationHistoryWriter =
-                await MigrationHistoryWriter.CreateAsync(PublicPermalinkMigrationContainerName, migrationId, _fileStorageService);
-            var shouldRun = await CheckMigrationShouldRunAndRecordHistoryAsync(migrationHistoryWriter);
+                await MigrationHistoryWriter.Create(PublicPermalinkMigrationContainerName, migrationId, _fileStorageService);
+            var shouldRun = await CheckMigrationShouldRunAndRecordHistory(migrationHistoryWriter);
             if (!shouldRun)
             {
                 _logger.LogInformation("Skipping Permalink migration: {MigrationId}", migrationId);
@@ -46,7 +46,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Api.Services
             if (errors.Any())
             {
                 _logger.LogError("Permalink migration: {MigrationId} finished with errors", migrationId);
-                await migrationHistoryWriter.WriteHistoryAsync(string.Join(Environment.NewLine, errors));
+                await migrationHistoryWriter.WriteHistory(string.Join(Environment.NewLine, errors));
                 return false;
             }
 
@@ -93,11 +93,24 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Api.Services
         private async Task<List<T>> DownloadPermalinksAsync<T>()
         {
             _logger.LogDebug("Listing blobs in container: {Container}", PublicPermalinkContainerName);
-            var blobs = _fileStorageService.ListBlobs(PublicPermalinkContainerName).ToList();
+
+            var blobs = (await _fileStorageService.ListBlobs(PublicPermalinkContainerName)).ToList();
+
             _logger.LogDebug("Found {Count} blobs in container: {Container}", blobs.Count, PublicPermalinkContainerName);
-            var strings = await Task.WhenAll(blobs.Select(blob => blob.DownloadTextAsync()));
+
+            var strings = await Task.WhenAll(
+                blobs.Select(blob =>
+                    _fileStorageService.GetBlobText(
+                        containerName: PublicPermalinkContainerName,
+                        path: blob.Path
+                    )
+                )
+            );
+
             _logger.LogDebug("Downloaded {Count} blobs", strings.Length);
+
             var deserialized = new List<T>();
+
             foreach (var s in strings)
             {
                 try
@@ -117,24 +130,24 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Api.Services
             List<Permalink> permalinks)
         {
             _logger.LogDebug("Uploading {Count} Permalinks", permalinks.Count);
-            await migrationHistoryWriter.WriteHistoryAsync($"Uploading {permalinks.Count} Permalinks");
+            await migrationHistoryWriter.WriteHistory($"Uploading {permalinks.Count} Permalinks");
             await Task.WhenAll(permalinks.Select(permalink =>
-                _fileStorageService.UploadFromStreamAsync(PublicPermalinkContainerName,
+                _fileStorageService.UploadText(PublicPermalinkContainerName,
                     permalink.Id.ToString(),
                     MediaTypeNames.Application.Json,
                     JsonConvert.SerializeObject(permalink))));
             _logger.LogDebug("Upload complete");
-            await migrationHistoryWriter.WriteHistoryAsync("Upload complete");
+            await migrationHistoryWriter.WriteHistory("Upload complete");
         }
 
-        private static async Task<bool> CheckMigrationShouldRunAndRecordHistoryAsync(
+        private static async Task<bool> CheckMigrationShouldRunAndRecordHistory(
             MigrationHistoryWriter migrationHistoryWriter)
         {
-            var shouldRun = !migrationHistoryWriter.IsHistoryExists();
+            var shouldRun = !(await migrationHistoryWriter.IsHistoryExists());
             // Presence of history file is used to prevent future executions
             if (shouldRun)
             {
-                await migrationHistoryWriter.WriteHistoryAsync("Started");
+                await migrationHistoryWriter.WriteHistory("Started");
             }
 
             return shouldRun;
@@ -157,53 +170,56 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Api.Services
             _appendSupported = appendSupported;
         }
 
-        internal static async Task<MigrationHistoryWriter> CreateAsync(string containerName, string migrationId,
+        internal static async Task<MigrationHistoryWriter> Create(string containerName, string migrationId,
             IFileStorageService fileStorageService)
         {
-            var appendSupported = await fileStorageService.TryGetOrCreateAppendBlobAsync(containerName, migrationId);
+            var appendSupported = await fileStorageService.IsAppendSupported(containerName, migrationId);
             return new MigrationHistoryWriter(containerName, migrationId, fileStorageService, appendSupported);
         }
 
-        public bool IsHistoryExists()
+        public async Task<bool> IsHistoryExists()
         {
-            var blob = _fileStorageService.GetBlob(_containerName, _migrationId);
-            if (!blob.Exists())
+            var exists = await _fileStorageService.CheckBlobExists(_containerName, _migrationId);
+
+            if (!exists)
             {
                 return false;
             }
 
-            blob.FetchAttributes();
-            return blob.Properties.Length > 0;
+            var blob = await _fileStorageService.GetBlob(_containerName, _migrationId);
+
+            return blob.ContentLength > 0;
         }
 
-        public Task WriteHistoryAsync(string message)
+        public Task WriteHistory(string message)
         {
             if (_appendSupported)
             {
-                return AppendMigrationHistoryAsync(message);
+                return AppendMigrationHistory(message);
             }
 
             // Appending is not supported by the Storage Emulator.
             // Currently history is lost as last log message is replaced instead
-            return UploadMigrationHistoryAsync(message);
+            return UploadMigrationHistory(message);
         }
 
-        private Task UploadMigrationHistoryAsync(string message)
+        private Task UploadMigrationHistory(string message)
         {
             var now = DateTime.UtcNow.ToString("o", CultureInfo.InvariantCulture);
-            return _fileStorageService.UploadFromStreamAsync(_containerName,
-                _migrationId,
-                MediaTypeNames.Text.Plain,
-                $"{now}: {message}");
+            return _fileStorageService.UploadText(_containerName,
+                path: _migrationId,
+                contentType: MediaTypeNames.Text.Plain,
+                content: $"{now}: {message}");
         }
 
-        private Task AppendMigrationHistoryAsync(string message)
+        private Task AppendMigrationHistory(string message)
         {
             var now = DateTime.UtcNow.ToString("o", CultureInfo.InvariantCulture);
-            return _fileStorageService.AppendFromStreamAsync(_containerName,
-                _migrationId,
-                MediaTypeNames.Text.Plain,
-                $"{now}: {message}{Environment.NewLine}");
+            return _fileStorageService.AppendText(
+                containerName: _containerName,
+                path: _migrationId,
+                contentType: MediaTypeNames.Text.Plain,
+                content: $"{now}: {message}{Environment.NewLine}");
         }
     }
 }

@@ -7,10 +7,10 @@ using GovUk.Education.ExploreEducationStatistics.Content.Model.Database;
 using GovUk.Education.ExploreEducationStatistics.Data.Importer.Services.Interfaces;
 using GovUk.Education.ExploreEducationStatistics.Data.Importer.Utils;
 using GovUk.Education.ExploreEducationStatistics.Data.Model.Database;
-using GovUk.Education.ExploreEducationStatistics.Data.Processor.Extensions;
 using GovUk.Education.ExploreEducationStatistics.Data.Processor.Model;
 using GovUk.Education.ExploreEducationStatistics.Data.Processor.Models;
 using GovUk.Education.ExploreEducationStatistics.Data.Processor.Services.Interfaces;
+using GovUk.Education.ExploreEducationStatistics.Data.Processor.Utils;
 using Microsoft.Azure.WebJobs;
 using Microsoft.Data.SqlClient;
 using Microsoft.Extensions.Logging;
@@ -72,7 +72,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Processor.Functions
             await _batchService.UpdateStatus(message.Release.Id.ToString(), message.DataFileName, IStatus.RUNNING_PHASE_1);
             var subjectData = await _fileStorageService.GetSubjectData(message);
 
-            await _validatorService.Validate(subjectData, executionContext, message)
+            await _validatorService.Validate(message.Release.Id, subjectData, executionContext, message)
                 .OnSuccess(async result =>
                 {
                     try
@@ -94,7 +94,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Processor.Functions
                             message.OrigDataFileName,
                             new List<ValidationError> {new ValidationError(ex.Message)}
                         );
-                    
+
                         logger.LogError(ex,$"{GetType().Name} function FAILED for : Datafile: " +
                                            $"{message.DataFileName} : {ex.Message}");
                         logger.LogError(ex.StackTrace);
@@ -102,16 +102,15 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Processor.Functions
 
                     return true;
                 })
-                .OnFailureSucceedWith(async errors =>
+                .OnFailureDo(async errors =>
                 {
                     await _batchService.FailImport(
                         message.Release.Id.ToString(),
                         message.OrigDataFileName,
                         errors
                     );
-                
+
                     logger.LogError($"Import FAILED for {message.DataFileName}...check log");
-                    return true;
                 });
         }
 
@@ -133,33 +132,40 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Processor.Functions
                                        $"{message.DataFileName} : {exception.Message} : transaction will be retried");
                     throw;
                 }
-                
+
                 var ex = GetInnerException(e);
-                
+
                 await _batchService.FailImport(
                     message.Release.Id.ToString(),
                     message.OrigDataFileName,
                     new List<ValidationError> {new ValidationError(ex.Message)}
                 );
-                    
+
                 logger.LogError(ex,$"{GetType().Name} function FAILED for : Datafile: " +
                                 $"{message.DataFileName} : {ex.Message}");
             }
         }
-        
-        private async Task ProcessSubject(ImportMessage message, StatisticsDbContext statisticsDbContext, ContentDbContext contentDbContext, SubjectData subjectData)
+
+        private async Task ProcessSubject(
+            ImportMessage message,
+            StatisticsDbContext statisticsDbContext,
+            ContentDbContext contentDbContext,
+            SubjectData subjectData)
         {
             var status = await _batchService.GetStatus(message.Release.Id.ToString(), message.OrigDataFileName);
-            
+
             // If already reached Phase 2 then don't re-create the subject
             if ((int)status > (int)IStatus.RUNNING_PHASE_1)
             {
-                return; 
+                return;
             }
 
             var subject = _releaseProcessorService.CreateOrUpdateRelease(subjectData, message, statisticsDbContext, contentDbContext);
-            
-            _importerService.ImportMeta(subjectData.GetMetaTable(), subject, statisticsDbContext);
+
+            await using var metaFileStream = await _fileStorageService.StreamBlob(subjectData.MetaBlob);
+            var metaFileTable = DataTableUtils.CreateFromStream(metaFileStream);
+
+            _importerService.ImportMeta(metaFileTable, subject, statisticsDbContext);
 
             if (message.Seeding)
             {
@@ -170,8 +176,8 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Processor.Functions
 
             await statisticsDbContext.SaveChangesAsync();
 
-            _fileImportService.ImportFiltersLocationsAndSchools(message, statisticsDbContext);
-            
+            await _fileImportService.ImportFiltersLocationsAndSchools(message, statisticsDbContext);
+
             if (message.Seeding)
             {
                 SampleGuids.GenerateFilterGuids(statisticsDbContext);
