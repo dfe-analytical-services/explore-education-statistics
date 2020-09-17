@@ -6,14 +6,14 @@ using Newtonsoft.Json;
 
 namespace GovUk.Education.ExploreEducationStatistics.Admin.ViewModels
 {
-    public class ReplacementPlanViewModel
+    public class DataReplacementPlanViewModel
     {
         public IEnumerable<DataBlockReplacementPlanViewModel> DataBlocks { get; }
         public IEnumerable<FootnoteReplacementPlanViewModel> Footnotes { get; }
         public Guid OriginalSubjectId { get; }
         public Guid ReplacementSubjectId { get; }
 
-        public ReplacementPlanViewModel(IEnumerable<DataBlockReplacementPlanViewModel> dataBlocks,
+        public DataReplacementPlanViewModel(IEnumerable<DataBlockReplacementPlanViewModel> dataBlocks,
             IEnumerable<FootnoteReplacementPlanViewModel> footnotes,
             Guid originalSubjectId,
             Guid replacementSubjectId)

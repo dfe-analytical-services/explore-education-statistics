@@ -3,11 +3,13 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
 using GovUk.Education.ExploreEducationStatistics.Admin.Services.Interfaces;
+using GovUk.Education.ExploreEducationStatistics.Admin.Services.Interfaces.Security;
 using GovUk.Education.ExploreEducationStatistics.Admin.ViewModels;
 using GovUk.Education.ExploreEducationStatistics.Common.Extensions;
 using GovUk.Education.ExploreEducationStatistics.Common.Model;
 using GovUk.Education.ExploreEducationStatistics.Common.Model.Data;
 using GovUk.Education.ExploreEducationStatistics.Common.Model.Data.Query;
+using GovUk.Education.ExploreEducationStatistics.Common.Services.Interfaces.Security;
 using GovUk.Education.ExploreEducationStatistics.Common.Utils;
 using GovUk.Education.ExploreEducationStatistics.Content.Model;
 using GovUk.Education.ExploreEducationStatistics.Content.Model.Database;
@@ -39,6 +41,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Services
         private readonly IReleaseService _releaseService;
         private readonly ITimePeriodService _timePeriodService;
         private readonly IPersistenceHelper<ContentDbContext> _contentPersistenceHelper;
+        private readonly IUserService _userService;
 
         public ReplacementService(ContentDbContext contentDbContext,
             StatisticsDbContext statisticsDbContext,
@@ -48,7 +51,8 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Services
             IFootnoteService footnoteService,
             IReleaseService releaseService,
             ITimePeriodService timePeriodService,
-            IPersistenceHelper<ContentDbContext> contentPersistenceHelper)
+            IPersistenceHelper<ContentDbContext> contentPersistenceHelper,
+            IUserService userService)
         {
             _contentDbContext = contentDbContext;
             _statisticsDbContext = statisticsDbContext;
@@ -59,40 +63,47 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Services
             _releaseService = releaseService;
             _timePeriodService = timePeriodService;
             _contentPersistenceHelper = contentPersistenceHelper;
+            _userService = userService;
         }
 
-        public async Task<Either<ActionResult, ReplacementPlanViewModel>> GetReplacementPlan(
-            Guid originalReleaseFileReferenceId,
-            Guid replacementReleaseFileReferenceId)
+        public async Task<Either<ActionResult, DataReplacementPlanViewModel>> GetReplacementPlan(
+            Guid originalFileId,
+            Guid replacementFileId)
         {
-            return await CheckReleaseFileReferenceExists(originalReleaseFileReferenceId)
-                .OnSuccess(async originalReleaseFileReference =>
+            return await CheckReleaseFileReferenceExists(originalFileId)
+                .OnSuccess(async originalFileReference =>
                 {
-                    return await CheckReleaseFileReferenceExists(replacementReleaseFileReferenceId)
-                        .OnSuccessDo(replacementReleaseFileReference =>
-                            CheckFilesAreForRelatedReleases(originalReleaseFileReference,
-                                replacementReleaseFileReference))
-                        .OnSuccess(replacementReleaseFileReference =>
+                    return await CheckReleaseFileReferenceExists(replacementFileId)
+                        .OnSuccessDo(replacementFileReference =>
+                            _userService.CheckCanUpdateRelease(replacementFileReference.Release))
+                        .OnSuccessDo(replacementFileReference =>
+                            CheckFilesAreForRelatedReleases(
+                                originalFileReference,
+                                replacementFileReference
+                            )
+                        )
+                        .OnSuccess(replacementFileReference =>
                         {
-                            var releaseId = replacementReleaseFileReference.ReleaseId;
-                            var originalSubjectId = originalReleaseFileReference.SubjectId.Value;
-                            var replacementSubjectId = replacementReleaseFileReference.SubjectId.Value;
+                            var releaseId = replacementFileReference.ReleaseId;
+                            var originalSubjectId = originalFileReference.SubjectId.Value;
+                            var replacementSubjectId = replacementFileReference.SubjectId.Value;
 
                             var replacementSubjectMeta = GetReplacementSubjectMeta(replacementSubjectId);
 
                             var dataBlocks = ValidateDataBlocks(releaseId, originalSubjectId, replacementSubjectMeta);
                             var footnotes = ValidateFootnotes(releaseId, originalSubjectId, replacementSubjectMeta);
 
-                            return new ReplacementPlanViewModel(dataBlocks, footnotes, originalSubjectId,
+                            return new DataReplacementPlanViewModel(dataBlocks, footnotes, originalSubjectId,
                                 replacementSubjectId);
                         });
                 });
         }
 
-        public async Task<Either<ActionResult, Unit>> Replace(Guid originalReleaseFileReferenceId,
-            Guid replacementReleaseFileReferenceId)
+        public async Task<Either<ActionResult, Unit>> Replace(
+            Guid originalFileId,
+            Guid replacementFileId)
         {
-            return await GetReplacementPlan(originalReleaseFileReferenceId, replacementReleaseFileReferenceId)
+            return await GetReplacementPlan(originalFileId, replacementFileId)
                 .OnSuccess(async replacementPlan =>
                 {
                     if (!replacementPlan.Valid)
@@ -111,19 +122,29 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Services
 
                     // This Release Id can be found on the ReplacementFileReference
                     var releaseId = (await _contentDbContext.ReleaseFileReferences
-                        .FindAsync(replacementReleaseFileReferenceId)).ReleaseId;
+                        .FindAsync(replacementFileId)).ReleaseId;
 
-                    return await RemoveSubjectAndFileFromRelease(releaseId, originalReleaseFileReferenceId);
+                    return await RemoveSubjectAndFileFromRelease(releaseId, originalFileId);
                 });
         }
 
         private async Task<Either<ActionResult, ReleaseFileReference>> CheckReleaseFileReferenceExists(Guid id)
         {
-            return await _contentPersistenceHelper.CheckEntityExists<ReleaseFileReference>(id)
-                .OnSuccess(releaseFileReference => releaseFileReference.ReleaseFileType != ReleaseFileTypes.Data
-                    ? new Either<ActionResult, ReleaseFileReference>(
-                        ValidationActionResult(ReplacementFileTypesMustBeData))
-                    : releaseFileReference);
+            return await _contentPersistenceHelper.CheckEntityExists<ReleaseFileReference>(
+                    id,
+                    q => q.Include(rfr => rfr.Release)
+                )
+                .OnSuccess<ActionResult, ReleaseFileReference, ReleaseFileReference>(
+                    releaseFileReference =>
+                    {
+                        if (releaseFileReference.ReleaseFileType != ReleaseFileTypes.Data)
+                        {
+                            return ValidationActionResult(ReplacementFileTypesMustBeData);
+                        }
+
+                        return releaseFileReference;
+                    }
+                );
         }
 
         private async Task<Either<ActionResult, Unit>> CheckFilesAreForRelatedReleases(
@@ -146,7 +167,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Services
             // Check the replacement is for the same Release
             if (replacementReleaseFileReference.ReleaseId != originalReleaseId)
             {
-                return ValidationActionResult(ReplacementDataFileMustBeForRelatedRelease);
+                return new NotFoundResult();
             }
 
             return Unit.Instance;

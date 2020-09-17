@@ -14,6 +14,7 @@ using GovUk.Education.ExploreEducationStatistics.Data.Model.Database;
 using GovUk.Education.ExploreEducationStatistics.Data.Model.Services;
 using GovUk.Education.ExploreEducationStatistics.Data.Model.Services.Interfaces;
 using GovUk.Education.ExploreEducationStatistics.Data.Services.Interfaces;
+using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Logging;
 using Moq;
@@ -258,7 +259,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
                     replacementReleaseFileReference.Id);
 
                 Assert.True(result.IsLeft);
-                AssertValidationProblem(result.Left, ReplacementDataFileMustBeForRelatedRelease);
+                Assert.IsType<NotFoundResult>(result.Left);
             }
         }
 
@@ -1436,7 +1437,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
                     replacementReleaseFileReference.Id);
 
                 mocks.ReleaseService.VerifyNoOtherCalls();
-                
+
                 Assert.True(result.IsLeft);
                 AssertValidationProblem(result.Left, ReplacementMustBeValid);
             }
@@ -2000,7 +2001,9 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
                 new FootnoteService(statisticsDbContext, new Mock<ILogger<FootnoteService>>().Object),
                 releaseService.Object,
                 timePeriodService.Object,
-                new PersistenceHelper<ContentDbContext>(contentDbContext));
+                new PersistenceHelper<ContentDbContext>(contentDbContext),
+                MockUtils.AlwaysTrueUserService().Object
+            );
         }
 
         private static (Mock<ILocationService> LocationService,
