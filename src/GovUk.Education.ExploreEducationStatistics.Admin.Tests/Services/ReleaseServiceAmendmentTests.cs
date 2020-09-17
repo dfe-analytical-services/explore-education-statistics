@@ -21,6 +21,7 @@ using IFootnoteService = GovUk.Education.ExploreEducationStatistics.Admin.Servic
 using Publication = GovUk.Education.ExploreEducationStatistics.Content.Model.Publication;
 using Release = GovUk.Education.ExploreEducationStatistics.Content.Model.Release;
 using ReleaseService = GovUk.Education.ExploreEducationStatistics.Admin.Services.ReleaseService;
+using Unit = GovUk.Education.ExploreEducationStatistics.Common.Model.Unit;
 
 namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
 {
@@ -380,6 +381,9 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
 
             var newReleaseId = Guid.Empty;
 
+            footnoteService.Setup(service => service.CopyFootnotes(releaseId, It.IsAny<Guid>()))
+                .ReturnsAsync(Unit.Instance);
+            
             using (var contentDbContext = InMemoryApplicationDbContext("CreateReleaseAmendment"))
             {
                 using (var statisticsDbContext = InMemoryStatisticsDbContext("CreateReleaseAmendment"))
@@ -394,6 +398,12 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
 
                     // Method under test
                     var amendmentViewModel = releaseService.CreateReleaseAmendmentAsync(releaseId).Result.Right;
+
+                    footnoteService.Verify(
+                        mock => mock.CopyFootnotes(releaseId, amendmentViewModel.Id), Times.Once);
+
+                    footnoteService.VerifyNoOtherCalls();
+                    
                     Assert.NotEqual(release.Id, amendmentViewModel.Id);
                     Assert.NotEqual(Guid.Empty, amendmentViewModel.Id);
                     newReleaseId = amendmentViewModel.Id;
@@ -603,42 +613,42 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
        }
 
        private (
-            Mock<IUserService>,
-            Mock<IPersistenceHelper<ContentDbContext>>,
-            Mock<IPublishingService>,
-            Mock<IReleaseRepository>,
-            Mock<ISubjectService>,
-            Mock<ITableStorageService>,
-            Mock<IReleaseFilesService>,
-            Mock<IImportStatusService>,
-            Mock<IFootnoteService>,
-            Mock<StatisticsDbContext>,
-            Mock<IDataBlockService>,
-            Mock<IReleaseSubjectService>) Mocks()
-        {
-            var userService = MockUtils.AlwaysTrueUserService();
+           Mock<IUserService>,
+           Mock<IPersistenceHelper<ContentDbContext>>,
+           Mock<IPublishingService>,
+           Mock<IReleaseRepository>,
+           Mock<ISubjectService>,
+           Mock<ITableStorageService>,
+           Mock<IReleaseFilesService>,
+           Mock<IImportStatusService>,
+           Mock<IFootnoteService>,
+           Mock<StatisticsDbContext>,
+           Mock<IDataBlockService>,
+           Mock<IReleaseSubjectService>) Mocks()
+       {
+           var userService = MockUtils.AlwaysTrueUserService();
 
-            userService
-                .Setup(s => s.GetUserId())
-                .Returns(_userId);
+           userService
+               .Setup(s => s.GetUserId())
+               .Returns(_userId);
 
-            var persistenceHelper = MockUtils.MockPersistenceHelper<ContentDbContext>();
-            MockUtils.SetupCall<ContentDbContext, Release>(persistenceHelper);
-            MockUtils.SetupCall<ContentDbContext, Publication>(persistenceHelper);
+           var persistenceHelper = MockUtils.MockPersistenceHelper<ContentDbContext>();
+           MockUtils.SetupCall<ContentDbContext, Release>(persistenceHelper);
+           MockUtils.SetupCall<ContentDbContext, Publication>(persistenceHelper);
 
-            return (
-                userService,
-                persistenceHelper,
-                new Mock<IPublishingService>(),
-                new Mock<IReleaseRepository>(),
-                new Mock<ISubjectService>(),
-                new Mock<ITableStorageService>(),
-                new Mock<IReleaseFilesService>(),
-                new Mock<IImportStatusService>(),
-                new Mock<IFootnoteService>(),
-                new Mock<StatisticsDbContext>(),
-                new Mock<IDataBlockService>(),
-                new Mock<IReleaseSubjectService>());
-        }
+           return (
+               userService,
+               persistenceHelper,
+               new Mock<IPublishingService>(),
+               new Mock<IReleaseRepository>(),
+               new Mock<ISubjectService>(),
+               new Mock<ITableStorageService>(),
+               new Mock<IReleaseFilesService>(),
+               new Mock<IImportStatusService>(),
+               new Mock<IFootnoteService>(),
+               new Mock<StatisticsDbContext>(),
+               new Mock<IDataBlockService>(),
+               new Mock<IReleaseSubjectService>());
+       }
     }
 }
