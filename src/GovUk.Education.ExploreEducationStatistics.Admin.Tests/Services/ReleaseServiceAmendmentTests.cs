@@ -29,11 +29,11 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
     {
         private readonly Guid _userId = Guid.NewGuid();
 
-       [Fact]
-       public void CreateReleaseAmendmentAsync()
+        [Fact]
+        public void CreateReleaseAmendmentAsync()
         {
             var (userService, _, publishingService, repository, subjectService, tableStorageService,
-                fileStorageService, importStatusService, footnoteService, _, dataBlockService, releaseSubjectService) = Mocks();
+                    fileStorageService, importStatusService, footnoteService, _, dataBlockService, releaseSubjectService) = Mocks();
 
             var releaseId = Guid.NewGuid();
             var releaseType = new ReleaseType
@@ -86,7 +86,6 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
 
             var release = new Release
             {
-
                 Id = releaseId,
                 Type = releaseType,
                 TypeId = releaseType.Id,
@@ -218,7 +217,8 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
                                 {
                                     Id = Guid.NewGuid(),
                                     Body = "Text",
-                                    Comments = new List<Comment> {
+                                    Comments = new List<Comment>
+                                    {
                                         new Comment
                                         {
                                             Id = Guid.NewGuid(),
@@ -383,7 +383,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
 
             footnoteService.Setup(service => service.CopyFootnotes(releaseId, It.IsAny<Guid>()))
                 .ReturnsAsync(Unit.Instance);
-            
+
             using (var contentDbContext = InMemoryApplicationDbContext("CreateReleaseAmendment"))
             {
                 using (var statisticsDbContext = InMemoryStatisticsDbContext("CreateReleaseAmendment"))
@@ -403,7 +403,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
                         mock => mock.CopyFootnotes(releaseId, amendmentViewModel.Id), Times.Once);
 
                     footnoteService.VerifyNoOtherCalls();
-                    
+
                     Assert.NotEqual(release.Id, amendmentViewModel.Id);
                     Assert.NotEqual(Guid.Empty, amendmentViewModel.Id);
                     newReleaseId = amendmentViewModel.Id;
@@ -431,7 +431,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
                 // Release
                 Assert.Equal(newReleaseId, amendment.Id);
                 Assert.Null(amendment.PublishScheduled);
-                Assert.Null( amendment.Published);
+                Assert.Null(amendment.Published);
                 Assert.Equal(release.Version + 1, amendment.Version);
                 Assert.Equal(ReleaseStatus.Draft, amendment.Status);
                 Assert.Equal(release.Id, amendment.PreviousVersion?.Id);
@@ -534,121 +534,122 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
                 Assert.Contains(subject1.Id, releaseSubjectLinks.Select(r => r.SubjectId));
                 Assert.Contains(subject2.Id, releaseSubjectLinks.Select(r => r.SubjectId));
             }
-       }
+        }
 
-       private static void AssertAmendedLinkCorrect(Link amended, Link previous)
-       {
-           Assert.True(amended.Id != Guid.Empty);
-           Assert.NotEqual(previous.Id, amended.Id);
-           Assert.Equal(previous.Description, amended.Description);
-           Assert.Equal(previous.Url, amended.Url);
-       }
+        private static void AssertAmendedLinkCorrect(Link amended, Link previous)
+        {
+            Assert.True(amended.Id != Guid.Empty);
+            Assert.NotEqual(previous.Id, amended.Id);
+            Assert.Equal(previous.Description, amended.Description);
+            Assert.Equal(previous.Url, amended.Url);
+        }
 
-       private static void AssertAmendedUpdateCorrect(Update amended, Update previous, Release amendment)
-       {
-           Assert.True(amended.Id != Guid.Empty);
-           Assert.NotEqual(previous.Id, amended.Id);
-           Assert.Equal(previous.On, amended.On);
-           Assert.Equal(previous.Reason, amended.Reason);
-           Assert.Equal(amendment, amended.Release);
-           Assert.Equal(amendment.Id, amended.ReleaseId);
-       }
+        private static void AssertAmendedUpdateCorrect(Update amended, Update previous, Release amendment)
+        {
+            Assert.True(amended.Id != Guid.Empty);
+            Assert.NotEqual(previous.Id, amended.Id);
+            Assert.Equal(previous.On, amended.On);
+            Assert.Equal(previous.Reason, amended.Reason);
+            Assert.Equal(amendment, amended.Release);
+            Assert.Equal(amendment.Id, amended.ReleaseId);
+        }
 
-       private static void AssertAmendedContentSectionCorrect(Release amendment, ReleaseContentSection amended,
-           ReleaseContentSection previous)
-       {
-           Assert.Equal(amendment, amended.Release);
-           Assert.Equal(amendment.Id, amended.ReleaseId);
-           Assert.True(amended.ContentSectionId != Guid.Empty);
-           Assert.NotEqual(previous.ContentSectionId, amended.ContentSectionId);
+        private static void AssertAmendedContentSectionCorrect(Release amendment, ReleaseContentSection amended,
+            ReleaseContentSection previous)
+        {
+            Assert.Equal(amendment, amended.Release);
+            Assert.Equal(amendment.Id, amended.ReleaseId);
+            Assert.True(amended.ContentSectionId != Guid.Empty);
+            Assert.NotEqual(previous.ContentSectionId, amended.ContentSectionId);
 
-           var previousSection = previous.ContentSection;
-           var amendedSection = amended.ContentSection;
+            var previousSection = previous.ContentSection;
+            var amendedSection = amended.ContentSection;
 
-           Assert.NotEqual(previousSection.Id, amendedSection.Id);
-           Assert.Equal(previousSection.Caption, amendedSection.Caption);
-           Assert.Equal(previousSection.Heading, amendedSection.Heading);
-           Assert.Equal(previousSection.Order, amendedSection.Order);
-           Assert.Equal(previousSection.Type, amendedSection.Type);
-           Assert.Equal(previousSection.Content.Count, amendedSection.Content.Count);
+            Assert.NotEqual(previousSection.Id, amendedSection.Id);
+            Assert.Equal(previousSection.Caption, amendedSection.Caption);
+            Assert.Equal(previousSection.Heading, amendedSection.Heading);
+            Assert.Equal(previousSection.Order, amendedSection.Order);
+            Assert.Equal(previousSection.Type, amendedSection.Type);
+            Assert.Equal(previousSection.Content.Count, amendedSection.Content.Count);
 
-           amendedSection.Content.ForEach(amendedBlock =>
-           {
-               var previousBlock = previousSection.Content.Find(b => b.Order == amendedBlock.Order);
-               AssertAmendedContentBlockCorrect(previousBlock, amendedBlock, amendedSection);
-           });
-       }
+            amendedSection.Content.ForEach(amendedBlock =>
+            {
+                var previousBlock = previousSection.Content.Find(b => b.Order == amendedBlock.Order);
+                AssertAmendedContentBlockCorrect(previousBlock, amendedBlock, amendedSection);
+            });
+        }
 
-       private static void AssertAmendedContentBlockCorrect(ContentBlock previousBlock, ContentBlock amendedBlock,
-           ContentSection amendedSection)
-       {
-           Assert.NotEqual(previousBlock.Id, amendedBlock.Id);
-           Assert.Equal(previousBlock.Order, amendedBlock.Order);
-           Assert.Equal(amendedSection, amendedBlock.ContentSection);
-           Assert.Equal(amendedSection.Id, amendedBlock.ContentSectionId);
-           Assert.NotEmpty(previousBlock.Comments);
-           Assert.Empty(amendedBlock.Comments);
-       }
+        private static void AssertAmendedContentBlockCorrect(ContentBlock previousBlock, ContentBlock amendedBlock,
+            ContentSection amendedSection)
+        {
+            Assert.NotEqual(previousBlock.Id, amendedBlock.Id);
+            Assert.Equal(previousBlock.Order, amendedBlock.Order);
+            Assert.Equal(amendedSection, amendedBlock.ContentSection);
+            Assert.Equal(amendedSection.Id, amendedBlock.ContentSectionId);
+            Assert.NotEmpty(previousBlock.Comments);
+            Assert.Empty(amendedBlock.Comments);
+        }
 
-       private static void AssertAmendedReleaseRoleCorrect(UserReleaseRole previous, UserReleaseRole amended,
-           Release amendment)
-       {
-           Assert.NotEqual(previous.Id, amended.Id);
-           Assert.Equal(amendment, amended.Release);
-           Assert.Equal(amendment.Id, amended.ReleaseId);
-           Assert.Equal(previous.UserId, amended.UserId);
-           Assert.Equal(previous.Role, amended.Role);
-       }
+        private static void AssertAmendedReleaseRoleCorrect(UserReleaseRole previous, UserReleaseRole amended,
+            Release amendment)
+        {
+            Assert.NotEqual(previous.Id, amended.Id);
+            Assert.Equal(amendment, amended.Release);
+            Assert.Equal(amendment.Id, amended.ReleaseId);
+            Assert.Equal(previous.UserId, amended.UserId);
+            Assert.Equal(previous.Role, amended.Role);
+        }
 
-       private static void AssertAmendedReleaseFileCorrect(ReleaseFile originalFile, ReleaseFile amendmentDataFile, Release amendment)
-       {
-           // assert it's a new link table entry between the Release amendment and the data file reference
-           Assert.NotEqual(originalFile.Id, amendmentDataFile.Id);
-           Assert.Equal(amendment, amendmentDataFile.Release);
-           Assert.Equal(amendment.Id, amendmentDataFile.ReleaseId);
+        private static void AssertAmendedReleaseFileCorrect(ReleaseFile originalFile, ReleaseFile amendmentDataFile,
+            Release amendment)
+        {
+            // assert it's a new link table entry between the Release amendment and the data file reference
+            Assert.NotEqual(originalFile.Id, amendmentDataFile.Id);
+            Assert.Equal(amendment, amendmentDataFile.Release);
+            Assert.Equal(amendment.Id, amendmentDataFile.ReleaseId);
 
-           // and assert that the file referenced is the SAME file reference as linked from the original Release's
-           // link table entry
-           Assert.Equal(originalFile.ReleaseFileReference.Id, amendmentDataFile.ReleaseFileReference.Id);
-       }
+            // and assert that the file referenced is the SAME file reference as linked from the original Release's
+            // link table entry
+            Assert.Equal(originalFile.ReleaseFileReference.Id, amendmentDataFile.ReleaseFileReference.Id);
+        }
 
-       private (
-           Mock<IUserService>,
-           Mock<IPersistenceHelper<ContentDbContext>>,
-           Mock<IPublishingService>,
-           Mock<IReleaseRepository>,
-           Mock<ISubjectService>,
-           Mock<ITableStorageService>,
-           Mock<IReleaseFilesService>,
-           Mock<IImportStatusService>,
-           Mock<IFootnoteService>,
-           Mock<StatisticsDbContext>,
-           Mock<IDataBlockService>,
-           Mock<IReleaseSubjectService>) Mocks()
-       {
-           var userService = MockUtils.AlwaysTrueUserService();
+        private (
+            Mock<IUserService>,
+            Mock<IPersistenceHelper<ContentDbContext>>,
+            Mock<IPublishingService>,
+            Mock<IReleaseRepository>,
+            Mock<ISubjectService>,
+            Mock<ITableStorageService>,
+            Mock<IReleaseFilesService>,
+            Mock<IImportStatusService>,
+            Mock<IFootnoteService>,
+            Mock<StatisticsDbContext>,
+            Mock<IDataBlockService>,
+            Mock<IReleaseSubjectService>) Mocks()
+        {
+            var userService = MockUtils.AlwaysTrueUserService();
 
-           userService
-               .Setup(s => s.GetUserId())
-               .Returns(_userId);
+            userService
+                .Setup(s => s.GetUserId())
+                .Returns(_userId);
 
-           var persistenceHelper = MockUtils.MockPersistenceHelper<ContentDbContext>();
-           MockUtils.SetupCall<ContentDbContext, Release>(persistenceHelper);
-           MockUtils.SetupCall<ContentDbContext, Publication>(persistenceHelper);
+            var persistenceHelper = MockUtils.MockPersistenceHelper<ContentDbContext>();
+            MockUtils.SetupCall<ContentDbContext, Release>(persistenceHelper);
+            MockUtils.SetupCall<ContentDbContext, Publication>(persistenceHelper);
 
-           return (
-               userService,
-               persistenceHelper,
-               new Mock<IPublishingService>(),
-               new Mock<IReleaseRepository>(),
-               new Mock<ISubjectService>(),
-               new Mock<ITableStorageService>(),
-               new Mock<IReleaseFilesService>(),
-               new Mock<IImportStatusService>(),
-               new Mock<IFootnoteService>(),
-               new Mock<StatisticsDbContext>(),
-               new Mock<IDataBlockService>(),
-               new Mock<IReleaseSubjectService>());
-       }
+            return (
+                userService,
+                persistenceHelper,
+                new Mock<IPublishingService>(),
+                new Mock<IReleaseRepository>(),
+                new Mock<ISubjectService>(),
+                new Mock<ITableStorageService>(),
+                new Mock<IReleaseFilesService>(),
+                new Mock<IImportStatusService>(),
+                new Mock<IFootnoteService>(),
+                new Mock<StatisticsDbContext>(),
+                new Mock<IDataBlockService>(),
+                new Mock<IReleaseSubjectService>());
+        }
     }
 }
