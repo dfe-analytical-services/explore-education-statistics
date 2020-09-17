@@ -6,7 +6,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Model.Services.Interfa
 {
     public interface IFilterItemService : IRepository<FilterItem, Guid>
     {
-        IEnumerable<FilterItem> GetFilterItems(IQueryable<Observation> observations);
+        IEnumerable<FilterItem> GetFilterItems(Guid subjectId, IQueryable<Observation> observations, bool toList);
 
         FilterItem GetTotal(Filter filter);
         

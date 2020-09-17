@@ -106,12 +106,12 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Services
             var stopwatch = Stopwatch.StartNew();
             stopwatch.Start();
 
-            var filters = GetFilters(observations);
+            var filters = query.TimePeriod != null ? GetFilters(subject.Id, observations, false) : new Dictionary<string, FilterMetaViewModel>();
 
             _logger.LogTrace("Got Filters in {Time} ms", stopwatch.Elapsed.TotalMilliseconds);
             stopwatch.Restart();
 
-            var indicators = GetIndicators(subject.Id);
+            var indicators = query.TimePeriod != null ? GetIndicators(subject.Id) : new Dictionary<string, IndicatorsMetaViewModel>();
 
             _logger.LogTrace("Got Indicators in {Time} ms", stopwatch.Elapsed.TotalMilliseconds);
             stopwatch.Restart();
