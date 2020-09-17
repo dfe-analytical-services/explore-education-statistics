@@ -518,7 +518,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Services
             return await _persistenceHelper
                 .CheckEntityExists<Release>(releaseId)
                 .OnSuccess(_userService.CheckCanUpdateRelease)
-                .OnSuccess(
+                .OnSuccessVoid(
                     async release =>
                     {
                         // Exclude metadata as they'll be deleted alongside the data file

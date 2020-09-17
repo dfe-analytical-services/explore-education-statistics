@@ -470,7 +470,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Services
 
                     return await _releaseFilesService
                         .DeleteDataFiles(releaseId, fileId)
-                        .OnSuccess(async () => await RemoveFileImportEntryIfOrphaned(deletePlan));
+                        .OnSuccessVoid(async () => await RemoveFileImportEntryIfOrphaned(deletePlan));
                 });
         }
 
