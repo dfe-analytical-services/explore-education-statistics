@@ -28,7 +28,7 @@ export interface DataFile {
   rows: number;
   metadataFilename: string;
   userName: string;
-  created: Date;
+  created?: string;
   canDelete?: boolean;
   isDeleting?: boolean;
 }
@@ -81,7 +81,7 @@ function mapFile(file: DataFileInfo): DataFile {
     metadataFilename: file.metaFileName,
     canDelete: true,
     userName: file.userName,
-    created: new Date(file.created),
+    created: file.created,
   };
 }
 

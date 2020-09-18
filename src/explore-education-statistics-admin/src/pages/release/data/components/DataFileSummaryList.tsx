@@ -6,9 +6,9 @@ import releaseDataFileService, {
 } from '@admin/services/releaseDataFileService';
 import releaseMetaFileService from '@admin/services/releaseMetaFileService';
 import ButtonText from '@common/components/ButtonText';
+import FormattedDate from '@common/components/FormattedDate';
 import SummaryList from '@common/components/SummaryList';
 import SummaryListItem from '@common/components/SummaryListItem';
-import { format } from 'date-fns';
 import React, { ReactNode } from 'react';
 
 interface Props {
@@ -63,12 +63,20 @@ const DataFileSummaryList = ({
         dataFile={dataFile}
         onStatusChange={onStatusChange}
       />
-      <SummaryListItem term="Uploaded by">
-        <a href={`mailto:${dataFile.userName}`}>{dataFile.userName}</a>
-      </SummaryListItem>
-      <SummaryListItem term="Date uploaded">
-        {format(dataFile.created, 'd MMMM yyyy HH:mm')}
-      </SummaryListItem>
+
+      {dataFile.userName && (
+        <SummaryListItem term="Uploaded by">
+          <a href={`mailto:${dataFile.userName}`}>{dataFile.userName}</a>
+        </SummaryListItem>
+      )}
+
+      {dataFile.created && (
+        <SummaryListItem term="Date uploaded">
+          <FormattedDate format="d MMMM yyyy HH:mm">
+            {dataFile.created}
+          </FormattedDate>
+        </SummaryListItem>
+      )}
 
       {children}
     </SummaryList>

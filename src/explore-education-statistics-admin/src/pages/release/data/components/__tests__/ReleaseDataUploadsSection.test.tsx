@@ -28,7 +28,7 @@ describe('ReleaseDataUploadsSection', () => {
         size: 50,
         unit: 'Kb',
       },
-      created: new Date('2020-06-12T12:00:00'),
+      created: '2020-06-12T12:00:00',
     },
     {
       id: 'data-2',
@@ -41,7 +41,7 @@ describe('ReleaseDataUploadsSection', () => {
         size: 100,
         unit: 'Kb',
       },
-      created: new Date('2020-07-01T12:00:00'),
+      created: '2020-07-01T12:00:00',
     },
   ];
 
@@ -333,7 +333,7 @@ describe('ReleaseDataUploadsSection', () => {
         size: 150,
         unit: 'Kb',
       },
-      created: new Date('2020-08-18T12:00:00'),
+      created: '2020-08-18T12:00:00',
     };
 
     beforeEach(() => {
