@@ -30,6 +30,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Controllers.Api
                     originalFileId: fileId,
                     replacementFileId: replacementFileId
                 )
+                .OnSuccess(plan => plan.ToSummary())
                 .HandleFailuresOrOk();
         }
 
