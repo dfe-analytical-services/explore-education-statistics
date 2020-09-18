@@ -1,3 +1,4 @@
+using System;
 using System.Collections.Generic;
 using System.Linq;
 using GovUk.Education.ExploreEducationStatistics.Common.Extensions;
@@ -31,9 +32,9 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Services
             return _boundaryLevelService.FindLatestByGeographicLevel(geographicLevel);
         }
 
-        protected Dictionary<string, FilterMetaViewModel> GetFilters(IQueryable<Observation> observations)
+        protected Dictionary<string, FilterMetaViewModel> GetFilters(Guid subjectId, IQueryable<Observation> observations, bool listFilterItems)
         {
-            return _filterItemService.GetFilterItems(observations)
+            return _filterItemService.GetFilterItems(subjectId, observations, listFilterItems)
                 .GroupBy(item => item.FilterGroup.Filter, item => item, Filter.IdComparer)
                 .ToDictionary(
                     itemsGroupedByFilter => itemsGroupedByFilter.Key.Label.PascalCase(),
