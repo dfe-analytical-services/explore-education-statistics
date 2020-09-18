@@ -12,7 +12,7 @@ using Microsoft.AspNetCore.Mvc;
 using Moq;
 using Xunit;
 using IFootnoteService = GovUk.Education.ExploreEducationStatistics.Admin.Services.Interfaces.IFootnoteService;
-using Unit = GovUk.Education.ExploreEducationStatistics.Data.Model.Unit;
+using Unit = GovUk.Education.ExploreEducationStatistics.Common.Model.Unit;
 
 namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Controllers.Api.Statistics
 {
@@ -84,7 +84,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Controllers.Api
             footnoteService.Setup(s => s.GetFootnotesAsync(ReleaseId)).Returns(footnotes);
 
             var deleteFootnoteResult = Task.FromResult(new Either<ActionResult, bool>(true));
-            footnoteService.Setup(s => s.DeleteFootnote(ReleaseId, FootnoteId)).Returns(deleteFootnoteResult);
+            footnoteService.Setup(s => s.DeleteFootnote(ReleaseId, FootnoteId)).ReturnsAsync(Unit.Instance);
 
             var subjects = subjectIds.Select(id => new IdLabel(id, $"Subject {id}")).ToList();
             releaseMetaService.Setup(s => s.GetSubjectsAsync(ReleaseId)).ReturnsAsync(subjects);
@@ -132,7 +132,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Controllers.Api
                                 Id = Guid.NewGuid(),
                                 Label = "Indicator label",
                                 Name = "Indicator name",
-                                Unit = Unit.Percent,
+                                Unit = Data.Model.Unit.Percent,
                                 DecimalPlaces = 2
                             }
                         }

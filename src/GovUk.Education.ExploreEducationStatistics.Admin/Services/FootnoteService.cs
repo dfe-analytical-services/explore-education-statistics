@@ -4,6 +4,7 @@ using System.Linq;
 using System.Linq.Expressions;
 using System.Threading.Tasks;
 using GovUk.Education.ExploreEducationStatistics.Admin.Services.Interfaces.Security;
+using GovUk.Education.ExploreEducationStatistics.Common.Extensions;
 using GovUk.Education.ExploreEducationStatistics.Common.Model;
 using GovUk.Education.ExploreEducationStatistics.Common.Services.Interfaces.Security;
 using GovUk.Education.ExploreEducationStatistics.Common.Utils;
@@ -17,6 +18,7 @@ using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Logging;
 using IFootnoteService = GovUk.Education.ExploreEducationStatistics.Admin.Services.Interfaces.IFootnoteService;
 using Release = GovUk.Education.ExploreEducationStatistics.Content.Model.Release;
+using Unit = GovUk.Education.ExploreEducationStatistics.Common.Model.Unit;
 
 namespace GovUk.Education.ExploreEducationStatistics.Admin.Services
 {
@@ -87,7 +89,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Services
                     CreateIndicatorsLinks(footnote, indicatorIds);
 
                     _context.ReleaseFootnote
-                        .Add(new ReleaseFootnote()
+                        .Add(new ReleaseFootnote
                         {
                             ReleaseId = releaseId,
                             Footnote = footnote
@@ -98,7 +100,38 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Services
                 });
         }
 
-        public async Task<Either<ActionResult, bool>> DeleteFootnote(Guid releaseId, Guid id)
+        public async Task<Either<ActionResult, Unit>> CopyFootnotes(Guid sourceReleaseId, Guid destinationReleaseId)
+        {
+            return await GetFootnotesAsync(sourceReleaseId)
+                .OnSuccess(async footnotes =>
+                {
+                    await footnotes.ForEachAsync(async footnote =>
+                    {
+                        var filters = footnote.Filters
+                            .Select(filterFootnote => filterFootnote.FilterId).ToList();
+                        var filterGroups = footnote.FilterGroups
+                            .Select(filterGroupFootnote => filterGroupFootnote.FilterGroupId).ToList();
+                        var filterItems = footnote.FilterItems
+                            .Select(filterItemFootnote => filterItemFootnote.FilterItemId).ToList();
+                        var indicators = footnote.Indicators
+                            .Select(indicatorFootnote => indicatorFootnote.IndicatorId).ToList();
+                        var subjects = footnote.Subjects
+                            .Select(subjectFootnote => subjectFootnote.SubjectId).ToList();
+
+                        await CreateFootnote(destinationReleaseId,
+                            footnote.Content,
+                            filters,
+                            filterGroups,
+                            filterItems,
+                            indicators,
+                            subjects);
+                    });
+
+                    return Unit.Instance;
+                });
+        }
+
+        public async Task<Either<ActionResult, Unit>> DeleteFootnote(Guid releaseId, Guid id)
         {
             return await _contentPersistenceHelper
                 .CheckEntityExists<Release>(releaseId)
@@ -108,7 +141,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Services
                 {
                     await _commonFootnoteService.DeleteFootnote(releaseId, footnote.Id);
                     await _context.SaveChangesAsync();
-                    return true;
+                    return Unit.Instance;
                 }));
         }
 
@@ -140,7 +173,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Services
                         UpdateIndicatorLinks(footnote, indicatorIds.ToList());
                         UpdateSubjectLinks(footnote, subjectIds.ToList());
 
-                        _context.SaveChanges();
+                        await _context.SaveChangesAsync();
                         return GetFootnote(id);
                     }
                     

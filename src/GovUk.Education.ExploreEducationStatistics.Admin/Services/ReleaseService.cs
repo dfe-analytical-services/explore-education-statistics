@@ -179,6 +179,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Services
                 .OnSuccess(originalRelease =>
                     CreateBasicReleaseAmendment(originalRelease)
                     .OnSuccess(CreateStatisticsReleaseRecord)
+                    .OnSuccessDo(amendment => _footnoteService.CopyFootnotes(releaseId, amendment.Id))
                     .OnSuccess(amendment => CopyReleaseTeam(releaseId, amendment))
                     .OnSuccess(amendment => CopyFileLinks(originalRelease, amendment))
                     .OnSuccess(amendment => GetRelease(amendment.Id)));
@@ -205,18 +206,8 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Services
                         SubjectId = rs.SubjectId
                     });
 
-                var statsAmendmentFootnoteLinks =_statisticsDbContext
-                    .ReleaseFootnote
-                    .Where(rf => rf.ReleaseId == amendment.PreviousVersionId)
-                    .Select(rf => new ReleaseFootnote
-                    {
-                        ReleaseId = statsAmendment.Id,
-                        FootnoteId = rf.FootnoteId
-                    });
-
                 _statisticsDbContext.Release.Add(statsAmendment);
                 _statisticsDbContext.ReleaseSubject.AddRange(statsAmendmentSubjectLinks);
-                _statisticsDbContext.ReleaseFootnote.AddRange(statsAmendmentFootnoteLinks);
 
                 await _statisticsDbContext.SaveChangesAsync();
             }
