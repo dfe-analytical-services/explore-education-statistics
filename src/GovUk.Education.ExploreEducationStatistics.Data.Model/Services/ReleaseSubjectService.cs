@@ -75,6 +75,11 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Model.Services
                 }
                 else
                 {
+                    // N.B. This delete will be slow if there are a large number of observations but this is only
+                    // executed by the tests when the topic is torn down so ensure files used are < 1000 rows.
+                    var observations =  _statisticsDbContext.Observation
+                        .Where(o => o.SubjectId == subjectId);
+                    _statisticsDbContext.Observation.RemoveRange(observations);
                     _statisticsDbContext.Subject.Remove(subject);
                 }
             }
