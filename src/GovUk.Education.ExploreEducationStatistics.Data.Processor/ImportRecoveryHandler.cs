@@ -17,7 +17,7 @@ using static GovUk.Education.ExploreEducationStatistics.Common.TableStorageTable
 
 namespace GovUk.Education.ExploreEducationStatistics.Data.Processor
 {
-    public static class FailedImportsHandler
+    public static class ImportRecoveryHandler
     {
         public static void CheckIncompleteImports(string connectionString)
         {
@@ -143,8 +143,6 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Processor
                         {
                             batchBlobs.Add(blob);
                         }
-
-                        batchBlobs.Add(blob);
                     }
 
                     continuationToken = page.ContinuationToken;
