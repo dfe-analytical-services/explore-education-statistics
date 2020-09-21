@@ -13,7 +13,6 @@ using GovUk.Education.ExploreEducationStatistics.Content.Model.Database;
 using GovUk.Education.ExploreEducationStatistics.Data.Model.Services.Interfaces;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
-using Microsoft.Extensions.Configuration;
 using Moq;
 using Xunit;
 using static GovUk.Education.ExploreEducationStatistics.Admin.Security.SecurityPolicies;
@@ -73,7 +72,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
             AssertSecurityPoliciesChecked(service =>
                     service.DeleteDataFilesAsync(
                         _release.Id,
-                        ""
+                        Guid.NewGuid()
                         ),
                 CanUpdateSpecificRelease);
         }

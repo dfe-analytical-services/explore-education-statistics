@@ -340,7 +340,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
                     async userService =>
                     {
                         var service = BuildReleaseService(userService: userService.Object);
-                        return await service.RemoveDataFilesAsync(_release.Id, "", "");
+                        return await service.RemoveDataFilesAsync(_release.Id, Guid.NewGuid());
                     }
                 );
         }

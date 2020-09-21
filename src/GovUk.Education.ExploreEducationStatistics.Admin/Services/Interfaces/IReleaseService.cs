@@ -29,9 +29,9 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Services.Interfaces
 
         Task<Either<ActionResult, List<MyReleaseViewModel>>> GetMyScheduledReleasesAsync();
 
-        Task<Either<ActionResult, DeleteDataFilePlan>> GetDeleteDataFilePlan(Guid releaseId, string dataFileName, string subjectTitle);
+        Task<Either<ActionResult, DeleteDataFilePlan>> GetDeleteDataFilePlan(Guid releaseId, Guid releaseFileReferenceId);
 
-        Task<Either<ActionResult, Unit>> RemoveDataFilesAsync(Guid releaseId, string fileName, string subjectTitle);
+        Task<Either<ActionResult, Unit>> RemoveDataFilesAsync(Guid releaseId, Guid releaseFileReferenceId);
 
         Task<Either<ActionResult, ImportStatus>> GetDataFileImportStatus(Guid releaseId, string dataFileName);
 

@@ -50,7 +50,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Controllers.Api
         public async Task<ActionResult> GetChartFile(Guid releaseId, Guid id)
         {
             return await _releaseFilesService
-                .StreamFile(releaseId, ReleaseFileTypes.Chart, id)
+                .StreamFile(releaseId, id)
                 .HandleFailures();
         }
 
@@ -174,12 +174,39 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Controllers.Api
         [RequestSizeLimit(int.MaxValue)]
         [RequestFormLimits(ValueLengthLimit = int.MaxValue, MultipartBodyLengthLimit = int.MaxValue)]
         public async Task<ActionResult<DataFileInfo>> AddDataFilesAsync(Guid releaseId,
-            [FromQuery(Name = "name"), Required] string name, IFormFile file, IFormFile metaFile)
+            [FromQuery(Name = "name"), Required] string subjectName, IFormFile file, IFormFile metaFile)
         {
             var user = await _userManager.GetUserAsync(User);
 
             return await _releaseFilesService
-                .UploadDataFilesAsync(releaseId, file, metaFile, name, user.Email)
+                .UploadDataFilesAsync(
+                    releaseId: releaseId,
+                    dataFile: file,
+                    metaFile: metaFile,
+                    userName: user.Email,
+                    subjectName: subjectName)
+                .HandleFailuresOrOk();
+        }
+
+        [HttpPost("release/{releaseId}/data/replacing/{replacingId}")]
+        [Produces("application/json")]
+        [ProducesResponseType(200)]
+        [ProducesResponseType(404)]
+        [RequestSizeLimit(int.MaxValue)]
+        [RequestFormLimits(ValueLengthLimit = int.MaxValue, MultipartBodyLengthLimit = int.MaxValue)]
+        public async Task<ActionResult<DataFileInfo>> AddReplacementDataFilesAsync(Guid releaseId,
+            Guid replacingId,
+            IFormFile file,
+            IFormFile metaFile)
+        {
+            var user = await _userManager.GetUserAsync(User);
+
+            return await _releaseFilesService
+                .UploadDataFilesAsync(releaseId: releaseId,
+                    dataFile: file,
+                    metaFile: metaFile,
+                    userName: user.Email,
+                    replacingId: replacingId)
                 .HandleFailuresOrOk();
         }
 
@@ -257,13 +284,12 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Controllers.Api
                 .HandleFailuresOrOk();
         }
 
-        [HttpGet("release/{releaseId}/data/{fileName}/delete-plan")]
+        [HttpGet("release/{releaseId}/data/{releaseFileReferenceId}/delete-plan")]
         public async Task<ActionResult<DeleteDataFilePlan>> GetDeleteDataFilePlan(Guid releaseId,
-            string fileName,
-            [FromQuery(Name = "name"), Required] string subjectTitle)
+            Guid releaseFileReferenceId)
         {
             return await _releaseService
-                .GetDeleteDataFilePlan(releaseId, fileName, subjectTitle)
+                .GetDeleteDataFilePlan(releaseId, releaseFileReferenceId)
                 .HandleFailuresOrOk();
         }
 
@@ -285,13 +311,12 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Controllers.Api
                 .HandleFailuresOrOk();
         }
 
-        [HttpDelete("release/{releaseId}/data/{fileName}")]
+        [HttpDelete("release/{releaseId}/data/{releaseFileReferenceId}")]
         public async Task<ActionResult> DeleteDataFiles(Guid releaseId,
-            string fileName,
-            [FromQuery(Name = "name"), Required] string subjectTitle)
+            Guid releaseFileReferenceId)
         {
             return await _releaseService
-                .RemoveDataFilesAsync(releaseId, fileName, subjectTitle)
+                .RemoveDataFilesAsync(releaseId, releaseFileReferenceId)
                 .HandleFailuresOrNoContent();
         }
 
@@ -306,7 +331,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Controllers.Api
 
         [HttpDelete("release/{releaseId}/chart/{id}")]
         public async Task<ActionResult> DeleteChartFile(
-            Guid releaseId, string subjectName, Guid id)
+            Guid releaseId, Guid id)
         {
             return await _dataBlockService.RemoveChartFile(releaseId, id)
                 .HandleFailuresOrNoContent();

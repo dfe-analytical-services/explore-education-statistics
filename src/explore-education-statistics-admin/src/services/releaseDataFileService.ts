@@ -18,6 +18,7 @@ export interface DeleteDataFilePlan {
 }
 
 export interface DataFile {
+  id: string;
   title: string;
   filename: string;
   fileSize: {
@@ -69,6 +70,7 @@ function mapFile(file: DataFileInfo): DataFile {
   const [size, unit] = file.size.split(' ');
 
   return {
+    id: file.id,
     title: file.name,
     filename: file.fileName,
     rows: file.rows || 0,
@@ -159,23 +161,11 @@ const releaseDataFileService = {
     dataFile: DataFile,
   ): Promise<DeleteDataFilePlan> {
     return client.get<DeleteDataFilePlan>(
-      `/release/${releaseId}/data/${dataFile.filename}/delete-plan`,
-      {
-        params: {
-          name: dataFile.title,
-        },
-      },
+      `/release/${releaseId}/data/${dataFile.id}/delete-plan`,
     );
   },
   deleteDataFiles(releaseId: string, dataFile: DataFile): Promise<void> {
-    return client.delete<void>(
-      `/release/${releaseId}/data/${dataFile.filename}`,
-      {
-        params: {
-          name: dataFile.title,
-        },
-      },
-    );
+    return client.delete<void>(`/release/${releaseId}/data/${dataFile.id}`);
   },
   downloadDataFile(releaseId: string, fileName: string): Promise<void> {
     return client

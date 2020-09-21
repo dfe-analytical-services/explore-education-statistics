@@ -97,64 +97,93 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Services
         }
 
         public Task<Either<ActionResult, DataFileInfo>> UploadDataFilesAsync(Guid releaseId,
-            IFormFile dataFile, IFormFile metadataFile, string name, string userName)
+            IFormFile dataFile,
+            IFormFile metadataFile,
+            string userName,
+            string subjectName = null,
+            Guid? replacingId = null)
         {
             return _persistenceHelper
                 .CheckEntityExists<Release>(releaseId)
                 .OnSuccess(_userService.CheckCanUpdateRelease)
                 .OnSuccess(async release =>
                 {
-                    return await _fileUploadsValidatorService
-                        .ValidateDataFilesForUpload(releaseId, dataFile, metadataFile, name)
-                        // First, create with status uploading to prevent other users uploading the same datafile
-                        .OnSuccess(async () => await _importService.CreateImportTableRow(releaseId, dataFile.FileName.ToLower()))
-                        .OnSuccess(async () =>
+                    return await _persistenceHelper.CheckOptionalEntityExists<ReleaseFileReference>(replacingId)
+                        .OnSuccess(async replacing =>
                         {
-                            var fileReference = await CreateOrUpdateFileReference(dataFile.FileName.ToLower(), releaseId, ReleaseFileTypes.Data);
-                            await CreateOrUpdateFileReference(metadataFile.FileName.ToLower(), releaseId,ReleaseFileTypes.Metadata);
-                            await _context.SaveChangesAsync();
-
-                            var dataInfo = GetDataFileMetaValues(
-                                name: name,
-                                metaFileName: metadataFile.FileName,
-                                userName: userName,
-                                numberOfRows: CalculateNumberOfRows(dataFile.OpenReadStream())
-                            );
-                            var metaDataInfo = GetMetaDataFileMetaValues(
-                                dataFileName: dataFile.FileName,
-                                userName: userName,
-                                numberOfRows: CalculateNumberOfRows(metadataFile.OpenReadStream())
-                            );
-
-                            await UploadFileToStorage(releaseId, dataFile, ReleaseFileTypes.Data, dataInfo);
-                            await UploadFileToStorage(releaseId, metadataFile,ReleaseFileTypes.Metadata, metaDataInfo);
-
-                            await _importService.Import(releaseId, dataFile.FileName.ToLower(),
-                                metadataFile.FileName.ToLower(), dataFile, false);
-
-                            var blob = await _blobStorageService.GetBlob(
-                                PrivateFilesContainerName,
-                                AdminReleasePathWithFileReference(fileReference)
-                            );
-
-                            return new DataFileInfo
+                            if (replacing == null)
                             {
-                                Id = fileReference.Id,
-                                Extension = blob.Extension,
-                                Name = blob.Name,
-                                Path = blob.Path,
-                                Size = blob.Size,
-                                MetaFileName = blob.GetMetaFileName(),
-                                Rows = blob.GetNumberOfRows(),
-                                UserName = blob.GetUserName(),
-                                Created = blob.Created
-                            };
+                                var validSubjectName = await _fileUploadsValidatorService.ValidateSubjectName(releaseId, subjectName);
+                                if (validSubjectName.IsLeft)
+                                {
+                                    return validSubjectName.Left;
+                                }
+                            }
+                            else
+                            {
+                                subjectName = await GetSubjectName(replacing);
+                            }
+
+                            return await _fileUploadsValidatorService
+                                .ValidateDataFilesForUpload(releaseId, dataFile, metadataFile)
+                                // First, create with status uploading to prevent other users uploading the same datafile
+                                .OnSuccess(async () =>
+                                    await _importService.CreateImportTableRow(releaseId, dataFile.FileName.ToLower()))
+                                .OnSuccess(async () =>
+                                {
+                                    var fileReference = await CreateOrUpdateFileReference(
+                                        filename: dataFile.FileName.ToLower(),
+                                        releaseId: releaseId,
+                                        type: ReleaseFileTypes.Data,
+                                        replacing: replacing);
+
+                                    await CreateOrUpdateFileReference(metadataFile.FileName.ToLower(), releaseId,
+                                        ReleaseFileTypes.Metadata);
+                                    await _context.SaveChangesAsync();
+
+                                    var dataInfo = GetDataFileMetaValues(
+                                        name: subjectName,
+                                        metaFileName: metadataFile.FileName,
+                                        userName: userName,
+                                        numberOfRows: CalculateNumberOfRows(dataFile.OpenReadStream())
+                                    );
+                                    var metaDataInfo = GetMetaDataFileMetaValues(
+                                        dataFileName: dataFile.FileName,
+                                        userName: userName,
+                                        numberOfRows: CalculateNumberOfRows(metadataFile.OpenReadStream())
+                                    );
+
+                                    await UploadFileToStorage(releaseId, dataFile, ReleaseFileTypes.Data, dataInfo);
+                                    await UploadFileToStorage(releaseId, metadataFile, ReleaseFileTypes.Metadata,
+                                        metaDataInfo);
+
+                                    await _importService.Import(releaseId, dataFile.FileName.ToLower(),
+                                        metadataFile.FileName.ToLower(), dataFile, false);
+
+                                    var blob = await _blobStorageService.GetBlob(
+                                        PrivateFilesContainerName,
+                                        AdminReleasePathWithFileReference(fileReference)
+                                    );
+
+                                    return new DataFileInfo
+                                    {
+                                        Id = fileReference.Id,
+                                        Extension = blob.Extension,
+                                        Name = blob.Name,
+                                        Path = blob.Path,
+                                        Size = blob.Size,
+                                        MetaFileName = blob.GetMetaFileName(),
+                                        Rows = blob.GetNumberOfRows(),
+                                        UserName = blob.GetUserName(),
+                                        Created = blob.Created
+                                    };
+                                });
                         });
                 });
         }
 
         public Task<Either<ActionResult, DataFileInfo>> UploadDataFilesAsZipAsync(Guid releaseId,
-            IFormFile zipFile, string name, string userName)
+            IFormFile zipFile, string subjectName, string userName)
         {
             return _persistenceHelper
                 .CheckEntityExists<Release>(releaseId)
@@ -167,13 +196,14 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Services
                             var dataFile = dataFiles.Item1;
                             var metadataFile = dataFiles.Item2;
                             var dataInfo = GetDataFileMetaValues(
-                                name: name,
+                                name: subjectName,
                                 metaFileName: metadataFile.Name,
                                 userName: userName,
                                 numberOfRows: 0
                             );
 
-                            return await _fileUploadsValidatorService.ValidateDataArchiveEntriesForUpload(releaseId, dataFile, metadataFile, name)
+                            return await _fileUploadsValidatorService.ValidateSubjectName(releaseId, subjectName)
+                                .OnSuccess(() => _fileUploadsValidatorService.ValidateDataArchiveEntriesForUpload(releaseId, dataFile, metadataFile)
                                 .OnSuccess(async () => await _importService.CreateImportTableRow(releaseId, dataFile.Name.ToLower()))
                                 .OnSuccess(async () =>
                                 {
@@ -206,41 +236,39 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Services
                                         UserName = blob.GetUserName(),
                                         Created = blob.Created
                                     };
-                                });
+                                }));
                         });
                 });
         }
 
-        public Task<Either<ActionResult, bool>> DeleteDataFilesAsync(Guid releaseId, string dataFileName)
+        public Task<Either<ActionResult, Unit>> DeleteDataFilesAsync(Guid releaseId, Guid releaseFileReferenceId)
         {
             return _persistenceHelper
                 .CheckEntityExists<Release>(releaseId)
                 .OnSuccess(_userService.CheckCanUpdateRelease)
-                .OnSuccess(async () =>
+                .OnSuccess(() => CheckReleaseFileReferenceExists(releaseFileReferenceId))
+                .OnSuccess(async releaseFileReference =>
                 {
-                    var metaFilename = await GetFilenameAssociatedToType(releaseId, dataFileName, ReleaseFileTypes.Data, ReleaseFileTypes.Metadata);
+                    var metaReleaseFileReference = await GetAssociatedReleaseFileReference(releaseFileReference, ReleaseFileTypes.Metadata);
 
-                    if (await DeletionWillOrphanFileAsync(releaseId, dataFileName, ReleaseFileTypes.Data))
+                    if (await DeletionWillOrphanFileAsync(releaseId, releaseFileReference.Filename, ReleaseFileTypes.Data))
                     {
-                        await _importService.RemoveImportTableRowIfExists(releaseId, dataFileName);
+                        await _importService.RemoveImportTableRowIfExists(releaseId, releaseFileReference.Filename);
                         await _blobStorageService.DeleteBlob(
                             PrivateFilesContainerName,
-                            AdminReleasePath(releaseId, ReleaseFileTypes.Data, dataFileName)
+                            AdminReleasePath(releaseId, ReleaseFileTypes.Data, releaseFileReference.Filename)
                         );
                         await _blobStorageService.DeleteBlob(
                             PrivateFilesContainerName,
-                            AdminReleasePath(releaseId, ReleaseFileTypes.Metadata, metaFilename)
+                            AdminReleasePath(releaseId, ReleaseFileTypes.Metadata, releaseFileReference.Filename)
                         );
 
-                        var dataFileRef = await GetReleaseFileLinkAsync(releaseId, dataFileName, ReleaseFileTypes.Data);
-                        var sourceId = dataFileRef.ReleaseFileReference.SourceId;
+                        _context.ReleaseFileReferences.Remove(releaseFileReference);
+                        _context.ReleaseFileReferences.Remove(metaReleaseFileReference);
 
-                        await DeleteFileReference(releaseId, dataFileName, ReleaseFileTypes.Data);
-                        await DeleteFileReference(releaseId, metaFilename, ReleaseFileTypes.Metadata);
-
-                        if (sourceId != null)
+                        if (releaseFileReference.SourceId.HasValue)
                         {
-                            var sourceRef = await GetReleaseFileReference(sourceId.Value);
+                            var sourceRef = await GetReleaseFileReference(releaseFileReference.SourceId.Value);
                             await _blobStorageService.DeleteBlob(
                                 PrivateFilesContainerName,
                                 AdminReleasePath(releaseId, ReleaseFileTypes.DataZip, sourceRef.Filename)
@@ -251,12 +279,12 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Services
                     }
                     else
                     {
-                        await DeleteFileLink(releaseId, dataFileName, ReleaseFileTypes.Data);
-                        await DeleteFileLink(releaseId, metaFilename, ReleaseFileTypes.Metadata);
+                        await DeleteFileLink(releaseId, releaseFileReference.Id);
+                        await DeleteFileLink(releaseId, metaReleaseFileReference.Id);
                     }
 
                     await _context.SaveChangesAsync();
-                    return true;
+                    return Unit.Instance;
                 });
         }
 
@@ -478,7 +506,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Services
                                     await DeleteChartFileAsync(release.Id, file.Id);
                                     break;
                                 case ReleaseFileTypes.Data:
-                                    await DeleteDataFilesAsync(release.Id, file.Filename);
+                                    await DeleteDataFilesAsync(release.Id, file.Id);
                                     break;
                                 default:
                                     await DeleteNonDataFileAsync(
@@ -506,17 +534,25 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Services
                 });
         }
 
-        public async Task<Either<ActionResult, FileStreamResult>> StreamFile(Guid releaseId,
-            ReleaseFileTypes type, Guid id)
+        public async Task<Either<ActionResult, FileStreamResult>> StreamFile(Guid releaseId, Guid id)
         {
             return await _persistenceHelper
                 .CheckEntityExists<Release>(releaseId)
                 .OnSuccess(_userService.CheckCanViewRelease)
                 .OnSuccess(async _ =>
                 {
-                    var fileLink = await GetReleaseFileLinkAsync(releaseId, id);
+                    var fileLink = await GetReleaseFileLink(releaseId, id);
                     return await GetStreamedFile(fileLink);
                 });
+        }
+
+        private async Task<Either<ActionResult, ReleaseFileReference>> CheckReleaseFileReferenceExists(Guid id)
+        {
+            return await _persistenceHelper.CheckEntityExists<ReleaseFileReference>(id)
+                .OnSuccess(releaseFileReference => releaseFileReference.ReleaseFileType != ReleaseFileTypes.Data
+                    ? new Either<ActionResult, ReleaseFileReference>(
+                        ValidationActionResult(FileTypeMustBeData))
+                    : releaseFileReference);
         }
 
         private async Task<Either<ActionResult, FileStreamResult>> GetStreamedFile(ReleaseFile fileLink)
@@ -533,8 +569,12 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Services
             };
         }
 
-        private async Task<ReleaseFileReference> CreateOrUpdateFileReference(string filename, Guid releaseId,
-            ReleaseFileTypes type, Guid? id = null, ReleaseFileReference? source = null)
+        private async Task<ReleaseFileReference> CreateOrUpdateFileReference(string filename,
+            Guid releaseId,
+            ReleaseFileTypes type,
+            Guid? id = null,
+            ReleaseFileReference replacing = null,
+            ReleaseFileReference source = null)
         {
             ReleaseFileReference releaseFileReference;
 
@@ -553,6 +593,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Services
                 ReleaseId = releaseId,
                 Filename = filename,
                 ReleaseFileType = type,
+                Replacing = replacing,
                 Source = source
             };
 
@@ -641,12 +682,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Services
 
             var dataFileName = fileReference.ReleaseFileType == ReleaseFileTypes.Data
                 ? fileReference.Filename
-                : await GetFilenameAssociatedToType(
-                    releaseId,
-                    fileReference.Filename,
-                    ReleaseFileTypes.Metadata,
-                    ReleaseFileTypes.Data
-                );
+                : (await GetAssociatedReleaseFileReference(fileReference, ReleaseFileTypes.Data)).Filename;
 
             // Fail the import if this was a datafile upload
             await _importService.FailImport(
@@ -662,20 +698,11 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Services
             {
                 Id = fileReference.Id,
                 Extension = Path.GetExtension(fileReference.Filename),
-                Name = await GetSubjectName(
-                    releaseId,
-                    fileReference.Filename,
-                    fileReference.ReleaseFileType
-                ),
+                Name = await GetSubjectName(fileReference),
                 Path = fileReference.Filename,
                 Size = "0.00 B",
                 MetaFileName = fileReference.ReleaseFileType == ReleaseFileTypes.Data
-                    ? await GetFilenameAssociatedToType(
-                        releaseId,
-                        fileReference.Filename,
-                        ReleaseFileTypes.Data,
-                        ReleaseFileTypes.Metadata
-                    )
+                    ? (await GetAssociatedReleaseFileReference(fileReference, ReleaseFileTypes.Metadata)).Filename
                     : "",
                 Rows = 0,
                 UserName = ""
@@ -692,6 +719,12 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Services
         private async Task DeleteFileLink(Guid releaseId, string filename, ReleaseFileTypes type)
         {
             var fileLink = await GetReleaseFileLinkAsync(releaseId, filename, type);
+            _context.ReleaseFiles.Remove(fileLink);
+        }
+
+        private async Task DeleteFileLink(Guid releaseId, Guid releaseFileReferenceId)
+        {
+            var fileLink = await GetReleaseFileLink(releaseId, releaseFileReferenceId);
             _context.ReleaseFiles.Remove(fileLink);
         }
 
@@ -733,12 +766,12 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Services
             return releaseFileLinks.FirstOrDefault(file => file.ReleaseFileReference.Filename == filename);
         }
 
-        private async Task<ReleaseFile> GetReleaseFileLinkAsync(Guid releaseId, Guid id)
+        private async Task<ReleaseFile> GetReleaseFileLink(Guid releaseId, Guid releaseFileReferenceId)
         {
             return await _context
                 .ReleaseFiles
                 .Include(f => f.ReleaseFileReference)
-                .Where(f => f.ReleaseId == releaseId && f.ReleaseFileReferenceId == id)
+                .Where(f => f.ReleaseId == releaseId && f.ReleaseFileReferenceId == releaseFileReferenceId)
                 .SingleAsync();
         }
 
@@ -783,11 +816,6 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Services
             );
         }
 
-        private static async Task DeleteFileFromStorageAsync(CloudBlobContainer blobContainer, string path)
-        {
-            await blobContainer.GetBlockBlobReference(path).DeleteIfExistsAsync();
-        }
-
         private async Task<bool> DeletionWillOrphanFileAsync(Guid releaseId, string filename,
             ReleaseFileTypes type)
         {
@@ -802,7 +830,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Services
 
         private async Task<bool> DeletionWillOrphanFileAsync(Guid releaseId, Guid id)
         {
-            var fileLink = await GetReleaseFileLinkAsync(releaseId, id);
+            var fileLink = await GetReleaseFileLink(releaseId, id);
 
             var otherFileReferences = await _context
                 .ReleaseFiles
@@ -817,31 +845,19 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Services
                 fileReference.ReleaseFileType == ReleaseFileTypes.Chart ? fileReference.Id.ToString() : fileReference.Filename);
         }
 
-        private async Task<string> GetFilenameAssociatedToType(Guid releaseId, string filename, ReleaseFileTypes type, ReleaseFileTypes associatedType)
+        private async Task<ReleaseFileReference> GetAssociatedReleaseFileReference(ReleaseFileReference releaseFileReference, ReleaseFileTypes associatedType)
         {
-            var releaseDataFileLink = await GetReleaseFileLinkAsync(releaseId, filename, type);
-
-            var associatedFileRef = await _context.ReleaseFileReferences
-                .FirstAsync(rfr => rfr.ReleaseId == releaseDataFileLink.ReleaseFileReference.ReleaseId
-                              && rfr.ReleaseFileType == associatedType
-                              && rfr.SubjectId == releaseDataFileLink.ReleaseFileReference.SubjectId);
-            return associatedFileRef.Filename;
+            return await _context.ReleaseFileReferences
+                .FirstAsync(rfr => rfr.ReleaseId == releaseFileReference.ReleaseId
+                                   && rfr.ReleaseFileType == associatedType
+                                   && rfr.SubjectId == releaseFileReference.SubjectId);
         }
 
-        private async Task<string> GetSubjectName(Guid releaseId, string filename, ReleaseFileTypes type)
+        private async Task<string> GetSubjectName(ReleaseFileReference releaseFileReference)
         {
-            // TODO Need to get back to the originating subject to get the name which is used in the delete plan
-            // Seems convoluted so flagging as future work
-            var releaseDataFileLink = await GetReleaseFileLinkAsync(releaseId, filename, type);
-
-            var associatedFileRef = await _context.ReleaseFileReferences
-                .FirstAsync(rfr => rfr.ReleaseId == releaseDataFileLink.ReleaseFileReference.ReleaseId
-                                   && rfr.ReleaseFileType == type
-                                   && rfr.Filename == filename);
-
-            if (associatedFileRef?.SubjectId != null)
+            if (releaseFileReference.SubjectId.HasValue)
             {
-                var subject = await _subjectService.GetAsync(associatedFileRef.SubjectId.Value);
+                var subject = await _subjectService.GetAsync(releaseFileReference.SubjectId.Value);
                 return subject.Name;
             }
 

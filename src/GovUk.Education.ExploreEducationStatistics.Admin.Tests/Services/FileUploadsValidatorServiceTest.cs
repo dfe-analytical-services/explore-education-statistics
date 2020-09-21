@@ -2,88 +2,83 @@ using System;
 using System.Collections.Generic;
 using System.IO;
 using System.IO.Compression;
-using System.Linq;
 using System.Reflection;
 using System.Text.RegularExpressions;
+using System.Threading.Tasks;
 using GovUk.Education.ExploreEducationStatistics.Admin.Services;
 using GovUk.Education.ExploreEducationStatistics.Common.Model;
 using GovUk.Education.ExploreEducationStatistics.Common.Services.Interfaces;
 using GovUk.Education.ExploreEducationStatistics.Content.Model;
+using GovUk.Education.ExploreEducationStatistics.Data.Model;
 using GovUk.Education.ExploreEducationStatistics.Data.Model.Services.Interfaces;
 using Microsoft.AspNetCore.Http;
-using Microsoft.AspNetCore.Mvc;
-using Microsoft.Azure.Storage.Blob;
 using Moq;
 using Xunit;
 using static GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services.DbUtils;
+using static GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services.ValidationTestUtil;
+using static GovUk.Education.ExploreEducationStatistics.Admin.Validators.ValidationErrorMessages;
 
 namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
 {
     public class FileUploadsServiceValidatorTests
     {
         [Fact]
-        public void AncillaryFileCannotBeEmpty()
+        public async Task AncillaryFileCannotBeEmpty()
         {
             var (subjectService, fileTypeService) = Mocks();
             var service = new FileUploadsValidatorService(subjectService.Object, fileTypeService.Object, null);
 
-            var lines = new List<string>().AsEnumerable();
-            var file = CreateFormFile(lines, "test.csv", "test.csv");
+            var file = CreateFormFile("test.csv", "test.csv");
 
-            var result = service.ValidateFileForUpload(Guid.NewGuid(),
-                file, ReleaseFileTypes.Ancillary, true).Result;
-
+            var result = await service.ValidateFileForUpload(Guid.NewGuid(),
+                file, ReleaseFileTypes.Ancillary, true);
+            
             Assert.True(result.IsLeft);
-            Assert.IsAssignableFrom<BadRequestObjectResult>(result.Left);
-            var details = (ValidationProblemDetails) ((BadRequestObjectResult) result.Left).Value;
-            Assert.Equal("FILE_CANNOT_BE_EMPTY", details.Errors[""].First());
+            AssertValidationProblem(result.Left, FileCannotBeEmpty);
         }
 
         [Fact]
-        public void AncillaryFileIsValid()
+        public async Task AncillaryFileIsValid()
         {
             var (subjectService, fileTypeService) = Mocks();
 
-            using (var context = InMemoryApplicationDbContext())
+            await using (var context = InMemoryApplicationDbContext())
             {
                 var service = new FileUploadsValidatorService(subjectService.Object, fileTypeService.Object, context);
 
-                var lines = new List<string> {"line1"}.AsEnumerable();
-                var file = CreateFormFile(lines, "test.csv", "test.csv");
+                var file = CreateSingleLineFormFile("test.csv", "test.csv");
 
-                var result = service.ValidateFileForUpload(Guid.NewGuid(),
-                    file, ReleaseFileTypes.Ancillary, true).Result;
+                var result = await service.ValidateFileForUpload(Guid.NewGuid(),
+                    file, ReleaseFileTypes.Ancillary, true);
 
                 Assert.True(result.IsRight);
             }
         }
 
         [Fact]
-        public void AncillaryFilenameIsInvalid()
+        public async Task AncillaryFilenameIsInvalid()
         {
             var (subjectService, fileTypeService) = Mocks();
 
-            using (var context = InMemoryApplicationDbContext())
+            await using (var context = InMemoryApplicationDbContext())
             {
                 var service = new FileUploadsValidatorService(subjectService.Object, fileTypeService.Object, context);
-                var lines = new List<string> {"line1"}.AsEnumerable();
-                var file = CreateFormFile(lines, "test 123.csv", "test 123.csv");
 
-                var result = service.ValidateFileForUpload(Guid.NewGuid(),
-                    file, ReleaseFileTypes.Ancillary, true).Result;
+                var file = CreateSingleLineFormFile("test 123.csv", "test 123.csv");
+
+                var result = await service.ValidateFileForUpload(Guid.NewGuid(),
+                    file, ReleaseFileTypes.Ancillary, true);
 
                 Assert.True(result.IsLeft);
-                Assert.IsAssignableFrom<BadRequestObjectResult>(result.Left);
-                var details = (ValidationProblemDetails) ((BadRequestObjectResult) result.Left).Value;
-                Assert.Equal("FILENAME_CANNOT_CONTAIN_SPACES_OR_SPECIAL_CHARACTERS", details.Errors[""].First());
+                AssertValidationProblem(result.Left, FilenameCannotContainSpacesOrSpecialCharacters);
             }
         }
 
         [Fact]
-        public void AncillaryCannotBeOverwritten()
+        public async Task AncillaryCannotBeOverwritten()
         {
             var (subjectService, fileTypeService) = Mocks();
-            using (var context = InMemoryApplicationDbContext())
+            await using (var context = InMemoryApplicationDbContext())
             {
                 var releaseId = Guid.NewGuid();
 
@@ -98,81 +93,107 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
                         Filename = "test.csv"
                     }
                 });
-                context.SaveChanges();
+                await context.SaveChangesAsync();
 
                 var service = new FileUploadsValidatorService(subjectService.Object, fileTypeService.Object, context);
 
-                var lines = new List<string> {"line1"}.AsEnumerable();
-                var file = CreateFormFile(lines, "test.csv", "test.csv");
+                var file = CreateSingleLineFormFile("test.csv", "test.csv");
 
-                var result = service.ValidateFileForUpload(releaseId,
-                    file, ReleaseFileTypes.Ancillary, false).Result;
+                var result = await service.ValidateFileForUpload(releaseId,
+                    file, ReleaseFileTypes.Ancillary, false);
 
                 Assert.True(result.IsLeft);
-                Assert.IsAssignableFrom<BadRequestObjectResult>(result.Left);
-                var details = (ValidationProblemDetails) ((BadRequestObjectResult) result.Left).Value;
-                Assert.Equal("CANNOT_OVERWRITE_FILE", details.Errors[""].First());
+                AssertValidationProblem(result.Left, CannotOverwriteFile);
             }
         }
 
         [Fact]
-        public void AncillaryFileTypeIsValid()
+        public async Task AncillaryFileTypeIsValid()
         {
             var (subjectService, fileTypeService) = Mocks();
 
-            using (var context = InMemoryApplicationDbContext())
+            await using (var context = InMemoryApplicationDbContext())
             {
                 var service = new FileUploadsValidatorService(subjectService.Object, fileTypeService.Object, context);
 
-                var lines = new List<string> {"line1"}.AsEnumerable();
-                var file = CreateFormFile(lines, "test.csv", "test.csv");
+                var file = CreateSingleLineFormFile("test.csv", "test.csv");
 
                 fileTypeService
                     .Setup(s => s.HasMatchingMimeType(file, It.IsAny<IEnumerable<Regex>>()))
                     .ReturnsAsync(() => true);
-                var result = service.ValidateUploadFileType(file, Common.Model.ReleaseFileTypes.Ancillary).Result;
+                var result = await service.ValidateUploadFileType(file, ReleaseFileTypes.Ancillary);
 
                 Assert.True(result.IsRight);
             }
         }
 
         [Fact]
-        public void AncillaryFileTypeIsInvalid()
+        public async Task AncillaryFileTypeIsInvalid()
         {
             var (subjectService, fileTypeService) = Mocks();
 
-            using (var context = InMemoryApplicationDbContext())
+            await using (var context = InMemoryApplicationDbContext())
             {
                 var service = new FileUploadsValidatorService(subjectService.Object, fileTypeService.Object, context);
 
-                var lines = new List<string> {"line1"}.AsEnumerable();
-                var file = CreateFormFile(lines, "test.csv", "test.csv");
+                var file = CreateSingleLineFormFile("test.csv", "test.csv");
 
                 fileTypeService
                     .Setup(s => s.HasMatchingMimeType(file, It.IsAny<IEnumerable<Regex>>()))
                     .ReturnsAsync(() => false);
-                var result = service.ValidateUploadFileType(file, Common.Model.ReleaseFileTypes.Ancillary).Result;
+                var result = await service.ValidateUploadFileType(file, ReleaseFileTypes.Ancillary);
 
                 Assert.True(result.IsLeft);
-                Assert.IsAssignableFrom<BadRequestObjectResult>(result.Left);
-                var details = (ValidationProblemDetails) ((BadRequestObjectResult) result.Left).Value;
-                Assert.Equal("FILE_TYPE_INVALID", details.Errors[""].First());
+                AssertValidationProblem(result.Left, FileTypeInvalid);
             }
         }
 
         [Fact]
-        public void UploadedDatafilesAreValid()
+        public async Task ValidateSubjectName_SubjectNameContainsSpecialCharacters()
         {
             var (subjectService, fileTypeService) = Mocks();
 
-            using (var context = InMemoryApplicationDbContext())
+            await using (var context = InMemoryApplicationDbContext())
             {
                 var service = new FileUploadsValidatorService(subjectService.Object, fileTypeService.Object, context);
 
-                var lines = new List<string> {"line1"}.AsEnumerable();
-                var dataFile = CreateFormFile(lines, "test.csv", "test.csv");
-                var metaFile = CreateFormFile(lines, "test.meta.csv", "test.meta.csv");
-                var subjectTitle = "Subject Title";
+                var result = await service.ValidateSubjectName(Guid.NewGuid(), "Subject & Title");
+
+                Assert.True(result.IsLeft);
+                AssertValidationProblem(result.Left, SubjectTitleCannotContainSpecialCharacters);
+            }
+        }
+        
+        [Fact]
+        public async Task ValidateSubjectName_SubjectNameNotUnique()
+        {
+            var (subjectService, fileTypeService) = Mocks();
+
+            subjectService.Setup(service => service.GetAsync(It.IsAny<Guid>(), "Subject Title"))
+                .ReturnsAsync(new Subject());
+
+            await using (var context = InMemoryApplicationDbContext())
+            {
+                var service = new FileUploadsValidatorService(subjectService.Object, fileTypeService.Object, context);
+
+                var result = await service.ValidateSubjectName(Guid.NewGuid(),  "Subject Title");
+
+                Assert.True(result.IsLeft);
+                AssertValidationProblem(result.Left, SubjectTitleMustBeUnique);
+            }
+        }
+
+        [Fact]
+        public async Task UploadedDatafilesAreValid()
+        {
+            var (subjectService, fileTypeService) = Mocks();
+
+            await using (var context = InMemoryApplicationDbContext())
+            {
+                var service = new FileUploadsValidatorService(subjectService.Object, fileTypeService.Object, context);
+
+                var dataFile = CreateSingleLineFormFile("test.csv", "test.csv");
+                var metaFile = CreateSingleLineFormFile("test.meta.csv", "test.meta.csv");
 
                 fileTypeService
                     .Setup(s => s.HasMatchingMimeType(dataFile, It.IsAny<IEnumerable<Regex>>()))
@@ -187,29 +208,65 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
                     .Setup(s => s.HasMatchingEncodingType(metaFile, It.IsAny<IEnumerable<string>>()))
                     .Returns(() => true);
 
-                var result = service.ValidateDataFilesForUpload(Guid.NewGuid(), dataFile, metaFile, subjectTitle).Result;
+                var result = await service.ValidateDataFilesForUpload(Guid.NewGuid(), dataFile, metaFile);
 
                 Assert.True(result.IsRight);
             }
         }
 
         [Fact]
-        public void UploadedDatafilesAreInvalid()
+        public async Task ValidateDataFilesForUpload_DataFileIsEmpty()
         {
             var (subjectService, fileTypeService) = Mocks();
 
-            using (var context = InMemoryApplicationDbContext())
+            await using (var context = InMemoryApplicationDbContext())
             {
                 var service = new FileUploadsValidatorService(subjectService.Object, fileTypeService.Object, context);
 
-                var lines = new List<string> {"line1"}.AsEnumerable();
-                var dataFile = CreateFormFile(lines, "test.csv", "test.csv");
-                var metaFile = CreateFormFile(lines, "test.meta.csv", "test.meta.csv");
-                var subjectTitle = "Subject & Title";
+                var dataFile = CreateFormFile("test.csv", "test.csv");
+                var metaFile = CreateSingleLineFormFile("test.meta.csv", "test.meta.csv");
+
+                var result = await service.ValidateDataFilesForUpload(Guid.NewGuid(), dataFile, metaFile);
+
+                Assert.True(result.IsLeft);
+                AssertValidationProblem(result.Left, DataFileCannotBeEmpty);
+            }
+        }
+
+        [Fact]
+        public async Task ValidateDataFilesForUpload_MetadataFileIsEmpty()
+        {
+            var (subjectService, fileTypeService) = Mocks();
+
+            await using (var context = InMemoryApplicationDbContext())
+            {
+                var service = new FileUploadsValidatorService(subjectService.Object, fileTypeService.Object, context);
+
+                var dataFile = CreateSingleLineFormFile("test.csv", "test.csv");
+                var metaFile = CreateFormFile("test.meta.csv", "test.meta.csv");
+
+                var result = await service.ValidateDataFilesForUpload(Guid.NewGuid(), dataFile, metaFile);
+
+                Assert.True(result.IsLeft);
+                AssertValidationProblem(result.Left, MetadataFileCannotBeEmpty);
+            }
+        }
+
+        [Fact]
+        public async Task ValidateDataFilesForUpload_DataFileNotCsv()
+        {
+            var (subjectService, fileTypeService) = Mocks();
+
+            await using (var context = InMemoryApplicationDbContext())
+            {
+                var service = new FileUploadsValidatorService(subjectService.Object, fileTypeService.Object, context);
+
+                var dataFile = CreateSingleLineFormFile("test.csv", "test.csv");
+                var metaFile = CreateSingleLineFormFile("test.meta.csv", "test.meta.csv");
 
                 fileTypeService
                     .Setup(s => s.HasMatchingMimeType(dataFile, It.IsAny<IEnumerable<Regex>>()))
-                    .ReturnsAsync(() => true);
+                    .ReturnsAsync(() => false);
                 fileTypeService
                     .Setup(s => s.HasMatchingMimeType(metaFile, It.IsAny<IEnumerable<Regex>>()))
                     .ReturnsAsync(() => true);
@@ -219,64 +276,90 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
                 fileTypeService
                     .Setup(s => s.HasMatchingEncodingType(metaFile, It.IsAny<IEnumerable<string>>()))
                     .Returns(() => true);
-
-                var result = service.ValidateDataFilesForUpload(Guid.NewGuid(), dataFile, metaFile, subjectTitle).Result;
+                
+                var result = await service.ValidateDataFilesForUpload(Guid.NewGuid(), dataFile, metaFile);
 
                 Assert.True(result.IsLeft);
-                Assert.IsAssignableFrom<BadRequestObjectResult>(result.Left);
-                var details = (ValidationProblemDetails) ((BadRequestObjectResult) result.Left).Value;
-                Assert.Equal("SUBJECT_TITLE_CANNOT_CONTAIN_SPECIAL_CHARACTERS", details.Errors[""].First());
+                AssertValidationProblem(result.Left, DataFileMustBeCsvFile);
             }
         }
 
         [Fact]
-        public void UploadedZippedDatafileIsValid()
+        public async Task ValidateDataFilesForUpload_MetadataFileNotCsv()
         {
             var (subjectService, fileTypeService) = Mocks();
 
-            using (var context = InMemoryApplicationDbContext())
+            await using (var context = InMemoryApplicationDbContext())
             {
                 var service = new FileUploadsValidatorService(subjectService.Object, fileTypeService.Object, context);
 
-                var subjectTitle = "Subject Title";
-                var entries = GetArchiveEntries("data-zip-valid.zip");
+                var dataFile = CreateSingleLineFormFile("test.csv", "test.csv");
+                var metaFile = CreateSingleLineFormFile("test.meta.csv", "test.meta.csv");
+
+                fileTypeService
+                    .Setup(s => s.HasMatchingMimeType(dataFile, It.IsAny<IEnumerable<Regex>>()))
+                    .ReturnsAsync(() => true);
+                fileTypeService
+                    .Setup(s => s.HasMatchingMimeType(metaFile, It.IsAny<IEnumerable<Regex>>()))
+                    .ReturnsAsync(() => false);
+                fileTypeService
+                    .Setup(s => s.HasMatchingEncodingType(dataFile, It.IsAny<IEnumerable<string>>()))
+                    .Returns(() => true);
+                fileTypeService
+                    .Setup(s => s.HasMatchingEncodingType(metaFile, It.IsAny<IEnumerable<string>>()))
+                    .Returns(() => true);
+                
+                var result = await service.ValidateDataFilesForUpload(Guid.NewGuid(), dataFile, metaFile);
+
+                Assert.True(result.IsLeft);
+                AssertValidationProblem(result.Left, MetaFileMustBeCsvFile);
+            }
+        }
+
+        [Fact]
+        public async Task UploadedZippedDatafileIsValid()
+        {
+            var (subjectService, fileTypeService) = Mocks();
+
+            await using (var context = InMemoryApplicationDbContext())
+            {
+                var service = new FileUploadsValidatorService(subjectService.Object, fileTypeService.Object, context);
+
+                var (dataFile, metaFile) = GetArchiveEntries("data-zip-valid.zip");
 
                 fileTypeService
                     .Setup(s => s.HasMatchingMimeType(It.IsAny<Stream>(),
                         It.IsAny<IEnumerable<Regex>>()))
                     .ReturnsAsync(() => true);
 
-                var result = service.ValidateDataArchiveEntriesForUpload(Guid.NewGuid(),
-                    entries.Item1,entries.Item2, subjectTitle).Result;
+                var result = await service.ValidateDataArchiveEntriesForUpload(Guid.NewGuid(),
+                    dataFile, metaFile);
 
                 Assert.True(result.IsRight);
             }
         }
 
         [Fact]
-        public void UploadedZippedDatafileIsInvalid()
+        public async Task UploadedZippedDatafileIsInvalid()
         {
             var (subjectService, fileTypeService) = Mocks();
 
-            using (var context = InMemoryApplicationDbContext())
+            await using (var context = InMemoryApplicationDbContext())
             {
                 var service = new FileUploadsValidatorService(subjectService.Object, fileTypeService.Object, context);
 
-                var subjectTitle = "Subject Title";
-                var entries = GetArchiveEntries("data-zip-invalid.zip");
+                var (dataFile, metaFile) = GetArchiveEntries("data-zip-invalid.zip");
 
                 fileTypeService
                     .Setup(s => s.HasMatchingMimeType(It.IsAny<Stream>(),
                         It.IsAny<IEnumerable<Regex>>()))
                     .ReturnsAsync(() => true);
 
-                var result = service.ValidateDataArchiveEntriesForUpload(Guid.NewGuid(),
-                    entries.Item1,entries.Item2, subjectTitle).Result;
+                var result = await service.ValidateDataArchiveEntriesForUpload(Guid.NewGuid(),
+                    dataFile,metaFile);
 
                 Assert.True(result.IsLeft);
-                Assert.IsAssignableFrom<BadRequestObjectResult>(result.Left);
-                var details = (ValidationProblemDetails) ((BadRequestObjectResult) result.Left).Value;
-                Assert.Equal("DATA_FILE_MUST_BE_CSV_FILE", details.Errors[""].First());
+                AssertValidationProblem(result.Left, DataFileMustBeCsvFile);
             }
         }
 
@@ -288,7 +371,12 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
             );
         }
 
-        private static IFormFile CreateFormFile(IEnumerable<string> lines, string fileName, string name)
+        private static IFormFile CreateSingleLineFormFile( string fileName, string name)
+        {
+            return CreateFormFile(fileName, name, "line1");
+        }
+        
+        private static IFormFile CreateFormFile(string fileName, string name, params string[] lines)
         {
             var mStream = new MemoryStream();
             var writer = new StreamWriter(mStream);
