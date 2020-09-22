@@ -16,9 +16,14 @@ import React, { useMemo } from 'react';
 interface Props {
   fileId: string;
   replacementFileId: string;
+  onReplacement?: () => void;
 }
 
-const DataFileReplacementPlan = ({ fileId, replacementFileId }: Props) => {
+const DataFileReplacementPlan = ({
+  fileId,
+  replacementFileId,
+  onReplacement,
+}: Props) => {
   const { value: plan, isLoading, error } = useAsyncRetry(
     () => dataReplacementService.getReplacementPlan(fileId, replacementFileId),
     [fileId],
@@ -297,7 +302,20 @@ const DataFileReplacementPlan = ({ fileId, replacementFileId }: Props) => {
 
           {plan.valid && (
             <ButtonGroup className="govuk-!-margin-top-8">
-              <Button>Confirm data replacement</Button>
+              <Button
+                onClick={async () => {
+                  await dataReplacementService.replaceData(
+                    fileId,
+                    replacementFileId,
+                  );
+
+                  if (onReplacement) {
+                    onReplacement();
+                  }
+                }}
+              >
+                Confirm data replacement
+              </Button>
             </ButtonGroup>
           )}
         </>

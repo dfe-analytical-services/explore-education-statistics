@@ -3,6 +3,7 @@ import useQueryParams from '@admin/hooks/useQueryParams';
 import DataFileReplacementPlan from '@admin/pages/release/data/components/DataFileReplacementPlan';
 import DataFileSummaryList from '@admin/pages/release/data/components/DataFileSummaryList';
 import {
+  releaseDataFileRoute,
   ReleaseDataFileRouteParams,
   releaseDataRoute,
   ReleaseRouteParams,
@@ -14,6 +15,7 @@ import React from 'react';
 import { generatePath, RouteComponentProps } from 'react-router';
 
 const ReleaseDataFilePage = ({
+  history,
   match: {
     params: { publicationId, releaseId, fileId },
   },
@@ -64,6 +66,18 @@ const ReleaseDataFilePage = ({
                 <DataFileReplacementPlan
                   fileId={dataFile.id}
                   replacementFileId={replacementFileId}
+                  onReplacement={() => {
+                    history.push(
+                      generatePath<ReleaseDataFileRouteParams>(
+                        releaseDataFileRoute.path,
+                        {
+                          publicationId,
+                          releaseId,
+                          fileId: replacementFileId,
+                        },
+                      ),
+                    );
+                  }}
                 />
               </>
             )}

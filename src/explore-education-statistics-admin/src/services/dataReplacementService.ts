@@ -105,6 +105,9 @@ const dataReplacementService = {
   ): Promise<DataReplacementPlan> {
     return client.get(`/data/${fileId}/replacement-plan/${replacementFileId}`);
   },
+  replaceData(fileId: string, replacementFileId: string): Promise<void> {
+    return client.post(`/data/${fileId}/replacement/${replacementFileId}`);
+  },
 };
 
 export default dataReplacementService;
