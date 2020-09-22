@@ -10,7 +10,6 @@ using GovUk.Education.ExploreEducationStatistics.Data.Processor.Model;
 using GovUk.Education.ExploreEducationStatistics.Data.Processor.Models;
 using GovUk.Education.ExploreEducationStatistics.Data.Processor.Services.Interfaces;
 using Microsoft.EntityFrameworkCore;
-using Microsoft.Extensions.Logging;
 using Publication = GovUk.Education.ExploreEducationStatistics.Data.Model.Publication;
 using Release = GovUk.Education.ExploreEducationStatistics.Data.Model.Release;
 using Theme = GovUk.Education.ExploreEducationStatistics.Data.Model.Theme;
@@ -20,14 +19,10 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Processor.Services
 {
     public class ReleaseProcessorService : IReleaseProcessorService
     {
-        private readonly ILogger<IReleaseProcessorService> _logger;
         private readonly IMapper _mapper;
 
-        public ReleaseProcessorService(
-            ILogger<IReleaseProcessorService> logger,
-            IMapper mapper)
+        public ReleaseProcessorService(IMapper mapper)
         {
-            _logger = logger;
             _mapper = mapper;
         }
 
@@ -38,7 +33,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Processor.Services
             Thread.Sleep(new Random().Next(1, 5) * 1000);
 
             var release = CreateOrUpdateRelease(message, statisticsDbContext);
-            RemoveSubjectIfExisting(subjectData.Name, release, statisticsDbContext);
+            RemoveSubjectIfExisting(message, statisticsDbContext);
 
             var subject = CreateSubject(message.SubjectId, subjectData.Name, release, statisticsDbContext);
 
@@ -88,11 +83,11 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Processor.Services
             return false;
         }
 
-        private void RemoveSubjectIfExisting(string name, Release release, StatisticsDbContext statisticsDbContext)
+        private static void RemoveSubjectIfExisting(ImportMessage message, StatisticsDbContext statisticsDbContext)
         {
             var releaseSubject = statisticsDbContext.ReleaseSubject
                 .Include(rs => rs.Subject)
-                .FirstOrDefault(r => r.Subject.Name == name && r.ReleaseId == release.Id);
+                .FirstOrDefault(r => r.Subject.Id == message.SubjectId && r.ReleaseId == message.Release.Id);
 
             // If the subject exists then this must be a reload of the same release/subject so delete & re-create.
             if (releaseSubject != null)
@@ -104,7 +99,10 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Processor.Services
             }
         }
 
-        private Subject CreateSubject(Guid subjectId, string name, Release release, StatisticsDbContext statisticsDbContext)
+        private static Subject CreateSubject(Guid subjectId,
+            string name,
+            Release release,
+            StatisticsDbContext statisticsDbContext)
         {
             var newSubject = statisticsDbContext.Subject.Add(new Subject
                 {
