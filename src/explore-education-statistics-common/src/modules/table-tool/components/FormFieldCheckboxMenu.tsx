@@ -8,8 +8,13 @@ import { useField } from 'formik';
 import React, { useEffect, useState } from 'react';
 import FormCheckboxSelectionCount from './FormCheckboxSelectedCount';
 
+interface Props<FormValues>
+  extends FormFieldCheckboxSearchGroupProps<FormValues> {
+  legend: string;
+}
+
 const FormFieldCheckboxMenu = <FormValues extends {}>(
-  props: FormFieldCheckboxSearchGroupProps<FormValues>,
+  props: Props<FormValues>,
 ) => {
   const { name, options, legend } = props;
   const [open, setOpen] = useState(false);
@@ -26,12 +31,8 @@ const FormFieldCheckboxMenu = <FormValues extends {}>(
     <DetailsMenu
       open={open}
       jsRequired
-      summary={
-        <>
-          {legend}
-          <FormCheckboxSelectionCount name={name} />
-        </>
-      }
+      summary={legend}
+      summaryAfter={<FormCheckboxSelectionCount name={name} />}
     >
       {options.length > 1 ? (
         <FormFieldCheckboxSearchGroup<FormValues>

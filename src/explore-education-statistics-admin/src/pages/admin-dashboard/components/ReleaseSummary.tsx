@@ -34,35 +34,25 @@ const ReleaseSummary = ({
   return (
     <Details
       className="govuk-!-margin-bottom-0"
-      summary={
-        <>
-          {getReleaseSummaryLabel(release)}
+      summary={getReleaseSummaryLabel(release)}
+      summaryAfter={
+        <TagGroup className="govuk-!-margin-left-2">
+          <Tag>{getReleaseStatusLabel(release.status)}</Tag>
 
-          <TagGroup className="govuk-!-margin-left-2">
-            <Tag>{getReleaseStatusLabel(release.status)}</Tag>
+          {release.amendment && <Tag>Amendment</Tag>}
 
-            {release.amendment && <Tag>Amendment</Tag>}
-
-            {release.status === 'Approved' && (
-              <LazyLoad
-                once
-                scroll={false}
-                placeholder={
-                  <LoadingSpinner
-                    className="govuk-!-margin-0"
-                    inline
-                    size="sm"
-                  />
-                }
-              >
-                <ReleaseServiceStatus
-                  exclude="details"
-                  releaseId={release.id}
-                />
-              </LazyLoad>
-            )}
-          </TagGroup>
-        </>
+          {release.status === 'Approved' && (
+            <LazyLoad
+              once
+              scroll={false}
+              placeholder={
+                <LoadingSpinner className="govuk-!-margin-0" inline size="sm" />
+              }
+            >
+              <ReleaseServiceStatus exclude="details" releaseId={release.id} />
+            </LazyLoad>
+          )}
+        </TagGroup>
       }
     >
       <SummaryList className="govuk-!-margin-bottom-3">
