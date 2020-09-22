@@ -44,7 +44,7 @@ export type ImportStatusChangeHandler = (
 interface ImportStatusProps {
   releaseId: string;
   dataFile: DataFile;
-  onStatusChange: ImportStatusChangeHandler;
+  onStatusChange?: ImportStatusChangeHandler;
 }
 
 class ImporterStatus extends Component<ImportStatusProps> {
@@ -133,7 +133,10 @@ class ImporterStatus extends Component<ImportStatusProps> {
       .finally(() => {
         const { current } = this.state;
         const currentStatus: DataFileImportStatus = (current as unknown) as DataFileImportStatus;
-        onStatusChange(dataFile, currentStatus.status);
+
+        if (onStatusChange) {
+          onStatusChange(dataFile, currentStatus.status);
+        }
       });
   }
 

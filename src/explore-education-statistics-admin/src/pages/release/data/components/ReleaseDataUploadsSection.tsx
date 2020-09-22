@@ -1,7 +1,12 @@
+import Link from '@admin/components/Link';
 import DataFileSummaryList from '@admin/pages/release/data/components/DataFileSummaryList';
 import DataFileUploadForm, {
   DataFileUploadFormValues,
 } from '@admin/pages/release/data/components/DataFileUploadForm';
+import {
+  releaseDataFileRoute,
+  ReleaseDataFileRouteParams,
+} from '@admin/routes/releaseRoutes';
 import releaseDataFileService, {
   DataFile,
   DeleteDataFilePlan,
@@ -20,6 +25,7 @@ import logger from '@common/services/logger';
 import { mapFieldErrors } from '@common/validation/serverValidations';
 import Yup from '@common/validation/yup';
 import React, { useCallback, useState } from 'react';
+import { generatePath } from 'react-router';
 
 interface FormValues extends DataFileUploadFormValues {
   subjectTitle: string;
@@ -37,6 +43,7 @@ const errorMappings = [
 ];
 
 interface Props {
+  publicationId: string;
   releaseId: string;
   canUpdateRelease: boolean;
 }
@@ -48,7 +55,11 @@ interface DeleteDataFile {
 
 const formId = 'dataFileUploadForm';
 
-const ReleaseDataUploadsSection = ({ releaseId, canUpdateRelease }: Props) => {
+const ReleaseDataUploadsSection = ({
+  publicationId,
+  releaseId,
+  canUpdateRelease,
+}: Props) => {
   const [deleteDataFile, setDeleteDataFile] = useState<DeleteDataFile>();
 
   const {
@@ -56,7 +67,7 @@ const ReleaseDataUploadsSection = ({ releaseId, canUpdateRelease }: Props) => {
     setState: setDataFiles,
     isLoading,
   } = useAsyncHandledRetry(
-    () => releaseDataFileService.getReleaseDataFiles(releaseId),
+    () => releaseDataFileService.getDataFiles(releaseId),
     [releaseId],
   );
 
@@ -217,20 +228,35 @@ const ReleaseDataUploadsSection = ({ releaseId, canUpdateRelease }: Props) => {
                       <SummaryListItem
                         term="Actions"
                         actions={
-                          <ButtonText
-                            onClick={() =>
-                              releaseDataFileService
-                                .getDeleteDataFilePlan(releaseId, dataFile)
-                                .then(plan => {
-                                  setDeleteDataFile({
-                                    plan,
-                                    file: dataFile,
-                                  });
-                                })
-                            }
-                          >
-                            Delete files
-                          </ButtonText>
+                          <>
+                            <Link
+                              className="govuk-!-margin-right-4"
+                              to={generatePath<ReleaseDataFileRouteParams>(
+                                releaseDataFileRoute.path,
+                                {
+                                  publicationId,
+                                  releaseId,
+                                  fileId: dataFile.id,
+                                },
+                              )}
+                            >
+                              Replace data
+                            </Link>
+                            <ButtonText
+                              onClick={() =>
+                                releaseDataFileService
+                                  .getDeleteDataFilePlan(releaseId, dataFile)
+                                  .then(plan => {
+                                    setDeleteDataFile({
+                                      plan,
+                                      file: dataFile,
+                                    });
+                                  })
+                              }
+                            >
+                              Delete files
+                            </ButtonText>
+                          </>
                         }
                       />
                     )}

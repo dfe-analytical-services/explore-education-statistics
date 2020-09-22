@@ -15,7 +15,7 @@ interface Props {
   children?: ReactNode;
   dataFile: DataFile;
   releaseId: string;
-  onStatusChange: ImportStatusChangeHandler;
+  onStatusChange?: ImportStatusChangeHandler;
 }
 
 const DataFileSummaryList = ({

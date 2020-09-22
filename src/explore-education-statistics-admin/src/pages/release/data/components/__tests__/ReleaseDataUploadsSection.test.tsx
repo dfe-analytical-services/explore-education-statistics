@@ -8,6 +8,7 @@ import _releaseDataFileService, {
 import { render, screen, waitFor, within } from '@testing-library/react';
 import userEvent from '@testing-library/user-event';
 import React from 'react';
+import { MemoryRouter } from 'react-router';
 
 jest.mock('@admin/services/releaseDataFileService');
 
@@ -58,17 +59,23 @@ describe('ReleaseDataUploadsSection', () => {
   };
 
   test('renders list of uploaded data files', async () => {
-    releaseDataFileService.getReleaseDataFiles.mockResolvedValue(testDataFiles);
+    releaseDataFileService.getDataFiles.mockResolvedValue(testDataFiles);
     releaseDataFileService.getDataFileImportStatus.mockResolvedValue(
       testQueuedImportStatus,
     );
 
     render(
-      <ReleaseDataUploadsSection releaseId="release-1" canUpdateRelease />,
+      <MemoryRouter>
+        <ReleaseDataUploadsSection
+          publicationId="publication-1"
+          releaseId="release-1"
+          canUpdateRelease
+        />
+      </MemoryRouter>,
     );
 
     await waitFor(() => {
-      expect(releaseDataFileService.getReleaseDataFiles).toHaveBeenCalledWith(
+      expect(releaseDataFileService.getDataFiles).toHaveBeenCalledWith(
         'release-1',
       );
 
@@ -128,10 +135,16 @@ describe('ReleaseDataUploadsSection', () => {
   });
 
   test('renders empty message when there are no data files', async () => {
-    releaseDataFileService.getReleaseDataFiles.mockResolvedValue([]);
+    releaseDataFileService.getDataFiles.mockResolvedValue([]);
 
     render(
-      <ReleaseDataUploadsSection releaseId="release-1" canUpdateRelease />,
+      <MemoryRouter>
+        <ReleaseDataUploadsSection
+          publicationId="publication-1"
+          releaseId="release-1"
+          canUpdateRelease
+        />
+      </MemoryRouter>,
     );
 
     await waitFor(() => {
@@ -146,9 +159,7 @@ describe('ReleaseDataUploadsSection', () => {
 
   describe('deleting data file', () => {
     test('does not render delete files button if file is not ready for deletion', async () => {
-      releaseDataFileService.getReleaseDataFiles.mockResolvedValue(
-        testDataFiles,
-      );
+      releaseDataFileService.getDataFiles.mockResolvedValue(testDataFiles);
       releaseDataFileService.getDataFileImportStatus.mockImplementation(
         async (releaseId, dataFileName) => {
           if (dataFileName === testDataFiles[1].filename) {
@@ -160,7 +171,13 @@ describe('ReleaseDataUploadsSection', () => {
       );
 
       render(
-        <ReleaseDataUploadsSection releaseId="release-1" canUpdateRelease />,
+        <MemoryRouter>
+          <ReleaseDataUploadsSection
+            publicationId="publication-1"
+            releaseId="release-1"
+            canUpdateRelease
+          />
+        </MemoryRouter>,
       );
 
       let sections: HTMLElement[] = [];
@@ -184,9 +201,7 @@ describe('ReleaseDataUploadsSection', () => {
     });
 
     test('clicking delete files button shows modal to confirm deletion plan', async () => {
-      releaseDataFileService.getReleaseDataFiles.mockResolvedValue(
-        testDataFiles,
-      );
+      releaseDataFileService.getDataFiles.mockResolvedValue(testDataFiles);
       releaseDataFileService.getDataFileImportStatus.mockResolvedValue(
         testCompleteImportStatus,
       );
@@ -209,7 +224,13 @@ describe('ReleaseDataUploadsSection', () => {
       });
 
       render(
-        <ReleaseDataUploadsSection releaseId="release-1" canUpdateRelease />,
+        <MemoryRouter>
+          <ReleaseDataUploadsSection
+            publicationId="publication-1"
+            releaseId="release-1"
+            canUpdateRelease
+          />
+        </MemoryRouter>,
       );
 
       let sections: HTMLElement[] = [];
@@ -263,9 +284,7 @@ describe('ReleaseDataUploadsSection', () => {
     });
 
     test('confirming deletion removes the data file section', async () => {
-      releaseDataFileService.getReleaseDataFiles.mockResolvedValue(
-        testDataFiles,
-      );
+      releaseDataFileService.getDataFiles.mockResolvedValue(testDataFiles);
       releaseDataFileService.getDataFileImportStatus.mockResolvedValue(
         testCompleteImportStatus,
       );
@@ -278,7 +297,13 @@ describe('ReleaseDataUploadsSection', () => {
       releaseDataFileService.deleteDataFiles.mockResolvedValue();
 
       render(
-        <ReleaseDataUploadsSection releaseId="release-1" canUpdateRelease />,
+        <MemoryRouter>
+          <ReleaseDataUploadsSection
+            publicationId="publication-1"
+            releaseId="release-1"
+            canUpdateRelease
+          />
+        </MemoryRouter>,
       );
 
       let sections: HTMLElement[] = [];
@@ -337,9 +362,7 @@ describe('ReleaseDataUploadsSection', () => {
     };
 
     beforeEach(() => {
-      releaseDataFileService.getReleaseDataFiles.mockResolvedValue(
-        testDataFiles,
-      );
+      releaseDataFileService.getDataFiles.mockResolvedValue(testDataFiles);
       releaseDataFileService.getDataFileImportStatus.mockResolvedValue(
         testQueuedImportStatus,
       );
@@ -347,7 +370,13 @@ describe('ReleaseDataUploadsSection', () => {
 
     test('show validation message when no subject title', async () => {
       render(
-        <ReleaseDataUploadsSection releaseId="release-1" canUpdateRelease />,
+        <MemoryRouter>
+          <ReleaseDataUploadsSection
+            publicationId="publication-1"
+            releaseId="release-1"
+            canUpdateRelease
+          />
+        </MemoryRouter>,
       );
 
       userEvent.click(screen.getByLabelText('Subject title'));
@@ -364,7 +393,13 @@ describe('ReleaseDataUploadsSection', () => {
 
     test('shows validation message when non-unique subject title', async () => {
       render(
-        <ReleaseDataUploadsSection releaseId="release-1" canUpdateRelease />,
+        <MemoryRouter>
+          <ReleaseDataUploadsSection
+            publicationId="publication-1"
+            releaseId="release-1"
+            canUpdateRelease
+          />
+        </MemoryRouter>,
       );
 
       await userEvent.type(
@@ -384,7 +419,13 @@ describe('ReleaseDataUploadsSection', () => {
 
     test('cannot submit with invalid values when trying to upload CSV files', async () => {
       render(
-        <ReleaseDataUploadsSection releaseId="release-1" canUpdateRelease />,
+        <MemoryRouter>
+          <ReleaseDataUploadsSection
+            publicationId="publication-1"
+            releaseId="release-1"
+            canUpdateRelease
+          />
+        </MemoryRouter>,
       );
 
       userEvent.click(
@@ -422,7 +463,11 @@ describe('ReleaseDataUploadsSection', () => {
 
     test('cannot submit with invalid values when trying to upload ZIP file', async () => {
       render(
-        <ReleaseDataUploadsSection releaseId="release-1" canUpdateRelease />,
+        <ReleaseDataUploadsSection
+          publicationId="publication-1"
+          releaseId="release-1"
+          canUpdateRelease
+        />,
       );
 
       userEvent.click(screen.getByLabelText('ZIP file'));
@@ -466,7 +511,13 @@ describe('ReleaseDataUploadsSection', () => {
       );
 
       render(
-        <ReleaseDataUploadsSection releaseId="release-1" canUpdateRelease />,
+        <MemoryRouter>
+          <ReleaseDataUploadsSection
+            publicationId="publication-1"
+            releaseId="release-1"
+            canUpdateRelease
+          />
+        </MemoryRouter>,
       );
 
       const dataFile = new File(['test'], 'test-data.csv', {
@@ -558,7 +609,13 @@ describe('ReleaseDataUploadsSection', () => {
       );
 
       render(
-        <ReleaseDataUploadsSection releaseId="release-1" canUpdateRelease />,
+        <MemoryRouter>
+          <ReleaseDataUploadsSection
+            publicationId="publication-1"
+            releaseId="release-1"
+            canUpdateRelease
+          />
+        </MemoryRouter>,
       );
 
       const zipFile = new File(['test'], 'test-data.zip', {

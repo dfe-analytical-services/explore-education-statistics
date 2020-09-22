@@ -86,13 +86,18 @@ function mapFile(file: DataFileInfo): DataFile {
 }
 
 const releaseDataFileService = {
-  getReleaseDataFiles(releaseId: string): Promise<DataFile[]> {
+  getDataFiles(releaseId: string): Promise<DataFile[]> {
     return client
       .get<DataFileInfo[]>(`/release/${releaseId}/data`)
       .then(response => {
         const dataFiles = response.filter(file => file.metaFileName.length > 0);
         return dataFiles.map(mapFile);
       });
+  },
+  getDataFile(releaseId: string, fileId: string): Promise<DataFile> {
+    return client
+      .get<DataFileInfo>(`/release/${releaseId}/data/${fileId}`)
+      .then(mapFile);
   },
   async uploadDataFiles(
     releaseId: string,
