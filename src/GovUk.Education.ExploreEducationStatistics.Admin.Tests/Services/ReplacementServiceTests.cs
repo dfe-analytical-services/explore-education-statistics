@@ -1769,10 +1769,6 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
                     }
                 });
 
-            mocks.ReleaseService.Setup(service => service.RemoveDataFilesAsync(
-                    contentReleaseVersion2.Id, originalReleaseFileReference.Id))
-                .ReturnsAsync(Unit.Instance);
-
             mocks.TimePeriodService.Setup(service => service.GetTimePeriods(replacementSubject.Id))
                 .Returns(new List<(int Year, TimeIdentifier TimeIdentifier)>
                 {
@@ -1805,6 +1801,10 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
                     footnoteForFilterItem, footnoteForIndicator, footnoteForSubject);
                 await statisticsDbContext.SaveChangesAsync();
             }
+
+            mocks.ReleaseService.Setup(service => service.RemoveDataFilesAsync(
+                    contentReleaseVersion2.Id, originalReleaseFileReference.Id))
+                .ReturnsAsync(Unit.Instance);
 
             await using (var contentDbContext = InMemoryApplicationDbContext(contentDbContextId))
             await using (var statisticsDbContext = InMemoryStatisticsDbContext(statisticsDbContextId))
