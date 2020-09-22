@@ -1,6 +1,7 @@
 using System;
 using System.Collections.Generic;
 using System.IO;
+using System.Security.Claims;
 using System.Threading.Tasks;
 using GovUk.Education.ExploreEducationStatistics.Admin.Controllers.Api;
 using GovUk.Education.ExploreEducationStatistics.Admin.Models;
@@ -19,15 +20,12 @@ using FileInfo = GovUk.Education.ExploreEducationStatistics.Common.Model.FileInf
 
 namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Controllers.Api
 {
-    public class ReleaseControllerTests
+    public class ReleasesControllerTests
     {
-        private static readonly List<ApplicationUser> Users = new List<ApplicationUser>
+        private static readonly ApplicationUser ApplicationUser = new ApplicationUser
         {
-            new ApplicationUser
-            {
-                Id = "1",
-                Email = "test@example.com"
-            }
+            Id = Guid.NewGuid().ToString(),
+            Email = "test@example.com"
         };
 
         private readonly Guid _releaseId = Guid.NewGuid();
@@ -102,7 +100,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Controllers.Api
             AssertOkResult(result);
         }
 
-        [Fact(Skip = "Needs principal setting")]
+        [Fact]
         public async Task AddDataFilesAsync_UploadsTheFiles_Returns_Ok()
         {
             var mocks = Mocks();
@@ -116,7 +114,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Controllers.Api
             };
 
             mocks.FileStorageService
-                .Setup(service => service.UploadDataFilesAsync(_releaseId, dataFile, metaFile, "test user", "Subject name", null))
+                .Setup(service => service.UploadDataFilesAsync(_releaseId, dataFile, metaFile, ApplicationUser.Email, "Subject name", null))
                 .ReturnsAsync(dataFileInfo);
 
             // Call the method under test
@@ -127,7 +125,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Controllers.Api
             Assert.Equal("datafile.csv", dataFileInfoResult.Path);
         }
 
-        [Fact(Skip = "Needs principal setting")]
+        [Fact]
         public async Task AddDataFilesAsync_UploadsTheFiles_Returns_ValidationProblem()
         {
             var mocks = Mocks();
@@ -135,14 +133,14 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Controllers.Api
             var metaFile = MockFile("metafile.csv");
 
             mocks.FileStorageService
-                .Setup(service => service.UploadDataFilesAsync(_releaseId, dataFile, metaFile, "test user", "Subject name", null))
-                .ReturnsAsync(new BadRequestObjectResult(CannotOverwriteFile));
+                .Setup(service => service.UploadDataFilesAsync(_releaseId, dataFile, metaFile, ApplicationUser.Email, "Subject name", null))
+                .ReturnsAsync(ValidationActionResult(CannotOverwriteFile));
 
             var controller = ReleasesControllerWithMocks(mocks);
 
             // Call the method under test
             var result = await controller.AddDataFilesAsync(_releaseId, "Subject name", dataFile, metaFile);
-            AssertValidationProblem(result.Result, CannotOverwriteFile);
+            AssertValidationProblem(result, CannotOverwriteFile);
         }
 
         [Fact]
@@ -281,7 +279,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Controllers.Api
                     new Mock<IReleaseFilesService>(),
                     new Mock<IReleaseStatusService>(),
                     new Mock<IReplacementService>(),
-                    MockUserManager(Users),
+                    MockUserManager(),
                     new Mock<IDataBlockService>()
                 );
         }
@@ -304,19 +302,14 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Controllers.Api
                 mocks.DataBlockService.Object);
         }
 
-        private static Mock<UserManager<TUser>> MockUserManager<TUser>(List<TUser> ls) where TUser : class
+        private static Mock<UserManager<ApplicationUser>> MockUserManager()
         {
-            var store = new Mock<IUserStore<TUser>>();
-            var mgr = new Mock<UserManager<TUser>>(store.Object, null, null, null, null, null, null, null, null);
-            mgr.Object.UserValidators.Add(new UserValidator<TUser>());
-            mgr.Object.PasswordValidators.Add(new PasswordValidator<TUser>());
+            var store = new Mock<IUserStore<ApplicationUser>>();
+            var mock = new Mock<UserManager<ApplicationUser>>(store.Object, null, null, null, null, null, null, null, null);
 
-            mgr.Setup(x => x.DeleteAsync(It.IsAny<TUser>())).ReturnsAsync(IdentityResult.Success);
-            mgr.Setup(x => x.CreateAsync(It.IsAny<TUser>(), It.IsAny<string>()))
-                .ReturnsAsync(IdentityResult.Success).Callback<TUser, string>((x, y) => ls.Add(x));
-            mgr.Setup(x => x.UpdateAsync(It.IsAny<TUser>())).ReturnsAsync(IdentityResult.Success);
+            mock.Setup(manager => manager.GetUserAsync(It.IsAny<ClaimsPrincipal>())).ReturnsAsync(ApplicationUser);
 
-            return mgr;
+            return mock;
         }
     }
 }
