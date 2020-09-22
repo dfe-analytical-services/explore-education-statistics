@@ -193,6 +193,12 @@ namespace GovUk.Education.ExploreEducationStatistics.Content.Model.Database
                 .HasForeignKey<ReleaseFileReference>(b => b.ReplacingId)
                 .IsRequired(false);
 
+            modelBuilder.Entity<ReleaseFileReference>()
+                .HasOne(b => b.ReplacedBy)
+                .WithOne()
+                .HasForeignKey<ReleaseFileReference>(b => b.ReplacedById)
+                .IsRequired(false);
+
             modelBuilder.Entity<Release>()
                 .HasOne(r => r.PreviousVersion)
                 .WithMany()

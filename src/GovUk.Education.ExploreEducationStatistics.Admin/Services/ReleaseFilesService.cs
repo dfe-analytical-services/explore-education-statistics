@@ -471,13 +471,15 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Services
                 .OnSuccess(_userService.CheckCanViewRelease)
                 .OnSuccess(async _ =>
                 {
-                    var files = await GetReleaseFiles(releaseId, ReleaseFileTypes.Data);
                     var fileList = new List<DataFileInfo>();
+                    var files = await GetReleaseFiles(releaseId, ReleaseFileTypes.Data);
 
-                    foreach (var fileLink in files)
-                    {
-                        fileList.Add(await GetDataFileInfo(releaseId, fileLink));
-                    }
+                    // Exclude files that are replacements in progress
+                    var filesExcludingReplacements = files.Where(file =>
+                        !file.ReleaseFileReference.ReplacingId.HasValue);
+
+                    await filesExcludingReplacements.ForEachAsync(async file =>
+                        fileList.Add(await GetDataFileInfo(releaseId, file)));
 
                     return fileList
                         .OrderBy(file => file.Name)
@@ -599,6 +601,12 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Services
 
             var entry = await _context.ReleaseFileReferences.AddAsync(releaseFileReference);
 
+            if (replacing != null)
+            {
+                _context.Update(replacing);
+                replacing.ReplacedBy = entry.Entity;
+            }
+
             // No ReleaseFileLink required for the zip file source reference
             if (type != ReleaseFileTypes.DataZip)
             {
@@ -644,6 +652,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Services
                 Path = blob.Path,
                 Size = blob.Size,
                 MetaFileName = blob.GetMetaFileName(),
+                ReplacedBy = fileLink.ReleaseFileReference.ReplacedById,
                 Rows = blob.GetNumberOfRows(),
                 UserName = blob.GetUserName(),
                 Created = blob.Created

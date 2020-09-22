@@ -532,6 +532,9 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Migrations.ContentMig
                     b.Property<Guid>("ReleaseId")
                         .HasColumnType("uniqueidentifier");
 
+                    b.Property<Guid?>("ReplacedById")
+                        .HasColumnType("uniqueidentifier");
+
                     b.Property<Guid?>("ReplacingId")
                         .HasColumnType("uniqueidentifier");
 
@@ -544,6 +547,10 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Migrations.ContentMig
                     b.HasKey("Id");
 
                     b.HasIndex("ReleaseId");
+
+                    b.HasIndex("ReplacedById")
+                        .IsUnique()
+                        .HasFilter("[ReplacedById] IS NOT NULL");
 
                     b.HasIndex("ReplacingId")
                         .IsUnique()
@@ -1078,6 +1085,10 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Migrations.ContentMig
                         .HasForeignKey("ReleaseId")
                         .OnDelete(DeleteBehavior.Cascade)
                         .IsRequired();
+
+                    b.HasOne("GovUk.Education.ExploreEducationStatistics.Content.Model.ReleaseFileReference", "ReplacedBy")
+                        .WithOne()
+                        .HasForeignKey("GovUk.Education.ExploreEducationStatistics.Content.Model.ReleaseFileReference", "ReplacedById");
 
                     b.HasOne("GovUk.Education.ExploreEducationStatistics.Content.Model.ReleaseFileReference", "Replacing")
                         .WithOne()
