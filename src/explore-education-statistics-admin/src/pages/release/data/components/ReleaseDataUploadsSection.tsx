@@ -26,6 +26,7 @@ import { mapFieldErrors } from '@common/validation/serverValidations';
 import Yup from '@common/validation/yup';
 import React, { useCallback, useState } from 'react';
 import { generatePath } from 'react-router';
+import orderBy from 'lodash/orderBy';
 
 interface FormValues extends DataFileUploadFormValues {
   subjectTitle: string;
@@ -122,7 +123,7 @@ const ReleaseDataUploadsSection = ({
       }
 
       setDataFiles({
-        value: [...dataFiles, file],
+        value: orderBy([...dataFiles, file], dataFile => dataFile.title),
       });
     },
     [dataFiles, releaseId, setDataFiles],
