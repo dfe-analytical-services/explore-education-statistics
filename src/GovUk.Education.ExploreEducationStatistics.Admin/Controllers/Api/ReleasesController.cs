@@ -112,7 +112,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Controllers.Api
         public async Task<ActionResult<IEnumerable<DataFileInfo>>> GetDataFilesAsync(Guid releaseId)
         {
             return await _releaseFilesService
-                .ListDataFilesAsync(releaseId)
+                .ListDataFiles(releaseId)
                 .HandleFailuresOrOk();
         }
 
@@ -123,7 +123,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Controllers.Api
         public async Task<ActionResult<IEnumerable<FileInfo>>> GetAncillaryFilesAsync(Guid releaseId)
         {
             return await _releaseFilesService
-                .ListFilesAsync(releaseId, ReleaseFileTypes.Ancillary)
+                .ListFiles(releaseId, ReleaseFileTypes.Ancillary)
                 .HandleFailuresOrOk();
         }
 
@@ -137,7 +137,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Controllers.Api
             [FromQuery(Name = "name"), Required] string name, IFormFile file)
         {
             return await _releaseFilesService
-                .UploadFileAsync(releaseId, file, name, ReleaseFileTypes.Ancillary, false)
+                .UploadFile(releaseId, file, name, ReleaseFileTypes.Ancillary, false)
                 .HandleFailuresOrOk();
         }
 
@@ -150,7 +150,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Controllers.Api
         public async Task<ActionResult<FileInfo>> AddChartFileAsync(Guid releaseId, IFormFile file)
         {
             return await _releaseFilesService
-                .UploadChartFileAsync(releaseId, file)
+                .UploadChartFile(releaseId, file)
                 .HandleFailuresOrOk();
         }
 
@@ -163,7 +163,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Controllers.Api
         public async Task<ActionResult<FileInfo>> UpdateChartFileAsync(Guid releaseId, Guid id, IFormFile file)
         {
             return await _releaseFilesService
-                .UploadChartFileAsync(releaseId, file, id)
+                .UploadChartFile(releaseId, file, id)
                 .HandleFailuresOrOk();
         }
 
@@ -179,7 +179,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Controllers.Api
             var user = await _userManager.GetUserAsync(User);
 
             return await _releaseFilesService
-                .UploadDataFilesAsync(releaseId: releaseId,
+                .UploadDataFiles(releaseId: releaseId,
                     dataFile: file,
                     metaFile: metaFile,
                     userName: user.Email,
@@ -194,18 +194,18 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Controllers.Api
         [RequestSizeLimit(int.MaxValue)]
         [RequestFormLimits(ValueLengthLimit = int.MaxValue, MultipartBodyLengthLimit = int.MaxValue)]
         public async Task<ActionResult<DataFileInfo>> AddReplacementDataFilesAsync(Guid releaseId,
-            Guid replacingId,
+            Guid replacingFileId,
             IFormFile file,
             IFormFile metaFile)
         {
             var user = await _userManager.GetUserAsync(User);
 
             return await _releaseFilesService
-                .UploadDataFilesAsync(releaseId: releaseId,
+                .UploadDataFiles(releaseId: releaseId,
                     dataFile: file,
                     metaFile: metaFile,
                     userName: user.Email,
-                    replacingId: replacingId)
+                    replacingFileId: replacingFileId)
                 .HandleFailuresOrOk();
         }
 
@@ -221,7 +221,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Controllers.Api
             var user = await _userManager.GetUserAsync(User);
 
             return await _releaseFilesService
-                .UploadDataFilesAsZipAsync(releaseId: releaseId,
+                .UploadDataFilesAsZip(releaseId: releaseId,
                     zipFile: zipFile,
                     userName: user.Email,
                     subjectName: name)
@@ -235,16 +235,16 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Controllers.Api
         [RequestSizeLimit(int.MaxValue)]
         [RequestFormLimits(ValueLengthLimit = int.MaxValue, MultipartBodyLengthLimit = int.MaxValue)]
         public async Task<ActionResult<DataFileInfo>> AddReplacementDataZipFileAsync(Guid releaseId,
-            Guid replacingId,
+            Guid replacingFileId,
             IFormFile zipFile)
         {
             var user = await _userManager.GetUserAsync(User);
 
             return await _releaseFilesService
-                .UploadDataFilesAsZipAsync(releaseId: releaseId,
+                .UploadDataFilesAsZip(releaseId: releaseId,
                     zipFile: zipFile, 
                     userName: user.Email,
-                    replacingId: replacingId)
+                    replacingFileId: replacingFileId)
                 .HandleFailuresOrOk();
         }
 
@@ -306,12 +306,11 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Controllers.Api
                 .HandleFailuresOrOk();
         }
 
-        [HttpGet("release/{releaseId}/data/{releaseFileReferenceId}/delete-plan")]
-        public async Task<ActionResult<DeleteDataFilePlan>> GetDeleteDataFilePlan(Guid releaseId,
-            Guid releaseFileReferenceId)
+        [HttpGet("release/{releaseId}/data/{fileId}/delete-plan")]
+        public async Task<ActionResult<DeleteDataFilePlan>> GetDeleteDataFilePlan(Guid releaseId, Guid fileId)
         {
             return await _releaseService
-                .GetDeleteDataFilePlan(releaseId, releaseFileReferenceId)
+                .GetDeleteDataFilePlan(releaseId, fileId)
                 .HandleFailuresOrOk();
         }
 
@@ -347,7 +346,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Controllers.Api
             Guid releaseId, string fileName)
         {
             return await _releaseFilesService
-                .DeleteNonDataFileAsync(releaseId, ReleaseFileTypes.Ancillary, fileName)
+                .DeleteNonDataFile(releaseId, ReleaseFileTypes.Ancillary, fileName)
                 .HandleFailuresOrNoContent();
         }
 

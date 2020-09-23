@@ -429,12 +429,11 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Services
             templateRelease.CreateGenericContentFromTemplate(newRelease);
         }
 
-        public async Task<Either<ActionResult, DeleteDataFilePlan>> GetDeleteDataFilePlan(Guid releaseId,
-            Guid releaseFileReferenceId)
+        public async Task<Either<ActionResult, DeleteDataFilePlan>> GetDeleteDataFilePlan(Guid releaseId, Guid fileId)
         {
             return await _persistenceHelper.CheckEntityExists<Release>(releaseId)
                 .OnSuccess(_userService.CheckCanUpdateRelease)
-                .OnSuccess(() => CheckReleaseFileReferenceExists(releaseFileReferenceId))
+                .OnSuccess(() => CheckReleaseFileReferenceExists(fileId))
                 .OnSuccess(async releaseFileReference =>
                 {
                     var subject = releaseFileReference.SubjectId.HasValue
@@ -456,21 +455,21 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Services
                 });
         }
 
-        public async Task<Either<ActionResult, Unit>> RemoveDataFilesAsync(Guid releaseId, Guid releaseFileReferenceId)
+        public async Task<Either<ActionResult, Unit>> RemoveDataFilesAsync(Guid releaseId, Guid fileId)
         {
             return await _persistenceHelper
                 .CheckEntityExists<Release>(releaseId)
                 .OnSuccess(_userService.CheckCanUpdateRelease)
-                .OnSuccess(() => CheckReleaseFileReferenceExists(releaseFileReferenceId))
+                .OnSuccess(() => CheckReleaseFileReferenceExists(fileId))
                 .OnSuccess(releaseFileReference => CheckCanDeleteDataFiles(releaseId, releaseFileReference))
-                .OnSuccess(_ => GetDeleteDataFilePlan(releaseId, releaseFileReferenceId))
+                .OnSuccess(_ => GetDeleteDataFilePlan(releaseId, fileId))
                 .OnSuccess(async deletePlan =>
                 {
                     await _dataBlockService.DeleteDataBlocks(deletePlan.DeleteDataBlockPlan);
                     await _releaseSubjectService.SoftDeleteSubjectOrBreakReleaseLink(releaseId, deletePlan.SubjectId);
 
                     return await _releaseFilesService
-                        .DeleteDataFilesAsync(releaseId, releaseFileReferenceId)
+                        .DeleteDataFiles(releaseId, fileId)
                         .OnSuccess(async () => await RemoveFileImportEntryIfOrphaned(deletePlan));
                 });
         }

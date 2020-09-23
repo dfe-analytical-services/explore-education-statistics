@@ -95,22 +95,22 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Services
                 );
         }
 
-        public Task<Either<ActionResult, DataFileInfo>> UploadDataFilesAsync(Guid releaseId,
+        public Task<Either<ActionResult, DataFileInfo>> UploadDataFiles(Guid releaseId,
             IFormFile dataFile,
             IFormFile metadataFile,
             string userName,
             string subjectName = null,
-            Guid? replacingId = null)
+            Guid? replacingFileId = null)
         {
             return _persistenceHelper
                 .CheckEntityExists<Release>(releaseId)
                 .OnSuccess(_userService.CheckCanUpdateRelease)
                 .OnSuccess(async release =>
                 {
-                    return await _persistenceHelper.CheckOptionalEntityExists<ReleaseFileReference>(replacingId)
-                        .OnSuccess(async replacing =>
+                    return await _persistenceHelper.CheckOptionalEntityExists<ReleaseFileReference>(replacingFileId)
+                        .OnSuccess(async replacingFile =>
                         {
-                            return await ValidateSubjectName(releaseId, subjectName, replacing)
+                            return await ValidateSubjectName(releaseId, subjectName, replacingFile)
                                 .OnSuccess(validSubjectName => _fileUploadsValidatorService
                                     .ValidateDataFilesForUpload(releaseId, dataFile, metadataFile)
                                     // First, create with status uploading to prevent other users uploading the same datafile
@@ -123,7 +123,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Services
                                             filename: dataFile.FileName.ToLower(),
                                             releaseId: releaseId,
                                             type: ReleaseFileTypes.Data,
-                                            replacing: replacing);
+                                            replacingFile: replacingFile);
 
                                         await CreateOrUpdateFileReference(metadataFile.FileName.ToLower(), releaseId,
                                             ReleaseFileTypes.Metadata);
@@ -170,21 +170,21 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Services
                 });
         }
 
-        public Task<Either<ActionResult, DataFileInfo>> UploadDataFilesAsZipAsync(Guid releaseId,
+        public Task<Either<ActionResult, DataFileInfo>> UploadDataFilesAsZip(Guid releaseId,
             IFormFile zipFile,
             string userName,
             string subjectName = null,
-            Guid? replacingId = null)
+            Guid? replacingFileId = null)
         {
             return _persistenceHelper
                 .CheckEntityExists<Release>(releaseId)
                 .OnSuccess(_userService.CheckCanUpdateRelease)
                 .OnSuccess(async release =>
                 {
-                    return await _persistenceHelper.CheckOptionalEntityExists<ReleaseFileReference>(replacingId)
-                        .OnSuccess(async replacing =>
+                    return await _persistenceHelper.CheckOptionalEntityExists<ReleaseFileReference>(replacingFileId)
+                        .OnSuccess(async replacingFile =>
                         {
-                            return await ValidateSubjectName(releaseId, subjectName, replacing)
+                            return await ValidateSubjectName(releaseId, subjectName, replacingFile)
                                 .OnSuccess(validSubjectName => 
                                     _dataArchiveValidationService.ValidateDataArchiveFile(releaseId, zipFile)
                                 .OnSuccess(async dataFiles =>
@@ -206,12 +206,25 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Services
                                         .OnSuccess(async () =>
                                         {
                                             var source = await CreateOrUpdateFileReference(
-                                                zipFile.FileName.ToLower(), releaseId, ReleaseFileTypes.DataZip);
+                                                filename: zipFile.FileName.ToLower(),
+                                                releaseId: releaseId,
+                                                type: ReleaseFileTypes.DataZip);
 
-                                            await CreateOrUpdateFileReference(dataFile.Name.ToLower(), releaseId,
-                                                ReleaseFileTypes.Data, null, source, replacing);
-                                            await CreateOrUpdateFileReference(metadataFile.Name.ToLower(),
-                                                releaseId, ReleaseFileTypes.Metadata, null, source);
+                                            await CreateOrUpdateFileReference(
+                                                filename: dataFile.Name.ToLower(),
+                                                releaseId: releaseId,
+                                                type: ReleaseFileTypes.Data,
+                                                id: null,
+                                                replacingFile: replacingFile,
+                                                source: source);
+
+                                            await CreateOrUpdateFileReference(
+                                                filename: metadataFile.Name.ToLower(),
+                                                releaseId: releaseId,
+                                                type: ReleaseFileTypes.Metadata,
+                                                id: null,
+                                                source: source);
+
                                             await _context.SaveChangesAsync();
 
                                             await UploadFileToStorage(releaseId, zipFile, ReleaseFileTypes.DataZip,
@@ -245,12 +258,12 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Services
                 });
         }
 
-        public Task<Either<ActionResult, Unit>> DeleteDataFilesAsync(Guid releaseId, Guid releaseFileReferenceId)
+        public Task<Either<ActionResult, Unit>> DeleteDataFiles(Guid releaseId, Guid fileId)
         {
             return _persistenceHelper
                 .CheckEntityExists<Release>(releaseId)
                 .OnSuccess(_userService.CheckCanUpdateRelease)
-                .OnSuccess(() => CheckReleaseFileReferenceExists(releaseFileReferenceId))
+                .OnSuccess(() => CheckReleaseFileReferenceExists(fileId))
                 .OnSuccess(async releaseFileReference =>
                 {
                     var metaReleaseFileReference = await GetAssociatedReleaseFileReference(releaseFileReference, ReleaseFileTypes.Metadata);
@@ -292,7 +305,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Services
                 });
         }
 
-        public Task<Either<ActionResult, FileInfo>> UploadFileAsync(Guid releaseId,
+        public Task<Either<ActionResult, FileInfo>> UploadFile(Guid releaseId,
             IFormFile file, string name, ReleaseFileTypes type, bool overwrite)
         {
             return _persistenceHelper
@@ -325,7 +338,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Services
                 });
         }
 
-        public Task<Either<ActionResult, FileInfo>> UploadChartFileAsync(Guid releaseId, IFormFile file, Guid? id = null)
+        public Task<Either<ActionResult, FileInfo>> UploadChartFile(Guid releaseId, IFormFile file, Guid? id = null)
         {
             return _persistenceHelper
                 .CheckEntityExists<Release>(releaseId)
@@ -356,7 +369,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Services
                 });
         }
 
-        public async Task<Either<ActionResult, bool>> DeleteChartFilesAsync(Guid releaseId, IEnumerable<Guid> fileIds)
+        public async Task<Either<ActionResult, bool>> DeleteChartFiles(Guid releaseId, IEnumerable<Guid> fileIds)
         {
             return await _persistenceHelper
                 .CheckEntityExists<Release>(releaseId)
@@ -389,12 +402,12 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Services
                 });
         }
 
-        public async Task<Either<ActionResult, bool>> DeleteChartFileAsync(Guid releaseId, Guid id)
+        public async Task<Either<ActionResult, bool>> DeleteChartFile(Guid releaseId, Guid id)
         {
-            return await DeleteChartFilesAsync(releaseId, new List<Guid>() {id});
+            return await DeleteChartFiles(releaseId, new List<Guid>() {id});
         }
 
-        public async Task<Either<ActionResult, bool>> DeleteNonDataFileAsync(Guid releaseId,
+        public async Task<Either<ActionResult, bool>> DeleteNonDataFile(Guid releaseId,
             ReleaseFileTypes type, string fileName)
         {
             if (type == ReleaseFileTypes.Data || type == ReleaseFileTypes.Metadata)
@@ -426,7 +439,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Services
                 });
         }
 
-        public async Task<Either<ActionResult, IEnumerable<FileInfo>>> ListFilesAsync(Guid releaseId,
+        public async Task<Either<ActionResult, IEnumerable<FileInfo>>> ListFiles(Guid releaseId,
             params ReleaseFileTypes[] types)
         {
             return await _persistenceHelper
@@ -468,7 +481,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Services
                 });
         }
 
-        public async Task<Either<ActionResult, IEnumerable<DataFileInfo>>> ListDataFilesAsync(Guid releaseId)
+        public async Task<Either<ActionResult, IEnumerable<DataFileInfo>>> ListDataFiles(Guid releaseId)
         {
             return await _persistenceHelper
                 .CheckEntityExists<Release>(releaseId)
@@ -509,13 +522,13 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Services
                             switch (file.ReleaseFileType)
                             {
                                 case ReleaseFileTypes.Chart:
-                                    await DeleteChartFileAsync(release.Id, file.Id);
+                                    await DeleteChartFile(release.Id, file.Id);
                                     break;
                                 case ReleaseFileTypes.Data:
-                                    await DeleteDataFilesAsync(release.Id, file.Id);
+                                    await DeleteDataFiles(release.Id, file.Id);
                                     break;
                                 default:
-                                    await DeleteNonDataFileAsync(
+                                    await DeleteNonDataFile(
                                         release.Id,
                                         file.ReleaseFileType,
                                         file.Filename
@@ -579,7 +592,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Services
             Guid releaseId,
             ReleaseFileTypes type,
             Guid? id = null,
-            ReleaseFileReference replacing = null,
+            ReleaseFileReference replacingFile = null,
             ReleaseFileReference source = null)
         {
             ReleaseFileReference releaseFileReference;
@@ -599,16 +612,16 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Services
                 ReleaseId = releaseId,
                 Filename = filename,
                 ReleaseFileType = type,
-                Replacing = replacing,
+                Replacing = replacingFile,
                 Source = source
             };
 
             var entry = await _context.ReleaseFileReferences.AddAsync(releaseFileReference);
 
-            if (replacing != null)
+            if (replacingFile != null)
             {
-                _context.Update(replacing);
-                replacing.ReplacedBy = entry.Entity;
+                _context.Update(replacingFile);
+                replacingFile.ReplacedBy = entry.Entity;
             }
 
             // No ReleaseFileLink required for the zip file source reference
@@ -796,14 +809,14 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Services
         }
 
         private async Task<Either<ActionResult, string>> ValidateSubjectName(Guid releaseId,
-            string subjectName, ReleaseFileReference replacing)
+            string subjectName, ReleaseFileReference replacingFile)
         {
-            if (replacing == null)
+            if (replacingFile == null)
             {
                 return await _fileUploadsValidatorService.ValidateSubjectName(releaseId, subjectName)
                     .OnSuccess(async () => subjectName);
             }
-            return await GetSubjectName(replacing);
+            return await GetSubjectName(replacingFile);
         }
 
         private async Task UploadFileToStorage(

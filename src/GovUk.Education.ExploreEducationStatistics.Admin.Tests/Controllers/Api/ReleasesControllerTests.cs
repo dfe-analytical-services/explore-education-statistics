@@ -60,7 +60,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Controllers.Api
             var ancillaryFile = MockFile("ancillaryFile.doc");
             mocks.FileStorageService
                 .Setup(service =>
-                    service.UploadFileAsync(_releaseId, ancillaryFile, "File name",
+                    service.UploadFile(_releaseId, ancillaryFile, "File name",
                         ReleaseFileTypes.Ancillary, false))
                 .ReturnsAsync(new Either<ActionResult, FileInfo>(testFile));
             var controller = ReleasesControllerWithMocks(mocks);
@@ -91,7 +91,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Controllers.Api
                 }
             };
             var mocks = Mocks();
-            mocks.FileStorageService.Setup(s => s.ListFilesAsync(_releaseId, ReleaseFileTypes.Ancillary))
+            mocks.FileStorageService.Setup(s => s.ListFiles(_releaseId, ReleaseFileTypes.Ancillary))
                 .ReturnsAsync(new Either<ActionResult, IEnumerable<FileInfo>>(testFiles));
             var controller = ReleasesControllerWithMocks(mocks);
 
@@ -114,7 +114,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Controllers.Api
             };
 
             mocks.FileStorageService
-                .Setup(service => service.UploadDataFilesAsync(_releaseId, dataFile, metaFile, ApplicationUser.Email, "Subject name", null))
+                .Setup(service => service.UploadDataFiles(_releaseId, dataFile, metaFile, ApplicationUser.Email, "Subject name", null))
                 .ReturnsAsync(dataFileInfo);
 
             // Call the method under test
@@ -133,7 +133,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Controllers.Api
             var metaFile = MockFile("metafile.csv");
 
             mocks.FileStorageService
-                .Setup(service => service.UploadDataFilesAsync(_releaseId, dataFile, metaFile, ApplicationUser.Email, "Subject name", null))
+                .Setup(service => service.UploadDataFiles(_releaseId, dataFile, metaFile, ApplicationUser.Email, "Subject name", null))
                 .ReturnsAsync(ValidationActionResult(CannotOverwriteFile));
 
             var controller = ReleasesControllerWithMocks(mocks);
@@ -166,7 +166,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Controllers.Api
 
             var mocks = Mocks();
 
-            mocks.FileStorageService.Setup(s => s.ListDataFilesAsync(_releaseId))
+            mocks.FileStorageService.Setup(s => s.ListDataFiles(_releaseId))
                 .ReturnsAsync(new Either<ActionResult, IEnumerable<DataFileInfo>>(testFiles));
             var controller = ReleasesControllerWithMocks(mocks);
 

@@ -30,7 +30,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
         public void UploadFilesAsync()
         {
             AssertSecurityPoliciesChecked(service =>
-                service.UploadFileAsync(
+                service.UploadFile(
                     _release.Id,
                     new Mock<IFormFile>().Object,
                     "",
@@ -44,7 +44,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
         public void DeleteFileAsync()
         {
             AssertSecurityPoliciesChecked(service =>
-                    service.DeleteNonDataFileAsync(
+                    service.DeleteNonDataFile(
                         _release.Id,
                         ReleaseFileTypes.Ancillary,
                         ""
@@ -56,7 +56,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
         public void UploadDataFilesAsync()
         {
             AssertSecurityPoliciesChecked(service =>
-                    service.UploadDataFilesAsync(
+                    service.UploadDataFiles(
                         _release.Id,
                         new Mock<IFormFile>().Object,
                         new Mock<IFormFile>().Object,
@@ -70,7 +70,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
         public void DeleteDataFileAsync()
         {
             AssertSecurityPoliciesChecked(service =>
-                    service.DeleteDataFilesAsync(
+                    service.DeleteDataFiles(
                         _release.Id,
                         Guid.NewGuid()
                         ),
@@ -81,7 +81,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
         public void ListFilesAsync()
         {
             AssertSecurityPoliciesChecked(service =>
-                    service.ListFilesAsync(
+                    service.ListFiles(
                         _release.Id,
                         ReleaseFileTypes.Ancillary
                     ),

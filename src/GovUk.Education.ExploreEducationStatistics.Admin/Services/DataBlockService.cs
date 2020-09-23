@@ -84,7 +84,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Services
         public async Task<Either<ActionResult, bool>> RemoveChartFile(Guid releaseId, Guid id)
         {
             return await RemoveInfographicChartFromDataBlock(releaseId, id)
-                .OnSuccess(async () => await _releaseFilesService.DeleteChartFileAsync(releaseId, id));
+                .OnSuccess(async () => await _releaseFilesService.DeleteChartFile(releaseId, id));
         }
 
         public async Task<DataBlockViewModel> GetAsync(Guid id)
@@ -121,7 +121,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Services
                     if (infographicChart != null && infographicChart.FileId != updatedInfographicChart?.FileId)
                     {
                         var release = GetReleaseForDataBlock(existing.Id);
-                        await _releaseFilesService.DeleteChartFileAsync(
+                        await _releaseFilesService.DeleteChartFile(
                             release.Id,
                             new Guid(infographicChart.FileId)
                         );
@@ -240,7 +240,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Services
             var chartFileIds = deletePlan.DependentDataBlocks.SelectMany(
                 block => block.InfographicFilesInfo.Select((f => f.Id)));
 
-            await _releaseFilesService.DeleteChartFilesAsync(deletePlan.ReleaseId, chartFileIds);
+            await _releaseFilesService.DeleteChartFiles(deletePlan.ReleaseId, chartFileIds);
         }
 
         private async Task DeleteDependentDataBlocks(DeleteDataBlockPlan deletePlan)
