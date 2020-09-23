@@ -77,7 +77,7 @@ const errorMappings = (
           META_FILENAME_CANNOT_CONTAIN_SPACES_OR_SPECIAL_CHARACTERS:
             'ZIP metadata filename cannot contain spaces or special characters',
           META_FILE_IS_INCORRECTLY_NAMED:
-            'ZIP metadata filename must end with .meta',
+            'ZIP metadata filename must end with .meta.csv',
         },
       }),
     ];
