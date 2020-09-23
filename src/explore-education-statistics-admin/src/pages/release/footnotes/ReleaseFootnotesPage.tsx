@@ -1,30 +1,37 @@
 import Link from '@admin/components/Link';
-import FootnotesList from '@admin/pages/release/data/components/footnotes/FootnotesList';
+import generateFootnoteMetaMap, {
+  FootnoteMetaGetters,
+} from '@admin/pages/release/data/utils/generateFootnoteMetaMap';
+import FootnotesList from '@admin/pages/release/footnotes/components/FootnotesList';
 import FootnoteForm, {
   FootnoteFormConfig,
-} from '@admin/pages/release/data/components/footnotes/form/FootnoteForm';
-import { FootnotesData } from '@admin/pages/release/data/ReleaseDataPage';
+} from '@admin/pages/release/footnotes/components/form/FootnoteForm';
+import {
+  releaseDataRoute,
+  ReleaseRouteParams,
+} from '@admin/routes/releaseRoutes';
 import footnotesService, {
   BaseFootnote,
   Footnote,
+  FootnoteMeta,
 } from '@admin/services/footnoteService';
+import permissionService from '@admin/services/permissionService';
 import ModalConfirm from '@common/components/ModalConfirm';
+import useAsyncHandledRetry from '@common/hooks/useAsyncHandledRetry';
 import React, { useState } from 'react';
+import { generatePath, RouteComponentProps } from 'react-router';
 
-interface Props {
-  publicationId: string;
-  releaseId: string;
-  footnotesData?: FootnotesData;
-  onSubmit: (footnotesData: FootnotesData) => void;
-  onDelete: () => void;
+interface FootnotesData {
+  footnoteMeta: FootnoteMeta;
+  footnotes: Footnote[];
+  footnoteMetaGetters: FootnoteMetaGetters;
 }
 
-const ReleaseFootnotesSection = ({
-  footnotesData,
-  onSubmit,
-  onDelete,
-  releaseId,
-}: Props) => {
+const ReleaseFootnotesPage = ({
+  match,
+}: RouteComponentProps<ReleaseRouteParams>) => {
+  const { publicationId, releaseId } = match.params;
+
   const [footnoteForm, _setFootnoteForm] = useState<FootnoteFormConfig>({
     state: 'cancel',
   });
@@ -32,6 +39,28 @@ const ReleaseFootnotesSection = ({
   const [footnoteToBeDeleted, setFootnoteToBeDeleted] = useState<
     Footnote | undefined
   >();
+
+  const { value: canUpdateRelease = false } = useAsyncHandledRetry(
+    () => permissionService.canUpdateRelease(releaseId),
+    [releaseId],
+  );
+
+  const {
+    value: footnotesData,
+    retry: fetchFootnotesData,
+    setState: setFootnotesData,
+  } = useAsyncHandledRetry<FootnotesData>(async () => {
+    const {
+      meta,
+      footnotes: footnotesList,
+    } = await footnotesService.getReleaseFootnoteData(releaseId);
+
+    return {
+      footnoteMeta: meta,
+      footnotes: footnotesList,
+      footnoteMetaGetters: generateFootnoteMetaMap(meta),
+    };
+  }, [releaseId]);
 
   const footnoteFormControls = {
     footnoteForm,
@@ -57,9 +86,11 @@ const ReleaseFootnotesSection = ({
                 ...updatedFootnote,
                 id: footnoteId,
               };
-              onSubmit({
-                ...footnotesData,
-                footnotes: updatedFootnotes,
+              setFootnotesData({
+                value: {
+                  ...footnotesData,
+                  footnotes: updatedFootnotes,
+                },
               });
             }
           });
@@ -67,9 +98,11 @@ const ReleaseFootnotesSection = ({
         footnotesService
           .createFootnote(releaseId, footnote)
           .then((newFootnote: Footnote) => {
-            onSubmit({
-              ...footnotesData,
-              footnotes: [...footnotesData.footnotes, newFootnote],
+            setFootnotesData({
+              value: {
+                ...footnotesData,
+                footnotes: [...footnotesData.footnotes, newFootnote],
+              },
             });
           });
       }
@@ -82,14 +115,13 @@ const ReleaseFootnotesSection = ({
     <>
       <h2>Footnotes</h2>
 
-      <p>
-        {!footnotesData.canUpdateRelease &&
-          'This release has been approved, and can no longer be updated.'}
-      </p>
+      {!canUpdateRelease && (
+        <p>This release has been approved, and can no longer be updated.</p>
+      )}
 
       {footnotesData.footnoteMeta && (
         <>
-          {footnotesData.canUpdateRelease && (
+          {canUpdateRelease && (
             <FootnoteForm
               {...footnoteForm}
               footnote={undefined}
@@ -104,6 +136,7 @@ const ReleaseFootnotesSection = ({
           <>
             <FootnotesList
               {...footnotesData}
+              canUpdateRelease={canUpdateRelease}
               footnoteFormControls={footnoteFormControls}
             />
             {typeof footnoteToBeDeleted !== 'undefined' && (
@@ -118,7 +151,7 @@ const ReleaseFootnotesSection = ({
                       (footnoteToBeDeleted as Footnote).id,
                     )
                     .then(() => setFootnoteToBeDeleted(undefined))
-                    .then(onDelete);
+                    .then(fetchFootnotesData);
                 }}
               >
                 The footnote:
@@ -137,10 +170,18 @@ const ReleaseFootnotesSection = ({
       <p>
         Before footnotes can be created, relevant data files need to be
         uploaded. That can be done in the{' '}
-        <Link to="#data-upload">Data uploads section</Link>.
+        <Link
+          to={generatePath<ReleaseRouteParams>(releaseDataRoute.path, {
+            publicationId,
+            releaseId,
+          })}
+        >
+          Data uploads section
+        </Link>
+        .
       </p>
     </>
   );
 };
 
-export default ReleaseFootnotesSection;
+export default ReleaseFootnotesPage;

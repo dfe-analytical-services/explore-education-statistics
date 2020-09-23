@@ -9,6 +9,7 @@ import {
   releaseContentRoute,
   releaseDataBlocksRoute,
   releaseDataFileRoute,
+  releaseFootnotesRoute,
   releaseDataRoute,
   releasePreReleaseAccessRoute,
   ReleaseRouteParams,
@@ -32,6 +33,7 @@ import { generatePath, Route, RouteComponentProps } from 'react-router';
 const navRoutes = [
   releaseSummaryRoute,
   releaseDataRoute,
+  releaseFootnotesRoute,
   releaseDataBlocksRoute,
   releaseContentRoute,
   releaseStatusRoute,

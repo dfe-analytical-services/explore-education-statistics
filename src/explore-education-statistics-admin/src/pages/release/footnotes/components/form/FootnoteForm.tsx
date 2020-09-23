@@ -1,7 +1,7 @@
-import FieldSubjectCheckbox from '@admin/pages/release/data/components/footnotes/form/FieldSubjectCheckbox';
-import FilterGroupDetails from '@admin/pages/release/data/components/footnotes/form/FilterGroupDetails';
-import styles from '@admin/pages/release/data/components/footnotes/form/FootnoteForm.module.scss';
-import IndicatorDetails from '@admin/pages/release/data/components/footnotes/form/IndicatorDetails';
+import FieldSubjectCheckbox from '@admin/pages/release/footnotes/components/form/FieldSubjectCheckbox';
+import FilterGroupDetails from '@admin/pages/release/footnotes/components/form/FilterGroupDetails';
+import styles from '@admin/pages/release/footnotes/components/form/FootnoteForm.module.scss';
+import IndicatorDetails from '@admin/pages/release/footnotes/components/form/IndicatorDetails';
 import { FootnoteMetaGetters } from '@admin/pages/release/data/utils/generateFootnoteMetaMap';
 import {
   BaseFootnote,

@@ -1,5 +1,5 @@
-import FieldSubjectCheckbox from '@admin/pages/release/data/components/footnotes/form/FieldSubjectCheckbox';
-import styles from '@admin/pages/release/data/components/footnotes/form/FootnoteForm.module.scss';
+import FieldSubjectCheckbox from '@admin/pages/release/footnotes/components/form/FieldSubjectCheckbox';
+import styles from '@admin/pages/release/footnotes/components/form/FootnoteForm.module.scss';
 import {
   BaseFootnote,
   FootnoteSubjectMeta,

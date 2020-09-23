@@ -1,8 +1,8 @@
-import styles from '@admin/pages/release/data/components/footnotes/FootnotesList.module.scss';
-import FootnoteSubjectSelection from '@admin/pages/release/data/components/footnotes/FootnoteSubjectSelection';
+import styles from '@admin/pages/release/footnotes/components/FootnotesList.module.scss';
+import FootnoteSubjectSelection from '@admin/pages/release/footnotes/components/FootnoteSubjectSelection';
 import FootnoteForm, {
   FootnoteFormControls,
-} from '@admin/pages/release/data/components/footnotes/form/FootnoteForm';
+} from '@admin/pages/release/footnotes/components/form/FootnoteForm';
 import { FootnoteMetaGetters } from '@admin/pages/release/data/utils/generateFootnoteMetaMap';
 import { Footnote, FootnoteMeta } from '@admin/services/footnoteService';
 import Button from '@common/components/Button';
