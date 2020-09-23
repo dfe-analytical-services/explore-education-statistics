@@ -179,8 +179,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Controllers.Api
             var user = await _userManager.GetUserAsync(User);
 
             return await _releaseFilesService
-                .UploadDataFilesAsync(
-                    releaseId: releaseId,
+                .UploadDataFilesAsync(releaseId: releaseId,
                     dataFile: file,
                     metaFile: metaFile,
                     userName: user.Email,
@@ -222,7 +221,30 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Controllers.Api
             var user = await _userManager.GetUserAsync(User);
 
             return await _releaseFilesService
-                .UploadDataFilesAsZipAsync(releaseId, zipFile, name, user.Email)
+                .UploadDataFilesAsZipAsync(releaseId: releaseId,
+                    zipFile: zipFile,
+                    userName: user.Email,
+                    subjectName: name)
+                .HandleFailuresOrOk();
+        }
+
+        [HttpPost("release/{releaseId}/zip-data/replacing/{replacingId}")]
+        [Produces("application/json")]
+        [ProducesResponseType(200)]
+        [ProducesResponseType(404)]
+        [RequestSizeLimit(int.MaxValue)]
+        [RequestFormLimits(ValueLengthLimit = int.MaxValue, MultipartBodyLengthLimit = int.MaxValue)]
+        public async Task<ActionResult<DataFileInfo>> AddReplacementDataZipFileAsync(Guid releaseId,
+            Guid replacingId,
+            IFormFile zipFile)
+        {
+            var user = await _userManager.GetUserAsync(User);
+
+            return await _releaseFilesService
+                .UploadDataFilesAsZipAsync(releaseId: releaseId,
+                    zipFile: zipFile, 
+                    userName: user.Email,
+                    replacingId: replacingId)
                 .HandleFailuresOrOk();
         }
 

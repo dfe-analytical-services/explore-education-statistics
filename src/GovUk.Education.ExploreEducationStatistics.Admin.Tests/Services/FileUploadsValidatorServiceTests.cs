@@ -363,7 +363,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
             }
         }
 
-        private (Mock<ISubjectService>, Mock<IFileTypeService>) Mocks()
+        private static (Mock<ISubjectService>, Mock<IFileTypeService>) Mocks()
         {
             return (
                 new Mock<ISubjectService>(),

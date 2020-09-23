@@ -10,24 +10,26 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Services.Interfaces
 {
     public interface IReleaseFilesService
     {
-        Task<Either<ActionResult, DataFileInfo>> UploadDataFilesAsync(Guid releaseId,
-            IFormFile dataFile, IFormFile metaFile, string userName, string subjectName = null, Guid? replacingId = null);
+        Task<Either<ActionResult, DataFileInfo>> UploadDataFilesAsync(Guid releaseId, IFormFile dataFile,
+            IFormFile metaFile, string userName, string subjectName = null, Guid? replacingId = null);
 
-        Task<Either<ActionResult, DataFileInfo>>  UploadDataFilesAsZipAsync(Guid releaseId, IFormFile zipFile, string subjectName, string userEmail);
+        Task<Either<ActionResult, DataFileInfo>> UploadDataFilesAsZipAsync(Guid releaseId, IFormFile zipFile,
+            string userName, string subjectName = null, Guid? replacingId = null);
 
-        Task<Either<ActionResult, IEnumerable<FileInfo>>> ListFilesAsync(Guid releaseId, params ReleaseFileTypes[] types);
+        Task<Either<ActionResult, IEnumerable<FileInfo>>> ListFilesAsync(Guid releaseId,
+            params ReleaseFileTypes[] types);
 
         Task<Either<ActionResult, IEnumerable<DataFileInfo>>> ListDataFilesAsync(Guid releaseId);
 
-        Task<Either<ActionResult, IEnumerable<FileInfo>>> ListPublicFilesPreview(Guid releaseId, IEnumerable<Guid> referencedReleaseVersions);
+        Task<Either<ActionResult, IEnumerable<FileInfo>>> ListPublicFilesPreview(Guid releaseId,
+            IEnumerable<Guid> referencedReleaseVersions);
 
-        Task<Either<ActionResult, FileInfo>> UploadFileAsync(Guid releaseId, IFormFile file,
-            string name, ReleaseFileTypes type, bool overwrite);
+        Task<Either<ActionResult, FileInfo>> UploadFileAsync(Guid releaseId, IFormFile file, string name,
+            ReleaseFileTypes type, bool overwrite);
 
         Task<Either<ActionResult, FileInfo>> UploadChartFileAsync(Guid releaseId, IFormFile file, Guid? id = null);
 
-        Task<Either<ActionResult, bool>> DeleteNonDataFileAsync(Guid releaseId, ReleaseFileTypes type,
-            string fileName);
+        Task<Either<ActionResult, bool>> DeleteNonDataFileAsync(Guid releaseId, ReleaseFileTypes type, string fileName);
 
         Task<Either<ActionResult, bool>> DeleteChartFileAsync(Guid releaseId, Guid id);
 
@@ -37,8 +39,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Services.Interfaces
 
         Task<Either<ActionResult, Unit>> DeleteAllFiles(Guid releaseId);
 
-        Task<Either<ActionResult, FileStreamResult>> StreamFile(Guid releaseId, ReleaseFileTypes type,
-            string fileName);
+        Task<Either<ActionResult, FileStreamResult>> StreamFile(Guid releaseId, ReleaseFileTypes type, string fileName);
 
         Task<Either<ActionResult, FileStreamResult>> StreamFile(Guid releaseId, Guid id);
     }
