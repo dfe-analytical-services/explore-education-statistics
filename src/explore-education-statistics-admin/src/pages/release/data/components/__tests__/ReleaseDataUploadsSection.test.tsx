@@ -24,7 +24,7 @@ const releaseDataFileService = _releaseDataFileService as jest.Mocked<
 describe('ReleaseDataUploadsSection', () => {
   const testDataFiles: DataFile[] = [
     {
-      id: '52d30125-6381-455a-abc6-eab82c943fc9',
+      id: 'data-1',
       title: 'Test data 1',
       userName: 'user1@test.com',
       filename: 'data-1.csv',
@@ -37,7 +37,7 @@ describe('ReleaseDataUploadsSection', () => {
       created: new Date('2020-06-12T12:00:00'),
     },
     {
-      id: '538a6f3f-5d84-449e-ae19-80788768e8d6',
+      id: 'data-2',
       title: 'Test data 2',
       userName: 'user2@test.com',
       filename: 'data-2.csv',
@@ -329,7 +329,7 @@ describe('ReleaseDataUploadsSection', () => {
 
   describe('uploading data file', () => {
     const testUploadedDataFile: DataFile = {
-      id: '4c96b8cf-140b-47cb-9774-83668c432578',
+      id: 'file-1',
       title: 'Test title',
       userName: 'user1@test.com',
       filename: 'test-data.csv',
