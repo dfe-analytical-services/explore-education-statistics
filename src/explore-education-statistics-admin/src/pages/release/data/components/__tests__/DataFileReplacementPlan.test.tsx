@@ -1,12 +1,19 @@
 import DataFileReplacementPlan from '@admin/pages/release/data/components/DataFileReplacementPlan';
+import _dataBlockService from '@admin/services/dataBlockService';
 import _dataReplacementService, {
   DataReplacementPlan,
 } from '@admin/services/dataReplacementService';
 import { render, screen, waitFor, within } from '@testing-library/react';
 import React from 'react';
+import { MemoryRouter } from 'react-router';
+import userEvent from '@testing-library/user-event';
 
+jest.mock('@admin/services/dataBlockService');
 jest.mock('@admin/services/dataReplacementService');
 
+const dataBlockService = _dataBlockService as jest.Mocked<
+  typeof _dataBlockService
+>;
 const dataReplacementService = _dataReplacementService as jest.Mocked<
   typeof _dataReplacementService
 >;
@@ -315,7 +322,14 @@ describe('DataReplacementPlan', () => {
     );
 
     render(
-      <DataFileReplacementPlan fileId="file-1" replacementFileId="file-2" />,
+      <MemoryRouter>
+        <DataFileReplacementPlan
+          publicationId="publication-1"
+          releaseId="release-1"
+          fileId="file-1"
+          replacementFileId="file-2"
+        />
+      </MemoryRouter>,
     );
 
     await waitFor(() => {
@@ -422,6 +436,19 @@ describe('DataReplacementPlan', () => {
       expect(dataBlock1.getByTestId('Indicator group 3')).toHaveTextContent(
         'Indicator 4 not present',
       );
+
+      expect(
+        dataBlock1.getByRole('link', { name: 'Edit data block', hidden: true }),
+      ).toHaveAttribute(
+        'href',
+        '/publication/publication-1/release/release-1/datablocks/block-1',
+      );
+      expect(
+        dataBlock1.getByRole('button', {
+          name: 'Delete data block',
+          hidden: true,
+        }),
+      ).toBeInTheDocument();
 
       const dataBlock2 = within(details[1]);
 
@@ -552,7 +579,14 @@ describe('DataReplacementPlan', () => {
     );
 
     render(
-      <DataFileReplacementPlan fileId="file-1" replacementFileId="file-2" />,
+      <MemoryRouter>
+        <DataFileReplacementPlan
+          publicationId="publication-1"
+          releaseId="release-1"
+          fileId="file-1"
+          replacementFileId="file-2"
+        />
+      </MemoryRouter>,
     );
 
     await waitFor(() => {
@@ -642,6 +676,97 @@ describe('DataReplacementPlan', () => {
 
       expect(
         screen.queryByText('Data replacement in progress'),
+      ).not.toBeInTheDocument();
+    });
+  });
+
+  test("clicking 'Delete data block' button renders confirmation modal", async () => {
+    dataReplacementService.getReplacementPlan.mockResolvedValue(
+      testReplacementPlan,
+    );
+
+    render(
+      <MemoryRouter>
+        <DataFileReplacementPlan
+          publicationId="publication-1"
+          releaseId="release-1"
+          fileId="file-1"
+          replacementFileId="file-2"
+        />
+      </MemoryRouter>,
+    );
+
+    await waitFor(() => {
+      expect(
+        screen.getByRole('button', { name: /Data block 1/ }),
+      ).toBeInTheDocument();
+    });
+
+    userEvent.click(screen.getByRole('button', { name: /Data block 1/ }));
+    userEvent.click(screen.getByRole('button', { name: 'Delete data block' }));
+
+    await waitFor(() => {
+      const modal = screen.getByRole('dialog');
+
+      expect(modal).toBeInTheDocument();
+      expect(modal).toHaveTextContent('Delete data block');
+      expect(modal).toHaveTextContent(
+        "Are you sure you want to delete 'Data block 1'",
+      );
+    });
+  });
+
+  test('deleting data block hides modal and removes data block from list', async () => {
+    dataBlockService.deleteDataBlock.mockResolvedValue(undefined);
+    dataReplacementService.getReplacementPlan.mockResolvedValue(
+      testReplacementPlan,
+    );
+
+    render(
+      <MemoryRouter>
+        <DataFileReplacementPlan
+          publicationId="publication-1"
+          releaseId="release-1"
+          fileId="file-1"
+          replacementFileId="file-2"
+        />
+      </MemoryRouter>,
+    );
+
+    await waitFor(() => {
+      expect(
+        screen.getByRole('button', { name: /Data block 1/ }),
+      ).toBeInTheDocument();
+    });
+
+    userEvent.click(screen.getByRole('button', { name: /Data block 1/ }));
+
+    userEvent.click(screen.getByRole('button', { name: 'Delete data block' }));
+
+    await waitFor(() => {
+      expect(screen.getByRole('dialog')).toBeInTheDocument();
+    });
+
+    expect(dataBlockService.deleteDataBlock).not.toHaveBeenCalled();
+
+    userEvent.click(screen.getByRole('button', { name: 'Confirm' }));
+
+    expect(dataBlockService.deleteDataBlock).toHaveBeenCalledTimes(1);
+
+    await waitFor(() => {
+      expect(screen.queryByRole('dialog')).not.toBeInTheDocument();
+
+      const details = screen.getAllByRole('group');
+
+      expect(details).toHaveLength(3);
+
+      const dataBlock = within(details[0]);
+
+      expect(
+        dataBlock.getByRole('button', { name: /Data block 2/ }),
+      ).toBeInTheDocument();
+      expect(
+        dataBlock.queryByRole('button', { name: /Data block 1/ }),
       ).not.toBeInTheDocument();
     });
   });

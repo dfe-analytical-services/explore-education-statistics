@@ -1,30 +1,53 @@
+import ButtonLink from '@admin/components/ButtonLink';
 import mergeReplacementFootnoteFilters from '@admin/pages/release/data/components/utils/mergeReplacementFootnoteFilters';
-import dataReplacementService from '@admin/services/dataReplacementService';
+import {
+  releaseDataBlocksRoute,
+  ReleaseDataBlocksRouteParams,
+} from '@admin/routes/releaseRoutes';
+import dataBlockService from '@admin/services/dataBlockService';
+import dataReplacementService, {
+  DataBlockReplacementPlan,
+} from '@admin/services/dataReplacementService';
 import Button from '@common/components/Button';
 import ButtonGroup from '@common/components/ButtonGroup';
 import CollapsibleList from '@common/components/CollapsibleList';
 import Details from '@common/components/Details';
 import LoadingSpinner from '@common/components/LoadingSpinner';
+import ModalConfirm from '@common/components/ModalConfirm';
 import SummaryList from '@common/components/SummaryList';
 import SummaryListItem from '@common/components/SummaryListItem';
 import Tag from '@common/components/Tag';
 import VisuallyHidden from '@common/components/VisuallyHidden';
 import WarningMessage from '@common/components/WarningMessage';
 import useAsyncRetry from '@common/hooks/useAsyncRetry';
-import React, { useMemo } from 'react';
+import React, { useMemo, useState } from 'react';
+import { generatePath } from 'react-router';
 
 interface Props {
+  publicationId: string;
+  releaseId: string;
   fileId: string;
   replacementFileId: string;
   onReplacement?: () => void;
 }
 
 const DataFileReplacementPlan = ({
+  publicationId,
+  releaseId,
   fileId,
   replacementFileId,
   onReplacement,
 }: Props) => {
-  const { value: plan, isLoading, error } = useAsyncRetry(
+  const [deleteDataBlock, setDeleteDataBlock] = useState<
+    DataBlockReplacementPlan
+  >();
+
+  const {
+    value: plan,
+    isLoading,
+    error,
+    setState: setPlan,
+  } = useAsyncRetry(
     () => dataReplacementService.getReplacementPlan(fileId, replacementFileId),
     [fileId],
   );
@@ -185,13 +208,28 @@ const DataFileReplacementPlan = ({
                     </SummaryListItem>
                   </SummaryList>
 
-                  {/*
-                  TODO: Add data block buttons (EES-1291)
                   <ButtonGroup>
-                    <Button variant="secondary">Edit data block</Button>
-                    <Button variant="warning">Delete data block</Button>
+                    <ButtonLink
+                      to={generatePath<ReleaseDataBlocksRouteParams>(
+                        releaseDataBlocksRoute.path,
+                        {
+                          publicationId,
+                          releaseId,
+                          dataBlockId: dataBlock.id,
+                        },
+                      )}
+                    >
+                      Edit data block
+                    </ButtonLink>
+                    <Button
+                      variant="warning"
+                      onClick={() => {
+                        setDeleteDataBlock(dataBlock);
+                      }}
+                    >
+                      Delete data block
+                    </Button>
                   </ButtonGroup>
-                  */}
                 </>
               )}
             </Details>
@@ -327,6 +365,37 @@ const DataFileReplacementPlan = ({
               </Button>
             </ButtonGroup>
           )}
+
+          <ModalConfirm
+            title="Delete data block"
+            mounted={!!deleteDataBlock}
+            onExit={() => setDeleteDataBlock(undefined)}
+            onConfirm={async () => {
+              if (!deleteDataBlock) {
+                return;
+              }
+
+              await dataBlockService.deleteDataBlock(
+                releaseId,
+                deleteDataBlock.id,
+              );
+
+              setDeleteDataBlock(undefined);
+              setPlan({
+                value: {
+                  ...plan,
+                  dataBlocks: plan?.dataBlocks.filter(
+                    block => block.id !== deleteDataBlock.id,
+                  ),
+                },
+              });
+            }}
+          >
+            <p>
+              Are you sure you want to delete{' '}
+              <strong>'{deleteDataBlock?.name}'</strong>?
+            </p>
+          </ModalConfirm>
         </>
       )}
     </LoadingSpinner>
