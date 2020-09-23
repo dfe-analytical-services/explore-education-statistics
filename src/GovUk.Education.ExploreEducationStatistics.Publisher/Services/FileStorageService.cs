@@ -71,10 +71,16 @@ namespace GovUk.Education.ExploreEducationStatistics.Publisher.Services
             var blobContainer = client.GetBlobContainerClient(PublisherLeasesContainerName);
             await blobContainer.CreateIfNotExistsAsync();
 
-            await using var stream = new MemoryStream(Encoding.UTF8.GetBytes(string.Empty));
-            await blobContainer.UploadBlobAsync(blobName, stream);
+            var blob = blobContainer.GetBlobClient(blobName);
+            var blobExists = await blob.ExistsAsync();
 
-            var leaseClient = blobContainer.GetBlobClient(blobName).GetBlobLeaseClient();
+            if (!blobExists)
+            {
+                await using var stream = new MemoryStream(Encoding.UTF8.GetBytes(string.Empty));
+                await blobContainer.UploadBlobAsync(blobName, stream);
+            }
+
+            var leaseClient = blob.GetBlobLeaseClient();
             await leaseClient.AcquireAsync(TimeSpan.FromSeconds(30));
 
             return new BlobLease(leaseClient);
