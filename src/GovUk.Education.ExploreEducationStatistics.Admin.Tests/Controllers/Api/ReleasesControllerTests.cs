@@ -114,12 +114,21 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Controllers.Api
             };
 
             mocks.FileStorageService
-                .Setup(service => service.UploadDataFiles(_releaseId, dataFile, metaFile, ApplicationUser.Email, "Subject name", null))
+                .Setup(service => service.UploadDataFiles(_releaseId,
+                    dataFile,
+                    metaFile,
+                    ApplicationUser.Email, 
+                    null,
+                    "Subject name"))
                 .ReturnsAsync(dataFileInfo);
 
             // Call the method under test
             var controller = ReleasesControllerWithMocks(mocks);
-            var result = await controller.AddDataFilesAsync(_releaseId, "Subject name", dataFile, metaFile);
+            var result = await controller.AddDataFilesAsync(releaseId: _releaseId,
+                replacingFileId: null,
+                subjectName: "Subject name",
+                file: dataFile,
+                metaFile: metaFile);
             var dataFileInfoResult = AssertOkResult(result);
             Assert.Equal("Subject name", dataFileInfoResult.Name);
             Assert.Equal("datafile.csv", dataFileInfoResult.Path);
@@ -133,13 +142,22 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Controllers.Api
             var metaFile = MockFile("metafile.csv");
 
             mocks.FileStorageService
-                .Setup(service => service.UploadDataFiles(_releaseId, dataFile, metaFile, ApplicationUser.Email, "Subject name", null))
+                .Setup(service => service.UploadDataFiles(_releaseId,
+                    dataFile,
+                    metaFile,
+                    ApplicationUser.Email,
+                    null,
+                    "Subject name"))
                 .ReturnsAsync(ValidationActionResult(CannotOverwriteFile));
 
             var controller = ReleasesControllerWithMocks(mocks);
 
             // Call the method under test
-            var result = await controller.AddDataFilesAsync(_releaseId, "Subject name", dataFile, metaFile);
+            var result = await controller.AddDataFilesAsync(releaseId: _releaseId,
+                replacingFileId: null,
+                subjectName: "Subject name",
+                file: dataFile,
+                metaFile: metaFile);
             AssertValidationProblem(result, CannotOverwriteFile);
         }
 

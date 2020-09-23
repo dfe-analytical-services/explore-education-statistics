@@ -67,6 +67,7 @@ Return to Admin Dashboard
 Create another release for the same publication
     [Tags]  HappyPath
     user selects theme "Test theme" and topic "${TOPIC_NAME}" from the admin dashboard
+    user waits until page contains link    Create new publication
     user opens accordion section   ${PUBLICATION_NAME}
     user clicks testid element   Create new release link for ${PUBLICATION_NAME}
     user creates release for publication  ${PUBLICATION_NAME}  Financial Year  3001

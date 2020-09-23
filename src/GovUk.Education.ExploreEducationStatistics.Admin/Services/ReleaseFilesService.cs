@@ -99,8 +99,8 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Services
             IFormFile dataFile,
             IFormFile metadataFile,
             string userName,
-            string subjectName = null,
-            Guid? replacingFileId = null)
+            Guid? replacingFileId = null,
+            string subjectName = null)
         {
             return _persistenceHelper
                 .CheckEntityExists<Release>(releaseId)
@@ -173,8 +173,8 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Services
         public Task<Either<ActionResult, DataFileInfo>> UploadDataFilesAsZip(Guid releaseId,
             IFormFile zipFile,
             string userName,
-            string subjectName = null,
-            Guid? replacingFileId = null)
+            Guid? replacingFileId = null,
+            string subjectName = null)
         {
             return _persistenceHelper
                 .CheckEntityExists<Release>(releaseId)

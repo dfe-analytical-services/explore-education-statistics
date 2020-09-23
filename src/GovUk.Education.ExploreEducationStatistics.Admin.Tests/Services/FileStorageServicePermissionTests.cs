@@ -57,12 +57,11 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
         {
             AssertSecurityPoliciesChecked(service =>
                     service.UploadDataFiles(
-                        _release.Id,
-                        new Mock<IFormFile>().Object,
-                        new Mock<IFormFile>().Object,
-                        "",
-                        ""
-                        ),
+                        releaseId: _release.Id,
+                        dataFile: new Mock<IFormFile>().Object,
+                        metadataFile: new Mock<IFormFile>().Object,
+                        userName: "",
+                        subjectName: ""),
                 CanUpdateSpecificRelease);
         }
 

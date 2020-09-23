@@ -11,10 +11,10 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Services.Interfaces
     public interface IReleaseFilesService
     {
         Task<Either<ActionResult, DataFileInfo>> UploadDataFiles(Guid releaseId, IFormFile dataFile,
-            IFormFile metaFile, string userName, string subjectName = null, Guid? replacingFileId = null);
+            IFormFile metaFile, string userName, Guid? replacingFileId = null, string subjectName = null);
 
         Task<Either<ActionResult, DataFileInfo>> UploadDataFilesAsZip(Guid releaseId, IFormFile zipFile,
-            string userName, string subjectName = null, Guid? replacingFileId = null);
+            string userName, Guid? replacingFileId = null, string subjectName = null);
 
         Task<Either<ActionResult, IEnumerable<FileInfo>>> ListFiles(Guid releaseId,
             params ReleaseFileTypes[] types);

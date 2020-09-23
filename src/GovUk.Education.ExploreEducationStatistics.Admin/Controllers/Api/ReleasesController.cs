@@ -174,27 +174,8 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Controllers.Api
         [RequestSizeLimit(int.MaxValue)]
         [RequestFormLimits(ValueLengthLimit = int.MaxValue, MultipartBodyLengthLimit = int.MaxValue)]
         public async Task<ActionResult<DataFileInfo>> AddDataFilesAsync(Guid releaseId,
-            [FromQuery(Name = "name"), Required] string subjectName, IFormFile file, IFormFile metaFile)
-        {
-            var user = await _userManager.GetUserAsync(User);
-
-            return await _releaseFilesService
-                .UploadDataFiles(releaseId: releaseId,
-                    dataFile: file,
-                    metaFile: metaFile,
-                    userName: user.Email,
-                    subjectName: subjectName)
-                .HandleFailuresOrOk();
-        }
-
-        [HttpPost("release/{releaseId}/data/replacing/{replacingId}")]
-        [Produces("application/json")]
-        [ProducesResponseType(200)]
-        [ProducesResponseType(404)]
-        [RequestSizeLimit(int.MaxValue)]
-        [RequestFormLimits(ValueLengthLimit = int.MaxValue, MultipartBodyLengthLimit = int.MaxValue)]
-        public async Task<ActionResult<DataFileInfo>> AddReplacementDataFilesAsync(Guid releaseId,
-            Guid replacingFileId,
+            [FromQuery(Name = "replacingFileId")] Guid? replacingFileId,
+            [FromQuery(Name = "name")] string subjectName,
             IFormFile file,
             IFormFile metaFile)
         {
@@ -205,7 +186,8 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Controllers.Api
                     dataFile: file,
                     metaFile: metaFile,
                     userName: user.Email,
-                    replacingFileId: replacingFileId)
+                    replacingFileId: replacingFileId,
+                    subjectName: subjectName)
                 .HandleFailuresOrOk();
         }
 
@@ -216,7 +198,9 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Controllers.Api
         [RequestSizeLimit(int.MaxValue)]
         [RequestFormLimits(ValueLengthLimit = int.MaxValue, MultipartBodyLengthLimit = int.MaxValue)]
         public async Task<ActionResult<DataFileInfo>> AddDataZipFileAsync(Guid releaseId,
-            [FromQuery(Name = "name"), Required] string name, IFormFile zipFile)
+            [FromQuery(Name = "replacingFileId")] Guid? replacingFileId,
+            [FromQuery(Name = "name")] string subjectName,
+            IFormFile zipFile)
         {
             var user = await _userManager.GetUserAsync(User);
 
@@ -224,27 +208,8 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Controllers.Api
                 .UploadDataFilesAsZip(releaseId: releaseId,
                     zipFile: zipFile,
                     userName: user.Email,
-                    subjectName: name)
-                .HandleFailuresOrOk();
-        }
-
-        [HttpPost("release/{releaseId}/zip-data/replacing/{replacingId}")]
-        [Produces("application/json")]
-        [ProducesResponseType(200)]
-        [ProducesResponseType(404)]
-        [RequestSizeLimit(int.MaxValue)]
-        [RequestFormLimits(ValueLengthLimit = int.MaxValue, MultipartBodyLengthLimit = int.MaxValue)]
-        public async Task<ActionResult<DataFileInfo>> AddReplacementDataZipFileAsync(Guid releaseId,
-            Guid replacingFileId,
-            IFormFile zipFile)
-        {
-            var user = await _userManager.GetUserAsync(User);
-
-            return await _releaseFilesService
-                .UploadDataFilesAsZip(releaseId: releaseId,
-                    zipFile: zipFile, 
-                    userName: user.Email,
-                    replacingFileId: replacingFileId)
+                    replacingFileId: replacingFileId,
+                    subjectName: subjectName)
                 .HandleFailuresOrOk();
         }
 
@@ -332,12 +297,12 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Controllers.Api
                 .HandleFailuresOrOk();
         }
 
-        [HttpDelete("release/{releaseId}/data/{releaseFileReferenceId}")]
+        [HttpDelete("release/{releaseId}/data/{fileId}")]
         public async Task<ActionResult> DeleteDataFiles(Guid releaseId,
-            Guid releaseFileReferenceId)
+            Guid fileId)
         {
             return await _releaseService
-                .RemoveDataFilesAsync(releaseId, releaseFileReferenceId)
+                .RemoveDataFilesAsync(releaseId, fileId)
                 .HandleFailuresOrNoContent();
         }
 
