@@ -16,11 +16,9 @@ describe('PreReleaseUserAccessForm', () => {
   const testUsers: PreReleaseUser[] = [
     {
       email: 'test1@test.com',
-      invited: true,
     },
     {
       email: 'test2@test.com',
-      invited: false,
     },
   ];
 
@@ -35,17 +33,14 @@ describe('PreReleaseUserAccessForm', () => {
 
       const headerCells = within(rows[0]).getAllByRole('columnheader');
       expect(headerCells[0]).toHaveTextContent('User email');
-      expect(headerCells[1]).toHaveTextContent('Invited?');
 
       const row1Cells = within(rows[1]).getAllByRole('cell');
 
       expect(row1Cells[0]).toHaveTextContent('test1@test.com');
-      expect(row1Cells[1]).toHaveTextContent('Yes');
 
       const row2Cells = within(rows[2]).getAllByRole('cell');
 
       expect(row2Cells[0]).toHaveTextContent('test2@test.com');
-      expect(row2Cells[1]).toHaveTextContent('No');
     });
   });
 
@@ -192,7 +187,6 @@ describe('PreReleaseUserAccessForm', () => {
 
       preReleaseUserService.inviteUser.mockResolvedValue({
         email: 'test3@test.com',
-        invited: true,
       });
 
       userEvent.click(screen.getByRole('button', { name: 'Invite new user' }));
@@ -204,17 +198,14 @@ describe('PreReleaseUserAccessForm', () => {
         const row1Cells = within(rows[1]).getAllByRole('cell');
 
         expect(row1Cells[0]).toHaveTextContent('test1@test.com');
-        expect(row1Cells[1]).toHaveTextContent('Yes');
 
         const row2Cells = within(rows[2]).getAllByRole('cell');
 
         expect(row2Cells[0]).toHaveTextContent('test2@test.com');
-        expect(row2Cells[1]).toHaveTextContent('No');
 
         const row3Cells = within(rows[3]).getAllByRole('cell');
 
         expect(row3Cells[0]).toHaveTextContent('test3@test.com');
-        expect(row3Cells[1]).toHaveTextContent('Yes');
       });
     });
   });
@@ -241,7 +232,6 @@ describe('PreReleaseUserAccessForm', () => {
         const row1Cells = within(rows[1]).getAllByRole('cell');
 
         expect(row1Cells[0]).toHaveTextContent('test1@test.com');
-        expect(row1Cells[1]).toHaveTextContent('Yes');
       });
     });
   });

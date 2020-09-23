@@ -116,7 +116,6 @@ const PreReleaseUserAccessForm = ({
           <thead>
             <tr>
               <th>User email</th>
-              <th>Invited?</th>
               {!isReleaseLive && <th />}
             </tr>
           </thead>
@@ -124,7 +123,6 @@ const PreReleaseUserAccessForm = ({
             {users.map(user => (
               <tr key={user.email}>
                 <td>{user.email}</td>
-                <td>{user.invited ? 'Yes' : 'No'}</td>
 
                 {!isReleaseLive && (
                   <td className="dfe-align--right">

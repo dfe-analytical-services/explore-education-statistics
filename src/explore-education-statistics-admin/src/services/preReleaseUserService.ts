@@ -2,7 +2,6 @@ import client from '@admin/services/utils/service';
 
 export interface PreReleaseUser {
   email: string;
-  invited: boolean;
 }
 
 const preReleaseUserService = {

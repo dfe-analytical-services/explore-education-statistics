@@ -85,16 +85,12 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
 
                 Assert.Equal(4, users.Count);
                 Assert.Equal("existing.1@test.com", users[0].Email);
-                Assert.False(users[0].Invited);
 
                 Assert.Equal("existing.2@test.com", users[1].Email);
-                Assert.False(users[1].Invited);
 
                 Assert.Equal("invited.1@test.com", users[2].Email);
-                Assert.True(users[2].Invited);
 
                 Assert.Equal("invited.2@test.com", users[3].Email);
-                Assert.True(users[3].Invited);
             }
         }
 
@@ -400,7 +396,6 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
                 Assert.True(result.IsRight);
 
                 Assert.Equal("test@test.com", result.Right.Email);
-                Assert.False(result.Right.Invited);
             }
 
             await using (var context = DbUtils.InMemoryApplicationDbContext(contextId))
@@ -500,7 +495,6 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
                 Assert.True(result.IsRight);
 
                 Assert.Equal("test@test.com", result.Right.Email);
-                Assert.True(result.Right.Invited);
             }
 
             await using (var context = DbUtils.InMemoryApplicationDbContext(contextId))
