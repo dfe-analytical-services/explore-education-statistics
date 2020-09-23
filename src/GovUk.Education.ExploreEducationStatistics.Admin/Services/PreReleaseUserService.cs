@@ -72,8 +72,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Services
                             .Select(
                                 email => new PreReleaseUserViewModel
                                 {
-                                    Email = email,
-                                    Invited = false
+                                    Email = email
                                 }
                             )
                             .ToListAsync();
@@ -88,8 +87,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Services
                             .Select(
                                 email => new PreReleaseUserViewModel
                                 {
-                                    Email = email,
-                                    Invited = true
+                                    Email = email
                                 }
                             )
                             .ToListAsync();
@@ -149,8 +147,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Services
 
                         return new PreReleaseUserViewModel
                         {
-                            Email = email,
-                            Invited = existingUser == null
+                            Email = email
                         };
                     }
                 );
@@ -376,7 +373,5 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Services
     public class PreReleaseUserViewModel
     {
         public string Email { get; set; }
-
-        public bool Invited { get; set; }
     }
 }

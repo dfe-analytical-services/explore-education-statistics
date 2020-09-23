@@ -109,15 +109,12 @@ Invite users to prerelease for scheduled release
     user clicks button  Invite new user
 
     user checks table column heading contains  css:table  1  1  User email
-    user checks table column heading contains  css:table  1  2  Invited?
 
     user checks results table cell contains  1  1  simulate-delivered@notifications.service.gov.uk
-    user checks results table cell contains  1  2  Yes
 
     user enters text into element  css:input[name="email"]  analyst1@example.com
     user clicks button  Invite new user
     user checks results table cell contains  2  1  analyst1@example.com
-    user checks results table cell contains  2  2  No
 
 Add public prerelease access list
     [Tags]  HappyPath
