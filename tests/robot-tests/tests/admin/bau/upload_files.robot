@@ -9,7 +9,7 @@ Suite Teardown    user closes the browser
 
 *** Variables ***
 ${TOPIC_NAME}        %{TEST_TOPIC_NAME}
-${PUBLICATION_NAME}  UI tests - ancillary files %{RUN_IDENTIFIER}
+${PUBLICATION_NAME}  UI tests - upload files %{RUN_IDENTIFIER}
 
 *** Test Cases ***
 Create Manage content test publication
@@ -37,8 +37,40 @@ Navigate to Manage data tab
     user clicks link  Manage data
     user waits until h1 is visible  ${PUBLICATION_NAME}
 
-Navigate to File uploads tab
+Upload a ZIP file subject
+    [Documentation]   EES-1397
     [Tags]  HappyPath
+    user enters text into element   id:dataFileUploadForm-subjectTitle    Absence in PRUs
+    user clicks radio    ZIP file
+    user waits until page contains element  id:dataFileUploadForm-zipFile
+    user chooses file   id:dataFileUploadForm-zipFile    ${CURDIR}${/}files${/}upload-zip-test.zip
+    user clicks button   Upload data files
+
+    user waits until h2 is visible   Uploaded data files
+    user waits until page contains accordion section   Absence in PRUs
+    user opens accordion section   Absence in PRUs
+
+    ${section}=  user gets accordion section content element  Absence in PRUs
+    user checks summary list contains  Subject title    Absence in PRUs  ${section}
+    user checks summary list contains  Data file        absence_in_prus.csv  ${section}
+    user checks summary list contains  Metadata file    absence_in_prus.meta.csv  ${section}
+    user checks summary list contains  Status           Complete  ${section}  180
+
+    # EES-1397
+    #user checks summary list contains  Number of rows   613  ${section}
+    #user checks summary list contains  Data file size   141 Kb  ${section}
+
+Check Absence in PRUs subject appears in Manage data blocks tab
+    [Tags]  HappyPath
+    user clicks link   Manage data blocks
+    user waits until h2 is visible   Choose a subject
+
+    user waits until page contains  Absence in PRUs
+
+Navigate to Manage data - File uploads tab
+    [Tags]  HappyPath
+    user clicks link  Manage data
+    user waits until h2 is visible   Add data file to release
     user clicks link  File uploads
     user waits until h2 is visible  Add file to release
     user waits until page contains  No files have been uploaded
@@ -87,4 +119,4 @@ Delete file
 
     user waits until page does not contain accordion section   test 2
     user waits until page contains accordion section  test 1
-    user checks there are x accordion sections  1
+    user checks there are x accordion sections  1   id:file-uploads
