@@ -82,8 +82,18 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Processor.Functions
                         message.NumBatches = result.NumBatches;
 
                         await _batchService.UpdateStoredMessage(message);
-                        await ProcessSubject(message, DbUtils.CreateStatisticsDbContext(), DbUtils.CreateContentDbContext(), subjectData);
-                        await _splitFileService.SplitDataFile(collector, message, subjectData);
+                        
+                        var status = await _batchService.GetStatus(message.Release.Id.ToString(), message.OrigDataFileName);
+
+                        // If already reached Phase 2 then don't re-create the subject or split into batches
+                        if ((int) status < (int) IStatus.RUNNING_PHASE_2)
+                        {
+                            await ProcessSubject(message, DbUtils.CreateStatisticsDbContext(),
+                                DbUtils.CreateContentDbContext(), subjectData);
+                            await _splitFileService.SplitDataFile(collector, message, subjectData);
+                            await _batchService.UpdateStatus(message.Release.Id.ToString(), message.OrigDataFileName,
+                                IStatus.RUNNING_PHASE_2);
+                        }
                     }
                     catch (Exception e)
                     {
@@ -152,14 +162,6 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Processor.Functions
             ContentDbContext contentDbContext,
             SubjectData subjectData)
         {
-            var status = await _batchService.GetStatus(message.Release.Id.ToString(), message.OrigDataFileName);
-
-            // If already reached Phase 2 then don't re-create the subject
-            if ((int)status > (int)IStatus.RUNNING_PHASE_1)
-            {
-                return;
-            }
-
             var subject = _releaseProcessorService.CreateOrUpdateRelease(subjectData, message, statisticsDbContext, contentDbContext);
 
             await using var metaFileStream = await _fileStorageService.StreamBlob(subjectData.MetaBlob);
@@ -186,8 +188,6 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Processor.Functions
             }
 
             await statisticsDbContext.SaveChangesAsync();
-            await _batchService.UpdateStatus(message.Release.Id.ToString(), message.OrigDataFileName,
-                IStatus.RUNNING_PHASE_2);
         }
 
         private static Exception GetInnerException(Exception ex)
