@@ -4,14 +4,16 @@ using GovUk.Education.ExploreEducationStatistics.Data.Model.Database;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Infrastructure;
 using Microsoft.EntityFrameworkCore.Metadata;
+using Microsoft.EntityFrameworkCore.Migrations;
 using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 
 namespace GovUk.Education.ExploreEducationStatistics.Data.Model.Migrations
 {
     [DbContext(typeof(StatisticsDbContext))]
-    partial class StatisticsDbContextModelSnapshot : ModelSnapshot
+    [Migration("20200923154238_EES-1385_Add_FilterId_To_ObservationFilterItem")]
+    partial class EES1385_Add_FilterId_To_ObservationFilterItem
     {
-        protected override void BuildModel(ModelBuilder modelBuilder)
+        protected override void BuildTargetModel(ModelBuilder modelBuilder)
         {
 #pragma warning disable 612, 618
             modelBuilder
