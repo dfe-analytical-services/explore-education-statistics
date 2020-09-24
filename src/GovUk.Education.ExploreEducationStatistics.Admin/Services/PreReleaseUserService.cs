@@ -290,7 +290,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Services
             return await _persistenceHelper
                 .CheckEntityExists<Release>(releaseId)
                 .OnSuccess(_userService.CheckCanAssignPrereleaseContactsToRelease)
-                .OnSuccess(
+                .OnSuccessVoid(
                     async () =>
                     {
                         _context.RemoveRange(

@@ -3,18 +3,31 @@ import React, { ReactNode } from 'react';
 
 interface Props {
   children: ReactNode;
+  colour?:
+    | 'grey'
+    | 'green'
+    | 'turquoise'
+    | 'blue'
+    | 'purple'
+    | 'pink'
+    | 'red'
+    | 'orange'
+    | 'yellow';
   className?: string;
-  strong?: boolean;
   id?: string | undefined;
+  strong?: boolean;
 }
 
 const Tag = ({
   children,
   className,
-  strong = false,
+  colour,
   id = undefined,
+  strong = false,
 }: Props) => {
-  const classes = classNames('govuk-tag', className);
+  const classes = classNames('govuk-tag', className, {
+    [`govuk-tag--${colour}`]: !!colour,
+  });
 
   return strong ? (
     <strong className={classes} id={id}>

@@ -8,6 +8,7 @@ import { getReleaseStatusLabel } from '@admin/pages/release/utils/releaseSummary
 import {
   releaseContentRoute,
   releaseDataBlocksRoute,
+  releaseDataFileRoute,
   releaseDataRoute,
   releasePreReleaseAccessRoute,
   ReleaseRouteParams,
@@ -37,7 +38,7 @@ const navRoutes = [
   releasePreReleaseAccessRoute,
 ];
 
-const routes = [...navRoutes, releaseSummaryEditRoute];
+const routes = [...navRoutes, releaseDataFileRoute, releaseSummaryEditRoute];
 
 interface MatchProps {
   publicationId: string;

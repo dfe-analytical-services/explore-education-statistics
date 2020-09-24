@@ -121,15 +121,14 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Validators
         CannotRemoveDataFilesOnceReleaseApproved,
         AllDatafilesUploadedMustBeComplete,
         FileTypeMustBeData,
-        
+
         // Data zip file
         DataFileMustBeZipFile,
         DataZipFileCanOnlyContainTwoFiles,
         DataZipFileDoesNotContainCsvFiles,
         DataZipFileAlreadyExists,
-        
+
         ReplacementFileTypesMustBeData,
-        ReplacementDataFileMustBeForRelatedRelease,
         ReplacementMustBeValid,
 
         // Meta file

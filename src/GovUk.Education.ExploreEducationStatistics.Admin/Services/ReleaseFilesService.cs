@@ -185,7 +185,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Services
                         .OnSuccess(async replacingFile =>
                         {
                             return await ValidateSubjectName(releaseId, subjectName, replacingFile)
-                                .OnSuccess(validSubjectName => 
+                                .OnSuccess(validSubjectName =>
                                     _dataArchiveValidationService.ValidateDataArchiveFile(releaseId, zipFile)
                                 .OnSuccess(async dataFiles =>
                                 {
@@ -481,6 +481,15 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Services
                 });
         }
 
+        public async Task<Either<ActionResult, DataFileInfo>> GetDataFile(Guid releaseId, Guid fileReferenceId)
+        {
+            return await _persistenceHelper
+                .CheckEntityExists<Release>(releaseId)
+                .OnSuccess(_userService.CheckCanViewRelease)
+                .OnSuccess(async release => await _persistenceHelper.CheckEntityExists<ReleaseFileReference>(fileReferenceId))
+                .OnSuccess(async fileReference => await GetDataFileInfo(releaseId, fileReference));
+        }
+
         public async Task<Either<ActionResult, IEnumerable<DataFileInfo>>> ListDataFiles(Guid releaseId)
         {
             return await _persistenceHelper
@@ -496,7 +505,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Services
                         !file.ReleaseFileReference.ReplacingId.HasValue);
 
                     await filesExcludingReplacements.ForEachAsync(async file =>
-                        fileList.Add(await GetDataFileInfo(releaseId, file)));
+                        fileList.Add(await GetDataFileInfo(releaseId, file.ReleaseFileReference)));
 
                     return fileList
                         .OrderBy(file => file.Name)
@@ -509,7 +518,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Services
             return await _persistenceHelper
                 .CheckEntityExists<Release>(releaseId)
                 .OnSuccess(_userService.CheckCanUpdateRelease)
-                .OnSuccess(
+                .OnSuccessVoid(
                     async release =>
                     {
                         // Exclude metadata as they'll be deleted alongside the data file
@@ -639,17 +648,16 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Services
             return entry.Entity;
         }
 
-        private async Task<DataFileInfo> GetDataFileInfo(Guid releaseId, ReleaseFile fileLink)
+        private async Task<DataFileInfo> GetDataFileInfo(Guid releaseId, ReleaseFileReference dataFileReference)
         {
-            var fileReference = fileLink.ReleaseFileReference;
-            var blobPath = AdminReleasePathWithFileReference(fileReference);
+            var blobPath = AdminReleasePathWithFileReference(dataFileReference);
 
             // Files should exists in storage but if not then allow user to delete
             var blobExists = await _blobStorageService.CheckBlobExists(PrivateFilesContainerName, blobPath);
 
             if (!blobExists)
             {
-                return await GetFallbackDataFileInfo(releaseId, fileLink.ReleaseFileReference);
+                return await GetFallbackDataFileInfo(releaseId, dataFileReference);
             }
 
             var blob = await _blobStorageService.GetBlob(PrivateFilesContainerName, blobPath);
@@ -658,18 +666,18 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Services
             // partially uploaded so make sure meta data exists for it
             if (blob.GetUserName().IsNullOrEmpty())
             {
-                return await GetFallbackDataFileInfo(releaseId, fileLink.ReleaseFileReference);
+                return await GetFallbackDataFileInfo(releaseId, dataFileReference);
             }
 
             return new DataFileInfo
             {
-                Id = fileReference.Id,
+                Id = dataFileReference.Id,
                 Extension = blob.Extension,
                 Name = blob.Name,
                 Path = blob.Path,
                 Size = blob.Size,
                 MetaFileName = blob.GetMetaFileName(),
-                ReplacedBy = fileLink.ReleaseFileReference.ReplacedById,
+                ReplacedBy = dataFileReference.ReplacedById,
                 Rows = blob.GetNumberOfRows(),
                 UserName = blob.GetUserName(),
                 Created = blob.Created
@@ -691,7 +699,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Services
                     return new DataFileInfo
                     {
                         Id = fileReference.Id,
-                        Extension = Path.GetExtension(fileReference.Filename),
+                        Extension = Path.GetExtension(fileReference.Filename)?.TrimStart('.') ?? string.Empty,
                         Name = zipBlob.Name,
                         Path = fileReference.Filename,
                         Size = zipBlob.Size,
@@ -723,8 +731,8 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Services
             return new DataFileInfo
             {
                 Id = fileReference.Id,
-                Extension = Path.GetExtension(fileReference.Filename),
                 Name = await GetSubjectName(fileReference),
+                Extension = Path.GetExtension(fileReference.Filename)?.TrimStart('.') ?? string.Empty,
                 Path = fileReference.Filename,
                 Size = "0.00 B",
                 MetaFileName = fileReference.ReleaseFileType == ReleaseFileTypes.Data

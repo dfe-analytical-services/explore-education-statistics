@@ -117,7 +117,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Controllers.Api
                 .Setup(service => service.UploadDataFiles(_releaseId,
                     dataFile,
                     metaFile,
-                    ApplicationUser.Email, 
+                    ApplicationUser.Email,
                     null,
                     "Subject name"))
                 .ReturnsAsync(dataFileInfo);
@@ -289,14 +289,12 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Controllers.Api
             Mock<IReleaseService> ReleaseService,
             Mock<IReleaseFilesService> FileStorageService,
             Mock<IReleaseStatusService> ReleaseStatusService,
-            Mock<IReplacementService> ReplacementService,
             Mock<UserManager<ApplicationUser>> UserManager,
             Mock<IDataBlockService> DataBlockService) Mocks()
         {
             return (new Mock<IReleaseService>(),
                     new Mock<IReleaseFilesService>(),
                     new Mock<IReleaseStatusService>(),
-                    new Mock<IReplacementService>(),
                     MockUserManager(),
                     new Mock<IDataBlockService>()
                 );
@@ -306,7 +304,6 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Controllers.Api
             Mock<IReleaseService> ReleaseService,
             Mock<IReleaseFilesService> FileStorageService,
             Mock<IReleaseStatusService> ReleaseStatusService,
-            Mock<IReplacementService> ReplacementService,
             Mock<UserManager<ApplicationUser>> UserManager,
             Mock<IDataBlockService> DataBlockService
             ) mocks)
@@ -315,7 +312,6 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Controllers.Api
                 mocks.ReleaseService.Object,
                 mocks.FileStorageService.Object,
                 mocks.ReleaseStatusService.Object,
-                mocks.ReplacementService.Object,
                 mocks.UserManager.Object,
                 mocks.DataBlockService.Object);
         }

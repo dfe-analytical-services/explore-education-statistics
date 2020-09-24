@@ -143,7 +143,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Services
                     )
                 )
                 .OnSuccessDo(_userService.CheckCanManageAllTaxonomy)
-                .OnSuccess(
+                .OnSuccessVoid(
                     async topic =>
                     {
                         // For now we only want to delete test topics as we

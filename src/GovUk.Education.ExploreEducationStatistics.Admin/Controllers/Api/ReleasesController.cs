@@ -25,7 +25,6 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Controllers.Api
         private readonly IReleaseService _releaseService;
         private readonly IReleaseFilesService _releaseFilesService;
         private readonly IReleaseStatusService _releaseStatusService;
-        private readonly IReplacementService _replacementService;
         private readonly UserManager<ApplicationUser> _userManager;
         private readonly IDataBlockService _dataBlockService;
 
@@ -33,7 +32,6 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Controllers.Api
             IReleaseService releaseService,
             IReleaseFilesService releaseFilesService,
             IReleaseStatusService releaseStatusService,
-            IReplacementService replacementService,
             UserManager<ApplicationUser> userManager,
             IDataBlockService dataBlockService
             )
@@ -41,7 +39,6 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Controllers.Api
             _releaseService = releaseService;
             _releaseFilesService = releaseFilesService;
             _releaseStatusService = releaseStatusService;
-            _replacementService = replacementService;
             _userManager = userManager;
             _dataBlockService = dataBlockService;
         }
@@ -102,6 +99,17 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Controllers.Api
         {
             return await _releaseService
                 .CreateReleaseAmendmentAsync(releaseId)
+                .HandleFailuresOrOk();
+        }
+
+        [HttpGet("release/{releaseId}/data/{fileId}")]
+        [Produces("application/json")]
+        [ProducesResponseType(200)]
+        [ProducesResponseType(404)]
+        public async Task<ActionResult<DataFileInfo>> GetDataFile(Guid releaseId, Guid fileId)
+        {
+            return await _releaseFilesService
+                .GetDataFile(releaseId, fileId)
                 .HandleFailuresOrOk();
         }
 
@@ -276,24 +284,6 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Controllers.Api
         {
             return await _releaseService
                 .GetDeleteDataFilePlan(releaseId, fileId)
-                .HandleFailuresOrOk();
-        }
-
-        [HttpPost("release/data/replacement-plan")]
-        public async Task<ActionResult<ReplacementPlanViewModel>> GetReplacementPlan(ReplacementPlanRequest request)
-        {
-            return await _replacementService.GetReplacementPlan(
-                    request.OriginalReleaseFileReferenceId.Value,
-                    request.ReplacementReleaseFileReferenceId.Value)
-                .HandleFailuresOrOk();
-        }
-
-        [HttpPost("release/data/replace")]
-        public async Task<ActionResult<Unit>> Replace(ReplacementPlanRequest request)
-        {
-            return await _replacementService.Replace(
-                    request.OriginalReleaseFileReferenceId.Value,
-                    request.ReplacementReleaseFileReferenceId.Value)
                 .HandleFailuresOrOk();
         }
 

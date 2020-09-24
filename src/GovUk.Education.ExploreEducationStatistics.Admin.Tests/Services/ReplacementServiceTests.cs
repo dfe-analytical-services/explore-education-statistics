@@ -14,6 +14,7 @@ using GovUk.Education.ExploreEducationStatistics.Data.Model.Database;
 using GovUk.Education.ExploreEducationStatistics.Data.Model.Services;
 using GovUk.Education.ExploreEducationStatistics.Data.Model.Services.Interfaces;
 using GovUk.Education.ExploreEducationStatistics.Data.Services.Interfaces;
+using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Logging;
 using Moq;
@@ -258,7 +259,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
                     replacementReleaseFileReference.Id);
 
                 Assert.True(result.IsLeft);
-                AssertValidationProblem(result.Left, ReplacementDataFileMustBeForRelatedRelease);
+                Assert.IsType<NotFoundResult>(result.Left);
             }
         }
 
@@ -533,6 +534,8 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
                 }
             };
 
+            var country = new Country(CountryCodeEngland, "England");
+
             var timePeriod = new TimePeriodQuery
             {
                 StartYear = 2019,
@@ -643,6 +646,13 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
             mocks.LocationService.Setup(service => service.GetObservationalUnits(replacementSubject.Id))
                 .Returns(new Dictionary<GeographicLevel, IEnumerable<IObservationalUnit>>());
 
+            mocks.LocationService
+                .Setup(s => s.GetObservationalUnits(GeographicLevel.Country, new [] { CountryCodeEngland }))
+                .Returns(new List<IObservationalUnit>(new List<IObservationalUnit>
+                {
+                    country
+                }));
+
             mocks.TimePeriodService.Setup(service => service.GetTimePeriods(replacementSubject.Id))
                 .Returns(new List<(int Year, TimeIdentifier TimeIdentifier)>());
 
@@ -690,33 +700,79 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
                 Assert.Equal(dataBlock.Id, dataBlockPlan.Id);
                 Assert.Equal(dataBlock.Name, dataBlockPlan.Name);
 
-                Assert.Single(dataBlockPlan.Indicators);
-                var dataBlockIndicatorPlan = dataBlockPlan.Indicators.First();
+                Assert.Single(dataBlockPlan.IndicatorGroups);
+
+                var dataBlockIndicatorGroupPlan = dataBlockPlan.IndicatorGroups.First();
+
+                Assert.Equal(originalIndicator.IndicatorGroup.Id,  dataBlockIndicatorGroupPlan.Key);
+                Assert.Equal(originalIndicator.IndicatorGroup.Label,  dataBlockIndicatorGroupPlan.Value.Label);
+                Assert.Single(dataBlockIndicatorGroupPlan.Value.Indicators);
+                Assert.False(dataBlockIndicatorGroupPlan.Value.Valid);
+
+                var dataBlockIndicatorPlan = dataBlockIndicatorGroupPlan.Value.Indicators.First();
                 Assert.Equal(originalIndicator.Id, dataBlockIndicatorPlan.Id);
                 Assert.Equal(originalIndicator.Label, dataBlockIndicatorPlan.Label);
                 Assert.Equal(originalIndicator.Name, dataBlockIndicatorPlan.Name);
                 Assert.Null(dataBlockIndicatorPlan.Target);
                 Assert.False(dataBlockIndicatorPlan.Valid);
 
-                Assert.Single(dataBlockPlan.FilterItems);
-                var dataBlockFilterItemPlan = dataBlockPlan.FilterItems.First();
-                Assert.Equal(dataBlockFilterItemPlan.Id, dataBlockFilterItemPlan.Id);
-                Assert.Equal(dataBlockFilterItemPlan.Label, dataBlockFilterItemPlan.Label);
+                Assert.Single(dataBlockPlan.Filters);
+
+                var dataBlockFilterPlan = dataBlockPlan.Filters.First();
+
+                Assert.Equal(originalFilter.Id, dataBlockFilterPlan.Key);
+                Assert.Equal(originalFilter.Id, dataBlockFilterPlan.Value.Id);
+                Assert.Equal(originalFilter.Label, dataBlockFilterPlan.Value.Label);
+                Assert.Equal(originalFilter.Name, dataBlockFilterPlan.Value.Name);
+
+                Assert.Single(dataBlockFilterPlan.Value.Groups);
+
+                var dataBlockFilterGroupPlan = dataBlockFilterPlan.Value.Groups.First();
+
+                Assert.Equal(originalFilterGroup.Id, dataBlockFilterGroupPlan.Key);
+                Assert.Equal(originalFilterGroup.Id, dataBlockFilterGroupPlan.Value.Id);
+                Assert.Equal(originalFilterGroup.Label, dataBlockFilterGroupPlan.Value.Label);
+                Assert.Null(dataBlockFilterGroupPlan.Value.Target);
+                Assert.False(dataBlockFilterGroupPlan.Value.Valid);
+
+                Assert.Single(dataBlockFilterGroupPlan.Value.Filters);
+
+                var dataBlockFilterItemPlan = dataBlockFilterGroupPlan.Value.Filters.First();
+
+                Assert.Equal(originalFilterItem.Id, dataBlockFilterItemPlan.Id);
+                Assert.Equal(originalFilterItem.Label, dataBlockFilterItemPlan.Label);
                 Assert.Null(dataBlockFilterItemPlan.Target);
                 Assert.False(dataBlockFilterItemPlan.Valid);
+
+                Assert.Null(dataBlockFilterPlan.Value.Target);
+                Assert.False(dataBlockFilterPlan.Value.Valid);
 
                 Assert.NotNull(dataBlockPlan.Locations);
                 Assert.Single(dataBlockPlan.Locations);
                 Assert.True(dataBlockPlan.Locations.ContainsKey(GeographicLevel.Country.ToString()));
-                Assert.Empty(dataBlockPlan.Locations[GeographicLevel.Country.ToString()].Matched);
-                Assert.Single(dataBlockPlan.Locations[GeographicLevel.Country.ToString()].Unmatched);
-                Assert.Equal(dataBlock.Query.Locations.Country,
-                    dataBlockPlan.Locations[GeographicLevel.Country.ToString()].Unmatched);
+                Assert.Single(dataBlockPlan.Locations[GeographicLevel.Country.ToString()].ObservationalUnits);
                 Assert.False(dataBlockPlan.Locations[GeographicLevel.Country.ToString()].Valid);
 
+                var dataBlockLocationPlan = dataBlockPlan
+                    .Locations[GeographicLevel.Country.ToString()]
+                    .ObservationalUnits
+                    .First();
+
+                Assert.Equal(country.Code, dataBlockLocationPlan.Code);
+                Assert.Equal(country.Name, dataBlockLocationPlan.Label);
+                Assert.Empty(dataBlockLocationPlan.Target);
+                Assert.False(dataBlockLocationPlan.Valid);
+
                 Assert.NotNull(dataBlockPlan.TimePeriods);
-                Assert.Equal(timePeriod, dataBlockPlan.TimePeriods.Query);
                 Assert.False(dataBlockPlan.TimePeriods.Valid);
+
+                Assert.Equal(timePeriod.StartYear, dataBlockPlan.TimePeriods.Start.Year);
+                Assert.Equal(timePeriod.StartCode, dataBlockPlan.TimePeriods.Start.Code);
+                Assert.False(dataBlockPlan.TimePeriods.Start.Valid);
+
+                Assert.Equal(timePeriod.EndYear, dataBlockPlan.TimePeriods.End.Year);
+                Assert.Equal(timePeriod.EndCode, dataBlockPlan.TimePeriods.End.Code);
+                Assert.False(dataBlockPlan.TimePeriods.End.Valid);
 
                 Assert.False(dataBlockPlan.Valid);
 
@@ -724,16 +780,17 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
 
                 var footnoteForFilterPlan =
                     replacementPlan.Footnotes.Single(plan => plan.Id == footnoteForFilter.Id);
+
                 Assert.Equal(footnoteForFilter.Content, footnoteForFilterPlan.Content);
                 Assert.Single(footnoteForFilterPlan.Filters);
                 Assert.Empty(footnoteForFilterPlan.FilterGroups);
                 Assert.Empty(footnoteForFilterPlan.FilterItems);
-                Assert.Empty(footnoteForFilterPlan.Indicators);
+                Assert.Empty(footnoteForFilterPlan.IndicatorGroups);
 
                 var footnoteForFilterFilterPlan = footnoteForFilterPlan.Filters.First();
+
                 Assert.Equal(originalFilter.Id, footnoteForFilterFilterPlan.Id);
                 Assert.Equal(originalFilter.Label, footnoteForFilterFilterPlan.Label);
-                Assert.Equal(originalFilter.Name, footnoteForFilterFilterPlan.Name);
                 Assert.Null(footnoteForFilterFilterPlan.Target);
                 Assert.False(footnoteForFilterFilterPlan.Valid);
 
@@ -741,15 +798,21 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
 
                 var footnoteForFilterGroupPlan =
                     replacementPlan.Footnotes.Single(plan => plan.Id == footnoteForFilterGroup.Id);
+
+                Assert.False(footnoteForFilterGroupPlan.Valid);
+
                 Assert.Equal(footnoteForFilterGroup.Content, footnoteForFilterGroupPlan.Content);
                 Assert.Empty(footnoteForFilterGroupPlan.Filters);
                 Assert.Single(footnoteForFilterGroupPlan.FilterGroups);
                 Assert.Empty(footnoteForFilterGroupPlan.FilterItems);
-                Assert.Empty(footnoteForFilterGroupPlan.Indicators);
+                Assert.Empty(footnoteForFilterGroupPlan.IndicatorGroups);
 
                 var footnoteForFilterGroupFilterGroupPlan = footnoteForFilterGroupPlan.FilterGroups.First();
+
                 Assert.Equal(originalFilterGroup.Id, footnoteForFilterGroupFilterGroupPlan.Id);
                 Assert.Equal(originalFilterGroup.Label, footnoteForFilterGroupFilterGroupPlan.Label);
+                Assert.Equal(originalFilterGroup.Filter.Id, footnoteForFilterGroupFilterGroupPlan.FilterId);
+                Assert.Equal(originalFilterGroup.Filter.Label, footnoteForFilterGroupFilterGroupPlan.FilterLabel);
                 Assert.Null(footnoteForFilterGroupFilterGroupPlan.Target);
                 Assert.False(footnoteForFilterGroupFilterGroupPlan.Valid);
 
@@ -757,15 +820,21 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
 
                 var footnoteForFilterItemPlan =
                     replacementPlan.Footnotes.Single(plan => plan.Id == footnoteForFilterItem.Id);
+
                 Assert.Equal(footnoteForFilterItem.Content, footnoteForFilterItemPlan.Content);
                 Assert.Empty(footnoteForFilterItemPlan.Filters);
                 Assert.Empty(footnoteForFilterItemPlan.FilterGroups);
                 Assert.Single(footnoteForFilterItemPlan.FilterItems);
-                Assert.Empty(footnoteForFilterItemPlan.Indicators);
+                Assert.Empty(footnoteForFilterItemPlan.IndicatorGroups);
 
                 var footnoteForFilterItemFilterItemPlan = footnoteForFilterItemPlan.FilterItems.First();
+
                 Assert.Equal(originalFilterItem.Id, footnoteForFilterItemFilterItemPlan.Id);
                 Assert.Equal(originalFilterItem.Label, footnoteForFilterItemFilterItemPlan.Label);
+                Assert.Equal(originalFilterItem.FilterGroup.Filter.Id, footnoteForFilterItemFilterItemPlan.FilterId);
+                Assert.Equal(originalFilterItem.FilterGroup.Filter.Label, footnoteForFilterItemFilterItemPlan.FilterLabel);
+                Assert.Equal(originalFilterItem.FilterGroup.Id, footnoteForFilterItemFilterItemPlan.FilterGroupId);
+                Assert.Equal(originalFilterItem.FilterGroup.Label, footnoteForFilterItemFilterItemPlan.FilterGroupLabel);
                 Assert.Null(footnoteForFilterItemFilterItemPlan.Target);
                 Assert.False(footnoteForFilterItemFilterItemPlan.Valid);
 
@@ -773,13 +842,24 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
 
                 var footnoteForIndicatorPlan =
                     replacementPlan.Footnotes.Single(plan => plan.Id == footnoteForIndicator.Id);
+
                 Assert.Equal(footnoteForIndicator.Content, footnoteForIndicatorPlan.Content);
                 Assert.Empty(footnoteForIndicatorPlan.Filters);
                 Assert.Empty(footnoteForIndicatorPlan.FilterGroups);
                 Assert.Empty(footnoteForIndicatorPlan.FilterItems);
-                Assert.Single(footnoteForIndicatorPlan.Indicators);
+                Assert.Single(footnoteForIndicatorPlan.IndicatorGroups);
 
-                var footnoteForIndicatorIndicatorPlan = footnoteForIndicatorPlan.Indicators.First();
+                var footnoteForIndicatorIndicatorGroupPlan = footnoteForIndicatorPlan.IndicatorGroups.First();
+
+
+                Assert.Equal(originalIndicator.IndicatorGroup.Id,  footnoteForIndicatorIndicatorGroupPlan.Key);
+                Assert.Equal(originalIndicator.IndicatorGroup.Label, footnoteForIndicatorIndicatorGroupPlan.Value.Label);
+                Assert.Single(footnoteForIndicatorIndicatorGroupPlan.Value.Indicators);
+                Assert.False(footnoteForIndicatorIndicatorGroupPlan.Value.Valid);
+
+                var footnoteForIndicatorIndicatorPlan =
+                    footnoteForIndicatorIndicatorGroupPlan.Value.Indicators.First();
+
                 Assert.Equal(originalIndicator.Id, footnoteForIndicatorIndicatorPlan.Id);
                 Assert.Equal(originalIndicator.Label, footnoteForIndicatorIndicatorPlan.Label);
                 Assert.Equal(originalIndicator.Name, footnoteForIndicatorIndicatorPlan.Name);
@@ -790,11 +870,12 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
 
                 var footnoteForSubjectPlan =
                     replacementPlan.Footnotes.Single(plan => plan.Id == footnoteForSubject.Id);
+
                 Assert.Equal(footnoteForSubject.Content, footnoteForSubjectPlan.Content);
                 Assert.Empty(footnoteForSubjectPlan.Filters);
                 Assert.Empty(footnoteForSubjectPlan.FilterGroups);
                 Assert.Empty(footnoteForSubjectPlan.FilterItems);
-                Assert.Empty(footnoteForSubjectPlan.Indicators);
+                Assert.Empty(footnoteForSubjectPlan.IndicatorGroups);
 
                 Assert.True(footnoteForSubjectPlan.Valid);
 
@@ -1017,6 +1098,8 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
                 EndCode = CalendarYear
             };
 
+            var country = new Country(CountryCodeEngland, "England");
+
             var table = new TableBuilderConfiguration
             {
                 TableHeaders = new TableHeaders
@@ -1123,9 +1206,16 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
                         GeographicLevel.Country,
                         new List<Country>
                         {
-                            new Country(CountryCodeEngland, "England")
+                            country,
                         }
                     }
+                });
+
+            mocks.LocationService
+                .Setup(service => service.GetObservationalUnits(GeographicLevel.Country, new []{ CountryCodeEngland }))
+                .Returns(new List<IObservationalUnit>
+                {
+                    country
                 });
 
             mocks.TimePeriodService.Setup(service => service.GetTimePeriods(replacementSubject.Id))
@@ -1180,33 +1270,79 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
                 Assert.Equal(dataBlock.Id, dataBlockPlan.Id);
                 Assert.Equal(dataBlock.Name, dataBlockPlan.Name);
 
-                Assert.Single(dataBlockPlan.Indicators);
-                var dataBlockIndicatorPlan = dataBlockPlan.Indicators.First();
+                Assert.Single(dataBlockPlan.IndicatorGroups);
+
+                var dataBlockIndicatorGroupPlan = dataBlockPlan.IndicatorGroups.First();
+
+                Assert.Equal(originalIndicator.IndicatorGroup.Id,  dataBlockIndicatorGroupPlan.Key);
+                Assert.Equal(originalIndicator.IndicatorGroup.Label, dataBlockIndicatorGroupPlan.Value.Label);
+                Assert.Single(dataBlockIndicatorGroupPlan.Value.Indicators);
+                Assert.True(dataBlockIndicatorGroupPlan.Value.Valid);
+
+                var dataBlockIndicatorPlan = dataBlockIndicatorGroupPlan.Value.Indicators.First();
+
                 Assert.Equal(originalIndicator.Id, dataBlockIndicatorPlan.Id);
                 Assert.Equal(originalIndicator.Label, dataBlockIndicatorPlan.Label);
                 Assert.Equal(originalIndicator.Name, dataBlockIndicatorPlan.Name);
                 Assert.Equal(replacementIndicator.Id, dataBlockIndicatorPlan.Target);
                 Assert.True(dataBlockIndicatorPlan.Valid);
 
-                Assert.Single(dataBlockPlan.FilterItems);
-                var dataBlockFilterItemPlan = dataBlockPlan.FilterItems.First();
-                Assert.Equal(dataBlockFilterItemPlan.Id, dataBlockFilterItemPlan.Id);
-                Assert.Equal(dataBlockFilterItemPlan.Label, dataBlockFilterItemPlan.Label);
-                Assert.Equal(replacementFilterItem1.Id, dataBlockFilterItemPlan.Target);
+                Assert.Single(dataBlockPlan.Filters);
+
+                var dataBlockFilterPlan = dataBlockPlan.Filters.First();
+
+                Assert.Equal(originalFilter1.Id, dataBlockFilterPlan.Key);
+                Assert.Equal(originalFilter1.Id, dataBlockFilterPlan.Value.Id);
+                Assert.Equal(originalFilter1.Label, dataBlockFilterPlan.Value.Label);
+                Assert.Equal(originalFilter1.Name, dataBlockFilterPlan.Value.Name);
+                Assert.Equal(replacementFilter1.Id, dataBlockFilterPlan.Value.Target);
+                Assert.True(dataBlockFilterPlan.Value.Valid);
+
+                Assert.Single(dataBlockFilterPlan.Value.Groups);
+
+                var dataBlockFilterGroupPlan = dataBlockFilterPlan.Value.Groups.First();
+
+                Assert.Equal(originalFilterGroup1.Id, dataBlockFilterGroupPlan.Key);
+                Assert.Equal(originalFilterGroup1.Id, dataBlockFilterGroupPlan.Value.Id);
+                Assert.Equal(originalFilterGroup1.Label, dataBlockFilterGroupPlan.Value.Label);
+                Assert.Equal(replacementFilterGroup1.Id, dataBlockFilterGroupPlan.Value.Target);
+                Assert.True(dataBlockFilterGroupPlan.Value.Valid);
+
+                Assert.Single(dataBlockFilterGroupPlan.Value.Filters);
+
+                var dataBlockFilterItemPlan = dataBlockFilterGroupPlan.Value.Filters.First();
+
                 Assert.True(dataBlockFilterItemPlan.Valid);
+                Assert.Equal(originalFilterItem1.Id, dataBlockFilterItemPlan.Id);
+                Assert.Equal(originalFilterItem1.Label, dataBlockFilterItemPlan.Label);
+                Assert.Equal(replacementFilterItem1.Id, dataBlockFilterItemPlan.Target);
 
                 Assert.NotNull(dataBlockPlan.Locations);
                 Assert.Single(dataBlockPlan.Locations);
                 Assert.True(dataBlockPlan.Locations.ContainsKey(GeographicLevel.Country.ToString()));
-                Assert.Single(dataBlockPlan.Locations[GeographicLevel.Country.ToString()].Matched);
-                Assert.Equal(dataBlock.Query.Locations.Country,
-                    dataBlockPlan.Locations[GeographicLevel.Country.ToString()].Matched);
-                Assert.Empty(dataBlockPlan.Locations[GeographicLevel.Country.ToString()].Unmatched);
+                Assert.Single(dataBlockPlan.Locations[GeographicLevel.Country.ToString()].ObservationalUnits);
                 Assert.True(dataBlockPlan.Locations[GeographicLevel.Country.ToString()].Valid);
 
+                var dataBlockLocationPlan = dataBlockPlan
+                    .Locations[GeographicLevel.Country.ToString()]
+                    .ObservationalUnits
+                    .First();
+
+                Assert.Equal(country.Code, dataBlockLocationPlan.Code);
+                Assert.Equal(country.Name, dataBlockLocationPlan.Label);
+                Assert.Equal(country.Code,dataBlockLocationPlan.Target);
+                Assert.True(dataBlockLocationPlan.Valid);
+
                 Assert.NotNull(dataBlockPlan.TimePeriods);
-                Assert.Equal(timePeriod, dataBlockPlan.TimePeriods.Query);
-                Assert.True(dataBlockPlan.TimePeriods.Valid);
+                Assert.True(dataBlockPlan.TimePeriods?.Valid);
+
+                Assert.Equal(timePeriod.StartYear, dataBlockPlan.TimePeriods?.Start.Year);
+                Assert.Equal(timePeriod.StartCode, dataBlockPlan.TimePeriods?.Start.Code);
+                Assert.True(dataBlockPlan.TimePeriods?.Start.Valid);
+
+                Assert.Equal(timePeriod.EndYear, dataBlockPlan.TimePeriods?.End.Year);
+                Assert.Equal(timePeriod.EndCode, dataBlockPlan.TimePeriods?.End.Code);
+                Assert.True(dataBlockPlan.TimePeriods?.End.Valid);
 
                 Assert.True(dataBlockPlan.Valid);
 
@@ -1214,16 +1350,17 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
 
                 var footnoteForFilterPlan =
                     replacementPlan.Footnotes.Single(plan => plan.Id == footnoteForFilter.Id);
+
                 Assert.Equal(footnoteForFilter.Content, footnoteForFilterPlan.Content);
                 Assert.Single(footnoteForFilterPlan.Filters);
                 Assert.Empty(footnoteForFilterPlan.FilterGroups);
                 Assert.Empty(footnoteForFilterPlan.FilterItems);
-                Assert.Empty(footnoteForFilterPlan.Indicators);
+                Assert.Empty(footnoteForFilterPlan.IndicatorGroups);
 
                 var footnoteForFilterFilterPlan = footnoteForFilterPlan.Filters.First();
+
                 Assert.Equal(originalFilter1.Id, footnoteForFilterFilterPlan.Id);
                 Assert.Equal(originalFilter1.Label, footnoteForFilterFilterPlan.Label);
-                Assert.Equal(originalFilter1.Name, footnoteForFilterFilterPlan.Name);
                 Assert.Equal(replacementFilter1.Id, footnoteForFilterFilterPlan.Target);
                 Assert.True(footnoteForFilterFilterPlan.Valid);
 
@@ -1231,15 +1368,19 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
 
                 var footnoteForFilterGroupPlan =
                     replacementPlan.Footnotes.Single(plan => plan.Id == footnoteForFilterGroup.Id);
+
                 Assert.Equal(footnoteForFilterGroup.Content, footnoteForFilterGroupPlan.Content);
                 Assert.Empty(footnoteForFilterGroupPlan.Filters);
                 Assert.Single(footnoteForFilterGroupPlan.FilterGroups);
                 Assert.Empty(footnoteForFilterGroupPlan.FilterItems);
-                Assert.Empty(footnoteForFilterGroupPlan.Indicators);
+                Assert.Empty(footnoteForFilterGroupPlan.IndicatorGroups);
 
                 var footnoteForFilterGroupFilterGroupPlan = footnoteForFilterGroupPlan.FilterGroups.First();
+
                 Assert.Equal(originalFilterGroup1.Id, footnoteForFilterGroupFilterGroupPlan.Id);
                 Assert.Equal(originalFilterGroup1.Label, footnoteForFilterGroupFilterGroupPlan.Label);
+                Assert.Equal(originalFilterGroup1.Filter.Id, footnoteForFilterGroupFilterGroupPlan.FilterId);
+                Assert.Equal(originalFilterGroup1.Filter.Label, footnoteForFilterGroupFilterGroupPlan.FilterLabel);
                 Assert.Equal(replacementFilterGroup1.Id, footnoteForFilterGroupFilterGroupPlan.Target);
                 Assert.True(footnoteForFilterGroupFilterGroupPlan.Valid);
 
@@ -1247,15 +1388,21 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
 
                 var footnoteForFilterItemPlan =
                     replacementPlan.Footnotes.Single(plan => plan.Id == footnoteForFilterItem.Id);
+
                 Assert.Equal(footnoteForFilterItem.Content, footnoteForFilterItemPlan.Content);
                 Assert.Empty(footnoteForFilterItemPlan.Filters);
                 Assert.Empty(footnoteForFilterItemPlan.FilterGroups);
                 Assert.Single(footnoteForFilterItemPlan.FilterItems);
-                Assert.Empty(footnoteForFilterItemPlan.Indicators);
+                Assert.Empty(footnoteForFilterItemPlan.IndicatorGroups);
 
                 var footnoteForFilterItemFilterItemPlan = footnoteForFilterItemPlan.FilterItems.First();
+
                 Assert.Equal(originalFilterItem1.Id, footnoteForFilterItemFilterItemPlan.Id);
                 Assert.Equal(originalFilterItem1.Label, footnoteForFilterItemFilterItemPlan.Label);
+                Assert.Equal(originalFilterItem1.FilterGroup.Filter.Id, footnoteForFilterItemFilterItemPlan.FilterId);
+                Assert.Equal(originalFilterItem1.FilterGroup.Filter.Label, footnoteForFilterItemFilterItemPlan.FilterLabel);
+                Assert.Equal(originalFilterItem1.FilterGroup.Id, footnoteForFilterItemFilterItemPlan.FilterGroupId);
+                Assert.Equal(originalFilterItem1.FilterGroup.Label, footnoteForFilterItemFilterItemPlan.FilterGroupLabel);
                 Assert.Equal(replacementFilterItem1.Id, footnoteForFilterItemFilterItemPlan.Target);
                 Assert.True(footnoteForFilterItemFilterItemPlan.Valid);
 
@@ -1264,12 +1411,23 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
                 var footnoteForIndicatorPlan =
                     replacementPlan.Footnotes.Single(plan => plan.Id == footnoteForIndicator.Id);
                 Assert.Equal(footnoteForIndicator.Content, footnoteForIndicatorPlan.Content);
+
                 Assert.Empty(footnoteForIndicatorPlan.Filters);
                 Assert.Empty(footnoteForIndicatorPlan.FilterGroups);
                 Assert.Empty(footnoteForIndicatorPlan.FilterItems);
-                Assert.Single(footnoteForIndicatorPlan.Indicators);
+                Assert.Single(footnoteForIndicatorPlan.IndicatorGroups);
 
-                var footnoteForIndicatorIndicatorPlan = footnoteForIndicatorPlan.Indicators.First();
+                var footnoteForIndicatorIndicatorGroupPlan =
+                    footnoteForIndicatorPlan.IndicatorGroups.First();
+
+                Assert.Equal(originalIndicator.IndicatorGroup.Id,  footnoteForIndicatorIndicatorGroupPlan.Key);
+                Assert.Equal(originalIndicator.IndicatorGroup.Label, footnoteForIndicatorIndicatorGroupPlan.Value.Label);
+                Assert.Single(footnoteForIndicatorIndicatorGroupPlan.Value.Indicators);
+                Assert.True(footnoteForIndicatorIndicatorGroupPlan.Value.Valid);
+
+                var footnoteForIndicatorIndicatorPlan =
+                    footnoteForIndicatorIndicatorGroupPlan.Value.Indicators.First();
+
                 Assert.Equal(originalIndicator.Id, footnoteForIndicatorIndicatorPlan.Id);
                 Assert.Equal(originalIndicator.Label, footnoteForIndicatorIndicatorPlan.Label);
                 Assert.Equal(originalIndicator.Name, footnoteForIndicatorIndicatorPlan.Name);
@@ -1284,7 +1442,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
                 Assert.Empty(footnoteForSubjectPlan.Filters);
                 Assert.Empty(footnoteForSubjectPlan.FilterGroups);
                 Assert.Empty(footnoteForSubjectPlan.FilterItems);
-                Assert.Empty(footnoteForSubjectPlan.Indicators);
+                Assert.Empty(footnoteForSubjectPlan.IndicatorGroups);
 
                 Assert.True(footnoteForSubjectPlan.Valid);
 
@@ -1436,14 +1594,14 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
                     replacementReleaseFileReference.Id);
 
                 mocks.ReleaseService.VerifyNoOtherCalls();
-                
+
                 Assert.True(result.IsLeft);
                 AssertValidationProblem(result.Left, ReplacementMustBeValid);
             }
         }
 
         [Fact]
-        public async Task Replace()
+        public async void Replace()
         {
             var originalSubject = new Subject
             {
@@ -2000,7 +2158,9 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
                 new FootnoteService(statisticsDbContext, new Mock<ILogger<FootnoteService>>().Object),
                 releaseService.Object,
                 timePeriodService.Object,
-                new PersistenceHelper<ContentDbContext>(contentDbContext));
+                new PersistenceHelper<ContentDbContext>(contentDbContext),
+                MockUtils.AlwaysTrueUserService().Object
+            );
         }
 
         private static (Mock<ILocationService> LocationService,

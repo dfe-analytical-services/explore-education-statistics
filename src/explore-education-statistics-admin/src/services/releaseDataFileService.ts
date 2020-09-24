@@ -28,7 +28,7 @@ export interface DataFile {
   rows: number;
   metadataFilename: string;
   userName: string;
-  created: Date;
+  created?: string;
   canDelete?: boolean;
   isDeleting?: boolean;
 }
@@ -81,18 +81,23 @@ function mapFile(file: DataFileInfo): DataFile {
     metadataFilename: file.metaFileName,
     canDelete: true,
     userName: file.userName,
-    created: new Date(file.created),
+    created: file.created,
   };
 }
 
 const releaseDataFileService = {
-  getReleaseDataFiles(releaseId: string): Promise<DataFile[]> {
+  getDataFiles(releaseId: string): Promise<DataFile[]> {
     return client
       .get<DataFileInfo[]>(`/release/${releaseId}/data`)
       .then(response => {
         const dataFiles = response.filter(file => file.metaFileName.length > 0);
         return dataFiles.map(mapFile);
       });
+  },
+  getDataFile(releaseId: string, fileId: string): Promise<DataFile> {
+    return client
+      .get<DataFileInfo>(`/release/${releaseId}/data/${fileId}`)
+      .then(mapFile);
   },
   async uploadDataFiles(
     releaseId: string,
