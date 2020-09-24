@@ -81,7 +81,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Controllers.Api
                 footnote
             }));
 
-            footnoteService.Setup(s => s.GetFootnotesAsync(ReleaseId)).Returns(footnotes);
+            footnoteService.Setup(s => s.GetFootnotes(ReleaseId)).Returns(footnotes);
 
             var deleteFootnoteResult = Task.FromResult(new Either<ActionResult, bool>(true));
             footnoteService.Setup(s => s.DeleteFootnote(ReleaseId, FootnoteId)).ReturnsAsync(Unit.Instance);

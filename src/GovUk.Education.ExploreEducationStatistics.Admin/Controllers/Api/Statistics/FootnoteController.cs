@@ -62,11 +62,21 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Controllers.Api.Stati
                 .HandleFailuresOrNoContent();
         }
 
+
+        [HttpGet("releases/{releaseId}/footnotes/{id}")]
+        public async Task<ActionResult<FootnoteViewModel>> GetFootnote(Guid releaseId, Guid id)
+        {
+            return await _footnoteService
+                .GetFootnote(releaseId, id)
+                .OnSuccess(GatherAndBuildFootnoteViewModel)
+                .HandleFailuresOrOk();
+        }
+
         [HttpGet("releases/{releaseId}/footnotes")]
         public async Task<ActionResult<IEnumerable<FootnoteViewModel>>> GetFootnotes(Guid releaseId)
         {
             return await _footnoteService
-                .GetFootnotesAsync(releaseId)
+                .GetFootnotes(releaseId)
                 .OnSuccess(footnotes => footnotes.Select(GatherAndBuildFootnoteViewModel))
                 .HandleFailuresOrOk();
         }
@@ -93,7 +103,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Controllers.Api.Stati
         public async Task<ActionResult<FootnotesMetaViewModel>> GetFootnotesMeta(Guid releaseId)
         {
             return await _footnoteService
-                .GetFootnotesAsync(releaseId)
+                .GetFootnotes(releaseId)
                 .OnSuccess(async footnotes =>
                 {
                     var meta = await _releaseMetaService.GetSubjectsAsync(releaseId);
