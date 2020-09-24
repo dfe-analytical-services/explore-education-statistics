@@ -7,14 +7,17 @@
 
 .row {
   display: flex;
-  &__footnoteContent {
-    flex-grow: 1;
-    flex-shrink: 1;
-  }
-  &__footnoteActions {
-    flex-shrink: 0;
-    flex-wrap: nowrap;
-  }
+}
+
+.rowContent {
+  flex-grow: 1;
+  flex-shrink: 1;
+}
+
+.rowActions {
+  flex-shrink: 0;
+  flex-wrap: nowrap;
+  margin-bottom: 0;
 }
 
 .footnoteSelectionTable {

@@ -1,4 +1,4 @@
-import styles from '@admin/pages/release/footnotes/components/form/FootnoteForm.module.scss';
+import styles from '@admin/pages/release/footnotes/components/FootnoteForm.module.scss';
 import {
   BaseFootnote,
   FootnoteSubjectMeta,
@@ -13,7 +13,7 @@ interface Props {
   summary: string;
   parentSelected: boolean;
   valuePath: string;
-  indicator: FootnoteSubjectMeta['indicators'];
+  indicatorGroups: FootnoteSubjectMeta['indicators'];
   form: FormikProps<BaseFootnote>;
 }
 
@@ -21,7 +21,7 @@ const IndicatorDetails = ({
   summary,
   parentSelected = false,
   valuePath,
-  indicator,
+  indicatorGroups,
   form,
 }: Props) => {
   return (
@@ -30,24 +30,25 @@ const IndicatorDetails = ({
       className="govuk-!-margin-bottom-2"
     >
       <div className={styles.filterOverflow}>
-        {Object.entries(indicator).map(([indicatorGroupId, indicatorGroup]) => {
-          const groupValue = get(
-            form.values,
-            `${valuePath}.indicatorGroups.${indicatorGroupId}.selected`,
-          );
-          const hideGrouping = indicatorGroup.label === 'Default';
-          const indicators =
-            get(
+        {Object.entries(indicatorGroups).map(
+          ([indicatorGroupId, indicatorGroup]) => {
+            const groupValue = get(
               form.values,
-              `${valuePath}.indicatorGroups.${indicatorGroupId}.indicators`,
-            ) || [];
-          return (
-            <div key={indicatorGroupId} className="govuk-!-margin-bottom-2 ">
-              {!hideGrouping && (
-                <div className="govuk-!-margin-top-1 govuk-!-margin-bottom-1">
-                  <strong>{indicatorGroup.label}</strong>
-                </div>
-                /*
+              `${valuePath}.indicatorGroups.${indicatorGroupId}.selected`,
+            );
+            const hideGrouping = indicatorGroup.label === 'Default';
+            const indicators =
+              get(
+                form.values,
+                `${valuePath}.indicatorGroups.${indicatorGroupId}.indicators`,
+              ) || [];
+            return (
+              <div key={indicatorGroupId} className="govuk-!-margin-bottom-2 ">
+                {!hideGrouping && (
+                  <div className="govuk-!-margin-top-1 govuk-!-margin-bottom-1">
+                    <strong>{indicatorGroup.label}</strong>
+                  </div>
+                  /*
                  // Disabling indicatorGroup selection for now
                   <FieldSubjectCheckbox
                   key={indicatorGroupId}
@@ -58,32 +59,26 @@ const IndicatorDetails = ({
                   boldLabel
                   disabled={parentSelected}
                 /> */
-              )}
-              <div
-                className={
-                  !hideGrouping
-                    ? 'govuk-!-margin-left-4 govuk-!-margin-bottom-3'
-                    : ''
-                }
-              >
-                {Object.entries(indicatorGroup.options)
-                  .sort((a, b) => {
-                    const textA = a[1].label.toUpperCase();
-                    const textB = b[1].label.toUpperCase();
-                    return textA < textB ? -1 : 1;
-                  })
-                  .map(([indicatorItemId, indicatorItem]) => {
+                )}
+                <div
+                  className={
+                    !hideGrouping
+                      ? 'govuk-!-margin-left-4 govuk-!-margin-bottom-3'
+                      : ''
+                  }
+                >
+                  {indicatorGroup.options.map(indicatorItem => {
                     const checked =
                       (indicators &&
                         indicators.includes(indicatorItem.value)) ||
                       false;
                     return (
                       <FormCheckbox
-                        key={`indicatorItem-${indicatorItemId}`}
+                        {...indicatorItem}
+                        key={`indicatorItem-${indicatorItem.value}`}
                         className="govuk-checkboxes--small"
                         name={`${valuePath}.indicatorGroups.${indicatorGroupId}.indicators`}
-                        id={indicatorItemId}
-                        {...indicatorItem}
+                        id={indicatorItem.value}
                         disabled={parentSelected || groupValue}
                         checked={checked}
                         onChange={e => {
@@ -111,10 +106,11 @@ const IndicatorDetails = ({
                       />
                     );
                   })}
+                </div>
               </div>
-            </div>
-          );
-        })}
+            );
+          },
+        )}
       </div>
     </Details>
   );

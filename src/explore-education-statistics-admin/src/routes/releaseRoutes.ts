@@ -1,7 +1,9 @@
 import ReleaseContentPage from '@admin/pages/release/content/ReleaseContentPage';
-import ReleaseDataPage from '@admin/pages/release/data/ReleaseDataPage';
 import ReleaseDataFilePage from '@admin/pages/release/data/ReleaseDataFilePage';
+import ReleaseDataPage from '@admin/pages/release/data/ReleaseDataPage';
 import ReleaseDataBlocksPage from '@admin/pages/release/datablocks/ReleaseDataBlocksPage';
+import ReleaseFootnoteCreatePage from '@admin/pages/release/footnotes/ReleaseFootnoteCreatePage';
+import ReleaseFootnoteEditPage from '@admin/pages/release/footnotes/ReleaseFootnoteEditPage';
 import ReleaseFootnotesPage from '@admin/pages/release/footnotes/ReleaseFootnotesPage';
 import ReleasePreReleaseAccessPage from '@admin/pages/release/ReleasePreReleaseAccessPage';
 import ReleasePublishStatusPage from '@admin/pages/release/ReleaseStatusPage';
@@ -20,6 +22,10 @@ export type ReleaseDataBlocksRouteParams = ReleaseRouteParams & {
 
 export type ReleaseDataFileRouteParams = ReleaseRouteParams & {
   fileId: string;
+};
+
+export type ReleaseFootnoteRouteParams = ReleaseRouteParams & {
+  footnoteId: string;
 };
 
 export interface ReleaseRouteProps extends RouteProps {
@@ -55,6 +61,18 @@ export const releaseFootnotesRoute: ReleaseRouteProps = {
   path: '/publication/:publicationId/release/:releaseId/footnotes',
   title: 'Footnotes',
   component: ReleaseFootnotesPage,
+};
+
+export const releaseFootnotesCreateRoute: ReleaseRouteProps = {
+  path: '/publication/:publicationId/release/:releaseId/create-footnote',
+  title: 'Create footnote',
+  component: ReleaseFootnoteCreatePage,
+};
+
+export const releaseFootnotesEditRoute: ReleaseRouteProps = {
+  path: '/publication/:publicationId/release/:releaseId/footnotes/:footnoteId',
+  title: 'Edit footnote',
+  component: ReleaseFootnoteEditPage,
 };
 
 export const releaseDataBlocksRoute: ReleaseRouteProps = {

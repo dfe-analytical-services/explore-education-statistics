@@ -16,6 +16,8 @@ import {
   releaseStatusRoute,
   releaseSummaryEditRoute,
   releaseSummaryRoute,
+  releaseFootnotesCreateRoute,
+  releaseFootnotesEditRoute,
 } from '@admin/routes/releaseRoutes';
 import publicationService, {
   BasicPublicationDetails,
@@ -40,7 +42,13 @@ const navRoutes = [
   releasePreReleaseAccessRoute,
 ];
 
-const routes = [...navRoutes, releaseDataFileRoute, releaseSummaryEditRoute];
+const routes = [
+  ...navRoutes,
+  releaseDataFileRoute,
+  releaseSummaryEditRoute,
+  releaseFootnotesCreateRoute,
+  releaseFootnotesEditRoute,
+];
 
 interface MatchProps {
   publicationId: string;

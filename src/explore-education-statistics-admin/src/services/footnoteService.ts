@@ -69,39 +69,39 @@ export interface FootnoteSubjectMeta {
 }
 
 export interface FootnoteMeta {
-  [key: string /* subjectId */]: FootnoteSubjectMeta;
+  subjects: {
+    [subjectId: string]: FootnoteSubjectMeta;
+  };
 }
 
 const footnoteService = {
-  async getReleaseFootnoteData(
-    releaseId: string,
-  ): Promise<{ meta: FootnoteMeta; footnotes: Footnote[] }> {
-    return client.get(`/data/footnote/release/${releaseId}`);
+  getFootnoteMeta(releaseId: string): Promise<FootnoteMeta> {
+    return client.get(`/releases/${releaseId}/footnotes-meta`);
   },
-  async createFootnote(
-    releaseId: string,
-    footnote: BaseFootnote,
-  ): Promise<Footnote> {
+  getFootnotes(releaseId: string): Promise<Footnote[]> {
+    return client.get(`/releases/${releaseId}/footnotes`);
+  },
+  getFootnote(releaseId: string, id: string): Promise<Footnote> {
+    return client.get(`/releases/${releaseId}/footnotes/${id}`);
+  },
+  createFootnote(releaseId: string, footnote: BaseFootnote): Promise<Footnote> {
     return client.post(
-      `/data/footnote/release/${releaseId}`,
+      `/releases/${releaseId}/footnotes`,
       footnoteToFlatFootnote(footnote),
     );
   },
-  async getFootnote(id: string) {
-    return client.get(`/data/footnote/${id}`);
-  },
-  async updateFootnote(
+  updateFootnote(
     releaseId: string,
     id: string,
     footnote: BaseFootnote,
   ): Promise<Footnote> {
     return client.put(
-      `/data/footnote/release/${releaseId}/${id}`,
+      `/releases/${releaseId}/footnotes/${id}`,
       footnoteToFlatFootnote(footnote),
     );
   },
-  async deleteFootnote(releaseId: string, id: string): Promise<void> {
-    return client.delete(`/data/footnote/release/${releaseId}/${id}`);
+  deleteFootnote(releaseId: string, id: string): Promise<void> {
+    return client.delete(`/releases/${releaseId}/footnotes/${id}`);
   },
 };
 
