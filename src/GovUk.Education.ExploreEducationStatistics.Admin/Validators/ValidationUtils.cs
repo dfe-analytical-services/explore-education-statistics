@@ -107,6 +107,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Validators
         FileUploadNameCannotContainSpecialCharacters,
 
         // Data file
+        SubjectTitleCannotContainSpecialCharacters,
         SubjectTitleMustBeUnique,
         CannotUseGenericFunctionToDeleteDataFile,
         CannotUseGenericFunctionToAddDataFile,
@@ -119,6 +120,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Validators
         CannotRemoveDataFilesUntilImportComplete,
         CannotRemoveDataFilesOnceReleaseApproved,
         AllDatafilesUploadedMustBeComplete,
+        FileTypeMustBeData,
         
         // Data zip file
         DataFileMustBeZipFile,
@@ -141,9 +143,6 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Validators
         // Release
         ReleaseNotApproved,
         ApprovedReleaseMustHavePublishScheduledDate,
-        PublishedReleaseCannotBeUnapproved,
-        
-        // Subject
-        SubjectTitleCannotContainSpecialCharacters,
+        PublishedReleaseCannotBeUnapproved
     }
 }

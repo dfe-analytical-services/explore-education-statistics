@@ -13,7 +13,6 @@ using GovUk.Education.ExploreEducationStatistics.Content.Model.Database;
 using GovUk.Education.ExploreEducationStatistics.Data.Model.Services.Interfaces;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
-using Microsoft.Extensions.Configuration;
 using Moq;
 using Xunit;
 using static GovUk.Education.ExploreEducationStatistics.Admin.Security.SecurityPolicies;
@@ -31,7 +30,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
         public void UploadFilesAsync()
         {
             AssertSecurityPoliciesChecked(service =>
-                service.UploadFileAsync(
+                service.UploadFile(
                     _release.Id,
                     new Mock<IFormFile>().Object,
                     "",
@@ -45,7 +44,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
         public void DeleteFileAsync()
         {
             AssertSecurityPoliciesChecked(service =>
-                    service.DeleteNonDataFileAsync(
+                    service.DeleteNonDataFile(
                         _release.Id,
                         ReleaseFileTypes.Ancillary,
                         ""
@@ -57,13 +56,12 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
         public void UploadDataFilesAsync()
         {
             AssertSecurityPoliciesChecked(service =>
-                    service.UploadDataFilesAsync(
-                        _release.Id,
-                        new Mock<IFormFile>().Object,
-                        new Mock<IFormFile>().Object,
-                        "",
-                        ""
-                        ),
+                    service.UploadDataFiles(
+                        releaseId: _release.Id,
+                        dataFile: new Mock<IFormFile>().Object,
+                        metadataFile: new Mock<IFormFile>().Object,
+                        userName: "",
+                        subjectName: ""),
                 CanUpdateSpecificRelease);
         }
 
@@ -71,9 +69,9 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
         public void DeleteDataFileAsync()
         {
             AssertSecurityPoliciesChecked(service =>
-                    service.DeleteDataFilesAsync(
+                    service.DeleteDataFiles(
                         _release.Id,
-                        ""
+                        Guid.NewGuid()
                         ),
                 CanUpdateSpecificRelease);
         }
@@ -82,7 +80,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
         public void ListFilesAsync()
         {
             AssertSecurityPoliciesChecked(service =>
-                    service.ListFilesAsync(
+                    service.ListFiles(
                         _release.Id,
                         ReleaseFileTypes.Ancillary
                     ),

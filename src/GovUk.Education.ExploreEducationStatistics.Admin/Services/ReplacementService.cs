@@ -113,8 +113,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Services
                     var releaseId = (await _contentDbContext.ReleaseFileReferences
                         .FindAsync(replacementReleaseFileReferenceId)).ReleaseId;
 
-                    return await RemoveSubjectAndFileFromRelease(releaseId, replacementPlan.OriginalSubjectId,
-                        originalReleaseFileReferenceId);
+                    return await RemoveSubjectAndFileFromRelease(releaseId, originalReleaseFileReferenceId);
                 });
         }
 
@@ -623,17 +622,9 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Services
         }
 
         private async Task<Either<ActionResult, Unit>> RemoveSubjectAndFileFromRelease(Guid releaseId,
-            Guid subjectId,
             Guid releaseFileReferenceId)
         {
-            var releaseFileReference = await _contentDbContext.ReleaseFileReferences
-                .FindAsync(releaseFileReferenceId);
-
-            var subject =
-                await _statisticsDbContext.Subject.FindAsync(subjectId);
-
-            return await _releaseService.RemoveDataFilesAsync(releaseId,
-                releaseFileReference.Filename, subject.Name);
+            return await _releaseService.RemoveDataFilesAsync(releaseId, releaseFileReferenceId);
         }
 
         private class ReplacementSubjectMeta

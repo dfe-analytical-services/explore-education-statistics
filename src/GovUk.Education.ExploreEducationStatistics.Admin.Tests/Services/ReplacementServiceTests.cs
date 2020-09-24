@@ -1769,10 +1769,6 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
                     }
                 });
 
-            mocks.ReleaseService.Setup(service => service.RemoveDataFilesAsync(
-                    contentReleaseVersion2.Id, originalReleaseFileReference.Filename, originalSubject.Name))
-                .ReturnsAsync(Unit.Instance);
-
             mocks.TimePeriodService.Setup(service => service.GetTimePeriods(replacementSubject.Id))
                 .Returns(new List<(int Year, TimeIdentifier TimeIdentifier)>
                 {
@@ -1806,6 +1802,10 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
                 await statisticsDbContext.SaveChangesAsync();
             }
 
+            mocks.ReleaseService.Setup(service => service.RemoveDataFilesAsync(
+                    contentReleaseVersion2.Id, originalReleaseFileReference.Id))
+                .ReturnsAsync(Unit.Instance);
+
             await using (var contentDbContext = InMemoryApplicationDbContext(contentDbContextId))
             await using (var statisticsDbContext = InMemoryStatisticsDbContext(statisticsDbContextId))
             {
@@ -1815,8 +1815,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
                     replacementReleaseFileReference.Id);
 
                 mocks.ReleaseService.Verify(
-                    mock => mock.RemoveDataFilesAsync(contentReleaseVersion2.Id, originalReleaseFileReference.Filename,
-                        originalSubject.Name), Times.Once());
+                    mock => mock.RemoveDataFilesAsync(contentReleaseVersion2.Id, originalReleaseFileReference.Id), Times.Once());
 
                 mocks.ReleaseService.VerifyNoOtherCalls();
 

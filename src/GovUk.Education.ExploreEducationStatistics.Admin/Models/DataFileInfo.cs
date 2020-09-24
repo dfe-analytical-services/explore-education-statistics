@@ -9,5 +9,6 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Models
         public int Rows { get; set; }
         public string UserName { get; set; }
         public DateTimeOffset? Created { get; set; }
+        public Guid? ReplacedBy { get; set; }
     }
 }

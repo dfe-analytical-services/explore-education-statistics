@@ -40,7 +40,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Processor.Services
                 IStatus.RUNNING_PHASE_3))
             {
                 var subjectData = await _fileStorageService.GetSubjectData(message);
-                var releaseSubject = GetReleaseSubjectLink(message, subjectData.Name, context);
+                var releaseSubject = GetReleaseSubjectLink(message, context);
 
                 await using var datafileStream = await _fileStorageService.StreamBlob(subjectData.DataBlob);
                 var dataFileTable = DataTableUtils.CreateFromStream(datafileStream);
@@ -76,7 +76,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Processor.Services
         public async Task ImportFiltersLocationsAndSchools(ImportMessage message, StatisticsDbContext context)
         {
             var subjectData = _fileStorageService.GetSubjectData(message).Result;
-            var releaseSubject = GetReleaseSubjectLink(message, subjectData.Name, context);
+            var releaseSubject = GetReleaseSubjectLink(message, context);
 
             await using var dataFileStream = await _fileStorageService.StreamBlob(subjectData.DataBlob);
             var dataFileTable = DataTableUtils.CreateFromStream(dataFileStream);
@@ -91,7 +91,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Processor.Services
                 context);
         }
 
-        private static ReleaseSubject GetReleaseSubjectLink(ImportMessage message, string subjectName, StatisticsDbContext context)
+        private static ReleaseSubject GetReleaseSubjectLink(ImportMessage message, StatisticsDbContext context)
         {
             return context
                 .ReleaseSubject
@@ -100,7 +100,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Processor.Services
                 .ThenInclude(r => r.Publication)
                 .ThenInclude(p => p.Topic)
                 .ThenInclude(t => t.Theme)
-                .FirstOrDefault(r => r.Subject.Name.Equals(subjectName) && r.ReleaseId == message.Release.Id);
+                .FirstOrDefault(r => r.Subject.Id == message.SubjectId && r.ReleaseId == message.Release.Id);
         }
     }
 }
