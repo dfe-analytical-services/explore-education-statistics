@@ -2,6 +2,7 @@
 using System.IdentityModel.Tokens.Jwt;
 using System.Security.Claims;
 using AutoMapper;
+using Azure.Storage.Blobs;
 using GovUk.Education.ExploreEducationStatistics.Admin.Areas.Identity.Data;
 using GovUk.Education.ExploreEducationStatistics.Admin.Mappings;
 using GovUk.Education.ExploreEducationStatistics.Admin.Mappings.Interfaces;
@@ -202,8 +203,6 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin
             // In production, the React files will be served from this directory
             services.AddSpaStaticFiles(configuration => { configuration.RootPath = "wwwroot"; });
 
-
-
             services.AddTransient<IReleaseFilesService, ReleaseFilesService>();
             services.AddTransient<IImportService, ImportService>();
             services.AddTransient<IPublishingService, PublishingService>(provider =>
@@ -291,6 +290,17 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin
             services.AddSingleton<DataServiceMemoryCache<GeoJson>, DataServiceMemoryCache<GeoJson>>();
             services.AddTransient<IUserManagementService, UserManagementService>();
             services.AddTransient<IFileUploadsValidatorService, FileUploadsValidatorService>();
+            services.AddTransient<IBlobStorageService, BlobStorageService>(provider =>
+                {
+                    var connectionString = Configuration.GetValue<string>("CoreStorage");
+
+                    return new BlobStorageService(
+                        connectionString,
+                        new BlobServiceClient(connectionString),
+                        provider.GetRequiredService<ILogger<BlobStorageService>>()
+                    );
+                }
+            );
             services.AddTransient<ITableStorageService, TableStorageService>(s =>
                 new TableStorageService(Configuration.GetValue<string>("CoreStorage")));
             services.AddSingleton<IGuidGenerator, SequentialGuidGenerator>();

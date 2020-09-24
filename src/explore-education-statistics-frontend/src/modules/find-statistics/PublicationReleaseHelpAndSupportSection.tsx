@@ -69,7 +69,7 @@ const HelpAndSupport = ({
         <AccordionSection heading="Contact us" headingTag="h3">
           <ContactUsSection
             publicationContact={publicationContact}
-            themeTitle={themeTitle}
+            publicationTitle={publicationTitle}
           />
         </AccordionSection>
       </AccordionComponent>

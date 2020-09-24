@@ -52,7 +52,7 @@ const ReleasePreReleaseAccessPage = () => {
                   )}
                 >
                   release status
-                </Link>
+                </Link>{' '}
                 page.
               </WarningMessage>
             )}

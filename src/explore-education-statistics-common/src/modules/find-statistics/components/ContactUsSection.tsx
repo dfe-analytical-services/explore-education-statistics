@@ -3,15 +3,16 @@ import React from 'react';
 
 const ContactUsSection = ({
   publicationContact,
-  themeTitle,
+  publicationTitle,
 }: {
   publicationContact: PublicationContact;
-  themeTitle: string;
+  publicationTitle: string;
 }) => {
   return (
     <>
       <p>
-        If you have a specific enquiry about {themeTitle} statistics and data:
+        If you have a specific enquiry about {publicationTitle} statistics and
+        data:
       </p>
       <h4 className="govuk-heading-s govuk-!-margin-bottom-0">
         {publicationContact.teamName}

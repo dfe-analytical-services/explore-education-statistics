@@ -126,7 +126,8 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Validators
         DataZipFileDoesNotContainCsvFiles,
         DataZipFileAlreadyExists,
         
-        ReplacementDataFileMustBeForSameRelease,
+        ReplacementFileTypesMustBeData,
+        ReplacementDataFileMustBeForRelatedRelease,
         ReplacementMustBeValid,
 
         // Meta file

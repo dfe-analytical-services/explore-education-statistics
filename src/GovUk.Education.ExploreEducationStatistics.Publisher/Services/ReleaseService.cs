@@ -77,7 +77,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Publisher.Services
 
             var releaseViewModel = _mapper.Map<CachedReleaseViewModel>(release);
             releaseViewModel.DownloadFiles =
-                _fileStorageService.ListPublicFiles(release.Publication.Slug, release.Slug).ToList();
+                _fileStorageService.ListPublicFiles(release.Publication.Slug, release.Slug).Result.ToList();
 
             // If the release isn't live yet set the published date based on what we expect it to be
             releaseViewModel.Published ??= context.Published;

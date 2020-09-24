@@ -5,6 +5,7 @@ using GovUk.Education.ExploreEducationStatistics.Admin.Security;
 using GovUk.Education.ExploreEducationStatistics.Admin.Services;
 using GovUk.Education.ExploreEducationStatistics.Admin.Services.Interfaces;
 using GovUk.Education.ExploreEducationStatistics.Common.Model;
+using GovUk.Education.ExploreEducationStatistics.Common.Services.Interfaces;
 using GovUk.Education.ExploreEducationStatistics.Common.Services.Interfaces.Security;
 using GovUk.Education.ExploreEducationStatistics.Common.Utils;
 using GovUk.Education.ExploreEducationStatistics.Content.Model;
@@ -29,107 +30,113 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
         [Fact]
         public void UploadFilesAsync()
         {
-            AssertSecurityPoliciesChecked(service => 
+            AssertSecurityPoliciesChecked(service =>
                 service.UploadFileAsync(
-                    _release.Id, 
-                    new Mock<IFormFile>().Object, 
-                    "", 
-                    ReleaseFileTypes.Ancillary, 
+                    _release.Id,
+                    new Mock<IFormFile>().Object,
+                    "",
+                    ReleaseFileTypes.Ancillary,
                     false
-                    ), 
+                    ),
                 CanUpdateSpecificRelease);
         }
 
         [Fact]
         public void DeleteFileAsync()
         {
-            AssertSecurityPoliciesChecked(service => 
+            AssertSecurityPoliciesChecked(service =>
                     service.DeleteNonDataFileAsync(
-                        _release.Id, 
-                        ReleaseFileTypes.Ancillary, 
+                        _release.Id,
+                        ReleaseFileTypes.Ancillary,
                         ""
-                        ), 
+                        ),
                 CanUpdateSpecificRelease);
         }
 
         [Fact]
         public void UploadDataFilesAsync()
         {
-            AssertSecurityPoliciesChecked(service => 
+            AssertSecurityPoliciesChecked(service =>
                     service.UploadDataFilesAsync(
-                        _release.Id, 
-                        new Mock<IFormFile>().Object, 
-                        new Mock<IFormFile>().Object, 
-                        "", 
+                        _release.Id,
+                        new Mock<IFormFile>().Object,
+                        new Mock<IFormFile>().Object,
+                        "",
                         ""
-                        ), 
+                        ),
                 CanUpdateSpecificRelease);
         }
 
         [Fact]
         public void DeleteDataFileAsync()
         {
-            AssertSecurityPoliciesChecked(service => 
+            AssertSecurityPoliciesChecked(service =>
                     service.DeleteDataFilesAsync(
-                        _release.Id, 
+                        _release.Id,
                         ""
-                        ), 
+                        ),
                 CanUpdateSpecificRelease);
         }
 
         [Fact]
         public void ListFilesAsync()
         {
-            AssertSecurityPoliciesChecked(service => 
+            AssertSecurityPoliciesChecked(service =>
                     service.ListFilesAsync(
                         _release.Id,
                         ReleaseFileTypes.Ancillary
-                    ), 
+                    ),
                 CanViewSpecificRelease);
         }
-        
+
         [Fact]
         public void ListPublicFilesPreview()
         {
-            AssertSecurityPoliciesChecked(service => 
+            AssertSecurityPoliciesChecked(service =>
                     service.ListPublicFilesPreview(
                         _release.Id,
                         new List<Guid>(){_release.Id}
-                    ), 
+                    ),
                 CanViewSpecificRelease);
         }
-        
+
         [Fact]
         public void StreamFile()
         {
-            AssertSecurityPoliciesChecked(service => 
+            AssertSecurityPoliciesChecked(service =>
                     service.StreamFile(
                         _release.Id,
                         ReleaseFileTypes.Ancillary,
                         ""
-                    ), 
+                    ),
                 CanViewSpecificRelease);
         }
-        
+
         private void AssertSecurityPoliciesChecked<T>(
             Func<ReleaseFilesService, Task<Either<ActionResult, T>>> protectedAction, params SecurityPolicies[] policies)
         {
-            var (configuration, userService, releaseHelper,
+            var (blobStorageService, userService, releaseHelper,
                 contentDbContext, importService,
                 fileUploadsValidatorService, subjectService,
                 dataArchiveValidationService) = Mocks();
 
-            var service = new ReleaseFilesService(configuration.Object,
-                userService.Object, releaseHelper.Object, contentDbContext.Object,
-                importService.Object, fileUploadsValidatorService.Object, subjectService.Object,
-                dataArchiveValidationService.Object);
+            var service = new ReleaseFilesService(
+                blobStorageService.Object,
+                userService.Object,
+                releaseHelper.Object,
+                contentDbContext.Object,
+                importService.Object,
+                fileUploadsValidatorService.Object,
+                subjectService.Object,
+                dataArchiveValidationService.Object
+            );
 
             PermissionTestUtil.AssertSecurityPoliciesChecked(protectedAction, _release, userService, service, policies);
         }
-        
+
         private (
-            Mock<IConfiguration>,
-            Mock<IUserService>, 
+            Mock<IBlobStorageService>,
+            Mock<IUserService>,
             Mock<IPersistenceHelper<ContentDbContext>>,
             Mock<ContentDbContext>,
             Mock<IImportService>,
@@ -138,12 +145,9 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
             Mock<IDataArchiveValidationService>
             ) Mocks()
         {
-            var mockConf= new Mock<IConfiguration>();
-            mockConf.Setup(c => c.GetSection(It.IsAny<string>())).Returns(new Mock<IConfigurationSection>().Object);  
-            
             return (
-                mockConf,
-                new Mock<IUserService>(), 
+                new Mock<IBlobStorageService>(),
+                new Mock<IUserService>(),
                 MockUtils.MockPersistenceHelper<ContentDbContext, Release>(_release.Id, _release),
                 new Mock<ContentDbContext>(),
                 new Mock<IImportService>(),

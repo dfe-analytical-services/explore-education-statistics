@@ -1,82 +1,90 @@
-using System;
 using System.Collections.Generic;
 using System.IO;
 using System.Threading.Tasks;
-using GovUk.Education.ExploreEducationStatistics.Common.Services;
+using GovUk.Education.ExploreEducationStatistics.Common.Extensions;
+using GovUk.Education.ExploreEducationStatistics.Common.Model;
+using GovUk.Education.ExploreEducationStatistics.Common.Services.Interfaces;
 using GovUk.Education.ExploreEducationStatistics.Data.Api.Services.Interfaces;
 using Microsoft.AspNetCore.Mvc;
-using Microsoft.Azure.Storage.Blob;
-using static GovUk.Education.ExploreEducationStatistics.Common.Services.FileStorageUtils;
 
 namespace GovUk.Education.ExploreEducationStatistics.Data.Api.Services
 {
     public class FileStorageService : IFileStorageService
     {
-        private readonly string _storageConnectionString;
+        private readonly IBlobStorageService _blobStorageService;
 
-        public FileStorageService(string connectionString)
+        public FileStorageService(IBlobStorageService blobStorageService)
         {
-            _storageConnectionString = connectionString;
-        }
-        
-
-        public async Task<string> DownloadTextAsync(string containerName, string blobName)
-        {
-            return await FileStorageUtils.DownloadTextAsync(_storageConnectionString, containerName, blobName);
+            _blobStorageService = blobStorageService;
         }
 
-        public IEnumerable<CloudBlockBlob> ListBlobs(string containerName)
+
+        public async Task<string> GetBlobText(string containerName, string path)
         {
-            return FileStorageUtils.ListBlobs(_storageConnectionString, containerName);
+            return await _blobStorageService.DownloadBlobText(containerName, path);
         }
 
-        public CloudBlob GetBlob(string containerName, string blobName)
+        public async Task<IEnumerable<BlobInfo>> ListBlobs(string containerName)
         {
-            return FileStorageUtils.GetBlob(_storageConnectionString, containerName, blobName);
+            return await _blobStorageService.ListBlobs(containerName);
         }
 
-        public bool FileExistsAndIsReleased(string containerName, string blobName)
+        public async Task<bool> CheckBlobExists(string containerName, string path)
         {
-            var blob = GetBlob(containerName, blobName);
-            return blob.Exists() && IsFileReleased(blob);
+            return await _blobStorageService.CheckBlobExists(containerName, path);
         }
 
-        public async Task<FileStreamResult> StreamFile(string containerName, string blobName, string fileName)
+        public async Task<BlobInfo> GetBlob(string containerName, string path)
         {
-            var blob = GetBlockBlob(_storageConnectionString, containerName, blobName);
+            return await _blobStorageService.GetBlob(containerName, path);
+        }
 
-            if (!blob.Exists())
-            {
-                throw new ArgumentException("File not found: {blobName}", blob.Name);
-            }
+        public async Task<bool> IsBlobReleased(string containerName, string path)
+        {
+            var blob = await _blobStorageService.GetBlob(containerName, path);
+
+            return blob.IsReleased();
+        }
+
+        public async Task<FileStreamResult> StreamFile(string containerName, string path)
+        {
+            var blob = await _blobStorageService.GetBlob(containerName, path);
 
             var stream = new MemoryStream();
+            await _blobStorageService.DownloadToStream(containerName, path, stream);
 
-            await blob.DownloadToStreamAsync(stream);
-            stream.Seek(0, SeekOrigin.Begin);
-            return new FileStreamResult(stream, blob.Properties.ContentType)
+            return new FileStreamResult(stream, blob.ContentType)
             {
-                FileDownloadName = fileName
+                FileDownloadName = blob.FileName,
             };
         }
 
-        public Task AppendFromStreamAsync(string containerName, string blobName, string contentType,
+        public Task AppendText(
+            string containerName,
+            string path,
+            string contentType,
             string content)
         {
-            return FileStorageUtils.AppendFromStreamAsync(_storageConnectionString, containerName, blobName,
-                contentType, content);
+            return _blobStorageService.AppendText(
+                containerName: containerName,
+                path: path,
+                content: content
+            );
         }
-        
-        public Task UploadFromStreamAsync(string containerName, string blobName, string contentType,
-            string content)
+
+        public Task UploadText(string containerName, string path, string contentType, string content)
         {
-            return FileStorageUtils.UploadFromStreamAsync(_storageConnectionString, containerName, blobName,
-                contentType, content);
+            return _blobStorageService.UploadText(
+                containerName: containerName,
+                path: path,
+                content: content,
+                contentType: contentType
+            );
         }
-        
-        public Task<bool> TryGetOrCreateAppendBlobAsync(string containerName, string blobName)
+
+        public Task<bool> IsAppendSupported(string containerName, string path)
         {
-            return FileStorageUtils.TryGetOrCreateAppendBlobAsync(_storageConnectionString, containerName, blobName);
+            return _blobStorageService.IsAppendSupported(containerName, path);
         }
     }
 }

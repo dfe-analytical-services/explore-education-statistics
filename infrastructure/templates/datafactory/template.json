@@ -80,6 +80,29 @@
       "dependsOn": [
         "[resourceId('Microsoft.DataFactory/factories', parameters('dataFactoryName'))]"
       ]
+    },
+    {
+      "name": "datafactory-housekeeping",
+      "type": "Microsoft.Resources/deployments",
+      "apiVersion": "2017-05-10",
+      "properties": {
+        "mode": "incremental",
+        "templateLink": {
+          "uri": "[concat(variables('templateBaseUrl'), 'datafactory/components/db-maintenance-template.json')]",
+          "contentVersion": "1.0.0.0"
+        },
+        "parameters": {
+          "factoryName": {
+            "value": "[parameters('dataFactoryName')]"
+          },
+          "keyVaultName": {
+            "value": "[parameters('keyVaultName')]"
+          }
+        }
+      },
+      "dependsOn": [
+        "[resourceId('Microsoft.DataFactory/factories', parameters('dataFactoryName'))]"
+      ]
     }
   ]
 }

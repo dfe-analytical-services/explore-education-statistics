@@ -23,10 +23,10 @@ const PrototypeMetaPreview = () => {
           <h2 className="govuk-heading-m">Before you start</h2>
           <div className="govuk-list--bullet">
             <li>
-              make sure your data has passed the screening checks in our{' '}
-              <a href="https://github.com/dfe-analytical-services/ees-data-screener">
-                R Project
-              </a>{' '}
+              make sure your data files have passed the checks in our{' '}
+              <a href="https://rsconnect/rsc/dfe-published-data-qa/">
+                screening app
+              </a>
             </li>
             <li>
               if your data doesn’t meet these standards, you won’t be able to

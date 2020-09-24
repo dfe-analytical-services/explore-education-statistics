@@ -4,6 +4,7 @@ using System.Threading.Tasks;
 using GovUk.Education.ExploreEducationStatistics.Common.Model;
 using GovUk.Education.ExploreEducationStatistics.Data.Model;
 using Microsoft.AspNetCore.Mvc;
+using Unit = GovUk.Education.ExploreEducationStatistics.Common.Model.Unit;
 
 namespace GovUk.Education.ExploreEducationStatistics.Admin.Services.Interfaces
 {
@@ -18,7 +19,9 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Services.Interfaces
             IReadOnlyCollection<Guid> indicatorIds,
             IReadOnlyCollection<Guid> subjectIds);
 
-        Task<Either<ActionResult, bool>> DeleteFootnote(Guid releaseId, Guid id);
+        Task<Either<ActionResult, Unit>> CopyFootnotes(Guid sourceReleaseId, Guid destinationReleaseId);
+
+        Task<Either<ActionResult, Unit>> DeleteFootnote(Guid releaseId, Guid id);
 
         Task<Either<ActionResult, IEnumerable<Footnote>>> GetFootnotesAsync(Guid releaseId);
 

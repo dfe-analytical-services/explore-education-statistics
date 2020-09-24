@@ -8,11 +8,11 @@ using System.Threading.Tasks;
 using CsvHelper;
 using CsvHelper.Configuration;
 using GovUk.Education.ExploreEducationStatistics.Common.Extensions;
+using GovUk.Education.ExploreEducationStatistics.Common.Model;
 using GovUk.Education.ExploreEducationStatistics.Common.Model.Data;
 using GovUk.Education.ExploreEducationStatistics.Common.Services;
 using GovUk.Education.ExploreEducationStatistics.Data.Importer.Exceptions;
 using GovUk.Education.ExploreEducationStatistics.Data.Importer.Services;
-using GovUk.Education.ExploreEducationStatistics.Data.Model.Extensions;
 using GovUk.Education.ExploreEducationStatistics.Data.Processor.Extensions;
 using GovUk.Education.ExploreEducationStatistics.Data.Processor.Model;
 using GovUk.Education.ExploreEducationStatistics.Data.Processor.Models;
@@ -27,7 +27,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Processor.Services
     {
         private readonly IFileStorageService _fileStorageService;
         private readonly ILogger<ISplitFileService> _logger;
-        
+
         private static readonly List<GeographicLevel> IgnoredGeographicLevels = new List<GeographicLevel>
         {
             GeographicLevel.Institution,
@@ -35,7 +35,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Processor.Services
             GeographicLevel.School,
             GeographicLevel.PlanningArea
         };
-        
+
         public SplitFileService(IFileStorageService fileStorageService, ILogger<ISplitFileService> logger)
         {
             _fileStorageService = fileStorageService;
@@ -47,10 +47,13 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Processor.Services
             ImportMessage message,
             SubjectData subjectData)
         {
-            if (subjectData.GetCsvTable().Rows.Count > message.RowsPerBatch)
+            await using var dataFileStream = await _fileStorageService.StreamBlob(subjectData.DataBlob);
+            var dataFileTable = DataTableUtils.CreateFromStream(dataFileStream);
+
+            if (dataFileTable.Rows.Count > message.RowsPerBatch)
             {
                 _logger.LogInformation($"Splitting Datafile: {message.DataFileName}");
-                await SplitFiles(message, subjectData, collector);
+                await SplitFiles(message, subjectData, dataFileTable, collector);
                 _logger.LogInformation($"Split of Datafile: {message.DataFileName} complete");
             }
             // Else perform any additional validation & pass on file to message queue for import
@@ -63,24 +66,24 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Processor.Services
         private async Task SplitFiles(
             ImportMessage message,
             SubjectData subjectData,
+            DataTable dataFileTable,
             ICollector<ImportMessage> collector)
         {
-            var csvTable = subjectData.GetCsvTable();
-            var headerList = CsvUtil.GetColumnValues(csvTable.Columns);
-            var batches = csvTable.Rows.OfType<DataRow>().Batch(message.RowsPerBatch);
+            var headerList = CsvUtil.GetColumnValues(dataFileTable.Columns);
+            var batches = dataFileTable.Rows.OfType<DataRow>().Batch(message.RowsPerBatch);
             var batchCount = 1;
-            var numRows = csvTable.Rows.Count + 1;
+            var numRows = dataFileTable.Rows.Count + 1;
             var messages = new List<ImportMessage>();
 
             foreach (var batch in batches)
             {
                 var fileName = $"{FileStoragePathUtils.BatchesDir}/{message.DataFileName}_{batchCount:000000}";
-                var mStream = new MemoryStream();
-                var writer = new StreamWriter(mStream);
-                writer.Flush();
-                
+                await using var stream = new MemoryStream();
+                var writer = new StreamWriter(stream);
+                await writer.FlushAsync();
+
                 var table = new DataTable();
-                CopyColumns(csvTable, table);
+                CopyColumns(dataFileTable, table);
                 CopyRows(table, batch.ToList(), headerList);
 
                 // If no lines then don't create a batch or message unless it's the last one & there are zero
@@ -92,16 +95,22 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Processor.Services
                 }
 
                 WriteDataTableToStream(table, writer);
-                writer.Flush();
+                await writer.FlushAsync();
 
-                await _fileStorageService.UploadDataFileAsync(
+                stream.Seek(0, SeekOrigin.Begin);
+
+                await _fileStorageService.UploadStream(
                     message.Release.Id,
-                    mStream, 
-                    BlobUtils.GetMetaFileName(subjectData.DataBlob),
-                    BlobUtils.GetName(subjectData.DataBlob),
-                    fileName,
-                    "text/csv",
-                    numRows
+                    fileType: ReleaseFileTypes.Data,
+                    fileName: fileName,
+                    stream: stream,
+                    contentType: "text/csv",
+                    FileStorageUtils.GetDataFileMetaValues(
+                        name: subjectData.DataBlob.Name,
+                        metaFileName: subjectData.DataBlob.GetMetaFileName(),
+                        userName: subjectData.DataBlob.GetUserName(),
+                        numberOfRows: numRows
+                    )
                 );
 
                 var iMessage = new ImportMessage
@@ -117,7 +126,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Processor.Services
                 };
 
                 messages.Add(iMessage);
-                
+
                 batchCount++;
             }
 
@@ -127,13 +136,13 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Processor.Services
                 collector.Add(m);
             }
         }
-        
+
         private static bool IsGeographicLevelIgnored(IReadOnlyList<string> line, List<string> headers)
         {
             var geographicLevel = GetGeographicLevel(line, headers);
             return IgnoredGeographicLevels.Contains(geographicLevel);
         }
-        
+
         private static GeographicLevel GetGeographicLevel(IReadOnlyList<string> line, List<string> headers)
         {
             return GetGeographicLevelFromString(CsvUtil.Value(line, headers, "geographic_level"));
@@ -150,7 +159,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Processor.Services
             }
             throw new InvalidGeographicLevelException(value);
         }
-        
+
         private static void WriteDataTableToStream(DataTable dataTable, TextWriter tw)
         {
             var csvWriter = new CsvWriter(tw, new CsvConfiguration(CultureInfo.InvariantCulture));

@@ -4,9 +4,9 @@ using GovUk.Education.ExploreEducationStatistics.Common.Services;
 using GovUk.Education.ExploreEducationStatistics.Data.Importer.Services.Interfaces;
 using GovUk.Education.ExploreEducationStatistics.Data.Model;
 using GovUk.Education.ExploreEducationStatistics.Data.Model.Database;
-using GovUk.Education.ExploreEducationStatistics.Data.Processor.Extensions;
 using GovUk.Education.ExploreEducationStatistics.Data.Processor.Model;
 using GovUk.Education.ExploreEducationStatistics.Data.Processor.Services.Interfaces;
+using GovUk.Education.ExploreEducationStatistics.Data.Processor.Utils;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Logging;
 
@@ -41,18 +41,22 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Processor.Services
             {
                 var subjectData = await _fileStorageService.GetSubjectData(message);
                 var releaseSubject = GetReleaseSubjectLink(message, subjectData.Name, context);
-                var csvTable = subjectData.GetCsvTable();
-                var metaTable = subjectData.GetMetaTable();
+
+                await using var datafileStream = await _fileStorageService.StreamBlob(subjectData.DataBlob);
+                var dataFileTable = DataTableUtils.CreateFromStream(datafileStream);
+
+                await using var metaFileStream = await _fileStorageService.StreamBlob(subjectData.MetaBlob);
+                var metaFileTable = DataTableUtils.CreateFromStream(metaFileStream);
 
                 context.Database.CreateExecutionStrategy().Execute(() =>
                 {
                     using var transaction = context.Database.BeginTransaction();
 
                     _importerService.ImportObservations(
-                        csvTable.Columns,
-                        csvTable.Rows,
+                        dataFileTable.Columns,
+                        dataFileTable.Rows,
                         releaseSubject.Subject,
-                        _importerService.GetMeta(metaTable, releaseSubject.Subject, context),
+                        _importerService.GetMeta(metaFileTable, releaseSubject.Subject, context),
                         message.BatchNo,
                         message.RowsPerBatch,
                         context
@@ -69,17 +73,21 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Processor.Services
             }
         }
 
-        public void ImportFiltersLocationsAndSchools(ImportMessage message, StatisticsDbContext context)
+        public async Task ImportFiltersLocationsAndSchools(ImportMessage message, StatisticsDbContext context)
         {
             var subjectData = _fileStorageService.GetSubjectData(message).Result;
             var releaseSubject = GetReleaseSubjectLink(message, subjectData.Name, context);
-            var csvTable = subjectData.GetCsvTable();
-            var metaTable = subjectData.GetMetaTable();
+
+            await using var dataFileStream = await _fileStorageService.StreamBlob(subjectData.DataBlob);
+            var dataFileTable = DataTableUtils.CreateFromStream(dataFileStream);
+
+            await using var metaFileStream = await _fileStorageService.StreamBlob(subjectData.MetaBlob);
+            var metaFileTable = DataTableUtils.CreateFromStream(metaFileStream);
 
             _importerService.ImportFiltersLocationsAndSchools(
-                csvTable.Columns,
-                csvTable.Rows,
-                _importerService.GetMeta(metaTable, releaseSubject.Subject, context),
+                dataFileTable.Columns,
+                dataFileTable.Rows,
+                _importerService.GetMeta(metaFileTable, releaseSubject.Subject, context),
                 context);
         }
 

@@ -61,23 +61,33 @@ namespace GovUk.Education.ExploreEducationStatistics.Publisher.Functions
                 catch (Exception e)
                 {
                     logger.LogError(e, $"Exception occured while executing {executionContext.FunctionName}");
+                    logger.LogError(e.StackTrace);
+
                     await UpdateStage(releaseId, releaseStatusId, Failed,
                         new ReleaseStatusLogMessage($"Exception in files stage: {e.Message}"));
                 }
             }
 
-            if (immediate)
+            try
             {
-                await _queueService.QueuePublishReleaseDataMessagesAsync(published);
-            }
-            else
-            {
-                await _queueService.QueueGenerateReleaseContentMessageAsync(published);
-            }
+                if (immediate)
+                {
+                    await _queueService.QueuePublishReleaseDataMessagesAsync(published);
+                }
+                else
+                {
+                    await _queueService.QueueGenerateReleaseContentMessageAsync(published);
+                }
 
-            foreach (var (releaseId, releaseStatusId) in published)
+                foreach (var (releaseId, releaseStatusId) in published)
+                {
+                    await UpdateStage(releaseId, releaseStatusId, Complete);
+                }
+            }
+            catch (Exception e)
             {
-                await UpdateStage(releaseId, releaseStatusId, Complete);
+                logger.LogError(e, $"Exception occured while executing {executionContext.FunctionName}");
+                logger.LogError(e.StackTrace);
             }
 
             logger.LogInformation($"{executionContext.FunctionName} completed");

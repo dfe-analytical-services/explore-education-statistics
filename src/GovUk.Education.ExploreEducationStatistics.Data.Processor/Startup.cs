@@ -1,5 +1,6 @@
 ﻿using System;
 using AutoMapper;
+using Azure.Storage.Blobs;
 using GovUk.Education.ExploreEducationStatistics.Common.Services;
 using GovUk.Education.ExploreEducationStatistics.Common.Services.Interfaces;
 using GovUk.Education.ExploreEducationStatistics.Data.Importer.Services;
@@ -10,6 +11,9 @@ using GovUk.Education.ExploreEducationStatistics.Data.Processor.Services.Interfa
 using Microsoft.Azure.Functions.Extensions.DependencyInjection;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
+using Microsoft.Extensions.Logging;
+using FileStorageService = GovUk.Education.ExploreEducationStatistics.Data.Processor.Services.FileStorageService;
+using IFileStorageService = GovUk.Education.ExploreEducationStatistics.Data.Processor.Services.Interfaces.IFileStorageService;
 
 [assembly: FunctionsStartup(typeof(Startup))]
 
@@ -21,8 +25,19 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Processor
         {
             var serviceProvider = builder.Services
                 .AddAutoMapper(typeof(Startup).Assembly)
-                .AddTransient<IFileStorageService, FileStorageService>(provider =>
-                    new FileStorageService(GetConfigurationValue(provider, "CoreStorage")))
+                .AddSingleton<IBlobStorageService, BlobStorageService>(
+                    provider =>
+                    {
+                        var connectionString = GetConfigurationValue(provider, "CoreStorage");
+
+                        var blobStorageService = new BlobStorageService(
+                            connectionString,
+                            new BlobServiceClient(connectionString),
+                            provider.GetRequiredService<ILogger<IBlobStorageService>>()
+                        );
+                        return blobStorageService;
+                    })
+                .AddSingleton<IFileStorageService, FileStorageService>()
                 .AddTransient<IFileImportService, FileImportService>()
                 .AddTransient<IImporterService, ImporterService>()
                 .AddTransient<ISplitFileService, SplitFileService>()
@@ -41,7 +56,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Processor
                 .AddSingleton<IGuidGenerator, SequentialGuidGenerator>()
                 .BuildServiceProvider();
 
-            FailedImportsHandler.CheckIncompleteImports(GetConfigurationValue(serviceProvider, "CoreStorage"));
+            ImportRecoveryHandler.CheckIncompleteImports(GetConfigurationValue(serviceProvider, "CoreStorage"));
         }
 
         private static string GetConfigurationValue(IServiceProvider provider, string key)

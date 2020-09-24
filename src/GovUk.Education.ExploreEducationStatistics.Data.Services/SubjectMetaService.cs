@@ -77,7 +77,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Services
             SubjectMetaQueryContext query)
         {
             return _persistenceHelper.CheckEntityExists<Subject>(query.SubjectId)
-                .OnSuccess(subject => GetSubjectMetaViewModelFromQuery(subject, query));
+                .OnSuccess(subject => GetSubjectMetaViewModelFromQuery(query));
         }
         
         public Task<Either<ActionResult, SubjectMetaViewModel>> GetSubjectMetaRestricted(
@@ -85,7 +85,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Services
         {
             return _persistenceHelper.CheckEntityExists<Subject>(query.SubjectId)
                 .OnSuccess(CheckCanViewSubjectData)
-                .OnSuccess(subject => GetSubjectMetaViewModelFromQuery(subject, query));
+                .OnSuccess(subject => GetSubjectMetaViewModelFromQuery(query));
         }
         
         private SubjectMetaViewModel GetSubjectMetaViewModel(Subject subject)
@@ -99,19 +99,19 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Services
             };
         }
 
-        private SubjectMetaViewModel GetSubjectMetaViewModelFromQuery(Subject subject, SubjectMetaQueryContext query)
+        private SubjectMetaViewModel GetSubjectMetaViewModelFromQuery(SubjectMetaQueryContext query)
         {
             var observations = _observationService.FindObservations(query).AsQueryable();
 
             var stopwatch = Stopwatch.StartNew();
             stopwatch.Start();
 
-            var filters = GetFilters(observations);
+            var filters = query.TimePeriod != null ? GetFilters(query.SubjectId, observations, false) : new Dictionary<string, FilterMetaViewModel>();
 
             _logger.LogTrace("Got Filters in {Time} ms", stopwatch.Elapsed.TotalMilliseconds);
             stopwatch.Restart();
 
-            var indicators = GetIndicators(subject.Id);
+            var indicators = query.TimePeriod != null ? GetIndicators(query.SubjectId) : new Dictionary<string, IndicatorsMetaViewModel>();
 
             _logger.LogTrace("Got Indicators in {Time} ms", stopwatch.Elapsed.TotalMilliseconds);
             stopwatch.Restart();

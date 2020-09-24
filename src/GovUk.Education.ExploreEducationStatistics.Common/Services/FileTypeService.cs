@@ -6,7 +6,6 @@ using System.Threading.Tasks;
 using GovUk.Education.ExploreEducationStatistics.Common.Services.Interfaces;
 using HeyRed.Mime;
 using Microsoft.AspNetCore.Http;
-using Microsoft.Azure.Storage.Blob;
 using MimeDetective.Extensions;
 using FileType = MimeDetective.FileType;
 
@@ -27,50 +26,51 @@ namespace GovUk.Education.ExploreEducationStatistics.Common.Services
 
             return mimeType;
         }
-        
+
         public async Task<bool> HasMatchingMimeType(IFormFile file, IEnumerable<Regex> mimeTypes)
         {
             var mimeType = GetMimeTypeUsingMimeProject(file.OpenReadStream());
-            
+
             if (IsMimeTypeNullOrZip(mimeType))
             {
                 var fileType = await GetMimeTypeUsingMimeDetective(file.OpenReadStream());
                 mimeType = fileType?.Mime ?? mimeType;
             }
+
             return mimeTypes.Any(pattern => pattern.Match(mimeType).Success);
         }
-        
+
         public bool HasMatchingEncodingType(IFormFile file, IEnumerable<string> encodingTypes)
         {
             var encodingType = GetMimeEncoding(file.OpenReadStream());
             return encodingTypes.Any(pattern => pattern.Equals(encodingType));
         }
-        
-        public async Task<bool> HasMatchingMimeType(CloudBlob blob, IEnumerable<Regex> mimeTypes)
+
+        public async Task<bool> HasMatchingMimeType(Stream stream, IEnumerable<Regex> mimeTypes)
         {
-            var mimeType = GetMimeTypeUsingMimeProject(await blob.OpenReadAsync());
-            
+            var mimeType = GetMimeTypeUsingMimeProject(stream);
+
             if (IsMimeTypeNullOrZip(mimeType))
             {
-                var fileType = await GetMimeTypeUsingMimeDetective(await blob.OpenReadAsync());
+                var fileType = await GetMimeTypeUsingMimeDetective(stream);
                 mimeType = fileType?.Mime ?? mimeType;
             }
-            
+
             return mimeTypes.Any(pattern => pattern.Match(mimeType).Success);
         }
-        
-        public async Task<bool> HasMatchingEncodingType(CloudBlob blob, IEnumerable<string> encodingTypes)
+
+        public bool HasMatchingEncodingType(Stream stream, IEnumerable<string> encodingTypes)
         {
-            var encodingType = GetMimeEncoding(await blob.OpenReadAsync());
+            var encodingType = GetMimeEncoding(stream);
             return encodingTypes.Any(pattern => pattern.Equals(encodingType));
         }
-        
+
         private string GetMimeTypeUsingMimeProject(Stream stream)
         {
             // The Mime project is generally very good at determining mime types from file contents
             return GuessMagicInfo(stream, MagicOpenFlags.MAGIC_MIME_TYPE);
         }
-        
+
         private async Task<FileType> GetMimeTypeUsingMimeDetective(Stream stream)
         {
             // Mime Detective is much better at zip files
@@ -81,7 +81,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Common.Services
         {
             return GuessMagicInfo(stream, MagicOpenFlags.MAGIC_MIME_ENCODING);
         }
-        
+
         private string GuessMagicInfo(Stream fileStream, MagicOpenFlags flag)
         {
             using var reader = new StreamReader(fileStream);

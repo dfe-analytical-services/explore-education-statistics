@@ -179,6 +179,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Services
                 .OnSuccess(originalRelease =>
                     CreateBasicReleaseAmendment(originalRelease)
                     .OnSuccess(CreateStatisticsReleaseRecord)
+                    .OnSuccessDo(amendment => _footnoteService.CopyFootnotes(releaseId, amendment.Id))
                     .OnSuccess(amendment => CopyReleaseTeam(releaseId, amendment))
                     .OnSuccess(amendment => CopyFileLinks(originalRelease, amendment))
                     .OnSuccess(amendment => GetRelease(amendment.Id)));
@@ -205,18 +206,8 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Services
                         SubjectId = rs.SubjectId
                     });
 
-                var statsAmendmentFootnoteLinks =_statisticsDbContext
-                    .ReleaseFootnote
-                    .Where(rf => rf.ReleaseId == amendment.PreviousVersionId)
-                    .Select(rf => new ReleaseFootnote
-                    {
-                        ReleaseId = statsAmendment.Id,
-                        FootnoteId = rf.FootnoteId
-                    });
-
                 _statisticsDbContext.Release.Add(statsAmendment);
                 _statisticsDbContext.ReleaseSubject.AddRange(statsAmendmentSubjectLinks);
-                _statisticsDbContext.ReleaseFootnote.AddRange(statsAmendmentFootnoteLinks);
 
                 await _statisticsDbContext.SaveChangesAsync();
             }
@@ -451,7 +442,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Services
                 });
         }
 
-        public async Task<Either<ActionResult, bool>> RemoveDataFilesAsync(Guid releaseId, string fileName, string subjectTitle)
+        public async Task<Either<ActionResult, Unit>> RemoveDataFilesAsync(Guid releaseId, string fileName, string subjectTitle)
         {
             return await _persistenceHelper
                 .CheckEntityExists<Release>(releaseId)
@@ -463,21 +454,18 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Services
                     await _dataBlockService.DeleteDataBlocks(deletePlan.DeleteDataBlockPlan);
                     await _releaseSubjectService.SoftDeleteSubjectOrBreakReleaseLink(releaseId, deletePlan.SubjectId);
 
-                    await _releaseFilesService
+                    return await _releaseFilesService
                         .DeleteDataFilesAsync(releaseId, fileName)
                         .OnSuccess(async () => await RemoveFileImportEntryIfOrphaned(deletePlan));
-                    return true;
                 });
         }
 
-        private async Task<bool> RemoveFileImportEntryIfOrphaned(DeleteDataFilePlan deletePlan)
+        private async Task RemoveFileImportEntryIfOrphaned(DeleteDataFilePlan deletePlan)
         {
             if (await _subjectService.GetAsync(deletePlan.SubjectId) == null)
             {
-                return await _coreTableStorageService.DeleteEntityAsync(DatafileImportsTableName, deletePlan.TableStorageItem);
+                await _coreTableStorageService.DeleteEntityAsync(DatafileImportsTableName, deletePlan.TableStorageItem);
             }
-
-            return false;
         }
 
         public async Task<Either<ActionResult, ImportStatus>> GetDataFileImportStatus(Guid releaseId, string dataFileName)

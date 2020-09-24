@@ -1,10 +1,11 @@
 ﻿using System.Linq;
+using GovUk.Education.ExploreEducationStatistics.Common.Services.Interfaces;
 using GovUk.Education.ExploreEducationStatistics.Content.Api.Controllers;
-using GovUk.Education.ExploreEducationStatistics.Content.Api.Services.Interfaces;
 using GovUk.Education.ExploreEducationStatistics.Publisher.Model.ViewModels;
 using Microsoft.AspNetCore.Mvc;
 using Moq;
 using Xunit;
+using static GovUk.Education.ExploreEducationStatistics.Common.BlobContainerNames;
 
 namespace GovUk.Education.ExploreEducationStatistics.Content.Api.Tests.Controllers
 {
@@ -13,9 +14,15 @@ namespace GovUk.Education.ExploreEducationStatistics.Content.Api.Tests.Controlle
         [Fact]
         public void Get_MethodologyTree_Returns_Ok()
         {
-            var fileStorageService = new Mock<IFileStorageService>();
+            var fileStorageService = new Mock<IBlobStorageService>();
 
-            fileStorageService.Setup(s => s.DownloadTextAsync("methodology/tree.json")).ReturnsAsync(@"
+            fileStorageService.Setup(
+                s => s.DownloadBlobText(
+                    PublicContentContainerName,
+                    "methodology/tree.json"
+                )
+            ).ReturnsAsync(
+                @"
             [
             {
                 ""id"": ""5dde1ee6-34b6-41f5-bdc0-10f7fe0c46fe"",
@@ -43,7 +50,8 @@ namespace GovUk.Education.ExploreEducationStatistics.Content.Api.Tests.Controlle
                 }
                 ]
             }
-            ]");
+            ]"
+            );
 
             var controller = new MethodologyController(fileStorageService.Object);
 
@@ -59,7 +67,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Content.Api.Tests.Controlle
         [Fact]
         public void Get_MethodologyTree_Returns_NoContent()
         {
-            var fileStorageService = new Mock<IFileStorageService>();
+            var fileStorageService = new Mock<IBlobStorageService>();
 
             var controller = new MethodologyController(fileStorageService.Object);
 
@@ -71,10 +79,16 @@ namespace GovUk.Education.ExploreEducationStatistics.Content.Api.Tests.Controlle
         [Fact]
         public void Get_Methodology_Returns_Ok()
         {
-            var fileStorageService = new Mock<IFileStorageService>();
+            var fileStorageService = new Mock<IBlobStorageService>();
 
-            fileStorageService.Setup(s => s.DownloadTextAsync("methodology/methodologies/test-slug.json"))
-                .ReturnsAsync(@"
+            fileStorageService.Setup(
+                    s => s.DownloadBlobText(
+                        PublicContentContainerName,
+                        "methodology/methodologies/test-slug.json"
+                    )
+                )
+                .ReturnsAsync(
+                    @"
             {
                 ""id"": ""c04e6613-1f98-4998-86a0-7570c2034d3a"",
                 ""title"": ""string"",
@@ -116,7 +130,8 @@ namespace GovUk.Education.ExploreEducationStatistics.Content.Api.Tests.Controlle
                     ]
                 }
                 ]
-            }");
+            }"
+                );
 
             var controller = new MethodologyController(fileStorageService.Object);
 
@@ -135,7 +150,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Content.Api.Tests.Controlle
         [Fact]
         public void Get_Methodology_Returns_NotFound()
         {
-            var fileStorageService = new Mock<IFileStorageService>();
+            var fileStorageService = new Mock<IBlobStorageService>();
 
             var controller = new MethodologyController(fileStorageService.Object);
 

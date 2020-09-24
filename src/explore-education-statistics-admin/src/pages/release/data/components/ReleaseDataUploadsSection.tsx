@@ -77,7 +77,7 @@ const errorMappings = (
           META_FILENAME_CANNOT_CONTAIN_SPACES_OR_SPECIAL_CHARACTERS:
             'ZIP metadata filename cannot contain spaces or special characters',
           META_FILE_IS_INCORRECTLY_NAMED:
-            'ZIP metadata filename must end with .meta',
+            'ZIP metadata filename must end with .meta.csv',
         },
       }),
     ];
@@ -270,10 +270,10 @@ const ReleaseDataUploadsSection = ({ releaseId, canUpdateRelease }: Props) => {
 
             <ul>
               <li>
-                make sure your data has passed the screening checks in our{' '}
-                <a href="https://github.com/dfe-analytical-services/ees-data-screener">
-                  R Project
-                </a>{' '}
+                make sure your data files have passed the checks in our{' '}
+                <a href="https://rsconnect/rsc/dfe-published-data-qa/">
+                  screening app
+                </a>
               </li>
               <li>
                 if your data does not meet these standards, you won’t be able to

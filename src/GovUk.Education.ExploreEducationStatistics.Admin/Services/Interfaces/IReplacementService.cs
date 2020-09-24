@@ -9,11 +9,11 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Services.Interfaces
     public interface IReplacementService
     {
         Task<Either<ActionResult, ReplacementPlanViewModel>> GetReplacementPlan(
-            Guid originalSubjectId,
-            Guid replacementSubjectId);
+            Guid originalReleaseFileReferenceId,
+            Guid replacementReleaseFileReferenceId);
         
         Task<Either<ActionResult, Unit>> Replace(
-            Guid originalSubjectId,
-            Guid replacementSubjectId);
+            Guid originalReleaseFileReferenceId,
+            Guid replacementReleaseFileReferenceId);
     }
 }

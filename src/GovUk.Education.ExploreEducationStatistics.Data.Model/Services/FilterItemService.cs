@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using System.Linq;
 using GovUk.Education.ExploreEducationStatistics.Data.Model.Database;
 using GovUk.Education.ExploreEducationStatistics.Data.Model.Services.Interfaces;
+using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Logging;
 
 namespace GovUk.Education.ExploreEducationStatistics.Data.Model.Services
@@ -14,14 +15,33 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Model.Services
         {
         }
 
-        public IEnumerable<FilterItem> GetFilterItems(IQueryable<Observation> observations)
+        public IEnumerable<FilterItem> GetFilterItems(Guid subjectId, IQueryable<Observation> observations, bool listFilterItems)
         {
-            var filterItems = observations
-                .SelectMany(observation => observation.FilterItems)
-                .Select(item => item.FilterItem)
+            // Temporary measure hopefully!
+            // The following query is optimal but since IQueryable observations can contain n number of conditions then LINQ
+            // may not be capable of converting it so allow a less efficient query to be executed
+            
+            if (!listFilterItems)
+            {
+                // optimal query
+                return _context.FilterItem
+                    .Include(fi => fi.FilterGroup)
+                    .ThenInclude(fg => fg.Filter)
+                    .Where(fi => fi.FilterGroup.Filter.SubjectId == subjectId &&
+                           observations.Any(o => o.FilterItems.Any(
+                               ofi => ofi.FilterItemId == fi.Id)));
+            }
+            
+            // sub-optimal query
+            var allFilterItemsForSubject = _context.FilterItem
+                .Include(fi => fi.FilterGroup)
+                .ThenInclude(fg => fg.Filter)
+                .Where(fi => fi.FilterGroup.Filter.SubjectId == subjectId)
                 .ToList();
 
-            return filterItems.Distinct();
+            return allFilterItemsForSubject.Where(
+                fi => observations.Any(o => o.FilterItems.Any(
+                    ofi => ofi.FilterItemId == fi.Id)));
         }
 
         public FilterItem GetTotal(Filter filter)
