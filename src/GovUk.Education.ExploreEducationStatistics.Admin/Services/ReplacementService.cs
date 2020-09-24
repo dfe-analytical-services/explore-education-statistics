@@ -3,11 +3,13 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
 using GovUk.Education.ExploreEducationStatistics.Admin.Services.Interfaces;
+using GovUk.Education.ExploreEducationStatistics.Admin.Services.Interfaces.Security;
 using GovUk.Education.ExploreEducationStatistics.Admin.ViewModels;
 using GovUk.Education.ExploreEducationStatistics.Common.Extensions;
 using GovUk.Education.ExploreEducationStatistics.Common.Model;
 using GovUk.Education.ExploreEducationStatistics.Common.Model.Data;
 using GovUk.Education.ExploreEducationStatistics.Common.Model.Data.Query;
+using GovUk.Education.ExploreEducationStatistics.Common.Services.Interfaces.Security;
 using GovUk.Education.ExploreEducationStatistics.Common.Utils;
 using GovUk.Education.ExploreEducationStatistics.Content.Model;
 using GovUk.Education.ExploreEducationStatistics.Content.Model.Database;
@@ -39,6 +41,9 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Services
         private readonly IReleaseService _releaseService;
         private readonly ITimePeriodService _timePeriodService;
         private readonly IPersistenceHelper<ContentDbContext> _contentPersistenceHelper;
+        private readonly IUserService _userService;
+
+        private static IComparer<string> LabelComparer { get; } = new LabelRelationalComparer();
 
         public ReplacementService(ContentDbContext contentDbContext,
             StatisticsDbContext statisticsDbContext,
@@ -48,7 +53,8 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Services
             IFootnoteService footnoteService,
             IReleaseService releaseService,
             ITimePeriodService timePeriodService,
-            IPersistenceHelper<ContentDbContext> contentPersistenceHelper)
+            IPersistenceHelper<ContentDbContext> contentPersistenceHelper,
+            IUserService userService)
         {
             _contentDbContext = contentDbContext;
             _statisticsDbContext = statisticsDbContext;
@@ -59,40 +65,50 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Services
             _releaseService = releaseService;
             _timePeriodService = timePeriodService;
             _contentPersistenceHelper = contentPersistenceHelper;
+            _userService = userService;
         }
 
-        public async Task<Either<ActionResult, ReplacementPlanViewModel>> GetReplacementPlan(
-            Guid originalReleaseFileReferenceId,
-            Guid replacementReleaseFileReferenceId)
+        public async Task<Either<ActionResult, DataReplacementPlanViewModel>> GetReplacementPlan(
+            Guid originalFileId,
+            Guid replacementFileId)
         {
-            return await CheckReleaseFileReferenceExists(originalReleaseFileReferenceId)
-                .OnSuccess(async originalReleaseFileReference =>
+            return await CheckReleaseFileReferenceExists(originalFileId)
+                .OnSuccess(async originalFileReference =>
                 {
-                    return await CheckReleaseFileReferenceExists(replacementReleaseFileReferenceId)
-                        .OnSuccessDo(replacementReleaseFileReference =>
-                            CheckFilesAreForRelatedReleases(originalReleaseFileReference,
-                                replacementReleaseFileReference))
-                        .OnSuccess(replacementReleaseFileReference =>
+                    return await CheckReleaseFileReferenceExists(replacementFileId)
+                        .OnSuccessDo(replacementFileReference =>
+                            _userService.CheckCanUpdateRelease(replacementFileReference.Release))
+                        .OnSuccessDo(replacementFileReference =>
+                            CheckFilesAreForRelatedReleases(
+                                originalFileReference,
+                                replacementFileReference
+                            )
+                        )
+                        .OnSuccess(replacementFileReference =>
                         {
-                            var releaseId = replacementReleaseFileReference.ReleaseId;
-                            var originalSubjectId = originalReleaseFileReference.SubjectId.Value;
-                            var replacementSubjectId = replacementReleaseFileReference.SubjectId.Value;
+                            var releaseId = replacementFileReference.ReleaseId;
+                            var originalSubjectId = originalFileReference.SubjectId.Value;
+                            var replacementSubjectId = replacementFileReference.SubjectId.Value;
 
                             var replacementSubjectMeta = GetReplacementSubjectMeta(replacementSubjectId);
 
                             var dataBlocks = ValidateDataBlocks(releaseId, originalSubjectId, replacementSubjectMeta);
                             var footnotes = ValidateFootnotes(releaseId, originalSubjectId, replacementSubjectMeta);
 
-                            return new ReplacementPlanViewModel(dataBlocks, footnotes, originalSubjectId,
+                            return new DataReplacementPlanViewModel(
+                                dataBlocks,
+                                footnotes,
+                                originalSubjectId,
                                 replacementSubjectId);
                         });
                 });
         }
 
-        public async Task<Either<ActionResult, Unit>> Replace(Guid originalReleaseFileReferenceId,
-            Guid replacementReleaseFileReferenceId)
+        public async Task<Either<ActionResult, Unit>> Replace(
+            Guid originalFileId,
+            Guid replacementFileId)
         {
-            return await GetReplacementPlan(originalReleaseFileReferenceId, replacementReleaseFileReferenceId)
+            return await GetReplacementPlan(originalFileId, replacementFileId)
                 .OnSuccess(async replacementPlan =>
                 {
                     if (!replacementPlan.Valid)
@@ -111,20 +127,29 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Services
 
                     // This Release Id can be found on the ReplacementFileReference
                     var releaseId = (await _contentDbContext.ReleaseFileReferences
-                        .FindAsync(replacementReleaseFileReferenceId)).ReleaseId;
+                        .FindAsync(replacementFileId)).ReleaseId;
 
-                    return await RemoveSubjectAndFileFromRelease(releaseId, replacementPlan.OriginalSubjectId,
-                        originalReleaseFileReferenceId);
+                    return await RemoveSubjectAndFileFromRelease(releaseId, originalFileId);
                 });
         }
 
         private async Task<Either<ActionResult, ReleaseFileReference>> CheckReleaseFileReferenceExists(Guid id)
         {
-            return await _contentPersistenceHelper.CheckEntityExists<ReleaseFileReference>(id)
-                .OnSuccess(releaseFileReference => releaseFileReference.ReleaseFileType != ReleaseFileTypes.Data
-                    ? new Either<ActionResult, ReleaseFileReference>(
-                        ValidationActionResult(ReplacementFileTypesMustBeData))
-                    : releaseFileReference);
+            return await _contentPersistenceHelper.CheckEntityExists<ReleaseFileReference>(
+                    id,
+                    q => q.Include(rfr => rfr.Release)
+                )
+                .OnSuccess<ActionResult, ReleaseFileReference, ReleaseFileReference>(
+                    releaseFileReference =>
+                    {
+                        if (releaseFileReference.ReleaseFileType != ReleaseFileTypes.Data)
+                        {
+                            return ValidationActionResult(ReplacementFileTypesMustBeData);
+                        }
+
+                        return releaseFileReference;
+                    }
+                );
         }
 
         private async Task<Either<ActionResult, Unit>> CheckFilesAreForRelatedReleases(
@@ -147,7 +172,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Services
             // Check the replacement is for the same Release
             if (replacementReleaseFileReference.ReleaseId != originalReleaseId)
             {
-                return ValidationActionResult(ReplacementDataFileMustBeForRelatedRelease);
+                return new NotFoundResult();
             }
 
             return Unit.Instance;
@@ -195,15 +220,15 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Services
         private DataBlockReplacementPlanViewModel ValidateDataBlock(DataBlock dataBlock,
             ReplacementSubjectMeta replacementSubjectMeta)
         {
-            var filterItems = ValidateFilterItemsForDataBlock(dataBlock, replacementSubjectMeta);
-            var indicators = ValidateIndicatorsForDataBlock(dataBlock, replacementSubjectMeta);
+            var filters = ValidateFiltersForDataBlock(dataBlock, replacementSubjectMeta);
+            var indicatorGroups = ValidateIndicatorGroupsForDataBlock(dataBlock, replacementSubjectMeta);
             var locations = ValidateLocationsForDataBlock(dataBlock, replacementSubjectMeta);
             var timePeriods = ValidateTimePeriodsForDataBlock(dataBlock, replacementSubjectMeta);
 
             return new DataBlockReplacementPlanViewModel(dataBlock.Id,
                 dataBlock.Name,
-                filterItems,
-                indicators,
+                filters,
+                indicatorGroups,
                 locations,
                 timePeriods);
         }
@@ -216,79 +241,153 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Services
                 .ToList();
         }
 
-        private static FootnoteReplacementPlanViewModel ValidateFootnote(Footnote footnote,
+        private static FootnoteReplacementPlanViewModel ValidateFootnote(
+            Footnote footnote,
             ReplacementSubjectMeta replacementSubjectMeta)
         {
             var filters = ValidateFiltersForFootnote(footnote, replacementSubjectMeta);
             var filterGroups = ValidateFilterGroupsForFootnote(footnote, replacementSubjectMeta);
             var filterItems = ValidateFilterItemsForFootnote(footnote, replacementSubjectMeta);
-            var indicators = ValidateIndicatorsForFootnote(footnote, replacementSubjectMeta);
+            var indicatorGroups = ValidateIndicatorGroupsForFootnote(footnote, replacementSubjectMeta);
 
-            return new FootnoteReplacementPlanViewModel(footnote.Id,
+            return new FootnoteReplacementPlanViewModel(
+                footnote.Id,
                 footnote.Content,
                 filters,
                 filterGroups,
                 filterItems,
-                indicators);
+                indicatorGroups);
         }
 
-        private static List<FilterReplacementViewModel> ValidateFiltersForFootnote(Footnote footnote,
+        private static List<FootnoteFilterReplacementViewModel> ValidateFiltersForFootnote(
+            Footnote footnote,
             ReplacementSubjectMeta replacementSubjectMeta)
         {
             return footnote.Filters
                 .Select(filterFootnote => filterFootnote.Filter)
-                .Select(filter => ValidateFilterForReplacement(filter, replacementSubjectMeta))
+                .OrderBy(filter => filter.Label, LabelComparer)
+                .Select(filter => new FootnoteFilterReplacementViewModel(
+                    id: filter.Id,
+                    label: filter.Label,
+                    target: FindReplacementFilter(replacementSubjectMeta, filter.Name)?.Id
+                ))
                 .ToList();
         }
 
-        private static List<FilterGroupReplacementViewModel> ValidateFilterGroupsForFootnote(Footnote footnote,
+        private static List<FootnoteFilterGroupReplacementViewModel> ValidateFilterGroupsForFootnote(Footnote footnote,
             ReplacementSubjectMeta replacementSubjectMeta)
         {
             return footnote.FilterGroups
                 .Select(filterGroupFootnote => filterGroupFootnote.FilterGroup)
-                .Select(filterGroup => ValidateFilterGroupForReplacement(filterGroup, replacementSubjectMeta))
+                .OrderBy(filterGroup => filterGroup.Label, LabelComparer)
+                .Select(filterGroup => new FootnoteFilterGroupReplacementViewModel(
+                    id: filterGroup.Id,
+                    label: filterGroup.Label,
+                    filterId: filterGroup.FilterId,
+                    filterLabel: filterGroup.Filter.Label,
+                    target: FindReplacementFilterGroup(
+                        replacementSubjectMeta,
+                        filterGroup.Filter.Name,
+                        filterGroup.Label
+                    )?.Id
+                ))
                 .ToList();
         }
 
-        private static List<FilterItemReplacementViewModel> ValidateFilterItemsForFootnote(Footnote footnote,
+        private static List<FootnoteFilterItemReplacementViewModel> ValidateFilterItemsForFootnote(Footnote footnote,
             ReplacementSubjectMeta replacementSubjectMeta)
         {
             return footnote.FilterItems
                 .Select(filterItemFootnote => filterItemFootnote.FilterItem)
-                .Select(filterItem => ValidateFilterItemForReplacement(filterItem, replacementSubjectMeta))
+                .OrderBy(filterItem => filterItem.Label, LabelComparer)
+                .Select(filterItem => new FootnoteFilterItemReplacementViewModel(
+                    id: filterItem.Id,
+                    label: filterItem.Label,
+                    filterId: filterItem.FilterGroup.FilterId,
+                    filterLabel: filterItem.FilterGroup.Filter.Label,
+                    filterGroupId: filterItem.FilterGroupId,
+                    filterGroupLabel: filterItem.FilterGroup.Label,
+                    target: FindReplacementFilterItem(
+                        replacementSubjectMeta,
+                        filterItem.FilterGroup.Filter.Name,
+                        filterItem.FilterGroup.Label,
+                        filterItem.Label
+                    )?.Id
+                ))
                 .ToList();
         }
 
-        private static List<IndicatorReplacementViewModel> ValidateIndicatorsForFootnote(Footnote footnote,
+        private static Dictionary<Guid, IndicatorGroupReplacementViewModel> ValidateIndicatorGroupsForFootnote(Footnote footnote,
             ReplacementSubjectMeta replacementSubjectMeta)
         {
             return footnote.Indicators
                 .Select(indicatorFootnote => indicatorFootnote.Indicator)
-                .Select(indicator => ValidateIndicatorForReplacement(indicator, replacementSubjectMeta))
-                .ToList();
+                .GroupBy(indicatorFootnote => indicatorFootnote.IndicatorGroup)
+                .OrderBy(group => group.Key.Label, LabelComparer)
+                .ToDictionary(
+                    group => group.Key.Id,
+                    group => new IndicatorGroupReplacementViewModel(
+                        id: group.Key.Id,
+                        label: group.Key.Label,
+                        indicators: group.Select(indicator => ValidateIndicatorForReplacement(indicator, replacementSubjectMeta))
+                    )
+                );
         }
 
-        private List<FilterItemReplacementViewModel> ValidateFilterItemsForDataBlock(DataBlock dataBlock,
+        private Dictionary<Guid, FilterReplacementViewModel> ValidateFiltersForDataBlock(
+            DataBlock dataBlock,
             ReplacementSubjectMeta replacementSubjectMeta)
         {
             return _statisticsDbContext.FilterItem
                 .Where(filterItem => dataBlock.Query.Filters.Contains(filterItem.Id))
                 .Include(filterItem => filterItem.FilterGroup)
                 .ThenInclude(filterGroup => filterGroup.Filter)
-                .Select(filterItem => ValidateFilterItemForReplacement(filterItem, replacementSubjectMeta))
-                .ToList();
+                .ToList()
+                .GroupBy(filterItem => filterItem.FilterGroup.Filter)
+                .OrderBy(filter => filter.Key.Label, LabelComparer)
+                .ToDictionary(
+                    filter => filter.Key.Id,
+                    filter =>
+                    {
+                        return new FilterReplacementViewModel(
+                            id: filter.Key.Id,
+                            name: filter.Key.Name,
+                            label: filter.Key.Label,
+                            target: FindReplacementFilter(replacementSubjectMeta, filter.Key.Name)?.Id,
+                            groups: filter
+                                .GroupBy(filterItem => filterItem.FilterGroup)
+                                .OrderBy(group => group.Key.Label, LabelComparer)
+                                .ToDictionary(
+                                    group => group.Key.Id,
+                                    group => ValidateFilterGroupForReplacement(group.Key, replacementSubjectMeta)
+                                )
+                        );
+                    }
+                );
         }
 
-        private List<IndicatorReplacementViewModel> ValidateIndicatorsForDataBlock(DataBlock dataBlock,
+        private Dictionary<Guid, IndicatorGroupReplacementViewModel> ValidateIndicatorGroupsForDataBlock(DataBlock dataBlock,
             ReplacementSubjectMeta replacementSubjectMeta)
         {
             return _statisticsDbContext.Indicator
+                .Include(indicator => indicator.IndicatorGroup)
                 .Where(indicator => dataBlock.Query.Indicators.Contains(indicator.Id))
-                .Select(indicator => ValidateIndicatorForReplacement(indicator, replacementSubjectMeta))
-                .ToList();
+                .ToList()
+                .GroupBy(indicator => indicator.IndicatorGroup)
+                .OrderBy(group => group.Key.Label, LabelComparer)
+                .ToDictionary(
+                    group => group.Key.Id,
+                    group => new IndicatorGroupReplacementViewModel(
+                        id: group.Key.Id,
+                        label: group.Key.Label,
+                        indicators: group
+                            .Select(indicator => ValidateIndicatorForReplacement(indicator, replacementSubjectMeta))
+                            .OrderBy(indicator => indicator.Label, LabelComparer)
+                    )
+                );
         }
 
-        private static Dictionary<string, LocationReplacementViewModel> ValidateLocationsForDataBlock(
+        private Dictionary<string, LocationReplacementViewModel> ValidateLocationsForDataBlock(
             DataBlock dataBlock,
             ReplacementSubjectMeta replacementSubjectMeta)
         {
@@ -296,78 +395,87 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Services
                 .Where(geographicLevel => !IgnoredLevels.Contains(geographicLevel))
                 .ToDictionary(geographicLevel => geographicLevel.ToString(),
                     geographicLevel =>
-                        ValidateLocationsForReplacement(dataBlock.Query.Locations,
+                        ValidateLocationLevelForReplacement(dataBlock.Query.Locations,
                             geographicLevel,
                             replacementSubjectMeta))
                 .Filter(pair => pair.Value.Any);
         }
 
-        private static TimePeriodReplacementViewModel ValidateTimePeriodsForDataBlock(DataBlock dataBlock,
+        private static TimePeriodRangeReplacementViewModel ValidateTimePeriodsForDataBlock(
+            DataBlock dataBlock,
             ReplacementSubjectMeta replacementSubjectMeta)
         {
-            var range = TimePeriodUtil.Range(dataBlock.Query.TimePeriod);
-            return new TimePeriodReplacementViewModel
-            {
-                Query = dataBlock.Query.TimePeriod,
-                Valid = range.Intersect(replacementSubjectMeta.TimePeriods).Any()
-            };
+            return new TimePeriodRangeReplacementViewModel(
+                start: ValidateTimePeriodForReplacement(
+                    dataBlock.Query.TimePeriod.StartYear,
+                    dataBlock.Query.TimePeriod.StartCode,
+                    replacementSubjectMeta
+                ),
+                end: ValidateTimePeriodForReplacement(
+                    dataBlock.Query.TimePeriod.EndYear,
+                    dataBlock.Query.TimePeriod.EndCode,
+                    replacementSubjectMeta
+                )
+            );
         }
 
-        private static FilterReplacementViewModel ValidateFilterForReplacement(Filter filter,
+        private static TimePeriodReplacementViewModel ValidateTimePeriodForReplacement(
+            int year,
+            TimeIdentifier code,
             ReplacementSubjectMeta replacementSubjectMeta)
         {
-            return new FilterReplacementViewModel
-            {
-                Id = filter.Id,
-                Name = filter.Name,
-                Label = filter.Label,
-                Target = FindReplacementFilter(replacementSubjectMeta,
-                    filter.Name)?.Id
-            };
+            return new TimePeriodReplacementViewModel(
+                year: year,
+                code: code,
+                valid: replacementSubjectMeta.TimePeriods.Contains((year, code))
+            );
         }
 
-        private static FilterGroupReplacementViewModel ValidateFilterGroupForReplacement(FilterGroup filterGroup,
+        private static  FilterGroupReplacementViewModel ValidateFilterGroupForReplacement(
+            FilterGroup filterGroup,
             ReplacementSubjectMeta replacementSubjectMeta)
         {
-            return new FilterGroupReplacementViewModel
-            {
-                Id = filterGroup.Id,
-                Label = filterGroup.Label,
-                FilterLabel = filterGroup.Filter.Label,
-                Target = FindReplacementFilterGroup(replacementSubjectMeta,
+            return new FilterGroupReplacementViewModel(
+                id: filterGroup.Id,
+                label: filterGroup.Label,
+                target: FindReplacementFilterGroup(
+                    replacementSubjectMeta,
                     filterGroup.Filter.Name,
-                    filterGroup.Label)?.Id
-            };
+                    filterGroup.Label)?.Id,
+                filters: filterGroup.FilterItems
+                    .Select(item => ValidateFilterItemForReplacement(item, replacementSubjectMeta))
+                    .OrderBy(item => item.Label, LabelComparer)
+            );
         }
 
-        private static FilterItemReplacementViewModel ValidateFilterItemForReplacement(FilterItem filterItem,
+        private static FilterItemReplacementViewModel ValidateFilterItemForReplacement(
+            FilterItem filterItem,
             ReplacementSubjectMeta replacementSubjectMeta)
         {
-            return new FilterItemReplacementViewModel
-            {
-                Id = filterItem.Id,
-                Label = filterItem.Label,
-                Target = FindReplacementFilterItem(replacementSubjectMeta,
+            return new FilterItemReplacementViewModel(
+                id: filterItem.Id,
+                label: filterItem.Label,
+                target: FindReplacementFilterItem(
+                    replacementSubjectMeta,
                     filterItem.FilterGroup.Filter.Name,
                     filterItem.FilterGroup.Label,
                     filterItem.Label)?.Id
-            };
+            );
         }
 
-        private static IndicatorReplacementViewModel ValidateIndicatorForReplacement(Indicator indicator,
+        private static IndicatorReplacementViewModel ValidateIndicatorForReplacement(
+            Indicator indicator,
             ReplacementSubjectMeta replacementSubjectMeta)
         {
-            return new IndicatorReplacementViewModel
-            {
-                Id = indicator.Id,
-                Name = indicator.Name,
-                Label = indicator.Label,
-                Target = FindReplacementIndicator(replacementSubjectMeta,
-                    indicator.Name)
-            };
+            return new IndicatorReplacementViewModel(
+                id: indicator.Id,
+                name: indicator.Name,
+                label: indicator.Label,
+                target: FindReplacementIndicator(replacementSubjectMeta, indicator.Name)
+            );
         }
 
-        private static LocationReplacementViewModel ValidateLocationsForReplacement(
+        private LocationReplacementViewModel ValidateLocationLevelForReplacement(
             LocationQuery locationQuery,
             GeographicLevel geographicLevel,
             ReplacementSubjectMeta replacementSubjectMeta)
@@ -379,19 +487,40 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Services
                     $"{nameof(locationQuery)} does not have a property {geographicLevel.ToString()} with get method");
             }
 
-            var originalCodes =
-                queryProperty.GetMethod.Invoke(locationQuery, new object[] { }) as IEnumerable<string> ??
-                new List<string>();
+            var originalCodes = (
+                queryProperty.GetMethod.Invoke(locationQuery, new object[] { }) as IEnumerable<string> ?? new List<string>()
+            ).ToList();
 
-            var replacementCodes = replacementSubjectMeta.ObservationalUnits.GetValueOrDefault(geographicLevel)
-                ?.Select(unit => unit.Code)
-                .ToList() ?? new List<string>();
-
-            return new LocationReplacementViewModel
+            if (!originalCodes.Any())
             {
-                Matched = originalCodes.Intersect(replacementCodes),
-                Unmatched = originalCodes.Except(replacementCodes),
-            };
+                return new LocationReplacementViewModel(
+                    label: geographicLevel.GetEnumLabel(),
+                    observationalUnits: new List<ObservationalUnitReplacementViewModel>()
+                );
+            }
+
+            var locations = _locationService.GetObservationalUnits(geographicLevel, originalCodes);
+            var replacementLocations = replacementSubjectMeta.ObservationalUnits
+                .GetValueOrDefault(geographicLevel)
+                ?.ToDictionary(location => location.Code) ?? new Dictionary<string, IObservationalUnit>();
+
+            return new LocationReplacementViewModel(
+                label: geographicLevel.GetEnumLabel(),
+                observationalUnits: locations
+                    .Select(location => ValidateLocationForReplacement(location, replacementLocations))
+                    .OrderBy(location => location.Label, LabelComparer)
+            );
+        }
+
+        private static ObservationalUnitReplacementViewModel ValidateLocationForReplacement(
+            IObservationalUnit location,
+            Dictionary<string, IObservationalUnit> replacementLocations)
+        {
+            return new ObservationalUnitReplacementViewModel(
+                label: location.Name,
+                code: location.Code,
+                target: replacementLocations.GetValueOrDefault(location.Code)?.Code ?? string.Empty
+            );
         }
 
         private static Filter FindReplacementFilter(ReplacementSubjectMeta replacementSubjectMeta,
@@ -446,11 +575,15 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Services
         {
             var filterItems = dataBlock.Query.Filters.ToList();
 
-            replacementPlan.FilterItems.ToList().ForEach(plan =>
-            {
-                filterItems.Remove(plan.Id);
-                filterItems.Add(plan.TargetValue);
-            });
+            replacementPlan.Filters
+                .SelectMany(filter =>
+                    filter.Value.Groups.SelectMany(group => group.Value.Filters))
+                .ToList()
+                .ForEach(plan =>
+                {
+                    filterItems.Remove(plan.Id);
+                    filterItems.Add(plan.TargetValue);
+                });
 
             dataBlock.Query.Filters = filterItems;
         }
@@ -460,11 +593,14 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Services
         {
             var indicators = dataBlock.Query.Indicators.ToList();
 
-            replacementPlan.Indicators.ToList().ForEach(plan =>
-            {
-                indicators.Remove(plan.Id);
-                indicators.Add(plan.TargetValue);
-            });
+            replacementPlan.IndicatorGroups
+                .SelectMany(group => group.Value.Indicators)
+                .ToList()
+                .ForEach(plan =>
+                {
+                    indicators.Remove(plan.Id);
+                    indicators.Add(plan.TargetValue);
+                });
 
             dataBlock.Query.Indicators = indicators;
         }
@@ -474,8 +610,13 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Services
         {
             var tableHeaders = dataBlock.Table.TableHeaders;
 
-            var filterItemTargets = replacementPlan.FilterItems.ToDictionary(plan => plan.Id, plan => plan.TargetValue);
-            var indicatorTargets = replacementPlan.Indicators.ToDictionary(plan => plan.Id, plan => plan.TargetValue);
+            var filterItemTargets = replacementPlan.Filters
+                .SelectMany(filter =>
+                    filter.Value.Groups.SelectMany(group => group.Value.Filters))
+                .ToDictionary(plan => plan.Id, plan => plan.TargetValue);
+            var indicatorTargets = replacementPlan.IndicatorGroups
+                .SelectMany(group => group.Value.Indicators)
+                .ToDictionary(plan => plan.Id, plan => plan.TargetValue);
 
             ReplaceDataBlockTableHeaders(
                 tableHeaders.Columns.FilterByType(TableHeaderType.Filter), dataBlock, filterItemTargets);
@@ -546,8 +687,10 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Services
             await replacementPlan.FilterItems.ForEachAsync(async plan =>
                 await ReplaceFootnoteFilterItem(replacementPlan.Id, plan));
 
-            await replacementPlan.Indicators.ForEachAsync(async plan =>
-                await ReplaceIndicatorFootnote(replacementPlan.Id, plan));
+            await replacementPlan.IndicatorGroups
+                .SelectMany(group => group.Value.Indicators)
+                .ForEachAsync(async plan =>
+                    await ReplaceIndicatorFootnote(replacementPlan.Id, plan));
         }
 
         private async Task ReplaceFootnoteSubject(Guid footnoteId, Guid originalSubjectId, Guid replacementSubjectId)
@@ -623,17 +766,9 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Services
         }
 
         private async Task<Either<ActionResult, Unit>> RemoveSubjectAndFileFromRelease(Guid releaseId,
-            Guid subjectId,
             Guid releaseFileReferenceId)
         {
-            var releaseFileReference = await _contentDbContext.ReleaseFileReferences
-                .FindAsync(releaseFileReferenceId);
-
-            var subject =
-                await _statisticsDbContext.Subject.FindAsync(subjectId);
-
-            return await _releaseService.RemoveDataFilesAsync(releaseId,
-                releaseFileReference.Filename, subject.Name);
+            return await _releaseService.RemoveDataFilesAsync(releaseId, releaseFileReferenceId);
         }
 
         private class ReplacementSubjectMeta

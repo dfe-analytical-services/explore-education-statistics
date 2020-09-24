@@ -129,7 +129,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Services
                         q => q.Include(t => t.Topics)
                     )
                 )
-                .OnSuccess(
+                .OnSuccessVoid(
                     async theme =>
                     {
                         // For now we only want to delete test themes as we

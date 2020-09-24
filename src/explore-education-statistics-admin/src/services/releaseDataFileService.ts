@@ -18,6 +18,7 @@ export interface DeleteDataFilePlan {
 }
 
 export interface DataFile {
+  id: string;
   title: string;
   filename: string;
   fileSize: {
@@ -27,7 +28,7 @@ export interface DataFile {
   rows: number;
   metadataFilename: string;
   userName: string;
-  created: Date;
+  created?: string;
   canDelete?: boolean;
   isDeleting?: boolean;
 }
@@ -69,6 +70,7 @@ function mapFile(file: DataFileInfo): DataFile {
   const [size, unit] = file.size.split(' ');
 
   return {
+    id: file.id,
     title: file.name,
     filename: file.fileName,
     rows: file.rows || 0,
@@ -79,18 +81,23 @@ function mapFile(file: DataFileInfo): DataFile {
     metadataFilename: file.metaFileName,
     canDelete: true,
     userName: file.userName,
-    created: new Date(file.created),
+    created: file.created,
   };
 }
 
 const releaseDataFileService = {
-  getReleaseDataFiles(releaseId: string): Promise<DataFile[]> {
+  getDataFiles(releaseId: string): Promise<DataFile[]> {
     return client
       .get<DataFileInfo[]>(`/release/${releaseId}/data`)
       .then(response => {
         const dataFiles = response.filter(file => file.metaFileName.length > 0);
         return dataFiles.map(mapFile);
       });
+  },
+  getDataFile(releaseId: string, fileId: string): Promise<DataFile> {
+    return client
+      .get<DataFileInfo>(`/release/${releaseId}/data/${fileId}`)
+      .then(mapFile);
   },
   async uploadDataFiles(
     releaseId: string,
@@ -159,23 +166,11 @@ const releaseDataFileService = {
     dataFile: DataFile,
   ): Promise<DeleteDataFilePlan> {
     return client.get<DeleteDataFilePlan>(
-      `/release/${releaseId}/data/${dataFile.filename}/delete-plan`,
-      {
-        params: {
-          name: dataFile.title,
-        },
-      },
+      `/release/${releaseId}/data/${dataFile.id}/delete-plan`,
     );
   },
   deleteDataFiles(releaseId: string, dataFile: DataFile): Promise<void> {
-    return client.delete<void>(
-      `/release/${releaseId}/data/${dataFile.filename}`,
-      {
-        params: {
-          name: dataFile.title,
-        },
-      },
-    );
+    return client.delete<void>(`/release/${releaseId}/data/${dataFile.id}`);
   },
   downloadDataFile(releaseId: string, fileName: string): Promise<void> {
     return client

@@ -78,10 +78,10 @@ namespace GovUk.Education.ExploreEducationStatistics.Common.Tests.Model
         }
 
         [Fact]
-        public async void OnSuccess_WithVoidTask()
+        public async void OnSuccessVoid()
         {
             var either = await Task.FromResult(new Either<int, string>("a success"))
-                .OnSuccess(
+                .OnSuccessVoid(
                     async str =>
                     {
                         await Task.FromResult(true);

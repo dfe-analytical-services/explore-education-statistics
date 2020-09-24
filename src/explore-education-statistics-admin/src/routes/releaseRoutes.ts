@@ -1,5 +1,6 @@
 import ReleaseContentPage from '@admin/pages/release/content/ReleaseContentPage';
 import ReleaseDataPage from '@admin/pages/release/data/ReleaseDataPage';
+import ReleaseDataFilePage from '@admin/pages/release/data/ReleaseDataFilePage';
 import ReleaseDataBlocksPage from '@admin/pages/release/datablocks/ReleaseDataBlocksPage';
 import ReleasePreReleaseAccessPage from '@admin/pages/release/ReleasePreReleaseAccessPage';
 import ReleasePublishStatusPage from '@admin/pages/release/ReleaseStatusPage';
@@ -14,6 +15,10 @@ export type ReleaseRouteParams = {
 
 export type ReleaseDataBlocksRouteParams = ReleaseRouteParams & {
   dataBlockId?: string;
+};
+
+export type ReleaseDataFileRouteParams = ReleaseRouteParams & {
+  fileId: string;
 };
 
 export interface ReleaseRouteProps extends RouteProps {
@@ -37,6 +42,12 @@ export const releaseDataRoute: ReleaseRouteProps = {
   path: '/publication/:publicationId/release/:releaseId/data',
   title: 'Manage data',
   component: ReleaseDataPage,
+};
+
+export const releaseDataFileRoute: ReleaseRouteProps = {
+  path: '/publication/:publicationId/release/:releaseId/data/:fileId',
+  title: 'Manage data',
+  component: ReleaseDataFilePage,
 };
 
 export const releaseDataBlocksRoute: ReleaseRouteProps = {

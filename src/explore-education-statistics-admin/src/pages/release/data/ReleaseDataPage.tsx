@@ -67,6 +67,7 @@ const ReleaseDataPage = () => {
       >
         <TabsSection id="data-uploads" title="Data uploads">
           <ReleaseDataUploadsSection
+            publicationId={publication.id}
             releaseId={releaseId}
             canUpdateRelease={canUpdateRelease}
           />

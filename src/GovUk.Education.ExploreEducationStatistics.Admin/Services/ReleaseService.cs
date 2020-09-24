@@ -392,6 +392,15 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Services
                 .Select(rfr => rfr.ReleaseId).Distinct();
         }
 
+        private async Task<Either<ActionResult, ReleaseFileReference>> CheckReleaseFileReferenceExists(Guid id)
+        {
+            return await _persistenceHelper.CheckEntityExists<ReleaseFileReference>(id)
+                .OnSuccess(releaseFileReference => releaseFileReference.ReleaseFileType != ReleaseFileTypes.Data
+                    ? new Either<ActionResult, ReleaseFileReference>(
+                        ValidationActionResult(FileTypeMustBeData))
+                    : releaseFileReference);
+        }
+
         private async Task<Either<ActionResult, bool>> ValidateReleaseSlugUniqueToPublication(string slug,
             Guid publicationId, Guid? releaseId = null)
         {
@@ -420,43 +429,48 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Services
             templateRelease.CreateGenericContentFromTemplate(newRelease);
         }
 
-        public async Task<Either<ActionResult, DeleteDataFilePlan>> GetDeleteDataFilePlan(Guid releaseId,
-            string dataFileName, string subjectTitle)
+        public async Task<Either<ActionResult, DeleteDataFilePlan>> GetDeleteDataFilePlan(Guid releaseId, Guid fileId)
         {
-            return await _persistenceHelper
-                .CheckEntityExists<Release>(releaseId)
+            return await _persistenceHelper.CheckEntityExists<Release>(releaseId)
                 .OnSuccess(_userService.CheckCanUpdateRelease)
-                .OnSuccess(async _ =>
+                .OnSuccess(() => CheckReleaseFileReferenceExists(fileId))
+                .OnSuccess(async releaseFileReference =>
                 {
-                    var subject = await _subjectService.GetAsync(releaseId, subjectTitle);
-                    var footnotes = subject == null ? new List<Footnote>() : _footnoteService.GetFootnotes(releaseId, subject.Id);
+                    var subject = releaseFileReference.SubjectId.HasValue
+                        ? await _subjectService.GetAsync(releaseFileReference.SubjectId.Value)
+                        : null;
+
+                    var footnotes = subject == null
+                        ? new List<Footnote>()
+                        : _footnoteService.GetFootnotes(releaseId, subject.Id);
 
                     return new DeleteDataFilePlan
                     {
                         ReleaseId = releaseId,
                         SubjectId = subject?.Id ?? Guid.Empty,
-                        TableStorageItem = new DatafileImport(releaseId.ToString(), dataFileName),
+                        TableStorageItem = new DatafileImport(releaseId.ToString(), releaseFileReference.Filename),
                         DeleteDataBlockPlan = await _dataBlockService.GetDeleteDataBlockPlan(releaseId, subject),
-                        FootnoteIds = footnotes.Select(footnote => footnote.Id).ToList(),
+                        FootnoteIds = footnotes.Select(footnote => footnote.Id).ToList()
                     };
                 });
         }
 
-        public async Task<Either<ActionResult, Unit>> RemoveDataFilesAsync(Guid releaseId, string fileName, string subjectTitle)
+        public async Task<Either<ActionResult, Unit>> RemoveDataFilesAsync(Guid releaseId, Guid fileId)
         {
             return await _persistenceHelper
                 .CheckEntityExists<Release>(releaseId)
                 .OnSuccess(_userService.CheckCanUpdateRelease)
-                .OnSuccess(() => CheckCanDeleteDataFiles(releaseId, fileName))
-                .OnSuccess(_ => GetDeleteDataFilePlan(releaseId, fileName, subjectTitle))
+                .OnSuccess(() => CheckReleaseFileReferenceExists(fileId))
+                .OnSuccess(releaseFileReference => CheckCanDeleteDataFiles(releaseId, releaseFileReference))
+                .OnSuccess(_ => GetDeleteDataFilePlan(releaseId, fileId))
                 .OnSuccess(async deletePlan =>
                 {
                     await _dataBlockService.DeleteDataBlocks(deletePlan.DeleteDataBlockPlan);
                     await _releaseSubjectService.SoftDeleteSubjectOrBreakReleaseLink(releaseId, deletePlan.SubjectId);
 
                     return await _releaseFilesService
-                        .DeleteDataFilesAsync(releaseId, fileName)
-                        .OnSuccess(async () => await RemoveFileImportEntryIfOrphaned(deletePlan));
+                        .DeleteDataFiles(releaseId, fileId)
+                        .OnSuccessVoid(async () => await RemoveFileImportEntryIfOrphaned(deletePlan));
                 });
         }
 
@@ -500,16 +514,11 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Services
             return release.Status != ReleaseStatus.Approved;
         }
 
-        private async Task<Either<ActionResult, bool>> CheckCanDeleteDataFiles(Guid releaseId, string dataFileName)
+        private async Task<Either<ActionResult, Unit>> CheckCanDeleteDataFiles(Guid releaseId,
+            ReleaseFileReference releaseFileReference)
         {
-            var releaseFileReference = _context
-                .ReleaseFiles
-                .Include(rf => rf.ReleaseFileReference)
-                .Where(rf => rf.ReleaseId == releaseId && rf.ReleaseFileReference.Filename == dataFileName)
-                .Select(rf => rf.ReleaseFileReference)
-                .First();
-
-            var importFinished = await _importStatusService.IsImportFinished(releaseFileReference.ReleaseId.ToString(), dataFileName);
+            var importFinished = await _importStatusService.IsImportFinished(releaseFileReference.ReleaseId.ToString(),
+                releaseFileReference.Filename);
 
             if (!importFinished)
             {
@@ -521,7 +530,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Services
                 return ValidationActionResult(CannotRemoveDataFilesOnceReleaseApproved);
             }
 
-            return true;
+            return Unit.Instance;
         }
 
         private async Task<Either<ActionResult, bool>> CheckMethodologyHasBeenApproved(Release release, ReleaseStatus status)
