@@ -77,7 +77,7 @@ pipenv run python run_tests.py -h
 
 After changing the tests and ensuring they pass locally, it is then recommended that you run your changes on the pipeline to ensure they also pass there. There is a build pipeline you can use to check any changes you've made will pass on the pipeline: 'UI Tests'. You can run this pipeline using the branch with your changes, and it will produce an artifact you can download with the test report, screenshots, etc.
 
-At the time of writing, the pipeline runs the tests against the Dev environment, and runs all `general_public` and `admin` tests. You can edit the pipeline if you wish to do something different.
+At the time of writing, the pipeline runs the tests against the Dev environment, and runs all tests. You can edit the pipeline if you wish to do something different.
 
 
 ## Authentication
@@ -177,6 +177,12 @@ IntelliJ also allows you use to External Tools to right click on a file and run 
 - Program: `/home/${USER}/.local/bin/pipenv` OR `C:\Python38\Scripts\pipenv.exe` OR wherever pipenv is located -- use `whereis pipenv` on linux or `where pipenv` on windows
 - Arguments: `run python run_tests.py --visual -i robot -f "$FilePath$" -e dev`
 - Working directory: `$ProjectFileDir$` (which should represent the robot-tests directory. You may have to do something like `$ProjectFileDir$/../tests/robot-tests`)
+
+
+# Troubleshooting
+
+### The tests are flaky when I run them locally against the public frontend.
+Try running the frontend with `npm run build & npm run start:prod`.
 
 
 # Who should I talk to?
