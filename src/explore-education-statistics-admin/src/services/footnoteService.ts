@@ -41,13 +41,11 @@ export interface FootnoteSubjectMeta {
       // indicator "group"
       label: string;
       options: {
-        [key: string]: {
-          // indicator "item"
-          label: string;
-          unit: string;
-          value: string;
-        };
-      };
+        // indicator "item"
+        label: string;
+        unit: string;
+        value: string;
+      }[];
     };
   };
   filters: {
@@ -56,16 +54,14 @@ export interface FootnoteSubjectMeta {
       hint: string;
       legend: string;
       options: {
+        // filterGroup
         [key: string]: {
           label: string;
-          // filterGroup
           options: {
-            [key: string]: {
-              // filterItem
-              label: string;
-              value: string;
-            };
-          };
+            // filterItem
+            label: string;
+            value: string;
+          }[];
         };
       };
     };

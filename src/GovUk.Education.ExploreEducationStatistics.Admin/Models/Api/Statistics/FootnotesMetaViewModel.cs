@@ -21,15 +21,15 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Models.Api.Statistics
         public string SubjectName { get; set; }
     }
 
-    public class FootnotesFilterItemsMetaViewModel : LabelOptionsMetaValueModel<Dictionary<Guid, LabelValue>>
+    public class FootnotesFilterMetaViewModel : LegendOptionsMetaValueModel<Dictionary<Guid, FootnotesFilterGroupsMetaViewModel>>
     {
     }
 
-    public class FootnotesFilterMetaViewModel : LegendOptionsMetaValueModel<Dictionary<Guid, FootnotesFilterItemsMetaViewModel>>
+    public class FootnotesFilterGroupsMetaViewModel : LabelOptionsMetaValueModel<List<LabelValue>>
     {
     }
 
-    public class FootnotesIndicatorsMetaViewModel : LabelOptionsMetaValueModel<Dictionary<Guid, IndicatorMetaViewModel>>
+    public class FootnotesIndicatorsMetaViewModel : LabelOptionsMetaValueModel<IList<IndicatorMetaViewModel>>
     {
     }
 }

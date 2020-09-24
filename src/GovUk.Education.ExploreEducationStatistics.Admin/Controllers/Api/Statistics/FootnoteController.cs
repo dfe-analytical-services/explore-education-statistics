@@ -138,8 +138,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Controllers.Api.Stati
                         Label = group.Label,
                         Options = group.Indicators
                             .OrderBy(indicator => indicator.Label, LabelComparer)
-                            .ToDictionary(
-                                indicator => indicator.Id,
+                            .Select(
                                 indicator => new IndicatorMetaViewModel
                                 {
                                     Label = indicator.Label,
@@ -147,7 +146,9 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Controllers.Api.Stati
                                     Unit = indicator.Unit.GetEnumValue(),
                                     Value = indicator.Id.ToString(),
                                     DecimalPlaces = indicator.DecimalPlaces
-                                })
+                                }
+                            )
+                            .ToList()
                     }
                 );
         }
@@ -169,21 +170,22 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Controllers.Api.Stati
                     });
         }
 
-        private static FootnotesFilterItemsMetaViewModel BuildFilterItemsMetaViewModel(FilterGroup filterGroup,
+        private static FootnotesFilterGroupsMetaViewModel BuildFilterItemsMetaViewModel(FilterGroup filterGroup,
             IEnumerable<FilterItem> filterItems)
         {
-            return new FootnotesFilterItemsMetaViewModel
+            return new FootnotesFilterGroupsMetaViewModel
             {
                 Label = filterGroup.Label,
                 Options = filterItems
                     .OrderBy(item => item.Label, LabelComparer)
-                    .ToDictionary(
-                        item => item.Id,
+                    .Select(
                         item => new LabelValue
                         {
                             Label = item.Label,
                             Value = item.Id.ToString()
-                        })
+                        }
+                    )
+                    .ToList()
             };
         }
 
