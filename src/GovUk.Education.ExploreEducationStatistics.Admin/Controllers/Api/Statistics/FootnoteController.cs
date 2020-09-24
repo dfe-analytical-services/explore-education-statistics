@@ -16,7 +16,7 @@ using IFootnoteService = GovUk.Education.ExploreEducationStatistics.Admin.Servic
 
 namespace GovUk.Education.ExploreEducationStatistics.Admin.Controllers.Api.Statistics
 {
-    [Route("api/data/[controller]")]
+    [Route("api")]
     [ApiController]
     [Authorize]
     public class FootnoteController : ControllerBase
@@ -38,7 +38,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Controllers.Api.Stati
             _releaseMetaService = releaseMetaService;
         }
 
-        [HttpPost("release/{releaseId}")]
+        [HttpPost("releases/{releaseId}/footnotes")]
         public async Task<ActionResult<FootnoteViewModel>> CreateFootnote(Guid releaseId, CreateFootnoteViewModel footnote)
         {
             return await _footnoteService
@@ -51,10 +51,10 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Controllers.Api.Stati
                     footnote.Indicators,
                     footnote.Subjects)
                 .OnSuccess(GatherAndBuildFootnoteViewModel)
-                .HandleFailuresOr(Ok);
+                .HandleFailuresOrOk();
         }
 
-        [HttpDelete("release/{releaseId}/{id}")]
+        [HttpDelete("releases/{releaseId}/footnotes/{id}")]
         public async Task<ActionResult> DeleteFootnote(Guid releaseId, Guid id)
         {
             return await _footnoteService
@@ -62,37 +62,16 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Controllers.Api.Stati
                 .HandleFailuresOrNoContent();
         }
 
-        [HttpGet("release/{releaseId}")]
-        public async Task<ActionResult<FootnotesViewModel>> GetFootnotes(Guid releaseId)
+        [HttpGet("releases/{releaseId}/footnotes")]
+        public async Task<ActionResult<IEnumerable<FootnoteViewModel>>> GetFootnotes(Guid releaseId)
         {
             return await _footnoteService
                 .GetFootnotesAsync(releaseId)
-                .OnSuccess(async footnotes =>
-                {
-                    var viewModels = footnotes.Select(GatherAndBuildFootnoteViewModel);
-
-                    var subjects = (await _releaseMetaService
-                        .GetSubjectsAsync(releaseId))
-                        .ToDictionary(subject => subject.Id, subject =>
-                            new FootnotesSubjectMetaViewModel
-                            {
-                                Filters = GetFilters(subject.Id),
-                                Indicators = GetIndicators(subject.Id),
-                                SubjectId = subject.Id,
-                                SubjectName = subject.Label
-                            }
-                        );
-
-                    return new FootnotesViewModel
-                    {
-                        Footnotes = viewModels,
-                        Meta = subjects
-                    };
-                })
-                .HandleFailuresOr(Ok);
+                .OnSuccess(footnotes => footnotes.Select(GatherAndBuildFootnoteViewModel))
+                .HandleFailuresOrOk();
         }
 
-        [HttpPut("release/{releaseId}/{id}")]
+        [HttpPut("releases/{releaseId}/footnotes/{id}")]
         public async Task<ActionResult<FootnoteViewModel>> UpdateFootnote(Guid releaseId, Guid id, UpdateFootnoteViewModel footnote)
         {
             return await _footnoteService
@@ -107,7 +86,35 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Controllers.Api.Stati
                     footnote.Subjects
                 )
                 .OnSuccess(GatherAndBuildFootnoteViewModel)
-                .HandleFailuresOr(Ok);
+                .HandleFailuresOrOk();
+        }
+
+        [HttpGet("releases/{releaseId}/footnotes-meta")]
+        public async Task<ActionResult<FootnotesMetaViewModel>> GetFootnotesMeta(Guid releaseId)
+        {
+            return await _footnoteService
+                .GetFootnotesAsync(releaseId)
+                .OnSuccess(async footnotes =>
+                {
+                    var meta = await _releaseMetaService.GetSubjectsAsync(releaseId);
+
+                    return new FootnotesMetaViewModel
+                    {
+                        Subjects = meta.ToDictionary(
+                            subject => subject.Id,
+                            subject =>
+                                new FootnotesSubjectMetaViewModel
+                                {
+                                    Filters = GetFilters(subject.Id),
+                                    Indicators = GetIndicators(subject.Id),
+                                    SubjectId = subject.Id,
+                                    SubjectName = subject.Label
+                                }
+                        )
+                    };
+
+                })
+                .HandleFailuresOrOk();
         }
 
         private Dictionary<Guid, FootnotesIndicatorsMetaViewModel> GetIndicators(Guid subjectId)
@@ -193,7 +200,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Controllers.Api.Stati
             var filterGroupsByFilter = filterGroupsGroupByFilter
                 .ToDictionary(grouping => grouping.Key.Id, grouping => grouping.ToList());
 
-            // There can be more than one indicator belonging to the same subject in each group so we add Distinct here. 
+            // There can be more than one indicator belonging to the same subject in each group so we add Distinct here.
             var indicatorGroupsBySubject = footnote.Indicators
                 .GroupBy(indicatorFootnote => indicatorFootnote.Indicator.IndicatorGroup.SubjectId,
                     indicatorFootnote => indicatorFootnote.Indicator.IndicatorGroupId)
@@ -209,13 +216,13 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Controllers.Api.Stati
                     filterFootnote => filterFootnote.FilterId)
                 .ToDictionary(grouping => grouping.Key, grouping => grouping.ToList());
 
-            // Index filter groups related to the filter items 
+            // Index filter groups related to the filter items
             AppendFilterGroups(filterItemsGroupByFilterGroup.Select(group => group.Key), filterGroupsByFilter);
 
             // Index filters related to the filter groups
             AppendFilters(filterGroupsGroupByFilter.Select(group => group.Key), filtersBySubject);
 
-            // Index filters related to the filter items 
+            // Index filters related to the filter items
             AppendFilters(filterItemsGroupByFilter.Select(group => group.Key), filtersBySubject);
 
             var selectedSubjects = footnote.Subjects.Select(subjectFootnote => subjectFootnote.SubjectId).ToList();
