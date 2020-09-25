@@ -169,33 +169,43 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.ViewModels
         }
     }
 
-    public class FilterReplacementViewModel : TargetableReplacementViewModel
+    public class FilterReplacementViewModel
     {
+        public Guid Id { get; }
+        public string Label { get; }
         public string Name { get; }
         public Dictionary<Guid, FilterGroupReplacementViewModel> Groups { get; }
 
+        public bool Valid => Groups.All(group => group.Value.Valid);
+        
         public FilterReplacementViewModel(
             Guid id,
             string label,
-            Guid? target,
             string name,
-            Dictionary<Guid, FilterGroupReplacementViewModel> groups) : base(id, label, target)
+            Dictionary<Guid, FilterGroupReplacementViewModel> groups)
         {
+            Id = id;
+            Label = label;
             Name = name;
             Groups = groups;
         }
     }
 
-    public class FilterGroupReplacementViewModel : TargetableReplacementViewModel
+    public class FilterGroupReplacementViewModel
     {
+        public Guid Id { get; }
+        public string Label { get; }
         public IEnumerable<FilterItemReplacementViewModel> Filters { get; }
+
+        public bool Valid => Filters.All(filter => filter.Valid);
 
         public FilterGroupReplacementViewModel(
             Guid id,
             string label,
-            Guid? target,
-            IEnumerable<FilterItemReplacementViewModel> filters) : base(id, label, target)
+            IEnumerable<FilterItemReplacementViewModel> filters)
         {
+            Id = id;
+            Label = label;
             Filters = filters;
         }
     }
