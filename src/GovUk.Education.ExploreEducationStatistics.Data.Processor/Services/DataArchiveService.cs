@@ -44,11 +44,11 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Processor.Services
                     releaseId: releaseId,
                     stream: stream,
                     fileType: ReleaseFileTypes.Data,
-                    fileName: dataFile.Name,
+                    fileName: dataFile.Name.ToLower(),
                     contentType: "text/csv",
                     metaValues: GetDataFileMetaValues(
                         name: blob.Name,
-                        metaFileName: metadataFile.Name,
+                        metaFileName: metadataFile.Name.ToLower(),
                         userName: blob.GetUserName(),
                         numberOfRows: CalculateNumberOfRows(rowStream)
                     )
@@ -62,10 +62,10 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Processor.Services
                     releaseId: releaseId,
                     stream: stream,
                     fileType: ReleaseFileTypes.Metadata,
-                    fileName: metadataFile.Name,
+                    fileName: metadataFile.Name.ToLower(),
                     contentType: "text/csv",
                     metaValues: GetMetaDataFileMetaValues(
-                        dataFileName: metadataFile.Name,
+                        dataFileName: dataFile.Name.ToLower(),
                         userName: blob.GetUserName(),
                         numberOfRows: CalculateNumberOfRows(rowStream)
                     )
