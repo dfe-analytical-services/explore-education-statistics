@@ -48,7 +48,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Processor.Services
                     contentType: "text/csv",
                     metaValues: GetDataFileMetaValues(
                         name: blob.Name,
-                        metaFileName: metadataFile.Name.ToLower(),
+                        metaFileName: metadataFile.Name,
                         userName: blob.GetUserName(),
                         numberOfRows: CalculateNumberOfRows(rowStream)
                     )
@@ -65,7 +65,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Processor.Services
                     fileName: metadataFile.Name.ToLower(),
                     contentType: "text/csv",
                     metaValues: GetMetaDataFileMetaValues(
-                        dataFileName: dataFile.Name.ToLower(),
+                        dataFileName: dataFile.Name,
                         userName: blob.GetUserName(),
                         numberOfRows: CalculateNumberOfRows(rowStream)
                     )
