@@ -125,8 +125,11 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Services
                                             type: ReleaseFileTypes.Data,
                                             replacingFile: replacingFile);
 
-                                        await CreateOrUpdateFileReference(metadataFile.FileName.ToLower(), releaseId,
+                                        var metaFileReference = await CreateOrUpdateFileReference(
+                                            filename: metadataFile.FileName.ToLower(),
+                                            releaseId: releaseId,
                                             ReleaseFileTypes.Metadata);
+
                                         await _context.SaveChangesAsync();
 
                                         var dataInfo = GetDataFileMetaValues(
@@ -160,6 +163,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Services
                                             Name = blob.Name,
                                             Path = blob.Path,
                                             Size = blob.Size,
+                                            MetaFileId = metaFileReference.Id,
                                             MetaFileName = blob.GetMetaFileName(),
                                             Rows = blob.GetNumberOfRows(),
                                             UserName = blob.GetUserName(),
@@ -218,7 +222,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Services
                                                 replacingFile: replacingFile,
                                                 source: source);
 
-                                            await CreateOrUpdateFileReference(
+                                            var metaFileReference = await CreateOrUpdateFileReference(
                                                 filename: metadataFile.Name.ToLower(),
                                                 releaseId: releaseId,
                                                 type: ReleaseFileTypes.Metadata,
@@ -247,6 +251,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Services
                                                 Name = blob.Name,
                                                 Path = dataFile.Name.ToLower(),
                                                 Size = blob.Size,
+                                                MetaFileId = metaFileReference.Id,
                                                 MetaFileName = blob.GetMetaFileName(),
                                                 Rows = blob.GetNumberOfRows(),
                                                 UserName = blob.GetUserName(),
@@ -549,19 +554,6 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Services
                 );
         }
 
-        public async Task<Either<ActionResult, FileStreamResult>> StreamFile(Guid releaseId,
-            ReleaseFileTypes type, string fileName)
-        {
-            return await _persistenceHelper
-                .CheckEntityExists<Release>(releaseId)
-                .OnSuccess(_userService.CheckCanViewRelease)
-                .OnSuccess(async _ =>
-                {
-                    var fileLink = await GetReleaseFileLinkAsync(releaseId, fileName, type);
-                    return await GetStreamedFile(fileLink);
-                });
-        }
-
         public async Task<Either<ActionResult, FileStreamResult>> StreamFile(Guid releaseId, Guid id)
         {
             return await _persistenceHelper
@@ -669,6 +661,9 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Services
                 return await GetFallbackDataFileInfo(releaseId, dataFileReference);
             }
 
+            var metaFileReference =
+                await GetAssociatedReleaseFileReference(dataFileReference, ReleaseFileTypes.Metadata);
+
             return new DataFileInfo
             {
                 Id = dataFileReference.Id,
@@ -676,6 +671,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Services
                 Name = blob.Name,
                 Path = blob.Path,
                 Size = blob.Size,
+                MetaFileId = metaFileReference.Id,
                 MetaFileName = blob.GetMetaFileName(),
                 ReplacedBy = dataFileReference.ReplacedById,
                 Rows = blob.GetNumberOfRows(),
@@ -703,6 +699,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Services
                         Name = zipBlob.Name,
                         Path = fileReference.Filename,
                         Size = zipBlob.Size,
+                        MetaFileId = null,
                         MetaFileName =
                             fileReference.ReleaseFileType == ReleaseFileTypes.Data
                                 ? zipBlob.GetMetaFileName()
@@ -728,6 +725,10 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Services
                 }.AsEnumerable()
             );
 
+            var metaFileReference = fileReference.ReleaseFileType == ReleaseFileTypes.Data
+                ? await GetAssociatedReleaseFileReference(fileReference, ReleaseFileTypes.Metadata)
+                : null;
+
             return new DataFileInfo
             {
                 Id = fileReference.Id,
@@ -735,9 +736,8 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Services
                 Extension = Path.GetExtension(fileReference.Filename)?.TrimStart('.') ?? string.Empty,
                 Path = fileReference.Filename,
                 Size = "0.00 B",
-                MetaFileName = fileReference.ReleaseFileType == ReleaseFileTypes.Data
-                    ? (await GetAssociatedReleaseFileReference(fileReference, ReleaseFileTypes.Metadata)).Filename
-                    : "",
+                MetaFileId = metaFileReference?.Id,
+                MetaFileName = metaFileReference?.Filename ?? "",
                 Rows = 0,
                 UserName = ""
             };

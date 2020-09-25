@@ -34,7 +34,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Controllers.Api
             IReleaseStatusService releaseStatusService,
             UserManager<ApplicationUser> userManager,
             IDataBlockService dataBlockService
-            )
+        )
         {
             _releaseService = releaseService;
             _releaseFilesService = releaseFilesService;
@@ -43,35 +43,11 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Controllers.Api
             _dataBlockService = dataBlockService;
         }
 
-        [HttpGet("release/{releaseId}/chart/{id}")]
-        public async Task<ActionResult> GetChartFile(Guid releaseId, Guid id)
+        [HttpGet("release/{releaseId}/file/{id}")]
+        public async Task<ActionResult> GetFile(Guid releaseId, Guid id)
         {
             return await _releaseFilesService
                 .StreamFile(releaseId, id)
-                .HandleFailures();
-        }
-
-        [HttpGet("release/{releaseId}/data/{filename}")]
-        public async Task<ActionResult> GetDataFile(Guid releaseId, string filename)
-        {
-            return await _releaseFilesService
-                .StreamFile(releaseId, ReleaseFileTypes.Data, filename)
-                .HandleFailures();
-        }
-
-        [HttpGet("release/{releaseId}/meta/{filename}")]
-        public async Task<ActionResult> GetMetaFile(Guid releaseId, string filename)
-        {
-            return await _releaseFilesService
-                .StreamFile(releaseId, ReleaseFileTypes.Metadata, filename)
-                .HandleFailures();
-        }
-
-        [HttpGet("release/{releaseId}/ancillary/{filename}")]
-        public async Task<ActionResult> GetAncillaryFile(Guid releaseId, string filename)
-        {
-            return await _releaseFilesService
-                .StreamFile(releaseId, ReleaseFileTypes.Ancillary, filename)
                 .HandleFailures();
         }
 
@@ -230,7 +206,8 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Controllers.Api
         }
 
         [HttpGet("releases/{releaseId}/publication-status")]
-        public async Task<ActionResult<ReleasePublicationStatusViewModel>> GetReleasePublicationStatusAsync(Guid releaseId)
+        public async Task<ActionResult<ReleasePublicationStatusViewModel>> GetReleasePublicationStatusAsync(
+            Guid releaseId)
         {
             return await _releaseService
                 .GetReleasePublicationStatusAsync(releaseId)

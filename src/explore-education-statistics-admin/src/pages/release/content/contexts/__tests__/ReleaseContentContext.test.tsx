@@ -301,6 +301,7 @@ const basicRelease: EditableRelease = {
   },
   downloadFiles: [
     {
+      id: 'download-1',
       extension: 'csv',
       name: 'prma',
       path: '6a97c9b6-eaa2-4d22-7ba9-08d7bec1ba1a/data/prma.csv',

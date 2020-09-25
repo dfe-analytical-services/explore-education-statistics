@@ -6,6 +6,7 @@ import downloadFile from './utils/file/downloadFile';
 import getFileNameFromPath from './utils/file/getFileNameFromPath';
 
 interface DataFileInfo extends FileInfo {
+  metaFileId: string;
   metaFileName: string;
   rows: number;
   userName: string;
@@ -26,6 +27,7 @@ export interface DataFile {
     unit: string;
   };
   rows: number;
+  metaFileId: string;
   metadataFilename: string;
   userName: string;
   created?: string;
@@ -78,6 +80,7 @@ function mapFile(file: DataFileInfo): DataFile {
       size: parseInt(size, 10),
       unit,
     },
+    metaFileId: file.metaFileId,
     metadataFilename: file.metaFileName,
     canDelete: true,
     userName: file.userName,
@@ -172,19 +175,12 @@ const releaseDataFileService = {
   deleteDataFiles(releaseId: string, dataFile: DataFile): Promise<void> {
     return client.delete<void>(`/release/${releaseId}/data/${dataFile.id}`);
   },
-  downloadDataFile(releaseId: string, fileName: string): Promise<void> {
+  downloadFile(releaseId: string, id: string, fileName: string): Promise<void> {
     return client
-      .get<Blob>(`/release/${releaseId}/data/${fileName}`, {
+      .get<Blob>(`/release/${releaseId}/file/${id}`, {
         responseType: 'blob',
       })
       .then(response => downloadFile(response, fileName));
-  },
-  downloadFile(path: string): Promise<void> {
-    return client
-      .get<Blob>(`/release/${path}`, {
-        responseType: 'blob',
-      })
-      .then(response => downloadFile(response, getFileNameFromPath(path)));
   },
 };
 

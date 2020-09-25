@@ -22,6 +22,7 @@ const releaseAncillaryFileService = _releaseAncillaryFileService as jest.Mocked<
 describe('ReleaseFileUploadsSection', () => {
   const testFiles: AncillaryFile[] = [
     {
+      id: 'file-1',
       title: 'Test file 1',
       filename: 'file-1.docx',
       fileSize: {
@@ -30,6 +31,7 @@ describe('ReleaseFileUploadsSection', () => {
       },
     },
     {
+      id: 'file-2',
       title: 'Test file 2',
       filename: 'file-2.docx',
       fileSize: {
@@ -297,6 +299,7 @@ describe('ReleaseFileUploadsSection', () => {
 
     test('can submit with valid values', async () => {
       releaseAncillaryFileService.uploadAncillaryFile.mockResolvedValue({
+        id: 'test-file',
         title: 'Test name',
         filename: 'test-file.docx',
         fileSize: {
@@ -332,6 +335,7 @@ describe('ReleaseFileUploadsSection', () => {
 
     test('renders with uploaded file appended to list of files', async () => {
       releaseAncillaryFileService.uploadAncillaryFile.mockResolvedValue({
+        id: 'test-file',
         title: 'Test name',
         filename: 'test-file.docx',
         fileSize: {

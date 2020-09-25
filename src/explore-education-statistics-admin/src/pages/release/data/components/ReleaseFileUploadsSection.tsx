@@ -212,8 +212,9 @@ const ReleaseFileUploadsSection = ({ releaseId, canUpdateRelease }: Props) => {
                     <SummaryListItem term="File">
                       <ButtonText
                         onClick={() =>
-                          releaseAncillaryFileService.downloadAncillaryFile(
+                          releaseAncillaryFileService.downloadFile(
                             releaseId,
+                            file.id,
                             file.filename,
                           )
                         }
