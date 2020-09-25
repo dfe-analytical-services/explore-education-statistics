@@ -724,6 +724,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
                 Assert.Equal(originalFilter.Id, dataBlockFilterPlan.Value.Id);
                 Assert.Equal(originalFilter.Label, dataBlockFilterPlan.Value.Label);
                 Assert.Equal(originalFilter.Name, dataBlockFilterPlan.Value.Name);
+                Assert.False(dataBlockFilterPlan.Value.Valid);
 
                 Assert.Single(dataBlockFilterPlan.Value.Groups);
 
@@ -732,7 +733,6 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
                 Assert.Equal(originalFilterGroup.Id, dataBlockFilterGroupPlan.Key);
                 Assert.Equal(originalFilterGroup.Id, dataBlockFilterGroupPlan.Value.Id);
                 Assert.Equal(originalFilterGroup.Label, dataBlockFilterGroupPlan.Value.Label);
-                Assert.Null(dataBlockFilterGroupPlan.Value.Target);
                 Assert.False(dataBlockFilterGroupPlan.Value.Valid);
 
                 Assert.Single(dataBlockFilterGroupPlan.Value.Filters);
@@ -743,9 +743,6 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
                 Assert.Equal(originalFilterItem.Label, dataBlockFilterItemPlan.Label);
                 Assert.Null(dataBlockFilterItemPlan.Target);
                 Assert.False(dataBlockFilterItemPlan.Valid);
-
-                Assert.Null(dataBlockFilterPlan.Value.Target);
-                Assert.False(dataBlockFilterPlan.Value.Valid);
 
                 Assert.NotNull(dataBlockPlan.Locations);
                 Assert.Single(dataBlockPlan.Locations);
@@ -850,7 +847,6 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
                 Assert.Single(footnoteForIndicatorPlan.IndicatorGroups);
 
                 var footnoteForIndicatorIndicatorGroupPlan = footnoteForIndicatorPlan.IndicatorGroups.First();
-
 
                 Assert.Equal(originalIndicator.IndicatorGroup.Id,  footnoteForIndicatorIndicatorGroupPlan.Key);
                 Assert.Equal(originalIndicator.IndicatorGroup.Label, footnoteForIndicatorIndicatorGroupPlan.Value.Label);
@@ -1295,7 +1291,6 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
                 Assert.Equal(originalFilter1.Id, dataBlockFilterPlan.Value.Id);
                 Assert.Equal(originalFilter1.Label, dataBlockFilterPlan.Value.Label);
                 Assert.Equal(originalFilter1.Name, dataBlockFilterPlan.Value.Name);
-                Assert.Equal(replacementFilter1.Id, dataBlockFilterPlan.Value.Target);
                 Assert.True(dataBlockFilterPlan.Value.Valid);
 
                 Assert.Single(dataBlockFilterPlan.Value.Groups);
@@ -1305,17 +1300,15 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
                 Assert.Equal(originalFilterGroup1.Id, dataBlockFilterGroupPlan.Key);
                 Assert.Equal(originalFilterGroup1.Id, dataBlockFilterGroupPlan.Value.Id);
                 Assert.Equal(originalFilterGroup1.Label, dataBlockFilterGroupPlan.Value.Label);
-                Assert.Equal(replacementFilterGroup1.Id, dataBlockFilterGroupPlan.Value.Target);
-                Assert.True(dataBlockFilterGroupPlan.Value.Valid);
-
                 Assert.Single(dataBlockFilterGroupPlan.Value.Filters);
+                Assert.True(dataBlockFilterGroupPlan.Value.Valid);
 
                 var dataBlockFilterItemPlan = dataBlockFilterGroupPlan.Value.Filters.First();
 
-                Assert.True(dataBlockFilterItemPlan.Valid);
                 Assert.Equal(originalFilterItem1.Id, dataBlockFilterItemPlan.Id);
                 Assert.Equal(originalFilterItem1.Label, dataBlockFilterItemPlan.Label);
                 Assert.Equal(replacementFilterItem1.Id, dataBlockFilterItemPlan.Target);
+                Assert.True(dataBlockFilterItemPlan.Valid);
 
                 Assert.NotNull(dataBlockPlan.Locations);
                 Assert.Single(dataBlockPlan.Locations);
