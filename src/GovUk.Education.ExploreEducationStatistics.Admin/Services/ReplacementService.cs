@@ -353,7 +353,6 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Services
                             id: filter.Key.Id,
                             name: filter.Key.Name,
                             label: filter.Key.Label,
-                            target: FindReplacementFilter(replacementSubjectMeta, filter.Key.Name)?.Id,
                             groups: filter
                                 .GroupBy(filterItem => filterItem.FilterGroup)
                                 .OrderBy(group => group.Key.Label, LabelComparer)
@@ -438,10 +437,6 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Services
             return new FilterGroupReplacementViewModel(
                 id: filterGroup.Id,
                 label: filterGroup.Label,
-                target: FindReplacementFilterGroup(
-                    replacementSubjectMeta,
-                    filterGroup.Filter.Name,
-                    filterGroup.Label)?.Id,
                 filters: filterGroup.FilterItems
                     .Select(item => ValidateFilterItemForReplacement(item, replacementSubjectMeta))
                     .OrderBy(item => item.Label, LabelComparer)
