@@ -309,7 +309,7 @@ describe('DataReplacementPlan', () => {
     valid: false,
   };
 
-  test('renders correctly', async () => {
+  test('renders correctly with invalid plan', async () => {
     dataReplacementService.getReplacementPlan.mockResolvedValue(
       testReplacementPlan,
     );
@@ -325,6 +325,17 @@ describe('DataReplacementPlan', () => {
 
       expect(screen.getByText('Data blocks: ERROR')).toBeInTheDocument();
       expect(screen.getByText('Footnotes: ERROR')).toBeInTheDocument();
+
+      expect(
+        screen.getByText(
+          /One or more data blocks will be invalidated by this data replacement/,
+        ),
+      ).toBeInTheDocument();
+      expect(
+        screen.getByText(
+          /One or more footnotes will be invalidated by this data replacement/,
+        ),
+      ).toBeInTheDocument();
 
       const details = screen.getAllByRole('group');
 
@@ -489,6 +500,128 @@ describe('DataReplacementPlan', () => {
         ),
       ).toBeInTheDocument();
     });
+  });
+
+  test('renders correctly with valid plan', async () => {
+    const testValidReplacementPlan: DataReplacementPlan = {
+      dataBlocks: [
+        {
+          id: 'block-1',
+          name: 'Data block 1',
+          indicatorGroups: {},
+          locations: {},
+          filters: {},
+          valid: true,
+        },
+        {
+          id: 'block-2',
+          name: 'Data block 2',
+          indicatorGroups: {},
+          locations: {},
+          filters: {},
+          valid: true,
+        },
+      ],
+      footnotes: [
+        {
+          id: 'footnote-1',
+          content: 'Footnote 1',
+          indicatorGroups: {},
+          filterItems: [],
+          filterGroups: [],
+          filters: [],
+          valid: true,
+        },
+        {
+          id: 'footnote-2',
+          content: 'Footnote 2',
+          indicatorGroups: {},
+          filterItems: [],
+          filterGroups: [],
+          filters: [],
+          valid: true,
+        },
+      ],
+      originalSubjectId: 'subject-1',
+      replacementSubjectId: 'subject-2',
+      valid: true,
+    };
+
+    dataReplacementService.getReplacementPlan.mockResolvedValue(
+      testValidReplacementPlan,
+    );
+
+    render(
+      <DataFileReplacementPlan fileId="file-1" replacementFileId="file-2" />,
+    );
+
+    await waitFor(() => {
+      expect(
+        screen.getByText('Data replacement in progress'),
+      ).toBeInTheDocument();
+
+      expect(screen.getByText('Data blocks: OK')).toBeInTheDocument();
+      expect(screen.getByText('Footnotes: OK')).toBeInTheDocument();
+
+      expect(
+        screen.getByText(
+          /All data blocks will still be valid after this data replacement/,
+        ),
+      ).toBeInTheDocument();
+      expect(
+        screen.getByText(
+          /All footnotes will still be valid after this data replacement/,
+        ),
+      ).toBeInTheDocument();
+    });
+
+    const details = screen.getAllByRole('group');
+
+    expect(details).toHaveLength(4);
+
+    const dataBlock1 = within(details[0]);
+
+    expect(
+      dataBlock1.getByRole('button', { name: /Data block 1/ }),
+    ).toHaveTextContent('OK');
+    expect(
+      dataBlock1.getByText(
+        'This data block has no conflicts with the replacement data.',
+      ),
+    ).toBeInTheDocument();
+
+    const dataBlock2 = within(details[1]);
+
+    expect(
+      dataBlock2.getByRole('button', { name: /Data block 2/ }),
+    ).toHaveTextContent('OK');
+    expect(
+      dataBlock2.getByText(
+        'This data block has no conflicts with the replacement data.',
+      ),
+    ).toBeInTheDocument();
+
+    const footnote1 = within(details[2]);
+
+    expect(
+      footnote1.getByRole('button', { name: /Footnote 1/ }),
+    ).toHaveTextContent('OK');
+    expect(
+      footnote1.getByText(
+        'This footnote has no conflicts with the replacement data.',
+      ),
+    ).toBeInTheDocument();
+
+    const footnote2 = within(details[3]);
+
+    expect(
+      footnote2.getByRole('button', { name: /Footnote 2/ }),
+    ).toHaveTextContent('OK');
+    expect(
+      footnote2.getByText(
+        'This footnote has no conflicts with the replacement data.',
+      ),
+    ).toBeInTheDocument();
   });
 
   test('renders error message if there is an error loading replacement plan', async () => {
