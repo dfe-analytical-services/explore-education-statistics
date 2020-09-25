@@ -118,6 +118,12 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Model.Database
                 .WithMany()
                 .HasForeignKey(observationFilterItem => observationFilterItem.FilterItemId)
                 .OnDelete(DeleteBehavior.Restrict);
+            
+            modelBuilder.Entity<ObservationFilterItem>()
+                .HasOne(observationFilterItem => observationFilterItem.Filter)
+                .WithMany()
+                .HasForeignKey(observationFilterItem => observationFilterItem.FilterId)
+                .OnDelete(DeleteBehavior.Restrict);
         }
 
         private static void ConfigureUnit(ModelBuilder modelBuilder)
