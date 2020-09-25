@@ -338,7 +338,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
             }
 
             mocks.ImportStatusService.Setup(service =>
-                    service.IsImportFinished(file.ReleaseId.ToString(), file.Filename))
+                    service.IsImportFinished(file.ReleaseId, file.Filename))
                 .ReturnsAsync(true);
 
             mocks.SubjectService.Setup(service => service.GetAsync(subject.Id)).ReturnsAsync(subject);
@@ -363,7 +363,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
                 mocks.FileStorageService.VerifyNoOtherCalls();
 
                 mocks.ImportStatusService.Verify(
-                    mock => mock.IsImportFinished(release.Id.ToString(), file.Filename),
+                    mock => mock.IsImportFinished(release.Id, file.Filename),
                     Times.Once());
                 mocks.ImportStatusService.VerifyNoOtherCalls();
 
@@ -425,7 +425,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
             }
 
             mocks.ImportStatusService.Setup(service =>
-                    service.IsImportFinished(file.ReleaseId.ToString(),
+                    service.IsImportFinished(file.ReleaseId,
                         It.IsIn(file.Filename, replacementFile.Filename)))
                 .ReturnsAsync(true);
 
@@ -445,7 +445,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
                     mock => mock.GetDeleteDataBlockPlan(release.Id, It.IsIn(subject, replacementSubject)),
                     Times.Exactly(2));
                 mocks.DataBlockService.Verify(
-                    mock => mock.DeleteDataBlocks(It.IsAny<DeleteDataBlockPlan>()), 
+                    mock => mock.DeleteDataBlocks(It.IsAny<DeleteDataBlockPlan>()),
                     Times.Exactly(2));
                 mocks.DataBlockService.VerifyNoOtherCalls();
 
@@ -454,7 +454,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
                 mocks.FileStorageService.VerifyNoOtherCalls();
 
                 mocks.ImportStatusService.Verify(
-                    mock => mock.IsImportFinished(release.Id.ToString(),
+                    mock => mock.IsImportFinished(release.Id,
                         It.IsIn(file.Filename, replacementFile.Filename)), Times.Exactly(2));
                 mocks.ImportStatusService.VerifyNoOtherCalls();
 

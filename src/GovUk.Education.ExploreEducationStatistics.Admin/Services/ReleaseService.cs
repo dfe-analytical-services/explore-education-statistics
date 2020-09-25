@@ -509,13 +509,13 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Services
                     {
                         return new ImportStatus
                         {
-                            Status = IStatus.NOT_FOUND.GetEnumValue()
+                            Status = IStatus.NOT_FOUND
                         };
                     }
 
                     var fileReference = fileLink.ReleaseFileReference;
 
-                    return await _importStatusService.GetImportStatus(fileReference.ReleaseId.ToString(), dataFileName);
+                    return await _importStatusService.GetImportStatus(fileReference.ReleaseId, dataFileName);
                 });
         }
 
@@ -528,7 +528,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Services
         private async Task<Either<ActionResult, Unit>> CheckCanDeleteDataFiles(Guid releaseId,
             ReleaseFileReference releaseFileReference)
         {
-            var importFinished = await _importStatusService.IsImportFinished(releaseFileReference.ReleaseId.ToString(),
+            var importFinished = await _importStatusService.IsImportFinished(releaseFileReference.ReleaseId,
                 releaseFileReference.Filename);
 
             if (!importFinished)

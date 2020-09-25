@@ -8,6 +8,7 @@ using GovUk.Education.ExploreEducationStatistics.Admin.Services.Interfaces;
 using GovUk.Education.ExploreEducationStatistics.Admin.Services.Interfaces.Security;
 using GovUk.Education.ExploreEducationStatistics.Common.Extensions;
 using GovUk.Education.ExploreEducationStatistics.Common.Model;
+using GovUk.Education.ExploreEducationStatistics.Common.Services;
 using GovUk.Education.ExploreEducationStatistics.Common.Services.Interfaces;
 using GovUk.Education.ExploreEducationStatistics.Common.Services.Interfaces.Security;
 using GovUk.Education.ExploreEducationStatistics.Common.Utils;
@@ -38,6 +39,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Services
         private readonly IFileUploadsValidatorService _fileUploadsValidatorService;
         private readonly ISubjectService _subjectService;
         private readonly IDataArchiveValidationService _dataArchiveValidationService;
+        private readonly IImportStatusService _importStatusService;
 
         public ReleaseFilesService(
             IBlobStorageService blobStorageService,
@@ -47,7 +49,8 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Services
             IImportService importService,
             IFileUploadsValidatorService fileUploadsValidatorService,
             ISubjectService subjectService,
-            IDataArchiveValidationService dataArchiveValidationService)
+            IDataArchiveValidationService dataArchiveValidationService,
+            IImportStatusService importStatusService)
         {
             _blobStorageService = blobStorageService;
             _userService = userService;
@@ -57,6 +60,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Services
             _fileUploadsValidatorService = fileUploadsValidatorService;
             _subjectService = subjectService;
             _dataArchiveValidationService = dataArchiveValidationService;
+            _importStatusService = importStatusService;
         }
 
         public async Task<Either<ActionResult, IEnumerable<FileInfo>>> ListPublicFilesPreview(
@@ -167,6 +171,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Services
                                             MetaFileName = blob.GetMetaFileName(),
                                             Rows = blob.GetNumberOfRows(),
                                             UserName = blob.GetUserName(),
+                                            Status = IStatus.QUEUED,
                                             Created = blob.Created
                                         };
                                     }));
@@ -255,6 +260,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Services
                                                 MetaFileName = blob.GetMetaFileName(),
                                                 Rows = blob.GetNumberOfRows(),
                                                 UserName = blob.GetUserName(),
+                                                Status = IStatus.QUEUED,
                                                 Created = blob.Created
                                             };
                                         });
@@ -664,6 +670,8 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Services
             var metaFileReference =
                 await GetAssociatedReleaseFileReference(dataFileReference, ReleaseFileTypes.Metadata);
 
+            var importStatus = await _importStatusService.GetImportStatus(releaseId, blob.FileName);
+
             return new DataFileInfo
             {
                 Id = dataFileReference.Id,
@@ -676,6 +684,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Services
                 ReplacedBy = dataFileReference.ReplacedById,
                 Rows = blob.GetNumberOfRows(),
                 UserName = blob.GetUserName(),
+                Status = importStatus.Status,
                 Created = blob.Created
             };
         }
@@ -691,6 +700,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Services
                 if (await _blobStorageService.CheckBlobExists(PrivateFilesContainerName, sourceBlobPath))
                 {
                     var zipBlob = await _blobStorageService.GetBlob(PrivateFilesContainerName, sourceBlobPath);
+                    var importStatus = await _importStatusService.GetImportStatus(releaseId, zipBlob.FileName);
 
                     return new DataFileInfo
                     {
@@ -706,6 +716,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Services
                                 : string.Empty,
                         Rows = 0,
                         UserName = zipBlob.GetUserName(),
+                        Status = importStatus.Status,
                         Created = zipBlob.Created
                     };
                 }
@@ -739,7 +750,8 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Services
                 MetaFileId = metaFileReference?.Id,
                 MetaFileName = metaFileReference?.Filename ?? "",
                 Rows = 0,
-                UserName = ""
+                UserName = "",
+                Status = IStatus.NOT_FOUND
             };
         }
 
