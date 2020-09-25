@@ -172,8 +172,8 @@ const releaseDataFileService = {
       `/release/${releaseId}/data/${dataFile.id}/delete-plan`,
     );
   },
-  deleteDataFiles(releaseId: string, dataFile: DataFile): Promise<void> {
-    return client.delete<void>(`/release/${releaseId}/data/${dataFile.id}`);
+  deleteDataFiles(releaseId: string, fileId: string): Promise<void> {
+    return client.delete<void>(`/release/${releaseId}/data/${fileId}`);
   },
   downloadFile(releaseId: string, id: string, fileName: string): Promise<void> {
     return client

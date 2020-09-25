@@ -12,6 +12,7 @@ import dataReplacementService, {
   FootnoteReplacementPlan,
 } from '@admin/services/dataReplacementService';
 import footnoteService from '@admin/services/footnoteService';
+import releaseDataFileService from '@admin/services/releaseDataFileService';
 import Button from '@common/components/Button';
 import ButtonGroup from '@common/components/ButtonGroup';
 import CollapsibleList from '@common/components/CollapsibleList';
@@ -24,6 +25,7 @@ import Tag from '@common/components/Tag';
 import VisuallyHidden from '@common/components/VisuallyHidden';
 import WarningMessage from '@common/components/WarningMessage';
 import useAsyncRetry from '@common/hooks/useAsyncRetry';
+import useToggle from '@common/hooks/useToggle';
 import React, { useMemo, useState } from 'react';
 import { generatePath } from 'react-router';
 
@@ -32,6 +34,7 @@ interface Props {
   releaseId: string;
   fileId: string;
   replacementFileId: string;
+  onCancel?: () => void;
   onReplacement?: () => void;
 }
 
@@ -40,8 +43,10 @@ const DataFileReplacementPlan = ({
   releaseId,
   fileId,
   replacementFileId,
+  onCancel,
   onReplacement,
 }: Props) => {
+  const [isCancelling, toggleCancelling] = useToggle(false);
   const [deleteDataBlock, setDeleteDataBlock] = useState<
     DataBlockReplacementPlan
   >();
@@ -369,8 +374,8 @@ const DataFileReplacementPlan = ({
             );
           })}
 
-          {plan.valid && (
-            <ButtonGroup className="govuk-!-margin-top-8">
+          <ButtonGroup className="govuk-!-margin-top-8">
+            {plan.valid && (
               <Button
                 onClick={async () => {
                   await dataReplacementService.replaceData(
@@ -385,8 +390,34 @@ const DataFileReplacementPlan = ({
               >
                 Confirm data replacement
               </Button>
-            </ButtonGroup>
-          )}
+            )}
+            <Button variant="secondary" onClick={toggleCancelling.on}>
+              Cancel data replacement
+            </Button>
+          </ButtonGroup>
+
+          <ModalConfirm
+            title="Cancel data replacement"
+            mounted={isCancelling}
+            onExit={toggleCancelling.off}
+            onConfirm={async () => {
+              toggleCancelling.off();
+
+              await releaseDataFileService.deleteDataFiles(
+                releaseId,
+                replacementFileId,
+              );
+
+              if (onCancel) {
+                onCancel();
+              }
+            }}
+          >
+            <p>
+              Are you sure you want to cancel this data replacement? The pending
+              replacement data file will be deleted.
+            </p>
+          </ModalConfirm>
 
           {deleteDataBlock && (
             <ModalConfirm

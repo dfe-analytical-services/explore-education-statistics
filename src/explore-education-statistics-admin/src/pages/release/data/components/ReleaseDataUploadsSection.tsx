@@ -283,7 +283,7 @@ const ReleaseDataUploadsSection = ({
             setFileDeleting(deleteDataFile, true);
 
             try {
-              await releaseDataFileService.deleteDataFiles(releaseId, file);
+              await releaseDataFileService.deleteDataFiles(releaseId, file.id);
 
               setDataFiles({
                 value: dataFiles.filter(dataFile => dataFile !== file),

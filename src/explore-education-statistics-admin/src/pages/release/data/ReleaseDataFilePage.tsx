@@ -24,7 +24,11 @@ const ReleaseDataFilePage = ({
   // TODO: Remove this when upload APIs are in place.
   const { replacementFileId } = useQueryParams<{ replacementFileId: string }>();
 
-  const { value: dataFile, isLoading } = useAsyncHandledRetry(
+  const {
+    value: dataFile,
+    isLoading,
+    retry: fetchDataFile,
+  } = useAsyncHandledRetry(
     () => releaseDataFileService.getDataFile(releaseId, fileId),
     [releaseId, fileId],
   );
@@ -68,6 +72,7 @@ const ReleaseDataFilePage = ({
                   releaseId={releaseId}
                   fileId={dataFile.id}
                   replacementFileId={replacementFileId}
+                  onCancel={fetchDataFile}
                   onReplacement={() => {
                     history.push(
                       generatePath<ReleaseDataFileRouteParams>(
