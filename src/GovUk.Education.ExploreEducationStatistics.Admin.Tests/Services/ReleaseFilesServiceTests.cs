@@ -33,6 +33,12 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
                 Filename = "test-data.csv",
                 ReleaseFileType = ReleaseFileTypes.Data
             };
+            var metaFileReference = new ReleaseFileReference
+            {
+                Release = release,
+                Filename = "test-data.meta.csv",
+                ReleaseFileType = ReleaseFileTypes.Metadata
+            };
 
             var contextId = Guid.NewGuid().ToString();
 
@@ -47,12 +53,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
                     new ReleaseFile
                     {
                         Release = release,
-                        ReleaseFileReference = new ReleaseFileReference
-                        {
-                            Release = release,
-                            Filename = "test-data.meta.csv",
-                            ReleaseFileType = ReleaseFileTypes.Metadata
-                        }
+                        ReleaseFileReference = metaFileReference
                     }
                 );
                 await context.SaveChangesAsync();
@@ -103,6 +104,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
                 Assert.Equal("test-data.csv", fileInfo.FileName);
                 Assert.Equal("csv", fileInfo.Extension);
                 Assert.Equal(blobPath, fileInfo.Path);
+                Assert.Equal(metaFileReference.Id, fileInfo.MetaFileId);
                 Assert.Equal("test-data.meta.csv", fileInfo.MetaFileName);
                 Assert.Equal("test@test.com", fileInfo.UserName);
                 Assert.Equal(200, fileInfo.Rows);
@@ -214,6 +216,13 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
                 Filename = "test-data.csv",
                 ReleaseFileType = ReleaseFileTypes.Data
             };
+            var metaFileReference = new ReleaseFileReference
+            {
+                Release = release,
+                SubjectId = subject.Id,
+                Filename = "test-data.meta.csv",
+                ReleaseFileType = ReleaseFileTypes.Metadata
+            };
 
             var contextId = Guid.NewGuid().ToString();
 
@@ -228,13 +237,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
                     new ReleaseFile
                     {
                         Release = release,
-                        ReleaseFileReference = new ReleaseFileReference
-                        {
-                            Release = release,
-                            SubjectId = subject.Id,
-                            Filename = "test-data.meta.csv",
-                            ReleaseFileType = ReleaseFileTypes.Metadata
-                        }
+                        ReleaseFileReference = metaFileReference
                     }
                 );
 
@@ -278,6 +281,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
                 Assert.Equal("test-data.csv", fileInfo.FileName);
                 Assert.Equal("csv", fileInfo.Extension);
                 Assert.Equal("test-data.csv", fileInfo.Path);
+                Assert.Equal(metaFileReference.Id, fileInfo.MetaFileId);
                 Assert.Equal("test-data.meta.csv", fileInfo.MetaFileName);
                 Assert.Equal("", fileInfo.UserName);
                 Assert.Equal(0, fileInfo.Rows);
@@ -385,6 +389,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
                 Assert.Equal("test-data.csv", fileInfo.FileName);
                 Assert.Equal("csv", fileInfo.Extension);
                 Assert.Equal("test-data.csv", fileInfo.Path);
+                Assert.False(fileInfo.MetaFileId.HasValue);
                 Assert.Equal("test-data.meta.csv", fileInfo.MetaFileName);
                 Assert.Equal("test@test.com", fileInfo.UserName);
                 Assert.Equal(0, fileInfo.Rows);
@@ -396,19 +401,45 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
         public async void ListDataFiles()
         {
             var release = new Release();
+            var subject1 = new Subject
+            {
+                Id = Guid.NewGuid(),
+                Name = "Test subject name"
+            };
+            var subject2 = new Subject
+            {
+                Id = Guid.NewGuid(),
+                Name = "Test subject name"
+            };
             var contextId = Guid.NewGuid().ToString();
 
             var dataFile1Reference = new ReleaseFileReference
             {
                 Release = release,
                 Filename = "test-data-1.csv",
-                ReleaseFileType = ReleaseFileTypes.Data
+                ReleaseFileType = ReleaseFileTypes.Data,
+                SubjectId = subject1.Id
+            };
+            var metaFile1Reference = new ReleaseFileReference
+            {
+                Release = release,
+                Filename = "test-data-1.meta.csv",
+                ReleaseFileType = ReleaseFileTypes.Metadata,
+                SubjectId = subject1.Id
             };
             var dataFile2Reference = new ReleaseFileReference
             {
                 Release = release,
                 Filename = "test-data-2.csv",
-                ReleaseFileType = ReleaseFileTypes.Data
+                ReleaseFileType = ReleaseFileTypes.Data,
+                SubjectId = subject2.Id
+            };
+            var metaFile2Reference = new ReleaseFileReference
+            {
+                Release = release,
+                Filename = "test-data-2.meta.csv",
+                ReleaseFileType = ReleaseFileTypes.Metadata,
+                SubjectId = subject2.Id
             };
 
             await using (var context = InMemoryApplicationDbContext(contextId))
@@ -417,32 +448,22 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
                     new ReleaseFile
                     {
                         Release = release,
-                        ReleaseFileReference = dataFile2Reference
-                    },
-                    new ReleaseFile
-                    {
-                        Release = release,
-                        ReleaseFileReference = new ReleaseFileReference
-                        {
-                            Release = release,
-                            Filename = "test-data-2.meta.csv",
-                            ReleaseFileType = ReleaseFileTypes.Metadata
-                        }
-                    },
-                    new ReleaseFile
-                    {
-                        Release = release,
                         ReleaseFileReference = dataFile1Reference
                     },
                     new ReleaseFile
                     {
                         Release = release,
-                        ReleaseFileReference = new ReleaseFileReference
-                        {
-                            Release = release,
-                            Filename = "test-data-1.meta.csv",
-                            ReleaseFileType = ReleaseFileTypes.Metadata
-                        }
+                        ReleaseFileReference = metaFile1Reference
+                    },
+                    new ReleaseFile
+                    {
+                        Release = release,
+                        ReleaseFileReference = dataFile2Reference
+                    },
+                    new ReleaseFile
+                    {
+                        Release = release,
+                        ReleaseFileReference = metaFile2Reference
                     }
                 );
                 await context.SaveChangesAsync();
@@ -513,6 +534,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
                 Assert.Equal("test-data-1.csv", files[0].FileName);
                 Assert.Equal("csv", files[0].Extension);
                 Assert.Equal(dataFile1Path, files[0].Path);
+                Assert.Equal(metaFile1Reference.Id, files[0].MetaFileId);
                 Assert.Equal("test-data-1.meta.csv", files[0].MetaFileName);
                 Assert.Equal("test1@test.com", files[0].UserName);
                 Assert.Equal(200, files[0].Rows);
@@ -523,6 +545,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
                 Assert.Equal("test-data-2.csv", files[1].FileName);
                 Assert.Equal("csv", files[1].Extension);
                 Assert.Equal(dataFile2Path, files[1].Path);
+                Assert.Equal(metaFile2Reference.Id, files[1].MetaFileId);
                 Assert.Equal("test-data-2.meta.csv", files[1].MetaFileName);
                 Assert.Equal("test2@test.com", files[1].UserName);
                 Assert.Equal(400, files[1].Rows);
@@ -542,6 +565,12 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
                 Filename = "test-data-1.csv",
                 ReleaseFileType = ReleaseFileTypes.Data
             };
+            var metaFileReference = new ReleaseFileReference
+            {
+                Release = release,
+                Filename = "test-data-1.meta.csv",
+                ReleaseFileType = ReleaseFileTypes.Metadata
+            };
 
             await using (var context = InMemoryApplicationDbContext(contextId))
             {
@@ -556,12 +585,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
                     new ReleaseFile
                     {
                         Release = release,
-                        ReleaseFileReference = new ReleaseFileReference
-                        {
-                            Release = release,
-                            Filename = "test-data-1.meta.csv",
-                            ReleaseFileType = ReleaseFileTypes.Metadata
-                        }
+                        ReleaseFileReference = metaFileReference
                     },
                     // For other release
                     new ReleaseFile
@@ -642,6 +666,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
                 Assert.Equal("test-data-1.csv", files[0].FileName);
                 Assert.Equal("csv", files[0].Extension);
                 Assert.Equal(dataFile1Path, files[0].Path);
+                Assert.Equal(metaFileReference.Id, files[0].MetaFileId);
                 Assert.Equal("test-data-1.meta.csv", files[0].MetaFileName);
                 Assert.Equal("test1@test.com", files[0].UserName);
                 Assert.Equal(200, files[0].Rows);
@@ -665,6 +690,13 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
                 Filename = "test-data.csv",
                 ReleaseFileType = ReleaseFileTypes.Data
             };
+            var metaFileReference = new ReleaseFileReference
+            {
+                Release = release,
+                SubjectId = subject.Id,
+                Filename = "test-data.meta.csv",
+                ReleaseFileType = ReleaseFileTypes.Metadata
+            };
 
             var contextId = Guid.NewGuid().ToString();
 
@@ -679,13 +711,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
                     new ReleaseFile
                     {
                         Release = release,
-                        ReleaseFileReference = new ReleaseFileReference
-                        {
-                            Release = release,
-                            SubjectId = subject.Id,
-                            Filename = "test-data.meta.csv",
-                            ReleaseFileType = ReleaseFileTypes.Metadata
-                        }
+                        ReleaseFileReference = metaFileReference
                     }
                 );
 
@@ -727,6 +753,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
                 Assert.Equal("test-data.csv", files[0].FileName);
                 Assert.Equal("csv", files[0].Extension);
                 Assert.Equal("test-data.csv", files[0].Path);
+                Assert.Equal(metaFileReference.Id, files[0].MetaFileId);
                 Assert.Equal("test-data.meta.csv", files[0].MetaFileName);
                 Assert.Equal("", files[0].UserName);
                 Assert.Equal(0, files[0].Rows);
@@ -833,6 +860,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
                 Assert.Equal("test-data.csv", files[0].FileName);
                 Assert.Equal("csv", files[0].Extension);
                 Assert.Equal("test-data.csv", files[0].Path);
+                Assert.False(files[0].MetaFileId.HasValue);
                 Assert.Equal("test-data.meta.csv", files[0].MetaFileName);
                 Assert.Equal("test@test.com", files[0].UserName);
                 Assert.Equal(0, files[0].Rows);

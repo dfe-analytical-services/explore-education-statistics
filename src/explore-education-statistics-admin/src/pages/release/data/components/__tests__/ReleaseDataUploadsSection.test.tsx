@@ -23,6 +23,7 @@ describe('ReleaseDataUploadsSection', () => {
       title: 'Test data 1',
       userName: 'user1@test.com',
       filename: 'data-1.csv',
+      metaFileId: 'data-1-meta',
       metadataFilename: 'data-1.meta.csv',
       rows: 100,
       fileSize: {
@@ -36,6 +37,7 @@ describe('ReleaseDataUploadsSection', () => {
       title: 'Test data 2',
       userName: 'user2@test.com',
       filename: 'data-2.csv',
+      metaFileId: 'data-2-meta',
       metadataFilename: 'data-2.meta.csv',
       rows: 200,
       fileSize: {
@@ -352,6 +354,7 @@ describe('ReleaseDataUploadsSection', () => {
       title: 'Test title',
       userName: 'user1@test.com',
       filename: 'test-data.csv',
+      metaFileId: 'file-1-meta',
       metadataFilename: 'test-data.meta.csv',
       rows: 300,
       fileSize: {

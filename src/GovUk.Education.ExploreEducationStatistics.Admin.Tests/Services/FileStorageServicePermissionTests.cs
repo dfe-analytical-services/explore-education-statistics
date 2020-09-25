@@ -104,8 +104,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
             AssertSecurityPoliciesChecked(service =>
                     service.StreamFile(
                         _release.Id,
-                        ReleaseFileTypes.Ancillary,
-                        ""
+                        Guid.NewGuid()
                     ),
                 CanViewSpecificRelease);
         }
