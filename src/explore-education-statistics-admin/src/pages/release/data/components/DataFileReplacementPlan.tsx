@@ -202,11 +202,20 @@ const DataFileReplacementPlan = ({
               {`Footnotes: ${hasInvalidFootnotes ? 'ERROR' : 'OK'}`}
             </Tag>
           </h3>
-          <p>
-            One or more footnotes will be invalidated by this data replacement.
-            The list below shows the affected footnotes, you can either delete
-            or edit these if you wish to continue with this data replacement.{' '}
-          </p>
+
+          {hasInvalidFootnotes ? (
+            <p>
+              One or more footnotes will be invalidated by this data
+              replacement. The list below shows the affected footnotes, you can
+              either delete or edit these if you wish to continue with this data
+              replacement.
+            </p>
+          ) : (
+            <p>
+              All footnotes will still be valid after this data replacement, no
+              action is required.
+            </p>
+          )}
 
           {plan.footnotes.map(footnote => {
             const mergedFilters = mergeReplacementFootnoteFilters(footnote);
