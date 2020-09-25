@@ -3,11 +3,15 @@ import mergeReplacementFootnoteFilters from '@admin/pages/release/data/component
 import {
   releaseDataBlocksRoute,
   ReleaseDataBlocksRouteParams,
+  ReleaseFootnoteRouteParams,
+  releaseFootnotesEditRoute,
 } from '@admin/routes/releaseRoutes';
 import dataBlockService from '@admin/services/dataBlockService';
 import dataReplacementService, {
   DataBlockReplacementPlan,
+  FootnoteReplacementPlan,
 } from '@admin/services/dataReplacementService';
+import footnoteService from '@admin/services/footnoteService';
 import Button from '@common/components/Button';
 import ButtonGroup from '@common/components/ButtonGroup';
 import CollapsibleList from '@common/components/CollapsibleList';
@@ -40,6 +44,9 @@ const DataFileReplacementPlan = ({
 }: Props) => {
   const [deleteDataBlock, setDeleteDataBlock] = useState<
     DataBlockReplacementPlan
+  >();
+  const [deleteFootnote, setDeleteFootnote] = useState<
+    FootnoteReplacementPlan
   >();
 
   const {
@@ -334,13 +341,28 @@ const DataFileReplacementPlan = ({
                       </SummaryListItem>
                     </SummaryList>
 
-                    {/*
-                    TODO: Add footnote buttons (EES-1291)
                     <ButtonGroup>
-                      <Button variant="secondary">Edit footnote</Button>
-                      <Button variant="warning">Delete footnote</Button>
+                      <ButtonLink
+                        to={generatePath<ReleaseFootnoteRouteParams>(
+                          releaseFootnotesEditRoute.path,
+                          {
+                            publicationId,
+                            releaseId,
+                            footnoteId: footnote.id,
+                          },
+                        )}
+                      >
+                        Edit footnote
+                      </ButtonLink>
+                      <Button
+                        variant="warning"
+                        onClick={() => {
+                          setDeleteFootnote(footnote);
+                        }}
+                      >
+                        Delete footnote
+                      </Button>
                     </ButtonGroup>
-                    */}
                   </>
                 )}
               </Details>
@@ -366,36 +388,60 @@ const DataFileReplacementPlan = ({
             </ButtonGroup>
           )}
 
-          <ModalConfirm
-            title="Delete data block"
-            mounted={!!deleteDataBlock}
-            onExit={() => setDeleteDataBlock(undefined)}
-            onConfirm={async () => {
-              if (!deleteDataBlock) {
-                return;
-              }
+          {deleteDataBlock && (
+            <ModalConfirm
+              title="Delete data block"
+              onExit={() => setDeleteDataBlock(undefined)}
+              onConfirm={async () => {
+                await dataBlockService.deleteDataBlock(
+                  releaseId,
+                  deleteDataBlock.id,
+                );
 
-              await dataBlockService.deleteDataBlock(
-                releaseId,
-                deleteDataBlock.id,
-              );
+                setDeleteDataBlock(undefined);
+                setPlan({
+                  value: {
+                    ...plan,
+                    dataBlocks: plan?.dataBlocks.filter(
+                      block => block.id !== deleteDataBlock.id,
+                    ),
+                  },
+                });
+              }}
+            >
+              <p>
+                Are you sure you want to delete{' '}
+                <strong>'{deleteDataBlock?.name}'</strong>?
+              </p>
+            </ModalConfirm>
+          )}
 
-              setDeleteDataBlock(undefined);
-              setPlan({
-                value: {
-                  ...plan,
-                  dataBlocks: plan?.dataBlocks.filter(
-                    block => block.id !== deleteDataBlock.id,
-                  ),
-                },
-              });
-            }}
-          >
-            <p>
-              Are you sure you want to delete{' '}
-              <strong>'{deleteDataBlock?.name}'</strong>?
-            </p>
-          </ModalConfirm>
+          {deleteFootnote && (
+            <ModalConfirm
+              title="Delete footnote"
+              onExit={() => setDeleteFootnote(undefined)}
+              onConfirm={async () => {
+                await footnoteService.deleteFootnote(
+                  releaseId,
+                  deleteFootnote.id,
+                );
+
+                setDeleteFootnote(undefined);
+                setPlan({
+                  value: {
+                    ...plan,
+                    footnotes: plan?.footnotes.filter(
+                      block => block.id !== deleteFootnote.id,
+                    ),
+                  },
+                });
+              }}
+            >
+              <p>Are you sure you want to delete the following footnote?</p>
+
+              <p className="govuk-inset-text">{deleteFootnote?.content}</p>
+            </ModalConfirm>
+          )}
         </>
       )}
     </LoadingSpinner>
