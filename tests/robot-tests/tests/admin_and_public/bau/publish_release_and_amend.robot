@@ -35,7 +35,7 @@ Create new release
 
 Verify release summary
     [Tags]  HappyPath
-    user checks page contains element   xpath://li/a[text()="Release summary" and contains(@aria-current, 'page')]
+    user checks page contains element   xpath://li/a[text()="Summary" and contains(@aria-current, 'page')]
     user waits until h2 is visible  Release summary
     user checks summary list contains  Publication title  ${PUBLICATION_NAME}
 
@@ -147,7 +147,7 @@ Create amendment
 
 Upload subject
     [Tags]  HappyPath
-    user clicks link  Manage data
+    user clicks link  Data and files
     user waits until page contains element  css:#dataFileUploadForm-subjectTitle
     user enters text into element  css:#dataFileUploadForm-subjectTitle   Dates test subject
     user chooses file   css:#dataFileUploadForm-dataFile       ${CURDIR}${/}files${/}dates.csv
@@ -201,7 +201,7 @@ Add ancillary files
 
 Create data block table
     [Tags]  HappyPath
-    user clicks link    Manage data blocks
+    user clicks link    Data blocks
     user waits until h2 is visible   Choose a subject
 
     user waits until page contains   Dates test subject
@@ -253,9 +253,9 @@ Navigate to Create chart tab
     user waits until page contains  Chart preview
     user checks infographic chart contains alt  id:chartBuilderPreview  Sample alt text
 
-Navigate to Manage content tab
+Navigate to 'Content' page
     [Tags]  HappyPath
-    user clicks link   Manage content
+    user clicks link   Content
     user waits until h2 is visible  ${PUBLICATION_NAME}
     user waits until page contains button  Add a summary text block
 

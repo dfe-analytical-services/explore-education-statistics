@@ -48,7 +48,7 @@ Click Create new release button
 
 Verify Release summary
     [Tags]  HappyPath
-    user checks page contains element   xpath://li/a[text()="Release summary" and contains(@aria-current, 'page')]
+    user checks page contains element   xpath://li/a[text()="Summary" and contains(@aria-current, 'page')]
     user waits until h2 is visible    Release summary
     user checks summary list contains  Publication title  ${PUBLICATION_NAME}
     user checks summary list contains  Time period  Tax Year
@@ -60,7 +60,7 @@ Verify Release summary
 
 Upload subject
     [Tags]  HappyPath
-    user clicks link  Manage data
+    user clicks link  Data and files
     user waits until h2 is visible  Add data file to release
     user enters text into element  id:dataFileUploadForm-subjectTitle   UI test subject
     user chooses file  id:dataFileUploadForm-dataFile       ${CURDIR}${/}files${/}upload-file-test-with-filter.csv
@@ -78,53 +78,65 @@ Upload subject
     user checks summary list contains  Data file size   16 Kb  ${section}
     user checks summary list contains  Status           Complete  ${section}  180
 
-Navigate to Footnotes tab
+Navigate to 'Footnotes' page
     [Tags]  HappyPath
     user clicks link  Footnotes
     user waits until h2 is visible  Footnotes
 
 Create subject footnote for new subject
     [Tags]  HappyPath
-    user clicks element   id:add-footnote-button
+    user clicks link  Create footnote
+    user waits until h2 is visible  Create footnote
+
     user waits until page contains testid  footnote-subject UI test subject
     user clicks checkbox  Select all indicators and filters for this subject
-    user clicks element   id:create-footnote-form-content
+    user clicks element   id:footnoteForm-content
     user presses keys  UI tests subject footnote
-    user clicks button   Create footnote
+    user clicks button   Save footnote
+    user waits until h2 is visible  Footnotes
 
 Create indicator footnote for new subject
     [Tags]  HappyPath
-    user clicks element  id:add-footnote-button
+    user clicks link  Create footnote
+    user waits until h2 is visible  Create footnote
+
     user waits until page contains testid  footnote-subject UI test subject
     user opens details dropdown  Indicators
     user clicks checkbox  Admission Numbers
-    user clicks element   id:create-footnote-form-content
+    user clicks element   id:footnoteForm-content
     user presses keys  UI tests indicator Admission Numbers footnote
-    user clicks button   Create footnote
+    user clicks button   Save footnote
+    user waits until h2 is visible  Footnotes
 
 Create Random Filter Total footnote for new subject
     [Tags]  HappyPath
-    user clicks element  id:add-footnote-button
+    user clicks link  Create footnote
+    user waits until h2 is visible  Create footnote
+
     user waits until page contains testid  footnote-subject UI test subject
     user opens details dropdown   Random Filter
     user clicks checkbox   Total
-    user clicks element   id:create-footnote-form-content
+    user clicks element   id:footnoteForm-content
     user presses keys  UI tests Random Filter Total footnote
-    user clicks button   Create footnote
+    user clicks button   Save footnote
+    user waits until h2 is visible  Footnotes
 
 Create Random Filter Select all footnote for new subject
     [Tags]  HappyPath
-    user clicks element  id:add-footnote-button
+    user clicks link  Create footnote
+    user waits until h2 is visible  Create footnote
+
     user waits until page contains testid  footnote-subject UI test subject
     user opens details dropdown   Random Filter
     user clicks checkbox   Select all
-    user clicks element   id:create-footnote-form-content
+    user clicks element   id:footnoteForm-content
     user presses keys  UI tests Random Filter Select all footnote
-    user clicks button   Create footnote
+    user clicks button   Save footnote
+    user waits until h2 is visible  Footnotes
 
-Navigate to Manage data blocks tab
+Navigate to 'Data blocks' page
     [Tags]  HappyPath
-    user clicks link    Manage data blocks
+    user clicks link    Data blocks
     user waits until h2 is visible   Choose a subject
 
 Select subject "UI test subject"
@@ -184,9 +196,9 @@ Navigate to Create chart tab
     user clicks button   Save chart options
     user waits until page contains  Chart preview
 
-Navigate back to Manage data tab
+Navigate back to 'Data and files' page
     [Tags]  HappyPath
-    user clicks link  Manage data
+    user clicks link  Data and files
     user waits until page contains link  Data uploads
 
 Delete UI test subject

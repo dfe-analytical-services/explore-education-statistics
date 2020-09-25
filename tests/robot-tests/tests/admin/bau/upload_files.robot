@@ -12,14 +12,14 @@ ${TOPIC_NAME}        %{TEST_TOPIC_NAME}
 ${PUBLICATION_NAME}  UI tests - upload files %{RUN_IDENTIFIER}
 
 *** Test Cases ***
-Create Manage content test publication
+Create test publication
     [Tags]  HappyPath
     user selects theme "Test theme" and topic "${TOPIC_NAME}" from the admin dashboard
     user waits until page contains link    Create new publication     60
     user clicks link  Create new publication
     user creates publication    ${PUBLICATION_NAME}
 
-Verify Manage content test publication is created
+Verify test publication is created
     [Tags]  HappyPath
     user waits until page contains accordion section  ${PUBLICATION_NAME}
     user opens accordion section  ${PUBLICATION_NAME}
@@ -32,9 +32,9 @@ Create release
     user creates release for publication  ${PUBLICATION_NAME}  Academic Year  2025
     user checks summary list contains  Publication title  ${PUBLICATION_NAME}
 
-Navigate to Manage data tab
+Navigate to 'Data and files' page
     [Tags]  HappyPath
-    user clicks link  Manage data
+    user clicks link  Data and files
     user waits until h1 is visible  ${PUBLICATION_NAME}
 
 Upload a ZIP file subject
@@ -60,16 +60,16 @@ Upload a ZIP file subject
     #user checks summary list contains  Number of rows   613  ${section}
     #user checks summary list contains  Data file size   141 Kb  ${section}
 
-Check Absence in PRUs subject appears in Manage data blocks tab
+Check Absence in PRUs subject appears in 'Data blocks' page
     [Tags]  HappyPath
-    user clicks link   Manage data blocks
+    user clicks link   Data blocks
     user waits until h2 is visible   Choose a subject
 
     user waits until page contains  Absence in PRUs
 
-Navigate to Manage data - File uploads tab
+Navigate to 'Data and files' page - 'File uploads' tab
     [Tags]  HappyPath
-    user clicks link  Manage data
+    user clicks link  Data and files
     user waits until h2 is visible   Add data file to release
     user clicks link  File uploads
     user waits until h2 is visible  Add file to release

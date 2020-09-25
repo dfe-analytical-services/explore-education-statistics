@@ -9,17 +9,17 @@ Suite Teardown    user closes the browser
 
 *** Variables ***
 ${TOPIC_NAME}        %{TEST_TOPIC_NAME}
-${PUBLICATION_NAME}  UI tests - manage content %{RUN_IDENTIFIER}
+${PUBLICATION_NAME}  UI tests - release content %{RUN_IDENTIFIER}
 
 *** Test Cases ***
-Create Manage content test publication
+Create test publication
     [Tags]  HappyPath
     user selects theme "Test theme" and topic "${TOPIC_NAME}" from the admin dashboard
     user waits until page contains element    xpath://a[text()="Create new publication"]     60
     user clicks link  Create new publication
     user creates publication    ${PUBLICATION_NAME}
 
-Verify Manage content test publication is created
+Verify test publication is created
     [Tags]  HappyPath
     user waits until page contains accordion section  ${PUBLICATION_NAME}
     user opens accordion section  ${PUBLICATION_NAME}
@@ -32,9 +32,9 @@ Create release
     user creates release for publication  ${PUBLICATION_NAME}  Academic Year  2025
     user checks summary list contains  Publication title  ${PUBLICATION_NAME}
 
-Navigate to Manage content tab
+Navigate to 'Content' page
     [Tags]  HappyPath
-    user clicks link   Manage content
+    user clicks link   Content
     user waits until h1 is visible  ${PUBLICATION_NAME}
     user waits until h2 is visible  ${PUBLICATION_NAME}
 
