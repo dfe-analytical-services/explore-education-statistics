@@ -32,6 +32,7 @@ describe('ReleaseDataUploadsSection', () => {
       },
       created: '2020-06-12T12:00:00',
       status: 'COMPLETE',
+      canDelete: false,
     },
     {
       id: 'data-2',
@@ -47,6 +48,7 @@ describe('ReleaseDataUploadsSection', () => {
       },
       created: '2020-07-01T12:00:00',
       status: 'COMPLETE',
+      canDelete: true,
     },
   ];
 
@@ -469,11 +471,13 @@ describe('ReleaseDataUploadsSection', () => {
 
     test('cannot submit with invalid values when trying to upload ZIP file', async () => {
       render(
-        <ReleaseDataUploadsSection
-          publicationId="publication-1"
-          releaseId="release-1"
-          canUpdateRelease
-        />,
+        <MemoryRouter>
+          <ReleaseDataUploadsSection
+            publicationId="publication-1"
+            releaseId="release-1"
+            canUpdateRelease
+          />
+        </MemoryRouter>,
       );
 
       userEvent.click(screen.getByLabelText('ZIP file'));

@@ -1,7 +1,7 @@
 import Link from '@admin/components/Link';
 import useQueryParams from '@admin/hooks/useQueryParams';
 import DataFileReplacementPlan from '@admin/pages/release/data/components/DataFileReplacementPlan';
-import DataFileSummaryList from '@admin/pages/release/data/components/DataFileSummaryList';
+import DataFileDetailsTable from '@admin/pages/release/data/components/DataFileDetailsTable';
 import {
   releaseDataFileRoute,
   ReleaseDataFileRouteParams,
@@ -51,7 +51,7 @@ const ReleaseDataFilePage = ({
           <>
             <h2>Current data file</h2>
 
-            <DataFileSummaryList dataFile={dataFile} releaseId={releaseId} />
+            <DataFileDetailsTable dataFile={dataFile} releaseId={releaseId} />
 
             {/*
             TODO: Add upload form when API is in place (EES-1399)

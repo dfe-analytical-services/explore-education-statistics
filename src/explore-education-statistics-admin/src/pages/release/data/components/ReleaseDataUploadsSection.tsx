@@ -1,5 +1,5 @@
 import Link from '@admin/components/Link';
-import DataFileSummaryList from '@admin/pages/release/data/components/DataFileSummaryList';
+import DataFileDetailsTable from '@admin/pages/release/data/components/DataFileDetailsTable';
 import DataFileUploadForm, {
   DataFileUploadFormValues,
 } from '@admin/pages/release/data/components/DataFileUploadForm';
@@ -18,7 +18,6 @@ import ButtonText from '@common/components/ButtonText';
 import FormFieldTextInput from '@common/components/form/FormFieldTextInput';
 import LoadingSpinner from '@common/components/LoadingSpinner';
 import ModalConfirm from '@common/components/ModalConfirm';
-import SummaryListItem from '@common/components/SummaryListItem';
 import WarningMessage from '@common/components/WarningMessage';
 import useAsyncHandledRetry from '@common/hooks/useAsyncHandledRetry';
 import logger from '@common/services/logger';
@@ -220,48 +219,43 @@ const ReleaseDataUploadsSection = ({
                   {dataFile.isDeleting && (
                     <LoadingSpinner text="Deleting files" overlay />
                   )}
-                  <DataFileSummaryList
+                  <DataFileDetailsTable
                     dataFile={dataFile}
                     releaseId={releaseId}
                     onStatusChange={handleStatusChange}
                   >
                     {canUpdateRelease && dataFile.canDelete && (
-                      <SummaryListItem
-                        term="Actions"
-                        actions={
-                          <>
-                            <Link
-                              className="govuk-!-margin-right-4"
-                              to={generatePath<ReleaseDataFileRouteParams>(
-                                releaseDataFileRoute.path,
-                                {
-                                  publicationId,
-                                  releaseId,
-                                  fileId: dataFile.id,
-                                },
-                              )}
-                            >
-                              Replace data
-                            </Link>
-                            <ButtonText
-                              onClick={() =>
-                                releaseDataFileService
-                                  .getDeleteDataFilePlan(releaseId, dataFile)
-                                  .then(plan => {
-                                    setDeleteDataFile({
-                                      plan,
-                                      file: dataFile,
-                                    });
-                                  })
-                              }
-                            >
-                              Delete files
-                            </ButtonText>
-                          </>
-                        }
-                      />
+                      <>
+                        <Link
+                          className="govuk-!-margin-right-4"
+                          to={generatePath<ReleaseDataFileRouteParams>(
+                            releaseDataFileRoute.path,
+                            {
+                              publicationId,
+                              releaseId,
+                              fileId: dataFile.id,
+                            },
+                          )}
+                        >
+                          Replace data
+                        </Link>
+                        <ButtonText
+                          onClick={() =>
+                            releaseDataFileService
+                              .getDeleteDataFilePlan(releaseId, dataFile)
+                              .then(plan => {
+                                setDeleteDataFile({
+                                  plan,
+                                  file: dataFile,
+                                });
+                              })
+                          }
+                        >
+                          Delete files
+                        </ButtonText>
+                      </>
                     )}
-                  </DataFileSummaryList>
+                  </DataFileDetailsTable>
                 </div>
               </AccordionSection>
             ))}
