@@ -37,16 +37,20 @@ const DataFileDetailsTable = ({
         </thead>
       )}
       <tbody>
-        <tr data-testid="Subject title">
+        <tr>
           <th scope="row" className="govuk-!-width-one-third">
             Subject title
           </th>
-          <td>{dataFile.title}</td>
-          {replacementDataFile && <td>{replacementDataFile.title}</td>}
+          <td data-testid="Subject title">{dataFile.title}</td>
+          {replacementDataFile && (
+            <td data-testid="Replacement Subject title">
+              {replacementDataFile.title}
+            </td>
+          )}
         </tr>
-        <tr data-testid="Data file">
+        <tr>
           <th scope="row">Data file</th>
-          <td>
+          <td data-testid="Data file">
             <ButtonText
               onClick={() =>
                 releaseDataFileService.downloadFile(
@@ -60,7 +64,7 @@ const DataFileDetailsTable = ({
             </ButtonText>
           </td>
           {replacementDataFile && (
-            <td>
+            <td data-testid="Replacement Data file">
               <ButtonText
                 onClick={() =>
                   releaseDataFileService.downloadFile(
@@ -75,9 +79,9 @@ const DataFileDetailsTable = ({
             </td>
           )}
         </tr>
-        <tr data-testid="Metadata file">
+        <tr>
           <th scope="row">Metadata file</th>
-          <td>
+          <td data-testid="Metadata file">
             <ButtonText
               onClick={() =>
                 releaseDataFileService.downloadFile(
@@ -91,7 +95,7 @@ const DataFileDetailsTable = ({
             </ButtonText>
           </td>
           {replacementDataFile && (
-            <td>
+            <td data-testid="Replacement Metadata file">
               <ButtonText
                 onClick={() =>
                   releaseDataFileService.downloadFile(
@@ -106,28 +110,30 @@ const DataFileDetailsTable = ({
             </td>
           )}
         </tr>
-        <tr data-testid="Data file size">
+        <tr>
           <th scope="row">Data file size</th>
-          <td>
+          <td data-testid="Data file size">
             {dataFile.fileSize.size.toLocaleString()} {dataFile.fileSize.unit}
           </td>
           {replacementDataFile && (
-            <td>
+            <td data-testid="Replacement Data file size">
               {replacementDataFile.fileSize.size.toLocaleString()}{' '}
               {replacementDataFile.fileSize.unit}
             </td>
           )}
         </tr>
-        <tr data-testid="Number of rows">
+        <tr>
           <th scope="row">Number of rows</th>
-          <td>{dataFile.rows.toLocaleString()}</td>
+          <td data-testid="Number of rows">{dataFile.rows.toLocaleString()}</td>
           {replacementDataFile && (
-            <td>{replacementDataFile.rows.toLocaleString()}</td>
+            <td data-testid="Replacement Number of rows">
+              {replacementDataFile.rows.toLocaleString()}
+            </td>
           )}
         </tr>
-        <tr data-testid="Status">
+        <tr>
           <th scope="row">Status</th>
-          <td>
+          <td data-testid="Status">
             <ImporterStatus
               releaseId={releaseId}
               dataFile={dataFile}
@@ -135,7 +141,7 @@ const DataFileDetailsTable = ({
             />
           </td>
           {replacementDataFile && (
-            <td>
+            <td data-testid="Replacement Status">
               <ImporterStatus
                 releaseId={releaseId}
                 dataFile={replacementDataFile}
@@ -144,13 +150,13 @@ const DataFileDetailsTable = ({
             </td>
           )}
         </tr>
-        <tr data-testid="Uploaded by">
+        <tr>
           <th scope="row">Uploaded by</th>
-          <td>
+          <td data-testid="Uploaded by">
             <a href={`mailto:${dataFile.userName}`}>{dataFile.userName}</a>
           </td>
           {replacementDataFile && (
-            <td>
+            <td data-testid="Replacement Uploaded by">
               <a href={`mailto:${replacementDataFile.userName}`}>
                 {replacementDataFile.userName}
               </a>
@@ -158,15 +164,15 @@ const DataFileDetailsTable = ({
           )}
         </tr>
         {dataFile.created && (
-          <tr data-testid="Date uploaded">
+          <tr>
             <th scope="row">Date uploaded</th>
-            <td>
+            <td data-testid="Date uploaded">
               <FormattedDate format="d MMMM yyyy HH:mm">
                 {dataFile.created}
               </FormattedDate>
             </td>
             {replacementDataFile?.created && (
-              <td>
+              <td data-testid="Replacement Date uploaded">
                 <FormattedDate format="d MMMM yyyy HH:mm">
                   {replacementDataFile.created}
                 </FormattedDate>

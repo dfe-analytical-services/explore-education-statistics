@@ -11,6 +11,7 @@ interface DataFileInfo extends FileInfo {
   userName: string;
   created: string;
   status: ImportStatusCode;
+  replacedBy?: string;
 }
 
 export interface DeleteDataFilePlan {
@@ -31,21 +32,33 @@ export interface DataFile {
   metaFileName: string;
   userName: string;
   status: ImportStatusCode;
+  replacedBy?: string;
   created?: string;
   canDelete?: boolean;
   isDeleting?: boolean;
 }
 
-export interface UploadDataFilesRequest {
-  name: string;
-  dataFile: File;
-  metadataFile: File;
-}
+export type UploadDataFilesRequest =
+  | {
+      name: string;
+      dataFile: File;
+      metadataFile: File;
+    }
+  | {
+      replacingFileId: string;
+      dataFile: File;
+      metadataFile: File;
+    };
 
-export interface UploadZipDataFileRequest {
-  name: string;
-  zipFile: File;
-}
+export type UploadZipDataFileRequest =
+  | {
+      name: string;
+      zipFile: File;
+    }
+  | {
+      replacingFileId: string;
+      zipFile: File;
+    };
 
 export type ImportStatusCode =
   | 'COMPLETE'
@@ -79,6 +92,7 @@ function mapFile(file: DataFileInfo): DataFile {
     },
     metaFileId: file.metaFileId,
     metaFileName: file.metaFileName,
+    replacedBy: file.replacedBy,
     canDelete: true,
     userName: file.userName,
     created: file.created,
@@ -104,17 +118,17 @@ const releaseDataFileService = {
     releaseId: string,
     request: UploadDataFilesRequest,
   ): Promise<DataFile> {
+    const { dataFile, metadataFile, ...params } = request;
+
     const data = new FormData();
-    data.append('file', request.dataFile);
-    data.append('metaFile', request.metadataFile);
+    data.append('file', dataFile);
+    data.append('metaFile', metadataFile);
 
     const file = await client.post<DataFileInfo>(
       `/release/${releaseId}/data`,
       data,
       {
-        params: {
-          name: request.name,
-        },
+        params,
       },
     );
 
@@ -124,16 +138,16 @@ const releaseDataFileService = {
     releaseId: string,
     request: UploadZipDataFileRequest,
   ): Promise<DataFile> {
+    const { zipFile, ...params } = request;
+
     const data = new FormData();
-    data.append('zipFile', request.zipFile);
+    data.append('zipFile', zipFile);
 
     const file = await client.post<DataFileInfo>(
       `/release/${releaseId}/zip-data`,
       data,
       {
-        params: {
-          name: request.name,
-        },
+        params,
       },
     );
 
