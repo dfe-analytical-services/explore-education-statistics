@@ -9,8 +9,8 @@ import {
 } from '@admin/routes/releaseRoutes';
 import releaseDataFileService, {
   DataFile,
+  DataFileImportStatus,
   DeleteDataFilePlan,
-  ImportStatusCode,
 } from '@admin/services/releaseDataFileService';
 import Accordion from '@common/components/Accordion';
 import AccordionSection from '@common/components/AccordionSection';
@@ -75,7 +75,7 @@ const ReleaseDataUploadsSection = ({
   const setFileDeleting = (dataFile: DeleteDataFile, deleting: boolean) => {
     setDataFiles({
       value: dataFiles.map(file =>
-        file.filename !== dataFile.file.filename
+        file.fileName !== dataFile.file.fileName
           ? file
           : {
               ...file,
@@ -87,19 +87,19 @@ const ReleaseDataUploadsSection = ({
 
   const handleStatusChange = async (
     dataFile: DataFile,
-    statusCode: ImportStatusCode,
+    { status }: DataFileImportStatus,
   ) => {
     setDataFiles({
       value: dataFiles.map(file =>
-        file.filename !== dataFile.filename
+        file.fileName !== dataFile.fileName
           ? file
           : {
               ...file,
               canDelete:
-                statusCode &&
-                (statusCode === 'NOT_FOUND' ||
-                  statusCode === 'COMPLETE' ||
-                  statusCode === 'FAILED'),
+                status &&
+                (status === 'NOT_FOUND' ||
+                  status === 'COMPLETE' ||
+                  status === 'FAILED'),
             },
       ),
     });

@@ -22,29 +22,31 @@ describe('ReleaseDataUploadsSection', () => {
       id: 'data-1',
       title: 'Test data 1',
       userName: 'user1@test.com',
-      filename: 'data-1.csv',
+      fileName: 'data-1.csv',
       metaFileId: 'data-1-meta',
-      metadataFilename: 'data-1.meta.csv',
+      metaFileName: 'data-1.meta.csv',
       rows: 100,
       fileSize: {
         size: 50,
         unit: 'Kb',
       },
       created: '2020-06-12T12:00:00',
+      status: 'COMPLETE',
     },
     {
       id: 'data-2',
       title: 'Test data 2',
       userName: 'user2@test.com',
-      filename: 'data-2.csv',
+      fileName: 'data-2.csv',
       metaFileId: 'data-2-meta',
-      metadataFilename: 'data-2.meta.csv',
+      metaFileName: 'data-2.meta.csv',
       rows: 200,
       fileSize: {
         size: 100,
         unit: 'Kb',
       },
       created: '2020-07-01T12:00:00',
+      status: 'COMPLETE',
     },
   ];
 
@@ -164,7 +166,7 @@ describe('ReleaseDataUploadsSection', () => {
       releaseDataFileService.getDataFiles.mockResolvedValue(testDataFiles);
       releaseDataFileService.getDataFileImportStatus.mockImplementation(
         async (releaseId, dataFileName) => {
-          if (dataFileName === testDataFiles[1].filename) {
+          if (dataFileName === testDataFiles[1].fileName) {
             return testCompleteImportStatus;
           }
 
@@ -353,15 +355,16 @@ describe('ReleaseDataUploadsSection', () => {
       id: 'file-1',
       title: 'Test title',
       userName: 'user1@test.com',
-      filename: 'test-data.csv',
+      fileName: 'test-data.csv',
       metaFileId: 'file-1-meta',
-      metadataFilename: 'test-data.meta.csv',
+      metaFileName: 'test-data.meta.csv',
       rows: 300,
       fileSize: {
         size: 150,
         unit: 'Kb',
       },
       created: '2020-08-18T12:00:00',
+      status: 'QUEUED',
     };
 
     beforeEach(() => {

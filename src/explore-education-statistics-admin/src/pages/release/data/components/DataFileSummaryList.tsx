@@ -1,6 +1,6 @@
 import ImporterStatus, {
-  ImportStatusChangeHandler,
-} from '@admin/components/ImporterStatus';
+  ImporterStatusChangeHandler,
+} from '@admin/pages/release/data/components/ImporterStatus';
 import releaseDataFileService, {
   DataFile,
 } from '@admin/services/releaseDataFileService';
@@ -14,7 +14,7 @@ interface Props {
   children?: ReactNode;
   dataFile: DataFile;
   releaseId: string;
-  onStatusChange?: ImportStatusChangeHandler;
+  onStatusChange?: ImporterStatusChangeHandler;
 }
 
 const DataFileSummaryList = ({
@@ -32,11 +32,11 @@ const DataFileSummaryList = ({
             releaseDataFileService.downloadFile(
               releaseId,
               dataFile.id,
-              dataFile.filename,
+              dataFile.fileName,
             )
           }
         >
-          {dataFile.filename}
+          {dataFile.fileName}
         </ButtonText>
       </SummaryListItem>
       <SummaryListItem term="Metadata file">
@@ -45,11 +45,11 @@ const DataFileSummaryList = ({
             releaseDataFileService.downloadFile(
               releaseId,
               dataFile.id,
-              dataFile.metadataFilename,
+              dataFile.metaFileName,
             )
           }
         >
-          {dataFile.metadataFilename}
+          {dataFile.metaFileName}
         </ButtonText>
       </SummaryListItem>
       <SummaryListItem term="Data file size">
@@ -59,11 +59,13 @@ const DataFileSummaryList = ({
         {dataFile.rows.toLocaleString()}
       </SummaryListItem>
 
-      <ImporterStatus
-        releaseId={releaseId}
-        dataFile={dataFile}
-        onStatusChange={onStatusChange}
-      />
+      <SummaryListItem term="Status">
+        <ImporterStatus
+          releaseId={releaseId}
+          dataFile={dataFile}
+          onStatusChange={onStatusChange}
+        />
+      </SummaryListItem>
 
       {dataFile.userName && (
         <SummaryListItem term="Uploaded by">

@@ -3,7 +3,6 @@ import { FileInfo } from '@admin/services/types/file';
 import client from '@admin/services/utils/service';
 import { Overwrite } from '@common/types';
 import downloadFile from './utils/file/downloadFile';
-import getFileNameFromPath from './utils/file/getFileNameFromPath';
 
 interface DataFileInfo extends FileInfo {
   metaFileId: string;
@@ -11,6 +10,7 @@ interface DataFileInfo extends FileInfo {
   rows: number;
   userName: string;
   created: string;
+  status: ImportStatusCode;
 }
 
 export interface DeleteDataFilePlan {
@@ -21,15 +21,16 @@ export interface DeleteDataFilePlan {
 export interface DataFile {
   id: string;
   title: string;
-  filename: string;
+  fileName: string;
   fileSize: {
     size: number;
     unit: string;
   };
   rows: number;
   metaFileId: string;
-  metadataFilename: string;
+  metaFileName: string;
   userName: string;
+  status: ImportStatusCode;
   created?: string;
   canDelete?: boolean;
   isDeleting?: boolean;
@@ -57,14 +58,10 @@ export type ImportStatusCode =
   | 'NOT_FOUND'
   | 'FAILED';
 
-export interface Errors {
-  Message: string;
-}
-
 export interface DataFileImportStatus {
   status: ImportStatusCode;
   percentageComplete?: string;
-  errors?: Errors[];
+  errors?: string[];
   numberOfRows: number;
 }
 
@@ -74,17 +71,18 @@ function mapFile(file: DataFileInfo): DataFile {
   return {
     id: file.id,
     title: file.name,
-    filename: file.fileName,
+    fileName: file.fileName,
     rows: file.rows || 0,
     fileSize: {
       size: parseInt(size, 10),
       unit,
     },
     metaFileId: file.metaFileId,
-    metadataFilename: file.metaFileName,
+    metaFileName: file.metaFileName,
     canDelete: true,
     userName: file.userName,
     created: file.created,
+    status: file.status,
   };
 }
 
@@ -158,7 +156,7 @@ const releaseDataFileService = {
         return {
           ...importStatus,
           errors: JSON.parse(importStatus.errors || '[]').map(
-            ({ Message }: Errors) => Message,
+            ({ Message }: { Message: string }) => Message,
           ),
         };
       });

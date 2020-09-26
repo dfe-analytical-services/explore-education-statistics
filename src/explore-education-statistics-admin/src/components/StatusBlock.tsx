@@ -1,7 +1,5 @@
 import Tag from '@common/components/Tag';
 import React from 'react';
-import classNames from 'classnames';
-import styles from '@admin/pages/release/data/components/ReleaseDataUploadsSection.module.scss';
 
 export interface StatusBlockProps {
   className?: string;
@@ -16,21 +14,8 @@ const StatusBlock = ({
   className,
   id = undefined,
 }: StatusBlockProps) => {
-  const colorClass = () => {
-    switch (color) {
-      case 'orange':
-        return [styles.ragStatusAmber];
-      case 'red':
-        return [styles.ragStatusRed];
-      case 'green':
-        return [styles.ragStatusGreen];
-      default:
-        return undefined;
-    }
-  };
-
   return (
-    <Tag className={classNames(colorClass(), className)} strong id={id}>
+    <Tag colour={color} className={className} strong id={id}>
       {text}
     </Tag>
   );
