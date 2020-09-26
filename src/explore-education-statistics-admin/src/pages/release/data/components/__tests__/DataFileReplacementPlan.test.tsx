@@ -387,10 +387,6 @@ describe('DataReplacementPlan', () => {
     );
 
     await waitFor(() => {
-      expect(
-        screen.getByText('Data replacement in progress'),
-      ).toBeInTheDocument();
-
       expect(screen.getByText('Data blocks: ERROR')).toBeInTheDocument();
       expect(screen.getByText('Footnotes: ERROR')).toBeInTheDocument();
 
@@ -604,10 +600,6 @@ describe('DataReplacementPlan', () => {
     );
 
     await waitFor(() => {
-      expect(
-        screen.getByText('Data replacement in progress'),
-      ).toBeInTheDocument();
-
       expect(screen.getByText('Data blocks: OK')).toBeInTheDocument();
       expect(screen.getByText('Footnotes: OK')).toBeInTheDocument();
 
@@ -693,13 +685,9 @@ describe('DataReplacementPlan', () => {
     await waitFor(() => {
       expect(
         screen.getByText(
-          'There was a problem loading the data replacement details.',
+          'There was a problem loading the data replacement information.',
         ),
       ).toBeInTheDocument();
-
-      expect(
-        screen.queryByText('Data replacement in progress'),
-      ).not.toBeInTheDocument();
     });
   });
 

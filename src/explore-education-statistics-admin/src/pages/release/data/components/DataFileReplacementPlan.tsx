@@ -77,7 +77,7 @@ const DataFileReplacementPlan = ({
   if (error) {
     return (
       <WarningMessage>
-        There was a problem loading the data replacement details.
+        There was a problem loading the data replacement information.
       </WarningMessage>
     );
   }
@@ -92,10 +92,6 @@ const DataFileReplacementPlan = ({
     <LoadingSpinner loading={isLoading}>
       {plan && (
         <>
-          <p>
-            <Tag>Data replacement in progress</Tag>
-          </p>
-
           <WarningMessage>
             Before confirming the data replacement please check the information
             below. Making this change could affect existing data blocks and

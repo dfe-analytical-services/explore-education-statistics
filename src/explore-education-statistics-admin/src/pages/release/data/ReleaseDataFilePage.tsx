@@ -12,6 +12,8 @@ import releaseDataFileService, {
   DataFile,
 } from '@admin/services/releaseDataFileService';
 import LoadingSpinner from '@common/components/LoadingSpinner';
+import Tag from '@common/components/Tag';
+import WarningMessage from '@common/components/WarningMessage';
 import useAsyncHandledRetry from '@common/hooks/useAsyncHandledRetry';
 import useAsyncRetry from '@common/hooks/useAsyncRetry';
 import React from 'react';
@@ -37,6 +39,7 @@ const ReleaseDataFilePage = ({
     value: replacementDataFile,
     isLoading: replacementDataFileLoading,
     setState: setReplacementDataFile,
+    error: replacementDataFileError,
   } = useAsyncRetry(async () => {
     if (!dataFile?.replacedBy) {
       return undefined;
@@ -44,6 +47,27 @@ const ReleaseDataFilePage = ({
 
     return releaseDataFileService.getDataFile(releaseId, dataFile.replacedBy);
   }, [dataFile]);
+
+  const getReplacementPlanMessage = () => {
+    if (replacementDataFileError) {
+      return (
+        <WarningMessage>
+          There was a problem loading the data replacement information.
+        </WarningMessage>
+      );
+    }
+
+    if (replacementDataFile?.status !== 'COMPLETE') {
+      return (
+        <WarningMessage>
+          The replacement data file is still being processed. Data replacement
+          cannot continue until it has completed.
+        </WarningMessage>
+      );
+    }
+
+    return null;
+  };
 
   return (
     <>
@@ -63,6 +87,12 @@ const ReleaseDataFilePage = ({
           <>
             <section className="govuk-!-margin-bottom-8">
               <h2>Data file details</h2>
+
+              {replacementDataFileError && (
+                <WarningMessage>
+                  There was a problem loading the replacement file details.
+                </WarningMessage>
+              )}
 
               <DataFileDetailsTable
                 dataFile={dataFile}
@@ -92,7 +122,6 @@ const ReleaseDataFilePage = ({
                 <h2>Upload replacement data</h2>
 
                 <DataFileUploadForm
-                  submitText="Upload replacement data"
                   onSubmit={async values => {
                     let file: DataFile;
 
@@ -130,6 +159,12 @@ const ReleaseDataFilePage = ({
             ) : (
               <section>
                 <h2>Pending data replacement</h2>
+
+                <p>
+                  <Tag>Data replacement in progress</Tag>
+                </p>
+
+                {getReplacementPlanMessage()}
 
                 {replacementDataFile?.status === 'COMPLETE' && (
                   <DataFileReplacementPlan
