@@ -1483,8 +1483,11 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
                 Filename = "replacement.csv",
                 ReleaseFileType = ReleaseFileTypes.Data,
                 Release = contentRelease,
-                SubjectId = replacementSubject.Id
+                SubjectId = replacementSubject.Id,
+                Replacing = originalReleaseFileReference
             };
+
+            originalReleaseFileReference.ReplacedBy = replacementReleaseFileReference;
 
             var originalReleaseFile = new ReleaseFile
             {
@@ -1645,8 +1648,11 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
                 Filename = "replacement.csv",
                 ReleaseFileType = ReleaseFileTypes.Data,
                 Release = contentReleaseVersion2,
-                SubjectId = replacementSubject.Id
+                SubjectId = replacementSubject.Id,
+                Replacing = originalReleaseFileReference
             };
+
+            originalReleaseFileReference.ReplacedBy = replacementReleaseFileReference;
 
             var originalReleaseFile1 = new ReleaseFile
             {
@@ -1954,8 +1960,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
             }
 
             mocks.ReleaseService.Setup(service => service.RemoveDataFiles(
-                    contentReleaseVersion2.Id, originalReleaseFileReference.Id, true))
-                .ReturnsAsync(Unit.Instance);
+                    contentReleaseVersion2.Id, originalReleaseFileReference.Id)).ReturnsAsync(Unit.Instance);
 
             await using (var contentDbContext = InMemoryApplicationDbContext(contentDbContextId))
             await using (var statisticsDbContext = InMemoryStatisticsDbContext(statisticsDbContextId))
@@ -1966,12 +1971,16 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
                     replacementReleaseFileReference.Id);
 
                 mocks.ReleaseService.Verify(
-                    mock => mock.RemoveDataFiles(contentReleaseVersion2.Id, originalReleaseFileReference.Id, true),
+                    mock => mock.RemoveDataFiles(contentReleaseVersion2.Id, originalReleaseFileReference.Id),
                     Times.Once());
 
                 mocks.ReleaseService.VerifyNoOtherCalls();
 
                 Assert.True(result.IsRight);
+
+                // Check that the original file was unlinked from the replacement before the mock call to remove it.
+                Assert.Null((await contentDbContext.ReleaseFileReferences.FindAsync(originalReleaseFileReference.Id))
+                    .ReplacedBy);
 
                 var replacedDataBlock = await contentDbContext.DataBlocks.FindAsync(dataBlock.Id);
                 Assert.NotNull(replacedDataBlock);

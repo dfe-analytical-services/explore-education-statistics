@@ -202,7 +202,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Controllers.Api
 
             var fileId = Guid.NewGuid();
 
-            mocks.ReleaseService.Setup(service => service.RemoveDataFiles(_releaseId, fileId, false))
+            mocks.ReleaseService.Setup(service => service.RemoveDataFiles(_releaseId, fileId))
                 .ReturnsAsync(Unit.Instance);
             var controller = ReleasesControllerWithMocks(mocks);
 
@@ -218,7 +218,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Controllers.Api
             var fileId = Guid.NewGuid();
 
             mocks.ReleaseService
-                .Setup(service => service.RemoveDataFiles(_releaseId, fileId, false))
+                .Setup(service => service.RemoveDataFiles(_releaseId, fileId))
                 .ReturnsAsync(ValidationActionResult(UnableToFindMetadataFileToDelete));
             var controller = ReleasesControllerWithMocks(mocks);
 

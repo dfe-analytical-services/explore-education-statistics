@@ -129,7 +129,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Services
                     var releaseId = (await _contentDbContext.ReleaseFileReferences
                         .FindAsync(replacementFileId)).ReleaseId;
 
-                    return await RemoveSubjectAndFileFromRelease(releaseId, originalFileId);
+                    return await RemoveOriginalSubjectAndFileFromRelease(releaseId, originalFileId, replacementFileId);
                 });
         }
 
@@ -760,10 +760,27 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Services
             });
         }
 
-        private async Task<Either<ActionResult, Unit>> RemoveSubjectAndFileFromRelease(Guid releaseId,
-            Guid fileId)
+        private async Task<Either<ActionResult, Unit>> RemoveOriginalSubjectAndFileFromRelease(Guid releaseId,
+            Guid originalFileId, Guid replacementFileId)
         {
-            return await _releaseService.RemoveDataFiles(releaseId, fileId, true);
+            // First, unlink the original file from the replacement before removing it.
+            // Ordinarily, removing a file from a Release deletes any associated replacement
+            // so that there's no possibility of abandoned replacements being orphaned from their original files.
+            await CheckReleaseFileReferenceExists(originalFileId)
+                .OnSuccess(async originalFile =>
+                {
+                    if (originalFile.ReplacedById != replacementFileId)
+                    {
+                        throw new InvalidOperationException(
+                            $"Expected the original file reference to be associated with the replacement but found: {originalFile.ReplacedById}");
+                    }
+
+                    _contentDbContext.Update(originalFile);
+                    originalFile.ReplacedById = null;
+                    await _contentDbContext.SaveChangesAsync();
+                });
+
+            return await _releaseService.RemoveDataFiles(releaseId, originalFileId);
         }
 
         private class ReplacementSubjectMeta

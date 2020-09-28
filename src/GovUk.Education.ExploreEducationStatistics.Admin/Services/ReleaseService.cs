@@ -455,9 +455,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Services
                 });
         }
 
-        public async Task<Either<ActionResult, Unit>> RemoveDataFiles(Guid releaseId,
-            Guid fileId,
-            bool removingReplacedSubject = false)
+        public async Task<Either<ActionResult, Unit>> RemoveDataFiles(Guid releaseId, Guid fileId)
         {
             return await _persistenceHelper
                 .CheckEntityExists<Release>(releaseId)
@@ -469,15 +467,11 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Services
                         .OnSuccess(_ => GetDeleteDataFilePlan(releaseId, fileId))
                         .OnSuccess(async deletePlan =>
                         {
-                            // Unless removing a Subject after completing a replacement
-                            // Delete any replacement Subject that might exist
-                            if (!removingReplacedSubject)
+                            // Delete any replacement that might exist
+                            var replacementInProgress = releaseFileReference.ReplacedById;
+                            if (replacementInProgress.HasValue)
                             {
-                                var replacementInProgress = releaseFileReference.ReplacedById;
-                                if (replacementInProgress.HasValue)
-                                {
-                                    await RemoveDataFiles(releaseId, replacementInProgress.Value);
-                                }
+                                await RemoveDataFiles(releaseId, replacementInProgress.Value);
                             }
 
                             await _dataBlockService.DeleteDataBlocks(deletePlan.DeleteDataBlockPlan);
