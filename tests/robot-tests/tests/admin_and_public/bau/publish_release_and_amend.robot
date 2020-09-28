@@ -1,6 +1,7 @@
 *** Settings ***
 Resource    ../../libs/admin-common.robot
 Resource    ../../libs/charts.robot
+Library     ../../libs/api_keywords.py
 
 Force Tags  Admin  Local  Dev  AltersData
 
@@ -16,31 +17,13 @@ ${DATABLOCK_NAME}    Dates data block name
 *** Test Cases ***
 Create new publication for "UI tests topic" topic
     [Tags]  HappyPath
-    user selects theme "Test theme" and topic "${TOPIC_NAME}" from the admin dashboard
-    user waits until page contains link    Create new publication
-    user checks page does not contain button   ${PUBLICATION_NAME}
-    user clicks link  Create new publication
-    user creates publication    ${PUBLICATION_NAME}
+    ${PUBLICATION_ID}=  user creates test publication via api   ${PUBLICATION_NAME}
+    user create test release via api  ${PUBLICATION_ID}   FY   3000
 
-Verify new publication
+Go to release's "Release status" tab
     [Tags]  HappyPath
-    user selects theme "Test theme" and topic "${TOPIC_NAME}" from the admin dashboard
-    user waits until page contains button  ${PUBLICATION_NAME}
+    user navigates to release summary from admin dashboard  ${PUBLICATION_NAME}   Financial Year 3000-01 (not Live)
 
-Create new release
-    [Tags]  HappyPath
-    user opens accordion section  ${PUBLICATION_NAME}
-    user clicks testid element   Create new release link for ${PUBLICATION_NAME}
-    user creates release for publication  ${PUBLICATION_NAME}  Financial Year  3000
-
-Verify release summary
-    [Tags]  HappyPath
-    user checks page contains element   xpath://li/a[text()="Summary" and contains(@aria-current, 'page')]
-    user waits until h2 is visible  Release summary
-    user checks summary list contains  Publication title  ${PUBLICATION_NAME}
-
-Go to "Release status" tab
-    [Tags]  HappyPath
     user clicks link   Release status
     user waits until h2 is visible  Release status
     user waits until page contains button  Edit release status
