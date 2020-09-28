@@ -23,7 +23,9 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Services.Interfaces
 
         Task<Either<ActionResult, Unit>> DeleteFootnote(Guid releaseId, Guid id);
 
-        Task<Either<ActionResult, IEnumerable<Footnote>>> GetFootnotesAsync(Guid releaseId);
+        Task<Either<ActionResult, Footnote>> GetFootnote(Guid releaseId, Guid id);
+
+        Task<Either<ActionResult, IEnumerable<Footnote>>> GetFootnotes(Guid releaseId);
 
         IEnumerable<Footnote> GetFootnotes(Guid releaseId, Guid subjectId);
 

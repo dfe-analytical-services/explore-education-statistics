@@ -74,13 +74,13 @@ Create another release for the same publication
 
 Verify new release summary
     [Tags]  HappyPath
-    user checks page contains element   xpath://li/a[text()="Release summary" and contains(@aria-current, 'page')]
+    user checks page contains element   xpath://li/a[text()="Summary" and contains(@aria-current, 'page')]
     user waits until h2 is visible  Release summary
     user checks summary list contains  Publication title  ${PUBLICATION_NAME}
 
 Upload subject to new release
     [Tags]  HappyPath
-    user clicks link  Manage data
+    user clicks link  Data and files
     user waits until page contains element  css:#dataFileUploadForm-subjectTitle
     user enters text into element  css:#dataFileUploadForm-subjectTitle   UI test subject
     user chooses file   css:#dataFileUploadForm-dataFile       ${CURDIR}${/}files${/}upload-file-test.csv
@@ -99,9 +99,9 @@ Upload subject to new release
     user checks summary list contains  Data file size   15 Kb  ${section}
     user checks summary list contains  Status           Complete  ${section}  360
 
-Navigate to Manage data blocks tab
+Navigate to 'Data blocks' page
     [Tags]  HappyPath
-    user clicks link    Manage data blocks
+    user clicks link    Data blocks
     user waits until h2 is visible   Choose a subject
 
 Select subject "UI test subject"

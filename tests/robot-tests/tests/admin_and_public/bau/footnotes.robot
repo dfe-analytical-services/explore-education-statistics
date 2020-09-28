@@ -41,13 +41,13 @@ Create new release
 
 Verify release summary
     [Tags]  HappyPath
-    user checks page contains element   xpath://li/a[text()="Release summary" and contains(@aria-current, 'page')]
+    user checks page contains element   xpath://li/a[text()="Summary" and contains(@aria-current, 'page')]
     user waits until h2 is visible  Release summary
     user checks summary list contains  Publication title  ${PUBLICATION_NAME}
 
 Upload subject
     [Tags]  HappyPath
-    user clicks link  Manage data
+    user clicks link  Data and files
     user waits until page contains element  css:#dataFileUploadForm-subjectTitle
     user enters text into element  css:#dataFileUploadForm-subjectTitle   ${SUBJECT_NAME}
     user chooses file   css:#dataFileUploadForm-dataFile       ${CURDIR}${/}files${/}${DATA_FILE_NAME}.csv
@@ -66,46 +66,49 @@ Upload subject
     user checks summary list contains  Data file size   17 Kb  ${section}
     user checks summary list contains  Status           Complete  ${section}  360
 
-Open footnotes tab
+Navigate to 'Footnotes' page
     [Tags]  HappyPath
     user clicks link  Footnotes
+    user waits until h2 is visible  Footnotes
 
 Create footnote
     [Tags]  HappyPath
-    user clicks element  css:#add-footnote-button
+    user clicks link  Create footnote
+    user waits until h2 is visible  Create footnote
+
     user opens details dropdown  Indicators
     user opens details dropdown  Date
     user clicks footnote checkbox  Number of open settings
     user checks footnote checkbox is selected  Number of open settings
     user clicks footnote checkbox  01/04/2020
     user checks footnote checkbox is selected  01/04/2020
-    user enters text into element  css:#create-footnote-form-content  ${FOOTNOTE_TEXT_1}
-    user clicks button  Create footnote
+    user enters text into element  css:#footnoteForm-content  ${FOOTNOTE_TEXT_1}
+    user clicks button  Save footnote
+    user waits until h2 is visible  Footnotes
 
 Create another footnote
     [Tags]  HappyPath
-    user clicks element  css:#add-footnote-button
+    user clicks link  Create footnote
+    user waits until h2 is visible  Create footnote
+
     user opens details dropdown  Indicators
     user opens details dropdown  Date
     user clicks footnote checkbox  Proportion of settings open
     user checks footnote checkbox is selected  Proportion of settings open
     user clicks footnote checkbox  01/04/2021
     user checks footnote checkbox is selected  01/04/2021
-    user enters text into element  css:#create-footnote-form-content  ${FOOTNOTE_TEXT_2}
-    user clicks button  Create footnote
+    user enters text into element  css:#footnoteForm-content  ${FOOTNOTE_TEXT_2}
+    user clicks button  Save footnote
 
 Confirm created footnotes
     [Tags]  HappyPath
+    user waits until h2 is visible  Footnotes
     user waits until page contains  ${FOOTNOTE_TEXT_1}
     user waits until page contains  ${FOOTNOTE_TEXT_2}
 
-Open Manage data blocks tab
+Navigate to 'Data blocks' tab
     [Tags]  HappyPath
-    user clicks link  Manage data blocks
-
-Navigate to Manage data blocks tab
-    [Tags]  HappyPath
-    user clicks link    Manage data blocks
+    user clicks link    Data blocks
     user waits until h2 is visible   Choose a subject
 
 Select subject "${SUBJECT_NAME}" (data block)
@@ -155,20 +158,19 @@ Save data block
     user enters text into element  css:#dataBlockDetailsForm-name  ${FOOTNOTE_DATABLOCK_NAME}
     user enters text into element  css:#dataBlockDetailsForm-heading  ${FOOTNOTE_DATABLOCK_NAME}
     user clicks button  Save data block
-    user waits until page contains element  xpath://h2[text()="${FOOTNOTE_DATABLOCK_NAME}"]
+    user waits until h2 is visible  ${FOOTNOTE_DATABLOCK_NAME}
 
 Go back and delete a footnote
     [Tags]  HappyPath
-    user clicks link  Manage data
     user clicks link  Footnotes
-    user clicks button  Delete
+    user clicks button  Delete footnote
     user clicks button  Confirm
     user waits until page does not contain  ${FOOTNOTE_TEXT_1}
     user checks page contains  ${FOOTNOTE_TEXT_2}
 
 Add data block to release
     [Tags]  HappyPath
-    user clicks link  Manage content
+    user clicks link  Content
     user clicks button  Add secondary stats
     user waits until page contains element  secondaryStats-dataBlockSelectForm-selectedDataBlock
     user selects from list by label  secondaryStats-dataBlockSelectForm-selectedDataBlock  ${FOOTNOTE_DATABLOCK_NAME}
@@ -180,19 +182,19 @@ Add data block to release
 
 Edit footnote
     [Tags]  HappyPath
-    user clicks link  Manage data
-    user waits until page contains link  Footnotes
     user clicks link  Footnotes
-    user waits until page contains button  Edit
-    user clicks button  Edit
-    user enters text into element  css:.govuk-textarea  ${FOOTNOTE_TEXT_3}
-    user clicks button  Update footnote
+    user waits until h2 is visible  Footnotes
+    user clicks link  Edit footnote
+
+    user waits until h2 is visible  Edit footnote
+    user enters text into element  css:#footnoteForm-content  ${FOOTNOTE_TEXT_3}
+    user clicks button  Save footnote
     user waits until page contains  ${FOOTNOTE_TEXT_3}
     user checks page does not contain  ${FOOTNOTE_TEXT_2}
 
 Check footnote was updated
     [Tags]  HappyPath
-    user clicks link  Manage content
+    user clicks link  Content
     user waits until page contains element  css:#releaseHeadlines
     user scrolls to element  css:#releaseHeadlines
     user waits until page contains link  Table  180
@@ -200,7 +202,6 @@ Check footnote was updated
     user checks page contains  ${FOOTNOTE_TEXT_3}
     user checks page does not contain  ${FOOTNOTE_TEXT_2}
     user checks page does not contain  ${FOOTNOTE_TEXT_1}
-
 
 Check footnote in Preview content mode
     [Tags]  HappyPath

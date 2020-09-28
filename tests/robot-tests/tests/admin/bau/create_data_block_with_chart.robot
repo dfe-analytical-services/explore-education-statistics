@@ -34,12 +34,13 @@ Create release
     user clicks testid element  Create new release link for ${PUBLICATION_NAME}
     user creates release for publication  ${PUBLICATION_NAME}  Academic Year  2025
     user checks summary list contains  Publication title  ${PUBLICATION_NAME}
+    user waits until h2 is visible    Release summary
+    user checks summary list contains  Publication title  ${PUBLICATION_NAME}
 
 Upload subject
     [Tags]  HappyPath
-    user waits until h2 is visible    Release summary
-    user checks summary list contains  Publication title  ${PUBLICATION_NAME}
-    user clicks link  Manage data
+    user clicks link  Data and files
+    user waits until h2 is visible  Add data file to release
     user enters text into element  id:dataFileUploadForm-subjectTitle   UI test subject
     user chooses file   id:dataFileUploadForm-dataFile       ${CURDIR}${/}files${/}upload-file-test.csv
     user chooses file   id:dataFileUploadForm-metadataFile   ${CURDIR}${/}files${/}upload-file-test.meta.csv
@@ -57,9 +58,9 @@ Upload subject
     user checks summary list contains  Data file size   15 Kb  ${section}
     user checks summary list contains  Status           Complete  ${section}  180
 
-Navigate to Manage data blocks tab
+Navigate to 'Data and files' page
     [Tags]  HappyPath
-    user clicks link    Manage data blocks
+    user clicks link    Data blocks
     user waits until h2 is visible   Choose a subject
 
 Select subject "UI test subject"
@@ -178,7 +179,7 @@ Save data block
 
 Embed data block into release content
     [Tags]  HappyPath
-    user clicks link  Manage content
+    user clicks link  Content
     user waits until h2 is visible  ${PUBLICATION_NAME}
     user clicks button  Add new section
     user changes accordion section title  1   ${CONTENT_SECTION_NAME}
@@ -253,7 +254,7 @@ Validate embedded table rows
 
 Navigate to Chart tab
     [Tags]  HappyPath
-    user clicks link  Manage data blocks
+    user clicks link  Data blocks
     user selects from list by label  id:selectedDataBlock  ${DATABLOCK_NAME}
     user waits until h2 is visible  ${DATABLOCK_NAME}
     user waits until page does not contain loading spinner
@@ -307,7 +308,7 @@ Save and validate line chart embeds correctly
     user clicks button  Save chart options
     user waits until button is enabled  Save chart options
 
-    user clicks link  Manage content
+    user clicks link  Content
     user waits until h2 is visible  ${PUBLICATION_NAME}
     user opens accordion section  ${CONTENT_SECTION_NAME}
 
@@ -342,7 +343,7 @@ Save and validate line chart embeds correctly
 
 Configure basic vertical bar chart
     [Tags]  HappyPath
-    user clicks link  Manage data blocks
+    user clicks link  Data blocks
     user selects from list by label  id:selectedDataBlock  ${DATABLOCK_NAME}
     user waits until h2 is visible  ${DATABLOCK_NAME}
     user waits until page does not contain loading spinner
@@ -388,7 +389,7 @@ Save and validate vertical bar chart embeds correctly
     user clicks button  Save chart options
     user waits until button is enabled  Save chart options
 
-    user clicks link  Manage content
+    user clicks link  Content
     user waits until h2 is visible  ${PUBLICATION_NAME}
     user opens accordion section  ${CONTENT_SECTION_NAME}
 
@@ -424,7 +425,7 @@ Save and validate vertical bar chart embeds correctly
 
 Configure basic horizontal bar chart
     [Tags]  HappyPath
-    user clicks link  Manage data blocks
+    user clicks link  Data blocks
     user selects from list by label  id:selectedDataBlock  ${DATABLOCK_NAME}
     user waits until h2 is visible  ${DATABLOCK_NAME}
     user waits until page does not contain loading spinner
@@ -471,7 +472,7 @@ Save and validate horizontal bar chart embeds correctly
     user clicks button  Save chart options
     user waits until button is enabled  Save chart options
 
-    user clicks link  Manage content
+    user clicks link  Content
     user waits until h2 is visible  ${PUBLICATION_NAME}
     user opens accordion section  ${CONTENT_SECTION_NAME}
 
@@ -506,7 +507,7 @@ Save and validate horizontal bar chart embeds correctly
 
 Configure basic geographic chart
     [Tags]  HappyPath
-    user clicks link  Manage data blocks
+    user clicks link  Data blocks
     user selects from list by label  id:selectedDataBlock  ${DATABLOCK_NAME}
     user waits until h2 is visible  ${DATABLOCK_NAME}
     user waits until page does not contain loading spinner
@@ -541,7 +542,7 @@ Save and validate geographic chart embeds correctly
     user clicks button  Save chart options
     user waits until button is enabled  Save chart options
 
-    user clicks link  Manage content
+    user clicks link  Content
     user waits until h2 is visible  ${PUBLICATION_NAME}
     user opens accordion section  ${CONTENT_SECTION_NAME}
 
@@ -567,7 +568,7 @@ Save and validate geographic chart embeds correctly
 
 Configure basic infographic chart
     [Tags]  HappyPath
-    user clicks link  Manage data blocks
+    user clicks link  Data blocks
     user selects from list by label  id:selectedDataBlock  ${DATABLOCK_NAME}
     user waits until h2 is visible  ${DATABLOCK_NAME}
     user waits until page does not contain loading spinner
@@ -587,7 +588,7 @@ Save and validate infographic chart embeds correctly
     user clicks button  Save chart options
     user waits until button is enabled  Save chart options
 
-    user clicks link  Manage content
+    user clicks link  Content
     user waits until h2 is visible  ${PUBLICATION_NAME}
     user opens accordion section  ${CONTENT_SECTION_NAME}
 
@@ -602,7 +603,7 @@ Delete embedded data block
 
 Delete chart from data block
     [Tags]  HappyPath
-    user clicks link  Manage data blocks
+    user clicks link  Data blocks
     user selects from list by label  id:selectedDataBlock  ${DATABLOCK_NAME}
     user waits until h2 is visible  ${DATABLOCK_NAME}
     user waits until page does not contain loading spinner

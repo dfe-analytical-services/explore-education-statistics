@@ -18,32 +18,27 @@ const generateFootnoteMetaMap = (
   const indicatorsToSubject: { [key: string]: string } = {};
   const indicatorItemsToIndicators: { [key: string]: string } = {};
 
-  Object.keys(footnoteMeta).forEach(subjectId => {
-    Object.keys(footnoteMeta[subjectId].indicators).forEach(indicatorId => {
-      indicatorsToSubject[indicatorId] = subjectId;
+  Object.entries(footnoteMeta.subjects).forEach(([subjectId, subject]) => {
+    Object.entries(subject.indicators).forEach(
+      ([indicatorGroupId, indicatorGroup]) => {
+        indicatorsToSubject[indicatorGroupId] = subjectId;
 
-      Object.keys(
-        footnoteMeta[subjectId].indicators[indicatorId].options,
-      ).forEach(indicatorItemId => {
-        indicatorItemsToIndicators[indicatorItemId] = indicatorId;
-      });
-    });
+        indicatorGroup.options.forEach(indicator => {
+          indicatorItemsToIndicators[indicator.value] = indicatorGroupId;
+        });
+      },
+    );
 
-    Object.keys(footnoteMeta[subjectId].filters).forEach(filterId => {
+    Object.entries(subject.filters).forEach(([filterId, filter]) => {
       filtersToSubject[filterId] = subjectId;
 
-      Object.keys(footnoteMeta[subjectId].filters[filterId].options).forEach(
-        filterGroupId => {
-          filterGroupsToFilters[filterGroupId] = filterId;
+      Object.entries(filter.options).forEach(([filterGroupId, filterGroup]) => {
+        filterGroupsToFilters[filterGroupId] = filterId;
 
-          Object.keys(
-            footnoteMeta[subjectId].filters[filterId].options[filterGroupId]
-              .options,
-          ).forEach(filterItemId => {
-            filterItemsToFilterGroups[filterItemId] = filterGroupId;
-          });
-        },
-      );
+        filterGroup.options.forEach(filterItem => {
+          filterItemsToFilterGroups[filterItem.value] = filterGroupId;
+        });
+      });
     });
   });
 
@@ -61,7 +56,7 @@ const generateFootnoteMetaMap = (
       };
     }
 
-    const subject = footnoteMeta[ids[0]];
+    const subject = footnoteMeta.subjects[ids[0]];
     if (itemType === 'subject') {
       return {
         label: subject.subjectName,
@@ -77,8 +72,10 @@ const generateFootnoteMetaMap = (
       if (indicatorItemId === undefined) {
         return { label: indicator.label, value: indicatorId };
       }
-      const indicatorItem = indicator.options[indicatorItemId];
-      return { label: indicatorItem.label, value: indicatorItemId };
+      const indicatorItem = indicator.options.find(
+        option => option.value === indicatorItemId,
+      );
+      return { label: indicatorItem?.label ?? '', value: indicatorItemId };
     }
 
     if (itemType === 'filter') {
@@ -94,9 +91,11 @@ const generateFootnoteMetaMap = (
       if (filterItemId === undefined) {
         return { label: filterGroup.label, value: filterGroupId };
       }
-      const filterItem = filterGroup.options[filterItemId];
+      const filterItem = filterGroup.options.find(
+        option => option.value === filterItemId,
+      );
       return {
-        label: filterItem.label,
+        label: filterItem?.label ?? '',
         value: filterItemId,
       };
     }

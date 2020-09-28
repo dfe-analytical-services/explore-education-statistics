@@ -34,15 +34,16 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Services
         private readonly IUserService _userService;
         private readonly GovUk.Education.ExploreEducationStatistics.Data.Model.Services.Interfaces.IFootnoteService
             _commonFootnoteService;
-        
-        public FootnoteService(StatisticsDbContext context,
+
+        public FootnoteService(
+            StatisticsDbContext context,
             ILogger<FootnoteService> logger,
             IFilterService filterService,
             IFilterGroupService filterGroupService,
             IFilterItemService filterItemService,
             IIndicatorService indicatorService,
-            ISubjectService subjectService, 
-            IPersistenceHelper<ContentDbContext> contentPersistenceHelper, 
+            ISubjectService subjectService,
+            IPersistenceHelper<ContentDbContext> contentPersistenceHelper,
             IUserService userService,
             GovUk.Education.ExploreEducationStatistics.Data.Model.Services.Interfaces.IFootnoteService commonFootnoteService,
             IPersistenceHelper<StatisticsDbContext> statisticsPersistenceHelper) : base(context, logger)
@@ -94,7 +95,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Services
                             ReleaseId = releaseId,
                             Footnote = footnote
                         });
-                    
+
                     _context.SaveChanges();
                     return footnote;
                 });
@@ -102,7 +103,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Services
 
         public async Task<Either<ActionResult, Unit>> CopyFootnotes(Guid sourceReleaseId, Guid destinationReleaseId)
         {
-            return await GetFootnotesAsync(sourceReleaseId)
+            return await GetFootnotes(sourceReleaseId)
                 .OnSuccess(async footnotes =>
                 {
                     await footnotes.ForEachAsync(async footnote =>
@@ -174,10 +175,10 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Services
                         UpdateSubjectLinks(footnote, subjectIds.ToList());
 
                         await _context.SaveChangesAsync();
-                        return GetFootnote(id);
+                        return await _commonFootnoteService.GetFootnote(id);
                     }
-                    
-                    // If this amendment of the footnote affects other release then break the link with the old 
+
+                    // If this amendment of the footnote affects other release then break the link with the old
                     // and create a new one
                     await _commonFootnoteService.DeleteReleaseFootnoteLinkAsync(releaseId, footnote.Id);
 
@@ -192,12 +193,32 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Services
                 }));
         }
 
-        public Task<Either<ActionResult, IEnumerable<Footnote>>> GetFootnotesAsync(Guid releaseId)
+        public Task<Either<ActionResult, Footnote>> GetFootnote(Guid releaseId, Guid id)
         {
             return _contentPersistenceHelper
                 .CheckEntityExists<Release>(releaseId)
                 .OnSuccess(_userService.CheckCanViewRelease)
-                .OnSuccess(_ => (_commonFootnoteService.GetFootnotes(releaseId)));
+                .OnSuccess<ActionResult, Release, Footnote>(async release =>
+                    {
+                        var footnote = await _commonFootnoteService.GetFootnote(id);
+
+                        if (footnote == null
+                            || footnote.Releases.All(rf => rf.ReleaseId != release.Id))
+                        {
+                            return new NotFoundResult();
+                        }
+
+                        return footnote;
+                    }
+                );
+        }
+
+        public Task<Either<ActionResult, IEnumerable<Footnote>>> GetFootnotes(Guid releaseId)
+        {
+            return _contentPersistenceHelper
+                .CheckEntityExists<Release>(releaseId)
+                .OnSuccess(_userService.CheckCanViewRelease)
+                .OnSuccess(_ => _commonFootnoteService.GetFootnotes(releaseId));
         }
 
         public IEnumerable<Footnote> GetFootnotes(Guid releaseId, Guid subjectId)
@@ -321,7 +342,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Services
                 CreateSubjectLinks(footnote, subjectIds);
             }
         }
-        
+
         private static void AddIndicatorLink(ref ICollection<IndicatorFootnote> links, Guid footnoteId, Guid linkId)
         {
             links.Add(new IndicatorFootnote
@@ -371,7 +392,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Services
         {
             return left.OrderBy(id => id).SequenceEqual(right.OrderBy(id => id));
         }
-        
+
         private static IQueryable<Footnote> HydrateFootnote(IQueryable<Footnote> query)
         {
             return query
@@ -380,25 +401,6 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Services
                 .Include(f => f.FilterItems)
                 .Include(f => f.Indicators)
                 .Include(f => f.Subjects);
-        }
-
-        private Either<ActionResult, Footnote> GetFootnote(Guid id)
-        {
-            return DbSet().Where(footnote => footnote.Id == id)
-                .Include(footnote => footnote.Filters)
-                .ThenInclude(filterFootnote => filterFootnote.Filter)
-                .Include(footnote => footnote.FilterGroups)
-                .ThenInclude(filterGroupFootnote => filterGroupFootnote.FilterGroup)
-                .ThenInclude(filterGroup => filterGroup.Filter)
-                .Include(footnote => footnote.FilterItems)
-                .ThenInclude(filterItemFootnote => filterItemFootnote.FilterItem)
-                .ThenInclude(filterItem => filterItem.FilterGroup)
-                .ThenInclude(filterGroup => filterGroup.Filter)
-                .Include(footnote => footnote.Indicators)
-                .ThenInclude(indicatorFootnote => indicatorFootnote.Indicator)
-                .ThenInclude(indicator => indicator.IndicatorGroup)
-                .Include(footnote => footnote.Subjects)
-                .SingleOrDefault();
         }
     }
 }

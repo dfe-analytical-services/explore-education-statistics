@@ -64,6 +64,8 @@ const ReleaseDataFilePage = ({
                 <h2>Pending data replacement</h2>
 
                 <DataFileReplacementPlan
+                  publicationId={publicationId}
+                  releaseId={releaseId}
                   fileId={dataFile.id}
                   replacementFileId={replacementFileId}
                   onReplacement={() => {

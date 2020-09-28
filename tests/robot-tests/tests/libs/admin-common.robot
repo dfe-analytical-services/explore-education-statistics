@@ -176,16 +176,16 @@ user checks scheduled releases tab publication has release
 
 user clicks footnote checkbox
     [Arguments]  ${label}
-    wait until page contains element  xpath://*[@id="create-footnote-form"]//label[text()="${label}"]/../input
-    page should contain checkbox  xpath://*[@id="create-footnote-form"]//label[text()="${label}"]/../input
-    user scrolls to element   xpath://*[@id="create-footnote-form"]//label[text()="${label}"]/../input
-    wait until element is enabled   xpath://*[@id="create-footnote-form"]//label[text()="${label}"]/../input
-    user clicks element     xpath://*[@id="create-footnote-form"]//label[text()="${label}"]/../input
+    user waits until page contains element  xpath://*[@id="footnoteForm"]//label[text()="${label}"]/../input
+    page should contain checkbox  xpath://*[@id="footnoteForm"]//label[text()="${label}"]/../input
+    user scrolls to element   xpath://*[@id="footnoteForm"]//label[text()="${label}"]/../input
+    wait until element is enabled   xpath://*[@id="footnoteForm"]//label[text()="${label}"]/../input
+    user clicks element     xpath://*[@id="footnoteForm"]//label[text()="${label}"]/../input
 
 user checks footnote checkbox is selected
     [Arguments]  ${label}
-    wait until element is enabled   xpath://*[@id="create-footnote-form"]//label[contains(text(), "${label}")]/../input
-    checkbox should be selected     xpath://*[@id="create-footnote-form"]//label[contains(text(), "${label}")]/../input
+    wait until element is enabled   xpath://*[@id="footnoteForm"]//label[contains(text(), "${label}")]/../input
+    checkbox should be selected     xpath://*[@id="footnoteForm"]//label[contains(text(), "${label}")]/../input
 
 user opens nth editable accordion section
     [Arguments]  ${section_num}  ${parent}=css:body

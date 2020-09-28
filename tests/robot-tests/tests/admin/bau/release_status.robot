@@ -32,7 +32,7 @@ Create new release
 
 Verify release summary
     [Tags]  HappyPath
-    user checks page contains element   xpath://li/a[text()="Release summary" and contains(@aria-current, 'page')]
+    user checks page contains element   xpath://li/a[text()="Summary" and contains(@aria-current, 'page')]
     user waits until h2 is visible  Release summary
     user checks summary list contains  Publication title  ${PUBLICATION_NAME}
 

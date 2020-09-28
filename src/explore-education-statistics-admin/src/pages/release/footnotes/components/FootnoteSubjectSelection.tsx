@@ -1,4 +1,4 @@
-import { FootnoteMetaGetters } from '@admin/pages/release/data/utils/generateFootnoteMetaMap';
+import { FootnoteMetaGetters } from '@admin/pages/release/footnotes/utils/generateFootnoteMetaMap';
 import { FootnoteSubject } from '@admin/services/footnoteService';
 import React, { ReactNode } from 'react';
 
@@ -55,10 +55,10 @@ const FootnoteSubjectSelection = ({
       return [{ ...selectedOption, indicators: [] }];
     }
     return Object.entries(subject.indicatorGroups).map(
-      ([indicatorGroupid, indicatorGroup]) => {
+      ([indicatorGroupId, indicatorGroup]) => {
         return {
-          id: indicatorGroupid,
-          label: getIndicatorGroup(indicatorGroupid).label,
+          id: indicatorGroupId,
+          label: getIndicatorGroup(indicatorGroupId).label,
           selected: indicatorGroup.selected,
           indicators: indicatorGroup.selected
             ? [selectedOption]
