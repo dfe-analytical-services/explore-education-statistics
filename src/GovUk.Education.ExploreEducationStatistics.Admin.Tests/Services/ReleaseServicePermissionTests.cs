@@ -332,7 +332,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
         }
 
         [Fact]
-        public void DeleteDataFilesAsync()
+        public void RemoveDataFiles()
         {
             PermissionTestUtil.PolicyCheckBuilder()
                 .ExpectResourceCheckToFail(_release, CanUpdateSpecificRelease)
@@ -340,7 +340,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
                     async userService =>
                     {
                         var service = BuildReleaseService(userService: userService.Object);
-                        return await service.RemoveDataFilesAsync(_release.Id, Guid.NewGuid());
+                        return await service.RemoveDataFiles(_release.Id, Guid.NewGuid());
                     }
                 );
         }
