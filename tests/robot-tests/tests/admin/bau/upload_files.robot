@@ -51,14 +51,14 @@ Upload a ZIP file subject
     user opens accordion section   Absence in PRUs
 
     ${section}=  user gets accordion section content element  Absence in PRUs
-    user checks summary list contains  Subject title    Absence in PRUs  ${section}
-    user checks summary list contains  Data file        absence_in_prus.csv  ${section}
-    user checks summary list contains  Metadata file    absence_in_prus.meta.csv  ${section}
-    user checks summary list contains  Status           Complete  ${section}  180
+    user checks headed table body row contains  Subject title    Absence in PRUs  ${section}
+    user checks headed table body row contains  Data file        absence_in_prus.csv  ${section}
+    user checks headed table body row contains  Metadata file    absence_in_prus.meta.csv  ${section}
+    user checks headed table body row contains  Status           Complete  ${section}  180
 
     # EES-1397
-    #user checks summary list contains  Number of rows   613  ${section}
-    #user checks summary list contains  Data file size   141 Kb  ${section}
+    #user checks headed table body row contains  Number of rows   613  ${section}
+    #user checks headed table body row contains  Data file size   141 Kb  ${section}
 
 Check Absence in PRUs subject appears in 'Data blocks' page
     [Tags]  HappyPath

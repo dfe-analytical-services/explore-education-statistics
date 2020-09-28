@@ -59,12 +59,12 @@ Upload subject
     user opens accordion section   ${SUBJECT_NAME}
 
     ${section}=  user gets accordion section content element  ${SUBJECT_NAME}
-    user checks summary list contains  Subject title    ${SUBJECT_NAME}  ${section}
-    user checks summary list contains  Data file        dates.csv  ${section}
-    user checks summary list contains  Metadata file    dates.meta.csv  ${section}
-    user checks summary list contains  Number of rows   119  ${section}
-    user checks summary list contains  Data file size   17 Kb  ${section}
-    user checks summary list contains  Status           Complete  ${section}  360
+    user checks headed table body row contains  Subject title    ${SUBJECT_NAME}  ${section}
+    user checks headed table body row contains  Data file        dates.csv  ${section}
+    user checks headed table body row contains  Metadata file    dates.meta.csv  ${section}
+    user checks headed table body row contains  Number of rows   119  ${section}
+    user checks headed table body row contains  Data file size   17 Kb  ${section}
+    user checks headed table body row contains  Status           Complete  ${section}  360
 
 Navigate to 'Footnotes' page
     [Tags]  HappyPath

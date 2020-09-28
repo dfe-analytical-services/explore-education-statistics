@@ -40,3 +40,6 @@ user gets table row with heading
     ${elem}=   get child element  ${table_selector}  xpath:.//tbody/tr/th[text()="${heading}"]/..
     [Return]   ${elem}
 
+user checks headed table body row contains
+    [Arguments]  ${row_heading}  ${content}  ${parent}=css:body  ${wait}=30
+    user waits until parent contains element  ${parent}  xpath:.//tbody/tr/th[text()="${row_heading}"]/../td[contains(., "${content}")]  timeout=${wait}

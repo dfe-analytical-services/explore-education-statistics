@@ -71,12 +71,12 @@ Upload subject
     user opens accordion section   UI test subject
 
     ${section}=  user gets accordion section content element  UI test subject
-    user checks summary list contains  Subject title    UI test subject  ${section}
-    user checks summary list contains  Data file        upload-file-test-with-filter.csv  ${section}
-    user checks summary list contains  Metadata file    upload-file-test-with-filter.meta.csv  ${section}
-    user checks summary list contains  Number of rows   159  ${section}
-    user checks summary list contains  Data file size   16 Kb  ${section}
-    user checks summary list contains  Status           Complete  ${section}  180
+    user checks headed table body row contains  Subject title    UI test subject  ${section}
+    user checks headed table body row contains  Data file        upload-file-test-with-filter.csv  ${section}
+    user checks headed table body row contains  Metadata file    upload-file-test-with-filter.meta.csv  ${section}
+    user checks headed table body row contains  Number of rows   159  ${section}
+    user checks headed table body row contains  Data file size   16 Kb  ${section}
+    user checks headed table body row contains  Status           Complete  ${section}  180
 
 Navigate to 'Footnotes' page
     [Tags]  HappyPath
