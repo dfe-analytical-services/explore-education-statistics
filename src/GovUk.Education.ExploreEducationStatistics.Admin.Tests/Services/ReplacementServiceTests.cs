@@ -1953,8 +1953,8 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
                 await statisticsDbContext.SaveChangesAsync();
             }
 
-            mocks.ReleaseService.Setup(service => service.RemoveDataFilesAsync(
-                    contentReleaseVersion2.Id, originalReleaseFileReference.Id))
+            mocks.ReleaseService.Setup(service => service.RemoveDataFiles(
+                    contentReleaseVersion2.Id, originalReleaseFileReference.Id, true))
                 .ReturnsAsync(Unit.Instance);
 
             await using (var contentDbContext = InMemoryApplicationDbContext(contentDbContextId))
@@ -1966,7 +1966,8 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
                     replacementReleaseFileReference.Id);
 
                 mocks.ReleaseService.Verify(
-                    mock => mock.RemoveDataFilesAsync(contentReleaseVersion2.Id, originalReleaseFileReference.Id), Times.Once());
+                    mock => mock.RemoveDataFiles(contentReleaseVersion2.Id, originalReleaseFileReference.Id, true),
+                    Times.Once());
 
                 mocks.ReleaseService.VerifyNoOtherCalls();
 

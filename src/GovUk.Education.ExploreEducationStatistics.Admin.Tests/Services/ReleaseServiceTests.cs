@@ -6,7 +6,6 @@ using GovUk.Education.ExploreEducationStatistics.Admin.Services;
 using GovUk.Education.ExploreEducationStatistics.Admin.Services.Interfaces;
 using GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services.Utils;
 using GovUk.Education.ExploreEducationStatistics.Admin.ViewModels;
-using GovUk.Education.ExploreEducationStatistics.Common.Extensions;
 using GovUk.Education.ExploreEducationStatistics.Common.Model;
 using GovUk.Education.ExploreEducationStatistics.Common.Services;
 using GovUk.Education.ExploreEducationStatistics.Common.Services.Interfaces;
@@ -14,6 +13,7 @@ using GovUk.Education.ExploreEducationStatistics.Common.Services.Interfaces.Secu
 using GovUk.Education.ExploreEducationStatistics.Common.Utils;
 using GovUk.Education.ExploreEducationStatistics.Content.Model;
 using GovUk.Education.ExploreEducationStatistics.Content.Model.Database;
+using GovUk.Education.ExploreEducationStatistics.Data.Model;
 using GovUk.Education.ExploreEducationStatistics.Data.Model.Database;
 using GovUk.Education.ExploreEducationStatistics.Data.Model.Services.Interfaces;
 using Microsoft.AspNetCore.Mvc;
@@ -25,6 +25,9 @@ using static GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services.DbU
 using static GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services.MapperUtils;
 using static GovUk.Education.ExploreEducationStatistics.Common.TableStorageTableNames;
 using IFootnoteService = GovUk.Education.ExploreEducationStatistics.Admin.Services.Interfaces.IFootnoteService;
+using Publication = GovUk.Education.ExploreEducationStatistics.Content.Model.Publication;
+using Release = GovUk.Education.ExploreEducationStatistics.Content.Model.Release;
+using Unit = GovUk.Education.ExploreEducationStatistics.Common.Model.Unit;
 
 namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
 {
@@ -299,6 +302,168 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
 
                 Assert.Equal(latestRelease.Id, latest.Id);
                 Assert.True(latest.LatestRelease);
+            }
+        }
+
+        [Fact]
+        public async void RemoveDataFiles()
+        {
+            var release = new Release
+            {
+                Status = ReleaseStatus.Draft
+            };
+
+            var subject = new Subject
+            {
+                Id = Guid.NewGuid()
+            };
+
+            var file = new ReleaseFileReference
+            {
+                Filename = "data.csv",
+                ReleaseFileType = ReleaseFileTypes.Data,
+                Release = release,
+                SubjectId = subject.Id
+            };
+
+            var mocks = Mocks();
+
+            var contentDbContextId = Guid.NewGuid().ToString();
+
+            await using (var contentDbContext = InMemoryApplicationDbContext(contentDbContextId))
+            {
+                await contentDbContext.AddAsync(release);
+                await contentDbContext.AddAsync(file);
+                await contentDbContext.SaveChangesAsync();
+            }
+
+            mocks.ImportStatusService.Setup(service =>
+                    service.IsImportFinished(file.ReleaseId.ToString(), file.Filename))
+                .ReturnsAsync(true);
+
+            mocks.SubjectService.Setup(service => service.GetAsync(subject.Id)).ReturnsAsync(subject);
+
+            mocks.FileStorageService.Setup(service => service.DeleteDataFiles(release.Id, file.Id))
+                .ReturnsAsync(Unit.Instance);
+
+            await using (var context = InMemoryApplicationDbContext(contentDbContextId))
+            {
+                var releaseService = BuildReleaseService(context, mocks);
+                var result = await releaseService.RemoveDataFiles(release.Id, file.Id);
+
+                mocks.DataBlockService.Verify(mock =>
+                    mock.GetDeleteDataBlockPlan(release.Id, subject), Times.Once());
+                mocks.DataBlockService.Verify(
+                    mock => mock.DeleteDataBlocks(It.IsAny<DeleteDataBlockPlan>()),
+                    Times.Once());
+                mocks.DataBlockService.VerifyNoOtherCalls();
+
+                mocks.FileStorageService.Verify(mock =>
+                    mock.DeleteDataFiles(release.Id, file.Id), Times.Once());
+                mocks.FileStorageService.VerifyNoOtherCalls();
+
+                mocks.ImportStatusService.Verify(
+                    mock => mock.IsImportFinished(release.Id.ToString(), file.Filename),
+                    Times.Once());
+                mocks.ImportStatusService.VerifyNoOtherCalls();
+
+                mocks.ReleaseSubjectService.Verify(
+                    mock => mock.SoftDeleteSubjectOrBreakReleaseLink(release.Id, subject.Id),
+                    Times.Once());
+                mocks.ReleaseSubjectService.VerifyNoOtherCalls();
+
+                Assert.True(result.IsRight);
+            }
+        }
+
+        [Fact]
+        public async void RemoveDataFiles_ReplacementExists()
+        {
+            var release = new Release
+            {
+                Status = ReleaseStatus.Draft
+            };
+
+            var subject = new Subject
+            {
+                Id = Guid.NewGuid()
+            };
+
+            var replacementSubject = new Subject
+            {
+                Id = Guid.NewGuid()
+            };
+
+            var file = new ReleaseFileReference
+            {
+                Filename = "data.csv",
+                ReleaseFileType = ReleaseFileTypes.Data,
+                Release =  release,
+                SubjectId = subject.Id
+            };
+
+            var replacementFile = new ReleaseFileReference
+            {
+                Filename = "replacement.csv",
+                ReleaseFileType = ReleaseFileTypes.Data,
+                Release = release,
+                SubjectId = replacementSubject.Id,
+                Replacing = file
+            };
+
+            file.ReplacedBy = replacementFile;
+
+            var mocks = Mocks();
+
+            var contentDbContextId = Guid.NewGuid().ToString();
+
+            await using (var contentDbContext = InMemoryApplicationDbContext(contentDbContextId))
+            {
+                await contentDbContext.AddAsync(release);
+                await contentDbContext.AddRangeAsync(file, replacementFile);
+                await contentDbContext.SaveChangesAsync();
+            }
+
+            mocks.ImportStatusService.Setup(service =>
+                    service.IsImportFinished(file.ReleaseId.ToString(),
+                        It.IsIn(file.Filename, replacementFile.Filename)))
+                .ReturnsAsync(true);
+
+            mocks.SubjectService.Setup(service => service.GetAsync(It.IsIn(subject.Id, replacementSubject.Id)))
+                .ReturnsAsync(subject);
+
+            mocks.FileStorageService
+                .Setup(service => service.DeleteDataFiles(release.Id, It.IsIn(file.Id, replacementFile.Id)))
+                .ReturnsAsync(Unit.Instance);
+
+            await using (var context = InMemoryApplicationDbContext(contentDbContextId))
+            {
+                var releaseService = BuildReleaseService(context, mocks);
+                var result = await releaseService.RemoveDataFiles(release.Id, file.Id);
+
+                mocks.DataBlockService.Verify(
+                    mock => mock.GetDeleteDataBlockPlan(release.Id, It.IsIn(subject, replacementSubject)),
+                    Times.Exactly(2));
+                mocks.DataBlockService.Verify(
+                    mock => mock.DeleteDataBlocks(It.IsAny<DeleteDataBlockPlan>()), 
+                    Times.Exactly(2));
+                mocks.DataBlockService.VerifyNoOtherCalls();
+
+                mocks.FileStorageService.Verify(
+                    mock => mock.DeleteDataFiles(release.Id, It.IsIn(file.Id, replacementFile.Id)), Times.Exactly(2));
+                mocks.FileStorageService.VerifyNoOtherCalls();
+
+                mocks.ImportStatusService.Verify(
+                    mock => mock.IsImportFinished(release.Id.ToString(),
+                        It.IsIn(file.Filename, replacementFile.Filename)), Times.Exactly(2));
+                mocks.ImportStatusService.VerifyNoOtherCalls();
+
+                mocks.ReleaseSubjectService.Verify(
+                    mock => mock.SoftDeleteSubjectOrBreakReleaseLink(release.Id,
+                        It.IsIn(subject.Id, replacementSubject.Id)), Times.Exactly(2));
+                mocks.ReleaseSubjectService.VerifyNoOtherCalls();
+
+                Assert.True(result.IsRight);
             }
         }
 

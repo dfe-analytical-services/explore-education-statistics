@@ -455,22 +455,39 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Services
                 });
         }
 
-        public async Task<Either<ActionResult, Unit>> RemoveDataFilesAsync(Guid releaseId, Guid fileId)
+        public async Task<Either<ActionResult, Unit>> RemoveDataFiles(Guid releaseId,
+            Guid fileId,
+            bool removingReplacedSubject = false)
         {
             return await _persistenceHelper
                 .CheckEntityExists<Release>(releaseId)
                 .OnSuccess(_userService.CheckCanUpdateRelease)
                 .OnSuccess(() => CheckReleaseFileReferenceExists(fileId))
-                .OnSuccess(releaseFileReference => CheckCanDeleteDataFiles(releaseId, releaseFileReference))
-                .OnSuccess(_ => GetDeleteDataFilePlan(releaseId, fileId))
-                .OnSuccess(async deletePlan =>
+                .OnSuccess(releaseFileReference =>
                 {
-                    await _dataBlockService.DeleteDataBlocks(deletePlan.DeleteDataBlockPlan);
-                    await _releaseSubjectService.SoftDeleteSubjectOrBreakReleaseLink(releaseId, deletePlan.SubjectId);
+                    return CheckCanDeleteDataFiles(releaseId, releaseFileReference)
+                        .OnSuccess(_ => GetDeleteDataFilePlan(releaseId, fileId))
+                        .OnSuccess(async deletePlan =>
+                        {
+                            // Unless removing a Subject after completing a replacement
+                            // Delete any replacement Subject that might exist
+                            if (!removingReplacedSubject)
+                            {
+                                var replacementInProgress = releaseFileReference.ReplacedById;
+                                if (replacementInProgress.HasValue)
+                                {
+                                    await RemoveDataFiles(releaseId, replacementInProgress.Value);
+                                }
+                            }
 
-                    return await _releaseFilesService
-                        .DeleteDataFiles(releaseId, fileId)
-                        .OnSuccessVoid(async () => await RemoveFileImportEntryIfOrphaned(deletePlan));
+                            await _dataBlockService.DeleteDataBlocks(deletePlan.DeleteDataBlockPlan);
+                            await _releaseSubjectService.SoftDeleteSubjectOrBreakReleaseLink(releaseId,
+                                deletePlan.SubjectId);
+
+                            return await _releaseFilesService
+                                .DeleteDataFiles(releaseId, fileId)
+                                .OnSuccessVoid(async () => await RemoveFileImportEntryIfOrphaned(deletePlan));
+                        });
                 });
         }
 

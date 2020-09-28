@@ -761,9 +761,9 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Services
         }
 
         private async Task<Either<ActionResult, Unit>> RemoveSubjectAndFileFromRelease(Guid releaseId,
-            Guid releaseFileReferenceId)
+            Guid fileId)
         {
-            return await _releaseService.RemoveDataFilesAsync(releaseId, releaseFileReferenceId);
+            return await _releaseService.RemoveDataFiles(releaseId, fileId, true);
         }
 
         private class ReplacementSubjectMeta

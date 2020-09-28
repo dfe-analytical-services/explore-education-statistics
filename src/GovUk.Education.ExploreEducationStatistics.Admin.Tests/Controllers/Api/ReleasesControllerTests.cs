@@ -200,15 +200,13 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Controllers.Api
         {
             var mocks = Mocks();
 
-            var releaseFileReferenceId = Guid.NewGuid();
+            var fileId = Guid.NewGuid();
 
-            mocks.ReleaseService
-                .Setup(service => service.RemoveDataFilesAsync(_releaseId, releaseFileReferenceId))
+            mocks.ReleaseService.Setup(service => service.RemoveDataFiles(_releaseId, fileId, false))
                 .ReturnsAsync(Unit.Instance);
             var controller = ReleasesControllerWithMocks(mocks);
 
-            // Call the method under test
-            var result = await controller.DeleteDataFiles(_releaseId, releaseFileReferenceId);
+            var result = await controller.DeleteDataFiles(_releaseId, fileId);
             Assert.IsAssignableFrom<NoContentResult>(result);
         }
 
@@ -217,15 +215,14 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Controllers.Api
         {
             var mocks = Mocks();
 
-            var releaseFileReferenceId = Guid.NewGuid();
+            var fileId = Guid.NewGuid();
 
             mocks.ReleaseService
-                .Setup(service => service.RemoveDataFilesAsync(_releaseId, releaseFileReferenceId))
+                .Setup(service => service.RemoveDataFiles(_releaseId, fileId, false))
                 .ReturnsAsync(ValidationActionResult(UnableToFindMetadataFileToDelete));
             var controller = ReleasesControllerWithMocks(mocks);
 
-            // Call the method under test
-            var result = await controller.DeleteDataFiles(_releaseId, releaseFileReferenceId);
+            var result = await controller.DeleteDataFiles(_releaseId, fileId);
             AssertValidationProblem(result, UnableToFindMetadataFileToDelete);
         }
 
