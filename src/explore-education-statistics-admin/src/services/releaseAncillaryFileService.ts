@@ -10,6 +10,7 @@ interface AncillaryFileInfo extends FileInfo {
 }
 
 export interface AncillaryFile {
+  id: string;
   title: string;
   filename: string;
   fileSize: {
@@ -28,6 +29,7 @@ function mapFile(file: AncillaryFileInfo): AncillaryFile {
   const [size, unit] = file.size.split(' ');
 
   return {
+    id: file.id,
     title: file.name,
     filename: file.fileName,
     fileSize: {
@@ -65,9 +67,9 @@ const releaseAncillaryFileService = {
   deleteAncillaryFile(releaseId: string, fileName: string): Promise<void> {
     return client.delete<void>(`/release/${releaseId}/ancillary/${fileName}`);
   },
-  downloadAncillaryFile(releaseId: string, fileName: string): Promise<void> {
+  downloadFile(releaseId: string, id: string, fileName: string): Promise<void> {
     return client
-      .get<Blob>(`/release/${releaseId}/ancillary/${fileName}`, {
+      .get<Blob>(`/release/${releaseId}/file/${id}`, {
         responseType: 'blob',
       })
       .then(response => downloadFile(response, fileName));

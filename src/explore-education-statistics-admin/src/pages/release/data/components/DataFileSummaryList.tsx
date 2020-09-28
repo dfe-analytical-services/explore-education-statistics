@@ -4,7 +4,6 @@ import ImporterStatus, {
 import releaseDataFileService, {
   DataFile,
 } from '@admin/services/releaseDataFileService';
-import releaseMetaFileService from '@admin/services/releaseMetaFileService';
 import ButtonText from '@common/components/ButtonText';
 import FormattedDate from '@common/components/FormattedDate';
 import SummaryList from '@common/components/SummaryList';
@@ -30,8 +29,9 @@ const DataFileSummaryList = ({
       <SummaryListItem term="Data file">
         <ButtonText
           onClick={() =>
-            releaseDataFileService.downloadDataFile(
+            releaseDataFileService.downloadFile(
               releaseId,
+              dataFile.id,
               dataFile.filename,
             )
           }
@@ -42,8 +42,9 @@ const DataFileSummaryList = ({
       <SummaryListItem term="Metadata file">
         <ButtonText
           onClick={() =>
-            releaseMetaFileService.downloadDataMetadataFile(
+            releaseDataFileService.downloadFile(
               releaseId,
+              dataFile.id,
               dataFile.metadataFilename,
             )
           }

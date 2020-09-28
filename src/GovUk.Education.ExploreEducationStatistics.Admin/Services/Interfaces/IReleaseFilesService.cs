@@ -41,8 +41,6 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Services.Interfaces
 
         Task<Either<ActionResult, Unit>> DeleteAllFiles(Guid releaseId);
 
-        Task<Either<ActionResult, FileStreamResult>> StreamFile(Guid releaseId, ReleaseFileTypes type, string fileName);
-
         Task<Either<ActionResult, FileStreamResult>> StreamFile(Guid releaseId, Guid id);
     }
 }

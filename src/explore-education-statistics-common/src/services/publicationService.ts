@@ -123,6 +123,7 @@ export interface Release<
     size: string;
   }[];
   downloadFiles: {
+    id: string;
     extension: string;
     name: string;
     path: string;

@@ -134,11 +134,15 @@ const ReleaseContent = () => {
               <Details summary="Download associated files">
                 <ul className="govuk-list govuk-list--bullet">
                   {release.downloadFiles.map(
-                    ({ extension, name, path, size }) => (
+                    ({ id, extension, name, path, size }) => (
                       <li key={path}>
                         <ButtonText
                           onClick={() =>
-                            releaseDataFileService.downloadFile(path)
+                            releaseDataFileService.downloadFile(
+                              release.id,
+                              id,
+                              name,
+                            )
                           }
                           className="govuk-link"
                         >
