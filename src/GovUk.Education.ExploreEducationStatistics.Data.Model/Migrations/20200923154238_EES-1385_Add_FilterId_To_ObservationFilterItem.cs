@@ -36,7 +36,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Model.Migrations
             migrationBuilder.SqlFromFile(MigrationsPath, $"{MigrationId}_Type_ObservationFilterItemType.sql");
             migrationBuilder.SqlFromFile(MigrationsPath, $"{PreviousInsertObservationFilterItemsMigrationId}_Routine_InsertObservationFilterItems.sql");
             
-            migrationBuilder.SqlFromFile(MigrationsPath, $"{MigrationId}_Populate_Ofi_FilterId.sql");
+            //migrationBuilder.SqlFromFile(MigrationsPath, $"{MigrationId}_Populate_Ofi_FilterId.sql");
         }
 
         protected override void Down(MigrationBuilder migrationBuilder)
