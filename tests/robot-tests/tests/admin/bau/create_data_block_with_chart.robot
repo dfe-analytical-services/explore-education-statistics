@@ -2,6 +2,7 @@
 Resource    ../../libs/admin-common.robot
 Resource    ../../libs/charts.robot
 Library  Collections
+Library  ../../libs/api_keywords.py
 
 Force Tags  Admin  Local  Dev  AltersData
 
@@ -15,30 +16,15 @@ ${DATABLOCK_NAME}           UI test data block
 ${CONTENT_SECTION_NAME}     Test data block section
 
 *** Test Cases ***
-Create test publication
+Create test publication and release via API
     [Tags]  HappyPath
-    user selects theme "Test theme" and topic "${TOPIC_NAME}" from the admin dashboard
-    user waits until page contains link  Create new publication     60
-    user clicks link   Create new publication
-    user creates publication    ${PUBLICATION_NAME}
-
-Verify test publication is created
-    [Tags]  HappyPath
-    user waits until page contains accordion section  ${PUBLICATION_NAME}
-    user opens accordion section  ${PUBLICATION_NAME}
-    user waits until accordion section contains text  ${PUBLICATION_NAME}    Methodology
-    user waits until accordion section contains text  ${PUBLICATION_NAME}    Releases
-
-Create release
-    [Tags]  HappyPath
-    user clicks testid element  Create new release link for ${PUBLICATION_NAME}
-    user creates release for publication  ${PUBLICATION_NAME}  Academic Year  2025
-    user checks summary list contains  Publication title  ${PUBLICATION_NAME}
-    user waits until h2 is visible    Release summary
-    user checks summary list contains  Publication title  ${PUBLICATION_NAME}
+    ${PUBLICATION_ID}=  user creates test publication via api   ${PUBLICATION_NAME}
+    user create test release via api  ${PUBLICATION_ID}   AY    2025
 
 Upload subject
     [Tags]  HappyPath
+    user navigates to release summary from admin dashboard  ${PUBLICATION_NAME}  Academic Year 2025/26 (not Live)
+
     user clicks link  Data and files
     user waits until h2 is visible  Add data file to release
     user enters text into element  id:dataFileUploadForm-subjectTitle   UI test subject
