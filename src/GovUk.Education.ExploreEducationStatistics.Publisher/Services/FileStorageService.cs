@@ -245,7 +245,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Publisher.Services
 
             var name = Path.GetFileName(item.Name);
 
-            if (releaseFileReferences.Exists(rfr => rfr.ReleaseId == releaseId && rfr.BlobStorageName == name))
+            if (releaseFileReferences.Exists(rfr => rfr.BlobStorageName == name))
             {
                 return true;
             }
