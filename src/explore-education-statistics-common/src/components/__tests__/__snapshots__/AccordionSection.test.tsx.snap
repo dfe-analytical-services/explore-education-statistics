@@ -1,7 +1,7 @@
 // Jest Snapshot v1, https://goo.gl/fbAQLP
 
 exports[`AccordionSection renders correctly with required props 1`] = `
-<div class="govuk-accordion__section section"
+<div class="govuk-accordion__section"
      data-testid="accordionSection"
      id="accordionSection"
      role="presentation"
@@ -22,7 +22,7 @@ exports[`AccordionSection renders correctly with required props 1`] = `
     </h2>
   </div>
   <div aria-labelledby="accordionSection-heading"
-       class="govuk-accordion__section-content sectionContent"
+       class="govuk-accordion__section-content"
        id="accordionSection-content"
   >
     <p>
@@ -40,7 +40,7 @@ exports[`AccordionSection renders correctly with required props 1`] = `
 `;
 
 exports[`AccordionSection renders with caption 1`] = `
-<div class="govuk-accordion__section section"
+<div class="govuk-accordion__section"
      data-testid="accordionSection"
      id="accordionSection"
      role="presentation"
@@ -64,7 +64,7 @@ exports[`AccordionSection renders with caption 1`] = `
     </div>
   </div>
   <div aria-labelledby="accordionSection-heading"
-       class="govuk-accordion__section-content sectionContent"
+       class="govuk-accordion__section-content"
        id="accordionSection-content"
   >
     <p>
@@ -82,7 +82,7 @@ exports[`AccordionSection renders with caption 1`] = `
 `;
 
 exports[`AccordionSection renders with different heading size 1`] = `
-<div class="govuk-accordion__section section"
+<div class="govuk-accordion__section"
      data-testid="accordionSection"
      id="accordionSection"
      role="presentation"
@@ -103,7 +103,7 @@ exports[`AccordionSection renders with different heading size 1`] = `
     </h3>
   </div>
   <div aria-labelledby="accordionSection-heading"
-       class="govuk-accordion__section-content sectionContent"
+       class="govuk-accordion__section-content"
        id="accordionSection-content"
   >
     <p>
