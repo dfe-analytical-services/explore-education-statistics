@@ -269,11 +269,11 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Services
                 });
         }
 
-        public Task<Either<ActionResult, Unit>> DeleteDataFiles(Guid releaseId, Guid fileId)
+        public Task<Either<ActionResult, Unit>> DeleteDataFiles(Guid releaseId, Guid fileId, bool forceDelete = false)
         {
             return _persistenceHelper
                 .CheckEntityExists<Release>(releaseId)
-                .OnSuccess(_userService.CheckCanUpdateRelease)
+                .OnSuccess(async release => await CheckCanDeleteReleaseFile(release, forceDelete))
                 .OnSuccess(() => CheckReleaseFileReferenceExists(fileId))
                 .OnSuccess(async releaseFileReference =>
                 {
@@ -380,12 +380,15 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Services
                 });
         }
 
-        public async Task<Either<ActionResult, bool>> DeleteChartFiles(Guid releaseId, IEnumerable<Guid> fileIds)
+        public async Task<Either<ActionResult, Unit>> DeleteChartFiles(
+            Guid releaseId,
+            IEnumerable<Guid> fileIds,
+            bool forceDelete = false)
         {
             return await _persistenceHelper
                 .CheckEntityExists<Release>(releaseId)
-                .OnSuccess(_userService.CheckCanUpdateRelease)
-                .OnSuccess(async () =>
+                .OnSuccess(async release => await CheckCanDeleteReleaseFile(release, forceDelete))
+                .OnSuccessVoid(async () =>
                 {
                     foreach (var id in fileIds)
                     {
@@ -409,17 +412,19 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Services
                     }
 
                     await _context.SaveChangesAsync();
-                    return true;
                 });
         }
 
-        public async Task<Either<ActionResult, bool>> DeleteChartFile(Guid releaseId, Guid id)
+        public async Task<Either<ActionResult, Unit>> DeleteChartFile(Guid releaseId, Guid id, bool forceDelete = false)
         {
-            return await DeleteChartFiles(releaseId, new List<Guid>() {id});
+            return await DeleteChartFiles(releaseId, new List<Guid>() {id}, forceDelete: forceDelete);
         }
 
-        public async Task<Either<ActionResult, bool>> DeleteNonDataFile(Guid releaseId,
-            ReleaseFileTypes type, string fileName)
+        public async Task<Either<ActionResult, Unit>> DeleteNonDataFile(
+            Guid releaseId,
+            ReleaseFileTypes type,
+            string fileName,
+            bool forceDelete = false)
         {
             if (type == ReleaseFileTypes.Data || type == ReleaseFileTypes.Metadata)
             {
@@ -428,8 +433,8 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Services
 
             return await _persistenceHelper
                 .CheckEntityExists<Release>(releaseId)
-                .OnSuccess(_userService.CheckCanUpdateRelease)
-                .OnSuccess(async () =>
+                .OnSuccess(async release => await CheckCanDeleteReleaseFile(release, forceDelete))
+                .OnSuccessVoid(async () =>
                 {
                     if (await DeletionWillOrphanFileAsync(releaseId, fileName, type))
                     {
@@ -446,7 +451,6 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Services
                     }
 
                     await _context.SaveChangesAsync();
-                    return true;
                 });
         }
 
@@ -524,11 +528,11 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Services
                 });
         }
 
-        public async Task<Either<ActionResult, Unit>> DeleteAllFiles(Guid releaseId)
+        public async Task<Either<ActionResult, Unit>> DeleteAllFiles(Guid releaseId, bool forceDelete = false)
         {
             return await _persistenceHelper
                 .CheckEntityExists<Release>(releaseId)
-                .OnSuccess(_userService.CheckCanUpdateRelease)
+                .OnSuccess(async release => await CheckCanDeleteReleaseFile(release, forceDelete))
                 .OnSuccessVoid(
                     async release =>
                     {
@@ -542,22 +546,33 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Services
                             switch (file.ReleaseFileType)
                             {
                                 case ReleaseFileTypes.Chart:
-                                    await DeleteChartFile(release.Id, file.Id);
+                                    await DeleteChartFile(release.Id, file.Id, forceDelete: forceDelete);
                                     break;
                                 case ReleaseFileTypes.Data:
-                                    await DeleteDataFiles(release.Id, file.Id);
+                                    await DeleteDataFiles(release.Id, file.Id, forceDelete: forceDelete);
                                     break;
                                 default:
                                     await DeleteNonDataFile(
                                         release.Id,
                                         file.ReleaseFileType,
-                                        file.Filename
+                                        file.Filename,
+                                        forceDelete: forceDelete
                                     );
                                     break;
                             }
                         }
                     }
                 );
+        }
+
+        private async Task<Either<ActionResult, Release>> CheckCanDeleteReleaseFile(Release release, bool forceDelete)
+        {
+            if (forceDelete)
+            {
+                return await Task.FromResult(release);
+            }
+
+            return await _userService.CheckCanUpdateRelease(release);
         }
 
         public async Task<Either<ActionResult, FileStreamResult>> StreamFile(Guid releaseId, Guid id)
