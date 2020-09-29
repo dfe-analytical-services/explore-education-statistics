@@ -193,8 +193,7 @@ Check footnote in Preview content mode
     user checks page does not contain  ${FOOTNOTE_TEXT_2}
     user checks page does not contain  ${FOOTNOTE_TEXT_1}
 
-# Stolen from publish_release.robot
-Go to "Release status" tab
+Go to "Release status" page
     [Tags]  HappyPath
     user clicks link   Release status
     user waits until h2 is visible  Release status

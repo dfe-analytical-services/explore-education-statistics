@@ -32,7 +32,7 @@ Add basic release content
     user waits until h2 is visible  ${PUBLICATION_NAME}
     user adds basic release content  ${PUBLICATION_NAME}
 
-Go to "Release status" tab
+Go to "Release status" page
     [Tags]  HappyPath
     user clicks link   Release status
     user waits until h2 is visible  Release status

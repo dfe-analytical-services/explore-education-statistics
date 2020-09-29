@@ -17,7 +17,7 @@ Create new publication and release via API
     ${PUBLICATION_ID}=  user creates test publication via api   ${PUBLICATION_NAME}
     user create test release via api  ${PUBLICATION_ID}   FY   3000
 
-Go to release's "Release status" tab
+Go to "Release status" page
     [Tags]  HappyPath
     user navigates to release summary from admin dashboard  ${PUBLICATION_NAME}  Financial Year 3000-01 (not Live)
 
@@ -142,7 +142,7 @@ Save data block as a highlight
     user clicks button   Save data block
     user waits until page contains    Delete this data block
 
-Go to "Release status" tab for new release
+Go to "Release status" page for new release
     [Tags]  HappyPath
     user clicks link   Release status
     user waits until h2 is visible  Release status

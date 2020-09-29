@@ -20,7 +20,7 @@ Create new publication for "UI tests topic" topic
     ${PUBLICATION_ID}=  user creates test publication via api   ${PUBLICATION_NAME}
     user create test release via api  ${PUBLICATION_ID}   FY   3000
 
-Go to release's "Release status" tab
+Go to "Release status" page
     [Tags]  HappyPath
     user navigates to release summary from admin dashboard  ${PUBLICATION_NAME}   Financial Year 3000-01 (not Live)
 
@@ -275,7 +275,7 @@ Add public prerelease access list
     user clicks button  Save access list
     user waits until element contains  css:[data-testid="publicPreReleaseAccessListPreview"]  Test public access list
 
-Go to "Release status" tab again
+Go to "Release status" page again
     [Tags]  HappyPath
     user clicks link   Release status
     user waits until h2 is visible  Release status
