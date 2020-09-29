@@ -1,5 +1,6 @@
 *** Settings ***
 Resource    ../../libs/admin-common.robot
+Library     ../../libs/api_keywords.py
 
 Force Tags  Admin  Local  Dev  AltersData
 
@@ -11,52 +12,23 @@ ${TOPIC_NAME}        %{TEST_TOPIC_NAME}
 ${PUBLICATION_NAME}  UI tests - delete subject %{RUN_IDENTIFIER}
 
 *** Test Cases ***
-Go to Create publication page for "UI tests topic" topic
+Create test publication and release via API
     [Tags]  HappyPath
-    user selects theme "Test theme" and topic "${TOPIC_NAME}" from the admin dashboard
-    user waits until page contains link    Create new publication
-    user checks page does not contain button   ${PUBLICATION_NAME}
-    user clicks link  Create new publication
-    user waits until h1 is visible  Create new publication
-    user creates publication    ${PUBLICATION_NAME}
-
-Verify that new publication has been created
-    [Tags]  HappyPath
-    user selects theme "Test theme" and topic "${TOPIC_NAME}" from the admin dashboard
-    user waits until page contains accordion section   ${PUBLICATION_NAME}
-    user opens accordion section  ${PUBLICATION_NAME}
-    user checks testid element contains  Methodology for ${PUBLICATION_NAME}  No methodology assigned
-    user checks testid element contains  Releases for ${PUBLICATION_NAME}  No releases created
-
-Create new release
-    [Tags]   HappyPath
-    user clicks testid element  Create new release link for ${PUBLICATION_NAME}
-    user waits until h1 is visible  Create new release
-
-User fills in form
-    [Tags]  HappyPath
-    user waits until page contains element  id:releaseSummaryForm-timePeriodCoverage
-    user selects from list by label  id:releaseSummaryForm-timePeriodCoverage  Tax Year
-    user enters text into element  id:releaseSummaryForm-timePeriodCoverageStartYear  2020
-    user clicks radio  Ad Hoc
-
-Click Create new release button
-    [Tags]   HappyPath
-    user clicks button   Create new release
-    user waits until page contains title caption  Edit release
-    user waits until h1 is visible  ${PUBLICATION_NAME}
+    ${PUBLICATION_ID}=   user creates test publication via api  ${PUBLICATION_NAME}
+    user create test release via api  ${PUBLICATION_ID}   TY    2020
 
 Verify Release summary
     [Tags]  HappyPath
-    user checks page contains element   xpath://li/a[text()="Summary" and contains(@aria-current, 'page')]
-    user waits until h2 is visible    Release summary
-    user checks summary list contains  Publication title  ${PUBLICATION_NAME}
-    user checks summary list contains  Time period  Tax Year
-    user checks summary list contains  Release period  2020-21
-    user checks summary list contains  Lead statistician  Tingting Shu
-    user checks summary list contains  Scheduled release  Not scheduled
+    user navigates to release summary from admin dashboard  ${PUBLICATION_NAME}   Tax Year 2020-21 (not Live)
+
+    user waits until h2 is visible     Release summary
+    user checks summary list contains  Publication title      ${PUBLICATION_NAME}
+    user checks summary list contains  Time period            Tax Year
+    user checks summary list contains  Release period         2020-21
+    user checks summary list contains  Lead statistician      UI test contact name
+    user checks summary list contains  Scheduled release      Not scheduled
     user checks summary list contains  Next release expected  Not set
-    user checks summary list contains  Release type  Ad Hoc
+    user checks summary list contains  Release type           National Statistics
 
 Upload subject
     [Tags]  HappyPath

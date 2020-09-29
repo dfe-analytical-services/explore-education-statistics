@@ -1,5 +1,6 @@
 *** Settings ***
 Resource    ../../libs/admin-common.robot
+Library     ../../libs/api_keywords.py
 
 Force Tags  Admin  Local  Dev  AltersData  Footnotes
 
@@ -20,33 +21,15 @@ ${FOOTNOTE_TEXT_3}  A edited test footnote!
 ${FOOTNOTE_DATABLOCK_NAME}  test data block (footnotes)
 
 *** Test Cases ***
-Create new publication for "UI tests topic" topic
+Create new publication and release via API
     [Tags]  HappyPath
-    user selects theme "Test theme" and topic "${TOPIC_NAME}" from the admin dashboard
-    user waits until page contains link    Create new publication
-    user checks page does not contain button   ${PUBLICATION_NAME}
-    user clicks link  Create new publication
-    user creates publication   ${PUBLICATION_NAME}
-
-Verify new publication
-    [Tags]  HappyPath
-    user selects theme "Test theme" and topic "${TOPIC_NAME}" from the admin dashboard
-    user waits until page contains button  ${PUBLICATION_NAME}
-
-Create new release
-    [Tags]  HappyPath
-    user opens accordion section  ${PUBLICATION_NAME}
-    user clicks testid element  Create new release link for ${PUBLICATION_NAME}
-    user creates release for publication  ${PUBLICATION_NAME}  Financial Year  3000
-
-Verify release summary
-    [Tags]  HappyPath
-    user checks page contains element   xpath://li/a[text()="Summary" and contains(@aria-current, 'page')]
-    user waits until h2 is visible  Release summary
-    user checks summary list contains  Publication title  ${PUBLICATION_NAME}
+    ${PUBLICATION_ID}=  user creates test publication via api   ${PUBLICATION_NAME}
+    user create test release via api  ${PUBLICATION_ID}   AY    2025
 
 Upload subject
     [Tags]  HappyPath
+    user navigates to release summary from admin dashboard  ${PUBLICATION_NAME}   Academic Year 2025/26 (not Live)
+
     user clicks link  Data and files
     user waits until page contains element  css:#dataFileUploadForm-subjectTitle
     user enters text into element  css:#dataFileUploadForm-subjectTitle   ${SUBJECT_NAME}
@@ -210,8 +193,7 @@ Check footnote in Preview content mode
     user checks page does not contain  ${FOOTNOTE_TEXT_2}
     user checks page does not contain  ${FOOTNOTE_TEXT_1}
 
-# Stolen from publish_release.robot
-Go to "Release status" tab
+Go to "Release status" page
     [Tags]  HappyPath
     user clicks link   Release status
     user waits until h2 is visible  Release status

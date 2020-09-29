@@ -59,6 +59,23 @@ user selects theme "${theme}" and topic "${topic}" from the admin dashboard
     user waits until h2 is visible  ${theme}
     user waits until h3 is visible  ${topic}
 
+user navigates to release summary from admin dashboard
+    [Arguments]   ${PUBLICATION_NAME}    ${DETAILS_HEADING}
+    user selects theme "Test theme" and topic "${TOPIC_NAME}" from the admin dashboard
+    user waits until page contains accordion section   ${PUBLICATION_NAME}
+    user opens accordion section  ${PUBLICATION_NAME}
+
+    ${accordion}=  user gets accordion section content element   ${PUBLICATION_NAME}
+    user opens details dropdown   ${DETAILS_HEADING}  ${accordion}
+    ${details}=  user gets details content element   ${DETAILS_HEADING}  ${accordion}
+
+    user waits until parent contains element   ${details}   xpath:.//a[text()="Edit this release"]
+    ${edit_button}=  get child element  ${details}  xpath:.//a[text()="Edit this release"]
+    user clicks element   ${edit_button}
+    
+    user waits until h2 is visible  Release summary
+    user checks summary list contains   Publication title  ${PUBLICATION_NAME}
+
 user creates publication
     [Arguments]   ${title}
     user waits until h1 is visible  Create new publication
