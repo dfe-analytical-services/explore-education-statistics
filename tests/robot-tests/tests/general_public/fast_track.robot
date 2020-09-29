@@ -42,11 +42,11 @@ Validate selected step options
 
 Validate table data
     [Tags]  HappyPath
-    user checks table column heading contains  css:table  1   1   2012/13
-    user checks table column heading contains  css:table  1   2   2013/14
-    user checks table column heading contains  css:table  1   3   2014/15
-    user checks table column heading contains  css:table  1   4   2015/16
-    user checks table column heading contains  css:table  1   5   2016/17
+    user checks table column heading contains  1   1   2012/13
+    user checks table column heading contains  1   2   2013/14
+    user checks table column heading contains  1   3   2014/15
+    user checks table column heading contains  1   4   2015/16
+    user checks table column heading contains  1   5   2016/17
 
     user checks results table row heading contains  1    1      England
     user checks results table row heading contains  1    2      Authorised absence rate
