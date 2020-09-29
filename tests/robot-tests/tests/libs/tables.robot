@@ -43,3 +43,7 @@ user gets table row with heading
 user checks headed table body row contains
     [Arguments]  ${row_heading}  ${content}  ${parent}=css:table  ${wait}=${timeout}
     user waits until parent contains element  ${parent}  xpath:.//tbody/tr/th[text()="${row_heading}"]/../td[contains(., "${content}")]  timeout=${wait}
+
+user checks headed table body row cell contains
+    [Arguments]  ${row_heading}  ${cell}  ${content}  ${parent}=css:table  ${wait}=${timeout}
+    user waits until parent contains element  ${parent}  xpath:.//tbody/tr/th[text()="${row_heading}"]/../td[${cell}][contains(., "${content}")]  timeout=${wait}
