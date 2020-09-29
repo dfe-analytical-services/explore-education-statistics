@@ -766,8 +766,8 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Services
             // First, unlink the original file from the replacement before removing it.
             // Ordinarily, removing a file from a Release deletes any associated replacement
             // so that there's no possibility of abandoned replacements being orphaned from their original files.
-            await CheckReleaseFileReferenceExists(originalFileId)
-                .OnSuccess(async originalFile =>
+            return await CheckReleaseFileReferenceExists(originalFileId)
+                .OnSuccessVoid(async originalFile =>
                 {
                     if (originalFile.ReplacedById != replacementFileId)
                     {
@@ -778,9 +778,8 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Services
                     _contentDbContext.Update(originalFile);
                     originalFile.ReplacedById = null;
                     await _contentDbContext.SaveChangesAsync();
-                });
-
-            return await _releaseService.RemoveDataFiles(releaseId, originalFileId);
+                })
+                .OnSuccess(async _ => await _releaseService.RemoveDataFiles(releaseId, originalFileId));
         }
 
         private class ReplacementSubjectMeta
