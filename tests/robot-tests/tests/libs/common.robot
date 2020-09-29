@@ -15,6 +15,7 @@ ${headless}   1
 
 ${timeout}          30
 ${implicit_wait}    3
+${release_complete_wait}   900
 
 *** Keywords ***
 do this on failure

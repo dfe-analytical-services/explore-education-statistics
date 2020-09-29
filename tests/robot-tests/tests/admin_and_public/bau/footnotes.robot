@@ -249,7 +249,7 @@ Verify release is scheduled
 Wait for release process status to be Complete
     [Tags]  HappyPath
     # EES-1007 - Release process status doesn't automatically update
-    user waits for release process status to be  Complete    900
+    user waits for release process status to be  Complete    ${release_complete_wait}
     user checks page does not contain button  Edit release status
 
 User goes to public Find Statistics page

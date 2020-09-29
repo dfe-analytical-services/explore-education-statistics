@@ -295,6 +295,9 @@ if args.visual:
 else:
     robotArgs += ["-v", "headless:1"]
 
+if os.getenv('RELEASE_COMPLETE_WAIT'):
+    robotArgs += ["-v", f"release_complete_wait:{os.getenv('RELEASE_COMPLETE_WAIT')}"]
+
 robotArgs += ["-v", "browser:" + args.browser]
 robotArgs += [args.tests]
 
