@@ -3,6 +3,7 @@ using System.Linq;
 using GovUk.Education.ExploreEducationStatistics.Admin.Services;
 using GovUk.Education.ExploreEducationStatistics.Admin.Services.Interfaces;
 using GovUk.Education.ExploreEducationStatistics.Common.Model;
+using GovUk.Education.ExploreEducationStatistics.Common.Services;
 using GovUk.Education.ExploreEducationStatistics.Common.Services.Interfaces;
 using GovUk.Education.ExploreEducationStatistics.Common.Services.Interfaces.Security;
 using GovUk.Education.ExploreEducationStatistics.Common.Utils;
@@ -87,12 +88,26 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
                         )
                     );
 
-                var service = SetupReleaseFilesService(context, blobStorageService.Object);
+                var importStatusService = new Mock<IImportStatusService>();
+
+                importStatusService
+                    .Setup(s => s.GetImportStatus(release.Id, "test-data.csv"))
+                    .ReturnsAsync(new ImportStatus
+                    {
+                        Status = IStatus.COMPLETE
+                    });
+
+                var service = SetupReleaseFilesService(
+                    context,
+                    blobStorageService.Object,
+                    importStatusService: importStatusService.Object
+                );
                 var result = await service.GetDataFile(
                     release.Id,
                     dataFileReference.Id
                 );
 
+                importStatusService.VerifyAll();
                 blobStorageService.VerifyAll();
 
                 Assert.True(result.IsRight);
@@ -110,6 +125,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
                 Assert.Equal(200, fileInfo.Rows);
                 Assert.Equal("400 B", fileInfo.Size);
                 Assert.Equal(DateTimeOffset.Parse("2020-09-16T12:00:00Z"), fileInfo.Created);
+                Assert.Equal(IStatus.COMPLETE, fileInfo.Status);
             }
         }
 
@@ -286,6 +302,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
                 Assert.Equal("", fileInfo.UserName);
                 Assert.Equal(0, fileInfo.Rows);
                 Assert.Equal("0.00 B", fileInfo.Size);
+                Assert.Equal(IStatus.NOT_FOUND, fileInfo.Status);
             }
         }
 
@@ -372,13 +389,29 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
                         )
                     );
 
-                var service = SetupReleaseFilesService(context, blobStorageService.Object);
+                var importStatusService = new Mock<IImportStatusService>();
+
+                importStatusService
+                    .Setup(s => s.GetImportStatus(release.Id, "test-data-archive.zip"))
+                    .ReturnsAsync(
+                        new ImportStatus
+                        {
+                            Status = IStatus.PROCESSING_ARCHIVE_FILE,
+                        }
+                    );
+
+                var service = SetupReleaseFilesService(
+                    context,
+                    blobStorageService.Object,
+                    importStatusService: importStatusService.Object
+                );
                 var result = await service.GetDataFile(
                     release.Id,
                     dataFileReference.Id
                 );
 
                 blobStorageService.VerifyAll();
+                importStatusService.VerifyAll();
 
                 Assert.True(result.IsRight);
 
@@ -393,6 +426,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
                 Assert.Equal("test-data.meta.csv", fileInfo.MetaFileName);
                 Assert.Equal("test@test.com", fileInfo.UserName);
                 Assert.Equal(0, fileInfo.Rows);
+                Assert.Equal(IStatus.PROCESSING_ARCHIVE_FILE, fileInfo.Status);
                 Assert.Equal("1 Mb", fileInfo.Size);
             }
         }
@@ -518,10 +552,35 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
                         )
                     );
 
-                var service = SetupReleaseFilesService(context, blobStorageService.Object);
+                var importStatusService = new Mock<IImportStatusService>();
+
+                importStatusService
+                    .Setup(s => s.GetImportStatus(release.Id, "test-data-1.csv"))
+                    .ReturnsAsync(
+                        new ImportStatus
+                        {
+                            Status = IStatus.COMPLETE,
+                        }
+                    );
+
+                importStatusService
+                    .Setup(s => s.GetImportStatus(release.Id, "test-data-2.csv"))
+                    .ReturnsAsync(
+                        new ImportStatus
+                        {
+                            Status = IStatus.RUNNING_PHASE_2,
+                        }
+                    );
+
+                var service = SetupReleaseFilesService(
+                    context,
+                    blobStorageService.Object,
+                    importStatusService: importStatusService.Object
+                );
                 var result = await service.ListDataFiles(release.Id);
 
                 blobStorageService.VerifyAll();
+                importStatusService.VerifyAll();
 
                 Assert.True(result.IsRight);
 
@@ -539,6 +598,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
                 Assert.Equal("test1@test.com", files[0].UserName);
                 Assert.Equal(200, files[0].Rows);
                 Assert.Equal("400 B", files[0].Size);
+                Assert.Equal(IStatus.COMPLETE, files[0].Status);
 
                 Assert.Equal(dataFile2Reference.Id, files[1].Id);
                 Assert.Equal("Test data file 2", files[1].Name);
@@ -550,6 +610,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
                 Assert.Equal("test2@test.com", files[1].UserName);
                 Assert.Equal(400, files[1].Rows);
                 Assert.Equal("800 B", files[1].Size);
+                Assert.Equal(IStatus.RUNNING_PHASE_2, files[1].Status);
             }
         }
 
@@ -650,10 +711,26 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
                         )
                     );
 
-                var service = SetupReleaseFilesService(context, blobStorageService.Object);
+                var importStatusService = new Mock<IImportStatusService>();
+
+                importStatusService
+                    .Setup(s => s.GetImportStatus(release.Id, "test-data-1.csv"))
+                    .ReturnsAsync(
+                        new ImportStatus
+                        {
+                            Status = IStatus.COMPLETE,
+                        }
+                    );
+
+                var service = SetupReleaseFilesService(
+                    context,
+                    blobStorageService.Object,
+                    importStatusService: importStatusService.Object
+                );
                 var result = await service.ListDataFiles(release.Id);
 
                 blobStorageService.VerifyAll();
+                importStatusService.VerifyAll();
 
                 Assert.True(result.IsRight);
 
@@ -671,6 +748,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
                 Assert.Equal("test1@test.com", files[0].UserName);
                 Assert.Equal(200, files[0].Rows);
                 Assert.Equal("400 B", files[0].Size);
+                Assert.Equal(IStatus.COMPLETE, files[0].Status);
             }
         }
 
@@ -758,6 +836,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
                 Assert.Equal("", files[0].UserName);
                 Assert.Equal(0, files[0].Rows);
                 Assert.Equal("0.00 B", files[0].Size);
+                Assert.Equal(IStatus.NOT_FOUND, files[0].Status);
             }
         }
 
@@ -844,10 +923,26 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
                         )
                     );
 
-                var service = SetupReleaseFilesService(context, blobStorageService.Object);
+                var importStatusService = new Mock<IImportStatusService>();
+
+                importStatusService
+                    .Setup(s => s.GetImportStatus(release.Id, "test-data-archive.zip"))
+                    .ReturnsAsync(
+                        new ImportStatus
+                        {
+                            Status = IStatus.PROCESSING_ARCHIVE_FILE,
+                        }
+                    );
+
+                var service = SetupReleaseFilesService(
+                    context,
+                    blobStorageService.Object,
+                    importStatusService: importStatusService.Object
+                );
                 var result = await service.ListDataFiles(release.Id);
 
                 blobStorageService.VerifyAll();
+                importStatusService.VerifyAll();
 
                 Assert.True(result.IsRight);
 
@@ -865,6 +960,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
                 Assert.Equal("test@test.com", files[0].UserName);
                 Assert.Equal(0, files[0].Rows);
                 Assert.Equal("1 Mb", files[0].Size);
+                Assert.Equal(IStatus.PROCESSING_ARCHIVE_FILE, files[0].Status);
             }
         }
 
@@ -876,7 +972,8 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
             IImportService importService = null,
             IFileUploadsValidatorService fileUploadsValidatorService = null,
             ISubjectService subjectService = null,
-            IDataArchiveValidationService dataArchiveValidationService = null)
+            IDataArchiveValidationService dataArchiveValidationService = null,
+            IImportStatusService importStatusService = null)
         {
             return new ReleaseFilesService(
                 blobStorageService ?? new Mock<IBlobStorageService>().Object,
@@ -886,7 +983,8 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
                 importService ?? new Mock<IImportService>().Object,
                 fileUploadsValidatorService ?? new Mock<IFileUploadsValidatorService>().Object,
                 subjectService ?? new Mock<ISubjectService>().Object,
-                dataArchiveValidationService ?? new Mock<IDataArchiveValidationService>().Object
+                dataArchiveValidationService ?? new Mock<IDataArchiveValidationService>().Object,
+                importStatusService ?? new Mock<IImportStatusService>().Object
             );
         }
     }

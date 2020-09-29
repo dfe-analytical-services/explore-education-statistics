@@ -4,6 +4,7 @@ import _dataReplacementService, {
   DataReplacementPlan,
 } from '@admin/services/dataReplacementService';
 import _footnoteService from '@admin/services/footnoteService';
+import _releaseDataFileService from '@admin/services/releaseDataFileService';
 import { render, screen, waitFor, within } from '@testing-library/react';
 import React from 'react';
 import { MemoryRouter } from 'react-router';
@@ -12,6 +13,7 @@ import userEvent from '@testing-library/user-event';
 jest.mock('@admin/services/dataBlockService');
 jest.mock('@admin/services/dataReplacementService');
 jest.mock('@admin/services/footnoteService');
+jest.mock('@admin/services/releaseDataFileService');
 
 const dataBlockService = _dataBlockService as jest.Mocked<
   typeof _dataBlockService
@@ -21,6 +23,9 @@ const dataReplacementService = _dataReplacementService as jest.Mocked<
 >;
 const footnoteService = _footnoteService as jest.Mocked<
   typeof _footnoteService
+>;
+const releaseDataFileService = _releaseDataFileService as jest.Mocked<
+  typeof _releaseDataFileService
 >;
 
 describe('DataReplacementPlan', () => {
@@ -321,6 +326,50 @@ describe('DataReplacementPlan', () => {
     valid: false,
   };
 
+  const testValidReplacementPlan: DataReplacementPlan = {
+    dataBlocks: [
+      {
+        id: 'block-1',
+        name: 'Data block 1',
+        indicatorGroups: {},
+        locations: {},
+        filters: {},
+        valid: true,
+      },
+      {
+        id: 'block-2',
+        name: 'Data block 2',
+        indicatorGroups: {},
+        locations: {},
+        filters: {},
+        valid: true,
+      },
+    ],
+    footnotes: [
+      {
+        id: 'footnote-1',
+        content: 'Footnote 1',
+        indicatorGroups: {},
+        filterItems: [],
+        filterGroups: [],
+        filters: [],
+        valid: true,
+      },
+      {
+        id: 'footnote-2',
+        content: 'Footnote 2',
+        indicatorGroups: {},
+        filterItems: [],
+        filterGroups: [],
+        filters: [],
+        valid: true,
+      },
+    ],
+    originalSubjectId: 'subject-1',
+    replacementSubjectId: 'subject-2',
+    valid: true,
+  };
+
   test('renders correctly with invalid plan', async () => {
     dataReplacementService.getReplacementPlan.mockResolvedValue(
       testReplacementPlan,
@@ -338,10 +387,6 @@ describe('DataReplacementPlan', () => {
     );
 
     await waitFor(() => {
-      expect(
-        screen.getByText('Data replacement in progress'),
-      ).toBeInTheDocument();
-
       expect(screen.getByText('Data blocks: ERROR')).toBeInTheDocument();
       expect(screen.getByText('Footnotes: ERROR')).toBeInTheDocument();
 
@@ -531,54 +576,14 @@ describe('DataReplacementPlan', () => {
           'This footnote has no conflicts with the replacement data.',
         ),
       ).toBeInTheDocument();
+
+      expect(
+        screen.queryByRole('button', { name: 'Confirm data replacement' }),
+      ).not.toBeInTheDocument();
     });
   });
 
   test('renders correctly with valid plan', async () => {
-    const testValidReplacementPlan: DataReplacementPlan = {
-      dataBlocks: [
-        {
-          id: 'block-1',
-          name: 'Data block 1',
-          indicatorGroups: {},
-          locations: {},
-          filters: {},
-          valid: true,
-        },
-        {
-          id: 'block-2',
-          name: 'Data block 2',
-          indicatorGroups: {},
-          locations: {},
-          filters: {},
-          valid: true,
-        },
-      ],
-      footnotes: [
-        {
-          id: 'footnote-1',
-          content: 'Footnote 1',
-          indicatorGroups: {},
-          filterItems: [],
-          filterGroups: [],
-          filters: [],
-          valid: true,
-        },
-        {
-          id: 'footnote-2',
-          content: 'Footnote 2',
-          indicatorGroups: {},
-          filterItems: [],
-          filterGroups: [],
-          filters: [],
-          valid: true,
-        },
-      ],
-      originalSubjectId: 'subject-1',
-      replacementSubjectId: 'subject-2',
-      valid: true,
-    };
-
     dataReplacementService.getReplacementPlan.mockResolvedValue(
       testValidReplacementPlan,
     );
@@ -595,10 +600,6 @@ describe('DataReplacementPlan', () => {
     );
 
     await waitFor(() => {
-      expect(
-        screen.getByText('Data replacement in progress'),
-      ).toBeInTheDocument();
-
       expect(screen.getByText('Data blocks: OK')).toBeInTheDocument();
       expect(screen.getByText('Footnotes: OK')).toBeInTheDocument();
 
@@ -661,6 +662,10 @@ describe('DataReplacementPlan', () => {
         'This footnote has no conflicts with the replacement data.',
       ),
     ).toBeInTheDocument();
+
+    expect(
+      screen.getByRole('button', { name: 'Confirm data replacement' }),
+    ).toBeInTheDocument();
   });
 
   test('renders error message if there is an error loading replacement plan', async () => {
@@ -680,13 +685,9 @@ describe('DataReplacementPlan', () => {
     await waitFor(() => {
       expect(
         screen.getByText(
-          'There was a problem loading the data replacement details.',
+          'There was a problem loading the data replacement information.',
         ),
       ).toBeInTheDocument();
-
-      expect(
-        screen.queryByText('Data replacement in progress'),
-      ).not.toBeInTheDocument();
     });
   });
 
@@ -941,6 +942,130 @@ describe('DataReplacementPlan', () => {
       expect(
         screen.queryByRole('button', { name: /Footnote 1/ }),
       ).not.toBeInTheDocument();
+    });
+  });
+
+  test('calls service to replace data when confirming replacement', async () => {
+    dataReplacementService.getReplacementPlan.mockResolvedValue(
+      testValidReplacementPlan,
+    );
+
+    render(
+      <MemoryRouter>
+        <DataFileReplacementPlan
+          publicationId="publication-1"
+          releaseId="release-1"
+          fileId="file-1"
+          replacementFileId="file-2"
+        />
+      </MemoryRouter>,
+    );
+
+    await waitFor(() => {
+      expect(
+        screen.getByRole('button', { name: 'Confirm data replacement' }),
+      ).toBeInTheDocument();
+    });
+
+    expect(dataReplacementService.replaceData).not.toHaveBeenCalled();
+
+    userEvent.click(
+      screen.getByRole('button', { name: 'Confirm data replacement' }),
+    );
+
+    expect(dataReplacementService.replaceData).toHaveBeenCalledWith(
+      'file-1',
+      'file-2',
+    );
+  });
+
+  test('renders confirmation modal when cancelling replacement', async () => {
+    dataReplacementService.getReplacementPlan.mockResolvedValue(
+      testReplacementPlan,
+    );
+
+    render(
+      <MemoryRouter>
+        <DataFileReplacementPlan
+          publicationId="publication-1"
+          releaseId="release-1"
+          fileId="file-1"
+          replacementFileId="file-2"
+        />
+      </MemoryRouter>,
+    );
+
+    await waitFor(() => {
+      expect(
+        screen.getByRole('button', { name: 'Cancel data replacement' }),
+      ).toBeInTheDocument();
+    });
+
+    userEvent.click(
+      screen.getByRole('button', { name: 'Cancel data replacement' }),
+    );
+
+    await waitFor(() => {
+      expect(screen.getByRole('dialog')).toBeInTheDocument();
+
+      const modal = within(screen.getByRole('dialog'));
+
+      expect(modal.getByRole('heading')).toHaveTextContent(
+        'Cancel data replacement',
+      );
+      expect(
+        modal.getByText(
+          /Are you sure you want to cancel this data replacement/,
+        ),
+      ).toBeInTheDocument();
+    });
+  });
+
+  test('confirming replacement cancellation hides modal and calls service to delete replacement file', async () => {
+    dataReplacementService.getReplacementPlan.mockResolvedValue(
+      testReplacementPlan,
+    );
+
+    render(
+      <MemoryRouter>
+        <DataFileReplacementPlan
+          publicationId="publication-1"
+          releaseId="release-1"
+          fileId="file-1"
+          replacementFileId="file-2"
+        />
+      </MemoryRouter>,
+    );
+
+    await waitFor(() => {
+      expect(
+        screen.getByRole('button', { name: 'Cancel data replacement' }),
+      ).toBeInTheDocument();
+    });
+
+    userEvent.click(
+      screen.getByRole('button', { name: 'Cancel data replacement' }),
+    );
+
+    await waitFor(() => {
+      expect(screen.getByRole('dialog')).toBeInTheDocument();
+    });
+
+    expect(releaseDataFileService.deleteDataFiles).not.toHaveBeenCalled();
+
+    userEvent.click(
+      within(screen.getByRole('dialog')).getByRole('button', {
+        name: 'Confirm',
+      }),
+    );
+
+    await waitFor(() => {
+      expect(screen.queryByRole('dialog')).not.toBeInTheDocument();
+
+      expect(releaseDataFileService.deleteDataFiles).toHaveBeenCalledWith(
+        'release-1',
+        'file-2',
+      );
     });
   });
 });

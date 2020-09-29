@@ -1,7 +1,7 @@
 import classNames from 'classnames';
 import React, { ReactNode } from 'react';
 
-interface Props {
+export interface TagProps {
   children: ReactNode;
   colour?:
     | 'grey'
@@ -24,7 +24,7 @@ const Tag = ({
   colour,
   id = undefined,
   strong = false,
-}: Props) => {
+}: TagProps) => {
   const classes = classNames('govuk-tag', className, {
     [`govuk-tag--${colour}`]: !!colour,
   });
