@@ -2,6 +2,7 @@ import useMounted from '@common/hooks/useMounted';
 import findAllParents from '@common/utils/dom/findAllParents';
 import classNames from 'classnames';
 import React, { createElement, memo, ReactNode } from 'react';
+import styles from './AccordionSection.module.scss';
 import GoToTopLink from './GoToTopLink';
 
 export type ToggleHandler = (open: boolean, id: string) => void;
@@ -52,14 +53,14 @@ const AccordionSection = ({
   open = false,
   onToggle,
 }: AccordionSectionProps) => {
-  const { isMounted } = useMounted();
+  const { isMounted, onMounted } = useMounted();
 
   const headingId = `${id}-heading`;
   const contentId = `${id}-content`;
 
   return (
     <div
-      className={classNames(classes.section, className, {
+      className={classNames(classes.section, styles.section, className, {
         [classes.expanded]: open,
       })}
       data-testid="accordionSection"
@@ -103,7 +104,10 @@ const AccordionSection = ({
       </div>
       <div
         aria-labelledby={headingId}
-        className={classNames(classes.sectionContent)}
+        className={classNames(
+          classes.sectionContent,
+          onMounted({ [styles.sectionContentCollapsed]: !open }),
+        )}
         id={contentId}
       >
         {typeof children === 'function'
