@@ -120,6 +120,7 @@ const ImporterStatus = ({
             inline
             size="sm"
             className="govuk-!-margin-left-1"
+            text={`Processing data file: ${dataFile.fileName}`}
           />
         )}
       </div>
