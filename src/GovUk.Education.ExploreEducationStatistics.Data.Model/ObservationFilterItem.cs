@@ -9,6 +9,6 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Model
         public FilterItem FilterItem { get; set; }
         public Guid FilterItemId { get; set; }
         public Filter Filter { get; set; }
-        public Guid FilterId { get; set; }
+        public Guid? FilterId { get; set; }
     }
 }

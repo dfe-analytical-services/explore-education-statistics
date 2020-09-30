@@ -1,6 +1,4 @@
 begin
-    declare @subjectId uniqueidentifier = '568576e5-d386-450e-a8db-307b7061d0d8'
-
     declare @geographicLevel nvarchar(6) = 'SCH'
 
     declare @timePeriodList TimePeriodListType
@@ -38,11 +36,11 @@ begin
     declare @planningAreasList IdListVarcharType
 
     declare @filterItemList IdListGuidType
+    insert @filterItemList values ('C62FD826-00B0-4933-995C-0739FA7CD1FE'), ('5C175038-297F-4B0D-89DD-2F6E9E22DB29'), ('006B1702-3D16-4D64-8D57-9336FBB7C4DA')
 
     declare @result int
     exec
-        @result = FilteredObservations
-                  @subjectId,
+        @result = GetFilteredObservations
                   @geographicLevel,
                   @timePeriodList,
                   @countriesList,

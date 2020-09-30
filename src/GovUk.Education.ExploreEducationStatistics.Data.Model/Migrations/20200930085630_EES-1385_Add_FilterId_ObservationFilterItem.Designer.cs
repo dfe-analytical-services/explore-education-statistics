@@ -10,8 +10,8 @@ using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 namespace GovUk.Education.ExploreEducationStatistics.Data.Model.Migrations
 {
     [DbContext(typeof(StatisticsDbContext))]
-    [Migration("20200923154238_EES-1385_Add_FilterId_To_ObservationFilterItem")]
-    partial class EES1385_Add_FilterId_To_ObservationFilterItem
+    [Migration("20200930085630_EES-1385_Add_FilterId_ObservationFilterItem")]
+    partial class EES1385_Add_FilterId_ObservationFilterItem
     {
         protected override void BuildTargetModel(ModelBuilder modelBuilder)
         {
@@ -307,7 +307,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Model.Migrations
                     b.Property<Guid>("FilterItemId")
                         .HasColumnType("uniqueidentifier");
 
-                    b.Property<Guid>("FilterId")
+                    b.Property<Guid?>("FilterId")
                         .HasColumnType("uniqueidentifier");
 
                     b.HasKey("ObservationId", "FilterItemId");
@@ -956,8 +956,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Model.Migrations
                     b.HasOne("GovUk.Education.ExploreEducationStatistics.Data.Model.Filter", "Filter")
                         .WithMany()
                         .HasForeignKey("FilterId")
-                        .OnDelete(DeleteBehavior.Cascade)
-                        .IsRequired();
+                        .OnDelete(DeleteBehavior.Restrict);
 
                     b.HasOne("GovUk.Education.ExploreEducationStatistics.Data.Model.FilterItem", "FilterItem")
                         .WithMany()

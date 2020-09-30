@@ -34,8 +34,6 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Services
             
             var localAuthorityOldCodes = locationsQuery?.LocalAuthority?.Where(s => s.Length == 3).ToList();
             var localAuthorityCodes = locationsQuery?.LocalAuthority?.Except(localAuthorityOldCodes).ToList();
-
-            var subjectIdParam = new SqlParameter("subjectId", query.SubjectId);
             var geographicLevelParam = new SqlParameter("geographicLevel",
                 locationsQuery?.GeographicLevel?.GetEnumValue() ?? (object) DBNull.Value);
             var timePeriodListParam = CreateTimePeriodListType("timePeriodList", GetTimePeriodRange(query));
@@ -63,52 +61,98 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Services
             var sponsorListParam = CreateIdListType("sponsorList", locationsQuery?.Sponsor);
             var wardListParam =
                 CreateIdListType("wardList", locationsQuery?.Ward);
-            var filterItemListParam = CreateIdListType("filterItemList", query.Filters);
 
-            // EES-745 It's ok to use Observation as the return type here, as long as only the Id field is selected
+            IQueryable<Observation> inner;
+            
+            if (query.Filters.Any())
+            {
+                var filterItemListParam = CreateIdListType("filterItemList", query.Filters);
 
-            var inner = _context
-                .Set<Observation>()
-                .FromSqlRaw("EXEC dbo.FilteredObservations " +
-                            "@subjectId," +
-                            "@geographicLevel," +
-                            "@timePeriodList," +
-                            "@countriesList," +
-                            "@institutionList," +
-                            "@localAuthorityList," +
-                            "@localAuthorityOldCodeList," +
-                            "@localAuthorityDistrictList," +
-                            "@localEnterprisePartnershipList," +
-                            "@mayoralCombinedAuthorityList," +
-                            "@multiAcademyTrustList," +
-                            "@opportunityAreaList," +
-                            "@parliamentaryConstituencyList," +
-                            "@regionsList," +
-                            "@rscRegionsList," +
-                            "@sponsorList," +
-                            "@wardList," +
-                            "@planningAreaList," +
-                            "@filterItemList",
-                    subjectIdParam,
-                    geographicLevelParam,
-                    timePeriodListParam,
-                    countriesListParam,
-                    institutionListParam,
-                    localAuthorityListParam,
-                    localAuthorityOldCodeListParam,
-                    localAuthorityDistrictListParam,
-                    localEnterprisePartnershipListParam,
-                    mayoralCombinedAuthorityListParam,
-                    multiAcademyTrustListParam,
-                    opportunityAreaListParam,
-                    parliamentaryConstituencyListParam,
-                    regionsListParam,
-                    rscRegionListParam,
-                    sponsorListParam,
-                    wardListParam,
-                    planningAreaListParam,
-                    filterItemListParam);
+                inner = _context
+                    .Set<Observation>()
+                    .FromSqlRaw("EXEC dbo.GetFilteredObservations " +
+                                "@geographicLevel," +
+                                "@timePeriodList," +
+                                "@countriesList," +
+                                "@institutionList," +
+                                "@localAuthorityList," +
+                                "@localAuthorityOldCodeList," +
+                                "@localAuthorityDistrictList," +
+                                "@localEnterprisePartnershipList," +
+                                "@mayoralCombinedAuthorityList," +
+                                "@multiAcademyTrustList," +
+                                "@opportunityAreaList," +
+                                "@parliamentaryConstituencyList," +
+                                "@regionsList," +
+                                "@rscRegionsList," +
+                                "@sponsorList," +
+                                "@wardList," +
+                                "@planningAreaList," +
+                                "@filterItemList",
+                        geographicLevelParam,
+                        timePeriodListParam,
+                        countriesListParam,
+                        institutionListParam,
+                        localAuthorityListParam,
+                        localAuthorityOldCodeListParam,
+                        localAuthorityDistrictListParam,
+                        localEnterprisePartnershipListParam,
+                        mayoralCombinedAuthorityListParam,
+                        multiAcademyTrustListParam,
+                        opportunityAreaListParam,
+                        parliamentaryConstituencyListParam,
+                        regionsListParam,
+                        rscRegionListParam,
+                        sponsorListParam,
+                        wardListParam,
+                        planningAreaListParam,
+                        filterItemListParam);
+            }
+            else
+            {
+                var subjectIdParam = new SqlParameter("subjectId", query.SubjectId);
 
+                inner = _context
+                    .Set<Observation>()
+                    .FromSqlRaw("EXEC dbo.FilteredObservations " +
+                                "@subjectId," +
+                                "@geographicLevel," +
+                                "@timePeriodList," +
+                                "@countriesList," +
+                                "@institutionList," +
+                                "@localAuthorityList," +
+                                "@localAuthorityOldCodeList," +
+                                "@localAuthorityDistrictList," +
+                                "@localEnterprisePartnershipList," +
+                                "@mayoralCombinedAuthorityList," +
+                                "@multiAcademyTrustList," +
+                                "@opportunityAreaList," +
+                                "@parliamentaryConstituencyList," +
+                                "@regionsList," +
+                                "@rscRegionsList," +
+                                "@sponsorList," +
+                                "@wardList," +
+                                "@planningAreaList",
+                        subjectIdParam,
+                        geographicLevelParam,
+                        timePeriodListParam,
+                        countriesListParam,
+                        institutionListParam,
+                        localAuthorityListParam,
+                        localAuthorityOldCodeListParam,
+                        localAuthorityDistrictListParam,
+                        localEnterprisePartnershipListParam,
+                        mayoralCombinedAuthorityListParam,
+                        multiAcademyTrustListParam,
+                        opportunityAreaListParam,
+                        parliamentaryConstituencyListParam,
+                        regionsListParam,
+                        rscRegionListParam,
+                        sponsorListParam,
+                        wardListParam,
+                        planningAreaListParam);
+            }
+            
             _logger.LogTrace("Executed inner stored procedure in {Time} ms", stopwatch.Elapsed.TotalMilliseconds);
             stopwatch.Restart();
 
