@@ -112,8 +112,17 @@ const ImporterStatus = ({
   return (
     <div>
       <div className="dfe-flex dfe-align-items--center">
-        <Tag colour={getImportStatusColour(currentStatus.status)} strong>
-          {getImportStatusLabel(currentStatus.status)}
+        <Tag
+          colour={
+            dataFile.replacedBy
+              ? 'blue'
+              : getImportStatusColour(currentStatus.status)
+          }
+          strong
+        >
+          {dataFile.replacedBy
+            ? 'Data replacement in progress'
+            : getImportStatusLabel(currentStatus.status)}
         </Tag>
 
         {!terminalImportStatuses.includes(currentStatus.status) && (

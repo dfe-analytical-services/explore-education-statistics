@@ -160,10 +160,6 @@ const ReleaseDataFilePage = ({
               <section>
                 <h2>Pending data replacement</h2>
 
-                <p>
-                  <Tag>Data replacement in progress</Tag>
-                </p>
-
                 {getReplacementPlanMessage()}
 
                 {replacementDataFile?.status === 'COMPLETE' && (
