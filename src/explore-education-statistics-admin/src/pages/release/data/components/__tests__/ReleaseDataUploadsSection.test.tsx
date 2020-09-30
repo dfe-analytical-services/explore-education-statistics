@@ -32,7 +32,6 @@ describe('ReleaseDataUploadsSection', () => {
       },
       created: '2020-06-12T12:00:00',
       status: 'COMPLETE',
-      canDelete: false,
     },
     {
       id: 'data-2',
@@ -48,7 +47,6 @@ describe('ReleaseDataUploadsSection', () => {
       },
       created: '2020-07-01T12:00:00',
       status: 'COMPLETE',
-      canDelete: true,
     },
   ];
 
@@ -165,15 +163,12 @@ describe('ReleaseDataUploadsSection', () => {
 
   describe('deleting data file', () => {
     test('does not render delete files button if file is not ready for deletion', async () => {
-      releaseDataFileService.getDataFiles.mockResolvedValue(testDataFiles);
-      releaseDataFileService.getDataFileImportStatus.mockImplementation(
-        async (releaseId, dataFileName) => {
-          if (dataFileName === testDataFiles[1].fileName) {
-            return testCompleteImportStatus;
-          }
-
-          return testQueuedImportStatus;
-        },
+      releaseDataFileService.getDataFiles.mockResolvedValue([
+        { ...testDataFiles[0], status: 'QUEUED' },
+        testDataFiles[1],
+      ]);
+      releaseDataFileService.getDataFileImportStatus.mockResolvedValue(
+        testQueuedImportStatus,
       );
 
       render(
@@ -186,10 +181,8 @@ describe('ReleaseDataUploadsSection', () => {
         </MemoryRouter>,
       );
 
-      let sections: HTMLElement[] = [];
-
       await waitFor(() => {
-        sections = screen.getAllByTestId('accordionSection');
+        const sections = screen.getAllByTestId('accordionSection');
         expect(sections).toHaveLength(2);
 
         const section1 = within(sections[0]);
@@ -348,6 +341,76 @@ describe('ReleaseDataUploadsSection', () => {
             name: 'Test data 1',
           }),
         ).toBeInTheDocument();
+      });
+    });
+  });
+
+  describe('replace data file', () => {
+    test('does not render replace data button if file import is not completed', async () => {
+      releaseDataFileService.getDataFiles.mockResolvedValue([
+        { ...testDataFiles[0], status: 'QUEUED' },
+        testDataFiles[1],
+      ]);
+      releaseDataFileService.getDataFileImportStatus.mockResolvedValue(
+        testQueuedImportStatus,
+      );
+
+      render(
+        <MemoryRouter>
+          <ReleaseDataUploadsSection
+            publicationId="publication-1"
+            releaseId="release-1"
+            canUpdateRelease
+          />
+        </MemoryRouter>,
+      );
+
+      await waitFor(() => {
+        const sections = screen.getAllByTestId('accordionSection');
+        expect(sections).toHaveLength(2);
+
+        const section1 = within(sections[0]);
+        expect(section1.getByTestId('Status')).toHaveTextContent('Queued');
+        expect(
+          section1.queryByRole('link', { name: 'Replace data' }),
+        ).not.toBeInTheDocument();
+
+        const section2 = within(sections[1]);
+        expect(section2.getByTestId('Status')).toHaveTextContent('Complete');
+        expect(
+          section2.getByRole('link', { name: 'Replace data' }),
+        ).toBeInTheDocument();
+      });
+    });
+
+    test('renders replace data button with correct link', async () => {
+      releaseDataFileService.getDataFiles.mockResolvedValue([
+        { ...testDataFiles[0], status: 'QUEUED' },
+        testDataFiles[1],
+      ]);
+      releaseDataFileService.getDataFileImportStatus.mockResolvedValue(
+        testQueuedImportStatus,
+      );
+
+      render(
+        <MemoryRouter>
+          <ReleaseDataUploadsSection
+            publicationId="publication-1"
+            releaseId="release-1"
+            canUpdateRelease
+          />
+        </MemoryRouter>,
+      );
+
+      await waitFor(() => {
+        const sections = screen.getAllByTestId('accordionSection');
+        const section2 = within(sections[1]);
+        expect(
+          section2.getByRole('link', { name: 'Replace data' }),
+        ).toHaveAttribute(
+          'href',
+          '/publication/publication-1/release/release-1/data/data-2',
+        );
       });
     });
   });

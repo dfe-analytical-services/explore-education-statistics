@@ -58,7 +58,11 @@ const getImportStatusColour = (
   }
 };
 
-const terminalStates: ImportStatusCode[] = ['NOT_FOUND', 'COMPLETE', 'FAILED'];
+export const terminalImportStatuses: ImportStatusCode[] = [
+  'NOT_FOUND',
+  'COMPLETE',
+  'FAILED',
+];
 
 export type ImporterStatusChangeHandler = (
   dataFile: DataFile,
@@ -70,7 +74,6 @@ interface ImporterStatusProps {
   dataFile: DataFile;
   onStatusChange?: ImporterStatusChangeHandler;
 }
-
 const ImporterStatus = ({
   releaseId,
   dataFile,
@@ -101,7 +104,7 @@ const ImporterStatus = ({
   });
 
   useEffect(() => {
-    if (terminalStates.includes(currentStatus.status)) {
+    if (terminalImportStatuses.includes(currentStatus.status)) {
       cancelInterval();
     }
   }, [cancelInterval, currentStatus]);
@@ -113,7 +116,7 @@ const ImporterStatus = ({
           {getImportStatusLabel(currentStatus.status)}
         </Tag>
 
-        {!terminalStates.includes(currentStatus.status) && (
+        {!terminalImportStatuses.includes(currentStatus.status) && (
           <LoadingSpinner
             alert
             hideText
