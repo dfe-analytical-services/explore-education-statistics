@@ -1,11 +1,12 @@
 import EditableBlockRenderer from '@admin/components/editable/EditableBlockRenderer';
-import { render, fireEvent, wait } from '@testing-library/react';
+import { render, screen, waitFor } from '@testing-library/react';
 import React from 'react';
+import userEvent from '@testing-library/user-event';
 
 describe('EditableBlockRenderer', () => {
   describe('MarkDownBlock', () => {
     test('renders non-editable version correctly', () => {
-      const { container, queryByText } = render(
+      const { container } = render(
         <EditableBlockRenderer
           releaseId="test-release-id"
           block={{
@@ -20,13 +21,13 @@ describe('EditableBlockRenderer', () => {
         />,
       );
 
-      expect(queryByText('Edit block')).toBeNull();
-      expect(queryByText('Remove block')).toBeNull();
+      expect(screen.queryByText('Edit block')).toBeNull();
+      expect(screen.queryByText('Remove block')).toBeNull();
       expect(container.innerHTML).toMatchSnapshot();
     });
 
     test('renders editable version correctly', () => {
-      const { container, queryByText } = render(
+      const { container } = render(
         <EditableBlockRenderer
           releaseId="test-release-id"
           editable
@@ -42,15 +43,15 @@ describe('EditableBlockRenderer', () => {
         />,
       );
 
-      expect(queryByText('Edit block')).not.toBeNull();
-      expect(queryByText('Remove block')).not.toBeNull();
+      expect(screen.queryByText('Edit block')).not.toBeNull();
+      expect(screen.queryByText('Remove block')).not.toBeNull();
       expect(container.innerHTML).toMatchSnapshot();
     });
 
     test('clicking "Edit block" and "Save" calls save callback', () => {
       const handleContentSave = jest.fn();
 
-      const { getByText } = render(
+      render(
         <EditableBlockRenderer
           releaseId="test-release-id"
           editable
@@ -66,8 +67,8 @@ describe('EditableBlockRenderer', () => {
         />,
       );
 
-      fireEvent.click(getByText('Edit block'));
-      fireEvent.click(getByText('Save'));
+      userEvent.click(screen.getByText('Edit block'));
+      userEvent.click(screen.getByText('Save'));
 
       expect(handleContentSave).toHaveBeenCalledWith('block-000', '');
     });
@@ -75,7 +76,7 @@ describe('EditableBlockRenderer', () => {
     test('clicking "Remove block" and "Confirm" calls delete callback', async () => {
       const handleDelete = jest.fn();
 
-      const { getByText } = render(
+      render(
         <EditableBlockRenderer
           releaseId="test-release-id"
           editable
@@ -91,11 +92,13 @@ describe('EditableBlockRenderer', () => {
         />,
       );
 
-      fireEvent.click(getByText('Remove block'));
+      userEvent.click(screen.getByText('Remove block'));
 
-      await wait();
+      await waitFor(() => {
+        expect(screen.getByText('Confirm')).toBeInTheDocument();
+      });
 
-      fireEvent.click(getByText('Confirm'));
+      userEvent.click(screen.getByText('Confirm'));
 
       expect(handleDelete).toHaveBeenCalledWith('block-000');
     });
