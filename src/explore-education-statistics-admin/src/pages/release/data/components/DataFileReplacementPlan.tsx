@@ -46,7 +46,9 @@ const DataFileReplacementPlan = ({
   onCancel,
   onReplacement,
 }: Props) => {
+  const [isSubmitting, toggleSubmitting] = useToggle(false);
   const [isCancelling, toggleCancelling] = useToggle(false);
+
   const [deleteDataBlock, setDeleteDataBlock] = useState<
     DataBlockReplacementPlan
   >();
@@ -367,7 +369,10 @@ const DataFileReplacementPlan = ({
           <ButtonGroup className="govuk-!-margin-top-8">
             {plan.valid && (
               <Button
+                disabled={isSubmitting}
                 onClick={async () => {
+                  toggleSubmitting.on();
+
                   await dataReplacementService.replaceData(
                     fileId,
                     replacementFileId,
@@ -376,11 +381,14 @@ const DataFileReplacementPlan = ({
                   if (onReplacement) {
                     onReplacement();
                   }
+
+                  toggleSubmitting.off();
                 }}
               >
                 Confirm data replacement
               </Button>
             )}
+
             <Button variant="secondary" onClick={toggleCancelling.on}>
               Cancel data replacement
             </Button>
