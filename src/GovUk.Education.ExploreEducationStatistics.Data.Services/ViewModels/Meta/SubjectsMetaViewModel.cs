@@ -4,9 +4,9 @@ using GovUk.Education.ExploreEducationStatistics.Data.Model;
 
 namespace GovUk.Education.ExploreEducationStatistics.Data.Services.ViewModels.Meta
 {
-    public class ReleaseSubjectsMetaViewModel
+    public class SubjectsMetaViewModel
     {
         public Guid ReleaseId { get; set; }
-        public IEnumerable<IdLabel> Subjects { get; set; }
+        public List<IdLabel> Subjects { get; set; }
     }
 }
