@@ -1,5 +1,6 @@
 import ReleaseContentPage from '@admin/pages/release/content/ReleaseContentPage';
 import ReleaseDataFilePage from '@admin/pages/release/data/ReleaseDataFilePage';
+import ReleaseDataFileReplacementCompletePage from '@admin/pages/release/data/ReleaseDataFileReplacementCompletePage';
 import ReleaseDataPage from '@admin/pages/release/data/ReleaseDataPage';
 import ReleaseDataBlocksPage from '@admin/pages/release/datablocks/ReleaseDataBlocksPage';
 import ReleaseFootnoteCreatePage from '@admin/pages/release/footnotes/ReleaseFootnoteCreatePage';
@@ -55,6 +56,13 @@ export const releaseDataFileRoute: ReleaseRouteProps = {
   path: '/publication/:publicationId/release/:releaseId/data/:fileId',
   title: 'Data file',
   component: ReleaseDataFilePage,
+};
+
+export const releaseDataFileReplacementCompleteRoute: ReleaseRouteProps = {
+  path:
+    '/publication/:publicationId/release/:releaseId/data/:fileId/replacement-complete',
+  title: 'Replacement complete',
+  component: ReleaseDataFileReplacementCompletePage,
 };
 
 export const releaseFootnotesRoute: ReleaseRouteProps = {

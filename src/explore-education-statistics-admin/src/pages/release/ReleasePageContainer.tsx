@@ -18,6 +18,7 @@ import {
   releaseSummaryRoute,
   releaseFootnotesCreateRoute,
   releaseFootnotesEditRoute,
+  releaseDataFileReplacementCompleteRoute,
 } from '@admin/routes/releaseRoutes';
 import publicationService, {
   BasicPublicationDetails,
@@ -45,6 +46,7 @@ const navRoutes = [
 const routes = [
   ...navRoutes,
   releaseDataFileRoute,
+  releaseDataFileReplacementCompleteRoute,
   releaseSummaryEditRoute,
   releaseFootnotesCreateRoute,
   releaseFootnotesEditRoute,

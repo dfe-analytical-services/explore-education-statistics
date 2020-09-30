@@ -46,7 +46,9 @@ const DataFileReplacementPlan = ({
   onCancel,
   onReplacement,
 }: Props) => {
+  const [isSubmitting, toggleSubmitting] = useToggle(false);
   const [isCancelling, toggleCancelling] = useToggle(false);
+
   const [deleteDataBlock, setDeleteDataBlock] = useState<
     DataBlockReplacementPlan
   >();
@@ -93,9 +95,9 @@ const DataFileReplacementPlan = ({
       {plan && (
         <>
           <WarningMessage>
-            Before confirming the data replacement please check the information
-            below. Making this change could affect existing data blocks and
-            footnotes.
+            Please check the information below before confirming the data
+            replacement as making this change may affect existing data blocks
+            and footnotes.
           </WarningMessage>
 
           <h3 className="govuk-heading-m">
@@ -113,8 +115,9 @@ const DataFileReplacementPlan = ({
             </p>
           ) : (
             <p>
-              All data blocks will still be valid after this data replacement,
-              no action is required.
+              {plan.dataBlocks.length > 0
+                ? 'All existing data blocks can be replaced by this data replacement.'
+                : 'No data blocks to replace.'}
             </p>
           )}
 
@@ -123,22 +126,18 @@ const DataFileReplacementPlan = ({
               key={dataBlock.id}
               summary={dataBlock.name}
               summaryAfter={
-                <>
-                  <Tag
-                    className="govuk-!-margin-left-2"
-                    colour={dataBlock.valid ? 'green' : 'red'}
-                  >
-                    <VisuallyHidden>:</VisuallyHidden>
+                <Tag
+                  className="govuk-!-margin-left-2"
+                  colour={dataBlock.valid ? 'green' : 'red'}
+                >
+                  <VisuallyHidden>:</VisuallyHidden>
 
-                    {dataBlock.valid ? ' OK' : ' ERROR'}
-                  </Tag>
-                </>
+                  {dataBlock.valid ? ' OK' : ' ERROR'}
+                </Tag>
               }
             >
               {dataBlock.valid ? (
-                <p>
-                  This data block has no conflicts with the replacement data.
-                </p>
+                <p>This data block has no conflicts and can be replaced.</p>
               ) : (
                 <>
                   <SummaryList smallKey>
@@ -258,8 +257,9 @@ const DataFileReplacementPlan = ({
             </p>
           ) : (
             <p>
-              All footnotes will still be valid after this data replacement, no
-              action is required.
+              {plan.footnotes.length > 0
+                ? 'All existing footnotes can be replaced by this data replacement.'
+                : 'No footnotes to replace.'}
             </p>
           )}
 
@@ -271,21 +271,17 @@ const DataFileReplacementPlan = ({
                 key={footnote.id}
                 summary={footnote.content}
                 summaryAfter={
-                  <>
-                    <Tag
-                      className="govuk-!-margin-left-2"
-                      colour={footnote.valid ? 'green' : 'red'}
-                    >
-                      <VisuallyHidden>:</VisuallyHidden>
-                      {footnote.valid ? ' OK' : ' ERROR'}
-                    </Tag>
-                  </>
+                  <Tag
+                    className="govuk-!-margin-left-2"
+                    colour={footnote.valid ? 'green' : 'red'}
+                  >
+                    <VisuallyHidden>:</VisuallyHidden>
+                    {footnote.valid ? ' OK' : ' ERROR'}
+                  </Tag>
                 }
               >
                 {footnote.valid ? (
-                  <p>
-                    This footnote has no conflicts with the replacement data.
-                  </p>
+                  <p>This footnote has no conflicts and can be replaced.</p>
                 ) : (
                   <>
                     <SummaryList smallKey>
@@ -373,7 +369,10 @@ const DataFileReplacementPlan = ({
           <ButtonGroup className="govuk-!-margin-top-8">
             {plan.valid && (
               <Button
+                disabled={isSubmitting}
                 onClick={async () => {
+                  toggleSubmitting.on();
+
                   await dataReplacementService.replaceData(
                     fileId,
                     replacementFileId,
@@ -382,11 +381,14 @@ const DataFileReplacementPlan = ({
                   if (onReplacement) {
                     onReplacement();
                   }
+
+                  toggleSubmitting.off();
                 }}
               >
                 Confirm data replacement
               </Button>
             )}
+
             <Button variant="secondary" onClick={toggleCancelling.on}>
               Cancel data replacement
             </Button>
