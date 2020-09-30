@@ -358,7 +358,14 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Services
                                 .OrderBy(group => group.Key.Label, LabelComparer)
                                 .ToDictionary(
                                     group => group.Key.Id,
-                                    group => ValidateFilterGroupForReplacement(group.Key, replacementSubjectMeta)
+                                    group => ValidateFilterGroupForReplacement(
+                                        new FilterGroup
+                                        {
+                                            Id = group.Key.Id,
+                                            Label = group.Key.Label,
+                                            FilterItems = filter.ToList()
+                                        },
+                                        replacementSubjectMeta)
                                 )
                         );
                     }
