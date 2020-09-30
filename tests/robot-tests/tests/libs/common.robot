@@ -365,7 +365,8 @@ user chooses file
 
 user clears element text
     [Arguments]   ${locator}
-    press keys  ${locator}  CTRL+a+BACKSPACE
+    press keys  ${locator}  CTRL+a
+    press keys  ${locator}  BACKSPACE
     sleep  0.1
 
 user presses keys

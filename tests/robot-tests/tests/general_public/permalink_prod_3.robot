@@ -34,29 +34,29 @@ Validate miscellaneous
 
 Validate table
     [Tags]  HappyPath
-    user checks table column heading contains  css:table  1   1   2014/15
-    user checks table column heading contains  css:table  1   2   2015/16
-    user checks table column heading contains  css:table  1   3   2016/17
+    user checks table column heading contains  1   1   2014/15
+    user checks table column heading contains  1   2   2015/16
+    user checks table column heading contains  1   3   2016/17
 
-    ${row}=  user gets row with group and indicator   xpath://table  Barnet   Fixed period exclusion rate
+    ${row}=  user gets row with group and indicator   Barnet   Fixed period exclusion rate
     user checks row contains heading  ${row}  	Fixed period exclusion rate
     user checks row cell contains text  ${row}    1     2.75%
     user checks row cell contains text  ${row}    2     2.83%
     user checks row cell contains text  ${row}    3     3.2%
 
-    ${row}=  user gets row with group and indicator   xpath://table  Barnet   Number of fixed period exclusions
+    ${row}=  user gets row with group and indicator   Barnet   Number of fixed period exclusions
     user checks row contains heading  ${row}  	Number of fixed period exclusions
     user checks row cell contains text  ${row}    1     1,496
     user checks row cell contains text  ${row}    2     1,580
     user checks row cell contains text  ${row}    3     1,825
 
-    ${row}=  user gets row with group and indicator   xpath://table  Barking and Dagenham   Fixed period exclusion rate
+    ${row}=  user gets row with group and indicator   Barking and Dagenham   Fixed period exclusion rate
     user checks row contains heading  ${row}  	Fixed period exclusion rate
     user checks row cell contains text  ${row}    1     2.02%
     user checks row cell contains text  ${row}    2     1.94%
     user checks row cell contains text  ${row}    3     1.87%
 
-    ${row}=  user gets row with group and indicator   xpath://table  Barking and Dagenham   Number of fixed period exclusions
+    ${row}=  user gets row with group and indicator   Barking and Dagenham   Number of fixed period exclusions
     user checks row contains heading  ${row}  	Number of fixed period exclusions
     user checks row cell contains text  ${row}    1     805
     user checks row cell contains text  ${row}    2     810

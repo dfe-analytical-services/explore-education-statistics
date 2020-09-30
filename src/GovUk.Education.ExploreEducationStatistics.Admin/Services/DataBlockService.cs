@@ -17,6 +17,7 @@ using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
 using Newtonsoft.Json;
 using Release = GovUk.Education.ExploreEducationStatistics.Content.Model.Release;
+using Unit = GovUk.Education.ExploreEducationStatistics.Common.Model.Unit;
 
 namespace GovUk.Education.ExploreEducationStatistics.Admin.Services
 {
@@ -81,7 +82,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Services
             return true;
         }
 
-        public async Task<Either<ActionResult, bool>> RemoveChartFile(Guid releaseId, Guid id)
+        public async Task<Either<ActionResult, Unit>> RemoveChartFile(Guid releaseId, Guid id)
         {
             return await RemoveInfographicChartFromDataBlock(releaseId, id)
                 .OnSuccess(async () => await _releaseFilesService.DeleteChartFile(releaseId, id));

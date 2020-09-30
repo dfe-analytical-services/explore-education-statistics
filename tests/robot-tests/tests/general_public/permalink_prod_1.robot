@@ -34,10 +34,10 @@ Validate miscellaneous
 
 Validate table
     [Tags]  HappyPath
-    user checks table column heading contains  css:table  1   1   State-funded secondary
-    user checks table column heading contains  css:table  2   1   2014/15
-    user checks table column heading contains  css:table  2   2   2015/16
-    user checks table column heading contains  css:table  2   3   2016/17
+    user checks table column heading contains  1   1   State-funded secondary
+    user checks table column heading contains  2   1   2014/15
+    user checks table column heading contains  2   2   2015/16
+    user checks table column heading contains  2   3   2016/17
 
     user checks results table row heading contains   1   1   England
     user checks results table cell contains  1    1    124,995
