@@ -508,7 +508,7 @@ describe('DataReplacementPlan', () => {
 
       expect(
         dataBlock2.getByText(
-          'This data block has no conflicts with the replacement data.',
+          'This data block has no conflicts and can be replaced.',
         ),
       ).toBeInTheDocument();
 
@@ -573,7 +573,7 @@ describe('DataReplacementPlan', () => {
 
       expect(
         footnote2.getByText(
-          'This footnote has no conflicts with the replacement data.',
+          'This footnote has no conflicts and can be replaced.',
         ),
       ).toBeInTheDocument();
 
@@ -605,12 +605,12 @@ describe('DataReplacementPlan', () => {
 
       expect(
         screen.getByText(
-          /All data blocks will still be valid after this data replacement/,
+          'All existing data blocks can be replaced by this data replacement.',
         ),
       ).toBeInTheDocument();
       expect(
         screen.getByText(
-          /All footnotes will still be valid after this data replacement/,
+          'All existing footnotes can be replaced by this data replacement.',
         ),
       ).toBeInTheDocument();
     });
@@ -626,7 +626,7 @@ describe('DataReplacementPlan', () => {
     ).toHaveTextContent('OK');
     expect(
       dataBlock1.getByText(
-        'This data block has no conflicts with the replacement data.',
+        'This data block has no conflicts and can be replaced.',
       ),
     ).toBeInTheDocument();
 
@@ -637,7 +637,7 @@ describe('DataReplacementPlan', () => {
     ).toHaveTextContent('OK');
     expect(
       dataBlock2.getByText(
-        'This data block has no conflicts with the replacement data.',
+        'This data block has no conflicts and can be replaced.',
       ),
     ).toBeInTheDocument();
 
@@ -648,7 +648,7 @@ describe('DataReplacementPlan', () => {
     ).toHaveTextContent('OK');
     expect(
       footnote1.getByText(
-        'This footnote has no conflicts with the replacement data.',
+        'This footnote has no conflicts and can be replaced.',
       ),
     ).toBeInTheDocument();
 
@@ -659,9 +659,44 @@ describe('DataReplacementPlan', () => {
     ).toHaveTextContent('OK');
     expect(
       footnote2.getByText(
-        'This footnote has no conflicts with the replacement data.',
+        'This footnote has no conflicts and can be replaced.',
       ),
     ).toBeInTheDocument();
+
+    expect(
+      screen.getByRole('button', { name: 'Confirm data replacement' }),
+    ).toBeInTheDocument();
+  });
+
+  test('renders correctly with valid empty plan', async () => {
+    dataReplacementService.getReplacementPlan.mockResolvedValue({
+      ...testValidReplacementPlan,
+      dataBlocks: [],
+      footnotes: [],
+    });
+
+    render(
+      <MemoryRouter>
+        <DataFileReplacementPlan
+          publicationId="publication-1"
+          releaseId="release-1"
+          fileId="file-1"
+          replacementFileId="file-2"
+        />
+      </MemoryRouter>,
+    );
+
+    await waitFor(() => {
+      expect(screen.getByText('Data blocks: OK')).toBeInTheDocument();
+      expect(screen.getByText('Footnotes: OK')).toBeInTheDocument();
+
+      expect(
+        screen.getByText('No data blocks to replace.'),
+      ).toBeInTheDocument();
+      expect(screen.getByText('No footnotes to replace.')).toBeInTheDocument();
+    });
+
+    expect(screen.queryAllByRole('group')).toHaveLength(0);
 
     expect(
       screen.getByRole('button', { name: 'Confirm data replacement' }),
