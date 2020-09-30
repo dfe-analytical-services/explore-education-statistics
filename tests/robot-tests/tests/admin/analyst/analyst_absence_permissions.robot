@@ -52,12 +52,12 @@ Validate Analyst1 can see Absence release summary
     user checks summary list contains  Next release expected  22 March 2019
     user checks summary list contains  Release type  Official Statistics
 
-Validate Analyst1 can see Manage content page
+Validate Analyst1 can see 'Content' page
     [Tags]  HappyPath
-    user clicks link  Manage content
+    user clicks link  Content
     user waits until h2 is visible   Pupil absence in schools in England
 
-Validate Analyst1 can see 'Manage content' page key stats
+Validate Analyst1 can see 'Content' page key stats
     [Tags]  HappyPath
     user waits until page contains element  id:releaseHeadlines
     user scrolls to element  id:releaseHeadlines
@@ -73,7 +73,7 @@ Validate Analyst1 can see 'Manage content' page key stats
 
     user checks element count is x    css:[data-testid="keyStat"]   3
 
-Validate Analyst1 can see 'Manage content' page accordion sections
+Validate Analyst1 can see 'Content' page accordion sections
     [Tags]  HappyPath
     user waits until page contains accordion section  About these statistics
     user checks accordion is in position  About these statistics            1

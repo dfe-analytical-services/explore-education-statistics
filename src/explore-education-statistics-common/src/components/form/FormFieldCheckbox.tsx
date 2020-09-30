@@ -3,12 +3,32 @@ import FormField, {
   FormFieldComponentProps,
 } from '@common/components/form/FormField';
 import { FormCheckbox } from '@common/components/form/index';
+import classNames from 'classnames';
 import React from 'react';
 
-type Props<FormValues> = FormFieldComponentProps<FormCheckboxProps, FormValues>;
+type Props<FormValues> = {
+  small?: boolean;
+  formGroup?: boolean;
+} & FormFieldComponentProps<FormCheckboxProps, FormValues>;
 
-const FormFieldCheckbox = <FormValues extends {}>(props: Props<FormValues>) => {
-  return <FormField {...props} as={FormCheckbox} type="checkbox" />;
+const FormFieldCheckbox = <FormValues extends {}>({
+  small,
+  formGroup,
+  ...props
+}: Props<FormValues>) => {
+  return (
+    <FormField<string> {...props} type="checkbox" formGroup={formGroup}>
+      {({ field }) => (
+        <div
+          className={classNames('govuk-checkboxes', {
+            'govuk-checkboxes--small': small,
+          })}
+        >
+          <FormCheckbox {...props} {...field} />
+        </div>
+      )}
+    </FormField>
+  );
 };
 
 export default FormFieldCheckbox;

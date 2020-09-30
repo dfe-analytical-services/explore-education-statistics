@@ -1,5 +1,6 @@
 *** Settings ***
 Resource    ../../libs/admin-common.robot
+Library     ../../libs/api_keywords.py
 
 Force Tags  Admin  Local  Dev  AltersData
 
@@ -12,39 +13,26 @@ ${PUBLICATION_NAME}  UI tests - prerelease %{RUN_IDENTIFIER}
 ${RELEASE_URL}
 
 *** Test Cases ***
-Create new publication for "UI tests topic" topic
+Create test publication and release via API
     [Tags]  HappyPath
-    user selects theme "Test theme" and topic "${TOPIC_NAME}" from the admin dashboard
-    user waits until page contains link     Create new publication
-    user checks page does not contain button   ${PUBLICATION_NAME}
-    user clicks link  Create new publication
-    user creates publication    ${PUBLICATION_NAME}
-
-Verify new publication
-    [Tags]  HappyPath
-    user selects theme "Test theme" and topic "${TOPIC_NAME}" from the admin dashboard
-    user waits until page contains button  ${PUBLICATION_NAME}
-
-Create new release
-    [Tags]  HappyPath
-    user opens accordion section  ${PUBLICATION_NAME}
-    user clicks testid element  Create new release link for ${PUBLICATION_NAME}
-    user creates release for publication  ${PUBLICATION_NAME}  Calendar Year  2000
+    ${PUBLICATION_ID}=  user creates test publication via api   ${PUBLICATION_NAME}
+    user create test release via api  ${PUBLICATION_ID}   CY    2000
 
 Verify release summary
     [Tags]  HappyPath
-    user checks page contains element   xpath://li/a[text()="Release summary" and contains(@aria-current, 'page')]
+    user navigates to release summary from admin dashboard  ${PUBLICATION_NAME}  Calendar Year 2000 (not Live)
     user waits until h2 is visible  Release summary
+    user checks page contains element   xpath://li/a[text()="Summary" and contains(@aria-current, 'page')]
     user checks summary list contains  Publication title  ${PUBLICATION_NAME}
 
 Add basic release content
     [Tags]  HappyPath
-    user clicks link  Manage content
+    user clicks link  Content
     user waits until h1 is visible  ${PUBLICATION_NAME}
     user waits until h2 is visible  ${PUBLICATION_NAME}
     user adds basic release content  ${PUBLICATION_NAME}
 
-Go to "Release status" tab
+Go to "Release status" page
     [Tags]  HappyPath
     user clicks link   Release status
     user waits until h2 is visible  Release status

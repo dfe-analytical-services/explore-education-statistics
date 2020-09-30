@@ -35,7 +35,6 @@ const ButtonLink = ({
         },
         className,
       )}
-      role="button"
       aria-disabled={disabled}
     >
       {children}

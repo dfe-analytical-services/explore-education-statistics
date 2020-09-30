@@ -1,6 +1,7 @@
 *** Settings ***
 Resource    ../../libs/admin-common.robot
 Resource    ../../libs/charts.robot
+Library     ../../libs/api_keywords.py
 
 Force Tags  Admin  Local  Dev  AltersData
 
@@ -16,31 +17,13 @@ ${DATABLOCK_NAME}    Dates data block name
 *** Test Cases ***
 Create new publication for "UI tests topic" topic
     [Tags]  HappyPath
-    user selects theme "Test theme" and topic "${TOPIC_NAME}" from the admin dashboard
-    user waits until page contains link    Create new publication
-    user checks page does not contain button   ${PUBLICATION_NAME}
-    user clicks link  Create new publication
-    user creates publication    ${PUBLICATION_NAME}
+    ${PUBLICATION_ID}=  user creates test publication via api   ${PUBLICATION_NAME}
+    user create test release via api  ${PUBLICATION_ID}   FY   3000
 
-Verify new publication
+Go to "Release status" page
     [Tags]  HappyPath
-    user selects theme "Test theme" and topic "${TOPIC_NAME}" from the admin dashboard
-    user waits until page contains button  ${PUBLICATION_NAME}
+    user navigates to release summary from admin dashboard  ${PUBLICATION_NAME}   Financial Year 3000-01 (not Live)
 
-Create new release
-    [Tags]  HappyPath
-    user opens accordion section  ${PUBLICATION_NAME}
-    user clicks testid element   Create new release link for ${PUBLICATION_NAME}
-    user creates release for publication  ${PUBLICATION_NAME}  Financial Year  3000
-
-Verify release summary
-    [Tags]  HappyPath
-    user checks page contains element   xpath://li/a[text()="Release summary" and contains(@aria-current, 'page')]
-    user waits until h2 is visible  Release summary
-    user checks summary list contains  Publication title  ${PUBLICATION_NAME}
-
-Go to "Release status" tab
-    [Tags]  HappyPath
     user clicks link   Release status
     user waits until h2 is visible  Release status
     user waits until page contains button  Edit release status
@@ -75,7 +58,7 @@ Verify release is scheduled
 Wait for release process status to be Complete
     [Tags]  HappyPath
     # EES-1007 - Release process status doesn't automatically update
-    user waits for release process status to be  Complete    900
+    user waits for release process status to be  Complete    ${release_complete_wait}
     user checks page does not contain button  Edit release status
 
 User goes to public Find Statistics page
@@ -147,7 +130,7 @@ Create amendment
 
 Upload subject
     [Tags]  HappyPath
-    user clicks link  Manage data
+    user clicks link  Data and files
     user waits until page contains element  css:#dataFileUploadForm-subjectTitle
     user enters text into element  css:#dataFileUploadForm-subjectTitle   Dates test subject
     user chooses file   css:#dataFileUploadForm-dataFile       ${CURDIR}${/}files${/}dates.csv
@@ -159,12 +142,12 @@ Upload subject
     user opens accordion section   Dates test subject
 
     ${section}=  user gets accordion section content element  Dates test subject
-    user checks summary list contains  Subject title    Dates test subject  ${section}
-    user checks summary list contains  Data file        dates.csv  ${section}
-    user checks summary list contains  Metadata file    dates.meta.csv  ${section}
-    user checks summary list contains  Number of rows   119  ${section}
-    user checks summary list contains  Data file size   17 Kb  ${section}
-    user checks summary list contains  Status           Complete  ${section}  180
+    user checks headed table body row contains  Subject title    Dates test subject  ${section}
+    user checks headed table body row contains  Data file        dates.csv  ${section}
+    user checks headed table body row contains  Metadata file    dates.meta.csv  ${section}
+    user checks headed table body row contains  Number of rows   119  ${section}
+    user checks headed table body row contains  Data file size   17 Kb  ${section}
+    user checks headed table body row contains  Status           Complete  ${section}  180
 
 # TODO: Add footnotes
 
@@ -201,7 +184,7 @@ Add ancillary files
 
 Create data block table
     [Tags]  HappyPath
-    user clicks link    Manage data blocks
+    user clicks link    Data blocks
     user waits until h2 is visible   Choose a subject
 
     user waits until page contains   Dates test subject
@@ -253,9 +236,9 @@ Navigate to Create chart tab
     user waits until page contains  Chart preview
     user checks infographic chart contains alt  id:chartBuilderPreview  Sample alt text
 
-Navigate to Manage content tab
+Navigate to 'Content' page
     [Tags]  HappyPath
-    user clicks link   Manage content
+    user clicks link   Content
     user waits until h2 is visible  ${PUBLICATION_NAME}
     user waits until page contains button  Add a summary text block
 
@@ -292,7 +275,7 @@ Add public prerelease access list
     user clicks button  Save access list
     user waits until element contains  css:[data-testid="publicPreReleaseAccessListPreview"]  Test public access list
 
-Go to "Release status" tab again
+Go to "Release status" page again
     [Tags]  HappyPath
     user clicks link   Release status
     user waits until h2 is visible  Release status
@@ -317,7 +300,7 @@ Wait for release process status to be Complete again
     user waits until h2 is visible  Release status
     user checks summary list contains  Current status  Approved
     user checks summary list contains  Scheduled release  ${PUBLISH_DATE_DAY} ${PUBLISH_DATE_MONTH} ${PUBLISH_DATE_YEAR}
-    user waits for release process status to be  Complete    900
+    user waits for release process status to be  Complete    ${release_complete_wait}
     user checks page does not contain button  Edit release status
 
 Go back to public find-statistics page

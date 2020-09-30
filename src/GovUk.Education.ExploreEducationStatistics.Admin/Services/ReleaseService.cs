@@ -455,22 +455,33 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Services
                 });
         }
 
-        public async Task<Either<ActionResult, Unit>> RemoveDataFilesAsync(Guid releaseId, Guid fileId)
+        public async Task<Either<ActionResult, Unit>> RemoveDataFiles(Guid releaseId, Guid fileId)
         {
             return await _persistenceHelper
                 .CheckEntityExists<Release>(releaseId)
                 .OnSuccess(_userService.CheckCanUpdateRelease)
                 .OnSuccess(() => CheckReleaseFileReferenceExists(fileId))
-                .OnSuccess(releaseFileReference => CheckCanDeleteDataFiles(releaseId, releaseFileReference))
-                .OnSuccess(_ => GetDeleteDataFilePlan(releaseId, fileId))
-                .OnSuccess(async deletePlan =>
+                .OnSuccess(releaseFileReference =>
                 {
-                    await _dataBlockService.DeleteDataBlocks(deletePlan.DeleteDataBlockPlan);
-                    await _releaseSubjectService.SoftDeleteSubjectOrBreakReleaseLink(releaseId, deletePlan.SubjectId);
+                    return CheckCanDeleteDataFiles(releaseId, releaseFileReference)
+                        .OnSuccess(_ => GetDeleteDataFilePlan(releaseId, fileId))
+                        .OnSuccess(async deletePlan =>
+                        {
+                            // Delete any replacement that might exist
+                            var replacementInProgress = releaseFileReference.ReplacedById;
+                            if (replacementInProgress.HasValue)
+                            {
+                                await RemoveDataFiles(releaseId, replacementInProgress.Value);
+                            }
 
-                    return await _releaseFilesService
-                        .DeleteDataFiles(releaseId, fileId)
-                        .OnSuccessVoid(async () => await RemoveFileImportEntryIfOrphaned(deletePlan));
+                            await _dataBlockService.DeleteDataBlocks(deletePlan.DeleteDataBlockPlan);
+                            await _releaseSubjectService.SoftDeleteSubjectOrBreakReleaseLink(releaseId,
+                                deletePlan.SubjectId);
+
+                            return await _releaseFilesService
+                                .DeleteDataFiles(releaseId, fileId)
+                                .OnSuccessVoid(async () => await RemoveFileImportEntryIfOrphaned(deletePlan));
+                        });
                 });
         }
 
@@ -498,13 +509,13 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Services
                     {
                         return new ImportStatus
                         {
-                            Status = IStatus.NOT_FOUND.GetEnumValue()
+                            Status = IStatus.NOT_FOUND
                         };
                     }
 
                     var fileReference = fileLink.ReleaseFileReference;
 
-                    return await _importStatusService.GetImportStatus(fileReference.ReleaseId.ToString(), dataFileName);
+                    return await _importStatusService.GetImportStatus(fileReference.ReleaseId, dataFileName);
                 });
         }
 
@@ -517,7 +528,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Services
         private async Task<Either<ActionResult, Unit>> CheckCanDeleteDataFiles(Guid releaseId,
             ReleaseFileReference releaseFileReference)
         {
-            var importFinished = await _importStatusService.IsImportFinished(releaseFileReference.ReleaseId.ToString(),
+            var importFinished = await _importStatusService.IsImportFinished(releaseFileReference.ReleaseId,
                 releaseFileReference.Filename);
 
             if (!importFinished)

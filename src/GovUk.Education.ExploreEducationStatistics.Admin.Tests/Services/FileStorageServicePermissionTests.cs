@@ -112,10 +112,17 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
         private void AssertSecurityPoliciesChecked<T>(
             Func<ReleaseFilesService, Task<Either<ActionResult, T>>> protectedAction, params SecurityPolicies[] policies)
         {
-            var (blobStorageService, userService, releaseHelper,
-                contentDbContext, importService,
-                fileUploadsValidatorService, subjectService,
-                dataArchiveValidationService) = Mocks();
+            var (
+                blobStorageService,
+                userService,
+                releaseHelper,
+                contentDbContext,
+                importService,
+                fileUploadsValidatorService,
+                subjectService,
+                dataArchiveValidationService,
+                importStatusService
+            ) = Mocks();
 
             var service = new ReleaseFilesService(
                 blobStorageService.Object,
@@ -125,7 +132,8 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
                 importService.Object,
                 fileUploadsValidatorService.Object,
                 subjectService.Object,
-                dataArchiveValidationService.Object
+                dataArchiveValidationService.Object,
+                importStatusService.Object
             );
 
             PermissionTestUtil.AssertSecurityPoliciesChecked(protectedAction, _release, userService, service, policies);
@@ -139,7 +147,8 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
             Mock<IImportService>,
             Mock<IFileUploadsValidatorService>,
             Mock<ISubjectService>,
-            Mock<IDataArchiveValidationService>
+            Mock<IDataArchiveValidationService>,
+            Mock<IImportStatusService>
             ) Mocks()
         {
             return (
@@ -150,8 +159,9 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
                 new Mock<IImportService>(),
                 new Mock<IFileUploadsValidatorService>(),
                 new Mock<ISubjectService>(),
-                new Mock<IDataArchiveValidationService>()
-                );
+                new Mock<IDataArchiveValidationService>(),
+                new Mock<IImportStatusService>()
+            );
         }
     }
 }

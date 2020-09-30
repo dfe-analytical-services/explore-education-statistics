@@ -269,7 +269,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Controllers.Api
             Guid fileId)
         {
             return await _releaseService
-                .RemoveDataFilesAsync(releaseId, fileId)
+                .RemoveDataFiles(releaseId, fileId)
                 .HandleFailuresOrNoContent();
         }
 

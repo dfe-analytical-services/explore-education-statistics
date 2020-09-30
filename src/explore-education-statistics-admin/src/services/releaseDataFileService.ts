@@ -3,7 +3,6 @@ import { FileInfo } from '@admin/services/types/file';
 import client from '@admin/services/utils/service';
 import { Overwrite } from '@common/types';
 import downloadFile from './utils/file/downloadFile';
-import getFileNameFromPath from './utils/file/getFileNameFromPath';
 
 interface DataFileInfo extends FileInfo {
   metaFileId: string;
@@ -11,6 +10,8 @@ interface DataFileInfo extends FileInfo {
   rows: number;
   userName: string;
   created: string;
+  status: ImportStatusCode;
+  replacedBy?: string;
 }
 
 export interface DeleteDataFilePlan {
@@ -21,30 +22,43 @@ export interface DeleteDataFilePlan {
 export interface DataFile {
   id: string;
   title: string;
-  filename: string;
+  fileName: string;
   fileSize: {
     size: number;
     unit: string;
   };
   rows: number;
   metaFileId: string;
-  metadataFilename: string;
+  metaFileName: string;
   userName: string;
+  status: ImportStatusCode;
+  replacedBy?: string;
   created?: string;
   canDelete?: boolean;
   isDeleting?: boolean;
 }
 
-export interface UploadDataFilesRequest {
-  name: string;
-  dataFile: File;
-  metadataFile: File;
-}
+export type UploadDataFilesRequest =
+  | {
+      name: string;
+      dataFile: File;
+      metadataFile: File;
+    }
+  | {
+      replacingFileId: string;
+      dataFile: File;
+      metadataFile: File;
+    };
 
-export interface UploadZipDataFileRequest {
-  name: string;
-  zipFile: File;
-}
+export type UploadZipDataFileRequest =
+  | {
+      name: string;
+      zipFile: File;
+    }
+  | {
+      replacingFileId: string;
+      zipFile: File;
+    };
 
 export type ImportStatusCode =
   | 'COMPLETE'
@@ -57,14 +71,10 @@ export type ImportStatusCode =
   | 'NOT_FOUND'
   | 'FAILED';
 
-export interface Errors {
-  Message: string;
-}
-
 export interface DataFileImportStatus {
   status: ImportStatusCode;
   percentageComplete?: string;
-  errors?: Errors[];
+  errors?: string[];
   numberOfRows: number;
 }
 
@@ -74,17 +84,19 @@ function mapFile(file: DataFileInfo): DataFile {
   return {
     id: file.id,
     title: file.name,
-    filename: file.fileName,
+    fileName: file.fileName,
     rows: file.rows || 0,
     fileSize: {
       size: parseInt(size, 10),
       unit,
     },
     metaFileId: file.metaFileId,
-    metadataFilename: file.metaFileName,
+    metaFileName: file.metaFileName,
+    replacedBy: file.replacedBy,
     canDelete: true,
     userName: file.userName,
     created: file.created,
+    status: file.status,
   };
 }
 
@@ -106,17 +118,17 @@ const releaseDataFileService = {
     releaseId: string,
     request: UploadDataFilesRequest,
   ): Promise<DataFile> {
+    const { dataFile, metadataFile, ...params } = request;
+
     const data = new FormData();
-    data.append('file', request.dataFile);
-    data.append('metaFile', request.metadataFile);
+    data.append('file', dataFile);
+    data.append('metaFile', metadataFile);
 
     const file = await client.post<DataFileInfo>(
       `/release/${releaseId}/data`,
       data,
       {
-        params: {
-          name: request.name,
-        },
+        params,
       },
     );
 
@@ -126,16 +138,16 @@ const releaseDataFileService = {
     releaseId: string,
     request: UploadZipDataFileRequest,
   ): Promise<DataFile> {
+    const { zipFile, ...params } = request;
+
     const data = new FormData();
-    data.append('zipFile', request.zipFile);
+    data.append('zipFile', zipFile);
 
     const file = await client.post<DataFileInfo>(
       `/release/${releaseId}/zip-data`,
       data,
       {
-        params: {
-          name: request.name,
-        },
+        params,
       },
     );
 
@@ -158,7 +170,7 @@ const releaseDataFileService = {
         return {
           ...importStatus,
           errors: JSON.parse(importStatus.errors || '[]').map(
-            ({ Message }: Errors) => Message,
+            ({ Message }: { Message: string }) => Message,
           ),
         };
       });
@@ -172,8 +184,8 @@ const releaseDataFileService = {
       `/release/${releaseId}/data/${dataFile.id}/delete-plan`,
     );
   },
-  deleteDataFiles(releaseId: string, dataFile: DataFile): Promise<void> {
-    return client.delete<void>(`/release/${releaseId}/data/${dataFile.id}`);
+  deleteDataFiles(releaseId: string, fileId: string): Promise<void> {
+    return client.delete<void>(`/release/${releaseId}/data/${fileId}`);
   },
   downloadFile(releaseId: string, id: string, fileName: string): Promise<void> {
     return client

@@ -1,6 +1,7 @@
 *** Settings ***
 Resource    ../../libs/admin-common.robot
 Library  Collections
+Library  ../../libs/api_keywords.py
 
 Force Tags  Admin  Local  Dev  AltersData
 
@@ -12,29 +13,16 @@ ${TOPIC_NAME}        %{TEST_TOPIC_NAME}
 ${PUBLICATION_NAME}  UI tests - upload files %{RUN_IDENTIFIER}
 
 *** Test Cases ***
-Create Manage content test publication
+Create test publication and release via api
     [Tags]  HappyPath
-    user selects theme "Test theme" and topic "${TOPIC_NAME}" from the admin dashboard
-    user waits until page contains link    Create new publication     60
-    user clicks link  Create new publication
-    user creates publication    ${PUBLICATION_NAME}
+    ${PUBLICATION_ID}=  user creates test publication via api   ${PUBLICATION_NAME}
+    user create test release via api  ${PUBLICATION_ID}   AY    2025
 
-Verify Manage content test publication is created
+Navigate to 'Data and files' page
     [Tags]  HappyPath
-    user waits until page contains accordion section  ${PUBLICATION_NAME}
-    user opens accordion section  ${PUBLICATION_NAME}
-    user waits until accordion section contains text  ${PUBLICATION_NAME}    Methodology
-    user waits until accordion section contains text  ${PUBLICATION_NAME}    Releases
+    user navigates to release summary from admin dashboard  ${PUBLICATION_NAME}   Academic Year 2025/26 (not Live)
 
-Create release
-    [Tags]  HappyPath
-    user clicks testid element   Create new release link for ${PUBLICATION_NAME}
-    user creates release for publication  ${PUBLICATION_NAME}  Academic Year  2025
-    user checks summary list contains  Publication title  ${PUBLICATION_NAME}
-
-Navigate to Manage data tab
-    [Tags]  HappyPath
-    user clicks link  Manage data
+    user clicks link  Data and files
     user waits until h1 is visible  ${PUBLICATION_NAME}
 
 Upload a ZIP file subject
@@ -51,25 +39,25 @@ Upload a ZIP file subject
     user opens accordion section   Absence in PRUs
 
     ${section}=  user gets accordion section content element  Absence in PRUs
-    user checks summary list contains  Subject title    Absence in PRUs  ${section}
-    user checks summary list contains  Data file        absence_in_prus.csv  ${section}
-    user checks summary list contains  Metadata file    absence_in_prus.meta.csv  ${section}
-    user checks summary list contains  Status           Complete  ${section}  180
+    user checks headed table body row contains  Subject title    Absence in PRUs  ${section}
+    user checks headed table body row contains  Data file        absence_in_prus.csv  ${section}
+    user checks headed table body row contains  Metadata file    absence_in_prus.meta.csv  ${section}
+    user checks headed table body row contains  Status           Complete  ${section}  180
 
     # EES-1397
-    #user checks summary list contains  Number of rows   613  ${section}
-    #user checks summary list contains  Data file size   141 Kb  ${section}
+    #user checks headed table body row contains  Number of rows   613  ${section}
+    #user checks headed table body row contains  Data file size   141 Kb  ${section}
 
-Check Absence in PRUs subject appears in Manage data blocks tab
+Check Absence in PRUs subject appears in 'Data blocks' page
     [Tags]  HappyPath
-    user clicks link   Manage data blocks
+    user clicks link   Data blocks
     user waits until h2 is visible   Choose a subject
 
     user waits until page contains  Absence in PRUs
 
-Navigate to Manage data - File uploads tab
+Navigate to 'Data and files' page - 'File uploads' tab
     [Tags]  HappyPath
-    user clicks link  Manage data
+    user clicks link  Data and files
     user waits until h2 is visible   Add data file to release
     user clicks link  File uploads
     user waits until h2 is visible  Add file to release
