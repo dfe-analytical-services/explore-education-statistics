@@ -204,9 +204,9 @@ Verify release is scheduled
 
 Wait for release process status to be Complete
     [Tags]  HappyPath
-    # EES-1007 - Release process status doesn't automatically update
     user waits for release process status to be  Complete    ${release_complete_wait}
-    user checks page does not contain button  Edit release status
+    user reloads page  # EES-1448
+    user waits until page does not contain button  Edit release status
 
 User goes to public Find Statistics page
     [Tags]  HappyPath
@@ -376,7 +376,7 @@ Upload replacement data
     user checks headed table body row cell contains  Metadata file   1  dates.meta.csv
     user checks headed table body row cell contains  Number of rows  1  119
     user checks headed table body row cell contains  Data file size  1  17 Kb
-    user checks headed table body row cell contains  Status          1  Complete   wait=180
+    user checks headed table body row cell contains  Status          1  Data replacement in progress   wait=180
 
     user checks headed table body row cell contains  Subject title   2  Dates test subject
     user checks headed table body row cell contains  Data file       2  dates-replacement.csv
@@ -390,13 +390,13 @@ Confirm data replacement
     user waits until page contains  Data blocks: OK
     user waits until page contains  Footnotes: OK
     user clicks button  Confirm data replacement
-    user waits until h2 is visible  Upload replacement data
-    user clicks link  Back
+    user waits until h2 is visible  Data replacement complete
 
 # TODO: Add footnotes
 
 Add ancillary file to amendment
     [Tags]  HappyPath
+    user clicks link  Data and files
     user clicks link  File uploads
     user waits until h2 is visible  Add file to release
 
@@ -507,6 +507,7 @@ Wait for release process status to be Complete again
     user checks summary list contains  Current status  Approved
     user checks summary list contains  Scheduled release  ${PUBLISH_DATE_DAY} ${PUBLISH_DATE_MONTH} ${PUBLISH_DATE_YEAR}
     user waits for release process status to be  Complete    ${release_complete_wait}
+    user reloads page  # EES-1448
     user checks page does not contain button  Edit release status
 
 Go back to public find-statistics page
