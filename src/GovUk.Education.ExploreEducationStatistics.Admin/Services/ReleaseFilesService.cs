@@ -196,22 +196,21 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Services
                             return await ValidateSubjectName(releaseId, subjectName, replacingFile)
                                 .OnSuccess(validSubjectName =>
                                     _dataArchiveValidationService.ValidateDataArchiveFile(releaseId, zipFile)
-                                .OnSuccess(async dataFiles =>
+                                .OnSuccess(async archiveFile =>
                                 {
-                                    var dataFile = dataFiles.Item1;
-                                    var metadataFile = dataFiles.Item2;
                                     var dataInfo = GetDataFileMetaValues(
-                                        name: subjectName,
-                                        metaFileName: metadataFile.Name,
+                                        name: validSubjectName,
+                                        metaFileName: archiveFile.MetaFileName,
                                         userName: userName,
                                         numberOfRows: 0
                                     );
 
                                     return await _fileUploadsValidatorService
-                                        .ValidateDataArchiveEntriesForUpload(releaseId, dataFile, metadataFile)
+                                        .ValidateDataArchiveEntriesForUpload(releaseId, archiveFile)
                                         .OnSuccess(async () =>
-                                            await _importService.CreateImportTableRow(releaseId,
-                                                dataFile.Name.ToLower()))
+                                            await _importService.CreateImportTableRow(
+                                                releaseId,
+                                                archiveFile.DataFileName))
                                         .OnSuccess(async () =>
                                         {
                                             var source = await CreateOrUpdateFileReference(
@@ -219,8 +218,8 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Services
                                                 releaseId: releaseId,
                                                 type: ReleaseFileTypes.DataZip);
 
-                                            await CreateOrUpdateFileReference(
-                                                filename: dataFile.Name.ToLower(),
+                                            var dataFileReference = await CreateOrUpdateFileReference(
+                                                filename: archiveFile.DataFileName,
                                                 releaseId: releaseId,
                                                 type: ReleaseFileTypes.Data,
                                                 id: null,
@@ -228,7 +227,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Services
                                                 source: source);
 
                                             var metaFileReference = await CreateOrUpdateFileReference(
-                                                filename: metadataFile.Name.ToLower(),
+                                                filename: archiveFile.MetaFileName,
                                                 releaseId: releaseId,
                                                 type: ReleaseFileTypes.Metadata,
                                                 id: null,
@@ -239,8 +238,12 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Services
                                             await UploadFileToStorage(releaseId, zipFile, ReleaseFileTypes.DataZip,
                                                 dataInfo);
 
-                                            await _importService.Import(releaseId, dataFile.Name.ToLower(),
-                                                metadataFile.Name.ToLower(), zipFile, true);
+                                            await _importService.Import(
+                                                releaseId,
+                                                dataFileName: archiveFile.DataFileName,
+                                                metaFileName: archiveFile.MetaFileName,
+                                                zipFile,
+                                                true);
 
                                             var blob = await _blobStorageService.GetBlob(
                                                 PrivateFilesContainerName,
@@ -251,10 +254,10 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Services
                                             {
                                                 // TODO size and rows are for zip file but they need to be for
                                                 // the datafile which isn't extracted yet
-                                                Id = source.Id,
-                                                Extension = blob.Extension,
-                                                Name = blob.Name,
-                                                Path = dataFile.Name.ToLower(),
+                                                Id = dataFileReference.Id,
+                                                Extension = dataFileReference.Extension,
+                                                Name = validSubjectName,
+                                                Path = dataFileReference.Filename,
                                                 Size = blob.Size,
                                                 MetaFileId = metaFileReference.Id,
                                                 MetaFileName = blob.GetMetaFileName(),
@@ -478,7 +481,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Services
                                 return new FileInfo
                                 {
                                     Id = fileReference.Id,
-                                    Extension = Path.GetExtension(fileReference.Filename),
+                                    Extension = fileReference.Extension,
                                     Name = "Unknown",
                                     Path = fileReference.Filename,
                                     Size = "0.00 B"
@@ -715,12 +718,12 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Services
                 if (await _blobStorageService.CheckBlobExists(PrivateFilesContainerName, sourceBlobPath))
                 {
                     var zipBlob = await _blobStorageService.GetBlob(PrivateFilesContainerName, sourceBlobPath);
-                    var importStatus = await _importStatusService.GetImportStatus(releaseId, zipBlob.FileName);
+                    var importStatus = await _importStatusService.GetImportStatus(releaseId, fileReference.Filename);
 
                     return new DataFileInfo
                     {
                         Id = fileReference.Id,
-                        Extension = Path.GetExtension(fileReference.Filename)?.TrimStart('.') ?? string.Empty,
+                        Extension = fileReference.Extension,
                         Name = zipBlob.Name,
                         Path = fileReference.Filename,
                         Size = zipBlob.Size,
@@ -759,7 +762,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Services
             {
                 Id = fileReference.Id,
                 Name = await GetSubjectName(fileReference),
-                Extension = Path.GetExtension(fileReference.Filename)?.TrimStart('.') ?? string.Empty,
+                Extension = fileReference.Extension,
                 Path = fileReference.Filename,
                 Size = "0.00 B",
                 MetaFileId = metaFileReference?.Id,
@@ -913,8 +916,10 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Services
 
         private string AdminReleasePathWithFileReference(ReleaseFileReference fileReference)
         {
-            return AdminReleasePath(fileReference.ReleaseId, fileReference.ReleaseFileType,
-                fileReference.ReleaseFileType == ReleaseFileTypes.Chart ? fileReference.Id.ToString() : fileReference.Filename);
+            return AdminReleasePath(
+                fileReference.ReleaseId,
+                fileReference.ReleaseFileType,
+                fileReference.BlobStorageName);
         }
 
         private async Task<ReleaseFileReference> GetAssociatedReleaseFileReference(ReleaseFileReference releaseFileReference, ReleaseFileTypes associatedType)

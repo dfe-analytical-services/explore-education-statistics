@@ -48,6 +48,11 @@ namespace GovUk.Education.ExploreEducationStatistics.Common.Services
             };
         }
 
+        public static string GetExtension(string fileName)
+        {
+            return Path.GetExtension(fileName)?.TrimStart('.') ?? string.Empty;
+        }
+
         public static string GetSize(long contentLength)
         {
             var fileSize = contentLength;

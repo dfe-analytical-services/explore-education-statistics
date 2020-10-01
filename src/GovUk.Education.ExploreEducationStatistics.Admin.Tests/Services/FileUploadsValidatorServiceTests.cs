@@ -32,7 +32,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
 
             var result = await service.ValidateFileForUpload(Guid.NewGuid(),
                 file, ReleaseFileTypes.Ancillary, true);
-            
+
             Assert.True(result.IsLeft);
             AssertValidationProblem(result.Left, FileCannotBeEmpty);
         }
@@ -163,7 +163,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
                 AssertValidationProblem(result.Left, SubjectTitleCannotContainSpecialCharacters);
             }
         }
-        
+
         [Fact]
         public async Task ValidateSubjectName_SubjectNameNotUnique()
         {
@@ -276,7 +276,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
                 fileTypeService
                     .Setup(s => s.HasMatchingEncodingType(metaFile, It.IsAny<IEnumerable<string>>()))
                     .Returns(() => true);
-                
+
                 var result = await service.ValidateDataFilesForUpload(Guid.NewGuid(), dataFile, metaFile);
 
                 Assert.True(result.IsLeft);
@@ -308,7 +308,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
                 fileTypeService
                     .Setup(s => s.HasMatchingEncodingType(metaFile, It.IsAny<IEnumerable<string>>()))
                     .Returns(() => true);
-                
+
                 var result = await service.ValidateDataFilesForUpload(Guid.NewGuid(), dataFile, metaFile);
 
                 Assert.True(result.IsLeft);
@@ -325,7 +325,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
             {
                 var service = new FileUploadsValidatorService(subjectService.Object, fileTypeService.Object, context);
 
-                var (dataFile, metaFile) = GetArchiveEntries("data-zip-valid.zip");
+                var archiveFile = GetArchiveFile("data-zip-valid.zip");
 
                 fileTypeService
                     .Setup(s => s.HasMatchingMimeType(It.IsAny<Stream>(),
@@ -333,7 +333,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
                     .ReturnsAsync(() => true);
 
                 var result = await service.ValidateDataArchiveEntriesForUpload(Guid.NewGuid(),
-                    dataFile, metaFile);
+                    archiveFile);
 
                 Assert.True(result.IsRight);
             }
@@ -348,7 +348,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
             {
                 var service = new FileUploadsValidatorService(subjectService.Object, fileTypeService.Object, context);
 
-                var (dataFile, metaFile) = GetArchiveEntries("data-zip-invalid.zip");
+                var archiveFile = GetArchiveFile("data-zip-invalid.zip");
 
                 fileTypeService
                     .Setup(s => s.HasMatchingMimeType(It.IsAny<Stream>(),
@@ -356,7 +356,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
                     .ReturnsAsync(() => true);
 
                 var result = await service.ValidateDataArchiveEntriesForUpload(Guid.NewGuid(),
-                    dataFile,metaFile);
+                    archiveFile);
 
                 Assert.True(result.IsLeft);
                 AssertValidationProblem(result.Left, DataFileMustBeCsvFile);
@@ -375,7 +375,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
         {
             return CreateFormFile(fileName, name, "line1");
         }
-        
+
         private static IFormFile CreateFormFile(string fileName, string name, params string[] lines)
         {
             var mStream = new MemoryStream();
@@ -396,7 +396,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
             return f;
         }
 
-        private static Tuple<ZipArchiveEntry, ZipArchiveEntry> GetArchiveEntries(string archiveFileName)
+        private static DataArchiveFile GetArchiveFile(string archiveFileName)
         {
             var archiveFile = CreateFormFileFromResource(archiveFileName);
 
@@ -409,7 +409,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
             var dataFile = file1.Name.Contains(".meta.") ? file2 : file1;
             var metaFile = file1.Name.Contains(".meta.") ? file1 : file2;
 
-            return new Tuple<ZipArchiveEntry, ZipArchiveEntry>(dataFile, metaFile);
+            return new DataArchiveFile(dataFile, metaFile);
         }
 
         private static IFormFile CreateFormFileFromResource(string fileName)

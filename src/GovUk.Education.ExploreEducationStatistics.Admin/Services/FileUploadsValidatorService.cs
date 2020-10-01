@@ -1,6 +1,5 @@
 using System;
 using System.IO;
-using System.IO.Compression;
 using System.Linq;
 using System.Threading.Tasks;
 using GovUk.Education.ExploreEducationStatistics.Admin.Services.Interfaces;
@@ -41,12 +40,12 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Services
                 .OnSuccess(async _ => await ValidateDataFileTypes(dataFile, metaFile));
         }
 
-        public async Task<Either<ActionResult, Unit>> ValidateDataArchiveEntriesForUpload(Guid releaseId,
-            ZipArchiveEntry dataFile,
-            ZipArchiveEntry metaFile)
+        public async Task<Either<ActionResult, Unit>> ValidateDataArchiveEntriesForUpload(
+            Guid releaseId,
+            IDataArchiveFile archiveFile)
         {
-            return await ValidateDataFileNames(releaseId, dataFile.Name, metaFile.Name)
-                .OnSuccess(async _ => await ValidateDataFileSizes(dataFile.Length, metaFile.Length));
+            return await ValidateDataFileNames(releaseId, archiveFile.DataFileName, archiveFile.MetaFileName)
+                .OnSuccess(async _ => await ValidateDataFileSizes(archiveFile.DataFileSize, archiveFile.MetaFileSize));
         }
 
         public async Task<Either<ActionResult, Unit>> ValidateFileForUpload(Guid releaseId, IFormFile file,
@@ -57,12 +56,12 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Services
             {
                 return ValidationActionResult(FileCannotBeEmpty);
             }
-            
+
             if (FileContainsSpacesOrSpecialChars(file.FileName))
             {
                 return ValidationActionResult(FilenameCannotContainSpacesOrSpecialCharacters);
             }
-            
+
             if (!overwrite && IsFileExisting(releaseId, type, file.FileName))
             {
                 return ValidationActionResult(CannotOverwriteFile);
@@ -70,7 +69,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Services
 
             return Unit.Instance;
         }
-        
+
         public async Task<Either<ActionResult, Unit>> ValidateFileUploadName(string name)
         {
             if (FileContainsSpecialChars(name))
@@ -87,7 +86,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Services
             {
                 return ValidationActionResult(SubjectTitleCannotContainSpecialCharacters);
             }
-            
+
             if (await _subjectService.GetAsync(releaseId, name) != null)
             {
                 return ValidationActionResult(SubjectTitleMustBeUnique);
@@ -101,12 +100,12 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Services
             IFormFile file, ReleaseFileTypes type)
         {
             var allowedMimeTypes = AllowedMimeTypesByFileType[type];
-            
+
             if (!await _fileTypeService.HasMatchingMimeType(file, allowedMimeTypes))
             {
                 return ValidationActionResult(FileTypeInvalid);
             }
-            
+
             if (type == ReleaseFileTypes.Data)
             {
                 return ValidationActionResult(CannotUseGenericFunctionToAddDataFile);
@@ -117,7 +116,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Services
 
         private async Task<bool> IsCsvFile(IFormFile file)
         {
-            return await _fileTypeService.HasMatchingMimeType(file, AllowedMimeTypesByFileType[ReleaseFileTypes.Data]) 
+            return await _fileTypeService.HasMatchingMimeType(file, AllowedMimeTypesByFileType[ReleaseFileTypes.Data])
                    && _fileTypeService.HasMatchingEncodingType(file, CsvEncodingTypes);
         }
 
@@ -126,7 +125,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Services
             return filename.IndexOf(" ", Ordinal) > -1 ||
                    FileContainsSpecialChars(filename);
         }
-        
+
         private bool FileContainsSpecialChars(string filename)
         {
             return filename.IndexOf("&", Ordinal) > -1 ||
@@ -160,7 +159,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Services
             {
                 return ValidationActionResult(MetaFilenameCannotContainSpacesOrSpecialCharacters);
             }
-            
+
             if (!metaFileName.ToLower().Contains(".meta."))
             {
                 return ValidationActionResult(MetaFileIsIncorrectlyNamed);
@@ -175,7 +174,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Services
             {
                 return ValidationActionResult(MetaFileMustBeCsvFile);
             }
-            
+
             if (IsFileExisting(releaseId, ReleaseFileTypes.Data, dataFileName))
             {
                 return ValidationActionResult(CannotOverwriteDataFile);
@@ -204,7 +203,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Services
 
             return Unit.Instance;
         }
-        
+
         private async Task<Either<ActionResult, Unit>> ValidateDataFileTypes(IFormFile dataFile, IFormFile metaFile)
         {
             if (!await IsCsvFile(dataFile))
@@ -219,7 +218,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Services
 
             return Unit.Instance;
         }
-        
+
         private static bool ValidateFileExtension(string fileName, string requiredExtension)
         {
             return fileName.EndsWith(requiredExtension);
