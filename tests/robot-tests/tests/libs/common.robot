@@ -303,6 +303,10 @@ user checks page does not contain button
     [Arguments]  ${text}
     user checks page does not contain element  xpath://button[text()="${text}"]
 
+user waits until page does not contain button
+    [Arguments]   ${text}
+    user waits until page does not contain element  xpath://button[text()="${text}"]
+
 user waits until button is enabled
     [Arguments]   ${text}
     user waits until element is enabled  xpath://button[text()="${text}"]
