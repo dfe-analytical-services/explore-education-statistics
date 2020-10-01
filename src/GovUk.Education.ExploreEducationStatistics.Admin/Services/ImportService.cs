@@ -31,7 +31,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Services
         private readonly ILogger _logger;
         private readonly IGuidGenerator _guidGenerator;
         private readonly ITableStorageService _tableStorageService;
-        
+
         public ImportService(ContentDbContext contentDbContext,
             IMapper mapper,
             ILogger<ImportService> logger,
@@ -59,23 +59,23 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Services
             // TODO - EES-1250
             var numRows = isZip ? 0 : FileStorageUtils.CalculateNumberOfRows(dataFile.OpenReadStream());
             var message = BuildMessage(dataFileName, metaFileName, releaseId, isZip ? dataFile.FileName.ToLower() : "");
-            
+
             await UpdateImportTableRow(
                 releaseId,
                 dataFileName,
                 numRows,
                 message);
-            
+
             pQueue.AddMessage(new CloudQueueMessage(JsonConvert.SerializeObject(message)));
 
             _logger.LogInformation($"Sent import message for data file: {dataFileName}, releaseId: {releaseId}");
         }
 
-        public async Task<Either<ActionResult, bool>> CreateImportTableRow(Guid releaseId, string dataFileName)
+        public async Task<Either<ActionResult, Unit>> CreateImportTableRow(Guid releaseId, string dataFileName)
         {
             var result = await _tableStorageService.RetrieveEntity(DatafileImportsTableName,
                 new DatafileImport(releaseId.ToString(), dataFileName), new List<string>());
-            
+
             if (result.Result != null)
             {
                 return ValidationActionResult(DataFileAlreadyUploaded);
@@ -84,7 +84,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Services
             await _tableStorageService.CreateOrUpdateEntity(DatafileImportsTableName,
                 new DatafileImport(releaseId.ToString(), dataFileName));
 
-            return true;
+            return Unit.Instance;
         }
 
         public async Task RemoveImportTableRowIfExists(Guid releaseId, string dataFileName)
@@ -92,7 +92,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Services
             await _tableStorageService.DeleteEntityAsync(DatafileImportsTableName,
                 new DatafileImport(releaseId.ToString(), dataFileName));
         }
-        
+
         public async Task FailImport(Guid releaseId, string dataFileName, IEnumerable<ValidationError> errors)
         {
             await _tableStorageService.CreateOrUpdateEntity(DatafileImportsTableName,
@@ -116,7 +116,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Services
                 .FirstOrDefault();
 
             var importMessageRelease = _mapper.Map<Release>(release);
-            
+
             return new ImportMessage
             {
                 SubjectId = _guidGenerator.NewGuid(),
@@ -130,7 +130,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Services
             };
         }
     }
-    
+
     public class ValidationError
     {
         public string Message { get; set; }
