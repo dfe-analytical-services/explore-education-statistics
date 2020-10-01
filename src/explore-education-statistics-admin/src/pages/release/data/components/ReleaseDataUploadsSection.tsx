@@ -3,6 +3,7 @@ import DataFileDetailsTable from '@admin/pages/release/data/components/DataFileD
 import DataFileUploadForm, {
   DataFileUploadFormValues,
 } from '@admin/pages/release/data/components/DataFileUploadForm';
+import { terminalImportStatuses } from '@admin/pages/release/data/components/ImporterStatus';
 import {
   releaseDataFileRoute,
   ReleaseDataFileRouteParams,
@@ -94,11 +95,7 @@ const ReleaseDataUploadsSection = ({
           ? file
           : {
               ...file,
-              canDelete:
-                status &&
-                (status === 'NOT_FOUND' ||
-                  status === 'COMPLETE' ||
-                  status === 'FAILED'),
+              status,
             },
       ),
     });
@@ -224,37 +221,41 @@ const ReleaseDataUploadsSection = ({
                     releaseId={releaseId}
                     onStatusChange={handleStatusChange}
                   >
-                    {canUpdateRelease && dataFile.canDelete && (
-                      <>
-                        <Link
-                          className="govuk-!-margin-right-4"
-                          to={generatePath<ReleaseDataFileRouteParams>(
-                            releaseDataFileRoute.path,
-                            {
-                              publicationId,
-                              releaseId,
-                              fileId: dataFile.id,
-                            },
+                    {canUpdateRelease &&
+                      terminalImportStatuses.includes(dataFile.status) && (
+                        <>
+                          {dataFile.status === 'COMPLETE' && (
+                            <Link
+                              className="govuk-!-margin-right-4"
+                              to={generatePath<ReleaseDataFileRouteParams>(
+                                releaseDataFileRoute.path,
+                                {
+                                  publicationId,
+                                  releaseId,
+                                  fileId: dataFile.id,
+                                },
+                              )}
+                            >
+                              Replace data
+                            </Link>
                           )}
-                        >
-                          Replace data
-                        </Link>
-                        <ButtonText
-                          onClick={() =>
-                            releaseDataFileService
-                              .getDeleteDataFilePlan(releaseId, dataFile)
-                              .then(plan => {
-                                setDeleteDataFile({
-                                  plan,
-                                  file: dataFile,
-                                });
-                              })
-                          }
-                        >
-                          Delete files
-                        </ButtonText>
-                      </>
-                    )}
+
+                          <ButtonText
+                            onClick={() =>
+                              releaseDataFileService
+                                .getDeleteDataFilePlan(releaseId, dataFile)
+                                .then(plan => {
+                                  setDeleteDataFile({
+                                    plan,
+                                    file: dataFile,
+                                  });
+                                })
+                            }
+                          >
+                            Delete files
+                          </ButtonText>
+                        </>
+                      )}
                   </DataFileDetailsTable>
                 </div>
               </AccordionSection>

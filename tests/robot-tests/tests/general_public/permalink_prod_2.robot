@@ -34,23 +34,23 @@ Validate miscellaneous
 
 Validate table
     [Tags]  HappyPath
-    user checks table column heading contains  css:table  1   1   2013/14
-    user checks table column heading contains  css:table  1   2   2014/15
-    user checks table column heading contains  css:table  1   3   2015/16
+    user checks table column heading contains  1   1   2013/14
+    user checks table column heading contains  1   2   2014/15
+    user checks table column heading contains  1   3   2015/16
 
-    ${row}=  user gets row with group and indicator   xpath://table  England   Number of fixed period exclusions
+    ${row}=  user gets row with group and indicator   England   Number of fixed period exclusions
     user checks row contains heading  ${row}  Number of fixed period exclusions
     user checks row cell contains text  ${row}    1     269,475
     user checks row cell contains text  ${row}    2     302,975
     user checks row cell contains text  ${row}    3     339,360
 
-    ${row}=  user gets row with group and indicator   xpath://table  England   Number of permanent exclusions
+    ${row}=  user gets row with group and indicator   England   Number of permanent exclusions
     user checks row contains heading  ${row}  Number of permanent exclusions
     user checks row cell contains text  ${row}    1     4,950
     user checks row cell contains text  ${row}    2     5,795
     user checks row cell contains text  ${row}    3     6,685
 
-    ${row}=  user gets row with group and indicator   xpath://table  England   Number of pupils
+    ${row}=  user gets row with group and indicator   England   Number of pupils
     user checks row contains heading  ${row}  Number of pupils
     user checks row cell contains text  ${row}    1     7,698,310
     user checks row cell contains text  ${row}    2     7,799,005

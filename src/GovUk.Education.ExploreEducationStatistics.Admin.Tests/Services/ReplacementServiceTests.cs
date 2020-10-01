@@ -1980,7 +1980,10 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
 
                 // Check that the original file was unlinked from the replacement before the mock call to remove it.
                 Assert.Null((await contentDbContext.ReleaseFileReferences.FindAsync(originalReleaseFileReference.Id))
-                    .ReplacedBy);
+                    .ReplacedById);
+                // Check that the replacement file was unlinked from the original.
+                Assert.Null((await contentDbContext.ReleaseFileReferences.FindAsync(replacementReleaseFileReference.Id))
+                    .ReplacingId);
 
                 var replacedDataBlock = await contentDbContext.DataBlocks.FindAsync(dataBlock.Id);
                 Assert.NotNull(replacedDataBlock);

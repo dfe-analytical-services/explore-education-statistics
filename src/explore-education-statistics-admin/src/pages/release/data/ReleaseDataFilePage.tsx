@@ -3,7 +3,7 @@ import DataFileReplacementPlan from '@admin/pages/release/data/components/DataFi
 import DataFileDetailsTable from '@admin/pages/release/data/components/DataFileDetailsTable';
 import DataFileUploadForm from '@admin/pages/release/data/components/DataFileUploadForm';
 import {
-  releaseDataFileRoute,
+  releaseDataFileReplacementCompleteRoute,
   ReleaseDataFileRouteParams,
   releaseDataRoute,
   ReleaseRouteParams,
@@ -160,10 +160,6 @@ const ReleaseDataFilePage = ({
               <section>
                 <h2>Pending data replacement</h2>
 
-                <p>
-                  <Tag>Data replacement in progress</Tag>
-                </p>
-
                 {getReplacementPlanMessage()}
 
                 {replacementDataFile?.status === 'COMPLETE' && (
@@ -176,7 +172,7 @@ const ReleaseDataFilePage = ({
                     onReplacement={() => {
                       history.push(
                         generatePath<ReleaseDataFileRouteParams>(
-                          releaseDataFileRoute.path,
+                          releaseDataFileReplacementCompleteRoute.path,
                           {
                             publicationId,
                             releaseId,

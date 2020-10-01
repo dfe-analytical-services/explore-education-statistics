@@ -250,6 +250,8 @@ user adds content to accordion section text block
     ${section}=  user gets accordion section content element  ${section_name}
     ${block}=  get child element  ${section}  css:[data-testid="editableSectionBlock"]:nth-of-type(${block_num})
     user clicks button  Edit block  ${block}
+    user presses keys  CTRL+a
+    user presses keys  BACKSPACE
     user presses keys  ${content}
     user clicks button  Save  ${block}
     user waits until element contains  ${block}  ${content}

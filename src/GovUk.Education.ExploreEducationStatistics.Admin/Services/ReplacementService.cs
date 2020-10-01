@@ -358,7 +358,14 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Services
                                 .OrderBy(group => group.Key.Label, LabelComparer)
                                 .ToDictionary(
                                     group => group.Key.Id,
-                                    group => ValidateFilterGroupForReplacement(group.Key, replacementSubjectMeta)
+                                    group => ValidateFilterGroupForReplacement(
+                                        new FilterGroup
+                                        {
+                                            Id = group.Key.Id,
+                                            Label = group.Key.Label,
+                                            FilterItems = filter.ToList()
+                                        },
+                                        replacementSubjectMeta)
                                 )
                         );
                     }
@@ -760,8 +767,10 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Services
             });
         }
 
-        private async Task<Either<ActionResult, Unit>> RemoveOriginalSubjectAndFileFromRelease(Guid releaseId,
-            Guid originalFileId, Guid replacementFileId)
+        private async Task<Either<ActionResult, Unit>> RemoveOriginalSubjectAndFileFromRelease(
+            Guid releaseId,
+            Guid originalFileId,
+            Guid replacementFileId)
         {
             // First, unlink the original file from the replacement before removing it.
             // Ordinarily, removing a file from a Release deletes any associated replacement
@@ -769,15 +778,23 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Services
             return await CheckReleaseFileReferenceExists(originalFileId)
                 .OnSuccessVoid(async originalFile =>
                 {
-                    if (originalFile.ReplacedById != replacementFileId)
-                    {
-                        throw new InvalidOperationException(
-                            $"Expected the original file reference to be associated with the replacement but found: {originalFile.ReplacedById}");
-                    }
+                    await CheckReleaseFileReferenceExists(replacementFileId)
+                        .OnSuccessVoid(
+                            async replacementFile =>
+                            {
+                                if (originalFile.ReplacedById != replacementFile.Id)
+                                {
+                                    throw new InvalidOperationException(
+                                        $"Expected the original file reference to be associated with the replacement but found: {originalFile.ReplacedById}");
+                                }
 
-                    _contentDbContext.Update(originalFile);
-                    originalFile.ReplacedById = null;
-                    await _contentDbContext.SaveChangesAsync();
+                                originalFile.ReplacedById = null;
+                                replacementFile.ReplacingId = null;
+                                _contentDbContext.Update(originalFile);
+                                _contentDbContext.Update(replacementFile);
+
+                                await _contentDbContext.SaveChangesAsync();
+                            });
                 })
                 .OnSuccess(async _ => await _releaseService.RemoveDataFiles(releaseId, originalFileId));
         }

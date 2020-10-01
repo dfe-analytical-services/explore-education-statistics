@@ -86,7 +86,7 @@ const DataFileDetailsTable = ({
               onClick={() =>
                 releaseDataFileService.downloadFile(
                   releaseId,
-                  dataFile.id,
+                  dataFile.metaFileId,
                   dataFile.metaFileName,
                 )
               }
@@ -100,7 +100,7 @@ const DataFileDetailsTable = ({
                 onClick={() =>
                   releaseDataFileService.downloadFile(
                     releaseId,
-                    replacementDataFile.id,
+                    replacementDataFile.metaFileId,
                     replacementDataFile.metaFileName,
                   )
                 }

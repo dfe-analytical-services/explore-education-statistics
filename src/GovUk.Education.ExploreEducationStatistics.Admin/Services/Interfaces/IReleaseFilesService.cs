@@ -31,15 +31,22 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Services.Interfaces
 
         Task<Either<ActionResult, FileInfo>> UploadChartFile(Guid releaseId, IFormFile file, Guid? id = null);
 
-        Task<Either<ActionResult, bool>> DeleteNonDataFile(Guid releaseId, ReleaseFileTypes type, string fileName);
+        Task<Either<ActionResult, Unit>> DeleteNonDataFile(
+            Guid releaseId,
+            ReleaseFileTypes type,
+            string fileName,
+            bool forceDelete = false);
 
-        Task<Either<ActionResult, bool>> DeleteChartFile(Guid releaseId, Guid id);
+        Task<Either<ActionResult, Unit>> DeleteChartFile(Guid releaseId, Guid id, bool forceDelete = false);
 
-        Task<Either<ActionResult, bool>> DeleteChartFiles(Guid releaseId, IEnumerable<Guid> fileIds);
+        Task<Either<ActionResult, Unit>> DeleteChartFiles(
+            Guid releaseId,
+            IEnumerable<Guid> fileIds,
+            bool forceDelete = false);
 
-        Task<Either<ActionResult, Unit>> DeleteDataFiles(Guid releaseId, Guid fileId);
+        Task<Either<ActionResult, Unit>> DeleteDataFiles(Guid releaseId, Guid fileId, bool forceDelete = false);
 
-        Task<Either<ActionResult, Unit>> DeleteAllFiles(Guid releaseId);
+        Task<Either<ActionResult, Unit>> DeleteAllFiles(Guid releaseId, bool forceDelete = false);
 
         Task<Either<ActionResult, FileStreamResult>> StreamFile(Guid releaseId, Guid id);
     }

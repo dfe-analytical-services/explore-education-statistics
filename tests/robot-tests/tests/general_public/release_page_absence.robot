@@ -159,13 +159,13 @@ Validate Key Statistics data block -- Data tables tab
    user clicks element   css:#releaseHeadlines-tables-tab
    user waits until element contains   css:#dataTableCaption    Table showing 'Absence by characteristic' from 'Pupil absence in schools in England' in England between 2012/13 and 2016/17
 
-   user checks table column heading contains  css:#releaseHeadlines-tables table  1   1   2012/13
-   user checks table column heading contains  css:#releaseHeadlines-tables table  1   2   2013/14
-   user checks table column heading contains  css:#releaseHeadlines-tables table  1   3   2014/15
-   user checks table column heading contains  css:#releaseHeadlines-tables table  1   4   2015/16
-   user checks table column heading contains  css:#releaseHeadlines-tables table  1   5   2016/17
+   user checks table column heading contains  1   1   2012/13  css:#releaseHeadlines-tables table
+   user checks table column heading contains  1   2   2013/14  css:#releaseHeadlines-tables table
+   user checks table column heading contains  1   3   2014/15  css:#releaseHeadlines-tables table
+   user checks table column heading contains  1   4   2015/16  css:#releaseHeadlines-tables table
+   user checks table column heading contains  1   5   2016/17  css:#releaseHeadlines-tables table
 
-   ${row}=  user gets row with group and indicator  css:#releaseHeadlines-tables table   England   Authorised absence rate
+   ${row}=  user gets row with group and indicator  England   Authorised absence rate  css:#releaseHeadlines-tables table
    user checks row contains heading  ${row}   Authorised absence rate
    user checks row cell contains text  ${row}   1    4.2
    user checks row cell contains text  ${row}   2    3.5
@@ -173,7 +173,7 @@ Validate Key Statistics data block -- Data tables tab
    user checks row cell contains text  ${row}   4    3.4
    user checks row cell contains text  ${row}   5    3.4
 
-   ${row}=  user gets row with group and indicator  css:#releaseHeadlines-tables table   England   Unauthorised absence rate
+   ${row}=  user gets row with group and indicator  England   Unauthorised absence rate  css:#releaseHeadlines-tables table
    user checks row contains heading  ${row}   Unauthorised absence rate
    user checks row cell contains text  ${row}   1    1.1
    user checks row cell contains text  ${row}   2    1.1
@@ -181,7 +181,7 @@ Validate Key Statistics data block -- Data tables tab
    user checks row cell contains text  ${row}   4    1.1
    user checks row cell contains text  ${row}   5    1.3
 
-   ${row}=  user gets row with group and indicator  css:#releaseHeadlines-tables table   England   Overall absence rate
+   ${row}=  user gets row with group and indicator  England   Overall absence rate  css:#releaseHeadlines-tables table
    user checks row contains heading  ${row}   Overall absence rate
    user checks row cell contains text  ${row}   1    5.3
    user checks row cell contains text  ${row}   2    4.5
@@ -209,35 +209,35 @@ Validate Regional and local authority (LA) breakdown table
     user opens accordion section  Regional and local authority (LA) breakdown
     user waits until element contains  css:#content_9_datablock-tables #dataTableCaption    Table showing 'Absence by characteristic' from 'Pupil absence in schools in England' in
 
-    user checks table column heading contains  css:#content_9_datablock-tables table   1   1   2016/17
+    user checks table column heading contains  1   1   2016/17  css:#content_9_datablock-tables table
 
-    ${row}=  user gets row with group and indicator  css:#content_9_datablock-tables table   Vale of White Horse   Authorised absence rate
+    ${row}=  user gets row with group and indicator  Vale of White Horse   Authorised absence rate  css:#content_9_datablock-tables table
     user checks row contains heading  ${row}   Authorised absence rate
     user checks row cell contains text  ${row}   1    3.4%
-    ${row}=  user gets row with group and indicator  css:#content_9_datablock-tables table   Vale of White Horse   Overall absence rate
+    ${row}=  user gets row with group and indicator  Vale of White Horse   Overall absence rate  css:#content_9_datablock-tables table
     user checks row contains heading  ${row}   Overall absence rate
     user checks row cell contains text  ${row}   1    4.3%
-    ${row}=  user gets row with group and indicator  css:#content_9_datablock-tables table   Vale of White Horse   Unauthorised absence rate
+    ${row}=  user gets row with group and indicator  Vale of White Horse   Unauthorised absence rate  css:#content_9_datablock-tables table
     user checks row contains heading  ${row}   Unauthorised absence rate
     user checks row cell contains text  ${row}   1    0.9%
 
-    ${row}=  user gets row with group and indicator  css:#content_9_datablock-tables table  Harlow   Authorised absence rate
+    ${row}=  user gets row with group and indicator  Harlow   Authorised absence rate  css:#content_9_datablock-tables table
     user checks row contains heading  ${row}   Authorised absence rate
     user checks row cell contains text  ${row}   1    3.1%
-    ${row}=  user gets row with group and indicator  css:#content_9_datablock-tables table  Harlow   Overall absence rate
+    ${row}=  user gets row with group and indicator  Harlow   Overall absence rate  css:#content_9_datablock-tables table
     user checks row contains heading  ${row}   Overall absence rate
     user checks row cell contains text  ${row}   1    4.2%
-    ${row}=  user gets row with group and indicator  css:#content_9_datablock-tables table  Harlow   Unauthorised absence rate
+    ${row}=  user gets row with group and indicator  Harlow   Unauthorised absence rate  css:#content_9_datablock-tables table
     user checks row contains heading  ${row}   Unauthorised absence rate
     user checks row cell contains text  ${row}   1    1.1%
 
-    ${row}=  user gets row with group and indicator  css:#content_9_datablock-tables table  Newham   Authorised absence rate
+    ${row}=  user gets row with group and indicator  Newham   Authorised absence rate  css:#content_9_datablock-tables table
     user checks row contains heading  ${row}   Authorised absence rate
     user checks row cell contains text  ${row}   1    2.7%
-    ${row}=  user gets row with group and indicator  css:#content_9_datablock-tables table  Newham   Overall absence rate
+    ${row}=  user gets row with group and indicator  Newham   Overall absence rate  css:#content_9_datablock-tables table
     user checks row contains heading  ${row}   Overall absence rate
     user checks row cell contains text  ${row}   1    4.4%
-    ${row}=  user gets row with group and indicator  css:#content_9_datablock-tables table  Newham   Unauthorised absence rate
+    ${row}=  user gets row with group and indicator  Newham   Unauthorised absence rate  css:#content_9_datablock-tables table
     user checks row contains heading  ${row}   Unauthorised absence rate
     user checks row cell contains text  ${row}   1    1.7%
 

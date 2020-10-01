@@ -34,7 +34,6 @@ export interface DataFile {
   status: ImportStatusCode;
   replacedBy?: string;
   created?: string;
-  canDelete?: boolean;
   isDeleting?: boolean;
 }
 
@@ -77,7 +76,6 @@ export interface DataFileImportStatus {
   errors?: string[];
   numberOfRows: number;
 }
-
 function mapFile(file: DataFileInfo): DataFile {
   const [size, unit] = file.size.split(' ');
 
@@ -93,7 +91,6 @@ function mapFile(file: DataFileInfo): DataFile {
     metaFileId: file.metaFileId,
     metaFileName: file.metaFileName,
     replacedBy: file.replacedBy,
-    canDelete: true,
     userName: file.userName,
     created: file.created,
     status: file.status,

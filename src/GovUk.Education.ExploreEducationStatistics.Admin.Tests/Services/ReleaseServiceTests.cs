@@ -343,7 +343,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
 
             mocks.SubjectService.Setup(service => service.GetAsync(subject.Id)).ReturnsAsync(subject);
 
-            mocks.FileStorageService.Setup(service => service.DeleteDataFiles(release.Id, file.Id))
+            mocks.FileStorageService.Setup(service => service.DeleteDataFiles(release.Id, file.Id, false))
                 .ReturnsAsync(Unit.Instance);
 
             await using (var context = InMemoryApplicationDbContext(contentDbContextId))
@@ -359,7 +359,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
                 mocks.DataBlockService.VerifyNoOtherCalls();
 
                 mocks.FileStorageService.Verify(mock =>
-                    mock.DeleteDataFiles(release.Id, file.Id), Times.Once());
+                    mock.DeleteDataFiles(release.Id, file.Id, false), Times.Once());
                 mocks.FileStorageService.VerifyNoOtherCalls();
 
                 mocks.ImportStatusService.Verify(
@@ -433,7 +433,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
                 .ReturnsAsync(subject);
 
             mocks.FileStorageService
-                .Setup(service => service.DeleteDataFiles(release.Id, It.IsIn(file.Id, replacementFile.Id)))
+                .Setup(service => service.DeleteDataFiles(release.Id, It.IsIn(file.Id, replacementFile.Id), false))
                 .ReturnsAsync(Unit.Instance);
 
             await using (var context = InMemoryApplicationDbContext(contentDbContextId))
@@ -450,7 +450,13 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
                 mocks.DataBlockService.VerifyNoOtherCalls();
 
                 mocks.FileStorageService.Verify(
-                    mock => mock.DeleteDataFiles(release.Id, It.IsIn(file.Id, replacementFile.Id)), Times.Exactly(2));
+                    mock => mock.DeleteDataFiles(
+                        release.Id,
+                        It.IsIn(file.Id, replacementFile.Id),
+                        false
+                    ),
+                    Times.Exactly(2)
+                );
                 mocks.FileStorageService.VerifyNoOtherCalls();
 
                 mocks.ImportStatusService.Verify(

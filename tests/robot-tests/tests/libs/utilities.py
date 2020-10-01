@@ -191,14 +191,15 @@ def capture_large_screenshot():
     sl.set_window_size(page_width, original_height)
 
 
-def user_gets_row_number_with_heading(table_locator: str, heading: str):
+def user_gets_row_number_with_heading(heading: str, table_locator: str = 'css:table'):
     elem = get_child_element(table_locator, f'xpath:.//tbody/tr/th[text()="{heading}"]/..')
     rows = get_child_elements(table_locator, 'css:tbody tr')
 
     return rows.index(elem) + 1
 
 
-def user_gets_row_with_group_and_indicator(table_selector, group, indicator):
+def user_gets_row_with_group_and_indicator(group: str, indicator: str,
+                                           table_selector: str = 'css:table'):
     table_elem = sl.get_webelement(table_selector)
     elems = table_elem.find_elements_by_xpath(
         f'.//tbody/tr/th[text()="{group}"]/../self::tr | .//tbody/tr/th[text()="{group}"]/../following-sibling::tr')

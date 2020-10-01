@@ -96,7 +96,7 @@ Invite users to prerelease for scheduled release
     user enters text into element  css:input[name="email"]  simulate-delivered@notifications.service.gov.uk
     user clicks button  Invite new user
 
-    user checks table column heading contains  css:table  1  1  User email
+    user checks table column heading contains  1  1  User email
 
     user checks results table cell contains  1  1  simulate-delivered@notifications.service.gov.uk
 

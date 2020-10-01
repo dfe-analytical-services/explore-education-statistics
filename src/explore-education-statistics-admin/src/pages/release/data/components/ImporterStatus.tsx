@@ -58,7 +58,11 @@ const getImportStatusColour = (
   }
 };
 
-const terminalStates: ImportStatusCode[] = ['NOT_FOUND', 'COMPLETE', 'FAILED'];
+export const terminalImportStatuses: ImportStatusCode[] = [
+  'NOT_FOUND',
+  'COMPLETE',
+  'FAILED',
+];
 
 export type ImporterStatusChangeHandler = (
   dataFile: DataFile,
@@ -70,7 +74,6 @@ interface ImporterStatusProps {
   dataFile: DataFile;
   onStatusChange?: ImporterStatusChangeHandler;
 }
-
 const ImporterStatus = ({
   releaseId,
   dataFile,
@@ -101,7 +104,7 @@ const ImporterStatus = ({
   });
 
   useEffect(() => {
-    if (terminalStates.includes(currentStatus.status)) {
+    if (terminalImportStatuses.includes(currentStatus.status)) {
       cancelInterval();
     }
   }, [cancelInterval, currentStatus]);
@@ -109,17 +112,27 @@ const ImporterStatus = ({
   return (
     <div>
       <div className="dfe-flex dfe-align-items--center">
-        <Tag colour={getImportStatusColour(currentStatus.status)} strong>
-          {getImportStatusLabel(currentStatus.status)}
+        <Tag
+          colour={
+            dataFile.replacedBy
+              ? 'blue'
+              : getImportStatusColour(currentStatus.status)
+          }
+          strong
+        >
+          {dataFile.replacedBy
+            ? 'Data replacement in progress'
+            : getImportStatusLabel(currentStatus.status)}
         </Tag>
 
-        {!terminalStates.includes(currentStatus.status) && (
+        {!terminalImportStatuses.includes(currentStatus.status) && (
           <LoadingSpinner
             alert
             hideText
             inline
             size="sm"
             className="govuk-!-margin-left-1"
+            text={`Processing data file: ${dataFile.fileName}`}
           />
         )}
       </div>

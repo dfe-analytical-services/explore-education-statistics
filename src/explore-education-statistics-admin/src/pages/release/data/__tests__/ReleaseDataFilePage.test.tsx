@@ -218,7 +218,9 @@ describe('ReleaseDataFilePage', () => {
       );
       expect(screen.getByTestId('Data file size')).toHaveTextContent('200 B');
       expect(screen.getByTestId('Number of rows')).toHaveTextContent('100');
-      expect(screen.getByTestId('Status')).toHaveTextContent('Complete');
+      expect(screen.getByTestId('Status')).toHaveTextContent(
+        'Data replacement in progress',
+      );
       expect(screen.getByTestId('Uploaded by')).toHaveTextContent(
         'original@test.com',
       );
@@ -274,7 +276,9 @@ describe('ReleaseDataFilePage', () => {
       );
       expect(screen.getByTestId('Data file size')).toHaveTextContent('200 B');
       expect(screen.getByTestId('Number of rows')).toHaveTextContent('100');
-      expect(screen.getByTestId('Status')).toHaveTextContent('Complete');
+      expect(screen.getByTestId('Status')).toHaveTextContent(
+        'Data replacement in progress',
+      );
       expect(screen.getByTestId('Uploaded by')).toHaveTextContent(
         'original@test.com',
       );
