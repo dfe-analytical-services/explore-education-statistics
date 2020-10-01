@@ -41,9 +41,14 @@ export default function formatPretty(
     });
   }
   if (unit) {
-    return unit === '£'
-      ? `${unit}${formattedValue}`
-      : `${formattedValue}${unit}`;
+    switch (unit) {
+      case '£':
+        return `£${formattedValue}`;
+      case '£m':
+        return `£${formattedValue}m`;
+      default:
+        return `${formattedValue}${unit}`;
+    }
   }
   return formattedValue;
 }
