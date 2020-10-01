@@ -3,12 +3,12 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
 using GovUk.Education.ExploreEducationStatistics.Admin.Models.Api.Statistics;
+using GovUk.Education.ExploreEducationStatistics.Admin.Services.Interfaces;
 using GovUk.Education.ExploreEducationStatistics.Common.Extensions;
 using GovUk.Education.ExploreEducationStatistics.Common.Model;
 using GovUk.Education.ExploreEducationStatistics.Data.Model;
 using GovUk.Education.ExploreEducationStatistics.Data.Model.Services.Interfaces;
 using GovUk.Education.ExploreEducationStatistics.Data.Services;
-using GovUk.Education.ExploreEducationStatistics.Data.Services.Interfaces;
 using GovUk.Education.ExploreEducationStatistics.Data.Services.ViewModels.Meta;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
@@ -102,15 +102,12 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Controllers.Api.Stati
         [HttpGet("releases/{releaseId}/footnotes-meta")]
         public async Task<ActionResult<FootnotesMetaViewModel>> GetFootnotesMeta(Guid releaseId)
         {
-            return await _footnoteService
-                .GetFootnotes(releaseId)
-                .OnSuccess(async footnotes =>
+            return await _releaseMetaService.GetSubjects(releaseId)
+                .OnSuccess(model =>
                 {
-                    var meta = await _releaseMetaService.GetSubjectsAsync(releaseId);
-
                     return new FootnotesMetaViewModel
                     {
-                        Subjects = meta.ToDictionary(
+                        Subjects = model.Subjects.ToDictionary(
                             subject => subject.Id,
                             subject =>
                                 new FootnotesSubjectMetaViewModel
@@ -122,7 +119,6 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Controllers.Api.Stati
                                 }
                         )
                     };
-
                 })
                 .HandleFailuresOrOk();
         }

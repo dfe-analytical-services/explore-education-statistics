@@ -4,10 +4,11 @@ using System.Linq;
 using System.Threading.Tasks;
 using GovUk.Education.ExploreEducationStatistics.Admin.Controllers.Api.Statistics;
 using GovUk.Education.ExploreEducationStatistics.Admin.Models.Api.Statistics;
+using GovUk.Education.ExploreEducationStatistics.Admin.Services.Interfaces;
 using GovUk.Education.ExploreEducationStatistics.Common.Model;
 using GovUk.Education.ExploreEducationStatistics.Data.Model;
 using GovUk.Education.ExploreEducationStatistics.Data.Model.Services.Interfaces;
-using GovUk.Education.ExploreEducationStatistics.Data.Services.Interfaces;
+using GovUk.Education.ExploreEducationStatistics.Data.Services.ViewModels.Meta;
 using Microsoft.AspNetCore.Mvc;
 using Moq;
 using Xunit;
@@ -83,11 +84,14 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Controllers.Api
 
             footnoteService.Setup(s => s.GetFootnotes(ReleaseId)).Returns(footnotes);
 
-            var deleteFootnoteResult = Task.FromResult(new Either<ActionResult, bool>(true));
             footnoteService.Setup(s => s.DeleteFootnote(ReleaseId, FootnoteId)).ReturnsAsync(Unit.Instance);
 
-            var subjects = subjectIds.Select(id => new IdLabel(id, $"Subject {id}")).ToList();
-            releaseMetaService.Setup(s => s.GetSubjectsAsync(ReleaseId)).ReturnsAsync(subjects);
+            releaseMetaService.Setup(s => s.GetSubjects(ReleaseId))
+                .ReturnsAsync(new SubjectsMetaViewModel
+                {
+                    ReleaseId = ReleaseId,
+                    Subjects = subjectIds.Select(id => new IdLabel(id, $"Subject {id}")).ToList()
+                });
 
             filterService.Setup(s => s.GetFiltersIncludingItems(It.IsIn(subjectIds))).Returns(
                 new List<Filter>
