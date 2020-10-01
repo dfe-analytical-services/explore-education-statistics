@@ -1,6 +1,6 @@
 import FiltersForm from '@common/modules/table-tool/components/FiltersForm';
 import { InjectedWizardProps } from '@common/modules/table-tool/components/Wizard';
-import { PublicationSubjectMeta } from '@common/services/tableBuilderService';
+import { SubjectMeta } from '@common/services/tableBuilderService';
 import { waitFor } from '@testing-library/dom';
 import { render, screen, within } from '@testing-library/react';
 import userEvent from '@testing-library/user-event';
@@ -8,7 +8,7 @@ import noop from 'lodash/noop';
 import React from 'react';
 
 describe('FiltersForm', () => {
-  const testSubjectMeta: PublicationSubjectMeta = {
+  const testSubjectMeta: SubjectMeta = {
     filters: {
       SchoolType: {
         totalValue: '',

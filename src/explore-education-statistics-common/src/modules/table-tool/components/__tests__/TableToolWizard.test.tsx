@@ -1,7 +1,7 @@
 import TableToolWizard from '@common/modules/table-tool/components/TableToolWizard';
 import _tableBuilderService, {
   PublicationMeta,
-  PublicationSubjectMeta,
+  SubjectMeta,
   ReleaseMeta,
   ThemeMeta,
 } from '@common/services/tableBuilderService';
@@ -38,7 +38,7 @@ describe('TableToolWizard', () => {
     },
   ];
 
-  const testSubjectMeta: PublicationSubjectMeta = {
+  const testSubjectMeta: SubjectMeta = {
     filters: {
       Characteristic: {
         totalValue: '',

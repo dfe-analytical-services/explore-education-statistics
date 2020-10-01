@@ -20,7 +20,7 @@ import mapFullTable from '@common/modules/table-tool/utils/mapFullTable';
 import mapTableHeadersConfig from '@common/modules/table-tool/utils/mapTableHeadersConfig';
 import mapUnmappedTableHeaders from '@common/modules/table-tool/utils/mapUnmappedTableHeaders';
 import tableBuilderService, {
-  PublicationSubjectMeta,
+  SubjectMeta,
   ReleaseTableDataQuery,
 } from '@common/services/tableBuilderService';
 import minDelay from '@common/utils/minDelay';
@@ -53,7 +53,7 @@ const ReleaseDataBlocksPageTabs = ({
   const [saveNumber, setSaveNumber] = useState(0);
   const [isSaving, setIsSaving] = useState(false);
 
-  const [subjectMeta, setSubjectMeta] = useState<PublicationSubjectMeta>();
+  const [subjectMeta, setSubjectMeta] = useState<SubjectMeta>();
 
   const {
     value: tableState,
@@ -74,7 +74,7 @@ const ReleaseDataBlocksPageTabs = ({
     };
 
     const tableData = await tableBuilderService.getTableData(query);
-    const nextSubjectMeta = await tableBuilderService.getPublicationSubjectMeta(
+    const nextSubjectMeta = await tableBuilderService.getSubjectMeta(
       query.subjectId,
     );
 

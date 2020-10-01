@@ -13,7 +13,7 @@ import WizardStepHeading from '@common/modules/table-tool/components/WizardStepH
 import { FullTable } from '@common/modules/table-tool/types/fullTable';
 import { TableHeadersConfig } from '@common/modules/table-tool/types/tableHeaders';
 import {
-  PublicationSubjectMeta,
+  SubjectMeta,
   ReleaseTableDataQuery,
 } from '@common/services/tableBuilderService';
 import React, {
@@ -118,7 +118,7 @@ interface DataBlockSourceWizardProps {
   dataBlock?: ReleaseDataBlock;
   query?: ReleaseTableDataQuery;
   releaseId?: string;
-  subjectMeta?: PublicationSubjectMeta;
+  subjectMeta?: SubjectMeta;
   table?: FullTable;
   tableHeaders?: TableHeadersConfig;
   onSave: DataBlockSourceWizardSaveHandler;
