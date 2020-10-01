@@ -28,15 +28,25 @@ DECLARE @numFilters int = @@ROWCOUNT,
     
 INSERT INTO @filterList SELECT * FROM @filterListTemp;
 
-DECLARE @sqlString NVARCHAR(2000) = N'WITH ReducedRows AS (SELECT a.ObservationId, b.FilterId FROM (SELECT ObservationId FROM dbo.ObservationFilterItem a WHERE a.FilterId = (SELECT FilterId FROM @filterList WHERE RowID = 1) AND a.FilterItemId in (select id from @filterItemList)';
+DECLARE @sqlString NVARCHAR(4000) = N'WITH ReducedRows AS (SELECT a.ObservationId, b.FilterId FROM ' +
+                                    N'(SELECT ObservationId FROM dbo.ObservationFilterItem a WHERE a.FilterId = ' +
+                                    N'(SELECT FilterId FROM @filterList WHERE RowID = 1) AND a.FilterItemId IN ' +
+                                    N'(SELECT id from @filterItemList) ';
 
+-- Use Row Reduction
 WHILE (@COUNT < @numFilters)
 BEGIN
     SET @COUNT = @COUNT + 1;
-    SET @sqlString = @sqlString + N'AND (@numFilters < @COUNT OR EXISTS (SELECT 1 FROM dbo.ObservationFilterItem b WHERE a.ObservationId = b.ObservationId AND b.FilterItemId in (select id from @filterItemList) AND b.FilterId = (SELECT FilterId FROM @filterList WHERE RowID = @COUNT)))';
+    SET @sqlString = @sqlString +
+                     N' AND EXISTS (SELECT 1 FROM dbo.ObservationFilterItem b ' +
+                     N'WHERE a.ObservationId = b.ObservationId AND b.FilterItemId IN' +
+                     N' (select id from @filterItemList) AND b.FilterId = (SELECT FilterId FROM @filterList WHERE RowID = ' +
+                     CAST(@COUNT AS VARCHAR) +
+                     N')))';
 END
 
-SET @sqlString = @sqlString + N') a JOIN dbo.ObservationFilterItem b ON a.ObservationId = b.ObservationId) '
+SET @sqlString = @sqlString + 
+                 N') a JOIN dbo.ObservationFilterItem b ON a.ObservationId = b.ObservationId) '
 
 DECLARE
     @timePeriodCount INT = (SELECT count(year) FROM @timePeriodList),
@@ -58,13 +68,14 @@ DECLARE
                 OR EXISTS(SELECT TOP 1 1 FROM @planningAreasList), 1, 0) AS BIT),
     @paramDefinition NVARCHAR(2000);
 
-    SET @sqlString = @sqlString + N'SELECT rr.ObservationId AS Id FROM (SELECT ObservationId, cnt=COUNT(*) FROM ReducedRows GROUP BY ObservationId) kc ' +
-                     'INNER JOIN (SELECT cnt=COUNT(*) FROM @filterList) nc ON nc.cnt = kc.cnt ' +
-                     'JOIN ReducedRows rr ON rr.ObservationId = kc.ObservationId ' +
-                     'JOIN @filterList n ON n.FilterId = rr.FilterId ' +
-                     'JOIN Observation o on rr.ObservationId = o.Id ' +
-                     'JOIN Location l ON o.LocationId = l.Id ' +
-                     'WHERE 1=1 '
+    SET @sqlString = @sqlString + N'SELECT rr.ObservationId AS Id FROM (SELECT ObservationId, cnt=COUNT(*) FROM ' +
+                     N'ReducedRows GROUP BY ObservationId) kc ' +
+                     N'INNER JOIN (SELECT cnt=COUNT(*) FROM @filterList) nc ON nc.cnt = kc.cnt ' +
+                     N'JOIN ReducedRows rr ON rr.ObservationId = kc.ObservationId ' +
+                     N'JOIN @filterList n ON n.FilterId = rr.FilterId ' +
+                     N'JOIN Observation o on rr.ObservationId = o.Id ' +
+                     N'JOIN Location l ON o.LocationId = l.Id ' +
+                     N'WHERE 1=1 '
 
     IF (@geographicLevel IS NOT NULL)
         SET @sqlString = @sqlString + N'AND o.GeographicLevel = @geographicLevel '
@@ -107,7 +118,7 @@ DECLARE
         END
 
     SET @sqlString = @sqlString + N'GROUP BY rr.ObservationId HAVING COUNT(*) = MIN(nc.cnt) ' +
-                     'ORDER BY rr.ObservationId;'
+                     N'ORDER BY rr.ObservationId;'
 
     SET @paramDefinition = N'@geographicLevel nvarchar(6) = NULL,
                            @timePeriodList TimePeriodListType READONLY,
