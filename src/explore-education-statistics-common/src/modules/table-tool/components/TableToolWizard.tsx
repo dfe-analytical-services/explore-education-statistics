@@ -1,4 +1,5 @@
 import { ConfirmContextProvider } from '@common/contexts/ConfirmContext';
+import useMounted from '@common/hooks/useMounted';
 import FiltersForm, {
   FilterFormSubmitHandler,
 } from '@common/modules/table-tool/components/FiltersForm';
@@ -25,20 +26,14 @@ import parseYearCodeTuple from '@common/modules/table-tool/utils/parseYearCodeTu
 import logger from '@common/services/logger';
 import tableBuilderService, {
   PublicationSubject,
-  SubjectMeta,
   ReleaseTableDataQuery,
+  SubjectMeta,
   TableHighlight,
   ThemeMeta,
 } from '@common/services/tableBuilderService';
 import { AxiosError } from 'axios';
 import classNames from 'classnames';
-import React, {
-  ReactElement,
-  ReactNode,
-  useEffect,
-  useMemo,
-  useState,
-} from 'react';
+import React, { ReactElement, ReactNode, useMemo, useState } from 'react';
 import { useImmer } from 'use-immer';
 
 interface Publication {
@@ -112,8 +107,12 @@ const TableToolWizard = ({
       .find(option => option.id === state.query.publicationId);
   }, [state.query.publicationId, themeMeta]);
 
-  useEffect(() => {
-    const { releaseId, publicationId } = state.query;
+  useMounted(() => {
+    if (!initialState?.query) {
+      return;
+    }
+
+    const { releaseId, publicationId } = initialState.query;
 
     if (releaseId) {
       tableBuilderService
@@ -143,7 +142,7 @@ const TableToolWizard = ({
           }
         });
     }
-  }, [state.query]);
+  });
 
   const handlePublicationFormSubmit: PublicationFormSubmitHandler = async ({
     publicationId: selectedPublicationId,
@@ -153,6 +152,7 @@ const TableToolWizard = ({
     );
 
     setSubjects(publicationMeta.subjects);
+    setHighlights(publicationMeta.highlights);
 
     updateState(draft => {
       draft.query.publicationId = selectedPublicationId;
