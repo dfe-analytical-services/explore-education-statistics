@@ -142,7 +142,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
                 Release = release,
                 Filename = "data.zip",
                 ReleaseFileType = ReleaseFileTypes.DataZip,
-                SubjectId = subject.Id,
+                SubjectId = subject.Id
             };
 
             var dataFile = new ReleaseFileReference
@@ -167,7 +167,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
                 Release = release,
                 Filename = "replacement.zip",
                 ReleaseFileType = ReleaseFileTypes.DataZip,
-                SubjectId = replacementSubject.Id,
+                SubjectId = replacementSubject.Id
             };
 
             var replacementDataFile = new ReleaseFileReference
@@ -187,7 +187,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
                 Filename = "replacement.meta.csv",
                 ReleaseFileType = ReleaseFileTypes.Metadata,
                 Release = release,
-                SubjectId = replacementSubject.Id,
+                SubjectId = replacementSubject.Id
             };
 
             var releaseDataFile = new ReleaseFile
@@ -264,10 +264,12 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
                 Assert.NotNull(await contentDbContext.ReleaseFileReferences.FindAsync(dataFile.Id));
                 Assert.NotNull(await contentDbContext.ReleaseFileReferences.FindAsync(metaFile.Id));
                 Assert.NotNull(await contentDbContext.ReleaseFileReferences.FindAsync(zipFile.Id));
-                
+
                 Assert.Null(await contentDbContext.ReleaseFileReferences.FindAsync(replacementDataFile.Id));
                 Assert.Null(await contentDbContext.ReleaseFileReferences.FindAsync(replacementMetaFile.Id));
                 Assert.Null(await contentDbContext.ReleaseFileReferences.FindAsync(replacementZipFile.Id));
+
+                Assert.Null((await contentDbContext.ReleaseFileReferences.FindAsync(dataFile.Id)).ReplacedById);
             }
         }
 
