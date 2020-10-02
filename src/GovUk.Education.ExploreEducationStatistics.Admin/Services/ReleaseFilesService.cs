@@ -278,11 +278,11 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Services
                 .CheckEntityExists<Release>(releaseId)
                 .OnSuccess(async release => await CheckCanDeleteReleaseFile(release, forceDelete))
                 .OnSuccess(() => CheckReleaseFileReferenceExists(fileId))
-                .OnSuccess(async releaseFileReference =>
+                .OnSuccessVoid(async releaseFileReference =>
                 {
                     var metaReleaseFileReference = await GetAssociatedReleaseFileReference(releaseFileReference, ReleaseFileTypes.Metadata);
 
-                    if (await DeletionWillOrphanFileAsync(releaseId, releaseFileReference.Filename, ReleaseFileTypes.Data))
+                    if (await DeletionWillOrphanFileAsync(releaseId, fileId))
                     {
                         await _importService.RemoveImportTableRowIfExists(releaseId, releaseFileReference.Filename);
                         await _blobStorageService.DeleteBlob(
@@ -291,8 +291,11 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Services
                         );
                         await _blobStorageService.DeleteBlob(
                             PrivateFilesContainerName,
-                            AdminReleasePath(releaseId, ReleaseFileTypes.Metadata, releaseFileReference.Filename)
+                            AdminReleasePath(releaseId, ReleaseFileTypes.Metadata, metaReleaseFileReference.Filename)
                         );
+
+                        await DeleteFileLink(releaseId, releaseFileReference.Id);
+                        await DeleteFileLink(releaseId, metaReleaseFileReference.Id);
 
                         _context.ReleaseFileReferences.Remove(releaseFileReference);
                         _context.ReleaseFileReferences.Remove(metaReleaseFileReference);
@@ -304,7 +307,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Services
                                 PrivateFilesContainerName,
                                 AdminReleasePath(releaseId, ReleaseFileTypes.DataZip, sourceRef.Filename)
                             );
-                            // N.B. Not ReleaseFies row for source links
+                            // N.B. No ReleaseFiles row for source links
                             _context.ReleaseFileReferences.Remove(sourceRef);
                         }
                     }
@@ -315,7 +318,6 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Services
                     }
 
                     await _context.SaveChangesAsync();
-                    return Unit.Instance;
                 });
         }
 
@@ -896,22 +898,16 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Services
         {
             var fileLink = await GetReleaseFileLinkAsync(releaseId, filename, type);
 
-            var otherFileReferences = await _context
-                .ReleaseFiles
-                .CountAsync(f => f.ReleaseFileReferenceId == fileLink.ReleaseFileReferenceId && f.Id != fileLink.Id);
-
-            return otherFileReferences == 0;
+            return !await _context.ReleaseFiles.AnyAsync(f => 
+                f.ReleaseFileReferenceId == fileLink.ReleaseFileReferenceId && f.Id != fileLink.Id);
         }
 
         private async Task<bool> DeletionWillOrphanFileAsync(Guid releaseId, Guid id)
         {
             var fileLink = await GetReleaseFileLink(releaseId, id);
 
-            var otherFileReferences = await _context
-                .ReleaseFiles
-                .CountAsync(f => f.ReleaseFileReferenceId == fileLink.ReleaseFileReferenceId && f.Id != fileLink.Id);
-
-            return otherFileReferences == 0;
+            return !await _context.ReleaseFiles.AnyAsync(f =>
+                f.ReleaseFileReferenceId == fileLink.ReleaseFileReferenceId && f.Id != fileLink.Id);
         }
 
         private string AdminReleasePathWithFileReference(ReleaseFileReference fileReference)
