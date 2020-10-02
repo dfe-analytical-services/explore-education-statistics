@@ -1,5 +1,5 @@
 import TableToolWizard, {
-  TableToolState,
+  InitialTableToolState,
 } from '@common/modules/table-tool/components/TableToolWizard';
 import WizardStep from '@common/modules/table-tool/components/WizardStep';
 import WizardStepHeading from '@common/modules/table-tool/components/WizardStepHeading';
@@ -36,7 +36,7 @@ const TableToolPage: NextPage<TableToolPageProps> = ({
   themeMeta,
 }) => {
   const initialTableToolState = useMemo<
-    Partial<TableToolState> | undefined
+    Partial<InitialTableToolState> | undefined
   >(() => {
     if (publicationSlug) {
       const publicationId =

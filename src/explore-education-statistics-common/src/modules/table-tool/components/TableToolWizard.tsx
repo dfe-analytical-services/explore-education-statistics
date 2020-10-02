@@ -42,14 +42,19 @@ interface Publication {
   slug: string;
 }
 
-export interface TableToolState {
+export interface InitialTableToolState {
   initialStep: number;
-  subjectMeta: SubjectMeta;
-  query: ReleaseTableDataQuery;
+  subjectMeta?: SubjectMeta;
+  query?: ReleaseTableDataQuery;
   response?: {
     table: FullTable;
     tableHeaders: TableHeadersConfig;
   };
+}
+
+interface TableToolState extends InitialTableToolState {
+  subjectMeta: SubjectMeta;
+  query: ReleaseTableDataQuery;
 }
 
 export interface FinalStepRenderProps {
@@ -63,7 +68,7 @@ export interface FinalStepRenderProps {
 
 export interface TableToolWizardProps {
   themeMeta: ThemeMeta[];
-  initialState?: Partial<TableToolState>;
+  initialState?: Partial<InitialTableToolState>;
   finalStep?: (props: FinalStepRenderProps) => ReactElement;
   renderHighlights?: (highlights: TableHighlight[]) => ReactNode;
   scrollOnMount?: boolean;

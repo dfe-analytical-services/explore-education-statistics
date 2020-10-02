@@ -14,15 +14,17 @@ import isEqual from 'lodash/isEqual';
 import React, { useCallback, useMemo } from 'react';
 import { useParams } from 'react-router';
 
+export type ChartBuilderTableUpdateHandler = (params: {
+  table: FullTable;
+  query: ReleaseTableDataQuery;
+}) => void;
+
 interface Props {
   dataBlock: ReleaseDataBlock;
   query: ReleaseTableDataQuery;
   table: FullTable;
   onDataBlockSave: (dataBlock: SavedDataBlock) => void;
-  onTableUpdate: (params: {
-    table: FullTable;
-    query: ReleaseTableDataQuery;
-  }) => void;
+  onTableUpdate: ChartBuilderTableUpdateHandler;
 }
 
 const ChartBuilderTabSection = ({

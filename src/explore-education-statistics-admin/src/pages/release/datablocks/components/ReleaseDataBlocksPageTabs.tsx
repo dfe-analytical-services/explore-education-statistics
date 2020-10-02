@@ -1,4 +1,6 @@
-import ChartBuilderTabSection from '@admin/pages/release/datablocks/components/ChartBuilderTabSection';
+import ChartBuilderTabSection, {
+  ChartBuilderTableUpdateHandler,
+} from '@admin/pages/release/datablocks/components/ChartBuilderTabSection';
 import DataBlockSourceWizard, {
   DataBlockSourceWizardSaveHandler,
 } from '@admin/pages/release/datablocks/components/DataBlockSourceWizard';
@@ -13,14 +15,13 @@ import TabsSection from '@common/components/TabsSection';
 import WarningMessage from '@common/components/WarningMessage';
 import useAsyncRetry from '@common/hooks/useAsyncRetry';
 import filterOrphanedDataSets from '@common/modules/charts/util/filterOrphanedDataSets';
-import { FullTable } from '@common/modules/table-tool/types/fullTable';
+import { InitialTableToolState } from '@common/modules/table-tool/components/TableToolWizard';
+import getInitialStepSubjectMeta from '@common/modules/table-tool/components/utils/getInitialStepSubjectMeta';
 import { TableHeadersConfig } from '@common/modules/table-tool/types/tableHeaders';
-import getDefaultTableHeaderConfig from '@common/modules/table-tool/utils/getDefaultTableHeadersConfig';
 import mapFullTable from '@common/modules/table-tool/utils/mapFullTable';
 import mapTableHeadersConfig from '@common/modules/table-tool/utils/mapTableHeadersConfig';
 import mapUnmappedTableHeaders from '@common/modules/table-tool/utils/mapUnmappedTableHeaders';
 import tableBuilderService, {
-  SubjectMeta,
   ReleaseTableDataQuery,
 } from '@common/services/tableBuilderService';
 import minDelay from '@common/utils/minDelay';
@@ -30,12 +31,6 @@ import React, { useCallback, useState } from 'react';
 export type SavedDataBlock = CreateReleaseDataBlock & {
   id?: string;
 };
-
-interface TableState {
-  table: FullTable;
-  tableHeaders: TableHeadersConfig;
-  query: ReleaseTableDataQuery;
-}
 
 interface Props {
   releaseId: string;
@@ -53,14 +48,12 @@ const ReleaseDataBlocksPageTabs = ({
   const [saveNumber, setSaveNumber] = useState(0);
   const [isSaving, setIsSaving] = useState(false);
 
-  const [subjectMeta, setSubjectMeta] = useState<SubjectMeta>();
-
   const {
     value: tableState,
     setState: setTableState,
     error,
     isLoading,
-  } = useAsyncRetry<TableState | undefined>(async () => {
+  } = useAsyncRetry<InitialTableToolState | undefined>(async () => {
     if (!selectedDataBlock) {
       return undefined;
     }
@@ -73,45 +66,37 @@ const ReleaseDataBlocksPageTabs = ({
       ),
     };
 
+    const { initialStep, subjectMeta } = await getInitialStepSubjectMeta(query);
+
+    // Reduce step by 1 as there is no publication step
+    const step = initialStep - 1;
+
+    if (step < 5) {
+      return {
+        initialStep: step,
+        subjectMeta,
+        query,
+      };
+    }
+
     const tableData = await tableBuilderService.getTableData(query);
-    const nextSubjectMeta = await tableBuilderService.getSubjectMeta(
-      query.subjectId,
-    );
 
     const table = mapFullTable(tableData);
-
-    setSubjectMeta(nextSubjectMeta);
-
-    const tableHeaders = selectedDataBlock
-      ? mapTableHeadersConfig(
-          selectedDataBlock.table.tableHeaders,
-          table.subjectMeta,
-        )
-      : getDefaultTableHeaderConfig(table.subjectMeta);
+    const tableHeaders = mapTableHeadersConfig(
+      selectedDataBlock.table.tableHeaders,
+      table.subjectMeta,
+    );
 
     return {
-      table,
-      tableHeaders,
+      initialStep: step,
+      subjectMeta,
       query,
+      response: {
+        table,
+        tableHeaders,
+      },
     };
   }, []);
-
-  const updateTableState = useCallback(
-    (nextTableState: Partial<TableState>) => {
-      if (!tableState) {
-        throw new Error('Cannot update undefined table state');
-      }
-
-      setTableState({
-        isLoading: false,
-        value: {
-          ...tableState,
-          ...nextTableState,
-        },
-      });
-    },
-    [setTableState, tableState],
-  );
 
   const handleDataBlockSave = useCallback(
     async (dataBlock: SavedDataBlock) => {
@@ -158,11 +143,13 @@ const ReleaseDataBlocksPageTabs = ({
       });
 
       setTableState({
-        isLoading: false,
         value: {
+          initialStep: 5,
           query,
-          table,
-          tableHeaders,
+          response: {
+            table,
+            tableHeaders,
+          },
         },
       });
 
@@ -188,7 +175,21 @@ const ReleaseDataBlocksPageTabs = ({
         );
       }
 
-      updateTableState({ tableHeaders });
+      if (!tableState?.response) {
+        throw new Error(
+          'Cannot save table headers when table has not been created',
+        );
+      }
+
+      setTableState({
+        value: {
+          ...tableState,
+          response: {
+            ...tableState?.response,
+            tableHeaders,
+          },
+        },
+      });
 
       await handleDataBlockSave({
         ...selectedDataBlock,
@@ -198,10 +199,30 @@ const ReleaseDataBlocksPageTabs = ({
         },
       });
     },
-    [handleDataBlockSave, selectedDataBlock, updateTableState],
+    [handleDataBlockSave, selectedDataBlock, setTableState, tableState],
   );
 
-  const { query, table, tableHeaders } = tableState ?? {};
+  const handleChartTableUpdate: ChartBuilderTableUpdateHandler = useCallback(
+    ({ table, query }) => {
+      if (!tableState?.response) {
+        throw new Error('Cannot update uninitialised table state');
+      }
+
+      setTableState({
+        value: {
+          ...tableState,
+          query,
+          response: {
+            ...tableState?.response,
+            table,
+          },
+        },
+      });
+    },
+    [setTableState, tableState],
+  );
+
+  const { query, response } = tableState ?? {};
 
   return (
     <div style={{ position: 'relative' }} className="govuk-!-padding-top-2">
@@ -212,6 +233,14 @@ const ReleaseDataBlocksPageTabs = ({
         />
       )}
 
+      {tableState && tableState?.initialStep < 5 && (
+        <WarningMessage>
+          There is a problem with this data block as some of the selected
+          options are invalid. Please re-check your choices to ensure the
+          correct table can be produced.
+        </WarningMessage>
+      )}
+
       {!error ? (
         <Tabs id="manageDataBlocks">
           <TabsSection title="Data source" id="manageDataBlocks-dataSource">
@@ -220,38 +249,41 @@ const ReleaseDataBlocksPageTabs = ({
                 key={saveNumber}
                 dataBlock={selectedDataBlock}
                 releaseId={releaseId}
-                query={query}
-                subjectMeta={subjectMeta}
-                table={table}
-                tableHeaders={tableHeaders}
+                tableToolState={tableState}
                 onSave={handleDataBlockSourceSave}
               />
             )}
           </TabsSection>
 
-          {selectedDataBlock && [
-            <TabsSection title="Table" key="table" id="manageDataBlocks-table">
-              {table && tableHeaders && (
+          {selectedDataBlock &&
+            query &&
+            response && [
+              <TabsSection
+                title="Table"
+                key="table"
+                id="manageDataBlocks-table"
+              >
                 <TableTabSection
-                  table={table}
-                  tableHeaders={tableHeaders}
+                  table={response.table}
+                  tableHeaders={response.tableHeaders}
                   onSave={handleTableHeadersSave}
                 />
-              )}
-            </TabsSection>,
-            <TabsSection title="Chart" key="chart" id="manageDataBlocks-chart">
-              {query && table && (
+              </TabsSection>,
+              <TabsSection
+                title="Chart"
+                key="chart"
+                id="manageDataBlocks-chart"
+              >
                 <ChartBuilderTabSection
                   key={saveNumber}
                   dataBlock={selectedDataBlock}
                   query={query}
-                  table={table}
+                  table={response.table}
                   onDataBlockSave={handleDataBlockSave}
-                  onTableUpdate={updateTableState}
+                  onTableUpdate={handleChartTableUpdate}
                 />
-              )}
-            </TabsSection>,
-          ]}
+              </TabsSection>,
+            ]}
         </Tabs>
       ) : (
         <WarningMessage>
