@@ -34,7 +34,7 @@ DECLARE @numFilters int = @@ROWCOUNT,
     
 INSERT INTO @filterList SELECT * FROM @filterListTemp;
 
-DECLARE @sqlString VARCHAR = N'WITH ReducedRows AS (SELECT a.ObservationId, b.FilterId FROM ' +
+DECLARE @sqlString NVARCHAR(4000) = N'WITH ReducedRows AS (SELECT a.ObservationId, b.FilterId FROM ' +
                                     N'(SELECT ObservationId FROM dbo.ObservationFilterItem a WHERE a.FilterId = ' +
                                     N'(SELECT FilterId FROM @filterList WHERE RowID = 1) AND a.FilterItemId IN ' +
                                     N'(SELECT id from @filterItemList) ';
@@ -72,7 +72,7 @@ DECLARE
                 OR EXISTS(SELECT TOP 1 1 FROM @sponsorList)
                 OR EXISTS(SELECT TOP 1 1 FROM @wardsList)
                 OR EXISTS(SELECT TOP 1 1 FROM @planningAreasList), 1, 0) AS BIT),
-    @paramDefinition VARCHAR;
+    @paramDefinition NVARCHAR(4000);
 
     SET @sqlString = @sqlString + N'SELECT rr.ObservationId AS Id FROM (SELECT ObservationId, cnt=COUNT(*) FROM ' +
                      N'ReducedRows GROUP BY ObservationId) kc ' +
