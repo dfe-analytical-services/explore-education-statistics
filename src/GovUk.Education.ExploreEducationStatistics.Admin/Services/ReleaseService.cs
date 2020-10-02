@@ -7,7 +7,6 @@ using GovUk.Education.ExploreEducationStatistics.Admin.Models.Api;
 using GovUk.Education.ExploreEducationStatistics.Admin.Services.Interfaces;
 using GovUk.Education.ExploreEducationStatistics.Admin.Services.Interfaces.Security;
 using GovUk.Education.ExploreEducationStatistics.Admin.ViewModels;
-using GovUk.Education.ExploreEducationStatistics.Common.Extensions;
 using GovUk.Education.ExploreEducationStatistics.Common.Model;
 using GovUk.Education.ExploreEducationStatistics.Common.Services;
 using GovUk.Education.ExploreEducationStatistics.Common.Services.Interfaces;
@@ -464,16 +463,18 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Services
                 .OnSuccess(releaseFileReference =>
                 {
                     return CheckCanDeleteDataFiles(releaseId, releaseFileReference)
+                        .OnSuccessDo(async _ =>
+                        {
+                            // Delete any replacement that might exist
+                            if (releaseFileReference.ReplacedById.HasValue)
+                            {
+                                return await RemoveDataFiles(releaseId, releaseFileReference.ReplacedById.Value);
+                            }
+                            return Unit.Instance;
+                        })
                         .OnSuccess(_ => GetDeleteDataFilePlan(releaseId, fileId))
                         .OnSuccess(async deletePlan =>
                         {
-                            // Delete any replacement that might exist
-                            var replacementInProgress = releaseFileReference.ReplacedById;
-                            if (replacementInProgress.HasValue)
-                            {
-                                await RemoveDataFiles(releaseId, replacementInProgress.Value);
-                            }
-
                             await _dataBlockService.DeleteDataBlocks(deletePlan.DeleteDataBlockPlan);
                             await _releaseSubjectService.SoftDeleteSubjectOrBreakReleaseLink(releaseId,
                                 deletePlan.SubjectId);

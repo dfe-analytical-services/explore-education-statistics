@@ -372,13 +372,12 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
                 dataBlockService.Verify(
                     mock => mock.DeleteDataBlocks(It.IsAny<DeleteDataBlockPlan>()),
                     Times.Once());
-                dataBlockService.VerifyNoOtherCalls();
 
                 fileStorageService.Verify(mock =>
                     mock.DeleteDataFiles(release.Id, file.Id, false), Times.Once());
 
                 importStatusService.Verify(
-                    mock => mock.IsImportFinished(release.Id, file.Filename),
+                    mock => mock.IsImportFinished(file.ReleaseId, file.Filename),
                     Times.Once());
 
                 releaseSubjectService.Verify(
@@ -386,6 +385,68 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
                     Times.Once());
 
                 Assert.True(result.IsRight);
+            }
+        }
+
+        [Fact]
+        public async Task RemoveDataFiles_FileImporting()
+        {
+            var release = new Release
+            {
+                Status = ReleaseStatus.Draft
+            };
+
+            var subject = new Subject
+            {
+                Id = Guid.NewGuid(),
+                Name = "Test subject"
+            };
+
+            var file = new ReleaseFileReference
+            {
+                Filename = "data.csv",
+                ReleaseFileType = ReleaseFileTypes.Data,
+                Release = release,
+                SubjectId = subject.Id
+            };
+
+            var contentDbContextId = Guid.NewGuid().ToString();
+
+            await using (var contentDbContext = InMemoryApplicationDbContext(contentDbContextId))
+            {
+                await contentDbContext.AddAsync(release);
+                await contentDbContext.AddAsync(file);
+                await contentDbContext.SaveChangesAsync();
+            }
+
+            var dataBlockService = new Mock<IDataBlockService>(MockBehavior.Strict);
+            var importStatusService = new Mock<IImportStatusService>(MockBehavior.Strict);
+            var subjectService = new Mock<ISubjectService>(MockBehavior.Strict);
+            var fileStorageService = new Mock<IReleaseFilesService>(MockBehavior.Strict);
+            var releaseSubjectService = new Mock<IReleaseSubjectService>(MockBehavior.Strict);
+
+            importStatusService.Setup(service =>
+                    service.IsImportFinished(file.ReleaseId, file.Filename))
+                .ReturnsAsync(false);
+
+            subjectService.Setup(service => service.GetAsync(subject.Id)).ReturnsAsync(subject);
+
+            await using (var context = InMemoryApplicationDbContext(contentDbContextId))
+            {
+                var releaseService = BuildReleaseService(context,
+                    dataBlockService: dataBlockService.Object,
+                    importStatusService: importStatusService.Object,
+                    subjectService: subjectService.Object,
+                    fileStorageService: fileStorageService.Object,
+                    releaseSubjectService: releaseSubjectService.Object);
+                var result = await releaseService.RemoveDataFiles(release.Id, file.Id);
+
+                importStatusService.Verify(
+                    mock => mock.IsImportFinished(file.ReleaseId, file.Filename),
+                    Times.Once());
+
+                Assert.True(result.IsLeft);
+                AssertValidationProblem(result.Left, CannotRemoveDataFilesUntilImportComplete);
             }
         }
 
@@ -451,7 +512,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
                 .Returns(Task.CompletedTask);
 
             importStatusService.Setup(service =>
-                    service.IsImportFinished(file.ReleaseId,
+                    service.IsImportFinished(release.Id,
                         It.IsIn(file.Filename, replacementFile.Filename)))
                 .ReturnsAsync(true);
 
@@ -501,6 +562,84 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
                         It.IsIn(subject.Id, replacementSubject.Id)), Times.Exactly(2));
 
                 Assert.True(result.IsRight);
+            }
+        }
+
+        [Fact]
+        public async Task RemoveDataFiles_ReplacementFileImporting()
+        {
+            var release = new Release
+            {
+                Status = ReleaseStatus.Draft
+            };
+
+            var subject = new Subject
+            {
+                Id = Guid.NewGuid(),
+                Name = "Test subject",
+            };
+
+            var replacementSubject = new Subject
+            {
+                Id = Guid.NewGuid(),
+                Name = "Replacement subject"
+            };
+
+            var file = new ReleaseFileReference
+            {
+                Filename = "data.csv",
+                ReleaseFileType = ReleaseFileTypes.Data,
+                Release =  release,
+                SubjectId = subject.Id
+            };
+
+            var replacementFile = new ReleaseFileReference
+            {
+                Filename = "replacement.csv",
+                ReleaseFileType = ReleaseFileTypes.Data,
+                Release = release,
+                SubjectId = replacementSubject.Id,
+                Replacing = file
+            };
+
+            file.ReplacedBy = replacementFile;
+
+            var contentDbContextId = Guid.NewGuid().ToString();
+
+            await using (var contentDbContext = InMemoryApplicationDbContext(contentDbContextId))
+            {
+                await contentDbContext.AddAsync(release);
+                await contentDbContext.AddRangeAsync(file, replacementFile);
+                await contentDbContext.SaveChangesAsync();
+            }
+
+            var dataBlockService = new Mock<IDataBlockService>(MockBehavior.Strict);
+            var importStatusService = new Mock<IImportStatusService>(MockBehavior.Strict);
+            var subjectService = new Mock<ISubjectService>(MockBehavior.Strict);
+            var fileStorageService = new Mock<IReleaseFilesService>(MockBehavior.Strict);
+            var releaseSubjectService = new Mock<IReleaseSubjectService>(MockBehavior.Strict);
+
+            importStatusService.Setup(service => service.IsImportFinished(file.ReleaseId, file.Filename))
+                .ReturnsAsync(true);
+            importStatusService.Setup(service => service.IsImportFinished(replacementFile.ReleaseId, replacementFile.Filename))
+                .ReturnsAsync(false);
+
+            await using (var context = InMemoryApplicationDbContext(contentDbContextId))
+            {
+                var releaseService = BuildReleaseService(context,
+                    dataBlockService: dataBlockService.Object,
+                    importStatusService: importStatusService.Object,
+                    subjectService: subjectService.Object,
+                    fileStorageService: fileStorageService.Object,
+                    releaseSubjectService: releaseSubjectService.Object);
+                var result = await releaseService.RemoveDataFiles(release.Id, file.Id);
+
+                importStatusService.Verify(
+                    mock => mock.IsImportFinished(release.Id,
+                        It.IsIn(file.Filename, replacementFile.Filename)), Times.Exactly(2));
+
+                Assert.True(result.IsLeft);
+                AssertValidationProblem(result.Left, CannotRemoveDataFilesUntilImportComplete);
             }
         }
 
