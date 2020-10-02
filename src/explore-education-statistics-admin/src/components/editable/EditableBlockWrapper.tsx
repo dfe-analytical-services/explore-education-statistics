@@ -35,7 +35,7 @@ const EditableBlockWrapper = ({
             </Button>
 
             <ModalConfirm
-              title="Delete section"
+              title="Remove block"
               mounted={showConfirmDelete}
               onConfirm={async () => {
                 await onDelete();
@@ -44,7 +44,10 @@ const EditableBlockWrapper = ({
               onExit={toggleConfirmDelete.off}
               onCancel={toggleConfirmDelete.off}
             >
-              <p>Are you sure you want to delete this block?</p>
+              <p>
+                Are you sure you want to remove this block from this content
+                section?
+              </p>
             </ModalConfirm>
           </>
         )}
