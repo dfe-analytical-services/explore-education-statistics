@@ -690,7 +690,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Services
             var metaFileReference =
                 await GetAssociatedReleaseFileReference(dataFileReference, ReleaseFileTypes.Metadata);
 
-            var importStatus = await _importStatusService.GetImportStatus(releaseId, blob.FileName);
+            var importStatus = await _importStatusService.GetImportStatus(dataFileReference.ReleaseId, blob.FileName);
 
             return new DataFileInfo
             {
