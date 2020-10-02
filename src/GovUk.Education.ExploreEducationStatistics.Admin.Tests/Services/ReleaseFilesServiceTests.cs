@@ -25,7 +25,7 @@ using Unit = GovUk.Education.ExploreEducationStatistics.Common.Model.Unit;
 
 namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
 {
-    public class ReleaseFileServiceTests
+    public class ReleaseFilesServiceTests
     {
         [Fact]
         public async Task DeleteDataFiles()
@@ -119,6 +119,155 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
                 Assert.Null(await contentDbContext.ReleaseFileReferences.FindAsync(dataFile.Id));
                 Assert.Null(await contentDbContext.ReleaseFileReferences.FindAsync(metaFile.Id));
                 Assert.Null(await contentDbContext.ReleaseFileReferences.FindAsync(zipFile.Id));
+            }
+        }
+
+        [Fact]
+        public async Task DeleteDataFiles_DeleteReplacementFiles()
+        {
+            var release = new Release();
+
+            var subject = new Subject
+            {
+                Id = Guid.NewGuid()
+            };
+
+            var replacementSubject = new Subject
+            {
+                Id = Guid.NewGuid()
+            };
+
+            var zipFile = new ReleaseFileReference
+            {
+                Release = release,
+                Filename = "data.zip",
+                ReleaseFileType = ReleaseFileTypes.DataZip,
+                SubjectId = subject.Id,
+            };
+
+            var dataFile = new ReleaseFileReference
+            {
+                Release = release,
+                Filename = "data.csv",
+                ReleaseFileType = ReleaseFileTypes.Data,
+                SubjectId = subject.Id,
+                Source = zipFile
+            };
+
+            var metaFile = new ReleaseFileReference
+            {
+                Release = release,
+                Filename = "data.meta.csv",
+                ReleaseFileType = ReleaseFileTypes.Metadata,
+                SubjectId = subject.Id
+            };
+
+            var replacementZipFile = new ReleaseFileReference
+            {
+                Release = release,
+                Filename = "replacement.zip",
+                ReleaseFileType = ReleaseFileTypes.DataZip,
+                SubjectId = replacementSubject.Id,
+            };
+
+            var replacementDataFile = new ReleaseFileReference
+            {
+                Filename = "replacement.csv",
+                ReleaseFileType = ReleaseFileTypes.Data,
+                Release = release,
+                SubjectId = replacementSubject.Id,
+                Replacing = dataFile,
+                Source = replacementZipFile
+            };
+            
+            dataFile.ReplacedBy = replacementDataFile;
+
+            var replacementMetaFile = new ReleaseFileReference
+            {
+                Filename = "replacement.meta.csv",
+                ReleaseFileType = ReleaseFileTypes.Metadata,
+                Release = release,
+                SubjectId = replacementSubject.Id,
+            };
+
+            var releaseDataFile = new ReleaseFile
+            {
+                Release = release,
+                ReleaseFileReference = dataFile
+            };
+
+            var releaseMetaFile = new ReleaseFile
+            {
+                Release = release,
+                ReleaseFileReference = metaFile
+            };
+
+            var replacementReleaseDataFile = new ReleaseFile
+            {
+                Release = release,
+                ReleaseFileReference = replacementDataFile
+            };
+
+            var replacementReleaseMetaFile = new ReleaseFile
+            {
+                Release = release,
+                ReleaseFileReference = replacementMetaFile
+            };
+            
+            var contentDbContextId = Guid.NewGuid().ToString();
+
+            await using (var contentDbContext = InMemoryApplicationDbContext(contentDbContextId))
+            {
+                await contentDbContext.AddAsync(release);
+                await contentDbContext.AddRangeAsync(zipFile, dataFile, metaFile,
+                    replacementZipFile, replacementDataFile, replacementMetaFile);
+                await contentDbContext.AddRangeAsync(releaseDataFile, releaseMetaFile,
+                    replacementReleaseDataFile, replacementReleaseMetaFile);
+                await contentDbContext.SaveChangesAsync();
+            }
+
+            var blobStorageService = new Mock<IBlobStorageService>(MockBehavior.Strict);
+            var importService = new Mock<IImportService>(MockBehavior.Strict);
+
+            importService.Setup(mock => mock.RemoveImportTableRowIfExists(release.Id, replacementDataFile.Filename))
+                .Returns(Task.CompletedTask);
+
+            blobStorageService.Setup(mock => mock.DeleteBlob(PrivateFilesContainerName, It.IsAny<string>()))
+                .Returns(Task.CompletedTask);
+
+            await using (var contentDbContext = InMemoryApplicationDbContext(contentDbContextId))
+            {
+                var releaseFilesService = SetupReleaseFilesService(context: contentDbContext,
+                    blobStorageService: blobStorageService.Object,
+                    importService: importService.Object);
+
+                var result = await releaseFilesService.DeleteDataFiles(release.Id, replacementDataFile.Id);
+
+                blobStorageService.Verify(mock =>
+                    mock.DeleteBlob(PrivateFilesContainerName, $"{release.Id}/data/replacement.csv"), Times.Once());
+                blobStorageService.Verify(mock =>
+                    mock.DeleteBlob(PrivateFilesContainerName, $"{release.Id}/data/replacement.meta.csv"), Times.Once());
+                blobStorageService.Verify(mock =>
+                    mock.DeleteBlob(PrivateFilesContainerName, $"{release.Id}/zip/replacement.zip"), Times.Once());
+
+                importService.Verify(mock => 
+                        mock.RemoveImportTableRowIfExists(release.Id, replacementDataFile.Filename), Times.Once());
+
+                Assert.True(result.IsRight);
+
+                Assert.NotNull(await contentDbContext.ReleaseFiles.FindAsync(releaseDataFile.Id));
+                Assert.NotNull(await contentDbContext.ReleaseFiles.FindAsync(releaseMetaFile.Id));
+
+                Assert.Null(await contentDbContext.ReleaseFiles.FindAsync(replacementReleaseDataFile.Id));
+                Assert.Null(await contentDbContext.ReleaseFiles.FindAsync(replacementReleaseMetaFile.Id));
+
+                Assert.NotNull(await contentDbContext.ReleaseFileReferences.FindAsync(dataFile.Id));
+                Assert.NotNull(await contentDbContext.ReleaseFileReferences.FindAsync(metaFile.Id));
+                Assert.NotNull(await contentDbContext.ReleaseFileReferences.FindAsync(zipFile.Id));
+                
+                Assert.Null(await contentDbContext.ReleaseFileReferences.FindAsync(replacementDataFile.Id));
+                Assert.Null(await contentDbContext.ReleaseFileReferences.FindAsync(replacementMetaFile.Id));
+                Assert.Null(await contentDbContext.ReleaseFileReferences.FindAsync(replacementZipFile.Id));
             }
         }
 
