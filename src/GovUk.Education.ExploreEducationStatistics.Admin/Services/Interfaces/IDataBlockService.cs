@@ -16,7 +16,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Services.Interfaces
     {
         Task<Either<ActionResult, DataBlockViewModel>> CreateAsync(ReleaseId releaseId, CreateDataBlockViewModel createDataBlock);
 
-        Task<Either<ActionResult, bool>> DeleteAsync(ReleaseId releaseId, DataBlockId id);
+        Task<Either<ActionResult, Unit>> DeleteAsync(ReleaseId releaseId, DataBlockId id);
 
         Task<DataBlockViewModel> GetAsync(DataBlockId id);
 
@@ -24,7 +24,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Services.Interfaces
 
         Task<Either<ActionResult, DataBlockViewModel>> UpdateAsync(DataBlockId id, UpdateDataBlockViewModel updateDataBlock);
 
-        Task<Either<ActionResult, bool>> DeleteDataBlocks(DeleteDataBlockPlan deletePlan);
+        Task DeleteDataBlocks(DeleteDataBlockPlan deletePlan);
 
         Task<Either<ActionResult, DeleteDataBlockPlan>> GetDeleteDataBlockPlan(Guid releaseId, Guid id);
 
