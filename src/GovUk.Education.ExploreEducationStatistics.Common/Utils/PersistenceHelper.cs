@@ -47,6 +47,20 @@ namespace GovUk.Education.ExploreEducationStatistics.Common.Utils
             return CheckEntityExists<TEntity, Guid>(id, hydrateEntityFn);
         }
 
+        public async Task<Either<ActionResult, TEntity>> CheckEntityExists<TEntity>(
+            Func<IQueryable<TEntity>, IQueryable<TEntity>> query)
+            where TEntity : class
+        {
+            var queryableEntities = _context.Set<TEntity>();
+
+            var entity = await query.Invoke(queryableEntities)
+                .FirstOrDefaultAsync();
+
+            return entity == null
+                ? new NotFoundResult()
+                : new Either<ActionResult, TEntity>(entity);
+        }
+
         public async Task<Either<ActionResult, TEntity>> CheckOptionalEntityExists<TEntity>(Guid? id,
             Func<IQueryable<TEntity>, IQueryable<TEntity>> hydrateEntityFn = null) where TEntity : class
         {
