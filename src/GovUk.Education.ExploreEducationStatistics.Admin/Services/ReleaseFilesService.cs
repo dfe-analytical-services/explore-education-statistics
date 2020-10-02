@@ -294,6 +294,9 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Services
                             AdminReleasePath(releaseId, ReleaseFileTypes.Metadata, metaReleaseFileReference.Filename)
                         );
 
+                        await DeleteFileLink(releaseId, releaseFileReference.Id);
+                        await DeleteFileLink(releaseId, metaReleaseFileReference.Id);
+
                         _context.ReleaseFileReferences.Remove(releaseFileReference);
                         _context.ReleaseFileReferences.Remove(metaReleaseFileReference);
 

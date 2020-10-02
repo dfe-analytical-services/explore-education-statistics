@@ -114,8 +114,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
                 Assert.True(result.IsRight);
 
                 Assert.Null(await contentDbContext.ReleaseFiles.FindAsync(releaseDataFile.Id));
-                // TODO not sure why this is failing?
-                //Assert.Null(await contentDbContext.ReleaseFiles.FindAsync(releaseMetaFile.Id));
+                Assert.Null(await contentDbContext.ReleaseFiles.FindAsync(releaseMetaFile.Id));
 
                 Assert.Null(await contentDbContext.ReleaseFileReferences.FindAsync(dataFile.Id));
                 Assert.Null(await contentDbContext.ReleaseFileReferences.FindAsync(metaFile.Id));
