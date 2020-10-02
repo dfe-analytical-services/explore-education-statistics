@@ -13,10 +13,14 @@ namespace GovUk.Education.ExploreEducationStatistics.Common.Utils
             TEntityId id,
             Func<IQueryable<TEntity>, IQueryable<TEntity>> hydrateEntityFn = null)
         where TEntity : class;
-        
+
         Task<Either<ActionResult, TEntity>> CheckEntityExists<TEntity>(
             Guid id,
             Func<IQueryable<TEntity>, IQueryable<TEntity>> hydrateEntityFn = null)
+            where TEntity : class;
+
+        Task<Either<ActionResult, TEntity>> CheckEntityExists<TEntity>(
+            Func<IQueryable<TEntity>, IQueryable<TEntity>> query)
             where TEntity : class;
 
         Task<Either<ActionResult, TEntity>> CheckOptionalEntityExists<TEntity>(

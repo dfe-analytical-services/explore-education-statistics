@@ -367,6 +367,58 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
         }
 
         [Fact]
+        public async void GetDataFile_FileNotForRelease()
+        {
+            var release = new Release();
+            var otherRelease = new Release();
+
+            var dataFileReference = new ReleaseFileReference
+            {
+                Release = release,
+                Filename = "test-data.csv",
+                ReleaseFileType = ReleaseFileTypes.Data
+            };
+            var metaFileReference = new ReleaseFileReference
+            {
+                Release = release,
+                Filename = "test-data.meta.csv",
+                ReleaseFileType = ReleaseFileTypes.Metadata
+            };
+
+            var contextId = Guid.NewGuid().ToString();
+
+            await using (var context = InMemoryApplicationDbContext(contextId))
+            {
+                await context.AddRangeAsync(
+                    new ReleaseFile
+                    {
+                        Release = release,
+                        ReleaseFileReference = dataFileReference
+                    },
+                    new ReleaseFile
+                    {
+                        Release = release,
+                        ReleaseFileReference = metaFileReference
+                    }
+                );
+                await context.AddAsync(otherRelease);
+                await context.SaveChangesAsync();
+            }
+
+            await using (var context = InMemoryApplicationDbContext(contextId))
+            {
+                var service = SetupReleaseFilesService(context);
+                var result = await service.GetDataFile(
+                    otherRelease.Id,
+                    dataFileReference.Id
+                );
+
+                Assert.True(result.IsLeft);
+                Assert.IsType<NotFoundResult>(result.Left);
+            }
+        }
+
+        [Fact]
         public async void GetDataFile_NoMatchingBlob()
         {
             var release = new Release();

@@ -506,8 +506,18 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Services
             return await _persistenceHelper
                 .CheckEntityExists<Release>(releaseId)
                 .OnSuccess(_userService.CheckCanViewRelease)
-                .OnSuccess(async release => await _persistenceHelper.CheckEntityExists<ReleaseFileReference>(fileReferenceId))
-                .OnSuccess(async fileReference => await GetDataFileInfo(releaseId, fileReference));
+                .OnSuccess(
+                    async release => await _persistenceHelper
+                        .CheckEntityExists<ReleaseFile>(
+                            q => q.Include(rf => rf.ReleaseFileReference)
+                                .Where(
+                                    rf => rf.ReleaseId == release.Id
+                                          && rf.ReleaseFileReference.ReleaseFileType == ReleaseFileTypes.Data
+                                          && rf.ReleaseFileReferenceId == fileReferenceId
+                                )
+                        )
+                )
+                .OnSuccess(async file => await GetDataFileInfo(releaseId, file.ReleaseFileReference));
         }
 
         public async Task<Either<ActionResult, IEnumerable<DataFileInfo>>> ListDataFiles(Guid releaseId)
@@ -898,7 +908,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Services
         {
             var fileLink = await GetReleaseFileLinkAsync(releaseId, filename, type);
 
-            return !await _context.ReleaseFiles.AnyAsync(f => 
+            return !await _context.ReleaseFiles.AnyAsync(f =>
                 f.ReleaseFileReferenceId == fileLink.ReleaseFileReferenceId && f.Id != fileLink.Id);
         }
 
