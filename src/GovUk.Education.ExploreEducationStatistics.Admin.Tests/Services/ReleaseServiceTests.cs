@@ -2,7 +2,6 @@ using System;
 using System.Collections.Generic;
 using System.Globalization;
 using System.Linq;
-using System.Threading.Tasks;
 using GovUk.Education.ExploreEducationStatistics.Admin.Services;
 using GovUk.Education.ExploreEducationStatistics.Admin.Services.Interfaces;
 using GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services.Utils;
@@ -10,20 +9,20 @@ using GovUk.Education.ExploreEducationStatistics.Admin.ViewModels;
 using GovUk.Education.ExploreEducationStatistics.Common.Model;
 using GovUk.Education.ExploreEducationStatistics.Common.Services;
 using GovUk.Education.ExploreEducationStatistics.Common.Services.Interfaces;
+using GovUk.Education.ExploreEducationStatistics.Common.Services.Interfaces.Security;
 using GovUk.Education.ExploreEducationStatistics.Common.Utils;
 using GovUk.Education.ExploreEducationStatistics.Content.Model;
 using GovUk.Education.ExploreEducationStatistics.Content.Model.Database;
 using GovUk.Education.ExploreEducationStatistics.Data.Model;
 using GovUk.Education.ExploreEducationStatistics.Data.Model.Database;
 using GovUk.Education.ExploreEducationStatistics.Data.Model.Services.Interfaces;
+using Microsoft.AspNetCore.Mvc;
 using Microsoft.Azure.Cosmos.Table;
 using Microsoft.EntityFrameworkCore;
 using Moq;
 using Xunit;
 using static GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services.DbUtils;
 using static GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services.MapperUtils;
-using static GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services.ValidationTestUtil;
-using static GovUk.Education.ExploreEducationStatistics.Admin.Validators.ValidationErrorMessages;
 using static GovUk.Education.ExploreEducationStatistics.Common.TableStorageTableNames;
 using IFootnoteService = GovUk.Education.ExploreEducationStatistics.Admin.Services.Interfaces.IFootnoteService;
 using Publication = GovUk.Education.ExploreEducationStatistics.Content.Model.Publication;
@@ -37,7 +36,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
         private readonly Guid _userId = Guid.NewGuid();
 
         [Fact]
-        public async Task CreateReleaseNoTemplate()
+        public async void CreateReleaseNoTemplate()
         {
             var publication = new Publication
             {
@@ -48,19 +47,20 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
 
             await using (var context = InMemoryApplicationDbContext(contextId))
             {
-                await context.AddAsync(
+                context.Add(
                     new ReleaseType
                     {
                         Title = "Ad Hoc",
                     }
                 );
-                await context.AddAsync(publication);
+                context.Add(publication);
                 await context.SaveChangesAsync();
             }
 
             await using (var context = InMemoryApplicationDbContext(contextId))
             {
-                var releaseService = BuildReleaseService(context);
+                var mocks = Mocks();
+                var releaseService = BuildReleaseService(context, mocks);
 
                 var result = releaseService.CreateReleaseAsync(
                     new CreateReleaseViewModel
@@ -84,7 +84,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
         }
 
         [Fact]
-        public async Task CreateReleaseWithTemplate()
+        public void CreateReleaseWithTemplate()
         {
             var dataBlock1 = new DataBlock
             {
@@ -116,15 +116,15 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
 
             var contextId = Guid.NewGuid().ToString();
 
-            await using (var context = InMemoryApplicationDbContext(contextId))
+            using (var context = InMemoryApplicationDbContext(contextId))
             {
-                await context.AddAsync(
+                context.Add(
                     new ReleaseType
                     {
                         Id = new Guid("2a0217ca-c514-45da-a8b3-44c68a6737e8"), Title = "Ad Hoc",
                     }
                 );
-                await context.AddAsync(
+                context.Add(
                     new Publication
                     {
                         Id = new Guid("403d3c5d-a8cd-4d54-a029-0c74c86c55b2"),
@@ -194,12 +194,13 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
                         }
                     }
                 );
-                await context.SaveChangesAsync();
+                context.SaveChanges();
             }
 
-            await using (var context = InMemoryApplicationDbContext(contextId))
+            using (var context = InMemoryApplicationDbContext(contextId))
             {
-                var releaseService = BuildReleaseService(context);
+                var mocks = Mocks();
+                var releaseService = BuildReleaseService(context, mocks);
 
                 var result = releaseService.CreateReleaseAsync(
                     new CreateReleaseViewModel
@@ -216,7 +217,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
                 // Do an in depth check of the saved release
                 var newRelease = context.Releases
                     .Include(r => r.Content)
-                    .ThenInclude(join => join.ContentSection)
+                    .ThenInclude(join => @join.ContentSection)
                     .ThenInclude(section => section.Content)
                     .Single(r => r.Id == result.Result.Right.Id);
 
@@ -238,7 +239,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
         }
 
         [Fact]
-        public async Task LatestReleaseCorrectlyReported()
+        public async void LatestReleaseCorrectlyReported()
         {
             var publication = new Publication
             {
@@ -271,21 +272,23 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
 
             await using (var context = InMemoryApplicationDbContext(contextId))
             {
-                await context.AddAsync(publication);
-                await context.AddRangeAsync(
+                context.Add(publication);
+                context.AddRange(
                     new List<Release>
                     {
                         notLatestRelease, latestRelease
                     }
                 );
-                await context.SaveChangesAsync();
+                context.SaveChanges();
             }
+
+            var mocks = Mocks();
 
             // Note that we use different contexts for each method call - this is to avoid misleadingly optimistic
             // loading of the entity graph as we go.
             await using (var context = InMemoryApplicationDbContext(contextId))
             {
-                var releaseService = BuildReleaseService(context);
+                var releaseService = BuildReleaseService(context, mocks);
                 var notLatest = (await releaseService.GetRelease(notLatestRelease.Id)).Right;
 
                 Assert.Equal(notLatestRelease.Id, notLatest.Id);
@@ -294,7 +297,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
 
             await using (var context = InMemoryApplicationDbContext(contextId))
             {
-                var releaseService = BuildReleaseService(context);
+                var releaseService = BuildReleaseService(context, mocks);
                 var latest = (await releaseService.GetRelease(latestRelease.Id)).Right;
 
                 Assert.Equal(latestRelease.Id, latest.Id);
@@ -303,7 +306,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
         }
 
         [Fact]
-        public async Task RemoveDataFiles()
+        public async void RemoveDataFiles()
         {
             var release = new Release
             {
@@ -312,8 +315,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
 
             var subject = new Subject
             {
-                Id = Guid.NewGuid(),
-                Name = "Test subject"
+                Id = Guid.NewGuid()
             };
 
             var file = new ReleaseFileReference
@@ -324,6 +326,8 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
                 SubjectId = subject.Id
             };
 
+            var mocks = Mocks();
+
             var contentDbContextId = Guid.NewGuid().ToString();
 
             await using (var contentDbContext = InMemoryApplicationDbContext(contentDbContextId))
@@ -333,64 +337,47 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
                 await contentDbContext.SaveChangesAsync();
             }
 
-            var dataBlockService = new Mock<IDataBlockService>(MockBehavior.Strict);
-            var importStatusService = new Mock<IImportStatusService>(MockBehavior.Strict);
-            var subjectService = new Mock<ISubjectService>(MockBehavior.Strict);
-            var fileStorageService = new Mock<IReleaseFilesService>(MockBehavior.Strict);
-            var releaseSubjectService = new Mock<IReleaseSubjectService>(MockBehavior.Strict);
-
-            dataBlockService.Setup(service => service.GetDeleteDataBlockPlan(release.Id, subject))
-                .ReturnsAsync(new DeleteDataBlockPlan());
-
-            dataBlockService.Setup(service => service.DeleteDataBlocks(It.IsAny<DeleteDataBlockPlan>()))
-                .Returns(Task.CompletedTask);
-
-            importStatusService.Setup(service =>
+            mocks.ImportStatusService.Setup(service =>
                     service.IsImportFinished(file.ReleaseId, file.Filename))
                 .ReturnsAsync(true);
 
-            subjectService.Setup(service => service.GetAsync(subject.Id)).ReturnsAsync(subject);
+            mocks.SubjectService.Setup(service => service.GetAsync(subject.Id)).ReturnsAsync(subject);
 
-            fileStorageService.Setup(service => service.DeleteDataFiles(release.Id, file.Id, false))
+            mocks.FileStorageService.Setup(service => service.DeleteDataFiles(release.Id, file.Id, false))
                 .ReturnsAsync(Unit.Instance);
 
-            releaseSubjectService.Setup(service => service.SoftDeleteSubjectOrBreakReleaseLink(release.Id, subject.Id))
-                .Returns(Task.CompletedTask);
-
-                await using (var context = InMemoryApplicationDbContext(contentDbContextId))
+            await using (var context = InMemoryApplicationDbContext(contentDbContextId))
             {
-                var releaseService = BuildReleaseService(context,
-                    dataBlockService: dataBlockService.Object,
-                    importStatusService: importStatusService.Object,
-                    subjectService: subjectService.Object,
-                    fileStorageService: fileStorageService.Object,
-                    releaseSubjectService: releaseSubjectService.Object);
+                var releaseService = BuildReleaseService(context, mocks);
                 var result = await releaseService.RemoveDataFiles(release.Id, file.Id);
 
-                dataBlockService.Verify(mock =>
+                mocks.DataBlockService.Verify(mock =>
                     mock.GetDeleteDataBlockPlan(release.Id, subject), Times.Once());
-                dataBlockService.Verify(
+                mocks.DataBlockService.Verify(
                     mock => mock.DeleteDataBlocks(It.IsAny<DeleteDataBlockPlan>()),
                     Times.Once());
-                dataBlockService.VerifyNoOtherCalls();
+                mocks.DataBlockService.VerifyNoOtherCalls();
 
-                fileStorageService.Verify(mock =>
+                mocks.FileStorageService.Verify(mock =>
                     mock.DeleteDataFiles(release.Id, file.Id, false), Times.Once());
+                mocks.FileStorageService.VerifyNoOtherCalls();
 
-                importStatusService.Verify(
+                mocks.ImportStatusService.Verify(
                     mock => mock.IsImportFinished(release.Id, file.Filename),
                     Times.Once());
+                mocks.ImportStatusService.VerifyNoOtherCalls();
 
-                releaseSubjectService.Verify(
+                mocks.ReleaseSubjectService.Verify(
                     mock => mock.SoftDeleteSubjectOrBreakReleaseLink(release.Id, subject.Id),
                     Times.Once());
+                mocks.ReleaseSubjectService.VerifyNoOtherCalls();
 
                 Assert.True(result.IsRight);
             }
         }
 
         [Fact]
-        public async Task RemoveDataFiles_ReplacementExists()
+        public async void RemoveDataFiles_ReplacementExists()
         {
             var release = new Release
             {
@@ -399,14 +386,12 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
 
             var subject = new Subject
             {
-                Id = Guid.NewGuid(),
-                Name = "Test subject",
+                Id = Guid.NewGuid()
             };
 
             var replacementSubject = new Subject
             {
-                Id = Guid.NewGuid(),
-                Name = "Replacement subject"
+                Id = Guid.NewGuid()
             };
 
             var file = new ReleaseFileReference
@@ -428,6 +413,8 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
 
             file.ReplacedBy = replacementFile;
 
+            var mocks = Mocks();
+
             var contentDbContextId = Guid.NewGuid().ToString();
 
             await using (var contentDbContext = InMemoryApplicationDbContext(contentDbContextId))
@@ -437,53 +424,32 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
                 await contentDbContext.SaveChangesAsync();
             }
 
-            var dataBlockService = new Mock<IDataBlockService>(MockBehavior.Strict);
-            var importStatusService = new Mock<IImportStatusService>(MockBehavior.Strict);
-            var subjectService = new Mock<ISubjectService>(MockBehavior.Strict);
-            var fileStorageService = new Mock<IReleaseFilesService>(MockBehavior.Strict);
-            var releaseSubjectService = new Mock<IReleaseSubjectService>(MockBehavior.Strict);
-
-            dataBlockService.Setup(service =>
-                    service.GetDeleteDataBlockPlan(release.Id, It.IsIn(subject, replacementSubject)))
-                .ReturnsAsync(new DeleteDataBlockPlan());
-
-            dataBlockService.Setup(service => service.DeleteDataBlocks(It.IsAny<DeleteDataBlockPlan>()))
-                .Returns(Task.CompletedTask);
-
-            importStatusService.Setup(service =>
+            mocks.ImportStatusService.Setup(service =>
                     service.IsImportFinished(file.ReleaseId,
                         It.IsIn(file.Filename, replacementFile.Filename)))
                 .ReturnsAsync(true);
 
-            subjectService.Setup(service => service.GetAsync(subject.Id)).ReturnsAsync(subject);
-            subjectService.Setup(service => service.GetAsync(replacementSubject.Id)).ReturnsAsync(replacementSubject);
-            
-            fileStorageService
+            mocks.SubjectService.Setup(service => service.GetAsync(It.IsIn(subject.Id, replacementSubject.Id)))
+                .ReturnsAsync(subject);
+
+            mocks.FileStorageService
                 .Setup(service => service.DeleteDataFiles(release.Id, It.IsIn(file.Id, replacementFile.Id), false))
                 .ReturnsAsync(Unit.Instance);
 
-            releaseSubjectService.Setup(service =>
-                    service.SoftDeleteSubjectOrBreakReleaseLink(release.Id, It.IsIn(subject.Id, replacementSubject.Id)))
-                .Returns(Task.CompletedTask);
-
             await using (var context = InMemoryApplicationDbContext(contentDbContextId))
             {
-                var releaseService = BuildReleaseService(context,
-                    dataBlockService: dataBlockService.Object,
-                    importStatusService: importStatusService.Object,
-                    subjectService: subjectService.Object,
-                    fileStorageService: fileStorageService.Object,
-                    releaseSubjectService: releaseSubjectService.Object);
+                var releaseService = BuildReleaseService(context, mocks);
                 var result = await releaseService.RemoveDataFiles(release.Id, file.Id);
 
-                dataBlockService.Verify(
+                mocks.DataBlockService.Verify(
                     mock => mock.GetDeleteDataBlockPlan(release.Id, It.IsIn(subject, replacementSubject)),
                     Times.Exactly(2));
-                dataBlockService.Verify(
+                mocks.DataBlockService.Verify(
                     mock => mock.DeleteDataBlocks(It.IsAny<DeleteDataBlockPlan>()),
                     Times.Exactly(2));
+                mocks.DataBlockService.VerifyNoOtherCalls();
 
-                fileStorageService.Verify(
+                mocks.FileStorageService.Verify(
                     mock => mock.DeleteDataFiles(
                         release.Id,
                         It.IsIn(file.Id, replacementFile.Id),
@@ -491,21 +457,24 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
                     ),
                     Times.Exactly(2)
                 );
+                mocks.FileStorageService.VerifyNoOtherCalls();
 
-                importStatusService.Verify(
+                mocks.ImportStatusService.Verify(
                     mock => mock.IsImportFinished(release.Id,
                         It.IsIn(file.Filename, replacementFile.Filename)), Times.Exactly(2));
+                mocks.ImportStatusService.VerifyNoOtherCalls();
 
-                releaseSubjectService.Verify(
+                mocks.ReleaseSubjectService.Verify(
                     mock => mock.SoftDeleteSubjectOrBreakReleaseLink(release.Id,
                         It.IsIn(subject.Id, replacementSubject.Id)), Times.Exactly(2));
+                mocks.ReleaseSubjectService.VerifyNoOtherCalls();
 
                 Assert.True(result.IsRight);
             }
         }
 
         [Fact]
-        public async Task UpdateRelease()
+        public async void UpdateRelease()
         {
             var releaseId = Guid.NewGuid();
 
@@ -549,14 +518,15 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
             {
                 await context.AddRangeAsync(adHocReleaseType, officialStatisticsReleaseType);
 
-                await context.AddAsync(newPublication);
-                await context.AddAsync(release);
+                context.Add(newPublication);
+                context.Add(release);
                 await context.SaveChangesAsync();
             }
 
             await using (var context = InMemoryApplicationDbContext(contextId))
             {
-                var releaseService = BuildReleaseService(context);
+                var mocks = Mocks();
+                var releaseService = BuildReleaseService(context, mocks);
 
                 var nextReleaseDateEdited = new PartialDate
                 {
@@ -603,7 +573,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
         }
 
         [Fact]
-        public async Task UpdateRelease_FailsNonUniqueSlug()
+        public async void UpdateRelease_FailsNonUniqueSlug()
         {
             var releaseType = new ReleaseType
             {
@@ -645,14 +615,15 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
 
             await using (var context = InMemoryApplicationDbContext(contextId))
             {
-                await context.AddAsync(releaseType);
+                context.Add(releaseType);
                 await context.AddRangeAsync(release, otherRelease);
                 await context.SaveChangesAsync();
             }
 
             await using (var context = InMemoryApplicationDbContext(contextId))
             {
-                var releaseService = BuildReleaseService(context);
+                var mocks = Mocks();
+                var releaseService = BuildReleaseService(context, mocks);
 
                 var result = await releaseService
                     .UpdateRelease(
@@ -668,12 +639,14 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
                     );
 
                 Assert.True(result.IsLeft);
-                AssertValidationProblem(result.Left, SlugNotUnique);
+                var badRequestResult = Assert.IsType<BadRequestObjectResult>(result.Left);
+                var details = Assert.IsType<ValidationProblemDetails>(badRequestResult.Value);
+                Assert.Equal("SLUG_NOT_UNIQUE", details.Errors[""].First());
             }
         }
 
         [Fact]
-        public async Task UpdateRelease_FailsNonExistingPublication()
+        public async void UpdateRelease_FailsNonExistingPublication()
         {
             var releaseType = new ReleaseType
             {
@@ -700,14 +673,15 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
 
             await using (var context = InMemoryApplicationDbContext(contextId))
             {
-                await context.AddAsync(releaseType);
-                await context.AddAsync(release);
+                context.Add(releaseType);
+                context.Add(release);
                 await context.SaveChangesAsync();
             }
 
             await using (var context = InMemoryApplicationDbContext(contextId))
             {
-                var releaseService = BuildReleaseService(context);
+                var mocks = Mocks();
+                var releaseService = BuildReleaseService(context, mocks);
 
                 var result = await releaseService
                     .UpdateRelease(
@@ -723,12 +697,14 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
                     );
 
                 Assert.True(result.IsLeft);
-                AssertValidationProblem(result.Left, PublicationDoesNotExist);
+                var badRequestResult = Assert.IsType<BadRequestObjectResult>(result.Left);
+                var details = Assert.IsType<ValidationProblemDetails>(badRequestResult.Value);
+                Assert.Equal("PUBLICATION_DOES_NOT_EXIST", details.Errors[""].First());
             }
         }
 
         [Fact]
-        public async Task UpdateRelease_Amendment_NoUniqueSlugFailure()
+        public async void UpdateRelease_Amendment_NoUniqueSlugFailure()
         {
             var releaseType = new ReleaseType
             {
@@ -768,14 +744,15 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
 
             await using (var context = InMemoryApplicationDbContext(contextId))
             {
-                await context.AddAsync(releaseType);
+                context.Add(releaseType);
                 await context.AddRangeAsync(amendedRelease, initialRelease);
                 await context.SaveChangesAsync();
             }
 
             await using (var context = InMemoryApplicationDbContext(contextId))
             {
-                var releaseService = BuildReleaseService(context);
+                var mocks = Mocks();
+                var releaseService = BuildReleaseService(context, mocks);
 
                 var result = await releaseService
                     .UpdateRelease(
@@ -797,7 +774,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
         }
 
         [Fact]
-        public async Task UpdateRelease_Approved_FailsDataFilesNotUploaded()
+        public async void UpdateRelease_Approved_FailsDataFilesNotUploaded()
         {
             var releaseId = Guid.NewGuid();
             var release = new Release
@@ -822,14 +799,13 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
 
             await using (var context = InMemoryApplicationDbContext(contextId))
             {
-                await context.AddAsync(release);
+                context.Add(release);
                 await context.SaveChangesAsync();
             }
 
-            var tableStorageService = new Mock<ITableStorageService>();
-
             await using (var context = InMemoryApplicationDbContext(contextId))
             {
+                var mocks = Mocks();
                 var cloudTableMock = TableStorageTestUtils.MockCloudTable();
 
                 cloudTableMock
@@ -843,11 +819,11 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
                         )
                     );
 
-                tableStorageService.Setup(service => service.GetTableAsync(DatafileImportsTableName, true))
+                mocks.TableStorageService
+                    .Setup(service => service.GetTableAsync(DatafileImportsTableName, true))
                     .ReturnsAsync(cloudTableMock.Object);
 
-                var releaseService = BuildReleaseService(context,
-                    tableStorageService: tableStorageService.Object);
+                var releaseService = BuildReleaseService(context, mocks);
 
                 var result = await releaseService
                     .UpdateRelease(
@@ -864,12 +840,14 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
                     );
 
                 Assert.True(result.IsLeft);
-                AssertValidationProblem(result.Left, AllDatafilesUploadedMustBeComplete);
+                var badRequestResult = Assert.IsType<BadRequestObjectResult>(result.Left);
+                var details = Assert.IsType<ValidationProblemDetails>(badRequestResult.Value);
+                Assert.Equal("ALL_DATAFILES_UPLOADED_MUST_BE_COMPLETE", details.Errors[""].First());
             }
         }
 
         [Fact]
-        public async Task UpdateRelease_Approved_FailsMethodologyNotApproved()
+        public async void UpdateRelease_Approved_FailsMethodologyNotApproved()
         {
             var releaseId = Guid.NewGuid();
 
@@ -900,25 +878,24 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
 
             await using (var context = InMemoryApplicationDbContext(contextId))
             {
-                await context.AddAsync(release);
+                context.Add(release);
                 await context.SaveChangesAsync();
             }
 
-            var tableStorageService = new Mock<ITableStorageService>();
-
             await using (var context = InMemoryApplicationDbContext(contextId))
             {
+                var mocks = Mocks();
                 var cloudTableMock = TableStorageTestUtils.MockCloudTable();
 
                 cloudTableMock
                     .Setup(table => table.ExecuteQuerySegmentedAsync(It.IsAny<TableQuery<DatafileImport>>(), null))
                     .ReturnsAsync(TableStorageTestUtils.CreateTableQuerySegment(new List<DatafileImport>()));
 
-                tableStorageService.Setup(service => service.GetTableAsync(DatafileImportsTableName, true))
+                mocks.TableStorageService
+                    .Setup(service => service.GetTableAsync(DatafileImportsTableName, true))
                     .ReturnsAsync(cloudTableMock.Object);
 
-                var releaseService = BuildReleaseService(context,
-                    tableStorageService: tableStorageService.Object);
+                var releaseService = BuildReleaseService(context, mocks);
 
                 var result = await releaseService
                     .UpdateRelease(
@@ -935,12 +912,14 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
                     );
 
                 Assert.True(result.IsLeft);
-                AssertValidationProblem(result.Left, MethodologyMustBeApprovedOrPublished);
+                var badRequestResult = Assert.IsType<BadRequestObjectResult>(result.Left);
+                var details = Assert.IsType<ValidationProblemDetails>(badRequestResult.Value);
+                Assert.Equal("METHODOLOGY_MUST_BE_APPROVED_OR_PUBLISHED", details.Errors[""].First());
             }
         }
 
         [Fact]
-        public async Task UpdateRelease_Approved_FailsChangingToDraft()
+        public async void UpdateRelease_Approved_FailsChangingToDraft()
         {
             var releaseId = Guid.NewGuid();
             var release = new Release
@@ -966,24 +945,23 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
 
             await using (var context = InMemoryApplicationDbContext(contextId))
             {
-                await context.AddAsync(release);
+                context.Add(release);
                 await context.SaveChangesAsync();
             }
 
-            var tableStorageService = new Mock<ITableStorageService>();
-
             await using (var context = InMemoryApplicationDbContext(contextId))
             {
+                var mocks = Mocks();
                 var cloudTableMock = TableStorageTestUtils.MockCloudTable();
 
                 cloudTableMock
                     .Setup(table => table.ExecuteQuerySegmentedAsync(It.IsAny<TableQuery<DatafileImport>>(), null))
                     .ReturnsAsync(TableStorageTestUtils.CreateTableQuerySegment(new List<DatafileImport>()));
 
-                tableStorageService.Setup(service => service.GetTableAsync(DatafileImportsTableName, true))
+                mocks.TableStorageService
+                    .Setup(service => service.GetTableAsync(DatafileImportsTableName, true))
                     .ReturnsAsync(cloudTableMock.Object);
-                var releaseService = BuildReleaseService(context,
-                    tableStorageService: tableStorageService.Object);
+                var releaseService = BuildReleaseService(context, mocks);
 
                 var result = await releaseService
                     .UpdateRelease(
@@ -1000,12 +978,14 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
                     );
 
                 Assert.True(result.IsLeft);
-                AssertValidationProblem(result.Left, PublishedReleaseCannotBeUnapproved);
+                var badRequestResult = Assert.IsType<BadRequestObjectResult>(result.Left);
+                var details = Assert.IsType<ValidationProblemDetails>(badRequestResult.Value);
+                Assert.Equal("PUBLISHED_RELEASE_CANNOT_BE_UNAPPROVED", details.Errors[""].First());
             }
         }
 
         [Fact]
-        public async Task UpdateRelease_Approved_FailsNoPublishScheduledDate()
+        public async void UpdateRelease_Approved_FailsNoPublishScheduledDate()
         {
             var releaseId = Guid.NewGuid();
             var release = new Release
@@ -1031,24 +1011,24 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
 
             await using (var context = InMemoryApplicationDbContext(contextId))
             {
-                await context.AddAsync(release);
+                context.Add(release);
                 await context.SaveChangesAsync();
             }
 
-            var tableStorageService = new Mock<ITableStorageService>();
 
             await using (var context = InMemoryApplicationDbContext(contextId))
             {
+                var mocks = Mocks();
                 var cloudTableMock = TableStorageTestUtils.MockCloudTable();
 
                 cloudTableMock
                     .Setup(table => table.ExecuteQuerySegmentedAsync(It.IsAny<TableQuery<DatafileImport>>(), null))
                     .ReturnsAsync(TableStorageTestUtils.CreateTableQuerySegment(new List<DatafileImport>()));
 
-                tableStorageService.Setup(service => service.GetTableAsync(DatafileImportsTableName, true))
+                mocks.TableStorageService
+                    .Setup(service => service.GetTableAsync(DatafileImportsTableName, true))
                     .ReturnsAsync(cloudTableMock.Object);
-                var releaseService = BuildReleaseService(context,
-                    tableStorageService: tableStorageService.Object);
+                var releaseService = BuildReleaseService(context, mocks);
 
                 var result = await releaseService
                     .UpdateRelease(
@@ -1065,12 +1045,14 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
                     );
 
                 Assert.True(result.IsLeft);
-                AssertValidationProblem(result.Left, ApprovedReleaseMustHavePublishScheduledDate);
+                var badRequestResult = Assert.IsType<BadRequestObjectResult>(result.Left);
+                var details = Assert.IsType<ValidationProblemDetails>(badRequestResult.Value);
+                Assert.Equal("APPROVED_RELEASE_MUST_HAVE_PUBLISH_SCHEDULED_DATE", details.Errors[""].First());
             }
         }
 
         [Fact]
-        public async Task GetRelease()
+        public async void GetRelease()
         {
             var adHocReleaseType = new ReleaseType
             {
@@ -1110,13 +1092,14 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
 
             await using (var context = InMemoryApplicationDbContext(contextId))
             {
-                await context.AddAsync(publication);
+                context.Add(publication);
                 await context.SaveChangesAsync();
             }
 
             await using (var context = InMemoryApplicationDbContext(contextId))
             {
-                var releaseService = BuildReleaseService(context);
+                var mocks = Mocks();
+                var releaseService = BuildReleaseService(context, mocks);
 
                 var result = await releaseService.GetRelease(releaseId);
 
@@ -1144,7 +1127,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
         }
 
         [Fact]
-        public async Task GetLatestReleaseAsync()
+        public async void GetLatestReleaseAsync()
         {
             var publication = new Publication
             {
@@ -1200,7 +1183,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
 
             await using (var context = InMemoryApplicationDbContext(contextId))
             {
-                await context.AddAsync(
+                context.Add(
                     new UserReleaseRole
                     {
                         UserId = _userId,
@@ -1208,19 +1191,20 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
                     }
                 );
 
-                await context.AddAsync(publication);
-                await context.AddRangeAsync(
+                context.Add(publication);
+                context.AddRange(
                     new List<Release>
                     {
                         notLatestRelease, latestReleaseV0, latestReleaseV1, latestReleaseV2Deleted
                     }
                 );
-                await context.SaveChangesAsync();
+                context.SaveChanges();
             }
 
             await using (var context = InMemoryApplicationDbContext(contextId))
             {
-                var releaseService = BuildReleaseService(context);
+                var mocks = Mocks();
+                var releaseService = BuildReleaseService(context, mocks);
 
                 var latest = releaseService.GetLatestReleaseAsync(publication.Id).Result.Right;
 
@@ -1231,7 +1215,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
         }
 
         [Fact]
-        public async Task DeleteReleaseAsync()
+        public async void DeleteReleaseAsync()
         {
             var publication = new Publication
             {
@@ -1283,21 +1267,22 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
 
             await using (var context = InMemoryApplicationDbContext(contextId))
             {
-                await context.AddAsync(publication);
-                await context.AddRangeAsync(release, anotherRelease);
-                await context.AddRangeAsync(userReleaseRole, anotherUserReleaseRole);
-                await context.AddRangeAsync(userReleaseInvite, anotherUserReleaseInvite);
-                await context.SaveChangesAsync();
+                context.Add(publication);
+                context.AddRange(release, anotherRelease);
+                context.AddRange(userReleaseRole, anotherUserReleaseRole);
+                context.AddRange(userReleaseInvite, anotherUserReleaseInvite);
+                context.SaveChanges();
             }
 
             await using (var context = InMemoryApplicationDbContext(contextId))
             {
-                var releaseService = BuildReleaseService(context);
+                var mocks = Mocks();
+                var releaseService = BuildReleaseService(context, mocks);
 
                 var result = releaseService.DeleteReleaseAsync(release.Id).Result.Right;
                 Assert.True(result);
 
-                // assert that soft-deleted entities are no longer discoverable by default
+// assert that soft-deleted entities are no longer discoverable by default
                 var unableToFindDeletedRelease = context
                     .Releases
                     .FirstOrDefault(r => r.Id == release.Id);
@@ -1314,9 +1299,9 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
                     .UserReleaseInvites
                     .FirstOrDefault(r => r.Id == userReleaseInvite.Id);
 
-                Assert.Null(unableToFindDeletedReleaseInvite); 
+                Assert.Null(unableToFindDeletedReleaseInvite);
 
-                // assert that soft-deleted entities do not appear via references from other entities by default
+// assert that soft-deleted entities do not appear via references from other entities by default
                 var publicationWithoutDeletedRelease = context
                     .Publications
                     .Include(p => p.Releases)
@@ -1324,9 +1309,9 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
                     .First(p => p.Id == publication.Id);
 
                 Assert.Single(publicationWithoutDeletedRelease.Releases);
-                Assert.Equal(anotherRelease.Id, publicationWithoutDeletedRelease.Releases[0].Id); 
+                Assert.Equal(anotherRelease.Id, publicationWithoutDeletedRelease.Releases[0].Id);
 
-                // assert that soft-deleted entities have had their soft-deleted flag set to true
+// assert that soft-deleted entities have had their soft-deleted flag set to true
                 var updatedRelease = context
                     .Releases
                     .IgnoreQueryFilters()
@@ -1346,9 +1331,9 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
                     .IgnoreQueryFilters()
                     .First(r => r.Id == userReleaseInvite.Id);
 
-                Assert.True(updatedReleaseInvite.SoftDeleted); 
+                Assert.True(updatedReleaseInvite.SoftDeleted);
 
-                // assert that soft-deleted entities appear via references from other entities when explicitly searched for
+// assert that soft-deleted entities appear via references from other entities when explicitly searched for
                 var publicationWithDeletedRelease = context
                     .Publications
                     .Include(p => p.Releases)
@@ -1362,7 +1347,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
                 Assert.True(publicationWithDeletedRelease.Releases[0].SoftDeleted);
                 Assert.False(publicationWithDeletedRelease.Releases[1].SoftDeleted);
 
-                // assert that other entities were not accidentally soft-deleted
+// assert that other entities were not accidentally soft-deleted
                 var retrievedAnotherReleaseRole = context
                     .UserReleaseRoles
                     .First(r => r.Id == anotherUserReleaseRole.Id);
@@ -1377,42 +1362,80 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
             }
         }
 
-        private ReleaseService BuildReleaseService(
-            ContentDbContext contentDbContext,
-            StatisticsDbContext statisticsDbContext = null,
-            IPublishingService publishingService = null,
-            IReleaseRepository releaseRepository = null,
-            ISubjectService subjectService = null,
-            ITableStorageService tableStorageService = null,
-            IReleaseFilesService fileStorageService = null,
-            IImportStatusService importStatusService = null,
-            IFootnoteService footnoteService = null,
-            IDataBlockService dataBlockService = null,
-            IReleaseSubjectService releaseSubjectService = null)
+        private static ReleaseService BuildReleaseService(
+            ContentDbContext context,
+            (Mock<IUserService> userService,
+                Mock<IPublishingService> publishingService,
+                Mock<IReleaseRepository> releaseRepository,
+                Mock<ISubjectService> subjectService,
+                Mock<ITableStorageService> tableStorageService,
+                Mock<IReleaseFilesService> fileStorageService,
+                Mock<IImportStatusService> importStatusService,
+                Mock<IFootnoteService> footnoteService,
+                Mock<StatisticsDbContext> statisticsDbContext,
+                Mock<IDataBlockService> dataBlockService,
+                Mock<IReleaseSubjectService> releaseSubjectService) mocks)
+        {
+            var (
+                userService,
+                publishingService,
+                releaseRepository,
+                subjectService,
+                tableStorageService,
+                fileStorageService,
+                importStatusService,
+                footnoteService,
+                statisticsDbContext,
+                dataBlockService,
+                releaseSubjectService) = mocks;
+            return new ReleaseService(
+                context,
+                AdminMapper(),
+                publishingService.Object,
+                new PersistenceHelper<ContentDbContext>(context),
+                userService.Object,
+                releaseRepository.Object,
+                subjectService.Object,
+                tableStorageService.Object,
+                fileStorageService.Object,
+                importStatusService.Object,
+                footnoteService.Object,
+                statisticsDbContext.Object,
+                dataBlockService.Object,
+                releaseSubjectService.Object,
+                new SequentialGuidGenerator()
+            );
+        }
+
+        private (Mock<IUserService> UserService,
+            Mock<IPublishingService> PublishingService,
+            Mock<IReleaseRepository> ReleaseRepository,
+            Mock<ISubjectService> SubjectService,
+            Mock<ITableStorageService> TableStorageService,
+            Mock<IReleaseFilesService> FileStorageService,
+            Mock<IImportStatusService> ImportStatusService,
+            Mock<IFootnoteService> FootnoteService,
+            Mock<StatisticsDbContext> StatisticsDbContext,
+            Mock<IDataBlockService> DataBlockService,
+            Mock<IReleaseSubjectService> ReleaseSubjectService) Mocks()
         {
             var userService = MockUtils.AlwaysTrueUserService();
 
             userService
                 .Setup(s => s.GetUserId())
                 .Returns(_userId);
-            
-            return new ReleaseService(
-                contentDbContext,
-                AdminMapper(),
-                publishingService ?? new Mock<IPublishingService>().Object,
-                new PersistenceHelper<ContentDbContext>(contentDbContext),
-                userService.Object,
-                releaseRepository ?? new Mock<IReleaseRepository>().Object,
-                subjectService ?? new Mock<ISubjectService>().Object,
-                tableStorageService ?? new Mock<ITableStorageService>().Object,
-                fileStorageService ?? new Mock<IReleaseFilesService>().Object,
-                importStatusService ?? new Mock<IImportStatusService>().Object,
-                footnoteService ?? new Mock<IFootnoteService>().Object,
-                statisticsDbContext ?? new Mock<StatisticsDbContext>().Object,
-                dataBlockService ?? new Mock<IDataBlockService>().Object,
-                releaseSubjectService ?? new Mock<IReleaseSubjectService>().Object,
-                new SequentialGuidGenerator()
-            );
+            return (
+                userService,
+                new Mock<IPublishingService>(),
+                new Mock<IReleaseRepository>(),
+                new Mock<ISubjectService>(),
+                new Mock<ITableStorageService>(),
+                new Mock<IReleaseFilesService>(),
+                new Mock<IImportStatusService>(),
+                new Mock<IFootnoteService>(),
+                new Mock<StatisticsDbContext>(),
+                new Mock<IDataBlockService>(),
+                new Mock<IReleaseSubjectService>());
         }
     }
 }

@@ -62,22 +62,24 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Services
                 });
         }
 
-        public async Task<Either<ActionResult, Unit>> DeleteAsync(Guid releaseId, Guid id)
+        public async Task<Either<ActionResult, bool>> DeleteAsync(Guid releaseId, Guid id)
         {
             return await _persistenceHelper
                 .CheckEntityExists<DataBlock>(id)
                 .OnSuccess(CheckCanUpdateReleaseForDataBlock)
                 .OnSuccess(block => GetDeleteDataBlockPlan(releaseId, id)
-                .OnSuccessVoid(async deletePlan =>
+                .OnSuccess(async deletePlan =>
                 {
                     await DeleteDataBlocks(deletePlan);
+                    return true;
                 }));
         }
 
-        public async Task DeleteDataBlocks(DeleteDataBlockPlan deletePlan)
+        public async Task<Either<ActionResult, bool>> DeleteDataBlocks(DeleteDataBlockPlan deletePlan)
         {
             await DeleteDependentDataBlocks(deletePlan);
             await RemoveChartFileReleaseLinks(deletePlan);
+            return true;
         }
 
         public async Task<Either<ActionResult, Unit>> RemoveChartFile(Guid releaseId, Guid id)
