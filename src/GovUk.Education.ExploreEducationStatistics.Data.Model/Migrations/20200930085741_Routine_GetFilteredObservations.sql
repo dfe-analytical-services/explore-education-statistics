@@ -20,7 +20,13 @@ CREATE OR ALTER PROCEDURE GetFilteredObservations
 AS
 
 DECLARE @filterListTemp AS TABLE (RowID INT NOT NULL PRIMARY KEY IDENTITY(1,1), FilterId uniqueidentifier);
-INSERT INTO @filterListTemp SELECT DISTINCT FilterId FROM ObservationFilterItem WHERE FilterItemId in (select id from @filterItemList);
+
+INSERT INTO @filterListTemp
+SELECT DISTINCT F.Id
+FROM Filter F
+JOIN FilterGroup FG ON F.Id = FG.FilterId
+JOIN FilterItem FI ON FG.Id = FI.FilterGroupId
+WHERE FI.Id IN (SELECT ID FROM @filterItemList)
 
 DECLARE @numFilters int = @@ROWCOUNT,
         @filterList FilterTableType,
@@ -28,7 +34,7 @@ DECLARE @numFilters int = @@ROWCOUNT,
     
 INSERT INTO @filterList SELECT * FROM @filterListTemp;
 
-DECLARE @sqlString NVARCHAR(4000) = N'WITH ReducedRows AS (SELECT a.ObservationId, b.FilterId FROM ' +
+DECLARE @sqlString VARCHAR = N'WITH ReducedRows AS (SELECT a.ObservationId, b.FilterId FROM ' +
                                     N'(SELECT ObservationId FROM dbo.ObservationFilterItem a WHERE a.FilterId = ' +
                                     N'(SELECT FilterId FROM @filterList WHERE RowID = 1) AND a.FilterItemId IN ' +
                                     N'(SELECT id from @filterItemList) ';
@@ -66,7 +72,7 @@ DECLARE
                 OR EXISTS(SELECT TOP 1 1 FROM @sponsorList)
                 OR EXISTS(SELECT TOP 1 1 FROM @wardsList)
                 OR EXISTS(SELECT TOP 1 1 FROM @planningAreasList), 1, 0) AS BIT),
-    @paramDefinition NVARCHAR(2000);
+    @paramDefinition VARCHAR;
 
     SET @sqlString = @sqlString + N'SELECT rr.ObservationId AS Id FROM (SELECT ObservationId, cnt=COUNT(*) FROM ' +
                      N'ReducedRows GROUP BY ObservationId) kc ' +

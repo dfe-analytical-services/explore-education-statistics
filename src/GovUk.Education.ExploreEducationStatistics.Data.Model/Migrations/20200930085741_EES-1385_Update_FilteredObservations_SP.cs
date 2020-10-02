@@ -20,7 +20,6 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Model.Migrations
             migrationBuilder.SqlFromFile(MigrationsPath, $"{PreviousInsertObservationFilterItemsMigrationId}_Routine_InsertObservationFilterItems.sql");
             migrationBuilder.SqlFromFile(MigrationsPath, $"{MigrationId}_Type_FilterTableType.sql");
             migrationBuilder.SqlFromFile(MigrationsPath, $"{MigrationId}_Routine_GetFilteredObservations.sql");
-            migrationBuilder.SqlFromFile(MigrationsPath, $"{MigrationId}_Routine_GetObservations.sql");
         }
 
         protected override void Down(MigrationBuilder migrationBuilder)
@@ -28,7 +27,6 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Model.Migrations
             migrationBuilder.Sql("CREATE TYPE ObservationFilterItemType AS table( ObservationId uniqueidentifier NOT NULL, FilterItemId  uniqueidentifier NOT NULL)");
             migrationBuilder.SqlFromFile(MigrationsPath, $"{PreviousInsertObservationFilterItemsMigrationId}_Routine_InsertObservationFilterItems.sql");
             migrationBuilder.Sql("DROP PROCEDURE dbo.GetFilteredObservations");
-            migrationBuilder.Sql("DROP PROCEDURE dbo.GetObservations");
             migrationBuilder.Sql("DROP TYPE dbo.FilterTableType");
             migrationBuilder.SqlFromFile(MigrationsPath, $"{PreviousFilteredObservationsMigrationId}_Routine_FilteredObservations.sql");
         }

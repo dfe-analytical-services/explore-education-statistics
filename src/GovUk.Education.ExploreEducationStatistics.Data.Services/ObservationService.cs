@@ -110,47 +110,13 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Services
             }
             else
             {
-                var subjectIdParam = new SqlParameter("subjectId", query.SubjectId);
-
-                inner = _context
-                    .Set<Observation>()
-                    .FromSqlRaw("EXEC dbo.GetObservations " +
-                                "@subjectId," +
-                                "@geographicLevel," +
-                                "@timePeriodList," +
-                                "@countriesList," +
-                                "@institutionList," +
-                                "@localAuthorityList," +
-                                "@localAuthorityOldCodeList," +
-                                "@localAuthorityDistrictList," +
-                                "@localEnterprisePartnershipList," +
-                                "@mayoralCombinedAuthorityList," +
-                                "@multiAcademyTrustList," +
-                                "@opportunityAreaList," +
-                                "@parliamentaryConstituencyList," +
-                                "@regionsList," +
-                                "@rscRegionsList," +
-                                "@sponsorList," +
-                                "@wardList," +
-                                "@planningAreaList",
-                        subjectIdParam,
-                        geographicLevelParam,
-                        timePeriodListParam,
-                        countriesListParam,
-                        institutionListParam,
-                        localAuthorityListParam,
-                        localAuthorityOldCodeListParam,
-                        localAuthorityDistrictListParam,
-                        localEnterprisePartnershipListParam,
-                        mayoralCombinedAuthorityListParam,
-                        multiAcademyTrustListParam,
-                        opportunityAreaListParam,
-                        parliamentaryConstituencyListParam,
-                        regionsListParam,
-                        rscRegionListParam,
-                        sponsorListParam,
-                        wardListParam,
-                        planningAreaListParam);
+                inner = DbSet()
+                    .AsNoTracking()
+                    .Include(observation => observation.FilterItems)
+                    .ThenInclude(filterItem => filterItem.FilterItem)
+                    .ThenInclude(filterItem => filterItem.FilterGroup)
+                    .ThenInclude(filterGroup => filterGroup.Filter)
+                    .Where(ObservationPredicateBuilder.Build(SubjectMetaQueryContext.FromObservationQueryContext(query)));
             }
             
             _logger.LogTrace("Executed inner stored procedure in {Time} ms", stopwatch.Elapsed.TotalMilliseconds);
