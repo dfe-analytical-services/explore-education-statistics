@@ -18,70 +18,64 @@ CREATE OR ALTER PROCEDURE GetFilteredObservations
     @planningAreasList IdListVarcharType READONLY,
     @filterItemList IdListGuidType READONLY
 AS
+    DECLARE @filterListTemp AS TABLE (RowID INT NOT NULL PRIMARY KEY IDENTITY(1,1), FilterId uniqueidentifier);
 
-DECLARE @filterListTemp AS TABLE (RowID INT NOT NULL PRIMARY KEY IDENTITY(1,1), FilterId uniqueidentifier);
+    INSERT INTO @filterListTemp
+    SELECT DISTINCT F.Id
+    FROM Filter F
+    JOIN FilterGroup FG ON F.Id = FG.FilterId
+    JOIN FilterItem FI ON FG.Id = FI.FilterGroupId
+    WHERE FI.Id IN (SELECT ID FROM @filterItemList);
 
-INSERT INTO @filterListTemp
-SELECT DISTINCT F.Id
-FROM Filter F
-JOIN FilterGroup FG ON F.Id = FG.FilterId
-JOIN FilterItem FI ON FG.Id = FI.FilterGroupId
-WHERE FI.Id IN (SELECT ID FROM @filterItemList)
+    DECLARE @numFilters int = @@ROWCOUNT,
+            @filterList FilterTableType,
+            @COUNT int = 1;
 
-DECLARE @numFilters int = @@ROWCOUNT,
-        @filterList FilterTableType,
-        @COUNT int = 1;
-    
-INSERT INTO @filterList SELECT * FROM @filterListTemp;
+    INSERT INTO @filterList SELECT * FROM @filterListTemp;
 
-DECLARE @sqlString NVARCHAR(4000) = N'WITH ReducedRows AS (SELECT a.ObservationId, b.FilterId FROM ' +
-                                    N'(SELECT ObservationId FROM dbo.ObservationFilterItem a WHERE a.FilterId = ' +
-                                    N'(SELECT FilterId FROM @filterList WHERE RowID = 1) AND a.FilterItemId IN ' +
-                                    N'(SELECT id from @filterItemList) ';
+    DECLARE @sqlString NVARCHAR(4000) = N'WITH ReducedRows AS (SELECT a.ObservationId, a.FilterItemId FROM ' +
+                                        N'(SELECT ObservationId, FilterItemId FROM dbo.ObservationFilterItem a WHERE a.FilterId = ' +
+                                        N'(SELECT FilterId FROM @filterList WHERE RowID = 1) AND a.FilterItemId IN ' +
+                                        N'(SELECT id from @filterItemList) ';
 
--- Use Row Reduction
-WHILE (@COUNT < @numFilters)
-BEGIN
-    SET @COUNT = @COUNT + 1;
+    -- Use Row Reduction
+    WHILE (@COUNT < @numFilters)
+    BEGIN
+        SET @COUNT = @COUNT + 1;
+        SET @sqlString = @sqlString +
+                         N' AND EXISTS (SELECT 1 FROM dbo.ObservationFilterItem b ' +
+                         N'WHERE a.ObservationId = b.ObservationId AND b.FilterItemId IN' +
+                         N' (select id from @filterItemList) AND b.FilterId = (SELECT FilterId FROM @filterList WHERE RowID = ' +
+                         CAST(@COUNT AS VARCHAR) +
+                         N'))';
+    END
+
     SET @sqlString = @sqlString +
-                     N' AND EXISTS (SELECT 1 FROM dbo.ObservationFilterItem b ' +
-                     N'WHERE a.ObservationId = b.ObservationId AND b.FilterItemId IN' +
-                     N' (select id from @filterItemList) AND b.FilterId = (SELECT FilterId FROM @filterList WHERE RowID = ' +
-                     CAST(@COUNT AS VARCHAR) +
-                     N')))';
-END
+                     N') a JOIN dbo.ObservationFilterItem b ON a.ObservationId = b.ObservationId AND a.FilterItemId = b.FilterItemId) '
 
-SET @sqlString = @sqlString + 
-                 N') a JOIN dbo.ObservationFilterItem b ON a.ObservationId = b.ObservationId) '
+    DECLARE
+        @timePeriodCount INT = (SELECT count(year) FROM @timePeriodList),
+        @observationalUnitExists BIT = CAST(IIF(
+                    EXISTS(SELECT TOP 1 1 FROM @countriesList)
+                    OR EXISTS(SELECT TOP 1 1 FROM @institutionsList)
+                    OR EXISTS(SELECT TOP 1 1 FROM @localAuthorityList)
+                    OR EXISTS(SELECT TOP 1 1 FROM @localAuthorityOldCodeList)
+                    OR EXISTS(SELECT TOP 1 1 FROM @localAuthorityDistrictList)
+                    OR EXISTS(SELECT TOP 1 1 FROM @localEnterprisePartnershipsList)
+                    OR EXISTS(SELECT TOP 1 1 FROM @mayoralCombinedAuthoritiesList)
+                    OR EXISTS(SELECT TOP 1 1 FROM @multiAcademyTrustList)
+                    OR EXISTS(SELECT TOP 1 1 FROM @opportunityAreasList)
+                    OR EXISTS(SELECT TOP 1 1 FROM @parliamentaryConstituenciesList)
+                    OR EXISTS(SELECT TOP 1 1 FROM @regionsList)
+                    OR EXISTS(SELECT TOP 1 1 FROM @rscRegionsList)
+                    OR EXISTS(SELECT TOP 1 1 FROM @sponsorList)
+                    OR EXISTS(SELECT TOP 1 1 FROM @wardsList)
+                    OR EXISTS(SELECT TOP 1 1 FROM @planningAreasList), 1, 0) AS BIT),
+        @paramDefinition NVARCHAR(4000);
 
-DECLARE
-    @timePeriodCount INT = (SELECT count(year) FROM @timePeriodList),
-    @observationalUnitExists BIT = CAST(IIF(
-                EXISTS(SELECT TOP 1 1 FROM @countriesList)
-                OR EXISTS(SELECT TOP 1 1 FROM @institutionsList)
-                OR EXISTS(SELECT TOP 1 1 FROM @localAuthorityList)
-                OR EXISTS(SELECT TOP 1 1 FROM @localAuthorityOldCodeList)
-                OR EXISTS(SELECT TOP 1 1 FROM @localAuthorityDistrictList)
-                OR EXISTS(SELECT TOP 1 1 FROM @localEnterprisePartnershipsList)
-                OR EXISTS(SELECT TOP 1 1 FROM @mayoralCombinedAuthoritiesList)
-                OR EXISTS(SELECT TOP 1 1 FROM @multiAcademyTrustList)
-                OR EXISTS(SELECT TOP 1 1 FROM @opportunityAreasList)
-                OR EXISTS(SELECT TOP 1 1 FROM @parliamentaryConstituenciesList)
-                OR EXISTS(SELECT TOP 1 1 FROM @regionsList)
-                OR EXISTS(SELECT TOP 1 1 FROM @rscRegionsList)
-                OR EXISTS(SELECT TOP 1 1 FROM @sponsorList)
-                OR EXISTS(SELECT TOP 1 1 FROM @wardsList)
-                OR EXISTS(SELECT TOP 1 1 FROM @planningAreasList), 1, 0) AS BIT),
-    @paramDefinition NVARCHAR(4000);
-
-    SET @sqlString = @sqlString + N'SELECT rr.ObservationId AS Id FROM (SELECT ObservationId, cnt=COUNT(*) FROM ' +
-                     N'ReducedRows GROUP BY ObservationId) kc ' +
-                     N'INNER JOIN (SELECT cnt=COUNT(*) FROM @filterList) nc ON nc.cnt = kc.cnt ' +
-                     N'JOIN ReducedRows rr ON rr.ObservationId = kc.ObservationId ' +
-                     N'JOIN @filterList n ON n.FilterId = rr.FilterId ' +
-                     N'JOIN Observation o on rr.ObservationId = o.Id ' +
+    SET @sqlString = @sqlString + N'SELECT DISTINCT o.Id from Observation o ' +
                      N'JOIN Location l ON o.LocationId = l.Id ' +
-                     N'WHERE 1=1 '
+                     N'WHERE EXISTS (SELECT 1 FROM ReducedRows WHERE ObservationId = o.Id) '
 
     IF (@geographicLevel IS NOT NULL)
         SET @sqlString = @sqlString + N'AND o.GeographicLevel = @geographicLevel '
@@ -123,30 +117,25 @@ DECLARE
             SET @sqlString = left(@sqlString, len(@sqlString) - 3) + N') '
         END
 
-    SET @sqlString = @sqlString + N'GROUP BY rr.ObservationId HAVING COUNT(*) = MIN(nc.cnt) ' +
-                     N'ORDER BY rr.ObservationId;'
-
     SET @paramDefinition = N'@geographicLevel nvarchar(6) = NULL,
-                           @timePeriodList TimePeriodListType READONLY,
-                           @countriesList IdListVarcharType READONLY,
-                           @institutionsList IdListVarcharType READONLY,
-                           @localAuthorityList IdListVarcharType READONLY,
-                           @localAuthorityOldCodeList IdListVarcharType READONLY,
-                           @localAuthorityDistrictList IdListVarcharType READONLY,
-                           @localEnterprisePartnershipsList IdListVarcharType READONLY,
-                           @mayoralCombinedAuthoritiesList IdListVarcharType READONLY,
-                           @multiAcademyTrustList IdListVarcharType READONLY,
-                           @opportunityAreasList IdListVarcharType READONLY,
-                           @parliamentaryConstituenciesList IdListVarcharType READONLY,
-                           @regionsList IdListVarcharType READONLY,
-                           @rscRegionsList IdListVarcharType READONLY,
-                           @sponsorList IdListVarcharType READONLY,
-                           @wardsList IdListVarcharType READONLY,
-                           @planningAreasList IdListVarcharType READONLY,
-                           @filterItemList IdListGuidType READONLY,
-                           @filterList FilterTableType READONLY'
-
-    PRINT @sqlString
+                       @timePeriodList TimePeriodListType READONLY,
+                       @countriesList IdListVarcharType READONLY,
+                       @institutionsList IdListVarcharType READONLY,
+                       @localAuthorityList IdListVarcharType READONLY,
+                       @localAuthorityOldCodeList IdListVarcharType READONLY,
+                       @localAuthorityDistrictList IdListVarcharType READONLY,
+                       @localEnterprisePartnershipsList IdListVarcharType READONLY,
+                       @mayoralCombinedAuthoritiesList IdListVarcharType READONLY,
+                       @multiAcademyTrustList IdListVarcharType READONLY,
+                       @opportunityAreasList IdListVarcharType READONLY,
+                       @parliamentaryConstituenciesList IdListVarcharType READONLY,
+                       @regionsList IdListVarcharType READONLY,
+                       @rscRegionsList IdListVarcharType READONLY,
+                       @sponsorList IdListVarcharType READONLY,
+                       @wardsList IdListVarcharType READONLY,
+                       @planningAreasList IdListVarcharType READONLY,
+                       @filterItemList IdListGuidType READONLY,
+                       @filterList FilterTableType READONLY'
 
     EXEC sp_executesql @sqlString, @paramDefinition,
          @geographicLevel = @geographicLevel,
@@ -167,4 +156,4 @@ DECLARE
          @wardsList = @wardsList,
          @planningAreasList = @planningAreasList,
          @filterItemList = @filterItemList,
-         @filterList = @filterList;
+         @filterList = @filterList
