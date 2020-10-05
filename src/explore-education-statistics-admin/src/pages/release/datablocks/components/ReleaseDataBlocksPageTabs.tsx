@@ -23,10 +23,12 @@ import mapTableHeadersConfig from '@common/modules/table-tool/utils/mapTableHead
 import mapUnmappedTableHeaders from '@common/modules/table-tool/utils/mapUnmappedTableHeaders';
 import tableBuilderService, {
   ReleaseTableDataQuery,
+  TableDataQuery,
 } from '@common/services/tableBuilderService';
 import minDelay from '@common/utils/minDelay';
 import produce from 'immer';
 import React, { useCallback, useState } from 'react';
+import omit from 'lodash/omit';
 
 export type SavedDataBlock = CreateReleaseDataBlock & {
   id?: string;
@@ -105,20 +107,20 @@ const ReleaseDataBlocksPageTabs = ({
       const dataBlockToSave: SavedDataBlock = {
         ...dataBlock,
         query: {
-          ...dataBlock.query,
+          ...(omit(dataBlock.query, ['releaseId']) as SavedDataBlock['query']),
           includeGeoJson: dataBlock.charts[0]?.type === 'map',
         },
       };
 
       const newDataBlock = await minDelay(() => {
         if (dataBlockToSave.id) {
-          return dataBlocksService.putDataBlock(
+          return dataBlocksService.updateDataBlock(
             dataBlockToSave.id,
             dataBlockToSave as ReleaseDataBlock,
           );
         }
 
-        return dataBlocksService.postDataBlock(releaseId, dataBlockToSave);
+        return dataBlocksService.createDataBlock(releaseId, dataBlockToSave);
       }, 500);
 
       onDataBlockSave(newDataBlock);
@@ -278,6 +280,7 @@ const ReleaseDataBlocksPageTabs = ({
                   key={saveNumber}
                   dataBlock={selectedDataBlock}
                   query={query}
+                  releaseId={releaseId}
                   table={response.table}
                   onDataBlockSave={handleDataBlockSave}
                   onTableUpdate={handleChartTableUpdate}

@@ -8,11 +8,11 @@ import { FullTable } from '@common/modules/table-tool/types/fullTable';
 import mapFullTable from '@common/modules/table-tool/utils/mapFullTable';
 import tableBuilderService, {
   ReleaseTableDataQuery,
+  TableDataQuery,
 } from '@common/services/tableBuilderService';
 import { Chart } from '@common/services/types/blocks';
 import isEqual from 'lodash/isEqual';
 import React, { useCallback, useMemo } from 'react';
-import { useParams } from 'react-router';
 
 export type ChartBuilderTableUpdateHandler = (params: {
   table: FullTable;
@@ -21,7 +21,8 @@ export type ChartBuilderTableUpdateHandler = (params: {
 
 interface Props {
   dataBlock: ReleaseDataBlock;
-  query: ReleaseTableDataQuery;
+  query: TableDataQuery;
+  releaseId: string;
   table: FullTable;
   onDataBlockSave: (dataBlock: SavedDataBlock) => void;
   onTableUpdate: ChartBuilderTableUpdateHandler;
@@ -30,12 +31,11 @@ interface Props {
 const ChartBuilderTabSection = ({
   dataBlock,
   query,
+  releaseId,
   table,
   onDataBlockSave,
   onTableUpdate,
 }: Props) => {
-  const { releaseId } = useParams<{ releaseId: string }>();
-
   const meta = useMemo(
     () => ({
       ...table.subjectMeta,
