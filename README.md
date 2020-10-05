@@ -61,6 +61,9 @@ You will need the following groups of dependencies to run the project successful
    
 2. To emulate azure storage you will require either:
    - [Azure Storage Emulator](https://docs.microsoft.com/en-us/azure/storage/common/storage-use-emulator)
+
+  To run Azure Storage Emulator, you'll need to install LocalDB via SQL Express. You can find the installer for Windows x64 [here](https://download.microsoft.com/download/3/9/F/39F968FA-DEBB-4960-8F9E-0E7BB3035959/SQLEXPR_x64_ENU.exe).
+
    - [Azurite](https://github.com/Azure/Azurite)
    - [Azure Storage Account](https://azure.microsoft.com/en-gb/services/storage/) 
    
