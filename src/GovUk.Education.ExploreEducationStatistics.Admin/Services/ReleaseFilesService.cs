@@ -294,6 +294,14 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Services
                             AdminReleasePath(releaseId, ReleaseFileTypes.Metadata, metaReleaseFileReference.Filename)
                         );
 
+                        // If this is a replacement then unlink it from the original
+                        if (releaseFileReference.ReplacingId.HasValue)
+                        {
+                            var originalFile = await GetReleaseFileReference(releaseFileReference.ReplacingId.Value);
+                            originalFile.ReplacedById = null;
+                            _context.Update(originalFile);
+                        }
+
                         await DeleteFileLink(releaseId, releaseFileReference.Id);
                         await DeleteFileLink(releaseId, metaReleaseFileReference.Id);
 
