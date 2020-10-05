@@ -7,7 +7,6 @@ import React, {
   HTMLAttributes,
   ReactNode,
   useEffect,
-  useRef,
   useState,
 } from 'react';
 import styles from './TabsSection.module.scss';
