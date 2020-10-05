@@ -25,7 +25,6 @@ interface Props {
 }
 
 const Tabs = ({ children, id, modifyHash = true, testId, onToggle }: Props) => {
-  const [loadedSections, setLoadedSections] = useState(new Set<number>());
   const [selectedTabIndex, setSelectedTabIndex] = useState(0);
 
   const { onMedia } = useDesktopMedia();
@@ -38,7 +37,6 @@ const Tabs = ({ children, id, modifyHash = true, testId, onToggle }: Props) => {
   ) as ReactElement<TabsSectionProps>[];
 
   const sections = filteredChildren.map((section, index) => {
-    const { lazy } = section.props;
     const sectionId = section.props.id || `${id}-${index + 1}`;
 
     return cloneElement<
@@ -54,7 +52,7 @@ const Tabs = ({ children, id, modifyHash = true, testId, onToggle }: Props) => {
         key: sectionId,
         ref: (element: HTMLElement) => sectionElements.current.push(element),
       },
-      lazy && !loadedSections.has(index) ? null : section.props.children,
+      section.props.children,
     );
   });
 
@@ -72,10 +70,9 @@ const Tabs = ({ children, id, modifyHash = true, testId, onToggle }: Props) => {
         }
       }
 
-      setLoadedSections(loadedSections.add(index));
       setSelectedTabIndex(index);
     },
-    [loadedSections, modifyHash],
+    [modifyHash],
   );
 
   useEffect(() => {

@@ -6,6 +6,9 @@ import React, {
   forwardRef,
   HTMLAttributes,
   ReactNode,
+  useEffect,
+  useRef,
+  useState,
 } from 'react';
 import styles from './TabsSection.module.scss';
 
@@ -33,18 +36,26 @@ const TabsSection = forwardRef<HTMLElement, TabsSectionProps>(
       id,
       headingTitle = '',
       headingTag = 'h3',
+      lazy,
       ...restProps
     }: TabsSectionProps,
     ref,
   ) => {
-    const { onMedia } = useDesktopMedia();
-
     // Hide additional props from the component's public API to
     // avoid any confusion over this component's usage as
     // it should only be used in combination with Tabs.
     const { hidden, ...tabProps } = restProps as HTMLAttributes<HTMLElement>;
 
-    return (
+    const { onMedia } = useDesktopMedia();
+    const [hasRendered, setRendered] = useState(!lazy);
+
+    useEffect(() => {
+      if (lazy && !hasRendered && !hidden) {
+        setRendered(true);
+      }
+    }, [hasRendered, hidden, lazy]);
+
+    return hasRendered ? (
       <section
         aria-labelledby={onMedia(tabProps['aria-labelledby'])}
         hidden={hidden}
@@ -59,7 +70,7 @@ const TabsSection = forwardRef<HTMLElement, TabsSectionProps>(
         {headingTitle && createElement(headingTag, { children: headingTitle })}
         {children}
       </section>
-    );
+    ) : null;
   },
 );
 
