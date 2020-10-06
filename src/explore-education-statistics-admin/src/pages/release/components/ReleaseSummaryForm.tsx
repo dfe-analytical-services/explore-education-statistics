@@ -104,11 +104,7 @@ const ReleaseSummaryForm = <
     timePeriodCoverageCode: Yup.string().required('Choose a time period'),
     timePeriodCoverageStartYear: Yup.string()
       .required('Enter a year')
-      .test(
-        'length',
-        'Year must be exactly 4 characters',
-        val => val?.length === 4,
-      ),
+      .length(4, 'Year must be exactly 4 characters'),
     releaseTypeId: Yup.string().required('Choose a release type'),
   });
 
