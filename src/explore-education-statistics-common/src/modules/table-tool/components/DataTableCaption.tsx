@@ -11,6 +11,7 @@ export function generateTableTitle({
   locations,
   subjectName,
   publicationName,
+  filters,
   expanded,
 }: FullTableMeta & {
   expanded?: boolean;
@@ -40,7 +41,13 @@ export function generateTableTitle({
       : locations.map(location => location.label).sort(),
   )}`;
 
-  return `Table showing ${indicatorString}'${subjectName}' from '${publicationName}'${locationsString}${timePeriodString}`;
+  const filterString = commaList(
+    Object.keys(filters).flatMap(value =>
+      filters[value].options.flatMap(value1 => value1.label),
+    ),
+  );
+
+  return `Table showing ${indicatorString}'${subjectName}' for ${filterString} from '${publicationName}'${locationsString}${timePeriodString}`;
 }
 
 interface Props extends FullTableMeta {
