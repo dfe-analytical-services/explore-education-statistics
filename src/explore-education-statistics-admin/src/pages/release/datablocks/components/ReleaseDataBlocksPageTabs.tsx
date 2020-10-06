@@ -21,14 +21,14 @@ import { TableHeadersConfig } from '@common/modules/table-tool/types/tableHeader
 import mapFullTable from '@common/modules/table-tool/utils/mapFullTable';
 import mapTableHeadersConfig from '@common/modules/table-tool/utils/mapTableHeadersConfig';
 import mapUnmappedTableHeaders from '@common/modules/table-tool/utils/mapUnmappedTableHeaders';
+import logger from '@common/services/logger';
 import tableBuilderService, {
   ReleaseTableDataQuery,
-  TableDataQuery,
 } from '@common/services/tableBuilderService';
 import minDelay from '@common/utils/minDelay';
 import produce from 'immer';
-import React, { useCallback, useState } from 'react';
 import omit from 'lodash/omit';
+import React, { useCallback, useState } from 'react';
 
 export type SavedDataBlock = CreateReleaseDataBlock & {
   id?: string;
@@ -68,7 +68,11 @@ const ReleaseDataBlocksPageTabs = ({
       ),
     };
 
-    const { initialStep, subjectMeta } = await getInitialStepSubjectMeta(query);
+    const tableData = await tableBuilderService.getTableData(query);
+    const { initialStep, subjectMeta } = await getInitialStepSubjectMeta(
+      query,
+      tableData,
+    );
 
     // Reduce step by 1 as there is no publication step
     const step = initialStep - 1;
@@ -81,23 +85,34 @@ const ReleaseDataBlocksPageTabs = ({
       };
     }
 
-    const tableData = await tableBuilderService.getTableData(query);
-
     const table = mapFullTable(tableData);
-    const tableHeaders = mapTableHeadersConfig(
-      selectedDataBlock.table.tableHeaders,
-      table.subjectMeta,
-    );
 
-    return {
-      initialStep: step,
-      subjectMeta,
-      query,
-      response: {
-        table,
-        tableHeaders,
-      },
-    };
+    try {
+      const tableHeaders = mapTableHeadersConfig(
+        selectedDataBlock.table.tableHeaders,
+        table.subjectMeta,
+      );
+
+      return {
+        initialStep: step,
+        subjectMeta,
+        query,
+        response: {
+          table,
+          tableHeaders,
+        },
+      };
+    } catch (err) {
+      logger.error(err);
+
+      // Return to step 2 if anything is wrong
+      // with producing the table headers.
+      return {
+        initialStep: 2,
+        subjectMeta,
+        query,
+      };
+    }
   }, []);
 
   const handleDataBlockSave = useCallback(
@@ -237,8 +252,8 @@ const ReleaseDataBlocksPageTabs = ({
 
       {tableState && tableState?.initialStep < 5 && (
         <WarningMessage>
-          There is a problem with this data block as some of the selected
-          options are invalid. Please re-check your choices to ensure the
+          There is a problem with this data block as we could not render a table
+          with the selected options. Please re-check your choices to ensure the
           correct table can be produced.
         </WarningMessage>
       )}

@@ -5,12 +5,11 @@ import _dataBlockService, {
 import _tableBuilderService, {
   SubjectMeta,
   TableDataResponse,
-  TimePeriodQuery,
 } from '@common/services/tableBuilderService';
 import { render, screen, waitFor } from '@testing-library/react';
+import userEvent from '@testing-library/user-event';
 import noop from 'lodash/noop';
 import React from 'react';
-import userEvent from '@testing-library/user-event';
 
 jest.mock('@admin/services/dataBlockService');
 jest.mock('@common/services/tableBuilderService');
@@ -113,7 +112,22 @@ describe('ReleaseDataBlocksPageTabs', () => {
         },
       },
     },
-    results: [],
+    results: [
+      {
+        timePeriod: '2020_AY',
+        measures: {
+          'authorised-absence-sessions': '123',
+        },
+        location: {
+          localAuthority: {
+            name: 'Barnet',
+            code: 'barnet',
+          },
+        },
+        geographicLevel: 'localAuthority',
+        filters: ['gender-female'],
+      },
+    ],
   };
 
   const testDataBlock: ReleaseDataBlock = {
@@ -140,10 +154,12 @@ describe('ReleaseDataBlocksPageTabs', () => {
     table: {
       indicators: [],
       tableHeaders: {
-        columnGroups: [],
-        columns: [],
-        rowGroups: [],
-        rows: [],
+        columnGroups: [[{ type: 'TimePeriod', value: '2020_AY' }]],
+        columns: [{ type: 'Filter', value: 'gender-female' }],
+        rowGroups: [
+          [{ type: 'Location', value: 'barnet', level: 'localAuthority' }],
+        ],
+        rows: [{ type: 'Indicator', value: 'authorised-absence-sessions' }],
       },
     },
     charts: [],
@@ -202,7 +218,6 @@ describe('ReleaseDataBlocksPageTabs', () => {
     });
 
     tableBuilderService.getSubjectMeta.mockResolvedValue(testSubjectMeta);
-    tableBuilderService.filterSubjectMeta.mockResolvedValue(testSubjectMeta);
     tableBuilderService.getTableData.mockResolvedValue(testTableData);
 
     render(
@@ -238,7 +253,6 @@ describe('ReleaseDataBlocksPageTabs', () => {
     });
 
     tableBuilderService.getSubjectMeta.mockResolvedValue(testSubjectMeta);
-    tableBuilderService.filterSubjectMeta.mockResolvedValue(testSubjectMeta);
     tableBuilderService.getTableData.mockResolvedValue(testTableData);
 
     render(
@@ -259,28 +273,22 @@ describe('ReleaseDataBlocksPageTabs', () => {
     });
   });
 
-  test('renders partially initialised table tool when there are invalid locations in query', async () => {
+  test('renders partially initialised table tool when there are no table results', async () => {
     tableBuilderService.getReleaseMeta.mockResolvedValue({
       releaseId: 'release-1',
       subjects: [],
     });
 
     tableBuilderService.getSubjectMeta.mockResolvedValue(testSubjectMeta);
-    tableBuilderService.filterSubjectMeta.mockResolvedValue(testSubjectMeta);
-    tableBuilderService.getTableData.mockResolvedValue(testTableData);
+    tableBuilderService.getTableData.mockResolvedValue({
+      ...testTableData,
+      results: [],
+    });
 
     render(
       <ReleaseDataBlocksPageTabs
         releaseId="release-1"
-        selectedDataBlock={{
-          ...testDataBlock,
-          query: {
-            ...testDataBlock.query,
-            locations: {
-              localAuthority: ['barnet', 'invalid-location'],
-            },
-          },
-        }}
+        selectedDataBlock={testDataBlock}
         onDataBlockSave={noop}
       />,
     );
@@ -288,7 +296,7 @@ describe('ReleaseDataBlocksPageTabs', () => {
     await waitFor(() => {
       expect(
         screen.getByText(
-          /There is a problem with this data block as some of the selected options are invalid/,
+          /There is a problem with this data block as we could not render a table/,
         ),
       ).toBeInTheDocument();
 
@@ -302,14 +310,13 @@ describe('ReleaseDataBlocksPageTabs', () => {
     });
   });
 
-  test('renders partially initialised table tool when there are invalid time periods in query', async () => {
+  test('renders partially initialised table tool when table header configuration would be invalid', async () => {
     tableBuilderService.getReleaseMeta.mockResolvedValue({
       releaseId: 'release-1',
       subjects: [],
     });
 
     tableBuilderService.getSubjectMeta.mockResolvedValue(testSubjectMeta);
-    tableBuilderService.filterSubjectMeta.mockResolvedValue(testSubjectMeta);
     tableBuilderService.getTableData.mockResolvedValue(testTableData);
 
     render(
@@ -317,12 +324,14 @@ describe('ReleaseDataBlocksPageTabs', () => {
         releaseId="release-1"
         selectedDataBlock={{
           ...testDataBlock,
-          query: {
-            ...testDataBlock.query,
-            timePeriod: {
-              ...(testDataBlock.query.timePeriod as TimePeriodQuery),
-              endCode: 'AY',
-              endYear: 2021,
+          table: {
+            indicators: [],
+            tableHeaders: {
+              ...testDataBlock.table.tableHeaders,
+              rows: [
+                { type: 'Indicator', value: 'authorised-absence-sessions' },
+                { type: 'Indicator', value: 'not-a-valid-indicator' },
+              ],
             },
           },
         }}
@@ -333,103 +342,16 @@ describe('ReleaseDataBlocksPageTabs', () => {
     await waitFor(() => {
       expect(
         screen.getByText(
-          /There is a problem with this data block as some of the selected options are invalid/,
+          /There is a problem with this data block as we could not render a table/,
         ),
       ).toBeInTheDocument();
 
       const stepHeadings = screen.queryAllByRole('heading', { name: /Step/ });
 
-      expect(stepHeadings).toHaveLength(3);
+      expect(stepHeadings).toHaveLength(2);
       expect(stepHeadings[0]).toHaveTextContent('Step 1: Choose a subject');
-      expect(stepHeadings[1]).toHaveTextContent('Step 2: Choose locations');
-      expect(stepHeadings[2]).toHaveTextContent(
-        'Step 3 (current): Choose time period',
-      );
-    });
-  });
-
-  test('renders partially initialised table tool when there are invalid filters in query', async () => {
-    tableBuilderService.getReleaseMeta.mockResolvedValue({
-      releaseId: 'release-1',
-      subjects: [],
-    });
-
-    tableBuilderService.getSubjectMeta.mockResolvedValue(testSubjectMeta);
-    tableBuilderService.filterSubjectMeta.mockResolvedValue(testSubjectMeta);
-    tableBuilderService.getTableData.mockResolvedValue(testTableData);
-
-    render(
-      <ReleaseDataBlocksPageTabs
-        releaseId="release-1"
-        selectedDataBlock={{
-          ...testDataBlock,
-          query: {
-            ...testDataBlock.query,
-            filters: ['gender-female', 'invalid-filter'],
-          },
-        }}
-        onDataBlockSave={noop}
-      />,
-    );
-
-    await waitFor(() => {
-      expect(
-        screen.getByText(
-          /There is a problem with this data block as some of the selected options are invalid/,
-        ),
-      ).toBeInTheDocument();
-
-      const stepHeadings = screen.queryAllByRole('heading', { name: /Step/ });
-
-      expect(stepHeadings).toHaveLength(4);
-      expect(stepHeadings[0]).toHaveTextContent('Step 1: Choose a subject');
-      expect(stepHeadings[1]).toHaveTextContent('Step 2: Choose locations');
-      expect(stepHeadings[2]).toHaveTextContent('Step 3: Choose time period');
-      expect(stepHeadings[3]).toHaveTextContent(
-        'Step 4 (current): Choose your filters',
-      );
-    });
-  });
-
-  test('renders partially initialised table tool when there are invalid indicators in query', async () => {
-    tableBuilderService.getReleaseMeta.mockResolvedValue({
-      releaseId: 'release-1',
-      subjects: [],
-    });
-
-    tableBuilderService.getSubjectMeta.mockResolvedValue(testSubjectMeta);
-    tableBuilderService.filterSubjectMeta.mockResolvedValue(testSubjectMeta);
-    tableBuilderService.getTableData.mockResolvedValue(testTableData);
-
-    render(
-      <ReleaseDataBlocksPageTabs
-        releaseId="release-1"
-        selectedDataBlock={{
-          ...testDataBlock,
-          query: {
-            ...testDataBlock.query,
-            indicators: ['authorised-absence-sessions', 'invalid-indicator'],
-          },
-        }}
-        onDataBlockSave={noop}
-      />,
-    );
-
-    await waitFor(() => {
-      expect(
-        screen.getByText(
-          /There is a problem with this data block as some of the selected options are invalid/,
-        ),
-      ).toBeInTheDocument();
-
-      const stepHeadings = screen.queryAllByRole('heading', { name: /Step/ });
-
-      expect(stepHeadings).toHaveLength(4);
-      expect(stepHeadings[0]).toHaveTextContent('Step 1: Choose a subject');
-      expect(stepHeadings[1]).toHaveTextContent('Step 2: Choose locations');
-      expect(stepHeadings[2]).toHaveTextContent('Step 3: Choose time period');
-      expect(stepHeadings[3]).toHaveTextContent(
-        'Step 4 (current): Choose your filters',
+      expect(stepHeadings[1]).toHaveTextContent(
+        'Step 2 (current): Choose locations',
       );
     });
   });
@@ -442,7 +364,6 @@ describe('ReleaseDataBlocksPageTabs', () => {
       });
 
       tableBuilderService.getSubjectMeta.mockResolvedValue(testSubjectMeta);
-      tableBuilderService.filterSubjectMeta.mockResolvedValue(testSubjectMeta);
       tableBuilderService.getTableData.mockResolvedValue(testTableData);
 
       render(

@@ -1,75 +1,8 @@
 import tableBuilderService, {
   ReleaseTableDataQuery,
   SubjectMeta,
+  TableDataResponse,
 } from '@common/services/tableBuilderService';
-import pick from 'lodash/pick';
-
-function hasAllLocations(
-  query: ReleaseTableDataQuery,
-  subjectMeta: SubjectMeta,
-) {
-  const locationEntries = Object.entries(query.locations);
-
-  if (locationEntries.length === 0) {
-    return false;
-  }
-
-  return locationEntries.every(([locationLevel, locations]) => {
-    if (locations.length === 0) {
-      return false;
-    }
-
-    return locations.every(locationCode =>
-      subjectMeta.locations[locationLevel]?.options?.find(
-        metaLocation => metaLocation.value === locationCode,
-      ),
-    );
-  });
-}
-
-function hasAllTimePeriods(
-  query: ReleaseTableDataQuery,
-  subjectMeta: SubjectMeta,
-) {
-  if (!query.timePeriod) {
-    return false;
-  }
-
-  return (
-    subjectMeta.timePeriod.options.some(
-      timePeriod =>
-        timePeriod.year === query.timePeriod?.startYear &&
-        timePeriod.code === query.timePeriod?.startCode,
-    ) &&
-    subjectMeta.timePeriod.options.some(
-      timePeriod =>
-        timePeriod.year === query.timePeriod?.endYear &&
-        timePeriod.code === query.timePeriod?.endCode,
-    )
-  );
-}
-
-function hasAllFilters(query: ReleaseTableDataQuery, subjectMeta: SubjectMeta) {
-  const metaFilters = Object.values(subjectMeta.filters)
-    .flatMap(filter => Object.values(filter.options))
-    .flatMap(filterGroup => filterGroup.options)
-    .flatMap(filterItem => filterItem.value);
-
-  return query.filters.every(filter => metaFilters.includes(filter));
-}
-
-function hasAllIndicators(
-  query: ReleaseTableDataQuery,
-  subjectMeta: SubjectMeta,
-) {
-  const metaIndicators = Object.values(subjectMeta.indicators)
-    .flatMap(indicatorGroup => indicatorGroup.options)
-    .map(indicator => indicator.value);
-
-  return query.indicators.every(indicator =>
-    metaIndicators.includes(indicator),
-  );
-}
 
 export interface InitialStepSubjectMeta {
   initialStep: number;
@@ -78,12 +11,16 @@ export interface InitialStepSubjectMeta {
 
 /**
  * Get the initial state for table tool given a {@param query}.
+ * The {@param tableData} can also be provided in cases where
+ * there is potentially a result.
+ *
  * This allows us to partially setup table tool, even when
  * some of the query options are invalid. The user can then
  * go back through table tool and pick valid options.
  */
 export default async function getInitialStepSubjectMeta(
   query: ReleaseTableDataQuery,
+  tableData?: TableDataResponse,
 ): Promise<InitialStepSubjectMeta> {
   if (!query.releaseId) {
     return {
@@ -99,34 +36,15 @@ export default async function getInitialStepSubjectMeta(
 
   const subjectMeta = await tableBuilderService.getSubjectMeta(query.subjectId);
 
-  if (!hasAllLocations(query, subjectMeta)) {
+  // Just do really basic checks to see if table can be rendered
+  // and don't bother checking the query itself.
+  // We've decided to go with this approach for the time being
+  // as it's quicker/easier to implement than if we were to try
+  // to be more helpful and tell the user exactly what is wrong.
+  // See: EES-1429
+  if (!tableData || tableData.results.length === 0) {
     return {
       initialStep: 3,
-      subjectMeta,
-    };
-  }
-
-  let filteredSubjectMeta = await tableBuilderService.filterSubjectMeta(
-    pick(query, ['subjectId', 'locations']),
-  );
-
-  if (!hasAllTimePeriods(query, filteredSubjectMeta)) {
-    return {
-      initialStep: 4,
-      subjectMeta,
-    };
-  }
-
-  filteredSubjectMeta = await tableBuilderService.filterSubjectMeta(
-    pick(query, ['subjectId', 'locations', 'timePeriod']),
-  );
-
-  if (
-    !hasAllIndicators(query, filteredSubjectMeta) ||
-    !hasAllFilters(query, filteredSubjectMeta)
-  ) {
-    return {
-      initialStep: 5,
       subjectMeta,
     };
   }
