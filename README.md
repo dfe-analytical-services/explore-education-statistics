@@ -56,11 +56,14 @@ You will need the following groups of dependencies to run the project successful
 1. To run applications in this service you will require the following:
 
    - [NodeJS v12+](https://nodejs.org/)
-   - [.NET Core v3.0](https://dotnet.microsoft.com/download/dotnet-core/3.0)
+   - [.NET Core v3.1](https://dotnet.microsoft.com/download/dotnet-core/3.1)
    - [Azure Functions Core Tools v3+](https://github.com/Azure/azure-functions-core-tools)
    
 2. To emulate azure storage you will require either:
    - [Azure Storage Emulator](https://docs.microsoft.com/en-us/azure/storage/common/storage-use-emulator)
+
+  To run Azure Storage Emulator, you'll need to install LocalDB via SQL Express. You can find the installer for Windows x64 [here](https://download.microsoft.com/download/3/9/F/39F968FA-DEBB-4960-8F9E-0E7BB3035959/SQLEXPR_x64_ENU.exe).
+
    - [Azurite](https://github.com/Azure/Azurite)
    - [Azure Storage Account](https://azure.microsoft.com/en-gb/services/storage/) 
    
