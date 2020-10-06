@@ -2285,6 +2285,16 @@
                                             "name": "FilterItemId",
                                             "type": "Guid"
                                         }
+                                    },
+                                    {
+                                        "source": {
+                                            "name": "FilterId",
+                                            "type": "Guid"
+                                        },
+                                        "sink": {
+                                            "name": "FilterId",
+                                            "type": "Guid"
+                                        }
                                     }
                                 ]
                             }
