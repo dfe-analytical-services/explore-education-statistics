@@ -137,12 +137,32 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Services
                 });
         }
 
-        public Task<Either<ActionResult, bool>> DeleteReleaseAsync(Guid releaseId)
+        public Task<Either<ActionResult, Unit>> DeleteRelease(Guid releaseId)
         {
             return _persistenceHelper
                 .CheckEntityExists<Release>(releaseId)
                 .OnSuccess(_userService.CheckCanDeleteRelease)
-                .OnSuccess(async release =>
+                .OnSuccessDo(async () =>
+                {
+                    // Delete any replacements that might exist
+                    var filesWithReplacements = await _context.ReleaseFiles
+                        .Include(f => f.ReleaseFileReference)
+                        .Where(f => f.ReleaseId == releaseId && f.ReleaseFileReference.ReplacedById.HasValue)
+                        .ToListAsync();
+
+                    foreach (var file in filesWithReplacements)
+                    {
+                        var result = await _releaseFilesService.DeleteDataFiles(releaseId,
+                            file.ReleaseFileReference.ReplacedById.Value);
+                        if (!result.IsRight)
+                        {
+                            return result;
+                        }
+                    }
+
+                    return Unit.Instance;
+                })
+                .OnSuccessVoid(async release =>
                 {
                     var roles = await _context
                         .UserReleaseRoles
@@ -165,8 +185,6 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Services
                     await _context.SaveChangesAsync();
 
                     await _releaseSubjectService.SoftDeleteAllSubjectsOrBreakReleaseLinks(releaseId);
-
-                    return true;
                 });
         }
 

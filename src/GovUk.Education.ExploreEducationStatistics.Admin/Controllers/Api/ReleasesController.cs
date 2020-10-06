@@ -63,11 +63,11 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Controllers.Api
         }
 
         [HttpDelete("release/{releaseId}")]
-        public async Task<ActionResult<ReleaseViewModel>> DeleteReleaseAsync(Guid releaseId)
+        public async Task<ActionResult<ReleaseViewModel>> DeleteRelease(Guid releaseId)
         {
             return await _releaseService
-                .DeleteReleaseAsync(releaseId)
-                .HandleFailuresOr(_ => NoContent());
+                .DeleteRelease(releaseId)
+                .HandleFailuresOrNoContent();
         }
 
         [HttpPost("release/{releaseId}/amendment")]
