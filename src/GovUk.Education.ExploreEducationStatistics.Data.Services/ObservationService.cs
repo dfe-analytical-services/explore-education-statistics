@@ -64,7 +64,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Services
 
             IQueryable<Observation> inner;
             
-            if (query.Filters?.Any() == true)
+            if (query.Filters?.Any())
             {
                 var filterItemListParam = CreateIdListType("filterItemList", query.Filters);
 
