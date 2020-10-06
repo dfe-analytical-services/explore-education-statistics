@@ -187,7 +187,7 @@ const PublicationForm = (props: Props & InjectedWizardProps) => {
                 </FormGroup>
               </FormFieldset>
 
-              <WizardStepFormActions {...props} form={form} formId={formId} />
+              <WizardStepFormActions {...props} formId={formId} />
             </Form>
           );
         }

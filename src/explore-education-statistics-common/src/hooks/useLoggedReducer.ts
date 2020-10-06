@@ -54,6 +54,7 @@ export function useLoggedImmerReducer<S, A>(
   initialState: S,
   initializer?: ReducerWithoutAction<S>,
 ) {
+  // eslint-disable-next-line react-hooks/exhaustive-deps
   const cachedReducer = useCallback(produce(reducer), [reducer]);
   return useLoggedReducer(
     name,

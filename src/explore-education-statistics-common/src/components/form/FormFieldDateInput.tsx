@@ -20,7 +20,7 @@ interface Props<FormValues> {
   type?: 'date' | 'partialDate';
 }
 
-const FormFieldDateInput = <FormValues extends {}>({
+function FormFieldDateInput<FormValues>({
   id,
   name,
   showError = true,
@@ -29,7 +29,7 @@ const FormFieldDateInput = <FormValues extends {}>({
   legendSize = 'l',
   partialDateType = 'dayMonthYear',
   type = 'date',
-}: Props<FormValues>) => {
+}: Props<FormValues>) {
   const isFocused = useRef(false);
 
   const [field, meta, helpers] = useField<
@@ -152,6 +152,6 @@ const FormFieldDateInput = <FormValues extends {}>({
       </FormGroup>
     </FormFieldset>
   );
-};
+}
 
 export default FormFieldDateInput;

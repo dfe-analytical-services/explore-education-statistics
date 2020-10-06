@@ -68,12 +68,7 @@ const MethodologyContentPageInternal = () => {
                   </dl>
                   {!isEditing && (
                     <>
-                      <PrintThisPage
-                        analytics={{
-                          category: 'Page print',
-                          action: 'Print this page link selected',
-                        }}
-                      />
+                      <PrintThisPage />
                       <PageSearchForm inputLabel="Search in this methodology page." />
                     </>
                   )}

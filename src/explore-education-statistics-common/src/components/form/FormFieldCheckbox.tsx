@@ -11,11 +11,11 @@ type Props<FormValues> = {
   formGroup?: boolean;
 } & FormFieldComponentProps<FormCheckboxProps, FormValues>;
 
-const FormFieldCheckbox = <FormValues extends {}>({
+function FormFieldCheckbox<FormValues>({
   small,
   formGroup,
   ...props
-}: Props<FormValues>) => {
+}: Props<FormValues>) {
   return (
     <FormField<string> {...props} type="checkbox" formGroup={formGroup}>
       {({ field }) => (
@@ -29,6 +29,6 @@ const FormFieldCheckbox = <FormValues extends {}>({
       )}
     </FormField>
   );
-};
+}
 
 export default FormFieldCheckbox;

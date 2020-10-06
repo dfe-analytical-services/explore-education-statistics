@@ -1,4 +1,4 @@
-/* eslint-disable import/no-duplicates,react/prefer-stateless-function */
+/* eslint-disable import/no-duplicates,react/prefer-stateless-function,max-classes-per-file */
 
 declare module 'recharts' {
   import * as React from 'react';

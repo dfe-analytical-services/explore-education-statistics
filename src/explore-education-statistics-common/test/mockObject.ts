@@ -5,7 +5,7 @@
  * on the actual instance (and not the prototype).
  */
 function mockObject<T>(
-  instance: object,
+  instance: Record<string, unknown>,
   defaultImplementation?: () => T,
 ): jest.Mocked<T> {
   return Object.entries(instance).reduce((acc, [key, value]) => {

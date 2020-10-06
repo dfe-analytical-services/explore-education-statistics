@@ -109,7 +109,9 @@ const LegacyReleasesPage = () => {
                     >
                       {(draggableProvided, draggableSnapshot) => (
                         <tr
+                          // eslint-disable-next-line react/jsx-props-no-spreading
                           {...draggableProvided.draggableProps}
+                          // eslint-disable-next-line react/jsx-props-no-spreading
                           {...draggableProvided.dragHandleProps}
                           ref={draggableProvided.innerRef}
                           className={classNames({

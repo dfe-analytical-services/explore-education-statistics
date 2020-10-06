@@ -52,6 +52,7 @@ const FormBaseInput = ({
       )}
       {error && <ErrorMessage id={`${id}-error`}>{error}</ErrorMessage>}
       <input
+        // eslint-disable-next-line react/jsx-props-no-spreading
         {...props}
         aria-describedby={
           classNames({

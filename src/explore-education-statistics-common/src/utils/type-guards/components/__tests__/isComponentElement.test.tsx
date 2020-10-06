@@ -1,12 +1,8 @@
-import React, { Component } from 'react';
+import React from 'react';
 import isComponentElement from '../isComponentElement';
 
 describe('isComponentElement', () => {
-  class TestClassComponent extends Component<{}> {
-    public render(): React.ReactNode {
-      return null;
-    }
-  }
+  const TestClassComponent = () => null;
 
   const TestFunctionComponent = () => null;
 

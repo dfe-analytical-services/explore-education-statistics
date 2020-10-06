@@ -77,18 +77,10 @@ const TableHeadersForm = ({
         }}
         validationSchema={Yup.object<FormValues>({
           rowGroups: Yup.array()
-            .of(
-              Yup.array()
-                .of<Filter>(Yup.object())
-                .ensure(),
-            )
+            .of(Yup.array().of<Filter>(Yup.object()).ensure())
             .min(1, 'Must have at least one row group'),
           columnGroups: Yup.array()
-            .of(
-              Yup.array()
-                .of<Filter>(Yup.object())
-                .ensure(),
-            )
+            .of(Yup.array().of<Filter>(Yup.object()).ensure())
             .min(1, 'Must have at least one column group'),
         })}
         onSubmit={handleSubmit}

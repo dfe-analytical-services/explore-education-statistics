@@ -179,7 +179,6 @@ const FiltersForm = (props: Props & InjectedWizardProps) => {
 
               <WizardStepFormActions
                 {...props}
-                form={form}
                 formId={formId}
                 submitText="Create table"
                 submittingText="Creating table"

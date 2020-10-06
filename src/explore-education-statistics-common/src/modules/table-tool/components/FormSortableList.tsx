@@ -39,6 +39,7 @@ const FormSortableList = (props: FormSortableListProps) => {
         <Droppable droppableId={id}>
           {(droppableProvided, droppableSnapshot) => (
             <div
+              // eslint-disable-next-line react/jsx-props-no-spreading
               {...droppableProvided.droppableProps}
               className={classNames(styles.list, {
                 [styles.listDraggingOver]: droppableSnapshot.isDraggingOver,
@@ -53,7 +54,9 @@ const FormSortableList = (props: FormSortableListProps) => {
                 >
                   {(draggableProvided, draggableSnapshot) => (
                     <div
+                      // eslint-disable-next-line react/jsx-props-no-spreading
                       {...draggableProvided.draggableProps}
+                      // eslint-disable-next-line react/jsx-props-no-spreading
                       {...draggableProvided.dragHandleProps}
                       className={classNames(styles.optionRow, {
                         [styles.optionCurrentDragging]:

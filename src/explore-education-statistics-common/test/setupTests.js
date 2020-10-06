@@ -13,7 +13,7 @@ if (typeof window !== 'undefined') {
 // fix for jsdom not working with SVGs
 const createElementNSOrig = global.document.createElementNS;
 // eslint-disable-next-line
-global.document.createElementNS = function(namespaceURI, qualifiedName) {
+global.document.createElementNS = function (namespaceURI, qualifiedName) {
   if (
     namespaceURI === 'http://www.w3.org/2000/svg' &&
     qualifiedName === 'svg'

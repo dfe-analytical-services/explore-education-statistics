@@ -173,6 +173,7 @@ const FormComboBox = ({
 
         <input
           type="text"
+          // eslint-disable-next-line react/jsx-props-no-spreading
           {...inputProps}
           aria-autocomplete="list"
           aria-activedescendant={

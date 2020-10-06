@@ -9,7 +9,6 @@ import React, { useState } from 'react';
 
 interface Props {
   release: EditableRelease;
-  isEditing?: boolean;
   updating?: boolean;
 }
 

@@ -13,18 +13,18 @@ const envConfig = DotEnv.config({
 });
 
 const createPlugin = plugin => {
-  return (nextConfig = {}) =>
-    Object.assign({}, nextConfig, {
-      webpack(config, options) {
-        plugin(config, options, nextConfig);
+  return (nextConfig = {}) => ({
+    ...nextConfig,
+    webpack(config, options) {
+      plugin(config, options, nextConfig);
 
-        if (typeof nextConfig.webpack === 'function') {
-          return nextConfig.webpack(config, options);
-        }
+      if (typeof nextConfig.webpack === 'function') {
+        return nextConfig.webpack(config, options);
+      }
 
-        return config;
-      },
-    });
+      return config;
+    },
+  });
 };
 
 const withFonts = createPlugin((config, options) => {
@@ -87,7 +87,9 @@ const nextConfig = {
 
       config.plugins.push(
         new ForkTsCheckerPlugin({
-          tsconfig: path.resolve(__dirname, 'src/tsconfig.json'),
+          typescript: {
+            configFile: path.resolve(__dirname, 'src/tsconfig.json'),
+          },
         }),
       );
 
