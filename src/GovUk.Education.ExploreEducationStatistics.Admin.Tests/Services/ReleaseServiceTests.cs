@@ -1420,11 +1420,20 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
                 await context.SaveChangesAsync();
             }
 
+            var releaseFilesService = new Mock<IReleaseFilesService>(MockBehavior.Strict);
+
+            releaseFilesService.Setup(mock => mock.DeleteAllFiles(release.Id, false)).ReturnsAsync(Unit.Instance);
+
             await using (var context = InMemoryApplicationDbContext(contextId))
             {
-                var releaseService = BuildReleaseService(context);
+                var releaseService = BuildReleaseService(context,
+                    fileStorageService: releaseFilesService.Object);
 
                 var result = await releaseService.DeleteRelease(release.Id);
+
+                releaseFilesService.Verify(mock =>
+                    mock.DeleteAllFiles(release.Id, false), Times.Once);
+
                 Assert.True(result.IsRight);
 
                 // assert that soft-deleted entities are no longer discoverable by default
@@ -1504,135 +1513,6 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
                     .First(r => r.Id == anotherUserReleaseInvite.Id);
 
                 Assert.False(retrievedAnotherReleaseInvite.SoftDeleted);
-            }
-        }
-
-        [Fact]
-        public async Task DeleteRelease_DeleteReplacements()
-        {
-            var subject1 = new Subject
-            {
-                Id = Guid.NewGuid()
-            };
-
-            var subject2 = new Subject
-            {
-                Id = Guid.NewGuid()
-            };
-
-            var replacementSubject1 = new Subject
-            {
-                Id = Guid.NewGuid()
-            };
-
-            var replacementSubject2 = new Subject
-            {
-                Id = Guid.NewGuid()
-            };
-
-            var release = new Release();
-
-            var file1 = new ReleaseFileReference
-            {
-                Filename = "data1.csv",
-                ReleaseFileType = ReleaseFileTypes.Data,
-                Release = release,
-                SubjectId = subject1.Id
-            };
-
-            var file2 = new ReleaseFileReference
-            {
-                Filename = "data2.csv",
-                ReleaseFileType = ReleaseFileTypes.Data,
-                Release = release,
-                SubjectId = subject2.Id
-            };
-
-            var replacementFile1 = new ReleaseFileReference
-            {
-                Filename = "replacement1.csv",
-                ReleaseFileType = ReleaseFileTypes.Data,
-                Release = release,
-                SubjectId = replacementSubject1.Id,
-                Replacing = file1
-            };
-
-            file1.ReplacedBy = replacementFile1;
-
-            var replacementFile2 = new ReleaseFileReference
-            {
-                Filename = "replacement2.csv",
-                ReleaseFileType = ReleaseFileTypes.Data,
-                Release = release,
-                SubjectId = replacementSubject2.Id,
-                Replacing = file2
-            };
-
-            file2.ReplacedBy = replacementFile2;
-
-            var releaseFile1 = new ReleaseFile
-            {
-                Release = release,
-                ReleaseFileReference = file1
-            };
-
-            var releaseFile2 = new ReleaseFile
-            {
-                Release = release,
-                ReleaseFileReference = file2
-            };
-
-            var replacementReleaseFile1 = new ReleaseFile
-            {
-                Release = release,
-                ReleaseFileReference = replacementFile1
-            };
-
-            var replacementReleaseFile2 = new ReleaseFile
-            {
-                Release = release,
-                ReleaseFileReference = replacementFile2
-            };
-
-            var contextId = Guid.NewGuid().ToString();
-
-            await using (var context = InMemoryApplicationDbContext(contextId))
-            {
-                await context.AddAsync(release);
-                await context.AddRangeAsync(file1, file2, replacementFile1, replacementFile2);
-                await context.AddRangeAsync(releaseFile1, releaseFile2, replacementReleaseFile1,
-                    replacementReleaseFile2);
-                await context.SaveChangesAsync();
-            }
-
-            var releaseFilesService = new Mock<IReleaseFilesService>(MockBehavior.Strict);
-
-            releaseFilesService
-                .Setup(mock =>
-                    mock.DeleteDataFiles(release.Id, It.IsIn(replacementFile1.Id, replacementFile2.Id), false))
-                .ReturnsAsync(Unit.Instance);
-
-            await using (var context = InMemoryApplicationDbContext(contextId))
-            {
-                var releaseService = BuildReleaseService(contentDbContext: context,
-                    fileStorageService: releaseFilesService.Object);
-
-                var result = await releaseService.DeleteRelease(release.Id);
-
-                releaseFilesService.Verify(mock =>
-                    mock.DeleteDataFiles(release.Id, replacementFile1.Id, false), Times.Once);
-
-                releaseFilesService.Verify(mock =>
-                    mock.DeleteDataFiles(release.Id, replacementFile2.Id, false), Times.Once);
-
-                Assert.True(result.IsRight);
-
-                Assert.Null(await context.Releases.FirstOrDefaultAsync(r => r.Id == release.Id));
-
-                Assert.True((await context
-                    .Releases
-                    .IgnoreQueryFilters()
-                    .FirstAsync(r => r.Id == release.Id)).SoftDeleted);
             }
         }
 

@@ -142,26 +142,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Services
             return _persistenceHelper
                 .CheckEntityExists<Release>(releaseId)
                 .OnSuccess(_userService.CheckCanDeleteRelease)
-                .OnSuccessDo(async () =>
-                {
-                    // Delete any replacements that might exist
-                    var filesWithReplacements = await _context.ReleaseFiles
-                        .Include(f => f.ReleaseFileReference)
-                        .Where(f => f.ReleaseId == releaseId && f.ReleaseFileReference.ReplacedById.HasValue)
-                        .ToListAsync();
-
-                    foreach (var file in filesWithReplacements)
-                    {
-                        var result = await _releaseFilesService.DeleteDataFiles(releaseId,
-                            file.ReleaseFileReference.ReplacedById.Value);
-                        if (!result.IsRight)
-                        {
-                            return result;
-                        }
-                    }
-
-                    return Unit.Instance;
-                })
+                .OnSuccessDo(async () => await _releaseFilesService.DeleteAllFiles(releaseId))
                 .OnSuccessVoid(async release =>
                 {
                     var roles = await _context
