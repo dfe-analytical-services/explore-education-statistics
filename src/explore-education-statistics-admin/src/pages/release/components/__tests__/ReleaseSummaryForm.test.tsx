@@ -1,5 +1,5 @@
 import _metaService from '@admin/services/metaService';
-import { render, screen, waitFor, within } from '@testing-library/react';
+import { render, screen, waitFor, within, wait } from '@testing-library/react';
 import noop from 'lodash/noop';
 import React from 'react';
 import ReleaseSummaryForm, {
@@ -95,6 +95,8 @@ describe('ReleaseSummaryForm', () => {
       testTimeIdentifiers,
     );
 
+    const onSubmit = jest.fn();
+
     render(
       <ReleaseSummaryForm<ReleaseSummaryFormValues>
         submitText="Create new release"
@@ -105,7 +107,7 @@ describe('ReleaseSummaryForm', () => {
             releaseTypeId: '',
           };
         }}
-        onSubmit={noop}
+        onSubmit={onSubmit}
         onCancel={noop}
       />,
     );
@@ -184,6 +186,114 @@ describe('ReleaseSummaryForm', () => {
           selector: 'a',
         }),
       ).not.toBeInTheDocument();
+    });
+
+    expect(onSubmit).not.toHaveBeenCalled();
+  });
+
+  test('renders with provided initial values', async () => {
+    metaService.getReleaseTypes.mockResolvedValue(testReleaseTypes);
+    metaService.getTimePeriodCoverageGroups.mockResolvedValue(
+      testTimeIdentifiers,
+    );
+
+    render(
+      <ReleaseSummaryForm<ReleaseSummaryFormValues>
+        submitText="Create new release"
+        initialValues={() => {
+          return {
+            timePeriodCoverageCode: 'AYQ4',
+            timePeriodCoverageStartYear: '1966',
+            releaseTypeId: testReleaseTypes[1].id,
+          };
+        }}
+        onSubmit={noop}
+        onCancel={noop}
+      />,
+    );
+
+    await waitFor(() => {
+      expect(
+        screen.getByText('Select time period coverage'),
+      ).toBeInTheDocument();
+    });
+
+    const selectYearType = screen.getByLabelText('Type', {
+      selector: 'select',
+    });
+    expect(selectYearType).toHaveValue('AYQ4');
+
+    const inputYear = screen.getByLabelText(
+      testTimeIdentifiers[0].category.label,
+      { selector: 'input' },
+    );
+    expect(inputYear).toHaveValue(1966);
+
+    const radioOptionsReleaseType = testReleaseTypes.map(type =>
+      screen.getByLabelText(type.title, {
+        selector: 'input',
+      }),
+    );
+    radioOptionsReleaseType.forEach((radio, index) => {
+      if (index === 1) return expect(radio).toBeChecked();
+      expect(radio).not.toBeChecked();
+    });
+  });
+
+  test('submits form with valid values', async () => {
+    metaService.getReleaseTypes.mockResolvedValue(testReleaseTypes);
+    metaService.getTimePeriodCoverageGroups.mockResolvedValue(
+      testTimeIdentifiers,
+    );
+
+    const onSubmit = jest.fn();
+
+    render(
+      <ReleaseSummaryForm<ReleaseSummaryFormValues>
+        submitText="Create new release"
+        initialValues={() => {
+          return {
+            timePeriodCoverageCode: '',
+            timePeriodCoverageStartYear: '',
+            releaseTypeId: '',
+          };
+        }}
+        onSubmit={onSubmit}
+        onCancel={noop}
+      />,
+    );
+
+    await waitFor(() => {
+      expect(
+        screen.getByText('Select time period coverage'),
+      ).toBeInTheDocument();
+    });
+
+    const selectYearType = screen.getByLabelText('Type', {
+      selector: 'select',
+    });
+    userEvent.selectOptions(selectYearType, 'AY');
+    const inputYear = screen.getByLabelText(
+      testTimeIdentifiers[0].category.label,
+      { selector: 'input' },
+    );
+    userEvent.type(inputYear, '1966');
+
+    const radioOptionsReleaseType = testReleaseTypes.map(type =>
+      screen.getByLabelText(type.title, {
+        selector: 'input',
+      }),
+    );
+    userEvent.click(radioOptionsReleaseType[0]);
+
+    const buttonCreate = screen.getByText('Create new release', {
+      selector: 'button',
+    });
+    expect(onSubmit).not.toHaveBeenCalled();
+    userEvent.click(buttonCreate);
+
+    await waitFor(() => {
+      expect(onSubmit).toHaveBeenCalledTimes(1);
     });
   });
 });
