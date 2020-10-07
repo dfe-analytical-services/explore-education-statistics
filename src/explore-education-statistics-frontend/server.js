@@ -22,7 +22,6 @@ const helmet = require('helmet');
 const nextApp = require('next');
 const path = require('path');
 const referrerPolicy = require('referrer-policy');
-const url = require('url');
 const dotenv = require('dotenv');
 
 dotenv.config();
@@ -97,19 +96,6 @@ async function startServer(port = process.env.PORT || 3000) {
     }),
   );
   server.use(referrerPolicy({ policy: 'no-referrer-when-downgrade' }));
-
-  server.use((req, res, next) => {
-    if (req.path !== '/' && req.path.endsWith('/')) {
-      // Strip trailing slashes as these
-      // don't work well with Next
-      const parsedUrl = url.parse(req.url);
-      const redirectUrl = req.path.slice(0, -1) + (parsedUrl.search || '');
-
-      res.redirect(301, redirectUrl);
-    } else {
-      next();
-    }
-  });
 
   if (process.env.BASIC_AUTH === 'true') {
     server.use(
