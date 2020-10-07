@@ -222,7 +222,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
         }
 
         [Fact]
-        public void DeleteReleaseAsync()
+        public void DeleteRelease()
         {
             PermissionTestUtil.PolicyCheckBuilder()
                 .ExpectResourceCheckToFail(_release, CanDeleteSpecificRelease)
@@ -230,7 +230,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
                     userService =>
                     {
                         var service = BuildReleaseService(userService: userService.Object);
-                        return service.DeleteReleaseAsync(_release.Id);
+                        return service.DeleteRelease(_release.Id);
                     }
                 );
         }

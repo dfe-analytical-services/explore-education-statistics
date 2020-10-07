@@ -1370,52 +1370,43 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
         }
 
         [Fact]
-        public async Task DeleteReleaseAsync()
+        public async Task DeleteRelease()
         {
-            var publication = new Publication
-            {
-                Id = Guid.NewGuid()
-            };
+            var publication = new Publication();
 
             var release = new Release
             {
-                Id = new Guid("defb0361-5084-43e8-a570-4841657041e2"),
-                PublicationId = publication.Id,
+                Publication = publication,
                 Version = 0,
-                PreviousVersionId = new Guid("defb0361-5084-43e8-a570-4841657041e2")
             };
 
             var userReleaseRole = new UserReleaseRole
             {
-                Id = Guid.NewGuid(),
                 UserId = _userId,
-                ReleaseId = release.Id
+                Release = release
             };
 
             var userReleaseInvite = new UserReleaseInvite
             {
-                Id = Guid.NewGuid(),
-                ReleaseId = release.Id
+                Release = release
             };
 
             var anotherRelease = new Release
             {
-                Id = new Guid("863cf537-c9cd-48d9-9874-cc222bdab0a7"),
-                PublicationId = publication.Id,
-                Version = 0,
-                PreviousVersionId = new Guid("863cf537-c9cd-48d9-9874-cc222bdab0a7")
+                Publication = publication,
+                Version = 0
             };
 
             var anotherUserReleaseRole = new UserReleaseRole
             {
                 Id = Guid.NewGuid(),
-                ReleaseId = anotherRelease.Id
+                Release = anotherRelease
             };
 
             var anotherUserReleaseInvite = new UserReleaseInvite
             {
                 Id = Guid.NewGuid(),
-                ReleaseId = anotherRelease.Id
+                Release = anotherRelease
             };
 
             var contextId = Guid.NewGuid().ToString();
@@ -1429,12 +1420,21 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
                 await context.SaveChangesAsync();
             }
 
+            var releaseFilesService = new Mock<IReleaseFilesService>(MockBehavior.Strict);
+
+            releaseFilesService.Setup(mock => mock.DeleteAllFiles(release.Id, false)).ReturnsAsync(Unit.Instance);
+
             await using (var context = InMemoryApplicationDbContext(contextId))
             {
-                var releaseService = BuildReleaseService(context);
+                var releaseService = BuildReleaseService(context,
+                    fileStorageService: releaseFilesService.Object);
 
-                var result = releaseService.DeleteReleaseAsync(release.Id).Result.Right;
-                Assert.True(result);
+                var result = await releaseService.DeleteRelease(release.Id);
+
+                releaseFilesService.Verify(mock =>
+                    mock.DeleteAllFiles(release.Id, false), Times.Once);
+
+                Assert.True(result.IsRight);
 
                 // assert that soft-deleted entities are no longer discoverable by default
                 var unableToFindDeletedRelease = context

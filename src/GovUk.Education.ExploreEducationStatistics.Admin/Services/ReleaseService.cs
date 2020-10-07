@@ -137,12 +137,13 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Services
                 });
         }
 
-        public Task<Either<ActionResult, bool>> DeleteReleaseAsync(Guid releaseId)
+        public Task<Either<ActionResult, Unit>> DeleteRelease(Guid releaseId)
         {
             return _persistenceHelper
                 .CheckEntityExists<Release>(releaseId)
                 .OnSuccess(_userService.CheckCanDeleteRelease)
-                .OnSuccess(async release =>
+                .OnSuccessDo(async () => await _releaseFilesService.DeleteAllFiles(releaseId))
+                .OnSuccessVoid(async release =>
                 {
                     var roles = await _context
                         .UserReleaseRoles
@@ -165,8 +166,6 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Services
                     await _context.SaveChangesAsync();
 
                     await _releaseSubjectService.SoftDeleteAllSubjectsOrBreakReleaseLinks(releaseId);
-
-                    return true;
                 });
         }
 
