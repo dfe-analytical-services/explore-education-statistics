@@ -11,10 +11,6 @@ junit.xml
 build/
 .next/
 
-#govuk-toolkit assets
-/src/public/assets
-/src/public/all.js
-
 # misc
 .DS_Store
 .env.local
