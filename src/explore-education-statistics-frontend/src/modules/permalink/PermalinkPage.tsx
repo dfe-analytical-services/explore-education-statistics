@@ -1,4 +1,5 @@
 import FormattedDate from '@common/components/FormattedDate';
+import WarningMessage from '@common/components/WarningMessage';
 import DownloadCsvButton from '@common/modules/table-tool/components/DownloadCsvButton';
 import DownloadExcelButton from '@common/modules/table-tool/components/DownloadExcelButton';
 import TimePeriodDataTable from '@common/modules/table-tool/components/TimePeriodDataTable';
@@ -58,6 +59,13 @@ const PermalinkPage: NextPage<Props> = ({ data }) => {
           />
         </div>
       </div>
+
+      {data.invalidated && (
+        <WarningMessage error>
+          WARNING - The data used in this permalink may be out-of-date.
+        </WarningMessage>
+      )}
+
       <div ref={tableRef}>
         <TimePeriodDataTable
           fullTable={fullTable}

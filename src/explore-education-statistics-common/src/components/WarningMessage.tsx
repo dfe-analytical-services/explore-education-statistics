@@ -5,13 +5,16 @@ import styles from './WarningMessage.module.scss';
 interface Props {
   children: ReactNode;
   className?: string;
+  error?: boolean;
   icon?: string;
 }
 
-const WarningMessage = ({ children, className, icon = '!' }: Props) => {
+const WarningMessage = ({ children, className, error, icon = '!' }: Props) => {
   return (
     <div
-      className={classNames('govuk-warning-text', styles.warning, className)}
+      className={classNames('govuk-warning-text', styles.warning, className, {
+        [styles.error]: error,
+      })}
     >
       <span
         className={classNames('govuk-warning-text__icon', styles.icon)}
