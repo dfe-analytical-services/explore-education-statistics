@@ -41,13 +41,16 @@
 											"});",
 											"",
 											"pm.test(\"Pupils and school theme should contain at least 2 topics\", function () {",
+											"    var foundPupilsAndSchools = false;",
 											"    for(var i = 0; i < pm.response.json().length; i++) {",
 											"        if(respJson[i].title === \"Pupils and schools\") {",
+											"            foundPupilsAndSchools = true;",
 											"            pm.expect(respJson[i].topics.length).to.be.above(1);",
 											"            pm.expect(pm.response.to.have.jsonBody(`[${i}].id`));",
 											"            pm.expect(pm.response.to.have.jsonBody(`[${i}].slug`));",
 											"        }",
 											"    }",
+											"    pm.expect(foundPupilsAndSchools).to.equal(true);",
 											"});"
 										],
 										"type": "text/javascript"
@@ -4118,7 +4121,7 @@
 			"name": "Download",
 			"item": [
 				{
-					"name": "Download - Absence by term",
+					"name": "Download - Absence by term - TESTS STOP HERE",
 					"event": [
 						{
 							"listen": "test",
@@ -4134,7 +4137,9 @@
 									"(pm.environment.get(\"data_api_url\") === \"http://localhost:5000/api\" ? pm.test.skip : pm.test)(\"First line of CSV should be correct\", function () { ",
 									"    pm.expect(pm.response.text()).to.contain(\"time_identifier,time_period,geographic_level,country_code,country_name,region_code,region_name,old_la_code,new_la_code,la_name,school_type,sess_possible,sess_overall,sess_authorised,sess_unauthorised,sess_overall_percent,sess_authorised_percent,sess_unauthorised_percent,sess_auth_illness,sess_auth_appointments,sess_auth_religious,sess_auth_study,sess_auth_traveller,sess_auth_holiday,sess_auth_ext_holiday,sess_auth_excluded,sess_auth_other,sess_auth_totalreasons,sess_unauth_holiday,sess_unauth_late,sess_unauth_other,sess_unauth_noyet,sess_unauth_totalreasons,sess_overall_totalreasons\");",
 									"});",
-									"*/"
+									"*/",
+									"",
+									"postman.setNextRequest(null);"
 								],
 								"type": "text/javascript"
 							}
@@ -4157,6 +4162,512 @@
 						}
 					},
 					"response": []
+				}
+			],
+			"protocolProfileBehavior": {}
+		},
+		{
+			"name": "Misc",
+			"item": [
+				{
+					"name": "workforce_fte_hc_2019_v9_anon",
+					"item": [
+						{
+							"name": "Get GUIDs for Workforce subject",
+							"event": [
+								{
+									"listen": "test",
+									"script": {
+										"id": "64ba0a00-0a92-47d8-98f2-ed7ad1b38bbe",
+										"exec": [
+											"var respJson;\r",
+											"\r",
+											"pm.test(\"Status code is 200\", function () { \r",
+											"    pm.response.to.have.status(200);\r",
+											"    respJson = pm.response.json();\r",
+											"});\r",
+											"\r",
+											"pm.test('Get locations GUIDs', function () {\r",
+											"    pm.globals.set('LOC_NAT_England', \r",
+											"        respJson.locations.country.options[0].value\r",
+											"    );\r",
+											"\r",
+											"    var localAuthorities = respJson.locations.localAuthority.options;\r",
+											"    for(var i = 0; i < localAuthorities.length; i++) {\r",
+											"        if(localAuthorities[i].label === 'Barking and Dagenham')\r",
+											"            pm.globals.set('LOC_LA_BarkingAndDagenham', localAuthorities[i].value);\r",
+											"            break;\r",
+											"    }\r",
+											"\r",
+											"    var regions = respJson.locations.region.options;\r",
+											"    for(var i = 0; i < regions.length; i++) {\r",
+											"        if(regions[i].label === 'East Midlands') {\r",
+											"            pm.globals.set('LOC_REG_EastMidlands', regions[i].value);\r",
+											"            break;\r",
+											"        }\r",
+											"    }\r",
+											"});\r",
+											"\r",
+											"pm.test(\"Get Indicator GUIDs\", function () {\r",
+											"    pm.expect(pm.response.to.have.jsonBody(\"indicators.Default.options\"));\r",
+											"    var indicatorsDefault = respJson.indicators.Default.options;\r",
+											"    for(var i = 0; i < indicatorsDefault.length; i++) {\r",
+											"        switch(indicatorsDefault[i].label) {\r",
+											"            case 'Number of schools':\r",
+											"                pm.globals.set('IND_NumberOfSchools', indicatorsDefault[i].value);\r",
+											"                break;\r",
+											"            case 'Percent of all teachers that are part-time':\r",
+											"                pm.globals.set('IND_PercentTeachersPartTime', indicatorsDefault[i].value);\r",
+											"                break;\r",
+											"            case 'Ratio of teaching assistants to all teachers':\r",
+											"                pm.globals.set('IND_RatioAssistantsToTeachers', indicatorsDefault[i].value);\r",
+											"                break;\r",
+											"        }\r",
+											"    }\r",
+											"});\r",
+											"\r",
+											"pm.test('Get Filter GUIDs', function () {\r",
+											"    filtersTypeOfSchool = respJson.filters.TypeOfSchool.options.Default.options;\r",
+											"    for(var i = 0; i < filtersTypeOfSchool.length; i++) {\r",
+											"        switch(filtersTypeOfSchool[i].label) {\r",
+											"            case 'Centrally employed':\r",
+											"                pm.globals.set('FILTI_CentrallyEmployed', filtersTypeOfSchool[i].value);\r",
+											"                break;\r",
+											"        }\r",
+											"    }\r",
+											"});\r",
+											"\r",
+											"\r",
+											"\r",
+											""
+										],
+										"type": "text/javascript"
+									}
+								}
+							],
+							"request": {
+								"method": "GET",
+								"header": [],
+								"url": {
+									"raw": "{{data_api_url}}/meta/subject/{{SUBJ_Workforce}}",
+									"host": [
+										"{{data_api_url}}"
+									],
+									"path": [
+										"meta",
+										"subject",
+										"{{SUBJ_Workforce}}"
+									]
+								}
+							},
+							"response": []
+						},
+						{
+							"name": "Workforce Tablebuilder query 1",
+							"event": [
+								{
+									"listen": "test",
+									"script": {
+										"id": "8f7eb37a-8283-467d-b953-27709460e190",
+										"exec": [
+											"var respJson;\r",
+											"\r",
+											"pm.test(\"Status code is 200\", function () { \r",
+											"    pm.response.to.have.status(200);\r",
+											"    respJson = pm.response.json();\r",
+											"});\r",
+											"\r",
+											"pm.test(\"Fields are present\", function () {\r",
+											"    pm.expect(pm.response.to.have.jsonBody(\"subjectMeta.filters.TypeOfSchool\"));\r",
+											"    pm.expect(pm.response.to.have.jsonBody(\"subjectMeta.footnotes\"));\r",
+											"    pm.expect(pm.response.to.have.jsonBody(\"subjectMeta.indicators\"));\r",
+											"    pm.expect(pm.response.to.have.jsonBody(\"subjectMeta.locations\"));\r",
+											"    pm.expect(pm.response.to.have.jsonBody(\"subjectMeta.boundaryLevels\"));\r",
+											"});\r",
+											"\r",
+											"pm.test('Results are correct', function () {\r",
+											"    pm.expect(respJson.results.length).to.equal(6);\r",
+											"\r",
+											"    country2010Result = respJson.results.filter(result => result.geographicLevel === \"Country\" && result.timePeriod == '2010_AY');\r",
+											"    pm.expect(country2010Result.length).to.equal(1);\r",
+											"    pm.expect(Object.keys(country2010Result[0].measures).length).to.equal(3);\r",
+											"    pm.expect(country2010Result[0].measures[pm.globals.get('IND_NumberOfSchools')]).to.equal('8888888888.9');\r",
+											"    pm.expect(country2010Result[0].measures[pm.globals.get('IND_PercentTeachersPartTime')]).to.equal('8888888888.9');\r",
+											"    pm.expect(country2010Result[0].measures[pm.globals.get('IND_RatioAssistantsToTeachers')]).to.equal('8888888888.9');\r",
+											"\r",
+											"    country2011Result = respJson.results.filter(result => result.geographicLevel === \"Country\" && result.timePeriod == '2011_AY');\r",
+											"    pm.expect(country2011Result.length).to.equal(1);\r",
+											"    pm.expect(Object.keys(country2011Result[0].measures).length).to.equal(3);\r",
+											"    pm.expect(country2011Result[0].measures[pm.globals.get('IND_NumberOfSchools')]).to.equal('8888888888.9');\r",
+											"    pm.expect(country2011Result[0].measures[pm.globals.get('IND_PercentTeachersPartTime')]).to.equal('8888888888.9');\r",
+											"    pm.expect(country2011Result[0].measures[pm.globals.get('IND_RatioAssistantsToTeachers')]).to.equal('8888888888.9');\r",
+											"\r",
+											"    localAuthority2010Result = respJson.results.filter(result => result.geographicLevel === \"LocalAuthority\" && result.timePeriod == '2010_AY');\r",
+											"    pm.expect(localAuthority2010Result.length).to.equal(1);\r",
+											"    pm.expect(Object.keys(localAuthority2010Result[0].measures).length).to.equal(3);\r",
+											"    pm.expect(localAuthority2010Result[0].measures[pm.globals.get('IND_NumberOfSchools')]).to.equal('8888888888.9');\r",
+											"    pm.expect(localAuthority2010Result[0].measures[pm.globals.get('IND_PercentTeachersPartTime')]).to.equal('8888888888.9');\r",
+											"    pm.expect(localAuthority2010Result[0].measures[pm.globals.get('IND_RatioAssistantsToTeachers')]).to.equal('8888888888.9');\r",
+											"\r",
+											"    localAuthority2011Result = respJson.results.filter(result => result.geographicLevel === \"LocalAuthority\" && result.timePeriod == '2011_AY');\r",
+											"    pm.expect(localAuthority2011Result.length).to.equal(1);\r",
+											"    pm.expect(Object.keys(localAuthority2011Result[0].measures).length).to.equal(3);\r",
+											"    pm.expect(localAuthority2011Result[0].measures[pm.globals.get('IND_NumberOfSchools')]).to.equal('8888888888.9');\r",
+											"    pm.expect(localAuthority2011Result[0].measures[pm.globals.get('IND_PercentTeachersPartTime')]).to.equal('8888888888.9');\r",
+											"    pm.expect(localAuthority2011Result[0].measures[pm.globals.get('IND_RatioAssistantsToTeachers')]).to.equal('8888888888.9');\r",
+											"\r",
+											"    region2010Result = respJson.results.filter(result => result.geographicLevel === \"Region\" && result.timePeriod === '2010_AY');\r",
+											"    pm.expect(region2010Result.length).to.equal(1);\r",
+											"    pm.expect(Object.keys(region2010Result[0].measures).length).to.equal(3);\r",
+											"    pm.expect(region2010Result[0].measures[pm.globals.get('IND_NumberOfSchools')]).to.equal('8888888888.9');\r",
+											"    pm.expect(region2010Result[0].measures[pm.globals.get('IND_PercentTeachersPartTime')]).to.equal('8888888888.9');\r",
+											"    pm.expect(region2010Result[0].measures[pm.globals.get('IND_RatioAssistantsToTeachers')]).to.equal('8888888888.9');\r",
+											"\r",
+											"    region2011Result = respJson.results.filter(result => result.geographicLevel === \"Region\" && result.timePeriod === '2011_AY');\r",
+											"    pm.expect(region2011Result.length).to.equal(1);\r",
+											"    pm.expect(Object.keys(region2011Result[0].measures).length).to.equal(3);\r",
+											"    pm.expect(region2011Result[0].measures[pm.globals.get('IND_NumberOfSchools')]).to.equal('8888888888.9');\r",
+											"    pm.expect(region2011Result[0].measures[pm.globals.get('IND_PercentTeachersPartTime')]).to.equal('8888888888.9');\r",
+											"    pm.expect(region2011Result[0].measures[pm.globals.get('IND_RatioAssistantsToTeachers')]).to.equal('8888888888.9');\r",
+											"\r",
+											"});"
+										],
+										"type": "text/javascript"
+									}
+								}
+							],
+							"request": {
+								"method": "POST",
+								"header": [],
+								"body": {
+									"mode": "raw",
+									"raw": "{\r\n    \"subjectId\": \"{{SUBJ_Workforce}}\",\r\n    \"indicators\": [\"{{IND_NumberOfSchools}}\", \"{{IND_PercentTeachersPartTime}}\", \"{{IND_RatioAssistantsToTeachers}}\"],\r\n    \"filters\": [\"{{FILTI_CentrallyEmployed}}\"],\r\n    \"locations\": {\r\n        \"country\": [\"{{LOC_NAT_England}}\"],\r\n        \"localAuthority\": [\"{{LOC_LA_BarkingAndDagenham}}\"],\r\n        \"region\": [\"{{LOC_REG_EastMidlands}}\"]\r\n    },\r\n    \"timePeriod\": {\r\n        \"startYear\": 2010,\r\n        \"startCode\": \"AY\",\r\n        \"endYear\": 2011,\r\n        \"endCode\": \"AY\"\r\n    }\r\n}",
+									"options": {
+										"raw": {
+											"language": "json"
+										}
+									}
+								},
+								"url": {
+									"raw": "{{data_api_url}}/tablebuilder",
+									"host": [
+										"{{data_api_url}}"
+									],
+									"path": [
+										"tablebuilder"
+									]
+								}
+							},
+							"response": []
+						}
+					],
+					"event": [
+						{
+							"listen": "prerequest",
+							"script": {
+								"id": "b70eabc3-a8c3-4393-a4ab-040b776c1aaf",
+								"type": "text/javascript",
+								"exec": [
+									"pm.globals.set('SUBJ_Workforce', '86da5629-4265-40ec-b49b-08d869c7a0a1');",
+									"pm.globals.set('PUB_Workforce', 'a2bb4e52-0c23-4e81-963a-08d869c7c959');"
+								]
+							}
+						},
+						{
+							"listen": "test",
+							"script": {
+								"id": "ebdf87c5-040b-4d19-85c0-4503c9f12739",
+								"type": "text/javascript",
+								"exec": [
+									""
+								]
+							}
+						}
+					],
+					"protocolProfileBehavior": {},
+					"_postman_isSubFolder": true
+				},
+				{
+					"name": "QL01",
+					"item": [
+						{
+							"name": "Get GUIDs for QL01 subject",
+							"event": [
+								{
+									"listen": "test",
+									"script": {
+										"id": "62874b55-1df9-4b6c-b6b2-5f305a753c50",
+										"exec": [
+											"var respJson;\r",
+											"\r",
+											"pm.test(\"Status code is 200\", function () { \r",
+											"    pm.response.to.have.status(200);\r",
+											"    respJson = pm.response.json();\r",
+											"});\r",
+											"\r",
+											"pm.test('Get locations GUIDs', function () {\r",
+											"    pm.globals.set('LOC_NAT_England', \r",
+											"        respJson.locations.country.options[0].value\r",
+											"    );\r",
+											"});\r",
+											"\r",
+											"pm.test(\"Get Indicator GUIDs\", function () {\r",
+											"    pm.expect(pm.response.to.have.jsonBody(\"indicators.Cohort.options\"));\r",
+											"    var indicatorsCohort = respJson.indicators.Cohort.options;\r",
+											"    for(var i = 0; i < indicatorsCohort.length; i++) {\r",
+											"        switch(indicatorsCohort[i].label) {\r",
+											"            case 'Learners':\r",
+											"                pm.globals.set('IND_Learners', indicatorsCohort[i].value);\r",
+											"                break;\r",
+											"            case 'Number of learners matched to LEO data':\r",
+											"                pm.globals.set('IND_NumberofLearnersLEOData', indicatorsCohort[i].value);\r",
+											"                break;\r",
+											"        }\r",
+											"    }\r",
+											"    var indSustainedPosDestRate = respJson.indicators.Destination.options.filter(ind => ind.label == 'Sustained positive destination rate');\r",
+											"    pm.expect(indSustainedPosDestRate.length).to.equal(1);\r",
+											"    pm.globals.set('IND_SustainedPositiveDestinationRate', indSustainedPosDestRate[0].value);\r",
+											"});\r",
+											"\r",
+											"pm.test('Get Filter GUIDs', function () {\r",
+											"    pm.globals.set('FILTI_SectorSubjectAreaTier1_Total', respJson.filters.SectorSubjectAreaTier1.totalValue);\r",
+											"    \r",
+											"\r",
+											"    pm.globals.set('FILTI_AccessToHigherEducation_Total', respJson.filters.AccessToHigherEducation.totalValue);\r",
+											"    var filti_AccessToHE = respJson.filters.AccessToHigherEducation.options.Default.options.filter(filti => filti.label === 'Access to HE');\r",
+											"    pm.expect(filti_AccessToHE.length).to.equal(1);\r",
+											"    pm.globals.set('FILTI_AccessToHigherEducation_AccessToHE', filti_AccessToHE[0].value);\r",
+											"    var filti_FEProvision = respJson.filters.AccessToHigherEducation.options.Default.options.filter(filti => filti.label === 'FE Provision');\r",
+											"    pm.expect(filti_FEProvision.length).to.equal(1);\r",
+											"    pm.globals.set('FILTI_AccessToHigherEducation_FEProvision', filti_FEProvision[0].value);\r",
+											"\r",
+											"    pm.globals.set('FILTI_QualificationTitle_Total', respJson.filters.QualificationTitle.totalValue);\r",
+											"\r",
+											"    pm.globals.set('FILTI_AgeBand_Total', respJson.filters.AgeBand.totalValue);\r",
+											"\r",
+											"    pm.globals.set('FILTI_ApprenticeshipType_Total', respJson.filters.ApprenticeshipType.totalValue);\r",
+											"    var filti_NotApplicable = respJson.filters.ApprenticeshipType.options.Default.options.filter(filti => filti.label === 'Not applicable');\r",
+											"    pm.expect(filti_NotApplicable.length).to.equal(1);\r",
+											"    pm.globals.set('FILTI_ApprenticeshipType_NotApplicable', filti_NotApplicable[0].value);\r",
+											"\r",
+											"    pm.globals.set('FILTI_Provision_Total', respJson.filters.Provision.totalValue);\r",
+											"    var filti_Traineeship = respJson.filters.Provision.options.Default.options.filter(filti => filti.label === 'Traineeship');\r",
+											"    pm.expect(filti_Traineeship.length).to.equal(1);\r",
+											"    pm.globals.set('FILTI_Provision_Traineeship', filti_Traineeship[0].value);\r",
+											"\r",
+											"    pm.globals.set('FILTI_SectorSubjectAreaTier2_Total', respJson.filters.AgeBand.totalValue);\r",
+											"\r",
+											"    pm.globals.set('FILTI_LevelOfLearning_Total', respJson.filters.LevelOfLearning.totalValue);\r",
+											"    var filti_FullLevel2 = respJson.filters.LevelOfLearning.options.Default.options.filter(filti => filti.label === 'Full level 2');\r",
+											"    pm.expect(filti_FullLevel2.length).to.equal(1);\r",
+											"    pm.globals.set('FILTI_LevelOfLearning_FullLevel2', filti_FullLevel2[0].value);\r",
+											"    var filti_FullLevel3 = respJson.filters.LevelOfLearning.options.Default.options.filter(filti => filti.label === 'Full level 3');\r",
+											"    pm.expect(filti_FullLevel3.length).to.equal(1);\r",
+											"    pm.globals.set('FILTI_LevelOfLearning_FullLevel3', filti_FullLevel3[0].value);\r",
+											"});\r",
+											"\r",
+											"\r",
+											"\r",
+											""
+										],
+										"type": "text/javascript"
+									}
+								}
+							],
+							"request": {
+								"method": "GET",
+								"header": [],
+								"url": {
+									"raw": "{{data_api_url}}/meta/subject/{{SUBJ_QL01}}",
+									"host": [
+										"{{data_api_url}}"
+									],
+									"path": [
+										"meta",
+										"subject",
+										"{{SUBJ_QL01}}"
+									]
+								}
+							},
+							"response": []
+						},
+						{
+							"name": "QL01 Tablebuilder query 1",
+							"event": [
+								{
+									"listen": "test",
+									"script": {
+										"id": "2f80ac31-2e85-4790-bbd0-af11b6d1933d",
+										"exec": [
+											"var respJson;\r",
+											"\r",
+											"pm.test(\"Status code is 200\", function () { \r",
+											"    pm.response.to.have.status(200);\r",
+											"    respJson = pm.response.json();\r",
+											"});\r",
+											"\r",
+											"pm.test(\"Fields are present\", function () {\r",
+											"    pm.expect(pm.response.to.have.jsonBody(\"subjectMeta.filters.AgeBand\"));\r",
+											"    pm.expect(pm.response.to.have.jsonBody(\"subjectMeta.filters.ApprenticeshipType\"));\r",
+											"    pm.expect(pm.response.to.have.jsonBody(\"subjectMeta.filters.Provision\"));\r",
+											"    pm.expect(pm.response.to.have.jsonBody(\"subjectMeta.filters.QualificationTitle\"));\r",
+											"    pm.expect(pm.response.to.have.jsonBody(\"subjectMeta.filters.SectorSubjectAreaTier2\"));\r",
+											"    pm.expect(pm.response.to.have.jsonBody(\"subjectMeta.filters.LevelOfLearning\"));\r",
+											"    pm.expect(pm.response.to.have.jsonBody(\"subjectMeta.filters.AccessToHigherEducation\"));\r",
+											"    pm.expect(pm.response.to.have.jsonBody(\"subjectMeta.filters.SectorSubjectAreaTier1\"));\r",
+											"    pm.expect(pm.response.to.have.jsonBody(\"subjectMeta.footnotes\"));\r",
+											"    pm.expect(pm.response.to.have.jsonBody(\"subjectMeta.indicators\"));\r",
+											"    pm.expect(pm.response.to.have.jsonBody(\"subjectMeta.locations\"));\r",
+											"    pm.expect(pm.response.to.have.jsonBody(\"subjectMeta.boundaryLevels\"));\r",
+											"});\r",
+											"\r",
+											"pm.test('Results are correct', function () {\r",
+											"    pm.expect(respJson.results.length).to.equal(1);\r",
+											"    result = respJson.results[0];\r",
+											"\r",
+											"    pm.expect(result.filters.length).to.equal(8);\r",
+											"    pm.expect(result.geographicLevel).to.equal('Country');\r",
+											"    pm.expect(result.location.country.name).to.equal('England');\r",
+											"    pm.expect(Object.keys(result.measures).length).to.equal(2);\r",
+											"    pm.expect(result.timePeriod).to.equal('2013_AY');\r",
+											"});"
+										],
+										"type": "text/javascript"
+									}
+								}
+							],
+							"request": {
+								"method": "POST",
+								"header": [],
+								"body": {
+									"mode": "raw",
+									"raw": "{\r\n    \"subjectId\": \"{{SUBJ_QL01}}\",\r\n    \"publicationId\": \"{{PUB_QL01}}\",\r\n    \"indicators\": [\"{{IND_Learners}}\", \"{{IND_NumberofLearnersLEOData}}\"],\r\n    \"filters\": [\"{{FILTI_SectorSubjectAreaTier1_Total}}\", \"{{FILTI_AccessToHigherEducation_Total}}\", \"{{FILTI_QualificationTitle_Total}}\", \"{{FILTI_AgeBand_Total}}\", \"{{FILTI_ApprenticeshipType_Total}}\", \"{{FILTI_Provision_Total}}\", \"{{FILTI_SectorSubjectAreaTier2_Total}}\", \"{{FILTI_LevelOfLearning_Total}}\"],\r\n    \"locations\": {\r\n        \"country\": [\"{{LOC_NAT_England}}\"]\r\n    },\r\n    \"timePeriod\": {\r\n        \"startYear\": 2013,\r\n        \"startCode\": \"AY\",\r\n        \"endYear\": 2013,\r\n        \"endCode\": \"AY\"\r\n    }\r\n}",
+									"options": {
+										"raw": {
+											"language": "json"
+										}
+									}
+								},
+								"url": {
+									"raw": "{{data_api_url}}/tablebuilder",
+									"host": [
+										"{{data_api_url}}"
+									],
+									"path": [
+										"tablebuilder"
+									]
+								}
+							},
+							"response": []
+						},
+						{
+							"name": "QL01 Tablebuilder query 2",
+							"event": [
+								{
+									"listen": "test",
+									"script": {
+										"id": "c753d540-6351-4390-9693-f05ec66c47f8",
+										"exec": [
+											"var respJson;\r",
+											"\r",
+											"pm.test(\"Status code is 200\", function () { \r",
+											"    pm.response.to.have.status(200);\r",
+											"    respJson = pm.response.json();\r",
+											"});\r",
+											"\r",
+											"pm.test(\"Fields are present\", function () {\r",
+											"    pm.expect(pm.response.to.have.jsonBody(\"subjectMeta.filters.AgeBand\"));\r",
+											"    pm.expect(pm.response.to.have.jsonBody(\"subjectMeta.filters.ApprenticeshipType\"));\r",
+											"    pm.expect(pm.response.to.have.jsonBody(\"subjectMeta.filters.Provision\"));\r",
+											"    pm.expect(pm.response.to.have.jsonBody(\"subjectMeta.filters.QualificationTitle\"));\r",
+											"    pm.expect(pm.response.to.have.jsonBody(\"subjectMeta.filters.SectorSubjectAreaTier2\"));\r",
+											"    pm.expect(pm.response.to.have.jsonBody(\"subjectMeta.filters.LevelOfLearning\"));\r",
+											"    pm.expect(pm.response.to.have.jsonBody(\"subjectMeta.filters.AccessToHigherEducation\"));\r",
+											"    pm.expect(pm.response.to.have.jsonBody(\"subjectMeta.filters.SectorSubjectAreaTier1\"));\r",
+											"    pm.expect(pm.response.to.have.jsonBody(\"subjectMeta.footnotes\"));\r",
+											"    pm.expect(pm.response.to.have.jsonBody(\"subjectMeta.indicators\"));\r",
+											"    pm.expect(pm.response.to.have.jsonBody(\"subjectMeta.locations\"));\r",
+											"    pm.expect(pm.response.to.have.jsonBody(\"subjectMeta.boundaryLevels\"));\r",
+											"});\r",
+											"\r",
+											"pm.test('Results are correct', function () {\r",
+											"    pm.expect(respJson.results.length).to.equal(2);\r",
+											"\r",
+											"    var resultFullLevel2 = respJson.results.filter(res => res.filters.includes(pm.globals.get('FILTI_LevelOfLearning_FullLevel2')));\r",
+											"    pm.expect(resultFullLevel2.length).to.equal(1);\r",
+											"    pm.expect(resultFullLevel2[0].filters.length).to.equal(8);\r",
+											"    pm.expect(resultFullLevel2[0].geographicLevel).to.equal('Country');\r",
+											"    pm.expect(resultFullLevel2[0].location.country.name).to.equal('England');\r",
+											"    pm.expect(Object.keys(resultFullLevel2[0].measures).length).to.equal(2);\r",
+											"    pm.expect(resultFullLevel2[0].measures[pm.globals.get('IND_Learners')]).to.equal('380');\r",
+											"    pm.expect(resultFullLevel2[0].measures[pm.globals.get('IND_SustainedPositiveDestinationRate')]).to.equal('67');\r",
+											"    pm.expect(resultFullLevel2[0].timePeriod).to.equal('2013_AY');\r",
+											"\r",
+											"    var resultFullLevel3 = respJson.results.filter(res => res.filters.includes(pm.globals.get('FILTI_LevelOfLearning_FullLevel3')));\r",
+											"    pm.expect(resultFullLevel3.length).to.equal(1);\r",
+											"    pm.expect(resultFullLevel3[0].filters.length).to.equal(8);\r",
+											"    pm.expect(resultFullLevel3[0].geographicLevel).to.equal('Country');\r",
+											"    pm.expect(resultFullLevel3[0].location.country.name).to.equal('England');\r",
+											"    pm.expect(Object.keys(resultFullLevel3[0].measures).length).to.equal(2);\r",
+											"    pm.expect(resultFullLevel3[0].measures[pm.globals.get('IND_Learners')]).to.equal('c');\r",
+											"    pm.expect(resultFullLevel3[0].measures[pm.globals.get('IND_SustainedPositiveDestinationRate')]).to.equal('c');\r",
+											"    pm.expect(resultFullLevel3[0].timePeriod).to.equal('2013_AY');\r",
+											"});"
+										],
+										"type": "text/javascript"
+									}
+								}
+							],
+							"request": {
+								"method": "POST",
+								"header": [],
+								"body": {
+									"mode": "raw",
+									"raw": "{\r\n    \"subjectId\": \"{{SUBJ_QL01}}\",\r\n    \"publicationId\": \"{{PUB_QL01}}\",\r\n    \"indicators\": [\"{{IND_Learners}}\", \"{{IND_SustainedPositiveDestinationRate}}\"],\r\n    \"filters\": [\"{{FILTI_AccessToHigherEducation_AccessToHE}}\", \"{{FILTI_AccessToHigherEducation_FEProvision}}\", \"{{FILTI_Provision_Traineeship}}\", \"{{FILTI_LevelOfLearning_FullLevel2}}\", \"{{FILTI_LevelOfLearning_FullLevel3}}\", \"{{FILTI_ApprenticeshipType_NotApplicable}}\", \"{{FILTI_SectorSubjectAreaTier1_Total}}\", \"{{FILTI_QualificationTitle_Total}}\", \"{{FILTI_AgeBand_Total}}\", \"{{FILTI_SectorSubjectAreaTier2_Total}}\"],\r\n    \"locations\": {\r\n        \"country\": [\"{{LOC_NAT_England}}\"]\r\n    },\r\n    \"timePeriod\": {\r\n        \"startYear\": 2013,\r\n        \"startCode\": \"AY\",\r\n        \"endYear\": 2016,\r\n        \"endCode\": \"AY\"\r\n    }\r\n}",
+									"options": {
+										"raw": {
+											"language": "json"
+										}
+									}
+								},
+								"url": {
+									"raw": "{{data_api_url}}/tablebuilder",
+									"host": [
+										"{{data_api_url}}"
+									],
+									"path": [
+										"tablebuilder"
+									]
+								}
+							},
+							"response": []
+						}
+					],
+					"event": [
+						{
+							"listen": "prerequest",
+							"script": {
+								"id": "606026ce-837f-4838-8508-3916c51a6c58",
+								"type": "text/javascript",
+								"exec": [
+									"pm.globals.set('SUBJ_QL01', 'be5735f3-2708-44ea-b49a-08d869c7a0a1');",
+									"pm.globals.set('PUB_QL01', 'a2bb4e52-0c23-4e81-963a-08d869c7c959');"
+								]
+							}
+						},
+						{
+							"listen": "test",
+							"script": {
+								"id": "e4148a48-c0b1-4bed-859a-cc86a4456830",
+								"type": "text/javascript",
+								"exec": [
+									""
+								]
+							}
+						}
+					],
+					"protocolProfileBehavior": {},
+					"_postman_isSubFolder": true
 				}
 			],
 			"protocolProfileBehavior": {}
