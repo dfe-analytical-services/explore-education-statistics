@@ -116,11 +116,6 @@ const nextConfig = {
     config.resolve.alias = {
       ...config.resolve.alias,
       './dist/cpexcel.js': '',
-      '@frontend': path.resolve(__dirname, 'src'),
-      '@common': path.resolve(
-        __dirname,
-        '../explore-education-statistics-common/src',
-      ),
       react: path.resolve(__dirname, 'node_modules/react'),
       formik: path.resolve(__dirname, 'node_modules/formik'),
     };
