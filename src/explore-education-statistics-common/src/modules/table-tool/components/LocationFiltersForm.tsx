@@ -5,7 +5,7 @@ import SummaryListItem from '@common/components/SummaryListItem';
 import ResetFormOnPreviousStep from '@common/modules/table-tool/components/ResetFormOnPreviousStep';
 import {
   FilterOption,
-  PublicationSubjectMeta,
+  SubjectMeta,
 } from '@common/services/tableBuilderService';
 import { Dictionary } from '@common/types/util';
 import Yup from '@common/validation/yup';
@@ -27,7 +27,7 @@ export type LocationFiltersFormSubmitHandler = (values: {
 }) => void;
 
 interface Props {
-  options: PublicationSubjectMeta['locations'];
+  options: SubjectMeta['locations'];
   initialValues?: Dictionary<string[]>;
   onSubmit: LocationFiltersFormSubmitHandler;
 }

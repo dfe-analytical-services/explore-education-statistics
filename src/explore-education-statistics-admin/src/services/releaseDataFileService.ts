@@ -3,13 +3,15 @@ import { FileInfo } from '@admin/services/types/file';
 import client from '@admin/services/utils/service';
 import { Overwrite } from '@common/types';
 import downloadFile from './utils/file/downloadFile';
-import getFileNameFromPath from './utils/file/getFileNameFromPath';
 
 interface DataFileInfo extends FileInfo {
+  metaFileId: string;
   metaFileName: string;
   rows: number;
   userName: string;
   created: string;
+  status: ImportStatusCode;
+  replacedBy?: string;
 }
 
 export interface DeleteDataFilePlan {
@@ -18,30 +20,44 @@ export interface DeleteDataFilePlan {
 }
 
 export interface DataFile {
+  id: string;
   title: string;
-  filename: string;
+  fileName: string;
   fileSize: {
     size: number;
     unit: string;
   };
   rows: number;
-  metadataFilename: string;
+  metaFileId: string;
+  metaFileName: string;
   userName: string;
-  created: Date;
-  canDelete?: boolean;
+  status: ImportStatusCode;
+  replacedBy?: string;
+  created?: string;
   isDeleting?: boolean;
 }
 
-export interface UploadDataFilesRequest {
-  name: string;
-  dataFile: File;
-  metadataFile: File;
-}
+export type UploadDataFilesRequest =
+  | {
+      name: string;
+      dataFile: File;
+      metadataFile: File;
+    }
+  | {
+      replacingFileId: string;
+      dataFile: File;
+      metadataFile: File;
+    };
 
-export interface UploadZipDataFileRequest {
-  name: string;
-  zipFile: File;
-}
+export type UploadZipDataFileRequest =
+  | {
+      name: string;
+      zipFile: File;
+    }
+  | {
+      replacingFileId: string;
+      zipFile: File;
+    };
 
 export type ImportStatusCode =
   | 'COMPLETE'
@@ -54,37 +70,35 @@ export type ImportStatusCode =
   | 'NOT_FOUND'
   | 'FAILED';
 
-export interface Errors {
-  Message: string;
-}
-
 export interface DataFileImportStatus {
   status: ImportStatusCode;
   percentageComplete?: string;
-  errors?: Errors[];
+  errors?: string[];
   numberOfRows: number;
 }
-
 function mapFile(file: DataFileInfo): DataFile {
   const [size, unit] = file.size.split(' ');
 
   return {
+    id: file.id,
     title: file.name,
-    filename: file.fileName,
+    fileName: file.fileName,
     rows: file.rows || 0,
     fileSize: {
       size: parseInt(size, 10),
       unit,
     },
-    metadataFilename: file.metaFileName,
-    canDelete: true,
+    metaFileId: file.metaFileId,
+    metaFileName: file.metaFileName,
+    replacedBy: file.replacedBy,
     userName: file.userName,
-    created: new Date(file.created),
+    created: file.created,
+    status: file.status,
   };
 }
 
 const releaseDataFileService = {
-  getReleaseDataFiles(releaseId: string): Promise<DataFile[]> {
+  getDataFiles(releaseId: string): Promise<DataFile[]> {
     return client
       .get<DataFileInfo[]>(`/release/${releaseId}/data`)
       .then(response => {
@@ -92,21 +106,26 @@ const releaseDataFileService = {
         return dataFiles.map(mapFile);
       });
   },
+  getDataFile(releaseId: string, fileId: string): Promise<DataFile> {
+    return client
+      .get<DataFileInfo>(`/release/${releaseId}/data/${fileId}`)
+      .then(mapFile);
+  },
   async uploadDataFiles(
     releaseId: string,
     request: UploadDataFilesRequest,
   ): Promise<DataFile> {
+    const { dataFile, metadataFile, ...params } = request;
+
     const data = new FormData();
-    data.append('file', request.dataFile);
-    data.append('metaFile', request.metadataFile);
+    data.append('file', dataFile);
+    data.append('metaFile', metadataFile);
 
     const file = await client.post<DataFileInfo>(
       `/release/${releaseId}/data`,
       data,
       {
-        params: {
-          name: request.name,
-        },
+        params,
       },
     );
 
@@ -116,16 +135,16 @@ const releaseDataFileService = {
     releaseId: string,
     request: UploadZipDataFileRequest,
   ): Promise<DataFile> {
+    const { zipFile, ...params } = request;
+
     const data = new FormData();
-    data.append('zipFile', request.zipFile);
+    data.append('zipFile', zipFile);
 
     const file = await client.post<DataFileInfo>(
       `/release/${releaseId}/zip-data`,
       data,
       {
-        params: {
-          name: request.name,
-        },
+        params,
       },
     );
 
@@ -148,7 +167,7 @@ const releaseDataFileService = {
         return {
           ...importStatus,
           errors: JSON.parse(importStatus.errors || '[]').map(
-            ({ Message }: Errors) => Message,
+            ({ Message }: { Message: string }) => Message,
           ),
         };
       });
@@ -159,37 +178,18 @@ const releaseDataFileService = {
     dataFile: DataFile,
   ): Promise<DeleteDataFilePlan> {
     return client.get<DeleteDataFilePlan>(
-      `/release/${releaseId}/data/${dataFile.filename}/delete-plan`,
-      {
-        params: {
-          name: dataFile.title,
-        },
-      },
+      `/release/${releaseId}/data/${dataFile.id}/delete-plan`,
     );
   },
-  deleteDataFiles(releaseId: string, dataFile: DataFile): Promise<void> {
-    return client.delete<void>(
-      `/release/${releaseId}/data/${dataFile.filename}`,
-      {
-        params: {
-          name: dataFile.title,
-        },
-      },
-    );
+  deleteDataFiles(releaseId: string, fileId: string): Promise<void> {
+    return client.delete<void>(`/release/${releaseId}/data/${fileId}`);
   },
-  downloadDataFile(releaseId: string, fileName: string): Promise<void> {
+  downloadFile(releaseId: string, id: string, fileName: string): Promise<void> {
     return client
-      .get<Blob>(`/release/${releaseId}/data/${fileName}`, {
+      .get<Blob>(`/release/${releaseId}/file/${id}`, {
         responseType: 'blob',
       })
       .then(response => downloadFile(response, fileName));
-  },
-  downloadFile(path: string): Promise<void> {
-    return client
-      .get<Blob>(`/release/${path}`, {
-        responseType: 'blob',
-      })
-      .then(response => downloadFile(response, getFileNameFromPath(path)));
   },
 };
 

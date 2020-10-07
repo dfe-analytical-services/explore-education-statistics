@@ -17,18 +17,16 @@ interface Props {
   methodologyUrl?: string;
   methodologySummary?: string;
   releaseType?: string;
-  themeTitle: string;
   publicationContact: PublicationContact;
 }
 
-const HelpAndSupport = ({
+const PublicationReleaseHelpAndSupportSection = ({
   accordionId,
   includeAnalytics = false,
   publicationTitle,
   methodologyUrl = '',
   methodologySummary,
   releaseType,
-  themeTitle,
   publicationContact,
 }: Props) => {
   return (
@@ -102,4 +100,4 @@ const AccordionComponent = ({
   );
 };
 
-export default HelpAndSupport;
+export default PublicationReleaseHelpAndSupportSection;

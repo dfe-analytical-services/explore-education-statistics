@@ -2,6 +2,7 @@
 Resource    ../../libs/admin-common.robot
 Resource    ../../libs/charts.robot
 Library  Collections
+Library  ../../libs/api_keywords.py
 
 Force Tags  Admin  Local  Dev  AltersData
 
@@ -15,31 +16,17 @@ ${DATABLOCK_NAME}           UI test data block
 ${CONTENT_SECTION_NAME}     Test data block section
 
 *** Test Cases ***
-Create test publication
+Create test publication and release via API
     [Tags]  HappyPath
-    user selects theme "Test theme" and topic "${TOPIC_NAME}" from the admin dashboard
-    user waits until page contains link  Create new publication     60
-    user clicks link   Create new publication
-    user creates publication    ${PUBLICATION_NAME}
-
-Verify test publication is created
-    [Tags]  HappyPath
-    user waits until page contains accordion section  ${PUBLICATION_NAME}
-    user opens accordion section  ${PUBLICATION_NAME}
-    user waits until accordion section contains text  ${PUBLICATION_NAME}    Methodology
-    user waits until accordion section contains text  ${PUBLICATION_NAME}    Releases
-
-Create release
-    [Tags]  HappyPath
-    user clicks testid element  Create new release link for ${PUBLICATION_NAME}
-    user creates release for publication  ${PUBLICATION_NAME}  Academic Year  2025
-    user checks summary list contains  Publication title  ${PUBLICATION_NAME}
+    ${PUBLICATION_ID}=  user creates test publication via api   ${PUBLICATION_NAME}
+    user create test release via api  ${PUBLICATION_ID}   AY    2025
 
 Upload subject
     [Tags]  HappyPath
-    user waits until h2 is visible    Release summary
-    user checks summary list contains  Publication title  ${PUBLICATION_NAME}
-    user clicks link  Manage data
+    user navigates to release summary from admin dashboard  ${PUBLICATION_NAME}  Academic Year 2025/26 (not Live)
+
+    user clicks link  Data and files
+    user waits until h2 is visible  Add data file to release
     user enters text into element  id:dataFileUploadForm-subjectTitle   UI test subject
     user chooses file   id:dataFileUploadForm-dataFile       ${CURDIR}${/}files${/}upload-file-test.csv
     user chooses file   id:dataFileUploadForm-metadataFile   ${CURDIR}${/}files${/}upload-file-test.meta.csv
@@ -50,16 +37,16 @@ Upload subject
     user opens accordion section   UI test subject
 
     ${section}=  user gets accordion section content element  UI test subject
-    user checks summary list contains  Subject title    UI test subject  ${section}
-    user checks summary list contains  Data file        upload-file-test.csv  ${section}
-    user checks summary list contains  Metadata file    upload-file-test.meta.csv  ${section}
-    user checks summary list contains  Number of rows   159  ${section}
-    user checks summary list contains  Data file size   15 Kb  ${section}
-    user checks summary list contains  Status           Complete  ${section}  180
+    user checks headed table body row contains  Subject title    UI test subject  ${section}
+    user checks headed table body row contains  Data file        upload-file-test.csv  ${section}
+    user checks headed table body row contains  Metadata file    upload-file-test.meta.csv  ${section}
+    user checks headed table body row contains  Number of rows   159  ${section}
+    user checks headed table body row contains  Data file size   15 Kb  ${section}
+    user checks headed table body row contains  Status           Complete  ${section}  180
 
-Navigate to Manage data blocks tab
+Navigate to 'Data and files' page
     [Tags]  HappyPath
-    user clicks link    Manage data blocks
+    user clicks link    Data blocks
     user waits until h2 is visible   Choose a subject
 
 Select subject "UI test subject"
@@ -111,62 +98,61 @@ Create table
 
 Validate table rows
     [Tags]  HappyPath
-    ${table}=  set variable  css:table
-    user checks table column heading contains  ${table}  1  1  Admission Numbers
+    user checks table column heading contains  1  1  Admission Numbers
 
-    ${row}=  user gets row number with heading  ${table}  Bolton 001 (E02000984)
-    user checks table heading in offset row contains  ${table}  ${row}  0  2  2019
+    ${row}=  user gets row number with heading  Bolton 001 (E02000984)
+    user checks table heading in offset row contains  ${row}  0  2  2019
 
-    user checks table cell in offset row contains  ${table}  ${row}  0  1  8,533
+    user checks table cell in offset row contains  ${row}  0  1  8,533
 
-    ${row}=  user gets row number with heading   ${table}  Bolton 001 (E05000364)
-    user checks table heading in offset row contains  ${table}  ${row}  0  2  2009
-    user checks table heading in offset row contains  ${table}  ${row}  1  1  2010
-    user checks table heading in offset row contains  ${table}  ${row}  2  1  2017
+    ${row}=  user gets row number with heading   Bolton 001 (E05000364)
+    user checks table heading in offset row contains  ${row}  0  2  2009
+    user checks table heading in offset row contains  ${row}  1  1  2010
+    user checks table heading in offset row contains  ${row}  2  1  2017
 
-    user checks table cell in offset row contains  ${table}  ${row}  0  1  5,815
-    user checks table cell in offset row contains  ${table}  ${row}  1  1  5,595
-    user checks table cell in offset row contains  ${table}  ${row}  2  1  6,373
+    user checks table cell in offset row contains  ${row}  0  1  5,815
+    user checks table cell in offset row contains  ${row}  1  1  5,595
+    user checks table cell in offset row contains  ${row}  2  1  6,373
 
-    ${row}=  user gets row number with heading  ${table}  Bolton 004 (E02000987)
-    user checks table heading in offset row contains  ${table}  ${row}  0  2  2020
+    ${row}=  user gets row number with heading  Bolton 004 (E02000987)
+    user checks table heading in offset row contains  ${row}  0  2  2020
 
-    user checks table cell in offset row contains  ${table}  ${row}  0  1  6,031
+    user checks table cell in offset row contains  ${row}  0  1  6,031
 
-    ${row}=  user gets row number with heading  ${table}  Bolton 004 (E05010450)
-    user checks table heading in offset row contains  ${table}  ${row}  0  2  2005
-    user checks table heading in offset row contains  ${table}  ${row}  1  1  2017
-    user checks table heading in offset row contains  ${table}  ${row}  2  1  2018
+    ${row}=  user gets row number with heading  Bolton 004 (E05010450)
+    user checks table heading in offset row contains  ${row}  0  2  2005
+    user checks table heading in offset row contains  ${row}  1  1  2017
+    user checks table heading in offset row contains  ${row}  2  1  2018
 
-    user checks table cell in offset row contains  ${table}  ${row}  0  1  8,557
-    user checks table cell in offset row contains  ${table}  ${row}  1  1  3,481
-    user checks table cell in offset row contains  ${table}  ${row}  2  1  8,630
+    user checks table cell in offset row contains  ${row}  0  1  8,557
+    user checks table cell in offset row contains  ${row}  1  1  3,481
+    user checks table cell in offset row contains  ${row}  2  1  8,630
 
-    ${row}=  user gets row number with heading  ${table}  Nailsea Youngwood
-    user checks table heading in offset row contains  ${table}  ${row}  0  2  2005
-    user checks table heading in offset row contains  ${table}  ${row}  1  1  2010
-    user checks table heading in offset row contains  ${table}  ${row}  2  1  2011
-    user checks table heading in offset row contains  ${table}  ${row}  3  1  2012
-    user checks table heading in offset row contains  ${table}  ${row}  4  1  2016
+    ${row}=  user gets row number with heading  Nailsea Youngwood
+    user checks table heading in offset row contains  ${row}  0  2  2005
+    user checks table heading in offset row contains  ${row}  1  1  2010
+    user checks table heading in offset row contains  ${row}  2  1  2011
+    user checks table heading in offset row contains  ${row}  3  1  2012
+    user checks table heading in offset row contains  ${row}  4  1  2016
 
-    user checks table cell in offset row contains  ${table}  ${row}  0  1  3,612
-    user checks table cell in offset row contains  ${table}  ${row}  1  1  9,304
-    user checks table cell in offset row contains  ${table}  ${row}  2  1  9,603
-    user checks table cell in offset row contains  ${table}  ${row}  3  1  8,150
-    user checks table cell in offset row contains  ${table}  ${row}  4  1  4,198
+    user checks table cell in offset row contains  ${row}  0  1  3,612
+    user checks table cell in offset row contains  ${row}  1  1  9,304
+    user checks table cell in offset row contains  ${row}  2  1  9,603
+    user checks table cell in offset row contains  ${row}  3  1  8,150
+    user checks table cell in offset row contains  ${row}  4  1  4,198
 
-    ${row}=  user gets row number with heading  ${table}  Syon
-    user checks table heading in offset row contains  ${table}  ${row}  0  2  2007
-    user checks table heading in offset row contains  ${table}  ${row}  1  1  2008
-    user checks table heading in offset row contains  ${table}  ${row}  2  1  2010
-    user checks table heading in offset row contains  ${table}  ${row}  3  1  2012
-    user checks table heading in offset row contains  ${table}  ${row}  4  1  2017
+    ${row}=  user gets row number with heading  Syon
+    user checks table heading in offset row contains  ${row}  0  2  2007
+    user checks table heading in offset row contains  ${row}  1  1  2008
+    user checks table heading in offset row contains  ${row}  2  1  2010
+    user checks table heading in offset row contains  ${row}  3  1  2012
+    user checks table heading in offset row contains  ${row}  4  1  2017
 
-    user checks table cell in offset row contains  ${table}  ${row}  0  1  9,914
-    user checks table cell in offset row contains  ${table}  ${row}  1  1  5,505
-    user checks table cell in offset row contains  ${table}  ${row}  2  1  6,060
-    user checks table cell in offset row contains  ${table}  ${row}  3  1  1,109
-    user checks table cell in offset row contains  ${table}  ${row}  4  1  1,959
+    user checks table cell in offset row contains  ${row}  0  1  9,914
+    user checks table cell in offset row contains  ${row}  1  1  5,505
+    user checks table cell in offset row contains  ${row}  2  1  6,060
+    user checks table cell in offset row contains  ${row}  3  1  1,109
+    user checks table cell in offset row contains  ${row}  4  1  1,959
 
 Save data block
     [Tags]  HappyPath
@@ -178,7 +164,7 @@ Save data block
 
 Embed data block into release content
     [Tags]  HappyPath
-    user clicks link  Manage content
+    user clicks link  Content
     user waits until h2 is visible  ${PUBLICATION_NAME}
     user clicks button  Add new section
     user changes accordion section title  1   ${CONTENT_SECTION_NAME}
@@ -195,65 +181,65 @@ Validate embedded table rows
     user scrolls to element   xpath://button[text()="${CONTENT_SECTION_NAME}"]
     user waits until page contains element  ${table}   30
 
-    user checks table column heading contains  ${table}  1  1  Admission Numbers
+    user checks table column heading contains  1  1  Admission Numbers  ${table}
 
-    ${row}=  user gets row number with heading  ${table}  Bolton 001 (E02000984)
-    user checks table heading in offset row contains  ${table}  ${row}  0  2  2019
+    ${row}=  user gets row number with heading  Bolton 001 (E02000984)  ${table}
+    user checks table heading in offset row contains  ${row}  0  2  2019  ${table}
 
-    user checks table cell in offset row contains  ${table}  ${row}  0  1  8,533
+    user checks table cell in offset row contains  ${row}  0  1  8,533  ${table}
 
-    ${row}=  user gets row number with heading   ${table}  Bolton 001 (E05000364)
-    user checks table heading in offset row contains  ${table}  ${row}  0  2  2009
-    user checks table heading in offset row contains  ${table}  ${row}  1  1  2010
-    user checks table heading in offset row contains  ${table}  ${row}  2  1  2017
+    ${row}=  user gets row number with heading   Bolton 001 (E05000364)  ${table}
+    user checks table heading in offset row contains  ${row}  0  2  2009  ${table}
+    user checks table heading in offset row contains  ${row}  1  1  2010  ${table}
+    user checks table heading in offset row contains  ${row}  2  1  2017  ${table}
 
-    user checks table cell in offset row contains  ${table}  ${row}  0  1  5,815
-    user checks table cell in offset row contains  ${table}  ${row}  1  1  5,595
-    user checks table cell in offset row contains  ${table}  ${row}  2  1  6,373
+    user checks table cell in offset row contains  ${row}  0  1  5,815  ${table}
+    user checks table cell in offset row contains  ${row}  1  1  5,595  ${table}
+    user checks table cell in offset row contains  ${row}  2  1  6,373  ${table}
 
-    ${row}=  user gets row number with heading  ${table}  Bolton 004 (E02000987)
-    user checks table heading in offset row contains  ${table}  ${row}  0  2  2020
+    ${row}=  user gets row number with heading  Bolton 004 (E02000987)  ${table}
+    user checks table heading in offset row contains  ${row}  0  2  2020  ${table}
 
-    user checks table cell in offset row contains  ${table}  ${row}  0  1  6,031
+    user checks table cell in offset row contains  ${row}  0  1  6,031  ${table}
 
-    ${row}=  user gets row number with heading  ${table}  Bolton 004 (E05010450)
-    user checks table heading in offset row contains  ${table}  ${row}  0  2  2005
-    user checks table heading in offset row contains  ${table}  ${row}  1  1  2017
-    user checks table heading in offset row contains  ${table}  ${row}  2  1  2018
+    ${row}=  user gets row number with heading  Bolton 004 (E05010450)  ${table}
+    user checks table heading in offset row contains  ${row}  0  2  2005  ${table}
+    user checks table heading in offset row contains  ${row}  1  1  2017  ${table}
+    user checks table heading in offset row contains  ${row}  2  1  2018  ${table}
 
-    user checks table cell in offset row contains  ${table}  ${row}  0  1  8,557
-    user checks table cell in offset row contains  ${table}  ${row}  1  1  3,481
-    user checks table cell in offset row contains  ${table}  ${row}  2  1  8,630
+    user checks table cell in offset row contains  ${row}  0  1  8,557  ${table}
+    user checks table cell in offset row contains  ${row}  1  1  3,481  ${table}
+    user checks table cell in offset row contains  ${row}  2  1  8,630  ${table}
 
-    ${row}=  user gets row number with heading  ${table}  Nailsea Youngwood
-    user checks table heading in offset row contains  ${table}  ${row}  0  2  2005
-    user checks table heading in offset row contains  ${table}  ${row}  1  1  2010
-    user checks table heading in offset row contains  ${table}  ${row}  2  1  2011
-    user checks table heading in offset row contains  ${table}  ${row}  3  1  2012
-    user checks table heading in offset row contains  ${table}  ${row}  4  1  2016
+    ${row}=  user gets row number with heading  Nailsea Youngwood  ${table}
+    user checks table heading in offset row contains  ${row}  0  2  2005  ${table}
+    user checks table heading in offset row contains  ${row}  1  1  2010  ${table}
+    user checks table heading in offset row contains  ${row}  2  1  2011  ${table}
+    user checks table heading in offset row contains  ${row}  3  1  2012  ${table}
+    user checks table heading in offset row contains  ${row}  4  1  2016  ${table}
 
-    user checks table cell in offset row contains  ${table}  ${row}  0  1  3,612
-    user checks table cell in offset row contains  ${table}  ${row}  1  1  9,304
-    user checks table cell in offset row contains  ${table}  ${row}  2  1  9,603
-    user checks table cell in offset row contains  ${table}  ${row}  3  1  8,150
-    user checks table cell in offset row contains  ${table}  ${row}  4  1  4,198
+    user checks table cell in offset row contains  ${row}  0  1  3,612  ${table}
+    user checks table cell in offset row contains  ${row}  1  1  9,304  ${table}
+    user checks table cell in offset row contains  ${row}  2  1  9,603  ${table}
+    user checks table cell in offset row contains  ${row}  3  1  8,150  ${table}
+    user checks table cell in offset row contains  ${row}  4  1  4,198  ${table}
 
-    ${row}=  user gets row number with heading  ${table}  Syon
-    user checks table heading in offset row contains  ${table}  ${row}  0  2  2007
-    user checks table heading in offset row contains  ${table}  ${row}  1  1  2008
-    user checks table heading in offset row contains  ${table}  ${row}  2  1  2010
-    user checks table heading in offset row contains  ${table}  ${row}  3  1  2012
-    user checks table heading in offset row contains  ${table}  ${row}  4  1  2017
+    ${row}=  user gets row number with heading  Syon  ${table}
+    user checks table heading in offset row contains  ${row}  0  2  2007  ${table}
+    user checks table heading in offset row contains  ${row}  1  1  2008  ${table}
+    user checks table heading in offset row contains  ${row}  2  1  2010  ${table}
+    user checks table heading in offset row contains  ${row}  3  1  2012  ${table}
+    user checks table heading in offset row contains  ${row}  4  1  2017  ${table}
 
-    user checks table cell in offset row contains  ${table}  ${row}  0  1  9,914
-    user checks table cell in offset row contains  ${table}  ${row}  1  1  5,505
-    user checks table cell in offset row contains  ${table}  ${row}  2  1  6,060
-    user checks table cell in offset row contains  ${table}  ${row}  3  1  1,109
-    user checks table cell in offset row contains  ${table}  ${row}  4  1  1,959
+    user checks table cell in offset row contains  ${row}  0  1  9,914  ${table}
+    user checks table cell in offset row contains  ${row}  1  1  5,505  ${table}
+    user checks table cell in offset row contains  ${row}  2  1  6,060  ${table}
+    user checks table cell in offset row contains  ${row}  3  1  1,109  ${table}
+    user checks table cell in offset row contains  ${row}  4  1  1,959  ${table}
 
 Navigate to Chart tab
     [Tags]  HappyPath
-    user clicks link  Manage data blocks
+    user clicks link  Data blocks
     user selects from list by label  id:selectedDataBlock  ${DATABLOCK_NAME}
     user waits until h2 is visible  ${DATABLOCK_NAME}
     user waits until page does not contain loading spinner
@@ -307,7 +293,7 @@ Save and validate line chart embeds correctly
     user clicks button  Save chart options
     user waits until button is enabled  Save chart options
 
-    user clicks link  Manage content
+    user clicks link  Content
     user waits until h2 is visible  ${PUBLICATION_NAME}
     user opens accordion section  ${CONTENT_SECTION_NAME}
 
@@ -342,7 +328,7 @@ Save and validate line chart embeds correctly
 
 Configure basic vertical bar chart
     [Tags]  HappyPath
-    user clicks link  Manage data blocks
+    user clicks link  Data blocks
     user selects from list by label  id:selectedDataBlock  ${DATABLOCK_NAME}
     user waits until h2 is visible  ${DATABLOCK_NAME}
     user waits until page does not contain loading spinner
@@ -388,7 +374,7 @@ Save and validate vertical bar chart embeds correctly
     user clicks button  Save chart options
     user waits until button is enabled  Save chart options
 
-    user clicks link  Manage content
+    user clicks link  Content
     user waits until h2 is visible  ${PUBLICATION_NAME}
     user opens accordion section  ${CONTENT_SECTION_NAME}
 
@@ -424,7 +410,7 @@ Save and validate vertical bar chart embeds correctly
 
 Configure basic horizontal bar chart
     [Tags]  HappyPath
-    user clicks link  Manage data blocks
+    user clicks link  Data blocks
     user selects from list by label  id:selectedDataBlock  ${DATABLOCK_NAME}
     user waits until h2 is visible  ${DATABLOCK_NAME}
     user waits until page does not contain loading spinner
@@ -471,7 +457,7 @@ Save and validate horizontal bar chart embeds correctly
     user clicks button  Save chart options
     user waits until button is enabled  Save chart options
 
-    user clicks link  Manage content
+    user clicks link  Content
     user waits until h2 is visible  ${PUBLICATION_NAME}
     user opens accordion section  ${CONTENT_SECTION_NAME}
 
@@ -506,7 +492,7 @@ Save and validate horizontal bar chart embeds correctly
 
 Configure basic geographic chart
     [Tags]  HappyPath
-    user clicks link  Manage data blocks
+    user clicks link  Data blocks
     user selects from list by label  id:selectedDataBlock  ${DATABLOCK_NAME}
     user waits until h2 is visible  ${DATABLOCK_NAME}
     user waits until page does not contain loading spinner
@@ -541,7 +527,7 @@ Save and validate geographic chart embeds correctly
     user clicks button  Save chart options
     user waits until button is enabled  Save chart options
 
-    user clicks link  Manage content
+    user clicks link  Content
     user waits until h2 is visible  ${PUBLICATION_NAME}
     user opens accordion section  ${CONTENT_SECTION_NAME}
 
@@ -567,7 +553,7 @@ Save and validate geographic chart embeds correctly
 
 Configure basic infographic chart
     [Tags]  HappyPath
-    user clicks link  Manage data blocks
+    user clicks link  Data blocks
     user selects from list by label  id:selectedDataBlock  ${DATABLOCK_NAME}
     user waits until h2 is visible  ${DATABLOCK_NAME}
     user waits until page does not contain loading spinner
@@ -587,7 +573,7 @@ Save and validate infographic chart embeds correctly
     user clicks button  Save chart options
     user waits until button is enabled  Save chart options
 
-    user clicks link  Manage content
+    user clicks link  Content
     user waits until h2 is visible  ${PUBLICATION_NAME}
     user opens accordion section  ${CONTENT_SECTION_NAME}
 
@@ -602,7 +588,7 @@ Delete embedded data block
 
 Delete chart from data block
     [Tags]  HappyPath
-    user clicks link  Manage data blocks
+    user clicks link  Data blocks
     user selects from list by label  id:selectedDataBlock  ${DATABLOCK_NAME}
     user waits until h2 is visible  ${DATABLOCK_NAME}
     user waits until page does not contain loading spinner

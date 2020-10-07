@@ -8,12 +8,17 @@ import { getReleaseStatusLabel } from '@admin/pages/release/utils/releaseSummary
 import {
   releaseContentRoute,
   releaseDataBlocksRoute,
+  releaseDataFileRoute,
+  releaseFootnotesRoute,
   releaseDataRoute,
   releasePreReleaseAccessRoute,
   ReleaseRouteParams,
   releaseStatusRoute,
   releaseSummaryEditRoute,
   releaseSummaryRoute,
+  releaseFootnotesCreateRoute,
+  releaseFootnotesEditRoute,
+  releaseDataFileReplacementCompleteRoute,
 } from '@admin/routes/releaseRoutes';
 import publicationService, {
   BasicPublicationDetails,
@@ -31,13 +36,21 @@ import { generatePath, Route, RouteComponentProps } from 'react-router';
 const navRoutes = [
   releaseSummaryRoute,
   releaseDataRoute,
+  releaseFootnotesRoute,
   releaseDataBlocksRoute,
   releaseContentRoute,
   releaseStatusRoute,
   releasePreReleaseAccessRoute,
 ];
 
-const routes = [...navRoutes, releaseSummaryEditRoute];
+const routes = [
+  ...navRoutes,
+  releaseDataFileRoute,
+  releaseDataFileReplacementCompleteRoute,
+  releaseSummaryEditRoute,
+  releaseFootnotesCreateRoute,
+  releaseFootnotesEditRoute,
+];
 
 interface MatchProps {
   publicationId: string;

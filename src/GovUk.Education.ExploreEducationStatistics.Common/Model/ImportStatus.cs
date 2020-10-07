@@ -1,8 +1,13 @@
+using GovUk.Education.ExploreEducationStatistics.Common.Converters;
+using GovUk.Education.ExploreEducationStatistics.Common.Services;
+using Newtonsoft.Json;
+
 namespace GovUk.Education.ExploreEducationStatistics.Common.Model
 {
     public class ImportStatus
     {
-        public string Status { get; set; }
+        [JsonConverter(typeof(EnumToEnumValueJsonConverter<IStatus>))]
+        public IStatus Status { get; set; }
 
         public int PercentageComplete { get; set; }
 

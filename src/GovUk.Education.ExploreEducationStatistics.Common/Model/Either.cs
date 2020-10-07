@@ -88,7 +88,11 @@ public class Either<Tl, Tr> {
             return result.Left;
         }
 
-        public static async Task<Either<Tl, Unit>> OnSuccess<Tl, Tr>(this Task<Either<Tl, Tr>> task, Func<Task> func)
+        /**
+         * Convenience method so that the chained function can be
+         * void and doesn't have to explicitly return a Unit.
+         */
+        public static async Task<Either<Tl, Unit>> OnSuccessVoid<Tl, Tr>(this Task<Either<Tl, Tr>> task, Func<Task> func)
         {
             var firstResult = await task;
 
@@ -126,7 +130,11 @@ public class Either<Tl, Tr> {
             return await func();
         }
 
-        public static async Task<Either<Tl, Unit>> OnSuccess<Tl, Tr>(this Task<Either<Tl, Tr>> task, Func<Tr, Task> func)
+        /**
+         * Convenience method so that the chained function can be
+         * void and doesn't have to explicitly return a Unit.
+         */
+        public static async Task<Either<Tl, Unit>> OnSuccessVoid<Tl, Tr>(this Task<Either<Tl, Tr>> task, Func<Tr, Task> func)
         {
             var firstResult = await task;
 

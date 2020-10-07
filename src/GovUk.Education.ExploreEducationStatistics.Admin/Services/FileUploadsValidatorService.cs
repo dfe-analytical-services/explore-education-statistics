@@ -1,6 +1,5 @@
 using System;
 using System.IO;
-using System.IO.Compression;
 using System.Linq;
 using System.Threading.Tasks;
 using GovUk.Education.ExploreEducationStatistics.Admin.Services.Interfaces;
@@ -14,7 +13,6 @@ using Microsoft.EntityFrameworkCore;
 using static GovUk.Education.ExploreEducationStatistics.Admin.Validators.ValidationErrorMessages;
 using static GovUk.Education.ExploreEducationStatistics.Admin.Validators.ValidationUtils;
 using static GovUk.Education.ExploreEducationStatistics.Common.Validators.FileTypeValidationUtils;
-using static GovUk.Education.ExploreEducationStatistics.Common.Services.FileStoragePathUtils;
 using static System.StringComparison;
 
 namespace GovUk.Education.ExploreEducationStatistics.Admin.Services
@@ -33,19 +31,21 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Services
         }
 
         // We cannot rely on the normal upload validation as we want this to be an atomic operation for both files.
-        public async Task<Either<ActionResult, Unit>> ValidateDataFilesForUpload(Guid releaseId, IFormFile dataFile, IFormFile metaFile, string name)
+        public async Task<Either<ActionResult, Unit>> ValidateDataFilesForUpload(Guid releaseId,
+            IFormFile dataFile,
+            IFormFile metaFile)
         {
             return await ValidateDataFileNames(releaseId, dataFile.FileName, metaFile.FileName)
                 .OnSuccess(async _ => await ValidateDataFileSizes(dataFile.Length, metaFile.Length))
-                .OnSuccess(async _ => await ValidateSubjectName(releaseId, name))
-                .OnSuccess(async _ => await ValidateDataFileTypes(releaseId, dataFile, metaFile));
+                .OnSuccess(async _ => await ValidateDataFileTypes(dataFile, metaFile));
         }
 
-        public async Task<Either<ActionResult, Unit>> ValidateDataArchiveEntriesForUpload(Guid releaseId, ZipArchiveEntry dataFile, ZipArchiveEntry metaFile, string name)
+        public async Task<Either<ActionResult, Unit>> ValidateDataArchiveEntriesForUpload(
+            Guid releaseId,
+            IDataArchiveFile archiveFile)
         {
-            return await ValidateDataFileNames(releaseId, dataFile.Name, metaFile.Name)
-                .OnSuccess(async _ => await ValidateDataFileSizes(dataFile.Length, metaFile.Length))
-                .OnSuccess(async _ => await ValidateSubjectName(releaseId, name));
+            return await ValidateDataFileNames(releaseId, archiveFile.DataFileName, archiveFile.MetaFileName)
+                .OnSuccess(async _ => await ValidateDataFileSizes(archiveFile.DataFileSize, archiveFile.MetaFileSize));
         }
 
         public async Task<Either<ActionResult, Unit>> ValidateFileForUpload(Guid releaseId, IFormFile file,
@@ -56,12 +56,12 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Services
             {
                 return ValidationActionResult(FileCannotBeEmpty);
             }
-            
+
             if (FileContainsSpacesOrSpecialChars(file.FileName))
             {
                 return ValidationActionResult(FilenameCannotContainSpacesOrSpecialCharacters);
             }
-            
+
             if (!overwrite && IsFileExisting(releaseId, type, file.FileName))
             {
                 return ValidationActionResult(CannotOverwriteFile);
@@ -69,7 +69,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Services
 
             return Unit.Instance;
         }
-        
+
         public async Task<Either<ActionResult, Unit>> ValidateFileUploadName(string name)
         {
             if (FileContainsSpecialChars(name))
@@ -80,17 +80,32 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Services
             return Unit.Instance;
         }
 
+        public async Task<Either<ActionResult, Unit>> ValidateSubjectName(Guid releaseId, string name)
+        {
+            if (FileContainsSpecialChars(name))
+            {
+                return ValidationActionResult(SubjectTitleCannotContainSpecialCharacters);
+            }
+
+            if (await _subjectService.GetAsync(releaseId, name) != null)
+            {
+                return ValidationActionResult(SubjectTitleMustBeUnique);
+            }
+
+            return Unit.Instance;
+        }
+
         // We cannot rely on the normal upload validation as we want this to be an atomic operation for both files.
         public async Task<Either<ActionResult, Unit>> ValidateUploadFileType(
             IFormFile file, ReleaseFileTypes type)
         {
             var allowedMimeTypes = AllowedMimeTypesByFileType[type];
-            
+
             if (!await _fileTypeService.HasMatchingMimeType(file, allowedMimeTypes))
             {
                 return ValidationActionResult(FileTypeInvalid);
             }
-            
+
             if (type == ReleaseFileTypes.Data)
             {
                 return ValidationActionResult(CannotUseGenericFunctionToAddDataFile);
@@ -99,9 +114,9 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Services
             return Unit.Instance;
         }
 
-        private async Task<bool> IsCsvFile(string filePath, IFormFile file)
+        private async Task<bool> IsCsvFile(IFormFile file)
         {
-            return await _fileTypeService.HasMatchingMimeType(file, AllowedMimeTypesByFileType[ReleaseFileTypes.Data]) 
+            return await _fileTypeService.HasMatchingMimeType(file, AllowedMimeTypesByFileType[ReleaseFileTypes.Data])
                    && _fileTypeService.HasMatchingEncodingType(file, CsvEncodingTypes);
         }
 
@@ -110,7 +125,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Services
             return filename.IndexOf(" ", Ordinal) > -1 ||
                    FileContainsSpecialChars(filename);
         }
-        
+
         private bool FileContainsSpecialChars(string filename)
         {
             return filename.IndexOf("&", Ordinal) > -1 ||
@@ -144,7 +159,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Services
             {
                 return ValidationActionResult(MetaFilenameCannotContainSpacesOrSpecialCharacters);
             }
-            
+
             if (!metaFileName.ToLower().Contains(".meta."))
             {
                 return ValidationActionResult(MetaFileIsIncorrectlyNamed);
@@ -159,7 +174,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Services
             {
                 return ValidationActionResult(MetaFileMustBeCsvFile);
             }
-            
+
             if (IsFileExisting(releaseId, ReleaseFileTypes.Data, dataFileName))
             {
                 return ValidationActionResult(CannotOverwriteDataFile);
@@ -173,7 +188,8 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Services
             return Unit.Instance;
         }
 
-        private async Task<Either<ActionResult, Unit>> ValidateDataFileSizes(long dataFileLength, long metaFileLength)
+        private static async Task<Either<ActionResult, Unit>> ValidateDataFileSizes(long dataFileLength,
+            long metaFileLength)
         {
             if (dataFileLength == 0)
             {
@@ -187,43 +203,25 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Services
 
             return Unit.Instance;
         }
-        
-        private async Task<Either<ActionResult, Unit>> ValidateDataFileTypes(Guid releaseId, IFormFile dataFile, IFormFile metaFile)
-        {
-            var dataFilePath = AdminReleasePath(releaseId, ReleaseFileTypes.Data, dataFile.FileName.ToLower());
-            var metadataFilePath = AdminReleasePath(releaseId, ReleaseFileTypes.Data, metaFile.FileName.ToLower());
 
-            if (!await IsCsvFile(dataFilePath, dataFile))
+        private async Task<Either<ActionResult, Unit>> ValidateDataFileTypes(IFormFile dataFile, IFormFile metaFile)
+        {
+            if (!await IsCsvFile(dataFile))
             {
                 return ValidationActionResult(DataFileMustBeCsvFile);
             }
 
-            if (!await IsCsvFile(metadataFilePath, metaFile))
+            if (!await IsCsvFile(metaFile))
             {
                 return ValidationActionResult(MetaFileMustBeCsvFile);
             }
 
             return Unit.Instance;
         }
-        
-        private bool ValidateFileExtension(string fileName, string requiredExtension)
+
+        private static bool ValidateFileExtension(string fileName, string requiredExtension)
         {
             return fileName.EndsWith(requiredExtension);
-        }
-        
-        private async Task<Either<ActionResult, Unit>> ValidateSubjectName(Guid releaseId, string name)
-        {
-            if (FileContainsSpecialChars(name))
-            {
-                return ValidationActionResult(SubjectTitleCannotContainSpecialCharacters);
-            }
-            
-            if (await _subjectService.GetAsync(releaseId, name) != null)
-            {
-                return ValidationActionResult(SubjectTitleMustBeUnique);
-            }
-
-            return Unit.Instance;
         }
     }
 }

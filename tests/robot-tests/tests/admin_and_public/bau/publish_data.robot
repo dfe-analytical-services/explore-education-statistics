@@ -1,5 +1,6 @@
 *** Settings ***
 Resource    ../../libs/admin-common.robot
+Library     ../../libs/api_keywords.py
 
 Force Tags  Admin  Local  Dev  AltersData
 
@@ -11,27 +12,15 @@ ${TOPIC_NAME}        %{TEST_TOPIC_NAME}
 ${PUBLICATION_NAME}  UI tests - publish data %{RUN_IDENTIFIER}
 
 *** Test Cases ***
-Create new publication for "UI tests topic" topic
+Create new publication and release via API
     [Tags]  HappyPath
-    user selects theme "Test theme" and topic "${TOPIC_NAME}" from the admin dashboard
-    user waits until page contains link    Create new publication
-    user checks page does not contain button   ${PUBLICATION_NAME}
-    user clicks link  Create new publication
-    user creates publication   ${PUBLICATION_NAME}
+    ${PUBLICATION_ID}=  user creates test publication via api   ${PUBLICATION_NAME}
+    user create test release via api  ${PUBLICATION_ID}   FY   3000
 
-Verify publication
+Go to "Release status" page
     [Tags]  HappyPath
-    user selects theme "Test theme" and topic "${TOPIC_NAME}" from the admin dashboard
-    user waits until page contains button  ${PUBLICATION_NAME}
+    user navigates to release summary from admin dashboard  ${PUBLICATION_NAME}  Financial Year 3000-01 (not Live)
 
-Create release
-    [Tags]  HappyPath
-    user opens accordion section  ${PUBLICATION_NAME}
-    user clicks testid element   Create new release link for ${PUBLICATION_NAME}
-    user creates release for publication  ${PUBLICATION_NAME}  Financial Year   3000
-
-Go to "Release status" tab
-    [Tags]  HappyPath
     user clicks link   Release status
     user waits until h2 is visible  Release status
     user waits until page contains button  Edit release status
@@ -54,8 +43,8 @@ Verify release is scheduled
 
 Wait for release process status to be Complete
     [Tags]  HappyPath
-    # EES-1007 - Release process status doesn't automatically update
-    user waits for release process status to be  Complete    900
+    user waits for release process status to be  Complete    ${release_complete_wait}
+    user reloads page  # EES-1448
     user checks page does not contain button  Edit release status
 
 Return to Admin Dashboard
@@ -67,19 +56,20 @@ Return to Admin Dashboard
 Create another release for the same publication
     [Tags]  HappyPath
     user selects theme "Test theme" and topic "${TOPIC_NAME}" from the admin dashboard
+    user waits until page contains link    Create new publication
     user opens accordion section   ${PUBLICATION_NAME}
     user clicks testid element   Create new release link for ${PUBLICATION_NAME}
     user creates release for publication  ${PUBLICATION_NAME}  Financial Year  3001
 
 Verify new release summary
     [Tags]  HappyPath
-    user checks page contains element   xpath://li/a[text()="Release summary" and contains(@aria-current, 'page')]
+    user checks page contains element   xpath://li/a[text()="Summary" and contains(@aria-current, 'page')]
     user waits until h2 is visible  Release summary
     user checks summary list contains  Publication title  ${PUBLICATION_NAME}
 
 Upload subject to new release
     [Tags]  HappyPath
-    user clicks link  Manage data
+    user clicks link  Data and files
     user waits until page contains element  css:#dataFileUploadForm-subjectTitle
     user enters text into element  css:#dataFileUploadForm-subjectTitle   UI test subject
     user chooses file   css:#dataFileUploadForm-dataFile       ${CURDIR}${/}files${/}upload-file-test.csv
@@ -91,16 +81,16 @@ Upload subject to new release
     user opens accordion section   UI test subject
 
     ${section}=  user gets accordion section content element  UI test subject
-    user checks summary list contains  Subject title    UI test subject  ${section}
-    user checks summary list contains  Data file        upload-file-test.csv  ${section}
-    user checks summary list contains  Metadata file    upload-file-test.meta.csv  ${section}
-    user checks summary list contains  Number of rows   159  ${section}
-    user checks summary list contains  Data file size   15 Kb  ${section}
-    user checks summary list contains  Status           Complete  ${section}  360
+    user checks headed table body row contains  Subject title    UI test subject  ${section}
+    user checks headed table body row contains  Data file        upload-file-test.csv  ${section}
+    user checks headed table body row contains  Metadata file    upload-file-test.meta.csv  ${section}
+    user checks headed table body row contains  Number of rows   159  ${section}
+    user checks headed table body row contains  Data file size   15 Kb  ${section}
+    user checks headed table body row contains  Status           Complete  ${section}  360
 
-Navigate to Manage data blocks tab
+Navigate to 'Data blocks' page
     [Tags]  HappyPath
-    user clicks link    Manage data blocks
+    user clicks link    Data blocks
     user waits until h2 is visible   Choose a subject
 
 Select subject "UI test subject"
@@ -152,7 +142,7 @@ Save data block as a highlight
     user clicks button   Save data block
     user waits until page contains    Delete this data block
 
-Go to "Release status" tab for new release
+Go to "Release status" page for new release
     [Tags]  HappyPath
     user clicks link   Release status
     user waits until h2 is visible  Release status
@@ -186,7 +176,8 @@ Wait for release process status for new release to be Complete
     user waits until h2 is visible  Release status
     user checks summary list contains  Current status  Approved
     user checks summary list contains  Scheduled release  ${PUBLISH_DATE_DAY} ${PUBLISH_DATE_MONTH_WORD} ${PUBLISH_DATE_YEAR}
-    user waits for release process status to be  Complete    900
+    user waits for release process status to be  Complete    ${release_complete_wait}
+    user reloads page  # EES-1448
     user checks page does not contain button  Edit release status
 
 User goes to public Find Statistics page
@@ -281,27 +272,26 @@ Select indicators in table tool
 
 Validate table
     [Tags]  HappyPath
-    ${table}=  set variable  css:table
     user waits until results table appears  180
-    user checks table column heading contains   ${table}  1  1  2014
-    user checks table column heading contains   ${table}  1  2  2015
-    user checks table column heading contains   ${table}  1  3  2016
-    user checks table column heading contains   ${table}  1  4  2017
-    user checks table column heading contains   ${table}  1  5  2018
+    user checks table column heading contains   1  1  2014
+    user checks table column heading contains   1  2  2015
+    user checks table column heading contains   1  3  2016
+    user checks table column heading contains   1  4  2017
+    user checks table column heading contains   1  5  2018
 
-    ${row}=  user gets row number with heading  ${table}  Barnsley
-    user checks table cell in offset row contains  ${table}  ${row}  0  1  9,854
-    user checks table cell in offset row contains  ${table}  ${row}  0  2  1,134
-    user checks table cell in offset row contains  ${table}  ${row}  0  3  7,419
-    user checks table cell in offset row contains  ${table}  ${row}  0  4  5,032
-    user checks table cell in offset row contains  ${table}  ${row}  0  5  8,123
+    ${row}=  user gets row number with heading  Barnsley
+    user checks table cell in offset row contains  ${row}  0  1  9,854
+    user checks table cell in offset row contains  ${row}  0  2  1,134
+    user checks table cell in offset row contains  ${row}  0  3  7,419
+    user checks table cell in offset row contains  ${row}  0  4  5,032
+    user checks table cell in offset row contains  ${row}  0  5  8,123
 
-    ${row}=  user gets row number with heading   ${table}  Birmingham
-    user checks table cell in offset row contains  ${table}  ${row}  0  1  3,708
-    user checks table cell in offset row contains  ${table}  ${row}  0  2  9,303
-    user checks table cell in offset row contains  ${table}  ${row}  0  3  8,856
-    user checks table cell in offset row contains  ${table}  ${row}  0  4  8,530
-    user checks table cell in offset row contains  ${table}  ${row}  0  5  3,962
+    ${row}=  user gets row number with heading   Birmingham
+    user checks table cell in offset row contains  ${row}  0  1  3,708
+    user checks table cell in offset row contains  ${row}  0  2  9,303
+    user checks table cell in offset row contains  ${row}  0  3  8,856
+    user checks table cell in offset row contains  ${row}  0  4  8,530
+    user checks table cell in offset row contains  ${row}  0  5  3,962
 
 Select table highlight from subjects step
     [Tags]  HappyPath
@@ -316,62 +306,60 @@ Select table highlight from subjects step
 
 Validate table column headings for table highlight
     [Tags]  HappyPath
-    user checks table column heading contains  css:table  1  1  Admission Numbers
+    user checks table column heading contains  1  1  Admission Numbers
 
 Validate table rows for table highlight
     [Tags]  HappyPath
-    ${table}=  set variable  css:table
+    ${row}=  user gets row number with heading  Bolton 001 (E02000984)
+    user checks table heading in offset row contains  ${row}  0  2  2019
 
-    ${row}=  user gets row number with heading  ${table}  Bolton 001 (E02000984)
-    user checks table heading in offset row contains  ${table}  ${row}  0  2  2019
+    user checks table cell in offset row contains  ${row}  0  1  8,533
 
-    user checks table cell in offset row contains  ${table}  ${row}  0  1  8,533
+    ${row}=  user gets row number with heading   Bolton 001 (E05000364)
+    user checks table heading in offset row contains  ${row}  0  2  2009
+    user checks table heading in offset row contains  ${row}  1  1  2010
+    user checks table heading in offset row contains  ${row}  2  1  2017
 
-    ${row}=  user gets row number with heading   ${table}  Bolton 001 (E05000364)
-    user checks table heading in offset row contains  ${table}  ${row}  0  2  2009
-    user checks table heading in offset row contains  ${table}  ${row}  1  1  2010
-    user checks table heading in offset row contains  ${table}  ${row}  2  1  2017
+    user checks table cell in offset row contains  ${row}  0  1  5,815
+    user checks table cell in offset row contains  ${row}  1  1  5,595
+    user checks table cell in offset row contains  ${row}  2  1  6,373
 
-    user checks table cell in offset row contains  ${table}  ${row}  0  1  5,815
-    user checks table cell in offset row contains  ${table}  ${row}  1  1  5,595
-    user checks table cell in offset row contains  ${table}  ${row}  2  1  6,373
+    ${row}=  user gets row number with heading   Bolton 004 (E02000987)
+    user checks table heading in offset row contains  ${row}  0  2  2020
 
-    ${row}=  user gets row number with heading   ${table}  Bolton 004 (E02000987)
-    user checks table heading in offset row contains  ${table}  ${row}  0  2  2020
+    user checks table cell in offset row contains  ${row}  0  1  6,031
 
-    user checks table cell in offset row contains  ${table}  ${row}  0  1  6,031
+    ${row}=  user gets row number with heading   Bolton 004 (E05010450)
+    user checks table heading in offset row contains  ${row}  0  2  2005
+    user checks table heading in offset row contains  ${row}  1  1  2017
+    user checks table heading in offset row contains  ${row}  2  1  2018
 
-    ${row}=  user gets row number with heading   ${table}  Bolton 004 (E05010450)
-    user checks table heading in offset row contains  ${table}  ${row}  0  2  2005
-    user checks table heading in offset row contains  ${table}  ${row}  1  1  2017
-    user checks table heading in offset row contains  ${table}  ${row}  2  1  2018
+    user checks table cell in offset row contains  ${row}  0  1  8,557
+    user checks table cell in offset row contains  ${row}  1  1  3,481
+    user checks table cell in offset row contains  ${row}  2  1  8,630
 
-    user checks table cell in offset row contains  ${table}  ${row}  0  1  8,557
-    user checks table cell in offset row contains  ${table}  ${row}  1  1  3,481
-    user checks table cell in offset row contains  ${table}  ${row}  2  1  8,630
+    ${row}=  user gets row number with heading   Nailsea Youngwood
+    user checks table heading in offset row contains  ${row}  0  2  2005
+    user checks table heading in offset row contains  ${row}  1  1  2010
+    user checks table heading in offset row contains  ${row}  2  1  2011
+    user checks table heading in offset row contains  ${row}  3  1  2012
+    user checks table heading in offset row contains  ${row}  4  1  2016
 
-    ${row}=  user gets row number with heading   ${table}  Nailsea Youngwood
-    user checks table heading in offset row contains  ${table}  ${row}  0  2  2005
-    user checks table heading in offset row contains  ${table}  ${row}  1  1  2010
-    user checks table heading in offset row contains  ${table}  ${row}  2  1  2011
-    user checks table heading in offset row contains  ${table}  ${row}  3  1  2012
-    user checks table heading in offset row contains  ${table}  ${row}  4  1  2016
+    user checks table cell in offset row contains  ${row}  0  1  3,612
+    user checks table cell in offset row contains  ${row}  1  1  9,304
+    user checks table cell in offset row contains  ${row}  2  1  9,603
+    user checks table cell in offset row contains  ${row}  3  1  8,150
+    user checks table cell in offset row contains  ${row}  4  1  4,198
 
-    user checks table cell in offset row contains  ${table}  ${row}  0  1  3,612
-    user checks table cell in offset row contains  ${table}  ${row}  1  1  9,304
-    user checks table cell in offset row contains  ${table}  ${row}  2  1  9,603
-    user checks table cell in offset row contains  ${table}  ${row}  3  1  8,150
-    user checks table cell in offset row contains  ${table}  ${row}  4  1  4,198
+    ${row}=  user gets row number with heading   Syon
+    user checks table heading in offset row contains  ${row}  0  2  2007
+    user checks table heading in offset row contains  ${row}  1  1  2008
+    user checks table heading in offset row contains  ${row}  2  1  2010
+    user checks table heading in offset row contains  ${row}  3  1  2012
+    user checks table heading in offset row contains  ${row}  4  1  2017
 
-    ${row}=  user gets row number with heading   ${table}  Syon
-    user checks table heading in offset row contains  ${table}  ${row}  0  2  2007
-    user checks table heading in offset row contains  ${table}  ${row}  1  1  2008
-    user checks table heading in offset row contains  ${table}  ${row}  2  1  2010
-    user checks table heading in offset row contains  ${table}  ${row}  3  1  2012
-    user checks table heading in offset row contains  ${table}  ${row}  4  1  2017
-
-    user checks table cell in offset row contains  ${table}  ${row}  0  1  9,914
-    user checks table cell in offset row contains  ${table}  ${row}  1  1  5,505
-    user checks table cell in offset row contains  ${table}  ${row}  2  1  6,060
-    user checks table cell in offset row contains  ${table}  ${row}  3  1  1,109
-    user checks table cell in offset row contains  ${table}  ${row}  4  1  1,959
+    user checks table cell in offset row contains  ${row}  0  1  9,914
+    user checks table cell in offset row contains  ${row}  1  1  5,505
+    user checks table cell in offset row contains  ${row}  2  1  6,060
+    user checks table cell in offset row contains  ${row}  3  1  1,109
+    user checks table cell in offset row contains  ${row}  4  1  1,959

@@ -8,6 +8,7 @@ using Microsoft.AspNetCore.Mvc;
 using ContentSectionId = System.Guid;
 using DataBlockId = System.Guid;
 using ReleaseId = System.Guid;
+using Unit = GovUk.Education.ExploreEducationStatistics.Common.Model.Unit;
 
 namespace GovUk.Education.ExploreEducationStatistics.Admin.Services.Interfaces
 {
@@ -15,20 +16,20 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Services.Interfaces
     {
         Task<Either<ActionResult, DataBlockViewModel>> CreateAsync(ReleaseId releaseId, CreateDataBlockViewModel createDataBlock);
 
-        Task<Either<ActionResult, bool>> DeleteAsync(ReleaseId releaseId, DataBlockId id);
-        
+        Task<Either<ActionResult, Unit>> DeleteAsync(ReleaseId releaseId, DataBlockId id);
+
         Task<DataBlockViewModel> GetAsync(DataBlockId id);
 
         Task<List<DataBlockViewModel>> ListAsync(ReleaseId releaseId);
 
         Task<Either<ActionResult, DataBlockViewModel>> UpdateAsync(DataBlockId id, UpdateDataBlockViewModel updateDataBlock);
 
-        Task<Either<ActionResult, bool>> DeleteDataBlocks(DeleteDataBlockPlan deletePlan);
+        Task DeleteDataBlocks(DeleteDataBlockPlan deletePlan);
 
         Task<Either<ActionResult, DeleteDataBlockPlan>> GetDeleteDataBlockPlan(Guid releaseId, Guid id);
 
         Task<DeleteDataBlockPlan> GetDeleteDataBlockPlan(Guid releaseId, Subject subject);
 
-        Task<Either<ActionResult, bool>> RemoveChartFile(Guid releaseId, Guid id);
+        Task<Either<ActionResult, Unit>> RemoveChartFile(Guid releaseId, Guid id);
     }
 }

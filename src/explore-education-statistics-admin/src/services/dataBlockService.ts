@@ -33,14 +33,17 @@ const dataBlockService = {
     );
   },
 
-  async postDataBlock(releaseId: string, dataBlock: CreateReleaseDataBlock) {
+  async createDataBlock(releaseId: string, dataBlock: CreateReleaseDataBlock) {
     return client.post<ReleaseDataBlock>(
       `/release/${releaseId}/datablocks`,
       dataBlock,
     );
   },
 
-  async putDataBlock(dataBlockId: string, dataBlock: UpdateReleaseDataBlock) {
+  async updateDataBlock(
+    dataBlockId: string,
+    dataBlock: UpdateReleaseDataBlock,
+  ) {
     return client.put<ReleaseDataBlock>(
       `/datablocks/${dataBlockId}`,
       dataBlock,

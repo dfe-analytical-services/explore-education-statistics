@@ -22,7 +22,7 @@ exports[`AccordionSection renders correctly with required props 1`] = `
     </h2>
   </div>
   <div aria-labelledby="accordionSection-heading"
-       class="govuk-accordion__section-content sectionContent"
+       class="govuk-accordion__section-content sectionContentCollapsed"
        id="accordionSection-content"
   >
     <p>
@@ -64,7 +64,7 @@ exports[`AccordionSection renders with caption 1`] = `
     </div>
   </div>
   <div aria-labelledby="accordionSection-heading"
-       class="govuk-accordion__section-content sectionContent"
+       class="govuk-accordion__section-content sectionContentCollapsed"
        id="accordionSection-content"
   >
     <p>
@@ -103,7 +103,7 @@ exports[`AccordionSection renders with different heading size 1`] = `
     </h3>
   </div>
   <div aria-labelledby="accordionSection-heading"
-       class="govuk-accordion__section-content sectionContent"
+       class="govuk-accordion__section-content sectionContentCollapsed"
        id="accordionSection-content"
   >
     <p>

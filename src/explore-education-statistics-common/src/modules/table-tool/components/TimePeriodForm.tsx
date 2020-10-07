@@ -4,7 +4,7 @@ import SummaryList from '@common/components/SummaryList';
 import SummaryListItem from '@common/components/SummaryListItem';
 import ResetFormOnPreviousStep from '@common/modules/table-tool/components/ResetFormOnPreviousStep';
 import {
-  PublicationSubjectMeta,
+  SubjectMeta,
   TimePeriodQuery,
 } from '@common/services/tableBuilderService';
 import Yup from '@common/validation/yup';
@@ -22,7 +22,7 @@ interface FormValues {
 export type TimePeriodFormSubmitHandler = (values: FormValues) => void;
 
 interface Props {
-  options: PublicationSubjectMeta['timePeriod']['options'];
+  options: SubjectMeta['timePeriod']['options'];
   initialValues?: { timePeriod?: TimePeriodQuery };
   onSubmit: TimePeriodFormSubmitHandler;
 }

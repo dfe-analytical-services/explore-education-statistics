@@ -15,6 +15,7 @@ ${headless}   1
 
 ${timeout}          30
 ${implicit_wait}    3
+${release_complete_wait}   900
 
 *** Keywords ***
 do this on failure
@@ -302,6 +303,10 @@ user checks page does not contain button
     [Arguments]  ${text}
     user checks page does not contain element  xpath://button[text()="${text}"]
 
+user waits until page does not contain button
+    [Arguments]   ${text}
+    user waits until page does not contain element  xpath://button[text()="${text}"]
+
 user waits until button is enabled
     [Arguments]   ${text}
     user waits until element is enabled  xpath://button[text()="${text}"]
@@ -364,7 +369,8 @@ user chooses file
 
 user clears element text
     [Arguments]   ${locator}
-    press keys  ${locator}  CTRL+a+BACKSPACE
+    press keys  ${locator}  CTRL+a
+    press keys  ${locator}  BACKSPACE
     sleep  0.1
 
 user presses keys

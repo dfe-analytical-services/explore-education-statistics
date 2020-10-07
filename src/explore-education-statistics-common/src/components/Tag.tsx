@@ -1,20 +1,33 @@
 import classNames from 'classnames';
 import React, { ReactNode } from 'react';
 
-interface Props {
+export interface TagProps {
   children: ReactNode;
+  colour?:
+    | 'grey'
+    | 'green'
+    | 'turquoise'
+    | 'blue'
+    | 'purple'
+    | 'pink'
+    | 'red'
+    | 'orange'
+    | 'yellow';
   className?: string;
-  strong?: boolean;
   id?: string | undefined;
+  strong?: boolean;
 }
 
 const Tag = ({
   children,
   className,
-  strong = false,
+  colour,
   id = undefined,
-}: Props) => {
-  const classes = classNames('govuk-tag', className);
+  strong = false,
+}: TagProps) => {
+  const classes = classNames('govuk-tag', className, {
+    [`govuk-tag--${colour}`]: !!colour,
+  });
 
   return strong ? (
     <strong className={classes} id={id}>

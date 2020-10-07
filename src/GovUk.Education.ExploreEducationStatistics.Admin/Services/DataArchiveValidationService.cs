@@ -33,7 +33,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Services
             _fileTypeService = fileTypeService;
         }
 
-        public async Task<Either<ActionResult, Tuple<ZipArchiveEntry, ZipArchiveEntry>>> ValidateDataArchiveFile(
+        public async Task<Either<ActionResult, IDataArchiveFile>> ValidateDataArchiveFile(
             Guid releaseId,
             IFormFile zipFile)
         {
@@ -49,7 +49,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Services
                 return ValidationActionResult(DataZipFileAlreadyExists);
             }
 
-            using var stream = zipFile.OpenReadStream();
+            await using var stream = zipFile.OpenReadStream();
             using var archive = new ZipArchive(stream);
 
             if (archive.Entries.Count != 2)
@@ -68,7 +68,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Services
             var dataFile = file1.Name.Contains(".meta.") ? file2 : file1;
             var metaFile = file1.Name.Contains(".meta.") ? file1 : file2;
 
-            return new Tuple<ZipArchiveEntry, ZipArchiveEntry>(dataFile, metaFile);
+            return new DataArchiveFile(dataFile: dataFile, metaFile: metaFile);
         }
 
         private async Task<bool> IsZipFile(IFormFile file)

@@ -59,6 +59,23 @@ user selects theme "${theme}" and topic "${topic}" from the admin dashboard
     user waits until h2 is visible  ${theme}
     user waits until h3 is visible  ${topic}
 
+user navigates to release summary from admin dashboard
+    [Arguments]   ${PUBLICATION_NAME}    ${DETAILS_HEADING}
+    user selects theme "Test theme" and topic "${TOPIC_NAME}" from the admin dashboard
+    user waits until page contains accordion section   ${PUBLICATION_NAME}
+    user opens accordion section  ${PUBLICATION_NAME}
+
+    ${accordion}=  user gets accordion section content element   ${PUBLICATION_NAME}
+    user opens details dropdown   ${DETAILS_HEADING}  ${accordion}
+    ${details}=  user gets details content element   ${DETAILS_HEADING}  ${accordion}
+
+    user waits until parent contains element   ${details}   xpath:.//a[text()="Edit this release"]
+    ${edit_button}=  get child element  ${details}  xpath:.//a[text()="Edit this release"]
+    user clicks element   ${edit_button}
+    
+    user waits until h2 is visible  Release summary
+    user checks summary list contains   Publication title  ${PUBLICATION_NAME}
+
 user creates publication
     [Arguments]   ${title}
     user waits until h1 is visible  Create new publication
@@ -176,16 +193,16 @@ user checks scheduled releases tab publication has release
 
 user clicks footnote checkbox
     [Arguments]  ${label}
-    wait until page contains element  xpath://*[@id="create-footnote-form"]//label[text()="${label}"]/../input
-    page should contain checkbox  xpath://*[@id="create-footnote-form"]//label[text()="${label}"]/../input
-    user scrolls to element   xpath://*[@id="create-footnote-form"]//label[text()="${label}"]/../input
-    wait until element is enabled   xpath://*[@id="create-footnote-form"]//label[text()="${label}"]/../input
-    user clicks element     xpath://*[@id="create-footnote-form"]//label[text()="${label}"]/../input
+    user waits until page contains element  xpath://*[@id="footnoteForm"]//label[text()="${label}"]/../input
+    page should contain checkbox  xpath://*[@id="footnoteForm"]//label[text()="${label}"]/../input
+    user scrolls to element   xpath://*[@id="footnoteForm"]//label[text()="${label}"]/../input
+    wait until element is enabled   xpath://*[@id="footnoteForm"]//label[text()="${label}"]/../input
+    user clicks element     xpath://*[@id="footnoteForm"]//label[text()="${label}"]/../input
 
 user checks footnote checkbox is selected
     [Arguments]  ${label}
-    wait until element is enabled   xpath://*[@id="create-footnote-form"]//label[contains(text(), "${label}")]/../input
-    checkbox should be selected     xpath://*[@id="create-footnote-form"]//label[contains(text(), "${label}")]/../input
+    wait until element is enabled   xpath://*[@id="footnoteForm"]//label[contains(text(), "${label}")]/../input
+    checkbox should be selected     xpath://*[@id="footnoteForm"]//label[contains(text(), "${label}")]/../input
 
 user opens nth editable accordion section
     [Arguments]  ${section_num}  ${parent}=css:body
@@ -233,6 +250,8 @@ user adds content to accordion section text block
     ${section}=  user gets accordion section content element  ${section_name}
     ${block}=  get child element  ${section}  css:[data-testid="editableSectionBlock"]:nth-of-type(${block_num})
     user clicks button  Edit block  ${block}
+    user presses keys  CTRL+a
+    user presses keys  BACKSPACE
     user presses keys  ${content}
     user clicks button  Save  ${block}
     user waits until element contains  ${block}  ${content}

@@ -8,7 +8,7 @@ import {
 import SummaryList from '@common/components/SummaryList';
 import SummaryListItem from '@common/components/SummaryListItem';
 import FormCheckboxSelectedCount from '@common/modules/table-tool/components/FormCheckboxSelectedCount';
-import { PublicationSubjectMeta } from '@common/services/tableBuilderService';
+import { SubjectMeta } from '@common/services/tableBuilderService';
 import { Dictionary } from '@common/types';
 import createErrorHelper from '@common/validation/createErrorHelper';
 import Yup from '@common/validation/yup';
@@ -34,7 +34,7 @@ interface Props {
     indicators: string[];
     filters: string[];
   };
-  subjectMeta: PublicationSubjectMeta;
+  subjectMeta: SubjectMeta;
   onSubmit: FilterFormSubmitHandler;
 }
 

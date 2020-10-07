@@ -305,7 +305,12 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Model.Migrations
                     b.Property<Guid>("FilterItemId")
                         .HasColumnType("uniqueidentifier");
 
+                    b.Property<Guid?>("FilterId")
+                        .HasColumnType("uniqueidentifier");
+
                     b.HasKey("ObservationId", "FilterItemId");
+
+                    b.HasIndex("FilterId");
 
                     b.HasIndex("FilterItemId");
 
@@ -946,6 +951,11 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Model.Migrations
 
             modelBuilder.Entity("GovUk.Education.ExploreEducationStatistics.Data.Model.ObservationFilterItem", b =>
                 {
+                    b.HasOne("GovUk.Education.ExploreEducationStatistics.Data.Model.Filter", "Filter")
+                        .WithMany()
+                        .HasForeignKey("FilterId")
+                        .OnDelete(DeleteBehavior.Restrict);
+
                     b.HasOne("GovUk.Education.ExploreEducationStatistics.Data.Model.FilterItem", "FilterItem")
                         .WithMany()
                         .HasForeignKey("FilterItemId")

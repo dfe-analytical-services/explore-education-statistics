@@ -102,180 +102,178 @@ const ReleaseFileUploadsSection = ({ releaseId, canUpdateRelease }: Props) => {
   }, errorMappings);
 
   return (
-    <Formik<FormValues>
-      enableReinitialize
-      initialValues={{
-        name: '',
-        file: null,
-      }}
-      onReset={() => {
-        document
-          .querySelectorAll(`#${formId} input[type='file']`)
-          .forEach(input => {
-            const fileInput = input as HTMLInputElement;
-            fileInput.value = '';
-          });
-      }}
-      onSubmit={handleSubmit}
-      validationSchema={Yup.object<FormValues>({
-        name: Yup.string()
-          .required('Enter a name')
-          .test({
-            name: 'unique',
-            message: 'Enter a unique name',
-            test(value: string) {
-              if (!value) {
-                return true;
-              }
-              return (
-                files.find(
-                  f => f.title.toUpperCase() === value.toUpperCase(),
-                ) === undefined
-              );
-            },
-          }),
-        file: Yup.file()
-          .required('Choose a file')
-          .minSize(0, 'Choose a file that is not empty'),
-      })}
-    >
-      {form => (
-        <>
-          <h2>Add file to release</h2>
-
-          {canUpdateRelease ? (
-            <Form id={formId}>
-              <div style={{ position: 'relative' }}>
-                {isUploading && (
-                  <LoadingSpinner text="Uploading files" overlay />
-                )}
-
-                <FormFieldTextInput<FormValues>
-                  id={`${formId}-name`}
-                  name="name"
-                  label="Name"
-                  width={20}
-                />
-
-                <FormFieldFileInput<FormValues>
-                  id={`${formId}-file`}
-                  name="file"
-                  label="Upload file"
-                />
-
-                <ButtonGroup>
-                  <Button type="submit" disabled={form.isSubmitting}>
-                    Upload file
-                  </Button>
-
-                  <ButtonText
-                    disabled={form.isSubmitting}
-                    onClick={async () => {
-                      form.resetForm();
-                    }}
-                  >
-                    Cancel
-                  </ButtonText>
-                </ButtonGroup>
-              </div>
-            </Form>
-          ) : (
-            <WarningMessage>
-              This release has been approved, and can no longer be updated.
-            </WarningMessage>
-          )}
-
-          <hr className="govuk-!-margin-top-6 govuk-!-margin-bottom-6" />
-
-          <h2>Uploaded files</h2>
-
-          <LoadingSpinner loading={isLoading}>
-            {files.length > 0 ? (
-              <Accordion id="uploadedFiles">
-                {files.map(file => (
-                  <AccordionSection
-                    key={file.title}
-                    heading={file.title}
-                    headingTag="h3"
-                  >
-                    <div style={{ position: 'relative' }}>
-                      {file.isDeleting && (
-                        <LoadingSpinner text="Deleting file" overlay />
-                      )}
-
-                      <SummaryList>
-                        <SummaryListItem term="Name">
-                          {file.title}
-                        </SummaryListItem>
-                        <SummaryListItem term="File">
-                          <ButtonText
-                            onClick={() =>
-                              releaseAncillaryFileService.downloadAncillaryFile(
-                                releaseId,
-                                file.filename,
-                              )
-                            }
-                          >
-                            {file.filename}
-                          </ButtonText>
-                        </SummaryListItem>
-                        <SummaryListItem term="File size">
-                          {file.fileSize.size.toLocaleString()}{' '}
-                          {file.fileSize.unit}
-                        </SummaryListItem>
-                        {canUpdateRelease && (
-                          <SummaryListItem
-                            term="Actions"
-                            actions={
-                              <ButtonText onClick={() => setDeleteFile(file)}>
-                                Delete file
-                              </ButtonText>
-                            }
-                          />
-                        )}
-                      </SummaryList>
-                    </div>
-                  </AccordionSection>
-                ))}
-              </Accordion>
-            ) : (
-              <p className="govuk-inset-text">No files have been uploaded.</p>
-            )}
-          </LoadingSpinner>
-
-          {deleteFile && (
-            <ModalConfirm
-              mounted
-              title="Confirm deletion of file"
-              onExit={() => setDeleteFile(undefined)}
-              onCancel={() => setDeleteFile(undefined)}
-              onConfirm={async () => {
-                setFileDeleting(deleteFile, true);
-                setDeleteFile(undefined);
-
-                try {
-                  await releaseAncillaryFileService.deleteAncillaryFile(
-                    releaseId,
-                    deleteFile.filename,
-                  );
-
-                  setFiles({
-                    value: files.filter(file => file !== deleteFile),
-                  });
-                } catch (err) {
-                  logger.error(err);
-                  setFileDeleting(deleteFile, false);
+    <>
+      <Formik<FormValues>
+        enableReinitialize
+        initialValues={{
+          name: '',
+          file: null,
+        }}
+        onReset={() => {
+          document
+            .querySelectorAll(`#${formId} input[type='file']`)
+            .forEach(input => {
+              const fileInput = input as HTMLInputElement;
+              fileInput.value = '';
+            });
+        }}
+        onSubmit={handleSubmit}
+        validationSchema={Yup.object<FormValues>({
+          name: Yup.string()
+            .required('Enter a name')
+            .test({
+              name: 'unique',
+              message: 'Enter a unique name',
+              test(value: string) {
+                if (!value) {
+                  return true;
                 }
-              }}
-            >
-              <p>
-                This file will no longer be available for use in this release
-              </p>
-            </ModalConfirm>
-          )}
-        </>
+                return (
+                  files.find(
+                    f => f.title.toUpperCase() === value.toUpperCase(),
+                  ) === undefined
+                );
+              },
+            }),
+          file: Yup.file()
+            .required('Choose a file')
+            .minSize(0, 'Choose a file that is not empty'),
+        })}
+      >
+        {form => (
+          <>
+            <h2>Add file to release</h2>
+
+            {canUpdateRelease ? (
+              <Form id={formId}>
+                <div style={{ position: 'relative' }}>
+                  {isUploading && (
+                    <LoadingSpinner text="Uploading files" overlay />
+                  )}
+
+                  <FormFieldTextInput<FormValues>
+                    id={`${formId}-name`}
+                    name="name"
+                    label="Name"
+                    width={20}
+                  />
+
+                  <FormFieldFileInput<FormValues>
+                    id={`${formId}-file`}
+                    name="file"
+                    label="Upload file"
+                  />
+
+                  <ButtonGroup>
+                    <Button type="submit" disabled={form.isSubmitting}>
+                      Upload file
+                    </Button>
+
+                    <ButtonText
+                      disabled={form.isSubmitting}
+                      onClick={async () => {
+                        form.resetForm();
+                      }}
+                    >
+                      Cancel
+                    </ButtonText>
+                  </ButtonGroup>
+                </div>
+              </Form>
+            ) : (
+              <WarningMessage>
+                This release has been approved, and can no longer be updated.
+              </WarningMessage>
+            )}
+          </>
+        )}
+      </Formik>
+
+      <hr className="govuk-!-margin-top-6 govuk-!-margin-bottom-6" />
+
+      <h2>Uploaded files</h2>
+
+      <LoadingSpinner loading={isLoading}>
+        {files.length > 0 ? (
+          <Accordion id="uploadedFiles">
+            {files.map(file => (
+              <AccordionSection
+                key={file.title}
+                heading={file.title}
+                headingTag="h3"
+              >
+                <div style={{ position: 'relative' }}>
+                  {file.isDeleting && (
+                    <LoadingSpinner text="Deleting file" overlay />
+                  )}
+
+                  <SummaryList>
+                    <SummaryListItem term="Name">{file.title}</SummaryListItem>
+                    <SummaryListItem term="File">
+                      <ButtonText
+                        onClick={() =>
+                          releaseAncillaryFileService.downloadFile(
+                            releaseId,
+                            file.id,
+                            file.filename,
+                          )
+                        }
+                      >
+                        {file.filename}
+                      </ButtonText>
+                    </SummaryListItem>
+                    <SummaryListItem term="File size">
+                      {file.fileSize.size.toLocaleString()} {file.fileSize.unit}
+                    </SummaryListItem>
+                    {canUpdateRelease && (
+                      <SummaryListItem
+                        term="Actions"
+                        actions={
+                          <ButtonText onClick={() => setDeleteFile(file)}>
+                            Delete file
+                          </ButtonText>
+                        }
+                      />
+                    )}
+                  </SummaryList>
+                </div>
+              </AccordionSection>
+            ))}
+          </Accordion>
+        ) : (
+          <p className="govuk-inset-text">No files have been uploaded.</p>
+        )}
+      </LoadingSpinner>
+
+      {deleteFile && (
+        <ModalConfirm
+          mounted
+          title="Confirm deletion of file"
+          onExit={() => setDeleteFile(undefined)}
+          onCancel={() => setDeleteFile(undefined)}
+          onConfirm={async () => {
+            setFileDeleting(deleteFile, true);
+            setDeleteFile(undefined);
+
+            try {
+              await releaseAncillaryFileService.deleteAncillaryFile(
+                releaseId,
+                deleteFile.filename,
+              );
+
+              setFiles({
+                value: files.filter(file => file !== deleteFile),
+              });
+            } catch (err) {
+              logger.error(err);
+              setFileDeleting(deleteFile, false);
+            }
+          }}
+        >
+          <p>This file will no longer be available for use in this release</p>
+        </ModalConfirm>
       )}
-    </Formik>
+    </>
   );
 };
 

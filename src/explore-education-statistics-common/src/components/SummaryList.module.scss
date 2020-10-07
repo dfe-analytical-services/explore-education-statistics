@@ -1,7 +1,10 @@
+@import '../styles/govuk-base';
+
 .compact {
   :global(.govuk-summary-list__key),
   :global(.govuk-summary-list__value) {
-    padding: 0;
+    padding-bottom: 0;
+    padding-top: govuk-spacing(1);
   }
 }
 

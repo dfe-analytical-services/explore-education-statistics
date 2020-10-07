@@ -20,25 +20,20 @@ interface Props {
   modifyHash?: boolean;
   id: string;
   onToggle?: (section: { id: string; title: string }) => void;
-  openId?: string;
   testId?: string;
 }
 
 const Tabs = ({ children, id, modifyHash = true, testId, onToggle }: Props) => {
-  const [loadedSections, setLoadedSections] = useState(new Set<number>());
   const [selectedTabIndex, setSelectedTabIndex] = useState(0);
+  const ref = useRef<HTMLDivElement>(null);
 
   const { onMedia } = useDesktopMedia();
-
-  const tabElements = useRef<HTMLAnchorElement[]>([]);
-  const sectionElements = useRef<HTMLElement[]>([]);
 
   const filteredChildren = React.Children.toArray(children).filter(child =>
     isComponentType(child, TabsSection),
   ) as ReactElement<TabsSectionProps>[];
 
   const sections = filteredChildren.map((section, index) => {
-    const { lazy } = section.props;
     const sectionId = section.props.id || `${id}-${index + 1}`;
 
     return cloneElement<
@@ -52,53 +47,73 @@ const Tabs = ({ children, id, modifyHash = true, testId, onToggle }: Props) => {
         hidden: selectedTabIndex !== index,
         id: sectionId,
         key: sectionId,
-        ref: (element: HTMLElement) => sectionElements.current.push(element),
       },
-      lazy && !loadedSections.has(index) ? null : section.props.children,
+      section.props.children,
     );
   });
 
   const selectTab = useCallback(
     (index: number) => {
-      if (sectionElements.current[index] && modifyHash) {
-        if (window.history.pushState) {
-          window.history.pushState(
-            null,
-            '',
-            `#${sectionElements.current[index].id}`,
-          );
-        } else {
-          window.location.hash = sectionElements.current[index].id;
-        }
+      setSelectedTabIndex(index);
+
+      const sectionId = sections[index]?.props?.id;
+
+      if (!sectionId) {
+        throw new Error(`Could not find tab section id for index ${index}`);
       }
 
-      setLoadedSections(loadedSections.add(index));
-      setSelectedTabIndex(index);
+      if (modifyHash) {
+        if (window.history.pushState) {
+          window.history.pushState(null, '', `#${sectionId}`);
+        } else {
+          window.location.hash = sectionId;
+        }
+      }
     },
-    [loadedSections, modifyHash],
+    [modifyHash, sections],
+  );
+
+  const focusTab = useCallback(
+    (index: number) => {
+      const sectionId = sections[index]?.props?.id;
+
+      if (!sectionId) {
+        throw new Error(`Could not find tab section id for index ${index}`);
+      }
+
+      if (ref.current) {
+        const tab = ref.current.querySelector<HTMLLinkElement>(
+          `#${sectionId}-tab`,
+        );
+
+        if (tab) {
+          tab.focus();
+        }
+      }
+    },
+    [sections],
   );
 
   useEffect(() => {
-    if (selectedTabIndex >= sections.length) {
-      setSelectedTabIndex(sections.length - 1);
-    }
-  }, [sections, selectedTabIndex, selectTab]);
-
-  useEffect(() => {
     if (window) {
+      if (selectedTabIndex >= sections.length) {
+        selectTab(sections.length - 1);
+      }
+
       sections.forEach((element, index) => {
         if (element.props.id === window.location.hash.substr(1)) {
           selectTab(index);
         }
       });
     }
-  }, [sections, selectTab]);
+  }, [sections, selectTab, selectedTabIndex]);
 
   return (
     <div
       className={classNames('govuk-tabs', styles.tabs)}
       id={id}
       data-testid={testId}
+      ref={ref}
     >
       <ul className="govuk-tabs__list" role="tablist">
         {sections.map(({ props }, index) => {
@@ -118,14 +133,12 @@ const Tabs = ({ children, id, modifyHash = true, testId, onToggle }: Props) => {
                 className="govuk-tabs__tab"
                 href={`#${sectionId}`}
                 id={`${sectionId}-tab`}
-                ref={(element: HTMLAnchorElement) =>
-                  tabElements.current.push(element)
-                }
                 tabIndex={selectedTabIndex !== index ? -1 : undefined}
                 onClick={event => {
                   event.preventDefault();
                   selectTab(index);
-                  if (typeof onToggle === 'function') {
+
+                  if (onToggle) {
                     onToggle({
                       title: props.title,
                       id: sectionId,
@@ -141,8 +154,9 @@ const Tabs = ({ children, id, modifyHash = true, testId, onToggle }: Props) => {
                           : sections.length - 1;
 
                       selectTab(nextTabIndex);
-                      tabElements.current[nextTabIndex].focus();
-                      if (typeof onToggle === 'function') {
+                      focusTab(nextTabIndex);
+
+                      if (onToggle) {
                         onToggle({
                           title: `${props.title}`,
                           id: `${sectionId}`,
@@ -157,8 +171,9 @@ const Tabs = ({ children, id, modifyHash = true, testId, onToggle }: Props) => {
                           : 0;
 
                       selectTab(nextTabIndex);
-                      tabElements.current[nextTabIndex].focus();
-                      if (typeof onToggle === 'function') {
+                      focusTab(nextTabIndex);
+
+                      if (onToggle) {
                         onToggle({
                           title: `${props.title}`,
                           id: `${sectionId}`,
@@ -166,9 +181,19 @@ const Tabs = ({ children, id, modifyHash = true, testId, onToggle }: Props) => {
                       }
                       break;
                     }
-                    case 'ArrowDown':
-                      sectionElements.current[selectedTabIndex].focus();
+                    case 'ArrowDown': {
+                      if (ref.current) {
+                        const section = ref.current.querySelector<
+                          HTMLDivElement
+                        >(`#${sections[selectedTabIndex].props.id}`);
+
+                        if (section) {
+                          section.focus();
+                        }
+                      }
+
                       break;
+                    }
                     default:
                       break;
                   }

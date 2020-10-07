@@ -1,5 +1,6 @@
 *** Settings ***
 Resource    ../../libs/admin-common.robot
+Library     ../../libs/api_keywords.py
 
 Force Tags  Admin  Local  Dev  AltersData
 
@@ -11,39 +12,18 @@ ${TOPIC_NAME}        %{TEST_TOPIC_NAME}
 ${PUBLICATION_NAME}  UI tests - release status %{RUN_IDENTIFIER}
 
 *** Test Cases ***
-Create new publication for "UI tests topic" topic
+Create new publication and release via API
     [Tags]  HappyPath
-    user selects theme "Test theme" and topic "${TOPIC_NAME}" from the admin dashboard
-    user waits until page contains link     Create new publication
-    user checks page does not contain button   ${PUBLICATION_NAME}
-    user clicks link  Create new publication
-    user creates publication    ${PUBLICATION_NAME}
-
-Verify new publication
-    [Tags]  HappyPath
-    user selects theme "Test theme" and topic "${TOPIC_NAME}" from the admin dashboard
-    user waits until page contains button  ${PUBLICATION_NAME}
-
-Create new release
-    [Tags]  HappyPath
-    user opens accordion section  ${PUBLICATION_NAME}
-    user clicks testid element  Create new release link for ${PUBLICATION_NAME}
-    user creates release for publication  ${PUBLICATION_NAME}  Financial Year  3000
-
-Verify release summary
-    [Tags]  HappyPath
-    user checks page contains element   xpath://li/a[text()="Release summary" and contains(@aria-current, 'page')]
-    user waits until h2 is visible  Release summary
-    user checks summary list contains  Publication title  ${PUBLICATION_NAME}
-
-Go to "Release status" tab
-    [Tags]  HappyPath
-    user clicks link   Release status
-    user waits until h2 is visible  Release status
-    user waits until page contains button  Edit release status
+    ${PUBLICATION_ID}=  user creates test publication via api   ${PUBLICATION_NAME}
+    user create test release via api  ${PUBLICATION_ID}   FY    3000
 
 Submit release for Higher Review
     [Tags]  HappyPath
+    user navigates to release summary from admin dashboard  ${PUBLICATION_NAME}  Financial Year 3000-01 (not Live)
+
+    user clicks link  Release status
+    user waits until h2 is visible  Release status
+
     user clicks button  Edit release status
     user clicks radio  Ready for higher review
     user enters text into element  id:releaseStatusForm-internalReleaseNote     Submitted for Higher Review

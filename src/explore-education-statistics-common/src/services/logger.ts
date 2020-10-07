@@ -19,6 +19,10 @@ const logger = {
     }
   },
   info(message: string) {
+    if (process.env.NODE_ENV === 'test') {
+      return;
+    }
+
     console.info(message);
 
     getApplicationInsights().trackTrace({
@@ -27,6 +31,10 @@ const logger = {
     });
   },
   warn(message: string) {
+    if (process.env.NODE_ENV === 'test') {
+      return;
+    }
+
     console.warn(message);
 
     getApplicationInsights().trackTrace({
@@ -35,6 +43,10 @@ const logger = {
     });
   },
   error(error: Error) {
+    if (process.env.NODE_ENV === 'test') {
+      return;
+    }
+
     console.error(error);
 
     getApplicationInsights().trackException({

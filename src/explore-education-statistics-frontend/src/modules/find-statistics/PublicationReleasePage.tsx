@@ -18,7 +18,7 @@ import Page from '@frontend/components/Page';
 import PageSearchFormWithAnalytics from '@frontend/components/PageSearchFormWithAnalytics';
 import PrintThisPage from '@frontend/components/PrintThisPage';
 import PublicationSectionBlocks from '@frontend/modules/find-statistics/components/PublicationSectionBlocks';
-import HelpAndSupport from '@frontend/modules/find-statistics/PublicationReleaseHelpAndSupportSection';
+import PublicationReleaseHelpAndSupportSection from '@frontend/modules/find-statistics/PublicationReleaseHelpAndSupportSection';
 import { logEvent } from '@frontend/services/googleAnalyticsService';
 import classNames from 'classnames';
 import { GetServerSideProps, NextPage } from 'next';
@@ -350,12 +350,11 @@ const PublicationReleasePage: NextPage<Props> = ({ data }) => {
         </Accordion>
       )}
 
-      <HelpAndSupport
+      <PublicationReleaseHelpAndSupportSection
         accordionId="help-and-support"
         publicationTitle={data.publication.title}
         methodologyUrl={methodologyUrl}
         methodologySummary={methodologySummary}
-        themeTitle={data.publication.topic.theme.title}
         publicationContact={data.publication.contact}
         releaseType={data.type.title}
       />

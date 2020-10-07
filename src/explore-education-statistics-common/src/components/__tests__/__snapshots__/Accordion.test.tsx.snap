@@ -52,7 +52,7 @@ exports[`Accordion renders with hidden content by default 1`] = `
       </div>
       <div
         aria-labelledby="test-sections-1-heading"
-        class="govuk-accordion__section-content sectionContent"
+        class="govuk-accordion__section-content sectionContentCollapsed"
         id="test-sections-1-content"
       >
         <p>
@@ -126,7 +126,7 @@ exports[`Accordion renders with visible content when \`open\` is true 1`] = `
       </div>
       <div
         aria-labelledby="test-sections-1-heading"
-        class="govuk-accordion__section-content sectionContent sectionContentExpanded"
+        class="govuk-accordion__section-content"
         id="test-sections-1-content"
       >
         <p>

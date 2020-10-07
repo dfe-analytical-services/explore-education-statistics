@@ -143,7 +143,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Services
                     )
                 )
                 .OnSuccessDo(_userService.CheckCanManageAllTaxonomy)
-                .OnSuccess(
+                .OnSuccessVoid(
                     async topic =>
                     {
                         // For now we only want to delete test topics as we
@@ -157,7 +157,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Services
 
                         foreach (var release in topic.Publications.SelectMany(publication => publication.Releases))
                         {
-                            await _releaseFilesService.DeleteAllFiles(release.Id);
+                            await _releaseFilesService.DeleteAllFiles(release.Id, forceDelete: true);
                             await _releaseSubjectService.DeleteAllSubjectsOrBreakReleaseLinks(release.Id);
                         }
 

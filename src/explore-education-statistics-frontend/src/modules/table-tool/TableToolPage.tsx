@@ -1,5 +1,5 @@
 import TableToolWizard, {
-  TableToolState,
+  InitialTableToolState,
 } from '@common/modules/table-tool/components/TableToolWizard';
 import WizardStep from '@common/modules/table-tool/components/WizardStep';
 import WizardStepHeading from '@common/modules/table-tool/components/WizardStepHeading';
@@ -7,7 +7,7 @@ import mapFullTable from '@common/modules/table-tool/utils/mapFullTable';
 import mapTableHeadersConfig from '@common/modules/table-tool/utils/mapTableHeadersConfig';
 import { FastTrackTable } from '@common/services/fastTrackService';
 import tableBuilderService, {
-  PublicationSubjectMeta,
+  SubjectMeta,
   ThemeMeta,
 } from '@common/services/tableBuilderService';
 import { Dictionary } from '@common/types';
@@ -25,7 +25,7 @@ const TableToolFinalStep = dynamic(() =>
 export interface TableToolPageProps {
   publicationSlug?: string;
   fastTrack?: FastTrackTable;
-  subjectMeta?: PublicationSubjectMeta;
+  subjectMeta?: SubjectMeta;
   themeMeta: ThemeMeta[];
 }
 
@@ -36,7 +36,7 @@ const TableToolPage: NextPage<TableToolPageProps> = ({
   themeMeta,
 }) => {
   const initialTableToolState = useMemo<
-    Partial<TableToolState> | undefined
+    Partial<InitialTableToolState> | undefined
   >(() => {
     if (publicationSlug) {
       const publicationId =

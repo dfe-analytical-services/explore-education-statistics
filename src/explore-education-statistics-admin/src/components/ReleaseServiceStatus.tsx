@@ -1,5 +1,4 @@
 import StatusBlock, { StatusBlockProps } from '@admin/components/StatusBlock';
-import styles from '@admin/pages/release/data/components/ReleaseDataUploadsSection.module.scss';
 import releaseService, {
   ReleaseStageStatuses,
 } from '@admin/services/releaseService';
@@ -122,7 +121,10 @@ const ReleaseServiceStatus = ({
           currentStatus.overallStage,
         ) &&
         exclude !== 'details' && (
-          <Details className={styles.errorSummary} summary="View stages">
+          <Details
+            className="govuk-!-margin-bottom-0 govuk-!-margin-top-1"
+            summary="View stages"
+          >
             <ul className="govuk-list">
               {Object.entries(currentStatus).map(([key, val]) => {
                 if (['overallStage', 'releaseId', 'lastUpdated'].includes(key))

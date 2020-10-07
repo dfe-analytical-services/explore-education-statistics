@@ -1,6 +1,6 @@
 using System;
 using System.Collections.Generic;
-using IOPath = System.IO.Path;
+using GovUk.Education.ExploreEducationStatistics.Common.Services;
 
 namespace GovUk.Education.ExploreEducationStatistics.Common.Model
 {
@@ -40,6 +40,6 @@ namespace GovUk.Education.ExploreEducationStatistics.Common.Model
 
         public string FileName => Path.Substring(Path.LastIndexOf('/') + 1);
 
-        public string Extension => IOPath.GetExtension(FileName)?.TrimStart('.') ?? string.Empty;
+        public string Extension => FileStorageUtils.GetExtension(FileName);
     }
 }

@@ -5,24 +5,15 @@ import { ReleaseDataBlock } from '@admin/services/dataBlockService';
 import { generateTableTitle } from '@common/modules/table-tool/components/DataTableCaption';
 import TableHeadersForm from '@common/modules/table-tool/components/TableHeadersForm';
 import TableToolWizard, {
-  TableToolState,
+  InitialTableToolState,
 } from '@common/modules/table-tool/components/TableToolWizard';
 import TimePeriodDataTable from '@common/modules/table-tool/components/TimePeriodDataTable';
 import WizardStep from '@common/modules/table-tool/components/WizardStep';
 import WizardStepHeading from '@common/modules/table-tool/components/WizardStepHeading';
 import { FullTable } from '@common/modules/table-tool/types/fullTable';
 import { TableHeadersConfig } from '@common/modules/table-tool/types/tableHeaders';
-import {
-  PublicationSubjectMeta,
-  ReleaseTableDataQuery,
-} from '@common/services/tableBuilderService';
-import React, {
-  createRef,
-  useCallback,
-  useEffect,
-  useMemo,
-  useState,
-} from 'react';
+import { ReleaseTableDataQuery } from '@common/services/tableBuilderService';
+import React, { createRef, useCallback, useEffect, useState } from 'react';
 
 export type DataBlockSourceWizardSaveHandler = (params: {
   details: DataBlockDetailsFormValues;
@@ -118,37 +109,16 @@ interface DataBlockSourceWizardProps {
   dataBlock?: ReleaseDataBlock;
   query?: ReleaseTableDataQuery;
   releaseId?: string;
-  subjectMeta?: PublicationSubjectMeta;
-  table?: FullTable;
-  tableHeaders?: TableHeadersConfig;
+  tableToolState?: InitialTableToolState;
   onSave: DataBlockSourceWizardSaveHandler;
 }
 
 const DataBlockSourceWizard = ({
   dataBlock,
-  query: initialQuery,
   releaseId,
-  subjectMeta,
-  table,
-  tableHeaders,
+  tableToolState,
   onSave,
 }: DataBlockSourceWizardProps) => {
-  const initialTableToolState = useMemo<TableToolState | undefined>(() => {
-    if (!initialQuery || !table || !tableHeaders || !subjectMeta) {
-      return undefined;
-    }
-
-    return {
-      initialStep: 5,
-      query: initialQuery,
-      subjectMeta,
-      response: {
-        table,
-        tableHeaders,
-      },
-    };
-  }, [initialQuery, subjectMeta, table, tableHeaders]);
-
   return (
     <div className="govuk-!-margin-bottom-8">
       <p>Configure data source for the data block</p>
@@ -156,7 +126,7 @@ const DataBlockSourceWizard = ({
       <TableToolWizard
         themeMeta={[]}
         initialState={
-          initialTableToolState ?? {
+          tableToolState ?? {
             query: {
               releaseId,
               subjectId: '',

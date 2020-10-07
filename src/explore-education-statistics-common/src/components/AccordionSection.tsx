@@ -53,7 +53,7 @@ const AccordionSection = ({
   open = false,
   onToggle,
 }: AccordionSectionProps) => {
-  const { isMounted } = useMounted();
+  const { isMounted, onMounted } = useMounted();
 
   const headingId = `${id}-heading`;
   const contentId = `${id}-content`;
@@ -104,9 +104,10 @@ const AccordionSection = ({
       </div>
       <div
         aria-labelledby={headingId}
-        className={classNames(classes.sectionContent, styles.sectionContent, {
-          [styles.sectionContentExpanded]: open,
-        })}
+        className={classNames(
+          classes.sectionContent,
+          onMounted({ [styles.sectionContentCollapsed]: !open }),
+        )}
         id={contentId}
       >
         {typeof children === 'function'

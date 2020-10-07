@@ -52,7 +52,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Controllers.Api
             SetupDataBlockExistsResult(persistenceHelper);
 
             dataBlockService.Setup(s => s.DeleteAsync(_releaseId, _dataBlockId))
-                .Returns(Task.FromResult(new Either<ActionResult, bool>(true)));
+                .ReturnsAsync(Unit.Instance);
 
             var controller = ControllerWithMocks(dataBlockService, persistenceHelper);
 

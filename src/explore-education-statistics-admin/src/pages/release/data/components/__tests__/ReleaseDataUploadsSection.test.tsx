@@ -5,15 +5,10 @@ import _releaseDataFileService, {
   UploadDataFilesRequest,
   UploadZipDataFileRequest,
 } from '@admin/services/releaseDataFileService';
-import {
-  fireEvent,
-  render,
-  screen,
-  waitFor,
-  within,
-} from '@testing-library/react';
+import { render, screen, waitFor, within } from '@testing-library/react';
 import userEvent from '@testing-library/user-event';
 import React from 'react';
+import { MemoryRouter } from 'react-router';
 
 jest.mock('@admin/services/releaseDataFileService');
 
@@ -24,28 +19,34 @@ const releaseDataFileService = _releaseDataFileService as jest.Mocked<
 describe('ReleaseDataUploadsSection', () => {
   const testDataFiles: DataFile[] = [
     {
+      id: 'data-1',
       title: 'Test data 1',
       userName: 'user1@test.com',
-      filename: 'data-1.csv',
-      metadataFilename: 'data-1.meta.csv',
+      fileName: 'data-1.csv',
+      metaFileId: 'data-1-meta',
+      metaFileName: 'data-1.meta.csv',
       rows: 100,
       fileSize: {
         size: 50,
         unit: 'Kb',
       },
-      created: new Date('2020-06-12T12:00:00'),
+      created: '2020-06-12T12:00:00',
+      status: 'COMPLETE',
     },
     {
+      id: 'data-2',
       title: 'Test data 2',
       userName: 'user2@test.com',
-      filename: 'data-2.csv',
-      metadataFilename: 'data-2.meta.csv',
+      fileName: 'data-2.csv',
+      metaFileId: 'data-2-meta',
+      metaFileName: 'data-2.meta.csv',
       rows: 200,
       fileSize: {
         size: 100,
         unit: 'Kb',
       },
-      created: new Date('2020-07-01T12:00:00'),
+      created: '2020-07-01T12:00:00',
+      status: 'COMPLETE',
     },
   ];
 
@@ -62,17 +63,23 @@ describe('ReleaseDataUploadsSection', () => {
   };
 
   test('renders list of uploaded data files', async () => {
-    releaseDataFileService.getReleaseDataFiles.mockResolvedValue(testDataFiles);
+    releaseDataFileService.getDataFiles.mockResolvedValue(testDataFiles);
     releaseDataFileService.getDataFileImportStatus.mockResolvedValue(
-      testQueuedImportStatus,
+      testCompleteImportStatus,
     );
 
     render(
-      <ReleaseDataUploadsSection releaseId="release-1" canUpdateRelease />,
+      <MemoryRouter>
+        <ReleaseDataUploadsSection
+          publicationId="publication-1"
+          releaseId="release-1"
+          canUpdateRelease
+        />
+      </MemoryRouter>,
     );
 
     await waitFor(() => {
-      expect(releaseDataFileService.getReleaseDataFiles).toHaveBeenCalledWith(
+      expect(releaseDataFileService.getDataFiles).toHaveBeenCalledWith(
         'release-1',
       );
 
@@ -95,7 +102,7 @@ describe('ReleaseDataUploadsSection', () => {
       );
       expect(section1.getByTestId('Data file size')).toHaveTextContent('50 Kb');
       expect(section1.getByTestId('Number of rows')).toHaveTextContent('100');
-      expect(section1.getByTestId('Status')).toHaveTextContent('Queued');
+      expect(section1.getByTestId('Status')).toHaveTextContent('Complete');
       expect(section1.getByTestId('Uploaded by')).toHaveTextContent(
         'user1@test.com',
       );
@@ -121,7 +128,7 @@ describe('ReleaseDataUploadsSection', () => {
         '100 Kb',
       );
       expect(section2.getByTestId('Number of rows')).toHaveTextContent('200');
-      expect(section2.getByTestId('Status')).toHaveTextContent('Queued');
+      expect(section2.getByTestId('Status')).toHaveTextContent('Complete');
       expect(section2.getByTestId('Uploaded by')).toHaveTextContent(
         'user2@test.com',
       );
@@ -131,11 +138,59 @@ describe('ReleaseDataUploadsSection', () => {
     });
   });
 
-  test('renders empty message when there are no data files', async () => {
-    releaseDataFileService.getReleaseDataFiles.mockResolvedValue([]);
+  test("renders data file details with status of 'Replacement in progress' if being replaced", async () => {
+    releaseDataFileService.getDataFiles.mockResolvedValue([
+      {
+        ...testDataFiles[0],
+        replacedBy: 'data-replacement-1',
+      },
+    ]);
+    releaseDataFileService.getDataFileImportStatus.mockResolvedValue(
+      testCompleteImportStatus,
+    );
 
     render(
-      <ReleaseDataUploadsSection releaseId="release-1" canUpdateRelease />,
+      <MemoryRouter>
+        <ReleaseDataUploadsSection
+          publicationId="publication-1"
+          releaseId="release-1"
+          canUpdateRelease
+        />
+      </MemoryRouter>,
+    );
+
+    await waitFor(() => {
+      expect(releaseDataFileService.getDataFiles).toHaveBeenCalledWith(
+        'release-1',
+      );
+
+      const sections = screen.getAllByTestId('accordionSection');
+
+      expect(sections).toHaveLength(1);
+
+      const section1 = within(sections[0]);
+
+      expect(
+        section1.getByRole('button', { name: 'Test data 1' }),
+      ).toBeInTheDocument();
+
+      expect(section1.getByTestId('Status')).toHaveTextContent(
+        'Data replacement in progress',
+      );
+    });
+  });
+
+  test('renders empty message when there are no data files', async () => {
+    releaseDataFileService.getDataFiles.mockResolvedValue([]);
+
+    render(
+      <MemoryRouter>
+        <ReleaseDataUploadsSection
+          publicationId="publication-1"
+          releaseId="release-1"
+          canUpdateRelease
+        />
+      </MemoryRouter>,
     );
 
     await waitFor(() => {
@@ -150,27 +205,26 @@ describe('ReleaseDataUploadsSection', () => {
 
   describe('deleting data file', () => {
     test('does not render delete files button if file is not ready for deletion', async () => {
-      releaseDataFileService.getReleaseDataFiles.mockResolvedValue(
-        testDataFiles,
-      );
-      releaseDataFileService.getDataFileImportStatus.mockImplementation(
-        async (releaseId, dataFileName) => {
-          if (dataFileName === testDataFiles[1].filename) {
-            return testCompleteImportStatus;
-          }
-
-          return testQueuedImportStatus;
-        },
+      releaseDataFileService.getDataFiles.mockResolvedValue([
+        { ...testDataFiles[0], status: 'QUEUED' },
+        testDataFiles[1],
+      ]);
+      releaseDataFileService.getDataFileImportStatus.mockResolvedValue(
+        testQueuedImportStatus,
       );
 
       render(
-        <ReleaseDataUploadsSection releaseId="release-1" canUpdateRelease />,
+        <MemoryRouter>
+          <ReleaseDataUploadsSection
+            publicationId="publication-1"
+            releaseId="release-1"
+            canUpdateRelease
+          />
+        </MemoryRouter>,
       );
 
-      let sections: HTMLElement[] = [];
-
       await waitFor(() => {
-        sections = screen.getAllByTestId('accordionSection');
+        const sections = screen.getAllByTestId('accordionSection');
         expect(sections).toHaveLength(2);
 
         const section1 = within(sections[0]);
@@ -188,9 +242,7 @@ describe('ReleaseDataUploadsSection', () => {
     });
 
     test('clicking delete files button shows modal to confirm deletion plan', async () => {
-      releaseDataFileService.getReleaseDataFiles.mockResolvedValue(
-        testDataFiles,
-      );
+      releaseDataFileService.getDataFiles.mockResolvedValue(testDataFiles);
       releaseDataFileService.getDataFileImportStatus.mockResolvedValue(
         testCompleteImportStatus,
       );
@@ -213,7 +265,13 @@ describe('ReleaseDataUploadsSection', () => {
       });
 
       render(
-        <ReleaseDataUploadsSection releaseId="release-1" canUpdateRelease />,
+        <MemoryRouter>
+          <ReleaseDataUploadsSection
+            publicationId="publication-1"
+            releaseId="release-1"
+            canUpdateRelease
+          />
+        </MemoryRouter>,
       );
 
       let sections: HTMLElement[] = [];
@@ -267,9 +325,7 @@ describe('ReleaseDataUploadsSection', () => {
     });
 
     test('confirming deletion removes the data file section', async () => {
-      releaseDataFileService.getReleaseDataFiles.mockResolvedValue(
-        testDataFiles,
-      );
+      releaseDataFileService.getDataFiles.mockResolvedValue(testDataFiles);
       releaseDataFileService.getDataFileImportStatus.mockResolvedValue(
         testCompleteImportStatus,
       );
@@ -282,7 +338,13 @@ describe('ReleaseDataUploadsSection', () => {
       releaseDataFileService.deleteDataFiles.mockResolvedValue();
 
       render(
-        <ReleaseDataUploadsSection releaseId="release-1" canUpdateRelease />,
+        <MemoryRouter>
+          <ReleaseDataUploadsSection
+            publicationId="publication-1"
+            releaseId="release-1"
+            canUpdateRelease
+          />
+        </MemoryRouter>,
       );
 
       let sections: HTMLElement[] = [];
@@ -325,24 +387,95 @@ describe('ReleaseDataUploadsSection', () => {
     });
   });
 
+  describe('replace data file', () => {
+    test('does not render replace data button if file import is not completed', async () => {
+      releaseDataFileService.getDataFiles.mockResolvedValue([
+        { ...testDataFiles[0], status: 'QUEUED' },
+        testDataFiles[1],
+      ]);
+      releaseDataFileService.getDataFileImportStatus.mockResolvedValue(
+        testQueuedImportStatus,
+      );
+
+      render(
+        <MemoryRouter>
+          <ReleaseDataUploadsSection
+            publicationId="publication-1"
+            releaseId="release-1"
+            canUpdateRelease
+          />
+        </MemoryRouter>,
+      );
+
+      await waitFor(() => {
+        const sections = screen.getAllByTestId('accordionSection');
+        expect(sections).toHaveLength(2);
+
+        const section1 = within(sections[0]);
+        expect(section1.getByTestId('Status')).toHaveTextContent('Queued');
+        expect(
+          section1.queryByRole('link', { name: 'Replace data' }),
+        ).not.toBeInTheDocument();
+
+        const section2 = within(sections[1]);
+        expect(section2.getByTestId('Status')).toHaveTextContent('Complete');
+        expect(
+          section2.getByRole('link', { name: 'Replace data' }),
+        ).toBeInTheDocument();
+      });
+    });
+
+    test('renders replace data button with correct link', async () => {
+      releaseDataFileService.getDataFiles.mockResolvedValue([
+        { ...testDataFiles[0], status: 'QUEUED' },
+        testDataFiles[1],
+      ]);
+      releaseDataFileService.getDataFileImportStatus.mockResolvedValue(
+        testQueuedImportStatus,
+      );
+
+      render(
+        <MemoryRouter>
+          <ReleaseDataUploadsSection
+            publicationId="publication-1"
+            releaseId="release-1"
+            canUpdateRelease
+          />
+        </MemoryRouter>,
+      );
+
+      await waitFor(() => {
+        const sections = screen.getAllByTestId('accordionSection');
+        const section2 = within(sections[1]);
+        expect(
+          section2.getByRole('link', { name: 'Replace data' }),
+        ).toHaveAttribute(
+          'href',
+          '/publication/publication-1/release/release-1/data/data-2',
+        );
+      });
+    });
+  });
+
   describe('uploading data file', () => {
     const testUploadedDataFile: DataFile = {
+      id: 'file-1',
       title: 'Test title',
       userName: 'user1@test.com',
-      filename: 'test-data.csv',
-      metadataFilename: 'test-data.meta.csv',
+      fileName: 'test-data.csv',
+      metaFileId: 'file-1-meta',
+      metaFileName: 'test-data.meta.csv',
       rows: 300,
       fileSize: {
         size: 150,
         unit: 'Kb',
       },
-      created: new Date('2020-08-18T12:00:00'),
+      created: '2020-08-18T12:00:00',
+      status: 'QUEUED',
     };
 
     beforeEach(() => {
-      releaseDataFileService.getReleaseDataFiles.mockResolvedValue(
-        testDataFiles,
-      );
+      releaseDataFileService.getDataFiles.mockResolvedValue(testDataFiles);
       releaseDataFileService.getDataFileImportStatus.mockResolvedValue(
         testQueuedImportStatus,
       );
@@ -350,7 +483,13 @@ describe('ReleaseDataUploadsSection', () => {
 
     test('show validation message when no subject title', async () => {
       render(
-        <ReleaseDataUploadsSection releaseId="release-1" canUpdateRelease />,
+        <MemoryRouter>
+          <ReleaseDataUploadsSection
+            publicationId="publication-1"
+            releaseId="release-1"
+            canUpdateRelease
+          />
+        </MemoryRouter>,
       );
 
       userEvent.click(screen.getByLabelText('Subject title'));
@@ -367,7 +506,13 @@ describe('ReleaseDataUploadsSection', () => {
 
     test('shows validation message when non-unique subject title', async () => {
       render(
-        <ReleaseDataUploadsSection releaseId="release-1" canUpdateRelease />,
+        <MemoryRouter>
+          <ReleaseDataUploadsSection
+            publicationId="publication-1"
+            releaseId="release-1"
+            canUpdateRelease
+          />
+        </MemoryRouter>,
       );
 
       await userEvent.type(
@@ -385,136 +530,15 @@ describe('ReleaseDataUploadsSection', () => {
       });
     });
 
-    test('shows validation message when no data file selected', async () => {
-      render(
-        <ReleaseDataUploadsSection releaseId="release-1" canUpdateRelease />,
-      );
-
-      userEvent.click(screen.getByLabelText('Upload data file'));
-      fireEvent.change(screen.getByLabelText('Upload data file'), {
-        target: {
-          value: null,
-        },
-      });
-      userEvent.tab();
-
-      await waitFor(() => {
-        expect(
-          screen.getByText('Choose a data file', {
-            selector: '#dataFileUploadForm-dataFile-error',
-          }),
-        ).toBeInTheDocument();
-      });
-    });
-
-    test('shows validation message when data file is not empty', async () => {
-      render(
-        <ReleaseDataUploadsSection releaseId="release-1" canUpdateRelease />,
-      );
-
-      const file = new File([], 'test.csv', {
-        type: 'text/csv',
-      });
-
-      userEvent.upload(screen.getByLabelText('Upload data file'), file);
-      userEvent.tab();
-
-      await waitFor(() => {
-        expect(
-          screen.getByText('Choose a data file that is not empty', {
-            selector: '#dataFileUploadForm-dataFile-error',
-          }),
-        ).toBeInTheDocument();
-      });
-    });
-
-    test('shows validation message when no meta data file selected', async () => {
-      render(
-        <ReleaseDataUploadsSection releaseId="release-1" canUpdateRelease />,
-      );
-
-      userEvent.click(screen.getByLabelText('Upload metadata file'));
-      fireEvent.change(screen.getByLabelText('Upload metadata file'), {
-        target: { value: null },
-      });
-      userEvent.tab();
-
-      await waitFor(() => {
-        expect(
-          screen.getByText('Choose a metadata file', {
-            selector: '#dataFileUploadForm-metadataFile-error',
-          }),
-        ).toBeInTheDocument();
-      });
-    });
-
-    test('shows validation message when metadata file is not empty', async () => {
-      render(
-        <ReleaseDataUploadsSection releaseId="release-1" canUpdateRelease />,
-      );
-
-      const file = new File([], 'test.csv', {
-        type: 'text/csv',
-      });
-
-      userEvent.upload(screen.getByLabelText('Upload metadata file'), file);
-      userEvent.tab();
-
-      await waitFor(() => {
-        expect(
-          screen.getByText('Choose a metadata file that is not empty', {
-            selector: '#dataFileUploadForm-metadataFile-error',
-          }),
-        ).toBeInTheDocument();
-      });
-    });
-
-    test('shows validation message when no ZIP file selected', async () => {
-      render(
-        <ReleaseDataUploadsSection releaseId="release-1" canUpdateRelease />,
-      );
-
-      userEvent.click(screen.getByLabelText('ZIP file'));
-      userEvent.click(screen.getByLabelText('Upload ZIP file'));
-      fireEvent.change(screen.getByLabelText('Upload ZIP file'), {
-        target: { value: null },
-      });
-      userEvent.tab();
-
-      await waitFor(() => {
-        expect(
-          screen.getByText('Choose a zip file', {
-            selector: '#dataFileUploadForm-zipFile-error',
-          }),
-        ).toBeInTheDocument();
-      });
-    });
-
-    test('shows validation message when ZIP file is empty', async () => {
-      render(
-        <ReleaseDataUploadsSection releaseId="release-1" canUpdateRelease />,
-      );
-
-      const file = new File([], 'test.zip', {
-        type: 'application/zip',
-      });
-
-      userEvent.click(screen.getByLabelText('ZIP file'));
-      userEvent.upload(screen.getByLabelText('Upload ZIP file'), file);
-      userEvent.tab();
-
-      await waitFor(() => {
-        expect(
-          screen.getByText('Choose a ZIP file that is not empty', {
-            selector: '#dataFileUploadForm-zipFile-error',
-          }),
-        ).toBeInTheDocument();
-      });
-    });
-
     test('cannot submit with invalid values when trying to upload CSV files', async () => {
       render(
-        <ReleaseDataUploadsSection releaseId="release-1" canUpdateRelease />,
+        <MemoryRouter>
+          <ReleaseDataUploadsSection
+            publicationId="publication-1"
+            releaseId="release-1"
+            canUpdateRelease
+          />
+        </MemoryRouter>,
       );
 
       userEvent.click(
@@ -552,7 +576,13 @@ describe('ReleaseDataUploadsSection', () => {
 
     test('cannot submit with invalid values when trying to upload ZIP file', async () => {
       render(
-        <ReleaseDataUploadsSection releaseId="release-1" canUpdateRelease />,
+        <MemoryRouter>
+          <ReleaseDataUploadsSection
+            publicationId="publication-1"
+            releaseId="release-1"
+            canUpdateRelease
+          />
+        </MemoryRouter>,
       );
 
       userEvent.click(screen.getByLabelText('ZIP file'));
@@ -596,7 +626,13 @@ describe('ReleaseDataUploadsSection', () => {
       );
 
       render(
-        <ReleaseDataUploadsSection releaseId="release-1" canUpdateRelease />,
+        <MemoryRouter>
+          <ReleaseDataUploadsSection
+            publicationId="publication-1"
+            releaseId="release-1"
+            canUpdateRelease
+          />
+        </MemoryRouter>,
       );
 
       const dataFile = new File(['test'], 'test-data.csv', {
@@ -688,7 +724,13 @@ describe('ReleaseDataUploadsSection', () => {
       );
 
       render(
-        <ReleaseDataUploadsSection releaseId="release-1" canUpdateRelease />,
+        <MemoryRouter>
+          <ReleaseDataUploadsSection
+            publicationId="publication-1"
+            releaseId="release-1"
+            canUpdateRelease
+          />
+        </MemoryRouter>,
       );
 
       const zipFile = new File(['test'], 'test-data.zip', {

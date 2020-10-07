@@ -38,7 +38,8 @@ export interface DetailsProps {
   jsRequired?: boolean;
   onToggle?: DetailsToggleHandler;
   open?: boolean;
-  summary: string | ReactNode;
+  summary: string;
+  summaryAfter?: ReactNode;
 }
 
 const Details = ({
@@ -49,6 +50,7 @@ const Details = ({
   open = false,
   onToggle,
   summary,
+  summaryAfter,
 }: DetailsProps) => {
   const [id] = useState(propId);
   const ref = useRef<HTMLElement>(null);
@@ -131,6 +133,8 @@ const Details = ({
         >
           {summary}
         </span>
+
+        {summaryAfter}
       </summary>
       <div
         aria-hidden={onMounted(!isOpened)}
