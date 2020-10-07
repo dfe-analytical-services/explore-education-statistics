@@ -352,6 +352,89 @@ describe('Tabs', () => {
     expect(queryByText('Test section 2 content')).not.toBeNull();
   });
 
+  test('can re-render with new tab and the active tab will still be active', () => {
+    const { rerender } = render(
+      <Tabs id="test-tabs">
+        <TabsSection title="Tab 1">
+          <p>Test section 1 content</p>
+        </TabsSection>
+        <TabsSection title="Tab 2">
+          <p>Test section 2 content</p>
+        </TabsSection>
+      </Tabs>,
+    );
+
+    fireEvent.click(screen.getByRole('tab', { name: 'Tab 2' }));
+
+    rerender(
+      <Tabs id="test-tabs">
+        <TabsSection title="Tab 1">
+          <p>Test section 1 content</p>
+        </TabsSection>
+        <TabsSection title="Tab 2">
+          <p>Test section 2 content</p>
+        </TabsSection>
+        <TabsSection title="Tab 3">
+          <p>Test section 3 content</p>
+        </TabsSection>
+      </Tabs>,
+    );
+
+    const tabs = screen.getAllByRole('tab');
+    const sections = screen.getAllByRole('tabpanel', { hidden: true });
+
+    expect(tabs).toHaveLength(3);
+    expect(sections).toHaveLength(3);
+
+    expect(tabs[0]).toHaveAttribute('aria-selected', 'false');
+    expect(tabs[1]).toHaveAttribute('aria-selected', 'true');
+    expect(tabs[2]).toHaveAttribute('aria-selected', 'false');
+
+    expect(sections[0]).not.toBeVisible();
+    expect(sections[1]).toBeVisible();
+    expect(sections[1]).toHaveTextContent('Test section 2 content');
+    expect(sections[2]).not.toBeVisible();
+
+    expect(window.location.hash).toBe('#test-tabs-2');
+  });
+
+  test('can re-render without active tab and another other tab will become active', () => {
+    const { rerender } = render(
+      <Tabs id="test-tabs">
+        <TabsSection title="Tab 1">
+          <p>Test section 1 content</p>
+        </TabsSection>
+        <TabsSection title="Tab 2">
+          <p>Test section 2 content</p>
+        </TabsSection>
+      </Tabs>,
+    );
+
+    fireEvent.click(screen.getByRole('tab', { name: 'Tab 2' }));
+
+    rerender(
+      <Tabs id="test-tabs">
+        <TabsSection title="Tab 1">
+          <p>Test section 1 content</p>
+        </TabsSection>
+      </Tabs>,
+    );
+
+    const tabs = screen.getAllByRole('tab');
+    const sections = screen.getAllByRole('tabpanel', { hidden: true });
+
+    expect(tabs).toHaveLength(1);
+    expect(sections).toHaveLength(1);
+
+    expect(tabs[0]).toHaveAttribute('aria-selected', 'true');
+    expect(tabs[0]).toHaveTextContent('Tab 1');
+
+    expect(sections[0]).toBeVisible();
+    expect(sections[0]).toHaveTextContent('Test section 1 content');
+
+    expect(window.location.hash).toBe('#test-tabs-1');
+  });
+
   describe('keyboard interactions', () => {
     let tab1: HTMLAnchorElement;
     let tab2: HTMLAnchorElement;

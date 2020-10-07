@@ -95,7 +95,7 @@ export interface ReleaseMeta {
   subjects: PublicationSubject[];
 }
 
-export interface PublicationSubjectMeta {
+export interface SubjectMeta {
   filters: Dictionary<{
     legend: string;
     hint?: string;
@@ -189,17 +189,15 @@ const tableBuilderService = {
   getReleaseMeta(releaseId: string): Promise<ReleaseMeta> {
     return dataApi.get(`/meta/release/${releaseId}`);
   },
-  getPublicationSubjectMeta(
-    subjectId: string,
-  ): Promise<PublicationSubjectMeta> {
+  getSubjectMeta(subjectId: string): Promise<SubjectMeta> {
     return dataApi.get(`/meta/subject/${subjectId}`);
   },
-  filterPublicationSubjectMeta(query: {
+  filterSubjectMeta(query: {
     subjectId: string;
     timePeriod?: TimePeriodQuery;
     geographicLevel?: string;
     locations?: Dictionary<string[]>;
-  }): Promise<PublicationSubjectMeta> {
+  }): Promise<SubjectMeta> {
     return dataApi.post('/meta/subject', query);
   },
   getTableData(query: ReleaseTableDataQuery): Promise<TableDataResponse> {
