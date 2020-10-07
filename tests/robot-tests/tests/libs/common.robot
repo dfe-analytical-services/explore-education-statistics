@@ -99,7 +99,11 @@ user reloads page
     reload page
 
 user scrolls to the top of the page
-    execute javascript      window.scrollTo(0, 0);
+    execute javascript  window.scrollTo(0, 0);
+
+user scrolls down
+    [Arguments]  ${px}
+    execute javascript  window.scrollBy(0, ${px});
 
 user scrolls to element
     [Arguments]  ${element}
@@ -207,6 +211,8 @@ user scrolls to accordion section content
     [Arguments]  ${heading_text}  ${parent}=css:[data-testid="accordion"]
     ${content}=  user gets accordion section content element  ${heading_text}  ${parent}
     user scrolls to element  ${content}
+    # Workaround to get lazy loaded data blocks to render
+    user scrolls down  1
 
 user waits until page contains testid
     [Arguments]  ${id}   ${wait}=${timeout}
