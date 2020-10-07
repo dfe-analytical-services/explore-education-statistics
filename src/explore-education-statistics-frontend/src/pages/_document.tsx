@@ -1,7 +1,8 @@
 import BaseDocument, {
-  Head,
-  Main,
   DocumentContext,
+  Head,
+  Html,
+  Main,
   NextScript,
 } from 'next/document';
 import React from 'react';
@@ -14,10 +15,8 @@ class Document extends BaseDocument {
 
   public render() {
     return (
-      <html lang="en" className="govuk-template app-html-class">
+      <Html lang="en" className="govuk-template app-html-class">
         <Head>
-          <meta name="viewport" content="width=device-width, initial-scale=1" />
-
           {process.env.NODE_ENV === 'development' && (
             <>
               {/* Force browser to not cache any assets */}
@@ -67,7 +66,7 @@ class Document extends BaseDocument {
           <Main />
           <NextScript />
         </body>
-      </html>
+      </Html>
     );
   }
 }

@@ -4,7 +4,7 @@
  * @param {string} hotjarId
  * @param {number} snippetVersion
  */
-export default (hotjarId, snippetVersion) => {
+export default function hotjarTracker(hotjarId, snippetVersion) {
   /* eslint-disable */
   (function (h, o, t, j, a, r) {
     h.hj =
@@ -19,4 +19,4 @@ export default (hotjarId, snippetVersion) => {
     r.src = t + h._hjSettings.hjid + j + h._hjSettings.hjsv;
     a.appendChild(r);
   })(window, document, '//static.hotjar.com/c/hotjar-', '.js?sv=');
-};
+}

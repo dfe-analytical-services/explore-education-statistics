@@ -67,38 +67,32 @@ async function startServer(port = process.env.PORT || 3000) {
 
   // Use Helmet for configuration of headers and disable express powered by header
   server.disable('x-powered-by');
-  server.use(helmet());
   server.use(
-    helmet.contentSecurityPolicy({
-      directives: {
-        defaultSrc: ["'self'"],
-        scriptSrc: cspScriptSrc,
-        styleSrc: ["'self'", "'unsafe-inline'"],
-        imgSrc: [
-          "'self'",
-          'data:',
-          'https://www.google-analytics.com/',
-          'https://insights.hotjar.com',
-          'https://static.hotjar.com',
-          'https://script.hotjar.com',
-        ],
-        fontSrc: [
-          "'self'",
-          'https://static.hotjar.com',
-          'https://script.hotjar.com',
-        ],
-        connectSrc:
-          process.env.NODE_ENV !== 'production' ? ['*'] : cspConnectSrc,
-        frameSrc: ["'self'", 'https://vars.hotjar.com '],
-        frameAncestors: ["'self'"],
-        childSrc: ["'self'", 'https://vars.hotjar.com'],
-      },
-    }),
-  );
-  server.use(
-    helmet.featurePolicy({
-      features: {
-        fullscreen: ["'self'"],
+    helmet({
+      contentSecurityPolicy: {
+        directives: {
+          defaultSrc: ["'self'"],
+          scriptSrc: cspScriptSrc,
+          styleSrc: ["'self'", "'unsafe-inline'"],
+          imgSrc: [
+            "'self'",
+            'data:',
+            'https://www.google-analytics.com/',
+            'https://insights.hotjar.com',
+            'https://static.hotjar.com',
+            'https://script.hotjar.com',
+          ],
+          fontSrc: [
+            "'self'",
+            'https://static.hotjar.com',
+            'https://script.hotjar.com',
+          ],
+          connectSrc:
+            process.env.NODE_ENV !== 'production' ? ['*'] : cspConnectSrc,
+          frameSrc: ["'self'", 'https://vars.hotjar.com '],
+          frameAncestors: ["'self'"],
+          childSrc: ["'self'", 'https://vars.hotjar.com'],
+        },
       },
     }),
   );
@@ -144,7 +138,9 @@ async function startServer(port = process.env.PORT || 3000) {
 }
 
 startServer().catch(err => {
-  appInsights.defaultClient.trackException({ exception: err });
+  if (appInsights.defaultClient) {
+    appInsights.defaultClient.trackException({ exception: err });
+  }
 
   console.error(err);
   process.exit(1);
