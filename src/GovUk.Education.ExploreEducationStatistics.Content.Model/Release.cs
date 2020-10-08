@@ -71,6 +71,8 @@ namespace GovUk.Education.ExploreEducationStatistics.Content.Model
 
         public string PreReleaseAccessList { get; set; }
 
+        public string MetaGuidance { get; set; }
+
         public Release? PreviousVersion { get; set; }
 
         public bool SoftDeleted { get; set; }
