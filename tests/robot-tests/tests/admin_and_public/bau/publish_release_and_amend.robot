@@ -325,7 +325,7 @@ Return to Admin to start creating an amendment
     user goes to url  %{ADMIN_URL}
     user waits until h1 is visible   Dashboard
     user waits until page contains title caption  Welcome Bau1
-    user waits until page contains element   css:#selectTheme   180
+    user waits until page contains element   id:publicationsReleases-themeTopic-themeId   180
 
 Create amendment
     [Tags]  HappyPath

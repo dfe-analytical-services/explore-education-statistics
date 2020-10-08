@@ -52,7 +52,7 @@ Return to Admin Dashboard
     [Tags]  HappyPath
     user goes to url    %{ADMIN_URL}
     user waits until h1 is visible   Dashboard
-    user waits until page contains element   css:#selectTheme    180
+    user waits until page contains element   id:publicationsReleases-themeTopic-themeId    180
 
 Create another release for the same publication
     [Tags]  HappyPath

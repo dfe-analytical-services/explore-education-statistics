@@ -13,7 +13,7 @@ user signs in as bau1
 
     user waits until h1 is visible   Dashboard
     user waits until page contains title caption  Welcome Bau1
-    user waits until page contains element   css:#selectTheme   180
+    user waits until page contains element   id:publicationsReleases-themeTopic-themeId   180
 
     user checks breadcrumb count should be  2
     user checks nth breadcrumb contains  1   Home
@@ -29,7 +29,7 @@ user signs in as analyst1
 
     user waits until h1 is visible  Dashboard
     user waits until page contains title caption  Welcome Analyst1
-    user waits until page contains element   css:#selectTheme   180
+    user waits until page contains element   id:publicationsReleases-themeTopic-themeId   180
 
     user checks breadcrumb count should be  2
     user checks nth breadcrumb contains  1   Home
@@ -49,13 +49,12 @@ user signs out
     user waits until page contains  You have successfully signed out
 
 user selects theme "${theme}" and topic "${topic}" from the admin dashboard
-    user waits until page contains element  id:my-publications-tab   60
-    user clicks element   id:my-publications-tab
-    user waits until page contains element   id:selectTheme
-    user waits until element contains  id:my-publications-tab  Manage publications and releases
-    user selects from list by label  id:selectTheme  ${theme}
-    user waits until page contains element   id:selectTopic
-    user selects from list by label  id:selectTopic  ${topic}
+    user waits until page contains link  Manage publications and releases  60
+    user clicks link   Manage publications and releases
+    user waits until page contains element   id:publicationsReleases-themeTopic-themeId
+    user selects from list by label  id:publicationsReleases-themeTopic-themeId  ${theme}
+    user waits until page contains element   id:publicationsReleases-themeTopic-topicId
+    user selects from list by label  id:publicationsReleases-themeTopic-topicId  ${topic}
     user waits until h2 is visible  ${theme}
     user waits until h3 is visible  ${topic}
 
@@ -72,7 +71,7 @@ user navigates to release summary from admin dashboard
     user waits until parent contains element   ${details}   xpath:.//a[text()="Edit this release"]
     ${edit_button}=  get child element  ${details}  xpath:.//a[text()="Edit this release"]
     user clicks element   ${edit_button}
-    
+
     user waits until h2 is visible  Release summary
     user checks summary list contains   Publication title  ${PUBLICATION_NAME}
 
