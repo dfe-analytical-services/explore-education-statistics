@@ -1405,7 +1405,11 @@
             "edition": "Standard",
             "collation": "SQL_Latin1_General_CP1_CI_AS",
             "maxSizeBytes": "268435456000",
-            "requestedServiceObjectiveName": "S3"
+            "minCapacity": "[parameters('minCapacityStatisticsDb')]"
+          },
+          "sku": {
+            "Tier": "[first(skip(split(parameters('skuStatisticsDb'), ' '), 1))]",
+            "Name": "[first(split(parameters('skuStatisticsDb'), ' '))]"
           }
         },
         {
@@ -1628,7 +1632,11 @@
             "edition": "Standard",
             "collation": "SQL_Latin1_General_CP1_CI_AS",
             "maxSizeBytes": "268435456000",
-            "requestedServiceObjectiveName": "S3"
+            "minCapacity": "[parameters('minCapacityStatisticsDb')]"
+          },
+          "sku": {
+            "Tier": "[first(skip(split(parameters('skuStatisticsDb'), ' '), 1))]",
+            "Name": "[first(split(parameters('skuStatisticsDb'), ' '))]"
           }
         },
         {
