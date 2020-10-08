@@ -43,6 +43,7 @@ const lineStyles: Dictionary<string> = {
   dotted: '2 2',
 };
 
+// eslint-disable-next-line react/display-name
 const getDot = (symbol: ChartSymbol | 'none' = 'circle') => (
   props: SymbolsProps,
 ) => {

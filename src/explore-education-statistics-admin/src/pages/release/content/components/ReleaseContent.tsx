@@ -186,12 +186,7 @@ const ReleaseContent = () => {
         </div>
 
         <div className="govuk-grid-column-one-third">
-          <PrintThisPage
-            analytics={{
-              category: 'Page print',
-              action: 'Print this page link selected',
-            }}
-          />
+          <PrintThisPage />
           <RelatedAside>
             <h2 className="govuk-heading-m">About these statistics</h2>
 

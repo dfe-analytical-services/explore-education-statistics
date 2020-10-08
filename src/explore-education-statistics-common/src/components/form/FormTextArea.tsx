@@ -35,9 +35,13 @@ const FormTextArea = ({
   hideLabel,
   label,
   maxLength,
+  name,
   rows = 5,
   value,
-  ...props
+  onBlur,
+  onChange,
+  onClick,
+  onKeyPress,
 }: FormTextAreaProps) => {
   const textArea = (
     <>
@@ -52,7 +56,6 @@ const FormTextArea = ({
       {error && <ErrorMessage id={`${id}-error`}>{error}</ErrorMessage>}
 
       <textarea
-        {...props}
         aria-describedby={
           classNames({
             [`${id}-error`]: !!error,
@@ -66,6 +69,11 @@ const FormTextArea = ({
         })}
         disabled={disabled}
         id={id}
+        name={name}
+        onBlur={onBlur}
+        onChange={onChange}
+        onClick={onClick}
+        onKeyPress={onKeyPress}
         rows={rows}
         value={value}
       />

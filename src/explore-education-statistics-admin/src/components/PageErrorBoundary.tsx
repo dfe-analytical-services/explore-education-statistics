@@ -4,7 +4,6 @@ import ServiceProblemsPage from '@admin/pages/errors/ServiceProblemsPage';
 import { ErrorControlContextProvider } from '@common/contexts/ErrorControlContext';
 import logger from '@common/services/logger';
 import { AxiosError } from 'axios';
-import * as H from 'history';
 import React, { Component } from 'react';
 import { RouteComponentProps, withRouter } from 'react-router';
 
@@ -20,7 +19,7 @@ interface State {
 class PageErrorBoundary extends Component<RouteComponentProps, State> {
   public state: State = {};
 
-  private unregisterCallback?: H.UnregisterCallback;
+  private unregisterCallback?: () => void;
 
   private handleManualErrors = {
     forbidden: () => {

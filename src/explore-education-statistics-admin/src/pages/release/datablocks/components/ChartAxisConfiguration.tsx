@@ -44,7 +44,6 @@ type FormValues = Partial<OmitStrict<AxisConfiguration, 'dataSets' | 'type'>>;
 interface Props {
   buttons?: ReactNode;
   canSaveChart: boolean;
-  defaultDataType?: AxisGroupBy;
   forms: Dictionary<ChartBuilderForm>;
   hasSubmittedChart: boolean;
   isSaving?: boolean;

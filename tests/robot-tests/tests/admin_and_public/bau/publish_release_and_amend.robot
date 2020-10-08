@@ -296,6 +296,7 @@ Verify accordions are correct
 Verify Dates data block accordion section
     [Tags]  HappyPath
     user opens accordion section  Dates data block
+    user scrolls to accordion section content  Dates data block
     ${section}=  user gets accordion section content element  Dates data block
 
     user checks chart title contains  ${section}  Sample title
@@ -611,6 +612,7 @@ Verify amendment accordions are correct
 Verify amendment Dates data block accordion section
     [Tags]  HappyPath
     user opens accordion section  Dates data block
+    user scrolls to accordion section content  Dates data block
     ${section}=  user gets accordion section content element  Dates data block
 
     user checks chart title contains  ${section}  Updated sample title

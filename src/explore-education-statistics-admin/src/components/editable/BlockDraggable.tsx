@@ -18,7 +18,9 @@ const BlockDraggable = ({ draggable, draggableId, index, children }: Props) => (
   >
     {(draggableProvided, snapshot) => (
       <div
+        // eslint-disable-next-line react/jsx-props-no-spreading
         {...draggableProvided.draggableProps}
+        // eslint-disable-next-line react/jsx-props-no-spreading
         {...draggableProvided.dragHandleProps}
         ref={draggableProvided.innerRef}
         className={classNames({

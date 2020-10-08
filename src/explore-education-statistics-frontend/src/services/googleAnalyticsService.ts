@@ -18,10 +18,12 @@ export function initGoogleAnalytics(trackingId: string) {
 }
 
 export function enableGoogleAnalytics() {
+  // eslint-disable-next-line @typescript-eslint/ban-ts-comment
   // @ts-ignore
   window[`ga-disable-${gaTrackingId}`] = false;
 }
 export function disableGoogleAnalytics() {
+  // eslint-disable-next-line @typescript-eslint/ban-ts-comment
   // @ts-ignore
   window[`ga-disable-${gaTrackingId}`] = true;
 }

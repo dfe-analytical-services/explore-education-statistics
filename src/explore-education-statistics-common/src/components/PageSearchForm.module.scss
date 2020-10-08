@@ -1,4 +1,4 @@
-@import '../styles/govuk-base';
+@import '~govuk-frontend/govuk/base';
 
 .container {
   @media print {
@@ -7,7 +7,7 @@
 }
 
 .searchButton {
-  background: $govuk-link-colour url('/static/images/search-button.png') 1px -17px;
+  background: $govuk-link-colour url('/assets/images/search-button.png') 1px -17px;
   border: 2px solid $govuk-input-border-colour;
   box-sizing: content-box;
   cursor: pointer;
@@ -21,7 +21,7 @@
 
 .searchButton:focus,
 .searchButton:hover {
-  background: $govuk-link-hover-colour url('/static/images/search-button.png')
+  background: $govuk-link-hover-colour url('/assets/images/search-button.png')
     1px -17px;
   border: 2px solid $govuk-focus-colour;
   outline: 0;

@@ -7,10 +7,10 @@ type CancelInterval = () => void;
  * {@param delay} interval (in milliseconds).
  */
 export default function useInterval(
-  callback: Function,
+  callback: () => void,
   delay: number,
 ): [CancelInterval] {
-  const savedCallback = useRef<Function>(callback);
+  const savedCallback = useRef<() => void>(callback);
   savedCallback.current = callback;
 
   const interval = useRef<NodeJS.Timeout>();

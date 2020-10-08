@@ -17,7 +17,7 @@ export interface ServerValidationError {
   message: string;
 }
 
-export type FieldName<FormValues> = FormValues extends {}
+export type FieldName<FormValues> = FormValues extends Record<string, unknown>
   ? keyof FormValues
   : string;
 

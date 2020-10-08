@@ -11,13 +11,13 @@ type Props<FormValues> = {
   formGroupClass?: string;
 } & OmitStrict<FormEditorProps, 'value' | 'onChange'>;
 
-const FormFieldEditor = <T extends {}>({
+function FormFieldEditor<T>({
   error,
   name,
   showError = true,
   formGroupClass,
   ...props
-}: Props<T>) => {
+}: Props<T>) {
   return (
     <Field name={name}>
       {({ field, form }: FieldProps) => {
@@ -47,6 +47,6 @@ const FormFieldEditor = <T extends {}>({
       }}
     </Field>
   );
-};
+}
 
 export default FormFieldEditor;

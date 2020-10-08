@@ -46,7 +46,7 @@ Validate accordion sections order
 
 Validate page has Print this page link
     [Tags]  HappyPath
-    user checks page contains link with text and url  Print this page   \#
+    user waits until page contains button  Print this page
 
 Search for "pupil"
     [Documentation]    EES-807

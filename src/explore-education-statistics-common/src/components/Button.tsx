@@ -21,7 +21,6 @@ const Button = ({
   type = 'button',
 }: ButtonProps) => {
   return (
-    // eslint-disable-next-line react/button-has-type
     <button
       aria-disabled={disabled}
       className={classNames(
@@ -36,6 +35,7 @@ const Button = ({
       disabled={disabled}
       id={id}
       onClick={onClick}
+      // eslint-disable-next-line react/button-has-type
       type={type}
     >
       {children}

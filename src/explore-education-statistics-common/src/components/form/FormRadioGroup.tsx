@@ -45,7 +45,7 @@ const FormRadioGroup = <Value extends string = string>({
   onFieldsetBlur,
   onFieldsetFocus,
   ...props
-}: FormRadioGroupProps) => {
+}: FormRadioGroupProps<Value>) => {
   const { id } = props;
 
   const orderedOptions =

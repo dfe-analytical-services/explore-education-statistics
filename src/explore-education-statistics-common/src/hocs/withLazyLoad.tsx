@@ -25,8 +25,9 @@ export default function withLazyLoad<P>(
     );
   };
 
-  LazyLoadedComponent.displayName = `withLazyLoad(${Component.displayName ||
-    Component.name})`;
+  LazyLoadedComponent.displayName = `withLazyLoad(${
+    Component.displayName || Component.name
+  })`;
 
   return LazyLoadedComponent;
 }

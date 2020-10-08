@@ -13,9 +13,9 @@ export type FormFieldCheckboxSearchGroupProps<FormValues> = OmitStrict<
   'formGroup'
 >;
 
-const FormFieldCheckboxSearchGroup = <FormValues extends {}>(
+function FormFieldCheckboxSearchGroup<FormValues>(
   props: FormFieldCheckboxSearchGroupProps<FormValues>,
-) => {
+) {
   const { options } = props;
 
   return (
@@ -57,6 +57,6 @@ const FormFieldCheckboxSearchGroup = <FormValues extends {}>(
       }}
     </FormField>
   );
-};
+}
 
 export default FormFieldCheckboxSearchGroup;

@@ -335,7 +335,6 @@ describe('serverValidations', () => {
         {
           errors: {
             TestField: ['TEST_CODE'],
-            // eslint-disable-next-line @typescript-eslint/camelcase
             test_field_2: ['TEST_CODE'],
           },
           status: 400,
@@ -368,7 +367,6 @@ describe('serverValidations', () => {
         {
           errors: {
             'Test.Field.Here': ['TEST_CODE'],
-            // eslint-disable-next-line @typescript-eslint/camelcase
             'test.field_2.here': ['TEST_CODE'],
           },
           status: 400,
@@ -407,7 +405,6 @@ describe('serverValidations', () => {
         {
           errors: {
             'TestField[1]': ['TEST_CODE'],
-            // eslint-disable-next-line @typescript-eslint/camelcase
             'test.field_2[1]': ['TEST_CODE'],
           },
           status: 400,

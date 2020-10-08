@@ -34,8 +34,9 @@ function withErrorControl<P extends ErrorControlState>(
     );
   };
 
-  WrappedComponent.displayName = `withErrorControl(${Component.displayName ??
-    Component.name})`;
+  WrappedComponent.displayName = `withErrorControl(${
+    Component.displayName ?? Component.name
+  })`;
 
   return WrappedComponent;
 }

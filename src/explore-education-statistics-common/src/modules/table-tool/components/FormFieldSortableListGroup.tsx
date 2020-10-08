@@ -8,23 +8,24 @@ import styles from './FormFieldSortableListGroup.module.scss';
 
 interface Props<FormValues> {
   id: string;
-  name: FormValues extends {} ? keyof FormValues : string;
+  name: FormValues extends Record<string, unknown> ? keyof FormValues : string;
   legend: string;
   groupLegend: string;
 }
 
-const FormFieldSortableListGroup = <FormValues extends {}>({
+function FormFieldSortableListGroup<FormValues>({
   id,
   name,
   legend,
   groupLegend,
-}: Props<FormValues>) => {
+}: Props<FormValues>) {
   const [field, meta] = useField(name as string);
 
   return (
     <Droppable droppableId={name as string} direction="horizontal">
       {(droppableProvided, droppableSnapshot) => (
         <div
+          // eslint-disable-next-line react/jsx-props-no-spreading
           {...droppableProvided.droppableProps}
           ref={droppableProvided.innerRef}
           className={classNames(styles.groupsFieldset, {
@@ -53,7 +54,9 @@ const FormFieldSortableListGroup = <FormValues extends {}>({
                 >
                   {(draggableProvided, draggableSnapshot) => (
                     <div
+                      // eslint-disable-next-line react/jsx-props-no-spreading
                       {...draggableProvided.draggableProps}
+                      // eslint-disable-next-line react/jsx-props-no-spreading
                       {...draggableProvided.dragHandleProps}
                       className={classNames(styles.list, {
                         [styles.isDragging]: draggableSnapshot.isDragging,
@@ -77,6 +80,6 @@ const FormFieldSortableListGroup = <FormValues extends {}>({
       )}
     </Droppable>
   );
-};
+}
 
 export default FormFieldSortableListGroup;
