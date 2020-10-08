@@ -1,4 +1,5 @@
 import { FormFieldset } from '@common/components/form';
+import useToggle from '@common/hooks/useToggle';
 import classNames from 'classnames';
 import { useField } from 'formik';
 import React from 'react';
@@ -20,6 +21,7 @@ function FormFieldSortableListGroup<FormValues>({
   groupLegend,
 }: Props<FormValues>) {
   const [field, meta] = useField(name as string);
+  const [isDragDisabled, toggleDragDisabled] = useToggle(false);
 
   return (
     <Droppable droppableId={name as string} direction="horizontal">
@@ -50,6 +52,7 @@ function FormFieldSortableListGroup<FormValues>({
                   // eslint-disable-next-line react/no-array-index-key
                   key={index}
                   draggableId={`${name}-${index}`}
+                  isDragDisabled={isDragDisabled}
                   index={index}
                 >
                   {(draggableProvided, draggableSnapshot) => (
@@ -68,6 +71,8 @@ function FormFieldSortableListGroup<FormValues>({
                         id={`${id}-${index}`}
                         legend={`${groupLegend} ${index + 1}`}
                         legendSize="s"
+                        onMouseEnter={toggleDragDisabled.on}
+                        onMouseLeave={toggleDragDisabled.off}
                       />
                     </div>
                   )}

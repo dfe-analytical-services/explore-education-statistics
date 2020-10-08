@@ -3,7 +3,7 @@ import { FormFieldsetProps } from '@common/components/form/FormFieldset';
 import { Filter } from '@common/modules/table-tool/types/filters';
 import reorder from '@common/utils/reorder';
 import classNames from 'classnames';
-import React from 'react';
+import React, { MouseEventHandler } from 'react';
 import { DragDropContext, Draggable, Droppable } from 'react-beautiful-dnd';
 import styles from './FormSortableList.module.scss';
 
@@ -11,14 +11,21 @@ type SortableOptionChangeEventHandler = (value: Filter[]) => void;
 
 export type FormSortableListProps = {
   onChange?: SortableOptionChangeEventHandler;
+  onMouseEnter?: MouseEventHandler<HTMLDivElement>;
+  onMouseLeave?: MouseEventHandler<HTMLDivElement>;
   value: Filter[];
 } & FormFieldsetProps;
 
-const FormSortableList = (props: FormSortableListProps) => {
-  const { id, onChange, value } = props;
-
+const FormSortableList = ({
+  id,
+  onChange,
+  onMouseEnter,
+  onMouseLeave,
+  value,
+  ...props
+}: FormSortableListProps) => {
   return (
-    <FormFieldset {...props}>
+    <FormFieldset {...props} id={id}>
       <DragDropContext
         onDragEnd={result => {
           if (!result.destination) {
@@ -45,6 +52,8 @@ const FormSortableList = (props: FormSortableListProps) => {
                 [styles.listDraggingOver]: droppableSnapshot.isDraggingOver,
               })}
               ref={droppableProvided.innerRef}
+              onMouseEnter={onMouseEnter}
+              onMouseLeave={onMouseLeave}
             >
               {value.map((option, index) => (
                 <Draggable
