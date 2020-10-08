@@ -1,6 +1,8 @@
+import FormFieldThemeTopicSelect from '@admin/components/form/FormFieldThemeTopicSelect';
 import useFormSubmit from '@admin/hooks/useFormSubmit';
 import { ExternalMethodology } from '@admin/services/dashboardService';
 import methodologyService from '@admin/services/methodologyService';
+import themeService from '@admin/services/themeService';
 import Button from '@common/components/Button';
 import ButtonGroup from '@common/components/ButtonGroup';
 import { FormFieldset, FormGroup } from '@common/components/form';
@@ -8,16 +10,18 @@ import Form from '@common/components/form/Form';
 import FormFieldRadioGroup from '@common/components/form/FormFieldRadioGroup';
 import FormFieldSelect from '@common/components/form/FormFieldSelect';
 import FormFieldTextInput from '@common/components/form/FormFieldTextInput';
+import LoadingSpinner from '@common/components/LoadingSpinner';
 import useAsyncHandledRetry from '@common/hooks/useAsyncHandledRetry';
 import { OmitStrict } from '@common/types';
 import { mapFieldErrors } from '@common/validation/serverValidations';
 import Yup from '@common/validation/yup';
 import { Formik } from 'formik';
 import orderBy from 'lodash/orderBy';
-import React, { ReactNode } from 'react';
+import React, { ReactNode, useMemo } from 'react';
 
 interface FormValues {
   title: string;
+  topicId?: string;
   teamName: string;
   teamEmail: string;
   contactName: string;
@@ -55,7 +59,6 @@ const errorMappings = [
     },
   }),
 ];
-
 interface Props {
   cancelButton?: ReactNode;
   id?: string;
@@ -69,9 +72,77 @@ const PublicationForm = ({
   initialValues,
   onSubmit,
 }: Props) => {
-  const { value: methodologies = [] } = useAsyncHandledRetry(
-    methodologyService.getMethodologies,
-  );
+  const {
+    value: methodologies = [],
+    isLoading: isMethodologiesLoading,
+  } = useAsyncHandledRetry(methodologyService.getMethodologies);
+
+  const {
+    value: themes = [],
+    isLoading: isThemesLoading,
+  } = useAsyncHandledRetry(themeService.getThemes);
+
+  const initialMethodologyChoice = useMemo<
+    FormValues['methodologyChoice']
+  >(() => {
+    if (initialValues?.methodologyId) {
+      return 'existing';
+    }
+
+    if (initialValues?.externalMethodology) {
+      return 'external';
+    }
+
+    return initialValues ? 'none' : 'existing';
+  }, [initialValues]);
+
+  const validationSchema = useMemo(() => {
+    const schema = Yup.object<FormValues>({
+      title: Yup.string().required('Enter a publication title'),
+      methodologyChoice: Yup.mixed<FormValues['methodologyChoice']>()
+        .oneOf(['external', 'existing', 'none'])
+        .required('Choose a methodology'),
+      methodologyId: Yup.string().when('methodologyChoice', {
+        is: 'existing',
+        then: Yup.string().required('Choose a methodology'),
+        otherwise: Yup.string(),
+      }),
+      externalMethodology: Yup.object<ExternalMethodology>().when(
+        'methodologyChoice',
+        {
+          is: 'external',
+          then: Yup.object().shape({
+            title: Yup.string().required(
+              'Enter an external methodology link title',
+            ),
+            url: Yup.string()
+              .required('Enter an external methodology URL')
+              .url('Enter a valid external methodology URL')
+              .test({
+                name: 'currentHostUrl',
+                message: 'External methodology URL cannot be for this website',
+                test: (value: string) =>
+                  Boolean(value && !value.includes(window.location.host)),
+              }),
+          }),
+        },
+      ),
+      teamName: Yup.string().required('Enter a team name'),
+      teamEmail: Yup.string()
+        .required('Enter a team email address')
+        .email('Enter a valid team email address'),
+      contactName: Yup.string().required('Enter a contact name'),
+      contactTelNo: Yup.string().required('Enter a contact telephone number'),
+    });
+
+    if (initialValues?.topicId) {
+      return schema.shape({
+        topicId: Yup.string().required('Choose a topic'),
+      });
+    }
+
+    return schema;
+  }, [initialValues?.topicId]);
 
   const handleSubmit = useFormSubmit(
     async ({
@@ -94,17 +165,9 @@ const PublicationForm = ({
     errorMappings,
   );
 
-  const initialMethodologyChoice = (): FormValues['methodologyChoice'] => {
-    if (initialValues?.methodologyId) {
-      return 'existing';
-    }
-
-    if (initialValues?.externalMethodology) {
-      return 'external';
-    }
-
-    return initialValues ? 'none' : 'existing';
-  };
+  if (isThemesLoading || isMethodologiesLoading) {
+    return <LoadingSpinner />;
+  }
 
   return (
     <Formik<FormValues>
@@ -122,46 +185,9 @@ const PublicationForm = ({
           contactName: '',
           contactTelNo: '',
         }),
-        methodologyChoice: initialMethodologyChoice(),
+        methodologyChoice: initialMethodologyChoice,
       }}
-      validationSchema={Yup.object<FormValues>({
-        title: Yup.string().required('Enter a publication title'),
-        methodologyChoice: Yup.mixed<FormValues['methodologyChoice']>()
-          .oneOf(['external', 'existing', 'none'])
-          .required('Choose a methodology'),
-        methodologyId: Yup.string().when('methodologyChoice', {
-          is: 'existing',
-          then: Yup.string().required('Choose a methodology'),
-          otherwise: Yup.string(),
-        }),
-        externalMethodology: Yup.object<ExternalMethodology>().when(
-          'methodologyChoice',
-          {
-            is: 'external',
-            then: Yup.object().shape({
-              title: Yup.string().required(
-                'Enter an external methodology link title',
-              ),
-              url: Yup.string()
-                .required('Enter an external methodology URL')
-                .url('Enter a valid external methodology URL')
-                .test({
-                  name: 'currentHostUrl',
-                  message:
-                    'External methodology URL cannot be for this website',
-                  test: (value: string) =>
-                    Boolean(value && !value.includes(window.location.host)),
-                }),
-            }),
-          },
-        ),
-        teamName: Yup.string().required('Enter a team name'),
-        teamEmail: Yup.string()
-          .required('Enter a team email address')
-          .email('Enter a valid team email address'),
-        contactName: Yup.string().required('Enter a contact name'),
-        contactTelNo: Yup.string().required('Enter a contact telephone number'),
-      })}
+      validationSchema={validationSchema}
       onSubmit={handleSubmit}
     >
       {form => (
@@ -172,6 +198,16 @@ const PublicationForm = ({
             name="title"
             className="govuk-!-width-two-thirds"
           />
+
+          {initialValues?.topicId && (
+            <FormFieldThemeTopicSelect<FormValues>
+              name="topicId"
+              legend="Choose a topic for this publication"
+              legendSize="m"
+              id={id}
+              themes={themes}
+            />
+          )}
 
           <FormFieldRadioGroup<FormValues, FormValues['methodologyChoice']>
             id={`${id}-methodologyChoice`}

@@ -6,7 +6,7 @@ import orderBy from 'lodash/orderBy';
 import React, { useMemo } from 'react';
 import styles from './FormThemeTopicSelect.module.scss';
 
-interface Props {
+export interface FormThemeTopicSelectProps {
   error?: string;
   id: string;
   hint?: string;
@@ -32,7 +32,7 @@ const FormThemeTopicSelect = ({
   topicId,
   topicInputName = 'topic',
   onChange,
-}: Props) => {
+}: FormThemeTopicSelectProps) => {
   const selectedTheme = useMemo<Theme | undefined>(() => {
     const matchingTheme = themes.find(theme =>
       theme.topics.find(topic => topic.id === topicId),
