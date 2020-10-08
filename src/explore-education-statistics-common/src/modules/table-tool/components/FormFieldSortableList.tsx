@@ -16,7 +16,7 @@ function FormFieldSortableList<FormValues>(props: Props<FormValues>) {
         return (
           <FormSortableList
             {...props}
-            {...field}
+            value={field.value}
             onChange={value => {
               form.setFieldValue(name as string, value);
             }}
