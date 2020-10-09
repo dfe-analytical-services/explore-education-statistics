@@ -19,12 +19,23 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.ViewModels
         public string Filename { get; set; }
         public string Name { get; set; }
         public string Content { get; set; }
-        public string Start { get; set; }
-        public string End { get; set; }
+        public MetaGuidanceSubjectTimePeriodsViewModel TimePeriods { get; set; }
         [JsonProperty (ItemConverterType = typeof(EnumToEnumValueJsonConverter<GeographicLevel>))]
         public List<GeographicLevel> GeographicLevels { get; set; }
     }
 
+    public class MetaGuidanceSubjectTimePeriodsViewModel
+    {
+        public string From { get;  }
+        public string To { get; }
+
+        public MetaGuidanceSubjectTimePeriodsViewModel(string from, string to)
+        {
+            From = from;
+            To = to;
+        }
+    }
+    
     public class MetaGuidanceUpdateReleaseViewModel
     {
         public string Content { get; set; }

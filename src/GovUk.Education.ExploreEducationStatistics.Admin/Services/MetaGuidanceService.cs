@@ -109,7 +109,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Services
                     {
                         var subject = releaseSubject.Subject;
                         var geographicLevels = await GetGeographicLevels(subject.Id);
-                        var (start, end) = await GetSubjectTimePeriods(subject.Id);
+                        var timePeriods = await GetSubjectTimePeriods(subject.Id);
                         return new MetaGuidanceSubjectViewModel
                         {
                             Id = subject.Id,
@@ -117,14 +117,13 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Services
                             Filename = dataFiles[subject.Id].Filename,
                             Name = subject.Name,
                             GeographicLevels = geographicLevels,
-                            Start = start,
-                            End = end
+                            TimePeriods = timePeriods
                         };
                     })
             )).ToList();
         }
 
-        private async Task<(string start, string end)> GetSubjectTimePeriods(Guid subjectId)
+        private async Task<MetaGuidanceSubjectTimePeriodsViewModel> GetSubjectTimePeriods(Guid subjectId)
         {
             var orderedObservations = _statisticsDbContext
                 .Observation
@@ -134,7 +133,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Services
 
             var first = await orderedObservations.FirstOrDefaultAsync();
             var last = await orderedObservations.LastOrDefaultAsync();
-            return (first?.GetTimePeriod(), last?.GetTimePeriod());
+            return new MetaGuidanceSubjectTimePeriodsViewModel(first?.GetTimePeriod(), last?.GetTimePeriod());
         }
 
         private async Task<List<GeographicLevel>> GetGeographicLevels(Guid subjectId)

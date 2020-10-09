@@ -206,8 +206,8 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
                 Assert.Equal("Version 1 Subject 1 Meta Guidance", version1Result.Right.Subjects[0].Content);
                 Assert.Equal("file1.csv", version1Result.Right.Subjects[0].Filename);
                 Assert.Equal("Subject 1", version1Result.Right.Subjects[0].Name);
-                Assert.Equal("2020_AYQ3", version1Result.Right.Subjects[0].Start);
-                Assert.Equal("2021_AYQ1", version1Result.Right.Subjects[0].End);
+                Assert.Equal("2020_AYQ3", version1Result.Right.Subjects[0].TimePeriods.From);
+                Assert.Equal("2021_AYQ1", version1Result.Right.Subjects[0].TimePeriods.To);
                 Assert.Equal(new List<GeographicLevel>
                 {
                     GeographicLevel.Country, GeographicLevel.LocalAuthority, GeographicLevel.LocalAuthorityDistrict
@@ -226,8 +226,8 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
                 Assert.Equal("Version 2 Subject 1 Meta Guidance", version2Result.Right.Subjects[0].Content);
                 Assert.Equal("file1.csv", version2Result.Right.Subjects[0].Filename);
                 Assert.Equal("Subject 1", version2Result.Right.Subjects[0].Name);
-                Assert.Equal("2020_AYQ3", version2Result.Right.Subjects[0].Start);
-                Assert.Equal("2021_AYQ1", version2Result.Right.Subjects[0].End);
+                Assert.Equal("2020_AYQ3", version2Result.Right.Subjects[0].TimePeriods.From);
+                Assert.Equal("2021_AYQ1", version2Result.Right.Subjects[0].TimePeriods.To);
                 Assert.Equal(new List<GeographicLevel>
                 {
                     GeographicLevel.Country, GeographicLevel.LocalAuthority, GeographicLevel.LocalAuthorityDistrict
@@ -237,8 +237,8 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
                 Assert.Equal("Version 2 Subject 2 Meta Guidance", version2Result.Right.Subjects[1].Content);
                 Assert.Equal("file2.csv", version2Result.Right.Subjects[1].Filename);
                 Assert.Equal("Subject 2", version2Result.Right.Subjects[1].Name);
-                Assert.Equal("2020_T3", version2Result.Right.Subjects[1].Start);
-                Assert.Equal("2021_T2", version2Result.Right.Subjects[1].End);
+                Assert.Equal("2020_T3", version2Result.Right.Subjects[1].TimePeriods.From);
+                Assert.Equal("2021_T2", version2Result.Right.Subjects[1].TimePeriods.To);
                 Assert.Equal(new List<GeographicLevel>
                 {
                     GeographicLevel.Country, GeographicLevel.Region
