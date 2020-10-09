@@ -41,13 +41,13 @@ export function generateTableTitle({
       : locations.map(location => location.label).sort(),
   )}`;
 
-  const filterString = commaList(
-    Object.values(filters)
-      .flatMap(filterGroup => filterGroup.options)
-      .map(filter => filter.label),
-  );
+  const filterList = Object.values(filters)
+    .flatMap(filterGroup => filterGroup.options)
+    .map(filter => filter.label)
+    .filter(label => label !== 'Total');
+  const filterString = filterList.length ? ` for ${commaList(filterList)}` : '';
 
-  return `Table showing ${indicatorString}'${subjectName}' for ${filterString} from '${publicationName}'${locationsString}${timePeriodString}`;
+  return `Table showing ${indicatorString}'${subjectName}'${filterString} from '${publicationName}'${locationsString}${timePeriodString}`;
 }
 
 interface Props extends FullTableMeta {
