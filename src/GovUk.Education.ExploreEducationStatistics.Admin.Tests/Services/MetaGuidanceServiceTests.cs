@@ -11,6 +11,10 @@ using GovUk.Education.ExploreEducationStatistics.Content.Model;
 using GovUk.Education.ExploreEducationStatistics.Content.Model.Database;
 using GovUk.Education.ExploreEducationStatistics.Data.Model;
 using GovUk.Education.ExploreEducationStatistics.Data.Model.Database;
+using GovUk.Education.ExploreEducationStatistics.Data.Model.Services;
+using GovUk.Education.ExploreEducationStatistics.Data.Model.Services.Interfaces;
+using Microsoft.Extensions.Logging;
+using Moq;
 using Xunit;
 using static GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services.DbUtils;
 using Release = GovUk.Education.ExploreEducationStatistics.Content.Model.Release;
@@ -58,6 +62,48 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
             {
                 Id = Guid.NewGuid(),
                 Name = "Subject 2"
+            };
+
+            var subject1Filter = new Filter
+            {
+                Subject = subject1,
+                Name = "subject1_filter",
+                Label = "Subject 1 Filter",
+                Hint = "Hint"
+            };
+
+            var subject2Filter = new Filter
+            {
+                Subject = subject2,
+                Name = "subject2_filter",
+                Label = "Subject 2 Filter",
+                Hint = null
+            };
+
+            var subject1IndicatorGroup = new IndicatorGroup
+            {
+                Subject = subject1,
+                Indicators = new List<Indicator>
+                {
+                    new Indicator
+                    {
+                        Name = "subject1_indicator",
+                        Label = "Subject 1 Indicator"
+                    }
+                }
+            };
+
+            var subject2IndicatorGroup = new IndicatorGroup
+            {
+                Subject = subject2,
+                Indicators = new List<Indicator>
+                {
+                    new Indicator
+                    {
+                        Name = "subject2_indicator",
+                        Label = "Subject 2 Indicator"
+                    }
+                }
             };
 
             // Version 1 has one Subject, Version 2 adds another Subject
@@ -182,6 +228,8 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
                 await statisticsDbContext.AddRangeAsync(subject1, subject2);
                 await statisticsDbContext.AddRangeAsync(releaseVersion1Subject1, releaseVersion2Subject1,
                     releaseVersion2Subject2);
+                await statisticsDbContext.AddRangeAsync(subject1Filter, subject2Filter);
+                await statisticsDbContext.AddRangeAsync(subject1IndicatorGroup, subject2IndicatorGroup);
                 await statisticsDbContext.AddRangeAsync(subject1Observation1, subject1Observation2,
                     subject1Observation3, subject2Observation1, subject2Observation2, subject2Observation3);
                 await statisticsDbContext.SaveChangesAsync();
@@ -212,6 +260,11 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
                 {
                     GeographicLevel.Country, GeographicLevel.LocalAuthority, GeographicLevel.LocalAuthorityDistrict
                 }, version1Result.Right.Subjects[0].GeographicLevels);
+                Assert.Equal(2, version1Result.Right.Subjects[0].Variables.Count);
+                Assert.Equal("Subject 1 Filter - Hint", version1Result.Right.Subjects[0].Variables[0].Label);
+                Assert.Equal("subject1_filter", version1Result.Right.Subjects[0].Variables[0].Value);
+                Assert.Equal("Subject 1 Indicator", version1Result.Right.Subjects[0].Variables[1].Label);
+                Assert.Equal("subject1_indicator", version1Result.Right.Subjects[0].Variables[1].Value);
 
                 // Assert version 2 has two Subjects with the correct content
                 var version2Result = await service.Get(contentReleaseVersion2.Id);
@@ -231,7 +284,12 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
                 Assert.Equal(new List<GeographicLevel>
                 {
                     GeographicLevel.Country, GeographicLevel.LocalAuthority, GeographicLevel.LocalAuthorityDistrict
-                }, version1Result.Right.Subjects[0].GeographicLevels);
+                }, version2Result.Right.Subjects[0].GeographicLevels);
+                Assert.Equal(2, version2Result.Right.Subjects[0].Variables.Count);
+                Assert.Equal("Subject 1 Filter - Hint", version2Result.Right.Subjects[0].Variables[0].Label);
+                Assert.Equal("subject1_filter", version2Result.Right.Subjects[0].Variables[0].Value);
+                Assert.Equal("Subject 1 Indicator", version2Result.Right.Subjects[0].Variables[1].Label);
+                Assert.Equal("subject1_indicator", version2Result.Right.Subjects[0].Variables[1].Value);
 
                 Assert.Equal(subject2.Id, version2Result.Right.Subjects[1].Id);
                 Assert.Equal("Version 2 Subject 2 Meta Guidance", version2Result.Right.Subjects[1].Content);
@@ -243,6 +301,11 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
                 {
                     GeographicLevel.Country, GeographicLevel.Region
                 }, version2Result.Right.Subjects[1].GeographicLevels);
+                Assert.Equal(2, version2Result.Right.Subjects[1].Variables.Count);
+                Assert.Equal("Subject 2 Filter", version2Result.Right.Subjects[1].Variables[0].Label);
+                Assert.Equal("subject2_filter", version2Result.Right.Subjects[1].Variables[0].Value);
+                Assert.Equal("Subject 2 Indicator", version2Result.Right.Subjects[1].Variables[1].Label);
+                Assert.Equal("subject2_indicator", version2Result.Right.Subjects[1].Variables[1].Value);
             }
         }
 
@@ -411,10 +474,10 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
                 // Update Subject 1 on version 2
                 var updateResult = await service.UpdateSubject(
                     contentReleaseVersion2.Id, subject1.Id, new MetaGuidanceUpdateSubjectViewModel
-                {
-                    Content = "Version 2 Subject 1 Meta Guidance Updated"
-                });
-                
+                    {
+                        Content = "Version 2 Subject 1 Meta Guidance Updated"
+                    });
+
                 // Assert only one Subject has been updated
 
                 Assert.True(updateResult.IsRight);
@@ -453,12 +516,17 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
             ContentDbContext contentDbContext,
             StatisticsDbContext statisticsDbContext,
             IPersistenceHelper<ContentDbContext> contentPersistenceHelper = null,
+            IFilterService filterService = null,
+            IIndicatorService indicatorService = null,
             IPersistenceHelper<StatisticsDbContext> statisticsPersistenceHelper = null,
             IUserService userService = null)
         {
             return new MetaGuidanceService(
                 contentDbContext,
                 contentPersistenceHelper ?? new PersistenceHelper<ContentDbContext>(contentDbContext),
+                filterService ?? new FilterService(statisticsDbContext, new Mock<ILogger<FilterService>>().Object),
+                indicatorService ??
+                new IndicatorService(statisticsDbContext, new Mock<ILogger<IndicatorService>>().Object),
                 statisticsDbContext,
                 statisticsPersistenceHelper ?? new PersistenceHelper<StatisticsDbContext>(statisticsDbContext),
                 userService ?? MockUtils.AlwaysTrueUserService().Object

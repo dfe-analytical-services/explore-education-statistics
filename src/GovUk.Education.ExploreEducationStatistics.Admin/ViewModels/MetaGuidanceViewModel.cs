@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
 using GovUk.Education.ExploreEducationStatistics.Common.Converters;
+using GovUk.Education.ExploreEducationStatistics.Common.Model;
 using GovUk.Education.ExploreEducationStatistics.Common.Model.Data;
 using Newtonsoft.Json;
 
@@ -22,6 +23,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.ViewModels
         public MetaGuidanceSubjectTimePeriodsViewModel TimePeriods { get; set; }
         [JsonProperty (ItemConverterType = typeof(EnumToEnumValueJsonConverter<GeographicLevel>))]
         public List<GeographicLevel> GeographicLevels { get; set; }
+        public List<LabelValue> Variables { get; set; }
     }
 
     public class MetaGuidanceSubjectTimePeriodsViewModel

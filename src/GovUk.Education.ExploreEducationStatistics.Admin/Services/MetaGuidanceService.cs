@@ -12,6 +12,7 @@ using GovUk.Education.ExploreEducationStatistics.Common.Utils;
 using GovUk.Education.ExploreEducationStatistics.Content.Model.Database;
 using GovUk.Education.ExploreEducationStatistics.Data.Model;
 using GovUk.Education.ExploreEducationStatistics.Data.Model.Database;
+using GovUk.Education.ExploreEducationStatistics.Data.Model.Services.Interfaces;
 using GovUk.Education.ExploreEducationStatistics.Data.Services.Extensions;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
@@ -23,18 +24,24 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Services
     {
         private readonly ContentDbContext _contentDbContext;
         private readonly IPersistenceHelper<ContentDbContext> _contentPersistenceHelper;
+        private readonly IFilterService _filterService;
+        private readonly IIndicatorService _indicatorService;
         private readonly StatisticsDbContext _statisticsDbContext;
         private readonly IPersistenceHelper<StatisticsDbContext> _statisticsPersistenceHelper;
         private readonly IUserService _userService;
 
         public MetaGuidanceService(ContentDbContext contentDbContext,
             IPersistenceHelper<ContentDbContext> contentPersistenceHelper,
+            IFilterService filterService,
+            IIndicatorService indicatorService,
             StatisticsDbContext statisticsDbContext,
             IPersistenceHelper<StatisticsDbContext> statisticsPersistenceHelper,
             IUserService userService)
         {
             _contentDbContext = contentDbContext;
             _contentPersistenceHelper = contentPersistenceHelper;
+            _filterService = filterService;
+            _indicatorService = indicatorService;
             _statisticsDbContext = statisticsDbContext;
             _statisticsPersistenceHelper = statisticsPersistenceHelper;
             _userService = userService;
@@ -109,7 +116,8 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Services
                     {
                         var subject = releaseSubject.Subject;
                         var geographicLevels = await GetGeographicLevels(subject.Id);
-                        var timePeriods = await GetSubjectTimePeriods(subject.Id);
+                        var timePeriods = await GetTimePeriods(subject.Id);
+                        var variables = GetVariables(subject.Id);
                         return new MetaGuidanceSubjectViewModel
                         {
                             Id = subject.Id,
@@ -117,13 +125,14 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Services
                             Filename = dataFiles[subject.Id].Filename,
                             Name = subject.Name,
                             GeographicLevels = geographicLevels,
-                            TimePeriods = timePeriods
+                            TimePeriods = timePeriods,
+                            Variables = variables
                         };
                     })
             )).ToList();
         }
 
-        private async Task<MetaGuidanceSubjectTimePeriodsViewModel> GetSubjectTimePeriods(Guid subjectId)
+        private async Task<MetaGuidanceSubjectTimePeriodsViewModel> GetTimePeriods(Guid subjectId)
         {
             var orderedObservations = _statisticsDbContext
                 .Observation
@@ -144,6 +153,23 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Services
                 .Select(observation => observation.GeographicLevel)
                 .Distinct()
                 .ToListAsync();
+        }
+
+        private List<LabelValue> GetVariables(Guid subjectId)
+        {
+            var filters = _filterService.FindMany(filter => filter.SubjectId == subjectId)
+                .Select(filter =>
+                    new LabelValue(
+                        string.IsNullOrWhiteSpace(filter.Hint) ? filter.Label : $"{filter.Label} - {filter.Hint}",
+                        filter.Name))
+                .ToList();
+
+            var indicators = _indicatorService.GetIndicators(subjectId)
+                .Select(indicator => new LabelValue(indicator.Label, indicator.Name));
+
+            return filters.Concat(indicators)
+                .OrderBy(labelValue => labelValue.Value)
+                .ToList();
         }
 
         private static MetaGuidanceViewModel BuildViewModel(Release release,
