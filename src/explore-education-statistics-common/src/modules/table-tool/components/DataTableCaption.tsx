@@ -42,9 +42,9 @@ export function generateTableTitle({
   )}`;
 
   const filterString = commaList(
-    Object.keys(filters).flatMap(value =>
-      filters[value].options.flatMap(value1 => value1.label),
-    ),
+    Object.values(filters)
+      .flatMap(filterGroup => filterGroup.options)
+      .map(filter => filter.label),
   );
 
   return `Table showing ${indicatorString}'${subjectName}' for ${filterString} from '${publicationName}'${locationsString}${timePeriodString}`;
