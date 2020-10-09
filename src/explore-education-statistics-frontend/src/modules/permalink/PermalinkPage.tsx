@@ -1,4 +1,5 @@
 import FormattedDate from '@common/components/FormattedDate';
+import WarningMessage from '@common/components/WarningMessage';
 import DownloadCsvButton from '@common/modules/table-tool/components/DownloadCsvButton';
 import DownloadExcelButton from '@common/modules/table-tool/components/DownloadExcelButton';
 import TimePeriodDataTable from '@common/modules/table-tool/components/TimePeriodDataTable';
@@ -37,27 +38,30 @@ const PermalinkPage: NextPage<Props> = ({ data }) => {
         { name: 'Permanent link', link: '/data-tables' },
       ]}
     >
-      <div className="govuk-grid-row">
-        <div className="govuk-grid-column-two-thirds">
-          <dl className="dfe-meta-content govuk-!-margin-bottom-9">
-            <dt className="govuk-caption-m">Created: </dt>
-            <dd data-testid="created-date">
-              <strong>
-                <FormattedDate>{data.created}</FormattedDate>
-              </strong>
-            </dd>
-          </dl>
-        </div>
-        <div className="govuk-grid-column-one-third">
-          <PrintThisPage
-            className="dfe-align--centre govuk-!-margin-top-0"
-            analytics={{
-              category: 'Page print',
-              action: 'Print this page link selected',
-            }}
-          />
-        </div>
+      <div className="dfe-flex dfe-justify-content--space-between">
+        <dl className="dfe-meta-content">
+          <dt className="govuk-caption-m">Created: </dt>
+          <dd data-testid="created-date">
+            <strong>
+              <FormattedDate>{data.created}</FormattedDate>
+            </strong>
+          </dd>
+        </dl>
+
+        <PrintThisPage
+          analytics={{
+            category: 'Page print',
+            action: 'Print this page link selected',
+          }}
+        />
       </div>
+
+      {data.invalidated && (
+        <WarningMessage error>
+          WARNING - The data used in this permalink may be out-of-date.
+        </WarningMessage>
+      )}
+
       <div ref={tableRef}>
         <TimePeriodDataTable
           fullTable={fullTable}
