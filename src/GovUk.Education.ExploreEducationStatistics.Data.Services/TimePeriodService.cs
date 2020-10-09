@@ -5,6 +5,7 @@ using GovUk.Education.ExploreEducationStatistics.Common.Model;
 using GovUk.Education.ExploreEducationStatistics.Data.Model;
 using GovUk.Education.ExploreEducationStatistics.Data.Model.Database;
 using GovUk.Education.ExploreEducationStatistics.Data.Services.Interfaces;
+using Microsoft.EntityFrameworkCore;
 
 namespace GovUk.Education.ExploreEducationStatistics.Data.Services
 {
@@ -25,6 +26,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Services
                 .Distinct()
                 .OrderBy(tuple => tuple.Year)
                 .ThenBy(tuple => tuple.TimeIdentifier)
+                .AsNoTracking()
                 .ToList()
                 .Select(tuple => (tuple.Year, tuple.TimeIdentifier));
         }
@@ -53,6 +55,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Services
                 .Distinct()
                 .OrderBy(tuple => tuple.Year)
                 .ThenBy(tuple => tuple.TimeIdentifier)
+                .AsNoTracking()
                 .ToList()
                 .Select(tuple => (tuple.Year, tuple.TimeIdentifier));
         }
