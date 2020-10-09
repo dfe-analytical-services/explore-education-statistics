@@ -132,9 +132,9 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Services
                 .OrderBy(observation => observation.Year)
                 .ThenBy(observation => observation.TimeIdentifier);
 
-            var first = await orderedObservations.FirstAsync();
-            var last = await orderedObservations.LastAsync();
-            return (first.GetTimePeriod(), last.GetTimePeriod());
+            var first = await orderedObservations.FirstOrDefaultAsync();
+            var last = await orderedObservations.LastOrDefaultAsync();
+            return (first?.GetTimePeriod(), last?.GetTimePeriod());
         }
 
         private async Task<List<GeographicLevel>> GetGeographicLevels(Guid subjectId)
