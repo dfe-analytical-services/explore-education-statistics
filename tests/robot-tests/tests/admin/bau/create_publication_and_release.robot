@@ -1,16 +1,27 @@
 *** Settings ***
 Resource    ../../libs/admin-common.robot
+Library  ../../libs/admin_api.py
 
 Force Tags  Admin  Local  Dev  AltersData
 
 Suite Setup       user signs in as bau1
-Suite Teardown    user closes the browser
+Suite Teardown    teardown suite
 
 *** Variables ***
 ${THEME_NAME}        %{TEST_THEME_NAME}
 ${TOPIC_NAME}        %{TEST_TOPIC_NAME}
 ${PUBLICATION_NAME}  UI tests - create publication %{RUN_IDENTIFIER}
 ${METHODOLOGY_NAME}  UI test methodology
+
+${CREATED_THEME_ID}    ${EMPTY}
+${CREATED_THEME_NAME}  UI test theme - create publication %{RUN_IDENTIFIER}
+${CREATED_TOPIC_NAME}  UI test topic - create publication %{RUN_IDENTIFIER}
+
+*** Keywords ***
+
+teardown suite
+    run keyword if  "${CREATED_THEME_ID}" != ""  user deletes theme via api  ${CREATED_THEME_ID}
+    user closes the browser
 
 *** Test Cases ***
 Create approved 'Test methodology'
@@ -68,6 +79,12 @@ Verify that new publication has been created
     user checks testid element contains  Methodology for ${PUBLICATION_NAME} (created)  No methodology assigned
     user checks testid element contains  Releases for ${PUBLICATION_NAME} (created)  No releases created
 
+Create new test theme and topic
+    [Tags]  HappyPath
+    ${theme_id}=  user creates theme via api  ${CREATED_THEME_NAME}
+    ${topic_id}=  user creates topic via api  ${CREATED_TOPIC_NAME}  ${theme_id}
+    set suite variable  ${CREATED_THEME_ID}  ${theme_id}
+
 Go to edit publication
     [Tags]  HappyPath
     user clicks testid element  Edit publication link for ${PUBLICATION_NAME} (created)
@@ -77,6 +94,8 @@ Go to edit publication
 Update publication
     [Tags]  HappyPath
     user enters text into element  id:publicationForm-title  ${PUBLICATION_NAME}
+    user selects from list by label  id:publicationForm-themeId  ${CREATED_THEME_NAME}
+    user selects from list by label  id:publicationForm-topicId  ${CREATED_TOPIC_NAME}
     user clicks radio  Choose an existing methodology
     user waits until page contains element  xpath://option[text()="${METHODOLOGY_NAME} [Approved]"]
     user selects from list by label  id:publicationForm-methodologyId   ${METHODOLOGY_NAME} [Approved]
@@ -89,7 +108,7 @@ Update publication
 Verify publication has been updated
     [Tags]  HappyPath
     user waits until h1 is visible  Dashboard
-    user selects theme and topic from admin dashboard  ${THEME_NAME}  ${TOPIC_NAME}
+    user selects theme and topic from admin dashboard  ${CREATED_THEME_NAME}  ${CREATED_TOPIC_NAME}
     user waits until page contains accordion section   ${PUBLICATION_NAME}
     user opens accordion section  ${PUBLICATION_NAME}
     user checks testid element contains  Team name for ${PUBLICATION_NAME}  Special educational needs statistics team

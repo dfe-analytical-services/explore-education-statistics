@@ -9,7 +9,7 @@ Suite Teardown    user closes the browser
 *** Test Cases ***
 Validate Analyst1 can see correct themes and topics
     [Tags]  HappyPath
-    user selects theme "Pupils and schools" and topic "Pupil absence" from the admin dashboard
+    user selects theme and topic from admin dashboard  Pupils and schools  Pupil absence
     user waits until page contains accordion section  Pupil absence in schools in England     60
 
     user checks list contains label   id:publicationsReleases-themeTopic-themeId  Pupils and schools

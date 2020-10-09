@@ -48,6 +48,20 @@ class AdminClient:
 admin_client = AdminClient()
 
 
+def user_creates_theme_via_api(title: str, summary: str = '') -> str:
+    assert title
+
+    resp = admin_client.post(f'/api/themes', {
+        'title': title,
+        'summary': summary
+    })
+
+    assert resp.status_code == 200, \
+        f'Could not delete theme! Responded with {resp.status_code} and {resp.text}'
+
+    return resp.json()['id']
+
+
 def user_deletes_theme_via_api(theme_id: str):
     assert theme_id
 
@@ -55,6 +69,20 @@ def user_deletes_theme_via_api(theme_id: str):
 
     assert resp.status_code == 204, \
         f'Could not delete theme! Responded with {resp.status_code} and {resp.text}'
+
+
+def user_creates_topic_via_api(title: str, theme_id: str) -> str:
+    assert title
+
+    resp = admin_client.post(f'/api/topics', {
+        'title': title,
+        'themeId': theme_id
+    })
+
+    assert resp.status_code == 200, \
+        f'Could not delete theme! Responded with {resp.status_code} and {resp.text}'
+
+    return resp.json()['id']
 
 
 def user_triggers_release_on_demand(release_id: str):
