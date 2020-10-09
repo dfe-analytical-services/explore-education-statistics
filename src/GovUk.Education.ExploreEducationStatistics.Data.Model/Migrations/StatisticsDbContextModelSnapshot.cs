@@ -416,6 +416,9 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Model.Migrations
                     b.Property<Guid>("SubjectId")
                         .HasColumnType("uniqueidentifier");
 
+                    b.Property<string>("MetaGuidance")
+                        .HasColumnType("nvarchar(max)");
+
                     b.HasKey("ReleaseId", "SubjectId");
 
                     b.HasIndex("SubjectId");
@@ -456,9 +459,6 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Model.Migrations
                     b.Property<Guid>("Id")
                         .ValueGeneratedOnAdd()
                         .HasColumnType("uniqueidentifier");
-
-                    b.Property<string>("MetaGuidance")
-                        .HasColumnType("nvarchar(max)");
 
                     b.Property<string>("Name")
                         .HasColumnType("nvarchar(max)");

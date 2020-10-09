@@ -276,6 +276,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin
             services.AddTransient<IIndicatorGroupService, IndicatorGroupService>();
             services.AddTransient<IIndicatorService, IndicatorService>();
             services.AddTransient<ILocationService, LocationService>();
+            services.AddTransient<IMetaGuidanceService, MetaGuidanceService>();
             services.AddTransient<IObservationService, ObservationService>();
             services.AddTransient<IReleaseMetaService, ReleaseMetaService>();
             services.AddTransient<IReleaseNoteService, ReleaseNoteService>();

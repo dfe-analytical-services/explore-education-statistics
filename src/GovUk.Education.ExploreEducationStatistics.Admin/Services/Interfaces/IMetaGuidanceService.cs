@@ -10,7 +10,11 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Services.Interfaces
     {
         public Task<Either<ActionResult, MetaGuidanceViewModel>> Get(Guid releaseId);
 
-        public Task<Either<ActionResult, MetaGuidanceViewModel>> Update(Guid releaseId,
-            MetaGuidanceUpdateViewModel request);
+        public Task<Either<ActionResult, MetaGuidanceViewModel>> UpdateRelease(Guid releaseId,
+            MetaGuidanceUpdateReleaseViewModel request);
+
+        public Task<Either<ActionResult, MetaGuidanceViewModel>> UpdateSubject(Guid releaseId,
+            Guid subjectId,
+            MetaGuidanceUpdateSubjectViewModel request);
     }
 }

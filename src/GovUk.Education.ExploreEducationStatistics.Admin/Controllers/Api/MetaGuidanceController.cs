@@ -8,8 +8,8 @@ using Microsoft.AspNetCore.Mvc;
 
 namespace GovUk.Education.ExploreEducationStatistics.Admin.Controllers.Api
 {
-    // TODO remove this
-    [AllowAnonymous]
+    [Route("api")]
+    [Authorize]
     [ApiController]
     public class MetaGuidanceController : ControllerBase
     {
@@ -20,17 +20,27 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Controllers.Api
             _metaGuidanceService = metaGuidanceService;
         }
 
-        [HttpGet("meta-guidance/{releaseId}")]
+        [HttpGet("release/{releaseId}/meta-guidance")]
         public async Task<ActionResult<MetaGuidanceViewModel>> Get(Guid releaseId)
         {
             return await _metaGuidanceService.Get(releaseId)
                 .HandleFailuresOrOk();
         }
 
-        [HttpPut("meta-guidance/{releaseId}")]
-        public async Task<ActionResult<MetaGuidanceViewModel>> Update(Guid releaseId, MetaGuidanceUpdateViewModel request)
+        [HttpPut("release/{releaseId}/meta-guidance")]
+        public async Task<ActionResult<MetaGuidanceViewModel>> UpdateRelease(Guid releaseId,
+            MetaGuidanceUpdateReleaseViewModel request)
         {
-            return await _metaGuidanceService.Update(releaseId, request)
+            return await _metaGuidanceService.UpdateRelease(releaseId, request)
+                .HandleFailuresOrOk();
+        }
+
+        [HttpPut("release/{releaseId}/meta-guidance/subject/{subjectId}")]
+        public async Task<ActionResult<MetaGuidanceViewModel>> UpdateSubject(Guid releaseId,
+            Guid subjectId,
+            MetaGuidanceUpdateSubjectViewModel request)
+        {
+            return await _metaGuidanceService.UpdateSubject(releaseId, subjectId, request)
                 .HandleFailuresOrOk();
         }
     }

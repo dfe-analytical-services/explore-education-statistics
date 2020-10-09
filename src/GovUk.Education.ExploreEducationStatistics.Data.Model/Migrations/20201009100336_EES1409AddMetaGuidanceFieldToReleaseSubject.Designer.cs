@@ -10,8 +10,8 @@ using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 namespace GovUk.Education.ExploreEducationStatistics.Data.Model.Migrations
 {
     [DbContext(typeof(StatisticsDbContext))]
-    [Migration("20201008103731_EES1409AddMetaGuidanceFieldToSubject")]
-    partial class EES1409AddMetaGuidanceFieldToSubject
+    [Migration("20201009100336_EES1409AddMetaGuidanceFieldToReleaseSubject")]
+    partial class EES1409AddMetaGuidanceFieldToReleaseSubject
     {
         protected override void BuildTargetModel(ModelBuilder modelBuilder)
         {
@@ -418,6 +418,9 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Model.Migrations
                     b.Property<Guid>("SubjectId")
                         .HasColumnType("uniqueidentifier");
 
+                    b.Property<string>("MetaGuidance")
+                        .HasColumnType("nvarchar(max)");
+
                     b.HasKey("ReleaseId", "SubjectId");
 
                     b.HasIndex("SubjectId");
@@ -458,9 +461,6 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Model.Migrations
                     b.Property<Guid>("Id")
                         .ValueGeneratedOnAdd()
                         .HasColumnType("uniqueidentifier");
-
-                    b.Property<string>("MetaGuidance")
-                        .HasColumnType("nvarchar(max)");
 
                     b.Property<string>("Name")
                         .HasColumnType("nvarchar(max)");
