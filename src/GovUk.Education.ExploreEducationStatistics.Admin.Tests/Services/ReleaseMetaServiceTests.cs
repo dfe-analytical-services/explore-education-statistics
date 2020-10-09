@@ -2,6 +2,8 @@
 using System.Threading.Tasks;
 using GovUk.Education.ExploreEducationStatistics.Admin.Services;
 using GovUk.Education.ExploreEducationStatistics.Common.Model;
+using GovUk.Education.ExploreEducationStatistics.Common.Services;
+using GovUk.Education.ExploreEducationStatistics.Common.Services.Interfaces;
 using GovUk.Education.ExploreEducationStatistics.Common.Services.Interfaces.Security;
 using GovUk.Education.ExploreEducationStatistics.Common.Utils;
 using GovUk.Education.ExploreEducationStatistics.Content.Model;
@@ -32,48 +34,146 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
                 Id = releaseId
             };
 
-            var subject1 = new Subject
-            {
-                Id = Guid.NewGuid(),
-                Name = "Subject 1"
-            };
-
-            var subject2 = new Subject
-            {
-                Id = Guid.NewGuid(),
-                Name = "Subject 2"
-            };
-
-            var subject2Replacement = new Subject
-            {
-                Id = Guid.NewGuid(),
-                Name = "Subject 2 Replacement"
-            };
-
             var releaseSubject1 = new ReleaseSubject
             {
                 Release = statisticsRelease,
-                Subject = subject1
+                Subject = new Subject
+                {
+                    Id = Guid.NewGuid(),
+                    Name = "Subject 1"
+                }
             };
 
             var releaseSubject2 = new ReleaseSubject
             {
                 Release = statisticsRelease,
-                Subject = subject2
+                Subject = new Subject
+                {
+                    Id = Guid.NewGuid(),
+                    Name = "Subject 2"
+                }
+            };
+
+            var releaseFile1 = new ReleaseFile
+            {
+                Release = contentRelease,
+                ReleaseFileReference = new ReleaseFileReference
+                {
+                    Release = contentRelease,
+                    Filename = "data1.csv",
+                    ReleaseFileType = ReleaseFileTypes.Data,
+                    SubjectId = releaseSubject1.Subject.Id
+                }
+            };
+
+            var releaseFile2 = new ReleaseFile
+            {
+                Release = contentRelease,
+                ReleaseFileReference = new ReleaseFileReference
+                {
+                    Release = contentRelease,
+                    Filename = "data2.csv",
+                    ReleaseFileType = ReleaseFileTypes.Data,
+                    SubjectId = releaseSubject2.Subject.Id,
+                }
+            };
+
+            var contentDbContextId = Guid.NewGuid().ToString();
+            var statisticsDbContextId = Guid.NewGuid().ToString();
+
+            await using (var contentDbContext = InMemoryApplicationDbContext(contentDbContextId))
+            {
+                await contentDbContext.AddAsync(contentRelease);
+                await contentDbContext.AddRangeAsync(releaseFile1, releaseFile2);
+                await contentDbContext.SaveChangesAsync();
+            }
+
+            await using (var statisticsDbContext = InMemoryStatisticsDbContext(statisticsDbContextId))
+            {
+                await statisticsDbContext.AddRangeAsync(releaseSubject1, releaseSubject2);
+                await statisticsDbContext.SaveChangesAsync();
+            }
+
+            await using (var contentDbContext = InMemoryApplicationDbContext(contentDbContextId))
+            await using (var statisticsDbContext = InMemoryStatisticsDbContext(statisticsDbContextId))
+            {
+                var importStatusService = new Mock<IImportStatusService>();
+
+                importStatusService
+                    .Setup(s => s.GetImportStatus(It.IsAny<Guid>(), It.IsAny<string>()))
+                    .ReturnsAsync(
+                        new ImportStatus()
+                        {
+                            Status = IStatus.COMPLETE
+                        }
+                    );
+
+                var replacementService = BuildReleaseMetaService(
+                    contentDbContext: contentDbContext,
+                    statisticsDbContext: statisticsDbContext,
+                    importStatusService: importStatusService.Object
+                );
+
+                var result = await replacementService.GetSubjects(contentRelease.Id);
+
+                Assert.True(result.IsRight);
+
+                Assert.Equal(contentRelease.Id, result.Right.ReleaseId);
+
+                var subjects = result.Right.Subjects;
+
+                Assert.NotNull(subjects);
+                Assert.Equal(2, subjects.Count);
+                Assert.Equal(releaseSubject1.Subject.Id, subjects[0].Id);
+                Assert.Equal(releaseSubject1.Subject.Name, subjects[0].Label);
+                Assert.Equal(releaseSubject2.Subject.Id, subjects[1].Id);
+                Assert.Equal(releaseSubject2.Subject.Name, subjects[1].Label);
+            }
+        }
+
+        [Fact]
+        public async Task GetSubjects_FiltersPendingReplacementSubjects()
+        {
+            var releaseId = Guid.NewGuid();
+
+            var contentRelease = new Release
+            {
+                Id = releaseId
+            };
+
+            var statisticsRelease = new Data.Model.Release
+            {
+                Id = releaseId
+            };
+
+            var releaseSubject1 = new ReleaseSubject
+            {
+                Release = statisticsRelease,
+                Subject = new Subject
+                {
+                    Id = Guid.NewGuid(),
+                    Name = "Subject 1"
+                }
+            };
+
+            var releaseSubject2 = new ReleaseSubject
+            {
+                Release = statisticsRelease,
+                Subject = new Subject
+                {
+                    Id = Guid.NewGuid(),
+                    Name = "Subject 2"
+                }
             };
 
             var releaseSubject2Replacement = new ReleaseSubject
             {
                 Release = statisticsRelease,
-                Subject = subject2Replacement
-            };
-
-            var file1 = new ReleaseFileReference
-            {
-                Release = contentRelease,
-                Filename = "data1.csv",
-                ReleaseFileType = ReleaseFileTypes.Data,
-                SubjectId = subject1.Id
+                Subject = new Subject
+                {
+                    Id = Guid.NewGuid(),
+                    Name = "Subject 2 Replacement"
+                }
             };
 
             var file2 = new ReleaseFileReference
@@ -81,7 +181,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
                 Release = contentRelease,
                 Filename = "data2.csv",
                 ReleaseFileType = ReleaseFileTypes.Data,
-                SubjectId = subject2.Id,
+                SubjectId = releaseSubject2.Subject.Id,
             };
 
             var file2Replacement = new ReleaseFileReference
@@ -89,7 +189,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
                 Release = contentRelease,
                 Filename = "data2_replacement.csv",
                 ReleaseFileType = ReleaseFileTypes.Data,
-                SubjectId = subject2Replacement.Id,
+                SubjectId =  releaseSubject2Replacement.Subject.Id,
                 Replacing = file2
             };
 
@@ -98,7 +198,13 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
             var releaseFile1 = new ReleaseFile
             {
                 Release = contentRelease,
-                ReleaseFileReference = file1
+                ReleaseFileReference = new ReleaseFileReference
+                {
+                    Release = contentRelease,
+                    Filename = "data1.csv",
+                    ReleaseFileType = ReleaseFileTypes.Data,
+                    SubjectId = releaseSubject1.Subject.Id
+                }
             };
 
             var releaseFile2 = new ReleaseFile
@@ -119,14 +225,12 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
             await using (var contentDbContext = InMemoryApplicationDbContext(contentDbContextId))
             {
                 await contentDbContext.AddAsync(contentRelease);
-                await contentDbContext.AddRangeAsync(file1, file2, file2Replacement);
                 await contentDbContext.AddRangeAsync(releaseFile1, releaseFile2, releaseFile2Replacement);
                 await contentDbContext.SaveChangesAsync();
             }
 
             await using (var statisticsDbContext = InMemoryStatisticsDbContext(statisticsDbContextId))
             {
-                await statisticsDbContext.AddRangeAsync(subject1, subject2, subject2Replacement);
                 await statisticsDbContext.AddRangeAsync(releaseSubject1, releaseSubject2, releaseSubject2Replacement);
                 await statisticsDbContext.SaveChangesAsync();
             }
@@ -134,8 +238,22 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
             await using (var contentDbContext = InMemoryApplicationDbContext(contentDbContextId))
             await using (var statisticsDbContext = InMemoryStatisticsDbContext(statisticsDbContextId))
             {
-                var replacementService = BuildReleaseMetaService(contentDbContext: contentDbContext,
-                    statisticsDbContext: statisticsDbContext);
+                var importStatusService = new Mock<IImportStatusService>();
+
+                importStatusService
+                    .Setup(s => s.GetImportStatus(It.IsAny<Guid>(), It.IsAny<string>()))
+                    .ReturnsAsync(
+                        new ImportStatus()
+                        {
+                            Status = IStatus.COMPLETE
+                        }
+                    );
+
+                var replacementService = BuildReleaseMetaService(
+                    contentDbContext: contentDbContext,
+                    statisticsDbContext: statisticsDbContext,
+                    importStatusService: importStatusService.Object
+                );
 
                 var result = await replacementService.GetSubjects(contentRelease.Id);
 
@@ -147,10 +265,130 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
 
                 Assert.NotNull(subjects);
                 Assert.Equal(2, subjects.Count);
-                Assert.Equal(subject1.Id, subjects[0].Id);
-                Assert.Equal(subject1.Name, subjects[0].Label);
-                Assert.Equal(subject2.Id, subjects[1].Id);
-                Assert.Equal(subject2.Name, subjects[1].Label);
+                Assert.Equal(releaseSubject1.Subject.Id, subjects[0].Id);
+                Assert.Equal(releaseSubject1.Subject.Name, subjects[0].Label);
+                Assert.Equal(releaseSubject2.Subject.Id, subjects[1].Id);
+                Assert.Equal(releaseSubject2.Subject.Name, subjects[1].Label);
+            }
+        }
+
+        [Fact]
+        public async Task GetSubjects_FiltersImportingSubjects()
+        {
+            var releaseId = Guid.NewGuid();
+
+            var contentRelease = new Release
+            {
+                Id = releaseId
+            };
+
+            var statisticsRelease = new Data.Model.Release
+            {
+                Id = releaseId
+            };
+
+            var releaseSubject1 = new ReleaseSubject
+            {
+                Release = statisticsRelease,
+                Subject = new Subject
+                {
+                    Id = Guid.NewGuid(),
+                    Name = "Subject 1"
+                }
+            };
+
+            var releaseSubject2 = new ReleaseSubject
+            {
+                Release = statisticsRelease,
+                Subject = new Subject
+                {
+                    Id = Guid.NewGuid(),
+                    Name = "Subject 2"
+                }
+            };
+
+            var releaseFile1 = new ReleaseFile
+            {
+                Release = contentRelease,
+                ReleaseFileReference = new ReleaseFileReference
+                {
+                    Release = contentRelease,
+                    Filename = "data1.csv",
+                    ReleaseFileType = ReleaseFileTypes.Data,
+                    SubjectId = releaseSubject1.Subject.Id
+                }
+            };
+
+            var releaseFile2 = new ReleaseFile
+            {
+                Release = contentRelease,
+                ReleaseFileReference = new ReleaseFileReference
+                {
+                    Release = contentRelease,
+                    Filename = "data2.csv",
+                    ReleaseFileType = ReleaseFileTypes.Data,
+                    SubjectId = releaseSubject2.Subject.Id,
+                }
+            };
+
+            var contentDbContextId = Guid.NewGuid().ToString();
+            var statisticsDbContextId = Guid.NewGuid().ToString();
+
+            await using (var contentDbContext = InMemoryApplicationDbContext(contentDbContextId))
+            {
+                await contentDbContext.AddAsync(contentRelease);
+                await contentDbContext.AddRangeAsync(releaseFile1, releaseFile2);
+                await contentDbContext.SaveChangesAsync();
+            }
+
+            await using (var statisticsDbContext = InMemoryStatisticsDbContext(statisticsDbContextId))
+            {
+                await statisticsDbContext.AddRangeAsync(releaseSubject1, releaseSubject2);
+                await statisticsDbContext.SaveChangesAsync();
+            }
+
+            await using (var contentDbContext = InMemoryApplicationDbContext(contentDbContextId))
+            await using (var statisticsDbContext = InMemoryStatisticsDbContext(statisticsDbContextId))
+            {
+                var importStatusService = new Mock<IImportStatusService>();
+
+                importStatusService
+                    .Setup(s =>
+                        s.GetImportStatus(releaseSubject1.ReleaseId, releaseFile1.ReleaseFileReference.Filename))
+                    .ReturnsAsync(
+                        new ImportStatus()
+                        {
+                            Status = IStatus.RUNNING_PHASE_1
+                        }
+                    );
+
+                importStatusService
+                    .Setup(s =>
+                        s.GetImportStatus(releaseSubject2.ReleaseId, releaseFile2.ReleaseFileReference.Filename))
+                    .ReturnsAsync(
+                        new ImportStatus()
+                        {
+                            Status = IStatus.COMPLETE
+                        }
+                    );
+
+                var replacementService = BuildReleaseMetaService(
+                    contentDbContext: contentDbContext,
+                    statisticsDbContext: statisticsDbContext,
+                    importStatusService: importStatusService.Object
+                );
+
+                var result = await replacementService.GetSubjects(contentRelease.Id);
+
+                Assert.True(result.IsRight);
+
+                Assert.Equal(contentRelease.Id, result.Right.ReleaseId);
+
+                var subjects = result.Right.Subjects;
+
+                Assert.Single(subjects);
+                Assert.Equal(releaseSubject2.Subject.Id, subjects[0].Id);
+                Assert.Equal(releaseSubject2.Subject.Name, subjects[0].Label);
             }
         }
 
@@ -158,13 +396,15 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
             ContentDbContext contentDbContext = null,
             IPersistenceHelper<ContentDbContext> persistenceHelper = null,
             StatisticsDbContext statisticsDbContext = null,
-            IUserService userService = null)
+            IUserService userService = null,
+            IImportStatusService importStatusService = null)
         {
             return new ReleaseMetaService(
                 contentDbContext ?? new Mock<ContentDbContext>().Object,
                 persistenceHelper ?? new PersistenceHelper<ContentDbContext>(contentDbContext),
                 statisticsDbContext ?? new Mock<StatisticsDbContext>().Object,
-                userService ?? MockUtils.AlwaysTrueUserService().Object
+                userService ?? MockUtils.AlwaysTrueUserService().Object,
+                importStatusService ?? new Mock<IImportStatusService>().Object
             );
         }
     }

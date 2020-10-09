@@ -97,12 +97,36 @@ namespace GovUk.Education.ExploreEducationStatistics.Common.Extensions
             }
         }
 
-        public static async Task ForEachAsync<T>(this IEnumerable<T> list, Func<T, Task> func)
+        public static async Task ForEachAsync<T>(this IEnumerable<T> source, Func<T, Task> func)
         {
-            foreach (var item in list)
+            foreach (var item in source)
             {
                 await func(item);
             }
+        }
+
+        /// <summary>
+        /// Filter a sequence of elements asynchronously.
+        /// </summary>
+        /// <remarks>
+        /// Do NOT use this in combination with <see cref="IQueryable{T}"/>, as Entity Framework
+        /// contexts are not thread safe. The most likely outcome will be some kind of exception.
+        /// Materialise the <see cref="IQueryable{T}"/> as a list or other collection first.
+        /// </remarks>
+        ///
+        /// <param name="source">Sequence of elements to filter</param>
+        /// <param name="filter">Filtering function that returns true if element should remain in sequence</param>
+        /// <typeparam name="T">Type of elements in the source sequence</typeparam>
+        /// <returns>Filtered sequence of elements</returns>
+        public static IEnumerable<T> WhereAsync<T>(this IEnumerable<T> source, Func<T, Task<bool>> filter)
+        {
+            var tasks = Task.WhenAll<(T item, bool isSuccess)>(
+                source.Select(async item => (item, await filter(item)))
+            );
+
+            return tasks.Result
+                .Where(tuple => tuple.isSuccess)
+                .Select(tuple => tuple.item);
         }
 
         public static IEnumerable<(T item, int index)> WithIndex<T>(this IEnumerable<T> self) =>
