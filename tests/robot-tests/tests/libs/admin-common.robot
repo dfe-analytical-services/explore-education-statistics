@@ -48,7 +48,8 @@ user signs out
     user waits until h1 is visible  Signed out
     user waits until page contains  You have successfully signed out
 
-user selects theme "${theme}" and topic "${topic}" from the admin dashboard
+user selects theme and topic from admin dashboard
+    [Arguments]  ${theme}  ${topic}
     user waits until page contains link  Manage publications and releases  60
     user clicks link   Manage publications and releases
     user waits until page contains element   id:publicationsReleases-themeTopic-themeId
@@ -60,7 +61,7 @@ user selects theme "${theme}" and topic "${topic}" from the admin dashboard
 
 user navigates to release summary from admin dashboard
     [Arguments]   ${PUBLICATION_NAME}    ${DETAILS_HEADING}
-    user selects theme "Test theme" and topic "${TOPIC_NAME}" from the admin dashboard
+    user selects theme and topic from admin dashboard  %{TEST_THEME_NAME}  %{TEST_TOPIC_NAME}
     user waits until page contains accordion section   ${PUBLICATION_NAME}
     user opens accordion section  ${PUBLICATION_NAME}
 

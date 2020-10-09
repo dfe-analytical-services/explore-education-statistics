@@ -7,6 +7,7 @@ Suite Setup       user signs in as bau1
 Suite Teardown    user closes the browser
 
 *** Variables ***
+${THEME_NAME}        %{TEST_THEME_NAME}
 ${TOPIC_NAME}        %{TEST_TOPIC_NAME}
 ${PUBLICATION_NAME}  UI tests - create publication %{RUN_IDENTIFIER}
 ${METHODOLOGY_NAME}  UI test methodology
@@ -20,7 +21,7 @@ Create approved 'Test methodology'
 
 Go to Create publication page for "UI tests topic" topic
     [Tags]  HappyPath
-    user selects theme "Test theme" and topic "${TOPIC_NAME}" from the admin dashboard
+    user selects theme and topic from admin dashboard  ${THEME_NAME}  ${TOPIC_NAME}
     user waits until page contains link    Create new publication
     user checks page does not contain button  ${PUBLICATION_NAME}
     user clicks link  Create new publication
@@ -57,7 +58,7 @@ User redirects to the dashboard after saving publication
 
 Verify that new publication has been created
     [Tags]  HappyPath
-    user selects theme "Test theme" and topic "${TOPIC_NAME}" from the admin dashboard
+    user selects theme and topic from admin dashboard  ${THEME_NAME}  ${TOPIC_NAME}
     user waits until page contains accordion section   ${PUBLICATION_NAME} (created)
     user opens accordion section  ${PUBLICATION_NAME} (created)
     user checks testid element contains  Team name for ${PUBLICATION_NAME} (created)  Post-16 statistics team
@@ -88,7 +89,7 @@ Update publication
 Verify publication has been updated
     [Tags]  HappyPath
     user waits until h1 is visible  Dashboard
-    user selects theme "Test theme" and topic "${TOPIC_NAME}" from the admin dashboard
+    user selects theme and topic from admin dashboard  ${THEME_NAME}  ${TOPIC_NAME}
     user waits until page contains accordion section   ${PUBLICATION_NAME}
     user opens accordion section  ${PUBLICATION_NAME}
     user checks testid element contains  Team name for ${PUBLICATION_NAME}  Special educational needs statistics team

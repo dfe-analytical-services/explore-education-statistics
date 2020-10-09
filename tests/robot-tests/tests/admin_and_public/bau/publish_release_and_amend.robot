@@ -11,6 +11,7 @@ Suite Teardown    user closes the browser
 
 *** Variables ***
 ${RUN_IDENTIFIER}    %{RUN_IDENTIFIER}
+${THEME_NAME}        %{TEST_THEME_NAME}
 ${TOPIC_NAME}        %{TEST_TOPIC_NAME}
 ${PUBLICATION_NAME}  UI tests - publish release %{RUN_IDENTIFIER}
 ${DATABLOCK_NAME}    Dates data block name
@@ -329,7 +330,7 @@ Return to Admin to start creating an amendment
 
 Create amendment
     [Tags]  HappyPath
-    user selects theme "Test theme" and topic "${TOPIC_NAME}" from the admin dashboard
+    user selects theme and topic from admin dashboard  ${THEME_NAME}  ${TOPIC_NAME}
     user waits until page contains link    Create new publication
     user waits until page contains accordion section  ${PUBLICATION_NAME}
 

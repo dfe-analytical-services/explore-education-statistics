@@ -259,15 +259,17 @@ if args.tests and "general_public" not in args.tests:
 
         get_themes_resp = get_test_themes()
         test_theme_id = None
+        test_theme_name = 'Test theme'
 
         for theme in get_themes_resp.json():
-            if theme['title'] == 'Test theme':
+            if theme['title'] == test_theme_name:
                 test_theme_id = theme['id']
                 break
         if not test_theme_id:
             create_theme_resp = create_test_theme()
             test_theme_id = create_theme_resp.json()['id']
 
+        os.environ['TEST_THEME_NAME'] = test_theme_name
         os.environ['TEST_THEME_ID'] = test_theme_id
 
         create_test_topic()
