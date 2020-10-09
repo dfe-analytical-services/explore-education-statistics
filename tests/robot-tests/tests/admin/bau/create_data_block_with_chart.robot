@@ -2,7 +2,7 @@
 Resource    ../../libs/admin-common.robot
 Resource    ../../libs/charts.robot
 Library  Collections
-Library  ../../libs/api_keywords.py
+Library  ../../libs/admin_api.py
 
 Force Tags  Admin  Local  Dev  AltersData
 

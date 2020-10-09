@@ -1,5 +1,6 @@
 *** Settings ***
 Resource    ../../libs/admin-common.robot
+Library  ../../libs/admin_api.py
 
 Force Tags  Admin  Local  Dev  AltersData
 
@@ -103,5 +104,5 @@ Delete test theme
     user clicks testid element  Edit link for ${THEME_NAME}
     user waits until h1 is visible  Edit theme
     ${theme_id}=  get theme id from url
-    delete theme  ${theme_id}
+    user deletes theme via api  ${theme_id}
     user closes the browser
