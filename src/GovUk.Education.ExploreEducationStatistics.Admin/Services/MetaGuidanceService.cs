@@ -43,6 +43,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Services
         public async Task<Either<ActionResult, MetaGuidanceViewModel>> Get(Guid releaseId)
         {
             return await _contentPersistenceHelper.CheckEntityExists<Release>(releaseId)
+                .OnSuccessDo(release => _userService.CheckCanViewRelease(release))
                 .OnSuccess(async release => BuildViewModel(release, await GetSubjects(releaseId)));
         }
 
