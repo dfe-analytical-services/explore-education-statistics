@@ -461,6 +461,14 @@
         "master",
         "dev"
       ]
+    },
+    "minCapacityStatisticsDb": {
+      "type": "number",
+      "defaultValue": 1.5
+    },
+    "autoPauseDelayStatisticsDb": {
+      "type": "int",
+      "defaultValue": 60
     }
   },
   "variables": {
@@ -1405,7 +1413,8 @@
             "edition": "Standard",
             "collation": "SQL_Latin1_General_CP1_CI_AS",
             "maxSizeBytes": "268435456000",
-            "minCapacity": "[parameters('minCapacityStatisticsDb')]"
+            "minCapacity": "[parameters('minCapacityStatisticsDb')]",
+            "autoPauseDelay": "[parameters('autoPauseDelayStatisticsDb')]"
           },
           "sku": {
             "Tier": "[first(skip(split(parameters('skuStatisticsDb'), ' '), 1))]",
@@ -1632,7 +1641,8 @@
             "edition": "Standard",
             "collation": "SQL_Latin1_General_CP1_CI_AS",
             "maxSizeBytes": "268435456000",
-            "minCapacity": "[parameters('minCapacityStatisticsDb')]"
+            "minCapacity": "[parameters('minCapacityStatisticsDb')]",
+            "autoPauseDelay": "[parameters('autoPauseDelayStatisticsDb')]"
           },
           "sku": {
             "Tier": "[first(skip(split(parameters('skuStatisticsDb'), ' '), 1))]",

@@ -17,11 +17,14 @@
     "skuImporter": {
       "value": "GeneralPurpose GP_S_Gen5_1"
     },
-    "skuStatisticsStatisticsDb": {
+    "skuStatisticsDb": {
       "value": "GeneralPurpose GP_S_Gen5_10"
     },
     "minCapacityStatisticsDb": {
-      "value": "1.5"
+      "value": 4
+    },
+    "autoPauseDelayStatisticsDb": {
+      "value": -1
     },
     "skuContentDb": {
       "value": "S3 Standard"
