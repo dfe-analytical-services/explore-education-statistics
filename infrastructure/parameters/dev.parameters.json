@@ -15,19 +15,13 @@
       "value": "S2 Standard"
     },
     "skuImporter": {
-      "value": "GeneralPurpose GP_S_Gen5_1"
-    },
-    "skuStatisticsDb": {
-      "value": "GeneralPurpose GP_S_Gen5_10"
+      "value": "S3 Standard"
     },
     "minCapacityStatisticsDb": {
       "value": 4
     },
     "autoPauseDelayStatisticsDb": {
       "value": -1
-    },
-    "skuContentDb": {
-      "value": "S3 Standard"
     },
     "publishReleasesCronSchedule": {
       "value": "0 0 * * * *"

@@ -462,6 +462,10 @@
         "dev"
       ]
     },
+    "skuStatisticsDb": {
+      "type": "string",
+      "defaultValue": "GeneralPurpose GP_S_Gen5_10"
+    },
     "minCapacityStatisticsDb": {
       "type": "int",
       "defaultValue": 1.5
