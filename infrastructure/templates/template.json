@@ -463,7 +463,7 @@
       ]
     },
     "minCapacityStatisticsDb": {
-      "type": "number",
+      "type": "int",
       "defaultValue": 1.5
     },
     "autoPauseDelayStatisticsDb": {
