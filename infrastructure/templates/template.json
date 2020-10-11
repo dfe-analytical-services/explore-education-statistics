@@ -1417,12 +1417,15 @@
             "edition": "Standard",
             "collation": "SQL_Latin1_General_CP1_CI_AS",
             "maxSizeBytes": "268435456000",
-            "minCapacity": "[parameters('minCapacityStatisticsDb')]",
             "autoPauseDelay": "[parameters('autoPauseDelayStatisticsDb')]"
           },
           "sku": {
             "Tier": "[first(skip(split(parameters('skuStatisticsDb'), ' '), 1))]",
             "Name": "[first(split(parameters('skuStatisticsDb'), ' '))]"
+          },
+          "per_database_settings" {
+            "min_capacity" = 0.25
+            "max_capacity" = 10
           }
         },
         {
@@ -1645,12 +1648,15 @@
             "edition": "Standard",
             "collation": "SQL_Latin1_General_CP1_CI_AS",
             "maxSizeBytes": "268435456000",
-            "minCapacity": "[parameters('minCapacityStatisticsDb')]",
             "autoPauseDelay": "[parameters('autoPauseDelayStatisticsDb')]"
           },
           "sku": {
             "Tier": "[first(skip(split(parameters('skuStatisticsDb'), ' '), 1))]",
             "Name": "[first(split(parameters('skuStatisticsDb'), ' '))]"
+          },
+          "per_database_settings" {
+            "min_capacity" = 0.25
+            "max_capacity" = 10
           }
         },
         {
