@@ -1426,7 +1426,7 @@
           "per_database_settings": {
             "min_capacity": 0.25,
             "max_capacity": 10
-          },
+          }
         },
         {
           "name": "content",
