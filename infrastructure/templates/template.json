@@ -1427,7 +1427,6 @@
             "min_capacity": 0.25,
             "max_capacity": 10
           },
-
         },
         {
           "name": "content",
