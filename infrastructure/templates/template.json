@@ -1423,10 +1423,10 @@
             "Tier": "[first(skip(split(parameters('skuStatisticsDb'), ' '), 1))]",
             "Name": "[first(split(parameters('skuStatisticsDb'), ' '))]"
           },
-          "per_database_settings" {
-            "min_capacity" = 0.25
-            "max_capacity" = 10
-          }
+          "per_database_settings": {
+            "min_capacity": 0.25,
+            "max_capacity": 10
+          },
         },
         {
           "name": "content",
@@ -1654,9 +1654,9 @@
             "Tier": "[first(skip(split(parameters('skuStatisticsDb'), ' '), 1))]",
             "Name": "[first(split(parameters('skuStatisticsDb'), ' '))]"
           },
-          "per_database_settings" {
-            "min_capacity" = 0.25
-            "max_capacity" = 10
+          "per_database_settings": {
+            "min_capacity": 0.25,
+            "max_capacity": 10
           }
         },
         {
