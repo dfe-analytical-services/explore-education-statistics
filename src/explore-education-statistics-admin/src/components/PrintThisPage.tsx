@@ -1,16 +1,9 @@
-import React, { AnchorHTMLAttributes } from 'react';
+import Button from '@common/components/Button';
 import classNames from 'classnames';
+import React from 'react';
 import styles from './PrintThisPage.module.scss';
 
-export type PrintThisPageProps = {
-  analytics?: unknown;
-} & AnchorHTMLAttributes<HTMLAnchorElement>;
-
-const PrintThisPage = ({ ...props }) => {
-  const openPrint = () => {
-    window.print();
-  };
-
+const PrintThisPage = () => {
   return (
     <div
       className={classNames(
@@ -19,14 +12,9 @@ const PrintThisPage = ({ ...props }) => {
         styles.mobileHidden,
       )}
     >
-      <a
-        className="govuk-button govuk-button--secondary"
-        {...props}
-        href="#"
-        onClick={() => openPrint()}
-      >
+      <Button variant="secondary" onClick={() => window.print()}>
         Print this page
-      </a>
+      </Button>
     </div>
   );
 };

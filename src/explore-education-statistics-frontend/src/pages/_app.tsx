@@ -13,6 +13,7 @@ import { useCookies } from '@frontend/hooks/useCookies';
 import loadEnv from '@frontend/loadEnv';
 import notificationApi from '@frontend/services/clients/notificationApi';
 import NextApp, { AppContext, AppProps } from 'next/app';
+import Head from 'next/head';
 import { useRouter } from 'next/router';
 import { parseCookies } from 'nookies';
 import React, { useEffect } from 'react';
@@ -81,6 +82,10 @@ const App = ({ Component, pageProps, cookies }: Props) => {
     <ApplicationInsightsContextProvider
       instrumentationKey={process.env.APPINSIGHTS_INSTRUMENTATIONKEY}
     >
+      <Head>
+        <meta name="viewport" content="width=device-width, initial-scale=1" />
+      </Head>
+
       <ApplicationInsightsTracking />
 
       <Component {...pageProps} />

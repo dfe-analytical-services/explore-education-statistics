@@ -4,11 +4,11 @@
   "settings": {
     "import/resolver": {
       "typescript": {
-        "directory": "./src"
+        "project": "./src"
       }
     },
     "react": {
-      "version": "latest"
+      "version": "detect"
     }
   },
   "env": {
@@ -34,10 +34,12 @@
       { "argsIgnorePattern": "^_$" }
     ],
     "@typescript-eslint/triple-slash-reference": "off",
+    "@typescript-eslint/explicit-module-boundary-types": "off",
     "import/extensions": "off",
     "import/no-cycle": "off",
     "import/no-extraneous-dependencies": ["error", { "devDependencies": true }],
     "import/no-unresolved": "off",
+    "react/forbid-prop-types": "off",
     "react/no-unescaped-entities": [
       "error",
       {
@@ -59,8 +61,14 @@
         "extensions": [".jsx", ".tsx"]
       }
     ],
+    "react/jsx-curly-newline": "off",
     "react/jsx-one-expression-per-line": "off",
+    "react/jsx-props-no-spreading": ["error", {
+      "html": "enforce",
+      "custom": "ignore"
+    }],
     "react/jsx-wrap-multilines": ["error", { "prop": "ignore" }],
+    "react/require-default-props": "off",
     "react/sort-comp": [
       "error",
       {
@@ -103,6 +111,8 @@
         }
       }
     ],
+    "react/state-in-constructor": "off",
+    "react/static-property-placement": ["error", "static public field"],
     "react/prop-types": "off",
     "react-hooks/rules-of-hooks": "error",
     "react-hooks/exhaustive-deps": "warn",

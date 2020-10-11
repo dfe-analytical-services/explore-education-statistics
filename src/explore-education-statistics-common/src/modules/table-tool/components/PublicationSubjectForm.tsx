@@ -81,7 +81,7 @@ const PublicationSubjectForm = (props: Props & InjectedWizardProps) => {
             />
 
             {options.length > 0 ? (
-              <WizardStepFormActions {...props} form={form} formId={formId} />
+              <WizardStepFormActions {...props} formId={formId} />
             ) : (
               <p>No subjects available for this release.</p>
             )}

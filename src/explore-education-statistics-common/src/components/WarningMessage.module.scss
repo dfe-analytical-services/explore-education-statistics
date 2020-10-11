@@ -1,4 +1,4 @@
-@import '../styles/govuk-base';
+@import '~govuk-frontend/govuk/base';
 
 .warning {
   align-items: center;
@@ -14,4 +14,18 @@
 
 .text {
   padding-left: govuk-spacing(3);
+}
+
+.error {
+  border: 5px solid $govuk-error-colour;
+  padding: govuk-spacing(4);
+
+  .text {
+    color: $govuk-error-colour;
+  }
+
+  .icon {
+    background: $govuk-error-colour;
+    border-color: $govuk-error-colour;
+  }
 }

@@ -20,8 +20,8 @@ const ButtonText = ({
   ...props
 }: Props) => {
   return (
-    // eslint-disable-next-line react/button-has-type
     <button
+      // eslint-disable-next-line react/jsx-props-no-spreading
       {...props}
       className={classNames(
         styles.button,
@@ -30,6 +30,7 @@ const ButtonText = ({
         },
         className,
       )}
+      // eslint-disable-next-line react/button-has-type
       type={type}
     >
       {children}

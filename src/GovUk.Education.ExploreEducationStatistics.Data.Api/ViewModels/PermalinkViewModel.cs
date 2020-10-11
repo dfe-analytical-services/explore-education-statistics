@@ -10,6 +10,8 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Api.ViewModels
 
         public DateTime Created { get; set; }
 
+        public bool Invalidated { get; set; }
+
         public TableBuilderConfiguration Configuration { get; set; }
 
         public TableBuilderResultViewModel FullTable { get; set; }

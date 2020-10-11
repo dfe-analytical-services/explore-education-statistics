@@ -2,6 +2,7 @@
  * Enumerates the typical comparison
  * integers of 1, 0 and -1.
  */
+// eslint-disable-next-line no-shadow
 export enum Comparison {
   GreaterThan = 1,
   EqualTo = 0,
@@ -52,5 +53,6 @@ export type PartialBy<T, K extends keyof T> = OmitStrict<T, K> &
  * Make all properties (including nested objects) in T optional.
  */
 export type NestedPartial<T> = {
+  // eslint-disable-next-line @typescript-eslint/ban-types
   [P in keyof T]?: T[P] extends object | undefined ? NestedPartial<T[P]> : T[P];
 };

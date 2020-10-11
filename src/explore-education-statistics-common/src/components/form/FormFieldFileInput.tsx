@@ -13,9 +13,7 @@ type Props<FormValues> = FormFieldComponentProps<
   FormValues
 >;
 
-const FormFieldFileInput = <FormValues extends {}>(
-  props: Props<FormValues>,
-) => {
+function FormFieldFileInput<FormValues>(props: Props<FormValues>) {
   // Have to do additional tracking as file inputs have
   // weird quirks that mean we get a weird validation
   // experience due to:
@@ -75,6 +73,6 @@ const FormFieldFileInput = <FormValues extends {}>(
       )}
     </FormField>
   );
-};
+}
 
 export default FormFieldFileInput;

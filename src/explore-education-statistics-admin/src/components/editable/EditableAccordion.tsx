@@ -115,6 +115,7 @@ const EditableAccordion = (props: EditableAccordionProps) => {
         >
           {(droppableProvided, snapshot) => (
             <div
+              // eslint-disable-next-line react/jsx-props-no-spreading
               {...droppableProvided.droppableProps}
               ref={droppableProvided.innerRef}
               className={classNames({

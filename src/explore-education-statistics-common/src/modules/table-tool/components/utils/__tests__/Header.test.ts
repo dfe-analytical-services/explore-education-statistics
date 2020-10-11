@@ -11,12 +11,9 @@ describe('Header', () => {
     expect(header.depth).toBe(0);
     expect(header.getLastChild()?.depth).toBe(1);
     expect(header.getLastChild()?.getLastChild()?.depth).toBe(2);
-    expect(
-      header
-        .getLastChild()
-        ?.getLastChild()
-        ?.getLastChild()?.depth,
-    ).toBe(3);
+    expect(header.getLastChild()?.getLastChild()?.getLastChild()?.depth).toBe(
+      3,
+    );
   });
 
   describe('addChild', () => {
@@ -156,17 +153,11 @@ describe('Header', () => {
       expect(header.getLastChild()?.getLastChild()?.id).toBe('0b-1b');
       expect(header.getLastChild()?.getLastChild()?.children).toHaveLength(1);
 
+      expect(header.getLastChild()?.getLastChild()?.getLastChild()?.id).toBe(
+        '2',
+      );
       expect(
-        header
-          .getLastChild()
-          ?.getLastChild()
-          ?.getLastChild()?.id,
-      ).toBe('2');
-      expect(
-        header
-          .getLastChild()
-          ?.getLastChild()
-          ?.getLastChild()?.children,
+        header.getLastChild()?.getLastChild()?.getLastChild()?.children,
       ).toHaveLength(0);
     });
   });

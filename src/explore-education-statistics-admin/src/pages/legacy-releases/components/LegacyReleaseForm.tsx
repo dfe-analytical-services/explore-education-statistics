@@ -37,9 +37,7 @@ const LegacyReleaseForm = ({
       onSubmit={handleSubmit}
       validationSchema={Yup.object<FormValues>({
         description: Yup.string().required('Enter a description'),
-        url: Yup.string()
-          .required('Enter a URL')
-          .url('Enter a valid URL'),
+        url: Yup.string().required('Enter a URL').url('Enter a valid URL'),
         order:
           typeof initialValues?.order === 'number'
             ? Yup.number()

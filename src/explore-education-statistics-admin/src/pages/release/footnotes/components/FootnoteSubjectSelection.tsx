@@ -8,11 +8,13 @@ interface Props {
   footnoteMetaGetters: FootnoteMetaGetters;
 }
 
+/* eslint-disable react/no-unused-prop-types */
 interface Item {
   id: string;
   label: string;
   selected: boolean;
 }
+/* eslint-enable react/no-unused-prop-types */
 
 interface Selection extends Item {
   indicatorGroups: {

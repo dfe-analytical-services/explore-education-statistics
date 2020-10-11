@@ -9,10 +9,8 @@ type Props<FormValues> = FormFieldComponentProps<
   FormValues
 >;
 
-const FormFieldTextInput = <FormValues extends {}>(
-  props: Props<FormValues>,
-) => {
+function FormFieldTextInput<FormValues>(props: Props<FormValues>) {
   return <FormField {...props} as={FormTextInput} />;
-};
+}
 
 export default FormFieldTextInput;

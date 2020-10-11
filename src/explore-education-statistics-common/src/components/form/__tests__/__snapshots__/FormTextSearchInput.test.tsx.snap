@@ -16,6 +16,7 @@ exports[`FormTextSearchInput renders correctly with error 1`] = `
        class="govuk-input searchInput"
        id="test-input"
        type="text"
+       value
 >
 `;
 
@@ -35,6 +36,7 @@ exports[`FormTextSearchInput renders correctly with hint 1`] = `
        class="govuk-input searchInput"
        id="test-input"
        type="text"
+       value
 >
 `;
 
@@ -48,6 +50,7 @@ exports[`FormTextSearchInput renders correctly with required props 1`] = `
        class="govuk-input searchInput"
        id="test-input"
        type="text"
+       value
 >
 `;
 
@@ -67,5 +70,6 @@ exports[`FormTextSearchInput renders with a specific width class 1`] = `
        class="govuk-input searchInput govuk-input--width-20"
        id="test-input"
        type="text"
+       value
 >
 `;

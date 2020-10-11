@@ -107,7 +107,7 @@ const ReleaseHeadlines = ({ release }: Props) => {
 
       {release.keyStatisticsSecondarySection.content?.length ? (
         <>
-          <AddSecondaryStats release={release} isEditing={isEditing} updating />
+          <AddSecondaryStats release={release} updating />
           <DataBlockTabs
             releaseId={release.id}
             id="releaseHeadlines-dataBlock"
@@ -118,7 +118,7 @@ const ReleaseHeadlines = ({ release }: Props) => {
         </>
       ) : (
         <>
-          <AddSecondaryStats release={release} isEditing={isEditing} />
+          <AddSecondaryStats release={release} />
           <Tabs id="releaseHeadlines-dataBlock">{headlinesTab}</Tabs>
         </>
       )}

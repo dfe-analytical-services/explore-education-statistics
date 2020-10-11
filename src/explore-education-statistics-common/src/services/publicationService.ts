@@ -74,6 +74,7 @@ export interface ReleaseNote {
   reason: string;
 }
 
+// eslint-disable-next-line no-shadow
 export enum ReleaseType {
   AdHoc = 'Ad Hoc',
   NationalStatistics = 'National Statistics',
@@ -84,7 +85,7 @@ export interface ContentSection<BlockType> {
   id: string;
   order: number;
   heading: string;
-  caption: string;
+  caption?: string;
   content: BlockType[];
 }
 
@@ -105,6 +106,7 @@ export interface Release<
   keyStatisticsSecondarySection: ContentSection<DataBlockType>;
   headlinesSection: ContentSection<ContentBlockType>;
   publication: PublicationType;
+  publicationId: string;
   latestRelease: boolean;
   publishScheduled?: string;
   nextReleaseDate: PartialDate;
@@ -129,7 +131,7 @@ export interface Release<
     path: string;
     size: string;
   }[];
-  preReleaseAccessList: string;
+  preReleaseAccessList?: string;
   dataLastPublished: string;
 }
 

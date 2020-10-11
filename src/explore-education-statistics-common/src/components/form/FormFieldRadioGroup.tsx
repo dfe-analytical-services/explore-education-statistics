@@ -9,12 +9,9 @@ type Props<FormValues, Value extends string> = FormFieldComponentProps<
   FormValues
 >;
 
-const FormFieldRadioGroup = <
-  FormValues extends {},
-  Value extends string = string
->(
+function FormFieldRadioGroup<FormValues, Value extends string = string>(
   props: Props<FormValues, Value>,
-) => {
+) {
   return (
     <FormField<string> {...props}>
       {({ field }) => (
@@ -34,6 +31,6 @@ const FormFieldRadioGroup = <
       )}
     </FormField>
   );
-};
+}
 
 export default FormFieldRadioGroup;

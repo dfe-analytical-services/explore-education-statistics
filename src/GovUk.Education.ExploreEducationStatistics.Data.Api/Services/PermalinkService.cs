@@ -44,7 +44,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Api.Services
             {
                 var text = await _fileStorageService.GetBlobText(PublicPermalinkContainerName, id.ToString());
                 var permalink = JsonConvert.DeserializeObject<Permalink>(text);
-                return BuildViewModel(permalink);
+                return await BuildViewModel(permalink);
             }
             catch (StorageException e)
                 when ((HttpStatusCode) e.RequestInformation.HttpStatusCode == HttpStatusCode.NotFound)
@@ -70,15 +70,20 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Api.Services
                 await _fileStorageService.UploadText(PublicPermalinkContainerName, permalink.Id.ToString(),
                     MediaTypeNames.Application.Json,
                     JsonConvert.SerializeObject(permalink));
-                return BuildViewModel(permalink);
+                return await BuildViewModel(permalink);
             });
         }
 
-        private PermalinkViewModel BuildViewModel(Permalink permalink)
+        private async Task<PermalinkViewModel> BuildViewModel(Permalink permalink)
         {
+            var isSubjectForLatestRelease = _subjectService.IsSubjectForLatestPublishedRelease(permalink.Query.SubjectId);
+            var publication = await _subjectService.GetPublicationForSubjectAsync(permalink.Query.SubjectId);
+
             var viewModel = _mapper.Map<PermalinkViewModel>(permalink);
-            viewModel.Query.PublicationId =
-                _subjectService.GetPublicationForSubjectAsync(permalink.Query.SubjectId).Result.Id;
+
+            viewModel.Query.PublicationId = publication.Id;
+            viewModel.Invalidated = !isSubjectForLatestRelease;
+
             return viewModel;
         }
     }

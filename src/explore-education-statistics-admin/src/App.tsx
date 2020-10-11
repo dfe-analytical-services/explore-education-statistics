@@ -18,8 +18,8 @@ import { Route, Switch, useHistory } from 'react-router';
 import { BrowserRouter } from 'react-router-dom';
 import PageNotFoundPage from './pages/errors/PageNotFoundPage';
 
-const PrototypeIndexPage = lazy(() =>
-  import('@admin/prototypes/PrototypeIndexPage'),
+const PrototypeIndexPage = lazy(
+  () => import('@admin/prototypes/PrototypeIndexPage'),
 );
 
 function ApplicationInsightsTracking() {
