@@ -17,9 +17,6 @@
     "skuImporter": {
       "value": "S2 Standard"
     },
-    "skuStatisticsDb": {
-      "value": "GeneralPurpose GP_S_Gen5_10"
-    },
     "publishReleasesCronSchedule": {
       "value": "0 0 * * * *"
     },
