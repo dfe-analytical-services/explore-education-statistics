@@ -45,9 +45,6 @@ const PublicationSummary = ({ publication, onChangePublication }: Props) => {
   const noAmendmentInProgressFilter = (release: Release) =>
     !releases.some(r => r.amendment && r.previousVersionId === release.id);
 
-  // BAU-404 - temporarily hide the Amend Release button completely until Release Versioning Phase 1 is complete
-  const showAmendmentButton = () => true;
-
   return (
     <>
       <table>
@@ -173,9 +170,7 @@ const PublicationSummary = ({ publication, onChangePublication }: Props) => {
                   {releases.filter(noAmendmentInProgressFilter).map(release => (
                     <li key={release.id}>
                       <NonScheduledReleaseSummary
-                        onClickAmendRelease={
-                          showAmendmentButton() ? setAmendReleaseId : undefined
-                        }
+                        onClickAmendRelease={setAmendReleaseId}
                         onClickCancelAmendment={setCancelAmendmentReleaseId}
                         release={release}
                       />
