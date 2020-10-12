@@ -138,17 +138,9 @@ const PublicationSummary = ({ publication, onChangePublication }: Props) => {
               ) : (
                 <>
                   {externalMethodology?.url ? (
-                    <>
-                      {externalMethodology.title} (
-                      <a
-                        href={externalMethodology.url}
-                        target="_blank"
-                        rel="noopener noreferrer"
-                      >
-                        {externalMethodology.url}
-                      </a>
-                      )
-                    </>
+                    <Link to={externalMethodology.url} unvisited>
+                      {externalMethodology.title} (external methodology)
+                    </Link>
                   ) : (
                     'No methodology assigned'
                   )}
