@@ -1424,9 +1424,11 @@
             "autoPauseDelay": "[parameters('autoPauseDelayStatisticsDb')]",
             "minCapacity": "[parameters('minCapacityStatisticsDb')]"
           },
+          "kind": "v12.0,user,vcore,serverless",
           "sku": {
-            "Tier": "[first(skip(split(parameters('skuStatisticsDb'), ' '), 1))]",
             "Name": "[first(split(parameters('skuStatisticsDb'), ' '))]",
+            "Tier": "[first(skip(split(parameters('skuStatisticsDb'), ' '), 1))]",
+            "family": "Gen5",
             "capacity": "[parameters('maxCapacityStatisticsDb')]"
           }
         },
@@ -1653,9 +1655,11 @@
             "autoPauseDelay": "[parameters('autoPauseDelayStatisticsDb')]",
             "minCapacity": "[parameters('minCapacityStatisticsDb')]"
           },
+          "kind": "v12.0,user,vcore,serverless",
           "sku": {
-            "Tier": "[first(skip(split(parameters('skuStatisticsDb'), ' '), 1))]",
             "Name": "[first(split(parameters('skuStatisticsDb'), ' '))]",
+            "Tier": "[first(skip(split(parameters('skuStatisticsDb'), ' '), 1))]",
+            "family": "Gen5",
             "capacity": "[parameters('maxCapacityStatisticsDb')]"
           }
         },
