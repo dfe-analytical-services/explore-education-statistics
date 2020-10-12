@@ -296,8 +296,6 @@ Clicking "Create tables" takes user to Table Tool page with absence publication 
     user clicks link    Create tables
     user waits until h1 is visible  Create your own tables online   60
     user waits for page to finish loading
-    user checks radio is checked  Pupil absence in schools in England
-    user clicks button  Next step
 
     user waits until page contains  Choose a subject   60
     user checks previous table tool step contains  1   Publication   Pupil absence in schools in England

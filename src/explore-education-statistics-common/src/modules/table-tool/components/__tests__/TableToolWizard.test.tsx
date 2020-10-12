@@ -133,18 +133,16 @@ describe('TableToolWizard', () => {
     expect(screen.getAllByRole('listitem')).toHaveLength(1);
   });
 
-  test('renders fetched publication subjects if `initialState.query.publicationId` set', async () => {
-    tableBuilderService.getPublicationMeta.mockResolvedValue({
-      publicationId: 'publication-1',
-      subjects: [{ id: 'subject-1', label: 'Subject 1' }],
-      highlights: [],
-    });
-
+  test('renders `initialState.subjects` on step when it is the current step', async () => {
     render(
       <TableToolWizard
         themeMeta={testThemeMeta}
         initialState={{
           initialStep: 2,
+          subjects: [
+            { id: 'subject-1', label: 'Subject 1' },
+            { id: 'subject-2', label: 'Subject 2' },
+          ],
           query: {
             publicationId: 'publication-1',
             subjectId: '',
@@ -157,11 +155,8 @@ describe('TableToolWizard', () => {
     );
 
     await waitFor(() => {
-      expect(tableBuilderService.getPublicationMeta).toHaveBeenCalledWith(
-        'publication-1',
-      );
-
       expect(screen.getByLabelText('Subject 1')).toBeInTheDocument();
+      expect(screen.getByLabelText('Subject 2')).toBeInTheDocument();
     });
   });
 
@@ -197,62 +192,18 @@ describe('TableToolWizard', () => {
     });
   });
 
-  test('renders fetched publication release subjects if `initialState.query.releaseId` is set', async () => {
-    tableBuilderService.getPublicationMeta.mockResolvedValue({
-      publicationId: 'publication-1',
-      subjects: [{ id: 'subject-1', label: 'Subject 1' }],
-      highlights: [],
-    });
-
-    tableBuilderService.getReleaseMeta.mockResolvedValue({
-      releaseId: 'release-1',
-      subjects: [{ id: 'subject-2', label: 'Subject 2' }],
-    });
-
-    render(
-      <TableToolWizard
-        themeMeta={testThemeMeta}
-        initialState={{
-          initialStep: 1,
-          query: {
-            publicationId: 'publication-1',
-            releaseId: 'release-1',
-            subjectId: '',
-            locations: {},
-            filters: [],
-            indicators: [],
-          },
-        }}
-      />,
-    );
-
-    await waitFor(() => {
-      expect(tableBuilderService.getPublicationMeta).not.toHaveBeenCalled();
-      expect(tableBuilderService.getReleaseMeta).toHaveBeenCalledWith(
-        'release-1',
-      );
-
-      expect(screen.queryByText('Subject 1')).not.toBeInTheDocument();
-      expect(screen.getByLabelText('Subject 2')).toBeInTheDocument();
-    });
-  });
-
-  test('renders table highlights on step 2 when it is the current step', async () => {
-    tableBuilderService.getPublicationMeta.mockResolvedValue({
-      publicationId: 'publication-1',
-      subjects: [{ id: 'subject-1', label: 'Subject 1' }],
-      highlights: [
-        { id: 'highlight-1', label: 'Test highlight 1' },
-        { id: 'highlight-2', label: 'Test highlight 2' },
-        { id: 'highlight-3', label: 'Test highlight 3' },
-      ],
-    });
-
+  test('renders `initialState.highlights` on step 2 when it is the current step', async () => {
     render(
       <TableToolWizard
         themeMeta={testThemeMeta}
         initialState={{
           initialStep: 2,
+          subjects: [{ id: 'subject-1', label: 'Subject 1' }],
+          highlights: [
+            { id: 'highlight-1', label: 'Test highlight 1' },
+            { id: 'highlight-2', label: 'Test highlight 2' },
+            { id: 'highlight-3', label: 'Test highlight 3' },
+          ],
           query: {
             publicationId: 'publication-1',
             subjectId: '',
@@ -296,22 +247,18 @@ describe('TableToolWizard', () => {
     });
   });
 
-  test('does not render table highlights when step 2 is not the current step', async () => {
-    tableBuilderService.getPublicationMeta.mockResolvedValue({
-      publicationId: 'publication-1',
-      subjects: [{ id: 'subject-1', label: 'Subject 1' }],
-      highlights: [
-        { id: 'highlight-1', label: 'Test highlight 1' },
-        { id: 'highlight-2', label: 'Test highlight 2' },
-        { id: 'highlight-3', label: 'Test highlight 3' },
-      ],
-    });
-
+  test('does not render `initialSate.highlights` when step 2 is not the current step', async () => {
     render(
       <TableToolWizard
         themeMeta={testThemeMeta}
         initialState={{
           initialStep: 3,
+          subjects: [{ id: 'subject-1', label: 'Subject 1' }],
+          highlights: [
+            { id: 'highlight-1', label: 'Test highlight 1' },
+            { id: 'highlight-2', label: 'Test highlight 2' },
+            { id: 'highlight-3', label: 'Test highlight 3' },
+          ],
           query: {
             publicationId: 'publication-1',
             subjectId: 'subject-1',
@@ -347,18 +294,14 @@ describe('TableToolWizard', () => {
   });
 
   test('renders all steps correctly when full `initialState` is provided', async () => {
-    tableBuilderService.getPublicationMeta.mockResolvedValue({
-      publicationId: 'publication-1',
-      subjects: [{ id: 'subject-1', label: 'Subject 1' }],
-      highlights: [],
-    });
-
     render(
       <TableToolWizard
         themeMeta={testThemeMeta}
         initialState={{
           initialStep: 5,
           subjectMeta: testSubjectMeta,
+          subjects: [{ id: 'subject-1', label: 'Subject 1' }],
+          highlights: [],
           query: {
             publicationId: 'publication-1',
             subjectId: 'subject-1',

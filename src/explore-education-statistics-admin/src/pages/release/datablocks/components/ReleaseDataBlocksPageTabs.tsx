@@ -55,9 +55,22 @@ const ReleaseDataBlocksPageTabs = ({
     setState: setTableState,
     error,
     isLoading,
-  } = useAsyncRetry<InitialTableToolState | undefined>(async () => {
+  } = useAsyncRetry<InitialTableToolState>(async () => {
+    const { subjects } = await tableBuilderService.getReleaseMeta(releaseId);
+
     if (!selectedDataBlock) {
-      return undefined;
+      return {
+        initialStep: 1,
+        subjects,
+        query: {
+          releaseId,
+          subjectId: '',
+          includeGeoJson: false,
+          locations: {},
+          filters: [],
+          indicators: [],
+        },
+      };
     }
 
     const query: ReleaseTableDataQuery = {
@@ -80,6 +93,7 @@ const ReleaseDataBlocksPageTabs = ({
     if (step < 5) {
       return {
         initialStep: step,
+        subjects,
         subjectMeta,
         query,
       };
@@ -95,6 +109,7 @@ const ReleaseDataBlocksPageTabs = ({
 
       return {
         initialStep: step,
+        subjects,
         subjectMeta,
         query,
         response: {
@@ -250,7 +265,7 @@ const ReleaseDataBlocksPageTabs = ({
         />
       )}
 
-      {tableState && tableState?.initialStep < 5 && (
+      {selectedDataBlock && tableState && tableState?.initialStep < 5 && (
         <WarningMessage>
           There is a problem with this data block as we could not render a table
           with the selected options. Please re-check your choices to ensure the
@@ -261,11 +276,10 @@ const ReleaseDataBlocksPageTabs = ({
       {!error ? (
         <Tabs id="manageDataBlocks">
           <TabsSection title="Data source" id="manageDataBlocks-dataSource">
-            {!isLoading && (
+            {!isLoading && tableState && (
               <DataBlockSourceWizard
                 key={saveNumber}
                 dataBlock={selectedDataBlock}
-                releaseId={releaseId}
                 tableToolState={tableState}
                 onSave={handleDataBlockSourceSave}
               />
