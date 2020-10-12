@@ -1418,11 +1418,15 @@
             "[variables('sqlserverName')]"
           ],
           "properties": {
-            "edition": "Standard",
             "collation": "SQL_Latin1_General_CP1_CI_AS",
-            "maxSizeBytes": "268435456000",
-            "autoPauseDelay": "[parameters('autoPauseDelayStatisticsDb')]",
-            "minCapacity": "[parameters('minCapacityStatisticsDb')]"
+            "maxSizeBytes": 268435456000,
+            "catalogCollation": "SQL_Latin1_General_CP1_CI_AS",
+            "zoneRedundant": false,
+            "readScale": "Disabled",
+            "readReplicaCount": 0,
+            "autoPauseDelay": 60,
+            "storageAccountType": "GRS",
+            "minCapacity": 2
           },
           "kind": "v12.0,user,vcore,serverless",
           "sku": {
@@ -1649,11 +1653,15 @@
             "[variables('publicSqlServerName')]"
           ],
           "properties": {
-            "edition": "Standard",
             "collation": "SQL_Latin1_General_CP1_CI_AS",
-            "maxSizeBytes": "268435456000",
-            "autoPauseDelay": "[parameters('autoPauseDelayStatisticsDb')]",
-            "minCapacity": "[parameters('minCapacityStatisticsDb')]"
+            "maxSizeBytes": 268435456000,
+            "catalogCollation": "SQL_Latin1_General_CP1_CI_AS",
+            "zoneRedundant": false,
+            "readScale": "Disabled",
+            "readReplicaCount": 0,
+            "autoPauseDelay": 60,
+            "storageAccountType": "GRS",
+            "minCapacity": 2
           },
           "kind": "v12.0,user,vcore,serverless",
           "sku": {
