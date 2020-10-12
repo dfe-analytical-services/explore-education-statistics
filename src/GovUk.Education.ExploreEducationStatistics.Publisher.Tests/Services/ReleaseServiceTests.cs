@@ -68,6 +68,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Publisher.Tests.Services
             PublicationId = PublicationA.Id,
             ReleaseName = "2018",
             TimePeriodCoverage = AcademicYearQ1,
+            MetaGuidance = "Release 1 v0 Guidance",
             RelatedInformation = new List<Link>
             {
                 new Link
@@ -90,6 +91,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Publisher.Tests.Services
             PublicationId = PublicationA.Id,
             ReleaseName = "2018",
             TimePeriodCoverage = AcademicYearQ1,
+            MetaGuidance = "Release 1 v1 Guidance",
             RelatedInformation = new List<Link>
             {
                 new Link
@@ -112,6 +114,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Publisher.Tests.Services
             PublicationId = PublicationA.Id,
             ReleaseName = "2018",
             TimePeriodCoverage = AcademicYearQ1,
+            MetaGuidance = "Release 1 v2 Guidance",
             RelatedInformation = new List<Link>
             {
                 new Link
@@ -134,6 +137,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Publisher.Tests.Services
             PublicationId = PublicationA.Id,
             ReleaseName = "2018",
             TimePeriodCoverage = AcademicYearQ2,
+            MetaGuidance = "Release 2 Guidance",
             RelatedInformation = new List<Link>
             {
                 new Link
@@ -155,6 +159,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Publisher.Tests.Services
             PublicationId = PublicationA.Id,
             ReleaseName = "2018",
             TimePeriodCoverage = AcademicYearQ3,
+            MetaGuidance = "Release 3 Guidance",
             RelatedInformation = new List<Link>(),
             Published = null,
             Status = Approved,
@@ -587,6 +592,8 @@ namespace GovUk.Education.ExploreEducationStatistics.Publisher.Tests.Services
                 Assert.Equal(Release2Section1HtmlContentBlock1.Id, content[2].Content[2].Id);
                 Assert.Equal("<p>Release 2 section 1 order 2</p>", (content[2].Content[2] as HtmlBlockViewModel)?.Body);
 
+                Assert.Equal("Release 2 Guidance", result.MetaGuidance);
+
                 Assert.Single(result.RelatedInformation);
                 Assert.Equal(new Guid("a0855237-b2f1-4dae-b2fc-027bb2802ba3"), result.RelatedInformation[0].Id);
             }
@@ -670,6 +677,8 @@ namespace GovUk.Education.ExploreEducationStatistics.Publisher.Tests.Services
                 Assert.Equal(Release1Section1HtmlContentBlock1.Id, content[2].Content[2].Id);
                 Assert.Equal("<p>Release 1 section 1 order 2</p>", (content[2].Content[2] as HtmlBlockViewModel)?.Body);
 
+                Assert.Equal("Release 1 v1 Guidance", result.MetaGuidance);
+
                 Assert.Single(result.RelatedInformation);
                 Assert.Equal(new Guid("9eb283bd-4f28-4e65-bc91-1da9cc6567f9"), result.RelatedInformation[0].Id);
             }
@@ -711,6 +720,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Publisher.Tests.Services
                 Assert.Null(result.KeyStatisticsSection);
                 Assert.Null(result.SummarySection);
                 Assert.Empty(result.Content);
+                Assert.Equal("Release 3 Guidance", result.MetaGuidance);
                 Assert.Empty(result.RelatedInformation);
             }
         }
