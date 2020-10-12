@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Linq;
 using System.Threading.Tasks;
 using GovUk.Education.ExploreEducationStatistics.Admin.Services;
 using GovUk.Education.ExploreEducationStatistics.Admin.ViewModels;
@@ -13,6 +14,7 @@ using GovUk.Education.ExploreEducationStatistics.Data.Model;
 using GovUk.Education.ExploreEducationStatistics.Data.Model.Database;
 using GovUk.Education.ExploreEducationStatistics.Data.Model.Services;
 using GovUk.Education.ExploreEducationStatistics.Data.Model.Services.Interfaces;
+using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Logging;
 using Moq;
 using Xunit;
@@ -345,6 +347,12 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
                 Assert.Equal("Updated Release Meta Guidance", result.Right.Content);
                 Assert.Empty(result.Right.Subjects);
             }
+
+            await using (var contentDbContext = InMemoryApplicationDbContext(contentDbContextId))
+            {
+                Assert.Equal("Updated Release Meta Guidance",
+                    (await contentDbContext.Releases.FindAsync(release.Id)).MetaGuidance);
+            }
         }
 
         [Fact]
@@ -509,6 +517,24 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
                 Assert.Equal("Version 1 Subject 1 Meta Guidance", version1Result.Right.Subjects[0].Content);
                 Assert.Equal("file1.csv", version1Result.Right.Subjects[0].Filename);
                 Assert.Equal("Subject 1", version1Result.Right.Subjects[0].Name);
+            }
+
+            await using (var statisticsDbContext = InMemoryStatisticsDbContext(statisticsDbContextId))
+            {
+                Assert.Equal("Version 1 Subject 1 Meta Guidance",
+                    (await statisticsDbContext.ReleaseSubject
+                        .Where(rs => rs.ReleaseId == statsReleaseVersion1.Id && rs.SubjectId == subject1.Id)
+                        .FirstAsync()).MetaGuidance);
+
+                Assert.Equal("Version 2 Subject 1 Meta Guidance Updated",
+                    (await statisticsDbContext.ReleaseSubject
+                        .Where(rs => rs.ReleaseId == statsReleaseVersion2.Id && rs.SubjectId == subject1.Id)
+                        .FirstAsync()).MetaGuidance);
+
+                Assert.Equal("Version 2 Subject 2 Meta Guidance",
+                    (await statisticsDbContext.ReleaseSubject
+                        .Where(rs => rs.ReleaseId == statsReleaseVersion2.Id && rs.SubjectId == subject2.Id)
+                        .FirstAsync()).MetaGuidance);
             }
         }
 
