@@ -18,7 +18,10 @@
       "value": "S3 Standard"
     },
     "minCapacityStatisticsDb": {
-      "value": 4
+      "value": 2
+    },
+    "minCapacityStatisticsDb": {
+      "value": 6
     },
     "autoPauseDelayStatisticsDb": {
       "value": -1

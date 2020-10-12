@@ -464,11 +464,15 @@
     },
     "skuStatisticsDb": {
       "type": "string",
-      "defaultValue": "GeneralPurpose GP_S_Gen5_10"
+      "defaultValue": "GP_S_Gen5 GeneralPurpose"
     },
     "minCapacityStatisticsDb": {
       "type": "int",
       "defaultValue": 1.5
+    },
+    "maxCapacityStatisticsDb": {
+      "type": "int",
+      "defaultValue": 4
     },
     "autoPauseDelayStatisticsDb": {
       "type": "int",
@@ -1418,14 +1422,12 @@
             "collation": "SQL_Latin1_General_CP1_CI_AS",
             "maxSizeBytes": "268435456000",
             "autoPauseDelay": "[parameters('autoPauseDelayStatisticsDb')]",
-            "per_database_settings": {
-              "min_capacity": 0.25,
-              "max_capacity": 10
-            }
+            "minCapacity": "[parameters('minCapacityStatisticsDb')]"
           },
           "sku": {
             "Tier": "[first(skip(split(parameters('skuStatisticsDb'), ' '), 1))]",
-            "Name": "[first(split(parameters('skuStatisticsDb'), ' '))]"
+            "Name": "[first(split(parameters('skuStatisticsDb'), ' '))]",
+            "capacity": "[parameters('minCapacityStatisticsDb')]"
           }
         },
         {
@@ -1649,14 +1651,12 @@
             "collation": "SQL_Latin1_General_CP1_CI_AS",
             "maxSizeBytes": "268435456000",
             "autoPauseDelay": "[parameters('autoPauseDelayStatisticsDb')]",
-            "per_database_settings": {
-              "min_capacity": 0.25,
-              "max_capacity": 10
-            }
+            "minCapacity": "[parameters('minCapacityStatisticsDb')]"
           },
           "sku": {
             "Tier": "[first(skip(split(parameters('skuStatisticsDb'), ' '), 1))]",
-            "Name": "[first(split(parameters('skuStatisticsDb'), ' '))]"
+            "Name": "[first(split(parameters('skuStatisticsDb'), ' '))]",
+            "capacity": "[parameters('maxCapacityStatisticsDb')]"
           }
         },
         {
