@@ -35,7 +35,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Controllers.Api
                 .HandleFailuresOrOk();
         }
 
-        [HttpPut("release/{releaseId}/meta-guidance/subject/{subjectId}")]
+        [HttpPut("release/{releaseId}/subjects/{subjectId}/meta-guidance")]
         public async Task<ActionResult<MetaGuidanceViewModel>> UpdateSubject(Guid releaseId,
             Guid subjectId,
             MetaGuidanceUpdateSubjectViewModel request)
