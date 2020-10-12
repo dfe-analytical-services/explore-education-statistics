@@ -51,7 +51,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Services
         {
             return await _contentPersistenceHelper.CheckEntityExists<Release>(releaseId)
                 .OnSuccessDo(release => _userService.CheckCanViewRelease(release))
-                .OnSuccess(async release => BuildViewModel(release, await GetSubjects(releaseId)));
+                .OnSuccess(BuildViewModel);
         }
 
         public async Task<Either<ActionResult, MetaGuidanceViewModel>> UpdateRelease(Guid releaseId,
@@ -65,7 +65,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Services
                     release.MetaGuidance = request.Content;
                     await _contentDbContext.SaveChangesAsync();
 
-                    return BuildViewModel(release, await GetSubjects(releaseId));
+                    return await BuildViewModel(release);
                 });
         }
 
@@ -87,7 +87,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Services
                             releaseSubject.MetaGuidance = request.Content;
                             await _statisticsDbContext.SaveChangesAsync();
 
-                            return BuildViewModel(release, await GetSubjects(releaseId));
+                            return await BuildViewModel(release);
                         });
                 });
         }
@@ -172,9 +172,9 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Services
                 .ToList();
         }
 
-        private static MetaGuidanceViewModel BuildViewModel(Release release,
-            List<MetaGuidanceSubjectViewModel> subjects)
+        private async Task<MetaGuidanceViewModel> BuildViewModel(Release release)
         {
+            var subjects = await GetSubjects(release.Id);
             return new MetaGuidanceViewModel
             {
                 Id = release.Id,
