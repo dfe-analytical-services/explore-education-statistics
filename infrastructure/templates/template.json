@@ -1388,7 +1388,7 @@
     {
       "name": "[variables('sqlserverName')]",
       "type": "Microsoft.Sql/servers",
-      "apiVersion": "2018-06-01-preview",
+      "apiVersion": "2019-06-01-preview",
       "location": "[resourceGroup().location]",
       "properties": {
         "administratorLogin": "[parameters('sqlAdministratorLogin')]",
@@ -1426,8 +1426,8 @@
           },
           "kind": "v12.0,user,vcore,serverless",
           "sku": {
-            "Name": "[first(split(parameters('skuStatisticsDb'), ' '))]",
-            "Tier": "[first(skip(split(parameters('skuStatisticsDb'), ' '), 1))]",
+            "name": "GP_S_Gen5",
+            "tier": "GeneralPurpose",
             "family": "Gen5",
             "capacity": "[parameters('maxCapacityStatisticsDb')]"
           }
@@ -1619,7 +1619,7 @@
     {
       "name": "[variables('publicSqlServerName')]",
       "type": "Microsoft.Sql/servers",
-      "apiVersion": "2018-06-01-preview",
+      "apiVersion": "2019-06-01-preview",
       "location": "[resourceGroup().location]",
       "properties": {
         "administratorLogin": "[parameters('sqlAdministratorLogin')]",
@@ -1657,8 +1657,8 @@
           },
           "kind": "v12.0,user,vcore,serverless",
           "sku": {
-            "Name": "[first(split(parameters('skuStatisticsDb'), ' '))]",
-            "Tier": "[first(skip(split(parameters('skuStatisticsDb'), ' '), 1))]",
+            "name": "GP_S_Gen5",
+            "tier": "GeneralPurpose",
             "family": "Gen5",
             "capacity": "[parameters('maxCapacityStatisticsDb')]"
           }
