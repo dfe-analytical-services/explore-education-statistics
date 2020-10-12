@@ -1427,7 +1427,7 @@
           "sku": {
             "Tier": "[first(skip(split(parameters('skuStatisticsDb'), ' '), 1))]",
             "Name": "[first(split(parameters('skuStatisticsDb'), ' '))]",
-            "capacity": "[parameters('minCapacityStatisticsDb')]"
+            "capacity": "[parameters('maxCapacityStatisticsDb')]"
           }
         },
         {

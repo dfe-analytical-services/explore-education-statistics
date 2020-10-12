@@ -20,8 +20,8 @@
     "minCapacityStatisticsDb": {
       "value": 2
     },
-    "minCapacityStatisticsDb": {
-      "value": 6
+    "maxCapacityStatisticsDb": {
+      "value": 10
     },
     "autoPauseDelayStatisticsDb": {
       "value": -1
