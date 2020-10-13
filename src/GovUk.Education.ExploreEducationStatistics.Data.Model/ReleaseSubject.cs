@@ -11,5 +11,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Model
         public Release Release { get; set; }
         
         public Guid ReleaseId { get; set; }
+        
+        public string MetaGuidance { get; set; }
     }
 }

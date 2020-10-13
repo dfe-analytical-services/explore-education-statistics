@@ -5,6 +5,16 @@ namespace GovUk.Education.ExploreEducationStatistics.Common.Model
         public string Label { get; set; }
         public string Value { get; set; }
 
+        public LabelValue()
+        {
+        }
+
+        public LabelValue(string label, string value)
+        {
+            Label = label;
+            Value = value;
+        }
+
         protected bool Equals(LabelValue other)
         {
             return Label == other.Label && Value == other.Value;
