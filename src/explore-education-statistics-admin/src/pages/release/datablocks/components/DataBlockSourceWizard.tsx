@@ -107,15 +107,12 @@ const DataBlockSourceWizardFinalStep = ({
 
 interface DataBlockSourceWizardProps {
   dataBlock?: ReleaseDataBlock;
-  query?: ReleaseTableDataQuery;
-  releaseId?: string;
-  tableToolState?: InitialTableToolState;
+  tableToolState: InitialTableToolState;
   onSave: DataBlockSourceWizardSaveHandler;
 }
 
 const DataBlockSourceWizard = ({
   dataBlock,
-  releaseId,
   tableToolState,
   onSave,
 }: DataBlockSourceWizardProps) => {
@@ -125,17 +122,7 @@ const DataBlockSourceWizard = ({
 
       <TableToolWizard
         themeMeta={[]}
-        initialState={
-          tableToolState ?? {
-            query: {
-              releaseId,
-              subjectId: '',
-              indicators: [],
-              filters: [],
-              locations: {},
-            },
-          }
-        }
+        initialState={tableToolState}
         finalStep={({ response, query }) => (
           <WizardStep>
             {wizardStepProps => (

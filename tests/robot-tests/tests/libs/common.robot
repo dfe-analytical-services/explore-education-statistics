@@ -436,9 +436,9 @@ user gets details content element
     [Return]  ${content}
 
 user waits until details contains element
-    [Arguments]  ${text}  ${element}  ${parent}=css:body
+    [Arguments]  ${text}  ${element}  ${parent}=css:body  ${wait}=${timeout}
     ${details}=  user gets details content element  ${text}  ${parent}
-    user waits until parent contains element  ${details}  ${element}
+    user waits until parent contains element  ${details}  ${element}  timeout=${wait}
 
 user waits until details contains link
     [Arguments]  ${text}  ${link}  ${parent}=css:body
