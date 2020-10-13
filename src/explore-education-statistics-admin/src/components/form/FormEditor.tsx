@@ -31,7 +31,17 @@ export const toolbarConfigs = {
     'redo',
     'undo',
   ],
-  reduced: ['bold', 'link', '|', 'bulletedList'],
+  simple: [
+    'bold',
+    'italic',
+    'link',
+    '|',
+    'bulletedList',
+    'numberedList',
+    '|',
+    'redo',
+    'undo',
+  ],
 };
 
 const defaultAllowedHeadings = ['h3', 'h4', 'h5'];
