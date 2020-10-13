@@ -110,7 +110,7 @@ describe('PermalinkPage', () => {
     );
 
     expect(screen.getByRole('figure')).toHaveTextContent(
-      "Table showing Number of authorised absence sessions for 'Subject 1' from 'Test publication' in Barnet for 2020/21",
+      "Table showing Number of authorised absence sessions for 'Subject 1' for Gender female from 'Test publication' in Barnet for 2020/21",
     );
 
     expect(screen.getByRole('table')).toBeInTheDocument();
