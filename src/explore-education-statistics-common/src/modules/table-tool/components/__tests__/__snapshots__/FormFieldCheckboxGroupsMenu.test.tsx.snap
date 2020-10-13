@@ -29,6 +29,7 @@ exports[`FormFieldCheckboxGroupsMenu renders multiple checkbox groups in correct
     id="test-search"
     name="test-search"
     type="text"
+    value=""
   />
   <div
     aria-live="assertive"
@@ -178,6 +179,7 @@ exports[`FormFieldCheckboxGroupsMenu renders single checkbox group with search i
     id="test-search"
     name="test-search"
     type="text"
+    value=""
   />
   <div
     aria-live="assertive"

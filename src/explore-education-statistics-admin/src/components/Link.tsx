@@ -28,6 +28,7 @@ const Link = ({
       <a
         rel="noopener noreferrer"
         target="_blank"
+        // eslint-disable-next-line react/jsx-props-no-spreading
         {...props}
         href={to as string}
         className={classNames(

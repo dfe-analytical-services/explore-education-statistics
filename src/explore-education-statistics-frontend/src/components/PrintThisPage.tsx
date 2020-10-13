@@ -1,3 +1,4 @@
+import Button from '@common/components/Button';
 import React from 'react';
 import classNames from 'classnames';
 import {
@@ -10,19 +11,7 @@ interface Props {
   className?: string;
 }
 
-const PrintThisPage = ({
-  analytics,
-  className,
-  ...props
-}: AnalyticProps & Props) => {
-  const openPrint = () => {
-    if (analytics) {
-      logEvent(analytics.category, analytics.action, window.location.pathname);
-    }
-
-    window.print();
-  };
-
+const PrintThisPage = ({ analytics, className }: AnalyticProps & Props) => {
   return (
     <div
       className={classNames(
@@ -32,14 +21,22 @@ const PrintThisPage = ({
         styles.mobileHidden,
       )}
     >
-      <a
-        className="govuk-button govuk-button--secondary"
-        {...props}
-        href="#"
-        onClick={() => openPrint()}
+      <Button
+        variant="secondary"
+        onClick={() => {
+          if (analytics) {
+            logEvent(
+              analytics.category,
+              analytics.action,
+              window.location.pathname,
+            );
+          }
+
+          window.print();
+        }}
       >
         Print this page
-      </a>
+      </Button>
     </div>
   );
 };

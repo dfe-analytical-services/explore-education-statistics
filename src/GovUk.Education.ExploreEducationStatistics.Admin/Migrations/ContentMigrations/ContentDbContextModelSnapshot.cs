@@ -343,6 +343,9 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Migrations.ContentMig
                     b.Property<string>("InternalReleaseNote")
                         .HasColumnType("nvarchar(max)");
 
+                    b.Property<string>("MetaGuidance")
+                        .HasColumnType("nvarchar(max)");
+
                     b.Property<string>("NextReleaseDate")
                         .HasColumnType("nvarchar(max)");
 

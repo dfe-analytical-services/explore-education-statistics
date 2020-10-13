@@ -116,12 +116,12 @@ describe('FormTextSearchInput', () => {
     expect(container.innerHTML).toMatchSnapshot();
   });
 
-  test('setting `labelHidden` visually hides the label', () => {
+  test('setting `hideLabel` visually hides the label', () => {
     const { getByText } = render(
       <FormTextSearchInput
         id="test-input"
         label="Test input"
-        labelHidden
+        hideLabel
         name="testInput"
         hint="Fill me in"
         width={20}

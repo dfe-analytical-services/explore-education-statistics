@@ -23,7 +23,7 @@ export type FormFieldComponentProps<Props, FormValues> = FormFieldProps<
 export interface FormFieldProps<FormValues = unknown> {
   formGroup?: boolean;
   formGroupClass?: string;
-  name: FormValues extends {} ? keyof FormValues : string;
+  name: FormValues extends Record<string, unknown> ? keyof FormValues : string;
   showError?: boolean;
 }
 
@@ -43,7 +43,7 @@ type InternalFormFieldProps<P, Value> = Omit<P, 'value' | 'error'> & {
   type?: 'checkbox' | 'radio' | 'text' | 'number';
 };
 
-const FormField = <Value, Props extends {} = {}>({
+function FormField<Value, Props = Record<string, unknown>>({
   as,
   children,
   formGroup = true,
@@ -52,7 +52,7 @@ const FormField = <Value, Props extends {} = {}>({
   showError = true,
   type,
   ...props
-}: FormFieldProps & InternalFormFieldProps<Props, Value>) => {
+}: FormFieldProps & InternalFormFieldProps<Props, Value>) {
   const [field, meta, helpers] = useField({
     name,
     type,
@@ -115,6 +115,6 @@ const FormField = <Value, Props extends {} = {}>({
   ) : (
     component
   );
-};
+}
 
 export default FormField;

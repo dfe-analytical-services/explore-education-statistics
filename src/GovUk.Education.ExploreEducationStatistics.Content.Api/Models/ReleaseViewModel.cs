@@ -23,6 +23,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Content.Api.Models
             release.KeyStatisticsSection,
             release.KeyStatisticsSecondarySection,
             release.DownloadFiles,
+            release.MetaGuidance,
             release.PreReleaseAccessList,
             release.RelatedInformation,
             release.DataLastPublished)

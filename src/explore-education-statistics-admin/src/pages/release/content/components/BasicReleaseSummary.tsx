@@ -18,7 +18,7 @@ interface ReleaseTypeIcon {
 }
 
 const nationalStatisticsLogo: ReleaseTypeIcon = {
-  url: '/static/images/UKSA-quality-mark.jpg',
+  url: '/assets/images/UKSA-quality-mark.jpg',
   altText: 'UK statistics authority quality mark',
 };
 

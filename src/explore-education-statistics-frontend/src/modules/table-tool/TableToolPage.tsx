@@ -18,8 +18,8 @@ import { GetServerSideProps, NextPage } from 'next';
 import dynamic from 'next/dynamic';
 import React, { useMemo } from 'react';
 
-const TableToolFinalStep = dynamic(() =>
-  import('@frontend/modules/table-tool/components/TableToolFinalStep'),
+const TableToolFinalStep = dynamic(
+  () => import('@frontend/modules/table-tool/components/TableToolFinalStep'),
 );
 
 export interface TableToolPageProps {

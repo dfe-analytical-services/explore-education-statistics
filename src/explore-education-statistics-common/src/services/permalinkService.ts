@@ -2,7 +2,9 @@ import { dataApi } from '@common/services/api';
 import { TableDataQuery } from '@common/services/tableBuilderService';
 import { ConfiguredTable } from '@common/services/types/table';
 
-export type Permalink = ConfiguredTable;
+export type Permalink = ConfiguredTable & {
+  invalidated: boolean;
+};
 
 export type TableHeader =
   | {

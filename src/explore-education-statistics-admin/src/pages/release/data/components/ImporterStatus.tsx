@@ -100,7 +100,9 @@ const ImporterStatus = ({
   const [cancelInterval] = useInterval(fetchStatus, 5000);
 
   useMounted(() => {
-    fetchStatus();
+    if (dataFile.status !== 'COMPLETE') {
+      fetchStatus();
+    }
   });
 
   useEffect(() => {

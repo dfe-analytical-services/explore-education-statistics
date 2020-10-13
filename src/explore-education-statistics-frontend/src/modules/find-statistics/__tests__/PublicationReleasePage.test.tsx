@@ -1,10 +1,9 @@
-import React from 'react';
-import { render } from '@testing-library/react';
-
-import PublicationReleasePage from '@frontend/modules/find-statistics/PublicationReleasePage';
 import { Release } from '@common/services/publicationService';
-import OfficialStats from './__data__/content.api.response.official.stats.json';
+import PublicationReleasePage from '@frontend/modules/find-statistics/PublicationReleasePage';
+import { render, screen } from '@testing-library/react';
+import React from 'react';
 import NationalStats from './__data__/content.api.response.national.stats.json';
+import OfficialStats from './__data__/content.api.response.official.stats.json';
 
 jest.mock('next/router', () => {
   return {
@@ -27,23 +26,13 @@ describe('PublicationReleasePage', () => {
   });
 
   test('renders national statistics section', () => {
-    const { container } = render(
+    render(
       <PublicationReleasePage data={(NationalStats as unknown) as Release} />,
     );
 
-    const elements = [
-      // @ts-ignore
-      ...container.querySelectorAll(
-        '.govuk-accordion__section-header h3 button',
-      ),
-    ] as Element[];
-
     expect(
-      elements.find(
-        ele =>
-          ele.textContent && ele.textContent.includes('National Statistics'),
-      ),
-    ).toBeDefined();
+      screen.getByRole('button', { name: 'National Statistics' }),
+    ).toBeInTheDocument();
   });
 
   test('renders official statistics image', () => {
@@ -59,22 +48,12 @@ describe('PublicationReleasePage', () => {
   });
 
   test('renders official statistics section', () => {
-    const { container } = render(
+    render(
       <PublicationReleasePage data={(OfficialStats as unknown) as Release} />,
     );
 
-    const elements = [
-      // @ts-ignore
-      ...container.querySelectorAll(
-        '.govuk-accordion__section-header h3 button',
-      ),
-    ] as Element[];
-
     expect(
-      elements.find(
-        ele =>
-          ele.textContent && ele.textContent.includes('National Statistics'),
-      ),
-    ).not.toBeDefined();
+      screen.queryByRole('button', { name: 'National Statistics' }),
+    ).not.toBeInTheDocument();
   });
 });

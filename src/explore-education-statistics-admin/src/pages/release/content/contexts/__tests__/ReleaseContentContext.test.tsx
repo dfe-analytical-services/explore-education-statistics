@@ -9,6 +9,7 @@ import {
   EditableBlock,
   EditableContentBlock,
 } from '@admin/services/types/content';
+import { ReleaseType } from '@common/services/publicationService';
 import { DataBlock, Table } from '@common/services/types/blocks';
 import { produce } from 'immer';
 
@@ -31,6 +32,8 @@ const basicRelease: EditableRelease = {
   slug: '2020-21',
   publicationId: '8586c490-7027-4a8b-9df5-cf105c3e88ec',
   status: 'Draft',
+  dataLastPublished: '',
+  published: '',
   publication: {
     id: '8586c490-7027-4a8b-9df5-cf105c3e88ec',
     title: 'My Pub',
@@ -58,8 +61,7 @@ const basicRelease: EditableRelease = {
   latestRelease: false,
   type: {
     id: '9d333457-9132-4e55-ae78-c55cb3673d7c',
-    // @ts-ignore
-    title: 'Official Statistics',
+    title: ReleaseType.OfficialStatistics,
   },
   updates: [
     {
@@ -107,8 +109,6 @@ const basicRelease: EditableRelease = {
         },
         {
           heading: "Table showing 'prma' from 'My Pub' in England for 2017/18",
-          // @ts-ignore
-          customFootnotes: '',
           name: 'DataBlock 1',
           source: '',
           query: {
@@ -145,7 +145,6 @@ const basicRelease: EditableRelease = {
       order: 1,
       heading: 'New section',
       content: [],
-      caption: '',
     },
   ],
   summarySection: {
@@ -153,12 +152,10 @@ const basicRelease: EditableRelease = {
     order: 0,
     content: [],
     heading: '',
-    caption: '',
   },
   headlinesSection: {
     id: '25a6cfbc-2cb5-43da-d1b7-08d7bec1ba1b',
     heading: '',
-    caption: '',
     order: 0,
     content: [
       {
@@ -173,12 +170,11 @@ const basicRelease: EditableRelease = {
   keyStatisticsSection: {
     id: '10e39b93-0304-43fb-d1b3-08d7bec1ba1b',
     order: 0,
+    heading: '',
     content: [
       {
         heading:
           "Table showing Main reason for issue: Unauthorised family holiday absence for 'prma' from 'My Pub' in England for 2017/18",
-        // @ts-ignore
-        customFootnotes: '',
         name: 'Holiday (Key Stat)',
         source: '',
         query: {
@@ -261,14 +257,11 @@ const basicRelease: EditableRelease = {
   },
   keyStatisticsSecondarySection: {
     heading: '',
-    caption: '',
     id: '5509024d-9389-40d1-d1b5-08d7bec1ba1b',
     order: 0,
     content: [
       {
         heading: "Table showing 'prma' from 'My Pub' in England for 2017/18",
-        //  @ts-ignore
-        customFootnotes: '',
         name: 'Aggregate table (Secondary)',
         source: '',
         query: {
@@ -686,7 +679,6 @@ describe('ReleaseContentContext', () => {
         type: 'ADD_CONTENT_SECTION',
         payload: {
           section: {
-            caption: '',
             heading: 'A new section',
             id: 'new-section-1',
             order: basicRelease.content.length,
@@ -744,7 +736,6 @@ describe('ReleaseContentContext', () => {
           meta: { sectionId: basicSection.id },
           section: {
             ...basicSection,
-            caption: 'updated caption',
             heading: 'updated heading',
           },
         },
@@ -752,7 +743,6 @@ describe('ReleaseContentContext', () => {
     );
 
     expect(release?.content[0].id).toEqual(basicSection.id);
-    expect(release?.content[0].caption).toEqual('updated caption');
     expect(release?.content[0].heading).toEqual('updated heading');
   });
 

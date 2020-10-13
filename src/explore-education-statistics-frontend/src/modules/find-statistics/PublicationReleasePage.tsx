@@ -113,7 +113,7 @@ const PublicationReleasePage: NextPage<Props> = ({ data }) => {
               {data.type &&
                 data.type.title === ReleaseType.NationalStatistics && (
                   <img
-                    src="/static/images/UKSA-quality-mark.jpg"
+                    src="/assets/images/UKSA-quality-mark.jpg"
                     alt="UK statistics authority quality mark"
                     height="120"
                     width="120"

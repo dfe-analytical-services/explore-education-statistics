@@ -12,7 +12,6 @@ import releaseDataFileService, {
   DataFile,
 } from '@admin/services/releaseDataFileService';
 import LoadingSpinner from '@common/components/LoadingSpinner';
-import Tag from '@common/components/Tag';
 import WarningMessage from '@common/components/WarningMessage';
 import useAsyncHandledRetry from '@common/hooks/useAsyncHandledRetry';
 import useAsyncRetry from '@common/hooks/useAsyncRetry';

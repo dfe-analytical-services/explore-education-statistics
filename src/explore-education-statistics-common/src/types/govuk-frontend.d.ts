@@ -1,3 +1,4 @@
+/* eslint-disable max-classes-per-file */
 declare class GovUkModule {
   public constructor(selector: HTMLElement | null);
 
@@ -48,6 +49,6 @@ declare module 'govuk-frontend/govuk/components/tabs/tabs' {
 }
 
 declare module '*.json' {
-  const value: object;
+  const value: Record<string, unknown>;
   export default value;
 }

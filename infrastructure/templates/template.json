@@ -461,6 +461,22 @@
         "master",
         "dev"
       ]
+    },
+    "skuStatisticsDb": {
+      "type": "string",
+      "defaultValue": "GP_S_Gen5 GeneralPurpose"
+    },
+    "minCapacityStatisticsDb": {
+      "type": "int",
+      "defaultValue": 1.5
+    },
+    "maxCapacityStatisticsDb": {
+      "type": "int",
+      "defaultValue": 4
+    },
+    "autoPauseDelayStatisticsDb": {
+      "type": "int",
+      "defaultValue": 60
     }
   },
   "variables": {
@@ -1372,7 +1388,7 @@
     {
       "name": "[variables('sqlserverName')]",
       "type": "Microsoft.Sql/servers",
-      "apiVersion": "2018-06-01-preview",
+      "apiVersion": "2019-06-01-preview",
       "location": "[resourceGroup().location]",
       "properties": {
         "administratorLogin": "[parameters('sqlAdministratorLogin')]",
@@ -1402,10 +1418,22 @@
             "[variables('sqlserverName')]"
           ],
           "properties": {
-            "edition": "Standard",
             "collation": "SQL_Latin1_General_CP1_CI_AS",
-            "maxSizeBytes": "268435456000",
-            "requestedServiceObjectiveName": "S3"
+            "maxSizeBytes": 268435456000,
+            "catalogCollation": "SQL_Latin1_General_CP1_CI_AS",
+            "zoneRedundant": false,
+            "readScale": "Disabled",
+            "readReplicaCount": 0,
+            "autoPauseDelay": 60,
+            "storageAccountType": "GRS",
+            "minCapacity": 2
+          },
+          "kind": "v12.0,user,vcore,serverless",
+          "sku": {
+            "name": "GP_S_Gen5",
+            "tier": "GeneralPurpose",
+            "family": "Gen5",
+            "capacity": "[parameters('maxCapacityStatisticsDb')]"
           }
         },
         {
@@ -1595,7 +1623,7 @@
     {
       "name": "[variables('publicSqlServerName')]",
       "type": "Microsoft.Sql/servers",
-      "apiVersion": "2018-06-01-preview",
+      "apiVersion": "2019-06-01-preview",
       "location": "[resourceGroup().location]",
       "properties": {
         "administratorLogin": "[parameters('sqlAdministratorLogin')]",
@@ -1625,10 +1653,22 @@
             "[variables('publicSqlServerName')]"
           ],
           "properties": {
-            "edition": "Standard",
             "collation": "SQL_Latin1_General_CP1_CI_AS",
-            "maxSizeBytes": "268435456000",
-            "requestedServiceObjectiveName": "S3"
+            "maxSizeBytes": 268435456000,
+            "catalogCollation": "SQL_Latin1_General_CP1_CI_AS",
+            "zoneRedundant": false,
+            "readScale": "Disabled",
+            "readReplicaCount": 0,
+            "autoPauseDelay": 60,
+            "storageAccountType": "GRS",
+            "minCapacity": 2
+          },
+          "kind": "v12.0,user,vcore,serverless",
+          "sku": {
+            "name": "GP_S_Gen5",
+            "tier": "GeneralPurpose",
+            "family": "Gen5",
+            "capacity": "[parameters('maxCapacityStatisticsDb')]"
           }
         },
         {

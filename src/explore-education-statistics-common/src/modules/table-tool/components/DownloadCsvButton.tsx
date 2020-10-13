@@ -39,7 +39,7 @@ export const getCsvData = (fullTable: FullTable): string[][] => {
       const [location, timePeriod, ...filterOptions] = filterCombination as [
         LocationFilter,
         TimePeriodFilter,
-        ...CategoryFilter[],
+        ...CategoryFilter[]
       ];
 
       const indicatorCells = indicators.map(indicator => {
