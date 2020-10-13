@@ -17,12 +17,6 @@
     "skuImporter": {
       "value": "S3 Standard"
     },
-    "minCapacityStatisticsDb": {
-      "value": 4
-    },
-    "autoPauseDelayStatisticsDb": {
-      "value": -1
-    },
     "publicAppBasicAuth": {
       "value": "false"
     },
