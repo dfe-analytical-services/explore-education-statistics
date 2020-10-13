@@ -14,19 +14,6 @@ import isBrowser from '@common/utils/isBrowser';
 import classNames from 'classnames';
 import React, { ChangeEvent, useCallback, useMemo } from 'react';
 
-export interface FormEditorProps {
-  allowHeadings?: boolean;
-  error?: string;
-  hideLabel?: boolean;
-  hint?: string;
-  id: string;
-  label: string;
-  toolbarConfig?: string[];
-  value: string;
-  onBlur?: () => void;
-  onChange: (content: string) => void;
-}
-
 export const toolbarConfigs = {
   full: [
     'heading',
@@ -47,8 +34,56 @@ export const toolbarConfigs = {
   reduced: ['bold', 'link', '|', 'bulletedList'],
 };
 
+const defaultAllowedHeadings = ['h3', 'h4', 'h5'];
+
+const headingOptions = [
+  {
+    model: 'heading1',
+    view: 'h1',
+    title: 'Heading 1',
+    class: 'ck-heading_heading1',
+  },
+  {
+    model: 'heading2',
+    view: 'h2',
+    title: 'Heading 2',
+    class: 'ck-heading_heading2',
+  },
+  {
+    model: 'heading3',
+    view: 'h3',
+    title: 'Heading 3',
+    class: 'ck-heading_heading3',
+  },
+  {
+    model: 'heading4',
+    view: 'h4',
+    title: 'Heading 4',
+    class: 'ck-heading_heading4',
+  },
+  {
+    model: 'heading5',
+    view: 'h5',
+    title: 'Heading 5',
+    class: 'ck-heading_heading5',
+  },
+];
+
+export interface FormEditorProps {
+  allowedHeadings?: string[];
+  error?: string;
+  hideLabel?: boolean;
+  hint?: string;
+  id: string;
+  label: string;
+  toolbarConfig?: string[];
+  value: string;
+  onBlur?: () => void;
+  onChange: (content: string) => void;
+}
+
 const FormEditor = ({
-  allowHeadings,
+  allowedHeadings = defaultAllowedHeadings,
   error,
   hideLabel,
   hint,
@@ -62,35 +97,22 @@ const FormEditor = ({
   const config = useMemo(
     () => ({
       toolbar: toolbarConfig,
-      heading: allowHeadings && {
-        options: [
-          {
-            model: 'paragraph',
-            title: 'Paragraph',
-            class: 'ck-heading_paragraph',
-          },
-          {
-            model: 'heading3',
-            view: 'h3',
-            title: 'Heading 3',
-            class: 'ck-heading_heading3',
-          },
-          {
-            model: 'heading4',
-            view: 'h4',
-            title: 'Heading 4',
-            class: 'ck-heading_heading4',
-          },
-          {
-            model: 'heading5',
-            view: 'h5',
-            title: 'Heading 5',
-            class: 'ck-heading_heading5',
-          },
-        ],
-      },
+      heading: toolbarConfig?.includes('heading')
+        ? {
+            options: [
+              {
+                model: 'paragraph',
+                title: 'Paragraph',
+                class: 'ck-heading_paragraph',
+              },
+              ...headingOptions.filter(option =>
+                allowedHeadings?.includes(option.view),
+              ),
+            ],
+          }
+        : undefined,
     }),
-    [allowHeadings, toolbarConfig],
+    [allowedHeadings, toolbarConfig],
   );
 
   const handleChange = useCallback(

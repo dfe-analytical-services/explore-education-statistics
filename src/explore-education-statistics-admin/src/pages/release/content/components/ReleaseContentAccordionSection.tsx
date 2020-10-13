@@ -162,7 +162,6 @@ const ReleaseContentAccordionSection = ({
     >
       <EditableSectionBlocks
         releaseId={release.id}
-        allowHeadings
         allowComments
         isReordering={isReordering}
         sectionId={sectionId}
