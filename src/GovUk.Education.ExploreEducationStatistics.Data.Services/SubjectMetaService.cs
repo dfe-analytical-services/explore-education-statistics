@@ -120,7 +120,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Services
             
             if (query.TimePeriod == null && query.Locations != null)
             {
-                timePeriods = query.TimePeriod != null ? null : GetTimePeriods(observations);
+                timePeriods = GetTimePeriods(observations);
 
                 _logger.LogTrace("Got Time Periods in {Time} ms", stopwatch.Elapsed.TotalMilliseconds);
                 stopwatch.Restart();
@@ -128,18 +128,20 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Services
             
             if (query.TimePeriod != null)
             {
-                filters = query.TimePeriod != null ? GetFilters(query.SubjectId, observations, false) : new Dictionary<string, FilterMetaViewModel>();
+                filters = GetFilters(query.SubjectId, observations, false);
 
                 _logger.LogTrace("Got Filters in {Time} ms", stopwatch.Elapsed.TotalMilliseconds);
                 stopwatch.Restart();
 
-                indicators = query.TimePeriod != null ? GetIndicators(query.SubjectId) : new Dictionary<string, IndicatorsMetaViewModel>();
+                indicators = GetIndicators(query.SubjectId);
 
                 _logger.LogTrace("Got Indicators in {Time} ms", stopwatch.Elapsed.TotalMilliseconds);
             }
 
             stopwatch.Stop();
             
+            // Only data relevant to the step being executed in the table tool needs to be returned hence the 
+            // null checks above so only the minimum requisite DB calls for the task are performed.
             return new SubjectMetaViewModel
             {
                 Filters = filters,
