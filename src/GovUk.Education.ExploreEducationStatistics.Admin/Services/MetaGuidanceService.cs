@@ -7,6 +7,7 @@ using GovUk.Education.ExploreEducationStatistics.Admin.Services.Interfaces.Secur
 using GovUk.Education.ExploreEducationStatistics.Admin.ViewModels;
 using GovUk.Education.ExploreEducationStatistics.Common.Extensions;
 using GovUk.Education.ExploreEducationStatistics.Common.Model;
+using GovUk.Education.ExploreEducationStatistics.Common.Services;
 using GovUk.Education.ExploreEducationStatistics.Common.Services.Interfaces.Security;
 using GovUk.Education.ExploreEducationStatistics.Common.Utils;
 using GovUk.Education.ExploreEducationStatistics.Content.Model;
@@ -137,8 +138,9 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Services
             var last = await orderedTimePeriods.LastAsync();
 
             return new MetaGuidanceSubjectTimePeriodsViewModel(
-                (first.Year, first.TimeIdentifier).GetTimePeriod(),
-                (last.Year, last.TimeIdentifier).GetTimePeriod());
+                TimePeriodLabelFormatter.Format(first.Year, first.TimeIdentifier),
+                TimePeriodLabelFormatter.Format(last.Year, last.TimeIdentifier)
+            );
         }
 
         private async Task<List<string>> GetGeographicLevels(Guid subjectId)

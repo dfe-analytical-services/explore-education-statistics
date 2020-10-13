@@ -226,8 +226,8 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
                 Assert.Equal("Subject 1 Meta Guidance", result.Right.Subjects[0].Content);
                 Assert.Equal("file1.csv", result.Right.Subjects[0].Filename);
                 Assert.Equal("Subject 1", result.Right.Subjects[0].Name);
-                Assert.Equal("2020_AYQ3", result.Right.Subjects[0].TimePeriods.From);
-                Assert.Equal("2021_AYQ1", result.Right.Subjects[0].TimePeriods.To);
+                Assert.Equal("2020/21 Q3", result.Right.Subjects[0].TimePeriods.From);
+                Assert.Equal("2021/22 Q1", result.Right.Subjects[0].TimePeriods.To);
                 Assert.Equal(new List<string>
                 {
                     "National", "Local Authority", "Local Authority District"
@@ -242,8 +242,8 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
                 Assert.Equal("Subject 2 Meta Guidance", result.Right.Subjects[1].Content);
                 Assert.Equal("file2.csv", result.Right.Subjects[1].Filename);
                 Assert.Equal("Subject 2", result.Right.Subjects[1].Name);
-                Assert.Equal("2020_T3", result.Right.Subjects[1].TimePeriods.From);
-                Assert.Equal("2021_T2", result.Right.Subjects[1].TimePeriods.To);
+                Assert.Equal("2020/21 Summer Term", result.Right.Subjects[1].TimePeriods.From);
+                Assert.Equal("2021/22 Spring Term", result.Right.Subjects[1].TimePeriods.To);
                 Assert.Equal(new List<string>
                 {
                     "National", "Regional"
