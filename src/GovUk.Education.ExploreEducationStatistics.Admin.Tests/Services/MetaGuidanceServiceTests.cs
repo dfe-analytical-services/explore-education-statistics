@@ -228,9 +228,9 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
                 Assert.Equal("Subject 1", result.Right.Subjects[0].Name);
                 Assert.Equal("2020_AYQ3", result.Right.Subjects[0].TimePeriods.From);
                 Assert.Equal("2021_AYQ1", result.Right.Subjects[0].TimePeriods.To);
-                Assert.Equal(new List<GeographicLevel>
+                Assert.Equal(new List<string>
                 {
-                    GeographicLevel.Country, GeographicLevel.LocalAuthority, GeographicLevel.LocalAuthorityDistrict
+                    "National", "Local Authority", "Local Authority District"
                 }, result.Right.Subjects[0].GeographicLevels);
                 Assert.Equal(2, result.Right.Subjects[0].Variables.Count);
                 Assert.Equal("Subject 1 Filter - Hint", result.Right.Subjects[0].Variables[0].Label);
@@ -244,9 +244,9 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
                 Assert.Equal("Subject 2", result.Right.Subjects[1].Name);
                 Assert.Equal("2020_T3", result.Right.Subjects[1].TimePeriods.From);
                 Assert.Equal("2021_T2", result.Right.Subjects[1].TimePeriods.To);
-                Assert.Equal(new List<GeographicLevel>
+                Assert.Equal(new List<string>
                 {
-                    GeographicLevel.Country, GeographicLevel.Region
+                    "National", "Regional"
                 }, result.Right.Subjects[1].GeographicLevels);
                 Assert.Equal(2, result.Right.Subjects[1].Variables.Count);
                 Assert.Equal("Subject 2 Filter", result.Right.Subjects[1].Variables[0].Label);

@@ -5,10 +5,11 @@ using System.Threading.Tasks;
 using GovUk.Education.ExploreEducationStatistics.Admin.Services.Interfaces;
 using GovUk.Education.ExploreEducationStatistics.Admin.Services.Interfaces.Security;
 using GovUk.Education.ExploreEducationStatistics.Admin.ViewModels;
+using GovUk.Education.ExploreEducationStatistics.Common.Extensions;
 using GovUk.Education.ExploreEducationStatistics.Common.Model;
-using GovUk.Education.ExploreEducationStatistics.Common.Model.Data;
 using GovUk.Education.ExploreEducationStatistics.Common.Services.Interfaces.Security;
 using GovUk.Education.ExploreEducationStatistics.Common.Utils;
+using GovUk.Education.ExploreEducationStatistics.Content.Model;
 using GovUk.Education.ExploreEducationStatistics.Content.Model.Database;
 using GovUk.Education.ExploreEducationStatistics.Data.Model;
 using GovUk.Education.ExploreEducationStatistics.Data.Model.Database;
@@ -109,48 +110,43 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Services
                 .Where(s => s.ReleaseId == releaseId)
                 .ToListAsync();
 
-            return (await Task.WhenAll(
-                releaseSubjects
-                    .OrderBy(subject => subject.Subject.Name)
-                    .Select(async releaseSubject =>
-                    {
-                        var subject = releaseSubject.Subject;
-                        var geographicLevels = await GetGeographicLevels(subject.Id);
-                        var timePeriods = await GetTimePeriods(subject.Id);
-                        var variables = GetVariables(subject.Id);
-                        return new MetaGuidanceSubjectViewModel
-                        {
-                            Id = subject.Id,
-                            Content = releaseSubject.MetaGuidance,
-                            Filename = dataFiles[subject.Id].Filename,
-                            Name = subject.Name,
-                            GeographicLevels = geographicLevels,
-                            TimePeriods = timePeriods,
-                            Variables = variables
-                        };
-                    })
-            )).ToList();
+            var result = new List<MetaGuidanceSubjectViewModel>();
+            await releaseSubjects.ForEachAsync(async releaseSubject =>
+            {
+                result.Add(await BuildSubjectViewModel(releaseSubject, dataFiles));
+            });
+
+            return result;
         }
 
         private async Task<MetaGuidanceSubjectTimePeriodsViewModel> GetTimePeriods(Guid subjectId)
         {
-            var orderedObservations = _statisticsDbContext
+            var orderedTimePeriods = _statisticsDbContext
                 .Observation
                 .Where(observation => observation.SubjectId == subjectId)
-                .OrderBy(observation => observation.Year)
-                .ThenBy(observation => observation.TimeIdentifier);
+                .Select(observation => new {observation.Year, observation.TimeIdentifier})
+                .OrderBy(tuple => tuple.Year)
+                .ThenBy(tuple => tuple.TimeIdentifier);
 
-            var first = await orderedObservations.FirstOrDefaultAsync();
-            var last = await orderedObservations.LastOrDefaultAsync();
-            return new MetaGuidanceSubjectTimePeriodsViewModel(first?.GetTimePeriod(), last?.GetTimePeriod());
+            if (!orderedTimePeriods.Any())
+            {
+                return new MetaGuidanceSubjectTimePeriodsViewModel();
+            }
+
+            var first = await orderedTimePeriods.FirstAsync();
+            var last = await orderedTimePeriods.LastAsync();
+
+            return new MetaGuidanceSubjectTimePeriodsViewModel(
+                (first.Year, first.TimeIdentifier).GetTimePeriod(),
+                (last.Year, last.TimeIdentifier).GetTimePeriod());
         }
 
-        private async Task<List<GeographicLevel>> GetGeographicLevels(Guid subjectId)
+        private async Task<List<string>> GetGeographicLevels(Guid subjectId)
         {
             return await _statisticsDbContext
                 .Observation
                 .Where(observation => observation.SubjectId == subjectId)
-                .Select(observation => observation.GeographicLevel)
+                .Select(observation => observation.GeographicLevel.GetEnumLabel())
                 .Distinct()
                 .ToListAsync();
         }
@@ -180,6 +176,25 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Services
                 Id = release.Id,
                 Content = release.MetaGuidance ?? "",
                 Subjects = subjects
+            };
+        }
+
+        private async Task<MetaGuidanceSubjectViewModel> BuildSubjectViewModel(ReleaseSubject releaseSubject,
+            IReadOnlyDictionary<Guid, ReleaseFileReference> dataFiles)
+        {
+            var subject = releaseSubject.Subject;
+            var geographicLevels = await GetGeographicLevels(subject.Id);
+            var timePeriods = await GetTimePeriods(subject.Id);
+            var variables = GetVariables(subject.Id);
+            return new MetaGuidanceSubjectViewModel
+            {
+                Id = subject.Id,
+                Content = releaseSubject.MetaGuidance,
+                Filename = dataFiles[subject.Id].Filename,
+                Name = subject.Name,
+                GeographicLevels = geographicLevels,
+                TimePeriods = timePeriods,
+                Variables = variables
             };
         }
     }
