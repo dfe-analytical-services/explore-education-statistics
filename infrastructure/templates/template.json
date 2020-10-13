@@ -1413,20 +1413,16 @@
             "DeploymentRepo": "[parameters('deploymentRepo')]",
             "DeploymentScript": "[parameters('deploymentScript')]"
           },
-          "apiVersion": "2015-01-01",
+          "apiVersion": "2019-06-01-preview",
           "dependsOn": [
             "[variables('sqlserverName')]"
           ],
           "properties": {
+            "edition": "Standard",
             "collation": "SQL_Latin1_General_CP1_CI_AS",
-            "maxSizeBytes": 268435456000,
-            "catalogCollation": "SQL_Latin1_General_CP1_CI_AS",
-            "zoneRedundant": false,
-            "readScale": "Disabled",
-            "readReplicaCount": 0,
-            "autoPauseDelay": 60,
-            "storageAccountType": "GRS",
-            "minCapacity": 2
+            "maxSizeBytes": "268435456000",
+            "autoPauseDelay": "[parameters('autoPauseDelayStatisticsDb')]",
+            "minCapacity": "[parameters('minCapacityStatisticsDb')]"
           },
           "kind": "v12.0,user,vcore,serverless",
           "sku": {
@@ -1648,20 +1644,16 @@
             "DeploymentRepo": "[parameters('deploymentRepo')]",
             "DeploymentScript": "[parameters('deploymentScript')]"
           },
-          "apiVersion": "2015-01-01",
+          "apiVersion": "2019-06-01-preview",
           "dependsOn": [
             "[variables('publicSqlServerName')]"
           ],
           "properties": {
+            "edition": "Standard",
             "collation": "SQL_Latin1_General_CP1_CI_AS",
-            "maxSizeBytes": 268435456000,
-            "catalogCollation": "SQL_Latin1_General_CP1_CI_AS",
-            "zoneRedundant": false,
-            "readScale": "Disabled",
-            "readReplicaCount": 0,
-            "autoPauseDelay": 60,
-            "storageAccountType": "GRS",
-            "minCapacity": 2
+            "maxSizeBytes": "268435456000",
+            "autoPauseDelay": "[parameters('autoPauseDelayStatisticsDb')]",
+            "minCapacity": "[parameters('minCapacityStatisticsDb')]"
           },
           "kind": "v12.0,user,vcore,serverless",
           "sku": {
