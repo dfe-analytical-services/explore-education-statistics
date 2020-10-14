@@ -15,7 +15,6 @@ using GovUk.Education.ExploreEducationStatistics.Content.Model.Database;
 using GovUk.Education.ExploreEducationStatistics.Data.Model;
 using GovUk.Education.ExploreEducationStatistics.Data.Model.Database;
 using GovUk.Education.ExploreEducationStatistics.Data.Model.Services.Interfaces;
-using GovUk.Education.ExploreEducationStatistics.Data.Services.Extensions;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
 using Release = GovUk.Education.ExploreEducationStatistics.Content.Model.Release;
@@ -29,7 +28,6 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Services
         private readonly IFilterService _filterService;
         private readonly IIndicatorService _indicatorService;
         private readonly StatisticsDbContext _statisticsDbContext;
-        private readonly IPersistenceHelper<StatisticsDbContext> _statisticsPersistenceHelper;
         private readonly IUserService _userService;
 
         public MetaGuidanceService(ContentDbContext contentDbContext,
@@ -37,7 +35,6 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Services
             IFilterService filterService,
             IIndicatorService indicatorService,
             StatisticsDbContext statisticsDbContext,
-            IPersistenceHelper<StatisticsDbContext> statisticsPersistenceHelper,
             IUserService userService)
         {
             _contentDbContext = contentDbContext;
@@ -45,7 +42,6 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Services
             _filterService = filterService;
             _indicatorService = indicatorService;
             _statisticsDbContext = statisticsDbContext;
-            _statisticsPersistenceHelper = statisticsPersistenceHelper;
             _userService = userService;
         }
 
@@ -56,8 +52,9 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Services
                 .OnSuccess(BuildViewModel);
         }
 
-        public async Task<Either<ActionResult, MetaGuidanceViewModel>> UpdateRelease(Guid releaseId,
-            MetaGuidanceUpdateReleaseViewModel request)
+        public async Task<Either<ActionResult, MetaGuidanceViewModel>> Update(
+            Guid releaseId,
+            MetaGuidanceUpdateViewModel request)
         {
             return await _contentPersistenceHelper.CheckEntityExists<Release>(releaseId)
                 .OnSuccessDo(release => _userService.CheckCanUpdateRelease(release))
@@ -67,31 +64,49 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Services
                     release.MetaGuidance = request.Content;
                     await _contentDbContext.SaveChangesAsync();
 
+                    await UpdateSubjects(releaseId, request.Subjects);
+
                     return await BuildViewModel(release);
                 });
         }
 
-        public async Task<Either<ActionResult, MetaGuidanceViewModel>> UpdateSubject(Guid releaseId,
-            Guid subjectId,
-            MetaGuidanceUpdateSubjectViewModel request)
+        private async Task UpdateSubjects(
+            Guid releaseId,
+            List<MetaGuidanceUpdateSubjectViewModel> subjects)
         {
-            return await _contentPersistenceHelper.CheckEntityExists<Release>(releaseId)
-                .OnSuccessDo(release => _userService.CheckCanUpdateRelease(release))
-                .OnSuccess(release =>
-                {
-                    return _statisticsPersistenceHelper.CheckEntityExists<ReleaseSubject>(
-                            releaseSubjects => releaseSubjects
-                                .Where(releaseSubject => releaseSubject.ReleaseId == releaseId
-                                                         && releaseSubject.SubjectId == subjectId))
-                        .OnSuccess(async releaseSubject =>
-                        {
-                            _statisticsDbContext.Update(releaseSubject);
-                            releaseSubject.MetaGuidance = request.Content;
-                            await _statisticsDbContext.SaveChangesAsync();
+            if (!subjects.Any())
+            {
+                return;
+            }
 
-                            return await BuildViewModel(release);
-                        });
+            var contentById = subjects.ToDictionary(
+                s => s.Id,
+                s => s.Content
+            );
+            var subjectIds = subjects.Select(s => s.Id);
+
+            var matchingSubjects = await _statisticsDbContext.ReleaseSubject
+                .Where(
+                    releaseSubject => releaseSubject.ReleaseId == releaseId
+                                      && subjectIds.Contains(releaseSubject.SubjectId)
+                )
+                .ToListAsync();
+
+            matchingSubjects.ForEach(
+                releaseSubject =>
+                {
+                    var content = contentById.GetValueOrDefault(releaseSubject.SubjectId);
+
+                    if (string.IsNullOrEmpty(content))
+                    {
+                        return;
+                    }
+
+                    releaseSubject.MetaGuidance = content;
+                    _statisticsDbContext.Update(releaseSubject);
                 });
+
+            await _statisticsDbContext.SaveChangesAsync();
         }
 
         private async Task<List<MetaGuidanceSubjectViewModel>> GetSubjects(Guid releaseId)
@@ -191,7 +206,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Services
             return new MetaGuidanceSubjectViewModel
             {
                 Id = subject.Id,
-                Content = releaseSubject.MetaGuidance,
+                Content = releaseSubject.MetaGuidance ?? "",
                 Filename = dataFiles[subject.Id].Filename,
                 Name = subject.Name,
                 GeographicLevels = geographicLevels,

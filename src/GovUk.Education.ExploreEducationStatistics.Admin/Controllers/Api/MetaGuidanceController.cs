@@ -27,20 +27,11 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Controllers.Api
                 .HandleFailuresOrOk();
         }
 
-        [HttpPut("release/{releaseId}/meta-guidance")]
-        public async Task<ActionResult<MetaGuidanceViewModel>> UpdateRelease(Guid releaseId,
-            MetaGuidanceUpdateReleaseViewModel request)
+        [HttpPatch("release/{releaseId}/meta-guidance")]
+        public async Task<ActionResult<MetaGuidanceViewModel>> Update(Guid releaseId,
+            MetaGuidanceUpdateViewModel request)
         {
-            return await _metaGuidanceService.UpdateRelease(releaseId, request)
-                .HandleFailuresOrOk();
-        }
-
-        [HttpPut("release/{releaseId}/subjects/{subjectId}/meta-guidance")]
-        public async Task<ActionResult<MetaGuidanceViewModel>> UpdateSubject(Guid releaseId,
-            Guid subjectId,
-            MetaGuidanceUpdateSubjectViewModel request)
-        {
-            return await _metaGuidanceService.UpdateSubject(releaseId, subjectId, request)
+            return await _metaGuidanceService.Update(releaseId, request)
                 .HandleFailuresOrOk();
         }
     }
