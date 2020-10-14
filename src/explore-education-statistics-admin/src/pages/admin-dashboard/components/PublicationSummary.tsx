@@ -45,9 +45,6 @@ const PublicationSummary = ({ publication, onChangePublication }: Props) => {
   const noAmendmentInProgressFilter = (release: Release) =>
     !releases.some(r => r.amendment && r.previousVersionId === release.id);
 
-  // BAU-404 - temporarily hide the Amend Release button completely until Release Versioning Phase 1 is complete
-  const showAmendmentButton = () => true;
-
   return (
     <>
       <table>
@@ -138,17 +135,9 @@ const PublicationSummary = ({ publication, onChangePublication }: Props) => {
               ) : (
                 <>
                   {externalMethodology?.url ? (
-                    <>
-                      {externalMethodology.title} (
-                      <a
-                        href={externalMethodology.url}
-                        target="_blank"
-                        rel="noopener noreferrer"
-                      >
-                        {externalMethodology.url}
-                      </a>
-                      )
-                    </>
+                    <Link to={externalMethodology.url} unvisited>
+                      {externalMethodology.title} (external methodology)
+                    </Link>
                   ) : (
                     'No methodology assigned'
                   )}
@@ -181,9 +170,7 @@ const PublicationSummary = ({ publication, onChangePublication }: Props) => {
                   {releases.filter(noAmendmentInProgressFilter).map(release => (
                     <li key={release.id}>
                       <NonScheduledReleaseSummary
-                        onClickAmendRelease={
-                          showAmendmentButton() ? setAmendReleaseId : undefined
-                        }
+                        onClickAmendRelease={setAmendReleaseId}
                         onClickCancelAmendment={setCancelAmendmentReleaseId}
                         release={release}
                       />
