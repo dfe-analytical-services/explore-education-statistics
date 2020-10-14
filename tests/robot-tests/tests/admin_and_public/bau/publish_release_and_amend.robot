@@ -2,7 +2,7 @@
 Resource    ../../libs/admin-common.robot
 Resource    ../../libs/charts.robot
 Resource    ../../libs/public-common.robot
-Library     ../../libs/api_keywords.py
+Library     ../../libs/admin_api.py
 
 Force Tags  Admin  Local  Dev  AltersData
 
@@ -11,6 +11,7 @@ Suite Teardown    user closes the browser
 
 *** Variables ***
 ${RUN_IDENTIFIER}    %{RUN_IDENTIFIER}
+${THEME_NAME}        %{TEST_THEME_NAME}
 ${TOPIC_NAME}        %{TEST_TOPIC_NAME}
 ${PUBLICATION_NAME}  UI tests - publish release %{RUN_IDENTIFIER}
 ${DATABLOCK_NAME}    Dates data block name
@@ -325,11 +326,11 @@ Return to Admin to start creating an amendment
     user goes to url  %{ADMIN_URL}
     user waits until h1 is visible   Dashboard
     user waits until page contains title caption  Welcome Bau1
-    user waits until page contains element   css:#selectTheme   180
+    user waits until page contains element   id:publicationsReleases-themeTopic-themeId   180
 
 Create amendment
     [Tags]  HappyPath
-    user selects theme "Test theme" and topic "${TOPIC_NAME}" from the admin dashboard
+    user selects theme and topic from admin dashboard  ${THEME_NAME}  ${TOPIC_NAME}
     user waits until page contains link    Create new publication
     user waits until page contains accordion section  ${PUBLICATION_NAME}
 

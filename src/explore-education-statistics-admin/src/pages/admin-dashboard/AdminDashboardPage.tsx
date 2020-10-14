@@ -105,7 +105,7 @@ const AdminDashboardPage = () => {
       <LoadingSpinner loading={loadingReleases}>
         <Tabs id="publicationTabs">
           <TabsSection
-            id="my-publications"
+            id="publicationsReleases"
             title="Manage publications and releases"
           >
             <ManagePublicationsAndReleasesTab />

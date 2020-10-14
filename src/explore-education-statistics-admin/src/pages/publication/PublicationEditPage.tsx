@@ -54,6 +54,7 @@ const PublicationEditPage = ({
         }
         initialValues={{
           title: publication.title,
+          topicId: publication.topicId,
           teamName: contact?.teamName ?? '',
           teamEmail: contact?.teamEmail ?? '',
           contactName: contact?.contactName ?? '',
@@ -68,21 +69,24 @@ const PublicationEditPage = ({
           contactTelNo,
           ...values
         }) => {
-          await publicationService.updatePublication(publication.id, {
-            ...values,
-            topicId: publication.topicId,
-            contact: {
-              teamName,
-              teamEmail,
-              contactName,
-              contactTelNo,
+          const updatedPublication = await publicationService.updatePublication(
+            publication.id,
+            {
+              ...values,
+              topicId: values.topicId ?? publication?.topicId,
+              contact: {
+                teamName,
+                teamEmail,
+                contactName,
+                contactTelNo,
+              },
             },
-          });
+          );
 
           history.push(
             appendQuery<ThemeTopicParams>(dashboardRoute.path, {
-              themeId: publication.themeId,
-              topicId: publication.topicId,
+              themeId: updatedPublication.themeId,
+              topicId: updatedPublication.topicId,
             }),
           );
         }}

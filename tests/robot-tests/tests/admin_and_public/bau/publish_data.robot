@@ -1,7 +1,7 @@
 *** Settings ***
 Resource    ../../libs/admin-common.robot
 Resource    ../../libs/public-common.robot
-Library     ../../libs/api_keywords.py
+Library     ../../libs/admin_api.py
 
 Force Tags  Admin  Local  Dev  AltersData
 
@@ -9,6 +9,7 @@ Suite Setup       user signs in as bau1
 Suite Teardown    user closes the browser
 
 *** Variables ***
+${THEME_NAME}        %{TEST_THEME_NAME}
 ${TOPIC_NAME}        %{TEST_TOPIC_NAME}
 ${PUBLICATION_NAME}  UI tests - publish data %{RUN_IDENTIFIER}
 
@@ -52,11 +53,11 @@ Return to Admin Dashboard
     [Tags]  HappyPath
     user goes to url    %{ADMIN_URL}
     user waits until h1 is visible   Dashboard
-    user waits until page contains element   css:#selectTheme    180
+    user waits until page contains element   id:publicationsReleases-themeTopic-themeId    180
 
 Create another release for the same publication
     [Tags]  HappyPath
-    user selects theme "Test theme" and topic "${TOPIC_NAME}" from the admin dashboard
+    user selects theme and topic from admin dashboard  ${THEME_NAME}  ${TOPIC_NAME}
     user waits until page contains link    Create new publication
     user opens accordion section   ${PUBLICATION_NAME}
     user clicks testid element   Create new release link for ${PUBLICATION_NAME}

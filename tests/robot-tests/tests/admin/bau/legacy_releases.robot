@@ -1,6 +1,6 @@
 *** Settings ***
 Resource    ../../libs/admin-common.robot
-Library     ../../libs/api_keywords.py
+Library     ../../libs/admin_api.py
 
 Force Tags  Admin  Local  Dev  AltersData
 
@@ -8,6 +8,7 @@ Suite Setup       user signs in as bau1
 Suite Teardown    user closes the browser
 
 *** Variables ***
+${THEME_NAME}        %{TEST_THEME_NAME}
 ${TOPIC_NAME}        %{TEST_TOPIC_NAME}
 ${PUBLICATION_NAME}  UI tests - legacy releases %{RUN_IDENTIFIER}
 
@@ -29,7 +30,7 @@ Create new publication for topic
 
 Verify new publication
     [Tags]  HappyPath
-    user selects theme "Test theme" and topic "${TOPIC_NAME}" from the admin dashboard
+    user selects theme and topic from admin dashboard  ${THEME_NAME}  ${TOPIC_NAME}
     user waits until page contains button  ${PUBLICATION_NAME}
 
 Go to legacy releases page

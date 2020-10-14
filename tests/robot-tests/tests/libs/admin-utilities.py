@@ -1,9 +1,6 @@
-from selenium.webdriver.common.keys import Keys
 from robot.libraries.BuiltIn import BuiltIn
 import time
 import os
-import json
-import requests
 from tests.libs.setup_auth_variables import setup_auth_variables
 from tests.libs.utilities import set_to_local_storage
 from tests.libs.utilities import set_cookie_from_json
@@ -39,36 +36,6 @@ def user_signs_in_as(user: str):
         raise_assertion_error(e)
 
 
-def admin_request(method, endpoint, body=None):
-    assert method and endpoint
-    assert os.getenv('IDENTITY_LOCAL_STORAGE_ADMIN') is not None
-    assert os.getenv('ADMIN_URL') is not None
-
-    # To prevent InsecureRequestWarning
-    requests.packages.urllib3.disable_warnings()
-
-    jwt_token = json.loads(os.getenv('IDENTITY_LOCAL_STORAGE_ADMIN'))['access_token']
-    headers = {
-        'Content-Type': 'application/json',
-        'Authorization': f'Bearer {jwt_token}',
-    }
-    return requests.request(
-        method,
-        url=f'{os.getenv("ADMIN_URL")}{endpoint}',
-        headers=headers,
-        json=body,
-        verify=False
-    )
-
-
-def delete_theme(theme_id: str):
-    assert theme_id
-
-    resp = admin_request('DELETE', f'/api/themes/{theme_id}')
-    assert resp.status_code == 204, \
-        f'Could not delete theme! Responded with {resp.status_code} and {resp.text}'
-
-
 def get_theme_id_from_url():
     url = sl.get_location()
     assert '/themes/' in url, 'URL does not contain /themes'
@@ -81,12 +48,6 @@ def get_release_guid_from_release_status_page_url(url):
     assert url.endswith('/status')
     url_components = url.split('/')
     return url_components[-2]
-
-
-def user_triggers_release_on_demand(release_id):
-    resp = admin_request('PUT', f'/api/bau/release/{release_id}/publish')
-    assert resp.status_code == 200, \
-        f'Release on demand request failed! Responded with {resp.status_code} and {resp.text}'
 
 
 def data_csv_number_contains_xpath(num, xpath):
