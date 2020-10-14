@@ -22,6 +22,7 @@ export interface AccordionProps {
   children: ReactNode;
   id: string;
   openAll?: boolean;
+  showOpenAll?: boolean;
   onToggleAll?: (open: boolean) => void;
   onToggle?: (accordionSection: { id: string; title: string }) => void;
 }
@@ -30,6 +31,7 @@ const Accordion = ({
   children,
   id,
   openAll,
+  showOpenAll = true,
   onToggleAll,
   onToggle,
 }: AccordionProps) => {
@@ -156,7 +158,7 @@ const Accordion = ({
       role="none"
       data-testid="accordion"
     >
-      {isMounted && typeof openAll !== 'boolean' && (
+      {isMounted && showOpenAll && (
         <div className="govuk-accordion__controls">
           <button
             aria-expanded={isAllOpen}
