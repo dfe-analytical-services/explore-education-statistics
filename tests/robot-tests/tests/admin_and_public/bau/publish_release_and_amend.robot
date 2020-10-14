@@ -304,7 +304,7 @@ Verify Dates data block accordion section
     user checks infographic chart contains alt  ${section}  Sample alt text
 
     user clicks link  Table  ${section}
-    user waits until parent contains element  ${section}  xpath:.//*[@id="dataTableCaption" and text()="Dates table title"]
+    user waits until parent contains element  ${section}  xpath:.//*[@data-testid="dataTableCaption" and text()="Dates table title"]
     user waits until parent contains element  ${section}  xpath:.//*[.="Source: Dates source"]
 
     user checks table column heading contains  1  1  2020 Week 13  ${section}
@@ -620,7 +620,7 @@ Verify amendment Dates data block accordion section
     user checks infographic chart contains alt  ${section}  Updated sample alt text
 
     user clicks link  Table  ${section}
-    user waits until parent contains element  ${section}  xpath:.//*[@id="dataTableCaption" and text()="Updated dates table title"]
+    user waits until parent contains element  ${section}  xpath:.//*[@data-testid="dataTableCaption" and text()="Updated dates table title"]
     user waits until parent contains element  ${section}  xpath:.//*[.="Source: Updated dates source"]
 
     user checks table column heading contains  1  1  2020 Week 13  ${section}

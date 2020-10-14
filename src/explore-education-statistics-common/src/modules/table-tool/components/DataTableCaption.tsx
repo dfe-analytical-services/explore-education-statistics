@@ -11,6 +11,7 @@ export function generateTableTitle({
   locations,
   subjectName,
   publicationName,
+  filters,
   expanded,
 }: FullTableMeta & {
   expanded?: boolean;
@@ -40,19 +41,21 @@ export function generateTableTitle({
       : locations.map(location => location.label).sort(),
   )}`;
 
-  return `Table showing ${indicatorString}'${subjectName}' from '${publicationName}'${locationsString}${timePeriodString}`;
+  const filterList = Object.values(filters)
+    .flatMap(filterGroup => filterGroup.options)
+    .map(filter => filter.label)
+    .filter(label => label !== 'Total');
+  const filterString = filterList.length ? ` for ${commaList(filterList)}` : '';
+
+  return `Table showing ${indicatorString}'${subjectName}'${filterString} from '${publicationName}'${locationsString}${timePeriodString}`;
 }
 
 interface Props extends FullTableMeta {
-  id: string;
+  id?: string;
   title?: string;
 }
 
-const DataTableCaption = ({
-  id = 'dataTableCaption',
-  title,
-  ...props
-}: Props) => {
+const DataTableCaption = ({ id, title, ...props }: Props) => {
   const { locations } = props;
 
   const [expanded, toggleExpanded] = useToggle(false);
@@ -64,7 +67,9 @@ const DataTableCaption = ({
 
   return (
     <>
-      <strong id={id}>{title || caption}</strong>
+      <strong id={id} data-testid="dataTableCaption">
+        {title || caption}
+      </strong>
       {locations.length > 10 && (
         <ButtonText
           className={classNames('govuk-!-display-block govuk-!-margin-top-2')}

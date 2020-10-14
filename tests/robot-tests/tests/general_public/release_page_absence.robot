@@ -157,7 +157,7 @@ Validate Key Statistics data block -- Charts tab
 Validate Key Statistics data block -- Data tables tab
    [Tags]  HappyPath
    user clicks element   css:#releaseHeadlines-tables-tab
-   user waits until element contains   css:#dataTableCaption    Table showing 'Absence by characteristic' from 'Pupil absence in schools in England' in England between 2012/13 and 2016/17
+   user waits until element contains   css:[data-testid="dataTableCaption"]    Table showing 'Absence by characteristic' from 'Pupil absence in schools in England' in England between 2012/13 and 2016/17
 
    user checks table column heading contains  1   1   2012/13  css:#releaseHeadlines-tables table
    user checks table column heading contains  1   2   2013/14  css:#releaseHeadlines-tables table
@@ -207,7 +207,7 @@ Validate Regional and local authority (LA) breakdown table
     [Tags]  HappyPath   Failing
     [Documentation]  BAU-540
     user opens accordion section  Regional and local authority (LA) breakdown
-    user waits until element contains  css:#content_9_datablock-tables #dataTableCaption    Table showing 'Absence by characteristic' from 'Pupil absence in schools in England' in
+    user waits until element contains  css:#content_9_datablock-tables [data-testid="dataTableCaption"]    Table showing 'Absence by characteristic' from 'Pupil absence in schools in England' in
 
     user checks table column heading contains  1   1   2016/17  css:#content_9_datablock-tables table
 
