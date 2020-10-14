@@ -158,10 +158,18 @@ export const getServerSideProps: GetServerSideProps<TableToolPageProps> = async 
     ? await tableBuilderService.getPublicationMeta(publicationId)
     : undefined;
 
+  if (publicationMeta) {
+    return {
+      props: {
+        themeMeta,
+        publicationMeta,
+      },
+    };
+  }
+
   return {
     props: {
       themeMeta,
-      publicationMeta,
     },
   };
 };
