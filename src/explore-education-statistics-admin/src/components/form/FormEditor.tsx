@@ -243,6 +243,7 @@ const FormEditor = ({
             );
 
             if (editorElement) {
+              editorElement.id = id;
               editorRef.current = editorElement;
             }
           }}

@@ -18,8 +18,8 @@ user checks results table row heading contains
     user waits until element contains  xpath://table/tbody/tr[${row}]/th[${column}]   ${expected}
 
 user checks results table cell contains
-    [Arguments]   ${row}  ${column}  ${expected}
-    user waits until element contains  xpath://table/tbody/tr[${row}]/td[${column}]   ${expected}
+    [Arguments]   ${row}  ${column}  ${expected}  ${parent}=css:table
+    user waits until parent contains element  ${parent}  xpath:.//tbody/tr[${row}]/td[${column}][contains(., "${expected}")]
 
 user checks table heading in offset row contains
     [Arguments]  ${row}   ${offset}   ${column}   ${expected}  ${parent}=css:table
