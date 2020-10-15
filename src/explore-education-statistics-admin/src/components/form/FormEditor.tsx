@@ -10,9 +10,17 @@ import CKEditor from '@ckeditor/ckeditor5-react';
 import ErrorMessage from '@common/components/ErrorMessage';
 import FormLabel from '@common/components/form/FormLabel';
 import SanitizeHtml from '@common/components/SanitizeHtml';
+import useToggle from '@common/hooks/useToggle';
 import isBrowser from '@common/utils/isBrowser';
 import classNames from 'classnames';
-import React, { ChangeEvent, useCallback, useMemo } from 'react';
+import React, {
+  ChangeEvent,
+  MutableRefObject,
+  useCallback,
+  useEffect,
+  useMemo,
+  useRef,
+} from 'react';
 
 export const toolbarConfigs = {
   full: [
@@ -104,6 +112,10 @@ const FormEditor = ({
   onBlur,
   onChange,
 }: FormEditorProps) => {
+  const editorRef: MutableRefObject<HTMLDivElement | null> = useRef(null);
+
+  const [isFocused, toggleFocused] = useToggle(false);
+
   const config = useMemo(
     () => ({
       toolbar: toolbarConfig,
@@ -125,12 +137,60 @@ const FormEditor = ({
     [allowedHeadings, toolbarConfig],
   );
 
+  useEffect(() => {
+    if (process.env.NODE_ENV === 'test') {
+      return undefined;
+    }
+
+    // Workaround to try and focus/scroll to CKEditor
+    // whenever a form validation error link is clicked.
+    const handleHashChange = () => {
+      if (!editorRef.current || !window.location.hash) {
+        return;
+      }
+
+      const hashId = window.location.hash.substring(1);
+
+      if (hashId !== id) {
+        return;
+      }
+
+      editorRef.current.focus();
+      editorRef.current.scrollIntoView({
+        block: 'center',
+        behavior: 'smooth',
+      });
+    };
+
+    window.addEventListener('hashchange', handleHashChange);
+
+    return () => {
+      window.removeEventListener('hashchange', handleHashChange);
+    };
+  }, [id]);
+
+  const handleLabelClick = useCallback(() => {
+    if (!editorRef.current) {
+      return;
+    }
+
+    editorRef.current.focus();
+  }, []);
+
   const handleChange = useCallback(
     (event: ChangeEvent, editor: { getData(): string }) => {
       onChange(editor.getData());
     },
     [onChange],
   );
+
+  const handleBlur = useCallback(() => {
+    toggleFocused.off();
+
+    if (onBlur) {
+      onBlur();
+    }
+  }, [onBlur, toggleFocused]);
 
   const handleInit = useCallback(
     (editor: { editing: { view: { focus(): void } } }) => {
@@ -144,11 +204,15 @@ const FormEditor = ({
   return (
     <>
       {process.env.NODE_ENV !== 'test' ? (
+        // Workaround to emulate standard label behaviour
+        // and focus the editor correctly.
+        // eslint-disable-next-line jsx-a11y/click-events-have-key-events,jsx-a11y/no-static-element-interactions
         <span
           id={`${id}-label`}
           className={classNames('govuk-label', {
             'govuk-visually-hidden': hideLabel,
           })}
+          onClick={handleLabelClick}
         >
           {label}
         </span>
@@ -165,18 +229,28 @@ const FormEditor = ({
       {error && <ErrorMessage id={`${id}-error`}>{error}</ErrorMessage>}
 
       {!isReadOnly ? (
-        <div className={styles.editor}>
+        <div
+          className={classNames(styles.editor, {
+            [styles.focused]: isFocused,
+          })}
+          ref={ref => {
+            const editorElement = ref?.querySelector<HTMLDivElement>(
+              '[role="textbox"]',
+            );
+
+            if (editorElement) {
+              editorRef.current = editorElement;
+            }
+          }}
+        >
           {process.env.NODE_ENV !== 'test' ? (
             <CKEditor
               editor={ClassicEditor}
               config={config}
               data={value}
               onChange={handleChange}
-              onBlur={() => {
-                if (onBlur) {
-                  onBlur();
-                }
-              }}
+              onFocus={toggleFocused.on}
+              onBlur={handleBlur}
               onInit={handleInit}
             />
           ) : (
