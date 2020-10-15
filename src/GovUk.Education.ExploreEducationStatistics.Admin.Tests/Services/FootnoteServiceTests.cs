@@ -12,6 +12,7 @@ using Microsoft.AspNetCore.Mvc;
 using Microsoft.Extensions.Logging;
 using Moq;
 using Xunit;
+using static GovUk.Education.ExploreEducationStatistics.Data.Model.Database.StatisticsDbUtils;
 
 namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
 {
@@ -99,7 +100,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
 
             var contextId = Guid.NewGuid().ToString();
 
-            await using (var statisticsDbContext = DbUtils.InMemoryStatisticsDbContext(contextId))
+            await using (var statisticsDbContext = InMemoryStatisticsDbContext(contextId))
             await using (var contentDbContext = DbUtils.InMemoryApplicationDbContext(contextId))
             {
                 await statisticsDbContext.AddAsync(release);
@@ -115,7 +116,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
                 await contentDbContext.SaveChangesAsync();
             }
 
-            await using (var statisticsDbContext = DbUtils.InMemoryStatisticsDbContext(contextId))
+            await using (var statisticsDbContext = InMemoryStatisticsDbContext(contextId))
             await using (var contentDbContext = DbUtils.InMemoryApplicationDbContext(contextId))
             {
                 var service = SetupFootnoteService(statisticsDbContext, contentDbContext: contentDbContext);
@@ -168,13 +169,13 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
 
             var contextId = Guid.NewGuid().ToString();
 
-            await using (var statisticsDbContext = DbUtils.InMemoryStatisticsDbContext(contextId))
+            await using (var statisticsDbContext = InMemoryStatisticsDbContext(contextId))
             {
                 await statisticsDbContext.AddAsync(footnote);
                 await statisticsDbContext.SaveChangesAsync();
             }
 
-            await using (var statisticsDbContext = DbUtils.InMemoryStatisticsDbContext(contextId))
+            await using (var statisticsDbContext = InMemoryStatisticsDbContext(contextId))
             await using (var contentDbContext = DbUtils.InMemoryApplicationDbContext(contextId))
             {
                 var service = SetupFootnoteService(statisticsDbContext, contentDbContext: contentDbContext);
@@ -194,7 +195,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
 
             var contextId = Guid.NewGuid().ToString();
 
-            await using (var statisticsDbContext = DbUtils.InMemoryStatisticsDbContext(contextId))
+            await using (var statisticsDbContext = InMemoryStatisticsDbContext(contextId))
             await using (var contentDbContext = DbUtils.InMemoryApplicationDbContext(contextId))
             {
                 await statisticsDbContext.AddAsync(release);
@@ -209,7 +210,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
                 await contentDbContext.SaveChangesAsync();
             }
 
-            await using (var statisticsDbContext = DbUtils.InMemoryStatisticsDbContext(contextId))
+            await using (var statisticsDbContext = InMemoryStatisticsDbContext(contextId))
             await using (var contentDbContext = DbUtils.InMemoryApplicationDbContext(contextId))
             {
                 var service = SetupFootnoteService(statisticsDbContext, contentDbContext: contentDbContext);
@@ -239,7 +240,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
 
             var contextId = Guid.NewGuid().ToString();
 
-            await using (var statisticsDbContext = DbUtils.InMemoryStatisticsDbContext(contextId))
+            await using (var statisticsDbContext = InMemoryStatisticsDbContext(contextId))
             await using (var contentDbContext = DbUtils.InMemoryApplicationDbContext(contextId))
             {
                 await statisticsDbContext.AddAsync(release);
@@ -255,7 +256,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
                 await contentDbContext.SaveChangesAsync();
             }
 
-            await using (var statisticsDbContext = DbUtils.InMemoryStatisticsDbContext(contextId))
+            await using (var statisticsDbContext = InMemoryStatisticsDbContext(contextId))
             await using (var contentDbContext = DbUtils.InMemoryApplicationDbContext(contextId))
             {
                 var service = SetupFootnoteService(statisticsDbContext, contentDbContext: contentDbContext);

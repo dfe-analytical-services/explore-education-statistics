@@ -1,11 +1,9 @@
 using System;
 using GovUk.Education.ExploreEducationStatistics.Admin.Areas.Identity.Data;
 using GovUk.Education.ExploreEducationStatistics.Content.Model.Database;
-using GovUk.Education.ExploreEducationStatistics.Data.Model.Database;
 using IdentityServer4.EntityFramework.Options;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Options;
-using Moq;
 
 namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
 {
@@ -21,18 +19,6 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
         public static ContentDbContext InMemoryApplicationDbContext()
         {
             return InMemoryApplicationDbContext(Guid.NewGuid().ToString());
-        }
-
-        public static StatisticsDbContext InMemoryStatisticsDbContext(string dbName)
-        {
-            var builder = new DbContextOptionsBuilder<StatisticsDbContext>();
-            builder.UseInMemoryDatabase(databaseName: dbName);
-            return new StatisticsDbContext(builder.Options, null);
-        }
-
-        public static StatisticsDbContext InMemoryStatisticsDbContext()
-        {
-            return InMemoryStatisticsDbContext(Guid.NewGuid().ToString());
         }
 
         public static UsersAndRolesDbContext InMemoryUserAndRolesDbContext(string dbName)

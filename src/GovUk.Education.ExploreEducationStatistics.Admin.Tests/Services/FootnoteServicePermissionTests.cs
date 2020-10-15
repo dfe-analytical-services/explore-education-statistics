@@ -15,6 +15,7 @@ using Microsoft.Extensions.Logging;
 using Moq;
 using Xunit;
 using static GovUk.Education.ExploreEducationStatistics.Admin.Security.SecurityPolicies;
+using static GovUk.Education.ExploreEducationStatistics.Data.Model.Database.StatisticsDbUtils;
 using Release = GovUk.Education.ExploreEducationStatistics.Content.Model.Release;
 
 namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
@@ -108,7 +109,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
                 footnoteHelper
                 ) = Mocks();
             
-            using (var context = DbUtils.InMemoryStatisticsDbContext())
+            using (var context = InMemoryStatisticsDbContext())
             {
                 var service = new FootnoteService(
                     context, 

@@ -23,6 +23,7 @@ using static GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services.DbU
 using static GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services.ValidationTestUtil;
 using static GovUk.Education.ExploreEducationStatistics.Admin.Validators.ValidationErrorMessages;
 using static GovUk.Education.ExploreEducationStatistics.Common.Model.TimeIdentifier;
+using static GovUk.Education.ExploreEducationStatistics.Data.Model.Database.StatisticsDbUtils;
 using FootnoteService = GovUk.Education.ExploreEducationStatistics.Data.Model.Services.FootnoteService;
 using IReleaseService = GovUk.Education.ExploreEducationStatistics.Admin.Services.Interfaces.IReleaseService;
 using Release = GovUk.Education.ExploreEducationStatistics.Data.Model.Release;

@@ -2044,6 +2044,16 @@
                                     },
                                     {
                                         "source": {
+                                            "name": "Filename",
+                                            "type": "String"
+                                        },
+                                        "sink": {
+                                            "name": "Filename",
+                                            "type": "String"
+                                        }
+                                    },
+                                    {
+                                        "source": {
                                             "name": "Name",
                                             "type": "String"
                                         },

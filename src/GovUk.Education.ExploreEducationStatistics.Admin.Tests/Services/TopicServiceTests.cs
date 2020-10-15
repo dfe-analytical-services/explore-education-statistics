@@ -11,10 +11,10 @@ using GovUk.Education.ExploreEducationStatistics.Data.Model;
 using GovUk.Education.ExploreEducationStatistics.Data.Model.Database;
 using GovUk.Education.ExploreEducationStatistics.Data.Model.Services.Interfaces;
 using Microsoft.AspNetCore.Mvc;
-using Microsoft.Azure.Documents.Linq;
 using Moq;
 using Xunit;
 using static GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services.MapperUtils;
+using static GovUk.Education.ExploreEducationStatistics.Data.Model.Database.StatisticsDbUtils;
 using Theme = GovUk.Education.ExploreEducationStatistics.Content.Model.Theme;
 using Topic = GovUk.Education.ExploreEducationStatistics.Content.Model.Topic;
 
@@ -341,7 +341,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
             var contextId = Guid.NewGuid().ToString();
 
             await using (var contentContext = DbUtils.InMemoryApplicationDbContext(contextId))
-            await using (var statisticsContext = DbUtils.InMemoryStatisticsDbContext(contextId))
+            await using (var statisticsContext = InMemoryStatisticsDbContext(contextId))
             {
                 contentContext.Add(topic);
                 statisticsContext.Add(release);
@@ -351,7 +351,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
             }
 
             await using (var contentContext = DbUtils.InMemoryApplicationDbContext(contextId))
-            await using (var statisticsContext = DbUtils.InMemoryStatisticsDbContext(contextId))
+            await using (var statisticsContext = InMemoryStatisticsDbContext(contextId))
             {
                 var service = SetupTopicService(contentContext, statisticsContext: statisticsContext);
 

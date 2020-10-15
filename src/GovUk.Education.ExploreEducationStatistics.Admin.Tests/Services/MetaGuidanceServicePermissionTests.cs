@@ -7,7 +7,7 @@ using GovUk.Education.ExploreEducationStatistics.Common.Utils;
 using GovUk.Education.ExploreEducationStatistics.Content.Model;
 using GovUk.Education.ExploreEducationStatistics.Content.Model.Database;
 using GovUk.Education.ExploreEducationStatistics.Data.Model.Database;
-using GovUk.Education.ExploreEducationStatistics.Data.Model.Services.Interfaces;
+using GovUk.Education.ExploreEducationStatistics.Data.Services.Interfaces;
 using Moq;
 using Xunit;
 
@@ -67,16 +67,14 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
             ContentDbContext contentDbContext = null,
             StatisticsDbContext statisticsDbContext = null,
             IPersistenceHelper<ContentDbContext> contentPersistenceHelper = null,
-            IFilterService filterService = null,
-            IIndicatorService indicatorService = null,
+            IMetaGuidanceSubjectService metaGuidanceSubjectService = null,
             IPersistenceHelper<StatisticsDbContext> statisticsPersistenceHelper = null,
             IUserService userService = null)
         {
             return new MetaGuidanceService(
                 contentDbContext ?? new Mock<ContentDbContext>().Object,
                 contentPersistenceHelper ?? DefaultPersistenceHelperMock().Object,
-                filterService ?? new Mock<IFilterService>().Object,
-                indicatorService ?? new Mock<IIndicatorService>().Object,
+                metaGuidanceSubjectService ?? new Mock<IMetaGuidanceSubjectService>().Object,
                 statisticsDbContext ?? new Mock<StatisticsDbContext>().Object,
                 statisticsPersistenceHelper ?? new PersistenceHelper<StatisticsDbContext>(statisticsDbContext),
                 userService ?? new Mock<IUserService>().Object
