@@ -90,6 +90,7 @@ const headingOptions = [
 export interface FormEditorProps {
   allowedHeadings?: string[];
   error?: string;
+  focusOnInit?: boolean;
   hideLabel?: boolean;
   hint?: string;
   id: string;
@@ -103,6 +104,7 @@ export interface FormEditorProps {
 const FormEditor = ({
   allowedHeadings = defaultAllowedHeadings,
   error,
+  focusOnInit,
   hideLabel,
   hint,
   id,
@@ -194,9 +196,11 @@ const FormEditor = ({
 
   const handleInit = useCallback(
     (editor: { editing: { view: { focus(): void } } }) => {
-      editor.editing.view.focus();
+      if (focusOnInit) {
+        editor.editing.view.focus();
+      }
     },
-    [],
+    [focusOnInit],
   );
 
   const isReadOnly = isBrowser('IE');

@@ -88,6 +88,7 @@ const PublicPreReleaseAccessForm = ({
               name="preReleaseAccessList"
               id={`${formId}-preReleaseAccessList`}
               label="Public access list"
+              focusOnInit
             />
 
             <ButtonGroup>

@@ -67,6 +67,7 @@ const EditableContentBlock = ({
           {...props}
           hideLabel={hideLabel}
           value={content}
+          focusOnInit
           onChange={setContent}
         />
 
