@@ -155,24 +155,26 @@ const ReleaseContent = () => {
                       </li>
                     ),
                   )}
-                  <li>
-                    <Link
-                      to={{
-                        pathname: generatePath<ReleaseRouteParams>(
-                          releaseMetaGuidanceRoute.path,
-                          {
-                            publicationId: release.publication.id,
-                            releaseId: release.id,
+                  {release.downloadFiles.some(file => file.type === 'Data') && (
+                    <li>
+                      <Link
+                        to={{
+                          pathname: generatePath<ReleaseRouteParams>(
+                            releaseMetaGuidanceRoute.path,
+                            {
+                              publicationId: release.publication.id,
+                              releaseId: release.id,
+                            },
+                          ),
+                          state: {
+                            backLink: location.pathname,
                           },
-                        ),
-                        state: {
-                          backLink: location.pathname,
-                        },
-                      }}
-                    >
-                      Metadata guidance
-                    </Link>
-                  </li>
+                        }}
+                      >
+                        Metadata guidance
+                      </Link>
+                    </li>
+                  )}
                   {release.preReleaseAccessList && (
                     <li>
                       <Link

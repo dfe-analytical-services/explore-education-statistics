@@ -44,7 +44,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Common.Extensions
             return false;
         }
 
-        public static FileInfo ToFileInfo(this BlobInfo blobInfo, Guid? id = null)
+        public static FileInfo ToFileInfo(this BlobInfo blobInfo, ReleaseFileTypes fileType, Guid? id = null)
         {
             return new FileInfo
             {
@@ -53,6 +53,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Common.Extensions
                 Extension = blobInfo.Extension,
                 Path = blobInfo.Path,
                 Size = blobInfo.Size,
+                Type = fileType,
             };
         }
 
