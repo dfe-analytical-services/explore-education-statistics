@@ -1,4 +1,6 @@
-export default (fn: Function, timeout: number) => (...args: unknown[]) => {
+type Callback = (...args: unknown[]) => void;
+
+export default (fn: Callback, timeout: number) => (...args: unknown[]) => {
   setTimeout(() => {
     fn(...args);
   }, timeout);

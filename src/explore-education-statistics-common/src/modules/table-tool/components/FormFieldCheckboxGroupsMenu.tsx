@@ -11,9 +11,7 @@ interface Props<FormValues>
   legend: string;
 }
 
-const FormFieldCheckboxGroupsMenu = <FormValues extends {}>(
-  props: Props<FormValues>,
-) => {
+function FormFieldCheckboxGroupsMenu<FormValues>(props: Props<FormValues>) {
   const { name, legend } = props;
   const [open, setOpen] = useState(false);
 
@@ -40,6 +38,6 @@ const FormFieldCheckboxGroupsMenu = <FormValues extends {}>(
       <FormFieldCheckboxSearchSubGroups<FormValues> {...props} legendHidden />
     </DetailsMenu>
   );
-};
+}
 
 export default FormFieldCheckboxGroupsMenu;

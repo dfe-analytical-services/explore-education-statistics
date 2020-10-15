@@ -44,7 +44,7 @@ const ChartDefinitionSelector = ({
               <span
                 className={styles.image}
                 style={{
-                  backgroundImage: `url(/static/images/chart-types/${definition.type}.png)`,
+                  backgroundImage: `url(/assets/images/chart-types/${definition.type}.png)`,
                 }}
               />
             </button>

@@ -2371,6 +2371,16 @@
                                             "name": "ReleaseId",
                                             "type": "Guid"
                                         }
+                                    },
+                                    {
+                                        "source": {
+                                            "name": "MetaGuidance",
+                                            "type": "String"
+                                        },
+                                        "sink": {
+                                            "name": "MetaGuidance",
+                                            "type": "String"
+                                        }
                                     }
                                 ]
                             }

@@ -4,12 +4,10 @@ import React from 'react';
 import FormSortableList, { FormSortableListProps } from './FormSortableList';
 
 type Props<FormValues> = {
-  name: FormValues extends {} ? keyof FormValues : string;
+  name: FormValues extends Record<string, unknown> ? keyof FormValues : string;
 } & OmitStrict<FormSortableListProps, 'value'>;
 
-const FormFieldSortableList = <FormValues extends {}>(
-  props: Props<FormValues>,
-) => {
+function FormFieldSortableList<FormValues>(props: Props<FormValues>) {
   const { name } = props;
 
   return (
@@ -18,7 +16,7 @@ const FormFieldSortableList = <FormValues extends {}>(
         return (
           <FormSortableList
             {...props}
-            {...field}
+            value={field.value}
             onChange={value => {
               form.setFieldValue(name as string, value);
             }}
@@ -27,6 +25,6 @@ const FormFieldSortableList = <FormValues extends {}>(
       }}
     </Field>
   );
-};
+}
 
 export default FormFieldSortableList;

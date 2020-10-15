@@ -1,4 +1,4 @@
-@import '../../../styles/govuk-base';
+@import '~govuk-frontend/govuk/base';
 
 $border-width: 1px;
 
@@ -8,10 +8,6 @@ $border-width: 1px;
 
 .table {
   border-collapse: separate;
-
-  @media print {
-    font-size: 0.8rem;
-  }
 
   th:last-child,
   td:last-child {
@@ -23,6 +19,33 @@ $border-width: 1px;
     position: relative;
     text-align: left !important;
     z-index: 1;
+  }
+
+  @media print {
+    font-size: 0.8rem;
+    max-height: none;
+    overflow: visible !important;
+    padding-right: 0;
+    width: auto;
+
+    thead {
+      display: table-row-group;
+    }
+
+    table {
+      break-inside: auto;
+    }
+
+    tr,
+    td {
+      break-after: auto;
+      break-inside: avoid;
+    }
+
+    thead th,
+    thead td {
+      transform: none !important;
+    }
   }
 }
 

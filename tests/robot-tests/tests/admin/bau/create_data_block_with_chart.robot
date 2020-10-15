@@ -2,7 +2,7 @@
 Resource    ../../libs/admin-common.robot
 Resource    ../../libs/charts.robot
 Library  Collections
-Library  ../../libs/api_keywords.py
+Library  ../../libs/admin_api.py
 
 Force Tags  Admin  Local  Dev  AltersData
 
@@ -94,7 +94,8 @@ Create table
     [Documentation]   EES-615
     user clicks element   id:filtersForm-submit
     user waits until results table appears     180
-    user waits until element contains  id:dataTableCaption  Table showing Admission Numbers for 'UI test subject' from '${PUBLICATION_NAME}' in Bolton 001 (E02000984), Bolton 001 (E05000364), Bolton 004 (E02000987), Bolton 004 (E05010450), Nailsea Youngwood and Syon between 2005 and 2020
+    user waits until element contains  css:[data-testid="dataTableCaption"]
+    ...  Table showing Admission Numbers for 'UI test subject' from '${PUBLICATION_NAME}' in Bolton 001 (E02000984), Bolton 001 (E05000364), Bolton 004 (E02000987), Bolton 004 (E05010450), Nailsea Youngwood and Syon between 2005 and 2020
 
 Validate table rows
     [Tags]  HappyPath

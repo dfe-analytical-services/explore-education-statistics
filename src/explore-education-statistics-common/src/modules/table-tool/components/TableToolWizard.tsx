@@ -1,5 +1,4 @@
 import { ConfirmContextProvider } from '@common/contexts/ConfirmContext';
-import useMounted from '@common/hooks/useMounted';
 import FiltersForm, {
   FilterFormSubmitHandler,
 } from '@common/modules/table-tool/components/FiltersForm';
@@ -23,7 +22,6 @@ import { TableHeadersConfig } from '@common/modules/table-tool/types/tableHeader
 import getDefaultTableHeaderConfig from '@common/modules/table-tool/utils/getDefaultTableHeadersConfig';
 import mapFullTable from '@common/modules/table-tool/utils/mapFullTable';
 import parseYearCodeTuple from '@common/modules/table-tool/utils/parseYearCodeTuple';
-import logger from '@common/services/logger';
 import tableBuilderService, {
   PublicationSubject,
   ReleaseTableDataQuery,
@@ -31,9 +29,8 @@ import tableBuilderService, {
   TableHighlight,
   ThemeMeta,
 } from '@common/services/tableBuilderService';
-import { AxiosError } from 'axios';
 import classNames from 'classnames';
-import React, { ReactElement, ReactNode, useMemo, useState } from 'react';
+import React, { ReactElement, ReactNode, useMemo } from 'react';
 import { useImmer } from 'use-immer';
 
 interface Publication {
@@ -44,6 +41,8 @@ interface Publication {
 
 export interface InitialTableToolState {
   initialStep: number;
+  subjects?: PublicationSubject[];
+  highlights?: TableHighlight[];
   subjectMeta?: SubjectMeta;
   query?: ReleaseTableDataQuery;
   response?: {
@@ -53,6 +52,8 @@ export interface InitialTableToolState {
 }
 
 interface TableToolState extends InitialTableToolState {
+  subjects: PublicationSubject[];
+  highlights: TableHighlight[];
   subjectMeta: SubjectMeta;
   query: ReleaseTableDataQuery;
 }
@@ -67,7 +68,7 @@ export interface FinalStepRenderProps {
 }
 
 export interface TableToolWizardProps {
-  themeMeta: ThemeMeta[];
+  themeMeta?: ThemeMeta[];
   initialState?: Partial<InitialTableToolState>;
   finalStep?: (props: FinalStepRenderProps) => ReactElement;
   renderHighlights?: (highlights: TableHighlight[]) => ReactNode;
@@ -75,17 +76,16 @@ export interface TableToolWizardProps {
 }
 
 const TableToolWizard = ({
-  themeMeta,
+  themeMeta = [],
   initialState = {},
   scrollOnMount,
   renderHighlights,
   finalStep,
 }: TableToolWizardProps) => {
-  const [subjects, setSubjects] = useState<PublicationSubject[]>([]);
-  const [highlights, setHighlights] = useState<TableHighlight[]>([]);
-
   const [state, updateState] = useImmer<TableToolState>({
     initialStep: 1,
+    subjects: [],
+    highlights: [],
     subjectMeta: {
       timePeriod: {
         hint: '',
@@ -112,43 +112,6 @@ const TableToolWizard = ({
       .find(option => option.id === state.query.publicationId);
   }, [state.query.publicationId, themeMeta]);
 
-  useMounted(() => {
-    if (!initialState?.query) {
-      return;
-    }
-
-    const { releaseId, publicationId } = initialState.query;
-
-    if (releaseId) {
-      tableBuilderService
-        .getReleaseMeta(releaseId)
-        .then(meta => {
-          setSubjects(meta.subjects);
-        })
-        .catch((err: AxiosError) => {
-          if (err.response?.status !== 404) {
-            logger.error(err);
-          }
-        });
-
-      return;
-    }
-
-    if (publicationId) {
-      tableBuilderService
-        .getPublicationMeta(publicationId)
-        .then(meta => {
-          setSubjects(meta.subjects);
-          setHighlights(meta.highlights);
-        })
-        .catch((err: AxiosError) => {
-          if (err.response?.status !== 404) {
-            logger.error(err);
-          }
-        });
-    }
-  });
-
   const handlePublicationFormSubmit: PublicationFormSubmitHandler = async ({
     publicationId: selectedPublicationId,
   }) => {
@@ -156,10 +119,10 @@ const TableToolWizard = ({
       selectedPublicationId,
     );
 
-    setSubjects(publicationMeta.subjects);
-    setHighlights(publicationMeta.highlights);
-
     updateState(draft => {
+      draft.subjects = publicationMeta.subjects;
+      draft.highlights = publicationMeta.highlights;
+
       draft.query.publicationId = selectedPublicationId;
     });
   };
@@ -330,7 +293,7 @@ const TableToolWizard = ({
                   <div
                     className={classNames({
                       'govuk-grid-column-one-half':
-                        stepProps.isActive && highlights.length,
+                        stepProps.isActive && state.highlights.length,
                       'govuk-grid-column-full': !stepProps.isActive,
                     })}
                   >
@@ -339,15 +302,15 @@ const TableToolWizard = ({
                       initialValues={{
                         subjectId: state.query.subjectId,
                       }}
-                      options={subjects}
+                      options={state.subjects}
                       onSubmit={handlePublicationSubjectFormSubmit}
                     />
                   </div>
                   {!!renderHighlights &&
-                    highlights.length > 0 &&
+                    state.highlights.length > 0 &&
                     stepProps.isActive && (
                       <div className="govuk-grid-column-one-half">
-                        {renderHighlights(highlights)}
+                        {renderHighlights(state.highlights)}
                       </div>
                     )}
                 </div>

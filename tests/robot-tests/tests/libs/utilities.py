@@ -256,19 +256,12 @@ def user_checks_selected_list_label(list_locator, label):
             f'Selected label "{selected_label}" didn\'t match label "{label}" for list "{list_locator}"')
 
 
-def user_waits_until_details_dropdown_contains_publication(details_heading, publication_name,
-                                                           timeout=3):
-    sl.wait_until_page_contains_element(f'xpath://details/summary[.="{details_heading}"]',
-                                        timeout=timeout)
-    sl.wait_until_page_contains_element(
-        f'xpath://details/summary[.="{details_heading}"]/../..//*[text()="{publication_name}"]')
-
-
 def remove_substring_from_right_of_string(string, substring):
     if string.endswith(substring):
         return string[:-len(substring)]
     else:
         raise_assertion_error(f'String "{string}" doesn\'t end with substring "{substring}"')
+
 
 def user_clicks_element_if_exists(selector):
     if element_finder.find(selector, required=False) is not None:

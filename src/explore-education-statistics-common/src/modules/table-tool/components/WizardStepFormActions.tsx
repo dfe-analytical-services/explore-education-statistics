@@ -1,13 +1,12 @@
-import ButtonGroup from '@common/components/ButtonGroup';
-import { FormikState } from 'formik';
-import React, { MouseEventHandler } from 'react';
 import Button from '@common/components/Button';
+import ButtonGroup from '@common/components/ButtonGroup';
 import { FormGroup } from '@common/components/form';
 import LoadingSpinner from '@common/components/LoadingSpinner';
+import { useFormikContext } from 'formik';
+import React, { MouseEventHandler } from 'react';
 import { InjectedWizardProps } from './Wizard';
 
 interface Props {
-  form: FormikState<{}>;
   formId: string;
   goToPreviousStep: InjectedWizardProps['goToPreviousStep'];
   onPreviousStep?: MouseEventHandler;
@@ -18,7 +17,6 @@ interface Props {
 }
 
 const WizardStepFormActions = ({
-  form,
   formId,
   goToPreviousStep,
   onPreviousStep,
@@ -27,6 +25,8 @@ const WizardStepFormActions = ({
   submittingText = 'Submitting',
   onSubmitClick = () => {},
 }: Props) => {
+  const form = useFormikContext();
+
   return (
     <FormGroup>
       <ButtonGroup>

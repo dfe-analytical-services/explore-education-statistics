@@ -1,6 +1,7 @@
 *** Settings ***
 Resource    ../../libs/admin-common.robot
-Library     ../../libs/api_keywords.py
+Resource    ../../libs/public-common.robot
+Library     ../../libs/admin_api.py
 
 Force Tags  Admin  Local  Dev  AltersData
 
@@ -8,6 +9,7 @@ Suite Setup       user signs in as bau1
 Suite Teardown    user closes the browser
 
 *** Variables ***
+${THEME_NAME}        %{TEST_THEME_NAME}
 ${TOPIC_NAME}        %{TEST_TOPIC_NAME}
 ${PUBLICATION_NAME}  UI tests - publish data %{RUN_IDENTIFIER}
 
@@ -51,11 +53,11 @@ Return to Admin Dashboard
     [Tags]  HappyPath
     user goes to url    %{ADMIN_URL}
     user waits until h1 is visible   Dashboard
-    user waits until page contains element   css:#selectTheme    180
+    user waits until page contains element   id:publicationsReleases-themeTopic-themeId    180
 
 Create another release for the same publication
     [Tags]  HappyPath
-    user selects theme "Test theme" and topic "${TOPIC_NAME}" from the admin dashboard
+    user selects theme and topic from admin dashboard  ${THEME_NAME}  ${TOPIC_NAME}
     user waits until page contains link    Create new publication
     user opens accordion section   ${PUBLICATION_NAME}
     user clicks testid element   Create new release link for ${PUBLICATION_NAME}
@@ -302,7 +304,7 @@ Select table highlight from subjects step
     user waits until element is visible  xpath://h3[text()="Table highlights"]
     user clicks link  Test highlight name
     user waits until results table appears  180
-    user waits until page contains element   xpath://*[@id="dataTableCaption" and text()="Table showing Admission Numbers for 'UI test subject' from '${PUBLICATION_NAME}' in Bolton 001 (E02000984), Bolton 001 (E05000364), Bolton 004 (E02000987), Bolton 004 (E05010450), Nailsea Youngwood and Syon between 2005 and 2020"]
+    user waits until page contains element   xpath://*[@data-testid="dataTableCaption" and text()="Table showing Admission Numbers for 'UI test subject' from '${PUBLICATION_NAME}' in Bolton 001 (E02000984), Bolton 001 (E05000364), Bolton 004 (E02000987), Bolton 004 (E05010450), Nailsea Youngwood and Syon between 2005 and 2020"]
 
 Validate table column headings for table highlight
     [Tags]  HappyPath

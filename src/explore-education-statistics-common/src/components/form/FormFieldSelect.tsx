@@ -6,8 +6,8 @@ import FormSelect, { FormSelectProps } from './FormSelect';
 
 type Props<FormValues> = FormFieldComponentProps<FormSelectProps, FormValues>;
 
-const FormFieldSelect = <FormValues extends {}>(props: Props<FormValues>) => {
+function FormFieldSelect<FormValues>(props: Props<FormValues>) {
   return <FormField {...props} as={FormSelect} />;
-};
+}
 
 export default FormFieldSelect;

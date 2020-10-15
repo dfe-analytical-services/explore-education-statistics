@@ -1,4 +1,5 @@
 import ButtonLink from '@admin/components/ButtonLink';
+import FormThemeTopicSelect from '@admin/components/form/FormThemeTopicSelect';
 import useQueryParams from '@admin/hooks/useQueryParams';
 import {
   dashboardRoute,
@@ -12,7 +13,6 @@ import { Topic } from '@admin/services/topicService';
 import appendQuery from '@admin/utils/url/appendQuery';
 import Accordion from '@common/components/Accordion';
 import AccordionSection from '@common/components/AccordionSection';
-import FormSelect from '@common/components/form/FormSelect';
 import LoadingSpinner from '@common/components/LoadingSpinner';
 import useAsyncHandledRetry from '@common/hooks/useAsyncHandledRetry';
 import useAsyncRetry from '@common/hooks/useAsyncRetry';
@@ -138,89 +138,26 @@ const ManagePublicationsAndReleasesTab = () => {
       <LoadingSpinner loading={loadingThemes}>
         {themes && themes.length > 0 ? (
           <>
-            <div className="dfe-flex dfe-flex-wrap">
-              <div className="govuk-!-margin-right-4">
-                <FormSelect
-                  id="selectTheme"
-                  label="Select theme"
-                  name="selectTheme"
-                  value={themeId}
-                  options={themes.map(theme => ({
-                    label: theme.title,
-                    value: theme.id,
-                  }))}
-                  onChange={event => {
-                    const nextTheme = themes.find(
-                      theme => theme.id === event.target.value,
-                    );
+            <FormThemeTopicSelect
+              id="publicationsReleases-themeTopic"
+              legend="Choose a theme and topic to view publications for"
+              legendHidden
+              themes={themes}
+              topicId={topicId}
+              onChange={(nextTopicId, nextThemeId) => {
+                setSavedThemeTopic({
+                  themeId: nextThemeId,
+                  topicId: nextTopicId,
+                });
 
-                    if (!nextTheme) {
-                      return;
-                    }
-
-                    const nextTopic = orderBy(
-                      nextTheme.topics,
-                      topic => topic.title,
-                    )[0];
-
-                    if (!nextTopic) {
-                      return;
-                    }
-
-                    setSavedThemeTopic({
-                      themeId: nextTheme.id,
-                      topicId: nextTopic.id,
-                    });
-
-                    history.replace(
-                      appendQuery<ThemeTopicParams>(dashboardRoute.path, {
-                        themeId: nextTheme.id,
-                        topicId: nextTopic.id,
-                      }),
-                    );
-                  }}
-                />
-              </div>
-              <div>
-                <FormSelect
-                  id="selectTopic"
-                  label="Select topic"
-                  name="selectTopic"
-                  options={
-                    selectedTheme?.topics.map(topic => ({
-                      label: topic.title,
-                      value: topic.id,
-                    })) ?? []
-                  }
-                  value={topicId}
-                  onChange={event => {
-                    if (!selectedTheme) {
-                      return;
-                    }
-
-                    const nextTopic = selectedTheme.topics.find(
-                      topic => topic.id === event.target.value,
-                    );
-
-                    if (!nextTopic) {
-                      return;
-                    }
-
-                    setSavedThemeTopic({
-                      themeId: selectedTheme.id,
-                      topicId: nextTopic.id,
-                    });
-
-                    history.replace(
-                      appendQuery<ThemeTopicParams>(dashboardRoute.path, {
-                        themeId: selectedTheme.id,
-                        topicId: nextTopic.id,
-                      }),
-                    );
-                  }}
-                />
-              </div>
-            </div>
+                history.replace(
+                  appendQuery<ThemeTopicParams>(dashboardRoute.path, {
+                    themeId: nextThemeId,
+                    topicId: nextTopicId,
+                  }),
+                );
+              }}
+            />
 
             <hr />
 

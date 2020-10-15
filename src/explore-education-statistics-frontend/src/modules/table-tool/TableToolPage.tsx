@@ -7,6 +7,7 @@ import mapFullTable from '@common/modules/table-tool/utils/mapFullTable';
 import mapTableHeadersConfig from '@common/modules/table-tool/utils/mapTableHeadersConfig';
 import { FastTrackTable } from '@common/services/fastTrackService';
 import tableBuilderService, {
+  PublicationMeta,
   SubjectMeta,
   ThemeMeta,
 } from '@common/services/tableBuilderService';
@@ -18,65 +19,63 @@ import { GetServerSideProps, NextPage } from 'next';
 import dynamic from 'next/dynamic';
 import React, { useMemo } from 'react';
 
-const TableToolFinalStep = dynamic(() =>
-  import('@frontend/modules/table-tool/components/TableToolFinalStep'),
+const TableToolFinalStep = dynamic(
+  () => import('@frontend/modules/table-tool/components/TableToolFinalStep'),
 );
 
 export interface TableToolPageProps {
-  publicationSlug?: string;
+  publicationMeta?: PublicationMeta;
   fastTrack?: FastTrackTable;
   subjectMeta?: SubjectMeta;
   themeMeta: ThemeMeta[];
 }
 
 const TableToolPage: NextPage<TableToolPageProps> = ({
-  publicationSlug,
+  publicationMeta,
   fastTrack,
   subjectMeta,
   themeMeta,
 }) => {
-  const initialTableToolState = useMemo<
-    Partial<InitialTableToolState> | undefined
-  >(() => {
-    if (publicationSlug) {
-      const publicationId =
-        themeMeta
-          .flatMap(option => option.topics)
-          .flatMap(option => option.publications)
-          .find(option => option.slug === publicationSlug)?.id ?? '';
+  const initialState = useMemo<InitialTableToolState | undefined>(() => {
+    if (!publicationMeta) {
+      return undefined;
+    }
+
+    const { publicationId, subjects, highlights } = publicationMeta;
+
+    if (fastTrack && subjectMeta) {
+      const fullTable = mapFullTable(fastTrack.fullTable);
+      const tableHeaders = mapTableHeadersConfig(
+        fastTrack.configuration.tableHeaders,
+        fullTable.subjectMeta,
+      );
 
       return {
-        initialStep: 1,
-        query: {
-          publicationId,
-          subjectId: '',
-          indicators: [],
-          filters: [],
-          locations: {},
+        initialStep: 6,
+        subjects,
+        highlights,
+        query: fastTrack.query,
+        subjectMeta,
+        response: {
+          table: fullTable,
+          tableHeaders,
         },
       };
     }
 
-    if (!fastTrack || !subjectMeta) {
-      return undefined;
-    }
-
-    const fullTable = mapFullTable(fastTrack.fullTable);
-    const tableHeaders = mapTableHeadersConfig(
-      fastTrack.configuration.tableHeaders,
-      fullTable.subjectMeta,
-    );
-
     return {
-      initialStep: 6,
-      query: fastTrack.query,
-      subjectMeta,
-      response: {
-        table: fullTable,
-        tableHeaders,
+      initialStep: 2,
+      subjects,
+      highlights,
+      query: {
+        publicationId,
+        subjectId: '',
+        indicators: [],
+        filters: [],
+        locations: {},
       },
     };
-  }, [fastTrack, publicationSlug, subjectMeta, themeMeta]);
+  }, [fastTrack, publicationMeta, subjectMeta]);
 
   return (
     <Page title="Create your own tables online" caption="Table Tool" wide>
@@ -94,7 +93,7 @@ const TableToolPage: NextPage<TableToolPageProps> = ({
         key={fastTrack?.id}
         scrollOnMount
         themeMeta={themeMeta}
-        initialState={initialTableToolState}
+        initialState={initialState}
         renderHighlights={highlights => (
           <aside>
             <h3>Table highlights</h3>
@@ -149,10 +148,28 @@ export const getServerSideProps: GetServerSideProps<TableToolPageProps> = async 
 
   const themeMeta = await tableBuilderService.getThemes();
 
+  const publicationId =
+    themeMeta
+      .flatMap(option => option.topics)
+      .flatMap(option => option.publications)
+      .find(option => option.slug === publicationSlug)?.id ?? '';
+
+  const publicationMeta = publicationId
+    ? await tableBuilderService.getPublicationMeta(publicationId)
+    : undefined;
+
+  if (publicationMeta) {
+    return {
+      props: {
+        themeMeta,
+        publicationMeta,
+      },
+    };
+  }
+
   return {
     props: {
       themeMeta,
-      publicationSlug,
     },
   };
 };

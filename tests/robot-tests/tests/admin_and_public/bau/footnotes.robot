@@ -1,6 +1,7 @@
 *** Settings ***
 Resource    ../../libs/admin-common.robot
-Library     ../../libs/api_keywords.py
+Resource    ../../libs/public-common.robot
+Library     ../../libs/admin_api.py
 
 Force Tags  Admin  Local  Dev  AltersData  Footnotes
 

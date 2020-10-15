@@ -1,7 +1,8 @@
 *** Settings ***
 Resource    ../../libs/admin-common.robot
 Resource    ../../libs/charts.robot
-Library     ../../libs/api_keywords.py
+Resource    ../../libs/public-common.robot
+Library     ../../libs/admin_api.py
 
 Force Tags  Admin  Local  Dev  AltersData
 
@@ -10,6 +11,7 @@ Suite Teardown    user closes the browser
 
 *** Variables ***
 ${RUN_IDENTIFIER}    %{RUN_IDENTIFIER}
+${THEME_NAME}        %{TEST_THEME_NAME}
 ${TOPIC_NAME}        %{TEST_TOPIC_NAME}
 ${PUBLICATION_NAME}  UI tests - publish release %{RUN_IDENTIFIER}
 ${DATABLOCK_NAME}    Dates data block name
@@ -296,13 +298,14 @@ Verify accordions are correct
 Verify Dates data block accordion section
     [Tags]  HappyPath
     user opens accordion section  Dates data block
+    user scrolls to accordion section content  Dates data block
     ${section}=  user gets accordion section content element  Dates data block
 
     user checks chart title contains  ${section}  Sample title
     user checks infographic chart contains alt  ${section}  Sample alt text
 
     user clicks link  Table  ${section}
-    user waits until parent contains element  ${section}  xpath:.//*[@id="dataTableCaption" and text()="Dates table title"]
+    user waits until parent contains element  ${section}  xpath:.//*[@data-testid="dataTableCaption" and text()="Dates table title"]
     user waits until parent contains element  ${section}  xpath:.//*[.="Source: Dates source"]
 
     user checks table column heading contains  1  1  2020 Week 13  ${section}
@@ -323,11 +326,11 @@ Return to Admin to start creating an amendment
     user goes to url  %{ADMIN_URL}
     user waits until h1 is visible   Dashboard
     user waits until page contains title caption  Welcome Bau1
-    user waits until page contains element   css:#selectTheme   180
+    user waits until page contains element   id:publicationsReleases-themeTopic-themeId   180
 
 Create amendment
     [Tags]  HappyPath
-    user selects theme "Test theme" and topic "${TOPIC_NAME}" from the admin dashboard
+    user selects theme and topic from admin dashboard  ${THEME_NAME}  ${TOPIC_NAME}
     user waits until page contains link    Create new publication
     user waits until page contains accordion section  ${PUBLICATION_NAME}
 
@@ -611,13 +614,14 @@ Verify amendment accordions are correct
 Verify amendment Dates data block accordion section
     [Tags]  HappyPath
     user opens accordion section  Dates data block
+    user scrolls to accordion section content  Dates data block
     ${section}=  user gets accordion section content element  Dates data block
 
     user checks chart title contains  ${section}  Updated sample title
     user checks infographic chart contains alt  ${section}  Updated sample alt text
 
     user clicks link  Table  ${section}
-    user waits until parent contains element  ${section}  xpath:.//*[@id="dataTableCaption" and text()="Updated dates table title"]
+    user waits until parent contains element  ${section}  xpath:.//*[@data-testid="dataTableCaption" and text()="Updated dates table title"]
     user waits until parent contains element  ${section}  xpath:.//*[.="Source: Updated dates source"]
 
     user checks table column heading contains  1  1  2020 Week 13  ${section}

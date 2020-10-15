@@ -13,9 +13,7 @@ interface Props<FormValues>
   legend: string;
 }
 
-const FormFieldCheckboxMenu = <FormValues extends {}>(
-  props: Props<FormValues>,
-) => {
+function FormFieldCheckboxMenu<FormValues>(props: Props<FormValues>) {
   const { name, options, legend } = props;
   const [open, setOpen] = useState(false);
 
@@ -52,6 +50,6 @@ const FormFieldCheckboxMenu = <FormValues extends {}>(
       )}
     </DetailsMenu>
   );
-};
+}
 
 export default FormFieldCheckboxMenu;

@@ -31,7 +31,14 @@ describe('ImporterStatus', () => {
     jest.useFakeTimers();
   });
 
-  test('renders initial status correctly', () => {
+  test('renders initial complete status correctly', () => {
+    render(<ImporterStatus releaseId="release-1" dataFile={testDataFile} />);
+
+    expect(screen.getByText('Complete')).toBeInTheDocument();
+    expect(screen.queryByRole('group')).not.toBeInTheDocument();
+  });
+
+  test('does not fetch status from service if data file status is already complete', () => {
     releaseDataFileService.getDataFileImportStatus.mockResolvedValue({
       status: 'COMPLETE',
       numberOfRows: 100,
@@ -39,8 +46,9 @@ describe('ImporterStatus', () => {
 
     render(<ImporterStatus releaseId="release-1" dataFile={testDataFile} />);
 
-    expect(screen.getByText('Complete')).toBeInTheDocument();
-    expect(screen.queryByRole('group')).not.toBeInTheDocument();
+    expect(
+      releaseDataFileService.getDataFileImportStatus,
+    ).not.toHaveBeenCalled();
   });
 
   test('renders with updated status from service', async () => {
@@ -60,9 +68,15 @@ describe('ImporterStatus', () => {
     );
 
     expect(screen.getByText('Queued')).toBeInTheDocument();
+    expect(
+      releaseDataFileService.getDataFileImportStatus,
+    ).toHaveBeenCalledTimes(1);
 
     await waitFor(() => {
       expect(screen.getByText('Validating')).toBeInTheDocument();
+      expect(
+        releaseDataFileService.getDataFileImportStatus,
+      ).toHaveBeenCalledTimes(1);
     });
   });
 
@@ -84,6 +98,10 @@ describe('ImporterStatus', () => {
 
     expect(screen.getByText('Queued')).toBeInTheDocument();
 
+    expect(
+      releaseDataFileService.getDataFileImportStatus,
+    ).toHaveBeenCalledTimes(1);
+
     await waitFor(() => {
       expect(screen.getByText('Validating')).toBeInTheDocument();
     });
@@ -95,6 +113,10 @@ describe('ImporterStatus', () => {
 
     jest.advanceTimersByTime(5000);
 
+    expect(
+      releaseDataFileService.getDataFileImportStatus,
+    ).toHaveBeenCalledTimes(2);
+
     await waitFor(() => {
       expect(screen.getByText('Importing')).toBeInTheDocument();
     });
@@ -105,6 +127,10 @@ describe('ImporterStatus', () => {
     });
 
     jest.advanceTimersByTime(5000);
+
+    expect(
+      releaseDataFileService.getDataFileImportStatus,
+    ).toHaveBeenCalledTimes(3);
 
     await waitFor(() => {
       expect(screen.getByText('Complete')).toBeInTheDocument();

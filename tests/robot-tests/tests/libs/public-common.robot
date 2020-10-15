@@ -16,3 +16,7 @@ user checks release update
     [Arguments]  ${number}  ${date}  ${text}
     user waits until element contains  css:#releaseNotes li:nth-of-type(${number}) time  ${date}
     user waits until element contains  css:#releaseNotes li:nth-of-type(${number}) p     ${text}
+
+user waits until details dropdown contains publication
+    [Arguments]  ${details_heading}  ${publication_name}  ${wait}=3
+    user waits until details contains element  ${details_heading}  xpath:.//*[text()="${publication_name}"]  wait=${wait}

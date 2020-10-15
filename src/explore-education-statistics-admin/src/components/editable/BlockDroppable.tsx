@@ -16,6 +16,7 @@ const BlockDroppable = ({ droppable, droppableId, children }: Props) => {
     >
       {droppableProvided => (
         <div
+          // eslint-disable-next-line react/jsx-props-no-spreading
           {...droppableProvided.droppableProps}
           ref={droppableProvided.innerRef}
         >

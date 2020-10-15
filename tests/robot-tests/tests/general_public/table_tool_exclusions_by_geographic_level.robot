@@ -81,7 +81,7 @@ User waits for table to appear
     [Tags]  HappyPath
     # Extra timeout until EES-234
     user waits until results table appears    180
-    user waits until page contains element   xpath://*[@id="dataTableCaption" and text()="Table showing 'Exclusions by geographic level' from 'Permanent and fixed-period exclusions in England' in Bury, Sheffield and York between 2006/07 and 2008/09"]
+    user waits until page contains element   xpath://*[@data-testid="dataTableCaption" and text()="Table showing 'Exclusions by geographic level' for State-funded secondary from 'Permanent and fixed-period exclusions in England' in Bury, Sheffield and York between 2006/07 and 2008/09"]
 
 Validate results table column headings
     [Tags]  HappyPath

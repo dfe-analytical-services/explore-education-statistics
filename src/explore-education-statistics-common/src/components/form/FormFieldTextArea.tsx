@@ -6,8 +6,8 @@ import FormField, { FormFieldComponentProps } from './FormField';
 
 type Props<FormValues> = FormFieldComponentProps<FormTextAreaProps, FormValues>;
 
-const FormFieldTextArea = <FormValues extends {}>(props: Props<FormValues>) => {
+function FormFieldTextArea<FormValues>(props: Props<FormValues>) {
   return <FormField {...props} as={FormTextArea} />;
-};
+}
 
 export default FormFieldTextArea;

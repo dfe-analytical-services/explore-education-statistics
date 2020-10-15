@@ -26,7 +26,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Model.Services
                 // optimal query
                 return _context.FilterItem
                     .Include(fi => fi.FilterGroup)
-                    .ThenInclude(fg => fg.Filter)
+                    .ThenInclude(fg => fg.Filter).AsNoTracking()
                     .Where(fi => fi.FilterGroup.Filter.SubjectId == subjectId &&
                            observations.Any(o => o.FilterItems.Any(
                                ofi => ofi.FilterItemId == fi.Id)));
@@ -35,7 +35,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Model.Services
             // sub-optimal query
             var allFilterItemsForSubject = _context.FilterItem
                 .Include(fi => fi.FilterGroup)
-                .ThenInclude(fg => fg.Filter)
+                .ThenInclude(fg => fg.Filter).AsNoTracking()
                 .Where(fi => fi.FilterGroup.Filter.SubjectId == subjectId)
                 .ToList();
 

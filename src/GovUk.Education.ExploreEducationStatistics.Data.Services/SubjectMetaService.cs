@@ -102,30 +102,46 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Services
         private SubjectMetaViewModel GetSubjectMetaViewModelFromQuery(SubjectMetaQueryContext query)
         {
             var observations = _observationService.FindObservations(query).AsQueryable();
-
+            var locations = new Dictionary<string, ObservationalUnitsMetaViewModel>();
+            var timePeriods = new TimePeriodsMetaViewModel();
+            var filters = new Dictionary<string, FilterMetaViewModel>();
+            var indicators = new Dictionary<string, IndicatorsMetaViewModel>();
+            
             var stopwatch = Stopwatch.StartNew();
             stopwatch.Start();
 
-            var filters = query.TimePeriod != null ? GetFilters(query.SubjectId, observations, false) : new Dictionary<string, FilterMetaViewModel>();
+            if (query.Locations == null)
+            {
+                locations = GetObservationalUnits(observations);
+                
+                _logger.LogTrace("Got Observational Units in {Time} ms", stopwatch.Elapsed.TotalMilliseconds);
+                stopwatch.Restart();
+            }
+            
+            if (query.TimePeriod == null && query.Locations != null)
+            {
+                timePeriods = GetTimePeriods(observations);
 
-            _logger.LogTrace("Got Filters in {Time} ms", stopwatch.Elapsed.TotalMilliseconds);
-            stopwatch.Restart();
+                _logger.LogTrace("Got Time Periods in {Time} ms", stopwatch.Elapsed.TotalMilliseconds);
+                stopwatch.Restart();
+            }
+            
+            if (query.TimePeriod != null)
+            {
+                filters = GetFilters(query.SubjectId, observations, false);
 
-            var indicators = query.TimePeriod != null ? GetIndicators(query.SubjectId) : new Dictionary<string, IndicatorsMetaViewModel>();
+                _logger.LogTrace("Got Filters in {Time} ms", stopwatch.Elapsed.TotalMilliseconds);
+                stopwatch.Restart();
 
-            _logger.LogTrace("Got Indicators in {Time} ms", stopwatch.Elapsed.TotalMilliseconds);
-            stopwatch.Restart();
+                indicators = GetIndicators(query.SubjectId);
 
-            var locations = GetObservationalUnits(observations);
+                _logger.LogTrace("Got Indicators in {Time} ms", stopwatch.Elapsed.TotalMilliseconds);
+            }
 
-            _logger.LogTrace("Got Observational Units in {Time} ms", stopwatch.Elapsed.TotalMilliseconds);
-            stopwatch.Restart();
-
-            var timePeriods = GetTimePeriods(observations);
-
-            _logger.LogTrace("Got Time Periods in {Time} ms", stopwatch.Elapsed.TotalMilliseconds);
             stopwatch.Stop();
-
+            
+            // Only data relevant to the step being executed in the table tool needs to be returned hence the 
+            // null checks above so only the minimum requisite DB calls for the task are performed.
             return new SubjectMetaViewModel
             {
                 Filters = filters,

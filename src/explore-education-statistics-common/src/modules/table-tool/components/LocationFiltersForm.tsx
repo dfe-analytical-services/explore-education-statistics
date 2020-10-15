@@ -128,7 +128,7 @@ const LocationFiltersForm = (props: Props & InjectedWizardProps) => {
                 </div>
               </FormFieldset>
 
-              <WizardStepFormActions {...props} form={form} formId={formId} />
+              <WizardStepFormActions {...props} formId={formId} />
             </Form>
           );
         }

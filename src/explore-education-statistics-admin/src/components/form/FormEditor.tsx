@@ -1,7 +1,10 @@
 import styles from '@admin/components/form/FormEditor.module.scss';
+// No types available for CKEditor 5
+// eslint-disable-next-line @typescript-eslint/ban-ts-comment
 // @ts-ignore
 import ClassicEditor from '@ckeditor/ckeditor5-build-classic';
-// No types generated for ckeditor 5 for react
+// No types available for CKEditor 5
+// eslint-disable-next-line @typescript-eslint/ban-ts-comment
 // @ts-ignore
 import CKEditor from '@ckeditor/ckeditor5-react';
 import ErrorMessage from '@common/components/ErrorMessage';

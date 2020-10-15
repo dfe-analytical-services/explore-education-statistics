@@ -1,21 +1,28 @@
 *** Settings ***
 Resource    ../../libs/admin-common.robot
+Library  ../../libs/admin_api.py
 
 Force Tags  Admin  Local  Dev  AltersData
 
 Suite Setup       user signs in as bau1
-Suite Teardown    user closes the browser
+Suite Teardown    teardown suite
 
 *** Variables ***
 ${THEME_NAME}           UI test theme - suite %{RUN_IDENTIFIER}
-${THEME_NAME_CREATED}   UI test theme - suite created %{RUN_IDENTIFIER}
 ${TOPIC_NAME}           UI test topic - suite %{RUN_IDENTIFIER}
-${TOPIC_NAME_CREATED}   UI test topic - suite created %{RUN_IDENTIFIER}
+
+${CREATED_THEME_ID}     ${EMPTY}
+${CREATED_THEME_NAME}   UI test theme - suite created %{RUN_IDENTIFIER}
+${CREATED_TOPIC_NAME}   UI test topic - suite created %{RUN_IDENTIFIER}
 
 *** Keywords ***
 user checks topic is in correct position
     [Arguments]  ${theme}  ${position}  ${topic}
     user checks element should contain  css:[data-testid="Topics for ${theme}"] dl > div:nth-child(${position}) > dt  ${topic}
+
+teardown suite
+    run keyword if  "${CREATED_THEME_ID}" != ""  user deletes theme via api  ${CREATED_THEME_ID}
+    user closes the browser
 
 *** Test Cases ***
 Go to 'Manage themes and topics'
@@ -39,23 +46,28 @@ Create theme
     [Tags]  HappyPath
     user clicks link    Create theme
     user waits until h1 is visible  Create theme
-    user enters text into element  id:themeForm-title   ${THEME_NAME_CREATED}
+    user enters text into element  id:themeForm-title   ${CREATED_THEME_NAME}
     user enters text into element  id:themeForm-summary  Created summary
     user clicks button  Save theme
 
 Verify created theme
     [Tags]  HappyPath
     user waits until h1 is visible  Manage themes and topics
-    user waits until page contains accordion section  ${THEME_NAME_CREATED}
-    user checks testid element contains  Summary for ${THEME_NAME_CREATED}  Created summary
-    user checks element is visible  xpath://*[@data-testid="Topics for ${THEME_NAME_CREATED}"]//*[text()="No topics for this theme"]
+    user waits until page contains accordion section  ${CREATED_THEME_NAME}
+    user checks testid element contains  Summary for ${CREATED_THEME_NAME}  Created summary
+    user checks element is visible  xpath://*[@data-testid="Topics for ${CREATED_THEME_NAME}"]//*[text()="No topics for this theme"]
 
 Edit theme
     [Tags]  HappyPath
-    user clicks testid element  Edit link for ${THEME_NAME_CREATED}
+    user clicks testid element  Edit link for ${CREATED_THEME_NAME}
     user waits until h1 is visible  Edit theme
+
+    # Used in teardown
+    ${theme_id}=  get theme id from url
+    set suite variable  ${CREATED_THEME_ID}  ${theme_id}
+
     user waits until page contains element   id:themeForm-title
-    user checks input field contains  id:themeForm-title   ${THEME_NAME_CREATED}
+    user checks input field contains  id:themeForm-title   ${CREATED_THEME_NAME}
     user checks input field contains  id:themeForm-summary   Created summary
     user enters text into element  id:themeForm-title   ${THEME_NAME}
     user enters text into element  id:themeForm-summary  Updated summary
@@ -73,22 +85,22 @@ Create topic
     user clicks testid element  Create topic link for ${THEME_NAME}
     user waits until page contains title caption  ${THEME_NAME}
     user waits until h1 is visible  Create topic
-    user enters text into element  id:topicForm-title   ${TOPIC_NAME_CREATED}
+    user enters text into element  id:topicForm-title   ${CREATED_TOPIC_NAME}
     user clicks button  Save topic
 
 Verify created topic
     [Tags]  HappyPath
     user waits until h1 is visible  Manage themes and topics
     user waits until page contains accordion section  ${THEME_NAME}
-    user checks topic is in correct position  ${THEME_NAME}  1  ${TOPIC_NAME_CREATED}
+    user checks topic is in correct position  ${THEME_NAME}  1  ${CREATED_TOPIC_NAME}
 
 Edit topic
     [Tags]  HappyPath
-    user clicks testid element  Edit ${TOPIC_NAME_CREATED} topic link for ${THEME_NAME}
+    user clicks testid element  Edit ${CREATED_TOPIC_NAME} topic link for ${THEME_NAME}
     user waits until page contains title caption  ${THEME_NAME}
     user waits until h1 is visible  Edit topic
     user waits until page contains element   id:topicForm-title
-    user checks input field contains  id:topicForm-title   ${TOPIC_NAME_CREATED}
+    user checks input field contains  id:topicForm-title   ${CREATED_TOPIC_NAME}
     user enters text into element  id:topicForm-title   ${TOPIC_NAME}
     user clicks button  Save topic
 
@@ -97,11 +109,3 @@ Verify updated topic
     user waits until h1 is visible  Manage themes and topics
     user waits until page contains accordion section  ${THEME_NAME}
     user checks topic is in correct position  ${THEME_NAME}  1  ${TOPIC_NAME}
-
-Delete test theme
-    [Tags]  HappyPath
-    user clicks testid element  Edit link for ${THEME_NAME}
-    user waits until h1 is visible  Edit theme
-    ${theme_id}=  get theme id from url
-    delete theme  ${theme_id}
-    user closes the browser

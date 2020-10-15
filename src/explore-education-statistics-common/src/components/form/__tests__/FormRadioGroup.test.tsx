@@ -1,6 +1,5 @@
-import React, { Component } from 'react';
 import { fireEvent, render, screen } from '@testing-library/react';
-import { RadioChangeEventHandler } from '../FormRadio';
+import React, { useState } from 'react';
 import FormRadioGroup from '../FormRadioGroup';
 
 describe('FormRadioGroup', () => {
@@ -79,31 +78,22 @@ describe('FormRadioGroup', () => {
   });
 
   test('clicking a radio checks it', () => {
-    class RadioWrapper extends Component {
-      public state = {
-        value: '',
-      };
+    const RadioWrapper = () => {
+      const [value, setValue] = useState('');
 
-      private handleChange: RadioChangeEventHandler = event => {
-        this.setState({
-          value: event.target.value,
-        });
-      };
-
-      public render() {
-        const { value } = this.state;
-        return (
-          <FormRadioGroup
-            value={value}
-            onChange={this.handleChange}
-            id="test-radios"
-            name="test-radios"
-            legend="Test radios"
-            options={[{ id: 'radio-1', label: 'Test radio', value: '1' }]}
-          />
-        );
-      }
-    }
+      return (
+        <FormRadioGroup
+          value={value}
+          onChange={event => {
+            setValue(event.target.value);
+          }}
+          id="test-radios"
+          name="test-radios"
+          legend="Test radios"
+          options={[{ id: 'radio-1', label: 'Test radio', value: '1' }]}
+        />
+      );
+    };
 
     render(<RadioWrapper />);
 
@@ -117,34 +107,25 @@ describe('FormRadioGroup', () => {
   });
 
   test('clicking radios toggles between them', () => {
-    class RadioWrapper extends Component {
-      public state = {
-        value: '',
-      };
+    const RadioWrapper = () => {
+      const [value, setValue] = useState('');
 
-      private handleChange: RadioChangeEventHandler = event => {
-        this.setState({
-          value: event.target.value,
-        });
-      };
-
-      public render() {
-        const { value } = this.state;
-        return (
-          <FormRadioGroup
-            value={value}
-            onChange={this.handleChange}
-            id="test-radios"
-            name="test-radios"
-            legend="Test radios"
-            options={[
-              { id: 'radio-1', label: 'Test radio 1', value: '1' },
-              { id: 'radio-2', label: 'Test radio 2', value: '2' },
-            ]}
-          />
-        );
-      }
-    }
+      return (
+        <FormRadioGroup
+          value={value}
+          onChange={event => {
+            setValue(event.target.value);
+          }}
+          id="test-radios"
+          name="test-radios"
+          legend="Test radios"
+          options={[
+            { id: 'radio-1', label: 'Test radio 1', value: '1' },
+            { id: 'radio-2', label: 'Test radio 2', value: '2' },
+          ]}
+        />
+      );
+    };
 
     render(<RadioWrapper />);
 

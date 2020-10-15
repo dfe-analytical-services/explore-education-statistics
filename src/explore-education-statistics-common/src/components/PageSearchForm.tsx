@@ -179,7 +179,6 @@ class PageSearchForm extends Component<PageSearchFormProps, State> {
     const { className, id, inputLabel } = this.props;
     const { searchResults, searchComplete } = this.state;
 
-    // @ts-ignore
     return (
       <form
         className={classNames(

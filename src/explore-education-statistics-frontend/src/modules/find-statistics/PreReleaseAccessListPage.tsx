@@ -37,7 +37,9 @@ const PreReleaseAccessListPage = ({ release }: Props) => {
         </p>
       )}
 
-      <SanitizeHtml dirtyHtml={release.preReleaseAccessList} />
+      {release.preReleaseAccessList && (
+        <SanitizeHtml dirtyHtml={release.preReleaseAccessList} />
+      )}
     </Page>
   );
 };

@@ -1,6 +1,6 @@
 import { ComponentType, ReactComponentElement, ReactElement } from 'react';
 
-export default function isComponentType<P = {}>(
+export default function isComponentType<P>(
   value: unknown,
   componentType: ComponentType<P>,
 ): value is ReactComponentElement<ComponentType<P>, P> {

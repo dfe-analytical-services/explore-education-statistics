@@ -4,6 +4,7 @@ using System.Linq;
 using GovUk.Education.ExploreEducationStatistics.Common.Model.Data;
 using GovUk.Education.ExploreEducationStatistics.Data.Model.Database;
 using GovUk.Education.ExploreEducationStatistics.Data.Model.Services.Interfaces;
+using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Logging;
 
 namespace GovUk.Education.ExploreEducationStatistics.Data.Model.Services
@@ -166,6 +167,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Model.Services
                     !IgnoredLevels.Contains(observation.GeographicLevel) && observation.SubjectId == subjectId)
                 .Select(observation => new {observation.GeographicLevel, observation.LocationId})
                 .Distinct()
+                .AsNoTracking()
                 .ToList()
                 .Select(arg => (arg.GeographicLevel, arg.LocationId));
 
@@ -179,6 +181,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Model.Services
                 .Where(observation => !IgnoredLevels.Contains(observation.GeographicLevel))
                 .Select(observation => new {observation.GeographicLevel, observation.LocationId})
                 .Distinct()
+                .AsNoTracking()
                 .ToList()
                 .Select(arg => (arg.GeographicLevel, arg.LocationId));
 
