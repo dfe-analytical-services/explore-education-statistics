@@ -1,6 +1,7 @@
+import { toolbarConfigs } from '@admin/components/form/FormEditor';
 import FormFieldEditor from '@admin/components/form/FormFieldEditor';
 import useFormSubmit from '@admin/hooks/useFormSubmit';
-import ReleaseMetaGuidanceDataFile from '@admin/pages/release/data/components/ReleaseMetaGuidanceDataFile';
+import ReleaseMetaGuidanceDataFile from '@admin/pages/release/components/ReleaseMetaGuidanceDataFile';
 import releaseMetaGuidanceService from '@admin/services/releaseMetaGuidanceService';
 import Accordion from '@common/components/Accordion';
 import AccordionSection from '@common/components/AccordionSection';
@@ -177,10 +178,24 @@ const ReleaseMetaGuidanceSection = ({ releaseId, canUpdateRelease }: Props) => {
                               >
                                 <ReleaseMetaGuidanceDataFile
                                   key={subject.id}
-                                  formId={formId}
-                                  isEditing={isEditing}
                                   subject={subject}
-                                  index={index}
+                                  renderContent={() =>
+                                    isEditing ? (
+                                      <FormFieldEditor<MetaGuidanceFormValues>
+                                        toolbarConfig={toolbarConfigs.simple}
+                                        id={`${formId}-subjects${index}Content`}
+                                        name={`subjects[${index}].content`}
+                                        label="File guidance content"
+                                      />
+                                    ) : (
+                                      <SanitizeHtml
+                                        dirtyHtml={
+                                          form.values.subjects[index].content
+                                        }
+                                        testId="fileGuidanceContent"
+                                      />
+                                    )
+                                  }
                                 />
                               </AccordionSection>
                             ))}

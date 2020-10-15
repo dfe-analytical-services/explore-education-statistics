@@ -1,30 +1,17 @@
-import { toolbarConfigs } from '@admin/components/form/FormEditor';
-import FormFieldEditor from '@admin/components/form/FormFieldEditor';
-import { MetaGuidanceFormValues } from '@admin/pages/release/data/components/ReleaseMetaGuidanceSection';
 import { SubjectMetaGuidance } from '@admin/services/releaseMetaGuidanceService';
 import Details from '@common/components/Details';
 import SanitizeHtml from '@common/components/SanitizeHtml';
 import SummaryList from '@common/components/SummaryList';
 import SummaryListItem from '@common/components/SummaryListItem';
-import { useField } from 'formik';
-import React from 'react';
+import React, { ReactNode } from 'react';
 
 interface Props {
-  formId: string;
-  index: number;
-  isEditing?: boolean;
   subject: SubjectMetaGuidance;
+  renderContent?: (subject: SubjectMetaGuidance) => ReactNode;
 }
 
-const ReleaseMetaGuidanceDataFile = ({
-  formId,
-  index,
-  isEditing,
-  subject,
-}: Props) => {
+const ReleaseMetaGuidanceDataFile = ({ subject, renderContent }: Props) => {
   const { filename, timePeriods, geographicLevels, variables } = subject;
-
-  const [field] = useField(`subjects[${index}].content`);
 
   return (
     <>
@@ -37,16 +24,11 @@ const ReleaseMetaGuidanceDataFile = ({
           {`${timePeriods.from} to ${timePeriods.to}`}
         </SummaryListItem>
         <SummaryListItem term="Content">
-          {isEditing ? (
-            <FormFieldEditor<MetaGuidanceFormValues>
-              toolbarConfig={toolbarConfigs.simple}
-              id={`${formId}-subjects${index}Content`}
-              name={`subjects[${index}].content`}
-              label="File guidance content"
-            />
+          {typeof renderContent === 'function' ? (
+            renderContent(subject)
           ) : (
             <SanitizeHtml
-              dirtyHtml={field.value}
+              dirtyHtml={subject.content}
               testId="fileGuidanceContent"
             />
           )}
