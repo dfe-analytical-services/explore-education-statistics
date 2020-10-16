@@ -1,10 +1,10 @@
-import Accordion from '@common/components/Accordion';
 import AccordionSection from '@common/components/AccordionSection';
 import PageSearchFormWithAnalytics from '@frontend/components/PageSearchFormWithAnalytics';
 import RelatedInformation from '@common/components/RelatedInformation';
 import Link from '@frontend/components/Link';
 import Page from '@frontend/components/Page';
 import React from 'react';
+import AccordionWithAnalytics from '@frontend/components/AccordionWithAnalytics';
 
 function GlossaryIndexPage() {
   return (
@@ -35,7 +35,7 @@ function GlossaryIndexPage() {
           </RelatedInformation>
         </div>
       </div>
-      <Accordion id="a-z">
+      <AccordionWithAnalytics publicationTitle="Glossary" id="a-z">
         <AccordionSection heading="A">
           <h3 id="absence">Absence</h3>
           <p>
@@ -431,7 +431,7 @@ function GlossaryIndexPage() {
             There are currently no entries under this section
           </p>
         </AccordionSection>
-      </Accordion>
+      </AccordionWithAnalytics>
     </Page>
   );
 }

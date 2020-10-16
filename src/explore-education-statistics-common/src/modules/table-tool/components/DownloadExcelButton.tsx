@@ -6,6 +6,7 @@ import last from 'lodash/last';
 import sum from 'lodash/sum';
 import React, { RefObject } from 'react';
 import { CellObject, utils, WorkSheet, writeFile } from 'xlsx';
+import { logEvent } from '../../../../../explore-education-statistics-frontend/src/services/googleAnalyticsService';
 
 interface Props {
   fileName: string;
@@ -172,6 +173,16 @@ const DownloadExcelButton = ({ fileName, subjectMeta, tableRef }: Props) => {
         writeFile(workBook, `${fileName}.xlsx`, {
           type: 'binary',
         });
+        logEvent(
+          'Excel download',
+          'Excel download button clicked',
+          `${subjectMeta.publicationName} between ${
+            subjectMeta.timePeriodRange[0].label
+          } and ${
+            subjectMeta.timePeriodRange[subjectMeta.timePeriodRange.length - 1]
+              .label
+          }`,
+        );
       }}
     >
       Download table as Excel spreadsheet (XLSX)

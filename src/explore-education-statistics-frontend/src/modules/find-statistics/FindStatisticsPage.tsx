@@ -1,4 +1,3 @@
-import Accordion from '@common/components/Accordion';
 import AccordionSection from '@common/components/AccordionSection';
 import Details from '@common/components/Details';
 import RelatedInformation from '@common/components/RelatedInformation';
@@ -8,6 +7,7 @@ import Page from '@frontend/components/Page';
 import PageSearchFormWithAnalytics from '@frontend/components/PageSearchFormWithAnalytics';
 import { GetServerSideProps, NextPage } from 'next';
 import React from 'react';
+import AccordionWithAnalytics from '@frontend/components/AccordionWithAnalytics';
 import PublicationList from './components/PublicationList';
 import { Topic } from './components/TopicList';
 
@@ -59,7 +59,10 @@ const FindStatisticsPage: NextPage<Props> = ({ themes = [] }) => {
       </div>
 
       {themes.length > 0 ? (
-        <Accordion id="publications">
+        <AccordionWithAnalytics
+          publicationTitle="Find statistics and data"
+          id="publications"
+        >
           {themes.map(
             ({
               id: themeId,
@@ -86,7 +89,7 @@ const FindStatisticsPage: NextPage<Props> = ({ themes = [] }) => {
               </AccordionSection>
             ),
           )}
-        </Accordion>
+        </AccordionWithAnalytics>
       ) : (
         <div className="govuk-inset-text">No data currently published.</div>
       )}

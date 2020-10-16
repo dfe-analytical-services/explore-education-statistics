@@ -32,6 +32,7 @@ import tableBuilderService, {
 import classNames from 'classnames';
 import React, { ReactElement, ReactNode, useMemo } from 'react';
 import { useImmer } from 'use-immer';
+import { logEvent } from '../../../../../explore-education-statistics-frontend/src/services/googleAnalyticsService';
 
 interface Publication {
   id: string;
@@ -246,6 +247,12 @@ const TableToolWizard = ({
 
     const table = mapFullTable(tableData);
     const tableHeaders = getDefaultTableHeaderConfig(table.subjectMeta);
+    logEvent(
+      'Table tool',
+      'Publication and subject chosen',
+      `${table.subjectMeta.publicationName}/${table.subjectMeta.subjectName}`,
+    );
+    logEvent('Table tool', 'Table created', window.location.pathname);
 
     updateState(draft => {
       draft.query = query;
