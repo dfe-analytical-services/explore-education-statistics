@@ -29,7 +29,7 @@ Validate breadcrumbs
 Validate miscellaneous
     [Tags]  HappyPath
     user checks summary list contains  Created  7 April 2020
-    user waits until element contains   css:[data-testid="dataTableCaption"]   Table showing Number of pupil enrolments for 'Total days missed due to fixed period exclusions' from 'Permanent and fixed-period exclusions in England' in England between 2014/15 and 2016/17
+    user waits until element contains   css:[data-testid="dataTableCaption"]   Table showing Number of pupil enrolments for 'Total days missed due to fixed period exclusions' for State-funded secondary from 'Permanent and fixed-period exclusions in England' in England between 2014/15 and 2016/17
     user checks page contains element   xpath://a[text()="Print this page"]
 
 Validate table

@@ -30,7 +30,7 @@ Validate miscellaneous
     [Tags]  HappyPath
     user checks summary list contains  Created  7 April 2020
     user waits until element contains   css:[data-testid="dataTableCaption"]   Table showing 'Exclusions by geographic level' from 'Permanent and fixed-period exclusions in England' in Barking and Dagenham and Barnet between 2014/15 and 2016/17
-    user checks page contains element   xpath://a[text()="Print this page"]
+    user waits until page contains button   Print this page
 
 Validate table
     [Tags]  HappyPath
