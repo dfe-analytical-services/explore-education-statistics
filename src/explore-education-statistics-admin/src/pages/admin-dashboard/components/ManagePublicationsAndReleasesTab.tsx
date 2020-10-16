@@ -6,8 +6,8 @@ import {
   publicationCreateRoute,
   ThemeTopicParams,
 } from '@admin/routes/routes';
-import dashboardService from '@admin/services/dashboardService';
 import permissionService from '@admin/services/permissionService';
+import publicationService from '@admin/services/publicationService';
 import themeService, { Theme } from '@admin/services/themeService';
 import { Topic } from '@admin/services/topicService';
 import appendQuery from '@admin/utils/url/appendQuery';
@@ -66,7 +66,7 @@ const ManagePublicationsAndReleasesTab = () => {
       return undefined;
     }
 
-    return dashboardService.getMyPublicationsByTopic(selectedTopic.id);
+    return publicationService.getMyPublicationsByTopic(selectedTopic.id);
   }, [selectedTopic?.id]);
 
   const { value: canCreatePublication = false } = useAsyncRetry(async () => {

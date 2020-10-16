@@ -10,7 +10,7 @@ import {
   PublicationRouteParams,
   releaseCreateRoute,
 } from '@admin/routes/routes';
-import { AdminDashboardPublication } from '@admin/services/dashboardService';
+import { MyPublication } from '@admin/services/publicationService';
 import releaseService, { Release } from '@admin/services/releaseService';
 import ButtonGroup from '@common/components/ButtonGroup';
 import ModalConfirm from '@common/components/ModalConfirm';
@@ -20,7 +20,7 @@ import CancelAmendmentModal from './CancelAmendmentModal';
 import NonScheduledReleaseSummary from './NonScheduledReleaseSummary';
 
 export interface Props {
-  publication: AdminDashboardPublication;
+  publication: MyPublication;
   onChangePublication: () => void;
 }
 
