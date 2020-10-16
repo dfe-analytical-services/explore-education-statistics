@@ -1,9 +1,9 @@
 import ManagePublicationsAndReleasesTab from '@admin/pages/admin-dashboard/components/ManagePublicationsAndReleasesTab';
 import { ContactDetails } from '@admin/services/contactService';
-import _dashboardService, {
-  AdminDashboardPublication,
-} from '@admin/services/dashboardService';
 import _permissionService from '@admin/services/permissionService';
+import _publicationService, {
+  MyPublication,
+} from '@admin/services/publicationService';
 import _themeService, { Theme } from '@admin/services/themeService';
 import _storageService from '@common/services/storageService';
 import { waitFor } from '@testing-library/dom';
@@ -13,13 +13,13 @@ import { createMemoryHistory } from 'history';
 import React from 'react';
 import { MemoryRouter, Router } from 'react-router';
 
-jest.mock('@admin/services/dashboardService');
 jest.mock('@admin/services/permissionService');
+jest.mock('@admin/services/publicationService');
 jest.mock('@admin/services/themeService');
 jest.mock('@common/services/storageService');
 
-const dashboardService = _dashboardService as jest.Mocked<
-  typeof _dashboardService
+const publicationService = _publicationService as jest.Mocked<
+  typeof _publicationService
 >;
 const permissionService = _permissionService as jest.Mocked<
   typeof _permissionService
@@ -79,7 +79,7 @@ describe('ManagePublicationsAndReleasesTab', () => {
     teamName: 'Team Smith',
   };
 
-  const testPublications: AdminDashboardPublication[] = [
+  const testPublications: MyPublication[] = [
     {
       id: 'publication-1',
       title: 'Publication 1',
@@ -104,7 +104,7 @@ describe('ManagePublicationsAndReleasesTab', () => {
 
   test('renders with first theme and topic selected by default', async () => {
     themeService.getThemes.mockResolvedValue(testThemeTopics);
-    dashboardService.getMyPublicationsByTopic.mockResolvedValue(
+    publicationService.getMyPublicationsByTopic.mockResolvedValue(
       testPublications,
     );
     permissionService.canCreatePublicationForTopic.mockResolvedValue(true);
@@ -130,7 +130,7 @@ describe('ManagePublicationsAndReleasesTab', () => {
 
   test('adds `themeId` and `topicId` query params from initial theme/topic', async () => {
     themeService.getThemes.mockResolvedValue(testThemeTopics);
-    dashboardService.getMyPublicationsByTopic.mockResolvedValue(
+    publicationService.getMyPublicationsByTopic.mockResolvedValue(
       testPublications,
     );
     permissionService.canCreatePublicationForTopic.mockResolvedValue(true);
@@ -155,7 +155,7 @@ describe('ManagePublicationsAndReleasesTab', () => {
     });
 
     themeService.getThemes.mockResolvedValue(testThemeTopics);
-    dashboardService.getMyPublicationsByTopic.mockResolvedValue(
+    publicationService.getMyPublicationsByTopic.mockResolvedValue(
       testPublications,
     );
     permissionService.canCreatePublicationForTopic.mockResolvedValue(true);
@@ -186,7 +186,7 @@ describe('ManagePublicationsAndReleasesTab', () => {
     });
 
     themeService.getThemes.mockResolvedValue(testThemeTopics);
-    dashboardService.getMyPublicationsByTopic.mockResolvedValue(
+    publicationService.getMyPublicationsByTopic.mockResolvedValue(
       testPublications,
     );
     permissionService.canCreatePublicationForTopic.mockResolvedValue(true);
@@ -217,7 +217,7 @@ describe('ManagePublicationsAndReleasesTab', () => {
     });
 
     themeService.getThemes.mockResolvedValue(testThemeTopics);
-    dashboardService.getMyPublicationsByTopic.mockResolvedValue(
+    publicationService.getMyPublicationsByTopic.mockResolvedValue(
       testPublications,
     );
     permissionService.canCreatePublicationForTopic.mockResolvedValue(true);
@@ -242,7 +242,7 @@ describe('ManagePublicationsAndReleasesTab', () => {
     });
 
     themeService.getThemes.mockResolvedValue(testThemeTopics);
-    dashboardService.getMyPublicationsByTopic.mockResolvedValue(
+    publicationService.getMyPublicationsByTopic.mockResolvedValue(
       testPublications,
     );
     permissionService.canCreatePublicationForTopic.mockResolvedValue(true);
@@ -270,7 +270,7 @@ describe('ManagePublicationsAndReleasesTab', () => {
 
   test('renders with first theme selected if `themeId` query param does not match any theme', async () => {
     themeService.getThemes.mockResolvedValue(testThemeTopics);
-    dashboardService.getMyPublicationsByTopic.mockResolvedValue(
+    publicationService.getMyPublicationsByTopic.mockResolvedValue(
       testPublications,
     );
     permissionService.canCreatePublicationForTopic.mockResolvedValue(true);
@@ -301,7 +301,7 @@ describe('ManagePublicationsAndReleasesTab', () => {
     });
 
     themeService.getThemes.mockResolvedValue(testThemeTopics);
-    dashboardService.getMyPublicationsByTopic.mockResolvedValue(
+    publicationService.getMyPublicationsByTopic.mockResolvedValue(
       testPublications,
     );
     permissionService.canCreatePublicationForTopic.mockResolvedValue(true);
@@ -327,7 +327,7 @@ describe('ManagePublicationsAndReleasesTab', () => {
 
   test('renders with first topic selected if `topicId` query param is missing', async () => {
     themeService.getThemes.mockResolvedValue(testThemeTopics);
-    dashboardService.getMyPublicationsByTopic.mockResolvedValue(
+    publicationService.getMyPublicationsByTopic.mockResolvedValue(
       testPublications,
     );
     permissionService.canCreatePublicationForTopic.mockResolvedValue(true);
@@ -353,7 +353,7 @@ describe('ManagePublicationsAndReleasesTab', () => {
 
   test('renders with first topic selected if `topicId` query param does not match any topic', async () => {
     themeService.getThemes.mockResolvedValue(testThemeTopics);
-    dashboardService.getMyPublicationsByTopic.mockResolvedValue(
+    publicationService.getMyPublicationsByTopic.mockResolvedValue(
       testPublications,
     );
     permissionService.canCreatePublicationForTopic.mockResolvedValue(true);
@@ -386,7 +386,7 @@ describe('ManagePublicationsAndReleasesTab', () => {
     });
 
     themeService.getThemes.mockResolvedValue(testThemeTopics);
-    dashboardService.getMyPublicationsByTopic.mockResolvedValue(
+    publicationService.getMyPublicationsByTopic.mockResolvedValue(
       testPublications,
     );
     permissionService.canCreatePublicationForTopic.mockResolvedValue(true);
@@ -412,7 +412,7 @@ describe('ManagePublicationsAndReleasesTab', () => {
 
   test('selecting new theme selects first topic automatically', async () => {
     themeService.getThemes.mockResolvedValue(testThemeTopics);
-    dashboardService.getMyPublicationsByTopic.mockImplementation(
+    publicationService.getMyPublicationsByTopic.mockImplementation(
       async topicId => {
         expect(topicId).toBe('topic-3');
 
@@ -455,7 +455,7 @@ describe('ManagePublicationsAndReleasesTab', () => {
 
   test('selecting new theme and topic renders correctly', async () => {
     themeService.getThemes.mockResolvedValue(testThemeTopics);
-    dashboardService.getMyPublicationsByTopic.mockImplementation(
+    publicationService.getMyPublicationsByTopic.mockImplementation(
       async topicId => {
         expect(topicId).toBe('topic-4');
 
@@ -508,7 +508,7 @@ describe('ManagePublicationsAndReleasesTab', () => {
 
   test('selecting new theme and topic updates query params correctly', async () => {
     themeService.getThemes.mockResolvedValue(testThemeTopics);
-    dashboardService.getMyPublicationsByTopic.mockResolvedValue(
+    publicationService.getMyPublicationsByTopic.mockResolvedValue(
       testPublications,
     );
     permissionService.canCreatePublicationForTopic.mockResolvedValue(true);
@@ -544,7 +544,7 @@ describe('ManagePublicationsAndReleasesTab', () => {
 
   test('renders correctly when no themes are available', async () => {
     themeService.getThemes.mockResolvedValue([]);
-    dashboardService.getMyPublicationsByTopic.mockResolvedValue([]);
+    publicationService.getMyPublicationsByTopic.mockResolvedValue([]);
     permissionService.canCreatePublicationForTopic.mockResolvedValue(true);
 
     render(
@@ -566,7 +566,7 @@ describe('ManagePublicationsAndReleasesTab', () => {
 
   test('renders correctly with list of publications', async () => {
     themeService.getThemes.mockResolvedValue(testThemeTopics);
-    dashboardService.getMyPublicationsByTopic.mockImplementation(
+    publicationService.getMyPublicationsByTopic.mockImplementation(
       async topicId => {
         expect(topicId).toBe('topic-1');
         return testPublications;
@@ -592,7 +592,7 @@ describe('ManagePublicationsAndReleasesTab', () => {
 
   test('renders correctly when no publications are available', async () => {
     themeService.getThemes.mockResolvedValue(testThemeTopics);
-    dashboardService.getMyPublicationsByTopic.mockResolvedValue([]);
+    publicationService.getMyPublicationsByTopic.mockResolvedValue([]);
     permissionService.canCreatePublicationForTopic.mockResolvedValue(true);
 
     render(
@@ -608,7 +608,7 @@ describe('ManagePublicationsAndReleasesTab', () => {
 
   test("renders 'Create new publication' button if authorised", async () => {
     themeService.getThemes.mockResolvedValue(testThemeTopics);
-    dashboardService.getMyPublicationsByTopic.mockResolvedValue(
+    publicationService.getMyPublicationsByTopic.mockResolvedValue(
       testPublications,
     );
     permissionService.canCreatePublicationForTopic.mockResolvedValue(true);
@@ -628,7 +628,7 @@ describe('ManagePublicationsAndReleasesTab', () => {
 
   test("does not render 'Create new publication' button if unauthorised", async () => {
     themeService.getThemes.mockResolvedValue(testThemeTopics);
-    dashboardService.getMyPublicationsByTopic.mockResolvedValue(
+    publicationService.getMyPublicationsByTopic.mockResolvedValue(
       testPublications,
     );
     permissionService.canCreatePublicationForTopic.mockResolvedValue(false);

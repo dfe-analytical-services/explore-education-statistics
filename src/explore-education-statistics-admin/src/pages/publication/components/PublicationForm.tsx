@@ -1,7 +1,7 @@
 import FormFieldThemeTopicSelect from '@admin/components/form/FormFieldThemeTopicSelect';
 import useFormSubmit from '@admin/hooks/useFormSubmit';
-import { ExternalMethodology } from '@admin/services/dashboardService';
 import methodologyService from '@admin/services/methodologyService';
+import { ExternalMethodology } from '@admin/services/publicationService';
 import themeService from '@admin/services/themeService';
 import Button from '@common/components/Button';
 import ButtonGroup from '@common/components/ButtonGroup';
