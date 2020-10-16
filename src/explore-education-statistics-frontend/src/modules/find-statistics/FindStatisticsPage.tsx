@@ -1,4 +1,3 @@
-import Accordion from '@common/components/Accordion';
 import AccordionSection from '@common/components/AccordionSection';
 import Details from '@common/components/Details';
 import RelatedInformation from '@common/components/RelatedInformation';
@@ -8,6 +7,8 @@ import Page from '@frontend/components/Page';
 import PageSearchFormWithAnalytics from '@frontend/components/PageSearchFormWithAnalytics';
 import { GetServerSideProps, NextPage } from 'next';
 import React from 'react';
+import { logEvent } from '@frontend/services/googleAnalyticsService';
+import Accordion from '@common/components/Accordion';
 import PublicationList from './components/PublicationList';
 import { Topic } from './components/TopicList';
 
@@ -59,7 +60,16 @@ const FindStatisticsPage: NextPage<Props> = ({ themes = [] }) => {
       </div>
 
       {themes.length > 0 ? (
-        <Accordion id="publications">
+        <Accordion
+          id="publications"
+          onSectionOpen={accordionSection => {
+            logEvent(
+              'Find statistics and data',
+              'Publications accordion opened',
+              accordionSection.title,
+            );
+          }}
+        >
           {themes.map(
             ({
               id: themeId,

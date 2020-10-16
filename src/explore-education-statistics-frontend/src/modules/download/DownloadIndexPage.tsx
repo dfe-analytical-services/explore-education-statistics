@@ -1,4 +1,3 @@
-import Accordion from '@common/components/Accordion';
 import AccordionSection from '@common/components/AccordionSection';
 import Details from '@common/components/Details';
 import RelatedInformation from '@common/components/RelatedInformation';
@@ -8,6 +7,8 @@ import Page from '@frontend/components/Page';
 import PageSearchFormWithAnalytics from '@frontend/components/PageSearchFormWithAnalytics';
 import { GetServerSideProps, NextPage } from 'next';
 import React from 'react';
+import Accordion from '@common/components/Accordion';
+import { logEvent } from '@frontend/services/googleAnalyticsService';
 import PublicationDownloadList from './components/PublicationDownloadList';
 import { Topic } from './components/TopicList';
 
@@ -57,7 +58,16 @@ const DownloadIndexPage: NextPage<Props> = ({ themes = [] }) => {
       </div>
 
       {themes.length > 0 ? (
-        <Accordion id="downloads">
+        <Accordion
+          id="downloads"
+          onSectionOpen={accordionSection => {
+            logEvent(
+              'Download index page',
+              'Accordion opened',
+              accordionSection.title,
+            );
+          }}
+        >
           {themes.map(
             ({
               id: themeId,

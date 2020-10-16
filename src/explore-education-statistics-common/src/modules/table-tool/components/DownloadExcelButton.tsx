@@ -7,10 +7,11 @@ import sum from 'lodash/sum';
 import React, { RefObject } from 'react';
 import { CellObject, utils, WorkSheet, writeFile } from 'xlsx';
 
-interface Props {
+export interface DownloadExcelButtonProps {
   fileName: string;
   subjectMeta: FullTableMeta;
   tableRef: RefObject<HTMLElement>;
+  onClick?: () => void;
 }
 
 /**
@@ -140,7 +141,12 @@ export function appendFootnotes(
   return sheet;
 }
 
-const DownloadExcelButton = ({ fileName, subjectMeta, tableRef }: Props) => {
+const DownloadExcelButton = ({
+  fileName,
+  subjectMeta,
+  tableRef,
+  onClick,
+}: DownloadExcelButtonProps) => {
   const { footnotes } = subjectMeta;
   return (
     <ButtonText
@@ -172,6 +178,10 @@ const DownloadExcelButton = ({ fileName, subjectMeta, tableRef }: Props) => {
         writeFile(workBook, `${fileName}.xlsx`, {
           type: 'binary',
         });
+
+        if (onClick) {
+          onClick();
+        }
       }}
     >
       Download table as Excel spreadsheet (XLSX)
