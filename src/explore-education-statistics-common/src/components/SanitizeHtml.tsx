@@ -1,7 +1,7 @@
 import React, { useMemo } from 'react';
 import sanitizeHtml from '@common/utils/sanitizeHtml';
 
-interface SanitizeHtmlProps {
+export interface SanitizeHtmlProps {
   className?: string;
   dirtyHtml: string;
   testId?: string;

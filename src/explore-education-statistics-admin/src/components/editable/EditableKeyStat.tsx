@@ -122,7 +122,7 @@ const EditableKeyStat = ({
 
               <FormFieldEditor<KeyStatsFormValues>
                 name="dataDefinition"
-                toolbarConfig={toolbarConfigs.reduced}
+                toolbarConfig={toolbarConfigs.simple}
                 id={`${formId}-dataDefinition`}
                 label="Guidance text"
               />

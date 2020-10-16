@@ -4,11 +4,11 @@ using System.Linq;
 using System.Threading.Tasks;
 using GovUk.Education.ExploreEducationStatistics.Common.Extensions;
 using GovUk.Education.ExploreEducationStatistics.Common.Model;
+using GovUk.Education.ExploreEducationStatistics.Common.Services;
 using GovUk.Education.ExploreEducationStatistics.Common.Utils;
 using GovUk.Education.ExploreEducationStatistics.Data.Model;
 using GovUk.Education.ExploreEducationStatistics.Data.Model.Database;
 using GovUk.Education.ExploreEducationStatistics.Data.Model.Services.Interfaces;
-using GovUk.Education.ExploreEducationStatistics.Data.Services.Extensions;
 using GovUk.Education.ExploreEducationStatistics.Data.Services.Interfaces;
 using GovUk.Education.ExploreEducationStatistics.Data.Services.ViewModels;
 using Microsoft.AspNetCore.Mvc;
@@ -73,8 +73,8 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Services
             var last = await orderedTimePeriods.LastAsync();
 
             return new MetaGuidanceSubjectTimePeriodsViewModel(
-                (first.Year, first.TimeIdentifier).GetTimePeriod(),
-                (last.Year, last.TimeIdentifier).GetTimePeriod());
+                TimePeriodLabelFormatter.Format(first.Year, first.TimeIdentifier),
+                TimePeriodLabelFormatter.Format(last.Year, last.TimeIdentifier));
         }
 
         private async Task<List<string>> GetGeographicLevels(Guid subjectId)

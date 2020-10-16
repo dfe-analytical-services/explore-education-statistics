@@ -12,6 +12,7 @@ using GovUk.Education.ExploreEducationStatistics.Data.Model;
 using GovUk.Education.ExploreEducationStatistics.Data.Model.Database;
 using GovUk.Education.ExploreEducationStatistics.Data.Services.Interfaces;
 using GovUk.Education.ExploreEducationStatistics.Data.Services.ViewModels;
+using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
 using Moq;
 using Xunit;
@@ -36,7 +37,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
                     {
                         "National", "Local Authority", "Local Authority District"
                     },
-                    TimePeriods = new MetaGuidanceSubjectTimePeriodsViewModel("2020_AYQ3", "2021_AYQ1"),
+                    TimePeriods = new MetaGuidanceSubjectTimePeriodsViewModel("2020/21 Q3", "2021/22 Q1"),
                     Variables = new List<LabelValue>
                     {
                         new LabelValue("Filter label", "test_filter"),
@@ -85,14 +86,111 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
         }
 
         [Fact]
-        public async Task UpdateRelease()
+        public async Task Get_NoRelease()
+        {
+            var contentDbContextId = Guid.NewGuid().ToString();
+
+            await using (var contentDbContext = InMemoryApplicationDbContext(contentDbContextId))
+            {
+                var service = SetupMetaGuidanceService(contentDbContext: contentDbContext);
+
+                var result = await service.Get(Guid.NewGuid());
+
+                Assert.True(result.IsLeft);
+                Assert.IsType<NotFoundResult>(result.Left);
+            }
+        }
+
+        [Fact]
+        public async Task Update_NoRelease()
+        {
+            var contentDbContextId = Guid.NewGuid().ToString();
+
+            await using (var contentDbContext = InMemoryApplicationDbContext(contentDbContextId))
+            {
+                var service = SetupMetaGuidanceService(contentDbContext: contentDbContext);
+
+                var result = await service.Update(
+                    Guid.NewGuid(),
+                    new MetaGuidanceUpdateViewModel
+                    {
+                        Content = "Updated Release Meta Guidance",
+                        Subjects = new List<MetaGuidanceUpdateSubjectViewModel>()
+                    });
+
+                Assert.True(result.IsLeft);
+                Assert.IsType<NotFoundResult>(result.Left);
+            }
+        }
+
+        [Fact]
+        public async Task Update_NoSubjects()
         {
             var release = new Release
             {
+                Id = Guid.NewGuid(),
+                PreviousVersionId = null,
                 MetaGuidance = "Release Meta Guidance"
             };
 
             var contentDbContextId = Guid.NewGuid().ToString();
+            var statisticsDbContextId = Guid.NewGuid().ToString();
+
+            await using (var contentDbContext = InMemoryApplicationDbContext(contentDbContextId))
+            {
+                await contentDbContext.AddAsync(release);
+                await contentDbContext.SaveChangesAsync();
+            }
+
+            var metaGuidanceSubjectService = new Mock<IMetaGuidanceSubjectService>(MockBehavior.Strict);
+
+            metaGuidanceSubjectService.Setup(mock =>
+                mock.GetSubjects(release.Id)).ReturnsAsync(new List<MetaGuidanceSubjectViewModel>());
+
+            await using (var contentDbContext = InMemoryApplicationDbContext(contentDbContextId))
+            await using (var statisticsDbContext = InMemoryStatisticsDbContext(statisticsDbContextId))
+            {
+                var service = SetupMetaGuidanceService(contentDbContext: contentDbContext,
+                    metaGuidanceSubjectService: metaGuidanceSubjectService.Object,
+                    statisticsDbContext: statisticsDbContext);
+
+                var result = await service.Update(
+                    release.Id,
+                    new MetaGuidanceUpdateViewModel
+                    {
+                        Content = "Updated Release Meta Guidance",
+                        Subjects = new List<MetaGuidanceUpdateSubjectViewModel>()
+                    });
+
+                Assert.True(result.IsRight);
+
+                metaGuidanceSubjectService.Verify(mock =>
+                    mock.GetSubjects(release.Id), Times.Once);
+
+                Assert.Equal(release.Id, result.Right.Id);
+                Assert.Equal("Updated Release Meta Guidance", result.Right.Content);
+                Assert.Empty(result.Right.Subjects);
+            }
+
+            await using (var contentDbContext = InMemoryApplicationDbContext(contentDbContextId))
+            {
+                Assert.Equal("Updated Release Meta Guidance",
+                    (await contentDbContext.Releases.FindAsync(release.Id)).MetaGuidance);
+            }
+        }
+
+        [Fact]
+        public async Task Update_NoMatchingSubjects()
+        {
+            var release = new Release
+            {
+                Id = Guid.NewGuid(),
+                PreviousVersionId = null,
+                MetaGuidance = "Release Meta Guidance"
+            };
+
+            var contentDbContextId = Guid.NewGuid().ToString();
+            var statisticsDbContextId = Guid.NewGuid().ToString();
 
             await using (var contentDbContext = InMemoryApplicationDbContext(contentDbContextId))
             {
@@ -106,14 +204,26 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
                 mock.GetSubjects(release.Id)).ReturnsAsync(SubjectMetaGuidance);
 
             await using (var contentDbContext = InMemoryApplicationDbContext(contentDbContextId))
+            await using (var statisticsDbContext = InMemoryStatisticsDbContext(statisticsDbContextId))
             {
                 var service = SetupMetaGuidanceService(contentDbContext: contentDbContext,
-                    metaGuidanceSubjectService: metaGuidanceSubjectService.Object);
+                    metaGuidanceSubjectService: metaGuidanceSubjectService.Object,
+                    statisticsDbContext: statisticsDbContext);
 
-                var result = await service.UpdateRelease(release.Id, new MetaGuidanceUpdateReleaseViewModel
-                {
-                    Content = "Updated Release Meta Guidance"
-                });
+                var result = await service.Update(
+                    release.Id,
+                    new MetaGuidanceUpdateViewModel
+                    {
+                        Content = "Updated Release Meta Guidance",
+                        Subjects = new List<MetaGuidanceUpdateSubjectViewModel>
+                        {
+                            new MetaGuidanceUpdateSubjectViewModel
+                            {
+                                Id = Guid.NewGuid(),
+                                Content = "Not a valid subject"
+                            }
+                        }
+                    });
 
                 Assert.True(result.IsRight);
 
@@ -133,7 +243,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
         }
 
         [Fact]
-        public async Task UpdateSubject()
+        public async Task Update_WithSubjects()
         {
             var contentRelease = new Release
             {
@@ -146,31 +256,27 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
                 Id = contentRelease.Id,
             };
 
-            var subject1 = new Subject
-            {
-                Id = Guid.NewGuid(),
-                Filename = "file1.csv",
-                Name = "Subject 1"
-            };
-
-            var subject2 = new Subject
-            {
-                Id = Guid.NewGuid(),
-                Filename = "file2.csv",
-                Name = "Subject 2"
-            };
-
             var releaseSubject1 = new ReleaseSubject
             {
                 Release = statsRelease,
-                Subject = subject1,
+                Subject = new Subject
+                {
+                    Id = Guid.NewGuid(),
+                    Filename = "file1.csv",
+                    Name = "Subject 1"
+                },
                 MetaGuidance = "Subject 1 Meta Guidance"
             };
 
             var releaseSubject2 = new ReleaseSubject
             {
                 Release = statsRelease,
-                Subject = subject2,
+                Subject = new Subject
+                {
+                    Id = Guid.NewGuid(),
+                    Filename = "file2.csv",
+                    Name = "Subject 2"
+                },
                 MetaGuidance = "Subject 2 Meta Guidance"
             };
 
@@ -186,7 +292,6 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
             await using (var statisticsDbContext = InMemoryStatisticsDbContext(statisticsDbContextId))
             {
                 await statisticsDbContext.AddRangeAsync(statsRelease);
-                await statisticsDbContext.AddRangeAsync(subject1, subject2);
                 await statisticsDbContext.AddRangeAsync(releaseSubject1, releaseSubject2);
                 await statisticsDbContext.SaveChangesAsync();
             }
@@ -200,15 +305,25 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
             await using (var statisticsDbContext = InMemoryStatisticsDbContext(statisticsDbContextId))
             {
                 var service = SetupMetaGuidanceService(contentDbContext: contentDbContext,
-                    statisticsDbContext: statisticsDbContext,
-                    metaGuidanceSubjectService: metaGuidanceSubjectService.Object);
+                    metaGuidanceSubjectService: metaGuidanceSubjectService.Object,
+                    statisticsDbContext: statisticsDbContext);
 
-                // Update Subject 1
-                var result = await service.UpdateSubject(
-                    contentRelease.Id, subject1.Id, new MetaGuidanceUpdateSubjectViewModel
+                // Update Release and Subject 1
+                var result = await service.Update(
+                    contentRelease.Id,
+                    new MetaGuidanceUpdateViewModel
                     {
-                        Content = "Subject 1 Meta Guidance Updated"
-                    });
+                        Content = "Release Meta Guidance Updated",
+                        Subjects = new List<MetaGuidanceUpdateSubjectViewModel>
+                        {
+                            new MetaGuidanceUpdateSubjectViewModel
+                            {
+                                Id = releaseSubject1.Subject.Id,
+                                Content = "Subject 1 Meta Guidance Updated"
+                            }
+                        }
+                    }
+                );
 
                 Assert.True(result.IsRight);
 
@@ -216,27 +331,34 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
                     mock.GetSubjects(statsRelease.Id), Times.Once);
 
                 Assert.Equal(contentRelease.Id, result.Right.Id);
-                Assert.Equal("Release Meta Guidance", result.Right.Content);
+                Assert.Equal("Release Meta Guidance Updated", result.Right.Content);
                 Assert.Equal(SubjectMetaGuidance, result.Right.Subjects);
             }
 
+            await using (var contentDbContext = InMemoryApplicationDbContext(contentDbContextId))
             await using (var statisticsDbContext = InMemoryStatisticsDbContext(statisticsDbContextId))
             {
+                Assert.Equal("Release Meta Guidance Updated",
+                    (await contentDbContext.Releases
+                        .FindAsync(contentRelease.Id)).MetaGuidance);
+
                 // Assert only one Subject has been updated
                 Assert.Equal("Subject 1 Meta Guidance Updated",
                     (await statisticsDbContext.ReleaseSubject
-                        .Where(rs => rs.ReleaseId == statsRelease.Id && rs.SubjectId == subject1.Id)
+                        .Where(rs => rs.ReleaseId == statsRelease.Id
+                                     && rs.SubjectId == releaseSubject1.Subject.Id)
                         .FirstAsync()).MetaGuidance);
 
                 Assert.Equal("Subject 2 Meta Guidance",
                     (await statisticsDbContext.ReleaseSubject
-                        .Where(rs => rs.ReleaseId == statsRelease.Id && rs.SubjectId == subject2.Id)
+                        .Where(rs => rs.ReleaseId == statsRelease.Id
+                                     && rs.SubjectId == releaseSubject2.Subject.Id)
                         .FirstAsync()).MetaGuidance);
             }
         }
 
         [Fact]
-        public async Task UpdateSubject_AmendedRelease()
+        public async Task Update_WithSubjects_AmendedRelease()
         {
             var contentReleaseVersion1 = new Release
             {
@@ -328,15 +450,25 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
             await using (var statisticsDbContext = InMemoryStatisticsDbContext(statisticsDbContextId))
             {
                 var service = SetupMetaGuidanceService(contentDbContext: contentDbContext,
-                    statisticsDbContext: statisticsDbContext,
-                    metaGuidanceSubjectService: metaGuidanceSubjectService.Object);
+                    metaGuidanceSubjectService: metaGuidanceSubjectService.Object,
+                    statisticsDbContext: statisticsDbContext);
 
-                // Update Subject 1 on version 2
-                var result = await service.UpdateSubject(
-                    contentReleaseVersion2.Id, subject1.Id, new MetaGuidanceUpdateSubjectViewModel
+                // Update Release and Subject 1 on version 2
+                var result = await service.Update(
+                    contentReleaseVersion2.Id,
+                    new MetaGuidanceUpdateViewModel
                     {
-                        Content = "Version 2 Subject 1 Meta Guidance Updated"
-                    });
+                        Content = "Version 2 Release Meta Guidance Updated",
+                        Subjects = new List<MetaGuidanceUpdateSubjectViewModel>
+                        {
+                            new MetaGuidanceUpdateSubjectViewModel
+                            {
+                                Id = subject1.Id,
+                                Content = "Version 2 Subject 1 Meta Guidance Updated"
+                            }
+                        }
+                    }
+                );
 
                 Assert.True(result.IsRight);
 
@@ -344,12 +476,21 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
                     mock.GetSubjects(statsReleaseVersion2.Id), Times.Once);
 
                 Assert.Equal(contentReleaseVersion2.Id, result.Right.Id);
-                Assert.Equal("Version 2 Release Meta Guidance", result.Right.Content);
+                Assert.Equal("Version 2 Release Meta Guidance Updated", result.Right.Content);
                 Assert.Equal(SubjectMetaGuidance, result.Right.Subjects);
             }
 
+            await using (var contentDbContext = InMemoryApplicationDbContext(contentDbContextId))
             await using (var statisticsDbContext = InMemoryStatisticsDbContext(statisticsDbContextId))
             {
+                Assert.Equal("Version 1 Release Meta Guidance",
+                    (await contentDbContext.Releases
+                        .FindAsync(contentReleaseVersion1.Id)).MetaGuidance);
+
+                Assert.Equal("Version 2 Release Meta Guidance Updated",
+                    (await contentDbContext.Releases
+                        .FindAsync(contentReleaseVersion2.Id)).MetaGuidance);
+
                 // Assert the same Subject on version 1 hasn't been affected
                 Assert.Equal("Version 1 Subject 1 Meta Guidance",
                     (await statisticsDbContext.ReleaseSubject
@@ -374,7 +515,6 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
             StatisticsDbContext statisticsDbContext = null,
             IPersistenceHelper<ContentDbContext> contentPersistenceHelper = null,
             IMetaGuidanceSubjectService metaGuidanceSubjectService = null,
-            IPersistenceHelper<StatisticsDbContext> statisticsPersistenceHelper = null,
             IUserService userService = null)
         {
             return new MetaGuidanceService(
@@ -382,7 +522,6 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
                 contentPersistenceHelper ?? new PersistenceHelper<ContentDbContext>(contentDbContext),
                 metaGuidanceSubjectService ?? new Mock<IMetaGuidanceSubjectService>().Object,
                 statisticsDbContext ?? new Mock<StatisticsDbContext>().Object,
-                statisticsPersistenceHelper ?? new PersistenceHelper<StatisticsDbContext>(statisticsDbContext),
                 userService ?? MockUtils.AlwaysTrueUserService().Object
             );
         }

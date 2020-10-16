@@ -72,27 +72,29 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Services
                 .OnSuccess(_userService.CheckCanViewRelease)
                 .OnSuccess(async release =>
                     {
-                        var files = new List<BlobInfo>();
+                        var files = new List<FileInfo>();
 
                         foreach (var version in referencedReleaseVersions)
                         {
                             files.AddRange(
-                                await _blobStorageService.ListBlobs(
+                                (await _blobStorageService.ListBlobs(
                                     PrivateFilesContainerName,
                                     AdminReleaseDirectoryPath(version, ReleaseFileTypes.Data)
-                                )
+                                ))
+                                .Where(blob => !blob.IsMetaDataFile())
+                                .Select(blob => blob.ToFileInfo(ReleaseFileTypes.Data))
                             );
                             files.AddRange(
-                                await _blobStorageService.ListBlobs(
+                                (await _blobStorageService.ListBlobs(
                                     PrivateFilesContainerName,
                                     AdminReleaseDirectoryPath(version, ReleaseFileTypes.Ancillary)
-                                )
+                                ))
+                                .Select(blob => blob.ToFileInfo(ReleaseFileTypes.Ancillary))
+
                             );
                         }
 
                         return files
-                            .Where(blob => !blob.IsMetaDataFile())
-                            .Select(blob => blob.ToFileInfo())
                             .OrderBy(f => f.Name)
                             .AsEnumerable();
                     }
@@ -357,7 +359,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Services
                                     AdminReleasePath(releaseId, type, file.FileName.ToLower())
                                 );
 
-                                return blob.ToFileInfo(releaseFileReference.Id);
+                                return blob.ToFileInfo(type, releaseFileReference.Id);
                             });
                 });
         }
@@ -388,7 +390,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Services
                                     AdminReleasePath(releaseId,ReleaseFileTypes.Chart, releaseFileReference.Id.ToString())
                                 );
 
-                                return blob.ToFileInfo(releaseFileReference.Id);
+                                return blob.ToFileInfo(ReleaseFileTypes.Chart, releaseFileReference.Id);
                             });
                 });
         }
@@ -494,13 +496,14 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Services
                                     Extension = fileReference.Extension,
                                     Name = "Unknown",
                                     Path = fileReference.Filename,
-                                    Size = "0.00 B"
+                                    Size = "0.00 B",
+                                    Type = fileLink.ReleaseFileReference.ReleaseFileType
                                 };
                             }
 
                             var blob = await _blobStorageService.GetBlob(PrivateFilesContainerName, blobPath);
 
-                            return blob.ToFileInfo(fileReference.Id);
+                            return blob.ToFileInfo(fileReference.ReleaseFileType, fileReference.Id);
                         });
 
                     return (await Task.WhenAll(filesWithMetadata))

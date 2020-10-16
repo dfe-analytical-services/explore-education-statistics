@@ -1,6 +1,6 @@
 import Link from '@admin/components/Link';
-import DataFileReplacementPlan from '@admin/pages/release/data/components/DataFileReplacementPlan';
 import DataFileDetailsTable from '@admin/pages/release/data/components/DataFileDetailsTable';
+import DataFileReplacementPlan from '@admin/pages/release/data/components/DataFileReplacementPlan';
 import DataFileUploadForm from '@admin/pages/release/data/components/DataFileUploadForm';
 import {
   releaseDataFileReplacementCompleteRoute,

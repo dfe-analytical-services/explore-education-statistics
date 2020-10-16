@@ -170,8 +170,8 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Services.Tests
                 Assert.Equal("Subject 1 Meta Guidance", result.Right[0].Content);
                 Assert.Equal("file1.csv", result.Right[0].Filename);
                 Assert.Equal("Subject 1", result.Right[0].Name);
-                Assert.Equal("2020_AYQ3", result.Right[0].TimePeriods.From);
-                Assert.Equal("2021_AYQ1", result.Right[0].TimePeriods.To);
+                Assert.Equal("2020/21 Q3", result.Right[0].TimePeriods.From);
+                Assert.Equal("2021/22 Q1", result.Right[0].TimePeriods.To);
                 Assert.Equal(new List<string>
                 {
                     "National", "Local Authority", "Local Authority District"
@@ -186,8 +186,8 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Services.Tests
                 Assert.Equal("Subject 2 Meta Guidance", result.Right[1].Content);
                 Assert.Equal("file2.csv", result.Right[1].Filename);
                 Assert.Equal("Subject 2", result.Right[1].Name);
-                Assert.Equal("2020_T3", result.Right[1].TimePeriods.From);
-                Assert.Equal("2021_T2", result.Right[1].TimePeriods.To);
+                Assert.Equal("2020/21 Summer Term", result.Right[1].TimePeriods.From);
+                Assert.Equal("2021/22 Spring Term", result.Right[1].TimePeriods.To);
                 Assert.Equal(new List<string>
                 {
                     "National", "Regional"

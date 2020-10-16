@@ -40,8 +40,8 @@ junit.xml
 **/*/chromedriver
 **/*/jwt
 
-/useful-scripts/get_data_block_responses/datablocks.csv
-/useful-scripts/get_data_block_responses/results
+/useful-scripts/get_data_block_responses/*datablocks*.csv
+/useful-scripts/get_data_block_responses/results*
 
 ## Data API Seed CSV data
 
