@@ -10,8 +10,8 @@ using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 namespace GovUk.Education.ExploreEducationStatistics.Data.Model.Migrations
 {
     [DbContext(typeof(StatisticsDbContext))]
-    [Migration("20201014140155_EES-1492_Rollback_Query")]
-    partial class EES1492_Rollback_Query
+    [Migration("20201015153357_EES1481AddFilenameToSubject")]
+    partial class EES1481AddFilenameToSubject
     {
         protected override void BuildTargetModel(ModelBuilder modelBuilder)
         {
@@ -461,6 +461,9 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Model.Migrations
                     b.Property<Guid>("Id")
                         .ValueGeneratedOnAdd()
                         .HasColumnType("uniqueidentifier");
+
+                    b.Property<string>("Filename")
+                        .HasColumnType("nvarchar(max)");
 
                     b.Property<string>("Name")
                         .HasColumnType("nvarchar(max)");
