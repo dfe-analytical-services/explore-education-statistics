@@ -33,7 +33,8 @@ namespace GovUk.Education.ExploreEducationStatistics.Content.Api.Services
 
             if (string.IsNullOrWhiteSpace(text))
             {
-                throw new ArgumentException();
+                throw new JsonException(
+                    $"Found empty file when trying to deserialize Release JSON for path {releasePath}");
             }
 
             var release = JsonConvert.DeserializeObject<CachedReleaseViewModel>(
