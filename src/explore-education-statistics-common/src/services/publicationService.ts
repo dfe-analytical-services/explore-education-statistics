@@ -1,4 +1,5 @@
 import { ContentBlock, DataBlock } from '@common/services/types/blocks';
+import { FileInfo } from '@common/services/types/file';
 import { PartialDate } from '@common/utils/date/partialDate';
 import { contentApi } from './api';
 
@@ -118,19 +119,7 @@ export interface Release<
   };
   updates: ReleaseNote[];
   content: ContentSection<ContentBlockType | DataBlockType>[];
-  dataFiles?: {
-    extension: string;
-    name: string;
-    path: string;
-    size: string;
-  }[];
-  downloadFiles: {
-    id: string;
-    extension: string;
-    name: string;
-    path: string;
-    size: string;
-  }[];
+  downloadFiles: FileInfo[];
   preReleaseAccessList?: string;
   dataLastPublished: string;
 }

@@ -1,5 +1,5 @@
 import client from '@admin/services/utils/service';
-import { FileInfo } from './types/file';
+import { FileInfo } from '@common/services/types/file';
 
 export interface ChartFile {
   id: string;

@@ -35,7 +35,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
         }
 
         [Fact]
-        public void UpdateRelease()
+        public void Update()
         {
             PermissionTestUtil.PolicyCheckBuilder()
                 .ExpectResourceCheckToFail(_release, SecurityPolicies.CanUpdateSpecificRelease)
@@ -43,25 +43,11 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
                     userService =>
                     {
                         var service = SetupMetaGuidanceService(userService: userService.Object);
-                        return service.UpdateRelease(_release.Id, new MetaGuidanceUpdateReleaseViewModel());
+                        return service.Update(_release.Id, new MetaGuidanceUpdateViewModel());
                     }
                 );
         }
 
-        [Fact]
-        public void UpdateSubject()
-        {
-            PermissionTestUtil.PolicyCheckBuilder()
-                .ExpectResourceCheckToFail(_release, SecurityPolicies.CanUpdateSpecificRelease)
-                .AssertForbidden(
-                    userService =>
-                    {
-                        var service = SetupMetaGuidanceService(userService: userService.Object);
-                        return service.UpdateSubject(_release.Id, Guid.NewGuid(),
-                            new MetaGuidanceUpdateSubjectViewModel());
-                    }
-                );
-        }
 
         private MetaGuidanceService SetupMetaGuidanceService(
             ContentDbContext contentDbContext = null,
@@ -78,7 +64,6 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
                 filterService ?? new Mock<IFilterService>().Object,
                 indicatorService ?? new Mock<IIndicatorService>().Object,
                 statisticsDbContext ?? new Mock<StatisticsDbContext>().Object,
-                statisticsPersistenceHelper ?? new PersistenceHelper<StatisticsDbContext>(statisticsDbContext),
                 userService ?? new Mock<IUserService>().Object
             );
         }

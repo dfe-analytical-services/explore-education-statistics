@@ -1,4 +1,5 @@
 import FormFieldEditor from '@admin/components/form/FormFieldEditor';
+import PreviewHtml from '@admin/components/PreviewHtml';
 import { useConfig } from '@admin/contexts/ConfigContext';
 import useFormSubmit from '@admin/hooks/useFormSubmit';
 import styles from '@admin/pages/release/components/PublicPreReleaseAccessForm.module.scss';
@@ -7,7 +8,6 @@ import { preReleaseRoute } from '@admin/routes/routes';
 import Button from '@common/components/Button';
 import ButtonGroup from '@common/components/ButtonGroup';
 import { Form } from '@common/components/form';
-import SanitizeHtml from '@common/components/SanitizeHtml';
 import UrlContainer from '@common/components/UrlContainer';
 import WarningMessage from '@common/components/WarningMessage';
 import useToggle from '@common/hooks/useToggle';
@@ -88,6 +88,7 @@ const PublicPreReleaseAccessForm = ({
               name="preReleaseAccessList"
               id={`${formId}-preReleaseAccessList`}
               label="Public access list"
+              focusOnInit
             />
 
             <ButtonGroup>
@@ -112,9 +113,9 @@ const PublicPreReleaseAccessForm = ({
                 Public pre-release access list preview
               </h3>
 
-              <SanitizeHtml
+              <PreviewHtml
                 className={styles.preview}
-                dirtyHtml={preReleaseAccessList}
+                html={preReleaseAccessList}
                 testId="publicPreReleaseAccessListPreview"
               />
             </>

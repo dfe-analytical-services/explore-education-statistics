@@ -47,6 +47,7 @@ interface Props {
   publicationId: string;
   releaseId: string;
   canUpdateRelease: boolean;
+  onDataFilesChange?: (dataFiles: DataFile[]) => void;
 }
 
 interface DeleteDataFile {
@@ -60,12 +61,13 @@ const ReleaseDataUploadsSection = ({
   publicationId,
   releaseId,
   canUpdateRelease,
+  onDataFilesChange,
 }: Props) => {
   const [deleteDataFile, setDeleteDataFile] = useState<DeleteDataFile>();
 
   const {
     value: dataFiles = [],
-    setState: setDataFiles,
+    setState: setDataFilesState,
     isLoading,
   } = useAsyncHandledRetry(
     () => releaseDataFileService.getDataFiles(releaseId),
@@ -73,8 +75,8 @@ const ReleaseDataUploadsSection = ({
   );
 
   const setFileDeleting = (dataFile: DeleteDataFile, deleting: boolean) => {
-    setDataFiles({
-      value: dataFiles.map(file =>
+    setDataFiles(
+      dataFiles.map(file =>
         file.fileName !== dataFile.file.fileName
           ? file
           : {
@@ -82,15 +84,26 @@ const ReleaseDataUploadsSection = ({
               isDeleting: deleting,
             },
       ),
-    });
+    );
   };
+
+  const setDataFiles = useCallback(
+    (nextDataFiles: DataFile[]) => {
+      setDataFilesState({ value: nextDataFiles });
+
+      if (onDataFilesChange) {
+        onDataFilesChange(nextDataFiles);
+      }
+    },
+    [onDataFilesChange, setDataFilesState],
+  );
 
   const handleStatusChange = async (
     dataFile: DataFile,
     { status }: DataFileImportStatus,
   ) => {
-    setDataFiles({
-      value: dataFiles.map(file =>
+    setDataFiles(
+      dataFiles.map(file =>
         file.fileName !== dataFile.fileName
           ? file
           : {
@@ -98,7 +111,7 @@ const ReleaseDataUploadsSection = ({
               status,
             },
       ),
-    });
+    );
   };
 
   const handleSubmit = useCallback(
@@ -118,9 +131,7 @@ const ReleaseDataUploadsSection = ({
         });
       }
 
-      setDataFiles({
-        value: orderBy([...dataFiles, file], dataFile => dataFile.title),
-      });
+      setDataFiles(orderBy([...dataFiles, file], dataFile => dataFile.title));
     },
     [dataFiles, releaseId, setDataFiles],
   );
@@ -280,9 +291,7 @@ const ReleaseDataUploadsSection = ({
             try {
               await releaseDataFileService.deleteDataFiles(releaseId, file.id);
 
-              setDataFiles({
-                value: dataFiles.filter(dataFile => dataFile !== file),
-              });
+              setDataFiles(dataFiles.filter(dataFile => dataFile !== file));
             } catch (err) {
               logger.error(err);
               setFileDeleting(deleteDataFile, false);

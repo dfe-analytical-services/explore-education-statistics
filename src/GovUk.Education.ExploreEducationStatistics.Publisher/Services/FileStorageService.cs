@@ -162,24 +162,27 @@ namespace GovUk.Education.ExploreEducationStatistics.Publisher.Services
 
         public async Task<IEnumerable<FileInfo>> ListPublicFiles(string publication, string release)
         {
-            var files = new List<BlobInfo>();
+            var files = new List<FileInfo>();
 
             files.AddRange(
-                await _publicBlobStorageService.ListBlobs(
+                (await _publicBlobStorageService.ListBlobs(
                     PublicFilesContainerName,
                     PublicReleaseDirectoryPath(publication, release, ReleaseFileTypes.Data)
-                )
+                ))
+                .Where(blob => !blob.IsMetaDataFile() && blob.IsReleased())
+                .Select(blob => blob.ToFileInfo(ReleaseFileTypes.Data))
             );
             files.AddRange(
-                await _publicBlobStorageService.ListBlobs(
+                (await _publicBlobStorageService.ListBlobs(
                     PublicFilesContainerName,
                     PublicReleaseDirectoryPath(publication, release, ReleaseFileTypes.Ancillary)
-                )
+                ))
+                .Where(blob => blob.IsReleased())
+                .Select(blob => blob.ToFileInfo(ReleaseFileTypes.Ancillary))
+
             );
 
             return files
-                .Where(blob => !blob.IsMetaDataFile() && blob.IsReleased())
-                .Select(blob => blob.ToFileInfo())
                 .OrderBy(f => f.Name)
                 .AsEnumerable();
         }

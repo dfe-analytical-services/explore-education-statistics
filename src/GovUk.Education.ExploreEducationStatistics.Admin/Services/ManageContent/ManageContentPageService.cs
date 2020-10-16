@@ -48,12 +48,17 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Services.ManageConten
                 .CheckEntityExists<Release>(releaseId, HydrateReleaseForReleaseViewModel)
                 .OnSuccess(_userService.CheckCanViewRelease)
                 .OnSuccess(release => _contentService.GetUnattachedContentBlocksAsync<DataBlock>(releaseId)
-                .OnSuccess(blocks => _releaseFilesService.ListPublicFilesPreview(
-                        releaseId, _releaseService.GetReferencedReleaseFileVersions(releaseId, ReleaseFileTypes.Data, ReleaseFileTypes.Ancillary))
+                .OnSuccess(blocks =>
+                    _releaseFilesService.ListPublicFilesPreview(
+                        releaseId,
+                        _releaseService.GetReferencedReleaseFileVersions(
+                            releaseId, ReleaseFileTypes.Data, ReleaseFileTypes.Ancillary))
                 .OnSuccess(publicFiles =>
                 {
                     var releaseViewModel = _mapper.Map<ManageContentPageViewModel.ReleaseViewModel>(release);
-                    releaseViewModel.DownloadFiles = publicFiles;
+                    var downloadFiles = publicFiles.ToList();
+
+                    releaseViewModel.DownloadFiles = downloadFiles;
 
                     return new ManageContentPageViewModel
                     {

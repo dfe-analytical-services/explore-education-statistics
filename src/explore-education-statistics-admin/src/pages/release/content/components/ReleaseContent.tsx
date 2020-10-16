@@ -13,7 +13,10 @@ import ReleaseNotesSection from '@admin/pages/release/content/components/Release
 import { useReleaseContentState } from '@admin/pages/release/content/contexts/ReleaseContentContext';
 import useReleaseContentActions from '@admin/pages/release/content/contexts/useReleaseContentActions';
 import { ReleaseRouteParams } from '@admin/routes/releaseRoutes';
-import { preReleaseAccessListRoute } from '@admin/routes/routes';
+import {
+  preReleaseAccessListRoute,
+  releaseMetaGuidanceRoute,
+} from '@admin/routes/routes';
 import releaseDataFileService from '@admin/services/releaseDataFileService';
 import Button from '@common/components/Button';
 import ButtonText from '@common/components/ButtonText';
@@ -151,6 +154,26 @@ const ReleaseContent = () => {
                         {` (${extension}, ${size})`}
                       </li>
                     ),
+                  )}
+                  {release.downloadFiles.some(file => file.type === 'Data') && (
+                    <li>
+                      <Link
+                        to={{
+                          pathname: generatePath<ReleaseRouteParams>(
+                            releaseMetaGuidanceRoute.path,
+                            {
+                              publicationId: release.publication.id,
+                              releaseId: release.id,
+                            },
+                          ),
+                          state: {
+                            backLink: location.pathname,
+                          },
+                        }}
+                      >
+                        Metadata guidance
+                      </Link>
+                    </li>
                   )}
                   {release.preReleaseAccessList && (
                     <li>
