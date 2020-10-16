@@ -8,6 +8,7 @@ using GovUk.Education.ExploreEducationStatistics.Data.Model;
 using GovUk.Education.ExploreEducationStatistics.Data.Model.Database;
 using GovUk.Education.ExploreEducationStatistics.Data.Model.Services;
 using GovUk.Education.ExploreEducationStatistics.Data.Model.Services.Interfaces;
+using Microsoft.AspNetCore.Mvc;
 using Microsoft.Extensions.Logging;
 using Moq;
 using Xunit;
@@ -197,6 +198,46 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Services.Tests
                 Assert.Equal("subject2_filter", result.Right[1].Variables[0].Value);
                 Assert.Equal("Subject 2 Indicator", result.Right[1].Variables[1].Label);
                 Assert.Equal("subject2_indicator", result.Right[1].Variables[1].Value);
+            }
+        }
+
+        [Fact]
+        public async Task Get_NoRelease()
+        {
+            var statisticsDbContextId = Guid.NewGuid().ToString();
+
+            await using (var statisticsDbContext = InMemoryStatisticsDbContext(statisticsDbContextId))
+            {
+                var service = SetupMetaGuidanceSubjectService(context: statisticsDbContext);
+
+                var result = await service.GetSubjects(Guid.NewGuid());
+
+                Assert.True(result.IsLeft);
+                Assert.IsType<NotFoundResult>(result.Left);
+            }
+        }
+
+        [Fact]
+        public async Task Get_NoSubjects()
+        {
+            var release = new Release();
+            
+            var statisticsDbContextId = Guid.NewGuid().ToString();
+
+            await using (var statisticsDbContext = InMemoryStatisticsDbContext(statisticsDbContextId))
+            {
+                await statisticsDbContext.AddAsync(release);
+                await statisticsDbContext.SaveChangesAsync();
+            }
+
+            await using (var statisticsDbContext = InMemoryStatisticsDbContext(statisticsDbContextId))
+            {
+                var service = SetupMetaGuidanceSubjectService(context: statisticsDbContext);
+
+                var result = await service.GetSubjects(release.Id);
+
+                Assert.True(result.IsRight);
+                Assert.Empty(result.Right);
             }
         }
 
