@@ -52,7 +52,11 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Services
                     });
 
                     return result;
-                });
+                })
+                // Currently we expect a failure checking the Release exists and succeed with an empty list.
+                // StatisticsDb Releases are not always in sync with ContentDb Releases.
+                // Until the first Subject is imported, no StatisticsDb Release exists.
+                .OnFailureSucceedWith(result => Task.FromResult(new List<MetaGuidanceSubjectViewModel>()));
         }
 
         private async Task<MetaGuidanceSubjectTimePeriodsViewModel> GetTimePeriods(Guid subjectId)
