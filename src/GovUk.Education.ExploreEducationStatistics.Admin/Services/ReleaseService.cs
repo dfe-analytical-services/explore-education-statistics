@@ -386,7 +386,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Services
                 .Include(rf => rf.ReleaseFileReference)
                 .Where(rf => rf.ReleaseId == releaseId)
                 .Select(rf => rf.ReleaseFileReference)
-                .Where(rfr => types.Contains(rfr.ReleaseFileType))
+                .Where(rfr => types.Contains(rfr.ReleaseFileType) && rfr.ReplacedById == null)
                 .Select(rfr => rfr.ReleaseId).Distinct();
         }
 
