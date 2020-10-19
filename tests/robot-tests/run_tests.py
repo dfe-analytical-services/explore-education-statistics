@@ -121,7 +121,7 @@ implicit_wait = 5
 chromedriver_filename = 'chromedriver.exe' if platform.system() == "Windows" else 'chromedriver'
 pyderman.install(file_directory='./webdriver/',
                  filename=chromedriver_filename,
-                 verbose=False,
+                 verbose=True,
                  chmod=True,
                  overwrite=False,
                  version=args.chromedriver_version)
