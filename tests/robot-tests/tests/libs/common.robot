@@ -375,13 +375,12 @@ user chooses file
 
 user clears element text
     [Arguments]   ${locator}
-    press keys  ${locator}  CTRL+a
-    press keys  ${locator}  BACKSPACE
+    press keys  ${locator}  CTRL+a+BACKSPACE
     sleep  0.1
 
 user presses keys
-    [Arguments]   ${keys}
-    press keys  ${None}    ${keys}
+    [Arguments]   ${keys}  ${selector}=${None}
+    press keys  ${selector}    ${keys}
     sleep  0.1
 
 user enters text into element
