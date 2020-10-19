@@ -17,6 +17,7 @@ using Microsoft.EntityFrameworkCore;
 using Moq;
 using Xunit;
 using static GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services.DbUtils;
+using static GovUk.Education.ExploreEducationStatistics.Admin.Validators.ValidationErrorMessages;
 using static GovUk.Education.ExploreEducationStatistics.Data.Model.Database.StatisticsDbUtils;
 using Release = GovUk.Education.ExploreEducationStatistics.Content.Model.Release;
 
@@ -507,6 +508,125 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
                     (await statisticsDbContext.ReleaseSubject
                         .Where(rs => rs.ReleaseId == statsReleaseVersion2.Id && rs.SubjectId == subject2.Id)
                         .FirstAsync()).MetaGuidance);
+            }
+        }
+
+        [Fact]
+        public async Task Validate_NoRelease()
+        {
+            var contentDbContextId = Guid.NewGuid().ToString();
+
+            var metaGuidanceSubjectService = new Mock<IMetaGuidanceSubjectService>(MockBehavior.Strict);
+
+            await using (var contentDbContext = InMemoryApplicationDbContext(contentDbContextId))
+            {
+                var service = SetupMetaGuidanceService(contentDbContext: contentDbContext,
+                    metaGuidanceSubjectService: metaGuidanceSubjectService.Object);
+
+                var result = await service.Validate(Guid.NewGuid());
+
+                Assert.True(result.IsLeft);
+                Assert.IsType<NotFoundResult>(result.Left);
+            }
+        }
+
+        [Fact]
+        public async Task Validate_MetaGuidancePopulated()
+        {
+            var release = new Release
+            {
+                MetaGuidance = "Release Meta Guidance"
+            };
+
+            var contentDbContextId = Guid.NewGuid().ToString();
+
+            await using (var contentDbContext = InMemoryApplicationDbContext(contentDbContextId))
+            {
+                await contentDbContext.AddAsync(release);
+                await contentDbContext.SaveChangesAsync();
+            }
+
+            var metaGuidanceSubjectService = new Mock<IMetaGuidanceSubjectService>(MockBehavior.Strict);
+
+            metaGuidanceSubjectService.Setup(mock => mock.Validate(release.Id))
+                .ReturnsAsync(true);
+
+            await using (var contentDbContext = InMemoryApplicationDbContext(contentDbContextId))
+            {
+                var service = SetupMetaGuidanceService(contentDbContext: contentDbContext,
+                    metaGuidanceSubjectService: metaGuidanceSubjectService.Object);
+
+                var result = await service.Validate(release.Id);
+
+                Assert.True(result.IsRight);
+
+                metaGuidanceSubjectService.Verify(mock => mock.Validate(release.Id), Times.Once);
+            }
+        }
+
+        [Fact]
+        public async Task Validate_ReleaseMetaGuidanceNotPopulated()
+        {
+            var release = new Release
+            {
+                MetaGuidance = null
+            };
+
+            var contentDbContextId = Guid.NewGuid().ToString();
+
+            await using (var contentDbContext = InMemoryApplicationDbContext(contentDbContextId))
+            {
+                await contentDbContext.AddAsync(release);
+                await contentDbContext.SaveChangesAsync();
+            }
+
+            var metaGuidanceSubjectService = new Mock<IMetaGuidanceSubjectService>(MockBehavior.Strict);
+
+            await using (var contentDbContext = InMemoryApplicationDbContext(contentDbContextId))
+            {
+                var service = SetupMetaGuidanceService(contentDbContext: contentDbContext,
+                    metaGuidanceSubjectService: metaGuidanceSubjectService.Object);
+
+                var result = await service.Validate(release.Id);
+
+                Assert.True(result.IsLeft);
+                ValidationTestUtil.AssertValidationProblem(result.Left, MetaGuidanceMustBePopulated);
+            }
+        }
+
+        [Fact]
+        public async Task Validate_SubjectMetaGuidanceNotPopulated()
+        {
+            var release = new Release
+            {
+                MetaGuidance = "Release Meta Guidance"
+            };
+
+            var contentDbContextId = Guid.NewGuid().ToString();
+
+            await using (var contentDbContext = InMemoryApplicationDbContext(contentDbContextId))
+            {
+                await contentDbContext.AddAsync(release);
+                await contentDbContext.SaveChangesAsync();
+            }
+
+            var metaGuidanceSubjectService = new Mock<IMetaGuidanceSubjectService>(MockBehavior.Strict);
+
+            metaGuidanceSubjectService.Setup(mock => mock.Validate(release.Id))
+                .ReturnsAsync(false);
+
+            await using (var contentDbContext = InMemoryApplicationDbContext(contentDbContextId))
+            {
+                var service = SetupMetaGuidanceService(contentDbContext: contentDbContext,
+                    metaGuidanceSubjectService: metaGuidanceSubjectService.Object);
+
+                var result = await service.Validate(release.Id);
+
+                Assert.True(result.IsLeft);
+
+                metaGuidanceSubjectService.Verify(mock => mock.Validate(release.Id), Times.Once);
+
+                ValidationTestUtil.AssertValidationProblem(result.Left, MetaGuidanceMustBePopulated);
             }
         }
 

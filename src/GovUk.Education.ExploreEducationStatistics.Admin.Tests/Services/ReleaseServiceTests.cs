@@ -24,6 +24,7 @@ using static GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services.DbU
 using static GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services.MapperUtils;
 using static GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services.ValidationTestUtil;
 using static GovUk.Education.ExploreEducationStatistics.Admin.Validators.ValidationErrorMessages;
+using static GovUk.Education.ExploreEducationStatistics.Admin.Validators.ValidationUtils;
 using static GovUk.Education.ExploreEducationStatistics.Common.TableStorageTableNames;
 using IFootnoteService = GovUk.Education.ExploreEducationStatistics.Admin.Services.Interfaces.IFootnoteService;
 using Publication = GovUk.Education.ExploreEducationStatistics.Content.Model.Publication;
@@ -714,6 +715,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
                             ReleaseName = "2035",
                             TimePeriodCoverage = TimeIdentifier.March,
                             PreReleaseAccessList = "New access list",
+                            Status = ReleaseStatus.Draft
 
                         }
                     );
@@ -802,7 +804,8 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
                             PublishScheduled = "2051-06-30",
                             TypeId = releaseType.Id,
                             ReleaseName = "2035",
-                            TimePeriodCoverage = TimeIdentifier.CalendarYear
+                            TimePeriodCoverage = TimeIdentifier.CalendarYear,
+                            Status = ReleaseStatus.Draft
                         }
                     );
 
@@ -857,7 +860,8 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
                             PublishScheduled = "2051-06-30",
                             TypeId = releaseType.Id,
                             ReleaseName = "2035",
-                            TimePeriodCoverage = TimeIdentifier.CalendarYear
+                            TimePeriodCoverage = TimeIdentifier.CalendarYear,
+                            Status = ReleaseStatus.Draft
                         }
                     );
 
@@ -925,7 +929,8 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
                             PublishScheduled = "2051-06-30",
                             TypeId = releaseType.Id,
                             ReleaseName = "2035",
-                            TimePeriodCoverage = TimeIdentifier.CalendarYear
+                            TimePeriodCoverage = TimeIdentifier.CalendarYear,
+                            Status = ReleaseStatus.Draft
                         }
                     );
 
@@ -938,23 +943,20 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
         [Fact]
         public async Task UpdateRelease_Approved_FailsDataFilesNotUploaded()
         {
-            var releaseId = Guid.NewGuid();
             var release = new Release
             {
-                Id = releaseId,
                 Type = new ReleaseType
                 {
                     Title = "Ad Hoc"
                 },
                 Publication = new Publication
                 {
-                    Title = "Old publication",
+                    Title = "Old publication"
                 },
                 ReleaseName = "2030",
                 Slug = "2030",
                 PublishScheduled = DateTime.UtcNow,
                 Version = 0,
-                PreviousVersionId = releaseId
             };
 
             var contextId = Guid.NewGuid().ToString();
@@ -965,6 +967,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
                 await context.SaveChangesAsync();
             }
 
+            var metaGuidanceService = new Mock<IMetaGuidanceService>(MockBehavior.Strict);
             var tableStorageService = new Mock<ITableStorageService>();
 
             await using (var context = InMemoryApplicationDbContext(contextId))
@@ -986,11 +989,12 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
                     .ReturnsAsync(cloudTableMock.Object);
 
                 var releaseService = BuildReleaseService(context,
+                    metaGuidanceService: metaGuidanceService.Object,
                     tableStorageService: tableStorageService.Object);
 
                 var result = await releaseService
                     .UpdateRelease(
-                        releaseId,
+                        release.Id,
                         new UpdateReleaseViewModel
                         {
                             PublicationId = release.PublicationId,
@@ -1008,13 +1012,80 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
         }
 
         [Fact]
-        public async Task UpdateRelease_Approved_FailsMethodologyNotApproved()
+        public async Task UpdateRelease_Approved_FailsMetaGuidanceNotPopulated()
         {
-            var releaseId = Guid.NewGuid();
-
             var release = new Release
             {
-                Id = releaseId,
+                Type = new ReleaseType
+                {
+                    Title = "Ad Hoc"
+                },
+                Publication = new Publication
+                {
+                    Title = "Old publication"
+                },
+                ReleaseName = "2030",
+                Slug = "2030",
+                PublishScheduled = DateTime.UtcNow,
+                Version = 0
+            };
+
+            var contextId = Guid.NewGuid().ToString();
+
+            await using (var context = InMemoryApplicationDbContext(contextId))
+            {
+                await context.AddAsync(release);
+                await context.SaveChangesAsync();
+            }
+
+            var metaGuidanceService = new Mock<IMetaGuidanceService>(MockBehavior.Strict);
+            var tableStorageService = new Mock<ITableStorageService>();
+
+            await using (var context = InMemoryApplicationDbContext(contextId))
+            {
+                var cloudTableMock = TableStorageTestUtils.MockCloudTable();
+
+                cloudTableMock
+                    .Setup(table => table.ExecuteQuerySegmentedAsync(It.IsAny<TableQuery<DatafileImport>>(), null))
+                    .ReturnsAsync(TableStorageTestUtils.CreateTableQuerySegment(new List<DatafileImport>()));
+
+                metaGuidanceService.Setup(service => service.Validate(release.Id))
+                    .ReturnsAsync(ValidationActionResult(MetaGuidanceMustBePopulated));                
+
+                tableStorageService.Setup(service => service.GetTableAsync(DatafileImportsTableName, true))
+                    .ReturnsAsync(cloudTableMock.Object);
+
+                var releaseService = BuildReleaseService(context,
+                    metaGuidanceService: metaGuidanceService.Object,
+                    tableStorageService: tableStorageService.Object);
+
+                var result = await releaseService
+                    .UpdateRelease(
+                        release.Id,
+                        new UpdateReleaseViewModel
+                        {
+                            PublicationId = release.PublicationId,
+                            PublishScheduled = "2051-06-30",
+                            TypeId = release.Type.Id,
+                            ReleaseName = "2030",
+                            TimePeriodCoverage = TimeIdentifier.CalendarYear,
+                            Status = ReleaseStatus.Approved
+                        }
+                    );
+
+                Assert.True(result.IsLeft);
+
+                metaGuidanceService.Verify(mock => mock.Validate(release.Id), Times.Once);
+
+                AssertValidationProblem(result.Left, MetaGuidanceMustBePopulated);
+            }
+        }
+
+        [Fact]
+        public async Task UpdateRelease_Approved_FailsMethodologyNotApproved()
+        {
+            var release = new Release
+            {
                 Type = new ReleaseType
                 {
                     Title = "Ad Hoc"
@@ -1031,8 +1102,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
                 ReleaseName = "2030",
                 Slug = "2030",
                 PublishScheduled = DateTime.UtcNow,
-                Version = 0,
-                PreviousVersionId = releaseId
+                Version = 0
             };
 
             var contextId = Guid.NewGuid().ToString();
@@ -1043,6 +1113,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
                 await context.SaveChangesAsync();
             }
 
+            var metaGuidanceService = new Mock<IMetaGuidanceService>(MockBehavior.Strict);
             var tableStorageService = new Mock<ITableStorageService>();
 
             await using (var context = InMemoryApplicationDbContext(contextId))
@@ -1053,15 +1124,19 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
                     .Setup(table => table.ExecuteQuerySegmentedAsync(It.IsAny<TableQuery<DatafileImport>>(), null))
                     .ReturnsAsync(TableStorageTestUtils.CreateTableQuerySegment(new List<DatafileImport>()));
 
+                metaGuidanceService.Setup(service => service.Validate(release.Id))
+                    .ReturnsAsync(Unit.Instance);                
+
                 tableStorageService.Setup(service => service.GetTableAsync(DatafileImportsTableName, true))
                     .ReturnsAsync(cloudTableMock.Object);
 
                 var releaseService = BuildReleaseService(context,
+                    metaGuidanceService: metaGuidanceService.Object,
                     tableStorageService: tableStorageService.Object);
 
                 var result = await releaseService
                     .UpdateRelease(
-                        releaseId,
+                        release.Id,
                         new UpdateReleaseViewModel
                         {
                             PublicationId = release.PublicationId,
@@ -1074,6 +1149,9 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
                     );
 
                 Assert.True(result.IsLeft);
+
+                metaGuidanceService.Verify(mock => mock.Validate(release.Id), Times.Once);
+
                 AssertValidationProblem(result.Left, MethodologyMustBeApprovedOrPublished);
             }
         }
@@ -1081,10 +1159,8 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
         [Fact]
         public async Task UpdateRelease_Approved_FailsChangingToDraft()
         {
-            var releaseId = Guid.NewGuid();
             var release = new Release
             {
-                Id = releaseId,
                 Type = new ReleaseType
                 {
                     Title = "Ad Hoc"
@@ -1098,7 +1174,6 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
                 Published = DateTime.Now,
                 PublishScheduled = DateTime.UtcNow,
                 Version = 0,
-                PreviousVersionId = releaseId
             };
 
             var contextId = Guid.NewGuid().ToString();
@@ -1109,6 +1184,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
                 await context.SaveChangesAsync();
             }
 
+            var metaGuidanceService = new Mock<IMetaGuidanceService>(MockBehavior.Strict);
             var tableStorageService = new Mock<ITableStorageService>();
 
             await using (var context = InMemoryApplicationDbContext(contextId))
@@ -1122,11 +1198,12 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
                 tableStorageService.Setup(service => service.GetTableAsync(DatafileImportsTableName, true))
                     .ReturnsAsync(cloudTableMock.Object);
                 var releaseService = BuildReleaseService(context,
+                    metaGuidanceService: metaGuidanceService.Object,
                     tableStorageService: tableStorageService.Object);
 
                 var result = await releaseService
                     .UpdateRelease(
-                        releaseId,
+                        release.Id,
                         new UpdateReleaseViewModel
                         {
                             PublicationId = release.PublicationId,
@@ -1146,10 +1223,8 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
         [Fact]
         public async Task UpdateRelease_Approved_FailsNoPublishScheduledDate()
         {
-            var releaseId = Guid.NewGuid();
             var release = new Release
             {
-                Id = releaseId,
                 Type = new ReleaseType
                 {
                     Title = "Ad Hoc"
@@ -1163,7 +1238,6 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
                 Published = DateTime.Now,
                 PublishScheduled = DateTime.UtcNow,
                 Version = 0,
-                PreviousVersionId = releaseId
             };
 
             var contextId = Guid.NewGuid().ToString();
@@ -1174,6 +1248,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
                 await context.SaveChangesAsync();
             }
 
+            var metaGuidanceService = new Mock<IMetaGuidanceService>(MockBehavior.Strict);
             var tableStorageService = new Mock<ITableStorageService>();
 
             await using (var context = InMemoryApplicationDbContext(contextId))
@@ -1184,14 +1259,19 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
                     .Setup(table => table.ExecuteQuerySegmentedAsync(It.IsAny<TableQuery<DatafileImport>>(), null))
                     .ReturnsAsync(TableStorageTestUtils.CreateTableQuerySegment(new List<DatafileImport>()));
 
+                metaGuidanceService.Setup(service => service.Validate(release.Id))
+                    .ReturnsAsync(Unit.Instance);
+
                 tableStorageService.Setup(service => service.GetTableAsync(DatafileImportsTableName, true))
                     .ReturnsAsync(cloudTableMock.Object);
+
                 var releaseService = BuildReleaseService(context,
+                    metaGuidanceService: metaGuidanceService.Object,
                     tableStorageService: tableStorageService.Object);
 
                 var result = await releaseService
                     .UpdateRelease(
-                        releaseId,
+                        release.Id,
                         new UpdateReleaseViewModel
                         {
                             PublicationId = release.PublicationId,
@@ -1204,6 +1284,9 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
                     );
 
                 Assert.True(result.IsLeft);
+
+                metaGuidanceService.Verify(mock => mock.Validate(release.Id), Times.Once);
+
                 AssertValidationProblem(result.Left, ApprovedReleaseMustHavePublishScheduledDate);
             }
         }
@@ -1527,6 +1610,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
             IImportStatusService importStatusService = null,
             IFootnoteService footnoteService = null,
             IDataBlockService dataBlockService = null,
+            IMetaGuidanceService metaGuidanceService = null,
             IReleaseSubjectService releaseSubjectService = null)
         {
             var userService = MockUtils.AlwaysTrueUserService();
@@ -1549,6 +1633,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
                 footnoteService ?? new Mock<IFootnoteService>().Object,
                 statisticsDbContext ?? new Mock<StatisticsDbContext>().Object,
                 dataBlockService ?? new Mock<IDataBlockService>().Object,
+                metaGuidanceService ?? new Mock<IMetaGuidanceService>().Object,
                 releaseSubjectService ?? new Mock<IReleaseSubjectService>().Object,
                 new SequentialGuidGenerator()
             );

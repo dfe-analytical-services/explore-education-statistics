@@ -4,6 +4,7 @@ using System.Linq;
 using System.Threading.Tasks;
 using GovUk.Education.ExploreEducationStatistics.Admin.Services.Interfaces;
 using GovUk.Education.ExploreEducationStatistics.Admin.Services.Interfaces.Security;
+using GovUk.Education.ExploreEducationStatistics.Admin.Validators;
 using GovUk.Education.ExploreEducationStatistics.Admin.ViewModels;
 using GovUk.Education.ExploreEducationStatistics.Common.Model;
 using GovUk.Education.ExploreEducationStatistics.Common.Services.Interfaces.Security;
@@ -14,6 +15,7 @@ using GovUk.Education.ExploreEducationStatistics.Data.Model.Database;
 using GovUk.Education.ExploreEducationStatistics.Data.Services.Interfaces;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
+using static GovUk.Education.ExploreEducationStatistics.Admin.Validators.ValidationUtils;
 
 namespace GovUk.Education.ExploreEducationStatistics.Admin.Services
 {
@@ -60,6 +62,24 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Services
                     await UpdateSubjects(releaseId, request.Subjects);
                 })
                 .OnSuccess(BuildViewModel);
+        }
+
+        public async Task<Either<ActionResult, Unit>> Validate(Guid releaseId)
+        {
+            return await _contentPersistenceHelper.CheckEntityExists<Release>(releaseId)
+                .OnSuccess(async release =>
+                {
+                    // TODO EES-1412 Actually this is wrong because if there are no Subjects the user can't enter this yet 
+                    if (string.IsNullOrWhiteSpace(release.MetaGuidance))
+                    {
+                        return ValidationActionResult(ValidationErrorMessages.MetaGuidanceMustBePopulated);
+                    }
+
+                    return await _metaGuidanceSubjectService.Validate(releaseId)
+                        .OnSuccess(valid => valid
+                            ? (Either<ActionResult, Unit>) Unit.Instance
+                            : ValidationActionResult(ValidationErrorMessages.MetaGuidanceMustBePopulated));
+                });
         }
 
         private async Task UpdateSubjects(

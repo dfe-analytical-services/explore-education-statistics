@@ -12,5 +12,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Services.Interfaces
 
         public Task<Either<ActionResult, MetaGuidanceViewModel>> Update(Guid releaseId,
             MetaGuidanceUpdateViewModel request);
+
+        public Task<Either<ActionResult, Unit>> Validate(Guid releaseId);
     }
 }

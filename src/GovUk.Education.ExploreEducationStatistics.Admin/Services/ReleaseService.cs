@@ -47,6 +47,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Services
         private readonly IImportStatusService _importStatusService;
 	    private readonly IFootnoteService _footnoteService;
         private readonly IDataBlockService _dataBlockService;
+        private readonly IMetaGuidanceService _metaGuidanceService;
         private readonly IReleaseSubjectService _releaseSubjectService;
         private readonly IGuidGenerator _guidGenerator;
 
@@ -66,6 +67,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Services
             IFootnoteService footnoteService,
             StatisticsDbContext statisticsDbContext,
             IDataBlockService dataBlockService,
+            IMetaGuidanceService metaGuidanceService,
             IReleaseSubjectService releaseSubjectService,
             IGuidGenerator guidGenerator)
         {
@@ -82,6 +84,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Services
             _footnoteService = footnoteService;
             _statisticsDbContext = statisticsDbContext;
             _dataBlockService = dataBlockService;
+            _metaGuidanceService = metaGuidanceService;
             _releaseSubjectService = releaseSubjectService;
             _guidGenerator = guidGenerator;
         }
@@ -264,6 +267,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Services
                 .OnSuccessDo(async release => await ValidateSelectedPublication(release, request.PublicationId))
                 .OnSuccessDo(async release => await ValidateReleaseSlugUniqueToPublication(request.Slug, release.PublicationId, releaseId))
                 .OnSuccessDo(async release => await CheckAllDataFilesUploaded(release, request.Status))
+                .OnSuccessDo(async release => await CheckMetaGuidancePopulated(release, request.Status))
                 .OnSuccessDo(async release => await CheckMethodologyHasBeenApproved(release, request.Status))
                 .OnSuccess(async release =>
                 {
@@ -399,7 +403,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Services
                     : releaseFileReference);
         }
 
-        private async Task<Either<ActionResult, bool>> ValidateReleaseSlugUniqueToPublication(string slug,
+        private async Task<Either<ActionResult, Unit>> ValidateReleaseSlugUniqueToPublication(string slug,
             Guid publicationId, Guid? releaseId = null)
         {
             var releases = await _context.Releases.Where(r => r.PublicationId == publicationId).ToListAsync();
@@ -409,7 +413,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Services
                 return ValidationActionResult(SlugNotUnique);
             }
 
-            return true;
+            return Unit.Instance;
         }
 
         private static bool IsLatestVersionOfRelease(IEnumerable<Release> releases, Guid releaseId)
@@ -544,7 +548,14 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Services
             return Unit.Instance;
         }
 
-        private async Task<Either<ActionResult, bool>> CheckMethodologyHasBeenApproved(Release release, ReleaseStatus status)
+        private async Task<Either<ActionResult, Unit>> CheckMetaGuidancePopulated(Release release, 
+            ReleaseStatus status)
+        {
+            return status == ReleaseStatus.Approved ? await _metaGuidanceService.Validate(release.Id) : Unit.Instance;
+        }
+
+        private async Task<Either<ActionResult, Unit>> CheckMethodologyHasBeenApproved(Release release, 
+            ReleaseStatus status)
         {
             if (status == ReleaseStatus.Approved)
             {
@@ -558,10 +569,10 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Services
                 }
             }
 
-            return true;
+            return Unit.Instance;
         }
 
-        private async Task<Either<ActionResult, bool>> CheckAllDataFilesUploaded(Release release, ReleaseStatus status)
+        private async Task<Either<ActionResult, Unit>> CheckAllDataFilesUploaded(Release release, ReleaseStatus status)
         {
             if (status == ReleaseStatus.Approved)
             {
@@ -581,7 +592,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Services
                 }
             }
 
-            return true;
+            return Unit.Instance;
         }
 
         public static IQueryable<Release> HydrateReleaseForReleaseViewModel(IQueryable<Release> values)
