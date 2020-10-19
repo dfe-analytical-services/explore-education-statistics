@@ -68,8 +68,7 @@ Search for "specific enquiry"
     user verifies accordion is closed  7. Contacts
 
     user clears element text    css:#pageSearchForm-input
-    user clicks element   css:#pageSearchForm-input
-    user presses keys  specific enquiry
+    user presses keys  specific enquiry   css:#pageSearchForm-input
     user waits until element contains     xpath://*[@id="pageSearchForm-resultsLabel"]   Found 1 result
     user clicks element   css:#pageSearchForm-option-0
 
