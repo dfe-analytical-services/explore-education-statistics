@@ -623,111 +623,7 @@
 									"response": []
 								},
 								{
-									"name": "Subject Meta - Filter SubjectId 803fbf56-600f-490f-8409-6413a891720d, Start/End date 2016",
-									"event": [
-										{
-											"listen": "prerequest",
-											"script": {
-												"id": "066bc209-63ad-4a2f-9be9-1bfe89ed1810",
-												"exec": [
-													""
-												],
-												"type": "text/javascript"
-											}
-										},
-										{
-											"listen": "test",
-											"script": {
-												"id": "1754adf9-523e-4ef8-9690-8937386e9ffd",
-												"exec": [
-													"pm.test(\"Status code is 200\", function () { pm.response.to.have.status(200); });",
-													"",
-													"pm.test(\"Fields are present\", function () {",
-													"    pm.expect(pm.response.to.have.jsonBody(\"filters\"));",
-													"    pm.expect(pm.response.to.have.jsonBody(\"filters.Characteristic\"));",
-													"    pm.expect(pm.response.to.have.jsonBody(\"filters.SchoolType\"));",
-													"    pm.expect(pm.response.to.have.jsonBody(\"indicators\"));",
-													"    pm.expect(pm.response.to.have.jsonBody(\"indicators.AbsenceFields\"));",
-													"    pm.expect(pm.response.to.have.jsonBody(\"indicators.AbsenceByReason\"));",
-													"    pm.expect(pm.response.to.have.jsonBody(\"indicators.AbsenceForPersistentAbsentees\"));",
-													"    pm.expect(pm.response.to.have.jsonBody(\"locations\"));",
-													"    pm.expect(pm.response.to.have.jsonBody(\"locations.country\"));",
-													"    pm.expect(pm.response.to.have.jsonBody(\"locations.localAuthority\"));",
-													"    pm.expect(pm.response.to.have.jsonBody(\"locations.localAuthorityDistrict\"));",
-													"    pm.expect(pm.response.to.have.jsonBody(\"timePeriod\"));",
-													"    pm.expect(pm.response.to.have.jsonBody(\"timePeriod.hint\"));",
-													"    pm.expect(pm.response.to.have.jsonBody(\"timePeriod.legend\"));",
-													"    pm.expect(pm.response.to.have.jsonBody(\"timePeriod.options\"));",
-													"});",
-													"",
-													"pm.test(\"Number of characteristic options should be correct\", function () { ",
-													"    pm.expect(Object.keys(pm.response.json().filters.Characteristic.options).length).to.equal(10);",
-													"    pm.expect(pm.response.json().filters.Characteristic.options.Total.options.length).to.equal(1);",
-													"    pm.expect(pm.response.json().filters.Characteristic.options.Gender.options.length).to.equal(2);",
-													"    pm.expect(pm.response.json().filters.Characteristic.options.EthnicGroupMajor.options.length).to.equal(8);",
-													"    pm.expect(pm.response.json().filters.Characteristic.options.EthnicGroupMinor.options.length).to.equal(16);",
-													"    pm.expect(pm.response.json().filters.Characteristic.options.NCYear.options.length).to.equal(13);",
-													"    pm.expect(pm.response.json().filters.Characteristic.options.FSM.options.length).to.equal(3);",
-													"    pm.expect(pm.response.json().filters.Characteristic.options.FSMEver6.options.length).to.equal(3);",
-													"    pm.expect(pm.response.json().filters.Characteristic.options.SENProvision.options.length).to.equal(4);",
-													"    pm.expect(pm.response.json().filters.Characteristic.options.SENPrimaryNeed.options.length).to.equal(14);",
-													"    pm.expect(pm.response.json().filters.Characteristic.options.FirstLanguage.options.length).to.equal(3);",
-													"});",
-													"",
-													"pm.test(\"Number of school type default options should be correct\", function () { ",
-													"    pm.expect(Object.keys(pm.response.json().filters.SchoolType.options.Default.options).length).to.equal(4);",
-													"});",
-													"",
-													"pm.test(\"Number of time periods options should be correct\", function() {",
-													"    pm.expect(pm.response.json().timePeriod.options.length).to.equal(1);",
-													"    pm.expect(pm.response.json().timePeriod.options[0].year).to.equal(2016);",
-													"});",
-													"",
-													"pm.test(\"Number of location options should be correct\", function() {",
-													"    pm.expect(pm.response.json().locations.country.options.length).to.equal(1);",
-													"    pm.expect(pm.response.json().locations.localAuthority.options.length).to.equal(152);",
-													"    pm.expect(pm.response.json().locations.localAuthorityDistrict.options.length).to.equal(326);",
-													"});",
-													"",
-													"pm.test(\"Expect indicators to have correct properties\", function () {",
-													"    pm.expect(pm.response.json().indicators.AbsenceFields.options.length).to.equal(10);",
-													"    pm.expect(pm.response.json().indicators.AbsenceByReason.options.length).to.equal(16);",
-													"    pm.expect(pm.response.json().indicators.AbsenceForPersistentAbsentees.options.length).to.equal(7);",
-													"});"
-												],
-												"type": "text/javascript"
-											}
-										}
-									],
-									"request": {
-										"method": "POST",
-										"header": [
-											{
-												"key": "Content-Type",
-												"name": "Content-Type",
-												"type": "text",
-												"value": "application/json"
-											}
-										],
-										"body": {
-											"mode": "raw",
-											"raw": "{\n\tsubjectId: \"803fbf56-600f-490f-8409-6413a891720d\",\n\ttimePeriod: {\n\t\tstartYear: 2016,\n\t\tstartCode: \"AY\",\n\t\tendYear: 2016,\n\t\tendCode: \"AY\",\n\t}\n}"
-										},
-										"url": {
-											"raw": "{{data_api_url}}/meta/subject",
-											"host": [
-												"{{data_api_url}}"
-											],
-											"path": [
-												"meta",
-												"subject"
-											]
-										}
-									},
-									"response": []
-								},
-								{
-									"name": "Subject Meta - Filter SubjectId 803fbf56-600f-490f-8409-6413a891720d, Start/End date 2016, GeographicLevel Country",
+									"name": "Subject Meta - Filter SubjectId 803fbf56-600f-490f-8409-6413a891720d, Country England",
 									"event": [
 										{
 											"listen": "prerequest",
@@ -744,6 +640,106 @@
 											"script": {
 												"id": "93dd153a-5522-47ee-a473-05c3b0c860bd",
 												"exec": [
+													"var respJson;",
+													"",
+													"pm.test(\"Status code is 200\", function () { ",
+													"    pm.response.to.have.status(200); ",
+													"    respJson = pm.response.json();",
+													"});",
+													"",
+													"pm.test(\"Fields are present\", function () {",
+													"    pm.expect(pm.response.to.have.jsonBody(\"filters\"));",
+													"    pm.expect(pm.response.to.have.jsonBody(\"indicators\"));",
+													"    pm.expect(pm.response.to.have.jsonBody(\"locations\"));",
+													"    pm.expect(pm.response.to.have.jsonBody(\"timePeriod\"));",
+													"    pm.expect(pm.response.to.have.jsonBody(\"timePeriod.hint\"));",
+													"    pm.expect(pm.response.to.have.jsonBody(\"timePeriod.legend\"));",
+													"    pm.expect(pm.response.to.have.jsonBody(\"timePeriod.options\"));",
+													"});",
+													"",
+													"pm.test(\"Time periods options should be correct\", function() {",
+													"    pm.expect(respJson.timePeriod.options.length).to.equal(5);",
+													"    const time2012 = respJson.timePeriod.options.find(item => item.year === 2012);",
+													"    pm.expect(time2012).to.include({",
+													"        code: \"AY\",",
+													"        label: \"2012/13\",",
+													"        year: 2012,",
+													"    });",
+													"    const time2013 = respJson.timePeriod.options.find(item => item.year === 2013);",
+													"    pm.expect(time2013).to.include({",
+													"        code: \"AY\",",
+													"        label: \"2013/14\",",
+													"        year: 2013,",
+													"    });",
+													"    const time2014 = respJson.timePeriod.options.find(item => item.year === 2014);",
+													"    pm.expect(time2014).to.include({",
+													"        code: \"AY\",",
+													"        label: \"2014/15\",",
+													"        year: 2014,",
+													"    });",
+													"    const time2015 = respJson.timePeriod.options.find(item => item.year === 2015);",
+													"    pm.expect(time2015).to.include({",
+													"        code: \"AY\",",
+													"        label: \"2015/16\",",
+													"        year: 2015,",
+													"    });",
+													"    const time2016 = respJson.timePeriod.options.find(item => item.year === 2016);",
+													"    pm.expect(time2016).to.include({",
+													"        code: \"AY\",",
+													"        label: \"2016/17\",",
+													"        year: 2016,",
+													"    });",
+													"});"
+												],
+												"type": "text/javascript"
+											}
+										}
+									],
+									"request": {
+										"method": "POST",
+										"header": [
+											{
+												"key": "Content-Type",
+												"name": "Content-Type",
+												"type": "text",
+												"value": "application/json"
+											}
+										],
+										"body": {
+											"mode": "raw",
+											"raw": "{\n\tsubjectId: \"803fbf56-600f-490f-8409-6413a891720d\",\n\tlocations: {\n\t\t\"country\": [\"E92000001\"]\n\t}\n}"
+										},
+										"url": {
+											"raw": "{{data_api_url}}/meta/subject",
+											"host": [
+												"{{data_api_url}}"
+											],
+											"path": [
+												"meta",
+												"subject"
+											]
+										}
+									},
+									"response": []
+								},
+								{
+									"name": "Subject Meta - Filter SubjectId 803fbf56-600f-490f-8409-6413a891720d, Start/End date 2016, Country England",
+									"event": [
+										{
+											"listen": "prerequest",
+											"script": {
+												"id": "eb7bf763-5852-43b5-9947-d24c00f7e86b",
+												"exec": [
+													""
+												],
+												"type": "text/javascript"
+											}
+										},
+										{
+											"listen": "test",
+											"script": {
+												"id": "2b917072-054c-49dc-a7df-6202349ee0f0",
+												"exec": [
 													"pm.test(\"Status code is 200\", function () { pm.response.to.have.status(200); });",
 													"",
 													"pm.test(\"Fields are present\", function () {",
@@ -755,11 +751,7 @@
 													"    pm.expect(pm.response.to.have.jsonBody(\"indicators.AbsenceByReason\"));",
 													"    pm.expect(pm.response.to.have.jsonBody(\"indicators.AbsenceForPersistentAbsentees\"));",
 													"    pm.expect(pm.response.to.have.jsonBody(\"locations\"));",
-													"    pm.expect(pm.response.to.have.jsonBody(\"locations.country\"));",
 													"    pm.expect(pm.response.to.have.jsonBody(\"timePeriod\"));",
-													"    pm.expect(pm.response.to.have.jsonBody(\"timePeriod.hint\"));",
-													"    pm.expect(pm.response.to.have.jsonBody(\"timePeriod.legend\"));",
-													"    pm.expect(pm.response.to.have.jsonBody(\"timePeriod.options\"));",
 													"});",
 													"",
 													"pm.test(\"Number of characteristic options should be correct\", function () { ",
@@ -780,17 +772,17 @@
 													"    pm.expect(Object.keys(pm.response.json().filters.SchoolType.options.Default.options).length).to.equal(4);",
 													"});",
 													"",
-													"pm.test(\"Number of time periods options should be correct\", function() {",
-													"    pm.expect(pm.response.json().timePeriod.options.length).to.equal(1);",
-													"    pm.expect(pm.response.json().timePeriod.options[0].year).to.equal(2016);",
-													"});",
+													"// pm.test(\"Number of time periods options should be correct\", function() {",
+													"//     pm.expect(pm.response.json().timePeriod.options.length).to.equal(1);",
+													"//     pm.expect(pm.response.json().timePeriod.options[0].year).to.equal(2016);",
+													"// });",
 													"",
-													"pm.test(\"Number of location options should be correct\", function() {",
-													"    pm.expect(pm.response.json().locations.country.options.length).to.equal(1);",
-													"    pm.expect(pm.response.json().locations).to.not.have.property(\"Region\");",
-													"    pm.expect(pm.response.json().locations).to.not.have.property(\"LocalAuthority\");",
-													"    pm.expect(pm.response.json().locations).to.not.have.property(\"LocalAuthorityDistrict\");",
-													"});",
+													"// pm.test(\"Number of location options should be correct\", function() {",
+													"//     pm.expect(pm.response.json().locations.country.options.length).to.equal(1);",
+													"//     pm.expect(pm.response.json().locations).to.not.have.property(\"Region\");",
+													"//     pm.expect(pm.response.json().locations).to.not.have.property(\"LocalAuthority\");",
+													"//     pm.expect(pm.response.json().locations).to.not.have.property(\"LocalAuthorityDistrict\");",
+													"// });",
 													"",
 													"pm.test(\"Expect indicators to have correct properties\", function () {",
 													"    pm.expect(pm.response.json().indicators.AbsenceFields.options.length).to.equal(10);",
@@ -814,7 +806,7 @@
 										],
 										"body": {
 											"mode": "raw",
-											"raw": "{\n\tsubjectId: \"803fbf56-600f-490f-8409-6413a891720d\",\n\ttimePeriod: {\n\t\tstartYear: 2016,\n\t\tstartCode: \"AY\",\n\t\tendYear: 2016,\n\t\tendCode: \"AY\",\n\t},\n\tlocations: {\n\t\tgeographicLevel: \"Country\"\n\t}\n}"
+											"raw": "{\n\tsubjectId: \"803fbf56-600f-490f-8409-6413a891720d\",\n\ttimePeriod: {\n\t\tstartYear: 2016,\n\t\tstartCode: \"AY\",\n\t\tendYear: 2016,\n\t\tendCode: \"AY\",\n\t},\n\tlocations: {\n\t\t\"country\": [\"E92000001\"]\n\t}\n}"
 										},
 										"url": {
 											"raw": "{{data_api_url}}/meta/subject",
@@ -858,11 +850,11 @@
 													"    pm.expect(pm.response.to.have.jsonBody(\"indicators.AbsenceByReason\"));",
 													"    pm.expect(pm.response.to.have.jsonBody(\"indicators.AbsenceForPersistentAbsentees\"));",
 													"    pm.expect(pm.response.to.have.jsonBody(\"locations\"));",
-													"    pm.expect(pm.response.to.have.jsonBody(\"locations.localAuthority\"));",
+													"    // pm.expect(pm.response.to.have.jsonBody(\"locations.localAuthority\"));",
 													"    pm.expect(pm.response.to.have.jsonBody(\"timePeriod\"));",
-													"    pm.expect(pm.response.to.have.jsonBody(\"timePeriod.hint\"));",
-													"    pm.expect(pm.response.to.have.jsonBody(\"timePeriod.legend\"));",
-													"    pm.expect(pm.response.to.have.jsonBody(\"timePeriod.options\"));",
+													"    // pm.expect(pm.response.to.have.jsonBody(\"timePeriod.hint\"));",
+													"    // pm.expect(pm.response.to.have.jsonBody(\"timePeriod.legend\"));",
+													"    // pm.expect(pm.response.to.have.jsonBody(\"timePeriod.options\"));",
 													"});",
 													"",
 													"pm.test(\"Number of characteristic options should be correct\", function () { ",
@@ -883,15 +875,15 @@
 													"    pm.expect(Object.keys(pm.response.json().filters.SchoolType.options.Default.options).length).to.equal(4);",
 													"});",
 													"",
-													"pm.test(\"Number of time periods options should be correct\", function() {",
-													"    pm.expect(pm.response.json().timePeriod.options.length).to.equal(1);",
-													"    pm.expect(pm.response.json().timePeriod.options[0].year).to.equal(2016);",
-													"});",
+													"// pm.test(\"Number of time periods options should be correct\", function() {",
+													"//     pm.expect(pm.response.json().timePeriod.options.length).to.equal(1);",
+													"//     pm.expect(pm.response.json().timePeriod.options[0].year).to.equal(2016);",
+													"// });",
 													"",
-													"pm.test(\"Number of location options should be correct\", function() {",
-													"    pm.expect(pm.response.json().locations.localAuthority.options.length).to.equal(152);",
-													"    pm.expect(pm.response.json().locations).to.not.have.property(\"LocalAuthorityDistrict\");",
-													"});",
+													"// pm.test(\"Number of location options should be correct\", function() {",
+													"//     pm.expect(pm.response.json().locations.localAuthority.options.length).to.equal(152);",
+													"//     pm.expect(pm.response.json().locations).to.not.have.property(\"LocalAuthorityDistrict\");",
+													"// });",
 													"",
 													"pm.test(\"Expect indicators to have correct properties\", function () {",
 													"    pm.expect(pm.response.json().indicators.AbsenceFields.options.length).to.equal(10);",
@@ -958,11 +950,11 @@
 													"    pm.expect(pm.response.to.have.jsonBody(\"indicators.AbsenceByReason\"));",
 													"    pm.expect(pm.response.to.have.jsonBody(\"indicators.AbsenceForPersistentAbsentees\"));",
 													"    pm.expect(pm.response.to.have.jsonBody(\"locations\"));",
-													"    pm.expect(pm.response.to.have.jsonBody(\"locations.localAuthority\"));",
+													"    // pm.expect(pm.response.to.have.jsonBody(\"locations.localAuthority\"));",
 													"    pm.expect(pm.response.to.have.jsonBody(\"timePeriod\"));",
-													"    pm.expect(pm.response.to.have.jsonBody(\"timePeriod.hint\"));",
-													"    pm.expect(pm.response.to.have.jsonBody(\"timePeriod.legend\"));",
-													"    pm.expect(pm.response.to.have.jsonBody(\"timePeriod.options\"));",
+													"    // pm.expect(pm.response.to.have.jsonBody(\"timePeriod.hint\"));",
+													"    // pm.expect(pm.response.to.have.jsonBody(\"timePeriod.legend\"));",
+													"    // pm.expect(pm.response.to.have.jsonBody(\"timePeriod.options\"));",
 													"});",
 													"",
 													"pm.test(\"Characteristics property shouldn't exist\", function () {",
@@ -973,15 +965,15 @@
 													"    pm.expect(pm.response.json().filters.SchoolType.options.Default.options.length).to.equal(2);",
 													"});",
 													"",
-													"pm.test(\"Time periods options should be correct\", function() {",
-													"    pm.expect(pm.response.json().timePeriod.options.length).to.equal(1);",
-													"    pm.expect(pm.response.json().timePeriod.options[0].year).to.equal(2014);",
-													"});",
+													"// pm.test(\"Time periods options should be correct\", function() {",
+													"//     pm.expect(pm.response.json().timePeriod.options.length).to.equal(1);",
+													"//     pm.expect(pm.response.json().timePeriod.options[0].year).to.equal(2014);",
+													"// });",
 													"",
-													"pm.test(\"Number of location options should be correct\", function() {",
-													"    pm.expect(pm.response.json().locations.localAuthority.options.length).to.equal(1);",
-													"    pm.expect(pm.response.json().locations).to.not.have.property(\"LocalAuthorityDistrict\");",
-													"});",
+													"// pm.test(\"Number of location options should be correct\", function() {",
+													"//     pm.expect(pm.response.json().locations.localAuthority.options.length).to.equal(1);",
+													"//     pm.expect(pm.response.json().locations).to.not.have.property(\"LocalAuthorityDistrict\");",
+													"// });",
 													"",
 													"pm.test(\"Expect indicators to have correct properties\", function () {",
 													"    pm.expect(pm.response.json().indicators.AbsenceFields.options.length).to.equal(11);",
@@ -1006,94 +998,6 @@
 										"body": {
 											"mode": "raw",
 											"raw": "{\n\tsubjectId: \"568576e5-d386-450e-a8db-307b7061d0d8\",\n\ttimePeriod: {\n\t\tstartYear: 2014,\n\t\tstartCode: \"AY\",\n\t\tendYear: 2014,\n\t\tendCode: \"AY\",\n\t},\n\tlocations: {\n\t\tlocalAuthority: [\"E09000001\"]\n\t}\n}"
-										},
-										"url": {
-											"raw": "{{data_api_url}}/meta/subject",
-											"host": [
-												"{{data_api_url}}"
-											],
-											"path": [
-												"meta",
-												"subject"
-											]
-										}
-									},
-									"response": []
-								},
-								{
-									"name": "Subject Meta - Filter SubjectId 666cd878-87bb-4f77-9a3f-f5c75078e112, Start/End date 2012-2014",
-									"event": [
-										{
-											"listen": "prerequest",
-											"script": {
-												"id": "cf809261-9125-4037-a7f9-f3488921f3b9",
-												"exec": [
-													""
-												],
-												"type": "text/javascript"
-											}
-										},
-										{
-											"listen": "test",
-											"script": {
-												"id": "ff34b5ce-b969-45e5-aec4-2883bb95cba5",
-												"exec": [
-													"pm.test(\"Status code is 200\", function () { pm.response.to.have.status(200); });",
-													"",
-													"pm.test(\"Fields are present\", function () {",
-													"    pm.expect(pm.response.to.have.jsonBody(\"filters\"));",
-													"    pm.expect(pm.response.to.have.jsonBody(\"filters.AbsencePercentageBand\"));",
-													"    pm.expect(pm.response.to.have.jsonBody(\"indicators\"));",
-													"    pm.expect(pm.response.to.have.jsonBody(\"indicators.EnrolmentsByAbsencePercentageBand\"));",
-													"    pm.expect(pm.response.to.have.jsonBody(\"locations\"));",
-													"    pm.expect(pm.response.to.have.jsonBody(\"locations.country\"));",
-													"    pm.expect(pm.response.to.have.jsonBody(\"timePeriod\"));",
-													"    pm.expect(pm.response.to.have.jsonBody(\"timePeriod.hint\"));",
-													"    pm.expect(pm.response.to.have.jsonBody(\"timePeriod.legend\"));",
-													"    pm.expect(pm.response.to.have.jsonBody(\"timePeriod.options\"));",
-													"});",
-													"",
-													"pm.test(\"Number of AbsencePercentageBand options should be correct\", function () { ",
-													"    pm.expect(pm.response.json().filters.AbsencePercentageBand.options.Default.options.length).to.equal(102);",
-													"});",
-													"",
-													"pm.test(\"Time periods options should be correct\", function() {",
-													"    pm.expect(pm.response.json().timePeriod.options.length).to.equal(3);",
-													"});",
-													"",
-													"pm.test(\"Number of location options should be correct\", function() {",
-													"    pm.expect(pm.response.json().locations.country.options.length).to.equal(1);",
-													"    pm.expect(pm.response.json().locations).to.not.have.property(\"Region\");",
-													"    pm.expect(pm.response.json().locations).to.not.have.property(\"LocalAuthority\");",
-													"    pm.expect(pm.response.json().locations).to.not.have.property(\"LocalAuthorityDistrict\");",
-													"});",
-													"",
-													"pm.test(\"Expect indicators to have correct properties\", function () {",
-													"    pm.expect(Object.keys(pm.response.json().indicators).length).to.equal(1);",
-													"    pm.expect(pm.response.json().indicators.EnrolmentsByAbsencePercentageBand.options.length).to.equal(6);",
-													"    ",
-													"    pm.expect(pm.response.json().indicators).to.not.have.property(\"AbsenceFields\");",
-													"    pm.expect(pm.response.json().indicators).to.not.have.property(\"AbsenceByReason\");",
-													"    pm.expect(pm.response.json().indicators).to.not.have.property(\"AbsenceForPersistentAbsentees\");",
-													"});"
-												],
-												"type": "text/javascript"
-											}
-										}
-									],
-									"request": {
-										"method": "POST",
-										"header": [
-											{
-												"key": "Content-Type",
-												"name": "Content-Type",
-												"type": "text",
-												"value": "application/json"
-											}
-										],
-										"body": {
-											"mode": "raw",
-											"raw": "{\n\tsubjectId: \"666cd878-87bb-4f77-9a3f-f5c75078e112\",\n\ttimePeriod: {\n\t\tstartYear: 2012,\n\t\tstartCode: \"AY\",\n\t\tendYear: 2014,\n\t\tendCode: \"AY\",\n\t}\n}"
 										},
 										"url": {
 											"raw": "{{data_api_url}}/meta/subject",
@@ -4368,8 +4272,8 @@
 								"id": "b70eabc3-a8c3-4393-a4ab-040b776c1aaf",
 								"type": "text/javascript",
 								"exec": [
-									"pm.globals.set('SUBJ_Workforce', '86da5629-4265-40ec-b49b-08d869c7a0a1');",
-									"pm.globals.set('PUB_Workforce', 'a2bb4e52-0c23-4e81-963a-08d869c7c959');"
+									"pm.globals.set('SUBJ_Workforce', '4b804bf4-e3a8-4cab-a1c1-08d87035ea8a');",
+									"pm.globals.set('PUB_Workforce', 'e314baa0-6b1e-4b7a-5bb4-08d85e3017e7');"
 								]
 							}
 						},
@@ -4650,8 +4554,8 @@
 								"id": "606026ce-837f-4838-8508-3916c51a6c58",
 								"type": "text/javascript",
 								"exec": [
-									"pm.globals.set('SUBJ_QL01', 'be5735f3-2708-44ea-b49a-08d869c7a0a1');",
-									"pm.globals.set('PUB_QL01', 'a2bb4e52-0c23-4e81-963a-08d869c7c959');"
+									"pm.globals.set('SUBJ_QL01', 'f79ffca9-e60a-431d-a1c0-08d87035ea8a');",
+									"pm.globals.set('PUB_QL01', 'e314baa0-6b1e-4b7a-5bb4-08d85e3017e7');"
 								]
 							}
 						},
