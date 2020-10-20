@@ -7,6 +7,7 @@ using GovUk.Education.ExploreEducationStatistics.Admin.ViewModels;
 using GovUk.Education.ExploreEducationStatistics.Common.Model;
 using GovUk.Education.ExploreEducationStatistics.Common.Services.Interfaces.Security;
 using GovUk.Education.ExploreEducationStatistics.Common.Utils;
+using GovUk.Education.ExploreEducationStatistics.Content.Model;
 using GovUk.Education.ExploreEducationStatistics.Content.Model.Database;
 using GovUk.Education.ExploreEducationStatistics.Data.Model;
 using GovUk.Education.ExploreEducationStatistics.Data.Model.Database;
@@ -531,6 +532,32 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
         }
 
         [Fact]
+        public async Task Validate_NoDataFiles()
+        {
+            var release = new Release();
+
+            var contentDbContextId = Guid.NewGuid().ToString();
+
+            await using (var contentDbContext = InMemoryApplicationDbContext(contentDbContextId))
+            {
+                await contentDbContext.AddAsync(release);
+                await contentDbContext.SaveChangesAsync();
+            }
+
+            var metaGuidanceSubjectService = new Mock<IMetaGuidanceSubjectService>(MockBehavior.Strict);
+
+            await using (var contentDbContext = InMemoryApplicationDbContext(contentDbContextId))
+            {
+                var service = SetupMetaGuidanceService(contentDbContext: contentDbContext,
+                    metaGuidanceSubjectService: metaGuidanceSubjectService.Object);
+
+                var result = await service.Validate(release.Id);
+
+                Assert.True(result.IsRight);
+            }
+        }
+
+        [Fact]
         public async Task Validate_MetaGuidancePopulated()
         {
             var release = new Release
@@ -538,11 +565,24 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
                 MetaGuidance = "Release Meta Guidance"
             };
 
+            var releaseFile = new ReleaseFile
+            {
+                Release = release,
+                ReleaseFileReference = new ReleaseFileReference
+                {
+                    Filename = "file1.csv",
+                    Release = release,
+                    ReleaseFileType = ReleaseFileTypes.Data,
+                    SubjectId = Guid.NewGuid()
+                }
+            };
+
             var contentDbContextId = Guid.NewGuid().ToString();
 
             await using (var contentDbContext = InMemoryApplicationDbContext(contentDbContextId))
             {
                 await contentDbContext.AddAsync(release);
+                await contentDbContext.AddAsync(releaseFile);
                 await contentDbContext.SaveChangesAsync();
             }
 
@@ -572,11 +612,24 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
                 MetaGuidance = null
             };
 
+            var releaseFile = new ReleaseFile
+            {
+                Release = release,
+                ReleaseFileReference = new ReleaseFileReference
+                {
+                    Filename = "file1.csv",
+                    Release = release,
+                    ReleaseFileType = ReleaseFileTypes.Data,
+                    SubjectId = Guid.NewGuid()
+                }
+            };
+
             var contentDbContextId = Guid.NewGuid().ToString();
 
             await using (var contentDbContext = InMemoryApplicationDbContext(contentDbContextId))
             {
                 await contentDbContext.AddAsync(release);
+                await contentDbContext.AddAsync(releaseFile);
                 await contentDbContext.SaveChangesAsync();
             }
 
@@ -602,11 +655,24 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
                 MetaGuidance = "Release Meta Guidance"
             };
 
+            var releaseFile = new ReleaseFile
+            {
+                Release = release,
+                ReleaseFileReference = new ReleaseFileReference
+                {
+                    Filename = "file1.csv",
+                    Release = release,
+                    ReleaseFileType = ReleaseFileTypes.Data,
+                    SubjectId = Guid.NewGuid()
+                }
+            };
+
             var contentDbContextId = Guid.NewGuid().ToString();
 
             await using (var contentDbContext = InMemoryApplicationDbContext(contentDbContextId))
             {
                 await contentDbContext.AddAsync(release);
+                await contentDbContext.AddAsync(releaseFile);
                 await contentDbContext.SaveChangesAsync();
             }
 

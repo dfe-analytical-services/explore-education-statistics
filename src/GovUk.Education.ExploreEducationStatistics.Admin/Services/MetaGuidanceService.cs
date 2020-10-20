@@ -69,16 +69,20 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Services
             return await _contentPersistenceHelper.CheckEntityExists<Release>(releaseId)
                 .OnSuccess(async release =>
                 {
-                    // TODO EES-1412 Actually this is wrong because if there are no Subjects the user can't enter this yet 
-                    if (string.IsNullOrWhiteSpace(release.MetaGuidance))
+                    if (await DataFilesExist(releaseId))
                     {
-                        return ValidationActionResult(ValidationErrorMessages.MetaGuidanceMustBePopulated);
+                        if (string.IsNullOrWhiteSpace(release.MetaGuidance))
+                        {
+                            return ValidationActionResult(ValidationErrorMessages.MetaGuidanceMustBePopulated);
+                        }
+
+                        return await _metaGuidanceSubjectService.Validate(releaseId)
+                            .OnSuccess(valid => valid
+                                ? (Either<ActionResult, Unit>) Unit.Instance
+                                : ValidationActionResult(ValidationErrorMessages.MetaGuidanceMustBePopulated));
                     }
 
-                    return await _metaGuidanceSubjectService.Validate(releaseId)
-                        .OnSuccess(valid => valid
-                            ? (Either<ActionResult, Unit>) Unit.Instance
-                            : ValidationActionResult(ValidationErrorMessages.MetaGuidanceMustBePopulated));
+                    return Unit.Instance;
                 });
         }
 
@@ -119,6 +123,17 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Services
                 });
 
             await _statisticsDbContext.SaveChangesAsync();
+        }
+
+        private async Task<bool> DataFilesExist(Guid releaseId)
+        {
+            return await _contentDbContext
+                .ReleaseFiles
+                .Include(rf => rf.ReleaseFileReference)
+                .Where(rf => rf.ReleaseId == releaseId
+                             && rf.ReleaseFileReference.ReleaseFileType == ReleaseFileTypes.Data
+                             && rf.ReleaseFileReference.SubjectId.HasValue)
+                .AnyAsync();
         }
 
         private async Task<Either<ActionResult, MetaGuidanceViewModel>> BuildViewModel(Release release)
