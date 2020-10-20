@@ -69,13 +69,13 @@
        "value": "dev"
     },
     "minCapacityStatisticsDb": {
-      "value": "4"
+      "value": "0.75"
     },
     "maxCapacityStatisticsDb": {
-      "value": 10
+      "value": 4
     },
     "autoPauseDelayStatisticsDb": {
-      "value": -1
+      "value": 60
     }
   }
 }
