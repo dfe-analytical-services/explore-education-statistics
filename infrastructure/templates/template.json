@@ -1414,8 +1414,7 @@
       },
       "resources": [
         {
-          "type": "Microsoft.Sql/servers/databases",
-          "apiVersion": "2020-08-01-preview",
+          "type": "databases",
           "name": "statistics",
           "location": "[resourceGroup().location]",
           "tags": {
@@ -1431,6 +1430,10 @@
             "DeploymentRepo": "[parameters('deploymentRepo')]",
             "DeploymentScript": "[parameters('deploymentScript')]"
           },
+          "apiVersion": "2020-08-01-preview",
+          "dependsOn": [
+            "[variables('sqlserverName')]"
+          ],
           "sku": {
             "name": "GP_S_Gen5",
             "tier": "GeneralPurpose",
