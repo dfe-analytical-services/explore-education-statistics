@@ -1405,7 +1405,7 @@
     {
       "name": "[variables('sqlserverName')]",
       "type": "Microsoft.Sql/servers",
-      "apiVersion": "2020-08-01-preview",
+      "apiVersion": "2019-06-01-preview",
       "location": "[resourceGroup().location]",
       "properties": {
         "administratorLogin": "[parameters('sqlAdministratorLogin')]",
@@ -1414,42 +1414,43 @@
       },
       "resources": [
         {
-          "name": "statistics",
-          "type": "databases",
-          "location": "[resourceGroup().location]",
+          "type": "Microsoft.Sql/servers/databases",
+          "apiVersion": "2020-08-01-preview",
+          "name": "[concat(parameters('servers_s101d01_sqlsvr_ees_01_name'), '/statistics')]",
+          "location": "westeurope",
           "tags": {
-            "Department": "[parameters('departmentName')]",
-            "Solution": "[parameters('solutionName')]",
+            "Department": "Data Directorate",
+            "Solution": "EES",
             "ServiceType": "SQL Database",
-            "Environment": "[parameters('environmentName')]",
-            "Subscription": "[parameters('subscriptionName')]",
-            "CostCentre": "[parameters('costCentre')]",
-            "ServiceOwner": "[parameters('serviceOwnerName')]",
-            "DateProvisioned": "[parameters('dateProvisioned')]",
-            "CreatedBy": "[parameters('createdBy')]",
-            "DeploymentRepo": "[parameters('deploymentRepo')]",
-            "DeploymentScript": "[parameters('deploymentScript')]"
+            "Environment": "",
+            "Subscription": "s101-datahub-development",
+            "CostCentre": "10421451",
+            "ServiceOwner": "SHELBY, Laura",
+            "DateProvisioned": "2020-10-19 11:35:47Z",
+            "CreatedBy": "CUTTS, James",
+            "DeploymentRepo": "https://github.com/dfe-analytical-services/explore-education-statistics/",
+            "DeploymentScript": "N/A",
+            "Portfolio": "",
+            "Product": "",
+            "Service Line": "",
+            "Service": ""
           },
-          "apiVersion": "2015-01-01",
-          "dependsOn": [
-            "[variables('sqlserverName')]"
-          ],
+          "sku": {
+            "name": "GP_S_Gen5",
+            "tier": "GeneralPurpose",
+            "family": "Gen5",
+            "capacity": 6
+          },
+          "kind": "v12.0,user,vcore,serverless",
           "properties": {
             "collation": "SQL_Latin1_General_CP1_CI_AS",
             "maxSizeBytes": 268435456000,
             "catalogCollation": "SQL_Latin1_General_CP1_CI_AS",
             "zoneRedundant": false,
             "readScale": "Disabled",
-            "autoPauseDelay": "[parameters('autoPauseDelayStatisticsDb')]",
+            "autoPauseDelay": 60,
             "storageAccountType": "GRS",
-            "minCapacity": "[parameters('minCapacityStatisticsDb')]"
-          },
-          "kind": "v12.0,user,vcore,serverless",
-          "sku": {
-            "name": "[first(split(parameters('skuStatisticsDb'), ' '))]",
-            "tier": "[first(skip(split(parameters('skuStatisticsDb'), ' '), 1))]",
-            "family": "Gen5",
-            "capacity": "[parameters('maxCapacityStatisticsDb')]"
+            "minCapacity": 0.75
           }
         },
         {
