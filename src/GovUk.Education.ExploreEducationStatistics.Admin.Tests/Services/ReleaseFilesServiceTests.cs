@@ -95,7 +95,8 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
 
             await using (var contentDbContext = InMemoryApplicationDbContext(contentDbContextId))
             {
-                var releaseFilesService = SetupReleaseFilesService(context: contentDbContext,
+                var releaseFilesService = SetupReleaseFilesService(
+                    contentDbContext: contentDbContext,
                     blobStorageService: blobStorageService.Object,
                     importService: importService.Object);
 
@@ -237,7 +238,8 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
 
             await using (var contentDbContext = InMemoryApplicationDbContext(contentDbContextId))
             {
-                var releaseFilesService = SetupReleaseFilesService(context: contentDbContext,
+                var releaseFilesService = SetupReleaseFilesService(
+                    contentDbContext: contentDbContext,
                     blobStorageService: blobStorageService.Object,
                     importService: importService.Object);
 
@@ -356,7 +358,8 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
 
             await using (var contentDbContext = InMemoryApplicationDbContext(contentDbContextId))
             {
-                var releaseFilesService = SetupReleaseFilesService(context: contentDbContext,
+                var releaseFilesService = SetupReleaseFilesService(
+                    contentDbContext: contentDbContext,
                     blobStorageService: blobStorageService.Object,
                     importService: importService.Object);
 
@@ -449,8 +452,8 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
                     });
 
                 var service = SetupReleaseFilesService(
-                    context,
-                    blobStorageService.Object,
+                    contentDbContext: context,
+                    blobStorageService: blobStorageService.Object,
                     importStatusService: importStatusService.Object
                 );
                 var result = await service.GetDataFile(
@@ -630,8 +633,8 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
                     .ReturnsAsync(subject);
 
                 var service = SetupReleaseFilesService(
-                    context,
-                    blobStorageService.Object,
+                    contentDbContext: context,
+                    blobStorageService: blobStorageService.Object,
                     subjectService: subjectService.Object
                 );
                 var result = await service.GetDataFile(
@@ -754,8 +757,8 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
                     );
 
                 var service = SetupReleaseFilesService(
-                    context,
-                    blobStorageService.Object,
+                    contentDbContext: context,
+                    blobStorageService: blobStorageService.Object,
                     importStatusService: importStatusService.Object
                 );
                 var result = await service.GetDataFile(
@@ -876,8 +879,8 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
                     );
 
                 var service = SetupReleaseFilesService(
-                    context,
-                    blobStorageService.Object,
+                    contentDbContext: context,
+                    blobStorageService: blobStorageService.Object,
                     importStatusService: importStatusService.Object
                 );
                 var result = await service.GetDataFile(
@@ -1049,8 +1052,8 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
                     );
 
                 var service = SetupReleaseFilesService(
-                    context,
-                    blobStorageService.Object,
+                    contentDbContext: context,
+                    blobStorageService: blobStorageService.Object,
                     importStatusService: importStatusService.Object
                 );
                 var result = await service.ListDataFiles(release.Id);
@@ -1199,8 +1202,8 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
                     );
 
                 var service = SetupReleaseFilesService(
-                    context,
-                    blobStorageService.Object,
+                    contentDbContext: context,
+                    blobStorageService: blobStorageService.Object,
                     importStatusService: importStatusService.Object
                 );
                 var result = await service.ListDataFiles(release.Id);
@@ -1355,8 +1358,8 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
                     );
 
                 var service = SetupReleaseFilesService(
-                    context,
-                    blobStorageService.Object,
+                    contentDbContext: context,
+                    blobStorageService: blobStorageService.Object,
                     importStatusService: importStatusService.Object
                 );
                 var result = await service.ListDataFiles(amendedRelease.Id);
@@ -1445,8 +1448,8 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
                     .ReturnsAsync(subject);
 
                 var service = SetupReleaseFilesService(
-                    context,
-                    blobStorageService.Object,
+                    contentDbContext: context,
+                    blobStorageService: blobStorageService.Object,
                     subjectService: subjectService.Object
                 );
                 var result = await service.ListDataFiles(release.Id);
@@ -1567,8 +1570,8 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
                     );
 
                 var service = SetupReleaseFilesService(
-                    context,
-                    blobStorageService.Object,
+                    contentDbContext: context,
+                    blobStorageService: blobStorageService.Object,
                     importStatusService: importStatusService.Object
                 );
                 var result = await service.ListDataFiles(release.Id);
@@ -1664,8 +1667,8 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
                     );
 
                 var service = SetupReleaseFilesService(
-                    context,
-                    blobStorageService.Object,
+                    contentDbContext: context,
+                    blobStorageService: blobStorageService.Object,
                     importService: importService.Object,
                     dataArchiveValidationService: dataArchiveValidationService.Object,
                     fileUploadsValidatorService: fileUploadsValidatorService.Object
@@ -1755,9 +1758,9 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
                 await context.SaveChangesAsync();
             }
 
-            var dataFileName = "test-data.csv";
-            var metaFileName = "test-data.meta.csv";
-            var zipFileName = "test-data-archive.zip";
+            const string dataFileName = "test-data.csv";
+            const string metaFileName = "test-data.meta.csv";
+            const string zipFileName = "test-data-archive.zip";
 
             await using (var context = InMemoryApplicationDbContext(contextId))
             {
@@ -1787,11 +1790,15 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
                     .Setup(s => s.ValidateDataArchiveFile(release.Id, zipFormFile.Object))
                     .ReturnsAsync(new Either<ActionResult, IDataArchiveFile>(archiveFile.Object));
 
-                var importService = new Mock<IImportService>();
+                var importService = new Mock<IImportService>(MockBehavior.Strict);
 
                 importService
                     .Setup(s => s.CreateImportTableRow(release.Id, dataFileName))
                     .ReturnsAsync(new Either<ActionResult, Unit>(Unit.Instance));
+
+                importService
+                    .Setup(s => s.Import(release.Id, dataFileName, metaFileName, zipFormFile.Object, true))
+                    .Returns(Task.CompletedTask);
 
                 var blobStorageService = new Mock<IBlobStorageService>();
 
@@ -1816,8 +1823,8 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
                     );
 
                 var service = SetupReleaseFilesService(
-                    context,
-                    blobStorageService.Object,
+                    contentDbContext: context,
+                    blobStorageService: blobStorageService.Object,
                     importService: importService.Object,
                     dataArchiveValidationService: dataArchiveValidationService.Object,
                     fileUploadsValidatorService: fileUploadsValidatorService.Object,
@@ -1922,7 +1929,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
         }
 
         private static ReleaseFilesService SetupReleaseFilesService(
-            ContentDbContext context,
+            ContentDbContext contentDbContext,
             IBlobStorageService blobStorageService = null,
             IUserService userService = null,
             IPersistenceHelper<ContentDbContext> persistenceHelper = null,
@@ -1935,8 +1942,8 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
             return new ReleaseFilesService(
                 blobStorageService ?? new Mock<IBlobStorageService>().Object,
                 userService ?? MockUtils.AlwaysTrueUserService().Object,
-                persistenceHelper ?? new PersistenceHelper<ContentDbContext>(context),
-                context,
+                persistenceHelper ?? new PersistenceHelper<ContentDbContext>(contentDbContext),
+                contentDbContext,
                 importService ?? new Mock<IImportService>().Object,
                 fileUploadsValidatorService ?? new Mock<IFileUploadsValidatorService>().Object,
                 subjectService ?? new Mock<ISubjectService>().Object,

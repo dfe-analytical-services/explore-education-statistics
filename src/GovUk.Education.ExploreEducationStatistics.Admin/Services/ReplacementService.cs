@@ -116,18 +116,20 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Services
                         return ValidationActionResult(ReplacementMustBeValid);
                     }
 
+                    // This Release Id can be found on the ReplacementFileReference
+                    var releaseId = (await _contentDbContext.ReleaseFileReferences
+                        .FindAsync(replacementFileId)).ReleaseId;
+
                     await replacementPlan.DataBlocks.ForEachAsync(plan =>
                         ReplaceLinksForDataBlock(plan, replacementPlan.ReplacementSubjectId));
                     await replacementPlan.Footnotes.ForEachAsync(plan =>
                         ReplaceLinksForFootnote(plan, replacementPlan.OriginalSubjectId,
                             replacementPlan.ReplacementSubjectId));
+                    await ReplaceMetaGuidance(releaseId, replacementPlan.OriginalSubjectId,
+                        replacementPlan.ReplacementSubjectId);
 
                     await _contentDbContext.SaveChangesAsync();
                     await _statisticsDbContext.SaveChangesAsync();
-
-                    // This Release Id can be found on the ReplacementFileReference
-                    var releaseId = (await _contentDbContext.ReleaseFileReferences
-                        .FindAsync(replacementFileId)).ReleaseId;
 
                     return await RemoveOriginalSubjectAndFileFromRelease(releaseId, originalFileId, replacementFileId);
                 });
@@ -765,6 +767,25 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Services
                 FootnoteId = footnoteId,
                 IndicatorId = plan.TargetValue
             });
+        }
+
+        private async Task ReplaceMetaGuidance(
+            Guid releaseId,
+            Guid originalSubject,
+            Guid replacementSubject)
+        {
+            var originalReleaseSubject = await _statisticsDbContext.ReleaseSubject
+                .Where(rs => rs.ReleaseId == releaseId &&
+                             rs.SubjectId == originalSubject)
+                .FirstAsync();
+
+            var replacementReleaseSubject = await _statisticsDbContext.ReleaseSubject
+                .Where(rs => rs.ReleaseId == releaseId &&
+                             rs.SubjectId == replacementSubject)
+                .FirstAsync();
+
+            _statisticsDbContext.Update(replacementReleaseSubject);
+            replacementReleaseSubject.MetaGuidance = originalReleaseSubject.MetaGuidance;
         }
 
         private async Task<Either<ActionResult, Unit>> RemoveOriginalSubjectAndFileFromRelease(

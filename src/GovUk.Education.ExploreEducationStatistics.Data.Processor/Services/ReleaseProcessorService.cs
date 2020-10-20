@@ -35,7 +35,10 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Processor.Services
             var release = CreateOrUpdateRelease(message, statisticsDbContext);
             RemoveSubjectIfExisting(message, statisticsDbContext);
 
-            var subject = CreateSubject(message.SubjectId, subjectData.DataBlob.FileName, subjectData.Name, release,
+            var subject = CreateSubject(message.SubjectId,
+                subjectData.DataBlob.FileName,
+                subjectData.Name,
+                release,
                 statisticsDbContext);
 
             if (!UpdateReleaseFileReferenceLinks(message, contentDbContext, release, subject))

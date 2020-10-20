@@ -1674,6 +1674,27 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
                 ReleaseFileReference = replacementReleaseFileReference
             };
 
+            var originalReleaseSubject1 = new ReleaseSubject
+            {
+                Release = statsReleaseVersion1,
+                Subject = originalSubject,
+                MetaGuidance = "Original meta guidance version 1"
+            };
+
+            var originalReleaseSubject2 = new ReleaseSubject
+            {
+                Release = statsReleaseVersion2,
+                Subject = originalSubject,
+                MetaGuidance = "Original meta guidance version 2"
+            };
+
+            var replacementReleaseSubject = new ReleaseSubject
+            {
+                Release = statsReleaseVersion2,
+                Subject = replacementSubject, 
+                MetaGuidance = null
+            };
+
             var originalFilterItem1 = new FilterItem
             {
                 Id = Guid.NewGuid(),
@@ -1952,6 +1973,8 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
             {
                 await statisticsDbContext.AddRangeAsync(statsReleaseVersion1, statsReleaseVersion2);
                 await statisticsDbContext.AddRangeAsync(originalSubject, replacementSubject);
+                await statisticsDbContext.AddRangeAsync(originalReleaseSubject1, originalReleaseSubject2,
+                    replacementReleaseSubject);
                 await statisticsDbContext.AddRangeAsync(originalFilter1, originalFilter2,
                     replacementFilter1, replacementFilter2);
                 await statisticsDbContext.AddRangeAsync(originalIndicatorGroup, replacementIndicatorGroup);
@@ -1978,7 +2001,11 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
                 mocks.ReleaseService.VerifyNoOtherCalls();
 
                 Assert.True(result.IsRight);
+            }
 
+            await using (var contentDbContext = InMemoryApplicationDbContext(contentDbContextId))
+            await using (var statisticsDbContext = InMemoryStatisticsDbContext(statisticsDbContextId))
+            {
                 // Check that the original file was unlinked from the replacement before the mock call to remove it.
                 Assert.Null((await contentDbContext.ReleaseFileReferences.FindAsync(originalReleaseFileReference.Id))
                     .ReplacedById);
@@ -2094,6 +2121,14 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
                 Assert.Single(replacedFootnoteForSubject.Subjects);
 
                 Assert.Equal(replacementSubject.Id, replacedFootnoteForSubject.Subjects.First().Subject.Id);
+
+                // Check the original Meta Guidance has been retained on the replacement
+                var replacedReleaseSubject = await statisticsDbContext.ReleaseSubject
+                    .Where(rs => rs.ReleaseId == statsReleaseVersion2.Id
+                                 && rs.SubjectId == replacementSubject.Id)
+                    .FirstAsync();
+
+                Assert.Equal("Original meta guidance version 2", replacedReleaseSubject.MetaGuidance);
             }
         }
 
