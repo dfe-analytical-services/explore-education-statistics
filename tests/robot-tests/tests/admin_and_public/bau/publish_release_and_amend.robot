@@ -219,9 +219,9 @@ User goes to public Find Statistics page
 
 Verify newly published release is on Find Statistics page
     [Tags]  HappyPath
-    user waits until page contains accordion section   Test theme
-    user opens accordion section  Test theme
-    user waits until accordion section contains text   Test theme   ${TOPIC_NAME}
+    user waits until page contains accordion section   %{TEST_THEME_NAME}
+    user opens accordion section  %{TEST_THEME_NAME}
+    user waits until accordion section contains text   %{TEST_THEME_NAME}   ${TOPIC_NAME}
 
     user opens details dropdown  ${TOPIC_NAME}
     user waits until details dropdown contains publication    ${TOPIC_NAME}  ${PUBLICATION_NAME}   10
@@ -521,9 +521,9 @@ Go back to public find-statistics page
 
 Verify amendment is on Find Statistics page again
     [Tags]  HappyPath
-    user waits until page contains accordion section   Test theme
-    user opens accordion section  Test theme
-    user waits until accordion section contains text   Test theme   ${TOPIC_NAME}
+    user waits until page contains accordion section   %{TEST_THEME_NAME}
+    user opens accordion section  %{TEST_THEME_NAME}
+    user waits until accordion section contains text   %{TEST_THEME_NAME}   ${TOPIC_NAME}
 
     user opens details dropdown  ${TOPIC_NAME}
     user waits until details dropdown contains publication    ${TOPIC_NAME}  ${PUBLICATION_NAME}   10
