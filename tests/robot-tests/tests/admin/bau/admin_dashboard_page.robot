@@ -16,10 +16,10 @@ Heading is present on tab
 
 Correct information is shown on tabs
     [Tags]   HappyPath
-    user clicks element   css:#draft-releases-tab
-    user waits until element contains  css:#draft-releases-tab  View draft releases
-    user clicks element   css:#scheduled-releases-tab
-    user waits until element contains  css:#scheduled-releases-tab  View scheduled releases
+    user clicks element   id:draft-releases-tab
+    user waits until element contains  id:draft-releases-tab  View draft releases
+    user clicks element   id:scheduled-releases-tab
+    user waits until element contains  id:scheduled-releases-tab  View scheduled releases
 
 Verify correct data is shown when theme and topic is shown
     [Tags]   HappyPath

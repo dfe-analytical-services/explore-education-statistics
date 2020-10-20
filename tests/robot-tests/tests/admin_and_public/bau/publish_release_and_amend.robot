@@ -35,10 +35,10 @@ Verify release summary
 Upload subject
     [Tags]  HappyPath
     user clicks link  Data and files
-    user waits until page contains element  css:#dataFileUploadForm-subjectTitle
-    user enters text into element  css:#dataFileUploadForm-subjectTitle   Dates test subject
-    user chooses file   css:#dataFileUploadForm-dataFile       ${CURDIR}${/}files${/}dates.csv
-    user chooses file   css:#dataFileUploadForm-metadataFile   ${CURDIR}${/}files${/}dates.meta.csv
+    user waits until page contains element  id:dataFileUploadForm-subjectTitle
+    user enters text into element  id:dataFileUploadForm-subjectTitle   Dates test subject
+    user chooses file   id:dataFileUploadForm-dataFile       ${CURDIR}${/}files${/}dates.csv
+    user chooses file   id:dataFileUploadForm-metadataFile   ${CURDIR}${/}files${/}dates.meta.csv
     user clicks button  Upload data files
 
     user waits until h2 is visible  Uploaded data files
@@ -81,17 +81,17 @@ Create data block table
 
     user waits until page contains   Dates test subject
     user clicks radio    Dates test subject
-    user clicks element   css:#publicationSubjectForm-submit
+    user clicks element   id:publicationSubjectForm-submit
 
     user waits until h2 is visible  Choose locations
     user opens details dropdown   National
     user clicks checkbox   England
-    user clicks element     css:#locationFiltersForm-submit
+    user clicks element     id:locationFiltersForm-submit
 
     user waits until h2 is visible  Choose time period
     user selects from list by label  id:timePeriodForm-start  2020 Week 13
     user selects from list by label  id:timePeriodForm-end    2020 Week 16
-    user clicks element     css:#timePeriodForm-submit
+    user clicks element     id:timePeriodForm-submit
 
     user waits until h2 is visible  Choose your filters
     user clicks subheaded indicator checkbox  Open settings  Number of open settings
@@ -103,7 +103,7 @@ Create data block table
     user clicks category checkbox  Date   23/03/2020
     user checks category checkbox is checked  Date  23/03/2020
 
-    user clicks element   css:#filtersForm-submit
+    user clicks element   id:filtersForm-submit
     user waits until results table appears     180
 
     user checks table column heading contains  1  1  2020 Week 13
@@ -367,8 +367,8 @@ Navigate to data replacement page
 Upload replacement data
     [Tags]  HappyPath
     user waits until h2 is visible  Upload replacement data
-    user chooses file   css:#dataFileUploadForm-dataFile       ${CURDIR}${/}files${/}dates-replacement.csv
-    user chooses file   css:#dataFileUploadForm-metadataFile   ${CURDIR}${/}files${/}dates-replacement.meta.csv
+    user chooses file   id:dataFileUploadForm-dataFile       ${CURDIR}${/}files${/}dates-replacement.csv
+    user chooses file   id:dataFileUploadForm-metadataFile   ${CURDIR}${/}files${/}dates-replacement.meta.csv
     user clicks button  Upload data files
 
     user checks table column heading contains  1  1  Original file
@@ -430,7 +430,7 @@ Edit data block for amendment
     user clicks category checkbox  Date   24/03/2020
     user checks category checkbox is checked  Date  24/03/2020
 
-    user clicks element   css:#filtersForm-submit
+    user clicks element   id:filtersForm-submit
     user waits until results table appears     180
 
     user checks table column heading contains  1  1  2020 Week 13

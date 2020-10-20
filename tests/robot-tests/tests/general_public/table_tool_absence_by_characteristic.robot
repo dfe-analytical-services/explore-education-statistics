@@ -19,14 +19,14 @@ Select "Pupil absence" publication
     user opens details dropdown    Pupils and schools
     user opens details dropdown    Pupil absence
     user clicks radio      Pupil absence in schools in England
-    user clicks element    css:#publicationForm-submit
+    user clicks element    id:publicationForm-submit
     user waits until h2 is visible  Choose a subject
     user checks previous table tool step contains  1   Publication   Pupil absence in schools in England
 
 Select subject "Absence by characteristic"
     [Tags]  HappyPath
     user clicks radio   Absence by characteristic
-    user clicks element   css:#publicationSubjectForm-submit
+    user clicks element   id:publicationSubjectForm-submit
     user waits until h2 is visible  Choose locations
     user checks previous table tool step contains  2    Subject     Absence by characteristic
 
@@ -34,7 +34,7 @@ Select Location Country, England
     [Tags]  HappyPath
     user opens details dropdown     National
     user clicks checkbox    England
-    user clicks element     css:#locationFiltersForm-submit
+    user clicks element     id:locationFiltersForm-submit
     # Extra timeout until EES-315/316
     user waits until h2 is visible  Choose time period
     user checks previous table tool step contains  3    National    England
@@ -43,7 +43,7 @@ Select Start date and End date
     [Tags]  HappyPath
     user selects from list by label  id:timePeriodForm-start   2012/13
     user selects from list by label  id:timePeriodForm-end   2015/16
-    user clicks element     css:#timePeriodForm-submit
+    user clicks element     id:timePeriodForm-submit
     user waits until h2 is visible  Choose your filters
     user waits until page contains element   id:filtersForm-indicators
     user checks previous table tool step contains  4    Start date    2012/13
@@ -72,7 +72,7 @@ Select Characteristics
 
 Create table
     [Tags]  HappyPath
-    user clicks element     css:#filtersForm-submit
+    user clicks element     id:filtersForm-submit
     user waits until results table appears    60
 
 Validate results table column headings

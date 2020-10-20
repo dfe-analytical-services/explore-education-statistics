@@ -19,14 +19,14 @@ Select Exclusions publication
     user opens details dropdown    Pupils and schools
     user opens details dropdown    Exclusions
     user clicks radio      Permanent and fixed-period exclusions in England
-    user clicks element    css:#publicationForm-submit
+    user clicks element    id:publicationForm-submit
     user waits until h2 is visible  Choose a subject
     user checks previous table tool step contains  1   Publication   Permanent and fixed-period exclusions in England
 
 Select subject "Exclusions by geographic level"
     [Tags]  HappyPath
     user clicks radio   Exclusions by geographic level
-    user clicks element   css:#publicationSubjectForm-submit
+    user clicks element   id:publicationSubjectForm-submit
     user waits until h2 is visible  Choose locations
     user checks previous table tool step contains  2    Subject     Exclusions by geographic level
 
@@ -36,7 +36,7 @@ Select Locations LA, Bury, Sheffield, York
     user clicks checkbox    Bury
     user clicks checkbox    Sheffield
     user clicks checkbox    York
-    user clicks element     css:#locationFiltersForm-submit
+    user clicks element     id:locationFiltersForm-submit
     # Extra timeout until EES-315/316
     user waits until h2 is visible  Choose time period
     user checks previous table tool step contains  3    Local Authority    Bury
@@ -47,7 +47,7 @@ Select Start date and End date
     [Tags]  HappyPath
     user selects from list by label  id:timePeriodForm-start   2006/07
     user selects from list by label  id:timePeriodForm-end     2008/09
-    user clicks element     css:#timePeriodForm-submit
+    user clicks element     id:timePeriodForm-submit
     user waits until h2 is visible  Choose your filters
     user waits until page contains element   id:filtersForm-indicators
     user checks previous table tool step contains  4    Start date    2006/07
@@ -75,7 +75,7 @@ Select Characteristics
 
 User clicks Create table button
     [Tags]  HappyPath
-    user clicks element     css:#filtersForm-submit
+    user clicks element     id:filtersForm-submit
 
 User waits for table to appear
     [Tags]  HappyPath
