@@ -474,13 +474,9 @@
         "dev"
       ]
     },
-    "skuStatisticsDb": {
-      "type": "string",
-      "defaultValue": "GP_S_Gen5 GeneralPurpose"
-    },
     "minCapacityStatisticsDb": {
-      "type": "int",
-      "defaultValue": 1
+      "type": "string",
+      "defaultValue": "0.75"
     },
     "maxCapacityStatisticsDb": {
       "type": "int",
@@ -1438,7 +1434,7 @@
             "name": "GP_S_Gen5",
             "tier": "GeneralPurpose",
             "family": "Gen5",
-            "capacity": 6
+            "capacity": "[parameters('maxCapacityStatisticsDb')]"
           },
           "kind": "v12.0,user,vcore,serverless",
           "properties": {
@@ -1447,9 +1443,9 @@
             "catalogCollation": "SQL_Latin1_General_CP1_CI_AS",
             "zoneRedundant": false,
             "readScale": "Disabled",
-            "autoPauseDelay": 60,
+            "autoPauseDelay": "[parameters('autoPauseDelayStatisticsDb')]",
             "storageAccountType": "GRS",
-            "minCapacity": 0.75
+            "minCapacity": "[parameters('minCapacityStatisticsDb')]"
           }
         },
         {
@@ -1639,7 +1635,7 @@
     {
       "name": "[variables('publicSqlServerName')]",
       "type": "Microsoft.Sql/servers",
-      "apiVersion": "2018-06-01-preview",
+      "apiVersion": "2019-06-01-preview",
       "location": "[resourceGroup().location]",
       "properties": {
         "administratorLogin": "[parameters('sqlAdministratorLogin')]",
@@ -1648,8 +1644,8 @@
       },
       "resources": [
         {
-          "name": "public-statistics",
           "type": "databases",
+          "name": "public-statistics",
           "location": "[resourceGroup().location]",
           "tags": {
             "Department": "[parameters('departmentName')]",
@@ -1664,15 +1660,26 @@
             "DeploymentRepo": "[parameters('deploymentRepo')]",
             "DeploymentScript": "[parameters('deploymentScript')]"
           },
-          "apiVersion": "2015-01-01",
+          "apiVersion": "2020-08-01-preview",
           "dependsOn": [
             "[variables('publicSqlServerName')]"
           ],
+          "sku": {
+            "name": "GP_S_Gen5",
+            "tier": "GeneralPurpose",
+            "family": "Gen5",
+            "capacity": "[parameters('maxCapacityStatisticsDb')]"
+          },
+          "kind": "v12.0,user,vcore,serverless",
           "properties": {
-            "edition": "Standard",
             "collation": "SQL_Latin1_General_CP1_CI_AS",
-            "maxSizeBytes": "268435456000",
-            "requestedServiceObjectiveName": "S3"
+            "maxSizeBytes": 268435456000,
+            "catalogCollation": "SQL_Latin1_General_CP1_CI_AS",
+            "zoneRedundant": false,
+            "readScale": "Disabled",
+            "autoPauseDelay": "[parameters('autoPauseDelayStatisticsDb')]",
+            "storageAccountType": "GRS",
+            "minCapacity": "[parameters('minCapacityStatisticsDb')]"
           }
         },
         {
