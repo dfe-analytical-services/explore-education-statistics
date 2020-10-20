@@ -1,11 +1,13 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.IO;
 using System.Threading.Tasks;
 using GovUk.Education.ExploreEducationStatistics.Common.Model;
 using GovUk.Education.ExploreEducationStatistics.Common.Services.Interfaces;
 using GovUk.Education.ExploreEducationStatistics.Content.Api.Services;
 using GovUk.Education.ExploreEducationStatistics.Data.Services.Interfaces;
 using GovUk.Education.ExploreEducationStatistics.Data.Services.ViewModels;
+using Microsoft.AspNetCore.Mvc;
 using Moq;
 using Xunit;
 using static GovUk.Education.ExploreEducationStatistics.Common.BlobContainerNames;
@@ -70,6 +72,30 @@ namespace GovUk.Education.ExploreEducationStatistics.Content.Api.Tests.Services
             Assert.Equal(releaseId, result.Right.Id);
             Assert.Equal("Release Meta Guidance", result.Right.Content);
             Assert.Equal(SubjectMetaGuidance, result.Right.Subjects);
+        }
+
+        [Fact]
+        public async Task Get_FileNotFoundExceptionForReleasePath()
+        {
+            const string releasePath = "incorrect/release-path";
+
+            var blobStorageService = new Mock<IBlobStorageService>(MockBehavior.Strict);
+            var metaGuidanceSubjectService = new Mock<IMetaGuidanceSubjectService>(MockBehavior.Strict);
+
+            var service = SetupMetaGuidanceService(blobStorageService: blobStorageService.Object,
+                metaGuidanceSubjectService: metaGuidanceSubjectService.Object);
+
+            blobStorageService.Setup(
+                    mock => mock.DownloadBlobText(PublicContentContainerName, releasePath))
+                .ThrowsAsync(new FileNotFoundException());
+
+            var result = await service.Get(releasePath);
+
+            blobStorageService.Verify(
+                mock => mock.DownloadBlobText(PublicContentContainerName, releasePath), Times.Once);
+
+            Assert.True(result.IsLeft);
+            Assert.IsType<NotFoundResult>(result.Left);
         }
 
         private static MetaGuidanceService SetupMetaGuidanceService(
