@@ -1,4 +1,4 @@
-﻿using System;
+﻿using System.IO;
 using System.Threading.Tasks;
 using GovUk.Education.ExploreEducationStatistics.Common.Model;
 using GovUk.Education.ExploreEducationStatistics.Common.Services.Interfaces;
@@ -26,10 +26,18 @@ namespace GovUk.Education.ExploreEducationStatistics.Content.Api.Services
 
         public async Task<Either<ActionResult, MetaGuidanceViewModel>> Get(string releasePath)
         {
-            var text = await _blobStorageService.DownloadBlobText(
-                PublicContentContainerName,
-                releasePath
-            );
+            string text;
+            try
+            {
+                text = await _blobStorageService.DownloadBlobText(
+                    PublicContentContainerName,
+                    releasePath
+                );
+            }
+            catch (FileNotFoundException)
+            {
+                return new NotFoundResult();
+            }
 
             if (string.IsNullOrWhiteSpace(text))
             {
