@@ -480,7 +480,7 @@
     },
     "minCapacityStatisticsDb": {
       "type": "int",
-      "defaultValue": 1.5
+      "defaultValue": 1
     },
     "maxCapacityStatisticsDb": {
       "type": "int",
