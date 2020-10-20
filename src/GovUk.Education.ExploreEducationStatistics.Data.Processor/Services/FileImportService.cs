@@ -48,11 +48,11 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Processor.Services
                 await using var metaFileStream = await _fileStorageService.StreamBlob(subjectData.MetaBlob);
                 var metaFileTable = DataTableUtils.CreateFromStream(metaFileStream);
 
-                context.Database.CreateExecutionStrategy().Execute(() =>
+                await context.Database.CreateExecutionStrategy().Execute(async () =>
                 {
-                    using var transaction = context.Database.BeginTransaction();
+                    await using var transaction = await context.Database.BeginTransactionAsync();
 
-                    _importerService.ImportObservations(
+                    await _importerService.ImportObservations(
                         dataFileTable.Columns,
                         dataFileTable.Rows,
                         releaseSubject.Subject,
@@ -62,7 +62,8 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Processor.Services
                         context
                     );
 
-                    transaction.Commit();
+                    await transaction.CommitAsync();
+                    await context.Database.CloseConnectionAsync();
                 });
 
                 await _batchService.CheckComplete(releaseId, message, context);
