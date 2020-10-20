@@ -1405,7 +1405,7 @@
     {
       "name": "[variables('sqlserverName')]",
       "type": "Microsoft.Sql/servers",
-      "apiVersion": "2018-06-01-preview",
+      "apiVersion": "2020-08-01-preview",
       "location": "[resourceGroup().location]",
       "properties": {
         "administratorLogin": "[parameters('sqlAdministratorLogin')]",
@@ -1435,10 +1435,13 @@
             "[variables('sqlserverName')]"
           ],
           "properties": {
-            "edition": "Standard",
             "collation": "SQL_Latin1_General_CP1_CI_AS",
-            "maxSizeBytes": "268435456000",
+            "maxSizeBytes": 268435456000,
+            "catalogCollation": "SQL_Latin1_General_CP1_CI_AS",
+            "zoneRedundant": false,
+            "readScale": "Disabled",
             "autoPauseDelay": "[parameters('autoPauseDelayStatisticsDb')]",
+            "storageAccountType": "GRS",
             "minCapacity": "[parameters('minCapacityStatisticsDb')]"
           },
           "kind": "v12.0,user,vcore,serverless",
