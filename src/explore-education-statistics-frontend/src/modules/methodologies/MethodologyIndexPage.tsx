@@ -8,7 +8,8 @@ import PageSearchFormWithAnalytics from '@frontend/components/PageSearchFormWith
 import MethodologyList from '@frontend/modules/methodologies/components/MethodologyList';
 import { GetServerSideProps, NextPage } from 'next';
 import React from 'react';
-import AccordionWithAnalytics from '@frontend/components/AccordionWithAnalytics';
+import { logEvent } from '@frontend/services/googleAnalyticsService';
+import Accordion from '@common/components/Accordion';
 
 interface Props {
   themes: Theme[];
@@ -46,9 +47,15 @@ const MethodologyIndexPage: NextPage<Props> = ({ themes = [] }) => {
       </div>
 
       {themes.length > 0 ? (
-        <AccordionWithAnalytics
-          publicationTitle="Methodologies"
+        <Accordion
           id="publications"
+          onToggle={accordionSection => {
+            logEvent(
+              'Accordion',
+              `${accordionSection.title} accordion opened`,
+              'Methodologies',
+            );
+          }}
         >
           {themes.map(
             ({
@@ -72,7 +79,7 @@ const MethodologyIndexPage: NextPage<Props> = ({ themes = [] }) => {
               </AccordionSection>
             ),
           )}
-        </AccordionWithAnalytics>
+        </Accordion>
       ) : (
         <div className="govuk-inset-text">No data currently published.</div>
       )}

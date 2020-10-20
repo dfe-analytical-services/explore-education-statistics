@@ -2,8 +2,6 @@ import ButtonText from '@common/components/ButtonText';
 import UrlContainer from '@common/components/UrlContainer';
 import LoadingSpinner from '@common/components/LoadingSpinner';
 import useAsyncRetry from '@common/hooks/useAsyncRetry';
-import DownloadCsvButton from '@common/modules/table-tool/components/DownloadCsvButton';
-import DownloadExcelButton from '@common/modules/table-tool/components/DownloadExcelButton';
 import TableHeadersForm from '@common/modules/table-tool/components/TableHeadersForm';
 import { FinalStepRenderProps } from '@common/modules/table-tool/components/TableToolWizard';
 import TimePeriodDataTable from '@common/modules/table-tool/components/TimePeriodDataTable';
@@ -15,6 +13,8 @@ import publicationService from '@common/services/publicationService';
 import { TableDataQuery } from '@common/services/tableBuilderService';
 import Link from '@frontend/components/Link';
 import React, { useEffect, useRef, useState } from 'react';
+import DownloadCsvButtonWithAnalytics from '@frontend/components/DownloadCsvButtonWithAnalytics';
+import DownloadExcelButtonWithAnalytics from '@frontend/components/DownloadExcelButtonWithAnalytics';
 
 interface TableToolFinalStepProps {
   publication: FinalStepRenderProps['publication'];
@@ -148,13 +148,13 @@ const TableToolFinalStep = ({
             </Link>
           </li>
           <li>
-            <DownloadCsvButton
+            <DownloadCsvButtonWithAnalytics
               fileName={`data-${publication.slug}`}
               fullTable={table}
             />
           </li>
           <li>
-            <DownloadExcelButton
+            <DownloadExcelButtonWithAnalytics
               fileName={`data-${publication.slug}`}
               tableRef={dataTableRef}
               subjectMeta={table.subjectMeta}

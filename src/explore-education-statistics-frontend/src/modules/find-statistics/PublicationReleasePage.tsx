@@ -22,7 +22,7 @@ import { logEvent } from '@frontend/services/googleAnalyticsService';
 import classNames from 'classnames';
 import { GetServerSideProps, NextPage } from 'next';
 import React from 'react';
-import AccordionWithAnalytics from '@frontend/components/AccordionWithAnalytics';
+import Accordion from '@common/components/Accordion';
 import PublicationReleaseHeadlinesSection from './components/PublicationReleaseHeadlinesSection';
 import styles from './PublicationReleasePage.module.scss';
 
@@ -329,9 +329,15 @@ const PublicationReleasePage: NextPage<Props> = ({ data }) => {
       <PublicationReleaseHeadlinesSection release={data} />
 
       {data.content.length > 0 && (
-        <AccordionWithAnalytics
-          publicationTitle={data.publication.title}
+        <Accordion
           id="content"
+          onToggle={accordionSection => {
+            logEvent(
+              'Accordion',
+              `${accordionSection.title} accordion opened`,
+              data.publication.title,
+            );
+          }}
         >
           {data.content.map(({ heading, caption, order, content }) => {
             return (
@@ -350,7 +356,7 @@ const PublicationReleasePage: NextPage<Props> = ({ data }) => {
               </AccordionSection>
             );
           })}
-        </AccordionWithAnalytics>
+        </Accordion>
       )}
 
       <PublicationReleaseHelpAndSupportSection

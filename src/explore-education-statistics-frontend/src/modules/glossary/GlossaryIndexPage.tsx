@@ -4,7 +4,8 @@ import RelatedInformation from '@common/components/RelatedInformation';
 import Link from '@frontend/components/Link';
 import Page from '@frontend/components/Page';
 import React from 'react';
-import AccordionWithAnalytics from '@frontend/components/AccordionWithAnalytics';
+import Accordion from '@common/components/Accordion';
+import { logEvent } from '@frontend/services/googleAnalyticsService';
 
 function GlossaryIndexPage() {
   return (
@@ -35,7 +36,16 @@ function GlossaryIndexPage() {
           </RelatedInformation>
         </div>
       </div>
-      <AccordionWithAnalytics publicationTitle="Glossary" id="a-z">
+      <Accordion
+        id="a-z"
+        onToggle={accordionSection => {
+          logEvent(
+            'Accordion',
+            `${accordionSection.title} accordion opened`,
+            'Glossary',
+          );
+        }}
+      >
         <AccordionSection heading="A">
           <h3 id="absence">Absence</h3>
           <p>
@@ -431,7 +441,7 @@ function GlossaryIndexPage() {
             There are currently no entries under this section
           </p>
         </AccordionSection>
-      </AccordionWithAnalytics>
+      </Accordion>
     </Page>
   );
 }

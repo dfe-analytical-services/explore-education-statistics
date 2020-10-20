@@ -7,7 +7,8 @@ import Page from '@frontend/components/Page';
 import PageSearchFormWithAnalytics from '@frontend/components/PageSearchFormWithAnalytics';
 import { GetServerSideProps, NextPage } from 'next';
 import React from 'react';
-import AccordionWithAnalytics from '@frontend/components/AccordionWithAnalytics';
+import Accordion from '@common/components/Accordion';
+import { logEvent } from '@frontend/services/googleAnalyticsService';
 import PublicationDownloadList from './components/PublicationDownloadList';
 import { Topic } from './components/TopicList';
 
@@ -57,9 +58,15 @@ const DownloadIndexPage: NextPage<Props> = ({ themes = [] }) => {
       </div>
 
       {themes.length > 0 ? (
-        <AccordionWithAnalytics
-          publicationTitle="Download index page"
+        <Accordion
           id="downloads"
+          onToggle={accordionSection => {
+            logEvent(
+              'Accordion',
+              `${accordionSection.title} accordion opened`,
+              'Download index page',
+            );
+          }}
         >
           {themes.map(
             ({
@@ -83,7 +90,7 @@ const DownloadIndexPage: NextPage<Props> = ({ themes = [] }) => {
               </AccordionSection>
             ),
           )}
-        </AccordionWithAnalytics>
+        </Accordion>
       ) : (
         <div className="govuk-inset-text">No data currently published.</div>
       )}

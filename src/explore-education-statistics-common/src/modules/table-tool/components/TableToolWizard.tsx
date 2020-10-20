@@ -32,7 +32,6 @@ import tableBuilderService, {
 import classNames from 'classnames';
 import React, { ReactElement, ReactNode, useMemo } from 'react';
 import { useImmer } from 'use-immer';
-import { logEvent } from '../../../../../explore-education-statistics-frontend/src/services/googleAnalyticsService';
 
 interface Publication {
   id: string;
@@ -74,6 +73,7 @@ export interface TableToolWizardProps {
   finalStep?: (props: FinalStepRenderProps) => ReactElement;
   renderHighlights?: (highlights: TableHighlight[]) => ReactNode;
   scrollOnMount?: boolean;
+  onSubmit?: (table: FullTable) => void;
 }
 
 const TableToolWizard = ({
@@ -82,6 +82,7 @@ const TableToolWizard = ({
   scrollOnMount,
   renderHighlights,
   finalStep,
+  onSubmit,
 }: TableToolWizardProps) => {
   const [state, updateState] = useImmer<TableToolState>({
     initialStep: 1,
@@ -247,12 +248,9 @@ const TableToolWizard = ({
 
     const table = mapFullTable(tableData);
     const tableHeaders = getDefaultTableHeaderConfig(table.subjectMeta);
-    logEvent(
-      'Table tool',
-      'Publication and subject chosen',
-      `${table.subjectMeta.publicationName}/${table.subjectMeta.subjectName}`,
-    );
-    logEvent('Table tool', 'Table created', window.location.pathname);
+    if (onSubmit) {
+      onSubmit(table);
+    }
 
     updateState(draft => {
       draft.query = query;

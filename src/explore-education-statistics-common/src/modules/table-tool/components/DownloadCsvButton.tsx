@@ -10,7 +10,6 @@ import cartesian from '@common/utils/cartesian';
 import camelCase from 'lodash/camelCase';
 import React from 'react';
 import { utils, writeFile } from 'xlsx';
-import { logEvent } from '../../../../../explore-education-statistics-frontend/src/services/googleAnalyticsService';
 
 export const getCsvData = (fullTable: FullTable): string[][] => {
   const { subjectMeta, results } = fullTable;
@@ -83,12 +82,17 @@ export const getCsvData = (fullTable: FullTable): string[][] => {
   return [columns, ...rows];
 };
 
-interface Props {
+export interface DownloadCsvButtonProps {
   fileName: string;
   fullTable: FullTable;
+  onClick?: () => void;
 }
 
-const DownloadCsvButton = ({ fileName, fullTable }: Props) => {
+const DownloadCsvButton = ({
+  fileName,
+  fullTable,
+  onClick,
+}: DownloadCsvButtonProps) => {
   return (
     <ButtonText
       onClick={() => {
@@ -99,17 +103,9 @@ const DownloadCsvButton = ({ fileName, fullTable }: Props) => {
         writeFile(workBook, `${fileName}.csv`, {
           type: 'binary',
         });
-        logEvent(
-          'CSV download',
-          'CSV download button clicked',
-          `${fullTable.subjectMeta.publicationName} between ${
-            fullTable.subjectMeta.timePeriodRange[0].label
-          } and ${
-            fullTable.subjectMeta.timePeriodRange[
-              fullTable.subjectMeta.timePeriodRange.length - 1
-            ].label
-          }`,
-        );
+        if (onClick) {
+          onClick();
+        }
       }}
     >
       Download the underlying data of this table (CSV)

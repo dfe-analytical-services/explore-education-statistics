@@ -12,7 +12,8 @@ import PrintThisPage from '@frontend/components/PrintThisPage';
 import MethodologyContentSection from '@frontend/modules/methodologies/components/MethodologyContentSection';
 import { GetServerSideProps, NextPage } from 'next';
 import React from 'react';
-import AccordionWithAnalytics from '@frontend/components/AccordionWithAnalytics';
+import { logEvent } from '@frontend/services/googleAnalyticsService';
+import Accordion from '@common/components/Accordion';
 
 interface Props {
   methodologySlug: string;
@@ -88,7 +89,16 @@ const MethodologyPage: NextPage<Props> = ({ data }) => {
       )}
 
       {data.content && (
-        <AccordionWithAnalytics publicationTitle={data.title} id="content">
+        <Accordion
+          id="content"
+          onToggle={accordionSection => {
+            logEvent(
+              'Accordion',
+              `${accordionSection.title} accordion opened`,
+              data.title,
+            );
+          }}
+        >
           {data.content.map(({ heading, caption, order, content }) => {
             return (
               <AccordionSection
@@ -107,16 +117,22 @@ const MethodologyPage: NextPage<Props> = ({ data }) => {
               </AccordionSection>
             );
           })}
-        </AccordionWithAnalytics>
+        </Accordion>
       )}
 
       {data.annexes && data.annexes.length > 0 && (
         <>
           <h2 className="govuk-heading-l govuk-!-margin-top-9">Annexes</h2>
 
-          <AccordionWithAnalytics
-            publicationTitle={`${data.title} annexes`}
+          <Accordion
             id="annexes"
+            onToggle={accordionSection => {
+              logEvent(
+                'Accordion',
+                `${accordionSection.title} accordion opened`,
+                `${data.title} annexes`,
+              );
+            }}
           >
             {data.annexes.map(({ heading, caption, order, content }) => {
               return (
@@ -129,7 +145,7 @@ const MethodologyPage: NextPage<Props> = ({ data }) => {
                 </AccordionSection>
               );
             })}
-          </AccordionWithAnalytics>
+          </Accordion>
         </>
       )}
 
