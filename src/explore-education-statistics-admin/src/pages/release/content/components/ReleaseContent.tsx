@@ -132,7 +132,7 @@ const ReleaseContent = () => {
             )}
           </div>
 
-          {(release.downloadFiles || release.preReleaseAccessList) &&
+          {(release.downloadFiles || release.hasPreReleaseAccessList) &&
             !isEditing && (
               <Details summary="Download associated files">
                 <ul className="govuk-list govuk-list--bullet">
@@ -155,7 +155,7 @@ const ReleaseContent = () => {
                       </li>
                     ),
                   )}
-                  {release.downloadFiles.some(file => file.type === 'Data') && (
+                  {release.hasMetaGuidance && (
                     <li>
                       <Link
                         to={{
@@ -175,7 +175,7 @@ const ReleaseContent = () => {
                       </Link>
                     </li>
                   )}
-                  {release.preReleaseAccessList && (
+                  {release.hasPreReleaseAccessList && (
                     <li>
                       <Link
                         to={{

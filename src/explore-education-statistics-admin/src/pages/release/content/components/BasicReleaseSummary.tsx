@@ -1,9 +1,8 @@
 import { getReleaseStatusLabel } from '@admin/pages/release/utils/releaseSummaryUtil';
 import metaService from '@admin/services/metaService';
-import { EditableContentBlock } from '@admin/services/types/content';
+import { EditableRelease } from '@admin/services/releaseContentService';
 import FormattedDate from '@common/components/FormattedDate';
 import Tag from '@common/components/Tag';
-import { Release } from '@common/services/publicationService';
 import { Dictionary } from '@common/types';
 import {
   formatPartialDate,
@@ -23,7 +22,7 @@ const nationalStatisticsLogo: ReleaseTypeIcon = {
 };
 
 interface Props {
-  release: Release<EditableContentBlock>;
+  release: EditableRelease;
 }
 
 const BasicReleaseSummary = ({ release }: Props) => {
