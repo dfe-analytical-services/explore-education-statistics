@@ -17,7 +17,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Common.Extensions
         
         public static string CamelCase(this string input)
         {
-            if (string.IsNullOrEmpty(input))
+            if (input.IsNullOrEmpty())
             {
                 return input;
             }
@@ -26,9 +26,14 @@ namespace GovUk.Education.ExploreEducationStatistics.Common.Extensions
             return char.ToLowerInvariant(s[0]) + s.Substring(1);
         }
 
+        public static bool IsNullOrEmpty(this string value)
+        {
+            return string.IsNullOrEmpty(value);
+        }
+
         public static string PascalCase(this string input)
         {
-            if (string.IsNullOrEmpty(input))
+            if (input.IsNullOrEmpty())
             {
                 return input;
             }
@@ -43,7 +48,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Common.Extensions
 
         public static string SnakeCase(this string input)
         {
-            if (string.IsNullOrEmpty(input))
+            if (input.IsNullOrEmpty())
             {
                 return input;
             }
@@ -55,7 +60,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Common.Extensions
 
         public static string ScreamingSnakeCase(this string input)
         {
-            if (string.IsNullOrEmpty(input))
+            if (input.IsNullOrEmpty())
             {
                 return input;
             }

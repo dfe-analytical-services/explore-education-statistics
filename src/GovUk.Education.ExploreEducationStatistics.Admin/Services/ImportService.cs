@@ -47,7 +47,11 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Services
             _guidGenerator = guidGenerator;
         }
 
-        public async Task Import(Guid releaseId, string dataFileName, string metaFileName, IFormFile dataFile, bool isZip)
+        public async Task Import(Guid releaseId,
+            string dataFileName,
+            string metaFileName,
+            IFormFile dataFile,
+            bool isZip)
         {
             var storageAccount = CloudStorageAccount.Parse(_storageConnectionString);
             var client = storageAccount.CreateCloudQueueClient();
@@ -106,7 +110,10 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Services
                     JsonConvert.SerializeObject(message), IStatus.QUEUED));
         }
 
-        private ImportMessage BuildMessage(string dataFileName, string metaFileName, Guid releaseId, string zipFileName)
+        private ImportMessage BuildMessage(string dataFileName,
+            string metaFileName,
+            Guid releaseId,
+            string zipFileName)
         {
             var release = _context.Releases
                 .Where(r => r.Id.Equals(releaseId))

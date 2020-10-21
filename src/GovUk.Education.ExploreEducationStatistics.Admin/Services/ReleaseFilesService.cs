@@ -14,8 +14,8 @@ using GovUk.Education.ExploreEducationStatistics.Common.Services.Interfaces.Secu
 using GovUk.Education.ExploreEducationStatistics.Common.Utils;
 using GovUk.Education.ExploreEducationStatistics.Content.Model;
 using GovUk.Education.ExploreEducationStatistics.Content.Model.Database;
+using GovUk.Education.ExploreEducationStatistics.Data.Model.Database;
 using GovUk.Education.ExploreEducationStatistics.Data.Model.Services.Interfaces;
-using IdentityServer4.Extensions;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
@@ -154,8 +154,12 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Services
                                         await UploadFileToStorage(releaseId, metadataFile, ReleaseFileTypes.Metadata,
                                             metaDataInfo);
 
-                                        await _importService.Import(releaseId, dataFile.FileName.ToLower(),
-                                            metadataFile.FileName.ToLower(), dataFile, false);
+                                        await _importService.Import(
+                                            releaseId: releaseId,
+                                            dataFileName: dataFile.FileName.ToLower(),
+                                            metaFileName: metadataFile.FileName.ToLower(),
+                                            dataFile: dataFile,
+                                            isZip: false);
 
                                         var blob = await _blobStorageService.GetBlob(
                                             PrivateFilesContainerName,
@@ -241,11 +245,11 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Services
                                                 dataInfo);
 
                                             await _importService.Import(
-                                                releaseId,
+                                                releaseId: releaseId,
                                                 dataFileName: archiveFile.DataFileName,
                                                 metaFileName: archiveFile.MetaFileName,
-                                                zipFile,
-                                                true);
+                                                dataFile: zipFile,
+                                                isZip: true);
 
                                             var blob = await _blobStorageService.GetBlob(
                                                 PrivateFilesContainerName,
@@ -703,7 +707,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Services
 
             // If the file does exist then it could possibly be
             // partially uploaded so make sure meta data exists for it
-            if (blob.GetUserName().IsNullOrEmpty())
+            if (string.IsNullOrEmpty(blob.GetUserName()))
             {
                 return await GetFallbackDataFileInfo(releaseId, dataFileReference);
             }
