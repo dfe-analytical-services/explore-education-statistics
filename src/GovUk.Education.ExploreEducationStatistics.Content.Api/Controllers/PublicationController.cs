@@ -10,7 +10,7 @@ using static GovUk.Education.ExploreEducationStatistics.Common.Services.FileStor
 
 namespace GovUk.Education.ExploreEducationStatistics.Content.Api.Controllers
 {
-    [Route("api/content")]
+    [Route("api")]
     [Produces(MediaTypeNames.Application.Json)]
     public class PublicationController : ControllerBase
     {
@@ -21,20 +21,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Content.Api.Controllers
             _blobStorageService = blobStorageService;
         }
 
-        [HttpGet("tree")]
-        public async Task<ActionResult<IEnumerable<ThemeTree<PublicationTreeNode>>>> GetPublicationTree()
-        {
-            return await this.JsonContentResultAsync<IEnumerable<ThemeTree<PublicationTreeNode>>>(
-                () =>
-                    _blobStorageService.DownloadBlobText(
-                        PublicContentContainerName,
-                        PublicContentPublicationsTreePath()
-                    ),
-                NoContent()
-            );
-        }
-
-        [HttpGet("publication/{slug}/title")]
+        [HttpGet("publications/{slug}/title")]
         public async Task<ActionResult<PublicationTitleViewModel>> GetPublicationTitle(string slug)
         {
             return await this.JsonContentResultAsync<PublicationTitleViewModel>(
@@ -47,7 +34,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Content.Api.Controllers
             );
         }
 
-        [HttpGet("publication/{slug}/methodology")]
+        [HttpGet("publications/{slug}/methodology")]
         public async Task<ActionResult<PublicationMethodologyViewModel>> GetPublicationMethodology(string slug)
         {
             return await this.JsonContentResultAsync<PublicationMethodologyViewModel>(

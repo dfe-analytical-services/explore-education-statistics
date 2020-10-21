@@ -11,7 +11,7 @@ using static GovUk.Education.ExploreEducationStatistics.Common.Services.FileStor
 
 namespace GovUk.Education.ExploreEducationStatistics.Content.Api.Controllers
 {
-    [Route("api/content")]
+    [Route("api")]
     [Produces(MediaTypeNames.Application.Json)]
     public class ReleaseController : ControllerBase
     {
@@ -22,7 +22,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Content.Api.Controllers
             _blobStorageService = blobStorageService;
         }
 
-        [HttpGet("publication/{publicationSlug}/latest")]
+        [HttpGet("publications/{publicationSlug}/releases/latest")]
         public async Task<ActionResult<ReleaseViewModel>> GetLatestRelease(string publicationSlug)
         {
             return await GetReleaseViewModel(
@@ -31,7 +31,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Content.Api.Controllers
             );
         }
 
-        [HttpGet("publication/{publicationSlug}/{releaseSlug}")]
+        [HttpGet("publications/{publicationSlug}/releases/{releaseSlug}")]
         public async Task<ActionResult<ReleaseViewModel>> GetRelease(string publicationSlug, string releaseSlug)
         {
             return await GetReleaseViewModel(
