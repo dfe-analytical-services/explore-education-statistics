@@ -268,3 +268,10 @@ user deletes editable accordion section content block
     ${block}=  get child element  ${section}  css:[data-testid="editableSectionBlock"]:nth-of-type(${block_num})
     user clicks button  Remove block  ${block}
     user clicks button  Confirm
+
+user gets meta guidance data file content editor
+    [Arguments]   ${accordion_heading}
+    ${accordion}=  user gets accordion section content element  ${accordion_heading}
+    user waits until parent contains element  ${accordion}   xpath://*[@data-testid="Content"]//*[@role="textbox"]
+    ${editor}=  get child element  ${accordion}  xpath://*[@data-testid="Content"]//*[@role="textbox"]
+    [Return]  ${editor}

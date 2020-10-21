@@ -53,6 +53,18 @@ Upload subject
     user checks headed table body row contains  Data file size   17 Kb  ${section}
     user checks headed table body row contains  Status           Complete  ${section}  180
 
+Add meta guidance to subject
+    [Tags]  HappyPath
+    user clicks link  Metadata guidance
+    user waits until h2 is visible  Public metadata guidance document
+
+    user waits until page contains accordion section  Dates test subject
+    user opens accordion section  Dates test subject
+    ${editor}=  user gets meta guidance data file content editor  Dates test subject
+    user clicks element  ${editor}
+    user presses keys  Dates test subject test meta guidance content
+    user clicks button  Save guidance
+
 # TODO: Add footnotes
 
 Add ancillary file
