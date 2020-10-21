@@ -34,16 +34,24 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Services
             _persistenceHelper = persistenceHelper;
         }
 
-        public async Task<Either<ActionResult, List<MetaGuidanceSubjectViewModel>>> GetSubjects(Guid releaseId)
+        public async Task<Either<ActionResult, List<MetaGuidanceSubjectViewModel>>> GetSubjects(Guid releaseId,
+            List<Guid> subjectIds = null)
         {
             return await _persistenceHelper.CheckEntityExists<Release>(releaseId)
                 .OnSuccess(async release =>
                 {
-                    var releaseSubjects = await _context
+                    var releaseSubjectsQueryable = _context
                         .ReleaseSubject
                         .Include(s => s.Subject)
-                        .Where(s => s.ReleaseId == releaseId)
-                        .ToListAsync();
+                        .Where(rs => rs.ReleaseId == releaseId);
+
+                    if (subjectIds != null)
+                    {
+                        releaseSubjectsQueryable =
+                            releaseSubjectsQueryable.Where(rs => subjectIds.Contains(rs.SubjectId));
+                    }
+
+                    var releaseSubjects = await releaseSubjectsQueryable.ToListAsync();
 
                     var result = new List<MetaGuidanceSubjectViewModel>();
                     await releaseSubjects.ForEachAsync(async releaseSubject =>
@@ -62,8 +70,8 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Services
         public async Task<Either<ActionResult, bool>> Validate(Guid releaseId)
         {
             var releaseSubjects = _context
-                        .ReleaseSubject
-                        .Where(rs => rs.ReleaseId == releaseId);
+                .ReleaseSubject
+                .Where(rs => rs.ReleaseId == releaseId);
 
             return !await releaseSubjects.AnyAsync() || !await releaseSubjects.AnyAsync(
                 rs => string.IsNullOrWhiteSpace(rs.MetaGuidance));
