@@ -34,7 +34,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
         public void CreateReleaseAmendmentAsync()
         {
             var (userService, _, publishingService, repository, subjectService, tableStorageService,
-                    fileStorageService, importStatusService, footnoteService, _, dataBlockService, releaseSubjectService) = Mocks();
+                    fileStorageService, importStatusService, footnoteService, _, metaGuidanceService, dataBlockService, releaseSubjectService) = Mocks();
 
             var releaseId = Guid.NewGuid();
             var releaseType = new ReleaseType
@@ -389,13 +389,22 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
             {
                 using (var statisticsDbContext = InMemoryStatisticsDbContext("CreateReleaseAmendment"))
                 {
-                    var releaseService = new ReleaseService(contentDbContext, AdminMapper(),
-                        publishingService.Object, new PersistenceHelper<ContentDbContext>(contentDbContext),
-                        userService.Object,
-                        repository.Object,
-                        subjectService.Object, tableStorageService.Object, fileStorageService.Object,
-                        importStatusService.Object, footnoteService.Object, statisticsDbContext,
-                        dataBlockService.Object, releaseSubjectService.Object, new SequentialGuidGenerator());
+                    var releaseService = new ReleaseService(context: contentDbContext,
+                        mapper: AdminMapper(),
+                        publishingService: publishingService.Object,
+                        persistenceHelper: new PersistenceHelper<ContentDbContext>(contentDbContext),
+                        userService: userService.Object,
+                        repository: repository.Object,
+                        subjectService: subjectService.Object,
+                        coreTableStorageService: tableStorageService.Object,
+                        releaseFilesService: fileStorageService.Object,
+                        importStatusService: importStatusService.Object,
+                        footnoteService: footnoteService.Object,
+                        statisticsDbContext: statisticsDbContext,
+                        dataBlockService: dataBlockService.Object,
+                        metaGuidanceService: metaGuidanceService.Object,
+                        releaseSubjectService: releaseSubjectService.Object,
+                        guidGenerator: new SequentialGuidGenerator());
 
                     // Method under test
                     var amendmentViewModel = releaseService.CreateReleaseAmendmentAsync(releaseId).Result.Right;
@@ -625,6 +634,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
             Mock<IImportStatusService>,
             Mock<IFootnoteService>,
             Mock<StatisticsDbContext>,
+            Mock<IMetaGuidanceService>,
             Mock<IDataBlockService>,
             Mock<IReleaseSubjectService>) Mocks()
         {
@@ -649,6 +659,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
                 new Mock<IImportStatusService>(),
                 new Mock<IFootnoteService>(),
                 new Mock<StatisticsDbContext>(),
+                new Mock<IMetaGuidanceService>(),
                 new Mock<IDataBlockService>(),
                 new Mock<IReleaseSubjectService>());
         }

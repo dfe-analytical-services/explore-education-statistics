@@ -359,6 +359,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
             IFootnoteService footnoteService = null,
             StatisticsDbContext statisticsDbContext = null,
             IDataBlockService dataBlockService = null,
+            IMetaGuidanceService metaGuidanceService = null,
             IReleaseSubjectService releaseSubjectService = null)
         {
             return new ReleaseService(
@@ -375,6 +376,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
                 footnoteService ?? new Mock<IFootnoteService>().Object,
                 statisticsDbContext ?? new Mock<StatisticsDbContext>().Object,
                 dataBlockService ?? new Mock<IDataBlockService>().Object,
+                metaGuidanceService ?? new Mock<IMetaGuidanceService>().Object,
                 releaseSubjectService ?? new Mock<IReleaseSubjectService>().Object,
                 new SequentialGuidGenerator()
             );

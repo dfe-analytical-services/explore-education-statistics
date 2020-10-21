@@ -59,6 +59,16 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Services
                 .OnFailureSucceedWith(result => Task.FromResult(new List<MetaGuidanceSubjectViewModel>()));
         }
 
+        public async Task<Either<ActionResult, bool>> Validate(Guid releaseId)
+        {
+            var releaseSubjects = _context
+                        .ReleaseSubject
+                        .Where(rs => rs.ReleaseId == releaseId);
+
+            return !await releaseSubjects.AnyAsync() || !await releaseSubjects.AnyAsync(
+                rs => string.IsNullOrWhiteSpace(rs.MetaGuidance));
+        }
+
         private async Task<MetaGuidanceSubjectTimePeriodsViewModel> GetTimePeriods(Guid subjectId)
         {
             var orderedTimePeriods = _context

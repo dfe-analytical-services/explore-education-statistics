@@ -220,7 +220,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Services.Tests
         public async Task Get_NoSubjects()
         {
             var release = new Release();
-            
+
             var statisticsDbContextId = Guid.NewGuid().ToString();
 
             await using (var statisticsDbContext = InMemoryStatisticsDbContext(statisticsDbContextId))
@@ -346,6 +346,141 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Services.Tests
                 Assert.Null(version2Result.Right[1].TimePeriods.To);
                 Assert.Empty(version2Result.Right[1].GeographicLevels);
                 Assert.Empty(version2Result.Right[1].Variables);
+            }
+        }
+
+        [Fact]
+        public async Task Validate_NoRelease()
+        {
+            var statisticsDbContextId = Guid.NewGuid().ToString();
+
+            await using (var statisticsDbContext = InMemoryStatisticsDbContext(statisticsDbContextId))
+            {
+                var service = SetupMetaGuidanceSubjectService(context: statisticsDbContext);
+
+                var result = await service.Validate(Guid.NewGuid());
+
+                Assert.True(result.IsRight);
+                Assert.True(result.Right);
+            }
+        }
+
+        [Fact]
+        public async Task Validate_NoSubjects()
+        {
+            var release = new Release();
+
+            var statisticsDbContextId = Guid.NewGuid().ToString();
+
+            await using (var statisticsDbContext = InMemoryStatisticsDbContext(statisticsDbContextId))
+            {
+                await statisticsDbContext.AddAsync(release);
+                await statisticsDbContext.SaveChangesAsync();
+            }
+
+            await using (var statisticsDbContext = InMemoryStatisticsDbContext(statisticsDbContextId))
+            {
+                var service = SetupMetaGuidanceSubjectService(context: statisticsDbContext);
+
+                var result = await service.Validate(release.Id);
+
+                Assert.True(result.IsRight);
+                Assert.True(result.Right);
+            }
+        }
+
+        [Fact]
+        public async Task Validate_MetaGuidancePopulated()
+        {
+            var release = new Release();
+
+            var releaseSubject1 = new ReleaseSubject
+            {
+                MetaGuidance = "Subject 1 Meta Guidance",
+                Release = release,
+                Subject = new Subject
+                {
+                    Filename = "file1.csv",
+                    Name = "Subject 1"
+                }
+            };
+
+            var releaseSubject2 = new ReleaseSubject
+            {
+                MetaGuidance = "Subject 2 Meta Guidance",
+                Release = release,
+                Subject = new Subject
+                {
+                    Filename = "file2.csv",
+                    Name = "Subject 2",
+                }
+            };
+
+            var statisticsDbContextId = Guid.NewGuid().ToString();
+
+            await using (var statisticsDbContext = InMemoryStatisticsDbContext(statisticsDbContextId))
+            {
+                await statisticsDbContext.AddAsync(release);
+                await statisticsDbContext.AddRangeAsync(releaseSubject1, releaseSubject2);
+                await statisticsDbContext.SaveChangesAsync();
+            }
+
+            await using (var statisticsDbContext = InMemoryStatisticsDbContext(statisticsDbContextId))
+            {
+                var service = SetupMetaGuidanceSubjectService(context: statisticsDbContext);
+
+                var result = await service.Validate(release.Id);
+
+                Assert.True(result.IsRight);
+                Assert.True(result.Right);
+            }
+        }
+
+        [Fact]
+        public async Task Validate_MetaGuidanceNotPopulated()
+        {
+            var release = new Release();
+
+            var releaseSubject1 = new ReleaseSubject
+            {
+                MetaGuidance = "Subject 1 Meta Guidance",
+                Release = release,
+                Subject = new Subject
+                {
+                    Filename = "file1.csv",
+                    Name = "Subject 1"
+                }
+            };
+
+            // Meta guidance is not populated for Subject 2
+            var releaseSubject2 = new ReleaseSubject
+            {
+                MetaGuidance = null,
+                Release = release,
+                Subject = new Subject
+                {
+                    Filename = "file2.csv",
+                    Name = "Subject 2",
+                }
+            };
+
+            var statisticsDbContextId = Guid.NewGuid().ToString();
+
+            await using (var statisticsDbContext = InMemoryStatisticsDbContext(statisticsDbContextId))
+            {
+                await statisticsDbContext.AddAsync(release);
+                await statisticsDbContext.AddRangeAsync(releaseSubject1, releaseSubject2);
+                await statisticsDbContext.SaveChangesAsync();
+            }
+
+            await using (var statisticsDbContext = InMemoryStatisticsDbContext(statisticsDbContextId))
+            {
+                var service = SetupMetaGuidanceSubjectService(context: statisticsDbContext);
+
+                var result = await service.Validate(release.Id);
+
+                Assert.True(result.IsRight);
+                Assert.False(result.Right);
             }
         }
 

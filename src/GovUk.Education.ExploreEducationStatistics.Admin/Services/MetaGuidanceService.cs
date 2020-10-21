@@ -4,6 +4,7 @@ using System.Linq;
 using System.Threading.Tasks;
 using GovUk.Education.ExploreEducationStatistics.Admin.Services.Interfaces;
 using GovUk.Education.ExploreEducationStatistics.Admin.Services.Interfaces.Security;
+using GovUk.Education.ExploreEducationStatistics.Admin.Validators;
 using GovUk.Education.ExploreEducationStatistics.Admin.ViewModels;
 using GovUk.Education.ExploreEducationStatistics.Common.Model;
 using GovUk.Education.ExploreEducationStatistics.Common.Services.Interfaces.Security;
@@ -14,6 +15,7 @@ using GovUk.Education.ExploreEducationStatistics.Data.Model.Database;
 using GovUk.Education.ExploreEducationStatistics.Data.Services.Interfaces;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
+using static GovUk.Education.ExploreEducationStatistics.Admin.Validators.ValidationUtils;
 
 namespace GovUk.Education.ExploreEducationStatistics.Admin.Services
 {
@@ -62,6 +64,28 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Services
                 .OnSuccess(BuildViewModel);
         }
 
+        public async Task<Either<ActionResult, Unit>> Validate(Guid releaseId)
+        {
+            return await _contentPersistenceHelper.CheckEntityExists<Release>(releaseId)
+                .OnSuccess(async release =>
+                {
+                    if (await DataFilesExist(releaseId))
+                    {
+                        if (string.IsNullOrWhiteSpace(release.MetaGuidance))
+                        {
+                            return ValidationActionResult(ValidationErrorMessages.MetaGuidanceMustBePopulated);
+                        }
+
+                        return await _metaGuidanceSubjectService.Validate(releaseId)
+                            .OnSuccess(valid => valid
+                                ? (Either<ActionResult, Unit>) Unit.Instance
+                                : ValidationActionResult(ValidationErrorMessages.MetaGuidanceMustBePopulated));
+                    }
+
+                    return Unit.Instance;
+                });
+        }
+
         private async Task UpdateSubjects(
             Guid releaseId,
             List<MetaGuidanceUpdateSubjectViewModel> subjects)
@@ -99,6 +123,17 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Services
                 });
 
             await _statisticsDbContext.SaveChangesAsync();
+        }
+
+        private async Task<bool> DataFilesExist(Guid releaseId)
+        {
+            return await _contentDbContext
+                .ReleaseFiles
+                .Include(rf => rf.ReleaseFileReference)
+                .Where(rf => rf.ReleaseId == releaseId
+                             && rf.ReleaseFileReference.ReleaseFileType == ReleaseFileTypes.Data
+                             && rf.ReleaseFileReference.SubjectId.HasValue)
+                .AnyAsync();
         }
 
         private async Task<Either<ActionResult, MetaGuidanceViewModel>> BuildViewModel(Release release)
