@@ -1,8 +1,6 @@
 ﻿using System;
-using System.Linq;
 using GovUk.Education.ExploreEducationStatistics.Common.Services.Interfaces;
 using GovUk.Education.ExploreEducationStatistics.Content.Api.Controllers;
-using GovUk.Education.ExploreEducationStatistics.Publisher.Model.ViewModels;
 using Microsoft.AspNetCore.Mvc;
 using Moq;
 using Xunit;
@@ -58,63 +56,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Content.Api.Tests.Controlle
               }
             }";
 
-        [Fact]
-        public void Get_PublicationTree_Returns_Ok()
-        {
-            var fileStorageService = new Mock<IBlobStorageService>();
-            fileStorageService.Setup(
-                s => s.DownloadBlobText(
-                    PublicContentContainerName,
-                    "publications/tree.json"
-                )
-            ).ReturnsAsync(
-                @"
-            [
-            {
-                ""id"": ""e6117db8-a641-46b4-9ef9-254180696298"",
-                ""title"": ""string"",
-                ""summary"": ""string"",
-                ""topics"": [
-                {
-                    ""id"": ""a89602d6-9bde-460b-ae5d-7c76b2657f1a"",
-                    ""title"": ""string"",
-                    ""summary"": ""string"",
-                    ""publications"": [
-                    {
-                        ""legacyPublicationUrl"": ""string"",
-                        ""id"": ""5f0a7d85-b8de-4fda-882c-1ea785fb1cab"",
-                        ""title"": ""string"",
-                        ""slug"": ""string"",
-                        ""summary"": ""string""
-                    }
-                    ]
-                }
-            ]
-        }
-        ]"
-            );
-
-            var controller = new PublicationController(fileStorageService.Object);
-
-            var result = controller.GetPublicationTree();
-            Assert.Single(result.Result.Value);
-            var theme = result.Result.Value.First();
-            Assert.IsAssignableFrom<ThemeTree<PublicationTreeNode>>(theme);
-            Assert.Single(theme.Topics);
-            var topic = theme.Topics.First();
-            Assert.Single(topic.Publications);
-        }
-
-        [Fact]
-        public void Get_PublicationTree_Returns_NoContent()
-        {
-            var fileStorageService = new Mock<IBlobStorageService>();
-            var controller = new PublicationController(fileStorageService.Object);
-            var result = controller.GetPublicationTree();
-            Assert.IsAssignableFrom<NoContentResult>(result.Result.Result);
-        }
-
-        [Fact]
+       [Fact]
         public void Get_PublicationTitle_Returns_Ok()
         {
             var fileStorageService = new Mock<IBlobStorageService>();

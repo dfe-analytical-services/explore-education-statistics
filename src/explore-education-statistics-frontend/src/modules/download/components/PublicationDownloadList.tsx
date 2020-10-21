@@ -1,21 +1,9 @@
+import { PublicationDownloadSummary } from '@common/services/themeService';
 import Link from '@frontend/components/Link';
 import React from 'react';
 
-export interface Publication {
-  id: string;
-  slug: string;
-  summary: string;
-  title: string;
-  downloadFiles: {
-    extension: string;
-    name: string;
-    path: string;
-    size: string;
-  }[];
-}
-
 interface Props {
-  publications: Publication[];
+  publications: PublicationDownloadSummary[];
 }
 
 function getPublicationDate(path: string) {

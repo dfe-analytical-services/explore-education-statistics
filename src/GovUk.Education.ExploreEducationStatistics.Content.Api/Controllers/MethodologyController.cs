@@ -10,7 +10,7 @@ using static GovUk.Education.ExploreEducationStatistics.Common.Services.FileStor
 
 namespace GovUk.Education.ExploreEducationStatistics.Content.Api.Controllers
 {
-    [Route("api/[controller]")]
+    [Route("api")]
     [Produces(MediaTypeNames.Application.Json)]
     public class MethodologyController : ControllerBase
     {
@@ -21,20 +21,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Content.Api.Controllers
             _blobStorageService = blobStorageService;
         }
 
-        [HttpGet("tree")]
-        public async Task<ActionResult<IEnumerable<ThemeTree<MethodologyTreeNode>>>> GetMethodologyTree()
-        {
-            return await this.JsonContentResultAsync<IEnumerable<ThemeTree<MethodologyTreeNode>>>(
-                () =>
-                    _blobStorageService.DownloadBlobText(
-                        PublicContentContainerName,
-                        PublicContentMethodologyTreePath()
-                    ),
-                NoContent()
-            );
-        }
-
-        [HttpGet("{slug}")]
+        [HttpGet("methodologies/{slug}")]
         public async Task<ActionResult<MethodologyViewModel>> Get(string slug)
         {
             return await this.JsonContentResultAsync<MethodologyViewModel>(

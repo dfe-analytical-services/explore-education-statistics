@@ -1,16 +1,9 @@
+import { PublicationSummary } from '@common/services/themeService';
 import Link from '@frontend/components/Link';
 import React from 'react';
 
-export interface Publication {
-  id: string;
-  legacyPublicationUrl: string | null;
-  slug: string;
-  summary: string;
-  title: string;
-}
-
 interface Props {
-  publications: Publication[];
+  publications: PublicationSummary[];
 }
 
 function PublicationList({ publications }: Props) {

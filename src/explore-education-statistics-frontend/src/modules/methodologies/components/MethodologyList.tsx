@@ -1,9 +1,9 @@
-import React from 'react';
-import { Publication } from '@common/services/publicationService';
+import { PublicationMethodologySummary } from '@common/services/themeService';
 import Link from '@frontend/components/Link';
+import React from 'react';
 
 interface Props {
-  publications: Publication[];
+  publications: PublicationMethodologySummary[];
 }
 
 function MethodologyList({ publications }: Props) {

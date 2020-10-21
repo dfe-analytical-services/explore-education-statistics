@@ -7,7 +7,7 @@ using static GovUk.Education.ExploreEducationStatistics.Common.Services.FileStor
 
 namespace GovUk.Education.ExploreEducationStatistics.Content.Api.Controllers
 {
-    [Route("api/content")]
+    [Route("api")]
     public class MetaGuidanceController
     {
         private readonly IMetaGuidanceService _metaGuidanceService;
@@ -17,7 +17,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Content.Api.Controllers
             _metaGuidanceService = metaGuidanceService;
         }
 
-        [HttpGet("publication/{publicationSlug}/release/{releaseSlug}/meta-guidance")]
+        [HttpGet("publications/{publicationSlug}/release/{releaseSlug}/meta-guidance")]
         public async Task<ActionResult<MetaGuidanceViewModel>> Get(string publicationSlug,
             string releaseSlug)
         {
