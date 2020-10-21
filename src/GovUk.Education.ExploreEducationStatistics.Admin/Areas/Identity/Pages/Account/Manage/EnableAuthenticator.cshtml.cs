@@ -1,12 +1,10 @@
-using System;
-using System.ComponentModel;
 using System.ComponentModel.DataAnnotations;
-using System.Collections.Generic;
 using System.Text;
 using System.Text.Encodings.Web;
 using System.Linq;
 using System.Threading.Tasks;
 using GovUk.Education.ExploreEducationStatistics.Admin.Models;
+using GovUk.Education.ExploreEducationStatistics.Common.Extensions;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.RazorPages;
@@ -116,7 +114,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Areas.Identity.Pages.
         {
             // Load the authenticator key & QR code URI to display on the form
             var unformattedKey = await _userManager.GetAuthenticatorKeyAsync(user);
-            if (string.IsNullOrEmpty(unformattedKey))
+            if (unformattedKey.IsNullOrEmpty())
             {
                 await _userManager.ResetAuthenticatorKeyAsync(user);
                 unformattedKey = await _userManager.GetAuthenticatorKeyAsync(user);

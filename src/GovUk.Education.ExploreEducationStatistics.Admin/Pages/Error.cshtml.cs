@@ -1,4 +1,5 @@
 using System.Diagnostics;
+using GovUk.Education.ExploreEducationStatistics.Common.Extensions;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.RazorPages;
 using Microsoft.Extensions.Logging;
@@ -17,7 +18,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Pages
 
         public string RequestId { get; set; }
 
-        public bool ShowRequestId => !string.IsNullOrEmpty(RequestId);
+        public bool ShowRequestId => !RequestId.IsNullOrEmpty();
 
         public void OnGet()
         {

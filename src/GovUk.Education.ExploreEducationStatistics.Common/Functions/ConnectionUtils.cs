@@ -1,5 +1,6 @@
 using System;
 using System.Collections.Generic;
+using GovUk.Education.ExploreEducationStatistics.Common.Extensions;
 
 namespace GovUk.Education.ExploreEducationStatistics.Common.Functions
 {
@@ -31,7 +32,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Common.Functions
             var connectionString =
                 Environment.GetEnvironmentVariable($"ConnectionStrings:{name}", EnvironmentVariableTarget.Process);
 
-            if (string.IsNullOrEmpty(connectionString))
+            if (connectionString.IsNullOrEmpty())
             {
                 // Get the connection string from the Azure Functions App using the naming convention for type SQLAzure.
                 connectionString = Environment.GetEnvironmentVariable($"{connectionTypeValue}_{name}", EnvironmentVariableTarget.Process);

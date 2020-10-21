@@ -5,6 +5,7 @@ using System.Threading.Tasks;
 using GovUk.Education.ExploreEducationStatistics.Admin.Services.Interfaces;
 using GovUk.Education.ExploreEducationStatistics.Admin.Services.Interfaces.Security;
 using GovUk.Education.ExploreEducationStatistics.Admin.ViewModels;
+using GovUk.Education.ExploreEducationStatistics.Common.Extensions;
 using GovUk.Education.ExploreEducationStatistics.Common.Model;
 using GovUk.Education.ExploreEducationStatistics.Common.Services.Interfaces.Security;
 using GovUk.Education.ExploreEducationStatistics.Common.Utils;
@@ -89,7 +90,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Services
                 {
                     var content = contentById.GetValueOrDefault(releaseSubject.SubjectId);
 
-                    if (string.IsNullOrEmpty(content))
+                    if (content.IsNullOrEmpty())
                     {
                         return;
                     }

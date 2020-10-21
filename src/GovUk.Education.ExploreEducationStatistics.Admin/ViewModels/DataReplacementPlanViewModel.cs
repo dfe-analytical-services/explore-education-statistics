@@ -3,6 +3,7 @@ using System;
 using System.Collections.Generic;
 using System.Linq;
 using GovUk.Education.ExploreEducationStatistics.Common.Converters;
+using GovUk.Education.ExploreEducationStatistics.Common.Extensions;
 using GovUk.Education.ExploreEducationStatistics.Common.Model;
 using GovUk.Education.ExploreEducationStatistics.Common.Services;
 using Newtonsoft.Json;
@@ -252,7 +253,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.ViewModels
         public string Label { get; }
         public string Target { get; }
 
-        public bool Valid => !string.IsNullOrEmpty(Target);
+        public bool Valid => !Target.IsNullOrEmpty();
 
         public ObservationalUnitReplacementViewModel(string code, string label, string target)
         {

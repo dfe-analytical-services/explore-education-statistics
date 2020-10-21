@@ -1,3 +1,4 @@
+using GovUk.Education.ExploreEducationStatistics.Common.Extensions;
 using Newtonsoft.Json;
 
 namespace GovUk.Education.ExploreEducationStatistics.Data.Model
@@ -26,7 +27,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Model
 
         public string GetCodeOrOldCodeIfEmpty()
         {
-            return string.IsNullOrEmpty(Code) ? OldCode : Code;
+            return Code.IsNullOrEmpty() ? OldCode : Code;
         }
 
         protected bool Equals(LocalAuthority other)

@@ -78,6 +78,29 @@ namespace GovUk.Education.ExploreEducationStatistics.Common.Tests.Extensions
             }
         }
 
+        public class IsNullOrEmptyTests
+        {
+            [Fact]
+            public void IsNullOrEmptyIsTrueForNullString()
+            {
+                const string input = null;
+                Assert.True(input.IsNullOrEmpty());
+            }
+            
+            
+            [Fact]
+            public void IsNullOrEmptyIsTrueForEmptyString()
+            {
+                Assert.True("".IsNullOrEmpty());
+            }
+            
+            [Fact]
+            public void IsNullOrEmptyIsFalseForNonEmptyString()
+            {
+                Assert.False("foo".IsNullOrEmpty());
+            }
+        }
+        
         public class PascalCaseTests
         {
             [Fact]

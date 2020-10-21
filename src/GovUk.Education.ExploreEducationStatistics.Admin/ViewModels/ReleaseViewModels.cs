@@ -137,7 +137,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.ViewModels
         {
             get
             {
-                if (string.IsNullOrEmpty(PublishScheduled))
+                if (PublishScheduled.IsNullOrEmpty())
                 {
                     return null;
                 }
