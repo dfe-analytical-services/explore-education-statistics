@@ -13,8 +13,9 @@ import publicationService from '@common/services/publicationService';
 import { TableDataQuery } from '@common/services/tableBuilderService';
 import Link from '@frontend/components/Link';
 import React, { useEffect, useRef, useState } from 'react';
-import DownloadCsvButtonWithAnalytics from '@frontend/components/DownloadCsvButtonWithAnalytics';
-import DownloadExcelButtonWithAnalytics from '@frontend/components/DownloadExcelButtonWithAnalytics';
+import DownloadCsvButton from '@common/modules/table-tool/components/DownloadCsvButton';
+import { logEvent } from '@frontend/services/googleAnalyticsService';
+import DownloadExcelButton from '@common/modules/table-tool/components/DownloadExcelButton';
 
 interface TableToolFinalStepProps {
   publication: FinalStepRenderProps['publication'];
@@ -148,16 +149,42 @@ const TableToolFinalStep = ({
             </Link>
           </li>
           <li>
-            <DownloadCsvButtonWithAnalytics
+            <DownloadCsvButton
               fileName={`data-${publication.slug}`}
               fullTable={table}
+              onClick={() =>
+                logEvent(
+                  'Table tool',
+                  'CSV download button clicked',
+                  `${table.subjectMeta.publicationName} between ${
+                    table.subjectMeta.timePeriodRange[0].label
+                  } and ${
+                    table.subjectMeta.timePeriodRange[
+                      table.subjectMeta.timePeriodRange.length - 1
+                    ].label
+                  }`,
+                )
+              }
             />
           </li>
           <li>
-            <DownloadExcelButtonWithAnalytics
+            <DownloadExcelButton
               fileName={`data-${publication.slug}`}
               tableRef={dataTableRef}
               subjectMeta={table.subjectMeta}
+              onClick={() =>
+                logEvent(
+                  'Table tool',
+                  'Excel download button clicked',
+                  `${table.subjectMeta.publicationName} between ${
+                    table.subjectMeta.timePeriodRange[0].label
+                  } and ${
+                    table.subjectMeta.timePeriodRange[
+                      table.subjectMeta.timePeriodRange.length - 1
+                    ].label
+                  }`,
+                )
+              }
             />
           </li>
           <li>

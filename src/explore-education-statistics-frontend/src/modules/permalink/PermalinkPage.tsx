@@ -11,6 +11,7 @@ import Page from '@frontend/components/Page';
 import PrintThisPage from '@frontend/components/PrintThisPage';
 import { GetServerSideProps, NextPage } from 'next';
 import React, { useRef } from 'react';
+import { logEvent } from '@frontend/services/googleAnalyticsService';
 import styles from './PermalinkPage.module.scss';
 
 interface Props {
@@ -76,6 +77,19 @@ const PermalinkPage: NextPage<Props> = ({ data }) => {
             <DownloadCsvButton
               fileName={`permalink-${data.id}`}
               fullTable={fullTable}
+              onClick={() =>
+                logEvent(
+                  'Permalink page',
+                  'CSV download button clicked',
+                  `${fullTable.subjectMeta.publicationName} between ${
+                    fullTable.subjectMeta.timePeriodRange[0].label
+                  } and ${
+                    fullTable.subjectMeta.timePeriodRange[
+                      fullTable.subjectMeta.timePeriodRange.length - 1
+                    ].label
+                  }`,
+                )
+              }
             />
           </li>
           <li>
@@ -83,6 +97,19 @@ const PermalinkPage: NextPage<Props> = ({ data }) => {
               tableRef={tableRef}
               fileName={`permalink-${data.id}`}
               subjectMeta={fullTable.subjectMeta}
+              onClick={() =>
+                logEvent(
+                  'Permalink page',
+                  'Excel download button clicked',
+                  `${fullTable.subjectMeta.publicationName} between ${
+                    fullTable.subjectMeta.timePeriodRange[0].label
+                  } and ${
+                    fullTable.subjectMeta.timePeriodRange[
+                      fullTable.subjectMeta.timePeriodRange.length - 1
+                    ].label
+                  }`,
+                )
+              }
             />
           </li>
         </ul>
