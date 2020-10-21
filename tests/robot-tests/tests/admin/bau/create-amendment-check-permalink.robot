@@ -26,8 +26,8 @@ upload a subject
     user clicks link  Data and files
     user waits until page contains element  css:#dataFileUploadForm-subjectTitle
     user enters text into element  css:#dataFileUploadForm-subjectTitle   ${SUBJECT_NAME}
-    user chooses file   css:#dataFileUploadForm-dataFile       ${CURDIR}${/}files${/}dates.csv
-    user chooses file   css:#dataFileUploadForm-metadataFile   ${CURDIR}${/}files${/}dates.meta.csv
+    user chooses file   css:#dataFileUploadForm-dataFile       ${FILES_DIR}dates.csv
+    user chooses file   css:#dataFileUploadForm-metadataFile   ${FILES_DIR}dates.meta.csv
     user clicks button  Upload data files
     user waits until h2 is visible  Uploaded data files
     user waits until page contains accordion section   ${SUBJECT_NAME}
@@ -156,8 +156,8 @@ replace data files for amendment
     user opens accordion section   Dates test subject
     ${section}=  user gets accordion section content element  Dates test subject
     user clicks link  Replace data  ${section}
-    user chooses file   css:#dataFileUploadForm-dataFile       ${CURDIR}${/}files${/}upload-file-test.csv
-    user chooses file   css:#dataFileUploadForm-metadataFile   ${CURDIR}${/}files${/}upload-file-test.meta.csv
+    user chooses file   css:#dataFileUploadForm-dataFile       ${FILES_DIR}upload-file-test.csv
+    user chooses file   css:#dataFileUploadForm-metadataFile   ${FILES_DIR}upload-file-test.meta.csv
     user clicks button  Upload data files
     user checks headed table body row cell contains  Status          2  Complete   wait=180
 

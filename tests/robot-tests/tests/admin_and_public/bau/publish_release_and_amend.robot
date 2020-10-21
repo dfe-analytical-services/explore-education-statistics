@@ -37,8 +37,8 @@ Upload subject
     user clicks link  Data and files
     user waits until page contains element  id:dataFileUploadForm-subjectTitle
     user enters text into element  id:dataFileUploadForm-subjectTitle   Dates test subject
-    user chooses file   id:dataFileUploadForm-dataFile       ${CURDIR}${/}files${/}dates.csv
-    user chooses file   id:dataFileUploadForm-metadataFile   ${CURDIR}${/}files${/}dates.meta.csv
+    user chooses file   id:dataFileUploadForm-dataFile       ${FILES_DIR}dates.csv
+    user chooses file   id:dataFileUploadForm-metadataFile   ${FILES_DIR}dates.meta.csv
     user clicks button  Upload data files
 
     user waits until h2 is visible  Uploaded data files
@@ -73,7 +73,7 @@ Add ancillary file
     user waits until h2 is visible  Add file to release
 
     user enters text into element  id:fileUploadForm-name   Test ancillary file 1
-    user chooses file   id:fileUploadForm-file      ${CURDIR}${/}files${/}test-file-1.txt
+    user chooses file   id:fileUploadForm-file      ${FILES_DIR}test-file-1.txt
     user clicks button  Upload file
 
     user waits until page contains accordion section   test ancillary file 1
@@ -137,7 +137,7 @@ Create chart for data block
     user waits until page does not contain loading spinner
     user clicks element   id:manageDataBlocks-chart-tab
     user clicks button  Choose an infographic as alternative
-    user chooses file  id:chartConfigurationForm-file       ${CURDIR}${/}files${/}test-infographic.png
+    user chooses file  id:chartConfigurationForm-file       ${FILES_DIR}test-infographic.png
     user enters text into element  id:chartConfigurationForm-title  Sample title
     user enters text into element  id:chartConfigurationForm-alt  Sample alt text
     user clicks button   Save chart options
@@ -379,8 +379,8 @@ Navigate to data replacement page
 Upload replacement data
     [Tags]  HappyPath
     user waits until h2 is visible  Upload replacement data
-    user chooses file   id:dataFileUploadForm-dataFile       ${CURDIR}${/}files${/}dates-replacement.csv
-    user chooses file   id:dataFileUploadForm-metadataFile   ${CURDIR}${/}files${/}dates-replacement.meta.csv
+    user chooses file   id:dataFileUploadForm-dataFile       ${FILES_DIR}dates-replacement.csv
+    user chooses file   id:dataFileUploadForm-metadataFile   ${FILES_DIR}dates-replacement.meta.csv
     user clicks button  Upload data files
 
     user checks table column heading contains  1  1  Original file
@@ -416,7 +416,7 @@ Add ancillary file to amendment
     user waits until h2 is visible  Add file to release
 
     user enters text into element  id:fileUploadForm-name   Test ancillary file 2
-    user chooses file   id:fileUploadForm-file      ${CURDIR}${/}files${/}test-file-2.txt
+    user chooses file   id:fileUploadForm-file      ${FILES_DIR}test-file-2.txt
     user clicks button  Upload file
 
     user waits until page contains accordion section   test ancillary file 2

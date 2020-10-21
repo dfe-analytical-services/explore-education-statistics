@@ -148,7 +148,7 @@ This directory holds scripts used by `run\_tests.py` and the CI pipeline.
 This directory holds the output of a test run, including the test report and log. Screenshots are preserved across runs, but other files are overwritten.
 
 ### tests
-This holds the actual robot framework/selenium tests. The tests are themselves organised into different folders. The `libs` doesn't contain tests, but utility keywords used by the tests.
+This holds the actual robot framework/selenium tests. The tests are themselves organised into different folders. The `libs` doesn't contain tests, but utility keywords used by the tests. Similar to `libs`, `files` contains files used by the tests.
 
 ### webdriver
 This holds chromedriver, used by selenium to interact with the browser.
