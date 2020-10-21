@@ -1,12 +1,10 @@
 using System;
 using System.Net.Mime;
 using System.Threading.Tasks;
-using GovUk.Education.ExploreEducationStatistics.Common.Services.Interfaces;
 using GovUk.Education.ExploreEducationStatistics.Content.Api.Models;
+using GovUk.Education.ExploreEducationStatistics.Content.Api.Services.Interfaces;
 using GovUk.Education.ExploreEducationStatistics.Publisher.Model.ViewModels;
 using Microsoft.AspNetCore.Mvc;
-using Newtonsoft.Json;
-using static GovUk.Education.ExploreEducationStatistics.Common.BlobContainerNames;
 using static GovUk.Education.ExploreEducationStatistics.Common.Services.FileStoragePathUtils;
 
 namespace GovUk.Education.ExploreEducationStatistics.Content.Api.Controllers
@@ -15,11 +13,11 @@ namespace GovUk.Education.ExploreEducationStatistics.Content.Api.Controllers
     [Produces(MediaTypeNames.Application.Json)]
     public class ReleaseController : ControllerBase
     {
-        private readonly IBlobStorageService _blobStorageService;
+        private readonly IFileStorageService _fileStorageService;
 
-        public ReleaseController(IBlobStorageService blobStorageService)
+        public ReleaseController(IFileStorageService fileStorageService)
         {
-            _blobStorageService = blobStorageService;
+            _fileStorageService = fileStorageService;
         }
 
         [HttpGet("publications/{publicationSlug}/releases/latest")]
@@ -44,49 +42,8 @@ namespace GovUk.Education.ExploreEducationStatistics.Content.Api.Controllers
             string publicationPath,
             string releasePath)
         {
-            var publicationTask = Task.Run(
-                async () =>
-                {
-                    var text = await _blobStorageService.DownloadBlobText(
-                        PublicContentContainerName,
-                        publicationPath
-                    );
-                    if (string.IsNullOrWhiteSpace(text))
-                    {
-                        throw new ArgumentException();
-                    }
-
-                    return JsonConvert.DeserializeObject<CachedPublicationViewModel>(
-                        text,
-                        new JsonSerializerSettings
-                        {
-                            TypeNameHandling = TypeNameHandling.Auto
-                        }
-                    );
-                }
-            );
-
-            var releaseTask = Task.Run(
-                async () =>
-                {
-                    var text = await _blobStorageService.DownloadBlobText(
-                        PublicContentContainerName,
-                        releasePath
-                    );
-                    if (string.IsNullOrWhiteSpace(text))
-                    {
-                        throw new ArgumentException();
-                    }
-
-                    return JsonConvert.DeserializeObject<CachedReleaseViewModel>(
-                        text,
-                        new JsonSerializerSettings
-                        {
-                            TypeNameHandling = TypeNameHandling.Auto
-                        }
-                    );
-                }
-            );
+            var publicationTask = _fileStorageService.GetDeserialized<CachedPublicationViewModel>(publicationPath);
+            var releaseTask = _fileStorageService.GetDeserialized<CachedReleaseViewModel>(releasePath);
 
             var continuation = Task.WhenAll(publicationTask, releaseTask);
 
@@ -98,9 +55,11 @@ namespace GovUk.Education.ExploreEducationStatistics.Content.Api.Controllers
             {
             }
 
-            if (continuation.Status == TaskStatus.RanToCompletion)
+            if (continuation.Status == TaskStatus.RanToCompletion
+                && releaseTask.Result.IsRight
+                && publicationTask.Result.IsRight)
             {
-                return new ReleaseViewModel(releaseTask.Result, publicationTask.Result);
+                return new ReleaseViewModel(releaseTask.Result.Right, publicationTask.Result.Right);
             }
 
             return NotFound();

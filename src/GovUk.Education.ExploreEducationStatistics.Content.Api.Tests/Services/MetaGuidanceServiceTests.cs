@@ -1,17 +1,15 @@
 ﻿using System;
 using System.Collections.Generic;
-using System.IO;
 using System.Threading.Tasks;
 using GovUk.Education.ExploreEducationStatistics.Common.Model;
-using GovUk.Education.ExploreEducationStatistics.Common.Services.Interfaces;
 using GovUk.Education.ExploreEducationStatistics.Content.Api.Services;
+using GovUk.Education.ExploreEducationStatistics.Content.Api.Services.Interfaces;
 using GovUk.Education.ExploreEducationStatistics.Data.Services.Interfaces;
 using GovUk.Education.ExploreEducationStatistics.Data.Services.ViewModels;
+using GovUk.Education.ExploreEducationStatistics.Publisher.Model.ViewModels;
 using Microsoft.AspNetCore.Mvc;
 using Moq;
 using Xunit;
-using static GovUk.Education.ExploreEducationStatistics.Common.BlobContainerNames;
-using static GovUk.Education.ExploreEducationStatistics.Content.Api.Tests.SampleContentJson;
 
 namespace GovUk.Education.ExploreEducationStatistics.Content.Api.Tests.Services
 {
@@ -45,15 +43,20 @@ namespace GovUk.Education.ExploreEducationStatistics.Content.Api.Tests.Services
             var releaseId = Guid.Parse("2ca4bbbc-e52d-4cb7-8dd2-541623973d68");
             const string releasePath = "publication/2016-17";
 
-            var blobStorageService = new Mock<IBlobStorageService>(MockBehavior.Strict);
+            var fileStorageService = new Mock<IFileStorageService>(MockBehavior.Strict);
             var metaGuidanceSubjectService = new Mock<IMetaGuidanceSubjectService>(MockBehavior.Strict);
 
-            var service = SetupMetaGuidanceService(blobStorageService: blobStorageService.Object,
+            var service = SetupMetaGuidanceService(
+                fileStorageService: fileStorageService.Object,
                 metaGuidanceSubjectService: metaGuidanceSubjectService.Object);
 
-            blobStorageService.Setup(
-                    mock => mock.DownloadBlobText(PublicContentContainerName, releasePath))
-                .ReturnsAsync(ReleaseJson);
+            fileStorageService.Setup(
+                    mock => mock.GetDeserialized<CachedReleaseViewModel>(releasePath))
+                .ReturnsAsync(new CachedReleaseViewModel
+                {
+                    Id = releaseId,
+                    MetaGuidance = "Release Meta guidance"
+                });
 
             metaGuidanceSubjectService.Setup(
                     mock => mock.GetSubjects(releaseId, null))
@@ -61,8 +64,8 @@ namespace GovUk.Education.ExploreEducationStatistics.Content.Api.Tests.Services
 
             var result = await service.Get(releasePath);
 
-            blobStorageService.Verify(
-                mock => mock.DownloadBlobText(PublicContentContainerName, releasePath), Times.Once);
+            fileStorageService.Verify(
+                mock => mock.GetDeserialized<CachedReleaseViewModel>(releasePath), Times.Once);
 
             metaGuidanceSubjectService.Verify(
                 mock => mock.GetSubjects(releaseId, null), Times.Once);
@@ -70,7 +73,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Content.Api.Tests.Services
             Assert.True(result.IsRight);
 
             Assert.Equal(releaseId, result.Right.Id);
-            Assert.Equal("Release Meta Guidance", result.Right.Content);
+            Assert.Equal("Release Meta guidance", result.Right.Content);
             Assert.Equal(SubjectMetaGuidance, result.Right.Subjects);
         }
 
@@ -79,31 +82,32 @@ namespace GovUk.Education.ExploreEducationStatistics.Content.Api.Tests.Services
         {
             const string releasePath = "incorrect/release-path";
 
-            var blobStorageService = new Mock<IBlobStorageService>(MockBehavior.Strict);
+            var fileStorageService = new Mock<IFileStorageService>(MockBehavior.Strict);
             var metaGuidanceSubjectService = new Mock<IMetaGuidanceSubjectService>(MockBehavior.Strict);
 
-            var service = SetupMetaGuidanceService(blobStorageService: blobStorageService.Object,
+            var service = SetupMetaGuidanceService(
+                fileStorageService: fileStorageService.Object,
                 metaGuidanceSubjectService: metaGuidanceSubjectService.Object);
 
-            blobStorageService.Setup(
-                    mock => mock.DownloadBlobText(PublicContentContainerName, releasePath))
-                .ThrowsAsync(new FileNotFoundException());
+            fileStorageService.Setup(
+                    mock => mock.GetDeserialized<CachedReleaseViewModel>(releasePath))
+                .ReturnsAsync(new NotFoundResult());
 
             var result = await service.Get(releasePath);
 
-            blobStorageService.Verify(
-                mock => mock.DownloadBlobText(PublicContentContainerName, releasePath), Times.Once);
+            fileStorageService.Verify(
+                mock => mock.GetDeserialized<CachedReleaseViewModel>(releasePath), Times.Once);
 
             Assert.True(result.IsLeft);
             Assert.IsType<NotFoundResult>(result.Left);
         }
 
         private static MetaGuidanceService SetupMetaGuidanceService(
-            IBlobStorageService blobStorageService = null,
+            IFileStorageService fileStorageService = null,
             IMetaGuidanceSubjectService metaGuidanceSubjectService = null)
         {
             return new MetaGuidanceService(
-                blobStorageService ?? new Mock<IBlobStorageService>().Object,
+                fileStorageService ?? new Mock<IFileStorageService>().Object,
                 metaGuidanceSubjectService ?? new Mock<IMetaGuidanceSubjectService>().Object
             );
         }
