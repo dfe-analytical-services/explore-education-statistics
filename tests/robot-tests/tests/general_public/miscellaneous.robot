@@ -61,7 +61,7 @@ Validate Cookies page
 
 Disable google analytics
     [Tags]  HappyPath   NotAgainstLocal
-    user clicks element   css:#googleAnalytics-off
+    user clicks element   id:googleAnalytics-off
     user clicks element   xpath://button[text()="Save changes"]
     user waits until page contains   Your cookie settings were saved
 
@@ -76,7 +76,7 @@ Enable google analytics
     user waits until h1 is visible   Cookies on Explore education statistics
 
     sleep  1   # NOTE(mark): Without the wait, the click doesn't select the radio despite the DOM being loaded
-    user clicks element   css:#googleAnalytics-on
+    user clicks element   id:googleAnalytics-on
     user clicks element   xpath://button[text()="Save changes"]
     user waits until page contains   Your cookie settings were saved
 

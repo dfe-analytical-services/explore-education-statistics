@@ -39,8 +39,8 @@ Go to Notify me page for Absence publication
 Sign up for email alerts
     [Tags]  HappyPath   NotAgainstPreProd
     [Documentation]   EES-716  EES-1265
-    user clicks element  css:#subscriptionForm-email
-    press keys  css:#subscriptionForm-email  mark@hiveit.co.uk
+    user clicks element  id:subscriptionForm-email
+    press keys  id:subscriptionForm-email  mark@hiveit.co.uk
     user clicks button   Subscribe
 
     # EES-1265

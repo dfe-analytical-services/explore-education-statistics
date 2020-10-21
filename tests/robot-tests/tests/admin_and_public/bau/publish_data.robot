@@ -72,10 +72,10 @@ Verify new release summary
 Upload subject to new release
     [Tags]  HappyPath
     user clicks link  Data and files
-    user waits until page contains element  css:#dataFileUploadForm-subjectTitle
-    user enters text into element  css:#dataFileUploadForm-subjectTitle   UI test subject
-    user chooses file   css:#dataFileUploadForm-dataFile       ${CURDIR}${/}files${/}upload-file-test.csv
-    user chooses file   css:#dataFileUploadForm-metadataFile   ${CURDIR}${/}files${/}upload-file-test.meta.csv
+    user waits until page contains element  id:dataFileUploadForm-subjectTitle
+    user enters text into element  id:dataFileUploadForm-subjectTitle   UI test subject
+    user chooses file   id:dataFileUploadForm-dataFile       ${CURDIR}${/}files${/}upload-file-test.csv
+    user chooses file   id:dataFileUploadForm-metadataFile   ${CURDIR}${/}files${/}upload-file-test.meta.csv
     user clicks button  Upload data files
 
     user waits until h2 is visible  Uploaded data files
@@ -99,7 +99,7 @@ Select subject "UI test subject"
     [Tags]  HappyPath
     user waits until page contains   UI test subject
     user clicks radio    UI test subject
-    user clicks element   css:#publicationSubjectForm-submit
+    user clicks element   id:publicationSubjectForm-submit
 
 Select locations
     [Tags]   HappyPath
@@ -112,14 +112,14 @@ Select locations
     user opens details dropdown   Ward
     user clicks checkbox   Nailsea Youngwood
     user clicks checkbox   Syon
-    user clicks element     css:#locationFiltersForm-submit
+    user clicks element     id:locationFiltersForm-submit
 
 Select time period
     [Tags]   HappyPath
     user waits until h2 is visible  Choose time period
     user selects from list by label  id:timePeriodForm-start  2005
     user selects from list by label  id:timePeriodForm-end  2020
-    user clicks element     css:#timePeriodForm-submit
+    user clicks element     id:timePeriodForm-submit
 
 Select indicators
     [Tags]  HappyPath
@@ -128,7 +128,7 @@ Select indicators
 
 Create table
     [Tags]  HappyPath
-    user clicks element   css:#filtersForm-submit
+    user clicks element   id:filtersForm-submit
     user waits until results table appears     180
 
 Save data block as a highlight
@@ -191,9 +191,9 @@ User goes to public Find Statistics page
 
 Verify newly published release is on Find Statistics page
     [Tags]  HappyPath
-    user waits until page contains accordion section   Test theme
-    user opens accordion section  Test theme
-    user waits until accordion section contains text   Test theme   ${TOPIC_NAME}
+    user waits until page contains accordion section   %{TEST_THEME_NAME}
+    user opens accordion section  %{TEST_THEME_NAME}
+    user waits until accordion section contains text   %{TEST_THEME_NAME}   ${TOPIC_NAME}
 
     user opens details dropdown  ${TOPIC_NAME}
     user waits until details dropdown contains publication    ${TOPIC_NAME}  ${PUBLICATION_NAME}
@@ -235,10 +235,10 @@ Go to Table Tool page
 
 Select publication in table tool
     [Tags]  HappyPath
-    user opens details dropdown    Test theme
+    user opens details dropdown    %{TEST_THEME_NAME}
     user opens details dropdown    ${TOPIC_NAME}
     user clicks radio      ${PUBLICATION_NAME}
-    user clicks element    css:#publicationForm-submit
+    user clicks element    id:publicationForm-submit
     user waits until h2 is visible   Choose a subject
     user checks previous table tool step contains  1    Publication    ${PUBLICATION_NAME}
 
@@ -246,7 +246,7 @@ Select subject "UI test subject" in table tool
     [Tags]  HappyPath
     user waits until page contains   UI test subject
     user clicks radio    UI test subject
-    user clicks element   css:#publicationSubjectForm-submit
+    user clicks element   id:publicationSubjectForm-submit
     user waits until h2 is visible  Choose locations
     user checks previous table tool step contains  2    Subject    UI test subject
 
@@ -255,7 +255,7 @@ Select locations in table tool
     user opens details dropdown   Local Authority
     user clicks checkbox   Barnsley
     user clicks checkbox   Birmingham
-    user clicks element     css:#locationFiltersForm-submit
+    user clicks element     id:locationFiltersForm-submit
     user waits until h2 is visible  Choose time period
     user checks previous table tool step contains  3   Local Authority    Barnsley
     user checks previous table tool step contains  3   Local Authority    Birmingham
@@ -264,13 +264,13 @@ Select time period in table tool
     [Tags]   HappyPath
     user selects from list by label  id:timePeriodForm-start  2014
     user selects from list by label  id:timePeriodForm-end    2018
-    user clicks element     css:#timePeriodForm-submit
+    user clicks element     id:timePeriodForm-submit
 
 Select indicators in table tool
     [Tags]  HappyPath
     user waits until h2 is visible  Choose your filters
     user clicks indicator checkbox    Admission Numbers
-    user clicks element   css:#filtersForm-submit
+    user clicks element   id:filtersForm-submit
 
 Validate table
     [Tags]  HappyPath

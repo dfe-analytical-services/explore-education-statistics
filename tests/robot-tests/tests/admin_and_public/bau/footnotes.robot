@@ -32,10 +32,10 @@ Upload subject
     user navigates to release summary from admin dashboard  ${PUBLICATION_NAME}   Academic Year 2025/26 (not Live)
 
     user clicks link  Data and files
-    user waits until page contains element  css:#dataFileUploadForm-subjectTitle
-    user enters text into element  css:#dataFileUploadForm-subjectTitle   ${SUBJECT_NAME}
-    user chooses file   css:#dataFileUploadForm-dataFile       ${CURDIR}${/}files${/}${DATA_FILE_NAME}.csv
-    user chooses file   css:#dataFileUploadForm-metadataFile   ${CURDIR}${/}files${/}${DATA_FILE_NAME}.meta.csv
+    user waits until page contains element  id:dataFileUploadForm-subjectTitle
+    user enters text into element  id:dataFileUploadForm-subjectTitle   ${SUBJECT_NAME}
+    user chooses file   id:dataFileUploadForm-dataFile       ${CURDIR}${/}files${/}${DATA_FILE_NAME}.csv
+    user chooses file   id:dataFileUploadForm-metadataFile   ${CURDIR}${/}files${/}${DATA_FILE_NAME}.meta.csv
     user clicks button  Upload data files
 
     user waits until h2 is visible  Uploaded data files
@@ -66,7 +66,7 @@ Create footnote
     user checks footnote checkbox is selected  Number of open settings
     user clicks footnote checkbox  01/04/2020
     user checks footnote checkbox is selected  01/04/2020
-    user enters text into element  css:#footnoteForm-content  ${FOOTNOTE_TEXT_1}
+    user enters text into element  id:footnoteForm-content  ${FOOTNOTE_TEXT_1}
     user clicks button  Save footnote
     user waits until h2 is visible  Footnotes
 
@@ -81,7 +81,7 @@ Create another footnote
     user checks footnote checkbox is selected  Proportion of settings open
     user clicks footnote checkbox  01/04/2021
     user checks footnote checkbox is selected  01/04/2021
-    user enters text into element  css:#footnoteForm-content  ${FOOTNOTE_TEXT_2}
+    user enters text into element  id:footnoteForm-content  ${FOOTNOTE_TEXT_2}
     user clicks button  Save footnote
 
 Confirm created footnotes
@@ -99,21 +99,21 @@ Select subject "${SUBJECT_NAME}" (data block)
     [Tags]  HappyPath
     user waits until page contains   ${SUBJECT_NAME}
     user clicks radio    ${SUBJECT_NAME}
-    user clicks element   css:#publicationSubjectForm-submit
+    user clicks element   id:publicationSubjectForm-submit
 
 Select locations (data block)
     [Tags]   HappyPath
     user waits until h2 is visible  Choose locations
     user opens details dropdown   National
     user clicks checkbox   England
-    user clicks element     css:#locationFiltersForm-submit
+    user clicks element     id:locationFiltersForm-submit
 
 Select time period
     [Tags]   HappyPath
     user waits until h2 is visible  Choose time period
     user selects from list by label  id:timePeriodForm-start    2020 Week 13
     user selects from list by label  id:timePeriodForm-end      2021 Week 24
-    user clicks element     css:#timePeriodForm-submit
+    user clicks element     id:timePeriodForm-submit
 
 Select indicators (data block)
     [Tags]  HappyPath
@@ -130,7 +130,7 @@ Select category filters (data block)
 
 Create table (data block)
     [Tags]  HappyPath
-    user clicks element   css:#filtersForm-submit
+    user clicks element   id:filtersForm-submit
     user waits until results table appears     180
 
 Check footnotes in table preview (data block)
@@ -139,8 +139,8 @@ Check footnotes in table preview (data block)
 
 Save data block
     [Tags]  HappyPath
-    user enters text into element  css:#dataBlockDetailsForm-name  ${FOOTNOTE_DATABLOCK_NAME}
-    user enters text into element  css:#dataBlockDetailsForm-heading  ${FOOTNOTE_DATABLOCK_NAME}
+    user enters text into element  id:dataBlockDetailsForm-name  ${FOOTNOTE_DATABLOCK_NAME}
+    user enters text into element  id:dataBlockDetailsForm-heading  ${FOOTNOTE_DATABLOCK_NAME}
     user clicks button  Save data block
     user waits until h2 is visible  ${FOOTNOTE_DATABLOCK_NAME}
 
@@ -171,7 +171,7 @@ Edit footnote
     user clicks link  Edit footnote
 
     user waits until h2 is visible  Edit footnote
-    user enters text into element  css:#footnoteForm-content  ${FOOTNOTE_TEXT_3}
+    user enters text into element  id:footnoteForm-content  ${FOOTNOTE_TEXT_3}
     user clicks button  Save footnote
     user waits until page contains  ${FOOTNOTE_TEXT_3}
     user checks page does not contain  ${FOOTNOTE_TEXT_2}
@@ -179,8 +179,8 @@ Edit footnote
 Check footnote was updated
     [Tags]  HappyPath
     user clicks link  Content
-    user waits until page contains element  css:#releaseHeadlines
-    user scrolls to element  css:#releaseHeadlines
+    user waits until page contains element  id:releaseHeadlines
+    user scrolls to element  id:releaseHeadlines
     user waits until page contains link  Table  180
     user clicks link  Table
     user checks page contains  ${FOOTNOTE_TEXT_3}
@@ -189,7 +189,7 @@ Check footnote was updated
 
 Check footnote in Preview content mode
     [Tags]  HappyPath
-    user clicks element   css:#pageMode-preview
+    user clicks element   id:pageMode-preview
     user checks page contains  ${FOOTNOTE_TEXT_3}
     user checks page does not contain  ${FOOTNOTE_TEXT_2}
     user checks page does not contain  ${FOOTNOTE_TEXT_1}
@@ -244,9 +244,9 @@ User goes to public Find Statistics page
 
 Verify newly published release is on Find Statistics page
     [Tags]  HappyPath
-    user waits until page contains accordion section   Test theme
-    user opens accordion section  Test theme
-    user waits until accordion section contains text   Test theme   ${TOPIC_NAME}
+    user waits until page contains accordion section   %{TEST_THEME_NAME}
+    user opens accordion section  %{TEST_THEME_NAME}
+    user waits until accordion section contains text   %{TEST_THEME_NAME}   ${TOPIC_NAME}
 
     user opens details dropdown  ${TOPIC_NAME}
     user waits until details dropdown contains publication    ${TOPIC_NAME}  ${PUBLICATION_NAME}   10
@@ -261,8 +261,8 @@ Navigate to newly published release page
 
 Check footnote on data block
     [Tags]  HappyPath
-    user waits until page contains element  css:#releaseHeadlines-tables-tab
-    user clicks element  css:#releaseHeadlines-tables-tab
+    user waits until page contains element  id:releaseHeadlines-tables-tab
+    user clicks element  id:releaseHeadlines-tables-tab
     user scrolls to element  xpath://h3[.="Footnotes"]
     user checks page contains  ${FOOTNOTE_TEXT_3}
     user checks page does not contain  ${FOOTNOTE_TEXT_2}
@@ -276,7 +276,7 @@ Navigate to table tool
 Choose publication
     [Tags]  HappyPath
     user waits until page contains   Choose a publication
-    user opens details dropdown  Test theme
+    user opens details dropdown  %{TEST_THEME_NAME}
     user opens details dropdown  ${TOPIC_NAME}
     user clicks radio  ${PUBLICATION_NAME}
     user clicks button  Next step
@@ -292,14 +292,14 @@ Select locations (table tool)
     user waits until h2 is visible  Choose locations
     user opens details dropdown   National
     user clicks checkbox   England
-    user clicks element     css:#locationFiltersForm-submit
+    user clicks element     id:locationFiltersForm-submit
 
 Select time period (table tool)
     [Tags]   HappyPath
     user waits until h2 is visible  Choose time period
     user selects from list by label  id:timePeriodForm-start    2020 Week 13
     user selects from list by label  id:timePeriodForm-end      2021 Week 24
-    user clicks element     css:#timePeriodForm-submit
+    user clicks element     id:timePeriodForm-submit
 
 Select indicators (table tool)
     [Tags]  HappyPath
@@ -316,7 +316,7 @@ Select category filters (table tool)
 
 Create table (table tool)
     [Tags]  HappyPath
-    user clicks element   css:#filtersForm-submit
+    user clicks element   id:filtersForm-submit
     user waits until results table appears     180
 
 Check footnotes in table preview (table tool)
