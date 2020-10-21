@@ -2,7 +2,7 @@ import Accordion from '@common/components/Accordion';
 import AccordionSection from '@common/components/AccordionSection';
 import Details from '@common/components/Details';
 import RelatedInformation from '@common/components/RelatedInformation';
-import methodologyService, { Theme } from '@common/services/methodologyService';
+import themeService, { MethodologyTheme } from '@common/services/themeService';
 import Link from '@frontend/components/Link';
 import Page from '@frontend/components/Page';
 import PageSearchFormWithAnalytics from '@frontend/components/PageSearchFormWithAnalytics';
@@ -11,7 +11,7 @@ import { GetServerSideProps, NextPage } from 'next';
 import React from 'react';
 
 interface Props {
-  themes: Theme[];
+  themes: MethodologyTheme[];
 }
 
 const MethodologyIndexPage: NextPage<Props> = ({ themes = [] }) => {
@@ -78,7 +78,7 @@ const MethodologyIndexPage: NextPage<Props> = ({ themes = [] }) => {
 };
 
 export const getServerSideProps: GetServerSideProps<Props> = async () => {
-  const themes = await methodologyService.getMethodologies();
+  const themes = await themeService.getMethodologyThemes();
 
   return {
     props: {

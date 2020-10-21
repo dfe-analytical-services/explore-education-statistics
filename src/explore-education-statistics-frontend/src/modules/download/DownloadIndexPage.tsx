@@ -2,23 +2,16 @@ import Accordion from '@common/components/Accordion';
 import AccordionSection from '@common/components/AccordionSection';
 import Details from '@common/components/Details';
 import RelatedInformation from '@common/components/RelatedInformation';
-import { contentApi } from '@common/services/api';
+import themeService, { DownloadTheme } from '@common/services/themeService';
 import Link from '@frontend/components/Link';
 import Page from '@frontend/components/Page';
 import PageSearchFormWithAnalytics from '@frontend/components/PageSearchFormWithAnalytics';
 import { GetServerSideProps, NextPage } from 'next';
 import React from 'react';
 import PublicationDownloadList from './components/PublicationDownloadList';
-import { Topic } from './components/TopicList';
 
 interface Props {
-  themes: {
-    id: string;
-    slug: string;
-    title: string;
-    summary: string;
-    topics: Topic[];
-  }[];
+  themes: DownloadTheme[];
 }
 
 const DownloadIndexPage: NextPage<Props> = ({ themes = [] }) => {
@@ -89,7 +82,7 @@ const DownloadIndexPage: NextPage<Props> = ({ themes = [] }) => {
 };
 
 export const getServerSideProps: GetServerSideProps<Props> = async () => {
-  const themes = await contentApi.get<Props['themes']>('/download/tree');
+  const themes = await themeService.getDownloadThemes();
 
   return {
     props: {

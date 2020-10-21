@@ -126,22 +126,22 @@ export interface Release<
 
 export default {
   getPublicationTitle(publicationSlug: string): Promise<PublicationTitle> {
-    return contentApi.get(`content/publication/${publicationSlug}/title`);
+    return contentApi.get(`/publications/${publicationSlug}/title`);
   },
   getPublicationMethodology(
     publicationSlug: string,
   ): Promise<PublicationMethodology> {
-    return contentApi.get(`content/publication/${publicationSlug}/methodology`);
+    return contentApi.get(`/publications/${publicationSlug}/methodology`);
   },
   getLatestPublicationRelease(publicationSlug: string): Promise<Release> {
-    return contentApi.get(`content/publication/${publicationSlug}/latest`);
+    return contentApi.get(`/publications/${publicationSlug}/releases/latest`);
   },
   getPublicationRelease(
     publicationSlug: string,
     releaseSlug: string,
   ): Promise<Release> {
     return contentApi.get(
-      `content/publication/${publicationSlug}/${releaseSlug}`,
+      `/publications/${publicationSlug}/releases/${releaseSlug}`,
     );
   },
 };
