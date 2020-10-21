@@ -125,26 +125,36 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Services
             await _statisticsDbContext.SaveChangesAsync();
         }
 
-        private async Task<bool> DataFilesExist(Guid releaseId)
-        {
-            return await _contentDbContext
-                .ReleaseFiles
-                .Include(rf => rf.ReleaseFileReference)
-                .Where(rf => rf.ReleaseId == releaseId
-                             && rf.ReleaseFileReference.ReleaseFileType == ReleaseFileTypes.Data
-                             && rf.ReleaseFileReference.SubjectId.HasValue)
-                .AnyAsync();
-        }
-
         private async Task<Either<ActionResult, MetaGuidanceViewModel>> BuildViewModel(Release release)
         {
-            return await _metaGuidanceSubjectService.GetSubjects(release.Id)
+            var subjectIds = await GetDataFilesQueryable(release.Id)
+                .Select(f => f.SubjectId.Value)
+                .ToListAsync();
+
+            return await _metaGuidanceSubjectService.GetSubjects(release.Id, subjectIds)
                 .OnSuccess(subjects => new MetaGuidanceViewModel
                 {
                     Id = release.Id,
                     Content = release.MetaGuidance ?? "",
                     Subjects = subjects
                 });
+        }
+
+        private async Task<bool> DataFilesExist(Guid releaseId)
+        {
+            return await GetDataFilesQueryable(releaseId).AnyAsync();
+        }
+
+        private IQueryable<ReleaseFileReference> GetDataFilesQueryable(Guid releaseId)
+        {
+            return _contentDbContext
+                .ReleaseFiles
+                .Include(rf => rf.ReleaseFileReference)
+                .Where(rf => rf.ReleaseId == releaseId
+                             && rf.ReleaseFileReference.ReleaseFileType == ReleaseFileTypes.Data
+                             && rf.ReleaseFileReference.ReplacingId == null
+                             && rf.ReleaseFileReference.SubjectId.HasValue)
+                .Select(rf => rf.ReleaseFileReference);
         }
     }
 }
