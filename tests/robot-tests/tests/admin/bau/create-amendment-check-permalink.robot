@@ -118,7 +118,7 @@ Validate results table column headings
 Generate the peramlink
     [Tags]  HappyPath
     user clicks button  Generate permanent link
-    user waits until page contains testid  xpath://*[@data-testid="permalink-generated-url"]
+    user waits until page contains testid  permalink-generated-url
     ${PERMA_LOCATION_URL}=  Get Text  xpath://*[@data-testid="permalink-generated-url"]
     Set Suite Variable  ${PERMA_LOCATION_URL}
 
