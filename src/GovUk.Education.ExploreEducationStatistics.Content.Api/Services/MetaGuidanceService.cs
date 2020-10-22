@@ -1,4 +1,5 @@
-﻿using System.Threading.Tasks;
+﻿using System;
+using System.Threading.Tasks;
 using GovUk.Education.ExploreEducationStatistics.Common.Model;
 using GovUk.Education.ExploreEducationStatistics.Content.Api.Services.Interfaces;
 using GovUk.Education.ExploreEducationStatistics.Content.Api.ViewModels;
@@ -21,21 +22,27 @@ namespace GovUk.Education.ExploreEducationStatistics.Content.Api.Services
             _metaGuidanceSubjectService = metaGuidanceSubjectService;
         }
 
-        public async Task<Either<ActionResult, MetaGuidanceViewModel>> Get(string releasePath)
+        public async Task<Either<ActionResult, MetaGuidanceViewModel>> Get(string publicationPath, string releasePath)
         {
-            return await _fileStorageService.GetDeserialized<CachedReleaseViewModel>(releasePath)
-                .OnSuccess(
-                    async release => await _metaGuidanceSubjectService.GetSubjects(release.Id)
-                        .OnSuccess(
-                            subjects =>
-                                new MetaGuidanceViewModel
-                                {
-                                    Id = release.Id,
-                                    Content = release.MetaGuidance,
-                                    Subjects = subjects
-                                }
-                        )
-                );
+            var publicationTask = _fileStorageService.GetDeserialized<CachedPublicationViewModel>(publicationPath);
+            var releaseTask = _fileStorageService.GetDeserialized<CachedReleaseViewModel>(releasePath);
+
+            await Task.WhenAll(publicationTask, releaseTask);
+
+            if (releaseTask.Result.IsRight && publicationTask.Result.IsRight)
+            {
+                return await _metaGuidanceSubjectService.GetSubjects(releaseTask.Result.Right.Id)
+                    .OnSuccess(
+                        subjects =>
+                            new MetaGuidanceViewModel(
+                                releaseTask.Result.Right,
+                                publicationTask.Result.Right,
+                                subjects
+                            )
+                    );
+            }
+
+            return new Either<ActionResult, MetaGuidanceViewModel>(new NotFoundResult());
         }
     }
 }

@@ -7,6 +7,6 @@ namespace GovUk.Education.ExploreEducationStatistics.Content.Api.Services.Interf
 {
     public interface IMetaGuidanceService
     {
-        public Task<Either<ActionResult, MetaGuidanceViewModel>> Get(string releasePath);
+        public Task<Either<ActionResult, MetaGuidanceViewModel>> Get(string publicationPath, string releasePath);
     }
 }
