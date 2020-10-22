@@ -49,7 +49,7 @@ const MethodologyIndexPage: NextPage<Props> = ({ themes = [] }) => {
       {themes.length > 0 ? (
         <Accordion
           id="publications"
-          onToggle={accordionSection => {
+          onSectionOpen={accordionSection => {
             logEvent(
               'Accordion',
               `${accordionSection.title} accordion opened`,

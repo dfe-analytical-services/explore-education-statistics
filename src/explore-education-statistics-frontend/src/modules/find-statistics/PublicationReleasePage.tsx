@@ -331,7 +331,7 @@ const PublicationReleasePage: NextPage<Props> = ({ data }) => {
       {data.content.length > 0 && (
         <Accordion
           id="content"
-          onToggle={accordionSection => {
+          onSectionOpen={accordionSection => {
             logEvent(
               'Accordion',
               `${accordionSection.title} accordion opened`,

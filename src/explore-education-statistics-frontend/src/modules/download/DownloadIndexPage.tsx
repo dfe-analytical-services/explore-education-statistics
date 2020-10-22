@@ -60,7 +60,7 @@ const DownloadIndexPage: NextPage<Props> = ({ themes = [] }) => {
       {themes.length > 0 ? (
         <Accordion
           id="downloads"
-          onToggle={accordionSection => {
+          onSectionOpen={accordionSection => {
             logEvent(
               'Accordion',
               `${accordionSection.title} accordion opened`,

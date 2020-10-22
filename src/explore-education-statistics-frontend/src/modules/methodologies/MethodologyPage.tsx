@@ -91,7 +91,7 @@ const MethodologyPage: NextPage<Props> = ({ data }) => {
       {data.content && (
         <Accordion
           id="content"
-          onToggle={accordionSection => {
+          onSectionOpen={accordionSection => {
             logEvent(
               'Accordion',
               `${accordionSection.title} accordion opened`,
@@ -126,7 +126,7 @@ const MethodologyPage: NextPage<Props> = ({ data }) => {
 
           <Accordion
             id="annexes"
-            onToggle={accordionSection => {
+            onSectionOpen={accordionSection => {
               logEvent(
                 'Accordion',
                 `${accordionSection.title} accordion opened`,

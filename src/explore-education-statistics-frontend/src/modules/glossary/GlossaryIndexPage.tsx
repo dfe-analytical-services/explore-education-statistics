@@ -38,7 +38,7 @@ function GlossaryIndexPage() {
       </div>
       <Accordion
         id="a-z"
-        onToggle={accordionSection => {
+        onSectionOpen={accordionSection => {
           logEvent(
             'Accordion',
             `${accordionSection.title} accordion opened`,

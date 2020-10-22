@@ -91,7 +91,7 @@ const AccordionComponent = ({
   return includeAnalytics ? (
     <Accordion
       id={accordionId}
-      onToggle={accordionSection => {
+      onSectionOpen={accordionSection => {
         logEvent(
           'Accordion',
           `${accordionSection.title} accordion opened`,
