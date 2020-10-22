@@ -244,5 +244,40 @@ describe('createErrorHelper', () => {
         firstName: 'First name is required',
       });
     });
+
+    test('handle single undefined, touched value in array in errors object', () => {
+      const { getAllErrors } = createErrorHelper<{
+        subjects: undefined[];
+      }>({
+        errors: {
+          subjects: [undefined],
+        } as any,
+        touched: {
+          subjects: [true],
+        } as any,
+      });
+      expect(getAllErrors()).toEqual({});
+    });
+
+    test('handle undefined in array in errors object', () => {
+      const { getAllErrors } = createErrorHelper<{
+        subjects: ({ content: string } | undefined)[];
+      }>({
+        errors: {
+          subjects: [
+            undefined,
+            { content: 'Error two' },
+            { content: 'Error three' },
+          ],
+        } as any,
+        touched: {
+          subjects: [{ content: false }, { content: true }, { content: true }],
+        } as any,
+      });
+      expect(getAllErrors()).toEqual({
+        'subjects.1.content': 'Error two',
+        'subjects.2.content': 'Error three',
+      });
+    });
   });
 });
