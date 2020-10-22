@@ -136,6 +136,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Validators
         // Release
         ReleaseNotApproved,
         MetaGuidanceMustBePopulated,
+        DataReplacementInProgress,
         ApprovedReleaseMustHavePublishScheduledDate,
         PublishedReleaseCannotBeUnapproved
     }

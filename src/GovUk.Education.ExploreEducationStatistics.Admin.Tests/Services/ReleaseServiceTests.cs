@@ -1012,6 +1012,100 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
         }
 
         [Fact]
+        public async Task UpdateRelease_Approved_FailsDataReplacementInProgress()
+        {
+            var release = new Release
+            {
+                Type = new ReleaseType
+                {
+                    Title = "Ad Hoc"
+                },
+                Publication = new Publication
+                {
+                    Title = "Old publication"
+                },
+                ReleaseName = "2030",
+                Slug = "2030",
+                PublishScheduled = DateTime.UtcNow,
+                Version = 0
+            };
+
+            var originalFile = new ReleaseFile
+            {
+                Release = release,
+                ReleaseFileReference = new ReleaseFileReference
+                {
+                    
+                    Filename = "original.csv",
+                    Release = release,
+                    ReleaseFileType = ReleaseFileTypes.Data,
+                    SubjectId = Guid.NewGuid()
+                }
+            };
+
+            var replacementFile = new ReleaseFile
+            {
+                Release = release,
+                ReleaseFileReference = new ReleaseFileReference
+                {
+                    Filename = "replacement.csv",
+                    Release = release,
+                    ReleaseFileType = ReleaseFileTypes.Data,
+                    SubjectId = Guid.NewGuid(),
+                    Replacing = originalFile.ReleaseFileReference
+                }
+            };
+
+            originalFile.ReleaseFileReference.ReplacedBy = replacementFile.ReleaseFileReference;
+
+            var contextId = Guid.NewGuid().ToString();
+
+            await using (var context = InMemoryApplicationDbContext(contextId))
+            {
+                await context.AddAsync(release);
+                await context.AddRangeAsync(originalFile, replacementFile);
+                await context.SaveChangesAsync();
+            }
+
+            var metaGuidanceService = new Mock<IMetaGuidanceService>(MockBehavior.Strict);
+            var tableStorageService = new Mock<ITableStorageService>();
+
+            await using (var context = InMemoryApplicationDbContext(contextId))
+            {
+                var cloudTableMock = TableStorageTestUtils.MockCloudTable();
+
+                cloudTableMock
+                    .Setup(table => table.ExecuteQuerySegmentedAsync(It.IsAny<TableQuery<DatafileImport>>(), null))
+                    .ReturnsAsync(TableStorageTestUtils.CreateTableQuerySegment(new List<DatafileImport>()));
+
+                tableStorageService.Setup(service => service.GetTableAsync(DatafileImportsTableName, true))
+                    .ReturnsAsync(cloudTableMock.Object);
+
+                var releaseService = BuildReleaseService(context,
+                    metaGuidanceService: metaGuidanceService.Object,
+                    tableStorageService: tableStorageService.Object);
+
+                var result = await releaseService
+                    .UpdateRelease(
+                        release.Id,
+                        new UpdateReleaseViewModel
+                        {
+                            PublicationId = release.PublicationId,
+                            PublishScheduled = "2051-06-30",
+                            TypeId = release.Type.Id,
+                            ReleaseName = "2030",
+                            TimePeriodCoverage = TimeIdentifier.CalendarYear,
+                            Status = ReleaseStatus.Approved
+                        }
+                    );
+
+                Assert.True(result.IsLeft);
+
+                AssertValidationProblem(result.Left, DataReplacementInProgress);
+            }
+        }
+
+        [Fact]
         public async Task UpdateRelease_Approved_FailsMetaGuidanceNotPopulated()
         {
             var release = new Release

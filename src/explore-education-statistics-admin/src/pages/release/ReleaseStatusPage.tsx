@@ -46,6 +46,8 @@ const errorMappings = [
         'Release has already been published and cannot be un-approved',
       META_GUIDANCE_MUST_BE_POPULATED:
         'All public metadata guidance must be populated before release can be approved',
+      DATA_REPLACEMENT_IN_PROGRESS:
+        'Pending data file replacements that are in progress must be completed or cancelled before release can be approved',
       METHODOLOGY_MUST_BE_APPROVED_OR_PUBLISHED:
         "The publication's methodology must be approved before release can be approved",
     },

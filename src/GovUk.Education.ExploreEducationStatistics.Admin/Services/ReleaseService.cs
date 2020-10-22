@@ -266,6 +266,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Services
                 .OnSuccessDo(release => _userService.CheckCanUpdateReleaseStatus(release, request.Status))
                 .OnSuccessDo(async release => await ValidateSelectedPublication(release, request.PublicationId))
                 .OnSuccessDo(async release => await ValidateReleaseSlugUniqueToPublication(request.Slug, release.PublicationId, releaseId))
+                .OnSuccessDo(async release => await CheckDataReplacementNotInProgress(release, request.Status))
                 .OnSuccessDo(async release => await CheckAllDataFilesUploaded(release, request.Status))
                 .OnSuccessDo(async release => await CheckMetaGuidancePopulated(release, request.Status))
                 .OnSuccessDo(async release => await CheckMethodologyHasBeenApproved(release, request.Status))
@@ -589,6 +590,24 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Services
                 if (results.Results.Count != 0)
                 {
                     return ValidationActionResult(AllDatafilesUploadedMustBeComplete);
+                }
+            }
+
+            return Unit.Instance;
+        }
+
+        private async Task<Either<ActionResult, Unit>> CheckDataReplacementNotInProgress(Release release, ReleaseStatus status)
+        {
+            if (status == ReleaseStatus.Approved)
+            {
+                if (await _context.ReleaseFiles
+                    .Include(rf => rf.ReleaseFileReference)
+                    .Where(rf => rf.ReleaseId == release.Id
+                                 && rf.ReleaseFileReference.ReleaseFileType == ReleaseFileTypes.Data
+                                 && rf.ReleaseFileReference.ReplacingId != null)
+                    .AnyAsync())
+                {
+                    return ValidationActionResult(DataReplacementInProgress);
                 }
             }
 
