@@ -4,8 +4,8 @@ Library  ../../libs/admin_api.py
 
 Force Tags  Admin  Local  Dev  AltersData
 
-Suite Setup       Run Keywords  user signs in as bau1
-Suite Teardown    Run Keywords  user closes the browser
+Suite Setup       user signs in as bau1
+Suite Teardown    user closes the browser
 
 *** Variables ***
 ${DETAILS_HEADING}  Academic Year 2020/21 (not Live)
@@ -24,10 +24,10 @@ upload a subject
     [Tags]  HappyPath
     user navigates to release summary from admin dashboard  ${PUBLICATION_NAME}  ${DETAILS_HEADING}
     user clicks link  Data and files
-    user waits until page contains element  css:#dataFileUploadForm-subjectTitle
-    user enters text into element  css:#dataFileUploadForm-subjectTitle   ${SUBJECT_NAME}
-    user chooses file   css:#dataFileUploadForm-dataFile       ${FILES_DIR}dates.csv
-    user chooses file   css:#dataFileUploadForm-metadataFile   ${FILES_DIR}dates.meta.csv
+    user waits until page contains element  id:dataFileUploadForm-subjectTitle
+    user enters text into element  id:dataFileUploadForm-subjectTitle   ${SUBJECT_NAME}
+    user chooses file   id:dataFileUploadForm-dataFile       ${FILES_DIR}dates.csv
+    user chooses file   id:dataFileUploadForm-metadataFile   ${FILES_DIR}dates.meta.csv
     user clicks button  Upload data files
     user waits until h2 is visible  Uploaded data files
     user waits until page contains accordion section   ${SUBJECT_NAME}
@@ -90,7 +90,7 @@ Select Start date and End date
     [Tags]  HappyPath
     user selects from list by label  id:timePeriodForm-start   2020 Week 14
     user selects from list by label  id:timePeriodForm-end     2020 Week 14
-    user clicks element     css:#timePeriodForm-submit
+    user clicks element     id:timePeriodForm-submit
     user waits until h2 is visible  Choose your filters
     user waits until page contains element   id:filtersForm-indicators
     user checks previous table tool step contains  4    Start date    2020 Week 14
@@ -108,7 +108,7 @@ Select Filters
 
 Create table
     [Tags]  HappyPath
-    user clicks element     css:#filtersForm-submit
+    user clicks element     id:filtersForm-submit
     user waits until results table appears     60
 
 Validate results table column headings
@@ -125,7 +125,6 @@ Generate the peramlink
 Go to permalink
     [Tags]  HappyPath
     user goes to url  ${PERMA_LOCATION_URL}
-    user waits for page to finish loading
     user waits until h1 is visible  '${SUBJECT_NAME}' from '${PUBLICATION_NAME}'
     user checks page does not contain   WARNING - The data used in this permalink may be out-of-date.
 
@@ -150,14 +149,14 @@ Create amendment
 replace data files for amendment
     [Tags]  HappyPath
     user clicks link  Data and files
-    user waits until page contains element  css:#dataFileUploadForm-subjectTitle
+    user waits until page contains element  id:dataFileUploadForm-subjectTitle
     user waits until h2 is visible  Uploaded data files
     user waits until page contains accordion section   Dates test subject
     user opens accordion section   Dates test subject
     ${section}=  user gets accordion section content element  Dates test subject
     user clicks link  Replace data  ${section}
-    user chooses file   css:#dataFileUploadForm-dataFile       ${FILES_DIR}upload-file-test.csv
-    user chooses file   css:#dataFileUploadForm-metadataFile   ${FILES_DIR}upload-file-test.meta.csv
+    user chooses file   id:dataFileUploadForm-dataFile       ${FILES_DIR}upload-file-test.csv
+    user chooses file   id:dataFileUploadForm-metadataFile   ${FILES_DIR}upload-file-test.meta.csv
     user clicks button  Upload data files
     user checks headed table body row cell contains  Status          2  Complete   wait=180
 
