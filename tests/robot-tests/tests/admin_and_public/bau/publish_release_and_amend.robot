@@ -68,8 +68,7 @@ Add meta guidance
 
     ${editor}=  user gets meta guidance data file content editor  Dates test subject
     user clicks element  ${editor}
-    user presses keys  Dates test subject test meta guidance content  ${editor}
-
+    user presses keys  Dates test subject test meta guidance content   ${editor}
     user clicks button  Save guidance
 
 Add ancillary file

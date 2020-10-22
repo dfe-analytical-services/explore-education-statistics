@@ -58,7 +58,7 @@ Add meta guidance to subject
     user waits until page contains accordion section  ${SUBJECT_NAME}
     ${editor}=  user gets meta guidance data file content editor  ${SUBJECT_NAME}
     user clicks element  ${editor}
-    user presses keys  ${SUBJECT_NAME} test meta guidance content
+    user presses keys  ${SUBJECT_NAME} test meta guidance content  ${editor}
 
     user clicks button  Save guidance
 

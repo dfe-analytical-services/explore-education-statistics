@@ -15,12 +15,12 @@ ${TOPIC_NAME}  %{TEST_TOPIC_NAME}
 ${SUBJECT_NAME}   Dates test subject
 
 *** Test Cases ***
-create publication & release
+Create publication & release
     [Tags]  HappyPath
     ${PUBLICATION_ID}=  user creates test publication via api  ${PUBLICATION_NAME}
     user create test release via api  ${PUBLICATION_ID}  AY  2020
 
-upload a subject
+Upload a subject
     [Tags]  HappyPath
     user navigates to release summary from admin dashboard  ${PUBLICATION_NAME}  ${DETAILS_HEADING}
     user clicks link  Data and files
@@ -34,6 +34,18 @@ upload a subject
     user opens accordion section   ${SUBJECT_NAME}
     ${section}=  user gets accordion section content element  ${SUBJECT_NAME}
     user checks headed table body row contains  Status           Complete  ${section}  180
+
+Add meta guidance to subject
+    [Tags]  HappyPath
+    user clicks link  Metadata guidance
+    user waits until h2 is visible  Public metadata guidance document
+
+    user waits until page contains accordion section  ${SUBJECT_NAME}
+    ${editor}=  user gets meta guidance data file content editor  ${SUBJECT_NAME}
+    user clicks element  ${editor}
+    user presses keys  ${SUBJECT_NAME} test meta guidance content   ${editor}
+
+    user clicks button  Save guidance
 
 Go to "Release status" page
     [Tags]  HappyPath
