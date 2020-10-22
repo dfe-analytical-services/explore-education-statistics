@@ -30,7 +30,7 @@ const PreReleaseAccessListPage = ({ release }: Props) => {
       <h2>Pre-release access list</h2>
 
       {release.published && (
-        <p>
+        <p className="govuk-!-margin-bottom-8">
           <strong>
             Published <FormattedDate>{release.published}</FormattedDate>
           </strong>

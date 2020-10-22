@@ -1,8 +1,8 @@
-import { SubjectMetaGuidance } from '@admin/services/releaseMetaGuidanceService';
 import Details from '@common/components/Details';
 import SanitizeHtml from '@common/components/SanitizeHtml';
 import SummaryList from '@common/components/SummaryList';
 import SummaryListItem from '@common/components/SummaryListItem';
+import { SubjectMetaGuidance } from '@common/services/releaseMetaGuidanceService';
 import React, { ReactNode } from 'react';
 
 interface Props {
