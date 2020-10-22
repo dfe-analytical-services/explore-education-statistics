@@ -12,6 +12,7 @@ Resource   ./table_tool.robot
 *** Variables ***
 ${browser}    chrome
 ${headless}   1
+${FILES_DIR}    ${EXECDIR}${/}tests${/}files${/}
 
 ${timeout}          30
 ${implicit_wait}    3

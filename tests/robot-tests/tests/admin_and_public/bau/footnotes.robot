@@ -34,8 +34,8 @@ Upload subject
     user clicks link  Data and files
     user waits until page contains element  id:dataFileUploadForm-subjectTitle
     user enters text into element  id:dataFileUploadForm-subjectTitle   ${SUBJECT_NAME}
-    user chooses file   id:dataFileUploadForm-dataFile       ${CURDIR}${/}files${/}${DATA_FILE_NAME}.csv
-    user chooses file   id:dataFileUploadForm-metadataFile   ${CURDIR}${/}files${/}${DATA_FILE_NAME}.meta.csv
+    user chooses file   id:dataFileUploadForm-dataFile       ${FILES_DIR}${DATA_FILE_NAME}.csv
+    user chooses file   id:dataFileUploadForm-metadataFile   ${FILES_DIR}${DATA_FILE_NAME}.meta.csv
     user clicks button  Upload data files
 
     user waits until h2 is visible  Uploaded data files
@@ -49,6 +49,18 @@ Upload subject
     user checks headed table body row contains  Number of rows   119  ${section}
     user checks headed table body row contains  Data file size   17 Kb  ${section}
     user checks headed table body row contains  Status           Complete  ${section}  360
+
+Add meta guidance to subject
+    [Tags]  HappyPath
+    user clicks link  Metadata guidance
+    user waits until h2 is visible  Public metadata guidance document
+
+    user waits until page contains accordion section  ${SUBJECT_NAME}
+    ${editor}=  user gets meta guidance data file content editor  ${SUBJECT_NAME}
+    user clicks element  ${editor}
+    user presses keys  ${SUBJECT_NAME} test meta guidance content
+
+    user clicks button  Save guidance
 
 Navigate to 'Footnotes' page
     [Tags]  HappyPath

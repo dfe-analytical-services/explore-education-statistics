@@ -35,8 +35,8 @@ Upload subject
     user clicks link  Data and files
     user waits until h2 is visible  Add data file to release
     user enters text into element  id:dataFileUploadForm-subjectTitle   UI test subject
-    user chooses file  id:dataFileUploadForm-dataFile       ${CURDIR}${/}files${/}upload-file-test-with-filter.csv
-    user chooses file  id:dataFileUploadForm-metadataFile   ${CURDIR}${/}files${/}upload-file-test-with-filter.meta.csv
+    user chooses file  id:dataFileUploadForm-dataFile       ${FILES_DIR}upload-file-test-with-filter.csv
+    user chooses file  id:dataFileUploadForm-metadataFile   ${FILES_DIR}upload-file-test-with-filter.meta.csv
     user clicks button  Upload data files
     user waits until h2 is visible  Uploaded data files
     user waits until page contains accordion section   UI test subject
@@ -162,7 +162,7 @@ Navigate to Create chart tab
     user waits until page does not contain loading spinner
     user clicks link  Chart
     user clicks button  Choose an infographic as alternative
-    choose file   id:chartConfigurationForm-file       ${CURDIR}${/}files${/}dfe-logo.jpg
+    choose file   id:chartConfigurationForm-file       ${FILES_DIR}dfe-logo.jpg
     user enters text into element  id:chartConfigurationForm-title  Sample title
     user enters text into element  id:chartConfigurationForm-alt  Sample alt text
     user clicks button   Save chart options

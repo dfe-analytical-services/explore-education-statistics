@@ -12,6 +12,7 @@ Suite Teardown    user closes the browser
 ${THEME_NAME}        %{TEST_THEME_NAME}
 ${TOPIC_NAME}        %{TEST_TOPIC_NAME}
 ${PUBLICATION_NAME}  UI tests - publish data %{RUN_IDENTIFIER}
+${SUBJECT_NAME}   UI test subject
 
 *** Test Cases ***
 Create new publication and release via API
@@ -73,32 +74,44 @@ Upload subject to new release
     [Tags]  HappyPath
     user clicks link  Data and files
     user waits until page contains element  id:dataFileUploadForm-subjectTitle
-    user enters text into element  id:dataFileUploadForm-subjectTitle   UI test subject
-    user chooses file   id:dataFileUploadForm-dataFile       ${CURDIR}${/}files${/}upload-file-test.csv
-    user chooses file   id:dataFileUploadForm-metadataFile   ${CURDIR}${/}files${/}upload-file-test.meta.csv
+    user enters text into element  id:dataFileUploadForm-subjectTitle   ${SUBJECT_NAME}
+    user chooses file   id:dataFileUploadForm-dataFile       ${FILES_DIR}upload-file-test.csv
+    user chooses file   id:dataFileUploadForm-metadataFile   ${FILES_DIR}upload-file-test.meta.csv
     user clicks button  Upload data files
 
     user waits until h2 is visible  Uploaded data files
-    user waits until page contains accordion section   UI test subject
-    user opens accordion section   UI test subject
+    user waits until page contains accordion section   ${SUBJECT_NAME}
+    user opens accordion section   ${SUBJECT_NAME}
 
-    ${section}=  user gets accordion section content element  UI test subject
-    user checks headed table body row contains  Subject title    UI test subject  ${section}
+    ${section}=  user gets accordion section content element  ${SUBJECT_NAME}
+    user checks headed table body row contains  Subject title    ${SUBJECT_NAME}  ${section}
     user checks headed table body row contains  Data file        upload-file-test.csv  ${section}
     user checks headed table body row contains  Metadata file    upload-file-test.meta.csv  ${section}
     user checks headed table body row contains  Number of rows   159  ${section}
     user checks headed table body row contains  Data file size   15 Kb  ${section}
     user checks headed table body row contains  Status           Complete  ${section}  360
 
+Add meta guidance to subject
+    [Tags]  HappyPath
+    user clicks link  Metadata guidance
+    user waits until h2 is visible  Public metadata guidance document
+
+    user waits until page contains accordion section  ${SUBJECT_NAME}
+    user opens accordion section  ${SUBJECT_NAME}
+    ${editor}=  user gets meta guidance data file content editor  ${SUBJECT_NAME}
+    user clicks element  ${editor}
+    user presses keys  ${SUBJECT_NAME} test meta guidance content
+    user clicks button  Save guidance
+
 Navigate to 'Data blocks' page
     [Tags]  HappyPath
     user clicks link    Data blocks
     user waits until h2 is visible   Choose a subject
 
-Select subject "UI test subject"
+Select subject "${SUBJECT_NAME}"
     [Tags]  HappyPath
-    user waits until page contains   UI test subject
-    user clicks radio    UI test subject
+    user waits until page contains   ${SUBJECT_NAME}
+    user clicks radio    ${SUBJECT_NAME}
     user clicks element   id:publicationSubjectForm-submit
 
 Select locations
@@ -242,13 +255,13 @@ Select publication in table tool
     user waits until h2 is visible   Choose a subject
     user checks previous table tool step contains  1    Publication    ${PUBLICATION_NAME}
 
-Select subject "UI test subject" in table tool
+Select subject "${SUBJECT_NAME}" in table tool
     [Tags]  HappyPath
-    user waits until page contains   UI test subject
-    user clicks radio    UI test subject
+    user waits until page contains   ${SUBJECT_NAME}
+    user clicks radio    ${SUBJECT_NAME}
     user clicks element   id:publicationSubjectForm-submit
     user waits until h2 is visible  Choose locations
-    user checks previous table tool step contains  2    Subject    UI test subject
+    user checks previous table tool step contains  2    Subject    ${SUBJECT_NAME}
 
 Select locations in table tool
     [Tags]   HappyPath
@@ -304,7 +317,7 @@ Select table highlight from subjects step
     user waits until element is visible  xpath://h3[text()="Table highlights"]
     user clicks link  Test highlight name
     user waits until results table appears  180
-    user waits until page contains element   xpath://*[@data-testid="dataTableCaption" and text()="Table showing Admission Numbers for 'UI test subject' from '${PUBLICATION_NAME}' in Bolton 001 (E02000984), Bolton 001 (E05000364), Bolton 004 (E02000987), Bolton 004 (E05010450), Nailsea Youngwood and Syon between 2005 and 2020"]
+    user waits until page contains element   xpath://*[@data-testid="dataTableCaption" and text()="Table showing Admission Numbers for '${SUBJECT_NAME}' from '${PUBLICATION_NAME}' in Bolton 001 (E02000984), Bolton 001 (E05000364), Bolton 004 (E02000987), Bolton 004 (E05010450), Nailsea Youngwood and Syon between 2005 and 2020"]
 
 Validate table column headings for table highlight
     [Tags]  HappyPath
