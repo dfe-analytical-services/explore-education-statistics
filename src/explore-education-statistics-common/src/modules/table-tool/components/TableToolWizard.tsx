@@ -73,6 +73,7 @@ export interface TableToolWizardProps {
   finalStep?: (props: FinalStepRenderProps) => ReactElement;
   renderHighlights?: (highlights: TableHighlight[]) => ReactNode;
   scrollOnMount?: boolean;
+  onSubmit?: (table: FullTable) => void;
 }
 
 const TableToolWizard = ({
@@ -81,6 +82,7 @@ const TableToolWizard = ({
   scrollOnMount,
   renderHighlights,
   finalStep,
+  onSubmit,
 }: TableToolWizardProps) => {
   const [state, updateState] = useImmer<TableToolState>({
     initialStep: 1,
@@ -246,6 +248,9 @@ const TableToolWizard = ({
 
     const table = mapFullTable(tableData);
     const tableHeaders = getDefaultTableHeaderConfig(table.subjectMeta);
+    if (onSubmit) {
+      onSubmit(table);
+    }
 
     updateState(draft => {
       draft.query = query;
