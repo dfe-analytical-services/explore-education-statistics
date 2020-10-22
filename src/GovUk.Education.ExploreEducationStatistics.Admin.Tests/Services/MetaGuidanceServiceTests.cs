@@ -107,6 +107,81 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
         }
 
         [Fact]
+        public async Task Get_ReplacementInProgressIsIgnored()
+        {
+            var release = new Release
+            {
+                MetaGuidance = "Release Meta Guidance"
+            };
+
+            var originalFile = new ReleaseFile
+            {
+                Release = release,
+                ReleaseFileReference = new ReleaseFileReference
+                {
+                    Filename = "file1.csv",
+                    Release = release,
+                    ReleaseFileType = ReleaseFileTypes.Data,
+                    SubjectId = Guid.NewGuid()
+                }
+            };
+
+            var replacementFile = new ReleaseFile
+            {
+                Release = release,
+                ReleaseFileReference = new ReleaseFileReference
+                {
+                    Filename = "file1.csv",
+                    Release = release,
+                    ReleaseFileType = ReleaseFileTypes.Data,
+                    SubjectId = Guid.NewGuid(),
+                    Replacing = originalFile.ReleaseFileReference
+                }
+            };
+
+           originalFile.ReleaseFileReference.ReplacedBy = replacementFile.ReleaseFileReference;
+
+            var contentDbContextId = Guid.NewGuid().ToString();
+
+            await using (var contentDbContext = InMemoryApplicationDbContext(contentDbContextId))
+            {
+                await contentDbContext.AddAsync(release);
+                await contentDbContext.AddRangeAsync(originalFile, replacementFile);
+                await contentDbContext.SaveChangesAsync();
+            }
+
+            var metaGuidanceSubjectService = new Mock<IMetaGuidanceSubjectService>(MockBehavior.Strict);
+
+            metaGuidanceSubjectService.Setup(mock =>
+                mock.GetSubjects(release.Id, new List<Guid>
+                {
+                    originalFile.ReleaseFileReference.SubjectId.Value
+                })).ReturnsAsync(SubjectMetaGuidance);
+
+            await using (var contentDbContext = InMemoryApplicationDbContext(contentDbContextId))
+            {
+                var service = SetupMetaGuidanceService(contentDbContext: contentDbContext,
+                    metaGuidanceSubjectService: metaGuidanceSubjectService.Object);
+
+                var result = await service.Get(release.Id);
+
+                Assert.True(result.IsRight);
+
+                // The Subject id of the replacement file should not be included
+
+                metaGuidanceSubjectService.Verify(mock =>
+                    mock.GetSubjects(release.Id, new List<Guid>
+                    {
+                        originalFile.ReleaseFileReference.SubjectId.Value
+                    }), Times.Once);
+
+                Assert.Equal(release.Id, result.Right.Id);
+                Assert.Equal("Release Meta Guidance", result.Right.Content);
+                Assert.Equal(SubjectMetaGuidance, result.Right.Subjects);
+            }
+        }
+
+        [Fact]
         public async Task Get_NoRelease()
         {
             var contentDbContextId = Guid.NewGuid().ToString();
