@@ -94,7 +94,8 @@ const AccordionComponent = ({
       onSectionOpen={accordionSection => {
         logEvent(
           `${publicationTitle} help and support`,
-          `${accordionSection.title} section opened`,
+          'Accordion opened',
+          accordionSection.title,
         );
       }}
     >

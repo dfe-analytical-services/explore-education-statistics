@@ -334,8 +334,8 @@ const PublicationReleasePage: NextPage<Props> = ({ data }) => {
           onSectionOpen={accordionSection => {
             logEvent(
               `${data.publication.title} release page`,
-              `${data.publication.title} accordion opened`,
-              `${accordionSection.title} section opened`,
+              `Content accordion opened`,
+              `${accordionSection.title}`,
             );
           }}
         >
