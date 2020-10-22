@@ -56,18 +56,34 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
                 MetaGuidance = "Release Meta Guidance"
             };
 
+            var releaseFile = new ReleaseFile
+            {
+                Release = release,
+                ReleaseFileReference = new ReleaseFileReference
+                {
+                    Filename = "file1.csv",
+                    Release = release,
+                    ReleaseFileType = ReleaseFileTypes.Data,
+                    SubjectId = Guid.NewGuid()
+                }
+            };
+
             var contentDbContextId = Guid.NewGuid().ToString();
 
             await using (var contentDbContext = InMemoryApplicationDbContext(contentDbContextId))
             {
                 await contentDbContext.AddAsync(release);
+                await contentDbContext.AddAsync(releaseFile);
                 await contentDbContext.SaveChangesAsync();
             }
 
             var metaGuidanceSubjectService = new Mock<IMetaGuidanceSubjectService>(MockBehavior.Strict);
 
             metaGuidanceSubjectService.Setup(mock =>
-                mock.GetSubjects(release.Id)).ReturnsAsync(SubjectMetaGuidance);
+                mock.GetSubjects(release.Id, new List<Guid>
+                {
+                    releaseFile.ReleaseFileReference.SubjectId.Value
+                })).ReturnsAsync(SubjectMetaGuidance);
 
             await using (var contentDbContext = InMemoryApplicationDbContext(contentDbContextId))
             {
@@ -79,7 +95,85 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
                 Assert.True(result.IsRight);
 
                 metaGuidanceSubjectService.Verify(mock =>
-                    mock.GetSubjects(release.Id), Times.Once);
+                    mock.GetSubjects(release.Id, new List<Guid>
+                    {
+                        releaseFile.ReleaseFileReference.SubjectId.Value
+                    }), Times.Once);
+
+                Assert.Equal(release.Id, result.Right.Id);
+                Assert.Equal("Release Meta Guidance", result.Right.Content);
+                Assert.Equal(SubjectMetaGuidance, result.Right.Subjects);
+            }
+        }
+
+        [Fact]
+        public async Task Get_ReplacementInProgressIsIgnored()
+        {
+            var release = new Release
+            {
+                MetaGuidance = "Release Meta Guidance"
+            };
+
+            var originalFile = new ReleaseFile
+            {
+                Release = release,
+                ReleaseFileReference = new ReleaseFileReference
+                {
+                    Filename = "file1.csv",
+                    Release = release,
+                    ReleaseFileType = ReleaseFileTypes.Data,
+                    SubjectId = Guid.NewGuid()
+                }
+            };
+
+            var replacementFile = new ReleaseFile
+            {
+                Release = release,
+                ReleaseFileReference = new ReleaseFileReference
+                {
+                    Filename = "file1.csv",
+                    Release = release,
+                    ReleaseFileType = ReleaseFileTypes.Data,
+                    SubjectId = Guid.NewGuid(),
+                    Replacing = originalFile.ReleaseFileReference
+                }
+            };
+
+           originalFile.ReleaseFileReference.ReplacedBy = replacementFile.ReleaseFileReference;
+
+            var contentDbContextId = Guid.NewGuid().ToString();
+
+            await using (var contentDbContext = InMemoryApplicationDbContext(contentDbContextId))
+            {
+                await contentDbContext.AddAsync(release);
+                await contentDbContext.AddRangeAsync(originalFile, replacementFile);
+                await contentDbContext.SaveChangesAsync();
+            }
+
+            var metaGuidanceSubjectService = new Mock<IMetaGuidanceSubjectService>(MockBehavior.Strict);
+
+            metaGuidanceSubjectService.Setup(mock =>
+                mock.GetSubjects(release.Id, new List<Guid>
+                {
+                    originalFile.ReleaseFileReference.SubjectId.Value
+                })).ReturnsAsync(SubjectMetaGuidance);
+
+            await using (var contentDbContext = InMemoryApplicationDbContext(contentDbContextId))
+            {
+                var service = SetupMetaGuidanceService(contentDbContext: contentDbContext,
+                    metaGuidanceSubjectService: metaGuidanceSubjectService.Object);
+
+                var result = await service.Get(release.Id);
+
+                Assert.True(result.IsRight);
+
+                // The Subject id of the replacement file should not be included
+
+                metaGuidanceSubjectService.Verify(mock =>
+                    mock.GetSubjects(release.Id, new List<Guid>
+                    {
+                        originalFile.ReleaseFileReference.SubjectId.Value
+                    }), Times.Once);
 
                 Assert.Equal(release.Id, result.Right.Id);
                 Assert.Equal("Release Meta Guidance", result.Right.Content);
@@ -147,7 +241,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
             var metaGuidanceSubjectService = new Mock<IMetaGuidanceSubjectService>(MockBehavior.Strict);
 
             metaGuidanceSubjectService.Setup(mock =>
-                mock.GetSubjects(release.Id)).ReturnsAsync(new List<MetaGuidanceSubjectViewModel>());
+                mock.GetSubjects(release.Id, new List<Guid>())).ReturnsAsync(new List<MetaGuidanceSubjectViewModel>());
 
             await using (var contentDbContext = InMemoryApplicationDbContext(contentDbContextId))
             await using (var statisticsDbContext = InMemoryStatisticsDbContext(statisticsDbContextId))
@@ -167,7 +261,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
                 Assert.True(result.IsRight);
 
                 metaGuidanceSubjectService.Verify(mock =>
-                    mock.GetSubjects(release.Id), Times.Once);
+                    mock.GetSubjects(release.Id, new List<Guid>()), Times.Once);
 
                 Assert.Equal(release.Id, result.Right.Id);
                 Assert.Equal("Updated Release Meta Guidance", result.Right.Content);
@@ -191,19 +285,35 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
                 MetaGuidance = "Release Meta Guidance"
             };
 
+            var releaseFile = new ReleaseFile
+            {
+                Release = release,
+                ReleaseFileReference = new ReleaseFileReference
+                {
+                    Filename = "file1.csv",
+                    Release = release,
+                    ReleaseFileType = ReleaseFileTypes.Data,
+                    SubjectId = Guid.NewGuid()
+                }
+            };
+
             var contentDbContextId = Guid.NewGuid().ToString();
             var statisticsDbContextId = Guid.NewGuid().ToString();
 
             await using (var contentDbContext = InMemoryApplicationDbContext(contentDbContextId))
             {
                 await contentDbContext.AddAsync(release);
+                await contentDbContext.AddAsync(releaseFile);
                 await contentDbContext.SaveChangesAsync();
             }
 
             var metaGuidanceSubjectService = new Mock<IMetaGuidanceSubjectService>(MockBehavior.Strict);
 
             metaGuidanceSubjectService.Setup(mock =>
-                mock.GetSubjects(release.Id)).ReturnsAsync(SubjectMetaGuidance);
+                mock.GetSubjects(release.Id, new List<Guid>
+                {
+                    releaseFile.ReleaseFileReference.SubjectId.Value
+                })).ReturnsAsync(SubjectMetaGuidance);
 
             await using (var contentDbContext = InMemoryApplicationDbContext(contentDbContextId))
             await using (var statisticsDbContext = InMemoryStatisticsDbContext(statisticsDbContextId))
@@ -230,7 +340,10 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
                 Assert.True(result.IsRight);
 
                 metaGuidanceSubjectService.Verify(mock =>
-                    mock.GetSubjects(release.Id), Times.Once);
+                    mock.GetSubjects(release.Id, new List<Guid>
+                    {
+                        releaseFile.ReleaseFileReference.SubjectId.Value
+                    }), Times.Once);
 
                 Assert.Equal(release.Id, result.Right.Id);
                 Assert.Equal("Updated Release Meta Guidance", result.Right.Content);
@@ -258,27 +371,55 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
                 Id = contentRelease.Id,
             };
 
+            var subject1 = new Subject
+            {
+                Id = Guid.NewGuid(),
+                Filename = "file1.csv",
+                Name = "Subject 1"
+            };
+
+            var subject2 = new Subject
+            {
+                Id = Guid.NewGuid(),
+                Filename = "file2.csv",
+                Name = "Subject 2"
+            };
+
+            var releaseFile1 = new ReleaseFile
+            {
+                Release = contentRelease,
+                ReleaseFileReference = new ReleaseFileReference
+                {
+                    Filename = "file1.csv",
+                    Release = contentRelease,
+                    ReleaseFileType = ReleaseFileTypes.Data,
+                    SubjectId = subject1.Id
+                }
+            };
+
+            var releaseFile2 = new ReleaseFile
+            {
+                Release = contentRelease,
+                ReleaseFileReference = new ReleaseFileReference
+                {
+                    Filename = "file2.csv",
+                    Release = contentRelease,
+                    ReleaseFileType = ReleaseFileTypes.Data,
+                    SubjectId = subject2.Id
+                }
+            };
+
             var releaseSubject1 = new ReleaseSubject
             {
                 Release = statsRelease,
-                Subject = new Subject
-                {
-                    Id = Guid.NewGuid(),
-                    Filename = "file1.csv",
-                    Name = "Subject 1"
-                },
+                Subject = subject1,
                 MetaGuidance = "Subject 1 Meta Guidance"
             };
 
             var releaseSubject2 = new ReleaseSubject
             {
                 Release = statsRelease,
-                Subject = new Subject
-                {
-                    Id = Guid.NewGuid(),
-                    Filename = "file2.csv",
-                    Name = "Subject 2"
-                },
+                Subject = subject2,
                 MetaGuidance = "Subject 2 Meta Guidance"
             };
 
@@ -288,6 +429,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
             await using (var contentDbContext = InMemoryApplicationDbContext(contentDbContextId))
             {
                 await contentDbContext.AddAsync(contentRelease);
+                await contentDbContext.AddRangeAsync(releaseFile1, releaseFile2);
                 await contentDbContext.SaveChangesAsync();
             }
 
@@ -301,7 +443,10 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
             var metaGuidanceSubjectService = new Mock<IMetaGuidanceSubjectService>(MockBehavior.Strict);
 
             metaGuidanceSubjectService.Setup(mock =>
-                mock.GetSubjects(statsRelease.Id)).ReturnsAsync(SubjectMetaGuidance);
+                mock.GetSubjects(statsRelease.Id, new List<Guid>
+                {
+                    subject1.Id, subject2.Id
+                })).ReturnsAsync(SubjectMetaGuidance);
 
             await using (var contentDbContext = InMemoryApplicationDbContext(contentDbContextId))
             await using (var statisticsDbContext = InMemoryStatisticsDbContext(statisticsDbContextId))
@@ -330,7 +475,10 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
                 Assert.True(result.IsRight);
 
                 metaGuidanceSubjectService.Verify(mock =>
-                    mock.GetSubjects(statsRelease.Id), Times.Once);
+                    mock.GetSubjects(statsRelease.Id, new List<Guid>
+                    {
+                        subject1.Id, subject2.Id
+                    }), Times.Once);
 
                 Assert.Equal(contentRelease.Id, result.Right.Id);
                 Assert.Equal("Release Meta Guidance Updated", result.Right.Content);
@@ -404,6 +552,42 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
 
             // Version 1 has one Subject, version 2 adds another Subject
 
+            var releaseVersion1File1 = new ReleaseFile
+            {
+                Release = contentReleaseVersion1,
+                ReleaseFileReference = new ReleaseFileReference
+                {
+                    Filename = "file1.csv",
+                    Release = contentReleaseVersion1,
+                    ReleaseFileType = ReleaseFileTypes.Data,
+                    SubjectId = subject1.Id
+                }
+            };
+
+            var releaseVersion2File1 = new ReleaseFile
+            {
+                Release = contentReleaseVersion2,
+                ReleaseFileReference = new ReleaseFileReference
+                {
+                    Filename = "file1.csv",
+                    Release = contentReleaseVersion2,
+                    ReleaseFileType = ReleaseFileTypes.Data,
+                    SubjectId = subject1.Id
+                }
+            };
+
+            var releaseVersion2File2 = new ReleaseFile
+            {
+                Release = contentReleaseVersion2,
+                ReleaseFileReference = new ReleaseFileReference
+                {
+                    Filename = "file2.csv",
+                    Release = contentReleaseVersion2,
+                    ReleaseFileType = ReleaseFileTypes.Data,
+                    SubjectId = subject2.Id
+                }
+            };
+
             var releaseVersion1Subject1 = new ReleaseSubject
             {
                 Release = statsReleaseVersion1,
@@ -431,6 +615,8 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
             await using (var contentDbContext = InMemoryApplicationDbContext(contentDbContextId))
             {
                 await contentDbContext.AddRangeAsync(contentReleaseVersion1, contentReleaseVersion2);
+                await contentDbContext.AddRangeAsync(releaseVersion1File1, releaseVersion2File1,
+                    releaseVersion2File2);
                 await contentDbContext.SaveChangesAsync();
             }
 
@@ -446,7 +632,10 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
             var metaGuidanceSubjectService = new Mock<IMetaGuidanceSubjectService>(MockBehavior.Strict);
 
             metaGuidanceSubjectService.Setup(mock =>
-                mock.GetSubjects(statsReleaseVersion2.Id)).ReturnsAsync(SubjectMetaGuidance);
+                mock.GetSubjects(statsReleaseVersion2.Id, new List<Guid>
+                {
+                    subject1.Id, subject2.Id
+                })).ReturnsAsync(SubjectMetaGuidance);
 
             await using (var contentDbContext = InMemoryApplicationDbContext(contentDbContextId))
             await using (var statisticsDbContext = InMemoryStatisticsDbContext(statisticsDbContextId))
@@ -475,7 +664,10 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
                 Assert.True(result.IsRight);
 
                 metaGuidanceSubjectService.Verify(mock =>
-                    mock.GetSubjects(statsReleaseVersion2.Id), Times.Once);
+                    mock.GetSubjects(statsReleaseVersion2.Id, new List<Guid>
+                    {
+                        subject1.Id, subject2.Id
+                    }), Times.Once);
 
                 Assert.Equal(contentReleaseVersion2.Id, result.Right.Id);
                 Assert.Equal("Version 2 Release Meta Guidance Updated", result.Right.Content);

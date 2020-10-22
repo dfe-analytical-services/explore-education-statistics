@@ -24,14 +24,12 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Services.Tests
 
             var subject1 = new Subject
             {
-                Id = Guid.NewGuid(),
                 Filename = "file1.csv",
                 Name = "Subject 1"
             };
 
             var subject2 = new Subject
             {
-                Id = Guid.NewGuid(),
                 Filename = "file2.csv",
                 Name = "Subject 2"
             };
@@ -146,8 +144,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Services.Tests
             {
                 await statisticsDbContext.AddAsync(release);
                 await statisticsDbContext.AddRangeAsync(subject1, subject2);
-                await statisticsDbContext.AddRangeAsync(releaseSubject1, releaseSubject1,
-                    releaseSubject2);
+                await statisticsDbContext.AddRangeAsync(releaseSubject1, releaseSubject2);
                 await statisticsDbContext.AddRangeAsync(subject1Filter, subject2Filter);
                 await statisticsDbContext.AddRangeAsync(subject1IndicatorGroup, subject2IndicatorGroup);
                 await statisticsDbContext.AddRangeAsync(subject1Observation1, subject1Observation2,
@@ -197,6 +194,94 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Services.Tests
                 Assert.Equal("subject2_filter", result.Right[1].Variables[0].Value);
                 Assert.Equal("Subject 2 Indicator", result.Right[1].Variables[1].Label);
                 Assert.Equal("subject2_indicator", result.Right[1].Variables[1].Value);
+            }
+        }
+
+        [Fact]
+        public async Task Get_SpecificSubjects()
+        {
+            var release = new Release();
+
+            var subject1 = new Subject
+            {
+                Filename = "file1.csv",
+                Name = "Subject 1"
+            };
+
+            var subject2 = new Subject
+            {
+                Filename = "file2.csv",
+                Name = "Subject 2"
+            };
+
+            var subject3 = new Subject
+            {
+                Filename = "file3.csv",
+                Name = "Subject 3"
+            };
+
+            var releaseSubject1 = new ReleaseSubject
+            {
+                Release = release,
+                Subject = subject1,
+                MetaGuidance = "Subject 1 Meta Guidance"
+            };
+
+            var releaseSubject2 = new ReleaseSubject
+            {
+                Release = release,
+                Subject = subject2,
+                MetaGuidance = "Subject 2 Meta Guidance"
+            };
+
+            var releaseSubject3 = new ReleaseSubject
+            {
+                Release = release,
+                Subject = subject3,
+                MetaGuidance = "Subject 3 Meta Guidance"
+            };
+
+            var statisticsDbContextId = Guid.NewGuid().ToString();
+
+            await using (var statisticsDbContext = InMemoryStatisticsDbContext(statisticsDbContextId))
+            {
+                await statisticsDbContext.AddAsync(release);
+                await statisticsDbContext.AddRangeAsync(subject1, subject2, subject3);
+                await statisticsDbContext.AddRangeAsync(releaseSubject1, releaseSubject2, releaseSubject3);
+                await statisticsDbContext.SaveChangesAsync();
+            }
+
+            await using (var statisticsDbContext = InMemoryStatisticsDbContext(statisticsDbContextId))
+            {
+                var service = SetupMetaGuidanceSubjectService(context: statisticsDbContext);
+
+                var result = await service.GetSubjects(release.Id, new List<Guid>
+                {
+                    subject1.Id, subject3.Id
+                });
+
+                // Assert only the specified Subjects are returned
+                Assert.True(result.IsRight);
+
+                Assert.Equal(2, result.Right.Count);
+
+                Assert.Equal(subject1.Id, result.Right[0].Id);
+                Assert.Equal("Subject 1 Meta Guidance", result.Right[0].Content);
+                Assert.Equal("file1.csv", result.Right[0].Filename);
+                Assert.Equal("Subject 1", result.Right[0].Name);
+                Assert.Null(result.Right[0].TimePeriods.From);
+                Assert.Null(result.Right[0].TimePeriods.To);
+                Assert.Empty(result.Right[0].GeographicLevels);
+                Assert.Empty(result.Right[0].Variables);
+
+                Assert.Equal(subject3.Id, result.Right[1].Id);
+                Assert.Equal("Subject 3 Meta Guidance", result.Right[1].Content);
+                Assert.Equal("file3.csv", result.Right[1].Filename);
+                Assert.Equal("Subject 3", result.Right[1].Name);
+                Assert.Null(result.Right[1].TimePeriods.From);
+                Assert.Null(result.Right[1].TimePeriods.To);
+                Assert.Empty(result.Right[1].GeographicLevels);
+                Assert.Empty(result.Right[1].Variables);
             }
         }
 
@@ -257,14 +342,12 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Services.Tests
 
             var subject1 = new Subject
             {
-                Id = Guid.NewGuid(),
                 Filename = "file1.csv",
                 Name = "Subject 1"
             };
 
             var subject2 = new Subject
             {
-                Id = Guid.NewGuid(),
                 Filename = "file2.csv",
                 Name = "Subject 2"
             };

@@ -56,7 +56,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Content.Api.Tests.Services
                 .ReturnsAsync(ReleaseJson);
 
             metaGuidanceSubjectService.Setup(
-                    mock => mock.GetSubjects(releaseId))
+                    mock => mock.GetSubjects(releaseId, null))
                 .ReturnsAsync(SubjectMetaGuidance);
 
             var result = await service.Get(releasePath);
@@ -65,7 +65,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Content.Api.Tests.Services
                 mock => mock.DownloadBlobText(PublicContentContainerName, releasePath), Times.Once);
 
             metaGuidanceSubjectService.Verify(
-                mock => mock.GetSubjects(releaseId), Times.Once);
+                mock => mock.GetSubjects(releaseId, null), Times.Once);
 
             Assert.True(result.IsRight);
 
