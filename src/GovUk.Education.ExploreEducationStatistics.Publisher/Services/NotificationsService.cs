@@ -28,7 +28,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Publisher.Services
         {
             var publications = GetPublications(releaseIds);
             var messages = publications.Select(BuildPublicationNotificationMessage);
-            await _storageQueueService.AddMessagesAsync(PublicationQueue, messages);
+            await _storageQueueService.AddMessages(PublicationQueue, messages);
         }
 
         private IEnumerable<Publication> GetPublications(IEnumerable<Guid> releaseIds)

@@ -144,7 +144,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Content.Api
             {
                 var publisherConnectionString = Configuration.GetValue<string>("PublisherStorage");
                 var storageQueueService = new StorageQueueService(publisherConnectionString);
-                storageQueueService.AddMessages(queueName, new PublishAllContentMessage());
+                storageQueueService.AddMessage(queueName, new PublishAllContentMessage());
 
                 logger.LogInformation($"Message added to {queueName} queue");
                 logger.LogInformation("Please ensure the Publisher function is running");

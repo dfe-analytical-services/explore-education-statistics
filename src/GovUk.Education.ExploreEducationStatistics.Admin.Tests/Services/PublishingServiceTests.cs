@@ -43,7 +43,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
                 var result = publishingService.RetryReleaseStage(release.Id, ContentAndPublishing).Result;
 
                 mocks.StorageQueueService.Verify(
-                    mock => mock.AddMessagesAsync(RetryStageQueue,
+                    mock => mock.AddMessageAsync(RetryStageQueue,
                         It.Is<RetryStageMessage>(message =>
                             message.ReleaseId == release.Id 
                             && message.Stage == ContentAndPublishing)), Times.Once());
@@ -74,7 +74,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
                 var result = publishingService.ReleaseChanged(release.Id, true).Result;
 
                 mocks.StorageQueueService.Verify(
-                    mock => mock.AddMessagesAsync(NotifyChangeQueue,
+                    mock => mock.AddMessageAsync(NotifyChangeQueue,
                         It.Is<NotifyChangeMessage>(message =>
                             message.ReleaseId == release.Id && message.Immediate)), Times.Once());
 
@@ -104,7 +104,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
                 var result = publishingService.PublicationChanged(publication.Id).Result;
 
                 mocks.StorageQueueService.Verify(
-                    mock => mock.AddMessagesAsync(PublishPublicationQueue,
+                    mock => mock.AddMessageAsync(PublishPublicationQueue,
                         It.Is<PublishPublicationMessage>(message =>
                             message.PublicationId == publication.Id)), Times.Once());
 
