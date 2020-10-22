@@ -5,12 +5,10 @@ namespace GovUk.Education.ExploreEducationStatistics.Common.Services.Interfaces
 {
     public interface IStorageQueueService
     {
-        void AddMessages(string queueName, params object[] values);
+        void AddMessage(string queueName, object value);
 
-        void AddMessages(string queueName, IEnumerable<object> values);
+        Task AddMessageAsync(string queueName, object value);
 
-        Task AddMessagesAsync(string queueName, params object[] values);
-
-        Task AddMessagesAsync(string queueName, IEnumerable<object> values);
+        Task AddMessages(string queueName, IEnumerable<object> values);
     }
 }
