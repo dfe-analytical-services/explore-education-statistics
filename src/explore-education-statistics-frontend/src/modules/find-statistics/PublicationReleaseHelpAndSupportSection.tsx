@@ -93,9 +93,8 @@ const AccordionComponent = ({
       id={accordionId}
       onSectionOpen={accordionSection => {
         logEvent(
-          'Accordion',
-          `${accordionSection.title} accordion opened`,
-          publicationTitle,
+          `${publicationTitle} help and support`,
+          `${accordionSection.title} section opened`,
         );
       }}
     >

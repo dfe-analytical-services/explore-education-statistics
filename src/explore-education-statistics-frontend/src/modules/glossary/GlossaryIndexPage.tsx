@@ -39,11 +39,7 @@ function GlossaryIndexPage() {
       <Accordion
         id="a-z"
         onSectionOpen={accordionSection => {
-          logEvent(
-            'Accordion',
-            `${accordionSection.title} accordion opened`,
-            'Glossary',
-          );
+          logEvent('Glossary', `${accordionSection.title} accordion opened`);
         }}
       >
         <AccordionSection heading="A">

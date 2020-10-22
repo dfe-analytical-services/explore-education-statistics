@@ -62,9 +62,8 @@ const DownloadIndexPage: NextPage<Props> = ({ themes = [] }) => {
           id="downloads"
           onSectionOpen={accordionSection => {
             logEvent(
-              'Accordion',
-              `${accordionSection.title} accordion opened`,
               'Download index page',
+              `${accordionSection.title} accordion opened`,
             );
           }}
         >

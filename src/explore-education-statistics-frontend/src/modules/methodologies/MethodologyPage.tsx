@@ -93,9 +93,9 @@ const MethodologyPage: NextPage<Props> = ({ data }) => {
           id="content"
           onSectionOpen={accordionSection => {
             logEvent(
-              'Accordion',
-              `${accordionSection.title} accordion opened`,
-              data.title,
+              `${data.title} methodology`,
+              `${data.title} accordion opened`,
+              `${accordionSection.title} section opened`,
             );
           }}
         >
@@ -128,9 +128,9 @@ const MethodologyPage: NextPage<Props> = ({ data }) => {
             id="annexes"
             onSectionOpen={accordionSection => {
               logEvent(
-                'Accordion',
-                `${accordionSection.title} accordion opened`,
-                `${data.title} annexes`,
+                `${data.title} methodology`,
+                `${data.title} annexes accordion opened`,
+                `${accordionSection.title} section opened`,
               );
             }}
           >

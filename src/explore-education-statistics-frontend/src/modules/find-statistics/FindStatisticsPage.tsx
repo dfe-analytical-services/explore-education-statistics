@@ -64,9 +64,8 @@ const FindStatisticsPage: NextPage<Props> = ({ themes = [] }) => {
           id="publications"
           onSectionOpen={accordionSection => {
             logEvent(
-              'Accordion',
-              `${accordionSection.title} accordion opened`,
               'Find statistics and data',
+              `${accordionSection.title} section opened`,
             );
           }}
         >

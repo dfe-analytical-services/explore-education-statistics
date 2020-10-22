@@ -51,9 +51,8 @@ const MethodologyIndexPage: NextPage<Props> = ({ themes = [] }) => {
           id="publications"
           onSectionOpen={accordionSection => {
             logEvent(
-              'Accordion',
-              `${accordionSection.title} accordion opened`,
               'Methodologies',
+              `${accordionSection.title} section opened`,
             );
           }}
         >
