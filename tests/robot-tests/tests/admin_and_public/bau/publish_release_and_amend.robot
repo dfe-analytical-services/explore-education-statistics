@@ -72,8 +72,6 @@ Add meta guidance
 
     user clicks button  Save guidance
 
-# TODO: Add footnotes
-
 Add ancillary file
     [Tags]  HappyPath
     user clicks link  File uploads
