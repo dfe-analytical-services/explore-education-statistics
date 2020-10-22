@@ -45,19 +45,9 @@ namespace GovUk.Education.ExploreEducationStatistics.Content.Api.Controllers
             var publicationTask = _fileStorageService.GetDeserialized<CachedPublicationViewModel>(publicationPath);
             var releaseTask = _fileStorageService.GetDeserialized<CachedReleaseViewModel>(releasePath);
 
-            var continuation = Task.WhenAll(publicationTask, releaseTask);
+            await Task.WhenAll(publicationTask, releaseTask);
 
-            try
-            {
-                continuation.Wait();
-            }
-            catch (AggregateException)
-            {
-            }
-
-            if (continuation.Status == TaskStatus.RanToCompletion
-                && releaseTask.Result.IsRight
-                && publicationTask.Result.IsRight)
+            if (releaseTask.Result.IsRight && publicationTask.Result.IsRight)
             {
                 return new PreReleaseAccessListViewModel(releaseTask.Result.Right, publicationTask.Result.Right);
             }
