@@ -9,7 +9,6 @@ Suite Setup       user signs in as bau1
 Suite Teardown    user closes the browser
 
 *** Variables ***
-${THEME_NAME}        %{TEST_THEME_NAME}
 ${TOPIC_NAME}        %{TEST_TOPIC_NAME}
 ${PUBLICATION_NAME}  UI tests - publish data %{RUN_IDENTIFIER}
 ${SUBJECT_NAME}   UI test subject
@@ -58,7 +57,7 @@ Return to Admin Dashboard
 
 Create another release for the same publication
     [Tags]  HappyPath
-    user selects theme and topic from admin dashboard  ${THEME_NAME}  ${TOPIC_NAME}
+    user selects theme and topic from admin dashboard  %{TEST_THEME_NAME}  ${TOPIC_NAME}
     user waits until page contains link    Create new publication
     user opens accordion section   ${PUBLICATION_NAME}
     user clicks testid element   Create new release link for ${PUBLICATION_NAME}
