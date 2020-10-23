@@ -1,18 +1,14 @@
 import Page from '@admin/components/Page';
 import PageTitle from '@admin/components/PageTitle';
 import { useAuthContext } from '@admin/contexts/AuthContext';
-import ReleaseMetaGuidanceDataFile from '@admin/pages/release/components/ReleaseMetaGuidanceDataFile';
 import { ReleaseRouteParams } from '@admin/routes/releaseRoutes';
 import releaseMetaGuidanceService, {
   ReleaseMetaGuidance,
 } from '@admin/services/releaseMetaGuidanceService';
 import releaseService, { Release } from '@admin/services/releaseService';
-import Accordion from '@common/components/Accordion';
-import AccordionSection from '@common/components/AccordionSection';
-import FormattedDate from '@common/components/FormattedDate';
 import LoadingSpinner from '@common/components/LoadingSpinner';
-import SanitizeHtml from '@common/components/SanitizeHtml';
 import useAsyncHandledRetry from '@common/hooks/useAsyncHandledRetry';
+import ReleaseMetaGuidancePageContent from '@common/modules/release/components/ReleaseMetaGuidancePageContent';
 import React from 'react';
 import { RouteComponentProps, StaticContext } from 'react-router';
 
@@ -66,33 +62,11 @@ const ReleaseMetaGuidancePage = ({
 
             <h2>Metadata guidance document</h2>
 
-            {model.release.published && (
-              <p>
-                <strong>
-                  Published{' '}
-                  <FormattedDate>{model.release.published}</FormattedDate>
-                </strong>
-              </p>
-            )}
-
-            <SanitizeHtml dirtyHtml={model.metaGuidance.content} />
-
-            {model.metaGuidance.subjects.length > 0 && (
-              <>
-                <h3 className="govuk-!-margin-top-6">Data files</h3>
-
-                <Accordion id="dataFiles">
-                  {model.metaGuidance.subjects.map(subject => (
-                    <AccordionSection heading={subject.name} key={subject.id}>
-                      <ReleaseMetaGuidanceDataFile
-                        key={subject.id}
-                        subject={subject}
-                      />
-                    </AccordionSection>
-                  ))}
-                </Accordion>
-              </>
-            )}
+            <ReleaseMetaGuidancePageContent
+              published={model.release.published}
+              metaGuidance={model.metaGuidance.content}
+              subjects={model.metaGuidance.subjects}
+            />
           </>
         )}
       </LoadingSpinner>

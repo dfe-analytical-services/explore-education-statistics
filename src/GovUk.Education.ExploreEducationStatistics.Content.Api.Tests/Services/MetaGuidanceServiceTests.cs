@@ -40,63 +40,167 @@ namespace GovUk.Education.ExploreEducationStatistics.Content.Api.Tests.Services
         [Fact]
         public async Task Get()
         {
-            var releaseId = Guid.Parse("2ca4bbbc-e52d-4cb7-8dd2-541623973d68");
-            const string releasePath = "publication/2016-17";
+            var publicationId = Guid.NewGuid();
+            var releaseId = Guid.NewGuid();
+
+            const string publicationPath = "test-publication";
+            const string releasePath = "2016-17";
 
             var fileStorageService = new Mock<IFileStorageService>(MockBehavior.Strict);
             var metaGuidanceSubjectService = new Mock<IMetaGuidanceSubjectService>(MockBehavior.Strict);
 
             var service = SetupMetaGuidanceService(
                 fileStorageService: fileStorageService.Object,
-                metaGuidanceSubjectService: metaGuidanceSubjectService.Object);
+                metaGuidanceSubjectService: metaGuidanceSubjectService.Object
+            );
 
             fileStorageService.Setup(
-                    mock => mock.GetDeserialized<CachedReleaseViewModel>(releasePath))
-                .ReturnsAsync(new CachedReleaseViewModel
-                {
-                    Id = releaseId,
-                    MetaGuidance = "Release Meta guidance"
-                });
+                    mock => mock.GetDeserialized<CachedPublicationViewModel>(publicationPath)
+                )
+                .ReturnsAsync(
+                    new CachedPublicationViewModel
+                    {
+                        Id = publicationId,
+                        Title = "Test publication",
+                        Slug = "test-publication",
+                        LatestReleaseId = releaseId
+                    }
+                );
+
+            fileStorageService.Setup(
+                    mock => mock.GetDeserialized<CachedReleaseViewModel>(releasePath)
+                )
+                .ReturnsAsync(
+                    new CachedReleaseViewModel
+                    {
+                        Id = releaseId,
+                        Title = "2016-17",
+                        Slug = "2016-17",
+                        MetaGuidance = "Release Meta guidance"
+                    }
+                );
 
             metaGuidanceSubjectService.Setup(
-                    mock => mock.GetSubjects(releaseId, null))
+                    mock => mock.GetSubjects(releaseId, null)
+                )
                 .ReturnsAsync(SubjectMetaGuidance);
 
-            var result = await service.Get(releasePath);
+            var result = await service.Get(publicationPath, releasePath);
 
             fileStorageService.Verify(
-                mock => mock.GetDeserialized<CachedReleaseViewModel>(releasePath), Times.Once);
+                mock => mock.GetDeserialized<CachedPublicationViewModel>(publicationPath),
+                Times.Once
+            );
+            fileStorageService.Verify(
+                mock => mock.GetDeserialized<CachedReleaseViewModel>(releasePath),
+                Times.Once
+            );
 
             metaGuidanceSubjectService.Verify(
-                mock => mock.GetSubjects(releaseId, null), Times.Once);
+                mock => mock.GetSubjects(releaseId, null),
+                Times.Once
+            );
 
             Assert.True(result.IsRight);
 
             Assert.Equal(releaseId, result.Right.Id);
-            Assert.Equal("Release Meta guidance", result.Right.Content);
+            Assert.Equal("2016-17", result.Right.Title);
+            Assert.Equal("2016-17", result.Right.Slug);
+            Assert.Equal("Release Meta guidance", result.Right.MetaGuidance);
             Assert.Equal(SubjectMetaGuidance, result.Right.Subjects);
+
+            Assert.Equal(publicationId, result.Right.Publication.Id);
+            Assert.Equal("Test publication", result.Right.Publication.Title);
+            Assert.Equal("test-publication", result.Right.Publication.Slug);
         }
 
         [Fact]
-        public async Task Get_FileNotFoundExceptionForReleasePath()
+        public async Task Get_NotFoundForPublicationPath()
         {
-            const string releasePath = "incorrect/release-path";
+            const string publicationPath = "incorrect-publication-path";
+            const string releasePath = "2016-17";
 
             var fileStorageService = new Mock<IFileStorageService>(MockBehavior.Strict);
             var metaGuidanceSubjectService = new Mock<IMetaGuidanceSubjectService>(MockBehavior.Strict);
 
             var service = SetupMetaGuidanceService(
                 fileStorageService: fileStorageService.Object,
-                metaGuidanceSubjectService: metaGuidanceSubjectService.Object);
+                metaGuidanceSubjectService: metaGuidanceSubjectService.Object
+            );
 
             fileStorageService.Setup(
-                    mock => mock.GetDeserialized<CachedReleaseViewModel>(releasePath))
+                    mock => mock.GetDeserialized<CachedPublicationViewModel>(publicationPath)
+                )
                 .ReturnsAsync(new NotFoundResult());
 
-            var result = await service.Get(releasePath);
+            fileStorageService.Setup(
+                    mock => mock.GetDeserialized<CachedReleaseViewModel>(releasePath)
+                )
+                .ReturnsAsync(new CachedReleaseViewModel
+                {
+                    Id = Guid.NewGuid(),
+                    Title = "2016-17",
+                    Slug = "2016-17",
+                    MetaGuidance = "Release Meta guidance"
+                });
+
+            var result = await service.Get(publicationPath, releasePath);
 
             fileStorageService.Verify(
-                mock => mock.GetDeserialized<CachedReleaseViewModel>(releasePath), Times.Once);
+                mock => mock.GetDeserialized<CachedPublicationViewModel>(publicationPath),
+                Times.Once
+            );
+            fileStorageService.Verify(
+                mock => mock.GetDeserialized<CachedReleaseViewModel>(releasePath),
+                Times.Once
+            );
+
+            Assert.True(result.IsLeft);
+            Assert.IsType<NotFoundResult>(result.Left);
+        }
+
+        [Fact]
+        public async Task Get_NotFoundForReleasePath()
+        {
+            const string publicationPath = "test-publication";
+            const string releasePath = "incorrect-release-path";
+
+            var fileStorageService = new Mock<IFileStorageService>(MockBehavior.Strict);
+            var metaGuidanceSubjectService = new Mock<IMetaGuidanceSubjectService>(MockBehavior.Strict);
+
+            var service = SetupMetaGuidanceService(
+                fileStorageService: fileStorageService.Object,
+                metaGuidanceSubjectService: metaGuidanceSubjectService.Object
+            );
+
+            fileStorageService.Setup(
+                    mock => mock.GetDeserialized<CachedPublicationViewModel>(publicationPath)
+                )
+                .ReturnsAsync(
+                    new CachedPublicationViewModel
+                    {
+                        Id = Guid.NewGuid(),
+                        Title = "Test publication",
+                        Slug = "test-publication",
+                        LatestReleaseId = Guid.NewGuid()
+                    }
+                );
+
+            fileStorageService.Setup(
+                    mock => mock.GetDeserialized<CachedReleaseViewModel>(releasePath)
+                )
+                .ReturnsAsync(new NotFoundResult());
+
+            var result = await service.Get(publicationPath, releasePath);
+
+            fileStorageService.Verify(
+                mock => mock.GetDeserialized<CachedPublicationViewModel>(publicationPath),
+                Times.Once
+            );
+            fileStorageService.Verify(
+                mock => mock.GetDeserialized<CachedReleaseViewModel>(releasePath),
+                Times.Once
+            );
 
             Assert.True(result.IsLeft);
             Assert.IsType<NotFoundResult>(result.Left);

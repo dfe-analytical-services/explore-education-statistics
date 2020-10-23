@@ -17,11 +17,25 @@ namespace GovUk.Education.ExploreEducationStatistics.Content.Api.Controllers
             _metaGuidanceService = metaGuidanceService;
         }
 
-        [HttpGet("publications/{publicationSlug}/release/{releaseSlug}/meta-guidance")]
-        public async Task<ActionResult<MetaGuidanceViewModel>> Get(string publicationSlug,
+        [HttpGet("publications/{publicationSlug}/releases/latest/meta-guidance")]
+        public async Task<ActionResult<MetaGuidanceViewModel>> GetLatest(string publicationSlug)
+        {
+            return await _metaGuidanceService.Get(
+                    publicationPath: PublicContentPublicationPath(publicationSlug),
+                    releasePath: PublicContentLatestReleasePath(publicationSlug)
+                )
+                .HandleFailuresOrOk();
+        }
+
+        [HttpGet("publications/{publicationSlug}/releases/{releaseSlug}/meta-guidance")]
+        public async Task<ActionResult<MetaGuidanceViewModel>> Get(
+            string publicationSlug,
             string releaseSlug)
         {
-            return await _metaGuidanceService.Get(PublicContentReleasePath(publicationSlug, releaseSlug))
+            return await _metaGuidanceService.Get(
+                    publicationPath: PublicContentPublicationPath(publicationSlug),
+                    releasePath: PublicContentReleasePath(publicationSlug, releaseSlug)
+                )
                 .HandleFailuresOrOk();
         }
     }

@@ -1,25 +1,10 @@
 import client from '@admin/services/utils/service';
+import { SubjectMetaGuidance } from '@common/services/releaseMetaGuidanceService';
 
 export interface ReleaseMetaGuidance {
   id: string;
   content: string;
   subjects: SubjectMetaGuidance[];
-}
-
-export interface SubjectMetaGuidance {
-  id: string;
-  filename: string;
-  name: string;
-  content: string;
-  timePeriods: {
-    from: string;
-    to: string;
-  };
-  geographicLevels: string[];
-  variables: {
-    label: string;
-    value: string;
-  }[];
 }
 
 const releaseMetaGuidanceService = {
