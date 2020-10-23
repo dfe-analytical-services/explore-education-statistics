@@ -111,7 +111,7 @@ Validate headlines -- Summary tab content
 Validate Key Statistics data block -- Charts tab
     [Tags]  HappyPath
     user clicks element   id:releaseHeadlines-charts-tab
-    ${headline_chart}=  set variable  id:releaseHeadlines-chart
+    ${headline_chart}=  set variable  css:#releaseHeadlines-chart   # must be css selector
     user waits until element contains line chart  ${headline_chart}
     user checks chart legend item contains  ${headline_chart}  1  Unauthorised absence rate (England)
     user checks chart legend item contains  ${headline_chart}  2  Authorised absence rate (England)

@@ -275,3 +275,11 @@ user gets meta guidance data file content editor
     user waits until parent contains element  ${accordion}   xpath://*[@data-testid="Content"]//*[@role="textbox"]
     ${editor}=  get child element  ${accordion}  xpath://*[@data-testid="Content"]//*[@role="textbox"]
     [Return]  ${editor}
+
+user enters text into meta guidance data file content editor
+    [Arguments]   ${accordion_heading}   ${text}
+    ${editor}=  user gets meta guidance data file content editor  ${accordion_heading}
+    user checks page does not contain testid   fileGuidanceContent-focused
+    user clicks element  ${editor}
+    user waits until page contains testid   fileGuidanceContent-focused
+    user presses keys  ${text}   ${editor}
