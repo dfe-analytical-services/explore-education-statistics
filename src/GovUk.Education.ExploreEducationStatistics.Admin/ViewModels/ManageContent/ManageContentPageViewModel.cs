@@ -1,5 +1,6 @@
 using System;
 using System.Collections.Generic;
+using System.Linq;
 using GovUk.Education.ExploreEducationStatistics.Admin.Models.Api;
 using GovUk.Education.ExploreEducationStatistics.Common.Converters;
 using GovUk.Education.ExploreEducationStatistics.Common.Model;
@@ -54,9 +55,11 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.ViewModels.ManageCont
 
             public ContentSectionViewModel KeyStatisticsSecondarySection { get; set; } = new ContentSectionViewModel();
 
-            public string PreReleaseAccessList { get; set; }
-
             public IEnumerable<FileInfo> DownloadFiles { get; set; }
+
+            public bool HasPreReleaseAccessList { get; set; }
+
+            public bool HasMetaGuidance => DownloadFiles.Any(file => file.Type == ReleaseFileTypes.Data);
 
             [JsonConverter(typeof(DateTimeToDateJsonConverter))]
             public DateTime? PublishScheduled { get; set; }

@@ -1,15 +1,14 @@
 import EditableKeyStat from '@admin/components/editable/EditableKeyStat';
 import KeyStatSelectForm from '@admin/pages/release/content/components/KeyStatSelectForm';
 import useReleaseContentActions from '@admin/pages/release/content/contexts/useReleaseContentActions';
-import { EditableContentBlock } from '@admin/services/types/content';
+import { EditableRelease } from '@admin/services/releaseContentService';
 import Button from '@common/components/Button';
 import WarningMessage from '@common/components/WarningMessage';
 import { KeyStatContainer } from '@common/modules/find-statistics/components/KeyStat';
-import { Release } from '@common/services/publicationService';
 import React, { useCallback, useState } from 'react';
 
 export interface KeyStatisticsProps {
-  release: Release<EditableContentBlock>;
+  release: EditableRelease;
   isEditing?: boolean;
 }
 

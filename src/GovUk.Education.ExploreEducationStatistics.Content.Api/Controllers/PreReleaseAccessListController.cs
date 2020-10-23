@@ -1,5 +1,4 @@
 using System;
-using System.Net.Mime;
 using System.Threading.Tasks;
 using GovUk.Education.ExploreEducationStatistics.Content.Api.Services.Interfaces;
 using GovUk.Education.ExploreEducationStatistics.Content.Api.ViewModels;
@@ -10,35 +9,36 @@ using static GovUk.Education.ExploreEducationStatistics.Common.Services.FileStor
 namespace GovUk.Education.ExploreEducationStatistics.Content.Api.Controllers
 {
     [Route("api")]
-    [Produces(MediaTypeNames.Application.Json)]
-    public class ReleaseController : ControllerBase
+    public class PreReleaseAccessListController : ControllerBase
     {
         private readonly IFileStorageService _fileStorageService;
 
-        public ReleaseController(IFileStorageService fileStorageService)
+        public PreReleaseAccessListController(IFileStorageService fileStorageService)
         {
             _fileStorageService = fileStorageService;
         }
 
-        [HttpGet("publications/{publicationSlug}/releases/latest")]
-        public async Task<ActionResult<ReleaseViewModel>> GetLatestRelease(string publicationSlug)
+        [HttpGet("publications/{publicationSlug}/releases/latest/prerelease-access-list")]
+        public async Task<ActionResult<PreReleaseAccessListViewModel>> GetLatest(string publicationSlug)
         {
-            return await GetReleaseViewModel(
+            return await GetViewModel(
                 PublicContentPublicationPath(publicationSlug),
                 PublicContentLatestReleasePath(publicationSlug)
             );
         }
 
-        [HttpGet("publications/{publicationSlug}/releases/{releaseSlug}")]
-        public async Task<ActionResult<ReleaseViewModel>> GetRelease(string publicationSlug, string releaseSlug)
+        [HttpGet("publications/{publicationSlug}/releases/{releaseSlug}/prerelease-access-list")]
+        public async Task<ActionResult<PreReleaseAccessListViewModel>> Get(
+            string publicationSlug,
+            string releaseSlug)
         {
-            return await GetReleaseViewModel(
+            return await GetViewModel(
                 PublicContentPublicationPath(publicationSlug),
                 PublicContentReleasePath(publicationSlug, releaseSlug)
             );
         }
 
-        private async Task<ActionResult<ReleaseViewModel>> GetReleaseViewModel(
+        private async Task<ActionResult<PreReleaseAccessListViewModel>> GetViewModel(
             string publicationPath,
             string releasePath)
         {
@@ -59,7 +59,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Content.Api.Controllers
                 && releaseTask.Result.IsRight
                 && publicationTask.Result.IsRight)
             {
-                return new ReleaseViewModel(releaseTask.Result.Right, publicationTask.Result.Right);
+                return new PreReleaseAccessListViewModel(releaseTask.Result.Right, publicationTask.Result.Right);
             }
 
             return NotFound();

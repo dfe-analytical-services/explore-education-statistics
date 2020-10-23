@@ -156,7 +156,7 @@ const PublicationReleasePage: NextPage<Props> = ({ data }) => {
                     {` (${extension}, ${size})`}
                   </li>
                 ))}
-                {data.preReleaseAccessList && (
+                {data.hasPreReleaseAccessList && (
                   <li>
                     <Link
                       to={

@@ -24,7 +24,6 @@ export interface Publication {
   description: string;
   dataSource: string;
   summary: string;
-  nextUpdate: string;
   otherReleases: {
     id: string;
     slug: string;
@@ -43,6 +42,15 @@ export interface Publication {
   contact: PublicationContact;
   methodology?: Methodology;
   externalMethodology?: ExternalMethodology;
+}
+
+export interface PublicationSummary {
+  id: string;
+  slug: string;
+  title: string;
+  description: string;
+  dataSource: string;
+  summary: string;
 }
 
 export interface PublicationContact {
@@ -107,11 +115,8 @@ export interface Release<
   keyStatisticsSecondarySection: ContentSection<DataBlockType>;
   headlinesSection: ContentSection<ContentBlockType>;
   publication: PublicationType;
-  publicationId: string;
   latestRelease: boolean;
-  publishScheduled?: string;
   nextReleaseDate: PartialDate;
-  status: ReleaseApprovalStatus;
   relatedInformation: BasicLink[];
   type: {
     id: string;
@@ -120,8 +125,31 @@ export interface Release<
   updates: ReleaseNote[];
   content: ContentSection<ContentBlockType | DataBlockType>[];
   downloadFiles: FileInfo[];
-  preReleaseAccessList?: string;
   dataLastPublished: string;
+  hasPreReleaseAccessList: boolean;
+  hasMetaGuidance: boolean;
+}
+
+export interface ReleaseSummary {
+  id: string;
+  title: string;
+  yearTitle: string;
+  coverageTitle: string;
+  releaseName: string;
+  published?: string;
+  slug: string;
+  nextReleaseDate: PartialDate;
+  type: {
+    id: string;
+    title: ReleaseType;
+  };
+  latestRelease: boolean;
+  publication: PublicationSummary;
+  dataLastPublished: string;
+}
+
+export interface PreReleaseAccessListSummary extends ReleaseSummary {
+  preReleaseAccessList: string;
 }
 
 export default {
@@ -142,6 +170,21 @@ export default {
   ): Promise<Release> {
     return contentApi.get(
       `/publications/${publicationSlug}/releases/${releaseSlug}`,
+    );
+  },
+  getLatestPreReleaseAccessList(
+    publicationSlug: string,
+  ): Promise<PreReleaseAccessListSummary> {
+    return contentApi.get(
+      `/publications/${publicationSlug}/releases/latest/prerelease-access-list`,
+    );
+  },
+  getPreReleaseAccessList(
+    publicationSlug: string,
+    releaseSlug: string,
+  ): Promise<PreReleaseAccessListSummary> {
+    return contentApi.get(
+      `/publications/${publicationSlug}/releases/${releaseSlug}/prerelease-access-list`,
     );
   },
 };

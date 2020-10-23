@@ -167,5 +167,49 @@
               ],
               ""metaGuidance"": ""Release Meta Guidance""
             }";
+
+        internal const string MethodologyJson = @"
+            {
+                ""id"": ""c04e6613-1f98-4998-86a0-7570c2034d3a"",
+                ""title"": ""string"",
+                ""slug"": ""string"",
+                ""summary"": ""string"",
+                ""published"": ""2020-02-03T17:19:09.892Z"",
+                ""lastUpdated"": ""2020-02-03T17:19:09.892Z"",
+                ""content"": [
+                {
+                    ""id"": ""28ada0ae-504d-480a-8757-a752d2994c89"",
+                    ""order"": 0,
+                    ""heading"": ""string"",
+                    ""caption"": ""string"",
+                    ""content"": [
+                    {
+                        ""$type"": ""GovUk.Education.ExploreEducationStatistics.Publisher.Model.ViewModels.HtmlBlockViewModel, GovUk.Education.ExploreEducationStatistics.Publisher.Model"",
+                        ""id"": ""382fa9aa-0fc6-4f00-957d-195862b01272"",
+                        ""order"": 0,
+                        ""body"": ""string"",
+                        ""type"": ""string""
+                    }
+                    ]
+                }
+                ],
+                ""annexes"": [
+                {
+                    ""id"": ""305dd865-47b4-4e05-988c-01e36fa15a95"",
+                    ""order"": 0,
+                    ""heading"": ""string"",
+                    ""caption"": ""string"",
+                    ""content"": [
+                    {
+                        ""$type"": ""GovUk.Education.ExploreEducationStatistics.Publisher.Model.ViewModels.MarkDownBlockViewModel, GovUk.Education.ExploreEducationStatistics.Publisher.Model"",
+                        ""id"": ""32daa5e8-0ee9-4134-9fef-f2ed79a49144"",
+                        ""order"": 0,
+                        ""body"": ""string"",
+                        ""type"": ""string""
+                    }
+                    ]
+                }
+                ]
+            }";
     }
 }

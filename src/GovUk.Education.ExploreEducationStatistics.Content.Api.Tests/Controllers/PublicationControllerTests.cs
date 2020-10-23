@@ -1,122 +1,113 @@
 ﻿using System;
-using GovUk.Education.ExploreEducationStatistics.Common.Services.Interfaces;
+using System.Threading.Tasks;
 using GovUk.Education.ExploreEducationStatistics.Content.Api.Controllers;
+using GovUk.Education.ExploreEducationStatistics.Content.Api.Services.Interfaces;
+using GovUk.Education.ExploreEducationStatistics.Publisher.Model.ViewModels;
 using Microsoft.AspNetCore.Mvc;
 using Moq;
 using Xunit;
-using static GovUk.Education.ExploreEducationStatistics.Common.BlobContainerNames;
 
 namespace GovUk.Education.ExploreEducationStatistics.Content.Api.Tests.Controllers
 {
     public class PublicationControllerTests
     {
-        private const string PublicationJson = @"
-            {
-              ""id"": ""4fd09502-15bb-4d2b-abd1-7fd112aeee14"",
-              ""title"": ""string"",
-              ""slug"": ""string"",
-              ""description"": ""string"",
-              ""dataSource"": ""string"",
-              ""summary"": ""string"",
-              ""latestReleaseId"": ""2ca4bbbc-e52d-4cb7-8dd2-541623973d68"",
-              ""releases"": [
-                {
-                  ""id"": ""2ca4bbbc-e52d-4cb7-8dd2-541623973d68"",
-                  ""slug"": ""string"",
-                  ""title"": ""string""
-                }
-              ],
-              ""legacyReleases"": [
-                {
-                  ""id"": ""6d43d18a-bc21-4939-b938-12e714490091"",
-                  ""description"": ""string"",
-                  ""url"": ""string""
-                }
-              ],
-              ""topic"": {
-                ""theme"": {
-                  ""title"": ""string""
-                }
-              },
-              ""contact"": {
-                ""teamName"": ""string"",
-                ""teamEmail"": ""string"",
-                ""contactName"": ""string"",
-                ""contactTelNo"": ""string""
-              },
-              ""externalMethodology"": {
-                ""title"": ""externalMethodologyTitle"",
-                ""url"": ""externalMethodologyUrl""
-              },
-              ""methodology"": {
-                ""id"": ""d18931ca-a801-4184-b43a-f48d95c23d2a"",
-                ""slug"": ""methodologySlug"",
-                ""summary"": ""methodologySummary"",
-                ""title"": ""methodologyTitle""
-              }
-            }";
-
-       [Fact]
-        public void Get_PublicationTitle_Returns_Ok()
+        [Fact]
+        public async Task GetPublicationTitle()
         {
-            var fileStorageService = new Mock<IBlobStorageService>();
-            fileStorageService.Setup(
-                    s => s.DownloadBlobText(
-                        PublicContentContainerName,
-                        "publications/publication-a/publication.json"
-                    )
+            var publicationId = Guid.NewGuid();
+
+            var fileStorageService = new Mock<IFileStorageService>();
+            fileStorageService
+                .Setup(s =>
+                    s.GetDeserialized<PublicationTitleViewModel>("publications/publication-a/publication.json")
                 )
-                .ReturnsAsync(PublicationJson);
+                .ReturnsAsync(new PublicationTitleViewModel
+                    {
+                        Id = publicationId,
+                        Title = "Test title"
+                    });
 
             var controller = new PublicationController(fileStorageService.Object);
 
-            var publicationTitleViewModel = controller.GetPublicationTitle("publication-a").Result.Value;
-            Assert.Equal(new Guid("4fd09502-15bb-4d2b-abd1-7fd112aeee14"), publicationTitleViewModel.Id);
-            Assert.Equal("string", publicationTitleViewModel.Title);
+            var publicationTitleViewModel = (await controller.GetPublicationTitle("publication-a")).Value;
+
+            Assert.IsType<PublicationTitleViewModel>(publicationTitleViewModel);
+
+            Assert.Equal(publicationId, publicationTitleViewModel.Id);
+            Assert.Equal("Test title", publicationTitleViewModel.Title);
         }
 
         [Fact]
-        public void Get_PublicationTitle_Returns_NotFound()
+        public async Task GetPublicationTitle_NotFound()
         {
-            var fileStorageService = new Mock<IBlobStorageService>();
+            var fileStorageService = new Mock<IFileStorageService>();
+
+            fileStorageService
+                .Setup(s => s.GetDeserialized<PublicationTitleViewModel>(It.IsAny<string>()))
+                .ReturnsAsync(new NotFoundResult());
+
             var controller = new PublicationController(fileStorageService.Object);
-            var result = controller.GetPublicationTitle("missing-publication");
-            Assert.IsAssignableFrom<NotFoundResult>(result.Result.Result);
+            var result = await controller.GetPublicationTitle("missing-publication");
+
+            Assert.IsType<NotFoundResult>(result.Result);
         }
 
         [Fact]
-        public void Get_PublicationMethodology_Returns_Ok()
+        public async Task GetPublicationMethodology()
         {
-            var fileStorageService = new Mock<IBlobStorageService>();
+            var methodologyId = Guid.NewGuid();
+
+            var fileStorageService = new Mock<IFileStorageService>();
+
             fileStorageService.Setup(
-                    s => s.DownloadBlobText(
-                        PublicContentContainerName,
+                    s => s.GetDeserialized<PublicationMethodologyViewModel>(
                         "publications/publication-a/publication.json"
                     )
                 )
-                .ReturnsAsync(PublicationJson);
+                .ReturnsAsync(new PublicationMethodologyViewModel
+                {
+                    Methodology = new MethodologySummaryViewModel
+                    {
+                        Id = methodologyId,
+                        Slug = "methodologySlug",
+                        Summary = "methodologySummary",
+                        Title = "methodologyTitle"
+                    },
+                    ExternalMethodology = new ExternalMethodologyViewModel
+                    {
+                        Title = "externalMethodologyTitle",
+                        Url = "externalMethodologyUrl"
+                    }
+                });
 
             var controller = new PublicationController(fileStorageService.Object);
 
-            var publicationMethodologyViewModel = controller.GetPublicationMethodology("publication-a").Result.Value;
+            var publicationMethodologyViewModel = (await controller.GetPublicationMethodology("publication-a")).Value;
+
+            Assert.IsType<PublicationMethodologyViewModel>(publicationMethodologyViewModel);
+
             Assert.Equal("externalMethodologyTitle", publicationMethodologyViewModel.ExternalMethodology.Title);
             Assert.Equal("externalMethodologyUrl", publicationMethodologyViewModel.ExternalMethodology.Url);
-            Assert.Equal(
-                new Guid("d18931ca-a801-4184-b43a-f48d95c23d2a"),
-                publicationMethodologyViewModel.Methodology.Id
-            );
+
+            Assert.Equal(methodologyId, publicationMethodologyViewModel.Methodology.Id);
             Assert.Equal("methodologySlug", publicationMethodologyViewModel.Methodology.Slug);
             Assert.Equal("methodologySummary", publicationMethodologyViewModel.Methodology.Summary);
             Assert.Equal("methodologyTitle", publicationMethodologyViewModel.Methodology.Title);
         }
 
         [Fact]
-        public void Get_PublicationMethodology_Returns_NotFound()
+        public async Task GetPublicationMethodology_NotFound()
         {
-            var fileStorageService = new Mock<IBlobStorageService>();
+            var fileStorageService = new Mock<IFileStorageService>();
+
+            fileStorageService
+                .Setup(s => s.GetDeserialized<PublicationMethodologyViewModel>(It.IsAny<string>()))
+                .ReturnsAsync(new NotFoundResult());
+
             var controller = new PublicationController(fileStorageService.Object);
-            var result = controller.GetPublicationMethodology("missing-publication");
-            Assert.IsAssignableFrom<NotFoundResult>(result.Result.Result);
+            var result = await controller.GetPublicationMethodology("missing-publication");
+
+            Assert.IsType<NotFoundResult>(result.Result);
         }
     }
 }

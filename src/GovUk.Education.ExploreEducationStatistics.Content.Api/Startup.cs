@@ -77,6 +77,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Content.Api
                     );
                 }
             );
+            services.AddTransient<IFileStorageService, FileStorageService>();
             services.AddTransient<IFilterService, FilterService>();
             services.AddTransient<IIndicatorService, IndicatorService>();
             services.AddTransient<IMetaGuidanceService, MetaGuidanceService>();

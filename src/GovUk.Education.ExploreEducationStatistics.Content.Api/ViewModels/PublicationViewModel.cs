@@ -2,11 +2,12 @@ using System;
 using System.Collections.Generic;
 using GovUk.Education.ExploreEducationStatistics.Publisher.Model.ViewModels;
 
-namespace GovUk.Education.ExploreEducationStatistics.Content.Api.Models
+namespace GovUk.Education.ExploreEducationStatistics.Content.Api.ViewModels
 {
     public class PublicationViewModel
     {
-        public PublicationViewModel(Guid id,
+        public PublicationViewModel(
+            Guid id,
             string title,
             string slug,
             string description,
@@ -35,30 +36,30 @@ namespace GovUk.Education.ExploreEducationStatistics.Content.Api.Models
             Methodology = methodology;
         }
 
-        public Guid Id { get; set; }
+        public Guid Id { get; }
 
-        public string Title { get; set; }
+        public string Title { get; }
 
-        public string Slug { get; set; }
+        public string Slug { get; }
 
-        public string Description { get; set; }
+        public string Description { get; }
 
-        public string DataSource { get; set; }
+        public string DataSource { get; }
 
-        public string Summary { get; set; }
+        public string Summary { get; }
 
-        public Guid LatestReleaseId { get; set; }
+        public Guid LatestReleaseId { get; }
 
-        public List<ReleaseTitleViewModel> OtherReleases { get; set; }
+        public List<ReleaseTitleViewModel> OtherReleases { get; }
 
-        public List<LegacyReleaseViewModel> LegacyReleases { get; set; }
+        public List<LegacyReleaseViewModel> LegacyReleases { get; }
 
-        public TopicViewModel Topic { get; set; }
+        public TopicViewModel Topic { get; }
 
-        public ContactViewModel Contact { get; set; }
+        public ContactViewModel Contact { get; }
 
-        public ExternalMethodologyViewModel ExternalMethodology { get; set; }
+        public ExternalMethodologyViewModel ExternalMethodology { get; }
 
-        public MethodologySummaryViewModel Methodology { get; set; }
+        public MethodologySummaryViewModel Methodology { get; }
     }
 }

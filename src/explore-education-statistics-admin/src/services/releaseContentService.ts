@@ -7,13 +7,22 @@ import {
   EditableDataBlock,
 } from '@admin/services/types/content';
 import client from '@admin/services/utils/service';
-import { ContentSection, Release } from '@common/services/publicationService';
+import {
+  ContentSection,
+  Release,
+  ReleaseApprovalStatus,
+} from '@common/services/publicationService';
 import { DataBlock } from '@common/services/types/blocks';
 import { Dictionary } from '@common/types';
 
 type ContentSectionViewModel = ContentSection<EditableBlock>;
 
-export type EditableRelease = Release<EditableContentBlock, EditableDataBlock>;
+export interface EditableRelease
+  extends Release<EditableContentBlock, EditableDataBlock> {
+  status: ReleaseApprovalStatus;
+  publishScheduled?: string;
+  publicationId: string;
+}
 
 export interface ReleaseContent {
   release: EditableRelease;
