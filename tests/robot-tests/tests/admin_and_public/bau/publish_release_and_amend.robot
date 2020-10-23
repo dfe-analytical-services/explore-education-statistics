@@ -464,10 +464,8 @@ Verify existing meta guidance for amendment
 Update existing meta guidance for amendment
     [Tags]  HappyPath
     user enters text into element  id:metaGuidanceForm-content  Updated test meta guidance content
-
-    ${editor}=  user gets meta guidance data file content editor  Dates test subject
-    user clicks element  ${editor}
-    user presses keys  Updated Dates test subject test meta guidance content  ${editor}
+    user enters text into meta guidance data file content editor  Dates test subject
+    ...  Updated Dates test subject test meta guidance content
 
     user clicks button  Save guidance
 
