@@ -282,4 +282,4 @@ user enters text into meta guidance data file content editor
     user checks page does not contain testid   fileGuidanceContent-focused
     user clicks element  ${editor}
     user waits until page contains testid   fileGuidanceContent-focused
-    user presses keys  ${text}   ${editor}
+    user enters text into element  ${editor}  ${text}
