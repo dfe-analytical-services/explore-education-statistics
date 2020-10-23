@@ -97,6 +97,7 @@ export interface FormEditorProps {
   label: string;
   toolbarConfig?: string[];
   value: string;
+  testId?: string;
   onBlur?: () => void;
   onChange: (content: string) => void;
 }
@@ -111,6 +112,7 @@ const FormEditor = ({
   label,
   toolbarConfig = toolbarConfigs.full,
   value,
+  testId,
   onBlur,
   onChange,
 }: FormEditorProps) => {
@@ -237,6 +239,7 @@ const FormEditor = ({
           className={classNames(styles.editor, {
             [styles.focused]: isFocused,
           })}
+          data-testid={isFocused ? `${testId}-focused` : testId}
           ref={ref => {
             const editorElement = ref?.querySelector<HTMLDivElement>(
               '[role="textbox"]',

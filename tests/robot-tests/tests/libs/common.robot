@@ -219,6 +219,10 @@ user waits until page contains testid
     [Arguments]  ${id}   ${wait}=${timeout}
     user waits until page contains element   css:[data-testid="${id}"]   ${wait}
 
+user checks page does not contain testid
+    [Arguments]  ${id}
+    user checks page does not contain element   css:[data-testid="${id}"]
+
 user checks testid element contains
     [Arguments]  ${id}  ${text}
     user waits until element contains  css:[data-testid="${id}"]   ${text}

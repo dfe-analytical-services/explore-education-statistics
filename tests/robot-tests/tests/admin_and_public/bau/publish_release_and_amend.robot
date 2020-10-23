@@ -66,9 +66,8 @@ Add meta guidance
     user checks summary list contains  Geographic levels    National
     user checks summary list contains  Time period          2020 Week 13 to 2021 Week 24
 
-    ${editor}=  user gets meta guidance data file content editor  Dates test subject
-    user clicks element  ${editor}
-    user presses keys  Dates test subject test meta guidance content   ${editor}
+    user enters text into meta guidance data file content editor  Dates test subject
+    ...   Dates test subject test meta guidance content
     user clicks button  Save guidance
 
 Add ancillary file

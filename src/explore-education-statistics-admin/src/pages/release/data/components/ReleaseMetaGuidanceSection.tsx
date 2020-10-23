@@ -186,6 +186,7 @@ const ReleaseMetaGuidanceSection = ({ releaseId, canUpdateRelease }: Props) => {
                                         id={`${formId}-subjects${index}Content`}
                                         name={`subjects[${index}].content`}
                                         label="File guidance content"
+                                        testId="fileGuidanceContent"
                                       />
                                     ) : (
                                       <SanitizeHtml

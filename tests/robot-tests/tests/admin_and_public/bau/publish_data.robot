@@ -97,9 +97,8 @@ Add meta guidance to subject
 
     user waits until page contains accordion section  ${SUBJECT_NAME}
     user opens accordion section  ${SUBJECT_NAME}
-    ${editor}=  user gets meta guidance data file content editor  ${SUBJECT_NAME}
-    user clicks element  ${editor}
-    user presses keys  ${SUBJECT_NAME} test meta guidance content   ${editor}
+    user enters text into meta guidance data file content editor  ${SUBJECT_NAME}
+    ...  ${SUBJECT_NAME} meta guidance content
     user clicks button  Save guidance
 
 Navigate to 'Data blocks' page

@@ -56,10 +56,8 @@ Add meta guidance to subject
     user waits until h2 is visible  Public metadata guidance document
 
     user waits until page contains accordion section  ${SUBJECT_NAME}
-    ${editor}=  user gets meta guidance data file content editor  ${SUBJECT_NAME}
-    user clicks element  ${editor}
-    user presses keys  ${SUBJECT_NAME} test meta guidance content  ${editor}
-
+    user enters text into meta guidance data file content editor  ${SUBJECT_NAME}
+    ...   ${SUBJECT_NAME} meta guidance content
     user clicks button  Save guidance
 
 Navigate to 'Footnotes' page
