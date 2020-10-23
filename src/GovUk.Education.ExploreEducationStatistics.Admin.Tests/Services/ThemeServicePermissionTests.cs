@@ -227,14 +227,16 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
             IMapper mapper = null,
             PersistenceHelper<ContentDbContext> persistenceHelper = null,
             IUserService userService = null,
-            ITopicService topicService = null)
+            ITopicService topicService = null,
+            IPublishingService publishingService = null)
         {
             return new ThemeService(
                 context ?? new Mock<ContentDbContext>().Object,
                 mapper ?? AdminMapper(),
                 persistenceHelper ?? MockUtils.MockPersistenceHelper<ContentDbContext, Theme>(_theme.Id, _theme).Object,
                 userService ?? MockUtils.AlwaysTrueUserService().Object,
-                topicService ?? new Mock<ITopicService>().Object
+                topicService ?? new Mock<ITopicService>().Object,
+                publishingService ?? new Mock<IPublishingService>().Object
             );
         }
     }

@@ -31,6 +31,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Services
         private readonly IUserService _userService;
         private readonly IReleaseSubjectService _releaseSubjectService;
         private readonly IReleaseFilesService _releaseFilesService;
+        private readonly IPublishingService _publishingService;
 
         public TopicService(
             ContentDbContext contentContext,
@@ -39,7 +40,8 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Services
             IMapper mapper,
             IUserService userService,
             IReleaseSubjectService releaseSubjectService,
-            IReleaseFilesService releaseFilesService)
+            IReleaseFilesService releaseFilesService,
+            IPublishingService publishingService)
         {
             _contentContext = contentContext;
             _statisticsContext = statisticsContext;
@@ -48,6 +50,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Services
             _userService = userService;
             _releaseSubjectService = releaseSubjectService;
             _releaseFilesService = releaseFilesService;
+            _publishingService = publishingService;
         }
 
         public async Task<Either<ActionResult, TopicViewModel>> CreateTopic(SaveTopicViewModel createdTopic)
@@ -75,6 +78,8 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Services
                         );
 
                         await _contentContext.SaveChangesAsync();
+
+                        await _publishingService.TaxonomyChanged();
 
                         return await GetTopic(saved.Entity.Id);
                     }
@@ -106,6 +111,8 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Services
 
                         _contentContext.Topics.Update(topic);
                         await _contentContext.SaveChangesAsync();
+
+                        await _publishingService.TaxonomyChanged();
 
                         return await GetTopic(topic.Id);
                     }
@@ -176,6 +183,8 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Services
                         );
 
                         await _contentContext.SaveChangesAsync();
+
+                        await _publishingService.TaxonomyChanged();
                     }
                 );
         }
