@@ -29,12 +29,17 @@ Search for Pupil referral unit
     [Tags]  HappyPath
     user verifies accordion is closed  P
 
-    user clicks element   id:pageSearchForm-input
-    element should be focused  id:pageSearchForm-input
-    user presses keys  Pupil referral unit
+    user enters text into element  id:pageSearchForm-input  Pupil referral unit
     user waits until element contains   xpath://*[@id="pageSearchForm-resultsLabel"]   Found 1 result
     user clicks element   id:pageSearchForm-option-0
 
     user verifies accordion is open  P
+
+    ${section}=  user gets accordion section content element  P
+
+    user waits until parent contains element  ${section}  id:pupil-referral-unit
     user checks element is visible  id:pupil-referral-unit
-    user checks page contains   An alternative education provision specifically organised to provide education for children who are not able to attend school and may not otherwise receive a suitable education.
+    user checks element should contain  id:pupil-referral-unit  Pupil referral unit (PRUs)
+    user checks element should contain  ${section}
+    ...  An alternative education provision specifically organised to provide education for children who are not able to attend school and may not otherwise receive a suitable education.
+
