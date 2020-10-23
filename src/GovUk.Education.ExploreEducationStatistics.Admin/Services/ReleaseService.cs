@@ -260,7 +260,6 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Services
                 .CheckEntityExists<Release>(releaseId)
                 .OnSuccess(_userService.CheckCanUpdateRelease)
                 .OnSuccessDo(release => _userService.CheckCanUpdateReleaseStatus(release, request.Status))
-                .OnSuccessDo(async release => await ValidateSelectedPublication(release, request.PublicationId))
                 .OnSuccessDo(async release => await ValidateReleaseSlugUniqueToPublication(request.Slug, release.PublicationId, releaseId))
                 .OnSuccessDo(async release => await CheckDataReplacementNotInProgress(release, request.Status))
                 .OnSuccessDo(async release => await CheckAllDataFilesUploaded(release, request.Status))
@@ -280,7 +279,6 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Services
                         return ValidationActionResult(ApprovedReleaseMustHavePublishScheduledDate);
                     }
 
-                    release.PublicationId = request.PublicationId;
                     release.Slug = request.Slug;
                     release.TypeId = request.TypeId;
                     release.ReleaseName = request.ReleaseName;
@@ -312,18 +310,6 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Services
 
                     return await GetRelease(releaseId);
                 });
-        }
-
-        private async Task<Either<ActionResult, Publication>> ValidateSelectedPublication(Release release, Guid publicationId)
-        {
-            if (release.PublicationId == publicationId)
-            {
-                return release.Publication;
-            }
-
-            return await _persistenceHelper.CheckEntityExists<Publication>(publicationId)
-                .OnFailureFailWith(() => ValidationActionResult(PublicationDoesNotExist))
-                .OnSuccess(_userService.CheckCanCreateReleaseForPublication);
         }
 
         public async Task<Either<ActionResult, TitleAndIdViewModel>> GetLatestReleaseAsync(Guid publicationId)
