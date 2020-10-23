@@ -519,7 +519,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
 
             subjectService.Setup(service => service.GetAsync(subject.Id)).ReturnsAsync(subject);
             subjectService.Setup(service => service.GetAsync(replacementSubject.Id)).ReturnsAsync(replacementSubject);
-            
+
             fileStorageService
                 .Setup(service => service.DeleteDataFiles(release.Id, It.IsIn(file.Id, replacementFile.Id), false))
                 .ReturnsAsync(Unit.Instance);
@@ -659,11 +659,6 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
                 Title = "Official Statistics"
             };
 
-            var newPublication = new Publication
-            {
-                Title = "New publication"
-            };
-
             var release = new Release
             {
                 Id = releaseId,
@@ -689,7 +684,6 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
             {
                 await context.AddRangeAsync(adHocReleaseType, officialStatisticsReleaseType);
 
-                await context.AddAsync(newPublication);
                 await context.AddAsync(release);
                 await context.SaveChangesAsync();
             }
@@ -708,7 +702,6 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
                         releaseId,
                         new UpdateReleaseViewModel
                         {
-                            PublicationId = newPublication.Id,
                             PublishScheduled = "2051-06-30",
                             NextReleaseDate = nextReleaseDateEdited,
                             TypeId = officialStatisticsReleaseType.Id,
@@ -722,7 +715,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
 
                 Assert.True(result.IsRight);
 
-                Assert.Equal(newPublication.Id, result.Right.PublicationId);
+                Assert.Equal(release.Publication.Id, result.Right.PublicationId);
                 Assert.Equal(new DateTime(2051, 6, 30, 0, 0, 0, DateTimeKind.Unspecified), result.Right.PublishScheduled);
                 Assert.Equal(nextReleaseDateEdited, result.Right.NextReleaseDate);
                 Assert.Equal(officialStatisticsReleaseType, result.Right.Type);
@@ -732,7 +725,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
 
                 var saved = await context.Releases.FindAsync(result.Right.Id);
 
-                Assert.Equal(newPublication.Id, saved.PublicationId);
+                Assert.Equal(release.Publication.Id, saved.PublicationId);
                 Assert.Equal(new DateTime(2051, 6, 29, 23, 0, 0, DateTimeKind.Utc), saved.PublishScheduled);
                 Assert.Equal(nextReleaseDateEdited, saved.NextReleaseDate);
                 Assert.Equal(officialStatisticsReleaseType, saved.Type);
@@ -800,7 +793,6 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
                         releaseId,
                         new UpdateReleaseViewModel
                         {
-                            PublicationId = release.PublicationId,
                             PublishScheduled = "2051-06-30",
                             TypeId = releaseType.Id,
                             ReleaseName = "2035",
@@ -811,62 +803,6 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
 
                 Assert.True(result.IsLeft);
                 AssertValidationProblem(result.Left, SlugNotUnique);
-            }
-        }
-
-        [Fact]
-        public async Task UpdateRelease_FailsNonExistingPublication()
-        {
-            var releaseType = new ReleaseType
-            {
-                Title = "Ad Hoc"
-            };
-
-            var releaseId = Guid.NewGuid();
-            var release = new Release
-            {
-                Id = releaseId,
-                Type = releaseType,
-                Publication = new Publication
-                {
-                    Title = "Old publication"
-                },
-                ReleaseName = "2030",
-                Slug = "2030",
-                PublishScheduled = DateTime.UtcNow,
-                Version = 0,
-                PreviousVersionId = releaseId
-            };
-
-            var contextId = Guid.NewGuid().ToString();
-
-            await using (var context = InMemoryApplicationDbContext(contextId))
-            {
-                await context.AddAsync(releaseType);
-                await context.AddAsync(release);
-                await context.SaveChangesAsync();
-            }
-
-            await using (var context = InMemoryApplicationDbContext(contextId))
-            {
-                var releaseService = BuildReleaseService(context);
-
-                var result = await releaseService
-                    .UpdateRelease(
-                        releaseId,
-                        new UpdateReleaseViewModel
-                        {
-                            PublicationId = Guid.NewGuid(),
-                            PublishScheduled = "2051-06-30",
-                            TypeId = releaseType.Id,
-                            ReleaseName = "2035",
-                            TimePeriodCoverage = TimeIdentifier.CalendarYear,
-                            Status = ReleaseStatus.Draft
-                        }
-                    );
-
-                Assert.True(result.IsLeft);
-                AssertValidationProblem(result.Left, PublicationDoesNotExist);
             }
         }
 
@@ -925,7 +861,6 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
                         amendedRelease.Id,
                         new UpdateReleaseViewModel
                         {
-                            PublicationId = amendedRelease.PublicationId,
                             PublishScheduled = "2051-06-30",
                             TypeId = releaseType.Id,
                             ReleaseName = "2035",
@@ -997,7 +932,6 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
                         release.Id,
                         new UpdateReleaseViewModel
                         {
-                            PublicationId = release.PublicationId,
                             PublishScheduled = "2051-06-30",
                             TypeId = release.Type.Id,
                             ReleaseName = "2030",
@@ -1035,7 +969,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
                 Release = release,
                 ReleaseFileReference = new ReleaseFileReference
                 {
-                    
+
                     Filename = "original.csv",
                     Release = release,
                     ReleaseFileType = ReleaseFileTypes.Data,
@@ -1090,7 +1024,6 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
                         release.Id,
                         new UpdateReleaseViewModel
                         {
-                            PublicationId = release.PublicationId,
                             PublishScheduled = "2051-06-30",
                             TypeId = release.Type.Id,
                             ReleaseName = "2030",
@@ -1144,7 +1077,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
                     .ReturnsAsync(TableStorageTestUtils.CreateTableQuerySegment(new List<DatafileImport>()));
 
                 metaGuidanceService.Setup(service => service.Validate(release.Id))
-                    .ReturnsAsync(ValidationActionResult(MetaGuidanceMustBePopulated));                
+                    .ReturnsAsync(ValidationActionResult(MetaGuidanceMustBePopulated));
 
                 tableStorageService.Setup(service => service.GetTableAsync(DatafileImportsTableName, true))
                     .ReturnsAsync(cloudTableMock.Object);
@@ -1158,7 +1091,6 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
                         release.Id,
                         new UpdateReleaseViewModel
                         {
-                            PublicationId = release.PublicationId,
                             PublishScheduled = "2051-06-30",
                             TypeId = release.Type.Id,
                             ReleaseName = "2030",
@@ -1219,7 +1151,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
                     .ReturnsAsync(TableStorageTestUtils.CreateTableQuerySegment(new List<DatafileImport>()));
 
                 metaGuidanceService.Setup(service => service.Validate(release.Id))
-                    .ReturnsAsync(Unit.Instance);                
+                    .ReturnsAsync(Unit.Instance);
 
                 tableStorageService.Setup(service => service.GetTableAsync(DatafileImportsTableName, true))
                     .ReturnsAsync(cloudTableMock.Object);
@@ -1233,7 +1165,6 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
                         release.Id,
                         new UpdateReleaseViewModel
                         {
-                            PublicationId = release.PublicationId,
                             PublishScheduled = "2051-06-30",
                             TypeId = release.Type.Id,
                             ReleaseName = "2030",
@@ -1300,7 +1231,6 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
                         release.Id,
                         new UpdateReleaseViewModel
                         {
-                            PublicationId = release.PublicationId,
                             PublishScheduled = "2051-06-30",
                             TypeId = release.Type.Id,
                             ReleaseName = "2030",
@@ -1368,7 +1298,6 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
                         release.Id,
                         new UpdateReleaseViewModel
                         {
-                            PublicationId = release.PublicationId,
                             TypeId = release.Type.Id,
                             ReleaseName = "2030",
                             TimePeriodCoverage = TimeIdentifier.CalendarYear,
@@ -1630,7 +1559,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
                     .UserReleaseInvites
                     .FirstOrDefault(r => r.Id == userReleaseInvite.Id);
 
-                Assert.Null(unableToFindDeletedReleaseInvite); 
+                Assert.Null(unableToFindDeletedReleaseInvite);
 
                 // assert that soft-deleted entities do not appear via references from other entities by default
                 var publicationWithoutDeletedRelease = context
@@ -1640,7 +1569,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
                     .First(p => p.Id == publication.Id);
 
                 Assert.Single(publicationWithoutDeletedRelease.Releases);
-                Assert.Equal(anotherRelease.Id, publicationWithoutDeletedRelease.Releases[0].Id); 
+                Assert.Equal(anotherRelease.Id, publicationWithoutDeletedRelease.Releases[0].Id);
 
                 // assert that soft-deleted entities have had their soft-deleted flag set to true
                 var updatedRelease = context
@@ -1662,7 +1591,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
                     .IgnoreQueryFilters()
                     .First(r => r.Id == userReleaseInvite.Id);
 
-                Assert.True(updatedReleaseInvite.SoftDeleted); 
+                Assert.True(updatedReleaseInvite.SoftDeleted);
 
                 // assert that soft-deleted entities appear via references from other entities when explicitly searched for
                 var publicationWithDeletedRelease = context
@@ -1712,7 +1641,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
             userService
                 .Setup(s => s.GetUserId())
                 .Returns(_userId);
-            
+
             return new ReleaseService(
                 contentDbContext,
                 AdminMapper(),

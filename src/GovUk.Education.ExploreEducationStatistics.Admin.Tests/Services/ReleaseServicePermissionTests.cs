@@ -83,10 +83,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
                         var service = BuildReleaseService(userService: userService.Object);
                         return service.UpdateRelease(
                             _release.Id,
-                            new UpdateReleaseViewModel
-                            {
-                                PublicationId = Publication.Id,
-                            }
+                            new UpdateReleaseViewModel()
                         );
                     }
                 );
@@ -106,7 +103,6 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
                             _release.Id,
                             new UpdateReleaseViewModel
                             {
-                                PublicationId = Publication.Id,
                                 Status = ReleaseStatus.Draft
                             }
                         );
@@ -128,7 +124,6 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
                             _release.Id,
                             new UpdateReleaseViewModel
                             {
-                                PublicationId = Publication.Id,
                                 Status = ReleaseStatus.HigherLevelReview
                             }
                         );
@@ -150,43 +145,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
                             _release.Id,
                             new UpdateReleaseViewModel
                             {
-                                PublicationId = Publication.Id,
                                 Status = ReleaseStatus.Approved
-                            }
-                        );
-                    }
-                );
-        }
-
-        [Fact]
-        public void UpdateRelease_CanCreateReleaseForSpecificPublication()
-        {
-            var nextPublication = new Publication
-            {
-                Id = Guid.NewGuid(),
-            };
-
-            var persistenceHelper = DefaultPersistenceHelperMock();
-
-            MockUtils.SetupCall(persistenceHelper, nextPublication.Id, nextPublication);
-
-            PermissionTestUtil.PolicyCheckBuilder()
-                .ExpectResourceCheck(_release, CanUpdateSpecificRelease)
-                .ExpectResourceCheck(_release, CanMarkSpecificReleaseAsDraft)
-                .ExpectResourceCheckToFail(nextPublication, CanCreateReleaseForSpecificPublication)
-                .AssertForbidden(
-                    userService =>
-                    {
-                        var service = BuildReleaseService(
-                            persistenceHelper: persistenceHelper.Object,
-                            userService: userService.Object
-                        );
-                        return service.UpdateRelease(
-                            _release.Id,
-                            new UpdateReleaseViewModel
-                            {
-                                PublicationId = nextPublication.Id,
-                                Status = ReleaseStatus.Draft,
                             }
                         );
                     }
