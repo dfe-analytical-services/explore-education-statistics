@@ -27,6 +27,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Processor.Services
     {
         private readonly IFileStorageService _fileStorageService;
         private readonly ILogger<ISplitFileService> _logger;
+        private readonly IBatchService _batchService;
 
         private static readonly List<GeographicLevel> IgnoredGeographicLevels = new List<GeographicLevel>
         {
@@ -36,10 +37,14 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Processor.Services
             GeographicLevel.PlanningArea
         };
 
-        public SplitFileService(IFileStorageService fileStorageService, ILogger<ISplitFileService> logger)
+        public SplitFileService(
+            IFileStorageService fileStorageService,
+            ILogger<ISplitFileService> logger,
+            IBatchService batchService)
         {
             _fileStorageService = fileStorageService;
             _logger = logger;
+            _batchService = batchService;
         }
 
         public async Task SplitDataFile(
@@ -61,6 +66,8 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Processor.Services
             {
                 collector.Add(message);
             }
+
+            await _batchService.UpdateProgress(message.Release.Id.ToString(), message.OrigDataFileName, 100);
         }
 
         private async Task SplitFiles(
@@ -126,6 +133,8 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Processor.Services
                 };
 
                 messages.Add(iMessage);
+                
+                await _batchService.UpdateProgress(message.Release.Id.ToString(), message.OrigDataFileName, batchCount / batches.Count());
 
                 batchCount++;
             }

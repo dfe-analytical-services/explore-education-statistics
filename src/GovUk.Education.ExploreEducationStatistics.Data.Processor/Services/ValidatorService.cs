@@ -55,15 +55,18 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Processor.Services
         private readonly ILogger<IValidatorService> _logger;
         private readonly IFileStorageService _fileStorageService;
         private readonly IFileTypeService _fileTypeService;
+        private readonly IBatchService _batchService;
 
         public ValidatorService(
             ILogger<IValidatorService> logger,
             IFileStorageService fileStorageService,
-            IFileTypeService fileTypeService)
+            IFileTypeService fileTypeService,
+            IBatchService batchService)
         {
             _logger = logger;
             _fileStorageService = fileStorageService;
             _fileTypeService = fileTypeService;
+            _batchService = batchService;
         }
 
         public ValidatorService(ILogger<IValidatorService> logger)
@@ -77,11 +80,13 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Processor.Services
             "time_period",
             "geographic_level"
         };
-
+        
         public async Task<Either<IEnumerable<ValidationError>, ProcessorStatistics>>
             Validate(Guid releaseId, SubjectData subjectData, ExecutionContext executionContext, ImportMessage message)
         {
             _logger.LogInformation($"Validating Datafile: {message.OrigDataFileName}");
+
+            await _batchService.UpdateStatus(message.Release.Id.ToString(), message.DataFileName, IStatus.RUNNING_PHASE_1);
 
             return await ValidateCsvFile(subjectData.DataBlob, false)
                 .OnSuccessDo(async () => await ValidateCsvFile(subjectData.MetaBlob, true))
@@ -93,13 +98,14 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Processor.Services
 
                         await using var metaFileStream = await _fileStorageService.StreamBlob(subjectData.MetaBlob);
                         var metaFileTable = DataTableUtils.CreateFromStream(metaFileStream);
-
+                        
                         return await ValidateMetaHeader(metaFileTable.Columns)
                             .OnSuccess(() => ValidateMetaRows(metaFileTable.Columns, metaFileTable.Rows))
                             .OnSuccess(() => ValidateObservationHeaders(dataFileTable.Columns))
                             .OnSuccess(
                                 () =>
-                                    ValidateAndCountObservations(dataFileTable.Columns, dataFileTable.Rows, executionContext)
+                                    ValidateAndCountObservations(dataFileTable.Columns, dataFileTable.Rows,
+                                            executionContext, message.Release.Id.ToString(), message.OrigDataFileName)
                                         .OnSuccess(
                                             result =>
                                             {
@@ -227,13 +233,19 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Processor.Services
             return Unit.Instance;
         }
 
-        private static async Task<Either<IEnumerable<ValidationError>, ProcessorStatistics>>
-            ValidateAndCountObservations(DataColumnCollection cols, DataRowCollection rows, ExecutionContext executionContext)
+        private async Task<Either<IEnumerable<ValidationError>, ProcessorStatistics>>
+            ValidateAndCountObservations(
+                DataColumnCollection cols,
+                DataRowCollection rows,
+                ExecutionContext executionContext,
+                string releaseId,
+                string origDataFileName)
         {
             var idx = 0;
             var filteredRows = 0;
-            var totalRows = 0;
+            var totalRowCount = 0;
             var errors = new List<ValidationError>();
+            var dataRows = rows.Count;
 
             foreach (DataRow row in rows)
             {
@@ -252,7 +264,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Processor.Services
                     ImporterService.GetGeographicLevel(rowValues, colValues);
                     ImporterService.GetTimeIdentifier(rowValues, colValues);
                     ImporterService.GetYear(rowValues, colValues);
-
+                    
                     if (!IsGeographicLevelIgnored(rowValues, colValues))
                     {
                         filteredRows++;
@@ -262,14 +274,21 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Processor.Services
                 {
                     errors.Add(new ValidationError($"error at row {idx}: {e.Message}"));
                 }
+                
+                totalRowCount++;
 
-                totalRows++;
+                if (totalRowCount % 200 == 0)
+                {
+                    await _batchService.UpdateProgress(releaseId, origDataFileName, dataRows / totalRowCount);
+                }
             }
 
             if (errors.Count > 0)
             {
                 return errors;
             }
+            
+            await _batchService.UpdateProgress(releaseId, origDataFileName, 100);
 
             var rowsPerBatch = Convert.ToInt32(LoadAppSettings(executionContext).GetValue<string>("RowsPerBatch"));
 
@@ -277,7 +296,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Processor.Services
             {
                 FilteredObservationCount = filteredRows,
                 RowsPerBatch = rowsPerBatch,
-                NumBatches = FileStorageUtils.GetNumBatches(totalRows, rowsPerBatch)
+                NumBatches = FileStorageUtils.GetNumBatches(totalRowCount, rowsPerBatch)
             };
         }
 

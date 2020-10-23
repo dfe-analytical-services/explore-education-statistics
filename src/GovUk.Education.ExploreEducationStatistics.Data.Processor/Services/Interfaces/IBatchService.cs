@@ -18,6 +18,6 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Processor.Services.Int
 
         Task UpdateStoredMessage(ImportMessage message);
 
-        Task CreateImport(string releaseId, string dataFileName, int numberOfRows, ImportMessage message);
+        Task UpdateProgress(string releaseId, string origDataFileName, int percentageComplete);
     }
 }

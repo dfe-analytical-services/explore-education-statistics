@@ -58,11 +58,6 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Processor.Functions
             [Queue("imports-available")] ICollector<ImportMessage> collector
         )
         {
-            if (message.Seeding)
-            {
-                await _batchService.CreateImport(message.Release.Id.ToString(), message.DataFileName, 0, message);
-            }
-
             if (message.ArchiveFileName != "")
             {
                 await _batchService.UpdateStatus(message.Release.Id.ToString(), message.DataFileName, IStatus.PROCESSING_ARCHIVE_FILE);
@@ -86,13 +81,17 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Processor.Functions
                         var status = await _batchService.GetStatus(message.Release.Id.ToString(), message.OrigDataFileName);
 
                         // If already reached Phase 2 then don't re-create the subject or split into batches
-                        if ((int) status < (int) IStatus.RUNNING_PHASE_2)
+                        if ((int) status < (int) IStatus.RUNNING_PHASE_4)
                         {
-                            await ProcessSubject(message, DbUtils.CreateStatisticsDbContext(),
-                                DbUtils.CreateContentDbContext(), subjectData);
-                            await _splitFileService.SplitDataFile(collector, message, subjectData);
                             await _batchService.UpdateStatus(message.Release.Id.ToString(), message.OrigDataFileName,
                                 IStatus.RUNNING_PHASE_2);
+                            await ProcessSubject(message, DbUtils.CreateStatisticsDbContext(),
+                                DbUtils.CreateContentDbContext(), subjectData);
+                            await _batchService.UpdateStatus(message.Release.Id.ToString(), message.OrigDataFileName,
+                                IStatus.RUNNING_PHASE_3);
+                            await _splitFileService.SplitDataFile(collector, message, subjectData);
+                            await _batchService.UpdateStatus(message.Release.Id.ToString(), message.OrigDataFileName,
+                                IStatus.RUNNING_PHASE_4);
                         }
                     }
                     catch (Exception e)
@@ -169,23 +168,9 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Processor.Functions
 
             _importerService.ImportMeta(metaFileTable, subject, statisticsDbContext);
 
-            if (message.Seeding)
-            {
-                SampleGuids.GenerateIndicatorGuids(statisticsDbContext);
-                SampleGuids.GenerateFilterGuids(statisticsDbContext);
-                SampleGuids.GenerateFilterGroupGuids(statisticsDbContext);
-            }
-
             await statisticsDbContext.SaveChangesAsync();
 
             await _fileImportService.ImportFiltersLocationsAndSchools(message, statisticsDbContext);
-
-            if (message.Seeding)
-            {
-                SampleGuids.GenerateFilterGuids(statisticsDbContext);
-                SampleGuids.GenerateFilterGroupGuids(statisticsDbContext);
-                SampleGuids.GenerateFilterItemGuids(statisticsDbContext);
-            }
 
             await statisticsDbContext.SaveChangesAsync();
         }

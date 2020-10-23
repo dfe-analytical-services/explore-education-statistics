@@ -42,7 +42,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Processor.Services
 
             var numBatchesRemaining = await _fileStorageService.GetNumBatchesRemaining(releaseId, message.OrigDataFileName);
 
-            if (import.Status.Equals(IStatus.RUNNING_PHASE_3)
+            if (import.Status.Equals(IStatus.RUNNING_PHASE_5)
                 && (message.NumBatches == 1 || numBatchesRemaining == 0))
             {
                 var observationCount = context.Observation.Count(o => o.SubjectId.Equals(message.SubjectId));
@@ -57,7 +57,6 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Processor.Services
                                 $"does not equal that expected ({message.TotalRows}) : Please delete & retry"
                             )
                         }.AsEnumerable());
-
                 }
                 else
                 {
@@ -68,6 +67,10 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Processor.Services
                 _logger.LogInformation(import.Errors.Equals("") && observationCount.Equals(message.TotalRows)
                     ? $"All batches imported for {releaseId} : {message.OrigDataFileName} with no errors"
                     : $"All batches imported for {releaseId} : {message.OrigDataFileName} but with errors - check storage log");
+            }
+            else
+            {
+                await UpdateProgress(releaseId, message.OrigDataFileName, (message.NumBatches - numBatchesRemaining) / message.NumBatches );
             }
         }
 
@@ -80,6 +83,8 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Processor.Services
             }
 
             import.Status = status;
+            import.PercentageComplete = import.Status == IStatus.COMPLETE ? 100 : import.PercentageComplete;
+            
             await _table.ExecuteAsync(TableOperation.InsertOrReplace(import));
 
             return true;
@@ -109,11 +114,11 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Processor.Services
             }
         }
 
-        public async Task CreateImport(string releaseId, string dataFileName, int numberOfRows, ImportMessage message)
+        public async Task UpdateProgress(string releaseId, string origDataFileName, int percentageComplete)
         {
-            await _table.ExecuteAsync(TableOperation.InsertOrReplace(
-                new DatafileImport(releaseId, dataFileName, numberOfRows, JsonConvert.SerializeObject(message), IStatus.QUEUED))
-            );
+            var import = await GetImport(releaseId, origDataFileName);
+            import.PercentageComplete = percentageComplete;
+            await _table.ExecuteAsync(TableOperation.InsertOrReplace(import));
         }
 
         private async Task<DatafileImport> GetImport(string releaseId, string dataFileName)
