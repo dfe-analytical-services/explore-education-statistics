@@ -14,6 +14,7 @@ ${RUN_IDENTIFIER}    %{RUN_IDENTIFIER}
 ${THEME_NAME}        %{TEST_THEME_NAME}
 ${TOPIC_NAME}        %{TEST_TOPIC_NAME}
 ${PUBLICATION_NAME}  UI tests - publish release %{RUN_IDENTIFIER}
+${RELEASE_NAME}      Financial Year 3000-01
 ${DATABLOCK_NAME}    Dates data block name
 
 *** Test Cases ***
@@ -24,7 +25,7 @@ Create new publication for "UI tests topic" topic
 
 Go to "Release summary" page
     [Tags]  HappyPath
-    user navigates to release summary from admin dashboard  ${PUBLICATION_NAME}   Financial Year 3000-01 (not Live)
+    user navigates to release summary from admin dashboard  ${PUBLICATION_NAME}   ${RELEASE_NAME} (not Live)
 
 Verify release summary
     [Tags]  HappyPath
@@ -53,16 +54,22 @@ Upload subject
     user checks headed table body row contains  Data file size   17 Kb  ${section}
     user checks headed table body row contains  Status           Complete  ${section}  180
 
-Add meta guidance to subject
+Add meta guidance
     [Tags]  HappyPath
     user clicks link  Metadata guidance
     user waits until h2 is visible  Public metadata guidance document
 
+    user enters text into element  id:metaGuidanceForm-content  Test meta guidance content
     user waits until page contains accordion section  Dates test subject
-    user opens accordion section  Dates test subject
+
+    user checks summary list contains  Filename             dates.csv
+    user checks summary list contains  Geographic levels    National
+    user checks summary list contains  Time period          2020 Week 13 to 2021 Week 24
+
     ${editor}=  user gets meta guidance data file content editor  Dates test subject
     user clicks element  ${editor}
-    user presses keys  Dates test subject test meta guidance content
+    user presses keys  Dates test subject test meta guidance content  ${editor}
+
     user clicks button  Save guidance
 
 # TODO: Add footnotes
@@ -249,7 +256,7 @@ Navigate to newly published release page
 Verify release URL and page caption
     [Tags]  HappyPath
     user checks url contains  %{PUBLIC_URL}/find-statistics/ui-tests-publish-release-${RUN_IDENTIFIER}
-    user waits until page contains title caption  Financial Year 3000-01
+    user waits until page contains title caption  ${RELEASE_NAME}
 
 Verify publish and update dates
     [Tags]  HappyPath
@@ -272,8 +279,51 @@ Verify release associated files
     user waits until element contains link  ${downloads}  test ancillary file 1
     user checks link has url  test ancillary file 1  %{DATA_API_URL}/download/ui-tests-publish-release-${RUN_IDENTIFIER}/3000-01/ancillary/test-file-1.txt   ${downloads}
 
+Verify public metadata guidance document
+    [Tags]  HappyPath
+    user clicks link  Metadata guidance document
+
+    user checks breadcrumb count should be   4
+    user checks nth breadcrumb contains   1    Home
+    user checks nth breadcrumb contains   2    Find statistics and data
+    user checks nth breadcrumb contains   3    ${PUBLICATION_NAME}
+    user checks nth breadcrumb contains   4    Metadata guidance document
+    user waits until h2 is visible  Metadata guidance document
+
+    user waits until page contains title caption  ${RELEASE_NAME}
+    user waits until h1 is visible  ${PUBLICATION_NAME}
+
+    user waits until h2 is visible  Metadata guidance document
+    user waits until page contains  Test meta guidance content
+
+    user waits until page contains accordion section  Dates test subject
+    user checks there are x accordion sections  1
+
+    user opens accordion section  Dates test subject
+    user checks summary list contains  Filename             dates.csv
+    user checks summary list contains  Geographic levels    National
+    user checks summary list contains  Time period          2020 Week 13 to 2021 Week 24
+    user checks summary list contains  Content              Dates test subject test meta guidance content
+
+    user opens details dropdown  Variable names and descriptions
+
+    user checks table column heading contains  1  1  Variable name
+    user checks table column heading contains  1  2  Variable description
+
+    user checks results table cell contains  1  1   children_attending
+    user checks results table cell contains  1  2   Number of children attending
+
+    user checks results table cell contains  6  1   date
+    user checks results table cell contains  6  2   Date
+
+    user checks results table cell contains  10  1   otherwise_vulnerable_children_attending
+    user checks results table cell contains  10  2   Number of otherwise vulnerable children attending
+
+    user goes to release page via breadcrumb  ${PUBLICATION_NAME}  ${RELEASE_NAME}
+
 Verify public pre-release access list
     [Tags]  HappyPath
+    user opens details dropdown     Download associated files
     user clicks link  Pre-release access list
 
     user checks breadcrumb count should be   4
@@ -282,23 +332,14 @@ Verify public pre-release access list
     user checks nth breadcrumb contains   3    ${PUBLICATION_NAME}
     user checks nth breadcrumb contains   4    Pre-release access list
 
-    user waits until page contains title caption  Financial Year 3000-01
+    user waits until page contains title caption  ${RELEASE_NAME}
     user waits until h1 is visible  ${PUBLICATION_NAME}
 
     user waits until h2 is visible  Pre-release access list
     user waits until page contains  Published ${PUBLISH_DATE_DAY} ${PUBLISH_DATE_MONTH} ${PUBLISH_DATE_YEAR}
     user waits until page contains  Test public access list
 
-Navigate back to release page
-    user clicks link  ${PUBLICATION_NAME}
-
-    user checks breadcrumb count should be   3
-    user checks nth breadcrumb contains   1    Home
-    user checks nth breadcrumb contains   2    Find statistics and data
-    user checks nth breadcrumb contains   3    ${PUBLICATION_NAME}
-
-    user waits until h1 is visible  ${PUBLICATION_NAME}
-    user waits until page contains title caption  Financial Year 3000-01
+    user goes to release page via breadcrumb  ${PUBLICATION_NAME}  ${RELEASE_NAME}
 
 Verify accordions are correct
     [Tags]  HappyPath
@@ -349,8 +390,8 @@ Create amendment
     user opens accordion section  ${PUBLICATION_NAME}
     ${accordion_section}=  user gets accordion section content element  ${PUBLICATION_NAME}
 
-    user opens details dropdown  Financial Year 3000-01 (Live - Latest release)  ${accordion_section}
-    ${details_elem}=  user gets details content element  Financial Year 3000-01 (Live - Latest release)  ${accordion_section}
+    user opens details dropdown  ${RELEASE_NAME}  ${accordion_section}
+    ${details_elem}=  user gets details content element  ${RELEASE_NAME} (Live - Latest release)  ${accordion_section}
 
     user clicks button  Amend this release  ${details_elem}
     user waits until h1 is visible  Confirm you want to amend this live release
@@ -406,6 +447,33 @@ Confirm data replacement
     user waits until page contains  Footnotes: OK
     user clicks button  Confirm data replacement
     user waits until h2 is visible  Data replacement complete
+
+Verify existing meta guidance for amendment
+    [Tags]  HappyPath
+    user clicks link  Data and files
+    user clicks link  Metadata guidance
+    user waits until h2 is visible  Public metadata guidance document
+
+    user waits until element contains  id:metaGuidanceForm-content  Test meta guidance content
+
+    user waits until page contains accordion section  Dates test subject
+
+    user checks summary list contains  Filename             dates-replacement.csv
+    user checks summary list contains  Geographic levels    National
+    user checks summary list contains  Time period          2020 Week 13 to 2021 Week 24
+
+    ${editor}=  user gets meta guidance data file content editor  Dates test subject
+    user waits until element contains  ${editor}    Dates test subject test meta guidance content
+
+Update existing meta guidance for amendment
+    [Tags]  HappyPath
+    user enters text into element  id:metaGuidanceForm-content  Updated test meta guidance content
+
+    ${editor}=  user gets meta guidance data file content editor  Dates test subject
+    user clicks element  ${editor}
+    user presses keys  Updated Dates test subject test meta guidance content  ${editor}
+
+    user clicks button  Save guidance
 
 # TODO: Add footnotes
 
@@ -548,7 +616,7 @@ Navigate to amendment release page
     user clicks testid element  View stats link for ${PUBLICATION_NAME}
 
     user waits until h1 is visible  ${PUBLICATION_NAME}  90
-    user waits until page contains title caption  Financial Year 3000-01
+    user waits until page contains title caption  ${RELEASE_NAME}
 
     user checks url contains  %{PUBLIC_URL}/find-statistics/ui-tests-publish-release-${RUN_IDENTIFIER}
 
@@ -588,8 +656,51 @@ Verify amendment files
     user waits until element contains link  ${downloads}  test ancillary file 2
     user checks link has url  test ancillary file 2  %{DATA_API_URL}/download/ui-tests-publish-release-${RUN_IDENTIFIER}/3000-01/ancillary/test-file-2.txt   ${downloads}
 
+Verify amendment public metadata guidance document
+    [Tags]  HappyPath
+    user clicks link  Metadata guidance document
+
+    user checks breadcrumb count should be   4
+    user checks nth breadcrumb contains   1    Home
+    user checks nth breadcrumb contains   2    Find statistics and data
+    user checks nth breadcrumb contains   3    ${PUBLICATION_NAME}
+    user checks nth breadcrumb contains   4    Metadata guidance document
+    user waits until h2 is visible  Metadata guidance document
+
+    user waits until page contains title caption  ${RELEASE_NAME}
+    user waits until h1 is visible  ${PUBLICATION_NAME}
+
+    user waits until h2 is visible  Metadata guidance document
+    user waits until page contains  Updated test meta guidance content
+
+    user waits until page contains accordion section  Dates test subject
+    user checks there are x accordion sections  1
+
+    user opens accordion section  Dates test subject
+    user checks summary list contains  Filename             dates-replacement.csv
+    user checks summary list contains  Geographic levels    National
+    user checks summary list contains  Time period          2020 Week 13 to 2021 Week 24
+    user checks summary list contains  Content              Updated Dates test subject test meta guidance content
+
+    user opens details dropdown  Variable names and descriptions
+
+    user checks table column heading contains  1  1  Variable name
+    user checks table column heading contains  1  2  Variable description
+
+    user checks results table cell contains  1  1   children_attending
+    user checks results table cell contains  1  2   Number of children attending
+
+    user checks results table cell contains  6  1   date
+    user checks results table cell contains  6  2   Date
+
+    user checks results table cell contains  10  1   otherwise_vulnerable_children_attending
+    user checks results table cell contains  10  2   Number of otherwise vulnerable children attending
+
+    user goes to release page via breadcrumb  ${PUBLICATION_NAME}  ${RELEASE_NAME}
+
 Verify amendment public pre-release access list
     [Tags]  HappyPath
+    user opens details dropdown     Download associated files
     user clicks link  Pre-release access list
 
     user checks breadcrumb count should be   4
@@ -598,23 +709,14 @@ Verify amendment public pre-release access list
     user checks nth breadcrumb contains   3    ${PUBLICATION_NAME}
     user checks nth breadcrumb contains   4    Pre-release access list
 
-    user waits until page contains title caption  Financial Year 3000-01
+    user waits until page contains title caption  ${RELEASE_NAME}
     user waits until h1 is visible  ${PUBLICATION_NAME}
 
     user waits until h2 is visible  Pre-release access list
     user waits until page contains  Published ${PUBLISH_DATE_DAY} ${PUBLISH_DATE_MONTH} ${PUBLISH_DATE_YEAR}
     user waits until page contains  Updated public access list
 
-Navigate back to amendment release page
-    user clicks link  ${PUBLICATION_NAME}
-
-    user checks breadcrumb count should be   3
-    user checks nth breadcrumb contains   1    Home
-    user checks nth breadcrumb contains   2    Find statistics and data
-    user checks nth breadcrumb contains   3    ${PUBLICATION_NAME}
-
-    user waits until h1 is visible  ${PUBLICATION_NAME}
-    user waits until page contains title caption  Financial Year 3000-01
+    user goes to release page via breadcrumb  ${PUBLICATION_NAME}  ${RELEASE_NAME}
 
 Verify amendment accordions are correct
     [Tags]  HappyPath
