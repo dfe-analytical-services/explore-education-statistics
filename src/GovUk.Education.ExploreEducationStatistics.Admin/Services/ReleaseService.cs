@@ -179,14 +179,14 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Services
                 .OnSuccess(_userService.CheckCanMakeAmendmentOfRelease)
                 .OnSuccess(originalRelease =>
                     CreateBasicReleaseAmendment(originalRelease)
-                    .OnSuccess(CreateStatisticsReleaseRecord)
+                    .OnSuccess(CreateStatisticsReleaseAmendment)
                     .OnSuccessDo(amendment => _footnoteService.CopyFootnotes(releaseId, amendment.Id))
                     .OnSuccess(amendment => CopyReleaseTeam(releaseId, amendment))
                     .OnSuccess(amendment => CopyFileLinks(originalRelease, amendment))
                     .OnSuccess(amendment => GetRelease(amendment.Id)));
         }
 
-        private async Task<Either<ActionResult, Release>> CreateStatisticsReleaseRecord(Release amendment)
+        private async Task<Either<ActionResult, Release>> CreateStatisticsReleaseAmendment(Release amendment)
         {
             var statsRelease =_statisticsDbContext
                 .Release
@@ -198,17 +198,13 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Services
             {
                 var statsAmendment = statsRelease.CreateReleaseAmendment(amendment.Id, amendment.PreviousVersionId);
 
-                var statsAmendmentSubjectLinks =_statisticsDbContext
+                var statsAmendmentSubjectLinks = _statisticsDbContext
                     .ReleaseSubject
                     .Where(rs => rs.ReleaseId == amendment.PreviousVersionId)
-                    .Select(rs => new ReleaseSubject
-                    {
-                        ReleaseId = statsAmendment.Id,
-                        SubjectId = rs.SubjectId
-                    });
+                    .Select(rs => rs.CopyForRelease(statsAmendment));
 
-                _statisticsDbContext.Release.Add(statsAmendment);
-                _statisticsDbContext.ReleaseSubject.AddRange(statsAmendmentSubjectLinks);
+                await _statisticsDbContext.Release.AddAsync(statsAmendment);
+                await _statisticsDbContext.ReleaseSubject.AddRangeAsync(statsAmendmentSubjectLinks);
 
                 await _statisticsDbContext.SaveChangesAsync();
             }
@@ -549,13 +545,13 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Services
             return Unit.Instance;
         }
 
-        private async Task<Either<ActionResult, Unit>> CheckMetaGuidancePopulated(Release release, 
+        private async Task<Either<ActionResult, Unit>> CheckMetaGuidancePopulated(Release release,
             ReleaseStatus status)
         {
             return status == ReleaseStatus.Approved ? await _metaGuidanceService.Validate(release.Id) : Unit.Instance;
         }
 
-        private async Task<Either<ActionResult, Unit>> CheckMethodologyHasBeenApproved(Release release, 
+        private async Task<Either<ActionResult, Unit>> CheckMethodologyHasBeenApproved(Release release,
             ReleaseStatus status)
         {
             if (status == ReleaseStatus.Approved)
