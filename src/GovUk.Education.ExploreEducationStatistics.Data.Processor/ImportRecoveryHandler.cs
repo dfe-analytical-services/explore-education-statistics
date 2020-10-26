@@ -91,26 +91,38 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Processor
                     QueryComparisons.Equal, IStatus.QUEUED.ToString())
                 , TableOperators.Or,
                 TableQuery.GenerateFilterCondition("Status",
-                    QueryComparisons.Equal, IStatus.RUNNING_PHASE_1.ToString()));
+                    QueryComparisons.Equal, IStatus.PROCESSING_ARCHIVE_FILE.ToString()));
 
+            combineFilters = TableQuery.CombineFilters(
+                combineFilters,
+                TableOperators.Or,
+                TableQuery.GenerateFilterCondition("Status",
+                    QueryComparisons.Equal, IStatus.RUNNING_PHASE_1.ToString()));
+            
             combineFilters = TableQuery.CombineFilters(
                 combineFilters,
                 TableOperators.Or,
                 TableQuery.GenerateFilterCondition("Status",
                     QueryComparisons.Equal, IStatus.RUNNING_PHASE_2.ToString()));
-
+            
             combineFilters = TableQuery.CombineFilters(
                 combineFilters,
                 TableOperators.Or,
                 TableQuery.GenerateFilterCondition("Status",
-                    QueryComparisons.Equal, IStatus.PROCESSING_ARCHIVE_FILE.ToString()));
-
+                    QueryComparisons.Equal, IStatus.RUNNING_PHASE_3.ToString()));
+            
+            combineFilters = TableQuery.CombineFilters(
+                combineFilters,
+                TableOperators.Or,
+                TableQuery.GenerateFilterCondition("Status",
+                    QueryComparisons.Equal, IStatus.RUNNING_PHASE_4.ToString()));
+            
             return new TableQuery<DatafileImport>()
                 .Where(TableQuery.CombineFilters(
                     combineFilters,
                     TableOperators.Or,
                     TableQuery.GenerateFilterCondition("Status",
-                    QueryComparisons.Equal, IStatus.RUNNING_PHASE_3.ToString())));
+                    QueryComparisons.Equal, IStatus.RUNNING_PHASE_5.ToString())));
         }
 
         private static async Task<List<BlobItem>> GetBatchesRemaining(

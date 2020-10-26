@@ -80,18 +80,14 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Processor.Functions
                         
                         var status = await _batchService.GetStatus(message.Release.Id.ToString(), message.OrigDataFileName);
 
-                        // If already reached Phase 2 then don't re-create the subject or split into batches
+                        // If already reached Phase 4 then don't re-create the subject or split into batches
                         if ((int) status < (int) IStatus.RUNNING_PHASE_4)
                         {
                             await _batchService.UpdateStatus(message.Release.Id.ToString(), message.OrigDataFileName,
                                 IStatus.RUNNING_PHASE_2);
                             await ProcessSubject(message, DbUtils.CreateStatisticsDbContext(),
                                 DbUtils.CreateContentDbContext(), subjectData);
-                            await _batchService.UpdateStatus(message.Release.Id.ToString(), message.OrigDataFileName,
-                                IStatus.RUNNING_PHASE_3);
                             await _splitFileService.SplitDataFile(collector, message, subjectData);
-                            await _batchService.UpdateStatus(message.Release.Id.ToString(), message.OrigDataFileName,
-                                IStatus.RUNNING_PHASE_4);
                         }
                     }
                     catch (Exception e)

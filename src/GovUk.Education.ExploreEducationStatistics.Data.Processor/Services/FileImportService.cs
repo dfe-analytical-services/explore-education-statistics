@@ -37,7 +37,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Processor.Services
 
             // Potentially status could already be failed so don't continue
             if (await _batchService.UpdateStatus(releaseId, message.OrigDataFileName,
-                IStatus.RUNNING_PHASE_4))
+                IStatus.RUNNING_PHASE_5))
             {
                 var subjectData = await _fileStorageService.GetSubjectData(message);
                 var releaseSubject = GetReleaseSubjectLink(message, context);

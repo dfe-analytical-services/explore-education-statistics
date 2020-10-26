@@ -1,3 +1,4 @@
+using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
@@ -33,20 +34,20 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Processor.Services
 
         public async Task CheckComplete(string releaseId, ImportMessage message, StatisticsDbContext context)
         {
-            var import = await GetImport(releaseId, message.OrigDataFileName);
-
             if (message.NumBatches > 1)
             {
                 await _fileStorageService.DeleteBatchFile(releaseId, message.DataFileName);
             }
 
             var numBatchesRemaining = await _fileStorageService.GetNumBatchesRemaining(releaseId, message.OrigDataFileName);
+            
+            var import = await GetImport(releaseId, message.OrigDataFileName);
 
             if (import.Status.Equals(IStatus.RUNNING_PHASE_5)
                 && (message.NumBatches == 1 || numBatchesRemaining == 0))
             {
                 var observationCount = context.Observation.Count(o => o.SubjectId.Equals(message.SubjectId));
-
+                
                 if (!observationCount.Equals(message.TotalRows))
                 {
                     await FailImport(releaseId, message.OrigDataFileName,
@@ -70,7 +71,8 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Processor.Services
             }
             else
             {
-                await UpdateProgress(releaseId, message.OrigDataFileName, (message.NumBatches - numBatchesRemaining) / message.NumBatches );
+                var percentageComplete = (double)(message.NumBatches - numBatchesRemaining) / message.NumBatches * 100;
+                await UpdateProgress(releaseId, message.OrigDataFileName, percentageComplete);
             }
         }
 
@@ -82,10 +84,12 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Processor.Services
                 return false;
             }
 
-            import.Status = status;
-            import.PercentageComplete = import.Status == IStatus.COMPLETE ? 100 : import.PercentageComplete;
-            
-            await _table.ExecuteAsync(TableOperation.InsertOrReplace(import));
+            if (import.Status != status)
+            {
+                import.PercentageComplete = status == IStatus.COMPLETE ? 100 : 0;
+                import.Status = status;
+                await _table.ExecuteAsync(TableOperation.InsertOrReplace(import));
+            }
 
             return true;
         }
@@ -106,7 +110,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Processor.Services
         public async Task FailImport(string releaseId, string origDataFileName, IEnumerable<ValidationError> errors)
         {
             var import = await GetImport(releaseId, origDataFileName);
-            if (import.Status != IStatus.COMPLETE)
+            if (import.Status != IStatus.COMPLETE && import.Status != IStatus.FAILED)
             {
                 import.Status = IStatus.FAILED;
                 import.Errors = JsonConvert.SerializeObject(errors);
@@ -114,11 +118,14 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Processor.Services
             }
         }
 
-        public async Task UpdateProgress(string releaseId, string origDataFileName, int percentageComplete)
+        public async Task UpdateProgress(string releaseId, string origDataFileName, double percentageComplete)
         {
             var import = await GetImport(releaseId, origDataFileName);
-            import.PercentageComplete = percentageComplete;
-            await _table.ExecuteAsync(TableOperation.InsertOrReplace(import));
+            if (import.PercentageComplete < (int)percentageComplete)
+            {
+                import.PercentageComplete = (int)percentageComplete;
+                await _table.ExecuteAsync(TableOperation.InsertOrReplace(import));  
+            }
         }
 
         private async Task<DatafileImport> GetImport(string releaseId, string dataFileName)
@@ -126,7 +133,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Processor.Services
             var result = await _table.ExecuteAsync(TableOperation.Retrieve<DatafileImport>(
                 releaseId,
                 dataFileName,
-                new List<string> {"NumBatches", "Status", "NumberOfRows", "Errors", "Message"}));
+                new List<string> {"NumBatches", "Status", "NumberOfRows", "Errors", "Message", "PercentageComplete"}));
 
             return (DatafileImport) result.Result;
         }

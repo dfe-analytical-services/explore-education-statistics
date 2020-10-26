@@ -4,6 +4,7 @@ using System.Threading.Tasks;
 using GovUk.Education.ExploreEducationStatistics.Common.Model;
 using GovUk.Education.ExploreEducationStatistics.Common.Services.Interfaces;
 using Microsoft.Azure.Cosmos.Table;
+using Microsoft.Extensions.Logging;
 using static GovUk.Education.ExploreEducationStatistics.Common.TableStorageTableNames;
 
 namespace GovUk.Education.ExploreEducationStatistics.Common.Services
@@ -31,25 +32,23 @@ namespace GovUk.Education.ExploreEducationStatistics.Common.Services
             IStatus.NOT_FOUND
         };
         
-        private static readonly Dictionary<IStatus, int> ProcessingRatios = new Dictionary<IStatus, int>() {
-            {IStatus.UPLOADING, 0},
-            {IStatus.QUEUED, 0},
-            {IStatus.PROCESSING_ARCHIVE_FILE, 0},
-            {IStatus.RUNNING_PHASE_1, 10},
-            {IStatus.RUNNING_PHASE_2, 10},
-            {IStatus.RUNNING_PHASE_3, 10},
-            {IStatus.RUNNING_PHASE_5, 70},
-            {IStatus.COMPLETE, 100},
-            {IStatus.FAILED, 0},
-            {IStatus.NOT_FOUND, 0}
+        private static readonly Dictionary<IStatus, double> ProcessingRatios = new Dictionary<IStatus, double>() {
+            {IStatus.RUNNING_PHASE_1, .1},
+            {IStatus.RUNNING_PHASE_2, .1},
+            {IStatus.RUNNING_PHASE_3, .1},
+            {IStatus.RUNNING_PHASE_5, .7},
+            {IStatus.COMPLETE, 1},
         };
 
         private readonly CloudTable _table;
+        private readonly ILogger<ImportStatusService> _logger;
 
         public ImportStatusService(
-            ITableStorageService tblStorageService)
+            ITableStorageService tblStorageService,
+            ILogger<ImportStatusService> logger)
         {
             _table = tblStorageService.GetTableAsync(DatafileImportsTableName).Result;
+            _logger = logger;
         }
 
         public async Task<ImportStatus> GetImportStatus(Guid releaseId, string dataFileName)
@@ -64,12 +63,16 @@ namespace GovUk.Education.ExploreEducationStatistics.Common.Services
                 };
             }
 
+            var percentageComplete = CalculatePercentageComplete(import.PercentageComplete, import.Status);
+
+            _logger.LogInformation($"current status: {import.Status} : {percentageComplete}% complete");
+            
             return new ImportStatus
             {
                 Errors = import.Errors,
                 Status = import.Status,
                 NumberOfRows = import.NumberOfRows,
-                PercentageComplete = CalculatePercentageComplete(import.PercentageComplete, import.Status)
+                PercentageComplete = percentageComplete
             };
         }
 
@@ -82,7 +85,6 @@ namespace GovUk.Education.ExploreEducationStatistics.Common.Services
 
         private async Task<DatafileImport> GetImport(Guid releaseId, string dataFileName)
         {
-
             // Need to define the extra columns to retrieve
             var result = await _table.ExecuteAsync(TableOperation.Retrieve<DatafileImport>(
                 releaseId.ToString(),
@@ -94,23 +96,24 @@ namespace GovUk.Education.ExploreEducationStatistics.Common.Services
 
         private int CalculatePercentageComplete(int percentageComplete, IStatus status)
         {
-            return status switch
+            return (int) (status switch
             {
-                IStatus.RUNNING_PHASE_1 => (percentageComplete * ProcessingRatios[IStatus.RUNNING_PHASE_1]),
-                IStatus.RUNNING_PHASE_2 => (ProcessingRatios[IStatus.RUNNING_PHASE_1] +
-                                            (percentageComplete * ProcessingRatios[IStatus.RUNNING_PHASE_2])),
-                IStatus.RUNNING_PHASE_3 => (ProcessingRatios[IStatus.RUNNING_PHASE_1] +
-                                            ProcessingRatios[IStatus.RUNNING_PHASE_2] + 
-                                            (percentageComplete * ProcessingRatios[IStatus.RUNNING_PHASE_3])),
-                IStatus.RUNNING_PHASE_4 => (ProcessingRatios[IStatus.RUNNING_PHASE_1] +
-                                            ProcessingRatios[IStatus.RUNNING_PHASE_2] +
-                                            (percentageComplete * ProcessingRatios[IStatus.RUNNING_PHASE_3])),
-                IStatus.RUNNING_PHASE_5 => (ProcessingRatios[IStatus.RUNNING_PHASE_1] +
-                                            ProcessingRatios[IStatus.RUNNING_PHASE_2] +
-                                            ProcessingRatios[IStatus.RUNNING_PHASE_3] +
-                                            (percentageComplete * ProcessingRatios[IStatus.RUNNING_PHASE_5])),
-                _ => ProcessingRatios[status]
-            };
+                IStatus.RUNNING_PHASE_1 => percentageComplete * ProcessingRatios[IStatus.RUNNING_PHASE_1],
+                IStatus.RUNNING_PHASE_2 => ProcessingRatios[IStatus.RUNNING_PHASE_1] * 100 +
+                                           (percentageComplete * ProcessingRatios[IStatus.RUNNING_PHASE_2]),
+                IStatus.RUNNING_PHASE_3 => ProcessingRatios[IStatus.RUNNING_PHASE_1] * 100 +
+                                           ProcessingRatios[IStatus.RUNNING_PHASE_2] * 100 + 
+                                           (percentageComplete * ProcessingRatios[IStatus.RUNNING_PHASE_3]),
+                IStatus.RUNNING_PHASE_4 => ProcessingRatios[IStatus.RUNNING_PHASE_1] * 100 +
+                                           ProcessingRatios[IStatus.RUNNING_PHASE_2] * 100 +
+                                           ProcessingRatios[IStatus.RUNNING_PHASE_3] * 100,
+                IStatus.RUNNING_PHASE_5 => ProcessingRatios[IStatus.RUNNING_PHASE_1] * 100 +
+                                           ProcessingRatios[IStatus.RUNNING_PHASE_2] * 100 +
+                                           ProcessingRatios[IStatus.RUNNING_PHASE_3] * 100 +
+                                           (percentageComplete * ProcessingRatios[IStatus.RUNNING_PHASE_5]),
+                IStatus.COMPLETE => ProcessingRatios[IStatus.COMPLETE] * 100,
+                _ => 0
+            });
         }
     }
 }

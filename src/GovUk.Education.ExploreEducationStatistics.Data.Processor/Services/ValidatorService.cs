@@ -277,9 +277,9 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Processor.Services
                 
                 totalRowCount++;
 
-                if (totalRowCount % 200 == 0)
+                if (totalRowCount % 1000 == 0)
                 {
-                    await _batchService.UpdateProgress(releaseId, origDataFileName, dataRows / totalRowCount);
+                    await _batchService.UpdateProgress(releaseId, origDataFileName, (double)totalRowCount / dataRows * 100);
                 }
             }
 

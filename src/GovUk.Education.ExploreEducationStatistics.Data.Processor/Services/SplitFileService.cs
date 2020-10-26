@@ -52,7 +52,9 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Processor.Services
             ImportMessage message,
             SubjectData subjectData)
         {
+            await _batchService.UpdateStatus(message.Release.Id.ToString(), message.OrigDataFileName, IStatus.RUNNING_PHASE_3);
             await using var dataFileStream = await _fileStorageService.StreamBlob(subjectData.DataBlob);
+            
             var dataFileTable = DataTableUtils.CreateFromStream(dataFileStream);
 
             if (dataFileTable.Rows.Count > message.RowsPerBatch)
@@ -64,10 +66,9 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Processor.Services
             // Else perform any additional validation & pass on file to message queue for import
             else
             {
+                await _batchService.UpdateStatus(message.Release.Id.ToString(), message.OrigDataFileName, IStatus.RUNNING_PHASE_4);
                 collector.Add(message);
             }
-
-            await _batchService.UpdateProgress(message.Release.Id.ToString(), message.OrigDataFileName, 100);
         }
 
         private async Task SplitFiles(
@@ -81,6 +82,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Processor.Services
             var batchCount = 1;
             var numRows = dataFileTable.Rows.Count + 1;
             var messages = new List<ImportMessage>();
+            var numBatches = (int)Math.Ceiling((double)dataFileTable.Rows.Count / message.RowsPerBatch);
 
             foreach (var batch in batches)
             {
@@ -92,10 +94,13 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Processor.Services
                 var table = new DataTable();
                 CopyColumns(dataFileTable, table);
                 CopyRows(table, batch.ToList(), headerList);
-
+                
+                var percentageComplete = (double)batchCount / numBatches * 100;
+                await _batchService.UpdateProgress(message.Release.Id.ToString(), message.OrigDataFileName, percentageComplete);
+                
                 // If no lines then don't create a batch or message unless it's the last one & there are zero
                 // lines in total in which case create a zero lines batch
-                if ((table.Rows.Count == 0 && batchCount != batches.Count()) || (table.Rows.Count == 0 && messages.Count != 0))
+                if (table.Rows.Count == 0 && batchCount != numBatches || table.Rows.Count == 0 && messages.Count != 0)
                 {
                     batchCount++;
                     continue;
@@ -133,11 +138,12 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Processor.Services
                 };
 
                 messages.Add(iMessage);
-                
-                await _batchService.UpdateProgress(message.Release.Id.ToString(), message.OrigDataFileName, batchCount / batches.Count());
 
                 batchCount++;
             }
+            
+            await _batchService.UpdateStatus(message.Release.Id.ToString(), message.OrigDataFileName,
+                IStatus.RUNNING_PHASE_4);
 
             // Ensure generated messages are added after batch creation.
             foreach (var m in messages)
