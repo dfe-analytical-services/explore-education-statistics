@@ -25,19 +25,22 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Services
         private readonly IPersistenceHelper<ContentDbContext> _persistenceHelper;
         private readonly IUserService _userService;
         private readonly ITopicService _topicService;
+        private readonly IPublishingService _publishingService;
 
         public ThemeService(
             ContentDbContext context,
             IMapper mapper,
             IPersistenceHelper<ContentDbContext> persistenceHelper,
             IUserService userService,
-            ITopicService topicService)
+            ITopicService topicService,
+            IPublishingService publishingService)
         {
             _context = context;
             _mapper = mapper;
             _persistenceHelper = persistenceHelper;
             _userService = userService;
             _topicService = topicService;
+            _publishingService = publishingService;
         }
 
         public async Task<Either<ActionResult, ThemeViewModel>> CreateTheme(SaveThemeViewModel createdTheme)
@@ -61,6 +64,9 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Services
                         );
 
                         await _context.SaveChangesAsync();
+
+                        await _publishingService.TaxonomyChanged();
+
                         return await GetTheme(saved.Entity.Id);
                     }
                 );
@@ -85,6 +91,9 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Services
                         theme.Summary = updatedTheme.Summary;
 
                         await _context.SaveChangesAsync();
+
+                        await _publishingService.TaxonomyChanged();
+
                         return await GetTheme(theme.Id);
                     }
                 );
@@ -150,6 +159,8 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Services
 
                         _context.Themes.Remove(theme);
                         await _context.SaveChangesAsync();
+
+                        await _publishingService.TaxonomyChanged();
                     }
                 );
         }

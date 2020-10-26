@@ -136,5 +136,19 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Services
                     return Unit.Instance;
                 });
         }
+
+        /// <summary>
+        /// Notify the Publisher that there has been a change to the
+        /// taxonomy, such as themes and topics.
+        /// </summary>
+        /// <returns></returns>
+        public async Task<Either<ActionResult, Unit>> TaxonomyChanged()
+        {
+            await _storageQueueService.AddMessageAsync(PublishTaxonomyQueue, new PublishTaxonomyMessage());
+
+            _logger.LogTrace($"Sent PublishTaxonomy message");
+
+            return Unit.Instance;
+        }
     }
 }
