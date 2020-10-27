@@ -56,7 +56,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Processor
                     Console.Out.WriteLine($"Recovering {entity.PartitionKey} : {entity.RowKey}");
 
                     // If batch was not split then just processing again by adding to pending queue
-                    if (entity.Status.Equals(IStatus.QUEUED) || entity.Status.Equals(IStatus.PROCESSING_ARCHIVE_FILE) || entity.Status.Equals(IStatus.RUNNING_PHASE_1))
+                    if (entity.Status.Equals(IStatus.QUEUED) || entity.Status.Equals(IStatus.PROCESSING_ARCHIVE_FILE) || entity.Status.Equals(IStatus.STAGE_1))
                     {
                         Console.WriteLine($"No data imported for {entity.PartitionKey} : {entity.RowKey} - Import will be re-run");
                         pendingQueue.AddMessage(new CloudQueueMessage(entity.Message));
@@ -86,43 +86,21 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Processor
 
         private static TableQuery<DatafileImport> BuildQuery()
         {
-            var combineFilters = TableQuery.CombineFilters(
-                TableQuery.GenerateFilterCondition("Status",
-                    QueryComparisons.Equal, IStatus.QUEUED.ToString())
-                , TableOperators.Or,
-                TableQuery.GenerateFilterCondition("Status",
-                    QueryComparisons.Equal, IStatus.PROCESSING_ARCHIVE_FILE.ToString()));
+            var combineFilters = TableQuery.GenerateFilterCondition("Status",
+                    QueryComparisons.Equal, IStatus.QUEUED.ToString());
 
-            combineFilters = TableQuery.CombineFilters(
-                combineFilters,
-                TableOperators.Or,
-                TableQuery.GenerateFilterCondition("Status",
-                    QueryComparisons.Equal, IStatus.RUNNING_PHASE_1.ToString()));
-            
-            combineFilters = TableQuery.CombineFilters(
-                combineFilters,
-                TableOperators.Or,
-                TableQuery.GenerateFilterCondition("Status",
-                    QueryComparisons.Equal, IStatus.RUNNING_PHASE_2.ToString()));
-            
-            combineFilters = TableQuery.CombineFilters(
-                combineFilters,
-                TableOperators.Or,
-                TableQuery.GenerateFilterCondition("Status",
-                    QueryComparisons.Equal, IStatus.RUNNING_PHASE_3.ToString()));
-            
-            combineFilters = TableQuery.CombineFilters(
-                combineFilters,
-                TableOperators.Or,
-                TableQuery.GenerateFilterCondition("Status",
-                    QueryComparisons.Equal, IStatus.RUNNING_PHASE_4.ToString()));
-            
-            return new TableQuery<DatafileImport>()
-                .Where(TableQuery.CombineFilters(
-                    combineFilters,
-                    TableOperators.Or,
-                    TableQuery.GenerateFilterCondition("Status",
-                    QueryComparisons.Equal, IStatus.RUNNING_PHASE_5.ToString())));
+            IStatus[] statuses = {
+                IStatus.PROCESSING_ARCHIVE_FILE,
+                IStatus.STAGE_1,
+                IStatus.STAGE_2,
+                IStatus.STAGE_3,
+                IStatus.STAGE_4,
+                IStatus.STAGE_5
+            };
+
+            combineFilters = statuses.Aggregate(combineFilters, (current, status) => TableQuery.CombineFilters(current, TableOperators.Or, TableQuery.GenerateFilterCondition("Status", QueryComparisons.Equal, status.ToString())));
+
+            return new TableQuery<DatafileImport>().Where(combineFilters);
         }
 
         private static async Task<List<BlobItem>> GetBatchesRemaining(

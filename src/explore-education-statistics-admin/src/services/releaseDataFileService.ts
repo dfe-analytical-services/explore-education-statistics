@@ -65,11 +65,11 @@ export type ImportStatusCode =
   | 'QUEUED'
   | 'UPLOADING'
   | 'PROCESSING_ARCHIVE_FILE'
-  | 'RUNNING_PHASE_1'
-  | 'RUNNING_PHASE_2'
-  | 'RUNNING_PHASE_3'
-  | 'RUNNING_PHASE_4'
-  | 'RUNNING_PHASE_5'
+  | 'STAGE_1'
+  | 'STAGE_2'
+  | 'STAGE_3'
+  | 'STAGE_4'
+  | 'STAGE_5'
   | 'NOT_FOUND'
   | 'FAILED';
 

@@ -18,6 +18,7 @@ using GovUk.Education.ExploreEducationStatistics.Data.Processor.Utils;
 using Microsoft.Azure.WebJobs;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.Logging;
+using static GovUk.Education.ExploreEducationStatistics.Common.Services.ImportStatusService;
 using static GovUk.Education.ExploreEducationStatistics.Data.Processor.Services.ValidationErrorMessages;
 using static GovUk.Education.ExploreEducationStatistics.Common.Validators.FileTypeValidationUtils;
 
@@ -55,18 +56,18 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Processor.Services
         private readonly ILogger<IValidatorService> _logger;
         private readonly IFileStorageService _fileStorageService;
         private readonly IFileTypeService _fileTypeService;
-        private readonly IBatchService _batchService;
-
+        private readonly IImportStatusService _importStatusService;
+        
         public ValidatorService(
             ILogger<IValidatorService> logger,
             IFileStorageService fileStorageService,
             IFileTypeService fileTypeService,
-            IBatchService batchService)
+            IImportStatusService importStatusService)
         {
             _logger = logger;
             _fileStorageService = fileStorageService;
             _fileTypeService = fileTypeService;
-            _batchService = batchService;
+            _importStatusService = importStatusService;
         }
 
         public ValidatorService(ILogger<IValidatorService> logger)
@@ -86,7 +87,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Processor.Services
         {
             _logger.LogInformation($"Validating Datafile: {message.OrigDataFileName}");
 
-            await _batchService.UpdateStatus(message.Release.Id.ToString(), message.DataFileName, IStatus.RUNNING_PHASE_1);
+            await _importStatusService.UpdateStatus(message.Release.Id, message.DataFileName, IStatus.STAGE_1);
 
             return await ValidateCsvFile(subjectData.DataBlob, false)
                 .OnSuccessDo(async () => await ValidateCsvFile(subjectData.MetaBlob, true))
@@ -105,7 +106,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Processor.Services
                             .OnSuccess(
                                 () =>
                                     ValidateAndCountObservations(dataFileTable.Columns, dataFileTable.Rows,
-                                            executionContext, message.Release.Id.ToString(), message.OrigDataFileName)
+                                            executionContext, message.Release.Id, message.OrigDataFileName)
                                         .OnSuccess(
                                             result =>
                                             {
@@ -238,7 +239,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Processor.Services
                 DataColumnCollection cols,
                 DataRowCollection rows,
                 ExecutionContext executionContext,
-                string releaseId,
+                Guid releaseId,
                 string origDataFileName)
         {
             var idx = 0;
@@ -277,9 +278,9 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Processor.Services
                 
                 totalRowCount++;
 
-                if (totalRowCount % 1000 == 0)
+                if (totalRowCount % STAGE_1_ROW_CHECK == 0)
                 {
-                    await _batchService.UpdateProgress(releaseId, origDataFileName, (double)totalRowCount / dataRows * 100);
+                    await _importStatusService.UpdateProgress(releaseId, origDataFileName, (double)totalRowCount / dataRows * 100);
                 }
             }
 
@@ -288,7 +289,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Processor.Services
                 return errors;
             }
             
-            await _batchService.UpdateProgress(releaseId, origDataFileName, 100);
+            await _importStatusService.UpdateProgress(releaseId, origDataFileName, 100);
 
             var rowsPerBatch = Convert.ToInt32(LoadAppSettings(executionContext).GetValue<string>("RowsPerBatch"));
 

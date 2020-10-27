@@ -24,8 +24,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Processor.Functions
         )
         {
             await _batchService.FailImport(
-                message.Release.Id.ToString(),
-                message.OrigDataFileName,
+                message.Release.Id, message.OrigDataFileName,
                 new List<ValidationError>
                 {
                     new ValidationError("File failed to import for unknown reason in upload processing stage.")
@@ -40,8 +39,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Processor.Functions
             ILogger logger)
         {
             await _batchService.FailImport(
-                message.Release.Id.ToString(),
-                message.OrigDataFileName,
+                message.Release.Id, message.OrigDataFileName,
                 new List<ValidationError>
                 {
                     new ValidationError("File failed to import for unknown reason in upload processing stage.")

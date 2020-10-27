@@ -14,6 +14,7 @@ using GovUk.Education.ExploreEducationStatistics.Data.Model;
 using GovUk.Education.ExploreEducationStatistics.Data.Model.Database;
 using Microsoft.Data.SqlClient;
 using Microsoft.EntityFrameworkCore;
+using static GovUk.Education.ExploreEducationStatistics.Common.Services.ImportStatusService;
 
 namespace GovUk.Education.ExploreEducationStatistics.Data.Importer.Services
 {
@@ -23,6 +24,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Importer.Services
         private readonly ImporterLocationService _importerLocationService;
         private readonly ImporterFilterService _importerFilterService;
         private readonly IImporterMetaService _importerMetaService;
+        private readonly IImportStatusService _importStatusService;
 
         private enum Columns
         {
@@ -105,12 +107,14 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Importer.Services
             IGuidGenerator guidGenerator,
             ImporterFilterService importerFilterService,
             ImporterLocationService importerLocationService,
-            IImporterMetaService importerMetaService)
+            IImporterMetaService importerMetaService,
+            IImportStatusService importStatusService)
         {
             _guidGenerator = guidGenerator;
             _importerFilterService = importerFilterService;
             _importerLocationService = importerLocationService;
             _importerMetaService = importerMetaService;
+            _importStatusService = importStatusService;
         }
 
         public void ImportMeta(DataTable table, Subject subject, StatisticsDbContext context)
@@ -123,16 +127,25 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Importer.Services
             return _importerMetaService.Get(table.Columns, table.Rows, subject, context);
         }
 
-        public void ImportFiltersLocationsAndSchools(DataColumnCollection cols, DataRowCollection rows, SubjectMeta subjectMeta, StatisticsDbContext context)
+        public async Task ImportFiltersLocationsAndSchools(DataColumnCollection cols, DataRowCollection rows,
+            SubjectMeta subjectMeta, StatisticsDbContext context, Guid releaseId, string origDataFileName)
         {
             // Clearing the caches is required here as the seeder shares the cache with all subjects
             _importerFilterService.ClearCache();
             _importerLocationService.ClearCache();
 
             var headers = CsvUtil.GetColumnValues(cols);
+            var rowCount = 1;
+            var dataRows = rows.Count;
+            
             foreach (DataRow row in rows)
             {
+                if (rowCount % STAGE_1_ROW_CHECK == 0)
+                {
+                    await _importStatusService.UpdateProgress(releaseId, origDataFileName, (double)rowCount / dataRows * 100);
+                }
                 CreateFiltersAndLocationsFromCsv(context, CsvUtil.GetRowValues(row), headers, subjectMeta.Filters);
+                rowCount++;
             }
         }
 
