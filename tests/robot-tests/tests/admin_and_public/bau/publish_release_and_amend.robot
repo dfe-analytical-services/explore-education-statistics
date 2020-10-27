@@ -72,7 +72,7 @@ Add meta guidance
 
 Add ancillary file
     [Tags]  HappyPath
-    user clicks link  File uploads
+    user clicks link  Ancillary file uploads
     user waits until h2 is visible  Add file to release
 
     user enters text into element  id:fileUploadForm-name   Test ancillary file 1
@@ -474,7 +474,7 @@ Update existing meta guidance for amendment
 Add ancillary file to amendment
     [Tags]  HappyPath
     user clicks link  Data and files
-    user clicks link  File uploads
+    user clicks link  Ancillary file uploads
     user waits until h2 is visible  Add file to release
 
     user enters text into element  id:fileUploadForm-name   Test ancillary file 2
