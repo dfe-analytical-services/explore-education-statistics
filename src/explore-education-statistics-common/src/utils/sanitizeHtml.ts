@@ -8,6 +8,7 @@ const config: sanitize.IOptions = {
     'h4',
     'h5',
     'strong',
+    'em',
     'i',
     'a',
     'ul',
