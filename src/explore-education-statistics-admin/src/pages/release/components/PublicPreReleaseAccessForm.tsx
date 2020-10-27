@@ -62,10 +62,9 @@ const PublicPreReleaseAccessForm = ({
       {!isReleaseLive && (
         <div className="govuk-inset-text">
           <h3 className="govuk-heading-m">Before you start</h3>
-
           <ul>
             <li>
-              you can add a list of roles who have been granted pre-release
+              you should add a list of roles who have been granted pre-release
               access to this release
             </li>
             <li>
@@ -130,40 +129,6 @@ const PublicPreReleaseAccessForm = ({
           )}
         </>
       )}
-
-      <hr />
-
-      <h3>How to access the release</h3>
-
-      {!isReleaseLive && (
-        <>
-          <p>
-            The <strong>pre-release</strong> will be accessible at:
-          </p>
-
-          <p>
-            <UrlContainer
-              url={`${window.location.origin}${generatePath<ReleaseRouteParams>(
-                preReleaseRoute.path,
-                {
-                  publicationId,
-                  releaseId,
-                },
-              )}`}
-            />
-          </p>
-        </>
-      )}
-
-      <p>
-        The <strong>public release</strong> will be accessible at:
-      </p>
-
-      <p>
-        <UrlContainer
-          url={`${PublicAppUrl}/find-statistics/${publicationSlug}/${releaseSlug}`}
-        />
-      </p>
     </>
   );
 };

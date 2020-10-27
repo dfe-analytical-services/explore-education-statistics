@@ -6,10 +6,12 @@ import {
   ReleaseRouteParams,
   releaseStatusRoute,
 } from '@admin/routes/releaseRoutes';
+import { preReleaseRoute } from '@admin/routes/routes';
 import releaseService from '@admin/services/releaseService';
 import LoadingSpinner from '@common/components/LoadingSpinner';
 import Tabs from '@common/components/Tabs';
 import TabsSection from '@common/components/TabsSection';
+import UrlContainer from '@common/components/UrlContainer';
 import WarningMessage from '@common/components/WarningMessage';
 import useAsyncHandledRetry from '@common/hooks/useAsyncHandledRetry';
 import React from 'react';
@@ -32,6 +34,34 @@ const ReleasePreReleaseAccessPage = () => {
         <Tabs id="preReleaseAccess">
           <TabsSection id="preReleaseAccess-users" title="Pre-release users">
             <h2>Manage pre-release user access</h2>
+            <div className="govuk-inset-text">
+              <h3>Before you start</h3>
+              <p>
+                Pre-release users will receive an email with a link to preview
+                the publication for pre-release as soon as you add them. The
+                preview will show a holding page until 24 hours before the
+                scheduled publication date.
+              </p>
+            </div>
+
+            {!release.live && (
+              <>
+                <p>
+                  The <strong>pre-release</strong> will be accessible at:
+                </p>
+
+                <p>
+                  <UrlContainer
+                    url={`${window.location.origin}${generatePath<
+                      ReleaseRouteParams
+                    >(preReleaseRoute.path, {
+                      publicationId: release.publicationId,
+                      releaseId: release.id,
+                    })}`}
+                  />
+                </p>
+              </>
+            )}
 
             {release.status === 'Approved' ? (
               <PreReleaseUserAccessForm

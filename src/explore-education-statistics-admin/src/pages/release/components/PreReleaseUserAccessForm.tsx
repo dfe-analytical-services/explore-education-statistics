@@ -112,44 +112,53 @@ const PreReleaseUserAccessForm = ({
       </Gate>
 
       {users.length > 0 ? (
-        <table>
-          <thead>
-            <tr>
-              <th>User email</th>
-              {!isReleaseLive && <th />}
-            </tr>
-          </thead>
-          <tbody>
-            {users.map(user => (
-              <tr key={user.email}>
-                <td>{user.email}</td>
+        <>
+          <div className="govuk-inset-text">
+            <p>
+              These people will have access to a preview of the release 24 hours
+              before the scheduled publish date.
+            </p>
+          </div>
 
-                {!isReleaseLive && (
-                  <td className="dfe-align--right">
-                    <ButtonText
-                      disabled={isRemoving}
-                      onClick={async () => {
-                        toggleRemoving.on();
-
-                        await preReleaseUserService.removeUser(
-                          releaseId,
-                          user.email,
-                        );
-
-                        setUsers({
-                          value: users.filter(u => u.email !== user.email),
-                        });
-                        toggleRemoving.off();
-                      }}
-                    >
-                      Remove
-                    </ButtonText>
-                  </td>
-                )}
+          <table>
+            <thead>
+              <tr>
+                <th>User email</th>
+                {!isReleaseLive && <th />}
               </tr>
-            ))}
-          </tbody>
-        </table>
+            </thead>
+            <tbody>
+              {users.map(user => (
+                <tr key={user.email}>
+                  <td>{user.email}</td>
+
+                  {!isReleaseLive && (
+                    <td className="dfe-align--right">
+                      <ButtonText
+                        disabled={isRemoving}
+                        onClick={async () => {
+                          toggleRemoving.on();
+
+                          await preReleaseUserService.removeUser(
+                            releaseId,
+                            user.email,
+                          );
+
+                          setUsers({
+                            value: users.filter(u => u.email !== user.email),
+                          });
+                          toggleRemoving.off();
+                        }}
+                      >
+                        Remove
+                      </ButtonText>
+                    </td>
+                  )}
+                </tr>
+              ))}
+            </tbody>
+          </table>
+        </>
       ) : (
         <p className="govuk-inset-text">
           No pre-release users have been invited.
