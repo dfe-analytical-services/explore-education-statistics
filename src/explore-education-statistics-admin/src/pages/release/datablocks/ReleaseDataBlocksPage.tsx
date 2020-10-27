@@ -114,116 +114,130 @@ const ReleaseDataBlocksPageInternal = ({
   }, [fetchDataBlocks, history, publicationId, releaseId, selectedDataBlock]);
 
   return (
-    <div ref={pageRef}>
-      {dataBlockOptions.length > 0 && (
-        <>
-          <FormSelect
-            id="selectedDataBlock"
-            name="selectedDataBlock"
-            label="Select an existing data block to edit or create a new one"
-            disabled={isLoading}
-            order={[]}
-            value={dataBlockId}
-            optGroups={{
-              'Create data block': [
-                {
-                  label: 'Create new data block',
-                  value: '',
-                },
-              ],
-              'Edit existing': dataBlockOptions,
-            }}
-            onChange={e => {
-              history.push(
-                generatePath<ReleaseDataBlocksRouteParams>(
-                  releaseDataBlocksRoute.path,
-                  {
-                    publicationId,
-                    releaseId,
-                    dataBlockId: e.target.value ? e.target.value : undefined,
-                  },
-                ),
-              );
-            }}
-          />
-          <hr />
-        </>
-      )}
+    <>
+      <h2>Data blocks</h2>
 
-      <LoadingSpinner loading={isLoading}>
-        <h2>{selectedDataBlock?.name ?? 'Create new data block'}</h2>
+      <div className="govuk-inset-text">
+        <h3>Before you start</h3>
+        <p>
+          A data block is a smaller cut of data from your original file that you
+          can embed into your publication as a presentation table, build charts
+          from, or link users directly to.
+        </p>
+      </div>
 
-        {selectedDataBlock && (
+      <div ref={pageRef}>
+        {dataBlockOptions.length > 0 && (
           <>
-            {config && (
-              <p className="govuk-!-margin-bottom-6">
-                <strong>Fast track URL:</strong>
-
-                <UrlContainer
-                  className="govuk-!-margin-left-4"
-                  url={`${config.PublicAppUrl}/data-tables/fast-track/${selectedDataBlock.id}`}
-                />
-              </p>
-            )}
-
-            <Button
-              type="button"
-              variant="warning"
-              onClick={() => {
-                dataBlocksService
-                  .getDeleteBlockPlan(releaseId, selectedDataBlock.id)
-                  .then(setDeletePlan);
+            <FormSelect
+              id="selectedDataBlock"
+              name="selectedDataBlock"
+              label="Select an existing data block to edit or create a new one"
+              disabled={isLoading}
+              order={[]}
+              value={dataBlockId}
+              optGroups={{
+                'Create data block': [
+                  {
+                    label: 'Create new data block',
+                    value: '',
+                  },
+                ],
+                'Edit existing': dataBlockOptions,
               }}
-            >
-              Delete this data block
-            </Button>
-
-            {deletePlan && (
-              <ModalConfirm
-                title="Delete data block"
-                mounted
-                onConfirm={handleDataBlockDelete}
-                onExit={() => setDeletePlan(undefined)}
-                onCancel={() => setDeletePlan(undefined)}
-              >
-                <p>Are you sure you wish to delete this data block?</p>
-                <ul>
-                  {deletePlan.dependentDataBlocks.map(block => (
-                    <li key={block.name}>
-                      <p>{block.name}</p>
-                      {block.contentSectionHeading && (
-                        <p>
-                          {`It will be removed from the "${block.contentSectionHeading}" content section.`}
-                        </p>
-                      )}
-                      {block.infographicFilesInfo.length > 0 && (
-                        <p>
-                          The following infographic files will also be removed:
-                          <ul>
-                            {block.infographicFilesInfo.map(finfo => (
-                              <li key={finfo.filename}>
-                                <p>{finfo.filename}</p>
-                              </li>
-                            ))}
-                          </ul>
-                        </p>
-                      )}
-                    </li>
-                  ))}
-                </ul>
-              </ModalConfirm>
-            )}
+              onChange={e => {
+                history.push(
+                  generatePath<ReleaseDataBlocksRouteParams>(
+                    releaseDataBlocksRoute.path,
+                    {
+                      publicationId,
+                      releaseId,
+                      dataBlockId: e.target.value ? e.target.value : undefined,
+                    },
+                  ),
+                );
+              }}
+            />
+            <hr />
           </>
         )}
 
-        <ReleaseDataBlocksPageTabs
-          key={selectedDataBlock?.id}
-          releaseId={releaseId}
-          selectedDataBlock={selectedDataBlock}
-          onDataBlockSave={handleDataBlockSave}
-        />
-      </LoadingSpinner>
-    </div>
+        <LoadingSpinner loading={isLoading}>
+          {selectedDataBlock?.name && <h2>{selectedDataBlock.name}</h2>}
+
+          {selectedDataBlock && (
+            <>
+              {config && (
+                <p className="govuk-!-margin-bottom-6">
+                  <strong>Fast track URL:</strong>
+
+                  <UrlContainer
+                    className="govuk-!-margin-left-4"
+                    url={`${config.PublicAppUrl}/data-tables/fast-track/${selectedDataBlock.id}`}
+                  />
+                </p>
+              )}
+
+              <Button
+                type="button"
+                variant="warning"
+                onClick={() => {
+                  dataBlocksService
+                    .getDeleteBlockPlan(releaseId, selectedDataBlock.id)
+                    .then(setDeletePlan);
+                }}
+              >
+                Delete this data block
+              </Button>
+
+              {deletePlan && (
+                <ModalConfirm
+                  title="Delete data block"
+                  mounted
+                  onConfirm={handleDataBlockDelete}
+                  onExit={() => setDeletePlan(undefined)}
+                  onCancel={() => setDeletePlan(undefined)}
+                >
+                  <p>Are you sure you wish to delete this data block?</p>
+                  <ul>
+                    {deletePlan.dependentDataBlocks.map(block => (
+                      <li key={block.name}>
+                        <p>{block.name}</p>
+                        {block.contentSectionHeading && (
+                          <p>
+                            {`It will be removed from the "${block.contentSectionHeading}" content section.`}
+                          </p>
+                        )}
+                        {block.infographicFilesInfo.length > 0 && (
+                          <p>
+                            The following infographic files will also be
+                            removed:
+                            <ul>
+                              {block.infographicFilesInfo.map(finfo => (
+                                <li key={finfo.filename}>
+                                  <p>{finfo.filename}</p>
+                                </li>
+                              ))}
+                            </ul>
+                          </p>
+                        )}
+                      </li>
+                    ))}
+                  </ul>
+                </ModalConfirm>
+              )}
+            </>
+          )}
+
+          <ReleaseDataBlocksPageTabs
+            key={selectedDataBlock?.id}
+            releaseId={releaseId}
+            selectedDataBlock={selectedDataBlock}
+            onDataBlockSave={handleDataBlockSave}
+          />
+        </LoadingSpinner>
+      </div>
+    </>
   );
 };
 
