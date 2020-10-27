@@ -54,7 +54,14 @@ namespace GovUk.Education.ExploreEducationStatistics.Publisher
 
             CreateMap<Theme, ThemeViewModel>();
 
+            CreateMap<Theme, Data.Model.Theme>()
+                .ForMember(dest => dest.Topics, m => m.Ignore());
+
             CreateMap<Topic, TopicViewModel>();
+
+            CreateMap<Topic, Data.Model.Topic>()
+                .ForMember(dest => dest.Publications, m => m.Ignore())
+                .ForMember(dest => dest.Theme, m => m.Ignore());
 
             CreateMap<Update, ReleaseNoteViewModel>();
         }
