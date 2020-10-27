@@ -27,15 +27,17 @@ namespace GovUk.Education.ExploreEducationStatistics.Common.Services
     public class ImportStatusService : IImportStatusService
     {
         public const int STAGE_1_ROW_CHECK = 1000;
-        public const double STAGE_2_ROW_CHECK = 1000;
-        
-        private static readonly List<IStatus> FinishedImportStatuses = new List<IStatus> {
+        public const int STAGE_2_ROW_CHECK = 1000;
+
+        private static readonly List<IStatus> FinishedImportStatuses = new List<IStatus>
+        {
             IStatus.COMPLETE,
             IStatus.FAILED,
             IStatus.NOT_FOUND
         };
-        
-        private static readonly Dictionary<IStatus, double> ProcessingRatios = new Dictionary<IStatus, double>() {
+
+        private static readonly Dictionary<IStatus, double> ProcessingRatios = new Dictionary<IStatus, double>()
+        {
             {IStatus.STAGE_1, .1},
             {IStatus.STAGE_2, .1},
             {IStatus.STAGE_3, .1},
@@ -69,7 +71,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Common.Services
             var percentageComplete = CalculatePercentageComplete(import.PercentageComplete, import.Status);
 
             _logger.LogInformation($"current status: {import.Status} : {percentageComplete}% complete");
-            
+
             return new ImportStatus
             {
                 Errors = import.Errors,
@@ -118,9 +120,9 @@ namespace GovUk.Education.ExploreEducationStatistics.Common.Services
         public async Task UpdateProgress(Guid releaseId, string origDataFileName, double percentageComplete)
         {
             var import = await GetImport(releaseId, origDataFileName);
-            if (import.PercentageComplete < (int)percentageComplete)
+            if (import.PercentageComplete < (int) percentageComplete)
             {
-                import.PercentageComplete = (int)percentageComplete;
+                import.PercentageComplete = (int) percentageComplete;
                 try
                 {
                     await _table.ExecuteAsync(TableOperation.Replace(import));
@@ -131,7 +133,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Common.Services
                 }
             }
         }
-        
+
         private async Task<DatafileImport> GetImport(Guid releaseId, string dataFileName)
         {
             // Need to define the extra columns to retrieve
@@ -140,7 +142,9 @@ namespace GovUk.Education.ExploreEducationStatistics.Common.Services
                 dataFileName,
                 new List<string> {"NumBatches", "Status", "NumberOfRows", "Errors", "Message", "PercentageComplete"}));
 
-            return result.Result != null ? (DatafileImport) result.Result : new DatafileImport {Status = IStatus.NOT_FOUND};
+            return result.Result != null
+                ? (DatafileImport) result.Result
+                : new DatafileImport {Status = IStatus.NOT_FOUND};
         }
 
         private int CalculatePercentageComplete(int percentageComplete, IStatus status)
@@ -149,17 +153,17 @@ namespace GovUk.Education.ExploreEducationStatistics.Common.Services
             {
                 IStatus.STAGE_1 => percentageComplete * ProcessingRatios[IStatus.STAGE_1],
                 IStatus.STAGE_2 => ProcessingRatios[IStatus.STAGE_1] * 100 +
-                                           (percentageComplete * ProcessingRatios[IStatus.STAGE_2]),
+                                   (percentageComplete * ProcessingRatios[IStatus.STAGE_2]),
                 IStatus.STAGE_3 => ProcessingRatios[IStatus.STAGE_1] * 100 +
-                                           ProcessingRatios[IStatus.STAGE_2] * 100 + 
-                                           (percentageComplete * ProcessingRatios[IStatus.STAGE_3]),
+                                   ProcessingRatios[IStatus.STAGE_2] * 100 +
+                                   (percentageComplete * ProcessingRatios[IStatus.STAGE_3]),
                 IStatus.STAGE_4 => ProcessingRatios[IStatus.STAGE_1] * 100 +
-                                           ProcessingRatios[IStatus.STAGE_2] * 100 +
-                                           ProcessingRatios[IStatus.STAGE_3] * 100,
+                                   ProcessingRatios[IStatus.STAGE_2] * 100 +
+                                   ProcessingRatios[IStatus.STAGE_3] * 100,
                 IStatus.STAGE_5 => ProcessingRatios[IStatus.STAGE_1] * 100 +
-                                           ProcessingRatios[IStatus.STAGE_2] * 100 +
-                                           ProcessingRatios[IStatus.STAGE_3] * 100 +
-                                           (percentageComplete * ProcessingRatios[IStatus.STAGE_5]),
+                                   ProcessingRatios[IStatus.STAGE_2] * 100 +
+                                   ProcessingRatios[IStatus.STAGE_3] * 100 +
+                                   (percentageComplete * ProcessingRatios[IStatus.STAGE_5]),
                 IStatus.COMPLETE => ProcessingRatios[IStatus.COMPLETE] * 100,
                 _ => 0
             });
