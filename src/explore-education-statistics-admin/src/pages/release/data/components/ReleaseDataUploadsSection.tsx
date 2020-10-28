@@ -141,21 +141,25 @@ const ReleaseDataUploadsSection = ({
       <h2>Add data file to release</h2>
       <div className="govuk-inset-text">
         <h3>Before you start</h3>
-
+        <p>
+          Data files will be displayed in the table tool and can be used to
+          create data blocks. They will also be attached to the release for
+          users to download. Please ensure:
+        </p>
         <ul>
           <li>
-            make sure your data files have passed the checks in our{' '}
+            your data files have passed the checks in our{' '}
             <a href="https://rsconnect/rsc/dfe-published-data-qa/">
               screening app
             </a>
           </li>
           <li>
-            if your data does not meet these standards, you won’t be able to
+            your data files meets these standards - if not you won’t be able to
             upload it to your release
           </li>
           <li>
-            if you have any issues uploading data and files, or questions about
-            data standards contact:{' '}
+            if you have any issues uploading data files, or questions about data
+            standards contact:{' '}
             <a href="mailto:explore.statistics@education.gov.uk">
               explore.statistics@education.gov.uk
             </a>
