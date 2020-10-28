@@ -27,8 +27,8 @@ Upload a subject
     user clicks link  Data and files
     user waits until page contains element  id:dataFileUploadForm-subjectTitle
     user enters text into element  id:dataFileUploadForm-subjectTitle   ${SUBJECT_NAME}
-    user chooses file   id:dataFileUploadForm-dataFile       ${FILES_DIR}dates.csv
-    user chooses file   id:dataFileUploadForm-metadataFile   ${FILES_DIR}dates.meta.csv
+    user chooses file  id:dataFileUploadForm-dataFile       ${FILES_DIR}dates.csv
+    user chooses file  id:dataFileUploadForm-metadataFile   ${FILES_DIR}dates.meta.csv
     user clicks button  Upload data files
     user waits until h2 is visible  Uploaded data files
     user waits until page contains accordion section   ${SUBJECT_NAME}
@@ -48,7 +48,7 @@ Add meta guidance to subject
 
 Go to "Release status" page
     [Tags]  HappyPath
-    user clicks link   Release status
+    user clicks link  Release status
     user waits until h2 is visible  Release status
     user waits until page contains button  Edit release status
 
@@ -56,10 +56,10 @@ Approve release
     [Tags]  HappyPath
     user clicks button  Edit release status
     user waits until h2 is visible  Edit release status
-    user clicks radio   Approved for publication
+    user clicks radio  Approved for publication
     user enters text into element  id:releaseStatusForm-internalReleaseNote  Approved by UI tests
-    user clicks radio   As soon as possible
-    user clicks button   Update status
+    user clicks radio  As soon as possible
+    user clicks button  Update status
 
 Wait for release process status to be Complete
     [Tags]  HappyPath
@@ -77,23 +77,23 @@ Select "Pupil Exclusions" publication
     [Tags]  HappyPath
     user opens details dropdown    %{TEST_THEME_NAME}
     user opens details dropdown    ${TOPIC_NAME}
-    user clicks radio      ${PUBLICATION_NAME}
-    user clicks element    id:publicationForm-submit
+    user clicks radio  ${PUBLICATION_NAME}
+    user clicks element  id:publicationForm-submit
     user waits until h2 is visible  Choose a subject
     user checks previous table tool step contains  1   Publication   ${PUBLICATION_NAME}
 
 Select subject "Duration of fixed exclusions"
     [Tags]  HappyPath
     user clicks radio   ${SUBJECT_NAME}
-    user clicks element   id:publicationSubjectForm-submit
+    user clicks element  id:publicationSubjectForm-submit
     user waits until h2 is visible  Choose locations
     user checks previous table tool step contains  2    Subject     ${SUBJECT_NAME}
 
 Select Location Country, England
     [Tags]  HappyPath
-    user opens details dropdown     National
-    user clicks checkbox    England
-    user clicks element     id:locationFiltersForm-submit
+    user opens details dropdown  National
+    user clicks checkbox  England
+    user clicks element  id:locationFiltersForm-submit
     user waits until h2 is visible  Choose time period
     user checks previous table tool step contains  3   National     England
 
@@ -101,25 +101,25 @@ Select Start date and End date
     [Tags]  HappyPath
     user selects from list by label  id:timePeriodForm-start   2020 Week 14
     user selects from list by label  id:timePeriodForm-end     2020 Week 14
-    user clicks element     id:timePeriodForm-submit
+    user clicks element  id:timePeriodForm-submit
     user waits until h2 is visible  Choose your filters
-    user waits until page contains element   id:filtersForm-indicators
+    user waits until page contains element  id:filtersForm-indicators
     user checks previous table tool step contains  4    Start date    2020 Week 14
     user checks previous table tool step contains  4    End date      2020 Week 14
 
 Select Indicators
     [Tags]  HappyPath
-    user clicks indicator checkbox   Number of open settings
+    user clicks indicator checkbox  Number of open settings
 
 Select Filters
     [Tags]   HappyPath
-    user opens details dropdown   Date
-    user clicks category checkbox   Date   30/03/2020
-    user checks category checkbox is checked   Date   30/03/2020
+    user opens details dropdown  Date
+    user clicks category checkbox  Date  30/03/2020
+    user checks category checkbox is checked  Date  30/03/2020
 
 Create table
     [Tags]  HappyPath
-    user clicks element     id:filtersForm-submit
+    user clicks element  id:filtersForm-submit
     user waits until results table appears     60
 
 Validate results table column headings
@@ -129,7 +129,7 @@ Validate results table column headings
 Return to Admin to start creating an amendment
     [Tags]  HappyPath
     user goes to url  %{ADMIN_URL}
-    user waits until h1 is visible   Dashboard
+    user waits until h1 is visible  Dashboard
     user waits until page contains title caption  Welcome Bau1
 
 Create amendment
@@ -159,5 +159,5 @@ Approve & publish the release
     user waits until h2 is visible  Edit release status
     user clicks radio   Approved for publication
     user enters text into element  id:releaseStatusForm-internalReleaseNote  Approved by UI tests
-    user clicks radio   As soon as possible
-    user clicks button   Update status
+    user clicks radio  As soon as possible
+    user clicks button  Update status
