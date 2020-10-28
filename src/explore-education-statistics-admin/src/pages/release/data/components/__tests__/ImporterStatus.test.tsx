@@ -53,7 +53,7 @@ describe('ImporterStatus', () => {
 
   test('renders with updated status from service', async () => {
     releaseDataFileService.getDataFileImportStatus.mockResolvedValue({
-      status: 'RUNNING_PHASE_1',
+      status: 'STAGE_1',
       numberOfRows: 100,
     });
 
@@ -82,7 +82,7 @@ describe('ImporterStatus', () => {
 
   test('renders with updated status from service at regular intervals', async () => {
     releaseDataFileService.getDataFileImportStatus.mockResolvedValue({
-      status: 'RUNNING_PHASE_1',
+      status: 'STAGE_1',
       numberOfRows: 100,
     });
 
@@ -107,7 +107,7 @@ describe('ImporterStatus', () => {
     });
 
     releaseDataFileService.getDataFileImportStatus.mockResolvedValue({
-      status: 'RUNNING_PHASE_2',
+      status: 'STAGE_2',
       numberOfRows: 100,
     });
 
