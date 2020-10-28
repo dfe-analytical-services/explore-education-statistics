@@ -133,7 +133,7 @@ const ReleaseStatusPage = () => {
     <>
       {!showForm ? (
         <>
-          <h2>Release status</h2>
+          <h2>Sign off</h2>
 
           <SummaryList>
             <SummaryListItem term="Current status">

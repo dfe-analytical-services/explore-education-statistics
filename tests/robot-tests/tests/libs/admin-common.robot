@@ -157,7 +157,7 @@ user approves methodology
     [Arguments]  ${title}
     user waits until page contains title caption  Edit methodology
     user waits until h1 is visible  ${title}
-    user clicks link  Release status
+    user clicks link  Sign off
     user clicks button  Edit status
     user waits until h2 is visible  Edit methodology status
     user clicks radio  Approved for publication

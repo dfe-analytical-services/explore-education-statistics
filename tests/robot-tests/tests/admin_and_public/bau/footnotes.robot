@@ -204,10 +204,10 @@ Check footnote in Preview content mode
     user checks page does not contain  ${FOOTNOTE_TEXT_2}
     user checks page does not contain  ${FOOTNOTE_TEXT_1}
 
-Go to "Release status" page
+Go to "Sign off" page
     [Tags]  HappyPath
-    user clicks link   Release status
-    user waits until h2 is visible  Release status
+    user clicks link   Sign off
+    user waits until h2 is visible  Sign off
     user waits until page contains button  Edit release status
 
 Approve release
@@ -234,7 +234,7 @@ Approve release
 
 Verify release is scheduled
     [Tags]  HappyPath
-    user waits until h2 is visible  Release status
+    user waits until h2 is visible  Sign off
     user checks summary list contains  Current status  Approved
     user checks summary list contains  Scheduled release  ${PUBLISH_DATE_DAY} ${PUBLISH_DATE_MONTH_WORD} ${PUBLISH_DATE_YEAR}
     user checks summary list contains  Next release expected  December 3001

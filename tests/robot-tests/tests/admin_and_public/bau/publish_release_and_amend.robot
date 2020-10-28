@@ -186,10 +186,10 @@ Add public prerelease access list
     user clicks button  Save access list
     user waits until element contains  css:[data-testid="publicPreReleaseAccessListPreview"]  Test public access list
 
-Go to "Release status" tab
+Go to "Sign off" tab
     [Tags]  HappyPath
-    user clicks link   Release status
-    user waits until h2 is visible  Release status
+    user clicks link   Sign off
+    user waits until h2 is visible  Sign off
     user waits until page contains button  Edit release status
 
 Approve release
@@ -214,7 +214,7 @@ Approve release
 
 Verify release is scheduled
     [Tags]  HappyPath
-    user waits until h2 is visible  Release status
+    user waits until h2 is visible  Sign off
     user checks summary list contains  Current status  Approved
     user checks summary list contains  Scheduled release  ${PUBLISH_DATE_DAY} ${PUBLISH_DATE_MONTH} ${PUBLISH_DATE_YEAR}
     user checks summary list contains  Next release expected  December 3001
@@ -558,10 +558,10 @@ Update public prerelease access list for amendment
     user clicks button  Save access list
     user waits until element contains  css:[data-testid="publicPreReleaseAccessListPreview"]  Updated public access list
 
-Go to "Release status" page again
+Go to "Sign off" page again
     [Tags]  HappyPath
-    user clicks link   Release status
-    user waits until h2 is visible  Release status
+    user clicks link   Sign off
+    user waits until h2 is visible  Sign off
     user waits until page contains button  Edit release status
 
 Approve amendment for immediate release
@@ -580,7 +580,7 @@ Approve amendment for immediate release
 Wait for release process status to be Complete again
     [Tags]  HappyPath
     # EES-1007 - Release process status doesn't automatically update
-    user waits until h2 is visible  Release status
+    user waits until h2 is visible  Sign off
     user checks summary list contains  Current status  Approved
     user checks summary list contains  Scheduled release  ${PUBLISH_DATE_DAY} ${PUBLISH_DATE_MONTH} ${PUBLISH_DATE_YEAR}
     user waits for release process status to be  Complete    ${release_complete_wait}

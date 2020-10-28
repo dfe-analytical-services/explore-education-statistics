@@ -81,7 +81,7 @@ const ReleasePreReleaseAccessPage = () => {
                     },
                   )}
                 >
-                  release status
+                  Sign off
                 </Link>{' '}
                 page.
               </WarningMessage>
