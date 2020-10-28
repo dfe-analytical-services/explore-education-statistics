@@ -17,11 +17,14 @@ namespace GovUk.Education.ExploreEducationStatistics.Content.Model
             var copy = MemberwiseClone() as ReleaseContentSection;
             copy.Release = ctx.Target;
             copy.ReleaseId = ctx.Target.Id;
-            
-            copy.ContentSection = copy
+
+            var contentSection = copy
                 .ContentSection
                 .Clone(ctx, copy);
-            
+
+            copy.ContentSection = contentSection;
+            copy.ContentSectionId = contentSection.Id;
+
             return copy;
         }
     }

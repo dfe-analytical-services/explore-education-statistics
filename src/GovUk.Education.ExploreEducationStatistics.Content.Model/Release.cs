@@ -237,6 +237,11 @@ namespace GovUk.Education.ExploreEducationStatistics.Content.Model
                 .Select(content => content.Clone(ctx))
                 .ToList();
 
+            amendment.ContentBlocks = amendment
+                .ContentBlocks?
+                .Select(releaseContentBlock => releaseContentBlock.Clone(ctx))
+                .ToList();
+
             amendment.RelatedInformation = amendment
                 .RelatedInformation?
                 .Select(link =>
@@ -250,11 +255,6 @@ namespace GovUk.Education.ExploreEducationStatistics.Content.Model
             amendment.Updates = amendment
                 .Updates?
                 .Select(update => update.Clone(ctx))
-                .ToList();
-
-            amendment.ContentBlocks = amendment
-                .ContentBlocks?
-                .Select(releaseContentBlock => releaseContentBlock.Clone(ctx))
                 .ToList();
 
             return amendment;
