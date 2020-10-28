@@ -202,7 +202,10 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin
             // In production, the React files will be served from this directory
             services.AddSpaStaticFiles(configuration => { configuration.RootPath = "wwwroot"; });
 
-            services.AddTransient<IReleaseFilesService, ReleaseFilesService>();
+            services.AddTransient<IFileRepository, FileRepository>();
+            services.AddTransient<IReleaseFileRepository, ReleaseFileRepository>();
+            services.AddTransient<IReleaseDataFileService, ReleaseDataFileService>();
+            services.AddTransient<IReleaseFileService, ReleaseFileService>();
             services.AddTransient<IImportService, ImportService>();
             services.AddTransient<IPublishingService, PublishingService>(provider =>
                 new PublishingService(

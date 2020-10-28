@@ -1,5 +1,7 @@
 using System;
+using System.Collections.Generic;
 using System.Threading.Tasks;
+using Microsoft.AspNetCore.Mvc;
 
 namespace GovUk.Education.ExploreEducationStatistics.Common.Model
 {
@@ -255,6 +257,21 @@ public class Either<Tl, Tr> {
             }
 
             return func();
+        }
+
+        public static async Task<Either<Tl, List<Tr>>> Aggregate<Tl, Tr>(this IEnumerable<Task<Either<Tl, Tr>>> tasks)
+        {
+            var result = new List<Tr>();
+            foreach (var task in tasks)
+            {
+                var r = await task;
+                if (r.IsLeft)
+                {
+                    return r.Left;
+                }
+                result.Add(r.Right);
+            }
+            return result;
         }
     }
 }

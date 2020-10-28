@@ -1,4 +1,4 @@
-using System;
+﻿using System;
 using System.Linq;
 using System.Threading.Tasks;
 using GovUk.Education.ExploreEducationStatistics.Admin.Services;
@@ -25,10 +25,10 @@ using Unit = GovUk.Education.ExploreEducationStatistics.Common.Model.Unit;
 
 namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
 {
-    public class ReleaseFilesServiceTests
+    public class ReleaseDataFileServiceTest
     {
         [Fact]
-        public async Task DeleteDataFiles()
+        public async Task Delete()
         {
             var release = new Release();
 
@@ -95,12 +95,12 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
 
             await using (var contentDbContext = InMemoryApplicationDbContext(contentDbContextId))
             {
-                var releaseFilesService = SetupReleaseFilesService(
+                var service = SetupReleaseDataFileService(
                     contentDbContext: contentDbContext,
                     blobStorageService: blobStorageService.Object,
                     importService: importService.Object);
 
-                var result = await releaseFilesService.DeleteDataFiles(release.Id, dataFile.Id);
+                var result = await service.Delete(release.Id, dataFile.Id);
 
                 blobStorageService.Verify(mock =>
                     mock.DeleteBlob(PrivateFilesContainerName, $"{release.Id}/data/data.csv"), Times.Once());
@@ -109,8 +109,8 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
                 blobStorageService.Verify(mock =>
                     mock.DeleteBlob(PrivateFilesContainerName, $"{release.Id}/zip/data.zip"), Times.Once());
 
-                importService.Verify(mock => 
-                        mock.RemoveImportTableRowIfExists(release.Id, dataFile.Filename), Times.Once());
+                importService.Verify(mock =>
+                    mock.RemoveImportTableRowIfExists(release.Id, dataFile.Filename), Times.Once());
 
                 Assert.True(result.IsRight);
 
@@ -124,7 +124,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
         }
 
         [Fact]
-        public async Task DeleteDataFiles_DeleteReplacementFiles()
+        public async Task Delete_DeleteReplacementFiles()
         {
             var release = new Release();
 
@@ -180,7 +180,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
                 Replacing = dataFile,
                 Source = replacementZipFile
             };
-            
+
             dataFile.ReplacedBy = replacementDataFile;
 
             var replacementMetaFile = new ReleaseFileReference
@@ -214,7 +214,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
                 Release = release,
                 ReleaseFileReference = replacementMetaFile
             };
-            
+
             var contentDbContextId = Guid.NewGuid().ToString();
 
             await using (var contentDbContext = InMemoryApplicationDbContext(contentDbContextId))
@@ -238,22 +238,23 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
 
             await using (var contentDbContext = InMemoryApplicationDbContext(contentDbContextId))
             {
-                var releaseFilesService = SetupReleaseFilesService(
+                var service = SetupReleaseDataFileService(
                     contentDbContext: contentDbContext,
                     blobStorageService: blobStorageService.Object,
                     importService: importService.Object);
 
-                var result = await releaseFilesService.DeleteDataFiles(release.Id, replacementDataFile.Id);
+                var result = await service.Delete(release.Id, replacementDataFile.Id);
 
                 blobStorageService.Verify(mock =>
                     mock.DeleteBlob(PrivateFilesContainerName, $"{release.Id}/data/replacement.csv"), Times.Once());
                 blobStorageService.Verify(mock =>
-                    mock.DeleteBlob(PrivateFilesContainerName, $"{release.Id}/data/replacement.meta.csv"), Times.Once());
+                        mock.DeleteBlob(PrivateFilesContainerName, $"{release.Id}/data/replacement.meta.csv"),
+                    Times.Once());
                 blobStorageService.Verify(mock =>
                     mock.DeleteBlob(PrivateFilesContainerName, $"{release.Id}/zip/replacement.zip"), Times.Once());
 
-                importService.Verify(mock => 
-                        mock.RemoveImportTableRowIfExists(release.Id, replacementDataFile.Filename), Times.Once());
+                importService.Verify(mock =>
+                    mock.RemoveImportTableRowIfExists(release.Id, replacementDataFile.Filename), Times.Once());
 
                 Assert.True(result.IsRight);
 
@@ -276,7 +277,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
         }
 
         [Fact]
-        public async Task DeleteDataFiles_DeleteFilesFromAmendment()
+        public async Task Delete_DeleteFilesFromAmendment()
         {
             var release = new Release
             {
@@ -285,7 +286,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
 
             var amendmentRelease = new Release
             {
-                PreviousVersionId = release.Id 
+                PreviousVersionId = release.Id
             };
 
             var subject = new Subject
@@ -358,12 +359,12 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
 
             await using (var contentDbContext = InMemoryApplicationDbContext(contentDbContextId))
             {
-                var releaseFilesService = SetupReleaseFilesService(
+                var service = SetupReleaseDataFileService(
                     contentDbContext: contentDbContext,
                     blobStorageService: blobStorageService.Object,
                     importService: importService.Object);
 
-                var result = await releaseFilesService.DeleteDataFiles(amendmentRelease.Id, dataFile.Id);
+                var result = await service.Delete(amendmentRelease.Id, dataFile.Id);
 
                 Assert.True(result.IsRight);
 
@@ -379,7 +380,13 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
         }
 
         [Fact]
-        public async Task GetDataFile()
+        public async Task DeleteAll()
+        {
+            // TODO
+        }
+
+        [Fact]
+        public async Task GetInfo()
         {
             var release = new Release();
             var dataFileReference = new ReleaseFileReference
@@ -451,12 +458,13 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
                         Status = IStatus.COMPLETE
                     });
 
-                var service = SetupReleaseFilesService(
+                var service = SetupReleaseDataFileService(
                     contentDbContext: context,
                     blobStorageService: blobStorageService.Object,
                     importStatusService: importStatusService.Object
                 );
-                var result = await service.GetDataFile(
+
+                var result = await service.GetInfo(
                     release.Id,
                     dataFileReference.Id
                 );
@@ -484,7 +492,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
         }
 
         [Fact]
-        public async Task GetDataFile_ReleaseNotFound()
+        public async Task GetInfo_ReleaseNotFound()
         {
             var contextId = Guid.NewGuid().ToString();
 
@@ -509,8 +517,9 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
 
             await using (var context = InMemoryApplicationDbContext(contextId))
             {
-                var service = SetupReleaseFilesService(context);
-                var result = await service.GetDataFile(
+                var service = SetupReleaseDataFileService(context);
+
+                var result = await service.GetInfo(
                     Guid.NewGuid(),
                     Guid.NewGuid()
                 );
@@ -521,7 +530,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
         }
 
         [Fact]
-        public async void GetDataFile_FileNotForRelease()
+        public async Task GetInfo_FileNotForRelease()
         {
             var release = new Release();
             var otherRelease = new Release();
@@ -561,8 +570,9 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
 
             await using (var context = InMemoryApplicationDbContext(contextId))
             {
-                var service = SetupReleaseFilesService(context);
-                var result = await service.GetDataFile(
+                var service = SetupReleaseDataFileService(context);
+
+                var result = await service.GetInfo(
                     otherRelease.Id,
                     dataFileReference.Id
                 );
@@ -573,7 +583,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
         }
 
         [Fact]
-        public async void GetDataFile_NoMatchingBlob()
+        public async Task GetInfo_NoMatchingBlob()
         {
             var release = new Release();
             var subject = new Subject
@@ -632,12 +642,13 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
                     .Setup(s => s.GetAsync(subject.Id))
                     .ReturnsAsync(subject);
 
-                var service = SetupReleaseFilesService(
+                var service = SetupReleaseDataFileService(
                     contentDbContext: context,
                     blobStorageService: blobStorageService.Object,
                     subjectService: subjectService.Object
                 );
-                var result = await service.GetDataFile(
+
+                var result = await service.GetInfo(
                     release.Id,
                     dataFileReference.Id
                 );
@@ -663,7 +674,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
         }
 
         [Fact]
-        public async void GetDataFile_MatchingSourceZipBlob()
+        public async Task GetInfo_MatchingSourceZipBlob()
         {
             var release = new Release();
 
@@ -756,12 +767,13 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
                         }
                     );
 
-                var service = SetupReleaseFilesService(
+                var service = SetupReleaseDataFileService(
                     contentDbContext: context,
                     blobStorageService: blobStorageService.Object,
                     importStatusService: importStatusService.Object
                 );
-                var result = await service.GetDataFile(
+
+                var result = await service.GetInfo(
                     release.Id,
                     dataFileReference.Id
                 );
@@ -788,7 +800,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
         }
 
         [Fact]
-        public async void GetDataFile_AmendedRelease()
+        public async Task GetInfo_AmendedRelease()
         {
             var originalRelease = new Release();
             var amendedRelease = new Release();
@@ -878,12 +890,12 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
                         }
                     );
 
-                var service = SetupReleaseFilesService(
+                var service = SetupReleaseDataFileService(
                     contentDbContext: context,
                     blobStorageService: blobStorageService.Object,
                     importStatusService: importStatusService.Object
                 );
-                var result = await service.GetDataFile(
+                var result = await service.GetInfo(
                     amendedRelease.Id,
                     dataFileReference.Id
                 );
@@ -911,7 +923,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
         }
 
         [Fact]
-        public async void ListDataFiles()
+        public async Task ListAll()
         {
             var release = new Release();
             var subject1 = new Subject
@@ -1051,12 +1063,12 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
                         }
                     );
 
-                var service = SetupReleaseFilesService(
+                var service = SetupReleaseDataFileService(
                     contentDbContext: context,
                     blobStorageService: blobStorageService.Object,
                     importStatusService: importStatusService.Object
                 );
-                var result = await service.ListDataFiles(release.Id);
+                var result = await service.ListAll(release.Id);
 
                 blobStorageService.VerifyAll();
                 importStatusService.VerifyAll();
@@ -1088,13 +1100,13 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
                 Assert.Equal("test-data-2.meta.csv", files[1].MetaFileName);
                 Assert.Equal("test2@test.com", files[1].UserName);
                 Assert.Equal(400, files[1].Rows);
-                 Assert.Equal("800 B", files[1].Size);
+                Assert.Equal("800 B", files[1].Size);
                 Assert.Equal(IStatus.RUNNING_PHASE_2, files[1].Status);
             }
         }
 
         [Fact]
-        public async void ListDataFiles_FiltersCorrectly()
+        public async Task ListAll_FiltersCorrectly()
         {
             var release = new Release();
             var contextId = Guid.NewGuid().ToString();
@@ -1201,12 +1213,13 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
                         }
                     );
 
-                var service = SetupReleaseFilesService(
+                var service = SetupReleaseDataFileService(
                     contentDbContext: context,
                     blobStorageService: blobStorageService.Object,
                     importStatusService: importStatusService.Object
                 );
-                var result = await service.ListDataFiles(release.Id);
+
+                var result = await service.ListAll(release.Id);
 
                 blobStorageService.VerifyAll();
                 importStatusService.VerifyAll();
@@ -1232,7 +1245,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
         }
 
         [Fact]
-        public async void ListDataFiles_AmendedRelease()
+        public async Task ListAll_AmendedRelease()
         {
             var originalRelease = new Release();
             var amendedRelease = new Release();
@@ -1357,12 +1370,13 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
                         }
                     );
 
-                var service = SetupReleaseFilesService(
+                var service = SetupReleaseDataFileService(
                     contentDbContext: context,
                     blobStorageService: blobStorageService.Object,
                     importStatusService: importStatusService.Object
                 );
-                var result = await service.ListDataFiles(amendedRelease.Id);
+
+                var result = await service.ListAll(amendedRelease.Id);
 
                 blobStorageService.VerifyAll();
                 importStatusService.VerifyAll();
@@ -1382,13 +1396,13 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
                 Assert.Equal("test-data-2.meta.csv", files[0].MetaFileName);
                 Assert.Equal("test2@test.com", files[0].UserName);
                 Assert.Equal(400, files[0].Rows);
-                 Assert.Equal("800 B", files[0].Size);
+                Assert.Equal("800 B", files[0].Size);
                 Assert.Equal(IStatus.RUNNING_PHASE_2, files[0].Status);
             }
         }
 
         [Fact]
-        public async void ListDataFiles_NoMatchingBlob()
+        public async Task ListAll_NoMatchingBlob()
         {
             var release = new Release();
             var subject = new Subject
@@ -1447,12 +1461,12 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
                     .Setup(s => s.GetAsync(subject.Id))
                     .ReturnsAsync(subject);
 
-                var service = SetupReleaseFilesService(
+                var service = SetupReleaseDataFileService(
                     contentDbContext: context,
                     blobStorageService: blobStorageService.Object,
                     subjectService: subjectService.Object
                 );
-                var result = await service.ListDataFiles(release.Id);
+                var result = await service.ListAll(release.Id);
 
                 blobStorageService.VerifyAll();
 
@@ -1476,7 +1490,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
         }
 
         [Fact]
-        public async void ListDataFiles_MatchingSourceZipBlob()
+        public async Task ListAll_MatchingSourceZipBlob()
         {
             var release = new Release();
 
@@ -1569,12 +1583,12 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
                         }
                     );
 
-                var service = SetupReleaseFilesService(
+                var service = SetupReleaseDataFileService(
                     contentDbContext: context,
                     blobStorageService: blobStorageService.Object,
                     importStatusService: importStatusService.Object
                 );
-                var result = await service.ListDataFiles(release.Id);
+                var result = await service.ListAll(release.Id);
 
                 blobStorageService.VerifyAll();
                 importStatusService.VerifyAll();
@@ -1600,7 +1614,13 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
         }
 
         [Fact]
-        public async void UploadDataFilesAsZip()
+        public void Upload()
+        {
+            // TODO
+        }
+
+        [Fact]
+        public async Task UploadAsZip()
         {
             var release = new Release();
 
@@ -1613,9 +1633,9 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
                 await context.SaveChangesAsync();
             }
 
-            var dataFileName = "test-data.csv";
-            var metaFileName = "test-data.meta.csv";
-            var zipFileName = "test-data-archive.zip";
+            const string dataFileName = "test-data.csv";
+            const string metaFileName = "test-data.meta.csv";
+            const string zipFileName = "test-data-archive.zip";
 
             await using (var context = InMemoryApplicationDbContext(contextId))
             {
@@ -1666,7 +1686,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
                         )
                     );
 
-                var service = SetupReleaseFilesService(
+                var service = SetupReleaseDataFileService(
                     contentDbContext: context,
                     blobStorageService: blobStorageService.Object,
                     importService: importService.Object,
@@ -1674,7 +1694,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
                     fileUploadsValidatorService: fileUploadsValidatorService.Object
                 );
 
-                var result = await service.UploadDataFilesAsZip(
+                var result = await service.UploadAsZip(
                     release.Id,
                     zipFile.Object,
                     userName: "test@test.com",
@@ -1735,7 +1755,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
         }
 
         [Fact]
-        public async void UploadDataFilesAsZip_Replacing()
+        public async Task UploadAsZip_Replacing()
         {
             var release = new Release();
             var originalDataFileReference = new ReleaseFileReference
@@ -1822,7 +1842,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
                         )
                     );
 
-                var service = SetupReleaseFilesService(
+                var service = SetupReleaseDataFileService(
                     contentDbContext: context,
                     blobStorageService: blobStorageService.Object,
                     importService: importService.Object,
@@ -1831,7 +1851,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
                     subjectService: subjectService.Object
                 );
 
-                var result = await service.UploadDataFilesAsZip(
+                var result = await service.UploadAsZip(
                     release.Id,
                     zipFormFile.Object,
                     userName: "test@test.com",
@@ -1909,8 +1929,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
 
             return zipFile;
         }
-
-
+        
         private static Mock<IDataArchiveFile> CreateDataArchiveFileMock(
             string dataFileName,
             string metaFileName)
@@ -1927,28 +1946,32 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
 
             return dataArchiveFile;
         }
-
-        private static ReleaseFilesService SetupReleaseFilesService(
+        
+        private static ReleaseDataFileService SetupReleaseDataFileService(
             ContentDbContext contentDbContext,
+            IPersistenceHelper<ContentDbContext> contentPersistenceHelper = null,
             IBlobStorageService blobStorageService = null,
-            IUserService userService = null,
-            IPersistenceHelper<ContentDbContext> persistenceHelper = null,
-            IImportService importService = null,
-            IFileUploadsValidatorService fileUploadsValidatorService = null,
-            ISubjectService subjectService = null,
             IDataArchiveValidationService dataArchiveValidationService = null,
-            IImportStatusService importStatusService = null)
+            IFileUploadsValidatorService fileUploadsValidatorService = null,
+            IFileRepository fileRepository = null,
+            IReleaseFileRepository releaseFileRepository = null,
+            IImportService importService = null,
+            IImportStatusService importStatusService = null,
+            ISubjectService subjectService = null,
+            IUserService userService = null)
         {
-            return new ReleaseFilesService(
+            return new ReleaseDataFileService(
+                contentDbContext ?? new Mock<ContentDbContext>().Object,
+                contentPersistenceHelper ?? new PersistenceHelper<ContentDbContext>(contentDbContext),
                 blobStorageService ?? new Mock<IBlobStorageService>().Object,
-                userService ?? MockUtils.AlwaysTrueUserService().Object,
-                persistenceHelper ?? new PersistenceHelper<ContentDbContext>(contentDbContext),
-                contentDbContext,
-                importService ?? new Mock<IImportService>().Object,
-                fileUploadsValidatorService ?? new Mock<IFileUploadsValidatorService>().Object,
-                subjectService ?? new Mock<ISubjectService>().Object,
                 dataArchiveValidationService ?? new Mock<IDataArchiveValidationService>().Object,
-                importStatusService ?? new Mock<IImportStatusService>().Object
+                fileUploadsValidatorService ?? new Mock<IFileUploadsValidatorService>().Object,
+                fileRepository ?? new FileRepository(contentDbContext),
+                releaseFileRepository ?? new ReleaseFileRepository(contentDbContext),
+                importService ?? new Mock<IImportService>().Object,
+                importStatusService ?? new Mock<IImportStatusService>().Object,
+                subjectService ?? new Mock<ISubjectService>().Object,
+                userService ?? MockUtils.AlwaysTrueUserService().Object
             );
         }
     }

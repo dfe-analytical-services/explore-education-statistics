@@ -34,7 +34,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
         public void CreateReleaseAmendmentAsync()
         {
             var (userService, _, publishingService, repository, subjectService, tableStorageService,
-                    fileStorageService, importStatusService, footnoteService, _, metaGuidanceService, dataBlockService, releaseSubjectService) = Mocks();
+                    releaseFileService, releaseDataFileService, importStatusService, footnoteService, _, metaGuidanceService, dataBlockService, releaseSubjectService) = Mocks();
 
             var releaseId = Guid.NewGuid();
             var releaseType = new ReleaseType
@@ -397,7 +397,8 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
                         repository: repository.Object,
                         subjectService: subjectService.Object,
                         coreTableStorageService: tableStorageService.Object,
-                        releaseFilesService: fileStorageService.Object,
+                        releaseFileService: releaseFileService.Object,
+                        releaseDataFileService: releaseDataFileService.Object,
                         importStatusService: importStatusService.Object,
                         footnoteService: footnoteService.Object,
                         statisticsDbContext: statisticsDbContext,
@@ -630,7 +631,8 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
             Mock<IReleaseRepository>,
             Mock<ISubjectService>,
             Mock<ITableStorageService>,
-            Mock<IReleaseFilesService>,
+            Mock<IReleaseFileService>,
+            Mock<IReleaseDataFileService>,
             Mock<IImportStatusService>,
             Mock<IFootnoteService>,
             Mock<StatisticsDbContext>,
@@ -655,7 +657,8 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
                 new Mock<IReleaseRepository>(),
                 new Mock<ISubjectService>(),
                 new Mock<ITableStorageService>(),
-                new Mock<IReleaseFilesService>(),
+                new Mock<IReleaseFileService>(),
+                new Mock<IReleaseDataFileService>(),
                 new Mock<IImportStatusService>(),
                 new Mock<IFootnoteService>(),
                 new Mock<StatisticsDbContext>(),

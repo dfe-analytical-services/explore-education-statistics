@@ -64,8 +64,8 @@ const releaseAncillaryFileService = {
 
     return mapFile(file);
   },
-  deleteAncillaryFile(releaseId: string, fileName: string): Promise<void> {
-    return client.delete<void>(`/release/${releaseId}/ancillary/${fileName}`);
+  deleteAncillaryFile(releaseId: string, fileId: string): Promise<void> {
+    return client.delete<void>(`/release/${releaseId}/ancillary/${fileId}`);
   },
   downloadFile(releaseId: string, id: string, fileName: string): Promise<void> {
     return client
