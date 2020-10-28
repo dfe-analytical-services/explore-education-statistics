@@ -126,13 +126,11 @@ Validate results table column headings
     [Tags]  HappyPath
     user checks table column heading contains  1   1   2020 Week 14
 
-
 Return to Admin to start creating an amendment
     [Tags]  HappyPath
     user goes to url  %{ADMIN_URL}
     user waits until h1 is visible   Dashboard
     user waits until page contains title caption  Welcome Bau1
-
 
 Create amendment
     [Tags]  HappyPath
