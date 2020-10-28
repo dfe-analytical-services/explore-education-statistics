@@ -1,0 +1,3 @@
+col_name,col_type,label,indicator_grouping,indicator_unit,filter_hint,filter_grouping_column
+ind_one,Indicator,Indicator one,Indicator group,,,
+ind_two,Indicator,Indicator two,Indicator group,,,
