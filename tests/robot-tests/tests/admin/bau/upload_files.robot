@@ -55,11 +55,11 @@ Check Absence in PRUs subject appears in 'Data blocks' page
 
     user waits until page contains  Absence in PRUs
 
-Navigate to 'Data and files' page - 'File uploads' tab
+Navigate to 'Data and files' page - 'Ancillary file uploads' tab
     [Tags]  HappyPath
     user clicks link  Data and files
     user waits until h2 is visible   Add data file to release
-    user clicks link  File uploads
+    user clicks link  Ancillary file uploads
     user waits until h2 is visible  Add file to release
     user waits until page contains  No files have been uploaded
 
