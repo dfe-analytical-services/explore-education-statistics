@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using System.Collections.Immutable;
 using System.ComponentModel.DataAnnotations.Schema;
 using System.Linq;
+using System.Text.RegularExpressions;
 using GovUk.Education.ExploreEducationStatistics.Common.Converters;
 using GovUk.Education.ExploreEducationStatistics.Common.Model;
 using GovUk.Education.ExploreEducationStatistics.Common.Services;
@@ -253,7 +254,50 @@ namespace GovUk.Education.ExploreEducationStatistics.Content.Model
                 .Select(update => update.Clone(amendment))
                 .ToList();
 
+            UpdateAmendmentContent(context);
+
             return amendment;
+        }
+
+        // Bit cheeky to re-use the clone context, but it's a nice
+        // easy way to access and modify all of the content blocks
+        // that we used during the clone.
+        private void UpdateAmendmentContent(CloneContext context)
+        {
+            var dataBlocks = context.ContentBlocks
+                .Where(pair => pair.Key is DataBlock && pair.Value is DataBlock)
+                .ToDictionary(pair => pair.Key as DataBlock, pair => pair.Value as DataBlock);
+
+            foreach (var contentBlock in context.ContentBlocks.Values)
+            {
+                switch (contentBlock)
+                {
+                    case HtmlBlock block:
+                        block.Body = UpdateFastTrackLinks(block.Body, dataBlocks);
+                        break;
+                    case MarkDownBlock block:
+                        block.Body = UpdateFastTrackLinks(block.Body, dataBlocks);
+                        break;
+                }
+            }
+        }
+
+        private string UpdateFastTrackLinks(string content, Dictionary<DataBlock, DataBlock> dataBlocks)
+        {
+            var nextContent = content;
+
+            foreach (var (oldDataBlock, newDataBlock) in dataBlocks)
+            {
+                // Not a particularly fast way to replace fast tracks
+                // if there's a lot of content. Could be improved
+                // using something like a parallel substring approach.
+                nextContent = nextContent.Replace(
+                    $"/fast-track/{oldDataBlock.Id}",
+                    $"/fast-track/{newDataBlock.Id}"
+                );
+            }
+
+            return nextContent;
         }
 
         public void CreateGenericContentFromTemplate(Release newRelease)
