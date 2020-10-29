@@ -27,20 +27,22 @@ namespace GovUk.Education.ExploreEducationStatistics.Content.Model
 
         public List<Comment> Comments { get; set; }
 
-        public ContentBlock Clone(CreateClonedContext ctx, ContentSection newParent)
+        public ContentBlock Clone(Release.CloneContext context, ContentSection newContentSection)
         {
             var copy = MemberwiseClone() as ContentBlock;
             copy.Id = Guid.NewGuid();
-            ctx.OldToNewIdContentBlockMappings.Add(this, copy);
 
-            if (newParent != null)
+            if (newContentSection != null)
             {
-                copy.ContentSection = newParent;
-                copy.ContentSectionId = newParent.Id;
+                copy.ContentSection = newContentSection;
+                copy.ContentSectionId = newContentSection.Id;
             }
 
             // start a new amendment with no comments
             copy.Comments = new List<Comment>();
+
+            context.ContentBlocks.Add(this, copy);
+
             return copy;
         }
     }

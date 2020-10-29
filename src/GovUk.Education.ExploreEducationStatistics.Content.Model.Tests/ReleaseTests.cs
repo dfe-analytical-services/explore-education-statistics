@@ -482,5 +482,106 @@ namespace GovUk.Education.ExploreEducationStatistics.Content.Model.Tests
             Assert.Equal("Block 2 name", block2.Name);
             Assert.Equal("Block 2 source", block2.Source);
         }
+
+        [Fact]
+        public void CreateReleaseAmendment_ClonesContentBlocks_SameAsBlocksInContent()
+        {
+            var release = new Release
+            {
+                Id = Guid.NewGuid(),
+            };
+
+            var section1Id = Guid.NewGuid();
+
+            var contentBlock = new HtmlBlock
+            {
+                Id = Guid.NewGuid(),
+                Order = 1,
+                Body = "Block 1 body",
+                ContentSectionId = section1Id,
+            };
+            var dataBlock = new DataBlock
+            {
+                Id = Guid.NewGuid(),
+                Order = 2,
+                Heading = "Block 2 heading",
+                Name = "Block 2 name",
+                Source = "Block 2 source",
+                ContentSectionId = section1Id,
+            };
+
+            release.Content = new List<ReleaseContentSection>
+            {
+                new ReleaseContentSection
+                {
+                    Release = release,
+                    ReleaseId = release.Id,
+                    ContentSectionId = section1Id,
+                    ContentSection = new ContentSection
+                    {
+                        Id = section1Id,
+                        Heading = "Section 1",
+                        Content = new List<ContentBlock>
+                        {
+                            contentBlock,
+                            dataBlock,
+                        },
+                    }
+                },
+            };
+
+            release.ContentBlocks = new List<ReleaseContentBlock>
+            {
+                new ReleaseContentBlock
+                {
+                    ReleaseId = release.Id,
+                    Release = release,
+                    ContentBlockId = contentBlock.Id,
+                    ContentBlock = contentBlock
+                },
+                new ReleaseContentBlock
+                {
+                    ReleaseId = release.Id,
+                    Release = release,
+                    ContentBlockId = dataBlock.Id,
+                    ContentBlock =  dataBlock
+                },
+            };
+
+            var createdDate = DateTime.Now;
+            var createdById = Guid.NewGuid();
+
+            var amendment = release.CreateReleaseAmendment(createdDate, createdById);
+
+            Assert.Equal(2, amendment.ContentBlocks.Count);
+
+            var releaseBlock1 = amendment.ContentBlocks[0];
+            Assert.Equal(amendment, releaseBlock1.Release);
+            Assert.Equal(amendment.Id, releaseBlock1.ReleaseId);
+            Assert.NotEqual(release.ContentBlocks[0].ContentBlockId, releaseBlock1.ContentBlockId);
+
+            var block1 = Assert.IsType<HtmlBlock>(releaseBlock1.ContentBlock);
+            Assert.NotEqual(release.ContentBlocks[0].ContentBlock.Id, block1.Id);
+            Assert.Equal(1, block1.Order);
+            Assert.Equal("Block 1 body", block1.Body);
+
+            var contentSection1Block1 = Assert.IsType<HtmlBlock>(amendment.Content[0].ContentSection.Content[0]);
+            Assert.Equal(block1, contentSection1Block1);
+
+            var releaseBlock2 = amendment.ContentBlocks[1];
+            Assert.Equal(amendment, releaseBlock2.Release);
+            Assert.Equal(amendment.Id, releaseBlock2.ReleaseId);
+            Assert.NotEqual(release.ContentBlocks[1].ContentBlockId, releaseBlock2.ContentBlockId);
+
+            var block2 = Assert.IsType<DataBlock>(releaseBlock2.ContentBlock);
+            Assert.NotEqual(release.ContentBlocks[1].ContentBlock.Id, block2.Id);
+            Assert.Equal(2, block2.Order);
+            Assert.Equal("Block 2 heading", block2.Heading);
+            Assert.Equal("Block 2 name", block2.Name);
+            Assert.Equal("Block 2 source", block2.Source);
+
+            var contentSection1Block2 = Assert.IsType<DataBlock>(amendment.Content[0].ContentSection.Content[1]);
+            Assert.Equal(block2, contentSection1Block2);
+        }
     }
 }
