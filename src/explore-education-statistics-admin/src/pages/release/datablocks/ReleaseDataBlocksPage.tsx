@@ -163,7 +163,11 @@ const ReleaseDataBlocksPageInternal = ({
         )}
 
         <LoadingSpinner loading={isLoading}>
-          {selectedDataBlock?.name && <h2>{selectedDataBlock.name}</h2>}
+          {selectedDataBlock?.name ? (
+            <h2>{selectedDataBlock.name}</h2>
+          ) : (
+            <h2>Create new data block</h2>
+          )}
 
           {selectedDataBlock && (
             <>
