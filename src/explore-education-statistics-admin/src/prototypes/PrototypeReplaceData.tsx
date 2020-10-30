@@ -40,7 +40,7 @@ const PrototypeMetadata = () => {
         <TabsSection title="Footnotes">
           This is the content for tab 2
         </TabsSection>
-        <TabsSection title="File uploads">
+        <TabsSection title="Ancillary file uploads">
           This is the content for tab 2
         </TabsSection>
         <TabsSection title="Public metadata">

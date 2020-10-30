@@ -108,7 +108,7 @@ Select Start date and End date
 Select Indicators
     [Tags]  HappyPath
     user clicks indicator checkbox   Number of open settings
-    user checks indicator checkbox is checked  Numberr of open settings
+    user checks indicator checkbox is checked  Number of open settings
 
 Select Filters
     [Tags]   HappyPath

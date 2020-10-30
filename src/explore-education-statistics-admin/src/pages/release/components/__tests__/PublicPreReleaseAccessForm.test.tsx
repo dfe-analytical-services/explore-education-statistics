@@ -37,17 +37,6 @@ describe('PublicPreReleaseAccessForm', () => {
     expect(
       screen.getByText('Test person 2', { selector: 'li' }),
     ).toBeInTheDocument();
-
-    expect(
-      screen.getByText(
-        'http://localhost/publication/publication-1/release/release-1/prerelease',
-      ),
-    ).toBeInTheDocument();
-    expect(
-      screen.getByText(
-        'http://localhost/find-statistics/test-publication/test-release',
-      ),
-    ).toBeInTheDocument();
   });
 
   test('clicking Create button renders form with default text', () => {
@@ -121,11 +110,6 @@ describe('PublicPreReleaseAccessForm', () => {
         'http://localhost/publication/publication-1/release/release-1/prerelease',
       ),
     ).not.toBeInTheDocument();
-    expect(
-      screen.getByText(
-        'http://localhost/find-statistics/test-publication/test-release',
-      ),
-    ).toBeInTheDocument();
   });
 
   test('submitting form hides the form', async () => {
