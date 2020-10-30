@@ -108,6 +108,7 @@ Select Start date and End date
 Select Indicators
     [Tags]  HappyPath
     user clicks indicator checkbox   Number of open settings
+    user checks indicator checkbox is checked  Numberr of open settings
 
 Select Filters
     [Tags]   HappyPath
@@ -212,7 +213,7 @@ Return to Admin to start deleting subject
 
 go to admin dashboard
     [Tags]  HappyPath
-    go to  %{ADMIN_URL}
+     go to  %{ADMIN_URL}
 
 Create amendment with empty files
     [Tags]  HappyPath
