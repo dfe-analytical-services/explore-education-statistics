@@ -8,11 +8,10 @@ Suite Setup       user signs in as bau1
 Suite Teardown    user closes the browser
 
 *** Variables ***
-${DETAILS_HEADING}  Academic Year 2020/21 (not Live)
-${AMEND_RELEASE_HEADING}  Academic Year 2020/21 (Live - Latest release)
+${DETAILS_HEADING}  Academic Year 2020/21
 ${PUBLICATION_NAME}  Permalink Test Publication %{RUN_IDENTIFIER}
 ${TOPIC_NAME}  %{TEST_TOPIC_NAME}
-${SUBJECT_NAME}   Dates test subject
+${SUBJECT_NAME}  Dates test subject
 
 *** Test Cases ***
 Create publication & release
@@ -22,7 +21,7 @@ Create publication & release
 
 Upload a subject
     [Tags]  HappyPath
-    user navigates to release summary from admin dashboard  ${PUBLICATION_NAME}  ${DETAILS_HEADING}
+    user navigates to release summary from admin dashboard  ${PUBLICATION_NAME}  ${DETAILS_HEADING} (not Live)
     user clicks link  Data and files
     user waits until page contains element  id:dataFileUploadForm-subjectTitle
     user enters text into element  id:dataFileUploadForm-subjectTitle   ${SUBJECT_NAME}
@@ -109,6 +108,7 @@ Select Start date and End date
 Select Indicators
     [Tags]  HappyPath
     user clicks indicator checkbox   Number of open settings
+    user checks indicator checkbox is checked  Number of open settings
 
 Select Filters
     [Tags]   HappyPath
@@ -126,6 +126,7 @@ Validate results table column headings
     user checks table column heading contains  1   1   2020 Week 14
 
 Generate the peramlink
+    # EES-214
     [Tags]  HappyPath
     user clicks button  Generate permanent link
     user waits until page contains testid  permalink-generated-url
@@ -150,8 +151,8 @@ Create amendment
     user waits until page contains accordion section   ${PUBLICATION_NAME}
     user opens accordion section  ${PUBLICATION_NAME}
     ${accordion}=  user gets accordion section content element  ${PUBLICATION_NAME}
-    user opens details dropdown   ${AMEND_RELEASE_HEADING}  ${accordion}
-    ${details}=  user gets details content element  ${AMEND_RELEASE_HEADING}  ${accordion}
+    user opens details dropdown   ${DETAILS_HEADING} (Live - Latest release)  ${accordion}
+    ${details}=  user gets details content element  ${DETAILS_HEADING} (Live - Latest release)  ${accordion}
     user waits until parent contains element   ${details}   xpath:.//a[text()="View this release"]
     user clicks button  Amend this release  ${details}
     user clicks button  Confirm
@@ -176,7 +177,6 @@ Confirm data replacement
     user waits until page contains  Footnotes: OK
     user clicks button  Confirm data replacement
     user waits until h2 is visible  Data replacement complete
-
 
 Go to "Release status" page for amendment
     [Tags]  HappyPath
@@ -203,3 +203,35 @@ Go to permalink page & check for error element to be present
     [Tags]  HappyPath
     user goes to url  ${PERMA_LOCATION_URL}
     user waits until page contains  WARNING - The data used in this permalink may be out-of-date.
+
+# EES-1303
+Return to Admin to start deleting subject
+    [Tags]  HappyPath
+    user goes to url  %{ADMIN_URL}
+    user waits until h1 is visible  Dashboard
+    user waits until page contains title caption  Welcome Bau1
+
+go to admin dashboard
+    [Tags]  HappyPath
+    go to  %{ADMIN_URL}
+
+Create amendment with empty files
+    [Tags]  HappyPath
+    user selects theme and topic from admin dashboard  %{TEST_THEME_NAME}  ${TOPIC_NAME}
+    user waits until page contains accordion section   ${PUBLICATION_NAME}
+    user opens accordion section  ${PUBLICATION_NAME}
+    ${accordion}=  user gets accordion section content element  ${PUBLICATION_NAME}
+    user opens details dropdown   ${DETAILS_HEADING} (Live - Latest release)  ${accordion}
+    ${details}=  user gets details content element  ${DETAILS_HEADING} (Live - Latest release)  ${accordion}
+    user waits until parent contains element   ${details}   xpath:.//a[text()="View this release"]
+    user clicks button  Amend this release  ${details}
+    user clicks button  Confirm
+
+Delete subject files
+    [Tags]  HappyPath
+    user clicks link  Data and files
+    user waits until h2 is visible  Add data file to release
+    user scrolls to accordion section content  Dates test subject
+    user opens accordion section  Dates test subject
+    user clicks button  Delete files
+    user clicks button  Confirm
