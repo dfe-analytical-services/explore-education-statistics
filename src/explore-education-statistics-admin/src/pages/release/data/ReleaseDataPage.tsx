@@ -33,7 +33,7 @@ const ReleaseDataPage = () => {
             onDataFilesChange={setDataFiles}
           />
         </TabsSection>
-        <TabsSection id="file-uploads" title="File uploads">
+        <TabsSection id="file-uploads" title="Ancillary file uploads">
           <ReleaseFileUploadsSection
             releaseId={releaseId}
             canUpdateRelease={canUpdateRelease}

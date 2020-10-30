@@ -16,6 +16,7 @@ import FormattedDate from '@common/components/FormattedDate';
 import LoadingSpinner from '@common/components/LoadingSpinner';
 import SummaryList from '@common/components/SummaryList';
 import SummaryListItem from '@common/components/SummaryListItem';
+import UrlContainer from '@common/components/UrlContainer';
 import WarningMessage from '@common/components/WarningMessage';
 import useAsyncHandledRetry from '@common/hooks/useAsyncHandledRetry';
 import useAsyncRetry from '@common/hooks/useAsyncRetry';
@@ -32,6 +33,7 @@ import Yup from '@common/validation/yup';
 import { endOfDay, format, formatISO, isValid, parseISO } from 'date-fns';
 import { Formik } from 'formik';
 import React, { useState } from 'react';
+import { useConfig } from '@admin/contexts/ConfigContext';
 import { StringSchema } from 'yup';
 
 const errorMappings = [
@@ -92,6 +94,8 @@ const ReleaseStatusPage = () => {
     () => permissionService.getReleaseStatusPermissions(releaseId),
   );
 
+  const { PublicAppUrl } = useConfig();
+
   const handleSubmit = useFormSubmit<FormValues>(async values => {
     if (!release) {
       throw new Error('Could not update missing release');
@@ -133,7 +137,16 @@ const ReleaseStatusPage = () => {
     <>
       {!showForm ? (
         <>
-          <h2>Release status</h2>
+          <h2>Sign off</h2>
+          <p>
+            The <strong>public release</strong> will be accessible at:
+          </p>
+
+          <p>
+            <UrlContainer
+              url={`${PublicAppUrl}/find-statistics/${release.publicationSlug}/${release.slug}`}
+            />
+          </p>
 
           <SummaryList>
             <SummaryListItem term="Current status">

@@ -11,14 +11,12 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
     {
         public static ContentDbContext InMemoryApplicationDbContext(string dbName)
         {
-            var builder = new DbContextOptionsBuilder<ContentDbContext>();
-            builder.UseInMemoryDatabase(databaseName: dbName);
-            return new ContentDbContext(builder.Options);
+            return ContentDbUtils.InMemoryContentDbContext(dbName);
         }
 
         public static ContentDbContext InMemoryApplicationDbContext()
         {
-            return InMemoryApplicationDbContext(Guid.NewGuid().ToString());
+            return ContentDbUtils.InMemoryContentDbContext();
         }
 
         public static UsersAndRolesDbContext InMemoryUserAndRolesDbContext(string dbName)

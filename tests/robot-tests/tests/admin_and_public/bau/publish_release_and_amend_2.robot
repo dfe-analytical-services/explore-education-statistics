@@ -8,7 +8,8 @@ Suite Setup       user signs in as bau1
 Suite Teardown    user closes the browser
 
 *** Variables ***
-${DETAILS_HEADING}  Academic Year 2020/21
+${DETAILS_HEADING}  Academic Year 2020/21 (not Live)
+${AMEND_RELEASE_HEADING}  Academic Year 2020/21 (Live - Latest release)
 ${PUBLICATION_NAME}  Permalink Test Publication %{RUN_IDENTIFIER}
 ${TOPIC_NAME}  %{TEST_TOPIC_NAME}
 ${SUBJECT_NAME}  Dates test subject
@@ -44,10 +45,10 @@ Add meta guidance to subject
     ...  ${SUBJECT_NAME} meta guidance content
     user clicks button  Save guidance
 
-Go to "Release status" page
+Go to "Sign off" page
     [Tags]  HappyPath
-    user clicks link   Release status
-    user waits until h2 is visible  Release status
+    user clicks link   Sign off
+    user waits until h2 is visible  Sign off
     user waits until page contains button  Edit release status
 
 Approve release
@@ -178,10 +179,11 @@ Confirm data replacement
     user clicks button  Confirm data replacement
     user waits until h2 is visible  Data replacement complete
 
-Go to "Release status" page for amendment
+
+Go to "Sign off" page for amendment
     [Tags]  HappyPath
-    user clicks link   Release status
-    user waits until h2 is visible  Release status
+    user clicks link   Sign off
+    user waits until h2 is visible  Sign off
     user waits until page contains button  Edit release status
 
 Approve release for amendment

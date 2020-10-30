@@ -5,6 +5,7 @@ using System.Threading.Tasks;
 using AutoMapper;
 using GovUk.Education.ExploreEducationStatistics.Content.Model;
 using GovUk.Education.ExploreEducationStatistics.Content.Model.Database;
+using GovUk.Education.ExploreEducationStatistics.Data.Model.Database;
 using GovUk.Education.ExploreEducationStatistics.Publisher.Model.ViewModels;
 using GovUk.Education.ExploreEducationStatistics.Publisher.Services.Interfaces;
 using Microsoft.EntityFrameworkCore;
@@ -14,25 +15,31 @@ namespace GovUk.Education.ExploreEducationStatistics.Publisher.Services
 {
     public class PublicationService : IPublicationService
     {
-        private readonly ContentDbContext _context;
+        private readonly ContentDbContext _contentDbContext;
+        private readonly StatisticsDbContext _statisticsDbContext;
         private readonly IReleaseService _releaseService;
         private readonly IMapper _mapper;
 
-        public PublicationService(ContentDbContext context, IMapper mapper, IReleaseService releaseService)
+        public PublicationService(
+            ContentDbContext contentDbContext,
+            StatisticsDbContext statisticsDbContext,
+            IMapper mapper,
+            IReleaseService releaseService)
         {
-            _context = context;
+            _contentDbContext = contentDbContext;
+            _statisticsDbContext = statisticsDbContext;
             _mapper = mapper;
             _releaseService = releaseService;
         }
 
         public async Task<Publication> Get(Guid id)
         {
-            return await _context.Publications.FindAsync(id);
+            return await _contentDbContext.Publications.FindAsync(id);
         }
 
         public async Task<CachedPublicationViewModel> GetViewModelAsync(Guid id, IEnumerable<Guid> includedReleaseIds)
         {
-            var publication = await _context.Publications
+            var publication = await _contentDbContext.Publications
                 .Include(p => p.Contact)
                 .Include(p => p.LegacyReleases)
                 .Include(p => p.Methodology)
@@ -49,7 +56,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Publisher.Services
 
         public List<ThemeTree<PublicationTreeNode>> GetTree(IEnumerable<Guid> includedReleaseIds)
         {
-            return _context.Themes
+            return _contentDbContext.Themes
                 .Include(theme => theme.Topics)
                 .ThenInclude(topic => topic.Publications)
                 .ThenInclude(publication => publication.Releases)
@@ -62,11 +69,13 @@ namespace GovUk.Education.ExploreEducationStatistics.Publisher.Services
 
         public IEnumerable<Publication> ListPublicationsWithPublishedReleases()
         {
-            return _context.Publications
+            return _contentDbContext.Publications
                 .Include(publication => publication.Releases)
                 .ToList()
-                .Where(publication =>
-                    publication.Releases.Any(release => IsReleasePublished(release, Enumerable.Empty<Guid>())))
+                .Where(
+                    publication =>
+                        publication.Releases.Any(release => IsReleasePublished(release, Enumerable.Empty<Guid>()))
+                )
                 .ToList();
         }
 
@@ -79,9 +88,32 @@ namespace GovUk.Education.ExploreEducationStatistics.Publisher.Services
                 throw new ArgumentException("Publication does not exist", nameof(id));
             }
 
-            _context.Update(publication);
             publication.Published = published;
-            await _context.SaveChangesAsync();
+
+            await UpdatePublication(publication);
+        }
+
+        private async Task UpdatePublication(Publication publication)
+        {
+            _contentDbContext.Update(publication);
+            await _contentDbContext.SaveChangesAsync();
+
+            // Synchronize the stats publication as well
+            var statsPublication = await _statisticsDbContext.Publication
+                .FindAsync(publication.Id);
+
+            if (statsPublication == null)
+            {
+                var newStatsPublication = _mapper.Map(publication, new Data.Model.Publication());
+                await _statisticsDbContext.Publication.AddAsync(newStatsPublication);
+            }
+            else
+            {
+                _mapper.Map(publication, statsPublication);
+                _statisticsDbContext.Update(statsPublication);
+            }
+
+            await _statisticsDbContext.SaveChangesAsync();
         }
 
         private static ThemeTree<PublicationTreeNode> BuildThemeTree(Theme theme, IEnumerable<Guid> includedReleaseIds)
@@ -112,7 +144,8 @@ namespace GovUk.Education.ExploreEducationStatistics.Publisher.Services
             };
         }
 
-        private static PublicationTreeNode BuildPublicationNode(Publication publication,
+        private static PublicationTreeNode BuildPublicationNode(
+            Publication publication,
             IEnumerable<Guid> includedReleaseIds)
         {
             // Ignore any legacyPublicationUrl once the Publication has Releases
@@ -131,10 +164,11 @@ namespace GovUk.Education.ExploreEducationStatistics.Publisher.Services
             };
         }
 
-        private List<ReleaseTitleViewModel> GetReleaseViewModels(Guid publicationId,
+        private List<ReleaseTitleViewModel> GetReleaseViewModels(
+            Guid publicationId,
             IEnumerable<Guid> includedReleaseIds)
         {
-            var releases = _context.Releases
+            var releases = _contentDbContext.Releases
                 .Include(r => r.Publication)
                 .Where(release => release.PublicationId == publicationId)
                 .ToList()

@@ -67,6 +67,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Publisher
                     })
                 .AddScoped<IPublishingService, PublishingService>()
                 .AddScoped<IContentService, ContentService>()
+                .AddScoped<ITaxonomyService, TaxonomyService>()
                 .AddScoped<IReleaseService, ReleaseService>()
                 .AddScoped<ITableStorageService, TableStorageService>(provider =>
                     new TableStorageService(GetConfigurationValue(provider, "PublisherStorage")))
