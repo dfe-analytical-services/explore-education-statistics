@@ -151,45 +151,6 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Services
                 });
         }
 
-        public async Task<Either<ActionResult, IEnumerable<FileInfo>>> ListPublicFilesPreview(
-            Guid releaseId,
-            IEnumerable<Guid> referencedReleaseVersions)
-        {
-            return await _persistenceHelper
-                .CheckEntityExists<Release>(releaseId)
-                .OnSuccess(_userService.CheckCanViewRelease)
-                .OnSuccess(async release =>
-                    {
-                        var files = new List<FileInfo>();
-
-                        foreach (var version in referencedReleaseVersions)
-                        {
-                            // TODO EES-1490 bug not setting file id's
-
-                            files.AddRange(
-                                (await _blobStorageService.ListBlobs(
-                                    PrivateFilesContainerName,
-                                    AdminReleaseDirectoryPath(version, ReleaseFileTypes.Data)
-                                ))
-                                .Where(blob => !blob.IsMetaDataFile())
-                                .Select(blob => blob.ToFileInfo(ReleaseFileTypes.Data))
-                            );
-                            files.AddRange(
-                                (await _blobStorageService.ListBlobs(
-                                    PrivateFilesContainerName,
-                                    AdminReleaseDirectoryPath(version, Ancillary)
-                                ))
-                                .Select(blob => blob.ToFileInfo(Ancillary))
-                            );
-                        }
-
-                        return files
-                            .OrderBy(f => f.Name)
-                            .AsEnumerable();
-                    }
-                );
-        }
-
         public async Task<Either<ActionResult, FileStreamResult>> Stream(Guid releaseId, Guid id)
         {
             return await _persistenceHelper

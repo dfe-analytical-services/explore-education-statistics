@@ -21,7 +21,6 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Services.ManageConten
         private readonly IMapper _mapper;
         private readonly IReleaseFileService _releaseFileService;
         private readonly IContentService _contentService;
-        private readonly IReleaseService _releaseService;
         private readonly IPersistenceHelper<ContentDbContext> _persistenceHelper;
         private readonly IUserService _userService;
 
@@ -29,43 +28,39 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Services.ManageConten
             IMapper mapper,
             IReleaseFileService releaseFileService,
             IContentService contentService,
-            IReleaseService releaseService,
             IPersistenceHelper<ContentDbContext> persistenceHelper,
             IUserService userService)
         {
             _mapper = mapper;
             _releaseFileService = releaseFileService;
             _contentService = contentService;
-            _releaseService = releaseService;
             _persistenceHelper = persistenceHelper;
             _userService = userService;
         }
 
-        public async Task<Either<ActionResult, ManageContentPageViewModel>> GetManageContentPageViewModelAsync(
+        public async Task<Either<ActionResult, ManageContentPageViewModel>> GetManageContentPageViewModel(
             Guid releaseId)
         {
             return await _persistenceHelper
                 .CheckEntityExists<Release>(releaseId, HydrateReleaseForReleaseViewModel)
                 .OnSuccess(_userService.CheckCanViewRelease)
                 .OnSuccess(release => _contentService.GetUnattachedContentBlocksAsync<DataBlock>(releaseId)
-                .OnSuccess(blocks =>
-                    _releaseFileService.ListPublicFilesPreview(
-                        releaseId,
-                        _releaseService.GetReferencedReleaseFileVersions(
-                            releaseId, ReleaseFileTypes.Data, ReleaseFileTypes.Ancillary))
-                .OnSuccess(publicFiles =>
-                {
-                    var releaseViewModel = _mapper.Map<ManageContentPageViewModel.ReleaseViewModel>(release);
-                    var downloadFiles = publicFiles.ToList();
+                    .OnSuccess(blocks => _releaseFileService.ListAll(
+                            releaseId,
+                            ReleaseFileTypes.Ancillary,
+                            ReleaseFileTypes.Data)
+                        .OnSuccess(files =>
+                        {
+                            var releaseViewModel =
+                                _mapper.Map<ManageContentPageViewModel.ReleaseViewModel>(release);
+                            releaseViewModel.DownloadFiles = files.ToList();
 
-                    releaseViewModel.DownloadFiles = downloadFiles;
-
-                    return new ManageContentPageViewModel
-                    {
-                        Release = releaseViewModel,
-                        AvailableDataBlocks = blocks
-                    };
-                })));
+                            return new ManageContentPageViewModel
+                            {
+                                Release = releaseViewModel,
+                                AvailableDataBlocks = blocks
+                            };
+                        })));
         }
 
         private static IQueryable<Release> HydrateReleaseForReleaseViewModel(IQueryable<Release> values)

@@ -1,5 +1,4 @@
 using System;
-using System.ComponentModel.DataAnnotations;
 using System.Threading.Tasks;
 using GovUk.Education.ExploreEducationStatistics.Admin.ViewModels.ManageContent;
 using GovUk.Education.ExploreEducationStatistics.Common.Model;
@@ -9,6 +8,6 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Services.Interfaces.M
 {
     public interface IManageContentPageService
     {
-        Task<Either<ActionResult, ManageContentPageViewModel>> GetManageContentPageViewModelAsync(Guid releaseId);
+        Task<Either<ActionResult, ManageContentPageViewModel>> GetManageContentPageViewModel(Guid releaseId);
     }
 }
