@@ -67,15 +67,6 @@
     },
     "branch": {
        "value": "dev"
-    },
-    "minCapacityStatisticsDb": {
-      "value": "4"
-    },
-    "maxCapacityStatisticsDb": {
-      "value": 10
-    },
-    "autoPauseDelayStatisticsDb": {
-      "value": -1
     }
   }
 }
