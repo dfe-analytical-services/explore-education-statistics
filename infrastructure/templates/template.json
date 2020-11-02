@@ -1414,7 +1414,7 @@
             "DeploymentRepo": "[parameters('deploymentRepo')]",
             "DeploymentScript": "[parameters('deploymentScript')]"
           },
-          "apiVersion": "2015-01-01",
+          "apiVersion": "2020-08-01-preview",
           "dependsOn": [
             "[variables('sqlserverName')]"
           ],
@@ -1442,7 +1442,7 @@
             "DeploymentRepo": "[parameters('deploymentRepo')]",
             "DeploymentScript": "[parameters('deploymentScript')]"
           },
-          "apiVersion": "2015-01-01",
+          "apiVersion": "2020-08-01-preview",
           "dependsOn": [
             "[variables('sqlserverName')]"
           ],
@@ -1637,7 +1637,7 @@
             "DeploymentRepo": "[parameters('deploymentRepo')]",
             "DeploymentScript": "[parameters('deploymentScript')]"
           },
-          "apiVersion": "2015-01-01",
+          "apiVersion": "2020-08-01-preview",
           "dependsOn": [
             "[variables('publicSqlServerName')]"
           ],
