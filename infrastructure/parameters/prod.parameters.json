@@ -46,15 +46,6 @@
     },
     "storageAccountPrefix": {
       "value": "sa"
-    },
-    "minCapacityStatisticsDb": {
-      "value": "4"
-    },
-    "maxCapacityStatisticsDb": {
-      "value": 10
-    },
-    "autoPauseDelayStatisticsDb": {
-      "value": -1
     }
   }
 }
