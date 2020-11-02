@@ -70,7 +70,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Common.Services
 
             var percentageComplete = CalculatePercentageComplete(import.PercentageComplete, import.Status);
 
-            _logger.LogInformation($"current status: {import.Status} : {percentageComplete}% complete");
+            _logger.LogInformation($"Current status: {import.Status} : {percentageComplete}% complete");
 
             return new ImportStatus
             {
@@ -105,7 +105,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Common.Services
                 {
                     await _table.ExecuteAsync(TableOperation.Replace(import));
                 }
-                catch (StorageException e)
+                catch (StorageException)
                 {
                     // If the table row has been updated in another thread subsequent
                     // to being read above then an exception will be thrown - ignore and continue.
@@ -122,12 +122,12 @@ namespace GovUk.Education.ExploreEducationStatistics.Common.Services
             var import = await GetImport(releaseId, origDataFileName);
             if (import.PercentageComplete < (int) percentageComplete)
             {
-                import.PercentageComplete = (int) percentageComplete;
+                import.PercentageComplete = (int) Math.Clamp(percentageComplete, 0, 100);
                 try
                 {
                     await _table.ExecuteAsync(TableOperation.Replace(import));
                 }
-                catch (StorageException e)
+                catch (StorageException)
                 {
                     // Ignore - as above
                 }
@@ -147,7 +147,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Common.Services
                 : new DatafileImport {Status = IStatus.NOT_FOUND};
         }
 
-        private int CalculatePercentageComplete(int percentageComplete, IStatus status)
+        private static int CalculatePercentageComplete(int percentageComplete, IStatus status)
         {
             return (int) (status switch
             {

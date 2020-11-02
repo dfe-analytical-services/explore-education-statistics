@@ -64,7 +64,10 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Processor.Functions
         {
             if (message.ArchiveFileName != "")
             {
-                await _importStatusService.UpdateStatus(message.Release.Id, message.DataFileName, IStatus.PROCESSING_ARCHIVE_FILE);
+                await _importStatusService.UpdateStatus(message.Release.Id,
+                    message.DataFileName,
+                    IStatus.PROCESSING_ARCHIVE_FILE);
+
                 await _dataArchiveService.ExtractDataFiles(message.Release.Id, message.ArchiveFileName);
             }
 
@@ -76,7 +79,9 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Processor.Functions
                 {
                     try
                     {
-                        var status = await _importStatusService.GetImportStatus(message.Release.Id, message.OrigDataFileName);
+                        var status =
+                            await _importStatusService.GetImportStatus(message.Release.Id, message.OrigDataFileName);
+
                         message.RowsPerBatch = result.RowsPerBatch;
                         message.TotalRows = result.FilteredObservationCount;
                         message.NumBatches = result.NumBatches;
@@ -97,11 +102,15 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Processor.Functions
                     {
                         var ex = GetInnerException(e);
 
-                        await _batchService.FailImport(message.Release.Id, message.OrigDataFileName,
-                            new List<ValidationError> {new ValidationError(ex.Message)});
+                        await _batchService.FailImport(message.Release.Id,
+                            message.OrigDataFileName,
+                            new List<ValidationError>
+                            {
+                                new ValidationError(ex.Message)
+                            });
 
-                        logger.LogError(ex,$"{GetType().Name} function FAILED for : Datafile: " +
-                                           $"{message.DataFileName} : {ex.Message}");
+                        logger.LogError(ex, $"{GetType().Name} function FAILED for : Datafile: " +
+                                            $"{message.DataFileName} : {ex.Message}");
                         logger.LogError(ex.StackTrace);
                     }
 
@@ -109,7 +118,10 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Processor.Functions
                 })
                 .OnFailureDo(async errors =>
                 {
-                    await _batchService.FailImport(message.Release.Id, message.OrigDataFileName, errors);
+                    await _batchService.FailImport(message.Release.Id,
+                        message.OrigDataFileName,
+                        errors);
+
                     logger.LogError($"Import FAILED for {message.DataFileName}...check log");
                 });
         }
@@ -129,16 +141,21 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Processor.Functions
                 if (e is SqlException exception && exception.Number == 1205)
                 {
                     logger.LogInformation($"{GetType().Name} : Handling known exception when processing Datafile: " +
-                                       $"{message.DataFileName} : {exception.Message} : transaction will be retried");
+                                          $"{message.DataFileName} : {exception.Message} : transaction will be retried");
                     throw;
                 }
 
                 var ex = GetInnerException(e);
 
-                await _batchService.FailImport(message.Release.Id, message.OrigDataFileName,new List<ValidationError> {new ValidationError(ex.Message)});
+                await _batchService.FailImport(message.Release.Id,
+                    message.OrigDataFileName,
+                    new List<ValidationError>
+                    {
+                        new ValidationError(ex.Message)
+                    });
 
-                logger.LogError(ex,$"{GetType().Name} function FAILED for : Datafile: " +
-                                $"{message.DataFileName} : {ex.Message}");
+                logger.LogError(ex, $"{GetType().Name} function FAILED for : Datafile: " +
+                                    $"{message.DataFileName} : {ex.Message}");
             }
         }
 
@@ -148,7 +165,10 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Processor.Functions
             ContentDbContext contentDbContext,
             SubjectData subjectData)
         {
-            var subject = _releaseProcessorService.CreateOrUpdateRelease(subjectData, message, statisticsDbContext, contentDbContext);
+            var subject = _releaseProcessorService.CreateOrUpdateRelease(subjectData,
+                    message,
+                    statisticsDbContext,
+                    contentDbContext);
 
             await using var metaFileStream = await _fileStorageService.StreamBlob(subjectData.MetaBlob);
             var metaFileTable = DataTableUtils.CreateFromStream(metaFileStream);
