@@ -96,8 +96,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Processor
                 IStatus.STAGE_1,
                 IStatus.STAGE_2,
                 IStatus.STAGE_3,
-                IStatus.STAGE_4,
-                IStatus.STAGE_5
+                IStatus.STAGE_4
             };
 
             combineFilters = statuses.Aggregate(combineFilters, (current, status) =>

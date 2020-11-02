@@ -32,6 +32,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Common.Tests.Services
 
             Assert.Equal(STAGE_1, result.Status);
             Assert.Equal(percentageComplete * 0.1, result.PercentageComplete);
+            Assert.Equal(percentageComplete, result.PhasePercentageComplete);
             Assert.Null(result.Errors);
             Assert.Equal(100, result.NumberOfRows);
         }
@@ -52,6 +53,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Common.Tests.Services
 
             Assert.Equal(STAGE_2, result.Status);
             Assert.Equal(100 * 0.1 + percentageComplete * 0.1, result.PercentageComplete);
+            Assert.Equal(percentageComplete, result.PhasePercentageComplete);
             Assert.Null(result.Errors);
             Assert.Equal(100, result.NumberOfRows);
         }
@@ -72,6 +74,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Common.Tests.Services
 
             Assert.Equal(STAGE_3, result.Status);
             Assert.Equal(100 * 0.1 + 100 * 0.1 + percentageComplete * 0.1, result.PercentageComplete);
+            Assert.Equal(percentageComplete, result.PhasePercentageComplete);
             Assert.Null(result.Errors);
             Assert.Equal(100, result.NumberOfRows);
         }
@@ -91,27 +94,8 @@ namespace GovUk.Education.ExploreEducationStatistics.Common.Tests.Services
             var result = await service.GetImportStatus(_releaseId, FileName);
 
             Assert.Equal(STAGE_4, result.Status);
-            Assert.Equal(100 * 0.1 + 100 * 0.1 + 100 * 0.1, result.PercentageComplete);
-            Assert.Null(result.Errors);
-            Assert.Equal(100, result.NumberOfRows);
-        }
-
-        [Fact]
-        public async Task GetImportStatus_Stage5()
-        {
-            var tableStorageService = new Mock<ITableStorageService>(MockBehavior.Strict);
-
-            const int percentageComplete = 50;
-
-            SetupImportsTableMockForDataFileImport(tableStorageService: tableStorageService,
-                importStatus: STAGE_5,
-                percentageComplete: percentageComplete);
-
-            var service = BuildImportStatusService(tableStorageService: tableStorageService.Object);
-            var result = await service.GetImportStatus(_releaseId, FileName);
-
-            Assert.Equal(STAGE_5, result.Status);
             Assert.Equal(100 * 0.1 + 100 * 0.1 + 100 * 0.1 + percentageComplete * 0.7, result.PercentageComplete);
+            Assert.Equal(percentageComplete, result.PhasePercentageComplete);
             Assert.Null(result.Errors);
             Assert.Equal(100, result.NumberOfRows);
         }
@@ -132,6 +116,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Common.Tests.Services
 
             Assert.Equal(COMPLETE, result.Status);
             Assert.Equal(100, result.PercentageComplete);
+            Assert.Equal(percentageComplete, result.PhasePercentageComplete);
             Assert.Null(result.Errors);
             Assert.Equal(100, result.NumberOfRows);
         }
@@ -141,9 +126,11 @@ namespace GovUk.Education.ExploreEducationStatistics.Common.Tests.Services
         {
             var tableStorageService = new Mock<ITableStorageService>(MockBehavior.Strict);
 
+            const int percentageComplete = 50;
+            
             SetupImportsTableMockForDataFileImport(tableStorageService: tableStorageService,
                 importStatus: FAILED,
-                percentageComplete: 50,
+                percentageComplete: percentageComplete,
                 errors: "Error message");
 
             var service = BuildImportStatusService(tableStorageService: tableStorageService.Object);
@@ -151,6 +138,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Common.Tests.Services
 
             Assert.Equal(FAILED, result.Status);
             Assert.Equal(0, result.PercentageComplete);
+            Assert.Equal(percentageComplete, result.PhasePercentageComplete);
             Assert.Equal("Error message", result.Errors);
             Assert.Equal(100, result.NumberOfRows);
         }
@@ -168,6 +156,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Common.Tests.Services
 
             Assert.Equal(NOT_FOUND, result.Status);
             Assert.Equal(0, result.PercentageComplete);
+            Assert.Equal(0, result.PhasePercentageComplete);
             Assert.Null(result.Errors);
             Assert.Equal(0, result.NumberOfRows);
         }
@@ -269,7 +258,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Common.Tests.Services
             var tableStorageService = new Mock<ITableStorageService>(MockBehavior.Strict);
 
             var importsTable = SetupImportsTableMockForDataFileImport(tableStorageService: tableStorageService,
-                importStatus: STAGE_5,
+                importStatus: STAGE_4,
                 percentageComplete: 0);
 
             importsTable.Setup(mock => mock.ExecuteAsync(It.Is<TableOperation>(operation =>

@@ -42,7 +42,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Processor.Services
             var releaseId = message.Release.Id;
 
             // Potentially status could already be failed so don't continue
-            if (await _importStatusService.UpdateStatus(releaseId, message.OrigDataFileName, IStatus.STAGE_5))
+            if (await _importStatusService.UpdateStatus(releaseId, message.OrigDataFileName, IStatus.STAGE_4))
             {
                 var subjectData = await _fileStorageService.GetSubjectData(message);
                 var releaseSubject = GetReleaseSubjectLink(message, context);
@@ -122,7 +122,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Processor.Services
             
             var import = await _importStatusService.GetImportStatus(releaseId, message.OrigDataFileName);
 
-            if (import.Status.Equals(IStatus.STAGE_5) && (message.NumBatches == 1 || numBatchesRemaining == 0))
+            if (import.Status.Equals(IStatus.STAGE_4) && (message.NumBatches == 1 || numBatchesRemaining == 0))
             {
                 var observationCount = context.Observation.Count(o => o.SubjectId.Equals(message.SubjectId));
                 

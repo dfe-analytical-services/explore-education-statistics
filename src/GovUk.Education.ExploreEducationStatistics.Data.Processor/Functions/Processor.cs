@@ -88,13 +88,19 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Processor.Functions
 
                         await _batchService.UpdateStoredMessage(message);
 
-                        // If already reached Phase 4 then don't re-create the subject or split into batches
-                        if ((int) status.Status < (int) IStatus.STAGE_4)
+                        // If already completed Phase 3 then don't re-create the subject or split into batches
+                        if (IStatus.STAGE_3.CompareTo(status.Status) > 0 ||
+                            status.Status == IStatus.STAGE_3 && !status.PhaseComplete)
                         {
-                            await _importStatusService.UpdateStatus(message.Release.Id, message.OrigDataFileName,
+                            await _importStatusService.UpdateStatus(message.Release.Id,
+                                message.OrigDataFileName,
                                 IStatus.STAGE_2);
-                            await ProcessSubject(message, DbUtils.CreateStatisticsDbContext(),
-                                DbUtils.CreateContentDbContext(), subjectData);
+
+                            await ProcessSubject(message,
+                                DbUtils.CreateStatisticsDbContext(),
+                                DbUtils.CreateContentDbContext(),
+                                subjectData);
+
                             await _splitFileService.SplitDataFile(collector, message, subjectData);
                         }
                     }

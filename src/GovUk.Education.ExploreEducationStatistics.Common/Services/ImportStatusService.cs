@@ -17,8 +17,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Common.Services
         STAGE_1, // Basic row validation
         STAGE_2, // Create locations and filters
         STAGE_3, // Split Files
-        STAGE_4, // Split Files complete
-        STAGE_5, // Import observations
+        STAGE_4, // Import observations
         COMPLETE,
         FAILED,
         NOT_FOUND
@@ -41,7 +40,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Common.Services
             {IStatus.STAGE_1, .1},
             {IStatus.STAGE_2, .1},
             {IStatus.STAGE_3, .1},
-            {IStatus.STAGE_5, .7},
+            {IStatus.STAGE_4, .7},
             {IStatus.COMPLETE, 1},
         };
 
@@ -77,7 +76,8 @@ namespace GovUk.Education.ExploreEducationStatistics.Common.Services
                 Errors = import.Errors,
                 Status = import.Status,
                 NumberOfRows = import.NumberOfRows,
-                PercentageComplete = percentageComplete
+                PercentageComplete = percentageComplete,
+                PhasePercentageComplete = import.PercentageComplete
             };
         }
 
@@ -153,17 +153,14 @@ namespace GovUk.Education.ExploreEducationStatistics.Common.Services
             {
                 IStatus.STAGE_1 => percentageComplete * ProcessingRatios[IStatus.STAGE_1],
                 IStatus.STAGE_2 => ProcessingRatios[IStatus.STAGE_1] * 100 +
-                                   (percentageComplete * ProcessingRatios[IStatus.STAGE_2]),
+                                   percentageComplete * ProcessingRatios[IStatus.STAGE_2],
                 IStatus.STAGE_3 => ProcessingRatios[IStatus.STAGE_1] * 100 +
                                    ProcessingRatios[IStatus.STAGE_2] * 100 +
-                                   (percentageComplete * ProcessingRatios[IStatus.STAGE_3]),
+                                   percentageComplete * ProcessingRatios[IStatus.STAGE_3],
                 IStatus.STAGE_4 => ProcessingRatios[IStatus.STAGE_1] * 100 +
                                    ProcessingRatios[IStatus.STAGE_2] * 100 +
-                                   ProcessingRatios[IStatus.STAGE_3] * 100,
-                IStatus.STAGE_5 => ProcessingRatios[IStatus.STAGE_1] * 100 +
-                                   ProcessingRatios[IStatus.STAGE_2] * 100 +
                                    ProcessingRatios[IStatus.STAGE_3] * 100 +
-                                   (percentageComplete * ProcessingRatios[IStatus.STAGE_5]),
+                                   percentageComplete * ProcessingRatios[IStatus.STAGE_4],
                 IStatus.COMPLETE => ProcessingRatios[IStatus.COMPLETE] * 100,
                 _ => 0
             });

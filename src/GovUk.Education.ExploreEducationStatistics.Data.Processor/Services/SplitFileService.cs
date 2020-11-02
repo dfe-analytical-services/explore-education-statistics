@@ -68,7 +68,6 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Processor.Services
             // Else perform any additional validation & pass on file to message queue for import
             else
             {
-                await _importStatusService.UpdateStatus(message.Release.Id, message.OrigDataFileName, IStatus.STAGE_4);
                 collector.Add(message);
             }
         }
@@ -143,8 +142,6 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Processor.Services
 
                 batchCount++;
             }
-            
-            await _importStatusService.UpdateStatus(message.Release.Id, message.OrigDataFileName, IStatus.STAGE_4);
 
             // Ensure generated messages are added after batch creation.
             foreach (var m in messages)
