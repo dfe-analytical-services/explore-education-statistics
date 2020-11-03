@@ -57,7 +57,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Services
                         return ValidationActionResult(ReleaseNotApproved);
                     }
 
-                    await _storageQueueService.AddMessagesAsync(
+                    await _storageQueueService.AddMessageAsync(
                         RetryStageQueue, new RetryStageMessage(releaseId, stage));
 
                     _logger.LogTrace($"Sent retry stage message for Release: {releaseId}");
@@ -90,7 +90,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Services
                 .CheckEntityExists<Release>(releaseId)
                 .OnSuccess(async release =>
                 {
-                    await _storageQueueService.AddMessagesAsync(
+                    await _storageQueueService.AddMessageAsync(
                         NotifyChangeQueue, new NotifyChangeMessage(immediate, release.Id));
 
                     _logger.LogTrace($"Sent message for Release: {releaseId}");
@@ -109,7 +109,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Services
                 .CheckEntityExists<Methodology>(id)
                 .OnSuccess(async release =>
                 {
-                    await _storageQueueService.AddMessagesAsync(PublishMethodologyQueue,
+                    await _storageQueueService.AddMessageAsync(PublishMethodologyQueue,
                         new PublishMethodologyMessage(id));
 
                     _logger.LogTrace($"Sent message for Methodology: {id}");
@@ -129,12 +129,26 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Services
                 .CheckEntityExists<Publication>(id)
                 .OnSuccess(async release =>
                 {
-                    await _storageQueueService.AddMessagesAsync(
+                    await _storageQueueService.AddMessageAsync(
                         PublishPublicationQueue, new PublishPublicationMessage(id));
 
                     _logger.LogTrace($"Sent message for Publication: {id}");
                     return Unit.Instance;
                 });
+        }
+
+        /// <summary>
+        /// Notify the Publisher that there has been a change to the
+        /// taxonomy, such as themes and topics.
+        /// </summary>
+        /// <returns></returns>
+        public async Task<Either<ActionResult, Unit>> TaxonomyChanged()
+        {
+            await _storageQueueService.AddMessageAsync(PublishTaxonomyQueue, new PublishTaxonomyMessage());
+
+            _logger.LogTrace($"Sent PublishTaxonomy message");
+
+            return Unit.Instance;
         }
     }
 }

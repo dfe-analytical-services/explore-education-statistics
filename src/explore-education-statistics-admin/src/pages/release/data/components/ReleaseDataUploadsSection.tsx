@@ -47,6 +47,7 @@ interface Props {
   publicationId: string;
   releaseId: string;
   canUpdateRelease: boolean;
+  onDataFilesChange?: (dataFiles: DataFile[]) => void;
 }
 
 interface DeleteDataFile {
@@ -60,12 +61,13 @@ const ReleaseDataUploadsSection = ({
   publicationId,
   releaseId,
   canUpdateRelease,
+  onDataFilesChange,
 }: Props) => {
   const [deleteDataFile, setDeleteDataFile] = useState<DeleteDataFile>();
 
   const {
     value: dataFiles = [],
-    setState: setDataFiles,
+    setState: setDataFilesState,
     isLoading,
   } = useAsyncHandledRetry(
     () => releaseDataFileService.getDataFiles(releaseId),
@@ -73,8 +75,8 @@ const ReleaseDataUploadsSection = ({
   );
 
   const setFileDeleting = (dataFile: DeleteDataFile, deleting: boolean) => {
-    setDataFiles({
-      value: dataFiles.map(file =>
+    setDataFiles(
+      dataFiles.map(file =>
         file.fileName !== dataFile.file.fileName
           ? file
           : {
@@ -82,15 +84,26 @@ const ReleaseDataUploadsSection = ({
               isDeleting: deleting,
             },
       ),
-    });
+    );
   };
+
+  const setDataFiles = useCallback(
+    (nextDataFiles: DataFile[]) => {
+      setDataFilesState({ value: nextDataFiles });
+
+      if (onDataFilesChange) {
+        onDataFilesChange(nextDataFiles);
+      }
+    },
+    [onDataFilesChange, setDataFilesState],
+  );
 
   const handleStatusChange = async (
     dataFile: DataFile,
     { status }: DataFileImportStatus,
   ) => {
-    setDataFiles({
-      value: dataFiles.map(file =>
+    setDataFiles(
+      dataFiles.map(file =>
         file.fileName !== dataFile.fileName
           ? file
           : {
@@ -98,7 +111,7 @@ const ReleaseDataUploadsSection = ({
               status,
             },
       ),
-    });
+    );
   };
 
   const handleSubmit = useCallback(
@@ -118,9 +131,7 @@ const ReleaseDataUploadsSection = ({
         });
       }
 
-      setDataFiles({
-        value: orderBy([...dataFiles, file], dataFile => dataFile.title),
-      });
+      setDataFiles(orderBy([...dataFiles, file], dataFile => dataFile.title));
     },
     [dataFiles, releaseId, setDataFiles],
   );
@@ -130,21 +141,25 @@ const ReleaseDataUploadsSection = ({
       <h2>Add data file to release</h2>
       <div className="govuk-inset-text">
         <h3>Before you start</h3>
-
+        <p>
+          Data files will be displayed in the table tool and can be used to
+          create data blocks. They will also be attached to the release for
+          users to download. Please ensure:
+        </p>
         <ul>
           <li>
-            make sure your data files have passed the checks in our{' '}
+            your data files have passed the checks in our{' '}
             <a href="https://rsconnect/rsc/dfe-published-data-qa/">
               screening app
             </a>
           </li>
           <li>
-            if your data does not meet these standards, you won’t be able to
+            your data files meets these standards - if not you won’t be able to
             upload it to your release
           </li>
           <li>
-            if you have any issues uploading data and files, or questions about
-            data standards contact:{' '}
+            if you have any issues uploading data files, or questions about data
+            standards contact:{' '}
             <a href="mailto:explore.statistics@education.gov.uk">
               explore.statistics@education.gov.uk
             </a>
@@ -280,9 +295,7 @@ const ReleaseDataUploadsSection = ({
             try {
               await releaseDataFileService.deleteDataFiles(releaseId, file.id);
 
-              setDataFiles({
-                value: dataFiles.filter(dataFile => dataFile !== file),
-              });
+              setDataFiles(dataFiles.filter(dataFile => dataFile !== file));
             } catch (err) {
               logger.error(err);
               setFileDeleting(deleteDataFile, false);

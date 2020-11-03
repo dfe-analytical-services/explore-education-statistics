@@ -2,12 +2,20 @@
 using Azure.Storage.Blobs;
 using GovUk.Education.ExploreEducationStatistics.Common.Services;
 using GovUk.Education.ExploreEducationStatistics.Common.Services.Interfaces;
+using GovUk.Education.ExploreEducationStatistics.Common.Utils;
+using GovUk.Education.ExploreEducationStatistics.Content.Api.Services;
+using GovUk.Education.ExploreEducationStatistics.Content.Api.Services.Interfaces;
+using GovUk.Education.ExploreEducationStatistics.Data.Model.Database;
+using GovUk.Education.ExploreEducationStatistics.Data.Model.Services;
+using GovUk.Education.ExploreEducationStatistics.Data.Model.Services.Interfaces;
+using GovUk.Education.ExploreEducationStatistics.Data.Services;
+using GovUk.Education.ExploreEducationStatistics.Data.Services.Interfaces;
 using GovUk.Education.ExploreEducationStatistics.Publisher.Model;
 using Microsoft.AspNetCore.Builder;
 using Microsoft.AspNetCore.Hosting;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Rewrite;
-using Microsoft.Extensions.Azure;
+using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Hosting;
@@ -21,12 +29,14 @@ namespace GovUk.Education.ExploreEducationStatistics.Content.Api
     [ExcludeFromCodeCoverage]
     public class Startup
     {
-        public Startup(IConfiguration configuration)
+        private IConfiguration Configuration { get; }
+        private IHostEnvironment HostEnvironment { get; }
+
+        public Startup(IConfiguration configuration, IHostEnvironment hostEnvironment)
         {
             Configuration = configuration;
+            HostEnvironment = hostEnvironment;
         }
-
-        public IConfiguration Configuration { get; }
 
         // This method gets called by the runtime. Use this method to add services to the container.
         public void ConfigureServices(IServiceCollection services)
@@ -37,6 +47,13 @@ namespace GovUk.Education.ExploreEducationStatistics.Content.Api
                 .AddNewtonsoftJson(options => {
                     options.SerializerSettings.NullValueHandling = NullValueHandling.Ignore;
                 });
+
+            services.AddDbContext<StatisticsDbContext>(options =>
+                options
+                    .UseSqlServer(Configuration.GetConnectionString("StatisticsDb"),
+                        builder => builder.MigrationsAssembly("GovUk.Education.ExploreEducationStatistics.Data.Model"))
+                    .EnableSensitiveDataLogging(HostEnvironment.IsDevelopment())
+            );
 
             // Adds Brotli and Gzip compressing
             services.AddResponseCompression();
@@ -60,6 +77,26 @@ namespace GovUk.Education.ExploreEducationStatistics.Content.Api
                     );
                 }
             );
+            services.AddTransient<IFileStorageService, FileStorageService>();
+            services.AddTransient<IFilterService, FilterService>();
+            services.AddTransient<IIndicatorService, IndicatorService>();
+            services.AddTransient<IMetaGuidanceService, MetaGuidanceService>();
+            services.AddTransient<IMetaGuidanceSubjectService, MetaGuidanceSubjectService>();
+
+            AddPersistenceHelper<StatisticsDbContext>(services);
+        }
+
+        private static void AddPersistenceHelper<TDbContext>(IServiceCollection services)
+            where TDbContext : DbContext
+        {
+            services.AddTransient<
+                IPersistenceHelper<TDbContext>,
+                PersistenceHelper<TDbContext>>(
+                s =>
+                {
+                    var dbContext = s.GetService<TDbContext>();
+                    return new PersistenceHelper<TDbContext>(dbContext);
+                });
         }
 
         // This method gets called by the runtime. Use this method to configure the HTTP request pipeline.
@@ -106,8 +143,9 @@ namespace GovUk.Education.ExploreEducationStatistics.Content.Api
             const string queueName = PublishAllContentQueue;
             try
             {
-                var storageQueueService = new StorageQueueService(Configuration.GetConnectionString("PublisherStorage"));
-                storageQueueService.AddMessages(queueName, new PublishAllContentMessage());
+                var publisherConnectionString = Configuration.GetValue<string>("PublisherStorage");
+                var storageQueueService = new StorageQueueService(publisherConnectionString);
+                storageQueueService.AddMessage(queueName, new PublishAllContentMessage());
 
                 logger.LogInformation($"Message added to {queueName} queue");
                 logger.LogInformation("Please ensure the Publisher function is running");

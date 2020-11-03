@@ -1,4 +1,5 @@
 import { ContentBlock, DataBlock } from '@common/services/types/blocks';
+import { FileInfo } from '@common/services/types/file';
 import { PartialDate } from '@common/utils/date/partialDate';
 import { contentApi } from './api';
 
@@ -23,7 +24,6 @@ export interface Publication {
   description: string;
   dataSource: string;
   summary: string;
-  nextUpdate: string;
   otherReleases: {
     id: string;
     slug: string;
@@ -42,6 +42,15 @@ export interface Publication {
   contact: PublicationContact;
   methodology?: Methodology;
   externalMethodology?: ExternalMethodology;
+}
+
+export interface PublicationSummary {
+  id: string;
+  slug: string;
+  title: string;
+  description: string;
+  dataSource: string;
+  summary: string;
 }
 
 export interface PublicationContact {
@@ -106,11 +115,8 @@ export interface Release<
   keyStatisticsSecondarySection: ContentSection<DataBlockType>;
   headlinesSection: ContentSection<ContentBlockType>;
   publication: PublicationType;
-  publicationId: string;
   latestRelease: boolean;
-  publishScheduled?: string;
   nextReleaseDate: PartialDate;
-  status: ReleaseApprovalStatus;
   relatedInformation: BasicLink[];
   type: {
     id: string;
@@ -118,41 +124,67 @@ export interface Release<
   };
   updates: ReleaseNote[];
   content: ContentSection<ContentBlockType | DataBlockType>[];
-  dataFiles?: {
-    extension: string;
-    name: string;
-    path: string;
-    size: string;
-  }[];
-  downloadFiles: {
-    id: string;
-    extension: string;
-    name: string;
-    path: string;
-    size: string;
-  }[];
-  preReleaseAccessList?: string;
+  downloadFiles: FileInfo[];
   dataLastPublished: string;
+  hasPreReleaseAccessList: boolean;
+  hasMetaGuidance: boolean;
+}
+
+export interface ReleaseSummary {
+  id: string;
+  title: string;
+  yearTitle: string;
+  coverageTitle: string;
+  releaseName: string;
+  published?: string;
+  slug: string;
+  nextReleaseDate: PartialDate;
+  type: {
+    id: string;
+    title: ReleaseType;
+  };
+  latestRelease: boolean;
+  publication: PublicationSummary;
+  dataLastPublished: string;
+}
+
+export interface PreReleaseAccessListSummary extends ReleaseSummary {
+  preReleaseAccessList: string;
 }
 
 export default {
   getPublicationTitle(publicationSlug: string): Promise<PublicationTitle> {
-    return contentApi.get(`content/publication/${publicationSlug}/title`);
+    return contentApi.get(`/publications/${publicationSlug}/title`);
   },
   getPublicationMethodology(
     publicationSlug: string,
   ): Promise<PublicationMethodology> {
-    return contentApi.get(`content/publication/${publicationSlug}/methodology`);
+    return contentApi.get(`/publications/${publicationSlug}/methodology`);
   },
   getLatestPublicationRelease(publicationSlug: string): Promise<Release> {
-    return contentApi.get(`content/publication/${publicationSlug}/latest`);
+    return contentApi.get(`/publications/${publicationSlug}/releases/latest`);
   },
   getPublicationRelease(
     publicationSlug: string,
     releaseSlug: string,
   ): Promise<Release> {
     return contentApi.get(
-      `content/publication/${publicationSlug}/${releaseSlug}`,
+      `/publications/${publicationSlug}/releases/${releaseSlug}`,
+    );
+  },
+  getLatestPreReleaseAccessList(
+    publicationSlug: string,
+  ): Promise<PreReleaseAccessListSummary> {
+    return contentApi.get(
+      `/publications/${publicationSlug}/releases/latest/prerelease-access-list`,
+    );
+  },
+  getPreReleaseAccessList(
+    publicationSlug: string,
+    releaseSlug: string,
+  ): Promise<PreReleaseAccessListSummary> {
+    return contentApi.get(
+      `/publications/${publicationSlug}/releases/${releaseSlug}/prerelease-access-list`,
     );
   },
 };

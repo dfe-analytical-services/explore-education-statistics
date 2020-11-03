@@ -35,22 +35,20 @@ using Microsoft.OpenApi.Models;
 using Newtonsoft.Json;
 using FileStorageService = GovUk.Education.ExploreEducationStatistics.Data.Api.Services.FileStorageService;
 using IFileStorageService = GovUk.Education.ExploreEducationStatistics.Data.Api.Services.Interfaces.IFileStorageService;
-using IHostingEnvironment = Microsoft.Extensions.Hosting.IHostingEnvironment;
 
 namespace GovUk.Education.ExploreEducationStatistics.Data.Api
 {
     [ExcludeFromCodeCoverage]
     public class Startup
     {
-        public Startup(IConfiguration configuration, IHostingEnvironment hostingEnvironment)
+        private IConfiguration Configuration { get; }
+        private IHostEnvironment HostEnvironment { get; }
+
+        public Startup(IConfiguration configuration, IHostEnvironment hostEnvironment)
         {
             Configuration = configuration;
-            HostingEnvironment = hostingEnvironment;
+            HostEnvironment = hostEnvironment;
         }
-
-        public IConfiguration Configuration { get; }
-        public IHostingEnvironment HostingEnvironment { get; }
-
 
         // This method gets called by the runtime. Use this method to add services to the container.
         public void ConfigureServices(IServiceCollection services)
@@ -73,7 +71,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Api
                 options
                     .UseSqlServer(Configuration.GetConnectionString("StatisticsDb"),
                         builder => builder.MigrationsAssembly("GovUk.Education.ExploreEducationStatistics.Data.Model"))
-                    .EnableSensitiveDataLogging(HostingEnvironment.IsDevelopment())
+                    .EnableSensitiveDataLogging(HostEnvironment.IsDevelopment())
             );
 
             // ReSharper disable once CommentTypo

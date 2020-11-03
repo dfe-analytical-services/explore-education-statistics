@@ -4,11 +4,11 @@ import {
   PublicationContact,
   ReleaseType,
 } from '@common/services/publicationService';
-import AccordionWithAnalytics from '@frontend/components/AccordionWithAnalytics';
 import Link from '@frontend/components/Link';
 import React, { ReactNode } from 'react';
 import ContactUsSection from '@common/modules/find-statistics/components/ContactUsSection';
 import NationalStatisticsSection from '@common/modules/find-statistics/components/NationalStatisticsSection';
+import { logEvent } from '@frontend/services/googleAnalyticsService';
 
 interface Props {
   includeAnalytics?: boolean;
@@ -89,12 +89,18 @@ const AccordionComponent = ({
   children,
 }: AccordionComponentProps) => {
   return includeAnalytics ? (
-    <AccordionWithAnalytics
+    <Accordion
       id={accordionId}
-      publicationTitle={publicationTitle}
+      onSectionOpen={accordionSection => {
+        logEvent(
+          `${publicationTitle} help and support`,
+          'Accordion opened',
+          accordionSection.title,
+        );
+      }}
     >
       {children}
-    </AccordionWithAnalytics>
+    </Accordion>
   ) : (
     <Accordion id={accordionId}>{children}</Accordion>
   );

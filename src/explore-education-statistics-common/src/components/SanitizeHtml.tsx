@@ -1,16 +1,22 @@
+import sanitizeHtml, { SanitizeHtmlOptions } from '@common/utils/sanitizeHtml';
 import React, { useMemo } from 'react';
-import sanitizeHtml from '@common/utils/sanitizeHtml';
 
-interface SanitizeHtmlProps {
+export interface SanitizeHtmlProps {
   className?: string;
   dirtyHtml: string;
+  options?: SanitizeHtmlOptions;
   testId?: string;
 }
 
-const SanitizeHtml = ({ className, dirtyHtml, testId }: SanitizeHtmlProps) => {
+const SanitizeHtml = ({
+  className,
+  dirtyHtml,
+  options,
+  testId,
+}: SanitizeHtmlProps) => {
   const cleanHtml = useMemo(() => {
-    return sanitizeHtml(dirtyHtml);
-  }, [dirtyHtml]);
+    return sanitizeHtml(dirtyHtml, options);
+  }, [dirtyHtml, options]);
 
   return (
     <div

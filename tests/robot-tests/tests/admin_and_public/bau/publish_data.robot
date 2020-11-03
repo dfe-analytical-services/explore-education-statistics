@@ -9,9 +9,9 @@ Suite Setup       user signs in as bau1
 Suite Teardown    user closes the browser
 
 *** Variables ***
-${THEME_NAME}        %{TEST_THEME_NAME}
 ${TOPIC_NAME}        %{TEST_TOPIC_NAME}
 ${PUBLICATION_NAME}  UI tests - publish data %{RUN_IDENTIFIER}
+${SUBJECT_NAME}   UI test subject
 
 *** Test Cases ***
 Create new publication and release via API
@@ -19,12 +19,12 @@ Create new publication and release via API
     ${PUBLICATION_ID}=  user creates test publication via api   ${PUBLICATION_NAME}
     user create test release via api  ${PUBLICATION_ID}   FY   3000
 
-Go to "Release status" page
+Go to "Sign off" page
     [Tags]  HappyPath
     user navigates to release summary from admin dashboard  ${PUBLICATION_NAME}  Financial Year 3000-01 (not Live)
 
-    user clicks link   Release status
-    user waits until h2 is visible  Release status
+    user clicks link   Sign off
+    user waits until h2 is visible  Sign off
     user waits until page contains button  Edit release status
 
 Approve release
@@ -40,7 +40,7 @@ Approve release
 
 Verify release is scheduled
     [Tags]  HappyPath
-    user waits until h2 is visible  Release status
+    user waits until h2 is visible  Sign off
     user checks summary list contains  Current status  Approved
 
 Wait for release process status to be Complete
@@ -57,7 +57,7 @@ Return to Admin Dashboard
 
 Create another release for the same publication
     [Tags]  HappyPath
-    user selects theme and topic from admin dashboard  ${THEME_NAME}  ${TOPIC_NAME}
+    user selects theme and topic from admin dashboard  %{TEST_THEME_NAME}  ${TOPIC_NAME}
     user waits until page contains link    Create new publication
     user opens accordion section   ${PUBLICATION_NAME}
     user clicks testid element   Create new release link for ${PUBLICATION_NAME}
@@ -72,34 +72,45 @@ Verify new release summary
 Upload subject to new release
     [Tags]  HappyPath
     user clicks link  Data and files
-    user waits until page contains element  css:#dataFileUploadForm-subjectTitle
-    user enters text into element  css:#dataFileUploadForm-subjectTitle   UI test subject
-    user chooses file   css:#dataFileUploadForm-dataFile       ${CURDIR}${/}files${/}upload-file-test.csv
-    user chooses file   css:#dataFileUploadForm-metadataFile   ${CURDIR}${/}files${/}upload-file-test.meta.csv
+    user waits until page contains element  id:dataFileUploadForm-subjectTitle
+    user enters text into element  id:dataFileUploadForm-subjectTitle   ${SUBJECT_NAME}
+    user chooses file   id:dataFileUploadForm-dataFile       ${FILES_DIR}upload-file-test.csv
+    user chooses file   id:dataFileUploadForm-metadataFile   ${FILES_DIR}upload-file-test.meta.csv
     user clicks button  Upload data files
 
     user waits until h2 is visible  Uploaded data files
-    user waits until page contains accordion section   UI test subject
-    user opens accordion section   UI test subject
+    user waits until page contains accordion section   ${SUBJECT_NAME}
+    user opens accordion section   ${SUBJECT_NAME}
 
-    ${section}=  user gets accordion section content element  UI test subject
-    user checks headed table body row contains  Subject title    UI test subject  ${section}
+    ${section}=  user gets accordion section content element  ${SUBJECT_NAME}
+    user checks headed table body row contains  Subject title    ${SUBJECT_NAME}  ${section}
     user checks headed table body row contains  Data file        upload-file-test.csv  ${section}
     user checks headed table body row contains  Metadata file    upload-file-test.meta.csv  ${section}
     user checks headed table body row contains  Number of rows   159  ${section}
     user checks headed table body row contains  Data file size   15 Kb  ${section}
     user checks headed table body row contains  Status           Complete  ${section}  360
 
+Add meta guidance to subject
+    [Tags]  HappyPath
+    user clicks link  Metadata guidance
+    user waits until h2 is visible  Public metadata guidance document
+
+    user waits until page contains accordion section  ${SUBJECT_NAME}
+    user opens accordion section  ${SUBJECT_NAME}
+    user enters text into meta guidance data file content editor  ${SUBJECT_NAME}
+    ...  ${SUBJECT_NAME} meta guidance content
+    user clicks button  Save guidance
+
 Navigate to 'Data blocks' page
     [Tags]  HappyPath
     user clicks link    Data blocks
     user waits until h2 is visible   Choose a subject
 
-Select subject "UI test subject"
+Select subject "${SUBJECT_NAME}"
     [Tags]  HappyPath
-    user waits until page contains   UI test subject
-    user clicks radio    UI test subject
-    user clicks element   css:#publicationSubjectForm-submit
+    user waits until page contains   ${SUBJECT_NAME}
+    user clicks radio    ${SUBJECT_NAME}
+    user clicks element   id:publicationSubjectForm-submit
 
 Select locations
     [Tags]   HappyPath
@@ -112,14 +123,14 @@ Select locations
     user opens details dropdown   Ward
     user clicks checkbox   Nailsea Youngwood
     user clicks checkbox   Syon
-    user clicks element     css:#locationFiltersForm-submit
+    user clicks element     id:locationFiltersForm-submit
 
 Select time period
     [Tags]   HappyPath
     user waits until h2 is visible  Choose time period
     user selects from list by label  id:timePeriodForm-start  2005
     user selects from list by label  id:timePeriodForm-end  2020
-    user clicks element     css:#timePeriodForm-submit
+    user clicks element     id:timePeriodForm-submit
 
 Select indicators
     [Tags]  HappyPath
@@ -128,7 +139,7 @@ Select indicators
 
 Create table
     [Tags]  HappyPath
-    user clicks element   css:#filtersForm-submit
+    user clicks element   id:filtersForm-submit
     user waits until results table appears     180
 
 Save data block as a highlight
@@ -144,10 +155,10 @@ Save data block as a highlight
     user clicks button   Save data block
     user waits until page contains    Delete this data block
 
-Go to "Release status" page for new release
+Go to "Sign off" page for new release
     [Tags]  HappyPath
-    user clicks link   Release status
-    user waits until h2 is visible  Release status
+    user clicks link   Sign off
+    user waits until h2 is visible  Sign off
     user waits until page contains button  Edit release status
 
 Approve new release
@@ -175,7 +186,7 @@ Approve new release
 Wait for release process status for new release to be Complete
     [Tags]  HappyPath
     # EES-1007 - Release process status doesn't automatically update
-    user waits until h2 is visible  Release status
+    user waits until h2 is visible  Sign off
     user checks summary list contains  Current status  Approved
     user checks summary list contains  Scheduled release  ${PUBLISH_DATE_DAY} ${PUBLISH_DATE_MONTH_WORD} ${PUBLISH_DATE_YEAR}
     user waits for release process status to be  Complete    ${release_complete_wait}
@@ -191,9 +202,9 @@ User goes to public Find Statistics page
 
 Verify newly published release is on Find Statistics page
     [Tags]  HappyPath
-    user waits until page contains accordion section   Test theme
-    user opens accordion section  Test theme
-    user waits until accordion section contains text   Test theme   ${TOPIC_NAME}
+    user waits until page contains accordion section   %{TEST_THEME_NAME}
+    user opens accordion section  %{TEST_THEME_NAME}
+    user waits until accordion section contains text   %{TEST_THEME_NAME}   ${TOPIC_NAME}
 
     user opens details dropdown  ${TOPIC_NAME}
     user waits until details dropdown contains publication    ${TOPIC_NAME}  ${PUBLICATION_NAME}
@@ -235,27 +246,27 @@ Go to Table Tool page
 
 Select publication in table tool
     [Tags]  HappyPath
-    user opens details dropdown    Test theme
+    user opens details dropdown    %{TEST_THEME_NAME}
     user opens details dropdown    ${TOPIC_NAME}
     user clicks radio      ${PUBLICATION_NAME}
-    user clicks element    css:#publicationForm-submit
+    user clicks element    id:publicationForm-submit
     user waits until h2 is visible   Choose a subject
     user checks previous table tool step contains  1    Publication    ${PUBLICATION_NAME}
 
-Select subject "UI test subject" in table tool
+Select subject "${SUBJECT_NAME}" in table tool
     [Tags]  HappyPath
-    user waits until page contains   UI test subject
-    user clicks radio    UI test subject
-    user clicks element   css:#publicationSubjectForm-submit
+    user waits until page contains   ${SUBJECT_NAME}
+    user clicks radio    ${SUBJECT_NAME}
+    user clicks element   id:publicationSubjectForm-submit
     user waits until h2 is visible  Choose locations
-    user checks previous table tool step contains  2    Subject    UI test subject
+    user checks previous table tool step contains  2    Subject    ${SUBJECT_NAME}
 
 Select locations in table tool
     [Tags]   HappyPath
     user opens details dropdown   Local Authority
     user clicks checkbox   Barnsley
     user clicks checkbox   Birmingham
-    user clicks element     css:#locationFiltersForm-submit
+    user clicks element     id:locationFiltersForm-submit
     user waits until h2 is visible  Choose time period
     user checks previous table tool step contains  3   Local Authority    Barnsley
     user checks previous table tool step contains  3   Local Authority    Birmingham
@@ -264,13 +275,13 @@ Select time period in table tool
     [Tags]   HappyPath
     user selects from list by label  id:timePeriodForm-start  2014
     user selects from list by label  id:timePeriodForm-end    2018
-    user clicks element     css:#timePeriodForm-submit
+    user clicks element     id:timePeriodForm-submit
 
 Select indicators in table tool
     [Tags]  HappyPath
     user waits until h2 is visible  Choose your filters
     user clicks indicator checkbox    Admission Numbers
-    user clicks element   css:#filtersForm-submit
+    user clicks element   id:filtersForm-submit
 
 Validate table
     [Tags]  HappyPath
@@ -304,7 +315,7 @@ Select table highlight from subjects step
     user waits until element is visible  xpath://h3[text()="Table highlights"]
     user clicks link  Test highlight name
     user waits until results table appears  180
-    user waits until page contains element   xpath://*[@data-testid="dataTableCaption" and text()="Table showing Admission Numbers for 'UI test subject' from '${PUBLICATION_NAME}' in Bolton 001 (E02000984), Bolton 001 (E05000364), Bolton 004 (E02000987), Bolton 004 (E05010450), Nailsea Youngwood and Syon between 2005 and 2020"]
+    user waits until page contains element   xpath://*[@data-testid="dataTableCaption" and text()="Table showing Admission Numbers for '${SUBJECT_NAME}' from '${PUBLICATION_NAME}' in Bolton 001 (E02000984), Bolton 001 (E05000364), Bolton 004 (E02000987), Bolton 004 (E05010450), Nailsea Youngwood and Syon between 2005 and 2020"]
 
 Validate table column headings for table highlight
     [Tags]  HappyPath

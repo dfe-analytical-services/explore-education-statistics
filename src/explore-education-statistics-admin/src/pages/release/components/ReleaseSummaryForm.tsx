@@ -102,7 +102,9 @@ const ReleaseSummaryForm = <
 
   const baseSchema = Yup.object<ReleaseSummaryFormValues>({
     timePeriodCoverageCode: Yup.string().required('Choose a time period'),
-    timePeriodCoverageStartYear: Yup.string().required('Enter a year'),
+    timePeriodCoverageStartYear: Yup.string()
+      .required('Enter a year')
+      .length(4, 'Year must be exactly 4 characters'),
     releaseTypeId: Yup.string().required('Choose a release type'),
   });
 

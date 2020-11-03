@@ -1,4 +1,3 @@
-import Accordion from '@common/components/Accordion';
 import AccordionSection from '@common/components/AccordionSection';
 import Details from '@common/components/Details';
 import FormattedDate from '@common/components/FormattedDate';
@@ -23,6 +22,7 @@ import { logEvent } from '@frontend/services/googleAnalyticsService';
 import classNames from 'classnames';
 import { GetServerSideProps, NextPage } from 'next';
 import React from 'react';
+import Accordion from '@common/components/Accordion';
 import PublicationReleaseHeadlinesSection from './components/PublicationReleaseHeadlinesSection';
 import styles from './PublicationReleasePage.module.scss';
 
@@ -156,7 +156,25 @@ const PublicationReleasePage: NextPage<Props> = ({ data }) => {
                     {` (${extension}, ${size})`}
                   </li>
                 ))}
-                {data.preReleaseAccessList && (
+                {data.hasMetaGuidance && (
+                  <li>
+                    <Link
+                      to={
+                        data.latestRelease
+                          ? '/find-statistics/[publication]/meta-guidance'
+                          : '/find-statistics/[publication]/[release]/meta-guidance'
+                      }
+                      as={
+                        data.latestRelease
+                          ? `/find-statistics/${data.publication.slug}/meta-guidance`
+                          : `/find-statistics/${data.publication.slug}/${data.slug}/meta-guidance`
+                      }
+                    >
+                      Metadata guidance document
+                    </Link>
+                  </li>
+                )}
+                {data.hasPreReleaseAccessList && (
                   <li>
                     <Link
                       to={
@@ -329,7 +347,16 @@ const PublicationReleasePage: NextPage<Props> = ({ data }) => {
       <PublicationReleaseHeadlinesSection release={data} />
 
       {data.content.length > 0 && (
-        <Accordion id="content">
+        <Accordion
+          id="content"
+          onSectionOpen={accordionSection => {
+            logEvent(
+              `${data.publication.title} release page`,
+              `Content accordion opened`,
+              `${accordionSection.title}`,
+            );
+          }}
+        >
           {data.content.map(({ heading, caption, order, content }) => {
             return (
               <AccordionSection heading={heading} caption={caption} key={order}>

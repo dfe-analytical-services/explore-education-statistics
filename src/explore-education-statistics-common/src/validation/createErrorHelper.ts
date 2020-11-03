@@ -17,7 +17,7 @@ const createErrorHelper = <T extends FormikValues>({
 
       const isTouched = get(touched, errorKey, false);
 
-      if (!isTouched) {
+      if (!isTouched || typeof error === 'undefined') {
         return acc;
       }
 

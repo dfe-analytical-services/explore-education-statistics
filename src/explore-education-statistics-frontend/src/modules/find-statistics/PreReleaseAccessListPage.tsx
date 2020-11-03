@@ -1,14 +1,14 @@
 import FormattedDate from '@common/components/FormattedDate';
 import SanitizeHtml from '@common/components/SanitizeHtml';
 import publicationService, {
-  Release,
+  PreReleaseAccessListSummary,
 } from '@common/services/publicationService';
 import Page from '@frontend/components/Page';
 import { GetServerSideProps } from 'next';
 import React from 'react';
 
 interface Props {
-  release: Release;
+  release: PreReleaseAccessListSummary;
 }
 
 const PreReleaseAccessListPage = ({ release }: Props) => {
@@ -30,7 +30,7 @@ const PreReleaseAccessListPage = ({ release }: Props) => {
       <h2>Pre-release access list</h2>
 
       {release.published && (
-        <p>
+        <p className="govuk-!-margin-bottom-8">
           <strong>
             Published <FormattedDate>{release.published}</FormattedDate>
           </strong>
@@ -55,8 +55,8 @@ export const getServerSideProps: GetServerSideProps<Props> = async ({
   };
 
   const data = await (release
-    ? publicationService.getPublicationRelease(publication, release)
-    : publicationService.getLatestPublicationRelease(publication));
+    ? publicationService.getPreReleaseAccessList(publication, release)
+    : publicationService.getLatestPreReleaseAccessList(publication));
 
   return {
     props: {

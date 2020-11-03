@@ -1,28 +1,26 @@
 using System;
 using System.Net.Mime;
 using System.Threading.Tasks;
-using GovUk.Education.ExploreEducationStatistics.Common.Services.Interfaces;
-using GovUk.Education.ExploreEducationStatistics.Content.Api.Models;
+using GovUk.Education.ExploreEducationStatistics.Content.Api.Services.Interfaces;
+using GovUk.Education.ExploreEducationStatistics.Content.Api.ViewModels;
 using GovUk.Education.ExploreEducationStatistics.Publisher.Model.ViewModels;
 using Microsoft.AspNetCore.Mvc;
-using Newtonsoft.Json;
-using static GovUk.Education.ExploreEducationStatistics.Common.BlobContainerNames;
 using static GovUk.Education.ExploreEducationStatistics.Common.Services.FileStoragePathUtils;
 
 namespace GovUk.Education.ExploreEducationStatistics.Content.Api.Controllers
 {
-    [Route("api/content")]
+    [Route("api")]
     [Produces(MediaTypeNames.Application.Json)]
     public class ReleaseController : ControllerBase
     {
-        private readonly IBlobStorageService _blobStorageService;
+        private readonly IFileStorageService _fileStorageService;
 
-        public ReleaseController(IBlobStorageService blobStorageService)
+        public ReleaseController(IFileStorageService fileStorageService)
         {
-            _blobStorageService = blobStorageService;
+            _fileStorageService = fileStorageService;
         }
 
-        [HttpGet("publication/{publicationSlug}/latest")]
+        [HttpGet("publications/{publicationSlug}/releases/latest")]
         public async Task<ActionResult<ReleaseViewModel>> GetLatestRelease(string publicationSlug)
         {
             return await GetReleaseViewModel(
@@ -31,7 +29,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Content.Api.Controllers
             );
         }
 
-        [HttpGet("publication/{publicationSlug}/{releaseSlug}")]
+        [HttpGet("publications/{publicationSlug}/releases/{releaseSlug}")]
         public async Task<ActionResult<ReleaseViewModel>> GetRelease(string publicationSlug, string releaseSlug)
         {
             return await GetReleaseViewModel(
@@ -44,63 +42,14 @@ namespace GovUk.Education.ExploreEducationStatistics.Content.Api.Controllers
             string publicationPath,
             string releasePath)
         {
-            var publicationTask = Task.Run(
-                async () =>
-                {
-                    var text = await _blobStorageService.DownloadBlobText(
-                        PublicContentContainerName,
-                        publicationPath
-                    );
-                    if (string.IsNullOrWhiteSpace(text))
-                    {
-                        throw new ArgumentException();
-                    }
+            var publicationTask = _fileStorageService.GetDeserialized<CachedPublicationViewModel>(publicationPath);
+            var releaseTask = _fileStorageService.GetDeserialized<CachedReleaseViewModel>(releasePath);
 
-                    return JsonConvert.DeserializeObject<CachedPublicationViewModel>(
-                        text,
-                        new JsonSerializerSettings
-                        {
-                            TypeNameHandling = TypeNameHandling.Auto
-                        }
-                    );
-                }
-            );
+            await Task.WhenAll(publicationTask, releaseTask);
 
-            var releaseTask = Task.Run(
-                async () =>
-                {
-                    var text = await _blobStorageService.DownloadBlobText(
-                        PublicContentContainerName,
-                        releasePath
-                    );
-                    if (string.IsNullOrWhiteSpace(text))
-                    {
-                        throw new ArgumentException();
-                    }
-
-                    return JsonConvert.DeserializeObject<CachedReleaseViewModel>(
-                        text,
-                        new JsonSerializerSettings
-                        {
-                            TypeNameHandling = TypeNameHandling.Auto
-                        }
-                    );
-                }
-            );
-
-            var continuation = Task.WhenAll(publicationTask, releaseTask);
-
-            try
+            if (releaseTask.Result.IsRight && publicationTask.Result.IsRight)
             {
-                continuation.Wait();
-            }
-            catch (AggregateException)
-            {
-            }
-
-            if (continuation.Status == TaskStatus.RanToCompletion)
-            {
-                return new ReleaseViewModel(releaseTask.Result, publicationTask.Result);
+                return new ReleaseViewModel(releaseTask.Result.Right, publicationTask.Result.Right);
             }
 
             return NotFound();

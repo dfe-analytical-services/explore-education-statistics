@@ -7,7 +7,6 @@ import React, { useCallback, useMemo } from 'react';
 
 interface Props {
   releaseId?: string;
-  allowHeadings?: boolean;
   block: EditableBlock;
   editable?: boolean;
   getInfographic?: GetInfographic;
@@ -17,7 +16,6 @@ interface Props {
 
 function EditableBlockRenderer({
   releaseId,
-  allowHeadings,
   block,
   editable,
   getInfographic,
@@ -55,7 +53,6 @@ function EditableBlockRenderer({
     case 'MarkDownBlock':
       return (
         <EditableContentBlock
-          allowHeadings={allowHeadings}
           editable={editable}
           id={blockId}
           label="Block content"

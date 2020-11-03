@@ -158,6 +158,11 @@ namespace GovUk.Education.ExploreEducationStatistics.Publisher.Services
             }
         }
 
+        public async Task UpdateTaxonomy(PublishContext context)
+        {
+            await CacheTrees(context);
+        }
+
         private async Task DeleteAllContent()
         {
             await _fastTrackService.DeleteAllReleaseFastTracks();

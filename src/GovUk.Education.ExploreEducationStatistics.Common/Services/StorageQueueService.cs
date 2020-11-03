@@ -1,4 +1,5 @@
-﻿using System.Threading.Tasks;
+﻿using System.Collections.Generic;
+using System.Threading.Tasks;
 using GovUk.Education.ExploreEducationStatistics.Common.Services.Interfaces;
 using Microsoft.Azure.Storage;
 using Microsoft.Azure.Storage.Queue;
@@ -15,16 +16,19 @@ namespace GovUk.Education.ExploreEducationStatistics.Common.Services
             _storageConnectionString = storageConnectionString;
         }
 
-        public void AddMessages(string queueName, params object[] values)
+        public void AddMessage(string queueName, object value)
         {
             var queue = GetQueueReference(queueName);
-            foreach (var value in values)
-            {
-                queue.AddMessage(ToCloudQueueMessage(value));
-            }
+            queue.AddMessage(ToCloudQueueMessage(value));
         }
 
-        public async Task AddMessagesAsync(string queueName, params object[] values)
+        public async Task AddMessageAsync(string queueName, object value)
+        {
+            var queue = await GetQueueReferenceAsync(queueName);
+            await queue.AddMessageAsync(ToCloudQueueMessage(value));
+        }
+
+        public async Task AddMessages(string queueName, IEnumerable<object> values)
         {
             var queue = await GetQueueReferenceAsync(queueName);
             foreach (var value in values)

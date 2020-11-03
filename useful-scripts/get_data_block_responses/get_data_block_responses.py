@@ -3,9 +3,10 @@ import json
 import csv
 import time
 import os
+import argparse
 
 """
-To generate datablocks.csv, use this SQL query:
+To generate datablocks.csv, use this SQL query against the Content DB:
 
 SELECT ContentBlock.Id AS ContentBlockId, Releases.Id AS ReleaseId, JSON_VALUE([DataBlock_Query], '$.SubjectId') AS SubjectId, ContentBlock.DataBlock_Query AS Query
   FROM ContentBlock
@@ -22,18 +23,46 @@ And then save the results as a CSV in MS SQL Server Management Studio.
 Place it in the same directory as this script.
 """
 
-DATA_API_URL = 'https://data.explore-education-statistics.service.gov.uk/api'
+parser = argparse.ArgumentParser(prog="python get_data_block_responses.py",
+                                 description="Used to get and time data block responses from "
+                                             "an environment")
+parser.add_argument("-e", "--env",
+                    dest="env",
+                    default="dev",
+                    choices=["local", "dev", "test", "preprod", "prod"],
+                    help="the environment to run again")
+parser.add_argument("-f", "--file",
+                    dest="datablocks_csv",
+                    default="datablocks.csv",
+                    help="CSV of data blocks (see comment in this script)")
+parser.add_argument("-s", "-sleep",
+                    dest="sleep_duration",
+                    default=1,
+                    help="duration to sleep between requests")
+args = parser.parse_args()
+
+data_api_urls = {
+    'local': 'http://localhost:5000/api',
+    'dev': 'https://data.dev.explore-education-statistics.service.gov.uk/api',
+    'test': 'https://data.test.explore-education-statistics.service.gov.uk/api',
+    'preprod': 'https://data.pre-production.explore-education-statistics.service.gov.uk/api',
+    'prod': 'https://data.explore-education-statistics.service.gov.uk/api',
+}
+
+data_api_url = data_api_urls[args.env]
+results_dir = f'results_{args.env}'
 
 datablocks = []
 
-with open('datablocks.csv', 'r') as input:
+with open(args.datablocks_csv, 'r') as input:
     csv_reader = csv.reader(input, delimiter=',')
     for row in csv_reader:
         datablocks.append(row)
 
-if not os.path.exists('results/fails'):
-    os.makedirs('results/fails')
+if not os.path.exists(f'{results_dir}/fails'):
+    os.makedirs(f'{results_dir}/fails')
 
+start_time = time.perf_counter()
 for datablock in datablocks:
     if datablock[0] == 'ContentBlockId':
         continue
@@ -43,26 +72,28 @@ for datablock in datablocks:
     subjectId = datablock[2]
     query = datablock[3]
 
-    if os.path.exists(f'results/block_{guid}') or os.path.exists(f'results/fails/block_{guid}'):
+    if os.path.exists(f'{results_dir}/block_{guid}') or os.path.exists(f'{results_dir}/fails/block_{guid}'):
         continue
 
-    url = f'{DATA_API_URL}/tablebuilder/release/{releaseId}'
+    url = f'{data_api_url}/tablebuilder/release/{releaseId}'
     headers = {
         'Content-Type': 'application/json'
     }
+    block_time_start = time.perf_counter()
     resp = requests.post(url=url,
                          headers=headers,
                          data=query
                          )
 
-    file_path = 'results'
+    file_path = results_dir
     if resp.status_code != 200:
         print(
             f'response status wasn\'t 200 for block {guid}\n'
             f'subject {subjectId}\n'
             f'{resp.text}\n'
         )
-        file_path = 'results/fails'
+        file_path = f'{results_dir}/fails'
+    block_time_end = time.perf_counter()
 
     try:
         with open(f'{file_path}/block_{guid}', 'w') as file:
@@ -73,10 +104,14 @@ for datablock in datablocks:
                 f'query:\n'
                 f'{query}\n'
                 f'response status: {resp.status_code}\n'
+                f'time for response: {block_time_end - block_time_start}\n'
                 f'response:\n{resp.text}'
             )
     except:
         print(f'file.write failed with block {guid}\n'
               f'subject {subjectId}\n{resp.text}')
 
-    time.sleep(1)
+    time.sleep(args.sleep_duration)
+
+end_time = time.perf_counter()
+print('Elapsed time: ', end_time - start_time)

@@ -12,6 +12,7 @@ Resource   ./table_tool.robot
 *** Variables ***
 ${browser}    chrome
 ${headless}   1
+${FILES_DIR}    ${EXECDIR}${/}tests${/}files${/}
 
 ${timeout}          30
 ${implicit_wait}    3
@@ -218,6 +219,10 @@ user waits until page contains testid
     [Arguments]  ${id}   ${wait}=${timeout}
     user waits until page contains element   css:[data-testid="${id}"]   ${wait}
 
+user checks page does not contain testid
+    [Arguments]  ${id}
+    user checks page does not contain element   css:[data-testid="${id}"]
+
 user checks testid element contains
     [Arguments]  ${id}  ${text}
     user waits until element contains  css:[data-testid="${id}"]   ${text}
@@ -375,13 +380,12 @@ user chooses file
 
 user clears element text
     [Arguments]   ${locator}
-    press keys  ${locator}  CTRL+a
-    press keys  ${locator}  BACKSPACE
+    press keys  ${locator}  CTRL+a+BACKSPACE
     sleep  0.1
 
 user presses keys
-    [Arguments]   ${keys}
-    press keys  ${None}    ${keys}
+    [Arguments]   ${keys}  ${selector}=${None}
+    press keys  ${selector}    ${keys}
     sleep  0.1
 
 user enters text into element

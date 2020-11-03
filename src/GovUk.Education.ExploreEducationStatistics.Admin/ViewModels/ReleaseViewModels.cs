@@ -112,8 +112,6 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.ViewModels
 
     public class UpdateReleaseViewModel
     {
-        [Required] public Guid PublicationId { get; set; }
-
         [Required] public Guid TypeId { get; set; }
 
         [JsonConverter(typeof(TimeIdentifierJsonConverter))]
@@ -137,7 +135,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.ViewModels
         {
             get
             {
-                if (string.IsNullOrEmpty(PublishScheduled))
+                if (PublishScheduled.IsNullOrEmpty())
                 {
                     return null;
                 }

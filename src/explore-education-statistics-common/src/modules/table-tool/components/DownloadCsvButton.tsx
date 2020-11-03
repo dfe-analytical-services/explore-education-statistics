@@ -82,12 +82,17 @@ export const getCsvData = (fullTable: FullTable): string[][] => {
   return [columns, ...rows];
 };
 
-interface Props {
+export interface DownloadCsvButtonProps {
   fileName: string;
   fullTable: FullTable;
+  onClick?: () => void;
 }
 
-const DownloadCsvButton = ({ fileName, fullTable }: Props) => {
+const DownloadCsvButton = ({
+  fileName,
+  fullTable,
+  onClick,
+}: DownloadCsvButtonProps) => {
   return (
     <ButtonText
       onClick={() => {
@@ -98,6 +103,9 @@ const DownloadCsvButton = ({ fileName, fullTable }: Props) => {
         writeFile(workBook, `${fileName}.csv`, {
           type: 'binary',
         });
+        if (onClick) {
+          onClick();
+        }
       }}
     >
       Download the underlying data of this table (CSV)

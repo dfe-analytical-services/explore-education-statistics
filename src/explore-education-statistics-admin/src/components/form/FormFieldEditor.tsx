@@ -9,6 +9,7 @@ type Props<FormValues> = {
   name: keyof FormValues | string;
   showError?: boolean;
   formGroupClass?: string;
+  testId?: string;
 } & OmitStrict<FormEditorProps, 'value' | 'onChange'>;
 
 function FormFieldEditor<T>({
@@ -16,6 +17,7 @@ function FormFieldEditor<T>({
   name,
   showError = true,
   formGroupClass,
+  testId,
   ...props
 }: Props<T>) {
   return (
@@ -32,6 +34,7 @@ function FormFieldEditor<T>({
         return (
           <FormGroup hasError={!!errorMessage} className={formGroupClass}>
             <FormEditor
+              testId={testId}
               {...props}
               {...field}
               onBlur={() => {

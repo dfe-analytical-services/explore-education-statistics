@@ -18,6 +18,7 @@ import orderBy from 'lodash/orderBy';
 import { GetServerSideProps, NextPage } from 'next';
 import dynamic from 'next/dynamic';
 import React, { useMemo } from 'react';
+import { logEvent } from '@frontend/services/googleAnalyticsService';
 
 const TableToolFinalStep = dynamic(
   () => import('@frontend/modules/table-tool/components/TableToolFinalStep'),
@@ -136,6 +137,14 @@ const TableToolPage: NextPage<TableToolPageProps> = ({
             )}
           </WizardStep>
         )}
+        onSubmit={table => {
+          logEvent(
+            'Table tool',
+            'Publication and subject chosen',
+            `${table.subjectMeta.publicationName}/${table.subjectMeta.subjectName}`,
+          );
+          logEvent('Table tool', 'Table created', window.location.pathname);
+        }}
       />
     </Page>
   );

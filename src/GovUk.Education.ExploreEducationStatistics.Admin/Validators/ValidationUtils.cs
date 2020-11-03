@@ -75,22 +75,17 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Validators
         UserDoesNotExist,
         UserAlreadyHasReleaseRole,
 
-        // Role
-        RoleDoesNotExist,
-
         // Invite
         UnableToCancelInvite,
         InvalidEmailAddress,
 
         // Publication
         PublicationDoesNotExist,
-        PublicationHasMethodologyAssigned,
 
         // Methodology
         MethodologyDoesNotExist,
         MethodologyMustBeApprovedOrPublished,
         CannotSpecifyMethodologyAndExternalMethodology,
-        MethodologyOrExternalMethodologyLinkMustBeDefined,
 
         // Theme
         ThemeDoesNotExist,
@@ -100,7 +95,6 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Validators
 
         // File
         CannotOverwriteFile,
-        FileNotFound,
         FileCannotBeEmpty,
         FileTypeInvalid,
         FilenameCannotContainSpacesOrSpecialCharacters,
@@ -141,6 +135,8 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Validators
 
         // Release
         ReleaseNotApproved,
+        MetaGuidanceMustBePopulated,
+        DataReplacementInProgress,
         ApprovedReleaseMustHavePublishScheduledDate,
         PublishedReleaseCannotBeUnapproved
     }

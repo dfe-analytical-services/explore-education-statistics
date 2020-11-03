@@ -35,7 +35,11 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Processor.Services
             var release = CreateOrUpdateRelease(message, statisticsDbContext);
             RemoveSubjectIfExisting(message, statisticsDbContext);
 
-            var subject = CreateSubject(message.SubjectId, subjectData.Name, release, statisticsDbContext);
+            var subject = CreateSubject(message.SubjectId,
+                subjectData.DataBlob.FileName,
+                subjectData.Name,
+                release,
+                statisticsDbContext);
 
             if (!UpdateReleaseFileReferenceLinks(message, contentDbContext, release, subject))
             {
@@ -100,6 +104,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Processor.Services
         }
 
         private static Subject CreateSubject(Guid subjectId,
+            string filename,
             string name,
             Release release,
             StatisticsDbContext statisticsDbContext)
@@ -107,6 +112,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Processor.Services
             var newSubject = statisticsDbContext.Subject.Add(new Subject
                 {
                     Id = subjectId,
+                    Filename = filename,
                     Name = name
                 }
             ).Entity;

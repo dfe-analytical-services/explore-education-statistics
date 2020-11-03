@@ -2,6 +2,7 @@ using System;
 using System.Collections.Generic;
 using System.Data;
 using System.Linq;
+using System.Threading.Tasks;
 using GovUk.Education.ExploreEducationStatistics.Common.Extensions;
 using GovUk.Education.ExploreEducationStatistics.Common.Model;
 using GovUk.Education.ExploreEducationStatistics.Common.Model.Data;
@@ -135,7 +136,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Importer.Services
             }
         }
 
-        public void ImportObservations(DataColumnCollection cols, DataRowCollection rows, Subject subject,
+        public async Task ImportObservations(DataColumnCollection cols, DataRowCollection rows, Subject subject,
             SubjectMeta subjectMeta, int batchNo, int rowsPerBatch, StatisticsDbContext context)
         {
             _importerFilterService.ClearCache();
@@ -150,7 +151,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Importer.Services
                 batchNo,
                 rowsPerBatch).ToList();
 
-            InsertObservations(context, observations);
+            await InsertObservations(context, observations);
         }
         
         public static GeographicLevel GetGeographicLevel(IReadOnlyList<string> line, List<string> headers)
@@ -417,7 +418,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Importer.Services
                 new PlanningArea(values[0], values[1]));
         }
 
-        private static void InsertObservations(DbContext context, IEnumerable<Observation> observations)
+        private async Task InsertObservations(DbContext context, IEnumerable<Observation> observations)
         {
             var observationsTable = new DataTable();
             observationsTable.Columns.Add("Id", typeof(Guid));
@@ -466,14 +467,14 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Importer.Services
                 Value = observationsTable, TypeName = "[dbo].[ObservationType]"
             };
 
-            context.Database.ExecuteSqlRaw("EXEC [dbo].[InsertObservations] @Observations", parameter);
+            await context.Database.ExecuteSqlRawAsync("EXEC [dbo].[InsertObservations] @Observations", parameter);
             
             parameter = new SqlParameter("@ObservationFilterItems", SqlDbType.Structured)
             {
                 Value = observationsFilterItemsTable, TypeName = "[dbo].[ObservationFilterItemType]"
             };
 
-            context.Database.ExecuteSqlRaw("EXEC [dbo].[InsertObservationFilterItems] @ObservationFilterItems", parameter);
+            await context.Database.ExecuteSqlRawAsync("EXEC [dbo].[InsertObservationFilterItems] @ObservationFilterItems", parameter);
         }
     }
 }

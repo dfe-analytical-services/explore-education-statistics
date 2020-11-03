@@ -1,5 +1,6 @@
 *** Settings ***
 Resource    ../../libs/admin-common.robot
+Resource    ../../libs/tables.robot
 Library     ../../libs/admin_api.py
 
 Force Tags  Admin  Local  Dev  AltersData
@@ -25,6 +26,54 @@ Verify release summary
     user checks page contains element   xpath://li/a[text()="Summary" and contains(@aria-current, 'page')]
     user checks summary list contains  Publication title  ${PUBLICATION_NAME}
 
+Upload subject
+    [Tags]  HappyPath
+    user clicks link  Data and files
+    user waits until h2 is visible  Add data file to release
+    user enters text into element  id:dataFileUploadForm-subjectTitle   UI test subject
+    user chooses file   id:dataFileUploadForm-dataFile       ${FILES_DIR}upload-file-test.csv
+    user chooses file   id:dataFileUploadForm-metadataFile   ${FILES_DIR}upload-file-test.meta.csv
+    user clicks button  Upload data files
+
+    user waits until h2 is visible  Uploaded data files
+    user waits until page contains accordion section   UI test subject
+    user opens accordion section   UI test subject
+
+    ${section}=  user gets accordion section content element  UI test subject
+    user checks headed table body row contains  Subject title    UI test subject  ${section}
+    user checks headed table body row contains  Data file        upload-file-test.csv  ${section}
+    user checks headed table body row contains  Metadata file    upload-file-test.meta.csv  ${section}
+    user checks headed table body row contains  Number of rows   159  ${section}
+    user checks headed table body row contains  Data file size   15 Kb  ${section}
+    user checks headed table body row contains  Status           Complete  ${section}  180
+
+Add metadata guidance
+    [Tags]  HappyPath
+    user clicks link  Metadata guidance
+    user waits until h2 is visible  Public metadata guidance document
+
+    user waits until page contains accordion section  UI test subject
+    user opens accordion section  UI test subject
+    user checks summary list contains  Filename             upload-file-test.csv
+    user checks summary list contains  Geographic levels
+    ...  Local Authority; Local Authority District; Local Enterprise Partnership; Opportunity Area; Parliamentary Constituency; Regional; RSC Region; Ward
+    user checks summary list contains  Time period          2005 to 2020
+
+    user opens details dropdown  Variable names and descriptions
+
+    user checks table column heading contains  1  1  Variable name
+    user checks table column heading contains  1  2  Variable description
+
+    user checks results table cell contains  1  1   admission_numbers   id:metaGuidance-dataFiles
+    user checks results table cell contains  1  2   Admission Numbers   id:metaGuidance-dataFiles
+
+    user enters text into element  id:metaGuidanceForm-content  Test metadata guidance content
+    user enters text into element  id:metaGuidanceForm-subjects0Content  Test file guidance content
+
+    user clicks button  Save guidance
+
+    user waits until page contains button  Edit guidance
+
 Add basic release content
     [Tags]  HappyPath
     user clicks link  Content
@@ -32,10 +81,10 @@ Add basic release content
     user waits until h2 is visible  ${PUBLICATION_NAME}
     user adds basic release content  ${PUBLICATION_NAME}
 
-Go to "Release status" page
+Go to "Sign off" page
     [Tags]  HappyPath
-    user clicks link   Release status
-    user waits until h2 is visible  Release status
+    user clicks link   Sign off
+    user waits until h2 is visible  Sign off
     user waits until page contains button  Edit release status
 
 Approve release and wait for it to be Scheduled
@@ -58,7 +107,7 @@ Approve release and wait for it to be Scheduled
     user enters text into element  id:releaseStatusForm-nextReleaseDate-year    2001
     user clicks button   Update status
 
-    user waits until h2 is visible  Release status
+    user waits until h2 is visible  Sign off
     user checks summary list contains  Current status  Approved
     user checks summary list contains  Scheduled release  ${day} ${month_word} ${year}
     user checks summary list contains  Next release expected  January 2001
@@ -153,7 +202,7 @@ Start prerelease
     user enters text into element  id:releaseStatusForm-publishScheduled-year   ${year}
     user clicks button   Update status
 
-    user waits until h2 is visible  Release status
+    user waits until h2 is visible  Sign off
     user checks summary list contains  Current status  Approved
     user checks summary list contains  Scheduled release  ${day} ${month_word} ${year}
     user waits for release process status to be  Scheduled  90
@@ -175,6 +224,49 @@ Validate prerelease has started
     user waits until element contains  id:releaseSummary  Test summary text for ${PUBLICATION_NAME}
     user waits until element contains  id:releaseHeadlines  Test headlines summary text for ${PUBLICATION_NAME}
 
+Validate metadata guidance page
+    [Tags]  HappyPath
+    user opens details dropdown  Download associated files
+    user clicks link  Metadata guidance
+
+    user checks breadcrumb count should be   2
+    user checks nth breadcrumb contains   1    Home
+    user checks nth breadcrumb contains   2    Metadata guidance document
+
+    user waits until page contains title caption  Calendar Year 2000
+    user waits until h1 is visible  ${PUBLICATION_NAME}
+
+    user waits until h2 is visible  Metadata guidance document
+    user waits until page contains  Test metadata guidance content
+
+    user waits until page contains accordion section  UI test subject
+    user checks there are x accordion sections  1
+
+    user opens accordion section  UI test subject
+    user checks summary list contains  Filename             upload-file-test.csv
+    user checks summary list contains  Geographic levels
+    ...  Local Authority; Local Authority District; Local Enterprise Partnership; Opportunity Area; Parliamentary Constituency; Regional; RSC Region; Ward
+    user checks summary list contains  Time period          2005 to 2020
+    user checks summary list contains  Content              Test file guidance content
+
+    user opens details dropdown  Variable names and descriptions
+
+    user checks table column heading contains  1  1  Variable name
+    user checks table column heading contains  1  2  Variable description
+
+    user checks results table cell contains  1  1   admission_numbers
+    user checks results table cell contains  1  2   Admission Numbers
+
+Go back to prerelease page
+    [Tags]  HappyPath
+    user clicks link  Back
+    user checks breadcrumb count should be   2
+    user checks nth breadcrumb contains   1    Home
+    user checks nth breadcrumb contains   2    Pre-release access
+
+    user waits until page contains title caption  Calendar Year 2000
+    user waits until h1 is visible  ${PUBLICATION_NAME}
+
 Validate public prerelease access list
     [Tags]  HappyPath
     user opens details dropdown  Download associated files
@@ -190,10 +282,9 @@ Validate public prerelease access list
     user waits until h2 is visible  Pre-release access list
     user waits until page contains  Updated test public access list
 
-Go back to prerelease page
+Go back to prerelease page again
     [Tags]  HappyPath
     user clicks link  Back
-
     user checks breadcrumb count should be   2
     user checks nth breadcrumb contains   1    Home
     user checks nth breadcrumb contains   2    Pre-release access
@@ -216,6 +307,49 @@ Validate prerelease has started for Analyst user
     user waits until element contains  id:releaseSummary  Test summary text for ${PUBLICATION_NAME}
     user waits until element contains  id:releaseHeadlines  Test headlines summary text for ${PUBLICATION_NAME}
 
+Validate public metdata guidance for Analyst user
+    [Tags]  HappyPath
+    user opens details dropdown  Download associated files
+    user clicks link  Metadata guidance
+
+    user checks breadcrumb count should be   2
+    user checks nth breadcrumb contains   1    Home
+    user checks nth breadcrumb contains   2    Metadata guidance document
+
+    user waits until page contains title caption  Calendar Year 2000
+    user waits until h1 is visible  ${PUBLICATION_NAME}
+
+    user waits until h2 is visible  Metadata guidance document
+    user waits until page contains  Test metadata guidance content
+
+    user waits until page contains accordion section  UI test subject
+    user checks there are x accordion sections  1
+
+    user opens accordion section  UI test subject
+    user checks summary list contains  Filename             upload-file-test.csv
+    user checks summary list contains  Geographic levels
+    ...  Local Authority; Local Authority District; Local Enterprise Partnership; Opportunity Area; Parliamentary Constituency; Regional; RSC Region; Ward
+    user checks summary list contains  Time period          2005 to 2020
+    user checks summary list contains  Content              Test file guidance content
+
+    user opens details dropdown  Variable names and descriptions
+
+    user checks table column heading contains  1  1  Variable name
+    user checks table column heading contains  1  2  Variable description
+
+    user checks results table cell contains  1  1   admission_numbers
+    user checks results table cell contains  1  2   Admission Numbers
+
+Go back to prerelease page as Analyst user
+    [Tags]  HappyPath
+    user clicks link  Back
+    user checks breadcrumb count should be   2
+    user checks nth breadcrumb contains   1    Home
+    user checks nth breadcrumb contains   2    Pre-release access
+
+    user waits until page contains title caption  Calendar Year 2000
+    user waits until h1 is visible  ${PUBLICATION_NAME}
+
 Validate public prerelease access list for Analyst user
     [Tags]  HappyPath
     user opens details dropdown  Download associated files
@@ -231,7 +365,7 @@ Validate public prerelease access list for Analyst user
     user waits until h2 is visible  Pre-release access list
     user waits until page contains  Updated test public access list
 
-Go back to prerelease page for Analyst user
+Go back to prerelease page again as Analyst user
     [Tags]  HappyPath
     user clicks link  Back
 

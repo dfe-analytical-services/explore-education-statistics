@@ -52,7 +52,6 @@ using Notify.Client;
 using Notify.Interfaces;
 using FootnoteService = GovUk.Education.ExploreEducationStatistics.Admin.Services.FootnoteService;
 using IFootnoteService = GovUk.Education.ExploreEducationStatistics.Admin.Services.Interfaces.IFootnoteService;
-using IHostingEnvironment = Microsoft.Extensions.Hosting.IHostingEnvironment;
 using IReleaseService = GovUk.Education.ExploreEducationStatistics.Admin.Services.Interfaces.IReleaseService;
 using ReleaseService = GovUk.Education.ExploreEducationStatistics.Admin.Services.ReleaseService;
 
@@ -60,14 +59,14 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin
 {
     public class Startup
     {
-        public Startup(IConfiguration configuration, IHostingEnvironment hostingEnvironment)
+        private IConfiguration Configuration { get; }
+        private IHostEnvironment HostEnvironment { get; }
+
+        public Startup(IConfiguration configuration, IHostEnvironment hostEnvironment)
         {
             Configuration = configuration;
-            HostingEnvironment = hostingEnvironment;
+            HostEnvironment = hostEnvironment;
         }
-
-        public IConfiguration Configuration { get; }
-        public IHostingEnvironment HostingEnvironment { get; }
 
         // This method gets called by the runtime. Use this method to add services to the container.
         public void ConfigureServices(IServiceCollection services)
@@ -86,21 +85,21 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin
                 options
                     .UseSqlServer(Configuration.GetConnectionString("ContentDb"),
                         builder => builder.MigrationsAssembly(typeof(Startup).Assembly.FullName))
-                    .EnableSensitiveDataLogging(HostingEnvironment.IsDevelopment())
+                    .EnableSensitiveDataLogging(HostEnvironment.IsDevelopment())
             );
 
             services.AddDbContext<ContentDbContext>(options =>
                 options
                     .UseSqlServer(Configuration.GetConnectionString("ContentDb"),
                         builder => builder.MigrationsAssembly(typeof(Startup).Assembly.FullName))
-                    .EnableSensitiveDataLogging(HostingEnvironment.IsDevelopment())
+                    .EnableSensitiveDataLogging(HostEnvironment.IsDevelopment())
             );
 
             services.AddDbContext<StatisticsDbContext>(options =>
                 options
                     .UseSqlServer(Configuration.GetConnectionString("StatisticsDb"),
                         builder => builder.MigrationsAssembly("GovUk.Education.ExploreEducationStatistics.Data.Model"))
-                    .EnableSensitiveDataLogging(HostingEnvironment.IsDevelopment())
+                    .EnableSensitiveDataLogging(HostEnvironment.IsDevelopment())
             );
 
             // remove default Microsoft remapping of the name of the OpenID "roles" claim mapping
@@ -113,7 +112,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin
                 .AddEntityFrameworkStores<UsersAndRolesDbContext>()
                 .AddDefaultTokenProviders();
 
-            if (HostingEnvironment.IsDevelopment())
+            if (HostEnvironment.IsDevelopment())
             {
                 services
                     .AddIdentityServer(options =>
@@ -248,7 +247,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin
             {
                 var notifyApiKey = Configuration.GetValue<string>("NotifyApiKey");
 
-                if (!HostingEnvironment.IsDevelopment())
+                if (!HostEnvironment.IsDevelopment())
                 {
                     return new NotificationClient(notifyApiKey);
                 }
@@ -277,6 +276,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin
             services.AddTransient<IIndicatorService, IndicatorService>();
             services.AddTransient<ILocationService, LocationService>();
             services.AddTransient<IMetaGuidanceService, MetaGuidanceService>();
+            services.AddTransient<IMetaGuidanceSubjectService, MetaGuidanceSubjectService>();
             services.AddTransient<IObservationService, ObservationService>();
             services.AddTransient<IReleaseMetaService, ReleaseMetaService>();
             services.AddTransient<IReleaseNoteService, ReleaseNoteService>();

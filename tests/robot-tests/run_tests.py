@@ -10,6 +10,7 @@ import argparse
 import cProfile
 import json
 import os
+import platform
 import pstats
 import shutil
 import datetime
@@ -117,9 +118,10 @@ timeout = 30
 implicit_wait = 5
 
 # Install chromedriver and add it to PATH
+chromedriver_filename = 'chromedriver.exe' if platform.system() == "Windows" else 'chromedriver'
 pyderman.install(file_directory='./webdriver/',
-                 filename='chromedriver',
-                 verbose=False,
+                 filename=chromedriver_filename,
+                 verbose=True,
                  chmod=True,
                  overwrite=False,
                  version=args.chromedriver_version)

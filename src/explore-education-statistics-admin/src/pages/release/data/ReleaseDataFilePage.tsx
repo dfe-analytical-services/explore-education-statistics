@@ -1,6 +1,6 @@
 import Link from '@admin/components/Link';
-import DataFileReplacementPlan from '@admin/pages/release/data/components/DataFileReplacementPlan';
 import DataFileDetailsTable from '@admin/pages/release/data/components/DataFileDetailsTable';
+import DataFileReplacementPlan from '@admin/pages/release/data/components/DataFileReplacementPlan';
 import DataFileUploadForm from '@admin/pages/release/data/components/DataFileUploadForm';
 import {
   releaseDataFileReplacementCompleteRoute,
@@ -11,6 +11,7 @@ import {
 import releaseDataFileService, {
   DataFile,
 } from '@admin/services/releaseDataFileService';
+import Button from '@common/components/Button';
 import LoadingSpinner from '@common/components/LoadingSpinner';
 import WarningMessage from '@common/components/WarningMessage';
 import useAsyncHandledRetry from '@common/hooks/useAsyncHandledRetry';
@@ -53,6 +54,27 @@ const ReleaseDataFilePage = ({
         <WarningMessage>
           There was a problem loading the data replacement information.
         </WarningMessage>
+      );
+    }
+
+    if (replacementDataFile?.status === 'FAILED') {
+      return (
+        <>
+          <WarningMessage>
+            Replacement data file import failed. Please cancel and try again.
+          </WarningMessage>
+          <Button
+            onClick={async () => {
+              await releaseDataFileService.deleteDataFiles(
+                releaseId,
+                replacementDataFile.id,
+              );
+              fetchDataFile();
+            }}
+          >
+            Cancel data replacement
+          </Button>
+        </>
       );
     }
 

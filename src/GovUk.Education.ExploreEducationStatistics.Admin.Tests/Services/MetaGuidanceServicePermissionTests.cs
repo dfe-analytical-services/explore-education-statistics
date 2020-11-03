@@ -7,7 +7,7 @@ using GovUk.Education.ExploreEducationStatistics.Common.Utils;
 using GovUk.Education.ExploreEducationStatistics.Content.Model;
 using GovUk.Education.ExploreEducationStatistics.Content.Model.Database;
 using GovUk.Education.ExploreEducationStatistics.Data.Model.Database;
-using GovUk.Education.ExploreEducationStatistics.Data.Model.Services.Interfaces;
+using GovUk.Education.ExploreEducationStatistics.Data.Services.Interfaces;
 using Moq;
 using Xunit;
 
@@ -35,7 +35,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
         }
 
         [Fact]
-        public void UpdateRelease()
+        public void Update()
         {
             PermissionTestUtil.PolicyCheckBuilder()
                 .ExpectResourceCheckToFail(_release, SecurityPolicies.CanUpdateSpecificRelease)
@@ -43,42 +43,24 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
                     userService =>
                     {
                         var service = SetupMetaGuidanceService(userService: userService.Object);
-                        return service.UpdateRelease(_release.Id, new MetaGuidanceUpdateReleaseViewModel());
+                        return service.Update(_release.Id, new MetaGuidanceUpdateViewModel());
                     }
                 );
         }
 
-        [Fact]
-        public void UpdateSubject()
-        {
-            PermissionTestUtil.PolicyCheckBuilder()
-                .ExpectResourceCheckToFail(_release, SecurityPolicies.CanUpdateSpecificRelease)
-                .AssertForbidden(
-                    userService =>
-                    {
-                        var service = SetupMetaGuidanceService(userService: userService.Object);
-                        return service.UpdateSubject(_release.Id, Guid.NewGuid(),
-                            new MetaGuidanceUpdateSubjectViewModel());
-                    }
-                );
-        }
 
         private MetaGuidanceService SetupMetaGuidanceService(
             ContentDbContext contentDbContext = null,
             StatisticsDbContext statisticsDbContext = null,
             IPersistenceHelper<ContentDbContext> contentPersistenceHelper = null,
-            IFilterService filterService = null,
-            IIndicatorService indicatorService = null,
-            IPersistenceHelper<StatisticsDbContext> statisticsPersistenceHelper = null,
+            IMetaGuidanceSubjectService metaGuidanceSubjectService = null,
             IUserService userService = null)
         {
             return new MetaGuidanceService(
                 contentDbContext ?? new Mock<ContentDbContext>().Object,
                 contentPersistenceHelper ?? DefaultPersistenceHelperMock().Object,
-                filterService ?? new Mock<IFilterService>().Object,
-                indicatorService ?? new Mock<IIndicatorService>().Object,
+                metaGuidanceSubjectService ?? new Mock<IMetaGuidanceSubjectService>().Object,
                 statisticsDbContext ?? new Mock<StatisticsDbContext>().Object,
-                statisticsPersistenceHelper ?? new PersistenceHelper<StatisticsDbContext>(statisticsDbContext),
                 userService ?? new Mock<IUserService>().Object
             );
         }

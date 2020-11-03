@@ -31,7 +31,7 @@ Upload a ZIP file subject
     user enters text into element   id:dataFileUploadForm-subjectTitle    Absence in PRUs
     user clicks radio    ZIP file
     user waits until page contains element  id:dataFileUploadForm-zipFile
-    user chooses file   id:dataFileUploadForm-zipFile    ${CURDIR}${/}files${/}upload-zip-test.zip
+    user chooses file   id:dataFileUploadForm-zipFile    ${FILES_DIR}upload-zip-test.zip
     user clicks button   Upload data files
 
     user waits until h2 is visible   Uploaded data files
@@ -55,25 +55,25 @@ Check Absence in PRUs subject appears in 'Data blocks' page
 
     user waits until page contains  Absence in PRUs
 
-Navigate to 'Data and files' page - 'File uploads' tab
+Navigate to 'Data and files' page - 'Ancillary file uploads' tab
     [Tags]  HappyPath
     user clicks link  Data and files
     user waits until h2 is visible   Add data file to release
-    user clicks link  File uploads
+    user clicks link  Ancillary file uploads
     user waits until h2 is visible  Add file to release
     user waits until page contains  No files have been uploaded
 
 Validate cannot upload empty file
     [Tags]  HappyPath
     user enters text into element  id:fileUploadForm-name   Empty test
-    user chooses file   id:fileUploadForm-file      ${CURDIR}${/}files${/}empty-file.txt
+    user chooses file   id:fileUploadForm-file      ${FILES_DIR}empty-file.txt
     user clicks button  Upload file
     user waits until page contains  Choose a file that is not empty
 
 Upload multiple files
     [Tags]  HappyPath
     user enters text into element  id:fileUploadForm-name   Test 1
-    user chooses file   id:fileUploadForm-file      ${CURDIR}${/}files${/}test-file-1.txt
+    user chooses file   id:fileUploadForm-file      ${FILES_DIR}test-file-1.txt
     user clicks button  Upload file
 
     user waits until page contains accordion section   test 1
@@ -85,7 +85,7 @@ Upload multiple files
     user checks summary list contains  File size    12 B                ${section_1}
 
     user enters text into element  id:fileUploadForm-name   Test 2
-    user chooses file   id:fileUploadForm-file      ${CURDIR}${/}files${/}test-file-2.txt
+    user chooses file   id:fileUploadForm-file      ${FILES_DIR}test-file-2.txt
     user clicks button  Upload file
 
     user waits until page contains accordion section   test 2

@@ -53,13 +53,13 @@ Search for "pupil"
     [Tags]  HappyPath
     user verifies accordion is closed  1. Overview of absence statistics
 
-    user clicks element   css:#pageSearchForm-input
+    user clicks element   id:pageSearchForm-input
     user presses keys  pupil
     user waits until element contains   xpath://*[@id="pageSearchForm-resultsLabel"]   Found 127 results
-    user clicks element   css:#pageSearchForm-option-0
+    user clicks element   id:pageSearchForm-option-0
 
     user verifies accordion is open  1. Overview of absence statistics
-    user waits until element is visible  css:#section1-1
+    user waits until element is visible  id:section1-1
     user waits until page contains    All maintained schools are required to provide 2 possible sessions per day,
 
 Search for "specific enquiry"
@@ -67,11 +67,10 @@ Search for "specific enquiry"
     [Tags]  HappyPath
     user verifies accordion is closed  7. Contacts
 
-    user clears element text    css:#pageSearchForm-input
-    user clicks element   css:#pageSearchForm-input
-    user presses keys  specific enquiry
+    user clears element text    id:pageSearchForm-input
+    user presses keys  specific enquiry   id:pageSearchForm-input
     user waits until element contains     xpath://*[@id="pageSearchForm-resultsLabel"]   Found 1 result
-    user clicks element   css:#pageSearchForm-option-0
+    user clicks element   id:pageSearchForm-option-0
 
     user verifies accordion is open  7. Contacts
     user checks page contains   If you have a specific enquiry about absence and exclusion statistics and

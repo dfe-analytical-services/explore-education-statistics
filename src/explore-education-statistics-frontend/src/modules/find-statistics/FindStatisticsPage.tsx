@@ -1,24 +1,18 @@
-import Accordion from '@common/components/Accordion';
 import AccordionSection from '@common/components/AccordionSection';
 import Details from '@common/components/Details';
 import RelatedInformation from '@common/components/RelatedInformation';
-import { contentApi } from '@common/services/api';
+import themeService, { Theme } from '@common/services/themeService';
 import Link from '@frontend/components/Link';
 import Page from '@frontend/components/Page';
 import PageSearchFormWithAnalytics from '@frontend/components/PageSearchFormWithAnalytics';
 import { GetServerSideProps, NextPage } from 'next';
 import React from 'react';
+import { logEvent } from '@frontend/services/googleAnalyticsService';
+import Accordion from '@common/components/Accordion';
 import PublicationList from './components/PublicationList';
-import { Topic } from './components/TopicList';
 
 interface Props {
-  themes: {
-    id: string;
-    slug: string;
-    title: string;
-    summary: string;
-    topics: Topic[];
-  }[];
+  themes: Theme[];
 }
 
 const FindStatisticsPage: NextPage<Props> = ({ themes = [] }) => {
@@ -59,7 +53,16 @@ const FindStatisticsPage: NextPage<Props> = ({ themes = [] }) => {
       </div>
 
       {themes.length > 0 ? (
-        <Accordion id="publications">
+        <Accordion
+          id="publications"
+          onSectionOpen={accordionSection => {
+            logEvent(
+              'Find statistics and data',
+              'Publications accordion opened',
+              accordionSection.title,
+            );
+          }}
+        >
           {themes.map(
             ({
               id: themeId,
@@ -95,7 +98,7 @@ const FindStatisticsPage: NextPage<Props> = ({ themes = [] }) => {
 };
 
 export const getServerSideProps: GetServerSideProps<Props> = async () => {
-  const themes = await contentApi.get<Props['themes']>('/content/tree');
+  const themes = await themeService.getThemes();
 
   return {
     props: {

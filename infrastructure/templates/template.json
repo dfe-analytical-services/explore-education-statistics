@@ -94,6 +94,18 @@
         "description": "Firewall restrictions for storage accounts, string array"
       }
     },
+    "sqlPublicContentApiUser": {
+      "type": "securestring",
+      "metadata": {
+        "description": "The username of the content api for the public SQL Server"
+      }
+    },
+    "sqlPublicContentApiPassword": {
+      "type": "securestring",
+      "metadata": {
+        "description": "The password of the content api user of the public SQL Server"
+      }
+    },
     "sqlPublicDataApiUser": {
       "type": "securestring",
       "metadata": {
@@ -826,6 +838,11 @@
             ]
           },
           "connectionStrings": [
+            {
+              "name": "StatisticsDb",
+              "type": "SQLAzure",
+              "connectionString": "[concat('Data Source=tcp:', reference(concat('Microsoft.Sql/servers/', variables('publicSqlServerName'))).fullyQualifiedDomainName, ',1433;Initial Catalog=', 'public-statistics', ';User Id=', parameters('sqlPublicContentApiUser'), '@', reference(concat('Microsoft.Sql/servers/', variables('publicSqlServerName'))).fullyQualifiedDomainName, ';Password=', parameters('sqlPublicContentApiPassword'), ';')]"
+            }
           ]
         }
       },
@@ -1397,7 +1414,7 @@
             "DeploymentRepo": "[parameters('deploymentRepo')]",
             "DeploymentScript": "[parameters('deploymentScript')]"
           },
-          "apiVersion": "2015-01-01",
+          "apiVersion": "2020-08-01-preview",
           "dependsOn": [
             "[variables('sqlserverName')]"
           ],
@@ -1425,7 +1442,7 @@
             "DeploymentRepo": "[parameters('deploymentRepo')]",
             "DeploymentScript": "[parameters('deploymentScript')]"
           },
-          "apiVersion": "2015-01-01",
+          "apiVersion": "2020-08-01-preview",
           "dependsOn": [
             "[variables('sqlserverName')]"
           ],
@@ -1620,7 +1637,7 @@
             "DeploymentRepo": "[parameters('deploymentRepo')]",
             "DeploymentScript": "[parameters('deploymentScript')]"
           },
-          "apiVersion": "2015-01-01",
+          "apiVersion": "2020-08-01-preview",
           "dependsOn": [
             "[variables('publicSqlServerName')]"
           ],

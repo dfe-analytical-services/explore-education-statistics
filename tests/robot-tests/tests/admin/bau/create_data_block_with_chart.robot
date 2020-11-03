@@ -28,8 +28,8 @@ Upload subject
     user clicks link  Data and files
     user waits until h2 is visible  Add data file to release
     user enters text into element  id:dataFileUploadForm-subjectTitle   UI test subject
-    user chooses file   id:dataFileUploadForm-dataFile       ${CURDIR}${/}files${/}upload-file-test.csv
-    user chooses file   id:dataFileUploadForm-metadataFile   ${CURDIR}${/}files${/}upload-file-test.meta.csv
+    user chooses file   id:dataFileUploadForm-dataFile       ${FILES_DIR}upload-file-test.csv
+    user chooses file   id:dataFileUploadForm-metadataFile   ${FILES_DIR}upload-file-test.meta.csv
     user clicks button  Upload data files
 
     user waits until h2 is visible  Uploaded data files
@@ -561,7 +561,7 @@ Configure basic infographic chart
     user clicks link  Chart
     user waits until h3 is visible  Choose chart type
     user clicks button  Choose an infographic as alternative
-    user chooses file  id:chartConfigurationForm-file  ${CURDIR}${/}files${/}test-infographic.png
+    user chooses file  id:chartConfigurationForm-file  ${FILES_DIR}test-infographic.png
 
 Validate basic infographic chart preview
     [Tags]  HappyPath

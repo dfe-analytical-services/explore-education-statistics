@@ -102,7 +102,8 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
             IMapper mapper = null,
             IUserService userService = null,
             IReleaseSubjectService releaseSubjectService = null,
-            IReleaseFilesService releaseFilesService = null)
+            IReleaseFilesService releaseFilesService = null,
+            IPublishingService publishingService = null)
         {
             return new TopicService(
                 contentContext ?? new Mock<ContentDbContext>().Object,
@@ -111,7 +112,8 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
                 mapper ?? AdminMapper(),
                 userService ?? MockUtils.AlwaysTrueUserService().Object,
                 releaseSubjectService ?? new Mock<IReleaseSubjectService>().Object,
-                releaseFilesService ?? new Mock<IReleaseFilesService>().Object
+                releaseFilesService ?? new Mock<IReleaseFilesService>().Object,
+                publishingService ?? new Mock<IPublishingService>().Object
             );
         }
     }

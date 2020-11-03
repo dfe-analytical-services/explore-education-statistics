@@ -18,7 +18,6 @@ export interface EditableSectionBlockProps extends SectionBlocksProps {
   content: EditableBlock[];
   sectionId: string;
   isReordering?: boolean;
-  allowHeadings?: boolean;
   allowComments?: boolean;
   onBlocksChange?: (nextBlocks: EditableBlock[]) => void;
   onBlockContentSave: (blockId: string, content: string) => void;
@@ -32,7 +31,6 @@ const EditableSectionBlocks = (props: EditableSectionBlockProps) => {
     content = [],
     sectionId,
     isReordering = false,
-    allowHeadings,
     allowComments = false,
     getInfographic,
     onBlockContentSave,
@@ -107,7 +105,6 @@ const EditableSectionBlocks = (props: EditableSectionBlockProps) => {
                 releaseId={releaseId}
                 block={block}
                 editable={!isReordering && !isBrowser('IE')}
-                allowHeadings={allowHeadings}
                 getInfographic={getInfographic}
                 onContentSave={onBlockContentSave}
                 onDelete={onBlockDelete}

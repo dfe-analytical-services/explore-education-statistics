@@ -19,14 +19,14 @@ Select "Pupil absence" publication
     user opens details dropdown    Pupils and schools
     user opens details dropdown    Pupil absence
     user clicks radio      Pupil absence in schools in England
-    user clicks element    css:#publicationForm-submit
+    user clicks element    id:publicationForm-submit
     user waits until h2 is visible  Choose a subject
     user checks previous table tool step contains  1   Publication   Pupil absence in schools in England
 
 Select subject "Absence in prus"
     [Tags]  HappyPath
     user clicks radio   Absence in prus
-    user clicks element   css:#publicationSubjectForm-submit
+    user clicks element   id:publicationSubjectForm-submit
     user waits until h2 is visible  Choose locations
     user checks previous table tool step contains  2    Subject     Absence in prus
 
@@ -34,7 +34,7 @@ Select Location Country, England
     [Tags]  HappyPath
     user opens details dropdown     National
     user clicks checkbox    England
-    user clicks element     css:#locationFiltersForm-submit
+    user clicks element     id:locationFiltersForm-submit
     user waits until h2 is visible  Choose time period
     user checks previous table tool step contains  3   National     England
 
@@ -42,7 +42,7 @@ Select Start date and End date
     [Tags]  HappyPath
     user selects from list by label  id:timePeriodForm-start   2013/14
     user selects from list by label  id:timePeriodForm-end     2016/17
-    user clicks element     css:#timePeriodForm-submit
+    user clicks element     id:timePeriodForm-submit
     user waits until h2 is visible  Choose your filters
     user waits until page contains element   id:filtersForm-indicators
     user checks previous table tool step contains  4    Start date    2013/14
@@ -55,7 +55,7 @@ Select Indicators
 
 Create table
     [Tags]  HappyPath
-    user clicks element     css:#filtersForm-submit
+    user clicks element     id:filtersForm-submit
     user waits until results table appears     60
     user waits until page contains element   xpath://*[@data-testid="dataTableCaption" and text()="Table showing Number of schools for 'Absence in prus' from 'Pupil absence in schools in England' in England between 2013/14 and 2016/17"]
 
@@ -98,7 +98,7 @@ Select locations LAs Barnet, Barnsley, Bedford
     user clicks checkbox            Barnsley
     user clicks checkbox            Bedford
 
-    user clicks element   css:#locationFiltersForm-submit
+    user clicks element   id:locationFiltersForm-submit
     user waits until h2 is visible  Choose time period
     user checks previous table tool step contains  3    Local Authority    Barnet
     user checks previous table tool step contains  3    Local Authority    Barnsley
@@ -108,7 +108,7 @@ Select new start and end date
     [Tags]   HappyPath
     user selects from list by label  id:timePeriodForm-start   2014/15
     user selects from list by label  id:timePeriodForm-end     2015/16
-    user clicks element     css:#timePeriodForm-submit
+    user clicks element     id:timePeriodForm-submit
     user waits until h2 is visible  Choose your filters
     user waits until page contains element   id:filtersForm-indicators
     user checks previous table tool step contains  4    Start date    2014/15
@@ -130,7 +130,7 @@ Verify indicator Number of schools is still selected
 
 Create table again
     [Tags]   HappyPath
-    user clicks element    css:#filtersForm-submit
+    user clicks element    id:filtersForm-submit
     user waits until results table appears    60
     user waits until page contains element   xpath://*[@data-testid="dataTableCaption" and text()="Table showing 'Absence in prus' from 'Pupil absence in schools in England' in Barnet, Barnsley and Bedford between 2014/15 and 2015/16"]
 

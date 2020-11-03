@@ -92,7 +92,9 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Mappings
                     m => m.MapFrom(p => p.Topic.ThemeId))
                 .ForMember(dest => dest.Releases,
                     m => m.MapFrom(p => p.Releases
-                        .FindAll(r => IsLatestVersionOfRelease(p.Releases, r.Id))))
+                        .FindAll(r => IsLatestVersionOfRelease(p.Releases, r.Id))
+                        .OrderByDescending(r => r.Year)
+                        .ThenByDescending(r => r.TimePeriodCoverage)))
                 .ForMember(dest => dest.Permissions, exp => exp.MapFrom<IMyPublicationPermissionSetPropertyResolver>());
 
             CreateMap<Contact, ContactViewModel>();
@@ -172,6 +174,9 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Mappings
                     m => m.MapFrom(r => r.Publication.LatestRelease().Id == r.Id))
                 .ForMember(dest => dest.CoverageTitle,
                     m => m.MapFrom(r => r.TimePeriodCoverage.GetEnumLabel()))
+                .ForMember(
+                    dest => dest.HasPreReleaseAccessList,
+                    m => m.MapFrom(r => !r.PreReleaseAccessList.IsNullOrEmpty()))
                 .ForMember(model => model.PublishScheduled,
                     m => m.MapFrom(model =>
                         model.PublishScheduled.HasValue

@@ -42,7 +42,6 @@ const basicRelease: EditableRelease = {
     legacyReleases: [],
     dataSource: '',
     description: '',
-    nextUpdate: '',
     summary: '',
     topic: { theme: { title: 'Children, early years and social care' } },
     contact: {
@@ -296,11 +295,15 @@ const basicRelease: EditableRelease = {
     {
       id: 'download-1',
       extension: 'csv',
+      fileName: 'prma.csv',
       name: 'prma',
       path: '6a97c9b6-eaa2-4d22-7ba9-08d7bec1ba1a/data/prma.csv',
       size: '268 Kb',
+      type: 'Data',
     },
   ],
+  hasPreReleaseAccessList: false,
+  hasMetaGuidance: true,
   publishScheduled: '2020-03-03T00:00:00',
   nextReleaseDate: { year: 2020, month: 3, day: 4 },
   relatedInformation: [],

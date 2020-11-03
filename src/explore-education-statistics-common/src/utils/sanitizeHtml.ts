@@ -1,6 +1,12 @@
+import { Dictionary } from '@common/types';
 import sanitize from 'sanitize-html';
 
-const config: sanitize.IOptions = {
+export type SanitizeHtmlOptions = {
+  allowedTags?: string[];
+  allowedAttributes?: Dictionary<string[]>;
+};
+
+export const defaultSanitizeOptions: SanitizeHtmlOptions = {
   allowedTags: [
     'p',
     'h2',
@@ -8,6 +14,7 @@ const config: sanitize.IOptions = {
     'h4',
     'h5',
     'strong',
+    'em',
     'i',
     'a',
     'ul',
@@ -34,6 +41,9 @@ const config: sanitize.IOptions = {
   },
 };
 
-export default function sanitizeHtml(dirtyHtml: string): string {
-  return sanitize(dirtyHtml, config);
+export default function sanitizeHtml(
+  dirtyHtml: string,
+  options: SanitizeHtmlOptions = defaultSanitizeOptions,
+): string {
+  return sanitize(dirtyHtml, options);
 }
