@@ -11,7 +11,21 @@ interface Props {
 }
 
 const ReleaseMetaGuidanceDataFile = ({ subject, renderContent }: Props) => {
-  const { filename, geographicLevels, timePeriods, variables } = subject;
+  const { filename, variables } = subject;
+
+  const geographicLevels = useMemo(() => subject.geographicLevels.join('; '), [
+    subject.geographicLevels,
+  ]);
+
+  const timePeriod = useMemo(() => {
+    const { from, to } = subject.timePeriods;
+
+    if (from && to) {
+      return from === to ? from : `${from} to ${to}`;
+    }
+
+    return from || to;
+  }, [subject.timePeriods]);
 
   const contentItem = useMemo(() => {
     if (typeof renderContent === 'function') {
@@ -40,12 +54,14 @@ const ReleaseMetaGuidanceDataFile = ({ subject, renderContent }: Props) => {
     <>
       <SummaryList className="govuk-!-margin-bottom-6">
         <SummaryListItem term="Filename">{filename}</SummaryListItem>
-        <SummaryListItem term="Geographic levels">
-          {geographicLevels.join('; ')}
-        </SummaryListItem>
-        <SummaryListItem term="Time period">
-          {`${timePeriods.from} to ${timePeriods.to}`}
-        </SummaryListItem>
+        {geographicLevels && (
+          <SummaryListItem term="Geographic levels">
+            {geographicLevels}
+          </SummaryListItem>
+        )}
+        {timePeriod && (
+          <SummaryListItem term="Time period">{timePeriod}</SummaryListItem>
+        )}
         {contentItem}
       </SummaryList>
 

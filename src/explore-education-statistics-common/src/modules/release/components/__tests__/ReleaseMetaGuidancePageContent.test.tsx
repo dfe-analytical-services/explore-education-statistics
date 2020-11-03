@@ -180,6 +180,75 @@ describe('ReleaseMetaGuidancePageContent', () => {
     expect(section2VariableRow2Cells[1]).toHaveTextContent('Indicator 2');
   });
 
+  test('renders single time period when `from` and `to` are the same', () => {
+    render(
+      <ReleaseMetaGuidancePageContent
+        metaGuidance="Test meta guidance content"
+        subjects={[
+          {
+            ...testSubjectMetaGuidance[0],
+            timePeriods: {
+              from: '2020',
+              to: '2020',
+            },
+          },
+        ]}
+      />,
+    );
+
+    const subjects = screen.getAllByTestId('accordionSection');
+
+    const subject1 = within(subjects[0]);
+
+    expect(subject1.queryByTestId('Time period')).toHaveTextContent('2020');
+    expect(subject1.queryByTestId('Time period')).not.toHaveTextContent(
+      '2020 to 2020',
+    );
+  });
+
+  test('does not render empty geographic levels', () => {
+    render(
+      <ReleaseMetaGuidancePageContent
+        metaGuidance="Test meta guidance content"
+        subjects={[
+          {
+            ...testSubjectMetaGuidance[0],
+            geographicLevels: [],
+          },
+        ]}
+      />,
+    );
+
+    const subjects = screen.getAllByTestId('accordionSection');
+
+    expect(
+      within(subjects[0]).queryByTestId('Geographic levels'),
+    ).not.toBeInTheDocument();
+  });
+
+  test('does not render empty time periods', () => {
+    render(
+      <ReleaseMetaGuidancePageContent
+        metaGuidance="Test meta guidance content"
+        subjects={[
+          {
+            ...testSubjectMetaGuidance[0],
+            timePeriods: {
+              from: '',
+              to: '',
+            },
+          },
+        ]}
+      />,
+    );
+
+    const subjects = screen.getAllByTestId('accordionSection');
+
+    expect(
+      within(subjects[0]).queryByTestId('Time periods'),
+    ).not.toBeInTheDocument();
+  });
+
   test('does not render empty file content', () => {
     render(
       <ReleaseMetaGuidancePageContent
