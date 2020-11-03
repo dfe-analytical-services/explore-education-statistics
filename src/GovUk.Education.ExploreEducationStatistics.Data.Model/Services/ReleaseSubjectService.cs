@@ -18,38 +18,40 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Model.Services
             _footnoteService = footnoteService;
         }
 
-        public async Task SoftDeleteAllSubjectsOrBreakReleaseLinks(Guid releaseId)
+        public async Task SoftDeleteAllReleaseSubjects(Guid releaseId)
         {
-            await DeleteAllSubjectsOrBreakReleaseLinks(releaseId, true);
+            await DeleteAllReleaseSubjects(releaseId, true);
         }
 
-        public async Task SoftDeleteSubjectOrBreakReleaseLink(Guid releaseId, Guid subjectId)
+        public async Task SoftDeleteReleaseSubject(Guid releaseId, Guid subjectId)
         {
-            await DeleteSubjectOrBreakReleaseLink(releaseId, subjectId, true);
+            await DeleteReleaseSubject(releaseId, subjectId, true);
         }
 
-        public async Task DeleteAllSubjectsOrBreakReleaseLinks(Guid releaseId, bool isSoftDelete = false)
+        public async Task DeleteAllReleaseSubjects(Guid releaseId, bool softDeleteOrphanedSubjects = false)
         {
             var subjectIds = await _statisticsDbContext.ReleaseSubject
                 .Include(rs => rs.Subject)
-                .Where(rs => rs.ReleaseId == releaseId).Select(rs => rs.SubjectId).ToListAsync();
+                .Where(rs => rs.ReleaseId == releaseId)
+                .Select(rs => rs.SubjectId)
+                .ToListAsync();
 
             foreach (var id in subjectIds)
             {
-                await DeleteSubjectOrBreakReleaseLink(releaseId, id, isSoftDelete);
+                await DeleteReleaseSubject(releaseId, id, softDeleteOrphanedSubjects);
             }
         }
 
-        public async Task DeleteSubjectOrBreakReleaseLink(Guid releaseId, Guid subjectId, bool isSoftDelete = false)
+        public async Task DeleteReleaseSubject(Guid releaseId, Guid subjectId, bool softDeleteOrphanedSubject = false)
         {
-            await RemoveReleaseSubjectLinkIfExists(releaseId, subjectId);
+            await DetachReleaseFromSubject(releaseId, subjectId);
             await _footnoteService.DeleteAllFootnotesBySubject(releaseId, subjectId);
-            await DeleteSubjectIfOrphanedAndExists(subjectId, isSoftDelete);
+            await DeleteSubjectIfOrphaned(subjectId, softDeleteOrphanedSubject);
 
             await _statisticsDbContext.SaveChangesAsync();
         }
 
-        private async Task RemoveReleaseSubjectLinkIfExists(Guid releaseId, Guid subjectId)
+        private async Task DetachReleaseFromSubject(Guid releaseId, Guid subjectId)
         {
             var releaseSubject = await _statisticsDbContext
                 .ReleaseSubject
@@ -61,12 +63,12 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Model.Services
             }
         }
 
-        private async Task DeleteSubjectIfOrphanedAndExists(Guid subjectId, bool isSoftDelete)
+        private async Task DeleteSubjectIfOrphaned(Guid subjectId, bool isSoftDelete)
         {
             var subject = await _statisticsDbContext.Subject
                 .FirstOrDefaultAsync(s => s.Id == subjectId);
 
-            if (CanDeleteSubject(subject))
+            if (IsSubjectOrphaned(subject))
             {
                 if (isSoftDelete)
                 {
@@ -85,7 +87,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Model.Services
             }
         }
 
-        private bool CanDeleteSubject(Subject subject)
+        private bool IsSubjectOrphaned(Subject subject)
         {
             return subject != null
                    && _statisticsDbContext.ReleaseSubject.Count(rs => rs.SubjectId == subject.Id) < 2;

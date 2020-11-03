@@ -178,7 +178,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Publisher.Services
 
             foreach (var previousVersion in previousVersions)
             {
-                await _releaseSubjectService.SoftDeleteAllSubjectsOrBreakReleaseLinks(previousVersion);
+                await _releaseSubjectService.SoftDeleteAllReleaseSubjects(previousVersion);
             }
 
             // Remove Statistical Releases for each of the Content Releases

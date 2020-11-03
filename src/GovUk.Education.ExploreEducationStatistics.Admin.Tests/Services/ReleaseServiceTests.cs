@@ -355,7 +355,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
             releaseDataFileService.Setup(service => service.Delete(release.Id, file.Id, false))
                 .ReturnsAsync(Unit.Instance);
 
-            releaseSubjectService.Setup(service => service.SoftDeleteSubjectOrBreakReleaseLink(release.Id, subject.Id))
+            releaseSubjectService.Setup(service => service.SoftDeleteReleaseSubject(release.Id, subject.Id))
                 .Returns(Task.CompletedTask);
 
                 await using (var context = InMemoryApplicationDbContext(contentDbContextId))
@@ -382,7 +382,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
                     Times.Once());
 
                 releaseSubjectService.Verify(
-                    mock => mock.SoftDeleteSubjectOrBreakReleaseLink(release.Id, subject.Id),
+                    mock => mock.SoftDeleteReleaseSubject(release.Id, subject.Id),
                     Times.Once());
 
                 Assert.True(result.IsRight);
@@ -525,7 +525,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
                 .ReturnsAsync(Unit.Instance);
 
             releaseSubjectService.Setup(service =>
-                    service.SoftDeleteSubjectOrBreakReleaseLink(release.Id, It.IsIn(subject.Id, replacementSubject.Id)))
+                    service.SoftDeleteReleaseSubject(release.Id, It.IsIn(subject.Id, replacementSubject.Id)))
                 .Returns(Task.CompletedTask);
 
             await using (var context = InMemoryApplicationDbContext(contentDbContextId))
@@ -559,7 +559,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
                         It.IsIn(file.Filename, replacementFile.Filename)), Times.Exactly(2));
 
                 releaseSubjectService.Verify(
-                    mock => mock.SoftDeleteSubjectOrBreakReleaseLink(release.Id,
+                    mock => mock.SoftDeleteReleaseSubject(release.Id,
                         It.IsIn(subject.Id, replacementSubject.Id)), Times.Exactly(2));
 
                 Assert.True(result.IsRight);

@@ -5,12 +5,12 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Model.Services.Interfa
 {
     public interface IReleaseSubjectService
     {
-        Task SoftDeleteAllSubjectsOrBreakReleaseLinks(Guid releaseId);
+        Task SoftDeleteAllReleaseSubjects(Guid releaseId);
 
-        Task SoftDeleteSubjectOrBreakReleaseLink(Guid releaseId, Guid subjectId);
+        Task SoftDeleteReleaseSubject(Guid releaseId, Guid subjectId);
 
-        Task DeleteAllSubjectsOrBreakReleaseLinks(Guid releaseId, bool isSoftDelete = false);
+        Task DeleteAllReleaseSubjects(Guid releaseId, bool softDeleteOrphanedSubjects = false);
 
-        Task DeleteSubjectOrBreakReleaseLink(Guid releaseId, Guid subjectId, bool isSoftDelete = false);
+        Task DeleteReleaseSubject(Guid releaseId, Guid subjectId, bool softDeleteOrphanedSubject = false);
     }
 }
