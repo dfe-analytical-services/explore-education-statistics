@@ -1059,7 +1059,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
                     .ReturnsAsync(
                         new ImportStatus
                         {
-                            Status = IStatus.RUNNING_PHASE_2,
+                            Status = IStatus.STAGE_2,
                         }
                     );
 
@@ -1101,7 +1101,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
                 Assert.Equal("test2@test.com", files[1].UserName);
                 Assert.Equal(400, files[1].Rows);
                 Assert.Equal("800 B", files[1].Size);
-                Assert.Equal(IStatus.RUNNING_PHASE_2, files[1].Status);
+                Assert.Equal(IStatus.STAGE_2, files[1].Status);
             }
         }
 
@@ -1366,7 +1366,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
                     .ReturnsAsync(
                         new ImportStatus
                         {
-                            Status = IStatus.RUNNING_PHASE_2,
+                            Status = IStatus.STAGE_2,
                         }
                     );
 
@@ -1397,7 +1397,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
                 Assert.Equal("test2@test.com", files[0].UserName);
                 Assert.Equal(400, files[0].Rows);
                 Assert.Equal("800 B", files[0].Size);
-                Assert.Equal(IStatus.RUNNING_PHASE_2, files[0].Status);
+                Assert.Equal(IStatus.STAGE_2, files[0].Status);
             }
         }
 

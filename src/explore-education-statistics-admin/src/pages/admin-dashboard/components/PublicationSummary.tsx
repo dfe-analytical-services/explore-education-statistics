@@ -168,10 +168,7 @@ const PublicationSummary = ({ publication, onChangePublication }: Props) => {
             <td colSpan={2} data-testid={`Releases for ${publication.title}`}>
               {releases.length > 0 ? (
                 <ul className="govuk-list">
-                  {orderBy(
-                    releases.filter(noAmendmentInProgressFilter),
-                    rel => rel.title,
-                  ).map(release => (
+                  {releases.filter(noAmendmentInProgressFilter).map(release => (
                     <li key={release.id}>
                       <NonScheduledReleaseSummary
                         onClickAmendRelease={setAmendReleaseId}

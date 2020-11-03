@@ -360,7 +360,7 @@ describe('ReleaseDataFilePage', () => {
       numberOfRows: 100,
     });
     releaseDataFileService.getDataFileImportStatus.mockResolvedValueOnce({
-      status: 'RUNNING_PHASE_1',
+      status: 'STAGE_1',
       numberOfRows: 110,
     });
 

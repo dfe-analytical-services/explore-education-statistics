@@ -18,6 +18,7 @@ using GovUk.Education.ExploreEducationStatistics.Data.Processor.Utils;
 using Microsoft.Azure.WebJobs;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.Logging;
+using static GovUk.Education.ExploreEducationStatistics.Common.Services.ImportStatusService;
 using static GovUk.Education.ExploreEducationStatistics.Data.Processor.Services.ValidationErrorMessages;
 using static GovUk.Education.ExploreEducationStatistics.Common.Validators.FileTypeValidationUtils;
 
@@ -55,15 +56,18 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Processor.Services
         private readonly ILogger<IValidatorService> _logger;
         private readonly IFileStorageService _fileStorageService;
         private readonly IFileTypeService _fileTypeService;
-
+        private readonly IImportStatusService _importStatusService;
+        
         public ValidatorService(
             ILogger<IValidatorService> logger,
             IFileStorageService fileStorageService,
-            IFileTypeService fileTypeService)
+            IFileTypeService fileTypeService,
+            IImportStatusService importStatusService)
         {
             _logger = logger;
             _fileStorageService = fileStorageService;
             _fileTypeService = fileTypeService;
+            _importStatusService = importStatusService;
         }
 
         public ValidatorService(ILogger<IValidatorService> logger)
@@ -77,11 +81,13 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Processor.Services
             "time_period",
             "geographic_level"
         };
-
+        
         public async Task<Either<IEnumerable<ValidationError>, ProcessorStatistics>>
             Validate(Guid releaseId, SubjectData subjectData, ExecutionContext executionContext, ImportMessage message)
         {
             _logger.LogInformation($"Validating Datafile: {message.OrigDataFileName}");
+
+            await _importStatusService.UpdateStatus(message.Release.Id, message.DataFileName, IStatus.STAGE_1);
 
             return await ValidateCsvFile(subjectData.DataBlob, false)
                 .OnSuccessDo(async () => await ValidateCsvFile(subjectData.MetaBlob, true))
@@ -93,13 +99,14 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Processor.Services
 
                         await using var metaFileStream = await _fileStorageService.StreamBlob(subjectData.MetaBlob);
                         var metaFileTable = DataTableUtils.CreateFromStream(metaFileStream);
-
+                        
                         return await ValidateMetaHeader(metaFileTable.Columns)
                             .OnSuccess(() => ValidateMetaRows(metaFileTable.Columns, metaFileTable.Rows))
                             .OnSuccess(() => ValidateObservationHeaders(dataFileTable.Columns))
                             .OnSuccess(
                                 () =>
-                                    ValidateAndCountObservations(dataFileTable.Columns, dataFileTable.Rows, executionContext)
+                                    ValidateAndCountObservations(dataFileTable.Columns, dataFileTable.Rows,
+                                            executionContext, message.Release.Id, message.OrigDataFileName)
                                         .OnSuccess(
                                             result =>
                                             {
@@ -227,13 +234,19 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Processor.Services
             return Unit.Instance;
         }
 
-        private static async Task<Either<IEnumerable<ValidationError>, ProcessorStatistics>>
-            ValidateAndCountObservations(DataColumnCollection cols, DataRowCollection rows, ExecutionContext executionContext)
+        private async Task<Either<IEnumerable<ValidationError>, ProcessorStatistics>>
+            ValidateAndCountObservations(
+                DataColumnCollection cols,
+                DataRowCollection rows,
+                ExecutionContext executionContext,
+                Guid releaseId,
+                string origDataFileName)
         {
             var idx = 0;
             var filteredRows = 0;
-            var totalRows = 0;
+            var totalRowCount = 0;
             var errors = new List<ValidationError>();
+            var dataRows = rows.Count;
 
             foreach (DataRow row in rows)
             {
@@ -252,7 +265,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Processor.Services
                     ImporterService.GetGeographicLevel(rowValues, colValues);
                     ImporterService.GetTimeIdentifier(rowValues, colValues);
                     ImporterService.GetYear(rowValues, colValues);
-
+                    
                     if (!IsGeographicLevelIgnored(rowValues, colValues))
                     {
                         filteredRows++;
@@ -262,14 +275,21 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Processor.Services
                 {
                     errors.Add(new ValidationError($"error at row {idx}: {e.Message}"));
                 }
+                
+                totalRowCount++;
 
-                totalRows++;
+                if (totalRowCount % STAGE_1_ROW_CHECK == 0)
+                {
+                    await _importStatusService.UpdateProgress(releaseId, origDataFileName, (double)totalRowCount / dataRows * 100);
+                }
             }
 
             if (errors.Count > 0)
             {
                 return errors;
             }
+            
+            await _importStatusService.UpdateProgress(releaseId, origDataFileName, 100);
 
             var rowsPerBatch = Convert.ToInt32(LoadAppSettings(executionContext).GetValue<string>("RowsPerBatch"));
 
@@ -277,7 +297,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Processor.Services
             {
                 FilteredObservationCount = filteredRows,
                 RowsPerBatch = rowsPerBatch,
-                NumBatches = FileStorageUtils.GetNumBatches(totalRows, rowsPerBatch)
+                NumBatches = FileStorageUtils.GetNumBatches(totalRowCount, rowsPerBatch)
             };
         }
 
