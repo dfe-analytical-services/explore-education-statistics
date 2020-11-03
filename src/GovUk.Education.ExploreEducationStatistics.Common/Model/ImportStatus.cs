@@ -11,8 +11,12 @@ namespace GovUk.Education.ExploreEducationStatistics.Common.Model
 
         public int PercentageComplete { get; set; }
 
+        public int PhasePercentageComplete { get; set; }
+
         public string Errors { get; set; }
 
         public int NumberOfRows { get; set; }
+
+        public bool PhaseComplete => PhasePercentageComplete == 100;
     }
 }

@@ -12,6 +12,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Common.Model
             PartitionKey = releaseId;
             RowKey = dataFileName;
             Status = IStatus.UPLOADING;
+            PercentageComplete = 0;
         }
         
         public DatafileImport(string releaseId, string dataFileName, int numberOfRows, string message, IStatus status, string errors = "")
@@ -22,6 +23,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Common.Model
             Message = message;
             Status = status;
             Errors = errors;
+            PercentageComplete = 0;
         }
 
         public DatafileImport()
@@ -36,6 +38,8 @@ namespace GovUk.Education.ExploreEducationStatistics.Common.Model
         
         public string Message { get; set; }
 
+        public int PercentageComplete { get; set; }
+        
         public override IDictionary<string, EntityProperty> WriteEntity(OperationContext operationContext)
         {
             var results = base.WriteEntity(operationContext);

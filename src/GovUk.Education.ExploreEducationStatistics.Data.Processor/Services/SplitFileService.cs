@@ -11,6 +11,7 @@ using GovUk.Education.ExploreEducationStatistics.Common.Extensions;
 using GovUk.Education.ExploreEducationStatistics.Common.Model;
 using GovUk.Education.ExploreEducationStatistics.Common.Model.Data;
 using GovUk.Education.ExploreEducationStatistics.Common.Services;
+using GovUk.Education.ExploreEducationStatistics.Common.Services.Interfaces;
 using GovUk.Education.ExploreEducationStatistics.Data.Importer.Exceptions;
 using GovUk.Education.ExploreEducationStatistics.Data.Importer.Services;
 using GovUk.Education.ExploreEducationStatistics.Data.Processor.Extensions;
@@ -27,6 +28,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Processor.Services
     {
         private readonly IFileStorageService _fileStorageService;
         private readonly ILogger<ISplitFileService> _logger;
+        private readonly IImportStatusService _importStatusService;
 
         private static readonly List<GeographicLevel> IgnoredGeographicLevels = new List<GeographicLevel>
         {
@@ -36,10 +38,15 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Processor.Services
             GeographicLevel.PlanningArea
         };
 
-        public SplitFileService(IFileStorageService fileStorageService, ILogger<ISplitFileService> logger)
+        public SplitFileService(
+            IFileStorageService fileStorageService,
+            ILogger<ISplitFileService> logger,
+            IImportStatusService importStatusService
+            )
         {
             _fileStorageService = fileStorageService;
             _logger = logger;
+            _importStatusService = importStatusService;
         }
 
         public async Task SplitDataFile(
@@ -47,7 +54,9 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Processor.Services
             ImportMessage message,
             SubjectData subjectData)
         {
+            await _importStatusService.UpdateStatus(message.Release.Id, message.OrigDataFileName, IStatus.STAGE_3);
             await using var dataFileStream = await _fileStorageService.StreamBlob(subjectData.DataBlob);
+            
             var dataFileTable = DataTableUtils.CreateFromStream(dataFileStream);
 
             if (dataFileTable.Rows.Count > message.RowsPerBatch)
@@ -74,6 +83,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Processor.Services
             var batchCount = 1;
             var numRows = dataFileTable.Rows.Count + 1;
             var messages = new List<ImportMessage>();
+            var numBatches = (int)Math.Ceiling((double)dataFileTable.Rows.Count / message.RowsPerBatch);
 
             foreach (var batch in batches)
             {
@@ -85,10 +95,13 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Processor.Services
                 var table = new DataTable();
                 CopyColumns(dataFileTable, table);
                 CopyRows(table, batch.ToList(), headerList);
-
+                
+                var percentageComplete = (double)batchCount / numBatches * 100;
+                await _importStatusService.UpdateProgress(message.Release.Id, message.OrigDataFileName, percentageComplete);
+                
                 // If no lines then don't create a batch or message unless it's the last one & there are zero
                 // lines in total in which case create a zero lines batch
-                if ((table.Rows.Count == 0 && batchCount != batches.Count()) || (table.Rows.Count == 0 && messages.Count != 0))
+                if (table.Rows.Count == 0 && batchCount != numBatches || table.Rows.Count == 0 && messages.Count != 0)
                 {
                     batchCount++;
                     continue;

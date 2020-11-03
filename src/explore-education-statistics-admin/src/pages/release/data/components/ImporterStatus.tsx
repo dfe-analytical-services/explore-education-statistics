@@ -22,11 +22,13 @@ export const getImportStatusLabel = (
       return 'Queued';
     case 'PROCESSING_ARCHIVE_FILE':
       return 'Processing archive file';
-    case 'RUNNING_PHASE_1':
+    case 'STAGE_1':
       return 'Validating';
-    case 'RUNNING_PHASE_2':
+    case 'STAGE_2':
       return 'Importing';
-    case 'RUNNING_PHASE_3':
+    case 'STAGE_3':
+      return 'Importing';
+    case 'STAGE_4':
       return 'Importing';
     case 'COMPLETE':
       return 'Complete';
@@ -45,9 +47,10 @@ const getImportStatusColour = (
     case 'UPLOADING':
     case 'QUEUED':
     case 'PROCESSING_ARCHIVE_FILE':
-    case 'RUNNING_PHASE_1':
-    case 'RUNNING_PHASE_2':
-    case 'RUNNING_PHASE_3':
+    case 'STAGE_1':
+    case 'STAGE_2':
+    case 'STAGE_3':
+    case 'STAGE_4':
       return 'orange';
     case 'COMPLETE':
       return 'green';
