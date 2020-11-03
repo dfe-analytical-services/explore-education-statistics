@@ -69,7 +69,6 @@ export type ImportStatusCode =
   | 'STAGE_2'
   | 'STAGE_3'
   | 'STAGE_4'
-  | 'STAGE_5'
   | 'NOT_FOUND'
   | 'FAILED';
 
