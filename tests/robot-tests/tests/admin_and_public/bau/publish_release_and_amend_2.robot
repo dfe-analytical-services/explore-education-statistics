@@ -51,28 +51,27 @@ upload another subject (for deletion later)
 
 Add meta guidance to dates test subject
     [Tags]  HappyPath
-    Set Selenium Speed  0.3s seconds
+    Set Selenium Speed  0.3
     user clicks link  Metadata guidance
     user waits until h2 is visible  Public metadata guidance document
 
     user waits until page contains accordion section  ${SUBJECT_NAME}
     user enters text into meta guidance data file content editor  ${SUBJECT_NAME}
     ...  ${SUBJECT_NAME} meta guidance content
-    user clicks element  css:body
 
 
 Add meta guidance to Second Subject
     [Tags]  HappyPath
-    Set Selenium Speed  0.3 seconds
     user waits until page contains accordion section  ${SECOND_SUBJECT}
+    user clicks element   css:body
     user enters text into meta guidance data file content editor  ${SECOND_SUBJECT}
     ...  ${SECOND_SUBJECT} meta guidance content
     user clicks button  Save guidance
-    Sleep  1000000
 
 
 Go to "Sign off" page
     [Tags]  HappyPath
+    Sleep  1000000
     user clicks link   Sign off
     user waits until h2 is visible  Sign off
     user waits until page contains button  Edit release status
