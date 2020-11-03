@@ -129,12 +129,12 @@ Generate the peramlink
     [Tags]  HappyPath
     user clicks button  Generate permanent link
     user waits until page contains testid  permalink-generated-url
-    ${PERMA_LOCATION_URL}=  Get Text  xpath://*[@data-testid="permalink-generated-url"]
-    Set Suite Variable  ${PERMA_LOCATION_URL}
+    ${PERMALINK_URL}=  Get Text  xpath://*[@data-testid="permalink-generated-url"]
+    Set Suite Variable  ${PERMALINK_URL}
 
 Go to permalink
     [Tags]  HappyPath
-    user goes to url  ${PERMA_LOCATION_URL}
+    user goes to url  ${PERMALINK_URL}
     user waits until h1 is visible  '${SUBJECT_NAME}' from '${PUBLICATION_NAME}'
     user checks page does not contain   WARNING - The data used in this permalink may be out-of-date.
 
@@ -156,7 +156,7 @@ Create amendment
     user clicks button  Amend this release  ${details}
     user clicks button  Confirm
 
-replace data files for amendment
+Replace data files for amendment
     [Tags]  HappyPath
     user clicks link  Data and files
     user waits until page contains element  id:dataFileUploadForm-subjectTitle
@@ -176,7 +176,6 @@ Confirm data replacement
     user waits until page contains  Footnotes: OK
     user clicks button  Confirm data replacement
     user waits until h2 is visible  Data replacement complete
-
 
 Go to "Sign off" page for amendment
     [Tags]  HappyPath
@@ -201,5 +200,5 @@ Wait for release amendment process status to be Complete
 
 Go to permalink page & check for error element to be present
     [Tags]  HappyPath
-    user goes to url  ${PERMA_LOCATION_URL}
+    user goes to url  ${PERMALINK_URL}
     user waits until page contains  WARNING - The data used in this permalink may be out-of-date.

@@ -44,53 +44,53 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Model.Services
 
         public async Task DeleteReleaseSubject(Guid releaseId, Guid subjectId, bool softDeleteOrphanedSubject = false)
         {
-            await DetachReleaseFromSubject(releaseId, subjectId);
-            await _footnoteService.DeleteAllFootnotesBySubject(releaseId, subjectId);
-            await DeleteSubjectIfOrphaned(subjectId, softDeleteOrphanedSubject);
-
-            await _statisticsDbContext.SaveChangesAsync();
-        }
-
-        private async Task DetachReleaseFromSubject(Guid releaseId, Guid subjectId)
-        {
             var releaseSubject = await _statisticsDbContext
                 .ReleaseSubject
+                .Include(rs => rs.Subject)
                 .FirstOrDefaultAsync(rs => rs.ReleaseId == releaseId && rs.SubjectId == subjectId);
 
+            await DeleteReleaseSubjectIfExists(releaseSubject);
+            await _footnoteService.DeleteAllFootnotesBySubject(releaseId, subjectId);
+            await DeleteSubjectIfOrphaned(releaseSubject.Subject, softDeleteOrphanedSubject);
+        }
+
+        private async Task DeleteReleaseSubjectIfExists(ReleaseSubject releaseSubject)
+        {
             if (releaseSubject != null)
             {
                 _statisticsDbContext.ReleaseSubject.Remove(releaseSubject);
             }
         }
 
-        private async Task DeleteSubjectIfOrphaned(Guid subjectId, bool isSoftDelete)
+        private async Task DeleteSubjectIfOrphaned(Subject subject, bool isSoftDelete)
         {
-            var subject = await _statisticsDbContext.Subject
-                .FirstOrDefaultAsync(s => s.Id == subjectId);
-
-            if (IsSubjectOrphaned(subject))
+            if (!IsSubjectOrphaned(subject))
             {
-                if (isSoftDelete)
-                {
-                    subject.SoftDeleted = true;
-                    _statisticsDbContext.Subject.Update(subject);
-                }
-                else
-                {
-                    // N.B. This delete will be slow if there are a large number of observations but this is only
-                    // executed by the tests when the topic is torn down so ensure files used are < 1000 rows.
-                    var observations =  _statisticsDbContext.Observation
-                        .Where(o => o.SubjectId == subjectId);
-                    _statisticsDbContext.Observation.RemoveRange(observations);
-                    _statisticsDbContext.Subject.Remove(subject);
-                }
+                return;
             }
+
+            if (isSoftDelete)
+            {
+                subject.SoftDeleted = true;
+                _statisticsDbContext.Subject.Update(subject);
+            }
+            else
+            {
+                // N.B. This delete will be slow if there are a large number of observations but this is only
+                // executed by the tests when the topic is torn down so ensure files used are < 1000 rows.
+                var observations = _statisticsDbContext.Observation
+                    .Where(o => o.SubjectId == subject.Id);
+                _statisticsDbContext.Observation.RemoveRange(observations);
+                _statisticsDbContext.Subject.Remove(subject);
+            }
+
+            await _statisticsDbContext.SaveChangesAsync();
         }
 
         private bool IsSubjectOrphaned(Subject subject)
         {
             return subject != null
-                   && _statisticsDbContext.ReleaseSubject.Count(rs => rs.SubjectId == subject.Id) < 2;
+                   && _statisticsDbContext.ReleaseSubject.Count(rs => rs.SubjectId == subject.Id) == 0;
         }
     }
 }
