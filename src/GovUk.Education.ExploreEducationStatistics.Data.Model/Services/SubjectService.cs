@@ -19,16 +19,16 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Model.Services
             _releaseService = releaseService;
         }
 
-        public bool IsSubjectForLatestPublishedRelease(Guid subjectId)
+        public async Task<bool> IsSubjectForLatestPublishedRelease(Guid subjectId)
         {
-            var publicationId = GetPublicationForSubject(subjectId).Result.Id;
-            var latestRelease = _releaseService.GetLatestPublishedRelease(publicationId);
+            var publication = await GetPublicationForSubject(subjectId);
+            var latestRelease = _releaseService.GetLatestPublishedRelease(publication.Id);
 
             if (!latestRelease.HasValue)
             {
                 return false;
             }
-            
+
             return _context
                 .ReleaseSubject
                 .Any(r => r.ReleaseId == latestRelease.Value && r.SubjectId == subjectId);
@@ -40,7 +40,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Model.Services
                 .Subject
                 .Where(s => s.Id == subjectId).FirstOrDefaultAsync();
         }
-        
+
         public async Task<Subject> Get(Guid releaseId, string name)
         {
             return await _context
@@ -70,6 +70,6 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Model.Services
                 .Where(s => s.ReleaseId == releaseId)
                 .Select(s => s.Subject)
                 .ToListAsync();
-        } 
+        }
     }
 }

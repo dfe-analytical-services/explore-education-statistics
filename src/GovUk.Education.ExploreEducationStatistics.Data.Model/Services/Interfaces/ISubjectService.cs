@@ -6,7 +6,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Model.Services.Interfa
 {
     public interface ISubjectService : IRepository<Subject, Guid>
     {
-        bool IsSubjectForLatestPublishedRelease(Guid subjectId);
+        Task<bool> IsSubjectForLatestPublishedRelease(Guid subjectId);
 
         Task<Publication> GetPublicationForSubject(Guid subjectId);
 

@@ -76,7 +76,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Api.Services
 
         private async Task<PermalinkViewModel> BuildViewModel(Permalink permalink)
         {
-            var isSubjectForLatestRelease = _subjectService.IsSubjectForLatestPublishedRelease(permalink.Query.SubjectId);
+            var isSubjectForLatestRelease = await _subjectService.IsSubjectForLatestPublishedRelease(permalink.Query.SubjectId);
             var publication = await _subjectService.GetPublicationForSubject(permalink.Query.SubjectId);
 
             var viewModel = _mapper.Map<PermalinkViewModel>(permalink);
