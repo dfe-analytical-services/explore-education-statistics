@@ -83,6 +83,14 @@ describe('ReleaseMetaGuidancePageContent', () => {
     ).toBeInTheDocument();
   });
 
+  test('does not render empty meta guidance content', () => {
+    render(<ReleaseMetaGuidancePageContent metaGuidance="" subjects={[]} />);
+
+    expect(
+      screen.queryByTestId('metaGuidance-content'),
+    ).not.toBeInTheDocument();
+  });
+
   test('renders guidance for subjects', async () => {
     render(
       <ReleaseMetaGuidancePageContent
@@ -170,6 +178,26 @@ describe('ReleaseMetaGuidancePageContent', () => {
 
     expect(section2VariableRow2Cells[0]).toHaveTextContent('indicator_2');
     expect(section2VariableRow2Cells[1]).toHaveTextContent('Indicator 2');
+  });
+
+  test('does not render empty file content', () => {
+    render(
+      <ReleaseMetaGuidancePageContent
+        metaGuidance="Test meta guidance content"
+        subjects={[
+          {
+            ...testSubjectMetaGuidance[0],
+            content: '',
+          },
+        ]}
+      />,
+    );
+
+    const subjects = screen.getAllByTestId('accordionSection');
+
+    expect(
+      within(subjects[0]).queryByTestId('Content'),
+    ).not.toBeInTheDocument();
   });
 
   test('renders no subject guidance when empty', () => {

@@ -3,7 +3,7 @@ import SanitizeHtml from '@common/components/SanitizeHtml';
 import SummaryList from '@common/components/SummaryList';
 import SummaryListItem from '@common/components/SummaryListItem';
 import { SubjectMetaGuidance } from '@common/services/releaseMetaGuidanceService';
-import React, { ReactNode } from 'react';
+import React, { ReactNode, useMemo } from 'react';
 
 interface Props {
   subject: SubjectMetaGuidance;
@@ -11,7 +11,30 @@ interface Props {
 }
 
 const ReleaseMetaGuidanceDataFile = ({ subject, renderContent }: Props) => {
-  const { filename, timePeriods, geographicLevels, variables } = subject;
+  const { filename, geographicLevels, timePeriods, variables } = subject;
+
+  const contentItem = useMemo(() => {
+    if (typeof renderContent === 'function') {
+      return (
+        <SummaryListItem term="Content">
+          {renderContent(subject)}
+        </SummaryListItem>
+      );
+    }
+
+    if (!subject.content) {
+      return null;
+    }
+
+    return (
+      <SummaryListItem term="Content">
+        <SanitizeHtml
+          dirtyHtml={subject.content}
+          testId="fileGuidanceContent"
+        />
+      </SummaryListItem>
+    );
+  }, [renderContent, subject]);
 
   return (
     <>
@@ -23,16 +46,7 @@ const ReleaseMetaGuidanceDataFile = ({ subject, renderContent }: Props) => {
         <SummaryListItem term="Time period">
           {`${timePeriods.from} to ${timePeriods.to}`}
         </SummaryListItem>
-        <SummaryListItem term="Content">
-          {typeof renderContent === 'function' ? (
-            renderContent(subject)
-          ) : (
-            <SanitizeHtml
-              dirtyHtml={subject.content}
-              testId="fileGuidanceContent"
-            />
-          )}
-        </SummaryListItem>
+        {contentItem}
       </SummaryList>
 
       <Details summary="Variable names and descriptions">
