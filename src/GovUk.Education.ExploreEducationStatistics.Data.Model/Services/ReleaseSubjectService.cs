@@ -59,6 +59,10 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Model.Services
             if (releaseSubject != null)
             {
                 _statisticsDbContext.ReleaseSubject.Remove(releaseSubject);
+                // Immediately save context as we will need to re-check
+                // how many ReleaseSubjects are attached to the Subject
+                // later when determining if the Subject has been orphaned.
+                await _statisticsDbContext.SaveChangesAsync();
             }
         }
 
