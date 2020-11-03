@@ -52,6 +52,7 @@ const ReleasePreReleaseAccessPage = () => {
 
                 <p>
                   <UrlContainer
+                    data-testid="prerelease-url"
                     url={`${window.location.origin}${generatePath<
                       ReleaseRouteParams
                     >(preReleaseRoute.path, {

@@ -144,6 +144,7 @@ const ReleaseStatusPage = () => {
 
           <p>
             <UrlContainer
+              data-testid="public-release-url"
               url={`${PublicAppUrl}/find-statistics/${release.publicationSlug}/${release.slug}`}
             />
           </p>
