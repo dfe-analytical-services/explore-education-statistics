@@ -54,6 +54,7 @@ Add meta guidance to dates test subject
     Set Selenium Speed  0.3s seconds
     user clicks link  Metadata guidance
     user waits until h2 is visible  Public metadata guidance document
+
     user waits until page contains accordion section  ${SUBJECT_NAME}
     user enters text into meta guidance data file content editor  ${SUBJECT_NAME}
     ...  ${SUBJECT_NAME} meta guidance content
