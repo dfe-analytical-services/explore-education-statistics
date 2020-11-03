@@ -1,3 +1,4 @@
+#nullable enable
 using System;
 using System.Collections.Generic;
 using System.Threading.Tasks;
@@ -10,9 +11,9 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Model.Services.Interfa
 
         Task<Publication> GetPublicationForSubject(Guid subjectId);
 
-        Task<Subject> Get(Guid releaseId, string name);
+        Task<Subject?> Get(Guid releaseId, string subjectName);
 
-        Task<Subject> Get(Guid subjectId);
+        Task<Subject?> Get(Guid subjectId);
 
         Task<List<Subject>> GetSubjectsForRelease(Guid releaseId);
     }

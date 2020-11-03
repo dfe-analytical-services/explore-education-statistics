@@ -1,3 +1,4 @@
+#nullable enable
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -34,19 +35,19 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Model.Services
                 .Any(r => r.ReleaseId == latestRelease.Value && r.SubjectId == subjectId);
         }
 
-        public async Task<Subject> Get(Guid subjectId)
+        public async Task<Subject?> Get(Guid subjectId)
         {
             return await _context
                 .Subject
-                .Where(s => s.Id == subjectId).FirstOrDefaultAsync();
+                .FindAsync(subjectId);
         }
 
-        public async Task<Subject> Get(Guid releaseId, string name)
+        public async Task<Subject?> Get(Guid releaseId, string subjectName)
         {
             return await _context
                 .ReleaseSubject
                 .Include(r => r.Subject)
-                .Where(r => r.ReleaseId == releaseId && r.Subject.Name == name)
+                .Where(r => r.ReleaseId == releaseId && r.Subject.Name == subjectName)
                 .Select(r => r.Subject)
                 .FirstOrDefaultAsync();
         }
