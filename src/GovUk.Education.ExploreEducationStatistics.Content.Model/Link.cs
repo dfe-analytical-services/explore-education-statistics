@@ -10,9 +10,12 @@ namespace GovUk.Education.ExploreEducationStatistics.Content.Model
 
         public string Url { get; set; }
 
-        public Link CreateCopy()
+        public Link Clone()
         {
-            return MemberwiseClone() as Link;
+            var clone = MemberwiseClone() as Link;
+            clone.Id = Guid.NewGuid();
+
+            return clone;
         }
     }
 }

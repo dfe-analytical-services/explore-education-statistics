@@ -8,21 +8,19 @@ namespace GovUk.Education.ExploreEducationStatistics.Content.Model
         [Key] [Required] public Guid Id { get; set; }
 
         public Guid ReleaseId { get; set; }
-        
+
         public Release Release { get; set; }
 
         [Required] public DateTime On { get; set; }
 
         [Required] public string Reason { get; set; }
 
-        public Update Clone(CreateClonedContext ctx)
+        public Update Clone(Release newRelease)
         {
             var copy = MemberwiseClone() as Update;
             copy.Id = Guid.NewGuid();
-            ctx.OldToNewIdUpdateMappings.Add(this, copy);
-            
-            copy.Release = ctx.Target;
-            copy.ReleaseId = ctx.Target.Id;
+            copy.Release = newRelease;
+            copy.ReleaseId = newRelease.Id;
             return copy;
         }
     }

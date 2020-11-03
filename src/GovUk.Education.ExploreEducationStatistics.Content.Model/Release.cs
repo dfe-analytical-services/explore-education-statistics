@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using System.Collections.Immutable;
 using System.ComponentModel.DataAnnotations.Schema;
 using System.Linq;
+using System.Text.RegularExpressions;
 using GovUk.Education.ExploreEducationStatistics.Common.Converters;
 using GovUk.Education.ExploreEducationStatistics.Common.Model;
 using GovUk.Education.ExploreEducationStatistics.Common.Services;
@@ -66,6 +67,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Content.Model
         [JsonIgnore]
         public List<ReleaseContentSection> Content { get; set; }
 
+        // TODO: EES-1568 This should be DataBlocks
         [JsonIgnore]
         public List<ReleaseContentBlock> ContentBlocks { get; set; }
 
@@ -218,8 +220,8 @@ namespace GovUk.Education.ExploreEducationStatistics.Content.Model
         {
             var amendment = MemberwiseClone() as Release;
 
-            // set new values for fields that should be altered in the amended Release rather than copied from the
-            // original Release
+            // Set new values for fields that should be altered in the amended
+            // Release rather than copied from the original Release
             amendment.Id = Guid.NewGuid();
             amendment.Published = null;
             amendment.PublishScheduled = null;
@@ -230,71 +232,99 @@ namespace GovUk.Education.ExploreEducationStatistics.Content.Model
             amendment.PreviousVersionId = Id;
             amendment.InternalReleaseNote = null;
 
-            var ctx = new CreateClonedContext(amendment);
+            var context = new CloneContext();
 
             amendment.Content = amendment
                 .Content?
-                .Select(content => content.Clone(ctx))
-                .ToList();
-
-            amendment.RelatedInformation = amendment
-                .RelatedInformation?
-                .Select(link =>
-                {
-                    var copy = link.CreateCopy();
-                    copy.Id = Guid.NewGuid();
-                    return copy;
-                })
-                .ToList();
-
-            amendment.Updates = amendment
-                .Updates?
-                .Select(update => update.Clone(ctx))
+                .Select(content => content.Clone(amendment, context))
                 .ToList();
 
             amendment.ContentBlocks = amendment
                 .ContentBlocks?
-                .Select(releaseContentBlock => releaseContentBlock.Clone(ctx))
+                .Select(releaseContentBlock => releaseContentBlock.Clone(amendment, context))
                 .ToList();
+
+            amendment.RelatedInformation = amendment
+                .RelatedInformation?
+                .Select(link => link.Clone())
+                .ToList();
+
+            amendment.Updates = amendment
+                .Updates?
+                .Select(update => update.Clone(amendment))
+                .ToList();
+
+            UpdateAmendmentContent(context);
 
             return amendment;
         }
 
+        // Bit cheeky to re-use the clone context, but it's a nice
+        // easy way to access and modify all of the content blocks
+        // that we used during the clone.
+        private void UpdateAmendmentContent(CloneContext context)
+        {
+            var dataBlocks = context.ContentBlocks
+                .Where(pair => pair.Key is DataBlock && pair.Value is DataBlock)
+                .ToDictionary(pair => pair.Key as DataBlock, pair => pair.Value as DataBlock);
+
+            foreach (var contentBlock in context.ContentBlocks.Values)
+            {
+                switch (contentBlock)
+                {
+                    case HtmlBlock block:
+                        block.Body = UpdateFastTrackLinks(block.Body, dataBlocks);
+                        break;
+                    case MarkDownBlock block:
+                        block.Body = UpdateFastTrackLinks(block.Body, dataBlocks);
+                        break;
+                }
+            }
+        }
+
+        private string UpdateFastTrackLinks(string content, Dictionary<DataBlock, DataBlock> dataBlocks)
+        {
+            var nextContent = content;
+
+            foreach (var (oldDataBlock, newDataBlock) in dataBlocks)
+            {
+                // Not a particularly fast way to replace fast tracks
+                // if there's a lot of content. Could be improved
+                // using something like a parallel substring approach.
+                nextContent = nextContent.Replace(
+                    $"/fast-track/{oldDataBlock.Id}",
+                    $"/fast-track/{newDataBlock.Id}"
+                );
+            }
+
+            return nextContent;
+        }
+
         public void CreateGenericContentFromTemplate(Release newRelease)
         {
-            var ctx = new CreateClonedContext(newRelease);
+            var context = new CloneContext();
+
             newRelease.Content = Content.Where(c => c.ContentSection.Type == ContentSectionType.Generic).ToList();
 
             newRelease.Content = newRelease
                 .Content?
-                .Select(content => content.Clone(ctx))
+                .Select(content => content.Clone(newRelease, context))
                 .ToList();
 
             newRelease.ContentBlocks = newRelease
                 .ContentBlocks?
-                .Select(releaseContentBlock => releaseContentBlock.Clone(ctx))
+                .Select(releaseContentBlock => releaseContentBlock.Clone(newRelease, context))
                 .ToList();
         }
-    }
 
-    public class CreateClonedContext
-    {
-        private readonly Dictionary<Update, Update> _oldToNewIdUpdateMappings = new Dictionary<Update, Update>();
-        private readonly Dictionary<ContentSection, ContentSection> _oldToNewIdContentSectionMappings = new Dictionary<ContentSection, ContentSection>();
-        private readonly Dictionary<ContentBlock, ContentBlock> _oldToNewIdContentBlockMappings = new Dictionary<ContentBlock, ContentBlock>();
-        private readonly Release _target;
-
-        public CreateClonedContext(Release target)
+        // Ideally we want to try and get rid of this completely as we
+        // shouldn't have to deal with the same content blocks being
+        // referenced in multiple places.
+        // TODO: EES-1306 may be possible to remove this as part of this ticket
+        public class CloneContext
         {
-            _target = target;
+            // Maps references to old content blocks to new content blocks
+            public Dictionary<ContentBlock, ContentBlock> ContentBlocks { get; } = new Dictionary<ContentBlock, ContentBlock>();
         }
-
-        public Release Target => _target;
-
-        public Dictionary<ContentSection, ContentSection> OldToNewIdContentSectionMappings => _oldToNewIdContentSectionMappings;
-
-        public Dictionary<ContentBlock, ContentBlock> OldToNewIdContentBlockMappings => _oldToNewIdContentBlockMappings;
-
-        public Dictionary<Update, Update> OldToNewIdUpdateMappings => _oldToNewIdUpdateMappings;
     }
 }
