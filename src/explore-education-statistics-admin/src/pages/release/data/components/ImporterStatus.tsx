@@ -5,6 +5,7 @@ import releaseDataFileService, {
 } from '@admin/services/releaseDataFileService';
 import Details from '@common/components/Details';
 import LoadingSpinner from '@common/components/LoadingSpinner';
+import ProgressBar from '@common/components/ProgressBar';
 import Tag, { TagProps } from '@common/components/Tag';
 import useInterval from '@common/hooks/useInterval';
 import useMounted from '@common/hooks/useMounted';
@@ -67,6 +68,11 @@ export const terminalImportStatuses: ImportStatusCode[] = [
   'FAILED',
 ];
 
+type StatusState = Pick<
+  DataFileImportStatus,
+  'status' | 'percentageComplete' | 'errors'
+>;
+
 export type ImporterStatusChangeHandler = (
   dataFile: DataFile,
   status: DataFileImportStatus,
@@ -82,9 +88,9 @@ const ImporterStatus = ({
   dataFile,
   onStatusChange,
 }: ImporterStatusProps) => {
-  const [currentStatus, setCurrentStatus] = useState<DataFileImportStatus>({
-    numberOfRows: dataFile.rows,
+  const [currentStatus, setCurrentStatus] = useState<StatusState>({
     status: dataFile.status,
+    percentageComplete: 0,
   });
 
   const fetchStatus = useCallback(async () => {
@@ -114,6 +120,10 @@ const ImporterStatus = ({
     }
   }, [cancelInterval, currentStatus]);
 
+  const hasTerminalStatus = terminalImportStatuses.includes(
+    currentStatus.status,
+  );
+
   return (
     <div>
       <div className="dfe-flex dfe-align-items--center">
@@ -130,17 +140,18 @@ const ImporterStatus = ({
             : getImportStatusLabel(currentStatus.status)}
         </Tag>
 
-        {!terminalImportStatuses.includes(currentStatus.status) && (
-          <LoadingSpinner
-            alert
-            hideText
-            inline
-            size="sm"
-            className="govuk-!-margin-left-1"
-            text={`Processing data file: ${dataFile.fileName}`}
-          />
+        {!hasTerminalStatus && (
+          <LoadingSpinner inline size="sm" className="govuk-!-margin-left-1" />
         )}
       </div>
+
+      {!hasTerminalStatus && (
+        <ProgressBar
+          className="govuk-!-margin-top-2"
+          value={currentStatus.percentageComplete}
+          width={200}
+        />
+      )}
 
       {currentStatus.errors && currentStatus.errors.length > 0 && (
         <Details
