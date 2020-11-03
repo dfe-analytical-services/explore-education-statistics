@@ -127,7 +127,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Common.Tests.Services
             var tableStorageService = new Mock<ITableStorageService>(MockBehavior.Strict);
 
             const int percentageComplete = 50;
-            
+
             SetupImportsTableMockForDataFileImport(tableStorageService: tableStorageService,
                 importStatus: FAILED,
                 percentageComplete: percentageComplete,
@@ -222,12 +222,12 @@ namespace GovUk.Education.ExploreEducationStatistics.Common.Tests.Services
                 percentageComplete: 100);
 
             var service = BuildImportStatusService(tableStorageService: tableStorageService.Object);
-            
+
             Assert.True(await service.UpdateStatus(_releaseId, FileName, STAGE_1));
 
-            importsTable.Verify(mock => 
+            importsTable.Verify(mock =>
                 mock.ExecuteAsync(It.Is<TableOperation>(operation =>
-                operation.OperationType == TableOperationType.Retrieve)), Times.Once);
+                    operation.OperationType == TableOperationType.Retrieve)), Times.Once);
 
             importsTable.VerifyNoOtherCalls();
         }
@@ -242,10 +242,10 @@ namespace GovUk.Education.ExploreEducationStatistics.Common.Tests.Services
                 percentageComplete: 0);
 
             var service = BuildImportStatusService(tableStorageService: tableStorageService.Object);
-            
+
             Assert.False(await service.UpdateStatus(_releaseId, FileName, STAGE_1));
 
-            importsTable.Verify(mock => 
+            importsTable.Verify(mock =>
                 mock.ExecuteAsync(It.Is<TableOperation>(operation =>
                     operation.OperationType == TableOperationType.Retrieve)), Times.Once);
 
@@ -276,11 +276,10 @@ namespace GovUk.Education.ExploreEducationStatistics.Common.Tests.Services
                 mock.ExecuteAsync(It.Is<TableOperation>(operation =>
                     operation.OperationType == TableOperationType.Retrieve)), Times.Once);
 
-            // TODO ideally we want to verify the percentage complete in the replacement
-            
             importsTable.Verify(mock =>
                 mock.ExecuteAsync(It.Is<TableOperation>(operation =>
-                    operation.OperationType == TableOperationType.Replace)), Times.Once);
+                    operation.OperationType == TableOperationType.Replace
+                    && (operation.Entity as DatafileImport).PercentageComplete == 100)), Times.Once);
 
             importsTable.VerifyNoOtherCalls();
         }
@@ -292,7 +291,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Common.Tests.Services
 
             var importsTable = SetupImportsTableMockForDataFileImport(tableStorageService: tableStorageService,
                 importStatus: STAGE_1,
-                percentageComplete: 0);
+                percentageComplete: 100);
 
             importsTable.Setup(mock => mock.ExecuteAsync(It.Is<TableOperation>(operation =>
                     operation.OperationType == TableOperationType.Replace)))
@@ -309,15 +308,14 @@ namespace GovUk.Education.ExploreEducationStatistics.Common.Tests.Services
                 mock.ExecuteAsync(It.Is<TableOperation>(operation =>
                     operation.OperationType == TableOperationType.Retrieve)), Times.Once);
 
-            // TODO ideally we want to verify the percentage complete in the replacement
-            
             importsTable.Verify(mock =>
                 mock.ExecuteAsync(It.Is<TableOperation>(operation =>
-                    operation.OperationType == TableOperationType.Replace)), Times.Once);
+                    operation.OperationType == TableOperationType.Replace
+                    && (operation.Entity as DatafileImport).PercentageComplete == 0)), Times.Once);
 
             importsTable.VerifyNoOtherCalls();
         }
-        
+
         [Fact]
         public async Task UpdateStatus_UpdateAsSameStatus()
         {
@@ -328,10 +326,10 @@ namespace GovUk.Education.ExploreEducationStatistics.Common.Tests.Services
                 percentageComplete: 0);
 
             var service = BuildImportStatusService(tableStorageService: tableStorageService.Object);
-            
+
             Assert.True(await service.UpdateStatus(_releaseId, FileName, STAGE_1));
 
-            importsTable.Verify(mock => 
+            importsTable.Verify(mock =>
                 mock.ExecuteAsync(It.Is<TableOperation>(operation =>
                     operation.OperationType == TableOperationType.Retrieve)), Times.Once);
 
@@ -345,7 +343,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Common.Tests.Services
 
             var importsTable = SetupImportsTableMockForDataFileImport(tableStorageService: tableStorageService,
                 importStatus: STAGE_1,
-                percentageComplete: 0);
+                percentageComplete: 100);
 
             importsTable.Setup(mock => mock.ExecuteAsync(It.Is<TableOperation>(operation =>
                     operation.OperationType == TableOperationType.Replace)))
@@ -361,7 +359,8 @@ namespace GovUk.Education.ExploreEducationStatistics.Common.Tests.Services
 
             importsTable.Verify(mock =>
                 mock.ExecuteAsync(It.Is<TableOperation>(operation =>
-                    operation.OperationType == TableOperationType.Replace)), Times.Once);
+                    operation.OperationType == TableOperationType.Replace
+                    && (operation.Entity as DatafileImport).PercentageComplete == 0)), Times.Once);
 
             importsTable.VerifyNoOtherCalls();
         }
@@ -390,11 +389,10 @@ namespace GovUk.Education.ExploreEducationStatistics.Common.Tests.Services
                 mock.ExecuteAsync(It.Is<TableOperation>(operation =>
                     operation.OperationType == TableOperationType.Retrieve)), Times.Once);
 
-            // TODO ideally we want to verify the percentage complete in the replacement
-            
             importsTable.Verify(mock =>
                 mock.ExecuteAsync(It.Is<TableOperation>(operation =>
-                    operation.OperationType == TableOperationType.Replace)), Times.Once);
+                    operation.OperationType == TableOperationType.Replace
+                    && (operation.Entity as DatafileImport).PercentageComplete == 50)), Times.Once);
 
             importsTable.VerifyNoOtherCalls();
         }
@@ -443,12 +441,11 @@ namespace GovUk.Education.ExploreEducationStatistics.Common.Tests.Services
                 mock.ExecuteAsync(It.Is<TableOperation>(operation =>
                     operation.OperationType == TableOperationType.Retrieve)), Times.Once);
 
-            // TODO ideally we want to verify the percentage complete in the replacement
-            
             importsTable.Verify(mock =>
                 mock.ExecuteAsync(It.Is<TableOperation>(operation =>
-                    operation.OperationType == TableOperationType.Replace)), Times.Once);
-            
+                    operation.OperationType == TableOperationType.Replace
+                    && (operation.Entity as DatafileImport).PercentageComplete == 100)), Times.Once);
+
             importsTable.VerifyNoOtherCalls();
         }
 
@@ -475,12 +472,14 @@ namespace GovUk.Education.ExploreEducationStatistics.Common.Tests.Services
 
             importsTable.Verify(mock =>
                 mock.ExecuteAsync(It.Is<TableOperation>(operation =>
-                    operation.OperationType == TableOperationType.Replace)), Times.Once);
+                    operation.OperationType == TableOperationType.Replace
+                    && (operation.Entity as DatafileImport).PercentageComplete == 50)), Times.Once);
 
             importsTable.VerifyNoOtherCalls();
         }
-        
-        private static Mock<CloudTable> SetupImportsTableMockForDataFileImport(Mock<ITableStorageService> tableStorageService,
+
+        private static Mock<CloudTable> SetupImportsTableMockForDataFileImport(
+            Mock<ITableStorageService> tableStorageService,
             IStatus importStatus,
             int percentageComplete,
             string errors = null,
@@ -501,10 +500,12 @@ namespace GovUk.Education.ExploreEducationStatistics.Common.Tests.Services
             SetupImportsTableMockForDataFileImportResponse(tableStorageService, null);
         }
 
-        private static Mock<CloudTable> SetupImportsTableMockForDataFileImportResponse(Mock<ITableStorageService> tableStorageService,
+        private static Mock<CloudTable> SetupImportsTableMockForDataFileImportResponse(
+            Mock<ITableStorageService> tableStorageService,
             DatafileImport response)
         {
-            var importsTable = new Mock<CloudTable>(MockBehavior.Strict, new Uri("http://127.0.0.1:10002/devstoreaccount1/imports"),
+            var importsTable = new Mock<CloudTable>(MockBehavior.Strict,
+                new Uri("http://127.0.0.1:10002/devstoreaccount1/imports"),
                 It.IsAny<TableClientConfiguration>());
 
             tableStorageService.Setup(mock =>
