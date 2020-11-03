@@ -55,7 +55,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Api.Services
 
         public async Task<Either<ActionResult, PermalinkViewModel>> CreateAsync(CreatePermalinkRequest request)
         {
-            var publicationId = _subjectService.GetPublicationForSubjectAsync(request.Query.SubjectId).Result.Id;
+            var publicationId = _subjectService.GetPublicationForSubject(request.Query.SubjectId).Result.Id;
             var releaseId = _releaseService.GetLatestPublishedRelease(publicationId);
 
             return await CreateAsync(releaseId.Value, request);
@@ -77,7 +77,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Api.Services
         private async Task<PermalinkViewModel> BuildViewModel(Permalink permalink)
         {
             var isSubjectForLatestRelease = _subjectService.IsSubjectForLatestPublishedRelease(permalink.Query.SubjectId);
-            var publication = await _subjectService.GetPublicationForSubjectAsync(permalink.Query.SubjectId);
+            var publication = await _subjectService.GetPublicationForSubject(permalink.Query.SubjectId);
 
             var viewModel = _mapper.Map<PermalinkViewModel>(permalink);
 

@@ -472,7 +472,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Services
         {
             if (file.SubjectId.HasValue)
             {
-                var subject = await _subjectService.GetAsync(file.SubjectId.Value);
+                var subject = await _subjectService.Get(file.SubjectId.Value);
                 return subject.Name;
             }
 

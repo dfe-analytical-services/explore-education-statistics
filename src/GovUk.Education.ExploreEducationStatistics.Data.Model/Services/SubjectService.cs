@@ -21,7 +21,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Model.Services
 
         public bool IsSubjectForLatestPublishedRelease(Guid subjectId)
         {
-            var publicationId = GetPublicationForSubjectAsync(subjectId).Result.Id;
+            var publicationId = GetPublicationForSubject(subjectId).Result.Id;
             var latestRelease = _releaseService.GetLatestPublishedRelease(publicationId);
 
             if (!latestRelease.HasValue)
@@ -34,14 +34,14 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Model.Services
                 .Any(r => r.ReleaseId == latestRelease.Value && r.SubjectId == subjectId);
         }
 
-        public async Task<Subject> GetAsync(Guid subjectId)
+        public async Task<Subject> Get(Guid subjectId)
         {
             return await _context
                 .Subject
                 .Where(s => s.Id == subjectId).FirstOrDefaultAsync();
         }
         
-        public async Task<Subject> GetAsync(Guid releaseId, string name)
+        public async Task<Subject> Get(Guid releaseId, string name)
         {
             return await _context
                 .ReleaseSubject
@@ -51,7 +51,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Model.Services
                 .FirstOrDefaultAsync();
         }
 
-        public Task<Publication> GetPublicationForSubjectAsync(Guid subjectId)
+        public Task<Publication> GetPublicationForSubject(Guid subjectId)
         {
             return _context
                 .ReleaseSubject
@@ -62,7 +62,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Model.Services
                 .FirstAsync();
         }
 
-        public Task<List<Subject>> GetSubjectsForReleaseAsync(Guid releaseId)
+        public Task<List<Subject>> GetSubjectsForRelease(Guid releaseId)
         {
             return _context
                 .ReleaseSubject

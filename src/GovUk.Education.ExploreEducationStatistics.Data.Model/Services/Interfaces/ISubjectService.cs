@@ -8,12 +8,12 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Model.Services.Interfa
     {
         bool IsSubjectForLatestPublishedRelease(Guid subjectId);
 
-        Task<Publication> GetPublicationForSubjectAsync(Guid subjectId);
-        
-        Task<Subject> GetAsync(Guid releaseId, string name);
-        
-        Task<Subject> GetAsync(Guid subjectId);
+        Task<Publication> GetPublicationForSubject(Guid subjectId);
 
-        Task<List<Subject>> GetSubjectsForReleaseAsync(Guid releaseId);
+        Task<Subject> Get(Guid releaseId, string name);
+
+        Task<Subject> Get(Guid subjectId);
+
+        Task<List<Subject>> GetSubjectsForRelease(Guid releaseId);
     }
 }

@@ -46,7 +46,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Services
 
         public Task<Either<ActionResult, TableBuilderResultViewModel>> Query(ObservationQueryContext queryContext)
         {
-            var publicationId = _subjectService.GetPublicationForSubjectAsync(queryContext.SubjectId).Result.Id;
+            var publicationId = _subjectService.GetPublicationForSubject(queryContext.SubjectId).Result.Id;
             var releaseId = _releaseService.GetLatestPublishedRelease(publicationId);
             
             return Query(releaseId.Value, queryContext);

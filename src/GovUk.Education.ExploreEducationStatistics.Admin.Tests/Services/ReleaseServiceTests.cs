@@ -350,7 +350,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
                     service.IsImportFinished(file.ReleaseId, file.Filename))
                 .ReturnsAsync(true);
 
-            subjectService.Setup(service => service.GetAsync(subject.Id)).ReturnsAsync(subject);
+            subjectService.Setup(service => service.Get(subject.Id)).ReturnsAsync(subject);
 
             releaseDataFileService.Setup(service => service.Delete(release.Id, file.Id, false))
                 .ReturnsAsync(Unit.Instance);
@@ -430,7 +430,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
                     service.IsImportFinished(file.ReleaseId, file.Filename))
                 .ReturnsAsync(false);
 
-            subjectService.Setup(service => service.GetAsync(subject.Id)).ReturnsAsync(subject);
+            subjectService.Setup(service => service.Get(subject.Id)).ReturnsAsync(subject);
 
             await using (var context = InMemoryApplicationDbContext(contentDbContextId))
             {
@@ -517,8 +517,8 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
                         It.IsIn(file.Filename, replacementFile.Filename)))
                 .ReturnsAsync(true);
 
-            subjectService.Setup(service => service.GetAsync(subject.Id)).ReturnsAsync(subject);
-            subjectService.Setup(service => service.GetAsync(replacementSubject.Id)).ReturnsAsync(replacementSubject);
+            subjectService.Setup(service => service.Get(subject.Id)).ReturnsAsync(subject);
+            subjectService.Setup(service => service.Get(replacementSubject.Id)).ReturnsAsync(replacementSubject);
 
             releaseDataFileService
                 .Setup(service => service.Delete(release.Id, It.IsIn(file.Id, replacementFile.Id), false))

@@ -426,7 +426,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Services
                 .OnSuccess(async releaseFileReference =>
                 {
                     var subject = releaseFileReference.SubjectId.HasValue
-                        ? await _subjectService.GetAsync(releaseFileReference.SubjectId.Value)
+                        ? await _subjectService.Get(releaseFileReference.SubjectId.Value)
                         : null;
 
                     var footnotes = subject == null
@@ -478,7 +478,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Services
 
         private async Task RemoveFileImportEntryIfOrphaned(DeleteDataFilePlan deletePlan)
         {
-            if (await _subjectService.GetAsync(deletePlan.SubjectId) == null)
+            if (await _subjectService.Get(deletePlan.SubjectId) == null)
             {
                 await _coreTableStorageService.DeleteEntityAsync(DatafileImportsTableName, deletePlan.TableStorageItem);
             }
