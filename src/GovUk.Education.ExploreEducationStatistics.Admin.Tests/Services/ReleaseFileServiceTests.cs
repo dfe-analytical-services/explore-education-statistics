@@ -1152,6 +1152,18 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
             }
         }
 
+        [Fact]
+        public async Task UploadAncillary()
+        {
+            // TODO
+        }
+
+        [Fact]
+        public async Task UploadChart()
+        {
+            // TODO
+        }
+
         private static ReleaseFileService SetupReleaseFileService(
             ContentDbContext contentDbContext,
             IPersistenceHelper<ContentDbContext> contentPersistenceHelper = null,

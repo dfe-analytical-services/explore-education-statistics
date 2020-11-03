@@ -69,6 +69,12 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Services
             return created;
         }
 
+        public async Task Delete(Guid id)
+        {
+            var file = await Get(id);
+            _contentDbContext.ReleaseFileReferences.Remove(file);
+        }
+
         public async Task<ReleaseFileReference> Get(Guid id)
         {
             return await _contentDbContext.ReleaseFileReferences

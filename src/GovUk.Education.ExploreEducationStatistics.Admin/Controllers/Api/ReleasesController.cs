@@ -124,7 +124,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Controllers.Api
             [FromQuery(Name = "name"), Required] string name, IFormFile file)
         {
             return await _releaseFileService
-                .Upload(releaseId, file, ReleaseFileTypes.Ancillary, name)
+                .UploadAncillary(releaseId, file, name)
                 .HandleFailuresOrOk();
         }
 
@@ -137,7 +137,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Controllers.Api
         public async Task<ActionResult<FileInfo>> AddChartFileAsync(Guid releaseId, IFormFile file)
         {
             return await _releaseFileService
-                .Upload(releaseId, file, ReleaseFileTypes.Chart)
+                .UploadChart(releaseId, file)
                 .HandleFailuresOrOk();
         }
 
@@ -150,7 +150,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Controllers.Api
         public async Task<ActionResult<FileInfo>> UpdateChartFileAsync(Guid releaseId, Guid id, IFormFile file)
         {
             return await _releaseFileService
-                .Upload(releaseId, file, ReleaseFileTypes.Chart, replacingId: id)
+                .UploadChart(releaseId, file, replacingId: id)
                 .HandleFailuresOrOk();
         }
 

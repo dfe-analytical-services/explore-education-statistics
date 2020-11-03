@@ -15,6 +15,8 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Services.Interfaces
             ReleaseFileReference replacingFile = null,
             ReleaseFileReference source = null);
 
+        public Task Delete(Guid id);
+
         public Task<ReleaseFileReference> Get(Guid id);
     }
 }

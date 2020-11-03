@@ -83,7 +83,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Services
                 .OnSuccess(async release => await _userService.CheckCanUpdateRelease(release, ignoreCheck: forceDelete))
                 .OnSuccess(async release =>
                     await ids.Select(id => _releaseFileRepository.CheckFileExists(releaseId, id, ReleaseFileTypes.Data))
-                        .Aggregate())
+                        .OnSuccessAll())
                 .OnSuccessVoid(async files =>
                 {
                     foreach (var file in files)
@@ -119,8 +119,8 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Services
                             await _releaseFileRepository.Delete(releaseId, file.Id);
                             await _releaseFileRepository.Delete(releaseId, metaReleaseFileReference.Id);
 
-                            _contentDbContext.ReleaseFileReferences.Remove(file);
-                            _contentDbContext.ReleaseFileReferences.Remove(metaReleaseFileReference);
+                            await _fileRepository.Delete(file.Id);
+                            await _fileRepository.Delete(metaReleaseFileReference.Id);
 
                             if (file.SourceId.HasValue)
                             {
@@ -131,7 +131,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Services
                                     AdminReleasePath(releaseId, DataZip, sourceRef.Filename)
                                 );
                                 // N.B. No ReleaseFiles row for source links
-                                _contentDbContext.ReleaseFileReferences.Remove(sourceRef);
+                                await _fileRepository.Delete(sourceRef.Id);
                             }
                         }
 
@@ -253,10 +253,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Services
 
                                         var blob = await _blobStorageService.GetBlob(
                                             PrivateFilesContainerName,
-                                            AdminReleasePath(
-                                                fileReference.ReleaseId,
-                                                fileReference.ReleaseFileType,
-                                                fileReference.BlobStorageName)
+                                            fileReference.Path()
                                         );
 
                                         return new DataFileInfo

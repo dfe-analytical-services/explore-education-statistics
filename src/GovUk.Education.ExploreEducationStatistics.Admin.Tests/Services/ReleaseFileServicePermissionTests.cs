@@ -139,7 +139,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
         }
 
         [Fact]
-        public void Upload()
+        public void UploadAncillary()
         {
             PolicyCheckBuilder()
                 .ExpectResourceCheckToFail(_release, CanUpdateSpecificRelease)
@@ -147,10 +147,24 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
                     userService =>
                     {
                         var service = SetupReleaseFileService(userService: userService.Object);
-                        return service.Upload(releaseId: _release.Id,
+                        return service.UploadAncillary(releaseId: _release.Id,
                             file: new Mock<IFormFile>().Object,
-                            type: ReleaseFileTypes.Ancillary,
-                            name: "",
+                            name: "");
+                    }
+                );
+        }
+
+        [Fact]
+        public void UploadChart()
+        {
+            PolicyCheckBuilder()
+                .ExpectResourceCheckToFail(_release, CanUpdateSpecificRelease)
+                .AssertForbidden(
+                    userService =>
+                    {
+                        var service = SetupReleaseFileService(userService: userService.Object);
+                        return service.UploadChart(releaseId: _release.Id,
+                            file: new Mock<IFormFile>().Object,
                             replacingId: null);
                     }
                 );

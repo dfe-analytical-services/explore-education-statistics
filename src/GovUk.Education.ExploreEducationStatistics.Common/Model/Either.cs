@@ -259,7 +259,7 @@ public class Either<Tl, Tr> {
             return func();
         }
 
-        public static async Task<Either<Tl, List<Tr>>> Aggregate<Tl, Tr>(this IEnumerable<Task<Either<Tl, Tr>>> tasks)
+        public static async Task<Either<Tl, List<Tr>>> OnSuccessAll<Tl, Tr>(this IEnumerable<Task<Either<Tl, Tr>>> tasks)
         {
             var result = new List<Tr>();
             foreach (var task in tasks)
