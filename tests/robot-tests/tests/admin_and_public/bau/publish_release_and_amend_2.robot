@@ -12,7 +12,7 @@ ${DETAILS_HEADING}  Academic Year 2020/21
 ${PUBLICATION_NAME}  Permalink Test Publication %{RUN_IDENTIFIER}
 ${TOPIC_NAME}  %{TEST_TOPIC_NAME}
 ${SUBJECT_NAME}  Dates test subject
-
+${SECOND_SUBJECT}  Dates test subject-%{RUN_IDENTIFIER}
 *** Test Cases ***
 Create publication & release
     [Tags]  HappyPath
@@ -34,20 +34,46 @@ Upload a subject
     ${section}=  user gets accordion section content element  ${SUBJECT_NAME}
     user checks headed table body row contains  Status           Complete  ${section}  180
 
-Add meta guidance to subject
+upload another subject (for deletion later)
+    user waits until page contains element  id:dataFileUploadForm-subjectTitle
+    user enters text into element  id:dataFileUploadForm-subjectTitle   ${SECOND_SUBJECT}
+    user chooses file   id:dataFileUploadForm-dataFile       ${FILES_DIR}upload-file-test.csv
+    user chooses file   id:dataFileUploadForm-metadataFile   ${FILES_DIR}upload-file-test.meta.csv
+    user clicks button  Upload data files
+    user waits until h2 is visible  Uploaded data files
+    user waits until page contains accordion section   ${SECOND_SUBJECT}
+    user opens accordion section   ${SECOND_SUBJECT}
+    ${section}=  user gets accordion section content element  ${SECOND_SUBJECT}
+    user checks headed table body row contains  Status           Complete  ${section}  180
+
+
+# fill out metaguidance
+
+Add meta guidance to dates test subject
     [Tags]  HappyPath
+    Set Selenium Speed  0.3s seconds
     user clicks link  Metadata guidance
     user waits until h2 is visible  Public metadata guidance document
-
     user waits until page contains accordion section  ${SUBJECT_NAME}
     user enters text into meta guidance data file content editor  ${SUBJECT_NAME}
     ...  ${SUBJECT_NAME} meta guidance content
-    user clicks button  Save guidance
+    user clicks element  css:body
 
-Go to "Release status" page
+
+Add meta guidance to Second Subject
     [Tags]  HappyPath
-    user clicks link   Release status
-    user waits until h2 is visible  Release status
+    Set Selenium Speed  0.3 seconds
+    user waits until page contains accordion section  ${SECOND_SUBJECT}
+    user enters text into meta guidance data file content editor  ${SECOND_SUBJECT}
+    ...  ${SECOND_SUBJECT} meta guidance content
+    user clicks button  Save guidance
+    Sleep  1000000
+
+
+Go to "Sign off" page
+    [Tags]  HappyPath
+    user clicks link   Sign off
+    user waits until h2 is visible  Sign off
     user waits until page contains button  Edit release status
 
 Approve release
@@ -126,8 +152,8 @@ Validate results table column headings
     user checks table column heading contains  1   1   2020 Week 14
 
 Generate the peramlink
-    # EES-214
     [Tags]  HappyPath
+    [Documentation]  EES-214
     user clicks button  Generate permanent link
     user waits until page contains testid  permalink-generated-url
     ${PERMA_LOCATION_URL}=  Get Text  xpath://*[@data-testid="permalink-generated-url"]
@@ -166,8 +192,8 @@ replace data files for amendment
     user opens accordion section   Dates test subject
     ${section}=  user gets accordion section content element  Dates test subject
     user clicks link  Replace data  ${section}
-    user chooses file   id:dataFileUploadForm-dataFile       ${FILES_DIR}upload-file-test.csv
-    user chooses file   id:dataFileUploadForm-metadataFile   ${FILES_DIR}upload-file-test.meta.csv
+    user chooses file   id:dataFileUploadForm-dataFile       ${FILES_DIR}upload-file-test-with-filter.csv
+    user chooses file   id:dataFileUploadForm-metadataFile   ${FILES_DIR}upload-file-test-with-filter.meta.csv
     user clicks button  Upload data files
     user checks headed table body row cell contains  Status          2  Complete   wait=180
 
@@ -178,10 +204,23 @@ Confirm data replacement
     user clicks button  Confirm data replacement
     user waits until h2 is visible  Data replacement complete
 
-Go to "Release status" page for amendment
+go back to data and files to upload & delete subject
+    user clicks link  Data and files
+    user waits until page contains element  id:dataFileUploadForm-subjectTitle
+    user waits until h2 is visible  Uploaded data files
+
+
+
+# delete subject
+# fill out meta guidance
+
+
+
+
+Go to "Sign off" page for amendment
     [Tags]  HappyPath
-    user clicks link   Release status
-    user waits until h2 is visible  Release status
+    user clicks link   Sign off
+    user waits until h2 is visible  Sign off
     user waits until page contains button  Edit release status
 
 Approve release for amendment
@@ -204,18 +243,18 @@ Go to permalink page & check for error element to be present
     user goes to url  ${PERMA_LOCATION_URL}
     user waits until page contains  WARNING - The data used in this permalink may be out-of-date.
 
-# EES-1303
 Return to Admin to start deleting subject
     [Tags]  HappyPath
+    [Documentation]  EES-1303
     user goes to url  %{ADMIN_URL}
     user waits until h1 is visible  Dashboard
     user waits until page contains title caption  Welcome Bau1
 
-go to admin dashboard
-    [Tags]  HappyPath
-     go to  %{ADMIN_URL}
+# TODO:
+   # MAKE NEW SUBJECT AT THE START OF TEST THAT WILL BE PART OF ORIG RELEASE
+   # DELETE THAT SUBJECT FILE HERE
 
-Create amendment with empty files
+Create amendment
     [Tags]  HappyPath
     user selects theme and topic from admin dashboard  %{TEST_THEME_NAME}  ${TOPIC_NAME}
     user waits until page contains accordion section   ${PUBLICATION_NAME}
