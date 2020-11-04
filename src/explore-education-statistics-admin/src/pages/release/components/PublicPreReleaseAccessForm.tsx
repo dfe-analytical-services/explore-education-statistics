@@ -1,19 +1,14 @@
 import FormFieldEditor from '@admin/components/form/FormFieldEditor';
 import PreviewHtml from '@admin/components/PreviewHtml';
-import { useConfig } from '@admin/contexts/ConfigContext';
 import useFormSubmit from '@admin/hooks/useFormSubmit';
 import styles from '@admin/pages/release/components/PublicPreReleaseAccessForm.module.scss';
-import { ReleaseRouteParams } from '@admin/routes/releaseRoutes';
-import { preReleaseRoute } from '@admin/routes/routes';
 import Button from '@common/components/Button';
 import ButtonGroup from '@common/components/ButtonGroup';
 import { Form } from '@common/components/form';
-import UrlContainer from '@common/components/UrlContainer';
 import WarningMessage from '@common/components/WarningMessage';
 import useToggle from '@common/hooks/useToggle';
 import { Formik } from 'formik';
 import React from 'react';
-import { generatePath } from 'react-router';
 
 const defaultAccessListText = `
 <p>Beside Department for Education (DfE) professional and production staff the 
@@ -31,26 +26,17 @@ interface FormValues {
 }
 
 interface Props {
-  publicationId: string;
-  publicationSlug: string;
-  releaseId: string;
-  releaseSlug: string;
   isReleaseLive?: boolean;
   preReleaseAccessList: string;
   onSubmit: (values: FormValues) => void;
 }
 
 const PublicPreReleaseAccessForm = ({
-  publicationId,
-  publicationSlug,
-  releaseId,
-  releaseSlug,
   isReleaseLive = false,
   preReleaseAccessList,
   onSubmit,
 }: Props) => {
   const [showForm, toggleForm] = useToggle(false);
-  const { PublicAppUrl } = useConfig();
 
   const handleSubmit = useFormSubmit<FormValues>(async values => {
     await onSubmit(values);

@@ -14,7 +14,6 @@ import { MyPublication } from '@admin/services/publicationService';
 import releaseService, { Release } from '@admin/services/releaseService';
 import ButtonGroup from '@common/components/ButtonGroup';
 import ModalConfirm from '@common/components/ModalConfirm';
-import { orderBy } from 'lodash';
 import React, { useState } from 'react';
 import { generatePath, useHistory } from 'react-router';
 import CancelAmendmentModal from './CancelAmendmentModal';
