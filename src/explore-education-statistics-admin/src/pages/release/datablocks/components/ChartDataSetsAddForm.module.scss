@@ -23,22 +23,3 @@
     margin-bottom: govuk-spacing(4);
   }
 }
-
-.dataSets {
-  list-style: none;
-  padding-left: 0;
-
-  li {
-    border-bottom: 1px solid govuk-colour('mid-grey');
-    margin-bottom: govuk-spacing(4);
-  }
-
-  &:last-of-type {
-    border-bottom: 0;
-  }
-}
-
-.dataSetRow {
-  display: flex;
-  justify-content: space-between;
-}

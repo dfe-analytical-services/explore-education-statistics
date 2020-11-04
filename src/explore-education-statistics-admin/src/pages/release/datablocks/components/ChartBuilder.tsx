@@ -2,7 +2,7 @@ import useGetChartFile from '@admin/hooks/useGetChartFile';
 import ChartAxisConfiguration from '@admin/pages/release/datablocks/components/ChartAxisConfiguration';
 import ChartBuilderPreview from '@admin/pages/release/datablocks/components/ChartBuilderPreview';
 import ChartConfiguration from '@admin/pages/release/datablocks/components/ChartConfiguration';
-import ChartDataSelector from '@admin/pages/release/datablocks/components/ChartDataSelector';
+import ChartDataSetsConfiguration from '@admin/pages/release/datablocks/components/ChartDataSetsConfiguration';
 import ChartDefinitionSelector from '@admin/pages/release/datablocks/components/ChartDefinitionSelector';
 import {
   ChartOptions,
@@ -401,7 +401,7 @@ const ChartBuilder = ({
               headingTitle="Add data sets to the chart"
               id={forms.data.id}
             >
-              <ChartDataSelector
+              <ChartDataSetsConfiguration
                 buttons={deleteButton}
                 canSaveChart={canSaveChart}
                 isSaving={isSaving}
