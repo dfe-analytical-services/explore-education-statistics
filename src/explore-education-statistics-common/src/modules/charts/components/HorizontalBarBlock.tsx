@@ -43,6 +43,7 @@ const HorizontalBarBlock = ({
   data,
   meta,
   height,
+  barThickness,
   width,
   stacked = false,
   axes,
@@ -140,6 +141,7 @@ const HorizontalBarBlock = ({
               key={dataKey}
               dataKey={dataKey}
               isAnimationActive={false}
+              maxBarSize={barThickness}
               name={config.label}
               fill={config.colour}
               unit={dataSet.indicator.unit}
