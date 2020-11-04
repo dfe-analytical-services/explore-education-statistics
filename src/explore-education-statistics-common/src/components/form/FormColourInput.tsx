@@ -3,7 +3,7 @@ import BaseFormInput, {
 } from '@common/components/form/FormBaseInput';
 import React from 'react';
 
-interface FormColourInputProps extends FormBaseInputProps {
+export interface FormColourInputProps extends FormBaseInputProps {
   list: string;
   value?: string;
 }

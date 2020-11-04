@@ -1,11 +1,19 @@
 import { ChartBuilderForm } from '@admin/pages/release/datablocks/components/ChartBuilder';
 import ChartBuilderSaveActions from '@admin/pages/release/datablocks/components/ChartBuilderSaveActions';
-import ChartDataConfiguration from '@admin/pages/release/datablocks/components/ChartDataConfiguration';
 import styles from '@admin/pages/release/datablocks/components/ChartDataSetsConfiguration.module.scss';
 import ChartDataSetsAddForm from '@admin/pages/release/datablocks/components/ChartDataSetsAddForm';
 import { FormState } from '@admin/pages/release/datablocks/reducers/chartBuilderReducer';
 import Button from '@common/components/Button';
 import Details from '@common/components/Details';
+import Effect from '@common/components/Effect';
+import {
+  Form,
+  FormFieldSelect,
+  FormFieldset,
+  FormFieldTextInput,
+} from '@common/components/form';
+import FormFieldColourInput from '@common/components/form/FormFieldColourInput';
+import { SelectOption } from '@common/components/form/FormSelect';
 import { ChartDefinition } from '@common/modules/charts/types/chart';
 import {
   DataSet,
@@ -18,8 +26,33 @@ import generateDefaultDataSetLabel from '@common/modules/charts/util/generateDef
 import { LocationFilter } from '@common/modules/table-tool/types/filters';
 import { FullTableMeta } from '@common/modules/table-tool/types/fullTable';
 import { Dictionary } from '@common/types';
+import { Formik } from 'formik';
 import difference from 'lodash/difference';
-import React, { ReactNode, useEffect, useState } from 'react';
+import upperFirst from 'lodash/upperFirst';
+import React, { ReactNode, useState } from 'react';
+
+const colourOptions: SelectOption[] = colours.map(color => {
+  return {
+    label: color,
+    value: color,
+    style: { backgroundColor: color },
+  };
+});
+
+const symbolOptions: SelectOption[] = symbols.map<SelectOption>(symbol => ({
+  label: upperFirst(symbol),
+  value: symbol,
+}));
+
+const lineStyleOptions: SelectOption[] = [
+  { label: 'Solid', value: 'solid' },
+  { label: 'Dashed', value: 'dashed' },
+  { label: 'Dotted', value: 'dotted' },
+];
+
+interface FormValues {
+  dataSets: DataSetConfiguration[];
+}
 
 interface Props {
   buttons?: ReactNode;
@@ -61,16 +94,6 @@ const ChartDataSetsConfiguration = ({
   const [dataSetConfigs, setDataSetConfigs] = useState<DataSetConfiguration[]>([
     ...dataSets,
   ]);
-
-  const [submitCount, setSubmitCount] = useState(0);
-
-  useEffect(() => {
-    onFormStateChange({
-      form: 'data',
-      isValid: true,
-      submitCount,
-    });
-  }, [onFormStateChange, submitCount]);
 
   const removeSelected = (selected: DataSetConfiguration, index: number) => {
     const newDataSets = [...dataSetConfigs];
@@ -144,76 +167,137 @@ const ChartDataSetsConfiguration = ({
         }}
       />
 
-      {dataSetConfigs.length > 0 && (
-        <>
-          <hr />
+      <hr />
 
-          <ul className={styles.dataSets}>
-            {dataSetConfigs.map((dataSet, index) => {
-              const expandedDataSet = expandDataSet(dataSet, meta);
-              const label = generateDefaultDataSetLabel(expandedDataSet);
+      <Formik<FormValues>
+        enableReinitialize
+        initialValues={{
+          dataSets: dataSetConfigs,
+        }}
+        onSubmit={values => {
+          if (canSaveChart) {
+            onSubmit(values.dataSets);
+          }
+        }}
+      >
+        {form => (
+          <Form id={formId}>
+            <Effect
+              value={{
+                form: 'data',
+                isValid: form.isValid,
+                submitCount: form.submitCount,
+              }}
+              onChange={onFormStateChange}
+              onMount={onFormStateChange}
+            />
+            <Effect value={form.values.dataSets} onChange={onDataChanged} />
 
-              return (
-                <li key={generateDataSetKey(dataSet)}>
-                  <div className={styles.dataSetRow}>
-                    <span>{label}</span>
+            <ul className={styles.dataSets}>
+              {dataSetConfigs.map((dataSet, index) => {
+                const id = `${formId}-dataSet-${index}`;
 
-                    <div>
-                      <Button
-                        onClick={() => removeSelected(dataSet, index)}
-                        className="govuk-!-margin-bottom-0 govuk-button--secondary"
-                      >
-                        Remove
-                      </Button>
+                const expandedDataSet = expandDataSet(dataSet, meta);
+                const label = generateDefaultDataSetLabel(expandedDataSet);
+
+                return (
+                  <li key={generateDataSetKey(dataSet)}>
+                    <div className={styles.dataSetRow}>
+                      <span>{label}</span>
+
+                      <div>
+                        <Button
+                          onClick={() => removeSelected(dataSet, index)}
+                          className="govuk-!-margin-bottom-0 govuk-button--secondary"
+                        >
+                          Remove
+                        </Button>
+                      </div>
                     </div>
-                  </div>
 
-                  <Details
-                    summary="Change styling"
-                    className="govuk-!-margin-bottom-3"
-                  >
-                    <ChartDataConfiguration
-                      capabilities={capabilities}
-                      dataSet={dataSet}
-                      id={`${formId}-chartDataConfiguration-${index}`}
-                      onConfigurationChange={updatedDataSetConfig => {
-                        const nextDataSetConfigs = [...dataSetConfigs];
+                    <Details
+                      summary="Change styling"
+                      className="govuk-!-margin-bottom-3"
+                    >
+                      <FormFieldset
+                        id={id}
+                        legend="Styling options"
+                        legendHidden
+                      >
+                        <div className={styles.configuration}>
+                          {dataSet.timePeriod && dataSet.location && (
+                            <div className={styles.labelInput}>
+                              <FormFieldTextInput
+                                id={`${id}-label`}
+                                name={`dataSets[${index}].config.label`}
+                                label="Label"
+                                formGroup={false}
+                              />
+                            </div>
+                          )}
 
-                        nextDataSetConfigs[index] = {
-                          ...nextDataSetConfigs[index],
-                          config: updatedDataSetConfig,
-                        };
+                          <div className={styles.colourInput}>
+                            <FormFieldColourInput
+                              id={`${id}-colour`}
+                              name={`dataSets[${index}].config.colour`}
+                              label="Colour"
+                              list={`${id}-colours`}
+                              formGroup={false}
+                            />
 
-                        setDataSetConfigs(nextDataSetConfigs);
+                            <datalist id={`${id}-colours`}>
+                              {colourOptions.map(({ value }) => (
+                                <option key={value} value={value} />
+                              ))}
+                            </datalist>
+                          </div>
 
-                        if (onDataChanged) {
-                          onDataChanged(nextDataSetConfigs);
-                        }
-                      }}
-                    />
-                  </Details>
-                </li>
-              );
-            })}
-          </ul>
+                          {capabilities.dataSymbols && (
+                            <div className={styles.configurationInput}>
+                              <FormFieldSelect
+                                id={`${id}-symbol`}
+                                name={`dataSets[${index}].config.symbol`}
+                                label="Symbol"
+                                placeholder="None"
+                                formGroup={false}
+                                options={symbolOptions}
+                              />
+                            </div>
+                          )}
 
-          <ChartBuilderSaveActions
-            disabled={isSaving}
-            formId={formId}
-            forms={forms}
-            showSubmitError={submitCount > 0 && !canSaveChart}
-            onClick={() => {
-              setSubmitCount(submitCount + 1);
+                          {capabilities.lineStyle && (
+                            <div className={styles.configurationInput}>
+                              <FormFieldSelect
+                                id={`${id}-lineStyle`}
+                                name={`dataSets[${index}].config.lineStyle`}
+                                label="Style"
+                                order={[]}
+                                formGroup={false}
+                                options={lineStyleOptions}
+                              />
+                            </div>
+                          )}
+                        </div>
+                      </FormFieldset>
+                    </Details>
+                  </li>
+                );
+              })}
+            </ul>
 
-              if (canSaveChart) {
-                onSubmit(dataSetConfigs);
+            <ChartBuilderSaveActions
+              disabled={isSaving}
+              formId={formId}
+              forms={forms}
+              showSubmitError={
+                form.isValid && form.submitCount > 0 && !canSaveChart
               }
-            }}
-          >
-            {buttons}
-          </ChartBuilderSaveActions>
-        </>
-      )}
+            >
+              {buttons}
+            </ChartBuilderSaveActions>
+          </Form>
+        )}
+      </Formik>
     </>
   );
 };
