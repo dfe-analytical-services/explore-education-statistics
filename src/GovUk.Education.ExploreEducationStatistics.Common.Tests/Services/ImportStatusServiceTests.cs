@@ -347,7 +347,10 @@ namespace GovUk.Education.ExploreEducationStatistics.Common.Tests.Services
 
             importsTable.Setup(mock => mock.ExecuteAsync(It.Is<TableOperation>(operation =>
                     operation.OperationType == TableOperationType.Replace)))
-                .ThrowsAsync(new StorageException());
+                .ThrowsAsync(new StorageException(new RequestResult
+                {
+                    HttpStatusCode = 412
+                }, "", null));
 
             var service = BuildImportStatusService(tableStorageService: tableStorageService.Object);
 
@@ -460,7 +463,10 @@ namespace GovUk.Education.ExploreEducationStatistics.Common.Tests.Services
 
             importsTable.Setup(mock => mock.ExecuteAsync(It.Is<TableOperation>(operation =>
                     operation.OperationType == TableOperationType.Replace)))
-                .ThrowsAsync(new StorageException());
+                .ThrowsAsync(new StorageException(new RequestResult
+                {
+                    HttpStatusCode = 412
+                }, "", null));
 
             var service = BuildImportStatusService(tableStorageService: tableStorageService.Object);
 
