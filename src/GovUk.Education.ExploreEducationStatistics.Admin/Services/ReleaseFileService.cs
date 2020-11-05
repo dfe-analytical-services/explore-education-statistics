@@ -212,77 +212,73 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Services
                 .CheckEntityExists<Release>(releaseId)
                 .OnSuccess(_userService.CheckCanUpdateRelease)
                 .OnSuccess(async () => await _fileUploadsValidatorService.ValidateUploadFileType(file, Ancillary))
-                .OnSuccess(async release =>
+                .OnSuccess(async () =>
+                    await _fileUploadsValidatorService.ValidateFileForUpload(releaseId, file, Ancillary, false))
+                .OnSuccess(async () => await _fileUploadsValidatorService.ValidateFileUploadName(name))
+                .OnSuccess(async () =>
                 {
-                    return await _fileUploadsValidatorService.ValidateFileForUpload(releaseId, file, Ancillary, false)
-                        .OnSuccessDo(async () => await _fileUploadsValidatorService.ValidateFileUploadName(name))
-                        .OnSuccess(async () =>
+                    var releaseFileReference = await _fileRepository.CreateOrUpdate(
+                        file.FileName.ToLower(), releaseId, Ancillary);
+                    await _contentDbContext.SaveChangesAsync();
+
+                    await _blobStorageService.UploadFile(
+                        containerName: PrivateFilesContainerName,
+                        path: releaseFileReference.Path(),
+                        file: file,
+                        options: new IBlobStorageService.UploadFileOptions
                         {
-                            var releaseFileReference = await _fileRepository.CreateOrUpdate(
-                                file.FileName.ToLower(), releaseId, Ancillary);
-                            await _contentDbContext.SaveChangesAsync();
-
-                            await _blobStorageService.UploadFile(
-                                containerName: PrivateFilesContainerName,
-                                path: releaseFileReference.Path(),
-                                file: file,
-                                options: new IBlobStorageService.UploadFileOptions
+                            MetaValues = new Dictionary<string, string>
+                            {
                                 {
-                                    MetaValues = new Dictionary<string, string>
-                                    {
-                                        {
-                                            NameKey, name
-                                        }
-                                    }
+                                    NameKey, name
                                 }
-                            );
+                            }
+                        }
+                    );
 
-                            var blob = await _blobStorageService.GetBlob(
-                                PrivateFilesContainerName,
-                                releaseFileReference.Path());
+                    var blob = await _blobStorageService.GetBlob(
+                        PrivateFilesContainerName,
+                        releaseFileReference.Path());
 
-                            return blob.ToFileInfo(Ancillary, releaseFileReference.Id);
-                        });
+                    return blob.ToFileInfo(Ancillary, releaseFileReference.Id);
                 });
         }
 
-        public Task<Either<ActionResult, FileInfo>> UploadChart(Guid releaseId, IFormFile file, Guid? replacingId = null)
+        public Task<Either<ActionResult, FileInfo>> UploadChart(Guid releaseId,
+            IFormFile file,
+            Guid? replacingId = null)
         {
             return _persistenceHelper
                 .CheckEntityExists<Release>(releaseId)
                 .OnSuccess(_userService.CheckCanUpdateRelease)
                 .OnSuccess(async () => await _fileUploadsValidatorService.ValidateUploadFileType(file, Chart))
-                .OnSuccess(async release =>
+                .OnSuccess(async () => await _fileUploadsValidatorService.ValidateFileForUpload(releaseId, file, Chart, replacingId.HasValue))
+                .OnSuccess(async () =>
                 {
-                    var overwrite = replacingId.HasValue;
-                    return await _fileUploadsValidatorService.ValidateFileForUpload(releaseId, file, Chart, overwrite)
-                        .OnSuccess(async () =>
+                    var releaseFileReference = await _fileRepository.CreateOrUpdate(
+                        file.FileName.ToLower(), releaseId, Chart, replacingId);
+                    await _contentDbContext.SaveChangesAsync();
+
+                    await _blobStorageService.UploadFile(
+                        containerName: PrivateFilesContainerName,
+                        path: releaseFileReference.Path(),
+                        file: file,
+                        options: new IBlobStorageService.UploadFileOptions
                         {
-                            var releaseFileReference = await _fileRepository.CreateOrUpdate(
-                                file.FileName.ToLower(), releaseId, Chart, replacingId);
-                            await _contentDbContext.SaveChangesAsync();
-
-                            await _blobStorageService.UploadFile(
-                                containerName: PrivateFilesContainerName,
-                                path: releaseFileReference.Path(),
-                                file: file,
-                                options: new IBlobStorageService.UploadFileOptions
+                            MetaValues = new Dictionary<string, string>
+                            {
                                 {
-                                    MetaValues = new Dictionary<string, string>
-                                    {
-                                        {
-                                            NameKey, file.FileName.ToLower()
-                                        }
-                                    }
+                                    NameKey, file.FileName.ToLower()
                                 }
-                            );
+                            }
+                        }
+                    );
 
-                            var blob = await _blobStorageService.GetBlob(
-                                PrivateFilesContainerName,
-                                releaseFileReference.Path());
+                    var blob = await _blobStorageService.GetBlob(
+                        PrivateFilesContainerName,
+                        releaseFileReference.Path());
 
-                            return blob.ToFileInfo(Chart, releaseFileReference.Id);
-                        });
+                    return blob.ToFileInfo(Chart, releaseFileReference.Id);
                 });
         }
     }
