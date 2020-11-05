@@ -18,10 +18,6 @@ describe('PublicPreReleaseAccessForm', () => {
     render(
       <TestConfigContextProvider>
         <PublicPreReleaseAccessForm
-          publicationId="publication-1"
-          publicationSlug="test-publication"
-          releaseId="release-1"
-          releaseSlug="test-release"
           preReleaseAccessList={testAccessList}
           onSubmit={noop}
         />
@@ -42,14 +38,7 @@ describe('PublicPreReleaseAccessForm', () => {
   test('clicking Create button renders form with default text', () => {
     render(
       <TestConfigContextProvider>
-        <PublicPreReleaseAccessForm
-          publicationId="publication-1"
-          publicationSlug="test-publication"
-          releaseId="release-1"
-          releaseSlug="test-release"
-          preReleaseAccessList=""
-          onSubmit={noop}
-        />
+        <PublicPreReleaseAccessForm preReleaseAccessList="" onSubmit={noop} />
       </TestConfigContextProvider>,
     );
 
@@ -78,10 +67,6 @@ describe('PublicPreReleaseAccessForm', () => {
     render(
       <TestConfigContextProvider>
         <PublicPreReleaseAccessForm
-          publicationId="publication-1"
-          publicationSlug="test-publication"
-          releaseId="release-1"
-          releaseSlug="test-release"
           isReleaseLive
           preReleaseAccessList={testAccessList}
           onSubmit={noop}
@@ -115,14 +100,7 @@ describe('PublicPreReleaseAccessForm', () => {
   test('submitting form hides the form', async () => {
     render(
       <TestConfigContextProvider>
-        <PublicPreReleaseAccessForm
-          publicationId="publication-1"
-          publicationSlug="test-publication"
-          releaseId="release-1"
-          releaseSlug="test-release"
-          preReleaseAccessList=""
-          onSubmit={noop}
-        />
+        <PublicPreReleaseAccessForm preReleaseAccessList="" onSubmit={noop} />
       </TestConfigContextProvider>,
     );
 
@@ -149,10 +127,6 @@ describe('PublicPreReleaseAccessForm', () => {
     render(
       <TestConfigContextProvider>
         <PublicPreReleaseAccessForm
-          publicationId="publication-1"
-          publicationSlug="test-publication"
-          releaseId="release-1"
-          releaseSlug="test-release"
           preReleaseAccessList=""
           onSubmit={handleSubmit}
         />

@@ -74,7 +74,9 @@ export type ImportStatusCode =
 
 export interface DataFileImportStatus {
   status: ImportStatusCode;
-  percentageComplete?: string;
+  percentageComplete: number;
+  phaseComplete: boolean;
+  phasePercentageComplete: number;
   errors?: string[];
   numberOfRows: number;
 }

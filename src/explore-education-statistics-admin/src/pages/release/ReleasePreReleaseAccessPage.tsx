@@ -94,10 +94,6 @@ const ReleasePreReleaseAccessPage = () => {
             <h2>Public pre-release access list</h2>
 
             <PublicPreReleaseAccessForm
-              publicationId={release.publicationId}
-              publicationSlug={release.publicationSlug}
-              releaseId={release.id}
-              releaseSlug={release.slug}
               isReleaseLive={release.live}
               preReleaseAccessList={release.preReleaseAccessList}
               onSubmit={async ({ preReleaseAccessList }) => {
