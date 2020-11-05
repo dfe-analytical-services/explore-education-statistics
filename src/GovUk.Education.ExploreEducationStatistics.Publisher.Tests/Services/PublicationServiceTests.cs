@@ -1,11 +1,13 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Linq;
+using System.Threading.Tasks;
+using AutoMapper;
 using GovUk.Education.ExploreEducationStatistics.Content.Model;
 using GovUk.Education.ExploreEducationStatistics.Content.Model.Database;
+using GovUk.Education.ExploreEducationStatistics.Data.Model.Database;
 using GovUk.Education.ExploreEducationStatistics.Publisher.Services;
 using GovUk.Education.ExploreEducationStatistics.Publisher.Services.Interfaces;
-using Microsoft.EntityFrameworkCore;
 using Moq;
 using Xunit;
 using static GovUk.Education.ExploreEducationStatistics.Common.Model.TimeIdentifier;
@@ -246,11 +248,9 @@ namespace GovUk.Education.ExploreEducationStatistics.Publisher.Tests.Services
         [Fact]
         public void GetTree()
         {
-            var builder = new DbContextOptionsBuilder<ContentDbContext>();
-            builder.UseInMemoryDatabase(databaseName: "GetPublicationTree");
-            var options = builder.Options;
+            var contextId = Guid.NewGuid().ToString();
 
-            using (var context = new ContentDbContext(options))
+            using (var context = ContentDbUtils.InMemoryContentDbContext(contextId))
             {
                 context.Add(Theme);
                 context.Add(Topic);
@@ -260,12 +260,9 @@ namespace GovUk.Education.ExploreEducationStatistics.Publisher.Tests.Services
                 context.SaveChanges();
             }
 
-            using (var context = new ContentDbContext(options))
+            using (var context = ContentDbUtils.InMemoryContentDbContext(contextId))
             {
-                var releaseService = new Mock<IReleaseService>();
-
-                var service =
-                    new PublicationService(context, MapperForProfile<MappingProfiles>(), releaseService.Object);
+                var service = BuildPublicationService(context);
 
                 var result = service.GetTree(Enumerable.Empty<Guid>());
 
@@ -294,11 +291,9 @@ namespace GovUk.Education.ExploreEducationStatistics.Publisher.Tests.Services
         [Fact]
         public void GetViewModelAsync()
         {
-            var builder = new DbContextOptionsBuilder<ContentDbContext>();
-            builder.UseInMemoryDatabase(databaseName: "GetPublicationViewModel");
-            var options = builder.Options;
+            var contextId = Guid.NewGuid().ToString();
 
-            using (var context = new ContentDbContext(options))
+            using (var context = ContentDbUtils.InMemoryContentDbContext(contextId))
             {
                 context.Add(Methodology);
                 context.Add(Theme);
@@ -309,15 +304,14 @@ namespace GovUk.Education.ExploreEducationStatistics.Publisher.Tests.Services
                 context.SaveChanges();
             }
 
-            using (var context = new ContentDbContext(options))
+            using (var context = ContentDbUtils.InMemoryContentDbContext(contextId))
             {
                 var releaseService = new Mock<IReleaseService>();
 
                 releaseService.Setup(s => s.GetLatestRelease(PublicationA.Id, Enumerable.Empty<Guid>()))
                     .Returns(PublicationARelease1V1);
 
-                var service =
-                    new PublicationService(context, MapperForProfile<MappingProfiles>(), releaseService.Object);
+                var service = BuildPublicationService(context, releaseService: releaseService.Object);
 
                 var result = service.GetViewModelAsync(PublicationA.Id, Enumerable.Empty<Guid>());
                 Assert.True(result.IsCompleted);
@@ -383,6 +377,150 @@ namespace GovUk.Education.ExploreEducationStatistics.Publisher.Tests.Services
                 Assert.Equal("publication-a-release-2017-q4", releases[2].Slug);
                 Assert.Equal("Academic Year Q4 2017/18", releases[2].Title);
             }
+        }
+
+        [Fact]
+        public async Task SetPublishedDate_AddsStatsPublication()
+        {
+            var publication = new Publication
+            {
+                Title = "Test publication",
+                Slug = "test-publication",
+                Topic = new Topic
+                {
+                    Title = "Test topic",
+                    Slug = "test-topic"
+                }
+            };
+
+            var publishDate = DateTime.Now;
+
+            var contextId = Guid.NewGuid().ToString();
+
+            await using (var contentDbContext = ContentDbUtils.InMemoryContentDbContext(contextId))
+            await using (var statisticsDbContext = StatisticsDbUtils.InMemoryStatisticsDbContext(contextId))
+            {
+                await contentDbContext.AddAsync(publication);
+                await contentDbContext.SaveChangesAsync();
+
+                await statisticsDbContext.AddAsync(
+                    new Data.Model.Topic
+                    {
+                        Id = publication.Topic.Id,
+                        Title = "Test topic",
+                        Slug = "test-topic",
+                    }
+                );
+                await statisticsDbContext.SaveChangesAsync();
+            }
+
+            await using (var contentDbContext = ContentDbUtils.InMemoryContentDbContext(contextId))
+            await using (var statisticsDbContext = StatisticsDbUtils.InMemoryStatisticsDbContext(contextId))
+            {
+                var service = BuildPublicationService(contentDbContext, statisticsDbContext);
+
+                await service.SetPublishedDate(publication.Id, publishDate);
+            }
+
+            await using (var contentDbContext = ContentDbUtils.InMemoryContentDbContext(contextId))
+            await using (var statisticsDbContext = StatisticsDbUtils.InMemoryStatisticsDbContext(contextId))
+            {
+                var contentPublication = await contentDbContext.Publications.FindAsync(publication.Id);
+                var statsPublication = await statisticsDbContext.Publication.FindAsync(publication.Id);
+
+                Assert.Equal(publication.Id, contentPublication.Id);
+                Assert.Equal("Test publication", contentPublication.Title);
+                Assert.Equal("test-publication", contentPublication.Slug);
+                Assert.Equal(publishDate, contentPublication.Published);
+
+                Assert.Equal(publication.Id, statsPublication.Id);
+                Assert.Equal("Test publication", statsPublication.Title);
+                Assert.Equal("test-publication", statsPublication.Slug);
+                Assert.Equal(publication.TopicId, statsPublication.TopicId);
+            }
+        }
+
+        [Fact]
+        public async Task SetPublishedDate_UpdatesStatsPublication()
+        {
+            var publication = new Publication
+            {
+                Title = "Test publication",
+                Slug = "test-publication",
+                Topic = new Topic
+                {
+                    Title = "Test topic",
+                    Slug = "test-topic"
+                }
+            };
+
+            var publishDate = DateTime.Now;
+
+            var contextId = Guid.NewGuid().ToString();
+
+            await using (var contentDbContext = ContentDbUtils.InMemoryContentDbContext(contextId))
+            await using (var statisticsDbContext = StatisticsDbUtils.InMemoryStatisticsDbContext(contextId))
+            {
+                await contentDbContext.AddAsync(publication);
+                await contentDbContext.SaveChangesAsync();
+
+                await statisticsDbContext.AddAsync(
+                    new Data.Model.Publication
+                    {
+                        Id = publication.Id,
+                        Title = "Old test publication",
+                        Slug = "old-test-publication"
+                    }
+                );
+                await statisticsDbContext.AddAsync(
+                    new Data.Model.Topic
+                    {
+                        Id = publication.Topic.Id,
+                        Title = "Test topic",
+                        Slug = "test-topic"
+                    }
+                );
+                await statisticsDbContext.SaveChangesAsync();
+            }
+
+            await using (var contentDbContext = ContentDbUtils.InMemoryContentDbContext(contextId))
+            await using (var statisticsDbContext = StatisticsDbUtils.InMemoryStatisticsDbContext(contextId))
+            {
+                var service = BuildPublicationService(contentDbContext, statisticsDbContext);
+
+                await service.SetPublishedDate(publication.Id, publishDate);
+            }
+
+            await using (var contentDbContext = ContentDbUtils.InMemoryContentDbContext(contextId))
+            await using (var statisticsDbContext = StatisticsDbUtils.InMemoryStatisticsDbContext(contextId))
+            {
+                var contentPublication = await contentDbContext.Publications.FindAsync(publication.Id);
+                var statsPublication = await statisticsDbContext.Publication.FindAsync(publication.Id);
+
+                Assert.Equal(publication.Id, contentPublication.Id);
+                Assert.Equal("Test publication", contentPublication.Title);
+                Assert.Equal("test-publication", contentPublication.Slug);
+                Assert.Equal(publishDate, contentPublication.Published);
+
+                Assert.Equal(publication.Id, statsPublication.Id);
+                Assert.Equal("Test publication", statsPublication.Title);
+                Assert.Equal("test-publication", statsPublication.Slug);
+                Assert.Equal(publication.TopicId, statsPublication.TopicId);
+            }
+        }
+
+        private PublicationService BuildPublicationService(
+            ContentDbContext contentDbContext,
+            StatisticsDbContext statisticsDbContext = null,
+            IMapper mapper = null,
+            IReleaseService releaseService = null
+        ) {
+            return new PublicationService(
+                contentDbContext: contentDbContext,
+                statisticsDbContext: statisticsDbContext ?? new Mock<StatisticsDbContext>().Object,
+                mapper: mapper ?? MapperForProfile<MappingProfiles>(),
+                releaseService: releaseService ?? new Mock<IReleaseService>().Object
+            );
         }
     }
 }

@@ -1,4 +1,5 @@
 col_name,col_type,label,indicator_grouping,indicator_unit,indicator_dp,filter_hint,filter_grouping_column
+zero_dp,Indicator,Zero DP,Zero DP,,0,,
 one_dp,Indicator,One DP,One DP,,1,,
 one_dp_percent,Indicator,One DP Percent,One DP,%,1,,
 one_dp_pound,Indicator,One DP Pound,One DP,£,1,,

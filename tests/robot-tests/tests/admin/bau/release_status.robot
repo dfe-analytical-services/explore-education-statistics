@@ -21,8 +21,8 @@ Submit release for Higher Review
     [Tags]  HappyPath
     user navigates to release summary from admin dashboard  ${PUBLICATION_NAME}  Financial Year 3000-01 (not Live)
 
-    user clicks link  Release status
-    user waits until h2 is visible  Release status
+    user clicks link  Sign off
+    user waits until h2 is visible  Sign off
 
     user clicks button  Edit release status
     user clicks radio  Ready for higher review
@@ -33,7 +33,7 @@ Submit release for Higher Review
 
 Verify release status is Higher Review
     [Tags]  HappyPath
-    user waits until h2 is visible  Release status
+    user waits until h2 is visible  Sign off
     user checks summary list contains  Current status  Awaiting higher review
     user checks summary list contains  Scheduled release  Not scheduled
     user checks summary list contains  Next release expected  December 3001
@@ -58,7 +58,7 @@ Approve release
 
 Verify release status is Approved
     [Tags]  HappyPath
-    user waits until h2 is visible  Release status
+    user waits until h2 is visible  Sign off
     user checks summary list contains  Current status  Approved
     user checks summary list contains  Scheduled release  1 December 3000
     user checks summary list contains  Next release expected  March 3002
@@ -78,7 +78,7 @@ Move release status back to Draft
 
 Verify release status is Draft
     [Tags]  HappyPath
-    user waits until h2 is visible  Release status
+    user waits until h2 is visible  Sign off
     user checks summary list contains  Current status  Draft
     user checks summary list contains  Scheduled release  Not scheduled
     user checks summary list contains  Next release expected  January 3001

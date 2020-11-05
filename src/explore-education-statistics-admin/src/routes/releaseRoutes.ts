@@ -98,7 +98,7 @@ export const releaseContentRoute: ReleaseRouteProps = {
 
 export const releaseStatusRoute: ReleaseRouteProps = {
   path: '/publication/:publicationId/release/:releaseId/status',
-  title: 'Release status',
+  title: 'Sign off',
   component: ReleasePublishStatusPage,
 };
 

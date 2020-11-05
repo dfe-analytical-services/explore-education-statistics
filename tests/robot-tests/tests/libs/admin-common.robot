@@ -157,7 +157,7 @@ user approves methodology
     [Arguments]  ${title}
     user waits until page contains title caption  Edit methodology
     user waits until h1 is visible  ${title}
-    user clicks link  Release status
+    user clicks link  Sign off
     user clicks button  Edit status
     user waits until h2 is visible  Edit methodology status
     user clicks radio  Approved for publication
@@ -271,9 +271,9 @@ user deletes editable accordion section content block
 
 user gets meta guidance data file content editor
     [Arguments]   ${accordion_heading}
-    ${accordion}=  user gets accordion section content element  ${accordion_heading}
-    user waits until parent contains element  ${accordion}   xpath://*[@data-testid="Content"]//*[@role="textbox"]
-    ${editor}=  get child element  ${accordion}  xpath://*[@data-testid="Content"]//*[@role="textbox"]
+    ${accordion}=  user gets accordion section content element  ${accordion_heading}   css:#metaGuidance-dataFiles
+    user waits until parent contains element  ${accordion}   xpath:.//*[@data-testid="Content"]//*[@role="textbox"]
+    ${editor}=  get child element  ${accordion}  xpath:.//*[@data-testid="Content"]//*[@role="textbox"]
     [Return]  ${editor}
 
 user enters text into meta guidance data file content editor
