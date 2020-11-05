@@ -122,7 +122,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Processor.Services
             
             var import = await _importStatusService.GetImportStatus(releaseId, message.OrigDataFileName);
 
-            if (import.Status.Equals(IStatus.STAGE_4) && (message.NumBatches == 1 || numBatchesRemaining == 0))
+            if (message.NumBatches == 1 || numBatchesRemaining == 0)
             {
                 var observationCount = context.Observation.Count(o => o.SubjectId.Equals(message.SubjectId));
                 
@@ -149,8 +149,12 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Processor.Services
             }
             else
             {
-                var percentageComplete = (double)(message.NumBatches - numBatchesRemaining) / message.NumBatches * 100;
-                await _importStatusService.UpdateProgress(releaseId, message.OrigDataFileName, percentageComplete);
+                var percentageComplete = (double) (message.NumBatches - numBatchesRemaining) / message.NumBatches * 100;
+
+                await _importStatusService.UpdateProgress(releaseId,
+                    message.OrigDataFileName,
+                    IStatus.STAGE_4,
+                    percentageComplete);
             }
         }
     }

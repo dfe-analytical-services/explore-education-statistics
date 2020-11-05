@@ -6,6 +6,7 @@ using System.Threading.Tasks;
 using GovUk.Education.ExploreEducationStatistics.Common.Extensions;
 using GovUk.Education.ExploreEducationStatistics.Common.Model;
 using GovUk.Education.ExploreEducationStatistics.Common.Model.Data;
+using GovUk.Education.ExploreEducationStatistics.Common.Services;
 using GovUk.Education.ExploreEducationStatistics.Common.Services.Interfaces;
 using GovUk.Education.ExploreEducationStatistics.Data.Importer.Exceptions;
 using GovUk.Education.ExploreEducationStatistics.Data.Importer.Models;
@@ -148,7 +149,9 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Importer.Services
             {
                 if (rowCount % STAGE_2_ROW_CHECK == 0)
                 {
-                    await _importStatusService.UpdateProgress(releaseId, origDataFileName,
+                    await _importStatusService.UpdateProgress(releaseId,
+                        origDataFileName,
+                        IStatus.STAGE_2,
                         (double) rowCount / totalRows * 100);
                 }
 

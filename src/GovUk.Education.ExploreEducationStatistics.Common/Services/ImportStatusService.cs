@@ -150,16 +150,26 @@ namespace GovUk.Education.ExploreEducationStatistics.Common.Services
             return true;
         }
 
-        public async Task UpdateProgress(Guid releaseId, string origDataFileName, double percentageComplete, int retry = 0)
+        public async Task UpdateProgress(Guid releaseId, string origDataFileName, IStatus status,
+            double percentageComplete, int retry = 0)
         {
             var import = await GetImport(releaseId, origDataFileName);
 
             var before = import.PercentageComplete;
             var after = (int) Math.Clamp(percentageComplete, 0, 100);
 
+            // Ensure that the intended phase progress is being updated by comparing the status
+            if (import.Status != status)
+            {
+                _logger.LogWarning(
+                    $"Update: {origDataFileName} {import.Status} ({before}%) -> {status} ({after}%) ignored due to status mismatch");
+                return;
+            }
+
             if (before < after)
             {
-                _logger.LogInformation($"Update: {origDataFileName} {import.Status} ({before}%) -> {import.Status} ({after}%)");
+                _logger.LogInformation(
+                    $"Update: {origDataFileName} {import.Status} ({before}%) -> {import.Status} ({after}%)");
                 import.PercentageComplete = after;
                 try
                 {
@@ -173,7 +183,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Common.Services
                             $"Precondition failure as expected while updating progress. ETag does not match for update: {origDataFileName} {import.Status} ({before}%) -> {import.Status} ({after}%)");
                         if (retry++ < 5)
                         {
-                            await UpdateProgress(releaseId, origDataFileName, percentageComplete, retry);
+                            await UpdateProgress(releaseId, origDataFileName, status, percentageComplete, retry);
                         }
                         else
                         {

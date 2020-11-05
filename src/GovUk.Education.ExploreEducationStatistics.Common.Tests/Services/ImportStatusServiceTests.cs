@@ -228,7 +228,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Common.Tests.Services
         }
 
         [Fact]
-        public async Task UpdateStatus_AlreadyComplete()
+        public async Task UpdateStatus_UpdateWhenAlreadyCompleteIsIgnored()
         {
             var tableStorageService = new Mock<ITableStorageService>(MockBehavior.Strict);
 
@@ -248,7 +248,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Common.Tests.Services
         }
 
         [Fact]
-        public async Task UpdateStatus_AlreadyFailed()
+        public async Task UpdateStatus_UpdateWhenAlreadyFailedIsIgnored()
         {
             var tableStorageService = new Mock<ITableStorageService>(MockBehavior.Strict);
 
@@ -300,7 +300,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Common.Tests.Services
         }
 
         [Fact]
-        public async Task UpdateStatus_UpdateToLesserStatus()
+        public async Task UpdateStatus_UpdateToLesserStatusIsIgnored()
         {
             var tableStorageService = new Mock<ITableStorageService>(MockBehavior.Strict);
 
@@ -352,7 +352,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Common.Tests.Services
         }
 
         [Fact]
-        public async Task UpdateStatus_UpdateAsSameStatus()
+        public async Task UpdateStatus_UpdateAsSameStatusIsIgnored()
         {
             var tableStorageService = new Mock<ITableStorageService>(MockBehavior.Strict);
 
@@ -454,7 +454,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Common.Tests.Services
 
             var service = BuildImportStatusService(tableStorageService: tableStorageService.Object);
 
-            await service.UpdateProgress(_releaseId, FileName, 50.0);
+            await service.UpdateProgress(_releaseId, FileName, STAGE_1, 50.0);
 
             importsTable.Verify(mock =>
                 mock.ExecuteAsync(It.Is<TableOperation>(operation =>
@@ -469,7 +469,27 @@ namespace GovUk.Education.ExploreEducationStatistics.Common.Tests.Services
         }
 
         [Fact]
-        public async Task UpdateProgress_PercentageCompleteGreaterThanUpdate()
+        public async Task UpdateProgress_IntendedStatusDifferentFromActualStatusIsIgnored()
+        {
+            var tableStorageService = new Mock<ITableStorageService>(MockBehavior.Strict);
+
+            var importsTable = SetupImportsTableMockForDataFileImport(tableStorageService: tableStorageService,
+                importStatus: STAGE_3,
+                percentageComplete: 0);
+
+            var service = BuildImportStatusService(tableStorageService: tableStorageService.Object);
+
+            await service.UpdateProgress(_releaseId, FileName, STAGE_2, 50.0);
+
+            importsTable.Verify(mock =>
+                mock.ExecuteAsync(It.Is<TableOperation>(operation =>
+                    operation.OperationType == TableOperationType.Retrieve)), Times.Once);
+
+            importsTable.VerifyNoOtherCalls();
+        }
+
+        [Fact]
+        public async Task UpdateProgress_PercentageCompleteGreaterThanUpdateIsIgnored()
         {
             var tableStorageService = new Mock<ITableStorageService>(MockBehavior.Strict);
 
@@ -479,7 +499,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Common.Tests.Services
 
             var service = BuildImportStatusService(tableStorageService: tableStorageService.Object);
 
-            await service.UpdateProgress(_releaseId, FileName, 25.0);
+            await service.UpdateProgress(_releaseId, FileName, STAGE_1, 25.0);
 
             importsTable.Verify(mock =>
                 mock.ExecuteAsync(It.Is<TableOperation>(operation =>
@@ -505,7 +525,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Common.Tests.Services
 
             var service = BuildImportStatusService(tableStorageService: tableStorageService.Object);
 
-            await service.UpdateProgress(_releaseId, FileName, 101.0);
+            await service.UpdateProgress(_releaseId, FileName, STAGE_1, 101.0);
 
             importsTable.Verify(mock =>
                 mock.ExecuteAsync(It.Is<TableOperation>(operation =>
@@ -533,7 +553,8 @@ namespace GovUk.Education.ExploreEducationStatistics.Common.Tests.Services
 
             var service = BuildImportStatusService(tableStorageService: tableStorageService.Object);
 
-            await Assert.ThrowsAsync<StorageException>(() => service.UpdateProgress(_releaseId, FileName, 50.0));
+            await Assert.ThrowsAsync<StorageException>(
+                () => service.UpdateProgress(_releaseId, FileName, STAGE_1, 50.0));
 
             importsTable.Verify(mock =>
                 mock.ExecuteAsync(It.Is<TableOperation>(operation =>
@@ -569,7 +590,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Common.Tests.Services
 
             var service = BuildImportStatusService(tableStorageService: tableStorageService.Object);
 
-            await service.UpdateProgress(_releaseId, FileName, 50.0);
+            await service.UpdateProgress(_releaseId, FileName, STAGE_1, 50.0);
 
             importsTable.Verify(mock =>
                 mock.ExecuteAsync(It.Is<TableOperation>(operation =>

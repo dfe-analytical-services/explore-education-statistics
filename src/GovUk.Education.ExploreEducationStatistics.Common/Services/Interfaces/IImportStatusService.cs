@@ -12,6 +12,6 @@ namespace GovUk.Education.ExploreEducationStatistics.Common.Services.Interfaces
 
         Task<bool> UpdateStatus(Guid releaseId, string origDataFileName, IStatus status, int retry = 0);
 
-        Task UpdateProgress(Guid releaseId, string origDataFileName, double percentageComplete, int retry = 0);
+        Task UpdateProgress(Guid releaseId, string origDataFileName, IStatus status, double percentageComplete, int retry = 0);
     }
 }
