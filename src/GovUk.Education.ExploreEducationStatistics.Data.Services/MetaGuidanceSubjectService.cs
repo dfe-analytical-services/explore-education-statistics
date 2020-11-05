@@ -51,7 +51,9 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Services
                             releaseSubjectsQueryable.Where(rs => subjectIds.Contains(rs.SubjectId));
                     }
 
-                    var releaseSubjects = await releaseSubjectsQueryable.ToListAsync();
+                    var releaseSubjects = await releaseSubjectsQueryable
+                        .OrderBy(rs => rs.Subject.Name)
+                        .ToListAsync();
 
                     var result = new List<MetaGuidanceSubjectViewModel>();
                     await releaseSubjects.ForEachAsync(async releaseSubject =>

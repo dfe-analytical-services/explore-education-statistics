@@ -1,3 +1,7 @@
+import sanitizeHtml, {
+  defaultSanitizeOptions,
+  SanitizeHtmlOptions,
+} from '@common/utils/sanitizeHtml';
 import {
   GlossaryEntry,
   GlossaryPageProps,
@@ -5,6 +9,14 @@ import {
 import fs from 'fs';
 import { GetStaticProps } from 'next';
 import path from 'path';
+
+const sanitizeHtmlOptions: SanitizeHtmlOptions = {
+  ...defaultSanitizeOptions,
+  allowedAttributes: {
+    ...defaultSanitizeOptions.allowedAttributes,
+    a: ['href', 'rel', 'target'],
+  },
+};
 
 export { default } from '@frontend/modules/glossary/GlossaryPage';
 
@@ -22,7 +34,7 @@ export const getStaticProps: GetStaticProps<GlossaryPageProps> = async () => {
 
     return {
       heading,
-      content,
+      content: sanitizeHtml(content, sanitizeHtmlOptions),
     };
   });
 

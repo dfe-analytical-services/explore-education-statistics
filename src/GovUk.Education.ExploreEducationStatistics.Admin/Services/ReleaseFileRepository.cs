@@ -33,10 +33,12 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Services
                 return new NotFoundResult();
             }
 
-            return !allowedFileTypes.Any() ||
-                   allowedFileTypes.Contains(releaseFile.ReleaseFileReference.ReleaseFileType)
-                ? releaseFile.ReleaseFileReference
-                : (Either<ActionResult, ReleaseFileReference>) ValidationUtils.ValidationActionResult(FileTypeInvalid);
+            if (allowedFileTypes.Any() && !allowedFileTypes.Contains(releaseFile.ReleaseFileReference.ReleaseFileType))
+            {
+                return ValidationUtils.ValidationActionResult(FileTypeInvalid);
+            }
+
+            return releaseFile.ReleaseFileReference;
         }
 
         public async Task Delete(Guid releaseId, Guid fileId)

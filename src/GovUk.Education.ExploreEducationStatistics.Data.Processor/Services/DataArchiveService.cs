@@ -15,9 +15,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Processor.Services
     {
         private readonly IBlobStorageService _blobStorageService;
         private readonly IFileStorageService _fileStorageService;
-
-        private const string NameKey = "name";
-
+        
         public DataArchiveService(IBlobStorageService blobStorageService, IFileStorageService fileStorageService)
         {
             _blobStorageService = blobStorageService;

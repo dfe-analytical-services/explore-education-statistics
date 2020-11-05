@@ -92,7 +92,9 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Mappings
                     m => m.MapFrom(p => p.Topic.ThemeId))
                 .ForMember(dest => dest.Releases,
                     m => m.MapFrom(p => p.Releases
-                        .FindAll(r => IsLatestVersionOfRelease(p.Releases, r.Id))))
+                        .FindAll(r => IsLatestVersionOfRelease(p.Releases, r.Id))
+                        .OrderByDescending(r => r.Year)
+                        .ThenByDescending(r => r.TimePeriodCoverage)))
                 .ForMember(dest => dest.Permissions, exp => exp.MapFrom<IMyPublicationPermissionSetPropertyResolver>());
 
             CreateMap<Contact, ContactViewModel>();

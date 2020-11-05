@@ -41,6 +41,9 @@ describe('ImporterStatus', () => {
   test('does not fetch status from service if data file status is already complete', () => {
     releaseDataFileService.getDataFileImportStatus.mockResolvedValue({
       status: 'COMPLETE',
+      percentageComplete: 100,
+      phasePercentageComplete: 100,
+      phaseComplete: true,
       numberOfRows: 100,
     });
 
@@ -53,7 +56,10 @@ describe('ImporterStatus', () => {
 
   test('renders with updated status from service', async () => {
     releaseDataFileService.getDataFileImportStatus.mockResolvedValue({
-      status: 'RUNNING_PHASE_1',
+      status: 'STAGE_1',
+      percentageComplete: 100,
+      phasePercentageComplete: 100,
+      phaseComplete: true,
       numberOfRows: 100,
     });
 
@@ -82,7 +88,10 @@ describe('ImporterStatus', () => {
 
   test('renders with updated status from service at regular intervals', async () => {
     releaseDataFileService.getDataFileImportStatus.mockResolvedValue({
-      status: 'RUNNING_PHASE_1',
+      status: 'STAGE_1',
+      percentageComplete: 10,
+      phasePercentageComplete: 100,
+      phaseComplete: true,
       numberOfRows: 100,
     });
 
@@ -104,10 +113,18 @@ describe('ImporterStatus', () => {
 
     await waitFor(() => {
       expect(screen.getByText('Validating')).toBeInTheDocument();
+      expect(screen.getByRole('progressbar')).toHaveAttribute(
+        'aria-valuenow',
+        '10',
+      );
+      expect(screen.getByText('10% complete')).toBeInTheDocument();
     });
 
     releaseDataFileService.getDataFileImportStatus.mockResolvedValue({
-      status: 'RUNNING_PHASE_2',
+      status: 'STAGE_2',
+      percentageComplete: 50,
+      phasePercentageComplete: 100,
+      phaseComplete: true,
       numberOfRows: 100,
     });
 
@@ -119,10 +136,18 @@ describe('ImporterStatus', () => {
 
     await waitFor(() => {
       expect(screen.getByText('Importing')).toBeInTheDocument();
+      expect(screen.getByRole('progressbar')).toHaveAttribute(
+        'aria-valuenow',
+        '50',
+      );
+      expect(screen.getByText('50% complete')).toBeInTheDocument();
     });
 
     releaseDataFileService.getDataFileImportStatus.mockResolvedValue({
       status: 'COMPLETE',
+      percentageComplete: 100,
+      phasePercentageComplete: 100,
+      phaseComplete: true,
       numberOfRows: 100,
     });
 
@@ -134,6 +159,8 @@ describe('ImporterStatus', () => {
 
     await waitFor(() => {
       expect(screen.getByText('Complete')).toBeInTheDocument();
+      expect(screen.queryByRole('progressbar')).not.toBeInTheDocument();
+      expect(screen.queryByText('100% complete')).not.toBeInTheDocument();
     });
 
     expect(screen.queryByRole('group')).not.toBeInTheDocument();
@@ -142,6 +169,9 @@ describe('ImporterStatus', () => {
   test('renders with error messages from service', async () => {
     releaseDataFileService.getDataFileImportStatus.mockResolvedValue({
       status: 'FAILED',
+      percentageComplete: 0,
+      phasePercentageComplete: 100,
+      phaseComplete: true,
       numberOfRows: 100,
       errors: ['Some error 1', 'Some error 2'],
     });

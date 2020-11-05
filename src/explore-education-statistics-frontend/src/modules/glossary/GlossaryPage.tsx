@@ -1,24 +1,11 @@
 import Accordion from '@common/components/Accordion';
 import AccordionSection from '@common/components/AccordionSection';
 import RelatedInformation from '@common/components/RelatedInformation';
-import SanitizeHtml from '@common/components/SanitizeHtml';
-import {
-  defaultSanitizeOptions,
-  SanitizeHtmlOptions,
-} from '@common/utils/sanitizeHtml';
 import Link from '@frontend/components/Link';
 import Page from '@frontend/components/Page';
 import PageSearchFormWithAnalytics from '@frontend/components/PageSearchFormWithAnalytics';
 import { logEvent } from '@frontend/services/googleAnalyticsService';
 import React from 'react';
-
-const sanitizeHtmlOptions: SanitizeHtmlOptions = {
-  ...defaultSanitizeOptions,
-  allowedAttributes: {
-    ...defaultSanitizeOptions.allowedAttributes,
-    a: ['href', 'rel', 'target'],
-  },
-};
 
 export interface GlossaryEntry {
   heading: string;
@@ -71,9 +58,11 @@ function GlossaryPage({ entries }: GlossaryPageProps) {
             id={`glossary-${entry.heading}`}
           >
             {entry.content ? (
-              <SanitizeHtml
-                dirtyHtml={entry.content}
-                options={sanitizeHtmlOptions}
+              <div
+                // eslint-disable-next-line react/no-danger
+                dangerouslySetInnerHTML={{
+                  __html: entry.content,
+                }}
               />
             ) : (
               <p className="govuk-inset-text">

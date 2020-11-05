@@ -3,7 +3,7 @@ import SanitizeHtml from '@common/components/SanitizeHtml';
 import SummaryList from '@common/components/SummaryList';
 import SummaryListItem from '@common/components/SummaryListItem';
 import { SubjectMetaGuidance } from '@common/services/releaseMetaGuidanceService';
-import React, { ReactNode } from 'react';
+import React, { ReactNode, useMemo } from 'react';
 
 interface Props {
   subject: SubjectMetaGuidance;
@@ -11,28 +11,58 @@ interface Props {
 }
 
 const ReleaseMetaGuidanceDataFile = ({ subject, renderContent }: Props) => {
-  const { filename, timePeriods, geographicLevels, variables } = subject;
+  const { filename, variables } = subject;
+
+  const geographicLevels = useMemo(() => subject.geographicLevels.join('; '), [
+    subject.geographicLevels,
+  ]);
+
+  const timePeriod = useMemo(() => {
+    const { from, to } = subject.timePeriods;
+
+    if (from && to) {
+      return from === to ? from : `${from} to ${to}`;
+    }
+
+    return from || to;
+  }, [subject.timePeriods]);
+
+  const contentItem = useMemo(() => {
+    if (typeof renderContent === 'function') {
+      return (
+        <SummaryListItem term="Content">
+          {renderContent(subject)}
+        </SummaryListItem>
+      );
+    }
+
+    if (!subject.content) {
+      return null;
+    }
+
+    return (
+      <SummaryListItem term="Content">
+        <SanitizeHtml
+          dirtyHtml={subject.content}
+          testId="fileGuidanceContent"
+        />
+      </SummaryListItem>
+    );
+  }, [renderContent, subject]);
 
   return (
     <>
       <SummaryList className="govuk-!-margin-bottom-6">
         <SummaryListItem term="Filename">{filename}</SummaryListItem>
-        <SummaryListItem term="Geographic levels">
-          {geographicLevels.join('; ')}
-        </SummaryListItem>
-        <SummaryListItem term="Time period">
-          {`${timePeriods.from} to ${timePeriods.to}`}
-        </SummaryListItem>
-        <SummaryListItem term="Content">
-          {typeof renderContent === 'function' ? (
-            renderContent(subject)
-          ) : (
-            <SanitizeHtml
-              dirtyHtml={subject.content}
-              testId="fileGuidanceContent"
-            />
-          )}
-        </SummaryListItem>
+        {geographicLevels && (
+          <SummaryListItem term="Geographic levels">
+            {geographicLevels}
+          </SummaryListItem>
+        )}
+        {timePeriod && (
+          <SummaryListItem term="Time period">{timePeriod}</SummaryListItem>
+        )}
+        {contentItem}
       </SummaryList>
 
       <Details summary="Variable names and descriptions">

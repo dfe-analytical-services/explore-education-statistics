@@ -30,17 +30,16 @@ namespace GovUk.Education.ExploreEducationStatistics.Content.Model
 
         [JsonIgnore] public ContentSectionType Type { get; set; }
 
-        public ContentSection Clone(CreateClonedContext ctx, ReleaseContentSection newParent)
+        public ContentSection Clone(ReleaseContentSection newReleaseContentSection, Release.CloneContext context)
         {
             var copy = MemberwiseClone() as ContentSection;
             copy.Id = Guid.NewGuid();
-            ctx.OldToNewIdContentSectionMappings.Add(this, copy);
 
-            copy.Release = newParent;
+            copy.Release = newReleaseContentSection;
 
             copy.Content = copy
                 .Content?
-                .Select(content => content.Clone(ctx, copy))
+                .Select(content => content.Clone(context, copy))
                 .ToList();
 
             return copy;

@@ -359,7 +359,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
                     .ReturnsAsync(
                         new ImportStatus()
                         {
-                            Status = IStatus.RUNNING_PHASE_1
+                            Status = IStatus.STAGE_1
                         }
                     );
 

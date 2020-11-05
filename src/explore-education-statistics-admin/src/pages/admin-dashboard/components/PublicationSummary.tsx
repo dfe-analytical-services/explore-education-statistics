@@ -14,7 +14,6 @@ import { MyPublication } from '@admin/services/publicationService';
 import releaseService, { Release } from '@admin/services/releaseService';
 import ButtonGroup from '@common/components/ButtonGroup';
 import ModalConfirm from '@common/components/ModalConfirm';
-import { orderBy } from 'lodash';
 import React, { useState } from 'react';
 import { generatePath, useHistory } from 'react-router';
 import CancelAmendmentModal from './CancelAmendmentModal';
@@ -168,10 +167,7 @@ const PublicationSummary = ({ publication, onChangePublication }: Props) => {
             <td colSpan={2} data-testid={`Releases for ${publication.title}`}>
               {releases.length > 0 ? (
                 <ul className="govuk-list">
-                  {orderBy(
-                    releases.filter(noAmendmentInProgressFilter),
-                    rel => rel.title,
-                  ).map(release => (
+                  {releases.filter(noAmendmentInProgressFilter).map(release => (
                     <li key={release.id}>
                       <NonScheduledReleaseSummary
                         onClickAmendRelease={setAmendReleaseId}
