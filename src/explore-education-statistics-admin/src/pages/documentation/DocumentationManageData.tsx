@@ -464,7 +464,7 @@ const DocumentationManageContent = ({ location: _ }: RouteChildrenProps) => {
                 <li>
                   <h4 className="govuk-heading-s">
                     To upload files you want users to view within or download
-                    from your release - use the ‘File uploads’ tab.
+                    from your release - use the ‘Ancillary file uploads’ tab.
                   </h4>
                   <img
                     src={imageFileTab}

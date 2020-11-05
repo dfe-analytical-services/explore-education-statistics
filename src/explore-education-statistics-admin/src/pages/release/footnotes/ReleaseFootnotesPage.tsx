@@ -102,7 +102,14 @@ const ReleaseFootnotesPage = ({
   return (
     <LoadingSpinner loading={isPermissionLoading}>
       <h2>Footnotes</h2>
-
+      <div className="govuk-inset-text">
+        <h3>Before you start</h3>
+        <p>
+          A footnote should outline any necessary caveats within your data.
+          These should be used sparingly, and only for information that is
+          critical to understanding the data in the table or chart it refers to.
+        </p>
+      </div>
       {!canUpdateRelease && (
         <p>This release has been approved, and can no longer be updated.</p>
       )}

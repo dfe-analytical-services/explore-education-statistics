@@ -286,7 +286,7 @@ const DocumentationCreateNewRelease = ({ location: _ }: RouteChildrenProps) => {
                   <h4 className="govuk-heading-s">
                     To upload any files you want to users to download from your
                     release (for example, infographics or images of more complex
-                    tables) - use the ‘File uploads’ tab.
+                    tables) - use the ‘Ancillary file uploads’ tab.
                   </h4>
                   <img
                     src={imageCreateReleaseFileTab}

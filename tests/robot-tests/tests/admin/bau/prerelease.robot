@@ -81,10 +81,10 @@ Add basic release content
     user waits until h2 is visible  ${PUBLICATION_NAME}
     user adds basic release content  ${PUBLICATION_NAME}
 
-Go to "Release status" page
+Go to "Sign off" page
     [Tags]  HappyPath
-    user clicks link   Release status
-    user waits until h2 is visible  Release status
+    user clicks link   Sign off
+    user waits until h2 is visible  Sign off
     user waits until page contains button  Edit release status
 
 Approve release and wait for it to be Scheduled
@@ -107,7 +107,7 @@ Approve release and wait for it to be Scheduled
     user enters text into element  id:releaseStatusForm-nextReleaseDate-year    2001
     user clicks button   Update status
 
-    user waits until h2 is visible  Release status
+    user waits until h2 is visible  Sign off
     user checks summary list contains  Current status  Approved
     user checks summary list contains  Scheduled release  ${day} ${month_word} ${year}
     user checks summary list contains  Next release expected  January 2001
@@ -202,7 +202,7 @@ Start prerelease
     user enters text into element  id:releaseStatusForm-publishScheduled-year   ${year}
     user clicks button   Update status
 
-    user waits until h2 is visible  Release status
+    user waits until h2 is visible  Sign off
     user checks summary list contains  Current status  Approved
     user checks summary list contains  Scheduled release  ${day} ${month_word} ${year}
     user waits for release process status to be  Scheduled  90
