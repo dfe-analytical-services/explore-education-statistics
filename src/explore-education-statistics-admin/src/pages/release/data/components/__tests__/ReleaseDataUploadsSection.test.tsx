@@ -52,14 +52,18 @@ describe('ReleaseDataUploadsSection', () => {
 
   const testQueuedImportStatus: DataFileImportStatus = {
     status: 'QUEUED',
+    percentageComplete: 0,
+    phasePercentageComplete: 0,
+    phaseComplete: false,
     numberOfRows: 0,
-    percentageComplete: '0%',
   };
 
   const testCompleteImportStatus: DataFileImportStatus = {
     status: 'COMPLETE',
+    percentageComplete: 100,
+    phasePercentageComplete: 100,
+    phaseComplete: true,
     numberOfRows: 100,
-    percentageComplete: '100%',
   };
 
   test('renders list of uploaded data files', async () => {

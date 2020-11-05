@@ -1,0 +1,21 @@
+@import '~govuk-frontend/govuk/base';
+
+$bar-border-radius: 2px;
+$bar-height: 10px;
+
+.container {
+  background: govuk-colour('mid-grey');
+  border-radius: $bar-border-radius;
+  display: block;
+  height: $bar-height;
+  width: 100%;
+}
+
+.bar {
+  background: govuk-colour('blue');
+  border-radius: $bar-border-radius;
+  display: block;
+  height: $bar-height;
+  position: relative;
+  transition: width 0.5s ease-in-out;
+}

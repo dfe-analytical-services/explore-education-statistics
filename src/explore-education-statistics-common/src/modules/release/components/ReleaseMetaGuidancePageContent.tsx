@@ -27,7 +27,9 @@ const ReleaseMetaGuidancePageContent = ({
         </p>
       )}
 
-      <SanitizeHtml dirtyHtml={metaGuidance} testId="metaGuidance-content" />
+      {metaGuidance && (
+        <SanitizeHtml dirtyHtml={metaGuidance} testId="metaGuidance-content" />
+      )}
 
       {subjects.length > 0 && (
         <>
