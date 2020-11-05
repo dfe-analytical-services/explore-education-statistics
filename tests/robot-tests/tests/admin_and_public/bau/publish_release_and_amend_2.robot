@@ -263,6 +263,10 @@ Return to Admin to start deleting subject
     user waits until h1 is visible  Dashboard
     user waits until page contains title caption  Welcome Bau1
 
+<<<<<<< HEAD
+=======
+
+>>>>>>> d211cb2ce... Fix test case
 Create amendment
     [Tags]  HappyPath
     user selects theme and topic from admin dashboard  %{TEST_THEME_NAME}  ${TOPIC_NAME}
@@ -274,6 +278,11 @@ Create amendment
     user waits until parent contains element   ${details}   xpath:.//a[text()="View this release"]
     user clicks button  Amend this release  ${details}
     user clicks button  Confirm
+<<<<<<< HEAD
+=======
+
+
+>>>>>>> d211cb2ce... Fix test case
 
 
 Delete subject files
