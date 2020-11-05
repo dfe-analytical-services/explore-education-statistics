@@ -56,6 +56,8 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Model.Services
 
                 await DeleteFootnote(releaseId, footnote, canRemoveReleaseFootnote, canRemoveFootnote);
             }
+
+            await _context.SaveChangesAsync();
         }
 
         public async Task DeleteFootnote(Guid releaseId, Guid id)
@@ -66,6 +68,8 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Model.Services
             {
                 await DeleteFootnote(releaseId, footnote, true, true);
             }
+
+            await _context.SaveChangesAsync();
         }
 
         private async Task DeleteFootnote(Guid releaseId, Footnote footnote, bool canRemoveReleaseFootnote, bool canRemoveFootnote)
