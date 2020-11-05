@@ -143,6 +143,14 @@ const ReleaseFileUploadsSection = ({ releaseId, canUpdateRelease }: Props) => {
         {form => (
           <>
             <h2>Add file to release</h2>
+            <div className="govuk-inset-text">
+              <h3>Before you start</h3>
+              <p>
+                Ancillary files are additional files attached to the release for
+                users to download. They will appear in the associated files list
+                on the release page and the download files page.
+              </p>
+            </div>
 
             {canUpdateRelease ? (
               <Form id={formId}>

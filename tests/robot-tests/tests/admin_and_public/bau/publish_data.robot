@@ -19,12 +19,12 @@ Create new publication and release via API
     ${PUBLICATION_ID}=  user creates test publication via api   ${PUBLICATION_NAME}
     user create test release via api  ${PUBLICATION_ID}   FY   3000
 
-Go to "Release status" page
+Go to "Sign off" page
     [Tags]  HappyPath
     user navigates to release summary from admin dashboard  ${PUBLICATION_NAME}  Financial Year 3000-01 (not Live)
 
-    user clicks link   Release status
-    user waits until h2 is visible  Release status
+    user clicks link   Sign off
+    user waits until h2 is visible  Sign off
     user waits until page contains button  Edit release status
 
 Approve release
@@ -40,7 +40,7 @@ Approve release
 
 Verify release is scheduled
     [Tags]  HappyPath
-    user waits until h2 is visible  Release status
+    user waits until h2 is visible  Sign off
     user checks summary list contains  Current status  Approved
 
 Wait for release process status to be Complete
@@ -155,10 +155,10 @@ Save data block as a highlight
     user clicks button   Save data block
     user waits until page contains    Delete this data block
 
-Go to "Release status" page for new release
+Go to "Sign off" page for new release
     [Tags]  HappyPath
-    user clicks link   Release status
-    user waits until h2 is visible  Release status
+    user clicks link   Sign off
+    user waits until h2 is visible  Sign off
     user waits until page contains button  Edit release status
 
 Approve new release
@@ -186,7 +186,7 @@ Approve new release
 Wait for release process status for new release to be Complete
     [Tags]  HappyPath
     # EES-1007 - Release process status doesn't automatically update
-    user waits until h2 is visible  Release status
+    user waits until h2 is visible  Sign off
     user checks summary list contains  Current status  Approved
     user checks summary list contains  Scheduled release  ${PUBLISH_DATE_DAY} ${PUBLISH_DATE_MONTH_WORD} ${PUBLISH_DATE_YEAR}
     user waits for release process status to be  Complete    ${release_complete_wait}
