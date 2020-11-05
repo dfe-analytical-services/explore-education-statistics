@@ -215,15 +215,15 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Services
                                             dataFile.FileName.ToLower()))
                                     .OnSuccess(async () =>
                                     {
-                                        var fileReference = await _fileRepository.CreateOrUpdate(
-                                            filename: dataFile.FileName.ToLower(),
+                                        var fileReference = await _fileRepository.Create(
                                             releaseId: releaseId,
+                                            filename: dataFile.FileName.ToLower(),
                                             type: ReleaseFileTypes.Data,
                                             replacingFile: replacingFile);
 
-                                        var metaFileReference = await _fileRepository.CreateOrUpdate(
-                                            filename: metaFile.FileName.ToLower(),
+                                        var metaFileReference = await _fileRepository.Create(
                                             releaseId: releaseId,
+                                            filename: metaFile.FileName.ToLower(),
                                             Metadata);
 
                                         await _contentDbContext.SaveChangesAsync();
@@ -309,24 +309,21 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Services
                                                         archiveFile.DataFileName))
                                                 .OnSuccess(async () =>
                                                 {
-                                                    var source = await _fileRepository.CreateOrUpdate(
+                                                    var source = await _fileRepository.CreateZip(
                                                         filename: zipFile.FileName.ToLower(),
-                                                        releaseId: releaseId,
-                                                        type: DataZip);
+                                                        releaseId: releaseId);
 
-                                                    var dataFileReference = await _fileRepository.CreateOrUpdate(
-                                                        filename: archiveFile.DataFileName,
+                                                    var dataFileReference = await _fileRepository.Create(
                                                         releaseId: releaseId,
+                                                        filename: archiveFile.DataFileName,
                                                         type: ReleaseFileTypes.Data,
-                                                        id: null,
                                                         replacingFile: replacingFile,
                                                         source: source);
 
-                                                    var metaFileReference = await _fileRepository.CreateOrUpdate(
-                                                        filename: archiveFile.MetaFileName,
+                                                    var metaFileReference = await _fileRepository.Create(
                                                         releaseId: releaseId,
+                                                        filename: archiveFile.MetaFileName,
                                                         type: Metadata,
-                                                        id: null,
                                                         source: source);
 
                                                     await _contentDbContext.SaveChangesAsync();
@@ -353,7 +350,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Services
                                                         // the datafile which isn't extracted yet
                                                         Id = dataFileReference.Id,
                                                         Extension = dataFileReference.Extension,
-                                                        Name = validSubjectName,
+                                                        Name = blob.Name,
                                                         Path = dataFileReference.Filename,
                                                         Size = blob.Size,
                                                         MetaFileId = metaFileReference.Id,

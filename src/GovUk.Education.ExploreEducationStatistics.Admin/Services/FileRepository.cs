@@ -1,5 +1,4 @@
 ﻿using System;
-using System.Linq;
 using System.Threading.Tasks;
 using GovUk.Education.ExploreEducationStatistics.Admin.Services.Interfaces;
 using GovUk.Education.ExploreEducationStatistics.Common.Model;
@@ -18,55 +17,50 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Services
             _contentDbContext = contentDbContext;
         }
 
-        public async Task<ReleaseFileReference> CreateOrUpdate(string filename,
-            Guid releaseId,
+        public async Task<ReleaseFileReference> Create(Guid releaseId,
+            string filename,
             ReleaseFileTypes type,
-            Guid? id = null,
             ReleaseFileReference replacingFile = null,
             ReleaseFileReference source = null)
         {
-            // If updating existing then check if existing reference is for this release - if not then create new ref
-            if (id != null)
+            if (type == ReleaseFileTypes.DataZip)
             {
-                var existing = await _contentDbContext.ReleaseFileReferences
-                    .Where(rfr => rfr.Id == id).FirstAsync();
-
-                if (existing.ReleaseId == releaseId)
-                {
-                    _contentDbContext.Update(existing);
-                    existing.Filename = filename;
-                    return existing;
-                }
+                throw new ArgumentException($"Cannot use generic Create method for type {ReleaseFileTypes.DataZip}",
+                    nameof(type));
             }
 
-            var created = (await _contentDbContext.ReleaseFileReferences.AddAsync(new ReleaseFileReference
+            var releaseFile = new ReleaseFile
             {
                 ReleaseId = releaseId,
-                Filename = filename,
-                ReleaseFileType = type,
-                Replacing = replacingFile,
-                Source = source
-            })).Entity;
+                ReleaseFileReference = new ReleaseFileReference
+                {
+                    ReleaseId = releaseId,
+                    Filename = filename,
+                    ReleaseFileType = type,
+                    Replacing = replacingFile,
+                    Source = source
+                }
+            };
+
+            var created = (await _contentDbContext.ReleaseFiles.AddAsync(releaseFile)).Entity;
 
             if (replacingFile != null)
             {
                 _contentDbContext.Update(replacingFile);
-                replacingFile.ReplacedBy = created;
+                replacingFile.ReplacedBy = releaseFile.ReleaseFileReference;
             }
 
-            // No ReleaseFileLink required for the zip file source reference
-            if (type != ReleaseFileTypes.DataZip)
+            return created.ReleaseFileReference;
+        }
+
+        public async Task<ReleaseFileReference> CreateZip(Guid releaseId, string filename)
+        {
+            return (await _contentDbContext.ReleaseFileReferences.AddAsync(new ReleaseFileReference
             {
-                var fileLink = new ReleaseFile
-                {
-                    ReleaseId = releaseId,
-                    ReleaseFileReference = created
-                };
-
-                await _contentDbContext.ReleaseFiles.AddAsync(fileLink);
-            }
-
-            return created;
+                ReleaseId = releaseId,
+                Filename = filename,
+                ReleaseFileType = ReleaseFileTypes.DataZip
+            })).Entity;
         }
 
         public async Task Delete(Guid id)
@@ -79,6 +73,24 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Services
         {
             return await _contentDbContext.ReleaseFileReferences
                 .SingleAsync(f => f.Id == id);
+        }
+
+        public async Task<ReleaseFileReference> UpdateFilename(Guid releaseId,
+            Guid fileId,
+            string filename)
+        {
+            // Ensure file is linked to the Release by getting the ReleaseFile first
+            var releaseFile = await _contentDbContext.ReleaseFiles
+                .Include(rf => rf.ReleaseFileReference)
+                .SingleAsync(rf =>
+                    rf.ReleaseId == releaseId
+                    && rf.ReleaseFileReferenceId == fileId);
+
+            var file = releaseFile.ReleaseFileReference;
+            _contentDbContext.Update(file);
+            file.Filename = filename;
+
+            return file;
         }
     }
 }

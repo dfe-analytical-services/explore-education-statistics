@@ -217,8 +217,11 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Services
                 .OnSuccess(async () => await _fileUploadsValidatorService.ValidateFileUploadName(name))
                 .OnSuccess(async () =>
                 {
-                    var releaseFileReference = await _fileRepository.CreateOrUpdate(
-                        file.FileName.ToLower(), releaseId, Ancillary);
+                    var releaseFileReference = await _fileRepository.Create(
+                        releaseId,
+                        file.FileName.ToLower(),
+                        Ancillary);
+
                     await _contentDbContext.SaveChangesAsync();
 
                     await _blobStorageService.UploadFile(
@@ -252,11 +255,21 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Services
                 .CheckEntityExists<Release>(releaseId)
                 .OnSuccess(_userService.CheckCanUpdateRelease)
                 .OnSuccess(async () => await _fileUploadsValidatorService.ValidateUploadFileType(file, Chart))
-                .OnSuccess(async () => await _fileUploadsValidatorService.ValidateFileForUpload(releaseId, file, Chart, replacingId.HasValue))
+                .OnSuccess(async () =>
+                    await _fileUploadsValidatorService.ValidateFileForUpload(releaseId, file, Chart,
+                        replacingId.HasValue))
                 .OnSuccess(async () =>
                 {
-                    var releaseFileReference = await _fileRepository.CreateOrUpdate(
-                        file.FileName.ToLower(), releaseId, Chart, replacingId);
+                    var releaseFileReference = replacingId.HasValue
+                        ? await _fileRepository.UpdateFilename(
+                            releaseId,
+                            replacingId.Value,
+                            file.FileName.ToLower())
+                        : await _fileRepository.Create(
+                            releaseId,
+                            file.FileName.ToLower(),
+                            Chart);
+
                     await _contentDbContext.SaveChangesAsync();
 
                     await _blobStorageService.UploadFile(

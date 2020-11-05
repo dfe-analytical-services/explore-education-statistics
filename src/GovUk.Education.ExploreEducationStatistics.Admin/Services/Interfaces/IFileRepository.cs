@@ -7,16 +7,22 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Services.Interfaces
 {
     public interface IFileRepository
     {
-        public Task<ReleaseFileReference> CreateOrUpdate(
+        public Task<ReleaseFileReference> Create(Guid releaseId,
             string filename,
-            Guid releaseId,
             ReleaseFileTypes type,
-            Guid? id = null,
             ReleaseFileReference replacingFile = null,
             ReleaseFileReference source = null);
+
+        public Task<ReleaseFileReference> CreateZip(
+            Guid releaseId,
+            string filename);
 
         public Task Delete(Guid id);
 
         public Task<ReleaseFileReference> Get(Guid id);
+
+        public Task<ReleaseFileReference> UpdateFilename(Guid releaseId,
+            Guid fileId,
+            string filename);
     }
 }
