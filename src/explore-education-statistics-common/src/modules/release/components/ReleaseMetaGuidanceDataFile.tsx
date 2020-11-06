@@ -13,9 +13,10 @@ interface Props {
 const ReleaseMetaGuidanceDataFile = ({ subject, renderContent }: Props) => {
   const { filename, variables } = subject;
 
-  const geographicLevels = useMemo(() => subject.geographicLevels.join('; '), [
-    subject.geographicLevels,
-  ]);
+  const geographicLevels = useMemo(
+    () => subject.geographicLevels.sort().join('; '),
+    [subject.geographicLevels],
+  );
 
   const timePeriod = useMemo(() => {
     const { from, to } = subject.timePeriods;
