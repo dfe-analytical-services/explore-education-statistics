@@ -816,7 +816,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
 
             await using (var contentDbContext = InMemoryApplicationDbContext(contentDbContextId))
             {
-                await contentDbContext.AddAsync(release);
+                await contentDbContext.AddRangeAsync(release, amendmentRelease);
                 await contentDbContext.AddRangeAsync(ancillaryFile, chartFile);
                 await contentDbContext.AddRangeAsync(ancillaryReleaseFile, ancillaryAmendmentReleaseFile,
                     chartAmendmentReleaseFile);
