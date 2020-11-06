@@ -13,13 +13,12 @@ ${PUBLICATION_NAME}  Permalink Test Publication %{RUN_IDENTIFIER}
 ${TOPIC_NAME}  %{TEST_TOPIC_NAME}
 ${SUBJECT_NAME}  Dates test subject
 ${SECOND_SUBJECT}  Dates test subject-%{RUN_IDENTIFIER}
-*** Test Cases ***
 
+*** Test Cases ***
 Create publication & release
     [Tags]  HappyPath
     ${PUBLICATION_ID}=  user creates test publication via api  ${PUBLICATION_NAME}
     user create test release via api  ${PUBLICATION_ID}  AY  2020
-
 
 Upload a subject
     [Tags]  HappyPath
@@ -36,8 +35,8 @@ Upload a subject
     ${section}=  user gets accordion section content element  ${SUBJECT_NAME}
     user checks headed table body row contains  Status           Complete  ${section}  180
 
-
-upload another subject (for deletion later)
+Upload another subject (for deletion later)
+    [Tags]  HappyPath
     user waits until page contains element  id:dataFileUploadForm-subjectTitle
     user enters text into element  id:dataFileUploadForm-subjectTitle   ${SECOND_SUBJECT}
     user chooses file   id:dataFileUploadForm-dataFile       ${FILES_DIR}upload-file-test.csv
@@ -49,7 +48,6 @@ upload another subject (for deletion later)
     ${section}=  user gets accordion section content element  ${SECOND_SUBJECT}
     user checks headed table body row contains  Status           Complete  ${section}  180
 
-
 Add meta guidance to dates test subject
     [Tags]  HappyPath
     user clicks link  Metadata guidance
@@ -59,7 +57,6 @@ Add meta guidance to dates test subject
     user enters text into meta guidance data file content editor  ${SUBJECT_NAME}
     ...  ${SUBJECT_NAME} meta guidance content
 
-
 Add meta guidance to Second Subject
     [Tags]  HappyPath
     user clicks element  css:body
@@ -68,13 +65,11 @@ Add meta guidance to Second Subject
     ...  ${SECOND_SUBJECT} meta guidance content
     user clicks button  Save guidance
 
-
 Go to "Sign off" page
     [Tags]  HappyPath
     user clicks link   Sign off
     user waits until h2 is visible  Sign off
     user waits until page contains button  Edit release status
-
 
 Approve release
     [Tags]  HappyPath
@@ -85,20 +80,17 @@ Approve release
     user clicks radio   As soon as possible
     user clicks button   Update status
 
-
 Wait for release process status to be Complete
     [Tags]  HappyPath
     user waits for release process status to be  Complete    ${release_complete_wait}
     user reloads page  # EES-1448
     user checks page does not contain button  Edit release status
 
-
 Go to Table Tool page
     [Tags]  HappyPath
     environment variable should be set  PUBLIC_URL
     user goes to url  %{PUBLIC_URL}/data-tables
     user waits until h1 is visible  Create your own tables online
-
 
 Select "Pupil Exclusions" publication
     [Tags]  HappyPath
@@ -109,14 +101,12 @@ Select "Pupil Exclusions" publication
     user waits until h2 is visible  Choose a subject
     user checks previous table tool step contains  1   Publication   ${PUBLICATION_NAME}
 
-
 Select subject "Duration of fixed exclusions"
     [Tags]  HappyPath
     user clicks radio   ${SUBJECT_NAME}
     user clicks element   id:publicationSubjectForm-submit
     user waits until h2 is visible  Choose locations
     user checks previous table tool step contains  2    Subject     ${SUBJECT_NAME}
-
 
 Select Location Country, England
     [Tags]  HappyPath
@@ -125,7 +115,6 @@ Select Location Country, England
     user clicks element     id:locationFiltersForm-submit
     user waits until h2 is visible  Choose time period
     user checks previous table tool step contains  3   National     England
-
 
 Select Start date and End date
     [Tags]  HappyPath
@@ -137,12 +126,10 @@ Select Start date and End date
     user checks previous table tool step contains  4    Start date    2020 Week 14
     user checks previous table tool step contains  4    End date      2020 Week 14
 
-
 Select Indicators
     [Tags]  HappyPath
     user clicks indicator checkbox   Number of open settings
     user checks indicator checkbox is checked  Number of open settings
-
 
 Select Filters
     [Tags]   HappyPath
@@ -150,19 +137,16 @@ Select Filters
     user clicks category checkbox   Date   30/03/2020
     user checks category checkbox is checked   Date   30/03/2020
 
-
 Create table
     [Tags]  HappyPath
     user clicks element     id:filtersForm-submit
     user waits until results table appears     60
 
-
 Validate results table column headings
     [Tags]  HappyPath
     user checks table column heading contains  1   1   2020 Week 14
 
-
-Generate the peramlink
+Generate the permalink
     [Tags]  HappyPath
     [Documentation]  EES-214
     user clicks button  Generate permanent link
@@ -170,20 +154,17 @@ Generate the peramlink
     ${PERMA_LOCATION_URL}=  Get Text  xpath://*[@data-testid="permalink-generated-url"]
     Set Suite Variable  ${PERMA_LOCATION_URL}
 
-
 Go to permalink
     [Tags]  HappyPath
     user goes to url  ${PERMA_LOCATION_URL}
     user waits until h1 is visible  '${SUBJECT_NAME}' from '${PUBLICATION_NAME}'
     user checks page does not contain   WARNING - The data used in this permalink may be out-of-date.
 
-
 Return to Admin to start creating an amendment
     [Tags]  HappyPath
     user goes to url  %{ADMIN_URL}
     user waits until h1 is visible   Dashboard
     user waits until page contains title caption  Welcome Bau1
-
 
 Create amendment
     [Tags]  HappyPath
@@ -196,7 +177,6 @@ Create amendment
     user waits until parent contains element   ${details}   xpath:.//a[text()="View this release"]
     user clicks button  Amend this release  ${details}
     user clicks button  Confirm
-
 
 replace data files for amendment
     [Tags]  HappyPath
@@ -212,7 +192,6 @@ replace data files for amendment
     user clicks button  Upload data files
     user checks headed table body row cell contains  Status          2  Complete   wait=180
 
-
 Confirm data replacement
     [Tags]  HappyPath
     user waits until page contains  Data blocks: OK
@@ -220,19 +199,17 @@ Confirm data replacement
     user clicks button  Confirm data replacement
     user waits until h2 is visible  Data replacement complete
 
-
 go back to data and files to upload & delete subject
+    [Tags]  HappyPath
     user clicks link  Data and files
     user waits until page contains element  id:dataFileUploadForm-subjectTitle
     user waits until h2 is visible  Uploaded data files
-
 
 Go to "Sign off" page for amendment
     [Tags]  HappyPath
     user clicks link   Sign off
     user waits until h2 is visible  Sign off
     user waits until page contains button  Edit release status
-
 
 Approve release for amendment
     [Tags]  HappyPath
@@ -243,19 +220,16 @@ Approve release for amendment
     user clicks radio   As soon as possible
     user clicks button   Update status
 
-
 Wait for release amendment process status to be Complete
     [Tags]  HappyPath
     user waits for release process status to be  Complete    ${release_complete_wait}
     user reloads page  # EES-1448
     user checks page does not contain button  Edit release status
 
-
 Go to permalink page & check for error element to be present
     [Tags]  HappyPath
     user goes to url  ${PERMA_LOCATION_URL}
     user waits until page contains  WARNING - The data used in this permalink may be out-of-date.
-
 
 Return to Admin to start deleting subject
     [Tags]  HappyPath
@@ -263,7 +237,6 @@ Return to Admin to start deleting subject
     user goes to url  %{ADMIN_URL}
     user waits until h1 is visible  Dashboard
     user waits until page contains title caption  Welcome Bau1
-
 
 Create amendment
     [Tags]  HappyPath
@@ -277,7 +250,6 @@ Create amendment
     user clicks button  Amend this release  ${details}
     user clicks button  Confirm
 
-
 Delete subject files
     [Tags]  HappyPath
     user clicks link  Data and files
@@ -289,7 +261,6 @@ Delete subject files
     user clicks element  ${button}
     user clicks button  Confirm
 
-
 Approve release
     [Tags]  HappyPath
     user clicks link   Sign off
@@ -300,15 +271,13 @@ Approve release
     user clicks radio   As soon as possible
     user clicks button   Update status
 
-
 Wait for release process status to be Complete
     [Tags]  HappyPath
     user waits for release process status to be  Complete    ${release_complete_wait}
     user reloads page  # EES-1448
     user checks page does not contain button  Edit release status
 
-
-check amended release doesn't contain deleted subject
+Check amended release doesn't contain deleted subject
     [Tags]  HappyPath
     user goes to url  %{PUBLIC_URL}/data-tables
     user waits until h1 is visible  Create your own tables online
