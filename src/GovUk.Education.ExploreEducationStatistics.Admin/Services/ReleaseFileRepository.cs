@@ -46,7 +46,8 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Services
             var releaseFile = await Get(releaseId, fileId);
             if (releaseFile != null)
             {
-                _contentDbContext.ReleaseFiles.Remove(releaseFile);    
+                _contentDbContext.ReleaseFiles.Remove(releaseFile);
+                await _contentDbContext.SaveChangesAsync();
             }
         }
 

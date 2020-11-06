@@ -85,8 +85,6 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Services
 
                             await _fileRepository.Delete(file.Id);
                         }
-
-                        await _contentDbContext.SaveChangesAsync();
                     }
                 });
         }
@@ -269,8 +267,6 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Services
                             releaseId,
                             file.FileName.ToLower(),
                             Chart);
-
-                    await _contentDbContext.SaveChangesAsync();
 
                     await _blobStorageService.UploadFile(
                         containerName: PrivateFilesContainerName,

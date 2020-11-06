@@ -50,23 +50,31 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Services
                 replacingFile.ReplacedBy = releaseFile.ReleaseFileReference;
             }
 
+            await _contentDbContext.SaveChangesAsync();
+
             return created.ReleaseFileReference;
         }
 
         public async Task<ReleaseFileReference> CreateZip(Guid releaseId, string filename)
         {
-            return (await _contentDbContext.ReleaseFileReferences.AddAsync(new ReleaseFileReference
+            var file = (await _contentDbContext.ReleaseFileReferences.AddAsync(new ReleaseFileReference
             {
                 ReleaseId = releaseId,
                 Filename = filename,
                 ReleaseFileType = ReleaseFileTypes.DataZip
             })).Entity;
+
+            await _contentDbContext.SaveChangesAsync();
+
+            return file;
         }
 
         public async Task Delete(Guid id)
         {
             var file = await Get(id);
             _contentDbContext.ReleaseFileReferences.Remove(file);
+
+            await _contentDbContext.SaveChangesAsync();
         }
 
         public async Task<ReleaseFileReference> Get(Guid id)
@@ -89,6 +97,8 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Services
             var file = releaseFile.ReleaseFileReference;
             _contentDbContext.Update(file);
             file.Filename = filename;
+
+            await _contentDbContext.SaveChangesAsync();
 
             return file;
         }

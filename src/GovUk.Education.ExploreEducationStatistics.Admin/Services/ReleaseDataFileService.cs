@@ -114,6 +114,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Services
                                 var originalFile = await _fileRepository.Get(file.ReplacingId.Value);
                                 originalFile.ReplacedById = null;
                                 _contentDbContext.Update(originalFile);
+                                await _contentDbContext.SaveChangesAsync();
                             }
 
                             await _releaseFileRepository.Delete(releaseId, file.Id);
@@ -134,8 +135,6 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Services
                                 await _fileRepository.Delete(sourceRef.Id);
                             }
                         }
-
-                        await _contentDbContext.SaveChangesAsync();
                     }
                 });
         }
@@ -225,8 +224,6 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Services
                                             releaseId: releaseId,
                                             filename: metaFile.FileName.ToLower(),
                                             Metadata);
-
-                                        await _contentDbContext.SaveChangesAsync();
 
                                         var dataInfo = GetDataFileMetaValues(
                                             name: validSubjectName,
@@ -325,8 +322,6 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Services
                                                         filename: archiveFile.MetaFileName,
                                                         type: Metadata,
                                                         source: source);
-
-                                                    await _contentDbContext.SaveChangesAsync();
 
                                                     await UploadFileToStorage(releaseId, zipFile,
                                                         DataZip,
