@@ -340,19 +340,13 @@ namespace GovUk.Education.ExploreEducationStatistics.Common.Tests.Services
         }
 
         [Fact]
-        public async Task UpdateStatus_UpdateToSameStatus()
+        public async Task UpdateStatus_UpdateToSamePercentageCompleteAtSameStatusIsIgnored()
         {
             var tableStorageService = new Mock<ITableStorageService>(MockBehavior.Strict);
 
             var importsTable = SetupImportsTableMockForDataFileImport(tableStorageService: tableStorageService,
                 importStatus: STAGE_2,
                 percentageComplete: 50);
-
-            importsTable.Setup(mock => mock.ExecuteAsync(It.Is(_tableReplaceExpression)))
-                .ReturnsAsync(new TableResult
-                {
-                    Result = null
-                });
 
             var service = BuildImportStatusService(tableStorageService: tableStorageService.Object);
 
@@ -362,15 +356,9 @@ namespace GovUk.Education.ExploreEducationStatistics.Common.Tests.Services
                 mock.ExecuteAsync(It.Is<TableOperation>(operation =>
                     operation.OperationType == TableOperationType.Retrieve)), Times.Once);
 
-            importsTable.Verify(mock =>
-                mock.ExecuteAsync(It.Is<TableOperation>(operation =>
-                    operation.OperationType == TableOperationType.Replace
-                    && (operation.Entity as DatafileImport).PercentageComplete == 50
-                    && (operation.Entity as DatafileImport).Status == STAGE_2)), Times.Once);
-
             importsTable.VerifyNoOtherCalls();
         }
-        
+
         [Fact]
         public async Task UpdateStatus_UpdateToGreaterStatus()
         {

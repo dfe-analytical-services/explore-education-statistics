@@ -50,7 +50,10 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Processor.Services
                 return;
             }
 
-            await _importStatusService.UpdateStatus(releaseId, message.OrigDataFileName, IStatus.STAGE_4);
+            if (status.Status != IStatus.STAGE_4)
+            {
+                await _importStatusService.UpdateStatus(releaseId, message.OrigDataFileName, IStatus.STAGE_4);                
+            }
 
             var subjectData = await _fileStorageService.GetSubjectData(message);
             var releaseSubject = GetReleaseSubjectLink(message, context);

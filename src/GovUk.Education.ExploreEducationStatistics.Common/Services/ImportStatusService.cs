@@ -89,7 +89,11 @@ namespace GovUk.Education.ExploreEducationStatistics.Common.Services
             return FinishedImportStatuses.Contains(importStatus.Status);
         }
 
-        public async Task UpdateStatus(Guid releaseId, string origDataFileName, IStatus status, double percentageComplete = 0, int retry = 0)
+        public async Task UpdateStatus(Guid releaseId,
+            string origDataFileName,
+            IStatus status,
+            double percentageComplete = 0,
+            int retry = 0)
         {
             var import = await GetImport(releaseId, origDataFileName);
 
@@ -106,6 +110,12 @@ namespace GovUk.Education.ExploreEducationStatistics.Common.Services
             {
                 _logger.LogWarning(
                     $"Update: {origDataFileName} {statusBefore} ({percentageCompleteBefore}%) -> {status} ({percentageCompleteAfter}%) ignored");
+                return;
+            }
+
+            // Ignore updating to an equal percentage complete (after rounding) at the same status without logging it
+            if (statusBefore == status && percentageCompleteBefore == percentageCompleteAfter)
+            {
                 return;
             }
 
@@ -128,10 +138,10 @@ namespace GovUk.Education.ExploreEducationStatistics.Common.Services
                     // A similar approach will be required if optimistic locking is employed when & if
                     // we switch from table storage to using db tables.
 
-                    _logger.LogWarning(e,
-                        $"Precondition failure as expected while updating progress. ETag does not match for update: {origDataFileName} {statusBefore} ({percentageCompleteBefore}%) -> {status} ({percentageCompleteAfter}%)");
                     if (retry++ < 5)
                     {
+                        _logger.LogWarning(
+                            $"Update: {origDataFileName} {statusBefore} ({percentageCompleteBefore}%) -> {status} ({percentageCompleteAfter}%) request failed and will be retried");
                         await UpdateStatus(releaseId, origDataFileName, status, percentageComplete, retry);
                     }
                     else
