@@ -33,6 +33,6 @@ export const methodologyContentRoute: MethodologyRouteProps = {
 
 export const methodologyStatusRoute: MethodologyRouteProps = {
   path: '/methodologies/:methodologyId/status',
-  title: 'Release status',
+  title: 'Sign off',
   component: MethodologyStatusPage,
 };
