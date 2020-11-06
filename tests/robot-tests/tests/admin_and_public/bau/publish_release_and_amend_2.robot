@@ -14,6 +14,7 @@ ${TOPIC_NAME}  %{TEST_TOPIC_NAME}
 ${SUBJECT_NAME}  Dates test subject
 ${SECOND_SUBJECT}  Dates test subject-%{RUN_IDENTIFIER}
 *** Test Cases ***
+
 Create publication & release
     [Tags]  HappyPath
     ${PUBLICATION_ID}=  user creates test publication via api  ${PUBLICATION_NAME}
@@ -277,8 +278,6 @@ Create amendment
     user clicks button  Confirm
 
 
-
-
 Delete subject files
     [Tags]  HappyPath
     user clicks link  Data and files
@@ -307,8 +306,6 @@ Wait for release process status to be Complete
     user waits for release process status to be  Complete    ${release_complete_wait}
     user reloads page  # EES-1448
     user checks page does not contain button  Edit release status
-
-
 
 
 check amended release doesn't contain deleted subject
