@@ -238,7 +238,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Common.Tests.Services
 
             var service = BuildImportStatusService(tableStorageService: tableStorageService.Object);
 
-            Assert.True(await service.UpdateStatus(_releaseId, FileName, STAGE_1));
+            await service.UpdateStatus(_releaseId, FileName, STAGE_1);
 
             importsTable.Verify(mock =>
                 mock.ExecuteAsync(It.Is<TableOperation>(operation =>
@@ -258,7 +258,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Common.Tests.Services
 
             var service = BuildImportStatusService(tableStorageService: tableStorageService.Object);
 
-            Assert.False(await service.UpdateStatus(_releaseId, FileName, STAGE_1));
+            await service.UpdateStatus(_releaseId, FileName, STAGE_1);
 
             importsTable.Verify(mock =>
                 mock.ExecuteAsync(It.Is<TableOperation>(operation =>
@@ -284,7 +284,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Common.Tests.Services
 
             var service = BuildImportStatusService(tableStorageService: tableStorageService.Object);
 
-            Assert.True(await service.UpdateStatus(_releaseId, FileName, COMPLETE));
+            await service.UpdateStatus(_releaseId, FileName, COMPLETE, 100);
 
             importsTable.Verify(mock =>
                 mock.ExecuteAsync(It.Is<TableOperation>(operation =>
@@ -300,7 +300,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Common.Tests.Services
         }
 
         [Fact]
-        public async Task UpdateStatus_UpdateToLesserStatusIsIgnored()
+        public async Task UpdateStatus_UpdateToLowerStatusIsIgnored()
         {
             var tableStorageService = new Mock<ITableStorageService>(MockBehavior.Strict);
 
@@ -310,7 +310,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Common.Tests.Services
 
             var service = BuildImportStatusService(tableStorageService: tableStorageService.Object);
 
-            Assert.True(await service.UpdateStatus(_releaseId, FileName, STAGE_3));
+            await service.UpdateStatus(_releaseId, FileName, STAGE_3);
 
             importsTable.Verify(mock =>
                 mock.ExecuteAsync(It.Is<TableOperation>(operation =>
@@ -319,6 +319,58 @@ namespace GovUk.Education.ExploreEducationStatistics.Common.Tests.Services
             importsTable.VerifyNoOtherCalls();
         }
 
+        [Fact]
+        public async Task UpdateStatus_UpdateToLowerPercentageCompleteAtSameStatusIsIgnored()
+        {
+            var tableStorageService = new Mock<ITableStorageService>(MockBehavior.Strict);
+
+            var importsTable = SetupImportsTableMockForDataFileImport(tableStorageService: tableStorageService,
+                importStatus: STAGE_1,
+                percentageComplete: 50);
+
+            var service = BuildImportStatusService(tableStorageService: tableStorageService.Object);
+
+            await service.UpdateStatus(_releaseId, FileName, STAGE_1, 25.0);
+
+            importsTable.Verify(mock =>
+                mock.ExecuteAsync(It.Is<TableOperation>(operation =>
+                    operation.OperationType == TableOperationType.Retrieve)), Times.Once);
+
+            importsTable.VerifyNoOtherCalls();
+        }
+
+        [Fact]
+        public async Task UpdateStatus_UpdateToSameStatus()
+        {
+            var tableStorageService = new Mock<ITableStorageService>(MockBehavior.Strict);
+
+            var importsTable = SetupImportsTableMockForDataFileImport(tableStorageService: tableStorageService,
+                importStatus: STAGE_2,
+                percentageComplete: 50);
+
+            importsTable.Setup(mock => mock.ExecuteAsync(It.Is(_tableReplaceExpression)))
+                .ReturnsAsync(new TableResult
+                {
+                    Result = null
+                });
+
+            var service = BuildImportStatusService(tableStorageService: tableStorageService.Object);
+
+            await service.UpdateStatus(_releaseId, FileName, STAGE_2, 50);
+
+            importsTable.Verify(mock =>
+                mock.ExecuteAsync(It.Is<TableOperation>(operation =>
+                    operation.OperationType == TableOperationType.Retrieve)), Times.Once);
+
+            importsTable.Verify(mock =>
+                mock.ExecuteAsync(It.Is<TableOperation>(operation =>
+                    operation.OperationType == TableOperationType.Replace
+                    && (operation.Entity as DatafileImport).PercentageComplete == 50
+                    && (operation.Entity as DatafileImport).Status == STAGE_2)), Times.Once);
+
+            importsTable.VerifyNoOtherCalls();
+        }
+        
         [Fact]
         public async Task UpdateStatus_UpdateToGreaterStatus()
         {
@@ -336,7 +388,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Common.Tests.Services
 
             var service = BuildImportStatusService(tableStorageService: tableStorageService.Object);
 
-            Assert.True(await service.UpdateStatus(_releaseId, FileName, STAGE_2));
+            await service.UpdateStatus(_releaseId, FileName, STAGE_2);
 
             importsTable.Verify(mock =>
                 mock.ExecuteAsync(It.Is<TableOperation>(operation =>
@@ -352,7 +404,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Common.Tests.Services
         }
 
         [Fact]
-        public async Task UpdateStatus_UpdateAsSameStatusIsIgnored()
+        public async Task UpdateStatus_PercentageCompleteExceedsUpperBound()
         {
             var tableStorageService = new Mock<ITableStorageService>(MockBehavior.Strict);
 
@@ -360,13 +412,25 @@ namespace GovUk.Education.ExploreEducationStatistics.Common.Tests.Services
                 importStatus: STAGE_1,
                 percentageComplete: 0);
 
+            importsTable.Setup(mock => mock.ExecuteAsync(It.Is(_tableReplaceExpression)))
+                .ReturnsAsync(new TableResult
+                {
+                    Result = null
+                });
+
             var service = BuildImportStatusService(tableStorageService: tableStorageService.Object);
 
-            Assert.True(await service.UpdateStatus(_releaseId, FileName, STAGE_1));
+            await service.UpdateStatus(_releaseId, FileName, STAGE_1, 101.0);
 
             importsTable.Verify(mock =>
                 mock.ExecuteAsync(It.Is<TableOperation>(operation =>
                     operation.OperationType == TableOperationType.Retrieve)), Times.Once);
+
+            importsTable.Verify(mock =>
+                mock.ExecuteAsync(It.Is<TableOperation>(operation =>
+                    operation.OperationType == TableOperationType.Replace
+                    && (operation.Entity as DatafileImport).PercentageComplete == 100
+                    && (operation.Entity as DatafileImport).Status == STAGE_1)), Times.Once);
 
             importsTable.VerifyNoOtherCalls();
         }
@@ -433,173 +497,6 @@ namespace GovUk.Education.ExploreEducationStatistics.Common.Tests.Services
                     operation.OperationType == TableOperationType.Replace
                     && (operation.Entity as DatafileImport).PercentageComplete == 0
                     && (operation.Entity as DatafileImport).Status == STAGE_2)), Times.Exactly(5));
-
-            importsTable.VerifyNoOtherCalls();
-        }
-
-        [Fact]
-        public async Task UpdateProgress()
-        {
-            var tableStorageService = new Mock<ITableStorageService>(MockBehavior.Strict);
-
-            var importsTable = SetupImportsTableMockForDataFileImport(tableStorageService: tableStorageService,
-                importStatus: STAGE_1,
-                percentageComplete: 0);
-
-            importsTable.Setup(mock => mock.ExecuteAsync(It.Is(_tableReplaceExpression)))
-                .ReturnsAsync(new TableResult
-                {
-                    Result = null
-                });
-
-            var service = BuildImportStatusService(tableStorageService: tableStorageService.Object);
-
-            await service.UpdateProgress(_releaseId, FileName, STAGE_1, 50.0);
-
-            importsTable.Verify(mock =>
-                mock.ExecuteAsync(It.Is<TableOperation>(operation =>
-                    operation.OperationType == TableOperationType.Retrieve)), Times.Once);
-
-            importsTable.Verify(mock =>
-                mock.ExecuteAsync(It.Is<TableOperation>(operation =>
-                    operation.OperationType == TableOperationType.Replace
-                    && (operation.Entity as DatafileImport).PercentageComplete == 50)), Times.Once);
-
-            importsTable.VerifyNoOtherCalls();
-        }
-
-        [Fact]
-        public async Task UpdateProgress_IntendedStatusDifferentFromActualStatusIsIgnored()
-        {
-            var tableStorageService = new Mock<ITableStorageService>(MockBehavior.Strict);
-
-            var importsTable = SetupImportsTableMockForDataFileImport(tableStorageService: tableStorageService,
-                importStatus: STAGE_3,
-                percentageComplete: 0);
-
-            var service = BuildImportStatusService(tableStorageService: tableStorageService.Object);
-
-            await service.UpdateProgress(_releaseId, FileName, STAGE_2, 50.0);
-
-            importsTable.Verify(mock =>
-                mock.ExecuteAsync(It.Is<TableOperation>(operation =>
-                    operation.OperationType == TableOperationType.Retrieve)), Times.Once);
-
-            importsTable.VerifyNoOtherCalls();
-        }
-
-        [Fact]
-        public async Task UpdateProgress_PercentageCompleteGreaterThanUpdateIsIgnored()
-        {
-            var tableStorageService = new Mock<ITableStorageService>(MockBehavior.Strict);
-
-            var importsTable = SetupImportsTableMockForDataFileImport(tableStorageService: tableStorageService,
-                importStatus: STAGE_1,
-                percentageComplete: 50);
-
-            var service = BuildImportStatusService(tableStorageService: tableStorageService.Object);
-
-            await service.UpdateProgress(_releaseId, FileName, STAGE_1, 25.0);
-
-            importsTable.Verify(mock =>
-                mock.ExecuteAsync(It.Is<TableOperation>(operation =>
-                    operation.OperationType == TableOperationType.Retrieve)), Times.Once);
-
-            importsTable.VerifyNoOtherCalls();
-        }
-
-        [Fact]
-        public async Task UpdateProgress_UpdateExceedsUpperBound()
-        {
-            var tableStorageService = new Mock<ITableStorageService>(MockBehavior.Strict);
-
-            var importsTable = SetupImportsTableMockForDataFileImport(tableStorageService: tableStorageService,
-                importStatus: STAGE_1,
-                percentageComplete: 0);
-
-            importsTable.Setup(mock => mock.ExecuteAsync(It.Is(_tableReplaceExpression)))
-                .ReturnsAsync(new TableResult
-                {
-                    Result = null
-                });
-
-            var service = BuildImportStatusService(tableStorageService: tableStorageService.Object);
-
-            await service.UpdateProgress(_releaseId, FileName, STAGE_1, 101.0);
-
-            importsTable.Verify(mock =>
-                mock.ExecuteAsync(It.Is<TableOperation>(operation =>
-                    operation.OperationType == TableOperationType.Retrieve)), Times.Once);
-
-            importsTable.Verify(mock =>
-                mock.ExecuteAsync(It.Is<TableOperation>(operation =>
-                    operation.OperationType == TableOperationType.Replace
-                    && (operation.Entity as DatafileImport).PercentageComplete == 100)), Times.Once);
-
-            importsTable.VerifyNoOtherCalls();
-        }
-
-        [Fact]
-        public async Task UpdateProgress_UpdateThrowsException()
-        {
-            var tableStorageService = new Mock<ITableStorageService>(MockBehavior.Strict);
-
-            var importsTable = SetupImportsTableMockForDataFileImport(tableStorageService: tableStorageService,
-                importStatus: STAGE_1,
-                percentageComplete: 0);
-
-            importsTable.Setup(mock => mock.ExecuteAsync(It.Is(_tableReplaceExpression)))
-                .ThrowsAsync(_genericStorageException);
-
-            var service = BuildImportStatusService(tableStorageService: tableStorageService.Object);
-
-            await Assert.ThrowsAsync<StorageException>(
-                () => service.UpdateProgress(_releaseId, FileName, STAGE_1, 50.0));
-
-            importsTable.Verify(mock =>
-                mock.ExecuteAsync(It.Is<TableOperation>(operation =>
-                    operation.OperationType == TableOperationType.Retrieve)), Times.Once);
-
-            importsTable.Verify(mock =>
-                mock.ExecuteAsync(It.Is<TableOperation>(operation =>
-                    operation.OperationType == TableOperationType.Replace
-                    && (operation.Entity as DatafileImport).PercentageComplete == 50)), Times.Once);
-
-            importsTable.VerifyNoOtherCalls();
-        }
-
-        [Fact]
-        public async Task UpdateProgress_UpdateIsRetriedIfImportWasChangedByConcurrentUpdate()
-        {
-            var tableStorageService = new Mock<ITableStorageService>(MockBehavior.Strict);
-
-            var importsTable = SetupImportsTableMockForDataFileImport(tableStorageService: tableStorageService,
-                importStatus: STAGE_1,
-                percentageComplete: 0);
-
-            importsTable.SetupSequence(mock =>
-                    mock.ExecuteAsync(It.Is(_tableReplaceExpression)))
-                .ThrowsAsync(_concurrentUpdateException)
-                .ThrowsAsync(_concurrentUpdateException)
-                .ThrowsAsync(_concurrentUpdateException)
-                .ThrowsAsync(_concurrentUpdateException)
-                .ReturnsAsync(new TableResult
-                {
-                    Result = null
-                });
-
-            var service = BuildImportStatusService(tableStorageService: tableStorageService.Object);
-
-            await service.UpdateProgress(_releaseId, FileName, STAGE_1, 50.0);
-
-            importsTable.Verify(mock =>
-                mock.ExecuteAsync(It.Is<TableOperation>(operation =>
-                    operation.OperationType == TableOperationType.Retrieve)), Times.Exactly(5));
-
-            importsTable.Verify(mock =>
-                mock.ExecuteAsync(It.Is<TableOperation>(operation =>
-                    operation.OperationType == TableOperationType.Replace
-                    && (operation.Entity as DatafileImport).PercentageComplete == 50)), Times.Exactly(5));
 
             importsTable.VerifyNoOtherCalls();
         }

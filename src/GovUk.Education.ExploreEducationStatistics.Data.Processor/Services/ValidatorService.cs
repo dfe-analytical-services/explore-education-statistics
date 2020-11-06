@@ -279,7 +279,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Processor.Services
 
                 if (totalRowCount % STAGE_1_ROW_CHECK == 0)
                 {
-                    await _importStatusService.UpdateProgress(releaseId,
+                    await _importStatusService.UpdateStatus(releaseId,
                         origDataFileName,
                         IStatus.STAGE_1,
                         (double) totalRowCount / dataRows * 100);
@@ -291,7 +291,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Processor.Services
                 return errors;
             }
 
-            await _importStatusService.UpdateProgress(releaseId,
+            await _importStatusService.UpdateStatus(releaseId,
                 origDataFileName,
                 IStatus.STAGE_1,
                 100);

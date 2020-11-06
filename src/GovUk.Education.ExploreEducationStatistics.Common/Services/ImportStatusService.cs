@@ -89,27 +89,25 @@ namespace GovUk.Education.ExploreEducationStatistics.Common.Services
             return FinishedImportStatuses.Contains(importStatus.Status);
         }
 
-        public async Task<bool> UpdateStatus(Guid releaseId, string origDataFileName, IStatus status, int retry = 0)
+        public async Task UpdateStatus(Guid releaseId, string origDataFileName, IStatus status, double percentageComplete = 0, int retry = 0)
         {
             var import = await GetImport(releaseId, origDataFileName);
 
-            // Ignore updating when already failed
-            if (import.Status == IStatus.FAILED)
-            {
-                _logger.LogWarning($"Update: {origDataFileName} {import.Status} -> {status} ignored");
-                return false;
-            }
-
-            // Ignore updating to a lesser or equal status 
-            if (import.Status.CompareTo(status) >= 0)
-            {
-                _logger.LogWarning($"Update: {origDataFileName} {import.Status} -> {status} ignored");
-                return true;
-            }
-
             var percentageCompleteBefore = import.PercentageComplete;
-            var percentageCompleteAfter = status == IStatus.COMPLETE ? 100 : 0;
+            var percentageCompleteAfter = (int) Math.Clamp(percentageComplete, 0, 100);
             var statusBefore = import.Status;
+
+            // Ignore updating when already failed
+            // Ignore updating to a lower status
+            // Ignore updating to a lower percentage complete at the same status
+            if (statusBefore == IStatus.FAILED
+                || statusBefore.CompareTo(status) > 0
+                || statusBefore == status && percentageCompleteBefore > percentageCompleteAfter)
+            {
+                _logger.LogWarning(
+                    $"Update: {origDataFileName} {statusBefore} ({percentageCompleteBefore}%) -> {status} ({percentageCompleteAfter}%) ignored");
+                return;
+            }
 
             _logger.LogInformation(
                 $"Update: {origDataFileName} {statusBefore} ({percentageCompleteBefore}%) -> {status} ({percentageCompleteAfter}%)");
@@ -134,7 +132,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Common.Services
                         $"Precondition failure as expected while updating progress. ETag does not match for update: {origDataFileName} {statusBefore} ({percentageCompleteBefore}%) -> {status} ({percentageCompleteAfter}%)");
                     if (retry++ < 5)
                     {
-                        await UpdateStatus(releaseId, origDataFileName, status, retry);
+                        await UpdateStatus(releaseId, origDataFileName, status, percentageComplete, retry);
                     }
                     else
                     {
@@ -145,61 +143,6 @@ namespace GovUk.Education.ExploreEducationStatistics.Common.Services
                 {
                     throw;
                 }
-            }
-
-            return true;
-        }
-
-        public async Task UpdateProgress(Guid releaseId, string origDataFileName, IStatus status,
-            double percentageComplete, int retry = 0)
-        {
-            var import = await GetImport(releaseId, origDataFileName);
-
-            var before = import.PercentageComplete;
-            var after = (int) Math.Clamp(percentageComplete, 0, 100);
-
-            // Ensure that the intended phase progress is being updated by comparing the status
-            if (import.Status != status)
-            {
-                _logger.LogWarning(
-                    $"Update: {origDataFileName} {import.Status} ({before}%) -> {status} ({after}%) ignored due to status mismatch");
-                return;
-            }
-
-            if (before < after)
-            {
-                _logger.LogInformation(
-                    $"Update: {origDataFileName} {import.Status} ({before}%) -> {import.Status} ({after}%)");
-                import.PercentageComplete = after;
-                try
-                {
-                    await _table.ExecuteAsync(TableOperation.Replace(import));
-                }
-                catch (StorageException e)
-                {
-                    if (e.RequestInformation.HttpStatusCode == (int) HttpStatusCode.PreconditionFailed)
-                    {
-                        _logger.LogWarning(e,
-                            $"Precondition failure as expected while updating progress. ETag does not match for update: {origDataFileName} {import.Status} ({before}%) -> {import.Status} ({after}%)");
-                        if (retry++ < 5)
-                        {
-                            await UpdateProgress(releaseId, origDataFileName, status, percentageComplete, retry);
-                        }
-                        else
-                        {
-                            throw;
-                        }
-                    }
-                    else
-                    {
-                        throw;
-                    }
-                }
-            }
-            else if (before != after)
-            {
-                _logger.LogWarning(
-                    $"Ignoring attempt for {origDataFileName} {import.Status} to replace {before}% with lower value {after}%");
             }
         }
 

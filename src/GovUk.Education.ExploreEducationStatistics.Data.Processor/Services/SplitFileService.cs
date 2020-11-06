@@ -98,7 +98,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Processor.Services
 
                 var percentageComplete = (double) batchCount / numBatches * 100;
 
-                await _importStatusService.UpdateProgress(message.Release.Id,
+                await _importStatusService.UpdateStatus(message.Release.Id,
                     message.OrigDataFileName,
                     IStatus.STAGE_3,
                     percentageComplete);

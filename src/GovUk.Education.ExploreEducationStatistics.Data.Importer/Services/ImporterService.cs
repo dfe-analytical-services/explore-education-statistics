@@ -149,7 +149,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Importer.Services
             {
                 if (rowCount % STAGE_2_ROW_CHECK == 0)
                 {
-                    await _importStatusService.UpdateProgress(releaseId,
+                    await _importStatusService.UpdateStatus(releaseId,
                         origDataFileName,
                         IStatus.STAGE_2,
                         (double) rowCount / totalRows * 100);
