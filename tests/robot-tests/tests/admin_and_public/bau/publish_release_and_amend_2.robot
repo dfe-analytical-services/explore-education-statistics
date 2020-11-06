@@ -302,6 +302,15 @@ Approve release
     user clicks button   Update status
 
 
+Wait for release process status to be Complete
+    [Tags]  HappyPath
+    user waits for release process status to be  Complete    ${release_complete_wait}
+    user reloads page  # EES-1448
+    user checks page does not contain button  Edit release status
+
+
+
+
 check amended release doesn't contain deleted subject
     [Tags]  HappyPath
     user goes to url  %{PUBLIC_URL}/data-tables
