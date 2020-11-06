@@ -248,6 +248,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Publisher.Services
 
             var name = Path.GetFileName(item.Name);
 
+            // TODO what is this, and is it affected by BlobStorageName being in Lower?
             if (releaseFileReferences.Exists(rfr => rfr.BlobStorageName == name))
             {
                 return true;
