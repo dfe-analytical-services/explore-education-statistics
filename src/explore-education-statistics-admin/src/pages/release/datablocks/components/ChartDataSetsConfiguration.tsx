@@ -31,14 +31,6 @@ import difference from 'lodash/difference';
 import upperFirst from 'lodash/upperFirst';
 import React, { ReactNode, useState } from 'react';
 
-const colourOptions: SelectOption[] = colours.map(color => {
-  return {
-    label: color,
-    value: color,
-    style: { backgroundColor: color },
-  };
-});
-
 const symbolOptions: SelectOption[] = symbols.map<SelectOption>(symbol => ({
   label: upperFirst(symbol),
   value: symbol,
@@ -241,15 +233,9 @@ const ChartDataSetsConfiguration = ({
                               id={`${id}-colour`}
                               name={`dataSets[${index}].config.colour`}
                               label="Colour"
-                              list={`${id}-colours`}
+                              colours={colours}
                               formGroup={false}
                             />
-
-                            <datalist id={`${id}-colours`}>
-                              {colourOptions.map(({ value }) => (
-                                <option key={value} value={value} />
-                              ))}
-                            </datalist>
                           </div>
 
                           {capabilities.dataSymbols && (
