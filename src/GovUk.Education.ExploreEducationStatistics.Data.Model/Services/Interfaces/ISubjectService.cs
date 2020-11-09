@@ -11,6 +11,8 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Model.Services.Interfa
 
         Task<Publication> GetPublicationForSubject(Guid subjectId);
 
+        Task<Publication?> FindPublicationForSubject(Guid subjectId);
+
         Task<Subject?> Get(Guid releaseId, string subjectName);
 
         Task<Subject?> Get(Guid subjectId);

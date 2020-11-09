@@ -54,13 +54,22 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Model.Services
 
         public Task<Publication> GetPublicationForSubject(Guid subjectId)
         {
+            return QueryPublicationForSubject(subjectId).FirstAsync();
+        }
+
+        public async Task<Publication?> FindPublicationForSubject(Guid subjectId)
+        {
+            return await QueryPublicationForSubject(subjectId).FirstOrDefaultAsync();
+        }
+
+        private IQueryable<Publication> QueryPublicationForSubject(Guid subjectId)
+        {
             return _context
                 .ReleaseSubject
                 .Include(r => r.Release)
                 .ThenInclude(r => r.Publication)
                 .Where(r => r.SubjectId == subjectId)
-                .Select(r => r.Release.Publication)
-                .FirstAsync();
+                .Select(r => r.Release.Publication);
         }
 
         public Task<List<Subject>> GetSubjectsForRelease(Guid releaseId)
