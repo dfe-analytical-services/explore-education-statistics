@@ -199,13 +199,18 @@ Confirm data replacement
     user clicks button  Confirm data replacement
     user waits until h2 is visible  Data replacement complete
 
-Go back to data and files to upload & delete subject
+Delete second subject file
     [Tags]  HappyPath
     user clicks link  Data and files
-    user waits until page contains element  id:dataFileUploadForm-subjectTitle
-    user waits until h2 is visible  Uploaded data files
+    user waits until page contains accordion section  ${SECOND_SUBJECT}
+    user opens accordion section  ${SECOND_SUBJECT}
+    user scrolls to accordion section content  ${SECOND_SUBJECT}
+    ${accordion}=  user gets accordion section content element  ${SECOND_SUBJECT}
+    ${button}=  user gets button element  Delete files  ${accordion}
+    user clicks element  ${button}
+    user clicks button  Confirm
 
-Go to "Sign off" page for amendment
+Go to "Sign off" page and approve amendment
     [Tags]  HappyPath
     user clicks link   Sign off
     user waits until h2 is visible  Sign off
@@ -230,52 +235,6 @@ Go to permalink page & check for error element to be present
     [Tags]  HappyPath
     user goes to url  ${PERMA_LOCATION_URL}
     user waits until page contains  WARNING - The data used in this permalink may be out-of-date.
-
-Return to Admin to start deleting subject
-    [Tags]  HappyPath
-    [Documentation]  EES-1303
-    user goes to url  %{ADMIN_URL}
-    user waits until h1 is visible  Dashboard
-    user waits until page contains title caption  Welcome Bau1
-
-Create amendment
-    [Tags]  HappyPath
-    user selects theme and topic from admin dashboard  %{TEST_THEME_NAME}  ${TOPIC_NAME}
-    user waits until page contains accordion section   ${PUBLICATION_NAME}
-    user opens accordion section  ${PUBLICATION_NAME}
-    ${accordion}=  user gets accordion section content element  ${PUBLICATION_NAME}
-    user opens details dropdown   ${DETAILS_HEADING} (Live - Latest release)  ${accordion}
-    ${details}=  user gets details content element  ${DETAILS_HEADING} (Live - Latest release)  ${accordion}
-    user waits until parent contains element   ${details}   xpath:.//a[text()="View this release"]
-    user clicks button  Amend this release  ${details}
-    user clicks button  Confirm
-
-Delete subject files
-    [Tags]  HappyPath
-    user clicks link  Data and files
-    user waits until page contains accordion section  ${SECOND_SUBJECT}
-    user opens accordion section  ${SECOND_SUBJECT}
-    user scrolls to accordion section content  ${SECOND_SUBJECT}
-    ${accordion}=  user gets accordion section content element  ${SECOND_SUBJECT}
-    ${button}=  user gets button element  Delete files  ${accordion}
-    user clicks element  ${button}
-    user clicks button  Confirm
-
-Approve release
-    [Tags]  HappyPath
-    user clicks link   Sign off
-    user clicks button  Edit release status
-    user waits until h2 is visible  Edit release status
-    user clicks radio   Approved for publication
-    user enters text into element  id:releaseStatusForm-internalReleaseNote  Approved by UI tests
-    user clicks radio   As soon as possible
-    user clicks button   Update status
-
-Wait for release process status to be Complete
-    [Tags]  HappyPath
-    user waits for release process status to be  Complete    ${release_complete_wait}
-    user reloads page  # EES-1448
-    user checks page does not contain button  Edit release status
 
 Check amended release doesn't contain deleted subject
     [Tags]  HappyPath
