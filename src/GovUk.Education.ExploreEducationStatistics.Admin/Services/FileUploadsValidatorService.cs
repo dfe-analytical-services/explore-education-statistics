@@ -87,7 +87,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Services
                 return ValidationActionResult(SubjectTitleCannotContainSpecialCharacters);
             }
 
-            if (await _subjectService.GetAsync(releaseId, name) != null)
+            if (await _subjectService.Get(releaseId, name) != null)
             {
                 return ValidationActionResult(SubjectTitleMustBeUnique);
             }

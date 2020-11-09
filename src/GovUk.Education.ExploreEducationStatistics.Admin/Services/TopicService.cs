@@ -169,7 +169,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Services
                         {
                             await _releaseDataFileService.DeleteAll(release.Id, forceDelete: true);
                             await _releaseFileService.DeleteAll(release.Id, forceDelete: true);
-                            await _releaseSubjectService.DeleteAllSubjectsOrBreakReleaseLinks(release.Id);
+                            await _releaseSubjectService.DeleteAllReleaseSubjects(release.Id);
                         }
 
                         _statisticsContext.Release.RemoveRange(

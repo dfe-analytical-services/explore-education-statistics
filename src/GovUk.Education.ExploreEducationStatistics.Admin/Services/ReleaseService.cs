@@ -172,7 +172,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Services
 
                     await _context.SaveChangesAsync();
 
-                    await _releaseSubjectService.SoftDeleteAllSubjectsOrBreakReleaseLinks(releaseId);
+                    await _releaseSubjectService.SoftDeleteAllReleaseSubjects(releaseId);
                 });
         }
 
@@ -426,7 +426,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Services
                 .OnSuccess(async releaseFileReference =>
                 {
                     var subject = releaseFileReference.SubjectId.HasValue
-                        ? await _subjectService.GetAsync(releaseFileReference.SubjectId.Value)
+                        ? await _subjectService.Get(releaseFileReference.SubjectId.Value)
                         : null;
 
                     var footnotes = subject == null
@@ -466,7 +466,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Services
                         .OnSuccess(async deletePlan =>
                         {
                             await _dataBlockService.DeleteDataBlocks(deletePlan.DeleteDataBlockPlan);
-                            await _releaseSubjectService.SoftDeleteSubjectOrBreakReleaseLink(releaseId,
+                            await _releaseSubjectService.SoftDeleteReleaseSubject(releaseId,
                                 deletePlan.SubjectId);
 
                             return await _releaseDataFileService
@@ -478,7 +478,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Services
 
         private async Task RemoveFileImportEntryIfOrphaned(DeleteDataFilePlan deletePlan)
         {
-            if (await _subjectService.GetAsync(deletePlan.SubjectId) == null)
+            if (await _subjectService.Get(deletePlan.SubjectId) == null)
             {
                 await _coreTableStorageService.DeleteEntityAsync(DatafileImportsTableName, deletePlan.TableStorageItem);
             }

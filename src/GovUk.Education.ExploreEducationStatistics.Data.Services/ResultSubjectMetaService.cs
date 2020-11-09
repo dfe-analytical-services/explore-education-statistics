@@ -100,7 +100,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Services
                     _logger.LogTrace("Got Time Periods in {Time} ms", stopwatch.Elapsed.TotalMilliseconds);
                     stopwatch.Stop();
 
-                    var publication = await _subjectService.GetPublicationForSubjectAsync(subject.Id);
+                    var publication = await _subjectService.GetPublicationForSubject(subject.Id);
                     
                     return new ResultSubjectMetaViewModel
                     {

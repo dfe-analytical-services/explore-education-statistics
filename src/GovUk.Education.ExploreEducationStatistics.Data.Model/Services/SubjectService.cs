@@ -1,3 +1,4 @@
+#nullable enable
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -19,39 +20,39 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Model.Services
             _releaseService = releaseService;
         }
 
-        public bool IsSubjectForLatestPublishedRelease(Guid subjectId)
+        public async Task<bool> IsSubjectForLatestPublishedRelease(Guid subjectId)
         {
-            var publicationId = GetPublicationForSubjectAsync(subjectId).Result.Id;
-            var latestRelease = _releaseService.GetLatestPublishedRelease(publicationId);
+            var publication = await GetPublicationForSubject(subjectId);
+            var latestRelease = _releaseService.GetLatestPublishedRelease(publication.Id);
 
             if (!latestRelease.HasValue)
             {
                 return false;
             }
-            
+
             return _context
                 .ReleaseSubject
                 .Any(r => r.ReleaseId == latestRelease.Value && r.SubjectId == subjectId);
         }
 
-        public async Task<Subject> GetAsync(Guid subjectId)
+        public async Task<Subject?> Get(Guid subjectId)
         {
             return await _context
                 .Subject
-                .Where(s => s.Id == subjectId).FirstOrDefaultAsync();
+                .FindAsync(subjectId);
         }
-        
-        public async Task<Subject> GetAsync(Guid releaseId, string name)
+
+        public async Task<Subject?> Get(Guid releaseId, string subjectName)
         {
             return await _context
                 .ReleaseSubject
                 .Include(r => r.Subject)
-                .Where(r => r.ReleaseId == releaseId && r.Subject.Name == name)
+                .Where(r => r.ReleaseId == releaseId && r.Subject.Name == subjectName)
                 .Select(r => r.Subject)
                 .FirstOrDefaultAsync();
         }
 
-        public Task<Publication> GetPublicationForSubjectAsync(Guid subjectId)
+        public Task<Publication> GetPublicationForSubject(Guid subjectId)
         {
             return _context
                 .ReleaseSubject
@@ -62,7 +63,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Model.Services
                 .FirstAsync();
         }
 
-        public Task<List<Subject>> GetSubjectsForReleaseAsync(Guid releaseId)
+        public Task<List<Subject>> GetSubjectsForRelease(Guid releaseId)
         {
             return _context
                 .ReleaseSubject
@@ -70,6 +71,6 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Model.Services
                 .Where(s => s.ReleaseId == releaseId)
                 .Select(s => s.Subject)
                 .ToListAsync();
-        } 
+        }
     }
 }

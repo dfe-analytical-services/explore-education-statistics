@@ -953,7 +953,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
                 var subjectService = new Mock<ISubjectService>();
 
                 subjectService
-                    .Setup(s => s.GetAsync(subject.Id))
+                    .Setup(s => s.Get(subject.Id))
                     .ReturnsAsync(subject);
 
                 var service = SetupReleaseDataFileService(
@@ -1772,7 +1772,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
                 var subjectService = new Mock<ISubjectService>();
 
                 subjectService
-                    .Setup(s => s.GetAsync(subject.Id))
+                    .Setup(s => s.Get(subject.Id))
                     .ReturnsAsync(subject);
 
                 var service = SetupReleaseDataFileService(
@@ -2115,7 +2115,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
             await using (var context = InMemoryApplicationDbContext(contextId))
             {
                 subjectService
-                    .Setup(s => s.GetAsync(originalDataFileReference.SubjectId.Value))
+                    .Setup(s => s.Get(originalDataFileReference.SubjectId.Value))
                     .ReturnsAsync(
                         new Subject
                         {
@@ -2445,7 +2445,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
             await using (var context = InMemoryApplicationDbContext(contextId))
             {
                 subjectService
-                    .Setup(s => s.GetAsync(originalDataFileReference.SubjectId.Value))
+                    .Setup(s => s.Get(originalDataFileReference.SubjectId.Value))
                     .ReturnsAsync(
                         new Subject
                         {
