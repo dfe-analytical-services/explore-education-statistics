@@ -5,6 +5,6 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Api.ViewModels
 {
     public class TableBuilderQueryViewModel : ObservationQueryContext
     {
-        public Guid PublicationId { get; set; }
+        public Guid? PublicationId { get; set; }
     }
 }

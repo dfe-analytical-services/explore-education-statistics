@@ -281,6 +281,56 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Model.Tests
             }
         }
 
+        [Fact]
+        public async Task FindPublicationForSubject()
+        {
+            var releaseSubject = new ReleaseSubject
+            {
+                Release = new Release
+                {
+                    Publication = new Publication
+                    {
+                        Title = "Test publication"
+                    },
+                },
+                Subject = new Subject
+                {
+                    Name = "Test subject"
+                }
+            };
+
+            var contextId = Guid.NewGuid().ToString();
+
+            await using (var context = StatisticsDbUtils.InMemoryStatisticsDbContext(contextId))
+            {
+                await context.AddAsync(releaseSubject);
+                await context.SaveChangesAsync();
+            }
+
+            await using (var context = StatisticsDbUtils.InMemoryStatisticsDbContext(contextId))
+            {
+                var service = BuildSubjectService(context);
+                var result = await service.FindPublicationForSubject(releaseSubject.SubjectId);
+
+                Assert.Equal(releaseSubject.Release.PublicationId, result.Id);
+                Assert.Equal("Test publication", result.Title);
+            }
+        }
+
+        [Fact]
+        public async Task FindPublicationForSubject_NotFoundReturnsNull()
+        {
+            var contextId = Guid.NewGuid().ToString();
+
+            await using (var context = StatisticsDbUtils.InMemoryStatisticsDbContext(contextId))
+            {
+                var service = BuildSubjectService(context);
+                var result = await service.FindPublicationForSubject(Guid.NewGuid());
+
+                Assert.Null(result);
+            }
+        }
+
         private SubjectService BuildSubjectService(
             StatisticsDbContext statisticsDbContext,
             IReleaseService releaseService = null)
