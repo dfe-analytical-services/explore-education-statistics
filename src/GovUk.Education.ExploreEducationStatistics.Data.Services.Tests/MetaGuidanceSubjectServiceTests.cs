@@ -198,6 +198,68 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Services.Tests
         }
 
         [Fact]
+        public async Task Get_OrderedByName()
+        {
+            var release = new Release();
+
+            var releaseSubject1 = new ReleaseSubject
+            {
+                Release = release,
+                Subject = new Subject
+                {
+                    Filename = "file1.csv",
+                    Name = "Subject 1"
+                },
+                MetaGuidance = "Subject 1 Meta Guidance"
+            };
+            var releaseSubject2 = new ReleaseSubject
+            {
+                Release = release,
+                Subject = new Subject
+                {
+                    Filename = "file2.csv",
+                    Name = "Subject 2"
+                },
+                MetaGuidance = "Subject 2 Meta Guidance"
+            };
+            var releaseSubject3 = new ReleaseSubject
+            {
+                Release = release,
+                Subject = new Subject
+                {
+                    Filename = "file3.csv",
+                    Name = "Subject 3"
+                },
+                MetaGuidance = "Subject 3 Meta Guidance"
+            };
+
+            var statisticsDbContextId = Guid.NewGuid().ToString();
+
+            await using (var statisticsDbContext = InMemoryStatisticsDbContext(statisticsDbContextId))
+            {
+                await statisticsDbContext.AddAsync(release);
+                // Saved in random order
+                await statisticsDbContext.AddRangeAsync(releaseSubject3, releaseSubject1, releaseSubject2);
+                await statisticsDbContext.SaveChangesAsync();
+            }
+
+            await using (var statisticsDbContext = InMemoryStatisticsDbContext(statisticsDbContextId))
+            {
+                var service = SetupMetaGuidanceSubjectService(context: statisticsDbContext);
+
+                var result = await service.GetSubjects(release.Id);
+
+                Assert.True(result.IsRight);
+
+                Assert.Equal(3, result.Right.Count);
+
+                Assert.Equal("Subject 1", result.Right[0].Name);
+                Assert.Equal("Subject 2", result.Right[1].Name);
+                Assert.Equal("Subject 3", result.Right[2].Name);
+            }
+        }
+
+        [Fact]
         public async Task Get_SpecificSubjects()
         {
             var release = new Release();
