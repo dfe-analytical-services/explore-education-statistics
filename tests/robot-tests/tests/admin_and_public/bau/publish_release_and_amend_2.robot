@@ -178,7 +178,7 @@ Create amendment
     user clicks button  Amend this release  ${details}
     user clicks button  Confirm
 
-replace data files for amendment
+Replace data files for amendment
     [Tags]  HappyPath
     user clicks link  Data and files
     user waits until page contains element  id:dataFileUploadForm-subjectTitle
@@ -199,7 +199,7 @@ Confirm data replacement
     user clicks button  Confirm data replacement
     user waits until h2 is visible  Data replacement complete
 
-go back to data and files to upload & delete subject
+Go back to data and files to upload & delete subject
     [Tags]  HappyPath
     user clicks link  Data and files
     user waits until page contains element  id:dataFileUploadForm-subjectTitle
