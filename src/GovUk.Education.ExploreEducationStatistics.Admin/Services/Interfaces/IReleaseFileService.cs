@@ -23,9 +23,6 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Services.Interfaces
 
         Task<Either<ActionResult, IEnumerable<FileInfo>>> ListAll(Guid releaseId, params ReleaseFileTypes[] types);
 
-        Task<Either<ActionResult, IEnumerable<FileInfo>>> ListPublicFilesPreview(Guid releaseId,
-            IEnumerable<Guid> referencedReleaseVersions);
-
         Task<Either<ActionResult, FileStreamResult>> Stream(Guid releaseId, Guid id);
 
         Task<Either<ActionResult, FileInfo>> UploadAncillary(Guid releaseId,

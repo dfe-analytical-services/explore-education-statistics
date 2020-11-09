@@ -106,24 +106,6 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
         }
 
         [Fact]
-        public void ListPublicFilesPreview()
-        {
-            PolicyCheckBuilder()
-                .ExpectResourceCheckToFail(_release, CanViewSpecificRelease)
-                .AssertForbidden(
-                    userService =>
-                    {
-                        var service = SetupReleaseFileService(userService: userService.Object);
-                        return service.ListPublicFilesPreview(_release.Id,
-                            new List<Guid>
-                            {
-                                _release.Id
-                            });
-                    }
-                );
-        }
-
-        [Fact]
         public void Stream()
         {
             PolicyCheckBuilder()

@@ -1029,12 +1029,6 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
         }
 
         [Fact]
-        public async Task ListPublicFilesPreview()
-        {
-            // TODO EES-1490
-        }
-
-        [Fact]
         public async Task Stream()
         {
             var release = new Release();

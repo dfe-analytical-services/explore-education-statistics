@@ -137,7 +137,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Services
                     release.Created = DateTime.UtcNow;
                     release.CreatedById = _userService.GetUserId();
 
-                    _context.Releases.Add(release);
+                    await _context.Releases.AddAsync(release);
                     await _context.SaveChangesAsync();
                     return await GetRelease(release.Id);
                 });
@@ -231,7 +231,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Services
         private async Task<Either<ActionResult, Release>> CreateBasicReleaseAmendment(Release release)
         {
             var amendment = release.CreateReleaseAmendment(DateTime.UtcNow, _userService.GetUserId());
-            _context.Releases.Add(amendment);
+            await _context.Releases.AddAsync(amendment);
             await _context.SaveChangesAsync();
             return amendment;
         }
@@ -368,17 +368,6 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Services
                         .Where(release => !release.Live)
                         .ToList();
                 });
-        }
-
-        public IEnumerable<Guid> GetReferencedReleaseFileVersions(Guid releaseId, params ReleaseFileTypes[] types)
-        {
-            return _context
-                .ReleaseFiles
-                .Include(rf => rf.ReleaseFileReference)
-                .Where(rf => rf.ReleaseId == releaseId)
-                .Select(rf => rf.ReleaseFileReference)
-                .Where(rfr => types.Contains(rfr.ReleaseFileType))
-                .Select(rfr => rfr.ReleaseId).Distinct();
         }
 
         private async Task<Either<ActionResult, ReleaseFileReference>> CheckReleaseFileReferenceExists(Guid id)
