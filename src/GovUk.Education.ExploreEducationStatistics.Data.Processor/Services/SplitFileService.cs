@@ -95,10 +95,14 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Processor.Services
                 var table = new DataTable();
                 CopyColumns(dataFileTable, table);
                 CopyRows(table, batch.ToList(), headerList);
-                
-                var percentageComplete = (double)batchCount / numBatches * 100;
-                await _importStatusService.UpdateProgress(message.Release.Id, message.OrigDataFileName, percentageComplete);
-                
+
+                var percentageComplete = (double) batchCount / numBatches * 100;
+
+                await _importStatusService.UpdateStatus(message.Release.Id,
+                    message.OrigDataFileName,
+                    IStatus.STAGE_3,
+                    percentageComplete);
+
                 // If no lines then don't create a batch or message unless it's the last one & there are zero
                 // lines in total in which case create a zero lines batch
                 if (table.Rows.Count == 0 && batchCount != numBatches || table.Rows.Count == 0 && messages.Count != 0)

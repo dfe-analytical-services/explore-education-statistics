@@ -85,7 +85,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Processor.Services
         public async Task<Either<IEnumerable<ValidationError>, ProcessorStatistics>>
             Validate(Guid releaseId, SubjectData subjectData, ExecutionContext executionContext, ImportMessage message)
         {
-            _logger.LogInformation($"Validating Datafile: {message.OrigDataFileName}");
+            _logger.LogInformation($"Validating: {message.OrigDataFileName}");
 
             await _importStatusService.UpdateStatus(message.Release.Id, message.DataFileName, IStatus.STAGE_1);
 
@@ -111,8 +111,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Processor.Services
                                             result =>
                                             {
                                                 _logger.LogInformation(
-                                                    $"Validation of Datafile: {message.OrigDataFileName} complete"
-                                                );
+                                                    $"Validating: {message.OrigDataFileName} complete");
                                                 return result;
                                             }
                                         )
@@ -280,7 +279,10 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Processor.Services
 
                 if (totalRowCount % STAGE_1_ROW_CHECK == 0)
                 {
-                    await _importStatusService.UpdateProgress(releaseId, origDataFileName, (double)totalRowCount / dataRows * 100);
+                    await _importStatusService.UpdateStatus(releaseId,
+                        origDataFileName,
+                        IStatus.STAGE_1,
+                        (double) totalRowCount / dataRows * 100);
                 }
             }
 
@@ -288,8 +290,11 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Processor.Services
             {
                 return errors;
             }
-            
-            await _importStatusService.UpdateProgress(releaseId, origDataFileName, 100);
+
+            await _importStatusService.UpdateStatus(releaseId,
+                origDataFileName,
+                IStatus.STAGE_1,
+                100);
 
             var rowsPerBatch = Convert.ToInt32(LoadAppSettings(executionContext).GetValue<string>("RowsPerBatch"));
 
