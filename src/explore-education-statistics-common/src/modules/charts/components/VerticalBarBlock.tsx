@@ -44,12 +44,12 @@ const VerticalBarBlock = ({
   meta,
   height,
   width,
+  barThickness,
   axes,
   stacked,
   legend,
 }: VerticalBarProps) => {
   const [legendProps, renderLegend] = useLegend();
-
   if (
     axes === undefined ||
     axes.major === undefined ||
@@ -142,6 +142,7 @@ const VerticalBarBlock = ({
               fill={config.colour}
               unit={dataSet.indicator.unit}
               stackId={stacked ? 'a' : undefined}
+              maxBarSize={barThickness}
             />
           ))}
 

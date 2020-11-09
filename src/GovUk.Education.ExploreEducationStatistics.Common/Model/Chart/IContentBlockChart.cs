@@ -32,6 +32,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Common.Model.Chart
         
         public ChartLegend Legend;
         public int LegendHeight { get; set; }
+        public int? BarThickness { get; set; }
 
         public Dictionary<string, ChartConfiguration> Labels;
         public Dictionary<string, ChartAxisConfigurationItem> Axes;
@@ -44,7 +45,8 @@ namespace GovUk.Education.ExploreEducationStatistics.Common.Model.Chart
         
         public ChartLegend Legend;
         public int LegendHeight { get; set; }
-        
+        public int? BarThickness { get; set; }
+
         public Dictionary<string, ChartConfiguration> Labels;
         public Dictionary<string, ChartAxisConfigurationItem> Axes;
         public bool Stacked;

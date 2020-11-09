@@ -133,6 +133,17 @@ const ChartConfiguration = ({
       });
     }
 
+    if (
+      definition.type === 'horizontalbar' ||
+      definition.type === 'verticalbar'
+    ) {
+      schema = schema.shape({
+        barThickness: Yup.number().positive(
+          'Chart bar thickness must be positive',
+        ),
+      });
+    }
+
     return schema;
   }, [
     definition.capabilities.hasLegend,
@@ -273,6 +284,15 @@ const ChartConfiguration = ({
                 name="width"
                 label="Width (px)"
                 hint="Leave blank to set as full width"
+                width={5}
+              />
+            )}
+
+            {validationSchema.fields.barThickness && (
+              <FormFieldNumberInput<FormValues>
+                id={`${formId}-barThickness`}
+                name="barThickness"
+                label="Bar thickness (px)"
                 width={5}
               />
             )}
