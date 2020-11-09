@@ -266,7 +266,7 @@ const ReleaseFileUploadsSection = ({ releaseId, canUpdateRelease }: Props) => {
             try {
               await releaseAncillaryFileService.deleteAncillaryFile(
                 releaseId,
-                deleteFile.id,
+                deleteFile.filename,
               );
 
               setFiles({

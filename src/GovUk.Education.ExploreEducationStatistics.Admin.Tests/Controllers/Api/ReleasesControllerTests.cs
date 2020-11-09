@@ -58,8 +58,10 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Controllers.Api
 
             var mocks = Mocks();
             var ancillaryFile = MockFile("ancillaryFile.doc");
-            mocks.ReleaseFileService
-                .Setup(service => service.UploadAncillary(_releaseId, ancillaryFile, "File name"))
+            mocks.FileStorageService
+                .Setup(service =>
+                    service.UploadFile(_releaseId, ancillaryFile, "File name",
+                        ReleaseFileTypes.Ancillary, false))
                 .ReturnsAsync(new Either<ActionResult, FileInfo>(testFile));
             var controller = ReleasesControllerWithMocks(mocks);
 
@@ -89,7 +91,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Controllers.Api
                 }
             };
             var mocks = Mocks();
-            mocks.ReleaseFileService.Setup(s => s.ListAll(_releaseId, ReleaseFileTypes.Ancillary))
+            mocks.FileStorageService.Setup(s => s.ListFiles(_releaseId, ReleaseFileTypes.Ancillary))
                 .ReturnsAsync(new Either<ActionResult, IEnumerable<FileInfo>>(testFiles));
             var controller = ReleasesControllerWithMocks(mocks);
 
@@ -111,8 +113,8 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Controllers.Api
                 Path = "datafile.csv"
             };
 
-            mocks.ReleaseDataFilesService
-                .Setup(service => service.Upload(_releaseId,
+            mocks.FileStorageService
+                .Setup(service => service.UploadDataFiles(_releaseId,
                     dataFile,
                     metaFile,
                     ApplicationUser.Email,
@@ -139,8 +141,8 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Controllers.Api
             var dataFile = MockFile("datafile.csv");
             var metaFile = MockFile("metafile.csv");
 
-            mocks.ReleaseDataFilesService
-                .Setup(service => service.Upload(_releaseId,
+            mocks.FileStorageService
+                .Setup(service => service.UploadDataFiles(_releaseId,
                     dataFile,
                     metaFile,
                     ApplicationUser.Email,
@@ -182,12 +184,12 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Controllers.Api
 
             var mocks = Mocks();
 
-            mocks.ReleaseDataFilesService.Setup(s => s.ListAll(_releaseId))
+            mocks.FileStorageService.Setup(s => s.ListDataFiles(_releaseId))
                 .ReturnsAsync(new Either<ActionResult, IEnumerable<DataFileInfo>>(testFiles));
             var controller = ReleasesControllerWithMocks(mocks);
 
             // Call the method under test
-            var result = await controller.GetDataFileInfo(_releaseId);
+            var result = await controller.GetDataFilesAsync(_releaseId);
             var unboxed = AssertOkResult(result);
             Assert.Contains(unboxed, f => f.Name == "Release a file 1");
             Assert.Contains(unboxed, f => f.Name == "Release a file 2");
@@ -282,15 +284,13 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Controllers.Api
 
         private static (
             Mock<IReleaseService> ReleaseService,
-            Mock<IReleaseFileService> ReleaseFileService,
-            Mock<IReleaseDataFileService> ReleaseDataFilesService,
+            Mock<IReleaseFilesService> FileStorageService,
             Mock<IReleaseStatusService> ReleaseStatusService,
             Mock<UserManager<ApplicationUser>> UserManager,
             Mock<IDataBlockService> DataBlockService) Mocks()
         {
             return (new Mock<IReleaseService>(),
-                    new Mock<IReleaseFileService>(),
-                    new Mock<IReleaseDataFileService>(),
+                    new Mock<IReleaseFilesService>(),
                     new Mock<IReleaseStatusService>(),
                     MockUserManager(),
                     new Mock<IDataBlockService>()
@@ -299,8 +299,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Controllers.Api
 
         private static ReleasesController ReleasesControllerWithMocks((
             Mock<IReleaseService> ReleaseService,
-            Mock<IReleaseFileService> ReleaseFileService,
-            Mock<IReleaseDataFileService> ReleaseDataFileService,
+            Mock<IReleaseFilesService> FileStorageService,
             Mock<IReleaseStatusService> ReleaseStatusService,
             Mock<UserManager<ApplicationUser>> UserManager,
             Mock<IDataBlockService> DataBlockService
@@ -308,8 +307,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Controllers.Api
         {
             return new ReleasesController(
                 mocks.ReleaseService.Object,
-                mocks.ReleaseFileService.Object,
-                mocks.ReleaseDataFileService.Object,
+                mocks.FileStorageService.Object,
                 mocks.ReleaseStatusService.Object,
                 mocks.UserManager.Object,
                 mocks.DataBlockService.Object);

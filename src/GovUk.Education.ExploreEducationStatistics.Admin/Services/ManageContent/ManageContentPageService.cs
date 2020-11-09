@@ -19,7 +19,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Services.ManageConten
     public class ManageContentPageService : IManageContentPageService
     {
         private readonly IMapper _mapper;
-        private readonly IReleaseFileService _releaseFileService;
+        private readonly IReleaseFilesService _releaseFilesService;
         private readonly IContentService _contentService;
         private readonly IReleaseService _releaseService;
         private readonly IPersistenceHelper<ContentDbContext> _persistenceHelper;
@@ -27,14 +27,14 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Services.ManageConten
 
         public ManageContentPageService(
             IMapper mapper,
-            IReleaseFileService releaseFileService,
+            IReleaseFilesService releaseFilesService,
             IContentService contentService,
             IReleaseService releaseService,
             IPersistenceHelper<ContentDbContext> persistenceHelper,
             IUserService userService)
         {
             _mapper = mapper;
-            _releaseFileService = releaseFileService;
+            _releaseFilesService = releaseFilesService;
             _contentService = contentService;
             _releaseService = releaseService;
             _persistenceHelper = persistenceHelper;
@@ -49,7 +49,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Services.ManageConten
                 .OnSuccess(_userService.CheckCanViewRelease)
                 .OnSuccess(release => _contentService.GetUnattachedContentBlocksAsync<DataBlock>(releaseId)
                 .OnSuccess(blocks =>
-                    _releaseFileService.ListPublicFilesPreview(
+                    _releaseFilesService.ListPublicFilesPreview(
                         releaseId,
                         _releaseService.GetReferencedReleaseFileVersions(
                             releaseId, ReleaseFileTypes.Data, ReleaseFileTypes.Ancillary))

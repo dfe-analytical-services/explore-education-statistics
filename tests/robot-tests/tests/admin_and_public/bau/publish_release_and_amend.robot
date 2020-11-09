@@ -79,11 +79,11 @@ Add ancillary file
     user chooses file   id:fileUploadForm-file      ${FILES_DIR}test-file-1.txt
     user clicks button  Upload file
 
-    user waits until page contains accordion section   Test ancillary file 1
-    user opens accordion section   Test ancillary file 1   id:file-uploads
+    user waits until page contains accordion section   test ancillary file 1
+    user opens accordion section   test ancillary file 1   id:file-uploads
 
-    ${section_1}=  user gets accordion section content element  Test ancillary file 1  id:file-uploads
-    user checks summary list contains  Name         Test ancillary file 1  ${section_1}
+    ${section_1}=  user gets accordion section content element  test ancillary file 1  id:file-uploads
+    user checks summary list contains  Name         test ancillary file 1  ${section_1}
     user checks summary list contains  File         test-file-1.txt     ${section_1}
     user checks summary list contains  File size    12 B                ${section_1}
 
@@ -271,9 +271,9 @@ Verify release associated files
     user waits until element contains link  ${downloads}  Dates test subject
     user checks link has url  Dates test subject  %{DATA_API_URL}/download/ui-tests-publish-release-${RUN_IDENTIFIER}/3000-01/data/dates.csv   ${downloads}
 
-    user checks element should contain  ${downloads}  Test ancillary file 1 (txt, 12 B)
-    user waits until element contains link  ${downloads}  Test ancillary file 1
-    user checks link has url  Test ancillary file 1  %{DATA_API_URL}/download/ui-tests-publish-release-${RUN_IDENTIFIER}/3000-01/ancillary/test-file-1.txt   ${downloads}
+    user checks element should contain  ${downloads}  test ancillary file 1 (txt, 12 B)
+    user waits until element contains link  ${downloads}  test ancillary file 1
+    user checks link has url  test ancillary file 1  %{DATA_API_URL}/download/ui-tests-publish-release-${RUN_IDENTIFIER}/3000-01/ancillary/test-file-1.txt   ${downloads}
 
 Verify public metadata guidance document
     [Tags]  HappyPath
@@ -481,11 +481,11 @@ Add ancillary file to amendment
     user chooses file   id:fileUploadForm-file      ${FILES_DIR}test-file-2.txt
     user clicks button  Upload file
 
-    user waits until page contains accordion section   Test ancillary file 2
-    user opens accordion section   Test ancillary file 2  id:file-uploads
+    user waits until page contains accordion section   test ancillary file 2
+    user opens accordion section   test ancillary file 2  id:file-uploads
 
-    ${section_2}=  user gets accordion section content element  Test ancillary file 2  id:file-uploads
-    user checks summary list contains  Name         Test ancillary file 2  ${section_2}
+    ${section_2}=  user gets accordion section content element  test ancillary file 2  id:file-uploads
+    user checks summary list contains  Name         test ancillary file 2  ${section_2}
     user checks summary list contains  File         test-file-2.txt     ${section_2}
     user checks summary list contains  File size    24 B                ${section_2}
 
@@ -642,13 +642,13 @@ Verify amendment files
     user waits until element contains link  ${downloads}  Dates test subject
     user checks link has url  Dates test subject  %{DATA_API_URL}/download/ui-tests-publish-release-${RUN_IDENTIFIER}/3000-01/data/dates-replacement.csv   ${downloads}
 
-    user checks element should contain  ${downloads}  Test ancillary file 1 (txt, 12 B)
-    user waits until element contains link  ${downloads}  Test ancillary file 1
-    user checks link has url  Test ancillary file 1  %{DATA_API_URL}/download/ui-tests-publish-release-${RUN_IDENTIFIER}/3000-01/ancillary/test-file-1.txt   ${downloads}
+    user checks element should contain  ${downloads}  test ancillary file 1 (txt, 12 B)
+    user waits until element contains link  ${downloads}  test ancillary file 1
+    user checks link has url  test ancillary file 1  %{DATA_API_URL}/download/ui-tests-publish-release-${RUN_IDENTIFIER}/3000-01/ancillary/test-file-1.txt   ${downloads}
 
-    user checks element should contain  ${downloads}  Test ancillary file 2 (txt, 24 B)
-    user waits until element contains link  ${downloads}  Test ancillary file 2
-    user checks link has url  Test ancillary file 2  %{DATA_API_URL}/download/ui-tests-publish-release-${RUN_IDENTIFIER}/3000-01/ancillary/test-file-2.txt   ${downloads}
+    user checks element should contain  ${downloads}  test ancillary file 2 (txt, 24 B)
+    user waits until element contains link  ${downloads}  test ancillary file 2
+    user checks link has url  test ancillary file 2  %{DATA_API_URL}/download/ui-tests-publish-release-${RUN_IDENTIFIER}/3000-01/ancillary/test-file-2.txt   ${downloads}
 
 Verify amendment public metadata guidance document
     [Tags]  HappyPath

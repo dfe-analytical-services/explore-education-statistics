@@ -74,7 +74,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
         private (
             Mock<IUserService>, 
             Mock<IPersistenceHelper<ContentDbContext>>,
-            Mock<IReleaseFileService>) Mocks()
+            Mock<IReleaseFilesService>) Mocks()
         {
             var persistenceHelper = MockUtils.MockPersistenceHelper<ContentDbContext>();
             MockUtils.SetupCall(persistenceHelper, _release.Id, _release);
@@ -83,7 +83,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
             return (
                 new Mock<IUserService>(), 
                 persistenceHelper,
-                new Mock<IReleaseFileService>());
+                new Mock<IReleaseFilesService>());
         }
     }
 }

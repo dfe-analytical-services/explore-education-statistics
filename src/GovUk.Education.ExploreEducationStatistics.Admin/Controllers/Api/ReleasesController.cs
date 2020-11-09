@@ -23,24 +23,21 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Controllers.Api
     public class ReleasesController : ControllerBase
     {
         private readonly IReleaseService _releaseService;
-        private readonly IReleaseFileService _releaseFileService;
-        private readonly IReleaseDataFileService _releaseDataFileService;
+        private readonly IReleaseFilesService _releaseFilesService;
         private readonly IReleaseStatusService _releaseStatusService;
         private readonly UserManager<ApplicationUser> _userManager;
         private readonly IDataBlockService _dataBlockService;
 
         public ReleasesController(
             IReleaseService releaseService,
-            IReleaseFileService releaseFileService,
-            IReleaseDataFileService releaseDataFileService,
+            IReleaseFilesService releaseFilesService,
             IReleaseStatusService releaseStatusService,
             UserManager<ApplicationUser> userManager,
             IDataBlockService dataBlockService
         )
         {
             _releaseService = releaseService;
-            _releaseDataFileService = releaseDataFileService;
-            _releaseFileService = releaseFileService;
+            _releaseFilesService = releaseFilesService;
             _releaseStatusService = releaseStatusService;
             _userManager = userManager;
             _dataBlockService = dataBlockService;
@@ -49,8 +46,8 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Controllers.Api
         [HttpGet("release/{releaseId}/file/{id}")]
         public async Task<ActionResult> GetFile(Guid releaseId, Guid id)
         {
-            return await _releaseFileService
-                .Stream(releaseId, id)
+            return await _releaseFilesService
+                .StreamFile(releaseId, id)
                 .HandleFailures();
         }
 
@@ -85,10 +82,10 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Controllers.Api
         [Produces("application/json")]
         [ProducesResponseType(200)]
         [ProducesResponseType(404)]
-        public async Task<ActionResult<DataFileInfo>> GetDataFileInfo(Guid releaseId, Guid fileId)
+        public async Task<ActionResult<DataFileInfo>> GetDataFile(Guid releaseId, Guid fileId)
         {
-            return await _releaseDataFileService
-                .GetInfo(releaseId, fileId)
+            return await _releaseFilesService
+                .GetDataFile(releaseId, fileId)
                 .HandleFailuresOrOk();
         }
 
@@ -96,10 +93,10 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Controllers.Api
         [Produces("application/json")]
         [ProducesResponseType(200)]
         [ProducesResponseType(404)]
-        public async Task<ActionResult<IEnumerable<DataFileInfo>>> GetDataFileInfo(Guid releaseId)
+        public async Task<ActionResult<IEnumerable<DataFileInfo>>> GetDataFilesAsync(Guid releaseId)
         {
-            return await _releaseDataFileService
-                .ListAll(releaseId)
+            return await _releaseFilesService
+                .ListDataFiles(releaseId)
                 .HandleFailuresOrOk();
         }
 
@@ -109,8 +106,8 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Controllers.Api
         [ProducesResponseType(404)]
         public async Task<ActionResult<IEnumerable<FileInfo>>> GetAncillaryFilesAsync(Guid releaseId)
         {
-            return await _releaseFileService
-                .ListAll(releaseId, ReleaseFileTypes.Ancillary)
+            return await _releaseFilesService
+                .ListFiles(releaseId, ReleaseFileTypes.Ancillary)
                 .HandleFailuresOrOk();
         }
 
@@ -123,8 +120,8 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Controllers.Api
         public async Task<ActionResult<FileInfo>> AddAncillaryFileAsync(Guid releaseId,
             [FromQuery(Name = "name"), Required] string name, IFormFile file)
         {
-            return await _releaseFileService
-                .UploadAncillary(releaseId, file, name)
+            return await _releaseFilesService
+                .UploadFile(releaseId, file, name, ReleaseFileTypes.Ancillary, false)
                 .HandleFailuresOrOk();
         }
 
@@ -136,8 +133,8 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Controllers.Api
         [RequestFormLimits(ValueLengthLimit = int.MaxValue, MultipartBodyLengthLimit = int.MaxValue)]
         public async Task<ActionResult<FileInfo>> AddChartFileAsync(Guid releaseId, IFormFile file)
         {
-            return await _releaseFileService
-                .UploadChart(releaseId, file)
+            return await _releaseFilesService
+                .UploadChartFile(releaseId, file)
                 .HandleFailuresOrOk();
         }
 
@@ -149,8 +146,8 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Controllers.Api
         [RequestFormLimits(ValueLengthLimit = int.MaxValue, MultipartBodyLengthLimit = int.MaxValue)]
         public async Task<ActionResult<FileInfo>> UpdateChartFileAsync(Guid releaseId, Guid id, IFormFile file)
         {
-            return await _releaseFileService
-                .UploadChart(releaseId, file, replacingId: id)
+            return await _releaseFilesService
+                .UploadChartFile(releaseId, file, id)
                 .HandleFailuresOrOk();
         }
 
@@ -168,8 +165,8 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Controllers.Api
         {
             var user = await _userManager.GetUserAsync(User);
 
-            return await _releaseDataFileService
-                .Upload(releaseId: releaseId,
+            return await _releaseFilesService
+                .UploadDataFiles(releaseId: releaseId,
                     dataFile: file,
                     metaFile: metaFile,
                     userName: user.Email,
@@ -191,8 +188,8 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Controllers.Api
         {
             var user = await _userManager.GetUserAsync(User);
 
-            return await _releaseDataFileService
-                .UploadAsZip(releaseId: releaseId,
+            return await _releaseFilesService
+                .UploadDataFilesAsZip(releaseId: releaseId,
                     zipFile: zipFile,
                     userName: user.Email,
                     replacingFileId: replacingFileId,
@@ -276,12 +273,12 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Controllers.Api
                 .HandleFailuresOrNoContent();
         }
 
-        [HttpDelete("release/{releaseId}/ancillary/{fileId}")]
+        [HttpDelete("release/{releaseId}/ancillary/{fileName}")]
         public async Task<ActionResult> DeleteAncillaryFile(
-            Guid releaseId, Guid fileId)
+            Guid releaseId, string fileName)
         {
-            return await _releaseFileService
-                .Delete(releaseId, fileId)
+            return await _releaseFilesService
+                .DeleteNonDataFile(releaseId, ReleaseFileTypes.Ancillary, fileName)
                 .HandleFailuresOrNoContent();
         }
 
