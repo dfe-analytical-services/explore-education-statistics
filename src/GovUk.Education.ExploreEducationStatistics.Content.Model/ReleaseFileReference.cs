@@ -32,7 +32,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Content.Model
                     return Id.ToString();
                 }
 
-                return Filename;
+                return Filename.ToLower();
             }
         }
 

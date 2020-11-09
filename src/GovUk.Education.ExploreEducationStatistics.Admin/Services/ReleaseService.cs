@@ -43,7 +43,8 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Services
         private readonly IReleaseRepository _repository;
         private readonly ISubjectService _subjectService;
         private readonly ITableStorageService _coreTableStorageService;
-        private readonly IReleaseFilesService _releaseFilesService;
+        private readonly IReleaseDataFileService _releaseDataFileService;
+        private readonly IReleaseFileService _releaseFileService;
         private readonly IImportStatusService _importStatusService;
 	    private readonly IFootnoteService _footnoteService;
         private readonly IDataBlockService _dataBlockService;
@@ -62,7 +63,8 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Services
             IReleaseRepository repository,
             ISubjectService subjectService,
             ITableStorageService coreTableStorageService,
-            IReleaseFilesService releaseFilesService,
+            IReleaseDataFileService releaseDataFileService,
+            IReleaseFileService releaseFileService,
             IImportStatusService importStatusService,
             IFootnoteService footnoteService,
             StatisticsDbContext statisticsDbContext,
@@ -79,7 +81,8 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Services
             _repository = repository;
             _subjectService = subjectService;
             _coreTableStorageService = coreTableStorageService;
-            _releaseFilesService = releaseFilesService;
+            _releaseDataFileService = releaseDataFileService;
+            _releaseFileService = releaseFileService;
             _importStatusService = importStatusService;
             _footnoteService = footnoteService;
             _statisticsDbContext = statisticsDbContext;
@@ -145,7 +148,8 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Services
             return _persistenceHelper
                 .CheckEntityExists<Release>(releaseId)
                 .OnSuccess(_userService.CheckCanDeleteRelease)
-                .OnSuccessDo(async () => await _releaseFilesService.DeleteAllFiles(releaseId))
+                .OnSuccessDo(async () => await _releaseDataFileService.DeleteAll(releaseId))
+                .OnSuccessDo(async () => await _releaseFileService.DeleteAll(releaseId))
                 .OnSuccessVoid(async release =>
                 {
                     var roles = await _context
@@ -465,8 +469,8 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Services
                             await _releaseSubjectService.SoftDeleteSubjectOrBreakReleaseLink(releaseId,
                                 deletePlan.SubjectId);
 
-                            return await _releaseFilesService
-                                .DeleteDataFiles(releaseId, fileId)
+                            return await _releaseDataFileService
+                                .Delete(releaseId, fileId)
                                 .OnSuccessVoid(async () => await RemoveFileImportEntryIfOrphaned(deletePlan));
                         });
                 });

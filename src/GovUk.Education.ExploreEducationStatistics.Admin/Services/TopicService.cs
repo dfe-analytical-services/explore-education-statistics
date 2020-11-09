@@ -30,7 +30,8 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Services
         private readonly IMapper _mapper;
         private readonly IUserService _userService;
         private readonly IReleaseSubjectService _releaseSubjectService;
-        private readonly IReleaseFilesService _releaseFilesService;
+        private readonly IReleaseDataFileService _releaseDataFileService;
+        private readonly IReleaseFileService _releaseFileService;
         private readonly IPublishingService _publishingService;
 
         public TopicService(
@@ -40,7 +41,8 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Services
             IMapper mapper,
             IUserService userService,
             IReleaseSubjectService releaseSubjectService,
-            IReleaseFilesService releaseFilesService,
+            IReleaseDataFileService releaseDataFileService,
+            IReleaseFileService releaseFileService,
             IPublishingService publishingService)
         {
             _contentContext = contentContext;
@@ -49,7 +51,8 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Services
             _mapper = mapper;
             _userService = userService;
             _releaseSubjectService = releaseSubjectService;
-            _releaseFilesService = releaseFilesService;
+            _releaseDataFileService = releaseDataFileService;
+            _releaseFileService = releaseFileService;
             _publishingService = publishingService;
         }
 
@@ -164,7 +167,8 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Services
 
                         foreach (var release in topic.Publications.SelectMany(publication => publication.Releases))
                         {
-                            await _releaseFilesService.DeleteAllFiles(release.Id, forceDelete: true);
+                            await _releaseDataFileService.DeleteAll(release.Id, forceDelete: true);
+                            await _releaseFileService.DeleteAll(release.Id, forceDelete: true);
                             await _releaseSubjectService.DeleteAllSubjectsOrBreakReleaseLinks(release.Id);
                         }
 
