@@ -1,3 +1,4 @@
+#nullable enable
 using System;
 using System.Linq;
 using System.Threading.Tasks;
@@ -51,10 +52,14 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Model.Services
 
             await DeleteReleaseSubjectIfExists(releaseSubject);
             await _footnoteService.DeleteAllFootnotesBySubject(releaseId, subjectId);
-            await DeleteSubjectIfOrphaned(releaseSubject.Subject, softDeleteOrphanedSubject);
+
+            if (releaseSubject?.Subject != null)
+            {
+                await DeleteSubjectIfOrphaned(releaseSubject.Subject, softDeleteOrphanedSubject);
+            }
         }
 
-        private async Task DeleteReleaseSubjectIfExists(ReleaseSubject releaseSubject)
+        private async Task DeleteReleaseSubjectIfExists(ReleaseSubject? releaseSubject)
         {
             if (releaseSubject != null)
             {
@@ -93,8 +98,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Model.Services
 
         private bool IsSubjectOrphaned(Subject subject)
         {
-            return subject != null
-                   && _statisticsDbContext.ReleaseSubject.Count(rs => rs.SubjectId == subject.Id) == 0;
+            return _statisticsDbContext.ReleaseSubject.Count(rs => rs.SubjectId == subject.Id) == 0;
         }
     }
 }

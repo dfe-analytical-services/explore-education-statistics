@@ -120,6 +120,43 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
         }
 
         [Fact]
+        public async Task DeleteReleaseSubject_NotFound()
+        {
+            var releaseSubject = new ReleaseSubject
+            {
+                Release = new Release(),
+                Subject = new Subject(),
+            };
+
+            var contextId = Guid.NewGuid().ToString();
+
+            await using (var statisticsDbContext = StatisticsDbUtils.InMemoryStatisticsDbContext(contextId))
+            {
+                await statisticsDbContext.AddAsync(releaseSubject);
+                await statisticsDbContext.SaveChangesAsync();
+            }
+
+            await using (var statisticsDbContext = StatisticsDbUtils.InMemoryStatisticsDbContext(contextId))
+            {
+                var service = BuildReleaseSubjectService(statisticsDbContext);
+                // Try to delete non-existing ReleaseSubject
+                await service.DeleteReleaseSubject(Guid.NewGuid(), Guid.NewGuid());
+            }
+
+            await using (var statisticsDbContext = StatisticsDbUtils.InMemoryStatisticsDbContext(contextId))
+            {
+                // Check that other ReleaseSubject has not been deleted
+                var releaseSubjects = statisticsDbContext.ReleaseSubject.ToList();
+                Assert.Single(releaseSubjects);
+                Assert.Equal(releaseSubject.SubjectId, releaseSubjects[0].SubjectId);
+
+                var subjects = statisticsDbContext.Subject.ToList();
+                Assert.Single(subjects);
+                Assert.Equal(releaseSubject.SubjectId, subjects[0].Id);
+            }
+        }
+
+        [Fact]
         public async Task DeleteAllReleaseSubjects()
         {
             var release = new Release();
