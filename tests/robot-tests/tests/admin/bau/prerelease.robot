@@ -56,7 +56,7 @@ Add metadata guidance
     user opens accordion section  UI test subject
     user checks summary list contains  Filename             upload-file-test.csv
     user checks summary list contains  Geographic levels
-    ...  Local Authority; Local Authority District; Local Enterprise Partnership; Opportunity Area; Parliamentary Constituency; Regional; RSC Region; Ward
+    ...  Local Authority; Local Authority District; Local Enterprise Partnership; Opportunity Area; Parliamentary Constituency; RSC Region; Regional; Ward
     user checks summary list contains  Time period          2005 to 2020
 
     user opens details dropdown  Variable names and descriptions
