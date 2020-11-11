@@ -6,7 +6,7 @@ using static GovUk.Education.ExploreEducationStatistics.Common.Model.Chart.Chart
 namespace GovUk.Education.ExploreEducationStatistics.Common.Model.Chart
 {
     [JsonConverter(typeof(ContentBlockChartConverter))]
-    public interface IContentBlockChart
+    public interface IChart
     {
         ChartType Type { get; }
         string Title { get; set; }
@@ -15,52 +15,62 @@ namespace GovUk.Education.ExploreEducationStatistics.Common.Model.Chart
         int? Width { get; set; }
     }
 
-    public class LineChart : AbstractChart
+    public abstract class Chart : IChart
+    {
+        public string Title { get; set; }
+        public string Alt { get; set; }
+        public int Height { get; set; }
+        public int? Width { get; set; }
+
+        public abstract ChartType Type { get; }
+    }
+
+    public class LineChart : Chart
     {
         public override ChartType Type => Line;
-        
-        public ChartLegend Legend;
+
+        public ChartLegendPosition Legend;
         public int LegendHeight { get; set; }
 
-        public Dictionary<string, ChartConfiguration> Labels;
-        public Dictionary<string, ChartAxisConfigurationItem> Axes;
+        public Dictionary<string, ChartLabelConfiguration> Labels;
+        public Dictionary<string, ChartAxisConfiguration> Axes;
     }
 
-    public class HorizontalBarChart : AbstractChart
+    public class HorizontalBarChart : Chart
     {
         public override ChartType Type => HorizontalBar;
-        
-        public ChartLegend Legend;
+
+        public ChartLegendPosition Legend;
         public int LegendHeight { get; set; }
         public int? BarThickness { get; set; }
 
-        public Dictionary<string, ChartConfiguration> Labels;
-        public Dictionary<string, ChartAxisConfigurationItem> Axes;
+        public Dictionary<string, ChartLabelConfiguration> Labels;
+        public Dictionary<string, ChartAxisConfiguration> Axes;
         public bool Stacked;
     }
 
-    public class VerticalBarChart : AbstractChart
+    public class VerticalBarChart : Chart
     {
         public override ChartType Type => VerticalBar;
-        
-        public ChartLegend Legend;
+
+        public ChartLegendPosition Legend;
         public int LegendHeight { get; set; }
         public int? BarThickness { get; set; }
 
-        public Dictionary<string, ChartConfiguration> Labels;
-        public Dictionary<string, ChartAxisConfigurationItem> Axes;
+        public Dictionary<string, ChartLabelConfiguration> Labels;
+        public Dictionary<string, ChartAxisConfiguration> Axes;
         public bool Stacked;
     }
 
-    public class MapChart : AbstractChart
+    public class MapChart : Chart
     {
         public override ChartType Type => Map;
-        
-        public Dictionary<string, ChartConfiguration> Labels;
-        public Dictionary<string, ChartAxisConfigurationItem> Axes;
+
+        public Dictionary<string, ChartLabelConfiguration> Labels;
+        public Dictionary<string, ChartAxisConfiguration> Axes;
     }
 
-    public class InfographicChart : AbstractChart
+    public class InfographicChart : Chart
     {
         public override ChartType Type => Infographic;
         public string FileId { get; set; }

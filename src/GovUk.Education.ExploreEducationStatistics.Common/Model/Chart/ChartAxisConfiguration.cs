@@ -1,5 +1,4 @@
-﻿using System;
-using System.Collections.Generic;
+﻿using System.Collections.Generic;
 using System.Diagnostics.CodeAnalysis;
 using System.Runtime.Serialization;
 using Newtonsoft.Json;
@@ -7,7 +6,7 @@ using Newtonsoft.Json.Converters;
 
 namespace GovUk.Education.ExploreEducationStatistics.Common.Model.Chart
 {
-    public class ChartAxisConfigurationItem
+    public class ChartAxisConfiguration
     {
         public string Name;
 
@@ -21,20 +20,20 @@ namespace GovUk.Education.ExploreEducationStatistics.Common.Model.Chart
         public bool SortAsc = true;
 
         public List<ChartDataSet> DataSets = new List<ChartDataSet>();
-        public List<ReferenceLine> ReferenceLines = new List<ReferenceLine>();
+        public List<AxisReferenceLine> ReferenceLines = new List<AxisReferenceLine>();
         public bool Visible = true;
         public string Title;
         public string Unit;
         public bool ShowGrid = true;
 
-        public Label Label;
+        public AxisLabel Label;
 
         public int? Min;
         public int? Max;
         public int? Size;
 
         [JsonConverter(typeof(StringEnumConverter))]
-        public TickConfig TickConfig;
+        public AxisTickConfig TickConfig;
 
         public int? TickSpacing;
     }
@@ -55,38 +54,21 @@ namespace GovUk.Education.ExploreEducationStatistics.Common.Model.Chart
         minor
     }
 
-    public class ChartDataSet
-    {
-        public Guid Indicator;
-        public List<Guid> Filters = new List<Guid>();
-        public ChartDataLocation Location;
-        public string TimePeriod;
-        public ChartConfiguration Config;
-    }
-
-    public class Label
+    public class AxisLabel
     {
         public string Text;
         public int? Width;
         public bool? Rotated;
     }
 
-    [SuppressMessage("ReSharper", "InconsistentNaming")]
-    public enum LineStyle
-    {
-        solid,
-        dashed,
-        dotted
-    }
-
-    public class ReferenceLine
+    public class AxisReferenceLine
     {
         public string Label;
         public string Position;
     }
 
     [SuppressMessage("ReSharper", "InconsistentNaming")]
-    public enum TickConfig
+    public enum AxisTickConfig
     {
         [EnumMember(Value = "default")] Default,
         startEnd,
