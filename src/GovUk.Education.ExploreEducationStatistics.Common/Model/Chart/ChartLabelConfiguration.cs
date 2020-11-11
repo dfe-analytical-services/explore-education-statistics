@@ -4,6 +4,7 @@ using Newtonsoft.Json.Converters;
 
 namespace GovUk.Education.ExploreEducationStatistics.Common.Model.Chart
 {
+    // TODO: Remove in EES-1600
     [Obsolete("Data sets should be used instead")]
     public class ChartLabelConfiguration
     {

@@ -1,4 +1,5 @@
-﻿using System.Collections.Generic;
+﻿#nullable enable
+using System.Collections.Generic;
 using GovUk.Education.ExploreEducationStatistics.Common.Converters;
 using Newtonsoft.Json;
 using static GovUk.Education.ExploreEducationStatistics.Common.Model.Chart.ChartType;
@@ -13,6 +14,11 @@ namespace GovUk.Education.ExploreEducationStatistics.Common.Model.Chart
         string Alt { get; set; }
         int Height { get; set; }
         int? Width { get; set; }
+
+        // Deprecated
+        // TODO: Remove in EES-1600
+        Dictionary<string, ChartLabelConfiguration>? Labels { get; set; }
+        Dictionary<string, ChartAxisConfiguration>? Axes { get; set; }
     }
 
     public abstract class Chart : IChart
@@ -23,6 +29,11 @@ namespace GovUk.Education.ExploreEducationStatistics.Common.Model.Chart
         public int? Width { get; set; }
 
         public abstract ChartType Type { get; }
+
+        // Deprecated
+        // TODO: Remove in EES-1600
+        public Dictionary<string, ChartLabelConfiguration>? Labels { get; set; }
+        public Dictionary<string, ChartAxisConfiguration>? Axes { get; set; }
     }
 
     public class LineChart : Chart
@@ -31,9 +42,6 @@ namespace GovUk.Education.ExploreEducationStatistics.Common.Model.Chart
 
         public ChartLegendPosition Legend;
         public int LegendHeight { get; set; }
-
-        public Dictionary<string, ChartLabelConfiguration> Labels;
-        public Dictionary<string, ChartAxisConfiguration> Axes;
     }
 
     public class HorizontalBarChart : Chart
@@ -44,8 +52,6 @@ namespace GovUk.Education.ExploreEducationStatistics.Common.Model.Chart
         public int LegendHeight { get; set; }
         public int? BarThickness { get; set; }
 
-        public Dictionary<string, ChartLabelConfiguration> Labels;
-        public Dictionary<string, ChartAxisConfiguration> Axes;
         public bool Stacked;
     }
 
@@ -57,17 +63,12 @@ namespace GovUk.Education.ExploreEducationStatistics.Common.Model.Chart
         public int LegendHeight { get; set; }
         public int? BarThickness { get; set; }
 
-        public Dictionary<string, ChartLabelConfiguration> Labels;
-        public Dictionary<string, ChartAxisConfiguration> Axes;
         public bool Stacked;
     }
 
     public class MapChart : Chart
     {
         public override ChartType Type => Map;
-
-        public Dictionary<string, ChartLabelConfiguration> Labels;
-        public Dictionary<string, ChartAxisConfiguration> Axes;
     }
 
     public class InfographicChart : Chart
