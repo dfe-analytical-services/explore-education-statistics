@@ -10,7 +10,7 @@ Suite Teardown    user closes the browser
 *** Variables ***
 ${DETAILS_HEADING}  Academic Year 2020/21
 ${PUBLICATION_NAME}  Publish Release and Amend 2 Publication %{RUN_IDENTIFIER}
-${SUBJECT_NAME}  Dates test subject
+${SUBJECT_NAME}  filter subject
 ${SECOND_SUBJECT}  Upload file test subject
 
 *** Test Cases ***
@@ -25,8 +25,8 @@ Upload a subject
     user clicks link  Data and files
     user waits until page contains element  id:dataFileUploadForm-subjectTitle
     user enters text into element  id:dataFileUploadForm-subjectTitle   ${SUBJECT_NAME}
-    user chooses file   id:dataFileUploadForm-dataFile       ${FILES_DIR}dates.csv
-    user chooses file   id:dataFileUploadForm-metadataFile   ${FILES_DIR}dates.meta.csv
+    user chooses file   id:dataFileUploadForm-dataFile       ${FILES_DIR}upload-file-test-with-filter.csv
+    user chooses file   id:dataFileUploadForm-metadataFile   ${FILES_DIR}upload-file-test-with-filter.meta.csv
     user clicks button  Upload data files
     user waits until h2 is visible  Uploaded data files
     user waits until page contains accordion section   ${SUBJECT_NAME}
@@ -47,7 +47,7 @@ Upload another subject (for deletion later)
     ${section}=  user gets accordion section content element  ${SECOND_SUBJECT}
     user checks headed table body row contains  Status           Complete  ${section}  180
 
-Add meta guidance to dates test subject
+Add meta guidance to filter subject
     [Tags]  HappyPath
     user clicks link  Metadata guidance
     user waits until h2 is visible  Public metadata guidance document
@@ -91,7 +91,7 @@ Go to Table Tool page
     user goes to url  %{PUBLIC_URL}/data-tables
     user waits until h1 is visible  Create your own tables online
 
-Select "Pupil Exclusions" publication
+Select "Test Topic" publication
     [Tags]  HappyPath
     environment variable should be set  TEST_THEME_NAME
     environment variable should be set  TEST_TOPIC_NAME
@@ -102,41 +102,77 @@ Select "Pupil Exclusions" publication
     user waits until h2 is visible  Choose a subject
     user checks previous table tool step contains  1   Publication   ${PUBLICATION_NAME}
 
-Select subject "Duration of fixed exclusions"
+Select "filter subject" subject
     [Tags]  HappyPath
     user clicks radio   ${SUBJECT_NAME}
     user clicks element   id:publicationSubjectForm-submit
     user waits until h2 is visible  Choose locations
     user checks previous table tool step contains  2    Subject     ${SUBJECT_NAME}
 
-Select Location Country, England
+Select Local Authority
     [Tags]  HappyPath
-    user opens details dropdown     National
-    user clicks checkbox    England
+    user opens details dropdown     Local Authority
+    user clicks select all for category  Local Authority
+
+Select Local Authority District
+    [Tags]  HappyPath
+    user opens details dropdown  Local Authority District
+    user clicks select all for category  Local Authority District
+
+Select Local Enterprise Partnership
+    [Tags]  HappyPath
+    user opens details dropdown  Local Enterprise Partnership
+    user clicks select all for category  Local Enterprise Partnership
+
+Select Opportunity Area
+    [Tags]  HappyPath
+    user opens details dropdown  Opportunity Area
+    user clicks select all for category  Opportunity Area
+
+Select Parliamentary Constituency
+    [Tags]  HappyPath
+    user opens details dropdown  Parliamentary Constituency
+    user clicks select all for category  Parliamentary Constituency
+
+Select Regional
+    [Tags]  HappyPath
+    user opens details dropdown  Regional
+    user clicks select all for category  Regional
+
+Select RSC Region
+    [Tags]  HappyPath
+    user opens details dropdown  RSC Region
+    user clicks select all for category  RSC Region
+
+Select Ward
+    [Tags]  HappyPath
+    user opens details dropdown  Ward
+    user clicks select all for category  Ward
+
+Click next step button
     user clicks element     id:locationFiltersForm-submit
     user waits until h2 is visible  Choose time period
-    user checks previous table tool step contains  3   National     England
 
 Select Start date and End date
     [Tags]  HappyPath
-    user selects from list by label  id:timePeriodForm-start   2020 Week 14
-    user selects from list by label  id:timePeriodForm-end     2020 Week 14
+    user selects from list by label  id:timePeriodForm-start   2005
+    user selects from list by label  id:timePeriodForm-end     2020
     user clicks element     id:timePeriodForm-submit
     user waits until h2 is visible  Choose your filters
     user waits until page contains element   id:filtersForm-indicators
-    user checks previous table tool step contains  4    Start date    2020 Week 14
-    user checks previous table tool step contains  4    End date      2020 Week 14
+    user checks previous table tool step contains  4    Start date    2005
+    user checks previous table tool step contains  4    End date      2020
 
 Select Indicators
     [Tags]  HappyPath
-    user clicks indicator checkbox   Number of open settings
-    user checks indicator checkbox is checked  Number of open settings
+    user clicks indicator checkbox   Admission Numbers
+    user checks indicator checkbox is checked  Admission Numbers
 
 Select Filters
     [Tags]   HappyPath
-    user opens details dropdown   Date
-    user clicks category checkbox   Date   30/03/2020
-    user checks category checkbox is checked   Date   30/03/2020
+    user opens details dropdown   Random Filter
+    user clicks category checkbox  Random Filter  Total
+    user checks category checkbox is checked  Random Filter  Total
 
 Create table
     [Tags]  HappyPath
@@ -145,7 +181,7 @@ Create table
 
 Validate results table column headings
     [Tags]  HappyPath
-    user checks table column heading contains  1   1   2020 Week 14
+    user checks table column heading contains  1   1  Admission Numbers
 
 Generate the permalink
     [Tags]  HappyPath
@@ -184,12 +220,12 @@ Replace data files for amendment
     user clicks link  Data and files
     user waits until page contains element  id:dataFileUploadForm-subjectTitle
     user waits until h2 is visible  Uploaded data files
-    user waits until page contains accordion section   Dates test subject
-    user opens accordion section   Dates test subject
-    ${section}=  user gets accordion section content element  Dates test subject
+    user waits until page contains accordion section   ${SUBJECT_NAME}
+    user opens accordion section   ${SUBJECT_NAME}
+    ${section}=  user gets accordion section content element  ${SUBJECT_NAME}
     user clicks link  Replace data  ${section}
-    user chooses file   id:dataFileUploadForm-dataFile       ${FILES_DIR}upload-file-test-with-filter.csv
-    user chooses file   id:dataFileUploadForm-metadataFile   ${FILES_DIR}upload-file-test-with-filter.meta.csv
+    user chooses file   id:dataFileUploadForm-dataFile       ${FILES_DIR}dates.csv
+    user chooses file   id:dataFileUploadForm-metadataFile   ${FILES_DIR}dates.meta.csv
     user clicks button  Upload data files
     user checks headed table body row cell contains  Status          2  Complete   wait=180
 
