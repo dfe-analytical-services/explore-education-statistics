@@ -66,6 +66,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Processor
                     // Else create a message for all remaining batches
                     else
                     {
+                        Console.WriteLine($"Creating messages for remaining batches for {entity.PartitionKey} : {entity.RowKey}");
                         var m = JsonConvert.DeserializeObject<ImportMessage>(entity.Message);
                         var batches = GetBatchesRemaining(blobContainer, entity.PartitionKey, m.OrigDataFileName)
                             .Result;
@@ -73,12 +74,16 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Processor
                         // If no batches then assume it didn't get passed initial validation stage
                         if (!batches.Any())
                         {
+                            Console.WriteLine($"No batches created for {entity.PartitionKey} : {entity.RowKey}`` although batches are necessary to create.  Adding message to the queue to try re-import.");
                             pendingQueue.AddMessage(new CloudQueueMessage(entity.Message));
-                            return;
+                            continue;
                         }
 
+                        Console.WriteLine($"Creating ${batches.Count} messages for remaining batches for {entity.PartitionKey} : {entity.RowKey}");
+                        
                         foreach (var folderAndFilename in batches)
                         {
+                            Console.WriteLine($"Creating message for importing batch file {folderAndFilename.Name} for {entity.PartitionKey} : {entity.RowKey}");
                             availableQueue.AddMessage(new CloudQueueMessage(BuildMessage(m, folderAndFilename.Name)));
                         }
                     }
