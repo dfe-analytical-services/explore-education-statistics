@@ -79,7 +79,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Processor
                             continue;
                         }
 
-                        Console.WriteLine($"Creating ${batches.Count} messages for remaining batches for {entity.PartitionKey} : {entity.RowKey}");
+                        Console.WriteLine($"Creating {batches.Count} messages for remaining batches for {entity.PartitionKey} : {entity.RowKey}");
                         
                         foreach (var folderAndFilename in batches)
                         {
