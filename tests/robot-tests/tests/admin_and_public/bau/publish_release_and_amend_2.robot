@@ -9,10 +9,9 @@ Suite Teardown    user closes the browser
 
 *** Variables ***
 ${DETAILS_HEADING}  Academic Year 2020/21
-${PUBLICATION_NAME}  Permalink Test Publication %{RUN_IDENTIFIER}
-${TOPIC_NAME}  %{TEST_TOPIC_NAME}
+${PUBLICATION_NAME}  Publish Release and Amend 2 Publication %{RUN_IDENTIFIER}
 ${SUBJECT_NAME}  Dates test subject
-${SECOND_SUBJECT}  Dates test subject-%{RUN_IDENTIFIER}
+${SECOND_SUBJECT}  Upload file test subject
 
 *** Test Cases ***
 Create publication & release
@@ -94,8 +93,10 @@ Go to Table Tool page
 
 Select "Pupil Exclusions" publication
     [Tags]  HappyPath
+    environment variable should be set  TEST_THEME_NAME
+    environment variable should be set  TEST_TOPIC_NAME
     user opens details dropdown    %{TEST_THEME_NAME}
-    user opens details dropdown    ${TOPIC_NAME}
+    user opens details dropdown    %{TEST_TOPIC_NAME}
     user clicks radio      ${PUBLICATION_NAME}
     user clicks element    id:publicationForm-submit
     user waits until h2 is visible  Choose a subject
@@ -168,7 +169,7 @@ Return to Admin to start creating an amendment
 
 Create amendment
     [Tags]  HappyPath
-    user selects theme and topic from admin dashboard  %{TEST_THEME_NAME}  ${TOPIC_NAME}
+    user selects theme and topic from admin dashboard  %{TEST_THEME_NAME}  %{TEST_TOPIC_NAME}
     user waits until page contains accordion section   ${PUBLICATION_NAME}
     user opens accordion section  ${PUBLICATION_NAME}
     ${accordion}=  user gets accordion section content element  ${PUBLICATION_NAME}
@@ -241,7 +242,7 @@ Check amended release doesn't contain deleted subject
     user goes to url  %{PUBLIC_URL}/data-tables
     user waits until h1 is visible  Create your own tables online
     user opens details dropdown    %{TEST_THEME_NAME}
-    user opens details dropdown    ${TOPIC_NAME}
+    user opens details dropdown    %{TEST_TOPIC_NAME}
     user clicks radio      ${PUBLICATION_NAME}
     user clicks element    id:publicationForm-submit
     user waits until h2 is visible  Choose a subject
