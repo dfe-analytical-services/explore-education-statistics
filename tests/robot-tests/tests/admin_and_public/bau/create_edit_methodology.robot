@@ -73,4 +73,4 @@ Approve update methodology
 
 Check updated methodology is approved
     user waits until page contains element  xpath://strong[text()="Approved"]
-    user checks page contains element       xpath://strong[text()="Approved"]
+    user checks page contains element  xpath://strong[text()="Approved"]
