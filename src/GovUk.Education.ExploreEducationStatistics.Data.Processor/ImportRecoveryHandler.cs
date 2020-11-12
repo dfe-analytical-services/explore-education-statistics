@@ -60,7 +60,8 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Processor
                         || entity.Status.Equals(IStatus.PROCESSING_ARCHIVE_FILE)
                         || entity.Status.Equals(IStatus.STAGE_1))
                     {
-                        Console.WriteLine($"No data imported for {entity.PartitionKey} : {entity.RowKey} - Import will be re-run");
+                        Console.WriteLine($"No data imported for {entity.PartitionKey} : {entity.RowKey} - Import " +
+                                          $"will be re-run");
                         pendingQueue.AddMessage(new CloudQueueMessage(entity.Message));
                     }
                     // Else create a message for all remaining batches
@@ -74,7 +75,9 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Processor
                         // If no batches then assume it didn't get passed initial validation stage
                         if (!batches.Any())
                         {
-                            Console.WriteLine($"No batches created for {entity.PartitionKey} : {entity.RowKey}`` although batches are necessary to create.  Adding message to the queue to try re-import.");
+                            Console.WriteLine($"No batches created for {entity.PartitionKey} : {entity.RowKey} " +
+                                              $"although batches are necessary to create.  Adding message to the " +
+                                              $"queue to try re-import.");
                             pendingQueue.AddMessage(new CloudQueueMessage(entity.Message));
                             continue;
                         }
@@ -83,7 +86,8 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Processor
                         
                         foreach (var folderAndFilename in batches)
                         {
-                            Console.WriteLine($"Creating message for importing batch file {folderAndFilename.Name} for {entity.PartitionKey} : {entity.RowKey}");
+                            Console.WriteLine($"Creating message for importing batch file {folderAndFilename.Name} " +
+                                              $"for {entity.PartitionKey} : {entity.RowKey}");
                             availableQueue.AddMessage(new CloudQueueMessage(BuildMessage(m, folderAndFilename.Name)));
                         }
                     }
