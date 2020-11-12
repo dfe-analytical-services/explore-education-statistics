@@ -638,7 +638,10 @@ namespace GovUk.Education.ExploreEducationStatistics.Content.Model.Database
                                         LineStyle = ChartLineStyle.solid
                                     },
                             },
-                            Legend = ChartLegendPosition.top
+                            Legend = new ChartLegend
+                            {
+                                Position = ChartLegendPosition.top
+                            }
                         }
                     }
                 },
@@ -833,7 +836,10 @@ namespace GovUk.Education.ExploreEducationStatistics.Content.Model.Database
                                         LineStyle = ChartLineStyle.solid
                                     }
                             },
-                            Legend = ChartLegendPosition.top
+                            Legend = new ChartLegend
+                            {
+                                Position = ChartLegendPosition.top
+                            }
                         }
                     }
                 },
@@ -996,7 +1002,10 @@ namespace GovUk.Education.ExploreEducationStatistics.Content.Model.Database
                                         LineStyle = ChartLineStyle.solid
                                     }
                             },
-                            Legend = ChartLegendPosition.top
+                            Legend = new ChartLegend
+                            {
+                                Position = ChartLegendPosition.top
+                            }
                         }
                     }
                 }
