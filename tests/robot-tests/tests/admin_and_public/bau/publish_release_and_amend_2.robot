@@ -10,7 +10,7 @@ Suite Teardown    user closes the browser
 *** Variables ***
 ${DETAILS_HEADING}  Academic Year 2020/21
 ${PUBLICATION_NAME}  Publish Release and Amend 2 Publication %{RUN_IDENTIFIER}
-${SUBJECT_NAME}  filter subject
+${SUBJECT_NAME}  multiple filters test subject
 ${SECOND_SUBJECT}  Upload file test subject
 
 *** Test Cases ***
@@ -25,8 +25,8 @@ Upload a subject
     user clicks link  Data and files
     user waits until page contains element  id:dataFileUploadForm-subjectTitle
     user enters text into element  id:dataFileUploadForm-subjectTitle   ${SUBJECT_NAME}
-    user chooses file   id:dataFileUploadForm-dataFile       ${FILES_DIR}upload-file-test-with-filter.csv
-    user chooses file   id:dataFileUploadForm-metadataFile   ${FILES_DIR}upload-file-test-with-filter.meta.csv
+    user chooses file   id:dataFileUploadForm-dataFile       ${FILES_DIR}multiple_filters.csv
+    user chooses file   id:dataFileUploadForm-metadataFile   ${FILES_DIR}multiple_filters.meta.csv
     user clicks button  Upload data files
     user waits until h2 is visible  Uploaded data files
     user waits until page contains accordion section   ${SUBJECT_NAME}
@@ -114,40 +114,15 @@ Select Local Authority
     user opens details dropdown     Local Authority
     user clicks select all for category  Local Authority
 
-Select Local Authority District
+Select National
     [Tags]  HappyPath
-    user opens details dropdown  Local Authority District
-    user clicks select all for category  Local Authority District
-
-Select Local Enterprise Partnership
-    [Tags]  HappyPath
-    user opens details dropdown  Local Enterprise Partnership
-    user clicks select all for category  Local Enterprise Partnership
-
-Select Opportunity Area
-    [Tags]  HappyPath
-    user opens details dropdown  Opportunity Area
-    user clicks select all for category  Opportunity Area
-
-Select Parliamentary Constituency
-    [Tags]  HappyPath
-    user opens details dropdown  Parliamentary Constituency
-    user clicks select all for category  Parliamentary Constituency
+    user opens details dropdown  National
+    user clicks checkbox  England
 
 Select Regional
     [Tags]  HappyPath
     user opens details dropdown  Regional
     user clicks select all for category  Regional
-
-Select RSC Region
-    [Tags]  HappyPath
-    user opens details dropdown  RSC Region
-    user clicks select all for category  RSC Region
-
-Select Ward
-    [Tags]  HappyPath
-    user opens details dropdown  Ward
-    user clicks select all for category  Ward
 
 Click next step button
     user clicks element     id:locationFiltersForm-submit
@@ -155,24 +130,40 @@ Click next step button
 
 Select Start date and End date
     [Tags]  HappyPath
-    user selects from list by label  id:timePeriodForm-start   2005
-    user selects from list by label  id:timePeriodForm-end     2020
+    user selects from list by label  id:timePeriodForm-start   2017/18
+    user selects from list by label  id:timePeriodForm-end     2017/18
     user clicks element     id:timePeriodForm-submit
     user waits until h2 is visible  Choose your filters
     user waits until page contains element   id:filtersForm-indicators
-    user checks previous table tool step contains  4    Start date    2005
-    user checks previous table tool step contains  4    End date      2020
+    user checks previous table tool step contains  4    Start date    2017/18
+    user checks previous table tool step contains  4    End date      2017/18
 
 Select Indicators
     [Tags]  HappyPath
-    user clicks indicator checkbox   Admission Numbers
-    user checks indicator checkbox is checked  Admission Numbers
+    user clicks indicator checkbox   Authorised absence rate
+    user checks indicator checkbox is checked  Authorised absence rate
+    user clicks indicator checkbox   Number of persistent absentees
+    user checks indicator checkbox is checked  Number of persistent absentees
+    user clicks indicator checkbox   Number of pupil enrolments
+    user checks indicator checkbox is checked  Number of pupil enrolments
+    user clicks indicator checkbox   Number of schools
+    user checks indicator checkbox is checked  Number of schools
+    user clicks indicator checkbox   Overall absence rate
+    user checks indicator checkbox is checked  Overall absence rate
+    user clicks indicator checkbox   Percentage of persistent absentees
+    user checks indicator checkbox is checked  Percentage of persistent absentees
+    user clicks indicator checkbox   Unauthorised absence rate
+    user checks indicator checkbox is checked  Unauthorised absence rate
 
-Select Filters
+Select gender filter
     [Tags]   HappyPath
-    user opens details dropdown   Random Filter
-    user clicks category checkbox  Random Filter  Total
-    user checks category checkbox is checked  Random Filter  Total
+    user opens details dropdown  Gender
+    user clicks select all for category  Gender
+
+Select school type filter
+    [Tags]  HappyPath
+    user opens details dropdown  School type
+    user clicks select all for category  School type
 
 Create table
     [Tags]  HappyPath
@@ -181,7 +172,7 @@ Create table
 
 Validate results table column headings
     [Tags]  HappyPath
-    user checks table column heading contains  1   1  Admission Numbers
+    user checks table column heading contains  1   1  Female
 
 Generate the permalink
     [Tags]  HappyPath
