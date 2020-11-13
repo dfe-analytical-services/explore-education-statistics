@@ -85,11 +85,14 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Model.Services
             }
             else
             {
+                // Manually detach subject from state tracking to stop EF from
+                // performing cascading deletes of child relationships in the wrong order.
+                // By detaching it, we just let the database handle the cascading delete instead.
+                // This is more efficient (fewer delete queries) and works correctly.
+                _statisticsDbContext.Entry(subject).State = EntityState.Detached;
+
                 // N.B. This delete will be slow if there are a large number of observations but this is only
                 // executed by the tests when the topic is torn down so ensure files used are < 1000 rows.
-                var observations = _statisticsDbContext.Observation
-                    .Where(o => o.SubjectId == subject.Id);
-                _statisticsDbContext.Observation.RemoveRange(observations);
                 _statisticsDbContext.Subject.Remove(subject);
             }
 
