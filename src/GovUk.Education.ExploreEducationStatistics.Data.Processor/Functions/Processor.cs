@@ -62,74 +62,32 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Processor.Functions
             [Queue("imports-available")] ICollector<ImportMessage> collector
         )
         {
-            if (message.ArchiveFileName != "")
+            try
             {
-                await _importStatusService.UpdateStatus(message.Release.Id,
-                    message.DataFileName,
-                    IStatus.PROCESSING_ARCHIVE_FILE);
+                await ProcessUnpackingArchive(message, logger);
 
-                await _dataArchiveService.ExtractDataFiles(message.Release.Id, message.ArchiveFileName);
+                var subjectData = await _fileStorageService.GetSubjectData(message);
+                
+                await ProcessStage1(message, logger, executionContext, subjectData);
+                await ProcessStage2(message, logger, subjectData);
+                await ProcessStage3(message, logger, subjectData);
+                await ProcessStage4Messages(message, logger, collector);
             }
+            catch (Exception e)
+            {
+                var ex = GetInnerException(e);
 
-            await _importStatusService.UpdateStatus(message.Release.Id, message.DataFileName, IStatus.STAGE_1);
-            var subjectData = await _fileStorageService.GetSubjectData(message);
-
-            await _validatorService.Validate(message.Release.Id, subjectData, executionContext, message)
-                .OnSuccess(async result =>
-                {
-                    try
+                await _batchService.FailImport(message.Release.Id,
+                    message.OrigDataFileName,
+                    new List<ValidationError>
                     {
-                        var status =
-                            await _importStatusService.GetImportStatus(message.Release.Id, message.OrigDataFileName);
+                        new ValidationError(ex.Message)
+                    });
 
-                        message.RowsPerBatch = result.RowsPerBatch;
-                        message.TotalRows = result.FilteredObservationCount;
-                        message.NumBatches = result.NumBatches;
-
-                        await _batchService.UpdateStoredMessage(message);
-
-                        // If already completed Phase 3 then don't re-create the subject or split into batches
-                        if (IStatus.STAGE_3.CompareTo(status.Status) > 0 ||
-                            status.Status == IStatus.STAGE_3 && !status.PhaseComplete)
-                        {
-                            await _importStatusService.UpdateStatus(message.Release.Id,
-                                message.OrigDataFileName,
-                                IStatus.STAGE_2);
-
-                            await ProcessSubject(message,
-                                DbUtils.CreateStatisticsDbContext(),
-                                DbUtils.CreateContentDbContext(),
-                                subjectData);
-
-                            await _splitFileService.SplitDataFile(collector, message, subjectData);
-                        }
-                    }
-                    catch (Exception e)
-                    {
-                        var ex = GetInnerException(e);
-
-                        await _batchService.FailImport(message.Release.Id,
-                            message.OrigDataFileName,
-                            new List<ValidationError>
-                            {
-                                new ValidationError(ex.Message)
-                            });
-
-                        logger.LogError(ex, $"{GetType().Name} function FAILED for : Datafile: " +
-                                            $"{message.DataFileName} : {ex.Message}");
-                        logger.LogError(ex.StackTrace);
-                    }
-
-                    return true;
-                })
-                .OnFailureDo(async errors =>
-                {
-                    await _batchService.FailImport(message.Release.Id,
-                        message.OrigDataFileName,
-                        errors);
-
-                    logger.LogError($"Import FAILED for {message.DataFileName}...check log");
-                });
+                logger.LogError(ex, $"{GetType().Name} function FAILED for : Datafile: " +
+                                    $"{message.DataFileName} : {ex.Message}");
+                logger.LogError(ex.StackTrace);
+            }
         }
 
         [FunctionName("ImportObservations")]
@@ -165,6 +123,134 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Processor.Functions
             }
         }
 
+        private async Task ProcessUnpackingArchive(
+            ImportMessage message,
+            ILogger logger)
+        {
+            if (message.ArchiveFileName != "")
+            {
+                logger.LogInformation($"Unpacking archive for {message.DataFileName}");
+
+                var status =
+                    await _importStatusService.GetImportStatus(message.Release.Id, message.OrigDataFileName);
+
+                if (status.IsAfterArchiveProcessing())
+                {
+                    logger.LogInformation($"Unpacking archive already completed for {message.DataFileName} - skipping");
+                    return;
+                }
+                
+                await _importStatusService.UpdateStatus(message.Release.Id,
+                    message.DataFileName,
+                    IStatus.PROCESSING_ARCHIVE_FILE);
+
+                await _dataArchiveService.ExtractDataFiles(message.Release.Id, message.ArchiveFileName);
+            }
+        }
+
+        private async Task ProcessStage1(
+            ImportMessage message,
+            ILogger logger,
+            ExecutionContext executionContext,
+            SubjectData subjectData)
+        {
+            logger.LogInformation($"Processing Stage 1 for {message.DataFileName}");
+
+            var status =
+                await _importStatusService.GetImportStatus(message.Release.Id, message.OrigDataFileName);
+
+            if (status.IsAfterStage1())
+            {
+                logger.LogInformation($"Stage 1 already completed for {message.DataFileName} - skipping");
+                return;
+            }
+            
+            await _importStatusService.UpdateStatus(message.Release.Id, message.DataFileName, IStatus.STAGE_1);
+
+            await _validatorService.Validate(message.Release.Id, subjectData, executionContext, message)
+                .OnSuccess(async result =>
+                {
+                    message.RowsPerBatch = result.RowsPerBatch;
+                    message.TotalRows = result.FilteredObservationCount;
+                    message.NumBatches = result.NumBatches;
+                    await _batchService.UpdateStoredMessage(message);
+                })
+                .OnFailureDo(async errors =>
+                {
+                    await _batchService.FailImport(message.Release.Id,
+                        message.OrigDataFileName,
+                        errors);
+
+                    logger.LogError($"Import FAILED for {message.DataFileName}...check log");
+                });
+        }
+
+        private async Task ProcessStage2(
+            ImportMessage message,
+            ILogger logger,
+            SubjectData subjectData)
+        {
+            logger.LogInformation($"Processing Stage 2 for {message.DataFileName}");
+
+            var status =
+                await _importStatusService.GetImportStatus(message.Release.Id, message.OrigDataFileName);
+
+            if (status.IsAfterStage2())
+            {
+                logger.LogInformation($"Stage 2 already completed for {message.DataFileName} - skipping");
+                return;
+            }
+
+            await _importStatusService.UpdateStatus(message.Release.Id,
+                message.OrigDataFileName,
+                IStatus.STAGE_2);
+
+            await ProcessSubject(message,
+                DbUtils.CreateStatisticsDbContext(),
+                DbUtils.CreateContentDbContext(),
+                subjectData);
+        }
+
+        private async Task ProcessStage3(
+            ImportMessage message, 
+            ILogger logger,
+            SubjectData subjectData)
+        {
+            logger.LogInformation($"Processing Stage 3 for {message.DataFileName}");
+
+            var status =
+                await _importStatusService.GetImportStatus(message.Release.Id, message.OrigDataFileName);
+
+            if (status.IsAfterStage3())
+            {
+                logger.LogInformation($"Stage 3 already completed for {message.DataFileName} - skipping");
+                return;
+            }
+
+            await _splitFileService.SplitDataFile(message, subjectData);
+        }
+        
+        
+
+        private async Task ProcessStage4Messages(
+            ImportMessage message, 
+            ILogger logger,
+            ICollector<ImportMessage> collector)
+        {
+            logger.LogInformation($"Processing Stage 4 message creation for {message.DataFileName}");
+
+            var status =
+                await _importStatusService.GetImportStatus(message.Release.Id, message.OrigDataFileName);
+
+            if (status.IsAfterStage4())
+            {
+                logger.LogInformation($"Stage 4 already completed for {message.DataFileName} - skipping");
+                return;
+            }
+
+            await _splitFileService.CreateDataFileProcessingMessages(collector, message);
+        }
+        
         private async Task ProcessSubject(
             ImportMessage message,
             StatisticsDbContext statisticsDbContext,

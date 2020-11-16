@@ -8,8 +8,11 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Processor.Services.Int
     public interface ISplitFileService
     {
         Task SplitDataFile(
-            ICollector<ImportMessage> collector,
             ImportMessage message,
             SubjectData subjectData);
+
+        Task CreateDataFileProcessingMessages(
+            ICollector<ImportMessage> collector, 
+            ImportMessage message);
     }
 }

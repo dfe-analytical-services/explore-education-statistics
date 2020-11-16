@@ -10,9 +10,9 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Processor.Services.Int
 {
     public interface IFileStorageService
     {
-        public Task<SubjectData> GetSubjectData(ImportMessage importMessage);
+        Task<SubjectData> GetSubjectData(ImportMessage importMessage);
 
-        public Task UploadStream(
+        Task UploadStream(
             Guid releaseId,
             ReleaseFileTypes fileType,
             string fileName,
@@ -20,14 +20,14 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Processor.Services.Int
             string contentType,
             IDictionary<string, string> metaValues);
 
-        public Task<Stream> StreamFile(Guid releaseId, ReleaseFileTypes fileType, string fileName);
+        Task<Stream> StreamFile(Guid releaseId, ReleaseFileTypes fileType, string fileName);
 
-        public Task<Stream> StreamBlob(BlobInfo blob);
+        Task<Stream> StreamBlob(BlobInfo blob);
 
-        public Task DeleteBatchFile(string releaseId, string dataFileName);
+        Task DeleteBatchFile(string releaseId, string dataFileName);
 
-        public Task<int> GetNumBatchesRemaining(string releaseId, string origDataFileName);
+        Task<int> GetNumBatchesRemaining(string releaseId, string origDataFileName);
 
-        public Task<IEnumerable<BlobInfo>> GetBatchesRemaining(string releaseId, string origDataFileName);
+        Task<IEnumerable<BlobInfo>> GetBatchFilesForDataFile(string releaseId, string origDataFileName);
     }
 }
