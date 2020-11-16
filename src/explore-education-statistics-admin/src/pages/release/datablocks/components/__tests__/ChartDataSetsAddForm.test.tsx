@@ -2,90 +2,85 @@ import ChartDataSetsAddForm, {
   ChartDataSetsAddFormValues,
 } from '@admin/pages/release/datablocks/components/ChartDataSetsAddForm';
 import { LocationFilter } from '@common/modules/table-tool/types/filters';
-import mapFullTable from '@common/modules/table-tool/utils/mapFullTable';
-import { TableDataResponse } from '@common/services/tableBuilderService';
+import { FullTableMeta } from '@common/modules/table-tool/types/fullTable';
+import mapFullTableMeta from '@common/modules/table-tool/utils/mapFullTableMeta';
 import { render, screen, waitFor, within } from '@testing-library/react';
 import userEvent from '@testing-library/user-event';
 import noop from 'lodash/noop';
 import React from 'react';
 
 describe('ChartDataSetsAddForm', () => {
-  const testTableData: TableDataResponse = {
-    results: [],
-    subjectMeta: {
-      publicationName: '',
-      subjectName: '',
-      geoJsonAvailable: false,
-      footnotes: [],
-      boundaryLevels: [],
-      locations: [
-        {
-          label: 'Barnet',
-          value: 'barnet',
-          level: 'localAuthority',
-        },
-        {
-          label: 'Barnsley',
-          value: 'barnsley',
-          level: 'localAuthority',
-        },
-      ],
-      timePeriodRange: [
-        {
-          label: '2019/20',
-          year: 2019,
-          code: 'AY',
-        },
-        {
-          label: '2020/21',
-          year: 2020,
-          code: 'AY',
-        },
-      ],
-      indicators: [
-        {
-          value: 'authorised-absence-sessions',
-          label: 'Number of authorised absence sessions',
-          unit: '',
-          name: 'sess_authorised',
-          decimalPlaces: 2,
-        },
-        {
-          value: 'unauthorised-absence-sessions',
-          label: 'Number of unauthorised absence sessions',
-          unit: '',
-          name: 'sess_unauthorised',
-          decimalPlaces: 2,
-        },
-      ],
-      filters: {
-        Characteristic: {
-          legend: 'Characteristic',
-          name: 'characteristic',
-          options: {
-            gender: {
-              label: 'Gender',
-              options: [
-                {
-                  value: 'male',
-                  label: 'Male',
-                },
-                {
-                  value: 'female',
-                  label: 'Female',
-                },
-              ],
-            },
+  const testSubjectMeta: FullTableMeta = mapFullTableMeta({
+    publicationName: '',
+    subjectName: '',
+    geoJsonAvailable: false,
+    footnotes: [],
+    boundaryLevels: [],
+    locations: [
+      {
+        label: 'Barnet',
+        value: 'barnet',
+        level: 'localAuthority',
+      },
+      {
+        label: 'Barnsley',
+        value: 'barnsley',
+        level: 'localAuthority',
+      },
+    ],
+    timePeriodRange: [
+      {
+        label: '2019/20',
+        year: 2019,
+        code: 'AY',
+      },
+      {
+        label: '2020/21',
+        year: 2020,
+        code: 'AY',
+      },
+    ],
+    indicators: [
+      {
+        value: 'authorised-absence-sessions',
+        label: 'Number of authorised absence sessions',
+        unit: '',
+        name: 'sess_authorised',
+        decimalPlaces: 2,
+      },
+      {
+        value: 'unauthorised-absence-sessions',
+        label: 'Number of unauthorised absence sessions',
+        unit: '',
+        name: 'sess_unauthorised',
+        decimalPlaces: 2,
+      },
+    ],
+    filters: {
+      Characteristic: {
+        legend: 'Characteristic',
+        name: 'characteristic',
+        options: {
+          gender: {
+            label: 'Gender',
+            options: [
+              {
+                value: 'male',
+                label: 'Male',
+              },
+              {
+                value: 'female',
+                label: 'Female',
+              },
+            ],
           },
         },
       },
     },
-  };
+  });
 
   test('renders correctly with multiple options per select', () => {
-    const { subjectMeta } = mapFullTable(testTableData);
-
-    render(<ChartDataSetsAddForm meta={subjectMeta} onSubmit={noop} />);
+    render(<ChartDataSetsAddForm meta={testSubjectMeta} onSubmit={noop} />);
 
     const characteristic = screen.getByLabelText('Characteristic');
     expect(characteristic).toBeInTheDocument();
@@ -114,7 +109,7 @@ describe('ChartDataSetsAddForm', () => {
 
     const locationOptions = within(location).getAllByRole('option');
     expect(locationOptions).toHaveLength(3);
-    expect(locationOptions[0]).toHaveTextContent('Any location');
+    expect(locationOptions[0]).toHaveTextContent('All location');
     expect(locationOptions[1]).toHaveTextContent('Barnet');
     expect(locationOptions[2]).toHaveTextContent('Barnsley');
 
@@ -129,12 +124,10 @@ describe('ChartDataSetsAddForm', () => {
   });
 
   test('does not render indicator when there is no option', () => {
-    const { subjectMeta } = mapFullTable(testTableData);
-
     render(
       <ChartDataSetsAddForm
         meta={{
-          ...subjectMeta,
+          ...testSubjectMeta,
           indicators: [],
         }}
         onSubmit={noop}
@@ -145,13 +138,11 @@ describe('ChartDataSetsAddForm', () => {
   });
 
   test('does not render indicator when there is only one option', () => {
-    const { subjectMeta } = mapFullTable(testTableData);
-
     render(
       <ChartDataSetsAddForm
         meta={{
-          ...subjectMeta,
-          indicators: [subjectMeta.indicators[0]],
+          ...testSubjectMeta,
+          indicators: [testSubjectMeta.indicators[0]],
         }}
         onSubmit={noop}
       />,
@@ -161,12 +152,10 @@ describe('ChartDataSetsAddForm', () => {
   });
 
   test('does not render location when there is no option', () => {
-    const { subjectMeta } = mapFullTable(testTableData);
-
     render(
       <ChartDataSetsAddForm
         meta={{
-          ...subjectMeta,
+          ...testSubjectMeta,
           locations: [],
         }}
         onSubmit={noop}
@@ -177,13 +166,11 @@ describe('ChartDataSetsAddForm', () => {
   });
 
   test('does not render location when there is only one option', () => {
-    const { subjectMeta } = mapFullTable(testTableData);
-
     render(
       <ChartDataSetsAddForm
         meta={{
-          ...subjectMeta,
-          locations: [subjectMeta.locations[0]],
+          ...testSubjectMeta,
+          locations: [testSubjectMeta.locations[0]],
         }}
         onSubmit={noop}
       />,
@@ -193,12 +180,10 @@ describe('ChartDataSetsAddForm', () => {
   });
 
   test('does not render time period when there is no option', () => {
-    const { subjectMeta } = mapFullTable(testTableData);
-
     render(
       <ChartDataSetsAddForm
         meta={{
-          ...subjectMeta,
+          ...testSubjectMeta,
           timePeriodRange: [],
         }}
         onSubmit={noop}
@@ -209,13 +194,11 @@ describe('ChartDataSetsAddForm', () => {
   });
 
   test('does not render time period when there is only one option', () => {
-    const { subjectMeta } = mapFullTable(testTableData);
-
     render(
       <ChartDataSetsAddForm
         meta={{
-          ...subjectMeta,
-          timePeriodRange: [subjectMeta.timePeriodRange[0]],
+          ...testSubjectMeta,
+          timePeriodRange: [testSubjectMeta.timePeriodRange[0]],
         }}
         onSubmit={noop}
       />,
@@ -226,12 +209,10 @@ describe('ChartDataSetsAddForm', () => {
 
   describe('submitting form', () => {
     test('shows correct error messages when no values have been selected', async () => {
-      const { subjectMeta } = mapFullTable(testTableData);
-
       const handleSubmit = jest.fn();
 
       render(
-        <ChartDataSetsAddForm meta={subjectMeta} onSubmit={handleSubmit} />,
+        <ChartDataSetsAddForm meta={testSubjectMeta} onSubmit={handleSubmit} />,
       );
 
       userEvent.click(screen.getByRole('button', { name: 'Add data' }));
@@ -256,12 +237,10 @@ describe('ChartDataSetsAddForm', () => {
     });
 
     test('successfully submits by selecting only indicator and filter', async () => {
-      const { subjectMeta } = mapFullTable(testTableData);
-
       const handleSubmit = jest.fn();
 
       render(
-        <ChartDataSetsAddForm meta={subjectMeta} onSubmit={handleSubmit} />,
+        <ChartDataSetsAddForm meta={testSubjectMeta} onSubmit={handleSubmit} />,
       );
 
       userEvent.selectOptions(screen.getByLabelText('Characteristic'), 'male');
@@ -289,12 +268,10 @@ describe('ChartDataSetsAddForm', () => {
     });
 
     test('successfully submits by selecting all options', async () => {
-      const { subjectMeta } = mapFullTable(testTableData);
-
       const handleSubmit = jest.fn();
 
       render(
-        <ChartDataSetsAddForm meta={subjectMeta} onSubmit={handleSubmit} />,
+        <ChartDataSetsAddForm meta={testSubjectMeta} onSubmit={handleSubmit} />,
       );
 
       const locationId = LocationFilter.createId({
@@ -329,14 +306,12 @@ describe('ChartDataSetsAddForm', () => {
     });
 
     test('successfully submits by selecting only indicator when there are no filters', async () => {
-      const { subjectMeta } = mapFullTable(testTableData);
-
       const handleSubmit = jest.fn();
 
       render(
         <ChartDataSetsAddForm
           meta={{
-            ...subjectMeta,
+            ...testSubjectMeta,
             filters: {},
           }}
           onSubmit={handleSubmit}
