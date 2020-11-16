@@ -248,7 +248,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Content.Model.Database
                 .HasColumnName("DataBlock_Charts")
                 .HasConversion(
                     v => JsonConvert.SerializeObject(v),
-                    v => JsonConvert.DeserializeObject<List<IContentBlockChart>>(v));
+                    v => JsonConvert.DeserializeObject<List<IChart>>(v));
 
             modelBuilder.Entity<DataBlock>()
                 .Property(block => block.Summary)
@@ -570,13 +570,13 @@ namespace GovUk.Education.ExploreEducationStatistics.Content.Model.Database
                             }
                         }
                     },
-                    Charts = new List<IContentBlockChart>
+                    Charts = new List<IChart>
                     {
                         new LineChart
                         {
-                            Axes = new Dictionary<string, ChartAxisConfigurationItem>
+                            Axes = new Dictionary<string, ChartAxisConfiguration>
                             {
-                                ["major"] = new ChartAxisConfigurationItem
+                                ["major"] = new ChartAxisConfiguration
                                 {
                                     GroupBy = AxisGroupBy.timePeriod,
                                     DataSets = new List<ChartDataSet>
@@ -620,24 +620,25 @@ namespace GovUk.Education.ExploreEducationStatistics.Content.Model.Database
                                     },
                                     Title = "School Year"
                                 },
-                                ["minor"] = new ChartAxisConfigurationItem
+                                ["minor"] = new ChartAxisConfiguration
                                 {
                                     Min = 0,
                                     Title = "Absence Rate"
                                 }
                             },
-                            Labels = new Dictionary<string, ChartConfiguration>
+                            Labels = new Dictionary<string, ChartLabelConfiguration>
                             {
                                 [$"{Indicator(SubjectIds[SubjectName.AbsenceByCharacteristic], IndicatorName.Overall_absence_rate)}_{FItem(SubjectIds[SubjectName.AbsenceByCharacteristic], FilterItemName.Characteristic__Total)}_{FItem(SubjectIds[SubjectName.AbsenceByCharacteristic], FilterItemName.School_Type__Total)}_____"]
-                                    = new ChartConfiguration
+                                    = new ChartLabelConfiguration
                                     {
                                         Label = "Overall absence rate",
                                         Unit = "%",
                                         Colour = "#f5a450",
-                                        symbol = ChartSymbol.cross
+                                        Symbol = ChartLineSymbol.cross,
+                                        LineStyle = ChartLineStyle.solid
                                     },
                             },
-                            Legend = ChartLegend.top
+                            Legend = ChartLegendPosition.top
                         }
                     }
                 },
@@ -746,13 +747,13 @@ namespace GovUk.Education.ExploreEducationStatistics.Content.Model.Database
                             }
                         }
                     },
-                    Charts = new List<IContentBlockChart>
+                    Charts = new List<IChart>
                     {
                         new LineChart
                         {
-                            Axes = new Dictionary<string, ChartAxisConfigurationItem>
+                            Axes = new Dictionary<string, ChartAxisConfiguration>
                             {
-                                ["major"] = new ChartAxisConfigurationItem
+                                ["major"] = new ChartAxisConfiguration
                                 {
                                     GroupBy = AxisGroupBy.timePeriod,
                                     DataSets = new List<ChartDataSet>
@@ -796,40 +797,43 @@ namespace GovUk.Education.ExploreEducationStatistics.Content.Model.Database
                                     },
                                     Title = "School Year"
                                 },
-                                ["minor"] = new ChartAxisConfigurationItem
+                                ["minor"] = new ChartAxisConfiguration
                                 {
                                     Min = 0,
                                     Title = "Absence Rate"
                                 }
                             },
-                            Labels = new Dictionary<string, ChartConfiguration>
+                            Labels = new Dictionary<string, ChartLabelConfiguration>
                             {
                                 [$"{Indicator(SubjectIds[SubjectName.AbsenceByCharacteristic], IndicatorName.Unauthorised_absence_rate)}_{FItem(SubjectIds[SubjectName.AbsenceByCharacteristic], FilterItemName.Characteristic__Total)}_{FItem(SubjectIds[SubjectName.AbsenceByCharacteristic], FilterItemName.School_Type__Total)}_____"]
-                                    = new ChartConfiguration
+                                    = new ChartLabelConfiguration
                                     {
                                         Label = "Unauthorised absence rate",
                                         Unit = "%",
                                         Colour = "#4763a5",
-                                        symbol = ChartSymbol.circle
+                                        Symbol = ChartLineSymbol.circle,
+                                        LineStyle = ChartLineStyle.solid
                                     },
                                 [$"{Indicator(SubjectIds[SubjectName.AbsenceByCharacteristic], IndicatorName.Overall_absence_rate)}_{FItem(SubjectIds[SubjectName.AbsenceByCharacteristic], FilterItemName.Characteristic__Total)}_{FItem(SubjectIds[SubjectName.AbsenceByCharacteristic], FilterItemName.School_Type__Total)}_____"]
-                                    = new ChartConfiguration
+                                    = new ChartLabelConfiguration
                                     {
                                         Label = "Overall absence rate",
                                         Unit = "%",
                                         Colour = "#f5a450",
-                                        symbol = ChartSymbol.cross
+                                        Symbol = ChartLineSymbol.cross,
+                                        LineStyle = ChartLineStyle.solid
                                     },
                                 [$"{Indicator(SubjectIds[SubjectName.AbsenceByCharacteristic], IndicatorName.Authorised_absence_rate)}_{FItem(SubjectIds[SubjectName.AbsenceByCharacteristic], FilterItemName.Characteristic__Total)}_{FItem(SubjectIds[SubjectName.AbsenceByCharacteristic], FilterItemName.School_Type__Total)}_____"]
-                                    = new ChartConfiguration
+                                    = new ChartLabelConfiguration
                                     {
                                         Label = "Authorised absence rate",
                                         Unit = "%",
                                         Colour = "#005ea5",
-                                        symbol = ChartSymbol.diamond
+                                        Symbol = ChartLineSymbol.diamond,
+                                        LineStyle = ChartLineStyle.solid
                                     }
                             },
-                            Legend = ChartLegend.top
+                            Legend = ChartLegendPosition.top
                         }
                     }
                 },
@@ -906,13 +910,13 @@ namespace GovUk.Education.ExploreEducationStatistics.Content.Model.Database
                             }
                         }
                     },
-                    Charts = new List<IContentBlockChart>
+                    Charts = new List<IChart>
                     {
                         new LineChart
                         {
-                            Axes = new Dictionary<string, ChartAxisConfigurationItem>
+                            Axes = new Dictionary<string, ChartAxisConfiguration>
                             {
-                                ["major"] = new ChartAxisConfigurationItem
+                                ["major"] = new ChartAxisConfiguration
                                 {
                                     GroupBy = AxisGroupBy.timePeriod,
                                     DataSets = new List<ChartDataSet>
@@ -956,40 +960,43 @@ namespace GovUk.Education.ExploreEducationStatistics.Content.Model.Database
                                     },
                                     Title = "School Year"
                                 },
-                                ["minor"] = new ChartAxisConfigurationItem
+                                ["minor"] = new ChartAxisConfiguration
                                 {
                                     Min = 0,
                                     Title = "Absence Rate"
                                 }
                             },
-                            Labels = new Dictionary<string, ChartConfiguration>
+                            Labels = new Dictionary<string, ChartLabelConfiguration>
                             {
                                 [$"{Indicator(SubjectIds[SubjectName.AbsenceByCharacteristic], IndicatorName.Unauthorised_absence_rate)}_{FItem(SubjectIds[SubjectName.AbsenceByCharacteristic], FilterItemName.Characteristic__Total)}_{FItem(SubjectIds[SubjectName.AbsenceByCharacteristic], FilterItemName.School_Type__Total)}_____"]
-                                    = new ChartConfiguration
+                                    = new ChartLabelConfiguration
                                     {
                                         Label = "Unauthorised absence rate",
                                         Unit = "%",
                                         Colour = "#4763a5",
-                                        symbol = ChartSymbol.circle
+                                        Symbol = ChartLineSymbol.circle,
+                                        LineStyle = ChartLineStyle.solid
                                     },
                                 [$"{Indicator(SubjectIds[SubjectName.AbsenceByCharacteristic], IndicatorName.Overall_absence_rate)}_{FItem(SubjectIds[SubjectName.AbsenceByCharacteristic], FilterItemName.Characteristic__Total)}_{FItem(SubjectIds[SubjectName.AbsenceByCharacteristic], FilterItemName.School_Type__Total)}_____"]
-                                    = new ChartConfiguration
+                                    = new ChartLabelConfiguration
                                     {
                                         Label = "Overall absence rate",
                                         Unit = "%",
                                         Colour = "#f5a450",
-                                        symbol = ChartSymbol.cross
+                                        Symbol = ChartLineSymbol.cross,
+                                        LineStyle = ChartLineStyle.solid
                                     },
                                 [$"{Indicator(SubjectIds[SubjectName.AbsenceByCharacteristic], IndicatorName.Authorised_absence_rate)}_{FItem(SubjectIds[SubjectName.AbsenceByCharacteristic], FilterItemName.Characteristic__Total)}_{FItem(SubjectIds[SubjectName.AbsenceByCharacteristic], FilterItemName.School_Type__Total)}_____"]
-                                    = new ChartConfiguration
+                                    = new ChartLabelConfiguration
                                     {
                                         Label = "Authorised absence rate",
                                         Unit = "%",
                                         Colour = "#005ea5",
-                                        symbol = ChartSymbol.diamond
+                                        Symbol = ChartLineSymbol.diamond,
+                                        LineStyle = ChartLineStyle.solid
                                     }
                             },
-                            Legend = ChartLegend.top
+                            Legend = ChartLegendPosition.top
                         }
                     }
                 }

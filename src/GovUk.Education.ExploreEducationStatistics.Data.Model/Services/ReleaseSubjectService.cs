@@ -1,3 +1,4 @@
+#nullable enable
 using System;
 using System.Linq;
 using System.Threading.Tasks;
@@ -51,10 +52,14 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Model.Services
 
             await DeleteReleaseSubjectIfExists(releaseSubject);
             await _footnoteService.DeleteAllFootnotesBySubject(releaseId, subjectId);
-            await DeleteSubjectIfOrphaned(releaseSubject.Subject, softDeleteOrphanedSubject);
+
+            if (releaseSubject?.Subject != null)
+            {
+                await DeleteSubjectIfOrphaned(releaseSubject.Subject, softDeleteOrphanedSubject);
+            }
         }
 
-        private async Task DeleteReleaseSubjectIfExists(ReleaseSubject releaseSubject)
+        private async Task DeleteReleaseSubjectIfExists(ReleaseSubject? releaseSubject)
         {
             if (releaseSubject != null)
             {
@@ -80,11 +85,14 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Model.Services
             }
             else
             {
+                // Manually detach subject from state tracking to stop EF from
+                // performing cascading deletes of child relationships in the wrong order.
+                // By detaching it, we just let the database handle the cascading delete instead.
+                // This is more efficient (fewer delete queries) and works correctly.
+                _statisticsDbContext.Entry(subject).State = EntityState.Detached;
+
                 // N.B. This delete will be slow if there are a large number of observations but this is only
                 // executed by the tests when the topic is torn down so ensure files used are < 1000 rows.
-                var observations = _statisticsDbContext.Observation
-                    .Where(o => o.SubjectId == subject.Id);
-                _statisticsDbContext.Observation.RemoveRange(observations);
                 _statisticsDbContext.Subject.Remove(subject);
             }
 
@@ -93,8 +101,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Model.Services
 
         private bool IsSubjectOrphaned(Subject subject)
         {
-            return subject != null
-                   && _statisticsDbContext.ReleaseSubject.Count(rs => rs.SubjectId == subject.Id) == 0;
+            return _statisticsDbContext.ReleaseSubject.Count(rs => rs.SubjectId == subject.Id) == 0;
         }
     }
 }

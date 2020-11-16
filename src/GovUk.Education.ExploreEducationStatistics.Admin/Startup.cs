@@ -6,6 +6,7 @@ using Azure.Storage.Blobs;
 using GovUk.Education.ExploreEducationStatistics.Admin.Areas.Identity.Data;
 using GovUk.Education.ExploreEducationStatistics.Admin.Mappings;
 using GovUk.Education.ExploreEducationStatistics.Admin.Mappings.Interfaces;
+using GovUk.Education.ExploreEducationStatistics.Admin.Migrations.Custom;
 using GovUk.Education.ExploreEducationStatistics.Admin.Models;
 using GovUk.Education.ExploreEducationStatistics.Admin.Security;
 using GovUk.Education.ExploreEducationStatistics.Admin.Services;
@@ -468,7 +469,17 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin
                 {
                     context.Database.SetCommandTimeout(int.MaxValue);
                     context.Database.Migrate();
+
+                    ApplyCustomMigrations(new EES1598RemoveChartLabelsField(context));
                 }
+            }
+        }
+
+        private static void ApplyCustomMigrations(params ICustomMigration[] migrations)
+        {
+            foreach (var migration in migrations)
+            {
+                migration.Apply();
             }
         }
     }

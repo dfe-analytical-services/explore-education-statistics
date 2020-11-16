@@ -6,7 +6,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Common.Model.Chart
 {
     [SuppressMessage("ReSharper", "InconsistentNaming")]
     [JsonConverter(typeof(StringEnumConverter))]
-    public enum ChartLegend
+    public enum ChartLegendPosition
     {
         none,
         bottom,
