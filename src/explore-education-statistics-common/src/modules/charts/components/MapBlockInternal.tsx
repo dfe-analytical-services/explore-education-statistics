@@ -372,6 +372,7 @@ export const MapBlockInternal = ({
                 `${dataSetConfig.config.label}: ${formatPretty(
                   dataSet.value,
                   dataSetConfig.dataSet.indicator.unit,
+                  dataSetConfig.dataSet.indicator.decimalPlaces,
                 )}` +
                 `</li>`
               );
@@ -539,6 +540,7 @@ export const MapBlockInternal = ({
                         value={formatPretty(
                           dataSet.value,
                           expandedDataSet.indicator.unit,
+                          expandedDataSet.indicator.decimalPlaces,
                         )}
                       />
                     </KeyStatColumn>

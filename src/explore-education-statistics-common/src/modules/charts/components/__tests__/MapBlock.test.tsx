@@ -7,23 +7,25 @@ import MapBlock, {
 } from '@common/modules/charts/components/MapBlock';
 import mapFullTable from '@common/modules/table-tool/utils/mapFullTable';
 import { within } from '@testing-library/dom';
-import { fireEvent, render, screen, waitFor } from '@testing-library/react';
+import { render, screen, waitFor } from '@testing-library/react';
+import produce from 'immer';
 import React from 'react';
+import userEvent from '@testing-library/user-event';
 
 describe('MapBlock', () => {
-  const fullTable = mapFullTable(testMapTableData);
-  const props: MapBlockProps = {
+  const testFullTable = mapFullTable(testMapTableData);
+  const testBlockProps: MapBlockProps = {
     ...testMapConfiguration,
     id: 'testMap',
     axes: testMapConfiguration.axes as MapBlockProps['axes'],
-    meta: fullTable.subjectMeta,
-    data: fullTable.results,
+    meta: testFullTable.subjectMeta,
+    data: testFullTable.results,
     height: 600,
     width: 900,
   };
 
   test('renders legends and polygons correctly', async () => {
-    const { container } = render(<MapBlock {...props} />);
+    const { container } = render(<MapBlock {...testBlockProps} />);
 
     await waitFor(() => {
       const paths = container.querySelectorAll<HTMLElement>(
@@ -42,6 +44,7 @@ describe('MapBlock', () => {
 
     const legendItems = screen.getAllByTestId('mapBlock-legend-item');
 
+    expect(legendItems).toHaveLength(5);
     expect(legendItems[0]).toHaveTextContent('3% to 3.2%');
     expect(legendItems[1]).toHaveTextContent('3.2% to 3.4%');
     expect(legendItems[2]).toHaveTextContent('3.4% to 3.6%');
@@ -50,6 +53,7 @@ describe('MapBlock', () => {
 
     const legendColours = screen.getAllByTestId('mapBlock-legend-colour');
 
+    expect(legendColours).toHaveLength(5);
     expect(legendColours[0].style.backgroundColor).toBe('rgb(134, 188, 255)');
     expect(legendColours[1].style.backgroundColor).toBe('rgb(113, 158, 255)');
     expect(legendColours[2].style.backgroundColor).toBe('rgb(92, 128, 214)');
@@ -57,8 +61,38 @@ describe('MapBlock', () => {
     expect(legendColours[4].style.backgroundColor).toBe('rgb(49, 69, 115)');
   });
 
+  test('renders legends correctly with custom decimal places', async () => {
+    const fullTable = mapFullTable(
+      produce(testMapTableData, draft => {
+        draft.results[0].measures['authorised-absence-rate'] = '3.5123';
+        draft.results[1].measures['authorised-absence-rate'] = '3.012';
+        draft.results[2].measures['authorised-absence-rate'] = '4.009';
+        draft.subjectMeta.indicators[0].decimalPlaces = 2;
+      }),
+    );
+
+    render(
+      <MapBlock
+        {...testBlockProps}
+        meta={fullTable.subjectMeta}
+        data={fullTable.results}
+      />,
+    );
+
+    await waitFor(() => {
+      const legendItems = screen.getAllByTestId('mapBlock-legend-item');
+
+      expect(legendItems).toHaveLength(5);
+      expect(legendItems[0]).toHaveTextContent('3.01% to 3.21%');
+      expect(legendItems[1]).toHaveTextContent('3.21% to 3.41%');
+      expect(legendItems[2]).toHaveTextContent('3.41% to 3.61%');
+      expect(legendItems[3]).toHaveTextContent('3.61% to 3.81%');
+      expect(legendItems[4]).toHaveTextContent('3.81% to 4.01%');
+    });
+  });
+
   test('includes all data sets in select', async () => {
-    render(<MapBlock {...props} />);
+    render(<MapBlock {...testBlockProps} />);
 
     await waitFor(() => {
       const select = screen.getByLabelText('1. Select data to view');
@@ -76,7 +110,7 @@ describe('MapBlock', () => {
   });
 
   test('includes all locations in select', async () => {
-    render(<MapBlock {...props} />);
+    render(<MapBlock {...testBlockProps} />);
 
     await waitFor(() => {
       const select = screen.getByLabelText('2. Select a location');
@@ -92,7 +126,7 @@ describe('MapBlock', () => {
   });
 
   test('changing selected data set changes legends and polygons', async () => {
-    const { container } = render(<MapBlock {...props} />);
+    const { container } = render(<MapBlock {...testBlockProps} />);
 
     await waitFor(() => {
       const select = screen.getByLabelText('1. Select data to view');
@@ -101,11 +135,7 @@ describe('MapBlock', () => {
         'Overall absence rate (2016/17)',
       );
 
-      fireEvent.change(select, {
-        target: {
-          value: select.children[1].getAttribute('value'),
-        },
-      });
+      userEvent.selectOptions(select, select.children[1] as HTMLElement);
 
       const paths = container.querySelectorAll<HTMLElement>(
         '.leaflet-container svg path',
@@ -138,7 +168,7 @@ describe('MapBlock', () => {
   });
 
   test('changing selected location focuses the correct polygon', async () => {
-    const { container } = render(<MapBlock {...props} />);
+    const { container } = render(<MapBlock {...testBlockProps} />);
 
     await waitFor(() => {
       expect(screen.getByLabelText('2. Select a location')).toBeInTheDocument();
@@ -148,11 +178,7 @@ describe('MapBlock', () => {
 
     expect(select.children[1]).toHaveTextContent('Leeds');
 
-    fireEvent.change(screen.getByLabelText('2. Select a location'), {
-      target: {
-        value: select.children[1].getAttribute('value'),
-      },
-    });
+    userEvent.selectOptions(select, select.children[1] as HTMLElement);
 
     const paths = container.querySelectorAll<HTMLElement>(
       '.leaflet-container svg path',
@@ -167,8 +193,8 @@ describe('MapBlock', () => {
     expect(paths[3]).toHaveClass('selected');
   });
 
-  test('changing selected location shows its indicator tiles', async () => {
-    render(<MapBlock {...props} />);
+  test('changing selected location renders its indicator tiles', async () => {
+    render(<MapBlock {...testBlockProps} />);
 
     await waitFor(() => {
       expect(screen.getByLabelText('2. Select a location')).toBeInTheDocument();
@@ -176,13 +202,7 @@ describe('MapBlock', () => {
 
     const select = screen.getByLabelText('2. Select a location');
 
-    expect(select.children[1]).toHaveTextContent('Leeds');
-
-    fireEvent.change(select, {
-      target: {
-        value: select.children[1].getAttribute('value'),
-      },
-    });
+    userEvent.selectOptions(select, select.children[1] as HTMLElement);
 
     const indicators = screen.getAllByTestId('mapBlock-indicator');
 
@@ -204,6 +224,61 @@ describe('MapBlock', () => {
     );
     expect(tile2.getByTestId('mapBlock-indicatorTile-value')).toHaveTextContent(
       '4.8%',
+    );
+  });
+
+  test('renders location indicator tiles correctly with custom decimal places', async () => {
+    const fullTable = mapFullTable(
+      produce(testMapTableData, draft => {
+        draft.results[0].measures['authorised-absence-rate'] = '3.5123';
+        draft.results[1].measures['authorised-absence-rate'] = '3.012';
+        draft.results[2].measures['authorised-absence-rate'] = '4.009';
+        draft.subjectMeta.indicators[0].decimalPlaces = 2;
+      }),
+    );
+
+    render(
+      <MapBlock
+        {...testBlockProps}
+        meta={fullTable.subjectMeta}
+        data={fullTable.results}
+      />,
+    );
+
+    await waitFor(() => {
+      expect(screen.getByLabelText('2. Select a location')).toBeInTheDocument();
+    });
+
+    const select = screen.getByLabelText('2. Select a location');
+
+    userEvent.selectOptions(select, select.children[1] as HTMLElement);
+
+    const tile1 = within(screen.getAllByTestId('mapBlock-indicator')[0]);
+    expect(tile1.getByTestId('mapBlock-indicatorTile-title')).toHaveTextContent(
+      'Authorised absence rate (2016/17)',
+    );
+    expect(tile1.getByTestId('mapBlock-indicatorTile-value')).toHaveTextContent(
+      '3.51%',
+    );
+
+    userEvent.selectOptions(select, select.children[2] as HTMLElement);
+
+    const tile2 = within(screen.getAllByTestId('mapBlock-indicator')[0]);
+    expect(tile2.getByTestId('mapBlock-indicatorTile-title')).toHaveTextContent(
+      'Authorised absence rate (2016/17)',
+    );
+    expect(tile2.getByTestId('mapBlock-indicatorTile-value')).toHaveTextContent(
+      '3.01%',
+    );
+
+    userEvent.selectOptions(select, select.children[3] as HTMLElement);
+
+    const tile3 = within(screen.getAllByTestId('mapBlock-indicator')[0]);
+    expect(tile3.getByTestId('mapBlock-indicatorTile-title')).toHaveTextContent(
+      'Authorised absence rate (2016/17)',
+    );
+    expect(tile3.getByTestId('mapBlock-indicatorTile-value')).toHaveTextContent(
+      '4.01%',
     );
   });
 });
