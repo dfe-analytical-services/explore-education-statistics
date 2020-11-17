@@ -129,8 +129,6 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Processor.Functions
         {
             if (message.ArchiveFileName != "")
             {
-                logger.LogInformation($"Unpacking archive for {message.DataFileName}");
-
                 var status =
                     await _importStatusService.GetImportStatus(message.Release.Id, message.OrigDataFileName);
 
@@ -140,6 +138,8 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Processor.Functions
                     return;
                 }
                 
+                logger.LogInformation($"Unpacking archive for {message.DataFileName}");
+
                 await _importStatusService.UpdateStatus(message.Release.Id,
                     message.DataFileName,
                     IStatus.PROCESSING_ARCHIVE_FILE);
@@ -154,8 +154,6 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Processor.Functions
             ExecutionContext executionContext,
             SubjectData subjectData)
         {
-            logger.LogInformation($"Processing Stage 1 for {message.DataFileName}");
-
             var status =
                 await _importStatusService.GetImportStatus(message.Release.Id, message.OrigDataFileName);
 
@@ -165,6 +163,8 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Processor.Functions
                 return;
             }
             
+            logger.LogInformation($"Processing Stage 1 for {message.DataFileName}");
+
             await _importStatusService.UpdateStatus(message.Release.Id, message.DataFileName, IStatus.STAGE_1);
 
             await _validatorService.Validate(message.Release.Id, subjectData, executionContext, message)
@@ -190,8 +190,6 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Processor.Functions
             ILogger logger,
             SubjectData subjectData)
         {
-            logger.LogInformation($"Processing Stage 2 for {message.DataFileName}");
-
             var status =
                 await _importStatusService.GetImportStatus(message.Release.Id, message.OrigDataFileName);
 
@@ -200,6 +198,8 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Processor.Functions
                 logger.LogInformation($"Stage 2 already completed for {message.DataFileName} - skipping");
                 return;
             }
+
+            logger.LogInformation($"Processing Stage 2 for {message.DataFileName}");
 
             await _importStatusService.UpdateStatus(message.Release.Id,
                 message.OrigDataFileName,
@@ -216,8 +216,6 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Processor.Functions
             ILogger logger,
             SubjectData subjectData)
         {
-            logger.LogInformation($"Processing Stage 3 for {message.DataFileName}");
-
             var status =
                 await _importStatusService.GetImportStatus(message.Release.Id, message.OrigDataFileName);
 
@@ -227,18 +225,16 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Processor.Functions
                 return;
             }
 
+            logger.LogInformation($"Processing Stage 3 for {message.DataFileName}");
+
             await _splitFileService.SplitDataFile(message, subjectData);
         }
-        
-        
 
         private async Task ProcessStage4Messages(
             ImportMessage message, 
             ILogger logger,
             ICollector<ImportMessage> collector)
         {
-            logger.LogInformation($"Processing Stage 4 message creation for {message.DataFileName}");
-
             var status =
                 await _importStatusService.GetImportStatus(message.Release.Id, message.OrigDataFileName);
 
@@ -248,7 +244,9 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Processor.Functions
                 return;
             }
 
-            await _splitFileService.CreateDataFileProcessingMessages(collector, message);
+            logger.LogInformation($"Processing Stage 4 message creation for {message.DataFileName}");
+
+            await _splitFileService.AddBatchDataFileMessages(collector, message);
         }
         
         private async Task ProcessSubject(

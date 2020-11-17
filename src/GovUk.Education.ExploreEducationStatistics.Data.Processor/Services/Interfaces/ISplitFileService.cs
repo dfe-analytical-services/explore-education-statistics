@@ -11,7 +11,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Processor.Services.Int
             ImportMessage message,
             SubjectData subjectData);
 
-        Task CreateDataFileProcessingMessages(
+        Task AddBatchDataFileMessages(
             ICollector<ImportMessage> collector, 
             ImportMessage message);
     }

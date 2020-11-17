@@ -70,7 +70,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Processor.Services
             }
         }
 
-        public async Task CreateDataFileProcessingMessages(
+        public async Task AddBatchDataFileMessages(
             ICollector<ImportMessage> collector, 
             ImportMessage message)
         {
@@ -130,6 +130,10 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Processor.Services
                 .AsQueryable()
                 .Select(blobInfo => GetBatchNumberFromBatchFileName(blobInfo.FileName));
 
+            // TODO: EES-1608 - this flag keeps a track of whether any batch files have been generated to date.
+            // It is used in a legacy check to determine whether or not to generate a "no rows" batch file.
+            // EES-1608 will investigate what the circumstances are that could lead to a "no rows" batch file
+            // situation, and whether this check can actually be entirely removed or not.
             var batchFilesExist = existingBatchFileNumbers.Any();
             
             foreach (var batch in batches)
