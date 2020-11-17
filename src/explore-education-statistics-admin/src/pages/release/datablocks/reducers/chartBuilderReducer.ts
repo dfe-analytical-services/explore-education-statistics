@@ -10,7 +10,6 @@ import {
   chartDefinitions,
 } from '@common/modules/charts/types/chart';
 import { DataSetConfiguration } from '@common/modules/charts/types/dataSet';
-import getLabelDataSetConfigurations from '@common/modules/charts/util/getLabelDataSetConfigurations';
 import { Chart } from '@common/services/types/blocks';
 import { Dictionary } from '@common/types';
 import deepMerge from 'deepmerge';
@@ -153,16 +152,6 @@ const getInitialState = (initialConfiguration?: Chart): ChartBuilderState => {
       );
     },
   );
-
-  if (
-    axes.major?.dataSets?.some(dataSet => !dataSet.config) &&
-    initialConfiguration.labels
-  ) {
-    axes.major.dataSets = getLabelDataSetConfigurations(
-      initialConfiguration.labels,
-      axes.major.dataSets,
-    );
-  }
 
   const forms: ChartBuilderState['forms'] = {
     ...initialState.forms,

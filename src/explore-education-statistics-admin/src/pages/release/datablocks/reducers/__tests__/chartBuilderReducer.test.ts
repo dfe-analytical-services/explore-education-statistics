@@ -1118,55 +1118,5 @@ describe('chartBuilderReducer', () => {
         },
       });
     });
-
-    test('merges deprecated `labels` configurations into `axes.major.dataSets`', () => {
-      const initialConfiguration: Chart = {
-        legend: 'top',
-        labels: {
-          'indicator-1_filter-1_____': {
-            value: 'indicator-1_filter-1_____',
-            label: 'Test label 1',
-          },
-        },
-        axes: {
-          major: {
-            type: 'major',
-            groupBy: 'timePeriod',
-            dataSets: [
-              {
-                indicator: 'indicator-1',
-                filters: ['filter-1'],
-              },
-            ],
-            referenceLines: [],
-            visible: true,
-          },
-          minor: {
-            type: 'minor',
-            dataSets: [],
-            referenceLines: [],
-            visible: true,
-          },
-        },
-        type: 'line',
-        height: 300,
-        title: '',
-        alt: '',
-      };
-
-      const { result } = renderHook(() =>
-        useChartBuilderReducer(initialConfiguration),
-      );
-
-      expect(result.current.state.axes.major?.dataSets).toEqual([
-        {
-          indicator: 'indicator-1',
-          filters: ['filter-1'],
-          config: {
-            label: 'Test label 1',
-          },
-        },
-      ]);
-    });
   });
 });

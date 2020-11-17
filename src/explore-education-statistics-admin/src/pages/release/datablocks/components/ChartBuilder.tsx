@@ -189,7 +189,6 @@ const ChartBuilder = ({
       case 'infographic':
         return {
           ...baseProps,
-          labels: [],
           type: 'infographic',
           fileId: options.file ? options.file.name : options.fileId ?? '',
           getInfographic: options.file

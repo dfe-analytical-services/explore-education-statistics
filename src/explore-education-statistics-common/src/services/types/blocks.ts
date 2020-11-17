@@ -6,24 +6,10 @@ import {
 import {
   DataSetConfiguration,
   DataSetConfigurationOptions,
-  DeprecatedDataSetConfiguration,
 } from '@common/modules/charts/types/dataSet';
 import { UnmappedTableHeadersConfig } from '@common/services/permalinkService';
 import { TableDataQuery } from '@common/services/tableBuilderService';
-import { Dictionary, OmitStrict } from '@common/types';
-
-/**
- * We want to phase this out in favour of
- * defining data set configuration alongside
- * the data set itself.
- *
- * The current data structure is unwieldy
- * as we have to unnecessarily stitch labels
- * and their associated data set back together.
- *
- * @deprecated
- */
-export type DeprecatedChartLabels = Dictionary<DeprecatedDataSetConfiguration>;
+import { OmitStrict } from '@common/types';
 
 interface ChartAxisConfiguration
   extends OmitStrict<AxisConfiguration, 'dataSets'> {
@@ -43,7 +29,6 @@ type ChartAxesConfiguration = {
  * to our newer one that is being used by {@see ChartRendererProps}.
  */
 export type Chart = OmitStrict<ChartRendererProps, 'data' | 'meta' | 'axes'> & {
-  labels?: DeprecatedChartLabels;
   axes: ChartAxesConfiguration;
 };
 

@@ -40,21 +40,6 @@ export interface DataSetCategory {
   }>;
 }
 
-/**
- * We want to try and remove this in the future
- * in favour of {@see DataSetConfiguration}.
- *
- * @deprecated
- */
-export interface DeprecatedDataSetConfiguration {
-  label: string;
-  value: string;
-  colour?: string;
-  unit?: string;
-  symbol?: ChartSymbol;
-  lineStyle?: LineStyle;
-}
-
 export interface DataSetConfigurationOptions {
   label: string;
   colour?: string;
