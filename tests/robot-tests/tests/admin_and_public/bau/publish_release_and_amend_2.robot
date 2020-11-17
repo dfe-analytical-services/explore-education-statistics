@@ -10,8 +10,8 @@ Suite Teardown    user closes the browser
 *** Variables ***
 ${RELEASE_NAME}  Academic Year Q1 2020/21
 ${PUBLICATION_NAME}  UI tests - publish release and amend 2 %{RUN_IDENTIFIER}
-${SUBJECT_NAME}  seven filters
-${SECOND_SUBJECT}  dates subject
+${SUBJECT_NAME}  Seven filters
+${SECOND_SUBJECT}  Dates subject
 ${METHODOLOGY_NAME}  UI tests - publish release and amend 2 %{RUN_IDENTIFIER}
 ${METHODOLOGY_TITLE}  ${METHODOLOGY_NAME} - Title
 *** Test Cases ***
@@ -198,11 +198,6 @@ Select color filter
     user opens details dropdown  Colour
     user clicks select all for category  Colour
 
-Select ethnicity group filter
-    [Tags]  HappyPath
-    user opens details dropdown  Ethnicity group
-    user clicks select all for category  Ethnicity group
-
 Select Provision filter
     [Tags]  HappyPath
     user opens details dropdown  Provision
@@ -211,17 +206,12 @@ Select Provision filter
 Select Number of years after achievement of learning aim filter
     [Tags]  HappyPath
     user opens details dropdown  Number of years after achievement of learning aim
-    user clicks select all for category  Number of years after achievement of learning aim
+    user clicks checkbox  1 year after study
 
 Select Gender filter
     [Tags]  HappyPath
     user opens details dropdown  Gender
     user clicks select all for category  Gender
-
-Select Cheese filter
-    [Tags]  HappyPath
-    user opens details dropdown  Cheese
-    user clicks select all for category  Cheese
 
 Click submit button
     [Tags]  HappyPath
@@ -233,70 +223,15 @@ Wait until table is generated
 
 Validate results table column headings
     [Tags]  HappyPath
-    # 1 YEAR AFTER STUDY
-    user checks results table row heading contains  2  1   British
-    user checks results table row heading contains  3  1   Mixed/Multiple ethnic group
-    user checks results table row heading contains  4  1   Not Known/Not Provided
-    user checks results table row heading contains  5  1   Other Ethnic Group
-    user checks results table row heading contains  6  1   Total
-    user checks results table row heading contains  7  1   White
-    # 2 YEAR AFTER STUDY
-    user checks results table row heading contains  8  2   Asian/Asian British
-    user checks results table row heading contains  9  1   Black/African/Caribbean/Black British
-    user checks results table row heading contains  10  1  Mixed/Multiple ethnic group
-    user checks results table row heading contains  11  1  Not Known/Not Provided
-    user checks results table row heading contains  11  1  Not Known/Not Provided
-    user checks results table row heading contains  12  1  Other Ethnic Group
-    user checks results table row heading contains  13  1  Total
-    user checks results table row heading contains  14  1  White
-    # 3 YEAR AFTER STUDY
-    user checks results table row heading contains  15  2  Asian/Asian British
-    user checks results table row heading contains  16  1  Black/African/Caribbean/Black British
-    user checks results table row heading contains  17  1  Mixed/Multiple ethnic group
-    user checks results table row heading contains  18  1  Not Known/Not Provided
-    user checks results table row heading contains  19  1  Other Ethnic Group
-    user checks results table row heading contains  20  1  Total
-    user checks results table row heading contains  21  1  White
-    # 4 YEAR AFTER STUDY
-    user checks results table row heading contains  22  2  Asian/Asian British
-    user checks results table row heading contains  23  1  Black/African/Caribbean/Black British
-    user checks results table row heading contains  24  1  Mixed/Multiple ethnic group
-    user checks results table row heading contains  25  1  Not Known/Not Provided
-    user checks results table row heading contains  26  1  Other Ethnic Group
-    user checks results table row heading contains  27  1  Total
-    user checks results table row heading contains  28  1  White
-    # 5 YEAR AFTER STUDY
-    user checks results table row heading contains  29  2  Asian/Asian British
-    user checks results table row heading contains  30  1  Black/African/Caribbean/Black British
-    user checks results table row heading contains  31  1  Mixed/Multiple ethnic group
-    user checks results table row heading contains  32  1  Not Known/Not Provided
-    user checks results table row heading contains  33  1  Other Ethnic Group
-    user checks results table row heading contains  34  1  Total
-    user checks results table row heading contains  35  1  White
+    user checks results table row heading contains  1  1  Female
+    user checks results table row heading contains  2  1  Male
+    user checks results table row heading contains  3  1  Total
 
 Validate table cells
     [Tags]  HappyPath
-    # BLUE
-    user checks results table cell contains  1   1  n/a
-    user checks results table cell contains  2   1  n/a
-    user checks results table cell contains  3   1  n/a
-    user checks results table cell contains  4   1  n/a
-    user checks results table cell contains  5   1  n/a
-    user checks results table cell contains  6   1  n/a
-    user checks results table cell contains  7   1  n/a
-    user checks results table cell contains  8   1  n/a
-    user checks results table cell contains  9   1  n/a
-    user checks results table cell contains  10  1  n/a
-    #ORANGE
-    user checks results table cell contains  1  4   1
-    user checks results table cell contains  2  4   1
-    user checks results table cell contains  3  4   9
-    user checks results table cell contains  4  4   1
-    user checks results table cell contains  5  4   7
-    user checks results table cell contains  6  4   10
-    user checks results table cell contains  7  4   10
-    user checks results table cell contains  8  4   3
-    user checks results table cell contains  9  4   4
+    user checks results table cell contains  1   1  0
+    user checks results table cell contains  2   1  2
+    user checks results table cell contains  3   1  2
 
 Generate the permalink
     [Tags]  HappyPath
@@ -326,7 +261,6 @@ Edit methodology
     user clicks link  Manage content
     user clicks button  ${METHODOLOGY_NAME}
     user clicks button  Add text block
-    user waits until page contains button  Edit block
     user clicks button  Edit block
     user presses keys  New & Updated content -
     user clicks button  Save
@@ -407,72 +341,12 @@ Go to permalink page & check for error element to be present
 
 Check the table has the same results as original table
     [Tags]  HappyPath
-    # 1 YEAR AFTER STUDY
-    user checks results table row heading contains  2  1   British
-    user checks results table row heading contains  3  1   Mixed/Multiple ethnic group
-    user checks results table row heading contains  4  1   Not Known/Not Provided
-    user checks results table row heading contains  5  1   Other Ethnic Group
-    user checks results table row heading contains  6  1   Total
-    user checks results table row heading contains  7  1   White
-
-    # 2 YEAR AFTER STUDY
-    user checks results table row heading contains  8  2   Asian/Asian British
-    user checks results table row heading contains  9  1   Black/African/Caribbean/Black British
-    user checks results table row heading contains  10  1  Mixed/Multiple ethnic group
-    user checks results table row heading contains  11  1  Not Known/Not Provided
-    user checks results table row heading contains  12  1  Other Ethnic Group
-    user checks results table row heading contains  13  1  Total
-    user checks results table row heading contains  14  1  White
-
-    # 3 YEAR AFTER STUDY
-    user checks results table row heading contains  15  2  Asian/Asian British
-    user checks results table row heading contains  16  1  Black/African/Caribbean/Black British
-    user checks results table row heading contains  17  1  Mixed/Multiple ethnic group
-    user checks results table row heading contains  18  1  Not Known/Not Provided
-    user checks results table row heading contains  19  1  Other Ethnic Group
-    user checks results table row heading contains  20  1  Total
-    user checks results table row heading contains  21  1  White
-
-    # 4 YEAR AFTER STUDY
-    user checks results table row heading contains  22  2  Asian/Asian British
-    user checks results table row heading contains  23  1  Black/African/Caribbean/Black British
-    user checks results table row heading contains  24  1  Mixed/Multiple ethnic group
-    user checks results table row heading contains  25  1  Not Known/Not Provided
-    user checks results table row heading contains  26  1  Other Ethnic Group
-    user checks results table row heading contains  27  1  Total
-    user checks results table row heading contains  28  1  White
-
-    # 5 YEAR AFTER STUDY
-    user checks results table row heading contains  29  2  Asian/Asian British
-    user checks results table row heading contains  30  1  Black/African/Caribbean/Black British
-    user checks results table row heading contains  31  1  Mixed/Multiple ethnic group
-    user checks results table row heading contains  32  1  Not Known/Not Provided
-    user checks results table row heading contains  33  1  Other Ethnic Group
-    user checks results table row heading contains  34  1  Total
-    user checks results table row heading contains  35  1  White
-
-    # BLUE
-    user checks results table cell contains  1   1  n/a
-    user checks results table cell contains  2   1  n/a
-    user checks results table cell contains  3   1  n/a
-    user checks results table cell contains  4   1  n/a
-    user checks results table cell contains  5   1  n/a
-    user checks results table cell contains  6   1  n/a
-    user checks results table cell contains  7   1  n/a
-    user checks results table cell contains  8   1  n/a
-    user checks results table cell contains  9   1  n/a
-    user checks results table cell contains  10  1  n/a
-
-    #ORANGE
-    user checks results table cell contains  1  4   1
-    user checks results table cell contains  2  4   1
-    user checks results table cell contains  3  4   9
-    user checks results table cell contains  4  4   1
-    user checks results table cell contains  5  4   7
-    user checks results table cell contains  6  4   10
-    user checks results table cell contains  7  4   10
-    user checks results table cell contains  8  4   3
-    user checks results table cell contains  9  4   4
+    user checks results table row heading contains  1  1  Female
+    user checks results table row heading contains  2  1  Male
+    user checks results table row heading contains  3  1  Total
+    user checks results table cell contains  1   1  0
+    user checks results table cell contains  2   1  2
+    user checks results table cell contains  3   1  2
 
 Check amended release doesn't contain deleted subject
     [Tags]  HappyPath
