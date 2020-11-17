@@ -83,10 +83,10 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Processor.Services
 
         public async Task<int> GetNumBatchesRemaining(string releaseId, string origDataFileName)
         {
-            return (await GetBatchesRemaining(releaseId, origDataFileName)).Count();
+            return (await GetBatchFilesForDataFile(releaseId, origDataFileName)).Count();
         }
 
-        public async Task<IEnumerable<BlobInfo>> GetBatchesRemaining(string releaseId, string origDataFileName)
+        public async Task<IEnumerable<BlobInfo>> GetBatchFilesForDataFile(string releaseId, string origDataFileName)
         {
             var blobs = await _blobStorageService.ListBlobs(
                 PrivateFilesContainerName,

@@ -24,7 +24,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Common.Services
         COMPLETE,
         FAILED,
         NOT_FOUND
-    };
+    }
 
     public class ImportStatusService : IImportStatusService
     {
