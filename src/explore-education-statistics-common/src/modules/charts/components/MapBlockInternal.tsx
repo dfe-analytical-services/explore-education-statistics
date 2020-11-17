@@ -65,11 +65,13 @@ interface MapDataSetCategory extends DataSetCategory {
 function calculateScaledColour({
   scale,
   colour,
+  groupSize,
 }: {
   scale: number;
   colour: string;
+  groupSize: number;
 }) {
-  return lighten(colour, 90 - (scale / 0.2) * 30);
+  return lighten(colour, 90 - (scale / groupSize) * 30);
 }
 
 function generateGeometryAndLegend(
@@ -98,15 +100,22 @@ function generateGeometryAndLegend(
     decimalPlaces,
   } = selectedDataSetConfiguration.dataSet.indicator;
 
+  const groups = 5;
+  const groupSize = 1 / groups;
+
   const legend: LegendEntry[] =
     range > 0
-      ? times(5, idx => {
-          const i = idx / 4;
+      ? times(groups, idx => {
+          const i = idx / groups;
 
           return {
-            colour: calculateScaledColour({ scale: i, colour }),
+            colour: calculateScaledColour({ scale: i, colour, groupSize }),
             min: formatPretty(min + i * range, unit, decimalPlaces),
-            max: formatPretty(min + (i + 0.25) * range, unit, decimalPlaces),
+            max: formatPretty(
+              min + (i + groupSize) * range,
+              unit,
+              decimalPlaces,
+            ),
           };
         })
       : [
@@ -129,6 +138,7 @@ function generateGeometryAndLegend(
               // Avoid divisions by 0
               scale: range > 0 ? (data - min) / range : 0,
               colour,
+              groupSize,
             })
           : '#fff';
 
