@@ -87,7 +87,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Processor.Services
         {
             _logger.LogInformation($"Validating: {message.OrigDataFileName}");
 
-            await _importStatusService.UpdateStatus(message.Release.Id, message.DataFileName, IStatus.STAGE_1);
+            await _importStatusService.UpdateStatus(message.Release.Id, message.OrigDataFileName, IStatus.STAGE_1);
 
             return await ValidateCsvFile(subjectData.DataBlob, false)
                 .OnSuccessDo(async () => await ValidateCsvFile(subjectData.MetaBlob, true))

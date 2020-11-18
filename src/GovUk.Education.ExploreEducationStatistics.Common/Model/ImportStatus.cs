@@ -44,7 +44,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Common.Model
             return IsAfterStage(IStatus.STAGE_4);
         }
         
-        private bool IsAfterStage(IStatus stage)
+        public bool IsAfterStage(IStatus stage)
         {
             return Status.CompareTo(stage) > 0;
         }

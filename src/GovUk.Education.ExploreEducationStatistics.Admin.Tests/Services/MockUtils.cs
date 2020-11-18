@@ -1,4 +1,5 @@
 using System;
+using System.Collections.Generic;
 using System.Linq;
 using GovUk.Education.ExploreEducationStatistics.Admin.Security;
 using GovUk.Education.ExploreEducationStatistics.Common.Model;
@@ -44,7 +45,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
             where TEntity : class
         {
             helper
-                .Setup(s => s.CheckEntityExists<TEntity>(id,
+                .Setup(s => s.CheckEntityExists(id,
                                 It.IsAny<Func<IQueryable<TEntity>, IQueryable<TEntity>>>()))
                 .ReturnsAsync(new Either<ActionResult, TEntity>(entity));
         }
@@ -55,7 +56,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
             where TEntity : class
         { 
             helper
-                .Setup(s => s.CheckEntityExists<TEntity>(It.IsAny<Guid>(),
+                .Setup(s => s.CheckEntityExists(It.IsAny<Guid>(),
                     It.IsAny<Func<IQueryable<TEntity>, IQueryable<TEntity>>>()))
                 .ReturnsAsync(new Either<ActionResult, TEntity>(Activator.CreateInstance<TEntity>()));
         }
@@ -73,6 +74,17 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
                 .ReturnsAsync(true);
 
             return userService;
+        }
+        
+        public static void VerifyAllMocks(params object[] mocks)
+        {
+            mocks
+                .ToList()
+                .ForEach(m =>
+                {
+                    m.GetType().GetMethod("VerifyAll", Type.EmptyTypes).Invoke(m, null);
+                    m.GetType().GetMethod("VerifyNoOtherCalls", Type.EmptyTypes).Invoke(m, null);
+                });
         }
     }
 }

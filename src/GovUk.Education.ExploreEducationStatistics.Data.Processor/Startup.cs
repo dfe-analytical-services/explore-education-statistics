@@ -54,6 +54,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Processor
                 .AddSingleton<IDataArchiveService, DataArchiveService>()
                 .AddSingleton<IFileTypeService, FileTypeService>()
                 .AddSingleton<IGuidGenerator, SequentialGuidGenerator>()
+                .AddSingleton<IProcessorService, ProcessorService>()
                 .BuildServiceProvider();
 
             ImportRecoveryHandler.CheckIncompleteImports(GetConfigurationValue(serviceProvider, "CoreStorage"));
