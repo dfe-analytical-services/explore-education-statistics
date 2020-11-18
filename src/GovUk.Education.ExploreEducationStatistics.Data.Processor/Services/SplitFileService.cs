@@ -53,7 +53,6 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Processor.Services
             ImportMessage message,
             SubjectData subjectData)
         {
-            await _importStatusService.UpdateStatus(message.Release.Id, message.OrigDataFileName, IStatus.STAGE_3);
             await using var dataFileStream = await _fileStorageService.StreamBlob(subjectData.DataBlob);
             
             var dataFileTable = DataTableUtils.CreateFromStream(dataFileStream);
