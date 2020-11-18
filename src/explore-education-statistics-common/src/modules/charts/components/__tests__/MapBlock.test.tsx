@@ -37,9 +37,9 @@ describe('MapBlock', () => {
       // UK polygon
       expect(paths[0]).toHaveAttribute('fill', '#3388ff');
       // Location polygons
-      expect(paths[1]).toHaveAttribute('fill', '#5171bd');
+      expect(paths[1]).toHaveAttribute('fill', '#5c80d6');
       expect(paths[2]).toHaveAttribute('fill', '#86bcff');
-      expect(paths[3]).toHaveAttribute('fill', '#1c2742');
+      expect(paths[3]).toHaveAttribute('fill', '#314573');
     });
 
     const legendItems = screen.getAllByTestId('mapBlock-legend-item');
@@ -145,9 +145,9 @@ describe('MapBlock', () => {
       // UK polygon
       expect(paths[0]).toHaveAttribute('fill', '#3388ff');
       // Location polygon
-      expect(paths[1]).toHaveAttribute('fill', '#fffa7a');
+      expect(paths[1]).toHaveAttribute('fill', '#ffff80');
       expect(paths[2]).toHaveAttribute('fill', '#ffff98');
-      expect(paths[3]).toHaveAttribute('fill', '#624120');
+      expect(paths[3]).toHaveAttribute('fill', '#ab7238');
     });
 
     const legendItems = screen.getAllByTestId('mapBlock-legend-item');

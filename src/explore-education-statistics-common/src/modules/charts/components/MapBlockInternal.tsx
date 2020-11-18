@@ -26,9 +26,11 @@ import generateHslColour from '@common/utils/colour/generateHslColour';
 import lighten from '@common/utils/colour/lighten';
 import formatPretty from '@common/utils/number/formatPretty';
 import getMinMax from '@common/utils/number/getMinMax';
+import { roundDownToNearest } from '@common/utils/number/roundNearest';
 import classNames from 'classnames';
 import { Feature, FeatureCollection, Geometry } from 'geojson';
 import { Layer, Path, PathOptions, Polyline } from 'leaflet';
+import clamp from 'lodash/clamp';
 import keyBy from 'lodash/keyBy';
 import orderBy from 'lodash/orderBy';
 import times from 'lodash/times';
@@ -83,6 +85,11 @@ function generateGeometryAndLegend(
 } {
   const selectedDataSetKey = selectedDataSetConfiguration.dataKey;
 
+  const {
+    unit,
+    decimalPlaces,
+  } = selectedDataSetConfiguration.dataSet.indicator;
+
   const { min = 0, max = 0 } = getMinMax(
     dataSetCategories
       .map(category => category.dataSets[selectedDataSetKey]?.value)
@@ -94,11 +101,6 @@ function generateGeometryAndLegend(
   const colour =
     selectedDataSetConfiguration.config.colour ??
     generateHslColour(selectedDataSetConfiguration.dataKey);
-
-  const {
-    unit,
-    decimalPlaces,
-  } = selectedDataSetConfiguration.dataSet.indicator;
 
   const groups = 5;
   const groupSize = 1 / groups;
@@ -126,20 +128,32 @@ function generateGeometryAndLegend(
           },
         ];
 
+  const lastGroupMin = (groups - 1) * groupSize;
+
   const geometry: FeatureCollection<Geometry, MapFeatureProperties> = {
     type: 'FeatureCollection',
     features: dataSetCategories.map(({ dataSets, filter, geoJson }) => {
       const data = dataSets?.[selectedDataSetKey]?.value;
 
+      // Create a scale for the colour. This goes from 0 to
+      // the last group's minimum e.g. 0.8 (when there are 5 groups).
+      // We don't actually want to scale all the way up to 1
+      // as this would create a colour that falls outside of
+      // the colours shown in the legend.
+      const scale =
+        // Avoid divisions by 0
+        range !== 0
+          ? clamp(
+              roundDownToNearest((data - min) / range, groupSize),
+              0,
+              lastGroupMin,
+            )
+          : 0;
+
       // Defaults to white if there is no data
       const scaledColour =
         typeof data !== 'undefined'
-          ? calculateScaledColour({
-              // Avoid divisions by 0
-              scale: range > 0 ? (data - min) / range : 0,
-              colour,
-              groupSize,
-            })
+          ? calculateScaledColour({ colour, groupSize, scale })
           : '#fff';
 
       return {
