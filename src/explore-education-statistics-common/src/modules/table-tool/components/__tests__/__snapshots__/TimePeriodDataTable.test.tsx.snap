@@ -921,7 +921,7 @@ exports[`TimePeriodDataTable renders table without indicators when there is only
       2.9%
     </td>
     <td class="govuk-table__cell--numeric">
-      3%
+      3.0%
     </td>
   </tr>
   <tr>
@@ -1027,7 +1027,7 @@ exports[`TimePeriodDataTable renders table without time period when there is onl
       3.3%
     </td>
     <td class="govuk-table__cell--numeric">
-      3%
+      3.0%
     </td>
   </tr>
   <tr>

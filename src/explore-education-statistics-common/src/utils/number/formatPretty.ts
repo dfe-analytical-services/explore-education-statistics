@@ -13,14 +13,13 @@
  * This also accepts strings and preserves their
  * decimal places, even if there are trailing zeros.
  */
-import countDecimals from '@common/utils/number/countDecimals';
-
 export default function formatPretty(
   value: string | number,
   unit?: string,
-  decimalPlaces = 2,
+  decimalPlaces?: number,
 ): string {
   let formattedValue;
+
   if (typeof value === 'string') {
     const numberValue = Number(value);
 
@@ -28,24 +27,17 @@ export default function formatPretty(
       return value;
     }
 
-    const decimals = countDecimals(numberValue);
-
-    if (decimals > 0) {
-      formattedValue = numberValue.toLocaleString('en-GB', {
-        maximumFractionDigits: decimalPlaces,
-        minimumFractionDigits:
-          decimals > decimalPlaces ? decimalPlaces : decimals,
-      });
-    } else {
-      formattedValue = Number(value).toLocaleString('en-GB', {
-        maximumFractionDigits: decimalPlaces,
-      });
-    }
+    formattedValue = numberValue.toLocaleString('en-GB', {
+      maximumFractionDigits: decimalPlaces,
+      minimumFractionDigits: decimalPlaces,
+    });
   } else {
     formattedValue = value.toLocaleString('en-GB', {
       maximumFractionDigits: decimalPlaces,
+      minimumFractionDigits: decimalPlaces,
     });
   }
+
   if (unit) {
     switch (unit) {
       case '£':
@@ -56,5 +48,6 @@ export default function formatPretty(
         return `${formattedValue}${unit}`;
     }
   }
+
   return formattedValue;
 }
