@@ -24,6 +24,7 @@ import {
 import { Dictionary } from '@common/types';
 import generateHslColour from '@common/utils/colour/generateHslColour';
 import lighten from '@common/utils/colour/lighten';
+import countDecimals from '@common/utils/number/countDecimals';
 import formatPretty from '@common/utils/number/formatPretty';
 import getMinMax from '@common/utils/number/getMinMax';
 import { roundDownToNearest } from '@common/utils/number/roundNearest';
@@ -105,14 +106,23 @@ function generateGeometryAndLegend(
   const groups = 5;
   const groupSize = 1 / groups;
 
+  // Calculate the increment between values by using
+  // decimal places expressed as a proportion of 1 e.g.
+  // 1 decimal place is 0.1, 2 decimal places is 0.01, etc.
+  const valueIncrement =
+    1 / 10 ** (decimalPlaces ?? countDecimals(range * groupSize));
+
   const legend: LegendEntry[] =
     range > 0
       ? times(groups, idx => {
           const i = idx / groups;
+          // Add an additional offset so that legend
+          // group min/max values don't overlap.
+          const minOffset = idx > 0 ? valueIncrement : 0;
 
           return {
             colour: calculateScaledColour({ scale: i, colour, groupSize }),
-            min: formatPretty(min + i * range, unit, decimalPlaces),
+            min: formatPretty(min + i * range + minOffset, unit, decimalPlaces),
             max: formatPretty(
               min + (i + groupSize) * range,
               unit,

@@ -46,10 +46,10 @@ describe('MapBlock', () => {
 
     expect(legendItems).toHaveLength(5);
     expect(legendItems[0]).toHaveTextContent('3% to 3.2%');
-    expect(legendItems[1]).toHaveTextContent('3.2% to 3.4%');
-    expect(legendItems[2]).toHaveTextContent('3.4% to 3.6%');
-    expect(legendItems[3]).toHaveTextContent('3.6% to 3.8%');
-    expect(legendItems[4]).toHaveTextContent('3.8% to 4%');
+    expect(legendItems[1]).toHaveTextContent('3.3% to 3.4%');
+    expect(legendItems[2]).toHaveTextContent('3.5% to 3.6%');
+    expect(legendItems[3]).toHaveTextContent('3.7% to 3.8%');
+    expect(legendItems[4]).toHaveTextContent('3.9% to 4%');
 
     const legendColours = screen.getAllByTestId('mapBlock-legend-colour');
 
@@ -84,10 +84,10 @@ describe('MapBlock', () => {
 
       expect(legendItems).toHaveLength(5);
       expect(legendItems[0]).toHaveTextContent('3.01% to 3.21%');
-      expect(legendItems[1]).toHaveTextContent('3.21% to 3.41%');
-      expect(legendItems[2]).toHaveTextContent('3.41% to 3.61%');
-      expect(legendItems[3]).toHaveTextContent('3.61% to 3.81%');
-      expect(legendItems[4]).toHaveTextContent('3.81% to 4.01%');
+      expect(legendItems[1]).toHaveTextContent('3.22% to 3.41%');
+      expect(legendItems[2]).toHaveTextContent('3.42% to 3.61%');
+      expect(legendItems[3]).toHaveTextContent('3.62% to 3.81%');
+      expect(legendItems[4]).toHaveTextContent('3.82% to 4.01%');
     });
   });
 
