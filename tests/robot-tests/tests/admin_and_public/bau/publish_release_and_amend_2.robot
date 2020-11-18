@@ -33,6 +33,9 @@ Add methodology content
     user clicks link  Manage content
     user clicks button  Add new section
     user clicks button  New section
+     # NOTE: scroll down is here to avoid selenium clicking the
+    # set page view text box on the methodology page
+    user scrolls down  400
     user clicks button  Add text block
     user clicks button  Edit block
     user presses keys  Adding Methodology content
@@ -198,6 +201,11 @@ Select color filter
     user opens details dropdown  Colour
     user clicks select all for category  Colour
 
+Select ethnicity group filter
+    [Tags]  HappyPath
+    user opens details dropdown  Ethnicity group
+    user clicks select all for category  Ethnicity group
+
 Select Provision filter
     [Tags]  HappyPath
     user opens details dropdown  Provision
@@ -206,12 +214,7 @@ Select Provision filter
 Select Number of years after achievement of learning aim filter
     [Tags]  HappyPath
     user opens details dropdown  Number of years after achievement of learning aim
-    user clicks checkbox  1 year after study
-
-Select Gender filter
-    [Tags]  HappyPath
-    user opens details dropdown  Gender
-    user clicks select all for category  Gender
+    user clicks select all for category  Number of years after achievement of learning aim
 
 Click submit button
     [Tags]  HappyPath
@@ -223,15 +226,64 @@ Wait until table is generated
 
 Validate results table column headings
     [Tags]  HappyPath
-    user checks results table row heading contains  1  1  Female
-    user checks results table row heading contains  2  1  Male
-    user checks results table row heading contains  3  1  Total
+    user checks results table row heading contains  1  1  Asian/Asian British
+    user checks results table row heading contains  2  1  Black/African/Caribbean/Black British
+    user checks results table row heading contains  3  1  Mixed/Multiple ethnic group
+
+    user checks results table row heading contains  4  1  Not Known/Not Provided
+    user checks results table row heading contains  5  1  Other Ethnic Group
+    user checks results table row heading contains  6  1  Total
+    user checks results table row heading contains  7  1  White
+
+Validate row headings
+    [Tags]  HappyPath
+    user checks table column heading contains  1  1  1 year after study
+    user checks table column heading contains  1  2  2 years after study
+    user checks table column heading contains  1  3  3 years after study
+    user checks table column heading contains  1  4  4 years after study
+    user checks table column heading contains  1  5  5 years after study
 
 Validate table cells
     [Tags]  HappyPath
-    user checks results table cell contains  1   1  0
+    user checks results table cell contains  1   1  8
     user checks results table cell contains  2   1  2
-    user checks results table cell contains  3   1  2
+    user checks results table cell contains  3   1  5
+    user checks results table cell contains  4   1  8
+    user checks results table cell contains  5   1  8
+    user checks results table cell contains  6   1  2
+    user checks results table cell contains  7   1  3
+
+    user checks results table cell contains  1   2  10
+    user checks results table cell contains  2   2  4
+    user checks results table cell contains  3   2  8
+    user checks results table cell contains  4   2  5
+    user checks results table cell contains  5   2  5
+    user checks results table cell contains  6   2  2
+    user checks results table cell contains  7   2  6
+
+    user checks results table cell contains  1   3  3
+    user checks results table cell contains  2   3  0
+    user checks results table cell contains  3   3  6
+    user checks results table cell contains  4   3  3
+    user checks results table cell contains  5   3  2
+    user checks results table cell contains  6   3  8
+    user checks results table cell contains  7   3  0
+
+    user checks results table cell contains  1   4  3
+    user checks results table cell contains  2   4  9
+    user checks results table cell contains  3   4  4
+    user checks results table cell contains  4   4  7
+    user checks results table cell contains  5   4  4
+    user checks results table cell contains  6   4  2
+    user checks results table cell contains  7   4  8
+
+    user checks results table cell contains  1   5  0
+    user checks results table cell contains  2   5  6
+    user checks results table cell contains  3   5  8
+    user checks results table cell contains  4   5  1
+    user checks results table cell contains  5   5  1
+    user checks results table cell contains  6   5  9
+    user checks results table cell contains  7   5  1
 
 Generate the permalink
     [Tags]  HappyPath
@@ -260,6 +312,9 @@ Edit methodology
     user clicks link  ${METHODOLOGY_NAME}
     user clicks link  Manage content
     user clicks button  ${METHODOLOGY_NAME}
+    # NOTE: scroll down is here to avoid selenium clicking the
+    # set page view text box on the methodology page
+    user scrolls down  400
     user clicks button  Add text block
     user clicks button  Edit block
     user presses keys  New & Updated content -
@@ -339,14 +394,62 @@ Go to permalink page & check for error element to be present
     user goes to url  ${PERMA_LOCATION_URL}
     user waits until page contains  WARNING - The data used in this permalink may be out-of-date.
 
-Check the table has the same results as original table
+Check the table has the same results as original table 
     [Tags]  HappyPath
-    user checks results table row heading contains  1  1  Female
-    user checks results table row heading contains  2  1  Male
-    user checks results table row heading contains  3  1  Total
-    user checks results table cell contains  1   1  0
+    user checks results table row heading contains  1  1  Asian/Asian British
+    user checks results table row heading contains  2  1  Black/African/Caribbean/Black British
+    user checks results table row heading contains  3  1  Mixed/Multiple ethnic group
+
+    user checks results table row heading contains  4  1  Not Known/Not Provided
+    user checks results table row heading contains  5  1  Other Ethnic Group
+    user checks results table row heading contains  6  1  Total
+    user checks results table row heading contains  7  1  White
+
+    user checks table column heading contains  1  1  1 year after study
+    user checks table column heading contains  1  2  2 years after study
+    user checks table column heading contains  1  3  3 years after study
+    user checks table column heading contains  1  4  4 years after study
+    user checks table column heading contains  1  5  5 years after study
+
+    user checks results table cell contains  1   1  8
     user checks results table cell contains  2   1  2
-    user checks results table cell contains  3   1  2
+    user checks results table cell contains  3   1  5
+    user checks results table cell contains  4   1  8
+    user checks results table cell contains  5   1  8
+    user checks results table cell contains  6   1  2
+    user checks results table cell contains  7   1  3
+
+    user checks results table cell contains  1   2  10
+    user checks results table cell contains  2   2  4
+    user checks results table cell contains  3   2  8
+    user checks results table cell contains  4   2  5
+    user checks results table cell contains  5   2  5
+    user checks results table cell contains  6   2  2
+    user checks results table cell contains  7   2  6
+
+    user checks results table cell contains  1   3  3
+    user checks results table cell contains  2   3  0
+    user checks results table cell contains  3   3  6
+    user checks results table cell contains  4   3  3
+    user checks results table cell contains  5   3  2
+    user checks results table cell contains  6   3  8
+    user checks results table cell contains  7   3  0
+
+    user checks results table cell contains  1   4  3
+    user checks results table cell contains  2   4  9
+    user checks results table cell contains  3   4  4
+    user checks results table cell contains  4   4  7
+    user checks results table cell contains  5   4  4
+    user checks results table cell contains  6   4  2
+    user checks results table cell contains  7   4  8
+
+    user checks results table cell contains  1   5  0
+    user checks results table cell contains  2   5  6
+    user checks results table cell contains  3   5  8
+    user checks results table cell contains  4   5  1
+    user checks results table cell contains  5   5  1
+    user checks results table cell contains  6   5  9
+    user checks results table cell contains  7   5  1
 
 Check amended release doesn't contain deleted subject
     [Tags]  HappyPath
