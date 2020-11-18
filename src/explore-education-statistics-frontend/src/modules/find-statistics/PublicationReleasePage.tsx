@@ -79,7 +79,7 @@ const PublicationReleasePage: NextPage<Props> = ({ data }) => {
                 </Link>
               )}
               <dl className="dfe-meta-content govuk-!-margin-top-3 govuk-!-margin-bottom-1">
-                <dt className="govuk-caption-m">Published: </dt>
+                <dt className="govuk-caption-m">Published:</dt>
                 <dd data-testid="published-date">
                   <strong>
                     <FormattedDate>{data.published}</FormattedDate>
@@ -87,7 +87,7 @@ const PublicationReleasePage: NextPage<Props> = ({ data }) => {
                 </dd>
                 {isValidPartialDate(data.nextReleaseDate) && (
                   <div>
-                    <dt className="govuk-caption-m">Next update: </dt>
+                    <dt className="govuk-caption-m">Next update:</dt>
                     <dd data-testid="next-update">
                       <strong>
                         <time>{formatPartialDate(data.nextReleaseDate)}</time>
@@ -141,7 +141,7 @@ const PublicationReleasePage: NextPage<Props> = ({ data }) => {
             >
               <ul className="govuk-list govuk-list--bullet">
                 {data.downloadFiles.map(({ extension, name, path, size }) => (
-                  <li key={path}>
+                  <li key={path} className="dfe-align--left">
                     <Link
                       to={`${process.env.DATA_API_BASE_URL}/download/${path}`}
                       analytics={{
@@ -213,7 +213,7 @@ const PublicationReleasePage: NextPage<Props> = ({ data }) => {
 
             <dl className="dfe-meta-content">
               <div className="govuk-!-margin-bottom-2">
-                <dt className="govuk-caption-m">For {data.coverageTitle}: </dt>
+                <dt className="govuk-caption-m">For {data.coverageTitle}:</dt>
                 <dd data-testid="release-name">
                   <strong>{data.yearTitle}</strong>
                   {!!releaseCount && (
@@ -258,7 +258,7 @@ const PublicationReleasePage: NextPage<Props> = ({ data }) => {
 
               {data.updates && data.updates.length > 0 && (
                 <>
-                  <dt className="govuk-caption-m">Last updated: </dt>
+                  <dt className="govuk-caption-m">Last updated:</dt>
                   <dd id="releaseLastUpdated">
                     <strong>
                       <FormattedDate>{data.updates[0].on}</FormattedDate>
