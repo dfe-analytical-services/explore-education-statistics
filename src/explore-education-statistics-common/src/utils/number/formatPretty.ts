@@ -2,13 +2,19 @@
  * Return a formatted {@param value} in a pretty format
  * i.e. 10,000,000.000.
  *
- * {@param maxDecimals} can be optionally used
+ * {@param unit} can be used to add a unit to the
+ * formatted value. We will try and handle different
+ * units to get a result that looks the best.
+ *
+ * {@param decimalPlaces} can be optionally used
  * determine the number of decimal places that
  * the formatted number can have.
  *
  * This also accepts strings and preserves their
  * decimal places, even if there are trailing zeros.
  */
+import countDecimals from '@common/utils/number/countDecimals';
+
 export default function formatPretty(
   value: string | number,
   unit?: string,
@@ -22,13 +28,13 @@ export default function formatPretty(
       return value;
     }
 
-    const decimals = value.split('.')[1];
-    const dps = decimals ? decimals.length : 0;
+    const decimals = countDecimals(numberValue);
 
-    if (dps > 0) {
+    if (decimals > 0) {
       formattedValue = numberValue.toLocaleString('en-GB', {
         maximumFractionDigits: decimalPlaces,
-        minimumFractionDigits: dps > decimalPlaces ? decimalPlaces : dps,
+        minimumFractionDigits:
+          decimals > decimalPlaces ? decimalPlaces : decimals,
       });
     } else {
       formattedValue = Number(value).toLocaleString('en-GB', {
