@@ -11,6 +11,7 @@
   cursor: pointer;
   display: inline-block;
   padding: 0;
+  text-align: left;
   text-decoration: underline;
   &:focus {
     @include govuk-focused-text;

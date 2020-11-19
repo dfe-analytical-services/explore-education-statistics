@@ -25,7 +25,6 @@ const ButtonText = ({
       {...props}
       className={classNames(
         styles.button,
-        'dfe-align--left',
         {
           [styles.noUnderline]: !underline,
         },
