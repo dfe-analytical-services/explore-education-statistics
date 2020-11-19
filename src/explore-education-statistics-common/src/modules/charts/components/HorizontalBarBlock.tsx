@@ -16,6 +16,7 @@ import {
 } from '@common/modules/charts/util/domainTicks';
 import getCategoryDataSetConfigurations from '@common/modules/charts/util/getCategoryDataSetConfigurations';
 import getCategoryLabel from '@common/modules/charts/util/getCategoryLabel';
+import getMinorAxisDecimalPlaces from '@common/modules/charts/util/getMinorAxisDecimalPlaces';
 import parseNumber from '@common/utils/number/parseNumber';
 import React, { memo } from 'react';
 import {
@@ -74,6 +75,16 @@ const HorizontalBarBlock = ({
   const yAxisWidth = parseNumber(axes.major.size);
   const xAxisHeight = parseNumber(axes.minor.size);
 
+  const categoryDataSetConfigurations = getCategoryDataSetConfigurations(
+    dataSetCategories,
+    axes.major,
+    meta,
+  );
+
+  const minorAxisDecimals = getMinorAxisDecimalPlaces(
+    categoryDataSetConfigurations,
+  );
+
   return (
     <ChartContainer
       height={height || 300}
@@ -110,7 +121,7 @@ const HorizontalBarBlock = ({
             height={xAxisHeight}
             padding={{ left: 20, right: 20 }}
             tickMargin={10}
-            tickFormatter={tick => formatPretty(tick)}
+            tickFormatter={tick => formatPretty(tick, '', minorAxisDecimals)}
           />
 
           <YAxis
@@ -132,11 +143,7 @@ const HorizontalBarBlock = ({
             <Legend content={renderLegend} align="left" layout="vertical" />
           )}
 
-          {getCategoryDataSetConfigurations(
-            dataSetCategories,
-            axes.major,
-            meta,
-          ).map(({ config, dataKey, dataSet }) => (
+          {categoryDataSetConfigurations.map(({ config, dataKey, dataSet }) => (
             <Bar
               key={dataKey}
               dataKey={dataKey}

@@ -7,151 +7,178 @@ import MapBlock, {
 } from '@common/modules/charts/components/MapBlock';
 import mapFullTable from '@common/modules/table-tool/utils/mapFullTable';
 import { within } from '@testing-library/dom';
-import { render, wait, fireEvent } from '@testing-library/react';
+import { render, screen, waitFor } from '@testing-library/react';
+import produce from 'immer';
 import React from 'react';
+import userEvent from '@testing-library/user-event';
 
 describe('MapBlock', () => {
-  const fullTable = mapFullTable(testMapTableData);
-  const props: MapBlockProps = {
+  const testFullTable = mapFullTable(testMapTableData);
+  const testBlockProps: MapBlockProps = {
     ...testMapConfiguration,
     id: 'testMap',
     axes: testMapConfiguration.axes as MapBlockProps['axes'],
-    meta: fullTable.subjectMeta,
-    data: fullTable.results,
+    meta: testFullTable.subjectMeta,
+    data: testFullTable.results,
     height: 600,
     width: 900,
   };
 
   test('renders legends and polygons correctly', async () => {
-    const { container, getAllByTestId } = render(<MapBlock {...props} />);
+    const { container } = render(<MapBlock {...testBlockProps} />);
 
-    await wait();
+    await waitFor(() => {
+      const paths = container.querySelectorAll<HTMLElement>(
+        '.leaflet-container svg path',
+      );
 
-    const paths = container.querySelectorAll<HTMLElement>(
-      '.leaflet-container svg path',
+      expect(paths).toHaveLength(4);
+
+      // UK polygon
+      expect(paths[0]).toHaveAttribute('fill', '#3388ff');
+      // Location polygons
+      expect(paths[1]).toHaveAttribute('fill', '#5c80d6');
+      expect(paths[2]).toHaveAttribute('fill', '#86bcff');
+      expect(paths[3]).toHaveAttribute('fill', '#314573');
+    });
+
+    const legendItems = screen.getAllByTestId('mapBlock-legend-item');
+
+    expect(legendItems).toHaveLength(5);
+    expect(legendItems[0]).toHaveTextContent('3% to 3.2%');
+    expect(legendItems[1]).toHaveTextContent('3.3% to 3.4%');
+    expect(legendItems[2]).toHaveTextContent('3.5% to 3.6%');
+    expect(legendItems[3]).toHaveTextContent('3.7% to 3.8%');
+    expect(legendItems[4]).toHaveTextContent('3.9% to 4%');
+
+    const legendColours = screen.getAllByTestId('mapBlock-legend-colour');
+
+    expect(legendColours).toHaveLength(5);
+    expect(legendColours[0].style.backgroundColor).toBe('rgb(134, 188, 255)');
+    expect(legendColours[1].style.backgroundColor).toBe('rgb(113, 158, 255)');
+    expect(legendColours[2].style.backgroundColor).toBe('rgb(92, 128, 214)');
+    expect(legendColours[3].style.backgroundColor).toBe('rgb(71, 99, 165)');
+    expect(legendColours[4].style.backgroundColor).toBe('rgb(49, 69, 115)');
+  });
+
+  test('renders legends correctly with custom decimal places', async () => {
+    const fullTable = mapFullTable(
+      produce(testMapTableData, draft => {
+        draft.results[0].measures['authorised-absence-rate'] = '3.5123';
+        draft.results[1].measures['authorised-absence-rate'] = '3.012';
+        draft.results[2].measures['authorised-absence-rate'] = '4.009';
+        draft.subjectMeta.indicators[0].decimalPlaces = 2;
+      }),
     );
 
-    expect(paths).toHaveLength(4);
-    // UK polygon
-    expect(paths[0]).toHaveAttribute('fill', '#3388ff');
-    // Location polygons
-    expect(paths[1]).toHaveAttribute('fill', '#86bcff');
-    expect(paths[2]).toHaveAttribute('fill', '#86bcff');
-    expect(paths[3]).toHaveAttribute('fill', '#1c2742');
+    render(
+      <MapBlock
+        {...testBlockProps}
+        meta={fullTable.subjectMeta}
+        data={fullTable.results}
+      />,
+    );
 
-    const legendItems = getAllByTestId('mapBlock-legend-item');
+    await waitFor(() => {
+      const legendItems = screen.getAllByTestId('mapBlock-legend-item');
 
-    expect(legendItems[0]).toHaveTextContent('3% to 3.03%');
-    expect(legendItems[1]).toHaveTextContent('3.03% to 3.05%');
-    expect(legendItems[2]).toHaveTextContent('3.05% to 3.08%');
-    expect(legendItems[3]).toHaveTextContent('3.08% to 3.1%');
-    expect(legendItems[4]).toHaveTextContent('3.1% to 3.13%');
-
-    const legendColours = getAllByTestId('mapBlock-legend-colour');
-
-    expect(legendColours[0].style.backgroundColor).toBe('rgb(134, 188, 255)');
-    expect(legendColours[1].style.backgroundColor).toBe('rgb(108, 150, 251)');
-    expect(legendColours[2].style.backgroundColor).toBe('rgb(81, 113, 189)');
-    expect(legendColours[3].style.backgroundColor).toBe('rgb(55, 76, 127)');
-    expect(legendColours[4].style.backgroundColor).toBe('rgb(28, 39, 66)');
+      expect(legendItems).toHaveLength(5);
+      expect(legendItems[0]).toHaveTextContent('3.01% to 3.21%');
+      expect(legendItems[1]).toHaveTextContent('3.22% to 3.41%');
+      expect(legendItems[2]).toHaveTextContent('3.42% to 3.61%');
+      expect(legendItems[3]).toHaveTextContent('3.62% to 3.81%');
+      expect(legendItems[4]).toHaveTextContent('3.82% to 4.01%');
+    });
   });
 
   test('includes all data sets in select', async () => {
-    const { getByLabelText } = render(<MapBlock {...props} />);
+    render(<MapBlock {...testBlockProps} />);
 
-    await wait();
+    await waitFor(() => {
+      const select = screen.getByLabelText('1. Select data to view');
 
-    const select = getByLabelText('1. Select data to view');
+      expect(select).toBeVisible();
 
-    expect(select).toBeVisible();
-
-    expect(select.children).toHaveLength(2);
-    expect(select.children[0]).toHaveTextContent(
-      'Authorised absence rate (2016/17)',
-    );
-    expect(select.children[1]).toHaveTextContent(
-      'Overall absence rate (2016/17)',
-    );
+      expect(select.children).toHaveLength(2);
+      expect(select.children[0]).toHaveTextContent(
+        'Authorised absence rate (2016/17)',
+      );
+      expect(select.children[1]).toHaveTextContent(
+        'Overall absence rate (2016/17)',
+      );
+    });
   });
 
   test('includes all locations in select', async () => {
-    const { getByLabelText } = render(<MapBlock {...props} />);
+    render(<MapBlock {...testBlockProps} />);
 
-    await wait();
+    await waitFor(() => {
+      const select = screen.getByLabelText('2. Select a location');
 
-    const select = getByLabelText('2. Select a location');
+      expect(select).toBeVisible();
 
-    expect(select).toBeVisible();
-
-    expect(select.children).toHaveLength(4);
-    expect(select.children[0]).toHaveTextContent('Select location');
-    expect(select.children[1]).toHaveTextContent('Leeds');
-    expect(select.children[2]).toHaveTextContent('Manchester');
-    expect(select.children[3]).toHaveTextContent('Sheffield');
+      expect(select.children).toHaveLength(4);
+      expect(select.children[0]).toHaveTextContent('Select location');
+      expect(select.children[1]).toHaveTextContent('Leeds');
+      expect(select.children[2]).toHaveTextContent('Manchester');
+      expect(select.children[3]).toHaveTextContent('Sheffield');
+    });
   });
 
   test('changing selected data set changes legends and polygons', async () => {
-    const { container, getAllByTestId, getByLabelText } = render(
-      <MapBlock {...props} />,
-    );
+    const { container } = render(<MapBlock {...testBlockProps} />);
 
-    await wait();
+    await waitFor(() => {
+      const select = screen.getByLabelText('1. Select data to view');
 
-    const select = getByLabelText('1. Select data to view');
+      expect(select.children[1]).toHaveTextContent(
+        'Overall absence rate (2016/17)',
+      );
 
-    expect(select.children[1]).toHaveTextContent(
-      'Overall absence rate (2016/17)',
-    );
+      userEvent.selectOptions(select, select.children[1] as HTMLElement);
 
-    fireEvent.change(select, {
-      target: {
-        value: select.children[1].getAttribute('value'),
-      },
+      const paths = container.querySelectorAll<HTMLElement>(
+        '.leaflet-container svg path',
+      );
+
+      expect(paths).toHaveLength(4);
+      // UK polygon
+      expect(paths[0]).toHaveAttribute('fill', '#3388ff');
+      // Location polygon
+      expect(paths[1]).toHaveAttribute('fill', '#ffff80');
+      expect(paths[2]).toHaveAttribute('fill', '#ffff98');
+      expect(paths[3]).toHaveAttribute('fill', '#ab7238');
     });
 
-    const paths = container.querySelectorAll<HTMLElement>(
-      '.leaflet-container svg path',
-    );
+    const legendItems = screen.getAllByTestId('mapBlock-legend-item');
 
-    expect(paths).toHaveLength(4);
-    // UK polygon
-    expect(paths[0]).toHaveAttribute('fill', '#3388ff');
-    // Location polygon
-    expect(paths[1]).toHaveAttribute('fill', '#ffff7f');
-    expect(paths[2]).toHaveAttribute('fill', '#ffff98');
-    expect(paths[3]).toHaveAttribute('fill', '#624120');
+    expect(legendItems[0]).toHaveTextContent('4.7% to 4.78%');
+    expect(legendItems[1]).toHaveTextContent('4.78% to 4.86%');
+    expect(legendItems[2]).toHaveTextContent('4.86% to 4.94%');
+    expect(legendItems[3]).toHaveTextContent('4.94% to 5.02%');
+    expect(legendItems[4]).toHaveTextContent('5.02% to 5.1%');
 
-    const legendItems = getAllByTestId('mapBlock-legend-item');
-
-    expect(legendItems[0]).toHaveTextContent('4.6% to 4.73%');
-    expect(legendItems[1]).toHaveTextContent('4.73% to 4.85%');
-    expect(legendItems[2]).toHaveTextContent('4.85% to 4.98%');
-    expect(legendItems[3]).toHaveTextContent('4.98% to 5.1%');
-    expect(legendItems[4]).toHaveTextContent('5.1% to 5.23%');
-
-    const legendColours = getAllByTestId('mapBlock-legend-colour');
+    const legendColours = screen.getAllByTestId('mapBlock-legend-colour');
 
     expect(legendColours[0].style.backgroundColor).toBe('rgb(255, 255, 152)');
-    expect(legendColours[1].style.backgroundColor).toBe('rgb(255, 250, 122)');
-    expect(legendColours[2].style.backgroundColor).toBe('rgb(255, 188, 92)');
-    expect(legendColours[3].style.backgroundColor).toBe('rgb(189, 127, 62)');
-    expect(legendColours[4].style.backgroundColor).toBe('rgb(98, 65, 32)');
+    expect(legendColours[1].style.backgroundColor).toBe('rgb(255, 255, 128)');
+    expect(legendColours[2].style.backgroundColor).toBe('rgb(255, 213, 104)');
+    expect(legendColours[3].style.backgroundColor).toBe('rgb(245, 164, 80)');
+    expect(legendColours[4].style.backgroundColor).toBe('rgb(171, 114, 56)');
   });
 
   test('changing selected location focuses the correct polygon', async () => {
-    const { getByLabelText, container } = render(<MapBlock {...props} />);
+    const { container } = render(<MapBlock {...testBlockProps} />);
 
-    await wait();
+    await waitFor(() => {
+      expect(screen.getByLabelText('2. Select a location')).toBeInTheDocument();
+    });
 
-    const select = getByLabelText('2. Select a location');
+    const select = screen.getByLabelText('2. Select a location');
 
     expect(select.children[1]).toHaveTextContent('Leeds');
 
-    fireEvent.change(select, {
-      target: {
-        value: select.children[1].getAttribute('value'),
-      },
-    });
+    userEvent.selectOptions(select, select.children[1] as HTMLElement);
 
     const paths = container.querySelectorAll<HTMLElement>(
       '.leaflet-container svg path',
@@ -166,22 +193,18 @@ describe('MapBlock', () => {
     expect(paths[3]).toHaveClass('selected');
   });
 
-  test('changing selected location shows its indicator tiles', async () => {
-    const { getByLabelText, getAllByTestId } = render(<MapBlock {...props} />);
+  test('changing selected location renders its indicator tiles', async () => {
+    render(<MapBlock {...testBlockProps} />);
 
-    await wait();
-
-    const select = getByLabelText('2. Select a location');
-
-    expect(select.children[1]).toHaveTextContent('Leeds');
-
-    fireEvent.change(select, {
-      target: {
-        value: select.children[1].getAttribute('value'),
-      },
+    await waitFor(() => {
+      expect(screen.getByLabelText('2. Select a location')).toBeInTheDocument();
     });
 
-    const indicators = getAllByTestId('mapBlock-indicator');
+    const select = screen.getByLabelText('2. Select a location');
+
+    userEvent.selectOptions(select, select.children[1] as HTMLElement);
+
+    const indicators = screen.getAllByTestId('mapBlock-indicator');
 
     expect(indicators).toHaveLength(2);
 
@@ -191,7 +214,7 @@ describe('MapBlock', () => {
       'Authorised absence rate (2016/17)',
     );
     expect(tile1.getByTestId('mapBlock-indicatorTile-value')).toHaveTextContent(
-      '3%',
+      '3.5%',
     );
 
     const tile2 = within(indicators[1]);
@@ -200,7 +223,62 @@ describe('MapBlock', () => {
       'Overall absence rate (2016/17)',
     );
     expect(tile2.getByTestId('mapBlock-indicatorTile-value')).toHaveTextContent(
-      '4.7%',
+      '4.8%',
+    );
+  });
+
+  test('renders location indicator tiles correctly with custom decimal places', async () => {
+    const fullTable = mapFullTable(
+      produce(testMapTableData, draft => {
+        draft.results[0].measures['authorised-absence-rate'] = '3.5123';
+        draft.results[1].measures['authorised-absence-rate'] = '3.012';
+        draft.results[2].measures['authorised-absence-rate'] = '4.009';
+        draft.subjectMeta.indicators[0].decimalPlaces = 2;
+      }),
+    );
+
+    render(
+      <MapBlock
+        {...testBlockProps}
+        meta={fullTable.subjectMeta}
+        data={fullTable.results}
+      />,
+    );
+
+    await waitFor(() => {
+      expect(screen.getByLabelText('2. Select a location')).toBeInTheDocument();
+    });
+
+    const select = screen.getByLabelText('2. Select a location');
+
+    userEvent.selectOptions(select, select.children[1] as HTMLElement);
+
+    const tile1 = within(screen.getAllByTestId('mapBlock-indicator')[0]);
+    expect(tile1.getByTestId('mapBlock-indicatorTile-title')).toHaveTextContent(
+      'Authorised absence rate (2016/17)',
+    );
+    expect(tile1.getByTestId('mapBlock-indicatorTile-value')).toHaveTextContent(
+      '3.51%',
+    );
+
+    userEvent.selectOptions(select, select.children[2] as HTMLElement);
+
+    const tile2 = within(screen.getAllByTestId('mapBlock-indicator')[0]);
+    expect(tile2.getByTestId('mapBlock-indicatorTile-title')).toHaveTextContent(
+      'Authorised absence rate (2016/17)',
+    );
+    expect(tile2.getByTestId('mapBlock-indicatorTile-value')).toHaveTextContent(
+      '3.01%',
+    );
+
+    userEvent.selectOptions(select, select.children[3] as HTMLElement);
+
+    const tile3 = within(screen.getAllByTestId('mapBlock-indicator')[0]);
+    expect(tile3.getByTestId('mapBlock-indicatorTile-title')).toHaveTextContent(
+      'Authorised absence rate (2016/17)',
+    );
+    expect(tile3.getByTestId('mapBlock-indicatorTile-value')).toHaveTextContent(
+      '4.01%',
     );
   });
 });
