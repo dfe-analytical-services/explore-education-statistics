@@ -17,14 +17,12 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Processor.Functions
     {
         private readonly IBatchService _batchService;
         private readonly IFileImportService _fileImportService;
-        private readonly IFileStorageService _fileStorageService;
         private readonly IImportStatusService _importStatusService;
         private readonly IProcessorService _processorService;
         private readonly ILogger<Processor> _logger;
 
         public Processor(
             IFileImportService fileImportService,
-            IFileStorageService fileStorageService,
             IBatchService batchService,
             IImportStatusService importStatusService,
             IProcessorService processorService,
@@ -32,7 +30,6 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Processor.Functions
         )
         {
             _fileImportService = fileImportService;
-            _fileStorageService = fileStorageService;
             _batchService = batchService;
             _importStatusService = importStatusService;
             _processorService = processorService;
@@ -51,10 +48,14 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Processor.Functions
             {
                 var status = await _importStatusService.GetImportStatus(message.Release.Id, message.OrigDataFileName);
 
+                _logger.LogInformation($"Processor Function processing import message for " +
+                                       $"{message.OrigDataFileName} at stage {status.Status}");
+                
                 if (status.Status == IStatus.QUEUED || status.Status == IStatus.PROCESSING_ARCHIVE_FILE)
                 {
                     if (message.ArchiveFileName != "")
                     {
+                        _logger.LogInformation($"Unpacking archive for {message.OrigDataFileName}");
                         await _processorService.ProcessUnpackingArchive(message);
                     }
 
