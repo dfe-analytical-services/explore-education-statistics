@@ -368,11 +368,20 @@ export const MapBlockInternal = ({
             },
           );
 
+          const mapWidth = mapRef.current?.container?.clientWidth;
+
+          // Not ideal, we would want to use `max-width` instead.
+          // Unfortunately it doesn't seem to work with the tooltip
+          // for some reason (maybe due to the pane styling).
+          const tooltipStyle = mapWidth ? `width: ${mapWidth / 2}px` : '';
+
           return (
+            `<div class="${styles.tooltip}" style="${tooltipStyle}">` +
             `<p><strong data-testid="chartTooltip-label">${feature.properties.name}</strong></p>` +
             `<ul class="${
               styles.tooltipList
-            }" data-testid="chartTooltip-items">${items.join('')}</ul>`
+            }" data-testid="chartTooltip-items">${items.join()}</ul>` +
+            `</div>`
           );
         }
 
