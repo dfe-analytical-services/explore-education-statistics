@@ -141,7 +141,7 @@ const PublicationReleasePage: NextPage<Props> = ({ data }) => {
             >
               <ul className="govuk-list govuk-list--bullet">
                 {data.downloadFiles.map(({ extension, name, path, size }) => (
-                  <li key={path} className="dfe-align--left">
+                  <li key={path}>
                     <Link
                       to={`${process.env.DATA_API_BASE_URL}/download/${path}`}
                       analytics={{
