@@ -147,7 +147,7 @@ const ReleaseContent = () => {
                               name,
                             )
                           }
-                          className="govuk-link"
+                          className="govuk-link dfe-align--left"
                         >
                           {name}
                         </ButtonText>
