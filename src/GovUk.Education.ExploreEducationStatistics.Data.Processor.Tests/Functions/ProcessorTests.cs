@@ -5,7 +5,6 @@ using GovUk.Education.ExploreEducationStatistics.Common.Model;
 using GovUk.Education.ExploreEducationStatistics.Common.Services;
 using GovUk.Education.ExploreEducationStatistics.Common.Services.Interfaces;
 using GovUk.Education.ExploreEducationStatistics.Data.Processor.Model;
-using GovUk.Education.ExploreEducationStatistics.Data.Processor.Models;
 using GovUk.Education.ExploreEducationStatistics.Data.Processor.Services.Interfaces;
 using Microsoft.Azure.WebJobs;
 using Microsoft.Extensions.Logging;
@@ -20,7 +19,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Processor.Tests.Functi
         public void ProcessUploadsUnpackArchive()
         {
             var mocks = Mocks();
-            var (fileStorageService, processorService, importStatusService, batchService, fileImportService) = mocks;
+            var (processorService, importStatusService, batchService, fileImportService) = mocks;
             var importStagesMessageQueue = new Mock<ICollector<ImportMessage>>();
             var datafileProcessingMessageQueue = new Mock<ICollector<ImportMessage>>();
 
@@ -37,7 +36,6 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Processor.Tests.Functi
 
             var processor = new Processor.Functions.Processor(
                 fileImportService.Object,
-                fileStorageService.Object,
                 batchService.Object,
                 importStatusService.Object,
                 processorService.Object,
@@ -68,7 +66,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Processor.Tests.Functi
                 datafileProcessingMessageQueue.Object
             );
 
-            MockUtils.VerifyAllMocks(fileStorageService, processorService, importStatusService, batchService,
+            MockUtils.VerifyAllMocks(processorService, importStatusService, batchService,
                 fileImportService, importStagesMessageQueue, datafileProcessingMessageQueue);
         }
 
@@ -76,7 +74,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Processor.Tests.Functi
         public void ProcessUploadsUnpackArchiveWithNoArchive()
         {
             var mocks = Mocks();
-            var (fileStorageService, processorService, importStatusService, batchService, fileImportService) = mocks;
+            var (processorService, importStatusService, batchService, fileImportService) = mocks;
             var importStagesMessageQueue = new Mock<ICollector<ImportMessage>>();
             var datafileProcessingMessageQueue = new Mock<ICollector<ImportMessage>>();
 
@@ -93,7 +91,6 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Processor.Tests.Functi
 
             var processor = new Processor.Functions.Processor(
                 fileImportService.Object,
-                fileStorageService.Object,
                 batchService.Object,
                 importStatusService.Object,
                 processorService.Object,
@@ -120,7 +117,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Processor.Tests.Functi
                 datafileProcessingMessageQueue.Object
             );
 
-            MockUtils.VerifyAllMocks(fileStorageService, processorService, importStatusService, batchService,
+            MockUtils.VerifyAllMocks(processorService, importStatusService, batchService,
                 fileImportService, importStagesMessageQueue, datafileProcessingMessageQueue);
         }
 
@@ -128,7 +125,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Processor.Tests.Functi
         public void ProcessUploadsStage1()
         {
             var mocks = Mocks();
-            var (fileStorageService, processorService, importStatusService, batchService, fileImportService) = mocks;
+            var (processorService, importStatusService, batchService, fileImportService) = mocks;
             var importStagesMessageQueue = new Mock<ICollector<ImportMessage>>();
             var datafileProcessingMessageQueue = new Mock<ICollector<ImportMessage>>();
 
@@ -147,7 +144,6 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Processor.Tests.Functi
             
             var processor = new Processor.Functions.Processor(
                 fileImportService.Object,
-                fileStorageService.Object,
                 batchService.Object,
                 importStatusService.Object, 
                 processorService.Object,
@@ -178,7 +174,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Processor.Tests.Functi
                 datafileProcessingMessageQueue.Object
             );
 
-            MockUtils.VerifyAllMocks(fileStorageService, processorService, importStatusService, batchService,
+            MockUtils.VerifyAllMocks(processorService, importStatusService, batchService,
                 fileImportService, importStagesMessageQueue, datafileProcessingMessageQueue);
         }
 
@@ -186,7 +182,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Processor.Tests.Functi
         public void ProcessUploadsStage2()
         {
             var mocks = Mocks();
-            var (fileStorageService, processorService, importStatusService, batchService, fileImportService) = mocks;
+            var (processorService, importStatusService, batchService, fileImportService) = mocks;
             var importStagesMessageQueue = new Mock<ICollector<ImportMessage>>();
             var datafileProcessingMessageQueue = new Mock<ICollector<ImportMessage>>();
 
@@ -203,7 +199,6 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Processor.Tests.Functi
             
             var processor = new Processor.Functions.Processor(
                 fileImportService.Object,
-                fileStorageService.Object,
                 batchService.Object,
                 importStatusService.Object, 
                 processorService.Object,
@@ -234,7 +229,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Processor.Tests.Functi
                 datafileProcessingMessageQueue.Object
             );
 
-            MockUtils.VerifyAllMocks(fileStorageService, processorService, importStatusService, batchService,
+            MockUtils.VerifyAllMocks(processorService, importStatusService, batchService,
                 fileImportService, importStagesMessageQueue, datafileProcessingMessageQueue);
         }
 
@@ -242,7 +237,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Processor.Tests.Functi
         public void ProcessUploadsStage3()
         {
             var mocks = Mocks();
-            var (fileStorageService, processorService, importStatusService, batchService, fileImportService) = mocks;
+            var (processorService, importStatusService, batchService, fileImportService) = mocks;
             var importStagesMessageQueue = new Mock<ICollector<ImportMessage>>();
             var datafileProcessingMessageQueue = new Mock<ICollector<ImportMessage>>();
 
@@ -259,7 +254,6 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Processor.Tests.Functi
             
             var processor = new Processor.Functions.Processor(
                 fileImportService.Object,
-                fileStorageService.Object,
                 batchService.Object,
                 importStatusService.Object, 
                 processorService.Object,
@@ -290,7 +284,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Processor.Tests.Functi
                 datafileProcessingMessageQueue.Object
             );
 
-            MockUtils.VerifyAllMocks(fileStorageService, processorService, importStatusService, batchService,
+            MockUtils.VerifyAllMocks(processorService, importStatusService, batchService,
                 fileImportService, importStagesMessageQueue, datafileProcessingMessageQueue);
         }
         
@@ -298,7 +292,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Processor.Tests.Functi
         public void ProcessUploadsStage4Messages()
         {
             var mocks = Mocks();
-            var (fileStorageService, processorService, importStatusService, batchService, fileImportService) = mocks;
+            var (processorService, importStatusService, batchService, fileImportService) = mocks;
             var importStagesMessageQueue = new Mock<ICollector<ImportMessage>>();
             var datafileProcessingMessageQueue = new Mock<ICollector<ImportMessage>>();
 
@@ -315,7 +309,6 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Processor.Tests.Functi
             
             var processor = new Processor.Functions.Processor(
                 fileImportService.Object,
-                fileStorageService.Object,
                 batchService.Object,
                 importStatusService.Object, 
                 processorService.Object,
@@ -339,19 +332,17 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Processor.Tests.Functi
                 datafileProcessingMessageQueue.Object
             );
 
-            MockUtils.VerifyAllMocks(fileStorageService, processorService, importStatusService, batchService,
+            MockUtils.VerifyAllMocks(processorService, importStatusService, batchService,
                 fileImportService, importStagesMessageQueue, datafileProcessingMessageQueue);
         }
 
         private (
-            Mock<IFileStorageService>,
             Mock<IProcessorService>,
             Mock<IImportStatusService>,
             Mock<IBatchService>,
             Mock<IFileImportService>
         ) Mocks() {
             return (
-                new Mock<IFileStorageService>(),
                 new Mock<IProcessorService>(),
                 new Mock<IImportStatusService>(),
                 new Mock<IBatchService>(),
