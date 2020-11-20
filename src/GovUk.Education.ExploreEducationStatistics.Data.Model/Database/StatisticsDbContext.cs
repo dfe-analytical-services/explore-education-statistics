@@ -64,6 +64,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Model.Database
             ConfigureIndicatorFootnote(modelBuilder);
             ConfigureLocation(modelBuilder);
             ConfigureMeasures(modelBuilder);
+            ConfigureObservation(modelBuilder);
             ConfigureObservationFilterItem(modelBuilder);
             ConfigurePublication(modelBuilder);
             ConfigureRelease(modelBuilder);
@@ -100,6 +101,15 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Model.Database
             ConfigureSponsor(modelBuilder);
             ConfigureWard(modelBuilder);
             ConfigurePlanningArea(modelBuilder);
+        }
+
+        private static void ConfigureObservation(ModelBuilder modelBuilder)
+        {
+            modelBuilder.Entity<Observation>()
+                .HasOne(observation => observation.Location)
+                .WithMany()
+                .HasForeignKey(observation => observation.LocationId)
+                .OnDelete(DeleteBehavior.Restrict);
         }
 
         private static void ConfigureObservationFilterItem(ModelBuilder modelBuilder)
