@@ -2161,26 +2161,6 @@
                                     },
                                     {
                                         "source": {
-                                            "name": "ProviderUrn",
-                                            "type": "String"
-                                        },
-                                        "sink": {
-                                            "name": "ProviderUrn",
-                                            "type": "String"
-                                        }
-                                    },
-                                    {
-                                        "source": {
-                                            "name": "SchoolLaEstab",
-                                            "type": "String"
-                                        },
-                                        "sink": {
-                                            "name": "SchoolLaEstab",
-                                            "type": "String"
-                                        }
-                                    },
-                                    {
-                                        "source": {
                                             "name": "Year",
                                             "type": "Int32"
                                         },
