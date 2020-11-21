@@ -2,7 +2,41 @@ import { TableDataResponse } from '@common/services/tableBuilderService';
 import { Chart } from '@common/services/types/blocks';
 
 export const testChartConfiguration: Chart = {
-  legend: 'top',
+  legend: {
+    position: 'top',
+    items: [
+      {
+        dataSet: {
+          indicator: 'unauthorised-absence-rate',
+          filters: ['characteristic-total', 'school-type-total'],
+        },
+        label: 'Unauthorised absence rate',
+        colour: '#4763a5',
+        symbol: 'circle',
+        lineStyle: 'solid',
+      },
+      {
+        dataSet: {
+          indicator: 'overall-absence-rate',
+          filters: ['characteristic-total', 'school-type-total'],
+        },
+        label: 'Overall absence rate',
+        colour: '#f5a450',
+        symbol: 'cross',
+        lineStyle: 'solid',
+      },
+      {
+        dataSet: {
+          indicator: 'authorised-absence-rate',
+          filters: ['characteristic-total', 'school-type-total'],
+        },
+        label: 'Authorised absence rate',
+        colour: '#005ea5',
+        symbol: 'diamond',
+        lineStyle: 'solid',
+      },
+    ],
+  },
   axes: {
     major: {
       type: 'major',
@@ -13,39 +47,29 @@ export const testChartConfiguration: Chart = {
         {
           indicator: 'unauthorised-absence-rate',
           filters: ['characteristic-total', 'school-type-total'],
-          config: {
-            label: 'Unauthorised absence rate',
-            unit: '%',
-            colour: '#4763a5',
-            symbol: 'circle',
-            lineStyle: 'solid',
+          location: {
+            level: 'country',
+            value: 'england',
           },
         },
         {
           indicator: 'overall-absence-rate',
           filters: ['characteristic-total', 'school-type-total'],
-          config: {
-            label: 'Overall absence rate',
-            unit: '%',
-            colour: '#f5a450',
-            symbol: 'cross',
-            lineStyle: 'solid',
+          location: {
+            level: 'country',
+            value: 'england',
           },
         },
         {
           indicator: 'authorised-absence-rate',
           filters: ['characteristic-total', 'school-type-total'],
-          config: {
-            label: 'Authorised absence rate',
-            unit: '%',
-            colour: '#005ea5',
-            symbol: 'diamond',
-            lineStyle: 'solid',
+          location: {
+            level: 'country',
+            value: 'england',
           },
         },
       ],
       visible: true,
-      title: 'School Year',
       size: 50,
       showGrid: true,
       tickConfig: 'default',
@@ -57,7 +81,6 @@ export const testChartConfiguration: Chart = {
       dataSets: [],
       sortAsc: true,
       visible: true,
-      title: 'Absence Rate',
       size: 50,
       showGrid: true,
       min: 0,
@@ -120,7 +143,7 @@ export const testChartTableData: TableDataResponse = {
         name: 'sess_overall_percent',
       },
     ],
-    locations: [{ level: 'country', label: 'England', value: 'E92000001' }],
+    locations: [{ level: 'country', label: 'England', value: 'england' }],
     boundaryLevels: [
       {
         id: 1,
@@ -143,7 +166,7 @@ export const testChartTableData: TableDataResponse = {
     {
       filters: ['characteristic-total', 'school-type-total'],
       geographicLevel: 'Country',
-      location: { country: { code: 'E92000001', name: 'England' } },
+      location: { country: { code: 'england', name: 'England' } },
       measures: {
         'authorised-absence-rate': '3.5',
         'overall-absence-rate': '4.6',
@@ -154,7 +177,7 @@ export const testChartTableData: TableDataResponse = {
     {
       filters: ['characteristic-total', 'school-type-total'],
       geographicLevel: 'Country',
-      location: { country: { code: 'E92000001', name: 'England' } },
+      location: { country: { code: 'england', name: 'England' } },
       measures: {
         'authorised-absence-rate': '4.2',
         'overall-absence-rate': '5.3',
@@ -165,7 +188,7 @@ export const testChartTableData: TableDataResponse = {
     {
       filters: ['characteristic-total', 'school-type-total'],
       geographicLevel: 'Country',
-      location: { country: { code: 'E92000001', name: 'England' } },
+      location: { country: { code: 'england', name: 'England' } },
       measures: {
         'authorised-absence-rate': '3.5',
         'overall-absence-rate': '4.5',
@@ -176,7 +199,7 @@ export const testChartTableData: TableDataResponse = {
     {
       filters: ['characteristic-total', 'school-type-total'],
       geographicLevel: 'Country',
-      location: { country: { code: 'E92000001', name: 'England' } },
+      location: { country: { code: 'england', name: 'England' } },
       measures: {
         'authorised-absence-rate': '3.4',
         'overall-absence-rate': '4.7',
@@ -187,7 +210,7 @@ export const testChartTableData: TableDataResponse = {
     {
       filters: ['characteristic-total', 'school-type-total'],
       geographicLevel: 'Country',
-      location: { country: { code: 'E92000001', name: 'England' } },
+      location: { country: { code: 'england', name: 'England' } },
       measures: {
         'authorised-absence-rate': '3.4',
         'overall-absence-rate': '4.6',

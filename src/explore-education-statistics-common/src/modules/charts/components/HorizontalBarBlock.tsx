@@ -7,6 +7,7 @@ import {
   StackedBarProps,
 } from '@common/modules/charts/types/chart';
 import { DataSetCategory } from '@common/modules/charts/types/dataSet';
+import { LegendConfiguration } from '@common/modules/charts/types/legend';
 import createDataSetCategories, {
   toChartData,
 } from '@common/modules/charts/util/createDataSetCategories';
@@ -14,7 +15,7 @@ import {
   getMajorAxisDomainTicks,
   getMinorAxisDomainTicks,
 } from '@common/modules/charts/util/domainTicks';
-import getCategoryDataSetConfigurations from '@common/modules/charts/util/getCategoryDataSetConfigurations';
+import getDataSetCategoryConfigs from '@common/modules/charts/util/getDataSetCategoryConfigs';
 import getCategoryLabel from '@common/modules/charts/util/getCategoryLabel';
 import getMinorAxisDecimalPlaces from '@common/modules/charts/util/getMinorAxisDecimalPlaces';
 import parseNumber from '@common/utils/number/parseNumber';
@@ -33,6 +34,7 @@ import {
 import formatPretty from '@common/utils/number/formatPretty';
 
 export interface HorizontalBarProps extends StackedBarProps {
+  legend: LegendConfiguration;
   axes: {
     major: AxisConfiguration;
     minor: AxisConfiguration;
@@ -75,21 +77,19 @@ const HorizontalBarBlock = ({
   const yAxisWidth = parseNumber(axes.major.size);
   const xAxisHeight = parseNumber(axes.minor.size);
 
-  const categoryDataSetConfigurations = getCategoryDataSetConfigurations(
+  const dataSetCategoryConfigs = getDataSetCategoryConfigs(
     dataSetCategories,
-    axes.major,
+    legend.items,
     meta,
   );
 
-  const minorAxisDecimals = getMinorAxisDecimalPlaces(
-    categoryDataSetConfigurations,
-  );
+  const minorAxisDecimals = getMinorAxisDecimalPlaces(dataSetCategoryConfigs);
 
   return (
     <ChartContainer
       height={height || 300}
       legend={legendProps}
-      legendPosition={legend}
+      legendPosition={legend.position}
       yAxisWidth={yAxisWidth}
       yAxisLabel={axes.major.label}
       xAxisHeight={xAxisHeight}
@@ -139,11 +139,11 @@ const HorizontalBarBlock = ({
             wrapperStyle={{ zIndex: 1000 }}
           />
 
-          {legend && legend !== 'none' && (
+          {legend.position !== 'none' && (
             <Legend content={renderLegend} align="left" layout="vertical" />
           )}
 
-          {categoryDataSetConfigurations.map(({ config, dataKey, dataSet }) => (
+          {dataSetCategoryConfigs.map(({ config, dataKey, dataSet }) => (
             <Bar
               key={dataKey}
               dataKey={dataKey}
@@ -181,21 +181,21 @@ export const horizontalBarBlockDefinition: ChartDefinition = {
   type: 'horizontalbar',
   name: 'Horizontal bar',
   capabilities: {
-    dataSymbols: false,
-    stackable: true,
-    lineStyle: false,
-    gridLines: true,
     canSize: true,
     canSort: true,
     fixedAxisGroupBy: false,
-    hasReferenceLines: true,
+    hasGridLines: true,
     hasLegend: true,
+    hasLegendPosition: true,
+    hasLineStyle: false,
+    hasReferenceLines: true,
+    hasSymbols: false,
     requiresGeoJson: false,
+    stackable: true,
   },
   options: {
     defaults: {
       height: 300,
-      legend: 'bottom',
     },
   },
   data: [
@@ -206,6 +206,11 @@ export const horizontalBarBlockDefinition: ChartDefinition = {
       targetAxis: 'yaxis',
     },
   ],
+  legend: {
+    defaults: {
+      position: 'bottom',
+    },
+  },
   axes: {
     major: {
       id: 'major',

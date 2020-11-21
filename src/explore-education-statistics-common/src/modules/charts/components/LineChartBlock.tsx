@@ -8,6 +8,7 @@ import {
   ChartSymbol,
 } from '@common/modules/charts/types/chart';
 import { DataSetCategory } from '@common/modules/charts/types/dataSet';
+import { LegendConfiguration } from '@common/modules/charts/types/legend';
 import createDataSetCategories, {
   toChartData,
 } from '@common/modules/charts/util/createDataSetCategories';
@@ -35,7 +36,7 @@ import {
   XAxis,
   YAxis,
 } from 'recharts';
-import getCategoryDataSetConfigurations from '../util/getCategoryDataSetConfigurations';
+import getDataSetCategoryConfigs from '@common/modules/charts/util/getDataSetCategoryConfigs';
 
 const lineStyles: Dictionary<string> = {
   solid: '',
@@ -65,6 +66,7 @@ const getLegendType = (
 };
 
 export interface LineChartProps extends ChartProps {
+  legend: LegendConfiguration;
   axes: {
     major: AxisConfiguration;
     minor: AxisConfiguration;
@@ -105,21 +107,19 @@ const LineChartBlock = ({
   const yAxisWidth = parseNumber(axes.minor.size);
   const xAxisHeight = parseNumber(axes.major.size);
 
-  const categoryDataSetConfigurations = getCategoryDataSetConfigurations(
+  const dataSetCategoryConfigs = getDataSetCategoryConfigs(
     dataSetCategories,
-    axes.major,
+    legend.items,
     meta,
   );
 
-  const minorAxisDecimals = getMinorAxisDecimalPlaces(
-    categoryDataSetConfigurations,
-  );
+  const minorAxisDecimals = getMinorAxisDecimalPlaces(dataSetCategoryConfigs);
 
   return (
     <ChartContainer
       height={height || 300}
       legend={legendProps}
-      legendPosition={legend}
+      legendPosition={legend.position}
       yAxisWidth={yAxisWidth}
       yAxisLabel={axes.minor.label}
       xAxisHeight={xAxisHeight}
@@ -140,7 +140,7 @@ const LineChartBlock = ({
             wrapperStyle={{ zIndex: 1000 }}
           />
 
-          {legend && legend !== 'none' && (
+          {legend.position !== 'none' && (
             <Legend content={renderLegend} align="left" layout="vertical" />
           )}
 
@@ -171,7 +171,7 @@ const LineChartBlock = ({
             tickFormatter={getCategoryLabel(dataSetCategories)}
           />
 
-          {categoryDataSetConfigurations.map(({ config, dataKey, dataSet }) => (
+          {dataSetCategoryConfigs.map(({ config, dataKey, dataSet }) => (
             <Line
               key={dataKey}
               dataKey={dataKey}
@@ -213,21 +213,21 @@ export const lineChartBlockDefinition: ChartDefinition = {
   type: 'line',
   name: 'Line',
   capabilities: {
-    dataSymbols: true,
-    stackable: false,
-    lineStyle: true,
-    gridLines: true,
     canSize: true,
     canSort: true,
     fixedAxisGroupBy: false,
-    hasReferenceLines: true,
+    hasGridLines: true,
     hasLegend: true,
+    hasLegendPosition: true,
+    hasLineStyle: true,
+    hasReferenceLines: true,
+    hasSymbols: true,
     requiresGeoJson: false,
+    stackable: false,
   },
   options: {
     defaults: {
       height: 300,
-      legend: 'bottom',
     },
   },
   data: [
@@ -238,6 +238,11 @@ export const lineChartBlockDefinition: ChartDefinition = {
       targetAxis: 'xaxis',
     },
   ],
+  legend: {
+    defaults: {
+      position: 'bottom',
+    },
+  },
   axes: {
     major: {
       id: 'xaxis',

@@ -3,19 +3,14 @@ import {
   AxisConfiguration,
   AxisType,
 } from '@common/modules/charts/types/chart';
-import {
-  DataSetConfiguration,
-  DataSetConfigurationOptions,
-} from '@common/modules/charts/types/dataSet';
+import { DataSet } from '@common/modules/charts/types/dataSet';
 import { UnmappedTableHeadersConfig } from '@common/services/permalinkService';
 import { TableDataQuery } from '@common/services/tableBuilderService';
 import { OmitStrict } from '@common/types';
 
 interface ChartAxisConfiguration
   extends OmitStrict<AxisConfiguration, 'dataSets'> {
-  dataSets: (OmitStrict<DataSetConfiguration, 'config'> & {
-    config?: DataSetConfigurationOptions;
-  })[];
+  dataSets: DataSet[];
 }
 
 type ChartAxesConfiguration = {

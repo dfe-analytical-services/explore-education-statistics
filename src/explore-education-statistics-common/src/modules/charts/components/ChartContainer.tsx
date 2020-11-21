@@ -1,7 +1,8 @@
 import useDebouncedCallback from '@common/hooks/useDebouncedCallback';
 import useMounted from '@common/hooks/useMounted';
 import AxisLabel from '@common/modules/charts/components/AxisLabel';
-import { ChartProps, Label } from '@common/modules/charts/types/chart';
+import { Label } from '@common/modules/charts/types/chart';
+import { LegendPosition } from '@common/modules/charts/types/legend';
 import classNames from 'classnames';
 import React, { ReactNode, useState } from 'react';
 import { LegendProps } from 'recharts';
@@ -11,7 +12,7 @@ interface Props {
   children: ReactNode;
   height: number;
   legend?: LegendProps;
-  legendPosition?: ChartProps['legend'];
+  legendPosition?: LegendPosition;
   yAxisWidth?: number;
   yAxisLabel?: Label;
   xAxisHeight?: number;

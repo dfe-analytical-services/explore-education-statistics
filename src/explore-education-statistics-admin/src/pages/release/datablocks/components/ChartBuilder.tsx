@@ -4,9 +4,10 @@ import ChartBuilderPreview from '@admin/pages/release/datablocks/components/Char
 import ChartConfiguration from '@admin/pages/release/datablocks/components/ChartConfiguration';
 import ChartDataSetsConfiguration from '@admin/pages/release/datablocks/components/ChartDataSetsConfiguration';
 import ChartDefinitionSelector from '@admin/pages/release/datablocks/components/ChartDefinitionSelector';
+import ChartLegendConfiguration from '@admin/pages/release/datablocks/components/ChartLegendConfiguration';
+import { ChartBuilderForms } from '@admin/pages/release/datablocks/components/types/chartBuilderForms';
 import {
   ChartOptions,
-  FormState,
   useChartBuilderReducer,
 } from '@admin/pages/release/datablocks/reducers/chartBuilderReducer';
 import Button from '@common/components/Button';
@@ -39,7 +40,8 @@ import {
   ChartDefinition,
   ChartProps,
 } from '@common/modules/charts/types/chart';
-import { DataSetConfiguration } from '@common/modules/charts/types/dataSet';
+import { DataSet } from '@common/modules/charts/types/dataSet';
+import { LegendConfiguration } from '@common/modules/charts/types/legend';
 import { FullTableMeta } from '@common/modules/table-tool/types/fullTable';
 import {
   ReleaseTableDataQuery,
@@ -52,6 +54,7 @@ import {
   isServerValidationError,
   ServerValidationErrorResponse,
 } from '@common/validation/serverValidations';
+import produce from 'immer';
 import mapValues from 'lodash/mapValues';
 import omit from 'lodash/omit';
 import React, {
@@ -74,31 +77,27 @@ type ChartBuilderChartProps = ChartRendererProps & {
 };
 
 const filterChartProps = (props: ChartBuilderChartProps): Chart => {
-  // Filter out any unnecessary props, for example,
-  // we don't want to persist data set `labels`
-  // anymore in the deprecated format.
   const excludedProps: (
     | keyof ChartBuilderChartProps
     | keyof InfographicChartProps
-    | 'labels'
-  )[] = ['data', 'meta', 'labels', 'getInfographic', 'file'];
+  )[] = ['data', 'meta', 'getInfographic', 'file'];
 
   if (props.type !== 'infographic') {
     excludedProps.push('fileId');
   }
 
-  return omit(props, excludedProps) as Chart;
-};
+  let filteredProps = omit(props, excludedProps) as Chart;
 
-export interface ChartBuilderForm extends FormState {
-  title: string;
-  id: string;
-}
+  // Filter out deprecated data set configurations
+  filteredProps = produce(filteredProps, draft => {
+    if (draft.axes.major) {
+      draft.axes.major.dataSets = draft.axes.major.dataSets.map(
+        dataSet => omit(dataSet, ['config']) as DataSet,
+      );
+    }
+  });
 
-type ChartBuilderForms = {
-  options: ChartBuilderForm;
-  data: ChartBuilderForm;
-  [key: string]: ChartBuilderForm;
+  return filteredProps;
 };
 
 export type TableQueryUpdateHandler = (
@@ -138,7 +137,13 @@ const ChartBuilder = ({
     initialConfiguration,
   );
 
-  const { axes, definition, options, forms: formStates } = chartBuilderState;
+  const {
+    axes,
+    definition,
+    options,
+    legend,
+    forms: formStates,
+  } = chartBuilderState;
 
   const getChartFile = useGetChartFile(releaseId);
 
@@ -149,6 +154,7 @@ const ChartBuilder = ({
         axis => axis.title,
       ),
       data: 'Data sets',
+      legend: 'Legend',
       options: 'Chart configuration',
     };
 
@@ -181,6 +187,7 @@ const ChartBuilder = ({
     const baseProps: ChartProps = {
       ...options,
       data,
+      legend,
       axes,
       meta,
     };
@@ -218,7 +225,7 @@ const ChartBuilder = ({
       default:
         return undefined;
     }
-  }, [axes, data, definition, getChartFile, meta, options]);
+  }, [axes, data, definition, getChartFile, legend, meta, options]);
 
   // Save the chart using an effect as it's easier to
   // ensure that the correct `chartProps` are passed
@@ -297,6 +304,11 @@ const ChartBuilder = ({
     200,
   );
 
+  const [handleLegendConfigurationChange] = useDebouncedCallback(
+    actions.updateChartLegend,
+    200,
+  );
+
   const [handleAxisConfigurationChange] = useDebouncedCallback(
     actions.updateChartAxis,
     200,
@@ -315,17 +327,26 @@ const ChartBuilder = ({
     [onTableQueryUpdate],
   );
 
-  const handleChartDataSubmit = useCallback(
-    (nextDataSets: DataSetConfiguration[]) => {
-      actions.updateDataSets(nextDataSets);
+  const handleChartConfigurationSubmit = useCallback(
+    (nextChartOptions: ChartOptions) => {
+      actions.updateChartOptions(nextChartOptions);
       setShouldSave(true);
     },
     [actions],
   );
 
-  const handleChartConfigurationSubmit = useCallback(
-    (nextChartOptions: ChartOptions) => {
-      actions.updateChartOptions(nextChartOptions);
+  const handleChartDataSetsSubmit = useCallback(() => {
+    setShouldSave(true);
+    actions.updateFormState({
+      form: 'data',
+      isValid: forms.data.isValid,
+      submitCount: forms.data.submitCount + 1,
+    });
+  }, [actions, forms.data.isValid, forms.data.submitCount]);
+
+  const handleLegendConfigurationSubmit = useCallback(
+    (nextLegend: LegendConfiguration) => {
+      actions.updateChartLegend(nextLegend);
       setShouldSave(true);
     },
     [actions],
@@ -379,7 +400,6 @@ const ChartBuilder = ({
           >
             <ChartConfiguration
               buttons={deleteButton}
-              canSaveChart={canSaveChart}
               hasSubmittedChart={hasSubmittedChart}
               isSaving={isSaving}
               submitError={submitError}
@@ -394,25 +414,43 @@ const ChartBuilder = ({
             />
           </TabsSection>
 
-          {definition.data.length > 0 && (
+          {definition.axes.major && (
             <TabsSection
               title="Data sets"
-              headingTitle="Add data sets to the chart"
+              headingTitle="Data sets"
               id={forms.data.id}
             >
               <ChartDataSetsConfiguration
                 buttons={deleteButton}
-                canSaveChart={canSaveChart}
                 isSaving={isSaving}
                 forms={forms}
                 meta={meta}
                 dataSets={axes.major?.dataSets}
-                definition={definition}
                 onDataAdded={actions.addDataSet}
                 onDataRemoved={actions.removeDataSet}
-                onDataChanged={actions.updateDataSets}
+                onSubmit={handleChartDataSetsSubmit}
+              />
+            </TabsSection>
+          )}
+
+          {definition.capabilities.hasLegend && axes.major && legend && (
+            <TabsSection
+              title="Legend"
+              headingTitle="Legend"
+              id={forms.legend.id}
+            >
+              <ChartLegendConfiguration
+                axisMajor={axes.major}
+                buttons={deleteButton}
+                data={data}
+                definition={definition}
+                isSaving={isSaving}
+                legend={legend}
+                forms={forms}
+                meta={meta}
+                onChange={handleLegendConfigurationChange}
                 onFormStateChange={actions.updateFormState}
-                onSubmit={handleChartDataSubmit}
+                onSubmit={handleLegendConfigurationSubmit}
               />
             </TabsSection>
           )}
@@ -435,7 +473,6 @@ const ChartBuilder = ({
                 >
                   <ChartAxisConfiguration
                     buttons={deleteButton}
-                    canSaveChart={canSaveChart}
                     hasSubmittedChart={hasSubmittedChart}
                     isSaving={isSaving}
                     forms={forms}

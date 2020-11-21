@@ -40,14 +40,21 @@ export interface DataSetCategory {
   }>;
 }
 
+/**
+ * Don't use this for storing configuration.
+ * @deprecated use {@see LegendItem} instead.
+ */
 export interface DataSetConfigurationOptions {
   label: string;
-  colour?: string;
-  unit?: string;
+  colour: string;
   symbol?: ChartSymbol;
   lineStyle?: LineStyle;
 }
 
+/**
+ * Don't use this for storing configuration.
+ * @deprecated use {@see LegendItem} instead.
+ */
 export interface DataSetConfiguration extends DataSet {
-  config: DataSetConfigurationOptions;
+  config?: DataSetConfigurationOptions;
 }

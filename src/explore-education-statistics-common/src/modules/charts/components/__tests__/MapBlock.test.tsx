@@ -5,6 +5,7 @@ import {
 import MapBlock, {
   MapBlockProps,
 } from '@common/modules/charts/components/MapBlock';
+import { LegendConfiguration } from '@common/modules/charts/types/legend';
 import mapFullTable from '@common/modules/table-tool/utils/mapFullTable';
 import { within } from '@testing-library/dom';
 import { render, screen, waitFor } from '@testing-library/react';
@@ -18,6 +19,7 @@ describe('MapBlock', () => {
     ...testMapConfiguration,
     id: 'testMap',
     axes: testMapConfiguration.axes as MapBlockProps['axes'],
+    legend: testMapConfiguration.legend as LegendConfiguration,
     meta: testFullTable.subjectMeta,
     data: testFullTable.results,
     height: 600,

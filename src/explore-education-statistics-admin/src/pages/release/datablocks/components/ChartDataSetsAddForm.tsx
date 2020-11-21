@@ -123,12 +123,7 @@ const ChartDataSetsAddForm = ({ meta, onSubmit }: Props) => {
             )}
           </div>
 
-          <Button
-            type="submit"
-            className="govuk-!-margin-bottom-0 govuk-!-margin-top-6"
-          >
-            Add data
-          </Button>
+          <Button type="submit">Add data set</Button>
         </Form>
       )}
     </Formik>

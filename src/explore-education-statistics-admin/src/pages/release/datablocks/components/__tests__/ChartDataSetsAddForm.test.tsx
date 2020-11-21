@@ -118,7 +118,7 @@ describe('ChartDataSetsAddForm', () => {
 
     const timePeriodOptions = within(timePeriod).getAllByRole('option');
     expect(timePeriodOptions).toHaveLength(3);
-    expect(timePeriodOptions[0]).toHaveTextContent('Any time period');
+    expect(timePeriodOptions[0]).toHaveTextContent('All time periods');
     expect(timePeriodOptions[1]).toHaveTextContent('2019/20');
     expect(timePeriodOptions[2]).toHaveTextContent('2020/21');
   });
@@ -215,7 +215,7 @@ describe('ChartDataSetsAddForm', () => {
         <ChartDataSetsAddForm meta={testSubjectMeta} onSubmit={handleSubmit} />,
       );
 
-      userEvent.click(screen.getByRole('button', { name: 'Add data' }));
+      userEvent.click(screen.getByRole('button', { name: 'Add data set' }));
 
       expect(handleSubmit).not.toHaveBeenCalled();
 
@@ -251,7 +251,7 @@ describe('ChartDataSetsAddForm', () => {
 
       expect(handleSubmit).not.toHaveBeenCalled();
 
-      userEvent.click(screen.getByRole('button', { name: 'Add data' }));
+      userEvent.click(screen.getByRole('button', { name: 'Add data set' }));
 
       await waitFor(() => {
         const expectedValues: ChartDataSetsAddFormValues = {
@@ -289,7 +289,7 @@ describe('ChartDataSetsAddForm', () => {
 
       expect(handleSubmit).not.toHaveBeenCalled();
 
-      userEvent.click(screen.getByRole('button', { name: 'Add data' }));
+      userEvent.click(screen.getByRole('button', { name: 'Add data set' }));
 
       await waitFor(() => {
         const expectedValues: ChartDataSetsAddFormValues = {
@@ -325,7 +325,7 @@ describe('ChartDataSetsAddForm', () => {
 
       expect(handleSubmit).not.toHaveBeenCalled();
 
-      userEvent.click(screen.getByRole('button', { name: 'Add data' }));
+      userEvent.click(screen.getByRole('button', { name: 'Add data set' }));
 
       await waitFor(() => {
         const expectedValues: ChartDataSetsAddFormValues = {

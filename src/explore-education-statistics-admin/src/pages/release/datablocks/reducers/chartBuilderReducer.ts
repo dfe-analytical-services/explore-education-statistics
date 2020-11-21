@@ -1,5 +1,4 @@
 import { useLoggedImmerReducer } from '@common/hooks/useLoggedReducer';
-import { ChartRendererProps } from '@common/modules/charts/components/ChartRenderer';
 import {
   AxesConfiguration,
   AxisConfiguration,
@@ -9,12 +8,12 @@ import {
   ChartDefinitionOptions,
   chartDefinitions,
 } from '@common/modules/charts/types/chart';
-import { DataSetConfiguration } from '@common/modules/charts/types/dataSet';
+import { DataSet } from '@common/modules/charts/types/dataSet';
+import { LegendConfiguration } from '@common/modules/charts/types/legend';
 import { Chart } from '@common/services/types/blocks';
 import { Dictionary } from '@common/types';
 import deepMerge from 'deepmerge';
 import mapValues from 'lodash/mapValues';
-import omit from 'lodash/omit';
 import { useCallback, useMemo } from 'react';
 import { Reducer } from 'use-immer';
 
@@ -33,9 +32,10 @@ export interface ChartBuilderState {
   definition?: ChartDefinition;
   options: ChartOptions;
   axes: AxesConfiguration;
-  chartProps?: ChartRendererProps;
+  legend?: LegendConfiguration;
   forms: {
     data: FormState;
+    legend: FormState;
     options: FormState;
     [form: string]: FormState;
   };
@@ -48,16 +48,19 @@ export type ChartBuilderActions =
     }
   | {
       type: 'ADD_DATA_SET';
-      payload: DataSetConfiguration;
+      payload: DataSet;
     }
-  | { type: 'REMOVE_DATA_SET'; payload: number }
   | {
-      type: 'UPDATE_DATA_SETS';
-      payload: DataSetConfiguration[];
+      type: 'REMOVE_DATA_SET';
+      payload: number;
     }
   | {
       type: 'UPDATE_CHART_OPTIONS';
       payload: ChartOptions;
+    }
+  | {
+      type: 'UPDATE_CHART_LEGEND';
+      payload: LegendConfiguration;
     }
   | {
       type: 'UPDATE_CHART_AXIS';
@@ -74,8 +77,14 @@ export type ChartBuilderActions =
       type: 'RESET';
     };
 
-const defaultOptions: Partial<ChartOptions> = {
+const defaultOptions: ChartOptions = {
+  height: 300,
   title: '',
+  alt: '',
+};
+
+const defaultLegend: LegendConfiguration = {
+  items: [],
 };
 
 const updateAxis = (
@@ -112,29 +121,28 @@ const updateAxis = (
 };
 
 const getInitialState = (initialConfiguration?: Chart): ChartBuilderState => {
-  const definition = chartDefinitions.find(
-    ({ type }) => type === initialConfiguration?.type,
-  );
+  const { type, axes, height, legend, ...options } = initialConfiguration ?? {};
 
-  // Make sure height is never actually 0 or negative
-  // as this wouldn't make sense for any chart.
-  const height =
-    typeof initialConfiguration?.height !== 'undefined' &&
-    initialConfiguration?.height > 0
-      ? initialConfiguration.height
-      : definition?.options?.defaults?.height ?? 300;
+  const definition = chartDefinitions.find(
+    chartDefinition => chartDefinition.type === type,
+  );
 
   const initialState: ChartBuilderState = {
     axes: {},
     definition,
     options: {
-      ...omit(initialConfiguration ?? {}, ['axes', 'type']),
-      title: initialConfiguration?.title ?? '',
-      alt: initialConfiguration?.alt ?? '',
-      height,
+      ...defaultOptions,
+      ...(options ?? {}),
+      height:
+        // Make sure height is never actually 0 or negative
+        // as this wouldn't make sense for any chart.
+        typeof height !== 'undefined' && height > 0
+          ? height
+          : definition?.options?.defaults?.height ?? 300,
     },
     forms: {
       data: { isValid: true, submitCount: 0 },
+      legend: { isValid: true, submitCount: 0 },
       options: { isValid: true, submitCount: 0 },
     },
   };
@@ -142,16 +150,6 @@ const getInitialState = (initialConfiguration?: Chart): ChartBuilderState => {
   if (!initialConfiguration) {
     return initialState;
   }
-
-  const axes: AxesConfiguration = mapValues(
-    initialState.definition?.axes ?? {},
-    (axisDefinition: ChartDefinitionAxis, type: AxisType) => {
-      return updateAxis(
-        axisDefinition,
-        (initialConfiguration.axes[type] ?? {}) as AxisConfiguration,
-      );
-    },
-  );
 
   const forms: ChartBuilderState['forms'] = {
     ...initialState.forms,
@@ -167,7 +165,18 @@ const getInitialState = (initialConfiguration?: Chart): ChartBuilderState => {
 
   return {
     ...initialState,
-    axes,
+    legend: {
+      ...defaultLegend,
+      ...(legend ?? {}),
+    },
+    axes: mapValues(
+      initialState.definition?.axes ?? {},
+      (axisDefinition: ChartDefinitionAxis, axisType: AxisType) =>
+        updateAxis(
+          axisDefinition,
+          (axes?.[axisType] ?? {}) as AxisConfiguration,
+        ),
+    ),
     forms,
   };
 };
@@ -185,6 +194,16 @@ export const chartBuilderReducer: Reducer<
         ...(action.payload.options.defaults ?? {}),
         ...draft.options,
       };
+
+      if (action.payload.capabilities.hasLegend) {
+        draft.legend = {
+          ...defaultLegend,
+          ...(action.payload.legend.defaults ?? {}),
+          ...(draft.legend ?? {}),
+        };
+      } else {
+        draft.legend = undefined;
+      }
 
       draft.axes = mapValues(
         action.payload.axes,
@@ -207,6 +226,7 @@ export const chartBuilderReducer: Reducer<
         ...newAxisForms,
         options: draft.forms.options,
         data: draft.forms.data,
+        legend: draft.forms.legend,
       };
 
       break;
@@ -234,6 +254,16 @@ export const chartBuilderReducer: Reducer<
 
       break;
     }
+    case 'UPDATE_CHART_LEGEND': {
+      draft.legend = {
+        ...defaultLegend,
+        ...(draft?.definition?.legend.defaults ?? {}),
+        ...draft.legend,
+        ...action.payload,
+      };
+
+      break;
+    }
     case 'UPDATE_CHART_OPTIONS': {
       draft.options = {
         ...defaultOptions,
@@ -256,15 +286,6 @@ export const chartBuilderReducer: Reducer<
     case 'REMOVE_DATA_SET': {
       if (draft.axes.major) {
         draft.axes.major.dataSets.splice(action.payload, 1);
-
-        draft.forms.data.isValid = draft.axes.major.dataSets.length > 0;
-      }
-
-      break;
-    }
-    case 'UPDATE_DATA_SETS': {
-      if (draft.axes.major) {
-        draft.axes.major.dataSets = action.payload;
 
         draft.forms.data.isValid = draft.axes.major.dataSets.length > 0;
       }
@@ -301,7 +322,7 @@ export function useChartBuilderReducer(initialConfiguration?: Chart) {
   );
 
   const addDataSet = useCallback(
-    (addedData: DataSetConfiguration) => {
+    (addedData: DataSet) => {
       dispatch({
         type: 'ADD_DATA_SET',
         payload: addedData,
@@ -311,20 +332,10 @@ export function useChartBuilderReducer(initialConfiguration?: Chart) {
   );
 
   const removeDataSet = useCallback(
-    (removedData: DataSetConfiguration, index: number) => {
+    (removedData: DataSet, index: number) => {
       dispatch({
         type: 'REMOVE_DATA_SET',
         payload: index,
-      });
-    },
-    [dispatch],
-  );
-
-  const updateDataSets = useCallback(
-    (newData: DataSetConfiguration[]) => {
-      dispatch({
-        type: 'UPDATE_DATA_SETS',
-        payload: newData,
       });
     },
     [dispatch],
@@ -345,6 +356,16 @@ export function useChartBuilderReducer(initialConfiguration?: Chart) {
       dispatch({
         type: 'UPDATE_CHART_OPTIONS',
         payload: chartOptions,
+      });
+    },
+    [dispatch],
+  );
+
+  const updateChartLegend = useCallback(
+    (legend: LegendConfiguration) => {
+      dispatch({
+        type: 'UPDATE_CHART_LEGEND',
+        payload: legend,
       });
     },
     [dispatch],
@@ -388,8 +409,8 @@ export function useChartBuilderReducer(initialConfiguration?: Chart) {
     () => ({
       addDataSet,
       removeDataSet,
-      updateDataSets,
       updateChartDefinition,
+      updateChartLegend,
       updateChartOptions,
       updateChartAxis,
       updateFormState,
@@ -400,8 +421,8 @@ export function useChartBuilderReducer(initialConfiguration?: Chart) {
       removeDataSet,
       updateChartAxis,
       updateChartDefinition,
+      updateChartLegend,
       updateChartOptions,
-      updateDataSets,
       updateFormState,
       resetState,
     ],
