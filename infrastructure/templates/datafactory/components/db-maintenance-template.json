@@ -17,7 +17,7 @@
   },
   "variables": {
     "factoryId": "[concat('Microsoft.DataFactory/factories/', parameters('factoryName'))]",
-    "fragmentationPercentage": "70",
+    "fragmentationPercentage": "30",
     "fragmentationTables": "Observation,ObservationFilterItem",
     "removeSoftDeletedSubjectsObservationLimit": "1500000",
     "removeSoftDeletedSubjectsObservationCommitBatchSize": "1000",
@@ -343,10 +343,10 @@
         "type": "ScheduleTrigger",
         "typeProperties": {
           "recurrence": {
-            "frequency": "Week",
+            "frequency": "Day",
             "interval": 1,
-            "startTime": "2020-09-19T23:00:00.000Z",
-            "timeZone": "UTC",
+            "startTime": "2020-11-23T19:00:00",
+            "timeZone": "GMT Standard Time",
             "schedule": {}
           }
         }
@@ -390,8 +390,8 @@
           "recurrence": {
             "frequency": "Week",
             "interval": 1,
-            "startTime": "2020-09-18T23:00:00.000Z",
-            "timeZone": "UTC",
+            "startTime": "2020-11-29T02:00:00",
+            "timeZone": "GMT Standard Time",
             "schedule": {}
           }
         }
