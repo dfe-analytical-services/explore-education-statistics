@@ -251,6 +251,20 @@
             }
           }
         ],
+        "parameters": {
+          "TotalObservationLimit": {
+            "type": "int",
+            "defaultValue": 1500000
+          },
+          "ObservationCommitBatchSize": {
+            "type": "int",
+            "defaultValue": 1000
+          },
+          "ObservationFilterItemCommitBatchSize": {
+            "type": "int",
+            "defaultValue": 20000
+          }
+        },
         "annotations": []
       },
       "dependsOn": [
@@ -307,6 +321,20 @@
             }
           }
         ],
+        "parameters": {
+          "TotalObservationLimit": {
+            "type": "int",
+            "defaultValue": 1500000
+          },
+          "ObservationCommitBatchSize": {
+            "type": "int",
+            "defaultValue": 1000
+          },
+          "ObservationFilterItemCommitBatchSize": {
+            "type": "int",
+            "defaultValue": 20000
+          }
+        },
         "annotations": []
       },
       "dependsOn": [
