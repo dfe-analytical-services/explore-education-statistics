@@ -45,11 +45,11 @@ describe('MapBlock', () => {
     const legendItems = screen.getAllByTestId('mapBlock-legend-item');
 
     expect(legendItems).toHaveLength(5);
-    expect(legendItems[0]).toHaveTextContent('3% to 3.2%');
-    expect(legendItems[1]).toHaveTextContent('3.3% to 3.4%');
-    expect(legendItems[2]).toHaveTextContent('3.5% to 3.6%');
-    expect(legendItems[3]).toHaveTextContent('3.7% to 3.8%');
-    expect(legendItems[4]).toHaveTextContent('3.9% to 4%');
+    expect(legendItems[0]).toHaveTextContent('3.00% to 3.20%');
+    expect(legendItems[1]).toHaveTextContent('3.21% to 3.40%');
+    expect(legendItems[2]).toHaveTextContent('3.41% to 3.60%');
+    expect(legendItems[3]).toHaveTextContent('3.61% to 3.80%');
+    expect(legendItems[4]).toHaveTextContent('3.81% to 4.00%');
 
     const legendColours = screen.getAllByTestId('mapBlock-legend-colour');
 
@@ -67,7 +67,7 @@ describe('MapBlock', () => {
         draft.results[0].measures['authorised-absence-rate'] = '3.5123';
         draft.results[1].measures['authorised-absence-rate'] = '3.012';
         draft.results[2].measures['authorised-absence-rate'] = '4.009';
-        draft.subjectMeta.indicators[0].decimalPlaces = 2;
+        draft.subjectMeta.indicators[0].decimalPlaces = 1;
       }),
     );
 
@@ -83,11 +83,11 @@ describe('MapBlock', () => {
       const legendItems = screen.getAllByTestId('mapBlock-legend-item');
 
       expect(legendItems).toHaveLength(5);
-      expect(legendItems[0]).toHaveTextContent('3.01% to 3.21%');
-      expect(legendItems[1]).toHaveTextContent('3.22% to 3.41%');
-      expect(legendItems[2]).toHaveTextContent('3.42% to 3.61%');
-      expect(legendItems[3]).toHaveTextContent('3.62% to 3.81%');
-      expect(legendItems[4]).toHaveTextContent('3.82% to 4.01%');
+      expect(legendItems[0]).toHaveTextContent('3.0% to 3.2%');
+      expect(legendItems[1]).toHaveTextContent('3.3% to 3.4%');
+      expect(legendItems[2]).toHaveTextContent('3.5% to 3.6%');
+      expect(legendItems[3]).toHaveTextContent('3.7% to 3.8%');
+      expect(legendItems[4]).toHaveTextContent('3.9% to 4.0%');
     });
   });
 
@@ -152,11 +152,11 @@ describe('MapBlock', () => {
 
     const legendItems = screen.getAllByTestId('mapBlock-legend-item');
 
-    expect(legendItems[0]).toHaveTextContent('4.7% to 4.78%');
-    expect(legendItems[1]).toHaveTextContent('4.78% to 4.86%');
-    expect(legendItems[2]).toHaveTextContent('4.86% to 4.94%');
-    expect(legendItems[3]).toHaveTextContent('4.94% to 5.02%');
-    expect(legendItems[4]).toHaveTextContent('5.02% to 5.1%');
+    expect(legendItems[0]).toHaveTextContent('4.70% to 4.78%');
+    expect(legendItems[1]).toHaveTextContent('4.79% to 4.86%');
+    expect(legendItems[2]).toHaveTextContent('4.87% to 4.94%');
+    expect(legendItems[3]).toHaveTextContent('4.95% to 5.02%');
+    expect(legendItems[4]).toHaveTextContent('5.03% to 5.10%');
 
     const legendColours = screen.getAllByTestId('mapBlock-legend-colour');
 
@@ -214,7 +214,7 @@ describe('MapBlock', () => {
       'Authorised absence rate (2016/17)',
     );
     expect(tile1.getByTestId('mapBlock-indicatorTile-value')).toHaveTextContent(
-      '3.5%',
+      '3.50%',
     );
 
     const tile2 = within(indicators[1]);
@@ -223,7 +223,7 @@ describe('MapBlock', () => {
       'Overall absence rate (2016/17)',
     );
     expect(tile2.getByTestId('mapBlock-indicatorTile-value')).toHaveTextContent(
-      '4.8%',
+      '4.80%',
     );
   });
 

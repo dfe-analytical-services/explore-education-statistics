@@ -2,7 +2,7 @@ import formatPretty from '../formatPretty';
 
 describe('formatPretty', () => {
   test('returns formatted string from integer', () => {
-    expect(formatPretty(150000000)).toBe('150,000,000');
+    expect(formatPretty(150000000)).toBe('150,000,000.00');
     expect(formatPretty(150000000, '', 1)).toBe('150,000,000.0');
     expect(formatPretty(150000000, '', 2)).toBe('150,000,000.00');
   });
@@ -23,7 +23,7 @@ describe('formatPretty', () => {
   });
 
   test('returns formatted string from string containing integer', () => {
-    expect(formatPretty('150000000')).toBe('150,000,000');
+    expect(formatPretty('150000000')).toBe('150,000,000.00');
     expect(formatPretty('150000000', '', 1)).toBe('150,000,000.0');
     expect(formatPretty('150000000', '', 2)).toBe('150,000,000.00');
   });
