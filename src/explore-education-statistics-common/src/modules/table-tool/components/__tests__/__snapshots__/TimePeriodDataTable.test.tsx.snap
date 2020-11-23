@@ -530,7 +530,7 @@ exports[`TimePeriodDataTable renders table with only one of each option and no f
       England
     </th>
     <td class="govuk-table__cell--numeric borderBottom">
-      18.3%
+      18.30%
     </td>
   </tr>
 </tbody>

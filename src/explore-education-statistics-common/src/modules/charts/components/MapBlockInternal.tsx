@@ -24,8 +24,9 @@ import {
 import { Dictionary } from '@common/types';
 import generateHslColour from '@common/utils/colour/generateHslColour';
 import lighten from '@common/utils/colour/lighten';
-import countDecimals from '@common/utils/number/countDecimals';
-import formatPretty from '@common/utils/number/formatPretty';
+import formatPretty, {
+  defaultDecimalPlaces,
+} from '@common/utils/number/formatPretty';
 import getMinMax from '@common/utils/number/getMinMax';
 import { roundDownToNearest } from '@common/utils/number/roundNearest';
 import classNames from 'classnames';
@@ -88,7 +89,7 @@ function generateGeometryAndLegend(
 
   const {
     unit,
-    decimalPlaces,
+    decimalPlaces = defaultDecimalPlaces,
   } = selectedDataSetConfiguration.dataSet.indicator;
 
   const { min = 0, max = 0 } = getMinMax(
@@ -109,8 +110,7 @@ function generateGeometryAndLegend(
   // Calculate the increment between values by using
   // decimal places expressed as a proportion of 1 e.g.
   // 1 decimal place is 0.1, 2 decimal places is 0.01, etc.
-  const valueIncrement =
-    1 / 10 ** (decimalPlaces ?? countDecimals(range * groupSize));
+  const valueIncrement = 1 / 10 ** decimalPlaces;
 
   const legend: LegendEntry[] =
     range > 0

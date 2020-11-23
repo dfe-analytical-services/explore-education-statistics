@@ -83,18 +83,21 @@ export const testMapTableData: TableDataResponse = {
         unit: '%',
         value: 'authorised-absence-rate',
         name: 'sess_authorised_percent',
+        decimalPlaces: 2,
       },
       {
         label: 'Unauthorised absence rate',
         unit: '%',
         value: 'unauthorised-absence-rate',
         name: 'sess_unauthorised_percent',
+        decimalPlaces: 2,
       },
       {
         label: 'Overall absence rate',
         unit: '%',
         value: 'overall-absence-rate',
         name: 'sess_overall_percent',
+        decimalPlaces: 2,
       },
     ],
     locations: [
