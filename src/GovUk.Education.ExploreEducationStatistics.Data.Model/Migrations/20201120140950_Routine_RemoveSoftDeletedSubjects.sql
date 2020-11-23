@@ -18,8 +18,9 @@ BEGIN
                  SELECT Subject.Id,
                         Subject.Filename,
                         Subject.Name,
-                        COUNT(Observation.Id)                                            AS ObservationCount,
-                        SUM(COUNT(Observation.Id)) OVER (ORDER BY COUNT(Observation.Id)) AS RunningTotal
+                        COUNT(Observation.Id) AS ObservationCount,
+                        SUM(COUNT(Observation.Id))
+                            OVER (ORDER BY COUNT(Observation.Id) ROWS UNBOUNDED PRECEDING) AS RunningTotal
                  FROM Subject
                           LEFT JOIN Observation ON Subject.Id = Observation.SubjectId
                  WHERE Subject.SoftDeleted = 1
