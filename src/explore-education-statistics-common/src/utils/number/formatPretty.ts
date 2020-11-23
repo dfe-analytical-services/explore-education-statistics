@@ -1,3 +1,5 @@
+export const defaultDecimalPlaces = 2;
+
 /**
  * Return a formatted {@param value} in a pretty format
  * i.e. 10,000,000.000.
@@ -16,7 +18,7 @@
 export default function formatPretty(
   value: string | number,
   unit?: string,
-  decimalPlaces?: number,
+  decimalPlaces = defaultDecimalPlaces,
 ): string {
   let formattedValue;
 

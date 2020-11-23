@@ -17,8 +17,11 @@
   },
   "variables": {
     "factoryId": "[concat('Microsoft.DataFactory/factories/', parameters('factoryName'))]",
-    "fragmentationPercentage": "70",
-    "fragmentationTables": "Observation,ObservationFilterItem"
+    "fragmentationPercentage": "30",
+    "fragmentationTables": "Observation,ObservationFilterItem",
+    "removeSoftDeletedSubjectsObservationLimit": "1500000",
+    "removeSoftDeletedSubjectsObservationCommitBatchSize": "1000",
+    "removeSoftDeletedSubjectsObservationFilterItemCommitBatchSize": "20000"
   },
   "resources": [
     {
@@ -217,7 +220,30 @@
             },
             "userProperties": [],
             "typeProperties": {
-              "storedProcedureName": "[[dbo].[RemoveSoftDeletedSubjects]"
+              "storedProcedureName": "[[dbo].[RemoveSoftDeletedSubjects]",
+              "storedProcedureParameters": {
+                "TotalObservationLimit": {
+                  "value": {
+                    "value": "@pipeline().parameters.TotalObservationLimit",
+                    "type": "Expression"
+                  },
+                  "type": "Int32"
+                },
+                "ObservationCommitBatchSize": {
+                  "value": {
+                    "value": "@pipeline().parameters.ObservationCommitBatchSize",
+                    "type": "Expression"
+                  },
+                  "type": "Int32"
+                },
+                "ObservationFilterItemCommitBatchSize": {
+                  "value": {
+                    "value": "@pipeline().parameters.ObservationFilterItemCommitBatchSize",
+                    "type": "Expression"
+                  },
+                  "type": "Int32"
+                }
+              }
             },
             "linkedServiceName": {
               "referenceName": "ls_sql_public_statistics",
@@ -250,7 +276,30 @@
             },
             "userProperties": [],
             "typeProperties": {
-              "storedProcedureName": "[[dbo].[RemoveSoftDeletedSubjects]"
+              "storedProcedureName": "[[dbo].[RemoveSoftDeletedSubjects]",
+              "storedProcedureParameters": {
+                "TotalObservationLimit": {
+                  "value": {
+                    "value": "@pipeline().parameters.TotalObservationLimit",
+                    "type": "Expression"
+                  },
+                  "type": "Int32"
+                },
+                "ObservationCommitBatchSize": {
+                  "value": {
+                    "value": "@pipeline().parameters.ObservationCommitBatchSize",
+                    "type": "Expression"
+                  },
+                  "type": "Int32"
+                },
+                "ObservationFilterItemCommitBatchSize": {
+                  "value": {
+                    "value": "@pipeline().parameters.ObservationFilterItemCommitBatchSize",
+                    "type": "Expression"
+                  },
+                  "type": "Int32"
+                }
+              }
             },
             "linkedServiceName": {
               "referenceName": "ls_sql_statistics",
@@ -284,16 +333,20 @@
               "referenceName": "pl_purge_subjects_public_statistics",
               "type": "PipelineReference"
             },
-            "parameters": {}
+            "parameters": {
+              "TotalObservationLimit": "[variables('removeSoftDeletedSubjectsObservationLimit')]",
+              "ObservationCommitBatchSize": "[variables('removeSoftDeletedSubjectsObservationCommitBatchSize')]",
+              "ObservationFilterItemCommitBatchSize": "[variables('removeSoftDeletedSubjectsObservationFilterItemCommitBatchSize')]"
+            }
           }
         ],
         "type": "ScheduleTrigger",
         "typeProperties": {
           "recurrence": {
-            "frequency": "Week",
+            "frequency": "Day",
             "interval": 1,
-            "startTime": "2020-09-19T23:00:00.000Z",
-            "timeZone": "UTC",
+            "startTime": "2020-11-23T19:00:00",
+            "timeZone": "GMT Standard Time",
             "schedule": {}
           }
         }
@@ -337,8 +390,8 @@
           "recurrence": {
             "frequency": "Week",
             "interval": 1,
-            "startTime": "2020-09-18T23:00:00.000Z",
-            "timeZone": "UTC",
+            "startTime": "2020-11-29T02:00:00",
+            "timeZone": "GMT Standard Time",
             "schedule": {}
           }
         }
