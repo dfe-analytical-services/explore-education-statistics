@@ -1,3 +1,4 @@
+#nullable enable
 using System;
 using System.Linq;
 using System.Threading.Tasks;
@@ -18,77 +19,89 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Model.Services
             _footnoteService = footnoteService;
         }
 
-        public async Task SoftDeleteAllSubjectsOrBreakReleaseLinks(Guid releaseId)
+        public async Task SoftDeleteAllReleaseSubjects(Guid releaseId)
         {
-            await DeleteAllSubjectsOrBreakReleaseLinks(releaseId, true);
+            await DeleteAllReleaseSubjects(releaseId, true);
         }
 
-        public async Task SoftDeleteSubjectOrBreakReleaseLink(Guid releaseId, Guid subjectId)
+        public async Task SoftDeleteReleaseSubject(Guid releaseId, Guid subjectId)
         {
-            await DeleteSubjectOrBreakReleaseLink(releaseId, subjectId, true);
+            await DeleteReleaseSubject(releaseId, subjectId, true);
         }
 
-        public async Task DeleteAllSubjectsOrBreakReleaseLinks(Guid releaseId, bool isSoftDelete = false)
+        public async Task DeleteAllReleaseSubjects(Guid releaseId, bool softDeleteOrphanedSubjects = false)
         {
             var subjectIds = await _statisticsDbContext.ReleaseSubject
                 .Include(rs => rs.Subject)
-                .Where(rs => rs.ReleaseId == releaseId).Select(rs => rs.SubjectId).ToListAsync();
+                .Where(rs => rs.ReleaseId == releaseId)
+                .Select(rs => rs.SubjectId)
+                .ToListAsync();
 
             foreach (var id in subjectIds)
             {
-                await DeleteSubjectOrBreakReleaseLink(releaseId, id, isSoftDelete);
+                await DeleteReleaseSubject(releaseId, id, softDeleteOrphanedSubjects);
             }
         }
 
-        public async Task DeleteSubjectOrBreakReleaseLink(Guid releaseId, Guid subjectId, bool isSoftDelete = false)
+        public async Task DeleteReleaseSubject(Guid releaseId, Guid subjectId, bool softDeleteOrphanedSubject = false)
         {
-            await RemoveReleaseSubjectLinkIfExists(releaseId, subjectId);
+            var releaseSubject = await _statisticsDbContext
+                .ReleaseSubject
+                .Include(rs => rs.Subject)
+                .FirstOrDefaultAsync(rs => rs.ReleaseId == releaseId && rs.SubjectId == subjectId);
+
+            await DeleteReleaseSubjectIfExists(releaseSubject);
             await _footnoteService.DeleteAllFootnotesBySubject(releaseId, subjectId);
-            await DeleteSubjectIfOrphanedAndExists(subjectId, isSoftDelete);
+
+            if (releaseSubject?.Subject != null)
+            {
+                await DeleteSubjectIfOrphaned(releaseSubject.Subject, softDeleteOrphanedSubject);
+            }
+        }
+
+        private async Task DeleteReleaseSubjectIfExists(ReleaseSubject? releaseSubject)
+        {
+            if (releaseSubject != null)
+            {
+                _statisticsDbContext.ReleaseSubject.Remove(releaseSubject);
+                // Immediately save context as we will need to re-check
+                // how many ReleaseSubjects are attached to the Subject
+                // later when determining if the Subject has been orphaned.
+                await _statisticsDbContext.SaveChangesAsync();
+            }
+        }
+
+        private async Task DeleteSubjectIfOrphaned(Subject subject, bool isSoftDelete)
+        {
+            if (!IsSubjectOrphaned(subject))
+            {
+                return;
+            }
+
+            if (isSoftDelete)
+            {
+                subject.SoftDeleted = true;
+                _statisticsDbContext.Subject.Update(subject);
+            }
+            else
+            {
+                // Manually detach subject from state tracking to stop EF from
+                // performing cascading deletes of child relationships in the wrong order.
+                // By detaching it, we just let the database handle the cascading delete instead.
+                // This is more efficient (fewer delete queries) and works correctly.
+                _statisticsDbContext.Entry(subject).State = EntityState.Detached;
+
+                // N.B. This delete will be slow if there are a large number of observations but this is only
+                // executed by the tests when the topic is torn down so ensure files used are < 1000 rows.
+                _statisticsDbContext.Subject.Remove(subject);
+            }
 
             await _statisticsDbContext.SaveChangesAsync();
         }
 
-        private async Task RemoveReleaseSubjectLinkIfExists(Guid releaseId, Guid subjectId)
+        private bool IsSubjectOrphaned(Subject subject)
         {
-            var releaseSubject = await _statisticsDbContext
-                .ReleaseSubject
-                .FirstOrDefaultAsync(rs => rs.ReleaseId == releaseId && rs.SubjectId == subjectId);
-
-            if (releaseSubject != null)
-            {
-                _statisticsDbContext.ReleaseSubject.Remove(releaseSubject);
-            }
-        }
-
-        private async Task DeleteSubjectIfOrphanedAndExists(Guid subjectId, bool isSoftDelete)
-        {
-            var subject = await _statisticsDbContext.Subject
-                .FirstOrDefaultAsync(s => s.Id == subjectId);
-
-            if (CanDeleteSubject(subject))
-            {
-                if (isSoftDelete)
-                {
-                    subject.SoftDeleted = true;
-                    _statisticsDbContext.Subject.Update(subject);
-                }
-                else
-                {
-                    // N.B. This delete will be slow if there are a large number of observations but this is only
-                    // executed by the tests when the topic is torn down so ensure files used are < 1000 rows.
-                    var observations =  _statisticsDbContext.Observation
-                        .Where(o => o.SubjectId == subjectId);
-                    _statisticsDbContext.Observation.RemoveRange(observations);
-                    _statisticsDbContext.Subject.Remove(subject);
-                }
-            }
-        }
-
-        private bool CanDeleteSubject(Subject subject)
-        {
-            return subject != null
-                   && _statisticsDbContext.ReleaseSubject.Count(rs => rs.SubjectId == subject.Id) < 2;
+            return _statisticsDbContext.ReleaseSubject.Count(rs => rs.SubjectId == subject.Id) == 0;
         }
     }
 }

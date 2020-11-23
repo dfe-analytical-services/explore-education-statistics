@@ -207,7 +207,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Common.Services
             var blobContainer = await GetBlobContainer(containerName);
             var blob = blobContainer.GetBlockBlobClient(path);
 
-            _logger.LogInformation($"Uploading stream to blob {containerName}/{path}");
+            _logger.LogInformation($"Uploading {containerName}/{path}");
 
             if (stream.CanSeek)
             {

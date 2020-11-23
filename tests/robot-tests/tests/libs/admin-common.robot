@@ -271,9 +271,10 @@ user deletes editable accordion section content block
 
 user gets meta guidance data file content editor
     [Arguments]   ${accordion_heading}
-    ${accordion}=  user gets accordion section content element  ${accordion_heading}
-    user waits until parent contains element  ${accordion}   xpath://*[@data-testid="Content"]//*[@role="textbox"]
-    ${editor}=  get child element  ${accordion}  xpath://*[@data-testid="Content"]//*[@role="textbox"]
+    user waits until page contains element   id:metaGuidance-dataFiles
+    ${accordion}=  user gets accordion section content element  ${accordion_heading}   id:metaGuidance-dataFiles
+    user waits until parent contains element  ${accordion}   xpath:.//*[@data-testid="Content"]//*[@role="textbox"]
+    ${editor}=  get child element  ${accordion}  xpath:.//*[@data-testid="Content"]//*[@role="textbox"]
     [Return]  ${editor}
 
 user enters text into meta guidance data file content editor

@@ -2,6 +2,7 @@ using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
+using GovUk.Education.ExploreEducationStatistics.Common.Extensions;
 using GovUk.Education.ExploreEducationStatistics.Common.Services;
 using GovUk.Education.ExploreEducationStatistics.Common.Services.Interfaces;
 using GovUk.Education.ExploreEducationStatistics.Data.Importer.Services.Interfaces;
@@ -42,41 +43,46 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Processor.Services
             var releaseId = message.Release.Id;
 
             // Potentially status could already be failed so don't continue
-            if (await _importStatusService.UpdateStatus(releaseId, message.OrigDataFileName, IStatus.STAGE_4))
-            {
-                var subjectData = await _fileStorageService.GetSubjectData(message);
-                var releaseSubject = GetReleaseSubjectLink(message, context);
-
-                await using var datafileStream = await _fileStorageService.StreamBlob(subjectData.DataBlob);
-                var dataFileTable = DataTableUtils.CreateFromStream(datafileStream);
-
-                await using var metaFileStream = await _fileStorageService.StreamBlob(subjectData.MetaBlob);
-                var metaFileTable = DataTableUtils.CreateFromStream(metaFileStream);
-
-                await context.Database.CreateExecutionStrategy().Execute(async () =>
-                {
-                    await using var transaction = await context.Database.BeginTransactionAsync();
-
-                    await _importerService.ImportObservations(
-                        dataFileTable.Columns,
-                        dataFileTable.Rows,
-                        releaseSubject.Subject,
-                        _importerService.GetMeta(metaFileTable, releaseSubject.Subject, context),
-                        message.BatchNo,
-                        message.RowsPerBatch,
-                        context
-                    );
-
-                    await transaction.CommitAsync();
-                    await context.Database.CloseConnectionAsync();
-                });
-
-                await CheckComplete(releaseId, message, context);
-            }
-            else
+            var status = await _importStatusService.GetImportStatus(releaseId, message.OrigDataFileName);
+            if (status.Status == IStatus.FAILED)
             {
                 _logger.LogInformation($"{message.DataFileName} already failed...skipping");
+                return;
             }
+
+            if (status.Status != IStatus.STAGE_4)
+            {
+                await _importStatusService.UpdateStatus(releaseId, message.OrigDataFileName, IStatus.STAGE_4);                
+            }
+
+            var subjectData = await _fileStorageService.GetSubjectData(message);
+            var releaseSubject = GetReleaseSubjectLink(message, context);
+
+            await using var datafileStream = await _fileStorageService.StreamBlob(subjectData.DataBlob);
+            var dataFileTable = DataTableUtils.CreateFromStream(datafileStream);
+
+            await using var metaFileStream = await _fileStorageService.StreamBlob(subjectData.MetaBlob);
+            var metaFileTable = DataTableUtils.CreateFromStream(metaFileStream);
+
+            await context.Database.CreateExecutionStrategy().Execute(async () =>
+            {
+                await using var transaction = await context.Database.BeginTransactionAsync();
+
+                await _importerService.ImportObservations(
+                    dataFileTable.Columns,
+                    dataFileTable.Rows,
+                    releaseSubject.Subject,
+                    _importerService.GetMeta(metaFileTable, releaseSubject.Subject, context),
+                    message.BatchNo,
+                    message.RowsPerBatch,
+                    context
+                );
+
+                await transaction.CommitAsync();
+                await context.Database.CloseConnectionAsync();
+            });
+
+            await CheckComplete(releaseId, message, context);
         }
 
         public async Task ImportFiltersLocationsAndSchools(ImportMessage message, StatisticsDbContext context)
@@ -122,10 +128,10 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Processor.Services
             
             var import = await _importStatusService.GetImportStatus(releaseId, message.OrigDataFileName);
 
-            if (import.Status.Equals(IStatus.STAGE_4) && (message.NumBatches == 1 || numBatchesRemaining == 0))
+            if (message.NumBatches == 1 || numBatchesRemaining == 0)
             {
                 var observationCount = context.Observation.Count(o => o.SubjectId.Equals(message.SubjectId));
-                
+
                 if (!observationCount.Equals(message.TotalRows))
                 {
                     await _batchService.FailImport(releaseId, message.OrigDataFileName,
@@ -139,18 +145,24 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Processor.Services
                 }
                 else
                 {
-                    await _importStatusService.UpdateStatus(releaseId, message.OrigDataFileName,
-                        import.Errors.Equals("") ? IStatus.COMPLETE : IStatus.FAILED);
+                    if (import.Errors.IsNullOrEmpty())
+                    {
+                        await _importStatusService.UpdateStatus(releaseId, message.OrigDataFileName, IStatus.COMPLETE, 100);
+                    }
+                    else
+                    {
+                        await _importStatusService.UpdateStatus(releaseId, message.OrigDataFileName, IStatus.FAILED);
+                    }
                 }
-
-                _logger.LogInformation(import.Errors.Equals("") && observationCount.Equals(message.TotalRows)
-                    ? $"All batches imported for {releaseId} : {message.OrigDataFileName} with no errors"
-                    : $"All batches imported for {releaseId} : {message.OrigDataFileName} but with errors - check storage log");
             }
             else
             {
-                var percentageComplete = (double)(message.NumBatches - numBatchesRemaining) / message.NumBatches * 100;
-                await _importStatusService.UpdateProgress(releaseId, message.OrigDataFileName, percentageComplete);
+                var percentageComplete = (double) (message.NumBatches - numBatchesRemaining) / message.NumBatches * 100;
+
+                await _importStatusService.UpdateStatus(releaseId,
+                    message.OrigDataFileName,
+                    IStatus.STAGE_4,
+                    percentageComplete);
             }
         }
     }

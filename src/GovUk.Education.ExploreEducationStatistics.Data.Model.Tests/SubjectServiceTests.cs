@@ -1,8 +1,8 @@
 ﻿using System;
+using System.Threading.Tasks;
 using GovUk.Education.ExploreEducationStatistics.Data.Model.Database;
 using GovUk.Education.ExploreEducationStatistics.Data.Model.Services;
 using GovUk.Education.ExploreEducationStatistics.Data.Model.Services.Interfaces;
-using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Logging;
 using Moq;
 using Xunit;
@@ -12,155 +12,334 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Model.Tests
     public class SubjectServiceTests
     {
         [Fact]
-        public void IsSubjectForLatestPublishedRelease()
+        public async Task IsSubjectForLatestPublishedRelease()
         {
-            var (logger, releaseService) = Mocks();
-
-            var builder = new DbContextOptionsBuilder<StatisticsDbContext>();
-            builder.UseInMemoryDatabase(Guid.NewGuid().ToString());
-            var options = builder.Options;
-
-            using (var context = new StatisticsDbContext(options, null))
+            var releaseSubject = new ReleaseSubject
             {
-                var publication = new Publication
+                Release = new Release
                 {
-                    Id = Guid.NewGuid()
-                };
-
-                var release = new Release
-                {
-                    Id = Guid.NewGuid(),
-                    PublicationId = publication.Id,
+                    Publication = new Publication(),
                     Published = DateTime.UtcNow
-                };
+                },
+                Subject = new Subject()
+            };
 
-                var subject = new Subject
-                {
-                    Id = Guid.NewGuid()
-                };
+            var contextId = Guid.NewGuid().ToString();
 
-                var releaseSubjectLink = new ReleaseSubject
-                {
-                    ReleaseId = release.Id,
-                    SubjectId = subject.Id
-                };
+            await using (var context = StatisticsDbUtils.InMemoryStatisticsDbContext(contextId))
+            {
+                await context.AddAsync(releaseSubject);
+                await context.SaveChangesAsync();
+            }
 
-                context.Add(publication);
-                context.Add(release);
-                context.Add(subject);
-                context.Add(releaseSubjectLink);
+            await using (var context = StatisticsDbUtils.InMemoryStatisticsDbContext(contextId))
+            {
+                var releaseService = new Mock<IReleaseService>();
 
-                context.SaveChanges();
+                releaseService
+                    .Setup(s => s.GetLatestPublishedRelease(releaseSubject.Release.PublicationId))
+                    .Returns(releaseSubject.ReleaseId);
 
-                releaseService.Setup(s => s.GetLatestPublishedRelease(publication.Id)).Returns(release.Id);
+                var service = BuildSubjectService(context, releaseService: releaseService.Object);
+                var result = await service.IsSubjectForLatestPublishedRelease(releaseSubject.SubjectId);
 
-                var service = new SubjectService(context, logger.Object, releaseService.Object);
-                Assert.True(service.IsSubjectForLatestPublishedRelease(subject.Id));
+                Assert.True(result);
             }
         }
 
         [Fact]
-        public void IsSubjectForLatestPublishedRelease_SubjectBelongsToOldRelease()
+        public async Task IsSubjectForLatestPublishedRelease_SubjectBelongsToOldRelease()
         {
-            var (logger, releaseService) = Mocks();
-
-            var builder = new DbContextOptionsBuilder<StatisticsDbContext>();
-            builder.UseInMemoryDatabase(Guid.NewGuid().ToString());
-            var options = builder.Options;
-
-            using (var context = new StatisticsDbContext(options, null))
+            var releaseSubject = new ReleaseSubject
             {
-                var publication = new Publication
+                Release = new Release
                 {
-                    Id = Guid.NewGuid()
-                };
-
-                var release = new Release
-                {
-                    Id = Guid.NewGuid(),
-                    PublicationId = publication.Id,
+                    Publication = new Publication(),
                     Published = DateTime.UtcNow
-                };
+                },
+                Subject = new Subject()
+            };
 
-                var subject = new Subject
-                {
-                    Id = Guid.NewGuid()
-                };
-                
-                var releaseSubjectLink = new ReleaseSubject
-                {
-                    ReleaseId = release.Id,
-                    SubjectId = subject.Id
-                };
+            var contextId = Guid.NewGuid().ToString();
 
-                context.Add(publication);
-                context.Add(release);
-                context.Add(subject);
-                context.Add(releaseSubjectLink);
+            await using (var context = StatisticsDbUtils.InMemoryStatisticsDbContext(contextId))
+            {
+                await context.AddAsync(releaseSubject);
+                await context.SaveChangesAsync();
+            }
 
-                context.SaveChanges();
+            await using (var context = StatisticsDbUtils.InMemoryStatisticsDbContext(contextId))
+            {
+                var releaseService = new Mock<IReleaseService>();
 
-                releaseService.Setup(s => s.GetLatestPublishedRelease(publication.Id)).Returns(Guid.NewGuid());
+                releaseService
+                    .Setup(s => s.GetLatestPublishedRelease(releaseSubject.Release.PublicationId))
+                    .Returns(Guid.NewGuid());
 
-                var service = new SubjectService(context, logger.Object, releaseService.Object);
-                Assert.False(service.IsSubjectForLatestPublishedRelease(subject.Id));
+                var service = BuildSubjectService(context, releaseService: releaseService.Object);
+                var result = await service.IsSubjectForLatestPublishedRelease(releaseSubject.SubjectId);
+
+                Assert.False(result);
             }
         }
 
         [Fact]
-        public void IsSubjectForLatestPublishedRelease_SubjectBelongsToNonLiveRelease()
+        public async Task IsSubjectForLatestPublishedRelease_SubjectBelongsToNonLiveRelease()
         {
-            var (logger, releaseService) = Mocks();
-
-            var builder = new DbContextOptionsBuilder<StatisticsDbContext>();
-            builder.UseInMemoryDatabase(Guid.NewGuid().ToString());
-            var options = builder.Options;
-
-            using (var context = new StatisticsDbContext(options, null))
+            var releaseSubject = new ReleaseSubject
             {
-                var publication = new Publication
+                Release = new Release
                 {
-                    Id = Guid.NewGuid()
-                };
-
-                var release = new Release
-                {
-                    Id = Guid.NewGuid(),
-                    PublicationId = publication.Id,
+                    Publication = new Publication(),
                     Published = null
-                };
+                },
+                Subject = new Subject()
+            };
 
-                var subject = new Subject
-                {
-                    Id = Guid.NewGuid()
-                };
-                
-                var releaseSubjectLink = new ReleaseSubject
-                {
-                    ReleaseId = release.Id,
-                    SubjectId = subject.Id
-                };
+            var contextId = Guid.NewGuid().ToString();
 
-                context.Add(publication);
-                context.Add(release);
-                context.Add(subject);
-                context.Add(releaseSubjectLink);
+            await using (var context = StatisticsDbUtils.InMemoryStatisticsDbContext(contextId))
+            {
+                await context.AddAsync(releaseSubject);
+                await context.SaveChangesAsync();
+            }
 
-                context.SaveChanges();
+            await using (var context = StatisticsDbUtils.InMemoryStatisticsDbContext(contextId))
+            {
+                var releaseService = new Mock<IReleaseService>();
 
-                releaseService.Setup(s => s.GetLatestPublishedRelease(publication.Id)).Returns(Guid.NewGuid());
+                releaseService
+                    .Setup(s => s.GetLatestPublishedRelease(releaseSubject.Release.PublicationId))
+                    .Returns(Guid.NewGuid());
 
-                var service = new SubjectService(context, logger.Object, releaseService.Object);
-                Assert.False(service.IsSubjectForLatestPublishedRelease(subject.Id));
+                var service = BuildSubjectService(context, releaseService: releaseService.Object);
+                var result = await service.IsSubjectForLatestPublishedRelease(releaseSubject.SubjectId);
+
+                Assert.False(result);
             }
         }
 
-        private static (Mock<ILogger<SubjectService>>,
-            Mock<IReleaseService>) Mocks()
+        [Fact]
+        public async Task Get_WithSubjectId()
         {
-            return (
-                new Mock<ILogger<SubjectService>>(),
-                new Mock<IReleaseService>());
+            var subject = new Subject();
+            var contextId = Guid.NewGuid().ToString();
+
+            await using (var context = StatisticsDbUtils.InMemoryStatisticsDbContext(contextId))
+            {
+                await context.AddAsync(subject);
+                await context.SaveChangesAsync();
+            }
+
+            await using (var context = StatisticsDbUtils.InMemoryStatisticsDbContext(contextId))
+            {
+                var service = BuildSubjectService(context);
+                var result = await service.Get(subject.Id);
+
+                Assert.NotNull(result);
+                Assert.Equal(subject.Id, result.Id);
+            }
+        }
+
+
+        [Fact]
+        public async Task Get_WithSubjectId_NotFound()
+        {
+            var contextId = Guid.NewGuid().ToString();
+
+            await using (var context = StatisticsDbUtils.InMemoryStatisticsDbContext(contextId))
+            {
+                var service = BuildSubjectService(context);
+                var result = await service.Get(Guid.NewGuid());
+
+                Assert.Null(result);
+            }
+        }
+
+        [Fact]
+        public async Task Get_WithReleaseAndSubjectName()
+        {
+            var releaseSubject = new ReleaseSubject
+            {
+                Release = new Release(),
+                Subject = new Subject
+                {
+                    Name = "Test subject"
+                }
+            };
+
+            var contextId = Guid.NewGuid().ToString();
+
+            await using (var context = StatisticsDbUtils.InMemoryStatisticsDbContext(contextId))
+            {
+                await context.AddAsync(releaseSubject);
+                await context.SaveChangesAsync();
+            }
+
+            await using (var context = StatisticsDbUtils.InMemoryStatisticsDbContext(contextId))
+            {
+                var service = BuildSubjectService(context);
+                var result = await service.Get(releaseSubject.ReleaseId, "Test subject");
+
+                Assert.NotNull(result);
+                Assert.Equal(releaseSubject.SubjectId, result.Id);
+                Assert.Equal("Test subject", result.Name);
+            }
+        }
+
+        [Fact]
+        public async Task Get_WithReleaseAndSubjectName_SubjectNameNotFound()
+        {
+            var releaseSubject = new ReleaseSubject
+            {
+                Release = new Release(),
+                Subject = new Subject
+                {
+                    Name = "Test subject"
+                }
+            };
+
+            var contextId = Guid.NewGuid().ToString();
+
+            await using (var context = StatisticsDbUtils.InMemoryStatisticsDbContext(contextId))
+            {
+                await context.AddAsync(releaseSubject);
+                await context.SaveChangesAsync();
+            }
+
+            await using (var context = StatisticsDbUtils.InMemoryStatisticsDbContext(contextId))
+            {
+                var service = BuildSubjectService(context);
+                var result = await service.Get(releaseSubject.ReleaseId, "Not the subject");
+
+                Assert.Null(result);
+            }
+        }
+
+        [Fact]
+        public async Task Get_WithReleaseAndSubjectName_ReleaseNotFound()
+        {
+            var contextId = Guid.NewGuid().ToString();
+
+            await using (var context = StatisticsDbUtils.InMemoryStatisticsDbContext(contextId))
+            {
+                var service = BuildSubjectService(context);
+                var result = await service.Get(Guid.NewGuid(), "Test subject");
+
+                Assert.Null(result);
+            }
+        }
+
+        [Fact]
+        public async Task GetPublicationForSubject()
+        {
+            var releaseSubject = new ReleaseSubject
+            {
+                Release = new Release
+                {
+                    Publication = new Publication
+                    {
+                        Title = "Test publication"
+                    },
+                },
+                Subject = new Subject
+                {
+                    Name = "Test subject"
+                }
+            };
+
+            var contextId = Guid.NewGuid().ToString();
+
+            await using (var context = StatisticsDbUtils.InMemoryStatisticsDbContext(contextId))
+            {
+                await context.AddAsync(releaseSubject);
+                await context.SaveChangesAsync();
+            }
+
+            await using (var context = StatisticsDbUtils.InMemoryStatisticsDbContext(contextId))
+            {
+                var service = BuildSubjectService(context);
+                var result = await service.GetPublicationForSubject(releaseSubject.SubjectId);
+
+                Assert.Equal(releaseSubject.Release.PublicationId, result.Id);
+                Assert.Equal("Test publication", result.Title);
+            }
+        }
+
+        [Fact]
+        public async Task GetPublicationForSubject_NotFoundThrows()
+        {
+            var contextId = Guid.NewGuid().ToString();
+
+            await using (var context = StatisticsDbUtils.InMemoryStatisticsDbContext(contextId))
+            {
+                var service = BuildSubjectService(context);
+
+                await Assert.ThrowsAsync<InvalidOperationException>(
+                    () => service.GetPublicationForSubject(Guid.NewGuid())
+                );
+            }
+        }
+
+        [Fact]
+        public async Task FindPublicationForSubject()
+        {
+            var releaseSubject = new ReleaseSubject
+            {
+                Release = new Release
+                {
+                    Publication = new Publication
+                    {
+                        Title = "Test publication"
+                    },
+                },
+                Subject = new Subject
+                {
+                    Name = "Test subject"
+                }
+            };
+
+            var contextId = Guid.NewGuid().ToString();
+
+            await using (var context = StatisticsDbUtils.InMemoryStatisticsDbContext(contextId))
+            {
+                await context.AddAsync(releaseSubject);
+                await context.SaveChangesAsync();
+            }
+
+            await using (var context = StatisticsDbUtils.InMemoryStatisticsDbContext(contextId))
+            {
+                var service = BuildSubjectService(context);
+                var result = await service.FindPublicationForSubject(releaseSubject.SubjectId);
+
+                Assert.Equal(releaseSubject.Release.PublicationId, result.Id);
+                Assert.Equal("Test publication", result.Title);
+            }
+        }
+
+        [Fact]
+        public async Task FindPublicationForSubject_NotFoundReturnsNull()
+        {
+            var contextId = Guid.NewGuid().ToString();
+
+            await using (var context = StatisticsDbUtils.InMemoryStatisticsDbContext(contextId))
+            {
+                var service = BuildSubjectService(context);
+                var result = await service.FindPublicationForSubject(Guid.NewGuid());
+
+                Assert.Null(result);
+            }
+        }
+
+        private SubjectService BuildSubjectService(
+            StatisticsDbContext statisticsDbContext,
+            IReleaseService releaseService = null)
+        {
+            return new SubjectService(
+                statisticsDbContext,
+                new Mock<ILogger<SubjectService>>().Object,
+                releaseService ?? new Mock<IReleaseService>().Object
+            );
         }
     }
 }

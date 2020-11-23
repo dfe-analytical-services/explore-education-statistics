@@ -1,17 +1,11 @@
 using System;
 using System.Collections.Generic;
 using System.Threading.Tasks;
-using GovUk.Education.ExploreEducationStatistics.Common.Model;
 using GovUk.Education.ExploreEducationStatistics.Common.Services;
 using GovUk.Education.ExploreEducationStatistics.Common.Services.Interfaces;
-using GovUk.Education.ExploreEducationStatistics.Content.Model.Database;
-using GovUk.Education.ExploreEducationStatistics.Data.Importer.Services.Interfaces;
 using GovUk.Education.ExploreEducationStatistics.Data.Importer.Utils;
-using GovUk.Education.ExploreEducationStatistics.Data.Model.Database;
 using GovUk.Education.ExploreEducationStatistics.Data.Processor.Model;
-using GovUk.Education.ExploreEducationStatistics.Data.Processor.Models;
 using GovUk.Education.ExploreEducationStatistics.Data.Processor.Services.Interfaces;
-using GovUk.Education.ExploreEducationStatistics.Data.Processor.Utils;
 using Microsoft.Azure.WebJobs;
 using Microsoft.Data.SqlClient;
 using Microsoft.Extensions.Logging;
@@ -23,119 +17,104 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Processor.Functions
     {
         private readonly IBatchService _batchService;
         private readonly IFileImportService _fileImportService;
-        private readonly IFileStorageService _fileStorageService;
-        private readonly IImporterService _importerService;
-        private readonly IReleaseProcessorService _releaseProcessorService;
-        private readonly ISplitFileService _splitFileService;
-        private readonly IValidatorService _validatorService;
-        private readonly IDataArchiveService _dataArchiveService;
         private readonly IImportStatusService _importStatusService;
+        private readonly IProcessorService _processorService;
+        private readonly ILogger<Processor> _logger;
 
         public Processor(
             IFileImportService fileImportService,
-            IReleaseProcessorService releaseProcessorService,
-            IFileStorageService fileStorageService,
-            ISplitFileService splitFileService,
-            IImporterService importerService,
             IBatchService batchService,
-            IValidatorService validatorService,
-            IDataArchiveService dataArchiveService,
-            IImportStatusService importStatusService
+            IImportStatusService importStatusService,
+            IProcessorService processorService,
+            ILogger<Processor> logger
         )
         {
             _fileImportService = fileImportService;
-            _releaseProcessorService = releaseProcessorService;
-            _fileStorageService = fileStorageService;
-            _splitFileService = splitFileService;
-            _importerService = importerService;
             _batchService = batchService;
-            _validatorService = validatorService;
-            _dataArchiveService = dataArchiveService;
             _importStatusService = importStatusService;
+            _processorService = processorService;
+            _logger = logger;
         }
 
         [FunctionName("ProcessUploads")]
         public async void ProcessUploads(
             [QueueTrigger("imports-pending")] ImportMessage message,
-            ILogger logger,
             ExecutionContext executionContext,
-            [Queue("imports-available")] ICollector<ImportMessage> collector
+            [Queue("imports-pending")] ICollector<ImportMessage> importStagesMessageQueue,
+            [Queue("imports-available")] ICollector<ImportMessage> dataFileProcessingMessageQueue
         )
         {
-            if (message.ArchiveFileName != "")
+            try
             {
-                await _importStatusService.UpdateStatus(message.Release.Id,
-                    message.DataFileName,
-                    IStatus.PROCESSING_ARCHIVE_FILE);
+                var status = await _importStatusService.GetImportStatus(message.Release.Id, message.OrigDataFileName);
 
-                await _dataArchiveService.ExtractDataFiles(message.Release.Id, message.ArchiveFileName);
+                _logger.LogInformation($"Processor Function processing import message for " +
+                                       $"{message.OrigDataFileName} at stage {status.Status}");
+                
+                if (status.Status == IStatus.QUEUED || status.Status == IStatus.PROCESSING_ARCHIVE_FILE)
+                {
+                    if (message.ArchiveFileName != "")
+                    {
+                        _logger.LogInformation($"Unpacking archive for {message.OrigDataFileName}");
+                        await _processorService.ProcessUnpackingArchive(message);
+                    }
+
+                    await _importStatusService.UpdateStatus(message.Release.Id, message.OrigDataFileName,
+                        IStatus.STAGE_1);
+                    importStagesMessageQueue.Add(message);
+                    return;
+                }
+
+                if (status.Status == IStatus.STAGE_1)
+                {
+                    await _processorService.ProcessStage1(message, executionContext);
+                    await _importStatusService.UpdateStatus(message.Release.Id, message.OrigDataFileName,
+                        IStatus.STAGE_2);
+                    importStagesMessageQueue.Add(message);
+                    return;
+                }
+
+                if (status.Status == IStatus.STAGE_2)
+                {
+                    await _processorService.ProcessStage2(message);
+                    await _importStatusService.UpdateStatus(message.Release.Id, message.OrigDataFileName,
+                        IStatus.STAGE_3);
+                    importStagesMessageQueue.Add(message);
+                    return;
+                }
+
+                if (status.Status == IStatus.STAGE_3)
+                {
+                    await _processorService.ProcessStage3(message);
+                    await _importStatusService.UpdateStatus(message.Release.Id, message.OrigDataFileName,
+                        IStatus.STAGE_4);
+                    importStagesMessageQueue.Add(message);
+                }
+
+                if (status.Status == IStatus.STAGE_4)
+                {
+                    await _processorService.ProcessStage4Messages(message, dataFileProcessingMessageQueue);
+                }
             }
+            catch (Exception e)
+            {
+                var ex = GetInnerException(e);
 
-            await _importStatusService.UpdateStatus(message.Release.Id, message.DataFileName, IStatus.STAGE_1);
-            var subjectData = await _fileStorageService.GetSubjectData(message);
-
-            await _validatorService.Validate(message.Release.Id, subjectData, executionContext, message)
-                .OnSuccess(async result =>
-                {
-                    try
+                await _batchService.FailImport(message.Release.Id,
+                    message.OrigDataFileName,
+                    new List<ValidationError>
                     {
-                        var status =
-                            await _importStatusService.GetImportStatus(message.Release.Id, message.OrigDataFileName);
+                        new ValidationError(ex.Message)
+                    });
 
-                        message.RowsPerBatch = result.RowsPerBatch;
-                        message.TotalRows = result.FilteredObservationCount;
-                        message.NumBatches = result.NumBatches;
-
-                        await _batchService.UpdateStoredMessage(message);
-
-                        // If already completed Phase 3 then don't re-create the subject or split into batches
-                        if (IStatus.STAGE_3.CompareTo(status.Status) > 0 ||
-                            status.Status == IStatus.STAGE_3 && !status.PhaseComplete)
-                        {
-                            await _importStatusService.UpdateStatus(message.Release.Id,
-                                message.OrigDataFileName,
-                                IStatus.STAGE_2);
-
-                            await ProcessSubject(message,
-                                DbUtils.CreateStatisticsDbContext(),
-                                DbUtils.CreateContentDbContext(),
-                                subjectData);
-
-                            await _splitFileService.SplitDataFile(collector, message, subjectData);
-                        }
-                    }
-                    catch (Exception e)
-                    {
-                        var ex = GetInnerException(e);
-
-                        await _batchService.FailImport(message.Release.Id,
-                            message.OrigDataFileName,
-                            new List<ValidationError>
-                            {
-                                new ValidationError(ex.Message)
-                            });
-
-                        logger.LogError(ex, $"{GetType().Name} function FAILED for : Datafile: " +
-                                            $"{message.DataFileName} : {ex.Message}");
-                        logger.LogError(ex.StackTrace);
-                    }
-
-                    return true;
-                })
-                .OnFailureDo(async errors =>
-                {
-                    await _batchService.FailImport(message.Release.Id,
-                        message.OrigDataFileName,
-                        errors);
-
-                    logger.LogError($"Import FAILED for {message.DataFileName}...check log");
-                });
+                _logger.LogError(ex, $"{GetType().Name} function FAILED for : Datafile: " +
+                                     $"{message.DataFileName} : {ex.Message}");
+                _logger.LogError(ex.StackTrace);
+            }
         }
 
         [FunctionName("ImportObservations")]
-        public async Task ImportObservations(
-            [QueueTrigger("imports-available")] ImportMessage message,
-            ILogger logger)
+        public async Task ImportObservations([QueueTrigger("imports-available")] ImportMessage message)
         {
             try
             {
@@ -146,8 +125,8 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Processor.Functions
                 // If deadlock exception then throw & try up to 3 times
                 if (e is SqlException exception && exception.Number == 1205)
                 {
-                    logger.LogInformation($"{GetType().Name} : Handling known exception when processing Datafile: " +
-                                          $"{message.DataFileName} : {exception.Message} : transaction will be retried");
+                    _logger.LogInformation($"{GetType().Name} : Handling known exception when processing Datafile: " +
+                                           $"{message.DataFileName} : {exception.Message} : transaction will be retried");
                     throw;
                 }
 
@@ -160,32 +139,9 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Processor.Functions
                         new ValidationError(ex.Message)
                     });
 
-                logger.LogError(ex, $"{GetType().Name} function FAILED for : Datafile: " +
-                                    $"{message.DataFileName} : {ex.Message}");
+                _logger.LogError(ex, $"{GetType().Name} function FAILED for : Datafile: " +
+                                     $"{message.DataFileName} : {ex.Message}");
             }
-        }
-
-        private async Task ProcessSubject(
-            ImportMessage message,
-            StatisticsDbContext statisticsDbContext,
-            ContentDbContext contentDbContext,
-            SubjectData subjectData)
-        {
-            var subject = _releaseProcessorService.CreateOrUpdateRelease(subjectData,
-                    message,
-                    statisticsDbContext,
-                    contentDbContext);
-
-            await using var metaFileStream = await _fileStorageService.StreamBlob(subjectData.MetaBlob);
-            var metaFileTable = DataTableUtils.CreateFromStream(metaFileStream);
-
-            _importerService.ImportMeta(metaFileTable, subject, statisticsDbContext);
-
-            await statisticsDbContext.SaveChangesAsync();
-
-            await _fileImportService.ImportFiltersLocationsAndSchools(message, statisticsDbContext);
-
-            await statisticsDbContext.SaveChangesAsync();
         }
 
         private static Exception GetInnerException(Exception ex)

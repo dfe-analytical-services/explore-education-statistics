@@ -261,12 +261,6 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Model.Migrations
                     b.Property<string>("Measures")
                         .HasColumnType("nvarchar(max)");
 
-                    b.Property<string>("ProviderUrn")
-                        .HasColumnType("nvarchar(450)");
-
-                    b.Property<string>("SchoolLaEstab")
-                        .HasColumnType("nvarchar(450)");
-
                     b.Property<Guid>("SubjectId")
                         .HasColumnType("uniqueidentifier");
 
@@ -283,10 +277,6 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Model.Migrations
                     b.HasIndex("GeographicLevel");
 
                     b.HasIndex("LocationId");
-
-                    b.HasIndex("ProviderUrn");
-
-                    b.HasIndex("SchoolLaEstab");
 
                     b.HasIndex("SubjectId");
 
@@ -315,25 +305,6 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Model.Migrations
                     b.HasIndex("FilterItemId");
 
                     b.ToTable("ObservationFilterItem");
-                });
-
-            modelBuilder.Entity("GovUk.Education.ExploreEducationStatistics.Data.Model.Provider", b =>
-                {
-                    b.Property<string>("Urn")
-                        .HasColumnType("nvarchar(450)");
-
-                    b.Property<string>("Name")
-                        .HasColumnType("nvarchar(max)");
-
-                    b.Property<string>("Ukprn")
-                        .HasColumnType("nvarchar(max)");
-
-                    b.Property<string>("Upin")
-                        .HasColumnType("nvarchar(max)");
-
-                    b.HasKey("Urn");
-
-                    b.ToTable("Provider");
                 });
 
             modelBuilder.Entity("GovUk.Education.ExploreEducationStatistics.Data.Model.Publication", b =>
@@ -424,34 +395,6 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Model.Migrations
                     b.HasIndex("SubjectId");
 
                     b.ToTable("ReleaseSubject");
-                });
-
-            modelBuilder.Entity("GovUk.Education.ExploreEducationStatistics.Data.Model.School", b =>
-                {
-                    b.Property<string>("LaEstab")
-                        .HasColumnType("nvarchar(450)");
-
-                    b.Property<string>("AcademyOpenDate")
-                        .HasColumnType("nvarchar(max)");
-
-                    b.Property<string>("AcademyType")
-                        .HasColumnType("nvarchar(max)");
-
-                    b.Property<string>("Estab")
-                        .HasColumnType("nvarchar(max)");
-
-                    b.Property<string>("Name")
-                        .HasColumnType("nvarchar(max)");
-
-                    b.Property<string>("Postcode")
-                        .HasColumnType("nvarchar(max)");
-
-                    b.Property<string>("Urn")
-                        .HasColumnType("nvarchar(max)");
-
-                    b.HasKey("LaEstab");
-
-                    b.ToTable("School");
                 });
 
             modelBuilder.Entity("GovUk.Education.ExploreEducationStatistics.Data.Model.Subject", b =>
@@ -935,18 +878,10 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Model.Migrations
             modelBuilder.Entity("GovUk.Education.ExploreEducationStatistics.Data.Model.Observation", b =>
                 {
                     b.HasOne("GovUk.Education.ExploreEducationStatistics.Data.Model.Location", "Location")
-                        .WithMany("Observations")
+                        .WithMany()
                         .HasForeignKey("LocationId")
-                        .OnDelete(DeleteBehavior.Cascade)
+                        .OnDelete(DeleteBehavior.Restrict)
                         .IsRequired();
-
-                    b.HasOne("GovUk.Education.ExploreEducationStatistics.Data.Model.Provider", "Provider")
-                        .WithMany("Observations")
-                        .HasForeignKey("ProviderUrn");
-
-                    b.HasOne("GovUk.Education.ExploreEducationStatistics.Data.Model.School", "School")
-                        .WithMany("Observations")
-                        .HasForeignKey("SchoolLaEstab");
 
                     b.HasOne("GovUk.Education.ExploreEducationStatistics.Data.Model.Subject", "Subject")
                         .WithMany("Observations")

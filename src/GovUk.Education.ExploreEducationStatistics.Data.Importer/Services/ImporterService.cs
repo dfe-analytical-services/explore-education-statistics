@@ -6,6 +6,7 @@ using System.Threading.Tasks;
 using GovUk.Education.ExploreEducationStatistics.Common.Extensions;
 using GovUk.Education.ExploreEducationStatistics.Common.Model;
 using GovUk.Education.ExploreEducationStatistics.Common.Model.Data;
+using GovUk.Education.ExploreEducationStatistics.Common.Services;
 using GovUk.Education.ExploreEducationStatistics.Common.Services.Interfaces;
 using GovUk.Education.ExploreEducationStatistics.Data.Importer.Exceptions;
 using GovUk.Education.ExploreEducationStatistics.Data.Importer.Models;
@@ -49,13 +50,6 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Importer.Services
             new Dictionary<Columns, string[]>
             {
                 {
-                    Columns.SCHOOL_COLS,
-                    new[]
-                    {
-                        "academy_open_date", "academy_type", "estab", "laestab", "school_name", "school_postcode", "urn"
-                    }
-                },
-                {
                     Columns.COUNTRY_COLS, new[] {"country_code", "country_name"}
                 },
                 {
@@ -83,9 +77,6 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Importer.Services
                 },
                 {
                     Columns.PARLIAMENTARY_CONSTITUENCY_COLS, new[] {"pcon_code", "pcon_name"}
-                },
-                {
-                    Columns.PROVIDER_COLS, new[] {"provider_urn", "provider_ukprn", "provider_upin", "provider_name"}
                 },
                 {
                     Columns.REGION_COLS, new[] {"region_code", "region_name"}
@@ -148,7 +139,9 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Importer.Services
             {
                 if (rowCount % STAGE_2_ROW_CHECK == 0)
                 {
-                    await _importStatusService.UpdateProgress(releaseId, origDataFileName,
+                    await _importStatusService.UpdateStatus(releaseId,
+                        origDataFileName,
+                        IStatus.STAGE_2,
                         (double) rowCount / totalRows * 100);
                 }
 
@@ -448,8 +441,6 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Importer.Services
             observationsTable.Columns.Add("SubjectId", typeof(Guid));
             observationsTable.Columns.Add("GeographicLevel", typeof(string));
             observationsTable.Columns.Add("LocationId", typeof(Guid));
-            observationsTable.Columns.Add("ProviderUrn", typeof(string));
-            observationsTable.Columns.Add("SchoolLaEstab", typeof(string));
             observationsTable.Columns.Add("Year", typeof(int));
             observationsTable.Columns.Add("TimeIdentifier", typeof(string));
             observationsTable.Columns.Add("Measures", typeof(string));
@@ -467,8 +458,6 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Importer.Services
                     o.SubjectId,
                     o.GeographicLevel.GetEnumValue(),
                     o.LocationId,
-                    o.ProviderUrn,
-                    o.SchoolLaEstab,
                     o.Year,
                     o.TimeIdentifier.GetEnumValue(),
                     "{" + string.Join(",", o.Measures.Select(x => $"\"{x.Key}\":\"{x.Value}\"")) + "}",

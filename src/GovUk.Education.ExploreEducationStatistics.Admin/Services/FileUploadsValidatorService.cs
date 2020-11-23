@@ -87,7 +87,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Services
                 return ValidationActionResult(SubjectTitleCannotContainSpecialCharacters);
             }
 
-            if (await _subjectService.GetAsync(releaseId, name) != null)
+            if (await _subjectService.Get(releaseId, name) != null)
             {
                 return ValidationActionResult(SubjectTitleMustBeUnique);
             }
@@ -120,13 +120,13 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Services
                    && _fileTypeService.HasMatchingEncodingType(file, CsvEncodingTypes);
         }
 
-        private bool FileContainsSpacesOrSpecialChars(string filename)
+        private static bool FileContainsSpacesOrSpecialChars(string filename)
         {
             return filename.IndexOf(" ", Ordinal) > -1 ||
                    FileContainsSpecialChars(filename);
         }
 
-        private bool FileContainsSpecialChars(string filename)
+        private static bool FileContainsSpecialChars(string filename)
         {
             return filename.IndexOf("&", Ordinal) > -1 ||
                    filename.IndexOfAny(Path.GetInvalidFileNameChars()) > -1;

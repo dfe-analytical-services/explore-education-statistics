@@ -31,7 +31,7 @@ const ContactUsSection = ({
       <p className="govuk-!-margin-top-0">If you have a media enquiry:</p>
       <p>
         Telephone <br />
-        020 7925 6789
+        020 7783 8300
       </p>
       <h4 className="govuk-heading-s govuk-!-margin-bottom-0">
         Public enquiries

@@ -16,9 +16,10 @@ import {
   getMinorAxisDomainTicks,
 } from '@common/modules/charts/util/domainTicks';
 import getCategoryLabel from '@common/modules/charts/util/getCategoryLabel';
+import getMinorAxisDecimalPlaces from '@common/modules/charts/util/getMinorAxisDecimalPlaces';
 import { Dictionary } from '@common/types';
+import formatPretty from '@common/utils/number/formatPretty';
 import parseNumber from '@common/utils/number/parseNumber';
-
 import React, { memo } from 'react';
 import {
   CartesianGrid,
@@ -34,7 +35,6 @@ import {
   XAxis,
   YAxis,
 } from 'recharts';
-import formatPretty from '@common/utils/number/formatPretty';
 import getCategoryDataSetConfigurations from '../util/getCategoryDataSetConfigurations';
 
 const lineStyles: Dictionary<string> = {
@@ -105,6 +105,16 @@ const LineChartBlock = ({
   const yAxisWidth = parseNumber(axes.minor.size);
   const xAxisHeight = parseNumber(axes.major.size);
 
+  const categoryDataSetConfigurations = getCategoryDataSetConfigurations(
+    dataSetCategories,
+    axes.major,
+    meta,
+  );
+
+  const minorAxisDecimals = getMinorAxisDecimalPlaces(
+    categoryDataSetConfigurations,
+  );
+
   return (
     <ChartContainer
       height={height || 300}
@@ -146,7 +156,7 @@ const LineChartBlock = ({
             hide={!axes.minor.visible}
             unit={axes.minor.unit}
             width={yAxisWidth}
-            tickFormatter={tick => formatPretty(tick)}
+            tickFormatter={tick => formatPretty(tick, '', minorAxisDecimals)}
           />
 
           <XAxis
@@ -161,11 +171,7 @@ const LineChartBlock = ({
             tickFormatter={getCategoryLabel(dataSetCategories)}
           />
 
-          {getCategoryDataSetConfigurations(
-            dataSetCategories,
-            axes.major,
-            meta,
-          ).map(({ config, dataKey, dataSet }) => (
+          {categoryDataSetConfigurations.map(({ config, dataKey, dataSet }) => (
             <Line
               key={dataKey}
               dataKey={dataKey}

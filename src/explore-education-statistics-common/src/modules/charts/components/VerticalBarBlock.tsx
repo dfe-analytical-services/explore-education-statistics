@@ -16,6 +16,7 @@ import {
 } from '@common/modules/charts/util/domainTicks';
 import getCategoryDataSetConfigurations from '@common/modules/charts/util/getCategoryDataSetConfigurations';
 import getCategoryLabel from '@common/modules/charts/util/getCategoryLabel';
+import getMinorAxisDecimalPlaces from '@common/modules/charts/util/getMinorAxisDecimalPlaces';
 import parseNumber from '@common/utils/number/parseNumber';
 import React, { memo } from 'react';
 import {
@@ -44,12 +45,12 @@ const VerticalBarBlock = ({
   meta,
   height,
   width,
+  barThickness,
   axes,
   stacked,
   legend,
 }: VerticalBarProps) => {
   const [legendProps, renderLegend] = useLegend();
-
   if (
     axes === undefined ||
     axes.major === undefined ||
@@ -72,6 +73,16 @@ const VerticalBarBlock = ({
 
   const yAxisWidth = parseNumber(axes.minor.size);
   const xAxisHeight = parseNumber(axes.major.size);
+
+  const categoryDataSetConfigurations = getCategoryDataSetConfigurations(
+    dataSetCategories,
+    axes.major,
+    meta,
+  );
+
+  const minorAxisDecimals = getMinorAxisDecimalPlaces(
+    categoryDataSetConfigurations,
+  );
 
   return (
     <ChartContainer
@@ -105,7 +116,7 @@ const VerticalBarBlock = ({
             hide={!axes.minor.visible}
             unit={axes.minor.unit}
             width={parseNumber(axes.minor.size)}
-            tickFormatter={tick => formatPretty(tick)}
+            tickFormatter={tick => formatPretty(tick, '', minorAxisDecimals)}
           />
 
           <XAxis
@@ -129,11 +140,7 @@ const VerticalBarBlock = ({
             <Legend content={renderLegend} align="left" layout="vertical" />
           )}
 
-          {getCategoryDataSetConfigurations(
-            dataSetCategories,
-            axes.major,
-            meta,
-          ).map(({ config, dataKey, dataSet }) => (
+          {categoryDataSetConfigurations.map(({ config, dataKey, dataSet }) => (
             <Bar
               key={dataKey}
               dataKey={dataKey}
@@ -142,6 +149,7 @@ const VerticalBarBlock = ({
               fill={config.colour}
               unit={dataSet.indicator.unit}
               stackId={stacked ? 'a' : undefined}
+              maxBarSize={barThickness}
             />
           ))}
 

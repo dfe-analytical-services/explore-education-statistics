@@ -76,11 +76,11 @@ Upload multiple files
     user chooses file   id:fileUploadForm-file      ${FILES_DIR}test-file-1.txt
     user clicks button  Upload file
 
-    user waits until page contains accordion section   test 1
-    user opens accordion section   test 1  id:file-uploads
+    user waits until page contains accordion section   Test 1
+    user opens accordion section   Test 1  id:file-uploads
 
-    ${section_1}=  user gets accordion section content element  test 1  id:file-uploads
-    user checks summary list contains  Name         test 1              ${section_1}
+    ${section_1}=  user gets accordion section content element  Test 1  id:file-uploads
+    user checks summary list contains  Name         Test 1              ${section_1}
     user checks summary list contains  File         test-file-1.txt     ${section_1}
     user checks summary list contains  File size    12 B                ${section_1}
 
@@ -88,11 +88,11 @@ Upload multiple files
     user chooses file   id:fileUploadForm-file      ${FILES_DIR}test-file-2.txt
     user clicks button  Upload file
 
-    user waits until page contains accordion section   test 2
-    user opens accordion section   test 2  id:file-uploads
+    user waits until page contains accordion section   Test 2
+    user opens accordion section   Test 2  id:file-uploads
 
-    ${section_2}=  user gets accordion section content element  test 2  id:file-uploads
-    user checks summary list contains  Name         test 2              ${section_2}
+    ${section_2}=  user gets accordion section content element  Test 2  id:file-uploads
+    user checks summary list contains  Name         Test 2              ${section_2}
     user checks summary list contains  File         test-file-2.txt     ${section_2}
     user checks summary list contains  File size    24 B                ${section_2}
 
@@ -100,11 +100,11 @@ Upload multiple files
 
 Delete file
     [Tags]  HappyPath
-    ${file_2_section}=  user gets accordion section content element  test 2  id:file-uploads
+    ${file_2_section}=  user gets accordion section content element  Test 2  id:file-uploads
     user clicks button   Delete file  ${file_2_section}
     user waits until h1 is visible   Confirm deletion of file
     user clicks button  Confirm
 
-    user waits until page does not contain accordion section   test 2
-    user waits until page contains accordion section  test 1
+    user waits until page does not contain accordion section   Test 2
+    user waits until page contains accordion section  Test 1
     user checks there are x accordion sections  1   id:file-uploads

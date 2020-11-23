@@ -1,3 +1,5 @@
+using System.Collections.Generic;
+using System.ComponentModel.DataAnnotations.Schema;
 using GovUk.Education.ExploreEducationStatistics.Common.Converters;
 using GovUk.Education.ExploreEducationStatistics.Common.Services;
 using Newtonsoft.Json;
@@ -16,8 +18,6 @@ namespace GovUk.Education.ExploreEducationStatistics.Common.Model
         public string Errors { get; set; }
 
         public int NumberOfRows { get; set; }
-
-        public bool PhaseComplete => PhasePercentageComplete == 100;
 
         public override string ToString()
         {

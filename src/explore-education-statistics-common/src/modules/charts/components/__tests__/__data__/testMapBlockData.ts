@@ -351,8 +351,8 @@ export const testMapTableData: TableDataResponse = {
         region: { code: 'E12000003', name: 'Yorkshire and the Humber' },
       },
       measures: {
-        'authorised-absence-rate': '3',
-        'overall-absence-rate': '4.7',
+        'authorised-absence-rate': '3.5',
+        'overall-absence-rate': '4.8',
         'unauthorised-absence-rate': '1.7',
       },
       timePeriod: '2016_AY',
@@ -368,7 +368,7 @@ export const testMapTableData: TableDataResponse = {
       },
       measures: {
         'authorised-absence-rate': '3',
-        'overall-absence-rate': '4.6',
+        'overall-absence-rate': '4.7',
         'unauthorised-absence-rate': '1.6',
       },
       timePeriod: '2016_AY',
@@ -383,7 +383,7 @@ export const testMapTableData: TableDataResponse = {
         region: { code: 'E12000003', name: 'Yorkshire and the Humber' },
       },
       measures: {
-        'authorised-absence-rate': '3.1',
+        'authorised-absence-rate': '4',
         'overall-absence-rate': '5.1',
         'unauthorised-absence-rate': '2',
       },

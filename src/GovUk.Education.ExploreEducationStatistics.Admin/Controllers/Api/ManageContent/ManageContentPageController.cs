@@ -24,8 +24,8 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Controllers.Api.Manag
         public async Task<ActionResult<ManageContentPageViewModel>> GetManageContentPageData(Guid releaseId)
         {
             return await _manageContentPageService
-                .GetManageContentPageViewModelAsync(releaseId)
-                .HandleFailuresOr(Ok);
+                .GetManageContentPageViewModel(releaseId)
+                .HandleFailuresOrOk();
         }
     }
 }

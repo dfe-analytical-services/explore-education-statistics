@@ -24,11 +24,14 @@ import {
 import { Dictionary } from '@common/types';
 import generateHslColour from '@common/utils/colour/generateHslColour';
 import lighten from '@common/utils/colour/lighten';
+import countDecimals from '@common/utils/number/countDecimals';
 import formatPretty from '@common/utils/number/formatPretty';
 import getMinMax from '@common/utils/number/getMinMax';
+import { roundDownToNearest } from '@common/utils/number/roundNearest';
 import classNames from 'classnames';
 import { Feature, FeatureCollection, Geometry } from 'geojson';
 import { Layer, Path, PathOptions, Polyline } from 'leaflet';
+import clamp from 'lodash/clamp';
 import keyBy from 'lodash/keyBy';
 import orderBy from 'lodash/orderBy';
 import times from 'lodash/times';
@@ -65,11 +68,13 @@ interface MapDataSetCategory extends DataSetCategory {
 function calculateScaledColour({
   scale,
   colour,
+  groupSize,
 }: {
   scale: number;
   colour: string;
+  groupSize: number;
 }) {
-  return lighten(colour, 90 - (scale / 0.2) * 30);
+  return lighten(colour, 90 - (scale / groupSize) * 30);
 }
 
 function generateGeometryAndLegend(
@@ -80,6 +85,11 @@ function generateGeometryAndLegend(
   legend: LegendEntry[];
 } {
   const selectedDataSetKey = selectedDataSetConfiguration.dataKey;
+
+  const {
+    unit,
+    decimalPlaces,
+  } = selectedDataSetConfiguration.dataSet.indicator;
 
   const { min = 0, max = 0 } = getMinMax(
     dataSetCategories
@@ -93,20 +103,31 @@ function generateGeometryAndLegend(
     selectedDataSetConfiguration.config.colour ??
     generateHslColour(selectedDataSetConfiguration.dataKey);
 
-  const {
-    unit,
-    decimalPlaces,
-  } = selectedDataSetConfiguration.dataSet.indicator;
+  const groups = 5;
+  const groupSize = 1 / groups;
+
+  // Calculate the increment between values by using
+  // decimal places expressed as a proportion of 1 e.g.
+  // 1 decimal place is 0.1, 2 decimal places is 0.01, etc.
+  const valueIncrement =
+    1 / 10 ** (decimalPlaces ?? countDecimals(range * groupSize));
 
   const legend: LegendEntry[] =
     range > 0
-      ? times(5, idx => {
-          const i = idx / 4;
+      ? times(groups, idx => {
+          const i = idx / groups;
+          // Add an additional offset so that legend
+          // group min/max values don't overlap.
+          const minOffset = idx > 0 ? valueIncrement : 0;
 
           return {
-            colour: calculateScaledColour({ scale: i, colour }),
-            min: formatPretty(min + i * range, unit, decimalPlaces),
-            max: formatPretty(min + (i + 0.25) * range, unit, decimalPlaces),
+            colour: calculateScaledColour({ scale: i, colour, groupSize }),
+            min: formatPretty(min + i * range + minOffset, unit, decimalPlaces),
+            max: formatPretty(
+              min + (i + groupSize) * range,
+              unit,
+              decimalPlaces,
+            ),
           };
         })
       : [
@@ -117,19 +138,32 @@ function generateGeometryAndLegend(
           },
         ];
 
+  const lastGroupMin = (groups - 1) * groupSize;
+
   const geometry: FeatureCollection<Geometry, MapFeatureProperties> = {
     type: 'FeatureCollection',
     features: dataSetCategories.map(({ dataSets, filter, geoJson }) => {
       const data = dataSets?.[selectedDataSetKey]?.value;
 
+      // Create a scale for the colour. This goes from 0 to
+      // the last group's minimum e.g. 0.8 (when there are 5 groups).
+      // We don't actually want to scale all the way up to 1
+      // as this would create a colour that falls outside of
+      // the colours shown in the legend.
+      const scale =
+        // Avoid divisions by 0
+        range !== 0
+          ? clamp(
+              roundDownToNearest((data - min) / range, groupSize),
+              0,
+              lastGroupMin,
+            )
+          : 0;
+
       // Defaults to white if there is no data
       const scaledColour =
         typeof data !== 'undefined'
-          ? calculateScaledColour({
-              // Avoid divisions by 0
-              scale: range > 0 ? (data - min) / range : 0,
-              colour,
-            })
+          ? calculateScaledColour({ colour, groupSize, scale })
           : '#fff';
 
       return {
@@ -362,17 +396,27 @@ export const MapBlockInternal = ({
                 `${dataSetConfig.config.label}: ${formatPretty(
                   dataSet.value,
                   dataSetConfig.dataSet.indicator.unit,
+                  dataSetConfig.dataSet.indicator.decimalPlaces,
                 )}` +
                 `</li>`
               );
             },
           );
 
+          const mapWidth = mapRef.current?.container?.clientWidth;
+
+          // Not ideal, we would want to use `max-width` instead.
+          // Unfortunately it doesn't seem to work with the tooltip
+          // for some reason (maybe due to the pane styling).
+          const tooltipStyle = mapWidth ? `width: ${mapWidth / 2}px` : '';
+
           return (
+            `<div class="${styles.tooltip}" style="${tooltipStyle}">` +
             `<p><strong data-testid="chartTooltip-label">${feature.properties.name}</strong></p>` +
             `<ul class="${
               styles.tooltipList
-            }" data-testid="chartTooltip-items">${items.join('')}</ul>`
+            }" data-testid="chartTooltip-items">${items.join()}</ul>` +
+            `</div>`
           );
         }
 
@@ -441,7 +485,7 @@ export const MapBlockInternal = ({
               }}
               className={classNames(styles.map, 'dfe-print-break-avoid')}
               center={position}
-              zoom={6.5}
+              zoom={5}
             >
               <GeoJSON data={ukGeometry} className={styles.uk} ref={ukRef} />
 
@@ -529,6 +573,7 @@ export const MapBlockInternal = ({
                         value={formatPretty(
                           dataSet.value,
                           expandedDataSet.indicator.unit,
+                          expandedDataSet.indicator.decimalPlaces,
                         )}
                       />
                     </KeyStatColumn>

@@ -26,7 +26,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Services
         private readonly ISubjectService _subjectService;
         private readonly IUserService _userService;
         private readonly IReleaseService _releaseService;
-        
+
         public TableBuilderService(IObservationService observationService,
             IPersistenceHelper<StatisticsDbContext> persistenceHelper,
             IResultSubjectMetaService resultSubjectMetaService,
@@ -46,12 +46,12 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Services
 
         public Task<Either<ActionResult, TableBuilderResultViewModel>> Query(ObservationQueryContext queryContext)
         {
-            var publicationId = _subjectService.GetPublicationForSubjectAsync(queryContext.SubjectId).Result.Id;
+            var publicationId = _subjectService.GetPublicationForSubject(queryContext.SubjectId).Result.Id;
             var releaseId = _releaseService.GetLatestPublishedRelease(publicationId);
-            
+
             return Query(releaseId.Value, queryContext);
         }
-        
+
         public Task<Either<ActionResult, TableBuilderResultViewModel>> Query(Guid releaseId, ObservationQueryContext queryContext)
         {
             return _persistenceHelper.CheckEntityExists<Subject>(queryContext.SubjectId)
@@ -81,7 +81,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Services
 
         private async Task<Either<ActionResult, Subject>> CheckCanViewSubjectData(Subject subject)
         {
-            if (_subjectService.IsSubjectForLatestPublishedRelease(subject.Id) ||
+            if (await _subjectService.IsSubjectForLatestPublishedRelease(subject.Id) ||
                 await _userService.MatchesPolicy(subject, CanViewSubjectData))
             {
                 return subject;

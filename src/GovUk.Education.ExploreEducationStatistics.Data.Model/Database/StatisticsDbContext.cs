@@ -44,7 +44,6 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Model.Database
         public DbSet<ObservationFilterItem> ObservationFilterItem { get; set; }
         public DbSet<Publication> Publication { get; set; }
         public DbSet<Release> Release { get; set; }
-        public DbSet<School> School { get; set; }
         public DbSet<Subject> Subject { get; set; }
         public DbSet<SubjectFootnote> SubjectFootnote { get; set; }
         public DbSet<Theme> Theme { get; set; }
@@ -65,6 +64,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Model.Database
             ConfigureIndicatorFootnote(modelBuilder);
             ConfigureLocation(modelBuilder);
             ConfigureMeasures(modelBuilder);
+            ConfigureObservation(modelBuilder);
             ConfigureObservationFilterItem(modelBuilder);
             ConfigurePublication(modelBuilder);
             ConfigureRelease(modelBuilder);
@@ -101,6 +101,15 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Model.Database
             ConfigureSponsor(modelBuilder);
             ConfigureWard(modelBuilder);
             ConfigurePlanningArea(modelBuilder);
+        }
+
+        private static void ConfigureObservation(ModelBuilder modelBuilder)
+        {
+            modelBuilder.Entity<Observation>()
+                .HasOne(observation => observation.Location)
+                .WithMany()
+                .HasForeignKey(observation => observation.LocationId)
+                .OnDelete(DeleteBehavior.Restrict);
         }
 
         private static void ConfigureObservationFilterItem(ModelBuilder modelBuilder)

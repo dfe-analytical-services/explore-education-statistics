@@ -76,6 +76,7 @@ export interface ChartProps {
 }
 
 export interface StackedBarProps extends ChartProps {
+  barThickness?: number;
   stacked?: boolean;
 }
 
@@ -97,6 +98,7 @@ export interface ChartDefinitionOptions {
   legend?: 'none' | 'top' | 'bottom';
   height: number;
   width?: number;
+  barThickness?: number;
   title: string;
   alt: string;
 }
