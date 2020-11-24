@@ -1,5 +1,4 @@
 using System;
-using System.Data;
 using System.Threading.Tasks;
 using GovUk.Education.ExploreEducationStatistics.Common.Functions;
 using GovUk.Education.ExploreEducationStatistics.Content.Model.Database;
@@ -40,21 +39,19 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Importer.Utils
         {
             return dbContext.Database.CreateExecutionStrategy().ExecuteAsync(async () =>
             {
-                using (var transaction = await dbContext.Database.BeginTransactionAsync(IsolationLevel.ReadCommitted))
-                {
-                    await dbContext.Database.ExecuteSqlRawAsync($"exec sp_getapplock '{lockName}', 'exclusive'");
+                await using var transaction = await dbContext.Database.BeginTransactionAsync();
+                await dbContext.Database.ExecuteSqlRawAsync($"exec sp_getapplock '{lockName}', 'exclusive'");
 
-                    try
-                    {
-                        var result = await action(dbContext);
-                        await transaction.CommitAsync();
-                        return result;
-                    }
-                    catch (Exception)
-                    {
-                        await transaction.RollbackAsync();
-                        return default;
-                    }
+                try
+                {
+                    var result = await action(dbContext);
+                    await transaction.CommitAsync();
+                    return result;
+                }
+                catch (Exception)
+                {
+                    await transaction.RollbackAsync();
+                    return default;
                 }
             });
         }

@@ -134,20 +134,15 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Processor.Services
             return newSubject;
         }
 
-        private async Task<Release> CreateOrUpdateRelease(ImportMessage message,
+        private Task<Release> CreateOrUpdateRelease(ImportMessage message,
             StatisticsDbContext statisticsDbContext, Publication publication)
         {
-            return await DbUtils.ExecuteWithExclusiveLock(statisticsDbContext, "CreateOrUpdateRelease", async (context) =>
-            {
-                Release release;
-
-                _logger.LogInformation($"Checking for existence of Release {message.Release.Slug}");
-
-                var existing = await statisticsDbContext.Release.FindAsync(message.Release.Id);
-
-                if (existing == null)
-                {
-                    release = new Release
+            return CreateOrUpdateWithExclusiveLock(
+                $"Release {message.Release.Slug} (for Publication \"{message.Release.Publication.Title}\")",
+                statisticsDbContext,
+                message.Release,
+                message.Release.Id,
+                () => new Release
                     {
                         Id = message.Release.Id,
                         Slug = message.Release.Slug,
@@ -155,124 +150,103 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Processor.Services
                         TimeIdentifier = message.Release.TimeIdentifier,
                         Year = message.Release.Year,
                         PreviousVersionId = message.Release.PreviousVersionId
-                    };
-                    _logger.LogInformation($"Creating Release {release.Slug}");
-                    release = (await statisticsDbContext.Release.AddAsync(release)).Entity;
-                }
-                else
-                {
-                    release = _mapper.Map(message.Release, existing);
-                    _logger.LogInformation($"Release {release.Slug} already exists - updating");
-                    release = statisticsDbContext.Release.Update(release).Entity;
-                }
-
-                await statisticsDbContext.SaveChangesAsync();
-                return release;
-            });
+                    });
         }
 
-        private async Task<Publication> CreateOrUpdatePublication(ImportMessage message,
+        private Task<Publication> CreateOrUpdatePublication(ImportMessage message,
             StatisticsDbContext statisticsDbContext, Topic topic)
         {
-            return await DbUtils.ExecuteWithExclusiveLock(statisticsDbContext, "CreateOrUpdatePublication", async (context) =>
-            {
-                Publication publication;
-
-                _logger.LogInformation($"Checking for existence of Publication {message.Release.Publication.Title}");
-
-                var existing = await statisticsDbContext.Publication.FindAsync(message.Release.Publication.Id);
-
-                if (existing == null)
-                {
-                    publication = new Publication
+            return CreateOrUpdateWithExclusiveLock(
+                message.Release.Publication.Title,
+                statisticsDbContext,
+                message.Release.Publication,
+                message.Release.Publication.Id,
+                () => new Publication
                     {
                         Id = message.Release.Publication.Id,
                         Title = message.Release.Publication.Title,
                         Slug = message.Release.Publication.Slug,
                         Topic = topic
-                    };
-                    _logger.LogInformation($"Creating Publication {publication.Title}");
-                    publication = (await statisticsDbContext.Publication.AddAsync(publication)).Entity;
-                }
-                else
-                {
-                    publication = _mapper.Map(message.Release.Publication, existing);
-                    _logger.LogInformation($"Publication {publication.Title} already exists - updating");
-                    publication = statisticsDbContext.Publication.Update(publication).Entity;
-                }
-
-                await statisticsDbContext.SaveChangesAsync();
-                return publication;
-            });
+                    });
         }
 
-        private async Task<Topic> CreateOrUpdateTopic(ImportMessage message, StatisticsDbContext statisticsDbContext,
+        private Task<Topic> CreateOrUpdateTopic(ImportMessage message, StatisticsDbContext statisticsDbContext,
             Theme theme)
         {
-            return await DbUtils.ExecuteWithExclusiveLock(statisticsDbContext, "CreateOrUpdateTopic", async (context) =>
-            {
-                Topic topic;
-
-                _logger.LogInformation($"Checking for existence of Topic {message.Release.Publication.Topic.Title}");
-
-                var existing = await statisticsDbContext.Topic.FindAsync(message.Release.Publication.Topic.Id);
-
-                if (existing == null)
-                {
-                    topic = new Topic
+            return CreateOrUpdateWithExclusiveLock(
+                message.Release.Publication.Topic.Title,
+                statisticsDbContext,
+                message.Release.Publication.Topic,
+                message.Release.Publication.Topic.Id,
+                () => new Topic
                     {
                         Id = message.Release.Publication.Topic.Id,
                         Title = message.Release.Publication.Topic.Title,
                         Slug = message.Release.Publication.Topic.Slug,
                         Theme = theme
-                    };
-                    _logger.LogInformation($"Creating Topic {topic.Title}");
-                    topic = (await statisticsDbContext.Topic.AddAsync(topic)).Entity;
-                }
-                else
-                {
-                    topic = _mapper.Map(message.Release.Publication.Topic, existing);
-                    _logger.LogInformation($"Topic {topic.Title} already exists - updating");
-                    topic = statisticsDbContext.Topic.Update(topic).Entity;
-                }
-
-                await statisticsDbContext.SaveChangesAsync();
-                return topic;
-            });
+                    });
         }
 
         private Task<Theme> CreateOrUpdateTheme(ImportMessage message, StatisticsDbContext statisticsDbContext)
         {
-            return DbUtils.ExecuteWithExclusiveLock(statisticsDbContext, "CreateOrUpdateTheme", async (context) =>
+            return CreateOrUpdateWithExclusiveLock(
+                message.Release.Publication.Topic.Theme.Title,
+                statisticsDbContext,
+                message.Release.Publication.Topic.Theme,
+                message.Release.Publication.Topic.Theme.Id,
+                () => new Theme 
+                {
+                    Id = message.Release.Publication.Topic.Theme.Id,
+                    Slug = message.Release.Publication.Topic.Theme.Slug,
+                    Title = message.Release.Publication.Topic.Theme.Title
+                });
+        }
+        
+        /**
+         * This method allows for a concurrency-safe pattern to check for the existence of a given entity and, if it
+         * does not exist to create it, or if it does exist, to update it.
+         *
+         * This is concurrency-safe as it ensures that any two concurrent importer processes that are trying to create
+         * or update the same entity type with the same ID will not be able to do so at the same time.  Rather, the
+         * first thread to reach this code will acquire a lock and prevent the second thread from being able to check
+         * for the existence of the entity until the first thread has finished creating it.  At this point, the second
+         * thread is freed up to check if the entity already exists, which by this point, it will.
+         */
+        private Task<TEntity> CreateOrUpdateWithExclusiveLock<TEntity, TMessageObject>(
+            string entityName,
+            StatisticsDbContext statisticsDbContext,
+            TMessageObject objectFromMessage,
+            Guid entityId,
+            Func<TEntity> createEntityFn)
+            where TEntity : class 
+            where TMessageObject : class
+        {
+            var typeName = typeof(TEntity).Name;
+            
+            return DbUtils.ExecuteWithExclusiveLock(
+                statisticsDbContext, 
+                $"CreateOrUpdate{typeName}-{entityId}", 
+                async (context) =>
             {
-                Theme theme;
-
                 _logger.LogInformation(
-                    $"Checking for existence of Theme {message.Release.Publication.Topic.Theme.Title}");
+                    $"Checking for existence of {typeName} \"{entityName}\"");
 
-                var existing = await statisticsDbContext.Theme
-                    .FindAsync(message.Release.Publication.Topic.Theme.Id);
+                var existing = await statisticsDbContext.Set<TEntity>().FindAsync(entityId);
                 
                 if (existing == null)
                 {
-                    theme = new Theme
-                    {
-                        Id = message.Release.Publication.Topic.Theme.Id,
-                        Slug = message.Release.Publication.Topic.Theme.Slug,
-                        Title = message.Release.Publication.Topic.Theme.Title
-                    };
-                    _logger.LogInformation($"Creating Theme {theme.Title}");
-                    theme = (await statisticsDbContext.Theme.AddAsync(theme)).Entity;
+                    _logger.LogInformation($"Creating {typeName} \"{entityName}\"");
+                    TEntity newEntity = createEntityFn.Invoke();
+                    TEntity created = (await statisticsDbContext.Set<TEntity>().AddAsync(newEntity)).Entity;
+                    await statisticsDbContext.SaveChangesAsync();
+                    return created;
                 }
-                else
-                {
-                    theme = _mapper.Map(message.Release.Publication.Topic.Theme, existing);
-                    _logger.LogInformation($"Theme {theme.Title} already exists - updating");
-                    theme = statisticsDbContext.Theme.Update(theme).Entity;
-                }
-
+                
+                _logger.LogInformation($"{typeName} \"{entityName}\" already exists - updating");
+                TEntity mappedEntity = _mapper.Map(objectFromMessage, existing);
+                TEntity updated = statisticsDbContext.Set<TEntity>().Update(mappedEntity).Entity;
                 await statisticsDbContext.SaveChangesAsync();
-                return theme;
+                return updated;
             });
         }
     }
