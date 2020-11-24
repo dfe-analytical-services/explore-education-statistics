@@ -29,7 +29,8 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Importer.Utils
 
         /**
          * Obtains an exclusive lock within a new transaction and stops other transactions needing to acquire the
-         * same lock to run until they can obtain the lock.  The lock is released upon a transaction being committed.
+         * same lock to run until they can obtain the lock.  The lock is released upon a transaction being committed
+         * or rolled back.
          */
         public static Task<TResult> ExecuteWithExclusiveLock<TDbContext, TResult>(
             TDbContext dbContext,
