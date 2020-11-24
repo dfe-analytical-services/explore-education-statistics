@@ -20,16 +20,29 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Security.Author
          * against an arbitrary Release, and fails otherwise
          */
         public static void AssertReleaseHandlerSucceedsWithCorrectClaims<TRequirement>(
-            IAuthorizationHandler handler, 
-            params SecurityClaimTypes[] claimsExpectedToSucceed) 
+            IAuthorizationHandler handler,
+            params SecurityClaimTypes[] claimsExpectedToSucceed)
             where TRequirement : IAuthorizationRequirement
         {
             var release = new Release
             {
                 Id = Guid.NewGuid()
             };
-            
+
             AssertReleaseHandlerSucceedsWithCorrectClaims<TRequirement>(handler, release, claimsExpectedToSucceed);
+        }
+
+        public static void AssertReleaseHandlerSucceedsWithCorrectClaims<TRequirement>(
+            Func<ContentDbContext, IAuthorizationHandler> handlerSupplier,
+            params SecurityClaimTypes[] claimsExpectedToSucceed)
+            where TRequirement : IAuthorizationRequirement
+        {
+            var release = new Release
+            {
+                Id = Guid.NewGuid()
+            };
+
+            AssertReleaseHandlerSucceedsWithCorrectClaims<TRequirement>(handlerSupplier, release, claimsExpectedToSucceed);
         }
 
         /**
@@ -37,26 +50,50 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Security.Author
          * against the supplied Release, and fails otherwise
          */
         public static void AssertReleaseHandlerSucceedsWithCorrectClaims<TRequirement>(
-            IAuthorizationHandler handler, 
+            IAuthorizationHandler handler,
             Release release,
-            params SecurityClaimTypes[] claimsExpectedToSucceed) 
+            params SecurityClaimTypes[] claimsExpectedToSucceed)
             where TRequirement : IAuthorizationRequirement
         {
-            var scenarios = GetEnumValues<SecurityClaimTypes>().Select(claim =>
-            {
-                var user = CreateClaimsPrincipal(Guid.NewGuid(), new Claim(claim.ToString(), ""));
-
-                return new ReleaseHandlerTestScenario
-                {
-                    User = user,
-                    Release = release,
-                    ExpectedToPass = claimsExpectedToSucceed.Contains(claim),
-                    UnexpectedFailMessage = "Expected claim " + claim + " to have caused the handler to succeed",
-                    UnexpectedPassMessage = "Expected claim " + claim + " to have caused the handler to fail"
-                };
-            }).ToList();
-            
+            var scenarios = GetClaimTestScenarios(release, claimsExpectedToSucceed);
             scenarios.ForEach(scenario => AssertReleaseHandlerHandlesScenarioSuccessfully<TRequirement>(handler, scenario));
+        }
+
+        public static void AssertReleaseHandlerSucceedsWithCorrectClaims<TRequirement>(
+            Func<ContentDbContext, IAuthorizationHandler> handlerSupplier,
+            Release release,
+            params SecurityClaimTypes[] claimsExpectedToSucceed)
+            where TRequirement : IAuthorizationRequirement
+        {
+            var scenarios = GetClaimTestScenarios(release, claimsExpectedToSucceed);
+            scenarios.ForEach(scenario => AssertReleaseHandlerHandlesScenarioSuccessfully<TRequirement>(handlerSupplier, scenario));
+        }
+
+        private static List<ReleaseHandlerTestScenario> GetClaimTestScenarios(
+            Release release,
+            SecurityClaimTypes[] claimsExpectedToSucceed)
+        {
+            return GetEnumValues<SecurityClaimTypes>()
+                .Select(
+                    claim =>
+                    {
+                        var user = CreateClaimsPrincipal(
+                            Guid.NewGuid(),
+                            new Claim(claim.ToString(), "")
+                        );
+
+                        return new ReleaseHandlerTestScenario
+                        {
+                            User = user,
+                            Release = release,
+                            ExpectedToPass = claimsExpectedToSucceed.Contains(claim),
+                            UnexpectedFailMessage =
+                                "Expected claim " + claim + " to have caused the handler to succeed",
+                            UnexpectedPassMessage = "Expected claim " + claim + " to have caused the handler to fail"
+                        };
+                    }
+                )
+                .ToList();
         }
 
         /**
@@ -72,7 +109,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Security.Author
             {
                 Id = Guid.NewGuid()
             };
-            
+
             AssertReleaseHandlerSucceedsWithCorrectReleaseRoles<TRequirement>(handlerSupplier, release, rolesExpectedToSucceed);
         }
 
@@ -82,7 +119,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Security.Author
          */
         public static void AssertReleaseHandlerSucceedsWithCorrectReleaseRoles<TRequirement>(
             Func<ContentDbContext, IAuthorizationHandler> handlerSupplier,
-            Release release, 
+            Release release,
             params ReleaseRole[] rolesExpectedToSucceed)
             where TRequirement : IAuthorizationRequirement
         {
@@ -91,10 +128,10 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Security.Author
             var allScenarios = new List<ReleaseHandlerTestScenario>(inTeamScenarios) {notInTeamScenario};
             allScenarios.ForEach(scenario => AssertReleaseHandlerHandlesScenarioSuccessfully<TRequirement>(handlerSupplier, scenario));
         }
-        
+
         public static async void AssertReleaseHandlerHandlesScenarioSuccessfully<TRequirement>(
-            IAuthorizationHandler handler, 
-            ReleaseHandlerTestScenario scenario) 
+            IAuthorizationHandler handler,
+            ReleaseHandlerTestScenario scenario)
             where TRequirement : IAuthorizationRequirement
         {
             var authContext = new AuthorizationHandlerContext(
@@ -105,11 +142,11 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Security.Author
 
             if (scenario.ExpectedToPass)
             {
-                Assert.True(authContext.HasSucceeded, scenario.UnexpectedFailMessage); 
+                Assert.True(authContext.HasSucceeded, scenario.UnexpectedFailMessage);
             }
             else
             {
-                Assert.False(authContext.HasSucceeded, scenario.UnexpectedPassMessage); 
+                Assert.False(authContext.HasSucceeded, scenario.UnexpectedPassMessage);
             }
         }
 
@@ -223,14 +260,22 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Security.Author
         }
 
         public static void AssertReleaseHandlerHandlesScenarioSuccessfully<TRequirement>(
-            Func<ContentDbContext, IAuthorizationHandler> handlerSupplier, 
+            Func<ContentDbContext, IAuthorizationHandler> handlerSupplier,
             ReleaseHandlerTestScenario scenario) where TRequirement : IAuthorizationRequirement
         {
-            using (var context = DbUtils.InMemoryApplicationDbContext())
+            var contextId = Guid.NewGuid().ToString();
+
+            using (var context = DbUtils.InMemoryApplicationDbContext(contextId))
             {
-                context.AddRange(scenario.UserReleaseRoles);
-                context.SaveChanges();
-                
+                if (scenario.UserReleaseRoles != null)
+                {
+                    context.AddRange(scenario.UserReleaseRoles);
+                    context.SaveChanges();
+                }
+            }
+
+            using (var context = DbUtils.InMemoryApplicationDbContext(contextId))
+            {
                 var handler = handlerSupplier(context);
                 AssertReleaseHandlerHandlesScenarioSuccessfully<TRequirement>(handler, scenario);
             }
@@ -239,15 +284,15 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Security.Author
         public class ReleaseHandlerTestScenario
         {
             public Release Release { get; set; }
-            
+
             public ClaimsPrincipal User { get; set; }
 
             public List<UserReleaseRole> UserReleaseRoles { get; set; }
-            
+
             public bool ExpectedToPass { get; set; }
-            
+
             public string UnexpectedPassMessage { get; set; }
-            
+
             public string UnexpectedFailMessage { get; set; }
         }
     }
