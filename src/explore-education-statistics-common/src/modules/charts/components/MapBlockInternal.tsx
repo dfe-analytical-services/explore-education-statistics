@@ -81,7 +81,7 @@ function calculateScaledColour({
 
 function getDefaultDecimalPlaces(values: number[]): number {
   const maxDecimals = values.reduce<number>((acc, value) => {
-    const decimals = unsafeCountDecimals(value.toString());
+    const decimals = unsafeCountDecimals(value?.toString() ?? 0);
 
     if (decimals > acc) {
       return decimals;
@@ -102,9 +102,14 @@ function generateGeometryAndLegend(
 } {
   const selectedDataSetKey = selectedDataSetConfiguration.dataKey;
 
-  const values = dataSetCategories.map(
-    category => category.dataSets[selectedDataSetKey]?.value,
-  );
+  // Use reduce to be more efficient than map/filter
+  const values = dataSetCategories.reduce<number[]>((acc, category) => {
+    if (typeof category.dataSets[selectedDataSetKey]?.value !== 'undefined') {
+      acc.push(category.dataSets[selectedDataSetKey]?.value);
+    }
+
+    return acc;
+  }, []);
 
   const {
     unit,
