@@ -6,6 +6,10 @@ export default function getMinMax(
 ): { min?: number; max?: number } {
   const { min, max } = values.reduce<{ min: number; max: number }>(
     (acc, value) => {
+      if (typeof value !== 'number') {
+        return acc;
+      }
+
       if (value < acc.min) {
         acc.min = value;
       }
