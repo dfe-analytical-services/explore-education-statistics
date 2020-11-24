@@ -24,8 +24,9 @@ import {
 import { Dictionary } from '@common/types';
 import generateHslColour from '@common/utils/colour/generateHslColour';
 import lighten from '@common/utils/colour/lighten';
+import { unsafeCountDecimals } from '@common/utils/number/countDecimals';
 import formatPretty, {
-  defaultDecimalPlaces,
+  defaultMaxDecimalPlaces,
 } from '@common/utils/number/formatPretty';
 import getMinMax from '@common/utils/number/getMinMax';
 import { roundDownToNearest } from '@common/utils/number/roundNearest';
@@ -78,6 +79,20 @@ function calculateScaledColour({
   return lighten(colour, 90 - (scale / groupSize) * 30);
 }
 
+function getDefaultDecimalPlaces(values: number[]): number {
+  const maxDecimals = values.reduce<number>((acc, value) => {
+    const decimals = unsafeCountDecimals(value.toString());
+
+    if (decimals > acc) {
+      return decimals;
+    }
+
+    return acc;
+  }, 0);
+
+  return clamp(maxDecimals, 0, defaultMaxDecimalPlaces);
+}
+
 function generateGeometryAndLegend(
   selectedDataSetConfiguration: CategoryDataSetConfiguration,
   dataSetCategories: MapDataSetCategory[],
@@ -87,16 +102,16 @@ function generateGeometryAndLegend(
 } {
   const selectedDataSetKey = selectedDataSetConfiguration.dataKey;
 
+  const values = dataSetCategories.map(
+    category => category.dataSets[selectedDataSetKey]?.value,
+  );
+
   const {
     unit,
-    decimalPlaces = defaultDecimalPlaces,
+    decimalPlaces = getDefaultDecimalPlaces(values),
   } = selectedDataSetConfiguration.dataSet.indicator;
 
-  const { min = 0, max = 0 } = getMinMax(
-    dataSetCategories
-      .map(category => category.dataSets[selectedDataSetKey]?.value)
-      .filter(value => typeof value !== 'undefined'),
-  );
+  const { min = 0, max = 0 } = getMinMax(values);
 
   const range = max - min;
 
@@ -107,10 +122,22 @@ function generateGeometryAndLegend(
   const groups = 5;
   const groupSize = 1 / groups;
 
+  let decimals = decimalPlaces;
+
   // Calculate the increment between values by using
   // decimal places expressed as a proportion of 1 e.g.
   // 1 decimal place is 0.1, 2 decimal places is 0.01, etc.
-  const valueIncrement = 1 / 10 ** decimalPlaces;
+  let valueIncrement = 1 / 10 ** decimals;
+
+  // Re-calculate if the increment is not small enough to
+  // prevent groups overlapping one another e.g.
+  // for a range of 0.4, we need an increment of 0.01
+  // rather than 0.1 as we would get group boundaries
+  // like 0.1, 0.2, 0.2, 0.3, 0.4
+  if (range < valueIncrement * groups) {
+    decimals = decimalPlaces + 1;
+    valueIncrement = 1 / 10 ** decimals;
+  }
 
   const legend: LegendEntry[] =
     range > 0
@@ -122,19 +149,15 @@ function generateGeometryAndLegend(
 
           return {
             colour: calculateScaledColour({ scale: i, colour, groupSize }),
-            min: formatPretty(min + i * range + minOffset, unit, decimalPlaces),
-            max: formatPretty(
-              min + (i + groupSize) * range,
-              unit,
-              decimalPlaces,
-            ),
+            min: formatPretty(min + i * range + minOffset, unit, decimals),
+            max: formatPretty(min + (i + groupSize) * range, unit, decimals),
           };
         })
       : [
           {
             colour,
-            min: formatPretty(min, unit, decimalPlaces),
-            max: formatPretty(max, unit, decimalPlaces),
+            min: formatPretty(min, unit, decimals),
+            max: formatPretty(max, unit, decimals),
           },
         ];
 
