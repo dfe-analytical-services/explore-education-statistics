@@ -52,7 +52,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Importer.Utils
                 catch (Exception)
                 {
                     await transaction.RollbackAsync();
-                    return default;
+                    throw;
                 }
             });
         }
