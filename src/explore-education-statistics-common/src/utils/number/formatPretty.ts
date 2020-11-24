@@ -1,4 +1,7 @@
-export const defaultDecimalPlaces = 2;
+import { unsafeCountDecimals } from '@common/utils/number/countDecimals';
+import clamp from 'lodash/clamp';
+
+export const defaultMaxDecimalPlaces = 2;
 
 /**
  * Return a formatted {@param value} in a pretty format
@@ -10,31 +13,40 @@ export const defaultDecimalPlaces = 2;
  *
  * {@param decimalPlaces} can be optionally used
  * determine the number of decimal places that
- * the formatted number can have.
- *
- * This also accepts strings and preserves their
- * decimal places, even if there are trailing zeros.
+ * the formatted number should have.
  */
 export default function formatPretty(
   value: string | number,
   unit?: string,
-  decimalPlaces = defaultDecimalPlaces,
+  decimalPlaces?: number,
 ): string {
-  let formattedValue;
+  let numberValue: number;
 
   if (typeof value === 'string') {
-    const numberValue = Number(value);
+    numberValue = Number(value);
 
-    if (Number.isNaN(numberValue)) {
+    if (Number.isNaN(numberValue) || value === '') {
       return value;
     }
+  } else {
+    numberValue = value;
+  }
+
+  let formattedValue: string;
+
+  if (typeof decimalPlaces === 'undefined') {
+    const minDecimalPlaces = clamp(
+      unsafeCountDecimals(value.toString()),
+      0,
+      defaultMaxDecimalPlaces,
+    );
 
     formattedValue = numberValue.toLocaleString('en-GB', {
-      maximumFractionDigits: decimalPlaces,
-      minimumFractionDigits: decimalPlaces,
+      maximumFractionDigits: defaultMaxDecimalPlaces,
+      minimumFractionDigits: minDecimalPlaces,
     });
   } else {
-    formattedValue = value.toLocaleString('en-GB', {
+    formattedValue = numberValue.toLocaleString('en-GB', {
       maximumFractionDigits: decimalPlaces,
       minimumFractionDigits: decimalPlaces,
     });
