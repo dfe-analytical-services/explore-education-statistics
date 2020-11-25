@@ -1,18 +1,31 @@
 import ChartBuilderSaveActions from '@admin/pages/release/datablocks/components/ChartBuilderSaveActions';
-import ChartDataSetsAddForm from '@admin/pages/release/datablocks/components/ChartDataSetsAddForm';
+import styles from '@admin/pages/release/datablocks/components/ChartDataSetsConfiguration.module.scss';
 import { ChartBuilderForms } from '@admin/pages/release/datablocks/components/types/chartBuilderForms';
 import generateDataSetLabel from '@admin/pages/release/datablocks/utils/generateDataSetLabel';
+import Button from '@common/components/Button';
 import ButtonText from '@common/components/ButtonText';
+import { Form, FormFieldSelect, FormSelect } from '@common/components/form';
 import VisuallyHidden from '@common/components/VisuallyHidden';
 import { DataSet } from '@common/modules/charts/types/dataSet';
 import expandDataSet from '@common/modules/charts/util/expandDataSet';
 import generateDataSetKey from '@common/modules/charts/util/generateDataSetKey';
 import { LocationFilter } from '@common/modules/table-tool/types/filters';
 import { FullTableMeta } from '@common/modules/table-tool/types/fullTable';
+import { Dictionary } from '@common/types';
+import Yup from '@common/validation/yup';
+import { Formik } from 'formik';
 import difference from 'lodash/difference';
-import React, { ReactNode } from 'react';
+import mapValues from 'lodash/mapValues';
+import React, { ReactNode, useMemo } from 'react';
 
 const formId = 'chartDataSetsConfigurationForm';
+
+interface FormValues {
+  filters: Dictionary<string>;
+  indicator: string;
+  location: string;
+  timePeriod: string;
+}
 
 interface Props {
   buttons?: ReactNode;
@@ -35,10 +48,48 @@ const ChartDataSetsConfiguration = ({
   onDataAdded,
   onSubmit,
 }: Props) => {
+  const indicatorOptions = useMemo(() => Object.values(meta.indicators), [
+    meta.indicators,
+  ]);
+
+  const locationOptions = useMemo(
+    () =>
+      meta.locations.map(location => ({
+        value: location.id,
+        label: location.label,
+      })),
+    [meta.locations],
+  );
+
   return (
     <>
-      <ChartDataSetsAddForm
-        meta={meta}
+      <Formik<FormValues>
+        initialValues={{
+          filters: mapValues(meta.filters, filterGroup =>
+            filterGroup.options.length === 1
+              ? filterGroup.options[0].value
+              : '',
+          ),
+          indicator:
+            meta.indicators.length === 1 ? meta.indicators[0].value : '',
+          location: meta.locations.length === 1 ? meta.locations[0].id : '',
+          timePeriod:
+            meta.timePeriodRange.length === 1
+              ? meta.timePeriodRange[0].value
+              : '',
+        }}
+        validateOnBlur={false}
+        validateOnChange={false}
+        validationSchema={Yup.object<FormValues>({
+          indicator: Yup.string().required('Choose indicator'),
+          filters: Yup.object(
+            mapValues(meta.filters, (filter, category) =>
+              Yup.string().required(`Choose ${category.toLowerCase()}`),
+            ),
+          ),
+          location: Yup.string(),
+          timePeriod: Yup.string(),
+        })}
         onSubmit={values => {
           const { indicator } = values;
           const filters = Object.values(values.filters);
@@ -77,7 +128,71 @@ const ChartDataSetsConfiguration = ({
             });
           }
         }}
-      />
+      >
+        {() => (
+          <Form id={formId} showSubmitError>
+            <div className={styles.formSelectRow}>
+              {Object.entries(meta.filters)
+                .filter(([, filters]) => filters.options.length > 1)
+                .map(([categoryName, filters]) => (
+                  <FormFieldSelect
+                    key={categoryName}
+                    id={`${formId}-filters${categoryName}`}
+                    name={`filters.${categoryName}`}
+                    label={categoryName}
+                    formGroupClass={styles.formSelectGroup}
+                    className="govuk-!-width-full"
+                    placeholder={
+                      filters.options.length > 1
+                        ? `Select ${categoryName.toLowerCase()}`
+                        : undefined
+                    }
+                    options={filters.options}
+                  />
+                ))}
+
+              {indicatorOptions.length > 1 && (
+                <FormFieldSelect<FormValues>
+                  id={`${formId}-indicator`}
+                  name="indicator"
+                  label="Indicator"
+                  formGroupClass={styles.formSelectGroup}
+                  className="govuk-!-width-full"
+                  placeholder="Select indicator"
+                  options={indicatorOptions}
+                />
+              )}
+
+              {locationOptions.length > 1 && (
+                <FormFieldSelect<FormValues>
+                  id={`${formId}-location`}
+                  name="location"
+                  label="Location"
+                  formGroupClass={styles.formSelectGroup}
+                  className="govuk-!-width-full"
+                  placeholder="All locations"
+                  options={locationOptions}
+                />
+              )}
+
+              {meta.timePeriodRange.length > 1 && (
+                <FormFieldSelect<FormValues>
+                  id={`${formId}-timePeriod`}
+                  name="timePeriod"
+                  label="Time period"
+                  formGroupClass={styles.formSelectGroup}
+                  className="govuk-!-width-full"
+                  placeholder="All time periods"
+                  options={meta.timePeriodRange}
+                  order={FormSelect.unordered}
+                />
+              )}
+            </div>
+
+            <Button type="submit">Add data set</Button>
+          </Form>
+        )}
+      </Formik>
 
       {dataSets?.length > 0 && (
         <>
