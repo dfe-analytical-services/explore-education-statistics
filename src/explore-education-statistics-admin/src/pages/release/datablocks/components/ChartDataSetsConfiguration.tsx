@@ -33,8 +33,7 @@ interface Props {
   forms: ChartBuilderForms;
   isSaving?: boolean;
   meta: FullTableMeta;
-  onDataAdded?: (data: DataSet) => void;
-  onDataRemoved?: (data: DataSet, index: number) => void;
+  onChange: (dataSets: DataSet[]) => void;
   onSubmit: () => void;
 }
 
@@ -44,8 +43,7 @@ const ChartDataSetsConfiguration = ({
   forms,
   meta,
   dataSets = [],
-  onDataRemoved,
-  onDataAdded,
+  onChange,
   onSubmit,
 }: Props) => {
   const indicatorOptions = useMemo(() => Object.values(meta.indicators), [
@@ -119,13 +117,15 @@ const ChartDataSetsConfiguration = ({
             );
           }
 
-          if (onDataAdded) {
-            onDataAdded({
+          if (onChange) {
+            const dataSet: DataSet = {
               filters,
               indicator,
               location,
               timePeriod,
-            });
+            };
+
+            onChange([...dataSets, dataSet]);
           }
         }}
       >
@@ -217,8 +217,11 @@ const ChartDataSetsConfiguration = ({
                       <ButtonText
                         className="govuk-!-margin-bottom-0"
                         onClick={() => {
-                          if (onDataRemoved) {
-                            onDataRemoved(dataSet, index);
+                          if (onChange) {
+                            const nextDataSets = [...dataSets];
+                            nextDataSets.splice(index, 1);
+
+                            onChange(nextDataSets);
                           }
                         }}
                       >

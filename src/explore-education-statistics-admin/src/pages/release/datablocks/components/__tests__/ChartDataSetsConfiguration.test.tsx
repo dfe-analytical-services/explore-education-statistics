@@ -128,6 +128,7 @@ describe('ChartDataSetsConfiguration', () => {
             timePeriod: '2019_AY',
           },
         ]}
+        onChange={noop}
         onSubmit={noop}
       />,
     );
@@ -170,6 +171,7 @@ describe('ChartDataSetsConfiguration', () => {
             filters: ['male'],
           },
         ]}
+        onChange={noop}
         onSubmit={handleSubmit}
       />,
     );
@@ -192,6 +194,7 @@ describe('ChartDataSetsConfiguration', () => {
         <ChartDataSetsConfiguration
           meta={testSubjectMeta}
           forms={testFormState}
+          onChange={noop}
           onSubmit={noop}
         />,
       );
@@ -249,6 +252,7 @@ describe('ChartDataSetsConfiguration', () => {
             indicators: [],
           }}
           forms={testFormState}
+          onChange={noop}
           onSubmit={noop}
         />,
       );
@@ -264,6 +268,7 @@ describe('ChartDataSetsConfiguration', () => {
             indicators: [testSubjectMeta.indicators[0]],
           }}
           forms={testFormState}
+          onChange={noop}
           onSubmit={noop}
         />,
       );
@@ -279,6 +284,7 @@ describe('ChartDataSetsConfiguration', () => {
             locations: [],
           }}
           forms={testFormState}
+          onChange={noop}
           onSubmit={noop}
         />,
       );
@@ -294,6 +300,7 @@ describe('ChartDataSetsConfiguration', () => {
             locations: [testSubjectMeta.locations[0]],
           }}
           forms={testFormState}
+          onChange={noop}
           onSubmit={noop}
         />,
       );
@@ -309,6 +316,7 @@ describe('ChartDataSetsConfiguration', () => {
             timePeriodRange: [],
           }}
           forms={testFormState}
+          onChange={noop}
           onSubmit={noop}
         />,
       );
@@ -324,6 +332,7 @@ describe('ChartDataSetsConfiguration', () => {
             timePeriodRange: [testSubjectMeta.timePeriodRange[0]],
           }}
           forms={testFormState}
+          onChange={noop}
           onSubmit={noop}
         />,
       );
@@ -332,20 +341,20 @@ describe('ChartDataSetsConfiguration', () => {
     });
 
     test('shows validation errors when no values have been selected', async () => {
-      const handleDataAdded = jest.fn();
+      const handleChange = jest.fn();
 
       render(
         <ChartDataSetsConfiguration
           meta={testSubjectMeta}
           forms={testFormState}
-          onDataAdded={handleDataAdded}
+          onChange={handleChange}
           onSubmit={noop}
         />,
       );
 
       userEvent.click(screen.getByRole('button', { name: 'Add data set' }));
 
-      expect(handleDataAdded).not.toHaveBeenCalled();
+      expect(handleChange).not.toHaveBeenCalled();
 
       await waitFor(() => {
         expect(
@@ -359,12 +368,12 @@ describe('ChartDataSetsConfiguration', () => {
           '#chartDataSetsConfigurationForm-filtersCharacteristic',
         );
 
-        expect(handleDataAdded).not.toHaveBeenCalled();
+        expect(handleChange).not.toHaveBeenCalled();
       });
     });
 
     test('shows submit error if data set already exists', async () => {
-      const handleDataAdded = jest.fn();
+      const handleChange = jest.fn();
 
       render(
         <ChartDataSetsConfiguration
@@ -376,7 +385,7 @@ describe('ChartDataSetsConfiguration', () => {
             },
           ]}
           forms={testFormState}
-          onDataAdded={handleDataAdded}
+          onChange={handleChange}
           onSubmit={noop}
         />,
       );
@@ -387,7 +396,7 @@ describe('ChartDataSetsConfiguration', () => {
         'unauthorised-absence-sessions',
       );
 
-      expect(handleDataAdded).not.toHaveBeenCalled();
+      expect(handleChange).not.toHaveBeenCalled();
 
       userEvent.click(screen.getByRole('button', { name: 'Add data set' }));
 
@@ -399,17 +408,17 @@ describe('ChartDataSetsConfiguration', () => {
         ).toHaveAttribute('href', '#chartDataSetsConfigurationForm-submit');
       });
 
-      expect(handleDataAdded).not.toHaveBeenCalled();
+      expect(handleChange).not.toHaveBeenCalled();
     });
 
     test('successfully submits by selecting only indicator and filter', async () => {
-      const handleDataAdded = jest.fn();
+      const handleChange = jest.fn();
 
       render(
         <ChartDataSetsConfiguration
           meta={testSubjectMeta}
           forms={testFormState}
-          onDataAdded={handleDataAdded}
+          onChange={handleChange}
           onSubmit={noop}
         />,
       );
@@ -420,28 +429,30 @@ describe('ChartDataSetsConfiguration', () => {
         'unauthorised-absence-sessions',
       );
 
-      expect(handleDataAdded).not.toHaveBeenCalled();
+      expect(handleChange).not.toHaveBeenCalled();
 
       userEvent.click(screen.getByRole('button', { name: 'Add data set' }));
 
       await waitFor(() => {
-        const expectedValues: DataSet = {
-          filters: ['male'],
-          indicator: 'unauthorised-absence-sessions',
-        };
+        const expected: DataSet[] = [
+          {
+            filters: ['male'],
+            indicator: 'unauthorised-absence-sessions',
+          },
+        ];
 
-        expect(handleDataAdded).toHaveBeenCalledWith(expectedValues);
+        expect(handleChange).toHaveBeenCalledWith(expected);
       });
     });
 
     test('successfully submits by selecting all options', async () => {
-      const handleDataAdded = jest.fn();
+      const handleChange = jest.fn();
 
       render(
         <ChartDataSetsConfiguration
           meta={testSubjectMeta}
           forms={testFormState}
-          onDataAdded={handleDataAdded}
+          onChange={handleChange}
           onSubmit={noop}
         />,
       );
@@ -460,27 +471,29 @@ describe('ChartDataSetsConfiguration', () => {
       );
       userEvent.selectOptions(screen.getByLabelText('Time period'), '2020_AY');
 
-      expect(handleDataAdded).not.toHaveBeenCalled();
+      expect(handleChange).not.toHaveBeenCalled();
 
       userEvent.click(screen.getByRole('button', { name: 'Add data set' }));
 
       await waitFor(() => {
-        const expectedValues: DataSet = {
-          filters: ['male'],
-          indicator: 'unauthorised-absence-sessions',
-          location: {
-            value: 'barnsley',
-            level: 'localAuthority',
+        const expected: DataSet[] = [
+          {
+            filters: ['male'],
+            indicator: 'unauthorised-absence-sessions',
+            location: {
+              value: 'barnsley',
+              level: 'localAuthority',
+            },
+            timePeriod: '2020_AY',
           },
-          timePeriod: '2020_AY',
-        };
+        ];
 
-        expect(handleDataAdded).toHaveBeenCalledWith(expectedValues);
+        expect(handleChange).toHaveBeenCalledWith(expected);
       });
     });
 
     test('successfully submits by selecting only indicator when there are no filters', async () => {
-      const handleDataAdded = jest.fn();
+      const handleChange = jest.fn();
 
       render(
         <ChartDataSetsConfiguration
@@ -489,7 +502,7 @@ describe('ChartDataSetsConfiguration', () => {
             filters: {},
           }}
           forms={testFormState}
-          onDataAdded={handleDataAdded}
+          onChange={handleChange}
           onSubmit={noop}
         />,
       );
@@ -499,18 +512,86 @@ describe('ChartDataSetsConfiguration', () => {
         'unauthorised-absence-sessions',
       );
 
-      expect(handleDataAdded).not.toHaveBeenCalled();
+      expect(handleChange).not.toHaveBeenCalled();
 
       userEvent.click(screen.getByRole('button', { name: 'Add data set' }));
 
       await waitFor(() => {
-        const expectedValues: DataSet = {
-          filters: [],
-          indicator: 'unauthorised-absence-sessions',
-        };
+        const expected: DataSet[] = [
+          {
+            filters: [],
+            indicator: 'unauthorised-absence-sessions',
+          },
+        ];
 
-        expect(handleDataAdded).toHaveBeenCalledWith(expectedValues);
+        expect(handleChange).toHaveBeenCalledWith(expected);
       });
+    });
+  });
+
+  describe('removing data set', () => {
+    test('calls `onChange` with only data set removed', () => {
+      const handleChange = jest.fn();
+
+      render(
+        <ChartDataSetsConfiguration
+          meta={testSubjectMeta}
+          forms={testFormState}
+          dataSets={[
+            {
+              filters: ['male'],
+              indicator: 'unauthorised-absence-sessions',
+            },
+          ]}
+          onChange={handleChange}
+          onSubmit={noop}
+        />,
+      );
+
+      expect(handleChange).not.toHaveBeenCalled();
+
+      userEvent.click(screen.getByRole('button', { name: 'Remove' }));
+
+      expect(handleChange).toHaveBeenCalledWith([]);
+    });
+
+    test('calls `onChange` with correct data set removed from multiple', () => {
+      const handleChange = jest.fn();
+
+      render(
+        <ChartDataSetsConfiguration
+          meta={testSubjectMeta}
+          forms={testFormState}
+          dataSets={[
+            {
+              filters: ['female'],
+              indicator: 'authorised-absence-sessions',
+            },
+            {
+              filters: ['male'],
+              indicator: 'unauthorised-absence-sessions',
+            },
+          ]}
+          onChange={handleChange}
+          onSubmit={noop}
+        />,
+      );
+
+      const tableRows = screen.getAllByRole('row');
+      expect(tableRows).toHaveLength(3);
+
+      expect(handleChange).not.toHaveBeenCalled();
+
+      userEvent.click(
+        within(tableRows[1]).getByRole('button', { name: 'Remove' }),
+      );
+
+      expect(handleChange).toHaveBeenCalledWith([
+        {
+          filters: ['male'],
+          indicator: 'unauthorised-absence-sessions',
+        },
+      ]);
     });
   });
 });

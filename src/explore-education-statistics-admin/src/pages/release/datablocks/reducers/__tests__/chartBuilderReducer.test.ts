@@ -511,19 +511,14 @@ describe('chartBuilderReducer', () => {
     });
   });
 
-  describe('ADD_DATA_SET', () => {
+  describe('UPDATE_DATA_SETS', () => {
     const initialState: ChartBuilderState = {
       axes: {
         major: {
           type: 'major',
           visible: true,
           referenceLines: [],
-          dataSets: [
-            {
-              indicator: 'indicator-1',
-              filters: ['filter-1'],
-            },
-          ],
+          dataSets: [],
         },
       },
       definition: testChartDefinition,
@@ -541,13 +536,15 @@ describe('chartBuilderReducer', () => {
       },
     };
 
-    test('adds payload to data sets', () => {
+    test('sets payload to data sets', () => {
       const action: ChartBuilderActions = {
-        type: 'ADD_DATA_SET',
-        payload: {
-          indicator: 'indicator-2',
-          filters: ['filter-2'],
-        },
+        type: 'UPDATE_DATA_SETS',
+        payload: [
+          {
+            indicator: 'indicator-1',
+            filters: ['filter-1'],
+          },
+        ],
       };
 
       const nextState = produce(chartBuilderReducer)(initialState, action);
@@ -557,20 +554,18 @@ describe('chartBuilderReducer', () => {
           indicator: 'indicator-1',
           filters: ['filter-1'],
         },
-        {
-          indicator: 'indicator-2',
-          filters: ['filter-2'],
-        },
       ]);
     });
 
-    test('sets `forms.data.isValid` to true', () => {
+    test('sets `forms.data.isValid` to true if more than one data set', () => {
       const action: ChartBuilderActions = {
-        type: 'ADD_DATA_SET',
-        payload: {
-          indicator: 'indicator-2',
-          filters: ['filter-2'],
-        },
+        type: 'UPDATE_DATA_SETS',
+        payload: [
+          {
+            indicator: 'indicator-2',
+            filters: ['filter-2'],
+          },
+        ],
       };
       const nextState = produce(chartBuilderReducer)(
         {
@@ -588,80 +583,26 @@ describe('chartBuilderReducer', () => {
 
       expect(nextState.forms.data.isValid).toBe(true);
     });
-  });
 
-  describe('REMOVE_DATA_SET', () => {
-    const initialState: ChartBuilderState = {
-      axes: {
-        major: {
-          type: 'major',
-          visible: true,
-          referenceLines: [],
-          dataSets: [
-            {
-              indicator: 'indicator-1',
-              filters: ['filter-1'],
-            },
-            {
-              indicator: 'indicator-2',
-              filters: ['filter-2'],
-            },
-          ],
-        },
-      },
-      definition: testChartDefinition,
-      options: {
-        height: 300,
-        title: '',
-        alt: '',
-      },
-      forms: {
-        options: {
-          isValid: true,
-          submitCount: 0,
-        },
-        data: {
-          isValid: true,
-          submitCount: 0,
-        },
-        legend: {
-          isValid: true,
-          submitCount: 0,
-        },
-        major: {
-          isValid: true,
-          submitCount: 0,
-        },
-      },
-    };
-
-    test('removes data set at the payload index', () => {
+    test('sets `forms.data.isValid` to false if no data sets', () => {
       const action: ChartBuilderActions = {
-        type: 'REMOVE_DATA_SET',
-        payload: 1,
+        type: 'UPDATE_DATA_SETS',
+        payload: [],
       };
-      const nextState = produce(chartBuilderReducer)(initialState, action);
-
-      expect(nextState.axes.major?.dataSets).toEqual<DataSet[]>([
+      const nextState = produce(chartBuilderReducer)(
         {
-          indicator: 'indicator-1',
-          filters: ['filter-1'],
+          ...initialState,
+          forms: {
+            ...initialState.forms,
+            data: {
+              isValid: false,
+              submitCount: 0,
+            },
+          },
         },
-      ]);
-    });
+        action,
+      );
 
-    test('sets `forms.data.isValid` to false if there are no remaining data sets', () => {
-      const action: ChartBuilderActions = {
-        type: 'REMOVE_DATA_SET',
-        payload: 0,
-      };
-      let nextState = produce(chartBuilderReducer)(initialState, action);
-
-      expect(nextState.forms.data.isValid).toBe(true);
-
-      nextState = produce(chartBuilderReducer)(nextState, action);
-
-      expect(nextState.axes.major?.dataSets).toEqual([]);
       expect(nextState.forms.data.isValid).toBe(false);
     });
   });

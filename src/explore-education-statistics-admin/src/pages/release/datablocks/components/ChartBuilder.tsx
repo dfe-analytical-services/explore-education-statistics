@@ -426,8 +426,7 @@ const ChartBuilder = ({
                 forms={forms}
                 meta={meta}
                 dataSets={axes.major?.dataSets}
-                onDataAdded={actions.addDataSet}
-                onDataRemoved={actions.removeDataSet}
+                onChange={actions.updateDataSets}
                 onSubmit={handleChartDataSetsSubmit}
               />
             </TabsSection>

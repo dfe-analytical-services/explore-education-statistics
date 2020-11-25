@@ -47,12 +47,8 @@ export type ChartBuilderActions =
       payload: ChartDefinition;
     }
   | {
-      type: 'ADD_DATA_SET';
-      payload: DataSet;
-    }
-  | {
-      type: 'REMOVE_DATA_SET';
-      payload: number;
+      type: 'UPDATE_DATA_SETS';
+      payload: DataSet[];
     }
   | {
       type: 'UPDATE_CHART_OPTIONS';
@@ -274,21 +270,12 @@ export const chartBuilderReducer: Reducer<
 
       break;
     }
-    case 'ADD_DATA_SET': {
+    case 'UPDATE_DATA_SETS': {
       if (draft.axes.major) {
-        draft.axes.major.dataSets.push(action.payload);
+        draft.axes.major.dataSets = action.payload;
       }
 
-      draft.forms.data.isValid = true;
-
-      break;
-    }
-    case 'REMOVE_DATA_SET': {
-      if (draft.axes.major) {
-        draft.axes.major.dataSets.splice(action.payload, 1);
-
-        draft.forms.data.isValid = draft.axes.major.dataSets.length > 0;
-      }
+      draft.forms.data.isValid = action.payload.length > 0;
 
       break;
     }
@@ -321,21 +308,11 @@ export function useChartBuilderReducer(initialConfiguration?: Chart) {
     getInitialState(initialConfiguration),
   );
 
-  const addDataSet = useCallback(
-    (addedData: DataSet) => {
+  const updateDataSets = useCallback(
+    (dataSets: DataSet[]) => {
       dispatch({
-        type: 'ADD_DATA_SET',
-        payload: addedData,
-      });
-    },
-    [dispatch],
-  );
-
-  const removeDataSet = useCallback(
-    (removedData: DataSet, index: number) => {
-      dispatch({
-        type: 'REMOVE_DATA_SET',
-        payload: index,
+        type: 'UPDATE_DATA_SETS',
+        payload: dataSets,
       });
     },
     [dispatch],
@@ -407,8 +384,7 @@ export function useChartBuilderReducer(initialConfiguration?: Chart) {
 
   const actions = useMemo(
     () => ({
-      addDataSet,
-      removeDataSet,
+      updateDataSets,
       updateChartDefinition,
       updateChartLegend,
       updateChartOptions,
@@ -417,8 +393,7 @@ export function useChartBuilderReducer(initialConfiguration?: Chart) {
       resetState,
     }),
     [
-      addDataSet,
-      removeDataSet,
+      updateDataSets,
       updateChartAxis,
       updateChartDefinition,
       updateChartLegend,
