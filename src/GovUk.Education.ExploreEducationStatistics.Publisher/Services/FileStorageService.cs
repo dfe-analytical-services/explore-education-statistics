@@ -170,7 +170,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Publisher.Services
                     PublicReleaseDirectoryPath(publication, release, ReleaseFileTypes.Data)
                 ))
                 .Where(blob => !blob.IsMetaDataFile() && blob.IsReleased())
-                .Select(blob => blob.ToFileInfo(ReleaseFileTypes.Data))
+                .Select(blob => blob.ToFileInfo(ReleaseFileTypes.Data, blob.FileName))
             );
             files.AddRange(
                 (await _publicBlobStorageService.ListBlobs(
@@ -178,8 +178,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Publisher.Services
                     PublicReleaseDirectoryPath(publication, release, ReleaseFileTypes.Ancillary)
                 ))
                 .Where(blob => blob.IsReleased())
-                .Select(blob => blob.ToFileInfo(ReleaseFileTypes.Ancillary))
-
+                .Select(blob => blob.ToFileInfo(ReleaseFileTypes.Ancillary, blob.FileName))
             );
 
             return files
@@ -248,7 +247,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Publisher.Services
 
             var name = Path.GetFileName(item.Name);
 
-            if (releaseFileReferences.Exists(rfr => rfr.BlobStorageName == name))
+            if (releaseFileReferences.Exists(rfr => rfr.Id.ToString() == name))
             {
                 return true;
             }

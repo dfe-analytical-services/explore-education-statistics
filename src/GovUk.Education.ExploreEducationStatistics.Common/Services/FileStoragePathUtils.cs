@@ -136,6 +136,12 @@ namespace GovUk.Education.ExploreEducationStatistics.Common.Services
             AdminReleaseDirectoryPath(releaseId.ToString());
 
         /**
+         * The admin file path, for a file of a particular type and id, on a release.
+         */
+        public static string AdminReleasePath(Guid releaseId, ReleaseFileTypes type, Guid fileId)
+            => AdminReleasePath(releaseId.ToString(), type, fileId.ToString());
+
+        /**
          * The admin file path, for a file of a particular type and name, on a release.
          */
         public static string AdminReleasePath(Guid releaseId, ReleaseFileTypes type, string fileName)
@@ -146,7 +152,6 @@ namespace GovUk.Education.ExploreEducationStatistics.Common.Services
          */
         public static string AdminReleaseDirectoryPath(Guid releaseId, ReleaseFileTypes type) =>
             AdminReleaseDirectoryPath(releaseId.ToString(), type);
-
 
         /**
          * The public file path, for a file of a particular type and name, on a release.

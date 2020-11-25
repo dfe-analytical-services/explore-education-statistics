@@ -107,34 +107,32 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Services
                 .OnSuccess(_userService.CheckCanViewRelease)
                 .OnSuccess(async _ =>
                 {
-                    var files = await _releaseFileRepository.GetByFileType(releaseId, types);
+                    var releaseFiles = await _releaseFileRepository.GetByFileType(releaseId, types);
 
-                    var filesWithMetadata = files
-                        .Select(async fileLink =>
+                    var filesWithMetadata = releaseFiles
+                        .Select(async releaseFile =>
                         {
-                            var fileReference = fileLink.ReleaseFileReference;
+                            var file = releaseFile.ReleaseFileReference;
 
                             // Files should exists in storage but if not then allow user to delete
                             var exists = await _blobStorageService.CheckBlobExists(
                                 PrivateFilesContainerName,
-                                fileReference.Path());
+                                file.Path());
 
                             if (!exists)
                             {
                                 return new FileInfo
                                 {
-                                    Id = fileReference.Id,
-                                    Extension = fileReference.Extension,
+                                    Id = file.Id,
+                                    FileName = file.Filename,
                                     Name = "Unknown",
-                                    Path = fileReference.Filename,
                                     Size = "0.00 B",
-                                    Type = fileLink.ReleaseFileReference.ReleaseFileType
+                                    Type = file.ReleaseFileType
                                 };
                             }
 
-                            var blob = await _blobStorageService.GetBlob(PrivateFilesContainerName,
-                                fileReference.Path());
-                            return blob.ToFileInfo(fileReference.ReleaseFileType, fileReference.Id);
+                            var blob = await _blobStorageService.GetBlob(PrivateFilesContainerName, file.Path());
+                            return blob.ToFileInfo(file.ReleaseFileType, file.Filename, file.Id);
                         });
 
                     return (await Task.WhenAll(filesWithMetadata))
@@ -164,28 +162,25 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Services
                 });
         }
 
-        public Task<Either<ActionResult, FileInfo>> UploadAncillary(Guid releaseId, IFormFile file, string name)
+        public Task<Either<ActionResult, FileInfo>> UploadAncillary(Guid releaseId, IFormFile formFile, string name)
         {
             return _persistenceHelper
                 .CheckEntityExists<Release>(releaseId)
                 .OnSuccess(_userService.CheckCanUpdateRelease)
-                .OnSuccess(async () => await _fileUploadsValidatorService.ValidateUploadFileType(file, Ancillary))
-                .OnSuccess(async () =>
-                    await _fileUploadsValidatorService.ValidateFileForUpload(releaseId, file, Ancillary, false))
-                .OnSuccess(async () => await _fileUploadsValidatorService.ValidateFileUploadName(name))
+                .OnSuccess(async () => await _fileUploadsValidatorService.ValidateFileForUpload(formFile, Ancillary))
                 .OnSuccess(async () =>
                 {
-                    var releaseFileReference = await _fileRepository.Create(
+                    var file = await _fileRepository.Create(
                         releaseId,
-                        file.FileName.ToLower(),
+                        formFile.FileName,
                         Ancillary);
 
                     await _contentDbContext.SaveChangesAsync();
 
                     await _blobStorageService.UploadFile(
                         containerName: PrivateFilesContainerName,
-                        path: releaseFileReference.Path(),
-                        file: file,
+                        path: file.Path(),
+                        file: formFile,
                         options: new IBlobStorageService.UploadFileOptions
                         {
                             MetaValues = new Dictionary<string, string>
@@ -199,45 +194,42 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Services
 
                     var blob = await _blobStorageService.GetBlob(
                         PrivateFilesContainerName,
-                        releaseFileReference.Path());
+                        file.Path());
 
-                    return blob.ToFileInfo(Ancillary, releaseFileReference.Id);
+                    return blob.ToFileInfo(Ancillary, file.Filename, file.Id);
                 });
         }
 
         public Task<Either<ActionResult, FileInfo>> UploadChart(Guid releaseId,
-            IFormFile file,
+            IFormFile formFile,
             Guid? replacingId = null)
         {
             return _persistenceHelper
                 .CheckEntityExists<Release>(releaseId)
                 .OnSuccess(_userService.CheckCanUpdateRelease)
-                .OnSuccess(async () => await _fileUploadsValidatorService.ValidateUploadFileType(file, Chart))
-                .OnSuccess(async () =>
-                    await _fileUploadsValidatorService.ValidateFileForUpload(releaseId, file, Chart,
-                        replacingId.HasValue))
+                .OnSuccess(async () => await _fileUploadsValidatorService.ValidateFileForUpload(formFile, Chart))
                 .OnSuccess(async () =>
                 {
-                    var releaseFileReference = replacingId.HasValue
+                    var file = replacingId.HasValue
                         ? await _fileRepository.UpdateFilename(
                             releaseId,
                             replacingId.Value,
-                            file.FileName.ToLower())
+                            formFile.FileName)
                         : await _fileRepository.Create(
                             releaseId,
-                            file.FileName.ToLower(),
+                            formFile.FileName,
                             Chart);
 
                     await _blobStorageService.UploadFile(
                         containerName: PrivateFilesContainerName,
-                        path: releaseFileReference.Path(),
-                        file: file,
+                        path: file.Path(),
+                        file: formFile,
                         options: new IBlobStorageService.UploadFileOptions
                         {
                             MetaValues = new Dictionary<string, string>
                             {
                                 {
-                                    NameKey, file.FileName.ToLower()
+                                    NameKey, file.Filename
                                 }
                             }
                         }
@@ -245,9 +237,9 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Services
 
                     var blob = await _blobStorageService.GetBlob(
                         PrivateFilesContainerName,
-                        releaseFileReference.Path());
+                        file.Path());
 
-                    return blob.ToFileInfo(Chart, releaseFileReference.Id);
+                    return blob.ToFileInfo(Chart, file.Filename, file.Id);
                 });
         }
     }

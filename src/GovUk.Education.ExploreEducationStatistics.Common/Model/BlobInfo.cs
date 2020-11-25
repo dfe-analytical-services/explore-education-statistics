@@ -1,6 +1,5 @@
 using System;
 using System.Collections.Generic;
-using GovUk.Education.ExploreEducationStatistics.Common.Services;
 
 namespace GovUk.Education.ExploreEducationStatistics.Common.Model
 {
@@ -39,7 +38,5 @@ namespace GovUk.Education.ExploreEducationStatistics.Common.Model
         public string Name => Meta.TryGetValue(NameKey, out var name) ? name : string.Empty;
 
         public string FileName => Path.Substring(Path.LastIndexOf('/') + 1);
-
-        public string Extension => FileStorageUtils.GetExtension(FileName);
     }
 }

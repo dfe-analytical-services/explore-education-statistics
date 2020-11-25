@@ -5,12 +5,17 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Extensions
 {
     public static class ReleaseFileReferenceExtensions
     {
+        public static string Path(this ReleaseFile releaseFile)
+        {
+            return releaseFile.ReleaseFileReference.Path();
+        }
+
         public static string Path(this ReleaseFileReference file)
         {
             return FileStoragePathUtils.AdminReleasePath(
                 file.ReleaseId,
                 file.ReleaseFileType,
-                file.BlobStorageName);
+                file.Id);
         }
     }
 }

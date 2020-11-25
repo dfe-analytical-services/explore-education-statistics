@@ -19,6 +19,8 @@ namespace GovUk.Education.ExploreEducationStatistics.Common.Services.Interfaces
 
         public Task DeleteBlob(string containerName, string path);
 
+        public Task<bool> MoveBlob(string containerName, string sourcePath, string destinationPath);
+
         public class UploadFileOptions
         {
             public IDictionary<string, string> MetaValues { get; set; }

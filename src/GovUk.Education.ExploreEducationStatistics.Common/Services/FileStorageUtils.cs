@@ -35,16 +35,11 @@ namespace GovUk.Education.ExploreEducationStatistics.Common.Services
             };
         }
 
-        public static IDictionary<string, string> GetMetaDataFileMetaValues(
-            string dataFileName,
-            string userName,
-            int numberOfRows)
+        public static IDictionary<string, string> GetMetaDataFileMetaValues(string dataFileName)
         {
             return new Dictionary<string, string>
             {
-                {BlobInfoExtensions.DataFileKey, dataFileName.ToLower()},
-                {BlobInfoExtensions.UserNameKey, userName},
-                {BlobInfoExtensions.NumberOfRowsKey, numberOfRows.ToString()}
+                {BlobInfoExtensions.DataFileKey, dataFileName.ToLower()}
             };
         }
 

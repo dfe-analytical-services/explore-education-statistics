@@ -1,3 +1,4 @@
+using System;
 using System.Collections.Generic;
 using System.IO;
 using System.Text;
@@ -16,6 +17,8 @@ using Microsoft.Azure.Storage.DataMovement;
 using Microsoft.Extensions.Logging;
 using static GovUk.Education.ExploreEducationStatistics.Common.Services.FileStorageUtils;
 using BlobInfo = GovUk.Education.ExploreEducationStatistics.Common.Model.BlobInfo;
+using BlobProperties = Azure.Storage.Blobs.Models.BlobProperties;
+using CopyStatus = Azure.Storage.Blobs.Models.CopyStatus;
 
 namespace GovUk.Education.ExploreEducationStatistics.Common.Services
 {
@@ -182,6 +185,64 @@ namespace GovUk.Education.ExploreEducationStatistics.Common.Services
                 },
                 options?.MetaValues
             );
+        }
+
+        public async Task<bool> MoveBlob(string containerName,
+            string sourcePath,
+            string destinationPath)
+        {
+            var blobContainer = await GetBlobContainer(containerName);
+
+            var destinationBlob = blobContainer.GetBlobClient(destinationPath);
+            if (await destinationBlob.ExistsAsync())
+            {
+                _logger.LogWarning(
+                    "Destination already exists while moving blob. Source: '{source}' Destination: '{destination}'",
+                    sourcePath, destinationPath);
+                return false;
+            }
+
+            var sourceBlob = blobContainer.GetBlobClient(sourcePath);
+            if (!await sourceBlob.ExistsAsync())
+            {
+                _logger.LogWarning(
+                    "Source blob not found while moving blob. Source: '{source}' Destination: '{destination}'",
+                    sourcePath, destinationPath);
+                return false;
+            }
+
+            // Lease the source blob for the copy operation 
+            // to prevent another client from modifying it.
+            var lease = sourceBlob.GetBlobLeaseClient();
+
+            // Specifying -1 for the lease interval creates an infinite lease.
+            await lease.AcquireAsync(TimeSpan.FromSeconds(-1));
+
+            try
+            {
+                await destinationBlob.StartCopyFromUriAsync(sourceBlob.Uri);
+
+                // Get the destination blob's properties and log the progress
+                BlobProperties destinationProperties = await destinationBlob.GetPropertiesAsync();
+                while (destinationProperties.CopyStatus == CopyStatus.Pending)
+                {
+                    await Task.Delay(1000);
+                    _logger.LogInformation("Copy progress: {progress}", destinationProperties.CopyProgress);
+                    destinationProperties = await destinationBlob.GetPropertiesAsync();
+                }
+                
+                if (destinationProperties.CopyStatus != CopyStatus.Success)
+                {
+                    return false;
+                }
+            }
+            finally
+            {
+                await lease.ReleaseAsync();
+            }
+
+            await sourceBlob.DeleteAsync();
+            return true;
         }
 
         private static async Task<string> UploadToTemporaryFile(IFormFile file)

@@ -170,8 +170,8 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Controllers.Api
 
             return await _releaseDataFileService
                 .Upload(releaseId: releaseId,
-                    dataFile: file,
-                    metaFile: metaFile,
+                    dataFormFile: file,
+                    metaFormFile: metaFile,
                     userName: user.Email,
                     replacingFileId: replacingFileId,
                     subjectName: subjectName)
@@ -193,7 +193,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Controllers.Api
 
             return await _releaseDataFileService
                 .UploadAsZip(releaseId: releaseId,
-                    zipFile: zipFile,
+                    zipFormFile: zipFile,
                     userName: user.Email,
                     replacingFileId: replacingFileId,
                     subjectName: subjectName)

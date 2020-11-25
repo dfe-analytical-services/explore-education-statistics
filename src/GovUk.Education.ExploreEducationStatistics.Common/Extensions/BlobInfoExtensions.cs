@@ -44,16 +44,16 @@ namespace GovUk.Education.ExploreEducationStatistics.Common.Extensions
             return false;
         }
 
-        public static FileInfo ToFileInfo(this BlobInfo blobInfo, ReleaseFileTypes fileType, Guid? id = null)
+        public static FileInfo ToFileInfo(this BlobInfo blobInfo, ReleaseFileTypes fileType, string filename, Guid? id = null)
         {
             return new FileInfo
             {
                 Id = id,
+                FileName = filename,
                 Name = blobInfo.Name,
-                Extension = blobInfo.Extension,
                 Path = blobInfo.Path,
                 Size = blobInfo.Size,
-                Type = fileType,
+                Type = fileType
             };
         }
 
