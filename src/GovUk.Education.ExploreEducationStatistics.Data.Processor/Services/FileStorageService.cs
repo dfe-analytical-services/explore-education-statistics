@@ -73,7 +73,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Processor.Services
             return await _blobStorageService.StreamBlob(PrivateFilesContainerName, blob.Path);
         }
 
-        public async Task DeleteBatchFile(string releaseId, string dataFileName)
+        public async Task DeleteBatchFile(Guid releaseId, string dataFileName)
         {
             await _blobStorageService.DeleteBlob(
                 PrivateFilesContainerName,
@@ -81,25 +81,19 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Processor.Services
             );
         }
 
-        public async Task<int> GetNumBatchesRemaining(string releaseId, string origDataFileName)
+        public async Task<int> GetNumBatchesRemaining(Guid releaseId, string origDataFileName)
         {
             return (await GetBatchFilesForDataFile(releaseId, origDataFileName)).Count();
         }
 
-        public async Task<IEnumerable<BlobInfo>> GetBatchFilesForDataFile(string releaseId, string origDataFileName)
+        public async Task<IEnumerable<BlobInfo>> GetBatchFilesForDataFile(Guid releaseId, string origDataFileName)
         {
             var blobs = await _blobStorageService.ListBlobs(
                 PrivateFilesContainerName,
                 AdminReleaseDirectoryPath(releaseId, ReleaseFileTypes.Data)
             );
 
-            return blobs
-                .Where(blob => IsBatchedFile(blob, releaseId) && blob.Path.Contains(origDataFileName));
-        }
-
-        private static bool IsBatchedFile(BlobInfo blob, string releaseId)
-        {
-            return blob.Path.StartsWith(AdminReleaseBatchesDirectoryPath(releaseId));
+            return blobs.Where(blob => IsBatchFileForDataFile(releaseId, origDataFileName, blob.Path));
         }
     }
 }

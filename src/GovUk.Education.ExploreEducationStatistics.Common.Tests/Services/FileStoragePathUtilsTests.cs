@@ -46,5 +46,26 @@ namespace GovUk.Education.ExploreEducationStatistics.Common.Tests.Services
             Assert.Equal(publicationSlug+ "/" + releaseSlug +  "/data/file.csv", PublicReleasePath(publicationSlug, releaseSlug, ReleaseFileTypes.Data, "file.csv"));
             Assert.Equal(publicationSlug+ "/" + releaseSlug +  "/chart/file.doc", PublicReleasePath(publicationSlug, releaseSlug, ReleaseFileTypes.Chart, "file.doc"));
         }
+        
+        [Fact]
+        public void TestIsBatchFileForDataFile()
+        {
+            var releaseId = Guid.NewGuid();
+            var originalDataFileName = "my_data_file.csv";
+         
+            Assert.True(IsBatchFileForDataFile(releaseId, originalDataFileName, 
+                $"{AdminReleaseBatchesDirectoryPath(releaseId)}{originalDataFileName}_000001"));
+            Assert.True(IsBatchFileForDataFile(releaseId, originalDataFileName, 
+                $"{AdminReleaseBatchesDirectoryPath(releaseId)}{originalDataFileName}_999999"));
+            
+            Assert.False(IsBatchFileForDataFile(Guid.NewGuid(), originalDataFileName, 
+                $"{AdminReleaseBatchesDirectoryPath(releaseId)}{originalDataFileName}_000001"));
+            Assert.False(IsBatchFileForDataFile(releaseId, originalDataFileName, 
+                $"{AdminReleaseBatchesDirectoryPath(releaseId)}another_file_name.csv_000001"));
+            Assert.False(IsBatchFileForDataFile(releaseId, originalDataFileName, 
+                $"{AdminReleaseBatchesDirectoryPath(releaseId)}{originalDataFileName}_000001.csv"));
+            Assert.False(IsBatchFileForDataFile(releaseId, originalDataFileName, 
+                $"{AdminReleaseBatchesDirectoryPath(releaseId)}{originalDataFileName}.csv_000001"));
+        }
     }
 }

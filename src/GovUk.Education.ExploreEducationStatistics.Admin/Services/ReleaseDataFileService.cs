@@ -84,24 +84,24 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Services
                 .OnSuccess(async release =>
                     await ids.Select(id => _releaseFileRepository.CheckFileExists(releaseId, id, ReleaseFileTypes.Data))
                         .OnSuccessAll())
-                .OnSuccessVoid(async files =>
+                .OnSuccessVoid(async dataFileReferences =>
                 {
-                    foreach (var file in files)
+                    foreach (var dataFileReference in dataFileReferences)
                     {
                         var metaReleaseFileReference =
-                            await GetAssociatedReleaseFileReference(file, Metadata);
+                            await GetAssociatedReleaseFileReference(dataFileReference, Metadata);
 
-                        if (await _releaseFileRepository.FileIsLinkedToOtherReleases(releaseId, file.Id))
+                        if (await _releaseFileRepository.FileIsLinkedToOtherReleases(releaseId, dataFileReference.Id))
                         {
-                            await _releaseFileRepository.Delete(releaseId, file.Id);
+                            await _releaseFileRepository.Delete(releaseId, dataFileReference.Id);
                             await _releaseFileRepository.Delete(releaseId, metaReleaseFileReference.Id);
                         }
                         else
                         {
-                            await _importService.RemoveImportTableRowIfExists(releaseId, file.Filename);
+                            await _importService.RemoveImportTableRowIfExists(releaseId, dataFileReference.Filename);
                             await _blobStorageService.DeleteBlob(
                                 PrivateFilesContainerName,
-                                file.Path()
+                                dataFileReference.Path()
                             );
                             await _blobStorageService.DeleteBlob(
                                 PrivateFilesContainerName,
@@ -109,23 +109,23 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Services
                             );
 
                             // If this is a replacement then unlink it from the original
-                            if (file.ReplacingId.HasValue)
+                            if (dataFileReference.ReplacingId.HasValue)
                             {
-                                var originalFile = await _fileRepository.Get(file.ReplacingId.Value);
+                                var originalFile = await _fileRepository.Get(dataFileReference.ReplacingId.Value);
                                 originalFile.ReplacedById = null;
                                 _contentDbContext.Update(originalFile);
                                 await _contentDbContext.SaveChangesAsync();
                             }
 
-                            await _releaseFileRepository.Delete(releaseId, file.Id);
+                            await _releaseFileRepository.Delete(releaseId, dataFileReference.Id);
                             await _releaseFileRepository.Delete(releaseId, metaReleaseFileReference.Id);
 
-                            await _fileRepository.Delete(file.Id);
+                            await _fileRepository.Delete(dataFileReference.Id);
                             await _fileRepository.Delete(metaReleaseFileReference.Id);
 
-                            if (file.SourceId.HasValue)
+                            if (dataFileReference.SourceId.HasValue)
                             {
-                                var sourceRef = await _fileRepository.Get(file.SourceId.Value);
+                                var sourceRef = await _fileRepository.Get(dataFileReference.SourceId.Value);
                                 await _blobStorageService.DeleteBlob(
                                     PrivateFilesContainerName,
                                     // TODO can this be sourceRef.Path()?
@@ -135,6 +135,8 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Services
                                 await _fileRepository.Delete(sourceRef.Id);
                             }
                         }
+
+                        await DeleteBatchFiles(releaseId, dataFileReference);
                     }
                 });
         }
@@ -516,6 +518,28 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Services
                 .FirstAsync(rfr => rfr.ReleaseId == releaseFileReference.ReleaseId
                                    && rfr.ReleaseFileType == associatedType
                                    && rfr.SubjectId == releaseFileReference.SubjectId);
+        }
+
+        private async Task<IEnumerable<BlobInfo>> GetBatchFilesForDataFile(Guid releaseId, string originalDataFileName)
+        {
+            var blobs = await _blobStorageService.ListBlobs(
+                PrivateFilesContainerName,
+                AdminReleaseDirectoryPath(releaseId, ReleaseFileTypes.Data)
+            );
+
+            return blobs.Where(blob => IsBatchFileForDataFile(releaseId, originalDataFileName, blob.Path));
+        }
+        
+        private async Task DeleteBatchFiles(Guid releaseId, ReleaseFileReference dataFileReference)
+        {
+            var batchFiles = await GetBatchFilesForDataFile(releaseId, dataFileReference.Filename);
+            await batchFiles.ForEachAsync(async batchFile =>
+            {
+                await _blobStorageService.DeleteBlob(
+                    PrivateFilesContainerName,
+                    AdminReleaseBatchesDirectoryPath(releaseId) + batchFile.FileName
+                );
+            });
         }
     }
 }

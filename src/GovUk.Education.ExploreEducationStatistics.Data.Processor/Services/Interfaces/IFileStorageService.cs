@@ -24,10 +24,10 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Processor.Services.Int
 
         Task<Stream> StreamBlob(BlobInfo blob);
 
-        Task DeleteBatchFile(string releaseId, string dataFileName);
+        Task DeleteBatchFile(Guid releaseId, string origDataFileName);
 
-        Task<int> GetNumBatchesRemaining(string releaseId, string origDataFileName);
+        Task<int> GetNumBatchesRemaining(Guid releaseId, string origDataFileName);
 
-        Task<IEnumerable<BlobInfo>> GetBatchFilesForDataFile(string releaseId, string origDataFileName);
+        Task<IEnumerable<BlobInfo>> GetBatchFilesForDataFile(Guid releaseId, string origDataFileName);
     }
 }
