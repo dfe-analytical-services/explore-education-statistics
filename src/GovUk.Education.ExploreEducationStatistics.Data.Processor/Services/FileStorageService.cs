@@ -90,7 +90,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Processor.Services
         {
             var blobs = await _blobStorageService.ListBlobs(
                 PrivateFilesContainerName,
-                AdminReleaseDirectoryPath(releaseId, ReleaseFileTypes.Data)
+                AdminReleaseBatchesDirectoryPath(releaseId)
             );
 
             return blobs.Where(blob => IsBatchFileForDataFile(releaseId, origDataFileName, blob.Path));

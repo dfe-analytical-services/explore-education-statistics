@@ -524,7 +524,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Services
         {
             var blobs = await _blobStorageService.ListBlobs(
                 PrivateFilesContainerName,
-                AdminReleaseDirectoryPath(releaseId, ReleaseFileTypes.Data)
+                AdminReleaseBatchesDirectoryPath(releaseId)
             );
 
             return blobs.Where(blob => IsBatchFileForDataFile(releaseId, originalDataFileName, blob.Path));

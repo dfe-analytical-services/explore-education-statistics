@@ -97,6 +97,29 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
                         AdminReleasePath(release.Id, ReleaseFileTypes.DataZip, "data.zip"))))
                 .Returns(Task.CompletedTask);
 
+            // set up the returning of batch files, both for this data file being deleted and others not being
+            // deleted too
+            blobStorageService
+                .Setup(mock =>
+                    mock.ListBlobs(PrivateFilesContainerName, AdminReleaseBatchesDirectoryPath(release.Id)))
+                .ReturnsAsync(new List<BlobInfo>
+                {
+                    new BlobInfo($"{AdminReleaseBatchesDirectoryPath(release.Id)}data.csv_000001", "", "", 0, null),
+                    new BlobInfo($"{AdminReleaseBatchesDirectoryPath(release.Id)}data.csv_000002", "", "", 0, null),
+                    new BlobInfo($"{AdminReleaseBatchesDirectoryPath(release.Id)}another_data_file.csv_000001", "", "", 0, null),
+                    new BlobInfo($"{AdminReleaseBatchesDirectoryPath(release.Id)}another_data_file.csv_000002", "", "", 0, null),
+                });
+            
+            blobStorageService
+                .Setup(mock => 
+                    mock.DeleteBlob(PrivateFilesContainerName, $"{AdminReleaseBatchesDirectoryPath(release.Id)}data.csv_000001"))
+                .Returns(Task.CompletedTask);
+
+            blobStorageService
+                .Setup(mock => 
+                    mock.DeleteBlob(PrivateFilesContainerName, $"{AdminReleaseBatchesDirectoryPath(release.Id)}data.csv_000002"))
+                .Returns(Task.CompletedTask);
+
             await using (var contentDbContext = InMemoryApplicationDbContext(contentDbContextId))
             {
                 var service = SetupReleaseDataFileService(
@@ -108,6 +131,8 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
 
                 Assert.True(result.IsRight);
 
+                // test that the deletion of the main data and metadata files completed, as well as any zip files that 
+                // were uploaded
                 blobStorageService.Verify(mock =>
                     mock.DeleteBlob(PrivateFilesContainerName,
                         AdminReleasePath(release.Id, ReleaseFileTypes.Data, "data.csv")), Times.Once());
@@ -120,6 +145,17 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
 
                 importService.Verify(mock =>
                     mock.RemoveImportTableRowIfExists(release.Id, "data.csv"), Times.Once());
+           
+                // test that the deletion of any remaining batch files went ahead and that it only affected batch files 
+                // for this particular data file
+                blobStorageService.Verify(mock => 
+                    mock.ListBlobs(PrivateFilesContainerName, AdminReleaseBatchesDirectoryPath(release.Id)));
+                blobStorageService.Verify(mock => 
+                    mock.DeleteBlob(PrivateFilesContainerName, $"{AdminReleaseBatchesDirectoryPath(release.Id)}data.csv_000001"));
+                blobStorageService.Verify(mock => 
+                    mock.DeleteBlob(PrivateFilesContainerName, $"{AdminReleaseBatchesDirectoryPath(release.Id)}data.csv_000002"));
+                
+                MockUtils.VerifyNoOthersCallsAllMocks(blobStorageService, importService);
             }
 
             await using (var contentDbContext = InMemoryApplicationDbContext(contentDbContextId))

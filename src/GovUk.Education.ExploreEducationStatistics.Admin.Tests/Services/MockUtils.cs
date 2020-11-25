@@ -80,11 +80,16 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
         {
             mocks
                 .ToList()
-                .ForEach(m =>
-                {
-                    m.GetType().GetMethod("VerifyAll", Type.EmptyTypes).Invoke(m, null);
-                    m.GetType().GetMethod("VerifyNoOtherCalls", Type.EmptyTypes).Invoke(m, null);
-                });
+                .ForEach(m => m.GetType().GetMethod("VerifyAll", Type.EmptyTypes).Invoke(m, null));
+            
+            VerifyNoOthersCallsAllMocks(mocks);
+        }
+        
+        public static void VerifyNoOthersCallsAllMocks(params object[] mocks)
+        {
+            mocks
+                .ToList()
+                .ForEach(m => m.GetType().GetMethod("VerifyNoOtherCalls", Type.EmptyTypes).Invoke(m, null));
         }
     }
 }
