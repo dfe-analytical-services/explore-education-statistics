@@ -142,7 +142,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Processor.Services
                 statisticsDbContext,
                 message.Release,
                 message.Release.Id,
-                () => new Release
+                new Release
                     {
                         Id = message.Release.Id,
                         Slug = message.Release.Slug,
@@ -161,7 +161,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Processor.Services
                 statisticsDbContext,
                 message.Release.Publication,
                 message.Release.Publication.Id,
-                () => new Publication
+                new Publication
                     {
                         Id = message.Release.Publication.Id,
                         Title = message.Release.Publication.Title,
@@ -178,7 +178,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Processor.Services
                 statisticsDbContext,
                 message.Release.Publication.Topic,
                 message.Release.Publication.Topic.Id,
-                () => new Topic
+                new Topic
                     {
                         Id = message.Release.Publication.Topic.Id,
                         Title = message.Release.Publication.Topic.Title,
@@ -194,7 +194,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Processor.Services
                 statisticsDbContext,
                 message.Release.Publication.Topic.Theme,
                 message.Release.Publication.Topic.Theme.Id,
-                () => new Theme 
+                new Theme 
                 {
                     Id = message.Release.Publication.Topic.Theme.Id,
                     Slug = message.Release.Publication.Topic.Theme.Slug,
@@ -217,7 +217,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Processor.Services
             StatisticsDbContext statisticsDbContext,
             TMessageObject objectFromMessage,
             Guid entityId,
-            Func<TEntity> createEntityFn)
+            TEntity entityToCreate)
             where TEntity : class 
             where TMessageObject : class
         {
@@ -236,8 +236,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Processor.Services
                 if (existing == null)
                 {
                     _logger.LogInformation($"Creating {typeName} \"{entityName}\"");
-                    TEntity newEntity = createEntityFn.Invoke();
-                    TEntity created = (await statisticsDbContext.Set<TEntity>().AddAsync(newEntity)).Entity;
+                    TEntity created = (await statisticsDbContext.Set<TEntity>().AddAsync(entityToCreate)).Entity;
                     await statisticsDbContext.SaveChangesAsync();
                     return created;
                 }
