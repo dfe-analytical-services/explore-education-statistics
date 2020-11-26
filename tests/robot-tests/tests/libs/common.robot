@@ -368,7 +368,11 @@ user selects newly opened window
 
 user checks element attribute value should be
     [Arguments]   ${locator}  ${attribute}    ${expected}
-    element attribute value should be  ${locator}     ${attribute}   ${expected}
+    element attribute value should be  ${locator}  ${attribute}  ${expected}
+
+user checks element value should be
+    [Arguments]  ${locator}  ${value}
+    element attribute value should be  ${locator}  value  ${value}
 
 user checks radio option for "${radiogroupId}" should be "${expectedLabelText}"
     user checks page contains element  css:#${radiogroupId} [data-testid="${expectedLabelText}"]:checked

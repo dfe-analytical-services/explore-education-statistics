@@ -15,6 +15,11 @@ ${PUBLICATION_NAME}         UI tests - create data block with chart %{RUN_IDENTI
 ${DATABLOCK_NAME}           UI test data block
 ${CONTENT_SECTION_NAME}     Test data block section
 
+*** Keywords ***
+user counts legend form item rows
+    [Arguments]  ${number}
+    user checks element count is x  css:fieldset[id^="chartLegendConfigurationForm-items"]  ${number}
+
 *** Test Cases ***
 Create test publication and release via API
     [Tags]  HappyPath
@@ -351,6 +356,15 @@ Configure basic vertical bar chart
     user enters text into element  id:chartConfigurationForm-height     500
     user enters text into element  id:chartConfigurationForm-width      800
 
+Change vertical bar chart legend
+    user clicks link  Legend
+    user waits until h3 is visible  Legend
+
+    user counts legend form item rows  1
+    user checks element value should be  id:chartLegendConfigurationForm-items0Label  Admission Numbers (Nailsea Youngwood)
+
+    user enters text into element  id:chartLegendConfigurationForm-items0Label  Admissions
+
     user waits for chart preview to update
 
 Validate basic vertical bar chart preview
@@ -360,7 +374,7 @@ Validate basic vertical bar chart preview
     user waits until element contains bar chart  ${preview}
 
     user checks chart title contains  ${preview}  Test chart title
-    user checks chart legend item contains  ${preview}  1  Admission Numbers (Nailsea Youngwood)
+    user checks chart legend item contains  ${preview}  1  Admissions
 
     user checks chart height  ${preview}  500
     user checks chart width   ${preview}  800
@@ -370,23 +384,23 @@ Validate basic vertical bar chart preview
 
     user mouses over chart bar  ${preview}  1
     user checks chart tooltip label contains  ${preview}  2005
-    user checks chart tooltip item contains  ${preview}  1  Admission Numbers (Nailsea Youngwood): 3,612
+    user checks chart tooltip item contains  ${preview}  1  Admissions: 3,612
 
     user mouses over chart bar  ${preview}  2
     user checks chart tooltip label contains  ${preview}  2010
-    user checks chart tooltip item contains  ${preview}  1  Admission Numbers (Nailsea Youngwood): 9,304
+    user checks chart tooltip item contains  ${preview}  1  Admissions: 9,304
 
     user mouses over chart bar  ${preview}  3
     user checks chart tooltip label contains  ${preview}  2011
-    user checks chart tooltip item contains  ${preview}  1  Admission Numbers (Nailsea Youngwood): 9,603
+    user checks chart tooltip item contains  ${preview}  1  Admissions: 9,603
 
     user mouses over chart bar  ${preview}  4
     user checks chart tooltip label contains  ${preview}  2012
-    user checks chart tooltip item contains  ${preview}  1  Admission Numbers (Nailsea Youngwood): 8,150
+    user checks chart tooltip item contains  ${preview}  1  Admissions: 8,150
 
     user mouses over chart bar  ${preview}  5
     user checks chart tooltip label contains  ${preview}  2016
-    user checks chart tooltip item contains  ${preview}  1  Admission Numbers (Nailsea Youngwood): 4,198
+    user checks chart tooltip item contains  ${preview}  1  Admissions: 4,198
 
 Save and validate vertical bar chart embeds correctly
     [Tags]  HappyPath
@@ -403,7 +417,7 @@ Save and validate vertical bar chart embeds correctly
     user waits until element contains bar chart  ${datablock}
 
     user checks chart title contains  ${datablock}  Test chart title
-    user checks chart legend item contains  ${datablock}  1  Admission Numbers (Nailsea Youngwood)
+    user checks chart legend item contains  ${datablock}  1  Admissions
 
     user checks chart height  ${datablock}  500
     user checks chart width   ${datablock}  800
@@ -413,23 +427,23 @@ Save and validate vertical bar chart embeds correctly
 
     user mouses over chart bar  ${datablock}  1
     user checks chart tooltip label contains  ${datablock}  2005
-    user checks chart tooltip item contains  ${datablock}  1  Admission Numbers (Nailsea Youngwood): 3,612
+    user checks chart tooltip item contains  ${datablock}  1  Admissions: 3,612
 
     user mouses over chart bar  ${datablock}  2
     user checks chart tooltip label contains  ${datablock}  2010
-    user checks chart tooltip item contains  ${datablock}  1  Admission Numbers (Nailsea Youngwood): 9,304
+    user checks chart tooltip item contains  ${datablock}  1  Admissions: 9,304
 
     user mouses over chart bar  ${datablock}  3
     user checks chart tooltip label contains  ${datablock}  2011
-    user checks chart tooltip item contains  ${datablock}  1  Admission Numbers (Nailsea Youngwood): 9,603
+    user checks chart tooltip item contains  ${datablock}  1  Admissions: 9,603
 
     user mouses over chart bar  ${datablock}  4
     user checks chart tooltip label contains  ${datablock}  2012
-    user checks chart tooltip item contains  ${datablock}  1  Admission Numbers (Nailsea Youngwood): 8,150
+    user checks chart tooltip item contains  ${datablock}  1  Admissions: 8,150
 
     user mouses over chart bar  ${datablock}  5
     user checks chart tooltip label contains  ${datablock}  2016
-    user checks chart tooltip item contains  ${datablock}  1  Admission Numbers (Nailsea Youngwood): 4,198
+    user checks chart tooltip item contains  ${datablock}  1  Admissions: 4,198
 
 Configure basic horizontal bar chart
     [Tags]  HappyPath
@@ -454,7 +468,7 @@ Validate basic horizontal bar chart preview
     user waits until element contains bar chart  ${preview}
 
     user checks chart title contains  ${preview}  Test chart title
-    user checks chart legend item contains  ${preview}  1  Admission Numbers (Nailsea Youngwood)
+    user checks chart legend item contains  ${preview}  1  Admissions
 
     user checks chart x axis ticks  ${preview}  0     2,500  5,000  7,500  10,000
     user checks chart y axis ticks  ${preview}  2005  2010  2011  2012  2016
@@ -464,23 +478,23 @@ Validate basic horizontal bar chart preview
 
     user mouses over chart bar  ${preview}  1
     user checks chart tooltip label contains  ${preview}  2005
-    user checks chart tooltip item contains  ${preview}  1  Admission Numbers (Nailsea Youngwood): 3,612
+    user checks chart tooltip item contains  ${preview}  1  Admissions: 3,612
 
     user mouses over chart bar  ${preview}  2
     user checks chart tooltip label contains  ${preview}  2010
-    user checks chart tooltip item contains  ${preview}  1  Admission Numbers (Nailsea Youngwood): 9,304
+    user checks chart tooltip item contains  ${preview}  1  Admissions: 9,304
 
     user mouses over chart bar  ${preview}  3
     user checks chart tooltip label contains  ${preview}  2011
-    user checks chart tooltip item contains  ${preview}  1  Admission Numbers (Nailsea Youngwood): 9,603
+    user checks chart tooltip item contains  ${preview}  1  Admissions: 9,603
 
     user mouses over chart bar  ${preview}  4
     user checks chart tooltip label contains  ${preview}  2012
-    user checks chart tooltip item contains  ${preview}  1  Admission Numbers (Nailsea Youngwood): 8,150
+    user checks chart tooltip item contains  ${preview}  1  Admissions: 8,150
 
     user mouses over chart bar  ${preview}  5
     user checks chart tooltip label contains  ${preview}  2016
-    user checks chart tooltip item contains  ${preview}  1  Admission Numbers (Nailsea Youngwood): 4,198
+    user checks chart tooltip item contains  ${preview}  1  Admissions: 4,198
 
 Save and validate horizontal bar chart embeds correctly
     [Tags]  HappyPath
@@ -496,7 +510,7 @@ Save and validate horizontal bar chart embeds correctly
     user waits until element contains bar chart  ${datablock}
 
     user checks chart title contains  ${datablock}  Test chart title
-    user checks chart legend item contains  ${datablock}  1  Admission Numbers (Nailsea Youngwood)
+    user checks chart legend item contains  ${datablock}  1  Admissions
 
     user checks chart x axis ticks  ${datablock}  0     2,500  5,000  7,500  10,000
     user checks chart y axis ticks  ${datablock}  2005  2010  2011  2012  2016
@@ -506,23 +520,23 @@ Save and validate horizontal bar chart embeds correctly
 
     user mouses over chart bar  ${datablock}  1
     user checks chart tooltip label contains  ${datablock}  2005
-    user checks chart tooltip item contains  ${datablock}  1  Admission Numbers (Nailsea Youngwood): 3,612
+    user checks chart tooltip item contains  ${datablock}  1  Admissions: 3,612
 
     user mouses over chart bar  ${datablock}  2
     user checks chart tooltip label contains  ${datablock}  2010
-    user checks chart tooltip item contains  ${datablock}  1  Admission Numbers (Nailsea Youngwood): 9,304
+    user checks chart tooltip item contains  ${datablock}  1  Admissions: 9,304
 
     user mouses over chart bar  ${datablock}  3
     user checks chart tooltip label contains  ${datablock}  2011
-    user checks chart tooltip item contains  ${datablock}  1  Admission Numbers (Nailsea Youngwood): 9,603
+    user checks chart tooltip item contains  ${datablock}  1  Admissions: 9,603
 
     user mouses over chart bar  ${datablock}  4
     user checks chart tooltip label contains  ${datablock}  2012
-    user checks chart tooltip item contains  ${datablock}  1  Admission Numbers (Nailsea Youngwood): 8,150
+    user checks chart tooltip item contains  ${datablock}  1  Admissions: 8,150
 
     user mouses over chart bar  ${datablock}  5
     user checks chart tooltip label contains  ${datablock}  2016
-    user checks chart tooltip item contains  ${datablock}  1  Admission Numbers (Nailsea Youngwood): 4,198
+    user checks chart tooltip item contains  ${datablock}  1  Admissions: 4,198
 
 Configure basic geographic chart
     [Tags]  HappyPath
@@ -535,9 +549,31 @@ Configure basic geographic chart
     user clicks button  Geographic
 
     user waits for chart preview to update
+    # Additional sleep to make sure chart has updated
+    sleep  0.3s
 
     user enters text into element  id:chartConfigurationForm-height     700
     user enters text into element  id:chartConfigurationForm-width      600
+
+    user waits for chart preview to update
+
+Change geographic chart legend
+    [Tags]  HappyPath
+    user clicks link  Legend
+    user waits until h3 is visible  Legend
+
+    user counts legend form item rows  5
+    user checks element value should be  id:chartLegendConfigurationForm-items0Label  Admission Numbers (2005)
+    user checks element value should be  id:chartLegendConfigurationForm-items1Label  Admission Numbers (2010)
+    user checks element value should be  id:chartLegendConfigurationForm-items2Label  Admission Numbers (2011)
+    user checks element value should be  id:chartLegendConfigurationForm-items3Label  Admission Numbers (2012)
+    user checks element value should be  id:chartLegendConfigurationForm-items4Label  Admission Numbers (2016)
+
+    user enters text into element  id:chartLegendConfigurationForm-items0Label  Admissions in 2005
+    user enters text into element  id:chartLegendConfigurationForm-items1Label  Admissions in 2010
+    user enters text into element  id:chartLegendConfigurationForm-items2Label  Admissions in 2011
+    user enters text into element  id:chartLegendConfigurationForm-items3Label  Admissions in 2012
+    user enters text into element  id:chartLegendConfigurationForm-items4Label  Admissions in 2016
 
     user waits for chart preview to update
 
@@ -554,17 +590,17 @@ Validate basic geographic chart preview
 
     user mouses over selected map feature  ${preview}
     user checks chart tooltip label contains  ${preview}  Nailsea Youngwood
-    user checks chart tooltip item contains  ${preview}  1  Admission Numbers (2005): 3,612
-    user checks chart tooltip item contains  ${preview}  2  Admission Numbers (2010): 9,304
-    user checks chart tooltip item contains  ${preview}  3  Admission Numbers (2011): 9,603
-    user checks chart tooltip item contains  ${preview}  4  Admission Numbers (2012): 8,150
-    user checks chart tooltip item contains  ${preview}  5  Admission Numbers (2016): 4,198
+    user checks chart tooltip item contains  ${preview}  1  Admissions in 2005: 3,612
+    user checks chart tooltip item contains  ${preview}  2  Admissions in 2010: 9,304
+    user checks chart tooltip item contains  ${preview}  3  Admissions in 2011: 9,603
+    user checks chart tooltip item contains  ${preview}  4  Admissions in 2012: 8,150
+    user checks chart tooltip item contains  ${preview}  5  Admissions in 2016: 4,198
 
-    user checks map chart indicator tile contains  ${preview}  1  Admission Numbers (2005)  3,612
-    user checks map chart indicator tile contains  ${preview}  2  Admission Numbers (2010)  9,304
-    user checks map chart indicator tile contains  ${preview}  3  Admission Numbers (2011)  9,603
-    user checks map chart indicator tile contains  ${preview}  4  Admission Numbers (2012)  8,150
-    user checks map chart indicator tile contains  ${preview}  5  Admission Numbers (2016)  4,198
+    user checks map chart indicator tile contains  ${preview}  1  Admissions in 2005  3,612
+    user checks map chart indicator tile contains  ${preview}  2  Admissions in 2010  9,304
+    user checks map chart indicator tile contains  ${preview}  3  Admissions in 2011  9,603
+    user checks map chart indicator tile contains  ${preview}  4  Admissions in 2012  8,150
+    user checks map chart indicator tile contains  ${preview}  5  Admissions in 2016  4,198
 
 Save and validate geographic chart embeds correctly
     [Tags]  HappyPath
@@ -587,17 +623,17 @@ Save and validate geographic chart embeds correctly
 
     user mouses over selected map feature  ${datablock}
     user checks chart tooltip label contains  ${datablock}  Nailsea Youngwood
-    user checks chart tooltip item contains  ${datablock}  1  Admission Numbers (2005): 3,612
-    user checks chart tooltip item contains  ${datablock}  2  Admission Numbers (2010): 9,304
-    user checks chart tooltip item contains  ${datablock}  3  Admission Numbers (2011): 9,603
-    user checks chart tooltip item contains  ${datablock}  4  Admission Numbers (2012): 8,150
-    user checks chart tooltip item contains  ${datablock}  5  Admission Numbers (2016): 4,198
+    user checks chart tooltip item contains  ${datablock}  1  Admissions in 2005: 3,612
+    user checks chart tooltip item contains  ${datablock}  2  Admissions in 2010: 9,304
+    user checks chart tooltip item contains  ${datablock}  3  Admissions in 2011: 9,603
+    user checks chart tooltip item contains  ${datablock}  4  Admissions in 2012: 8,150
+    user checks chart tooltip item contains  ${datablock}  5  Admissions in 2016: 4,198
 
-    user checks map chart indicator tile contains  ${datablock}  1  Admission Numbers (2005)  3,612
-    user checks map chart indicator tile contains  ${datablock}  2  Admission Numbers (2010)  9,304
-    user checks map chart indicator tile contains  ${datablock}  3  Admission Numbers (2011)  9,603
-    user checks map chart indicator tile contains  ${datablock}  4  Admission Numbers (2012)  8,150
-    user checks map chart indicator tile contains  ${datablock}  5  Admission Numbers (2016)  4,198
+    user checks map chart indicator tile contains  ${datablock}  1  Admissions in 2005  3,612
+    user checks map chart indicator tile contains  ${datablock}  2  Admissions in 2010  9,304
+    user checks map chart indicator tile contains  ${datablock}  3  Admissions in 2011  9,603
+    user checks map chart indicator tile contains  ${datablock}  4  Admissions in 2012  8,150
+    user checks map chart indicator tile contains  ${datablock}  5  Admissions in 2016  4,198
 
 Configure basic infographic chart
     [Tags]  HappyPath
