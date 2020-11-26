@@ -52,7 +52,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Controllers.Api
 
         [HttpDelete("release/{releaseId}/prerelease-users")]
         public async Task<ActionResult> RemovePreReleaseUser(
-            Guid releaseId, [FromQuery] PreReleaseAccessRequest request)
+            Guid releaseId, [FromBody] PreReleaseAccessRequest request)
         {
             return await _preReleaseUserService
                 .RemovePreReleaseUser(releaseId, request.Email)

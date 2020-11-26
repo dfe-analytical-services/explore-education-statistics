@@ -156,5 +156,8 @@
     "ancestorSeparator": " › ",
     "suiteName": "Common Jest tests",
     "outputName": "junit-common.xml"
+  },
+  "dependencies": {
+    "axios": "0.21.0"
   }
 }
