@@ -40,6 +40,9 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Security
                 options.AddPolicy(SecurityPolicies.CanManageMethodologiesOnSystem.ToString(), policy =>
                     policy.RequireClaim(SecurityClaimTypes.ManageAnyMethodology.ToString()));
 
+                options.AddPolicy(SecurityPolicies.CanAccessAllImports.ToString(), policy =>
+                    policy.RequireClaim(SecurityClaimTypes.AccessAllImports.ToString()));
+
                 /**
                  * Publication management
                  */

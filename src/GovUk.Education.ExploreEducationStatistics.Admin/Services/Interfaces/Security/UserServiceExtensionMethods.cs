@@ -34,6 +34,11 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Services.Interfaces.S
             return userService.DoCheck(SecurityPolicies.CanManageMethodologiesOnSystem);
         }
 
+        public static Task<Either<ActionResult, Unit>> CheckCanViewAllImports(this IUserService userService)
+        {
+            return userService.DoCheck(SecurityPolicies.CanAccessAllImports);
+        }
+
         public static Task<Either<ActionResult, Unit>> CheckCanViewAllMethodologies(this IUserService userService)
         {
             return userService.DoCheck(SecurityPolicies.CanViewAllMethodologies);

@@ -37,7 +37,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Services
         public async Task<Either<ActionResult, List<ImportStatusBau>>> GetAllIncompleteImports()
         {
             return await _userService
-                .CheckCanViewAllReleases()
+                .CheckCanViewAllImports()
                 .OnSuccess(async () =>
                 {
                     var queryFilterCondition = TableQuery.GenerateFilterCondition("Status",
