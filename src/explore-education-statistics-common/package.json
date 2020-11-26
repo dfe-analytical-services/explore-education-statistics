@@ -36,7 +36,7 @@
     "@types/yup": "^0.28.3",
     "@typescript-eslint/eslint-plugin": "^4.4.0",
     "@typescript-eslint/parser": "^4.4.0",
-    "axios": "^0.20.0",
+    "axios": "^0.21.0",
     "babel-jest": "^26.5.2",
     "babel-preset-react-app": "^9.1.2",
     "classnames": "^2.2.6",
@@ -156,8 +156,5 @@
     "ancestorSeparator": " › ",
     "suiteName": "Common Jest tests",
     "outputName": "junit-common.xml"
-  },
-  "dependencies": {
-    "axios": "0.21.0"
   }
 }
