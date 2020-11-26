@@ -15,7 +15,7 @@ const preReleaseUserService = {
   },
   removeUser(releaseId: string, email: string): Promise<void> {
     return client.delete(`/release/${releaseId}/prerelease-users`, {
-      data: {
+      params: {
         email,
       },
     });
