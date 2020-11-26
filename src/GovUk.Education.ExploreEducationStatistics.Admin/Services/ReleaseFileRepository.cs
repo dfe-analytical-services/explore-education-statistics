@@ -41,9 +41,9 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Services
             return releaseFile.ReleaseFileReference;
         }
 
-        public async Task Delete(Guid releaseId, Guid releaseFileReferenceId)
+        public async Task Delete(Guid releaseId, Guid fileId)
         {
-            var releaseFile = await Get(releaseId, releaseFileReferenceId);
+            var releaseFile = await Get(releaseId, fileId);
             if (releaseFile != null)
             {
                 _contentDbContext.ReleaseFiles.Remove(releaseFile);
@@ -51,13 +51,13 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Services
             }
         }
 
-        public async Task<ReleaseFile> Get(Guid releaseId, Guid releaseFileReferenceId)
+        public async Task<ReleaseFile> Get(Guid releaseId, Guid fileId)
         {
             return await _contentDbContext.ReleaseFiles
                 .Include(releaseFile => releaseFile.ReleaseFileReference)
                 .SingleOrDefaultAsync(releaseFile =>
                     releaseFile.ReleaseId == releaseId
-                    && releaseFile.ReleaseFileReferenceId == releaseFileReferenceId);
+                    && releaseFile.ReleaseFileReferenceId == fileId);
         }
 
         public async Task<List<ReleaseFile>> GetByFileType(Guid releaseId, params ReleaseFileTypes[] types)

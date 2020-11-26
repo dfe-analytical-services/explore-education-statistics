@@ -12,9 +12,9 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Services.Interfaces
         public Task<Either<ActionResult, ReleaseFileReference>> CheckFileExists(Guid releaseId, Guid id,
             params ReleaseFileTypes[] allowedFileTypes);
         
-        public Task Delete(Guid releaseId, Guid releaseFileReferenceId);
+        public Task Delete(Guid releaseId, Guid fileId);
 
-        public Task<ReleaseFile> Get(Guid releaseId, Guid releaseFileReferenceId);
+        public Task<ReleaseFile> Get(Guid releaseId, Guid fileId);
 
         public Task<List<ReleaseFile>> GetByFileType(Guid releaseId, params ReleaseFileTypes[] types);
 
