@@ -135,6 +135,8 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Services
                                 await _fileRepository.Delete(sourceRef.Id);
                             }
                         }
+
+                        await DeleteBatchFiles(releaseId, file);
                     }
                 });
         }
@@ -516,6 +518,28 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Services
                 .FirstAsync(rfr => rfr.ReleaseId == releaseFileReference.ReleaseId
                                    && rfr.ReleaseFileType == associatedType
                                    && rfr.SubjectId == releaseFileReference.SubjectId);
+        }
+
+        private async Task<IEnumerable<BlobInfo>> GetBatchFilesForDataFile(Guid releaseId, string originalDataFileName)
+        {
+            var blobs = await _blobStorageService.ListBlobs(
+                PrivateFilesContainerName,
+                AdminReleaseBatchesDirectoryPath(releaseId)
+            );
+
+            return blobs.Where(blob => IsBatchFileForDataFile(releaseId, originalDataFileName, blob.Path));
+        }
+        
+        private async Task DeleteBatchFiles(Guid releaseId, ReleaseFileReference dataFileReference)
+        {
+            var batchFiles = await GetBatchFilesForDataFile(releaseId, dataFileReference.Filename);
+            await batchFiles.ForEachAsync(async batchFile =>
+            {
+                await _blobStorageService.DeleteBlob(
+                    PrivateFilesContainerName,
+                    AdminReleaseBatchesDirectoryPath(releaseId) + batchFile.FileName
+                );
+            });
         }
     }
 }

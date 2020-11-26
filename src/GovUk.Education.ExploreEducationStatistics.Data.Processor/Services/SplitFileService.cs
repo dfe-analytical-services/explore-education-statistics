@@ -74,7 +74,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Processor.Services
             ImportMessage message)
         {
             var batchFilesForDataFile = await _fileStorageService.GetBatchFilesForDataFile(
-                message.Release.Id.ToString(), 
+                message.Release.Id, 
                 message.DataFileName);
 
             // If no batching was necessary, simply add a message to process the lone data file
@@ -122,7 +122,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Processor.Services
             var numBatches = (int)Math.Ceiling((double)dataFileTable.Rows.Count / message.RowsPerBatch);
 
             var existingBatchFiles = await _fileStorageService.GetBatchFilesForDataFile(
-                message.Release.Id.ToString(), 
+                message.Release.Id, 
                 message.DataFileName);
 
             var existingBatchFileNumbers = existingBatchFiles
