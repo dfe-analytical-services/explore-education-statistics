@@ -252,41 +252,47 @@ Configure basic line chart
     user clicks button  Line
     user enters text into element  id:chartConfigurationForm-title      Test chart title
     user enters text into element  id:chartConfigurationForm-alt        Test chart alt
+    user enters text into element  id:chartConfigurationForm-height     400
+    user enters text into element  id:chartConfigurationForm-width      900
 
     user clicks link  Data sets
-    user waits until h3 is visible  Add data sets to the chart
-    user selects from list by label  id:chartDataSelectorForm-location  Nailsea Youngwood
-    user clicks button  Add data
+    user waits until h3 is visible  Data sets
+    user selects from list by label  id:chartDataSetsConfigurationForm-location  Nailsea Youngwood
+    user clicks button  Add data set
 
 Validate basic line chart preview
     [Tags]  HappyPath
-    user waits until element contains line chart  id:chartBuilderPreview
+    ${preview}=  set variable  id:chartBuilderPreview
+    user waits until element contains line chart  ${preview}
 
-    user checks chart title contains  id:chartBuilderPreview  Test chart title
-    user checks chart legend item contains  id:chartBuilderPreview  1  Admission Numbers (Nailsea Youngwood)
+    user checks chart title contains  ${preview}  Test chart title
+    user checks chart legend item contains  ${preview}  1  Admission Numbers (Nailsea Youngwood)
 
-    user checks chart y axis ticks  id:chartBuilderPreview  0     2,500  5,000  7,500  10,000
-    user checks chart x axis ticks  id:chartBuilderPreview  2005  2010  2011  2012  2016
+    user checks chart height  ${preview}  400
+    user checks chart width   ${preview}  900
 
-    user mouses over line chart point  id:chartBuilderPreview  1  1
-    user checks chart tooltip label contains  id:chartBuilderPreview  2005
-    user checks chart tooltip item contains  id:chartBuilderPreview  1  Admission Numbers (Nailsea Youngwood): 3,612
+    user checks chart y axis ticks  ${preview}  0     2,500  5,000  7,500  10,000
+    user checks chart x axis ticks  ${preview}  2005  2010  2011  2012  2016
 
-    user mouses over line chart point  id:chartBuilderPreview  1  2
-    user checks chart tooltip label contains  id:chartBuilderPreview  2010
-    user checks chart tooltip item contains  id:chartBuilderPreview  1  Admission Numbers (Nailsea Youngwood): 9,304
+    user mouses over line chart point  ${preview}  1  1
+    user checks chart tooltip label contains  ${preview}  2005
+    user checks chart tooltip item contains  ${preview}  1  Admission Numbers (Nailsea Youngwood): 3,612
 
-    user mouses over line chart point  id:chartBuilderPreview  1  3
-    user checks chart tooltip label contains  id:chartBuilderPreview  2011
-    user checks chart tooltip item contains  id:chartBuilderPreview  1  Admission Numbers (Nailsea Youngwood): 9,603
+    user mouses over line chart point  ${preview}  1  2
+    user checks chart tooltip label contains  ${preview}  2010
+    user checks chart tooltip item contains  ${preview}  1  Admission Numbers (Nailsea Youngwood): 9,304
 
-    user mouses over line chart point  id:chartBuilderPreview  1  4
-    user checks chart tooltip label contains  id:chartBuilderPreview  2012
-    user checks chart tooltip item contains  id:chartBuilderPreview  1  Admission Numbers (Nailsea Youngwood): 8,150
+    user mouses over line chart point  ${preview}  1  3
+    user checks chart tooltip label contains  ${preview}  2011
+    user checks chart tooltip item contains  ${preview}  1  Admission Numbers (Nailsea Youngwood): 9,603
 
-    user mouses over line chart point  id:chartBuilderPreview  1  5
-    user checks chart tooltip label contains  id:chartBuilderPreview  2016
-    user checks chart tooltip item contains  id:chartBuilderPreview  1  Admission Numbers (Nailsea Youngwood): 4,198
+    user mouses over line chart point  ${preview}  1  4
+    user checks chart tooltip label contains  ${preview}  2012
+    user checks chart tooltip item contains  ${preview}  1  Admission Numbers (Nailsea Youngwood): 8,150
+
+    user mouses over line chart point  ${preview}  1  5
+    user checks chart tooltip label contains  ${preview}  2016
+    user checks chart tooltip item contains  ${preview}  1  Admission Numbers (Nailsea Youngwood): 4,198
 
 Save and validate line chart embeds correctly
     [Tags]  HappyPath
@@ -303,6 +309,9 @@ Save and validate line chart embeds correctly
 
     user checks chart title contains  ${datablock}  Test chart title
     user checks chart legend item contains  ${datablock}  1  Admission Numbers (Nailsea Youngwood)
+
+    user checks chart height  ${datablock}  400
+    user checks chart width   ${datablock}  900
 
     user checks chart y axis ticks  ${datablock}  0     2,500  5,000  7,500  10,000
     user checks chart x axis ticks  ${datablock}  2005  2010  2011  2012  2016
@@ -337,6 +346,13 @@ Configure basic vertical bar chart
     user waits until h3 is visible  Choose chart type
     user clicks button  Vertical bar
 
+    user waits for chart preview to update
+
+    user enters text into element  id:chartConfigurationForm-height     500
+    user enters text into element  id:chartConfigurationForm-width      800
+
+    user waits for chart preview to update
+
 Validate basic vertical bar chart preview
     [Tags]  HappyPath
     ${preview}=  set variable  id:chartBuilderPreview
@@ -345,6 +361,9 @@ Validate basic vertical bar chart preview
 
     user checks chart title contains  ${preview}  Test chart title
     user checks chart legend item contains  ${preview}  1  Admission Numbers (Nailsea Youngwood)
+
+    user checks chart height  ${preview}  500
+    user checks chart width   ${preview}  800
 
     user checks chart y axis ticks  ${preview}  0     2,500  5,000  7,500  10,000
     user checks chart x axis ticks  ${preview}  2005  2010  2011  2012  2016
@@ -386,6 +405,9 @@ Save and validate vertical bar chart embeds correctly
     user checks chart title contains  ${datablock}  Test chart title
     user checks chart legend item contains  ${datablock}  1  Admission Numbers (Nailsea Youngwood)
 
+    user checks chart height  ${datablock}  500
+    user checks chart width   ${datablock}  800
+
     user checks chart y axis ticks  ${datablock}  0     2,500  5,000  7,500  10,000
     user checks chart x axis ticks  ${datablock}  2005  2010  2011  2012  2016
 
@@ -418,8 +440,13 @@ Configure basic horizontal bar chart
     user clicks link  Chart
     user waits until h3 is visible  Choose chart type
     user clicks button  Horizontal bar
-    # Make sure chart has updated
-    sleep  0.3s
+
+    user waits for chart preview to update
+
+    user enters text into element  id:chartConfigurationForm-height     600
+    user enters text into element  id:chartConfigurationForm-width      700
+
+    user waits for chart preview to update
 
 Validate basic horizontal bar chart preview
     [Tags]  HappyPath
@@ -431,6 +458,9 @@ Validate basic horizontal bar chart preview
 
     user checks chart x axis ticks  ${preview}  0     2,500  5,000  7,500  10,000
     user checks chart y axis ticks  ${preview}  2005  2010  2011  2012  2016
+
+    user checks chart height  ${preview}  600
+    user checks chart width   ${preview}  700
 
     user mouses over chart bar  ${preview}  1
     user checks chart tooltip label contains  ${preview}  2005
@@ -471,6 +501,9 @@ Save and validate horizontal bar chart embeds correctly
     user checks chart x axis ticks  ${datablock}  0     2,500  5,000  7,500  10,000
     user checks chart y axis ticks  ${datablock}  2005  2010  2011  2012  2016
 
+    user checks chart height  ${datablock}  600
+    user checks chart width   ${datablock}  700
+
     user mouses over chart bar  ${datablock}  1
     user checks chart tooltip label contains  ${datablock}  2005
     user checks chart tooltip item contains  ${datablock}  1  Admission Numbers (Nailsea Youngwood): 3,612
@@ -501,26 +534,37 @@ Configure basic geographic chart
     user waits until h3 is visible  Choose chart type
     user clicks button  Geographic
 
+    user waits for chart preview to update
+
+    user enters text into element  id:chartConfigurationForm-height     700
+    user enters text into element  id:chartConfigurationForm-width      600
+
+    user waits for chart preview to update
+
 Validate basic geographic chart preview
     [Tags]  HappyPath
-    user waits until element does not contain bar chart  id:chartBuilderPreview
-    user waits until element contains map chart  id:chartBuilderPreview
+    ${preview}=  set variable  id:chartBuilderPreview
+    user waits until element does not contain bar chart  ${preview}
+    user waits until element contains map chart  ${preview}
 
-    user selects from list by label  id:chartBuilderPreview-map-selectedLocation  Nailsea Youngwood
+    user checks map chart height  ${preview}  700
+    user checks map chart width   ${preview}  600
 
-    user mouses over selected map feature  id:chartBuilderPreview
-    user checks chart tooltip label contains  id:chartBuilderPreview  Nailsea Youngwood
-    user checks chart tooltip item contains  id:chartBuilderPreview  1  Admission Numbers (2005): 3,612
-    user checks chart tooltip item contains  id:chartBuilderPreview  2  Admission Numbers (2010): 9,304
-    user checks chart tooltip item contains  id:chartBuilderPreview  3  Admission Numbers (2011): 9,603
-    user checks chart tooltip item contains  id:chartBuilderPreview  4  Admission Numbers (2012): 8,150
-    user checks chart tooltip item contains  id:chartBuilderPreview  5  Admission Numbers (2016): 4,198
+    user selects from list by label  ${preview}-map-selectedLocation  Nailsea Youngwood
 
-    user checks map chart indicator tile contains  id:chartBuilderPreview  1  Admission Numbers (2005)  3,612
-    user checks map chart indicator tile contains  id:chartBuilderPreview  2  Admission Numbers (2010)  9,304
-    user checks map chart indicator tile contains  id:chartBuilderPreview  3  Admission Numbers (2011)  9,603
-    user checks map chart indicator tile contains  id:chartBuilderPreview  4  Admission Numbers (2012)  8,150
-    user checks map chart indicator tile contains  id:chartBuilderPreview  5  Admission Numbers (2016)  4,198
+    user mouses over selected map feature  ${preview}
+    user checks chart tooltip label contains  ${preview}  Nailsea Youngwood
+    user checks chart tooltip item contains  ${preview}  1  Admission Numbers (2005): 3,612
+    user checks chart tooltip item contains  ${preview}  2  Admission Numbers (2010): 9,304
+    user checks chart tooltip item contains  ${preview}  3  Admission Numbers (2011): 9,603
+    user checks chart tooltip item contains  ${preview}  4  Admission Numbers (2012): 8,150
+    user checks chart tooltip item contains  ${preview}  5  Admission Numbers (2016): 4,198
+
+    user checks map chart indicator tile contains  ${preview}  1  Admission Numbers (2005)  3,612
+    user checks map chart indicator tile contains  ${preview}  2  Admission Numbers (2010)  9,304
+    user checks map chart indicator tile contains  ${preview}  3  Admission Numbers (2011)  9,603
+    user checks map chart indicator tile contains  ${preview}  4  Admission Numbers (2012)  8,150
+    user checks map chart indicator tile contains  ${preview}  5  Admission Numbers (2016)  4,198
 
 Save and validate geographic chart embeds correctly
     [Tags]  HappyPath
@@ -535,6 +579,9 @@ Save and validate geographic chart embeds correctly
     ${datablock}=  set variable  css:[data-testid="Data block - ${DATABLOCK_NAME}"]
     user waits until element does not contain bar chart  ${datablock}
     user waits until element contains map chart  ${datablock}
+
+    user checks map chart height  ${datablock}  700
+    user checks map chart width   ${datablock}  600
 
     user selects from list by label  ${datablock} select[name="selectedLocation"]  Nailsea Youngwood
 
