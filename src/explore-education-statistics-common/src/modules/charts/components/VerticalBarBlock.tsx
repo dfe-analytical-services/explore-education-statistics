@@ -180,7 +180,6 @@ export const verticalBarBlockDefinition: ChartDefinition = {
   capabilities: {
     canSize: true,
     canSort: true,
-    fixedAxisGroupBy: false,
     hasGridLines: true,
     hasLegend: true,
     hasLegendPosition: true,

@@ -24,7 +24,6 @@ describe('chartBuilderReducer', () => {
     capabilities: {
       canSize: true,
       canSort: true,
-      fixedAxisGroupBy: false,
       hasGridLines: true,
       hasLegend: true,
       hasLegendPosition: true,

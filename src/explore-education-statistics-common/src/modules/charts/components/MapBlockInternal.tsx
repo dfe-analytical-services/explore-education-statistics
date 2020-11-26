@@ -268,8 +268,6 @@ export const MapBlockInternal = ({
     [dataSetCategories, legend, meta],
   );
 
-  console.log({ dataSetCategoryConfigs });
-
   const dataSetOptions = useMemo<SelectOption[]>(() => {
     return orderBy(
       Object.values(dataSetCategoryConfigs).map(dataSet => ({
@@ -444,7 +442,7 @@ export const MapBlockInternal = ({
             `<p><strong data-testid="chartTooltip-label">${feature.properties.name}</strong></p>` +
             `<ul class="${
               styles.tooltipList
-            }" data-testid="chartTooltip-items">${items.join()}</ul>` +
+            }" data-testid="chartTooltip-items">${items.join('')}</ul>` +
             `</div>`
           );
         }

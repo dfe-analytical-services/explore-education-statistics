@@ -111,7 +111,10 @@ const ChartLegendConfiguration = ({
 
   const initialValues = useMemo<FormValues>(() => {
     const dataSetCategories: DataSetCategory[] = createDataSetCategories(
-      axisMajor,
+      {
+        ...axisMajor,
+        groupBy: definition.axes.major?.constants?.groupBy ?? axisMajor.groupBy,
+      },
       data,
       meta,
     );
@@ -139,6 +142,7 @@ const ChartLegendConfiguration = ({
     };
   }, [
     axisMajor,
+    definition.axes.major?.constants?.groupBy,
     data,
     meta,
     legend.position,

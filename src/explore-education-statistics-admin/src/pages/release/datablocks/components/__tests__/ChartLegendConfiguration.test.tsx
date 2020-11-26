@@ -2,7 +2,6 @@ import { testTableData } from '@admin/pages/release/datablocks/components/__test
 import ChartLegendConfiguration from '@admin/pages/release/datablocks/components/ChartLegendConfiguration';
 import { ChartBuilderForms } from '@admin/pages/release/datablocks/components/types/chartBuilderForms';
 import { lineChartBlockDefinition } from '@common/modules/charts/components/LineChartBlock';
-import { mapBlockDefinition } from '@common/modules/charts/components/MapBlock';
 import { DataSetConfiguration } from '@common/modules/charts/types/dataSet';
 import { LegendConfiguration } from '@common/modules/charts/types/legend';
 import mapFullTable from '@common/modules/table-tool/utils/mapFullTable';
@@ -13,9 +12,9 @@ import {
   waitFor,
   within,
 } from '@testing-library/react';
+import userEvent from '@testing-library/user-event';
 import noop from 'lodash/noop';
 import React from 'react';
-import userEvent from '@testing-library/user-event';
 
 describe('ChartLegendConfiguration', () => {
   const testTable = mapFullTable(testTableData);
@@ -438,7 +437,13 @@ describe('ChartLegendConfiguration', () => {
   test('does not render Symbol field if chart does not have capability', () => {
     render(
       <ChartLegendConfiguration
-        definition={mapBlockDefinition}
+        definition={{
+          ...lineChartBlockDefinition,
+          capabilities: {
+            ...lineChartBlockDefinition.capabilities,
+            hasSymbols: false,
+          },
+        }}
         meta={testTable.subjectMeta}
         data={testTable.results}
         forms={testFormState}
@@ -491,7 +496,13 @@ describe('ChartLegendConfiguration', () => {
   test('does not render Style field if chart does not have capability', () => {
     render(
       <ChartLegendConfiguration
-        definition={mapBlockDefinition}
+        definition={{
+          ...lineChartBlockDefinition,
+          capabilities: {
+            ...lineChartBlockDefinition.capabilities,
+            hasLineStyle: false,
+          },
+        }}
         meta={testTable.subjectMeta}
         data={testTable.results}
         forms={testFormState}

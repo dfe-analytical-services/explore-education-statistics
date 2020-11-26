@@ -62,7 +62,6 @@ export const infographicBlockDefinition: ChartDefinition = {
   capabilities: {
     canSize: true,
     canSort: false,
-    fixedAxisGroupBy: true,
     hasGridLines: false,
     hasLegend: false,
     hasLegendPosition: false,

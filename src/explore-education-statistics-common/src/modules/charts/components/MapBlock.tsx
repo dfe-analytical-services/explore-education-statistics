@@ -30,7 +30,6 @@ export const mapBlockDefinition: ChartDefinition = {
   capabilities: {
     canSize: true,
     canSort: false,
-    fixedAxisGroupBy: true,
     hasGridLines: false,
     hasLegend: true,
     hasLegendPosition: false,
@@ -66,6 +65,9 @@ export const mapBlockDefinition: ChartDefinition = {
         canRotateLabel: false,
       },
       defaults: {
+        groupBy: 'locations',
+      },
+      constants: {
         groupBy: 'locations',
       },
     },

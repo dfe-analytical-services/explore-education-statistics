@@ -83,7 +83,6 @@ export interface StackedBarProps extends ChartProps {
 export interface ChartCapabilities {
   canSize: boolean;
   canSort: boolean;
-  fixedAxisGroupBy: boolean;
   hasGridLines: boolean;
   hasLegend: boolean;
   hasLegendPosition: boolean;
@@ -135,6 +134,9 @@ export interface ChartDefinitionAxis {
   hide?: boolean;
   capabilities: ChartDefinitionAxisCapabilities;
   defaults?: NestedPartial<AxisConfiguration>;
+  constants?: {
+    groupBy?: AxisGroupBy;
+  };
 }
 
 export const chartDefinitions: ChartDefinition[] = [

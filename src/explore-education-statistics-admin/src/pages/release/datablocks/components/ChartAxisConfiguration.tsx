@@ -24,6 +24,7 @@ import {
   ChartDefinition,
   Label,
   ReferenceLine,
+  TickConfig,
 } from '@common/modules/charts/types/chart';
 import { DataSetCategory } from '@common/modules/charts/types/dataSet';
 import createDataSetCategories from '@common/modules/charts/util/createDataSetCategories';
@@ -217,10 +218,10 @@ const ChartAxisConfiguration = ({
       size: Yup.number()
         .required('Enter size of axis')
         .positive('Size of axis must be positive'),
-      tickConfig: Yup.string().oneOf(
+      tickConfig: Yup.string().oneOf<TickConfig>(
         ['default', 'startEnd', 'custom'],
         'Select a valid tick display type',
-      ) as Schema<AxisConfiguration['tickConfig']>,
+      ),
       tickSpacing: Yup.number().when('tickConfig', {
         is: 'custom',
         then: Yup.number()
@@ -232,14 +233,12 @@ const ChartAxisConfiguration = ({
       visible: Yup.boolean(),
     });
 
-    if (type === 'major' && !capabilities.fixedAxisGroupBy) {
+    if (type === 'major' && !definition.axes.major?.constants?.groupBy) {
       schema = schema.shape({
-        groupBy: Yup.string().oneOf([
-          'locations',
-          'timePeriod',
-          'filters',
-          'indicators',
-        ]) as Schema<AxisConfiguration['groupBy']>,
+        groupBy: Yup.string().oneOf<AxisGroupBy>(
+          ['locations', 'timePeriod', 'filters', 'indicators'],
+          'Choose a valid group by',
+        ),
       });
     }
 
@@ -281,7 +280,6 @@ const ChartAxisConfiguration = ({
     return schema;
   }, [
     capabilities.canSort,
-    capabilities.fixedAxisGroupBy,
     capabilities.hasGridLines,
     capabilities.hasReferenceLines,
     definition.axes,
