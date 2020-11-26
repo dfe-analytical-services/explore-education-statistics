@@ -18,9 +18,6 @@ const preReleaseUserService = {
       data: {
         email,
       },
-      headers: {
-        'Content-Type': 'application/json; charset=utf-8',
-      },
     });
   },
 };
