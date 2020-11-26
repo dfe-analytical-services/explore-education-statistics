@@ -43,14 +43,6 @@ describe('chartBuilderReducer', () => {
         position: 'top',
       },
     },
-    data: [
-      {
-        type: 'line',
-        title: 'Line',
-        entryCount: 'multiple',
-        targetAxis: 'xaxis',
-      },
-    ],
     axes: {
       major: {
         id: 'xaxis',

@@ -44,14 +44,6 @@ export const mapBlockDefinition: ChartDefinition = {
       height: 600,
     },
   },
-  data: [
-    {
-      type: 'geojson',
-      title: 'Geographic',
-      entryCount: 'multiple',
-      targetAxis: 'geojson',
-    },
-  ],
   legend: {
     defaults: {},
   },

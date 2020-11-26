@@ -197,14 +197,6 @@ export const horizontalBarBlockDefinition: ChartDefinition = {
       height: 300,
     },
   },
-  data: [
-    {
-      type: 'bar',
-      title: 'Bar',
-      entryCount: 1,
-      targetAxis: 'yaxis',
-    },
-  ],
   legend: {
     defaults: {
       position: 'bottom',

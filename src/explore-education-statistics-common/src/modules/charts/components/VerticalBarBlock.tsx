@@ -194,14 +194,6 @@ export const verticalBarBlockDefinition: ChartDefinition = {
       height: 300,
     },
   },
-  data: [
-    {
-      type: 'bar',
-      title: 'Bar',
-      entryCount: 1,
-      targetAxis: 'xaxis',
-    },
-  ],
   legend: {
     defaults: {
       position: 'bottom',

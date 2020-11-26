@@ -229,14 +229,6 @@ export const lineChartBlockDefinition: ChartDefinition = {
       height: 300,
     },
   },
-  data: [
-    {
-      type: 'line',
-      title: 'Line',
-      entryCount: 'multiple',
-      targetAxis: 'xaxis',
-    },
-  ],
   legend: {
     defaults: {
       position: 'bottom',

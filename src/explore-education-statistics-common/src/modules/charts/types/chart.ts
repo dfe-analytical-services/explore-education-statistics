@@ -109,12 +109,6 @@ export interface ChartDefinition {
   options: {
     defaults?: Partial<ChartDefinitionOptions>;
   };
-  data: {
-    type: string;
-    title: string;
-    entryCount: number | 'multiple';
-    targetAxis: string;
-  }[];
   legend: {
     defaults?: Partial<LegendConfiguration>;
   };

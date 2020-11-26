@@ -71,7 +71,6 @@ export const infographicBlockDefinition: ChartDefinition = {
     requiresGeoJson: false,
     stackable: false,
   },
-  data: [],
   axes: {},
 };
 
