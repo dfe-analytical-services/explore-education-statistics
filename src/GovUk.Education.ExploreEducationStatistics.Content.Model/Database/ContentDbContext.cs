@@ -570,80 +570,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Content.Model.Database
                             }
                         }
                     },
-                    Charts = new List<IChart>
-                    {
-                        new LineChart
-                        {
-                            Axes = new Dictionary<string, ChartAxisConfiguration>
-                            {
-                                ["major"] = new ChartAxisConfiguration
-                                {
-                                    GroupBy = AxisGroupBy.timePeriod,
-                                    DataSets = new List<ChartDataSet>
-                                    {
-                                        new ChartDataSet
-                                        {
-                                            Indicator = Indicator(SubjectIds[SubjectName.AbsenceByCharacteristic],
-                                                IndicatorName.Unauthorised_absence_rate),
-                                            Filters = new List<Guid>
-                                            {
-                                                FItem(SubjectIds[SubjectName.AbsenceByCharacteristic],
-                                                    FilterItemName.Characteristic__Total),
-                                                FItem(SubjectIds[SubjectName.AbsenceByCharacteristic],
-                                                    FilterItemName.School_Type__Total)
-                                            }
-                                        },
-                                        new ChartDataSet
-                                        {
-                                            Indicator = Indicator(SubjectIds[SubjectName.AbsenceByCharacteristic],
-                                                IndicatorName.Overall_absence_rate),
-                                            Filters = new List<Guid>
-                                            {
-                                                FItem(SubjectIds[SubjectName.AbsenceByCharacteristic],
-                                                    FilterItemName.Characteristic__Total),
-                                                FItem(SubjectIds[SubjectName.AbsenceByCharacteristic],
-                                                    FilterItemName.School_Type__Total)
-                                            }
-                                        },
-                                        new ChartDataSet
-                                        {
-                                            Indicator = Indicator(SubjectIds[SubjectName.AbsenceByCharacteristic],
-                                                IndicatorName.Authorised_absence_rate),
-                                            Filters = new List<Guid>
-                                            {
-                                                FItem(SubjectIds[SubjectName.AbsenceByCharacteristic],
-                                                    FilterItemName.Characteristic__Total),
-                                                FItem(SubjectIds[SubjectName.AbsenceByCharacteristic],
-                                                    FilterItemName.School_Type__Total)
-                                            }
-                                        }
-                                    },
-                                    Title = "School Year"
-                                },
-                                ["minor"] = new ChartAxisConfiguration
-                                {
-                                    Min = 0,
-                                    Title = "Absence Rate"
-                                }
-                            },
-                            Labels = new Dictionary<string, ChartLabelConfiguration>
-                            {
-                                [$"{Indicator(SubjectIds[SubjectName.AbsenceByCharacteristic], IndicatorName.Overall_absence_rate)}_{FItem(SubjectIds[SubjectName.AbsenceByCharacteristic], FilterItemName.Characteristic__Total)}_{FItem(SubjectIds[SubjectName.AbsenceByCharacteristic], FilterItemName.School_Type__Total)}_____"]
-                                    = new ChartLabelConfiguration
-                                    {
-                                        Label = "Overall absence rate",
-                                        Unit = "%",
-                                        Colour = "#f5a450",
-                                        Symbol = ChartLineSymbol.cross,
-                                        LineStyle = ChartLineStyle.solid
-                                    },
-                            },
-                            Legend = new ChartLegend
-                            {
-                                Position = ChartLegendPosition.top
-                            }
-                        }
-                    }
+                    Charts = new List<IChart>()
                 },
                 // absence key statistics aggregate table
                 new DataBlock
@@ -806,39 +733,62 @@ namespace GovUk.Education.ExploreEducationStatistics.Content.Model.Database
                                     Title = "Absence Rate"
                                 }
                             },
-                            Labels = new Dictionary<string, ChartLabelConfiguration>
+                            Legend = new ChartLegend
                             {
-                                [$"{Indicator(SubjectIds[SubjectName.AbsenceByCharacteristic], IndicatorName.Unauthorised_absence_rate)}_{FItem(SubjectIds[SubjectName.AbsenceByCharacteristic], FilterItemName.Characteristic__Total)}_{FItem(SubjectIds[SubjectName.AbsenceByCharacteristic], FilterItemName.School_Type__Total)}_____"]
-                                    = new ChartLabelConfiguration
+                                Position = ChartLegendPosition.top,
+                                Items = new List<ChartLegendItem>
+                                {
+                                    new ChartLegendItem
                                     {
+                                        DataSet = new ChartDataSet
+                                        {
+                                            Indicator = Indicator(SubjectIds[SubjectName.AbsenceByCharacteristic], IndicatorName.Unauthorised_absence_rate),
+                                            Filters = new List<Guid>
+                                            {
+                                                FItem(SubjectIds[SubjectName.AbsenceByCharacteristic], FilterItemName.Characteristic__Total),
+                                                FItem(SubjectIds[SubjectName.AbsenceByCharacteristic], FilterItemName.School_Type__Total)
+
+                                            }
+                                        },
                                         Label = "Unauthorised absence rate",
-                                        Unit = "%",
                                         Colour = "#4763a5",
                                         Symbol = ChartLineSymbol.circle,
                                         LineStyle = ChartLineStyle.solid
                                     },
-                                [$"{Indicator(SubjectIds[SubjectName.AbsenceByCharacteristic], IndicatorName.Overall_absence_rate)}_{FItem(SubjectIds[SubjectName.AbsenceByCharacteristic], FilterItemName.Characteristic__Total)}_{FItem(SubjectIds[SubjectName.AbsenceByCharacteristic], FilterItemName.School_Type__Total)}_____"]
-                                    = new ChartLabelConfiguration
+                                    new ChartLegendItem
                                     {
+                                        DataSet = new ChartDataSet
+                                        {
+                                            Indicator = Indicator(SubjectIds[SubjectName.AbsenceByCharacteristic], IndicatorName.Overall_absence_rate),
+                                            Filters = new List<Guid>
+                                            {
+                                                FItem(SubjectIds[SubjectName.AbsenceByCharacteristic], FilterItemName.Characteristic__Total),
+                                                FItem(SubjectIds[SubjectName.AbsenceByCharacteristic], FilterItemName.School_Type__Total)
+                                            },
+                                        },
                                         Label = "Overall absence rate",
-                                        Unit = "%",
                                         Colour = "#f5a450",
                                         Symbol = ChartLineSymbol.cross,
                                         LineStyle = ChartLineStyle.solid
                                     },
-                                [$"{Indicator(SubjectIds[SubjectName.AbsenceByCharacteristic], IndicatorName.Authorised_absence_rate)}_{FItem(SubjectIds[SubjectName.AbsenceByCharacteristic], FilterItemName.Characteristic__Total)}_{FItem(SubjectIds[SubjectName.AbsenceByCharacteristic], FilterItemName.School_Type__Total)}_____"]
-                                    = new ChartLabelConfiguration
+                                    new ChartLegendItem
                                     {
+                                        DataSet = new ChartDataSet
+                                        {
+                                            Indicator = Indicator(SubjectIds[SubjectName.AbsenceByCharacteristic], IndicatorName.Authorised_absence_rate),
+                                            Filters = new List<Guid>
+                                            {
+                                                FItem(SubjectIds[SubjectName.AbsenceByCharacteristic], FilterItemName.Characteristic__Total),
+                                                FItem(SubjectIds[SubjectName.AbsenceByCharacteristic], FilterItemName.School_Type__Total)
+                                            },
+                                        },
                                         Label = "Authorised absence rate",
-                                        Unit = "%",
                                         Colour = "#005ea5",
                                         Symbol = ChartLineSymbol.diamond,
                                         LineStyle = ChartLineStyle.solid
+
                                     }
-                            },
-                            Legend = new ChartLegend
-                            {
-                                Position = ChartLegendPosition.top
+                                }
                             }
                         }
                     }
@@ -972,39 +922,60 @@ namespace GovUk.Education.ExploreEducationStatistics.Content.Model.Database
                                     Title = "Absence Rate"
                                 }
                             },
-                            Labels = new Dictionary<string, ChartLabelConfiguration>
+                            Legend = new ChartLegend
                             {
-                                [$"{Indicator(SubjectIds[SubjectName.AbsenceByCharacteristic], IndicatorName.Unauthorised_absence_rate)}_{FItem(SubjectIds[SubjectName.AbsenceByCharacteristic], FilterItemName.Characteristic__Total)}_{FItem(SubjectIds[SubjectName.AbsenceByCharacteristic], FilterItemName.School_Type__Total)}_____"]
-                                    = new ChartLabelConfiguration
+                                Position = ChartLegendPosition.top,
+                                Items = new List<ChartLegendItem>
+                                {
+                                    new ChartLegendItem
                                     {
+                                        DataSet = new ChartDataSet
+                                        {
+                                            Indicator = Indicator(SubjectIds[SubjectName.AbsenceByCharacteristic], IndicatorName.Unauthorised_absence_rate),
+                                            Filters = new List<Guid>
+                                            {
+                                                FItem(SubjectIds[SubjectName.AbsenceByCharacteristic], FilterItemName.Characteristic__Total),
+                                                FItem(SubjectIds[SubjectName.AbsenceByCharacteristic], FilterItemName.School_Type__Total)
+                                            }
+                                        },
                                         Label = "Unauthorised absence rate",
-                                        Unit = "%",
                                         Colour = "#4763a5",
                                         Symbol = ChartLineSymbol.circle,
                                         LineStyle = ChartLineStyle.solid
                                     },
-                                [$"{Indicator(SubjectIds[SubjectName.AbsenceByCharacteristic], IndicatorName.Overall_absence_rate)}_{FItem(SubjectIds[SubjectName.AbsenceByCharacteristic], FilterItemName.Characteristic__Total)}_{FItem(SubjectIds[SubjectName.AbsenceByCharacteristic], FilterItemName.School_Type__Total)}_____"]
-                                    = new ChartLabelConfiguration
+                                    new ChartLegendItem
                                     {
+                                        DataSet = new ChartDataSet
+                                        {
+                                            Indicator = Indicator(SubjectIds[SubjectName.AbsenceByCharacteristic], IndicatorName.Overall_absence_rate),
+                                            Filters = new List<Guid>
+                                            {
+                                                FItem(SubjectIds[SubjectName.AbsenceByCharacteristic], FilterItemName.Characteristic__Total),
+                                                FItem(SubjectIds[SubjectName.AbsenceByCharacteristic], FilterItemName.School_Type__Total)
+                                            }
+                                        },
                                         Label = "Overall absence rate",
-                                        Unit = "%",
                                         Colour = "#f5a450",
                                         Symbol = ChartLineSymbol.cross,
                                         LineStyle = ChartLineStyle.solid
                                     },
-                                [$"{Indicator(SubjectIds[SubjectName.AbsenceByCharacteristic], IndicatorName.Authorised_absence_rate)}_{FItem(SubjectIds[SubjectName.AbsenceByCharacteristic], FilterItemName.Characteristic__Total)}_{FItem(SubjectIds[SubjectName.AbsenceByCharacteristic], FilterItemName.School_Type__Total)}_____"]
-                                    = new ChartLabelConfiguration
+                                    new ChartLegendItem
                                     {
+                                        DataSet = new ChartDataSet
+                                        {
+                                            Indicator = Indicator(SubjectIds[SubjectName.AbsenceByCharacteristic], IndicatorName.Authorised_absence_rate),
+                                            Filters = new List<Guid>
+                                            {
+                                                FItem(SubjectIds[SubjectName.AbsenceByCharacteristic], FilterItemName.Characteristic__Total),
+                                                FItem(SubjectIds[SubjectName.AbsenceByCharacteristic], FilterItemName.School_Type__Total)
+                                            }
+                                        },
                                         Label = "Authorised absence rate",
-                                        Unit = "%",
                                         Colour = "#005ea5",
                                         Symbol = ChartLineSymbol.diamond,
                                         LineStyle = ChartLineStyle.solid
                                     }
-                            },
-                            Legend = new ChartLegend
-                            {
-                                Position = ChartLegendPosition.top
+                                }
                             }
                         }
                     }
