@@ -471,7 +471,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin
                     context.Database.SetCommandTimeout(int.MaxValue);
                     context.Database.Migrate();
 
-                    ApplyCustomMigrations(new EES1598RemoveChartLabelsField(context));
+                    ApplyCustomMigrations();
                 }
             }
         }
