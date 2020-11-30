@@ -1,15 +1,17 @@
 using System;
 using System.Linq;
-using System.Threading;
+using System.Threading.Tasks;
 using AutoMapper;
 using GovUk.Education.ExploreEducationStatistics.Common.Model;
 using GovUk.Education.ExploreEducationStatistics.Content.Model.Database;
+using GovUk.Education.ExploreEducationStatistics.Data.Importer.Utils;
 using GovUk.Education.ExploreEducationStatistics.Data.Model;
 using GovUk.Education.ExploreEducationStatistics.Data.Model.Database;
 using GovUk.Education.ExploreEducationStatistics.Data.Processor.Model;
 using GovUk.Education.ExploreEducationStatistics.Data.Processor.Models;
 using GovUk.Education.ExploreEducationStatistics.Data.Processor.Services.Interfaces;
 using Microsoft.EntityFrameworkCore;
+using Microsoft.Extensions.Logging;
 using Publication = GovUk.Education.ExploreEducationStatistics.Data.Model.Publication;
 using Release = GovUk.Education.ExploreEducationStatistics.Data.Model.Release;
 using Theme = GovUk.Education.ExploreEducationStatistics.Data.Model.Theme;
@@ -20,19 +22,22 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Processor.Services
     public class ReleaseProcessorService : IReleaseProcessorService
     {
         private readonly IMapper _mapper;
+        private readonly ILogger<ReleaseProcessorService> _logger;
 
-        public ReleaseProcessorService(IMapper mapper)
+        public ReleaseProcessorService(IMapper mapper, ILogger<ReleaseProcessorService> logger)
         {
             _mapper = mapper;
+            _logger = logger;
         }
 
         public Subject CreateOrUpdateRelease(SubjectData subjectData, ImportMessage message,
             StatisticsDbContext statisticsDbContext, ContentDbContext contentDbContext)
         {
-            // Avoid potential collisions
-            Thread.Sleep(new Random().Next(1, 5) * 1000);
+            var theme = CreateOrUpdateTheme(message, statisticsDbContext).Result;
+            var topic = CreateOrUpdateTopic(message, statisticsDbContext, theme).Result;
+            var publication = CreateOrUpdatePublication(message, statisticsDbContext, topic).Result;
+            var release = CreateOrUpdateRelease(message, statisticsDbContext, publication).Result;
 
-            var release = CreateOrUpdateRelease(message, statisticsDbContext);
             RemoveSubjectIfExisting(message, statisticsDbContext);
 
             var subject = CreateSubject(message.SubjectId,
@@ -129,102 +134,119 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Processor.Services
             return newSubject;
         }
 
-        private Release CreateOrUpdateRelease(ImportMessage message, StatisticsDbContext statisticsDbContext)
+        private Task<Release> CreateOrUpdateRelease(ImportMessage message,
+            StatisticsDbContext statisticsDbContext, Publication publication)
         {
-            Release release;
-
-            if (!statisticsDbContext.Release.Any(r => r.Id.Equals(message.Release.Id)))
-            {
-                release = new Release
-                {
-                    Id = message.Release.Id,
-                    Slug = message.Release.Slug,
-                    Publication = CreateOrUpdatePublication(message, statisticsDbContext),
-                    TimeIdentifier = message.Release.TimeIdentifier,
-                    Year = message.Release.Year,
-                    PreviousVersionId = message.Release.PreviousVersionId
-                };
-
-                release = statisticsDbContext.Release.Add(release).Entity;
-            }
-            else
-            {
-                release = _mapper.Map(message.Release, (Release) null);
-                release = statisticsDbContext.Release.Update(release).Entity;
-            }
-            statisticsDbContext.SaveChanges();
-            return release;
+            return CreateOrUpdateWithExclusiveLock(
+                $"Release {message.Release.Slug} (for Publication \"{message.Release.Publication.Title}\")",
+                statisticsDbContext,
+                message.Release,
+                message.Release.Id,
+                new Release
+                    {
+                        Id = message.Release.Id,
+                        Slug = message.Release.Slug,
+                        Publication = publication,
+                        TimeIdentifier = message.Release.TimeIdentifier,
+                        Year = message.Release.Year,
+                        PreviousVersionId = message.Release.PreviousVersionId
+                    });
         }
 
-        private Publication CreateOrUpdatePublication(ImportMessage message, StatisticsDbContext statisticsDbContext)
+        private Task<Publication> CreateOrUpdatePublication(ImportMessage message,
+            StatisticsDbContext statisticsDbContext, Topic topic)
         {
-            Publication publication;
-
-            if (!statisticsDbContext.Publication.Any(p => p.Id.Equals(message.Release.Publication.Id)))
-            {
-                publication = new Publication
-                {
-                    Id = message.Release.Publication.Id,
-                    Title = message.Release.Publication.Title,
-                    Slug = message.Release.Publication.Slug,
-                    Topic = CreateOrUpdateTopic(message, statisticsDbContext)
-                };
-                publication = statisticsDbContext.Publication.Add(publication).Entity;
-            }
-            else
-            {
-                publication = _mapper.Map(message.Release.Publication, (Publication) null);
-                publication = statisticsDbContext.Publication.Update(publication).Entity;
-            }
-            statisticsDbContext.SaveChanges();
-            return publication;
+            return CreateOrUpdateWithExclusiveLock(
+                message.Release.Publication.Title,
+                statisticsDbContext,
+                message.Release.Publication,
+                message.Release.Publication.Id,
+                new Publication
+                    {
+                        Id = message.Release.Publication.Id,
+                        Title = message.Release.Publication.Title,
+                        Slug = message.Release.Publication.Slug,
+                        Topic = topic
+                    });
         }
 
-        private Topic CreateOrUpdateTopic(ImportMessage message, StatisticsDbContext statisticsDbContext)
+        private Task<Topic> CreateOrUpdateTopic(ImportMessage message, StatisticsDbContext statisticsDbContext,
+            Theme theme)
         {
-            Topic topic;
-
-            if (!statisticsDbContext.Topic.Any(t => t.Id.Equals(message.Release.Publication.Topic.Id)))
-            {
-                topic = new Topic
-                {
-                    Id = message.Release.Publication.Topic.Id,
-                    Title = message.Release.Publication.Topic.Title,
-                    Slug = message.Release.Publication.Topic.Slug,
-                    Theme = CreateOrUpdateTheme(message, statisticsDbContext)
-                };
-                topic = statisticsDbContext.Topic.Add(topic).Entity;
-            }
-            else
-            {
-                topic = _mapper.Map(message.Release.Publication.Topic, (Topic) null);
-                topic = statisticsDbContext.Topic.Update(topic).Entity;
-            }
-            statisticsDbContext.SaveChanges();
-            return topic;
+            return CreateOrUpdateWithExclusiveLock(
+                message.Release.Publication.Topic.Title,
+                statisticsDbContext,
+                message.Release.Publication.Topic,
+                message.Release.Publication.Topic.Id,
+                new Topic
+                    {
+                        Id = message.Release.Publication.Topic.Id,
+                        Title = message.Release.Publication.Topic.Title,
+                        Slug = message.Release.Publication.Topic.Slug,
+                        Theme = theme
+                    });
         }
 
-        private Theme CreateOrUpdateTheme(ImportMessage message, StatisticsDbContext statisticsDbContext)
+        private Task<Theme> CreateOrUpdateTheme(ImportMessage message, StatisticsDbContext statisticsDbContext)
         {
-            Theme theme;
-            if (!statisticsDbContext.Theme
-                .Any(t => t.Id.Equals(message.Release.Publication.Topic.Theme.Id)))
-            {
-                theme = new Theme
+            return CreateOrUpdateWithExclusiveLock(
+                message.Release.Publication.Topic.Theme.Title,
+                statisticsDbContext,
+                message.Release.Publication.Topic.Theme,
+                message.Release.Publication.Topic.Theme.Id,
+                new Theme 
                 {
                     Id = message.Release.Publication.Topic.Theme.Id,
                     Slug = message.Release.Publication.Topic.Theme.Slug,
                     Title = message.Release.Publication.Topic.Theme.Title
-                };
-                theme = statisticsDbContext.Theme.Add(theme).Entity;
-            }
-            else
+                });
+        }
+        
+        /**
+         * This method allows for a concurrency-safe pattern to check for the existence of a given entity and, if it
+         * does not exist to create it, or if it does exist, to update it.
+         *
+         * This is concurrency-safe as it ensures that any two concurrent importer processes that are trying to create
+         * or update the same entity type with the same ID will not be able to do so at the same time.  Rather, the
+         * first thread to reach this code will acquire a lock and prevent the second thread from being able to check
+         * for the existence of the entity until the first thread has finished creating it.  At this point, the second
+         * thread is freed up to check if the entity already exists, which by this point, it will.
+         */
+        private Task<TEntity> CreateOrUpdateWithExclusiveLock<TEntity, TMessageObject>(
+            string entityName,
+            StatisticsDbContext statisticsDbContext,
+            TMessageObject objectFromMessage,
+            Guid entityId,
+            TEntity entityToCreate)
+            where TEntity : class 
+            where TMessageObject : class
+        {
+            var typeName = typeof(TEntity).Name;
+            
+            return DbUtils.ExecuteWithExclusiveLock(
+                statisticsDbContext, 
+                $"CreateOrUpdate{typeName}-{entityId}", 
+                async (context) =>
             {
-                theme = _mapper.Map(message.Release.Publication.Topic.Theme, (Theme) null);
-                theme = statisticsDbContext.Theme.Update(theme).Entity;
-            }
-            statisticsDbContext.SaveChanges();
-            return theme;
+                _logger.LogInformation(
+                    $"Checking for existence of {typeName} \"{entityName}\"");
+
+                var existing = await statisticsDbContext.Set<TEntity>().FindAsync(entityId);
+                
+                if (existing == null)
+                {
+                    _logger.LogInformation($"Creating {typeName} \"{entityName}\"");
+                    TEntity created = (await statisticsDbContext.Set<TEntity>().AddAsync(entityToCreate)).Entity;
+                    await statisticsDbContext.SaveChangesAsync();
+                    return created;
+                }
+                
+                _logger.LogInformation($"{typeName} \"{entityName}\" already exists - updating");
+                TEntity mappedEntity = _mapper.Map(objectFromMessage, existing);
+                TEntity updated = statisticsDbContext.Set<TEntity>().Update(mappedEntity).Entity;
+                await statisticsDbContext.SaveChangesAsync();
+                return updated;
+            });
         }
     }
 }

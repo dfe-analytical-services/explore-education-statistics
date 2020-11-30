@@ -1,4 +1,5 @@
 using System;
+using System.Text.RegularExpressions;
 using GovUk.Education.ExploreEducationStatistics.Common.Extensions;
 using GovUk.Education.ExploreEducationStatistics.Common.Model;
 
@@ -171,6 +172,19 @@ namespace GovUk.Education.ExploreEducationStatistics.Common.Services
         public static string PublicReleaseDirectoryPath(string publicationSlug, string releaseSlug)
         {
             return $"{publicationSlug}/{releaseSlug}/";
+        }
+
+        /**
+         * Given a Release ID and a data file's original filename, this method will check to see if the fullFilePath
+         * given represents a batch file for that data file.
+         */
+        public static bool IsBatchFileForDataFile(Guid releaseId, string originalDataFileName, string fullFilePath)
+        {
+            var folderPath = Regex.Escape(AdminReleaseBatchesDirectoryPath(releaseId));
+            var dataFileName = Regex.Escape(originalDataFileName);
+            var batchFileRegex = new Regex(@$"^{folderPath}{dataFileName}_\d{{6}}$");
+
+            return batchFileRegex.IsMatch(fullFilePath);
         }
         
         private static string AppendPathSeparator(string segment = null)

@@ -121,10 +121,10 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Processor.Services
         {
             if (message.NumBatches > 1)
             {
-                await _fileStorageService.DeleteBatchFile(releaseId.ToString(), message.DataFileName);
+                await _fileStorageService.DeleteBatchFile(releaseId, message.DataFileName);
             }
 
-            var numBatchesRemaining = await _fileStorageService.GetNumBatchesRemaining(releaseId.ToString(), message.OrigDataFileName);
+            var numBatchesRemaining = await _fileStorageService.GetNumBatchesRemaining(releaseId, message.OrigDataFileName);
             
             var import = await _importStatusService.GetImportStatus(releaseId, message.OrigDataFileName);
 

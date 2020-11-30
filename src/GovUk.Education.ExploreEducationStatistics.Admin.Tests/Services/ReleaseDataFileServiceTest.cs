@@ -90,11 +90,37 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
             importService.Setup(mock => mock.RemoveImportTableRowIfExists(release.Id, "data.csv"))
                 .Returns(Task.CompletedTask);
 
+            // test that the deletion of the main data and metadata files completed, as well as any zip files that 
+            // were uploaded
             blobStorageService.Setup(mock =>
                     mock.DeleteBlob(PrivateFilesContainerName, It.IsIn(
                         AdminReleasePath(release.Id, ReleaseFileTypes.Data, "data.csv"),
                         AdminReleasePath(release.Id, ReleaseFileTypes.Data, "data.meta.csv"),
                         AdminReleasePath(release.Id, ReleaseFileTypes.DataZip, "data.zip"))))
+                .Returns(Task.CompletedTask);
+
+            // set up the returning of batch files, both for this data file being deleted and others not being
+            // deleted too
+            blobStorageService
+                .Setup(mock =>
+                    mock.ListBlobs(PrivateFilesContainerName, AdminReleaseBatchesDirectoryPath(release.Id)))
+                .ReturnsAsync(new List<BlobInfo>
+                {
+                    new BlobInfo($"{AdminReleaseBatchesDirectoryPath(release.Id)}data.csv_000001", "", "", 0, null),
+                    new BlobInfo($"{AdminReleaseBatchesDirectoryPath(release.Id)}data.csv_000002", "", "", 0, null),
+                    new BlobInfo($"{AdminReleaseBatchesDirectoryPath(release.Id)}another_data_file.csv_000001", "", "", 0, null),
+                    new BlobInfo($"{AdminReleaseBatchesDirectoryPath(release.Id)}another_data_file.csv_000002", "", "", 0, null),
+                });
+            
+            // test that the deletion of any remaining batch files went ahead and that it only affected batch files 
+            // for this particular data file
+            blobStorageService
+                .Setup(mock => 
+                    mock.DeleteBlob(PrivateFilesContainerName, $"{AdminReleaseBatchesDirectoryPath(release.Id)}data.csv_000001"))
+                .Returns(Task.CompletedTask);
+            blobStorageService
+                .Setup(mock => 
+                    mock.DeleteBlob(PrivateFilesContainerName, $"{AdminReleaseBatchesDirectoryPath(release.Id)}data.csv_000002"))
                 .Returns(Task.CompletedTask);
 
             await using (var contentDbContext = InMemoryApplicationDbContext(contentDbContextId))
@@ -107,19 +133,8 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
                 var result = await service.Delete(release.Id, releaseDataFile.ReleaseFileReference.Id);
 
                 Assert.True(result.IsRight);
-
-                blobStorageService.Verify(mock =>
-                    mock.DeleteBlob(PrivateFilesContainerName,
-                        AdminReleasePath(release.Id, ReleaseFileTypes.Data, "data.csv")), Times.Once());
-                blobStorageService.Verify(mock =>
-                    mock.DeleteBlob(PrivateFilesContainerName,
-                        AdminReleasePath(release.Id, ReleaseFileTypes.Metadata, "data.meta.csv")), Times.Once());
-                blobStorageService.Verify(mock =>
-                    mock.DeleteBlob(PrivateFilesContainerName,
-                        AdminReleasePath(release.Id, ReleaseFileTypes.DataZip, "data.zip")), Times.Once());
-
-                importService.Verify(mock =>
-                    mock.RemoveImportTableRowIfExists(release.Id, "data.csv"), Times.Once());
+                
+                MockUtils.VerifyAllMocks(blobStorageService, importService);
             }
 
             await using (var contentDbContext = InMemoryApplicationDbContext(contentDbContextId))
@@ -191,6 +206,11 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
                         AdminReleasePath(release.Id, ReleaseFileTypes.Data, "Data 1.meta.csv"))))
                 .Returns(Task.CompletedTask);
 
+            blobStorageService
+                .Setup(mock =>
+                    mock.ListBlobs(PrivateFilesContainerName, AdminReleaseBatchesDirectoryPath(release.Id)))
+                .ReturnsAsync(new List<BlobInfo>());
+            
             await using (var contentDbContext = InMemoryApplicationDbContext(contentDbContextId))
             {
                 var service = SetupReleaseDataFileService(
@@ -201,16 +221,8 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
                 var result = await service.Delete(release.Id, releaseDataFile.ReleaseFileReference.Id);
 
                 Assert.True(result.IsRight);
-
-                blobStorageService.Verify(mock =>
-                    mock.DeleteBlob(PrivateFilesContainerName,
-                        AdminReleasePath(release.Id, ReleaseFileTypes.Data, "Data 1.csv")), Times.Once());
-                blobStorageService.Verify(mock =>
-                    mock.DeleteBlob(PrivateFilesContainerName,
-                        AdminReleasePath(release.Id, ReleaseFileTypes.Metadata, "Data 1.meta.csv")), Times.Once());
-
-                importService.Verify(mock =>
-                    mock.RemoveImportTableRowIfExists(release.Id, "Data 1.csv"), Times.Once());
+                
+                MockUtils.VerifyAllMocks(blobStorageService, importService);
             }
 
             await using (var contentDbContext = InMemoryApplicationDbContext(contentDbContextId))
@@ -338,6 +350,11 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
             blobStorageService.Setup(mock => mock.DeleteBlob(PrivateFilesContainerName, It.IsAny<string>()))
                 .Returns(Task.CompletedTask);
 
+            blobStorageService
+                .Setup(mock =>
+                    mock.ListBlobs(PrivateFilesContainerName, AdminReleaseBatchesDirectoryPath(release.Id)))
+                .ReturnsAsync(new List<BlobInfo>());
+
             await using (var contentDbContext = InMemoryApplicationDbContext(contentDbContextId))
             {
                 var service = SetupReleaseDataFileService(
@@ -348,20 +365,8 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
                 var result = await service.Delete(release.Id, replacementDataFile.Id);
 
                 Assert.True(result.IsRight);
-
-                blobStorageService.Verify(mock =>
-                    mock.DeleteBlob(PrivateFilesContainerName,
-                        AdminReleasePath(release.Id, ReleaseFileTypes.Data, "replacement.csv")), Times.Once());
-                blobStorageService.Verify(mock =>
-                        mock.DeleteBlob(PrivateFilesContainerName,
-                            AdminReleasePath(release.Id, ReleaseFileTypes.Metadata, "replacement.meta.csv")),
-                    Times.Once());
-                blobStorageService.Verify(mock =>
-                    mock.DeleteBlob(PrivateFilesContainerName,
-                        AdminReleasePath(release.Id, ReleaseFileTypes.DataZip, "replacement.zip")), Times.Once());
-
-                importService.Verify(mock =>
-                    mock.RemoveImportTableRowIfExists(release.Id, replacementDataFile.Filename), Times.Once());
+                
+                MockUtils.VerifyAllMocks(blobStorageService, importService);
             }
 
             await using (var contentDbContext = InMemoryApplicationDbContext(contentDbContextId))
@@ -469,6 +474,11 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
             var blobStorageService = new Mock<IBlobStorageService>(MockBehavior.Strict);
             var importService = new Mock<IImportService>(MockBehavior.Strict);
 
+            blobStorageService
+                .Setup(mock =>
+                    mock.ListBlobs(PrivateFilesContainerName, AdminReleaseBatchesDirectoryPath(amendmentRelease.Id)))
+                .ReturnsAsync(new List<BlobInfo>());
+
             await using (var contentDbContext = InMemoryApplicationDbContext(contentDbContextId))
             {
                 var service = SetupReleaseDataFileService(
@@ -479,6 +489,8 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
                 var result = await service.Delete(amendmentRelease.Id, dataFile.Id);
 
                 Assert.True(result.IsRight);
+                
+                MockUtils.VerifyAllMocks(blobStorageService, importService);
             }
 
             await using (var contentDbContext = InMemoryApplicationDbContext(contentDbContextId))
@@ -582,6 +594,11 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
             blobStorageService.Setup(mock => mock.DeleteBlob(PrivateFilesContainerName, It.IsAny<string>()))
                 .Returns(Task.CompletedTask);
 
+            blobStorageService
+                .Setup(mock =>
+                    mock.ListBlobs(PrivateFilesContainerName, AdminReleaseBatchesDirectoryPath(release.Id)))
+                .ReturnsAsync(new List<BlobInfo>());
+
             await using (var contentDbContext = InMemoryApplicationDbContext(contentDbContextId))
             {
                 var service = SetupReleaseDataFileService(
@@ -592,19 +609,8 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
                 var result = await service.DeleteAll(release.Id);
 
                 Assert.True(result.IsRight);
-
-                blobStorageService.Verify(mock =>
-                    mock.DeleteBlob(PrivateFilesContainerName,
-                        AdminReleasePath(release.Id, ReleaseFileTypes.Data, "data.csv")), Times.Once());
-                blobStorageService.Verify(mock =>
-                    mock.DeleteBlob(PrivateFilesContainerName,
-                        AdminReleasePath(release.Id, ReleaseFileTypes.Metadata, "data.meta.csv")), Times.Once());
-                blobStorageService.Verify(mock =>
-                    mock.DeleteBlob(PrivateFilesContainerName,
-                        AdminReleasePath(release.Id, ReleaseFileTypes.DataZip, "data.zip")), Times.Once());
-
-                importService.Verify(mock =>
-                    mock.RemoveImportTableRowIfExists(release.Id, "data.csv"), Times.Once());
+                
+                MockUtils.VerifyAllMocks(blobStorageService, importService);
             }
 
             await using (var contentDbContext = InMemoryApplicationDbContext(contentDbContextId))
@@ -709,11 +715,10 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
             var blobStorageService = new Mock<IBlobStorageService>(MockBehavior.Strict);
             var importService = new Mock<IImportService>(MockBehavior.Strict);
 
-            importService.Setup(mock => mock.RemoveImportTableRowIfExists(release.Id, "data.csv"))
-                .Returns(Task.CompletedTask);
-
-            blobStorageService.Setup(mock => mock.DeleteBlob(PrivateFilesContainerName, It.IsAny<string>()))
-                .Returns(Task.CompletedTask);
+            blobStorageService
+                .Setup(mock =>
+                    mock.ListBlobs(PrivateFilesContainerName, AdminReleaseBatchesDirectoryPath(amendmentRelease.Id)))
+                .ReturnsAsync(new List<BlobInfo>());
 
             await using (var contentDbContext = InMemoryApplicationDbContext(contentDbContextId))
             {
@@ -725,6 +730,8 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
                 var result = await service.DeleteAll(amendmentRelease.Id);
 
                 Assert.True(result.IsRight);
+                
+                MockUtils.VerifyAllMocks(blobStorageService, importService);
             }
 
             await using (var contentDbContext = InMemoryApplicationDbContext(contentDbContextId))
@@ -790,6 +797,8 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
                 var result = await service.DeleteAll(release.Id);
 
                 Assert.True(result.IsRight);
+                
+                MockUtils.VerifyAllMocks(blobStorageService, importService);
             }
         }
 
@@ -2250,6 +2259,8 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
                 Assert.Equal(0, result.Right.Rows);
                 Assert.Equal("1 Mb", result.Right.Size);
                 Assert.Equal(IStatus.QUEUED, result.Right.Status);
+                
+                MockUtils.VerifyAllMocks(blobStorageService, importService);
             }
 
             await using (var context = InMemoryApplicationDbContext(contextId))
