@@ -130,9 +130,9 @@ user creates approved methodology
     user waits until h1 is visible  Manage methodologies
     user waits until page contains element  id:approved-methodologies-tab
     user clicks element  id:approved-methodologies-tab
-    ${is_approved}=  run keyword and return status  user checks page contains element  xpath://section[@id="approved-methodologies"]//a[text()="${title}"]
+    ${is_approved}=  run keyword and return status  user waits until page contains element  xpath://section[@id="approved-methodologies"]//a[text()="${title}"]  1
     user clicks element  id:draft-methodologies-tab
-    ${is_draft}=  run keyword and return status  user checks page contains element  xpath://section[@id="draft-methodologies"]//a[text()="${title}"]
+    ${is_draft}=  run keyword and return status  user waits until page contains element  xpath://section[@id="draft-methodologies"]//a[text()="${title}"]  1
     run keyword if  ${is_approved} == False and ${is_draft} == False  run keywords
     ...  user creates methodology  ${title}
     ...  AND    user approves methodology  ${title}
