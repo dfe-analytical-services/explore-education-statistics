@@ -46,7 +46,7 @@ const Page = ({
       />
       <PageHeader />
 
-      {router.pathname.includes(
+      {router.asPath.includes(
         'find-statistics/attendance-in-education-and-early-years-settings-during-the-coronavirus-covid-19-outbreak',
       ) && (
         <TemporaryNotice
