@@ -18,7 +18,6 @@ ${CREATED_THEME_NAME}  UI test theme - create publication %{RUN_IDENTIFIER}
 ${CREATED_TOPIC_NAME}  UI test topic - create publication %{RUN_IDENTIFIER}
 
 *** Keywords ***
-
 teardown suite
     run keyword if  "${CREATED_THEME_ID}" != ""  user deletes theme via api  ${CREATED_THEME_ID}
     user closes the browser
