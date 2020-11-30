@@ -1,6 +1,6 @@
-import { testTableData } from '@admin/pages/release/datablocks/components/__tests__/__data__/testTableData';
-import ChartLegendConfiguration from '@admin/pages/release/datablocks/components/ChartLegendConfiguration';
-import { ChartBuilderForms } from '@admin/pages/release/datablocks/components/types/chartBuilderForms';
+import { testTableData } from '@admin/pages/release/datablocks/components/chart/__tests__/__data__/testTableData';
+import ChartLegendConfiguration from '@admin/pages/release/datablocks/components/chart/ChartLegendConfiguration';
+import { ChartBuilderForms } from '@admin/pages/release/datablocks/components/chart/types/chartBuilderForms';
 import { lineChartBlockDefinition } from '@common/modules/charts/components/LineChartBlock';
 import { DataSetConfiguration } from '@common/modules/charts/types/dataSet';
 import { LegendConfiguration } from '@common/modules/charts/types/legend';

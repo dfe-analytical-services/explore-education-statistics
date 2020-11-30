@@ -4,7 +4,7 @@ import {
   ChartBuilderState,
   ChartOptions,
   useChartBuilderReducer,
-} from '@admin/pages/release/datablocks/reducers/chartBuilderReducer';
+} from '@admin/pages/release/datablocks/components/chart/reducers/chartBuilderReducer';
 import { lineChartBlockDefinition } from '@common/modules/charts/components/LineChartBlock';
 import {
   AxisConfiguration,

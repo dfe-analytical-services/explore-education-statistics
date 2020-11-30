@@ -1,4 +1,4 @@
-import { FormState } from '@admin/pages/release/datablocks/reducers/chartBuilderReducer';
+import { FormState } from '@admin/pages/release/datablocks/components/chart/reducers/chartBuilderReducer';
 
 export interface ChartBuilderForm extends FormState {
   title: string;

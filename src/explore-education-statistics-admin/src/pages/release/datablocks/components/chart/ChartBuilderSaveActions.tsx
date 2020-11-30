@@ -1,4 +1,4 @@
-import { ChartBuilderForms } from '@admin/pages/release/datablocks/components/types/chartBuilderForms';
+import { ChartBuilderForms } from '@admin/pages/release/datablocks/components/chart/types/chartBuilderForms';
 import Button from '@common/components/Button';
 import ButtonGroup from '@common/components/ButtonGroup';
 import ErrorSummary from '@common/components/ErrorSummary';

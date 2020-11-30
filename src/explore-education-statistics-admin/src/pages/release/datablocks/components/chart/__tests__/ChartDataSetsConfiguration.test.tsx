@@ -1,5 +1,5 @@
-import ChartDataSetsConfiguration from '@admin/pages/release/datablocks/components/ChartDataSetsConfiguration';
-import { ChartBuilderForms } from '@admin/pages/release/datablocks/components/types/chartBuilderForms';
+import ChartDataSetsConfiguration from '@admin/pages/release/datablocks/components/chart/ChartDataSetsConfiguration';
+import { ChartBuilderForms } from '@admin/pages/release/datablocks/components/chart/types/chartBuilderForms';
 import { DataSet } from '@common/modules/charts/types/dataSet';
 import { LocationFilter } from '@common/modules/table-tool/types/filters';
 import { FullTableMeta } from '@common/modules/table-tool/types/fullTable';

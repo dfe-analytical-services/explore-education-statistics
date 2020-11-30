@@ -1,7 +1,7 @@
-import ChartBuilderSaveActions from '@admin/pages/release/datablocks/components/ChartBuilderSaveActions';
-import styles from '@admin/pages/release/datablocks/components/ChartDataSetsConfiguration.module.scss';
-import { ChartBuilderForms } from '@admin/pages/release/datablocks/components/types/chartBuilderForms';
-import generateDataSetLabel from '@admin/pages/release/datablocks/utils/generateDataSetLabel';
+import ChartBuilderSaveActions from '@admin/pages/release/datablocks/components/chart/ChartBuilderSaveActions';
+import styles from '@admin/pages/release/datablocks/components/chart/ChartDataSetsConfiguration.module.scss';
+import { ChartBuilderForms } from '@admin/pages/release/datablocks/components/chart/types/chartBuilderForms';
+import generateDataSetLabel from '@admin/pages/release/datablocks/components/chart/utils/generateDataSetLabel';
 import Button from '@common/components/Button';
 import ButtonText from '@common/components/ButtonText';
 import { Form, FormFieldSelect, FormSelect } from '@common/components/form';

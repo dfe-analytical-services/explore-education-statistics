@@ -1,15 +1,15 @@
 import useGetChartFile from '@admin/hooks/useGetChartFile';
-import ChartAxisConfiguration from '@admin/pages/release/datablocks/components/ChartAxisConfiguration';
-import ChartBuilderPreview from '@admin/pages/release/datablocks/components/ChartBuilderPreview';
-import ChartConfiguration from '@admin/pages/release/datablocks/components/ChartConfiguration';
-import ChartDataSetsConfiguration from '@admin/pages/release/datablocks/components/ChartDataSetsConfiguration';
-import ChartDefinitionSelector from '@admin/pages/release/datablocks/components/ChartDefinitionSelector';
-import ChartLegendConfiguration from '@admin/pages/release/datablocks/components/ChartLegendConfiguration';
-import { ChartBuilderForms } from '@admin/pages/release/datablocks/components/types/chartBuilderForms';
+import ChartAxisConfiguration from '@admin/pages/release/datablocks/components/chart/ChartAxisConfiguration';
+import ChartBuilderPreview from '@admin/pages/release/datablocks/components/chart/ChartBuilderPreview';
+import ChartConfiguration from '@admin/pages/release/datablocks/components/chart/ChartConfiguration';
+import ChartDataSetsConfiguration from '@admin/pages/release/datablocks/components/chart/ChartDataSetsConfiguration';
+import ChartDefinitionSelector from '@admin/pages/release/datablocks/components/chart/ChartDefinitionSelector';
+import ChartLegendConfiguration from '@admin/pages/release/datablocks/components/chart/ChartLegendConfiguration';
 import {
   ChartOptions,
   useChartBuilderReducer,
-} from '@admin/pages/release/datablocks/reducers/chartBuilderReducer';
+} from '@admin/pages/release/datablocks/components/chart/reducers/chartBuilderReducer';
+import { ChartBuilderForms } from '@admin/pages/release/datablocks/components/chart/types/chartBuilderForms';
 import Button from '@common/components/Button';
 import ModalConfirm from '@common/components/ModalConfirm';
 import Tabs from '@common/components/Tabs';

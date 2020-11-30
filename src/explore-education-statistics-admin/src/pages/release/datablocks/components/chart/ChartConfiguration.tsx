@@ -1,9 +1,9 @@
-import ChartBuilderSaveActions from '@admin/pages/release/datablocks/components/ChartBuilderSaveActions';
-import { ChartBuilderForms } from '@admin/pages/release/datablocks/components/types/chartBuilderForms';
+import ChartBuilderSaveActions from '@admin/pages/release/datablocks/components/chart/ChartBuilderSaveActions';
 import {
   ChartOptions,
   FormState,
-} from '@admin/pages/release/datablocks/reducers/chartBuilderReducer';
+} from '@admin/pages/release/datablocks/components/chart/reducers/chartBuilderReducer';
+import { ChartBuilderForms } from '@admin/pages/release/datablocks/components/chart/types/chartBuilderForms';
 import Effect from '@common/components/Effect';
 import { Form, FormFieldSelect, FormGroup } from '@common/components/form';
 import FormFieldCheckbox from '@common/components/form/FormFieldCheckbox';

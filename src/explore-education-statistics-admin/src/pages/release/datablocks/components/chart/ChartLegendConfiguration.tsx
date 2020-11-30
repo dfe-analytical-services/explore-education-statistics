@@ -1,7 +1,7 @@
-import ChartBuilderSaveActions from '@admin/pages/release/datablocks/components/ChartBuilderSaveActions';
-import styles from '@admin/pages/release/datablocks/components/ChartLegendConfiguration.module.scss';
-import { ChartBuilderForms } from '@admin/pages/release/datablocks/components/types/chartBuilderForms';
-import { FormState } from '@admin/pages/release/datablocks/reducers/chartBuilderReducer';
+import ChartBuilderSaveActions from '@admin/pages/release/datablocks/components/chart/ChartBuilderSaveActions';
+import styles from '@admin/pages/release/datablocks/components/chart/ChartLegendConfiguration.module.scss';
+import { FormState } from '@admin/pages/release/datablocks/components/chart/reducers/chartBuilderReducer';
+import { ChartBuilderForms } from '@admin/pages/release/datablocks/components/chart/types/chartBuilderForms';
 import Effect from '@common/components/Effect';
 import {
   Form,

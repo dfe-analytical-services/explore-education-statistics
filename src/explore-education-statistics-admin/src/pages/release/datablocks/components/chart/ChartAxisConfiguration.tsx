@@ -1,7 +1,7 @@
-import styles from '@admin/pages/release/datablocks/components/ChartAxisConfiguration.module.scss';
-import ChartBuilderSaveActions from '@admin/pages/release/datablocks/components/ChartBuilderSaveActions';
-import { ChartBuilderForms } from '@admin/pages/release/datablocks/components/types/chartBuilderForms';
-import { FormState } from '@admin/pages/release/datablocks/reducers/chartBuilderReducer';
+import styles from '@admin/pages/release/datablocks/components/chart/ChartAxisConfiguration.module.scss';
+import ChartBuilderSaveActions from '@admin/pages/release/datablocks/components/chart/ChartBuilderSaveActions';
+import { FormState } from '@admin/pages/release/datablocks/components/chart/reducers/chartBuilderReducer';
+import { ChartBuilderForms } from '@admin/pages/release/datablocks/components/chart/types/chartBuilderForms';
 import Button from '@common/components/Button';
 import Effect from '@common/components/Effect';
 import {
@@ -38,7 +38,7 @@ import mapValues from 'lodash/mapValues';
 import merge from 'lodash/merge';
 import pick from 'lodash/pick';
 import React, { ReactNode, useCallback, useMemo, useState } from 'react';
-import { ObjectSchema, Schema } from 'yup';
+import { ObjectSchema } from 'yup';
 
 type FormValues = Partial<OmitStrict<AxisConfiguration, 'dataSets' | 'type'>>;
 

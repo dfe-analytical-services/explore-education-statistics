@@ -1,4 +1,4 @@
-import styles from '@admin/pages/release/datablocks/components/ChartBuilder.module.scss';
+import styles from '@admin/pages/release/datablocks/components/chart/ChartBuilder.module.scss';
 import Details from '@common/components/Details';
 import LoadingSpinner from '@common/components/LoadingSpinner';
 import useDebouncedEffect from '@common/hooks/useDebouncedEffect';
