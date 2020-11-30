@@ -7,6 +7,7 @@ using GovUk.Education.ExploreEducationStatistics.Admin.Services.Interfaces.Secur
 using GovUk.Education.ExploreEducationStatistics.Admin.ViewModels;
 using GovUk.Education.ExploreEducationStatistics.Common.Extensions;
 using GovUk.Education.ExploreEducationStatistics.Common.Model;
+using GovUk.Education.ExploreEducationStatistics.Common.Model.Chart;
 using GovUk.Education.ExploreEducationStatistics.Common.Model.Data;
 using GovUk.Education.ExploreEducationStatistics.Common.Model.Data.Query;
 using GovUk.Education.ExploreEducationStatistics.Common.Services.Interfaces.Security;
@@ -571,7 +572,17 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Services
             dataBlock.Query.SubjectId = replacementSubjectId;
             ReplaceDataBlockQueryFilters(replacementPlan, dataBlock);
             ReplaceDataBlockQueryIndicators(replacementPlan, dataBlock);
-            ReplaceDataBlockTableHeaders(replacementPlan, dataBlock);
+
+            var filterItemTargets = replacementPlan.Filters
+                .SelectMany(filter =>
+                    filter.Value.Groups.SelectMany(group => group.Value.Filters))
+                .ToDictionary(plan => plan.Id, plan => plan.TargetValue);
+            var indicatorTargets = replacementPlan.IndicatorGroups
+                .SelectMany(group => group.Value.Indicators)
+                .ToDictionary(plan => plan.Id, plan => plan.TargetValue);
+
+            ReplaceDataBlockTableHeaders(filterItemTargets, indicatorTargets, dataBlock);
+            ReplaceDataBlockCharts(filterItemTargets, indicatorTargets, dataBlock);
         }
 
         private static void ReplaceDataBlockQueryFilters(DataBlockReplacementPlanViewModel replacementPlan,
@@ -609,18 +620,12 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Services
             dataBlock.Query.Indicators = indicators;
         }
 
-        private static void ReplaceDataBlockTableHeaders(DataBlockReplacementPlanViewModel replacementPlan,
+        private static void ReplaceDataBlockTableHeaders(
+            Dictionary<Guid, Guid> filterItemTargets,
+            Dictionary<Guid, Guid> indicatorTargets,
             DataBlock dataBlock)
         {
             var tableHeaders = dataBlock.Table.TableHeaders;
-
-            var filterItemTargets = replacementPlan.Filters
-                .SelectMany(filter =>
-                    filter.Value.Groups.SelectMany(group => group.Value.Filters))
-                .ToDictionary(plan => plan.Id, plan => plan.TargetValue);
-            var indicatorTargets = replacementPlan.IndicatorGroups
-                .SelectMany(group => group.Value.Indicators)
-                .ToDictionary(plan => plan.Id, plan => plan.TargetValue);
 
             ReplaceDataBlockTableHeaders(
                 tableHeaders.Columns.FilterByType(TableHeaderType.Filter), dataBlock, filterItemTargets);
@@ -674,6 +679,57 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Services
                         $"Expected Guid for dataBlock {dataBlock.Id} {tableHeader.Type} table header value but found: {tableHeader.Value}");
                 }
             }
+        }
+
+        private static void ReplaceDataBlockCharts(
+            Dictionary<Guid, Guid> filterItemTargets,
+            Dictionary<Guid, Guid> indicatorTargets,
+            DataBlock dataBlock)
+        {
+            dataBlock.Charts.ForEach(
+                chart =>
+                {
+                    ReplaceChartMajorAxisDataSets(filterItemTargets, indicatorTargets, dataBlock, chart);
+                    // TODO: EES-1319 Replace legend data sets
+                }
+            );
+        }
+
+        private static void ReplaceChartMajorAxisDataSets(
+            Dictionary<Guid, Guid> filterItemTargets,
+            Dictionary<Guid, Guid> indicatorTargets,
+            DataBlock dataBlock,
+            IChart chart)
+        {
+            chart.Axes?["major"]?.DataSets.ForEach(
+                dataSet =>
+                {
+                    dataSet.Filters = dataSet.Filters.Select(
+                        filter =>
+                        {
+                            if (filterItemTargets.TryGetValue(filter, out var targetFilterId))
+                            {
+                                return targetFilterId;
+                            }
+
+                            throw new InvalidOperationException(
+                                $"Expected target replacement value for dataBlock {dataBlock.Id} chart data set filter: {filter}"
+                            );
+                        }
+                    ).ToList();
+
+                    if (indicatorTargets.TryGetValue(dataSet.Indicator, out var targetIndicatorId))
+                    {
+                        dataSet.Indicator = targetIndicatorId;
+                    }
+                    else
+                    {
+                        throw new InvalidOperationException(
+                            $"Expected target replacement value for dataBlock {dataBlock.Id} chart data set indicator: {dataSet.Indicator}"
+                        );
+                    }
+                }
+            );
         }
 
         private async Task ReplaceLinksForFootnote(FootnoteReplacementPlanViewModel replacementPlan,
