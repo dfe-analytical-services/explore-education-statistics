@@ -5,13 +5,6 @@ import React from 'react';
 import NationalStats from './__data__/content.api.response.national.stats.json';
 import OfficialStats from './__data__/content.api.response.official.stats.json';
 
-jest.mock('next/router', () => {
-  return {
-    push: () => {},
-    prefetch: () => {},
-  };
-});
-
 describe('PublicationReleasePage', () => {
   test('renders national statistics image', () => {
     const { container } = render(
