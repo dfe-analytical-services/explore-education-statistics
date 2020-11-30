@@ -4,12 +4,19 @@ import styles from './TemporaryNotice.module.scss';
 
 interface Props {
   children: ReactNode;
-  expires?: Date;
+  start?: Date;
+  end?: Date;
   wide?: boolean;
 }
 
-const TemporaryNotice = ({ children, expires, wide }: Props) => {
-  if (expires && new Date() > expires) {
+const TemporaryNotice = ({ children, start, end, wide }: Props) => {
+  const now = new Date();
+
+  if (start && now < start) {
+    return null;
+  }
+
+  if (end && now > end) {
     return null;
   }
 
