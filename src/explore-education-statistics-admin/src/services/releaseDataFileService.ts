@@ -70,7 +70,8 @@ export type ImportStatusCode =
   | 'STAGE_3'
   | 'STAGE_4'
   | 'NOT_FOUND'
-  | 'FAILED';
+  | 'FAILED'
+  | 'CANCELLED';
 
 export interface DataFileImportStatus {
   status: ImportStatusCode;
