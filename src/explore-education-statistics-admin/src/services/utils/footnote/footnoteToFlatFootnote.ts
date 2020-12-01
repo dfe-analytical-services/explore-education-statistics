@@ -11,51 +11,48 @@ interface FlatFootnote {
 }
 
 const footnoteToFlatFootnote = (footnote: BaseFootnote): FlatFootnote => {
-  const subjects: string[] = [];
-  const indicatorGroups: string[] = [];
-  let indicators: string[] = [];
-  const filters: string[] = [];
-  const filterGroups: string[] = [];
-  let filterItems: string[] = [];
+  const flatFootnote: FlatFootnote = {
+    ...footnote,
+    subjects: [],
+    indicators: [],
+    indicatorGroups: [],
+    filters: [],
+    filterItems: [],
+    filterGroups: [],
+  };
 
-  Object.entries(footnote.subjects).map(([subjectId, subject]) => {
+  Object.entries(footnote.subjects).forEach(([subjectId, subject]) => {
     if (subject.selected) {
-      return subjects.push(subjectId);
+      flatFootnote.subjects.push(subjectId);
     }
-    Object.entries(subject.indicatorGroups).map(
+
+    Object.entries(subject.indicatorGroups).forEach(
       ([indicatorGroupId, indicatorGroup]) => {
         if (indicatorGroup.selected) {
-          return indicatorGroups.push(indicatorGroupId);
+          flatFootnote.indicatorGroups.push(indicatorGroupId);
+        } else {
+          flatFootnote.indicators.push(...indicatorGroup.indicators);
         }
-        indicators = [...indicators, ...indicatorGroup.indicators];
-        return null;
       },
     );
-    return Object.entries(subject.filters).map(([filterId, filter]) => {
-      if (filter.selected) {
-        return filters.push(filterId);
-      }
-      return Object.entries(filter.filterGroups).map(
-        ([filterGroupId, filterGroup]) => {
-          if (filterGroup.selected) {
-            return filterGroups.push(filterGroupId);
-          }
 
-          filterItems = [...filterItems, ...filterGroup.filterItems];
-          return null;
-        },
-      );
+    Object.entries(subject.filters).forEach(([filterId, filter]) => {
+      if (filter.selected) {
+        flatFootnote.filters.push(filterId);
+      } else {
+        Object.entries(filter.filterGroups).forEach(
+          ([filterGroupId, filterGroup]) => {
+            if (filterGroup.selected) {
+              flatFootnote.filterGroups.push(filterGroupId);
+            } else {
+              flatFootnote.filterItems.push(...filterGroup.filterItems);
+            }
+          },
+        );
+      }
     });
   });
 
-  return {
-    ...footnote,
-    subjects,
-    indicatorGroups,
-    indicators,
-    filters,
-    filterGroups,
-    filterItems,
-  };
+  return flatFootnote;
 };
 export default footnoteToFlatFootnote;
