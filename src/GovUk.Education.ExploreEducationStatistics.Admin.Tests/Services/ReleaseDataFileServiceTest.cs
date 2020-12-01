@@ -4,7 +4,6 @@ using System.IO;
 using System.Linq;
 using System.Reflection;
 using System.Threading.Tasks;
-using GovUk.Education.ExploreEducationStatistics.Admin.Extensions;
 using GovUk.Education.ExploreEducationStatistics.Admin.Services;
 using GovUk.Education.ExploreEducationStatistics.Admin.Services.Interfaces;
 using GovUk.Education.ExploreEducationStatistics.Common.Extensions;
@@ -15,6 +14,7 @@ using GovUk.Education.ExploreEducationStatistics.Common.Services.Interfaces.Secu
 using GovUk.Education.ExploreEducationStatistics.Common.Utils;
 using GovUk.Education.ExploreEducationStatistics.Content.Model;
 using GovUk.Education.ExploreEducationStatistics.Content.Model.Database;
+using GovUk.Education.ExploreEducationStatistics.Content.Model.Extensions;
 using GovUk.Education.ExploreEducationStatistics.Data.Model;
 using GovUk.Education.ExploreEducationStatistics.Data.Model.Database;
 using Microsoft.AspNetCore.Http;
@@ -109,10 +109,10 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
                     mock.ListBlobs(PrivateFilesContainerName, AdminReleaseBatchesDirectoryPath(release.Id)))
                 .ReturnsAsync(new List<BlobInfo>
                 {
-                    new BlobInfo($"{AdminReleaseBatchesDirectoryPath(release.Id)}data.csv_000001", "", "", 0, null),
-                    new BlobInfo($"{AdminReleaseBatchesDirectoryPath(release.Id)}data.csv_000002", "", "", 0, null),
-                    new BlobInfo($"{AdminReleaseBatchesDirectoryPath(release.Id)}another_data_file.csv_000001", "", "", 0, null),
-                    new BlobInfo($"{AdminReleaseBatchesDirectoryPath(release.Id)}another_data_file.csv_000002", "", "", 0, null),
+                    new BlobInfo($"{AdminReleaseBatchesDirectoryPath(release.Id)}data.csv_000001", "", "", 0, new Dictionary<string, string>()),
+                    new BlobInfo($"{AdminReleaseBatchesDirectoryPath(release.Id)}data.csv_000002", "", "", 0, new Dictionary<string, string>()),
+                    new BlobInfo($"{AdminReleaseBatchesDirectoryPath(release.Id)}another_data_file.csv_000001", "", "", 0, new Dictionary<string, string>()),
+                    new BlobInfo($"{AdminReleaseBatchesDirectoryPath(release.Id)}another_data_file.csv_000002", "", "", 0, new Dictionary<string, string>())
                 });
             
             // test that the deletion of any remaining batch files went ahead and that it only affected batch files 
@@ -136,6 +136,16 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
                 var result = await service.Delete(release.Id, releaseDataFile.ReleaseFileReference.Id);
 
                 Assert.True(result.IsRight);
+
+                blobStorageService.Verify(mock =>
+                    mock.DeleteBlob(PrivateFilesContainerName, releaseDataFile.Path()), Times.Once());
+                blobStorageService.Verify(mock =>
+                    mock.DeleteBlob(PrivateFilesContainerName, releaseMetaFile.Path()), Times.Once());
+                blobStorageService.Verify(mock =>
+                    mock.DeleteBlob(PrivateFilesContainerName, zipFile.Path()), Times.Once());
+
+                importService.Verify(mock =>
+                    mock.RemoveImportTableRowIfExists(release.Id, "data.csv"), Times.Once());
 
                 MockUtils.VerifyAllMocks(blobStorageService, importService);
             }
@@ -747,12 +757,6 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
             var blobStorageService = new Mock<IBlobStorageService>(MockBehavior.Strict);
             var importService = new Mock<IImportService>(MockBehavior.Strict);
 
-            importService.Setup(mock => mock.RemoveImportTableRowIfExists(release.Id, "data.csv"))
-                .Returns(Task.CompletedTask);
-
-            blobStorageService.Setup(mock => mock.DeleteBlob(PrivateFilesContainerName, It.IsAny<string>()))
-                .Returns(Task.CompletedTask);
-
             blobStorageService
                 .Setup(mock =>
                     mock.ListBlobs(PrivateFilesContainerName, AdminReleaseBatchesDirectoryPath(amendmentRelease.Id)))
@@ -807,6 +811,8 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
 
                 Assert.True(result.IsLeft);
                 Assert.IsType<NotFoundResult>(result.Left);
+
+                MockUtils.VerifyAllMocks(blobStorageService, importService);
             }
         }
 
@@ -941,6 +947,8 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
 
                 Assert.True(result.IsRight);
 
+                MockUtils.VerifyAllMocks(blobStorageService, importStatusService);
+
                 var fileInfo = result.Right;
 
                 Assert.Equal(dataFile.Id, fileInfo.Id);
@@ -1060,6 +1068,8 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
                 );
 
                 Assert.True(result.IsRight);
+
+                MockUtils.VerifyAllMocks(blobStorageService, importStatusService);
 
                 var fileInfo = result.Right;
 
@@ -1242,6 +1252,8 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
 
                 Assert.True(result.IsRight);
 
+                MockUtils.VerifyAllMocks(blobStorageService);
+
                 var fileInfo = result.Right;
 
                 Assert.Equal(dataFile.Id, fileInfo.Id);
@@ -1361,6 +1373,8 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
 
                 Assert.True(result.IsRight);
 
+                MockUtils.VerifyAllMocks(blobStorageService, importStatusService);
+
                 var fileInfo = result.Right;
 
                 Assert.Equal(dataFile.Id, fileInfo.Id);
@@ -1438,7 +1452,6 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
                 await contentDbContext.SaveChangesAsync();
             }
 
-
             await using (var statisticsDbContext = InMemoryStatisticsDbContext(statisticsDbContextId))
             {
                 await statisticsDbContext.AddAsync(subject);
@@ -1488,12 +1501,15 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
                     blobStorageService: blobStorageService.Object,
                     importStatusService: importStatusService.Object
                 );
+
                 var result = await service.GetInfo(
                     amendedRelease.Id,
                     dataFile.Id
                 );
 
                 Assert.True(result.IsRight);
+
+                MockUtils.VerifyAllMocks(blobStorageService, importStatusService);
 
                 var fileInfo = result.Right;
 
@@ -1663,9 +1679,12 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
                     blobStorageService: blobStorageService.Object,
                     importStatusService: importStatusService.Object
                 );
+
                 var result = await service.ListAll(release.Id);
 
                 Assert.True(result.IsRight);
+
+                MockUtils.VerifyAllMocks(blobStorageService, importStatusService);
 
                 var files = result.Right.ToList();
 
@@ -1830,6 +1849,8 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
 
                 Assert.True(result.IsRight);
 
+                MockUtils.VerifyAllMocks(blobStorageService, importStatusService);
+
                 var files = result.Right.ToList();
 
                 Assert.Single(files);
@@ -1991,6 +2012,8 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
 
                 Assert.True(result.IsRight);
 
+                MockUtils.VerifyAllMocks(blobStorageService, importStatusService);
+
                 var files = result.Right.ToList();
 
                 Assert.Single(files);
@@ -2078,6 +2101,8 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
 
                 Assert.True(result.IsRight);
 
+                MockUtils.VerifyAllMocks(blobStorageService);
+
                 var files = result.Right.ToList();
 
                 Assert.Single(files);
@@ -2104,14 +2129,14 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
             {
                 Release = release,
                 Filename = "test-data-archive.zip",
-                ReleaseFileType = DataZip,
+                ReleaseFileType = DataZip
             };
             var dataFile = new ReleaseFileReference
             {
                 Release = release,
                 Filename = "test-data.csv",
                 ReleaseFileType = ReleaseFileTypes.Data,
-                Source = zipFile,
+                Source = zipFile
             };
 
             var contentDbContextId = Guid.NewGuid().ToString();
@@ -2194,6 +2219,8 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
                 var result = await service.ListAll(release.Id);
 
                 Assert.True(result.IsRight);
+
+                MockUtils.VerifyAllMocks(blobStorageService, importStatusService);
 
                 var files = result.Right.ToList();
 
@@ -2322,7 +2349,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
 
                 Assert.True(result.IsRight);
 
-                MockUtils.VerifyAllMocks(blobStorageService, importService);
+                MockUtils.VerifyAllMocks(blobStorageService, fileUploadsValidatorService, importService);
 
                 Assert.True(result.Right.Id.HasValue);
                 Assert.Equal(subjectName, result.Right.Name);
@@ -2416,10 +2443,6 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
             await using (var statisticsDbContext = InMemoryStatisticsDbContext(statisticsDbContextId))
             {
                 fileUploadsValidatorService
-                    .Setup(s => s.ValidateSubjectName(release.Id, subject.Name))
-                    .ReturnsAsync(Unit.Instance);
-
-                fileUploadsValidatorService
                     .Setup(s => s.ValidateDataFilesForUpload(
                         release.Id,
                         dataFormFile,
@@ -2498,6 +2521,8 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
                     replacingFileId: originalDataFileReference.Id);
 
                 Assert.True(result.IsRight);
+
+                MockUtils.VerifyAllMocks(blobStorageService, fileUploadsValidatorService, importService);
 
                 Assert.True(result.Right.Id.HasValue);
                 Assert.Equal("Test data", result.Right.Name);
@@ -2650,6 +2675,9 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
                     subjectName: subjectName);
 
                 Assert.True(result.IsRight);
+
+                MockUtils.VerifyAllMocks(blobStorageService, dataArchiveValidationService, fileUploadsValidatorService,
+                    importService);
 
                 Assert.True(result.Right.Id.HasValue);
                 Assert.Equal(subjectName, result.Right.Name);
@@ -2815,6 +2843,9 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
 
                 Assert.True(result.IsRight);
 
+                MockUtils.VerifyAllMocks(blobStorageService, dataArchiveValidationService, fileUploadsValidatorService, 
+                    importService);
+                
                 Assert.True(result.Right.Id.HasValue);
                 Assert.Equal("Test data", result.Right.Name);
                 Assert.Equal(dataFileName, result.Right.FileName);

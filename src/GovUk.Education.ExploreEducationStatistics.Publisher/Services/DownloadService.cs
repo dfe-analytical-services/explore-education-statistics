@@ -1,6 +1,8 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Linq;
+using System.Threading.Tasks;
+using GovUk.Education.ExploreEducationStatistics.Common.Extensions;
 using GovUk.Education.ExploreEducationStatistics.Common.Model;
 using GovUk.Education.ExploreEducationStatistics.Content.Model;
 using GovUk.Education.ExploreEducationStatistics.Content.Model.Database;
@@ -13,62 +15,64 @@ namespace GovUk.Education.ExploreEducationStatistics.Publisher.Services
     public class DownloadService : IDownloadService
     {
         private readonly ContentDbContext _context;
-        private readonly IFileStorageService _fileStorageService;
         private readonly IReleaseService _releaseService;
 
         public DownloadService(ContentDbContext context,
-            IFileStorageService fileStorageService,
             IReleaseService releaseService)
         {
             _context = context;
-            _fileStorageService = fileStorageService;
             _releaseService = releaseService;
         }
 
-        public IEnumerable<ThemeTree<PublicationDownloadTreeNode>> GetTree(IEnumerable<Guid> includedReleaseIds)
+        public async Task<IEnumerable<ThemeTree<PublicationDownloadTreeNode>>> GetTree(IEnumerable<Guid> includedReleaseIds)
         {
-            return _context.Themes
+            var themes = await _context.Themes
                 .Include(theme => theme.Topics)
                 .ThenInclude(topic => topic.Publications)
                 .ThenInclude(publication => publication.Releases)
-                .ToList()
+                .ToListAsync();
+
+            var trees = await themes
                 .Where(theme => IsThemePublished(theme, includedReleaseIds))
-                .Select(theme => BuildThemeTree(theme, includedReleaseIds))
-                .OrderBy(theme => theme.Title)
-                .ToList();
+                .SelectAsync(async theme => await BuildThemeTree(theme, includedReleaseIds));
+            return trees.OrderBy(theme => theme.Title);
         }
 
-        private ThemeTree<PublicationDownloadTreeNode> BuildThemeTree(Theme theme, IEnumerable<Guid> includedReleaseIds)
+        private async Task<ThemeTree<PublicationDownloadTreeNode>> BuildThemeTree(Theme theme,
+            IEnumerable<Guid> includedReleaseIds)
         {
+            var topics = await theme.Topics
+                .Where(topic => IsTopicPublished(topic, includedReleaseIds))
+                .SelectAsync(topic => BuildTopicTree(topic, includedReleaseIds));
+
             return new ThemeTree<PublicationDownloadTreeNode>
             {
                 Id = theme.Id,
                 Title = theme.Title,
                 Summary = theme.Summary,
-                Topics = theme.Topics
-                    .Where(topic => IsTopicPublished(topic, includedReleaseIds))
-                    .Select(topic => BuildTopicTree(topic, includedReleaseIds))
-                    .OrderBy(topic => topic.Title)
-                    .ToList()
+                Topics = topics.OrderBy(topic => topic.Title).ToList()
             };
         }
 
-        private TopicTree<PublicationDownloadTreeNode> BuildTopicTree(Topic topic, IEnumerable<Guid> includedReleaseIds)
+        private async Task<TopicTree<PublicationDownloadTreeNode>> BuildTopicTree(Topic topic, IEnumerable<Guid> includedReleaseIds)
         {
+            var publications = await topic.Publications
+                .Where(publication => IsPublicationPublished(publication, includedReleaseIds))
+                .SelectAsync(async publication => await BuildPublicationNode(publication, includedReleaseIds));
+
             return new TopicTree<PublicationDownloadTreeNode>
             {
                 Id = topic.Id,
                 Title = topic.Title,
-                Publications = topic.Publications
-                    .Where(publication => IsPublicationPublished(publication, includedReleaseIds))
-                    .Select(publication => BuildPublicationNode(publication, includedReleaseIds))
+                Publications = publications
                     .Where(publicationTree => publicationTree.DownloadFiles.Any())
                     .OrderBy(publication => publication.Title)
                     .ToList()
             };
         }
 
-        private PublicationDownloadTreeNode BuildPublicationNode(Publication publication, IEnumerable<Guid> includedReleaseIds)
+        private async Task <PublicationDownloadTreeNode> BuildPublicationNode(Publication publication,
+            IEnumerable<Guid> includedReleaseIds)
         {
             var releases = publication.Releases
                 .Where(r => IsReleasePublished(r, includedReleaseIds))
@@ -82,16 +86,16 @@ namespace GovUk.Education.ExploreEducationStatistics.Publisher.Services
                 Title = publication.Title,
                 Summary = publication.Summary,
                 Slug = publication.Slug,
-                DownloadFiles = GetDownloadFiles(publication, includedReleaseIds).ToList(),
+                DownloadFiles = await GetDownloadFiles(publication, includedReleaseIds),
                 EarliestReleaseTime = releases.FirstOrDefault()?.Title,
                 LatestReleaseTime = releases.LastOrDefault()?.Title
             };
         }
 
-        private IEnumerable<FileInfo> GetDownloadFiles(Publication publication, IEnumerable<Guid> includedReleaseIds)
+        private async Task<List<FileInfo>> GetDownloadFiles(Publication publication, IEnumerable<Guid> includedReleaseIds)
         {
-            var latestRelease = _releaseService.GetLatestRelease(publication.Id, includedReleaseIds);
-            return _fileStorageService.ListPublicFiles(publication.Slug, latestRelease.Slug).Result;
+            var latestRelease = await _releaseService.GetLatestRelease(publication.Id, includedReleaseIds);
+            return await _releaseService.GetDownloadFiles(latestRelease);
         }
 
         private static bool IsThemePublished(Theme theme, IEnumerable<Guid> includedReleaseIds)

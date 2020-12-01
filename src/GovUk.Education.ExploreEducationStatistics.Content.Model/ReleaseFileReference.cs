@@ -19,6 +19,23 @@ namespace GovUk.Education.ExploreEducationStatistics.Content.Model
 
         public ReleaseFileTypes ReleaseFileType { get; set; }
 
+        public string BlobStorageName
+        {
+            get
+            {
+                // Ideally all blob storage files should be
+                // saved by ID instead of file name to
+                // prevent naming collisions.
+                // Remove this BlobStorageName field and use Id when all types are migrated
+                if (ReleaseFileType == ReleaseFileTypes.Ancillary || ReleaseFileType == ReleaseFileTypes.Chart)
+                {
+                    return Id.ToString();
+                }
+
+                return Filename;
+            }
+        }
+
         public Guid? ReplacedById { get; set; }
         public ReleaseFileReference ReplacedBy { get; set; }
 

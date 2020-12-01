@@ -6,6 +6,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Common.Extensions
 {
     public static class BlobInfoExtensions
     {
+        public const string FilenameKey = BlobInfo.FilenameKey;
         public const string NameKey = BlobInfo.NameKey;
         public const string NumberOfRowsKey = "NumberOfRows";
         public const string UserNameKey = "userName";
@@ -42,19 +43,6 @@ namespace GovUk.Education.ExploreEducationStatistics.Common.Extensions
             }
 
             return false;
-        }
-
-        public static FileInfo ToFileInfo(this BlobInfo blobInfo, ReleaseFileTypes fileType, string filename, Guid? id = null)
-        {
-            return new FileInfo
-            {
-                Id = id,
-                FileName = filename,
-                Name = blobInfo.Name,
-                Path = blobInfo.Path,
-                Size = blobInfo.Size,
-                Type = fileType
-            };
         }
 
         public static string GetMetaFileName(this BlobInfo blob)

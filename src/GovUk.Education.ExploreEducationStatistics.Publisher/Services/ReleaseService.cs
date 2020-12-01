@@ -64,7 +64,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Publisher.Services
                 .ToListAsync();
         }
 
-        public CachedReleaseViewModel GetReleaseViewModel(Guid id, PublishContext context)
+        public async Task<CachedReleaseViewModel> GetReleaseViewModel(Guid id, PublishContext context)
         {
             var release = _contentDbContext.Releases
                 .Include(r => r.Type)
@@ -76,8 +76,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Publisher.Services
                 .Single(r => r.Id == id);
 
             var releaseViewModel = _mapper.Map<CachedReleaseViewModel>(release);
-            releaseViewModel.DownloadFiles =
-                _fileStorageService.ListPublicFiles(release.Publication.Slug, release.Slug).Result.ToList();
+            releaseViewModel.DownloadFiles = await GetDownloadFiles(release);
 
             // If the release isn't live yet set the published date based on what we expect it to be
             releaseViewModel.Published ??= context.Published;
@@ -85,23 +84,25 @@ namespace GovUk.Education.ExploreEducationStatistics.Publisher.Services
             return releaseViewModel;
         }
 
-        public Release GetLatestRelease(Guid publicationId, IEnumerable<Guid> includedReleaseIds)
+        public async Task<Release> GetLatestRelease(Guid publicationId, IEnumerable<Guid> includedReleaseIds)
         {
-            return _contentDbContext.Releases
+            var releases = await _contentDbContext.Releases
                 .Include(r => r.Publication)
                 .Where(release => release.PublicationId == publicationId)
-                .ToList()
+                .ToListAsync();
+
+            return releases
                 .Where(release => IsLatestVersionOfRelease(release.Publication.Releases, release, includedReleaseIds))
                 .OrderBy(release => release.Year)
                 .ThenBy(release => release.TimePeriodCoverage)
                 .LastOrDefault();
         }
 
-        public CachedReleaseViewModel GetLatestReleaseViewModel(Guid publicationId,
+        public async Task<CachedReleaseViewModel> GetLatestReleaseViewModel(Guid publicationId,
             IEnumerable<Guid> includedReleaseIds, PublishContext context)
         {
-            var latestRelease = GetLatestRelease(publicationId, includedReleaseIds);
-            return GetReleaseViewModel(latestRelease.Id, context);
+            var latestRelease = await GetLatestRelease(publicationId, includedReleaseIds);
+            return await GetReleaseViewModel(latestRelease.Id, context);
         }
 
         public async Task SetPublishedDatesAsync(Guid id, DateTime published)
@@ -157,14 +158,29 @@ namespace GovUk.Education.ExploreEducationStatistics.Publisher.Services
             }
         }
 
-        public List<ReleaseFileReference> GetReleaseFileReferences(Guid releaseId, params ReleaseFileTypes[] types)
+        public async Task<List<ReleaseFileReference>> GetFiles(Guid releaseId, params ReleaseFileTypes[] types)
         {
-            return _contentDbContext
+            return await _contentDbContext
                 .ReleaseFiles
                 .Include(rf => rf.ReleaseFileReference)
-                .Where(rfr => rfr.ReleaseId == releaseId)
+                .Where(rf => rf.ReleaseId == releaseId)
                 .Select(rf => rf.ReleaseFileReference)
-                .Where(rfr => types.Contains(rfr.ReleaseFileType))
+                .Where(file => types.Contains(file.ReleaseFileType))
+                .ToListAsync();
+        }
+
+        public async Task<List<FileInfo>> GetDownloadFiles(Release release)
+        {
+            var files = await GetFiles(release.Id, ReleaseFileTypes.Ancillary, ReleaseFileTypes.Data);
+
+            var filesWithInfo = files.Select(async file =>
+                await _fileStorageService.GetPublicFileInfo(
+                    release.Publication.Slug,
+                    release.Slug,
+                    file));
+
+            return (await Task.WhenAll(filesWithInfo))
+                .OrderBy(file => file.Name)
                 .ToList();
         }
 

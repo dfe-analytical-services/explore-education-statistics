@@ -48,7 +48,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Publisher.Services
                 .SingleOrDefaultAsync(p => p.Id == id);
 
             var publicationViewModel = _mapper.Map<CachedPublicationViewModel>(publication);
-            var latestRelease = _releaseService.GetLatestRelease(publication.Id, includedReleaseIds);
+            var latestRelease = await _releaseService.GetLatestRelease(publication.Id, includedReleaseIds);
             publicationViewModel.LatestReleaseId = latestRelease.Id;
             publicationViewModel.Releases = GetReleaseViewModels(id, includedReleaseIds);
             return publicationViewModel;

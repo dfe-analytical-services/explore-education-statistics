@@ -181,7 +181,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Common.Services
                 tempFilePath,
                 new BlobHttpHeaders
                 {
-                    ContentType = file.ContentType,
+                    ContentType = file.ContentType
                 },
                 options?.MetaValues
             );

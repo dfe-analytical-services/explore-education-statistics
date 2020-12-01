@@ -3,7 +3,6 @@ using System.Collections.Generic;
 using System.IO;
 using System.Linq;
 using System.Threading.Tasks;
-using GovUk.Education.ExploreEducationStatistics.Admin.Extensions;
 using GovUk.Education.ExploreEducationStatistics.Admin.Services;
 using GovUk.Education.ExploreEducationStatistics.Admin.Services.Interfaces;
 using GovUk.Education.ExploreEducationStatistics.Common.Extensions;
@@ -13,6 +12,7 @@ using GovUk.Education.ExploreEducationStatistics.Common.Services.Interfaces.Secu
 using GovUk.Education.ExploreEducationStatistics.Common.Utils;
 using GovUk.Education.ExploreEducationStatistics.Content.Model;
 using GovUk.Education.ExploreEducationStatistics.Content.Model.Database;
+using GovUk.Education.ExploreEducationStatistics.Content.Model.Extensions;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
@@ -968,7 +968,8 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
                     contentLength: 0L,
                     meta: new Dictionary<string, string>
                     {
-                        {BlobInfoExtensions.NameKey, "Ancillary Test File 1"},
+                        {BlobInfoExtensions.FilenameKey, "ancillary_1.pdf"},
+                        {BlobInfoExtensions.NameKey, "Ancillary Test File 1"}
                     },
                     created: null));
 
@@ -981,7 +982,8 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
                     contentLength: 0L,
                     meta: new Dictionary<string, string>
                     {
-                        {BlobInfoExtensions.NameKey, "Ancillary Test File 2"},
+                        {BlobInfoExtensions.FilenameKey, "Ancillary 2.pdf"},
+                        {BlobInfoExtensions.NameKey, "Ancillary Test File 2"}
                     },
                     created: null));
 
@@ -992,10 +994,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
                     size: "20 Kb",
                     contentType: "image/png",
                     contentLength: 0L,
-                    meta: new Dictionary<string, string>
-                    {
-                        {BlobInfoExtensions.NameKey, "chart.png"}
-                    },
+                    meta: new Dictionary<string, string>(),
                     created: null));
 
             await using (var contentDbContext = InMemoryApplicationDbContext(contentDbContextId))
@@ -1276,7 +1275,8 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
                         path.Contains(AdminReleaseDirectoryPath(release.Id, Ancillary))),
                     formFile,
                     It.Is<IBlobStorageService.UploadFileOptions>(options =>
-                        options.MetaValues[BlobInfoExtensions.NameKey] == uploadName)
+                        options.MetaValues[BlobInfoExtensions.FilenameKey] == filename
+                        && options.MetaValues[BlobInfoExtensions.NameKey] == uploadName)
                 )).Returns(Task.CompletedTask);
 
             blobStorageService.Setup(mock =>
@@ -1290,6 +1290,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
                     contentLength: 0L,
                     meta: new Dictionary<string, string>
                     {
+                        {BlobInfoExtensions.FilenameKey, filename},
                         {BlobInfoExtensions.NameKey, uploadName}
                     },
                     created: null));
@@ -1317,6 +1318,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
                             path.Contains(AdminReleaseDirectoryPath(release.Id, Ancillary))),
                         formFile,
                         It.Is<IBlobStorageService.UploadFileOptions>(options =>
+                            options.MetaValues[BlobInfoExtensions.FilenameKey] == filename &&
                             options.MetaValues[BlobInfoExtensions.NameKey] == uploadName)
                     ), Times.Once);
 
@@ -1330,7 +1332,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
                 Assert.Equal("pdf", result.Right.Extension);
                 Assert.Equal("ancillary.pdf", result.Right.FileName);
                 Assert.Equal("Ancillary Test File", result.Right.Name);
-                Assert.Equal(filePath, result.Right.Path);
+                Assert.Contains(AdminReleaseDirectoryPath(release.Id, Ancillary), result.Right.Path);
                 Assert.Equal("10 Kb", result.Right.Size);
                 Assert.Equal(Ancillary, result.Right.Type);
             }
@@ -1375,11 +1377,10 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
 
             blobStorageService.Setup(mock =>
                 mock.UploadFile(PrivateFilesContainerName,
-                    It.Is<string>(path => 
+                    It.Is<string>(path =>
                         path.Contains(AdminReleaseDirectoryPath(release.Id, Chart))),
                     formFile,
-                    It.Is<IBlobStorageService.UploadFileOptions>(options =>
-                        options.MetaValues[BlobInfoExtensions.NameKey] == filename)
+                    null
                 )).Returns(Task.CompletedTask);
 
             blobStorageService.Setup(mock =>
@@ -1391,10 +1392,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
                     size: "20 Kb",
                     contentType: "image/png",
                     contentLength: 0L,
-                    meta: new Dictionary<string, string>
-                    {
-                        {BlobInfoExtensions.NameKey, filename}
-                    },
+                    meta: new Dictionary<string, string>(),
                     created: null));
 
             fileUploadsValidatorService.Setup(mock =>
@@ -1419,8 +1417,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
                         It.Is<string>(path => 
                             path.Contains(AdminReleaseDirectoryPath(release.Id, Chart))),
                         formFile,
-                        It.Is<IBlobStorageService.UploadFileOptions>(options =>
-                            options.MetaValues[BlobInfoExtensions.NameKey] == filename)
+                        null
                     ), Times.Once);
 
                 blobStorageService.Verify(mock =>
@@ -1433,7 +1430,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
                 Assert.Equal("png", result.Right.Extension);
                 Assert.Equal("chart.png", result.Right.FileName);
                 Assert.Equal("chart.png", result.Right.Name);
-                Assert.Equal(filePath, result.Right.Path);
+                Assert.Contains(AdminReleaseDirectoryPath(release.Id, Chart), result.Right.Path);
                 Assert.Equal("20 Kb", result.Right.Size);
                 Assert.Equal(Chart, result.Right.Type);
             }

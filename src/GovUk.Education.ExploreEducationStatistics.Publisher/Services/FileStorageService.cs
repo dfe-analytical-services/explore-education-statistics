@@ -9,10 +9,10 @@ using System.Threading.Tasks;
 using Azure.Core;
 using Azure.Storage.Blobs;
 using Azure.Storage.Blobs.Specialized;
-using GovUk.Education.ExploreEducationStatistics.Common.Extensions;
 using GovUk.Education.ExploreEducationStatistics.Common.Model;
 using GovUk.Education.ExploreEducationStatistics.Common.Services.Interfaces;
 using GovUk.Education.ExploreEducationStatistics.Content.Model;
+using GovUk.Education.ExploreEducationStatistics.Content.Model.Extensions;
 using GovUk.Education.ExploreEducationStatistics.Publisher.Models;
 using GovUk.Education.ExploreEducationStatistics.Publisher.Services.Interfaces;
 using ICSharpCode.SharpZipLib.Zip;
@@ -93,7 +93,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Publisher.Services
 
             await _publicBlobStorageService.DeleteBlobs(PublicFilesContainerName, destinationDirectoryPath);
 
-            var referencedReleaseVersions = copyReleaseFilesCommand.ReleaseFileReferences
+            var referencedReleaseVersions = copyReleaseFilesCommand.Files
                 .Select(rfr => rfr.ReleaseId)
                 .Distinct();
 
@@ -160,30 +160,22 @@ namespace GovUk.Education.ExploreEducationStatistics.Publisher.Services
             await _publicBlobStorageService.DeleteBlob(PublicContentContainerName, path);
         }
 
-        public async Task<IEnumerable<FileInfo>> ListPublicFiles(string publication, string release)
+        public async Task<FileInfo> GetPublicFileInfo(string publication, string release, ReleaseFileReference file)
         {
-            var files = new List<FileInfo>();
+            var exists = await _publicBlobStorageService.CheckBlobExists(PublicFilesContainerName,
+                file.PublicPath(publication, release));
 
-            files.AddRange(
-                (await _publicBlobStorageService.ListBlobs(
-                    PublicFilesContainerName,
-                    PublicReleaseDirectoryPath(publication, release, ReleaseFileTypes.Data)
-                ))
-                .Where(blob => !blob.IsMetaDataFile() && blob.IsReleased())
-                .Select(blob => blob.ToFileInfo(ReleaseFileTypes.Data, blob.FileName))
-            );
-            files.AddRange(
-                (await _publicBlobStorageService.ListBlobs(
-                    PublicFilesContainerName,
-                    PublicReleaseDirectoryPath(publication, release, ReleaseFileTypes.Ancillary)
-                ))
-                .Where(blob => blob.IsReleased())
-                .Select(blob => blob.ToFileInfo(ReleaseFileTypes.Ancillary, blob.FileName))
-            );
+            if (!exists)
+            {
+                _logger.LogWarning("Public blob not found for file: {fileId} at: {path}", file.Id,
+                    file.PublicPath(publication, release));
+                return file.ToFileInfoNotFound();
+            }
 
-            return files
-                .OrderBy(f => f.Name)
-                .AsEnumerable();
+            var blob = await _publicBlobStorageService.GetBlob(PublicFilesContainerName,
+                file.PublicPath(publication, release));
+
+            return file.ToPublicFileInfo(blob);
         }
 
         public async Task MovePublicDirectory(string containerName, string sourceDirectoryPath, string destinationDirectoryPath)
@@ -215,7 +207,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Publisher.Services
                         CopyFileUnlessBatchedOrMeta(
                             source,
                             copyReleaseFilesCommand.ReleaseId,
-                            copyReleaseFilesCommand.ReleaseFileReferences),
+                            copyReleaseFilesCommand.Files),
                 }
             );
         }
@@ -245,14 +237,14 @@ namespace GovUk.Education.ExploreEducationStatistics.Publisher.Services
                 return false;
             }
 
-            var name = Path.GetFileName(item.Name);
+            var filename = Path.GetFileName(item.Name);
 
-            if (releaseFileReferences.Exists(rfr => rfr.Id.ToString() == name))
+            if (releaseFileReferences.Exists(file => file.BlobStorageName == filename))
             {
                 return true;
             }
 
-            _logger.LogError($"No release file reference found for releaseId {releaseId} and name: {name}");
+            _logger.LogError($"No ReleaseFileReference found for releaseId: {releaseId} matching filename: {filename}");
             return false;
 
         }

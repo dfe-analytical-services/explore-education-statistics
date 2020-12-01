@@ -105,6 +105,19 @@ namespace GovUk.Education.ExploreEducationStatistics.Common.Extensions
             }
         }
 
+        public static async Task<IEnumerable<TResult>> SelectAsync<TSource, TResult>(
+            this IEnumerable<TSource> source, Func<TSource, Task<TResult>> asyncSelector)
+        {
+            var result = new List<TResult>();
+
+            foreach (var item in source)
+            {
+                result.Add(await asyncSelector(item));
+            }
+
+            return result;
+        }
+        
         /// <summary>
         /// Filter a sequence of elements asynchronously.
         /// </summary>

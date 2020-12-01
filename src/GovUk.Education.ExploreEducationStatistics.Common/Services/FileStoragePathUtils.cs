@@ -154,6 +154,15 @@ namespace GovUk.Education.ExploreEducationStatistics.Common.Services
             AdminReleaseDirectoryPath(releaseId.ToString(), type);
 
         /**
+         * The public file path, for a file of a particular type and id, on a release.
+         */
+        public static string PublicReleasePath(string publicationSlug, string releaseSlug, ReleaseFileTypes type,
+            Guid fileId)
+        {
+            return $"{PublicReleaseDirectoryPath(publicationSlug, releaseSlug, type)}{fileId}";
+        }
+
+        /**
          * The public file path, for a file of a particular type and name, on a release.
          */
         public static string PublicReleasePath(string publicationSlug, string releaseSlug, ReleaseFileTypes type,

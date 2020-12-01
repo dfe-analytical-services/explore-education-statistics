@@ -2,7 +2,6 @@
 using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
-using GovUk.Education.ExploreEducationStatistics.Admin.Extensions;
 using GovUk.Education.ExploreEducationStatistics.Admin.Models;
 using GovUk.Education.ExploreEducationStatistics.Admin.Services.Interfaces;
 using GovUk.Education.ExploreEducationStatistics.Admin.Services.Interfaces.Security;
@@ -14,6 +13,7 @@ using GovUk.Education.ExploreEducationStatistics.Common.Services.Interfaces.Secu
 using GovUk.Education.ExploreEducationStatistics.Common.Utils;
 using GovUk.Education.ExploreEducationStatistics.Content.Model;
 using GovUk.Education.ExploreEducationStatistics.Content.Model.Database;
+using GovUk.Education.ExploreEducationStatistics.Content.Model.Extensions;
 using GovUk.Education.ExploreEducationStatistics.Data.Model.Database;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
@@ -21,6 +21,7 @@ using Microsoft.EntityFrameworkCore;
 using static GovUk.Education.ExploreEducationStatistics.Common.Services.FileStorageUtils;
 using static GovUk.Education.ExploreEducationStatistics.Common.BlobContainerNames;
 using static GovUk.Education.ExploreEducationStatistics.Common.Model.ReleaseFileTypes;
+using static GovUk.Education.ExploreEducationStatistics.Common.Services.FileStoragePathUtils;
 
 namespace GovUk.Education.ExploreEducationStatistics.Admin.Services
 {
@@ -435,7 +436,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Services
                 : (await GetAssociatedReleaseFileReference(file, ReleaseFileTypes.Data)).Filename;
 
             var metaFileReference = file.ReleaseFileType == ReleaseFileTypes.Data
-                ? await GetAssociatedReleaseFileReference(file, ReleaseFileTypes.Metadata)
+                ? await GetAssociatedReleaseFileReference(file, Metadata)
                 : null;
 
             var metaFileName = metaFileReference?.Filename ?? "";
@@ -524,7 +525,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Services
 
             return blobs.Where(blob => IsBatchFileForDataFile(releaseId, originalDataFileName, blob.Path));
         }
-        
+
         private async Task DeleteBatchFiles(Guid releaseId, ReleaseFileReference dataFileReference)
         {
             var batchFiles = await GetBatchFilesForDataFile(releaseId, dataFileReference.Filename);

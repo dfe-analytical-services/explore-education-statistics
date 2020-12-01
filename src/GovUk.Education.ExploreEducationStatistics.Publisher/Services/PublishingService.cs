@@ -36,8 +36,10 @@ namespace GovUk.Education.ExploreEducationStatistics.Publisher.Services
                 PublicationSlug = release.Publication.Slug,
                 PublishScheduled = release.PublishScheduled.Value,
                 ReleaseSlug = release.Slug,
-                ReleaseFileReferences = _releaseService.GetReleaseFileReferences(
-                    releaseId, ReleaseFileTypes.Ancillary, ReleaseFileTypes.Chart, ReleaseFileTypes.Data)
+                Files = await _releaseService.GetFiles(releaseId,
+                    ReleaseFileTypes.Ancillary,
+                    ReleaseFileTypes.Chart,
+                    ReleaseFileTypes.Data)
             };
             await _fileStorageService.CopyReleaseFilesToPublicContainer(copyReleaseCommand);
         }

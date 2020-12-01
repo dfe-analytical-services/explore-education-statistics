@@ -3,7 +3,6 @@ using System.Collections.Generic;
 using System.IO;
 using System.Linq;
 using System.Threading.Tasks;
-using GovUk.Education.ExploreEducationStatistics.Admin.Extensions;
 using GovUk.Education.ExploreEducationStatistics.Admin.Services.Interfaces;
 using GovUk.Education.ExploreEducationStatistics.Admin.Services.Interfaces.Security;
 using GovUk.Education.ExploreEducationStatistics.Common.Model;
@@ -12,6 +11,7 @@ using GovUk.Education.ExploreEducationStatistics.Common.Services.Interfaces.Secu
 using GovUk.Education.ExploreEducationStatistics.Common.Utils;
 using GovUk.Education.ExploreEducationStatistics.Content.Model;
 using GovUk.Education.ExploreEducationStatistics.Content.Model.Database;
+using GovUk.Education.ExploreEducationStatistics.Content.Model.Extensions;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
 using static GovUk.Education.ExploreEducationStatistics.Common.BlobContainerNames;
@@ -121,18 +121,11 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Services
 
                             if (!exists)
                             {
-                                return new FileInfo
-                                {
-                                    Id = file.Id,
-                                    FileName = file.Filename,
-                                    Name = "Unknown",
-                                    Size = "0.00 B",
-                                    Type = file.ReleaseFileType
-                                };
+                                return file.ToFileInfoNotFound();
                             }
 
                             var blob = await _blobStorageService.GetBlob(PrivateFilesContainerName, file.Path());
-                            return blob.ToFileInfo(file.ReleaseFileType, file.Filename, file.Id);
+                            return file.ToFileInfo(blob);
                         });
 
                     return (await Task.WhenAll(filesWithMetadata))
@@ -186,7 +179,10 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Services
                             MetaValues = new Dictionary<string, string>
                             {
                                 {
-                                    NameKey, name
+                                    FilenameKey, file.Filename
+                                },
+                                {
+                                    NameKey, name                                    
                                 }
                             }
                         }
@@ -196,7 +192,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Services
                         PrivateFilesContainerName,
                         file.Path());
 
-                    return blob.ToFileInfo(Ancillary, file.Filename, file.Id);
+                    return file.ToFileInfo(blob);
                 });
         }
 
@@ -223,23 +219,14 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Services
                     await _blobStorageService.UploadFile(
                         containerName: PrivateFilesContainerName,
                         path: file.Path(),
-                        file: formFile,
-                        options: new IBlobStorageService.UploadFileOptions
-                        {
-                            MetaValues = new Dictionary<string, string>
-                            {
-                                {
-                                    NameKey, file.Filename
-                                }
-                            }
-                        }
+                        file: formFile
                     );
 
                     var blob = await _blobStorageService.GetBlob(
                         PrivateFilesContainerName,
                         file.Path());
 
-                    return blob.ToFileInfo(Chart, file.Filename, file.Id);
+                    return file.ToFileInfo(blob);
                 });
         }
     }
