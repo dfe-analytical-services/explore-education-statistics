@@ -690,7 +690,46 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Services
                 chart =>
                 {
                     ReplaceChartMajorAxisDataSets(filterItemTargets, indicatorTargets, dataBlock, chart);
-                    // TODO: EES-1319 Replace legend data sets
+                    ReplaceChartLegendDataSets(filterItemTargets, indicatorTargets, dataBlock, chart);
+                }
+            );
+        }
+
+        private static void ReplaceChartLegendDataSets(
+            Dictionary<Guid, Guid> filterItemTargets,
+            Dictionary<Guid, Guid> indicatorTargets,
+            DataBlock dataBlock,
+            IChart chart)
+        {
+            chart.Legend?.Items.ForEach(
+                item =>
+                {
+                    var dataSet = item.DataSet;
+
+                    dataSet.Filters = dataSet.Filters.Select(
+                        filter =>
+                        {
+                            if (filterItemTargets.TryGetValue(filter, out var targetFilterId))
+                            {
+                                return targetFilterId;
+                            }
+
+                            throw new InvalidOperationException(
+                                $"Expected target replacement value for dataBlock {dataBlock.Id} chart legend data set filter: {filter}"
+                            );
+                        }
+                    ).ToList();
+
+                    if (indicatorTargets.TryGetValue(dataSet.Indicator, out var targetIndicatorId))
+                    {
+                        dataSet.Indicator = targetIndicatorId;
+                    }
+                    else
+                    {
+                        throw new InvalidOperationException(
+                            $"Expected target replacement value for dataBlock {dataBlock.Id} chart legend data set indicator: {dataSet.Indicator}"
+                        );
+                    }
                 }
             );
         }

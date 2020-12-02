@@ -1903,6 +1903,23 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
                                     }
                                 }
                             }
+                        },
+                        Legend = new ChartLegend
+                        {
+                            Items = new List<ChartLegendItem>
+                            {
+                                new ChartLegendItem
+                                {
+                                    DataSet = new ChartDataSet
+                                    {
+                                        Filters = new List<Guid>
+                                        {
+                                            originalFilterItem1.Id
+                                        },
+                                        Indicator = originalIndicator.Id
+                                    }
+                                }
+                            }
                         }
                     }
                 }
@@ -2083,6 +2100,13 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
                 Assert.Single(chartMajorAxis.DataSets[0].Filters);
                 Assert.Equal(replacementFilterItem1.Id, chartMajorAxis.DataSets[0].Filters[0]);
                 Assert.Equal(replacementIndicator.Id, chartMajorAxis.DataSets[0].Indicator);
+
+                var chartLegendItems = replacedDataBlock.Charts[0].Legend?.Items;
+                Assert.NotNull(chartLegendItems);
+                Assert.Single(chartLegendItems);
+                Assert.Single(chartLegendItems[0].DataSet.Filters);
+                Assert.Equal(replacementFilterItem1.Id, chartLegendItems[0].DataSet.Filters[0]);
+                Assert.Equal(replacementIndicator.Id, chartLegendItems[0].DataSet.Indicator);
 
                 var replacedFootnoteForFilter = await GetFootnoteById(statisticsDbContext, footnoteForFilter.Id);
                 Assert.NotNull(replacedFootnoteForFilter);
