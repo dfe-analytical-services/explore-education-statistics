@@ -12,9 +12,11 @@ import { Form, FormFieldCheckbox } from '@common/components/form';
 import FormFieldTextArea from '@common/components/form/FormFieldTextArea';
 import Yup from '@common/validation/yup';
 import { Formik } from 'formik';
+import deepmerge from 'deepmerge';
 import get from 'lodash/get';
+import mapValues from 'lodash/mapValues';
 import orderBy from 'lodash/orderBy';
-import React, { ReactNode } from 'react';
+import React, { ReactNode, useMemo } from 'react';
 
 interface Props {
   cancelButton?: ReactNode;
@@ -31,56 +33,35 @@ const FootnoteForm = ({
   id = 'footnoteForm',
   onSubmit,
 }: Props) => {
-  const getInitialValues = (): BaseFootnote => {
-    /**
-     * This function can be removed once the id's of
-     * filters, filterItems etc. aren't numbers
-     * We can just use the initialValue below.
-     */
-    const initialValue: BaseFootnote = {
-      content: '',
-      subjects: {},
-    };
+  const initialValues = useMemo<BaseFootnote>(() => {
+    const subjects = mapValues(footnoteMeta.subjects, subject => {
+      const { indicators, filters } = subject;
 
-    Object.values(footnoteMeta.subjects).map(subject => {
-      const { subjectId } = subject;
-
-      initialValue.subjects[subjectId] = {
-        indicatorGroups: {},
-        filters: {},
+      return {
         selected: false,
-      };
-      Object.keys(subject.indicators).map(indicatorId => {
-        initialValue.subjects[subjectId].indicatorGroups[`${indicatorId}`] = {
+        indicatorGroups: mapValues(indicators, () => ({
           selected: false,
           indicators: [],
-        };
-        return null;
-      });
-      return Object.entries(subject.filters).map(([filterId, filter]) => {
-        initialValue.subjects[subjectId].filters[`${filterId}`] = {
+        })),
+        filters: mapValues(filters, filter => ({
           selected: false,
-          filterGroups: {},
-        };
-
-        return Object.keys(filter.options).map(filterGroupId => {
-          initialValue.subjects[subjectId].filters[`${filterId}`].filterGroups[
-            `${filterGroupId}`
-          ] = {
+          filterGroups: mapValues(filter.options, () => ({
             selected: false,
             filterItems: [],
-          };
-          return null;
-        });
-      });
+          })),
+        })),
+      };
     });
 
-    return initialValue;
-  };
+    return {
+      content: footnote?.content ?? '',
+      subjects: deepmerge(subjects, footnote?.subjects ?? {}),
+    };
+  }, [footnote, footnoteMeta.subjects]);
 
   return (
     <Formik<BaseFootnote>
-      initialValues={footnote || getInitialValues()}
+      initialValues={initialValues}
       validationSchema={Yup.object<BaseFootnote>({
         content: Yup.string().required('Footnote content must be added.'),
         subjects: Yup.object(),

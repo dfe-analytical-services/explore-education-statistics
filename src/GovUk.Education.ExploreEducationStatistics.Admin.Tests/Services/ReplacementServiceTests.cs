@@ -4,6 +4,7 @@ using System.Linq;
 using System.Threading.Tasks;
 using GovUk.Education.ExploreEducationStatistics.Admin.Services;
 using GovUk.Education.ExploreEducationStatistics.Common.Model;
+using GovUk.Education.ExploreEducationStatistics.Common.Model.Chart;
 using GovUk.Education.ExploreEducationStatistics.Common.Model.Data;
 using GovUk.Education.ExploreEducationStatistics.Common.Model.Data.Query;
 using GovUk.Education.ExploreEducationStatistics.Common.Utils;
@@ -1509,7 +1510,6 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
                 EndYear = 2020,
                 EndCode = CalendarYear
             };
-
             var table = new TableBuilderConfiguration
             {
                 TableHeaders = new TableHeaders
@@ -1598,7 +1598,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
         }
 
         [Fact]
-        public async void Replace()
+        public async Task Replace()
         {
             var originalSubject = new Subject
             {
@@ -1691,7 +1691,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
             var replacementReleaseSubject = new ReleaseSubject
             {
                 Release = statsReleaseVersion2,
-                Subject = replacementSubject, 
+                Subject = replacementSubject,
                 MetaGuidance = null
             };
 
@@ -1837,36 +1837,6 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
                 EndCode = CalendarYear
             };
 
-            var table = new TableBuilderConfiguration
-            {
-                TableHeaders = new TableHeaders
-                {
-                    ColumnGroups = new List<List<TableHeader>>
-                    {
-                        new List<TableHeader>
-                        {
-                            TableHeader.NewLocationHeader(GeographicLevel.Country, CountryCodeEngland)
-                        }
-                    },
-                    Columns = new List<TableHeader>
-                    {
-                        new TableHeader("2019_CY", TableHeaderType.TimePeriod),
-                        new TableHeader("2020_CY", TableHeaderType.TimePeriod)
-                    },
-                    RowGroups = new List<List<TableHeader>>
-                    {
-                        new List<TableHeader>
-                        {
-                            new TableHeader(originalFilterItem1.Id.ToString(), TableHeaderType.Filter)
-                        }
-                    },
-                    Rows = new List<TableHeader>
-                    {
-                        new TableHeader(originalIndicator.Id.ToString(), TableHeaderType.Indicator)
-                    }
-                }
-            };
-
             var dataBlock = new DataBlock
             {
                 Name = "Test DataBlock",
@@ -1881,7 +1851,61 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
                     },
                     TimePeriod = timePeriod
                 },
-                Table = table
+                Table = new TableBuilderConfiguration
+                {
+                    TableHeaders = new TableHeaders
+                    {
+                        ColumnGroups = new List<List<TableHeader>>
+                        {
+                            new List<TableHeader>
+                            {
+                                TableHeader.NewLocationHeader(GeographicLevel.Country, CountryCodeEngland)
+                            }
+                        },
+                        Columns = new List<TableHeader>
+                        {
+                            new TableHeader("2019_CY", TableHeaderType.TimePeriod),
+                            new TableHeader("2020_CY", TableHeaderType.TimePeriod)
+                        },
+                        RowGroups = new List<List<TableHeader>>
+                        {
+                            new List<TableHeader>
+                            {
+                                new TableHeader(originalFilterItem1.Id.ToString(), TableHeaderType.Filter)
+                            }
+                        },
+                        Rows = new List<TableHeader>
+                        {
+                            new TableHeader(originalIndicator.Id.ToString(), TableHeaderType.Indicator)
+                        }
+                    }
+                },
+                Charts = new List<IChart>
+                {
+                    new LineChart
+                    {
+                        Axes = new Dictionary<string, ChartAxisConfiguration>
+                        {
+                            {
+                                "major",
+                                new ChartAxisConfiguration
+                                {
+                                    DataSets = new List<ChartDataSet>
+                                    {
+                                        new ChartDataSet
+                                        {
+                                            Filters = new List<Guid>
+                                            {
+                                                originalFilterItem1.Id
+                                            },
+                                            Indicator = originalIndicator.Id
+                                        }
+                                    }
+                                }
+                            }
+                        }
+                    }
+                }
             };
 
             var releaseContentBlock = new ReleaseContentBlock
@@ -2052,6 +2076,13 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
                     replacedDataBlock.Table.TableHeaders.RowGroups.First().First().Type);
                 Assert.Equal(replacementFilterItem1.Id.ToString(),
                     replacedDataBlock.Table.TableHeaders.RowGroups.First().First().Value);
+
+                var chartMajorAxis = replacedDataBlock.Charts[0].Axes?["major"];
+                Assert.NotNull(chartMajorAxis);
+                Assert.Single(chartMajorAxis.DataSets);
+                Assert.Single(chartMajorAxis.DataSets[0].Filters);
+                Assert.Equal(replacementFilterItem1.Id, chartMajorAxis.DataSets[0].Filters[0]);
+                Assert.Equal(replacementIndicator.Id, chartMajorAxis.DataSets[0].Indicator);
 
                 var replacedFootnoteForFilter = await GetFootnoteById(statisticsDbContext, footnoteForFilter.Id);
                 Assert.NotNull(replacedFootnoteForFilter);
