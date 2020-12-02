@@ -1,6 +1,9 @@
 import { testTableData } from '@admin/pages/release/datablocks/components/chart/__tests__/__data__/testTableData';
 import ChartLegendConfiguration from '@admin/pages/release/datablocks/components/chart/ChartLegendConfiguration';
-import { ChartBuilderForms } from '@admin/pages/release/datablocks/components/chart/types/chartBuilderForms';
+import {
+  ChartBuilderForms,
+  ChartBuilderFormsContextProvider,
+} from '@admin/pages/release/datablocks/components/chart/contexts/ChartBuilderFormsContext';
 import { lineChartBlockDefinition } from '@common/modules/charts/components/LineChartBlock';
 import { DataSetConfiguration } from '@common/modules/charts/types/dataSet';
 import { LegendConfiguration } from '@common/modules/charts/types/legend';
@@ -32,36 +35,30 @@ describe('ChartLegendConfiguration', () => {
       id: 'legend',
       title: 'Legend',
     },
-    data: {
-      isValid: true,
-      submitCount: 0,
-      id: 'data',
-      title: 'Data',
-    },
   };
 
   test('renders correctly with no legend items', () => {
     render(
-      <ChartLegendConfiguration
-        definition={lineChartBlockDefinition}
-        meta={testTable.subjectMeta}
-        data={testTable.results}
-        forms={testFormState}
-        axisMajor={{
-          dataSets: [],
-          groupBy: 'timePeriod',
-          referenceLines: [],
-          type: 'major',
-          visible: true,
-        }}
-        legend={{
-          position: 'top',
-          items: [],
-        }}
-        onSubmit={noop}
-        onChange={noop}
-        onFormStateChange={noop}
-      />,
+      <ChartBuilderFormsContextProvider initialForms={testFormState}>
+        <ChartLegendConfiguration
+          definition={lineChartBlockDefinition}
+          meta={testTable.subjectMeta}
+          data={testTable.results}
+          axisMajor={{
+            dataSets: [],
+            groupBy: 'timePeriod',
+            referenceLines: [],
+            type: 'major',
+            visible: true,
+          }}
+          legend={{
+            position: 'top',
+            items: [],
+          }}
+          onSubmit={noop}
+          onChange={noop}
+        />
+      </ChartBuilderFormsContextProvider>,
     );
 
     expect(
@@ -71,35 +68,35 @@ describe('ChartLegendConfiguration', () => {
 
   test('renders correctly with single legend item from new data set', () => {
     render(
-      <ChartLegendConfiguration
-        definition={lineChartBlockDefinition}
-        meta={testTable.subjectMeta}
-        data={testTable.results}
-        forms={testFormState}
-        axisMajor={{
-          dataSets: [
-            {
-              location: {
-                value: 'barnet',
-                level: 'localAuthority',
+      <ChartBuilderFormsContextProvider initialForms={testFormState}>
+        <ChartLegendConfiguration
+          definition={lineChartBlockDefinition}
+          meta={testTable.subjectMeta}
+          data={testTable.results}
+          axisMajor={{
+            dataSets: [
+              {
+                location: {
+                  value: 'barnet',
+                  level: 'localAuthority',
+                },
+                filters: ['ethnicity-major-chinese', 'state-funded-primary'],
+                indicator: 'authorised-absence-sessions',
               },
-              filters: ['ethnicity-major-chinese', 'state-funded-primary'],
-              indicator: 'authorised-absence-sessions',
-            },
-          ],
-          groupBy: 'timePeriod',
-          referenceLines: [],
-          type: 'major',
-          visible: true,
-        }}
-        legend={{
-          position: 'top',
-          items: [],
-        }}
-        onSubmit={noop}
-        onChange={noop}
-        onFormStateChange={noop}
-      />,
+            ],
+            groupBy: 'timePeriod',
+            referenceLines: [],
+            type: 'major',
+            visible: true,
+          }}
+          legend={{
+            position: 'top',
+            items: [],
+          }}
+          onSubmit={noop}
+          onChange={noop}
+        />
+      </ChartBuilderFormsContextProvider>,
     );
 
     expect(screen.getByLabelText('Position')).toHaveValue('top');
@@ -119,31 +116,31 @@ describe('ChartLegendConfiguration', () => {
 
   test('renders correctly with multiple legend items from new data set', () => {
     render(
-      <ChartLegendConfiguration
-        definition={lineChartBlockDefinition}
-        meta={testTable.subjectMeta}
-        data={testTable.results}
-        forms={testFormState}
-        axisMajor={{
-          dataSets: [
-            {
-              filters: ['ethnicity-major-chinese', 'state-funded-primary'],
-              indicator: 'authorised-absence-sessions',
-            },
-          ],
-          groupBy: 'timePeriod',
-          referenceLines: [],
-          type: 'major',
-          visible: true,
-        }}
-        legend={{
-          position: 'top',
-          items: [],
-        }}
-        onSubmit={noop}
-        onChange={noop}
-        onFormStateChange={noop}
-      />,
+      <ChartBuilderFormsContextProvider initialForms={testFormState}>
+        <ChartLegendConfiguration
+          definition={lineChartBlockDefinition}
+          meta={testTable.subjectMeta}
+          data={testTable.results}
+          axisMajor={{
+            dataSets: [
+              {
+                filters: ['ethnicity-major-chinese', 'state-funded-primary'],
+                indicator: 'authorised-absence-sessions',
+              },
+            ],
+            groupBy: 'timePeriod',
+            referenceLines: [],
+            type: 'major',
+            visible: true,
+          }}
+          legend={{
+            position: 'top',
+            items: [],
+          }}
+          onSubmit={noop}
+          onChange={noop}
+        />
+      </ChartBuilderFormsContextProvider>,
     );
 
     expect(screen.getByLabelText('Position')).toHaveValue('top');
@@ -172,41 +169,41 @@ describe('ChartLegendConfiguration', () => {
 
   test('renders correctly with single legend item from deprecated data sets', () => {
     render(
-      <ChartLegendConfiguration
-        definition={lineChartBlockDefinition}
-        meta={testTable.subjectMeta}
-        data={testTable.results}
-        forms={testFormState}
-        axisMajor={{
-          dataSets: [
-            {
-              location: {
-                value: 'barnet',
-                level: 'localAuthority',
+      <ChartBuilderFormsContextProvider initialForms={testFormState}>
+        <ChartLegendConfiguration
+          definition={lineChartBlockDefinition}
+          meta={testTable.subjectMeta}
+          data={testTable.results}
+          axisMajor={{
+            dataSets: [
+              {
+                location: {
+                  value: 'barnet',
+                  level: 'localAuthority',
+                },
+                filters: ['ethnicity-major-chinese', 'state-funded-primary'],
+                indicator: 'authorised-absence-sessions',
+                config: {
+                  label: 'Legend item 1',
+                  colour: '#ff0000',
+                  lineStyle: 'dashed',
+                  symbol: 'diamond',
+                },
               },
-              filters: ['ethnicity-major-chinese', 'state-funded-primary'],
-              indicator: 'authorised-absence-sessions',
-              config: {
-                label: 'Legend item 1',
-                colour: '#ff0000',
-                lineStyle: 'dashed',
-                symbol: 'diamond',
-              },
-            },
-          ] as DataSetConfiguration[],
-          groupBy: 'timePeriod',
-          referenceLines: [],
-          type: 'major',
-          visible: true,
-        }}
-        legend={{
-          position: 'top',
-          items: [],
-        }}
-        onSubmit={noop}
-        onChange={noop}
-        onFormStateChange={noop}
-      />,
+            ] as DataSetConfiguration[],
+            groupBy: 'timePeriod',
+            referenceLines: [],
+            type: 'major',
+            visible: true,
+          }}
+          legend={{
+            position: 'top',
+            items: [],
+          }}
+          onSubmit={noop}
+          onChange={noop}
+        />
+      </ChartBuilderFormsContextProvider>,
     );
 
     expect(screen.getByLabelText('Position')).toHaveValue('top');
@@ -224,55 +221,55 @@ describe('ChartLegendConfiguration', () => {
 
   test('renders correctly with multiple legend items from deprecated data sets', () => {
     render(
-      <ChartLegendConfiguration
-        definition={lineChartBlockDefinition}
-        meta={testTable.subjectMeta}
-        data={testTable.results}
-        forms={testFormState}
-        axisMajor={{
-          dataSets: [
-            {
-              location: {
-                value: 'barnsley',
-                level: 'localAuthority',
+      <ChartBuilderFormsContextProvider initialForms={testFormState}>
+        <ChartLegendConfiguration
+          definition={lineChartBlockDefinition}
+          meta={testTable.subjectMeta}
+          data={testTable.results}
+          axisMajor={{
+            dataSets: [
+              {
+                location: {
+                  value: 'barnsley',
+                  level: 'localAuthority',
+                },
+                filters: ['ethnicity-major-chinese', 'state-funded-primary'],
+                indicator: 'authorised-absence-sessions',
+                config: {
+                  label: 'Legend item 1',
+                  colour: '#00ff00',
+                  lineStyle: 'dotted',
+                  symbol: 'square',
+                },
               },
-              filters: ['ethnicity-major-chinese', 'state-funded-primary'],
-              indicator: 'authorised-absence-sessions',
-              config: {
-                label: 'Legend item 1',
-                colour: '#00ff00',
-                lineStyle: 'dotted',
-                symbol: 'square',
+              {
+                location: {
+                  value: 'barnet',
+                  level: 'localAuthority',
+                },
+                filters: ['ethnicity-major-chinese', 'state-funded-primary'],
+                indicator: 'authorised-absence-sessions',
+                config: {
+                  label: 'Legend item 2',
+                  colour: '#ff0000',
+                  lineStyle: 'dashed',
+                  symbol: 'diamond',
+                },
               },
-            },
-            {
-              location: {
-                value: 'barnet',
-                level: 'localAuthority',
-              },
-              filters: ['ethnicity-major-chinese', 'state-funded-primary'],
-              indicator: 'authorised-absence-sessions',
-              config: {
-                label: 'Legend item 2',
-                colour: '#ff0000',
-                lineStyle: 'dashed',
-                symbol: 'diamond',
-              },
-            },
-          ] as DataSetConfiguration[],
-          groupBy: 'timePeriod',
-          referenceLines: [],
-          type: 'major',
-          visible: true,
-        }}
-        legend={{
-          position: 'top',
-          items: [],
-        }}
-        onSubmit={noop}
-        onChange={noop}
-        onFormStateChange={noop}
-      />,
+            ] as DataSetConfiguration[],
+            groupBy: 'timePeriod',
+            referenceLines: [],
+            type: 'major',
+            visible: true,
+          }}
+          legend={{
+            position: 'top',
+            items: [],
+          }}
+          onSubmit={noop}
+          onChange={noop}
+        />
+      </ChartBuilderFormsContextProvider>,
     );
 
     expect(screen.getByLabelText('Position')).toHaveValue('top');
@@ -297,32 +294,14 @@ describe('ChartLegendConfiguration', () => {
 
   test('renders correctly with single existing legend item', () => {
     render(
-      <ChartLegendConfiguration
-        definition={lineChartBlockDefinition}
-        meta={testTable.subjectMeta}
-        data={testTable.results}
-        forms={testFormState}
-        axisMajor={{
-          dataSets: [
-            {
-              location: {
-                value: 'barnet',
-                level: 'localAuthority',
-              },
-              filters: ['ethnicity-major-chinese', 'state-funded-primary'],
-              indicator: 'authorised-absence-sessions',
-            },
-          ],
-          groupBy: 'timePeriod',
-          referenceLines: [],
-          type: 'major',
-          visible: true,
-        }}
-        legend={{
-          position: 'top',
-          items: [
-            {
-              dataSet: {
+      <ChartBuilderFormsContextProvider initialForms={testFormState}>
+        <ChartLegendConfiguration
+          definition={lineChartBlockDefinition}
+          meta={testTable.subjectMeta}
+          data={testTable.results}
+          axisMajor={{
+            dataSets: [
+              {
                 location: {
                   value: 'barnet',
                   level: 'localAuthority',
@@ -330,17 +309,35 @@ describe('ChartLegendConfiguration', () => {
                 filters: ['ethnicity-major-chinese', 'state-funded-primary'],
                 indicator: 'authorised-absence-sessions',
               },
-              label: 'Legend item 1',
-              colour: '#00ff00',
-              lineStyle: 'dashed',
-              symbol: 'star',
-            },
-          ],
-        }}
-        onSubmit={noop}
-        onChange={noop}
-        onFormStateChange={noop}
-      />,
+            ],
+            groupBy: 'timePeriod',
+            referenceLines: [],
+            type: 'major',
+            visible: true,
+          }}
+          legend={{
+            position: 'top',
+            items: [
+              {
+                dataSet: {
+                  location: {
+                    value: 'barnet',
+                    level: 'localAuthority',
+                  },
+                  filters: ['ethnicity-major-chinese', 'state-funded-primary'],
+                  indicator: 'authorised-absence-sessions',
+                },
+                label: 'Legend item 1',
+                colour: '#00ff00',
+                lineStyle: 'dashed',
+                symbol: 'star',
+              },
+            ],
+          }}
+          onSubmit={noop}
+          onChange={noop}
+        />
+      </ChartBuilderFormsContextProvider>,
     );
 
     expect(screen.getByLabelText('Position')).toHaveValue('top');
@@ -358,60 +355,60 @@ describe('ChartLegendConfiguration', () => {
 
   test('renders correctly with multiple existing legend items', () => {
     render(
-      <ChartLegendConfiguration
-        definition={lineChartBlockDefinition}
-        meta={testTable.subjectMeta}
-        data={testTable.results}
-        forms={testFormState}
-        axisMajor={{
-          dataSets: [
-            {
-              filters: ['ethnicity-major-chinese', 'state-funded-primary'],
-              indicator: 'authorised-absence-sessions',
-            },
-          ],
-          groupBy: 'timePeriod',
-          referenceLines: [],
-          type: 'major',
-          visible: true,
-        }}
-        legend={{
-          position: 'top',
-          items: [
-            {
-              dataSet: {
-                location: {
-                  value: 'barnsley',
-                  level: 'localAuthority',
-                },
+      <ChartBuilderFormsContextProvider initialForms={testFormState}>
+        <ChartLegendConfiguration
+          definition={lineChartBlockDefinition}
+          meta={testTable.subjectMeta}
+          data={testTable.results}
+          axisMajor={{
+            dataSets: [
+              {
                 filters: ['ethnicity-major-chinese', 'state-funded-primary'],
                 indicator: 'authorised-absence-sessions',
               },
-              label: 'Legend item 1',
-              colour: '#ff0000',
-              lineStyle: 'dotted',
-              symbol: 'square',
-            },
-            {
-              dataSet: {
-                location: {
-                  value: 'barnet',
-                  level: 'localAuthority',
+            ],
+            groupBy: 'timePeriod',
+            referenceLines: [],
+            type: 'major',
+            visible: true,
+          }}
+          legend={{
+            position: 'top',
+            items: [
+              {
+                dataSet: {
+                  location: {
+                    value: 'barnsley',
+                    level: 'localAuthority',
+                  },
+                  filters: ['ethnicity-major-chinese', 'state-funded-primary'],
+                  indicator: 'authorised-absence-sessions',
                 },
-                filters: ['ethnicity-major-chinese', 'state-funded-primary'],
-                indicator: 'authorised-absence-sessions',
+                label: 'Legend item 1',
+                colour: '#ff0000',
+                lineStyle: 'dotted',
+                symbol: 'square',
               },
-              label: 'Legend item 2',
-              colour: '#00ff00',
-              lineStyle: 'dashed',
-              symbol: 'star',
-            },
-          ],
-        }}
-        onSubmit={noop}
-        onChange={noop}
-        onFormStateChange={noop}
-      />,
+              {
+                dataSet: {
+                  location: {
+                    value: 'barnet',
+                    level: 'localAuthority',
+                  },
+                  filters: ['ethnicity-major-chinese', 'state-funded-primary'],
+                  indicator: 'authorised-absence-sessions',
+                },
+                label: 'Legend item 2',
+                colour: '#00ff00',
+                lineStyle: 'dashed',
+                symbol: 'star',
+              },
+            ],
+          }}
+          onSubmit={noop}
+          onChange={noop}
+        />
+      </ChartBuilderFormsContextProvider>,
     );
 
     expect(screen.getByLabelText('Position')).toHaveValue('top');
@@ -436,38 +433,20 @@ describe('ChartLegendConfiguration', () => {
 
   test('does not render Symbol field if chart does not have capability', () => {
     render(
-      <ChartLegendConfiguration
-        definition={{
-          ...lineChartBlockDefinition,
-          capabilities: {
-            ...lineChartBlockDefinition.capabilities,
-            hasSymbols: false,
-          },
-        }}
-        meta={testTable.subjectMeta}
-        data={testTable.results}
-        forms={testFormState}
-        axisMajor={{
-          dataSets: [
-            {
-              location: {
-                value: 'barnet',
-                level: 'localAuthority',
-              },
-              filters: ['ethnicity-major-chinese', 'state-funded-primary'],
-              indicator: 'authorised-absence-sessions',
+      <ChartBuilderFormsContextProvider initialForms={testFormState}>
+        <ChartLegendConfiguration
+          definition={{
+            ...lineChartBlockDefinition,
+            capabilities: {
+              ...lineChartBlockDefinition.capabilities,
+              hasSymbols: false,
             },
-          ],
-          groupBy: 'timePeriod',
-          referenceLines: [],
-          type: 'major',
-          visible: true,
-        }}
-        legend={{
-          position: 'top',
-          items: [
-            {
-              dataSet: {
+          }}
+          meta={testTable.subjectMeta}
+          data={testTable.results}
+          axisMajor={{
+            dataSets: [
+              {
                 location: {
                   value: 'barnet',
                   level: 'localAuthority',
@@ -475,15 +454,33 @@ describe('ChartLegendConfiguration', () => {
                 filters: ['ethnicity-major-chinese', 'state-funded-primary'],
                 indicator: 'authorised-absence-sessions',
               },
-              label: 'Legend item 1',
-              colour: '#ff0000',
-            },
-          ],
-        }}
-        onSubmit={noop}
-        onChange={noop}
-        onFormStateChange={noop}
-      />,
+            ],
+            groupBy: 'timePeriod',
+            referenceLines: [],
+            type: 'major',
+            visible: true,
+          }}
+          legend={{
+            position: 'top',
+            items: [
+              {
+                dataSet: {
+                  location: {
+                    value: 'barnet',
+                    level: 'localAuthority',
+                  },
+                  filters: ['ethnicity-major-chinese', 'state-funded-primary'],
+                  indicator: 'authorised-absence-sessions',
+                },
+                label: 'Legend item 1',
+                colour: '#ff0000',
+              },
+            ],
+          }}
+          onSubmit={noop}
+          onChange={noop}
+        />
+      </ChartBuilderFormsContextProvider>,
     );
 
     const legendItems = screen.getAllByRole('group');
@@ -495,38 +492,20 @@ describe('ChartLegendConfiguration', () => {
 
   test('does not render Style field if chart does not have capability', () => {
     render(
-      <ChartLegendConfiguration
-        definition={{
-          ...lineChartBlockDefinition,
-          capabilities: {
-            ...lineChartBlockDefinition.capabilities,
-            hasLineStyle: false,
-          },
-        }}
-        meta={testTable.subjectMeta}
-        data={testTable.results}
-        forms={testFormState}
-        axisMajor={{
-          dataSets: [
-            {
-              location: {
-                value: 'barnet',
-                level: 'localAuthority',
-              },
-              filters: ['ethnicity-major-chinese', 'state-funded-primary'],
-              indicator: 'authorised-absence-sessions',
+      <ChartBuilderFormsContextProvider initialForms={testFormState}>
+        <ChartLegendConfiguration
+          definition={{
+            ...lineChartBlockDefinition,
+            capabilities: {
+              ...lineChartBlockDefinition.capabilities,
+              hasLineStyle: false,
             },
-          ],
-          groupBy: 'timePeriod',
-          referenceLines: [],
-          type: 'major',
-          visible: true,
-        }}
-        legend={{
-          position: 'top',
-          items: [
-            {
-              dataSet: {
+          }}
+          meta={testTable.subjectMeta}
+          data={testTable.results}
+          axisMajor={{
+            dataSets: [
+              {
                 location: {
                   value: 'barnet',
                   level: 'localAuthority',
@@ -534,15 +513,33 @@ describe('ChartLegendConfiguration', () => {
                 filters: ['ethnicity-major-chinese', 'state-funded-primary'],
                 indicator: 'authorised-absence-sessions',
               },
-              label: 'Legend item 1',
-              colour: '#ff0000',
-            },
-          ],
-        }}
-        onSubmit={noop}
-        onChange={noop}
-        onFormStateChange={noop}
-      />,
+            ],
+            groupBy: 'timePeriod',
+            referenceLines: [],
+            type: 'major',
+            visible: true,
+          }}
+          legend={{
+            position: 'top',
+            items: [
+              {
+                dataSet: {
+                  location: {
+                    value: 'barnet',
+                    level: 'localAuthority',
+                  },
+                  filters: ['ethnicity-major-chinese', 'state-funded-primary'],
+                  indicator: 'authorised-absence-sessions',
+                },
+                label: 'Legend item 1',
+                colour: '#ff0000',
+              },
+            ],
+          }}
+          onSubmit={noop}
+          onChange={noop}
+        />
+      </ChartBuilderFormsContextProvider>,
     );
 
     const legendItems = screen.getAllByRole('group');
@@ -554,31 +551,31 @@ describe('ChartLegendConfiguration', () => {
 
   test('shows validation errors if missing legend item label', async () => {
     render(
-      <ChartLegendConfiguration
-        definition={lineChartBlockDefinition}
-        meta={testTable.subjectMeta}
-        data={testTable.results}
-        forms={testFormState}
-        axisMajor={{
-          dataSets: [
-            {
-              filters: ['ethnicity-major-chinese', 'state-funded-primary'],
-              indicator: 'authorised-absence-sessions',
-            },
-          ],
-          groupBy: 'timePeriod',
-          referenceLines: [],
-          type: 'major',
-          visible: true,
-        }}
-        legend={{
-          position: 'top',
-          items: [],
-        }}
-        onSubmit={noop}
-        onChange={noop}
-        onFormStateChange={noop}
-      />,
+      <ChartBuilderFormsContextProvider initialForms={testFormState}>
+        <ChartLegendConfiguration
+          definition={lineChartBlockDefinition}
+          meta={testTable.subjectMeta}
+          data={testTable.results}
+          axisMajor={{
+            dataSets: [
+              {
+                filters: ['ethnicity-major-chinese', 'state-funded-primary'],
+                indicator: 'authorised-absence-sessions',
+              },
+            ],
+            groupBy: 'timePeriod',
+            referenceLines: [],
+            type: 'major',
+            visible: true,
+          }}
+          legend={{
+            position: 'top',
+            items: [],
+          }}
+          onSubmit={noop}
+          onChange={noop}
+        />
+      </ChartBuilderFormsContextProvider>,
     );
 
     const legendItems = screen.getAllByRole('group');
@@ -612,35 +609,35 @@ describe('ChartLegendConfiguration', () => {
     const handleSubmit = jest.fn();
 
     render(
-      <ChartLegendConfiguration
-        definition={lineChartBlockDefinition}
-        meta={testTable.subjectMeta}
-        data={testTable.results}
-        forms={testFormState}
-        axisMajor={{
-          dataSets: [
-            {
-              location: {
-                level: 'localAuthority',
-                value: 'barnet',
+      <ChartBuilderFormsContextProvider initialForms={testFormState}>
+        <ChartLegendConfiguration
+          definition={lineChartBlockDefinition}
+          meta={testTable.subjectMeta}
+          data={testTable.results}
+          axisMajor={{
+            dataSets: [
+              {
+                location: {
+                  level: 'localAuthority',
+                  value: 'barnet',
+                },
+                filters: ['ethnicity-major-chinese', 'state-funded-primary'],
+                indicator: 'authorised-absence-sessions',
               },
-              filters: ['ethnicity-major-chinese', 'state-funded-primary'],
-              indicator: 'authorised-absence-sessions',
-            },
-          ],
-          groupBy: 'timePeriod',
-          referenceLines: [],
-          type: 'major',
-          visible: true,
-        }}
-        legend={{
-          position: 'top',
-          items: [],
-        }}
-        onSubmit={handleSubmit}
-        onChange={noop}
-        onFormStateChange={noop}
-      />,
+            ],
+            groupBy: 'timePeriod',
+            referenceLines: [],
+            type: 'major',
+            visible: true,
+          }}
+          legend={{
+            position: 'top',
+            items: [],
+          }}
+          onSubmit={handleSubmit}
+          onChange={noop}
+        />
+      </ChartBuilderFormsContextProvider>,
     );
 
     const legendItems = screen.getAllByRole('group');
@@ -663,41 +660,43 @@ describe('ChartLegendConfiguration', () => {
     const handleSubmit = jest.fn();
 
     render(
-      <ChartLegendConfiguration
-        definition={lineChartBlockDefinition}
-        meta={testTable.subjectMeta}
-        data={testTable.results}
-        forms={{
+      <ChartBuilderFormsContextProvider
+        initialForms={{
           ...testFormState,
           options: {
             ...testFormState.options,
             isValid: false,
           },
         }}
-        axisMajor={{
-          dataSets: [
-            {
-              location: {
-                level: 'localAuthority',
-                value: 'barnet',
+      >
+        <ChartLegendConfiguration
+          definition={lineChartBlockDefinition}
+          meta={testTable.subjectMeta}
+          data={testTable.results}
+          axisMajor={{
+            dataSets: [
+              {
+                location: {
+                  level: 'localAuthority',
+                  value: 'barnet',
+                },
+                filters: ['ethnicity-major-chinese', 'state-funded-primary'],
+                indicator: 'authorised-absence-sessions',
               },
-              filters: ['ethnicity-major-chinese', 'state-funded-primary'],
-              indicator: 'authorised-absence-sessions',
-            },
-          ],
-          groupBy: 'timePeriod',
-          referenceLines: [],
-          type: 'major',
-          visible: true,
-        }}
-        legend={{
-          position: 'top',
-          items: [],
-        }}
-        onSubmit={handleSubmit}
-        onChange={noop}
-        onFormStateChange={noop}
-      />,
+            ],
+            groupBy: 'timePeriod',
+            referenceLines: [],
+            type: 'major',
+            visible: true,
+          }}
+          legend={{
+            position: 'top',
+            items: [],
+          }}
+          onSubmit={handleSubmit}
+          onChange={noop}
+        />
+      </ChartBuilderFormsContextProvider>,
     );
 
     expect(handleSubmit).not.toHaveBeenCalled();
@@ -716,35 +715,35 @@ describe('ChartLegendConfiguration', () => {
     const handleSubmit = jest.fn();
 
     render(
-      <ChartLegendConfiguration
-        definition={lineChartBlockDefinition}
-        meta={testTable.subjectMeta}
-        data={testTable.results}
-        forms={testFormState}
-        axisMajor={{
-          dataSets: [
-            {
-              location: {
-                level: 'localAuthority',
-                value: 'barnet',
+      <ChartBuilderFormsContextProvider initialForms={testFormState}>
+        <ChartLegendConfiguration
+          definition={lineChartBlockDefinition}
+          meta={testTable.subjectMeta}
+          data={testTable.results}
+          axisMajor={{
+            dataSets: [
+              {
+                location: {
+                  level: 'localAuthority',
+                  value: 'barnet',
+                },
+                filters: ['ethnicity-major-chinese', 'state-funded-primary'],
+                indicator: 'authorised-absence-sessions',
               },
-              filters: ['ethnicity-major-chinese', 'state-funded-primary'],
-              indicator: 'authorised-absence-sessions',
-            },
-          ],
-          groupBy: 'timePeriod',
-          referenceLines: [],
-          type: 'major',
-          visible: true,
-        }}
-        legend={{
-          position: 'top',
-          items: [],
-        }}
-        onSubmit={handleSubmit}
-        onChange={noop}
-        onFormStateChange={noop}
-      />,
+            ],
+            groupBy: 'timePeriod',
+            referenceLines: [],
+            type: 'major',
+            visible: true,
+          }}
+          legend={{
+            position: 'top',
+            items: [],
+          }}
+          onSubmit={handleSubmit}
+          onChange={noop}
+        />
+      </ChartBuilderFormsContextProvider>,
     );
 
     userEvent.selectOptions(screen.getByLabelText('Position'), 'bottom');

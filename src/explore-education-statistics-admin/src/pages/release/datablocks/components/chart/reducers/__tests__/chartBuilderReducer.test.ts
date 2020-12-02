@@ -75,21 +75,6 @@ describe('chartBuilderReducer', () => {
     },
   };
 
-  const testInitialFormState: ChartBuilderState['forms'] = {
-    options: {
-      isValid: true,
-      submitCount: 0,
-    },
-    legend: {
-      isValid: true,
-      submitCount: 0,
-    },
-    data: {
-      isValid: true,
-      submitCount: 0,
-    },
-  };
-
   describe('UPDATE_CHART_DEFINITION', () => {
     const initialState: ChartBuilderState = {
       axes: {},
@@ -97,9 +82,6 @@ describe('chartBuilderReducer', () => {
         height: 300,
         title: '',
         alt: '',
-      },
-      forms: {
-        ...testInitialFormState,
       },
     };
 
@@ -276,38 +258,6 @@ describe('chartBuilderReducer', () => {
         visible: false,
       });
     });
-
-    test('adds new `forms` state for each new axis', () => {
-      const action: ChartBuilderActions = {
-        type: 'UPDATE_CHART_DEFINITION',
-        payload: testChartDefinition,
-      };
-
-      const nextState = produce(chartBuilderReducer)(initialState, action);
-
-      expect(nextState.forms).toEqual<ChartBuilderState['forms']>({
-        options: {
-          isValid: true,
-          submitCount: 0,
-        },
-        data: {
-          isValid: true,
-          submitCount: 0,
-        },
-        legend: {
-          isValid: true,
-          submitCount: 0,
-        },
-        major: {
-          isValid: true,
-          submitCount: 0,
-        },
-        minor: {
-          isValid: true,
-          submitCount: 0,
-        },
-      });
-    });
   });
 
   describe('UPDATE_CHART_AXIS', () => {
@@ -325,13 +275,6 @@ describe('chartBuilderReducer', () => {
         height: 300,
         title: '',
         alt: '',
-      },
-      forms: {
-        ...testInitialFormState,
-        major: {
-          isValid: true,
-          submitCount: 0,
-        },
       },
     };
 
@@ -402,13 +345,6 @@ describe('chartBuilderReducer', () => {
         height: 300,
         title: '',
         alt: '',
-      },
-      forms: {
-        ...testInitialFormState,
-        major: {
-          isValid: true,
-          submitCount: 0,
-        },
       },
     };
 
@@ -518,13 +454,6 @@ describe('chartBuilderReducer', () => {
         title: '',
         alt: '',
       },
-      forms: {
-        ...testInitialFormState,
-        major: {
-          isValid: true,
-          submitCount: 0,
-        },
-      },
     };
 
     test('sets payload to data sets', () => {
@@ -547,106 +476,6 @@ describe('chartBuilderReducer', () => {
         },
       ]);
     });
-
-    test('sets `forms.data.isValid` to true if more than one data set', () => {
-      const action: ChartBuilderActions = {
-        type: 'UPDATE_DATA_SETS',
-        payload: [
-          {
-            indicator: 'indicator-2',
-            filters: ['filter-2'],
-          },
-        ],
-      };
-      const nextState = produce(chartBuilderReducer)(
-        {
-          ...initialState,
-          forms: {
-            ...initialState.forms,
-            data: {
-              isValid: false,
-              submitCount: 0,
-            },
-          },
-        },
-        action,
-      );
-
-      expect(nextState.forms.data.isValid).toBe(true);
-    });
-
-    test('sets `forms.data.isValid` to false if no data sets', () => {
-      const action: ChartBuilderActions = {
-        type: 'UPDATE_DATA_SETS',
-        payload: [],
-      };
-      const nextState = produce(chartBuilderReducer)(
-        {
-          ...initialState,
-          forms: {
-            ...initialState.forms,
-            data: {
-              isValid: false,
-              submitCount: 0,
-            },
-          },
-        },
-        action,
-      );
-
-      expect(nextState.forms.data.isValid).toBe(false);
-    });
-  });
-
-  describe('UPDATE_FORM', () => {
-    const initialState: ChartBuilderState = {
-      axes: {},
-      definition: testChartDefinition,
-      options: {
-        height: 300,
-        title: '',
-        alt: '',
-      },
-      forms: {
-        ...testInitialFormState,
-      },
-    };
-
-    test('throws error if invalid `form` key is used', () => {
-      expect(() => {
-        const action: ChartBuilderActions = {
-          type: 'UPDATE_FORM',
-          payload: {
-            form: 'not-correct',
-            state: {
-              isValid: false,
-            },
-          },
-        } as ChartBuilderActions;
-
-        produce(chartBuilderReducer)(initialState, action);
-      }).toThrowError("Could not find form 'not-correct' to update");
-    });
-
-    test('updates correct `form` with payload', () => {
-      const action: ChartBuilderActions = {
-        type: 'UPDATE_FORM',
-        payload: {
-          form: 'options',
-          state: {
-            isValid: false,
-            submitCount: 1,
-          },
-        },
-      };
-
-      const nextState = produce(chartBuilderReducer)(initialState, action);
-
-      expect(nextState.forms.options).toEqual({
-        isValid: false,
-        submitCount: 1,
-      });
-    });
   });
 
   describe('RESET', () => {
@@ -666,24 +495,6 @@ describe('chartBuilderReducer', () => {
           title: 'Something',
           alt: 'Some alt',
         },
-        forms: {
-          options: {
-            isValid: false,
-            submitCount: 1,
-          },
-          data: {
-            isValid: false,
-            submitCount: 1,
-          },
-          legend: {
-            isValid: false,
-            submitCount: 1,
-          },
-          major: {
-            isValid: false,
-            submitCount: 1,
-          },
-        },
       };
 
       const nextState = produce(chartBuilderReducer)(initialState, {
@@ -698,20 +509,6 @@ describe('chartBuilderReducer', () => {
           alt: '',
         },
         definition: undefined,
-        forms: {
-          options: {
-            isValid: true,
-            submitCount: 0,
-          },
-          legend: {
-            isValid: true,
-            submitCount: 0,
-          },
-          data: {
-            isValid: true,
-            submitCount: 0,
-          },
-        },
       });
     });
   });
@@ -726,9 +523,6 @@ describe('chartBuilderReducer', () => {
           title: '',
           alt: '',
           height: 300,
-        },
-        forms: {
-          ...testInitialFormState,
         },
       });
     });
@@ -848,28 +642,6 @@ describe('chartBuilderReducer', () => {
           position: 'top',
           items: [],
         },
-        forms: {
-          data: {
-            isValid: true,
-            submitCount: 0,
-          },
-          options: {
-            isValid: true,
-            submitCount: 0,
-          },
-          legend: {
-            isValid: true,
-            submitCount: 0,
-          },
-          major: {
-            isValid: true,
-            submitCount: 0,
-          },
-          minor: {
-            isValid: true,
-            submitCount: 0,
-          },
-        },
       });
     });
 
@@ -978,28 +750,6 @@ describe('chartBuilderReducer', () => {
               label: 'Legend item 1',
             },
           ],
-        },
-        forms: {
-          data: {
-            isValid: true,
-            submitCount: 0,
-          },
-          options: {
-            isValid: true,
-            submitCount: 0,
-          },
-          legend: {
-            isValid: true,
-            submitCount: 0,
-          },
-          major: {
-            isValid: true,
-            submitCount: 0,
-          },
-          minor: {
-            isValid: true,
-            submitCount: 0,
-          },
         },
       });
     });

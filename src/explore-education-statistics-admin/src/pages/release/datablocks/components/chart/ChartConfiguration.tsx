@@ -1,9 +1,6 @@
 import ChartBuilderSaveActions from '@admin/pages/release/datablocks/components/chart/ChartBuilderSaveActions';
-import {
-  ChartOptions,
-  FormState,
-} from '@admin/pages/release/datablocks/components/chart/reducers/chartBuilderReducer';
-import { ChartBuilderForms } from '@admin/pages/release/datablocks/components/chart/types/chartBuilderForms';
+import { useChartBuilderFormsContext } from '@admin/pages/release/datablocks/components/chart/contexts/ChartBuilderFormsContext';
+import { ChartOptions } from '@admin/pages/release/datablocks/components/chart/reducers/chartBuilderReducer';
 import Effect from '@common/components/Effect';
 import { Form, FormFieldSelect, FormGroup } from '@common/components/form';
 import FormFieldCheckbox from '@common/components/form/FormFieldCheckbox';
@@ -50,18 +47,10 @@ interface Props {
   buttons?: ReactNode;
   chartOptions: ChartOptions;
   definition: ChartDefinition;
-  forms: ChartBuilderForms;
-  hasSubmittedChart: boolean;
-  isSaving?: boolean;
   meta: FullTableMeta;
   submitError?: ServerValidationErrorResponse;
   onBoundaryLevelChange?: (boundaryLevel: string) => void;
   onChange: (chartOptions: ChartOptions) => void;
-  onFormStateChange: (
-    state: {
-      form: 'options';
-    } & FormState,
-  ) => void;
   onSubmit: (chartOptions: ChartOptions) => void;
 }
 
@@ -71,16 +60,14 @@ const ChartConfiguration = ({
   buttons,
   chartOptions,
   definition,
-  forms,
-  hasSubmittedChart,
-  isSaving,
   meta,
   submitError,
   onBoundaryLevelChange,
   onChange,
-  onFormStateChange,
   onSubmit,
 }: Props) => {
+  const { hasSubmitted, updateForm, submit } = useChartBuilderFormsContext();
+
   const validationSchema = useMemo<ObjectSchema<FormValues>>(() => {
     let schema: ObjectSchema<FormValues> = Yup.object<FormValues>({
       title: Yup.string().required('Enter chart title'),
@@ -169,7 +156,7 @@ const ChartConfiguration = ({
       }
       initialValues={initialValues}
       initialTouched={
-        hasSubmittedChart
+        hasSubmitted
           ? mapValues(validationSchema.fields, () => true)
           : undefined
       }
@@ -177,6 +164,7 @@ const ChartConfiguration = ({
       validationSchema={validationSchema}
       onSubmit={values => {
         onSubmit(normalizeValues(values));
+        submit();
       }}
     >
       {form => {
@@ -192,12 +180,12 @@ const ChartConfiguration = ({
 
             <Effect
               value={{
-                form: 'options',
+                formKey: 'options',
                 isValid: form.isValid,
                 submitCount: form.submitCount,
               }}
-              onChange={onFormStateChange}
-              onMount={onFormStateChange}
+              onChange={updateForm}
+              onMount={updateForm}
             />
 
             {validationSchema.fields.file && (
@@ -297,12 +285,7 @@ const ChartConfiguration = ({
               </>
             )}
 
-            <ChartBuilderSaveActions
-              disabled={isSaving}
-              formId={formId}
-              forms={forms}
-              showSubmitError={form.isValid && form.submitCount > 0}
-            >
+            <ChartBuilderSaveActions formId={formId} formKey="options">
               {buttons}
             </ChartBuilderSaveActions>
           </Form>

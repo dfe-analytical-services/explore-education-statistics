@@ -1,7 +1,6 @@
 import ChartBuilderSaveActions from '@admin/pages/release/datablocks/components/chart/ChartBuilderSaveActions';
 import styles from '@admin/pages/release/datablocks/components/chart/ChartLegendConfiguration.module.scss';
-import { FormState } from '@admin/pages/release/datablocks/components/chart/reducers/chartBuilderReducer';
-import { ChartBuilderForms } from '@admin/pages/release/datablocks/components/chart/types/chartBuilderForms';
+import { useChartBuilderFormsContext } from '@admin/pages/release/datablocks/components/chart/contexts/ChartBuilderFormsContext';
 import Effect from '@common/components/Effect';
 import {
   Form,
@@ -72,17 +71,9 @@ interface Props {
   buttons?: ReactNode;
   data: TableDataResult[];
   definition: ChartDefinition;
-  forms: ChartBuilderForms;
-  hasSubmittedChart?: boolean;
   legend: LegendConfiguration;
-  isSaving?: boolean;
   meta: FullTableMeta;
   onChange: (legend: LegendConfiguration) => void;
-  onFormStateChange: (
-    state: {
-      form: 'legend';
-    } & FormState,
-  ) => void;
   onSubmit: (legend: LegendConfiguration) => void;
 }
 
@@ -91,16 +82,14 @@ const ChartLegendConfiguration = ({
   buttons,
   data,
   definition,
-  forms,
-  hasSubmittedChart = false,
-  isSaving,
   legend,
   meta,
   onChange,
-  onFormStateChange,
   onSubmit,
 }: Props) => {
   const { capabilities } = definition;
+
+  const { hasSubmitted, updateForm, submit } = useChartBuilderFormsContext();
 
   // Prevent legend items from being a dependency of
   // `initialValues` by accessing it as a ref.
@@ -151,7 +140,7 @@ const ChartLegendConfiguration = ({
   ]);
 
   const initialTouched = useMemo<FormikTouched<FormValues> | undefined>(() => {
-    if (!hasSubmittedChart) {
+    if (!hasSubmitted) {
       return undefined;
     }
 
@@ -161,7 +150,7 @@ const ChartLegendConfiguration = ({
         mapValues(item, () => true),
       ) as FormikTouched<LegendItem>[],
     };
-  }, [hasSubmittedChart, initialValues.items]);
+  }, [hasSubmitted, initialValues.items]);
 
   const validationSchema = useMemo<ObjectSchema<FormValues>>(() => {
     let itemSchema = Yup.object<LegendItem>({
@@ -242,6 +231,7 @@ const ChartLegendConfiguration = ({
       validationSchema={validationSchema}
       onSubmit={values => {
         onSubmit(values);
+        submit();
       }}
     >
       {form => (
@@ -260,12 +250,12 @@ const ChartLegendConfiguration = ({
 
           <Effect
             value={{
-              form: 'legend',
+              formKey: 'legend',
               isValid: form.isValid,
               submitCount: form.submitCount,
             }}
-            onChange={onFormStateChange}
-            onMount={onFormStateChange}
+            onChange={updateForm}
+            onMount={updateForm}
           />
 
           {validationSchema.fields.position && (
@@ -359,12 +349,7 @@ const ChartLegendConfiguration = ({
             )}
           </div>
 
-          <ChartBuilderSaveActions
-            disabled={isSaving}
-            formId={formId}
-            forms={forms}
-            showSubmitError={form.isValid && form.submitCount > 0}
-          >
+          <ChartBuilderSaveActions formId={formId} formKey="legend">
             {buttons}
           </ChartBuilderSaveActions>
         </Form>

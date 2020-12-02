@@ -1,6 +1,6 @@
 import ChartBuilderSaveActions from '@admin/pages/release/datablocks/components/chart/ChartBuilderSaveActions';
 import styles from '@admin/pages/release/datablocks/components/chart/ChartDataSetsConfiguration.module.scss';
-import { ChartBuilderForms } from '@admin/pages/release/datablocks/components/chart/types/chartBuilderForms';
+import { useChartBuilderFormsContext } from '@admin/pages/release/datablocks/components/chart/contexts/ChartBuilderFormsContext';
 import generateDataSetLabel from '@admin/pages/release/datablocks/components/chart/utils/generateDataSetLabel';
 import Button from '@common/components/Button';
 import ButtonText from '@common/components/ButtonText';
@@ -16,7 +16,7 @@ import Yup from '@common/validation/yup';
 import { Formik } from 'formik';
 import difference from 'lodash/difference';
 import mapValues from 'lodash/mapValues';
-import React, { ReactNode, useMemo } from 'react';
+import React, { ReactNode, useEffect, useMemo } from 'react';
 
 const formId = 'chartDataSetsConfigurationForm';
 
@@ -30,22 +30,18 @@ interface FormValues {
 interface Props {
   buttons?: ReactNode;
   dataSets?: DataSet[];
-  forms: ChartBuilderForms;
-  isSaving?: boolean;
   meta: FullTableMeta;
   onChange: (dataSets: DataSet[]) => void;
-  onSubmit: () => void;
 }
 
 const ChartDataSetsConfiguration = ({
   buttons,
-  isSaving,
-  forms,
   meta,
   dataSets = [],
   onChange,
-  onSubmit,
 }: Props) => {
+  const { forms, updateForm, submit } = useChartBuilderFormsContext();
+
   const indicatorOptions = useMemo(() => Object.values(meta.indicators), [
     meta.indicators,
   ]);
@@ -58,6 +54,13 @@ const ChartDataSetsConfiguration = ({
       })),
     [meta.locations],
   );
+
+  useEffect(() => {
+    updateForm({
+      formKey: 'dataSets',
+      isValid: dataSets.length > 0,
+    });
+  }, [dataSets.length, updateForm]);
 
   return (
     <>
@@ -235,13 +238,20 @@ const ChartDataSetsConfiguration = ({
           </table>
 
           <ChartBuilderSaveActions
-            disabled={isSaving}
             formId={formId}
-            forms={forms}
+            formKey="dataSets"
             onClick={() => {
-              onSubmit();
+              if (!forms.dataSets) {
+                return;
+              }
+
+              updateForm({
+                formKey: 'dataSets',
+                submitCount: forms.dataSets.submitCount + 1,
+              });
+
+              submit();
             }}
-            showSubmitError={forms.data.submitCount > 0}
           >
             {buttons}
           </ChartBuilderSaveActions>
