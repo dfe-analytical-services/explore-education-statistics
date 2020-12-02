@@ -2,6 +2,13 @@
 Resource    ./common.robot
 
 *** Keywords ***
+user waits for chart preview to update
+    # We check that the chart has updated using the number of renders as
+    # there is no other good way to check that the DOM has actually changed.
+    ${count}=  get element attribute  id:chartBuilderPreviewContainer  data-render-count
+    ${next_count}=  evaluate  int(${count}) + 1
+    user waits until page contains element  css:#chartBuilderPreviewContainer[data-render-count="${next_count}"]
+
 user waits until element contains line chart
     [Arguments]  ${locator}
     user waits until parent contains element  ${locator}  css:.recharts-line
@@ -45,6 +52,26 @@ user waits until element does not contain chart tooltip
 user checks chart title contains
     [Arguments]  ${locator}  ${text}
     user waits until parent contains element  ${locator}  xpath://figcaption[text()="${text}"]
+
+user checks chart height
+    [Arguments]  ${locator}  ${height}
+    user waits until parent contains element  ${locator}  css:.recharts-surface[height="${height}"]
+
+user checks chart width
+    [Arguments]  ${locator}  ${width}
+    user waits until parent contains element  ${locator}  css:.recharts-surface[width="${width}"]
+
+user checks map chart height
+    [Arguments]  ${locator}  ${height}  ${unit}=px
+    user waits until parent contains element  ${locator}  css:.leaflet-container
+    ${element}=  get child element  ${locator}  css:.leaflet-container
+    user checks css property value  ${element}  height  ${height}${unit}
+
+user checks map chart width
+    [Arguments]  ${locator}  ${width}  ${unit}=px
+    user waits until parent contains element  ${locator}  css:.leaflet-container
+    ${element}=  get child element  ${locator}  css:.leaflet-container
+    user checks css property value  ${element}  width  ${width}${unit}
 
 user checks chart legend item contains
     [Arguments]  ${locator}  ${item}  ${text}

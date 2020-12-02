@@ -7,7 +7,6 @@ import withLazyLoad from '@common/hocs/withLazyLoad';
 import ChartRenderer from '@common/modules/charts/components/ChartRenderer';
 import { GetInfographic } from '@common/modules/charts/components/InfographicBlock';
 import { AxesConfiguration } from '@common/modules/charts/types/chart';
-import getLabelDataSetConfigurations from '@common/modules/charts/util/getLabelDataSetConfigurations';
 import useTableQuery, {
   TableQueryOptions,
 } from '@common/modules/find-statistics/hooks/useTableQuery';
@@ -92,16 +91,6 @@ const DataBlockTabs = ({
                   const key = index;
 
                   const axes = { ...chart.axes } as Required<AxesConfiguration>;
-
-                  if (
-                    axes.major?.dataSets?.some(dataSet => !dataSet.config) &&
-                    chart.labels
-                  ) {
-                    axes.major.dataSets = getLabelDataSetConfigurations(
-                      chart.labels,
-                      axes.major.dataSets,
-                    );
-                  }
 
                   if (chart.type === 'infographic') {
                     return (

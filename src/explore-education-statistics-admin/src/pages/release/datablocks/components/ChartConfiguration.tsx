@@ -1,5 +1,5 @@
-import { ChartBuilderForm } from '@admin/pages/release/datablocks/components/ChartBuilder';
 import ChartBuilderSaveActions from '@admin/pages/release/datablocks/components/ChartBuilderSaveActions';
+import { ChartBuilderForms } from '@admin/pages/release/datablocks/components/types/chartBuilderForms';
 import {
   ChartOptions,
   FormState,
@@ -12,7 +12,6 @@ import FormFieldNumberInput from '@common/components/form/FormFieldNumberInput';
 import FormFieldTextArea from '@common/components/form/FormFieldTextArea';
 import { ChartDefinition } from '@common/modules/charts/types/chart';
 import { FullTableMeta } from '@common/modules/table-tool/types/fullTable';
-import { Dictionary } from '@common/types';
 import parseNumber from '@common/utils/number/parseNumber';
 import {
   convertServerFieldErrors,
@@ -25,7 +24,7 @@ import mapValues from 'lodash/mapValues';
 import merge from 'lodash/merge';
 import pick from 'lodash/pick';
 import React, { ChangeEvent, ReactNode, useCallback, useMemo } from 'react';
-import { ObjectSchema, Schema } from 'yup';
+import { ObjectSchema } from 'yup';
 
 type FormValues = Partial<ChartOptions>;
 
@@ -49,10 +48,9 @@ const replaceNewLines = (event: ChangeEvent<HTMLTextAreaElement>) => {
 
 interface Props {
   buttons?: ReactNode;
-  canSaveChart: boolean;
   chartOptions: ChartOptions;
   definition: ChartDefinition;
-  forms: Dictionary<ChartBuilderForm>;
+  forms: ChartBuilderForms;
   hasSubmittedChart: boolean;
   isSaving?: boolean;
   meta: FullTableMeta;
@@ -71,7 +69,6 @@ const formId = 'chartConfigurationForm';
 
 const ChartConfiguration = ({
   buttons,
-  canSaveChart,
   chartOptions,
   definition,
   forms,
@@ -105,15 +102,6 @@ const ChartConfiguration = ({
       width: Yup.number().positive('Chart width must be positive'),
     });
 
-    if (definition.capabilities.hasLegend) {
-      schema = schema.shape({
-        legend: Yup.string().oneOf(
-          ['bottom', 'top', 'none'],
-          'Select a valid legend position',
-        ) as Schema<ChartOptions['legend']>,
-      });
-    }
-
     if (definition.capabilities.stackable) {
       schema = schema.shape({
         stacked: Yup.boolean(),
@@ -145,11 +133,7 @@ const ChartConfiguration = ({
     }
 
     return schema;
-  }, [
-    definition.capabilities.hasLegend,
-    definition.capabilities.stackable,
-    definition.type,
-  ]);
+  }, [definition.capabilities.stackable, definition.type]);
 
   const initialValues = useMemo<FormValues>(() => {
     return pick(chartOptions, Object.keys(validationSchema.fields));
@@ -192,9 +176,7 @@ const ChartConfiguration = ({
       validateOnMount
       validationSchema={validationSchema}
       onSubmit={values => {
-        if (canSaveChart) {
-          onSubmit(normalizeValues(values));
-        }
+        onSubmit(normalizeValues(values));
       }}
     >
       {form => {
@@ -252,20 +234,6 @@ const ChartConfiguration = ({
                 id={`${formId}-stacked`}
                 name="stacked"
                 label="Stacked bars"
-              />
-            )}
-
-            {validationSchema.fields.legend && (
-              <FormFieldSelect<FormValues>
-                id={`${formId}-position`}
-                name="legend"
-                label="Legend position"
-                options={[
-                  { label: 'Top', value: 'top' },
-                  { label: 'Bottom', value: 'bottom' },
-                  { label: 'None', value: 'none' },
-                ]}
-                order={[]}
               />
             )}
 
@@ -333,9 +301,7 @@ const ChartConfiguration = ({
               disabled={isSaving}
               formId={formId}
               forms={forms}
-              showSubmitError={
-                form.isValid && form.submitCount > 0 && !canSaveChart
-              }
+              showSubmitError={form.isValid && form.submitCount > 0}
             >
               {buttons}
             </ChartBuilderSaveActions>

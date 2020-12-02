@@ -1,6 +1,6 @@
 import styles from '@admin/pages/release/datablocks/components/ChartAxisConfiguration.module.scss';
-import { ChartBuilderForm } from '@admin/pages/release/datablocks/components/ChartBuilder';
 import ChartBuilderSaveActions from '@admin/pages/release/datablocks/components/ChartBuilderSaveActions';
+import { ChartBuilderForms } from '@admin/pages/release/datablocks/components/types/chartBuilderForms';
 import { FormState } from '@admin/pages/release/datablocks/reducers/chartBuilderReducer';
 import Button from '@common/components/Button';
 import Effect from '@common/components/Effect';
@@ -24,12 +24,13 @@ import {
   ChartDefinition,
   Label,
   ReferenceLine,
+  TickConfig,
 } from '@common/modules/charts/types/chart';
 import { DataSetCategory } from '@common/modules/charts/types/dataSet';
 import createDataSetCategories from '@common/modules/charts/util/createDataSetCategories';
 import { FullTableMeta } from '@common/modules/table-tool/types/fullTable';
 import { TableDataResult } from '@common/services/tableBuilderService';
-import { Dictionary, OmitStrict } from '@common/types';
+import { OmitStrict } from '@common/types';
 import parseNumber from '@common/utils/number/parseNumber';
 import Yup from '@common/validation/yup';
 import { Formik } from 'formik';
@@ -43,8 +44,7 @@ type FormValues = Partial<OmitStrict<AxisConfiguration, 'dataSets' | 'type'>>;
 
 interface Props {
   buttons?: ReactNode;
-  canSaveChart: boolean;
-  forms: Dictionary<ChartBuilderForm>;
+  forms: ChartBuilderForms;
   hasSubmittedChart: boolean;
   isSaving?: boolean;
   id: string;
@@ -60,7 +60,6 @@ interface Props {
 
 const ChartAxisConfiguration = ({
   buttons,
-  canSaveChart,
   configuration,
   definition,
   forms,
@@ -219,10 +218,10 @@ const ChartAxisConfiguration = ({
       size: Yup.number()
         .required('Enter size of axis')
         .positive('Size of axis must be positive'),
-      tickConfig: Yup.string().oneOf(
+      tickConfig: Yup.string().oneOf<TickConfig>(
         ['default', 'startEnd', 'custom'],
         'Select a valid tick display type',
-      ) as Schema<AxisConfiguration['tickConfig']>,
+      ),
       tickSpacing: Yup.number().when('tickConfig', {
         is: 'custom',
         then: Yup.number()
@@ -234,14 +233,12 @@ const ChartAxisConfiguration = ({
       visible: Yup.boolean(),
     });
 
-    if (type === 'major' && !capabilities.fixedAxisGroupBy) {
+    if (type === 'major' && !definition.axes.major?.constants?.groupBy) {
       schema = schema.shape({
-        groupBy: Yup.string().oneOf([
-          'locations',
-          'timePeriod',
-          'filters',
-          'indicators',
-        ]) as Schema<AxisConfiguration['groupBy']>,
+        groupBy: Yup.string().oneOf<AxisGroupBy>(
+          ['locations', 'timePeriod', 'filters', 'indicators'],
+          'Choose a valid group by',
+        ),
       });
     }
 
@@ -268,7 +265,7 @@ const ChartAxisConfiguration = ({
       });
     }
 
-    if (capabilities.gridLines) {
+    if (capabilities.hasGridLines) {
       schema = schema.shape({
         showGrid: Yup.boolean(),
       });
@@ -283,8 +280,7 @@ const ChartAxisConfiguration = ({
     return schema;
   }, [
     capabilities.canSort,
-    capabilities.fixedAxisGroupBy,
-    capabilities.gridLines,
+    capabilities.hasGridLines,
     capabilities.hasReferenceLines,
     definition.axes,
     type,
@@ -307,9 +303,7 @@ const ChartAxisConfiguration = ({
       validateOnMount
       validationSchema={validationSchema}
       onSubmit={values => {
-        if (canSaveChart) {
-          onSubmit(normalizeValues(values));
-        }
+        onSubmit(normalizeValues(values));
       }}
     >
       {form => (
@@ -639,9 +633,7 @@ const ChartAxisConfiguration = ({
             disabled={isSaving}
             formId={id}
             forms={forms}
-            showSubmitError={
-              form.isValid && form.submitCount > 0 && !canSaveChart
-            }
+            showSubmitError={form.isValid && form.submitCount > 0}
           >
             {buttons}
           </ChartBuilderSaveActions>

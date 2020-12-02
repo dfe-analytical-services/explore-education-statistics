@@ -1,4 +1,4 @@
-import { DataSetConfiguration } from '@common/modules/charts/types/dataSet';
+import { DataSet } from '@common/modules/charts/types/dataSet';
 import filterOrphanedDataSets from '@common/modules/charts/util/filterOrphanedDataSets';
 import mapFullTable from '@common/modules/table-tool/utils/mapFullTable';
 import { TableDataResponse } from '@common/services/tableBuilderService';
@@ -101,16 +101,13 @@ describe('filterOrphanedDataSets', () => {
   const testFullTable = mapFullTable(testTableData);
 
   test('returns data set that has matching location', () => {
-    const testDataSets: DataSetConfiguration[] = [
+    const testDataSets: DataSet[] = [
       {
         filters: ['ethnicity-major-chinese', 'state-funded-primary'],
         indicator: 'authorised-absence-sessions',
         location: {
           value: 'E08000016',
           level: 'localAuthority',
-        },
-        config: {
-          label: 'Test label',
         },
       },
     ];
@@ -121,16 +118,13 @@ describe('filterOrphanedDataSets', () => {
   });
 
   test('removes data set where the location does not match on `value`', () => {
-    const testDataSets: DataSetConfiguration[] = [
+    const testDataSets: DataSet[] = [
       {
         filters: ['ethnicity-major-chinese', 'state-funded-primary'],
         indicator: 'authorised-absence-sessions',
         location: {
           value: 'does not exist',
           level: 'localAuthority',
-        },
-        config: {
-          label: 'Test label',
         },
       },
     ];
@@ -141,16 +135,13 @@ describe('filterOrphanedDataSets', () => {
   });
 
   test('removes data set where the location does not match on `level`', () => {
-    const testDataSets: DataSetConfiguration[] = [
+    const testDataSets: DataSet[] = [
       {
         filters: ['ethnicity-major-chinese', 'state-funded-primary'],
         indicator: 'authorised-absence-sessions',
         location: {
           value: 'E08000016',
           level: 'localAuthorityDistrict',
-        },
-        config: {
-          label: 'Test label',
         },
       },
     ];
@@ -161,14 +152,11 @@ describe('filterOrphanedDataSets', () => {
   });
 
   test('returns data sets that have matching time period', () => {
-    const testDataSets: DataSetConfiguration[] = [
+    const testDataSets: DataSet[] = [
       {
         filters: ['ethnicity-major-chinese', 'state-funded-primary'],
         indicator: 'authorised-absence-sessions',
         timePeriod: '2013_AY',
-        config: {
-          label: 'Test label',
-        },
       },
     ];
 
@@ -178,14 +166,11 @@ describe('filterOrphanedDataSets', () => {
   });
 
   test('removes data set where the time period does not match', () => {
-    const testDataSets: DataSetConfiguration[] = [
+    const testDataSets: DataSet[] = [
       {
         filters: ['ethnicity-major-chinese', 'state-funded-primary'],
         indicator: 'authorised-absence-sessions',
         timePeriod: 'does not match',
-        config: {
-          label: 'Test label',
-        },
       },
     ];
 
@@ -195,13 +180,10 @@ describe('filterOrphanedDataSets', () => {
   });
 
   test('returns data set where all filters match', () => {
-    const testDataSets: DataSetConfiguration[] = [
+    const testDataSets: DataSet[] = [
       {
         filters: ['ethnicity-major-chinese', 'state-funded-primary'],
         indicator: 'authorised-absence-sessions',
-        config: {
-          label: 'Test label',
-        },
       },
     ];
 
@@ -211,13 +193,10 @@ describe('filterOrphanedDataSets', () => {
   });
 
   test('removes data set where at least one filter does not match', () => {
-    const testDataSets: DataSetConfiguration[] = [
+    const testDataSets: DataSet[] = [
       {
         filters: ['ethnicity-major-chinese', 'does not match'],
         indicator: 'authorised-absence-sessions',
-        config: {
-          label: 'Test label',
-        },
       },
     ];
 
@@ -227,13 +206,10 @@ describe('filterOrphanedDataSets', () => {
   });
 
   test('returns data set where indicator matches', () => {
-    const testDataSets: DataSetConfiguration[] = [
+    const testDataSets: DataSet[] = [
       {
         filters: ['ethnicity-major-chinese', 'state-funded-primary'],
         indicator: 'authorised-absence-sessions',
-        config: {
-          label: 'Test label',
-        },
       },
     ];
 
@@ -243,13 +219,10 @@ describe('filterOrphanedDataSets', () => {
   });
 
   test('removes data set where indicator does not match', () => {
-    const testDataSets: DataSetConfiguration[] = [
+    const testDataSets: DataSet[] = [
       {
         filters: ['ethnicity-major-chinese', 'state-funded-primary'],
         indicator: 'does not match',
-        config: {
-          label: 'Test label',
-        },
       },
     ];
 
@@ -259,7 +232,7 @@ describe('filterOrphanedDataSets', () => {
   });
 
   test('returns data set where all criteria match', () => {
-    const testDataSets: DataSetConfiguration[] = [
+    const testDataSets: DataSet[] = [
       {
         filters: ['ethnicity-major-chinese', 'state-funded-primary'],
         indicator: 'authorised-absence-sessions',
@@ -267,9 +240,6 @@ describe('filterOrphanedDataSets', () => {
         location: {
           value: 'E08000016',
           level: 'localAuthority',
-        },
-        config: {
-          label: 'Test label',
         },
       },
     ];

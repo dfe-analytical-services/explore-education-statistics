@@ -1,5 +1,5 @@
 import { AxisConfiguration } from '@common/modules/charts/types/chart';
-import { DataSetConfiguration } from '@common/modules/charts/types/dataSet';
+import { DataSet } from '@common/modules/charts/types/dataSet';
 import createDataSetCategories from '@common/modules/charts/util/createDataSetCategories';
 import mapFullTable from '@common/modules/table-tool/utils/mapFullTable';
 import { TableDataResponse } from '@common/services/tableBuilderService';
@@ -290,9 +290,6 @@ describe('createDataSetCategories', () => {
             value: 'barnet',
           },
           timePeriod: '2014_AY',
-          config: {
-            label: 'Test label 1',
-          },
         },
       ],
       referenceLines: [],
@@ -329,7 +326,7 @@ describe('createDataSetCategories', () => {
     });
 
     expect(dataSet1.value).toBe(2613);
-    expect(dataSet1.dataSet).toEqual<DataSetConfiguration>({
+    expect(dataSet1.dataSet).toEqual<DataSet>({
       indicator: 'authorised-absence-sessions',
       filters: ['ethnicity-major-chinese', 'state-funded-primary'],
       location: {
@@ -337,9 +334,6 @@ describe('createDataSetCategories', () => {
         value: 'barnet',
       },
       timePeriod: '2014_AY',
-      config: {
-        label: 'Test label 1',
-      },
     });
   });
 
@@ -356,9 +350,6 @@ describe('createDataSetCategories', () => {
           location: {
             level: 'localAuthority',
             value: 'barnet',
-          },
-          config: {
-            label: 'Test label 1',
           },
         },
       ],
@@ -396,7 +387,7 @@ describe('createDataSetCategories', () => {
     });
 
     expect(dataSet1.value).toBe(2613);
-    expect(dataSet1.dataSet).toEqual<DataSetConfiguration>({
+    expect(dataSet1.dataSet).toEqual<DataSet>({
       indicator: 'authorised-absence-sessions',
       filters: ['ethnicity-major-chinese', 'state-funded-primary'],
       location: {
@@ -404,9 +395,6 @@ describe('createDataSetCategories', () => {
         value: 'barnet',
       },
       timePeriod: '2014_AY',
-      config: {
-        label: 'Test label 1',
-      },
     });
 
     expect(dataSetCategories[1].filter.label).toBe('2015/16');
@@ -427,7 +415,7 @@ describe('createDataSetCategories', () => {
     });
 
     expect(dataSet2.value).toBe(2652);
-    expect(dataSet2.dataSet).toEqual<DataSetConfiguration>({
+    expect(dataSet2.dataSet).toEqual<DataSet>({
       indicator: 'authorised-absence-sessions',
       filters: ['ethnicity-major-chinese', 'state-funded-primary'],
       location: {
@@ -435,9 +423,6 @@ describe('createDataSetCategories', () => {
         value: 'barnet',
       },
       timePeriod: '2015_AY',
-      config: {
-        label: 'Test label 1',
-      },
     });
   });
 
@@ -451,9 +436,6 @@ describe('createDataSetCategories', () => {
         {
           indicator: 'authorised-absence-sessions',
           filters: ['ethnicity-major-chinese', 'state-funded-primary'],
-          config: {
-            label: 'Test label 1',
-          },
         },
       ],
       referenceLines: [],
@@ -492,7 +474,7 @@ describe('createDataSetCategories', () => {
       },
     });
     expect(dataSet1.value).toBe(2613);
-    expect(dataSet1.dataSet).toEqual<DataSetConfiguration>({
+    expect(dataSet1.dataSet).toEqual<DataSet>({
       indicator: 'authorised-absence-sessions',
       filters: ['ethnicity-major-chinese', 'state-funded-primary'],
       location: {
@@ -500,9 +482,6 @@ describe('createDataSetCategories', () => {
         value: 'barnet',
       },
       timePeriod: '2014_AY',
-      config: {
-        label: 'Test label 1',
-      },
     });
 
     expect(JSON.parse(dataSet2Key)).toEqual({
@@ -514,7 +493,7 @@ describe('createDataSetCategories', () => {
       },
     });
     expect(dataSet2.value).toBe(39);
-    expect(dataSet2.dataSet).toEqual<DataSetConfiguration>({
+    expect(dataSet2.dataSet).toEqual<DataSet>({
       indicator: 'authorised-absence-sessions',
       filters: ['ethnicity-major-chinese', 'state-funded-primary'],
       location: {
@@ -522,9 +501,6 @@ describe('createDataSetCategories', () => {
         value: 'barnsley',
       },
       timePeriod: '2014_AY',
-      config: {
-        label: 'Test label 1',
-      },
     });
 
     expect(dataSetCategories[1].filter.label).toBe('2015/16');
@@ -547,7 +523,7 @@ describe('createDataSetCategories', () => {
       },
     });
     expect(dataSet3.value).toBe(2652);
-    expect(dataSet3.dataSet).toEqual<DataSetConfiguration>({
+    expect(dataSet3.dataSet).toEqual<DataSet>({
       indicator: 'authorised-absence-sessions',
       filters: ['ethnicity-major-chinese', 'state-funded-primary'],
       location: {
@@ -555,9 +531,6 @@ describe('createDataSetCategories', () => {
         value: 'barnet',
       },
       timePeriod: '2015_AY',
-      config: {
-        label: 'Test label 1',
-      },
     });
 
     expect(JSON.parse(dataSet4Key)).toEqual({
@@ -569,7 +542,7 @@ describe('createDataSetCategories', () => {
       },
     });
     expect(dataSet4.value).toBe(19);
-    expect(dataSet4.dataSet).toEqual<DataSetConfiguration>({
+    expect(dataSet4.dataSet).toEqual<DataSet>({
       indicator: 'authorised-absence-sessions',
       filters: ['ethnicity-major-chinese', 'state-funded-primary'],
       location: {
@@ -577,9 +550,6 @@ describe('createDataSetCategories', () => {
         value: 'barnsley',
       },
       timePeriod: '2015_AY',
-      config: {
-        label: 'Test label 1',
-      },
     });
   });
 
@@ -593,9 +563,6 @@ describe('createDataSetCategories', () => {
         {
           indicator: 'authorised-absence-sessions',
           filters: ['ethnicity-major-chinese', 'state-funded-primary'],
-          config: {
-            label: 'Test label 1',
-          },
         },
       ],
       referenceLines: [],
@@ -631,7 +598,7 @@ describe('createDataSetCategories', () => {
       timePeriod: '2014_AY',
     });
     expect(dataSet1.value).toBe(2613);
-    expect(dataSet1.dataSet).toEqual<DataSetConfiguration>({
+    expect(dataSet1.dataSet).toEqual<DataSet>({
       indicator: 'authorised-absence-sessions',
       filters: ['ethnicity-major-chinese', 'state-funded-primary'],
       location: {
@@ -639,9 +606,6 @@ describe('createDataSetCategories', () => {
         value: 'barnet',
       },
       timePeriod: '2014_AY',
-      config: {
-        label: 'Test label 1',
-      },
     });
 
     expect(JSON.parse(dataSet2Key)).toEqual({
@@ -650,7 +614,7 @@ describe('createDataSetCategories', () => {
       timePeriod: '2015_AY',
     });
     expect(dataSet2.value).toBe(2652);
-    expect(dataSet2.dataSet).toEqual<DataSetConfiguration>({
+    expect(dataSet2.dataSet).toEqual<DataSet>({
       indicator: 'authorised-absence-sessions',
       filters: ['ethnicity-major-chinese', 'state-funded-primary'],
       location: {
@@ -658,9 +622,6 @@ describe('createDataSetCategories', () => {
         value: 'barnet',
       },
       timePeriod: '2015_AY',
-      config: {
-        label: 'Test label 1',
-      },
     });
 
     expect(dataSetCategories[1].filter.label).toBe('Barnsley');
@@ -680,7 +641,7 @@ describe('createDataSetCategories', () => {
       timePeriod: '2014_AY',
     });
     expect(dataSet3.value).toBe(39);
-    expect(dataSet3.dataSet).toEqual<DataSetConfiguration>({
+    expect(dataSet3.dataSet).toEqual<DataSet>({
       indicator: 'authorised-absence-sessions',
       filters: ['ethnicity-major-chinese', 'state-funded-primary'],
       location: {
@@ -688,9 +649,6 @@ describe('createDataSetCategories', () => {
         value: 'barnsley',
       },
       timePeriod: '2014_AY',
-      config: {
-        label: 'Test label 1',
-      },
     });
 
     expect(JSON.parse(dataSet4Key)).toEqual({
@@ -699,7 +657,7 @@ describe('createDataSetCategories', () => {
       timePeriod: '2015_AY',
     });
     expect(dataSet4.value).toBe(19);
-    expect(dataSet4.dataSet).toEqual<DataSetConfiguration>({
+    expect(dataSet4.dataSet).toEqual<DataSet>({
       indicator: 'authorised-absence-sessions',
       filters: ['ethnicity-major-chinese', 'state-funded-primary'],
       location: {
@@ -707,9 +665,6 @@ describe('createDataSetCategories', () => {
         value: 'barnsley',
       },
       timePeriod: '2015_AY',
-      config: {
-        label: 'Test label 1',
-      },
     });
   });
 
@@ -723,9 +678,6 @@ describe('createDataSetCategories', () => {
         {
           indicator: 'authorised-absence-sessions',
           filters: ['ethnicity-major-chinese', 'state-funded-primary'],
-          config: {
-            label: 'Test label 1',
-          },
         },
       ],
       referenceLines: [],
@@ -768,7 +720,7 @@ describe('createDataSetCategories', () => {
       },
     });
     expect(dataSet1.value).toBe(2613);
-    expect(dataSet1.dataSet).toEqual<DataSetConfiguration>({
+    expect(dataSet1.dataSet).toEqual<DataSet>({
       indicator: 'authorised-absence-sessions',
       filters: ['ethnicity-major-chinese', 'state-funded-primary'],
       location: {
@@ -776,9 +728,6 @@ describe('createDataSetCategories', () => {
         value: 'barnet',
       },
       timePeriod: '2014_AY',
-      config: {
-        label: 'Test label 1',
-      },
     });
 
     expect(JSON.parse(dataSet2Key)).toEqual({
@@ -790,7 +739,7 @@ describe('createDataSetCategories', () => {
       },
     });
     expect(dataSet2.value).toBe(2652);
-    expect(dataSet2.dataSet).toEqual<DataSetConfiguration>({
+    expect(dataSet2.dataSet).toEqual<DataSet>({
       indicator: 'authorised-absence-sessions',
       filters: ['ethnicity-major-chinese', 'state-funded-primary'],
       location: {
@@ -798,9 +747,6 @@ describe('createDataSetCategories', () => {
         value: 'barnet',
       },
       timePeriod: '2015_AY',
-      config: {
-        label: 'Test label 1',
-      },
     });
 
     expect(JSON.parse(dataSet3Key)).toEqual({
@@ -812,7 +758,7 @@ describe('createDataSetCategories', () => {
       },
     });
     expect(dataSet3.value).toBe(39);
-    expect(dataSet3.dataSet).toEqual<DataSetConfiguration>({
+    expect(dataSet3.dataSet).toEqual<DataSet>({
       indicator: 'authorised-absence-sessions',
       filters: ['ethnicity-major-chinese', 'state-funded-primary'],
       location: {
@@ -820,9 +766,6 @@ describe('createDataSetCategories', () => {
         value: 'barnsley',
       },
       timePeriod: '2014_AY',
-      config: {
-        label: 'Test label 1',
-      },
     });
 
     expect(JSON.parse(dataSet4Key)).toEqual({
@@ -834,7 +777,7 @@ describe('createDataSetCategories', () => {
       },
     });
     expect(dataSet4.value).toBe(19);
-    expect(dataSet4.dataSet).toEqual<DataSetConfiguration>({
+    expect(dataSet4.dataSet).toEqual<DataSet>({
       indicator: 'authorised-absence-sessions',
       filters: ['ethnicity-major-chinese', 'state-funded-primary'],
       location: {
@@ -842,9 +785,6 @@ describe('createDataSetCategories', () => {
         value: 'barnsley',
       },
       timePeriod: '2015_AY',
-      config: {
-        label: 'Test label 1',
-      },
     });
   });
 
@@ -858,9 +798,6 @@ describe('createDataSetCategories', () => {
         {
           indicator: 'authorised-absence-sessions',
           filters: ['ethnicity-major-chinese', 'state-funded-primary'],
-          config: {
-            label: 'Test label 1',
-          },
         },
       ],
       referenceLines: [],
@@ -902,7 +839,7 @@ describe('createDataSetCategories', () => {
       },
     });
     expect(dataSet1.value).toBe(2613);
-    expect(dataSet1.dataSet).toEqual<DataSetConfiguration>({
+    expect(dataSet1.dataSet).toEqual<DataSet>({
       indicator: 'authorised-absence-sessions',
       filters: ['ethnicity-major-chinese', 'state-funded-primary'],
       location: {
@@ -910,9 +847,6 @@ describe('createDataSetCategories', () => {
         value: 'barnet',
       },
       timePeriod: '2014_AY',
-      config: {
-        label: 'Test label 1',
-      },
     });
 
     expect(JSON.parse(dataSet2Key)).toEqual({
@@ -925,7 +859,7 @@ describe('createDataSetCategories', () => {
       },
     });
     expect(dataSet2.value).toBe(2652);
-    expect(dataSet2.dataSet).toEqual<DataSetConfiguration>({
+    expect(dataSet2.dataSet).toEqual<DataSet>({
       indicator: 'authorised-absence-sessions',
       filters: ['ethnicity-major-chinese', 'state-funded-primary'],
       location: {
@@ -933,9 +867,6 @@ describe('createDataSetCategories', () => {
         value: 'barnet',
       },
       timePeriod: '2015_AY',
-      config: {
-        label: 'Test label 1',
-      },
     });
 
     expect(JSON.parse(dataSet3Key)).toEqual({
@@ -948,7 +879,7 @@ describe('createDataSetCategories', () => {
       },
     });
     expect(dataSet3.value).toBe(39);
-    expect(dataSet3.dataSet).toEqual<DataSetConfiguration>({
+    expect(dataSet3.dataSet).toEqual<DataSet>({
       indicator: 'authorised-absence-sessions',
       filters: ['ethnicity-major-chinese', 'state-funded-primary'],
       location: {
@@ -956,9 +887,6 @@ describe('createDataSetCategories', () => {
         value: 'barnsley',
       },
       timePeriod: '2014_AY',
-      config: {
-        label: 'Test label 1',
-      },
     });
 
     expect(JSON.parse(dataSet4Key)).toEqual({
@@ -971,7 +899,7 @@ describe('createDataSetCategories', () => {
       },
     });
     expect(dataSet4.value).toBe(19);
-    expect(dataSet4.dataSet).toEqual<DataSetConfiguration>({
+    expect(dataSet4.dataSet).toEqual<DataSet>({
       indicator: 'authorised-absence-sessions',
       filters: ['ethnicity-major-chinese', 'state-funded-primary'],
       location: {
@@ -979,9 +907,6 @@ describe('createDataSetCategories', () => {
         value: 'barnsley',
       },
       timePeriod: '2015_AY',
-      config: {
-        label: 'Test label 1',
-      },
     });
   });
 
@@ -995,9 +920,6 @@ describe('createDataSetCategories', () => {
         {
           indicator: 'authorised-absence-sessions',
           filters: ['ethnicity-major-chinese', 'state-funded-primary'],
-          config: {
-            label: 'Test label 1',
-          },
         },
         {
           indicator: 'authorised-absence-sessions',
@@ -1006,9 +928,6 @@ describe('createDataSetCategories', () => {
           location: {
             level: 'localAuthority',
             value: 'barnsley',
-          },
-          config: {
-            label: 'Overriding test label',
           },
         },
       ],
@@ -1048,7 +967,7 @@ describe('createDataSetCategories', () => {
       },
     });
     expect(dataSet1.value).toBe(2613);
-    expect(dataSet1.dataSet).toEqual<DataSetConfiguration>({
+    expect(dataSet1.dataSet).toEqual<DataSet>({
       indicator: 'authorised-absence-sessions',
       filters: ['ethnicity-major-chinese', 'state-funded-primary'],
       location: {
@@ -1056,9 +975,6 @@ describe('createDataSetCategories', () => {
         value: 'barnet',
       },
       timePeriod: '2014_AY',
-      config: {
-        label: 'Test label 1',
-      },
     });
 
     expect(JSON.parse(dataSet2Key)).toEqual({
@@ -1070,7 +986,7 @@ describe('createDataSetCategories', () => {
       },
     });
     expect(dataSet2.value).toBe(39);
-    expect(dataSet2.dataSet).toEqual<DataSetConfiguration>({
+    expect(dataSet2.dataSet).toEqual<DataSet>({
       indicator: 'authorised-absence-sessions',
       filters: ['ethnicity-major-chinese', 'state-funded-primary'],
       location: {
@@ -1078,9 +994,6 @@ describe('createDataSetCategories', () => {
         value: 'barnsley',
       },
       timePeriod: '2014_AY',
-      config: {
-        label: 'Test label 1',
-      },
     });
 
     expect(dataSetCategories[1].filter.label).toBe('2015/16');
@@ -1103,7 +1016,7 @@ describe('createDataSetCategories', () => {
       },
     });
     expect(dataSet3.value).toBe(2652);
-    expect(dataSet3.dataSet).toEqual<DataSetConfiguration>({
+    expect(dataSet3.dataSet).toEqual<DataSet>({
       indicator: 'authorised-absence-sessions',
       filters: ['ethnicity-major-chinese', 'state-funded-primary'],
       location: {
@@ -1111,9 +1024,6 @@ describe('createDataSetCategories', () => {
         value: 'barnet',
       },
       timePeriod: '2015_AY',
-      config: {
-        label: 'Test label 1',
-      },
     });
 
     expect(JSON.parse(dataSet4Key)).toEqual({
@@ -1125,7 +1035,7 @@ describe('createDataSetCategories', () => {
       },
     });
     expect(dataSet4.value).toBe(19);
-    expect(dataSet4.dataSet).toEqual<DataSetConfiguration>({
+    expect(dataSet4.dataSet).toEqual<DataSet>({
       indicator: 'authorised-absence-sessions',
       filters: ['ethnicity-major-chinese', 'state-funded-primary'],
       location: {
@@ -1133,9 +1043,6 @@ describe('createDataSetCategories', () => {
         value: 'barnsley',
       },
       timePeriod: '2015_AY',
-      config: {
-        label: 'Overriding test label',
-      },
     });
   });
 
@@ -1149,9 +1056,6 @@ describe('createDataSetCategories', () => {
         {
           indicator: 'authorised-absence-sessions',
           filters: ['ethnicity-major-chinese', 'state-funded-primary'],
-          config: {
-            label: 'Test label 1',
-          },
         },
       ],
       referenceLines: [],
@@ -1205,9 +1109,6 @@ describe('createDataSetCategories', () => {
         {
           indicator: 'authorised-absence-sessions',
           filters: ['ethnicity-major-chinese', 'state-funded-primary'],
-          config: {
-            label: 'Test label 1',
-          },
         },
       ],
       referenceLines: [],
@@ -1280,9 +1181,6 @@ describe('createDataSetCategories', () => {
             level: 'country',
             value: 'E92000001',
           },
-          config: {
-            label: 'Test label 1',
-          },
         },
         {
           indicator: 'authorised-absence-sessions',
@@ -1290,9 +1188,6 @@ describe('createDataSetCategories', () => {
           location: {
             level: 'country',
             value: 'E92000001',
-          },
-          config: {
-            label: 'Test label 2',
           },
         },
       ],
@@ -1399,7 +1294,7 @@ describe('createDataSetCategories', () => {
     expect(dataSets).toHaveLength(2);
 
     expect(dataSets[0].value).toBe(42219483);
-    expect(dataSets[0].dataSet).toEqual<DataSetConfiguration>({
+    expect(dataSets[0].dataSet).toEqual<DataSet>({
       indicator: 'authorised-absence-sessions',
       filters: ['state-funded-primary'],
       location: {
@@ -1407,13 +1302,10 @@ describe('createDataSetCategories', () => {
         value: 'E92000001',
       },
       timePeriod: '2015_AY',
-      config: {
-        label: 'Test label 1',
-      },
     });
 
     expect(dataSets[1].value).toBe(37997247);
-    expect(dataSets[1].dataSet).toEqual<DataSetConfiguration>({
+    expect(dataSets[1].dataSet).toEqual<DataSet>({
       indicator: 'authorised-absence-sessions',
       filters: ['state-funded-secondary'],
       location: {
@@ -1421,9 +1313,6 @@ describe('createDataSetCategories', () => {
         value: 'E92000001',
       },
       timePeriod: '2015_AY',
-      config: {
-        label: 'Test label 2',
-      },
     });
   });
 });

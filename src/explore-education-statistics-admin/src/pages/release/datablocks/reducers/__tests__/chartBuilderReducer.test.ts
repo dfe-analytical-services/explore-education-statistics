@@ -11,7 +11,8 @@ import {
   AxisType,
   ChartDefinition,
 } from '@common/modules/charts/types/chart';
-import { DataSetConfiguration } from '@common/modules/charts/types/dataSet';
+import { DataSet } from '@common/modules/charts/types/dataSet';
+import { LegendConfiguration } from '@common/modules/charts/types/legend';
 import { Chart } from '@common/services/types/blocks';
 import { renderHook } from '@testing-library/react-hooks';
 import produce from 'immer';
@@ -21,31 +22,27 @@ describe('chartBuilderReducer', () => {
     type: 'line',
     name: 'Line',
     capabilities: {
-      dataSymbols: true,
-      stackable: false,
-      lineStyle: true,
-      gridLines: true,
       canSize: true,
       canSort: true,
-      fixedAxisGroupBy: false,
-      hasReferenceLines: true,
+      hasGridLines: true,
       hasLegend: true,
+      hasLegendPosition: true,
+      hasLineStyle: true,
+      hasReferenceLines: true,
+      hasSymbols: true,
       requiresGeoJson: false,
+      stackable: false,
     },
     options: {
       defaults: {
         height: 300,
-        legend: 'top',
       },
     },
-    data: [
-      {
-        type: 'line',
-        title: 'Line',
-        entryCount: 'multiple',
-        targetAxis: 'xaxis',
+    legend: {
+      defaults: {
+        position: 'top',
       },
-    ],
+    },
     axes: {
       major: {
         id: 'xaxis',
@@ -78,6 +75,21 @@ describe('chartBuilderReducer', () => {
     },
   };
 
+  const testInitialFormState: ChartBuilderState['forms'] = {
+    options: {
+      isValid: true,
+      submitCount: 0,
+    },
+    legend: {
+      isValid: true,
+      submitCount: 0,
+    },
+    data: {
+      isValid: true,
+      submitCount: 0,
+    },
+  };
+
   describe('UPDATE_CHART_DEFINITION', () => {
     const initialState: ChartBuilderState = {
       axes: {},
@@ -87,22 +99,17 @@ describe('chartBuilderReducer', () => {
         alt: '',
       },
       forms: {
-        options: {
-          isValid: true,
-          submitCount: 0,
-        },
-        data: {
-          isValid: true,
-          submitCount: 0,
-        },
+        ...testInitialFormState,
       },
     };
 
     test('sets the `definition` to the payload', () => {
-      const nextState = produce(chartBuilderReducer)(initialState, {
+      const action: ChartBuilderActions = {
         type: 'UPDATE_CHART_DEFINITION',
         payload: testChartDefinition,
-      } as ChartBuilderActions);
+      };
+
+      const nextState = produce(chartBuilderReducer)(initialState, action);
 
       expect(nextState.definition).toEqual(testChartDefinition);
     });
@@ -111,45 +118,89 @@ describe('chartBuilderReducer', () => {
       const nextState = produce(chartBuilderReducer)(initialState, {
         type: 'UPDATE_CHART_DEFINITION',
         payload: testChartDefinition,
-      } as ChartBuilderActions);
+      });
 
       expect(nextState.options).toEqual<ChartOptions>({
         height: 300,
-        legend: 'top',
         title: '',
         alt: '',
       });
     });
 
-    test('does not override `options` that already exist ', () => {
+    test('sets `legend` with defaults from the definition', () => {
+      const action: ChartBuilderActions = {
+        type: 'UPDATE_CHART_DEFINITION',
+        payload: testChartDefinition,
+      };
+
+      const nextState = produce(chartBuilderReducer)(initialState, action);
+
+      expect(nextState.legend).toEqual<LegendConfiguration>({
+        position: 'top',
+        items: [],
+      });
+    });
+
+    test('does not override `options` or `legend` that already exist ', () => {
       const initialStateWithOptions: ChartBuilderState = {
         ...initialState,
         options: {
           height: 400,
           title: 'Some title',
           alt: 'Some alt',
-          legend: 'bottom',
+        },
+        legend: {
+          position: 'bottom',
+          items: [
+            {
+              dataSet: {
+                indicator: 'indicator-1',
+                filters: [],
+              },
+              label: 'Existing legend item',
+              colour: 'blue',
+            },
+          ],
         },
       };
 
-      const nextState = produce(chartBuilderReducer)(initialStateWithOptions, {
+      const action: ChartBuilderActions = {
         type: 'UPDATE_CHART_DEFINITION',
         payload: testChartDefinition,
-      } as ChartBuilderActions);
+      };
+
+      const nextState = produce(chartBuilderReducer)(
+        initialStateWithOptions,
+        action,
+      );
 
       expect(nextState.options).toEqual<ChartOptions>({
         height: 400,
         title: 'Some title',
         alt: 'Some alt',
-        legend: 'bottom',
+      });
+      expect(nextState.legend).toEqual<LegendConfiguration>({
+        position: 'bottom',
+        items: [
+          {
+            dataSet: {
+              indicator: 'indicator-1',
+              filters: [],
+            },
+            label: 'Existing legend item',
+            colour: 'blue',
+          },
+        ],
       });
     });
 
     test('sets `axes` with defaults', () => {
-      const nextState = produce(chartBuilderReducer)(initialState, {
+      const action: ChartBuilderActions = {
         type: 'UPDATE_CHART_DEFINITION',
         payload: testChartDefinition,
-      } as ChartBuilderActions);
+      };
+
+      const nextState = produce(chartBuilderReducer)(initialState, action);
 
       expect(nextState.axes.major).toEqual<AxisConfiguration>({
         dataSets: [],
@@ -203,10 +254,15 @@ describe('chartBuilderReducer', () => {
         },
       };
 
-      const nextState = produce(chartBuilderReducer)(initialStateWithAxes, {
+      const action: ChartBuilderActions = {
         type: 'UPDATE_CHART_DEFINITION',
         payload: testChartDefinition,
-      } as ChartBuilderActions);
+      };
+
+      const nextState = produce(chartBuilderReducer)(
+        initialStateWithAxes,
+        action,
+      );
 
       expect(nextState.axes.major).toMatchObject<Partial<AxisConfiguration>>({
         dataSets: [],
@@ -222,10 +278,12 @@ describe('chartBuilderReducer', () => {
     });
 
     test('adds new `forms` state for each new axis', () => {
-      const nextState = produce(chartBuilderReducer)(initialState, {
+      const action: ChartBuilderActions = {
         type: 'UPDATE_CHART_DEFINITION',
         payload: testChartDefinition,
-      } as ChartBuilderActions);
+      };
+
+      const nextState = produce(chartBuilderReducer)(initialState, action);
 
       expect(nextState.forms).toEqual<ChartBuilderState['forms']>({
         options: {
@@ -233,6 +291,10 @@ describe('chartBuilderReducer', () => {
           submitCount: 0,
         },
         data: {
+          isValid: true,
+          submitCount: 0,
+        },
+        legend: {
           isValid: true,
           submitCount: 0,
         },
@@ -265,14 +327,7 @@ describe('chartBuilderReducer', () => {
         alt: '',
       },
       forms: {
-        options: {
-          isValid: true,
-          submitCount: 0,
-        },
-        data: {
-          isValid: true,
-          submitCount: 0,
-        },
+        ...testInitialFormState,
         major: {
           isValid: true,
           submitCount: 0,
@@ -281,9 +336,11 @@ describe('chartBuilderReducer', () => {
     };
 
     test('overrides chart definition defaults', () => {
-      const nextState = produce(chartBuilderReducer)(initialState, {
+      const action: ChartBuilderActions = {
         type: 'UPDATE_CHART_AXIS',
         payload: {
+          dataSets: [],
+          referenceLines: [],
           type: 'major',
           groupBy: 'indicators',
           visible: false,
@@ -291,7 +348,9 @@ describe('chartBuilderReducer', () => {
             text: 'Some label',
           },
         },
-      } as ChartBuilderActions);
+      };
+
+      const nextState = produce(chartBuilderReducer)(initialState, action);
 
       expect(nextState.axes.major).toEqual<AxisConfiguration>({
         dataSets: [],
@@ -315,17 +374,22 @@ describe('chartBuilderReducer', () => {
 
     test('throws if an invalid axis definition `type` is provided', () => {
       expect(() => {
-        produce(chartBuilderReducer)(initialState, {
+        const action: ChartBuilderActions = {
           type: 'UPDATE_CHART_AXIS',
           payload: {
             type: 'not valid' as AxisType,
+            referenceLines: [],
+            visible: true,
             dataSets: [
               {
                 indicator: 'some thing',
+                filters: [],
               },
             ],
           },
-        } as ChartBuilderActions);
+        };
+
+        produce(chartBuilderReducer)(initialState, action);
       }).toThrow("Could not find chart axis definition for type 'not valid'");
     });
   });
@@ -340,14 +404,7 @@ describe('chartBuilderReducer', () => {
         alt: '',
       },
       forms: {
-        options: {
-          isValid: true,
-          submitCount: 0,
-        },
-        data: {
-          isValid: true,
-          submitCount: 0,
-        },
+        ...testInitialFormState,
         major: {
           isValid: true,
           submitCount: 0,
@@ -355,27 +412,42 @@ describe('chartBuilderReducer', () => {
       },
     };
 
-    test('sets `options` with defaults not in payload', () => {
-      const nextState = produce(chartBuilderReducer)(initialState, {
+    test('sets `options` to payload', () => {
+      const action: ChartBuilderActions = {
         type: 'UPDATE_CHART_OPTIONS',
         payload: {
-          legend: 'top',
+          height: 500,
+          width: 400,
+          title: 'Test title',
+          alt: 'Test alt',
         },
-      } as ChartBuilderActions);
+      };
+
+      const nextState = produce(chartBuilderReducer)(initialState, action);
 
       expect(nextState.options).toEqual<ChartOptions>({
-        height: 300,
-        legend: 'top',
-        title: '',
-        alt: '',
+        height: 500,
+        width: 400,
+        title: 'Test title',
+        alt: 'Test alt',
       });
     });
 
-    test('does not unset existing `options`', () => {
+    test('does not unset existing `options` state that were not included in payload', () => {
       const initialStateWithExistingOptions: ChartBuilderState = {
         ...initialState,
         options: {
           height: 300,
+          title: '',
+          alt: '',
+          stacked: true,
+        },
+      };
+
+      const action: ChartBuilderActions = {
+        type: 'UPDATE_CHART_OPTIONS',
+        payload: {
+          height: 500,
           width: 400,
           title: '',
           alt: '',
@@ -384,20 +456,15 @@ describe('chartBuilderReducer', () => {
 
       const nextState = produce(chartBuilderReducer)(
         initialStateWithExistingOptions,
-        {
-          type: 'UPDATE_CHART_OPTIONS',
-          payload: {
-            legend: 'top',
-          },
-        } as ChartBuilderActions,
+        action,
       );
 
       expect(nextState.options).toEqual<ChartOptions>({
-        height: 300,
-        legend: 'top',
+        height: 500,
+        width: 400,
         title: '',
         alt: '',
-        width: 400,
+        stacked: true,
       });
     });
 
@@ -412,42 +479,37 @@ describe('chartBuilderReducer', () => {
         },
       };
 
+      const action: ChartBuilderActions = {
+        type: 'UPDATE_CHART_OPTIONS',
+        payload: {
+          height: 300,
+          width: undefined,
+          title: '',
+          alt: '',
+        },
+      };
+
       const nextState = produce(chartBuilderReducer)(
         initialStateWithExistingOptions,
-        {
-          type: 'UPDATE_CHART_OPTIONS',
-          payload: {
-            legend: 'top',
-            width: undefined,
-          },
-        } as ChartBuilderActions,
+        action,
       );
 
       expect(nextState.options).toEqual<ChartOptions>({
         height: 300,
-        legend: 'top',
         title: '',
         alt: '',
       });
     });
   });
 
-  describe('ADD_DATA_SET', () => {
+  describe('UPDATE_DATA_SETS', () => {
     const initialState: ChartBuilderState = {
       axes: {
         major: {
           type: 'major',
           visible: true,
           referenceLines: [],
-          dataSets: [
-            {
-              indicator: 'indicator-1',
-              filters: ['filter-1'],
-              config: {
-                label: 'Label 1',
-              },
-            },
-          ],
+          dataSets: [],
         },
       },
       definition: testChartDefinition,
@@ -457,14 +519,7 @@ describe('chartBuilderReducer', () => {
         alt: '',
       },
       forms: {
-        options: {
-          isValid: true,
-          submitCount: 0,
-        },
-        data: {
-          isValid: true,
-          submitCount: 0,
-        },
+        ...testInitialFormState,
         major: {
           isValid: true,
           submitCount: 0,
@@ -472,37 +527,37 @@ describe('chartBuilderReducer', () => {
       },
     };
 
-    test('adds payload to data sets', () => {
-      const nextState = produce(chartBuilderReducer)(initialState, {
-        type: 'ADD_DATA_SET',
-        payload: {
-          indicator: 'indicator-2',
-          filters: ['filter-2'],
-          config: {
-            label: 'Label 2',
+    test('sets payload to data sets', () => {
+      const action: ChartBuilderActions = {
+        type: 'UPDATE_DATA_SETS',
+        payload: [
+          {
+            indicator: 'indicator-1',
+            filters: ['filter-1'],
           },
-        },
-      } as ChartBuilderActions);
+        ],
+      };
 
-      expect(nextState.axes.major?.dataSets).toEqual<DataSetConfiguration[]>([
+      const nextState = produce(chartBuilderReducer)(initialState, action);
+
+      expect(nextState.axes.major?.dataSets).toEqual<DataSet[]>([
         {
           indicator: 'indicator-1',
           filters: ['filter-1'],
-          config: {
-            label: 'Label 1',
-          },
-        },
-        {
-          indicator: 'indicator-2',
-          filters: ['filter-2'],
-          config: {
-            label: 'Label 2',
-          },
         },
       ]);
     });
 
-    test('sets `forms.data.isValid` to true', () => {
+    test('sets `forms.data.isValid` to true if more than one data set', () => {
+      const action: ChartBuilderActions = {
+        type: 'UPDATE_DATA_SETS',
+        payload: [
+          {
+            indicator: 'indicator-2',
+            filters: ['filter-2'],
+          },
+        ],
+      };
       const nextState = produce(chartBuilderReducer)(
         {
           ...initialState,
@@ -514,177 +569,31 @@ describe('chartBuilderReducer', () => {
             },
           },
         },
-        {
-          type: 'ADD_DATA_SET',
-          payload: {
-            indicator: 'indicator-2',
-            filters: ['filter-2'],
-            config: {
-              label: 'Label 2',
-            },
-          },
-        } as ChartBuilderActions,
+        action,
       );
 
       expect(nextState.forms.data.isValid).toBe(true);
     });
-  });
 
-  describe('REMOVE_DATA_SET', () => {
-    const initialState: ChartBuilderState = {
-      axes: {
-        major: {
-          type: 'major',
-          visible: true,
-          referenceLines: [],
-          dataSets: [
-            {
-              indicator: 'indicator-1',
-              filters: ['filter-1'],
-              config: {
-                label: 'Label 1',
-              },
-            },
-            {
-              indicator: 'indicator-2',
-              filters: ['filter-2'],
-              config: {
-                label: 'Label 2',
-              },
-            },
-          ],
-        },
-      },
-      definition: testChartDefinition,
-      options: {
-        height: 300,
-        title: '',
-        alt: '',
-      },
-      forms: {
-        options: {
-          isValid: true,
-          submitCount: 0,
-        },
-        data: {
-          isValid: true,
-          submitCount: 0,
-        },
-        major: {
-          isValid: true,
-          submitCount: 0,
-        },
-      },
-    };
-
-    test('removes data set at the payload index', () => {
-      const nextState = produce(chartBuilderReducer)(initialState, {
-        type: 'REMOVE_DATA_SET',
-        payload: 1,
-      } as ChartBuilderActions);
-
-      expect(nextState.axes.major?.dataSets).toEqual<DataSetConfiguration[]>([
-        {
-          indicator: 'indicator-1',
-          filters: ['filter-1'],
-          config: {
-            label: 'Label 1',
-          },
-        },
-      ]);
-    });
-
-    test('sets `forms.data.isValid` to false if there are no remaining data sets', () => {
-      let nextState = produce(chartBuilderReducer)(initialState, {
-        type: 'REMOVE_DATA_SET',
-        payload: 0,
-      } as ChartBuilderActions);
-
-      expect(nextState.forms.data.isValid).toBe(true);
-
-      nextState = produce(chartBuilderReducer)(nextState, {
-        type: 'REMOVE_DATA_SET',
-        payload: 0,
-      } as ChartBuilderActions);
-
-      expect(nextState.axes.major?.dataSets).toEqual([]);
-      expect(nextState.forms.data.isValid).toBe(false);
-    });
-  });
-
-  describe('UPDATE_DATA_SETS', () => {
-    const initialState: ChartBuilderState = {
-      axes: {
-        major: {
-          type: 'major',
-          visible: true,
-          referenceLines: [],
-          dataSets: [
-            {
-              indicator: 'indicator-1',
-              filters: ['filter-1'],
-              config: {
-                label: 'Label 1',
-              },
-            },
-            {
-              indicator: 'indicator-2',
-              filters: ['filter-2'],
-              config: {
-                label: 'Label 2',
-              },
-            },
-          ],
-        },
-      },
-      definition: testChartDefinition,
-      options: {
-        height: 300,
-        title: '',
-        alt: '',
-      },
-      forms: {
-        options: {
-          isValid: true,
-          submitCount: 0,
-        },
-        data: {
-          isValid: true,
-          submitCount: 0,
-        },
-        major: {
-          isValid: true,
-          submitCount: 0,
-        },
-      },
-    };
-
-    test('replaces data sets with payload', () => {
-      const payload: DataSetConfiguration[] = [
-        {
-          indicator: 'indicator-3',
-          filters: ['filter-3'],
-          config: {
-            label: 'Label 3',
-          },
-        },
-      ];
-
-      const nextState = produce(chartBuilderReducer)(initialState, {
-        type: 'UPDATE_DATA_SETS',
-        payload,
-      } as ChartBuilderActions);
-
-      expect(nextState.axes.major?.dataSets).toEqual(payload);
-    });
-
-    test('sets `forms.data.isValid` to false if there are no remaining data sets', () => {
-      const nextState = produce(chartBuilderReducer)(initialState, {
+    test('sets `forms.data.isValid` to false if no data sets', () => {
+      const action: ChartBuilderActions = {
         type: 'UPDATE_DATA_SETS',
         payload: [],
-      } as ChartBuilderActions);
+      };
+      const nextState = produce(chartBuilderReducer)(
+        {
+          ...initialState,
+          forms: {
+            ...initialState.forms,
+            data: {
+              isValid: false,
+              submitCount: 0,
+            },
+          },
+        },
+        action,
+      );
 
-      expect(nextState.axes.major?.dataSets).toEqual([]);
       expect(nextState.forms.data.isValid).toBe(false);
     });
   });
@@ -699,20 +608,13 @@ describe('chartBuilderReducer', () => {
         alt: '',
       },
       forms: {
-        options: {
-          isValid: true,
-          submitCount: 0,
-        },
-        data: {
-          isValid: true,
-          submitCount: 0,
-        },
+        ...testInitialFormState,
       },
     };
 
     test('throws error if invalid `form` key is used', () => {
       expect(() => {
-        produce(chartBuilderReducer)(initialState, {
+        const action: ChartBuilderActions = {
           type: 'UPDATE_FORM',
           payload: {
             form: 'not-correct',
@@ -720,12 +622,14 @@ describe('chartBuilderReducer', () => {
               isValid: false,
             },
           },
-        } as ChartBuilderActions);
+        } as ChartBuilderActions;
+
+        produce(chartBuilderReducer)(initialState, action);
       }).toThrowError("Could not find form 'not-correct' to update");
     });
 
     test('updates correct `form` with payload', () => {
-      const nextState = produce(chartBuilderReducer)(initialState, {
+      const action: ChartBuilderActions = {
         type: 'UPDATE_FORM',
         payload: {
           form: 'options',
@@ -734,7 +638,9 @@ describe('chartBuilderReducer', () => {
             submitCount: 1,
           },
         },
-      } as ChartBuilderActions);
+      };
+
+      const nextState = produce(chartBuilderReducer)(initialState, action);
 
       expect(nextState.forms.options).toEqual({
         isValid: false,
@@ -769,6 +675,10 @@ describe('chartBuilderReducer', () => {
             isValid: false,
             submitCount: 1,
           },
+          legend: {
+            isValid: false,
+            submitCount: 1,
+          },
           major: {
             isValid: false,
             submitCount: 1,
@@ -793,6 +703,10 @@ describe('chartBuilderReducer', () => {
             isValid: true,
             submitCount: 0,
           },
+          legend: {
+            isValid: true,
+            submitCount: 0,
+          },
           data: {
             isValid: true,
             submitCount: 0,
@@ -814,21 +728,17 @@ describe('chartBuilderReducer', () => {
           height: 300,
         },
         forms: {
-          data: {
-            isValid: true,
-            submitCount: 0,
-          },
-          options: {
-            isValid: true,
-            submitCount: 0,
-          },
+          ...testInitialFormState,
         },
       });
     });
 
     test('has correct state with initial configuration', () => {
       const initialConfiguration: Chart = {
-        legend: 'top',
+        legend: {
+          position: 'top',
+          items: [],
+        },
         axes: {
           major: {
             type: 'major',
@@ -839,9 +749,6 @@ describe('chartBuilderReducer', () => {
               {
                 indicator: 'indicator-1',
                 filters: ['filter-1'],
-                config: {
-                  label: 'Test label 1',
-                },
               },
             ],
             referenceLines: [],
@@ -895,9 +802,6 @@ describe('chartBuilderReducer', () => {
               {
                 indicator: 'indicator-1',
                 filters: ['filter-1'],
-                config: {
-                  label: 'Test label 1',
-                },
               },
             ],
             referenceLines: [],
@@ -937,9 +841,12 @@ describe('chartBuilderReducer', () => {
         definition: lineChartBlockDefinition,
         options: {
           height: 300,
-          legend: 'top',
           title: '',
           alt: '',
+        },
+        legend: {
+          position: 'top',
+          items: [],
         },
         forms: {
           data: {
@@ -947,6 +854,10 @@ describe('chartBuilderReducer', () => {
             submitCount: 0,
           },
           options: {
+            isValid: true,
+            submitCount: 0,
+          },
+          legend: {
             isValid: true,
             submitCount: 0,
           },
@@ -964,7 +875,19 @@ describe('chartBuilderReducer', () => {
 
     test('has correct state with minimal initial configuration merged with chart definition defaults', () => {
       const initialConfiguration: Chart = {
-        legend: 'top',
+        legend: {
+          position: 'top',
+          items: [
+            {
+              dataSet: {
+                indicator: 'indicator-1',
+                filters: ['filter-1'],
+              },
+              colour: 'yellow',
+              label: 'Legend item 1',
+            },
+          ],
+        },
         axes: {
           major: {
             type: 'major',
@@ -973,9 +896,6 @@ describe('chartBuilderReducer', () => {
               {
                 indicator: 'indicator-1',
                 filters: ['filter-1'],
-                config: {
-                  label: 'Test label 1',
-                },
               },
             ],
             referenceLines: [],
@@ -1009,9 +929,6 @@ describe('chartBuilderReducer', () => {
               {
                 indicator: 'indicator-1',
                 filters: ['filter-1'],
-                config: {
-                  label: 'Test label 1',
-                },
               },
             ],
             referenceLines: [],
@@ -1046,9 +963,21 @@ describe('chartBuilderReducer', () => {
         definition: lineChartBlockDefinition,
         options: {
           height: 300,
-          legend: 'top',
           title: '',
           alt: '',
+        },
+        legend: {
+          position: 'top',
+          items: [
+            {
+              dataSet: {
+                indicator: 'indicator-1',
+                filters: ['filter-1'],
+              },
+              colour: 'yellow',
+              label: 'Legend item 1',
+            },
+          ],
         },
         forms: {
           data: {
@@ -1056,6 +985,10 @@ describe('chartBuilderReducer', () => {
             submitCount: 0,
           },
           options: {
+            isValid: true,
+            submitCount: 0,
+          },
+          legend: {
             isValid: true,
             submitCount: 0,
           },
@@ -1073,7 +1006,10 @@ describe('chartBuilderReducer', () => {
 
     test('has default `axes.minor` state if initial configuration is missing it', () => {
       const initialConfiguration: Chart = {
-        legend: 'top',
+        legend: {
+          position: 'top',
+          items: [],
+        },
         axes: {
           major: {
             type: 'major',
@@ -1082,9 +1018,6 @@ describe('chartBuilderReducer', () => {
               {
                 indicator: 'indicator-1',
                 filters: ['filter-1'],
-                config: {
-                  label: 'Test label 1',
-                },
               },
             ],
             referenceLines: [],
@@ -1117,56 +1050,6 @@ describe('chartBuilderReducer', () => {
           width: 100,
         },
       });
-    });
-
-    test('merges deprecated `labels` configurations into `axes.major.dataSets`', () => {
-      const initialConfiguration: Chart = {
-        legend: 'top',
-        labels: {
-          'indicator-1_filter-1_____': {
-            value: 'indicator-1_filter-1_____',
-            label: 'Test label 1',
-          },
-        },
-        axes: {
-          major: {
-            type: 'major',
-            groupBy: 'timePeriod',
-            dataSets: [
-              {
-                indicator: 'indicator-1',
-                filters: ['filter-1'],
-              },
-            ],
-            referenceLines: [],
-            visible: true,
-          },
-          minor: {
-            type: 'minor',
-            dataSets: [],
-            referenceLines: [],
-            visible: true,
-          },
-        },
-        type: 'line',
-        height: 300,
-        title: '',
-        alt: '',
-      };
-
-      const { result } = renderHook(() =>
-        useChartBuilderReducer(initialConfiguration),
-      );
-
-      expect(result.current.state.axes.major?.dataSets).toEqual([
-        {
-          indicator: 'indicator-1',
-          filters: ['filter-1'],
-          config: {
-            label: 'Test label 1',
-          },
-        },
-      ]);
     });
   });
 });

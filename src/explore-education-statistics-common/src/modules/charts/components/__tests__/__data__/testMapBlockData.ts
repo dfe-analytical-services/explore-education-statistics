@@ -13,23 +13,11 @@ export const testMapConfiguration: Chart = {
           indicator: 'authorised-absence-rate',
           filters: ['school-type-total', 'characteristic-total'],
           timePeriod: '2016_AY',
-          config: {
-            label: 'Authorised absence rate (2016/17)',
-            colour: '#4763a5',
-            symbol: 'circle',
-            lineStyle: 'solid',
-          },
         },
         {
           indicator: 'overall-absence-rate',
           filters: ['school-type-total', 'characteristic-total'],
           timePeriod: '2016_AY',
-          config: {
-            label: 'Overall absence rate (2016/17)',
-            colour: '#f5a450',
-            symbol: 'square',
-            lineStyle: 'solid',
-          },
         },
       ],
       referenceLines: [],
@@ -41,6 +29,33 @@ export const testMapConfiguration: Chart = {
       tickConfig: 'default',
       tickSpacing: 1,
     },
+  },
+  legend: {
+    position: 'none',
+    items: [
+      {
+        dataSet: {
+          indicator: 'authorised-absence-rate',
+          filters: ['school-type-total', 'characteristic-total'],
+          timePeriod: '2016_AY',
+        },
+        label: 'Authorised absence rate (2016/17)',
+        colour: '#4763a5',
+        symbol: 'circle',
+        lineStyle: 'solid',
+      },
+      {
+        dataSet: {
+          indicator: 'overall-absence-rate',
+          filters: ['school-type-total', 'characteristic-total'],
+          timePeriod: '2016_AY',
+        },
+        label: 'Overall absence rate (2016/17)',
+        colour: '#f5a450',
+        symbol: 'square',
+        lineStyle: 'solid',
+      },
+    ],
   },
   type: 'map',
   title: '',

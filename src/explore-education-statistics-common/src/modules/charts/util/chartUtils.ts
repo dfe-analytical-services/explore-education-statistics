@@ -1,4 +1,5 @@
-import { ChartSymbol } from '@common/modules/charts/types/chart';
+import { ChartSymbol, LineStyle } from '@common/modules/charts/types/chart';
+import { LegendPosition } from '@common/modules/charts/types/legend';
 
 export const colours: string[] = [
   '#1d70b8',
@@ -16,10 +17,16 @@ export const colours: string[] = [
   '#00703c',
 ];
 
+export const legendPositions: LegendPosition[] = ['bottom', 'top', 'none'];
+
 export const symbols: ChartSymbol[] = [
   'circle',
-  'square',
-  'triangle',
   'cross',
+  'diamond',
+  'square',
   'star',
+  'triangle',
+  'wye',
 ];
+
+export const lineStyles: LineStyle[] = ['dashed', 'dotted', 'solid'];

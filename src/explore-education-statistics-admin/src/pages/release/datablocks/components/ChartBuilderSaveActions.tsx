@@ -1,15 +1,14 @@
-import { ChartBuilderForm } from '@admin/pages/release/datablocks/components/ChartBuilder';
+import { ChartBuilderForms } from '@admin/pages/release/datablocks/components/types/chartBuilderForms';
 import Button from '@common/components/Button';
 import ButtonGroup from '@common/components/ButtonGroup';
 import ErrorSummary from '@common/components/ErrorSummary';
-import { Dictionary } from '@common/types';
 import React, { MouseEventHandler, ReactNode } from 'react';
 
 interface Props {
   children?: ReactNode;
   disabled?: boolean;
   formId: string;
-  forms: Dictionary<ChartBuilderForm>;
+  forms: ChartBuilderForms;
   showSubmitError: boolean;
   onClick?: MouseEventHandler<HTMLButtonElement>;
 }

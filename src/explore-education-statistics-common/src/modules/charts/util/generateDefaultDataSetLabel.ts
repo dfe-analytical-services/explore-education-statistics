@@ -2,6 +2,7 @@ import { ExpandedDataSet } from '@common/modules/charts/types/dataSet';
 import {
   CategoryFilter,
   Filter,
+  Indicator,
   LocationFilter,
   TimePeriodFilter,
 } from '@common/modules/table-tool/types/filters';
@@ -28,6 +29,10 @@ export default function generateDefaultDataSetLabel(
       ? dataSet.timePeriod
       : undefined,
   ]).map(filter => filter.label);
+
+  if (excludeFilter instanceof Indicator) {
+    return filterLabels.join(', ');
+  }
 
   return `${dataSet.indicator.label}${
     filterLabels.length ? ` (${filterLabels.join(', ')})` : ''

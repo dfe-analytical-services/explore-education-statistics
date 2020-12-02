@@ -86,7 +86,7 @@ describe('generateDefaultDataSetLabel', () => {
     expect(label).toBe('Indicator 1 (Filter 1, Filter 2, Location 1)');
   });
 
-  test('cannot exclude indicator from the label', () => {
+  test('returns a label that excludes the indicator from the label', () => {
     const label = generateDefaultDataSetLabel(
       testDataSet,
       new Indicator({
@@ -97,6 +97,6 @@ describe('generateDefaultDataSetLabel', () => {
       }),
     );
 
-    expect(label).toBe('Indicator 1 (Filter 1, Filter 2, Location 1, 2020/21)');
+    expect(label).toBe('Filter 1, Filter 2, Location 1, 2020/21');
   });
 });

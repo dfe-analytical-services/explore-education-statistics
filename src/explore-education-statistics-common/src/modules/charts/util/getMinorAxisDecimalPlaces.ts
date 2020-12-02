@@ -1,4 +1,4 @@
-import { CategoryDataSetConfiguration } from '@common/modules/charts/util/getCategoryDataSetConfigurations';
+import { DataSetCategoryConfig } from '@common/modules/charts/util/getDataSetCategoryConfigs';
 
 /**
  * Get the decimal places needed for the minor axis of a
@@ -15,7 +15,7 @@ import { CategoryDataSetConfiguration } from '@common/modules/charts/util/getCat
  * using significantly different indicators on the same chart.
  */
 export default function getMinorAxisDecimalPlaces(
-  categoryDataSets: CategoryDataSetConfiguration[],
+  categoryDataSets: DataSetCategoryConfig[],
 ): number | undefined {
   return categoryDataSets.reduce<number | undefined>((acc, { dataSet }) => {
     if (typeof dataSet.indicator.decimalPlaces === 'undefined') {
