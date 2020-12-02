@@ -140,6 +140,13 @@ export const chartBuilderReducer: Reducer<
         ...defaultOptions,
         ...(action.payload.options.defaults ?? {}),
         ...draft.options,
+        // Set height/width to definition defaults
+        // as this seems to surprise users the least.
+        height:
+          action.payload.options.defaults?.height ??
+          draft.options?.height ??
+          defaultOptions.height,
+        width: action.payload.options.defaults?.width ?? draft.options?.width,
       };
 
       if (action.payload.capabilities.hasLegend) {
