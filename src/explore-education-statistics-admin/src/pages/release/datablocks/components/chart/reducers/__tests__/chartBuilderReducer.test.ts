@@ -503,12 +503,6 @@ describe('chartBuilderReducer', () => {
 
       expect(nextState).toEqual<ChartBuilderState>({
         axes: {},
-        options: {
-          height: 300,
-          title: '',
-          alt: '',
-        },
-        definition: undefined,
       });
     });
   });
@@ -519,11 +513,6 @@ describe('chartBuilderReducer', () => {
 
       expect(result.current.state).toEqual<ChartBuilderState>({
         axes: {},
-        options: {
-          title: '',
-          alt: '',
-          height: 300,
-        },
       });
     });
 

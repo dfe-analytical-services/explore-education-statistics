@@ -24,7 +24,7 @@ export interface ChartOptions extends ChartDefinitionOptions {
 
 export interface ChartBuilderState {
   definition?: ChartDefinition;
-  options: ChartOptions;
+  options?: ChartOptions;
   axes: AxesConfiguration;
   legend?: LegendConfiguration;
 }
@@ -97,40 +97,28 @@ const updateAxis = (
   );
 };
 
-const getInitialState = (initialConfiguration?: Chart): ChartBuilderState => {
-  const { type, axes, height, legend, ...options } = initialConfiguration ?? {};
+const getInitialState = (initialChart?: Chart): ChartBuilderState => {
+  if (!initialChart) {
+    return {
+      axes: {},
+    };
+  }
+
+  const { type, axes, legend, ...options } = initialChart;
 
   const definition = chartDefinitions.find(
     chartDefinition => chartDefinition.type === type,
   );
 
-  const initialState: ChartBuilderState = {
-    axes: {},
-    definition,
-    options: {
-      ...defaultOptions,
-      ...(options ?? {}),
-      height:
-        // Make sure height is never actually 0 or negative
-        // as this wouldn't make sense for any chart.
-        typeof height !== 'undefined' && height > 0
-          ? height
-          : definition?.options?.defaults?.height ?? 300,
-    },
-  };
-
-  if (!initialConfiguration) {
-    return initialState;
-  }
-
   return {
-    ...initialState,
+    definition,
+    options,
     legend: {
       ...defaultLegend,
       ...(legend ?? {}),
     },
     axes: mapValues(
-      initialState.definition?.axes ?? {},
+      definition?.axes ?? {},
       (axisDefinition: ChartDefinitionAxis, axisType: AxisType) =>
         updateAxis(
           axisDefinition,
@@ -232,15 +220,11 @@ export const chartBuilderReducer: Reducer<
   return draft;
 };
 
-export function useChartBuilderReducer(initialConfiguration?: Chart) {
+export function useChartBuilderReducer(initialChart?: Chart) {
   const [state, dispatch] = useLoggedImmerReducer<
     ChartBuilderState,
     ChartBuilderActions
-  >(
-    'Chart builder',
-    chartBuilderReducer,
-    getInitialState(initialConfiguration),
-  );
+  >('Chart builder', chartBuilderReducer, getInitialState(initialChart));
 
   const updateDataSets = useCallback(
     (dataSets: DataSet[]) => {

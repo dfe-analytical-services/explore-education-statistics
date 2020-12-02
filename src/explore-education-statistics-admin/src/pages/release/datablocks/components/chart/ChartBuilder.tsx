@@ -130,7 +130,7 @@ const ChartBuilder = ({
   >();
 
   const chartProps = useMemo<ChartBuilderChartProps | undefined>(() => {
-    if (!definition) {
+    if (!definition || !options) {
       return undefined;
     }
 
@@ -303,22 +303,24 @@ const ChartBuilder = ({
         >
           {({ forms }) => (
             <Tabs id="chartBuilder-tabs" modifyHash={false}>
-              <TabsSection
-                title="Chart configuration"
-                headingTitle="Chart configuration"
-                id={forms.options.id}
-              >
-                <ChartConfiguration
-                  buttons={deleteButton}
-                  submitError={submitError}
-                  definition={definition}
-                  chartOptions={options}
-                  meta={meta}
-                  onBoundaryLevelChange={handleBoundaryLevelChange}
-                  onChange={handleChartConfigurationChange}
-                  onSubmit={actions.updateChartOptions}
-                />
-              </TabsSection>
+              {options && (
+                <TabsSection
+                  title="Chart configuration"
+                  headingTitle="Chart configuration"
+                  id={forms.options.id}
+                >
+                  <ChartConfiguration
+                    buttons={deleteButton}
+                    submitError={submitError}
+                    definition={definition}
+                    chartOptions={options}
+                    meta={meta}
+                    onBoundaryLevelChange={handleBoundaryLevelChange}
+                    onChange={handleChartConfigurationChange}
+                    onSubmit={actions.updateChartOptions}
+                  />
+                </TabsSection>
+              )}
 
               {forms.dataSets && definition.axes.major && (
                 <TabsSection
