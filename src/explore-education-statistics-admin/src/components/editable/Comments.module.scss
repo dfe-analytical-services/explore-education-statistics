@@ -7,6 +7,7 @@
   padding: govuk-spacing(3);
   position: absolute;
   width: 300px;
+  z-index: 998;
 
   &::before {
     border-bottom: 20px solid transparent;
@@ -23,6 +24,10 @@
     padding-left: govuk-spacing(3);
     padding-right: 0;
   }
+}
+
+.containerOpen {
+  z-index: 999;
 }
 
 .commentsContainer {

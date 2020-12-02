@@ -14,7 +14,8 @@ import FormFieldTextArea from '@common/components/form/FormFieldTextArea';
 import FormattedDate from '@common/components/FormattedDate';
 import Yup from '@common/validation/yup';
 import { Formik } from 'formik';
-import React, { useState } from 'react';
+import React, { useEffect, useState } from 'react';
+import classNames from 'classnames';
 import styles from './Comments.module.scss';
 
 interface FormValues {
@@ -42,6 +43,7 @@ const Comments = ({
   canComment = true,
 }: Props) => {
   const [editingComment, setEditingComment] = useState<Comment>();
+  const [sectionOpened, setSectionOpened] = useState<boolean>(false);
 
   const { user } = useAuthContext();
   const { releaseId } = useManageReleaseContext();
@@ -97,8 +99,14 @@ const Comments = ({
   };
 
   return (
-    <div className={styles.container}>
+    <div
+      className={classNames(
+        styles.container,
+        sectionOpened && styles.containerOpen,
+      )}
+    >
       <Details
+        onToggle={() => setSectionOpened(!sectionOpened)}
         className="govuk-!-margin-bottom-1 govuk-body-s"
         summary={`${canComment ? `Add / ` : ''}View comments (${
           comments.length
