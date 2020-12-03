@@ -1,6 +1,6 @@
 import ChartBuilderTabSection, {
   ChartBuilderTableUpdateHandler,
-} from '@admin/pages/release/datablocks/components/ChartBuilderTabSection';
+} from '@admin/pages/release/datablocks/components/chart/ChartBuilderTabSection';
 import DataBlockSourceWizard, {
   DataBlockSourceWizardSaveHandler,
 } from '@admin/pages/release/datablocks/components/DataBlockSourceWizard';

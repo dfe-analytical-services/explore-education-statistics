@@ -1,7 +1,6 @@
-import styles from '@admin/pages/release/datablocks/components/ChartAxisConfiguration.module.scss';
-import ChartBuilderSaveActions from '@admin/pages/release/datablocks/components/ChartBuilderSaveActions';
-import { ChartBuilderForms } from '@admin/pages/release/datablocks/components/types/chartBuilderForms';
-import { FormState } from '@admin/pages/release/datablocks/reducers/chartBuilderReducer';
+import styles from '@admin/pages/release/datablocks/components/chart/ChartAxisConfiguration.module.scss';
+import ChartBuilderSaveActions from '@admin/pages/release/datablocks/components/chart/ChartBuilderSaveActions';
+import { useChartBuilderFormsContext } from '@admin/pages/release/datablocks/components/chart/contexts/ChartBuilderFormsContext';
 import Button from '@common/components/Button';
 import Effect from '@common/components/Effect';
 import {
@@ -38,15 +37,12 @@ import mapValues from 'lodash/mapValues';
 import merge from 'lodash/merge';
 import pick from 'lodash/pick';
 import React, { ReactNode, useCallback, useMemo, useState } from 'react';
-import { ObjectSchema, Schema } from 'yup';
+import { ObjectSchema } from 'yup';
 
 type FormValues = Partial<OmitStrict<AxisConfiguration, 'dataSets' | 'type'>>;
 
 interface Props {
   buttons?: ReactNode;
-  forms: ChartBuilderForms;
-  hasSubmittedChart: boolean;
-  isSaving?: boolean;
   id: string;
   type: AxisType;
   configuration: AxisConfiguration;
@@ -54,7 +50,6 @@ interface Props {
   data: TableDataResult[];
   meta: FullTableMeta;
   onChange: (configuration: AxisConfiguration) => void;
-  onFormStateChange: (state: { form: AxisType } & FormState) => void;
   onSubmit: (configuration: AxisConfiguration) => void;
 }
 
@@ -62,18 +57,16 @@ const ChartAxisConfiguration = ({
   buttons,
   configuration,
   definition,
-  forms,
-  hasSubmittedChart,
-  isSaving,
   id,
   data,
   meta,
   type,
   onChange,
-  onFormStateChange,
   onSubmit,
 }: Props) => {
   const { capabilities } = definition;
+
+  const { hasSubmitted, updateForm, submit } = useChartBuilderFormsContext();
 
   const dataSetCategories = useMemo<DataSetCategory[]>(() => {
     if (type === 'minor') {
@@ -296,7 +289,7 @@ const ChartAxisConfiguration = ({
       enableReinitialize
       initialValues={initialValues}
       initialTouched={
-        hasSubmittedChart
+        hasSubmitted
           ? mapValues(validationSchema.fields, () => true)
           : undefined
       }
@@ -304,6 +297,7 @@ const ChartAxisConfiguration = ({
       validationSchema={validationSchema}
       onSubmit={values => {
         onSubmit(normalizeValues(values));
+        submit();
       }}
     >
       {form => (
@@ -318,12 +312,12 @@ const ChartAxisConfiguration = ({
 
           <Effect
             value={{
-              form: type,
+              formKey: type,
               isValid: form.isValid,
               submitCount: form.submitCount,
             }}
-            onMount={onFormStateChange}
-            onChange={onFormStateChange}
+            onMount={updateForm}
+            onChange={updateForm}
           />
 
           <div className="govuk-grid-row">
@@ -629,12 +623,7 @@ const ChartAxisConfiguration = ({
             </table>
           )}
 
-          <ChartBuilderSaveActions
-            disabled={isSaving}
-            formId={id}
-            forms={forms}
-            showSubmitError={form.isValid && form.submitCount > 0}
-          >
+          <ChartBuilderSaveActions formId={id} formKey={type}>
             {buttons}
           </ChartBuilderSaveActions>
         </Form>

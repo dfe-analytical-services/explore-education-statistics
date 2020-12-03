@@ -1,4 +1,7 @@
-import { ChartBuilderForms } from '@admin/pages/release/datablocks/components/types/chartBuilderForms';
+import {
+  ChartBuilderFormKeys,
+  useChartBuilderFormsContext,
+} from '@admin/pages/release/datablocks/components/chart/contexts/ChartBuilderFormsContext';
 import Button from '@common/components/Button';
 import ButtonGroup from '@common/components/ButtonGroup';
 import ErrorSummary from '@common/components/ErrorSummary';
@@ -8,8 +11,7 @@ interface Props {
   children?: ReactNode;
   disabled?: boolean;
   formId: string;
-  forms: ChartBuilderForms;
-  showSubmitError: boolean;
+  formKey: ChartBuilderFormKeys;
   onClick?: MouseEventHandler<HTMLButtonElement>;
 }
 
@@ -17,10 +19,19 @@ const ChartBuilderSaveActions = ({
   children,
   disabled,
   formId,
-  forms,
-  showSubmitError,
+  formKey,
   onClick,
 }: Props) => {
+  const { forms, isSubmitting } = useChartBuilderFormsContext();
+
+  const currentForm = forms[formKey];
+
+  if (!currentForm) {
+    return null;
+  }
+
+  const showSubmitError = currentForm.isValid && currentForm.submitCount > 0;
+
   return (
     <>
       <ErrorSummary
@@ -64,7 +75,7 @@ const ChartBuilderSaveActions = ({
         <Button
           type="submit"
           id={`${formId}-submit`}
-          disabled={disabled}
+          disabled={disabled || isSubmitting}
           onClick={onClick}
         >
           Save chart options

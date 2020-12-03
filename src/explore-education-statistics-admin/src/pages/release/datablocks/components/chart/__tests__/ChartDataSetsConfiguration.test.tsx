@@ -1,5 +1,8 @@
-import ChartDataSetsConfiguration from '@admin/pages/release/datablocks/components/ChartDataSetsConfiguration';
-import { ChartBuilderForms } from '@admin/pages/release/datablocks/components/types/chartBuilderForms';
+import ChartDataSetsConfiguration from '@admin/pages/release/datablocks/components/chart/ChartDataSetsConfiguration';
+import {
+  ChartBuilderForms,
+  ChartBuilderFormsContextProvider,
+} from '@admin/pages/release/datablocks/components/chart/contexts/ChartBuilderFormsContext';
 import { DataSet } from '@common/modules/charts/types/dataSet';
 import { LocationFilter } from '@common/modules/table-tool/types/filters';
 import { FullTableMeta } from '@common/modules/table-tool/types/fullTable';
@@ -86,51 +89,45 @@ describe('ChartDataSetsConfiguration', () => {
       id: 'options',
       title: 'Options',
     },
-    legend: {
+    dataSets: {
       isValid: true,
       submitCount: 0,
-      id: 'legend',
-      title: 'Legend',
-    },
-    data: {
-      isValid: true,
-      submitCount: 0,
-      id: 'data',
-      title: 'Data',
+      id: 'dataSets',
+      title: 'Data sets',
     },
   };
 
   test('renders data set labels correctly', () => {
     render(
-      <ChartDataSetsConfiguration
-        meta={testSubjectMeta}
-        forms={testFormState}
-        dataSets={[
-          {
-            indicator: 'authorised-absence-sessions',
-            filters: ['male'],
-          },
-          {
-            indicator: 'authorised-absence-sessions',
-            filters: ['male'],
-            location: {
-              level: 'localAuthority',
-              value: 'barnet',
+      <ChartBuilderFormsContextProvider initialForms={testFormState}>
+        <ChartDataSetsConfiguration
+          meta={testSubjectMeta}
+          dataSets={[
+            {
+              indicator: 'authorised-absence-sessions',
+              filters: ['male'],
             },
-          },
-          {
-            indicator: 'authorised-absence-sessions',
-            filters: ['male'],
-            location: {
-              level: 'localAuthority',
-              value: 'barnet',
+            {
+              indicator: 'authorised-absence-sessions',
+              filters: ['male'],
+              location: {
+                level: 'localAuthority',
+                value: 'barnet',
+              },
             },
-            timePeriod: '2019_AY',
-          },
-        ]}
-        onChange={noop}
-        onSubmit={noop}
-      />,
+            {
+              indicator: 'authorised-absence-sessions',
+              filters: ['male'],
+              location: {
+                level: 'localAuthority',
+                value: 'barnet',
+              },
+              timePeriod: '2019_AY',
+            },
+          ]}
+          onChange={noop}
+        />
+      </ChartBuilderFormsContextProvider>,
     );
 
     const rows = screen.getAllByRole('row');
@@ -149,54 +146,43 @@ describe('ChartDataSetsConfiguration', () => {
   });
 
   test('submitting fails if another form is invalid', async () => {
-    const handleSubmit = jest.fn();
-
     render(
-      <ChartDataSetsConfiguration
-        meta={testSubjectMeta}
-        forms={{
+      <ChartBuilderFormsContextProvider
+        initialForms={{
           ...testFormState,
-          data: {
-            ...testFormState.data,
-            submitCount: 1,
-          },
           options: {
             ...testFormState.options,
             isValid: false,
           },
         }}
-        dataSets={[
-          {
-            indicator: 'authorised-absence-sessions',
-            filters: ['male'],
-          },
-        ]}
-        onChange={noop}
-        onSubmit={handleSubmit}
-      />,
+      >
+        <ChartDataSetsConfiguration
+          meta={testSubjectMeta}
+          dataSets={[
+            {
+              indicator: 'authorised-absence-sessions',
+              filters: ['male'],
+            },
+          ]}
+          onChange={noop}
+        />
+      </ChartBuilderFormsContextProvider>,
     );
-
-    expect(handleSubmit).not.toHaveBeenCalled();
 
     userEvent.click(screen.getByRole('button', { name: 'Save chart options' }));
 
     await waitFor(() => {
       expect(screen.getByText('Cannot save chart')).toBeInTheDocument();
       expect(screen.getByText('Options tab is invalid')).toBeInTheDocument();
-
-      expect(handleSubmit).toHaveBeenCalled();
     });
   });
 
   describe('add data set form', () => {
     test('renders correctly with multiple options per select', () => {
       render(
-        <ChartDataSetsConfiguration
-          meta={testSubjectMeta}
-          forms={testFormState}
-          onChange={noop}
-          onSubmit={noop}
-        />,
+        <ChartBuilderFormsContextProvider initialForms={testFormState}>
+          <ChartDataSetsConfiguration meta={testSubjectMeta} onChange={noop} />
+        </ChartBuilderFormsContextProvider>,
       );
 
       const characteristic = screen.getByLabelText('Characteristic');
@@ -246,15 +232,15 @@ describe('ChartDataSetsConfiguration', () => {
 
     test('does not render indicator when there is no option', () => {
       render(
-        <ChartDataSetsConfiguration
-          meta={{
-            ...testSubjectMeta,
-            indicators: [],
-          }}
-          forms={testFormState}
-          onChange={noop}
-          onSubmit={noop}
-        />,
+        <ChartBuilderFormsContextProvider initialForms={testFormState}>
+          <ChartDataSetsConfiguration
+            meta={{
+              ...testSubjectMeta,
+              indicators: [],
+            }}
+            onChange={noop}
+          />
+        </ChartBuilderFormsContextProvider>,
       );
 
       expect(screen.queryByLabelText('Indicator')).not.toBeInTheDocument();
@@ -262,15 +248,15 @@ describe('ChartDataSetsConfiguration', () => {
 
     test('does not render indicator when there is only one option', () => {
       render(
-        <ChartDataSetsConfiguration
-          meta={{
-            ...testSubjectMeta,
-            indicators: [testSubjectMeta.indicators[0]],
-          }}
-          forms={testFormState}
-          onChange={noop}
-          onSubmit={noop}
-        />,
+        <ChartBuilderFormsContextProvider initialForms={testFormState}>
+          <ChartDataSetsConfiguration
+            meta={{
+              ...testSubjectMeta,
+              indicators: [testSubjectMeta.indicators[0]],
+            }}
+            onChange={noop}
+          />
+        </ChartBuilderFormsContextProvider>,
       );
 
       expect(screen.queryByLabelText('Indicator')).not.toBeInTheDocument();
@@ -278,15 +264,15 @@ describe('ChartDataSetsConfiguration', () => {
 
     test('does not render location when there is no option', () => {
       render(
-        <ChartDataSetsConfiguration
-          meta={{
-            ...testSubjectMeta,
-            locations: [],
-          }}
-          forms={testFormState}
-          onChange={noop}
-          onSubmit={noop}
-        />,
+        <ChartBuilderFormsContextProvider initialForms={testFormState}>
+          <ChartDataSetsConfiguration
+            meta={{
+              ...testSubjectMeta,
+              locations: [],
+            }}
+            onChange={noop}
+          />
+        </ChartBuilderFormsContextProvider>,
       );
 
       expect(screen.queryByLabelText('Location')).not.toBeInTheDocument();
@@ -294,15 +280,15 @@ describe('ChartDataSetsConfiguration', () => {
 
     test('does not render location when there is only one option', () => {
       render(
-        <ChartDataSetsConfiguration
-          meta={{
-            ...testSubjectMeta,
-            locations: [testSubjectMeta.locations[0]],
-          }}
-          forms={testFormState}
-          onChange={noop}
-          onSubmit={noop}
-        />,
+        <ChartBuilderFormsContextProvider initialForms={testFormState}>
+          <ChartDataSetsConfiguration
+            meta={{
+              ...testSubjectMeta,
+              locations: [testSubjectMeta.locations[0]],
+            }}
+            onChange={noop}
+          />
+        </ChartBuilderFormsContextProvider>,
       );
 
       expect(screen.queryByLabelText('Location')).not.toBeInTheDocument();
@@ -310,15 +296,15 @@ describe('ChartDataSetsConfiguration', () => {
 
     test('does not render time period when there is no option', () => {
       render(
-        <ChartDataSetsConfiguration
-          meta={{
-            ...testSubjectMeta,
-            timePeriodRange: [],
-          }}
-          forms={testFormState}
-          onChange={noop}
-          onSubmit={noop}
-        />,
+        <ChartBuilderFormsContextProvider initialForms={testFormState}>
+          <ChartDataSetsConfiguration
+            meta={{
+              ...testSubjectMeta,
+              timePeriodRange: [],
+            }}
+            onChange={noop}
+          />
+        </ChartBuilderFormsContextProvider>,
       );
 
       expect(screen.queryByLabelText('Time period')).not.toBeInTheDocument();
@@ -326,15 +312,15 @@ describe('ChartDataSetsConfiguration', () => {
 
     test('does not render time period when there is only one option', () => {
       render(
-        <ChartDataSetsConfiguration
-          meta={{
-            ...testSubjectMeta,
-            timePeriodRange: [testSubjectMeta.timePeriodRange[0]],
-          }}
-          forms={testFormState}
-          onChange={noop}
-          onSubmit={noop}
-        />,
+        <ChartBuilderFormsContextProvider initialForms={testFormState}>
+          <ChartDataSetsConfiguration
+            meta={{
+              ...testSubjectMeta,
+              timePeriodRange: [testSubjectMeta.timePeriodRange[0]],
+            }}
+            onChange={noop}
+          />
+        </ChartBuilderFormsContextProvider>,
       );
 
       expect(screen.queryByLabelText('Time period')).not.toBeInTheDocument();
@@ -344,12 +330,12 @@ describe('ChartDataSetsConfiguration', () => {
       const handleChange = jest.fn();
 
       render(
-        <ChartDataSetsConfiguration
-          meta={testSubjectMeta}
-          forms={testFormState}
-          onChange={handleChange}
-          onSubmit={noop}
-        />,
+        <ChartBuilderFormsContextProvider initialForms={testFormState}>
+          <ChartDataSetsConfiguration
+            meta={testSubjectMeta}
+            onChange={handleChange}
+          />
+        </ChartBuilderFormsContextProvider>,
       );
 
       userEvent.click(screen.getByRole('button', { name: 'Add data set' }));
@@ -376,18 +362,18 @@ describe('ChartDataSetsConfiguration', () => {
       const handleChange = jest.fn();
 
       render(
-        <ChartDataSetsConfiguration
-          meta={testSubjectMeta}
-          dataSets={[
-            {
-              filters: ['male'],
-              indicator: 'unauthorised-absence-sessions',
-            },
-          ]}
-          forms={testFormState}
-          onChange={handleChange}
-          onSubmit={noop}
-        />,
+        <ChartBuilderFormsContextProvider initialForms={testFormState}>
+          <ChartDataSetsConfiguration
+            meta={testSubjectMeta}
+            dataSets={[
+              {
+                filters: ['male'],
+                indicator: 'unauthorised-absence-sessions',
+              },
+            ]}
+            onChange={handleChange}
+          />
+        </ChartBuilderFormsContextProvider>,
       );
 
       userEvent.selectOptions(screen.getByLabelText('Characteristic'), 'male');
@@ -415,12 +401,12 @@ describe('ChartDataSetsConfiguration', () => {
       const handleChange = jest.fn();
 
       render(
-        <ChartDataSetsConfiguration
-          meta={testSubjectMeta}
-          forms={testFormState}
-          onChange={handleChange}
-          onSubmit={noop}
-        />,
+        <ChartBuilderFormsContextProvider initialForms={testFormState}>
+          <ChartDataSetsConfiguration
+            meta={testSubjectMeta}
+            onChange={handleChange}
+          />
+        </ChartBuilderFormsContextProvider>,
       );
 
       userEvent.selectOptions(screen.getByLabelText('Characteristic'), 'male');
@@ -449,12 +435,12 @@ describe('ChartDataSetsConfiguration', () => {
       const handleChange = jest.fn();
 
       render(
-        <ChartDataSetsConfiguration
-          meta={testSubjectMeta}
-          forms={testFormState}
-          onChange={handleChange}
-          onSubmit={noop}
-        />,
+        <ChartBuilderFormsContextProvider initialForms={testFormState}>
+          <ChartDataSetsConfiguration
+            meta={testSubjectMeta}
+            onChange={handleChange}
+          />
+        </ChartBuilderFormsContextProvider>,
       );
 
       userEvent.selectOptions(screen.getByLabelText('Characteristic'), 'male');
@@ -496,15 +482,15 @@ describe('ChartDataSetsConfiguration', () => {
       const handleChange = jest.fn();
 
       render(
-        <ChartDataSetsConfiguration
-          meta={{
-            ...testSubjectMeta,
-            filters: {},
-          }}
-          forms={testFormState}
-          onChange={handleChange}
-          onSubmit={noop}
-        />,
+        <ChartBuilderFormsContextProvider initialForms={testFormState}>
+          <ChartDataSetsConfiguration
+            meta={{
+              ...testSubjectMeta,
+              filters: {},
+            }}
+            onChange={handleChange}
+          />
+        </ChartBuilderFormsContextProvider>,
       );
 
       userEvent.selectOptions(
@@ -534,18 +520,18 @@ describe('ChartDataSetsConfiguration', () => {
       const handleChange = jest.fn();
 
       render(
-        <ChartDataSetsConfiguration
-          meta={testSubjectMeta}
-          forms={testFormState}
-          dataSets={[
-            {
-              filters: ['male'],
-              indicator: 'unauthorised-absence-sessions',
-            },
-          ]}
-          onChange={handleChange}
-          onSubmit={noop}
-        />,
+        <ChartBuilderFormsContextProvider initialForms={testFormState}>
+          <ChartDataSetsConfiguration
+            meta={testSubjectMeta}
+            dataSets={[
+              {
+                filters: ['male'],
+                indicator: 'unauthorised-absence-sessions',
+              },
+            ]}
+            onChange={handleChange}
+          />
+        </ChartBuilderFormsContextProvider>,
       );
 
       expect(handleChange).not.toHaveBeenCalled();
@@ -559,22 +545,22 @@ describe('ChartDataSetsConfiguration', () => {
       const handleChange = jest.fn();
 
       render(
-        <ChartDataSetsConfiguration
-          meta={testSubjectMeta}
-          forms={testFormState}
-          dataSets={[
-            {
-              filters: ['female'],
-              indicator: 'authorised-absence-sessions',
-            },
-            {
-              filters: ['male'],
-              indicator: 'unauthorised-absence-sessions',
-            },
-          ]}
-          onChange={handleChange}
-          onSubmit={noop}
-        />,
+        <ChartBuilderFormsContextProvider initialForms={testFormState}>
+          <ChartDataSetsConfiguration
+            meta={testSubjectMeta}
+            dataSets={[
+              {
+                filters: ['female'],
+                indicator: 'authorised-absence-sessions',
+              },
+              {
+                filters: ['male'],
+                indicator: 'unauthorised-absence-sessions',
+              },
+            ]}
+            onChange={handleChange}
+          />
+        </ChartBuilderFormsContextProvider>,
       );
 
       const tableRows = screen.getAllByRole('row');

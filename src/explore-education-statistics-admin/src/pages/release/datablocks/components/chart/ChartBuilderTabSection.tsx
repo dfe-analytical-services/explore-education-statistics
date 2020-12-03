@@ -1,6 +1,6 @@
 import ChartBuilder, {
   TableQueryUpdateHandler,
-} from '@admin/pages/release/datablocks/components/ChartBuilder';
+} from '@admin/pages/release/datablocks/components/chart/ChartBuilder';
 import { SavedDataBlock } from '@admin/pages/release/datablocks/components/ReleaseDataBlocksPageTabs';
 import { ReleaseDataBlock } from '@admin/services/dataBlockService';
 import releaseChartFileService from '@admin/services/releaseChartFileService';

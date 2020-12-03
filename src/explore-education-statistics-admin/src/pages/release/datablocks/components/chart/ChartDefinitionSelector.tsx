@@ -1,4 +1,4 @@
-import styles from '@admin/pages/release/datablocks/components/ChartDefinitionSelector.module.scss';
+import styles from '@admin/pages/release/datablocks/components/chart/ChartDefinitionSelector.module.scss';
 import ButtonText from '@common/components/ButtonText';
 import { infographicBlockDefinition } from '@common/modules/charts/components/InfographicBlock';
 import { ChartDefinition } from '@common/modules/charts/types/chart';

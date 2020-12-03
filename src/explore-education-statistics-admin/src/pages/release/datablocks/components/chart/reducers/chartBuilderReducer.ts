@@ -11,7 +11,6 @@ import {
 import { DataSet } from '@common/modules/charts/types/dataSet';
 import { LegendConfiguration } from '@common/modules/charts/types/legend';
 import { Chart } from '@common/services/types/blocks';
-import { Dictionary } from '@common/types';
 import deepMerge from 'deepmerge';
 import mapValues from 'lodash/mapValues';
 import { useCallback, useMemo } from 'react';
@@ -23,22 +22,11 @@ export interface ChartOptions extends ChartDefinitionOptions {
   geographicId?: string;
 }
 
-export interface FormState {
-  isValid: boolean;
-  submitCount: number;
-}
-
 export interface ChartBuilderState {
   definition?: ChartDefinition;
   options: ChartOptions;
   axes: AxesConfiguration;
   legend?: LegendConfiguration;
-  forms: {
-    data: FormState;
-    legend: FormState;
-    options: FormState;
-    [form: string]: FormState;
-  };
 }
 
 export type ChartBuilderActions =
@@ -61,13 +49,6 @@ export type ChartBuilderActions =
   | {
       type: 'UPDATE_CHART_AXIS';
       payload: AxisConfiguration;
-    }
-  | {
-      type: 'UPDATE_FORM';
-      payload: {
-        form: keyof ChartBuilderState['forms'];
-        state: FormState;
-      };
     }
   | {
       type: 'RESET';
@@ -136,28 +117,11 @@ const getInitialState = (initialConfiguration?: Chart): ChartBuilderState => {
           ? height
           : definition?.options?.defaults?.height ?? 300,
     },
-    forms: {
-      data: { isValid: true, submitCount: 0 },
-      legend: { isValid: true, submitCount: 0 },
-      options: { isValid: true, submitCount: 0 },
-    },
   };
 
   if (!initialConfiguration) {
     return initialState;
   }
-
-  const forms: ChartBuilderState['forms'] = {
-    ...initialState.forms,
-    ...mapValues(axes as Required<AxesConfiguration>, () => {
-      const formState: FormState = {
-        isValid: true,
-        submitCount: 0,
-      };
-
-      return formState;
-    }),
-  };
 
   return {
     ...initialState,
@@ -173,7 +137,6 @@ const getInitialState = (initialConfiguration?: Chart): ChartBuilderState => {
           (axes?.[axisType] ?? {}) as AxisConfiguration,
         ),
     ),
-    forms,
   };
 };
 
@@ -207,23 +170,6 @@ export const chartBuilderReducer: Reducer<
           return updateAxis(axisDefinition, draft.axes[type]);
         },
       );
-
-      const newAxisForms: Dictionary<FormState> = mapValues(
-        draft.definition.axes as Required<ChartDefinition['axes']>,
-        _ => {
-          return {
-            isValid: true,
-            submitCount: 0,
-          };
-        },
-      );
-
-      draft.forms = {
-        ...newAxisForms,
-        options: draft.forms.options,
-        data: draft.forms.data,
-        legend: draft.forms.legend,
-      };
 
       break;
     }
@@ -275,20 +221,8 @@ export const chartBuilderReducer: Reducer<
         draft.axes.major.dataSets = action.payload;
       }
 
-      draft.forms.data.isValid = action.payload.length > 0;
-
       break;
     }
-    case 'UPDATE_FORM':
-      if (!draft.forms[action.payload.form]) {
-        throw new Error(
-          `Could not find form '${action.payload.form}' to update`,
-        );
-      }
-
-      draft.forms[action.payload.form] = action.payload.state;
-
-      break;
     case 'RESET':
       return getInitialState();
     default:
@@ -358,24 +292,6 @@ export function useChartBuilderReducer(initialConfiguration?: Chart) {
     [dispatch],
   );
 
-  const updateFormState = useCallback(
-    ({
-      form,
-      ...formState
-    }: {
-      form: keyof ChartBuilderState['forms'];
-    } & FormState) => {
-      dispatch({
-        type: 'UPDATE_FORM',
-        payload: {
-          form,
-          state: formState,
-        },
-      });
-    },
-    [dispatch],
-  );
-
   const resetState = useCallback(() => {
     dispatch({
       type: 'RESET',
@@ -389,7 +305,6 @@ export function useChartBuilderReducer(initialConfiguration?: Chart) {
       updateChartLegend,
       updateChartOptions,
       updateChartAxis,
-      updateFormState,
       resetState,
     }),
     [
@@ -398,7 +313,6 @@ export function useChartBuilderReducer(initialConfiguration?: Chart) {
       updateChartDefinition,
       updateChartLegend,
       updateChartOptions,
-      updateFormState,
       resetState,
     ],
   );
