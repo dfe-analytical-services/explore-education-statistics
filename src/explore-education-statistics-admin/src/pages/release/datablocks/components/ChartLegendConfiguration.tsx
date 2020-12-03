@@ -268,13 +268,15 @@ const ChartLegendConfiguration = ({
             onMount={onFormStateChange}
           />
 
-          <FormFieldSelect<FormValues>
-            id={`${formId}-position`}
-            name="position"
-            label="Position"
-            options={positionOptions}
-            order={FormSelect.unordered}
-          />
+          {validationSchema.fields.position && (
+            <FormFieldSelect<FormValues>
+              id={`${formId}-position`}
+              name="position"
+              label="Position"
+              options={positionOptions}
+              order={FormSelect.unordered}
+            />
+          )}
 
           <div className="govuk-!-margin-bottom-6">
             <h4>Legend items</h4>
