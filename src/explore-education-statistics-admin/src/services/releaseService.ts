@@ -21,7 +21,7 @@ export interface Release {
   contact: ContactDetails;
   publishScheduled?: string;
   published?: string;
-  nextReleaseDate: PartialDate;
+  nextReleaseDate?: PartialDate;
   internalReleaseNote?: string;
   previousVersionId: string;
   preReleaseAccessList: string;
@@ -68,6 +68,7 @@ export interface UpdateReleaseRequest extends BaseReleaseRequest {
   status: ReleaseApprovalStatus;
   internalReleaseNote?: string;
   publishScheduled?: string;
+  publishMethod?: 'Scheduled' | 'Immediate';
   nextReleaseDate?: PartialDate;
   preReleaseAccessList?: string;
 }
