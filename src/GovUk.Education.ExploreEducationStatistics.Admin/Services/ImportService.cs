@@ -97,10 +97,15 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Services
                 new DatafileImport(releaseId.ToString(), dataFileName));
         }
 
-        public async Task FailImport(Guid releaseId, string dataFileName, IEnumerable<ValidationError> errors)
+        public async Task FailImport(Guid releaseId, string dataFileName, string metaFileName,
+            IEnumerable<ValidationError> errors)
         {
+            var importReleaseMessage =
+                JsonConvert.SerializeObject(BuildMessage(dataFileName, metaFileName, releaseId));
+
             await _tableStorageService.CreateOrUpdateEntity(DatafileImportsTableName,
-                new DatafileImport(releaseId.ToString(), dataFileName, 0, "", IStatus.FAILED, JsonConvert.SerializeObject(errors)));
+                new DatafileImport(releaseId.ToString(), dataFileName, 0, importReleaseMessage,
+                    IStatus.FAILED, JsonConvert.SerializeObject(errors)));
         }
 
         private async Task UpdateImportTableRow(Guid releaseId, string dataFileName, int numberOfRows, ImportMessage message)
@@ -113,7 +118,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Services
         private ImportMessage BuildMessage(string dataFileName,
             string metaFileName,
             Guid releaseId,
-            string zipFileName)
+            string zipFileName = "")
         {
             var release = _context.Releases
                 .Where(r => r.Id.Equals(releaseId))

@@ -13,7 +13,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Services.Interfaces
 
         Task<Either<ActionResult, Unit>> CreateImportTableRow(Guid releaseId, string dataFileName);
 
-        Task FailImport(Guid releaseId, string dataFileName, IEnumerable<ValidationError> errors);
+        Task FailImport(Guid releaseId, string dataFileName, string metaFileName, IEnumerable<ValidationError> errors);
 
         Task RemoveImportTableRowIfExists(Guid releaseId, string dataFileName);
     }

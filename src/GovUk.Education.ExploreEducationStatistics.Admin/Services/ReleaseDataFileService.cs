@@ -441,19 +441,22 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Services
                 ? file.Filename
                 : (await GetAssociatedReleaseFileReference(file, ReleaseFileTypes.Data)).Filename;
 
+            var metaFileReference = file.ReleaseFileType == ReleaseFileTypes.Data
+                ? await GetAssociatedReleaseFileReference(file, ReleaseFileTypes.Metadata)
+                : null;
+
+            var metaFileName = metaFileReference?.Filename ?? "";
+
             // Fail the import if this was a datafile upload
             await _importService.FailImport(
                 releaseId,
                 dataFileName,
+                metaFileName,
                 new List<ValidationError>
                 {
                     new ValidationError("Files not uploaded correctly. Please delete and retry")
                 }.AsEnumerable()
             );
-
-            var metaFileReference = file.ReleaseFileType == ReleaseFileTypes.Data
-                ? await GetAssociatedReleaseFileReference(file, Metadata)
-                : null;
 
             return new DataFileInfo
             {

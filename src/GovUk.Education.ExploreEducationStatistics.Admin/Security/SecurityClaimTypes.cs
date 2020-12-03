@@ -10,6 +10,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Security
         PrereleasePagesAccessGranted,
         ManageAnyUser,
         ManageAnyMethodology,
+        AccessAllImports,
 
         /**
          * Publication management

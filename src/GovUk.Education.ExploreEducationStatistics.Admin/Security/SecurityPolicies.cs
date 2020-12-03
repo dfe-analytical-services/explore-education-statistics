@@ -10,6 +10,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Security
         CanAccessPrereleasePages,
         CanManageUsersOnSystem,
         CanManageMethodologiesOnSystem,
+        CanAccessAllImports,
 
         /**
          * Publication management
