@@ -113,9 +113,9 @@ Validate Key Statistics data block -- Charts tab
     user clicks element   id:releaseHeadlines-charts-tab
     ${headline_chart}=  set variable  css:#releaseHeadlines-chart   # must be css selector
     user waits until element contains line chart  ${headline_chart}
-    user checks chart legend item contains  ${headline_chart}  1  Unauthorised absence rate (England)
-    user checks chart legend item contains  ${headline_chart}  2  Authorised absence rate (England)
-    user checks chart legend item contains  ${headline_chart}  3  Overall absence rate (England)
+    user checks chart legend item contains  ${headline_chart}  1  Authorised absence rate (England)
+    user checks chart legend item contains  ${headline_chart}  2  Overall absence rate (England)
+    user checks chart legend item contains  ${headline_chart}  3  Unauthorised absence rate (England)
 
     user checks chart x axis ticks  ${headline_chart}  2012/13  2013/14  2014/15  2015/16  2016/17
     user checks chart y axis ticks  ${headline_chart}  0  2  4  6
@@ -254,13 +254,13 @@ Validate Regional and local authority (LA) breakdown chart
 
     user mouses over selected map feature  ${datablock}
     user checks chart tooltip label contains  ${datablock}  Vale of White Horse
-    user checks chart tooltip item contains  ${datablock}  1  Unauthorised absence rate (2016/17): 0.9%
-    user checks chart tooltip item contains  ${datablock}  2  Overall absence rate (2016/17): 4.3%
-    user checks chart tooltip item contains  ${datablock}  3  Authorised absence rate (2016/17): 3.4%
+    user checks chart tooltip item contains  ${datablock}  1  Unauthorised absence rate: 0.9%
+    user checks chart tooltip item contains  ${datablock}  2  Overall absence rate: 4.3%
+    user checks chart tooltip item contains  ${datablock}  3  Authorised absence rate: 3.4%
 
-    user checks map chart indicator tile contains  ${datablock}  1  Unauthorised absence rate (2016/17)  0.9%
-    user checks map chart indicator tile contains  ${datablock}  2  Overall absence rate (2016/17)  4.3%
-    user checks map chart indicator tile contains  ${datablock}  3  Authorised absence rate (2016/17)  3.4%
+    user checks map chart indicator tile contains  ${datablock}  1  Unauthorised absence rate  0.9%
+    user checks map chart indicator tile contains  ${datablock}  2  Overall absence rate  4.3%
+    user checks map chart indicator tile contains  ${datablock}  3  Authorised absence rate  3.4%
 
     user mouses over element  ${datablock} select[name="selectedLocation"]
     user selects from list by label  ${datablock} select[name="selectedLocation"]  Harlow
@@ -268,13 +268,13 @@ Validate Regional and local authority (LA) breakdown chart
 
     user mouses over selected map feature  ${datablock}
     user checks chart tooltip label contains  ${datablock}  Harlow
-    user checks chart tooltip item contains  ${datablock}  1  Unauthorised absence rate (2016/17): 1.1%
-    user checks chart tooltip item contains  ${datablock}  2  Overall absence rate (2016/17): 4.2%
-    user checks chart tooltip item contains  ${datablock}  3  Authorised absence rate (2016/17): 3.1%
+    user checks chart tooltip item contains  ${datablock}  1  Unauthorised absence rate: 1.1%
+    user checks chart tooltip item contains  ${datablock}  2  Overall absence rate: 4.2%
+    user checks chart tooltip item contains  ${datablock}  3  Authorised absence rate: 3.1%
 
-    user checks map chart indicator tile contains  ${datablock}  1  Unauthorised absence rate (2016/17)  1.1%
-    user checks map chart indicator tile contains  ${datablock}  2  Overall absence rate (2016/17)  4.2%
-    user checks map chart indicator tile contains  ${datablock}  3  Authorised absence rate (2016/17)  3.1%
+    user checks map chart indicator tile contains  ${datablock}  1  Unauthorised absence rate  1.1%
+    user checks map chart indicator tile contains  ${datablock}  2  Overall absence rate  4.2%
+    user checks map chart indicator tile contains  ${datablock}  3  Authorised absence rate  3.1%
 
     user mouses over element  ${datablock} select[name="selectedLocation"]
     user selects from list by label  ${datablock} select[name="selectedLocation"]  Newham
@@ -282,13 +282,13 @@ Validate Regional and local authority (LA) breakdown chart
 
     user mouses over selected map feature  ${datablock}
     user checks chart tooltip label contains  ${datablock}  Newham
-    user checks chart tooltip item contains  ${datablock}  1  Unauthorised absence rate (2016/17): 1.7%
-    user checks chart tooltip item contains  ${datablock}  2  Overall absence rate (2016/17): 4.4%
-    user checks chart tooltip item contains  ${datablock}  3  Authorised absence rate (2016/17): 2.7%
+    user checks chart tooltip item contains  ${datablock}  1  Unauthorised absence rate: 1.7%
+    user checks chart tooltip item contains  ${datablock}  2  Overall absence rate: 4.4%
+    user checks chart tooltip item contains  ${datablock}  3  Authorised absence rate: 2.7%
 
-    user checks map chart indicator tile contains  ${datablock}  1  Unauthorised absence rate (2016/17)  1.7%
-    user checks map chart indicator tile contains  ${datablock}  2  Overall absence rate (2016/17)  4.4%
-    user checks map chart indicator tile contains  ${datablock}  3  Authorised absence rate (2016/17)  2.7%
+    user checks map chart indicator tile contains  ${datablock}  1  Unauthorised absence rate  1.7%
+    user checks map chart indicator tile contains  ${datablock}  2  Overall absence rate  4.4%
+    user checks map chart indicator tile contains  ${datablock}  3  Authorised absence rate  2.7%
 
 Clicking "Create tables" takes user to Table Tool page with absence publication selected
     [Documentation]  DFE-898
