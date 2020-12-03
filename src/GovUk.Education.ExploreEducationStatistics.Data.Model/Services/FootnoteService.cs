@@ -217,6 +217,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Model.Services
 
             var footnote = _context.Footnote
                 .Include(f => f.Filters)
+                .ThenInclude(f => f.Filter)
                 .Include(f => f.FilterGroups)
                 .ThenInclude(f => f.FilterGroup.Filter)
                 .Include(f => f.FilterItems)
