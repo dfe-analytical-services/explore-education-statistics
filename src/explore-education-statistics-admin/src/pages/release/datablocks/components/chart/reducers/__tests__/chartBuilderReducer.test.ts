@@ -123,7 +123,7 @@ describe('chartBuilderReducer', () => {
       });
     });
 
-    test('does not override `options` or `legend` that already exist ', () => {
+    test('merges correctly with `options` or `legend` that already exist', () => {
       const initialStateWithOptions: ChartBuilderState = {
         ...initialState,
         options: {
@@ -157,7 +157,8 @@ describe('chartBuilderReducer', () => {
       );
 
       expect(nextState.options).toEqual<ChartOptions>({
-        height: 400,
+        // Height is set to the definition default
+        height: 300,
         title: 'Some title',
         alt: 'Some alt',
       });
@@ -214,7 +215,7 @@ describe('chartBuilderReducer', () => {
       });
     });
 
-    test('does not override `axes` options that already exist', () => {
+    test('merges correctly with `axes` options that already exist', () => {
       const initialStateWithAxes: ChartBuilderState = {
         ...initialState,
         axes: {
@@ -503,12 +504,6 @@ describe('chartBuilderReducer', () => {
 
       expect(nextState).toEqual<ChartBuilderState>({
         axes: {},
-        options: {
-          height: 300,
-          title: '',
-          alt: '',
-        },
-        definition: undefined,
       });
     });
   });
@@ -519,11 +514,6 @@ describe('chartBuilderReducer', () => {
 
       expect(result.current.state).toEqual<ChartBuilderState>({
         axes: {},
-        options: {
-          title: '',
-          alt: '',
-          height: 300,
-        },
       });
     });
 
