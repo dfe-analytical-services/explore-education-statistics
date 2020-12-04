@@ -740,7 +740,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Services
             DataBlock dataBlock,
             IChart chart)
         {
-            chart.Axes?["major"]?.DataSets.ForEach(
+            chart.Axes?.GetValueOrDefault("major")?.DataSets.ForEach(
                 dataSet =>
                 {
                     dataSet.Filters = dataSet.Filters.Select(
