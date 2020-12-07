@@ -1,5 +1,6 @@
 import { ReleaseStatusPermissions } from '@admin/services/permissionService';
 import { Release } from '@admin/services/releaseService';
+import { createServerValidationErrorMock } from '@common-test/createAxiosErrorMock';
 import { render, screen, waitFor, within } from '@testing-library/react';
 import React from 'react';
 import ReleaseStatusForm, {
@@ -551,6 +552,35 @@ describe('ReleaseStatusForm', () => {
         ).toBeInTheDocument();
 
         expect(handleSubmit).not.toHaveBeenCalled();
+      });
+    });
+
+    test('shows mapped server validation error from failed `onSubmit`', async () => {
+      const handleSubmit = jest.fn().mockImplementation(() => {
+        throw createServerValidationErrorMock([
+          'META_GUIDANCE_MUST_BE_POPULATED',
+        ]);
+      });
+
+      render(
+        <ReleaseStatusForm
+          release={testRelease}
+          statusPermissions={testStatusPermissions}
+          onCancel={noop}
+          onSubmit={handleSubmit}
+        />,
+      );
+
+      userEvent.click(screen.getByRole('button', { name: 'Update status' }));
+
+      await waitFor(() => {
+        expect(screen.getByText('There is a problem')).toBeInTheDocument();
+        expect(
+          screen.getByRole('link', {
+            name:
+              'All public metadata guidance must be populated before release can be approved',
+          }),
+        ).toBeInTheDocument();
       });
     });
 
