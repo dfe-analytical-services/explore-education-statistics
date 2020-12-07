@@ -366,7 +366,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Services
                                         {
                                             Id = group.Key.Id,
                                             Label = group.Key.Label,
-                                            FilterItems = filter.ToList()
+                                            FilterItems = group.Key.FilterItems.Intersect(filter).ToList()
                                         },
                                         replacementSubjectMeta)
                                 )
