@@ -12,6 +12,7 @@ const BauDashboardPage = () => {
   const canManageMethodologies = user
     ? user.permissions.canAccessMethodologyAdministrationPages
     : false;
+  const canManageImports = user ? user.permissions.canAccessAllImports : false;
 
   return (
     <Page wide breadcrumbs={[{ name: 'Platform administration' }]}>
@@ -38,6 +39,18 @@ const BauDashboardPage = () => {
             View a list of all publication contacts.
           </p>
         </div>
+        {canManageImports && (
+          <div className="govuk-grid-column-one-third">
+            <h3 className="govuk-heading-s govuk-!-margin-bottom-0">
+              <Link to="/administration/imports">
+                Manage incomplete imports
+              </Link>
+            </h3>
+            <p className="govuk-caption-m govuk-!-margin-top-1">
+              View a list of all current incomplete imports.
+            </p>
+          </div>
+        )}
       </div>
 
       <hr className="govuk-!-margin-top-9" />
