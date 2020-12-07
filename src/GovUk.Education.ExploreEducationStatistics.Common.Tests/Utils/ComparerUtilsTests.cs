@@ -16,6 +16,8 @@ namespace GovUk.Education.ExploreEducationStatistics.Common.Tests.Utils
             Assert.False(comparer.Equals(new TestClass(1), new TestClass(2)));
             Assert.False(comparer.Equals(null, new TestClass(2)));
             Assert.False(comparer.Equals(new TestClass(1), null));
+            
+            Assert.Equal(comparer.GetHashCode(new TestClass(1)), 1.GetHashCode());
         }
 
         private class TestClass
