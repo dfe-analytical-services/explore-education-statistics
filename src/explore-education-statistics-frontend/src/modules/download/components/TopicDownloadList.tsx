@@ -10,50 +10,47 @@ interface Props {
   topic: Topic<PublicationDownloadSummary>;
 }
 
-function getPublicationDate(path: string) {
-  const twoYearDateFormat = /.*\/([0-9]{4})-([0-9]{2})\/.*/;
-  const singleYearDateFormat = /.*\/([0-9]{4})\/.*/;
-
-  const twoYearDate = twoYearDateFormat.exec(path);
-  const singleYearDate = singleYearDateFormat.exec(path);
-
-  if (twoYearDate) {
-    return `, ${twoYearDate[1]}/${twoYearDate[2]}`;
-  }
-
-  if (singleYearDate) {
-    return `, ${singleYearDate[1]}`;
-  }
-  return '';
-}
-
 function TopicDownloadList({ topic }: Props) {
   return (
     <Details summary={topic.title}>
-      {topic.publications.map(({ id, title, downloadFiles }) => (
-        <React.Fragment key={id}>
-          <h3 className="govuk-heading-s">{title}</h3>
+      {topic.publications.map(
+        ({
+          id,
+          title,
+          downloadFiles,
+          earliestReleaseTime,
+          latestReleaseTime,
+        }) => (
+          <React.Fragment key={id}>
+            <h3 className="govuk-heading-s govuk-!-margin-bottom-2">{title}</h3>
 
-          <ul>
-            {downloadFiles.map(({ extension, name, path, size }) => (
-              <li key={path}>
-                <Link
-                  to={`${process.env.DATA_API_BASE_URL}/download/${path}`}
-                  data-testid={`download-stats-${path}`}
-                  analytics={{
-                    category: 'Downloads',
-                    action: `Download latest data page ${name} file downloaded`,
-                    label: `File URL: /api/download/${path}`,
-                  }}
-                >
-                  {`${name}${getPublicationDate(path)}`}
-                </Link>
-                {` (${extension}, ${size})`}
-              </li>
-            ))}
-          </ul>
-        </React.Fragment>
-      ))}
+            <p>
+              {earliestReleaseTime === latestReleaseTime
+                ? earliestReleaseTime
+                : `${earliestReleaseTime} to ${latestReleaseTime}`}
+            </p>
+
+            <ul>
+              {downloadFiles.map(({ extension, name, path, size }) => (
+                <li key={path}>
+                  <Link
+                    to={`${process.env.DATA_API_BASE_URL}/download/${path}`}
+                    data-testid={`download-stats-${path}`}
+                    analytics={{
+                      category: 'Downloads',
+                      action: `Download latest data page ${name} file downloaded`,
+                      label: `File URL: /api/download/${path}`,
+                    }}
+                  >
+                    {name}
+                  </Link>
+                  {` (${extension}, ${size})`}
+                </li>
+              ))}
+            </ul>
+          </React.Fragment>
+        ),
+      )}
     </Details>
   );
 }
