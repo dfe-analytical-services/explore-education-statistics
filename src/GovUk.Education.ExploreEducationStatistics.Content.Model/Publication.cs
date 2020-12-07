@@ -45,7 +45,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Content.Model
 
         public bool Live => Published.HasValue && DateTime.Compare(DateTime.UtcNow, Published.Value) > 0;
 
-        public Release LatestRelease()
+        public Release LatestPublishedRelease()
         {
             return Releases?.Where(r => r.Live && IsLatestVersionOfRelease(r.Id))
                 .OrderBy(r => r.Year)

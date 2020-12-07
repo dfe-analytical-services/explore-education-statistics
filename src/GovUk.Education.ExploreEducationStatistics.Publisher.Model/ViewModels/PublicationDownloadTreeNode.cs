@@ -6,5 +6,9 @@ namespace GovUk.Education.ExploreEducationStatistics.Publisher.Model.ViewModels
     public class PublicationDownloadTreeNode : AbstractPublicationTreeNode
     {
         public List<FileInfo> DownloadFiles { get; set; }
+
+        public string EarliestReleaseTime { get; set; }
+
+        public string LatestReleaseTime { get; set; }
     }
 }
