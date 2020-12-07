@@ -72,10 +72,10 @@ const ReleaseStatusForm = ({
   onSubmit,
 }: Props) => {
   const handleSubmit = useFormSubmit<ReleaseStatusFormValues>(
-    ({ status, publishMethod, publishScheduled, ...values }) => {
+    async ({ status, publishMethod, publishScheduled, ...values }) => {
       const isApproved = status === 'Approved';
 
-      onSubmit({
+      await onSubmit({
         ...values,
         status,
         publishMethod: isApproved ? publishMethod : undefined,
