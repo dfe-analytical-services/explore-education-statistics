@@ -112,8 +112,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
             using (var context = InMemoryStatisticsDbContext())
             {
                 var service = new FootnoteService(
-                    context, 
-                    logger.Object, 
+                    context,
                     filterService.Object, 
                     filterGroupService.Object, 
                     filterItemService.Object,

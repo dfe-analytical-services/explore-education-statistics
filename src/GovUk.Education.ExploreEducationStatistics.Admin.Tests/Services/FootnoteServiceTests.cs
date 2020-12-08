@@ -286,7 +286,6 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
 
             return new FootnoteService(
                 statisticsDbContext,
-                logger ?? new Mock<ILogger<FootnoteService>>().Object,
                 filterService ?? new Mock<IFilterService>().Object,
                 filterGroupService ?? new Mock<IFilterGroupService>().Object,
                 filterItemService ?? new Mock<IFilterItemService>().Object,
