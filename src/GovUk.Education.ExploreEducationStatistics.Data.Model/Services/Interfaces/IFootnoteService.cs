@@ -18,7 +18,9 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Model.Services.Interfa
 
         IEnumerable<Footnote> GetFootnotes(Guid releaseId);
 
-        IEnumerable<Footnote> GetFootnotes(Guid releaseId, params Guid[] subjects);
+        IEnumerable<Footnote> GetFootnotes(Guid releaseId, Guid subjectId);
+
+        IEnumerable<Footnote> GetFootnotes(Guid releaseId, List<Guid> subjects);
 
         Task DeleteFootnote(Guid releaseId, Guid id);
 
