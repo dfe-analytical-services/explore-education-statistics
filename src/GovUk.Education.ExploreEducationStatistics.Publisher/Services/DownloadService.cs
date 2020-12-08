@@ -70,13 +70,21 @@ namespace GovUk.Education.ExploreEducationStatistics.Publisher.Services
 
         private PublicationDownloadTreeNode BuildPublicationNode(Publication publication, IEnumerable<Guid> includedReleaseIds)
         {
+            var releases = publication.Releases
+                .Where(r => IsReleasePublished(r, includedReleaseIds))
+                .OrderBy(r => r.Year)
+                .ThenBy(r => r.TimePeriodCoverage)
+                .ToList();
+
             return new PublicationDownloadTreeNode
             {
                 Id = publication.Id,
                 Title = publication.Title,
                 Summary = publication.Summary,
                 Slug = publication.Slug,
-                DownloadFiles = GetDownloadFiles(publication, includedReleaseIds).ToList()
+                DownloadFiles = GetDownloadFiles(publication, includedReleaseIds).ToList(),
+                EarliestReleaseTime = releases.FirstOrDefault()?.Title,
+                LatestReleaseTime = releases.LastOrDefault()?.Title
             };
         }
 

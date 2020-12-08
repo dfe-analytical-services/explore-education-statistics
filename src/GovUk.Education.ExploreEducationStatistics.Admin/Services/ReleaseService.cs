@@ -324,7 +324,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Services
                 .OnSuccess(_userService.CheckCanViewPublication)
                 .OnSuccess(publication =>
                 {
-                    var latestRelease = publication.LatestRelease();
+                    var latestRelease = publication.LatestPublishedRelease();
                     return latestRelease != null ? new TitleAndIdViewModel
                     {
                         Id = latestRelease.Id,
