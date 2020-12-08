@@ -138,24 +138,20 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
             Assert.True(result.IsRight);
             Assert.Equal(2, result.Right.Count);
 
-            var result1 = result.Right.Find(r => r.SubjectId.ToString() == testDatafileImport1.PartitionKey);
+            var result1 = result.Right.Find(r => r.SubjectId == testImportMessage1.SubjectId);
             Assert.NotNull(result1);
             Assert.Equal(testDatafileImport1.RowKey, result1.DataFileName);
             Assert.Equal(testImportMessage1.MetaFileName, result1.MetaFileName);
-            Assert.Equal(JsonConvert.SerializeObject(testRelease),
-                JsonConvert.SerializeObject(result1.Release));
-            Assert.Equal(testDatafileImport1.Errors, result1.Errors);
+            Assert.Equal(testRelease.Id, result1.ReleaseId);
             Assert.Equal(testDatafileImport1.NumberOfRows, result1.NumberOfRows);
             Assert.Equal(testDatafileImport1.Status, result1.Status);
             Assert.Equal(testDatafileImport1.PercentageComplete, result1.StagePercentageComplete);
 
-            var result2 = result.Right.Find(r => r.SubjectId.ToString() == testDatafileImport2.PartitionKey);
+            var result2 = result.Right.Find(r => r.SubjectId == testImportMessage2.SubjectId);
             Assert.NotNull(result2);
             Assert.Equal(testDatafileImport2.RowKey, result2.DataFileName);
             Assert.Equal(testImportMessage2.MetaFileName, result2.MetaFileName);
-            Assert.Equal(JsonConvert.SerializeObject(testRelease),
-                JsonConvert.SerializeObject(result2.Release));
-            Assert.Equal(testDatafileImport2.Errors, result2.Errors);
+            Assert.Equal(testRelease.Id, result2.ReleaseId);
             Assert.Equal(testDatafileImport2.NumberOfRows, result2.NumberOfRows);
             Assert.Equal(testDatafileImport2.Status, result2.Status);
             Assert.Equal(testDatafileImport2.PercentageComplete, result2.StagePercentageComplete);
