@@ -27,18 +27,21 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Services
         private readonly IMetaGuidanceSubjectService _metaGuidanceSubjectService;
         private readonly StatisticsDbContext _statisticsDbContext;
         private readonly IUserService _userService;
+        private readonly IFileRepository _fileRepository;
 
         public MetaGuidanceService(ContentDbContext contentDbContext,
             IPersistenceHelper<ContentDbContext> contentPersistenceHelper,
             IMetaGuidanceSubjectService metaGuidanceSubjectService,
             StatisticsDbContext statisticsDbContext,
-            IUserService userService)
+            IUserService userService,
+            IFileRepository fileRepository)
         {
             _contentDbContext = contentDbContext;
             _contentPersistenceHelper = contentPersistenceHelper;
             _metaGuidanceSubjectService = metaGuidanceSubjectService;
             _statisticsDbContext = statisticsDbContext;
             _userService = userService;
+            _fileRepository = fileRepository;
         }
 
         public async Task<Either<ActionResult, MetaGuidanceViewModel>> Get(Guid releaseId)
@@ -70,7 +73,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Services
             return await _contentPersistenceHelper.CheckEntityExists<Release>(releaseId)
                 .OnSuccess(async release =>
                 {
-                    if (await DataFilesExist(releaseId))
+                    if (await _fileRepository.HasAnyDataFiles(release.Id))
                     {
                         if (string.IsNullOrWhiteSpace(release.MetaGuidance))
                         {
@@ -128,9 +131,10 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Services
 
         private async Task<Either<ActionResult, MetaGuidanceViewModel>> BuildViewModel(Release release)
         {
-            var subjectIds = await GetDataFilesQueryable(release.Id)
+            var subjectIds = (await _fileRepository.ListDataFiles(release.Id))
+                .Where(f => f.SubjectId.HasValue)
                 .Select(f => f.SubjectId.Value)
-                .ToListAsync();
+                .ToList();
 
             return await _metaGuidanceSubjectService.GetSubjects(release.Id, subjectIds)
                 .OnSuccess(subjects => new MetaGuidanceViewModel
@@ -139,23 +143,6 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Services
                     Content = release.MetaGuidance ?? "",
                     Subjects = subjects
                 });
-        }
-
-        private async Task<bool> DataFilesExist(Guid releaseId)
-        {
-            return await GetDataFilesQueryable(releaseId).AnyAsync();
-        }
-
-        private IQueryable<ReleaseFileReference> GetDataFilesQueryable(Guid releaseId)
-        {
-            return _contentDbContext
-                .ReleaseFiles
-                .Include(rf => rf.ReleaseFileReference)
-                .Where(rf => rf.ReleaseId == releaseId
-                             && rf.ReleaseFileReference.ReleaseFileType == ReleaseFileTypes.Data
-                             && rf.ReleaseFileReference.ReplacingId == null
-                             && rf.ReleaseFileReference.SubjectId.HasValue)
-                .Select(rf => rf.ReleaseFileReference);
         }
     }
 }
