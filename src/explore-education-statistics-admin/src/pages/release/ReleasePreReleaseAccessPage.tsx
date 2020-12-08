@@ -8,6 +8,7 @@ import {
 } from '@admin/routes/releaseRoutes';
 import { preReleaseRoute } from '@admin/routes/routes';
 import releaseService from '@admin/services/releaseService';
+import InsetText from '@common/components/InsetText';
 import LoadingSpinner from '@common/components/LoadingSpinner';
 import Tabs from '@common/components/Tabs';
 import TabsSection from '@common/components/TabsSection';
@@ -34,7 +35,7 @@ const ReleasePreReleaseAccessPage = () => {
         <Tabs id="preReleaseAccess">
           <TabsSection id="preReleaseAccess-users" title="Pre-release users">
             <h2>Manage pre-release user access</h2>
-            <div className="govuk-inset-text">
+            <InsetText>
               <h3>Before you start</h3>
               <p>
                 Pre-release users will receive an email with a link to preview
@@ -42,7 +43,7 @@ const ReleasePreReleaseAccessPage = () => {
                 preview will show a holding page until 24 hours before the
                 scheduled publication date.
               </p>
-            </div>
+            </InsetText>
 
             {!release.live && (
               <>

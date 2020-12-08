@@ -1,0 +1,13 @@
+@import '~govuk-frontend/govuk/base';
+
+.success {
+  border-left-color: govuk-colour('turquoise');
+}
+
+.warning {
+  border-left-color: govuk-colour('orange');
+}
+
+.error {
+  border-left-color: govuk-colour('red');
+}

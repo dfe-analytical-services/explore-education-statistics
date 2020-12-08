@@ -1,10 +1,11 @@
-import { useEditingContext } from '@admin/contexts/EditingContext';
 import BlockDraggable from '@admin/components/editable/BlockDraggable';
 import BlockDroppable from '@admin/components/editable/BlockDroppable';
 import Comments, {
   CommentsChangeHandler,
 } from '@admin/components/editable/Comments';
+import { useEditingContext } from '@admin/contexts/EditingContext';
 import { EditableBlock } from '@admin/services/types/content';
+import InsetText from '@common/components/InsetText';
 import SectionBlocks, {
   SectionBlocksProps,
 } from '@common/modules/find-statistics/components/SectionBlocks';
@@ -68,11 +69,7 @@ const EditableSectionBlocks = (props: EditableSectionBlockProps) => {
   }
 
   if (content.length === 0) {
-    return (
-      <div className="govuk-inset-text">
-        There is no content for this section.
-      </div>
-    );
+    return <InsetText>There is no content for this section.</InsetText>;
   }
 
   return (
