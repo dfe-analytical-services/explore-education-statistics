@@ -954,104 +954,136 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
                 ReleaseFileReference = replacementReleaseFileReference
             };
 
-            var originalFilterItem1 = new FilterItem
+            var originalDefaultFilterItem = new FilterItem
             {
                 Id = Guid.NewGuid(),
                 Label = "Test filter item - not changing"
             };
 
-            var originalFilterItem2 = new FilterItem
+            var originalPrimarySchoolsFilterItem = new FilterItem
+            {
+                Id = Guid.NewGuid(),
+                Label = "Primary schools"
+            };
+
+            var originalPrimaryAndSecondarySchoolsFilterItem = new FilterItem
+            {
+                Id = Guid.NewGuid(),
+                Label = "Primary and secondary schools"
+            };
+
+            var replacementDefaultFilterItem = new FilterItem
             {
                 Label = "Test filter item - not changing"
             };
 
-            var replacementFilterItem1 = new FilterItem
+            var replacementPrimarySchoolsFilterItem = new FilterItem
             {
-                Label = "Test filter item - not changing"
+                Label = "Primary schools"
             };
 
-            var replacementFilterItem2 = new FilterItem
+            var replacementPrimaryAndSecondarySchoolsFilterItem = new FilterItem
             {
-                Label = "Test filter item - not changing"
+                Label = "Primary and secondary schools"
             };
 
-            var originalFilterGroup1 = new FilterGroup
-            {
-                Label = "Default group - not changing",
-                FilterItems = new List<FilterItem>
-                {
-                    originalFilterItem1
-                }
-            };
-
-            var originalFilterGroup2 = new FilterGroup
+            var originalDefaultFilterGroup = new FilterGroup
             {
                 Label = "Default group - not changing",
                 FilterItems = new List<FilterItem>
                 {
-                    originalFilterItem2
+                    originalDefaultFilterItem
                 }
             };
 
-            var replacementFilterGroup1 = new FilterGroup
+            var originalIndividualSchoolTypeFilterGroup = new FilterGroup
+            {
+                Label = "Individual",
+                FilterItems = new List<FilterItem>
+                {
+                    originalPrimarySchoolsFilterItem
+                }
+            };
+
+            var originalCombinedSchoolTypeFilterGroup = new FilterGroup
+            {
+                Label = "Combined",
+                FilterItems = new List<FilterItem>
+                {
+                    originalPrimaryAndSecondarySchoolsFilterItem
+                }
+            };
+
+            var replacementDefaultFilterGroup = new FilterGroup
             {
                 Label = "Default group - not changing",
                 FilterItems = new List<FilterItem>
                 {
-                    replacementFilterItem1
+                    replacementDefaultFilterItem
                 }
             };
 
-            var replacementFilterGroup2 = new FilterGroup
+            var replacementIndividualSchoolTypeFilterGroup = new FilterGroup
             {
-                Label = "Default group - not changing",
+                Label = "Individual",
                 FilterItems = new List<FilterItem>
                 {
-                    replacementFilterItem2
+                    replacementPrimarySchoolsFilterItem
+                }
+            };
+            
+            var replacementCombinedSchoolTypeFilterGroup = new FilterGroup
+            {
+                Label = "Combined",
+                FilterItems = new List<FilterItem>
+                {
+                    replacementPrimaryAndSecondarySchoolsFilterItem
                 }
             };
 
-            var originalFilter1 = new Filter
+            var originalDefaultFilter = new Filter
             {
                 Label = "Test filter 1 - not changing",
                 Name = "test_filter_1_not_changing",
                 Subject = originalSubject,
                 FilterGroups = new List<FilterGroup>
                 {
-                    originalFilterGroup1
+                    originalDefaultFilterGroup
                 }
             };
 
-            var originalFilter2 = new Filter
+            var originalSchoolTypeFilter = new Filter
             {
-                Label = "Test filter 2 - not changing",
-                Name = "test_filter_2_not_changing",
+                Label = "School type",
+                Name = "school_type",
                 Subject = originalSubject,
                 FilterGroups = new List<FilterGroup>
                 {
-                    originalFilterGroup2
+                    originalIndividualSchoolTypeFilterGroup,
+                    originalCombinedSchoolTypeFilterGroup,
                 }
             };
 
-            var replacementFilter1 = new Filter
+            var replacementDefaultFilter = new Filter
             {
                 Label = "Test filter 1 - not changing",
                 Name = "test_filter_1_not_changing",
                 Subject = replacementSubject,
                 FilterGroups = new List<FilterGroup>
                 {
-                    replacementFilterGroup1
+                    replacementDefaultFilterGroup
                 }
             };
 
-            var replacementFilter2 = new Filter
+            var replacementSchoolTypeFilter = new Filter
             {
-                Label = "Test filter 2 - not changing",
-                Name = "test_filter_2_not_changing",
+                Label = "School type",
+                Name = "school_type",
                 Subject = replacementSubject,
                 FilterGroups = new List<FilterGroup>
                 {
-                    replacementFilterGroup2
+                    replacementIndividualSchoolTypeFilterGroup,
+                    replacementCombinedSchoolTypeFilterGroup
                 }
             };
 
@@ -1118,7 +1150,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
                     {
                         new List<TableHeader>
                         {
-                            new TableHeader(originalFilterItem1.Id.ToString(), TableHeaderType.Filter)
+                            new TableHeader(originalDefaultFilterItem.Id.ToString(), TableHeaderType.Filter)
                         }
                     },
                     Rows = new List<TableHeader>
@@ -1134,7 +1166,12 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
                 Query = new ObservationQueryContext
                 {
                     SubjectId = originalSubject.Id,
-                    Filters = new[] {originalFilterItem1.Id},
+                    Filters = new[]
+                    {
+                        originalDefaultFilterItem.Id,
+                        originalPrimarySchoolsFilterItem.Id,
+                        originalPrimaryAndSecondarySchoolsFilterItem.Id,
+                    },
                     Indicators = new[] {originalIndicator.Id},
                     Locations = new LocationQuery
                     {
@@ -1157,7 +1194,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
                 {
                     new FilterFootnote
                     {
-                        Filter = originalFilter1
+                        Filter = originalDefaultFilter
                     }
                 });
 
@@ -1167,7 +1204,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
                 {
                     new FilterGroupFootnote
                     {
-                        FilterGroup = originalFilterGroup1
+                        FilterGroup = originalDefaultFilterGroup
                     }
                 });
 
@@ -1177,7 +1214,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
                 {
                     new FilterItemFootnote
                     {
-                        FilterItem = originalFilterItem1
+                        FilterItem = originalDefaultFilterItem
                     }
                 });
 
@@ -1241,8 +1278,8 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
             {
                 await statisticsDbContext.AddRangeAsync(statsReleaseVersion1, statsReleaseVersion2);
                 await statisticsDbContext.AddRangeAsync(originalSubject, replacementSubject);
-                await statisticsDbContext.AddRangeAsync(originalFilter1, originalFilter2,
-                    replacementFilter1, replacementFilter2);
+                await statisticsDbContext.AddRangeAsync(originalDefaultFilter, originalSchoolTypeFilter,
+                    replacementDefaultFilter, replacementSchoolTypeFilter);
                 await statisticsDbContext.AddRangeAsync(originalIndicatorGroup, replacementIndicatorGroup);
                 await statisticsDbContext.AddRangeAsync(footnoteForFilter, footnoteForFilterGroup,
                     footnoteForFilterItem, footnoteForIndicator, footnoteForSubject);
@@ -1285,32 +1322,63 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
                 Assert.Equal(replacementIndicator.Id, dataBlockIndicatorPlan.Target);
                 Assert.True(dataBlockIndicatorPlan.Valid);
 
-                Assert.Single(dataBlockPlan.Filters);
+                Assert.Equal(2, dataBlockPlan.Filters.Count);
 
-                var dataBlockFilterPlan = dataBlockPlan.Filters.First();
+                var dataBlockDefaultFilterPlan = dataBlockPlan.Filters.First(f => f.Key.Equals(originalDefaultFilter.Id));
 
-                Assert.Equal(originalFilter1.Id, dataBlockFilterPlan.Key);
-                Assert.Equal(originalFilter1.Id, dataBlockFilterPlan.Value.Id);
-                Assert.Equal(originalFilter1.Label, dataBlockFilterPlan.Value.Label);
-                Assert.Equal(originalFilter1.Name, dataBlockFilterPlan.Value.Name);
-                Assert.True(dataBlockFilterPlan.Value.Valid);
+                Assert.Equal(originalDefaultFilter.Id, dataBlockDefaultFilterPlan.Value.Id);
+                Assert.Equal(originalDefaultFilter.Label, dataBlockDefaultFilterPlan.Value.Label);
+                Assert.Equal(originalDefaultFilter.Name, dataBlockDefaultFilterPlan.Value.Name);
+                Assert.True(dataBlockDefaultFilterPlan.Value.Valid);
 
-                Assert.Single(dataBlockFilterPlan.Value.Groups);
+                Assert.Single(dataBlockDefaultFilterPlan.Value.Groups);
 
-                var dataBlockFilterGroupPlan = dataBlockFilterPlan.Value.Groups.First();
+                var dataBlockDefaultFilterGroupPlan = dataBlockDefaultFilterPlan.Value.Groups.First();
 
-                Assert.Equal(originalFilterGroup1.Id, dataBlockFilterGroupPlan.Key);
-                Assert.Equal(originalFilterGroup1.Id, dataBlockFilterGroupPlan.Value.Id);
-                Assert.Equal(originalFilterGroup1.Label, dataBlockFilterGroupPlan.Value.Label);
-                Assert.Single(dataBlockFilterGroupPlan.Value.Filters);
-                Assert.True(dataBlockFilterGroupPlan.Value.Valid);
+                Assert.Equal(originalDefaultFilterGroup.Id, dataBlockDefaultFilterGroupPlan.Key);
+                Assert.Equal(originalDefaultFilterGroup.Id, dataBlockDefaultFilterGroupPlan.Value.Id);
+                Assert.Equal(originalDefaultFilterGroup.Label, dataBlockDefaultFilterGroupPlan.Value.Label);
+                Assert.Single(dataBlockDefaultFilterGroupPlan.Value.Filters);
+                Assert.True(dataBlockDefaultFilterGroupPlan.Value.Valid);
 
-                var dataBlockFilterItemPlan = dataBlockFilterGroupPlan.Value.Filters.First();
+                var dataBlockDefaultFilterItemPlan = dataBlockDefaultFilterGroupPlan.Value.Filters.First();
 
-                Assert.Equal(originalFilterItem1.Id, dataBlockFilterItemPlan.Id);
-                Assert.Equal(originalFilterItem1.Label, dataBlockFilterItemPlan.Label);
-                Assert.Equal(replacementFilterItem1.Id, dataBlockFilterItemPlan.Target);
-                Assert.True(dataBlockFilterItemPlan.Valid);
+                Assert.Equal(originalDefaultFilterItem.Id, dataBlockDefaultFilterItemPlan.Id);
+                Assert.Equal(originalDefaultFilterItem.Label, dataBlockDefaultFilterItemPlan.Label);
+                Assert.Equal(replacementDefaultFilterItem.Id, dataBlockDefaultFilterItemPlan.Target);
+                Assert.True(dataBlockDefaultFilterItemPlan.Valid);
+
+                var dataBlockSchoolTypeFilterPlan = dataBlockPlan.Filters.First(f => f.Key.Equals(originalSchoolTypeFilter.Id));
+
+                Assert.Equal(originalSchoolTypeFilter.Id, dataBlockSchoolTypeFilterPlan.Value.Id);
+                Assert.Equal(originalSchoolTypeFilter.Label, dataBlockSchoolTypeFilterPlan.Value.Label);
+                Assert.Equal(originalSchoolTypeFilter.Name, dataBlockSchoolTypeFilterPlan.Value.Name);
+                Assert.True(dataBlockSchoolTypeFilterPlan.Value.Valid);
+
+                Assert.Equal(2, dataBlockSchoolTypeFilterPlan.Value.Groups.Count);
+
+                var dataBlockIndividualSchoolTypeFilterGroupPlan = 
+                    dataBlockSchoolTypeFilterPlan.Value.Groups.First(g => g.Key == originalIndividualSchoolTypeFilterGroup.Id);
+
+                Assert.Equal(originalIndividualSchoolTypeFilterGroup.Id, dataBlockIndividualSchoolTypeFilterGroupPlan.Value.Id);
+                Assert.Equal(originalIndividualSchoolTypeFilterGroup.Label, dataBlockIndividualSchoolTypeFilterGroupPlan.Value.Label);
+                Assert.Single(dataBlockIndividualSchoolTypeFilterGroupPlan.Value.Filters);
+                Assert.True(dataBlockIndividualSchoolTypeFilterGroupPlan.Value.Valid);
+
+                var dataBlockCombinedSchoolTypeFilterGroupPlan = 
+                    dataBlockSchoolTypeFilterPlan.Value.Groups.First(g => g.Key == originalCombinedSchoolTypeFilterGroup.Id);
+
+                Assert.Equal(originalCombinedSchoolTypeFilterGroup.Id, dataBlockCombinedSchoolTypeFilterGroupPlan.Value.Id);
+                Assert.Equal(originalCombinedSchoolTypeFilterGroup.Label, dataBlockCombinedSchoolTypeFilterGroupPlan.Value.Label);
+                Assert.Single(dataBlockCombinedSchoolTypeFilterGroupPlan.Value.Filters);
+                Assert.True(dataBlockCombinedSchoolTypeFilterGroupPlan.Value.Valid);
+
+                var dataBlockPrimarySchoolsFilterItemPlan = dataBlockIndividualSchoolTypeFilterGroupPlan.Value.Filters.First();
+
+                Assert.Equal(originalPrimarySchoolsFilterItem.Id, dataBlockPrimarySchoolsFilterItemPlan.Id);
+                Assert.Equal(originalPrimarySchoolsFilterItem.Label, dataBlockPrimarySchoolsFilterItemPlan.Label);
+                Assert.Equal(replacementPrimarySchoolsFilterItem.Id, dataBlockPrimarySchoolsFilterItemPlan.Target);
+                Assert.True(dataBlockPrimarySchoolsFilterItemPlan.Valid);
 
                 Assert.NotNull(dataBlockPlan.Locations);
                 Assert.Single(dataBlockPlan.Locations);
@@ -1354,9 +1422,9 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
 
                 var footnoteForFilterFilterPlan = footnoteForFilterPlan.Filters.First();
 
-                Assert.Equal(originalFilter1.Id, footnoteForFilterFilterPlan.Id);
-                Assert.Equal(originalFilter1.Label, footnoteForFilterFilterPlan.Label);
-                Assert.Equal(replacementFilter1.Id, footnoteForFilterFilterPlan.Target);
+                Assert.Equal(originalDefaultFilter.Id, footnoteForFilterFilterPlan.Id);
+                Assert.Equal(originalDefaultFilter.Label, footnoteForFilterFilterPlan.Label);
+                Assert.Equal(replacementDefaultFilter.Id, footnoteForFilterFilterPlan.Target);
                 Assert.True(footnoteForFilterFilterPlan.Valid);
 
                 Assert.True(footnoteForFilterPlan.Valid);
@@ -1372,11 +1440,11 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
 
                 var footnoteForFilterGroupFilterGroupPlan = footnoteForFilterGroupPlan.FilterGroups.First();
 
-                Assert.Equal(originalFilterGroup1.Id, footnoteForFilterGroupFilterGroupPlan.Id);
-                Assert.Equal(originalFilterGroup1.Label, footnoteForFilterGroupFilterGroupPlan.Label);
-                Assert.Equal(originalFilterGroup1.Filter.Id, footnoteForFilterGroupFilterGroupPlan.FilterId);
-                Assert.Equal(originalFilterGroup1.Filter.Label, footnoteForFilterGroupFilterGroupPlan.FilterLabel);
-                Assert.Equal(replacementFilterGroup1.Id, footnoteForFilterGroupFilterGroupPlan.Target);
+                Assert.Equal(originalDefaultFilterGroup.Id, footnoteForFilterGroupFilterGroupPlan.Id);
+                Assert.Equal(originalDefaultFilterGroup.Label, footnoteForFilterGroupFilterGroupPlan.Label);
+                Assert.Equal(originalDefaultFilterGroup.Filter.Id, footnoteForFilterGroupFilterGroupPlan.FilterId);
+                Assert.Equal(originalDefaultFilterGroup.Filter.Label, footnoteForFilterGroupFilterGroupPlan.FilterLabel);
+                Assert.Equal(replacementDefaultFilterGroup.Id, footnoteForFilterGroupFilterGroupPlan.Target);
                 Assert.True(footnoteForFilterGroupFilterGroupPlan.Valid);
 
                 Assert.True(footnoteForFilterGroupPlan.Valid);
@@ -1392,13 +1460,13 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
 
                 var footnoteForFilterItemFilterItemPlan = footnoteForFilterItemPlan.FilterItems.First();
 
-                Assert.Equal(originalFilterItem1.Id, footnoteForFilterItemFilterItemPlan.Id);
-                Assert.Equal(originalFilterItem1.Label, footnoteForFilterItemFilterItemPlan.Label);
-                Assert.Equal(originalFilterItem1.FilterGroup.Filter.Id, footnoteForFilterItemFilterItemPlan.FilterId);
-                Assert.Equal(originalFilterItem1.FilterGroup.Filter.Label, footnoteForFilterItemFilterItemPlan.FilterLabel);
-                Assert.Equal(originalFilterItem1.FilterGroup.Id, footnoteForFilterItemFilterItemPlan.FilterGroupId);
-                Assert.Equal(originalFilterItem1.FilterGroup.Label, footnoteForFilterItemFilterItemPlan.FilterGroupLabel);
-                Assert.Equal(replacementFilterItem1.Id, footnoteForFilterItemFilterItemPlan.Target);
+                Assert.Equal(originalDefaultFilterItem.Id, footnoteForFilterItemFilterItemPlan.Id);
+                Assert.Equal(originalDefaultFilterItem.Label, footnoteForFilterItemFilterItemPlan.Label);
+                Assert.Equal(originalDefaultFilterItem.FilterGroup.Filter.Id, footnoteForFilterItemFilterItemPlan.FilterId);
+                Assert.Equal(originalDefaultFilterItem.FilterGroup.Filter.Label, footnoteForFilterItemFilterItemPlan.FilterLabel);
+                Assert.Equal(originalDefaultFilterItem.FilterGroup.Id, footnoteForFilterItemFilterItemPlan.FilterGroupId);
+                Assert.Equal(originalDefaultFilterItem.FilterGroup.Label, footnoteForFilterItemFilterItemPlan.FilterGroupLabel);
+                Assert.Equal(replacementDefaultFilterItem.Id, footnoteForFilterItemFilterItemPlan.Target);
                 Assert.True(footnoteForFilterItemFilterItemPlan.Valid);
 
                 Assert.True(footnoteForFilterItemPlan.Valid);
