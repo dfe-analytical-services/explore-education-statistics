@@ -113,12 +113,21 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Model.Services
         {
             var subjectsIdsForRelease = _context.ReleaseSubject
                 .Where(rs => rs.ReleaseId == releaseId)
-                .Select(rs => rs.SubjectId).ToArray();
+                .Select(rs => rs.SubjectId)
+                .ToList();
 
             return GetFootnotes(releaseId, subjectsIdsForRelease);
         }
 
-        public IEnumerable<Footnote> GetFootnotes(Guid releaseId, params Guid[] subjects)
+        public IEnumerable<Footnote> GetFootnotes(Guid releaseId, Guid subjectId)
+        {
+            return GetFootnotes(releaseId, new List<Guid>
+            {
+                subjectId
+            });
+        }
+
+        public IEnumerable<Footnote> GetFootnotes(Guid releaseId, List<Guid> subjects)
         {
             return GetBaseFootnoteQuery()
                     .Where(footnote => footnote.Releases.Any(releaseFootnote => releaseFootnote.ReleaseId == releaseId))
@@ -201,11 +210,11 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Model.Services
                 .ThenInclude(i => i.Indicator.IndicatorGroup)
                 .Include(f => f.Subjects).Single(f => f.Id == id);
 
-            return (footnote.Subjects.Any(subject => subject.SubjectId != subjectId) ||
+            return footnote.Subjects.Any(subject => subject.SubjectId != subjectId) ||
                     footnote.Filters.Any(filter => filter.Filter.SubjectId != subjectId) ||
                     footnote.Indicators.Any(indicator => indicator.Indicator.IndicatorGroup.SubjectId != subjectId) ||
                     footnote.FilterGroups.Any(filterGroup => filterGroup.FilterGroup.Filter.SubjectId != subjectId) ||
-                    footnote.FilterItems.Any(filterItem => filterItem.FilterItem.FilterGroup.Filter.SubjectId != subjectId));
+                    footnote.FilterItems.Any(filterItem => filterItem.FilterItem.FilterGroup.Filter.SubjectId != subjectId);
         }
 
         private bool IsFootnoteLinkedToAnotherSubjectForThisRelease(Guid id, Guid releaseId, Guid subjectId)

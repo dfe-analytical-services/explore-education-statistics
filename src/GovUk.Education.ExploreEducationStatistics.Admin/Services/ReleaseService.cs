@@ -197,7 +197,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Services
                 .FirstOrDefault(r => r.Id == amendment.PreviousVersionId);
 
             // Release does not have to have stats uploaded but if it has then
-            // create a link row to link back to the original subject & footnotes
+            // create a link row to link back to the original subject
             if (statsRelease != null)
             {
                 var statsAmendment = statsRelease.CreateReleaseAmendment(amendment.Id, amendment.PreviousVersionId);
