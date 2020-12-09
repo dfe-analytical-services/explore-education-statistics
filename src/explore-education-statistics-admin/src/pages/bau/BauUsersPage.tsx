@@ -20,39 +20,33 @@ const BauUsersPage = () => {
         <span className="govuk-caption-xl">Manage access to the service</span>
         Users
       </h1>
-      <table className="govuk-table">
-        <caption className="govuk-table__caption">Active user accounts</caption>
-        <thead className="govuk-table__head">
-          <tr className="govuk-table__row">
-            <th scope="col" className="govuk-table__header">
-              Name
-            </th>
-            <th scope="col" className="govuk-table__header">
-              Email
-            </th>
-            <th>Role</th>
-            <th>Actions</th>
-          </tr>
-        </thead>
-        <LoadingSpinner loading={isLoading} text="Loading users">
+      <LoadingSpinner loading={isLoading} text="Loading users">
+        <table>
+          <caption>Active user accounts</caption>
+          <thead>
+            <tr>
+              <th scope="col">Name</th>
+              <th scope="col">Email</th>
+              <th>Role</th>
+              <th>Actions</th>
+            </tr>
+          </thead>
           {value && (
-            <tbody className="govuk-table__body">
+            <tbody>
               {value.map(user => (
-                <tr className="govuk-table__row" key={user.id}>
-                  <th scope="row" className="govuk-table__header">
-                    {user.name}
-                  </th>
-                  <td className="govuk-table__cell">{user.email}</td>
-                  <td className="govuk-table__cell">{user.role}</td>
-                  <td className="govuk-table__cell">
+                <tr key={user.id}>
+                  <th scope="row">{user.name}</th>
+                  <td>{user.email}</td>
+                  <td>{user.role}</td>
+                  <td>
                     <Link to={`/administration/users/${user.id}`}>Manage</Link>
                   </td>
                 </tr>
               ))}
             </tbody>
           )}
-        </LoadingSpinner>
-      </table>
+        </table>
+      </LoadingSpinner>
       <p>
         <Link to="/administration/" className="govuk-back-link">
           Back
