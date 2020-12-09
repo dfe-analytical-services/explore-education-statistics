@@ -41,25 +41,25 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Processor.Functions
             [QueueTrigger("imports-pending")] ImportMessage message,
             ExecutionContext executionContext,
             [Queue("imports-pending")] ICollector<ImportMessage> importStagesMessageQueue,
-            [Queue("imports-available")] ICollector<ImportMessage> dataFileProcessingMessageQueue
+            [Queue("imports-available")] ICollector<ImportObservationsMessage> importObservationsMessageQueue
         )
         {
             try
             {
-                var status = await _importStatusService.GetImportStatus(message.Release.Id, message.OrigDataFileName);
+                var status = await _importStatusService.GetImportStatus(message.Release.Id, message.DataFileName);
 
                 _logger.LogInformation($"Processor Function processing import message for " +
-                                       $"{message.OrigDataFileName} at stage {status.Status}");
+                                       $"{message.DataFileName} at stage {status.Status}");
                 
                 if (status.Status == IStatus.QUEUED || status.Status == IStatus.PROCESSING_ARCHIVE_FILE)
                 {
                     if (message.ArchiveFileName != "")
                     {
-                        _logger.LogInformation($"Unpacking archive for {message.OrigDataFileName}");
+                        _logger.LogInformation($"Unpacking archive for {message.DataFileName}");
                         await _processorService.ProcessUnpackingArchive(message);
                     }
 
-                    await _importStatusService.UpdateStatus(message.Release.Id, message.OrigDataFileName,
+                    await _importStatusService.UpdateStatus(message.Release.Id, message.DataFileName,
                         IStatus.STAGE_1);
                     importStagesMessageQueue.Add(message);
                     return;
@@ -68,7 +68,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Processor.Functions
                 if (status.Status == IStatus.STAGE_1)
                 {
                     await _processorService.ProcessStage1(message, executionContext);
-                    await _importStatusService.UpdateStatus(message.Release.Id, message.OrigDataFileName,
+                    await _importStatusService.UpdateStatus(message.Release.Id, message.DataFileName,
                         IStatus.STAGE_2);
                     importStagesMessageQueue.Add(message);
                     return;
@@ -77,7 +77,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Processor.Functions
                 if (status.Status == IStatus.STAGE_2)
                 {
                     await _processorService.ProcessStage2(message);
-                    await _importStatusService.UpdateStatus(message.Release.Id, message.OrigDataFileName,
+                    await _importStatusService.UpdateStatus(message.Release.Id, message.DataFileName,
                         IStatus.STAGE_3);
                     importStagesMessageQueue.Add(message);
                     return;
@@ -86,14 +86,14 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Processor.Functions
                 if (status.Status == IStatus.STAGE_3)
                 {
                     await _processorService.ProcessStage3(message);
-                    await _importStatusService.UpdateStatus(message.Release.Id, message.OrigDataFileName,
+                    await _importStatusService.UpdateStatus(message.Release.Id, message.DataFileName,
                         IStatus.STAGE_4);
                     importStagesMessageQueue.Add(message);
                 }
 
                 if (status.Status == IStatus.STAGE_4)
                 {
-                    await _processorService.ProcessStage4Messages(message, dataFileProcessingMessageQueue);
+                    await _processorService.ProcessStage4Messages(message, importObservationsMessageQueue);
                 }
             }
             catch (Exception e)
@@ -101,7 +101,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Processor.Functions
                 var ex = GetInnerException(e);
 
                 await _batchService.FailImport(message.Release.Id,
-                    message.OrigDataFileName,
+                    message.DataFileName,
                     new List<ValidationError>
                     {
                         new ValidationError(ex.Message)
@@ -114,7 +114,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Processor.Functions
         }
 
         [FunctionName("ImportObservations")]
-        public async Task ImportObservations([QueueTrigger("imports-available")] ImportMessage message)
+        public async Task ImportObservations([QueueTrigger("imports-available")] ImportObservationsMessage message)
         {
             try
             {
@@ -132,8 +132,8 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Processor.Functions
 
                 var ex = GetInnerException(e);
 
-                await _batchService.FailImport(message.Release.Id,
-                    message.OrigDataFileName,
+                await _batchService.FailImport(message.ReleaseId,
+                    message.DataFileName,
                     new List<ValidationError>
                     {
                         new ValidationError(ex.Message)

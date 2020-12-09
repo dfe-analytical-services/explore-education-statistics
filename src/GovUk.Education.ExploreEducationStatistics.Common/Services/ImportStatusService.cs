@@ -92,12 +92,12 @@ namespace GovUk.Education.ExploreEducationStatistics.Common.Services
         }
 
         public async Task UpdateStatus(Guid releaseId,
-            string origDataFileName,
+            string dataFileName,
             IStatus status,
             double percentageComplete = 0,
             int retry = 0)
         {
-            var import = await GetImport(releaseId, origDataFileName);
+            var import = await GetImport(releaseId, dataFileName);
 
             var percentageCompleteBefore = import.PercentageComplete;
             var percentageCompleteAfter = (int) Math.Clamp(percentageComplete, 0, 100);
@@ -111,7 +111,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Common.Services
                 || statusBefore == status && percentageCompleteBefore > percentageCompleteAfter)
             {
                 _logger.LogWarning(
-                    $"Update: {origDataFileName} {statusBefore} ({percentageCompleteBefore}%) -> {status} ({percentageCompleteAfter}%) ignored");
+                    $"Update: {dataFileName} {statusBefore} ({percentageCompleteBefore}%) -> {status} ({percentageCompleteAfter}%) ignored");
                 return;
             }
 
@@ -122,7 +122,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Common.Services
             }
 
             _logger.LogInformation(
-                $"Update: {origDataFileName} {statusBefore} ({percentageCompleteBefore}%) -> {status} ({percentageCompleteAfter}%)");
+                $"Update: {dataFileName} {statusBefore} ({percentageCompleteBefore}%) -> {status} ({percentageCompleteAfter}%)");
 
             import.PercentageComplete = percentageCompleteAfter;
             import.Status = status;
@@ -143,8 +143,8 @@ namespace GovUk.Education.ExploreEducationStatistics.Common.Services
                     if (retry++ < 5)
                     {
                         _logger.LogWarning(
-                            $"Update: {origDataFileName} {statusBefore} ({percentageCompleteBefore}%) -> {status} ({percentageCompleteAfter}%) request failed and will be retried");
-                        await UpdateStatus(releaseId, origDataFileName, status, percentageComplete, retry);
+                            $"Update: {dataFileName} {statusBefore} ({percentageCompleteBefore}%) -> {status} ({percentageCompleteAfter}%) request failed and will be retried");
+                        await UpdateStatus(releaseId, dataFileName, status, percentageComplete, retry);
                     }
                     else
                     {

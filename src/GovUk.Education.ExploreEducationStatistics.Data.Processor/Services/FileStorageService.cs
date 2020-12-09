@@ -23,13 +23,11 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Processor.Services
             _blobStorageService = blobStorageService;
         }
 
-        public async Task<SubjectData> GetSubjectData(ImportMessage importMessage)
+        public async Task<SubjectData> GetSubjectData(Guid releaseId, string observationsFileBlobPath)
         {
-            var releaseId = importMessage.Release.Id.ToString();
-
             var dataBlob = await _blobStorageService.GetBlob(
                 PrivateFilesContainerName,
-                AdminReleasePath(releaseId, ReleaseFileTypes.Data, importMessage.DataFileName)
+                observationsFileBlobPath
             );
 
             var metaBlob = await _blobStorageService.GetBlob(
@@ -73,12 +71,9 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Processor.Services
             return await _blobStorageService.StreamBlob(PrivateFilesContainerName, blob.Path);
         }
 
-        public async Task DeleteBatchFile(Guid releaseId, string dataFileName)
+        public async Task DeleteBlobByPath(string blobPath)
         {
-            await _blobStorageService.DeleteBlob(
-                PrivateFilesContainerName,
-                AdminReleaseDirectoryPath(releaseId, ReleaseFileTypes.Data) + dataFileName
-            );
+            await _blobStorageService.DeleteBlob(PrivateFilesContainerName, blobPath);
         }
 
         public async Task<int> GetNumBatchesRemaining(Guid releaseId, string origDataFileName)

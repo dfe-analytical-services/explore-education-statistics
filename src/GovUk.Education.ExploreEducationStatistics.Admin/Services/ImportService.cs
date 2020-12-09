@@ -133,7 +133,6 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Services
             {
                 SubjectId = _guidGenerator.NewGuid(),
                 DataFileName = dataFileName,
-                OrigDataFileName = dataFileName,
                 MetaFileName = metaFileName,
                 Release = importMessageRelease,
                 NumBatches = 1,

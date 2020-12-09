@@ -10,6 +10,6 @@ namespace GovUk.Education.ExploreEducationStatistics.Common.Services.Interfaces
 
         Task<bool> IsImportFinished(Guid releaseId, string dataFileName);
 
-        Task UpdateStatus(Guid releaseId, string origDataFileName, IStatus status, double percentageComplete = 0, int retry = 0);
+        Task UpdateStatus(Guid releaseId, string dataFileName, IStatus status, double percentageComplete = 0, int retry = 0);
     }
 }
