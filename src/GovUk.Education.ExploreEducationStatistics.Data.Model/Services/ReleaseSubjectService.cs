@@ -11,12 +11,12 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Model.Services
     public class ReleaseSubjectService : IReleaseSubjectService
     {
         private readonly StatisticsDbContext _statisticsDbContext;
-        private readonly IFootnoteService _footnoteService;
+        private readonly IFootnoteRepository _footnoteRepository;
 
-        public ReleaseSubjectService(StatisticsDbContext statisticsDbContext, IFootnoteService footnoteService)
+        public ReleaseSubjectService(StatisticsDbContext statisticsDbContext, IFootnoteRepository footnoteRepository)
         {
             _statisticsDbContext = statisticsDbContext;
-            _footnoteService = footnoteService;
+            _footnoteRepository = footnoteRepository;
         }
 
         public async Task SoftDeleteAllReleaseSubjects(Guid releaseId)
@@ -51,7 +51,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Model.Services
                 .FirstOrDefaultAsync(rs => rs.ReleaseId == releaseId && rs.SubjectId == subjectId);
 
             await DeleteReleaseSubjectIfExists(releaseSubject);
-            await _footnoteService.DeleteAllFootnotesBySubject(releaseId, subjectId);
+            await _footnoteRepository.DeleteAllFootnotesBySubject(releaseId, subjectId);
 
             if (releaseSubject?.Subject != null)
             {

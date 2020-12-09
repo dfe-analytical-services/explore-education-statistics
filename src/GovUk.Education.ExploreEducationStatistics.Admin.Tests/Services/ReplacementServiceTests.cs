@@ -25,7 +25,6 @@ using static GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services.Val
 using static GovUk.Education.ExploreEducationStatistics.Admin.Validators.ValidationErrorMessages;
 using static GovUk.Education.ExploreEducationStatistics.Common.Model.TimeIdentifier;
 using static GovUk.Education.ExploreEducationStatistics.Data.Model.Database.StatisticsDbUtils;
-using FootnoteService = GovUk.Education.ExploreEducationStatistics.Data.Model.Services.FootnoteService;
 using IReleaseService = GovUk.Education.ExploreEducationStatistics.Admin.Services.Interfaces.IReleaseService;
 using Release = GovUk.Education.ExploreEducationStatistics.Data.Model.Release;
 using Unit = GovUk.Education.ExploreEducationStatistics.Common.Model.Unit;
@@ -2320,7 +2319,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
                 new FilterService(statisticsDbContext, new Mock<ILogger<FilterService>>().Object),
                 new IndicatorService(statisticsDbContext, new Mock<ILogger<IndicatorService>>().Object),
                 locationService.Object,
-                new FootnoteService(statisticsDbContext, new Mock<ILogger<FootnoteService>>().Object),
+                new FootnoteRepository(statisticsDbContext, new Mock<ILogger<FootnoteRepository>>().Object),
                 releaseService.Object,
                 timePeriodService.Object,
                 new PersistenceHelper<ContentDbContext>(contentDbContext),

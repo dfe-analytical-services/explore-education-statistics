@@ -25,7 +25,6 @@ using static GovUk.Education.ExploreEducationStatistics.Admin.Validators.Validat
 using static GovUk.Education.ExploreEducationStatistics.Admin.Validators.ValidationUtils;
 using static GovUk.Education.ExploreEducationStatistics.Common.Services.EnumUtil;
 using static GovUk.Education.ExploreEducationStatistics.Data.Model.Services.LocationService;
-using IFootnoteService = GovUk.Education.ExploreEducationStatistics.Data.Model.Services.Interfaces.IFootnoteService;
 using IReleaseService = GovUk.Education.ExploreEducationStatistics.Admin.Services.Interfaces.IReleaseService;
 using Unit = GovUk.Education.ExploreEducationStatistics.Common.Model.Unit;
 
@@ -38,7 +37,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Services
         private readonly IFilterService _filterService;
         private readonly IIndicatorService _indicatorService;
         private readonly ILocationService _locationService;
-        private readonly IFootnoteService _footnoteService;
+        private readonly IFootnoteRepository _footnoteRepository;
         private readonly IReleaseService _releaseService;
         private readonly ITimePeriodService _timePeriodService;
         private readonly IPersistenceHelper<ContentDbContext> _contentPersistenceHelper;
@@ -51,7 +50,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Services
             IFilterService filterService,
             IIndicatorService indicatorService,
             ILocationService locationService,
-            IFootnoteService footnoteService,
+            IFootnoteRepository footnoteRepository,
             IReleaseService releaseService,
             ITimePeriodService timePeriodService,
             IPersistenceHelper<ContentDbContext> contentPersistenceHelper,
@@ -62,7 +61,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Services
             _filterService = filterService;
             _indicatorService = indicatorService;
             _locationService = locationService;
-            _footnoteService = footnoteService;
+            _footnoteRepository = footnoteRepository;
             _releaseService = releaseService;
             _timePeriodService = timePeriodService;
             _contentPersistenceHelper = contentPersistenceHelper;
@@ -239,7 +238,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Services
         private List<FootnoteReplacementPlanViewModel> ValidateFootnotes(Guid releaseId, Guid subjectId,
             ReplacementSubjectMeta replacementSubjectMeta)
         {
-            return _footnoteService.GetFootnotes(releaseId, subjectId)
+            return _footnoteRepository.GetFootnotes(releaseId, subjectId)
                 .Select(footnote => ValidateFootnote(footnote, replacementSubjectMeta))
                 .ToList();
         }

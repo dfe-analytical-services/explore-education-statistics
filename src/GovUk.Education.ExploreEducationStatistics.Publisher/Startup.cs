@@ -88,7 +88,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Publisher
                 .AddScoped<IReleaseStatusService, ReleaseStatusService>()
                 .AddScoped<IValidationService, ValidationService>()
                 .AddScoped<IReleaseSubjectService, ReleaseSubjectService>()
-                .AddScoped<IFootnoteService, FootnoteService>();
+                .AddScoped<IFootnoteRepository, FootnoteRepository>();
         }
 
         private static string GetConfigurationValue(IServiceProvider provider, string key)

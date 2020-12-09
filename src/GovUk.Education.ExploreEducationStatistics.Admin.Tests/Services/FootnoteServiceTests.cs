@@ -7,6 +7,7 @@ using GovUk.Education.ExploreEducationStatistics.Common.Utils;
 using GovUk.Education.ExploreEducationStatistics.Content.Model.Database;
 using GovUk.Education.ExploreEducationStatistics.Data.Model;
 using GovUk.Education.ExploreEducationStatistics.Data.Model.Database;
+using GovUk.Education.ExploreEducationStatistics.Data.Model.Services;
 using GovUk.Education.ExploreEducationStatistics.Data.Model.Services.Interfaces;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.Extensions.Logging;
@@ -279,7 +280,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
             ISubjectService subjectService = null,
             IPersistenceHelper<ContentDbContext> contentPersistenceHelper = null,
             IUserService userService = null,
-            IFootnoteService commonFootnoteService = null,
+            IFootnoteRepository footnoteRepository = null,
             IPersistenceHelper<StatisticsDbContext> statisticsPersistenceHelper = null)
         {
             var contentContext = contentDbContext ?? new Mock<ContentDbContext>().Object;
@@ -293,9 +294,9 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
                 subjectService ?? new Mock<ISubjectService>().Object,
                 contentPersistenceHelper ?? new PersistenceHelper<ContentDbContext>(contentContext),
                 userService ?? MockUtils.AlwaysTrueUserService().Object,
-                commonFootnoteService ?? new Data.Model.Services.FootnoteService(
+                footnoteRepository ?? new FootnoteRepository(
                     statisticsDbContext,
-                    new Mock<ILogger<Data.Model.Services.FootnoteService>>().Object
+                    new Mock<ILogger<FootnoteRepository>>().Object
                 ),
                 statisticsPersistenceHelper ?? new PersistenceHelper<StatisticsDbContext>(statisticsDbContext)
             );
