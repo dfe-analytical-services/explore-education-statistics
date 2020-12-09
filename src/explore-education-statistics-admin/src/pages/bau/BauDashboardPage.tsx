@@ -6,14 +6,6 @@ import React from 'react';
 const BauDashboardPage = () => {
   const { user } = useAuthContext();
 
-  const canManageUsers = user
-    ? user.permissions.canAccessUserAdministrationPages
-    : false;
-  const canManageMethodologies = user
-    ? user.permissions.canAccessMethodologyAdministrationPages
-    : false;
-  const canManageImports = user ? user.permissions.canAccessAllImports : false;
-
   return (
     <Page
       title="Platform administration"
@@ -23,7 +15,7 @@ const BauDashboardPage = () => {
       <h2 className="govuk-heading-m govuk-!-margin-top-9">Content and data</h2>
 
       <div className="govuk-grid-row govuk-!-margin-bottom-9">
-        {canManageMethodologies && (
+        {user?.permissions.canAccessMethodologyAdministrationPages && (
           <div className="govuk-grid-column-one-third">
             <h3 className="govuk-heading-s govuk-!-margin-bottom-0">
               <Link to="/administration/methodology">Manage methodology</Link>
@@ -41,7 +33,7 @@ const BauDashboardPage = () => {
             View a list of all publication contacts.
           </p>
         </div>
-        {canManageImports && (
+        {user?.permissions.canAccessAllImports && (
           <div className="govuk-grid-column-one-third">
             <h3 className="govuk-heading-s govuk-!-margin-bottom-0">
               <Link to="/administration/imports">
@@ -61,7 +53,7 @@ const BauDashboardPage = () => {
         Access to the service
       </h2>
       <div className="govuk-grid-row govuk-!-margin-bottom-9">
-        {canManageUsers && (
+        {user?.permissions.canAccessUserAdministrationPages && (
           <>
             <div className="govuk-grid-column-one-third">
               <h3 className="govuk-heading-s govuk-!-margin-bottom-0">
