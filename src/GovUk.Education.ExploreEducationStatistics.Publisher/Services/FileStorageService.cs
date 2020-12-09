@@ -205,9 +205,10 @@ namespace GovUk.Education.ExploreEducationStatistics.Publisher.Services
                         SetAttributesCallbackAsync(destination, copyReleaseFilesCommand.PublishScheduled),
                     ShouldTransferCallbackAsync = (source, _) =>
                         CopyFileUnlessBatchedOrMeta(
-                            source,
-                            copyReleaseFilesCommand.ReleaseId,
-                            copyReleaseFilesCommand.Files),
+                            source: source,
+                            sourceContainerName: PrivateFilesContainerName,
+                            releaseId: copyReleaseFilesCommand.ReleaseId,
+                            files: copyReleaseFilesCommand.Files)
                 }
             );
         }
@@ -222,7 +223,10 @@ namespace GovUk.Education.ExploreEducationStatistics.Publisher.Services
             }
         }
 
-        private async Task<bool> CopyFileUnlessBatchedOrMeta(object source, Guid releaseId, List<ReleaseFileReference> releaseFileReferences)
+        private async Task<bool> CopyFileUnlessBatchedOrMeta(object source,
+            string sourceContainerName,
+            Guid releaseId,
+            List<ReleaseFileReference> files)
         {
             var item = source as CloudBlockBlob;
             if (item == null)
@@ -239,14 +243,13 @@ namespace GovUk.Education.ExploreEducationStatistics.Publisher.Services
 
             var filename = Path.GetFileName(item.Name);
 
-            if (releaseFileReferences.Exists(file => file.BlobStorageName == filename))
+            if (files.Exists(file => file.BlobStorageName == filename))
             {
                 return true;
             }
 
-            _logger.LogError($"No ReleaseFileReference found for releaseId: {releaseId} matching filename: {filename}");
+            _logger.LogInformation("Not transferring {0}/{1}", sourceContainerName, item.Name);
             return false;
-
         }
 
         private async Task UploadZippedFiles(
