@@ -527,10 +527,11 @@ Update data block chart for amendment
     user waits until page contains link  Chart
     user waits until page does not contain loading spinner
     user clicks element   id:manageDataBlocks-chart-tab
+    user waits until page contains element  id:chartConfigurationForm-title
     user enters text into element  id:chartConfigurationForm-title  Updated sample title
     user enters text into element  id:chartConfigurationForm-alt  Updated sample alt text
     user clicks button   Save chart options
-    user waits until page contains  Chart preview
+    user waits until page does not contain loading spinner
     user checks infographic chart contains alt  id:chartBuilderPreview  Updated sample alt text
 
 Navigate to 'Content' page for amendment
