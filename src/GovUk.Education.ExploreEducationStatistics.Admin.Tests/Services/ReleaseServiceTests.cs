@@ -340,7 +340,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
             var releaseDataFileService = new Mock<IReleaseDataFileService>(MockBehavior.Strict);
             var releaseSubjectService = new Mock<IReleaseSubjectService>(MockBehavior.Strict);
 
-            dataBlockService.Setup(service => service.GetDeleteDataBlockPlan(release.Id, subject))
+            dataBlockService.Setup(service => service.GetDeletePlan(release.Id, subject))
                 .ReturnsAsync(new DeleteDataBlockPlan());
 
             dataBlockService.Setup(service => service.DeleteDataBlocks(It.IsAny<DeleteDataBlockPlan>()))
@@ -369,7 +369,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
                 var result = await releaseService.RemoveDataFiles(release.Id, file.Id);
 
                 dataBlockService.Verify(mock =>
-                    mock.GetDeleteDataBlockPlan(release.Id, subject), Times.Once());
+                    mock.GetDeletePlan(release.Id, subject), Times.Once());
                 dataBlockService.Verify(
                     mock => mock.DeleteDataBlocks(It.IsAny<DeleteDataBlockPlan>()),
                     Times.Once());
@@ -506,7 +506,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
             var releaseSubjectService = new Mock<IReleaseSubjectService>(MockBehavior.Strict);
 
             dataBlockService.Setup(service =>
-                    service.GetDeleteDataBlockPlan(release.Id, It.IsIn(subject, replacementSubject)))
+                    service.GetDeletePlan(release.Id, It.IsIn(subject, replacementSubject)))
                 .ReturnsAsync(new DeleteDataBlockPlan());
 
             dataBlockService.Setup(service => service.DeleteDataBlocks(It.IsAny<DeleteDataBlockPlan>()))
@@ -539,7 +539,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
                 var result = await releaseService.RemoveDataFiles(release.Id, file.Id);
 
                 dataBlockService.Verify(
-                    mock => mock.GetDeleteDataBlockPlan(release.Id, It.IsIn(subject, replacementSubject)),
+                    mock => mock.GetDeletePlan(release.Id, It.IsIn(subject, replacementSubject)),
                     Times.Exactly(2));
                 dataBlockService.Verify(
                     mock => mock.DeleteDataBlocks(It.IsAny<DeleteDataBlockPlan>()),
