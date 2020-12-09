@@ -10,16 +10,14 @@ const BauUsersPage = () => {
 
   return (
     <Page
+      title="Users"
+      caption="Manage access to the service"
       wide
       breadcrumbs={[
         { name: 'Platform administration', link: '/administration' },
         { name: 'Users' },
       ]}
     >
-      <h1 className="govuk-heading-xl">
-        <span className="govuk-caption-xl">Manage access to the service</span>
-        Users
-      </h1>
       <LoadingSpinner loading={isLoading} text="Loading users">
         <table>
           <caption>Active user accounts</caption>

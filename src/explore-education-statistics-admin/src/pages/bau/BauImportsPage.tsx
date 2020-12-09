@@ -12,16 +12,14 @@ const BauImportsPage = () => {
 
   return (
     <Page
+      title="Incomplete imports"
+      caption="Manage incomplete imports"
       wide
       breadcrumbs={[
         { name: 'Platform administration', link: '/administration' },
         { name: 'Incomplete imports' },
       ]}
     >
-      <h1 className="govuk-heading-xl">
-        <span className="govuk-caption-xl">Manage incomplete imports</span>
-        Incomplete imports
-      </h1>
       <LoadingSpinner loading={isLoading} text="Loading imports">
         <table>
           <thead>

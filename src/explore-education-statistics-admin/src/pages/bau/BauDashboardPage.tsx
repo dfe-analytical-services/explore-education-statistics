@@ -15,9 +15,11 @@ const BauDashboardPage = () => {
   const canManageImports = user ? user.permissions.canAccessAllImports : false;
 
   return (
-    <Page wide breadcrumbs={[{ name: 'Platform administration' }]}>
-      <h1 className="govuk-heading-xl">Platform administration</h1>
-
+    <Page
+      title="Platform administration"
+      wide
+      breadcrumbs={[{ name: 'Platform administration' }]}
+    >
       <h2 className="govuk-heading-m govuk-!-margin-top-9">Content and data</h2>
 
       <div className="govuk-grid-row govuk-!-margin-bottom-9">
