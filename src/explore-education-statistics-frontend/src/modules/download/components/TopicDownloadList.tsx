@@ -30,7 +30,7 @@ function TopicDownloadList({ topic }: Props) {
                 : `${earliestReleaseTime} to ${latestReleaseTime}`}
             </p>
 
-            <ul>
+            <ul data-testid={title}>
               {downloadFiles.map(({ extension, name, path, size }) => (
                 <li key={path}>
                   <Link
