@@ -240,11 +240,11 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
 
         private ReleaseSubjectService BuildReleaseSubjectService(
             StatisticsDbContext statisticsDbContext,
-            IFootnoteService footnoteService = null)
+            IFootnoteRepository footnoteRepository = null)
         {
             return new ReleaseSubjectService(
                 statisticsDbContext,
-                footnoteService ?? new Mock<IFootnoteService>().Object
+                footnoteRepository ?? new Mock<IFootnoteRepository>().Object
             );
         }
     }

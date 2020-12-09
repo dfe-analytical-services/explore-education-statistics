@@ -10,10 +10,10 @@ using Microsoft.Extensions.Logging;
 
 namespace GovUk.Education.ExploreEducationStatistics.Data.Model.Services
 {
-    public class FootnoteService : AbstractRepository<Footnote, Guid>, IFootnoteService
+    public class FootnoteRepository : AbstractRepository<Footnote, Guid>, IFootnoteRepository
     {
-        public FootnoteService(StatisticsDbContext context,
-            ILogger<FootnoteService> logger) : base(context, logger)
+        public FootnoteRepository(StatisticsDbContext context,
+            ILogger<FootnoteRepository> logger) : base(context, logger)
         {}
 
         public IEnumerable<Footnote> GetFilteredFootnotes(

@@ -5,7 +5,7 @@ using System.Threading.Tasks;
 
 namespace GovUk.Education.ExploreEducationStatistics.Data.Model.Services.Interfaces
 {
-    public interface IFootnoteService
+    public interface IFootnoteRepository
     {
         IEnumerable<Footnote> GetFilteredFootnotes(
             Guid releaseId,
