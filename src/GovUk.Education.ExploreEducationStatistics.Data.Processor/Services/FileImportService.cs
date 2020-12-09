@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
 using GovUk.Education.ExploreEducationStatistics.Common.Extensions;
+using GovUk.Education.ExploreEducationStatistics.Common.Model;
 using GovUk.Education.ExploreEducationStatistics.Common.Services;
 using GovUk.Education.ExploreEducationStatistics.Common.Services.Interfaces;
 using GovUk.Education.ExploreEducationStatistics.Data.Importer.Services.Interfaces;
@@ -38,12 +39,13 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Processor.Services
             _importStatusService = importStatusService;
         }
 
-        public async Task ImportObservations(ImportMessage message, StatisticsDbContext context)
+        public async Task ImportObservations(ImportObservationsMessage message, StatisticsDbContext context)
         {
-            var releaseId = message.Release.Id;
+            var releaseId = message.ReleaseId;
 
             // Potentially status could already be failed so don't continue
-            var status = await _importStatusService.GetImportStatus(releaseId, message.OrigDataFileName);
+            var status = await _importStatusService.GetImportStatus(releaseId, message.DataFileName);
+            
             if (status.Status == IStatus.FAILED)
             {
                 _logger.LogInformation($"{message.DataFileName} already failed...skipping");
@@ -52,11 +54,11 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Processor.Services
 
             if (status.Status != IStatus.STAGE_4)
             {
-                await _importStatusService.UpdateStatus(releaseId, message.OrigDataFileName, IStatus.STAGE_4);                
+                await _importStatusService.UpdateStatus(releaseId, message.DataFileName, IStatus.STAGE_4);                
             }
 
-            var subjectData = await _fileStorageService.GetSubjectData(message);
-            var releaseSubject = GetReleaseSubjectLink(message, context);
+            var subjectData = await _fileStorageService.GetSubjectData(message.ReleaseId, message.ObservationsFilePath);
+            var releaseSubject = GetReleaseSubjectLink(message.ReleaseId, message.SubjectId, context);
 
             await using var datafileStream = await _fileStorageService.StreamBlob(subjectData.DataBlob);
             var dataFileTable = DataTableUtils.CreateFromStream(datafileStream);
@@ -81,14 +83,21 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Processor.Services
                 await transaction.CommitAsync();
                 await context.Database.CloseConnectionAsync();
             });
+            
+            if (message.NumBatches > 1)
+            {
+                await _fileStorageService.DeleteBlobByPath(message.ObservationsFilePath);
+            }
 
             await CheckComplete(releaseId, message, context);
         }
 
         public async Task ImportFiltersLocationsAndSchools(ImportMessage message, StatisticsDbContext context)
         {
-            var subjectData = _fileStorageService.GetSubjectData(message).Result;
-            var releaseSubject = GetReleaseSubjectLink(message, context);
+            var dataFileBlobPath = FileStoragePathUtils.AdminReleasePath(message.Release.Id, ReleaseFileTypes.Data, message.DataFileName);
+
+            var subjectData = await _fileStorageService.GetSubjectData(message.Release.Id, dataFileBlobPath);
+            var releaseSubject = GetReleaseSubjectLink(message.Release.Id, message.SubjectId, context);
 
             await using var dataFileStream = await _fileStorageService.StreamBlob(subjectData.DataBlob);
             var dataFileTable = DataTableUtils.CreateFromStream(dataFileStream);
@@ -102,10 +111,10 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Processor.Services
                 _importerService.GetMeta(metaFileTable, releaseSubject.Subject, context),
                 context,
                 message.Release.Id,
-                message.OrigDataFileName);
+                message.DataFileName);
         }
 
-        private static ReleaseSubject GetReleaseSubjectLink(ImportMessage message, StatisticsDbContext context)
+        private static ReleaseSubject GetReleaseSubjectLink(Guid releaseId, Guid subjectId, StatisticsDbContext context)
         {
             return context
                 .ReleaseSubject
@@ -114,19 +123,14 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Processor.Services
                 .ThenInclude(r => r.Publication)
                 .ThenInclude(p => p.Topic)
                 .ThenInclude(t => t.Theme)
-                .FirstOrDefault(r => r.Subject.Id == message.SubjectId && r.ReleaseId == message.Release.Id);
+                .FirstOrDefault(r => r.Subject.Id == subjectId && r.ReleaseId == releaseId);
         }
         
-        private async Task CheckComplete(Guid releaseId, ImportMessage message, StatisticsDbContext context)
+        private async Task CheckComplete(Guid releaseId, ImportObservationsMessage message, StatisticsDbContext context)
         {
-            if (message.NumBatches > 1)
-            {
-                await _fileStorageService.DeleteBatchFile(releaseId, message.DataFileName);
-            }
-
-            var numBatchesRemaining = await _fileStorageService.GetNumBatchesRemaining(releaseId, message.OrigDataFileName);
+            var numBatchesRemaining = await _fileStorageService.GetNumBatchesRemaining(releaseId.ToString(), message.DataFileName);
             
-            var import = await _importStatusService.GetImportStatus(releaseId, message.OrigDataFileName);
+            var import = await _importStatusService.GetImportStatus(releaseId, message.DataFileName);
 
             if (message.NumBatches == 1 || numBatchesRemaining == 0)
             {
@@ -134,7 +138,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Processor.Services
 
                 if (!observationCount.Equals(message.TotalRows))
                 {
-                    await _batchService.FailImport(releaseId, message.OrigDataFileName,
+                    await _batchService.FailImport(releaseId, message.DataFileName,
                         new List<ValidationError>
                         {
                             new ValidationError(
@@ -147,11 +151,11 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Processor.Services
                 {
                     if (import.Errors.IsNullOrEmpty())
                     {
-                        await _importStatusService.UpdateStatus(releaseId, message.OrigDataFileName, IStatus.COMPLETE, 100);
+                        await _importStatusService.UpdateStatus(releaseId, message.DataFileName, IStatus.COMPLETE, 100);
                     }
                     else
                     {
-                        await _importStatusService.UpdateStatus(releaseId, message.OrigDataFileName, IStatus.FAILED);
+                        await _importStatusService.UpdateStatus(releaseId, message.DataFileName, IStatus.FAILED);
                     }
                 }
             }
@@ -160,7 +164,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Processor.Services
                 var percentageComplete = (double) (message.NumBatches - numBatchesRemaining) / message.NumBatches * 100;
 
                 await _importStatusService.UpdateStatus(releaseId,
-                    message.OrigDataFileName,
+                    message.DataFileName,
                     IStatus.STAGE_4,
                     percentageComplete);
             }

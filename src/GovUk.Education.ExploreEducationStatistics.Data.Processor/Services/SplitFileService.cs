@@ -21,6 +21,7 @@ using GovUk.Education.ExploreEducationStatistics.Data.Processor.Services.Interfa
 using GovUk.Education.ExploreEducationStatistics.Data.Processor.Utils;
 using Microsoft.Azure.WebJobs;
 using Microsoft.Extensions.Logging;
+using static GovUk.Education.ExploreEducationStatistics.Common.Services.FileStoragePathUtils;
 
 namespace GovUk.Education.ExploreEducationStatistics.Data.Processor.Services
 {
@@ -70,7 +71,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Processor.Services
         }
 
         public async Task AddBatchDataFileMessages(
-            ICollector<ImportMessage> collector, 
+            ICollector<ImportObservationsMessage> collector, 
             ImportMessage message)
         {
             var batchFilesForDataFile = await _fileStorageService.GetBatchFilesForDataFile(
@@ -80,7 +81,20 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Processor.Services
             // If no batching was necessary, simply add a message to process the lone data file
             if (!batchFilesForDataFile.Any())
             {
-                collector.Add(message);
+                var observationsFilePath = 
+                    AdminReleaseDirectoryPath(message.Release.Id, ReleaseFileTypes.Data) + message.DataFileName;
+                
+                collector.Add(new ImportObservationsMessage
+                {
+                    ReleaseId = message.Release.Id,
+                    SubjectId = message.SubjectId,
+                    DataFileName = message.DataFileName,
+                    ObservationsFilePath = observationsFilePath,
+                    BatchNo = 1,
+                    NumBatches = 1,
+                    TotalRows = message.TotalRows,
+                    RowsPerBatch = message.RowsPerBatch
+                });
                 return;
             }
             
@@ -88,15 +102,15 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Processor.Services
             var importBatchFileMessages = batchFilesForDataFile.Select(blobInfo =>
             {
                 var batchFileName = blobInfo.FileName;
-                var batchFilePath = $"{FileStoragePathUtils.BatchesDir}/{batchFileName}";
+                var batchFilePath = blobInfo.Path;
                 var batchNo = GetBatchNumberFromBatchFileName(batchFileName);
                 
-                return new ImportMessage
+                return new ImportObservationsMessage
                 {
+                    ReleaseId = message.Release.Id,
                     SubjectId = message.SubjectId,
-                    DataFileName = batchFilePath,
-                    OrigDataFileName = message.DataFileName,
-                    Release = message.Release,
+                    ObservationsFilePath = batchFilePath,
+                    DataFileName = message.DataFileName,
                     BatchNo = batchNo,
                     NumBatches = message.NumBatches,
                     RowsPerBatch = message.RowsPerBatch,
@@ -146,7 +160,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Processor.Services
                     continue;    
                 }
                 
-                var batchFilePath = $"{FileStoragePathUtils.BatchesDir}/{batchFileName}";
+                var batchFilePath = $"{BatchesDir}/{batchFileName}";
 
                 await using var stream = new MemoryStream();
                 var writer = new StreamWriter(stream);
@@ -159,7 +173,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Processor.Services
                 var percentageComplete = (double) batchCount / numBatches * 100;
 
                 await _importStatusService.UpdateStatus(message.Release.Id,
-                    message.OrigDataFileName,
+                    message.DataFileName,
                     IStatus.STAGE_3,
                     percentageComplete);
 
