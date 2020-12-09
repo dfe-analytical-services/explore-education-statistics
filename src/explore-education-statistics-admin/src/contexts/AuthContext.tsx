@@ -24,6 +24,7 @@ const defaultPermissions: GlobalPermissions = {
   canAccessPrereleasePages: false,
   canAccessAnalystPages: false,
   canAccessUserAdministrationPages: false,
+  canAccessAllImports: false,
   canAccessMethodologyAdministrationPages: false,
   canManageAllTaxonomy: false,
 };

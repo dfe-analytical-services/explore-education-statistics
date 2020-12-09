@@ -1,4 +1,3 @@
-using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Reflection;
@@ -56,6 +55,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Services
                                 $"PartitionKey: \"{result.PartitionKey}\", RowKey: \"{result.RowKey}\"");
                             return false;
                         }
+
                         return true;
                     }).Select(result =>
                     {
@@ -63,11 +63,12 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Services
 
                         return new ImportStatusBau()
                         {
-                            SubjectId = new Guid(result.PartitionKey),
+                            SubjectTitle = null,  // EES-1655
+                            SubjectId = m.SubjectId,
+                            PublicationId = m.Release.Publication.Id,
+                            ReleaseId = m.Release.Id,
                             DataFileName = result.RowKey,
                             MetaFileName = m.MetaFileName,
-                            Release = m.Release,
-                            Errors = result.Errors,
                             NumberOfRows = result.NumberOfRows,
                             Status = result.Status,
                             StagePercentageComplete = result.PercentageComplete,

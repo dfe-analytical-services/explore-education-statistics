@@ -20,17 +20,14 @@ const ContactsPage = () => {
 
   return (
     <Page
+      title="Manage contacts"
+      caption="Content and data"
       wide
       breadcrumbs={[
         { name: 'Platform administration', link: '/administration' },
         { name: 'Manage contacts' },
       ]}
     >
-      <h1 className="govuk-heading-xl">
-        <span className="govuk-caption-xl">Content and data</span>
-        Manage contacts
-      </h1>
-
       {model && (
         <table className="govuk-table">
           <thead className="govuk-table__head">
