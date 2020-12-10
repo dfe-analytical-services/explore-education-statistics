@@ -22,11 +22,27 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Controllers.Api
             _migrateFilesService = migrateFilesService;
         }
 
-        [HttpPatch("api/files/ancillary/migrate-filenames")]
-        public async Task<ActionResult<Unit>> MigrateAncillaryFilenames()
+        [HttpPatch("api/files/private/ancillary/migrate-filenames")]
+        public async Task<ActionResult<Unit>> MigratePrivateAncillaryFilenames()
         {
             return await _migrateFilesService
-                .MigrateFilenames(Ancillary)
+                .MigratePrivateFiles(Ancillary)
+                .HandleFailuresOrOk();
+        }
+
+        [HttpPatch("api/files/public/ancillary/migrate-filenames")]
+        public async Task<ActionResult<Unit>> MigratePublicAncillaryFilenames()
+        {
+            return await _migrateFilesService
+                .MigratePublicFiles(Ancillary)
+                .HandleFailuresOrOk();
+        }
+
+        [HttpPatch("api/files/public/chart/migrate-filenames")]
+        public async Task<ActionResult<Unit>> MigratePublicChartFilenames()
+        {
+            return await _migrateFilesService
+                .MigratePublicFiles(Chart, lenient: true)
                 .HandleFailuresOrOk();
         }
     }

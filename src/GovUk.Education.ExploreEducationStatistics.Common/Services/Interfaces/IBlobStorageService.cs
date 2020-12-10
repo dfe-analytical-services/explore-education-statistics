@@ -69,6 +69,8 @@ namespace GovUk.Education.ExploreEducationStatistics.Common.Services.Interfaces
         /// <returns>the blob stream</returns>
         public Task<Stream> DownloadToStream(string containerName, string path, Stream stream);
 
+        public Task SetMetadata(string containerName, string path, IDictionary<string, string> metadata);
+
         /// <summary>
         /// Stream a blob in chunks.
         /// </summary>

@@ -22,24 +22,11 @@ namespace GovUk.Education.ExploreEducationStatistics.Common.Extensions
          */
         public const string MetaFileKey = "metafile";
 
-        public static bool IsMetaDataFile(this BlobInfo blob)
-        {
-            return blob.Meta.ContainsKey(DataFileKey);
-        }
-
-        public static bool IsDataFile(this BlobInfo blob)
-        {
-            return blob.Meta.ContainsKey(MetaFileKey);
-        }
-
         public static bool IsReleased(this BlobInfo blob)
         {
             if (blob.Meta.TryGetValue(ReleaseDateTimeKey, out var releaseDateTime))
             {
-                return DateTime.Compare(
-                    DateTime.ParseExact(releaseDateTime, "o", CultureInfo.InvariantCulture, DateTimeStyles.None),
-                    DateTime.Now
-                ) <= 0;
+                return DateTime.Compare(ParseDateTime(releaseDateTime), DateTime.Now) <= 0;
             }
 
             return false;
@@ -59,16 +46,6 @@ namespace GovUk.Education.ExploreEducationStatistics.Common.Extensions
         {
             return blob.Meta.TryGetValue(NumberOfRowsKey, out var numberOfRows) &&
                    int.TryParse(numberOfRows, out var numberOfRowsValue) ? numberOfRowsValue : 0;
-        }
-
-        public static bool IsFileReleased(this BlobInfo blob)
-        {
-            if (blob.Meta.TryGetValue(ReleaseDateTimeKey, out var releaseDateTime))
-            {
-                return DateTime.Compare(ParseDateTime(releaseDateTime), DateTime.Now) <= 0;
-            }
-
-            return false;
         }
 
         private static DateTime ParseDateTime(string dateTime)

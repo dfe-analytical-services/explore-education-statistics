@@ -87,14 +87,13 @@ namespace GovUk.Education.ExploreEducationStatistics.Common.Services
 
         public async Task<bool> CheckBlobExists(string containerName, string path)
         {
-            var blobContainer = await GetBlobContainer(containerName);
-            return await blobContainer.GetBlobClient(path).ExistsAsync();
+            var blob = await GetBlobClient(containerName, path);
+            return await blob.ExistsAsync();
         }
 
         public async Task<BlobInfo> GetBlob(string containerName, string path)
         {
-            var blobContainer = await GetBlobContainer(containerName);
-            var blob = blobContainer.GetBlobClient(path);
+            var blob = await GetBlobClient(containerName, path);
             var properties = (await blob.GetPropertiesAsync()).Value;
 
             return new BlobInfo(
@@ -156,8 +155,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Common.Services
 
         public async Task DeleteBlob(string containerName, string path)
         {
-            var blobContainer = await GetBlobContainer(containerName);
-            var blob = blobContainer.GetBlobClient(path);
+            var blob = await GetBlobClient(containerName, path);
 
             _logger.LogInformation($"Deleting blob {containerName}/{path}");
 
@@ -170,8 +168,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Common.Services
             IFormFile file,
             IBlobStorageService.UploadFileOptions options = null)
         {
-            var blobContainer = await GetBlobContainer(containerName);
-            var blob = blobContainer.GetBlobClient(path);
+            var blob = await GetBlobClient(containerName, path);
 
             var tempFilePath = await UploadToTemporaryFile(file);
 
@@ -370,6 +367,12 @@ namespace GovUk.Education.ExploreEducationStatistics.Common.Services
             return targetStream;
         }
 
+        public async Task SetMetadata(string containerName, string path, IDictionary<string, string> metadata)
+        {
+            var blob = await GetBlobClient(containerName, path);
+            await blob.SetMetadataAsync(metadata);
+        }
+
         public async Task<Stream> StreamBlob(string containerName, string path, int? bufferSize = null)
         {
             // Azure SDK v12 isn't compatible with how we want to use file
@@ -395,8 +398,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Common.Services
 
         public async Task<string> DownloadBlobText(string containerName, string path)
         {
-            var blobContainer = await GetBlobContainer(containerName);
-            var blob = blobContainer.GetBlobClient(path);
+            var blob = await GetBlobClient(containerName, path);
 
             if (!await blob.ExistsAsync())
             {
@@ -544,6 +546,12 @@ namespace GovUk.Education.ExploreEducationStatistics.Common.Services
                 destination.Container.Name,
                 destination.Name
             );
+        }
+
+        private async Task<BlobClient> GetBlobClient(string containerName, string path)
+        {
+            var blobContainer = await GetBlobContainer(containerName);
+            return blobContainer.GetBlobClient(path);
         }
 
         /**

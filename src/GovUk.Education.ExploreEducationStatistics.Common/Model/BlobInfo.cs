@@ -37,7 +37,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Common.Model
         }
 
         public string Name => Meta.TryGetValue(NameKey, out var name) ? name : string.Empty;
-        
+
         /// <summary>
         /// In the case of the Public API's which have no access to the Content Db,
         /// this is the only method of retrieving the filename

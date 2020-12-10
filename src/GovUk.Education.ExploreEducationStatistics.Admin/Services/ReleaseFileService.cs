@@ -182,7 +182,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Services
                                     FilenameKey, file.Filename
                                 },
                                 {
-                                    NameKey, name                                    
+                                    NameKey, name
                                 }
                             }
                         }
