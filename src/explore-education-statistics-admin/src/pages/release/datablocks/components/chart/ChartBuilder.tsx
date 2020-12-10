@@ -266,15 +266,16 @@ const ChartBuilder = ({
   );
 
   const deleteButton = useMemo(
-    () => (
-      <Button
-        variant="warning"
-        onClick={toggleDeleteModal.on}
-        disabled={isDeleting}
-      >
-        Delete chart
-      </Button>
-    ),
+    () =>
+      initialConfiguration && (
+        <Button
+          variant="warning"
+          onClick={toggleDeleteModal.on}
+          disabled={isDeleting}
+        >
+          Delete chart
+        </Button>
+      ),
     [isDeleting, toggleDeleteModal.on],
   );
 
