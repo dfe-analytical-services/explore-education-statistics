@@ -30,7 +30,7 @@ export interface ReleaseStatusFormValues {
   internalReleaseNote: string;
 }
 
-const formId = 'releaseStatusForm';
+export const formId = 'releaseStatusForm';
 
 const errorMappings = [
   mapFieldErrors<ReleaseStatusFormValues>({
@@ -153,8 +153,6 @@ const ReleaseStatusForm = ({
     >
       {form => (
         <Form id={formId}>
-          <h2>Edit release status</h2>
-
           <FormFieldRadioGroup<ReleaseStatusFormValues>
             legend="Status"
             name="status"

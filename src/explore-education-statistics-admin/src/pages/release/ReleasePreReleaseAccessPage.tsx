@@ -18,6 +18,11 @@ import useAsyncHandledRetry from '@common/hooks/useAsyncHandledRetry';
 import React from 'react';
 import { generatePath } from 'react-router';
 
+export const releasePreReleaseAccessPageTabs = {
+  users: 'preReleaseAccess-users',
+  publicAccessList: 'preReleaseAccess-publicList',
+};
+
 const ReleasePreReleaseAccessPage = () => {
   const { releaseId } = useManageReleaseContext();
 
@@ -33,7 +38,10 @@ const ReleasePreReleaseAccessPage = () => {
     <LoadingSpinner loading={isLoading}>
       {release && (
         <Tabs id="preReleaseAccess">
-          <TabsSection id="preReleaseAccess-users" title="Pre-release users">
+          <TabsSection
+            id={releasePreReleaseAccessPageTabs.users}
+            title="Pre-release users"
+          >
             <h2>Manage pre-release user access</h2>
             <InsetText>
               <h3>Before you start</h3>
@@ -90,7 +98,7 @@ const ReleasePreReleaseAccessPage = () => {
             )}
           </TabsSection>
           <TabsSection
-            id="preReleaseAccess-publicList"
+            id={releasePreReleaseAccessPageTabs.publicAccessList}
             title="Public access list"
           >
             <h2>Public pre-release access list</h2>
