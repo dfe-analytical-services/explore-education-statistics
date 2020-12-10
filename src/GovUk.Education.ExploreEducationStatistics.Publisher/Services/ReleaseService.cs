@@ -12,6 +12,7 @@ using GovUk.Education.ExploreEducationStatistics.Publisher.Model.ViewModels;
 using GovUk.Education.ExploreEducationStatistics.Publisher.Models;
 using GovUk.Education.ExploreEducationStatistics.Publisher.Services.Interfaces;
 using Microsoft.EntityFrameworkCore;
+using static GovUk.Education.ExploreEducationStatistics.Common.Services.FileStoragePathUtils;
 using IReleaseService = GovUk.Education.ExploreEducationStatistics.Publisher.Services.Interfaces.IReleaseService;
 using static GovUk.Education.ExploreEducationStatistics.Publisher.Utils.PublisherUtils;
 
@@ -179,9 +180,12 @@ namespace GovUk.Education.ExploreEducationStatistics.Publisher.Services
                     release.Slug,
                     file));
 
-            return (await Task.WhenAll(filesWithInfo))
-                .OrderBy(file => file.Name)
-                .ToList();
+            var orderedFiles = (await Task.WhenAll(filesWithInfo))
+                .OrderBy(file => file.Name);
+
+            // Prepend the "All files" zip
+            var allFilesZip = await GetAllFilesZip(release);
+            return orderedFiles.Prepend(allFilesZip).ToList();
         }
 
         public async Task DeletePreviousVersionsStatisticalData(params Guid[] releaseIds)
@@ -201,6 +205,12 @@ namespace GovUk.Education.ExploreEducationStatistics.Publisher.Services
             await RemoveStatisticalReleases(previousVersions);
 
             await _statisticsDbContext.SaveChangesAsync();
+        }
+
+        private async Task<FileInfo> GetAllFilesZip(Release release)
+        {
+            return await _fileStorageService.GetPublicFileInfo(ReleaseFileTypes.Ancillary,
+                PublicReleaseAllFilesZipPath(release.Publication.Slug, release.Slug));
         }
 
         private async Task RemoveStatisticalReleases(IEnumerable<Guid> releaseIds)

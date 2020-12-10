@@ -48,12 +48,21 @@ namespace GovUk.Education.ExploreEducationStatistics.Common.Tests.Services
             Assert.Equal($"{publicationSlug}/{releaseSlug}/data/{fileId}", PublicReleasePath(publicationSlug, releaseSlug, Data, fileId));
             Assert.Equal($"{publicationSlug}/{releaseSlug}/chart/{fileId}", PublicReleasePath(publicationSlug, releaseSlug, Chart, fileId));
         }
-        
+
+        [Fact]
+        public void TestPublicReleaseAllFilesZipPath()
+        {
+            const string releaseSlug = "release-slug";
+            const string publicationSlug = "publication-slug";
+            Assert.Equal($"{publicationSlug}/{releaseSlug}/ancillary/{publicationSlug}_{releaseSlug}.zip",
+                PublicReleaseAllFilesZipPath(publicationSlug, releaseSlug));
+        }
+
         [Fact]
         public void TestIsBatchFileForDataFile()
         {
             var releaseId = Guid.NewGuid();
-            var originalDataFileName = "my_data_file.csv";
+            const string originalDataFileName = "my_data_file.csv";
          
             Assert.True(IsBatchFileForDataFile(releaseId, originalDataFileName, 
                 $"{AdminReleaseBatchesDirectoryPath(releaseId)}{originalDataFileName}_000001"));

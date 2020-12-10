@@ -14,6 +14,7 @@ using GovUk.Education.ExploreEducationStatistics.Publisher.Services.Interfaces;
 using Moq;
 using Xunit;
 using static GovUk.Education.ExploreEducationStatistics.Common.Model.TimeIdentifier;
+using static GovUk.Education.ExploreEducationStatistics.Common.Services.FileStoragePathUtils;
 using static GovUk.Education.ExploreEducationStatistics.Common.Services.MapperUtils;
 using static GovUk.Education.ExploreEducationStatistics.Content.Model.Database.ContentDbUtils;
 using static GovUk.Education.ExploreEducationStatistics.Content.Model.ReleaseStatus;
@@ -561,8 +562,19 @@ namespace GovUk.Education.ExploreEducationStatistics.Publisher.Tests.Services
                     .ReturnsAsync((string publication, string release, ReleaseFileReference file) =>
                         new FileInfo
                         {
+                            FileName = file.Filename,
                             Name = file.Filename,
                             Type = file.ReleaseFileType
+                        });
+
+                fileStorageService.Setup(s => s.GetPublicFileInfo(ReleaseFileTypes.Ancillary,
+                        PublicReleaseAllFilesZipPath(PublicationA.Slug,
+                            PublicationARelease2.Slug)))
+                    .ReturnsAsync(new FileInfo
+                        {
+                            FileName = "all.zip",
+                            Name = "All files",
+                            Type = ReleaseFileTypes.Ancillary
                         });
 
                 var service = BuildReleaseService(contentDbContext: contentDbContext,
@@ -572,11 +584,16 @@ namespace GovUk.Education.ExploreEducationStatistics.Publisher.Tests.Services
 
                 fileStorageService.VerifyAll();
 
-                Assert.Equal(2, result.Count);
-                Assert.Equal("ancillary.pdf", result[0].Name);
+                Assert.Equal(3, result.Count);
+                Assert.Equal("all.zip", result[0].FileName);
+                Assert.Equal("All files", result[0].Name);
                 Assert.Equal(ReleaseFileTypes.Ancillary, result[0].Type);
-                Assert.Equal("data.csv", result[1].Name);
-                Assert.Equal(ReleaseFileTypes.Data, result[1].Type);
+                Assert.Equal("ancillary.pdf", result[1].FileName);
+                Assert.Equal("ancillary.pdf", result[1].Name);
+                Assert.Equal(ReleaseFileTypes.Ancillary, result[1].Type);
+                Assert.Equal("data.csv", result[2].FileName);
+                Assert.Equal("data.csv", result[2].Name);
+                Assert.Equal(ReleaseFileTypes.Data, result[2].Type);
             }
         }
 
@@ -662,10 +679,21 @@ namespace GovUk.Education.ExploreEducationStatistics.Publisher.Tests.Services
                     .ReturnsAsync((string publication, string release, ReleaseFileReference file) =>
                         new FileInfo
                         {
+                            FileName = file.Filename,
                             Name = file.Filename,
                             Type = file.ReleaseFileType
                         });
                 
+                fileStorageService.Setup(s => s.GetPublicFileInfo(ReleaseFileTypes.Ancillary,
+                        PublicReleaseAllFilesZipPath(PublicationA.Slug,
+                            PublicationARelease2.Slug)))
+                    .ReturnsAsync(new FileInfo
+                    {
+                        FileName = "all.zip",
+                        Name = "All files",
+                        Type = ReleaseFileTypes.Ancillary
+                    });
+
                 var service = BuildReleaseService(contentDbContext: contentDbContext,
                     fileStorageService: fileStorageService.Object);
 
@@ -725,11 +753,16 @@ namespace GovUk.Education.ExploreEducationStatistics.Publisher.Tests.Services
                 Assert.Equal(Release2Section1HtmlContentBlock1.Id, content[2].Content[2].Id);
                 Assert.Equal("<p>Release 2 section 1 order 2</p>", (content[2].Content[2] as HtmlBlockViewModel)?.Body);
 
-                Assert.Equal(2, result.DownloadFiles.Count);
-                Assert.Equal("ancillary.pdf", result.DownloadFiles[0].Name);
+                Assert.Equal(3, result.DownloadFiles.Count);
+                Assert.Equal("all.zip", result.DownloadFiles[0].FileName);
+                Assert.Equal("All files", result.DownloadFiles[0].Name);
                 Assert.Equal(ReleaseFileTypes.Ancillary, result.DownloadFiles[0].Type);
-                Assert.Equal("data.csv", result.DownloadFiles[1].Name);
-                Assert.Equal(ReleaseFileTypes.Data, result.DownloadFiles[1].Type);
+                Assert.Equal("ancillary.pdf", result.DownloadFiles[1].FileName);
+                Assert.Equal("ancillary.pdf", result.DownloadFiles[1].Name);
+                Assert.Equal(ReleaseFileTypes.Ancillary, result.DownloadFiles[1].Type);
+                Assert.Equal("data.csv", result.DownloadFiles[2].FileName);
+                Assert.Equal("data.csv", result.DownloadFiles[2].Name);
+                Assert.Equal(ReleaseFileTypes.Data, result.DownloadFiles[2].Type);
 
                 Assert.Equal("Release 2 Guidance", result.MetaGuidance);
 
@@ -755,6 +788,16 @@ namespace GovUk.Education.ExploreEducationStatistics.Publisher.Tests.Services
             }
 
             var fileStorageService = new Mock<IFileStorageService>(MockBehavior.Strict);
+
+            fileStorageService.Setup(s => s.GetPublicFileInfo(ReleaseFileTypes.Ancillary,
+                    PublicReleaseAllFilesZipPath(PublicationA.Slug,
+                        PublicationARelease1V1.Slug)))
+                .ReturnsAsync(new FileInfo
+                {
+                    FileName = "all.zip",
+                    Name = "All files",
+                    Type = ReleaseFileTypes.Ancillary
+                });
 
             using (var contentDbContext = InMemoryContentDbContext(contentDbContextId))
             {
@@ -814,7 +857,10 @@ namespace GovUk.Education.ExploreEducationStatistics.Publisher.Tests.Services
                 Assert.Equal(Release1Section1HtmlContentBlock1.Id, content[2].Content[2].Id);
                 Assert.Equal("<p>Release 1 section 1 order 2</p>", (content[2].Content[2] as HtmlBlockViewModel)?.Body);
 
-                Assert.Empty(result.DownloadFiles);
+                Assert.Single(result.DownloadFiles);
+                Assert.Equal("all.zip", result.DownloadFiles[0].FileName);
+                Assert.Equal("All files", result.DownloadFiles[0].Name);
+                Assert.Equal(ReleaseFileTypes.Ancillary, result.DownloadFiles[0].Type);
 
                 Assert.Equal("Release 1 v1 Guidance", result.MetaGuidance);
 
@@ -841,6 +887,16 @@ namespace GovUk.Education.ExploreEducationStatistics.Publisher.Tests.Services
 
             var fileStorageService = new Mock<IFileStorageService>(MockBehavior.Strict);
 
+            fileStorageService.Setup(s => s.GetPublicFileInfo(ReleaseFileTypes.Ancillary,
+                    PublicReleaseAllFilesZipPath(PublicationA.Slug,
+                        PublicationARelease3.Slug)))
+                .ReturnsAsync(new FileInfo
+                {
+                    FileName = "all.zip",
+                    Name = "All files",
+                    Type = ReleaseFileTypes.Ancillary
+                });
+
             using (var contentDbContext = InMemoryContentDbContext(contentDbContextId))
             {
                 var service = BuildReleaseService(contentDbContext: contentDbContext,
@@ -857,7 +913,12 @@ namespace GovUk.Education.ExploreEducationStatistics.Publisher.Tests.Services
                 Assert.Null(result.KeyStatisticsSection);
                 Assert.Null(result.SummarySection);
                 Assert.Empty(result.Content);
-                Assert.Empty(result.DownloadFiles);
+
+                Assert.Single(result.DownloadFiles);
+                Assert.Equal("all.zip", result.DownloadFiles[0].FileName);
+                Assert.Equal("All files", result.DownloadFiles[0].Name);
+                Assert.Equal(ReleaseFileTypes.Ancillary, result.DownloadFiles[0].Type);
+
                 Assert.Equal("Release 3 Guidance", result.MetaGuidance);
                 Assert.Empty(result.RelatedInformation);
             }

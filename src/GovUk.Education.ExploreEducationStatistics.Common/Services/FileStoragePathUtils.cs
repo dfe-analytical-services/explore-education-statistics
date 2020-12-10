@@ -189,6 +189,15 @@ namespace GovUk.Education.ExploreEducationStatistics.Common.Services
         }
 
         /**
+         * The public file path of the "All files" zip file on a release.
+         */
+        public static string PublicReleaseAllFilesZipPath(string publicationSlug, string releaseSlug)
+        {
+            return
+                $"{PublicReleaseDirectoryPath(publicationSlug, releaseSlug, ReleaseFileTypes.Ancillary)}{publicationSlug}_{releaseSlug}.zip";
+        }
+
+        /**
          * Given a Release ID and a data file's original filename, this method will check to see if the fullFilePath
          * given represents a batch file for that data file.
          */

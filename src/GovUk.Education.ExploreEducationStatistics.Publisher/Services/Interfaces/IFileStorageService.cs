@@ -1,3 +1,4 @@
+using System;
 using System.Threading.Tasks;
 using GovUk.Education.ExploreEducationStatistics.Common.Model;
 using GovUk.Education.ExploreEducationStatistics.Content.Model;
@@ -19,6 +20,9 @@ namespace GovUk.Education.ExploreEducationStatistics.Publisher.Services.Interfac
         Task DeletePublicBlobs(string directoryPath, string excludePattern = null);
 
         Task DeletePublicBlob(string path);
+
+        [Obsolete("Use GetPublicFileInfo with a file reference instead of filename")]
+        Task<FileInfo> GetPublicFileInfo(ReleaseFileTypes type, string filename);
 
         Task<FileInfo> GetPublicFileInfo(string publication, string release, ReleaseFileReference file);
 

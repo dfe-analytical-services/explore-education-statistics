@@ -122,12 +122,9 @@ namespace GovUk.Education.ExploreEducationStatistics.Publisher.Services
 
             await UploadZippedFiles(
                 PublicFilesContainerName,
-                destinationPath: PublicReleasePath(
-                        copyReleaseFilesCommand.PublicationSlug,
-                        copyReleaseFilesCommand.ReleaseSlug,
-                        ReleaseFileTypes.Ancillary,
-                    $"{copyReleaseFilesCommand.PublicationSlug}_{copyReleaseFilesCommand.ReleaseSlug}.zip"
-                    ),
+                destinationPath: PublicReleaseAllFilesZipPath(
+                    copyReleaseFilesCommand.PublicationSlug,
+                    copyReleaseFilesCommand.ReleaseSlug),
                 zipFileName: "All files",
                 files: zipFiles,
                 copyReleaseFilesCommand: copyReleaseFilesCommand
@@ -160,6 +157,22 @@ namespace GovUk.Education.ExploreEducationStatistics.Publisher.Services
             await _publicBlobStorageService.DeleteBlob(PublicContentContainerName, path);
         }
 
+        [Obsolete("Use GetPublicFileInfo with a file reference instead of filename")]
+        public async Task<FileInfo> GetPublicFileInfo(ReleaseFileTypes type, string path)
+        {
+            var blob = await _publicBlobStorageService.GetBlob(PublicFilesContainerName, path);
+
+            return new FileInfo
+            {
+                Id = null,
+                FileName = blob.FileName,
+                Name = blob.Name,
+                Path = blob.Path,
+                Size = blob.Size,
+                Type = type
+            };
+        }
+
         public async Task<FileInfo> GetPublicFileInfo(string publication, string release, ReleaseFileReference file)
         {
             var exists = await _publicBlobStorageService.CheckBlobExists(PublicFilesContainerName,
@@ -167,7 +180,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Publisher.Services
 
             if (!exists)
             {
-                _logger.LogWarning("Public blob not found for file: {fileId} at: {path}", file.Id,
+                _logger.LogWarning("Public blob not found for file: {0} at: {1}", file.Id,
                     file.PublicPath(publication, release));
                 return file.ToFileInfoNotFound();
             }
