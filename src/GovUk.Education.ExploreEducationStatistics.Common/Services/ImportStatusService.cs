@@ -23,7 +23,8 @@ namespace GovUk.Education.ExploreEducationStatistics.Common.Services
         STAGE_4, // Import observations
         COMPLETE,
         FAILED,
-        NOT_FOUND
+        NOT_FOUND,
+        CANCELLED
     }
 
     public class ImportStatusService : IImportStatusService
@@ -35,7 +36,8 @@ namespace GovUk.Education.ExploreEducationStatistics.Common.Services
         {
             IStatus.COMPLETE,
             IStatus.FAILED,
-            IStatus.NOT_FOUND
+            IStatus.NOT_FOUND,
+            IStatus.CANCELLED
         };
 
         private static readonly Dictionary<IStatus, double> ProcessingRatios = new Dictionary<IStatus, double>()

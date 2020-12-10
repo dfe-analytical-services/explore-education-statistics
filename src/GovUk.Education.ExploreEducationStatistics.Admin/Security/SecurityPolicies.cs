@@ -35,6 +35,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Security
         CanDeleteSpecificRelease,
         CanViewSpecificPreReleaseSummary,
         CanUpdateSpecificComment,
+        CanCancelOngoingImports,
 
         /**
          * Legacy release management
