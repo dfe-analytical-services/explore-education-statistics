@@ -16,5 +16,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Services.Interfaces
         Task FailImport(Guid releaseId, string dataFileName, string metaFileName, IEnumerable<ValidationError> errors);
 
         Task RemoveImportTableRowIfExists(Guid releaseId, string dataFileName);
+
+        Task CancelImport(Guid releaseId, string dataFileName);
     }
 }

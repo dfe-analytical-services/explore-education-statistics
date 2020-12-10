@@ -52,7 +52,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Processor.Tests.Functi
                 });
 
             importStatusService
-                .Setup(s => s.UpdateStatus(message.Release.Id, message.DataFileName, IStatus.STAGE_1, 0, 0))
+                .Setup(s => s.UpdateStatus(message.Release.Id, message.DataFileName, IStatus.STAGE_1, 0))
                 .Returns(Task.CompletedTask);
 
             importStagesMessageQueue
@@ -102,7 +102,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Processor.Tests.Functi
                 });
 
             importStatusService
-                .Setup(s => s.UpdateStatus(message.Release.Id, message.DataFileName, IStatus.STAGE_1, 0, 0))
+                .Setup(s => s.UpdateStatus(message.Release.Id, message.DataFileName, IStatus.STAGE_1, 0))
                 .Returns(Task.CompletedTask);
 
             importStagesMessageQueue
@@ -158,7 +158,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Processor.Tests.Functi
                 .Returns(Task.CompletedTask);
 
             importStatusService
-                .Setup(s => s.UpdateStatus(message.Release.Id, message.DataFileName, IStatus.STAGE_2, 0, 0))
+                .Setup(s => s.UpdateStatus(message.Release.Id, message.DataFileName, IStatus.STAGE_2, 0))
                 .Returns(Task.CompletedTask);
 
             importStagesMessageQueue
@@ -212,7 +212,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Processor.Tests.Functi
                 .Returns(Task.CompletedTask);
 
             importStatusService
-                .Setup(s => s.UpdateStatus(message.Release.Id, message.DataFileName, IStatus.STAGE_3, 0, 0))
+                .Setup(s => s.UpdateStatus(message.Release.Id, message.DataFileName, IStatus.STAGE_3, 0))
                 .Returns(Task.CompletedTask);
 
             importStagesMessageQueue
@@ -266,7 +266,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Processor.Tests.Functi
                 .Returns(Task.CompletedTask);
 
             importStatusService
-                .Setup(s => s.UpdateStatus(message.Release.Id, message.DataFileName, IStatus.STAGE_4, 0, 0))
+                .Setup(s => s.UpdateStatus(message.Release.Id, message.DataFileName, IStatus.STAGE_4, 0))
                 .Returns(Task.CompletedTask);
 
             importStagesMessageQueue
