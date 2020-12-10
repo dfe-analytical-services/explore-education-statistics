@@ -836,7 +836,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
                 var result = await service.Validate(release.Id);
 
                 Assert.True(result.IsLeft);
-                ValidationTestUtil.AssertValidationProblem(result.Left, MetaGuidanceMustBePopulated);
+                ValidationTestUtil.AssertValidationProblem(result.Left, PublicMetaGuidanceRequired);
             }
         }
 
@@ -885,7 +885,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
 
                 metaGuidanceSubjectService.Verify(mock => mock.Validate(release.Id), Times.Once);
 
-                ValidationTestUtil.AssertValidationProblem(result.Left, MetaGuidanceMustBePopulated);
+                ValidationTestUtil.AssertValidationProblem(result.Left, PublicMetaGuidanceRequired);
             }
         }
 

@@ -941,7 +941,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
                     );
 
                 Assert.True(result.IsLeft);
-                AssertValidationProblem(result.Left, AllDatafilesUploadedMustBeComplete);
+                AssertValidationProblem(result.Left, DataFileImportsMustBeCompleted);
             }
         }
 
@@ -1033,7 +1033,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
 
                 Assert.True(result.IsLeft);
 
-                AssertValidationProblem(result.Left, DataReplacementInProgress);
+                AssertValidationProblem(result.Left, DataFileReplacementsMustBeCompleted);
             }
         }
 
@@ -1076,7 +1076,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
                     .ReturnsAsync(TableStorageTestUtils.CreateTableQuerySegment(new List<DatafileImport>()));
 
                 metaGuidanceService.Setup(service => service.Validate(release.Id))
-                    .ReturnsAsync(ValidationActionResult(MetaGuidanceMustBePopulated));
+                    .ReturnsAsync(ValidationActionResult(PublicMetaGuidanceRequired));
 
                 tableStorageService.Setup(service => service.GetTableAsync(DatafileImportsTableName, true))
                     .ReturnsAsync(cloudTableMock.Object);
@@ -1102,7 +1102,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
 
                 metaGuidanceService.Verify(mock => mock.Validate(release.Id), Times.Once);
 
-                AssertValidationProblem(result.Left, MetaGuidanceMustBePopulated);
+                AssertValidationProblem(result.Left, PublicMetaGuidanceRequired);
             }
         }
 
@@ -1176,7 +1176,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
 
                 metaGuidanceService.Verify(mock => mock.Validate(release.Id), Times.Once);
 
-                AssertValidationProblem(result.Left, MethodologyMustBeApprovedOrPublished);
+                AssertValidationProblem(result.Left, MethodologyMustBeApproved);
             }
         }
 

@@ -541,7 +541,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Services
 
                 if (publication.Methodology != null && publication.Methodology.Status != MethodologyStatus.Approved)
                 {
-                    return ValidationActionResult(MethodologyMustBeApprovedOrPublished);
+                    return ValidationActionResult(MethodologyMustBeApproved);
                 }
             }
 
@@ -564,7 +564,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Services
 
                 if (results.Results.Count != 0)
                 {
-                    return ValidationActionResult(AllDatafilesUploadedMustBeComplete);
+                    return ValidationActionResult(DataFileImportsMustBeCompleted);
                 }
             }
 
@@ -582,7 +582,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Services
                                  && rf.ReleaseFileReference.ReplacingId != null)
                     .AnyAsync())
                 {
-                    return ValidationActionResult(DataReplacementInProgress);
+                    return ValidationActionResult(DataFileReplacementsMustBeCompleted);
                 }
             }
 

@@ -156,8 +156,8 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Model.Tests
 
             await using (var context = StatisticsDbUtils.InMemoryStatisticsDbContext(contextId))
             {
-                var service = BuildFootnoteRepository(context);
-                var results = service.GetFootnotes(release.Id).ToList();
+                var repository = BuildFootnoteRepository(context);
+                var results = repository.GetFootnotes(release.Id).ToList();
 
                 Assert.Single(results);
 
@@ -293,8 +293,8 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Model.Tests
 
             await using (var context = StatisticsDbUtils.InMemoryStatisticsDbContext(contextId))
             {
-                var service = BuildFootnoteRepository(context);
-                var results = service.GetFootnotes(release.Id).ToList();
+                var repository = BuildFootnoteRepository(context);
+                var results = repository.GetFootnotes(release.Id).ToList();
 
                 Assert.Equal(2, results.Count);
 
@@ -390,8 +390,8 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Model.Tests
 
             await using (var context = StatisticsDbUtils.InMemoryStatisticsDbContext(contextId))
             {
-                var service = BuildFootnoteRepository(context);
-                var results = service.GetFootnotes(release.Id, releaseSubject2.SubjectId).ToList();
+                var repository = BuildFootnoteRepository(context);
+                var results = repository.GetFootnotes(release.Id, releaseSubject2.SubjectId).ToList();
 
                 Assert.Single(results);
                 Assert.Equal("Test footnote 2", results[0].Content);
@@ -490,11 +490,11 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Model.Tests
 
             await using (var context = StatisticsDbUtils.InMemoryStatisticsDbContext(contextId))
             {
-                var service = BuildFootnoteRepository(context);
-                var results = service.GetFootnotes(
-                    release.Id,
-                    new List<Guid> { releaseSubject1.SubjectId, releaseSubject3.SubjectId }
-                )
+                var repository = BuildFootnoteRepository(context);
+                var results = repository.GetFootnotes(
+                        release.Id,
+                        new List<Guid> {releaseSubject1.SubjectId, releaseSubject3.SubjectId}
+                    )
                     .ToList();
 
                 Assert.Equal(2, results.Count);
@@ -659,8 +659,8 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Model.Tests
 
             await using (var context = StatisticsDbUtils.InMemoryStatisticsDbContext(contextId))
             {
-                var service = BuildFootnoteRepository(context);
-                var results = service.GetFootnotes(release.Id, releaseSubject.SubjectId).ToList();
+                var repository = BuildFootnoteRepository(context);
+                var results = repository.GetFootnotes(release.Id, releaseSubject.SubjectId).ToList();
 
                 Assert.Single(results);
                 Assert.Equal("Test footnote", results[0].Content);
@@ -694,6 +694,358 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Model.Tests
 
                 Assert.Single(footnoteIndicators);
                 Assert.Equal(releaseSubject.SubjectId, footnoteIndicators[0].Indicator.IndicatorGroup.SubjectId);
+            }
+        }
+
+        [Fact]
+        public async Task GetSubjectsWithNoFootnotes_FootnotePerSubject()
+        {
+            var release = new Release();
+
+            var releaseSubject1 = new ReleaseSubject
+            {
+                Release = release,
+                Subject = new Subject
+                {
+                    Name = "Test subject 1"
+                }
+            };
+            var releaseSubject2 = new ReleaseSubject
+            {
+                Release = release,
+                Subject = new Subject
+                {
+                    Name = "Test subject 2"
+                }
+            };
+            var releaseSubject3 = new ReleaseSubject
+            {
+                Release = release,
+                Subject = new Subject
+                {
+                    Name = "Test subject 3"
+                }
+            };
+            var releaseSubject4 = new ReleaseSubject
+            {
+                Release = release,
+                Subject = new Subject
+                {
+                    Name = "Test subject 4"
+                }
+            };
+            var releaseSubject5 = new ReleaseSubject
+            {
+                Release = release,
+                Subject = new Subject
+                {
+                    Name = "Test subject 5",
+                }
+            };
+            var releaseSubjectWithNoFootnotes = new ReleaseSubject
+            {
+                Release = release,
+                Subject = new Subject
+                {
+                    Name = "Test subject with no footnotes"
+                }
+            };
+
+            var footnote1 = new Footnote
+            {
+                Content = "Test footnote 1",
+                Releases = new List<ReleaseFootnote>
+                {
+                    new ReleaseFootnote
+                    {
+                        Release = release
+                    },
+                },
+                Subjects = new List<SubjectFootnote>
+                {
+                    new SubjectFootnote
+                    {
+                        Subject = releaseSubject1.Subject,
+                    }
+                }
+            };
+            var footnote2 = new Footnote
+            {
+                Content = "Test footnote 2",
+                Releases = new List<ReleaseFootnote>
+                {
+                    new ReleaseFootnote
+                    {
+                        Release = release
+                    },
+                },
+                Filters = new List<FilterFootnote>
+                {
+                    new FilterFootnote
+                    {
+                        Filter = new Filter
+                        {
+                            Subject = releaseSubject2.Subject
+                        }
+                    }
+                }
+            };
+            var footnote3 = new Footnote
+            {
+                Content = "Test footnote 3",
+                Releases = new List<ReleaseFootnote>
+                {
+                    new ReleaseFootnote
+                    {
+                        Release = release
+                    },
+                },
+                FilterGroups = new List<FilterGroupFootnote>
+                {
+                    new FilterGroupFootnote
+                    {
+                        FilterGroup = new FilterGroup
+                        {
+                            Filter = new Filter
+                            {
+                                Subject = releaseSubject3.Subject
+                            }
+                        }
+                    }
+                }
+            };
+            var footnote4 = new Footnote
+            {
+                Content = "Test footnote 4",
+                Releases = new List<ReleaseFootnote>
+                {
+                    new ReleaseFootnote
+                    {
+                        Release = release
+                    },
+                },
+                FilterItems = new List<FilterItemFootnote>
+                {
+                    new FilterItemFootnote
+                    {
+                        FilterItem = new FilterItem
+                        {
+                            FilterGroup = new FilterGroup
+                            {
+                                Filter = new Filter
+                                {
+                                    Subject = releaseSubject4.Subject
+                                }
+                            }
+                        }
+                    },
+                }
+            };
+            var footnote5 = new Footnote
+            {
+                Content = "Test footnote 5",
+                Releases = new List<ReleaseFootnote>
+                {
+                    new ReleaseFootnote
+                    {
+                        Release = release
+                    },
+                },
+                Indicators = new List<IndicatorFootnote>
+                {
+                    new IndicatorFootnote
+                    {
+                        Indicator = new Indicator
+                        {
+                            IndicatorGroup = new IndicatorGroup
+                            {
+                                Subject = releaseSubject5.Subject
+                            }
+                        }
+                    }
+                }
+            };
+
+            var contextId = Guid.NewGuid().ToString();
+
+            await using (var context = StatisticsDbUtils.InMemoryStatisticsDbContext(contextId))
+            {
+                await context.AddRangeAsync(release);
+                await context.AddRangeAsync(
+                    releaseSubject1,
+                    releaseSubject2,
+                    releaseSubject3,
+                    releaseSubject4,
+                    releaseSubject5,
+                    releaseSubjectWithNoFootnotes
+                );
+                await context.AddRangeAsync(footnote1, footnote2, footnote3, footnote4, footnote5);
+                await context.SaveChangesAsync();
+            }
+
+            await using (var context = StatisticsDbUtils.InMemoryStatisticsDbContext(contextId))
+            {
+                var repository = BuildFootnoteRepository(context);
+                var results = await repository.GetSubjectsWithNoFootnotes(release.Id);
+
+                Assert.Single(results);
+
+                Assert.Equal(releaseSubjectWithNoFootnotes.Subject.Id, results[0].Id);
+                Assert.Equal(releaseSubjectWithNoFootnotes.Subject.Name, results[0].Name);
+            }
+        }
+
+        [Fact]
+        public async Task GetSubjectsWithNoFootnotes_FootnoteForMultipleSubjects()
+        {
+            var release = new Release();
+
+            var releaseSubject1 = new ReleaseSubject
+            {
+                Release = release,
+                Subject = new Subject
+                {
+                    Name = "Test subject 1"
+                }
+            };
+            var releaseSubject2 = new ReleaseSubject
+            {
+                Release = release,
+                Subject = new Subject
+                {
+                    Name = "Test subject 2"
+                }
+            };
+            var releaseSubject3 = new ReleaseSubject
+            {
+                Release = release,
+                Subject = new Subject
+                {
+                    Name = "Test subject 3"
+                }
+            };
+            var releaseSubject4 = new ReleaseSubject
+            {
+                Release = release,
+                Subject = new Subject
+                {
+                    Name = "Test subject 4"
+                }
+            };
+            var releaseSubject5 = new ReleaseSubject
+            {
+                Release = release,
+                Subject = new Subject
+                {
+                    Name = "Test subject 5",
+                }
+            };
+            var releaseSubjectWithNoFootnotes = new ReleaseSubject
+            {
+                Release = release,
+                Subject = new Subject
+                {
+                    Name = "Test subject with no footnotes"
+                }
+            };
+
+            var footnote = new Footnote
+            {
+                Content = "Test footnote 1",
+                Releases = new List<ReleaseFootnote>
+                {
+                    new ReleaseFootnote
+                    {
+                        Release = release
+                    },
+                },
+                Subjects = new List<SubjectFootnote>
+                {
+                    new SubjectFootnote
+                    {
+                        Subject = releaseSubject1.Subject,
+                    }
+                },
+                Filters = new List<FilterFootnote>
+                {
+                    new FilterFootnote
+                    {
+                        Filter = new Filter
+                        {
+                            Subject = releaseSubject2.Subject
+                        },
+                    }
+                },
+                FilterGroups = new List<FilterGroupFootnote>
+                {
+                    new FilterGroupFootnote
+                    {
+                        FilterGroup = new FilterGroup
+                        {
+                            Filter = new Filter
+                            {
+                                Subject = releaseSubject3.Subject
+                            },
+                        }
+                    }
+                },
+                FilterItems = new List<FilterItemFootnote>
+                {
+                    new FilterItemFootnote
+                    {
+                        FilterItem = new FilterItem
+                        {
+                            FilterGroup = new FilterGroup
+                            {
+                                Filter = new Filter
+                                {
+                                    Subject = releaseSubject4.Subject
+                                },
+                            }
+                        }
+                    }
+                },
+                Indicators = new List<IndicatorFootnote>
+                {
+                    new IndicatorFootnote
+                    {
+                        Indicator = new Indicator
+                        {
+                            IndicatorGroup = new IndicatorGroup
+                            {
+                                Subject = releaseSubject5.Subject
+                            }
+                        }
+                    }
+                }
+            };
+
+            var contextId = Guid.NewGuid().ToString();
+
+            await using (var context = StatisticsDbUtils.InMemoryStatisticsDbContext(contextId))
+            {
+                await context.AddRangeAsync(release);
+                await context.AddRangeAsync(
+                    releaseSubject1,
+                    releaseSubject2,
+                    releaseSubject3,
+                    releaseSubject4,
+                    releaseSubject5,
+                    releaseSubjectWithNoFootnotes
+                );
+                await context.AddRangeAsync(footnote);
+                await context.SaveChangesAsync();
+            }
+
+            await using (var context = StatisticsDbUtils.InMemoryStatisticsDbContext(contextId))
+            {
+                var repository = BuildFootnoteRepository(context);
+                var results = await repository.GetSubjectsWithNoFootnotes(release.Id);
+
+                Assert.Single(results);
+
+                Assert.Equal(releaseSubjectWithNoFootnotes.Subject.Id, results[0].Id);
+                Assert.Equal(releaseSubjectWithNoFootnotes.Subject.Name, results[0].Name);
             }
         }
 

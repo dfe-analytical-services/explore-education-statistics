@@ -26,6 +26,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Controllers.Api
         private readonly IReleaseFileService _releaseFileService;
         private readonly IReleaseDataFileService _releaseDataFileService;
         private readonly IReleaseStatusService _releaseStatusService;
+        private readonly IReleaseChecklistService _releaseChecklistService;
         private readonly UserManager<ApplicationUser> _userManager;
         private readonly IDataBlockService _dataBlockService;
 
@@ -34,6 +35,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Controllers.Api
             IReleaseFileService releaseFileService,
             IReleaseDataFileService releaseDataFileService,
             IReleaseStatusService releaseStatusService,
+            IReleaseChecklistService releaseChecklistService,
             UserManager<ApplicationUser> userManager,
             IDataBlockService dataBlockService
         )
@@ -42,6 +44,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Controllers.Api
             _releaseDataFileService = releaseDataFileService;
             _releaseFileService = releaseFileService;
             _releaseStatusService = releaseStatusService;
+            _releaseChecklistService = releaseChecklistService;
             _userManager = userManager;
             _dataBlockService = dataBlockService;
         }
@@ -298,6 +301,14 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Controllers.Api
         {
             return await _releaseStatusService
                 .GetReleaseStatusAsync(releaseId)
+                .HandleFailuresOrOk();
+        }
+
+        [HttpGet("releases/{releaseId}/checklist")]
+        public async Task<ActionResult<ReleaseChecklistViewModel>> GetChecklist(Guid releaseId)
+        {
+            return await _releaseChecklistService
+                .GetChecklist(releaseId)
                 .HandleFailuresOrOk();
         }
     }

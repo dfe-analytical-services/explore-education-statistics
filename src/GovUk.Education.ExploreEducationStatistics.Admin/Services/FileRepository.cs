@@ -128,5 +128,19 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Services
                 )
                 .Select(rf => rf.ReleaseFileReference);
         }
+
+        public async Task<IList<ReleaseFileReference>> ListReplacementDataFiles(Guid releaseId)
+        {
+            return await _contentDbContext
+                .ReleaseFiles
+                .Include(rf => rf.ReleaseFileReference)
+                .Where(
+                    rf => rf.ReleaseId == releaseId
+                          && rf.ReleaseFileReference.ReleaseFileType == ReleaseFileTypes.Data
+                          && rf.ReleaseFileReference.ReplacingId != null
+                )
+                .Select(rf => rf.ReleaseFileReference)
+                .ToListAsync();
+        }
     }
 }

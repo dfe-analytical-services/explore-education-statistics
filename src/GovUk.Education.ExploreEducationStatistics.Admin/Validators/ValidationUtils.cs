@@ -84,7 +84,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Validators
 
         // Methodology
         MethodologyDoesNotExist,
-        MethodologyMustBeApprovedOrPublished,
+        MethodologyMustBeApproved,
         CannotSpecifyMethodologyAndExternalMethodology,
 
         // Theme
@@ -113,7 +113,6 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Validators
         DataFilenameCannotContainSpacesOrSpecialCharacters,
         CannotRemoveDataFilesUntilImportComplete,
         CannotRemoveDataFilesOnceReleaseApproved,
-        AllDatafilesUploadedMustBeComplete,
         FileTypeMustBeData,
 
         // Data zip file
@@ -135,9 +134,21 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Validators
 
         // Release
         ReleaseNotApproved,
-        MetaGuidanceMustBePopulated,
-        DataReplacementInProgress,
         ApprovedReleaseMustHavePublishScheduledDate,
-        PublishedReleaseCannotBeUnapproved
+        PublishedReleaseCannotBeUnapproved,
+
+        // Release checklist errors
+        DataFileImportsMustBeCompleted,
+        DataFileReplacementsMustBeCompleted,
+        ReleaseNoteRequired,
+        PublicMetaGuidanceRequired,
+        PublicPreReleaseAccessListRequired,
+
+        // Release checklist warnings
+        NoMethodology,
+        NoNextReleaseDate,
+        NoDataFiles,
+        NoFootnotesOnSubjects,
+        NoTableHighlights,
     }
 }

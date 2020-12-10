@@ -77,13 +77,13 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Services
                     {
                         if (string.IsNullOrWhiteSpace(release.MetaGuidance))
                         {
-                            return ValidationActionResult(ValidationErrorMessages.MetaGuidanceMustBePopulated);
+                            return ValidationActionResult(ValidationErrorMessages.PublicMetaGuidanceRequired);
                         }
 
                         return await _metaGuidanceSubjectService.Validate(releaseId)
                             .OnSuccess(valid => valid
                                 ? (Either<ActionResult, Unit>) Unit.Instance
-                                : ValidationActionResult(ValidationErrorMessages.MetaGuidanceMustBePopulated));
+                                : ValidationActionResult(ValidationErrorMessages.PublicMetaGuidanceRequired));
                     }
 
                     return Unit.Instance;
