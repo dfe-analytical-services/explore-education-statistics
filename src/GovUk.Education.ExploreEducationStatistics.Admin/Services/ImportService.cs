@@ -53,13 +53,9 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Services
             IFormFile dataFile,
             bool isZip)
         {
-            var storageAccount = CloudStorageAccount.Parse(_storageConnectionString);
-            var client = storageAccount.CreateCloudQueueClient();
-            var pQueue = client.GetQueueReference("imports-pending");
-            var aQueue = client.GetQueueReference("imports-available");
+            var pQueue = GetOrCreateQueue("imports-pending");
+            GetOrCreateQueue("imports-available");
 
-            pQueue.CreateIfNotExists();
-            aQueue.CreateIfNotExists();
             // TODO - EES-1250
             var numRows = isZip ? 0 : FileStorageUtils.CalculateNumberOfRows(dataFile.OpenReadStream());
             var message = BuildMessage(dataFileName, metaFileName, releaseId, isZip ? dataFile.FileName.ToLower() : "");
@@ -70,9 +66,26 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Services
                 numRows,
                 message);
 
-            pQueue.AddMessage(new CloudQueueMessage(JsonConvert.SerializeObject(message)));
+            pQueue.AddMessage(CreateQueueMessage(message));
 
             _logger.LogInformation($"Sent import message for data file: {dataFileName}, releaseId: {releaseId}");
+        }
+
+        public async Task CancelImport(
+            Guid releaseId,
+            string dataFileName)
+        {
+            var queue = GetOrCreateQueue("imports-cancelling");
+            queue.AddMessage(CreateQueueMessage(new CancelImportMessage
+            {
+                ReleaseId = releaseId,
+                DataFileName = dataFileName
+            }));
+        }
+
+        private static CloudQueueMessage CreateQueueMessage(object message)
+        {
+            return new CloudQueueMessage(JsonConvert.SerializeObject(message));
         }
 
         public async Task<Either<ActionResult, Unit>> CreateImportTableRow(Guid releaseId, string dataFileName)
@@ -139,6 +152,21 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Services
                 BatchNo = 1,
                 ArchiveFileName = zipFileName
             };
+        }
+
+        private CloudQueue GetOrCreateQueue(string queueName)
+        {
+            var client = CreateCloudQueueClient();
+            var queue = client.GetQueueReference(queueName);
+            queue.CreateIfNotExists();
+            return queue;
+        }
+
+        private CloudQueueClient CreateCloudQueueClient()
+        {
+            var storageAccount = CloudStorageAccount.Parse(_storageConnectionString);
+            var client = storageAccount.CreateCloudQueueClient();
+            return client;
         }
     }
 

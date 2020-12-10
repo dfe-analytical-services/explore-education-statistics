@@ -14,6 +14,7 @@ using GovUk.Education.ExploreEducationStatistics.Data.Processor.Services.Interfa
 using GovUk.Education.ExploreEducationStatistics.Data.Processor.Utils;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Logging;
+using static GovUk.Education.ExploreEducationStatistics.Common.Services.IStatus;
 
 namespace GovUk.Education.ExploreEducationStatistics.Data.Processor.Services
 {
@@ -46,15 +47,24 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Processor.Services
             // Potentially status could already be failed so don't continue
             var status = await _importStatusService.GetImportStatus(releaseId, message.DataFileName);
             
-            if (status.Status == IStatus.FAILED)
+            if (status.Status == CANCELLED)
             {
-                _logger.LogInformation($"{message.DataFileName} already failed...skipping");
+                _logger.LogInformation($"Import for {message.DataFileName} is in the process of being " +
+                                       $"cancelled, so not processing any further Observations - ignoring Observations " +
+                                       $"in file {message.ObservationsFilePath}");
                 return;
             }
 
-            if (status.Status != IStatus.STAGE_4)
+            if (status.Status == FAILED)
             {
-                await _importStatusService.UpdateStatus(releaseId, message.DataFileName, IStatus.STAGE_4);                
+                _logger.LogInformation($"Import for {message.DataFileName} already failed - ignoring Observations " +
+                                       $"in file {message.ObservationsFilePath}");
+                return;
+            }
+            
+            if (status.Status != STAGE_4)
+            {
+                await _importStatusService.UpdateStatus(releaseId, message.DataFileName, STAGE_4);                
             }
 
             var subjectData = await _fileStorageService.GetSubjectData(message.ReleaseId, message.ObservationsFilePath);
@@ -151,11 +161,11 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Processor.Services
                 {
                     if (import.Errors.IsNullOrEmpty())
                     {
-                        await _importStatusService.UpdateStatus(releaseId, message.DataFileName, IStatus.COMPLETE, 100);
+                        await _importStatusService.UpdateStatus(releaseId, message.DataFileName, COMPLETE, 100);
                     }
                     else
                     {
-                        await _importStatusService.UpdateStatus(releaseId, message.DataFileName, IStatus.FAILED);
+                        await _importStatusService.UpdateStatus(releaseId, message.DataFileName, FAILED);
                     }
                 }
             }
@@ -165,7 +175,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Processor.Services
 
                 await _importStatusService.UpdateStatus(releaseId,
                     message.DataFileName,
-                    IStatus.STAGE_4,
+                    STAGE_4,
                     percentageComplete);
             }
         }

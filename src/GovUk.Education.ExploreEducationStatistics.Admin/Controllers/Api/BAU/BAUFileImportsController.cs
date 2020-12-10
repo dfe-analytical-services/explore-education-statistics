@@ -1,6 +1,7 @@
 using System;
 using System.Threading.Tasks;
 using GovUk.Education.ExploreEducationStatistics.Admin.Models;
+using GovUk.Education.ExploreEducationStatistics.Admin.Services.Interfaces;
 using GovUk.Education.ExploreEducationStatistics.Admin.Services.Interfaces.Security;
 using GovUk.Education.ExploreEducationStatistics.Common.Extensions;
 using GovUk.Education.ExploreEducationStatistics.Common.Model;
@@ -17,12 +18,12 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Controllers.Api.BAU
     [Authorize]
     public class BAUFileImportsController : Controller
     {
-        private readonly IImportStatusService _importStatusService;
+        private readonly IImportService _importService;
         private readonly IUserService _userService;
 
-        public BAUFileImportsController(IImportStatusService importStatusService, IUserService userService)
+        public BAUFileImportsController(IImportService importService, IUserService userService)
         {
-            _importStatusService = importStatusService;
+            _importService = importService;
             _userService = userService;
         }
 
@@ -31,7 +32,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Controllers.Api.BAU
         {
             return await _userService
                 .CheckCanCancelFileImport(file)
-                .OnSuccess(import => _importStatusService.UpdateStatus(file.ReleaseId, file.Filename, IStatus.CANCELLED))
+                .OnSuccess(import => _importService.CancelImport(file.ReleaseId, file.Filename))
                 .HandleFailuresOr(Ok);
         }
     }

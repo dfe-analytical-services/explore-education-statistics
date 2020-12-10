@@ -7,6 +7,7 @@ using GovUk.Education.ExploreEducationStatistics.Common.Model;
 using GovUk.Education.ExploreEducationStatistics.Common.Services.Interfaces;
 using Microsoft.Azure.Cosmos.Table;
 using Microsoft.Extensions.Logging;
+using static GovUk.Education.ExploreEducationStatistics.Common.Services.IStatus;
 using static GovUk.Education.ExploreEducationStatistics.Common.TableStorageTableNames;
 
 namespace GovUk.Education.ExploreEducationStatistics.Common.Services
@@ -24,6 +25,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Common.Services
         COMPLETE,
         FAILED,
         NOT_FOUND,
+        CANCELLING,
         CANCELLED
     }
 
@@ -32,21 +34,28 @@ namespace GovUk.Education.ExploreEducationStatistics.Common.Services
         public const int STAGE_1_ROW_CHECK = 1000;
         public const int STAGE_2_ROW_CHECK = 1000;
 
+        private static readonly List<IStatus> StatusUpdateIgnoreStates = new List<IStatus>
+        {
+            FAILED,
+            CANCELLING,
+            CANCELLED
+        };
+        
         private static readonly List<IStatus> FinishedImportStatuses = new List<IStatus>
         {
-            IStatus.COMPLETE,
-            IStatus.FAILED,
-            IStatus.NOT_FOUND,
-            IStatus.CANCELLED
+            COMPLETE,
+            FAILED,
+            NOT_FOUND,
+            CANCELLED
         };
 
         private static readonly Dictionary<IStatus, double> ProcessingRatios = new Dictionary<IStatus, double>()
         {
-            {IStatus.STAGE_1, .1},
-            {IStatus.STAGE_2, .1},
-            {IStatus.STAGE_3, .1},
-            {IStatus.STAGE_4, .7},
-            {IStatus.COMPLETE, 1},
+            {STAGE_1, .1},
+            {STAGE_2, .1},
+            {STAGE_3, .1},
+            {STAGE_4, .7},
+            {COMPLETE, 1},
         };
 
         private readonly CloudTable _table;
@@ -64,7 +73,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Common.Services
         {
             var import = await GetImport(releaseId, dataFileName);
 
-            if (import.Status == IStatus.NOT_FOUND)
+            if (import.Status == NOT_FOUND)
             {
                 return new ImportStatus
                 {
@@ -94,8 +103,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Common.Services
         public async Task UpdateStatus(Guid releaseId,
             string dataFileName,
             IStatus status,
-            double percentageComplete = 0,
-            int retry = 0)
+            double percentageComplete = 0)
         {
             var import = await GetImport(releaseId, dataFileName);
 
@@ -103,10 +111,10 @@ namespace GovUk.Education.ExploreEducationStatistics.Common.Services
             var percentageCompleteAfter = (int) Math.Clamp(percentageComplete, 0, 100);
             var statusBefore = import.Status;
 
-            // Ignore updating when already failed
+            // Ignore updating when already failed, cancelled or in the process of being cancelled
             // Ignore updating to a lower status
             // Ignore updating to a lower percentage complete at the same status
-            if (statusBefore == IStatus.FAILED
+            if (StatusUpdateIgnoreStates.Contains(statusBefore) 
                 || statusBefore.CompareTo(status) > 0
                 || statusBefore == status && percentageCompleteBefore > percentageCompleteAfter)
             {
@@ -127,35 +135,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Common.Services
             import.PercentageComplete = percentageCompleteAfter;
             import.Status = status;
 
-            try
-            {
-                await _table.ExecuteAsync(TableOperation.Replace(import));
-            }
-            catch (StorageException e)
-            {
-                if (e.RequestInformation.HttpStatusCode == (int) HttpStatusCode.PreconditionFailed)
-                {
-                    // If the table row has been updated in another thread subsequent
-                    // to being read above then an exception will be thrown - ignore and continue.
-                    // A similar approach will be required if optimistic locking is employed when & if
-                    // we switch from table storage to using db tables.
-
-                    if (retry++ < 5)
-                    {
-                        _logger.LogWarning(
-                            $"Update: {dataFileName} {statusBefore} ({percentageCompleteBefore}%) -> {status} ({percentageCompleteAfter}%) request failed and will be retried");
-                        await UpdateStatus(releaseId, dataFileName, status, percentageComplete, retry);
-                    }
-                    else
-                    {
-                        throw;
-                    }
-                }
-                else
-                {
-                    throw;
-                }
-            }
+            await _table.ExecuteAsync(TableOperation.Merge(import));
         }
 
         private async Task<DatafileImport> GetImport(Guid releaseId, string dataFileName)
@@ -168,24 +148,24 @@ namespace GovUk.Education.ExploreEducationStatistics.Common.Services
 
             return result.Result != null
                 ? (DatafileImport) result.Result
-                : new DatafileImport {Status = IStatus.NOT_FOUND};
+                : new DatafileImport {Status = NOT_FOUND};
         }
 
         private static int CalculatePercentageComplete(int percentageComplete, IStatus status)
         {
             return (int) (status switch
             {
-                IStatus.STAGE_1 => percentageComplete * ProcessingRatios[IStatus.STAGE_1],
-                IStatus.STAGE_2 => ProcessingRatios[IStatus.STAGE_1] * 100 +
-                                   percentageComplete * ProcessingRatios[IStatus.STAGE_2],
-                IStatus.STAGE_3 => ProcessingRatios[IStatus.STAGE_1] * 100 +
-                                   ProcessingRatios[IStatus.STAGE_2] * 100 +
-                                   percentageComplete * ProcessingRatios[IStatus.STAGE_3],
-                IStatus.STAGE_4 => ProcessingRatios[IStatus.STAGE_1] * 100 +
-                                   ProcessingRatios[IStatus.STAGE_2] * 100 +
-                                   ProcessingRatios[IStatus.STAGE_3] * 100 +
-                                   percentageComplete * ProcessingRatios[IStatus.STAGE_4],
-                IStatus.COMPLETE => ProcessingRatios[IStatus.COMPLETE] * 100,
+                STAGE_1 => percentageComplete * ProcessingRatios[STAGE_1],
+                STAGE_2 => ProcessingRatios[STAGE_1] * 100 +
+                                   percentageComplete * ProcessingRatios[STAGE_2],
+                STAGE_3 => ProcessingRatios[STAGE_1] * 100 +
+                                   ProcessingRatios[STAGE_2] * 100 +
+                                   percentageComplete * ProcessingRatios[STAGE_3],
+                STAGE_4 => ProcessingRatios[STAGE_1] * 100 +
+                                   ProcessingRatios[STAGE_2] * 100 +
+                                   ProcessingRatios[STAGE_3] * 100 +
+                                   percentageComplete * ProcessingRatios[STAGE_4],
+                COMPLETE => ProcessingRatios[COMPLETE] * 100,
                 _ => 0
             });
         }
