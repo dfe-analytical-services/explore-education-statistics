@@ -27,12 +27,18 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Api.Controllers
             return await GetFile(PublicReleasePath(publication, release, ReleaseFileTypes.Data, filename));
         }
 
-        [HttpGet("{publication}/{release}/ancillary/{fileId}")]
-        public async Task<ActionResult> GetAncillaryFile(string publication, string release, string fileId)
+        [HttpGet("{publication}/{release}/ancillary/{fileNameOrId}")]
+        public async Task<ActionResult> GetAncillaryFile(string publication, string release, string filenameOrId)
         {
-            if (Guid.TryParse(fileId, out var idAsGuid))
+            if (Guid.TryParse(filenameOrId, out var idAsGuid))
             {
                 return await GetFile(PublicReleasePath(publication, release, Ancillary, idAsGuid));
+            }
+
+            // Allow downloading the "All files" zip by filename rather than id
+            if (IsFilenameAllFilesZipFilename(publication, release, filenameOrId))
+            {
+                return await GetFile(PublicReleaseAllFilesZipPath(publication, release));
             }
 
             return NotFound();
@@ -47,6 +53,12 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Api.Controllers
             }
 
             return NotFound();
+        }
+
+        private static bool IsFilenameAllFilesZipFilename(string publication, string release, string filename)
+        {
+            return PublicReleasePath(publication, release, Ancillary, filename) ==
+                   PublicReleaseAllFilesZipPath(publication, release);
         }
 
         private async Task<ActionResult> GetFile(string path)
