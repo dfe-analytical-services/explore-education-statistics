@@ -87,7 +87,7 @@ const ReleaseFileUploadsSection = ({ releaseId, canUpdateRelease }: Props) => {
       const newFile = await releaseAncillaryFileService.uploadAncillaryFile(
         releaseId,
         {
-          name: values.name,
+          name: values.name.trim(),
           file: values.file as File,
         },
       );
@@ -120,6 +120,7 @@ const ReleaseFileUploadsSection = ({ releaseId, canUpdateRelease }: Props) => {
         onSubmit={handleSubmit}
         validationSchema={Yup.object<FormValues>({
           name: Yup.string()
+            .trim()
             .required('Enter a name')
             .test({
               name: 'unique',
