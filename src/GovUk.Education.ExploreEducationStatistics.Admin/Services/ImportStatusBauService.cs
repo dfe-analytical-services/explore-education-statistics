@@ -1,3 +1,4 @@
+using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Reflection;
@@ -48,11 +49,25 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Services
 
                     return queryResults.Where(result =>
                     {
-                        if (result.Message == "")
+                        try
+                        {
+                            var m = JsonConvert.DeserializeObject<ImportMessage>(result.Message);
+
+                            if (m.Release?.Id == null || m.Release?.Publication?.Id == null || m.MetaFileName == null)
+                            {
+                                _logger.LogWarning(
+                                    $"{MethodBase.GetCurrentMethod()}: Parsed Message contains null values. " +
+                                    "These are needed to create new ImportStatusBau. " +
+                                    $"PartitionKey: \"{result.PartitionKey}\", RowKey: \"{result.RowKey}\"");
+                                return false;
+                            }
+                        }
+                        catch (JsonReaderException e)
                         {
                             _logger.LogWarning(
-                                $"{MethodBase.GetCurrentMethod()} received Imports row with empty Message. " +
-                                $"PartitionKey: \"{result.PartitionKey}\", RowKey: \"{result.RowKey}\"");
+                                $"{MethodBase.GetCurrentMethod()}: JsonReaderException when parsing Message. " +
+                                $"PartitionKey: \"{result.PartitionKey}\", RowKey: \"{result.RowKey}\", " +
+                                $"JsonReaderException: \"{e}\"");
                             return false;
                         }
 
