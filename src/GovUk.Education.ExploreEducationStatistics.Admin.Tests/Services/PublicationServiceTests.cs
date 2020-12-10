@@ -1,6 +1,5 @@
 using System;
 using System.Collections.Generic;
-using System.Linq;
 using GovUk.Education.ExploreEducationStatistics.Admin.Services;
 using GovUk.Education.ExploreEducationStatistics.Admin.Services.Interfaces;
 using GovUk.Education.ExploreEducationStatistics.Admin.ViewModels;
@@ -8,11 +7,12 @@ using GovUk.Education.ExploreEducationStatistics.Common.Services.Interfaces.Secu
 using GovUk.Education.ExploreEducationStatistics.Common.Utils;
 using GovUk.Education.ExploreEducationStatistics.Content.Model;
 using GovUk.Education.ExploreEducationStatistics.Content.Model.Database;
-using Microsoft.AspNetCore.Mvc;
 using Moq;
 using Xunit;
 using static GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services.DbUtils;
 using static GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services.MapperUtils;
+using static GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services.ValidationTestUtil;
+using static GovUk.Education.ExploreEducationStatistics.Admin.Validators.ValidationErrorMessages;
 
 namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
 {
@@ -110,11 +110,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
                 });
 
             Assert.True(result.IsLeft);
-
-            var badRequestObjectResult = Assert.IsType<BadRequestObjectResult>(result.Left);
-            var details = Assert.IsType<ValidationProblemDetails>(badRequestObjectResult.Value);
-
-            Assert.Equal("TOPIC_DOES_NOT_EXIST", details.Errors[""].First());
+            AssertValidationProblem(result.Left, TopicDoesNotExist);
         }
 
         [Fact]
@@ -148,11 +144,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
                 );
 
                 Assert.True(result.IsLeft);
-
-                var badRequestObjectResult = Assert.IsType<BadRequestObjectResult>(result.Left);
-                var details = Assert.IsType<ValidationProblemDetails>(badRequestObjectResult.Value);
-
-                Assert.Equal("METHODOLOGY_DOES_NOT_EXIST", details.Errors[""].First());
+                AssertValidationProblem(result.Left, MethodologyDoesNotExist);
             }
         }
 
@@ -198,11 +190,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
                 );
 
                 Assert.True(result.IsLeft);
-
-                var badRequestObjectResult = Assert.IsType<BadRequestObjectResult>(result.Left);
-                var details = Assert.IsType<ValidationProblemDetails>(badRequestObjectResult.Value);
-
-                Assert.Equal("CANNOT_SPECIFY_METHODOLOGY_AND_EXTERNAL_METHODOLOGY", details.Errors[""].First());
+                AssertValidationProblem(result.Left, CannotSpecifyMethodologyAndExternalMethodology);
             }
         }
 
@@ -244,11 +232,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
                 );
 
                 Assert.True(result.IsLeft);
-
-                var badRequestObjectResult = Assert.IsType<BadRequestObjectResult>(result.Left);
-                var details = Assert.IsType<ValidationProblemDetails>(badRequestObjectResult.Value);
-
-                Assert.Equal("METHODOLOGY_MUST_BE_APPROVED_OR_PUBLISHED", details.Errors[""].First());
+                AssertValidationProblem(result.Left, MethodologyMustBeApproved);
             }
         }
 
@@ -291,11 +275,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
                 );
 
                 Assert.True(result.IsLeft);
-
-                var badRequestObjectResult = Assert.IsType<BadRequestObjectResult>(result.Left);
-                var details = Assert.IsType<ValidationProblemDetails>(badRequestObjectResult.Value);
-
-                Assert.Equal("SLUG_NOT_UNIQUE", details.Errors[""].First());
+                AssertValidationProblem(result.Left, SlugNotUnique);
             }
         }
 
@@ -396,7 +376,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
                 Assert.Equal("New methodology", updatedPublication.Methodology.Title);
             }
         }
-        
+
         [Fact]
         public async void UpdatePublication_AlreadyPublished()
         {
@@ -614,7 +594,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
                         MethodologyId = publication.MethodologyId,
                     }
                 );
-                
+
                 var updatedPublication = await context.Publications.FindAsync(result.Right.Id);
 
                 Assert.NotEqual(sharedContact.Id, updatedPublication.Contact.Id);
@@ -664,11 +644,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
                 );
 
                 Assert.True(result.IsLeft);
-
-                var badRequestObjectResult = Assert.IsType<BadRequestObjectResult>(result.Left);
-                var details = Assert.IsType<ValidationProblemDetails>(badRequestObjectResult.Value);
-
-                Assert.Equal("TOPIC_DOES_NOT_EXIST", details.Errors[""].First());
+                AssertValidationProblem(result.Left, TopicDoesNotExist);
             }
         }
 
@@ -707,11 +683,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
                 );
 
                 Assert.True(result.IsLeft);
-
-                var badRequestObjectResult = Assert.IsType<BadRequestObjectResult>(result.Left);
-                var details = Assert.IsType<ValidationProblemDetails>(badRequestObjectResult.Value);
-
-                Assert.Equal("METHODOLOGY_DOES_NOT_EXIST", details.Errors[""].First());
+                AssertValidationProblem(result.Left, MethodologyDoesNotExist);
             }
         }
 
@@ -755,11 +727,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
                 );
 
                 Assert.True(result.IsLeft);
-
-                var badRequestObjectResult = Assert.IsType<BadRequestObjectResult>(result.Left);
-                var details = Assert.IsType<ValidationProblemDetails>(badRequestObjectResult.Value);
-
-                Assert.Equal("CANNOT_SPECIFY_METHODOLOGY_AND_EXTERNAL_METHODOLOGY", details.Errors[""].First());
+                AssertValidationProblem(result.Left, CannotSpecifyMethodologyAndExternalMethodology);
             }
         }
 
@@ -805,11 +773,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
                 );
 
                 Assert.True(result.IsLeft);
-
-                var badRequestObjectResult = Assert.IsType<BadRequestObjectResult>(result.Left);
-                var details = Assert.IsType<ValidationProblemDetails>(badRequestObjectResult.Value);
-
-                Assert.Equal("METHODOLOGY_MUST_BE_APPROVED_OR_PUBLISHED", details.Errors[""].First());
+                AssertValidationProblem(result.Left, MethodologyMustBeApproved);
             }
         }
 
@@ -857,11 +821,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
                 );
 
                 Assert.True(result.IsLeft);
-
-                var badRequestObjectResult = Assert.IsType<BadRequestObjectResult>(result.Left);
-                var details = Assert.IsType<ValidationProblemDetails>(badRequestObjectResult.Value);
-
-                Assert.Equal("SLUG_NOT_UNIQUE", details.Errors[""].First());
+                AssertValidationProblem(result.Left, SlugNotUnique);
             }
         }
 

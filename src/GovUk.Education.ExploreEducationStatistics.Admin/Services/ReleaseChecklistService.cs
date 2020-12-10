@@ -55,13 +55,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Services
 
         public async Task<Either<ActionResult, ReleaseChecklistViewModel>> GetChecklist(Guid releaseId)
         {
-            return await _persistenceHelper.CheckEntityExists<Release>(
-                    releaseId,
-                    release =>
-                        release.Include(r => r.Publication)
-                            .ThenInclude(p => p.Methodology)
-                            .Include(r => r.Updates)
-                )
+            return await _persistenceHelper.CheckEntityExists<Release>(releaseId, HydrateReleaseForChecklist)
                 .OnSuccess(_userService.CheckCanViewRelease)
                 .OnSuccess(
                     async release => new ReleaseChecklistViewModel(
@@ -69,6 +63,13 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Services
                         await GetWarnings(release)
                     )
                 );
+        }
+
+        public static IQueryable<Release> HydrateReleaseForChecklist(IQueryable<Release> query)
+        {
+            return query.Include(r => r.Publication)
+                .ThenInclude(p => p.Methodology)
+                .Include(r => r.Updates);
         }
 
         public async Task<List<ReleaseChecklistIssue>> GetErrors(Release release)

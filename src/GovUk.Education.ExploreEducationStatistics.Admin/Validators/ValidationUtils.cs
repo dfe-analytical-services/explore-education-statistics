@@ -1,3 +1,4 @@
+using System.Collections.Generic;
 using System.ComponentModel.DataAnnotations;
 using System.Linq;
 using GovUk.Education.ExploreEducationStatistics.Common.Extensions;
@@ -38,6 +39,18 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Validators
         {
             ModelStateDictionary errors = new ModelStateDictionary();
             errors.AddModelError(string.Empty, message.ToString().ScreamingSnakeCase());
+            return new BadRequestObjectResult(new ValidationProblemDetails(errors));
+        }
+
+        public static ActionResult ValidationActionResult(IEnumerable<ValidationErrorMessages> messages)
+        {
+            ModelStateDictionary errors = new ModelStateDictionary();
+
+            foreach (var message in messages)
+            {
+                errors.AddModelError(string.Empty, message.ToString().ScreamingSnakeCase());
+            }
+
             return new BadRequestObjectResult(new ValidationProblemDetails(errors));
         }
 
