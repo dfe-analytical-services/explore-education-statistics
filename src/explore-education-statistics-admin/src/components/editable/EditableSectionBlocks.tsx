@@ -10,7 +10,7 @@ import SectionBlocks, {
 } from '@common/modules/find-statistics/components/SectionBlocks';
 import isBrowser from '@common/utils/isBrowser';
 import reorder from '@common/utils/reorder';
-import React, { useCallback } from 'react';
+import React, { useCallback, useState } from 'react';
 import { DragDropContext, DropResult } from 'react-beautiful-dnd';
 import EditableBlockRenderer from './EditableBlockRenderer';
 
@@ -26,6 +26,8 @@ export interface EditableSectionBlockProps extends SectionBlocksProps {
 }
 
 const EditableSectionBlocks = (props: EditableSectionBlockProps) => {
+  const [openedCommentId, setOpenedCommentId] = useState<string>('');
+
   const {
     releaseId,
     content = [],
@@ -97,7 +99,13 @@ const EditableSectionBlocks = (props: EditableSectionBlockProps) => {
                   blockId={block.id}
                   comments={block.comments}
                   canComment
+                  onToggle={opened =>
+                    opened
+                      ? setOpenedCommentId(block.id)
+                      : setOpenedCommentId('')
+                  }
                   onChange={handleCommentsChange}
+                  open={block.id === openedCommentId}
                 />
               )}
 

@@ -32,6 +32,8 @@ interface Props {
   sectionId: string;
   comments: Comment[];
   canComment?: boolean;
+  onToggle?: (opened: boolean) => void;
+  open?: boolean;
   onChange: CommentsChangeHandler;
 }
 
@@ -40,11 +42,12 @@ const Comments = ({
   sectionId,
   comments = [],
   onChange,
+  open,
+  onToggle,
   canComment = true,
 }: Props) => {
   const [editingComment, setEditingComment] = useState<Comment>();
   const [sectionOpened, setSectionOpened] = useState<boolean>(false);
-
   const { user } = useAuthContext();
   const { releaseId } = useManageReleaseContext();
 
@@ -98,6 +101,18 @@ const Comments = ({
       });
   };
 
+  useEffect(() => {
+    if (open) {
+      setSectionOpened(open);
+    }
+  }, []);
+
+  useEffect(() => {
+    if (onToggle) {
+      onToggle(sectionOpened);
+    }
+  }, [sectionOpened]);
+
   return (
     <div
       className={classNames(
@@ -106,7 +121,9 @@ const Comments = ({
       )}
     >
       <Details
-        onToggle={() => setSectionOpened(!sectionOpened)}
+        onToggle={() => {
+          setSectionOpened(!sectionOpened);
+        }}
         className="govuk-!-margin-bottom-1 govuk-body-s"
         summary={`${canComment ? `Add / ` : ''}View comments (${
           comments.length
