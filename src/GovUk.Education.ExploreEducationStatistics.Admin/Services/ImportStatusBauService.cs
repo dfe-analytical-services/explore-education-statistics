@@ -1,20 +1,19 @@
 using System;
 using System.Collections.Generic;
 using System.Linq;
-using System.Reflection;
 using System.Threading.Tasks;
 using GovUk.Education.ExploreEducationStatistics.Admin.ViewModels;
 using GovUk.Education.ExploreEducationStatistics.Admin.Services.Interfaces;
 using GovUk.Education.ExploreEducationStatistics.Admin.Services.Interfaces.Security;
+using GovUk.Education.ExploreEducationStatistics.Common.Extensions;
 using GovUk.Education.ExploreEducationStatistics.Common.Model;
 using GovUk.Education.ExploreEducationStatistics.Common.Services;
 using GovUk.Education.ExploreEducationStatistics.Common.Services.Interfaces;
 using GovUk.Education.ExploreEducationStatistics.Common.Services.Interfaces.Security;
-using GovUk.Education.ExploreEducationStatistics.Data.Processor.Model;
+using GovUk.Education.ExploreEducationStatistics.Content.Model.Database;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.Azure.Cosmos.Table;
-using Microsoft.Extensions.Logging;
-using Newtonsoft.Json;
+using Microsoft.EntityFrameworkCore;
 using static GovUk.Education.ExploreEducationStatistics.Common.TableStorageTableNames;
 
 namespace GovUk.Education.ExploreEducationStatistics.Admin.Services
@@ -22,16 +21,16 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Services
     public class ImportStatusBauService : IImportStatusBauService
     {
         private readonly ITableStorageService _tableStorageService;
-        private readonly ILogger _logger;
         private readonly IUserService _userService;
+        private readonly ContentDbContext _contentDbContext;
 
         public ImportStatusBauService(ITableStorageService tableStorageService,
-            ILogger<ImportStatusBauService> logger,
-            IUserService userService)
+            IUserService userService,
+            ContentDbContext contentDbContext)
         {
             _tableStorageService = tableStorageService;
-            _logger = logger;
             _userService = userService;
+            _contentDbContext = contentDbContext;
         }
 
         public async Task<Either<ActionResult, List<ImportStatusBau>>> GetAllIncompleteImports()
@@ -47,48 +46,37 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Services
                     var queryResults = await _tableStorageService.ExecuteQueryAsync(
                         DatafileImportsTableName, tableQuery);
 
-                    return queryResults.Where(result =>
+                    return queryResults
+                        .OrderByDescending(result => result.Timestamp)
+                        .Select(async result =>
                     {
-                        try
-                        {
-                            var m = JsonConvert.DeserializeObject<ImportMessage>(result.Message);
+                        var releaseId = new Guid(result.PartitionKey);
+                        var dataFileName = result.RowKey;
+                        var release =
+                            await _contentDbContext.Releases
+                                .Where(r => r.Id == releaseId)
+                                .Include(r => r.Publication)
+                                .FirstAsync();
 
-                            if (m.Release?.Id == null || m.Release?.Publication?.Id == null || m.MetaFileName == null)
-                            {
-                                _logger.LogWarning(
-                                    $"{MethodBase.GetCurrentMethod()}: Parsed Message contains null values. " +
-                                    "These are needed to create new ImportStatusBau. " +
-                                    $"PartitionKey: \"{result.PartitionKey}\", RowKey: \"{result.RowKey}\"");
-                                return false;
-                            }
-                        }
-                        catch (JsonReaderException e)
-                        {
-                            _logger.LogWarning(
-                                $"{MethodBase.GetCurrentMethod()}: JsonReaderException when parsing Message. " +
-                                $"PartitionKey: \"{result.PartitionKey}\", RowKey: \"{result.RowKey}\", " +
-                                $"JsonReaderException: \"{e}\"");
-                            return false;
-                        }
-
-                        return true;
-                    }).Select(result =>
-                    {
-                        var m = JsonConvert.DeserializeObject<ImportMessage>(result.Message);
+                        var releaseFileRef = await _contentDbContext.ReleaseFileReferences.FirstAsync(r =>
+                            r.ReleaseId == releaseId &&
+                            r.Filename == dataFileName &&
+                            r.ReleaseFileType == ReleaseFileTypes.Data);
 
                         return new ImportStatusBau()
                         {
-                            SubjectTitle = null,  // EES-1655
-                            SubjectId = m.SubjectId,
-                            PublicationId = m.Release.Publication.Id,
-                            ReleaseId = m.Release.Id,
+                            SubjectTitle = null, // EES-1655
+                            SubjectId = releaseFileRef.SubjectId,
+                            PublicationId = release.PublicationId,
+                            PublicationTitle = release.Publication.Title,
+                            ReleaseId = release.Id,
+                            ReleaseTitle = release.Title,
                             DataFileName = result.RowKey,
-                            MetaFileName = m.MetaFileName,
                             NumberOfRows = result.NumberOfRows,
                             Status = result.Status,
                             StagePercentageComplete = result.PercentageComplete,
                         };
-                    }).ToList();
+                    }).Select(t => t.Result).ToList();
                 });
         }
     }

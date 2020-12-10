@@ -8,11 +8,12 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.ViewModels
     public class ImportStatusBau
     {
         public string SubjectTitle { get; set; }
-        public Guid SubjectId { get; set; }
+        public Guid? SubjectId { get; set; }
         public Guid PublicationId { get; set; }
+        public string PublicationTitle { get; set; }
         public Guid ReleaseId { get; set; }
+        public string ReleaseTitle { get; set; }
         public string DataFileName { get; set; }
-        public string MetaFileName { get; set; }
         public int NumberOfRows { get; set; }
         [JsonConverter(typeof(StringEnumConverter))]
         public IStatus Status { get; set; }
