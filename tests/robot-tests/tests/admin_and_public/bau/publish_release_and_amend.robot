@@ -273,7 +273,8 @@ Verify release associated files
 
     user checks element should contain  ${downloads}  Test ancillary file 1 (txt, 12 B)
     user waits until element contains link  ${downloads}  Test ancillary file 1
-    user checks link has url  Test ancillary file 1  %{DATA_API_URL}/download/ui-tests-publish-release-${RUN_IDENTIFIER}/3000-01/ancillary/test-file-1.txt   ${downloads}
+    download file  link:Test ancillary file 1   test_ancillary_file_1.txt
+    downloaded file should have first line  test_ancillary_file_1.txt   Test file 1
 
 Verify public metadata guidance document
     [Tags]  HappyPath
@@ -645,11 +646,13 @@ Verify amendment files
 
     user checks element should contain  ${downloads}  Test ancillary file 1 (txt, 12 B)
     user waits until element contains link  ${downloads}  Test ancillary file 1
-    user checks link has url  Test ancillary file 1  %{DATA_API_URL}/download/ui-tests-publish-release-${RUN_IDENTIFIER}/3000-01/ancillary/test-file-1.txt   ${downloads}
+    download file  link:Test ancillary file 1   test_ancillary_file_1.txt
+    downloaded file should have first line  test_ancillary_file_1.txt   Test file 1
 
     user checks element should contain  ${downloads}  Test ancillary file 2 (txt, 24 B)
     user waits until element contains link  ${downloads}  Test ancillary file 2
-    user checks link has url  Test ancillary file 2  %{DATA_API_URL}/download/ui-tests-publish-release-${RUN_IDENTIFIER}/3000-01/ancillary/test-file-2.txt   ${downloads}
+    download file  link:Test ancillary file 2   test_ancillary_file_2.txt
+    downloaded file should have first line  test_ancillary_file_2.txt   Test file 2
 
 Verify amendment public metadata guidance document
     [Tags]  HappyPath
