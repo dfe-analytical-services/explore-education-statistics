@@ -394,22 +394,25 @@ user chooses file
     choose file  ${locator}  ${file_path}
 
 user clears element text
-    [Arguments]   ${locator}
-    press keys  ${locator}  CTRL+a+BACKSPACE
+    [Arguments]   ${selector}
+    user presses keys   CTRL+a+BACKSPACE  ${selector}
     sleep  0.1
 
 user presses keys
-    [Arguments]   ${keys}  ${selector}=${None}
-    press keys  ${selector}    ${keys}
+    [Arguments]   ${keys}   ${selector}=${EMPTY}
+    run keyword if  '${selector}' != '${EMPTY}'
+    ...  run keywords
+    ...  user waits until page contains element  ${selector}
+    ...  AND  user waits until element is visible   ${selector}
+    ...  AND  user sets focus to element  ${selector}
+    ...  AND  user clicks element  ${selector}
+    press keys   ${NONE}    ${keys}   # No selector as sometimes leads to text not being input
     sleep  0.1
 
 user enters text into element
     [Arguments]   ${selector}   ${text}
-    user waits until page contains element  ${selector}
-    user waits until element is visible   ${selector}
     user clears element text  ${selector}
-    user clicks element   ${selector}
-    user presses keys  ${text}  ${selector}
+    user presses keys   ${text}   ${selector}
 
 user checks element count is x
     [Arguments]   ${locator}   ${amount}
