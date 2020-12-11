@@ -201,7 +201,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Processor.Services
 
                 await _fileStorageService.UploadStream(
                     message.Release.Id,
-                    fileType: ReleaseFileTypes.Data,
+                    fileType: FileType.Data,
                     fileName: batchFilePath,
                     stream: stream,
                     contentType: "text/csv",

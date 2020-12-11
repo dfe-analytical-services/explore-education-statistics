@@ -144,7 +144,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Services
                 .OnSuccess<ActionResult, ReleaseFileReference, ReleaseFileReference>(
                     releaseFileReference =>
                     {
-                        if (releaseFileReference.ReleaseFileType != ReleaseFileTypes.Data)
+                        if (releaseFileReference.ReleaseFileType != FileType.Data)
                         {
                             return ValidationActionResult(ReplacementFileTypesMustBeData);
                         }

@@ -23,7 +23,7 @@ using Moq;
 using Xunit;
 using static GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services.DbUtils;
 using static GovUk.Education.ExploreEducationStatistics.Common.BlobContainerNames;
-using static GovUk.Education.ExploreEducationStatistics.Common.Model.ReleaseFileTypes;
+using static GovUk.Education.ExploreEducationStatistics.Common.Model.FileType;
 using static GovUk.Education.ExploreEducationStatistics.Common.Services.FileStoragePathUtils;
 using static GovUk.Education.ExploreEducationStatistics.Common.Services.FileStorageUtils;
 using static GovUk.Education.ExploreEducationStatistics.Data.Model.Database.StatisticsDbUtils;
@@ -59,7 +59,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
                 {
                     Release = release,
                     Filename = "data.csv",
-                    ReleaseFileType = ReleaseFileTypes.Data,
+                    ReleaseFileType = FileType.Data,
                     SubjectId = subject.Id,
                     Source = zipFile
                 }
@@ -181,7 +181,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
                 {
                     Release = release,
                     Filename = "Data 1.csv",
-                    ReleaseFileType = ReleaseFileTypes.Data,
+                    ReleaseFileType = FileType.Data,
                     SubjectId = subject.Id
                 }
             };
@@ -285,7 +285,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
             {
                 Release = release,
                 Filename = "data.csv",
-                ReleaseFileType = ReleaseFileTypes.Data,
+                ReleaseFileType = FileType.Data,
                 SubjectId = subject.Id,
                 Source = zipFile
             };
@@ -309,7 +309,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
             var replacementDataFile = new ReleaseFileReference
             {
                 Filename = "replacement.csv",
-                ReleaseFileType = ReleaseFileTypes.Data,
+                ReleaseFileType = FileType.Data,
                 Release = release,
                 SubjectId = replacementSubject.Id,
                 Replacing = dataFile,
@@ -455,7 +455,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
             {
                 Release = release,
                 Filename = "data.csv",
-                ReleaseFileType = ReleaseFileTypes.Data,
+                ReleaseFileType = FileType.Data,
                 SubjectId = subject.Id,
                 Source = zipFile
             };
@@ -588,7 +588,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
                 {
                     Release = release,
                     Filename = "data.csv",
-                    ReleaseFileType = ReleaseFileTypes.Data,
+                    ReleaseFileType = FileType.Data,
                     SubjectId = subject.Id,
                     Source = zipFile
                 }
@@ -706,7 +706,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
             {
                 Release = release,
                 Filename = "data.csv",
-                ReleaseFileType = ReleaseFileTypes.Data,
+                ReleaseFileType = FileType.Data,
                 SubjectId = subject.Id,
                 Source = zipFile
             };
@@ -861,7 +861,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
             {
                 Release = release,
                 Filename = "test-data.csv",
-                ReleaseFileType = ReleaseFileTypes.Data,
+                ReleaseFileType = FileType.Data,
                 SubjectId = subject.Id
             };
             var metaFile = new ReleaseFileReference
@@ -981,7 +981,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
             {
                 Release = release,
                 Filename = "Test data 1.csv",
-                ReleaseFileType = ReleaseFileTypes.Data,
+                ReleaseFileType = FileType.Data,
                 SubjectId = subject.Id
             };
             var metaFile = new ReleaseFileReference
@@ -1136,7 +1136,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
             {
                 Release = release,
                 Filename = "test-data.csv",
-                ReleaseFileType = ReleaseFileTypes.Data
+                ReleaseFileType = FileType.Data
             };
             var metaFile = new ReleaseFileReference
             {
@@ -1193,7 +1193,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
                 Release = release,
                 SubjectId = subject.Id,
                 Filename = "test-data.csv",
-                ReleaseFileType = ReleaseFileTypes.Data
+                ReleaseFileType = FileType.Data
             };
             var metaFile = new ReleaseFileReference
             {
@@ -1285,7 +1285,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
             {
                 Release = release,
                 Filename = "test-data.csv",
-                ReleaseFileType = ReleaseFileTypes.Data,
+                ReleaseFileType = FileType.Data,
                 Source = zipFile
             };
 
@@ -1407,7 +1407,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
             {
                 Release = originalRelease,
                 Filename = "test-data.csv",
-                ReleaseFileType = ReleaseFileTypes.Data,
+                ReleaseFileType = FileType.Data,
                 SubjectId = subject.Id
             };
             var metaFile = new ReleaseFileReference
@@ -1547,7 +1547,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
             {
                 Release = release,
                 Filename = "test-data-1.csv",
-                ReleaseFileType = ReleaseFileTypes.Data,
+                ReleaseFileType = FileType.Data,
                 SubjectId = subject1.Id
             };
             var metaFile1 = new ReleaseFileReference
@@ -1561,7 +1561,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
             {
                 Release = release,
                 Filename = "Test data 2.csv",
-                ReleaseFileType = ReleaseFileTypes.Data,
+                ReleaseFileType = FileType.Data,
                 SubjectId = subject2.Id
             };
             var metaFile2 = new ReleaseFileReference
@@ -1731,7 +1731,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
             {
                 Release = release,
                 Filename = "test-data-1.csv",
-                ReleaseFileType = ReleaseFileTypes.Data,
+                ReleaseFileType = FileType.Data,
                 SubjectId = subject.Id
             };
             var metaFile = new ReleaseFileReference
@@ -1768,7 +1768,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
                         {
                             Release = otherRelease,
                             Filename = "test-data-2.csv",
-                            ReleaseFileType = ReleaseFileTypes.Data
+                            ReleaseFileType = FileType.Data
                         }
                     },
                     new ReleaseFile
@@ -1890,7 +1890,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
             {
                 Release = originalRelease,
                 Filename = "test-data-1.csv",
-                ReleaseFileType = ReleaseFileTypes.Data,
+                ReleaseFileType = FileType.Data,
                 SubjectId = subject1.Id
             };
             var metaFile1 = new ReleaseFileReference
@@ -1904,7 +1904,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
             {
                 Release = originalRelease,
                 Filename = "test-data-2.csv",
-                ReleaseFileType = ReleaseFileTypes.Data,
+                ReleaseFileType = FileType.Data,
                 SubjectId = subject2.Id
             };
             var metaFile2 = new ReleaseFileReference
@@ -2045,7 +2045,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
             {
                 Release = release,
                 Filename = "test-data.csv",
-                ReleaseFileType = ReleaseFileTypes.Data,
+                ReleaseFileType = FileType.Data,
                 SubjectId = subject.Id
             };
             var metaFile = new ReleaseFileReference
@@ -2135,7 +2135,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
             {
                 Release = release,
                 Filename = "test-data.csv",
-                ReleaseFileType = ReleaseFileTypes.Data,
+                ReleaseFileType = FileType.Data,
                 Source = zipFile
             };
 
@@ -2293,7 +2293,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
                 blobStorageService.Setup(mock =>
                     mock.UploadFile(PrivateFilesContainerName,
                         It.Is<string>(path => 
-                            path.Contains(AdminReleaseDirectoryPath(release.Id, ReleaseFileTypes.Data))),
+                            path.Contains(AdminReleaseDirectoryPath(release.Id, FileType.Data))),
                         dataFormFile,
                         It.Is<IBlobStorageService.UploadFileOptions>(options =>
                             options.MetaValues[BlobInfoExtensions.NameKey] == subjectName
@@ -2305,18 +2305,18 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
                 blobStorageService.Setup(mock =>
                     mock.UploadFile(PrivateFilesContainerName,
                         It.Is<string>(path =>
-                            path.Contains(AdminReleaseDirectoryPath(release.Id, ReleaseFileTypes.Data))),
+                            path.Contains(AdminReleaseDirectoryPath(release.Id, FileType.Data))),
                         metaFormFile,
                         It.Is<IBlobStorageService.UploadFileOptions>(options =>
                             options.MetaValues[BlobInfoExtensions.DataFileKey] == dataFileName)
                     )).Returns(Task.CompletedTask);
 
-                var dataFilePath = AdminReleasePath(release.Id, ReleaseFileTypes.Data, Guid.NewGuid());
+                var dataFilePath = AdminReleasePath(release.Id, FileType.Data, Guid.NewGuid());
 
                 blobStorageService
                     .Setup(s => s.GetBlob(PrivateFilesContainerName, 
                         It.Is<string>(path =>
-                            path.Contains(AdminReleaseDirectoryPath(release.Id, ReleaseFileTypes.Data)))))
+                            path.Contains(AdminReleaseDirectoryPath(release.Id, FileType.Data)))))
                     .ReturnsAsync(
                         new BlobInfo(
                             path: dataFilePath,
@@ -2375,7 +2375,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
                 var metaFile = fileReferences
                     .Single(rfr => rfr.Filename == metaFileName);
 
-                Assert.Equal(ReleaseFileTypes.Data, dataFile.ReleaseFileType);
+                Assert.Equal(FileType.Data, dataFile.ReleaseFileType);
                 Assert.Equal(release.Id, dataFile.ReleaseId);
                 Assert.False(dataFile.FilenameMigrated);
 
@@ -2412,7 +2412,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
             {
                 Release = release,
                 Filename = "original-data.csv",
-                ReleaseFileType = ReleaseFileTypes.Data,
+                ReleaseFileType = FileType.Data,
                 SubjectId = subject.Id
             };
 
@@ -2467,7 +2467,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
                 blobStorageService.Setup(mock =>
                     mock.UploadFile(PrivateFilesContainerName,
                         It.Is<string>(path =>
-                            path.Contains(AdminReleaseDirectoryPath(release.Id, ReleaseFileTypes.Data))),
+                            path.Contains(AdminReleaseDirectoryPath(release.Id, FileType.Data))),
                         dataFormFile,
                         It.Is<IBlobStorageService.UploadFileOptions>(options =>
                             options.MetaValues[BlobInfoExtensions.NameKey] == subject.Name
@@ -2479,18 +2479,18 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
                 blobStorageService.Setup(mock =>
                     mock.UploadFile(PrivateFilesContainerName,
                         It.Is<string>(path =>
-                            path.Contains(AdminReleaseDirectoryPath(release.Id, ReleaseFileTypes.Data))),
+                            path.Contains(AdminReleaseDirectoryPath(release.Id, FileType.Data))),
                         metaFormFile,
                         It.Is<IBlobStorageService.UploadFileOptions>(options =>
                             options.MetaValues[BlobInfoExtensions.DataFileKey] == dataFileName)
                     )).Returns(Task.CompletedTask);
 
-                var dataFilePath = AdminReleasePath(release.Id, ReleaseFileTypes.Data, Guid.NewGuid());
+                var dataFilePath = AdminReleasePath(release.Id, FileType.Data, Guid.NewGuid());
 
                 blobStorageService
                     .Setup(s => s.GetBlob(PrivateFilesContainerName, 
                             It.Is<string>(path => 
-                                path.Contains(AdminReleaseDirectoryPath(release.Id, ReleaseFileTypes.Data)))))
+                                path.Contains(AdminReleaseDirectoryPath(release.Id, FileType.Data)))))
                     .ReturnsAsync(
                         new BlobInfo(
                             path: dataFilePath,
@@ -2552,11 +2552,11 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
                 var metaFile = fileReferences
                     .Single(rfr => rfr.Filename == metaFileName);
 
-                Assert.Equal(ReleaseFileTypes.Data, originalDataFile.ReleaseFileType);
+                Assert.Equal(FileType.Data, originalDataFile.ReleaseFileType);
                 Assert.Equal(release.Id, originalDataFile.ReleaseId);
                 Assert.Equal(dataFile.Id, originalDataFile.ReplacedById);
 
-                Assert.Equal(ReleaseFileTypes.Data, dataFile.ReleaseFileType);
+                Assert.Equal(FileType.Data, dataFile.ReleaseFileType);
                 Assert.Equal(release.Id, dataFile.ReleaseId);
                 Assert.Equal(originalDataFile.Id, dataFile.ReplacingId);
 
@@ -2707,7 +2707,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
                 var zipFile = fileReferences
                     .Single(rfr => rfr.Filename == zipFileName);
 
-                Assert.Equal(ReleaseFileTypes.Data, dataFile.ReleaseFileType);
+                Assert.Equal(FileType.Data, dataFile.ReleaseFileType);
                 Assert.Equal(release.Id, dataFile.ReleaseId);
                 Assert.Equal(zipFile.Id, dataFile.SourceId);
                 Assert.False(dataFile.FilenameMigrated);
@@ -2750,7 +2750,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
             {
                 Release = release,
                 Filename = "original-data.csv",
-                ReleaseFileType = ReleaseFileTypes.Data,
+                ReleaseFileType = FileType.Data,
                 SubjectId = subject.Id
             };
 
@@ -2879,12 +2879,12 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
                 var zipFile = fileReferences
                     .Single(rfr => rfr.Filename == zipFileName);
 
-                Assert.Equal(ReleaseFileTypes.Data, originalDataFile.ReleaseFileType);
+                Assert.Equal(FileType.Data, originalDataFile.ReleaseFileType);
                 Assert.Equal(release.Id, originalDataFile.ReleaseId);
                 Assert.Equal(dataFile.Id, originalDataFile.ReplacedById);
                 Assert.Null(originalDataFile.SourceId);
 
-                Assert.Equal(ReleaseFileTypes.Data, dataFile.ReleaseFileType);
+                Assert.Equal(FileType.Data, dataFile.ReleaseFileType);
                 Assert.Equal(release.Id, dataFile.ReleaseId);
                 Assert.Equal(originalDataFile.Id, dataFile.ReplacingId);
                 Assert.Equal(zipFile.Id, dataFile.SourceId);

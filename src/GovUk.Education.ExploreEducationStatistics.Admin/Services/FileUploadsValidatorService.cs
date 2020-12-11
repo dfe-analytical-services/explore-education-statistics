@@ -14,6 +14,7 @@ using static GovUk.Education.ExploreEducationStatistics.Admin.Validators.Validat
 using static GovUk.Education.ExploreEducationStatistics.Admin.Validators.ValidationUtils;
 using static GovUk.Education.ExploreEducationStatistics.Common.Validators.FileTypeValidationUtils;
 using static System.StringComparison;
+using static GovUk.Education.ExploreEducationStatistics.Common.Model.FileType;
 
 namespace GovUk.Education.ExploreEducationStatistics.Admin.Services
 {
@@ -48,9 +49,9 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Services
                 .OnSuccess(async _ => await ValidateDataFileSizes(archiveFile.DataFileSize, archiveFile.MetaFileSize));
         }
 
-        public async Task<Either<ActionResult, Unit>> ValidateFileForUpload(IFormFile file, ReleaseFileTypes type)
+        public async Task<Either<ActionResult, Unit>> ValidateFileForUpload(IFormFile file, FileType type)
         {
-            if (type != ReleaseFileTypes.Ancillary && type != ReleaseFileTypes.Chart)
+            if (type != Ancillary && type != Chart)
             {
                 throw new ArgumentException("Cannot use generic function to validate data file", nameof(type));
             }
@@ -86,7 +87,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Services
 
         private async Task<bool> IsCsvFile(IFormFile file)
         {
-            return await _fileTypeService.HasMatchingMimeType(file, AllowedMimeTypesByFileType[ReleaseFileTypes.Data])
+            return await _fileTypeService.HasMatchingMimeType(file, AllowedMimeTypesByFileType[FileType.Data])
                    && _fileTypeService.HasMatchingEncodingType(file, CsvEncodingTypes);
         }
 
@@ -102,7 +103,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Services
                    filename.IndexOfAny(Path.GetInvalidFileNameChars()) > -1;
         }
 
-        private bool IsFileExisting(Guid releaseId, ReleaseFileTypes type, string name)
+        private bool IsFileExisting(Guid releaseId, FileType type, string name)
         {
             return _context
                 .ReleaseFiles
@@ -145,12 +146,12 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Services
                 return ValidationActionResult(MetaFileMustBeCsvFile);
             }
 
-            if (IsFileExisting(releaseId, ReleaseFileTypes.Data, dataFileName))
+            if (IsFileExisting(releaseId, FileType.Data, dataFileName))
             {
                 return ValidationActionResult(CannotOverwriteDataFile);
             }
 
-            if (IsFileExisting(releaseId, ReleaseFileTypes.Metadata, metaFileName))
+            if (IsFileExisting(releaseId, Metadata, metaFileName))
             {
                 return ValidationActionResult(CannotOverwriteMetadataFile);
             }

@@ -9,6 +9,7 @@ using GovUk.Education.ExploreEducationStatistics.Common.Services.Interfaces;
 using GovUk.Education.ExploreEducationStatistics.Data.Processor.Models;
 using GovUk.Education.ExploreEducationStatistics.Data.Processor.Services.Interfaces;
 using static GovUk.Education.ExploreEducationStatistics.Common.BlobContainerNames;
+using static GovUk.Education.ExploreEducationStatistics.Common.Model.FileType;
 using static GovUk.Education.ExploreEducationStatistics.Common.Services.FileStoragePathUtils;
 
 namespace GovUk.Education.ExploreEducationStatistics.Data.Processor.Services
@@ -31,7 +32,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Processor.Services
 
             var metaBlob = await _blobStorageService.GetBlob(
                 PrivateFilesContainerName,
-                AdminReleasePath(releaseId, ReleaseFileTypes.Metadata, dataBlob.GetMetaFileName())
+                AdminReleasePath(releaseId, Metadata, dataBlob.GetMetaFileName())
             );
 
             return new SubjectData(dataBlob, metaBlob);
@@ -39,7 +40,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Processor.Services
 
         public async Task UploadStream(
             Guid releaseId,
-            ReleaseFileTypes fileType,
+            FileType fileType,
             string fileName,
             Stream stream,
             string contentType,

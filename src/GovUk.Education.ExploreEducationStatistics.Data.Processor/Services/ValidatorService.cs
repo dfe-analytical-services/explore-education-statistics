@@ -327,7 +327,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Processor.Services
 
             var hasMatchingMimeType = await _fileTypeService.HasMatchingMimeType(
                 mimeTypeStream,
-                AllowedMimeTypesByFileType[ReleaseFileTypes.Data]
+                AllowedMimeTypesByFileType[FileType.Data]
             );
 
             if (!hasMatchingMimeType)

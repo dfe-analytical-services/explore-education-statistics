@@ -7,6 +7,7 @@ using GovUk.Education.ExploreEducationStatistics.Common.Model;
 using GovUk.Education.ExploreEducationStatistics.Content.Model;
 using GovUk.Education.ExploreEducationStatistics.Content.Model.Database;
 using Microsoft.EntityFrameworkCore;
+using static GovUk.Education.ExploreEducationStatistics.Common.Model.FileType;
 
 namespace GovUk.Education.ExploreEducationStatistics.Admin.Services
 {
@@ -21,13 +22,13 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Services
 
         public async Task<ReleaseFileReference> Create(Guid releaseId,
             string filename,
-            ReleaseFileTypes type,
+            FileType type,
             ReleaseFileReference replacingFile = null,
             ReleaseFileReference source = null)
         {
-            if (type == ReleaseFileTypes.DataZip)
+            if (type == DataZip)
             {
-                throw new ArgumentException($"Cannot use generic Create method for type {ReleaseFileTypes.DataZip}",
+                throw new ArgumentException($"Cannot use generic Create method for type {DataZip}",
                     nameof(type));
             }
 
@@ -39,7 +40,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Services
                     ReleaseId = releaseId,
                     Filename = filename,
                     // Mark any new ancillary or chart files as already migrated while this flag temporarily exists 
-                    FilenameMigrated = type == ReleaseFileTypes.Ancillary || type == ReleaseFileTypes.Chart,
+                    FilenameMigrated = type == Ancillary || type == Chart,
                     ReleaseFileType = type,
                     Replacing = replacingFile,
                     Source = source
@@ -65,7 +66,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Services
             {
                 ReleaseId = releaseId,
                 Filename = filename,
-                ReleaseFileType = ReleaseFileTypes.DataZip
+                ReleaseFileType = DataZip
             })).Entity;
 
             await _contentDbContext.SaveChangesAsync();

@@ -394,7 +394,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Services
         private async Task<Either<ActionResult, ReleaseFileReference>> CheckReleaseFileReferenceExists(Guid id)
         {
             return await _persistenceHelper.CheckEntityExists<ReleaseFileReference>(id)
-                .OnSuccess(releaseFileReference => releaseFileReference.ReleaseFileType != ReleaseFileTypes.Data
+                .OnSuccess(releaseFileReference => releaseFileReference.ReleaseFileType != FileType.Data
                     ? new Either<ActionResult, ReleaseFileReference>(
                         ValidationActionResult(FileTypeMustBeData))
                     : releaseFileReference);

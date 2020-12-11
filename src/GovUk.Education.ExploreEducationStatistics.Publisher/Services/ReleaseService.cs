@@ -13,6 +13,7 @@ using GovUk.Education.ExploreEducationStatistics.Publisher.Model.ViewModels;
 using GovUk.Education.ExploreEducationStatistics.Publisher.Models;
 using GovUk.Education.ExploreEducationStatistics.Publisher.Services.Interfaces;
 using Microsoft.EntityFrameworkCore;
+using static GovUk.Education.ExploreEducationStatistics.Common.Model.FileType;
 using Microsoft.Extensions.Logging;
 using static GovUk.Education.ExploreEducationStatistics.Common.BlobContainerNames;
 using static GovUk.Education.ExploreEducationStatistics.Common.Services.FileStoragePathUtils;
@@ -166,7 +167,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Publisher.Services
             }
         }
 
-        public async Task<List<ReleaseFileReference>> GetFiles(Guid releaseId, params ReleaseFileTypes[] types)
+        public async Task<List<ReleaseFileReference>> GetFiles(Guid releaseId, params FileType[] types)
         {
             return await _contentDbContext
                 .ReleaseFiles
@@ -179,7 +180,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Publisher.Services
 
         public async Task<List<FileInfo>> GetDownloadFiles(Release release)
         {
-            var files = await GetFiles(release.Id, ReleaseFileTypes.Ancillary, ReleaseFileTypes.Data);
+            var files = await GetFiles(release.Id, Ancillary, FileType.Data);
 
             var filesWithInfo = files.Select(async file => await GetPublicFileInfo(release, file));
 
@@ -223,7 +224,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Publisher.Services
                 Name = blob.Name,
                 Path = blob.Path,
                 Size = blob.Size,
-                Type = ReleaseFileTypes.Ancillary
+                Type = Ancillary
             };
         }
 

@@ -13,7 +13,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Processor.Services.Int
 
         Task UploadStream(
             Guid releaseId,
-            ReleaseFileTypes fileType,
+            FileType fileType,
             string fileName,
             Stream stream,
             string contentType,

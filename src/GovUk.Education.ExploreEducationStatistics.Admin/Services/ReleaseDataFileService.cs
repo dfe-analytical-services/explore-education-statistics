@@ -20,7 +20,7 @@ using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
 using static GovUk.Education.ExploreEducationStatistics.Common.Services.FileStorageUtils;
 using static GovUk.Education.ExploreEducationStatistics.Common.BlobContainerNames;
-using static GovUk.Education.ExploreEducationStatistics.Common.Model.ReleaseFileTypes;
+using static GovUk.Education.ExploreEducationStatistics.Common.Model.FileType;
 using static GovUk.Education.ExploreEducationStatistics.Common.Services.FileStoragePathUtils;
 
 namespace GovUk.Education.ExploreEducationStatistics.Admin.Services
@@ -82,7 +82,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Services
                 .CheckEntityExists<Release>(releaseId)
                 .OnSuccess(async release => await _userService.CheckCanUpdateRelease(release, ignoreCheck: forceDelete))
                 .OnSuccess(async release =>
-                    await ids.Select(id => _releaseFileRepository.CheckFileExists(releaseId, id, ReleaseFileTypes.Data))
+                    await ids.Select(id => _releaseFileRepository.CheckFileExists(releaseId, id, FileType.Data))
                         .OnSuccessAll())
                 .OnSuccessVoid(async files =>
                 {
@@ -142,7 +142,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Services
 
         public async Task<Either<ActionResult, Unit>> DeleteAll(Guid releaseId, bool forceDelete = false)
         {
-            var releaseFiles = await _releaseFileRepository.GetByFileType(releaseId, ReleaseFileTypes.Data);
+            var releaseFiles = await _releaseFileRepository.GetByFileType(releaseId, FileType.Data);
 
             return await Delete(releaseId,
                 releaseFiles.Select(releaseFile => releaseFile.ReleaseFileReference.Id),
@@ -160,7 +160,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Services
                             q => q.Include(rf => rf.ReleaseFileReference)
                                 .Where(
                                     rf => rf.ReleaseId == release.Id
-                                          && rf.ReleaseFileReference.ReleaseFileType == ReleaseFileTypes.Data
+                                          && rf.ReleaseFileReference.ReleaseFileType == FileType.Data
                                           && rf.ReleaseFileReferenceId == id
                                 )
                         )
@@ -176,7 +176,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Services
                 .OnSuccess(async _ =>
                 {
                     var fileList = new List<DataFileInfo>();
-                    var files = await _releaseFileRepository.GetByFileType(releaseId, ReleaseFileTypes.Data);
+                    var files = await _releaseFileRepository.GetByFileType(releaseId, FileType.Data);
 
                     // Exclude files that are replacements in progress
                     var filesExcludingReplacements = files.Where(file =>
@@ -218,7 +218,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Services
                                         var dataFile = await _fileRepository.Create(
                                             releaseId: releaseId,
                                             filename: dataFormFile.FileName.ToLower(),
-                                            type: ReleaseFileTypes.Data,
+                                            type: FileType.Data,
                                             replacingFile: replacingFile);
 
                                         var metaFile = await _fileRepository.Create(
@@ -312,7 +312,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Services
                                                     var dataFile = await _fileRepository.Create(
                                                         releaseId: releaseId,
                                                         filename: archiveFile.DataFileName,
-                                                        type: ReleaseFileTypes.Data,
+                                                        type: FileType.Data,
                                                         replacingFile: replacingFile,
                                                         source: zipFile);
 
@@ -420,7 +420,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Services
                         Size = zipBlob.Size,
                         MetaFileId = null,
                         MetaFileName =
-                            file.ReleaseFileType == ReleaseFileTypes.Data
+                            file.ReleaseFileType == FileType.Data
                                 ? zipBlob.GetMetaFileName()
                                 : string.Empty,
                         Rows = 0,
@@ -431,11 +431,11 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Services
                 }
             }
 
-            var dataFileName = file.ReleaseFileType == ReleaseFileTypes.Data
+            var dataFileName = file.ReleaseFileType == FileType.Data
                 ? file.Filename
-                : (await GetAssociatedReleaseFileReference(file, ReleaseFileTypes.Data)).Filename;
+                : (await GetAssociatedReleaseFileReference(file, FileType.Data)).Filename;
 
-            var metaFileReference = file.ReleaseFileType == ReleaseFileTypes.Data
+            var metaFileReference = file.ReleaseFileType == FileType.Data
                 ? await GetAssociatedReleaseFileReference(file, Metadata)
                 : null;
 
@@ -508,7 +508,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Services
 
         private async Task<ReleaseFileReference> GetAssociatedReleaseFileReference(
             ReleaseFileReference releaseFileReference,
-            ReleaseFileTypes associatedType)
+            FileType associatedType)
         {
             return await _contentDbContext.ReleaseFileReferences
                 .FirstAsync(rfr => rfr.ReleaseId == releaseFileReference.ReleaseId

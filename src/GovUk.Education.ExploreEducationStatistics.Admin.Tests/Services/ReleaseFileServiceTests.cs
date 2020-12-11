@@ -21,7 +21,7 @@ using Xunit;
 using static GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services.DbUtils;
 using static GovUk.Education.ExploreEducationStatistics.Admin.Validators.ValidationErrorMessages;
 using static GovUk.Education.ExploreEducationStatistics.Common.BlobContainerNames;
-using static GovUk.Education.ExploreEducationStatistics.Common.Model.ReleaseFileTypes;
+using static GovUk.Education.ExploreEducationStatistics.Common.Model.FileType;
 using static GovUk.Education.ExploreEducationStatistics.Common.Services.FileStoragePathUtils;
 using static GovUk.Education.ExploreEducationStatistics.Common.Services.FileStorageUtils;
 
@@ -171,7 +171,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
                 ReleaseFileReference = new ReleaseFileReference
                 {
                     Filename = "data.csv",
-                    ReleaseFileType = ReleaseFileTypes.Data,
+                    ReleaseFileType = FileType.Data,
                     Release = release,
                     SubjectId = Guid.NewGuid()
                 }
@@ -381,7 +381,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
                 ReleaseFileReference = new ReleaseFileReference
                 {
                     Filename = "data.csv",
-                    ReleaseFileType = ReleaseFileTypes.Data,
+                    ReleaseFileType = FileType.Data,
                     Release = release,
                     SubjectId = Guid.NewGuid()
                 }
@@ -661,7 +661,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
                 ReleaseFileReference = new ReleaseFileReference
                 {
                     Filename = "data.csv",
-                    ReleaseFileType = ReleaseFileTypes.Data,
+                    ReleaseFileType = FileType.Data,
                     Release = release,
                     SubjectId = Guid.NewGuid()
                 }
@@ -936,7 +936,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
                 ReleaseFileReference = new ReleaseFileReference
                 {
                     Filename = "data.csv",
-                    ReleaseFileType = ReleaseFileTypes.Data,
+                    ReleaseFileType = FileType.Data,
                     Release = release,
                     SubjectId = Guid.NewGuid()
                 }

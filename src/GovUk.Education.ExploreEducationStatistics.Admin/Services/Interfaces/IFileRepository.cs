@@ -11,7 +11,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Services.Interfaces
         public Task<ReleaseFileReference> Create(
             Guid releaseId,
             string filename,
-            ReleaseFileTypes type,
+            FileType type,
             ReleaseFileReference replacingFile = null,
             ReleaseFileReference source = null);
 

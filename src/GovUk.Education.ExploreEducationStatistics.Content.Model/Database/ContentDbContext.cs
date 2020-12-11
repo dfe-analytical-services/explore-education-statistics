@@ -185,7 +185,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Content.Model.Database
 
             modelBuilder.Entity<ReleaseFileReference>()
                 .Property(b => b.ReleaseFileType)
-                .HasConversion(new EnumToStringConverter<ReleaseFileTypes>());
+                .HasConversion(new EnumToStringConverter<FileType>());
 
             modelBuilder.Entity<ReleaseFileReference>()
                 .HasOne(b => b.Replacing)

@@ -51,7 +51,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Services
                     var files = _contentDbContext.ReleaseFiles
                         .Include(file => file.ReleaseFileReference)
                         .Where(file => file.ReleaseId == releaseId
-                                       && file.ReleaseFileReference.ReleaseFileType == ReleaseFileTypes.Data)
+                                       && file.ReleaseFileReference.ReleaseFileType == FileType.Data)
                         .Select(file => file.ReleaseFileReference);
 
                     // Exclude files that are replacements in progress

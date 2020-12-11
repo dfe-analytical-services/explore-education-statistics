@@ -23,7 +23,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Services
         }
 
         public async Task<Either<ActionResult, ReleaseFileReference>> CheckFileExists(Guid releaseId, Guid id,
-            params ReleaseFileTypes[] allowedFileTypes)
+            params FileType[] allowedFileTypes)
         {
             // Ensure file is linked to the Release by getting the ReleaseFile first
             var releaseFile = await Get(releaseId, id);
@@ -60,7 +60,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Services
                     && releaseFile.ReleaseFileReferenceId == fileId);
         }
 
-        public async Task<List<ReleaseFile>> GetByFileType(Guid releaseId, params ReleaseFileTypes[] types)
+        public async Task<List<ReleaseFile>> GetByFileType(Guid releaseId, params FileType[] types)
         {
             return await _contentDbContext.ReleaseFiles
                 .Include(f => f.ReleaseFileReference)

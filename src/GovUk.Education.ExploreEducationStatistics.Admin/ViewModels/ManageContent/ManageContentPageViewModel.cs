@@ -59,7 +59,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.ViewModels.ManageCont
 
             public bool HasPreReleaseAccessList { get; set; }
 
-            public bool HasMetaGuidance => DownloadFiles.Any(file => file.Type == ReleaseFileTypes.Data);
+            public bool HasMetaGuidance => DownloadFiles.Any(file => file.Type == FileType.Data);
 
             [JsonConverter(typeof(DateTimeToDateJsonConverter))]
             public DateTime? PublishScheduled { get; set; }

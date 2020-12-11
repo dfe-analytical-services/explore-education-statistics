@@ -16,6 +16,7 @@ using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Logging;
 using static GovUk.Education.ExploreEducationStatistics.Common.BlobContainerNames;
 using static GovUk.Education.ExploreEducationStatistics.Common.Extensions.BlobInfoExtensions;
+using static GovUk.Education.ExploreEducationStatistics.Common.Model.FileType;
 using static GovUk.Education.ExploreEducationStatistics.Common.Services.FileStoragePathUtils;
 using static GovUk.Education.ExploreEducationStatistics.Common.Services.FileStorageUtils;
 
@@ -48,7 +49,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Services
             _logger = logger;
         }
 
-        public async Task<Either<ActionResult, Unit>> MigratePrivateFiles(ReleaseFileTypes type)
+        public async Task<Either<ActionResult, Unit>> MigratePrivateFiles(FileType type)
         {
             return await _userService.CheckCanRunMigrations()
                 .OnSuccessVoid(async () =>
@@ -70,7 +71,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Services
                 });
         }
 
-        public async Task<Either<ActionResult, Unit>> MigratePublicFiles(ReleaseFileTypes type, bool lenient = false)
+        public async Task<Either<ActionResult, Unit>> MigratePublicFiles(FileType type, bool lenient = false)
         {
             return await _userService.CheckCanRunMigrations()
                 .OnSuccessVoid(async () =>
@@ -107,7 +108,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Services
 
         private async Task SetPrivateBlobMetadata(ReleaseFileReference file)
         {
-            if (file.ReleaseFileType == ReleaseFileTypes.Ancillary)
+            if (file.ReleaseFileType == Ancillary)
             {
                 await SetPrivateAncillaryBlobMetadata(file);
             }
@@ -115,7 +116,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Services
 
         private async Task SetPublicBlobMetadata(Release release, ReleaseFileReference file)
         {
-            if (file.ReleaseFileType == ReleaseFileTypes.Ancillary)
+            if (file.ReleaseFileType == Ancillary)
             {
                 await SetPublicAncillaryBlobMetadata(release, file);
             }
@@ -162,7 +163,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Services
                 metadata: metadata);
         }
 
-        private async Task<List<ReleaseFileReference>> GetFiles(ReleaseFileTypes type)
+        private async Task<List<ReleaseFileReference>> GetFiles(FileType type)
         {
             return await _contentDbContext
                 .ReleaseFileReferences

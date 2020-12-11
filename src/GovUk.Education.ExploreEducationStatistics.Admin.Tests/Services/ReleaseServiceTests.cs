@@ -316,7 +316,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
             var file = new ReleaseFileReference
             {
                 Filename = "data.csv",
-                ReleaseFileType = ReleaseFileTypes.Data,
+                ReleaseFileType = FileType.Data,
                 Release = release,
                 SubjectId = subject.Id
             };
@@ -402,7 +402,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
             var file = new ReleaseFileReference
             {
                 Filename = "data.csv",
-                ReleaseFileType = ReleaseFileTypes.Data,
+                ReleaseFileType = FileType.Data,
                 Release = release,
                 SubjectId = subject.Id
             };
@@ -470,7 +470,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
             var file = new ReleaseFileReference
             {
                 Filename = "data.csv",
-                ReleaseFileType = ReleaseFileTypes.Data,
+                ReleaseFileType = FileType.Data,
                 Release =  release,
                 SubjectId = subject.Id
             };
@@ -478,7 +478,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
             var replacementFile = new ReleaseFileReference
             {
                 Filename = "replacement.csv",
-                ReleaseFileType = ReleaseFileTypes.Data,
+                ReleaseFileType = FileType.Data,
                 Release = release,
                 SubjectId = replacementSubject.Id,
                 Replacing = file
@@ -585,7 +585,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
             var file = new ReleaseFileReference
             {
                 Filename = "data.csv",
-                ReleaseFileType = ReleaseFileTypes.Data,
+                ReleaseFileType = FileType.Data,
                 Release =  release,
                 SubjectId = subject.Id
             };
@@ -593,7 +593,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
             var replacementFile = new ReleaseFileReference
             {
                 Filename = "replacement.csv",
-                ReleaseFileType = ReleaseFileTypes.Data,
+                ReleaseFileType = FileType.Data,
                 Release = release,
                 SubjectId = replacementSubject.Id,
                 Replacing = file

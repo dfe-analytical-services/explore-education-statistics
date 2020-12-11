@@ -62,7 +62,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
                 {
                     Release = contentRelease,
                     Filename = "data1.csv",
-                    ReleaseFileType = ReleaseFileTypes.Data,
+                    ReleaseFileType = FileType.Data,
                     SubjectId = releaseSubject1.Subject.Id
                 }
             };
@@ -74,7 +74,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
                 {
                     Release = contentRelease,
                     Filename = "data2.csv",
-                    ReleaseFileType = ReleaseFileTypes.Data,
+                    ReleaseFileType = FileType.Data,
                     SubjectId = releaseSubject2.Subject.Id,
                 }
             };
@@ -181,7 +181,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
             {
                 Release = contentRelease,
                 Filename = "data2.csv",
-                ReleaseFileType = ReleaseFileTypes.Data,
+                ReleaseFileType = FileType.Data,
                 SubjectId = releaseSubject2.Subject.Id,
             };
 
@@ -189,7 +189,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
             {
                 Release = contentRelease,
                 Filename = "data2_replacement.csv",
-                ReleaseFileType = ReleaseFileTypes.Data,
+                ReleaseFileType = FileType.Data,
                 SubjectId =  releaseSubject2Replacement.Subject.Id,
                 Replacing = file2
             };
@@ -203,7 +203,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
                 {
                     Release = contentRelease,
                     Filename = "data1.csv",
-                    ReleaseFileType = ReleaseFileTypes.Data,
+                    ReleaseFileType = FileType.Data,
                     SubjectId = releaseSubject1.Subject.Id
                 }
             };
@@ -315,7 +315,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
                 {
                     Release = contentRelease,
                     Filename = "data1.csv",
-                    ReleaseFileType = ReleaseFileTypes.Data,
+                    ReleaseFileType = FileType.Data,
                     SubjectId = releaseSubject1.Subject.Id
                 }
             };
@@ -327,7 +327,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
                 {
                     Release = contentRelease,
                     Filename = "data2.csv",
-                    ReleaseFileType = ReleaseFileTypes.Data,
+                    ReleaseFileType = FileType.Data,
                     SubjectId = releaseSubject2.Subject.Id,
                 }
             };

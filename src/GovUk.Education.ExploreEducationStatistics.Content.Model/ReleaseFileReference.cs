@@ -1,6 +1,7 @@
 using System;
 using GovUk.Education.ExploreEducationStatistics.Common.Model;
 using Newtonsoft.Json;
+using static GovUk.Education.ExploreEducationStatistics.Common.Model.FileType;
 
 namespace GovUk.Education.ExploreEducationStatistics.Content.Model
 {
@@ -17,7 +18,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Content.Model
 
         public string Filename { get; set; }
 
-        public ReleaseFileTypes ReleaseFileType { get; set; }
+        public FileType ReleaseFileType { get; set; }
 
         public string BlobStorageName
         {
@@ -27,7 +28,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Content.Model
                 // saved by ID instead of file name to
                 // prevent naming collisions.
                 // Remove this BlobStorageName field and use Id when all types are migrated
-                if (ReleaseFileType == ReleaseFileTypes.Ancillary || ReleaseFileType == ReleaseFileTypes.Chart)
+                if (ReleaseFileType == Ancillary || ReleaseFileType == Chart)
                 {
                     return Id.ToString();
                 }
