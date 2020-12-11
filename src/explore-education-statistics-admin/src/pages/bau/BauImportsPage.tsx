@@ -30,11 +30,10 @@ const BauImportsPage = () => {
             </th> */}
               <th scope="col">Subject ID</th>
               <th scope="col">Data file name</th>
-              <th scope="col">Meta file name</th>
               <th scope="col">Data file rows</th>
               <th scope="col">Status</th>
               <th scope="col">Stage Percentage Complete</th>
-              <th scope="col">Go to release</th>
+              <th scope="col">Go to release data files</th>
             </tr>
           </thead>
           {value && (
@@ -47,7 +46,6 @@ const BauImportsPage = () => {
                   </th> */}
                   <td>{subject.subjectId}</td>
                   <td>{subject.dataFileName}</td>
-                  <td>{subject.metaFileName}</td>
                   <td>{subject.numberOfRows}</td>
                   <td>{subject.status}</td>
                   <td>{subject.stagePercentageComplete}</td>
@@ -55,7 +53,7 @@ const BauImportsPage = () => {
                     <Link
                       to={`/publication/${subject.publicationId}/release/${subject.releaseId}/data`}
                     >
-                      Go to release
+                      {subject.publicationTitle} {subject.releaseTitle}
                     </Link>
                   </td>
                 </tr>

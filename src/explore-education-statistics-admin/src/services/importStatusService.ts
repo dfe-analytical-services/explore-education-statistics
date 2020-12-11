@@ -4,9 +4,10 @@ export interface ImportStatus {
   subjectTitle: string;
   subjectId: string;
   publicationId: string;
+  publicationTitle: string;
   releaseId: string;
+  releaseTitle: string;
   dataFileName: string;
-  metaFileName: string;
   numberOfRows: number;
   status: number;
   stagePercentageComplete: number;
