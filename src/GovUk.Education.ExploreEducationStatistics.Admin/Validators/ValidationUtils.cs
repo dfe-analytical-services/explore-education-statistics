@@ -91,6 +91,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Validators
         // Invite
         UnableToCancelInvite,
         InvalidEmailAddress,
+        InvalidUserRole,
 
         // Publication
         PublicationDoesNotExist,
