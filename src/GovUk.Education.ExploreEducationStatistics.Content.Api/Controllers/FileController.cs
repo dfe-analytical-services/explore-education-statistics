@@ -2,32 +2,32 @@ using System;
 using System.IO;
 using System.Threading.Tasks;
 using GovUk.Education.ExploreEducationStatistics.Common.Model;
-using GovUk.Education.ExploreEducationStatistics.Data.Api.Services.Interfaces;
+using GovUk.Education.ExploreEducationStatistics.Content.Api.Services.Interfaces;
 using Microsoft.AspNetCore.Mvc;
 using static GovUk.Education.ExploreEducationStatistics.Common.BlobContainerNames;
 using static GovUk.Education.ExploreEducationStatistics.Common.Model.ReleaseFileTypes;
 using static GovUk.Education.ExploreEducationStatistics.Common.Services.FileStoragePathUtils;
 
-namespace GovUk.Education.ExploreEducationStatistics.Data.Api.Controllers
+namespace GovUk.Education.ExploreEducationStatistics.Content.Api.Controllers
 {
-    [Route("api/[controller]")]
+    [Route("api")]
     [ApiController]
-    public class DownloadController : ControllerBase
+    public class FileController : ControllerBase
     {
         private readonly IFileStorageService _fileStorageService;
 
-        public DownloadController(IFileStorageService fileStorageService)
+        public FileController(IFileStorageService fileStorageService)
         {
             _fileStorageService = fileStorageService;
         }
 
-        [HttpGet("{publication}/{release}/data/{filename}")]
+        [HttpGet("download/{publication}/{release}/data/{filename}")]
         public async Task<ActionResult> GetDataFile(string publication, string release, string filename)
         {
             return await GetFile(PublicReleasePath(publication, release, ReleaseFileTypes.Data, filename));
         }
 
-        [HttpGet("{publication}/{release}/ancillary/{fileNameOrId}")]
+        [HttpGet("download/{publication}/{release}/ancillary/{fileNameOrId}")]
         public async Task<ActionResult> GetAncillaryFile(string publication, string release, string filenameOrId)
         {
             if (Guid.TryParse(filenameOrId, out var idAsGuid))
@@ -44,7 +44,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Api.Controllers
             return NotFound();
         }
 
-        [HttpGet("{publication}/{release}/chart/{fileId}")]
+        [HttpGet("download/{publication}/{release}/chart/{fileId}")]
         public async Task<ActionResult> GetChartFile(string publication, string release, string fileId)
         {
             if (Guid.TryParse(fileId, out var idAsGuid))

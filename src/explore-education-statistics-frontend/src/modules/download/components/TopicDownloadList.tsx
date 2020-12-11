@@ -34,7 +34,7 @@ function TopicDownloadList({ topic }: Props) {
               {downloadFiles.map(({ extension, name, path, size }) => (
                 <li key={path}>
                   <Link
-                    to={`${process.env.DATA_API_BASE_URL}/download/${path}`}
+                    to={`${process.env.CONTENT_API_BASE_URL}/download/${path}`}
                     data-testid={`download-stats-${path}`}
                     analytics={{
                       category: 'Downloads',
