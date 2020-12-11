@@ -120,13 +120,13 @@ const ReleaseDataUploadsSection = ({
 
       if (values.uploadType === 'csv') {
         file = await releaseDataFileService.uploadDataFiles(releaseId, {
-          name: values.subjectTitle,
+          name: values.subjectTitle.trim(),
           dataFile: values.dataFile as File,
           metadataFile: values.metadataFile as File,
         });
       } else {
         file = await releaseDataFileService.uploadZipDataFile(releaseId, {
-          name: values.subjectTitle,
+          name: values.subjectTitle.trim(),
           zipFile: values.zipFile as File,
         });
       }
@@ -181,6 +181,7 @@ const ReleaseDataUploadsSection = ({
           validationSchema={baseSchema =>
             baseSchema.shape({
               subjectTitle: Yup.string()
+                .trim()
                 .required('Enter a subject title')
                 .test({
                   name: 'unique',
