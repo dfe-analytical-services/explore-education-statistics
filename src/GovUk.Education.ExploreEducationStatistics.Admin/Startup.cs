@@ -234,6 +234,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin
             services.AddTransient<IContactService, ContactService>();
             services.AddTransient<ILegacyReleaseService, LegacyReleaseService>();
             services.AddTransient<IReleaseService, ReleaseService>();
+            services.AddTransient<ReleaseSubjectService.SubjectDeleter, ReleaseSubjectService.SubjectDeleter>();
             services.AddTransient<IReleaseSubjectService, ReleaseSubjectService>();
             services.AddTransient<IReleaseChecklistService, ReleaseChecklistService>();
             services.AddTransient<IReleaseRepository, ReleaseRepository>();
