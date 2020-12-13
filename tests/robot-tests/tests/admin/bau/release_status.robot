@@ -38,8 +38,17 @@ Verify release status is Higher Review
     user checks summary list contains  Scheduled release  Not scheduled
     user checks summary list contains  Next release expected  December 3001
 
+Add public prerelease access list
+    [Tags]  HappyPath
+    user clicks link  Pre-release access
+    user waits until h2 is visible  Manage pre-release user access
+    user creates public prerelease access list   Test public access list
+
 Approve release
     [Tags]  HappyPath
+    user clicks link  Sign off
+    user waits until h2 is visible  Sign off
+
     user clicks button  Edit release status
     user waits until h2 is visible  Edit release status
 
