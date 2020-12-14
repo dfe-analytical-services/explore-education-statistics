@@ -1,4 +1,5 @@
 using System;
+using System.Collections.Generic;
 using System.Threading.Tasks;
 using GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services;
 using GovUk.Education.ExploreEducationStatistics.Common.Model;
@@ -115,6 +116,111 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Processor.Tests.Functi
                 datafileProcessingMessageQueue.Object
             );
 
+            MockUtils.VerifyAllMocks(processorService, importStatusService, batchService,
+                fileImportService, importStagesMessageQueue, datafileProcessingMessageQueue);
+        }
+        
+        [Fact]
+        public void ProcessUploadsButImportIsFinished()
+        {
+            var finishedStates = new List<IStatus>
+            {
+                IStatus.COMPLETE,
+                IStatus.FAILED,
+                IStatus.NOT_FOUND,
+                IStatus.CANCELLED
+            };
+            
+            finishedStates.ForEach(currentState =>
+            {
+                var mocks = Mocks();
+                var (processorService, importStatusService, batchService, fileImportService) = mocks;
+                var importStagesMessageQueue = new Mock<ICollector<ImportMessage>>();
+                var datafileProcessingMessageQueue = new Mock<ICollector<ImportObservationsMessage>>();
+
+                var message = new ImportMessage
+                {
+                    ArchiveFileName = "an_archive",
+                    Release = new Release
+                    {
+                        Id = Guid.NewGuid()
+                    },
+                    DataFileName = "my_data_file",
+                };
+
+                var processor = new Processor.Functions.Processor(
+                    fileImportService.Object,
+                    batchService.Object,
+                    importStatusService.Object,
+                    processorService.Object,
+                    new Mock<ILogger<Processor.Functions.Processor>>().Object);
+
+                importStatusService
+                    .Setup(s => s.GetImportStatus(message.Release.Id, message.DataFileName))
+                    .ReturnsAsync(new ImportStatus
+                    {
+                        Status = currentState
+                    });
+                
+                processor.ProcessUploads(
+                    message,
+                    null,
+                    importStagesMessageQueue.Object,
+                    datafileProcessingMessageQueue.Object
+                );
+
+                // Verify that no Status updates occurred and that no further attempt to add further processing 
+                // messages to queues occurred.
+                MockUtils.VerifyAllMocks(processorService, importStatusService, batchService,
+                    fileImportService, importStagesMessageQueue, datafileProcessingMessageQueue);
+            });
+        }
+
+        [Fact]
+        public void ProcessUploadsButImportIsBeingCancelled()
+        {
+            var mocks = Mocks();
+            var (processorService, importStatusService, batchService, fileImportService) = mocks;
+            var importStagesMessageQueue = new Mock<ICollector<ImportMessage>>();
+            var datafileProcessingMessageQueue = new Mock<ICollector<ImportObservationsMessage>>();
+
+            var message = new ImportMessage
+            {
+                ArchiveFileName = "an_archive",
+                Release = new Release
+                {
+                    Id = Guid.NewGuid()
+                },
+                DataFileName = "my_data_file",
+            };
+
+            var processor = new Processor.Functions.Processor(
+                fileImportService.Object,
+                batchService.Object,
+                importStatusService.Object,
+                processorService.Object,
+                new Mock<ILogger<Processor.Functions.Processor>>().Object);
+
+            importStatusService
+                .Setup(s => s.GetImportStatus(message.Release.Id, message.DataFileName))
+                .ReturnsAsync(new ImportStatus
+                {
+                    Status = IStatus.CANCELLING
+                });
+
+            importStatusService
+                .Setup(s => s.UpdateStatus(message.Release.Id, message.DataFileName, IStatus.CANCELLED, 100))
+                .Returns(Task.CompletedTask);
+
+            processor.ProcessUploads(
+                message,
+                null,
+                importStagesMessageQueue.Object,
+                datafileProcessingMessageQueue.Object
+            );
+
+            // Verify that an import with the current Status of CANCELLING will be updated to be CANCELLED, and that
+            // no further processing messages are added to any queues.
             MockUtils.VerifyAllMocks(processorService, importStatusService, batchService,
                 fileImportService, importStagesMessageQueue, datafileProcessingMessageQueue);
         }
@@ -328,6 +434,48 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Processor.Tests.Functi
 
             MockUtils.VerifyAllMocks(processorService, importStatusService, batchService,
                 fileImportService, importStagesMessageQueue, datafileProcessingMessageQueue);
+        }
+        
+        [Fact]
+        public void CancelImport()
+        {
+            var mocks = Mocks();
+            var (processorService, importStatusService, batchService, fileImportService) = mocks;
+
+            var message = new CancelImportMessage
+            {
+                ReleaseId = Guid.NewGuid(),
+                DataFileName = "my_data_file"
+            };
+            
+            var processor = new Processor.Functions.Processor(
+                fileImportService.Object,
+                batchService.Object,
+                importStatusService.Object, 
+                processorService.Object,
+                new Mock<ILogger<Processor.Functions.Processor>>().Object);
+
+            var currentImportStatus = new ImportStatus
+            {
+                Status = IStatus.STAGE_4,
+                PercentageComplete = 10,
+                PhasePercentageComplete = 50,
+            };
+            
+            importStatusService
+                .Setup(s => s.GetImportStatus(message.ReleaseId, message.DataFileName))
+                .ReturnsAsync(currentImportStatus);
+
+            importStatusService
+                .Setup(s => s.UpdateStatus(message.ReleaseId, message.DataFileName, IStatus.CANCELLING, currentImportStatus.PercentageComplete))
+                .Returns(Task.CompletedTask);
+
+            processor.CancelImports(
+                message,
+                null);
+
+            // Verify that the  status has been updated to CANCELLING.
+            MockUtils.VerifyAllMocks(processorService, importStatusService, batchService, fileImportService);
         }
 
         private (

@@ -16,23 +16,20 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Controllers.Api.BAU
     [Route("api")]
     [ApiController]
     [Authorize]
-    public class BAUFileImportsController : Controller
+    public class BauFileImportsController : Controller
     {
         private readonly IImportService _importService;
-        private readonly IUserService _userService;
 
-        public BAUFileImportsController(IImportService importService, IUserService userService)
+        public BauFileImportsController(IImportService importService)
         {
             _importService = importService;
-            _userService = userService;
         }
 
-        [HttpPost("release/{releaseId}/data/{filename}/import/cancel")]
-        public async Task<IActionResult> CancelFileImport([FromRoute] ReleaseFileUploadInfo file)
+        [HttpPost("release/{releaseId}/data/{dataFileName}/import/cancel")]
+        public async Task<IActionResult> CancelFileImport([FromRoute] ReleaseFileImportInfo file)
         {
-            return await _userService
-                .CheckCanCancelFileImport(file)
-                .OnSuccess(import => _importService.CancelImport(file.ReleaseId, file.Filename))
+            return await _importService
+                .CancelImport(file)
                 .HandleFailuresOr(result => new AcceptedResult());
         }
     }

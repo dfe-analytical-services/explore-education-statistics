@@ -113,6 +113,24 @@ public class Either<Tl, Tr> {
 
             return Unit.Instance;
         }
+        
+        /**
+         * Convenience method so that the chained function can be
+         * void and doesn't have to explicitly return a Unit.
+         */
+        public static async Task<Either<Tl, Unit>> OnSuccessVoid<Tl, Tr>(this Task<Either<Tl, Tr>> task, Action action)
+        {
+            var firstResult = await task;
+
+            if (firstResult.IsLeft)
+            {
+                return firstResult.Left;
+            }
+
+            action();
+
+            return Unit.Instance;
+        }
 
         public static async Task<Either<Tl, T>> OnSuccess<Tl, Tr, T>(this Task<Either<Tl, Tr>> task, Func<Task<T>> func)
         {
