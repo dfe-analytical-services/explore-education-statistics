@@ -15,6 +15,7 @@ using GovUk.Education.ExploreEducationStatistics.Data.Model;
 using GovUk.Education.ExploreEducationStatistics.Data.Model.Database;
 using Microsoft.Data.SqlClient;
 using Microsoft.EntityFrameworkCore;
+using Microsoft.Extensions.Logging;
 using static GovUk.Education.ExploreEducationStatistics.Common.Services.ImportStatusService;
 
 namespace GovUk.Education.ExploreEducationStatistics.Data.Importer.Services
@@ -26,6 +27,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Importer.Services
         private readonly ImporterFilterService _importerFilterService;
         private readonly IImporterMetaService _importerMetaService;
         private readonly IImportStatusService _importStatusService;
+        private readonly ILogger<ImporterService> _logger;
 
         private enum Columns
         {
@@ -105,13 +107,15 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Importer.Services
             ImporterFilterService importerFilterService,
             ImporterLocationService importerLocationService,
             IImporterMetaService importerMetaService,
-            IImportStatusService importStatusService)
+            IImportStatusService importStatusService, 
+            ILogger<ImporterService> logger)
         {
             _guidGenerator = guidGenerator;
             _importerFilterService = importerFilterService;
             _importerLocationService = importerLocationService;
             _importerMetaService = importerMetaService;
             _importStatusService = importStatusService;
+            _logger = logger;
         }
 
         public void ImportMeta(DataTable table, Subject subject, StatisticsDbContext context)
@@ -125,7 +129,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Importer.Services
         }
 
         public async Task ImportFiltersLocationsAndSchools(DataColumnCollection cols, DataRowCollection rows,
-            SubjectMeta subjectMeta, StatisticsDbContext context, Guid releaseId, string origDataFileName)
+            SubjectMeta subjectMeta, StatisticsDbContext context, Guid releaseId, string dataFileName)
         {
             // Clearing the caches is required here as the seeder shares the cache with all subjects
             _importerFilterService.ClearCache();
@@ -139,8 +143,17 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Importer.Services
             {
                 if (rowCount % STAGE_2_ROW_CHECK == 0)
                 {
+                    var currentStatus = await _importStatusService.GetImportStatus(releaseId, dataFileName);
+
+                    if (currentStatus.IsFinishedOrAborting())
+                    {
+                        _logger.LogInformation($"Import for {dataFileName} has finished or is being aborted, " +
+                                               $"so finishing importing Filters, Locations and Schools early");
+                        return;
+                    }
+                    
                     await _importStatusService.UpdateStatus(releaseId,
-                        origDataFileName,
+                        dataFileName,
                         IStatus.STAGE_2,
                         (double) rowCount / totalRows * 100);
                 }

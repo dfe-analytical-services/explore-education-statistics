@@ -50,7 +50,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Common.Model
         
         public static bool IsFinishedOrAbortingState(IStatus state)
         {
-            return AbortingStatuses.Contains(state);
+            return IsFinishedState(state) || AbortingStatuses.Contains(state);
         }
 
         public override string ToString()
