@@ -33,7 +33,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Controllers.Api.BAU
             return await _userService
                 .CheckCanCancelFileImport(file)
                 .OnSuccess(import => _importService.CancelImport(file.ReleaseId, file.Filename))
-                .HandleFailuresOr(Ok);
+                .HandleFailuresOr(result => new AcceptedResult());
         }
     }
 }

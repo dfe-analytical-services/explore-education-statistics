@@ -57,7 +57,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Processor.Services
         {
             var subjectData = await GetSubjectDataFromMainDataFile(message);
 
-            await _validatorService.Validate(message.Release.Id, subjectData, executionContext, message)
+            await _validatorService.Validate(subjectData, executionContext, message)
                 .OnSuccessDo(async result =>
                 {
                     message.RowsPerBatch = result.RowsPerBatch;

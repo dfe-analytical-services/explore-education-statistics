@@ -77,7 +77,6 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
             {
                 SubjectId = Guid.NewGuid(),
                 DataFileName = "one.csv",
-                OrigDataFileName = "one.csv",
                 MetaFileName = "one.meta.csv",
                 Release = testRelease,
                 NumBatches = 0,
@@ -92,7 +91,6 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
             {
                 SubjectId = Guid.NewGuid(),
                 DataFileName = "two.csv",
-                OrigDataFileName = "two.csv",
                 MetaFileName = "two.meta.csv",
                 Release = testRelease,
                 NumBatches = 0,

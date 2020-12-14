@@ -156,7 +156,8 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Processor.Functions
             ExecutionContext executionContext
         )
         {
-            await _importStatusService.UpdateStatus(message.ReleaseId, message.DataFileName, IStatus.CANCELLING);
+            var currentStatus = await _importStatusService.GetImportStatus(message.ReleaseId, message.DataFileName);
+            await _importStatusService.UpdateStatus(message.ReleaseId, message.DataFileName, IStatus.CANCELLING, currentStatus.PercentageComplete);
         }
 
 
