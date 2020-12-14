@@ -12,6 +12,5 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Processor.Model
         public int BatchNo { get; set; }
         public int RowsPerBatch { get; set; }
         public int TotalRows { get; set; }
-
     }
 }
