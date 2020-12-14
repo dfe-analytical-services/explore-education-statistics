@@ -18,6 +18,6 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Importer.Services.Inte
             SubjectMeta subjectMeta, int batchNo, int rowsPerBatch, StatisticsDbContext context);
 
         Task ImportFiltersLocationsAndSchools(DataColumnCollection cols, DataRowCollection rows, SubjectMeta subjectMeta,
-            StatisticsDbContext context, Guid releaseId, string origDataFileName);
+            StatisticsDbContext context, Guid releaseId, string dataFileName);
     }
 }
