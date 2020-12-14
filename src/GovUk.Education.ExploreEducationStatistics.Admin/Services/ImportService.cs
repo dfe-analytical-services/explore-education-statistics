@@ -83,11 +83,6 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Services
             }));
         }
 
-        private static CloudQueueMessage CreateQueueMessage(object message)
-        {
-            return new CloudQueueMessage(JsonConvert.SerializeObject(message));
-        }
-
         public async Task<Either<ActionResult, Unit>> CreateImportTableRow(Guid releaseId, string dataFileName)
         {
             var result = await _tableStorageService.RetrieveEntity(DatafileImportsTableName,
@@ -167,6 +162,11 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Services
             var storageAccount = CloudStorageAccount.Parse(_storageConnectionString);
             var client = storageAccount.CreateCloudQueueClient();
             return client;
+        }
+
+        private static CloudQueueMessage CreateQueueMessage(object message)
+        {
+            return new CloudQueueMessage(JsonConvert.SerializeObject(message));
         }
     }
 

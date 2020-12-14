@@ -40,6 +40,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Common.Services
             {STAGE_2, .1},
             {STAGE_3, .1},
             {STAGE_4, .7},
+            {CANCELLED, 1},
             {COMPLETE, 1},
         };
 

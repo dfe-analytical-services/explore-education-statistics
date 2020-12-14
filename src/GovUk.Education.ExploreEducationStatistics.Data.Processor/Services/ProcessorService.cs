@@ -75,14 +75,6 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Processor.Services
                 });
         }
 
-        private async Task<SubjectData> GetSubjectDataFromMainDataFile(ImportMessage message)
-        {
-            var dataFileBlobPath = AdminReleasePath(message.Release.Id, ReleaseFileTypes.Data, message.DataFileName);
-
-            var subjectData = await _fileStorageService.GetSubjectData(message.Release.Id, dataFileBlobPath);
-            return subjectData;
-        }
-
         public async Task ProcessStage2(ImportMessage message)
         {
             var subjectData = await GetSubjectDataFromMainDataFile(message);
@@ -127,6 +119,14 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Processor.Services
             await _fileImportService.ImportFiltersLocationsAndSchools(message, statisticsDbContext);
 
             await statisticsDbContext.SaveChangesAsync();
+        }
+
+        private async Task<SubjectData> GetSubjectDataFromMainDataFile(ImportMessage message)
+        {
+            var dataFileBlobPath = AdminReleasePath(message.Release.Id, ReleaseFileTypes.Data, message.DataFileName);
+
+            var subjectData = await _fileStorageService.GetSubjectData(message.Release.Id, dataFileBlobPath);
+            return subjectData;
         }
     }
 }

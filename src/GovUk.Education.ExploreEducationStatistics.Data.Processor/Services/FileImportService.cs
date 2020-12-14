@@ -55,10 +55,6 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Processor.Services
             
             if (status.Status == CANCELLING)
             {
-                _logger.LogInformation($"Import for {message.DataFileName} is in the process of being " +
-                                       $"cancelled, so not processing any further Observations - ignoring Observations " +
-                                       $"in file {message.ObservationsFilePath}");
-
                 await HandleBatchFileDuringImportCancellation(message, releaseId);
                 return;
             }
@@ -114,14 +110,21 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Processor.Services
 
                 var numBatchesRemaining = await _fileStorageService.GetNumBatchesRemaining(releaseId, message.DataFileName);
 
-                if (numBatchesRemaining == 0)
+                if (numBatchesRemaining > 0)
+                {
+                    _logger.LogInformation($"Import for {message.DataFileName} is in the process of being " +
+                                           $"cancelled, so not processing any further Observations - ignoring Observations " +
+                                           $"in file {message.ObservationsFilePath} and continuing");
+
+                } 
+                else 
                 {
                     _logger.LogInformation($"Import for {message.DataFileName} has {message.ObservationsFilePath} " +
                                            $"as the final batch file since the cancellation request was issued - marking " +
                                            $"as cancelled");
 
                     await _importStatusService.UpdateStatus(releaseId, message.DataFileName, CANCELLED, 100);
-                }
+                } 
             }
             else
             {
