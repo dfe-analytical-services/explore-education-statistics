@@ -165,7 +165,7 @@ const ReleaseStatusChecklist = ({ checklist, release }: Props) => {
       <h3>Publishing checklist</h3>
 
       {errors.length === 0 && checklist.warnings.length === 0 && (
-        <InsetText variant="success">
+        <InsetText variant="success" testId="releaseChecklist-success">
           <h4 className="govuk-heading-m">All checks passed</h4>
 
           <p>No issues to resolve. This release can be published.</p>
@@ -173,7 +173,7 @@ const ReleaseStatusChecklist = ({ checklist, release }: Props) => {
       )}
 
       {errors.length > 0 && (
-        <InsetText variant="error">
+        <InsetText variant="error" testId="releaseChecklist-errors">
           <h4 className="govuk-heading-m">Errors</h4>
 
           <p>
@@ -200,7 +200,7 @@ const ReleaseStatusChecklist = ({ checklist, release }: Props) => {
       )}
 
       {warnings.length > 0 && (
-        <InsetText variant="warning">
+        <InsetText variant="warning" testId="releaseChecklist-warnings">
           <h4 className="govuk-heading-m">Warnings</h4>
 
           <p>
