@@ -34,21 +34,6 @@ namespace GovUk.Education.ExploreEducationStatistics.Common.Services
         public const int STAGE_1_ROW_CHECK = 1000;
         public const int STAGE_2_ROW_CHECK = 1000;
 
-        private static readonly List<IStatus> StatusUpdateIgnoreStates = new List<IStatus>
-        {
-            FAILED,
-            CANCELLING,
-            CANCELLED
-        };
-        
-        private static readonly List<IStatus> FinishedImportStatuses = new List<IStatus>
-        {
-            COMPLETE,
-            FAILED,
-            NOT_FOUND,
-            CANCELLED
-        };
-
         private static readonly Dictionary<IStatus, double> ProcessingRatios = new Dictionary<IStatus, double>()
         {
             {STAGE_1, .1},
@@ -96,46 +81,79 @@ namespace GovUk.Education.ExploreEducationStatistics.Common.Services
         public async Task<bool> IsImportFinished(Guid releaseId, string dataFileName)
         {
             var importStatus = await GetImportStatus(releaseId, dataFileName);
-
-            return FinishedImportStatuses.Contains(importStatus.Status);
+            return importStatus.IsFinished();
         }
 
         public async Task UpdateStatus(Guid releaseId,
             string dataFileName,
-            IStatus status,
+            IStatus newStatus,
             double percentageComplete = 0)
         {
             var import = await GetImport(releaseId, dataFileName);
+            var currentImportStatus = await GetImportStatus(releaseId, dataFileName);
 
             var percentageCompleteBefore = import.PercentageComplete;
             var percentageCompleteAfter = (int) Math.Clamp(percentageComplete, 0, 100);
-            var statusBefore = import.Status;
 
-            // Ignore updating when already failed, cancelled or in the process of being cancelled
-            // Ignore updating to a lower status
-            // Ignore updating to a lower percentage complete at the same status
-            if (StatusUpdateIgnoreStates.Contains(statusBefore) 
-                || statusBefore.CompareTo(status) > 0
-                || statusBefore == status && percentageCompleteBefore > percentageCompleteAfter)
+            // Don't ignore this status update if the client calling this is attempting to abort it or set it to a
+            // finished state.
+            // Ignore updating when already finished or in the process of being aborted.
+            // Ignore updating to a lower status.
+            // Ignore updating to a lower percentage complete at the same status.
+            if (!ImportStatus.IsFinishedOrAbortingState(newStatus) && 
+                (currentImportStatus.IsFinishedOrAborting() 
+                    || currentImportStatus.Status.CompareTo(newStatus) > 0
+                    || currentImportStatus.Status == newStatus && percentageCompleteBefore > percentageCompleteAfter))
             {
                 _logger.LogWarning(
-                    $"Update: {dataFileName} {statusBefore} ({percentageCompleteBefore}%) -> {status} ({percentageCompleteAfter}%) ignored");
+                    $"Update: {dataFileName} {currentImportStatus.Status} ({percentageCompleteBefore}%) -> {newStatus} ({percentageCompleteAfter}%) ignored");
                 return;
             }
 
             // Ignore updating to an equal percentage complete (after rounding) at the same status without logging it
-            if (statusBefore == status && percentageCompleteBefore == percentageCompleteAfter)
+            if (currentImportStatus.Status == newStatus && percentageCompleteBefore == percentageCompleteAfter)
             {
                 return;
             }
 
             _logger.LogInformation(
-                $"Update: {dataFileName} {statusBefore} ({percentageCompleteBefore}%) -> {status} ({percentageCompleteAfter}%)");
+                $"Update: {dataFileName} {currentImportStatus.Status} ({percentageCompleteBefore}%) -> {newStatus} ({percentageCompleteAfter}%)");
 
             import.PercentageComplete = percentageCompleteAfter;
-            import.Status = status;
+            import.Status = newStatus;
 
-            await _table.ExecuteAsync(TableOperation.Merge(import));
+            // If this is a status update that MUST be the "winner" when multiple threads are writing to the same Table
+            // Row in storage, set the If-Match header to "*" (via the ETag) to ensure that this update does not check
+            // for other updates between this entity getting retrieved and getting merged.
+            if (ImportStatus.IsFinishedOrAbortingState(newStatus))
+            {
+                var mergeOperation = TableOperation.Merge(import);
+                mergeOperation.Entity.ETag = "*";
+                await _table.ExecuteAsync(mergeOperation);
+            }
+            // Otherwise, attempt to update the Import row and if it fails due to another thread updating it first,
+            // simply ignore and continue.  
+            else
+            {
+                try
+                {
+                    await _table.ExecuteAsync(TableOperation.Replace(import));
+                }
+                catch (StorageException e)
+                {
+                    if (e.RequestInformation.HttpStatusCode == (int) HttpStatusCode.PreconditionFailed)
+                    {
+                        // If the table row has been updated in another thread subsequent
+                        // to being read above then an exception will be thrown - ignore and continue.
+                        // A similar approach will be required if optimistic locking is employed when & if
+                        // we switch from table storage to using db tables.
+                    }
+                    else
+                    {
+                        throw;
+                    }
+                }
+            }
         }
 
         private async Task<DatafileImport> GetImport(Guid releaseId, string dataFileName)

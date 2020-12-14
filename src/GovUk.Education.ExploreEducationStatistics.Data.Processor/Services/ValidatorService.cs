@@ -83,7 +83,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Processor.Services
         };
         
         public async Task<Either<IEnumerable<ValidationError>, ProcessorStatistics>>
-            Validate(Guid releaseId, SubjectData subjectData, ExecutionContext executionContext, ImportMessage message)
+            Validate(SubjectData subjectData, ExecutionContext executionContext, ImportMessage message)
         {
             _logger.LogInformation($"Validating: {message.DataFileName}");
 

@@ -25,6 +25,6 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Processor.Services.Int
 
         Task<int> GetNumBatchesRemaining(Guid releaseId, string dataFileName);
 
-        Task<IEnumerable<BlobInfo>> GetBatchFilesForDataFile(string releaseId, string dataFileName);
+        Task<IEnumerable<BlobInfo>> GetBatchFilesForDataFile(Guid releaseId, string dataFileName);
     }
 }

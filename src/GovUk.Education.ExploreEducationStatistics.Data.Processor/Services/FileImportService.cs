@@ -44,27 +44,23 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Processor.Services
         {
             var releaseId = message.ReleaseId;
 
-            // Potentially status could already be failed so don't continue
             var status = await _importStatusService.GetImportStatus(releaseId, message.DataFileName);
+
+            if (status.IsFinished())
+            {
+                _logger.LogInformation($"Import for {message.DataFileName} already finished with state " +
+                                       $"{status.Status} - ignoring Observations in file {message.ObservationsFilePath}");
+                return;
+            }
             
-            if (status.Status == CANCELLED)
+            if (status.Status == CANCELLING)
             {
                 _logger.LogInformation($"Import for {message.DataFileName} is in the process of being " +
                                        $"cancelled, so not processing any further Observations - ignoring Observations " +
                                        $"in file {message.ObservationsFilePath}");
-                return;
-            }
 
-            if (status.Status == FAILED)
-            {
-                _logger.LogInformation($"Import for {message.DataFileName} already failed - ignoring Observations " +
-                                       $"in file {message.ObservationsFilePath}");
+                await HandleBatchFileDuringImportCancellation(message, releaseId);
                 return;
-            }
-            
-            if (status.Status != STAGE_4)
-            {
-                await _importStatusService.UpdateStatus(releaseId, message.DataFileName, STAGE_4);                
             }
 
             var subjectData = await _fileStorageService.GetSubjectData(message.ReleaseId, message.ObservationsFilePath);
@@ -100,6 +96,40 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Processor.Services
             }
 
             await CheckComplete(releaseId, message, context);
+        }
+
+        /**
+         * If this Import has been requested to be cancelled, ignore the current request to import Observation file.
+         *
+         * If it is the final batch file of a batch, delete it and mark the Import as CANCELLED.  Otherwise, continue
+         * and allow the subsequent batch file import requests to deal with the cancellation.
+         *
+         * If it is a single data file that was not batched for Import, mark the Import as CANCELLED.
+         */
+        private async Task HandleBatchFileDuringImportCancellation(ImportObservationsMessage message, Guid releaseId)
+        {
+            if (message.NumBatches > 1)
+            {
+                await _fileStorageService.DeleteBlobByPath(message.ObservationsFilePath);
+
+                var numBatchesRemaining = await _fileStorageService.GetNumBatchesRemaining(releaseId, message.DataFileName);
+
+                if (numBatchesRemaining == 0)
+                {
+                    _logger.LogInformation($"Import for {message.DataFileName} has {message.ObservationsFilePath} " +
+                                           $"as the final batch file since the cancellation request was issued - marking " +
+                                           $"as cancelled");
+
+                    await _importStatusService.UpdateStatus(releaseId, message.DataFileName, CANCELLED, 100);
+                }
+            }
+            else
+            {
+                _logger.LogInformation($"Import for {message.DataFileName} is not a batch import, so " +
+                                       $"marking import as cancelled immediately");
+
+                await _importStatusService.UpdateStatus(releaseId, message.DataFileName, CANCELLED, 100);
+            }
         }
 
         public async Task ImportFiltersLocationsAndSchools(ImportMessage message, StatisticsDbContext context)
@@ -138,7 +168,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Processor.Services
         
         private async Task CheckComplete(Guid releaseId, ImportObservationsMessage message, StatisticsDbContext context)
         {
-            var numBatchesRemaining = await _fileStorageService.GetNumBatchesRemaining(releaseId.ToString(), message.DataFileName);
+            var numBatchesRemaining = await _fileStorageService.GetNumBatchesRemaining(releaseId, message.DataFileName);
             
             var import = await _importStatusService.GetImportStatus(releaseId, message.DataFileName);
 
@@ -161,7 +191,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Processor.Services
                 {
                     if (import.Errors.IsNullOrEmpty())
                     {
-                        await _importStatusService.UpdateStatus(releaseId, message.DataFileName, COMPLETE, 100);
+                        await _importStatusService.UpdateStatus(releaseId, message.DataFileName, COMPLETE);
                     }
                     else
                     {

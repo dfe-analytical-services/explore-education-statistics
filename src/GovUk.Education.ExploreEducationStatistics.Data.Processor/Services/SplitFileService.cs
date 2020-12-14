@@ -151,6 +151,15 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Processor.Services
             
             foreach (var batch in batches)
             {
+                var currentStatus = await _importStatusService.GetImportStatus(message.Release.Id, message.DataFileName);
+
+                if (currentStatus.IsFinishedOrAborting())
+                {
+                    _logger.LogInformation($"Import for {message.DataFileName} is finished or aborting - " +
+                                           $"stopping creating batch files");
+                    return;
+                }
+                
                 var batchFileName = $"{message.DataFileName}_{batchCount:000000}";
 
                 if (existingBatchFileNumbers.Contains(batchCount))
