@@ -12,7 +12,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Security.Authorizatio
     }
 
     public class CancelSpecificFileImportAuthorizationHandler 
-        : AuthorizationHandler<CancelSpecificFileImportRequirement, ReleaseFileUploadInfo>
+        : AuthorizationHandler<CancelSpecificFileImportRequirement, ReleaseFileImportInfo>
     {
         private readonly IImportStatusService _importStatusService;
 
@@ -23,9 +23,9 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Security.Authorizatio
 
         protected override async Task HandleRequirementAsync(AuthorizationHandlerContext ctx,
             CancelSpecificFileImportRequirement requirement,
-            ReleaseFileUploadInfo import)
+            ReleaseFileImportInfo import)
         {
-            if (await _importStatusService.IsImportFinished(import.ReleaseId, import.Filename))
+            if (await _importStatusService.IsImportFinished(import.ReleaseId, import.DataFileName))
             {
                 return;
             }

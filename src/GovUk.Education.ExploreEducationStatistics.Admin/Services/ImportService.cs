@@ -3,10 +3,13 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
 using AutoMapper;
+using GovUk.Education.ExploreEducationStatistics.Admin.Models;
 using GovUk.Education.ExploreEducationStatistics.Admin.Services.Interfaces;
+using GovUk.Education.ExploreEducationStatistics.Admin.Services.Interfaces.Security;
 using GovUk.Education.ExploreEducationStatistics.Common.Model;
 using GovUk.Education.ExploreEducationStatistics.Common.Services;
 using GovUk.Education.ExploreEducationStatistics.Common.Services.Interfaces;
+using GovUk.Education.ExploreEducationStatistics.Common.Services.Interfaces.Security;
 using GovUk.Education.ExploreEducationStatistics.Content.Model.Database;
 using GovUk.Education.ExploreEducationStatistics.Data.Processor.Model;
 using Microsoft.AspNetCore.Http;
@@ -31,13 +34,15 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Services
         private readonly ILogger _logger;
         private readonly IGuidGenerator _guidGenerator;
         private readonly ITableStorageService _tableStorageService;
+        private readonly IUserService _userService;
 
         public ImportService(ContentDbContext contentDbContext,
             IMapper mapper,
             ILogger<ImportService> logger,
             IConfiguration config,
             ITableStorageService tableStorageService,
-            IGuidGenerator guidGenerator)
+            IGuidGenerator guidGenerator, 
+            IUserService userService)
         {
             _context = contentDbContext;
             _mapper = mapper;
@@ -45,6 +50,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Services
             _logger = logger;
             _tableStorageService = tableStorageService;
             _guidGenerator = guidGenerator;
+            _userService = userService;
         }
 
         public async Task Import(Guid releaseId,
@@ -71,16 +77,19 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Services
             _logger.LogInformation($"Sent import message for data file: {dataFileName}, releaseId: {releaseId}");
         }
 
-        public async Task CancelImport(
-            Guid releaseId,
-            string dataFileName)
+        public Task<Either<ActionResult, Unit>> CancelImport(ReleaseFileImportInfo import)
         {
-            var queue = GetOrCreateQueue("imports-cancelling");
-            queue.AddMessage(CreateQueueMessage(new CancelImportMessage
-            {
-                ReleaseId = releaseId,
-                DataFileName = dataFileName
-            }));
+            return _userService
+                .CheckCanCancelFileImport(import)
+                .OnSuccessVoid(() =>
+                {
+                    var queue = GetOrCreateQueue("imports-cancelling");
+                    queue.AddMessage(CreateQueueMessage(new CancelImportMessage
+                    {
+                        ReleaseId = import.ReleaseId,
+                        DataFileName = import.DataFileName
+                    }));
+                });
         }
 
         public async Task<Either<ActionResult, Unit>> CreateImportTableRow(Guid releaseId, string dataFileName)

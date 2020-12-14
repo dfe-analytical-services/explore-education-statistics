@@ -241,8 +241,8 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Services.Interfaces.S
             return userService.DoCheck(comment, SecurityPolicies.CanUpdateSpecificComment);
         }
 
-        public static Task<Either<ActionResult, ReleaseFileUploadInfo>> CheckCanCancelFileImport(
-            this IUserService userService, ReleaseFileUploadInfo import)
+        public static Task<Either<ActionResult, ReleaseFileImportInfo>> CheckCanCancelFileImport(
+            this IUserService userService, ReleaseFileImportInfo import)
         {
             return userService.DoCheck(import, SecurityPolicies.CanCancelOngoingImports);
         }
