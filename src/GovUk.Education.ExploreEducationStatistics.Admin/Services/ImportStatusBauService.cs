@@ -5,7 +5,6 @@ using System.Threading.Tasks;
 using GovUk.Education.ExploreEducationStatistics.Admin.ViewModels;
 using GovUk.Education.ExploreEducationStatistics.Admin.Services.Interfaces;
 using GovUk.Education.ExploreEducationStatistics.Admin.Services.Interfaces.Security;
-using GovUk.Education.ExploreEducationStatistics.Common.Extensions;
 using GovUk.Education.ExploreEducationStatistics.Common.Model;
 using GovUk.Education.ExploreEducationStatistics.Common.Services;
 using GovUk.Education.ExploreEducationStatistics.Common.Services.Interfaces;
@@ -14,6 +13,7 @@ using GovUk.Education.ExploreEducationStatistics.Content.Model.Database;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.Azure.Cosmos.Table;
 using Microsoft.EntityFrameworkCore;
+using Microsoft.Extensions.Logging;
 using static GovUk.Education.ExploreEducationStatistics.Common.TableStorageTableNames;
 
 namespace GovUk.Education.ExploreEducationStatistics.Admin.Services
@@ -23,14 +23,17 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Services
         private readonly ITableStorageService _tableStorageService;
         private readonly IUserService _userService;
         private readonly ContentDbContext _contentDbContext;
+        private readonly ILogger<ImportStatusBauService> _logger;
 
         public ImportStatusBauService(ITableStorageService tableStorageService,
             IUserService userService,
-            ContentDbContext contentDbContext)
+            ContentDbContext contentDbContext,
+            ILogger<ImportStatusBauService> logger)
         {
             _tableStorageService = tableStorageService;
             _userService = userService;
             _contentDbContext = contentDbContext;
+            _logger = logger;
         }
 
         public async Task<Either<ActionResult, List<ImportStatusBau>>> GetAllIncompleteImports()
@@ -49,34 +52,45 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Services
                     return queryResults
                         .OrderByDescending(result => result.Timestamp)
                         .Select(async result =>
-                    {
-                        var releaseId = new Guid(result.PartitionKey);
-                        var dataFileName = result.RowKey;
-                        var release =
-                            await _contentDbContext.Releases
-                                .Where(r => r.Id == releaseId)
-                                .Include(r => r.Publication)
-                                .FirstAsync();
-
-                        var releaseFileRef = await _contentDbContext.ReleaseFileReferences.FirstAsync(r =>
-                            r.ReleaseId == releaseId &&
-                            r.Filename == dataFileName &&
-                            r.ReleaseFileType == ReleaseFileTypes.Data);
-
-                        return new ImportStatusBau()
                         {
-                            SubjectTitle = null, // EES-1655
-                            SubjectId = releaseFileRef.SubjectId,
-                            PublicationId = release.PublicationId,
-                            PublicationTitle = release.Publication.Title,
-                            ReleaseId = release.Id,
-                            ReleaseTitle = release.Title,
-                            DataFileName = result.RowKey,
-                            NumberOfRows = result.NumberOfRows,
-                            Status = result.Status,
-                            StagePercentageComplete = result.PercentageComplete,
-                        };
-                    }).Select(t => t.Result).ToList();
+                            var releaseId = new Guid(result.PartitionKey);
+                            var dataFileName = result.RowKey;
+
+                            var releaseFileRef = await _contentDbContext.ReleaseFileReferences.Where(
+                                    r =>
+                                        r.ReleaseId == releaseId &&
+                                        r.Filename == dataFileName &&
+                                        r.ReleaseFileType == ReleaseFileTypes.Data)
+                                .Include(rfr => rfr.Release)
+                                .ThenInclude(r => r.Publication)
+                                .FirstOrDefaultAsync();
+
+                            if (releaseFileRef == null)
+                            {
+                                _logger.LogWarning(
+                                    "No ReleaseFileReference found! " +
+                                    $"releaseId: \"{releaseId}\" " +
+                                    $"dataFileName: \"{dataFileName}\"");
+                                return null;
+                            }
+
+                            return new ImportStatusBau()
+                            {
+                                SubjectTitle = null, // EES-1655
+                                SubjectId = releaseFileRef.SubjectId,
+                                PublicationId = releaseFileRef.Release.PublicationId,
+                                PublicationTitle = releaseFileRef.Release.Publication.Title,
+                                ReleaseId = releaseFileRef.Release.Id,
+                                ReleaseTitle = releaseFileRef.Release.Title,
+                                DataFileName = result.RowKey,
+                                NumberOfRows = result.NumberOfRows,
+                                Status = result.Status,
+                                StagePercentageComplete = result.PercentageComplete,
+                            };
+                        })
+                        .Select(t => t?.Result)
+                        .Where(item => item != null)
+                        .ToList();
                 });
         }
     }
