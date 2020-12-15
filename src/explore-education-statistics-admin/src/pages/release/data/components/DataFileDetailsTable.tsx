@@ -1,18 +1,12 @@
-import Link from '@admin/components/Link';
 import ImporterStatus, {
   ImporterStatusChangeHandler,
 } from '@admin/pages/release/data/components/ImporterStatus';
-import {
-  releaseDataFileRoute,
-  ReleaseDataFileRouteParams,
-} from '@admin/routes/releaseRoutes';
 import releaseDataFileService, {
   DataFile,
 } from '@admin/services/releaseDataFileService';
 import ButtonText from '@common/components/ButtonText';
 import FormattedDate from '@common/components/FormattedDate';
 import React, { ReactNode } from 'react';
-import { generatePath } from 'react-router';
 
 interface Props {
   children?: ReactNode;
@@ -191,25 +185,7 @@ const DataFileDetailsTable = ({
           <tr>
             <th scope="row">Actions</th>
             <td colSpan={2}>
-              <div className="dfe-float--right">
-                {children}
-
-                {canCancelImport && (
-                  <Link
-                    className="govuk-!-margin-right-4"
-                    to={generatePath<ReleaseDataFileRouteParams>(
-                      releaseDataFileRoute.path,
-                      {
-                        publicationId,
-                        releaseId,
-                        fileId: dataFile.id,
-                      },
-                    )}
-                  >
-                    Replace data
-                  </Link>
-                )}
-              </div>
+              <div className="dfe-float--right">{children}</div>
             </td>
           </tr>
         )}
