@@ -172,21 +172,25 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Services
 
         private async Task<List<Release>> GetPublicReleases()
         {
-            var allReleases = await _contentDbContext
-                .Releases
-                .Include(release => release.Publication)
+            var publications = await _contentDbContext.Publications
+                .Include(publication => publication.Releases)
                 .ToListAsync();
 
-            var publicReleases = allReleases
+            return publications.SelectMany(publication => publication.Releases)
                 .Where(release =>
-                    release.Live &&
-                    !allReleases.Any(r =>
-                    r.PreviousVersionId == release.Id
-                    && r.Live
-                    && r.Id != release.Id))
+                    // Release itself must be live
+                    release.Live
+                    // It must also be the latest version unless the later version is a draft
+                    && IsLatestVersionOfReleaseIgnoringDrafts(release))
                 .ToList();
+        }
 
-            return publicReleases;
+        private static bool IsLatestVersionOfReleaseIgnoringDrafts(Release release)
+        {
+            return !release.Publication.Releases.Any(r =>
+                r.Live
+                && r.PreviousVersionId == release.Id
+                && r.Id != release.Id);
         }
 
         private async Task MarkFileAsMigrated(ReleaseFileReference file)
