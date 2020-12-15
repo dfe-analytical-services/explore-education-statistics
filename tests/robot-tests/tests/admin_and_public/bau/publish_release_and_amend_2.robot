@@ -402,8 +402,6 @@ Replace data files for amendment
     user clicks button  Confirm
     #EES-1442: Bug when Confirm data replacement button doesn't show
     user reloads page
-#    Sleep  10000
-#    user scrolls down  800
     user waits until page contains  Footnotes: OK
     user waits until page contains  Data blocks: OK
     user waits until button is enabled  Confirm data replacement
@@ -411,7 +409,6 @@ Replace data files for amendment
 Confirm data replacement
     [Tags]  HappyPath
     user clicks button  Confirm data replacement
-    # potentially a bug here
 
 Delete second subject file
     [Tags]  HappyPath
