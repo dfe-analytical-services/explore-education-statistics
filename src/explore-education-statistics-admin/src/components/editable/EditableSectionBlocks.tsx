@@ -12,7 +12,9 @@ import isBrowser from '@common/utils/isBrowser';
 import reorder from '@common/utils/reorder';
 import React, { useCallback, useState } from 'react';
 import { DragDropContext, DropResult } from 'react-beautiful-dnd';
+import classNames from 'classnames';
 import EditableBlockRenderer from './EditableBlockRenderer';
+import styles from './EditableSectionBlocks.module.scss';
 
 export interface EditableSectionBlockProps extends SectionBlocksProps {
   content: EditableBlock[];
@@ -26,7 +28,7 @@ export interface EditableSectionBlockProps extends SectionBlocksProps {
 }
 
 const EditableSectionBlocks = (props: EditableSectionBlockProps) => {
-  const [openedCommentId, setOpenedCommentId] = useState<string>('');
+  const [openedCommentId, setOpenedCommentId] = useState<string[]>([]);
 
   const {
     releaseId,
@@ -84,7 +86,10 @@ const EditableSectionBlocks = (props: EditableSectionBlockProps) => {
           <div
             key={block.id}
             id={`editableSectionBlocks-${block.id}`}
-            className="govuk-!-margin-bottom-9"
+            className={classNames(
+              'govuk-!-margin-bottom-9',
+              openedCommentId.includes(block.id) && styles.openSectionBlock,
+            )}
             data-testid="editableSectionBlock"
           >
             <BlockDraggable
@@ -99,13 +104,14 @@ const EditableSectionBlocks = (props: EditableSectionBlockProps) => {
                   blockId={block.id}
                   comments={block.comments}
                   canComment
+                  onChange={handleCommentsChange}
                   onToggle={opened =>
                     opened
-                      ? setOpenedCommentId(block.id)
-                      : setOpenedCommentId('')
+                      ? setOpenedCommentId([block.id, ...openedCommentId])
+                      : setOpenedCommentId(
+                          openedCommentId.filter(e => e !== block.id),
+                        )
                   }
-                  onChange={handleCommentsChange}
-                  open={block.id === openedCommentId}
                 />
               )}
 
