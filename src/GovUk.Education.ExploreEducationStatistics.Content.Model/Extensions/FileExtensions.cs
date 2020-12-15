@@ -19,6 +19,11 @@ namespace GovUk.Education.ExploreEducationStatistics.Content.Model.Extensions
                 file.BlobStorageName);
         }
 
+        public static string PublicPath(this ReleaseFile releaseFile, string publicationSlug, string releaseSlug)
+        {
+            return releaseFile.ReleaseFileReference.PublicPath(publicationSlug, releaseSlug);
+        }
+
         public static string PublicPath(this ReleaseFileReference file, string publicationSlug, string releaseSlug)
         {
             return PublicReleasePath(publicationSlug,

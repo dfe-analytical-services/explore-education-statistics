@@ -1,104 +1,72 @@
-﻿using System;
-using System.Threading.Tasks;
+﻿using System.Threading.Tasks;
 using GovUk.Education.ExploreEducationStatistics.Common.Model;
+using GovUk.Education.ExploreEducationStatistics.Common.Services;
 using GovUk.Education.ExploreEducationStatistics.Common.Services.Interfaces;
-using GovUk.Education.ExploreEducationStatistics.Content.Model;
-using GovUk.Education.ExploreEducationStatistics.Content.Model.Extensions;
 using GovUk.Education.ExploreEducationStatistics.Publisher.Services;
 using Microsoft.Extensions.Logging;
 using Moq;
 using Xunit;
 using static GovUk.Education.ExploreEducationStatistics.Common.BlobContainerNames;
-using static GovUk.Education.ExploreEducationStatistics.Common.Services.FileStorageUtils;
 
 namespace GovUk.Education.ExploreEducationStatistics.Publisher.Tests.Services
 {
     public class FileStorageServiceTests
     {
         [Fact]
-        public async Task GetPublicFileInfo()
+        public async Task CheckBlobExists_BlobExists()
         {
-            const string publicationSlug = "publication-slug";
-            const string releaseSlug = "release-slug";
-
-            var file = new ReleaseFileReference
-            {
-                Id = Guid.NewGuid(),
-                Filename = "data.csv",
-                ReleaseFileType = ReleaseFileTypes.Data
-            };
-
             var publicBlobStorageService = new Mock<IBlobStorageService>(MockBehavior.Strict);
 
             publicBlobStorageService.Setup(s =>
-                    s.CheckBlobExists(PublicFilesContainerName, file.PublicPath(publicationSlug, releaseSlug)))
+                    s.CheckBlobExists(PublicFilesContainerName, "path"))
                 .ReturnsAsync(true);
-
-            publicBlobStorageService.Setup(s =>
-                    s.GetBlob(PublicFilesContainerName, file.PublicPath(publicationSlug, releaseSlug)))
-                .ReturnsAsync(new BlobInfo
-                (
-                    path: file.PublicPath(publicationSlug, releaseSlug),
-                    size: "400 B",
-                    contentType: "text/csv",
-                    contentLength: 400L,
-                    meta: GetDataFileMetaValues(
-                        name: "Test data file",
-                        metaFileName: "test-data.meta.csv",
-                        userName: "test@test.com",
-                        numberOfRows: 200
-                    )
-                ));
 
             var service = BuildFileStorageService(
                 publicBlobStorageService: publicBlobStorageService.Object);
 
-            var result = await service.GetPublicFileInfo(publicationSlug, releaseSlug, file);
-
-            publicBlobStorageService.VerifyAll();
-
-            Assert.Equal(file.Id, result.Id);
-            Assert.Equal("csv", result.Extension);
-            Assert.Equal("data.csv", result.FileName);
-            Assert.Equal("Test data file", result.Name);
-            Assert.Equal(file.PublicPath(publicationSlug, releaseSlug), result.Path);
-            Assert.Equal("400 B", result.Size);
-            Assert.Equal(ReleaseFileTypes.Data, result.Type);
+            Assert.True(await service.CheckBlobExists(PublicFilesContainerName, "path"));
         }
 
         [Fact]
-        public async Task GetPublicFileInfo_FileNotFound()
+        public async Task CheckBlobExists_BlobDoesNotExist()
         {
-            const string publicationSlug = "publication-slug";
-            const string releaseSlug = "release-slug";
-
-            var file = new ReleaseFileReference
-            {
-                Id = Guid.NewGuid(),
-                Filename = "data.csv",
-                ReleaseFileType = ReleaseFileTypes.Data
-            };
-
             var publicBlobStorageService = new Mock<IBlobStorageService>(MockBehavior.Strict);
 
             publicBlobStorageService.Setup(s =>
-                    s.CheckBlobExists(PublicFilesContainerName, file.PublicPath(publicationSlug, releaseSlug)))
+                    s.CheckBlobExists(PublicFilesContainerName, "path"))
                 .ReturnsAsync(false);
 
             var service = BuildFileStorageService(
                 publicBlobStorageService: publicBlobStorageService.Object);
 
-            var result = await service.GetPublicFileInfo(publicationSlug, releaseSlug, file);
+            Assert.False(await service.CheckBlobExists(PublicFilesContainerName, "path"));
+        }
 
-            publicBlobStorageService.VerifyAll();
+        [Fact]
+        public async Task GetBlob()
+        {
+            var publicBlobStorageService = new Mock<IBlobStorageService>(MockBehavior.Strict);
 
-            Assert.Equal(file.Id, result.Id);
-            Assert.Equal("csv", result.Extension);
-            Assert.Equal("data.csv", result.FileName);
-            Assert.Equal("Unknown", result.Name);
-            Assert.Null(result.Path);
-            Assert.Equal("0.00 B", result.Size);
-            Assert.Equal(ReleaseFileTypes.Data, result.Type);
+            var blobInfo = new BlobInfo
+            (
+                path: "data.csv",
+                size: "400 B",
+                contentType: "text/csv",
+                contentLength: 0L,
+                meta: FileStorageUtils.GetAncillaryFileMetaValues(
+                    name: "Test data file",
+                    filename: "data.csv"
+                )
+            );
+
+            publicBlobStorageService.Setup(s =>
+                    s.GetBlob(PublicFilesContainerName, "path"))
+                .ReturnsAsync(blobInfo);
+
+            var service = BuildFileStorageService(
+                publicBlobStorageService: publicBlobStorageService.Object);
+
+            Assert.Equal(blobInfo, await service.GetBlob(PublicFilesContainerName, "path"));
         }
 
         private static FileStorageService BuildFileStorageService(

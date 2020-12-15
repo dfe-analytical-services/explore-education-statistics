@@ -40,6 +40,18 @@ namespace GovUk.Education.ExploreEducationStatistics.Content.Model.Tests.Extensi
         }
 
         [Fact]
+        public void PublicPath_ReleaseFile()
+        {
+            var releaseFile = new ReleaseFile
+            {
+                ReleaseFileReference = _file
+            };
+
+            Assert.Equal(_file.PublicPath(PublicationSlug, ReleaseSlug),
+                releaseFile.PublicPath(PublicationSlug, ReleaseSlug));
+        }
+
+        [Fact]
         public void PublicPath()
         {
             Assert.Equal(PublicReleasePath(PublicationSlug, ReleaseSlug, _file.ReleaseFileType, _file.BlobStorageName),

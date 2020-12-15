@@ -12,7 +12,6 @@ using Azure.Storage.Blobs.Specialized;
 using GovUk.Education.ExploreEducationStatistics.Common.Model;
 using GovUk.Education.ExploreEducationStatistics.Common.Services.Interfaces;
 using GovUk.Education.ExploreEducationStatistics.Content.Model;
-using GovUk.Education.ExploreEducationStatistics.Content.Model.Extensions;
 using GovUk.Education.ExploreEducationStatistics.Publisher.Models;
 using GovUk.Education.ExploreEducationStatistics.Publisher.Services.Interfaces;
 using ICSharpCode.SharpZipLib.Zip;
@@ -24,7 +23,6 @@ using static GovUk.Education.ExploreEducationStatistics.Common.BlobContainerName
 using static GovUk.Education.ExploreEducationStatistics.Common.Extensions.BlobInfoExtensions;
 using static GovUk.Education.ExploreEducationStatistics.Common.Services.FileStoragePathUtils;
 using static GovUk.Education.ExploreEducationStatistics.Common.Services.FileStorageUtils;
-using FileInfo = GovUk.Education.ExploreEducationStatistics.Common.Model.FileInfo;
 
 namespace GovUk.Education.ExploreEducationStatistics.Publisher.Services
 {
@@ -84,6 +82,11 @@ namespace GovUk.Education.ExploreEducationStatistics.Publisher.Services
             await leaseClient.AcquireAsync(TimeSpan.FromSeconds(30));
 
             return new BlobLease(leaseClient);
+        }
+
+        public async Task<bool> CheckBlobExists(string containerName, string path)
+        {
+            return await _publicBlobStorageService.CheckBlobExists(containerName, path);
         }
 
         public async Task CopyReleaseFilesToPublicContainer(CopyReleaseFilesCommand copyReleaseFilesCommand)
@@ -157,38 +160,9 @@ namespace GovUk.Education.ExploreEducationStatistics.Publisher.Services
             await _publicBlobStorageService.DeleteBlob(PublicContentContainerName, path);
         }
 
-        [Obsolete("Use GetPublicFileInfo with a file reference instead of filename")]
-        public async Task<FileInfo> GetPublicFileInfo(ReleaseFileTypes type, string path)
+        public async Task<BlobInfo> GetBlob(string containerName, string path)
         {
-            var blob = await _publicBlobStorageService.GetBlob(PublicFilesContainerName, path);
-
-            return new FileInfo
-            {
-                Id = null,
-                FileName = blob.FileName,
-                Name = blob.Name,
-                Path = blob.Path,
-                Size = blob.Size,
-                Type = type
-            };
-        }
-
-        public async Task<FileInfo> GetPublicFileInfo(string publication, string release, ReleaseFileReference file)
-        {
-            var exists = await _publicBlobStorageService.CheckBlobExists(PublicFilesContainerName,
-                file.PublicPath(publication, release));
-
-            if (!exists)
-            {
-                _logger.LogWarning("Public blob not found for file: {0} at: {1}", file.Id,
-                    file.PublicPath(publication, release));
-                return file.ToFileInfoNotFound();
-            }
-
-            var blob = await _publicBlobStorageService.GetBlob(PublicFilesContainerName,
-                file.PublicPath(publication, release));
-
-            return file.ToPublicFileInfo(blob);
+            return await _publicBlobStorageService.GetBlob(containerName, path);
         }
 
         public async Task MovePublicDirectory(string containerName, string sourceDirectoryPath, string destinationDirectoryPath)
@@ -295,14 +269,9 @@ namespace GovUk.Education.ExploreEducationStatistics.Publisher.Services
                 contentType: "application/x-zip-compressed",
                 options: new IBlobStorageService.UploadStreamOptions
                 {
-                    MetaValues = new Dictionary<string, string>
-                    {
-                        {NameKey, zipFileName},
-                        {
-                            ReleaseDateTimeKey,
-                            copyReleaseFilesCommand.PublishScheduled.ToString("o", CultureInfo.InvariantCulture)
-                        }
-                    }
+                    MetaValues = GetAllFilesZipMetaValues(
+                        name: zipFileName,
+                        releaseDateTime: copyReleaseFilesCommand.PublishScheduled)
                 }
             );
         }

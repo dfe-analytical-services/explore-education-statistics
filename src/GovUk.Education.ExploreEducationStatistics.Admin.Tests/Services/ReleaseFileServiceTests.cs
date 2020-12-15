@@ -7,7 +7,6 @@ using GovUk.Education.ExploreEducationStatistics.Admin.Services;
 using GovUk.Education.ExploreEducationStatistics.Admin.Services.Interfaces;
 using GovUk.Education.ExploreEducationStatistics.Common.Extensions;
 using GovUk.Education.ExploreEducationStatistics.Common.Model;
-using GovUk.Education.ExploreEducationStatistics.Common.Services;
 using GovUk.Education.ExploreEducationStatistics.Common.Services.Interfaces;
 using GovUk.Education.ExploreEducationStatistics.Common.Services.Interfaces.Security;
 using GovUk.Education.ExploreEducationStatistics.Common.Utils;
@@ -24,6 +23,7 @@ using static GovUk.Education.ExploreEducationStatistics.Admin.Validators.Validat
 using static GovUk.Education.ExploreEducationStatistics.Common.BlobContainerNames;
 using static GovUk.Education.ExploreEducationStatistics.Common.Model.ReleaseFileTypes;
 using static GovUk.Education.ExploreEducationStatistics.Common.Services.FileStoragePathUtils;
+using static GovUk.Education.ExploreEducationStatistics.Common.Services.FileStorageUtils;
 
 namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
 {
@@ -967,7 +967,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
                     size: "10 Kb",
                     contentType: "application/pdf",
                     contentLength: 0L,
-                    meta: FileStorageUtils.GetAncillaryFileMetaValues(
+                    meta: GetAncillaryFileMetaValues(
                         filename: "ancillary_1.pdf",
                         name: "Ancillary Test File 1"),
                     created: null));
@@ -979,7 +979,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
                     size: "10 Kb",
                     contentType: "application/pdf",
                     contentLength: 0L,
-                    meta: FileStorageUtils.GetAncillaryFileMetaValues(
+                    meta: GetAncillaryFileMetaValues(
                         filename: "Ancillary  2.pdf",
                         name: "Ancillary Test File 2"),
                     created: null));
@@ -1285,7 +1285,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
                     size: "10 Kb",
                     contentType: "application/pdf",
                     contentLength: 0L,
-                    meta: FileStorageUtils.GetAncillaryFileMetaValues(
+                    meta: GetAncillaryFileMetaValues(
                         filename: filename,
                         name: uploadName),
                     created: null));

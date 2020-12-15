@@ -11,6 +11,8 @@ namespace GovUk.Education.ExploreEducationStatistics.Publisher.Services.Interfac
     {
         Task<BlobLease> AcquireLease(string blobName);
 
+        Task<bool> CheckBlobExists(string containerName, string path);
+
         Task CopyReleaseFilesToPublicContainer(CopyReleaseFilesCommand copyReleaseFilesCommand);
 
         Task DeleteAllContentAsyncExcludingStaging();
@@ -21,10 +23,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Publisher.Services.Interfac
 
         Task DeletePublicBlob(string path);
 
-        [Obsolete("Use GetPublicFileInfo with a file reference instead of filename")]
-        Task<FileInfo> GetPublicFileInfo(ReleaseFileTypes type, string filename);
-
-        Task<FileInfo> GetPublicFileInfo(string publication, string release, ReleaseFileReference file);
+        Task<BlobInfo> GetBlob(string containerName, string path);
 
         Task MovePublicDirectory(string containerName, string sourceDirectoryPath, string destinationDirectoryPath);
 

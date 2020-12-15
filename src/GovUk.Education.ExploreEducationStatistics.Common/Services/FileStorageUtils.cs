@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Diagnostics.CodeAnalysis;
+using System.Globalization;
 using System.IO;
 using GovUk.Education.ExploreEducationStatistics.Common.Extensions;
 using Microsoft.Azure.Storage.Blob;
@@ -18,6 +19,21 @@ namespace GovUk.Education.ExploreEducationStatistics.Common.Services
             Mb,
             Gb,
             Tb
+        }
+
+        public static IDictionary<string, string> GetAllFilesZipMetaValues(
+            string name,
+            DateTime releaseDateTime)
+        {
+            return new Dictionary<string, string>
+            {
+                {
+                    BlobInfoExtensions.NameKey, name
+                },
+                {
+                    BlobInfoExtensions.ReleaseDateTimeKey, releaseDateTime.ToString("o", CultureInfo.InvariantCulture)
+                }
+            };
         }
 
         public static IDictionary<string, string> GetAncillaryFileMetaValues(
