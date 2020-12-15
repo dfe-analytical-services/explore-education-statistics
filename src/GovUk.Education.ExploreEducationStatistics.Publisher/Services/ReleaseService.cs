@@ -231,18 +231,18 @@ namespace GovUk.Education.ExploreEducationStatistics.Publisher.Services
         {
             var exists = await _fileStorageService.CheckBlobExists(
                 containerName: PublicFilesContainerName,
-                path: file.PublicPath(release.Publication.Slug, release.Slug));
+                path: file.PublicPath(release));
 
             if (!exists)
             {
                 _logger.LogWarning("Public blob not found for file: {0} at: {1}", file.Id,
-                    file.PublicPath(release.Publication.Slug, release.Slug));
+                    file.PublicPath(release));
                 return file.ToFileInfoNotFound();
             }
 
             var blob = await _fileStorageService.GetBlob(
                 containerName: PublicFilesContainerName,
-                path: file.PublicPath(release.Publication.Slug, release.Slug));
+                path: file.PublicPath(release));
 
             return file.ToPublicFileInfo(blob);
         }

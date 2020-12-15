@@ -140,7 +140,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Services
         {
             var blob = await _publicBlobStorageService.GetBlob(
                 containerName: PublicFilesContainerName,
-                path: file.PublicPath(release.Publication.Slug, release.Slug));
+                path: file.PublicPath(release));
 
             var metadata = GetAncillaryFileMetaValues(
                 filename: file.Filename,
@@ -158,7 +158,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Services
 
             await _publicBlobStorageService.SetMetadata(
                 containerName: PublicFilesContainerName,
-                path: file.PublicPath(release.Publication.Slug, release.Slug),
+                path: file.PublicPath(release),
                 metadata: metadata);
         }
 
@@ -223,7 +223,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Services
             if (!await _publicBlobStorageService.MoveBlob(
                 containerName: PublicFilesContainerName,
                 sourcePath: sourcePath,
-                destinationPath: file.PublicPath(release.Publication.Slug, release.Slug)))
+                destinationPath: file.PublicPath(release)))
             {
                 throw new InvalidOperationException($"Unable to move public blob for file: {file.Id} - {sourcePath}");
             }

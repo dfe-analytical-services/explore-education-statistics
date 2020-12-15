@@ -567,24 +567,20 @@ namespace GovUk.Education.ExploreEducationStatistics.Publisher.Tests.Services
             {
                 fileStorageService.Setup(s =>
                         s.CheckBlobExists(PublicFilesContainerName,
-                            PublicationARelease2AncillaryReleaseFile.PublicPath(
-                                PublicationA.Slug, PublicationARelease2.Slug)))
+                            PublicationARelease2AncillaryReleaseFile.PublicPath()))
                     .ReturnsAsync(true);
 
                 fileStorageService.Setup(s =>
                         s.CheckBlobExists(PublicFilesContainerName,
-                            PublicationARelease2DataReleaseFile.PublicPath(
-                                PublicationA.Slug, PublicationARelease2.Slug)))
+                            PublicationARelease2DataReleaseFile.PublicPath()))
                     .ReturnsAsync(true);
 
                 fileStorageService.Setup(s =>
                         s.GetBlob(PublicFilesContainerName,
-                            PublicationARelease2AncillaryReleaseFile.PublicPath(
-                                PublicationA.Slug, PublicationARelease2.Slug)))
+                            PublicationARelease2AncillaryReleaseFile.PublicPath()))
                     .ReturnsAsync(new BlobInfo
                     (
-                        path: PublicationARelease2AncillaryReleaseFile.PublicPath(
-                            PublicationA.Slug, PublicationARelease2.Slug),
+                        path: PublicationARelease2AncillaryReleaseFile.PublicPath(),
                         size: "15 Kb",
                         contentType: "application/pdf",
                         contentLength: 0L,
@@ -596,12 +592,10 @@ namespace GovUk.Education.ExploreEducationStatistics.Publisher.Tests.Services
 
                 fileStorageService.Setup(s =>
                         s.GetBlob(PublicFilesContainerName,
-                            PublicationARelease2DataReleaseFile.PublicPath(
-                                PublicationA.Slug, PublicationARelease2.Slug)))
+                            PublicationARelease2DataReleaseFile.PublicPath()))
                     .ReturnsAsync(new BlobInfo
                     (
-                        path: PublicationARelease2DataReleaseFile.PublicPath(
-                            PublicationA.Slug, PublicationARelease2.Slug),
+                        path: PublicationARelease2DataReleaseFile.PublicPath(),
                         size: "10 Mb",
                         contentType: "text/csv",
                         contentLength: 0L,
@@ -647,14 +641,14 @@ namespace GovUk.Education.ExploreEducationStatistics.Publisher.Tests.Services
                 Assert.Equal("pdf", result[1].Extension);
                 Assert.Equal("ancillary.pdf", result[1].FileName);
                 Assert.Equal("Ancillary Test File", result[1].Name);
-                Assert.Equal(PublicationARelease2AncillaryReleaseFile.PublicPath(PublicationA.Slug, PublicationARelease2.Slug), result[1].Path);
+                Assert.Equal(PublicationARelease2AncillaryReleaseFile.PublicPath(), result[1].Path);
                 Assert.Equal("15 Kb", result[1].Size);
                 Assert.Equal(ReleaseFileTypes.Ancillary, result[1].Type);
                 Assert.Equal(PublicationARelease2DataReleaseFile.ReleaseFileReference.Id, result[2].Id);
                 Assert.Equal("csv", result[2].Extension);
                 Assert.Equal("data.csv", result[2].FileName);
                 Assert.Equal("Data Test File", result[2].Name);
-                Assert.Equal(PublicationARelease2DataReleaseFile.PublicPath(PublicationA.Slug, PublicationARelease2.Slug), result[2].Path);
+                Assert.Equal(PublicationARelease2DataReleaseFile.PublicPath(), result[2].Path);
                 Assert.Equal("10 Mb", result[2].Size);
                 Assert.Equal(ReleaseFileTypes.Data, result[2].Type);
             }
@@ -732,24 +726,20 @@ namespace GovUk.Education.ExploreEducationStatistics.Publisher.Tests.Services
             {
                 fileStorageService.Setup(s =>
                         s.CheckBlobExists(PublicFilesContainerName,
-                            PublicationARelease2AncillaryReleaseFile.PublicPath(
-                                PublicationA.Slug, PublicationARelease2.Slug)))
+                            PublicationARelease2AncillaryReleaseFile.PublicPath()))
                     .ReturnsAsync(true);
 
                 fileStorageService.Setup(s =>
                         s.CheckBlobExists(PublicFilesContainerName,
-                            PublicationARelease2DataReleaseFile.PublicPath(
-                                PublicationA.Slug, PublicationARelease2.Slug)))
+                            PublicationARelease2DataReleaseFile.PublicPath()))
                     .ReturnsAsync(true);
 
                 fileStorageService.Setup(s =>
                         s.GetBlob(PublicFilesContainerName,
-                            PublicationARelease2AncillaryReleaseFile.PublicPath(
-                                PublicationA.Slug, PublicationARelease2.Slug)))
+                            PublicationARelease2AncillaryReleaseFile.PublicPath()))
                     .ReturnsAsync(new BlobInfo
                     (
-                        path: PublicationARelease2AncillaryReleaseFile.PublicPath(
-                            PublicationA.Slug, PublicationARelease2.Slug),
+                        path: PublicationARelease2AncillaryReleaseFile.PublicPath(),
                         size: "15 Kb",
                         contentType: "application/pdf",
                         contentLength: 0L,
@@ -761,12 +751,10 @@ namespace GovUk.Education.ExploreEducationStatistics.Publisher.Tests.Services
 
                 fileStorageService.Setup(s =>
                         s.GetBlob(PublicFilesContainerName,
-                            PublicationARelease2DataReleaseFile.PublicPath(
-                                PublicationA.Slug, PublicationARelease2.Slug)))
+                            PublicationARelease2DataReleaseFile.PublicPath()))
                     .ReturnsAsync(new BlobInfo
                     (
-                        path: PublicationARelease2DataReleaseFile.PublicPath(
-                            PublicationA.Slug, PublicationARelease2.Slug),
+                        path: PublicationARelease2DataReleaseFile.PublicPath(),
                         size: "10 Mb",
                         contentType: "text/csv",
                         contentLength: 0L,
@@ -864,14 +852,14 @@ namespace GovUk.Education.ExploreEducationStatistics.Publisher.Tests.Services
                 Assert.Equal("pdf", result.DownloadFiles[1].Extension);
                 Assert.Equal("ancillary.pdf", result.DownloadFiles[1].FileName);
                 Assert.Equal("Ancillary Test File", result.DownloadFiles[1].Name);
-                Assert.Equal(PublicationARelease2AncillaryReleaseFile.PublicPath(PublicationA.Slug, PublicationARelease2.Slug), result.DownloadFiles[1].Path);
+                Assert.Equal(PublicationARelease2AncillaryReleaseFile.PublicPath(), result.DownloadFiles[1].Path);
                 Assert.Equal("15 Kb", result.DownloadFiles[1].Size);
                 Assert.Equal(ReleaseFileTypes.Ancillary, result.DownloadFiles[1].Type);
                 Assert.Equal(PublicationARelease2DataReleaseFile.ReleaseFileReference.Id, result.DownloadFiles[2].Id);
                 Assert.Equal("csv", result.DownloadFiles[2].Extension);
                 Assert.Equal("data.csv", result.DownloadFiles[2].FileName);
                 Assert.Equal("Data Test File", result.DownloadFiles[2].Name);
-                Assert.Equal(PublicationARelease2DataReleaseFile.PublicPath(PublicationA.Slug, PublicationARelease2.Slug), result.DownloadFiles[2].Path);
+                Assert.Equal(PublicationARelease2DataReleaseFile.PublicPath(), result.DownloadFiles[2].Path);
                 Assert.Equal("10 Mb", result.DownloadFiles[2].Size);
                 Assert.Equal(ReleaseFileTypes.Data, result.DownloadFiles[2].Type);
 

@@ -42,20 +42,38 @@ namespace GovUk.Education.ExploreEducationStatistics.Content.Model.Tests.Extensi
         [Fact]
         public void PublicPath_ReleaseFile()
         {
+            var release = new Release
+            {
+                Publication = new Publication
+                {
+                    Slug = PublicationSlug
+                },
+                Slug = ReleaseSlug
+            };
+
             var releaseFile = new ReleaseFile
             {
+                Release = release,
                 ReleaseFileReference = _file
             };
 
-            Assert.Equal(_file.PublicPath(PublicationSlug, ReleaseSlug),
-                releaseFile.PublicPath(PublicationSlug, ReleaseSlug));
+            Assert.Equal(_file.PublicPath(release), releaseFile.PublicPath());
         }
 
         [Fact]
         public void PublicPath()
         {
+            var release = new Release
+            {
+                Publication = new Publication
+                {
+                    Slug = PublicationSlug
+                },
+                Slug = ReleaseSlug
+            };
+            
             Assert.Equal(PublicReleasePath(PublicationSlug, ReleaseSlug, _file.ReleaseFileType, _file.BlobStorageName),
-                _file.PublicPath(PublicationSlug, ReleaseSlug));
+                _file.PublicPath(release));
         }
 
         [Fact]
@@ -125,9 +143,18 @@ namespace GovUk.Education.ExploreEducationStatistics.Content.Model.Tests.Extensi
         [Fact]
         public void ToPublicFileInfo()
         {
+            var release = new Release
+            {
+                Publication = new Publication
+                {
+                    Slug = PublicationSlug
+                },
+                Slug = ReleaseSlug
+            };
+
             var result = _file.ToPublicFileInfo(new BlobInfo
             (
-                path: _file.PublicPath(PublicationSlug, ReleaseSlug),
+                path: _file.PublicPath(release),
                 size: "400 B",
                 contentType: "Ignored",
                 contentLength: -1L,
@@ -142,7 +169,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Content.Model.Tests.Extensi
             Assert.Equal("pdf", result.Extension);
             Assert.Equal("ancillary.pdf", result.FileName);
             Assert.Equal("Test ancillary file", result.Name);
-            Assert.Equal(_file.PublicPath(PublicationSlug, ReleaseSlug), result.Path);
+            Assert.Equal(_file.PublicPath(release), result.Path);
             Assert.Equal("400 B", result.Size);
             Assert.Equal(Ancillary, result.Type);
         }
