@@ -37,6 +37,11 @@ namespace GovUk.Education.ExploreEducationStatistics.Common.Model
         {
             return IsFinishedState(Status);
         }
+        
+        public bool IsAborting()
+        {
+            return IsAbortingState(Status);
+        }
 
         public bool IsFinishedOrAborting()
         {
@@ -48,9 +53,14 @@ namespace GovUk.Education.ExploreEducationStatistics.Common.Model
             return FinishedStatuses.Contains(state);
         }
         
+        public static bool IsAbortingState(IStatus state)
+        {
+            return AbortingStatuses.Contains(state);
+        }
+        
         public static bool IsFinishedOrAbortingState(IStatus state)
         {
-            return IsFinishedState(state) || AbortingStatuses.Contains(state);
+            return IsFinishedState(state) || IsAbortingState(state);
         }
 
         public override string ToString()
