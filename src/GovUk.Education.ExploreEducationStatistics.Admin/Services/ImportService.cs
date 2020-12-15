@@ -14,14 +14,11 @@ using GovUk.Education.ExploreEducationStatistics.Content.Model.Database;
 using GovUk.Education.ExploreEducationStatistics.Data.Processor.Model;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
-using Microsoft.Azure.Storage.Queue;
 using Microsoft.EntityFrameworkCore;
-using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.Logging;
 using Newtonsoft.Json;
 using static GovUk.Education.ExploreEducationStatistics.Admin.Validators.ValidationErrorMessages;
 using static GovUk.Education.ExploreEducationStatistics.Admin.Validators.ValidationUtils;
-using CloudStorageAccount = Microsoft.Azure.Storage.CloudStorageAccount;
 using static GovUk.Education.ExploreEducationStatistics.Common.TableStorageTableNames;
 
 namespace GovUk.Education.ExploreEducationStatistics.Admin.Services
@@ -30,8 +27,8 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Services
     {
         private readonly ContentDbContext _context;
         private readonly IMapper _mapper;
-        private readonly string _storageConnectionString;
         private readonly ILogger _logger;
+        private readonly IStorageQueueService _queueService;
         private readonly IGuidGenerator _guidGenerator;
         private readonly ITableStorageService _tableStorageService;
         private readonly IUserService _userService;
@@ -39,15 +36,15 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Services
         public ImportService(ContentDbContext contentDbContext,
             IMapper mapper,
             ILogger<ImportService> logger,
-            IConfiguration config,
+            IStorageQueueService queueService,
             ITableStorageService tableStorageService,
             IGuidGenerator guidGenerator, 
             IUserService userService)
         {
             _context = contentDbContext;
             _mapper = mapper;
-            _storageConnectionString = config.GetValue<string>("CoreStorage");
             _logger = logger;
+            _queueService = queueService;
             _tableStorageService = tableStorageService;
             _guidGenerator = guidGenerator;
             _userService = userService;
@@ -59,9 +56,6 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Services
             IFormFile dataFile,
             bool isZip)
         {
-            var pQueue = GetOrCreateQueue("imports-pending");
-            GetOrCreateQueue("imports-available");
-
             // TODO - EES-1250
             var numRows = isZip ? 0 : FileStorageUtils.CalculateNumberOfRows(dataFile.OpenReadStream());
             var message = BuildMessage(dataFileName, metaFileName, releaseId, isZip ? dataFile.FileName.ToLower() : "");
@@ -72,7 +66,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Services
                 numRows,
                 message);
 
-            pQueue.AddMessage(CreateQueueMessage(message));
+            await _queueService.AddMessageAsync("imports-pending", message);
 
             _logger.LogInformation($"Sent import message for data file: {dataFileName}, releaseId: {releaseId}");
         }
@@ -81,14 +75,13 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Services
         {
             return _userService
                 .CheckCanCancelFileImport(import)
-                .OnSuccessVoid(() =>
+                .OnSuccessVoid(async () =>
                 {
-                    var queue = GetOrCreateQueue("imports-cancelling");
-                    queue.AddMessage(CreateQueueMessage(new CancelImportMessage
+                    await _queueService.AddMessageAsync("imports-cancelling", new CancelImportMessage
                     {
                         ReleaseId = import.ReleaseId,
                         DataFileName = import.DataFileName
-                    }));
+                    });
                 });
         }
 
@@ -156,26 +149,6 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Services
                 BatchNo = 1,
                 ArchiveFileName = zipFileName
             };
-        }
-
-        private CloudQueue GetOrCreateQueue(string queueName)
-        {
-            var client = CreateCloudQueueClient();
-            var queue = client.GetQueueReference(queueName);
-            queue.CreateIfNotExists();
-            return queue;
-        }
-
-        private CloudQueueClient CreateCloudQueueClient()
-        {
-            var storageAccount = CloudStorageAccount.Parse(_storageConnectionString);
-            var client = storageAccount.CreateCloudQueueClient();
-            return client;
-        }
-
-        private static CloudQueueMessage CreateQueueMessage(object message)
-        {
-            return new CloudQueueMessage(JsonConvert.SerializeObject(message));
         }
     }
 
