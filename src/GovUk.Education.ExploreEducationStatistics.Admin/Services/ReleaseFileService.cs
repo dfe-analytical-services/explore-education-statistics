@@ -15,8 +15,8 @@ using GovUk.Education.ExploreEducationStatistics.Content.Model.Extensions;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
 using static GovUk.Education.ExploreEducationStatistics.Common.BlobContainerNames;
-using static GovUk.Education.ExploreEducationStatistics.Common.Extensions.BlobInfoExtensions;
 using static GovUk.Education.ExploreEducationStatistics.Common.Model.ReleaseFileTypes;
+using static GovUk.Education.ExploreEducationStatistics.Common.Services.FileStorageUtils;
 using FileInfo = GovUk.Education.ExploreEducationStatistics.Common.Model.FileInfo;
 
 namespace GovUk.Education.ExploreEducationStatistics.Admin.Services
@@ -176,15 +176,9 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Services
                         file: formFile,
                         options: new IBlobStorageService.UploadFileOptions
                         {
-                            MetaValues = new Dictionary<string, string>
-                            {
-                                {
-                                    FilenameKey, file.Filename
-                                },
-                                {
-                                    NameKey, name
-                                }
-                            }
+                            MetaValues = GetAncillaryFileMetaValues(
+                                filename: file.Filename,
+                                name: name)
                         }
                     );
 

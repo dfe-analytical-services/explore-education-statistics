@@ -20,6 +20,17 @@ namespace GovUk.Education.ExploreEducationStatistics.Common.Services
             Tb
         }
 
+        public static IDictionary<string, string> GetAncillaryFileMetaValues(
+            string filename,
+            string name)
+        {
+            return new Dictionary<string, string>
+            {
+                {BlobInfoExtensions.FilenameKey, filename},
+                {BlobInfoExtensions.NameKey, name}
+            };
+        }
+
         public static IDictionary<string, string> GetDataFileMetaValues(
             string name,
             string metaFileName,

@@ -17,6 +17,7 @@ using Microsoft.Extensions.Logging;
 using static GovUk.Education.ExploreEducationStatistics.Common.BlobContainerNames;
 using static GovUk.Education.ExploreEducationStatistics.Common.Extensions.BlobInfoExtensions;
 using static GovUk.Education.ExploreEducationStatistics.Common.Services.FileStoragePathUtils;
+using static GovUk.Education.ExploreEducationStatistics.Common.Services.FileStorageUtils;
 
 namespace GovUk.Education.ExploreEducationStatistics.Admin.Services
 {
@@ -129,15 +130,10 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Services
             await _privateBlobStorageService.SetMetadata(
                 containerName: PrivateFilesContainerName,
                 path: file.Path(),
-                metadata: new Dictionary<string, string>
-                {
-                    {
-                        BlobInfo.FilenameKey, file.Filename
-                    },
-                    {
-                        BlobInfo.NameKey, blob.Name
-                    }
-                });
+                metadata: GetAncillaryFileMetaValues(
+                    filename: file.Filename,
+                    name: blob.Name)
+                );
         }
 
         private async Task SetPublicAncillaryBlobMetadata(Release release, ReleaseFileReference file)
@@ -146,23 +142,24 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Services
                 containerName: PublicFilesContainerName,
                 path: file.PublicPath(release.Publication.Slug, release.Slug));
 
-            blob.Meta.TryGetValue(ReleaseDateTimeKey, out var releaseDateTime);
+            var metadata = GetAncillaryFileMetaValues(
+                filename: file.Filename,
+                name: blob.Name);
+
+            // Retain the ReleaseDateTime which was added during publishing
+            if (blob.Meta.TryGetValue(ReleaseDateTimeKey, out var releaseDateTime))
+            {
+                metadata.Add(ReleaseDateTimeKey, releaseDateTime);
+            }
+            else
+            {
+                _logger.LogWarning("Public blob found without ReleaseDateTime key: {0}", blob.Path);
+            }
 
             await _publicBlobStorageService.SetMetadata(
                 containerName: PublicFilesContainerName,
                 path: file.PublicPath(release.Publication.Slug, release.Slug),
-                metadata: new Dictionary<string, string>
-                {
-                    {
-                        FilenameKey, file.Filename
-                    },
-                    {
-                        NameKey, blob.Name
-                    },
-                    {
-                        ReleaseDateTimeKey, releaseDateTime ?? string.Empty
-                    }
-                });
+                metadata: metadata);
         }
 
         private async Task<List<ReleaseFileReference>> GetFiles(ReleaseFileTypes type)

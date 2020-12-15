@@ -7,6 +7,7 @@ using GovUk.Education.ExploreEducationStatistics.Admin.Services;
 using GovUk.Education.ExploreEducationStatistics.Admin.Services.Interfaces;
 using GovUk.Education.ExploreEducationStatistics.Common.Extensions;
 using GovUk.Education.ExploreEducationStatistics.Common.Model;
+using GovUk.Education.ExploreEducationStatistics.Common.Services;
 using GovUk.Education.ExploreEducationStatistics.Common.Services.Interfaces;
 using GovUk.Education.ExploreEducationStatistics.Common.Services.Interfaces.Security;
 using GovUk.Education.ExploreEducationStatistics.Common.Utils;
@@ -966,11 +967,9 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
                     size: "10 Kb",
                     contentType: "application/pdf",
                     contentLength: 0L,
-                    meta: new Dictionary<string, string>
-                    {
-                        {BlobInfoExtensions.FilenameKey, "ancillary_1.pdf"},
-                        {BlobInfoExtensions.NameKey, "Ancillary Test File 1"}
-                    },
+                    meta: FileStorageUtils.GetAncillaryFileMetaValues(
+                        filename: "ancillary_1.pdf",
+                        name: "Ancillary Test File 1"),
                     created: null));
 
             blobStorageService.Setup(mock =>
@@ -980,11 +979,9 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
                     size: "10 Kb",
                     contentType: "application/pdf",
                     contentLength: 0L,
-                    meta: new Dictionary<string, string>
-                    {
-                        {BlobInfoExtensions.FilenameKey, "Ancillary 2.pdf"},
-                        {BlobInfoExtensions.NameKey, "Ancillary Test File 2"}
-                    },
+                    meta: FileStorageUtils.GetAncillaryFileMetaValues(
+                        filename: "Ancillary  2.pdf",
+                        name: "Ancillary Test File 2"),
                     created: null));
 
             blobStorageService.Setup(mock =>
@@ -1288,11 +1285,9 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
                     size: "10 Kb",
                     contentType: "application/pdf",
                     contentLength: 0L,
-                    meta: new Dictionary<string, string>
-                    {
-                        {BlobInfoExtensions.FilenameKey, filename},
-                        {BlobInfoExtensions.NameKey, uploadName}
-                    },
+                    meta: FileStorageUtils.GetAncillaryFileMetaValues(
+                        filename: filename,
+                        name: uploadName),
                     created: null));
 
             fileUploadsValidatorService.Setup(mock =>
