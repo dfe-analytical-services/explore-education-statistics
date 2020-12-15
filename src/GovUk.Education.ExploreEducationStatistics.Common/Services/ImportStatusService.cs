@@ -58,25 +58,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Common.Services
         public async Task<ImportStatus> GetImportStatus(Guid releaseId, string dataFileName)
         {
             var import = await GetImport(releaseId, dataFileName);
-
-            if (import.Status == NOT_FOUND)
-            {
-                return new ImportStatus
-                {
-                    Status = import.Status
-                };
-            }
-
-            var percentageComplete = CalculatePercentageComplete(import.PercentageComplete, import.Status);
-
-            return new ImportStatus
-            {
-                Errors = import.Errors,
-                Status = import.Status,
-                NumberOfRows = import.NumberOfRows,
-                PercentageComplete = percentageComplete,
-                PhasePercentageComplete = import.PercentageComplete
-            };
+            return CreateImportStatusFromImportRow(import);
         }
 
         public async Task<bool> IsImportFinished(Guid releaseId, string dataFileName)
@@ -91,23 +73,38 @@ namespace GovUk.Education.ExploreEducationStatistics.Common.Services
             double percentageComplete = 0)
         {
             var import = await GetImport(releaseId, dataFileName);
-            var currentImportStatus = await GetImportStatus(releaseId, dataFileName);
+            var currentImportStatus = CreateImportStatusFromImportRow(import);
 
             var percentageCompleteBefore = import.PercentageComplete;
             var percentageCompleteAfter = (int) Math.Clamp(percentageComplete, 0, 100);
-
-            // Don't ignore this status update if the client calling this is attempting to abort it or set it to a
-            // finished state.
-            // Ignore updating when already finished or in the process of being aborted.
-            // Ignore updating to a lower status.
-            // Ignore updating to a lower percentage complete at the same status.
-            if (!ImportStatus.IsFinishedOrAbortingState(newStatus) && 
-                (currentImportStatus.IsFinishedOrAborting() 
-                    || currentImportStatus.Status.CompareTo(newStatus) > 0
-                    || currentImportStatus.Status == newStatus && percentageCompleteBefore > percentageCompleteAfter))
+            
+            // Ignore updating if already finished
+            if (currentImportStatus.IsFinished())
             {
                 _logger.LogWarning(
-                    $"Update: {dataFileName} {currentImportStatus.Status} ({percentageCompleteBefore}%) -> {newStatus} ({percentageCompleteAfter}%) ignored");
+                    $"Update: {dataFileName} {currentImportStatus.Status} ({percentageCompleteBefore}%) -> " +
+                    $"{newStatus} ({percentageCompleteAfter}%) ignored as this import is already finished");
+                return;
+            }
+
+            // Ignore updating if already aborting and the new state is not aborting or finishing
+            if (currentImportStatus.IsAborting() && !ImportStatus.IsFinishedOrAbortingState(newStatus))
+            {
+                _logger.LogWarning(
+                    $"Update: {dataFileName} {currentImportStatus.Status} ({percentageCompleteBefore}%) -> " +
+                    $"{newStatus} ({percentageCompleteAfter}%) ignored as this import is already aborting or is finished");
+                return;
+            }
+            
+            // Ignore updates if attempting to downgrade from a normal importing state to a lower normal importing state,
+            // or if the percentage is being set lower or the same as is currently and is the same state
+            if (!ImportStatus.IsFinishedOrAbortingState(newStatus) && 
+                (currentImportStatus.Status.CompareTo(newStatus) > 0 || 
+                 currentImportStatus.Status == newStatus && percentageCompleteBefore > percentageCompleteAfter))
+            {
+                _logger.LogWarning(
+                    $"Update: {dataFileName} {currentImportStatus.Status} ({percentageCompleteBefore}%) -> " +
+                    $"{newStatus} ({percentageCompleteAfter}%) ignored");
                 return;
             }
 
@@ -187,6 +184,28 @@ namespace GovUk.Education.ExploreEducationStatistics.Common.Services
                 COMPLETE => ProcessingRatios[COMPLETE] * 100,
                 _ => 0
             });
+        }
+
+        private static ImportStatus CreateImportStatusFromImportRow(DatafileImport import)
+        {
+            if (import.Status == NOT_FOUND)
+            {
+                return new ImportStatus
+                {
+                    Status = import.Status
+                };
+            }
+
+            var percentageComplete = CalculatePercentageComplete(import.PercentageComplete, import.Status);
+
+            return new ImportStatus
+            {
+                Errors = import.Errors,
+                Status = import.Status,
+                NumberOfRows = import.NumberOfRows,
+                PercentageComplete = percentageComplete,
+                PhasePercentageComplete = import.PercentageComplete
+            };
         }
     }
 }
