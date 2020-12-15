@@ -47,7 +47,11 @@ const FootnotesList = ({
         const { id, content } = footnote;
 
         return (
-          <div key={id} className={styles.itemContainer}>
+          <div
+            key={id}
+            className={styles.itemContainer}
+            data-testid={`footnote ${content}`}
+          >
             <div className={styles.row}>
               <div className={styles.rowContent}>{content}</div>
 

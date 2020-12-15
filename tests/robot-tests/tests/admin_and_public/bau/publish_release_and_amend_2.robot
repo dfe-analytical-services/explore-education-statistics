@@ -11,10 +11,11 @@ Suite Teardown    user closes the browser
 ${RELEASE_NAME}  Academic Year Q1 2020/21
 ${PUBLICATION_NAME}  UI tests - publish release and amend 2 %{RUN_IDENTIFIER}
 ${SUBJECT_NAME}  Seven filters
-${SECOND_SUBJECT}  Dates subject
+${SECOND_SUBJECT}  upload file test
+${THIRD_SUBJECT}  upload file test with filter subject
 ${METHODOLOGY_NAME}  UI tests - publish release and amend 2 %{RUN_IDENTIFIER}
 ${METHODOLOGY_TITLE}  ${METHODOLOGY_NAME} - Title
-${ADD_METHODLOGY_TEXT_BLOCK}  //*[@type="button" and text()="Add text block"]
+
 *** Test Cases ***
 Navigate to manage methodoligies page
     [Tags]  HappyPath
@@ -36,7 +37,7 @@ Add methodology content
     user clicks button  New section
     # NOTE: scroll to element is here to avoid selenium clicking the
     # set page view text box on the methodology page
-    user scrolls to element  ${ADD_METHODLOGY_TEXT_BLOCK}
+    user scrolls to element  xpath://button[text()="Add text block"]
     user clicks button  Add text block
     user clicks button  Edit block
     user presses keys  Adding Methodology content
@@ -106,7 +107,7 @@ Upload another subject (for deletion later)
     ${section}=  user gets accordion section content element  ${SECOND_SUBJECT}
     user checks headed table body row contains  Status           Complete  ${section}  180
 
-Add meta guidance to seven filters subject
+Add meta guidance to ${SUBJECT_NAME} subject
     [Tags]  HappyPath
     user clicks link  Metadata guidance
     user waits until h2 is visible  Public metadata guidance document  90
@@ -151,19 +152,19 @@ Add footnote to ${SUBJECT_NAME} subject
     [Tags]  HappyPath
     user clicks link  Create footnote
     user waits until h2 is visible  Create footnote
-    user clicks element  //*[@data-testid="footnote-subject Seven filters"]//input[@type="checkbox"]
-    user enters text into element  id:footnoteForm-content  Footnote 1 seven filters
+    user clicks element  //*[@data-testid="footnote-subject ${SUBJECT_NAME}"]//input[@type="checkbox"]
+    user enters text into element  id:footnoteForm-content  Footnote 1 ${SUBJECT_NAME}
     user clicks button  Save footnote
     user waits until h2 is visible  Footnotes
 
-Add second footnote to seven filters subject
+Add second footnote to ${SUBJECT_NAME} subject
     [Tags]  HappyPath
     user clicks link  Create footnote
     user waits until h2 is visible  Create footnote
     user opens details dropdown  Cheese
     user clicks footnote checkbox  Stilton
     user clicks footnote checkbox  Feta
-    user enters text into element  id:footnoteForm-content  Footnote 2 seven filters
+    user enters text into element  id:footnoteForm-content  Footnote 2 ${SUBJECT_NAME}
     user clicks button  Save footnote
     user waits until h2 is visible  Footnotes
 
@@ -205,7 +206,7 @@ Select "Test Topic" publication
     user waits until h2 is visible  Choose a subject
     user checks previous table tool step contains  1   Publication   ${PUBLICATION_NAME}
 
-Select "seven filters" subject
+Select "${SUBJECT_NAME}" subject
     [Tags]  HappyPath
     user clicks radio   ${SUBJECT_NAME}
     user clicks element   id:publicationSubjectForm-submit
@@ -267,7 +268,7 @@ Wait until table is generated
 
 Wait until new footnote is visible
     [Tags]  HappyPath
-    user checks page contains  Footnote 1 seven filters
+    user checks page contains  Footnote 1 ${SUBJECT_NAME}
 
 Validate results table column headings
     [Tags]  HappyPath
@@ -343,7 +344,7 @@ Go to permalink
     user goes to url  ${PERMA_LOCATION_URL}
     user waits until h1 is visible  '${SUBJECT_NAME}' from '${PUBLICATION_NAME}'
     user checks page does not contain   WARNING - The data used in this permalink may be out-of-date.
-    user checks page contains  Footnote 1 seven filters
+    user checks page contains  Footnote 1 ${SUBJECT_NAME}
 
 Return to Admin
     [Tags]  HappyPath
@@ -360,7 +361,7 @@ Edit methodology
     user clicks button  ${METHODOLOGY_NAME}
     # NOTE: scrolls to element is here to avoid selenium clicking the
     # set page view text box on the methodology page
-    user scrolls to element  ${ADD_METHODLOGY_TEXT_BLOCK}
+    user scrolls to element  xpath://button[text()="Add text block"]
     user waits until button is enabled  Add text block
     user clicks button  Add text block
     user clicks button  Edit block
@@ -396,20 +397,25 @@ Replace data files for amendment
     user chooses file   id:dataFileUploadForm-dataFile       ${FILES_DIR}dates.csv
     user chooses file   id:dataFileUploadForm-metadataFile   ${FILES_DIR}dates.meta.csv
     user clicks button  Upload data files
-    user opens details dropdown  Footnote 2 seven filters
+    user opens details dropdown  Footnote 2 ${SUBJECT_NAME}
     user clicks button  Delete footnote
     user clicks button  Confirm
     #EES-1442: Bug when Confirm data replacement button doesn't show
     user reloads page
+#    Sleep  10000
+#    user scrolls down  800
+    user waits until page contains  Footnotes: OK
+    user waits until page contains  Data blocks: OK
     user waits until button is enabled  Confirm data replacement
 
 Confirm data replacement
     [Tags]  HappyPath
     user clicks button  Confirm data replacement
-    user waits until h2 is visible  Data replacement complete
+    # potentially a bug here
 
 Delete second subject file
     [Tags]  HappyPath
+    user clicks link  Footnotes
     user clicks link  Data and files
     user waits until page contains accordion section  ${SECOND_SUBJECT}
     user opens accordion section  ${SECOND_SUBJECT}
@@ -534,29 +540,28 @@ Create amendment to add and modify footnotes
     user clicks button  Amend this release  ${details}
     user clicks button  Confirm
 
-Add "upload file test filter" subject file
+Add "upload file test with filter" subject file
     [Tags]  HappyPath
     user clicks link  Data and files
-     user waits until page contains element  id:dataFileUploadForm-subjectTitle
-    user enters text into element  id:dataFileUploadForm-subjectTitle   New subject file footnotes
+    user waits until page contains element  id:dataFileUploadForm-subjectTitle
+    user enters text into element  id:dataFileUploadForm-subjectTitle   ${THIRD_SUBJECT}
     user chooses file   id:dataFileUploadForm-dataFile       ${FILES_DIR}upload-file-test-with-filter.csv
     user chooses file   id:dataFileUploadForm-metadataFile   ${FILES_DIR}upload-file-test-with-filter.meta.csv
     user clicks button  Upload data files
     user waits until h2 is visible  Uploaded data files
-    user waits until page contains accordion section   New subject file footnotes
-    user opens accordion section   New subject file footnotes
-    ${section}=  user gets accordion section content element  New subject file footnotes
+    user waits until page contains accordion section   ${THIRD_SUBJECT}
+    user opens accordion section   ${THIRD_SUBJECT}
+    ${section}=  user gets accordion section content element  ${THIRD_SUBJECT}
     user checks headed table body row contains  Status           Complete  ${section}  180
 
-Add meta guidance to "New subject file" subject
+Add meta guidance to ${THIRD_SUBJECT} subject
     [Tags]  HappyPath
     user clicks link  Metadata guidance
-    user waits until h2 is visible  Public metadata guidance document
+    user waits until h2 is visible  Public metadata guidance document  90
     user enters text into element  id:metaGuidanceForm-content  Test meta guidance content
-    user waits until page contains accordion section  New subject file footnotes
-    user enters text into meta guidance data file content editor  New subject file footnotes
+    user waits until page contains accordion section  ${THIRD_SUBJECT}
+    user enters text into meta guidance data file content editor  ${THIRD_SUBJECT}
     ...  meta guidance content
-    user clicks button  Save guidance
 
 Navigate to 'Footnotes' Tab
     [Tags]  HappyPath
@@ -567,15 +572,16 @@ Add footnote to "upload file test filter" subject file
     [Tags]  HappyPath
     user clicks link  Create footnote
     user waits until h2 is visible  Create footnote
-    user clicks footnote checkbox  Select all indicators and filters for this subject
+    user clicks element  //*[@data-testid="footnote-subject ${THIRD_SUBJECT}"]//input
     user enters text into element  id:footnoteForm-content  upload file test filter footnote
     user clicks button  Save footnote
     user waits until h2 is visible  Footnotes
 
-Update "seven filters" footnote
+Update ${SUBJECT_NAME} footnote
     [Tags]  HappyPath
-    user clicks link  Edit footnote
-    user enters text into element  id:footnoteForm-content  Updating seven filters footnote
+    user clicks element  xpath://*[@data-testid="footnote Footnote 1 Seven filters"]//div//div[2]//a
+    # seven filters
+    user enters text into element  id:footnoteForm-content  Updating ${SUBJECT_NAME} footnote
     user clicks button  Save footnote
     user waits until h2 is visible  Footnotes
 
@@ -596,7 +602,6 @@ Approve the release for amendment
 
 Go to Table Tool page for amendment
     [Tags]  HappyPath
-#    environment variable should be set  PUBLIC_URL
     user goes to url  %{PUBLIC_URL}/data-tables
     user waits until h1 is visible  Create your own tables online
 
@@ -612,7 +617,7 @@ Go to amended release & create table
     user checks previous table tool step contains  1   Publication   ${PUBLICATION_NAME}
     user checks page does not contain  ${SECOND_SUBJECT}
 
-Select Seven filters subject
+Select ${SUBJECT_NAME} subject
     user clicks radio   ${SUBJECT_NAME}
     user clicks element   id:publicationSubjectForm-submit
     user waits until h2 is visible  Choose locations
@@ -673,4 +678,4 @@ Go to new permalink
     user goes to url  ${PERMA_LOCATION_URL_TWO}
     user waits until h1 is visible  '${SUBJECT_NAME}' from '${PUBLICATION_NAME}'
     user checks page does not contain   WARNING - The data used in this permalink may be out-of-date.
-    user checks page contains  Updating seven filters footnote
+    user checks page contains  Updating ${SUBJECT_NAME} footnote
