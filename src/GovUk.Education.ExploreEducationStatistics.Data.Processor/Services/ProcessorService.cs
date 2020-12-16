@@ -116,7 +116,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Processor.Services
 
             await statisticsDbContext.SaveChangesAsync();
 
-            await _fileImportService.ImportFiltersLocationsAndSchools(message, statisticsDbContext);
+            await _fileImportService.ImportFiltersAndLocations(message, statisticsDbContext);
 
             await statisticsDbContext.SaveChangesAsync();
         }
@@ -124,9 +124,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Processor.Services
         private async Task<SubjectData> GetSubjectDataFromMainDataFile(ImportMessage message)
         {
             var dataFileBlobPath = AdminReleasePath(message.Release.Id, ReleaseFileTypes.Data, message.DataFileName);
-
-            var subjectData = await _fileStorageService.GetSubjectData(message.Release.Id, dataFileBlobPath);
-            return subjectData;
+            return await _fileStorageService.GetSubjectData(message.Release.Id, dataFileBlobPath);
         }
     }
 }
