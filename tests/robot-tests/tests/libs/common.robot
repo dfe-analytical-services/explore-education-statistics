@@ -374,6 +374,10 @@ user checks element value should be
     [Arguments]  ${locator}  ${value}
     element attribute value should be  ${locator}  value  ${value}
 
+user checks textarea contains
+    [Arguments]   ${selector}   ${text}
+    textarea should contain   ${selector}   ${text}
+
 user checks radio option for "${radiogroupId}" should be "${expectedLabelText}"
     user checks page contains element  css:#${radiogroupId} [data-testid="${expectedLabelText}"]:checked
 
