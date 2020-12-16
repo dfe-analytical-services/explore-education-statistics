@@ -1,4 +1,5 @@
 import { useDesktopMedia } from '@common/hooks/useMedia';
+import useMounted from '@common/hooks/useMounted';
 import isComponentType from '@common/utils/type-guards/components/isComponentType';
 import classNames from 'classnames';
 import React, {
@@ -100,11 +101,17 @@ const Tabs = ({ children, id, modifyHash = true, testId, onToggle }: Props) => {
         selectTab(sections.length - 1);
       }
 
-      sections.forEach((element, index) => {
-        if (element.props.id === window.location.hash.substr(1)) {
-          selectTab(index);
+      if (window.location.hash) {
+        const matchingTabIndex = sections.findIndex(
+          element => element.props.id === window.location.hash.substr(1),
+        );
+
+        if (matchingTabIndex > -1) {
+          // Set index directly as we don't want to modify
+          // the location hash again by using `selectTab`
+          setSelectedTabIndex(matchingTabIndex);
         }
-      });
+      }
     }
   }, [sections, selectTab, selectedTabIndex]);
 

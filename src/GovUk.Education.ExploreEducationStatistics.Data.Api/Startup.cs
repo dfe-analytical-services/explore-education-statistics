@@ -33,8 +33,6 @@ using Microsoft.Extensions.Hosting;
 using Microsoft.Extensions.Logging;
 using Microsoft.OpenApi.Models;
 using Newtonsoft.Json;
-using FileStorageService = GovUk.Education.ExploreEducationStatistics.Data.Api.Services.FileStorageService;
-using IFileStorageService = GovUk.Education.ExploreEducationStatistics.Data.Api.Services.Interfaces.IFileStorageService;
 
 namespace GovUk.Education.ExploreEducationStatistics.Data.Api
 {
@@ -102,7 +100,6 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Api
                     );
                 }
             );
-            services.AddSingleton<IFileStorageService, FileStorageService>();
             services.AddTransient<IFilterGroupService, FilterGroupService>();
             services.AddTransient<IFilterItemService, FilterItemService>();
             services.AddTransient<IFilterService, FilterService>();

@@ -57,14 +57,6 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Processor.Services
             );
         }
 
-        public async Task<Stream> StreamFile(Guid releaseId, ReleaseFileTypes fileType, string fileName)
-        {
-            return await _blobStorageService.StreamBlob(
-                PrivateFilesContainerName,
-                AdminReleasePath(releaseId, fileType, fileName)
-            );
-        }
-
         public async Task<Stream> StreamBlob(BlobInfo blob)
         {
             return await _blobStorageService.StreamBlob(PrivateFilesContainerName, blob.Path);

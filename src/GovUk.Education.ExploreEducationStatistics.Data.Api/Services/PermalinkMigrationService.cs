@@ -7,6 +7,7 @@ using System.Net.Mime;
 using System.Threading.Tasks;
 using GovUk.Education.ExploreEducationStatistics.Common.Extensions;
 using GovUk.Education.ExploreEducationStatistics.Common.Model;
+using GovUk.Education.ExploreEducationStatistics.Common.Services.Interfaces;
 using GovUk.Education.ExploreEducationStatistics.Data.Api.Models;
 using GovUk.Education.ExploreEducationStatistics.Data.Api.Services.Interfaces;
 using Microsoft.Extensions.Logging;
@@ -18,13 +19,13 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Api.Services
     [SuppressMessage("ReSharper", "IdentifierTypo")]
     public class PermalinkMigrationService : IPermalinkMigrationService
     {
-        private readonly IFileStorageService _fileStorageService;
+        private readonly IBlobStorageService _blobStorageService;
         private readonly ILogger _logger;
 
-        public PermalinkMigrationService(IFileStorageService fileStorageService,
+        public PermalinkMigrationService(IBlobStorageService blobStorageService,
             ILogger<PermalinkMigrationService> logger)
         {
-            _fileStorageService = fileStorageService;
+            _blobStorageService = blobStorageService;
             _logger = logger;
         }
 
@@ -32,7 +33,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Api.Services
             Func<T, Task<Either<string, Permalink>>> transformFunc)
         {
             var migrationHistoryWriter =
-                await MigrationHistoryWriter.Create(PublicPermalinkMigrationContainerName, migrationId, _fileStorageService);
+                await MigrationHistoryWriter.Create(PublicPermalinkMigrationContainerName, migrationId, _blobStorageService);
             var shouldRun = await CheckMigrationShouldRunAndRecordHistory(migrationHistoryWriter);
             if (!shouldRun)
             {
@@ -94,13 +95,13 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Api.Services
         {
             _logger.LogDebug("Listing blobs in container: {Container}", PublicPermalinkContainerName);
 
-            var blobs = (await _fileStorageService.ListBlobs(PublicPermalinkContainerName)).ToList();
+            var blobs = (await _blobStorageService.ListBlobs(PublicPermalinkContainerName)).ToList();
 
             _logger.LogDebug("Found {Count} blobs in container: {Container}", blobs.Count, PublicPermalinkContainerName);
 
             var strings = await Task.WhenAll(
                 blobs.Select(blob =>
-                    _fileStorageService.GetBlobText(
+                    _blobStorageService.DownloadBlobText(
                         containerName: PublicPermalinkContainerName,
                         path: blob.Path
                     )
@@ -132,10 +133,10 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Api.Services
             _logger.LogDebug("Uploading {Count} Permalinks", permalinks.Count);
             await migrationHistoryWriter.WriteHistory($"Uploading {permalinks.Count} Permalinks");
             await Task.WhenAll(permalinks.Select(permalink =>
-                _fileStorageService.UploadText(PublicPermalinkContainerName,
-                    permalink.Id.ToString(),
-                    MediaTypeNames.Application.Json,
-                    JsonConvert.SerializeObject(permalink))));
+                _blobStorageService.UploadText(containerName: PublicPermalinkContainerName,
+                    path: permalink.Id.ToString(),
+                    content: JsonConvert.SerializeObject(permalink),
+                    contentType: MediaTypeNames.Application.Json)));
             _logger.LogDebug("Upload complete");
             await migrationHistoryWriter.WriteHistory("Upload complete");
         }
@@ -158,35 +159,37 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Api.Services
     {
         private readonly string _containerName;
         private readonly string _migrationId;
-        private readonly IFileStorageService _fileStorageService;
+        private readonly IBlobStorageService _blobStorageService;
         private readonly bool _appendSupported;
 
-        private MigrationHistoryWriter(string containerName, string migrationId, IFileStorageService fileStorageService,
+        private MigrationHistoryWriter(string containerName,
+            string migrationId,
+            IBlobStorageService blobStorageService,
             bool appendSupported)
         {
             _containerName = containerName;
             _migrationId = migrationId;
-            _fileStorageService = fileStorageService;
+            _blobStorageService = blobStorageService;
             _appendSupported = appendSupported;
         }
 
         internal static async Task<MigrationHistoryWriter> Create(string containerName, string migrationId,
-            IFileStorageService fileStorageService)
+            IBlobStorageService blobStorageService)
         {
-            var appendSupported = await fileStorageService.IsAppendSupported(containerName, migrationId);
-            return new MigrationHistoryWriter(containerName, migrationId, fileStorageService, appendSupported);
+            var appendSupported = await blobStorageService.IsAppendSupported(containerName, migrationId);
+            return new MigrationHistoryWriter(containerName, migrationId, blobStorageService, appendSupported);
         }
 
         public async Task<bool> IsHistoryExists()
         {
-            var exists = await _fileStorageService.CheckBlobExists(_containerName, _migrationId);
+            var exists = await _blobStorageService.CheckBlobExists(_containerName, _migrationId);
 
             if (!exists)
             {
                 return false;
             }
 
-            var blob = await _fileStorageService.GetBlob(_containerName, _migrationId);
+            var blob = await _blobStorageService.GetBlob(_containerName, _migrationId);
 
             return blob.ContentLength > 0;
         }
@@ -206,19 +209,18 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Api.Services
         private Task UploadMigrationHistory(string message)
         {
             var now = DateTime.UtcNow.ToString("o", CultureInfo.InvariantCulture);
-            return _fileStorageService.UploadText(_containerName,
+            return _blobStorageService.UploadText(containerName: _containerName,
                 path: _migrationId,
-                contentType: MediaTypeNames.Text.Plain,
-                content: $"{now}: {message}");
+                content: $"{now}: {message}",
+                contentType: MediaTypeNames.Text.Plain);
         }
 
         private Task AppendMigrationHistory(string message)
         {
             var now = DateTime.UtcNow.ToString("o", CultureInfo.InvariantCulture);
-            return _fileStorageService.AppendText(
+            return _blobStorageService.AppendText(
                 containerName: _containerName,
                 path: _migrationId,
-                contentType: MediaTypeNames.Text.Plain,
                 content: $"{now}: {message}{Environment.NewLine}");
         }
     }

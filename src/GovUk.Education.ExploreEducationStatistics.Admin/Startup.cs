@@ -209,6 +209,29 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin
             services.AddTransient<IReleaseFileService, ReleaseFileService>();
             services.AddTransient<IImportService, ImportService>();
             services.AddTransient<IImportStatusBauService, ImportStatusBauService>();
+            services.AddTransient<IMigrateFilesService, MigrateFilesService>(provider =>
+            {
+                var privateStorageConnectionString = Configuration.GetValue<string>("CoreStorage");
+                var publicStorageConnectionString = Configuration.GetValue<string>("PublicStorage");
+
+                var privateBlobStorageService = new BlobStorageService(
+                    privateStorageConnectionString,
+                    new BlobServiceClient(privateStorageConnectionString),
+                    provider.GetRequiredService<ILogger<BlobStorageService>>());
+
+                var publicBlobStorageService = new BlobStorageService(
+                    publicStorageConnectionString,
+                    new BlobServiceClient(publicStorageConnectionString),
+                    provider.GetRequiredService<ILogger<BlobStorageService>>());
+
+                return new MigrateFilesService(
+                    contentDbContext: provider.GetRequiredService<ContentDbContext>(),
+                    privateBlobStorageService: privateBlobStorageService,
+                    publicBlobStorageService: publicBlobStorageService,
+                    releaseFileRepository: provider.GetRequiredService<IReleaseFileRepository>(),
+                    userService: provider.GetRequiredService<IUserService>(),
+                    logger: provider.GetRequiredService<ILogger<MigrateFilesService>>());
+            });
             services.AddTransient<IPublishingService, PublishingService>(provider =>
                 new PublishingService(
                     provider.GetService<IPersistenceHelper<ContentDbContext>>(),
@@ -234,7 +257,9 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin
             services.AddTransient<IContactService, ContactService>();
             services.AddTransient<ILegacyReleaseService, LegacyReleaseService>();
             services.AddTransient<IReleaseService, ReleaseService>();
+            services.AddTransient<ReleaseSubjectService.SubjectDeleter, ReleaseSubjectService.SubjectDeleter>();
             services.AddTransient<IReleaseSubjectService, ReleaseSubjectService>();
+            services.AddTransient<IReleaseChecklistService, ReleaseChecklistService>();
             services.AddTransient<IReleaseRepository, ReleaseRepository>();
             services.AddTransient<IMethodologyService, MethodologyService>();
             services.AddTransient<IMethodologyContentService, MethodologyContentService>();

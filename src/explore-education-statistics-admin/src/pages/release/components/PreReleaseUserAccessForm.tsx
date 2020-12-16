@@ -6,6 +6,7 @@ import ButtonText from '@common/components/ButtonText';
 import Form from '@common/components/form/Form';
 import FormFieldTextInput from '@common/components/form/FormFieldTextInput';
 import Gate from '@common/components/Gate';
+import InsetText from '@common/components/InsetText';
 import LoadingSpinner from '@common/components/LoadingSpinner';
 import WarningMessage from '@common/components/WarningMessage';
 import useAsyncRetry from '@common/hooks/useAsyncRetry';
@@ -113,12 +114,12 @@ const PreReleaseUserAccessForm = ({
 
       {users.length > 0 ? (
         <>
-          <div className="govuk-inset-text">
+          <InsetText>
             <p>
               These people will have access to a preview of the release 24 hours
               before the scheduled publish date.
             </p>
-          </div>
+          </InsetText>
 
           <table>
             <thead>
@@ -160,9 +161,7 @@ const PreReleaseUserAccessForm = ({
           </table>
         </>
       ) : (
-        <p className="govuk-inset-text">
-          No pre-release users have been invited.
-        </p>
+        <InsetText>No pre-release users have been invited.</InsetText>
       )}
     </LoadingSpinner>
   );

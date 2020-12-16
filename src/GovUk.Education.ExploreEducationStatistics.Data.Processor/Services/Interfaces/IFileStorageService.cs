@@ -19,8 +19,6 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Processor.Services.Int
             string contentType,
             IDictionary<string, string> metaValues);
 
-        Task<Stream> StreamFile(Guid releaseId, ReleaseFileTypes fileType, string fileName);
-
         Task<Stream> StreamBlob(BlobInfo blob);
 
         Task DeleteBlobByPath(string blobPath);

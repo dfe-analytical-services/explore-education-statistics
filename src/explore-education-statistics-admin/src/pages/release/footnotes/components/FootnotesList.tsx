@@ -10,6 +10,7 @@ import { Footnote, FootnoteMeta } from '@admin/services/footnoteService';
 import Button from '@common/components/Button';
 import ButtonGroup from '@common/components/ButtonGroup';
 import Details from '@common/components/Details';
+import InsetText from '@common/components/InsetText';
 import ModalConfirm from '@common/components/ModalConfirm';
 import React, { useMemo, useState } from 'react';
 import { generatePath } from 'react-router';
@@ -38,7 +39,7 @@ const FootnotesList = ({
   }, [footnoteMeta]);
 
   if (footnotes.length === 0) {
-    return <p className="govuk-inset-text">No footnotes have been created.</p>;
+    return <InsetText>No footnotes have been created.</InsetText>;
   }
 
   return (
@@ -119,7 +120,10 @@ const FootnotesList = ({
           }}
         >
           <p>Are you sure you want to delete the following footnote:</p>
-          <p className="govuk-inset-text">{deleteFootnote.content}</p>
+
+          <InsetText>
+            <p>{deleteFootnote.content}</p>
+          </InsetText>
         </ModalConfirm>
       )}
     </>

@@ -558,7 +558,7 @@ describe('ReleaseStatusForm', () => {
     test('shows mapped server validation error from failed `onSubmit`', async () => {
       const handleSubmit = jest.fn().mockImplementation(() => {
         throw createServerValidationErrorMock([
-          'META_GUIDANCE_MUST_BE_POPULATED',
+          'PUBLIC_META_GUIDANCE_REQUIRED',
         ]);
       });
 
@@ -578,7 +578,7 @@ describe('ReleaseStatusForm', () => {
         expect(
           screen.getByRole('link', {
             name:
-              'All public metadata guidance must be populated before release can be approved',
+              'All public metadata guidance must be populated before the release can be approved',
           }),
         ).toBeInTheDocument();
       });

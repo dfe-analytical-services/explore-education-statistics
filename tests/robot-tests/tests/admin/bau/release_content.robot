@@ -39,8 +39,8 @@ Add summary content to release
 Add release note to release
     [Tags]  HappyPath
     user clicks button   Add note
-    user enters text into element  css:textarea#reason  Test release note one
-    user clicks button   Add note
+    user enters text into element  id:createReleaseNoteForm-reason  Test release note one
+    user clicks button   Save note
     user opens details dropdown  See all 1 updates  id:releaseLastUpdated
     ${date}=  get current datetime   %-d %B %Y
     user waits until element contains  css:#releaseNotes li:nth-of-type(1) time  ${date}

@@ -206,10 +206,10 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Services.Interfaces.S
             return userService.DoCheck(release, SecurityPolicies.CanMakeAmendmentOfSpecificRelease);
         }
 
-        public static Task<Either<ActionResult, Release>> CheckCanRunReleaseMigrations(
-            this IUserService userService, Release release)
+        public static Task<Either<ActionResult, Unit>> CheckCanRunMigrations(
+            this IUserService userService)
         {
-            return userService.DoCheck(release, SecurityPolicies.CanRunReleaseMigrations);
+            return userService.DoCheck(SecurityPolicies.CanRunReleaseMigrations);
         }
 
         public static Task<Either<ActionResult, Unit>> CheckCanViewPrereleaseContactsList(

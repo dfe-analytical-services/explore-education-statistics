@@ -7,6 +7,7 @@ import {
 import methodologyService, {
   MethodologyStatusListItem,
 } from '@admin/services/methodologyService';
+import InsetText from '@common/components/InsetText';
 import RelatedInformation from '@common/components/RelatedInformation';
 import Tabs from '@common/components/Tabs';
 import TabsSection from '@common/components/TabsSection';
@@ -137,9 +138,7 @@ const MethodologiesPage = () => {
           {model && model.liveMethodologies.length ? (
             <MethodologiesTable methodologies={model.liveMethodologies} />
           ) : (
-            <div className="govuk-inset-text">
-              There are currently no live methodologies
-            </div>
+            <InsetText>There are currently no live methodologies</InsetText>
           )}
           <Link to="/methodologies/create" className="govuk-button">
             Create new methodology
@@ -156,9 +155,7 @@ const MethodologiesPage = () => {
           {model && model.draftMethodologies.length ? (
             <MethodologiesTable methodologies={model.draftMethodologies} />
           ) : (
-            <div className="govuk-inset-text">
-              There are currently no draft methodologies
-            </div>
+            <InsetText>There are currently no draft methodologies</InsetText>
           )}
         </TabsSection>
         <TabsSection
@@ -172,9 +169,7 @@ const MethodologiesPage = () => {
           {model && model.approvedMethodologies.length ? (
             <MethodologiesTable methodologies={model.approvedMethodologies} />
           ) : (
-            <div className="govuk-inset-text">
-              There are currently no approved methodologies
-            </div>
+            <InsetText>There are currently no approved methodologies</InsetText>
           )}
         </TabsSection>
       </Tabs>

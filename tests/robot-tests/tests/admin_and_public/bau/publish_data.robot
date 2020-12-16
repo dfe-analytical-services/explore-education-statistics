@@ -19,10 +19,25 @@ Create new publication and release via API
     ${PUBLICATION_ID}=  user creates test publication via api   ${PUBLICATION_NAME}
     user create test release via api  ${PUBLICATION_ID}   FY   3000
 
-Go to "Sign off" page
+Navigate to release
     [Tags]  HappyPath
     user navigates to release summary from admin dashboard  ${PUBLICATION_NAME}  Financial Year 3000-01 (not Live)
 
+Add public prerelease access list
+    [Tags]  HappyPath
+    user clicks link  Pre-release access
+    user waits until h2 is visible  Manage pre-release user access
+
+    user clicks link  Public access list
+    user waits until h2 is visible  Public pre-release access list
+    user clicks button   Create public pre-release access list
+    user presses keys  CTRL+a+BACKSPACE
+    user presses keys  Test public access list
+    user clicks button  Save access list
+    user waits until element contains  css:[data-testid="publicPreReleaseAccessListPreview"]  Test public access list
+
+Go to "Sign off" page
+    [Tags]  HappyPath
     user clicks link   Sign off
     user waits until h2 is visible  Sign off
     user waits until page contains button  Edit release status
@@ -154,6 +169,12 @@ Save data block as a highlight
 
     user clicks button   Save data block
     user waits until page contains    Delete this data block
+
+Add public prerelease access list for new release
+    [Tags]  HappyPath
+    user clicks link  Pre-release access
+    user waits until h2 is visible  Manage pre-release user access
+    user creates public prerelease access list   Test public access list
 
 Go to "Sign off" page for new release
     [Tags]  HappyPath

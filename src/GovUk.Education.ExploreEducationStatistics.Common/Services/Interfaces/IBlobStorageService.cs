@@ -19,6 +19,8 @@ namespace GovUk.Education.ExploreEducationStatistics.Common.Services.Interfaces
 
         public Task DeleteBlob(string containerName, string path);
 
+        public Task<bool> MoveBlob(string containerName, string sourcePath, string destinationPath);
+
         public class UploadFileOptions
         {
             public IDictionary<string, string> MetaValues { get; set; }
@@ -66,6 +68,8 @@ namespace GovUk.Education.ExploreEducationStatistics.Common.Services.Interfaces
         /// <param name="stream">stream to output blob to</param>
         /// <returns>the blob stream</returns>
         public Task<Stream> DownloadToStream(string containerName, string path, Stream stream);
+
+        public Task SetMetadata(string containerName, string path, IDictionary<string, string> metadata);
 
         /// <summary>
         /// Stream a blob in chunks.

@@ -167,6 +167,27 @@ user approves methodology
     user waits until h2 is visible  Methodology status
     user checks page contains tag  Approved
 
+user creates public prerelease access list
+    [Arguments]  ${content}
+    user clicks link  Public access list
+    user waits until h2 is visible  Public pre-release access list
+    user clicks button   Create public pre-release access list
+    user presses keys  CTRL+a+BACKSPACE
+    user presses keys  ${content}
+    user clicks button  Save access list
+    user waits until element contains  css:[data-testid="publicPreReleaseAccessListPreview"]  ${content}
+
+user updates public prerelease access list
+    [Arguments]  ${content}
+    user clicks link  Public access list
+    user waits until h2 is visible  Public pre-release access list
+    user clicks button   Edit public pre-release access list
+    user presses keys  CTRL+a
+    user presses keys  BACKSPACE
+    user presses keys  ${content}
+    user clicks button  Save access list
+    user waits until element contains  css:[data-testid="publicPreReleaseAccessListPreview"]  ${content}
+
 user checks draft releases tab contains publication
     [Arguments]    ${publication_name}
     user checks page contains element   xpath://*[@id="draft-releases"]//h3[text()="${publication_name}"]

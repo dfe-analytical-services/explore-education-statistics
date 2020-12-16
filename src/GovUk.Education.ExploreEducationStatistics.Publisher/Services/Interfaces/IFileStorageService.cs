@@ -1,4 +1,4 @@
-using System.Collections.Generic;
+using System;
 using System.Threading.Tasks;
 using GovUk.Education.ExploreEducationStatistics.Common.Model;
 using GovUk.Education.ExploreEducationStatistics.Content.Model;
@@ -9,6 +9,10 @@ namespace GovUk.Education.ExploreEducationStatistics.Publisher.Services.Interfac
 {
     public interface IFileStorageService
     {
+        Task<BlobLease> AcquireLease(string blobName);
+
+        Task<bool> CheckBlobExists(string containerName, string path);
+
         Task CopyReleaseFilesToPublicContainer(CopyReleaseFilesCommand copyReleaseFilesCommand);
 
         Task DeleteAllContentAsyncExcludingStaging();
@@ -19,9 +23,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Publisher.Services.Interfac
 
         Task DeletePublicBlob(string path);
 
-        Task<BlobLease> AcquireLease(string blobName);
-
-        Task<IEnumerable<FileInfo>> ListPublicFiles(string publication, string release);
+        Task<BlobInfo> GetBlob(string containerName, string path);
 
         Task MovePublicDirectory(string containerName, string sourceDirectoryPath, string destinationDirectoryPath);
 

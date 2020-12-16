@@ -16,7 +16,6 @@ using Newtonsoft.Json;
 using static GovUk.Education.ExploreEducationStatistics.Common.BlobContainerNames;
 using static GovUk.Education.ExploreEducationStatistics.Common.Services.FileStoragePathUtils;
 using static GovUk.Education.ExploreEducationStatistics.Common.TableStorageTableNames;
-using IFileStorageService = GovUk.Education.ExploreEducationStatistics.Data.Api.Services.Interfaces.IFileStorageService;
 using StorageException = Microsoft.Azure.Storage.StorageException;
 
 namespace GovUk.Education.ExploreEducationStatistics.Data.Api.Services
@@ -24,20 +23,20 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Api.Services
     public class FastTrackService : IFastTrackService
     {
         private readonly ITableBuilderService _tableBuilderService;
-        private readonly IFileStorageService _fileStorageService;
+        private readonly IBlobStorageService _blobStorageService;
         private readonly ISubjectService _subjectService;
         private readonly ITableStorageService _tableStorageService;
         private readonly IMapper _mapper;
 
         public FastTrackService(
             ITableBuilderService tableBuilderService,
-            IFileStorageService fileStorageService,
+            IBlobStorageService blobStorageService,
             ISubjectService subjectService,
             ITableStorageService tableStorageService,
             IMapper mapper)
         {
             _tableBuilderService = tableBuilderService;
-            _fileStorageService = fileStorageService;
+            _blobStorageService = blobStorageService;
             _subjectService = subjectService;
             _tableStorageService = tableStorageService;
             _mapper = mapper;
@@ -74,7 +73,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Api.Services
             return await GetReleaseFastTrack(id)
                 .OnSuccess(async releaseFastTrack =>
                 {
-                    var text = await _fileStorageService.GetBlobText(PublicContentContainerName,
+                    var text = await _blobStorageService.DownloadBlobText(PublicContentContainerName,
                         PublicContentFastTrackPath(releaseFastTrack.ReleaseId.ToString(), id.ToString()));
                     return JsonConvert.DeserializeObject<FastTrack>(text);
                 });

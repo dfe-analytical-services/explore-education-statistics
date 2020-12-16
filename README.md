@@ -327,6 +327,17 @@ cd explore-education-statistics\src\GovUk.Education.ExploreEducationStatistics.A
 dotnet ef migrations add EES1234MigrationNameGoesHere --context UsersAndRolesDbContext -v
 ```
 
+### Resetting the storage emulator
+
+During development you might want to reset your storage emulator to clear out all data from 
+blobs, queues and tables. This is typically done at the same time as resetting the databases.
+
+To delete all data in the storage emulator:
+
+```
+AzureStorageEmulator.exe clear blob queue table
+```
+
 ## Automated tests
 
 Aside from unit tests for each project, we maintain suites of Robot Framework and Postman/Newman 

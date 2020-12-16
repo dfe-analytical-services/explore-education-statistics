@@ -17,6 +17,7 @@ import Button from '@common/components/Button';
 import ButtonGroup from '@common/components/ButtonGroup';
 import CollapsibleList from '@common/components/CollapsibleList';
 import Details from '@common/components/Details';
+import InsetText from '@common/components/InsetText';
 import LoadingSpinner from '@common/components/LoadingSpinner';
 import ModalConfirm from '@common/components/ModalConfirm';
 import SummaryList from '@common/components/SummaryList';
@@ -468,7 +469,9 @@ const DataFileReplacementPlan = ({
             >
               <p>Are you sure you want to delete the following footnote?</p>
 
-              <p className="govuk-inset-text">{deleteFootnote?.content}</p>
+              <InsetText>
+                <p>{deleteFootnote?.content}</p>
+              </InsetText>
             </ModalConfirm>
           )}
         </>
