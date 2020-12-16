@@ -581,6 +581,7 @@ Add meta guidance to ${THIRD_SUBJECT} subject
     user waits until page contains accordion section  ${THIRD_SUBJECT}
     user enters text into meta guidance data file content editor  ${THIRD_SUBJECT}
     ...  meta guidance content
+    user clicks button  Save guidance
 
 Navigate to 'Footnotes' Tab
     [Tags]  HappyPath
@@ -591,18 +592,19 @@ Add footnote to "upload file test filter" subject file
     [Tags]  HappyPath
     user clicks link  Create footnote
     user waits until h2 is visible  Create footnote
-    user clicks element  //*[@data-testid="footnote-subject ${THIRD_SUBJECT}"]//input
+    user clicks element  xpath://*[@data-testid="footnote-subject ${THIRD_SUBJECT}"]//input
     user enters text into element  id:footnoteForm-content  upload file test filter footnote
     user clicks button  Save footnote
+    user waits until page contains testid  footnote upload file test filter footnote
     user waits until h2 is visible  Footnotes
 
-Update ${SUBJECT_NAME} footnote
+Update Seven filters footnote
     [Tags]  HappyPath
-    user clicks element  xpath://*[@data-testid="footnote Footnote 1 Seven filters"]//div//div[2]//a
-    # seven filters
+    user clicks link   Edit footnote   xpath://*[@data-testid="footnote Footnote 1 ${SUBJECT_NAME}"]
     user enters text into element  id:footnoteForm-content  Updating ${SUBJECT_NAME} footnote
+    textarea should contain  id:footnoteForm-content  Updating ${SUBJECT_NAME} footnote
     user clicks button  Save footnote
-    user waits until h2 is visible  Footnotes
+    user waits until page contains testid  footnote Updating ${SUBJECT_NAME} footnote
 
 Go to "Sign off" page for amendment
     [Tags]  HappyPath
@@ -619,6 +621,15 @@ Approve the release for amendment
     user clicks radio   As soon as possible
     user clicks button   Update status
 
+Wait for release process status to be Complete again
+    [Tags]  HappyPath
+    # EES-1007 - Release process status doesn't automatically update
+    user waits until h2 is visible  Sign off
+    user checks summary list contains  Current status  Approved
+    user waits for release process status to be  Complete    ${release_complete_wait}
+    user reloads page  # EES-1448
+    user checks page does not contain button  Edit release status
+
 Go to Table Tool page for amendment
     [Tags]  HappyPath
     user goes to url  %{PUBLIC_URL}/data-tables
@@ -634,7 +645,7 @@ Go to amended release & create table
     user clicks element    id:publicationForm-submit
     user waits until h2 is visible  Choose a subject
     user checks previous table tool step contains  1   Publication   ${PUBLICATION_NAME}
-    user checks page does not contain  ${SECOND_SUBJECT}
+    #user checks page does not contain  ${SECOND_SUBJECT}   # EES-1360
 
 Select ${SUBJECT_NAME} subject
     user clicks radio   ${SUBJECT_NAME}
@@ -683,6 +694,10 @@ Generate table
 Wait until the table is generated
     [Tags]  HappyPath
     user waits until page contains button  Generate permanent link
+
+Validate generated table
+    [Tags]   HappyPath
+    user checks page contains  Updating ${SUBJECT_NAME} footnote
 
 Generate the new permalink
     [Tags]  HappyPath
