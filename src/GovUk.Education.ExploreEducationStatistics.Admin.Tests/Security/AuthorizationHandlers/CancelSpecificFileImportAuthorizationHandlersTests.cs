@@ -1,7 +1,12 @@
 using System;
+using System.Collections.Generic;
+using System.Linq;
 using GovUk.Education.ExploreEducationStatistics.Admin.Models;
 using GovUk.Education.ExploreEducationStatistics.Admin.Security;
 using GovUk.Education.ExploreEducationStatistics.Admin.Security.AuthorizationHandlers;
+using GovUk.Education.ExploreEducationStatistics.Common.Extensions;
+using GovUk.Education.ExploreEducationStatistics.Common.Model;
+using GovUk.Education.ExploreEducationStatistics.Common.Services;
 using GovUk.Education.ExploreEducationStatistics.Common.Services.Interfaces;
 using Moq;
 using Xunit;
@@ -12,46 +17,69 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Security.Author
     public class CancelSpecificFileImportAuthorizationHandlersTests
     {
         [Fact]
-        public void CannotCancelFinishedImport()
+        public void CannotCancelFinishedOrAbortingImport()
         {
-            var releaseId = Guid.NewGuid();
-            var dataFileName = "my_data_file.csv";
-            
-            var importStatusService = new Mock<IImportStatusService>();
+            var finishedOrAbortingStatuses = EnumUtil
+                .GetEnumValues<IStatus>()
+                .Where(ImportStatus.IsFinishedOrAbortingState)
+                .ToList();
 
-            importStatusService
-                .Setup(s => s.IsImportFinished(releaseId, dataFileName))
-                .ReturnsAsync(true);
+            finishedOrAbortingStatuses.ForEach(state =>
+            {
+                var releaseId = Guid.NewGuid();
+                var dataFileName = "my_data_file.csv";
 
-            // Assert that no users can cancel a finished Import
-            AssertHandlerSucceedsWithCorrectClaims<ReleaseFileImportInfo, CancelSpecificFileImportRequirement>(
-                new CancelSpecificFileImportAuthorizationHandler(importStatusService.Object), new ReleaseFileImportInfo
-                {
-                    ReleaseId = releaseId,
-                    DataFileName = dataFileName,
-                });
+                var importStatusService = new Mock<IImportStatusService>();
+
+                importStatusService
+                    .Setup(s => s.GetImportStatus(releaseId, dataFileName))
+                    .ReturnsAsync(new ImportStatus
+                    {
+                        Status = state
+                    });
+
+                // Assert that no users can cancel a finished or aborting Import
+                AssertHandlerSucceedsWithCorrectClaims<ReleaseFileImportInfo, CancelSpecificFileImportRequirement>(
+                    new CancelSpecificFileImportAuthorizationHandler(importStatusService.Object),
+                    new ReleaseFileImportInfo
+                    {
+                        ReleaseId = releaseId,
+                        DataFileName = dataFileName,
+                    });
+            });
         }
         
         [Fact]
-        public void CanCancelFinishedImportWithCorrectClaim()
+        public void CanCancelFinishedImportWithCorrectClaimAndImportState()
         {
-            var releaseId = Guid.NewGuid();
-            var dataFileName = "my_data_file.csv";
+            var nonFinishedOrAbortingStatuses = EnumUtil
+                .GetEnumValues<IStatus>()
+                .Where(s => !ImportStatus.IsFinishedOrAbortingState(s))
+                .ToList();
             
-            var importStatusService = new Mock<IImportStatusService>();
+            nonFinishedOrAbortingStatuses.ForEach(state =>
+            {
+                var releaseId = Guid.NewGuid();
+                var dataFileName = "my_data_file.csv";
+            
+                var importStatusService = new Mock<IImportStatusService>();
 
-            importStatusService
-                .Setup(s => s.IsImportFinished(releaseId, dataFileName))
-                .ReturnsAsync(false);
+                importStatusService
+                    .Setup(s => s.GetImportStatus(releaseId, dataFileName))
+                    .ReturnsAsync(new ImportStatus
+                    {
+                        Status = state
+                    });
 
-            // Assert that no users can cancel a finished Import
-            AssertHandlerSucceedsWithCorrectClaims<ReleaseFileImportInfo, CancelSpecificFileImportRequirement>(
-                new CancelSpecificFileImportAuthorizationHandler(importStatusService.Object), new ReleaseFileImportInfo
-                {
-                    ReleaseId = releaseId,
-                    DataFileName = dataFileName,
-                },
-                SecurityClaimTypes.CancelAllFileImports);
+                // Assert that no users can cancel a finished Import
+                AssertHandlerSucceedsWithCorrectClaims<ReleaseFileImportInfo, CancelSpecificFileImportRequirement>(
+                    new CancelSpecificFileImportAuthorizationHandler(importStatusService.Object), new ReleaseFileImportInfo
+                    {
+                        ReleaseId = releaseId,
+                        DataFileName = dataFileName,
+                    },
+                    SecurityClaimTypes.CancelAllFileImports);
+            });
         }
     }
 }
