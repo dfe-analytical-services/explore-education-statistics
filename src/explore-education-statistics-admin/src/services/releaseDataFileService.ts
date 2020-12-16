@@ -113,7 +113,7 @@ const releaseDataFileService = {
         return dataFiles.map(mapFile);
       });
   },
-  getDataFileWIthPermissions(
+  getDataFileWithPermissions(
     releaseId: string,
     fileId: string,
   ): Promise<DataFileWithPermissions> {
