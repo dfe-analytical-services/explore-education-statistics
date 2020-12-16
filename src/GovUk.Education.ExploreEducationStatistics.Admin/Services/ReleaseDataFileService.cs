@@ -1,4 +1,4 @@
-﻿using System;
+﻿﻿using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
@@ -228,7 +228,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Services
                                             Metadata);
 
                                         var dataInfo = GetDataFileMetaValues(
-                                            name: validSubjectName,
+                                            name: validSubjectName,    
                                             metaFileName: metaFile.FileName,
                                             userName: userName,
                                             numberOfRows: CalculateNumberOfRows(dataFile.OpenReadStream())
@@ -267,7 +267,8 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Services
                                             Rows = blob.GetNumberOfRows(),
                                             UserName = blob.GetUserName(),
                                             Status = IStatus.QUEUED,
-                                            Created = blob.Created
+                                            Created = blob.Created,
+                                            Permissions = await _userService.GetDataFilePermissions(releaseId, blob.FileName)
                                         };
                                     }));
                         });
@@ -355,7 +356,8 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Services
                                                         Rows = blob.GetNumberOfRows(),
                                                         UserName = blob.GetUserName(),
                                                         Status = IStatus.QUEUED,
-                                                        Created = blob.Created
+                                                        Created = blob.Created,
+                                                        Permissions = await _userService.GetDataFilePermissions(releaseId, blob.FileName)
                                                     };
                                                 });
                                         }));
@@ -401,7 +403,8 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Services
                 Rows = blob.GetNumberOfRows(),
                 UserName = blob.GetUserName(),
                 Status = importStatus.Status,
-                Created = blob.Created
+                Created = blob.Created,
+                Permissions = await _userService.GetDataFilePermissions(releaseId, blob.FileName)
             };
         }
 
@@ -432,7 +435,8 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Services
                         Rows = 0,
                         UserName = zipBlob.GetUserName(),
                         Status = importStatus.Status,
-                        Created = zipBlob.Created
+                        Created = zipBlob.Created,
+                        Permissions = await _userService.GetDataFilePermissions(releaseId, file.Filename)
                     };
                 }
             }
@@ -469,7 +473,8 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Services
                 MetaFileName = metaFileReference?.Filename ?? "",
                 Rows = 0,
                 UserName = "",
-                Status = IStatus.NOT_FOUND
+                Status = IStatus.NOT_FOUND,
+                Permissions = await _userService.GetDataFilePermissions(releaseId, dataFileName)
             };
         }
 

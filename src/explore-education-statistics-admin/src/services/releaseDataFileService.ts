@@ -1,4 +1,5 @@
 import { DeleteDataBlockPlan } from '@admin/services/dataBlockService';
+import { DataFilePermissions } from '@admin/services/permissionService';
 import client from '@admin/services/utils/service';
 import { FileInfo } from '@common/services/types/file';
 import { Overwrite } from '@common/types';
@@ -13,6 +14,7 @@ interface DataFileInfo extends FileInfo {
   created: string;
   status: ImportStatusCode;
   replacedBy?: string;
+  permissions: DataFilePermissions;
 }
 
 export interface DeleteDataFilePlan {
@@ -36,6 +38,10 @@ export interface DataFile {
   replacedBy?: string;
   created?: string;
   isDeleting?: boolean;
+}
+
+export interface DataFileWithPermissions extends DataFile {
+  permissions: DataFilePermissions;
 }
 
 export type UploadDataFilesRequest =
@@ -82,29 +88,24 @@ export interface DataFileImportStatus {
   errors?: string[];
   numberOfRows: number;
 }
-function mapFile(file: DataFileInfo): DataFile {
+function mapFile(file: DataFileInfo): DataFileWithPermissions {
   const [size, unit] = file.size.split(' ');
 
   return {
-    id: file.id,
+    ...file,
     title: file.name,
-    fileName: file.fileName,
     rows: file.rows || 0,
     fileSize: {
       size: parseInt(size, 10),
       unit,
     },
-    metaFileId: file.metaFileId,
-    metaFileName: file.metaFileName,
-    replacedBy: file.replacedBy,
-    userName: file.userName,
-    created: file.created,
-    status: file.status,
   };
 }
 
 const releaseDataFileService = {
-  getDataFiles(releaseId: string): Promise<DataFile[]> {
+  getDataFilesWithPermissions(
+    releaseId: string,
+  ): Promise<DataFileWithPermissions[]> {
     return client
       .get<DataFileInfo[]>(`/release/${releaseId}/data`)
       .then(response => {
@@ -112,7 +113,10 @@ const releaseDataFileService = {
         return dataFiles.map(mapFile);
       });
   },
-  getDataFile(releaseId: string, fileId: string): Promise<DataFile> {
+  getDataFileWIthPermissions(
+    releaseId: string,
+    fileId: string,
+  ): Promise<DataFileWithPermissions> {
     return client
       .get<DataFileInfo>(`/release/${releaseId}/data/${fileId}`)
       .then(mapFile);
@@ -120,7 +124,7 @@ const releaseDataFileService = {
   async uploadDataFiles(
     releaseId: string,
     request: UploadDataFilesRequest,
-  ): Promise<DataFile> {
+  ): Promise<DataFileWithPermissions> {
     const { dataFile, metadataFile, ...params } = request;
 
     const data = new FormData();
@@ -140,7 +144,7 @@ const releaseDataFileService = {
   async uploadZipDataFile(
     releaseId: string,
     request: UploadZipDataFileRequest,
-  ): Promise<DataFile> {
+  ): Promise<DataFileWithPermissions> {
     const { zipFile, ...params } = request;
 
     const data = new FormData();
@@ -196,6 +200,9 @@ const releaseDataFileService = {
         responseType: 'blob',
       })
       .then(response => downloadFile(response, fileName));
+  },
+  cancelImport(releaseId: string, fileId: string): Promise<void> {
+    return client.post(`/release/${releaseId}/data/${fileId}/import/cancel`);
   },
 };
 

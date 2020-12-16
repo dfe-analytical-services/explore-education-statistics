@@ -20,5 +20,6 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Models
 
         [JsonConverter(typeof(EnumToEnumValueJsonConverter<IStatus>))]
         public IStatus Status { get; set; }
+        public DataFilePermissions Permissions { get; set; }
     }
 }
