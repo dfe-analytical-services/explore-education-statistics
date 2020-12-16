@@ -1,14 +1,12 @@
 using System;
-using System.IO;
 using System.Threading.Tasks;
-using GovUk.Education.ExploreEducationStatistics.Admin.Controllers.Api.BAU;
 using GovUk.Education.ExploreEducationStatistics.Admin.Models;
 using GovUk.Education.ExploreEducationStatistics.Admin.Security;
 using GovUk.Education.ExploreEducationStatistics.Admin.Services;
-using GovUk.Education.ExploreEducationStatistics.Admin.Services.Interfaces;
+using GovUk.Education.ExploreEducationStatistics.Common.Services.Interfaces;
 using GovUk.Education.ExploreEducationStatistics.Common.Services.Interfaces.Security;
+using GovUk.Education.ExploreEducationStatistics.Data.Processor.Model;
 using Microsoft.AspNetCore.Mvc;
-using Microsoft.Extensions.Configuration;
 using Moq;
 using Xunit;
 
@@ -19,8 +17,9 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
         [Fact]
         public async void CancelFileImport()
         {
-            var userService = new Mock<IUserService>();
-
+            var userService = new Mock<IUserService>(MockBehavior.Strict);
+            var queueService = new Mock<IStorageQueueService>(MockBehavior.Strict);
+            
             var cancelRequest = new ReleaseFileImportInfo
             {
                 ReleaseId = Guid.NewGuid(),
@@ -31,19 +30,26 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
                 .Setup(s => s.MatchesPolicy(cancelRequest, SecurityPolicies.CanCancelOngoingImports))
                 .ReturnsAsync(true);
 
+            queueService
+                .Setup(s => s.AddMessageAsync("imports-cancelling", 
+                    It.Is<CancelImportMessage>(m => m.ReleaseId == cancelRequest.ReleaseId 
+                                                    && m.DataFileName == cancelRequest.DataFileName))).
+                Returns(Task.CompletedTask);
+
             var service = new ImportService(
-                null, null, null, GetConfiguration(), null, null, userService.Object);
+                null, null, null, queueService.Object, null, null, userService.Object);
             
             var result = await service.CancelImport(cancelRequest);
             Assert.True(result.IsRight);
             
-            MockUtils.VerifyAllMocks(userService);
+            MockUtils.VerifyAllMocks(userService, queueService);
         }
         
         [Fact]
         public async void CancelFileImportButNotAllowed()
         {
             var userService = new Mock<IUserService>();
+            var queueService = new Mock<IStorageQueueService>(MockBehavior.Strict);
 
             var cancelRequest = new ReleaseFileImportInfo
             {
@@ -56,22 +62,13 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
                 .ReturnsAsync(false);
 
             var service = new ImportService(
-                null, null, null, GetConfiguration(), null, null, userService.Object);
+                null, null, null, queueService.Object, null, null, userService.Object);
             
             var result = await service.CancelImport(cancelRequest);
             Assert.True(result.IsLeft);
             Assert.IsType<ForbidResult>(result.Left);
 
-            MockUtils.VerifyAllMocks(userService);
-        }
-
-        private static IConfiguration GetConfiguration()
-        {
-            return new ConfigurationBuilder()
-                .SetBasePath(Directory.GetCurrentDirectory())
-                .AddJsonFile("appsettings.Development.json", optional: false)
-                .AddEnvironmentVariables()
-                .Build();
+            MockUtils.VerifyAllMocks(userService, queueService);
         }
     }
 }
