@@ -23,7 +23,6 @@ using Newtonsoft.Json;
 using static GovUk.Education.ExploreEducationStatistics.Admin.Validators.ValidationErrorMessages;
 using static GovUk.Education.ExploreEducationStatistics.Admin.Validators.ValidationUtils;
 using static GovUk.Education.ExploreEducationStatistics.Common.TableStorageTableNames;
-using IFootnoteService = GovUk.Education.ExploreEducationStatistics.Admin.Services.Interfaces.IFootnoteService;
 using IReleaseService = GovUk.Education.ExploreEducationStatistics.Admin.Services.Interfaces.IReleaseService;
 using Publication = GovUk.Education.ExploreEducationStatistics.Content.Model.Publication;
 using Release = GovUk.Education.ExploreEducationStatistics.Content.Model.Release;

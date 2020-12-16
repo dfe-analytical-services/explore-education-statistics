@@ -31,7 +31,7 @@ const ReleaseDataFilePage = ({
     setState: setDataFile,
     retry: fetchDataFile,
   } = useAsyncHandledRetry(
-    () => releaseDataFileService.getDataFile(releaseId, fileId),
+    () => releaseDataFileService.getDataFileWIthPermissions(releaseId, fileId),
     [releaseId, fileId],
   );
 
@@ -45,7 +45,10 @@ const ReleaseDataFilePage = ({
       return undefined;
     }
 
-    return releaseDataFileService.getDataFile(releaseId, dataFile.replacedBy);
+    return releaseDataFileService.getDataFileWIthPermissions(
+      releaseId,
+      dataFile.replacedBy,
+    );
   }, [dataFile]);
 
   const getReplacementPlanMessage = () => {
