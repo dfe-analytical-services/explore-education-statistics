@@ -357,7 +357,8 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Services
                                                         UserName = blob.GetUserName(),
                                                         Status = IStatus.QUEUED,
                                                         Created = blob.Created,
-                                                        Permissions = await _userService.GetDataFilePermissions(releaseId, blob.FileName)
+                                                        Permissions = await _userService.
+                                                            GetDataFilePermissions(releaseId, archiveFile.DataFileName)
                                                     };
                                                 });
                                         }));

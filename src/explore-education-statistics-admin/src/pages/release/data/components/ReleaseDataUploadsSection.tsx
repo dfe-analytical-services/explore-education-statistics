@@ -66,6 +66,7 @@ const ReleaseDataUploadsSection = ({
   onDataFilesChange,
 }: Props) => {
   const [deleteDataFile, setDeleteDataFile] = useState<DeleteDataFile>();
+  const [cancelDataFile, setCancelDataFile] = useState<DataFile>();
 
   const {
     value: dataFiles = [],
@@ -84,6 +85,19 @@ const ReleaseDataUploadsSection = ({
           : {
               ...file,
               isDeleting: deleting,
+            },
+      ),
+    );
+  };
+
+  const setFileCancelling = (dataFile: DataFile, cancelling: boolean) => {
+    setDataFiles(
+      dataFiles.map(file =>
+        file.fileName !== dataFile.fileName
+          ? file
+          : {
+              ...file,
+              isCancelling: cancelling,
             },
       ),
     );
@@ -281,18 +295,12 @@ const ReleaseDataUploadsSection = ({
                         </>
                       )}
 
-                    {dataFile.permissions.canCancelImport && (
-                      <ButtonText
-                        onClick={() =>
-                          releaseDataFileService.cancelImport(
-                            releaseId,
-                            dataFile.fileName,
-                          )
-                        }
-                      >
-                        Cancel
-                      </ButtonText>
-                    )}
+                    {dataFile.permissions.canCancelImport &&
+                      !dataFile.isCancelling && (
+                        <ButtonText onClick={() => setCancelDataFile(dataFile)}>
+                          Cancel
+                        </ButtonText>
+                      )}
                   </DataFileDetailsTable>
                 </div>
               </AccordionSection>
@@ -368,6 +376,31 @@ const ReleaseDataUploadsSection = ({
               } will be removed or updated.`}
             </p>
           )}
+        </ModalConfirm>
+      )}
+
+      {cancelDataFile && (
+        <ModalConfirm
+          mounted
+          title="Confirm cancellation of selected data file"
+          onExit={() => setCancelDataFile(undefined)}
+          onCancel={() => setCancelDataFile(undefined)}
+          onConfirm={async () => {
+            try {
+              await releaseDataFileService.cancelImport(
+                releaseId,
+                cancelDataFile.fileName,
+              );
+
+              setCancelDataFile(undefined);
+              setFileCancelling(cancelDataFile, true);
+            } catch (err) {
+              logger.error(err);
+              setFileCancelling(cancelDataFile, false);
+            }
+          }}
+        >
+          <p>This file upload will be cancelled and may then be removed.</p>
         </ModalConfirm>
       )}
     </>

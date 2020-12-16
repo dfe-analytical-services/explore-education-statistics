@@ -38,6 +38,7 @@ export interface DataFile {
   replacedBy?: string;
   created?: string;
   isDeleting?: boolean;
+  isCancelling?: boolean;
 }
 
 export interface DataFileWithPermissions extends DataFile {
