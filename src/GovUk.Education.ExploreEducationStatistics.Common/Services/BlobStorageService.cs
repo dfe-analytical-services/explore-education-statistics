@@ -1,3 +1,4 @@
+using System;
 using System.Collections.Generic;
 using System.IO;
 using System.Text;
@@ -16,6 +17,8 @@ using Microsoft.Azure.Storage.DataMovement;
 using Microsoft.Extensions.Logging;
 using static GovUk.Education.ExploreEducationStatistics.Common.Services.FileStorageUtils;
 using BlobInfo = GovUk.Education.ExploreEducationStatistics.Common.Model.BlobInfo;
+using BlobProperties = Azure.Storage.Blobs.Models.BlobProperties;
+using CopyStatus = Azure.Storage.Blobs.Models.CopyStatus;
 
 namespace GovUk.Education.ExploreEducationStatistics.Common.Services
 {
@@ -84,14 +87,13 @@ namespace GovUk.Education.ExploreEducationStatistics.Common.Services
 
         public async Task<bool> CheckBlobExists(string containerName, string path)
         {
-            var blobContainer = await GetBlobContainer(containerName);
-            return await blobContainer.GetBlobClient(path).ExistsAsync();
+            var blob = await GetBlobClient(containerName, path);
+            return await blob.ExistsAsync();
         }
 
         public async Task<BlobInfo> GetBlob(string containerName, string path)
         {
-            var blobContainer = await GetBlobContainer(containerName);
-            var blob = blobContainer.GetBlobClient(path);
+            var blob = await GetBlobClient(containerName, path);
             var properties = (await blob.GetPropertiesAsync()).Value;
 
             return new BlobInfo(
@@ -153,8 +155,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Common.Services
 
         public async Task DeleteBlob(string containerName, string path)
         {
-            var blobContainer = await GetBlobContainer(containerName);
-            var blob = blobContainer.GetBlobClient(path);
+            var blob = await GetBlobClient(containerName, path);
 
             _logger.LogInformation($"Deleting blob {containerName}/{path}");
 
@@ -167,8 +168,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Common.Services
             IFormFile file,
             IBlobStorageService.UploadFileOptions options = null)
         {
-            var blobContainer = await GetBlobContainer(containerName);
-            var blob = blobContainer.GetBlobClient(path);
+            var blob = await GetBlobClient(containerName, path);
 
             var tempFilePath = await UploadToTemporaryFile(file);
 
@@ -178,10 +178,68 @@ namespace GovUk.Education.ExploreEducationStatistics.Common.Services
                 tempFilePath,
                 new BlobHttpHeaders
                 {
-                    ContentType = file.ContentType,
+                    ContentType = file.ContentType
                 },
                 options?.MetaValues
             );
+        }
+
+        public async Task<bool> MoveBlob(string containerName,
+            string sourcePath,
+            string destinationPath)
+        {
+            var blobContainer = await GetBlobContainer(containerName);
+
+            var destinationBlob = blobContainer.GetBlobClient(destinationPath);
+            if (await destinationBlob.ExistsAsync())
+            {
+                _logger.LogWarning(
+                    "Destination already exists while moving blob. Source: '{source}' Destination: '{destination}'",
+                    sourcePath, destinationPath);
+                return false;
+            }
+
+            var sourceBlob = blobContainer.GetBlobClient(sourcePath);
+            if (!await sourceBlob.ExistsAsync())
+            {
+                _logger.LogWarning(
+                    "Source blob not found while moving blob. Source: '{source}' Destination: '{destination}'",
+                    sourcePath, destinationPath);
+                return false;
+            }
+
+            // Lease the source blob for the copy operation 
+            // to prevent another client from modifying it.
+            var lease = sourceBlob.GetBlobLeaseClient();
+
+            // Specifying -1 for the lease interval creates an infinite lease.
+            await lease.AcquireAsync(TimeSpan.FromSeconds(-1));
+
+            try
+            {
+                await destinationBlob.StartCopyFromUriAsync(sourceBlob.Uri);
+
+                // Get the destination blob's properties and log the progress
+                BlobProperties destinationProperties = await destinationBlob.GetPropertiesAsync();
+                while (destinationProperties.CopyStatus == CopyStatus.Pending)
+                {
+                    await Task.Delay(1000);
+                    _logger.LogInformation("Copy progress: {progress}", destinationProperties.CopyProgress);
+                    destinationProperties = await destinationBlob.GetPropertiesAsync();
+                }
+                
+                if (destinationProperties.CopyStatus != CopyStatus.Success)
+                {
+                    return false;
+                }
+            }
+            finally
+            {
+                await lease.ReleaseAsync();
+            }
+
+            await sourceBlob.DeleteAsync();
+            return true;
         }
 
         private static async Task<string> UploadToTemporaryFile(IFormFile file)
@@ -309,6 +367,12 @@ namespace GovUk.Education.ExploreEducationStatistics.Common.Services
             return targetStream;
         }
 
+        public async Task SetMetadata(string containerName, string path, IDictionary<string, string> metadata)
+        {
+            var blob = await GetBlobClient(containerName, path);
+            await blob.SetMetadataAsync(metadata);
+        }
+
         public async Task<Stream> StreamBlob(string containerName, string path, int? bufferSize = null)
         {
             // Azure SDK v12 isn't compatible with how we want to use file
@@ -334,8 +398,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Common.Services
 
         public async Task<string> DownloadBlobText(string containerName, string path)
         {
-            var blobContainer = await GetBlobContainer(containerName);
-            var blob = blobContainer.GetBlobClient(path);
+            var blob = await GetBlobClient(containerName, path);
 
             if (!await blob.ExistsAsync())
             {
@@ -483,6 +546,12 @@ namespace GovUk.Education.ExploreEducationStatistics.Common.Services
                 destination.Container.Name,
                 destination.Name
             );
+        }
+
+        private async Task<BlobClient> GetBlobClient(string containerName, string path)
+        {
+            var blobContainer = await GetBlobContainer(containerName);
+            return blobContainer.GetBlobClient(path);
         }
 
         /**

@@ -111,13 +111,10 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Validators
         FileCannotBeEmpty,
         FileTypeInvalid,
         FilenameCannotContainSpacesOrSpecialCharacters,
-        FileUploadNameCannotContainSpecialCharacters,
 
         // Data file
         SubjectTitleCannotContainSpecialCharacters,
         SubjectTitleMustBeUnique,
-        CannotUseGenericFunctionToDeleteDataFile,
-        CannotUseGenericFunctionToAddDataFile,
         CannotOverwriteDataFile,
         DataAndMetadataFilesCannotHaveTheSameName,
         DataFileCannotBeEmpty,

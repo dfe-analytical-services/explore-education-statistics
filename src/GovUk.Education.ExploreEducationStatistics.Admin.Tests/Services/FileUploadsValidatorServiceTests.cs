@@ -8,7 +8,6 @@ using System.Threading.Tasks;
 using GovUk.Education.ExploreEducationStatistics.Admin.Services;
 using GovUk.Education.ExploreEducationStatistics.Common.Model;
 using GovUk.Education.ExploreEducationStatistics.Common.Services.Interfaces;
-using GovUk.Education.ExploreEducationStatistics.Content.Model;
 using GovUk.Education.ExploreEducationStatistics.Data.Model;
 using GovUk.Education.ExploreEducationStatistics.Data.Model.Services.Interfaces;
 using Microsoft.AspNetCore.Http;
@@ -20,132 +19,66 @@ using static GovUk.Education.ExploreEducationStatistics.Admin.Validators.Validat
 
 namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
 {
-    public class FileUploadsServiceValidatorTests
+    public class FileUploadsValidatorServiceTests
     {
         [Fact]
-        public async Task AncillaryFileCannotBeEmpty()
+        public async Task ValidateFileForUpload_FileCannotBeEmpty()
         {
             var (subjectService, fileTypeService) = Mocks();
             var service = new FileUploadsValidatorService(subjectService.Object, fileTypeService.Object, null);
 
             var file = CreateFormFile("test.csv", "test.csv");
 
-            var result = await service.ValidateFileForUpload(Guid.NewGuid(),
-                file, ReleaseFileTypes.Ancillary, true);
+            var result = await service.ValidateFileForUpload(file, ReleaseFileTypes.Ancillary);
 
             Assert.True(result.IsLeft);
             AssertValidationProblem(result.Left, FileCannotBeEmpty);
         }
 
         [Fact]
-        public async Task AncillaryFileIsValid()
+        public async Task ValidateFileForUpload_ExceptionThrownForDataFileType()
         {
             var (subjectService, fileTypeService) = Mocks();
+            var service = new FileUploadsValidatorService(subjectService.Object, fileTypeService.Object, null);
 
-            await using (var context = InMemoryApplicationDbContext())
-            {
-                var service = new FileUploadsValidatorService(subjectService.Object, fileTypeService.Object, context);
+            var file = CreateFormFile("test.csv", "test.csv");
 
-                var file = CreateSingleLineFormFile("test.csv", "test.csv");
-
-                var result = await service.ValidateFileForUpload(Guid.NewGuid(),
-                    file, ReleaseFileTypes.Ancillary, true);
-
-                Assert.True(result.IsRight);
-            }
+            await Assert.ThrowsAsync<ArgumentException>(() => service.ValidateFileForUpload(file, ReleaseFileTypes.Data));
         }
 
         [Fact]
-        public async Task AncillaryFilenameIsInvalid()
+        public async Task ValidateFileForUpload_FileTypeIsValid()
         {
             var (subjectService, fileTypeService) = Mocks();
 
-            await using (var context = InMemoryApplicationDbContext())
-            {
-                var service = new FileUploadsValidatorService(subjectService.Object, fileTypeService.Object, context);
+            var service = new FileUploadsValidatorService(subjectService.Object, fileTypeService.Object, null);
 
-                var file = CreateSingleLineFormFile("test 123.csv", "test 123.csv");
+            var file = CreateSingleLineFormFile("test.csv", "test.csv");
 
-                var result = await service.ValidateFileForUpload(Guid.NewGuid(),
-                    file, ReleaseFileTypes.Ancillary, true);
+            fileTypeService
+                .Setup(s => s.HasMatchingMimeType(file, It.IsAny<IEnumerable<Regex>>()))
+                .ReturnsAsync(() => true);
+            var result = await service.ValidateFileForUpload(file, ReleaseFileTypes.Ancillary);
 
-                Assert.True(result.IsLeft);
-                AssertValidationProblem(result.Left, FilenameCannotContainSpacesOrSpecialCharacters);
-            }
+            Assert.True(result.IsRight);
         }
 
         [Fact]
-        public async Task AncillaryCannotBeOverwritten()
-        {
-            var (subjectService, fileTypeService) = Mocks();
-            await using (var context = InMemoryApplicationDbContext())
-            {
-                var releaseId = Guid.NewGuid();
-
-                context.Add(new ReleaseFile
-                {
-
-                    ReleaseId = releaseId,
-                    ReleaseFileReference = new ReleaseFileReference()
-                    {
-                        ReleaseId = releaseId,
-                        ReleaseFileType = ReleaseFileTypes.Ancillary,
-                        Filename = "test.csv"
-                    }
-                });
-                await context.SaveChangesAsync();
-
-                var service = new FileUploadsValidatorService(subjectService.Object, fileTypeService.Object, context);
-
-                var file = CreateSingleLineFormFile("test.csv", "test.csv");
-
-                var result = await service.ValidateFileForUpload(releaseId,
-                    file, ReleaseFileTypes.Ancillary, false);
-
-                Assert.True(result.IsLeft);
-                AssertValidationProblem(result.Left, CannotOverwriteFile);
-            }
-        }
-
-        [Fact]
-        public async Task AncillaryFileTypeIsValid()
+        public async Task ValidateFileForUpload_FileTypeIsInvalid()
         {
             var (subjectService, fileTypeService) = Mocks();
 
-            await using (var context = InMemoryApplicationDbContext())
-            {
-                var service = new FileUploadsValidatorService(subjectService.Object, fileTypeService.Object, context);
+            var service = new FileUploadsValidatorService(subjectService.Object, fileTypeService.Object, null);
 
-                var file = CreateSingleLineFormFile("test.csv", "test.csv");
+            var file = CreateSingleLineFormFile("test.csv", "test.csv");
 
-                fileTypeService
-                    .Setup(s => s.HasMatchingMimeType(file, It.IsAny<IEnumerable<Regex>>()))
-                    .ReturnsAsync(() => true);
-                var result = await service.ValidateUploadFileType(file, ReleaseFileTypes.Ancillary);
+            fileTypeService
+                .Setup(s => s.HasMatchingMimeType(file, It.IsAny<IEnumerable<Regex>>()))
+                .ReturnsAsync(() => false);
+            var result = await service.ValidateFileForUpload(file, ReleaseFileTypes.Ancillary);
 
-                Assert.True(result.IsRight);
-            }
-        }
-
-        [Fact]
-        public async Task AncillaryFileTypeIsInvalid()
-        {
-            var (subjectService, fileTypeService) = Mocks();
-
-            await using (var context = InMemoryApplicationDbContext())
-            {
-                var service = new FileUploadsValidatorService(subjectService.Object, fileTypeService.Object, context);
-
-                var file = CreateSingleLineFormFile("test.csv", "test.csv");
-
-                fileTypeService
-                    .Setup(s => s.HasMatchingMimeType(file, It.IsAny<IEnumerable<Regex>>()))
-                    .ReturnsAsync(() => false);
-                var result = await service.ValidateUploadFileType(file, ReleaseFileTypes.Ancillary);
-
-                Assert.True(result.IsLeft);
-                AssertValidationProblem(result.Left, FileTypeInvalid);
-            }
+            Assert.True(result.IsLeft);
+            AssertValidationProblem(result.Left, FileTypeInvalid);
         }
 
         [Fact]

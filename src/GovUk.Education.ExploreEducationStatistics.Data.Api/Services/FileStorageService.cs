@@ -18,7 +18,6 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Api.Services
             _blobStorageService = blobStorageService;
         }
 
-
         public async Task<string> GetBlobText(string containerName, string path)
         {
             return await _blobStorageService.DownloadBlobText(containerName, path);
@@ -55,7 +54,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Api.Services
 
             return new FileStreamResult(stream, blob.ContentType)
             {
-                FileDownloadName = blob.FileName,
+                FileDownloadName = blob.FileName
             };
         }
 

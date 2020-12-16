@@ -5,6 +5,7 @@ using GovUk.Education.ExploreEducationStatistics.Common.Model;
 using GovUk.Education.ExploreEducationStatistics.Data.Api.Services.Interfaces;
 using Microsoft.AspNetCore.Mvc;
 using static GovUk.Education.ExploreEducationStatistics.Common.BlobContainerNames;
+using static GovUk.Education.ExploreEducationStatistics.Common.Model.ReleaseFileTypes;
 using static GovUk.Education.ExploreEducationStatistics.Common.Services.FileStoragePathUtils;
 
 namespace GovUk.Education.ExploreEducationStatistics.Data.Api.Controllers
@@ -20,30 +21,51 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Api.Controllers
             _fileStorageService = fileStorageService;
         }
 
-        [Obsolete(
-            "TODO This endpoint is deprecated and needs to be removed when all file release file types are supported by the front end not just data.")]
-        [HttpGet("{publication}/{release}/{filename}")]
-        public async Task<ActionResult> GetFile(string publication, string release, string filename)
-            => await GetFile(publication, release, ReleaseFileTypes.Data, filename);
-
         [HttpGet("{publication}/{release}/data/{filename}")]
         public async Task<ActionResult> GetDataFile(string publication, string release, string filename)
-            => await GetFile(publication, release, ReleaseFileTypes.Data, filename);
+        {
+            return await GetFile(PublicReleasePath(publication, release, ReleaseFileTypes.Data, filename));
+        }
 
-        [HttpGet("{publication}/{release}/ancillary/{filename}")]
-        public async Task<ActionResult> GetAncillaryFile(string publication, string release, string filename)
-            => await GetFile(publication, release, ReleaseFileTypes.Ancillary, filename);
+        [HttpGet("{publication}/{release}/ancillary/{fileNameOrId}")]
+        public async Task<ActionResult> GetAncillaryFile(string publication, string release, string filenameOrId)
+        {
+            if (Guid.TryParse(filenameOrId, out var idAsGuid))
+            {
+                return await GetFile(PublicReleasePath(publication, release, Ancillary, idAsGuid));
+            }
 
-        [HttpGet("{publication}/{release}/chart/{filename}")]
-        public async Task<ActionResult> GetChartFile(string publication, string release, string filename)
-            => await GetFile(publication, release, ReleaseFileTypes.Chart, filename);
+            // Allow downloading the "All files" zip by filename rather than id
+            if (IsFilenameAllFilesZipFilename(publication, release, filenameOrId))
+            {
+                return await GetFile(PublicReleaseAllFilesZipPath(publication, release));
+            }
 
-        private async Task<ActionResult> GetFile(string publication, string release, ReleaseFileTypes type,
-            string filename)
+            return NotFound();
+        }
+
+        [HttpGet("{publication}/{release}/chart/{fileId}")]
+        public async Task<ActionResult> GetChartFile(string publication, string release, string fileId)
+        {
+            if (Guid.TryParse(fileId, out var idAsGuid))
+            {
+                return await GetFile(PublicReleasePath(publication, release, Chart, idAsGuid));
+            }
+
+            return NotFound();
+        }
+
+        private static bool IsFilenameAllFilesZipFilename(string publication, string release, string filename)
+        {
+            return PublicReleasePath(publication, release, Ancillary, filename) ==
+                   PublicReleaseAllFilesZipPath(publication, release);
+        }
+
+        private async Task<ActionResult> GetFile(string path)
         {
             var isReleased = await _fileStorageService.IsBlobReleased(
                 containerName: PublicFilesContainerName,
-                path: PublicReleasePath(publication, release, type, filename)
+                path: path
             );
 
             if (!isReleased)
@@ -55,10 +77,10 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Api.Controllers
             {
                 return await _fileStorageService.StreamFile(
                     containerName: PublicFilesContainerName,
-                    path: PublicReleasePath(publication, release, type, filename)
+                    path: path
                 );
             }
-            catch (FileNotFoundException e)
+            catch (FileNotFoundException)
             {
                 return NotFound();
             }

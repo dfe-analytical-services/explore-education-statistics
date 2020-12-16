@@ -172,7 +172,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Publisher.Services
         private async Task CacheDownloadTree(PublishContext context, params Guid[] includedReleaseIds)
         {
             // This assumes the files have been copied first
-            var tree = _downloadService.GetTree(includedReleaseIds);
+            var tree = await _downloadService.GetTree(includedReleaseIds);
             await Upload(PublicContentDownloadTreePath, context, tree, _jsonSerializerSettingsCamelCase);
         }
 
@@ -195,7 +195,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Publisher.Services
 
         private async Task CacheLatestRelease(Publication publication, PublishContext context, params Guid[] includedReleaseIds)
         {
-            var viewModel = _releaseService.GetLatestReleaseViewModel(publication.Id, includedReleaseIds, context);
+            var viewModel = await _releaseService.GetLatestReleaseViewModel(publication.Id, includedReleaseIds, context);
             await Upload(prefix => PublicContentLatestReleasePath(publication.Slug, prefix), context, viewModel, _jsonSerializerSettingsCamelCase);
         }
 
@@ -213,7 +213,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Publisher.Services
 
         private async Task CacheRelease(Release release, PublishContext context)
         {
-            var viewModel = _releaseService.GetReleaseViewModel(release.Id, context);
+            var viewModel = await _releaseService.GetReleaseViewModel(release.Id, context);
             await Upload(prefix => PublicContentReleasePath(release.Publication.Slug, release.Slug, prefix), context, viewModel, _jsonSerializerSettingsCamelCase);
         }
 

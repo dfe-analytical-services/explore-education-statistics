@@ -130,7 +130,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
                     {
                         var service = SetupReleaseFileService(userService: userService.Object);
                         return service.UploadAncillary(releaseId: _release.Id,
-                            file: new Mock<IFormFile>().Object,
+                            formFile: new Mock<IFormFile>().Object,
                             name: "");
                     }
                 );
@@ -146,7 +146,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
                     {
                         var service = SetupReleaseFileService(userService: userService.Object);
                         return service.UploadChart(releaseId: _release.Id,
-                            file: new Mock<IFormFile>().Object,
+                            formFile: new Mock<IFormFile>().Object,
                             replacingId: null);
                     }
                 );

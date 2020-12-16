@@ -48,33 +48,22 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Services
                 .OnSuccess(async _ => await ValidateDataFileSizes(archiveFile.DataFileSize, archiveFile.MetaFileSize));
         }
 
-        public async Task<Either<ActionResult, Unit>> ValidateFileForUpload(Guid releaseId, IFormFile file,
-            ReleaseFileTypes type, bool overwrite)
+        public async Task<Either<ActionResult, Unit>> ValidateFileForUpload(IFormFile file, ReleaseFileTypes type)
         {
+            if (type != ReleaseFileTypes.Ancillary && type != ReleaseFileTypes.Chart)
+            {
+                throw new ArgumentException("Cannot use generic function to validate data file", nameof(type));
+            }
+
             // Check that it is not an empty file because this causes issues downstream
             if (file.Length == 0)
             {
                 return ValidationActionResult(FileCannotBeEmpty);
             }
-
-            if (FileContainsSpacesOrSpecialChars(file.FileName))
+            
+            if (!await _fileTypeService.HasMatchingMimeType(file, AllowedMimeTypesByFileType[type]))
             {
-                return ValidationActionResult(FilenameCannotContainSpacesOrSpecialCharacters);
-            }
-
-            if (!overwrite && IsFileExisting(releaseId, type, file.FileName))
-            {
-                return ValidationActionResult(CannotOverwriteFile);
-            }
-
-            return Unit.Instance;
-        }
-
-        public async Task<Either<ActionResult, Unit>> ValidateFileUploadName(string name)
-        {
-            if (FileContainsSpecialChars(name))
-            {
-                return ValidationActionResult(FileUploadNameCannotContainSpecialCharacters);
+                return ValidationActionResult(FileTypeInvalid);
             }
 
             return Unit.Instance;
@@ -90,25 +79,6 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Services
             if (await _subjectService.Get(releaseId, name) != null)
             {
                 return ValidationActionResult(SubjectTitleMustBeUnique);
-            }
-
-            return Unit.Instance;
-        }
-
-        // We cannot rely on the normal upload validation as we want this to be an atomic operation for both files.
-        public async Task<Either<ActionResult, Unit>> ValidateUploadFileType(
-            IFormFile file, ReleaseFileTypes type)
-        {
-            var allowedMimeTypes = AllowedMimeTypesByFileType[type];
-
-            if (!await _fileTypeService.HasMatchingMimeType(file, allowedMimeTypes))
-            {
-                return ValidationActionResult(FileTypeInvalid);
-            }
-
-            if (type == ReleaseFileTypes.Data)
-            {
-                return ValidationActionResult(CannotUseGenericFunctionToAddDataFile);
             }
 
             return Unit.Instance;

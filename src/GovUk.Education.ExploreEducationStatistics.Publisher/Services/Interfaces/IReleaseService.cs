@@ -16,16 +16,19 @@ namespace GovUk.Education.ExploreEducationStatistics.Publisher.Services.Interfac
 
         Task<IEnumerable<Release>> GetAmendedReleases(IEnumerable<Guid> releaseIds);
 
-        CachedReleaseViewModel GetReleaseViewModel(Guid id, PublishContext context);
+        Task<List<FileInfo>> GetDownloadFiles(Release release);
 
-        Release GetLatestRelease(Guid publicationId, IEnumerable<Guid> includedReleaseIds);
+        Task<List<ReleaseFileReference>> GetFiles(Guid releaseId, params ReleaseFileTypes[] types);
 
-        CachedReleaseViewModel GetLatestReleaseViewModel(Guid publicationId, IEnumerable<Guid> includedReleaseIds,
+        Task<Release> GetLatestRelease(Guid publicationId, IEnumerable<Guid> includedReleaseIds);
+
+        Task<CachedReleaseViewModel> GetLatestReleaseViewModel(Guid publicationId,
+            IEnumerable<Guid> includedReleaseIds,
             PublishContext context);
 
-        Task SetPublishedDatesAsync(Guid id, DateTime published);
+        Task<CachedReleaseViewModel> GetReleaseViewModel(Guid id, PublishContext context);
 
-        List<ReleaseFileReference> GetReleaseFileReferences(Guid releaseId, params ReleaseFileTypes[] types);
+        Task SetPublishedDatesAsync(Guid id, DateTime published);
 
         Task DeletePreviousVersionsStatisticalData(params Guid[] releaseIds);
     }

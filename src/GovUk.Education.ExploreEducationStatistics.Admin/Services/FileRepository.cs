@@ -38,6 +38,8 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Services
                 {
                     ReleaseId = releaseId,
                     Filename = filename,
+                    // Mark any new ancillary or chart files as already migrated while this flag temporarily exists 
+                    FilenameMigrated = type == ReleaseFileTypes.Ancillary || type == ReleaseFileTypes.Chart,
                     ReleaseFileType = type,
                     Replacing = replacingFile,
                     Source = source
