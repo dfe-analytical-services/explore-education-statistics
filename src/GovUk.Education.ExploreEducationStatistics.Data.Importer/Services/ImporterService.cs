@@ -128,7 +128,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Importer.Services
             return _importerMetaService.Get(table.Columns, table.Rows, subject, context);
         }
 
-        public async Task ImportFiltersLocationsAndSchools(DataColumnCollection cols, DataRowCollection rows,
+        public async Task ImportFiltersAndLocations(DataColumnCollection cols, DataRowCollection rows,
             SubjectMeta subjectMeta, StatisticsDbContext context, Guid releaseId, string dataFileName)
         {
             // Clearing the caches is required here as the seeder shares the cache with all subjects
@@ -148,7 +148,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Importer.Services
                     if (currentStatus.IsFinishedOrAborting())
                     {
                         _logger.LogInformation($"Import for {dataFileName} has finished or is being aborted, " +
-                                               $"so finishing importing Filters, Locations and Schools early");
+                                               $"so finishing importing Filters and Locations early");
                         return;
                     }
                     

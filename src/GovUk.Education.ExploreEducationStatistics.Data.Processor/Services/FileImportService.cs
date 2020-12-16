@@ -135,7 +135,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Processor.Services
             }
         }
 
-        public async Task ImportFiltersLocationsAndSchools(ImportMessage message, StatisticsDbContext context)
+        public async Task ImportFiltersAndLocations(ImportMessage message, StatisticsDbContext context)
         {
             var dataFileBlobPath = FileStoragePathUtils.AdminReleasePath(message.Release.Id, ReleaseFileTypes.Data, message.DataFileName);
 
@@ -148,7 +148,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Processor.Services
             await using var metaFileStream = await _fileStorageService.StreamBlob(subjectData.MetaBlob);
             var metaFileTable = DataTableUtils.CreateFromStream(metaFileStream);
 
-            await _importerService.ImportFiltersLocationsAndSchools(
+            await _importerService.ImportFiltersAndLocations(
                 dataFileTable.Columns,
                 dataFileTable.Rows,
                 _importerService.GetMeta(metaFileTable, releaseSubject.Subject, context),
