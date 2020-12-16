@@ -4,6 +4,7 @@ using System.Net.Mime;
 using System.Threading.Tasks;
 using AutoMapper;
 using GovUk.Education.ExploreEducationStatistics.Common.Model;
+using GovUk.Education.ExploreEducationStatistics.Common.Services.Interfaces;
 using GovUk.Education.ExploreEducationStatistics.Data.Api.Controllers;
 using GovUk.Education.ExploreEducationStatistics.Data.Api.Models;
 using GovUk.Education.ExploreEducationStatistics.Data.Api.Services.Interfaces;
@@ -20,19 +21,19 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Api.Services
     public class PermalinkService : IPermalinkService
     {
         private readonly ITableBuilderService _tableBuilderService;
-        private readonly IFileStorageService _fileStorageService;
+        private readonly IBlobStorageService _blobStorageService;
         private readonly ISubjectService _subjectService;
         private readonly IReleaseService _releaseService;
         private readonly IMapper _mapper;
 
         public PermalinkService(ITableBuilderService tableBuilderService,
-            IFileStorageService fileStorageService,
+            IBlobStorageService blobStorageService,
             ISubjectService subjectService,
             IReleaseService releaseService,
             IMapper mapper)
         {
             _tableBuilderService = tableBuilderService;
-            _fileStorageService = fileStorageService;
+            _blobStorageService = blobStorageService;
             _subjectService = subjectService;
             _releaseService = releaseService;
             _mapper = mapper;
@@ -42,7 +43,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Api.Services
         {
             try
             {
-                var text = await _fileStorageService.GetBlobText(PublicPermalinkContainerName, id.ToString());
+                var text = await _blobStorageService.DownloadBlobText(PublicPermalinkContainerName, id.ToString());
                 var permalink = JsonConvert.DeserializeObject<Permalink>(text);
                 return await BuildViewModel(permalink);
             }
@@ -67,9 +68,10 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Api.Services
             return await _tableBuilderService.Query(releaseId, request.Query).OnSuccess(async result =>
             {
                 var permalink = new Permalink(request.Configuration, result, request.Query);
-                await _fileStorageService.UploadText(PublicPermalinkContainerName, permalink.Id.ToString(),
-                    MediaTypeNames.Application.Json,
-                    JsonConvert.SerializeObject(permalink));
+                await _blobStorageService.UploadText(containerName: PublicPermalinkContainerName,
+                    path: permalink.Id.ToString(),
+                    content: JsonConvert.SerializeObject(permalink),
+                    contentType: MediaTypeNames.Application.Json);
                 return await BuildViewModel(permalink);
             });
         }
