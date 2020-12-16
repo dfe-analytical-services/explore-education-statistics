@@ -7,7 +7,6 @@ import _dataReplacementService, {
   DataReplacementPlan,
 } from '@admin/services/dataReplacementService';
 import _releaseDataFileService, {
-  DataFile,
   DataFileWithPermissions,
 } from '@admin/services/releaseDataFileService';
 import { render, screen, waitFor } from '@testing-library/react';
@@ -72,7 +71,7 @@ describe('ReleaseDataFilePage', () => {
   };
 
   test('renders original data file details', async () => {
-    releaseDataFileService.getDataFileWIthPermissions.mockResolvedValue(
+    releaseDataFileService.getDataFileWithPermissions.mockResolvedValue(
       testOriginalFile,
     );
     releaseDataFileService.getDataFileImportStatus.mockResolvedValue({
@@ -121,7 +120,7 @@ describe('ReleaseDataFilePage', () => {
   });
 
   test('renders replacement upload form', async () => {
-    releaseDataFileService.getDataFileWIthPermissions.mockResolvedValueOnce(
+    releaseDataFileService.getDataFileWithPermissions.mockResolvedValueOnce(
       testOriginalFile,
     );
     releaseDataFileService.getDataFileImportStatus.mockResolvedValue({
@@ -166,11 +165,11 @@ describe('ReleaseDataFilePage', () => {
   });
 
   test('renders replacement and original data file details', async () => {
-    releaseDataFileService.getDataFileWIthPermissions.mockResolvedValueOnce({
+    releaseDataFileService.getDataFileWithPermissions.mockResolvedValueOnce({
       ...testOriginalFile,
       replacedBy: testReplacementFile.id,
     });
-    releaseDataFileService.getDataFileWIthPermissions.mockResolvedValueOnce(
+    releaseDataFileService.getDataFileWithPermissions.mockResolvedValueOnce(
       testReplacementFile,
     );
     releaseDataFileService.getDataFileImportStatus.mockResolvedValue({
@@ -251,11 +250,11 @@ describe('ReleaseDataFilePage', () => {
   });
 
   test('renders correct error state if unable to load replacement data file', async () => {
-    releaseDataFileService.getDataFileWIthPermissions.mockResolvedValueOnce({
+    releaseDataFileService.getDataFileWithPermissions.mockResolvedValueOnce({
       ...testOriginalFile,
       replacedBy: testReplacementFile.id,
     });
-    releaseDataFileService.getDataFileWIthPermissions.mockRejectedValueOnce(
+    releaseDataFileService.getDataFileWithPermissions.mockRejectedValueOnce(
       new Error('Something went wrong'),
     );
     releaseDataFileService.getDataFileImportStatus.mockResolvedValue({
@@ -322,11 +321,11 @@ describe('ReleaseDataFilePage', () => {
   });
 
   test('renders valid replacement plan', async () => {
-    releaseDataFileService.getDataFileWIthPermissions.mockResolvedValueOnce({
+    releaseDataFileService.getDataFileWithPermissions.mockResolvedValueOnce({
       ...testOriginalFile,
       replacedBy: testReplacementFile.id,
     });
-    releaseDataFileService.getDataFileWIthPermissions.mockResolvedValueOnce(
+    releaseDataFileService.getDataFileWithPermissions.mockResolvedValueOnce(
       testReplacementFile,
     );
     releaseDataFileService.getDataFileImportStatus.mockResolvedValue({
@@ -373,11 +372,11 @@ describe('ReleaseDataFilePage', () => {
   });
 
   test('renders correct state if replacement file has not finished importing', async () => {
-    releaseDataFileService.getDataFileWIthPermissions.mockResolvedValueOnce({
+    releaseDataFileService.getDataFileWithPermissions.mockResolvedValueOnce({
       ...testOriginalFile,
       replacedBy: testReplacementFile.id,
     });
-    releaseDataFileService.getDataFileWIthPermissions.mockResolvedValueOnce({
+    releaseDataFileService.getDataFileWithPermissions.mockResolvedValueOnce({
       ...testReplacementFile,
       status: 'QUEUED',
     });
@@ -428,11 +427,11 @@ describe('ReleaseDataFilePage', () => {
   });
 
   test('renders correct error state if unable to load replacement plan', async () => {
-    releaseDataFileService.getDataFileWIthPermissions.mockResolvedValueOnce({
+    releaseDataFileService.getDataFileWithPermissions.mockResolvedValueOnce({
       ...testOriginalFile,
       replacedBy: testReplacementFile.id,
     });
-    releaseDataFileService.getDataFileWIthPermissions.mockResolvedValueOnce(
+    releaseDataFileService.getDataFileWithPermissions.mockResolvedValueOnce(
       testReplacementFile,
     );
     releaseDataFileService.getDataFileImportStatus.mockResolvedValue({

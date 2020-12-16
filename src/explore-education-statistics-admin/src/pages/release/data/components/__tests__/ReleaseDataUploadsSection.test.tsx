@@ -1,6 +1,5 @@
 import ReleaseDataUploadsSection from '@admin/pages/release/data/components/ReleaseDataUploadsSection';
 import _releaseDataFileService, {
-  DataFile,
   DataFileImportStatus,
   DataFileWithPermissions,
   UploadDataFilesRequest,
