@@ -1,8 +1,8 @@
 import ReleaseServiceStatus from '@admin/components/ReleaseServiceStatus';
 import StatusBlock from '@admin/components/StatusBlock';
 import { useConfig } from '@admin/contexts/ConfigContext';
-import ReleaseStatusForm from '@admin/pages/release/components/ReleaseStatusForm';
 import { useManageReleaseContext } from '@admin/pages/release/contexts/ManageReleaseContext';
+import ReleaseStatusEditPage from '@admin/pages/release/ReleaseStatusEditPage';
 import permissionService, {
   ReleaseStatusPermissions,
 } from '@admin/services/permissionService';
@@ -20,7 +20,7 @@ import {
   formatPartialDate,
   isValidPartialDate,
 } from '@common/utils/date/partialDate';
-import { formatISO, parseISO } from 'date-fns';
+import { parseISO } from 'date-fns';
 import React from 'react';
 
 const statusMap: {
@@ -32,13 +32,13 @@ const statusMap: {
 };
 
 const ReleaseStatusPage = () => {
-  const [showForm, toggleShowForm] = useToggle(false);
+  const [isEditing, toggleEditing] = useToggle(false);
 
   const { releaseId, onChangeReleaseStatus } = useManageReleaseContext();
 
   const { value: release, setState: setRelease } = useAsyncHandledRetry(
     () => releaseService.getRelease(releaseId),
-    [showForm],
+    [isEditing],
   );
 
   const { value: statusPermissions } = useAsyncRetry<ReleaseStatusPermissions>(
@@ -55,27 +55,16 @@ const ReleaseStatusPage = () => {
     !!statusPermissions &&
     Object.values(statusPermissions).some(permission => permission);
 
-  if (showForm && statusPermissions) {
+  if (isEditing && statusPermissions) {
     return (
-      <ReleaseStatusForm
+      <ReleaseStatusEditPage
         release={release}
         statusPermissions={statusPermissions}
-        onCancel={toggleShowForm.off}
-        onSubmit={async values => {
-          const nextRelease = await releaseService.updateRelease(releaseId, {
-            ...release,
-            typeId: release.type.id,
-            ...values,
-            publishScheduled: values.publishScheduled
-              ? formatISO(values.publishScheduled, {
-                  representation: 'date',
-                })
-              : undefined,
-          });
-
+        onCancel={toggleEditing.off}
+        onUpdate={nextRelease => {
           setRelease({ value: nextRelease });
 
-          toggleShowForm.off();
+          toggleEditing.off();
           onChangeReleaseStatus();
         }}
       />
@@ -125,7 +114,7 @@ const ReleaseStatusPage = () => {
       </SummaryList>
 
       {isEditable && (
-        <Button className="govuk-!-margin-top-2" onClick={toggleShowForm.on}>
+        <Button className="govuk-!-margin-top-2" onClick={toggleEditing.on}>
           Edit release status
         </Button>
       )}

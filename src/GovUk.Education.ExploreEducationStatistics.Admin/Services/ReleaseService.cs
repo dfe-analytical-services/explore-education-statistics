@@ -18,7 +18,6 @@ using GovUk.Education.ExploreEducationStatistics.Data.Model;
 using GovUk.Education.ExploreEducationStatistics.Data.Model.Database;
 using GovUk.Education.ExploreEducationStatistics.Data.Model.Services.Interfaces;
 using Microsoft.AspNetCore.Mvc;
-using Microsoft.Azure.Cosmos.Table;
 using Microsoft.EntityFrameworkCore;
 using Newtonsoft.Json;
 using static GovUk.Education.ExploreEducationStatistics.Admin.Validators.ValidationErrorMessages;
@@ -48,7 +47,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Services
         private readonly IImportStatusService _importStatusService;
 	    private readonly IFootnoteService _footnoteService;
         private readonly IDataBlockService _dataBlockService;
-        private readonly IMetaGuidanceService _metaGuidanceService;
+        private readonly IReleaseChecklistService _releaseChecklistService;
         private readonly IReleaseSubjectService _releaseSubjectService;
         private readonly IGuidGenerator _guidGenerator;
 
@@ -69,7 +68,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Services
             IFootnoteService footnoteService,
             StatisticsDbContext statisticsDbContext,
             IDataBlockService dataBlockService,
-            IMetaGuidanceService metaGuidanceService,
+            IReleaseChecklistService releaseChecklistService,
             IReleaseSubjectService releaseSubjectService,
             IGuidGenerator guidGenerator)
         {
@@ -87,7 +86,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Services
             _footnoteService = footnoteService;
             _statisticsDbContext = statisticsDbContext;
             _dataBlockService = dataBlockService;
-            _metaGuidanceService = metaGuidanceService;
+            _releaseChecklistService = releaseChecklistService;
             _releaseSubjectService = releaseSubjectService;
             _guidGenerator = guidGenerator;
         }
@@ -261,14 +260,10 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Services
             Guid releaseId, UpdateReleaseViewModel request)
         {
             return await _persistenceHelper
-                .CheckEntityExists<Release>(releaseId)
+                .CheckEntityExists<Release>(releaseId, ReleaseChecklistService.HydrateReleaseForChecklist)
                 .OnSuccess(_userService.CheckCanUpdateRelease)
                 .OnSuccessDo(release => _userService.CheckCanUpdateReleaseStatus(release, request.Status))
                 .OnSuccessDo(async release => await ValidateReleaseSlugUniqueToPublication(request.Slug, release.PublicationId, releaseId))
-                .OnSuccessDo(async release => await CheckDataReplacementNotInProgress(release, request.Status))
-                .OnSuccessDo(async release => await CheckAllDataFilesUploaded(release, request.Status))
-                .OnSuccessDo(async release => await CheckMetaGuidancePopulated(release, request.Status))
-                .OnSuccessDo(async release => await CheckMethodologyHasBeenApproved(release, request.Status))
                 .OnSuccess(async release =>
                 {
                     if (request.Status != ReleaseStatus.Approved && release.Published.HasValue)
@@ -276,9 +271,9 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Services
                         return ValidationActionResult(PublishedReleaseCannotBeUnapproved);
                     }
 
-                    if (request.Status == ReleaseStatus.Approved &&
-                        request.PublishMethod == PublishMethod.Scheduled &&
-                        !request.PublishScheduledDate.HasValue)
+                    if (request.Status == ReleaseStatus.Approved
+                        && request.PublishMethod == PublishMethod.Scheduled
+                        && !request.PublishScheduledDate.HasValue)
                     {
                         return ValidationActionResult(ApprovedReleaseMustHavePublishScheduledDate);
                     }
@@ -296,24 +291,50 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Services
                     release.NextReleaseDate = request.NextReleaseDate;
 
                     release.PublishScheduled = request.PublishMethod == PublishMethod.Immediate &&
-                        request.Status == ReleaseStatus.Approved
+                                               request.Status == ReleaseStatus.Approved
                         ? DateTime.UtcNow
                         : request.PublishScheduledDate;
 
-                    _context.Releases.Update(release);
-                    await _context.SaveChangesAsync();
+                    return await ValidateReleaseWithChecklist(release)
+                        .OnSuccess(async () =>
+                        {
+                            _context.Releases.Update(release);
+                            await _context.SaveChangesAsync();
 
-                    // Only need to inform Publisher if changing release status to or from Approved
-                    if (oldStatus == ReleaseStatus.Approved || request.Status == ReleaseStatus.Approved)
-                    {
-                        await _publishingService.ReleaseChanged(releaseId, request.PublishMethod == PublishMethod.Immediate);
-                    }
+                            // Only need to inform Publisher if changing release status to or from Approved
+                            if (oldStatus == ReleaseStatus.Approved || request.Status == ReleaseStatus.Approved)
+                            {
+                                await _publishingService.ReleaseChanged(
+                                    releaseId,
+                                    request.PublishMethod == PublishMethod.Immediate
+                                );
+                            }
 
-                    _context.Update(release);
-                    await _context.SaveChangesAsync();
+                            _context.Update(release);
+                            await _context.SaveChangesAsync();
 
-                    return await GetRelease(releaseId);
+                            return await GetRelease(releaseId);
+                        });
                 });
+        }
+
+        private async Task<Either<ActionResult, Unit>> ValidateReleaseWithChecklist(Release release)
+        {
+            if (release.Status != ReleaseStatus.Approved)
+            {
+                return Unit.Instance;
+            }
+
+            var errors = (await _releaseChecklistService.GetErrors(release))
+                .Select(error => error.Code)
+                .ToList();
+
+            if (!errors.Any())
+            {
+                return Unit.Instance;
+            }
+
+            return ValidationActionResult(errors);
         }
 
         public async Task<Either<ActionResult, TitleAndIdViewModel>> GetLatestReleaseAsync(Guid publicationId)
@@ -519,71 +540,6 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Services
             if (!CanUpdateDataFiles(releaseId))
             {
                 return ValidationActionResult(CannotRemoveDataFilesOnceReleaseApproved);
-            }
-
-            return Unit.Instance;
-        }
-
-        private async Task<Either<ActionResult, Unit>> CheckMetaGuidancePopulated(Release release,
-            ReleaseStatus status)
-        {
-            return status == ReleaseStatus.Approved ? await _metaGuidanceService.Validate(release.Id) : Unit.Instance;
-        }
-
-        private async Task<Either<ActionResult, Unit>> CheckMethodologyHasBeenApproved(Release release,
-            ReleaseStatus status)
-        {
-            if (status == ReleaseStatus.Approved)
-            {
-                var publication = await _context.Publications
-                    .Include(publication => publication.Methodology)
-                    .FirstAsync(publication => publication.Id == release.PublicationId);
-
-                if (publication.Methodology != null && publication.Methodology.Status != MethodologyStatus.Approved)
-                {
-                    return ValidationActionResult(MethodologyMustBeApprovedOrPublished);
-                }
-            }
-
-            return Unit.Instance;
-        }
-
-        private async Task<Either<ActionResult, Unit>> CheckAllDataFilesUploaded(Release release, ReleaseStatus status)
-        {
-            if (status == ReleaseStatus.Approved)
-            {
-                var filters = TableQuery.CombineFilters(
-                    TableQuery.GenerateFilterCondition("PartitionKey", QueryComparisons.Equal, release.Id.ToString()),
-                    TableOperators.And,
-                    TableQuery.GenerateFilterCondition("Status", QueryComparisons.NotEqual, IStatus.COMPLETE.ToString())
-                );
-
-                var query = new TableQuery<DatafileImport>().Where(filters);
-                var cloudTable = await _coreTableStorageService.GetTableAsync(DatafileImportsTableName);
-                var results = await cloudTable.ExecuteQuerySegmentedAsync(query, null);
-
-                if (results.Results.Count != 0)
-                {
-                    return ValidationActionResult(AllDatafilesUploadedMustBeComplete);
-                }
-            }
-
-            return Unit.Instance;
-        }
-
-        private async Task<Either<ActionResult, Unit>> CheckDataReplacementNotInProgress(Release release, ReleaseStatus status)
-        {
-            if (status == ReleaseStatus.Approved)
-            {
-                if (await _context.ReleaseFiles
-                    .Include(rf => rf.ReleaseFileReference)
-                    .Where(rf => rf.ReleaseId == release.Id
-                                 && rf.ReleaseFileReference.ReleaseFileType == ReleaseFileTypes.Data
-                                 && rf.ReleaseFileReference.ReplacingId != null)
-                    .AnyAsync())
-                {
-                    return ValidationActionResult(DataReplacementInProgress);
-                }
             }
 
             return Unit.Instance;

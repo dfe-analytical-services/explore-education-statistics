@@ -55,4 +55,18 @@ describe('Link', () => {
     expect(link).toHaveAttribute('rel', 'noopener noreferrer');
     expect(link).toHaveAttribute('target', '_blank');
   });
+
+  test('links to hash URL correctly', () => {
+    const { getByText } = render(
+      <MemoryRouter>
+        <Link to="#test">Test Link</Link>
+      </MemoryRouter>,
+    );
+
+    const link = getByText('Test Link');
+
+    expect(link).toHaveAttribute('href', '#test');
+    expect(link).not.toHaveAttribute('rel', 'noopener noreferrer');
+    expect(link).not.toHaveAttribute('target', '_blank');
+  });
 });

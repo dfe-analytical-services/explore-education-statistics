@@ -63,9 +63,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Processor.Services
                     fileName: metadataFile.Name.ToLower(),
                     contentType: "text/csv",
                     metaValues: GetMetaDataFileMetaValues(
-                        dataFileName: dataFile.Name,
-                        userName: blob.GetUserName(),
-                        numberOfRows: CalculateNumberOfRows(rowStream)
+                        dataFileName: dataFile.Name
                     )
                 );
             }

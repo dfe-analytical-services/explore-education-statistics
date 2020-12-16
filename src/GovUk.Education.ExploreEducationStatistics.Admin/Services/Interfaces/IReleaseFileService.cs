@@ -26,11 +26,11 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Services.Interfaces
         Task<Either<ActionResult, FileStreamResult>> Stream(Guid releaseId, Guid id);
 
         Task<Either<ActionResult, FileInfo>> UploadAncillary(Guid releaseId,
-            IFormFile file,
+            IFormFile formFile,
             string name);
 
         Task<Either<ActionResult, FileInfo>> UploadChart(Guid releaseId,
-            IFormFile file,
+            IFormFile formFile,
             Guid? replacingId = null);
     }
 }

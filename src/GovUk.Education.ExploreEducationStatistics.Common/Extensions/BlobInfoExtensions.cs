@@ -6,6 +6,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Common.Extensions
 {
     public static class BlobInfoExtensions
     {
+        public const string FilenameKey = BlobInfo.FilenameKey;
         public const string NameKey = BlobInfo.NameKey;
         public const string NumberOfRowsKey = "NumberOfRows";
         public const string UserNameKey = "userName";
@@ -21,40 +22,14 @@ namespace GovUk.Education.ExploreEducationStatistics.Common.Extensions
          */
         public const string MetaFileKey = "metafile";
 
-        public static bool IsMetaDataFile(this BlobInfo blob)
-        {
-            return blob.Meta.ContainsKey(DataFileKey);
-        }
-
-        public static bool IsDataFile(this BlobInfo blob)
-        {
-            return blob.Meta.ContainsKey(MetaFileKey);
-        }
-
         public static bool IsReleased(this BlobInfo blob)
         {
             if (blob.Meta.TryGetValue(ReleaseDateTimeKey, out var releaseDateTime))
             {
-                return DateTime.Compare(
-                    DateTime.ParseExact(releaseDateTime, "o", CultureInfo.InvariantCulture, DateTimeStyles.None),
-                    DateTime.Now
-                ) <= 0;
+                return DateTime.Compare(ParseDateTime(releaseDateTime), DateTime.Now) <= 0;
             }
 
             return false;
-        }
-
-        public static FileInfo ToFileInfo(this BlobInfo blobInfo, ReleaseFileTypes fileType, Guid? id = null)
-        {
-            return new FileInfo
-            {
-                Id = id,
-                Name = blobInfo.Name,
-                Extension = blobInfo.Extension,
-                Path = blobInfo.Path,
-                Size = blobInfo.Size,
-                Type = fileType,
-            };
         }
 
         public static string GetMetaFileName(this BlobInfo blob)
@@ -71,16 +46,6 @@ namespace GovUk.Education.ExploreEducationStatistics.Common.Extensions
         {
             return blob.Meta.TryGetValue(NumberOfRowsKey, out var numberOfRows) &&
                    int.TryParse(numberOfRows, out var numberOfRowsValue) ? numberOfRowsValue : 0;
-        }
-
-        public static bool IsFileReleased(this BlobInfo blob)
-        {
-            if (blob.Meta.TryGetValue(ReleaseDateTimeKey, out var releaseDateTime))
-            {
-                return DateTime.Compare(ParseDateTime(releaseDateTime), DateTime.Now) <= 0;
-            }
-
-            return false;
         }
 
         private static DateTime ParseDateTime(string dateTime)

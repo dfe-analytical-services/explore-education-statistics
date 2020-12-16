@@ -50,7 +50,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Controllers.Api
         {
             var testFile = new FileInfo
             {
-                Extension = "doc",
+                FileName = "ancillaryFile.doc",
                 Name = "File name",
                 Path = "ancillaryFile.doc",
                 Size = "1 Kb"
@@ -75,14 +75,14 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Controllers.Api
             {
                 new FileInfo
                 {
-                    Extension = "doc",
+                    FileName = "file1.doc",
                     Name = "Ancillary 1",
                     Path = "file1.doc",
                     Size = "1 Kb"
                 },
                 new FileInfo
                 {
-                    Extension = "doc",
+                    FileName = "file2.doc",
                     Name = "Ancillary 2",
                     Path = "file2.doc",
                     Size = "1 Kb"
@@ -166,14 +166,14 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Controllers.Api
             {
                 new DataFileInfo
                 {
-                    Extension = "csv",
+                    FileName = "file1.csv",
                     Name = "Release a file 1",
                     Path = "file1.csv",
                     Size = "1 Kb"
                 },
                 new DataFileInfo
                 {
-                    Extension = "csv",
+                    FileName = "file2.csv",
                     Name = "Release a file 2",
                     Path = "file2.csv",
                     Size = "1 Kb"
@@ -285,6 +285,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Controllers.Api
             Mock<IReleaseFileService> ReleaseFileService,
             Mock<IReleaseDataFileService> ReleaseDataFilesService,
             Mock<IReleaseStatusService> ReleaseStatusService,
+            Mock<IReleaseChecklistService> ReleaseChecklistService,
             Mock<UserManager<ApplicationUser>> UserManager,
             Mock<IDataBlockService> DataBlockService) Mocks()
         {
@@ -292,6 +293,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Controllers.Api
                     new Mock<IReleaseFileService>(),
                     new Mock<IReleaseDataFileService>(),
                     new Mock<IReleaseStatusService>(),
+                    new Mock<IReleaseChecklistService>(),
                     MockUserManager(),
                     new Mock<IDataBlockService>()
                 );
@@ -302,6 +304,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Controllers.Api
             Mock<IReleaseFileService> ReleaseFileService,
             Mock<IReleaseDataFileService> ReleaseDataFileService,
             Mock<IReleaseStatusService> ReleaseStatusService,
+            Mock<IReleaseChecklistService> ReleaseChecklistService,
             Mock<UserManager<ApplicationUser>> UserManager,
             Mock<IDataBlockService> DataBlockService
             ) mocks)
@@ -311,6 +314,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Controllers.Api
                 mocks.ReleaseFileService.Object,
                 mocks.ReleaseDataFileService.Object,
                 mocks.ReleaseStatusService.Object,
+                mocks.ReleaseChecklistService.Object,
                 mocks.UserManager.Object,
                 mocks.DataBlockService.Object);
         }

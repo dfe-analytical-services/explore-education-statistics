@@ -528,6 +528,9 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Migrations.ContentMig
                     b.Property<string>("Filename")
                         .HasColumnType("nvarchar(max)");
 
+                    b.Property<bool>("FilenameMigrated")
+                        .HasColumnType("bit");
+
                     b.Property<string>("ReleaseFileType")
                         .IsRequired()
                         .HasColumnType("nvarchar(max)");

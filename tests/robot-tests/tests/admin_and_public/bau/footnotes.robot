@@ -204,6 +204,12 @@ Check footnote in Preview content mode
     user checks page does not contain  ${FOOTNOTE_TEXT_2}
     user checks page does not contain  ${FOOTNOTE_TEXT_1}
 
+Add public prerelease access list
+    [Tags]  HappyPath
+    user clicks link  Pre-release access
+    user waits until h2 is visible  Manage pre-release user access
+    user creates public prerelease access list   Test public access list
+
 Go to "Sign off" page
     [Tags]  HappyPath
     user clicks link   Sign off

@@ -30,7 +30,7 @@ export interface ReleaseStatusFormValues {
   internalReleaseNote: string;
 }
 
-const formId = 'releaseStatusForm';
+export const formId = 'releaseStatusForm';
 
 const errorMappings = [
   mapFieldErrors<ReleaseStatusFormValues>({
@@ -38,16 +38,20 @@ const errorMappings = [
     messages: {
       APPROVED_RELEASE_MUST_HAVE_PUBLISH_SCHEDULED_DATE:
         'Enter a publish scheduled date before approving',
-      ALL_DATAFILES_UPLOADED_MUST_BE_COMPLETE:
-        'Check all uploaded datafiles are complete before approving',
       PUBLISHED_RELEASE_CANNOT_BE_UNAPPROVED:
         'Release has already been published and cannot be un-approved',
-      META_GUIDANCE_MUST_BE_POPULATED:
-        'All public metadata guidance must be populated before release can be approved',
-      DATA_REPLACEMENT_IN_PROGRESS:
-        'Pending data file replacements that are in progress must be completed or cancelled before release can be approved',
-      METHODOLOGY_MUST_BE_APPROVED_OR_PUBLISHED:
-        "The publication's methodology must be approved before release can be approved",
+      PUBLIC_META_GUIDANCE_REQUIRED:
+        'All public metadata guidance must be populated before the release can be approved',
+      PUBLIC_PRE_RELEASE_ACCESS_LIST_REQUIRED:
+        'Public pre-release access list is required before the release can be approved',
+      DATA_FILE_REPLACEMENTS_MUST_BE_COMPLETED:
+        'Pending data file replacements that are in progress must be completed or cancelled before the release can be approved',
+      DATA_FILE_IMPORTS_MUST_BE_COMPLETED:
+        'All data file imports must be completed before the release can be approved',
+      METHODOLOGY_MUST_BE_APPROVED:
+        "The publication's methodology must be approved before the release can be approved",
+      RELEASE_NOTE_REQUIRED:
+        'A public release note must be added for this amendment before it can be approved',
     },
   }),
   mapFieldErrors<ReleaseStatusFormValues>({
@@ -153,8 +157,6 @@ const ReleaseStatusForm = ({
     >
       {form => (
         <Form id={formId}>
-          <h2>Edit release status</h2>
-
           <FormFieldRadioGroup<ReleaseStatusFormValues>
             legend="Status"
             name="status"

@@ -13,6 +13,7 @@ import { Topic } from '@admin/services/topicService';
 import appendQuery from '@admin/utils/url/appendQuery';
 import Accordion from '@common/components/Accordion';
 import AccordionSection from '@common/components/AccordionSection';
+import InsetText from '@common/components/InsetText';
 import LoadingSpinner from '@common/components/LoadingSpinner';
 import useAsyncHandledRetry from '@common/hooks/useAsyncHandledRetry';
 import useAsyncRetry from '@common/hooks/useAsyncRetry';
@@ -186,9 +187,7 @@ const ManagePublicationsAndReleasesTab = () => {
                       ))}
                     </Accordion>
                   ) : (
-                    <div className="govuk-inset-text">
-                      No publications available
-                    </div>
+                    <InsetText>No publications available</InsetText>
                   )}
 
                   {canCreatePublication && (

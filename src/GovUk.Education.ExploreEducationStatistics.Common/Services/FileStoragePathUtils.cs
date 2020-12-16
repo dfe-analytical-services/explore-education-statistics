@@ -136,6 +136,12 @@ namespace GovUk.Education.ExploreEducationStatistics.Common.Services
             AdminReleaseDirectoryPath(releaseId.ToString());
 
         /**
+         * The admin file path, for a file of a particular type and id, on a release.
+         */
+        public static string AdminReleasePath(Guid releaseId, ReleaseFileTypes type, Guid fileId)
+            => AdminReleasePath(releaseId.ToString(), type, fileId.ToString());
+
+        /**
          * The admin file path, for a file of a particular type and name, on a release.
          */
         public static string AdminReleasePath(Guid releaseId, ReleaseFileTypes type, string fileName)
@@ -147,6 +153,14 @@ namespace GovUk.Education.ExploreEducationStatistics.Common.Services
         public static string AdminReleaseDirectoryPath(Guid releaseId, ReleaseFileTypes type) =>
             AdminReleaseDirectoryPath(releaseId.ToString(), type);
 
+        /**
+         * The public file path, for a file of a particular type and id, on a release.
+         */
+        public static string PublicReleasePath(string publicationSlug, string releaseSlug, ReleaseFileTypes type,
+            Guid fileId)
+        {
+            return $"{PublicReleaseDirectoryPath(publicationSlug, releaseSlug, type)}{fileId}";
+        }
 
         /**
          * The public file path, for a file of a particular type and name, on a release.
@@ -172,6 +186,15 @@ namespace GovUk.Education.ExploreEducationStatistics.Common.Services
         public static string PublicReleaseDirectoryPath(string publicationSlug, string releaseSlug)
         {
             return $"{publicationSlug}/{releaseSlug}/";
+        }
+
+        /**
+         * The public file path of the "All files" zip file on a release.
+         */
+        public static string PublicReleaseAllFilesZipPath(string publicationSlug, string releaseSlug)
+        {
+            return
+                $"{PublicReleaseDirectoryPath(publicationSlug, releaseSlug, ReleaseFileTypes.Ancillary)}{publicationSlug}_{releaseSlug}.zip";
         }
 
         /**

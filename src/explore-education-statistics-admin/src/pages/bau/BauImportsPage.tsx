@@ -32,7 +32,7 @@ const BauImportsPage = () => {
               <th scope="col">Data file name</th>
               <th scope="col">Data file rows</th>
               <th scope="col">Status</th>
-              <th scope="col">Stage Percentage Complete</th>
+              <th scope="col">Stage percentage complete</th>
               <th scope="col">Go to release data files</th>
             </tr>
           </thead>

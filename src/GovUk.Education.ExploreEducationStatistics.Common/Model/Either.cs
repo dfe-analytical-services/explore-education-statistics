@@ -41,6 +41,12 @@ public class Either<Tl, Tr> {
 
         public Either<Tl, Tr> OrElse(Func<Tr> func) => IsLeft ? func() : Right;
 
+        public T Fold<T>(Func<Tl, T> leftFunc, Func<Tr, T> rightFunc) => IsRight ? rightFunc(Right) : leftFunc(Left);
+
+        public T FoldLeft<T>(Func<Tl, T> leftFunc, T defaultValue) => IsLeft ? leftFunc(Left) : defaultValue;
+
+        public T FoldRight<T>(Func<Tr, T> rightFunc, T defaultValue) => IsRight ? rightFunc(Right) : defaultValue;
+
         public static implicit operator Either<Tl, Tr>(Tl left) => new Either<Tl, Tr>(left);
 
         public static implicit operator Either<Tl, Tr>(Tr right) => new Either<Tl, Tr>(right);
