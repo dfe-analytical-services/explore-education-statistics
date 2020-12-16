@@ -2,6 +2,7 @@ import ReleaseDataUploadsSection from '@admin/pages/release/data/components/Rele
 import _releaseDataFileService, {
   DataFile,
   DataFileImportStatus,
+  DataFileWithPermissions,
   UploadDataFilesRequest,
   UploadZipDataFileRequest,
 } from '@admin/services/releaseDataFileService';
@@ -17,7 +18,7 @@ const releaseDataFileService = _releaseDataFileService as jest.Mocked<
 >;
 
 describe('ReleaseDataUploadsSection', () => {
-  const testDataFiles: DataFile[] = [
+  const testDataFiles: DataFileWithPermissions[] = [
     {
       id: 'data-1',
       title: 'Test data 1',
@@ -32,6 +33,9 @@ describe('ReleaseDataUploadsSection', () => {
       },
       created: '2020-06-12T12:00:00',
       status: 'COMPLETE',
+      permissions: {
+        canCancelImport: false,
+      },
     },
     {
       id: 'data-2',
@@ -47,6 +51,9 @@ describe('ReleaseDataUploadsSection', () => {
       },
       created: '2020-07-01T12:00:00',
       status: 'COMPLETE',
+      permissions: {
+        canCancelImport: false,
+      },
     },
   ];
 
@@ -67,7 +74,9 @@ describe('ReleaseDataUploadsSection', () => {
   };
 
   test('renders list of uploaded data files', async () => {
-    releaseDataFileService.getDataFiles.mockResolvedValue(testDataFiles);
+    releaseDataFileService.getDataFilesWithPermissions.mockResolvedValue(
+      testDataFiles,
+    );
     releaseDataFileService.getDataFileImportStatus.mockResolvedValue(
       testCompleteImportStatus,
     );
@@ -83,9 +92,9 @@ describe('ReleaseDataUploadsSection', () => {
     );
 
     await waitFor(() => {
-      expect(releaseDataFileService.getDataFiles).toHaveBeenCalledWith(
-        'release-1',
-      );
+      expect(
+        releaseDataFileService.getDataFilesWithPermissions,
+      ).toHaveBeenCalledWith('release-1');
 
       const sections = screen.getAllByTestId('accordionSection');
 
@@ -143,7 +152,7 @@ describe('ReleaseDataUploadsSection', () => {
   });
 
   test("renders data file details with status of 'Replacement in progress' if being replaced", async () => {
-    releaseDataFileService.getDataFiles.mockResolvedValue([
+    releaseDataFileService.getDataFilesWithPermissions.mockResolvedValue([
       {
         ...testDataFiles[0],
         replacedBy: 'data-replacement-1',
@@ -164,9 +173,9 @@ describe('ReleaseDataUploadsSection', () => {
     );
 
     await waitFor(() => {
-      expect(releaseDataFileService.getDataFiles).toHaveBeenCalledWith(
-        'release-1',
-      );
+      expect(
+        releaseDataFileService.getDataFilesWithPermissions,
+      ).toHaveBeenCalledWith('release-1');
 
       const sections = screen.getAllByTestId('accordionSection');
 
@@ -185,7 +194,7 @@ describe('ReleaseDataUploadsSection', () => {
   });
 
   test('renders empty message when there are no data files', async () => {
-    releaseDataFileService.getDataFiles.mockResolvedValue([]);
+    releaseDataFileService.getDataFilesWithPermissions.mockResolvedValue([]);
 
     render(
       <MemoryRouter>
@@ -209,7 +218,7 @@ describe('ReleaseDataUploadsSection', () => {
 
   describe('deleting data file', () => {
     test('does not render delete files button if file is not ready for deletion', async () => {
-      releaseDataFileService.getDataFiles.mockResolvedValue([
+      releaseDataFileService.getDataFilesWithPermissions.mockResolvedValue([
         { ...testDataFiles[0], status: 'QUEUED' },
         testDataFiles[1],
       ]);
@@ -246,7 +255,9 @@ describe('ReleaseDataUploadsSection', () => {
     });
 
     test('clicking delete files button shows modal to confirm deletion plan', async () => {
-      releaseDataFileService.getDataFiles.mockResolvedValue(testDataFiles);
+      releaseDataFileService.getDataFilesWithPermissions.mockResolvedValue(
+        testDataFiles,
+      );
       releaseDataFileService.getDataFileImportStatus.mockResolvedValue(
         testCompleteImportStatus,
       );
@@ -329,7 +340,9 @@ describe('ReleaseDataUploadsSection', () => {
     });
 
     test('confirming deletion removes the data file section', async () => {
-      releaseDataFileService.getDataFiles.mockResolvedValue(testDataFiles);
+      releaseDataFileService.getDataFilesWithPermissions.mockResolvedValue(
+        testDataFiles,
+      );
       releaseDataFileService.getDataFileImportStatus.mockResolvedValue(
         testCompleteImportStatus,
       );
@@ -393,7 +406,7 @@ describe('ReleaseDataUploadsSection', () => {
 
   describe('replace data file', () => {
     test('does not render replace data button if file import is not completed', async () => {
-      releaseDataFileService.getDataFiles.mockResolvedValue([
+      releaseDataFileService.getDataFilesWithPermissions.mockResolvedValue([
         { ...testDataFiles[0], status: 'QUEUED' },
         testDataFiles[1],
       ]);
@@ -430,7 +443,7 @@ describe('ReleaseDataUploadsSection', () => {
     });
 
     test('renders replace data button with correct link', async () => {
-      releaseDataFileService.getDataFiles.mockResolvedValue([
+      releaseDataFileService.getDataFilesWithPermissions.mockResolvedValue([
         { ...testDataFiles[0], status: 'QUEUED' },
         testDataFiles[1],
       ]);
@@ -462,7 +475,7 @@ describe('ReleaseDataUploadsSection', () => {
   });
 
   describe('uploading data file', () => {
-    const testUploadedDataFile: DataFile = {
+    const testUploadedDataFile: DataFileWithPermissions = {
       id: 'file-1',
       title: 'Test title',
       userName: 'user1@test.com',
@@ -476,10 +489,15 @@ describe('ReleaseDataUploadsSection', () => {
       },
       created: '2020-08-18T12:00:00',
       status: 'QUEUED',
+      permissions: {
+        canCancelImport: true,
+      },
     };
 
     beforeEach(() => {
-      releaseDataFileService.getDataFiles.mockResolvedValue(testDataFiles);
+      releaseDataFileService.getDataFilesWithPermissions.mockResolvedValue(
+        testDataFiles,
+      );
       releaseDataFileService.getDataFileImportStatus.mockResolvedValue(
         testQueuedImportStatus,
       );
@@ -812,6 +830,101 @@ describe('ReleaseDataUploadsSection', () => {
           '18 August 2020 12:00',
         );
       });
+    });
+
+    describe('permissions during upload', () => {
+      type DataFileActionButton = 'Cancel';
+
+      test('cancel button is available when permissions allow it ', async () => {
+        await performUploadAndCheckForButtons(
+          {
+            ...testUploadedDataFile,
+            permissions: {
+              canCancelImport: true,
+            },
+          },
+          'Cancel',
+        );
+      });
+
+      test('cancel button is not available when permissions do not allow it ', async () => {
+        await performUploadAndCheckForButtons({
+          ...testUploadedDataFile,
+          permissions: {
+            canCancelImport: false,
+          },
+        });
+      });
+
+      async function performUploadAndCheckForButtons(
+        file: DataFileWithPermissions,
+        ...expectedButtons: DataFileActionButton[]
+      ) {
+        const availableActionButtons: DataFileActionButton[] = ['Cancel'];
+
+        releaseDataFileService.uploadDataFiles.mockResolvedValue(file);
+
+        render(
+          <MemoryRouter>
+            <ReleaseDataUploadsSection
+              publicationId="publication-1"
+              releaseId="release-1"
+              canUpdateRelease
+            />
+          </MemoryRouter>,
+        );
+
+        const dataFile = new File(['test'], 'test-data.csv', {
+          type: 'text/csv',
+        });
+        const metadataFile = new File(['test'], 'test-data.meta.csv', {
+          type: 'text/csv',
+        });
+
+        await userEvent.type(
+          screen.getByLabelText('Subject title'),
+          'Test title',
+        );
+
+        userEvent.upload(screen.getByLabelText('Upload data file'), dataFile);
+        userEvent.upload(
+          screen.getByLabelText('Upload metadata file'),
+          metadataFile,
+        );
+        userEvent.click(
+          screen.getByRole('button', {
+            name: 'Upload data files',
+          }),
+        );
+
+        await waitFor(() => {
+          expect(releaseDataFileService.uploadDataFiles).toHaveBeenCalledWith(
+            'release-1',
+            {
+              name: 'Test title',
+              dataFile,
+              metadataFile,
+            } as UploadDataFilesRequest,
+          );
+
+          const sections = screen.getAllByTestId('accordionSection');
+          expect(sections).toHaveLength(3);
+
+          const section3 = within(screen.getAllByTestId('accordionSection')[2]);
+
+          availableActionButtons.forEach(availableButton => {
+            if (expectedButtons.indexOf(availableButton) !== -1) {
+              expect(
+                section3.queryByRole('button', { name: 'Cancel' }),
+              ).toBeInTheDocument();
+            } else {
+              expect(
+                section3.queryByRole('button', { name: 'Cancel' }),
+              ).not.toBeInTheDocument();
+            }
+          });
+        });
+      }
     });
   });
 });

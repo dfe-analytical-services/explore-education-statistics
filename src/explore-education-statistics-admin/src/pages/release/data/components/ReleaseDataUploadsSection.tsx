@@ -8,9 +8,11 @@ import {
   releaseDataFileRoute,
   ReleaseDataFileRouteParams,
 } from '@admin/routes/releaseRoutes';
+import permissionService from '@admin/services/permissionService';
 import releaseDataFileService, {
   DataFile,
   DataFileImportStatus,
+  DataFileWithPermissions,
   DeleteDataFilePlan,
 } from '@admin/services/releaseDataFileService';
 import Accordion from '@common/components/Accordion';
@@ -71,7 +73,7 @@ const ReleaseDataUploadsSection = ({
     setState: setDataFilesState,
     isLoading,
   } = useAsyncHandledRetry(
-    () => releaseDataFileService.getDataFiles(releaseId),
+    () => releaseDataFileService.getDataFilesWithPermissions(releaseId),
     [releaseId],
   );
 
@@ -89,7 +91,7 @@ const ReleaseDataUploadsSection = ({
   };
 
   const setDataFiles = useCallback(
-    (nextDataFiles: DataFile[]) => {
+    (nextDataFiles: DataFileWithPermissions[]) => {
       setDataFilesState({ value: nextDataFiles });
 
       if (onDataFilesChange) {
@@ -103,6 +105,11 @@ const ReleaseDataUploadsSection = ({
     dataFile: DataFile,
     { status }: DataFileImportStatus,
   ) => {
+    const permissions = await permissionService.getDataFilePermissions(
+      releaseId,
+      dataFile.fileName,
+    );
+
     setDataFiles(
       dataFiles.map(file =>
         file.fileName !== dataFile.fileName
@@ -110,6 +117,7 @@ const ReleaseDataUploadsSection = ({
           : {
               ...file,
               status,
+              permissions,
             },
       ),
     );
@@ -117,7 +125,7 @@ const ReleaseDataUploadsSection = ({
 
   const handleSubmit = useCallback(
     async (values: FormValues) => {
-      let file: DataFile;
+      let file: DataFileWithPermissions;
 
       if (values.uploadType === 'csv') {
         file = await releaseDataFileService.uploadDataFiles(releaseId, {
@@ -273,6 +281,19 @@ const ReleaseDataUploadsSection = ({
                           </ButtonText>
                         </>
                       )}
+
+                    {dataFile.permissions.canCancelImport && (
+                      <ButtonText
+                        onClick={() =>
+                          releaseDataFileService.cancelImport(
+                            releaseId,
+                            dataFile.fileName,
+                          )
+                        }
+                      >
+                        Cancel
+                      </ButtonText>
+                    )}
                   </DataFileDetailsTable>
                 </div>
               </AccordionSection>

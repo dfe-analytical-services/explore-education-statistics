@@ -1,3 +1,4 @@
+using System;
 using System.Threading.Tasks;
 using GovUk.Education.ExploreEducationStatistics.Admin.Controllers.Api.BAU;
 using GovUk.Education.ExploreEducationStatistics.Admin.Models;
@@ -269,6 +270,19 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Services.Interfaces.S
             this IUserService userService, LegacyRelease legacyRelease)
         {
             return userService.DoCheck(legacyRelease, SecurityPolicies.CanDeleteLegacyRelease);
+        }
+
+        public static async Task<DataFilePermissions> GetDataFilePermissions(this IUserService userService, 
+            Guid releaseId, string dataFileName)
+        {
+            return new DataFilePermissions
+            {
+                CanCancelImport = (await userService.CheckCanCancelFileImport(new ReleaseFileImportInfo
+                {
+                    ReleaseId = releaseId,
+                    DataFileName = dataFileName
+                })).IsRight
+            };
         }
 
         private static async Task<Either<ActionResult, T>> DoCheck<T>(this IUserService userService, T resource, SecurityPolicies policy)
