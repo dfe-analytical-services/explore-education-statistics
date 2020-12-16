@@ -258,11 +258,11 @@ Verify release associated files
     ${downloads}=  user gets details content element  Download associated files
     user checks element should contain  ${downloads}  All files (zip, 3 Kb)
     user waits until element contains link  ${downloads}  All files
-    user checks link has url  All files  %{DATA_API_URL}/download/ui-tests-publish-release-${RUN_IDENTIFIER}/3000-01/ancillary/ui-tests-publish-release-${RUN_IDENTIFIER}_3000-01.zip   ${downloads}
+    user checks link has url  All files  %{CONTENT_API_URL}/download/ui-tests-publish-release-${RUN_IDENTIFIER}/3000-01/ancillary/ui-tests-publish-release-${RUN_IDENTIFIER}_3000-01.zip   ${downloads}
 
     user checks element should contain  ${downloads}  Dates test subject (csv, 17 Kb)
     user waits until element contains link  ${downloads}  Dates test subject
-    user checks link has url  Dates test subject  %{DATA_API_URL}/download/ui-tests-publish-release-${RUN_IDENTIFIER}/3000-01/data/dates.csv   ${downloads}
+    user checks link has url  Dates test subject  %{CONTENT_API_URL}/download/ui-tests-publish-release-${RUN_IDENTIFIER}/3000-01/data/dates.csv   ${downloads}
 
     user checks element should contain  ${downloads}  Test ancillary file 1 (txt, 12 B)
     user waits until element contains link  ${downloads}  Test ancillary file 1
@@ -633,11 +633,11 @@ Verify amendment files
     ${downloads}=  user gets details content element  Download associated files
     user checks element should contain  ${downloads}  All files (zip, 3 Kb)
     user waits until element contains link  ${downloads}  All files
-    user checks link has url  All files  %{DATA_API_URL}/download/ui-tests-publish-release-${RUN_IDENTIFIER}/3000-01/ancillary/ui-tests-publish-release-${RUN_IDENTIFIER}_3000-01.zip   ${downloads}
+    user checks link has url  All files  %{CONTENT_API_URL}/download/ui-tests-publish-release-${RUN_IDENTIFIER}/3000-01/ancillary/ui-tests-publish-release-${RUN_IDENTIFIER}_3000-01.zip   ${downloads}
 
     user checks element should contain  ${downloads}  Dates test subject (csv, 17 Kb)
     user waits until element contains link  ${downloads}  Dates test subject
-    user checks link has url  Dates test subject  %{DATA_API_URL}/download/ui-tests-publish-release-${RUN_IDENTIFIER}/3000-01/data/dates-replacement.csv   ${downloads}
+    user checks link has url  Dates test subject  %{CONTENT_API_URL}/download/ui-tests-publish-release-${RUN_IDENTIFIER}/3000-01/data/dates-replacement.csv   ${downloads}
 
     user checks element should contain  ${downloads}  Test ancillary file 1 (txt, 12 B)
     user waits until element contains link  ${downloads}  Test ancillary file 1
