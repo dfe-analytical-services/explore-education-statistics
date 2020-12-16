@@ -142,7 +142,7 @@ Add footnote to ${SECOND_SUBJECT}
 Add second footnote to ${SECOND_SUBJECT}
     user clicks link  Create footnote
     user waits until h2 is visible  Create footnote
-    user opens details dropdown  Indicators
+    user opens details dropdown  Indicators   css:[data-testid="footnote-subject upload file test"]
     user clicks footnote checkbox  Admission Numbers
     user enters text into element  id:footnoteForm-content  Footnote 2 ${SECOND_SUBJECT}
     user clicks button  Save footnote
