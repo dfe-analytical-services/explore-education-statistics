@@ -56,6 +56,25 @@ describe('ReleaseDataUploadsSection', () => {
     },
   ];
 
+  const testUploadedDataFile: DataFileWithPermissions = {
+    id: 'file-1',
+    title: 'Test title',
+    userName: 'user1@test.com',
+    fileName: 'test-data.csv',
+    metaFileId: 'file-1-meta',
+    metaFileName: 'test-data.meta.csv',
+    rows: 300,
+    fileSize: {
+      size: 150,
+      unit: 'Kb',
+    },
+    created: '2020-08-18T12:00:00',
+    status: 'QUEUED',
+    permissions: {
+      canCancelImport: true,
+    },
+  };
+
   const testQueuedImportStatus: DataFileImportStatus = {
     status: 'QUEUED',
     percentageComplete: 0,
@@ -474,25 +493,6 @@ describe('ReleaseDataUploadsSection', () => {
   });
 
   describe('uploading data file', () => {
-    const testUploadedDataFile: DataFileWithPermissions = {
-      id: 'file-1',
-      title: 'Test title',
-      userName: 'user1@test.com',
-      fileName: 'test-data.csv',
-      metaFileId: 'file-1-meta',
-      metaFileName: 'test-data.meta.csv',
-      rows: 300,
-      fileSize: {
-        size: 150,
-        unit: 'Kb',
-      },
-      created: '2020-08-18T12:00:00',
-      status: 'QUEUED',
-      permissions: {
-        canCancelImport: true,
-      },
-    };
-
     beforeEach(() => {
       releaseDataFileService.getDataFilesWithPermissions.mockResolvedValue(
         testDataFiles,
@@ -835,7 +835,7 @@ describe('ReleaseDataUploadsSection', () => {
       type DataFileActionButton = 'Cancel';
 
       test('cancel button is available when permissions allow it ', async () => {
-        await performUploadAndCheckForButtons(
+        await performUploadAndCheckForDateFileActionButtons(
           {
             ...testUploadedDataFile,
             permissions: {
@@ -846,8 +846,8 @@ describe('ReleaseDataUploadsSection', () => {
         );
       });
 
-      test('cancel button is not available when permissions do not allow it ', async () => {
-        await performUploadAndCheckForButtons({
+      test('cancel button is not available when permissions do not allow it', async () => {
+        await performUploadAndCheckForDateFileActionButtons({
           ...testUploadedDataFile,
           permissions: {
             canCancelImport: false,
@@ -855,75 +855,192 @@ describe('ReleaseDataUploadsSection', () => {
         });
       });
 
-      async function performUploadAndCheckForButtons(
+      async function performUploadAndCheckForDateFileActionButtons(
         file: DataFileWithPermissions,
         ...expectedButtons: DataFileActionButton[]
       ) {
+        await performSuccessfulUpload(file);
+
         const availableActionButtons: DataFileActionButton[] = ['Cancel'];
 
-        releaseDataFileService.uploadDataFiles.mockResolvedValue(file);
+        const section = getLatestDataFileAccordionSection(3);
 
-        render(
-          <MemoryRouter>
-            <ReleaseDataUploadsSection
-              publicationId="publication-1"
-              releaseId="release-1"
-              canUpdateRelease
-            />
-          </MemoryRouter>,
-        );
-
-        const dataFile = new File(['test'], 'test-data.csv', {
-          type: 'text/csv',
-        });
-        const metadataFile = new File(['test'], 'test-data.meta.csv', {
-          type: 'text/csv',
-        });
-
-        await userEvent.type(
-          screen.getByLabelText('Subject title'),
-          'Test title',
-        );
-
-        userEvent.upload(screen.getByLabelText('Upload data file'), dataFile);
-        userEvent.upload(
-          screen.getByLabelText('Upload metadata file'),
-          metadataFile,
-        );
-        userEvent.click(
-          screen.getByRole('button', {
-            name: 'Upload data files',
-          }),
-        );
-
-        await waitFor(() => {
-          expect(releaseDataFileService.uploadDataFiles).toHaveBeenCalledWith(
-            'release-1',
-            {
-              name: 'Test title',
-              dataFile,
-              metadataFile,
-            } as UploadDataFilesRequest,
-          );
-
-          const sections = screen.getAllByTestId('accordionSection');
-          expect(sections).toHaveLength(3);
-
-          const section3 = within(screen.getAllByTestId('accordionSection')[2]);
-
-          availableActionButtons.forEach(availableButton => {
-            if (expectedButtons.indexOf(availableButton) !== -1) {
-              expect(
-                section3.queryByRole('button', { name: 'Cancel' }),
-              ).toBeInTheDocument();
-            } else {
-              expect(
-                section3.queryByRole('button', { name: 'Cancel' }),
-              ).not.toBeInTheDocument();
-            }
-          });
+        availableActionButtons.forEach(availableButton => {
+          if (expectedButtons.indexOf(availableButton) !== -1) {
+            expect(
+              section.queryByRole('button', { name: 'Cancel' }),
+            ).toBeInTheDocument();
+          } else {
+            expect(
+              section.queryByRole('button', { name: 'Cancel' }),
+            ).not.toBeInTheDocument();
+          }
         });
       }
     });
   });
+
+  describe('cancelling file import', () => {
+    beforeEach(() => {
+      releaseDataFileService.getDataFilesWithPermissions.mockResolvedValue(
+        testDataFiles,
+      );
+      releaseDataFileService.getDataFileImportStatus.mockResolvedValue(
+        testQueuedImportStatus,
+      );
+    });
+
+    test('clicking cancel presents a cancellation modal', async () => {
+      await performSuccessfulUpload(testUploadedDataFile);
+
+      const section = getLatestDataFileAccordionSection(3);
+
+      userEvent.click(section.getByRole('button', { name: 'Cancel' }));
+
+      await waitFor(() => {
+        expect(screen.getByRole('dialog')).toBeInTheDocument();
+      });
+
+      const modal = within(screen.getByRole('dialog'));
+
+      expect(
+        modal.getByText('Confirm cancellation of selected data file'),
+      ).toBeInTheDocument();
+
+      expect(
+        modal.getByText(
+          'This file upload will be cancelled and may then be removed.',
+        ),
+      ).toBeInTheDocument();
+
+      expect(
+        modal.queryByRole('button', { name: 'Cancel' }),
+      ).toBeInTheDocument();
+
+      expect(
+        modal.queryByRole('button', { name: 'Confirm' }),
+      ).toBeInTheDocument();
+    });
+
+    test(
+      'confirming the cancellation modal initiates cancellation and ' +
+        'removes the Cancel link',
+      async () => {
+        await performSuccessfulUpload(testUploadedDataFile);
+
+        const section = getLatestDataFileAccordionSection(3);
+
+        userEvent.click(section.getByRole('button', { name: 'Cancel' }));
+
+        await waitFor(() => {
+          expect(screen.getByRole('dialog')).toBeInTheDocument();
+        });
+
+        const modal = within(screen.getByRole('dialog'));
+        userEvent.click(modal.getByRole('button', { name: 'Confirm' }));
+
+        await waitFor(() => {
+          expect(releaseDataFileService.cancelImport).toHaveBeenCalledWith(
+            'release-1',
+            testUploadedDataFile.fileName,
+          );
+        });
+
+        await waitFor(() => {
+          expect(screen.queryByRole('dialog')).not.toBeInTheDocument();
+        });
+
+        await waitFor(() => {
+          expect(
+            section.queryByRole('button', { name: 'Cancel' }),
+          ).not.toBeInTheDocument();
+        });
+      },
+    );
+
+    test('cancelling the cancellation modal calls off the import cancellation', async () => {
+      await performSuccessfulUpload(testUploadedDataFile);
+
+      const section = getLatestDataFileAccordionSection(3);
+
+      userEvent.click(section.getByRole('button', { name: 'Cancel' }));
+
+      await waitFor(() => {
+        expect(screen.getByRole('dialog')).toBeInTheDocument();
+      });
+
+      const modal = within(screen.getByRole('dialog'));
+      userEvent.click(modal.getByRole('button', { name: 'Cancel' }));
+
+      await waitFor(() => {
+        expect(releaseDataFileService.cancelImport).not.toHaveBeenCalled();
+      });
+
+      await waitFor(() => {
+        expect(screen.queryByRole('dialog')).not.toBeInTheDocument();
+      });
+
+      await waitFor(() => {
+        expect(
+          section.queryByRole('button', { name: 'Cancel' }),
+        ).toBeInTheDocument();
+      });
+    });
+  });
+
+  async function performSuccessfulUpload(file: DataFileWithPermissions) {
+    releaseDataFileService.uploadDataFiles.mockResolvedValue(file);
+
+    render(
+      <MemoryRouter>
+        <ReleaseDataUploadsSection
+          publicationId="publication-1"
+          releaseId="release-1"
+          canUpdateRelease
+        />
+      </MemoryRouter>,
+    );
+
+    const dataFile = new File(['test'], 'test-data.csv', {
+      type: 'text/csv',
+    });
+    const metadataFile = new File(['test'], 'test-data.meta.csv', {
+      type: 'text/csv',
+    });
+
+    await userEvent.type(screen.getByLabelText('Subject title'), 'Test title');
+
+    userEvent.upload(screen.getByLabelText('Upload data file'), dataFile);
+    userEvent.upload(
+      screen.getByLabelText('Upload metadata file'),
+      metadataFile,
+    );
+    userEvent.click(
+      screen.getByRole('button', {
+        name: 'Upload data files',
+      }),
+    );
+
+    await waitFor(() => {
+      expect(releaseDataFileService.uploadDataFiles).toHaveBeenCalledWith(
+        'release-1',
+        {
+          name: 'Test title',
+          dataFile,
+          metadataFile,
+        } as UploadDataFilesRequest,
+      );
+    });
+
+    const sections = screen.getAllByTestId('accordionSection');
+    expect(sections).toHaveLength(3);
+  }
+
+  function getLatestDataFileAccordionSection(expectedNumberOfFiles: number) {
+    const sections = screen.getAllByTestId('accordionSection');
+    expect(sections).toHaveLength(expectedNumberOfFiles);
+    return within(
+      screen.getAllByTestId('accordionSection')[expectedNumberOfFiles - 1],
+    );
+  }
 });
