@@ -8,6 +8,7 @@ import {
 } from '@admin/routes/releaseRoutes';
 import { preReleaseRoute } from '@admin/routes/routes';
 import releaseService from '@admin/services/releaseService';
+import InsetText from '@common/components/InsetText';
 import LoadingSpinner from '@common/components/LoadingSpinner';
 import Tabs from '@common/components/Tabs';
 import TabsSection from '@common/components/TabsSection';
@@ -16,6 +17,11 @@ import WarningMessage from '@common/components/WarningMessage';
 import useAsyncHandledRetry from '@common/hooks/useAsyncHandledRetry';
 import React from 'react';
 import { generatePath } from 'react-router';
+
+export const releasePreReleaseAccessPageTabs = {
+  users: 'preReleaseAccess-users',
+  publicAccessList: 'preReleaseAccess-publicList',
+};
 
 const ReleasePreReleaseAccessPage = () => {
   const { releaseId } = useManageReleaseContext();
@@ -32,9 +38,12 @@ const ReleasePreReleaseAccessPage = () => {
     <LoadingSpinner loading={isLoading}>
       {release && (
         <Tabs id="preReleaseAccess">
-          <TabsSection id="preReleaseAccess-users" title="Pre-release users">
+          <TabsSection
+            id={releasePreReleaseAccessPageTabs.users}
+            title="Pre-release users"
+          >
             <h2>Manage pre-release user access</h2>
-            <div className="govuk-inset-text">
+            <InsetText>
               <h3>Before you start</h3>
               <p>
                 Pre-release users will receive an email with a link to preview
@@ -42,7 +51,7 @@ const ReleasePreReleaseAccessPage = () => {
                 preview will show a holding page until 24 hours before the
                 scheduled publication date.
               </p>
-            </div>
+            </InsetText>
 
             {!release.live && (
               <>
@@ -89,7 +98,7 @@ const ReleasePreReleaseAccessPage = () => {
             )}
           </TabsSection>
           <TabsSection
-            id="preReleaseAccess-publicList"
+            id={releasePreReleaseAccessPageTabs.publicAccessList}
             title="Public access list"
           >
             <h2>Public pre-release access list</h2>

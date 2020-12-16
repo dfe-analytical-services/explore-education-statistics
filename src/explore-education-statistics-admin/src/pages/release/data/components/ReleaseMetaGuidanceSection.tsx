@@ -8,6 +8,7 @@ import Button from '@common/components/Button';
 import ButtonGroup from '@common/components/ButtonGroup';
 import ButtonText from '@common/components/ButtonText';
 import { Form } from '@common/components/form';
+import InsetText from '@common/components/InsetText';
 import LoadingSpinner from '@common/components/LoadingSpinner';
 import SanitizeHtml from '@common/components/SanitizeHtml';
 import WarningMessage from '@common/components/WarningMessage';
@@ -79,7 +80,7 @@ const ReleaseMetaGuidanceSection = ({ releaseId, canUpdateRelease }: Props) => {
       <h2>Public metadata guidance document</h2>
 
       {canUpdateRelease ? (
-        <div className="govuk-inset-text">
+        <InsetText>
           <h3>Before you start</h3>
 
           <ul>
@@ -96,7 +97,7 @@ const ReleaseMetaGuidanceSection = ({ releaseId, canUpdateRelease }: Props) => {
               released
             </li>
           </ul>
-        </div>
+        </InsetText>
       ) : (
         <WarningMessage>
           This release has been approved, and can no longer be updated.
@@ -151,9 +152,9 @@ const ReleaseMetaGuidanceSection = ({ releaseId, canUpdateRelease }: Props) => {
                       ) : (
                         <>
                           {!canUpdateRelease && !metaGuidance?.content ? (
-                            <p className="govuk-inset-text">
+                            <InsetText>
                               No guidance content was saved.
-                            </p>
+                            </InsetText>
                           ) : (
                             <SanitizeHtml
                               dirtyHtml={form.values.content}
@@ -238,10 +239,10 @@ const ReleaseMetaGuidanceSection = ({ releaseId, canUpdateRelease }: Props) => {
                     upload at least one data file.
                   </WarningMessage>
                 ) : (
-                  <p className="govuk-inset-text">
+                  <InsetText>
                     The public metadata guidance document has not been created
                     as no data files were uploaded.
-                  </p>
+                  </InsetText>
                 )}
               </>
             )}

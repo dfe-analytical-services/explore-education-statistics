@@ -12,11 +12,16 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Model.Services
     {
         private readonly StatisticsDbContext _statisticsDbContext;
         private readonly IFootnoteRepository _footnoteRepository;
+        private readonly SubjectDeleter _subjectDeleter;
 
-        public ReleaseSubjectService(StatisticsDbContext statisticsDbContext, IFootnoteRepository footnoteRepository)
+        public ReleaseSubjectService(
+            StatisticsDbContext statisticsDbContext,
+            IFootnoteRepository footnoteRepository,
+            SubjectDeleter subjectDeleter)
         {
             _statisticsDbContext = statisticsDbContext;
             _footnoteRepository = footnoteRepository;
+            _subjectDeleter = subjectDeleter;
         }
 
         public async Task SoftDeleteAllReleaseSubjects(Guid releaseId)
@@ -85,15 +90,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Model.Services
             }
             else
             {
-                // Manually detach subject from state tracking to stop EF from
-                // performing cascading deletes of child relationships in the wrong order.
-                // By detaching it, we just let the database handle the cascading delete instead.
-                // This is more efficient (fewer delete queries) and works correctly.
-                _statisticsDbContext.Entry(subject).State = EntityState.Detached;
-
-                // N.B. This delete will be slow if there are a large number of observations but this is only
-                // executed by the tests when the topic is torn down so ensure files used are < 1000 rows.
-                _statisticsDbContext.Subject.Remove(subject);
+                _subjectDeleter.Delete(subject, _statisticsDbContext);
             }
 
             await _statisticsDbContext.SaveChangesAsync();
@@ -102,6 +99,19 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Model.Services
         private bool IsSubjectOrphaned(Subject subject)
         {
             return _statisticsDbContext.ReleaseSubject.Count(rs => rs.SubjectId == subject.Id) == 0;
+        }
+
+        // Separate this into a separate class
+        // for ease of mocking in tests.
+        public class SubjectDeleter
+        {
+            public virtual void Delete(Subject subject, StatisticsDbContext context)
+            {
+                // Use raw delete as EF can't correctly figure out how to cascade the delete, whilst the database can.
+                // N.B. This delete will be slow if there are a large number of observations but this is only
+                // executed by the tests when the topic is torn down so ensure files used are < 1000 rows.
+                context.Subject.FromSqlInterpolated($"DELETE Subject WHERE Id = {subject.Id}");
+            }
         }
     }
 }

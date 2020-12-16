@@ -22,12 +22,13 @@ const Link = ({
   ...props
 }: LinkProps) => {
   const isAbsolute = typeof to === 'string' && to.startsWith('http');
+  const isHash = typeof to === 'string' && to.startsWith('#');
 
-  if (isAbsolute) {
+  if (isAbsolute || isHash) {
     return (
       <a
-        rel="noopener noreferrer"
-        target="_blank"
+        rel={isAbsolute ? 'noopener noreferrer' : undefined}
+        target={isAbsolute ? '_blank' : undefined}
         // eslint-disable-next-line react/jsx-props-no-spreading
         {...props}
         href={to as string}

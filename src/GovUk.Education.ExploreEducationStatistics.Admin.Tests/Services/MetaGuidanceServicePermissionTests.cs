@@ -1,6 +1,7 @@
 ﻿using System;
 using GovUk.Education.ExploreEducationStatistics.Admin.Security;
 using GovUk.Education.ExploreEducationStatistics.Admin.Services;
+using GovUk.Education.ExploreEducationStatistics.Admin.Services.Interfaces;
 using GovUk.Education.ExploreEducationStatistics.Admin.ViewModels;
 using GovUk.Education.ExploreEducationStatistics.Common.Services.Interfaces.Security;
 using GovUk.Education.ExploreEducationStatistics.Common.Utils;
@@ -54,14 +55,16 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
             StatisticsDbContext statisticsDbContext = null,
             IPersistenceHelper<ContentDbContext> contentPersistenceHelper = null,
             IMetaGuidanceSubjectService metaGuidanceSubjectService = null,
-            IUserService userService = null)
+            IUserService userService = null,
+            IFileRepository fileRepository = null)
         {
             return new MetaGuidanceService(
                 contentDbContext ?? new Mock<ContentDbContext>().Object,
                 contentPersistenceHelper ?? DefaultPersistenceHelperMock().Object,
                 metaGuidanceSubjectService ?? new Mock<IMetaGuidanceSubjectService>().Object,
                 statisticsDbContext ?? new Mock<StatisticsDbContext>().Object,
-                userService ?? new Mock<IUserService>().Object
+                userService ?? new Mock<IUserService>().Object,
+                fileRepository ?? new FileRepository(contentDbContext)
             );
         }
 

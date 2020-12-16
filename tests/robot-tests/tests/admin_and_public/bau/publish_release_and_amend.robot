@@ -177,14 +177,7 @@ Add public prerelease access list
     [Tags]  HappyPath
     user clicks link  Pre-release access
     user waits until h2 is visible  Manage pre-release user access
-
-    user clicks link  Public access list
-    user waits until h2 is visible  Public pre-release access list
-    user clicks button   Create public pre-release access list
-    user presses keys  CTRL+a+BACKSPACE
-    user presses keys  Test public access list
-    user clicks button  Save access list
-    user waits until element contains  css:[data-testid="publicPreReleaseAccessListPreview"]  Test public access list
+    user creates public prerelease access list  Test public access list
 
 Go to "Sign off" tab
     [Tags]  HappyPath
@@ -545,19 +538,21 @@ Update second accordion section text for amendment
     user opens accordion section  Test text
     user adds content to accordion section text block  Test text  1  Updated test text!
 
+Add release note to amendment
+    [Tags]  HappyPath
+    user clicks button   Add note
+    user enters text into element  id:createReleaseNoteForm-reason  Test release note one
+    user clicks button   Save note
+    user opens details dropdown  See all 1 updates  id:releaseLastUpdated
+    ${date}=  get current datetime   %-d %B %Y
+    user waits until element contains  css:#releaseNotes li:nth-of-type(1) time  ${date}
+    user waits until element contains  css:#releaseNotes li:nth-of-type(1) p     Test release note one
+
 Update public prerelease access list for amendment
     [Tags]  HappyPath
     user clicks link  Pre-release access
     user waits until h2 is visible  Manage pre-release user access
-
-    user clicks link  Public access list
-    user waits until h2 is visible  Public pre-release access list
-    user clicks button   Edit public pre-release access list
-    user presses keys  CTRL+a
-    user presses keys  BACKSPACE
-    user presses keys  Updated public access list
-    user clicks button  Save access list
-    user waits until element contains  css:[data-testid="publicPreReleaseAccessListPreview"]  Updated public access list
+    user updates public prerelease access list  Updated public access list
 
 Go to "Sign off" page again
     [Tags]  HappyPath

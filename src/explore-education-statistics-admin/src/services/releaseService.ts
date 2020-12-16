@@ -110,6 +110,39 @@ export interface ReleaseStageStatuses {
   lastUpdated?: string;
 }
 
+export type ReleaseChecklistError =
+  | {
+      code:
+        | 'DataFileImportsMustBeCompleted'
+        | 'DataFileReplacementsMustBeCompleted'
+        | 'PublicMetaGuidanceRequired'
+        | 'PublicPreReleaseAccessListRequired'
+        | 'ReleaseNoteRequired';
+    }
+  | {
+      code: 'MethodologyMustBeApproved';
+      methodologyId: string;
+    };
+
+export type ReleaseChecklistWarning =
+  | {
+      code:
+        | 'NoMethodology'
+        | 'NoNextReleaseDate'
+        | 'NoDataFiles'
+        | 'NoTableHighlights';
+    }
+  | {
+      code: 'NoFootnotesOnSubjects';
+      totalSubjects: number;
+    };
+
+export interface ReleaseChecklist {
+  valid: boolean;
+  errors: ReleaseChecklistError[];
+  warnings: ReleaseChecklistWarning[];
+}
+
 export interface ReleasePublicationStatus {
   publishScheduled: string;
   nextReleaseDate?: PartialDate;
@@ -158,6 +191,10 @@ const releaseService = {
 
   getReleaseStatus(releaseId: string): Promise<ReleaseStageStatuses> {
     return client.get<ReleaseStageStatuses>(`/releases/${releaseId}/status`);
+  },
+
+  getReleaseChecklist(releaseId: string): Promise<ReleaseChecklist> {
+    return client.get(`/releases/${releaseId}/checklist`);
   },
 
   createReleaseAmendment(releaseId: string): Promise<ReleaseSummary> {

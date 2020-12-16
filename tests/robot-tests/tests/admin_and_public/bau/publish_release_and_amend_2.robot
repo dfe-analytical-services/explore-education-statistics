@@ -126,6 +126,12 @@ Add meta guidance to second Subject
     ...  meta guidance content
     user clicks button  Save guidance
 
+Add public prerelease access list
+    [Tags]  HappyPath
+    user clicks link  Pre-release access
+    user waits until h2 is visible  Manage pre-release user access
+    user creates public prerelease access list   Test public access list
+
 Go to "Sign off" page
     [Tags]  HappyPath
     user clicks link   Sign off
@@ -368,6 +374,22 @@ Delete second subject file
     user clicks element  ${button}
     user clicks button  Confirm
 
+Navigate to 'Content' page for amendment
+    [Tags]  HappyPath
+    user clicks link   Content
+    user waits until h2 is visible  ${PUBLICATION_NAME}
+    user waits until page contains button  Add a summary text block
+
+Add release note to amendment
+    [Tags]  HappyPath
+    user clicks button   Add note
+    user enters text into element  id:createReleaseNoteForm-reason  Test release note one
+    user clicks button   Save note
+    user opens details dropdown  See all 1 updates  id:releaseLastUpdated
+    ${date}=  get current datetime   %-d %B %Y
+    user waits until element contains  css:#releaseNotes li:nth-of-type(1) time  ${date}
+    user waits until element contains  css:#releaseNotes li:nth-of-type(1) p     Test release note one
+
 Go to "Sign off" page and approve amendment
     [Tags]  HappyPath
     user clicks link   Sign off
@@ -394,7 +416,7 @@ Go to permalink page & check for error element to be present
     user goes to url  ${PERMA_LOCATION_URL}
     user waits until page contains  WARNING - The data used in this permalink may be out-of-date.
 
-Check the table has the same results as original table 
+Check the table has the same results as original table
     [Tags]  HappyPath
     user checks results table row heading contains  1  1  Asian/Asian British
     user checks results table row heading contains  2  1  Black/African/Caribbean/Black British

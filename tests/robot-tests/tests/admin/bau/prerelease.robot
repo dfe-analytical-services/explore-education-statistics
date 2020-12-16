@@ -81,6 +81,16 @@ Add basic release content
     user waits until h2 is visible  ${PUBLICATION_NAME}
     user adds basic release content  ${PUBLICATION_NAME}
 
+Add public prerelease access list
+    [Tags]  HappyPath
+    user clicks link  Pre-release access
+    user waits until h2 is visible  Manage pre-release user access
+    user creates public prerelease access list  Initial test public access list
+
+Update public prerelease access list
+    [Tags]  HappyPath
+    user updates public prerelease access list  Updated test public access list
+
 Go to "Sign off" page
     [Tags]  HappyPath
     user clicks link   Sign off
@@ -152,24 +162,6 @@ Invite users to prerelease for scheduled release
     user enters text into element  css:input[name="email"]  analyst1@example.com
     user clicks button  Invite new user
     user checks results table cell contains  2  1  analyst1@example.com
-
-Add public prerelease access list
-    [Tags]  HappyPath
-    user clicks link  Public access list
-    user waits until h2 is visible  Public pre-release access list
-    user clicks button   Create public pre-release access list
-    user presses keys  CTRL+a+BACKSPACE
-    user presses keys  Initial test public access list
-    user clicks button  Save access list
-    user waits until element contains  css:[data-testid="publicPreReleaseAccessListPreview"]  Initial test public access list
-
-Update public prerelease access list
-    [Tags]  HappyPath
-    user clicks button   Edit public pre-release access list
-    user presses keys  CTRL+a+BACKSPACE
-    user presses keys  Updated test public access list
-    user clicks button  Save access list
-    user waits until element contains  css:[data-testid="publicPreReleaseAccessListPreview"]  Updated test public access list
 
 Validate prerelease has not started for Analyst user
     [Tags]  HappyPath

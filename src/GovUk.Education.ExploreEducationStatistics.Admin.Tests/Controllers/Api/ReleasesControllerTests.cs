@@ -285,6 +285,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Controllers.Api
             Mock<IReleaseFileService> ReleaseFileService,
             Mock<IReleaseDataFileService> ReleaseDataFilesService,
             Mock<IReleaseStatusService> ReleaseStatusService,
+            Mock<IReleaseChecklistService> ReleaseChecklistService,
             Mock<UserManager<ApplicationUser>> UserManager,
             Mock<IDataBlockService> DataBlockService) Mocks()
         {
@@ -292,6 +293,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Controllers.Api
                     new Mock<IReleaseFileService>(),
                     new Mock<IReleaseDataFileService>(),
                     new Mock<IReleaseStatusService>(),
+                    new Mock<IReleaseChecklistService>(),
                     MockUserManager(),
                     new Mock<IDataBlockService>()
                 );
@@ -302,6 +304,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Controllers.Api
             Mock<IReleaseFileService> ReleaseFileService,
             Mock<IReleaseDataFileService> ReleaseDataFileService,
             Mock<IReleaseStatusService> ReleaseStatusService,
+            Mock<IReleaseChecklistService> ReleaseChecklistService,
             Mock<UserManager<ApplicationUser>> UserManager,
             Mock<IDataBlockService> DataBlockService
             ) mocks)
@@ -311,6 +314,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Controllers.Api
                 mocks.ReleaseFileService.Object,
                 mocks.ReleaseDataFileService.Object,
                 mocks.ReleaseStatusService.Object,
+                mocks.ReleaseChecklistService.Object,
                 mocks.UserManager.Object,
                 mocks.DataBlockService.Object);
         }

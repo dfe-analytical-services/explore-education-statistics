@@ -1,4 +1,6 @@
 ﻿using System;
+using System.Collections.Generic;
+using System.Linq;
 using System.Threading.Tasks;
 using GovUk.Education.ExploreEducationStatistics.Admin.Services.Interfaces;
 using GovUk.Education.ExploreEducationStatistics.Common.Model;
@@ -101,6 +103,44 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Services
             await _contentDbContext.SaveChangesAsync();
 
             return file;
+        }
+
+        public async Task<IList<ReleaseFileReference>> ListDataFiles(Guid releaseId)
+        {
+            return await ListDataFilesQuery(releaseId).ToListAsync();
+        }
+
+        public async Task<bool> HasAnyDataFiles(Guid releaseId)
+        {
+            return await ListDataFilesQuery(releaseId).AnyAsync();
+        }
+
+        private IQueryable<ReleaseFileReference> ListDataFilesQuery(Guid releaseId)
+        {
+            return _contentDbContext
+                .ReleaseFiles
+                .Include(rf => rf.ReleaseFileReference)
+                .Where(
+                    rf => rf.ReleaseId == releaseId
+                          && rf.ReleaseFileReference.ReleaseFileType == ReleaseFileTypes.Data
+                          && rf.ReleaseFileReference.ReplacingId == null
+                          && rf.ReleaseFileReference.SubjectId.HasValue
+                )
+                .Select(rf => rf.ReleaseFileReference);
+        }
+
+        public async Task<IList<ReleaseFileReference>> ListReplacementDataFiles(Guid releaseId)
+        {
+            return await _contentDbContext
+                .ReleaseFiles
+                .Include(rf => rf.ReleaseFileReference)
+                .Where(
+                    rf => rf.ReleaseId == releaseId
+                          && rf.ReleaseFileReference.ReleaseFileType == ReleaseFileTypes.Data
+                          && rf.ReleaseFileReference.ReplacingId != null
+                )
+                .Select(rf => rf.ReleaseFileReference)
+                .ToListAsync();
         }
     }
 }
