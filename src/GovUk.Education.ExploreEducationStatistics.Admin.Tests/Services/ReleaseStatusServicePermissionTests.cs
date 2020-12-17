@@ -6,6 +6,7 @@ using GovUk.Education.ExploreEducationStatistics.Admin.Services;
 using GovUk.Education.ExploreEducationStatistics.Common.Model;
 using GovUk.Education.ExploreEducationStatistics.Common.Services.Interfaces;
 using GovUk.Education.ExploreEducationStatistics.Common.Services.Interfaces.Security;
+using GovUk.Education.ExploreEducationStatistics.Common.Tests.Utils;
 using GovUk.Education.ExploreEducationStatistics.Common.Utils;
 using GovUk.Education.ExploreEducationStatistics.Content.Model;
 using GovUk.Education.ExploreEducationStatistics.Content.Model.Database;
@@ -22,34 +23,34 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
         {
             Id = Guid.NewGuid()
         };
-        
+
         [Fact]
         public void GetReleaseStatusesAsync()
         {
-            AssertSecurityPoliciesChecked(service => 
+            AssertSecurityPoliciesChecked(service =>
                     service.GetReleaseStatusAsync(_release.Id), _release, CanViewSpecificRelease);
         }
-        
+
         private void AssertSecurityPoliciesChecked<T, TEntity>(
             Func<ReleaseStatusService, Task<Either<ActionResult, T>>> protectedAction, TEntity protectedEntity, params SecurityPolicies[] policies)
             where TEntity : class
         {
             var (mapper, userService, persistenceHelper, tableStorageService) = Mocks();
 
-            var service = new ReleaseStatusService(mapper.Object, userService.Object, 
+            var service = new ReleaseStatusService(mapper.Object, userService.Object,
                 persistenceHelper.Object, tableStorageService.Object);
             PermissionTestUtil.AssertSecurityPoliciesChecked(protectedAction, protectedEntity, userService, service, policies);
         }
-        
+
         private (
             Mock<IMapper>,
-            Mock<IUserService>, 
+            Mock<IUserService>,
             Mock<IPersistenceHelper<ContentDbContext>>,
             Mock<ITableStorageService>) Mocks()
         {
             return (
-                new Mock<IMapper>(), 
-                new Mock<IUserService>(), 
+                new Mock<IMapper>(),
+                new Mock<IUserService>(),
                 MockUtils.MockPersistenceHelper<ContentDbContext, Release>(_release.Id, _release),
                 new Mock<ITableStorageService>());
         }

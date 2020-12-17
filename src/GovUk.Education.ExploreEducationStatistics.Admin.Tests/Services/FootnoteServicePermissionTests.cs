@@ -6,6 +6,7 @@ using GovUk.Education.ExploreEducationStatistics.Admin.Services;
 using GovUk.Education.ExploreEducationStatistics.Common.Model;
 using GovUk.Education.ExploreEducationStatistics.Common.Services.Interfaces;
 using GovUk.Education.ExploreEducationStatistics.Common.Services.Interfaces.Security;
+using GovUk.Education.ExploreEducationStatistics.Common.Tests.Utils;
 using GovUk.Education.ExploreEducationStatistics.Common.Utils;
 using GovUk.Education.ExploreEducationStatistics.Content.Model.Database;
 using GovUk.Education.ExploreEducationStatistics.Data.Model;
@@ -27,12 +28,12 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
         {
             Id = Guid.NewGuid()
         };
-        
+
         private static readonly Subject Subject = new Subject
         {
             Id = Guid.NewGuid()
         };
-        
+
         private static readonly Footnote Footnote = new Footnote
         {
             Id = Guid.NewGuid(),
@@ -40,63 +41,71 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
             {
                 new SubjectFootnote
                 {
-                    SubjectId = Subject.Id 
+                    SubjectId = Subject.Id
                 }
             }
         };
 
         private static readonly IReadOnlyCollection<Guid> SubjectIdsList = new List<Guid>
         {
-            Subject.Id    
+            Subject.Id
         };
-        
+
         private static readonly IReadOnlyCollection<Guid> GuidList = new List<Guid>();
-        
+
         [Fact]
         public void CreateFootnote()
         {
-            AssertSecurityPoliciesChecked(service => service
-                .CreateFootnote(
-                    Release.Id,
-                    "", 
-                    GuidList, 
-                    GuidList, 
-                    GuidList, 
-                    GuidList, 
-                    SubjectIdsList), 
-                CanUpdateSpecificRelease);
+            AssertSecurityPoliciesChecked(
+                service => service
+                    .CreateFootnote(
+                        Release.Id,
+                        "",
+                        GuidList,
+                        GuidList,
+                        GuidList,
+                        GuidList,
+                        SubjectIdsList
+                    ),
+                CanUpdateSpecificRelease
+            );
         }
-        
+
         [Fact]
         public void UpdateFootnote()
         {
-            AssertSecurityPoliciesChecked(service => service
+            AssertSecurityPoliciesChecked(
+                service => service
                     .UpdateFootnote(
-                        Release.Id, 
+                        Release.Id,
                         Footnote.Id,
-                        "", 
-                        GuidList, 
-                        GuidList, 
-                        GuidList, 
-                        GuidList, 
-                        SubjectIdsList), 
-                CanUpdateSpecificRelease);
+                        "",
+                        GuidList,
+                        GuidList,
+                        GuidList,
+                        GuidList,
+                        SubjectIdsList
+                    ),
+                CanUpdateSpecificRelease
+            );
         }
-        
+
         [Fact]
         public void DeleteFootnote()
         {
-            AssertSecurityPoliciesChecked(service => service
-                    .DeleteFootnote(Release.Id, Footnote.Id), 
-                CanUpdateSpecificRelease);
+            AssertSecurityPoliciesChecked(
+                service => service
+                    .DeleteFootnote(Release.Id, Footnote.Id),
+                CanUpdateSpecificRelease
+            );
         }
-        
+
         private void AssertSecurityPoliciesChecked<T>(
             Func<FootnoteService, Task<Either<ActionResult, T>>> protectedAction, params SecurityPolicies[] policies)
         {
             var (
-                _, 
-                releaseHelper, 
+                _,
+                releaseHelper,
                 userService,
                 footnoteService,
                 footnoteHelper,
@@ -106,7 +115,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
             using var context = InMemoryStatisticsDbContext();
             var service = new FootnoteService(
                 context,
-                releaseHelper.Object, 
+                releaseHelper.Object,
                 userService.Object,
                 footnoteService.Object,
                 footnoteHelper.Object,
@@ -126,12 +135,12 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
         {
             var contentPersistenceHelper = MockUtils.MockPersistenceHelper<ContentDbContext>();
             MockUtils.SetupCall(contentPersistenceHelper, Release.Id, Release);
-            
+
             return (
-                new Mock<ILogger<FootnoteService>>(), 
+                new Mock<ILogger<FootnoteService>>(),
                 contentPersistenceHelper,
                 new Mock<IUserService>(),
-                new Mock<IFootnoteRepository>(), 
+                new Mock<IFootnoteRepository>(),
                 MockUtils.MockPersistenceHelper<StatisticsDbContext, Footnote>(Footnote.Id, Footnote),
                 new Mock<IGuidGenerator>());
         }

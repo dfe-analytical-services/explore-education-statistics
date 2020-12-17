@@ -5,6 +5,7 @@ using GovUk.Education.ExploreEducationStatistics.Admin.Models;
 using GovUk.Education.ExploreEducationStatistics.Admin.Security;
 using GovUk.Education.ExploreEducationStatistics.Admin.Services;
 using GovUk.Education.ExploreEducationStatistics.Common.Services.Interfaces.Security;
+using GovUk.Education.ExploreEducationStatistics.Common.Tests.Utils;
 using GovUk.Education.ExploreEducationStatistics.Common.Utils;
 using GovUk.Education.ExploreEducationStatistics.Content.Model.Database;
 using Microsoft.AspNetCore.Identity;
@@ -71,8 +72,8 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
                                 userAndRolesDbContext,
                                 userService.Object);
                             return await userManagementService.InviteUser(
-                                "test@test.com", 
-                                "Test User", 
+                                "test@test.com",
+                                "Test User",
                                 role.Id);
                         }
                     });
