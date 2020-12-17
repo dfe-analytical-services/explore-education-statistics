@@ -39,9 +39,6 @@ export interface DataFile {
   created?: string;
   isDeleting?: boolean;
   isCancelling?: boolean;
-}
-
-export interface DataFileWithPermissions extends DataFile {
   permissions: DataFilePermissions;
 }
 
@@ -89,7 +86,7 @@ export interface DataFileImportStatus {
   errors?: string[];
   numberOfRows: number;
 }
-function mapFile(file: DataFileInfo): DataFileWithPermissions {
+function mapFile(file: DataFileInfo): DataFile {
   const [size, unit] = file.size.split(' ');
 
   return {
@@ -104,9 +101,7 @@ function mapFile(file: DataFileInfo): DataFileWithPermissions {
 }
 
 const releaseDataFileService = {
-  getDataFilesWithPermissions(
-    releaseId: string,
-  ): Promise<DataFileWithPermissions[]> {
+  getDataFiles(releaseId: string): Promise<DataFile[]> {
     return client
       .get<DataFileInfo[]>(`/release/${releaseId}/data`)
       .then(response => {
@@ -114,10 +109,7 @@ const releaseDataFileService = {
         return dataFiles.map(mapFile);
       });
   },
-  getDataFileWithPermissions(
-    releaseId: string,
-    fileId: string,
-  ): Promise<DataFileWithPermissions> {
+  getDataFile(releaseId: string, fileId: string): Promise<DataFile> {
     return client
       .get<DataFileInfo>(`/release/${releaseId}/data/${fileId}`)
       .then(mapFile);
@@ -125,7 +117,7 @@ const releaseDataFileService = {
   async uploadDataFiles(
     releaseId: string,
     request: UploadDataFilesRequest,
-  ): Promise<DataFileWithPermissions> {
+  ): Promise<DataFile> {
     const { dataFile, metadataFile, ...params } = request;
 
     const data = new FormData();
@@ -145,7 +137,7 @@ const releaseDataFileService = {
   async uploadZipDataFile(
     releaseId: string,
     request: UploadZipDataFileRequest,
-  ): Promise<DataFileWithPermissions> {
+  ): Promise<DataFile> {
     const { zipFile, ...params } = request;
 
     const data = new FormData();

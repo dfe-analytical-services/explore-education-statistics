@@ -1,7 +1,7 @@
 import ReleaseDataUploadsSection from '@admin/pages/release/data/components/ReleaseDataUploadsSection';
 import _releaseDataFileService, {
   DataFileImportStatus,
-  DataFileWithPermissions,
+  DataFile,
   UploadDataFilesRequest,
   UploadZipDataFileRequest,
 } from '@admin/services/releaseDataFileService';
@@ -17,7 +17,7 @@ const releaseDataFileService = _releaseDataFileService as jest.Mocked<
 >;
 
 describe('ReleaseDataUploadsSection', () => {
-  const testDataFiles: DataFileWithPermissions[] = [
+  const testDataFiles: DataFile[] = [
     {
       id: 'data-1',
       title: 'Test data 1',
@@ -56,7 +56,7 @@ describe('ReleaseDataUploadsSection', () => {
     },
   ];
 
-  const testUploadedDataFile: DataFileWithPermissions = {
+  const testUploadedDataFile: DataFile = {
     id: 'file-1',
     title: 'Test title',
     userName: 'user1@test.com',
@@ -92,9 +92,7 @@ describe('ReleaseDataUploadsSection', () => {
   };
 
   test('renders list of uploaded data files', async () => {
-    releaseDataFileService.getDataFilesWithPermissions.mockResolvedValue(
-      testDataFiles,
-    );
+    releaseDataFileService.getDataFiles.mockResolvedValue(testDataFiles);
     releaseDataFileService.getDataFileImportStatus.mockResolvedValue(
       testCompleteImportStatus,
     );
@@ -110,9 +108,9 @@ describe('ReleaseDataUploadsSection', () => {
     );
 
     await waitFor(() => {
-      expect(
-        releaseDataFileService.getDataFilesWithPermissions,
-      ).toHaveBeenCalledWith('release-1');
+      expect(releaseDataFileService.getDataFiles).toHaveBeenCalledWith(
+        'release-1',
+      );
 
       const sections = screen.getAllByTestId('accordionSection');
 
@@ -170,7 +168,7 @@ describe('ReleaseDataUploadsSection', () => {
   });
 
   test("renders data file details with status of 'Replacement in progress' if being replaced", async () => {
-    releaseDataFileService.getDataFilesWithPermissions.mockResolvedValue([
+    releaseDataFileService.getDataFiles.mockResolvedValue([
       {
         ...testDataFiles[0],
         replacedBy: 'data-replacement-1',
@@ -191,9 +189,9 @@ describe('ReleaseDataUploadsSection', () => {
     );
 
     await waitFor(() => {
-      expect(
-        releaseDataFileService.getDataFilesWithPermissions,
-      ).toHaveBeenCalledWith('release-1');
+      expect(releaseDataFileService.getDataFiles).toHaveBeenCalledWith(
+        'release-1',
+      );
 
       const sections = screen.getAllByTestId('accordionSection');
 
@@ -212,7 +210,7 @@ describe('ReleaseDataUploadsSection', () => {
   });
 
   test('renders empty message when there are no data files', async () => {
-    releaseDataFileService.getDataFilesWithPermissions.mockResolvedValue([]);
+    releaseDataFileService.getDataFiles.mockResolvedValue([]);
 
     render(
       <MemoryRouter>
@@ -236,7 +234,7 @@ describe('ReleaseDataUploadsSection', () => {
 
   describe('deleting data file', () => {
     test('does not render delete files button if file is not ready for deletion', async () => {
-      releaseDataFileService.getDataFilesWithPermissions.mockResolvedValue([
+      releaseDataFileService.getDataFiles.mockResolvedValue([
         { ...testDataFiles[0], status: 'QUEUED' },
         testDataFiles[1],
       ]);
@@ -273,9 +271,7 @@ describe('ReleaseDataUploadsSection', () => {
     });
 
     test('clicking delete files button shows modal to confirm deletion plan', async () => {
-      releaseDataFileService.getDataFilesWithPermissions.mockResolvedValue(
-        testDataFiles,
-      );
+      releaseDataFileService.getDataFiles.mockResolvedValue(testDataFiles);
       releaseDataFileService.getDataFileImportStatus.mockResolvedValue(
         testCompleteImportStatus,
       );
@@ -358,9 +354,7 @@ describe('ReleaseDataUploadsSection', () => {
     });
 
     test('confirming deletion removes the data file section', async () => {
-      releaseDataFileService.getDataFilesWithPermissions.mockResolvedValue(
-        testDataFiles,
-      );
+      releaseDataFileService.getDataFiles.mockResolvedValue(testDataFiles);
       releaseDataFileService.getDataFileImportStatus.mockResolvedValue(
         testCompleteImportStatus,
       );
@@ -424,7 +418,7 @@ describe('ReleaseDataUploadsSection', () => {
 
   describe('replace data file', () => {
     test('does not render replace data button if file import is not completed', async () => {
-      releaseDataFileService.getDataFilesWithPermissions.mockResolvedValue([
+      releaseDataFileService.getDataFiles.mockResolvedValue([
         { ...testDataFiles[0], status: 'QUEUED' },
         testDataFiles[1],
       ]);
@@ -461,7 +455,7 @@ describe('ReleaseDataUploadsSection', () => {
     });
 
     test('renders replace data button with correct link', async () => {
-      releaseDataFileService.getDataFilesWithPermissions.mockResolvedValue([
+      releaseDataFileService.getDataFiles.mockResolvedValue([
         { ...testDataFiles[0], status: 'QUEUED' },
         testDataFiles[1],
       ]);
@@ -494,9 +488,7 @@ describe('ReleaseDataUploadsSection', () => {
 
   describe('uploading data file', () => {
     beforeEach(() => {
-      releaseDataFileService.getDataFilesWithPermissions.mockResolvedValue(
-        testDataFiles,
-      );
+      releaseDataFileService.getDataFiles.mockResolvedValue(testDataFiles);
       releaseDataFileService.getDataFileImportStatus.mockResolvedValue(
         testQueuedImportStatus,
       );
@@ -833,7 +825,7 @@ describe('ReleaseDataUploadsSection', () => {
 
     describe('permissions during upload', () => {
       test('cancel button is available when permissions allow it ', async () => {
-        releaseDataFileService.getDataFilesWithPermissions.mockResolvedValue([
+        releaseDataFileService.getDataFiles.mockResolvedValue([
           {
             ...testUploadedDataFile,
             permissions: {
@@ -864,7 +856,7 @@ describe('ReleaseDataUploadsSection', () => {
       });
 
       test('cancel button is not available when permissions do not allow it', async () => {
-        releaseDataFileService.getDataFilesWithPermissions.mockResolvedValue([
+        releaseDataFileService.getDataFiles.mockResolvedValue([
           {
             ...testUploadedDataFile,
             permissions: {
@@ -904,7 +896,7 @@ describe('ReleaseDataUploadsSection', () => {
     });
 
     test('clicking cancel presents a cancellation modal', async () => {
-      releaseDataFileService.getDataFilesWithPermissions.mockResolvedValue([
+      releaseDataFileService.getDataFiles.mockResolvedValue([
         testUploadedDataFile,
       ]);
 
@@ -955,7 +947,7 @@ describe('ReleaseDataUploadsSection', () => {
       'confirming the cancellation modal initiates cancellation and ' +
         'removes the Cancel link',
       async () => {
-        releaseDataFileService.getDataFilesWithPermissions.mockResolvedValue([
+        releaseDataFileService.getDataFiles.mockResolvedValue([
           testUploadedDataFile,
         ]);
 
@@ -1004,7 +996,7 @@ describe('ReleaseDataUploadsSection', () => {
     );
 
     test('cancelling the cancellation modal calls off the import cancellation', async () => {
-      releaseDataFileService.getDataFilesWithPermissions.mockResolvedValue([
+      releaseDataFileService.getDataFiles.mockResolvedValue([
         testUploadedDataFile,
       ]);
 

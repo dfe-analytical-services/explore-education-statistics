@@ -12,7 +12,6 @@ import permissionService from '@admin/services/permissionService';
 import releaseDataFileService, {
   DataFile,
   DataFileImportStatus,
-  DataFileWithPermissions,
   DeleteDataFilePlan,
 } from '@admin/services/releaseDataFileService';
 import Accordion from '@common/components/Accordion';
@@ -74,7 +73,7 @@ const ReleaseDataUploadsSection = ({
     setState: setDataFilesState,
     isLoading,
   } = useAsyncHandledRetry(
-    () => releaseDataFileService.getDataFilesWithPermissions(releaseId),
+    () => releaseDataFileService.getDataFiles(releaseId),
     [releaseId],
   );
 
@@ -105,7 +104,7 @@ const ReleaseDataUploadsSection = ({
   };
 
   const setDataFiles = useCallback(
-    (nextDataFiles: DataFileWithPermissions[]) => {
+    (nextDataFiles: DataFile[]) => {
       setDataFilesState({ value: nextDataFiles });
 
       if (onDataFilesChange) {
@@ -139,7 +138,7 @@ const ReleaseDataUploadsSection = ({
 
   const handleSubmit = useCallback(
     async (values: FormValues) => {
-      let file: DataFileWithPermissions;
+      let file: DataFile;
 
       if (values.uploadType === 'csv') {
         file = await releaseDataFileService.uploadDataFiles(releaseId, {
