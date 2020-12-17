@@ -1,4 +1,6 @@
 using System.Threading.Tasks;
+using GovUk.Education.ExploreEducationStatistics.Admin.Controllers.Api.BAU;
+using GovUk.Education.ExploreEducationStatistics.Admin.Models;
 using GovUk.Education.ExploreEducationStatistics.Admin.Security;
 using GovUk.Education.ExploreEducationStatistics.Common.Model;
 using GovUk.Education.ExploreEducationStatistics.Common.Services.Interfaces.Security;
@@ -237,6 +239,12 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Services.Interfaces.S
             this IUserService userService, Comment comment)
         {
             return userService.DoCheck(comment, SecurityPolicies.CanUpdateSpecificComment);
+        }
+
+        public static Task<Either<ActionResult, ReleaseFileImportInfo>> CheckCanCancelFileImport(
+            this IUserService userService, ReleaseFileImportInfo import)
+        {
+            return userService.DoCheck(import, SecurityPolicies.CanCancelOngoingImports);
         }
 
         public static Task<Either<ActionResult, Publication>> CheckCanCreateLegacyRelease(

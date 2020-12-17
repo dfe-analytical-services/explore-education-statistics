@@ -15,6 +15,6 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Processor.Services.Int
 
         Task ProcessStage3(ImportMessage message);
 
-        Task ProcessStage4Messages(ImportMessage message, ICollector<ImportMessage> collector);
+        Task ProcessStage4Messages(ImportMessage message, ICollector<ImportObservationsMessage> collector);
     }
 }

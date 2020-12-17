@@ -6,7 +6,6 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Processor.Model
     {
         public Guid SubjectId { get; set; }
         public string DataFileName { get; set; }
-        public string OrigDataFileName { get; set; }
         public string MetaFileName { get; set; }
         public Release Release { get; set; }
         public int NumBatches { get; set; }
@@ -20,7 +19,6 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Processor.Model
         {
             return $"{nameof(SubjectId)}: {SubjectId}, " +
                    $"{nameof(DataFileName)}: {DataFileName}, " +
-                   $"{nameof(OrigDataFileName)}: {OrigDataFileName}, " +
                    $"{nameof(MetaFileName)}: {MetaFileName}, " +
                    $"{nameof(Release)}: {Release}, " +
                    $"{nameof(NumBatches)}: {NumBatches}, " +
