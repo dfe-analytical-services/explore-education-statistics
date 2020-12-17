@@ -1,4 +1,6 @@
 import ButtonGroup from '@common/components/ButtonGroup';
+import useMountedRef from '@common/hooks/useMountedRef';
+import useToggle from '@common/hooks/useToggle';
 import React, { ReactNode } from 'react';
 import Button from './Button';
 import Modal from './Modal';
@@ -12,6 +14,7 @@ interface Props {
   onCancel?(): void;
   onExit(): void;
   title: string;
+  underlayClass?: string;
 }
 
 const ModalConfirm = ({
@@ -23,16 +26,50 @@ const ModalConfirm = ({
   onExit,
   onCancel = onExit,
   title,
+  underlayClass,
 }: Props) => {
+  const isMounted = useMountedRef();
+  const [isDisabled, toggleDisabled] = useToggle(false);
+
+  const handleAction = (callback: () => void) => async () => {
+    if (isDisabled || !isMounted.current) {
+      return;
+    }
+
+    toggleDisabled.on();
+
+    await callback();
+
+    // Callback may finish after
+    // component has been unmounted.
+    if (isMounted.current) {
+      toggleDisabled.off();
+    }
+  };
+
   return (
-    <Modal focusDialog title={title} onExit={onExit} mounted={mounted}>
+    <Modal
+      focusDialog
+      title={title}
+      mounted={mounted}
+      underlayClass={underlayClass}
+      underlayClickExits={!isDisabled}
+      escapeExits={!isDisabled}
+      onExit={onExit}
+    >
       {children}
 
       <ButtonGroup>
-        <Button variant="secondary" onClick={onCancel}>
+        <Button
+          variant="secondary"
+          onClick={handleAction(onCancel)}
+          disabled={isDisabled}
+        >
           {cancelText}
         </Button>
-        <Button onClick={onConfirm}>{confirmText}</Button>
+        <Button onClick={handleAction(onConfirm)} disabled={isDisabled}>
+          {confirmText}
+        </Button>
       </ButtonGroup>
     </Modal>
   );
