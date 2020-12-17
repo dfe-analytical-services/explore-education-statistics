@@ -1,5 +1,5 @@
 using System;
-using System.Collections.Generic;
+using System.Linq;
 using System.Threading.Tasks;
 using GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services;
 using GovUk.Education.ExploreEducationStatistics.Common.Model;
@@ -123,13 +123,10 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Processor.Tests.Functi
         [Fact]
         public void ProcessUploadsButImportIsFinished()
         {
-            var finishedStates = new List<IStatus>
-            {
-                IStatus.COMPLETE,
-                IStatus.FAILED,
-                IStatus.NOT_FOUND,
-                IStatus.CANCELLED
-            };
+            var finishedStates = EnumUtil
+                .GetEnumValues<IStatus>()
+                .Where(ImportStatus.IsFinishedState)
+                .ToList();
             
             finishedStates.ForEach(currentState =>
             {
