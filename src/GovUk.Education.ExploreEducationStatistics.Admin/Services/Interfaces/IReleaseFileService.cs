@@ -21,7 +21,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Services.Interfaces
 
         Task<Either<ActionResult, Unit>> DeleteAll(Guid releaseId, bool forceDelete = false);
 
-        Task<Either<ActionResult, IEnumerable<FileInfo>>> ListAll(Guid releaseId, params ReleaseFileTypes[] types);
+        Task<Either<ActionResult, IEnumerable<FileInfo>>> ListAll(Guid releaseId, params FileType[] types);
 
         Task<Either<ActionResult, FileStreamResult>> Stream(Guid releaseId, Guid id);
 

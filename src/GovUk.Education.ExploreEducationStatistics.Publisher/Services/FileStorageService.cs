@@ -18,11 +18,12 @@ using ICSharpCode.SharpZipLib.Zip;
 using Microsoft.Azure.Storage.Blob;
 using Microsoft.Extensions.Logging;
 using Newtonsoft.Json;
-using static GovUk.Education.ExploreEducationStatistics.Common.Model.ReleaseFileTypes;
+using static GovUk.Education.ExploreEducationStatistics.Common.Model.FileType;
 using static GovUk.Education.ExploreEducationStatistics.Common.BlobContainerNames;
 using static GovUk.Education.ExploreEducationStatistics.Common.Extensions.BlobInfoExtensions;
 using static GovUk.Education.ExploreEducationStatistics.Common.Services.FileStoragePathUtils;
 using static GovUk.Education.ExploreEducationStatistics.Common.Services.FileStorageUtils;
+using File = GovUk.Education.ExploreEducationStatistics.Content.Model.File;
 
 namespace GovUk.Education.ExploreEducationStatistics.Publisher.Services
 {
@@ -97,7 +98,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Publisher.Services
             await _publicBlobStorageService.DeleteBlobs(PublicFilesContainerName, destinationDirectoryPath);
 
             var referencedReleaseVersions = copyReleaseFilesCommand.Files
-                .Select(rfr => rfr.ReleaseId)
+                .Select(f => f.ReleaseId)
                 .Distinct();
 
             var transferredFiles = new List<BlobInfo>();
@@ -213,7 +214,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Publisher.Services
         private async Task<bool> CopyFileUnlessBatchedOrMeta(object source,
             string sourceContainerName,
             Guid releaseId,
-            List<ReleaseFileReference> files)
+            List<File> files)
         {
             var item = source as CloudBlockBlob;
             if (item == null)

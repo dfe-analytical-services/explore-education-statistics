@@ -16,6 +16,7 @@ using Microsoft.Extensions.Logging;
 using Moq;
 using Xunit;
 using static GovUk.Education.ExploreEducationStatistics.Common.BlobContainerNames;
+using static GovUk.Education.ExploreEducationStatistics.Common.Model.FileType;
 using static GovUk.Education.ExploreEducationStatistics.Common.Model.TimeIdentifier;
 using static GovUk.Education.ExploreEducationStatistics.Common.Services.FileStoragePathUtils;
 using static GovUk.Education.ExploreEducationStatistics.Common.Services.FileStorageUtils;
@@ -501,33 +502,33 @@ namespace GovUk.Education.ExploreEducationStatistics.Publisher.Tests.Services
         private static readonly ReleaseFile PublicationARelease2AncillaryReleaseFile = new ReleaseFile
         {
             Release = PublicationARelease2,
-            ReleaseFileReference = new ReleaseFileReference
+            File = new File
             {
                 Filename = "ancillary.pdf",
                 Release = PublicationARelease2,
-                ReleaseFileType = ReleaseFileTypes.Ancillary
+                Type = Ancillary
             }
         };
 
         private static readonly ReleaseFile PublicationARelease2ChartReleaseFile = new ReleaseFile
         {
             Release = PublicationARelease2,
-            ReleaseFileReference = new ReleaseFileReference
+            File = new File
             {
                 Filename = "chart.png",
                 Release = PublicationARelease2,
-                ReleaseFileType = ReleaseFileTypes.Chart
+                Type = Chart
             }
         };
 
         private static readonly ReleaseFile PublicationARelease2DataReleaseFile = new ReleaseFile
         {
             Release = PublicationARelease2,
-            ReleaseFileReference = new ReleaseFileReference
+            File = new File
             {
                 Filename = "data.csv",
                 Release = PublicationARelease2,
-                ReleaseFileType = ReleaseFileTypes.Data
+                Type = FileType.Data
             }
         };
 
@@ -539,11 +540,11 @@ namespace GovUk.Education.ExploreEducationStatistics.Publisher.Tests.Services
             new ReleaseFile
             {
                 Release = PublicationARelease2,
-                ReleaseFileReference = new ReleaseFileReference
+                File = new File
                 {
                     Filename = "data.meta.csv",
                     Release = PublicationARelease2,
-                    ReleaseFileType = ReleaseFileTypes.Metadata
+                    Type = Metadata
                 }
             }
         };
@@ -636,21 +637,21 @@ namespace GovUk.Education.ExploreEducationStatistics.Publisher.Tests.Services
                 Assert.Equal("All files", result[0].Name);
                 Assert.Equal(PublicReleaseAllFilesZipPath(PublicationA.Slug, PublicationARelease2.Slug), result[0].Path);
                 Assert.Equal("3 Mb", result[0].Size);
-                Assert.Equal(ReleaseFileTypes.Ancillary, result[0].Type);
-                Assert.Equal(PublicationARelease2AncillaryReleaseFile.ReleaseFileReference.Id, result[1].Id);
+                Assert.Equal(Ancillary, result[0].Type);
+                Assert.Equal(PublicationARelease2AncillaryReleaseFile.File.Id, result[1].Id);
                 Assert.Equal("pdf", result[1].Extension);
                 Assert.Equal("ancillary.pdf", result[1].FileName);
                 Assert.Equal("Ancillary Test File", result[1].Name);
                 Assert.Equal(PublicationARelease2AncillaryReleaseFile.PublicPath(), result[1].Path);
                 Assert.Equal("15 Kb", result[1].Size);
-                Assert.Equal(ReleaseFileTypes.Ancillary, result[1].Type);
-                Assert.Equal(PublicationARelease2DataReleaseFile.ReleaseFileReference.Id, result[2].Id);
+                Assert.Equal(Ancillary, result[1].Type);
+                Assert.Equal(PublicationARelease2DataReleaseFile.File.Id, result[2].Id);
                 Assert.Equal("csv", result[2].Extension);
                 Assert.Equal("data.csv", result[2].FileName);
                 Assert.Equal("Data Test File", result[2].Name);
                 Assert.Equal(PublicationARelease2DataReleaseFile.PublicPath(), result[2].Path);
                 Assert.Equal("10 Mb", result[2].Size);
-                Assert.Equal(ReleaseFileTypes.Data, result[2].Type);
+                Assert.Equal(FileType.Data, result[2].Type);
             }
         }
 
@@ -672,12 +673,12 @@ namespace GovUk.Education.ExploreEducationStatistics.Publisher.Tests.Services
                 var service = BuildReleaseService(contentDbContext);
 
                 var result = await service.GetFiles(PublicationARelease2.Id,
-                    ReleaseFileTypes.Ancillary,
-                    ReleaseFileTypes.Chart);
+                    Ancillary,
+                    Chart);
 
                 Assert.Equal(2, result.Count);
-                Assert.Equal(PublicationARelease2AncillaryReleaseFile.ReleaseFileReference.Id, result[0].Id);
-                Assert.Equal(PublicationARelease2ChartReleaseFile.ReleaseFileReference.Id, result[1].Id);
+                Assert.Equal(PublicationARelease2AncillaryReleaseFile.File.Id, result[0].Id);
+                Assert.Equal(PublicationARelease2ChartReleaseFile.File.Id, result[1].Id);
             }
         }
 
@@ -847,21 +848,21 @@ namespace GovUk.Education.ExploreEducationStatistics.Publisher.Tests.Services
                 Assert.Equal("All files", result.DownloadFiles[0].Name);
                 Assert.Equal(PublicReleaseAllFilesZipPath(PublicationA.Slug, PublicationARelease2.Slug), result.DownloadFiles[0].Path);
                 Assert.Equal("3 Mb", result.DownloadFiles[0].Size);
-                Assert.Equal(ReleaseFileTypes.Ancillary, result.DownloadFiles[0].Type);
-                Assert.Equal(PublicationARelease2AncillaryReleaseFile.ReleaseFileReference.Id, result.DownloadFiles[1].Id);
+                Assert.Equal(Ancillary, result.DownloadFiles[0].Type);
+                Assert.Equal(PublicationARelease2AncillaryReleaseFile.File.Id, result.DownloadFiles[1].Id);
                 Assert.Equal("pdf", result.DownloadFiles[1].Extension);
                 Assert.Equal("ancillary.pdf", result.DownloadFiles[1].FileName);
                 Assert.Equal("Ancillary Test File", result.DownloadFiles[1].Name);
                 Assert.Equal(PublicationARelease2AncillaryReleaseFile.PublicPath(), result.DownloadFiles[1].Path);
                 Assert.Equal("15 Kb", result.DownloadFiles[1].Size);
-                Assert.Equal(ReleaseFileTypes.Ancillary, result.DownloadFiles[1].Type);
-                Assert.Equal(PublicationARelease2DataReleaseFile.ReleaseFileReference.Id, result.DownloadFiles[2].Id);
+                Assert.Equal(Ancillary, result.DownloadFiles[1].Type);
+                Assert.Equal(PublicationARelease2DataReleaseFile.File.Id, result.DownloadFiles[2].Id);
                 Assert.Equal("csv", result.DownloadFiles[2].Extension);
                 Assert.Equal("data.csv", result.DownloadFiles[2].FileName);
                 Assert.Equal("Data Test File", result.DownloadFiles[2].Name);
                 Assert.Equal(PublicationARelease2DataReleaseFile.PublicPath(), result.DownloadFiles[2].Path);
                 Assert.Equal("10 Mb", result.DownloadFiles[2].Size);
-                Assert.Equal(ReleaseFileTypes.Data, result.DownloadFiles[2].Type);
+                Assert.Equal(FileType.Data, result.DownloadFiles[2].Type);
 
                 Assert.Equal("Release 2 Guidance", result.MetaGuidance);
 
@@ -968,7 +969,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Publisher.Tests.Services
                 Assert.Equal("All files", result.DownloadFiles[0].Name);
                 Assert.Equal(PublicReleaseAllFilesZipPath(PublicationA.Slug, PublicationARelease1V1.Slug), result.DownloadFiles[0].Path);
                 Assert.Equal("0 b", result.DownloadFiles[0].Size);
-                Assert.Equal(ReleaseFileTypes.Ancillary, result.DownloadFiles[0].Type);
+                Assert.Equal(Ancillary, result.DownloadFiles[0].Type);
 
                 Assert.Equal("Release 1 v1 Guidance", result.MetaGuidance);
 
@@ -1034,7 +1035,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Publisher.Tests.Services
                 Assert.Equal("All files", result.DownloadFiles[0].Name);
                 Assert.Equal(PublicReleaseAllFilesZipPath(PublicationA.Slug, PublicationARelease3.Slug), result.DownloadFiles[0].Path);
                 Assert.Equal("0 b", result.DownloadFiles[0].Size);
-                Assert.Equal(ReleaseFileTypes.Ancillary, result.DownloadFiles[0].Type);
+                Assert.Equal(Ancillary, result.DownloadFiles[0].Type);
 
                 Assert.Equal("Release 3 Guidance", result.MetaGuidance);
                 Assert.Empty(result.RelatedInformation);

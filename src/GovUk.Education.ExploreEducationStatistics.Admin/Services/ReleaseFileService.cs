@@ -15,7 +15,7 @@ using GovUk.Education.ExploreEducationStatistics.Content.Model.Extensions;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
 using static GovUk.Education.ExploreEducationStatistics.Common.BlobContainerNames;
-using static GovUk.Education.ExploreEducationStatistics.Common.Model.ReleaseFileTypes;
+using static GovUk.Education.ExploreEducationStatistics.Common.Model.FileType;
 using static GovUk.Education.ExploreEducationStatistics.Common.Services.FileStorageUtils;
 using FileInfo = GovUk.Education.ExploreEducationStatistics.Common.Model.FileInfo;
 
@@ -95,12 +95,12 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Services
                 Chart);
 
             return await Delete(releaseId,
-                releaseFiles.Select(releaseFile => releaseFile.ReleaseFileReference.Id),
+                releaseFiles.Select(releaseFile => releaseFile.File.Id),
                 forceDelete: forceDelete);
         }
 
         public async Task<Either<ActionResult, IEnumerable<FileInfo>>> ListAll(Guid releaseId,
-            params ReleaseFileTypes[] types)
+            params FileType[] types)
         {
             return await _persistenceHelper
                 .CheckEntityExists<Release>(releaseId)
@@ -112,7 +112,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Services
                     var filesWithMetadata = releaseFiles
                         .Select(async releaseFile =>
                         {
-                            var file = releaseFile.ReleaseFileReference;
+                            var file = releaseFile.File;
 
                             // Files should exists in storage but if not then allow user to delete
                             var exists = await _blobStorageService.CheckBlobExists(

@@ -22,8 +22,8 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Services
             _contentDbContext = contentDbContext;
         }
 
-        public async Task<Either<ActionResult, ReleaseFileReference>> CheckFileExists(Guid releaseId, Guid id,
-            params ReleaseFileTypes[] allowedFileTypes)
+        public async Task<Either<ActionResult, File>> CheckFileExists(Guid releaseId, Guid id,
+            params FileType[] allowedFileTypes)
         {
             // Ensure file is linked to the Release by getting the ReleaseFile first
             var releaseFile = await Get(releaseId, id);
@@ -33,12 +33,12 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Services
                 return new NotFoundResult();
             }
 
-            if (allowedFileTypes.Any() && !allowedFileTypes.Contains(releaseFile.ReleaseFileReference.ReleaseFileType))
+            if (allowedFileTypes.Any() && !allowedFileTypes.Contains(releaseFile.File.Type))
             {
                 return ValidationUtils.ValidationActionResult(FileTypeInvalid);
             }
 
-            return releaseFile.ReleaseFileReference;
+            return releaseFile.File;
         }
 
         public async Task Delete(Guid releaseId, Guid fileId)
@@ -54,19 +54,19 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Services
         public async Task<ReleaseFile> Get(Guid releaseId, Guid fileId)
         {
             return await _contentDbContext.ReleaseFiles
-                .Include(releaseFile => releaseFile.ReleaseFileReference)
+                .Include(releaseFile => releaseFile.File)
                 .SingleOrDefaultAsync(releaseFile =>
                     releaseFile.ReleaseId == releaseId
-                    && releaseFile.ReleaseFileReferenceId == fileId);
+                    && releaseFile.FileId == fileId);
         }
 
-        public async Task<List<ReleaseFile>> GetByFileType(Guid releaseId, params ReleaseFileTypes[] types)
+        public async Task<List<ReleaseFile>> GetByFileType(Guid releaseId, params FileType[] types)
         {
             return await _contentDbContext.ReleaseFiles
-                .Include(f => f.ReleaseFileReference)
+                .Include(f => f.File)
                 .Where(releaseFile =>
                     releaseFile.ReleaseId == releaseId
-                    && types.Contains(releaseFile.ReleaseFileReference.ReleaseFileType))
+                    && types.Contains(releaseFile.File.Type))
                 .ToListAsync();
         }
 
@@ -75,7 +75,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Services
             return await _contentDbContext.ReleaseFiles
                 .AnyAsync(releaseFile =>
                     releaseFile.ReleaseId != releaseId
-                    && releaseFile.ReleaseFileReferenceId == fileId);
+                    && releaseFile.FileId == fileId);
         }
     }
 }

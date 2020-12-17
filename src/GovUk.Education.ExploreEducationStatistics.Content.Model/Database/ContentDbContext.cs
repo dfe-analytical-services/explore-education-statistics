@@ -95,7 +95,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Content.Model.Database
         public DbSet<Release> Releases { get; set; }
         public DbSet<LegacyRelease> LegacyReleases { get; set; }
         public DbSet<ReleaseFile> ReleaseFiles { get; set; }
-        public DbSet<ReleaseFileReference> ReleaseFileReferences { get; set; }
+        public DbSet<File> Files { get; set; }
         public DbSet<ContentSection> ContentSections { get; set; }
         public DbSet<ContentBlock> ContentBlocks { get; set; }
         public DbSet<DataBlock> DataBlocks { get; set; }
@@ -178,25 +178,25 @@ namespace GovUk.Education.ExploreEducationStatistics.Content.Model.Database
                 .WithMany()
                 .OnDelete(DeleteBehavior.NoAction);
 
-            modelBuilder.Entity<ReleaseFileReference>()
+            modelBuilder.Entity<File>()
                 .HasOne(r => r.Release)
                 .WithMany()
                 .OnDelete(DeleteBehavior.Cascade);
 
-            modelBuilder.Entity<ReleaseFileReference>()
-                .Property(b => b.ReleaseFileType)
-                .HasConversion(new EnumToStringConverter<ReleaseFileTypes>());
+            modelBuilder.Entity<File>()
+                .Property(b => b.Type)
+                .HasConversion(new EnumToStringConverter<FileType>());
 
-            modelBuilder.Entity<ReleaseFileReference>()
+            modelBuilder.Entity<File>()
                 .HasOne(b => b.Replacing)
                 .WithOne()
-                .HasForeignKey<ReleaseFileReference>(b => b.ReplacingId)
+                .HasForeignKey<File>(b => b.ReplacingId)
                 .IsRequired(false);
 
-            modelBuilder.Entity<ReleaseFileReference>()
+            modelBuilder.Entity<File>()
                 .HasOne(b => b.ReplacedBy)
                 .WithOne()
-                .HasForeignKey<ReleaseFileReference>(b => b.ReplacedById)
+                .HasForeignKey<File>(b => b.ReplacedById)
                 .IsRequired(false);
 
             modelBuilder.Entity<Release>()
@@ -1005,9 +1005,9 @@ namespace GovUk.Education.ExploreEducationStatistics.Content.Model.Database
                                 new HtmlBlock
                                 {
                                     Id = new Guid("4d5ae97d-fa1c-4a09-a0a3-b28307fcfb09"),
-                                    Body = File.Exists(
+                                    Body = System.IO.File.Exists(
                                         @"Migrations/ContentMigrations/Html/Pupil_Absence_Statistics/Section1.html")
-                                        ? File.ReadAllText(
+                                        ? System.IO.File.ReadAllText(
                                             @"Migrations/ContentMigrations/Html/Pupil_Absence_Statistics/Section1.html",
                                             Encoding.UTF8)
                                         : ""
@@ -1028,9 +1028,9 @@ namespace GovUk.Education.ExploreEducationStatistics.Content.Model.Database
                                 new HtmlBlock
                                 {
                                     Id = new Guid("8b90b3b2-f63d-4499-91aa-41ccae74e1c7"),
-                                    Body = File.Exists(
+                                    Body = System.IO.File.Exists(
                                         @"Migrations/ContentMigrations/Html/Pupil_Absence_Statistics/AnnexA.html")
-                                        ? File.ReadAllText(
+                                        ? System.IO.File.ReadAllText(
                                             @"Migrations/ContentMigrations/Html/Pupil_Absence_Statistics/AnnexA.html",
                                             Encoding.UTF8)
                                         : ""

@@ -2,7 +2,6 @@ using System;
 using System.Linq;
 using System.Threading.Tasks;
 using AutoMapper;
-using GovUk.Education.ExploreEducationStatistics.Common.Model;
 using GovUk.Education.ExploreEducationStatistics.Content.Model.Database;
 using GovUk.Education.ExploreEducationStatistics.Data.Importer.Utils;
 using GovUk.Education.ExploreEducationStatistics.Data.Model;
@@ -12,6 +11,7 @@ using GovUk.Education.ExploreEducationStatistics.Data.Processor.Models;
 using GovUk.Education.ExploreEducationStatistics.Data.Processor.Services.Interfaces;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Logging;
+using static GovUk.Education.ExploreEducationStatistics.Common.Model.FileType;
 using Publication = GovUk.Education.ExploreEducationStatistics.Data.Model.Publication;
 using Release = GovUk.Education.ExploreEducationStatistics.Data.Model.Release;
 using Theme = GovUk.Education.ExploreEducationStatistics.Data.Model.Theme;
@@ -60,22 +60,22 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Processor.Services
         {
             var releaseFileLinks = contentDbContext
                 .ReleaseFiles
-                .Include(f => f.ReleaseFileReference)
+                .Include(f => f.File)
                 .Where(f => f.ReleaseId == release.Id);
 
             // Make sure the filename predicate is case sensitive by executing in memory rather than in the db
             var releaseDataFileLink = releaseFileLinks.ToList()
-                .FirstOrDefault(file => file.ReleaseFileReference.Filename == message.DataFileName);
+                .FirstOrDefault(file => file.File.Filename == message.DataFileName);
 
             if (releaseDataFileLink != null)
             {
-                releaseDataFileLink.ReleaseFileReference.SubjectId = subject.Id;
+                releaseDataFileLink.File.SubjectId = subject.Id;
                 contentDbContext.Update(releaseDataFileLink);
 
-                var associatedMetaReference = contentDbContext.ReleaseFileReferences
-                    .FirstOrDefault(rfr => rfr.ReleaseId == releaseDataFileLink.ReleaseFileReference.ReleaseId
-                                  && rfr.ReleaseFileType == ReleaseFileTypes.Metadata
-                                  && rfr.Filename == message.MetaFileName);
+                var associatedMetaReference = contentDbContext.Files
+                    .FirstOrDefault(f => f.ReleaseId == releaseDataFileLink.File.ReleaseId
+                                  && f.Type == Metadata
+                                  && f.Filename == message.MetaFileName);
 
                 if (associatedMetaReference == null)
                 {

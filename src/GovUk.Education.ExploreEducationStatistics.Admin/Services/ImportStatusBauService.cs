@@ -56,12 +56,12 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Services
                             var releaseId = new Guid(result.PartitionKey);
                             var dataFileName = result.RowKey;
 
-                            var releaseFileRef = await _contentDbContext.ReleaseFileReferences.Where(
+                            var releaseFileRef = await _contentDbContext.Files.Where(
                                     r =>
                                         r.ReleaseId == releaseId &&
                                         r.Filename == dataFileName &&
-                                        r.ReleaseFileType == ReleaseFileTypes.Data)
-                                .Include(rfr => rfr.Release)
+                                        r.Type == FileType.Data)
+                                .Include(f => f.Release)
                                 .ThenInclude(r => r.Publication)
                                 .FirstOrDefaultAsync();
 

@@ -11,6 +11,7 @@ using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
 using static GovUk.Education.ExploreEducationStatistics.Admin.Validators.ValidationErrorMessages;
 using static GovUk.Education.ExploreEducationStatistics.Admin.Validators.ValidationUtils;
+using static GovUk.Education.ExploreEducationStatistics.Common.Model.FileType;
 using static GovUk.Education.ExploreEducationStatistics.Common.Validators.FileTypeValidationUtils;
 using static GovUk.Education.ExploreEducationStatistics.Common.Services.FileStoragePathUtils;
 
@@ -21,10 +22,10 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Services
         private readonly IBlobStorageService _blobStorageService;
         private readonly IFileTypeService _fileTypeService;
 
-        private static readonly Dictionary<ReleaseFileTypes, IEnumerable<Regex>> AllowedMimeTypesByFileType =
-            new Dictionary<ReleaseFileTypes, IEnumerable<Regex>>
+        private static readonly Dictionary<FileType, IEnumerable<Regex>> AllowedMimeTypesByFileType =
+            new Dictionary<FileType, IEnumerable<Regex>>
             {
-                {ReleaseFileTypes.DataZip, AllowedArchiveMimeTypes}
+                {DataZip, AllowedArchiveMimeTypes}
             };
 
         public DataArchiveValidationService(IBlobStorageService blobStorageService, IFileTypeService fileTypeService)
@@ -42,7 +43,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Services
                 return ValidationActionResult(DataFileMustBeZipFile);
             }
 
-            var path = AdminReleasePath(releaseId, ReleaseFileTypes.DataZip, zipFile.FileName);
+            var path = AdminReleasePath(releaseId, DataZip, zipFile.FileName);
 
             if (await _blobStorageService.CheckBlobExists(BlobContainerNames.PrivateFilesContainerName, path))
             {
@@ -80,7 +81,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Services
 
             return await _fileTypeService.HasMatchingMimeType(
                        file,
-                       AllowedMimeTypesByFileType[ReleaseFileTypes.DataZip]
+                       AllowedMimeTypesByFileType[DataZip]
                    )
                    && _fileTypeService.HasMatchingEncodingType(file, ZipEncodingTypes);
         }

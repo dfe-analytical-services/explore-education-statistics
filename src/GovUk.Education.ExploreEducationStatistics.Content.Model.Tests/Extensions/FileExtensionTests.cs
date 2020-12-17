@@ -4,7 +4,7 @@ using GovUk.Education.ExploreEducationStatistics.Common.Model;
 using GovUk.Education.ExploreEducationStatistics.Content.Model.Extensions;
 using Xunit;
 using static GovUk.Education.ExploreEducationStatistics.Common.Model.BlobInfo;
-using static GovUk.Education.ExploreEducationStatistics.Common.Model.ReleaseFileTypes;
+using static GovUk.Education.ExploreEducationStatistics.Common.Model.FileType;
 using static GovUk.Education.ExploreEducationStatistics.Common.Services.FileStoragePathUtils;
 
 namespace GovUk.Education.ExploreEducationStatistics.Content.Model.Tests.Extensions
@@ -14,12 +14,12 @@ namespace GovUk.Education.ExploreEducationStatistics.Content.Model.Tests.Extensi
         private const string PublicationSlug = "publication-slug";
         private const string ReleaseSlug = "release-slug";
 
-        private readonly ReleaseFileReference _file = new ReleaseFileReference
+        private readonly File _file = new File
         {
             Id = Guid.NewGuid(),
             Filename = "ancillary.pdf",
             ReleaseId = Guid.NewGuid(),
-            ReleaseFileType = Ancillary
+            Type = Ancillary
         };
 
         [Fact]
@@ -27,7 +27,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Content.Model.Tests.Extensi
         {
             var releaseFile = new ReleaseFile
             {
-                ReleaseFileReference = _file
+                File = _file
             };
 
             Assert.Equal(_file.Path(), releaseFile.Path());
@@ -36,7 +36,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Content.Model.Tests.Extensi
         [Fact]
         public void Path()
         {
-            Assert.Equal(AdminReleasePath(_file.ReleaseId, _file.ReleaseFileType, _file.BlobStorageName), _file.Path());
+            Assert.Equal(AdminReleasePath(_file.ReleaseId, _file.Type, _file.BlobStorageName), _file.Path());
         }
 
         [Fact]
@@ -54,7 +54,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Content.Model.Tests.Extensi
             var releaseFile = new ReleaseFile
             {
                 Release = release,
-                ReleaseFileReference = _file
+                File = _file
             };
 
             Assert.Equal(_file.PublicPath(release), releaseFile.PublicPath());
@@ -72,7 +72,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Content.Model.Tests.Extensi
                 Slug = ReleaseSlug
             };
             
-            Assert.Equal(PublicReleasePath(PublicationSlug, ReleaseSlug, _file.ReleaseFileType, _file.BlobStorageName),
+            Assert.Equal(PublicReleasePath(PublicationSlug, ReleaseSlug, _file.Type, _file.BlobStorageName),
                 _file.PublicPath(release));
         }
 

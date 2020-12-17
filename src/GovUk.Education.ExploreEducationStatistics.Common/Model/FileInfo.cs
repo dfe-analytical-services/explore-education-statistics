@@ -14,7 +14,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Common.Model
         public string Path { get; set; }
         public string Size { get; set; }
 
-        [JsonConverter(typeof(EnumToEnumValueJsonConverter<ReleaseFileTypes>))]
-        public ReleaseFileTypes Type { get; set; }
+        [JsonConverter(typeof(EnumToEnumValueJsonConverter<FileType>))]
+        public FileType Type { get; set; }
     }
 }

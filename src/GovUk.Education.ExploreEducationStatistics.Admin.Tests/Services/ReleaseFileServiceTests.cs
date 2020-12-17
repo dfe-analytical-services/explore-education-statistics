@@ -21,9 +21,10 @@ using Xunit;
 using static GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services.DbUtils;
 using static GovUk.Education.ExploreEducationStatistics.Admin.Validators.ValidationErrorMessages;
 using static GovUk.Education.ExploreEducationStatistics.Common.BlobContainerNames;
-using static GovUk.Education.ExploreEducationStatistics.Common.Model.ReleaseFileTypes;
+using static GovUk.Education.ExploreEducationStatistics.Common.Model.FileType;
 using static GovUk.Education.ExploreEducationStatistics.Common.Services.FileStoragePathUtils;
 using static GovUk.Education.ExploreEducationStatistics.Common.Services.FileStorageUtils;
+using File = GovUk.Education.ExploreEducationStatistics.Content.Model.File;
 
 namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
 {
@@ -37,10 +38,10 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
             var ancillaryFile = new ReleaseFile
             {
                 Release = release,
-                ReleaseFileReference = new ReleaseFileReference
+                File = new File
                 {
                     Filename = "ancillary.pdf",
-                    ReleaseFileType = Ancillary,
+                    Type = Ancillary,
                     Release = release
                 }
             };
@@ -48,10 +49,10 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
             var chartFile = new ReleaseFile
             {
                 Release = release,
-                ReleaseFileReference = new ReleaseFileReference
+                File = new File
                 {
                     Filename = "chart.png",
-                    ReleaseFileType = Chart,
+                    Type = Chart,
                     Release = release
                 }
             };
@@ -76,7 +77,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
                 var service = SetupReleaseFileService(contentDbContext: contentDbContext,
                     blobStorageService: blobStorageService.Object);
 
-                var result = await service.Delete(release.Id, ancillaryFile.ReleaseFileReference.Id);
+                var result = await service.Delete(release.Id, ancillaryFile.File.Id);
 
                 Assert.True(result.IsRight);
 
@@ -88,12 +89,12 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
             {
                 Assert.Null(await contentDbContext.ReleaseFiles.FindAsync(ancillaryFile.Id));
                 Assert.Null(
-                    await contentDbContext.ReleaseFileReferences.FindAsync(ancillaryFile.ReleaseFileReference.Id));
+                    await contentDbContext.Files.FindAsync(ancillaryFile.File.Id));
 
                 // Check that other files remain untouched
                 Assert.NotNull(await contentDbContext.ReleaseFiles.FindAsync(chartFile.Id));
                 Assert.NotNull(
-                    await contentDbContext.ReleaseFileReferences.FindAsync(chartFile.ReleaseFileReference.Id));
+                    await contentDbContext.Files.FindAsync(chartFile.File.Id));
             }
         }
 
@@ -107,23 +108,23 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
                 PreviousVersionId = release.Id
             };
 
-            var ancillaryFile = new ReleaseFileReference
+            var ancillaryFile = new File
             {
                 Filename = "ancillary.pdf",
-                ReleaseFileType = Ancillary,
+                Type = Ancillary,
                 Release = release
             };
 
             var releaseFile = new ReleaseFile
             {
                 Release = release,
-                ReleaseFileReference = ancillaryFile
+                File = ancillaryFile
             };
 
             var amendmentReleaseFile = new ReleaseFile
             {
                 Release = amendmentRelease,
-                ReleaseFileReference = ancillaryFile
+                File = ancillaryFile
             };
 
             var contentDbContextId = Guid.NewGuid().ToString();
@@ -155,7 +156,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
 
                 // Check that the file and link to the previous version remain untouched
                 Assert.NotNull(
-                    await contentDbContext.ReleaseFileReferences.FindAsync(ancillaryFile.Id));
+                    await contentDbContext.Files.FindAsync(ancillaryFile.Id));
                 Assert.NotNull(await contentDbContext.ReleaseFiles.FindAsync(releaseFile.Id));
             }
         }
@@ -168,10 +169,10 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
             var dataFile = new ReleaseFile
             {
                 Release = release,
-                ReleaseFileReference = new ReleaseFileReference
+                File = new File
                 {
                     Filename = "data.csv",
-                    ReleaseFileType = ReleaseFileTypes.Data,
+                    Type = FileType.Data,
                     Release = release,
                     SubjectId = Guid.NewGuid()
                 }
@@ -193,7 +194,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
                 var service = SetupReleaseFileService(contentDbContext: contentDbContext,
                     blobStorageService: blobStorageService.Object);
 
-                var result = await service.Delete(release.Id, dataFile.ReleaseFileReference.Id);
+                var result = await service.Delete(release.Id, dataFile.File.Id);
 
                 Assert.True(result.IsLeft);
                 ValidationTestUtil.AssertValidationProblem(result.Left, FileTypeInvalid);
@@ -204,7 +205,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
                 // Check that the file remains untouched
                 Assert.NotNull(await contentDbContext.ReleaseFiles.FindAsync(dataFile.Id));
                 Assert.NotNull(
-                    await contentDbContext.ReleaseFileReferences.FindAsync(dataFile.ReleaseFileReference.Id));
+                    await contentDbContext.Files.FindAsync(dataFile.File.Id));
             }
         }
 
@@ -216,10 +217,10 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
             var ancillaryFile = new ReleaseFile
             {
                 Release = release,
-                ReleaseFileReference = new ReleaseFileReference
+                File = new File
                 {
                     Filename = "ancillary.pdf",
-                    ReleaseFileType = Ancillary,
+                    Type = Ancillary,
                     Release = release
                 }
             };
@@ -240,7 +241,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
                 var service = SetupReleaseFileService(contentDbContext: contentDbContext,
                     blobStorageService: blobStorageService.Object);
 
-                var result = await service.Delete(Guid.NewGuid(), ancillaryFile.ReleaseFileReference.Id);
+                var result = await service.Delete(Guid.NewGuid(), ancillaryFile.File.Id);
 
                 Assert.True(result.IsLeft);
                 Assert.IsType<NotFoundResult>(result.Left);
@@ -251,7 +252,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
                 // Check that the file remains untouched
                 Assert.NotNull(await contentDbContext.ReleaseFiles.FindAsync(ancillaryFile.Id));
                 Assert.NotNull(
-                    await contentDbContext.ReleaseFileReferences.FindAsync(ancillaryFile.ReleaseFileReference.Id));
+                    await contentDbContext.Files.FindAsync(ancillaryFile.File.Id));
             }
         }
 
@@ -290,10 +291,10 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
             var ancillaryFile = new ReleaseFile
             {
                 Release = release,
-                ReleaseFileReference = new ReleaseFileReference
+                File = new File
                 {
                     Filename = "ancillary.pdf",
-                    ReleaseFileType = Ancillary,
+                    Type = Ancillary,
                     Release = release
                 }
             };
@@ -301,10 +302,10 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
             var chartFile = new ReleaseFile
             {
                 Release = release,
-                ReleaseFileReference = new ReleaseFileReference
+                File = new File
                 {
                     Filename = "chart.png",
-                    ReleaseFileType = Chart,
+                    Type = Chart,
                     Release = release
                 }
             };
@@ -335,8 +336,8 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
 
                 var result = await service.Delete(release.Id, new List<Guid>
                 {
-                    ancillaryFile.ReleaseFileReference.Id,
-                    chartFile.ReleaseFileReference.Id
+                    ancillaryFile.File.Id,
+                    chartFile.File.Id
                 });
 
                 Assert.True(result.IsRight);
@@ -352,10 +353,10 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
             {
                 Assert.Null(await contentDbContext.ReleaseFiles.FindAsync(ancillaryFile.Id));
                 Assert.Null(
-                    await contentDbContext.ReleaseFileReferences.FindAsync(ancillaryFile.ReleaseFileReference.Id));
+                    await contentDbContext.Files.FindAsync(ancillaryFile.File.Id));
 
                 Assert.Null(await contentDbContext.ReleaseFiles.FindAsync(chartFile.Id));
-                Assert.Null(await contentDbContext.ReleaseFileReferences.FindAsync(chartFile.ReleaseFileReference.Id));
+                Assert.Null(await contentDbContext.Files.FindAsync(chartFile.File.Id));
             }
         }
 
@@ -367,10 +368,10 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
             var ancillaryFile = new ReleaseFile
             {
                 Release = release,
-                ReleaseFileReference = new ReleaseFileReference
+                File = new File
                 {
                     Filename = "ancillary.pdf",
-                    ReleaseFileType = Ancillary,
+                    Type = Ancillary,
                     Release = release
                 }
             };
@@ -378,10 +379,10 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
             var dataFile = new ReleaseFile
             {
                 Release = release,
-                ReleaseFileReference = new ReleaseFileReference
+                File = new File
                 {
                     Filename = "data.csv",
-                    ReleaseFileType = ReleaseFileTypes.Data,
+                    Type = FileType.Data,
                     Release = release,
                     SubjectId = Guid.NewGuid()
                 }
@@ -405,8 +406,8 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
 
                 var result = await service.Delete(release.Id, new List<Guid>
                 {
-                    ancillaryFile.ReleaseFileReference.Id,
-                    dataFile.ReleaseFileReference.Id
+                    ancillaryFile.File.Id,
+                    dataFile.File.Id
                 });
 
                 Assert.True(result.IsLeft);
@@ -418,7 +419,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
                 // Check that all the files remain untouched
                 Assert.NotNull(await contentDbContext.ReleaseFiles.FindAsync(ancillaryFile.Id));
                 Assert.NotNull(
-                    await contentDbContext.ReleaseFileReferences.FindAsync(ancillaryFile.ReleaseFileReference.Id));
+                    await contentDbContext.Files.FindAsync(ancillaryFile.File.Id));
             }
         }
 
@@ -430,10 +431,10 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
             var ancillaryFile = new ReleaseFile
             {
                 Release = release,
-                ReleaseFileReference = new ReleaseFileReference
+                File = new File
                 {
                     Filename = "ancillary.pdf",
-                    ReleaseFileType = Ancillary,
+                    Type = Ancillary,
                     Release = release
                 }
             };
@@ -441,10 +442,10 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
             var chartFile = new ReleaseFile
             {
                 Release = release,
-                ReleaseFileReference = new ReleaseFileReference
+                File = new File
                 {
                     Filename = "chart.png",
-                    ReleaseFileType = Chart,
+                    Type = Chart,
                     Release = release
                 }
             };
@@ -467,8 +468,8 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
 
                 var result = await service.Delete(Guid.NewGuid(), new List<Guid>
                 {
-                    ancillaryFile.ReleaseFileReference.Id,
-                    chartFile.ReleaseFileReference.Id
+                    ancillaryFile.File.Id,
+                    chartFile.File.Id
                 });
 
                 Assert.True(result.IsLeft);
@@ -480,7 +481,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
                 // Check that the file remains untouched
                 Assert.NotNull(await contentDbContext.ReleaseFiles.FindAsync(ancillaryFile.Id));
                 Assert.NotNull(
-                    await contentDbContext.ReleaseFileReferences.FindAsync(ancillaryFile.ReleaseFileReference.Id));
+                    await contentDbContext.Files.FindAsync(ancillaryFile.File.Id));
             }
         }
 
@@ -492,10 +493,10 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
             var ancillaryFile = new ReleaseFile
             {
                 Release = release,
-                ReleaseFileReference = new ReleaseFileReference
+                File = new File
                 {
                     Filename = "ancillary.pdf",
-                    ReleaseFileType = Ancillary,
+                    Type = Ancillary,
                     Release = release
                 }
             };
@@ -518,7 +519,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
 
                 var result = await service.Delete(release.Id, new List<Guid>
                 {
-                    ancillaryFile.ReleaseFileReference.Id,
+                    ancillaryFile.File.Id,
                     // Include an unknown id
                     Guid.NewGuid()
                 });
@@ -532,7 +533,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
                 // Check that the files remain untouched
                 Assert.NotNull(await contentDbContext.ReleaseFiles.FindAsync(ancillaryFile.Id));
                 Assert.NotNull(
-                    await contentDbContext.ReleaseFileReferences.FindAsync(ancillaryFile.ReleaseFileReference.Id));
+                    await contentDbContext.Files.FindAsync(ancillaryFile.File.Id));
             }
         }
 
@@ -546,36 +547,36 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
                 PreviousVersionId = release.Id
             };
 
-            var ancillaryFile = new ReleaseFileReference
+            var ancillaryFile = new File
             {
                 Filename = "ancillary.pdf",
-                ReleaseFileType = Ancillary,
+                Type = Ancillary,
                 Release = release
             };
 
-            var chartFile = new ReleaseFileReference
+            var chartFile = new File
             {
                 Filename = "chart.png",
-                ReleaseFileType = Chart,
+                Type = Chart,
                 Release = amendmentRelease
             };
 
             var ancillaryReleaseFile = new ReleaseFile
             {
                 Release = release,
-                ReleaseFileReference = ancillaryFile
+                File = ancillaryFile
             };
 
             var ancillaryAmendmentReleaseFile = new ReleaseFile
             {
                 Release = amendmentRelease,
-                ReleaseFileReference = ancillaryFile
+                File = ancillaryFile
             };
 
             var chartAmendmentReleaseFile = new ReleaseFile
             {
                 Release = amendmentRelease,
-                ReleaseFileReference = chartFile
+                File = chartFile
             };
 
             var contentDbContextId = Guid.NewGuid().ToString();
@@ -619,11 +620,11 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
 
                 // Check that the ancillary file and link to the previous version remain untouched
                 Assert.NotNull(
-                    await contentDbContext.ReleaseFileReferences.FindAsync(ancillaryFile.Id));
+                    await contentDbContext.Files.FindAsync(ancillaryFile.Id));
                 Assert.NotNull(await contentDbContext.ReleaseFiles.FindAsync(ancillaryReleaseFile.Id));
 
                 // Check that the chart file and link to the amendment are removed
-                Assert.Null(await contentDbContext.ReleaseFileReferences.FindAsync(chartFile.Id));
+                Assert.Null(await contentDbContext.Files.FindAsync(chartFile.Id));
                 Assert.Null(await contentDbContext.ReleaseFiles.FindAsync(chartAmendmentReleaseFile.Id));
             }
         }
@@ -636,10 +637,10 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
             var ancillaryFile = new ReleaseFile
             {
                 Release = release,
-                ReleaseFileReference = new ReleaseFileReference
+                File = new File
                 {
                     Filename = "ancillary.pdf",
-                    ReleaseFileType = Ancillary,
+                    Type = Ancillary,
                     Release = release
                 }
             };
@@ -647,10 +648,10 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
             var chartFile = new ReleaseFile
             {
                 Release = release,
-                ReleaseFileReference = new ReleaseFileReference
+                File = new File
                 {
                     Filename = "chart.png",
-                    ReleaseFileType = Chart,
+                    Type = Chart,
                     Release = release
                 }
             };
@@ -658,10 +659,10 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
             var dataFile = new ReleaseFile
             {
                 Release = release,
-                ReleaseFileReference = new ReleaseFileReference
+                File = new File
                 {
                     Filename = "data.csv",
-                    ReleaseFileType = ReleaseFileTypes.Data,
+                    Type = FileType.Data,
                     Release = release,
                     SubjectId = Guid.NewGuid()
                 }
@@ -706,15 +707,15 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
             {
                 Assert.Null(await contentDbContext.ReleaseFiles.FindAsync(ancillaryFile.Id));
                 Assert.Null(
-                    await contentDbContext.ReleaseFileReferences.FindAsync(ancillaryFile.ReleaseFileReference.Id));
+                    await contentDbContext.Files.FindAsync(ancillaryFile.File.Id));
 
                 Assert.Null(await contentDbContext.ReleaseFiles.FindAsync(chartFile.Id));
-                Assert.Null(await contentDbContext.ReleaseFileReferences.FindAsync(chartFile.ReleaseFileReference.Id));
+                Assert.Null(await contentDbContext.Files.FindAsync(chartFile.File.Id));
 
                 // Check that data files remain untouched
                 Assert.NotNull(await contentDbContext.ReleaseFiles.FindAsync(dataFile.Id));
                 Assert.NotNull(
-                    await contentDbContext.ReleaseFileReferences.FindAsync(dataFile.ReleaseFileReference.Id));
+                    await contentDbContext.Files.FindAsync(dataFile.File.Id));
             }
         }
 
@@ -771,36 +772,36 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
                 PreviousVersionId = release.Id
             };
 
-            var ancillaryFile = new ReleaseFileReference
+            var ancillaryFile = new File
             {
                 Filename = "ancillary.pdf",
-                ReleaseFileType = Ancillary,
+                Type = Ancillary,
                 Release = release
             };
 
-            var chartFile = new ReleaseFileReference
+            var chartFile = new File
             {
                 Filename = "chart.png",
-                ReleaseFileType = Chart,
+                Type = Chart,
                 Release = amendmentRelease
             };
 
             var ancillaryReleaseFile = new ReleaseFile
             {
                 Release = release,
-                ReleaseFileReference = ancillaryFile
+                File = ancillaryFile
             };
 
             var ancillaryAmendmentReleaseFile = new ReleaseFile
             {
                 Release = amendmentRelease,
-                ReleaseFileReference = ancillaryFile
+                File = ancillaryFile
             };
 
             var chartAmendmentReleaseFile = new ReleaseFile
             {
                 Release = amendmentRelease,
-                ReleaseFileReference = chartFile
+                File = chartFile
             };
 
             var contentDbContextId = Guid.NewGuid().ToString();
@@ -839,11 +840,11 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
 
                 // Check that the ancillary file and link to the previous version remain untouched
                 Assert.NotNull(
-                    await contentDbContext.ReleaseFileReferences.FindAsync(ancillaryFile.Id));
+                    await contentDbContext.Files.FindAsync(ancillaryFile.Id));
                 Assert.NotNull(await contentDbContext.ReleaseFiles.FindAsync(ancillaryReleaseFile.Id));
 
                 // Check that the chart file and link to the amendment are removed
-                Assert.Null(await contentDbContext.ReleaseFileReferences.FindAsync(chartFile.Id));
+                Assert.Null(await contentDbContext.Files.FindAsync(chartFile.Id));
                 Assert.Null(await contentDbContext.ReleaseFiles.FindAsync(chartAmendmentReleaseFile.Id));
             }
         }
@@ -900,10 +901,10 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
             var ancillaryFile1 = new ReleaseFile
             {
                 Release = release,
-                ReleaseFileReference = new ReleaseFileReference
+                File = new File
                 {
                     Filename = "ancillary_1.pdf",
-                    ReleaseFileType = Ancillary,
+                    Type = Ancillary,
                     Release = release
                 }
             };
@@ -911,10 +912,10 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
             var ancillaryFile2 = new ReleaseFile
             {
                 Release = release,
-                ReleaseFileReference = new ReleaseFileReference
+                File = new File
                 {
                     Filename = "Ancillary 2.pdf",
-                    ReleaseFileType = Ancillary,
+                    Type = Ancillary,
                     Release = release
                 }
             };
@@ -922,10 +923,10 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
             var chartFile = new ReleaseFile
             {
                 Release = release,
-                ReleaseFileReference = new ReleaseFileReference
+                File = new File
                 {
                     Filename = "chart.png",
-                    ReleaseFileType = Chart,
+                    Type = Chart,
                     Release = release
                 }
             };
@@ -933,10 +934,10 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
             var dataFile = new ReleaseFile
             {
                 Release = release,
-                ReleaseFileReference = new ReleaseFileReference
+                File = new File
                 {
                     Filename = "data.csv",
-                    ReleaseFileType = ReleaseFileTypes.Data,
+                    Type = FileType.Data,
                     Release = release,
                     SubjectId = Guid.NewGuid()
                 }
@@ -1018,7 +1019,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
                 var fileInfoList = result.Right.ToList();
                 Assert.Equal(3, fileInfoList.Count);
 
-                Assert.Equal(ancillaryFile1.ReleaseFileReference.Id, fileInfoList[0].Id);
+                Assert.Equal(ancillaryFile1.File.Id, fileInfoList[0].Id);
                 Assert.Equal("pdf", fileInfoList[0].Extension);
                 Assert.Equal("ancillary_1.pdf", fileInfoList[0].FileName);
                 Assert.Equal("Ancillary Test File 1", fileInfoList[0].Name);
@@ -1026,7 +1027,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
                 Assert.Equal("10 Kb", fileInfoList[0].Size);
                 Assert.Equal(Ancillary, fileInfoList[0].Type);
 
-                Assert.Equal(ancillaryFile2.ReleaseFileReference.Id, fileInfoList[1].Id);
+                Assert.Equal(ancillaryFile2.File.Id, fileInfoList[1].Id);
                 Assert.Equal("pdf", fileInfoList[1].Extension);
                 Assert.Equal("Ancillary 2.pdf", fileInfoList[1].FileName);
                 Assert.Equal("Ancillary Test File 2", fileInfoList[1].Name);
@@ -1034,7 +1035,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
                 Assert.Equal("10 Kb", fileInfoList[1].Size);
                 Assert.Equal(Ancillary, fileInfoList[1].Type);
 
-                Assert.Equal(chartFile.ReleaseFileReference.Id, fileInfoList[2].Id);
+                Assert.Equal(chartFile.File.Id, fileInfoList[2].Id);
                 Assert.Equal("png", fileInfoList[2].Extension);
                 Assert.Equal("chart.png", fileInfoList[2].FileName);
                 Assert.Equal("chart.png", fileInfoList[2].Name);
@@ -1052,10 +1053,10 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
             var releaseFile = new ReleaseFile
             {
                 Release = release,
-                ReleaseFileReference = new ReleaseFileReference
+                File = new File
                 {
                     Filename = "ancillary.pdf",
-                    ReleaseFileType = Ancillary,
+                    Type = Ancillary,
                     Release = release
                 }
             };
@@ -1093,7 +1094,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
                 var service = SetupReleaseFileService(contentDbContext: contentDbContext,
                     blobStorageService: blobStorageService.Object);
 
-                var result = await service.Stream(release.Id, releaseFile.ReleaseFileReference.Id);
+                var result = await service.Stream(release.Id, releaseFile.File.Id);
 
                 Assert.True(result.IsRight);
 
@@ -1119,10 +1120,10 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
             var releaseFile = new ReleaseFile
             {
                 Release = release,
-                ReleaseFileReference = new ReleaseFileReference
+                File = new File
                 {
                     Filename = "Ancillary 1.pdf",
-                    ReleaseFileType = Ancillary,
+                    Type = Ancillary,
                     Release = release
                 }
             };
@@ -1160,7 +1161,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
                 var service = SetupReleaseFileService(contentDbContext: contentDbContext,
                     blobStorageService: blobStorageService.Object);
 
-                var result = await service.Stream(release.Id, releaseFile.ReleaseFileReference.Id);
+                var result = await service.Stream(release.Id, releaseFile.File.Id);
 
                 Assert.True(result.IsRight);
 
@@ -1186,10 +1187,10 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
             var releaseFile = new ReleaseFile
             {
                 Release = release,
-                ReleaseFileReference = new ReleaseFileReference
+                File = new File
                 {
                     Filename = "ancillary.pdf",
-                    ReleaseFileType = Ancillary,
+                    Type = Ancillary,
                     Release = release
                 }
             };
@@ -1210,7 +1211,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
                 var service = SetupReleaseFileService(contentDbContext: contentDbContext,
                     blobStorageService: blobStorageService.Object);
 
-                var result = await service.Stream(Guid.NewGuid(), releaseFile.ReleaseFileReference.Id);
+                var result = await service.Stream(Guid.NewGuid(), releaseFile.File.Id);
 
                 Assert.True(result.IsLeft);
                 Assert.IsType<NotFoundResult>(result.Left);
@@ -1334,10 +1335,10 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
 
             await using (var contentDbContext = InMemoryApplicationDbContext(contentDbContextId))
             {
-                var file = await contentDbContext.ReleaseFileReferences.SingleOrDefaultAsync(f =>
+                var file = await contentDbContext.Files.SingleOrDefaultAsync(f =>
                     f.ReleaseId == release.Id
                     && f.Filename == filename
-                    && f.ReleaseFileType == Ancillary
+                    && f.Type == Ancillary
                     && f.FilenameMigrated
                 );
 
@@ -1345,7 +1346,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
 
                 Assert.NotNull(await contentDbContext.ReleaseFiles.SingleOrDefaultAsync(rf =>
                     rf.ReleaseId == release.Id
-                    && rf.ReleaseFileReferenceId == file.Id
+                    && rf.FileId == file.Id
                 ));
             }
         }
@@ -1433,10 +1434,10 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
 
             await using (var contentDbContext = InMemoryApplicationDbContext(contentDbContextId))
             {
-                var file = await contentDbContext.ReleaseFileReferences.SingleOrDefaultAsync(f =>
+                var file = await contentDbContext.Files.SingleOrDefaultAsync(f =>
                     f.ReleaseId == release.Id
                     && f.Filename == filename
-                    && f.ReleaseFileType == Chart
+                    && f.Type == Chart
                     && f.FilenameMigrated
                 );
 
@@ -1444,7 +1445,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
 
                 Assert.NotNull(await contentDbContext.ReleaseFiles.SingleOrDefaultAsync(rf =>
                     rf.ReleaseId == release.Id
-                    && rf.ReleaseFileReferenceId == file.Id
+                    && rf.FileId == file.Id
                 ));
             }
         }

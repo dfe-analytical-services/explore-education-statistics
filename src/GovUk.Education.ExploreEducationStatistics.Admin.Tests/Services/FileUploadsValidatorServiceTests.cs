@@ -16,6 +16,7 @@ using Xunit;
 using static GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services.DbUtils;
 using static GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services.ValidationTestUtil;
 using static GovUk.Education.ExploreEducationStatistics.Admin.Validators.ValidationErrorMessages;
+using static GovUk.Education.ExploreEducationStatistics.Common.Model.FileType;
 
 namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
 {
@@ -29,7 +30,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
 
             var file = CreateFormFile("test.csv", "test.csv");
 
-            var result = await service.ValidateFileForUpload(file, ReleaseFileTypes.Ancillary);
+            var result = await service.ValidateFileForUpload(file, Ancillary);
 
             Assert.True(result.IsLeft);
             AssertValidationProblem(result.Left, FileCannotBeEmpty);
@@ -43,7 +44,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
 
             var file = CreateFormFile("test.csv", "test.csv");
 
-            await Assert.ThrowsAsync<ArgumentException>(() => service.ValidateFileForUpload(file, ReleaseFileTypes.Data));
+            await Assert.ThrowsAsync<ArgumentException>(() => service.ValidateFileForUpload(file, FileType.Data));
         }
 
         [Fact]
@@ -58,7 +59,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
             fileTypeService
                 .Setup(s => s.HasMatchingMimeType(file, It.IsAny<IEnumerable<Regex>>()))
                 .ReturnsAsync(() => true);
-            var result = await service.ValidateFileForUpload(file, ReleaseFileTypes.Ancillary);
+            var result = await service.ValidateFileForUpload(file, Ancillary);
 
             Assert.True(result.IsRight);
         }
@@ -75,7 +76,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
             fileTypeService
                 .Setup(s => s.HasMatchingMimeType(file, It.IsAny<IEnumerable<Regex>>()))
                 .ReturnsAsync(() => false);
-            var result = await service.ValidateFileForUpload(file, ReleaseFileTypes.Ancillary);
+            var result = await service.ValidateFileForUpload(file, Ancillary);
 
             Assert.True(result.IsLeft);
             AssertValidationProblem(result.Left, FileTypeInvalid);

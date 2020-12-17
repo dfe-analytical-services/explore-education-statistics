@@ -192,8 +192,8 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Services
                 .Select(chart => new Guid(chart.FileId))
                 .ToList();
 
-            var releaseFileReferences = await _context.ReleaseFileReferences
-                .Where(rfr => fileIds.Contains(rfr.Id))
+            var files = await _context.Files
+                .Where(f => fileIds.Contains(f.Id))
                 .ToListAsync();
 
             return new DependentDataBlock
@@ -201,10 +201,10 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Services
                 Id = block.Id,
                 Name = block.Name,
                 ContentSectionHeading = GetContentSectionHeading(block),
-                InfographicFilesInfo = releaseFileReferences.Select(rfr => new InfographicFileInfo
+                InfographicFilesInfo = files.Select(f => new InfographicFileInfo
                 {
-                    Id = rfr.Id,
-                    Filename = rfr.Filename
+                    Id = f.Id,
+                    Filename = f.Filename
                 }).ToList()
             };
         }

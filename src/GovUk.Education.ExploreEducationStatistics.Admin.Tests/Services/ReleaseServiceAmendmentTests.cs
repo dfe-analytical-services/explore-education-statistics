@@ -270,7 +270,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
                 contributorReleaseRole
             };
 
-            var dataFileReference1 = new ReleaseFileReference
+            var dataFile1 = new File
             {
                 Id = Guid.NewGuid(),
                 Filename = "Filename 1",
@@ -279,7 +279,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
                 SubjectId = Guid.NewGuid()
             };
 
-            var dataFileReference2 = new ReleaseFileReference
+            var dataFile2 = new File
             {
                 Id = Guid.NewGuid(),
                 Filename = "Filename 2",
@@ -295,16 +295,16 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
                     Id = Guid.NewGuid(),
                     Release = release,
                     ReleaseId = releaseId,
-                    ReleaseFileReference = dataFileReference1,
-                    ReleaseFileReferenceId = dataFileReference1.Id
+                    File = dataFile1,
+                    FileId = dataFile1.Id
                 },
                 new ReleaseFile
                 {
                     Id = Guid.NewGuid(),
                     Release = release,
                     ReleaseId = releaseId,
-                    ReleaseFileReference = dataFileReference2,
-                    ReleaseFileReferenceId = dataFileReference2.Id
+                    File = dataFile2,
+                    FileId = dataFile2.Id
                 }
             };
 
@@ -501,7 +501,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
 
                 var amendmentDataFiles = contentDbContext
                     .ReleaseFiles
-                    .Include(f => f.ReleaseFileReference)
+                    .Include(f => f.File)
                     .Where(f => f.ReleaseId == amendment.Id)
                     .ToList();
 
@@ -509,12 +509,12 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
 
                 var amendmentDataFile = amendmentDataFiles[0];
                 var originalFile = releaseFiles.First(f =>
-                    f.ReleaseFileReference.Filename == amendmentDataFile.ReleaseFileReference.Filename);
+                    f.File.Filename == amendmentDataFile.File.Filename);
                 AssertAmendedReleaseFileCorrect(originalFile, amendmentDataFile, amendment);
 
                 var amendmentDataFile2 = amendmentDataFiles[1];
                 var originalFile2 = releaseFiles.First(f =>
-                    f.ReleaseFileReference.Filename == amendmentDataFile2.ReleaseFileReference.Filename);
+                    f.File.Filename == amendmentDataFile2.File.Filename);
                 AssertAmendedReleaseFileCorrect(originalFile2, amendmentDataFile2, amendment);
 
                 Assert.True(amendment.Amendment);
@@ -607,7 +607,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
 
             // and assert that the file referenced is the SAME file reference as linked from the original Release's
             // link table entry
-            Assert.Equal(originalFile.ReleaseFileReference.Id, amendmentDataFile.ReleaseFileReference.Id);
+            Assert.Equal(originalFile.File.Id, amendmentDataFile.File.Id);
         }
 
         private Mock<IUserService> UserServiceMock()

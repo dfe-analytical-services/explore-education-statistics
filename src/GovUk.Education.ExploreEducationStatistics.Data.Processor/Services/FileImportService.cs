@@ -137,7 +137,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Processor.Services
 
         public async Task ImportFiltersAndLocations(ImportMessage message, StatisticsDbContext context)
         {
-            var dataFileBlobPath = FileStoragePathUtils.AdminReleasePath(message.Release.Id, ReleaseFileTypes.Data, message.DataFileName);
+            var dataFileBlobPath = FileStoragePathUtils.AdminReleasePath(message.Release.Id, FileType.Data, message.DataFileName);
 
             var subjectData = await _fileStorageService.GetSubjectData(message.Release.Id, dataFileBlobPath);
             var releaseSubject = GetReleaseSubjectLink(message.Release.Id, message.SubjectId, context);
