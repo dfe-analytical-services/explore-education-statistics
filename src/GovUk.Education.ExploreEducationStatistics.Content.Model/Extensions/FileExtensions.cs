@@ -9,23 +9,23 @@ namespace GovUk.Education.ExploreEducationStatistics.Content.Model.Extensions
     {
         public static string Path(this ReleaseFile releaseFile)
         {
-            return releaseFile.ReleaseFileReference.Path();
+            return releaseFile.File.Path();
         }
 
-        public static string Path(this ReleaseFileReference file)
+        public static string Path(this File file)
         {
             return AdminReleasePath(
                 file.ReleaseId,
-                file.ReleaseFileType,
+                file.Type,
                 file.BlobStorageName);
         }
 
         public static string PublicPath(this ReleaseFile releaseFile)
         {
-            return releaseFile.ReleaseFileReference.PublicPath(releaseFile.Release);
+            return releaseFile.File.PublicPath(releaseFile.Release);
         }
 
-        public static string PublicPath(this ReleaseFileReference file, Release release)
+        public static string PublicPath(this File file, Release release)
         {
             if (release.Publication == null)
             {
@@ -38,11 +38,11 @@ namespace GovUk.Education.ExploreEducationStatistics.Content.Model.Extensions
             // which is not the same if the file belongs to a Release amendment.
             return PublicReleasePath(release.Publication.Slug,
                 release.Slug,
-                file.ReleaseFileType,
+                file.Type,
                 file.BlobStorageName);
         }
 
-        public static FileInfo ToFileInfo(this ReleaseFileReference file, BlobInfo blobInfo)
+        public static FileInfo ToFileInfo(this File file, BlobInfo blobInfo)
         {
             return new FileInfo
             {
@@ -52,11 +52,11 @@ namespace GovUk.Education.ExploreEducationStatistics.Content.Model.Extensions
                 Name = blobInfo.Name.IsNullOrEmpty() ? file.Filename : blobInfo.Name,
                 Path = file.Path(),
                 Size = blobInfo.Size,
-                Type = file.ReleaseFileType
+                Type = file.Type
             };
         }
 
-        public static FileInfo ToFileInfoNotFound(this ReleaseFileReference file)
+        public static FileInfo ToFileInfoNotFound(this File file)
         {
             return new FileInfo
             {
@@ -65,11 +65,11 @@ namespace GovUk.Education.ExploreEducationStatistics.Content.Model.Extensions
                 Name = "Unknown",
                 Path = null,
                 Size = "0.00 B",
-                Type = file.ReleaseFileType
+                Type = file.Type
             };
         }
 
-        public static FileInfo ToPublicFileInfo(this ReleaseFileReference file, BlobInfo blobInfo)
+        public static FileInfo ToPublicFileInfo(this File file, BlobInfo blobInfo)
         {
             return new FileInfo
             {
@@ -78,7 +78,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Content.Model.Extensions
                 Name = blobInfo.Name,
                 Path = blobInfo.Path,
                 Size = blobInfo.Size,
-                Type = file.ReleaseFileType
+                Type = file.Type
             };
         }
     }

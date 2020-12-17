@@ -18,7 +18,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Publisher.Services.Interfac
 
         Task<List<FileInfo>> GetDownloadFiles(Release release);
 
-        Task<List<ReleaseFileReference>> GetFiles(Guid releaseId, params FileType[] types);
+        Task<List<File>> GetFiles(Guid releaseId, params FileType[] types);
 
         Task<Release> GetLatestRelease(Guid publicationId, IEnumerable<Guid> includedReleaseIds);
 

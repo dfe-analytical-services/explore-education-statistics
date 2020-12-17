@@ -107,11 +107,11 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Services
         {
             return _context
                 .ReleaseFiles
-                .Include(rf => rf.ReleaseFileReference)
+                .Include(rf => rf.File)
                 .Where(rf => rf.ReleaseId == releaseId)
                 .ToList()
-                .Any(rf => String.Equals(rf.ReleaseFileReference.Filename, name, CurrentCultureIgnoreCase)
-                && rf.ReleaseFileReference.ReleaseFileType == type);
+                .Any(rf => String.Equals(rf.File.Filename, name, CurrentCultureIgnoreCase)
+                && rf.File.Type == type);
         }
 
         private async Task<Either<ActionResult, Unit>> ValidateDataFileNames(Guid releaseId, string dataFileName, string metaFileName)

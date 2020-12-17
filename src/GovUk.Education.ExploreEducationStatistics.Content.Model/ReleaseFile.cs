@@ -11,10 +11,10 @@ namespace GovUk.Education.ExploreEducationStatistics.Content.Model
         public Release Release { get; set; }
         
         public Guid ReleaseId { get; set; }
-        
-        public ReleaseFileReference ReleaseFileReference { get; set; }
 
-        public Guid ReleaseFileReferenceId { get; set; }
+        public File File { get; set; }
+
+        public Guid FileId { get; set; }
 
         public ReleaseFile CreateReleaseAmendment(Release amendment)
         {

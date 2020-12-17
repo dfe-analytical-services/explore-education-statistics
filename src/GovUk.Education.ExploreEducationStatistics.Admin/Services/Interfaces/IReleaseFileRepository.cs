@@ -9,7 +9,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Services.Interfaces
 {
     public interface IReleaseFileRepository
     {
-        public Task<Either<ActionResult, ReleaseFileReference>> CheckFileExists(Guid releaseId, Guid id,
+        public Task<Either<ActionResult, File>> CheckFileExists(Guid releaseId, Guid id,
             params FileType[] allowedFileTypes);
         
         public Task Delete(Guid releaseId, Guid fileId);

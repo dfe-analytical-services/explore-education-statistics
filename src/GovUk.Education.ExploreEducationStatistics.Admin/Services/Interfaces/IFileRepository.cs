@@ -8,30 +8,30 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Services.Interfaces
 {
     public interface IFileRepository
     {
-        public Task<ReleaseFileReference> Create(
+        public Task<File> Create(
             Guid releaseId,
             string filename,
             FileType type,
-            ReleaseFileReference replacingFile = null,
-            ReleaseFileReference source = null);
+            File replacingFile = null,
+            File source = null);
 
-        public Task<ReleaseFileReference> CreateZip(
+        public Task<File> CreateZip(
             Guid releaseId,
             string filename);
 
         public Task Delete(Guid id);
 
-        public Task<ReleaseFileReference> Get(Guid id);
+        public Task<File> Get(Guid id);
 
-        public Task<IList<ReleaseFileReference>> ListDataFiles(Guid releaseId);
+        public Task<IList<File>> ListDataFiles(Guid releaseId);
 
         public Task<bool> HasAnyDataFiles(Guid releaseId);
 
-        public Task<ReleaseFileReference> UpdateFilename(
+        public Task<File> UpdateFilename(
             Guid releaseId,
             Guid fileId,
             string filename);
 
-        public Task<IList<ReleaseFileReference>> ListReplacementDataFiles(Guid releaseId);
+        public Task<IList<File>> ListReplacementDataFiles(Guid releaseId);
     }
 }

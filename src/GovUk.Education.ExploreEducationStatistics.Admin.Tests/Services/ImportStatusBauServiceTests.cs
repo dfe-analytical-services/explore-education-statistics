@@ -145,19 +145,19 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
                     },
                     ReleaseName = testRelease.Year.ToString(),
                 });
-                await contentDbContext.AddAsync(new ReleaseFileReference
+                await contentDbContext.AddAsync(new File
                 {
                     ReleaseId = testRelease.Id,
                     SubjectId = testImportMessage1.SubjectId,
                     Filename = testDatafileImport1.RowKey,
-                    ReleaseFileType = ReleaseFileTypes.Data,
+                    Type = FileType.Data
                 });
-                await contentDbContext.AddAsync(new ReleaseFileReference
+                await contentDbContext.AddAsync(new File
                 {
                     ReleaseId = testRelease.Id,
                     SubjectId = testImportMessage2.SubjectId,
                     Filename = testDatafileImport2.RowKey,
-                    ReleaseFileType = ReleaseFileTypes.Data,
+                    Type = FileType.Data,
                 });
                 await contentDbContext.SaveChangesAsync();
             }

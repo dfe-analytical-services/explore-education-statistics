@@ -82,7 +82,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Processor.Services
             if (!batchFilesForDataFile.Any())
             {
                 var observationsFilePath = 
-                    AdminReleasePath(message.Release.Id, ReleaseFileTypes.Data, message.DataFileName);
+                    AdminReleasePath(message.Release.Id, FileType.Data, message.DataFileName);
                 
                 collector.Add(new ImportObservationsMessage
                 {

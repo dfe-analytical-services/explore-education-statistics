@@ -123,7 +123,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Processor.Services
 
         private async Task<SubjectData> GetSubjectDataFromMainDataFile(ImportMessage message)
         {
-            var dataFileBlobPath = AdminReleasePath(message.Release.Id, ReleaseFileTypes.Data, message.DataFileName);
+            var dataFileBlobPath = AdminReleasePath(message.Release.Id, FileType.Data, message.DataFileName);
             return await _fileStorageService.GetSubjectData(message.Release.Id, dataFileBlobPath);
         }
     }

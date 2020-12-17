@@ -49,10 +49,10 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Services
                 .OnSuccess(release =>
                 {
                     var files = _contentDbContext.ReleaseFiles
-                        .Include(file => file.ReleaseFileReference)
+                        .Include(file => file.File)
                         .Where(file => file.ReleaseId == releaseId
-                                       && file.ReleaseFileReference.ReleaseFileType == FileType.Data)
-                        .Select(file => file.ReleaseFileReference);
+                                       && file.File.Type == FileType.Data)
+                        .Select(file => file.File);
 
                     // Exclude files that are replacements in progress
                     var filesExcludingReplacements = files

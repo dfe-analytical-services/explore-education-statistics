@@ -145,7 +145,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Services
             var releaseFiles = await _releaseFileRepository.GetByFileType(releaseId, FileType.Data);
 
             return await Delete(releaseId,
-                releaseFiles.Select(releaseFile => releaseFile.ReleaseFileReference.Id),
+                releaseFiles.Select(releaseFile => releaseFile.File.Id),
                 forceDelete: forceDelete);
         }
 
@@ -157,15 +157,15 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Services
                 .OnSuccess(
                     async release => await _persistenceHelper
                         .CheckEntityExists<ReleaseFile>(
-                            q => q.Include(rf => rf.ReleaseFileReference)
+                            q => q.Include(rf => rf.File)
                                 .Where(
                                     rf => rf.ReleaseId == release.Id
-                                          && rf.ReleaseFileReference.ReleaseFileType == FileType.Data
-                                          && rf.ReleaseFileReferenceId == id
+                                          && rf.File.Type == FileType.Data
+                                          && rf.FileId == id
                                 )
                         )
                 )
-                .OnSuccess(async file => await GetDataFileInfo(releaseId, file.ReleaseFileReference));
+                .OnSuccess(async file => await GetDataFileInfo(releaseId, file.File));
         }
 
         public async Task<Either<ActionResult, IEnumerable<DataFileInfo>>> ListAll(Guid releaseId)
@@ -180,10 +180,10 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Services
 
                     // Exclude files that are replacements in progress
                     var filesExcludingReplacements = files.Where(file =>
-                        !file.ReleaseFileReference.ReplacingId.HasValue);
+                        !file.File.ReplacingId.HasValue);
 
                     await filesExcludingReplacements.ForEachAsync(async file =>
-                        fileList.Add(await GetDataFileInfo(releaseId, file.ReleaseFileReference)));
+                        fileList.Add(await GetDataFileInfo(releaseId, file.File)));
 
                     return fileList
                         .OrderBy(file => file.Name)
@@ -203,7 +203,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Services
                 .OnSuccess(_userService.CheckCanUpdateRelease)
                 .OnSuccess(async release =>
                 {
-                    return await _persistenceHelper.CheckOptionalEntityExists<ReleaseFileReference>(replacingFileId)
+                    return await _persistenceHelper.CheckOptionalEntityExists<File>(replacingFileId)
                         .OnSuccess(async replacingFile =>
                         {
                             return await ValidateSubjectName(releaseId, subjectName, replacingFile)
@@ -282,7 +282,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Services
                 .OnSuccess(_userService.CheckCanUpdateRelease)
                 .OnSuccess(async release =>
                 {
-                    return await _persistenceHelper.CheckOptionalEntityExists<ReleaseFileReference>(replacingFileId)
+                    return await _persistenceHelper.CheckOptionalEntityExists<File>(replacingFileId)
                         .OnSuccess(async replacingFile =>
                         {
                             return await ValidateSubjectName(releaseId, subjectName, replacingFile)
@@ -358,7 +358,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Services
                 });
         }
 
-        private async Task<DataFileInfo> GetDataFileInfo(Guid releaseId, ReleaseFileReference dataFile)
+        private async Task<DataFileInfo> GetDataFileInfo(Guid releaseId, File dataFile)
         {
             // Files should exists in storage but if not then allow user to delete
             var blobExists =
@@ -399,7 +399,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Services
             };
         }
 
-        private async Task<DataFileInfo> GetFallbackDataFileInfo(Guid releaseId, ReleaseFileReference file)
+        private async Task<DataFileInfo> GetFallbackDataFileInfo(Guid releaseId, File file)
         {
             // Try to get the name from the zip file if existing
             if (file.SourceId != null)
@@ -420,7 +420,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Services
                         Size = zipBlob.Size,
                         MetaFileId = null,
                         MetaFileName =
-                            file.ReleaseFileType == FileType.Data
+                            file.Type == FileType.Data
                                 ? zipBlob.GetMetaFileName()
                                 : string.Empty,
                         Rows = 0,
@@ -431,11 +431,11 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Services
                 }
             }
 
-            var dataFileName = file.ReleaseFileType == FileType.Data
+            var dataFileName = file.Type == FileType.Data
                 ? file.Filename
                 : (await GetAssociatedReleaseFileReference(file, FileType.Data)).Filename;
 
-            var metaFileReference = file.ReleaseFileType == FileType.Data
+            var metaFileReference = file.Type == FileType.Data
                 ? await GetAssociatedReleaseFileReference(file, Metadata)
                 : null;
 
@@ -467,7 +467,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Services
             };
         }
 
-        private async Task<string> GetSubjectName(ReleaseFileReference file)
+        private async Task<string> GetSubjectName(File file)
         {
             if (file.SubjectId.HasValue)
             {
@@ -479,7 +479,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Services
         }
 
         private async Task<Either<ActionResult, string>> ValidateSubjectName(Guid releaseId,
-            string subjectName, ReleaseFileReference replacingFile)
+            string subjectName, File replacingFile)
         {
             if (replacingFile == null)
             {
@@ -491,7 +491,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Services
         }
 
         private async Task UploadFileToStorage(
-            ReleaseFileReference file,
+            File file,
             IFormFile formFile,
             IDictionary<string, string> metaValues)
         {
@@ -506,14 +506,14 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Services
             );
         }
 
-        private async Task<ReleaseFileReference> GetAssociatedReleaseFileReference(
-            ReleaseFileReference releaseFileReference,
+        private async Task<File> GetAssociatedReleaseFileReference(
+            File file,
             FileType associatedType)
         {
-            return await _contentDbContext.ReleaseFileReferences
-                .FirstAsync(rfr => rfr.ReleaseId == releaseFileReference.ReleaseId
-                                   && rfr.ReleaseFileType == associatedType
-                                   && rfr.SubjectId == releaseFileReference.SubjectId);
+            return await _contentDbContext.Files
+                .FirstAsync(f => f.ReleaseId == file.ReleaseId
+                                   && f.Type == associatedType
+                                   && f.SubjectId == file.SubjectId);
         }
 
         private async Task<IEnumerable<BlobInfo>> GetBatchFilesForDataFile(Guid releaseId, string originalDataFileName)
@@ -526,9 +526,9 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Services
             return blobs.Where(blob => IsBatchFileForDataFile(releaseId, originalDataFileName, blob.Path));
         }
 
-        private async Task DeleteBatchFiles(Guid releaseId, ReleaseFileReference dataFileReference)
+        private async Task DeleteBatchFiles(Guid releaseId, File dataFile)
         {
-            var batchFiles = await GetBatchFilesForDataFile(releaseId, dataFileReference.Filename);
+            var batchFiles = await GetBatchFilesForDataFile(releaseId, dataFile.Filename);
             await batchFiles.ForEachAsync(async batchFile =>
             {
                 await _blobStorageService.DeleteBlob(

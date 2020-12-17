@@ -61,10 +61,10 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
             var releaseFile = new ReleaseFile
             {
                 Release = _release,
-                ReleaseFileReference = new ReleaseFileReference
+                File = new File
                 {
                     Filename = "ancillary.pdf",
-                    ReleaseFileType = Ancillary,
+                    Type = Ancillary,
                     Release = _release
                 }
             };

@@ -167,14 +167,14 @@ namespace GovUk.Education.ExploreEducationStatistics.Publisher.Services
             }
         }
 
-        public async Task<List<ReleaseFileReference>> GetFiles(Guid releaseId, params FileType[] types)
+        public async Task<List<File>> GetFiles(Guid releaseId, params FileType[] types)
         {
             return await _contentDbContext
                 .ReleaseFiles
-                .Include(rf => rf.ReleaseFileReference)
+                .Include(rf => rf.File)
                 .Where(rf => rf.ReleaseId == releaseId)
-                .Select(rf => rf.ReleaseFileReference)
-                .Where(file => types.Contains(file.ReleaseFileType))
+                .Select(rf => rf.File)
+                .Where(file => types.Contains(file.Type))
                 .ToListAsync();
         }
 
@@ -228,7 +228,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Publisher.Services
             };
         }
 
-        private async Task<FileInfo> GetPublicFileInfo(Release release, ReleaseFileReference file)
+        private async Task<FileInfo> GetPublicFileInfo(Release release, File file)
         {
             var exists = await _fileStorageService.CheckBlobExists(
                 containerName: PublicFilesContainerName,

@@ -95,7 +95,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Services
                 Chart);
 
             return await Delete(releaseId,
-                releaseFiles.Select(releaseFile => releaseFile.ReleaseFileReference.Id),
+                releaseFiles.Select(releaseFile => releaseFile.File.Id),
                 forceDelete: forceDelete);
         }
 
@@ -112,7 +112,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Services
                     var filesWithMetadata = releaseFiles
                         .Select(async releaseFile =>
                         {
-                            var file = releaseFile.ReleaseFileReference;
+                            var file = releaseFile.File;
 
                             // Files should exists in storage but if not then allow user to delete
                             var exists = await _blobStorageService.CheckBlobExists(
