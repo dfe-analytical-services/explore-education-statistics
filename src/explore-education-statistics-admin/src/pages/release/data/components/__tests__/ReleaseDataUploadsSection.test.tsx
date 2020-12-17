@@ -832,8 +832,6 @@ describe('ReleaseDataUploadsSection', () => {
     });
 
     describe('permissions during upload', () => {
-      type DataFileActionButton = 'Cancel';
-
       test('cancel button is available when permissions allow it ', async () => {
         releaseDataFileService.getDataFilesWithPermissions.mockResolvedValue([
           {
