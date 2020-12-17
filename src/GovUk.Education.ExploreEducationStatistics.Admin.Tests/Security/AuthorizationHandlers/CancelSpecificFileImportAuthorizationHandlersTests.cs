@@ -50,7 +50,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Security.Author
         }
         
         [Fact]
-        public void CanCancelFinishedImportWithCorrectClaimAndImportState()
+        public void CanCancelHealthyOngoingImportWithCorrectClaim()
         {
             var nonFinishedOrAbortingStatuses = EnumUtil
                 .GetEnumValues<IStatus>()
