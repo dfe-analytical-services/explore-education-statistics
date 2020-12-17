@@ -71,7 +71,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Security.Author
                         Status = state
                     });
 
-                // Assert that no users can cancel a finished Import
+                // Assert that users with the CancelAllFileImports claim can cancel a non-finished-or-aborting Import
                 AssertHandlerSucceedsWithCorrectClaims<ReleaseFileImportInfo, CancelSpecificFileImportRequirement>(
                     new CancelSpecificFileImportAuthorizationHandler(importStatusService.Object), new ReleaseFileImportInfo
                     {
