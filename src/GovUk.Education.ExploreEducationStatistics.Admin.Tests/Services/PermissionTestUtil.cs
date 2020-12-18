@@ -4,9 +4,9 @@ using System.Reflection;
 using System.Threading.Tasks;
 using Castle.Core.Internal;
 using GovUk.Education.ExploreEducationStatistics.Admin.Security;
-using GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services.Utils;
 using GovUk.Education.ExploreEducationStatistics.Common.Model;
 using GovUk.Education.ExploreEducationStatistics.Common.Services.Interfaces.Security;
+using GovUk.Education.ExploreEducationStatistics.Common.Tests.Utils;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using Moq;
@@ -16,9 +16,9 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
 {
     public static class PermissionTestUtil
     {
-        public static SecurityPolicyCheckBuilder PolicyCheckBuilder()
+        public static PolicyCheckBuilder<SecurityPolicies> PolicyCheckBuilder(Mock<IUserService> userService = null)
         {
-            return new SecurityPolicyCheckBuilder();
+            return new PolicyCheckBuilder<SecurityPolicies>(userService);
         }
 
         [Obsolete("Use SecurityPolicyCheckBuilder class or PolicyCheckBuilder method")]
@@ -36,7 +36,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
 
             var result = await protectedAction.Invoke(service);
 
-            AssertForbidden(result);
+            PermissionTestUtils.AssertForbidden(result);
 
             policies.ToList().ForEach(policy =>
                 userService.Verify(s => s.MatchesPolicy(resource, policy)));
@@ -50,13 +50,6 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
 
             var publicMethods = typeof(TClass).GetMethods(BindingFlags.Public);
             publicMethods.ToList().ForEach(method => Assert.Null(method.GetAttribute<AuthorizeAttribute>()));
-        }
-
-        public static void AssertForbidden<T>(Either<ActionResult,T> result)
-        {
-            Assert.NotNull(result);
-            Assert.True(result.IsLeft);
-            Assert.IsAssignableFrom<ForbidResult>(result.Left);
         }
     }
 }

@@ -1,20 +1,23 @@
 using System;
 using System.Threading.Tasks;
-using GovUk.Education.ExploreEducationStatistics.Admin.Security;
 using GovUk.Education.ExploreEducationStatistics.Common.Model;
 using GovUk.Education.ExploreEducationStatistics.Common.Services.Interfaces.Security;
-using GovUk.Education.ExploreEducationStatistics.Content.Model;
 using Microsoft.AspNetCore.Mvc;
 using Moq;
 using Xunit;
 
-namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services.Utils
+namespace GovUk.Education.ExploreEducationStatistics.Common.Tests.Utils
 {
-    public class SecurityPolicyCheckBuilder
+    public class PolicyCheckBuilder<TPolicy> where TPolicy : Enum
     {
-        private readonly Mock<IUserService> _userService = new Mock<IUserService>();
+        private readonly Mock<IUserService> _userService;
 
-        public SecurityPolicyCheckBuilder ExpectCheck(SecurityPolicies policy, bool checkResult = true)
+        public PolicyCheckBuilder(Mock<IUserService> userService = null)
+        {
+            _userService = userService ?? new Mock<IUserService>();
+        }
+
+        public PolicyCheckBuilder<TPolicy> ExpectCheck(TPolicy policy, bool checkResult = true)
         {
             _userService
                 .Setup(s => s.MatchesPolicy(policy))
@@ -23,14 +26,14 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services.Utils
             return this;
         }
 
-        public SecurityPolicyCheckBuilder ExpectCheckToFail(SecurityPolicies policy)
+        public PolicyCheckBuilder<TPolicy> ExpectCheckToFail(TPolicy policy)
         {
             return ExpectCheck(policy, false);
         }
 
-        public SecurityPolicyCheckBuilder ExpectResourceCheck(
+        public PolicyCheckBuilder<TPolicy> ExpectResourceCheck(
             object resource,
-            SecurityPolicies policy,
+            TPolicy policy,
             bool checkResult = true)
         {
             _userService
@@ -40,7 +43,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services.Utils
             return this;
         }
 
-        public SecurityPolicyCheckBuilder ExpectResourceCheckToFail(object resource, SecurityPolicies policy)
+        public PolicyCheckBuilder<TPolicy> ExpectResourceCheckToFail(object resource, TPolicy policy)
         {
             return ExpectResourceCheck(resource, policy, false);
         }
@@ -54,7 +57,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services.Utils
         {
             var result = await action.Invoke(_userService);
 
-            PermissionTestUtil.AssertForbidden(result);
+            PermissionTestUtils.AssertForbidden(result);
 
             _userService.VerifyAll();
             _userService.VerifyNoOtherCalls();
