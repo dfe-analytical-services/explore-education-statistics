@@ -44,12 +44,17 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Services
             _releaseService = releaseService;
         }
 
-        public Task<Either<ActionResult, TableBuilderResultViewModel>> Query(ObservationQueryContext queryContext)
+        public async Task<Either<ActionResult, TableBuilderResultViewModel>> Query(ObservationQueryContext queryContext)
         {
             var publicationId = _subjectService.GetPublicationForSubject(queryContext.SubjectId).Result.Id;
-            var releaseId = _releaseService.GetLatestPublishedRelease(publicationId);
+            var release = _releaseService.GetLatestPublishedRelease(publicationId);
 
-            return Query(releaseId.Value, queryContext);
+            if (release == null)
+            {
+                return new NotFoundResult();
+            }
+
+            return await Query(release.Id, queryContext);
         }
 
         public Task<Either<ActionResult, TableBuilderResultViewModel>> Query(Guid releaseId, ObservationQueryContext queryContext)
