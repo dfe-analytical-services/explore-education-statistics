@@ -2,6 +2,7 @@ using System;
 using System.Collections.Generic;
 using AutoMapper;
 using GovUk.Education.ExploreEducationStatistics.Admin.Models.Api;
+using GovUk.Education.ExploreEducationStatistics.Admin.Security;
 using GovUk.Education.ExploreEducationStatistics.Admin.Services;
 using GovUk.Education.ExploreEducationStatistics.Admin.Services.Interfaces;
 using GovUk.Education.ExploreEducationStatistics.Admin.ViewModels;
@@ -13,12 +14,14 @@ using GovUk.Education.ExploreEducationStatistics.Common.Tests.Utils;
 using GovUk.Education.ExploreEducationStatistics.Common.Utils;
 using GovUk.Education.ExploreEducationStatistics.Content.Model;
 using GovUk.Education.ExploreEducationStatistics.Content.Model.Database;
+using GovUk.Education.ExploreEducationStatistics.Content.Security;
 using GovUk.Education.ExploreEducationStatistics.Data.Model.Database;
 using GovUk.Education.ExploreEducationStatistics.Data.Model.Services.Interfaces;
 using Moq;
 using Xunit;
 using static GovUk.Education.ExploreEducationStatistics.Admin.Security.SecurityPolicies;
 using static GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services.MapperUtils;
+using static GovUk.Education.ExploreEducationStatistics.Common.Tests.Utils.PermissionTestUtils;
 using IFootnoteService = GovUk.Education.ExploreEducationStatistics.Admin.Services.Interfaces.IFootnoteService;
 
 namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
@@ -43,8 +46,8 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
         [Fact]
         public void GetRelease()
         {
-            PermissionTestUtil.PolicyCheckBuilder()
-                .ExpectResourceCheckToFail(_release, CanViewSpecificRelease)
+            PolicyCheckBuilder<ContentSecurityPolicies>()
+                .ExpectResourceCheckToFail(_release, ContentSecurityPolicies.CanViewRelease)
                 .AssertForbidden(
                     userService =>
                     {
@@ -57,7 +60,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
         [Fact]
         public void CreateReleaseAsync()
         {
-            PermissionTestUtil.PolicyCheckBuilder()
+            PolicyCheckBuilder<SecurityPolicies>()
                 .ExpectResourceCheckToFail(Publication, CanCreateReleaseForSpecificPublication)
                 .AssertForbidden(
                     userService =>
@@ -76,7 +79,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
         [Fact]
         public void UpdateRelease()
         {
-            PermissionTestUtil.PolicyCheckBuilder()
+            PolicyCheckBuilder<SecurityPolicies>()
                 .ExpectResourceCheckToFail(_release, CanUpdateSpecificRelease)
                 .AssertForbidden(
                     userService =>
@@ -93,7 +96,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
         [Fact]
         public void UpdateRelease_Draft()
         {
-            PermissionTestUtil.PolicyCheckBuilder()
+            PolicyCheckBuilder<SecurityPolicies>()
                 .ExpectResourceCheck(_release, CanUpdateSpecificRelease)
                 .ExpectResourceCheckToFail(_release, CanMarkSpecificReleaseAsDraft)
                 .AssertForbidden(
@@ -114,7 +117,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
         [Fact]
         public void UpdateRelease_SubmitForHigherLevelReview()
         {
-            PermissionTestUtil.PolicyCheckBuilder()
+            PolicyCheckBuilder<SecurityPolicies>()
                 .ExpectResourceCheck(_release, CanUpdateSpecificRelease)
                 .ExpectResourceCheckToFail(_release, CanSubmitSpecificReleaseToHigherReview)
                 .AssertForbidden(
@@ -135,7 +138,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
         [Fact]
         public void UpdateRelease_Approve()
         {
-            PermissionTestUtil.PolicyCheckBuilder()
+            PolicyCheckBuilder<SecurityPolicies>()
                 .ExpectResourceCheck(_release, CanUpdateSpecificRelease)
                 .ExpectResourceCheckToFail(_release, CanApproveSpecificRelease)
                 .AssertForbidden(
@@ -156,7 +159,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
         [Fact]
         public void GetLatestReleaseAsync()
         {
-            PermissionTestUtil.PolicyCheckBuilder()
+            PolicyCheckBuilder<SecurityPolicies>()
                 .ExpectResourceCheckToFail(Publication, CanViewSpecificPublication)
                 .AssertForbidden(
                     userService =>
@@ -170,7 +173,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
         [Fact]
         public void CreateReleaseAmendmentAsync()
         {
-            PermissionTestUtil.PolicyCheckBuilder()
+            PolicyCheckBuilder<SecurityPolicies>()
                 .ExpectResourceCheckToFail(_release, CanMakeAmendmentOfSpecificRelease)
                 .AssertForbidden(
                     userService =>
@@ -184,7 +187,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
         [Fact]
         public void DeleteRelease()
         {
-            PermissionTestUtil.PolicyCheckBuilder()
+            PolicyCheckBuilder<SecurityPolicies>()
                 .ExpectResourceCheckToFail(_release, CanDeleteSpecificRelease)
                 .AssertForbidden(
                     userService =>
@@ -212,7 +215,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
                 .Setup(s => s.GetAllReleasesForReleaseStatusesAsync(ReleaseStatus.Approved))
                 .ReturnsAsync(list);
 
-            PermissionTestUtil.PolicyCheckBuilder()
+            PolicyCheckBuilder<SecurityPolicies>()
                 .ExpectCheck(CanAccessSystem)
                 .ExpectCheck(CanViewAllReleases)
                 .AssertSuccess(
@@ -251,7 +254,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
                 .Setup(s => s.GetReleasesForReleaseStatusRelatedToUserAsync(_userId, ReleaseStatus.Approved))
                 .ReturnsAsync(list);
 
-            PermissionTestUtil.PolicyCheckBuilder()
+            PolicyCheckBuilder<SecurityPolicies>()
                 .ExpectCheck(CanAccessSystem)
                 .ExpectCheckToFail(CanViewAllReleases)
                 .AssertSuccess(
@@ -280,7 +283,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
         [Fact]
         public void GetMyReleasesForReleaseStatusesAsync_NoAccessToSystem()
         {
-            PermissionTestUtil.PolicyCheckBuilder()
+            PolicyCheckBuilder<SecurityPolicies>()
                 .ExpectCheckToFail(CanAccessSystem)
                 .AssertForbidden(
                     async userService =>
@@ -294,7 +297,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
         [Fact]
         public void RemoveDataFiles()
         {
-            PermissionTestUtil.PolicyCheckBuilder()
+            PolicyCheckBuilder<SecurityPolicies>()
                 .ExpectResourceCheckToFail(_release, CanUpdateSpecificRelease)
                 .AssertForbidden(
                     async userService =>

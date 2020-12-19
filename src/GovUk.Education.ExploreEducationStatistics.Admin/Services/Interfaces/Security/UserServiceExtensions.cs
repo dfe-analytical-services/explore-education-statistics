@@ -5,6 +5,7 @@ using GovUk.Education.ExploreEducationStatistics.Admin.Security;
 using GovUk.Education.ExploreEducationStatistics.Common.Model;
 using GovUk.Education.ExploreEducationStatistics.Common.Services.Interfaces.Security;
 using GovUk.Education.ExploreEducationStatistics.Content.Model;
+using GovUk.Education.ExploreEducationStatistics.Content.Security;
 using Microsoft.AspNetCore.Mvc;
 
 namespace GovUk.Education.ExploreEducationStatistics.Admin.Services.Interfaces.Security
@@ -132,7 +133,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Services.Interfaces.S
         public static Task<Either<ActionResult, Release>> CheckCanViewRelease(
             this IUserService userService, Release release)
         {
-            return userService.CheckPolicy(release, SecurityPolicies.CanViewSpecificRelease);
+            return userService.CheckPolicy(release, ContentSecurityPolicies.CanViewRelease);
         }
 
         public static Task<Either<ActionResult, Release>> CheckCanUpdateRelease(
@@ -282,7 +283,6 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Services.Interfaces.S
                     DataFileName = dataFileName
                 })).IsRight
             };
-        }
         }
     }
 }

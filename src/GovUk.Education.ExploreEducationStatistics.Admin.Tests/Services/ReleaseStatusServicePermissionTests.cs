@@ -1,19 +1,15 @@
 using System;
-using System.Threading.Tasks;
 using AutoMapper;
-using GovUk.Education.ExploreEducationStatistics.Admin.Security;
 using GovUk.Education.ExploreEducationStatistics.Admin.Services;
-using GovUk.Education.ExploreEducationStatistics.Common.Model;
 using GovUk.Education.ExploreEducationStatistics.Common.Services.Interfaces;
 using GovUk.Education.ExploreEducationStatistics.Common.Services.Interfaces.Security;
 using GovUk.Education.ExploreEducationStatistics.Common.Tests.Utils;
 using GovUk.Education.ExploreEducationStatistics.Common.Utils;
 using GovUk.Education.ExploreEducationStatistics.Content.Model;
 using GovUk.Education.ExploreEducationStatistics.Content.Model.Database;
-using Microsoft.AspNetCore.Mvc;
+using GovUk.Education.ExploreEducationStatistics.Content.Security;
 using Moq;
 using Xunit;
-using static GovUk.Education.ExploreEducationStatistics.Admin.Security.SecurityPolicies;
 
 namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
 {
@@ -27,32 +23,31 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
         [Fact]
         public void GetReleaseStatusesAsync()
         {
-            AssertSecurityPoliciesChecked(service =>
-                    service.GetReleaseStatusAsync(_release.Id), _release, CanViewSpecificRelease);
+            PermissionTestUtils.PolicyCheckBuilder<ContentSecurityPolicies>()
+                .ExpectResourceCheck(_release, ContentSecurityPolicies.CanViewRelease, false)
+                .AssertForbidden(
+                    async userService =>
+                    {
+                        var service = BuildReleaseStatusService(userService: userService.Object);
+
+                        return await service.GetReleaseStatusAsync(_release.Id);
+                    }
+                );
         }
 
-        private void AssertSecurityPoliciesChecked<T, TEntity>(
-            Func<ReleaseStatusService, Task<Either<ActionResult, T>>> protectedAction, TEntity protectedEntity, params SecurityPolicies[] policies)
-            where TEntity : class
+        private ReleaseStatusService BuildReleaseStatusService(
+            IMapper mapper = null,
+            IUserService userService = null,
+            IPersistenceHelper<ContentDbContext> persistenceHelper = null,
+            ITableStorageService publisherTableStorageService = null)
         {
-            var (mapper, userService, persistenceHelper, tableStorageService) = Mocks();
-
-            var service = new ReleaseStatusService(mapper.Object, userService.Object,
-                persistenceHelper.Object, tableStorageService.Object);
-            PermissionTestUtil.AssertSecurityPoliciesChecked(protectedAction, protectedEntity, userService, service, policies);
-        }
-
-        private (
-            Mock<IMapper>,
-            Mock<IUserService>,
-            Mock<IPersistenceHelper<ContentDbContext>>,
-            Mock<ITableStorageService>) Mocks()
-        {
-            return (
-                new Mock<IMapper>(),
-                new Mock<IUserService>(),
-                MockUtils.MockPersistenceHelper<ContentDbContext, Release>(_release.Id, _release),
-                new Mock<ITableStorageService>());
+            return new ReleaseStatusService(
+                mapper ?? MapperUtils.AdminMapper(),
+                userService ?? new Mock<IUserService>().Object,
+                persistenceHelper ?? MockUtils.MockPersistenceHelper<ContentDbContext, Release>(_release.Id, _release)
+                    .Object,
+                publisherTableStorageService ?? new Mock<ITableStorageService>().Object
+            );
         }
     }
 }
