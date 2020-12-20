@@ -1,4 +1,7 @@
-import os
+from azure.core.exceptions import ResourceExistsError
+from azure.storage.blob import BlobServiceClient
+from datetime import datetime, timezone
+
 
 class File:
     def __init__(self, path, name):
@@ -9,11 +12,13 @@ class ReleaseFilesGenerator(object):
 
     def create_public_release_files(self):
 
-        from azure.storage.blob import ContainerClient
-        from datetime import datetime, timezone
-
         # Instantiate a new ContainerClient for the emulator
-        container_client = ContainerClient.from_connection_string("DefaultEndpointsProtocol=http;AccountName=devstoreaccount1;AccountKey=Eby8vdM02xNOcqFlqUwJPLlmEtlCDXJ1OUzFT50uSRZ6IFsuFq2UVErCz4I6tq/K1SZFPTOtr/KBHBeksoGMGw==;BlobEndpoint=http://data-storage:10000/devstoreaccount1", "downloads")
+        blob_service_client = BlobServiceClient.from_connection_string("DefaultEndpointsProtocol=http;AccountName=devstoreaccount1;AccountKey=Eby8vdM02xNOcqFlqUwJPLlmEtlCDXJ1OUzFT50uSRZ6IFsuFq2UVErCz4I6tq/K1SZFPTOtr/KBHBeksoGMGw==;BlobEndpoint=http://data-storage:10000/devstoreaccount1")
+
+        try:
+            container_client = blob_service_client.create_container("downloads")
+        except ResourceExistsError:
+            container_client = blob_service_client.get_container_client("downloads")
 
         files = [
             # Exclusions
