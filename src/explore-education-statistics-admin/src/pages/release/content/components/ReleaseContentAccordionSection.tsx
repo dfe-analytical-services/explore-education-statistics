@@ -2,8 +2,9 @@ import { CommentsChangeHandler } from '@admin/components/editable/Comments';
 import EditableAccordionSection from '@admin/components/editable/EditableAccordionSection';
 import EditableSectionBlocks from '@admin/components/editable/EditableSectionBlocks';
 import { useEditingContext } from '@admin/contexts/EditingContext';
-import useGetChartFile from '@admin/hooks/useGetChartFile';
 import DataBlockSelectForm from '@admin/pages/release/content/components/DataBlockSelectForm';
+import ReleaseBlock from '@admin/pages/release/content/components/ReleaseBlock';
+import ReleaseEditableBlock from '@admin/pages/release/content/components/ReleaseEditableBlock';
 import useReleaseContentActions from '@admin/pages/release/content/contexts/useReleaseContentActions';
 import { EditableRelease } from '@admin/services/releaseContentService';
 import { EditableBlock } from '@admin/services/types/content';
@@ -37,8 +38,6 @@ const ReleaseContentAccordionSection = ({
   useEffect(() => {
     setBlocks(sectionContent);
   }, [sectionContent]);
-
-  const getChartFile = useGetChartFile(release.id);
 
   const addBlock = useCallback(async () => {
     await actions.addContentSectionBlock({
@@ -161,16 +160,24 @@ const ReleaseContentAccordionSection = ({
       }
     >
       <EditableSectionBlocks
-        releaseId={release.id}
         allowComments
+        blocks={blocks}
         isReordering={isReordering}
         sectionId={sectionId}
-        getInfographic={getChartFile}
-        content={blocks}
-        onBlockContentSave={updateBlock}
-        onBlockDelete={removeBlock}
         onBlocksChange={setBlocks}
         onBlockCommentsChange={updateBlockComments}
+        renderBlock={block => (
+          <ReleaseBlock block={block} releaseId={release.id} />
+        )}
+        renderEditableBlock={block => (
+          <ReleaseEditableBlock
+            block={block}
+            editable={!isReordering}
+            releaseId={release.id}
+            onSave={updateBlock}
+            onDelete={removeBlock}
+          />
+        )}
       />
 
       {isEditing && !isReordering && (
