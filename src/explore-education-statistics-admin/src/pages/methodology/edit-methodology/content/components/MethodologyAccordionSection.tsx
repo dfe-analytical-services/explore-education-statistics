@@ -1,11 +1,10 @@
 import EditableAccordionSection from '@admin/components/editable/EditableAccordionSection';
 import EditableSectionBlocks from '@admin/components/editable/EditableSectionBlocks';
 import { useEditingContext } from '@admin/contexts/EditingContext';
-import {
-  EditableBlock,
-  EditableContentBlock,
-} from '@admin/services/types/content';
+import MethodologyEditableBlock from '@admin/pages/methodology/edit-methodology/content/components/MethodologyEditableBlock';
+import { EditableContentBlock } from '@admin/services/types/content';
 import Button from '@common/components/Button';
+import ContentBlockRenderer from '@common/modules/find-statistics/components/ContentBlockRenderer';
 import { ContentSection } from '@common/services/publicationService';
 import { Dictionary } from '@common/types';
 import React, { memo, useCallback, useEffect, useState } from 'react';
@@ -13,7 +12,6 @@ import { ContentSectionKeys } from '../context/MethodologyContextActionTypes';
 import useMethodologyActions from '../context/useMethodologyActions';
 
 interface MethodologyAccordionSectionProps {
-  releaseId?: string;
   id: string;
   section: ContentSection<EditableContentBlock>;
   sectionKey: ContentSectionKeys;
@@ -21,7 +19,6 @@ interface MethodologyAccordionSectionProps {
 }
 
 const MethodologyAccordionSection = ({
-  releaseId = '',
   sectionKey,
   section: { id: sectionId, caption, heading, content: sectionContent = [] },
   methodologyId,
@@ -39,7 +36,7 @@ const MethodologyAccordionSection = ({
   } = useMethodologyActions();
 
   const [isReordering, setIsReordering] = useState(false);
-  const [blocks, setBlocks] = useState<EditableBlock[]>(sectionContent);
+  const [blocks, setBlocks] = useState<EditableContentBlock[]>(sectionContent);
 
   useEffect(() => {
     setBlocks(sectionContent);
@@ -146,14 +143,20 @@ const MethodologyAccordionSection = ({
       onHeadingChange={handleHeadingChange}
       onRemoveSection={handleRemoveSection}
     >
-      <EditableSectionBlocks
-        releaseId={releaseId}
+      <EditableSectionBlocks<EditableContentBlock>
+        blocks={blocks}
         isReordering={isReordering}
         sectionId={sectionId}
-        content={blocks}
-        onBlockContentSave={updateBlockInAccordionSection}
-        onBlockDelete={removeBlockFromAccordionSection}
         onBlocksChange={setBlocks}
+        renderBlock={block => <ContentBlockRenderer block={block} />}
+        renderEditableBlock={block => (
+          <MethodologyEditableBlock
+            block={block}
+            editable={!isReordering}
+            onSave={updateBlockInAccordionSection}
+            onDelete={removeBlockFromAccordionSection}
+          />
+        )}
       />
       {isEditing && !isReordering && (
         <div className="govuk-!-margin-bottom-8 dfe-align--centre">

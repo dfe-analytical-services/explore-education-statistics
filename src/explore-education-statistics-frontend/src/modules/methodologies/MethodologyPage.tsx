@@ -1,7 +1,8 @@
+import Accordion from '@common/components/Accordion';
 import AccordionSection from '@common/components/AccordionSection';
 import FormattedDate from '@common/components/FormattedDate';
 import RelatedAside from '@common/components/RelatedAside';
-import SectionBlocks from '@common/modules/find-statistics/components/SectionBlocks';
+import MethodologySectionBlocks from '@common/modules/methodology/components/MethodologySectionBlocks';
 import methodologyService, {
   Methodology,
 } from '@common/services/methodologyService';
@@ -10,10 +11,9 @@ import Page from '@frontend/components/Page';
 import PageSearchFormWithAnalytics from '@frontend/components/PageSearchFormWithAnalytics';
 import PrintThisPage from '@frontend/components/PrintThisPage';
 import MethodologyContentSection from '@frontend/modules/methodologies/components/MethodologyContentSection';
+import { logEvent } from '@frontend/services/googleAnalyticsService';
 import { GetServerSideProps, NextPage } from 'next';
 import React from 'react';
-import { logEvent } from '@frontend/services/googleAnalyticsService';
-import Accordion from '@common/components/Accordion';
 
 interface Props {
   methodologySlug: string;
@@ -141,7 +141,7 @@ const MethodologyPage: NextPage<Props> = ({ data }) => {
                   caption={caption}
                   key={order}
                 >
-                  <SectionBlocks content={content} />
+                  <MethodologySectionBlocks blocks={content} />
                 </AccordionSection>
               );
             })}

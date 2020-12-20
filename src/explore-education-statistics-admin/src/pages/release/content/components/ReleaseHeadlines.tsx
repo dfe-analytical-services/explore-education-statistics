@@ -3,6 +3,8 @@ import EditableSectionBlocks from '@admin/components/editable/EditableSectionBlo
 import { useEditingContext } from '@admin/contexts/EditingContext';
 import useGetChartFile from '@admin/hooks/useGetChartFile';
 import KeyStatistics from '@admin/pages/release/content/components/KeyStatistics';
+import ReleaseBlock from '@admin/pages/release/content/components/ReleaseBlock';
+import ReleaseEditableBlock from '@admin/pages/release/content/components/ReleaseEditableBlock';
 import useReleaseContentActions from '@admin/pages/release/content/contexts/useReleaseContentActions';
 import { EditableRelease } from '@admin/services/releaseContentService';
 import Button from '@common/components/Button';
@@ -79,13 +81,21 @@ const ReleaseHeadlines = ({ release }: Props) => {
       </section>
       <section id="releaseHeadlines-headlines">
         <EditableSectionBlocks
-          releaseId={release.id}
           allowComments
+          blocks={release.headlinesSection.content}
           sectionId={release.headlinesSection.id}
-          content={release.headlinesSection.content}
-          onBlockContentSave={updateBlock}
-          onBlockDelete={removeBlock}
           onBlockCommentsChange={updateBlockComments}
+          renderBlock={block => (
+            <ReleaseBlock block={block} releaseId={release.id} />
+          )}
+          renderEditableBlock={block => (
+            <ReleaseEditableBlock
+              block={block}
+              releaseId={release.id}
+              onSave={updateBlock}
+              onDelete={removeBlock}
+            />
+          )}
         />
 
         {isEditing && release.headlinesSection.content?.length === 0 && (
