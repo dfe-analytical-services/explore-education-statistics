@@ -18,11 +18,20 @@ namespace GovUk.Education.ExploreEducationStatistics.Common.Tests.Utils
         }
 
         public static Mock<IPersistenceHelper<TDbContext>> MockPersistenceHelper<TDbContext, TEntity>(
-            Guid id, TEntity entity)
+            Guid id,
+            TEntity entity)
             where TDbContext : DbContext where TEntity : class
         {
             var helper = new Mock<IPersistenceHelper<TDbContext>>();
             SetupCall(helper, id, entity);
+            return helper;
+        }
+
+        public static Mock<IPersistenceHelper<TDbContext>> MockPersistenceHelper<TDbContext, TEntity>(TEntity entity)
+            where TDbContext : DbContext where TEntity : class
+        {
+            var helper = new Mock<IPersistenceHelper<TDbContext>>();
+            SetupCall(helper, entity);
             return helper;
         }
 
@@ -43,20 +52,47 @@ namespace GovUk.Education.ExploreEducationStatistics.Common.Tests.Utils
             where TEntity : class
         {
             helper
-                .Setup(s => s.CheckEntityExists(id,
-                    It.IsAny<Func<IQueryable<TEntity>, IQueryable<TEntity>>>()))
-                .ReturnsAsync(new Either<ActionResult, TEntity>(entity));
+                .Setup(s =>
+                    s.CheckEntityExists(id, It.IsAny<Func<IQueryable<TEntity>, IQueryable<TEntity>>>()))
+                .ReturnsAsync(EntityOrNotFoundResult(entity));
         }
 
         public static void SetupCall<TDbContext, TEntity>(
-            Mock<IPersistenceHelper<TDbContext>> helper)
+            Mock<IPersistenceHelper<TDbContext>> helper,
+            TEntity entity)
             where TDbContext : DbContext
             where TEntity : class
         {
             helper
-                .Setup(s => s.CheckEntityExists(It.IsAny<Guid>(),
-                    It.IsAny<Func<IQueryable<TEntity>, IQueryable<TEntity>>>()))
+                .Setup(
+                    s => s.CheckEntityExists(
+                        It.IsAny<Func<IQueryable<TEntity>, IQueryable<TEntity>>>()
+                    )
+                )
+                .ReturnsAsync(EntityOrNotFoundResult(entity));
+        }
+
+        public static void SetupCall<TDbContext, TEntity>(Mock<IPersistenceHelper<TDbContext>> helper)
+            where TDbContext : DbContext
+            where TEntity : class
+        {
+            helper
+                .Setup(s =>
+                    s.CheckEntityExists(It.IsAny<Guid>(), It.IsAny<Func<IQueryable<TEntity>, IQueryable<TEntity>>>()))
                 .ReturnsAsync(new Either<ActionResult, TEntity>(Activator.CreateInstance<TEntity>()));
+        }
+
+        private static Func<Either<ActionResult, TEntity>> EntityOrNotFoundResult<TEntity>(TEntity entity)
+        {
+            return () =>
+            {
+                if (entity != null)
+                {
+                    return entity;
+                }
+
+                return new NotFoundResult();
+            };
         }
 
         public static Mock<IUserService> AlwaysTrueUserService()

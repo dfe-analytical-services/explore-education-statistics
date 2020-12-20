@@ -13,22 +13,24 @@ using GovUk.Education.ExploreEducationStatistics.Data.Model.Services.Interfaces;
 using GovUk.Education.ExploreEducationStatistics.Data.Services.Interfaces;
 using GovUk.Education.ExploreEducationStatistics.Data.Services.ViewModels;
 using Microsoft.AspNetCore.Mvc;
+using Microsoft.EntityFrameworkCore;
 using static GovUk.Education.ExploreEducationStatistics.Data.Services.Security.DataSecurityPolicies;
 
 namespace GovUk.Education.ExploreEducationStatistics.Data.Services
 {
     public class TableBuilderService : ITableBuilderService
     {
-        private readonly IResultSubjectMetaService _resultSubjectMetaService;
-        private readonly IResultBuilder<Observation, ObservationViewModel> _resultBuilder;
         private readonly IObservationService _observationService;
-        private readonly IPersistenceHelper<StatisticsDbContext> _persistenceHelper;
+        private readonly IPersistenceHelper<StatisticsDbContext> _statisticsPersistenceHelper;
+        private readonly IResultSubjectMetaService _resultSubjectMetaService;
         private readonly ISubjectService _subjectService;
         private readonly IUserService _userService;
+        private readonly IResultBuilder<Observation, ObservationViewModel> _resultBuilder;
         private readonly IReleaseService _releaseService;
 
-        public TableBuilderService(IObservationService observationService,
-            IPersistenceHelper<StatisticsDbContext> persistenceHelper,
+        public TableBuilderService(
+            IObservationService observationService,
+            IPersistenceHelper<StatisticsDbContext> statisticsPersistenceHelper,
             IResultSubjectMetaService resultSubjectMetaService,
             ISubjectService subjectService,
             IUserService userService,
@@ -36,42 +38,57 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Services
             IReleaseService releaseService)
         {
             _observationService = observationService;
-            _resultBuilder = resultBuilder;
+            _statisticsPersistenceHelper = statisticsPersistenceHelper;
             _resultSubjectMetaService = resultSubjectMetaService;
-            _persistenceHelper = persistenceHelper;
             _subjectService = subjectService;
             _userService = userService;
+            _resultBuilder = resultBuilder;
             _releaseService = releaseService;
         }
 
         public async Task<Either<ActionResult, TableBuilderResultViewModel>> Query(ObservationQueryContext queryContext)
         {
-            var publicationId = _subjectService.GetPublicationForSubject(queryContext.SubjectId).Result.Id;
-            var release = _releaseService.GetLatestPublishedRelease(publicationId);
+            var publication = await _subjectService.GetPublicationForSubject(queryContext.SubjectId);
+            var release = _releaseService.GetLatestPublishedRelease(publication.Id);
 
             if (release == null)
             {
                 return new NotFoundResult();
             }
 
-            return await Query(release.Id, queryContext);
+            return await Query(release, queryContext);
         }
 
-        public Task<Either<ActionResult, TableBuilderResultViewModel>> Query(Guid releaseId, ObservationQueryContext queryContext)
+        public async Task<Either<ActionResult, TableBuilderResultViewModel>> Query(
+            Guid releaseId,
+            ObservationQueryContext queryContext)
         {
-            return _persistenceHelper.CheckEntityExists<Subject>(queryContext.SubjectId)
-                .OnSuccess(CheckCanViewSubjectData)
-                .OnSuccess(_ =>
+            return await _statisticsPersistenceHelper.CheckEntityExists<ReleaseSubject>(
+                    query => query
+                        .Include(rs => rs.Release)
+                        .Where(rs => rs.ReleaseId == releaseId
+                                     && rs.SubjectId == queryContext.SubjectId)
+                )
+                .OnSuccess(rs => Query(rs.Release, queryContext));
+        }
+
+        private async Task<Either<ActionResult, TableBuilderResultViewModel>> Query(
+            Release release,
+            ObservationQueryContext queryContext)
+        {
+            return await _statisticsPersistenceHelper.CheckEntityExists<Subject>(queryContext.SubjectId)
+                .OnSuccessDo(CheckCanViewSubjectData)
+                .OnSuccess(async () =>
                 {
                     var observations = GetObservations(queryContext).AsQueryable();
+
                     if (!observations.Any())
                     {
-                        return Task.FromResult(
-                            new Either<ActionResult, TableBuilderResultViewModel>(new TableBuilderResultViewModel()));
+                        return new TableBuilderResultViewModel();
                     }
 
-                    return _resultSubjectMetaService
-                        .GetSubjectMeta(releaseId, SubjectMetaQueryContext.FromObservationQueryContext(queryContext), observations)
+                    return await _resultSubjectMetaService
+                        .GetSubjectMeta(release.Id, SubjectMetaQueryContext.FromObservationQueryContext(queryContext), observations)
                         .OnSuccess(subjectMetaViewModel =>
                         {
                             return new TableBuilderResultViewModel
