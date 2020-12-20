@@ -1,7 +1,7 @@
 import os
 
 class File:
-    def __init__(self, path, name):  
+    def __init__(self, path, name):
         self.path = path
         self.name = name
 
@@ -13,7 +13,7 @@ class ReleaseFilesGenerator(object):
         from datetime import datetime, timezone
 
         # Instantiate a new ContainerClient for the emulator
-        container_client = ContainerClient.from_connection_string("DefaultEndpointsProtocol=http;AccountName=devstoreaccount1;AccountKey=Eby8vdM02xNOcqFlqUwJPLlmEtlCDXJ1OUzFT50uSRZ6IFsuFq2UVErCz4I6tq/K1SZFPTOtr/KBHBeksoGMGw==;BlobEndpoint=http://127.0.0.1:10000/devstoreaccount1", "downloads")
+        container_client = ContainerClient.from_connection_string("DefaultEndpointsProtocol=http;AccountName=devstoreaccount1;AccountKey=Eby8vdM02xNOcqFlqUwJPLlmEtlCDXJ1OUzFT50uSRZ6IFsuFq2UVErCz4I6tq/K1SZFPTOtr/KBHBeksoGMGw==;BlobEndpoint=http://data-storage:10000/devstoreaccount1", "downloads")
 
         files = [
             # Exclusions
