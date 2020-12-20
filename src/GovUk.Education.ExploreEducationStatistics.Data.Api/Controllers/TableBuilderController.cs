@@ -3,6 +3,7 @@ using System.Linq;
 using System.Threading.Tasks;
 using GovUk.Education.ExploreEducationStatistics.Common.Extensions;
 using GovUk.Education.ExploreEducationStatistics.Common.Model;
+using GovUk.Education.ExploreEducationStatistics.Common.Model.Chart;
 using GovUk.Education.ExploreEducationStatistics.Common.Model.Data.Query;
 using GovUk.Education.ExploreEducationStatistics.Common.Services.Interfaces.Security;
 using GovUk.Education.ExploreEducationStatistics.Common.Utils;
@@ -69,8 +70,11 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Api.Controllers
                     {
                         if (block.ContentBlock is DataBlock dataBlock)
                         {
+                            var query = dataBlock.Query.Clone();
+                            query.IncludeGeoJson = dataBlock.Charts.Any(chart => chart.Type == ChartType.Map);
+
                             return await _userService.CheckCanViewRelease(block.Release)
-                                .OnSuccess(_ => _tableBuilderService.Query(block.ReleaseId, dataBlock.Query));
+                                .OnSuccess(_ => _tableBuilderService.Query(block.ReleaseId, query));
                         }
 
                         return new NotFoundResult();

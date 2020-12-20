@@ -2,6 +2,7 @@
 using System.Collections.Generic;
 using System.Threading.Tasks;
 using GovUk.Education.ExploreEducationStatistics.Admin.Controllers.Api.Statistics;
+using GovUk.Education.ExploreEducationStatistics.Common.Model.Chart;
 using GovUk.Education.ExploreEducationStatistics.Common.Model.Data.Query;
 using GovUk.Education.ExploreEducationStatistics.Common.Services.Interfaces.Security;
 using GovUk.Education.ExploreEducationStatistics.Common.Tests.Utils;
@@ -56,15 +57,25 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Controllers.Api
         {
             var tableBuilderService = new Mock<ITableBuilderService>();
 
-            tableBuilderService.Setup(s => s.Query(_releaseId, _query)).ReturnsAsync(
-                new TableBuilderResultViewModel
-                {
-                    Results = new List<ObservationViewModel>
+            tableBuilderService
+                .Setup(
+                    s =>
+                        s.Query(
+                            _releaseId,
+                            It.Is<ObservationQueryContext>(
+                                q => q.SubjectId == _query.SubjectId
+                            )
+                        )
+                )
+                .ReturnsAsync(
+                    new TableBuilderResultViewModel
                     {
-                        new ObservationViewModel()
+                        Results = new List<ObservationViewModel>
+                        {
+                            new ObservationViewModel()
+                        }
                     }
-                }
-            );
+                );
 
             var contentPersistenceHelper =
                 MockUtils.MockPersistenceHelper<ContentDbContext, ReleaseContentBlock>(
@@ -79,7 +90,80 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Controllers.Api
                         ContentBlock = new DataBlock
                         {
                             Id = _dataBlockId,
-                            Query = _query
+                            Query = _query,
+                            Charts = new List<IChart>()
+                        }
+                    }
+                );
+
+            var controller = BuildTableBuilderController(
+                tableBuilderService: tableBuilderService.Object,
+                contentPersistenceHelper: contentPersistenceHelper.Object
+            );
+
+            controller.ControllerContext = new ControllerContext
+            {
+                HttpContext = new DefaultHttpContext()
+            };
+
+            var result = await controller.QueryForDataBlock(_releaseId, _dataBlockId);
+
+            Assert.IsType<TableBuilderResultViewModel>(result.Value);
+            Assert.Single(result.Value.Results);
+
+            MockUtils.VerifyAllMocks(tableBuilderService, contentPersistenceHelper);
+        }
+
+        [Fact]
+        public async Task QueryForDataBlock_NoGeoJson()
+        {
+            var subjectId = Guid.NewGuid();
+
+            var tableBuilderService = new Mock<ITableBuilderService>();
+
+            tableBuilderService
+                .Setup(
+                    s =>
+                        s.Query(
+                            _releaseId,
+                            It.Is<ObservationQueryContext>(
+                                q =>
+                                    q.SubjectId == subjectId && q.IncludeGeoJson == true
+                            )
+                        )
+                )
+                .ReturnsAsync(
+                    new TableBuilderResultViewModel
+                    {
+                        Results = new List<ObservationViewModel>
+                        {
+                            new ObservationViewModel()
+                        }
+                    }
+                );
+
+            var contentPersistenceHelper =
+                MockUtils.MockPersistenceHelper<ContentDbContext, ReleaseContentBlock>(
+                    new ReleaseContentBlock
+                    {
+                        ReleaseId = _releaseId,
+                        Release = new Release
+                        {
+                            Id = _releaseId,
+                        },
+                        ContentBlockId = _dataBlockId,
+                        ContentBlock = new DataBlock
+                        {
+                            Id = _dataBlockId,
+                            Query = new ObservationQueryContext
+                            {
+                                SubjectId = subjectId,
+                                IncludeGeoJson = false
+                            },
+                            Charts = new List<IChart>
+                            {
+                                new MapChart()
+                            }
                         }
                     }
                 );
