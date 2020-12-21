@@ -9,6 +9,7 @@ using GovUk.Education.ExploreEducationStatistics.Publisher.Model.ViewModels;
 using GovUk.Education.ExploreEducationStatistics.Publisher.Models;
 using GovUk.Education.ExploreEducationStatistics.Publisher.Services.Interfaces;
 using Microsoft.EntityFrameworkCore;
+using static GovUk.Education.ExploreEducationStatistics.Publisher.Extensions.PublisherExtensions;
 
 namespace GovUk.Education.ExploreEducationStatistics.Publisher.Services
 {
@@ -135,12 +136,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Publisher.Services
         private static bool IsPublicationPublished(Publication publication, IEnumerable<Guid> includedReleaseIds)
         {
             return publication.MethodologyId != null &&
-                   publication.Releases.Any(release => IsReleasePublished(release, includedReleaseIds));
-        }
-
-        private static bool IsReleasePublished(Release release, IEnumerable<Guid> includedReleaseIds)
-        {
-            return release.Live || includedReleaseIds.Contains(release.Id);
+                   publication.Releases.Any(release => release.IsReleasePublished(includedReleaseIds));
         }
     }
 }
