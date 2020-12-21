@@ -2,7 +2,6 @@ import EditableKeyStat, {
   KeyStatsFormValues,
 } from '@admin/components/editable/EditableKeyStat';
 import _tableBuilderService, {
-  TableDataQuery,
   TableDataResponse,
 } from '@common/services/tableBuilderService';
 import { render, screen, waitFor } from '@testing-library/react';
@@ -17,21 +16,6 @@ const tableBuilderService = _tableBuilderService as jest.Mocked<
 >;
 
 describe('EditableKeyStat', () => {
-  const testQuery: TableDataQuery = {
-    filters: ['filter-1'],
-    indicators: ['indicator-1'],
-    subjectId: 'subject-1',
-    timePeriod: {
-      startCode: 'AY',
-      startYear: 2020,
-      endCode: 'AY',
-      endYear: 2020,
-    },
-    locations: {
-      country: ['england'],
-    },
-  };
-
   const testTableDataResponse: TableDataResponse = {
     subjectMeta: {
       publicationName: 'Test publication',
@@ -92,14 +76,16 @@ describe('EditableKeyStat', () => {
   };
 
   test('renders correctly with read-only summary', async () => {
-    tableBuilderService.getTableData.mockResolvedValue(testTableDataResponse);
+    tableBuilderService.getDataBlockTableData.mockResolvedValue(
+      testTableDataResponse,
+    );
 
     render(
       <EditableKeyStat
-        id="test-id-1"
+        releaseId="release-1"
+        dataBlockId="block-1"
         name="Key Stat 1"
         onSubmit={noop}
-        query={testQuery}
         summary={{
           dataSummary: ['Down from 620,330 in 2017'],
           dataDefinitionTitle: ['What is the number of applications received?'],
@@ -112,7 +98,9 @@ describe('EditableKeyStat', () => {
     );
 
     await waitFor(() => {
-      expect(tableBuilderService.getTableData).toHaveBeenCalledTimes(1);
+      expect(tableBuilderService.getDataBlockTableData).toHaveBeenCalledTimes(
+        1,
+      );
 
       expect(screen.getByTestId('keyStat-title')).toHaveTextContent(
         'Number of applications received',
@@ -137,19 +125,23 @@ describe('EditableKeyStat', () => {
   });
 
   test('renders correctly without read-only summary', async () => {
-    tableBuilderService.getTableData.mockResolvedValue(testTableDataResponse);
+    tableBuilderService.getDataBlockTableData.mockResolvedValue(
+      testTableDataResponse,
+    );
 
     render(
       <EditableKeyStat
-        id="test-id-1"
+        releaseId="release-1"
+        dataBlockId="block-1"
         name="Key Stat 1"
         onSubmit={noop}
-        query={testQuery}
       />,
     );
 
     await waitFor(() => {
-      expect(tableBuilderService.getTableData).toHaveBeenCalledTimes(1);
+      expect(tableBuilderService.getDataBlockTableData).toHaveBeenCalledTimes(
+        1,
+      );
 
       expect(screen.getByTestId('keyStat-title')).toHaveTextContent(
         'Number of applications received',
@@ -165,15 +157,17 @@ describe('EditableKeyStat', () => {
   });
 
   test('clicking Edit button renders editable summary form with no initial summary', async () => {
-    tableBuilderService.getTableData.mockResolvedValue(testTableDataResponse);
+    tableBuilderService.getDataBlockTableData.mockResolvedValue(
+      testTableDataResponse,
+    );
 
     render(
       <EditableKeyStat
         isEditing
-        id="test-id-1"
+        releaseId="release-1"
+        dataBlockId="block-1"
         name="Key Stat 1"
         onSubmit={noop}
-        query={testQuery}
       />,
     );
 
@@ -198,15 +192,17 @@ describe('EditableKeyStat', () => {
   });
 
   test('clicking Edit button renders editable summary form with initial summary', async () => {
-    tableBuilderService.getTableData.mockResolvedValue(testTableDataResponse);
+    tableBuilderService.getDataBlockTableData.mockResolvedValue(
+      testTableDataResponse,
+    );
 
     render(
       <EditableKeyStat
         isEditing
-        id="test-id-1"
+        releaseId="release-1"
+        dataBlockId="block-1"
         name="Key Stat 1"
         onSubmit={noop}
-        query={testQuery}
         summary={{
           dataSummary: ['Down from 620,330 in 2017'],
           dataDefinitionTitle: ['What is the number of applications received?'],
@@ -247,16 +243,18 @@ describe('EditableKeyStat', () => {
   test('clicking Remove button calls the `onRemove` callback prop', async () => {
     const handleRemove = jest.fn();
 
-    tableBuilderService.getTableData.mockResolvedValue(testTableDataResponse);
+    tableBuilderService.getDataBlockTableData.mockResolvedValue(
+      testTableDataResponse,
+    );
 
     render(
       <EditableKeyStat
         isEditing
-        id="test-id-1"
+        releaseId="release-1"
+        dataBlockId="block-1"
         name="Key Stat 1"
         onRemove={handleRemove}
         onSubmit={noop}
-        query={testQuery}
         summary={{
           dataSummary: ['Down from 620,330 in 2017'],
           dataDefinitionTitle: ['What is the number of applications received?'],
@@ -282,15 +280,17 @@ describe('EditableKeyStat', () => {
   });
 
   test('clicking Cancel button shows read-only summary again', async () => {
-    tableBuilderService.getTableData.mockResolvedValue(testTableDataResponse);
+    tableBuilderService.getDataBlockTableData.mockResolvedValue(
+      testTableDataResponse,
+    );
 
     render(
       <EditableKeyStat
         isEditing
-        id="test-id-1"
+        releaseId="release-1"
+        dataBlockId="block-1"
         name="Key Stat 1"
         onSubmit={noop}
-        query={testQuery}
         summary={{
           dataSummary: ['Down from 620,330 in 2017'],
           dataDefinitionTitle: ['What is the number of applications received?'],
@@ -346,15 +346,17 @@ describe('EditableKeyStat', () => {
   test('can submit with updated summary field values', async () => {
     const handleSubmit = jest.fn();
 
-    tableBuilderService.getTableData.mockResolvedValue(testTableDataResponse);
+    tableBuilderService.getDataBlockTableData.mockResolvedValue(
+      testTableDataResponse,
+    );
 
     render(
       <EditableKeyStat
         isEditing
-        id="test-id-1"
+        releaseId="release-1"
+        dataBlockId="block-1"
         name="Key Stat 1"
         onSubmit={handleSubmit}
-        query={testQuery}
       />,
     );
 
@@ -393,17 +395,17 @@ describe('EditableKeyStat', () => {
   });
 
   test('renders correctly if there was an error fetching the table data', async () => {
-    tableBuilderService.getTableData.mockRejectedValue(
+    tableBuilderService.getDataBlockTableData.mockRejectedValue(
       new Error('Something went wrong'),
     );
 
     render(
       <EditableKeyStat
-        id="test-id-1"
+        releaseId="release-1"
+        dataBlockId="block-1"
         name="Key Stat 1"
         onRemove={noop}
         onSubmit={noop}
-        query={testQuery}
         summary={{
           dataSummary: ['Down from 620,330 in 2017'],
           dataDefinitionTitle: ['What is the number of applications received?'],
@@ -416,7 +418,9 @@ describe('EditableKeyStat', () => {
     );
 
     await waitFor(() => {
-      expect(tableBuilderService.getTableData).toHaveBeenCalledTimes(1);
+      expect(tableBuilderService.getDataBlockTableData).toHaveBeenCalledTimes(
+        1,
+      );
       expect(screen.getByText('Could not load key stat')).toBeInTheDocument();
       expect(
         screen.getByRole('button', { name: 'Remove' }),
@@ -435,7 +439,7 @@ describe('EditableKeyStat', () => {
   });
 
   test('renders correctly if there is no matching result in the response', async () => {
-    tableBuilderService.getTableData.mockResolvedValue({
+    tableBuilderService.getDataBlockTableData.mockResolvedValue({
       ...testTableDataResponse,
       subjectMeta: {
         ...testTableDataResponse.subjectMeta,
@@ -453,11 +457,11 @@ describe('EditableKeyStat', () => {
 
     render(
       <EditableKeyStat
-        id="test-id-1"
+        releaseId="release-1"
+        dataBlockId="block-1"
         name="Key Stat 1"
         onRemove={noop}
         onSubmit={noop}
-        query={testQuery}
         summary={{
           dataSummary: ['Down from 620,330 in 2017'],
           dataDefinitionTitle: ['What is the number of applications received?'],
@@ -470,7 +474,9 @@ describe('EditableKeyStat', () => {
     );
 
     await waitFor(() => {
-      expect(tableBuilderService.getTableData).toHaveBeenCalledTimes(1);
+      expect(tableBuilderService.getDataBlockTableData).toHaveBeenCalledTimes(
+        1,
+      );
       expect(screen.getByText('Could not load key stat')).toBeInTheDocument();
       expect(
         screen.getByRole('button', { name: 'Remove' }),
@@ -491,17 +497,17 @@ describe('EditableKeyStat', () => {
   test('clicking Remove button when there has been an error calls the `onRemove` callback prop', async () => {
     const handleRemove = jest.fn();
 
-    tableBuilderService.getTableData.mockRejectedValue(
+    tableBuilderService.getDataBlockTableData.mockRejectedValue(
       new Error('Something went wrong'),
     );
 
     render(
       <EditableKeyStat
-        id="test-id-1"
+        releaseId="release-1"
+        dataBlockId="block-1"
         name="Key Stat 1"
         onRemove={handleRemove}
         onSubmit={noop}
-        query={testQuery}
         summary={{
           dataSummary: ['Down from 620,330 in 2017'],
           dataDefinitionTitle: ['What is the number of applications received?'],
