@@ -1,3 +1,4 @@
+using System;
 using System.Collections.Generic;
 using System.Linq;
 using GovUk.Education.ExploreEducationStatistics.Common.Converters;
@@ -46,6 +47,17 @@ namespace GovUk.Education.ExploreEducationStatistics.Common.Model
         public bool IsFinishedOrAborting()
         {
             return IsFinishedOrAbortingState(Status);
+        }
+
+        public IStatus GetFinishingStateOfAbortProcess()
+        {
+            switch (Status)
+            {
+                case CANCELLING: 
+                    return CANCELLED;
+                default: 
+                    throw new ArgumentOutOfRangeException($"No final abort state exists for state {Status}");
+            }
         }
         
         public static bool IsFinishedState(IStatus state)
