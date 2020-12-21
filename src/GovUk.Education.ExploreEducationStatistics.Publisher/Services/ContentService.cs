@@ -2,6 +2,7 @@ using System;
 using System.Linq;
 using System.Threading.Tasks;
 using GovUk.Education.ExploreEducationStatistics.Content.Model;
+using GovUk.Education.ExploreEducationStatistics.Content.Model.Extensions;
 using GovUk.Education.ExploreEducationStatistics.Publisher.Models;
 using GovUk.Education.ExploreEducationStatistics.Publisher.Services.Interfaces;
 using Newtonsoft.Json;
@@ -80,13 +81,13 @@ namespace GovUk.Education.ExploreEducationStatistics.Publisher.Services
             await DeleteAllContent();
             await CacheTrees(context);
 
-            var publications = _publicationService.ListPublicationsWithPublishedReleases().ToList();
+            var publications = _publicationService.GetPublicationsWithPublishedReleases();
             var methodologyIds = publications.Where(publication => publication.MethodologyId.HasValue)
                 .Select(publication => publication.MethodologyId.Value).Distinct();
 
             foreach (var publication in publications)
             {
-                var releases = publication.Releases.Where(release => release.Live);
+                var releases = publication.Releases.Where(release => release.IsLatestPublishedVersionOfRelease());
                 await CachePublication(publication.Id, context);
                 await CacheLatestRelease(publication, context);
                 foreach (var release in releases)
@@ -172,7 +173,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Publisher.Services
         private async Task CacheDownloadTree(PublishContext context, params Guid[] includedReleaseIds)
         {
             // This assumes the files have been copied first
-            var tree = _downloadService.GetTree(includedReleaseIds);
+            var tree = await _downloadService.GetTree(includedReleaseIds);
             await Upload(PublicContentDownloadTreePath, context, tree, _jsonSerializerSettingsCamelCase);
         }
 
@@ -195,7 +196,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Publisher.Services
 
         private async Task CacheLatestRelease(Publication publication, PublishContext context, params Guid[] includedReleaseIds)
         {
-            var viewModel = _releaseService.GetLatestReleaseViewModel(publication.Id, includedReleaseIds, context);
+            var viewModel = await _releaseService.GetLatestReleaseViewModel(publication.Id, includedReleaseIds, context);
             await Upload(prefix => PublicContentLatestReleasePath(publication.Slug, prefix), context, viewModel, _jsonSerializerSettingsCamelCase);
         }
 
@@ -213,7 +214,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Publisher.Services
 
         private async Task CacheRelease(Release release, PublishContext context)
         {
-            var viewModel = _releaseService.GetReleaseViewModel(release.Id, context);
+            var viewModel = await _releaseService.GetReleaseViewModel(release.Id, context);
             await Upload(prefix => PublicContentReleasePath(release.Publication.Slug, release.Slug, prefix), context, viewModel, _jsonSerializerSettingsCamelCase);
         }
 

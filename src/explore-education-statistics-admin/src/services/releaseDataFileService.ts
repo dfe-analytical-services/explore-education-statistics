@@ -1,4 +1,5 @@
 import { DeleteDataBlockPlan } from '@admin/services/dataBlockService';
+import { DataFilePermissions } from '@admin/services/permissionService';
 import client from '@admin/services/utils/service';
 import { FileInfo } from '@common/services/types/file';
 import { Overwrite } from '@common/types';
@@ -13,6 +14,7 @@ interface DataFileInfo extends FileInfo {
   created: string;
   status: ImportStatusCode;
   replacedBy?: string;
+  permissions: DataFilePermissions;
 }
 
 export interface DeleteDataFilePlan {
@@ -36,6 +38,8 @@ export interface DataFile {
   replacedBy?: string;
   created?: string;
   isDeleting?: boolean;
+  isCancelling?: boolean;
+  permissions: DataFilePermissions;
 }
 
 export type UploadDataFilesRequest =
@@ -70,7 +74,9 @@ export type ImportStatusCode =
   | 'STAGE_3'
   | 'STAGE_4'
   | 'NOT_FOUND'
-  | 'FAILED';
+  | 'FAILED'
+  | 'CANCELLING'
+  | 'CANCELLED';
 
 export interface DataFileImportStatus {
   status: ImportStatusCode;
@@ -84,20 +90,13 @@ function mapFile(file: DataFileInfo): DataFile {
   const [size, unit] = file.size.split(' ');
 
   return {
-    id: file.id,
+    ...file,
     title: file.name,
-    fileName: file.fileName,
     rows: file.rows || 0,
     fileSize: {
       size: parseInt(size, 10),
       unit,
     },
-    metaFileId: file.metaFileId,
-    metaFileName: file.metaFileName,
-    replacedBy: file.replacedBy,
-    userName: file.userName,
-    created: file.created,
-    status: file.status,
   };
 }
 
@@ -194,6 +193,9 @@ const releaseDataFileService = {
         responseType: 'blob',
       })
       .then(response => downloadFile(response, fileName));
+  },
+  cancelImport(releaseId: string, fileId: string): Promise<void> {
+    return client.post(`/release/${releaseId}/data/${fileId}/import/cancel`);
   },
 };
 

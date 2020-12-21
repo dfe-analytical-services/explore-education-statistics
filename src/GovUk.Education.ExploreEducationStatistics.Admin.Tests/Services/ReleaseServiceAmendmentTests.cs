@@ -33,9 +33,6 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
         [Fact]
         public void CreateReleaseAmendmentAsync()
         {
-            var (userService, _, publishingService, repository, subjectService, tableStorageService,
-                    releaseFileService, releaseDataFileService, importStatusService, footnoteService, _, metaGuidanceService, dataBlockService, releaseSubjectService) = Mocks();
-
             var releaseId = Guid.NewGuid();
             var releaseType = new ReleaseType
             {
@@ -273,7 +270,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
                 contributorReleaseRole
             };
 
-            var dataFileReference1 = new ReleaseFileReference
+            var dataFile1 = new File
             {
                 Id = Guid.NewGuid(),
                 Filename = "Filename 1",
@@ -282,7 +279,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
                 SubjectId = Guid.NewGuid()
             };
 
-            var dataFileReference2 = new ReleaseFileReference
+            var dataFile2 = new File
             {
                 Id = Guid.NewGuid(),
                 Filename = "Filename 2",
@@ -298,16 +295,16 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
                     Id = Guid.NewGuid(),
                     Release = release,
                     ReleaseId = releaseId,
-                    ReleaseFileReference = dataFileReference1,
-                    ReleaseFileReferenceId = dataFileReference1.Id
+                    File = dataFile1,
+                    FileId = dataFile1.Id
                 },
                 new ReleaseFile
                 {
                     Id = Guid.NewGuid(),
                     Release = release,
                     ReleaseId = releaseId,
-                    ReleaseFileReference = dataFileReference2,
-                    ReleaseFileReferenceId = dataFileReference2.Id
+                    File = dataFile2,
+                    FileId = dataFile2.Id
                 }
             };
 
@@ -382,43 +379,32 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
 
             var newReleaseId = Guid.Empty;
 
-            footnoteService.Setup(service => service.CopyFootnotes(releaseId, It.IsAny<Guid>()))
+            var footnoteService = new Mock<IFootnoteService>();
+
+            footnoteService
+                .Setup(service => service.CopyFootnotes(releaseId, It.IsAny<Guid>()))
                 .ReturnsAsync(Unit.Instance);
 
             using (var contentDbContext = InMemoryApplicationDbContext("CreateReleaseAmendment"))
+            using (var statisticsDbContext = InMemoryStatisticsDbContext("CreateReleaseAmendment"))
             {
-                using (var statisticsDbContext = InMemoryStatisticsDbContext("CreateReleaseAmendment"))
-                {
-                    var releaseService = new ReleaseService(context: contentDbContext,
-                        mapper: AdminMapper(),
-                        publishingService: publishingService.Object,
-                        persistenceHelper: new PersistenceHelper<ContentDbContext>(contentDbContext),
-                        userService: userService.Object,
-                        repository: repository.Object,
-                        subjectService: subjectService.Object,
-                        coreTableStorageService: tableStorageService.Object,
-                        releaseFileService: releaseFileService.Object,
-                        releaseDataFileService: releaseDataFileService.Object,
-                        importStatusService: importStatusService.Object,
-                        footnoteService: footnoteService.Object,
-                        statisticsDbContext: statisticsDbContext,
-                        dataBlockService: dataBlockService.Object,
-                        metaGuidanceService: metaGuidanceService.Object,
-                        releaseSubjectService: releaseSubjectService.Object,
-                        guidGenerator: new SequentialGuidGenerator());
+                var releaseService = BuildReleaseService(
+                    contentDbContext,
+                    statisticsDbContext,
+                    footnoteService: footnoteService.Object
+                );
 
-                    // Method under test
-                    var amendmentViewModel = releaseService.CreateReleaseAmendmentAsync(releaseId).Result.Right;
+                // Method under test
+                var amendmentViewModel = releaseService.CreateReleaseAmendmentAsync(releaseId).Result.Right;
 
-                    footnoteService.Verify(
-                        mock => mock.CopyFootnotes(releaseId, amendmentViewModel.Id), Times.Once);
+                footnoteService.Verify(
+                    mock => mock.CopyFootnotes(releaseId, amendmentViewModel.Id), Times.Once);
 
-                    footnoteService.VerifyNoOtherCalls();
+                footnoteService.VerifyNoOtherCalls();
 
-                    Assert.NotEqual(release.Id, amendmentViewModel.Id);
-                    Assert.NotEqual(Guid.Empty, amendmentViewModel.Id);
-                    newReleaseId = amendmentViewModel.Id;
-                }
+                Assert.NotEqual(release.Id, amendmentViewModel.Id);
+                Assert.NotEqual(Guid.Empty, amendmentViewModel.Id);
+                newReleaseId = amendmentViewModel.Id;
             }
 
             using (var contentDbContext = InMemoryApplicationDbContext("CreateReleaseAmendment"))
@@ -515,7 +501,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
 
                 var amendmentDataFiles = contentDbContext
                     .ReleaseFiles
-                    .Include(f => f.ReleaseFileReference)
+                    .Include(f => f.File)
                     .Where(f => f.ReleaseId == amendment.Id)
                     .ToList();
 
@@ -523,12 +509,12 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
 
                 var amendmentDataFile = amendmentDataFiles[0];
                 var originalFile = releaseFiles.First(f =>
-                    f.ReleaseFileReference.Filename == amendmentDataFile.ReleaseFileReference.Filename);
+                    f.File.Filename == amendmentDataFile.File.Filename);
                 AssertAmendedReleaseFileCorrect(originalFile, amendmentDataFile, amendment);
 
                 var amendmentDataFile2 = amendmentDataFiles[1];
                 var originalFile2 = releaseFiles.First(f =>
-                    f.ReleaseFileReference.Filename == amendmentDataFile2.ReleaseFileReference.Filename);
+                    f.File.Filename == amendmentDataFile2.File.Filename);
                 AssertAmendedReleaseFileCorrect(originalFile2, amendmentDataFile2, amendment);
 
                 Assert.True(amendment.Amendment);
@@ -621,24 +607,10 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
 
             // and assert that the file referenced is the SAME file reference as linked from the original Release's
             // link table entry
-            Assert.Equal(originalFile.ReleaseFileReference.Id, amendmentDataFile.ReleaseFileReference.Id);
+            Assert.Equal(originalFile.File.Id, amendmentDataFile.File.Id);
         }
 
-        private (
-            Mock<IUserService>,
-            Mock<IPersistenceHelper<ContentDbContext>>,
-            Mock<IPublishingService>,
-            Mock<IReleaseRepository>,
-            Mock<ISubjectService>,
-            Mock<ITableStorageService>,
-            Mock<IReleaseFileService>,
-            Mock<IReleaseDataFileService>,
-            Mock<IImportStatusService>,
-            Mock<IFootnoteService>,
-            Mock<StatisticsDbContext>,
-            Mock<IMetaGuidanceService>,
-            Mock<IDataBlockService>,
-            Mock<IReleaseSubjectService>) Mocks()
+        private Mock<IUserService> UserServiceMock()
         {
             var userService = MockUtils.AlwaysTrueUserService();
 
@@ -646,25 +618,46 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
                 .Setup(s => s.GetUserId())
                 .Returns(_userId);
 
-            var persistenceHelper = MockUtils.MockPersistenceHelper<ContentDbContext>();
-            MockUtils.SetupCall<ContentDbContext, Release>(persistenceHelper);
-            MockUtils.SetupCall<ContentDbContext, Publication>(persistenceHelper);
+            return userService;
+        }
 
-            return (
-                userService,
-                persistenceHelper,
-                new Mock<IPublishingService>(),
-                new Mock<IReleaseRepository>(),
-                new Mock<ISubjectService>(),
-                new Mock<ITableStorageService>(),
-                new Mock<IReleaseFileService>(),
-                new Mock<IReleaseDataFileService>(),
-                new Mock<IImportStatusService>(),
-                new Mock<IFootnoteService>(),
-                new Mock<StatisticsDbContext>(),
-                new Mock<IMetaGuidanceService>(),
-                new Mock<IDataBlockService>(),
-                new Mock<IReleaseSubjectService>());
+        private ReleaseService BuildReleaseService(
+            ContentDbContext contentDbContext,
+            StatisticsDbContext statisticsDbContext,
+            IPublishingService publishingService = null,
+            IPersistenceHelper<ContentDbContext> persistenceHelper = null,
+            IUserService userService = null,
+            IReleaseRepository repository = null,
+            ISubjectService subjectService = null,
+            ITableStorageService coreTableStorageService = null,
+            IReleaseDataFileService releaseDataFileService = null,
+            IReleaseFileService releaseFileService = null,
+            IImportStatusService importStatusService = null,
+            IFootnoteService footnoteService = null,
+            IDataBlockService dataBlockService = null,
+            IReleaseSubjectService releaseSubjectService = null,
+            IReleaseChecklistService releaseChecklistService = null,
+            IGuidGenerator guidGenerator = null)
+        {
+            return new ReleaseService(
+                contentDbContext,
+                AdminMapper(),
+                publishingService ?? new Mock<IPublishingService>().Object,
+                persistenceHelper ?? new PersistenceHelper<ContentDbContext>(contentDbContext),
+                userService ?? UserServiceMock().Object,
+                repository ?? new Mock<IReleaseRepository>().Object,
+                subjectService ?? new Mock<ISubjectService>().Object,
+                coreTableStorageService ?? new Mock<ITableStorageService>().Object,
+                releaseDataFileService ?? new Mock<IReleaseDataFileService>().Object,
+                releaseFileService ?? new Mock<IReleaseFileService>().Object,
+                importStatusService ?? new Mock<IImportStatusService>().Object,
+                footnoteService ?? new Mock<IFootnoteService>().Object,
+                statisticsDbContext ?? statisticsDbContext,
+                dataBlockService ?? new Mock<IDataBlockService>().Object,
+                releaseChecklistService ?? new Mock<IReleaseChecklistService>().Object,
+                releaseSubjectService ?? new Mock<IReleaseSubjectService>().Object,
+                guidGenerator ?? new SequentialGuidGenerator()
+            );
         }
     }
 }

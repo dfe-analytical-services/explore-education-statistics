@@ -28,6 +28,66 @@ namespace GovUk.Education.ExploreEducationStatistics.Common.Tests.Model
             Assert.Equal("a success", either.Right);
             Assert.Throws<ArgumentException>(() => either.Left);
         }
+
+        [Fact]
+        public void Fold_Right()
+        {
+            var result = new Either<int, string>("a success")
+                .Fold(
+                    value => value.ToString(),
+                    value => value.ToUpper()
+                );
+
+            Assert.Equal("A SUCCESS", result);
+        }
+
+        [Fact]
+        public void Fold_Left()
+        {
+            var result = new Either<int, string>(10)
+                .Fold(
+                    value => value.ToString(),
+                    value => value.ToUpper()
+                );
+
+            Assert.Equal("10", result);
+        }
+
+        [Fact]
+        public void FoldRight_Right()
+        {
+            var result = new Either<int, string>("a success")
+                .FoldRight(value => value.ToUpper(), "a default");
+
+            Assert.Equal("A SUCCESS", result);
+        }
+
+        [Fact]
+        public void FoldRight_Left()
+        {
+            var result = new Either<int, string>(10)
+                .FoldRight(value => value.ToUpper(), "a default");
+
+            Assert.Equal("a default", result);
+        }
+
+        [Fact]
+        public void FoldLeft_Left()
+        {
+            var result = new Either<int, string>(10)
+                .FoldLeft(value => value.ToString(), "a default");
+
+            Assert.Equal("10", result);
+        }
+
+        [Fact]
+        public void FoldLeft_Right()
+        {
+            var result = new Either<int, string>("a success")
+                .FoldLeft(value => value.ToString(), "a default");
+
+            Assert.Equal("a default", result);
+        }
     }
 
     public class EitherTaskTest

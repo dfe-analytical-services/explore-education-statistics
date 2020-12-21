@@ -8,6 +8,7 @@ using GovUk.Education.ExploreEducationStatistics.Common.Services.Interfaces;
 using GovUk.Education.ExploreEducationStatistics.Common.Services.Interfaces.Security;
 using GovUk.Education.ExploreEducationStatistics.Common.Services.Security;
 using GovUk.Education.ExploreEducationStatistics.Common.Utils;
+using GovUk.Education.ExploreEducationStatistics.Content.Model.Database;
 using GovUk.Education.ExploreEducationStatistics.Data.Api.ModelBinding;
 using GovUk.Education.ExploreEducationStatistics.Data.Api.Security;
 using GovUk.Education.ExploreEducationStatistics.Data.Api.Services;
@@ -33,8 +34,6 @@ using Microsoft.Extensions.Hosting;
 using Microsoft.Extensions.Logging;
 using Microsoft.OpenApi.Models;
 using Newtonsoft.Json;
-using FileStorageService = GovUk.Education.ExploreEducationStatistics.Data.Api.Services.FileStorageService;
-using IFileStorageService = GovUk.Education.ExploreEducationStatistics.Data.Api.Services.Interfaces.IFileStorageService;
 
 namespace GovUk.Education.ExploreEducationStatistics.Data.Api
 {
@@ -74,6 +73,13 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Api
                     .EnableSensitiveDataLogging(HostEnvironment.IsDevelopment())
             );
 
+            services.AddDbContext<ContentDbContext>(options =>
+                options
+                    .UseSqlServer(Configuration.GetConnectionString("ContentDb"),
+                        builder => builder.MigrationsAssembly(typeof(Startup).Assembly.FullName))
+                    .EnableSensitiveDataLogging(HostEnvironment.IsDevelopment())
+            );
+
             // ReSharper disable once CommentTypo
             // Adds Brotli and Gzip compressing
             services.AddResponseCompression();
@@ -102,11 +108,10 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Api
                     );
                 }
             );
-            services.AddSingleton<IFileStorageService, FileStorageService>();
             services.AddTransient<IFilterGroupService, FilterGroupService>();
             services.AddTransient<IFilterItemService, FilterItemService>();
             services.AddTransient<IFilterService, FilterService>();
-            services.AddTransient<IFootnoteService, FootnoteService>();
+            services.AddTransient<IFootnoteRepository, FootnoteRepository>();
             services.AddTransient<IGeoJsonService, GeoJsonService>();
             services.AddTransient<IIndicatorGroupService, IndicatorGroupService>();
             services.AddTransient<IIndicatorService, IndicatorService>();

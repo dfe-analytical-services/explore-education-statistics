@@ -6,14 +6,19 @@ using AutoMapper;
 using GovUk.Education.ExploreEducationStatistics.Common.Model;
 using GovUk.Education.ExploreEducationStatistics.Content.Model;
 using GovUk.Education.ExploreEducationStatistics.Content.Model.Database;
+using GovUk.Education.ExploreEducationStatistics.Content.Model.Extensions;
 using GovUk.Education.ExploreEducationStatistics.Data.Model.Database;
 using GovUk.Education.ExploreEducationStatistics.Data.Model.Services.Interfaces;
 using GovUk.Education.ExploreEducationStatistics.Publisher.Model.ViewModels;
 using GovUk.Education.ExploreEducationStatistics.Publisher.Models;
 using GovUk.Education.ExploreEducationStatistics.Publisher.Services.Interfaces;
 using Microsoft.EntityFrameworkCore;
+using static GovUk.Education.ExploreEducationStatistics.Common.Model.FileType;
+using Microsoft.Extensions.Logging;
+using static GovUk.Education.ExploreEducationStatistics.Common.BlobContainerNames;
+using static GovUk.Education.ExploreEducationStatistics.Common.Services.FileStoragePathUtils;
 using IReleaseService = GovUk.Education.ExploreEducationStatistics.Publisher.Services.Interfaces.IReleaseService;
-using static GovUk.Education.ExploreEducationStatistics.Publisher.Utils.PublisherUtils;
+using static GovUk.Education.ExploreEducationStatistics.Publisher.Extensions.PublisherExtensions;
 
 namespace GovUk.Education.ExploreEducationStatistics.Publisher.Services
 {
@@ -23,18 +28,21 @@ namespace GovUk.Education.ExploreEducationStatistics.Publisher.Services
         private readonly StatisticsDbContext _statisticsDbContext;
         private readonly IFileStorageService _fileStorageService;
         private readonly IReleaseSubjectService _releaseSubjectService;
+        private readonly ILogger<ReleaseService> _logger;
         private readonly IMapper _mapper;
 
         public ReleaseService(ContentDbContext contentDbContext,
             StatisticsDbContext statisticsDbContext,
             IFileStorageService fileStorageService,
             IReleaseSubjectService releaseSubjectService,
+            ILogger<ReleaseService> logger,
             IMapper mapper)
         {
             _contentDbContext = contentDbContext;
             _statisticsDbContext = statisticsDbContext;
             _fileStorageService = fileStorageService;
             _releaseSubjectService = releaseSubjectService;
+            _logger = logger;
             _mapper = mapper;
         }
 
@@ -64,7 +72,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Publisher.Services
                 .ToListAsync();
         }
 
-        public CachedReleaseViewModel GetReleaseViewModel(Guid id, PublishContext context)
+        public async Task<CachedReleaseViewModel> GetReleaseViewModel(Guid id, PublishContext context)
         {
             var release = _contentDbContext.Releases
                 .Include(r => r.Type)
@@ -76,8 +84,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Publisher.Services
                 .Single(r => r.Id == id);
 
             var releaseViewModel = _mapper.Map<CachedReleaseViewModel>(release);
-            releaseViewModel.DownloadFiles =
-                _fileStorageService.ListPublicFiles(release.Publication.Slug, release.Slug).Result.ToList();
+            releaseViewModel.DownloadFiles = await GetDownloadFiles(release);
 
             // If the release isn't live yet set the published date based on what we expect it to be
             releaseViewModel.Published ??= context.Published;
@@ -85,23 +92,25 @@ namespace GovUk.Education.ExploreEducationStatistics.Publisher.Services
             return releaseViewModel;
         }
 
-        public Release GetLatestRelease(Guid publicationId, IEnumerable<Guid> includedReleaseIds)
+        public async Task<Release> GetLatestRelease(Guid publicationId, IEnumerable<Guid> includedReleaseIds)
         {
-            return _contentDbContext.Releases
+            var releases = await _contentDbContext.Releases
                 .Include(r => r.Publication)
                 .Where(release => release.PublicationId == publicationId)
-                .ToList()
-                .Where(release => IsLatestVersionOfRelease(release.Publication.Releases, release, includedReleaseIds))
+                .ToListAsync();
+
+            return releases
+                .Where(release => release.IsReleasePublished(includedReleaseIds))
                 .OrderBy(release => release.Year)
                 .ThenBy(release => release.TimePeriodCoverage)
                 .LastOrDefault();
         }
 
-        public CachedReleaseViewModel GetLatestReleaseViewModel(Guid publicationId,
+        public async Task<CachedReleaseViewModel> GetLatestReleaseViewModel(Guid publicationId,
             IEnumerable<Guid> includedReleaseIds, PublishContext context)
         {
-            var latestRelease = GetLatestRelease(publicationId, includedReleaseIds);
-            return GetReleaseViewModel(latestRelease.Id, context);
+            var latestRelease = await GetLatestRelease(publicationId, includedReleaseIds);
+            return await GetReleaseViewModel(latestRelease.Id, context);
         }
 
         public async Task SetPublishedDatesAsync(Guid id, DateTime published)
@@ -126,7 +135,8 @@ namespace GovUk.Education.ExploreEducationStatistics.Publisher.Services
 
                 if (previousVersion?.Published == null)
                 {
-                    throw new ArgumentException("Previous version of release does not exist or is not live", nameof(contentRelease.PreviousVersionId));
+                    throw new ArgumentException("Previous version of release does not exist or is not live",
+                        nameof(contentRelease.PreviousVersionId));
                 }
 
                 published = previousVersion.Published.Value;
@@ -157,15 +167,29 @@ namespace GovUk.Education.ExploreEducationStatistics.Publisher.Services
             }
         }
 
-        public List<ReleaseFileReference> GetReleaseFileReferences(Guid releaseId, params ReleaseFileTypes[] types)
+        public async Task<List<File>> GetFiles(Guid releaseId, params FileType[] types)
         {
-            return _contentDbContext
+            return await _contentDbContext
                 .ReleaseFiles
-                .Include(rf => rf.ReleaseFileReference)
-                .Where(rfr => rfr.ReleaseId == releaseId)
-                .Select(rf => rf.ReleaseFileReference)
-                .Where(rfr => types.Contains(rfr.ReleaseFileType))
-                .ToList();
+                .Include(rf => rf.File)
+                .Where(rf => rf.ReleaseId == releaseId)
+                .Select(rf => rf.File)
+                .Where(file => types.Contains(file.Type))
+                .ToListAsync();
+        }
+
+        public async Task<List<FileInfo>> GetDownloadFiles(Release release)
+        {
+            var files = await GetFiles(release.Id, Ancillary, FileType.Data);
+
+            var filesWithInfo = files.Select(async file => await GetPublicFileInfo(release, file));
+
+            var orderedFiles = (await Task.WhenAll(filesWithInfo))
+                .OrderBy(file => file.Name);
+
+            // Prepend the "All files" zip
+            var allFilesZip = await GetAllFilesZip(release);
+            return orderedFiles.Prepend(allFilesZip).ToList();
         }
 
         public async Task DeletePreviousVersionsStatisticalData(params Guid[] releaseIds)
@@ -185,6 +209,66 @@ namespace GovUk.Education.ExploreEducationStatistics.Publisher.Services
             await RemoveStatisticalReleases(previousVersions);
 
             await _statisticsDbContext.SaveChangesAsync();
+        }
+
+        private async Task<FileInfo> GetAllFilesZip(Release release)
+        {
+            var path = PublicReleaseAllFilesZipPath(release.Publication.Slug, release.Slug);
+
+            var exists = await _fileStorageService.CheckBlobExists(
+                containerName: PublicFilesContainerName,
+                path: path);
+
+            // EES-1755 we should throw an exception here and not be as lenient.
+            // Temporarily to collect a list of missing files and not halt publishing while regenerating
+            // content for all releases, we log an error and continue.
+            if (!exists)
+            {
+                _logger.LogError("Public blob not found for 'All files' zip at: {0}", path);
+                return new FileInfo
+                {
+                    Id = null,
+                    FileName = null,
+                    Name = "Unknown",
+                    Path = null,
+                    Size = "0.00 B",
+                    Type = Ancillary
+                };
+            }
+
+            var blob = await _fileStorageService.GetBlob(
+                containerName: PublicFilesContainerName,
+                path: path);
+
+            return new FileInfo
+            {
+                Id = null,
+                FileName = blob.FileName,
+                Name = blob.Name,
+                Path = blob.Path,
+                Size = blob.Size,
+                Type = Ancillary
+            };
+        }
+
+        private async Task<FileInfo> GetPublicFileInfo(Release release, File file)
+        {
+            var exists = await _fileStorageService.CheckBlobExists(
+                containerName: PublicFilesContainerName,
+                path: file.PublicPath(release));
+
+            if (!exists)
+            {
+                _logger.LogWarning("Public blob not found for file: {0} at: {1}", file.Id,
+                    file.PublicPath(release));
+                return file.ToFileInfoNotFound();
+            }
+
+            var blob = await _fileStorageService.GetBlob(
+                containerName: PublicFilesContainerName,
+                path: file.PublicPath(release));
+
+            return file.ToPublicFileInfo(blob);
         }
 
         private async Task RemoveStatisticalReleases(IEnumerable<Guid> releaseIds)

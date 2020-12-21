@@ -7,6 +7,7 @@ export interface GlobalPermissions {
   canAccessPrereleasePages: boolean;
   canAccessAnalystPages: boolean;
   canAccessUserAdministrationPages: boolean;
+  canAccessAllImports: boolean;
   canAccessMethodologyAdministrationPages: boolean;
   canManageAllTaxonomy: boolean;
 }
@@ -15,6 +16,10 @@ export interface ReleaseStatusPermissions {
   canMarkDraft: boolean;
   canMarkHigherLevelReview: boolean;
   canMarkApproved: boolean;
+}
+
+export interface DataFilePermissions {
+  canCancelImport: boolean;
 }
 
 export type PreReleaseAccess = 'Before' | 'After' | 'Within' | 'NoneSet';
@@ -76,6 +81,14 @@ const permissionService = {
         start: parseISO(status.start),
         end: parseISO(status.end),
       }));
+  },
+  getDataFilePermissions(
+    releaseId: string,
+    fileId: string,
+  ): Promise<DataFilePermissions> {
+    return client.get<DataFilePermissions>(
+      `/permissions/release/${releaseId}/data/${fileId}`,
+    );
   },
 };
 

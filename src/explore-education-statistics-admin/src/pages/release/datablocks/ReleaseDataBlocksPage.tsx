@@ -12,6 +12,7 @@ import permissionService from '@admin/services/permissionService';
 import Button from '@common/components/Button';
 import { FormSelect } from '@common/components/form';
 import Gate from '@common/components/Gate';
+import InsetText from '@common/components/InsetText';
 import LoadingSpinner from '@common/components/LoadingSpinner';
 import ModalConfirm from '@common/components/ModalConfirm';
 import UrlContainer from '@common/components/UrlContainer';
@@ -117,14 +118,14 @@ const ReleaseDataBlocksPageInternal = ({
     <>
       <h2>Data blocks</h2>
 
-      <div className="govuk-inset-text">
+      <InsetText>
         <h3>Before you start</h3>
         <p>
           A data block is a smaller cut of data from your original file that you
           can embed into your publication as a presentation table, build charts
           from, or link users directly to.
         </p>
-      </div>
+      </InsetText>
 
       <div ref={pageRef}>
         {dataBlockOptions.length > 0 && (

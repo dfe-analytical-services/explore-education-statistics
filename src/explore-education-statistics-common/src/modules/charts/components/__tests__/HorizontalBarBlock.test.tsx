@@ -7,6 +7,7 @@ import HorizontalBarBlock, {
   HorizontalBarProps,
 } from '@common/modules/charts/components/HorizontalBarBlock';
 import { VerticalBarProps } from '@common/modules/charts/components/VerticalBarBlock';
+import { LegendConfiguration } from '@common/modules/charts/types/legend';
 import { FullTableMeta } from '@common/modules/table-tool/types/fullTable';
 import mapFullTable from '@common/modules/table-tool/utils/mapFullTable';
 import { TableDataResponse } from '@common/services/tableBuilderService';
@@ -19,6 +20,7 @@ describe('HorizontalBarBlock', () => {
   const fullTable = mapFullTable(testChartTableData);
   const props: VerticalBarProps = {
     ...testChartConfiguration,
+    legend: testChartConfiguration.legend as LegendConfiguration,
     axes: testChartConfiguration.axes as VerticalBarProps['axes'],
     meta: fullTable.subjectMeta,
     data: fullTable.results,
@@ -56,9 +58,9 @@ describe('HorizontalBarBlock', () => {
 
       const legendItems = container.querySelectorAll('.recharts-legend-item');
 
-      expect(legendItems[0]).toHaveTextContent('Unauthorised absence rate');
-      expect(legendItems[1]).toHaveTextContent('Authorised absence rate');
-      expect(legendItems[2]).toHaveTextContent('Overall absence rate');
+      expect(legendItems[0]).toHaveTextContent('Authorised absence rate');
+      expect(legendItems[1]).toHaveTextContent('Overall absence rate');
+      expect(legendItems[2]).toHaveTextContent('Unauthorised absence rate');
 
       expect(container.querySelectorAll('.recharts-rectangle')).toHaveLength(
         15,
@@ -133,7 +135,13 @@ describe('HorizontalBarBlock', () => {
 
   test('can hide legend', () => {
     const { container } = render(
-      <HorizontalBarBlock {...props} legend="none" />,
+      <HorizontalBarBlock
+        {...props}
+        legend={{
+          ...props.legend,
+          position: 'none',
+        }}
+      />,
     );
 
     expect(
@@ -154,7 +162,6 @@ describe('HorizontalBarBlock', () => {
           },
         }}
         stacked
-        legend="none"
       />,
     );
 
@@ -179,7 +186,6 @@ describe('HorizontalBarBlock', () => {
             ],
           },
         }}
-        legend="none"
       />,
     );
 
@@ -203,7 +209,6 @@ describe('HorizontalBarBlock', () => {
             ],
           },
         }}
-        legend="none"
       />,
     );
 
@@ -216,6 +221,7 @@ describe('HorizontalBarBlock', () => {
     const invalidData = (undefined as unknown) as TableDataResponse['results'];
     const invalidMeta = (undefined as unknown) as FullTableMeta;
     const invalidAxes = (undefined as unknown) as HorizontalBarProps['axes'];
+    const invalidLegend = (undefined as unknown) as LegendConfiguration;
 
     const { container } = render(
       <HorizontalBarBlock
@@ -225,6 +231,7 @@ describe('HorizontalBarBlock', () => {
         data={invalidData}
         meta={invalidMeta}
         axes={invalidAxes}
+        legend={invalidLegend}
       />,
     );
     expect(container).toHaveTextContent('Unable to render chart');

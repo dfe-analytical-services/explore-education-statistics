@@ -35,6 +35,10 @@ export const getImportStatusLabel = (
       return 'Complete';
     case 'FAILED':
       return 'Failed';
+    case 'CANCELLING':
+      return 'Cancelling';
+    case 'CANCELLED':
+      return 'Cancelled';
     default:
       return undefined;
   }
@@ -52,10 +56,13 @@ const getImportStatusColour = (
     case 'STAGE_2':
     case 'STAGE_3':
     case 'STAGE_4':
+    case 'CANCELLING':
       return 'orange';
     case 'COMPLETE':
       return 'green';
     case 'FAILED':
+    case 'CANCELLED':
+      return 'red';
       return 'red';
     default:
       return undefined;
@@ -66,6 +73,7 @@ export const terminalImportStatuses: ImportStatusCode[] = [
   'NOT_FOUND',
   'COMPLETE',
   'FAILED',
+  'CANCELLED',
 ];
 
 type StatusState = Pick<

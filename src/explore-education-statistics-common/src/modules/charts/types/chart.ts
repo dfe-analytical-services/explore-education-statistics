@@ -3,7 +3,8 @@ import { infographicBlockDefinition } from '@common/modules/charts/components/In
 import { lineChartBlockDefinition } from '@common/modules/charts/components/LineChartBlock';
 import { mapBlockDefinition } from '@common/modules/charts/components/MapBlock';
 import { verticalBarBlockDefinition } from '@common/modules/charts/components/VerticalBarBlock';
-import { DataSetConfiguration } from '@common/modules/charts/types/dataSet';
+import { DataSet } from '@common/modules/charts/types/dataSet';
+import { LegendConfiguration } from '@common/modules/charts/types/legend';
 import { FullTableMeta } from '@common/modules/table-tool/types/fullTable';
 import { TableDataResult } from '@common/services/tableBuilderService';
 import { NestedPartial } from '@common/types';
@@ -46,7 +47,7 @@ export interface AxisConfiguration {
   groupBy?: AxisGroupBy;
   sortBy?: string;
   sortAsc?: boolean;
-  dataSets: DataSetConfiguration[];
+  dataSets: DataSet[];
   referenceLines: ReferenceLine[];
   visible: boolean;
   unit?: string;
@@ -55,7 +56,6 @@ export interface AxisConfiguration {
   size?: number;
   min?: number;
   max?: number;
-  title?: string;
   tickConfig?: TickConfig;
   tickSpacing?: number;
 }
@@ -72,7 +72,7 @@ export interface ChartProps {
   height: number;
   width?: number;
   axes: AxesConfiguration;
-  legend?: 'none' | 'top' | 'bottom';
+  legend?: LegendConfiguration;
 }
 
 export interface StackedBarProps extends ChartProps {
@@ -81,21 +81,20 @@ export interface StackedBarProps extends ChartProps {
 }
 
 export interface ChartCapabilities {
-  dataSymbols: boolean;
-  stackable: boolean;
-  lineStyle: boolean;
-  gridLines: boolean;
   canSize: boolean;
   canSort: boolean;
-  fixedAxisGroupBy: boolean;
-  hasReferenceLines: boolean;
+  hasGridLines: boolean;
   hasLegend: boolean;
+  hasLegendPosition: boolean;
+  hasLineStyle: boolean;
+  hasReferenceLines: boolean;
+  hasSymbols: boolean;
   requiresGeoJson: boolean;
+  stackable: boolean;
 }
 
 export interface ChartDefinitionOptions {
   stacked?: boolean;
-  legend?: 'none' | 'top' | 'bottom';
   height: number;
   width?: number;
   barThickness?: number;
@@ -110,12 +109,9 @@ export interface ChartDefinition {
   options: {
     defaults?: Partial<ChartDefinitionOptions>;
   };
-  data: {
-    type: string;
-    title: string;
-    entryCount: number | 'multiple';
-    targetAxis: string;
-  }[];
+  legend: {
+    defaults?: Partial<LegendConfiguration>;
+  };
   axes: {
     [key in AxisType]?: ChartDefinitionAxis;
   };
@@ -132,6 +128,9 @@ export interface ChartDefinitionAxis {
   hide?: boolean;
   capabilities: ChartDefinitionAxisCapabilities;
   defaults?: NestedPartial<AxisConfiguration>;
+  constants?: {
+    groupBy?: AxisGroupBy;
+  };
 }
 
 export const chartDefinitions: ChartDefinition[] = [

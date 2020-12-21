@@ -6,21 +6,16 @@ import React from 'react';
 const BauDashboardPage = () => {
   const { user } = useAuthContext();
 
-  const canManageUsers = user
-    ? user.permissions.canAccessUserAdministrationPages
-    : false;
-  const canManageMethodologies = user
-    ? user.permissions.canAccessMethodologyAdministrationPages
-    : false;
-
   return (
-    <Page wide breadcrumbs={[{ name: 'Platform administration' }]}>
-      <h1 className="govuk-heading-xl">Platform administration</h1>
-
+    <Page
+      title="Platform administration"
+      wide
+      breadcrumbs={[{ name: 'Platform administration' }]}
+    >
       <h2 className="govuk-heading-m govuk-!-margin-top-9">Content and data</h2>
 
       <div className="govuk-grid-row govuk-!-margin-bottom-9">
-        {canManageMethodologies && (
+        {user?.permissions.canAccessMethodologyAdministrationPages && (
           <div className="govuk-grid-column-one-third">
             <h3 className="govuk-heading-s govuk-!-margin-bottom-0">
               <Link to="/administration/methodology">Manage methodology</Link>
@@ -38,6 +33,18 @@ const BauDashboardPage = () => {
             View a list of all publication contacts.
           </p>
         </div>
+        {user?.permissions.canAccessAllImports && (
+          <div className="govuk-grid-column-one-third">
+            <h3 className="govuk-heading-s govuk-!-margin-bottom-0">
+              <Link to="/administration/imports">
+                Manage incomplete imports
+              </Link>
+            </h3>
+            <p className="govuk-caption-m govuk-!-margin-top-1">
+              View a list of all current incomplete imports.
+            </p>
+          </div>
+        )}
       </div>
 
       <hr className="govuk-!-margin-top-9" />
@@ -46,7 +53,7 @@ const BauDashboardPage = () => {
         Access to the service
       </h2>
       <div className="govuk-grid-row govuk-!-margin-bottom-9">
-        {canManageUsers && (
+        {user?.permissions.canAccessUserAdministrationPages && (
           <>
             <div className="govuk-grid-column-one-third">
               <h3 className="govuk-heading-s govuk-!-margin-bottom-0">

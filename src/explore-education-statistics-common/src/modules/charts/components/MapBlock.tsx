@@ -28,31 +28,25 @@ export const mapBlockDefinition: ChartDefinition = {
   type: 'map',
   name: 'Geographic',
   capabilities: {
-    dataSymbols: false,
-    stackable: false,
-    lineStyle: false,
-    gridLines: false,
     canSize: true,
     canSort: false,
-    fixedAxisGroupBy: true,
+    hasGridLines: false,
+    hasLegend: true,
+    hasLegendPosition: false,
+    hasLineStyle: false,
     hasReferenceLines: false,
-    hasLegend: false,
+    hasSymbols: false,
     requiresGeoJson: true,
+    stackable: false,
   },
   options: {
     defaults: {
       height: 600,
-      legend: 'none',
     },
   },
-  data: [
-    {
-      type: 'geojson',
-      title: 'Geographic',
-      entryCount: 'multiple',
-      targetAxis: 'geojson',
-    },
-  ],
+  legend: {
+    defaults: {},
+  },
   axes: {
     major: {
       id: 'geojson',
@@ -63,6 +57,9 @@ export const mapBlockDefinition: ChartDefinition = {
         canRotateLabel: false,
       },
       defaults: {
+        groupBy: 'locations',
+      },
+      constants: {
         groupBy: 'locations',
       },
     },

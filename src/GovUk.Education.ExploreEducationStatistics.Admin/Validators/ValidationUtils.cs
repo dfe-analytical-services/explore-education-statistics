@@ -1,3 +1,4 @@
+using System.Collections.Generic;
 using System.ComponentModel.DataAnnotations;
 using System.Linq;
 using GovUk.Education.ExploreEducationStatistics.Common.Extensions;
@@ -38,6 +39,18 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Validators
         {
             ModelStateDictionary errors = new ModelStateDictionary();
             errors.AddModelError(string.Empty, message.ToString().ScreamingSnakeCase());
+            return new BadRequestObjectResult(new ValidationProblemDetails(errors));
+        }
+
+        public static ActionResult ValidationActionResult(IEnumerable<ValidationErrorMessages> messages)
+        {
+            ModelStateDictionary errors = new ModelStateDictionary();
+
+            foreach (var message in messages)
+            {
+                errors.AddModelError(string.Empty, message.ToString().ScreamingSnakeCase());
+            }
+
             return new BadRequestObjectResult(new ValidationProblemDetails(errors));
         }
 
@@ -84,7 +97,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Validators
 
         // Methodology
         MethodologyDoesNotExist,
-        MethodologyMustBeApprovedOrPublished,
+        MethodologyMustBeApproved,
         CannotSpecifyMethodologyAndExternalMethodology,
 
         // Theme
@@ -98,13 +111,10 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Validators
         FileCannotBeEmpty,
         FileTypeInvalid,
         FilenameCannotContainSpacesOrSpecialCharacters,
-        FileUploadNameCannotContainSpecialCharacters,
 
         // Data file
         SubjectTitleCannotContainSpecialCharacters,
         SubjectTitleMustBeUnique,
-        CannotUseGenericFunctionToDeleteDataFile,
-        CannotUseGenericFunctionToAddDataFile,
         CannotOverwriteDataFile,
         DataAndMetadataFilesCannotHaveTheSameName,
         DataFileCannotBeEmpty,
@@ -113,7 +123,6 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Validators
         DataFilenameCannotContainSpacesOrSpecialCharacters,
         CannotRemoveDataFilesUntilImportComplete,
         CannotRemoveDataFilesOnceReleaseApproved,
-        AllDatafilesUploadedMustBeComplete,
         FileTypeMustBeData,
 
         // Data zip file
@@ -135,9 +144,21 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Validators
 
         // Release
         ReleaseNotApproved,
-        MetaGuidanceMustBePopulated,
-        DataReplacementInProgress,
         ApprovedReleaseMustHavePublishScheduledDate,
-        PublishedReleaseCannotBeUnapproved
+        PublishedReleaseCannotBeUnapproved,
+
+        // Release checklist errors
+        DataFileImportsMustBeCompleted,
+        DataFileReplacementsMustBeCompleted,
+        ReleaseNoteRequired,
+        PublicMetaGuidanceRequired,
+        PublicPreReleaseAccessListRequired,
+
+        // Release checklist warnings
+        NoMethodology,
+        NoNextReleaseDate,
+        NoDataFiles,
+        NoFootnotesOnSubjects,
+        NoTableHighlights,
     }
 }

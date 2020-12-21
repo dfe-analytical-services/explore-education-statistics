@@ -309,7 +309,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Publisher.Tests.Services
                 var releaseService = new Mock<IReleaseService>();
 
                 releaseService.Setup(s => s.GetLatestRelease(PublicationA.Id, Enumerable.Empty<Guid>()))
-                    .Returns(PublicationARelease1V1);
+                    .ReturnsAsync(PublicationARelease1V1);
 
                 var service = BuildPublicationService(context, releaseService: releaseService.Object);
 

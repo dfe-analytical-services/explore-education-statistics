@@ -16,6 +16,7 @@ export interface FormBaseInputProps extends FormLabelProps {
   error?: ReactNode | string;
   hint?: string;
   id: string;
+  list?: string;
   name: string;
   width?: 20 | 10 | 5 | 4 | 3 | 2;
   onBlur?: FocusEventHandler<HTMLInputElement>;

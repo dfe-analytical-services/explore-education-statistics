@@ -1,7 +1,6 @@
 import {
   testChartConfiguration,
   testChartTableData,
-  testDeprecatedChartConfiguration,
 } from '@common/modules/charts/components/__tests__/__data__/testChartData';
 import {
   testMapConfiguration,
@@ -375,48 +374,6 @@ describe('DataBlockTabs', () => {
       } as ReleaseTableDataQuery);
 
       expect(container.querySelector('.leaflet-container')).toBeInTheDocument();
-    });
-  });
-
-  test('can render line chart with deprecated `labels` for data sets', async () => {
-    tableBuilderService.getTableData.mockImplementation(() =>
-      Promise.resolve(testChartTableData),
-    );
-
-    const { container } = render(
-      <DataBlockTabs
-        releaseId="test-release-id"
-        id="test-datablock"
-        dataBlock={{
-          ...testDataBlock,
-          charts: [testDeprecatedChartConfiguration],
-        }}
-      />,
-    );
-
-    forceVisible();
-
-    await waitFor(() => {
-      expect(tableBuilderService.getTableData).toBeCalledWith({
-        ...testDataBlock.query,
-        releaseId: 'test-release-id',
-        includeGeoJson: false,
-      } as ReleaseTableDataQuery);
-
-      expect(screen.getAllByRole('tabpanel')).toHaveLength(1);
-
-      expect(container.querySelectorAll('.recharts-line')).toHaveLength(3);
-
-      const legendItems = container.querySelectorAll('.recharts-legend-item');
-      expect(legendItems[0]).toHaveTextContent(
-        'Unauthorised absence rate (England)',
-      );
-      expect(legendItems[1]).toHaveTextContent(
-        'Authorised absence rate (England)',
-      );
-      expect(legendItems[2]).toHaveTextContent(
-        'Overall absence rate (England)',
-      );
     });
   });
 

@@ -6,10 +6,10 @@ using System.Threading.Tasks;
 using GovUk.Education.ExploreEducationStatistics.Common.Extensions;
 using GovUk.Education.ExploreEducationStatistics.Common.Model;
 using GovUk.Education.ExploreEducationStatistics.Common.Services.Interfaces;
-using GovUk.Education.ExploreEducationStatistics.Data.Processor.Model;
 using GovUk.Education.ExploreEducationStatistics.Data.Processor.Models;
 using GovUk.Education.ExploreEducationStatistics.Data.Processor.Services.Interfaces;
 using static GovUk.Education.ExploreEducationStatistics.Common.BlobContainerNames;
+using static GovUk.Education.ExploreEducationStatistics.Common.Model.FileType;
 using static GovUk.Education.ExploreEducationStatistics.Common.Services.FileStoragePathUtils;
 
 namespace GovUk.Education.ExploreEducationStatistics.Data.Processor.Services
@@ -23,18 +23,16 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Processor.Services
             _blobStorageService = blobStorageService;
         }
 
-        public async Task<SubjectData> GetSubjectData(ImportMessage importMessage)
+        public async Task<SubjectData> GetSubjectData(Guid releaseId, string observationsFileBlobPath)
         {
-            var releaseId = importMessage.Release.Id.ToString();
-
             var dataBlob = await _blobStorageService.GetBlob(
                 PrivateFilesContainerName,
-                AdminReleasePath(releaseId, ReleaseFileTypes.Data, importMessage.DataFileName)
+                observationsFileBlobPath
             );
 
             var metaBlob = await _blobStorageService.GetBlob(
                 PrivateFilesContainerName,
-                AdminReleasePath(releaseId, ReleaseFileTypes.Metadata, dataBlob.GetMetaFileName())
+                AdminReleasePath(releaseId, Metadata, dataBlob.GetMetaFileName())
             );
 
             return new SubjectData(dataBlob, metaBlob);
@@ -42,7 +40,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Processor.Services
 
         public async Task UploadStream(
             Guid releaseId,
-            ReleaseFileTypes fileType,
+            FileType fileType,
             string fileName,
             Stream stream,
             string contentType,
@@ -60,25 +58,14 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Processor.Services
             );
         }
 
-        public async Task<Stream> StreamFile(Guid releaseId, ReleaseFileTypes fileType, string fileName)
-        {
-            return await _blobStorageService.StreamBlob(
-                PrivateFilesContainerName,
-                AdminReleasePath(releaseId, fileType, fileName)
-            );
-        }
-
         public async Task<Stream> StreamBlob(BlobInfo blob)
         {
             return await _blobStorageService.StreamBlob(PrivateFilesContainerName, blob.Path);
         }
 
-        public async Task DeleteBatchFile(Guid releaseId, string dataFileName)
+        public async Task DeleteBlobByPath(string blobPath)
         {
-            await _blobStorageService.DeleteBlob(
-                PrivateFilesContainerName,
-                AdminReleaseDirectoryPath(releaseId, ReleaseFileTypes.Data) + dataFileName
-            );
+            await _blobStorageService.DeleteBlob(PrivateFilesContainerName, blobPath);
         }
 
         public async Task<int> GetNumBatchesRemaining(Guid releaseId, string origDataFileName)

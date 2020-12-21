@@ -22,14 +22,13 @@ const BauMethodologyPage = () => {
 
   return (
     <Page
+      title="Methodology status"
       wide
       breadcrumbs={[
         { name: 'Platform administration', link: '/administration' },
         { name: 'Methodology' },
       ]}
     >
-      <h1>Methodology status</h1>
-
       {model && (
         <table className="govuk-table">
           <caption className="govuk-table__caption">

@@ -24,7 +24,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Services
     public class ResultSubjectMetaService : AbstractSubjectMetaService, IResultSubjectMetaService
     {
         private readonly IBoundaryLevelService _boundaryLevelService;
-        private readonly IFootnoteService _footnoteService;
+        private readonly IFootnoteRepository _footnoteRepository;
         private readonly IIndicatorService _indicatorService;
         private readonly ILocationService _locationService;
         private readonly IPersistenceHelper<StatisticsDbContext> _persistenceHelper;
@@ -36,7 +36,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Services
 
         public ResultSubjectMetaService(IBoundaryLevelService boundaryLevelService,
             IFilterItemService filterItemService,
-            IFootnoteService footnoteService,
+            IFootnoteRepository footnoteRepository,
             IGeoJsonService geoJsonService,
             IIndicatorService indicatorService,
             ILocationService locationService,
@@ -48,7 +48,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Services
             IMapper mapper) : base(boundaryLevelService, filterItemService, geoJsonService)
         {
             _boundaryLevelService = boundaryLevelService;
-            _footnoteService = footnoteService;
+            _footnoteRepository = footnoteRepository;
             _indicatorService = indicatorService;
             _locationService = locationService;
             _persistenceHelper = persistenceHelper;
@@ -162,7 +162,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Services
         private IEnumerable<FootnoteViewModel> GetFilteredFootnotes(Guid releaseId, IQueryable<Observation> observations,
             SubjectMetaQueryContext queryContext)
         {
-            return _footnoteService.GetFilteredFootnotes(releaseId, queryContext.SubjectId, observations, queryContext.Indicators)
+            return _footnoteRepository.GetFilteredFootnotes(releaseId, queryContext.SubjectId, observations, queryContext.Indicators)
                 .Select(footnote => new FootnoteViewModel
                 {
                     Id = footnote.Id,

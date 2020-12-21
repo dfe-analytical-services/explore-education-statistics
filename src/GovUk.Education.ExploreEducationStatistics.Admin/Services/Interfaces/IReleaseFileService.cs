@@ -21,16 +21,16 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Services.Interfaces
 
         Task<Either<ActionResult, Unit>> DeleteAll(Guid releaseId, bool forceDelete = false);
 
-        Task<Either<ActionResult, IEnumerable<FileInfo>>> ListAll(Guid releaseId, params ReleaseFileTypes[] types);
+        Task<Either<ActionResult, IEnumerable<FileInfo>>> ListAll(Guid releaseId, params FileType[] types);
 
         Task<Either<ActionResult, FileStreamResult>> Stream(Guid releaseId, Guid id);
 
         Task<Either<ActionResult, FileInfo>> UploadAncillary(Guid releaseId,
-            IFormFile file,
+            IFormFile formFile,
             string name);
 
         Task<Either<ActionResult, FileInfo>> UploadChart(Guid releaseId,
-            IFormFile file,
+            IFormFile formFile,
             Guid? replacingId = null);
     }
 }

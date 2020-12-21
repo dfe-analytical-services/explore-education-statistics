@@ -10,6 +10,7 @@ using GovUk.Education.ExploreEducationStatistics.Data.Processor.Services.Interfa
 using GovUk.Education.ExploreEducationStatistics.Data.Processor.Utils;
 using Microsoft.Azure.WebJobs;
 using Microsoft.Extensions.Logging;
+using static GovUk.Education.ExploreEducationStatistics.Common.Services.FileStoragePathUtils;
 
 namespace GovUk.Education.ExploreEducationStatistics.Data.Processor.Services
 {
@@ -54,9 +55,9 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Processor.Services
 
         public async Task ProcessStage1(ImportMessage message, ExecutionContext executionContext)
         {
-            var subjectData = await _fileStorageService.GetSubjectData(message);
+            var subjectData = await GetSubjectDataFromMainDataFile(message);
 
-            await _validatorService.Validate(message.Release.Id, subjectData, executionContext, message)
+            await _validatorService.Validate(subjectData, executionContext, message)
                 .OnSuccessDo(async result =>
                 {
                     message.RowsPerBatch = result.RowsPerBatch;
@@ -67,7 +68,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Processor.Services
                 .OnFailureDo(async errors =>
                 {
                     await _batchService.FailImport(message.Release.Id,
-                        message.OrigDataFileName,
+                        message.DataFileName,
                         errors);
 
                     _logger.LogError($"Import FAILED for {message.DataFileName}...check log");
@@ -76,7 +77,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Processor.Services
 
         public async Task ProcessStage2(ImportMessage message)
         {
-            var subjectData = await _fileStorageService.GetSubjectData(message);
+            var subjectData = await GetSubjectDataFromMainDataFile(message);
 
             await ProcessSubject(message,
                 DbUtils.CreateStatisticsDbContext(),
@@ -87,12 +88,12 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Processor.Services
 
         public async Task ProcessStage3(ImportMessage message)
         {
-            var subjectData = await _fileStorageService.GetSubjectData(message);
+            var subjectData = await GetSubjectDataFromMainDataFile(message);
 
             await _splitFileService.SplitDataFile(message, subjectData);
         }
 
-        public async Task ProcessStage4Messages(ImportMessage message, ICollector<ImportMessage> collector)
+        public async Task ProcessStage4Messages(ImportMessage message, ICollector<ImportObservationsMessage> collector)
         {
             await _splitFileService.AddBatchDataFileMessages(collector, message);
         }
@@ -115,9 +116,15 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Processor.Services
 
             await statisticsDbContext.SaveChangesAsync();
 
-            await _fileImportService.ImportFiltersLocationsAndSchools(message, statisticsDbContext);
+            await _fileImportService.ImportFiltersAndLocations(message, statisticsDbContext);
 
             await statisticsDbContext.SaveChangesAsync();
+        }
+
+        private async Task<SubjectData> GetSubjectDataFromMainDataFile(ImportMessage message)
+        {
+            var dataFileBlobPath = AdminReleasePath(message.Release.Id, FileType.Data, message.DataFileName);
+            return await _fileStorageService.GetSubjectData(message.Release.Id, dataFileBlobPath);
         }
     }
 }

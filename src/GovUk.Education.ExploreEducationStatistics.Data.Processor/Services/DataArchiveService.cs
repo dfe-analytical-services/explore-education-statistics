@@ -6,6 +6,7 @@ using GovUk.Education.ExploreEducationStatistics.Common.Model;
 using GovUk.Education.ExploreEducationStatistics.Common.Services.Interfaces;
 using GovUk.Education.ExploreEducationStatistics.Data.Processor.Services.Interfaces;
 using static GovUk.Education.ExploreEducationStatistics.Common.BlobContainerNames;
+using static GovUk.Education.ExploreEducationStatistics.Common.Model.FileType;
 using static GovUk.Education.ExploreEducationStatistics.Common.Services.FileStoragePathUtils;
 using static GovUk.Education.ExploreEducationStatistics.Common.Services.FileStorageUtils;
 
@@ -24,7 +25,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Processor.Services
 
         public async Task ExtractDataFiles(Guid releaseId, string zipFileName)
         {
-            var path = AdminReleasePath(releaseId, ReleaseFileTypes.DataZip, zipFileName.ToLower());
+            var path = AdminReleasePath(releaseId, DataZip, zipFileName.ToLower());
             var blob = await _blobStorageService.GetBlob(PrivateFilesContainerName, path);
 
             await using var zipBlobFileStream = await _blobStorageService.StreamBlob(PrivateFilesContainerName, path);
@@ -41,7 +42,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Processor.Services
                 await _fileStorageService.UploadStream(
                     releaseId: releaseId,
                     stream: stream,
-                    fileType: ReleaseFileTypes.Data,
+                    fileType: FileType.Data,
                     fileName: dataFile.Name.ToLower(),
                     contentType: "text/csv",
                     metaValues: GetDataFileMetaValues(
@@ -59,13 +60,11 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Processor.Services
                 await _fileStorageService.UploadStream(
                     releaseId: releaseId,
                     stream: stream,
-                    fileType: ReleaseFileTypes.Metadata,
+                    fileType: Metadata,
                     fileName: metadataFile.Name.ToLower(),
                     contentType: "text/csv",
                     metaValues: GetMetaDataFileMetaValues(
-                        dataFileName: dataFile.Name,
-                        userName: blob.GetUserName(),
-                        numberOfRows: CalculateNumberOfRows(rowStream)
+                        dataFileName: dataFile.Name
                     )
                 );
             }

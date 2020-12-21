@@ -1,0 +1,25 @@
+@import '~govuk-frontend/govuk/base';
+
+.formSelectRow {
+  align-items: flex-end;
+  display: flex;
+  flex-wrap: wrap;
+}
+
+.formSelectGroup {
+  flex-basis: calc(33% - #{govuk-spacing(2)});
+  margin-bottom: govuk-spacing(4);
+  margin-right: govuk-spacing(2);
+
+  @include govuk-media-query($until: tablet) {
+    flex-basis: calc(50% - #{govuk-spacing(2)});
+  }
+
+  @include govuk-media-query($until: mobile) {
+    flex-basis: 100%;
+  }
+
+  &:last-of-type {
+    margin-bottom: govuk-spacing(4);
+  }
+}

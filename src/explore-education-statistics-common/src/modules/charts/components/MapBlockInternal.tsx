@@ -8,10 +8,11 @@ import {
   ChartProps,
 } from '@common/modules/charts/types/chart';
 import { DataSetCategory } from '@common/modules/charts/types/dataSet';
+import { LegendConfiguration } from '@common/modules/charts/types/legend';
 import createDataSetCategories from '@common/modules/charts/util/createDataSetCategories';
-import getCategoryDataSetConfigurations, {
-  CategoryDataSetConfiguration,
-} from '@common/modules/charts/util/getCategoryDataSetConfigurations';
+import getDataSetCategoryConfigs, {
+  DataSetCategoryConfig,
+} from '@common/modules/charts/util/getDataSetCategoryConfigs';
 import {
   KeyStatColumn,
   KeyStatContainer,
@@ -94,7 +95,7 @@ function getDefaultDecimalPlaces(values: number[]): number {
 }
 
 function generateGeometryAndLegend(
-  selectedDataSetConfiguration: CategoryDataSetConfiguration,
+  selectedDataSetConfiguration: DataSetCategoryConfig,
   dataSetCategories: MapDataSetCategory[],
 ): {
   geometry: MapFeatureCollection;
@@ -215,6 +216,7 @@ export interface MapBlockProps extends ChartProps {
   position?: { lat: number; lng: number };
   maxBounds?: LatLngBounds;
   geographicId?: string;
+  legend: LegendConfiguration;
   axes: {
     major: AxisConfiguration;
   };
@@ -224,6 +226,7 @@ export const MapBlockInternal = ({
   id,
   data,
   meta,
+  legend,
   position = { lat: 53.00986, lng: -3.2524038 },
   width,
   height,
@@ -256,26 +259,24 @@ export const MapBlockInternal = ({
       .filter(category => !!category?.geoJson) as MapDataSetCategory[];
   }, [axisMajor, data, meta]);
 
-  const dataSetConfigurations = useMemo<
-    Dictionary<CategoryDataSetConfiguration>
-  >(
+  const dataSetCategoryConfigs = useMemo<Dictionary<DataSetCategoryConfig>>(
     () =>
       keyBy(
-        getCategoryDataSetConfigurations(dataSetCategories, axisMajor, meta),
+        getDataSetCategoryConfigs(dataSetCategories, legend.items, meta),
         dataSetConfig => dataSetConfig.dataKey,
       ),
-    [axisMajor, dataSetCategories, meta],
+    [dataSetCategories, legend, meta],
   );
 
   const dataSetOptions = useMemo<SelectOption[]>(() => {
     return orderBy(
-      Object.values(dataSetConfigurations).map(dataSet => ({
+      Object.values(dataSetCategoryConfigs).map(dataSet => ({
         label: dataSet.config.label,
         value: dataSet.dataKey,
       })),
       ['label'],
     );
-  }, [dataSetConfigurations]);
+  }, [dataSetCategoryConfigs]);
 
   const locationOptions = useMemo(() => {
     return orderBy(
@@ -295,10 +296,10 @@ export const MapBlockInternal = ({
   const [geometry, setGeometry] = useState<MapFeatureCollection>();
   const [ukGeometry, setUkGeometry] = useState<FeatureCollection>();
 
-  const [legend, setLegend] = useState<LegendEntry[]>([]);
+  const [legendEntries, setLegendEntries] = useState<LegendEntry[]>([]);
 
   const selectedDataSetConfiguration =
-    dataSetConfigurations[selectedDataSetKey];
+    dataSetCategoryConfigs[selectedDataSetKey];
 
   // initialise
   useEffect(() => {
@@ -334,20 +335,18 @@ export const MapBlockInternal = ({
     if (dataSetCategories.length && selectedDataSetConfiguration) {
       const {
         geometry: newGeometry,
-        legend: newLegend,
+        legend: newLegendEntries,
       } = generateGeometryAndLegend(
         selectedDataSetConfiguration,
         dataSetCategories,
       );
 
-      if (newGeometry && newLegend) {
-        setGeometry(newGeometry);
-        setLegend(newLegend);
-      }
+      setGeometry(newGeometry);
+      setLegendEntries(newLegendEntries);
     }
   }, [
     dataSetCategories,
-    dataSetConfigurations,
+    dataSetCategoryConfigs,
     meta,
     selectedDataSetConfiguration,
     selectedDataSetKey,
@@ -417,7 +416,7 @@ export const MapBlockInternal = ({
         if (feature.properties) {
           const items = Object.entries(feature.properties.dataSets).map(
             ([dataSetKey, dataSet]) => {
-              const dataSetConfig = dataSetConfigurations[dataSetKey];
+              const dataSetConfig = dataSetCategoryConfigs[dataSetKey];
 
               return (
                 `<li>` +
@@ -443,7 +442,7 @@ export const MapBlockInternal = ({
             `<p><strong data-testid="chartTooltip-label">${feature.properties.name}</strong></p>` +
             `<ul class="${
               styles.tooltipList
-            }" data-testid="chartTooltip-items">${items.join()}</ul>` +
+            }" data-testid="chartTooltip-items">${items.join('')}</ul>` +
             `</div>`
           );
         }
@@ -451,7 +450,7 @@ export const MapBlockInternal = ({
         return '';
       });
     },
-    [dataSetConfigurations],
+    [dataSetCategoryConfigs],
   );
 
   if (
@@ -553,7 +552,7 @@ export const MapBlockInternal = ({
               Key to {selectedDataSetConfiguration?.config?.label}
             </h3>
             <ul className="govuk-list">
-              {legend.map(({ min, max, colour }) => (
+              {legendEntries.map(({ min, max, colour }) => (
                 <li
                   key={`${min}-${max}-${colour}`}
                   className={styles.legend}
@@ -584,14 +583,14 @@ export const MapBlockInternal = ({
             <KeyStatContainer>
               {Object.entries(selectedFeature?.properties.dataSets).map(
                 ([dataSetKey, dataSet]) => {
-                  if (!dataSetConfigurations[dataSetKey]) {
+                  if (!dataSetCategoryConfigs[dataSetKey]) {
                     return null;
                   }
 
                   const {
                     config,
                     dataSet: expandedDataSet,
-                  } = dataSetConfigurations[dataSetKey];
+                  } = dataSetCategoryConfigs[dataSetKey];
 
                   return (
                     <KeyStatColumn key={dataSetKey} testId="mapBlock-indicator">

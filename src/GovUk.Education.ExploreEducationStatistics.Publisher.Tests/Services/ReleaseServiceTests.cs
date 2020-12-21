@@ -1,19 +1,27 @@
 using System;
 using System.Collections.Generic;
 using System.Linq;
+using System.Threading.Tasks;
+using GovUk.Education.ExploreEducationStatistics.Common.Model;
 using GovUk.Education.ExploreEducationStatistics.Content.Model;
 using GovUk.Education.ExploreEducationStatistics.Content.Model.Database;
+using GovUk.Education.ExploreEducationStatistics.Content.Model.Extensions;
 using GovUk.Education.ExploreEducationStatistics.Data.Model.Database;
 using GovUk.Education.ExploreEducationStatistics.Data.Model.Services.Interfaces;
 using GovUk.Education.ExploreEducationStatistics.Publisher.Model.ViewModels;
 using GovUk.Education.ExploreEducationStatistics.Publisher.Models;
 using GovUk.Education.ExploreEducationStatistics.Publisher.Services;
 using GovUk.Education.ExploreEducationStatistics.Publisher.Services.Interfaces;
-using Microsoft.EntityFrameworkCore;
+using Microsoft.Extensions.Logging;
 using Moq;
 using Xunit;
+using static GovUk.Education.ExploreEducationStatistics.Common.BlobContainerNames;
+using static GovUk.Education.ExploreEducationStatistics.Common.Model.FileType;
 using static GovUk.Education.ExploreEducationStatistics.Common.Model.TimeIdentifier;
+using static GovUk.Education.ExploreEducationStatistics.Common.Services.FileStoragePathUtils;
+using static GovUk.Education.ExploreEducationStatistics.Common.Services.FileStorageUtils;
 using static GovUk.Education.ExploreEducationStatistics.Common.Services.MapperUtils;
+using static GovUk.Education.ExploreEducationStatistics.Content.Model.Database.ContentDbUtils;
 using static GovUk.Education.ExploreEducationStatistics.Content.Model.ReleaseStatus;
 
 namespace GovUk.Education.ExploreEducationStatistics.Publisher.Tests.Services
@@ -46,6 +54,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Publisher.Tests.Services
             Id = Guid.NewGuid(),
             Title = "Publication A",
             Contact = Contact,
+            Slug  = "publication-a",
             Topic = Topic
         };
 
@@ -54,6 +63,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Publisher.Tests.Services
             Id = Guid.NewGuid(),
             Title = "Publication B",
             Contact = Contact,
+            Slug  = "publication-b",
             Topic = Topic
         };
 
@@ -78,6 +88,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Publisher.Tests.Services
                     Url = "http://example.com"
                 }
             },
+            Slug = "2018-19-q1",
             Published = new DateTime(2019, 1, 01),
             Status = Approved,
             Version = 0,
@@ -101,6 +112,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Publisher.Tests.Services
                     Url = "http://example.com"
                 }
             },
+            Slug = "2018-19-q1",
             Published = new DateTime(2019, 1, 01),
             Status = Approved,
             Version = 1,
@@ -124,6 +136,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Publisher.Tests.Services
                     Url = "http://example.com"
                 }
             },
+            Slug = "2018-19-q1",
             Published = new DateTime(2019, 1, 01),
             Status = Approved,
             Version = 2,
@@ -147,6 +160,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Publisher.Tests.Services
                     Url = "http://example.com"
                 }
             },
+            Slug = "2018-19-q2",
             Published = new DateTime(2019, 1, 01),
             Status = Approved,
             Version = 0,
@@ -161,6 +175,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Publisher.Tests.Services
             TimePeriodCoverage = AcademicYearQ3,
             MetaGuidance = "Release 3 Guidance",
             RelatedInformation = new List<Link>(),
+            Slug = "2018-19-q3",
             Published = null,
             Status = Approved,
             Version = 0,
@@ -180,6 +195,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Publisher.Tests.Services
                 PublicationId = PublicationA.Id,
                 ReleaseName = "2017",
                 TimePeriodCoverage = AcademicYearQ4,
+                Slug = "2017-18-q4",
                 Published = new DateTime(2019, 1, 01),
                 Status = Approved,
                 Version = 0,
@@ -191,6 +207,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Publisher.Tests.Services
                 PublicationId = PublicationA.Id,
                 ReleaseName = "2018",
                 TimePeriodCoverage = AcademicYearQ4,
+                Slug = "2018-19-q4",
                 Published = null,
                 Status = Draft,
                 Version = 0,
@@ -482,31 +499,210 @@ namespace GovUk.Education.ExploreEducationStatistics.Publisher.Tests.Services
             Release2KeyStatsDataBlock
         };
 
-        [Fact]
-        public void GetLatestRelease()
+        private static readonly ReleaseFile PublicationARelease2AncillaryReleaseFile = new ReleaseFile
         {
-            var builder = new DbContextOptionsBuilder<ContentDbContext>();
-            builder.UseInMemoryDatabase(databaseName: "LatestRelease");
-            var options = builder.Options;
-
-            var (fileStorageService, statisticsDbContext, releaseSubjectService) = Mocks();
-
-            using (var context = new ContentDbContext(options))
+            Release = PublicationARelease2,
+            File = new File
             {
-                context.AddRange(Publications);
-                context.AddRange(Releases);
-                context.SaveChanges();
+                Filename = "ancillary.pdf",
+                Release = PublicationARelease2,
+                Type = Ancillary
+            }
+        };
+
+        private static readonly ReleaseFile PublicationARelease2ChartReleaseFile = new ReleaseFile
+        {
+            Release = PublicationARelease2,
+            File = new File
+            {
+                Filename = "chart.png",
+                Release = PublicationARelease2,
+                Type = Chart
+            }
+        };
+
+        private static readonly ReleaseFile PublicationARelease2DataReleaseFile = new ReleaseFile
+        {
+            Release = PublicationARelease2,
+            File = new File
+            {
+                Filename = "data.csv",
+                Release = PublicationARelease2,
+                Type = FileType.Data
+            }
+        };
+
+        private static readonly List<ReleaseFile> ReleaseFiles = new List<ReleaseFile>
+        {
+            PublicationARelease2AncillaryReleaseFile,
+            PublicationARelease2ChartReleaseFile,
+            PublicationARelease2DataReleaseFile,
+            new ReleaseFile
+            {
+                Release = PublicationARelease2,
+                File = new File
+                {
+                    Filename = "data.meta.csv",
+                    Release = PublicationARelease2,
+                    Type = Metadata
+                }
+            }
+        };
+
+        [Fact]
+        public async Task GetDownloadFiles()
+        {
+            var contentDbContextId = Guid.NewGuid().ToString();
+
+            using (var contentDbContext = InMemoryContentDbContext(contentDbContextId))
+            {
+                await contentDbContext.AddRangeAsync(Publications);
+                await contentDbContext.AddRangeAsync(Releases);
+                await contentDbContext.AddRangeAsync(ReleaseFiles);
+                await contentDbContext.SaveChangesAsync();
             }
 
-            using (var contentDbContext = new ContentDbContext(options))
-            {
-                var service = new ReleaseService(contentDbContext,
-                    statisticsDbContext.Object,
-                    fileStorageService.Object,
-                    releaseSubjectService.Object,
-                    MapperForProfile<MappingProfiles>());
+            var fileStorageService = new Mock<IFileStorageService>(MockBehavior.Strict);
 
-                var result = service.GetLatestRelease(PublicationA.Id, Enumerable.Empty<Guid>());
+            using (var contentDbContext = InMemoryContentDbContext(contentDbContextId))
+            {
+                fileStorageService.Setup(s =>
+                        s.CheckBlobExists(PublicFilesContainerName,
+                            PublicationARelease2AncillaryReleaseFile.PublicPath()))
+                    .ReturnsAsync(true);
+
+                fileStorageService.Setup(s =>
+                        s.CheckBlobExists(PublicFilesContainerName,
+                            PublicationARelease2DataReleaseFile.PublicPath()))
+                    .ReturnsAsync(true);
+
+                fileStorageService.Setup(s =>
+                        s.CheckBlobExists(PublicFilesContainerName, 
+                            PublicReleaseAllFilesZipPath(PublicationA.Slug, PublicationARelease2.Slug)))
+                    .ReturnsAsync(true);
+
+                fileStorageService.Setup(s =>
+                        s.GetBlob(PublicFilesContainerName,
+                            PublicationARelease2AncillaryReleaseFile.PublicPath()))
+                    .ReturnsAsync(new BlobInfo
+                    (
+                        path: PublicationARelease2AncillaryReleaseFile.PublicPath(),
+                        size: "15 Kb",
+                        contentType: "application/pdf",
+                        contentLength: 0L,
+                        meta: GetAncillaryFileMetaValues(
+                            name: "Ancillary Test File",
+                            filename: "Ignored"),
+                        created: null
+                    ));
+
+                fileStorageService.Setup(s =>
+                        s.GetBlob(PublicFilesContainerName,
+                            PublicationARelease2DataReleaseFile.PublicPath()))
+                    .ReturnsAsync(new BlobInfo
+                    (
+                        path: PublicationARelease2DataReleaseFile.PublicPath(),
+                        size: "10 Mb",
+                        contentType: "text/csv",
+                        contentLength: 0L,
+                        meta: GetDataFileMetaValues(
+                            name: "Data Test File",
+                            metaFileName: "data.meta.csv",
+                            userName: "test@test.com",
+                            numberOfRows: 200),
+                        created: null
+                    ));
+
+                fileStorageService.Setup(s => s.GetBlob(PublicFilesContainerName,
+                        PublicReleaseAllFilesZipPath(PublicationA.Slug, PublicationARelease2.Slug)))
+                    .ReturnsAsync(new BlobInfo
+                    (
+                        path: PublicReleaseAllFilesZipPath(PublicationA.Slug, PublicationARelease2.Slug),
+                        size: "3 Mb",
+                        contentType: "application/x-zip-compressed",
+                        contentLength: 0L,
+                        meta: GetAllFilesZipMetaValues(
+                            name: "All files",
+                            releaseDateTime: DateTime.Now),
+                        created: null
+                    ));
+
+                var service = BuildReleaseService(contentDbContext: contentDbContext,
+                    fileStorageService: fileStorageService.Object);
+
+                var result = await service.GetDownloadFiles(PublicationARelease2);
+
+                fileStorageService.VerifyAll();
+
+                Assert.Equal(3, result.Count);
+                Assert.False(result[0].Id.HasValue);
+                Assert.Equal("zip", result[0].Extension);
+                Assert.Equal("publication-a_2018-19-q2.zip", result[0].FileName);
+                Assert.Equal("All files", result[0].Name);
+                Assert.Equal(PublicReleaseAllFilesZipPath(PublicationA.Slug, PublicationARelease2.Slug), result[0].Path);
+                Assert.Equal("3 Mb", result[0].Size);
+                Assert.Equal(Ancillary, result[0].Type);
+                Assert.Equal(PublicationARelease2AncillaryReleaseFile.File.Id, result[1].Id);
+                Assert.Equal("pdf", result[1].Extension);
+                Assert.Equal("ancillary.pdf", result[1].FileName);
+                Assert.Equal("Ancillary Test File", result[1].Name);
+                Assert.Equal(PublicationARelease2AncillaryReleaseFile.PublicPath(), result[1].Path);
+                Assert.Equal("15 Kb", result[1].Size);
+                Assert.Equal(Ancillary, result[1].Type);
+                Assert.Equal(PublicationARelease2DataReleaseFile.File.Id, result[2].Id);
+                Assert.Equal("csv", result[2].Extension);
+                Assert.Equal("data.csv", result[2].FileName);
+                Assert.Equal("Data Test File", result[2].Name);
+                Assert.Equal(PublicationARelease2DataReleaseFile.PublicPath(), result[2].Path);
+                Assert.Equal("10 Mb", result[2].Size);
+                Assert.Equal(FileType.Data, result[2].Type);
+            }
+        }
+
+        [Fact]
+        public async Task GetFiles()
+        {
+            var contentDbContextId = Guid.NewGuid().ToString();
+
+            using (var contentDbContext = InMemoryContentDbContext(contentDbContextId))
+            {
+                await contentDbContext.AddRangeAsync(Publications);
+                await contentDbContext.AddRangeAsync(Releases);
+                await contentDbContext.AddRangeAsync(ReleaseFiles);
+                await contentDbContext.SaveChangesAsync();
+            }
+
+            using (var contentDbContext = InMemoryContentDbContext(contentDbContextId))
+            {
+                var service = BuildReleaseService(contentDbContext);
+
+                var result = await service.GetFiles(PublicationARelease2.Id,
+                    Ancillary,
+                    Chart);
+
+                Assert.Equal(2, result.Count);
+                Assert.Equal(PublicationARelease2AncillaryReleaseFile.File.Id, result[0].Id);
+                Assert.Equal(PublicationARelease2ChartReleaseFile.File.Id, result[1].Id);
+            }
+        }
+
+        [Fact]
+        public async Task GetLatestRelease()
+        {
+            var contentDbContextId = Guid.NewGuid().ToString();
+
+            using (var contentDbContext = InMemoryContentDbContext(contentDbContextId))
+            {
+                await contentDbContext.AddRangeAsync(Publications);
+                await contentDbContext.AddRangeAsync(Releases);
+                await contentDbContext.SaveChangesAsync();
+            }
+
+            using (var contentDbContext = InMemoryContentDbContext(contentDbContextId))
+            {
+                var service = BuildReleaseService(contentDbContext);
+
+                var result = await service.GetLatestRelease(PublicationA.Id, Enumerable.Empty<Guid>());
 
                 Assert.Equal(PublicationARelease2.Id, result.Id);
                 Assert.Equal("Academic Year Q2 2018/19", result.Title);
@@ -514,34 +710,94 @@ namespace GovUk.Education.ExploreEducationStatistics.Publisher.Tests.Services
         }
 
         [Fact]
-        public void GetLatestReleaseViewModel()
+        public async Task GetLatestReleaseViewModel()
         {
-            var builder = new DbContextOptionsBuilder<ContentDbContext>();
-            builder.UseInMemoryDatabase(databaseName: "LatestReleaseViewModel");
-            var options = builder.Options;
+            var contentDbContextId = Guid.NewGuid().ToString();
 
-            var (fileStorageService, statisticsDbContext, releaseSubjectService) = Mocks();
-
-            using (var context = new ContentDbContext(options))
+            using (var contentDbContext = InMemoryContentDbContext(contentDbContextId))
             {
-                context.AddRange(Publications);
-                context.AddRange(Releases);
-                context.AddRange(ContentSections);
-                context.AddRange(ReleaseContentSections);
-                context.AddRange(ContentBlocks);
-                context.SaveChanges();
+                await contentDbContext.AddRangeAsync(Publications);
+                await contentDbContext.AddRangeAsync(Releases);
+                await contentDbContext.AddRangeAsync(ReleaseFiles);
+                await contentDbContext.AddRangeAsync(ContentSections);
+                await contentDbContext.AddRangeAsync(ReleaseContentSections);
+                await contentDbContext.AddRangeAsync(ContentBlocks);
+                await contentDbContext.SaveChangesAsync();
             }
 
-            using (var contentDbContext = new ContentDbContext(options))
+            var fileStorageService = new Mock<IFileStorageService>(MockBehavior.Strict);
+
+            using (var contentDbContext = InMemoryContentDbContext(contentDbContextId))
             {
-                var service = new ReleaseService(contentDbContext,
-                    statisticsDbContext.Object,
-                    fileStorageService.Object,
-                    releaseSubjectService.Object,
-                    MapperForProfile<MappingProfiles>());
+                fileStorageService.Setup(s =>
+                        s.CheckBlobExists(PublicFilesContainerName,
+                            PublicationARelease2AncillaryReleaseFile.PublicPath()))
+                    .ReturnsAsync(true);
+
+                fileStorageService.Setup(s =>
+                        s.CheckBlobExists(PublicFilesContainerName,
+                            PublicationARelease2DataReleaseFile.PublicPath()))
+                    .ReturnsAsync(true);
+
+                fileStorageService.Setup(s =>
+                        s.CheckBlobExists(PublicFilesContainerName, 
+                            PublicReleaseAllFilesZipPath(PublicationA.Slug, PublicationARelease2.Slug)))
+                    .ReturnsAsync(true);
+
+                fileStorageService.Setup(s =>
+                        s.GetBlob(PublicFilesContainerName,
+                            PublicationARelease2AncillaryReleaseFile.PublicPath()))
+                    .ReturnsAsync(new BlobInfo
+                    (
+                        path: PublicationARelease2AncillaryReleaseFile.PublicPath(),
+                        size: "15 Kb",
+                        contentType: "application/pdf",
+                        contentLength: 0L,
+                        meta: GetAncillaryFileMetaValues(
+                            name: "Ancillary Test File",
+                            filename: "Ignored"),
+                        created: null
+                    ));
+
+                fileStorageService.Setup(s =>
+                        s.GetBlob(PublicFilesContainerName,
+                            PublicationARelease2DataReleaseFile.PublicPath()))
+                    .ReturnsAsync(new BlobInfo
+                    (
+                        path: PublicationARelease2DataReleaseFile.PublicPath(),
+                        size: "10 Mb",
+                        contentType: "text/csv",
+                        contentLength: 0L,
+                        meta: GetDataFileMetaValues(
+                            name: "Data Test File",
+                            metaFileName: "data.meta.csv",
+                            userName: "test@test.com",
+                            numberOfRows: 200),
+                        created: null
+                    ));
+
+                fileStorageService.Setup(s => s.GetBlob(PublicFilesContainerName,
+                        PublicReleaseAllFilesZipPath(PublicationA.Slug, PublicationARelease2.Slug)))
+                    .ReturnsAsync(new BlobInfo
+                    (
+                        path: PublicReleaseAllFilesZipPath(PublicationA.Slug, PublicationARelease2.Slug),
+                        size: "3 Mb",
+                        contentType: "application/x-zip-compressed",
+                        contentLength: 0L,
+                        meta: GetAllFilesZipMetaValues(
+                            name: "All files",
+                            releaseDateTime: DateTime.Now),
+                        created: null
+                    ));
+
+                var service = BuildReleaseService(contentDbContext: contentDbContext,
+                    fileStorageService: fileStorageService.Object);
 
                 var result =
-                    service.GetLatestReleaseViewModel(PublicationA.Id, Enumerable.Empty<Guid>(), PublishContext());
+                    await service.GetLatestReleaseViewModel(PublicationA.Id, Enumerable.Empty<Guid>(),
+                        PublishContext());
+
+                fileStorageService.VerifyAll();
 
                 Assert.Equal(PublicationARelease2.Id, result.Id);
                 Assert.Equal("Academic Year Q2 2018/19", result.Title);
@@ -571,6 +827,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Publisher.Tests.Services
                     (summarySectionContent[2] as HtmlBlockViewModel)?.Body);
 
                 var content = result.Content;
+
                 Assert.NotNull(content);
                 Assert.Equal(3, content.Count);
 
@@ -592,6 +849,29 @@ namespace GovUk.Education.ExploreEducationStatistics.Publisher.Tests.Services
                 Assert.Equal(Release2Section1HtmlContentBlock1.Id, content[2].Content[2].Id);
                 Assert.Equal("<p>Release 2 section 1 order 2</p>", (content[2].Content[2] as HtmlBlockViewModel)?.Body);
 
+                Assert.Equal(3, result.DownloadFiles.Count);
+                Assert.False(result.DownloadFiles[0].Id.HasValue);
+                Assert.Equal("zip", result.DownloadFiles[0].Extension);
+                Assert.Equal("publication-a_2018-19-q2.zip", result.DownloadFiles[0].FileName);
+                Assert.Equal("All files", result.DownloadFiles[0].Name);
+                Assert.Equal(PublicReleaseAllFilesZipPath(PublicationA.Slug, PublicationARelease2.Slug), result.DownloadFiles[0].Path);
+                Assert.Equal("3 Mb", result.DownloadFiles[0].Size);
+                Assert.Equal(Ancillary, result.DownloadFiles[0].Type);
+                Assert.Equal(PublicationARelease2AncillaryReleaseFile.File.Id, result.DownloadFiles[1].Id);
+                Assert.Equal("pdf", result.DownloadFiles[1].Extension);
+                Assert.Equal("ancillary.pdf", result.DownloadFiles[1].FileName);
+                Assert.Equal("Ancillary Test File", result.DownloadFiles[1].Name);
+                Assert.Equal(PublicationARelease2AncillaryReleaseFile.PublicPath(), result.DownloadFiles[1].Path);
+                Assert.Equal("15 Kb", result.DownloadFiles[1].Size);
+                Assert.Equal(Ancillary, result.DownloadFiles[1].Type);
+                Assert.Equal(PublicationARelease2DataReleaseFile.File.Id, result.DownloadFiles[2].Id);
+                Assert.Equal("csv", result.DownloadFiles[2].Extension);
+                Assert.Equal("data.csv", result.DownloadFiles[2].FileName);
+                Assert.Equal("Data Test File", result.DownloadFiles[2].Name);
+                Assert.Equal(PublicationARelease2DataReleaseFile.PublicPath(), result.DownloadFiles[2].Path);
+                Assert.Equal("10 Mb", result.DownloadFiles[2].Size);
+                Assert.Equal(FileType.Data, result.DownloadFiles[2].Type);
+
                 Assert.Equal("Release 2 Guidance", result.MetaGuidance);
 
                 Assert.Single(result.RelatedInformation);
@@ -600,33 +880,50 @@ namespace GovUk.Education.ExploreEducationStatistics.Publisher.Tests.Services
         }
 
         [Fact]
-        public void GetReleaseViewModel()
+        public async Task GetReleaseViewModel()
         {
-            var builder = new DbContextOptionsBuilder<ContentDbContext>();
-            builder.UseInMemoryDatabase("ReleaseViewModel");
-            var options = builder.Options;
+            var contentDbContextId = Guid.NewGuid().ToString();
 
-            var (fileStorageService, statisticsDbContext, releaseSubjectService) = Mocks();
-
-            using (var context = new ContentDbContext(options))
+            using (var contentDbContext = InMemoryContentDbContext(contentDbContextId))
             {
-                context.AddRange(Publications);
-                context.AddRange(Releases);
-                context.AddRange(ContentSections);
-                context.AddRange(ReleaseContentSections);
-                context.AddRange(ContentBlocks);
-                context.SaveChanges();
+                await contentDbContext.AddRangeAsync(Publications);
+                await contentDbContext.AddRangeAsync(Releases);
+                await contentDbContext.AddRangeAsync(ReleaseFiles);
+                await contentDbContext.AddRangeAsync(ContentSections);
+                await contentDbContext.AddRangeAsync(ReleaseContentSections);
+                await contentDbContext.AddRangeAsync(ContentBlocks);
+                await contentDbContext.SaveChangesAsync();
             }
 
-            using (var contentDbContext = new ContentDbContext(options))
-            {
-                var service = new ReleaseService(contentDbContext,
-                    statisticsDbContext.Object,
-                    fileStorageService.Object,
-                    releaseSubjectService.Object,
-                    MapperForProfile<MappingProfiles>());
+            var fileStorageService = new Mock<IFileStorageService>(MockBehavior.Strict);
 
-                var result = service.GetReleaseViewModel(PublicationARelease1V1.Id, PublishContext());
+            fileStorageService.Setup(s =>
+                    s.CheckBlobExists(PublicFilesContainerName, 
+                        PublicReleaseAllFilesZipPath(PublicationA.Slug, PublicationARelease1V1.Slug)))
+                .ReturnsAsync(true);
+
+            fileStorageService.Setup(s => s.GetBlob(PublicFilesContainerName,
+                    PublicReleaseAllFilesZipPath(PublicationA.Slug, PublicationARelease1V1.Slug)))
+                .ReturnsAsync(new BlobInfo
+                (
+                    path: PublicReleaseAllFilesZipPath(PublicationA.Slug, PublicationARelease1V1.Slug),
+                    size: "0 b",
+                    contentType: "application/x-zip-compressed",
+                    contentLength: 0L,
+                    meta: GetAllFilesZipMetaValues(
+                        name: "All files",
+                        releaseDateTime: DateTime.Now),
+                    created: null
+                ));
+
+            using (var contentDbContext = InMemoryContentDbContext(contentDbContextId))
+            {
+                var service = BuildReleaseService(contentDbContext: contentDbContext,
+                    fileStorageService: fileStorageService.Object);
+
+                var result = await service.GetReleaseViewModel(PublicationARelease1V1.Id, PublishContext());
+
+                fileStorageService.VerifyAll();
 
                 Assert.Equal(PublicationARelease1V1.Id, result.Id);
                 Assert.Equal("Academic Year Q1 2018/19", result.Title);
@@ -677,6 +974,15 @@ namespace GovUk.Education.ExploreEducationStatistics.Publisher.Tests.Services
                 Assert.Equal(Release1Section1HtmlContentBlock1.Id, content[2].Content[2].Id);
                 Assert.Equal("<p>Release 1 section 1 order 2</p>", (content[2].Content[2] as HtmlBlockViewModel)?.Body);
 
+                Assert.Single(result.DownloadFiles);
+                Assert.False(result.DownloadFiles[0].Id.HasValue);
+                Assert.Equal("zip", result.DownloadFiles[0].Extension);
+                Assert.Equal("publication-a_2018-19-q1.zip", result.DownloadFiles[0].FileName);
+                Assert.Equal("All files", result.DownloadFiles[0].Name);
+                Assert.Equal(PublicReleaseAllFilesZipPath(PublicationA.Slug, PublicationARelease1V1.Slug), result.DownloadFiles[0].Path);
+                Assert.Equal("0 b", result.DownloadFiles[0].Size);
+                Assert.Equal(Ancillary, result.DownloadFiles[0].Type);
+
                 Assert.Equal("Release 1 v1 Guidance", result.MetaGuidance);
 
                 Assert.Single(result.RelatedInformation);
@@ -685,34 +991,51 @@ namespace GovUk.Education.ExploreEducationStatistics.Publisher.Tests.Services
         }
 
         [Fact]
-        public void GetReleaseViewModel_NotYetPublished()
+        public async Task GetReleaseViewModel_NotYetPublished()
         {
-            var builder = new DbContextOptionsBuilder<ContentDbContext>();
-            builder.UseInMemoryDatabase("ReleaseViewModel_NotYetPublished");
-            var options = builder.Options;
+            var contentDbContextId = Guid.NewGuid().ToString();
 
-            var (fileStorageService, statisticsDbContext, releaseSubjectService) = Mocks();
-
-            using (var context = new ContentDbContext(options))
+            using (var contentDbContext = InMemoryContentDbContext(contentDbContextId))
             {
-                context.AddRange(Publications);
-                context.AddRange(Releases);
-                context.AddRange(ContentSections);
-                context.AddRange(ReleaseContentSections);
-                context.AddRange(ContentBlocks);
-                context.SaveChanges();
+                await contentDbContext.AddRangeAsync(Publications);
+                await contentDbContext.AddRangeAsync(Releases);
+                await contentDbContext.AddRangeAsync(ReleaseFiles);
+                await contentDbContext.AddRangeAsync(ContentSections);
+                await contentDbContext.AddRangeAsync(ReleaseContentSections);
+                await contentDbContext.AddRangeAsync(ContentBlocks);
+                await contentDbContext.SaveChangesAsync();
             }
 
-            using (var contentDbContext = new ContentDbContext(options))
+            var fileStorageService = new Mock<IFileStorageService>(MockBehavior.Strict);
+
+            fileStorageService.Setup(s =>
+                    s.CheckBlobExists(PublicFilesContainerName, 
+                        PublicReleaseAllFilesZipPath(PublicationA.Slug, PublicationARelease3.Slug)))
+                .ReturnsAsync(true);
+
+            fileStorageService.Setup(s => s.GetBlob(PublicFilesContainerName,
+                    PublicReleaseAllFilesZipPath(PublicationA.Slug, PublicationARelease3.Slug)))
+                .ReturnsAsync(new BlobInfo
+                (
+                    path: PublicReleaseAllFilesZipPath(PublicationA.Slug, PublicationARelease3.Slug),
+                    size: "0 b",
+                    contentType: "application/x-zip-compressed",
+                    contentLength: 0L,
+                    meta: GetAllFilesZipMetaValues(
+                        name: "All files",
+                        releaseDateTime: DateTime.Now),
+                    created: null
+                ));
+
+            using (var contentDbContext = InMemoryContentDbContext(contentDbContextId))
             {
-                var service = new ReleaseService(contentDbContext,
-                    statisticsDbContext.Object,
-                    fileStorageService.Object,
-                    releaseSubjectService.Object,
-                    MapperForProfile<MappingProfiles>());
+                var service = BuildReleaseService(contentDbContext: contentDbContext,
+                    fileStorageService: fileStorageService.Object);
 
                 var context = PublishContext();
-                var result = service.GetReleaseViewModel(PublicationARelease3.Id, context);
+                var result = await service.GetReleaseViewModel(PublicationARelease3.Id, context);
+
+                fileStorageService.VerifyAll();
 
                 Assert.Equal(PublicationARelease3.Id, result.Id);
                 Assert.Equal("Academic Year Q3 2018/19", result.Title);
@@ -720,6 +1043,16 @@ namespace GovUk.Education.ExploreEducationStatistics.Publisher.Tests.Services
                 Assert.Null(result.KeyStatisticsSection);
                 Assert.Null(result.SummarySection);
                 Assert.Empty(result.Content);
+
+                Assert.Single(result.DownloadFiles);
+                Assert.False(result.DownloadFiles[0].Id.HasValue);
+                Assert.Equal("zip", result.DownloadFiles[0].Extension);
+                Assert.Equal("publication-a_2018-19-q3.zip", result.DownloadFiles[0].FileName);
+                Assert.Equal("All files", result.DownloadFiles[0].Name);
+                Assert.Equal(PublicReleaseAllFilesZipPath(PublicationA.Slug, PublicationARelease3.Slug), result.DownloadFiles[0].Path);
+                Assert.Equal("0 b", result.DownloadFiles[0].Size);
+                Assert.Equal(Ancillary, result.DownloadFiles[0].Type);
+
                 Assert.Equal("Release 3 Guidance", result.MetaGuidance);
                 Assert.Empty(result.RelatedInformation);
             }
@@ -731,14 +1064,19 @@ namespace GovUk.Education.ExploreEducationStatistics.Publisher.Tests.Services
             return new PublishContext(published, true);
         }
 
-        private static (Mock<IFileStorageService>,
-            Mock<StatisticsDbContext>,
-            Mock<IReleaseSubjectService>) Mocks()
+        private static ReleaseService BuildReleaseService(
+            ContentDbContext contentDbContext,
+            StatisticsDbContext statisticsDbContext = null,
+            IFileStorageService fileStorageService = null,
+            IReleaseSubjectService releaseSubjectService = null)
         {
-            return (
-                new Mock<IFileStorageService>(),
-                new Mock<StatisticsDbContext>(),
-                new Mock<IReleaseSubjectService>());
+            return new ReleaseService(
+                contentDbContext,
+                statisticsDbContext ?? new Mock<StatisticsDbContext>().Object,
+                fileStorageService ?? new Mock<IFileStorageService>().Object,
+                releaseSubjectService ?? new Mock<IReleaseSubjectService>().Object,
+                new Mock<ILogger<ReleaseService>>().Object,
+                MapperForProfile<MappingProfiles>());
         }
     }
 }

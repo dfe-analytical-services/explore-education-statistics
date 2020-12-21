@@ -177,14 +177,7 @@ Add public prerelease access list
     [Tags]  HappyPath
     user clicks link  Pre-release access
     user waits until h2 is visible  Manage pre-release user access
-
-    user clicks link  Public access list
-    user waits until h2 is visible  Public pre-release access list
-    user clicks button   Create public pre-release access list
-    user presses keys  CTRL+a+BACKSPACE
-    user presses keys  Test public access list
-    user clicks button  Save access list
-    user waits until element contains  css:[data-testid="publicPreReleaseAccessListPreview"]  Test public access list
+    user creates public prerelease access list  Test public access list
 
 Go to "Sign off" tab
     [Tags]  HappyPath
@@ -265,15 +258,16 @@ Verify release associated files
     ${downloads}=  user gets details content element  Download associated files
     user checks element should contain  ${downloads}  All files (zip, 3 Kb)
     user waits until element contains link  ${downloads}  All files
-    user checks link has url  All files  %{DATA_API_URL}/download/ui-tests-publish-release-${RUN_IDENTIFIER}/3000-01/ancillary/ui-tests-publish-release-${RUN_IDENTIFIER}_3000-01.zip   ${downloads}
+    user checks link has url  All files  %{CONTENT_API_URL}/download/ui-tests-publish-release-${RUN_IDENTIFIER}/3000-01/ancillary/ui-tests-publish-release-${RUN_IDENTIFIER}_3000-01.zip   ${downloads}
 
     user checks element should contain  ${downloads}  Dates test subject (csv, 17 Kb)
     user waits until element contains link  ${downloads}  Dates test subject
-    user checks link has url  Dates test subject  %{DATA_API_URL}/download/ui-tests-publish-release-${RUN_IDENTIFIER}/3000-01/data/dates.csv   ${downloads}
+    user checks link has url  Dates test subject  %{CONTENT_API_URL}/download/ui-tests-publish-release-${RUN_IDENTIFIER}/3000-01/data/dates.csv   ${downloads}
 
     user checks element should contain  ${downloads}  Test ancillary file 1 (txt, 12 B)
     user waits until element contains link  ${downloads}  Test ancillary file 1
-    user checks link has url  Test ancillary file 1  %{DATA_API_URL}/download/ui-tests-publish-release-${RUN_IDENTIFIER}/3000-01/ancillary/test-file-1.txt   ${downloads}
+    download file  link:Test ancillary file 1   test_ancillary_file_1.txt
+    downloaded file should have first line  test_ancillary_file_1.txt   Test file 1
 
 Verify public metadata guidance document
     [Tags]  HappyPath
@@ -527,10 +521,14 @@ Update data block chart for amendment
     user waits until page contains link  Chart
     user waits until page does not contain loading spinner
     user clicks element   id:manageDataBlocks-chart-tab
+    user waits until page contains element  id:chartConfigurationForm-title
     user enters text into element  id:chartConfigurationForm-title  Updated sample title
+    user checks textarea contains   id:chartConfigurationForm-title  Updated sample title
     user enters text into element  id:chartConfigurationForm-alt  Updated sample alt text
+    user checks textarea contains   id:chartConfigurationForm-alt    Updated sample alt text
     user clicks button   Save chart options
-    user waits until page contains  Chart preview
+    user waits until page does not contain loading spinner
+    user waits until page contains element   id:chartBuilderPreview
     user checks infographic chart contains alt  id:chartBuilderPreview  Updated sample alt text
 
 Navigate to 'Content' page for amendment
@@ -544,19 +542,21 @@ Update second accordion section text for amendment
     user opens accordion section  Test text
     user adds content to accordion section text block  Test text  1  Updated test text!
 
+Add release note to amendment
+    [Tags]  HappyPath
+    user clicks button   Add note
+    user enters text into element  id:createReleaseNoteForm-reason  Test release note one
+    user clicks button   Save note
+    user opens details dropdown  See all 1 updates  id:releaseLastUpdated
+    ${date}=  get current datetime   %-d %B %Y
+    user waits until element contains  css:#releaseNotes li:nth-of-type(1) time  ${date}
+    user waits until element contains  css:#releaseNotes li:nth-of-type(1) p     Test release note one
+
 Update public prerelease access list for amendment
     [Tags]  HappyPath
     user clicks link  Pre-release access
     user waits until h2 is visible  Manage pre-release user access
-
-    user clicks link  Public access list
-    user waits until h2 is visible  Public pre-release access list
-    user clicks button   Edit public pre-release access list
-    user presses keys  CTRL+a
-    user presses keys  BACKSPACE
-    user presses keys  Updated public access list
-    user clicks button  Save access list
-    user waits until element contains  css:[data-testid="publicPreReleaseAccessListPreview"]  Updated public access list
+    user updates public prerelease access list  Updated public access list
 
 Go to "Sign off" page again
     [Tags]  HappyPath
@@ -636,19 +636,21 @@ Verify amendment files
     ${downloads}=  user gets details content element  Download associated files
     user checks element should contain  ${downloads}  All files (zip, 3 Kb)
     user waits until element contains link  ${downloads}  All files
-    user checks link has url  All files  %{DATA_API_URL}/download/ui-tests-publish-release-${RUN_IDENTIFIER}/3000-01/ancillary/ui-tests-publish-release-${RUN_IDENTIFIER}_3000-01.zip   ${downloads}
+    user checks link has url  All files  %{CONTENT_API_URL}/download/ui-tests-publish-release-${RUN_IDENTIFIER}/3000-01/ancillary/ui-tests-publish-release-${RUN_IDENTIFIER}_3000-01.zip   ${downloads}
 
     user checks element should contain  ${downloads}  Dates test subject (csv, 17 Kb)
     user waits until element contains link  ${downloads}  Dates test subject
-    user checks link has url  Dates test subject  %{DATA_API_URL}/download/ui-tests-publish-release-${RUN_IDENTIFIER}/3000-01/data/dates-replacement.csv   ${downloads}
+    user checks link has url  Dates test subject  %{CONTENT_API_URL}/download/ui-tests-publish-release-${RUN_IDENTIFIER}/3000-01/data/dates-replacement.csv   ${downloads}
 
     user checks element should contain  ${downloads}  Test ancillary file 1 (txt, 12 B)
     user waits until element contains link  ${downloads}  Test ancillary file 1
-    user checks link has url  Test ancillary file 1  %{DATA_API_URL}/download/ui-tests-publish-release-${RUN_IDENTIFIER}/3000-01/ancillary/test-file-1.txt   ${downloads}
+    download file  link:Test ancillary file 1   test_ancillary_file_1.txt
+    downloaded file should have first line  test_ancillary_file_1.txt   Test file 1
 
     user checks element should contain  ${downloads}  Test ancillary file 2 (txt, 24 B)
     user waits until element contains link  ${downloads}  Test ancillary file 2
-    user checks link has url  Test ancillary file 2  %{DATA_API_URL}/download/ui-tests-publish-release-${RUN_IDENTIFIER}/3000-01/ancillary/test-file-2.txt   ${downloads}
+    download file  link:Test ancillary file 2   test_ancillary_file_2.txt
+    downloaded file should have first line  test_ancillary_file_2.txt   Test file 2
 
 Verify amendment public metadata guidance document
     [Tags]  HappyPath

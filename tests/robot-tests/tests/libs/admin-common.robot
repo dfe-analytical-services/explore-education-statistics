@@ -167,6 +167,27 @@ user approves methodology
     user waits until h2 is visible  Methodology status
     user checks page contains tag  Approved
 
+user creates public prerelease access list
+    [Arguments]  ${content}
+    user clicks link  Public access list
+    user waits until h2 is visible  Public pre-release access list
+    user clicks button   Create public pre-release access list
+    user presses keys  CTRL+a+BACKSPACE
+    user presses keys  ${content}
+    user clicks button  Save access list
+    user waits until element contains  css:[data-testid="publicPreReleaseAccessListPreview"]  ${content}
+
+user updates public prerelease access list
+    [Arguments]  ${content}
+    user clicks link  Public access list
+    user waits until h2 is visible  Public pre-release access list
+    user clicks button   Edit public pre-release access list
+    user presses keys  CTRL+a
+    user presses keys  BACKSPACE
+    user presses keys  ${content}
+    user clicks button  Save access list
+    user waits until element contains  css:[data-testid="publicPreReleaseAccessListPreview"]  ${content}
+
 user checks draft releases tab contains publication
     [Arguments]    ${publication_name}
     user checks page contains element   xpath://*[@id="draft-releases"]//h3[text()="${publication_name}"]
@@ -192,17 +213,20 @@ user checks scheduled releases tab publication has release
     user checks page contains element   xpath://*[@id="scheduled-releases"]//*[@data-testid="releaseByStatusTab ${publication_name}"]//*[contains(@data-testid, "${release_text}")]
 
 user clicks footnote checkbox
-    [Arguments]  ${label}
-    user waits until page contains element  xpath://*[@id="footnoteForm"]//label[text()="${label}"]/../input
-    page should contain checkbox  xpath://*[@id="footnoteForm"]//label[text()="${label}"]/../input
-    user scrolls to element   xpath://*[@id="footnoteForm"]//label[text()="${label}"]/../input
-    wait until element is enabled   xpath://*[@id="footnoteForm"]//label[text()="${label}"]/../input
-    user clicks element     xpath://*[@id="footnoteForm"]//label[text()="${label}"]/../input
+    [Arguments]  ${label}    ${parent}=css:body
+    user waits until parent contains element  ${parent}   xpath://*[@id="footnoteForm"]//label[text()="${label}"]/../input
+    ${checkbox}=  get child element  ${parent}    xpath://*[@id="footnoteForm"]//label[text()="${label}"]/../input
+    page should contain checkbox  ${checkbox}
+    user scrolls to element   ${checkbox}
+    wait until element is enabled   ${checkbox}
+    user clicks element     ${checkbox}
 
 user checks footnote checkbox is selected
-    [Arguments]  ${label}
-    wait until element is enabled   xpath://*[@id="footnoteForm"]//label[contains(text(), "${label}")]/../input
-    checkbox should be selected     xpath://*[@id="footnoteForm"]//label[contains(text(), "${label}")]/../input
+    [Arguments]  ${label}   ${parent}=css:body
+    user waits until parent contains element  ${parent}   xpath://*[@id="footnoteForm"]//label[contains(text(), "${label}")]/../input
+    ${checkbox}=  get child element   ${parent}   xpath://*[@id="footnoteForm"]//label[contains(text(), "${label}")]/../input
+    wait until element is enabled   ${checkbox}
+    checkbox should be selected     ${checkbox}
 
 user opens nth editable accordion section
     [Arguments]  ${section_num}  ${parent}=css:body

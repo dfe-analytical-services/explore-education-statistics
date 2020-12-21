@@ -1,4 +1,7 @@
+using System;
 using System.Threading.Tasks;
+using GovUk.Education.ExploreEducationStatistics.Admin.Controllers.Api.BAU;
+using GovUk.Education.ExploreEducationStatistics.Admin.Models;
 using GovUk.Education.ExploreEducationStatistics.Admin.Security;
 using GovUk.Education.ExploreEducationStatistics.Common.Model;
 using GovUk.Education.ExploreEducationStatistics.Common.Services.Interfaces.Security;
@@ -32,6 +35,11 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Services.Interfaces.S
         public static Task<Either<ActionResult, Unit>> CheckCanManageAllMethodologies(this IUserService userService)
         {
             return userService.DoCheck(SecurityPolicies.CanManageMethodologiesOnSystem);
+        }
+
+        public static Task<Either<ActionResult, Unit>> CheckCanViewAllImports(this IUserService userService)
+        {
+            return userService.DoCheck(SecurityPolicies.CanAccessAllImports);
         }
 
         public static Task<Either<ActionResult, Unit>> CheckCanViewAllMethodologies(this IUserService userService)
@@ -198,10 +206,10 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Services.Interfaces.S
             return userService.DoCheck(release, SecurityPolicies.CanMakeAmendmentOfSpecificRelease);
         }
 
-        public static Task<Either<ActionResult, Release>> CheckCanRunReleaseMigrations(
-            this IUserService userService, Release release)
+        public static Task<Either<ActionResult, Unit>> CheckCanRunMigrations(
+            this IUserService userService)
         {
-            return userService.DoCheck(release, SecurityPolicies.CanRunReleaseMigrations);
+            return userService.DoCheck(SecurityPolicies.CanRunReleaseMigrations);
         }
 
         public static Task<Either<ActionResult, Unit>> CheckCanViewPrereleaseContactsList(
@@ -234,6 +242,12 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Services.Interfaces.S
             return userService.DoCheck(comment, SecurityPolicies.CanUpdateSpecificComment);
         }
 
+        public static Task<Either<ActionResult, ReleaseFileImportInfo>> CheckCanCancelFileImport(
+            this IUserService userService, ReleaseFileImportInfo import)
+        {
+            return userService.DoCheck(import, SecurityPolicies.CanCancelOngoingImports);
+        }
+
         public static Task<Either<ActionResult, Publication>> CheckCanCreateLegacyRelease(
             this IUserService userService, Publication publication)
         {
@@ -256,6 +270,19 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Services.Interfaces.S
             this IUserService userService, LegacyRelease legacyRelease)
         {
             return userService.DoCheck(legacyRelease, SecurityPolicies.CanDeleteLegacyRelease);
+        }
+
+        public static async Task<DataFilePermissions> GetDataFilePermissions(this IUserService userService, 
+            Guid releaseId, string dataFileName)
+        {
+            return new DataFilePermissions
+            {
+                CanCancelImport = (await userService.CheckCanCancelFileImport(new ReleaseFileImportInfo
+                {
+                    ReleaseId = releaseId,
+                    DataFileName = dataFileName
+                })).IsRight
+            };
         }
 
         private static async Task<Either<ActionResult, T>> DoCheck<T>(this IUserService userService, T resource, SecurityPolicies policy)

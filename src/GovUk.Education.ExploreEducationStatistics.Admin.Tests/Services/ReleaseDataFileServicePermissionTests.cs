@@ -2,18 +2,18 @@
 using System.Collections.Generic;
 using GovUk.Education.ExploreEducationStatistics.Admin.Services;
 using GovUk.Education.ExploreEducationStatistics.Admin.Services.Interfaces;
-using GovUk.Education.ExploreEducationStatistics.Common.Model;
 using GovUk.Education.ExploreEducationStatistics.Common.Services.Interfaces;
 using GovUk.Education.ExploreEducationStatistics.Common.Services.Interfaces.Security;
 using GovUk.Education.ExploreEducationStatistics.Common.Utils;
 using GovUk.Education.ExploreEducationStatistics.Content.Model;
 using GovUk.Education.ExploreEducationStatistics.Content.Model.Database;
-using GovUk.Education.ExploreEducationStatistics.Data.Model.Services.Interfaces;
+using GovUk.Education.ExploreEducationStatistics.Data.Model.Database;
 using Microsoft.AspNetCore.Http;
 using Moq;
 using Xunit;
 using static GovUk.Education.ExploreEducationStatistics.Admin.Security.SecurityPolicies;
 using static GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services.PermissionTestUtil;
+using static GovUk.Education.ExploreEducationStatistics.Common.Model.FileType;
 
 namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
 {
@@ -61,10 +61,10 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
             var releaseFile = new ReleaseFile
             {
                 Release = _release,
-                ReleaseFileReference = new ReleaseFileReference
+                File = new File
                 {
                     Filename = "ancillary.pdf",
-                    ReleaseFileType = ReleaseFileTypes.Ancillary,
+                    Type = Ancillary,
                     Release = _release
                 }
             };
@@ -128,8 +128,8 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
                     {
                         var service = SetupReleaseDataFileService(userService: userService.Object);
                         return service.Upload(releaseId: _release.Id,
-                            dataFile: new Mock<IFormFile>().Object,
-                            metaFile: new Mock<IFormFile>().Object,
+                            dataFormFile: new Mock<IFormFile>().Object,
+                            metaFormFile: new Mock<IFormFile>().Object,
                             userName: "",
                             replacingFileId: null,
                             subjectName: "");
@@ -147,7 +147,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
                     {
                         var service = SetupReleaseDataFileService(userService: userService.Object);
                         return service.UploadAsZip(releaseId: _release.Id,
-                            zipFile: new Mock<IFormFile>().Object,
+                            zipFormFile: new Mock<IFormFile>().Object,
                             userName: "",
                             replacingFileId: null,
                             subjectName: "");
@@ -157,6 +157,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
 
         private ReleaseDataFileService SetupReleaseDataFileService(
             ContentDbContext contentDbContext = null,
+            StatisticsDbContext statisticsDbContext = null,
             IPersistenceHelper<ContentDbContext> contentPersistenceHelper = null,
             IBlobStorageService blobStorageService = null,
             IDataArchiveValidationService dataArchiveValidationService = null,
@@ -165,11 +166,11 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
             IReleaseFileRepository releaseFileRepository = null,
             IImportService importService = null,
             IImportStatusService importStatusService = null,
-            ISubjectService subjectService = null,
             IUserService userService = null)
         {
             return new ReleaseDataFileService(
                 contentDbContext ?? new Mock<ContentDbContext>().Object,
+                statisticsDbContext ?? new Mock<StatisticsDbContext>().Object,
                 contentPersistenceHelper ?? DefaultPersistenceHelperMock().Object,
                 blobStorageService ?? new Mock<IBlobStorageService>().Object,
                 dataArchiveValidationService ?? new Mock<IDataArchiveValidationService>().Object,
@@ -178,7 +179,6 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
                 releaseFileRepository ?? new ReleaseFileRepository(contentDbContext),
                 importService ?? new Mock<IImportService>().Object,
                 importStatusService ?? new Mock<IImportStatusService>().Object,
-                subjectService ?? new Mock<ISubjectService>().Object,
                 userService ?? new Mock<IUserService>().Object
             );
         }

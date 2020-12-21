@@ -1,10 +1,13 @@
 ﻿using System;
+using System.Collections.Generic;
+using System.Linq;
 using System.Threading.Tasks;
 using GovUk.Education.ExploreEducationStatistics.Admin.Services.Interfaces;
 using GovUk.Education.ExploreEducationStatistics.Common.Model;
 using GovUk.Education.ExploreEducationStatistics.Content.Model;
 using GovUk.Education.ExploreEducationStatistics.Content.Model.Database;
 using Microsoft.EntityFrameworkCore;
+using static GovUk.Education.ExploreEducationStatistics.Common.Model.FileType;
 
 namespace GovUk.Education.ExploreEducationStatistics.Admin.Services
 {
@@ -17,26 +20,28 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Services
             _contentDbContext = contentDbContext;
         }
 
-        public async Task<ReleaseFileReference> Create(Guid releaseId,
+        public async Task<File> Create(Guid releaseId,
             string filename,
-            ReleaseFileTypes type,
-            ReleaseFileReference replacingFile = null,
-            ReleaseFileReference source = null)
+            FileType type,
+            File replacingFile = null,
+            File source = null)
         {
-            if (type == ReleaseFileTypes.DataZip)
+            if (type == DataZip)
             {
-                throw new ArgumentException($"Cannot use generic Create method for type {ReleaseFileTypes.DataZip}",
+                throw new ArgumentException($"Cannot use generic Create method for type {DataZip}",
                     nameof(type));
             }
 
             var releaseFile = new ReleaseFile
             {
                 ReleaseId = releaseId,
-                ReleaseFileReference = new ReleaseFileReference
+                File = new File
                 {
                     ReleaseId = releaseId,
                     Filename = filename,
-                    ReleaseFileType = type,
+                    // Mark any new ancillary or chart files as already migrated while this flag temporarily exists 
+                    FilenameMigrated = type == Ancillary || type == Chart,
+                    Type = type,
                     Replacing = replacingFile,
                     Source = source
                 }
@@ -47,21 +52,21 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Services
             if (replacingFile != null)
             {
                 _contentDbContext.Update(replacingFile);
-                replacingFile.ReplacedBy = releaseFile.ReleaseFileReference;
+                replacingFile.ReplacedBy = releaseFile.File;
             }
 
             await _contentDbContext.SaveChangesAsync();
 
-            return created.ReleaseFileReference;
+            return created.File;
         }
 
-        public async Task<ReleaseFileReference> CreateZip(Guid releaseId, string filename)
+        public async Task<File> CreateZip(Guid releaseId, string filename)
         {
-            var file = (await _contentDbContext.ReleaseFileReferences.AddAsync(new ReleaseFileReference
+            var file = (await _contentDbContext.Files.AddAsync(new File
             {
                 ReleaseId = releaseId,
                 Filename = filename,
-                ReleaseFileType = ReleaseFileTypes.DataZip
+                Type = DataZip
             })).Entity;
 
             await _contentDbContext.SaveChangesAsync();
@@ -72,35 +77,73 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Services
         public async Task Delete(Guid id)
         {
             var file = await Get(id);
-            _contentDbContext.ReleaseFileReferences.Remove(file);
+            _contentDbContext.Files.Remove(file);
 
             await _contentDbContext.SaveChangesAsync();
         }
 
-        public async Task<ReleaseFileReference> Get(Guid id)
+        public async Task<File> Get(Guid id)
         {
-            return await _contentDbContext.ReleaseFileReferences
+            return await _contentDbContext.Files
                 .SingleAsync(f => f.Id == id);
         }
 
-        public async Task<ReleaseFileReference> UpdateFilename(Guid releaseId,
+        public async Task<File> UpdateFilename(Guid releaseId,
             Guid fileId,
             string filename)
         {
             // Ensure file is linked to the Release by getting the ReleaseFile first
             var releaseFile = await _contentDbContext.ReleaseFiles
-                .Include(rf => rf.ReleaseFileReference)
+                .Include(rf => rf.File)
                 .SingleAsync(rf =>
                     rf.ReleaseId == releaseId
-                    && rf.ReleaseFileReferenceId == fileId);
+                    && rf.FileId == fileId);
 
-            var file = releaseFile.ReleaseFileReference;
+            var file = releaseFile.File;
             _contentDbContext.Update(file);
             file.Filename = filename;
 
             await _contentDbContext.SaveChangesAsync();
 
             return file;
+        }
+
+        public async Task<IList<File>> ListDataFiles(Guid releaseId)
+        {
+            return await ListDataFilesQuery(releaseId).ToListAsync();
+        }
+
+        public async Task<bool> HasAnyDataFiles(Guid releaseId)
+        {
+            return await ListDataFilesQuery(releaseId).AnyAsync();
+        }
+
+        private IQueryable<File> ListDataFilesQuery(Guid releaseId)
+        {
+            return _contentDbContext
+                .ReleaseFiles
+                .Include(rf => rf.File)
+                .Where(
+                    rf => rf.ReleaseId == releaseId
+                          && rf.File.Type == FileType.Data
+                          && rf.File.ReplacingId == null
+                          && rf.File.SubjectId.HasValue
+                )
+                .Select(rf => rf.File);
+        }
+
+        public async Task<IList<File>> ListReplacementDataFiles(Guid releaseId)
+        {
+            return await _contentDbContext
+                .ReleaseFiles
+                .Include(rf => rf.File)
+                .Where(
+                    rf => rf.ReleaseId == releaseId
+                          && rf.File.Type == FileType.Data
+                          && rf.File.ReplacingId != null
+                )
+                .Select(rf => rf.File)
+                .ToListAsync();
         }
     }
 }

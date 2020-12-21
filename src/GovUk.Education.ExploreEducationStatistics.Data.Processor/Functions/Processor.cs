@@ -41,59 +41,64 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Processor.Functions
             [QueueTrigger("imports-pending")] ImportMessage message,
             ExecutionContext executionContext,
             [Queue("imports-pending")] ICollector<ImportMessage> importStagesMessageQueue,
-            [Queue("imports-available")] ICollector<ImportMessage> dataFileProcessingMessageQueue
+            [Queue("imports-available")] ICollector<ImportObservationsMessage> importObservationsMessageQueue
         )
         {
             try
             {
-                var status = await _importStatusService.GetImportStatus(message.Release.Id, message.OrigDataFileName);
+                var status = await _importStatusService.GetImportStatus(message.Release.Id, message.DataFileName);
 
                 _logger.LogInformation($"Processor Function processing import message for " +
-                                       $"{message.OrigDataFileName} at stage {status.Status}");
-                
-                if (status.Status == IStatus.QUEUED || status.Status == IStatus.PROCESSING_ARCHIVE_FILE)
+                                       $"{message.DataFileName} at stage {status.Status}");
+
+                switch (status.Status)
                 {
-                    if (message.ArchiveFileName != "")
+                    case IStatus.CANCELLING:
+                        _logger.LogInformation($"Import for {message.DataFileName} is in the process of being " +
+                                               $"cancelled, so not processing to the next import stage - marking as " +
+                                               $"CANCELLED");
+                        await _importStatusService.UpdateStatus(message.Release.Id, message.DataFileName, IStatus.CANCELLED,
+                            100);
+                        break;
+                    case IStatus.CANCELLED:
+                        _logger.LogInformation($"Import for {message.DataFileName} is cancelled, so not " +
+                                               $"processing any further");
+                        break;
+                    case IStatus.QUEUED:
+                    case IStatus.PROCESSING_ARCHIVE_FILE:
                     {
-                        _logger.LogInformation($"Unpacking archive for {message.OrigDataFileName}");
-                        await _processorService.ProcessUnpackingArchive(message);
+                        if (message.ArchiveFileName != "")
+                        {
+                            _logger.LogInformation($"Unpacking archive for {message.DataFileName}");
+                            await _processorService.ProcessUnpackingArchive(message);
+                        }
+
+                        await _importStatusService.UpdateStatus(message.Release.Id, message.DataFileName,
+                            IStatus.STAGE_1);
+                        importStagesMessageQueue.Add(message);
+                        break;
                     }
-
-                    await _importStatusService.UpdateStatus(message.Release.Id, message.OrigDataFileName,
-                        IStatus.STAGE_1);
-                    importStagesMessageQueue.Add(message);
-                    return;
-                }
-
-                if (status.Status == IStatus.STAGE_1)
-                {
-                    await _processorService.ProcessStage1(message, executionContext);
-                    await _importStatusService.UpdateStatus(message.Release.Id, message.OrigDataFileName,
-                        IStatus.STAGE_2);
-                    importStagesMessageQueue.Add(message);
-                    return;
-                }
-
-                if (status.Status == IStatus.STAGE_2)
-                {
-                    await _processorService.ProcessStage2(message);
-                    await _importStatusService.UpdateStatus(message.Release.Id, message.OrigDataFileName,
-                        IStatus.STAGE_3);
-                    importStagesMessageQueue.Add(message);
-                    return;
-                }
-
-                if (status.Status == IStatus.STAGE_3)
-                {
-                    await _processorService.ProcessStage3(message);
-                    await _importStatusService.UpdateStatus(message.Release.Id, message.OrigDataFileName,
-                        IStatus.STAGE_4);
-                    importStagesMessageQueue.Add(message);
-                }
-
-                if (status.Status == IStatus.STAGE_4)
-                {
-                    await _processorService.ProcessStage4Messages(message, dataFileProcessingMessageQueue);
+                    case IStatus.STAGE_1:
+                        await _processorService.ProcessStage1(message, executionContext);
+                        await _importStatusService.UpdateStatus(message.Release.Id, message.DataFileName,
+                            IStatus.STAGE_2);
+                        importStagesMessageQueue.Add(message);
+                        break;
+                    case IStatus.STAGE_2:
+                        await _processorService.ProcessStage2(message);
+                        await _importStatusService.UpdateStatus(message.Release.Id, message.DataFileName,
+                            IStatus.STAGE_3);
+                        importStagesMessageQueue.Add(message);
+                        break;
+                    case IStatus.STAGE_3:
+                        await _processorService.ProcessStage3(message);
+                        await _importStatusService.UpdateStatus(message.Release.Id, message.DataFileName,
+                            IStatus.STAGE_4);
+                        importStagesMessageQueue.Add(message);
+                        break;
+                    case IStatus.STAGE_4:
+                        await _processorService.ProcessStage4Messages(message, importObservationsMessageQueue);
+                        break;
                 }
             }
             catch (Exception e)
@@ -101,7 +106,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Processor.Functions
                 var ex = GetInnerException(e);
 
                 await _batchService.FailImport(message.Release.Id,
-                    message.OrigDataFileName,
+                    message.DataFileName,
                     new List<ValidationError>
                     {
                         new ValidationError(ex.Message)
@@ -114,7 +119,8 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Processor.Functions
         }
 
         [FunctionName("ImportObservations")]
-        public async Task ImportObservations([QueueTrigger("imports-available")] ImportMessage message)
+        public async Task ImportObservations(
+            [QueueTrigger("imports-available")] ImportObservationsMessage message)
         {
             try
             {
@@ -132,8 +138,8 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Processor.Functions
 
                 var ex = GetInnerException(e);
 
-                await _batchService.FailImport(message.Release.Id,
-                    message.OrigDataFileName,
+                await _batchService.FailImport(message.ReleaseId,
+                    message.DataFileName,
                     new List<ValidationError>
                     {
                         new ValidationError(ex.Message)
@@ -143,6 +149,17 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Processor.Functions
                                      $"{message.DataFileName} : {ex.Message}");
             }
         }
+
+        [FunctionName("CancelImports")]
+        public async void CancelImports(
+            [QueueTrigger("imports-cancelling")] CancelImportMessage message,
+            ExecutionContext executionContext
+        )
+        {
+            var currentStatus = await _importStatusService.GetImportStatus(message.ReleaseId, message.DataFileName);
+            await _importStatusService.UpdateStatus(message.ReleaseId, message.DataFileName, IStatus.CANCELLING, currentStatus.PercentageComplete);
+        }
+
 
         private static Exception GetInnerException(Exception ex)
         {

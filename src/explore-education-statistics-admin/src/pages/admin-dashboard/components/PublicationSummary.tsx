@@ -212,18 +212,18 @@ const PublicationSummary = ({ publication, onChangePublication }: Props) => {
       {amendReleaseId && (
         <ModalConfirm
           title="Confirm you want to amend this live release"
-          onConfirm={async () =>
-            releaseService
-              .createReleaseAmendment(amendReleaseId)
-              .then(amendment =>
-                history.push(
-                  generatePath<ReleaseRouteParams>(releaseSummaryRoute.path, {
-                    publicationId: id,
-                    releaseId: amendment.id,
-                  }),
-                ),
-              )
-          }
+          onConfirm={async () => {
+            const amendment = await releaseService.createReleaseAmendment(
+              amendReleaseId,
+            );
+
+            history.push(
+              generatePath<ReleaseRouteParams>(releaseSummaryRoute.path, {
+                publicationId: id,
+                releaseId: amendment.id,
+              }),
+            );
+          }}
           onExit={() => setAmendReleaseId(undefined)}
           onCancel={() => setAmendReleaseId(undefined)}
           mounted

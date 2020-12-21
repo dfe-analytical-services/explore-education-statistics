@@ -15,10 +15,9 @@ namespace GovUk.Education.ExploreEducationStatistics.Common.Model.Chart
         int Height { get; set; }
         int? Width { get; set; }
 
-        // Deprecated
-        // TODO: Remove in EES-1600
-        Dictionary<string, ChartLabelConfiguration>? Labels { get; set; }
         Dictionary<string, ChartAxisConfiguration>? Axes { get; set; }
+        public ChartLegend? Legend { get; set; }
+
     }
 
     public abstract class Chart : IChart
@@ -30,28 +29,20 @@ namespace GovUk.Education.ExploreEducationStatistics.Common.Model.Chart
 
         public abstract ChartType Type { get; }
 
-        // Deprecated
-        // TODO: Remove in EES-1600
-        public Dictionary<string, ChartLabelConfiguration>? Labels { get; set; }
         public Dictionary<string, ChartAxisConfiguration>? Axes { get; set; }
+        public ChartLegend? Legend { get; set; }
     }
 
     public class LineChart : Chart
     {
         public override ChartType Type => Line;
-
-        public ChartLegendPosition Legend;
-        public int LegendHeight { get; set; }
     }
 
     public class HorizontalBarChart : Chart
     {
         public override ChartType Type => HorizontalBar;
 
-        public ChartLegendPosition Legend;
-        public int LegendHeight { get; set; }
         public int? BarThickness { get; set; }
-
         public bool Stacked;
     }
 
@@ -59,10 +50,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Common.Model.Chart
     {
         public override ChartType Type => VerticalBar;
 
-        public ChartLegendPosition Legend;
-        public int LegendHeight { get; set; }
         public int? BarThickness { get; set; }
-
         public bool Stacked;
     }
 

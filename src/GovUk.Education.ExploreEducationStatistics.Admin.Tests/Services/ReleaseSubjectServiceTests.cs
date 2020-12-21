@@ -32,14 +32,24 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
 
             await using (var statisticsDbContext = StatisticsDbUtils.InMemoryStatisticsDbContext(contextId))
             {
-                var service = BuildReleaseSubjectService(statisticsDbContext);
+                var subjectDeleter = new Mock<ReleaseSubjectService.SubjectDeleter>();
+
+                subjectDeleter
+                    .Setup(
+                        s =>
+                            s.Delete(
+                                It.Is<Subject>(subject => subject.Id == releaseSubject.SubjectId),
+                                It.IsAny<StatisticsDbContext>()
+                            )
+                    );
+
+                var service = BuildReleaseSubjectService(statisticsDbContext, subjectDeleter: subjectDeleter.Object);
                 await service.DeleteReleaseSubject(releaseSubject.ReleaseId, releaseSubject.SubjectId);
             }
 
             await using (var statisticsDbContext = StatisticsDbUtils.InMemoryStatisticsDbContext(contextId))
             {
                 Assert.Empty(statisticsDbContext.ReleaseSubject.ToList());
-                Assert.Empty(statisticsDbContext.Subject.IgnoreQueryFilters().ToList());
             }
         }
 
@@ -183,14 +193,33 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
 
             await using (var statisticsDbContext = StatisticsDbUtils.InMemoryStatisticsDbContext(contextId))
             {
-                var service = BuildReleaseSubjectService(statisticsDbContext);
+                var subjectDeleter = new Mock<ReleaseSubjectService.SubjectDeleter>();
+
+                subjectDeleter
+                    .Setup(
+                        s =>
+                            s.Delete(
+                                It.Is<Subject>(subject => subject.Id == releaseSubject1.SubjectId),
+                                It.IsAny<StatisticsDbContext>()
+                            )
+                    );
+                subjectDeleter
+                    .Setup(
+                        s => s.Delete(
+                            It.Is<Subject>(subject => subject.Id == releaseSubject2.SubjectId),
+                            It.IsAny<StatisticsDbContext>()
+                        )
+                    );
+
+                var service = BuildReleaseSubjectService(statisticsDbContext, subjectDeleter: subjectDeleter.Object);
                 await service.DeleteAllReleaseSubjects(release.Id);
+
+                MockUtils.VerifyAllMocks(subjectDeleter);
             }
 
             await using (var statisticsDbContext = StatisticsDbUtils.InMemoryStatisticsDbContext(contextId))
             {
                 Assert.Empty(statisticsDbContext.ReleaseSubject.ToList());
-                Assert.Empty(statisticsDbContext.Subject.IgnoreQueryFilters().ToList());
             }
         }
 
@@ -240,11 +269,13 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
 
         private ReleaseSubjectService BuildReleaseSubjectService(
             StatisticsDbContext statisticsDbContext,
-            IFootnoteService footnoteService = null)
+            IFootnoteRepository footnoteRepository = null,
+            ReleaseSubjectService.SubjectDeleter subjectDeleter = null)
         {
             return new ReleaseSubjectService(
                 statisticsDbContext,
-                footnoteService ?? new Mock<IFootnoteService>().Object
+                footnoteRepository ?? new Mock<IFootnoteRepository>().Object,
+                subjectDeleter ?? new Mock<ReleaseSubjectService.SubjectDeleter>().Object
             );
         }
     }

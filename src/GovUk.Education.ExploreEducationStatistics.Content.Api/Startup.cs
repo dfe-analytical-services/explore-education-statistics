@@ -5,6 +5,7 @@ using GovUk.Education.ExploreEducationStatistics.Common.Services.Interfaces;
 using GovUk.Education.ExploreEducationStatistics.Common.Utils;
 using GovUk.Education.ExploreEducationStatistics.Content.Api.Services;
 using GovUk.Education.ExploreEducationStatistics.Content.Api.Services.Interfaces;
+using GovUk.Education.ExploreEducationStatistics.Content.Model.Database;
 using GovUk.Education.ExploreEducationStatistics.Data.Model.Database;
 using GovUk.Education.ExploreEducationStatistics.Data.Model.Services;
 using GovUk.Education.ExploreEducationStatistics.Data.Model.Services.Interfaces;
@@ -52,6 +53,13 @@ namespace GovUk.Education.ExploreEducationStatistics.Content.Api
                 options
                     .UseSqlServer(Configuration.GetConnectionString("StatisticsDb"),
                         builder => builder.MigrationsAssembly("GovUk.Education.ExploreEducationStatistics.Data.Model"))
+                    .EnableSensitiveDataLogging(HostEnvironment.IsDevelopment())
+            );
+
+            services.AddDbContext<ContentDbContext>(options =>
+                options
+                    .UseSqlServer(Configuration.GetConnectionString("ContentDb"),
+                        builder => builder.MigrationsAssembly(typeof(Startup).Assembly.FullName))
                     .EnableSensitiveDataLogging(HostEnvironment.IsDevelopment())
             );
 

@@ -21,7 +21,7 @@ export interface Release {
   contact: ContactDetails;
   publishScheduled?: string;
   published?: string;
-  nextReleaseDate: PartialDate;
+  nextReleaseDate?: PartialDate;
   internalReleaseNote?: string;
   previousVersionId: string;
   preReleaseAccessList: string;
@@ -68,6 +68,7 @@ export interface UpdateReleaseRequest extends BaseReleaseRequest {
   status: ReleaseApprovalStatus;
   internalReleaseNote?: string;
   publishScheduled?: string;
+  publishMethod?: 'Scheduled' | 'Immediate';
   nextReleaseDate?: PartialDate;
   preReleaseAccessList?: string;
 }
@@ -107,6 +108,39 @@ export interface ReleaseStageStatuses {
   publishingStage?: PublishingStage;
   overallStage: OverallStage;
   lastUpdated?: string;
+}
+
+export type ReleaseChecklistError =
+  | {
+      code:
+        | 'DataFileImportsMustBeCompleted'
+        | 'DataFileReplacementsMustBeCompleted'
+        | 'PublicMetaGuidanceRequired'
+        | 'PublicPreReleaseAccessListRequired'
+        | 'ReleaseNoteRequired';
+    }
+  | {
+      code: 'MethodologyMustBeApproved';
+      methodologyId: string;
+    };
+
+export type ReleaseChecklistWarning =
+  | {
+      code:
+        | 'NoMethodology'
+        | 'NoNextReleaseDate'
+        | 'NoDataFiles'
+        | 'NoTableHighlights';
+    }
+  | {
+      code: 'NoFootnotesOnSubjects';
+      totalSubjects: number;
+    };
+
+export interface ReleaseChecklist {
+  valid: boolean;
+  errors: ReleaseChecklistError[];
+  warnings: ReleaseChecklistWarning[];
 }
 
 export interface ReleasePublicationStatus {
@@ -157,6 +191,10 @@ const releaseService = {
 
   getReleaseStatus(releaseId: string): Promise<ReleaseStageStatuses> {
     return client.get<ReleaseStageStatuses>(`/releases/${releaseId}/status`);
+  },
+
+  getReleaseChecklist(releaseId: string): Promise<ReleaseChecklist> {
+    return client.get(`/releases/${releaseId}/checklist`);
   },
 
   createReleaseAmendment(releaseId: string): Promise<ReleaseSummary> {

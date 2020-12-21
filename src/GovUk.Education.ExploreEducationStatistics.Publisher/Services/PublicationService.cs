@@ -5,11 +5,12 @@ using System.Threading.Tasks;
 using AutoMapper;
 using GovUk.Education.ExploreEducationStatistics.Content.Model;
 using GovUk.Education.ExploreEducationStatistics.Content.Model.Database;
+using GovUk.Education.ExploreEducationStatistics.Content.Model.Extensions;
 using GovUk.Education.ExploreEducationStatistics.Data.Model.Database;
 using GovUk.Education.ExploreEducationStatistics.Publisher.Model.ViewModels;
 using GovUk.Education.ExploreEducationStatistics.Publisher.Services.Interfaces;
 using Microsoft.EntityFrameworkCore;
-using static GovUk.Education.ExploreEducationStatistics.Publisher.Utils.PublisherUtils;
+using static GovUk.Education.ExploreEducationStatistics.Publisher.Extensions.PublisherExtensions;
 
 namespace GovUk.Education.ExploreEducationStatistics.Publisher.Services
 {
@@ -48,7 +49,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Publisher.Services
                 .SingleOrDefaultAsync(p => p.Id == id);
 
             var publicationViewModel = _mapper.Map<CachedPublicationViewModel>(publication);
-            var latestRelease = _releaseService.GetLatestRelease(publication.Id, includedReleaseIds);
+            var latestRelease = await _releaseService.GetLatestRelease(publication.Id, includedReleaseIds);
             publicationViewModel.LatestReleaseId = latestRelease.Id;
             publicationViewModel.Releases = GetReleaseViewModels(id, includedReleaseIds);
             return publicationViewModel;
@@ -67,15 +68,12 @@ namespace GovUk.Education.ExploreEducationStatistics.Publisher.Services
                 .ToList();
         }
 
-        public IEnumerable<Publication> ListPublicationsWithPublishedReleases()
+        public List<Publication> GetPublicationsWithPublishedReleases()
         {
             return _contentDbContext.Publications
                 .Include(publication => publication.Releases)
                 .ToList()
-                .Where(
-                    publication =>
-                        publication.Releases.Any(release => IsReleasePublished(release, Enumerable.Empty<Guid>()))
-                )
+                .Where(p => p.Releases.Any(release => release.IsLatestPublishedVersionOfRelease()))
                 .ToList();
         }
 
@@ -150,7 +148,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Publisher.Services
         {
             // Ignore any legacyPublicationUrl once the Publication has Releases
             var legacyPublicationUrlIgnored =
-                publication.Releases.Any(release => IsReleasePublished(release, includedReleaseIds));
+                publication.Releases.Any(release => release.IsReleasePublished(includedReleaseIds));
             var legacyPublicationUrl =
                 legacyPublicationUrlIgnored ? null : publication.LegacyPublicationUrl?.ToString();
 
@@ -172,7 +170,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Publisher.Services
                 .Include(r => r.Publication)
                 .Where(release => release.PublicationId == publicationId)
                 .ToList()
-                .Where(release => IsLatestVersionOfRelease(release.Publication.Releases, release, includedReleaseIds))
+                .Where(release => release.IsReleasePublished(includedReleaseIds))
                 .OrderByDescending(release => release.Year)
                 .ThenByDescending(release => release.TimePeriodCoverage);
             return _mapper.Map<List<ReleaseTitleViewModel>>(releases);
@@ -191,7 +189,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Publisher.Services
         private static bool IsPublicationPublished(Publication publication, IEnumerable<Guid> includedReleaseIds)
         {
             return !string.IsNullOrEmpty(publication.LegacyPublicationUrl?.ToString()) ||
-                   publication.Releases.Any(release => IsReleasePublished(release, includedReleaseIds));
+                   publication.Releases.Any(release => release.IsReleasePublished(includedReleaseIds));
         }
     }
 }

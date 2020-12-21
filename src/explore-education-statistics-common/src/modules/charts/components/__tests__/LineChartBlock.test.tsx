@@ -6,6 +6,7 @@ import { expectTicks } from '@common/modules/charts/components/__tests__/testUti
 import LineChartBlock, {
   LineChartProps,
 } from '@common/modules/charts/components/LineChartBlock';
+import { LegendConfiguration } from '@common/modules/charts/types/legend';
 import { FullTableMeta } from '@common/modules/table-tool/types/fullTable';
 import mapFullTable from '@common/modules/table-tool/utils/mapFullTable';
 import { TableDataResult } from '@common/services/tableBuilderService';
@@ -19,6 +20,7 @@ describe('LineChartBlock', () => {
   const props: LineChartProps = {
     ...testChartConfiguration,
     axes: testChartConfiguration.axes as LineChartProps['axes'],
+    legend: testChartConfiguration.legend as LegendConfiguration,
     meta: fullTable.subjectMeta,
     data: fullTable.results,
   };
@@ -54,9 +56,9 @@ describe('LineChartBlock', () => {
       ).toBeInTheDocument();
 
       const legendItems = container.querySelectorAll('.recharts-legend-item');
-      expect(legendItems[0]).toHaveTextContent('Unauthorised absence rate');
-      expect(legendItems[1]).toHaveTextContent('Authorised absence rate');
-      expect(legendItems[2]).toHaveTextContent('Overall absence rate');
+      expect(legendItems[0]).toHaveTextContent('Authorised absence rate');
+      expect(legendItems[1]).toHaveTextContent('Overall absence rate');
+      expect(legendItems[2]).toHaveTextContent('Unauthorised absence rate');
 
       // expect there to be lines for all 3 data sets
       expect(container.querySelectorAll('.recharts-line')).toHaveLength(3);
@@ -129,7 +131,15 @@ describe('LineChartBlock', () => {
   });
 
   test('can hide legend', () => {
-    const { container } = render(<LineChartBlock {...props} legend="none" />);
+    const { container } = render(
+      <LineChartBlock
+        {...props}
+        legend={{
+          ...props.legend,
+          position: 'none',
+        }}
+      />,
+    );
 
     expect(
       container.querySelector('.recharts-default-legend'),
@@ -140,26 +150,26 @@ describe('LineChartBlock', () => {
     const { container } = render(
       <LineChartBlock
         {...props}
-        axes={{
-          ...axes,
-          major: {
-            ...axes.major,
-            dataSets: [
-              {
+        legend={{
+          ...props.legend,
+          items: [
+            {
+              dataSet: {
                 indicator: 'unauthorised-absence-rate',
                 filters: ['characteristic-total', 'school-type-total'],
-                config: {
-                  label: 'Unauthorised absence rate',
-                  unit: '%',
-                  colour: '#4763a5',
-                  symbol: 'circle',
-                  lineStyle: 'dashed',
+                location: {
+                  level: 'country',
+                  value: 'england',
                 },
               },
-              props.axes.major.dataSets[1],
-              props.axes.major.dataSets[2],
-            ],
-          },
+              label: 'Unauthorised absence rate',
+              colour: '#4763a5',
+              symbol: 'circle',
+              lineStyle: 'dashed',
+            },
+            props.legend.items[1],
+            props.legend.items[2],
+          ],
         }}
       />,
     );
@@ -173,26 +183,26 @@ describe('LineChartBlock', () => {
     const { container } = render(
       <LineChartBlock
         {...props}
-        axes={{
-          ...axes,
-          major: {
-            ...axes.major,
-            dataSets: [
-              {
+        legend={{
+          ...props.legend,
+          items: [
+            {
+              dataSet: {
                 indicator: 'unauthorised-absence-rate',
                 filters: ['characteristic-total', 'school-type-total'],
-                config: {
-                  label: 'Unauthorised absence rate',
-                  unit: '%',
-                  colour: '#4763a5',
-                  symbol: 'circle',
-                  lineStyle: 'dotted',
+                location: {
+                  level: 'country',
+                  value: 'england',
                 },
               },
-              props.axes.major.dataSets[1],
-              props.axes.major.dataSets[2],
-            ],
-          },
+              label: 'Unauthorised absence rate',
+              colour: '#4763a5',
+              symbol: 'circle',
+              lineStyle: 'dotted',
+            },
+            props.legend.items[1],
+            props.legend.items[2],
+          ],
         }}
       />,
     );
@@ -218,7 +228,6 @@ describe('LineChartBlock', () => {
             ],
           },
         }}
-        legend="none"
       />,
     );
 
@@ -245,7 +254,6 @@ describe('LineChartBlock', () => {
             ],
           },
         }}
-        legend="none"
       />,
     );
 
@@ -258,6 +266,7 @@ describe('LineChartBlock', () => {
     const invalidData = (undefined as unknown) as TableDataResult[];
     const invalidMeta = (undefined as unknown) as FullTableMeta;
     const invalidAxes = (undefined as unknown) as LineChartProps['axes'];
+    const invalidLegend = (undefined as unknown) as LegendConfiguration;
 
     const { container } = render(
       <LineChartBlock
@@ -267,6 +276,7 @@ describe('LineChartBlock', () => {
         data={invalidData}
         meta={invalidMeta}
         axes={invalidAxes}
+        legend={invalidLegend}
       />,
     );
     expect(container).toHaveTextContent('Unable to render chart');

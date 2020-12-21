@@ -83,11 +83,11 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Processor.Services
         };
         
         public async Task<Either<IEnumerable<ValidationError>, ProcessorStatistics>>
-            Validate(Guid releaseId, SubjectData subjectData, ExecutionContext executionContext, ImportMessage message)
+            Validate(SubjectData subjectData, ExecutionContext executionContext, ImportMessage message)
         {
-            _logger.LogInformation($"Validating: {message.OrigDataFileName}");
+            _logger.LogInformation($"Validating: {message.DataFileName}");
 
-            await _importStatusService.UpdateStatus(message.Release.Id, message.OrigDataFileName, IStatus.STAGE_1);
+            await _importStatusService.UpdateStatus(message.Release.Id, message.DataFileName, IStatus.STAGE_1);
 
             return await ValidateCsvFile(subjectData.DataBlob, false)
                 .OnSuccessDo(async () => await ValidateCsvFile(subjectData.MetaBlob, true))
@@ -106,12 +106,12 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Processor.Services
                             .OnSuccess(
                                 () =>
                                     ValidateAndCountObservations(dataFileTable.Columns, dataFileTable.Rows,
-                                            executionContext, message.Release.Id, message.OrigDataFileName)
+                                            executionContext, message.Release.Id, message.DataFileName)
                                         .OnSuccess(
                                             result =>
                                             {
                                                 _logger.LogInformation(
-                                                    $"Validating: {message.OrigDataFileName} complete");
+                                                    $"Validating: {message.DataFileName} complete");
                                                 return result;
                                             }
                                         )
@@ -239,7 +239,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Processor.Services
                 DataRowCollection rows,
                 ExecutionContext executionContext,
                 Guid releaseId,
-                string origDataFileName)
+                string dataFileName)
         {
             var idx = 0;
             var filteredRows = 0;
@@ -280,7 +280,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Processor.Services
                 if (totalRowCount % STAGE_1_ROW_CHECK == 0)
                 {
                     await _importStatusService.UpdateStatus(releaseId,
-                        origDataFileName,
+                        dataFileName,
                         IStatus.STAGE_1,
                         (double) totalRowCount / dataRows * 100);
                 }
@@ -292,7 +292,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Processor.Services
             }
 
             await _importStatusService.UpdateStatus(releaseId,
-                origDataFileName,
+                dataFileName,
                 IStatus.STAGE_1,
                 100);
 
@@ -327,7 +327,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Processor.Services
 
             var hasMatchingMimeType = await _fileTypeService.HasMatchingMimeType(
                 mimeTypeStream,
-                AllowedMimeTypesByFileType[ReleaseFileTypes.Data]
+                AllowedMimeTypesByFileType[FileType.Data]
             );
 
             if (!hasMatchingMimeType)

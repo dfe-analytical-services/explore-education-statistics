@@ -30,8 +30,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Services
         private readonly IPersistenceHelper<ContentDbContext> _contentPersistenceHelper;
         private readonly IPersistenceHelper<StatisticsDbContext> _statisticsPersistenceHelper;
         private readonly IUserService _userService;
-        private readonly GovUk.Education.ExploreEducationStatistics.Data.Model.Services.Interfaces.IFootnoteService
-            _commonFootnoteService;
+        private readonly IFootnoteRepository _footnoteRepository;
 
         public FootnoteService(
             StatisticsDbContext context,
@@ -42,10 +41,10 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Services
             ISubjectService subjectService,
             IPersistenceHelper<ContentDbContext> contentPersistenceHelper,
             IUserService userService,
-            GovUk.Education.ExploreEducationStatistics.Data.Model.Services.Interfaces.IFootnoteService commonFootnoteService,
+            IFootnoteRepository footnoteRepository,
             IPersistenceHelper<StatisticsDbContext> statisticsPersistenceHelper)
         {
-            _context = context; 
+            _context = context;
             _filterService = filterService;
             _filterGroupService = filterGroupService;
             _filterItemService = filterItemService;
@@ -53,7 +52,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Services
             _subjectService = subjectService;
             _contentPersistenceHelper = contentPersistenceHelper;
             _userService = userService;
-            _commonFootnoteService = commonFootnoteService;
+            _footnoteRepository = footnoteRepository;
             _statisticsPersistenceHelper = statisticsPersistenceHelper;
         }
 
@@ -137,7 +136,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Services
                 .OnSuccess(_ => _statisticsPersistenceHelper.CheckEntityExists<Footnote>(id)
                 .OnSuccess(async footnote =>
                 {
-                    await _commonFootnoteService.DeleteFootnote(releaseId, footnote.Id);
+                    await _footnoteRepository.DeleteFootnote(releaseId, footnote.Id);
                     await _context.SaveChangesAsync();
                     return Unit.Instance;
                 }));
@@ -159,7 +158,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Services
                 .OnSuccess(_ => _statisticsPersistenceHelper.CheckEntityExists<Footnote>(id, HydrateFootnote)
                 .OnSuccess(async footnote =>
                 {
-                    if (await _commonFootnoteService.IsFootnoteExclusiveToReleaseAsync(releaseId, footnote.Id))
+                    if (await _footnoteRepository.IsFootnoteExclusiveToReleaseAsync(releaseId, footnote.Id))
                     {
                         _context.Update(footnote);
 
@@ -172,12 +171,12 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Services
                         UpdateSubjectLinks(footnote, subjectIds.ToList());
 
                         await _context.SaveChangesAsync();
-                        return await _commonFootnoteService.GetFootnote(id);
+                        return await _footnoteRepository.GetFootnote(id);
                     }
 
                     // If this amendment of the footnote affects other release then break the link with the old
                     // and create a new one
-                    await _commonFootnoteService.DeleteReleaseFootnoteLinkAsync(releaseId, footnote.Id);
+                    await _footnoteRepository.DeleteReleaseFootnoteLinkAsync(releaseId, footnote.Id);
 
                     return await CreateFootnote(
                         releaseId,
@@ -197,7 +196,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Services
                 .OnSuccess(_userService.CheckCanViewRelease)
                 .OnSuccess<ActionResult, Release, Footnote>(async release =>
                     {
-                        var footnote = await _commonFootnoteService.GetFootnote(id);
+                        var footnote = await _footnoteRepository.GetFootnote(id);
 
                         if (footnote == null
                             || footnote.Releases.All(rf => rf.ReleaseId != release.Id))
@@ -215,12 +214,12 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Services
             return await _contentPersistenceHelper
                 .CheckEntityExists<Release>(releaseId)
                 .OnSuccess(_userService.CheckCanViewRelease)
-                .OnSuccess(_ => _commonFootnoteService.GetFootnotes(releaseId));
+                .OnSuccess(_ => _footnoteRepository.GetFootnotes(releaseId));
         }
 
         public IEnumerable<Footnote> GetFootnotes(Guid releaseId, Guid subjectId)
         {
-            return _commonFootnoteService.GetFootnotes(releaseId, subjectId);
+            return _footnoteRepository.GetFootnotes(releaseId, subjectId);
         }
 
         private void CreateSubjectLinks(Footnote footnote, IEnumerable<Guid> subjectIds)

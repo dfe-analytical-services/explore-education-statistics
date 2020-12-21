@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
 using GovUk.Education.ExploreEducationStatistics.Admin.Services;
+using GovUk.Education.ExploreEducationStatistics.Admin.Services.Interfaces;
 using GovUk.Education.ExploreEducationStatistics.Admin.ViewModels;
 using GovUk.Education.ExploreEducationStatistics.Common.Model;
 using GovUk.Education.ExploreEducationStatistics.Common.Services.Interfaces.Security;
@@ -59,11 +60,11 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
             var releaseFile = new ReleaseFile
             {
                 Release = release,
-                ReleaseFileReference = new ReleaseFileReference
+                File = new File
                 {
                     Filename = "file1.csv",
                     Release = release,
-                    ReleaseFileType = ReleaseFileTypes.Data,
+                    Type = FileType.Data,
                     SubjectId = Guid.NewGuid()
                 }
             };
@@ -82,7 +83,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
             metaGuidanceSubjectService.Setup(mock =>
                 mock.GetSubjects(release.Id, new List<Guid>
                 {
-                    releaseFile.ReleaseFileReference.SubjectId.Value
+                    releaseFile.File.SubjectId.Value
                 })).ReturnsAsync(SubjectMetaGuidance);
 
             await using (var contentDbContext = InMemoryApplicationDbContext(contentDbContextId))
@@ -97,7 +98,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
                 metaGuidanceSubjectService.Verify(mock =>
                     mock.GetSubjects(release.Id, new List<Guid>
                     {
-                        releaseFile.ReleaseFileReference.SubjectId.Value
+                        releaseFile.File.SubjectId.Value
                     }), Times.Once);
 
                 Assert.Equal(release.Id, result.Right.Id);
@@ -117,11 +118,11 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
             var originalFile = new ReleaseFile
             {
                 Release = release,
-                ReleaseFileReference = new ReleaseFileReference
+                File = new File
                 {
                     Filename = "file1.csv",
                     Release = release,
-                    ReleaseFileType = ReleaseFileTypes.Data,
+                    Type = FileType.Data,
                     SubjectId = Guid.NewGuid()
                 }
             };
@@ -129,17 +130,17 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
             var replacementFile = new ReleaseFile
             {
                 Release = release,
-                ReleaseFileReference = new ReleaseFileReference
+                File = new File
                 {
                     Filename = "file1.csv",
                     Release = release,
-                    ReleaseFileType = ReleaseFileTypes.Data,
+                    Type = FileType.Data,
                     SubjectId = Guid.NewGuid(),
-                    Replacing = originalFile.ReleaseFileReference
+                    Replacing = originalFile.File
                 }
             };
 
-           originalFile.ReleaseFileReference.ReplacedBy = replacementFile.ReleaseFileReference;
+           originalFile.File.ReplacedBy = replacementFile.File;
 
             var contentDbContextId = Guid.NewGuid().ToString();
 
@@ -155,7 +156,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
             metaGuidanceSubjectService.Setup(mock =>
                 mock.GetSubjects(release.Id, new List<Guid>
                 {
-                    originalFile.ReleaseFileReference.SubjectId.Value
+                    originalFile.File.SubjectId.Value
                 })).ReturnsAsync(SubjectMetaGuidance);
 
             await using (var contentDbContext = InMemoryApplicationDbContext(contentDbContextId))
@@ -172,7 +173,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
                 metaGuidanceSubjectService.Verify(mock =>
                     mock.GetSubjects(release.Id, new List<Guid>
                     {
-                        originalFile.ReleaseFileReference.SubjectId.Value
+                        originalFile.File.SubjectId.Value
                     }), Times.Once);
 
                 Assert.Equal(release.Id, result.Right.Id);
@@ -288,11 +289,11 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
             var releaseFile = new ReleaseFile
             {
                 Release = release,
-                ReleaseFileReference = new ReleaseFileReference
+                File = new File
                 {
                     Filename = "file1.csv",
                     Release = release,
-                    ReleaseFileType = ReleaseFileTypes.Data,
+                    Type = FileType.Data,
                     SubjectId = Guid.NewGuid()
                 }
             };
@@ -312,7 +313,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
             metaGuidanceSubjectService.Setup(mock =>
                 mock.GetSubjects(release.Id, new List<Guid>
                 {
-                    releaseFile.ReleaseFileReference.SubjectId.Value
+                    releaseFile.File.SubjectId.Value
                 })).ReturnsAsync(SubjectMetaGuidance);
 
             await using (var contentDbContext = InMemoryApplicationDbContext(contentDbContextId))
@@ -342,7 +343,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
                 metaGuidanceSubjectService.Verify(mock =>
                     mock.GetSubjects(release.Id, new List<Guid>
                     {
-                        releaseFile.ReleaseFileReference.SubjectId.Value
+                        releaseFile.File.SubjectId.Value
                     }), Times.Once);
 
                 Assert.Equal(release.Id, result.Right.Id);
@@ -388,11 +389,11 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
             var releaseFile1 = new ReleaseFile
             {
                 Release = contentRelease,
-                ReleaseFileReference = new ReleaseFileReference
+                File = new File
                 {
                     Filename = "file1.csv",
                     Release = contentRelease,
-                    ReleaseFileType = ReleaseFileTypes.Data,
+                    Type = FileType.Data,
                     SubjectId = subject1.Id
                 }
             };
@@ -400,11 +401,11 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
             var releaseFile2 = new ReleaseFile
             {
                 Release = contentRelease,
-                ReleaseFileReference = new ReleaseFileReference
+                File = new File
                 {
                     Filename = "file2.csv",
                     Release = contentRelease,
-                    ReleaseFileType = ReleaseFileTypes.Data,
+                    Type = FileType.Data,
                     SubjectId = subject2.Id
                 }
             };
@@ -555,11 +556,11 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
             var releaseVersion1File1 = new ReleaseFile
             {
                 Release = contentReleaseVersion1,
-                ReleaseFileReference = new ReleaseFileReference
+                File = new File
                 {
                     Filename = "file1.csv",
                     Release = contentReleaseVersion1,
-                    ReleaseFileType = ReleaseFileTypes.Data,
+                    Type = FileType.Data,
                     SubjectId = subject1.Id
                 }
             };
@@ -567,11 +568,11 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
             var releaseVersion2File1 = new ReleaseFile
             {
                 Release = contentReleaseVersion2,
-                ReleaseFileReference = new ReleaseFileReference
+                File = new File
                 {
                     Filename = "file1.csv",
                     Release = contentReleaseVersion2,
-                    ReleaseFileType = ReleaseFileTypes.Data,
+                    Type = FileType.Data,
                     SubjectId = subject1.Id
                 }
             };
@@ -579,11 +580,11 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
             var releaseVersion2File2 = new ReleaseFile
             {
                 Release = contentReleaseVersion2,
-                ReleaseFileReference = new ReleaseFileReference
+                File = new File
                 {
                     Filename = "file2.csv",
                     Release = contentReleaseVersion2,
-                    ReleaseFileType = ReleaseFileTypes.Data,
+                    Type = FileType.Data,
                     SubjectId = subject2.Id
                 }
             };
@@ -760,11 +761,11 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
             var releaseFile = new ReleaseFile
             {
                 Release = release,
-                ReleaseFileReference = new ReleaseFileReference
+                File = new File
                 {
                     Filename = "file1.csv",
                     Release = release,
-                    ReleaseFileType = ReleaseFileTypes.Data,
+                    Type = FileType.Data,
                     SubjectId = Guid.NewGuid()
                 }
             };
@@ -807,11 +808,11 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
             var releaseFile = new ReleaseFile
             {
                 Release = release,
-                ReleaseFileReference = new ReleaseFileReference
+                File = new File
                 {
                     Filename = "file1.csv",
                     Release = release,
-                    ReleaseFileType = ReleaseFileTypes.Data,
+                    Type = FileType.Data,
                     SubjectId = Guid.NewGuid()
                 }
             };
@@ -835,7 +836,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
                 var result = await service.Validate(release.Id);
 
                 Assert.True(result.IsLeft);
-                ValidationTestUtil.AssertValidationProblem(result.Left, MetaGuidanceMustBePopulated);
+                ValidationTestUtil.AssertValidationProblem(result.Left, PublicMetaGuidanceRequired);
             }
         }
 
@@ -850,11 +851,11 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
             var releaseFile = new ReleaseFile
             {
                 Release = release,
-                ReleaseFileReference = new ReleaseFileReference
+                File = new File
                 {
                     Filename = "file1.csv",
                     Release = release,
-                    ReleaseFileType = ReleaseFileTypes.Data,
+                    Type = FileType.Data,
                     SubjectId = Guid.NewGuid()
                 }
             };
@@ -884,7 +885,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
 
                 metaGuidanceSubjectService.Verify(mock => mock.Validate(release.Id), Times.Once);
 
-                ValidationTestUtil.AssertValidationProblem(result.Left, MetaGuidanceMustBePopulated);
+                ValidationTestUtil.AssertValidationProblem(result.Left, PublicMetaGuidanceRequired);
             }
         }
 
@@ -893,14 +894,16 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
             StatisticsDbContext statisticsDbContext = null,
             IPersistenceHelper<ContentDbContext> contentPersistenceHelper = null,
             IMetaGuidanceSubjectService metaGuidanceSubjectService = null,
-            IUserService userService = null)
+            IUserService userService = null,
+            IFileRepository fileRepository = null)
         {
             return new MetaGuidanceService(
                 contentDbContext,
                 contentPersistenceHelper ?? new PersistenceHelper<ContentDbContext>(contentDbContext),
                 metaGuidanceSubjectService ?? new Mock<IMetaGuidanceSubjectService>().Object,
                 statisticsDbContext ?? new Mock<StatisticsDbContext>().Object,
-                userService ?? MockUtils.AlwaysTrueUserService().Object
+                userService ?? MockUtils.AlwaysTrueUserService().Object,
+                fileRepository ?? new FileRepository(contentDbContext)
             );
         }
     }

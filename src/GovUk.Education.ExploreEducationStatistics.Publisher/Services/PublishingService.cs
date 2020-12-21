@@ -4,6 +4,7 @@ using GovUk.Education.ExploreEducationStatistics.Common.Model;
 using GovUk.Education.ExploreEducationStatistics.Publisher.Models;
 using GovUk.Education.ExploreEducationStatistics.Publisher.Services.Interfaces;
 using static GovUk.Education.ExploreEducationStatistics.Common.BlobContainerNames;
+using static GovUk.Education.ExploreEducationStatistics.Common.Model.FileType;
 using static GovUk.Education.ExploreEducationStatistics.Common.Services.FileStoragePathUtils;
 
 namespace GovUk.Education.ExploreEducationStatistics.Publisher.Services
@@ -36,8 +37,10 @@ namespace GovUk.Education.ExploreEducationStatistics.Publisher.Services
                 PublicationSlug = release.Publication.Slug,
                 PublishScheduled = release.PublishScheduled.Value,
                 ReleaseSlug = release.Slug,
-                ReleaseFileReferences = _releaseService.GetReleaseFileReferences(
-                    releaseId, ReleaseFileTypes.Ancillary, ReleaseFileTypes.Chart, ReleaseFileTypes.Data)
+                Files = await _releaseService.GetFiles(releaseId,
+                    Ancillary,
+                    Chart,
+                    FileType.Data)
             };
             await _fileStorageService.CopyReleaseFilesToPublicContainer(copyReleaseCommand);
         }

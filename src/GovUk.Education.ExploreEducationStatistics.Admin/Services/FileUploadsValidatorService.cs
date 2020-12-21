@@ -14,6 +14,7 @@ using static GovUk.Education.ExploreEducationStatistics.Admin.Validators.Validat
 using static GovUk.Education.ExploreEducationStatistics.Admin.Validators.ValidationUtils;
 using static GovUk.Education.ExploreEducationStatistics.Common.Validators.FileTypeValidationUtils;
 using static System.StringComparison;
+using static GovUk.Education.ExploreEducationStatistics.Common.Model.FileType;
 
 namespace GovUk.Education.ExploreEducationStatistics.Admin.Services
 {
@@ -48,33 +49,22 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Services
                 .OnSuccess(async _ => await ValidateDataFileSizes(archiveFile.DataFileSize, archiveFile.MetaFileSize));
         }
 
-        public async Task<Either<ActionResult, Unit>> ValidateFileForUpload(Guid releaseId, IFormFile file,
-            ReleaseFileTypes type, bool overwrite)
+        public async Task<Either<ActionResult, Unit>> ValidateFileForUpload(IFormFile file, FileType type)
         {
+            if (type != Ancillary && type != Chart)
+            {
+                throw new ArgumentException("Cannot use generic function to validate data file", nameof(type));
+            }
+
             // Check that it is not an empty file because this causes issues downstream
             if (file.Length == 0)
             {
                 return ValidationActionResult(FileCannotBeEmpty);
             }
-
-            if (FileContainsSpacesOrSpecialChars(file.FileName))
+            
+            if (!await _fileTypeService.HasMatchingMimeType(file, AllowedMimeTypesByFileType[type]))
             {
-                return ValidationActionResult(FilenameCannotContainSpacesOrSpecialCharacters);
-            }
-
-            if (!overwrite && IsFileExisting(releaseId, type, file.FileName))
-            {
-                return ValidationActionResult(CannotOverwriteFile);
-            }
-
-            return Unit.Instance;
-        }
-
-        public async Task<Either<ActionResult, Unit>> ValidateFileUploadName(string name)
-        {
-            if (FileContainsSpecialChars(name))
-            {
-                return ValidationActionResult(FileUploadNameCannotContainSpecialCharacters);
+                return ValidationActionResult(FileTypeInvalid);
             }
 
             return Unit.Instance;
@@ -95,28 +85,9 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Services
             return Unit.Instance;
         }
 
-        // We cannot rely on the normal upload validation as we want this to be an atomic operation for both files.
-        public async Task<Either<ActionResult, Unit>> ValidateUploadFileType(
-            IFormFile file, ReleaseFileTypes type)
-        {
-            var allowedMimeTypes = AllowedMimeTypesByFileType[type];
-
-            if (!await _fileTypeService.HasMatchingMimeType(file, allowedMimeTypes))
-            {
-                return ValidationActionResult(FileTypeInvalid);
-            }
-
-            if (type == ReleaseFileTypes.Data)
-            {
-                return ValidationActionResult(CannotUseGenericFunctionToAddDataFile);
-            }
-
-            return Unit.Instance;
-        }
-
         private async Task<bool> IsCsvFile(IFormFile file)
         {
-            return await _fileTypeService.HasMatchingMimeType(file, AllowedMimeTypesByFileType[ReleaseFileTypes.Data])
+            return await _fileTypeService.HasMatchingMimeType(file, AllowedMimeTypesByFileType[FileType.Data])
                    && _fileTypeService.HasMatchingEncodingType(file, CsvEncodingTypes);
         }
 
@@ -132,15 +103,15 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Services
                    filename.IndexOfAny(Path.GetInvalidFileNameChars()) > -1;
         }
 
-        private bool IsFileExisting(Guid releaseId, ReleaseFileTypes type, string name)
+        private bool IsFileExisting(Guid releaseId, FileType type, string name)
         {
             return _context
                 .ReleaseFiles
-                .Include(rf => rf.ReleaseFileReference)
+                .Include(rf => rf.File)
                 .Where(rf => rf.ReleaseId == releaseId)
                 .ToList()
-                .Any(rf => String.Equals(rf.ReleaseFileReference.Filename, name, CurrentCultureIgnoreCase)
-                && rf.ReleaseFileReference.ReleaseFileType == type);
+                .Any(rf => String.Equals(rf.File.Filename, name, CurrentCultureIgnoreCase)
+                && rf.File.Type == type);
         }
 
         private async Task<Either<ActionResult, Unit>> ValidateDataFileNames(Guid releaseId, string dataFileName, string metaFileName)
@@ -175,12 +146,12 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Services
                 return ValidationActionResult(MetaFileMustBeCsvFile);
             }
 
-            if (IsFileExisting(releaseId, ReleaseFileTypes.Data, dataFileName))
+            if (IsFileExisting(releaseId, FileType.Data, dataFileName))
             {
                 return ValidationActionResult(CannotOverwriteDataFile);
             }
 
-            if (IsFileExisting(releaseId, ReleaseFileTypes.Metadata, metaFileName))
+            if (IsFileExisting(releaseId, Metadata, metaFileName))
             {
                 return ValidationActionResult(CannotOverwriteMetadataFile);
             }

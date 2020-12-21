@@ -12,7 +12,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Processor.Services.Int
             SubjectData subjectData);
 
         Task AddBatchDataFileMessages(
-            ICollector<ImportMessage> collector, 
+            ICollector<ImportObservationsMessage> collector, 
             ImportMessage message);
     }
 }

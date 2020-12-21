@@ -21,14 +21,14 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Services.Interfaces
         Task<Either<ActionResult, IEnumerable<DataFileInfo>>> ListAll(Guid releaseId);
 
         Task<Either<ActionResult, DataFileInfo>> Upload(Guid releaseId,
-            IFormFile dataFile,
-            IFormFile metaFile,
+            IFormFile dataFormFile,
+            IFormFile metaFormFile,
             string userName,
             Guid? replacingFileId = null,
             string subjectName = null);
 
         Task<Either<ActionResult, DataFileInfo>> UploadAsZip(Guid releaseId,
-            IFormFile zipFile,
+            IFormFile zipFormFile,
             string userName,
             Guid? replacingFileId = null,
             string subjectName = null);

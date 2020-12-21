@@ -25,7 +25,6 @@ using static GovUk.Education.ExploreEducationStatistics.Admin.Validators.Validat
 using static GovUk.Education.ExploreEducationStatistics.Admin.Validators.ValidationUtils;
 using static GovUk.Education.ExploreEducationStatistics.Common.Services.EnumUtil;
 using static GovUk.Education.ExploreEducationStatistics.Data.Model.Services.LocationService;
-using IFootnoteService = GovUk.Education.ExploreEducationStatistics.Data.Model.Services.Interfaces.IFootnoteService;
 using IReleaseService = GovUk.Education.ExploreEducationStatistics.Admin.Services.Interfaces.IReleaseService;
 using Unit = GovUk.Education.ExploreEducationStatistics.Common.Model.Unit;
 
@@ -38,7 +37,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Services
         private readonly IFilterService _filterService;
         private readonly IIndicatorService _indicatorService;
         private readonly ILocationService _locationService;
-        private readonly IFootnoteService _footnoteService;
+        private readonly IFootnoteRepository _footnoteRepository;
         private readonly IReleaseService _releaseService;
         private readonly ITimePeriodService _timePeriodService;
         private readonly IPersistenceHelper<ContentDbContext> _contentPersistenceHelper;
@@ -51,7 +50,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Services
             IFilterService filterService,
             IIndicatorService indicatorService,
             ILocationService locationService,
-            IFootnoteService footnoteService,
+            IFootnoteRepository footnoteRepository,
             IReleaseService releaseService,
             ITimePeriodService timePeriodService,
             IPersistenceHelper<ContentDbContext> contentPersistenceHelper,
@@ -62,7 +61,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Services
             _filterService = filterService;
             _indicatorService = indicatorService;
             _locationService = locationService;
-            _footnoteService = footnoteService;
+            _footnoteRepository = footnoteRepository;
             _releaseService = releaseService;
             _timePeriodService = timePeriodService;
             _contentPersistenceHelper = contentPersistenceHelper;
@@ -73,23 +72,23 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Services
             Guid originalFileId,
             Guid replacementFileId)
         {
-            return await CheckReleaseFileReferenceExists(originalFileId)
-                .OnSuccess(async originalFileReference =>
+            return await CheckFileExists(originalFileId)
+                .OnSuccess(async originalFile =>
                 {
-                    return await CheckReleaseFileReferenceExists(replacementFileId)
-                        .OnSuccessDo(replacementFileReference =>
-                            _userService.CheckCanUpdateRelease(replacementFileReference.Release))
-                        .OnSuccessDo(replacementFileReference =>
+                    return await CheckFileExists(replacementFileId)
+                        .OnSuccessDo(replacementFile =>
+                            _userService.CheckCanUpdateRelease(replacementFile.Release))
+                        .OnSuccessDo(replacementFile =>
                             CheckFilesAreForRelatedReleases(
-                                originalFileReference,
-                                replacementFileReference
+                                originalFile,
+                                replacementFile
                             )
                         )
-                        .OnSuccess(replacementFileReference =>
+                        .OnSuccess(replacementFile =>
                         {
-                            var releaseId = replacementFileReference.ReleaseId;
-                            var originalSubjectId = originalFileReference.SubjectId.Value;
-                            var replacementSubjectId = replacementFileReference.SubjectId.Value;
+                            var releaseId = replacementFile.ReleaseId;
+                            var originalSubjectId = originalFile.SubjectId.Value;
+                            var replacementSubjectId = replacementFile.SubjectId.Value;
 
                             var replacementSubjectMeta = GetReplacementSubjectMeta(replacementSubjectId);
 
@@ -117,8 +116,8 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Services
                         return ValidationActionResult(ReplacementMustBeValid);
                     }
 
-                    // This Release Id can be found on the ReplacementFileReference
-                    var releaseId = (await _contentDbContext.ReleaseFileReferences
+                    // This Release Id can be found on the File
+                    var releaseId = (await _contentDbContext.Files
                         .FindAsync(replacementFileId)).ReleaseId;
 
                     await replacementPlan.DataBlocks.ForEachAsync(plan =>
@@ -136,30 +135,29 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Services
                 });
         }
 
-        private async Task<Either<ActionResult, ReleaseFileReference>> CheckReleaseFileReferenceExists(Guid id)
+        private async Task<Either<ActionResult, File>> CheckFileExists(Guid id)
         {
-            return await _contentPersistenceHelper.CheckEntityExists<ReleaseFileReference>(
+            return await _contentPersistenceHelper.CheckEntityExists<File>(
                     id,
-                    q => q.Include(rfr => rfr.Release)
+                    q => q.Include(f => f.Release)
                 )
-                .OnSuccess<ActionResult, ReleaseFileReference, ReleaseFileReference>(
-                    releaseFileReference =>
+                .OnSuccess<ActionResult, File, File>(file =>
                     {
-                        if (releaseFileReference.ReleaseFileType != ReleaseFileTypes.Data)
+                        if (file.Type != FileType.Data)
                         {
                             return ValidationActionResult(ReplacementFileTypesMustBeData);
                         }
 
-                        return releaseFileReference;
+                        return file;
                     }
                 );
         }
 
         private async Task<Either<ActionResult, Unit>> CheckFilesAreForRelatedReleases(
-            ReleaseFileReference originalReleaseFileReference,
-            ReleaseFileReference replacementReleaseFileReference)
+            File originalFile,
+            File replacementFile)
         {
-            // Get the latest Release referencing the original ReleaseFileReference
+            // Get the latest Release referencing the original File
             var originalReleaseId = await _contentDbContext.ReleaseFiles
                 .GroupJoin(_contentDbContext.Releases, releaseFile => releaseFile.ReleaseId,
                     newerVersion => newerVersion.PreviousVersionId,
@@ -167,13 +165,13 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Services
                 .SelectMany(tuple => tuple.newerVersionGroup.DefaultIfEmpty(),
                     (tuple, newerVersion) => new {tuple.releaseFile, newerVersion})
                 .Where(tuple =>
-                    tuple.releaseFile.ReleaseFileReferenceId == originalReleaseFileReference.Id
+                    tuple.releaseFile.FileId == originalFile.Id
                     && tuple.newerVersion == null)
                 .Select(tuple => tuple.releaseFile.ReleaseId)
                 .SingleAsync();
 
             // Check the replacement is for the same Release
-            if (replacementReleaseFileReference.ReleaseId != originalReleaseId)
+            if (replacementFile.ReleaseId != originalReleaseId)
             {
                 return new NotFoundResult();
             }
@@ -239,7 +237,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Services
         private List<FootnoteReplacementPlanViewModel> ValidateFootnotes(Guid releaseId, Guid subjectId,
             ReplacementSubjectMeta replacementSubjectMeta)
         {
-            return _footnoteService.GetFootnotes(releaseId, subjectId)
+            return _footnoteRepository.GetFootnotes(releaseId, subjectId)
                 .Select(footnote => ValidateFootnote(footnote, replacementSubjectMeta))
                 .ToList();
         }
@@ -690,7 +688,46 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Services
                 chart =>
                 {
                     ReplaceChartMajorAxisDataSets(filterItemTargets, indicatorTargets, dataBlock, chart);
-                    // TODO: EES-1319 Replace legend data sets
+                    ReplaceChartLegendDataSets(filterItemTargets, indicatorTargets, dataBlock, chart);
+                }
+            );
+        }
+
+        private static void ReplaceChartLegendDataSets(
+            Dictionary<Guid, Guid> filterItemTargets,
+            Dictionary<Guid, Guid> indicatorTargets,
+            DataBlock dataBlock,
+            IChart chart)
+        {
+            chart.Legend?.Items.ForEach(
+                item =>
+                {
+                    var dataSet = item.DataSet;
+
+                    dataSet.Filters = dataSet.Filters.Select(
+                        filter =>
+                        {
+                            if (filterItemTargets.TryGetValue(filter, out var targetFilterId))
+                            {
+                                return targetFilterId;
+                            }
+
+                            throw new InvalidOperationException(
+                                $"Expected target replacement value for dataBlock {dataBlock.Id} chart legend data set filter: {filter}"
+                            );
+                        }
+                    ).ToList();
+
+                    if (indicatorTargets.TryGetValue(dataSet.Indicator, out var targetIndicatorId))
+                    {
+                        dataSet.Indicator = targetIndicatorId;
+                    }
+                    else
+                    {
+                        throw new InvalidOperationException(
+                            $"Expected target replacement value for dataBlock {dataBlock.Id} chart legend data set indicator: {dataSet.Indicator}"
+                        );
+                    }
                 }
             );
         }
@@ -852,10 +889,10 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Services
             // First, unlink the original file from the replacement before removing it.
             // Ordinarily, removing a file from a Release deletes any associated replacement
             // so that there's no possibility of abandoned replacements being orphaned from their original files.
-            return await CheckReleaseFileReferenceExists(originalFileId)
+            return await CheckFileExists(originalFileId)
                 .OnSuccessVoid(async originalFile =>
                 {
-                    await CheckReleaseFileReferenceExists(replacementFileId)
+                    await CheckFileExists(replacementFileId)
                         .OnSuccessVoid(
                             async replacementFile =>
                             {

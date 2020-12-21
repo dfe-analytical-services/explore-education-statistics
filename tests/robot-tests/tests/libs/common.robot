@@ -114,6 +114,17 @@ user mouses over element
     [Arguments]  ${element}
     mouse over  ${element}
 
+user gets css property value
+    [Arguments]  ${locator}  ${property}
+    ${element}=  get webelement  ${locator}
+    ${value}=    call method  ${element}  value_of_css_property  ${property}
+    [Return]  ${value}
+
+user checks css property value
+    [Arguments]  ${locator}  ${property}  ${value}
+    ${actual_value}=  user gets css property value  ${locator}  ${property}
+    should be equal  ${value}  ${actual_value}
+
 user waits for page to finish loading
     # This is required because despite the DOM being loaded, and even a button being enabled, React/NextJS
     # hasn't finished processing the page, and so click are intermittently ignored. I'm wrapping
@@ -357,7 +368,15 @@ user selects newly opened window
 
 user checks element attribute value should be
     [Arguments]   ${locator}  ${attribute}    ${expected}
-    element attribute value should be  ${locator}     ${attribute}   ${expected}
+    element attribute value should be  ${locator}  ${attribute}  ${expected}
+
+user checks element value should be
+    [Arguments]  ${locator}  ${value}
+    element attribute value should be  ${locator}  value  ${value}
+
+user checks textarea contains
+    [Arguments]   ${selector}   ${text}
+    textarea should contain   ${selector}   ${text}
 
 user checks radio option for "${radiogroupId}" should be "${expectedLabelText}"
     user checks page contains element  css:#${radiogroupId} [data-testid="${expectedLabelText}"]:checked
@@ -379,22 +398,25 @@ user chooses file
     choose file  ${locator}  ${file_path}
 
 user clears element text
-    [Arguments]   ${locator}
-    press keys  ${locator}  CTRL+a+BACKSPACE
+    [Arguments]   ${selector}
+    user presses keys   CTRL+a+BACKSPACE  ${selector}
     sleep  0.1
 
 user presses keys
-    [Arguments]   ${keys}  ${selector}=${None}
-    press keys  ${selector}    ${keys}
+    [Arguments]   ${keys}   ${selector}=${EMPTY}
+    run keyword if  '${selector}' != '${EMPTY}'
+    ...  run keywords
+    ...  user waits until page contains element  ${selector}
+    ...  AND  user waits until element is visible   ${selector}
+    ...  AND  user sets focus to element  ${selector}
+    ...  AND  user clicks element  ${selector}
+    press keys   ${NONE}    ${keys}   # No selector as sometimes leads to text not being input
     sleep  0.1
 
 user enters text into element
     [Arguments]   ${selector}   ${text}
-    user waits until page contains element  ${selector}
-    user waits until element is visible   ${selector}
     user clears element text  ${selector}
-    user clicks element   ${selector}
-    user presses keys  ${text}
+    user presses keys   ${text}   ${selector}
 
 user checks element count is x
     [Arguments]   ${locator}   ${amount}
