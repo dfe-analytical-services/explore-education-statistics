@@ -577,6 +577,11 @@ namespace GovUk.Education.ExploreEducationStatistics.Publisher.Tests.Services
                     .ReturnsAsync(true);
 
                 fileStorageService.Setup(s =>
+                        s.CheckBlobExists(PublicFilesContainerName, 
+                            PublicReleaseAllFilesZipPath(PublicationA.Slug, PublicationARelease2.Slug)))
+                    .ReturnsAsync(true);
+
+                fileStorageService.Setup(s =>
                         s.GetBlob(PublicFilesContainerName,
                             PublicationARelease2AncillaryReleaseFile.PublicPath()))
                     .ReturnsAsync(new BlobInfo
@@ -609,8 +614,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Publisher.Tests.Services
                     ));
 
                 fileStorageService.Setup(s => s.GetBlob(PublicFilesContainerName,
-                        PublicReleaseAllFilesZipPath(PublicationA.Slug,
-                            PublicationARelease2.Slug)))
+                        PublicReleaseAllFilesZipPath(PublicationA.Slug, PublicationARelease2.Slug)))
                     .ReturnsAsync(new BlobInfo
                     (
                         path: PublicReleaseAllFilesZipPath(PublicationA.Slug, PublicationARelease2.Slug),
@@ -736,6 +740,11 @@ namespace GovUk.Education.ExploreEducationStatistics.Publisher.Tests.Services
                     .ReturnsAsync(true);
 
                 fileStorageService.Setup(s =>
+                        s.CheckBlobExists(PublicFilesContainerName, 
+                            PublicReleaseAllFilesZipPath(PublicationA.Slug, PublicationARelease2.Slug)))
+                    .ReturnsAsync(true);
+
+                fileStorageService.Setup(s =>
                         s.GetBlob(PublicFilesContainerName,
                             PublicationARelease2AncillaryReleaseFile.PublicPath()))
                     .ReturnsAsync(new BlobInfo
@@ -768,8 +777,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Publisher.Tests.Services
                     ));
 
                 fileStorageService.Setup(s => s.GetBlob(PublicFilesContainerName,
-                        PublicReleaseAllFilesZipPath(PublicationA.Slug,
-                            PublicationARelease2.Slug)))
+                        PublicReleaseAllFilesZipPath(PublicationA.Slug, PublicationARelease2.Slug)))
                     .ReturnsAsync(new BlobInfo
                     (
                         path: PublicReleaseAllFilesZipPath(PublicationA.Slug, PublicationARelease2.Slug),
@@ -889,9 +897,13 @@ namespace GovUk.Education.ExploreEducationStatistics.Publisher.Tests.Services
 
             var fileStorageService = new Mock<IFileStorageService>(MockBehavior.Strict);
 
+            fileStorageService.Setup(s =>
+                    s.CheckBlobExists(PublicFilesContainerName, 
+                        PublicReleaseAllFilesZipPath(PublicationA.Slug, PublicationARelease1V1.Slug)))
+                .ReturnsAsync(true);
+
             fileStorageService.Setup(s => s.GetBlob(PublicFilesContainerName,
-                    PublicReleaseAllFilesZipPath(PublicationA.Slug,
-                        PublicationARelease1V1.Slug)))
+                    PublicReleaseAllFilesZipPath(PublicationA.Slug, PublicationARelease1V1.Slug)))
                 .ReturnsAsync(new BlobInfo
                 (
                     path: PublicReleaseAllFilesZipPath(PublicationA.Slug, PublicationARelease1V1.Slug),
@@ -996,9 +1008,13 @@ namespace GovUk.Education.ExploreEducationStatistics.Publisher.Tests.Services
 
             var fileStorageService = new Mock<IFileStorageService>(MockBehavior.Strict);
 
+            fileStorageService.Setup(s =>
+                    s.CheckBlobExists(PublicFilesContainerName, 
+                        PublicReleaseAllFilesZipPath(PublicationA.Slug, PublicationARelease3.Slug)))
+                .ReturnsAsync(true);
+
             fileStorageService.Setup(s => s.GetBlob(PublicFilesContainerName,
-                    PublicReleaseAllFilesZipPath(PublicationA.Slug,
-                        PublicationARelease3.Slug)))
+                    PublicReleaseAllFilesZipPath(PublicationA.Slug, PublicationARelease3.Slug)))
                 .ReturnsAsync(new BlobInfo
                 (
                     path: PublicReleaseAllFilesZipPath(PublicationA.Slug, PublicationARelease3.Slug),
