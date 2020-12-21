@@ -2,6 +2,7 @@ import { ReleaseStatusPermissions } from '@admin/services/permissionService';
 import { Release } from '@admin/services/releaseService';
 import { createServerValidationErrorMock } from '@common-test/createAxiosErrorMock';
 import { render, screen, waitFor, within } from '@testing-library/react';
+import { format } from 'date-fns';
 import React from 'react';
 import ReleaseStatusForm, {
   ReleaseStatusFormValues,
@@ -591,7 +592,7 @@ describe('ReleaseStatusForm', () => {
         <ReleaseStatusForm
           release={{
             ...testRelease,
-            publishScheduled: '2020-12-20',
+            publishScheduled: format(new Date(), 'yyyy-MM-dd'),
             status: 'Approved',
           }}
           statusPermissions={testStatusPermissions}
