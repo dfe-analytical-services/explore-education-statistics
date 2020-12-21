@@ -178,20 +178,8 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Services
                 .ToListAsync();
 
             return publications.SelectMany(publication => publication.Releases)
-                .Where(release =>
-                    // Release itself must be live
-                    release.Live
-                    // It must also be the latest version unless the later version is a draft
-                    && IsLatestVersionOfReleaseIgnoringDrafts(release))
+                .Where(release => release.IsLatestPublishedVersionOfRelease())
                 .ToList();
-        }
-
-        private static bool IsLatestVersionOfReleaseIgnoringDrafts(Release release)
-        {
-            return !release.Publication.Releases.Any(r =>
-                r.Live
-                && r.PreviousVersionId == release.Id
-                && r.Id != release.Id);
         }
 
         private async Task MarkFileAsMigrated(File file)

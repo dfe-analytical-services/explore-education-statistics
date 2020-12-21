@@ -9,6 +9,7 @@ using GovUk.Education.ExploreEducationStatistics.Content.Model.Database;
 using GovUk.Education.ExploreEducationStatistics.Publisher.Model.ViewModels;
 using GovUk.Education.ExploreEducationStatistics.Publisher.Services.Interfaces;
 using Microsoft.EntityFrameworkCore;
+using static GovUk.Education.ExploreEducationStatistics.Publisher.Extensions.PublisherExtensions;
 
 namespace GovUk.Education.ExploreEducationStatistics.Publisher.Services
 {
@@ -75,7 +76,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Publisher.Services
             IEnumerable<Guid> includedReleaseIds)
         {
             var releases = publication.Releases
-                .Where(r => IsReleasePublished(r, includedReleaseIds))
+                .Where(r => r.IsReleasePublished(includedReleaseIds))
                 .OrderBy(r => r.Year)
                 .ThenBy(r => r.TimePeriodCoverage)
                 .ToList();
@@ -110,12 +111,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Publisher.Services
 
         private static bool IsPublicationPublished(Publication publication, IEnumerable<Guid> includedReleaseIds)
         {
-            return publication.Releases.Any(release => IsReleasePublished(release, includedReleaseIds));
-        }
-
-        private static bool IsReleasePublished(Release release, IEnumerable<Guid> includedReleaseIds)
-        {
-            return release.Live || includedReleaseIds.Contains(release.Id);
+            return publication.Releases.Any(release => release.IsReleasePublished(includedReleaseIds));
         }
     }
 }

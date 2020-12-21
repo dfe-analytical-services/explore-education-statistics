@@ -18,7 +18,7 @@ using Microsoft.Extensions.Logging;
 using static GovUk.Education.ExploreEducationStatistics.Common.BlobContainerNames;
 using static GovUk.Education.ExploreEducationStatistics.Common.Services.FileStoragePathUtils;
 using IReleaseService = GovUk.Education.ExploreEducationStatistics.Publisher.Services.Interfaces.IReleaseService;
-using static GovUk.Education.ExploreEducationStatistics.Publisher.Utils.PublisherUtils;
+using static GovUk.Education.ExploreEducationStatistics.Publisher.Extensions.PublisherExtensions;
 
 namespace GovUk.Education.ExploreEducationStatistics.Publisher.Services
 {
@@ -100,7 +100,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Publisher.Services
                 .ToListAsync();
 
             return releases
-                .Where(release => IsLatestVersionOfRelease(release.Publication.Releases, release, includedReleaseIds))
+                .Where(release => release.IsReleasePublished(includedReleaseIds))
                 .OrderBy(release => release.Year)
                 .ThenBy(release => release.TimePeriodCoverage)
                 .LastOrDefault();
