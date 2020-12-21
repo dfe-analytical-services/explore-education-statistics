@@ -213,9 +213,32 @@ namespace GovUk.Education.ExploreEducationStatistics.Publisher.Services
 
         private async Task<FileInfo> GetAllFilesZip(Release release)
         {
+            var path = PublicReleaseAllFilesZipPath(release.Publication.Slug, release.Slug);
+
+            var exists = await _fileStorageService.CheckBlobExists(
+                containerName: PublicFilesContainerName,
+                path: path);
+
+            // EES-1755 we should throw an exception here and not be as lenient.
+            // Temporarily to collect a list of missing files and not halt publishing while regenerating
+            // content for all releases, we log an error and continue.
+            if (!exists)
+            {
+                _logger.LogError("Public blob not found for 'All files' zip at: {0}", path);
+                return new FileInfo
+                {
+                    Id = null,
+                    FileName = null,
+                    Name = "Unknown",
+                    Path = null,
+                    Size = "0.00 B",
+                    Type = Ancillary
+                };
+            }
+
             var blob = await _fileStorageService.GetBlob(
                 containerName: PublicFilesContainerName,
-                path: PublicReleaseAllFilesZipPath(release.Publication.Slug, release.Slug));
+                path: path);
 
             return new FileInfo
             {
