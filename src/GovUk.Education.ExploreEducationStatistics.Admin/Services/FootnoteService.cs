@@ -2,6 +2,7 @@ using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
+using GovUk.Education.ExploreEducationStatistics.Admin.Services.Interfaces;
 using GovUk.Education.ExploreEducationStatistics.Admin.Services.Interfaces.Security;
 using GovUk.Education.ExploreEducationStatistics.Common.Extensions;
 using GovUk.Education.ExploreEducationStatistics.Common.Model;
@@ -13,7 +14,6 @@ using GovUk.Education.ExploreEducationStatistics.Data.Model.Database;
 using GovUk.Education.ExploreEducationStatistics.Data.Model.Services.Interfaces;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
-using IFootnoteService = GovUk.Education.ExploreEducationStatistics.Admin.Services.Interfaces.IFootnoteService;
 using Release = GovUk.Education.ExploreEducationStatistics.Content.Model.Release;
 using Unit = GovUk.Education.ExploreEducationStatistics.Common.Model.Unit;
 
@@ -22,11 +22,6 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Services
     public class FootnoteService : IFootnoteService
     {
         private readonly StatisticsDbContext _context;
-        private readonly IFilterService _filterService;
-        private readonly IFilterGroupService _filterGroupService;
-        private readonly IFilterItemService _filterItemService;
-        private readonly IIndicatorService _indicatorService;
-        private readonly ISubjectService _subjectService;
         private readonly IPersistenceHelper<ContentDbContext> _contentPersistenceHelper;
         private readonly IPersistenceHelper<StatisticsDbContext> _statisticsPersistenceHelper;
         private readonly IUserService _userService;
@@ -34,22 +29,12 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Services
 
         public FootnoteService(
             StatisticsDbContext context,
-            IFilterService filterService,
-            IFilterGroupService filterGroupService,
-            IFilterItemService filterItemService,
-            IIndicatorService indicatorService,
-            ISubjectService subjectService,
             IPersistenceHelper<ContentDbContext> contentPersistenceHelper,
             IUserService userService,
             IFootnoteRepository footnoteRepository,
             IPersistenceHelper<StatisticsDbContext> statisticsPersistenceHelper)
         {
             _context = context;
-            _filterService = filterService;
-            _filterGroupService = filterGroupService;
-            _filterItemService = filterItemService;
-            _indicatorService = indicatorService;
-            _subjectService = subjectService;
             _contentPersistenceHelper = contentPersistenceHelper;
             _userService = userService;
             _footnoteRepository = footnoteRepository;
@@ -70,21 +55,18 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Services
                 .OnSuccess(_userService.CheckCanUpdateRelease)
                 .OnSuccess(async () =>
                 {
+                    var newFootnoteId = Guid.NewGuid();
+
                     var footnote = (await _context.Footnote.AddAsync(new Footnote
                     {
                         Content = content,
-                        Filters = new List<FilterFootnote>(),
-                        FilterGroups = new List<FilterGroupFootnote>(),
-                        FilterItems = new List<FilterItemFootnote>(),
-                        Indicators = new List<IndicatorFootnote>(),
-                        Subjects = new List<SubjectFootnote>()
-                    })).Entity;
+                        Subjects = CreateSubjectLinks(newFootnoteId, subjectIds),
+                        Filters = CreateFilterLinks(newFootnoteId, filterIds),
+                        FilterGroups = CreateFilterGroupLinks(newFootnoteId, filterGroupIds),
+                        FilterItems = CreateFilterItemLinks(newFootnoteId, filterItemIds),
+                        Indicators = CreateIndicatorsLinks(newFootnoteId, indicatorIds)
 
-                    CreateSubjectLinks(footnote, subjectIds);
-                    CreateFilterLinks(footnote, filterIds);
-                    CreateFilterGroupLinks(footnote, filterGroupIds);
-                    CreateFilterItemLinks(footnote, filterItemIds);
-                    CreateIndicatorsLinks(footnote, indicatorIds);
+                    })).Entity;
 
                     await _context.ReleaseFootnote.AddAsync(new ReleaseFootnote
                         {
@@ -97,11 +79,10 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Services
                 });
         }
 
-        public async Task<Either<ActionResult, Unit>> CopyFootnotes(Guid sourceReleaseId, Guid destinationReleaseId)
+        public async Task<Either<ActionResult, List<Footnote>>> CopyFootnotes(Guid sourceReleaseId, Guid destinationReleaseId)
         {
             return await GetFootnotes(sourceReleaseId)
-                .OnSuccess(async footnotes =>
-                {
+                .OnSuccess(async footnotes => 
                     await footnotes.ForEachAsync(async footnote =>
                     {
                         var filters = footnote.Filters
@@ -115,17 +96,14 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Services
                         var subjects = footnote.Subjects
                             .Select(subjectFootnote => subjectFootnote.SubjectId).ToList();
 
-                        await CreateFootnote(destinationReleaseId,
+                        return await CreateFootnote(destinationReleaseId,
                             footnote.Content,
                             filters,
                             filterGroups,
                             filterItems,
                             indicators,
                             subjects);
-                    });
-
-                    return Unit.Instance;
-                });
+                    }));
         }
 
         public async Task<Either<ActionResult, Unit>> DeleteFootnote(Guid releaseId, Guid id)
@@ -222,73 +200,60 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Services
             return _footnoteRepository.GetFootnotes(releaseId, subjectId);
         }
 
-        private void CreateSubjectLinks(Footnote footnote, IEnumerable<Guid> subjectIds)
+        private List<SubjectFootnote> CreateSubjectLinks(Guid footnoteId, IReadOnlyCollection<Guid> subjectIds)
         {
-            var subjects = _subjectService.FindMany(subject => subjectIds.Contains(subject.Id));
-
-            foreach (var subject in subjects)
-            {
-                footnote.Subjects.Add(new SubjectFootnote
-                {
-                    FootnoteId = footnote.Id,
-                    SubjectId = subject.Id
-                });
-            }
+            return subjectIds
+                .Select(id => 
+                    new SubjectFootnote
+                    {
+                        FootnoteId = footnoteId,
+                        SubjectId = id
+                    })
+                .ToList();
         }
 
-        private void CreateFilterLinks(Footnote footnote, IEnumerable<Guid> filterIds)
+        private List<FilterFootnote> CreateFilterLinks(Guid footnoteId, IReadOnlyCollection<Guid> filterIds)
         {
-            var filters = _filterService.FindMany(filter => filterIds.Contains(filter.Id));
-            foreach (var filter in filters)
-            {
-                footnote.Filters.Add(new FilterFootnote
+            return filterIds.Select(id => 
+                new FilterFootnote
                 {
-                    FootnoteId = footnote.Id,
-                    FilterId = filter.Id
-                });
-            }
+                    FootnoteId = footnoteId,
+                    FilterId = id
+                })
+                .ToList();
         }
 
-        private void CreateFilterGroupLinks(Footnote footnote, IEnumerable<Guid> filterGroupIds)
+        private List<FilterGroupFootnote> CreateFilterGroupLinks(Guid footnoteId, IReadOnlyCollection<Guid> filterGroupIds)
         {
-            var filterGroups = _filterGroupService.FindMany(filterGroup => filterGroupIds.Contains(filterGroup.Id));
-
-            foreach (var filterGroup in filterGroups)
-            {
-                footnote.FilterGroups.Add(new FilterGroupFootnote
+            return filterGroupIds.Select(id => 
+                new FilterGroupFootnote
                 {
-                    FootnoteId = footnote.Id,
-                    FilterGroupId = filterGroup.Id
-                });
-            }
+                    FootnoteId = footnoteId,
+                    FilterGroupId = id
+                })
+                .ToList();
         }
 
-        private void CreateFilterItemLinks(Footnote footnote, IEnumerable<Guid> filterItemIds)
+        private List<FilterItemFootnote> CreateFilterItemLinks(Guid footnoteId, IReadOnlyCollection<Guid> filterItemIds)
         {
-            var filterItems = _filterItemService.FindMany(filterItem => filterItemIds.Contains(filterItem.Id));
-
-            foreach (var filterItem in filterItems)
-            {
-                footnote.FilterItems.Add(new FilterItemFootnote
+            return filterItemIds.Select(id => 
+                new FilterItemFootnote
                 {
-                    FootnoteId = footnote.Id,
-                    FilterItemId = filterItem.Id
-                });
-            }
+                    FootnoteId = footnoteId,
+                    FilterItemId = id
+                })
+                .ToList();
         }
 
-        private void CreateIndicatorsLinks(Footnote footnote, IEnumerable<Guid> indicatorIds)
+        private List<IndicatorFootnote> CreateIndicatorsLinks(Guid footnoteId, IReadOnlyCollection<Guid> indicatorIds)
         {
-            var indicators = _indicatorService.FindMany(indicator => indicatorIds.Contains(indicator.Id));
-
-            foreach (var indicator in indicators)
-            {
-                footnote.Indicators.Add(new IndicatorFootnote
+            return indicatorIds.Select(id => 
+                new IndicatorFootnote
                 {
-                    FootnoteId = footnote.Id,
-                    IndicatorId = indicator.Id
-                });
-            }
+                    FootnoteId = footnoteId,
+                    IndicatorId = id
+                })
+                .ToList();
         }
 
         private void UpdateFilterLinks(Footnote footnote, IReadOnlyCollection<Guid> filterIds)
@@ -296,8 +261,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Services
             if (!SequencesAreEqualIgnoringOrder(
                 footnote.Filters.Select(link => link.FilterId), filterIds))
             {
-                footnote.Filters = new List<FilterFootnote>();
-                CreateFilterLinks(footnote, filterIds);
+                footnote.Filters = CreateFilterLinks(footnote.Id, filterIds);
             }
         }
 
@@ -306,8 +270,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Services
             if (!SequencesAreEqualIgnoringOrder(
                 footnote.FilterGroups.Select(link => link.FilterGroupId), filterGroupIds))
             {
-                footnote.FilterGroups = new List<FilterGroupFootnote>();
-                CreateFilterGroupLinks(footnote, filterGroupIds);
+                footnote.FilterGroups = CreateFilterGroupLinks(footnote.Id, filterGroupIds);
             }
         }
 
@@ -316,8 +279,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Services
             if (!SequencesAreEqualIgnoringOrder(
                 footnote.FilterItems.Select(link => link.FilterItemId), filterItemIds))
             {
-                footnote.FilterItems = new List<FilterItemFootnote>();
-                CreateFilterItemLinks(footnote, filterItemIds);
+                footnote.FilterItems = CreateFilterItemLinks(footnote.Id, filterItemIds);
             }
         }
 
@@ -326,8 +288,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Services
             if (!SequencesAreEqualIgnoringOrder(
                 footnote.Indicators.Select(link => link.IndicatorId), indicatorIds))
             {
-                footnote.Indicators = new List<IndicatorFootnote>();
-                CreateIndicatorsLinks(footnote, indicatorIds);
+                footnote.Indicators = CreateIndicatorsLinks(footnote.Id, indicatorIds);
             }
         }
 
@@ -336,8 +297,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Services
             if (!SequencesAreEqualIgnoringOrder(
                 footnote.Subjects.Select(link => link.SubjectId), subjectIds))
             {
-                footnote.Subjects = new List<SubjectFootnote>();
-                CreateSubjectLinks(footnote, subjectIds);
+                footnote.Subjects = CreateSubjectLinks(footnote.Id, subjectIds);
             }
         }
 
