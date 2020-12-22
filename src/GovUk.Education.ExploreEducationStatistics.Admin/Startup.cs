@@ -295,7 +295,6 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin
             services.AddTransient<IBoundaryLevelService, BoundaryLevelService>();
             services.AddTransient<ITableBuilderService, TableBuilderService>();
             services.AddTransient<IFilterService, FilterService>();
-            services.AddTransient<IFilterGroupService, FilterGroupService>();
             services.AddTransient<IFilterItemService, FilterItemService>();
             services.AddTransient<IFootnoteService, FootnoteService>();
             services.AddTransient<IFootnoteRepository, FootnoteRepository>();

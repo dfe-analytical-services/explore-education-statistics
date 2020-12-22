@@ -108,7 +108,6 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Api
                     );
                 }
             );
-            services.AddTransient<IFilterGroupService, FilterGroupService>();
             services.AddTransient<IFilterItemService, FilterItemService>();
             services.AddTransient<IFilterService, FilterService>();
             services.AddTransient<IFootnoteRepository, FootnoteRepository>();

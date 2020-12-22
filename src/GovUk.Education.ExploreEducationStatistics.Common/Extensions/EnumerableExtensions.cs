@@ -22,6 +22,7 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
 using GovUk.Education.ExploreEducationStatistics.Common.Utils;
+using GovUk.Education.ExploreEducationStatistics.Common.Model;
 
 namespace GovUk.Education.ExploreEducationStatistics.Common.Extensions
 {
@@ -104,6 +105,37 @@ namespace GovUk.Education.ExploreEducationStatistics.Common.Extensions
             {
                 await func(item);
             }
+        }
+
+        public static async Task<Either<TLeft, List<TRight>>> ForEachAsync<T, TLeft, TRight>(this IEnumerable<T> source, 
+            Func<T, Task<Either<TLeft, TRight>>> func)
+        {
+            List<TRight> rightResults = new List<TRight>();
+            
+            foreach (var item in source)
+            {
+                var result = await func(item);
+
+                if (result.IsLeft)
+                {
+                    return new Either<TLeft, List<TRight>>(result.Left);
+                }
+                
+                rightResults.Add(result.Right);
+            }
+
+            return rightResults;
+        }
+
+        public static IEnumerable<TResult> SelectNullSafe<TSource, TResult>(
+            this IEnumerable<TSource> source, Func<TSource, TResult> selector)
+        {
+            if (source == null)
+            {
+                return new List<TResult>();
+            }
+
+            return source.Select(selector);
         }
 
         public static async Task<IEnumerable<TResult>> SelectAsync<TSource, TResult>(

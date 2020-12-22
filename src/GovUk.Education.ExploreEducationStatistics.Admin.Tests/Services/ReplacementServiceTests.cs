@@ -2257,10 +2257,10 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
 
         private static Footnote CreateFootnote(Release release,
             string content,
-            ICollection<FilterFootnote> filterFootnotes = null,
-            ICollection<FilterGroupFootnote> filterGroupFootnotes = null,
-            ICollection<FilterItemFootnote> filterItemFootnotes = null,
-            ICollection<IndicatorFootnote> indicatorFootnotes = null,
+            List<FilterFootnote> filterFootnotes = null,
+            List<FilterGroupFootnote> filterGroupFootnotes = null,
+            List<FilterItemFootnote> filterItemFootnotes = null,
+            List<IndicatorFootnote> indicatorFootnotes = null,
             Subject subject = null)
         {
             return new Footnote
