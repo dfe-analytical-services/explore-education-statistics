@@ -57,16 +57,18 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Services
                 {
                     var newFootnoteId = Guid.NewGuid();
 
-                    var footnote = (await _context.Footnote.AddAsync(new Footnote
+                    var footnote = new Footnote
                     {
+                        Id = newFootnoteId,
                         Content = content,
                         Subjects = CreateSubjectLinks(newFootnoteId, subjectIds),
                         Filters = CreateFilterLinks(newFootnoteId, filterIds),
                         FilterGroups = CreateFilterGroupLinks(newFootnoteId, filterGroupIds),
                         FilterItems = CreateFilterItemLinks(newFootnoteId, filterItemIds),
                         Indicators = CreateIndicatorsLinks(newFootnoteId, indicatorIds)
+                    };
 
-                    })).Entity;
+                    await _context.Footnote.AddAsync(footnote);
 
                     await _context.ReleaseFootnote.AddAsync(new ReleaseFootnote
                         {
