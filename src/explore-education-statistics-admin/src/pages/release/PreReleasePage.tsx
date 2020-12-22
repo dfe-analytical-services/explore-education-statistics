@@ -106,7 +106,7 @@ const PreReleasePage = ({ match }: RouteComponentProps<MatchProps>) => {
           {preReleaseSummary && (
             <>
               <p>
-                Pre-releease access for the{' '}
+                Pre-release access for the{' '}
                 <strong>{preReleaseSummary.releaseTitle}</strong> release of{' '}
                 <strong>{preReleaseSummary.publicationTitle}</strong> is not yet
                 available.
