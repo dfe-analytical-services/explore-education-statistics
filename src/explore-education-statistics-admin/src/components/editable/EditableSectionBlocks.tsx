@@ -15,7 +15,6 @@ import React, { useCallback, useState } from 'react';
 import { DragDropContext, DropResult } from 'react-beautiful-dnd';
 import classNames from 'classnames';
 import EditableBlockRenderer from './EditableBlockRenderer';
-import styles from './EditableSectionBlocks.module.scss';
 
 export interface EditableSectionBlockProps extends SectionBlocksProps {
   content: EditableBlock[];
@@ -29,7 +28,7 @@ export interface EditableSectionBlockProps extends SectionBlocksProps {
 }
 
 const EditableSectionBlocks = (props: EditableSectionBlockProps) => {
-  const [openedCommentId, setOpenedCommentId] = useState<string[]>([]);
+  const [openedCommentIds, setOpenedCommentIds] = useState<string[]>([]);
 
   const {
     releaseId,
@@ -83,10 +82,9 @@ const EditableSectionBlocks = (props: EditableSectionBlockProps) => {
           <div
             key={block.id}
             id={`editableSectionBlocks-${block.id}`}
-            className={classNames(
-              'govuk-!-margin-bottom-9',
-              openedCommentId.includes(block.id) && styles.openSectionBlock,
-            )}
+            className={classNames('govuk-!-margin-bottom-9', {
+              openSectionBlocks: openedCommentIds.includes(block.id),
+            })}
             data-testid="editableSectionBlock"
           >
             <BlockDraggable
@@ -104,9 +102,9 @@ const EditableSectionBlocks = (props: EditableSectionBlockProps) => {
                   onChange={handleCommentsChange}
                   onToggle={opened =>
                     opened
-                      ? setOpenedCommentId([block.id, ...openedCommentId])
-                      : setOpenedCommentId(
-                          openedCommentId.filter(e => e !== block.id),
+                      ? setOpenedCommentIds([block.id, ...openedCommentIds])
+                      : setOpenedCommentIds(
+                          openedCommentIds.filter(e => e !== block.id),
                         )
                   }
                 />
