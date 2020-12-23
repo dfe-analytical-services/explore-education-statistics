@@ -5,7 +5,7 @@ using GovUk.Education.ExploreEducationStatistics.Admin.Services.Interfaces;
 using GovUk.Education.ExploreEducationStatistics.Admin.ViewModels;
 using GovUk.Education.ExploreEducationStatistics.Common.Extensions;
 using GovUk.Education.ExploreEducationStatistics.Common.Model;
-using Microsoft.AspNetCore.Mvc;
+using GovUk.Education.ExploreEducationStatistics.Content.Model;
 using Moq;
 using Xunit;
 
@@ -17,7 +17,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Controllers.Api
         public async void GetUserList_Returns_Ok()
         {
             var userManagementService = new Mock<IUserManagementService>();
-            userManagementService.Setup(s => s.ListAsync())
+            userManagementService.Setup(s => s.ListAllUsers())
                 .ReturnsAsync(new List<UserViewModel>
                 {
                     new UserViewModel {Id = Guid.NewGuid().ToString()},
@@ -25,27 +25,27 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Controllers.Api
                 });
             var controller = new UsersController(userManagementService.Object);
 
-            var result = await controller.GetUserList();
+            var actionResult = await controller.GetUserList();
+            var result = actionResult.Value;
 
-            Assert.IsAssignableFrom<OkObjectResult>(result.Result);
-
-            var model = (List<UserViewModel>) ((OkObjectResult) result.Result).Value;
-            Assert.IsAssignableFrom<List<UserViewModel>>(model);
-            Assert.Equal(2, model.Count);
+            Assert.IsType<List<UserViewModel>>(result);
+            Assert.Equal(2, result.Count);
         }
 
         [Fact]
-        public async void GetUserList_Returns_Not_Found()
+        public async void GetUserList_Empty()
         {
             var userManagementService = new Mock<IUserManagementService>();
-            userManagementService.Setup(s => s.ListAsync())
+            userManagementService.Setup(s => s.ListAllUsers())
                 .ReturnsAsync(new List<UserViewModel>());
 
             var controller = new UsersController(userManagementService.Object);
 
-            var result = await controller.GetUserList();
+            var actionResult = await controller.GetUserList();
+            var result = actionResult.Value;
 
-            Assert.IsAssignableFrom<NotFoundResult>(result.Result);
+            Assert.IsType<List<UserViewModel>>(result);
+            Assert.Empty(result);
         }
 
         [Fact]
@@ -53,35 +53,18 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Controllers.Api
         {
             var userId = Guid.NewGuid().ToString();
             var userManagementService = new Mock<IUserManagementService>();
-            userManagementService.Setup(s => s.GetAsync(userId))
+            userManagementService.Setup(s => s.GetUser(userId))
                 .ReturnsAsync(
                     new UserViewModel {Id = userId}
                 );
             var controller = new UsersController(userManagementService.Object);
 
-            var result = await controller.GetUser(userId);
+            var actionResult = await controller.GetUser(userId);
+            var result = actionResult.Value;
 
-            Assert.IsAssignableFrom<OkObjectResult>(result.Result);
-
-            var model = (UserViewModel) ((OkObjectResult) result.Result).Value;
-            Assert.IsAssignableFrom<UserViewModel>(model);
-            Assert.Equal(userId, model.Id);
+            Assert.IsType<UserViewModel>(result);
+            Assert.Equal(userId, result.Id);
         }
-
-        [Fact]
-        public async void GetUser_Returns_Not_Found()
-        {
-            var userManagementService = new Mock<IUserManagementService>();
-            userManagementService.Setup(s => s.GetAsync("not-found"))
-                .ReturnsAsync(new UserViewModel());
-
-            var controller = new UsersController(userManagementService.Object);
-
-            var result = await controller.GetUser(Guid.NewGuid().ToString());
-
-            Assert.IsAssignableFrom<NotFoundResult>(result.Result);
-        }
-
 
         [Fact]
         public async void GetUserReleaseRoles_Returns_Ok()
@@ -89,7 +72,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Controllers.Api
             var userId = Guid.NewGuid();
             var userManagementService = new Mock<IUserManagementService>();
             userManagementService.Setup(s => s.GetUserReleaseRoles(userId.ToString()))
-                .Returns(new List<UserReleaseRoleViewModel>
+                .ReturnsAsync(new List<UserReleaseRoleViewModel>
                 {
                     new UserReleaseRoleViewModel {Publication = new IdTitlePair {Id = Guid.NewGuid(), Title = "Pub a"}},
                     new UserReleaseRoleViewModel {Publication = new IdTitlePair {Id = Guid.NewGuid(), Title = "Pub b"}}
@@ -97,29 +80,27 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Controllers.Api
 
             var controller = new UsersController(userManagementService.Object);
 
-            var result = controller.GetUserReleaseRoles(userId);
+            var actionResult = await controller.GetUserReleaseRoles(userId.ToString());
+            var result = actionResult.Value;
 
-            Assert.IsAssignableFrom<OkObjectResult>(result.Result);
-
-            var model = (List<UserReleaseRoleViewModel>) ((OkObjectResult) result.Result).Value;
-
-            Assert.IsAssignableFrom<List<UserReleaseRoleViewModel>>(model);
-            Assert.Equal(2, model.Count);
+            Assert.IsType<List<UserReleaseRoleViewModel>>(result);
+            Assert.Equal(2, result.Count);
         }
 
         [Fact]
-        public async void GetUserReleaseRoles_Returns_Not_Found()
+        public async void GetUserReleaseRoles_Returns_Empty()
         {
             var userId = Guid.NewGuid();
             var userManagementService = new Mock<IUserManagementService>();
             userManagementService.Setup(s => s.GetUserReleaseRoles(userId.ToString()))
-                .Returns(new List<UserReleaseRoleViewModel>());
+                .ReturnsAsync(new List<UserReleaseRoleViewModel>());
 
             var controller = new UsersController(userManagementService.Object);
 
-            var result = controller.GetUserReleaseRoles(userId);
+            var result = await controller.GetUserReleaseRoles(userId.ToString());
 
-            Assert.IsAssignableFrom<NotFoundResult>(result.Result);
+            Assert.IsType<List<UserReleaseRoleViewModel>>(result.Value);
+            Assert.Empty(result.Value);
         }
 
         [Fact]
@@ -135,13 +116,10 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Controllers.Api
             
             var controller = new UsersController(userManagementService.Object);
 
-            var result = await controller.GetReleases();
+            var actionResult = await controller.GetReleases();
+            var result = actionResult.Value;
 
-            Assert.IsAssignableFrom<OkObjectResult>(result.Result);
-            
-            var model = (List<IdTitlePair>) ((OkObjectResult) result.Result).Value;
-            Assert.IsAssignableFrom<List<IdTitlePair>>(model);
-            Assert.Equal(2, model.Count);
+            Assert.Equal(2, result.Count);
         }
 
         [Fact]
@@ -157,39 +135,25 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Controllers.Api
 
             var controller = new UsersController(userManagementService.Object);
 
-            var result = await controller.GetRoles();
+            var actionResult = await controller.GetRoles();
+            var result = actionResult.Value;
 
-            Assert.IsAssignableFrom<OkObjectResult>(result.Result);
-
-            var model = (List<RoleViewModel>) ((OkObjectResult) result.Result).Value;
-            Assert.IsAssignableFrom<List<RoleViewModel>>(model);
-            Assert.Equal(2, model.Count);
+            Assert.IsType<List<RoleViewModel>>(result);
+            Assert.Equal(2, result.Count);
         }
 
         [Fact]
-        public async void GetRoles_Returns_Not_Found()
+        public async void GetReleaseRoles_Returns_Ok()
         {
             var userManagementService = new Mock<IUserManagementService>();
-
-            userManagementService.Setup(s => s.ListRoles())
-                .ReturnsAsync(new List<RoleViewModel>());
+            userManagementService.Setup(s => s.ListReleaseRoles())
+                .ReturnsAsync(EnumExtensions.GetValues<ReleaseRole>());
 
             var controller = new UsersController(userManagementService.Object);
 
-            var result = await controller.GetRoles();
-
-            Assert.IsAssignableFrom<NotFoundResult>(result.Result);
-        }
-
-        [Fact]
-        public void GetReleaseRoles_Returns_Ok()
-        {
-            var userManagementService = new Mock<IUserManagementService>();
-
-            var controller = new UsersController(userManagementService.Object);
-
-            var result = controller.GetReleaseRoles();
-            Assert.IsAssignableFrom<List<EnumExtensions.EnumValue>>(result);
+            var actionResult = await controller.GetReleaseRoles();
+            var result = actionResult.Value;
+            Assert.IsType<List<EnumExtensions.EnumValue>>(result);
             Assert.Equal(5, result.Count);
         }
     }
