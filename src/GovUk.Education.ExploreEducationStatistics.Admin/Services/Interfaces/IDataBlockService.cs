@@ -14,21 +14,21 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Services.Interfaces
 {
     public interface IDataBlockService
     {
-        Task<Either<ActionResult, DataBlockViewModel>> CreateAsync(ReleaseId releaseId, CreateDataBlockViewModel createDataBlock);
+        Task<Either<ActionResult, DataBlockViewModel>> Create(ReleaseId releaseId, CreateDataBlockViewModel createDataBlock);
 
-        Task<Either<ActionResult, Unit>> DeleteAsync(ReleaseId releaseId, DataBlockId id);
+        Task<Either<ActionResult, Unit>> Delete(ReleaseId releaseId, DataBlockId id);
 
-        Task<DataBlockViewModel> GetAsync(DataBlockId id);
+        Task<Either<ActionResult, DataBlockViewModel>> Get(DataBlockId id);
 
-        Task<List<DataBlockViewModel>> ListAsync(ReleaseId releaseId);
+        Task<Either<ActionResult, List<DataBlockViewModel>>> List(ReleaseId releaseId);
 
-        Task<Either<ActionResult, DataBlockViewModel>> UpdateAsync(DataBlockId id, UpdateDataBlockViewModel updateDataBlock);
+        Task<Either<ActionResult, DataBlockViewModel>> Update(DataBlockId id, UpdateDataBlockViewModel updateDataBlock);
 
         Task DeleteDataBlocks(DeleteDataBlockPlan deletePlan);
 
-        Task<Either<ActionResult, DeleteDataBlockPlan>> GetDeleteDataBlockPlan(Guid releaseId, Guid id);
+        Task<Either<ActionResult, DeleteDataBlockPlan>> GetDeletePlan(Guid releaseId, Guid id);
 
-        Task<DeleteDataBlockPlan> GetDeleteDataBlockPlan(Guid releaseId, Subject subject);
+        Task<DeleteDataBlockPlan> GetDeletePlan(Guid releaseId, Subject subject);
 
         Task<Either<ActionResult, Unit>> RemoveChartFile(Guid releaseId, Guid id);
     }

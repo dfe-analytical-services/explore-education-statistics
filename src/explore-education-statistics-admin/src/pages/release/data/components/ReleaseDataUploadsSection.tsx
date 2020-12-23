@@ -17,6 +17,7 @@ import Accordion from '@common/components/Accordion';
 import AccordionSection from '@common/components/AccordionSection';
 import ButtonText from '@common/components/ButtonText';
 import FormFieldTextInput from '@common/components/form/FormFieldTextInput';
+import InsetText from '@common/components/InsetText';
 import LoadingSpinner from '@common/components/LoadingSpinner';
 import ModalConfirm from '@common/components/ModalConfirm';
 import WarningMessage from '@common/components/WarningMessage';
@@ -24,9 +25,9 @@ import useAsyncHandledRetry from '@common/hooks/useAsyncHandledRetry';
 import logger from '@common/services/logger';
 import { mapFieldErrors } from '@common/validation/serverValidations';
 import Yup from '@common/validation/yup';
+import orderBy from 'lodash/orderBy';
 import React, { useCallback, useState } from 'react';
 import { generatePath } from 'react-router';
-import orderBy from 'lodash/orderBy';
 
 interface FormValues extends DataFileUploadFormValues {
   subjectTitle: string;
@@ -120,13 +121,13 @@ const ReleaseDataUploadsSection = ({
 
       if (values.uploadType === 'csv') {
         file = await releaseDataFileService.uploadDataFiles(releaseId, {
-          name: values.subjectTitle,
+          name: values.subjectTitle.trim(),
           dataFile: values.dataFile as File,
           metadataFile: values.metadataFile as File,
         });
       } else {
         file = await releaseDataFileService.uploadZipDataFile(releaseId, {
-          name: values.subjectTitle,
+          name: values.subjectTitle.trim(),
           zipFile: values.zipFile as File,
         });
       }
@@ -139,7 +140,7 @@ const ReleaseDataUploadsSection = ({
   return (
     <>
       <h2>Add data file to release</h2>
-      <div className="govuk-inset-text">
+      <InsetText>
         <h3>Before you start</h3>
         <p>
           Data files will be displayed in the table tool and can be used to
@@ -165,7 +166,7 @@ const ReleaseDataUploadsSection = ({
             </a>
           </li>
         </ul>
-      </div>
+      </InsetText>
       {canUpdateRelease ? (
         <DataFileUploadForm
           id={formId}
@@ -181,6 +182,7 @@ const ReleaseDataUploadsSection = ({
           validationSchema={baseSchema =>
             baseSchema.shape({
               subjectTitle: Yup.string()
+                .trim()
                 .required('Enter a subject title')
                 .test({
                   name: 'unique',
@@ -277,7 +279,7 @@ const ReleaseDataUploadsSection = ({
             ))}
           </Accordion>
         ) : (
-          <p className="govuk-inset-text">No data files have been uploaded.</p>
+          <InsetText>No data files have been uploaded.</InsetText>
         )}
       </LoadingSpinner>
       {deleteDataFile && (

@@ -39,6 +39,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Controllers.Api.Secur
             public bool CanAccessSystem { get; set; }
             public bool CanAccessPrereleasePages { get; set; }
             public bool CanAccessAnalystPages { get; set; }
+            public bool CanAccessAllImports { get; set; }
             public bool CanAccessUserAdministrationPages { get; set; }
             public bool CanAccessMethodologyAdministrationPages { get; set; }
             public bool CanManageAllTaxonomy { get; set; }
@@ -51,6 +52,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Controllers.Api.Secur
             {
                 CanAccessSystem = _userService.CheckCanAccessSystem().Result.IsRight,
                 CanAccessAnalystPages = _userService.CheckCanAccessAnalystPages().Result.IsRight,
+                CanAccessAllImports = _userService.CheckCanViewAllImports().Result.IsRight,
                 CanAccessPrereleasePages = _userService.CheckCanAccessPrereleasePages().Result.IsRight,
                 CanAccessUserAdministrationPages = _userService.CheckCanManageAllUsers().Result.IsRight,
                 CanAccessMethodologyAdministrationPages = _userService.CheckCanManageAllMethodologies().Result.IsRight,

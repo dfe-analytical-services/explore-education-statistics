@@ -4,7 +4,7 @@ import releaseNoteService from '@admin/services/releaseNoteService';
 import Button from '@common/components/Button';
 import ButtonGroup from '@common/components/ButtonGroup';
 import Details from '@common/components/Details';
-import { Form, FormFieldset } from '@common/components/form';
+import { Form } from '@common/components/form';
 import FormFieldDateInput from '@common/components/form/FormFieldDateInput';
 import FormFieldTextArea from '@common/components/form/FormFieldTextArea';
 import FormattedDate from '@common/components/FormattedDate';
@@ -18,7 +18,7 @@ interface Props {
   release: EditableRelease;
 }
 
-interface AddFormValues {
+interface CreateFormValues {
   reason: string;
 }
 
@@ -48,7 +48,7 @@ const ReleaseNotesSection = ({ release }: Props) => {
   );
   const { isEditing } = useEditingContext();
 
-  const addReleaseNote = (releaseNote: AddFormValues) => {
+  const addReleaseNote = (releaseNote: CreateFormValues) => {
     return new Promise(resolve => {
       releaseNoteService
         .create(release.id, releaseNote)
@@ -85,12 +85,14 @@ const ReleaseNotesSection = ({ release }: Props) => {
   };
 
   const renderAddForm = () => {
+    const formId = 'createReleaseNoteForm';
+
     return !addFormOpen ? (
       <Button onClick={openAddForm}>Add note</Button>
     ) : (
-      <Formik<AddFormValues>
+      <Formik<CreateFormValues>
         initialValues={{ reason: '' }}
-        validationSchema={Yup.object<AddFormValues>({
+        validationSchema={Yup.object<CreateFormValues>({
           reason: Yup.string().required('Release note must be provided'),
         })}
         onSubmit={releaseNote =>
@@ -101,22 +103,16 @@ const ReleaseNotesSection = ({ release }: Props) => {
       >
         {form => {
           return (
-            <Form {...form} id="create-new-release-note-form">
-              <FormFieldset
-                id="allFieldsFieldset"
-                legend="Add new release note"
-                legendSize="m"
-              >
-                <FormFieldTextArea
-                  id="reason"
-                  label="Release note"
-                  name="reason"
-                  rows={3}
-                />
-              </FormFieldset>
+            <Form id={formId}>
+              <FormFieldTextArea<CreateFormValues>
+                id={`${formId}-reason`}
+                label="New release note"
+                name="reason"
+                rows={3}
+              />
 
               <ButtonGroup>
-                <Button type="submit">Add note</Button>
+                <Button type="submit">Save note</Button>
                 <Button
                   variant="secondary"
                   onClick={() => {
@@ -135,7 +131,7 @@ const ReleaseNotesSection = ({ release }: Props) => {
   };
 
   const renderEditForm = () => {
-    const formId = 'edit-release-note-form';
+    const formId = 'editReleaseNoteForm';
 
     return (
       <Formik<EditFormValues>
@@ -164,28 +160,22 @@ const ReleaseNotesSection = ({ release }: Props) => {
       >
         {form => {
           return (
-            <Form {...form} id={formId}>
-              <FormFieldset
-                id="allFieldsFieldset"
-                legend="Edit release note"
-                legendSize="m"
-              >
-                <FormFieldDateInput<EditFormValues>
-                  id={`${formId}-on`}
-                  name="on"
-                  legend="Edit date"
-                  legendSize="s"
-                />
-                <FormFieldTextArea<EditFormValues>
-                  id="reason"
-                  label="Edit release note"
-                  name="reason"
-                  rows={3}
-                />
-              </FormFieldset>
+            <Form id={formId}>
+              <FormFieldDateInput<EditFormValues>
+                id={`${formId}-on`}
+                name="on"
+                legend="Edit date"
+                legendSize="s"
+              />
+              <FormFieldTextArea<EditFormValues>
+                id={`${formId}-reason`}
+                label="Edit release note"
+                name="reason"
+                rows={3}
+              />
 
               <ButtonGroup>
-                <Button type="submit">Update</Button>
+                <Button type="submit">Update note</Button>
                 <Button
                   variant="secondary"
                   onClick={() => {
@@ -236,13 +226,13 @@ const ReleaseNotesSection = ({ release }: Props) => {
                               variant="secondary"
                               onClick={() => openEditForm(elem)}
                             >
-                              Edit
+                              Edit note
                             </Button>
                             <Button
                               variant="warning"
                               onClick={() => setDeletedReleaseNote(elem)}
                             >
-                              Remove
+                              Remove note
                             </Button>
                           </ButtonGroup>
                         )}

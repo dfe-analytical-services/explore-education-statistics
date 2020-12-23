@@ -5,6 +5,7 @@ import styles from '@admin/pages/release/components/PublicPreReleaseAccessForm.m
 import Button from '@common/components/Button';
 import ButtonGroup from '@common/components/ButtonGroup';
 import { Form } from '@common/components/form';
+import InsetText from '@common/components/InsetText';
 import WarningMessage from '@common/components/WarningMessage';
 import useToggle from '@common/hooks/useToggle';
 import { Formik } from 'formik';
@@ -46,7 +47,7 @@ const PublicPreReleaseAccessForm = ({
   return (
     <>
       {!isReleaseLive && (
-        <div className="govuk-inset-text">
+        <InsetText>
           <h3 className="govuk-heading-m">Before you start</h3>
           <ul>
             <li>
@@ -58,7 +59,7 @@ const PublicPreReleaseAccessForm = ({
               released
             </li>
           </ul>
-        </div>
+        </InsetText>
       )}
 
       {showForm ? (

@@ -135,7 +135,12 @@ const HorizontalBarBlock = ({
           />
 
           <Tooltip
-            content={<CustomTooltip dataSetCategories={dataSetCategories} />}
+            content={
+              <CustomTooltip
+                dataSetCategories={dataSetCategories}
+                dataSetCategoryConfigs={dataSetCategoryConfigs}
+              />
+            }
             wrapperStyle={{ zIndex: 1000 }}
           />
 

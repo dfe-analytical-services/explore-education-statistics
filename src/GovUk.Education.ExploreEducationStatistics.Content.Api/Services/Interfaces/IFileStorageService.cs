@@ -7,5 +7,9 @@ namespace GovUk.Education.ExploreEducationStatistics.Content.Api.Services.Interf
     public interface IFileStorageService
     {
         Task<Either<ActionResult, T>> GetDeserialized<T>(string path);
+
+        Task<bool> IsBlobReleased(string containerName, string path);
+
+        Task<FileStreamResult> StreamFile(string containerName, string path);
     }
 }

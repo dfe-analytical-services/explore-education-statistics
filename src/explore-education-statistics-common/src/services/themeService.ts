@@ -14,6 +14,8 @@ export interface PublicationSummary extends BasePublicationSummary {
 
 export interface PublicationDownloadSummary extends BasePublicationSummary {
   downloadFiles: FileInfo[];
+  earliestReleaseTime: string;
+  latestReleaseTime: string;
 }
 
 export interface PublicationMethodologySummary extends BasePublicationSummary {

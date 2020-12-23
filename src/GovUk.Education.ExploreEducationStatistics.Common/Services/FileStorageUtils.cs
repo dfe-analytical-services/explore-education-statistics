@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Diagnostics.CodeAnalysis;
+using System.Globalization;
 using System.IO;
 using GovUk.Education.ExploreEducationStatistics.Common.Extensions;
 using Microsoft.Azure.Storage.Blob;
@@ -20,6 +21,32 @@ namespace GovUk.Education.ExploreEducationStatistics.Common.Services
             Tb
         }
 
+        public static IDictionary<string, string> GetAllFilesZipMetaValues(
+            string name,
+            DateTime releaseDateTime)
+        {
+            return new Dictionary<string, string>
+            {
+                {
+                    BlobInfoExtensions.NameKey, name
+                },
+                {
+                    BlobInfoExtensions.ReleaseDateTimeKey, releaseDateTime.ToString("o", CultureInfo.InvariantCulture)
+                }
+            };
+        }
+
+        public static IDictionary<string, string> GetAncillaryFileMetaValues(
+            string filename,
+            string name)
+        {
+            return new Dictionary<string, string>
+            {
+                {BlobInfoExtensions.FilenameKey, filename},
+                {BlobInfoExtensions.NameKey, name}
+            };
+        }
+
         public static IDictionary<string, string> GetDataFileMetaValues(
             string name,
             string metaFileName,
@@ -35,16 +62,11 @@ namespace GovUk.Education.ExploreEducationStatistics.Common.Services
             };
         }
 
-        public static IDictionary<string, string> GetMetaDataFileMetaValues(
-            string dataFileName,
-            string userName,
-            int numberOfRows)
+        public static IDictionary<string, string> GetMetaDataFileMetaValues(string dataFileName)
         {
             return new Dictionary<string, string>
             {
-                {BlobInfoExtensions.DataFileKey, dataFileName.ToLower()},
-                {BlobInfoExtensions.UserNameKey, userName},
-                {BlobInfoExtensions.NumberOfRowsKey, numberOfRows.ToString()}
+                {BlobInfoExtensions.DataFileKey, dataFileName.ToLower()}
             };
         }
 

@@ -41,6 +41,12 @@ public class Either<Tl, Tr> {
 
         public Either<Tl, Tr> OrElse(Func<Tr> func) => IsLeft ? func() : Right;
 
+        public T Fold<T>(Func<Tl, T> leftFunc, Func<Tr, T> rightFunc) => IsRight ? rightFunc(Right) : leftFunc(Left);
+
+        public T FoldLeft<T>(Func<Tl, T> leftFunc, T defaultValue) => IsLeft ? leftFunc(Left) : defaultValue;
+
+        public T FoldRight<T>(Func<Tr, T> rightFunc, T defaultValue) => IsRight ? rightFunc(Right) : defaultValue;
+
         public static implicit operator Either<Tl, Tr>(Tl left) => new Either<Tl, Tr>(left);
 
         public static implicit operator Either<Tl, Tr>(Tr right) => new Either<Tl, Tr>(right);
@@ -104,6 +110,24 @@ public class Either<Tl, Tr> {
             }
 
             await func();
+
+            return Unit.Instance;
+        }
+        
+        /**
+         * Convenience method so that the chained function can be
+         * void and doesn't have to explicitly return a Unit.
+         */
+        public static async Task<Either<Tl, Unit>> OnSuccessVoid<Tl, Tr>(this Task<Either<Tl, Tr>> task, Action action)
+        {
+            var firstResult = await task;
+
+            if (firstResult.IsLeft)
+            {
+                return firstResult.Left;
+            }
+
+            action();
 
             return Unit.Instance;
         }

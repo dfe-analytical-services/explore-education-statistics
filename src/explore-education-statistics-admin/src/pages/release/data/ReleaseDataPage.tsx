@@ -10,6 +10,12 @@ import TabsSection from '@common/components/TabsSection';
 import useAsyncHandledRetry from '@common/hooks/useAsyncHandledRetry';
 import React, { useState } from 'react';
 
+export const releaseDataPageTabIds = {
+  dataUploads: 'data-uploads',
+  fileUploads: 'file-uploads',
+  metaGuidance: 'metadata-guidance',
+};
+
 const ReleaseDataPage = () => {
   const { publication, releaseId } = useManageReleaseContext();
   const [dataFiles, setDataFiles] = useState<DataFile[]>([]);
@@ -25,7 +31,10 @@ const ReleaseDataPage = () => {
   return (
     <LoadingSpinner loading={isLoading}>
       <Tabs id="dataUploadTab">
-        <TabsSection id="data-uploads" title="Data uploads">
+        <TabsSection
+          id={releaseDataPageTabIds.dataUploads}
+          title="Data uploads"
+        >
           <ReleaseDataUploadsSection
             publicationId={publication.id}
             releaseId={releaseId}
@@ -33,13 +42,20 @@ const ReleaseDataPage = () => {
             onDataFilesChange={setDataFiles}
           />
         </TabsSection>
-        <TabsSection id="file-uploads" title="Ancillary file uploads">
+        <TabsSection
+          id={releaseDataPageTabIds.fileUploads}
+          title="Ancillary file uploads"
+        >
           <ReleaseFileUploadsSection
             releaseId={releaseId}
             canUpdateRelease={canUpdateRelease}
           />
         </TabsSection>
-        <TabsSection id="metadata-guidance" title="Metadata guidance" lazy>
+        <TabsSection
+          id={releaseDataPageTabIds.metaGuidance}
+          title="Metadata guidance"
+          lazy
+        >
           <ReleaseMetaGuidanceSection
             // Track data files so that we can re-render this
             // section automatically whenever there is a change

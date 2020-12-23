@@ -10,6 +10,7 @@ import ButtonText from '@common/components/ButtonText';
 import { Form } from '@common/components/form';
 import FormFieldFileInput from '@common/components/form/FormFieldFileInput';
 import FormFieldTextInput from '@common/components/form/FormFieldTextInput';
+import InsetText from '@common/components/InsetText';
 import LoadingSpinner from '@common/components/LoadingSpinner';
 import ModalConfirm from '@common/components/ModalConfirm';
 import SummaryList from '@common/components/SummaryList';
@@ -87,7 +88,7 @@ const ReleaseFileUploadsSection = ({ releaseId, canUpdateRelease }: Props) => {
       const newFile = await releaseAncillaryFileService.uploadAncillaryFile(
         releaseId,
         {
-          name: values.name,
+          name: values.name.trim(),
           file: values.file as File,
         },
       );
@@ -120,6 +121,7 @@ const ReleaseFileUploadsSection = ({ releaseId, canUpdateRelease }: Props) => {
         onSubmit={handleSubmit}
         validationSchema={Yup.object<FormValues>({
           name: Yup.string()
+            .trim()
             .required('Enter a name')
             .test({
               name: 'unique',
@@ -143,14 +145,14 @@ const ReleaseFileUploadsSection = ({ releaseId, canUpdateRelease }: Props) => {
         {form => (
           <>
             <h2>Add file to release</h2>
-            <div className="govuk-inset-text">
+            <InsetText>
               <h3>Before you start</h3>
               <p>
                 Ancillary files are additional files attached to the release for
                 users to download. They will appear in the associated files list
                 on the release page and the download files page.
               </p>
-            </div>
+            </InsetText>
 
             {canUpdateRelease ? (
               <Form id={formId}>
@@ -249,7 +251,7 @@ const ReleaseFileUploadsSection = ({ releaseId, canUpdateRelease }: Props) => {
             ))}
           </Accordion>
         ) : (
-          <p className="govuk-inset-text">No files have been uploaded.</p>
+          <InsetText>No files have been uploaded.</InsetText>
         )}
       </LoadingSpinner>
 

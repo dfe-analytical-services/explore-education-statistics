@@ -112,8 +112,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
             using (var context = InMemoryStatisticsDbContext())
             {
                 var service = new FootnoteService(
-                    context, 
-                    logger.Object, 
+                    context,
                     filterService.Object, 
                     filterGroupService.Object, 
                     filterItemService.Object,
@@ -138,7 +137,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
             Mock<ISubjectService>,
             Mock<IPersistenceHelper<ContentDbContext>>,
             Mock<IUserService>,
-            Mock<IFootnoteService>,
+            Mock<IFootnoteRepository>,
             Mock<IPersistenceHelper<StatisticsDbContext>>) Mocks()
         {
             var contentPersistenceHelper = MockUtils.MockPersistenceHelper<ContentDbContext>();
@@ -153,7 +152,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
                 new Mock<ISubjectService>(), 
                 contentPersistenceHelper,
                 new Mock<IUserService>(),
-                new Mock<IFootnoteService>(), 
+                new Mock<IFootnoteRepository>(), 
                 MockUtils.MockPersistenceHelper<StatisticsDbContext, Footnote>(footnote.Id, footnote));
         }
     }

@@ -10,6 +10,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Security
         PrereleasePagesAccessGranted,
         ManageAnyUser,
         ManageAnyMethodology,
+        AccessAllImports,
 
         /**
          * Publication management
@@ -29,6 +30,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Security
         MakeAmendmentsOfAllReleases,
         PublishAllReleases,
         DeleteAllReleaseAmendments,
+        CancelAllFileImports,
         
         /**
          * Pre Release management

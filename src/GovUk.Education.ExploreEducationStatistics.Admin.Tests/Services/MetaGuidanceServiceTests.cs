@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
 using GovUk.Education.ExploreEducationStatistics.Admin.Services;
+using GovUk.Education.ExploreEducationStatistics.Admin.Services.Interfaces;
 using GovUk.Education.ExploreEducationStatistics.Admin.ViewModels;
 using GovUk.Education.ExploreEducationStatistics.Common.Model;
 using GovUk.Education.ExploreEducationStatistics.Common.Services.Interfaces.Security;
@@ -835,7 +836,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
                 var result = await service.Validate(release.Id);
 
                 Assert.True(result.IsLeft);
-                ValidationTestUtil.AssertValidationProblem(result.Left, MetaGuidanceMustBePopulated);
+                ValidationTestUtil.AssertValidationProblem(result.Left, PublicMetaGuidanceRequired);
             }
         }
 
@@ -884,7 +885,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
 
                 metaGuidanceSubjectService.Verify(mock => mock.Validate(release.Id), Times.Once);
 
-                ValidationTestUtil.AssertValidationProblem(result.Left, MetaGuidanceMustBePopulated);
+                ValidationTestUtil.AssertValidationProblem(result.Left, PublicMetaGuidanceRequired);
             }
         }
 
@@ -893,14 +894,16 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
             StatisticsDbContext statisticsDbContext = null,
             IPersistenceHelper<ContentDbContext> contentPersistenceHelper = null,
             IMetaGuidanceSubjectService metaGuidanceSubjectService = null,
-            IUserService userService = null)
+            IUserService userService = null,
+            IFileRepository fileRepository = null)
         {
             return new MetaGuidanceService(
                 contentDbContext,
                 contentPersistenceHelper ?? new PersistenceHelper<ContentDbContext>(contentDbContext),
                 metaGuidanceSubjectService ?? new Mock<IMetaGuidanceSubjectService>().Object,
                 statisticsDbContext ?? new Mock<StatisticsDbContext>().Object,
-                userService ?? MockUtils.AlwaysTrueUserService().Object
+                userService ?? MockUtils.AlwaysTrueUserService().Object,
+                fileRepository ?? new FileRepository(contentDbContext)
             );
         }
     }

@@ -208,6 +208,30 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin
             services.AddTransient<IReleaseDataFileService, ReleaseDataFileService>();
             services.AddTransient<IReleaseFileService, ReleaseFileService>();
             services.AddTransient<IImportService, ImportService>();
+            services.AddTransient<IImportStatusBauService, ImportStatusBauService>();
+            services.AddTransient<IMigrateFilesService, MigrateFilesService>(provider =>
+            {
+                var privateStorageConnectionString = Configuration.GetValue<string>("CoreStorage");
+                var publicStorageConnectionString = Configuration.GetValue<string>("PublicStorage");
+
+                var privateBlobStorageService = new BlobStorageService(
+                    privateStorageConnectionString,
+                    new BlobServiceClient(privateStorageConnectionString),
+                    provider.GetRequiredService<ILogger<BlobStorageService>>());
+
+                var publicBlobStorageService = new BlobStorageService(
+                    publicStorageConnectionString,
+                    new BlobServiceClient(publicStorageConnectionString),
+                    provider.GetRequiredService<ILogger<BlobStorageService>>());
+
+                return new MigrateFilesService(
+                    contentDbContext: provider.GetRequiredService<ContentDbContext>(),
+                    privateBlobStorageService: privateBlobStorageService,
+                    publicBlobStorageService: publicBlobStorageService,
+                    releaseFileRepository: provider.GetRequiredService<IReleaseFileRepository>(),
+                    userService: provider.GetRequiredService<IUserService>(),
+                    logger: provider.GetRequiredService<ILogger<MigrateFilesService>>());
+            });
             services.AddTransient<IPublishingService, PublishingService>(provider =>
                 new PublishingService(
                     provider.GetService<IPersistenceHelper<ContentDbContext>>(),
@@ -233,7 +257,9 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin
             services.AddTransient<IContactService, ContactService>();
             services.AddTransient<ILegacyReleaseService, LegacyReleaseService>();
             services.AddTransient<IReleaseService, ReleaseService>();
+            services.AddTransient<ReleaseSubjectService.SubjectDeleter, ReleaseSubjectService.SubjectDeleter>();
             services.AddTransient<IReleaseSubjectService, ReleaseSubjectService>();
+            services.AddTransient<IReleaseChecklistService, ReleaseChecklistService>();
             services.AddTransient<IReleaseRepository, ReleaseRepository>();
             services.AddTransient<IMethodologyService, MethodologyService>();
             services.AddTransient<IMethodologyContentService, MethodologyContentService>();
@@ -272,9 +298,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin
             services.AddTransient<IFilterGroupService, FilterGroupService>();
             services.AddTransient<IFilterItemService, FilterItemService>();
             services.AddTransient<IFootnoteService, FootnoteService>();
-            services.AddTransient<GovUk.Education.ExploreEducationStatistics.Data.Model.Services.Interfaces.IFootnoteService,
-                GovUk.Education.ExploreEducationStatistics.Data.Model.Services.FootnoteService>();
-            services.AddTransient<Data.Model.Services.Interfaces.IFootnoteService, Data.Model.Services.FootnoteService>();
+            services.AddTransient<IFootnoteRepository, FootnoteRepository>();
             services.AddTransient<IGeoJsonService, GeoJsonService>();
             services.AddTransient<IIndicatorGroupService, IndicatorGroupService>();
             services.AddTransient<IIndicatorService, IndicatorService>();
@@ -308,6 +332,8 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin
             );
             services.AddTransient<ITableStorageService, TableStorageService>(s =>
                 new TableStorageService(Configuration.GetValue<string>("CoreStorage")));
+            services.AddTransient<IStorageQueueService, StorageQueueService>(s => 
+                new StorageQueueService(Configuration.GetValue<string>("CoreStorage")));
             services.AddSingleton<IGuidGenerator, SequentialGuidGenerator>();
             AddPersistenceHelper<ContentDbContext>(services);
             AddPersistenceHelper<StatisticsDbContext>(services);
@@ -470,7 +496,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin
                     context.Database.SetCommandTimeout(int.MaxValue);
                     context.Database.Migrate();
 
-                    ApplyCustomMigrations(new EES1598RemoveChartLabelsField(context));
+                    ApplyCustomMigrations();
                 }
             }
         }

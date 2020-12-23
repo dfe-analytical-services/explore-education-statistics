@@ -23,32 +23,32 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
         {
             Id = Guid.NewGuid()
         };
-        
+
         private readonly DataBlock _dataBlock = new DataBlock()
         {
             Id = Guid.NewGuid()
         };
-        
+
         [Fact]
-        public void CreateAsync()
+        public void Create()
         {
-            AssertSecurityPoliciesChecked(service => 
-                service.CreateAsync(_release.Id, new CreateDataBlockViewModel()), CanUpdateSpecificRelease);
+            AssertSecurityPoliciesChecked(service =>
+                service.Create(_release.Id, new CreateDataBlockViewModel()), CanUpdateSpecificRelease);
         }
-        
+
         [Fact]
-        public void UpdateAsync()
+        public void Update()
         {
-            AssertSecurityPoliciesChecked(service => 
-                service.UpdateAsync(_dataBlock.Id, new UpdateDataBlockViewModel()), CanUpdateSpecificRelease);
+            AssertSecurityPoliciesChecked(service =>
+                service.Update(_dataBlock.Id, new UpdateDataBlockViewModel()), CanUpdateSpecificRelease);
         }
-        
+
         [Fact]
-        public void DeleteAsync()
+        public void Delete()
         {
-            AssertSecurityPoliciesChecked(service => service.DeleteAsync(_release.Id, _dataBlock.Id), CanUpdateSpecificRelease);
+            AssertSecurityPoliciesChecked(service => service.Delete(_release.Id, _dataBlock.Id), CanUpdateSpecificRelease);
         }
-        
+
         private void AssertSecurityPoliciesChecked<T>(
             Func<DataBlockService, Task<Either<ActionResult, T>>> protectedAction, params SecurityPolicies[] policies)
         {
@@ -62,8 +62,8 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
                         ContentBlockId = _dataBlock.Id
                     });
                 context.SaveChanges();
-                
-                var service = new DataBlockService(context, AdminMapper(), 
+
+                var service = new DataBlockService(context, AdminMapper(),
                     persistenceHelper.Object, userService.Object,
                     fileStorageService.Object);
 
@@ -72,7 +72,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
         }
 
         private (
-            Mock<IUserService>, 
+            Mock<IUserService>,
             Mock<IPersistenceHelper<ContentDbContext>>,
             Mock<IReleaseFileService>) Mocks()
         {
@@ -81,7 +81,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
             MockUtils.SetupCall(persistenceHelper, _dataBlock.Id, _dataBlock);
 
             return (
-                new Mock<IUserService>(), 
+                new Mock<IUserService>(),
                 persistenceHelper,
                 new Mock<IReleaseFileService>());
         }

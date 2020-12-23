@@ -11,7 +11,6 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Processor.Services.Int
     public interface IValidatorService
     {
         Task<Either<IEnumerable<ValidationError>, ProcessorStatistics>> Validate(
-            Guid releaseId,
             SubjectData subjectData,
             ExecutionContext executionContext,
             ImportMessage message);

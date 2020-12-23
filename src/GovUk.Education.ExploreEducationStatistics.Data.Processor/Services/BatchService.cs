@@ -23,14 +23,14 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Processor.Services
 
         public async Task UpdateStoredMessage(ImportMessage message)
         {
-            var import = await GetImport(message.Release.Id, message.OrigDataFileName);
+            var import = await GetImport(message.Release.Id, message.DataFileName);
             import.Message = JsonConvert.SerializeObject(message);
             await _table.ExecuteAsync(TableOperation.InsertOrReplace(import));
         }
 
-        public async Task FailImport(Guid releaseId, string origDataFileName, IEnumerable<ValidationError> errors)
+        public async Task FailImport(Guid releaseId, string dataFileName, IEnumerable<ValidationError> errors)
         {
-            var import = await GetImport(releaseId, origDataFileName);
+            var import = await GetImport(releaseId, dataFileName);
             if (import.Status != IStatus.COMPLETE && import.Status != IStatus.FAILED)
             {
                 import.Status = IStatus.FAILED;

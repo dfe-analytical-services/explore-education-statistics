@@ -306,7 +306,7 @@ To generate a migration for the content db:
 
 ```
 cd explore-education-statistics\src\GovUk.Education.ExploreEducationStatistics.Admin
-dotnet ef migrations add AdjustFiltersIdsPreSeed --context ContentDbContext --output-dir Migrations/ContentMigrations
+dotnet ef migrations add AdjustFiltersIdsPreSeed --context ContentDbContext --output-dir Migrations/ContentMigrations -v
 ```
 
 #### Statistics DB migrations
@@ -315,7 +315,27 @@ To generate a migration for the statistics db:
 
 ```
 cd explore-education-statistics\src\GovUk.Education.ExploreEducationStatistics.Data.Api
-dotnet ef migrations add Ees183Test --project ..\GovUk.Education.ExploreEducationStatistics.Data.Model
+dotnet ef migrations add Ees183Test --project ..\GovUk.Education.ExploreEducationStatistics.Data.Model -v
+```
+
+#### Users and Roles DB migrations
+
+To generate a migration for the UsersAndRolesDbContext:
+
+```
+cd explore-education-statistics\src\GovUk.Education.ExploreEducationStatistics.Admin
+dotnet ef migrations add EES1234MigrationNameGoesHere --context UsersAndRolesDbContext -v
+```
+
+### Resetting the storage emulator
+
+During development you might want to reset your storage emulator to clear out all data from 
+blobs, queues and tables. This is typically done at the same time as resetting the databases.
+
+To delete all data in the storage emulator:
+
+```
+AzureStorageEmulator.exe clear blob queue table
 ```
 
 ## Automated tests

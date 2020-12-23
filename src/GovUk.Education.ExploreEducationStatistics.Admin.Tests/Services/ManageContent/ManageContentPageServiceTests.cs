@@ -16,6 +16,7 @@ using Moq;
 using Xunit;
 using static GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services.DbUtils;
 using static GovUk.Education.ExploreEducationStatistics.Common.Model.TimeIdentifier;
+using static GovUk.Education.ExploreEducationStatistics.Common.Services.FileStoragePathUtils;
 
 namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services.ManageContent
 {
@@ -111,23 +112,25 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services.Manage
                 new DataBlock()
             };
 
+            var ancillaryFileId = Guid.NewGuid();
+            var dataFileId = Guid.NewGuid();
             var files = new List<FileInfo>
             {
                 new FileInfo
                 {
-                    Id = Guid.NewGuid(),
-                    Extension = "pdf",
+                    Id = ancillaryFileId,
+                    FileName = "ancillary.pdf",
                     Name = "Ancillary File",
-                    Path = $"{release.Id}/ancillary/ancillary.pdf",
+                    Path = AdminReleasePath(release.Id, ReleaseFileTypes.Ancillary, ancillaryFileId),
                     Size = "10 Kb",
                     Type = ReleaseFileTypes.Ancillary
                 },
                 new FileInfo
                 {
-                    Id = Guid.NewGuid(),
-                    Extension = "csv",
+                    Id = dataFileId,
+                    FileName = "data.csv",
                     Name = "Subject File",
-                    Path = $"{release.Id}/data/data.csv",
+                    Path = AdminReleasePath(release.Id, ReleaseFileTypes.Data, dataFileId),
                     Size = "20 Kb",
                     Type = ReleaseFileTypes.Data
                 }
@@ -244,14 +247,16 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services.Manage
                 Assert.Equal("pdf", contentDownloadFiles[0].Extension);
                 Assert.Equal("ancillary.pdf", contentDownloadFiles[0].FileName);
                 Assert.Equal("Ancillary File", contentDownloadFiles[0].Name);
-                Assert.Equal($"{release.Id}/ancillary/ancillary.pdf", contentDownloadFiles[0].Path);
+                Assert.Equal(AdminReleasePath(release.Id, ReleaseFileTypes.Ancillary, ancillaryFileId),
+                    contentDownloadFiles[0].Path);
                 Assert.Equal("10 Kb", contentDownloadFiles[0].Size);
                 Assert.Equal(ReleaseFileTypes.Ancillary, contentDownloadFiles[0].Type);
                 Assert.Equal(files[1].Id, contentDownloadFiles[1].Id);
                 Assert.Equal("csv", contentDownloadFiles[1].Extension);
                 Assert.Equal("data.csv", contentDownloadFiles[1].FileName);
                 Assert.Equal("Subject File", contentDownloadFiles[1].Name);
-                Assert.Equal($"{release.Id}/data/data.csv", contentDownloadFiles[1].Path);
+                Assert.Equal(AdminReleasePath(release.Id, ReleaseFileTypes.Data, dataFileId),
+                    contentDownloadFiles[1].Path);
                 Assert.Equal("20 Kb", contentDownloadFiles[1].Size);
                 Assert.Equal(ReleaseFileTypes.Data, contentDownloadFiles[1].Type);
 
