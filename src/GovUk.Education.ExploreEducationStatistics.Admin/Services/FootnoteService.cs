@@ -6,6 +6,7 @@ using GovUk.Education.ExploreEducationStatistics.Admin.Services.Interfaces;
 using GovUk.Education.ExploreEducationStatistics.Admin.Services.Interfaces.Security;
 using GovUk.Education.ExploreEducationStatistics.Common.Extensions;
 using GovUk.Education.ExploreEducationStatistics.Common.Model;
+using GovUk.Education.ExploreEducationStatistics.Common.Services.Interfaces;
 using GovUk.Education.ExploreEducationStatistics.Common.Services.Interfaces.Security;
 using GovUk.Education.ExploreEducationStatistics.Common.Utils;
 using GovUk.Education.ExploreEducationStatistics.Content.Model.Database;
@@ -26,19 +27,22 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Services
         private readonly IPersistenceHelper<StatisticsDbContext> _statisticsPersistenceHelper;
         private readonly IUserService _userService;
         private readonly IFootnoteRepository _footnoteRepository;
+        private readonly IGuidGenerator _guidGenerator;
 
         public FootnoteService(
             StatisticsDbContext context,
             IPersistenceHelper<ContentDbContext> contentPersistenceHelper,
             IUserService userService,
             IFootnoteRepository footnoteRepository,
-            IPersistenceHelper<StatisticsDbContext> statisticsPersistenceHelper)
+            IPersistenceHelper<StatisticsDbContext> statisticsPersistenceHelper, 
+            IGuidGenerator guidGenerator)
         {
             _context = context;
             _contentPersistenceHelper = contentPersistenceHelper;
             _userService = userService;
             _footnoteRepository = footnoteRepository;
             _statisticsPersistenceHelper = statisticsPersistenceHelper;
+            _guidGenerator = guidGenerator;
         }
 
         public async Task<Either<ActionResult, Footnote>> CreateFootnote(
@@ -55,7 +59,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Services
                 .OnSuccess(_userService.CheckCanUpdateRelease)
                 .OnSuccess(async () =>
                 {
-                    var newFootnoteId = Guid.NewGuid();
+                    var newFootnoteId = _guidGenerator.NewGuid();
 
                     var footnote = new Footnote
                     {
