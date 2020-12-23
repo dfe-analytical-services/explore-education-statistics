@@ -3,6 +3,8 @@ using System.Collections.Generic;
 using System.Linq;
 using GovUk.Education.ExploreEducationStatistics.Admin.Services;
 using GovUk.Education.ExploreEducationStatistics.Common.Extensions;
+using GovUk.Education.ExploreEducationStatistics.Common.Services;
+using GovUk.Education.ExploreEducationStatistics.Common.Services.Interfaces;
 using GovUk.Education.ExploreEducationStatistics.Common.Services.Interfaces.Security;
 using GovUk.Education.ExploreEducationStatistics.Common.Utils;
 using GovUk.Education.ExploreEducationStatistics.Content.Model.Database;
@@ -435,16 +437,27 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
                         }
                     }
                 };
-                
+
                 footnoteRepository
-                    .SetupSequence(s => s.GetFootnote(It.IsAny<Guid>()))
-                    .ReturnsAsync(newFootnote1)
+                    .Setup(s => s.GetFootnote(newFootnote1.Id))
+                    .ReturnsAsync(newFootnote1);
+
+                footnoteRepository
+                    .Setup(s => s.GetFootnote(newFootnote2.Id))
                     .ReturnsAsync(newFootnote2);
+
+                var guidGenerator = new Mock<IGuidGenerator>();
+
+                guidGenerator
+                    .SetupSequence(s => s.NewGuid())
+                    .Returns(newFootnote1.Id)
+                    .Returns(newFootnote2.Id);
 
                 var service = SetupFootnoteService(
                     statisticsDbContext, 
                     contentDbContext, 
-                    footnoteRepository: footnoteRepository.Object);
+                    footnoteRepository: footnoteRepository.Object,
+                    guidGenerator: guidGenerator.Object);
 
                 var result = 
                     await service.CopyFootnotes(release.Id, amendment.Id);
@@ -539,7 +552,8 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
             IPersistenceHelper<ContentDbContext> contentPersistenceHelper = null,
             IUserService userService = null,
             IFootnoteRepository footnoteRepository = null,
-            IPersistenceHelper<StatisticsDbContext> statisticsPersistenceHelper = null)
+            IPersistenceHelper<StatisticsDbContext> statisticsPersistenceHelper = null,
+            IGuidGenerator guidGenerator = null)
         {
             var contentContext = contentDbContext ?? new Mock<ContentDbContext>().Object;
 
@@ -551,7 +565,8 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
                     statisticsDbContext,
                     new Mock<ILogger<FootnoteRepository>>().Object
                 ),
-                statisticsPersistenceHelper ?? new PersistenceHelper<StatisticsDbContext>(statisticsDbContext)
+                statisticsPersistenceHelper ?? new PersistenceHelper<StatisticsDbContext>(statisticsDbContext),
+                guidGenerator ?? new SequentialGuidGenerator()
             );
         }
     }
