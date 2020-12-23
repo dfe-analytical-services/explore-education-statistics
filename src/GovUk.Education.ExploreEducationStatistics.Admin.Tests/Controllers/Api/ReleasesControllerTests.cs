@@ -1,12 +1,10 @@
 using System;
 using System.Collections.Generic;
 using System.IO;
-using System.Security.Claims;
 using System.Threading.Tasks;
 using GovUk.Education.ExploreEducationStatistics.Admin.Controllers.Api;
 using GovUk.Education.ExploreEducationStatistics.Admin.Models;
 using GovUk.Education.ExploreEducationStatistics.Admin.Services.Interfaces;
-using GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services;
 using GovUk.Education.ExploreEducationStatistics.Admin.ViewModels;
 using GovUk.Education.ExploreEducationStatistics.Common.Model;
 using GovUk.Education.ExploreEducationStatistics.Common.Tests.Utils;
@@ -16,6 +14,7 @@ using Microsoft.AspNetCore.Mvc;
 using Moq;
 using Xunit;
 using static GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services.ValidationTestUtil;
+using static GovUk.Education.ExploreEducationStatistics.Admin.Tests.Utils.AdminMockUtils;
 using static GovUk.Education.ExploreEducationStatistics.Admin.Validators.ValidationErrorMessages;
 using static GovUk.Education.ExploreEducationStatistics.Admin.Validators.ValidationUtils;
 using static GovUk.Education.ExploreEducationStatistics.Common.Model.FileType;
@@ -25,12 +24,6 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Controllers.Api
 {
     public class ReleasesControllerTests
     {
-        private static readonly ApplicationUser ApplicationUser = new ApplicationUser
-        {
-            Id = Guid.NewGuid().ToString(),
-            Email = "test@example.com"
-        };
-
         private readonly Guid _releaseId = Guid.NewGuid();
         private readonly Guid _publicationId = Guid.NewGuid();
 
@@ -118,7 +111,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Controllers.Api
                 .Setup(service => service.Upload(_releaseId,
                     dataFile,
                     metaFile,
-                    ApplicationUser.Email,
+                    "test@example.com",
                     null,
                     "Subject name"))
                 .ReturnsAsync(dataFileInfo);
@@ -146,7 +139,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Controllers.Api
                 .Setup(service => service.Upload(_releaseId,
                     dataFile,
                     metaFile,
-                    ApplicationUser.Email,
+                    "test@example.com",
                     null,
                     "Subject name"))
                 .ReturnsAsync(ValidationActionResult(CannotOverwriteFile));
@@ -370,16 +363,6 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Controllers.Api
                 mocks.UserManager.Object,
                 mocks.DataBlockService.Object,
                 mocks.ImportService.Object);
-        }
-
-        private static Mock<UserManager<ApplicationUser>> MockUserManager()
-        {
-            var store = new Mock<IUserStore<ApplicationUser>>();
-            var mock = new Mock<UserManager<ApplicationUser>>(store.Object, null, null, null, null, null, null, null, null);
-
-            mock.Setup(manager => manager.GetUserAsync(It.IsAny<ClaimsPrincipal>())).ReturnsAsync(ApplicationUser);
-
-            return mock;
         }
     }
 }
