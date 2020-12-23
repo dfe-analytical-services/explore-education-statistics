@@ -126,7 +126,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Controllers.Api
         public async void GetReleases_Returns_Ok()
         {
             var userManagementService = new Mock<IUserManagementService>();
-            userManagementService.Setup(s => s.ListReleasesAsync())
+            userManagementService.Setup(s => s.ListReleases())
                 .ReturnsAsync(new List<IdTitlePair>
                 {
                     new IdTitlePair {Title = "Release 1", Id = Guid.NewGuid()},
@@ -148,7 +148,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Controllers.Api
         public async void GetRoles_Returns_Ok()
         {
             var userManagementService = new Mock<IUserManagementService>();
-            userManagementService.Setup(s => s.ListRolesAsync())
+            userManagementService.Setup(s => s.ListRoles())
                 .ReturnsAsync(new List<RoleViewModel>
                 {
                     new RoleViewModel {Name = "Role1", Id = Guid.NewGuid().ToString()},
@@ -171,7 +171,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Controllers.Api
         {
             var userManagementService = new Mock<IUserManagementService>();
 
-            userManagementService.Setup(s => s.ListRolesAsync())
+            userManagementService.Setup(s => s.ListRoles())
                 .ReturnsAsync(new List<RoleViewModel>());
 
             var controller = new UsersController(userManagementService.Object);
