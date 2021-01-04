@@ -6,6 +6,7 @@ using GovUk.Education.ExploreEducationStatistics.Admin.Security;
 using GovUk.Education.ExploreEducationStatistics.Admin.Services;
 using GovUk.Education.ExploreEducationStatistics.Common.Services.Interfaces;
 using GovUk.Education.ExploreEducationStatistics.Common.Services.Interfaces.Security;
+using GovUk.Education.ExploreEducationStatistics.Common.Tests.Utils;
 using GovUk.Education.ExploreEducationStatistics.Content.Model.Database;
 using GovUk.Education.ExploreEducationStatistics.Data.Processor.Model;
 using Microsoft.AspNetCore.Mvc;
@@ -22,7 +23,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
         {
             var userService = new Mock<IUserService>(MockBehavior.Strict);
             var queueService = new Mock<IStorageQueueService>(MockBehavior.Strict);
-            
+
             var cancelRequest = new ReleaseFileImportInfo
             {
                 ReleaseId = Guid.NewGuid(),
@@ -34,16 +35,16 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
                 .ReturnsAsync(true);
 
             queueService
-                .Setup(s => s.AddMessageAsync("imports-cancelling", 
-                    It.Is<CancelImportMessage>(m => m.ReleaseId == cancelRequest.ReleaseId 
+                .Setup(s => s.AddMessageAsync("imports-cancelling",
+                    It.Is<CancelImportMessage>(m => m.ReleaseId == cancelRequest.ReleaseId
                                                     && m.DataFileName == cancelRequest.DataFileName))).
                 Returns(Task.CompletedTask);
 
             var service = BuildImportService(queueService: queueService.Object, userService: userService.Object);
-            
+
             var result = await service.CancelImport(cancelRequest);
             Assert.True(result.IsRight);
-            
+
             MockUtils.VerifyAllMocks(userService, queueService);
         }
 
@@ -64,7 +65,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
                 .ReturnsAsync(false);
 
             var service = BuildImportService(queueService: queueService.Object, userService: userService.Object);
-            
+
             var result = await service.CancelImport(cancelRequest);
             Assert.True(result.IsLeft);
             Assert.IsType<ForbidResult>(result.Left);
@@ -82,12 +83,12 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
             IUserService userService = null)
         {
             return new ImportService(
-                context ?? DbUtils.InMemoryApplicationDbContext(), 
-                mapper ?? new Mock<IMapper>().Object, 
-                logger ?? new Mock<ILogger<ImportService>>().Object, 
+                context ?? DbUtils.InMemoryApplicationDbContext(),
+                mapper ?? new Mock<IMapper>().Object,
+                logger ?? new Mock<ILogger<ImportService>>().Object,
                 queueService ?? new Mock<IStorageQueueService>().Object,
-                tableStorageService ?? new Mock<ITableStorageService>().Object, 
-                guidGenerator ?? new Mock<IGuidGenerator>().Object, 
+                tableStorageService ?? new Mock<ITableStorageService>().Object,
+                guidGenerator ?? new Mock<IGuidGenerator>().Object,
                 userService ?? MockUtils.AlwaysTrueUserService().Object);
         }
     }

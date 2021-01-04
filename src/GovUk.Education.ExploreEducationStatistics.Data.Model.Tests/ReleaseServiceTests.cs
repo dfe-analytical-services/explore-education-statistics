@@ -90,7 +90,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Model.Tests
                 var service = new ReleaseService(context, new Mock<ILogger<ReleaseService>>().Object);
 
                 var result = service.GetLatestPublishedRelease(publicationA.Id);
-                Assert.Equal(publicationARelease1.Id, result);
+                Assert.Equal(publicationARelease1, result);
             }
         }
 
@@ -106,7 +106,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Model.Tests
                 var service = new ReleaseService(context, new Mock<ILogger<ReleaseService>>().Object);
 
                 var result = service.GetLatestPublishedRelease(Guid.NewGuid());
-                Assert.False(result.HasValue);
+                Assert.Null(result);
             }
         }
     }

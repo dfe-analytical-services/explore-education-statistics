@@ -2,16 +2,13 @@ using GovUk.Education.ExploreEducationStatistics.Admin.Models;
 using GovUk.Education.ExploreEducationStatistics.Admin.Services.Interfaces;
 using GovUk.Education.ExploreEducationStatistics.Content.Model;
 using GovUk.Education.ExploreEducationStatistics.Content.Model.Database;
-using Microsoft.AspNetCore.Authorization;
+using GovUk.Education.ExploreEducationStatistics.Content.Security.AuthorizationHandlers;
 using static System.DateTime;
 using static GovUk.Education.ExploreEducationStatistics.Admin.Security.AuthorizationHandlers.AuthorizationHandlerUtil;
 
 namespace GovUk.Education.ExploreEducationStatistics.Admin.Security.AuthorizationHandlers
 {
-    public class ViewSpecificReleaseRequirement : IAuthorizationRequirement
-    {}
-    
-    public class ViewSpecificReleaseAuthorizationHandler : CompoundAuthorizationHandler<ViewSpecificReleaseRequirement, Release>
+    public class ViewSpecificReleaseAuthorizationHandler : CompoundAuthorizationHandler<ViewReleaseRequirement, Release>
     {
         public ViewSpecificReleaseAuthorizationHandler(
             ContentDbContext context, IPreReleaseService preReleaseService) : base(
@@ -19,29 +16,28 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Security.Authorizatio
             new HasUnrestrictedViewerRoleOnReleaseAuthorizationHandler(context),
             new HasPreReleaseRoleWithinAccessWindowAuthorizationHandler(context, preReleaseService))
         {
-            
         }
-    
+
         public class CanSeeAllReleasesAuthorizationHandler : HasClaimAuthorizationHandler<
-            ViewSpecificReleaseRequirement>
+            ViewReleaseRequirement>
         {
-            public CanSeeAllReleasesAuthorizationHandler() 
+            public CanSeeAllReleasesAuthorizationHandler()
                 : base(SecurityClaimTypes.AccessAllReleases) {}
         }
-    
+
         public class HasUnrestrictedViewerRoleOnReleaseAuthorizationHandler
-            : HasRoleOnReleaseAuthorizationHandler<ViewSpecificReleaseRequirement>
+            : HasRoleOnReleaseAuthorizationHandler<ViewReleaseRequirement>
         {
-            public HasUnrestrictedViewerRoleOnReleaseAuthorizationHandler(ContentDbContext context) 
+            public HasUnrestrictedViewerRoleOnReleaseAuthorizationHandler(ContentDbContext context)
                 : base(context, ctx => ContainsUnrestrictedViewerRole(ctx.Roles))
             {}
         }
-    
+
         public class HasPreReleaseRoleWithinAccessWindowAuthorizationHandler
-            : HasRoleOnReleaseAuthorizationHandler<ViewSpecificReleaseRequirement>
+            : HasRoleOnReleaseAuthorizationHandler<ViewReleaseRequirement>
         {
             public HasPreReleaseRoleWithinAccessWindowAuthorizationHandler(
-                ContentDbContext context, IPreReleaseService preReleaseService) 
+                ContentDbContext context, IPreReleaseService preReleaseService)
                 : base(context, ctx =>
                 {
                     if (!ContainsPreReleaseViewerRole(ctx.Roles))

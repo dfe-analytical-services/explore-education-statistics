@@ -38,12 +38,9 @@ const KeyStatistics = ({ release, isEditing }: KeyStatisticsProps) => {
           .map(block => (
             <EditableKeyStat
               key={block.id}
-              id={block.id}
               name={block.name}
-              query={{
-                ...block.query,
-                releaseId: release.id,
-              }}
+              releaseId={release.id}
+              dataBlockId={block.id}
               summary={block.summary}
               isEditing={isEditing}
               onRemove={async () => {

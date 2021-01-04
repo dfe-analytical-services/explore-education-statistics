@@ -9,6 +9,7 @@ using GovUk.Education.ExploreEducationStatistics.Admin.Services.Interfaces;
 using GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services;
 using GovUk.Education.ExploreEducationStatistics.Admin.ViewModels;
 using GovUk.Education.ExploreEducationStatistics.Common.Model;
+using GovUk.Education.ExploreEducationStatistics.Common.Tests.Utils;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Mvc;
@@ -260,7 +261,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Controllers.Api
             var result = await controller.GetTemplateReleaseAsync(_releaseId);
             AssertOkResult(result);
         }
-        
+
         [Fact]
         public async void CancelFileImport()
         {
@@ -275,15 +276,15 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Controllers.Api
             mocks.ImportService
                 .Setup(s => s.CancelImport(cancelRequest))
                 .ReturnsAsync(Unit.Instance);
-            
+
             var controller = ReleasesControllerWithMocks(mocks);
-            
+
             var result = await controller.CancelFileImport(cancelRequest);
             Assert.IsType<AcceptedResult>(result);
-            
+
             MockUtils.VerifyAllMocks(mocks.ImportService);
         }
-        
+
         [Fact]
         public async void CancelFileImportButNotAllowed()
         {
@@ -298,9 +299,9 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Controllers.Api
             mocks.ImportService
                 .Setup(s => s.CancelImport(cancelRequest))
                 .ReturnsAsync(new ForbidResult());
-            
+
             var controller = ReleasesControllerWithMocks(mocks);
-            
+
             var result = await controller.CancelFileImport(cancelRequest);
             Assert.IsType<ForbidResult>(result);
 

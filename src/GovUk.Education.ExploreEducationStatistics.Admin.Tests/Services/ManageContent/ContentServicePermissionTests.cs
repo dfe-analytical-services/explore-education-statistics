@@ -7,6 +7,7 @@ using GovUk.Education.ExploreEducationStatistics.Admin.Security;
 using GovUk.Education.ExploreEducationStatistics.Admin.Services.ManageContent;
 using GovUk.Education.ExploreEducationStatistics.Common.Model;
 using GovUk.Education.ExploreEducationStatistics.Common.Services.Interfaces.Security;
+using GovUk.Education.ExploreEducationStatistics.Common.Tests.Utils;
 using GovUk.Education.ExploreEducationStatistics.Common.Utils;
 using GovUk.Education.ExploreEducationStatistics.Content.Model;
 using GovUk.Education.ExploreEducationStatistics.Content.Model.Database;
@@ -20,7 +21,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services.Manage
     {
         private static readonly Guid ContentSectionId = Guid.NewGuid();
         private static readonly Guid ContentBlockId = Guid.NewGuid();
-        
+
         private readonly Release _release = new Release
         {
             Id = Guid.NewGuid(),
@@ -51,7 +52,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services.Manage
         [Fact]
         public void AddCommentAsync()
         {
-            AssertSecurityPoliciesChecked(service => 
+            AssertSecurityPoliciesChecked(service =>
                     service.AddCommentAsync(
                         _release.Id,
                         ContentSectionId,
@@ -64,7 +65,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services.Manage
         [Fact]
         public void DeleteCommentAsync()
         {
-            AssertSecurityPoliciesChecked(service => 
+            AssertSecurityPoliciesChecked(service =>
                     service.DeleteCommentAsync(_comment.Id),
                 _comment,
                 SecurityPolicies.CanUpdateSpecificComment);
@@ -73,7 +74,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services.Manage
         [Fact]
         public void UpdateCommentAsync()
         {
-            AssertSecurityPoliciesChecked(service => 
+            AssertSecurityPoliciesChecked(service =>
                     service.UpdateCommentAsync(
                         _comment.Id,
                         new AddOrUpdateCommentRequest()),
@@ -84,7 +85,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services.Manage
         [Fact]
         public void AddContentBlockAsync()
         {
-            AssertSecurityPoliciesChecked(service => 
+            AssertSecurityPoliciesChecked(service =>
                     service.AddContentBlockAsync(
                         _release.Id,
                         ContentSectionId,
@@ -96,7 +97,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services.Manage
         [Fact]
         public void AddContentSectionAsync()
         {
-            AssertSecurityPoliciesChecked(service => 
+            AssertSecurityPoliciesChecked(service =>
                     service.AddContentSectionAsync(
                         _release.Id,
                         new AddContentSectionRequest()),
@@ -107,7 +108,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services.Manage
         [Fact]
         public void AttachDataBlock()
         {
-            AssertSecurityPoliciesChecked(service => 
+            AssertSecurityPoliciesChecked(service =>
                     service.AttachDataBlock(
                         _release.Id,
                         ContentSectionId,
@@ -119,7 +120,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services.Manage
         [Fact]
         public void RemoveContentBlockAsync()
         {
-            AssertSecurityPoliciesChecked(service => 
+            AssertSecurityPoliciesChecked(service =>
                     service.RemoveContentBlockAsync(
                         _release.Id,
                         ContentSectionId,
@@ -131,7 +132,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services.Manage
         [Fact]
         public void RemoveContentSectionAsync()
         {
-            AssertSecurityPoliciesChecked(service => 
+            AssertSecurityPoliciesChecked(service =>
                     service.RemoveContentSectionAsync(
                         _release.Id,
                         ContentSectionId),
@@ -142,7 +143,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services.Manage
         [Fact]
         public void ReorderContentBlocksAsync()
         {
-            AssertSecurityPoliciesChecked(service => 
+            AssertSecurityPoliciesChecked(service =>
                     service.ReorderContentBlocksAsync(
                         _release.Id,
                         ContentSectionId,
@@ -154,7 +155,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services.Manage
         [Fact]
         public void ReorderContentSectionsAsync()
         {
-            AssertSecurityPoliciesChecked(service => 
+            AssertSecurityPoliciesChecked(service =>
                     service.ReorderContentSectionsAsync(
                         _release.Id,
                         new Dictionary<Guid, int>()),
@@ -165,7 +166,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services.Manage
         [Fact]
         public void UpdateContentSectionHeadingAsync()
         {
-            AssertSecurityPoliciesChecked(service => 
+            AssertSecurityPoliciesChecked(service =>
                     service.UpdateContentSectionHeadingAsync(
                         _release.Id,
                         ContentSectionId,
@@ -177,7 +178,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services.Manage
         [Fact]
         public void UpdateTextBasedContentBlockAsync()
         {
-            AssertSecurityPoliciesChecked(service => 
+            AssertSecurityPoliciesChecked(service =>
                     service.UpdateTextBasedContentBlockAsync(
                         _release.Id,
                         ContentSectionId,
@@ -190,7 +191,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services.Manage
         [Fact]
         public void UpdateDataBlockAsync()
         {
-            AssertSecurityPoliciesChecked(service => 
+            AssertSecurityPoliciesChecked(service =>
                     service.UpdateDataBlockAsync(
                         _release.Id,
                         ContentSectionId,
@@ -199,7 +200,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services.Manage
                 _release,
                 SecurityPolicies.CanUpdateSpecificRelease);
         }
-        
+
         private void AssertSecurityPoliciesChecked<T, TProtectedResource>(
             Func<ContentService, Task<Either<ActionResult, T>>> protectedAction,
             TProtectedResource resource,
@@ -211,7 +212,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services.Manage
 
             PermissionTestUtil.AssertSecurityPoliciesChecked(protectedAction, resource, userService, service, policies);
         }
-        
+
         private (
             Mock<ContentDbContext>,
             Mock<IPersistenceHelper<ContentDbContext>>,
@@ -221,11 +222,11 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services.Manage
             var persistenceHelper = MockUtils.MockPersistenceHelper<ContentDbContext>();
             MockUtils.SetupCall(persistenceHelper, _release.Id, _release);
             MockUtils.SetupCall(persistenceHelper, _comment.Id, _comment);
-            
+
             return (
-                new Mock<ContentDbContext>(), 
+                new Mock<ContentDbContext>(),
                 persistenceHelper,
-                new Mock<IMapper>(), 
+                new Mock<IMapper>(),
                 new Mock<IUserService>());
         }
     }

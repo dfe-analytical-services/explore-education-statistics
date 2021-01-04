@@ -200,11 +200,23 @@ const tableBuilderService = {
   }): Promise<SubjectMeta> {
     return dataApi.post('/meta/subject', query);
   },
-  getTableData(query: ReleaseTableDataQuery): Promise<TableDataResponse> {
-    if (query.releaseId) {
-      return dataApi.post(`/tablebuilder/release/${query.releaseId}`, query);
+  getTableData({
+    releaseId,
+    ...query
+  }: ReleaseTableDataQuery): Promise<TableDataResponse> {
+    if (releaseId) {
+      return dataApi.post(`/tablebuilder/release/${releaseId}`, query);
     }
+
     return dataApi.post(`/tablebuilder`, query);
+  },
+  getDataBlockTableData(
+    releaseId: string,
+    dataBlockId: string,
+  ): Promise<TableDataResponse> {
+    return dataApi.get(
+      `/tablebuilder/release/${releaseId}/datablock/${dataBlockId}`,
+    );
   },
 };
 

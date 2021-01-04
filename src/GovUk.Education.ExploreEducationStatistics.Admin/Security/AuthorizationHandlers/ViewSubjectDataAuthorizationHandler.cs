@@ -2,6 +2,7 @@
 using System.Threading.Tasks;
 using GovUk.Education.ExploreEducationStatistics.Admin.Services.Interfaces;
 using GovUk.Education.ExploreEducationStatistics.Content.Model.Database;
+using GovUk.Education.ExploreEducationStatistics.Content.Security.AuthorizationHandlers;
 using GovUk.Education.ExploreEducationStatistics.Data.Model;
 using GovUk.Education.ExploreEducationStatistics.Data.Model.Database;
 using GovUk.Education.ExploreEducationStatistics.Data.Services.Security.AuthorizationHandlers;
@@ -21,7 +22,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Security.Authorizatio
                 new SubjectBelongsToViewableReleaseAuthorizationHandler(contentDbContext, statisticsDbContext, preReleaseService)
             )
         { }
-    
+
         public class SubjectBelongsToViewableReleaseAuthorizationHandler : AuthorizationHandler<
             ViewSubjectDataRequirement, Subject>
         {
@@ -30,8 +31,8 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Security.Authorizatio
             private readonly StatisticsDbContext _statisticsDbContext;
 
             public SubjectBelongsToViewableReleaseAuthorizationHandler(
-                ContentDbContext contentDbContext, 
-                StatisticsDbContext statisticsDbContext, 
+                ContentDbContext contentDbContext,
+                StatisticsDbContext statisticsDbContext,
                 IPreReleaseService preReleaseService)
             {
                 _contentDbContext = contentDbContext;
@@ -40,7 +41,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Security.Authorizatio
             }
 
             protected override async Task HandleRequirementAsync(
-                AuthorizationHandlerContext context, 
+                AuthorizationHandlerContext context,
                 ViewSubjectDataRequirement requirement,
                 Subject subject)
             {
@@ -50,14 +51,14 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Security.Authorizatio
                     .Where(r => r.SubjectId == subject.Id)
                     .Select(r => r.Release);
 
-                var viewSpecificReleaseHandler = new 
+                var viewSpecificReleaseHandler = new
                     ViewSpecificReleaseAuthorizationHandler(_contentDbContext, _preReleaseService);
 
                 foreach (var release in linkedReleases)
                 {
                     var contentRelease = GetContentRelease(_contentDbContext, release);
                     var delegatedContext = new AuthorizationHandlerContext(
-                        new[] {new ViewSpecificReleaseRequirement()}, context.User, contentRelease);
+                        new[] {new ViewReleaseRequirement()}, context.User, contentRelease);
 
                     await viewSpecificReleaseHandler.HandleAsync(delegatedContext);
 

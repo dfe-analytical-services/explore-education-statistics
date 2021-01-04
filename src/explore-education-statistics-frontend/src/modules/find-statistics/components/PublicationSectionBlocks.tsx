@@ -17,7 +17,7 @@ const PublicationSectionBlocks = ({
   release,
   blocks,
 }: PublicationSectionBlocksProps) => {
-  const { dataLastPublished, slug, publication } = release;
+  const { slug, publication } = release;
 
   const getChartFile = useGetChartFile(publication.slug, slug);
 
@@ -31,10 +31,6 @@ const PublicationSectionBlocks = ({
               dataBlock={block}
               releaseId={release.id}
               getInfographic={getChartFile}
-              queryOptions={{
-                expiresIn: 60 * 60 * 24,
-                dataLastPublished,
-              }}
               onToggle={section => {
                 logEvent(
                   'Publication Release Data Tabs',

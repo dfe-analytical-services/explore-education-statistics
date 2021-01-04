@@ -22,7 +22,6 @@ const PublicationReleaseHeadlinesSection = ({
     headlinesSection,
     publication,
     slug,
-    dataLastPublished,
   },
 }: Props) => {
   const getChartFile = useGetChartFile(publication.slug, slug);
@@ -38,15 +37,9 @@ const PublicationReleaseHeadlinesSection = ({
           return (
             <KeyStat
               key={block.id}
-              query={{
-                releaseId: id,
-                ...block.query,
-              }}
+              releaseId={id}
+              dataBlockId={block.id}
               summary={block.summary}
-              queryOptions={{
-                dataLastPublished,
-                expiresIn: 60 * 60 * 24,
-              }}
             />
           );
         })}
@@ -69,10 +62,6 @@ const PublicationReleaseHeadlinesSection = ({
       getInfographic={getChartFile}
       dataBlock={keyStatisticsSecondarySection.content[0]}
       firstTabs={summaryTab}
-      queryOptions={{
-        dataLastPublished,
-        expiresIn: 60 * 60 * 24,
-      }}
     />
   );
 };

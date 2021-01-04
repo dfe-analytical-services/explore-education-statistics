@@ -19,7 +19,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Content.Model
 
         public string Summary { get; set; }
 
-        public List<Release> Releases { get; set; }
+        public List<Release> Releases { get; set; } = new List<Release>();
 
         public Guid? MethodologyId { get; set; }
 
