@@ -761,5 +761,87 @@ namespace GovUk.Education.ExploreEducationStatistics.Content.Model.Tests
                 amendmentContentBlock4.Body
             );
         }
+
+        [Fact]
+        public void CreateReleaseAmendment_UpdatesFastTrackLinkIds_NullHtmlBlockBody()
+        {
+            var release = new Release
+            {
+                Id = Guid.NewGuid()
+            };
+
+            var section1Id = Guid.NewGuid();
+
+            var contentBlock = new HtmlBlock
+            {
+                Id = Guid.NewGuid(),
+                Order = 1,
+                Body = null,
+                ContentSectionId = section1Id
+            };
+
+            var dataBlock = new DataBlock
+            {
+                Id = Guid.NewGuid(),
+                Order = 2,
+                Heading = "Block 2 heading",
+                Name = "Block 2 name",
+                Source = "Block 2 source",
+                ContentSectionId = section1Id
+            };
+
+            release.Content = new List<ReleaseContentSection>
+            {
+                new ReleaseContentSection
+                {
+                    Release = release,
+                    ReleaseId = release.Id,
+                    ContentSectionId = section1Id,
+                    ContentSection = new ContentSection
+                    {
+                        Id = section1Id,
+                        Heading = "Section 1",
+                        Content = new List<ContentBlock>
+                        {
+                            contentBlock,
+                            dataBlock
+                        }
+                    }
+                }
+            };
+
+            release.ContentBlocks = new List<ReleaseContentBlock>
+            {
+                new ReleaseContentBlock
+                {
+                    ReleaseId = release.Id,
+                    Release = release,
+                    ContentBlockId = contentBlock.Id,
+                    ContentBlock = contentBlock
+                },
+                new ReleaseContentBlock
+                {
+                    ReleaseId = release.Id,
+                    Release = release,
+                    ContentBlockId = dataBlock.Id,
+                    ContentBlock =  dataBlock
+                }
+            };
+
+            var createdDate = DateTime.Now;
+            var createdById = Guid.NewGuid();
+
+            // Minimal test to make sure that a null HtmlBlock body doesn't affect creating a Release amendment
+            var amendment = release.CreateReleaseAmendment(createdDate, createdById);
+
+            Assert.Equal(2, amendment.ContentBlocks.Count);
+
+            var releaseBlock1 = amendment.ContentBlocks[0];
+            Assert.NotEqual(release.ContentBlocks[0].ContentBlockId, releaseBlock1.ContentBlockId);
+
+            var block1 = Assert.IsType<HtmlBlock>(releaseBlock1.ContentBlock);
+            Assert.NotEqual(release.ContentBlocks[0].ContentBlock.Id, block1.Id);
+            Assert.Null(block1.Body);
+        }
     }
 }

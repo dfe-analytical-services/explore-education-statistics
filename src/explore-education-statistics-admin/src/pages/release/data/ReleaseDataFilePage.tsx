@@ -8,6 +8,7 @@ import {
   releaseDataRoute,
   ReleaseRouteParams,
 } from '@admin/routes/releaseRoutes';
+import permissionService from '@admin/services/permissionService';
 import releaseDataFileService, {
   DataFile,
 } from '@admin/services/releaseDataFileService';
@@ -119,19 +120,27 @@ const ReleaseDataFilePage = ({
                 dataFile={dataFile}
                 replacementDataFile={replacementDataFile}
                 releaseId={releaseId}
-                onStatusChange={(file, { status }) => {
+                onStatusChange={async (file, { status }) => {
                   setDataFile({
                     value: {
                       ...file,
                       status,
+                      permissions: await permissionService.getDataFilePermissions(
+                        releaseId,
+                        file.fileName,
+                      ),
                     },
                   });
                 }}
-                onReplacementStatusChange={(file, { status }) => {
+                onReplacementStatusChange={async (file, { status }) => {
                   setReplacementDataFile({
                     value: {
                       ...file,
                       status,
+                      permissions: await permissionService.getDataFilePermissions(
+                        releaseId,
+                        file.fileName,
+                      ),
                     },
                   });
                 }}
@@ -172,7 +181,13 @@ const ReleaseDataFilePage = ({
                       },
                     });
                     setReplacementDataFile({
-                      value: file,
+                      value: {
+                        ...file,
+                        permissions: await permissionService.getDataFilePermissions(
+                          releaseId,
+                          file.fileName,
+                        ),
+                      },
                     });
                   }}
                 />

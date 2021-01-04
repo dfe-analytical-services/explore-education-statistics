@@ -1,5 +1,4 @@
 import { useDesktopMedia } from '@common/hooks/useMedia';
-import useMounted from '@common/hooks/useMounted';
 import isComponentType from '@common/utils/type-guards/components/isComponentType';
 import classNames from 'classnames';
 import React, {

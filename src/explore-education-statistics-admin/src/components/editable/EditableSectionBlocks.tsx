@@ -6,52 +6,45 @@ import Comments, {
 import { useEditingContext } from '@admin/contexts/EditingContext';
 import { EditableBlock } from '@admin/services/types/content';
 import InsetText from '@common/components/InsetText';
-import SectionBlocks, {
-  SectionBlocksProps,
-} from '@common/modules/find-statistics/components/SectionBlocks';
-import isBrowser from '@common/utils/isBrowser';
 import reorder from '@common/utils/reorder';
-import React, { useCallback, useState } from 'react';
+import React, { Fragment, ReactNode, useCallback, useState } from 'react';
 import { DragDropContext, DropResult } from 'react-beautiful-dnd';
 import classNames from 'classnames';
-import EditableBlockRenderer from './EditableBlockRenderer';
 
-export interface EditableSectionBlockProps extends SectionBlocksProps {
-  content: EditableBlock[];
-  sectionId: string;
-  isReordering?: boolean;
+export interface EditableSectionBlockProps<
+  T extends EditableBlock = EditableBlock
+> {
   allowComments?: boolean;
-  onBlocksChange?: (nextBlocks: EditableBlock[]) => void;
-  onBlockContentSave: (blockId: string, content: string) => void;
-  onBlockDelete: (blockId: string) => void;
+  blocks: T[];
+  isReordering?: boolean;
+  sectionId: string;
+  onBlocksChange?: (nextBlocks: T[]) => void;
   onBlockCommentsChange?: CommentsChangeHandler;
+  renderBlock: (block: T) => ReactNode;
+  renderEditableBlock: (block: T) => ReactNode;
 }
 
-const EditableSectionBlocks = (props: EditableSectionBlockProps) => {
-  const [openedCommentIds, setOpenedCommentIds] = useState<string[]>([]);
-
-  const {
-    releaseId,
-    content = [],
-    sectionId,
-    isReordering = false,
-    allowComments = false,
-    getInfographic,
-    onBlockContentSave,
-    onBlockDelete,
-    onBlocksChange,
-    onBlockCommentsChange,
-  } = props;
-
+const EditableSectionBlocks = <T extends EditableBlock = EditableBlock>({
+  allowComments = false,
+  blocks = [],
+  isReordering = false,
+  sectionId,
+  renderBlock,
+  renderEditableBlock,
+  onBlocksChange,
+  onBlockCommentsChange,
+}: EditableSectionBlockProps<T>) => {
   const { isEditing } = useEditingContext();
+
+  const [openedCommentIds, setOpenedCommentIds] = useState<string[]>([]);
 
   const handleDragEnd = useCallback(
     ({ source, destination }: DropResult) => {
       if (destination && onBlocksChange) {
-        onBlocksChange(reorder(content, source.index, destination.index));
+        onBlocksChange(reorder(blocks, source.index, destination.index));
       }
     },
-    [content, onBlocksChange],
+    [blocks, onBlocksChange],
   );
 
   const handleCommentsChange: CommentsChangeHandler = useCallback(
@@ -60,25 +53,33 @@ const EditableSectionBlocks = (props: EditableSectionBlockProps) => {
         return;
       }
 
-      if (content.find(block => block.id === blockId)) {
+      if (blocks.find(block => block.id === blockId)) {
         onBlockCommentsChange(blockId, comments);
       }
     },
-    [content, onBlockCommentsChange],
+    [blocks, onBlockCommentsChange],
   );
 
   if (!isEditing) {
-    return <SectionBlocks {...props} />;
+    return blocks.length > 0 ? (
+      <>
+        {blocks.map(block => (
+          <Fragment key={block.id}>{renderBlock(block)}</Fragment>
+        ))}
+      </>
+    ) : (
+      <InsetText>There is no content for this section.</InsetText>
+    );
   }
 
-  if (content.length === 0) {
+  if (blocks.length === 0) {
     return <InsetText>There is no content for this section.</InsetText>;
   }
 
   return (
     <DragDropContext onDragEnd={handleDragEnd}>
       <BlockDroppable droppable={isReordering} droppableId={sectionId}>
-        {content.map((block, index) => (
+        {blocks.map((block, index) => (
           <div
             key={block.id}
             id={`editableSectionBlocks-${block.id}`}
@@ -110,14 +111,7 @@ const EditableSectionBlocks = (props: EditableSectionBlockProps) => {
                 />
               )}
 
-              <EditableBlockRenderer
-                releaseId={releaseId}
-                block={block}
-                editable={!isReordering && !isBrowser('IE')}
-                getInfographic={getInfographic}
-                onContentSave={onBlockContentSave}
-                onDelete={onBlockDelete}
-              />
+              {renderEditableBlock(block)}
             </BlockDraggable>
           </div>
         ))}

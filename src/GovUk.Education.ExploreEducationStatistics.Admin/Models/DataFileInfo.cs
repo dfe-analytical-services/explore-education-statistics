@@ -8,8 +8,8 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Models
 {
     public class DataFileInfo : FileInfo
     {
-        [JsonConverter(typeof(EnumToEnumValueJsonConverter<ReleaseFileTypes>))]
-        public new readonly ReleaseFileTypes Type = ReleaseFileTypes.Data;
+        [JsonConverter(typeof(EnumToEnumValueJsonConverter<FileType>))]
+        public new readonly FileType Type = FileType.Data;
 
         public Guid? MetaFileId { get; set; }
         public string MetaFileName { get; set; }
@@ -20,5 +20,6 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Models
 
         [JsonConverter(typeof(EnumToEnumValueJsonConverter<IStatus>))]
         public IStatus Status { get; set; }
+        public DataFilePermissions Permissions { get; set; }
     }
 }

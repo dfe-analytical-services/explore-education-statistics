@@ -1,10 +1,11 @@
 using System;
 using GovUk.Education.ExploreEducationStatistics.Common.Model;
 using Newtonsoft.Json;
+using static GovUk.Education.ExploreEducationStatistics.Common.Model.FileType;
 
 namespace GovUk.Education.ExploreEducationStatistics.Content.Model
 {
-    public class ReleaseFileReference
+    public class File
     {
         public Guid Id { get; set; }
 
@@ -17,7 +18,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Content.Model
 
         public string Filename { get; set; }
 
-        public ReleaseFileTypes ReleaseFileType { get; set; }
+        public FileType Type { get; set; }
 
         public string BlobStorageName
         {
@@ -27,7 +28,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Content.Model
                 // saved by ID instead of file name to
                 // prevent naming collisions.
                 // Remove this BlobStorageName field and use Id when all types are migrated
-                if (ReleaseFileType == ReleaseFileTypes.Ancillary || ReleaseFileType == ReleaseFileTypes.Chart)
+                if (Type == Ancillary || Type == Chart)
                 {
                     return Id.ToString();
                 }
@@ -37,13 +38,13 @@ namespace GovUk.Education.ExploreEducationStatistics.Content.Model
         }
 
         public Guid? ReplacedById { get; set; }
-        public ReleaseFileReference ReplacedBy { get; set; }
+        public File ReplacedBy { get; set; }
 
         public Guid? ReplacingId { get; set; }
-        public ReleaseFileReference Replacing { get; set; }
+        public File Replacing { get; set; }
 
         public Guid? SourceId { get; set; }
-        public ReleaseFileReference? Source { get; set; }
+        public File? Source { get; set; }
 
         // EES-1560 Temporary field used to track the filename migration to guids.
         public bool FilenameMigrated { get; set; }

@@ -95,7 +95,7 @@
       }
     },
     "sqlPublicContentApiUser": {
-      "type": "securestring",
+      "type": "string",
       "metadata": {
         "description": "The username of the content api for the public SQL Server"
       }
@@ -107,7 +107,7 @@
       }
     },
     "sqlPublicDataApiUser": {
-      "type": "securestring",
+      "type": "string",
       "metadata": {
         "description": "The username of the data api for the public SQL Server"
       }
@@ -118,40 +118,64 @@
         "description": "The password of the data api user of the public SQL Server"
       }
     },
-    "sqlPublisherUser": {
+    "sqlContentApiUser": {
+      "type": "string",
+      "metadata": {
+        "description": "The username of the content api for the private SQL Server"
+      }
+    },
+    "sqlContentApiPassword": {
       "type": "securestring",
       "metadata": {
-        "description": "The username of the publisher for the public SQL Server"
+        "description": "The password of the content api user for the private SQL Server"
+      }
+    },
+    "sqlDataApiUser": {
+      "type": "string",
+      "metadata": {
+        "description": "The username of the data api for the private SQL Server"
+      }
+    },
+    "sqlDataApiPassword": {
+      "type": "securestring",
+      "metadata": {
+        "description": "The password of the data api user for the private SQL Server"
+      }
+    },
+    "sqlPublisherUser": {
+      "type": "string",
+      "metadata": {
+        "description": "The username of the publisher for the private SQL Server"
       }
     },
     "sqlPublisherUserPassword": {
       "type": "securestring",
       "metadata": {
-        "description": "The password of the publisher application used to read from the content db"
+        "description": "The password of the publisher user for the private SQL Server"
       }
     },
     "sqlImporterUser": {
-      "type": "securestring",
+      "type": "string",
       "metadata": {
-        "description": "The username of the publisher for the public SQL Server"
+        "description": "The username of the publisher for the private SQL Server"
       }
     },
     "sqlImporterUserPassword": {
       "type": "securestring",
       "metadata": {
-        "description": "The password of the importer application used to import data to the statistics db"
+        "description": "The password of the importer user for the private SQL Server"
       }
     },
     "sqlAdminUser": {
-      "type": "securestring",
+      "type": "string",
       "metadata": {
-        "description": "The username of the publisher for the public SQL Server"
+        "description": "The username of the admin app for the private SQL Server"
       }
     },
     "sqlAdminUserPassword": {
       "type": "securestring",
       "metadata": {
-        "description": "The password of the admin application the content and statistics db"
+        "description": "The password of the admin app for the private SQL Server"
       }
     },
     "sqlFirewallRules": {
@@ -641,6 +665,11 @@
               "name": "StatisticsDb",
               "type": "SQLAzure",
               "connectionString": "[concat('Data Source=tcp:', reference(concat('Microsoft.Sql/servers/', variables('publicSqlServerName'))).fullyQualifiedDomainName, ',1433;Initial Catalog=', 'public-statistics', ';User Id=', parameters('sqlPublicDataApiUser'), '@', reference(concat('Microsoft.Sql/servers/', variables('publicSqlServerName'))).fullyQualifiedDomainName, ';Password=', parameters('sqlPublicDataApiPassword'), ';')]"
+            },
+            {
+              "name": "ContentDb",
+              "type": "SQLAzure",
+              "connectionString": "[concat('Data Source=tcp:', reference(concat('Microsoft.Sql/servers/', variables('sqlserverName'))).fullyQualifiedDomainName, ',1433;Initial Catalog=', 'content', ';User Id=', parameters('sqlDataApiUser'), '@', reference(concat('Microsoft.Sql/servers/', variables('sqlserverName'))).fullyQualifiedDomainName, ';Password=', parameters('sqlDataApiPassword'), ';')]"
             }
           ]
         }
@@ -842,6 +871,11 @@
               "name": "StatisticsDb",
               "type": "SQLAzure",
               "connectionString": "[concat('Data Source=tcp:', reference(concat('Microsoft.Sql/servers/', variables('publicSqlServerName'))).fullyQualifiedDomainName, ',1433;Initial Catalog=', 'public-statistics', ';User Id=', parameters('sqlPublicContentApiUser'), '@', reference(concat('Microsoft.Sql/servers/', variables('publicSqlServerName'))).fullyQualifiedDomainName, ';Password=', parameters('sqlPublicContentApiPassword'), ';')]"
+            },
+            {
+              "name": "ContentDb",
+              "type": "SQLAzure",
+              "connectionString": "[concat('Data Source=tcp:', reference(concat('Microsoft.Sql/servers/', variables('sqlserverName'))).fullyQualifiedDomainName, ',1433;Initial Catalog=', 'content', ';User Id=', parameters('sqlContentApiUser'), '@', reference(concat('Microsoft.Sql/servers/', variables('sqlserverName'))).fullyQualifiedDomainName, ';Password=', parameters('sqlContentApiPassword'), ';')]"
             }
           ]
         }

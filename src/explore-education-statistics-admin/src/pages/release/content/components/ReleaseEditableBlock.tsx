@@ -1,34 +1,35 @@
 import EditableBlockWrapper from '@admin/components/editable/EditableBlockWrapper';
 import EditableContentBlock from '@admin/components/editable/EditableContentBlock';
+import useGetChartFile from '@admin/hooks/useGetChartFile';
 import { EditableBlock } from '@admin/services/types/content';
-import { GetInfographic } from '@common/modules/charts/components/InfographicBlock';
 import DataBlockTabs from '@common/modules/find-statistics/components/DataBlockTabs';
-import React, { useCallback, useMemo } from 'react';
+import isBrowser from '@common/utils/isBrowser';
+import React, { useCallback } from 'react';
 
 interface Props {
-  releaseId?: string;
+  releaseId: string;
   block: EditableBlock;
   editable?: boolean;
-  getInfographic?: GetInfographic;
-  onContentSave: (blockId: string, content: string) => void;
+  onSave: (blockId: string, content: string) => void;
   onDelete: (blockId: string) => void;
 }
 
-function EditableBlockRenderer({
+const ReleaseEditableBlock = ({
   releaseId,
   block,
-  editable,
-  getInfographic,
-  onContentSave,
+  editable = true,
+  onSave,
   onDelete,
-}: Props) {
+}: Props) => {
   const blockId = `block-${block.id}`;
 
-  const handleContentSave = useMemo(
-    () => (content: string) => {
-      onContentSave(block.id, content);
+  const getChartFile = useGetChartFile(releaseId);
+
+  const handleSave = useCallback(
+    (content: string) => {
+      onSave(block.id, content);
     },
-    [block.id, onContentSave],
+    [block.id, onSave],
   );
 
   const handleDelete = useCallback(() => {
@@ -44,7 +45,7 @@ function EditableBlockRenderer({
               releaseId={releaseId}
               id={blockId}
               dataBlock={block}
-              getInfographic={getInfographic}
+              getInfographic={getChartFile}
             />
           </EditableBlockWrapper>
         </div>
@@ -53,18 +54,18 @@ function EditableBlockRenderer({
     case 'MarkDownBlock':
       return (
         <EditableContentBlock
-          editable={editable}
+          editable={editable && !isBrowser('IE')}
           id={blockId}
           label="Block content"
           value={block.body}
           useMarkdown={block.type === 'MarkDownBlock'}
-          onSave={handleContentSave}
+          onSave={handleSave}
           onDelete={handleDelete}
         />
       );
     default:
       return <div>Unable to edit content</div>;
   }
-}
+};
 
-export default EditableBlockRenderer;
+export default ReleaseEditableBlock;

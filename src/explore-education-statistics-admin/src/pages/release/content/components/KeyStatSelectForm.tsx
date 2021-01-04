@@ -57,10 +57,8 @@ const KeyStatSelectForm = ({
         >
           <KeyStat
             summary={selectedDataBlock.summary}
-            query={{
-              ...selectedDataBlock.query,
-              releaseId,
-            }}
+            releaseId={releaseId}
+            dataBlockId={selectedDataBlock.id}
           />
         </Details>
       </section>

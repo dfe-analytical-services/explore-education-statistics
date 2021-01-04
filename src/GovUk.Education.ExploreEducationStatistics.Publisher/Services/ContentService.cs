@@ -2,6 +2,7 @@ using System;
 using System.Linq;
 using System.Threading.Tasks;
 using GovUk.Education.ExploreEducationStatistics.Content.Model;
+using GovUk.Education.ExploreEducationStatistics.Content.Model.Extensions;
 using GovUk.Education.ExploreEducationStatistics.Publisher.Models;
 using GovUk.Education.ExploreEducationStatistics.Publisher.Services.Interfaces;
 using Newtonsoft.Json;
@@ -80,13 +81,13 @@ namespace GovUk.Education.ExploreEducationStatistics.Publisher.Services
             await DeleteAllContent();
             await CacheTrees(context);
 
-            var publications = _publicationService.ListPublicationsWithPublishedReleases().ToList();
+            var publications = _publicationService.GetPublicationsWithPublishedReleases();
             var methodologyIds = publications.Where(publication => publication.MethodologyId.HasValue)
                 .Select(publication => publication.MethodologyId.Value).Distinct();
 
             foreach (var publication in publications)
             {
-                var releases = publication.Releases.Where(release => release.Live);
+                var releases = publication.Releases.Where(release => release.IsLatestPublishedVersionOfRelease());
                 await CachePublication(publication.Id, context);
                 await CacheLatestRelease(publication, context);
                 foreach (var release in releases)

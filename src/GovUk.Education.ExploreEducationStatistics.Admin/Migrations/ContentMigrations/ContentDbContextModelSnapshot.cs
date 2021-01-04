@@ -180,6 +180,54 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Migrations.ContentMig
                         });
                 });
 
+            modelBuilder.Entity("GovUk.Education.ExploreEducationStatistics.Content.Model.File", b =>
+                {
+                    b.Property<Guid>("Id")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("uniqueidentifier");
+
+                    b.Property<string>("Filename")
+                        .HasColumnType("nvarchar(max)");
+
+                    b.Property<bool>("FilenameMigrated")
+                        .HasColumnType("bit");
+
+                    b.Property<Guid>("ReleaseId")
+                        .HasColumnType("uniqueidentifier");
+
+                    b.Property<Guid?>("ReplacedById")
+                        .HasColumnType("uniqueidentifier");
+
+                    b.Property<Guid?>("ReplacingId")
+                        .HasColumnType("uniqueidentifier");
+
+                    b.Property<Guid?>("SourceId")
+                        .HasColumnType("uniqueidentifier");
+
+                    b.Property<Guid?>("SubjectId")
+                        .HasColumnType("uniqueidentifier");
+
+                    b.Property<string>("Type")
+                        .IsRequired()
+                        .HasColumnType("nvarchar(max)");
+
+                    b.HasKey("Id");
+
+                    b.HasIndex("ReleaseId");
+
+                    b.HasIndex("ReplacedById")
+                        .IsUnique()
+                        .HasFilter("[ReplacedById] IS NOT NULL");
+
+                    b.HasIndex("ReplacingId")
+                        .IsUnique()
+                        .HasFilter("[ReplacingId] IS NOT NULL");
+
+                    b.HasIndex("SourceId");
+
+                    b.ToTable("Files");
+                });
+
             modelBuilder.Entity("GovUk.Education.ExploreEducationStatistics.Content.Model.LegacyRelease", b =>
                 {
                     b.Property<Guid>("Id")
@@ -504,7 +552,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Migrations.ContentMig
                         .ValueGeneratedOnAdd()
                         .HasColumnType("uniqueidentifier");
 
-                    b.Property<Guid>("ReleaseFileReferenceId")
+                    b.Property<Guid>("FileId")
                         .HasColumnType("uniqueidentifier");
 
                     b.Property<Guid>("ReleaseId")
@@ -512,59 +560,11 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Migrations.ContentMig
 
                     b.HasKey("Id");
 
-                    b.HasIndex("ReleaseFileReferenceId");
+                    b.HasIndex("FileId");
 
                     b.HasIndex("ReleaseId");
 
                     b.ToTable("ReleaseFiles");
-                });
-
-            modelBuilder.Entity("GovUk.Education.ExploreEducationStatistics.Content.Model.ReleaseFileReference", b =>
-                {
-                    b.Property<Guid>("Id")
-                        .ValueGeneratedOnAdd()
-                        .HasColumnType("uniqueidentifier");
-
-                    b.Property<string>("Filename")
-                        .HasColumnType("nvarchar(max)");
-
-                    b.Property<bool>("FilenameMigrated")
-                        .HasColumnType("bit");
-
-                    b.Property<string>("ReleaseFileType")
-                        .IsRequired()
-                        .HasColumnType("nvarchar(max)");
-
-                    b.Property<Guid>("ReleaseId")
-                        .HasColumnType("uniqueidentifier");
-
-                    b.Property<Guid?>("ReplacedById")
-                        .HasColumnType("uniqueidentifier");
-
-                    b.Property<Guid?>("ReplacingId")
-                        .HasColumnType("uniqueidentifier");
-
-                    b.Property<Guid?>("SourceId")
-                        .HasColumnType("uniqueidentifier");
-
-                    b.Property<Guid?>("SubjectId")
-                        .HasColumnType("uniqueidentifier");
-
-                    b.HasKey("Id");
-
-                    b.HasIndex("ReleaseId");
-
-                    b.HasIndex("ReplacedById")
-                        .IsUnique()
-                        .HasFilter("[ReplacedById] IS NOT NULL");
-
-                    b.HasIndex("ReplacingId")
-                        .IsUnique()
-                        .HasFilter("[ReplacingId] IS NOT NULL");
-
-                    b.HasIndex("SourceId");
-
-                    b.ToTable("ReleaseFileReferences");
                 });
 
             modelBuilder.Entity("GovUk.Education.ExploreEducationStatistics.Content.Model.ReleaseType", b =>
@@ -968,6 +968,27 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Migrations.ContentMig
                         .HasForeignKey("ContentSectionId");
                 });
 
+            modelBuilder.Entity("GovUk.Education.ExploreEducationStatistics.Content.Model.File", b =>
+                {
+                    b.HasOne("GovUk.Education.ExploreEducationStatistics.Content.Model.Release", "Release")
+                        .WithMany()
+                        .HasForeignKey("ReleaseId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+
+                    b.HasOne("GovUk.Education.ExploreEducationStatistics.Content.Model.File", "ReplacedBy")
+                        .WithOne()
+                        .HasForeignKey("GovUk.Education.ExploreEducationStatistics.Content.Model.File", "ReplacedById");
+
+                    b.HasOne("GovUk.Education.ExploreEducationStatistics.Content.Model.File", "Replacing")
+                        .WithOne()
+                        .HasForeignKey("GovUk.Education.ExploreEducationStatistics.Content.Model.File", "ReplacingId");
+
+                    b.HasOne("GovUk.Education.ExploreEducationStatistics.Content.Model.File", "Source")
+                        .WithMany()
+                        .HasForeignKey("SourceId");
+                });
+
             modelBuilder.Entity("GovUk.Education.ExploreEducationStatistics.Content.Model.LegacyRelease", b =>
                 {
                     b.HasOne("GovUk.Education.ExploreEducationStatistics.Content.Model.Publication", "Publication")
@@ -1071,9 +1092,9 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Migrations.ContentMig
 
             modelBuilder.Entity("GovUk.Education.ExploreEducationStatistics.Content.Model.ReleaseFile", b =>
                 {
-                    b.HasOne("GovUk.Education.ExploreEducationStatistics.Content.Model.ReleaseFileReference", "ReleaseFileReference")
+                    b.HasOne("GovUk.Education.ExploreEducationStatistics.Content.Model.File", "File")
                         .WithMany()
-                        .HasForeignKey("ReleaseFileReferenceId")
+                        .HasForeignKey("FileId")
                         .OnDelete(DeleteBehavior.Cascade)
                         .IsRequired();
 
@@ -1082,27 +1103,6 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Migrations.ContentMig
                         .HasForeignKey("ReleaseId")
                         .OnDelete(DeleteBehavior.NoAction)
                         .IsRequired();
-                });
-
-            modelBuilder.Entity("GovUk.Education.ExploreEducationStatistics.Content.Model.ReleaseFileReference", b =>
-                {
-                    b.HasOne("GovUk.Education.ExploreEducationStatistics.Content.Model.Release", "Release")
-                        .WithMany()
-                        .HasForeignKey("ReleaseId")
-                        .OnDelete(DeleteBehavior.Cascade)
-                        .IsRequired();
-
-                    b.HasOne("GovUk.Education.ExploreEducationStatistics.Content.Model.ReleaseFileReference", "ReplacedBy")
-                        .WithOne()
-                        .HasForeignKey("GovUk.Education.ExploreEducationStatistics.Content.Model.ReleaseFileReference", "ReplacedById");
-
-                    b.HasOne("GovUk.Education.ExploreEducationStatistics.Content.Model.ReleaseFileReference", "Replacing")
-                        .WithOne()
-                        .HasForeignKey("GovUk.Education.ExploreEducationStatistics.Content.Model.ReleaseFileReference", "ReplacingId");
-
-                    b.HasOne("GovUk.Education.ExploreEducationStatistics.Content.Model.ReleaseFileReference", "Source")
-                        .WithMany()
-                        .HasForeignKey("SourceId");
                 });
 
             modelBuilder.Entity("GovUk.Education.ExploreEducationStatistics.Content.Model.Topic", b =>

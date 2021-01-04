@@ -14,6 +14,7 @@ using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Mvc;
+using static GovUk.Education.ExploreEducationStatistics.Common.Model.FileType;
 
 namespace GovUk.Education.ExploreEducationStatistics.Admin.Controllers.Api
 {
@@ -29,6 +30,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Controllers.Api
         private readonly IReleaseChecklistService _releaseChecklistService;
         private readonly UserManager<ApplicationUser> _userManager;
         private readonly IDataBlockService _dataBlockService;
+        private readonly IImportService _importService;
 
         public ReleasesController(
             IReleaseService releaseService,
@@ -37,8 +39,8 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Controllers.Api
             IReleaseStatusService releaseStatusService,
             IReleaseChecklistService releaseChecklistService,
             UserManager<ApplicationUser> userManager,
-            IDataBlockService dataBlockService
-        )
+            IDataBlockService dataBlockService, 
+            IImportService importService)
         {
             _releaseService = releaseService;
             _releaseDataFileService = releaseDataFileService;
@@ -47,6 +49,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Controllers.Api
             _releaseChecklistService = releaseChecklistService;
             _userManager = userManager;
             _dataBlockService = dataBlockService;
+            _importService = importService;
         }
 
         [HttpGet("release/{releaseId}/file/{id}")]
@@ -113,7 +116,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Controllers.Api
         public async Task<ActionResult<IEnumerable<FileInfo>>> GetAncillaryFilesAsync(Guid releaseId)
         {
             return await _releaseFileService
-                .ListAll(releaseId, ReleaseFileTypes.Ancillary)
+                .ListAll(releaseId, Ancillary)
                 .HandleFailuresOrOk();
         }
 
@@ -277,6 +280,14 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Controllers.Api
             return await _releaseService
                 .RemoveDataFiles(releaseId, fileId)
                 .HandleFailuresOrNoContent();
+        }
+
+        [HttpPost("release/{releaseId}/data/{dataFileName}/import/cancel")]
+        public async Task<IActionResult> CancelFileImport([FromRoute] ReleaseFileImportInfo file)
+        {
+            return await _importService
+                .CancelImport(file)
+                .HandleFailuresOr(result => new AcceptedResult());
         }
 
         [HttpDelete("release/{releaseId}/ancillary/{fileId}")]

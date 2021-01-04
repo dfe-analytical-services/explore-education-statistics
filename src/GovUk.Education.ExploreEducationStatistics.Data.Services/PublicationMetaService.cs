@@ -36,8 +36,9 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Services
         public async Task<Either<ActionResult, PublicationSubjectsMetaViewModel>> GetSubjectsForLatestRelease(
             Guid publicationId)
         {
-            var releaseId = _releaseService.GetLatestPublishedRelease(publicationId);
-            if (!releaseId.HasValue)
+            var release = _releaseService.GetLatestPublishedRelease(publicationId);
+
+            if (release == null)
             {
                 return new NotFoundResult();
             }
@@ -45,8 +46,8 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Services
             return new PublicationSubjectsMetaViewModel
             {
                 PublicationId = publicationId,
-                Highlights = await GetHighlights(releaseId.Value),
-                Subjects = await GetSubjects(releaseId.Value)
+                Highlights = await GetHighlights(release.Id),
+                Subjects = await GetSubjects(release.Id)
             };
         }
 
@@ -54,10 +55,10 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Services
         {
             var releaseFilter = TableQuery.GenerateFilterCondition(nameof(ReleaseFastTrack.PartitionKey),
                 QueryComparisons.Equal, releaseId.ToString());
-            
+
             var highlightFilter = TableQuery.GenerateFilterCondition(nameof(ReleaseFastTrack.HighlightName), QueryComparisons.NotEqual,
                     string.Empty);
-            
+
             var combineFilter = TableQuery.CombineFilters(releaseFilter, TableOperators.And, highlightFilter);
             var query = new TableQuery<ReleaseFastTrack>().Where(combineFilter);
 

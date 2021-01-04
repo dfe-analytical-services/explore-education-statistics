@@ -1,7 +1,7 @@
 import ReleaseDataUploadsSection from '@admin/pages/release/data/components/ReleaseDataUploadsSection';
 import _releaseDataFileService, {
-  DataFile,
   DataFileImportStatus,
+  DataFile,
   UploadDataFilesRequest,
   UploadZipDataFileRequest,
 } from '@admin/services/releaseDataFileService';
@@ -32,6 +32,9 @@ describe('ReleaseDataUploadsSection', () => {
       },
       created: '2020-06-12T12:00:00',
       status: 'COMPLETE',
+      permissions: {
+        canCancelImport: false,
+      },
     },
     {
       id: 'data-2',
@@ -47,8 +50,30 @@ describe('ReleaseDataUploadsSection', () => {
       },
       created: '2020-07-01T12:00:00',
       status: 'COMPLETE',
+      permissions: {
+        canCancelImport: false,
+      },
     },
   ];
+
+  const testUploadedDataFile: DataFile = {
+    id: 'file-1',
+    title: 'Test title',
+    userName: 'user1@test.com',
+    fileName: 'test-data.csv',
+    metaFileId: 'file-1-meta',
+    metaFileName: 'test-data.meta.csv',
+    rows: 300,
+    fileSize: {
+      size: 150,
+      unit: 'Kb',
+    },
+    created: '2020-08-18T12:00:00',
+    status: 'QUEUED',
+    permissions: {
+      canCancelImport: true,
+    },
+  };
 
   const testQueuedImportStatus: DataFileImportStatus = {
     status: 'QUEUED',
@@ -462,22 +487,6 @@ describe('ReleaseDataUploadsSection', () => {
   });
 
   describe('uploading data file', () => {
-    const testUploadedDataFile: DataFile = {
-      id: 'file-1',
-      title: 'Test title',
-      userName: 'user1@test.com',
-      fileName: 'test-data.csv',
-      metaFileId: 'file-1-meta',
-      metaFileName: 'test-data.meta.csv',
-      rows: 300,
-      fileSize: {
-        size: 150,
-        unit: 'Kb',
-      },
-      created: '2020-08-18T12:00:00',
-      status: 'QUEUED',
-    };
-
     beforeEach(() => {
       releaseDataFileService.getDataFiles.mockResolvedValue(testDataFiles);
       releaseDataFileService.getDataFileImportStatus.mockResolvedValue(
@@ -813,5 +822,226 @@ describe('ReleaseDataUploadsSection', () => {
         );
       });
     });
+
+    describe('permissions during upload', () => {
+      test('cancel button is available when permissions allow it ', async () => {
+        releaseDataFileService.getDataFiles.mockResolvedValue([
+          {
+            ...testUploadedDataFile,
+            permissions: {
+              canCancelImport: true,
+            },
+          },
+        ]);
+
+        render(
+          <MemoryRouter>
+            <ReleaseDataUploadsSection
+              publicationId="publication-1"
+              releaseId="release-1"
+              canUpdateRelease
+            />
+          </MemoryRouter>,
+        );
+
+        await waitFor(() =>
+          expect(screen.queryAllByTestId('accordionSection')).toHaveLength(1),
+        );
+
+        const section = getAccordionSection(0);
+
+        expect(
+          section.queryByRole('button', { name: 'Cancel' }),
+        ).toBeInTheDocument();
+      });
+
+      test('cancel button is not available when permissions do not allow it', async () => {
+        releaseDataFileService.getDataFiles.mockResolvedValue([
+          {
+            ...testUploadedDataFile,
+            permissions: {
+              canCancelImport: false,
+            },
+          },
+        ]);
+
+        render(
+          <MemoryRouter>
+            <ReleaseDataUploadsSection
+              publicationId="publication-1"
+              releaseId="release-1"
+              canUpdateRelease
+            />
+          </MemoryRouter>,
+        );
+
+        await waitFor(() =>
+          expect(screen.queryAllByTestId('accordionSection')).toHaveLength(1),
+        );
+
+        const section = getAccordionSection(0);
+
+        expect(
+          section.queryByRole('button', { name: 'Cancel' }),
+        ).not.toBeInTheDocument();
+      });
+    });
   });
+
+  describe('cancelling file import', () => {
+    beforeEach(() => {
+      releaseDataFileService.getDataFileImportStatus.mockResolvedValue(
+        testQueuedImportStatus,
+      );
+    });
+
+    test('clicking cancel presents a cancellation modal', async () => {
+      releaseDataFileService.getDataFiles.mockResolvedValue([
+        testUploadedDataFile,
+      ]);
+
+      render(
+        <MemoryRouter>
+          <ReleaseDataUploadsSection
+            publicationId="publication-1"
+            releaseId="release-1"
+            canUpdateRelease
+          />
+        </MemoryRouter>,
+      );
+
+      await waitFor(() =>
+        expect(screen.queryAllByTestId('accordionSection')).toHaveLength(1),
+      );
+
+      const section = getAccordionSection(0);
+
+      userEvent.click(section.getByRole('button', { name: 'Cancel' }));
+
+      await waitFor(() => {
+        expect(screen.getByRole('dialog')).toBeInTheDocument();
+      });
+
+      const modal = within(screen.getByRole('dialog'));
+
+      expect(
+        modal.getByText('Confirm cancellation of selected data file'),
+      ).toBeInTheDocument();
+
+      expect(
+        modal.getByText(
+          'This file upload will be cancelled and may then be removed.',
+        ),
+      ).toBeInTheDocument();
+
+      expect(
+        modal.queryByRole('button', { name: 'Cancel' }),
+      ).toBeInTheDocument();
+
+      expect(
+        modal.queryByRole('button', { name: 'Confirm' }),
+      ).toBeInTheDocument();
+    });
+
+    test(
+      'confirming the cancellation modal initiates cancellation and ' +
+        'removes the Cancel link',
+      async () => {
+        releaseDataFileService.getDataFiles.mockResolvedValue([
+          testUploadedDataFile,
+        ]);
+
+        render(
+          <MemoryRouter>
+            <ReleaseDataUploadsSection
+              publicationId="publication-1"
+              releaseId="release-1"
+              canUpdateRelease
+            />
+          </MemoryRouter>,
+        );
+
+        await waitFor(() =>
+          expect(screen.queryAllByTestId('accordionSection')).toHaveLength(1),
+        );
+
+        const section = getAccordionSection(0);
+
+        userEvent.click(section.getByRole('button', { name: 'Cancel' }));
+
+        await waitFor(() => {
+          expect(screen.getByRole('dialog')).toBeInTheDocument();
+        });
+
+        const modal = within(screen.getByRole('dialog'));
+        userEvent.click(modal.getByRole('button', { name: 'Confirm' }));
+
+        await waitFor(() => {
+          expect(releaseDataFileService.cancelImport).toHaveBeenCalledWith(
+            'release-1',
+            testUploadedDataFile.fileName,
+          );
+        });
+
+        await waitFor(() => {
+          expect(screen.queryByRole('dialog')).not.toBeInTheDocument();
+        });
+
+        await waitFor(() => {
+          expect(
+            section.queryByRole('button', { name: 'Cancel' }),
+          ).not.toBeInTheDocument();
+        });
+      },
+    );
+
+    test('cancelling the cancellation modal calls off the import cancellation', async () => {
+      releaseDataFileService.getDataFiles.mockResolvedValue([
+        testUploadedDataFile,
+      ]);
+
+      render(
+        <MemoryRouter>
+          <ReleaseDataUploadsSection
+            publicationId="publication-1"
+            releaseId="release-1"
+            canUpdateRelease
+          />
+        </MemoryRouter>,
+      );
+
+      await waitFor(() =>
+        expect(screen.queryAllByTestId('accordionSection')).toHaveLength(1),
+      );
+
+      const section = getAccordionSection(0);
+
+      userEvent.click(section.getByRole('button', { name: 'Cancel' }));
+
+      await waitFor(() => {
+        expect(screen.getByRole('dialog')).toBeInTheDocument();
+      });
+
+      const modal = within(screen.getByRole('dialog'));
+      userEvent.click(modal.getByRole('button', { name: 'Cancel' }));
+
+      await waitFor(() => {
+        expect(releaseDataFileService.cancelImport).not.toHaveBeenCalled();
+      });
+
+      await waitFor(() => {
+        expect(screen.queryByRole('dialog')).not.toBeInTheDocument();
+      });
+
+      await waitFor(() => {
+        expect(
+          section.queryByRole('button', { name: 'Cancel' }),
+        ).toBeInTheDocument();
+      });
+    });
+  });
+
+  function getAccordionSection(index: number) {
+    return within(screen.getAllByTestId('accordionSection')[index]);
+  }
 });

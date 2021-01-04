@@ -97,6 +97,12 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Controllers.Api.Secur
                 })
                 .OrElse(() => new ReleaseStatusPermissionsViewModel());
         }
+        
+        [HttpGet("release/{releaseId}/data/{dataFileName}")]
+        public async Task<ActionResult<DataFilePermissions>> GetDataFilePermissions(Guid releaseId, string dataFileName)
+        {
+            return await _userService.GetDataFilePermissions(releaseId, dataFileName);
+        }
 
         [HttpGet("release/{releaseId}/amend")]
         public Task<ActionResult<bool>> CanMakeAmendmentOfRelease(Guid releaseId)

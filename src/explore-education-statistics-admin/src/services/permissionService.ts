@@ -18,6 +18,10 @@ export interface ReleaseStatusPermissions {
   canMarkApproved: boolean;
 }
 
+export interface DataFilePermissions {
+  canCancelImport: boolean;
+}
+
 export type PreReleaseAccess = 'Before' | 'After' | 'Within' | 'NoneSet';
 
 export interface PreReleaseWindowStatus {
@@ -77,6 +81,14 @@ const permissionService = {
         start: parseISO(status.start),
         end: parseISO(status.end),
       }));
+  },
+  getDataFilePermissions(
+    releaseId: string,
+    fileId: string,
+  ): Promise<DataFilePermissions> {
+    return client.get<DataFilePermissions>(
+      `/permissions/release/${releaseId}/data/${fileId}`,
+    );
   },
 };
 

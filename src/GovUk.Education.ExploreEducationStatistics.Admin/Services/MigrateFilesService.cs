@@ -16,6 +16,7 @@ using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Logging;
 using static GovUk.Education.ExploreEducationStatistics.Common.BlobContainerNames;
 using static GovUk.Education.ExploreEducationStatistics.Common.Extensions.BlobInfoExtensions;
+using static GovUk.Education.ExploreEducationStatistics.Common.Model.FileType;
 using static GovUk.Education.ExploreEducationStatistics.Common.Services.FileStoragePathUtils;
 using static GovUk.Education.ExploreEducationStatistics.Common.Services.FileStorageUtils;
 
@@ -48,7 +49,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Services
             _logger = logger;
         }
 
-        public async Task<Either<ActionResult, Unit>> MigratePrivateFiles(ReleaseFileTypes type)
+        public async Task<Either<ActionResult, Unit>> MigratePrivateFiles(FileType type)
         {
             return await _userService.CheckCanRunMigrations()
                 .OnSuccessVoid(async () =>
@@ -70,7 +71,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Services
                 });
         }
 
-        public async Task<Either<ActionResult, Unit>> MigratePublicFiles(ReleaseFileTypes type, bool lenient = false)
+        public async Task<Either<ActionResult, Unit>> MigratePublicFiles(FileType type, bool lenient = false)
         {
             return await _userService.CheckCanRunMigrations()
                 .OnSuccessVoid(async () =>
@@ -81,7 +82,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Services
                         var releaseFiles = await _releaseFileRepository.GetByFileType(release.Id, type);
                         await releaseFiles.ForEachAsync(async releaseFile =>
                         {
-                            var file = releaseFile.ReleaseFileReference;
+                            var file = releaseFile.File;
                             try
                             {
                                 if (!lenient ||
@@ -89,7 +90,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Services
                                         containerName: PublicFilesContainerName,
                                         path: PublicReleasePath(release.Publication.Slug,
                                             release.Slug,
-                                            file.ReleaseFileType,
+                                            file.Type,
                                             file.Filename)))
                                 {
                                     await MovePublicBlobForFile(release, file)
@@ -105,23 +106,23 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Services
                 });
         }
 
-        private async Task SetPrivateBlobMetadata(ReleaseFileReference file)
+        private async Task SetPrivateBlobMetadata(File file)
         {
-            if (file.ReleaseFileType == ReleaseFileTypes.Ancillary)
+            if (file.Type == Ancillary)
             {
                 await SetPrivateAncillaryBlobMetadata(file);
             }
         }
 
-        private async Task SetPublicBlobMetadata(Release release, ReleaseFileReference file)
+        private async Task SetPublicBlobMetadata(Release release, File file)
         {
-            if (file.ReleaseFileType == ReleaseFileTypes.Ancillary)
+            if (file.Type == Ancillary)
             {
                 await SetPublicAncillaryBlobMetadata(release, file);
             }
         }
 
-        private async Task SetPrivateAncillaryBlobMetadata(ReleaseFileReference file)
+        private async Task SetPrivateAncillaryBlobMetadata(File file)
         {
             var blob = await _privateBlobStorageService.GetBlob(
                 containerName: PrivateFilesContainerName,
@@ -136,7 +137,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Services
                 );
         }
 
-        private async Task SetPublicAncillaryBlobMetadata(Release release, ReleaseFileReference file)
+        private async Task SetPublicAncillaryBlobMetadata(Release release, File file)
         {
             var blob = await _publicBlobStorageService.GetBlob(
                 containerName: PublicFilesContainerName,
@@ -162,11 +163,11 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Services
                 metadata: metadata);
         }
 
-        private async Task<List<ReleaseFileReference>> GetFiles(ReleaseFileTypes type)
+        private async Task<List<File>> GetFiles(FileType type)
         {
             return await _contentDbContext
-                .ReleaseFileReferences
-                .Where(file => file.ReleaseFileType == type && !file.FilenameMigrated)
+                .Files
+                .Where(file => file.Type == type && !file.FilenameMigrated)
                 .ToListAsync();
         }
 
@@ -177,32 +178,20 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Services
                 .ToListAsync();
 
             return publications.SelectMany(publication => publication.Releases)
-                .Where(release =>
-                    // Release itself must be live
-                    release.Live
-                    // It must also be the latest version unless the later version is a draft
-                    && IsLatestVersionOfReleaseIgnoringDrafts(release))
+                .Where(release => release.IsLatestPublishedVersionOfRelease())
                 .ToList();
         }
 
-        private static bool IsLatestVersionOfReleaseIgnoringDrafts(Release release)
-        {
-            return !release.Publication.Releases.Any(r =>
-                r.Live
-                && r.PreviousVersionId == release.Id
-                && r.Id != release.Id);
-        }
-
-        private async Task MarkFileAsMigrated(ReleaseFileReference file)
+        private async Task MarkFileAsMigrated(File file)
         {
             _contentDbContext.Update(file);
             file.FilenameMigrated = true;
             await _contentDbContext.SaveChangesAsync();
         }
 
-        private async Task<Either<ActionResult, Unit>> MovePrivateBlobForFile(ReleaseFileReference file)
+        private async Task<Either<ActionResult, Unit>> MovePrivateBlobForFile(File file)
         {
-            var sourcePath = AdminReleasePath(file.ReleaseId, file.ReleaseFileType, file.Filename);
+            var sourcePath = AdminReleasePath(file.ReleaseId, file.Type, file.Filename);
 
             _logger.LogInformation("Renaming private file: {0}", sourcePath);
 
@@ -217,9 +206,9 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Services
             return Unit.Instance;
         }
 
-        private async Task<Either<ActionResult, Unit>> MovePublicBlobForFile(Release release, ReleaseFileReference file)
+        private async Task<Either<ActionResult, Unit>> MovePublicBlobForFile(Release release, File file)
         {
-            var sourcePath = PublicReleasePath(release.Publication.Slug, release.Slug, file.ReleaseFileType,
+            var sourcePath = PublicReleasePath(release.Publication.Slug, release.Slug, file.Type,
                 file.Filename);
 
             _logger.LogInformation("Renaming public file: {0}", sourcePath);

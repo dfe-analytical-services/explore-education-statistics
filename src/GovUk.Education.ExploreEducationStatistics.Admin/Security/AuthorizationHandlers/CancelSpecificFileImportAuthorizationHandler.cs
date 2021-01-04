@@ -25,7 +25,9 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Security.Authorizatio
             CancelSpecificFileImportRequirement requirement,
             ReleaseFileImportInfo import)
         {
-            if (await _importStatusService.IsImportFinished(import.ReleaseId, import.DataFileName))
+            var status = await _importStatusService.GetImportStatus(import.ReleaseId, import.DataFileName);
+            
+            if (status.IsFinishedOrAborting())
             {
                 return;
             }

@@ -27,7 +27,6 @@ export interface KeyStatsFormValues {
 }
 
 interface EditableKeyStatProps extends KeyStatProps {
-  id: string;
   isEditing?: boolean;
   name: string;
   onRemove?: () => void;
@@ -35,10 +34,10 @@ interface EditableKeyStatProps extends KeyStatProps {
 }
 
 const EditableKeyStat = ({
-  id,
   isEditing = false,
   name,
-  query,
+  releaseId,
+  dataBlockId,
   summary,
   testId = 'keyStat',
   onRemove,
@@ -47,12 +46,12 @@ const EditableKeyStat = ({
   const [showForm, toggleShowForm] = useToggle(false);
   const [removing, toggleRemoving] = useToggle(false);
 
-  const { value: keyStat, isLoading, error } = useKeyStatQuery({
-    ...query,
-    includeGeoJson: false,
-  });
+  const { value: keyStat, isLoading, error } = useKeyStatQuery(
+    releaseId,
+    dataBlockId,
+  );
 
-  const formId = `editableKeyStatForm-${id}`;
+  const formId = `editableKeyStatForm-${dataBlockId}`;
 
   const renderInner = () => {
     if (error || !keyStat) {

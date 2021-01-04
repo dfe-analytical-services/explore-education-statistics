@@ -1,10 +1,11 @@
 using System;
-using System.Collections.Generic;
+using System.Linq;
 using System.Threading.Tasks;
 using GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services;
 using GovUk.Education.ExploreEducationStatistics.Common.Model;
 using GovUk.Education.ExploreEducationStatistics.Common.Services;
 using GovUk.Education.ExploreEducationStatistics.Common.Services.Interfaces;
+using GovUk.Education.ExploreEducationStatistics.Common.Tests.Utils;
 using GovUk.Education.ExploreEducationStatistics.Data.Processor.Model;
 using GovUk.Education.ExploreEducationStatistics.Data.Processor.Services.Interfaces;
 using Microsoft.Azure.WebJobs;
@@ -119,18 +120,15 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Processor.Tests.Functi
             MockUtils.VerifyAllMocks(processorService, importStatusService, batchService,
                 fileImportService, importStagesMessageQueue, datafileProcessingMessageQueue);
         }
-        
+
         [Fact]
         public void ProcessUploadsButImportIsFinished()
         {
-            var finishedStates = new List<IStatus>
-            {
-                IStatus.COMPLETE,
-                IStatus.FAILED,
-                IStatus.NOT_FOUND,
-                IStatus.CANCELLED
-            };
-            
+            var finishedStates = EnumUtil
+                .GetEnumValues<IStatus>()
+                .Where(ImportStatus.IsFinishedState)
+                .ToList();
+
             finishedStates.ForEach(currentState =>
             {
                 var mocks = Mocks();
@@ -161,7 +159,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Processor.Tests.Functi
                     {
                         Status = currentState
                     });
-                
+
                 processor.ProcessUploads(
                     message,
                     null,
@@ -169,7 +167,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Processor.Tests.Functi
                     datafileProcessingMessageQueue.Object
                 );
 
-                // Verify that no Status updates occurred and that no further attempt to add further processing 
+                // Verify that no Status updates occurred and that no further attempt to add further processing
                 // messages to queues occurred.
                 MockUtils.VerifyAllMocks(processorService, importStatusService, batchService,
                     fileImportService, importStagesMessageQueue, datafileProcessingMessageQueue);
@@ -242,13 +240,13 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Processor.Tests.Functi
                 },
                 DataFileName = "my_data_file",
             };
-            
+
             var executionContext = new ExecutionContext();
-            
+
             var processor = new Processor.Functions.Processor(
                 fileImportService.Object,
                 batchService.Object,
-                importStatusService.Object, 
+                importStatusService.Object,
                 processorService.Object,
                 new Mock<ILogger<Processor.Functions.Processor>>().Object);
 
@@ -298,11 +296,11 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Processor.Tests.Functi
                 },
                 DataFileName = "my_data_file",
             };
-            
+
             var processor = new Processor.Functions.Processor(
                 fileImportService.Object,
                 batchService.Object,
-                importStatusService.Object, 
+                importStatusService.Object,
                 processorService.Object,
                 new Mock<ILogger<Processor.Functions.Processor>>().Object);
 
@@ -352,11 +350,11 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Processor.Tests.Functi
                 },
                 DataFileName = "my_data_file",
             };
-            
+
             var processor = new Processor.Functions.Processor(
                 fileImportService.Object,
                 batchService.Object,
-                importStatusService.Object, 
+                importStatusService.Object,
                 processorService.Object,
                 new Mock<ILogger<Processor.Functions.Processor>>().Object);
 
@@ -388,7 +386,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Processor.Tests.Functi
             MockUtils.VerifyAllMocks(processorService, importStatusService, batchService,
                 fileImportService, importStagesMessageQueue, datafileProcessingMessageQueue);
         }
-        
+
         [Fact]
         public void ProcessUploadsStage4Messages()
         {
@@ -406,11 +404,11 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Processor.Tests.Functi
                 },
                 DataFileName = "my_data_file",
             };
-            
+
             var processor = new Processor.Functions.Processor(
                 fileImportService.Object,
                 batchService.Object,
-                importStatusService.Object, 
+                importStatusService.Object,
                 processorService.Object,
                 new Mock<ILogger<Processor.Functions.Processor>>().Object);
 
@@ -435,7 +433,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Processor.Tests.Functi
             MockUtils.VerifyAllMocks(processorService, importStatusService, batchService,
                 fileImportService, importStagesMessageQueue, datafileProcessingMessageQueue);
         }
-        
+
         [Fact]
         public void CancelImport()
         {
@@ -447,11 +445,11 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Processor.Tests.Functi
                 ReleaseId = Guid.NewGuid(),
                 DataFileName = "my_data_file"
             };
-            
+
             var processor = new Processor.Functions.Processor(
                 fileImportService.Object,
                 batchService.Object,
-                importStatusService.Object, 
+                importStatusService.Object,
                 processorService.Object,
                 new Mock<ILogger<Processor.Functions.Processor>>().Object);
 
@@ -461,7 +459,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Processor.Tests.Functi
                 PercentageComplete = 10,
                 PhasePercentageComplete = 50,
             };
-            
+
             importStatusService
                 .Setup(s => s.GetImportStatus(message.ReleaseId, message.DataFileName))
                 .ReturnsAsync(currentImportStatus);

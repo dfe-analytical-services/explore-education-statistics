@@ -6,6 +6,7 @@ import {
 import _dataReplacementService, {
   DataReplacementPlan,
 } from '@admin/services/dataReplacementService';
+import _permissionService from '@admin/services/permissionService';
 import _releaseDataFileService, {
   DataFile,
 } from '@admin/services/releaseDataFileService';
@@ -15,6 +16,7 @@ import { generatePath, MemoryRouter, Route } from 'react-router';
 
 jest.mock('@admin/services/dataReplacementService');
 jest.mock('@admin/services/releaseDataFileService');
+jest.mock('@admin/services/permissionService');
 
 const dataReplacementService = _dataReplacementService as jest.Mocked<
   typeof _dataReplacementService
@@ -22,8 +24,17 @@ const dataReplacementService = _dataReplacementService as jest.Mocked<
 const releaseDataFileService = _releaseDataFileService as jest.Mocked<
   typeof _releaseDataFileService
 >;
+const permissionService = _permissionService as jest.Mocked<
+  typeof _permissionService
+>;
 
 describe('ReleaseDataFilePage', () => {
+  beforeEach(() => {
+    permissionService.getDataFilePermissions.mockResolvedValue({
+      canCancelImport: false,
+    });
+  });
+
   const testOriginalFile: DataFile = {
     id: 'data-1',
     title: 'Test data',
@@ -38,6 +49,9 @@ describe('ReleaseDataFilePage', () => {
     metaFileId: 'meta-1',
     userName: 'original@test.com',
     created: '2020-09-20T12:00:00',
+    permissions: {
+      canCancelImport: false,
+    },
   };
 
   const testReplacementFile: DataFile = {
@@ -54,6 +68,9 @@ describe('ReleaseDataFilePage', () => {
     metaFileId: 'meta-2',
     userName: 'replacer@test.com',
     created: '2020-09-28T12:00:00',
+    permissions: {
+      canCancelImport: false,
+    },
   };
 
   const testValidReplacementPlan: DataReplacementPlan = {

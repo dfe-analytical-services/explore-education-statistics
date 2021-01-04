@@ -1,6 +1,7 @@
 using System.Collections.Generic;
 using System.Text.RegularExpressions;
 using GovUk.Education.ExploreEducationStatistics.Common.Model;
+using static GovUk.Education.ExploreEducationStatistics.Common.Model.FileType;
 
 namespace GovUk.Education.ExploreEducationStatistics.Common.Validators
 {
@@ -43,13 +44,13 @@ namespace GovUk.Education.ExploreEducationStatistics.Common.Validators
             new Regex(@"^(application)/x-compressed$")
         };
         
-        public static readonly Dictionary<ReleaseFileTypes, IEnumerable<Regex>> AllowedMimeTypesByFileType = 
-            new Dictionary<ReleaseFileTypes, IEnumerable<Regex>>
+        public static readonly Dictionary<FileType, IEnumerable<Regex>> AllowedMimeTypesByFileType = 
+            new Dictionary<FileType, IEnumerable<Regex>>
             {
-                { ReleaseFileTypes.Ancillary, AllowedAncillaryFileTypes },
-                { ReleaseFileTypes.Chart, AllowedChartFileTypes },
-                { ReleaseFileTypes.Data, AllowedCsvMimeTypes },
-                { ReleaseFileTypes.DataZip, AllowedArchiveMimeTypes }
+                { Ancillary, AllowedAncillaryFileTypes },
+                { Chart, AllowedChartFileTypes },
+                { Data, AllowedCsvMimeTypes },
+                { DataZip, AllowedArchiveMimeTypes }
             };
     }
 }

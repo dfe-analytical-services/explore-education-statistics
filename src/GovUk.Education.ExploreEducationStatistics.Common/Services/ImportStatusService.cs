@@ -40,6 +40,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Common.Services
             {STAGE_2, .1},
             {STAGE_3, .1},
             {STAGE_4, .7},
+            {CANCELLING, 1},
             {CANCELLED, 1},
             {COMPLETE, 1},
         };
@@ -181,6 +182,12 @@ namespace GovUk.Education.ExploreEducationStatistics.Common.Services
                                    ProcessingRatios[STAGE_2] * 100 +
                                    ProcessingRatios[STAGE_3] * 100 +
                                    percentageComplete * ProcessingRatios[STAGE_4],
+                CANCELLING => ProcessingRatios[STAGE_1] * 100 +
+                              ProcessingRatios[STAGE_2] * 100 +
+                              ProcessingRatios[STAGE_3] * 100 +
+                              ProcessingRatios[STAGE_4] * 100 +
+                              percentageComplete * ProcessingRatios[CANCELLING],
+                CANCELLED => ProcessingRatios[CANCELLED] * 100,
                 COMPLETE => ProcessingRatios[COMPLETE] * 100,
                 _ => 0
             });

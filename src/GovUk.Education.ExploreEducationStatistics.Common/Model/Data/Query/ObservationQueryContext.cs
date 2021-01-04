@@ -13,6 +13,12 @@ namespace GovUk.Education.ExploreEducationStatistics.Common.Model.Data.Query
         public LocationQuery Locations { get; set; }
         public bool? IncludeGeoJson { get; set; }
 
+        public ObservationQueryContext Clone()
+        {
+            var clone = MemberwiseClone() as ObservationQueryContext;
+            return clone;
+        }
+
         public override string ToString()
         {
             return

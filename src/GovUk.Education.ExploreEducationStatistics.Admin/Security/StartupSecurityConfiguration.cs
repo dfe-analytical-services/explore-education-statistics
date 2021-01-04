@@ -1,6 +1,8 @@
 using GovUk.Education.ExploreEducationStatistics.Admin.Security.AuthorizationHandlers;
 using GovUk.Education.ExploreEducationStatistics.Common.Services.Interfaces.Security;
 using GovUk.Education.ExploreEducationStatistics.Common.Services.Security;
+using GovUk.Education.ExploreEducationStatistics.Content.Security;
+using GovUk.Education.ExploreEducationStatistics.Content.Security.AuthorizationHandlers;
 using GovUk.Education.ExploreEducationStatistics.Data.Services.Security;
 using GovUk.Education.ExploreEducationStatistics.Data.Services.Security.AuthorizationHandlers;
 using Microsoft.AspNetCore.Authorization;
@@ -64,8 +66,8 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Security
                     policy.RequireClaim(SecurityClaimTypes.AccessAllReleases.ToString()));
 
                 // does this user have permission to view a specific Release?
-                options.AddPolicy(SecurityPolicies.CanViewSpecificRelease.ToString(), policy =>
-                    policy.Requirements.Add(new ViewSpecificReleaseRequirement()));
+                options.AddPolicy(ContentSecurityPolicies.CanViewRelease.ToString(), policy =>
+                    policy.Requirements.Add(new ViewReleaseRequirement()));
 
                 // does this user have permission to update a specific Release?
                 options.AddPolicy(SecurityPolicies.CanUpdateSpecificRelease.ToString(), policy =>

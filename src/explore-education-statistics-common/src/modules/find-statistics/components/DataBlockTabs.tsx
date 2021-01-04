@@ -7,9 +7,7 @@ import withLazyLoad from '@common/hocs/withLazyLoad';
 import ChartRenderer from '@common/modules/charts/components/ChartRenderer';
 import { GetInfographic } from '@common/modules/charts/components/InfographicBlock';
 import { AxesConfiguration } from '@common/modules/charts/types/chart';
-import useTableQuery, {
-  TableQueryOptions,
-} from '@common/modules/find-statistics/hooks/useTableQuery';
+import useTableQuery from '@common/modules/find-statistics/hooks/useTableQuery';
 import TimePeriodDataTable from '@common/modules/table-tool/components/TimePeriodDataTable';
 import getDefaultTableHeaderConfig from '@common/modules/table-tool/utils/getDefaultTableHeadersConfig';
 import mapTableHeadersConfig from '@common/modules/table-tool/utils/mapTableHeadersConfig';
@@ -26,8 +24,7 @@ export interface DataBlockTabsProps {
   lastTabs?: ReactNode;
   getInfographic?: GetInfographic;
   id?: string;
-  releaseId?: string;
-  queryOptions?: TableQueryOptions;
+  releaseId: string;
   onToggle?: (section: { id: string; title: string }) => void;
 }
 
@@ -39,16 +36,11 @@ const DataBlockTabs = ({
   getInfographic,
   id = `dataBlock-${dataBlock.id}`,
   releaseId,
-  queryOptions,
   onToggle,
 }: DataBlockTabsProps) => {
   const { value: fullTable, isLoading, error } = useTableQuery(
-    {
-      ...dataBlock.query,
-      releaseId,
-      includeGeoJson: dataBlock.charts.some(chart => chart.type === 'map'),
-    },
-    queryOptions,
+    releaseId,
+    dataBlock.id,
   );
 
   const errorMessage = <WarningMessage>Could not load content</WarningMessage>;

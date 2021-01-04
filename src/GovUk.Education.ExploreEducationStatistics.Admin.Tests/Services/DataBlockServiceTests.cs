@@ -11,6 +11,7 @@ using GovUk.Education.ExploreEducationStatistics.Common.Model.Chart;
 using GovUk.Education.ExploreEducationStatistics.Common.Model.Data;
 using GovUk.Education.ExploreEducationStatistics.Common.Model.Data.Query;
 using GovUk.Education.ExploreEducationStatistics.Common.Services.Interfaces.Security;
+using GovUk.Education.ExploreEducationStatistics.Common.Tests.Utils;
 using GovUk.Education.ExploreEducationStatistics.Common.Utils;
 using GovUk.Education.ExploreEducationStatistics.Content.Model;
 using GovUk.Education.ExploreEducationStatistics.Content.Model.Database;
@@ -400,7 +401,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
                     Heading = "Test heading"
                 }
             };
-            var releaseFileReference = new ReleaseFileReference
+            var file = new File
             {
                 Id = fileId,
                 Filename = "test-infographic.jpg"
@@ -417,7 +418,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
                         ContentBlock = dataBlock
                     }
                 );
-                await context.AddAsync(releaseFileReference);
+                await context.AddAsync(file);
                 await context.SaveChangesAsync();
             }
 
@@ -439,8 +440,8 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
 
                 Assert.Single(dependentBlocks[0].InfographicFilesInfo);
 
-                Assert.Equal(releaseFileReference.Id, dependentBlocks[0].InfographicFilesInfo[0].Id);
-                Assert.Equal(releaseFileReference.Filename, dependentBlocks[0].InfographicFilesInfo[0].Filename);
+                Assert.Equal(file.Id, dependentBlocks[0].InfographicFilesInfo[0].Id);
+                Assert.Equal(file.Filename, dependentBlocks[0].InfographicFilesInfo[0].Filename);
             }
         }
 
@@ -491,7 +492,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
                     Heading = "Test heading"
                 }
             };
-            var releaseFileReference = new ReleaseFileReference
+            var file = new File
             {
                 Id = fileId,
                 Filename = "test-infographic.jpg"
@@ -508,7 +509,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
                         ContentBlock = dataBlock
                     }
                 );
-                await context.AddAsync(releaseFileReference);
+                await context.AddAsync(file);
                 await context.SaveChangesAsync();
             }
 
@@ -546,7 +547,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
                     Heading = "Test heading"
                 }
             };
-            var releaseFileReference = new ReleaseFileReference
+            var file = new File
             {
                 Id = fileId,
                 Filename = "test-infographic.jpg"
@@ -563,7 +564,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
                         ContentBlock = dataBlock
                     }
                 );
-                await context.AddAsync(releaseFileReference);
+                await context.AddAsync(file);
                 await context.SaveChangesAsync();
             }
 
@@ -752,7 +753,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
                 },
             };
 
-            var releaseFileReference = new ReleaseFileReference
+            var file = new File
             {
                 Id = fileId,
                 Filename = "test-infographic.jpg"
@@ -769,7 +770,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
                         ContentBlock = dataBlock
                     }
                 );
-                await context.AddAsync(releaseFileReference);
+                await context.AddAsync(file);
                 await context.SaveChangesAsync();
             }
 

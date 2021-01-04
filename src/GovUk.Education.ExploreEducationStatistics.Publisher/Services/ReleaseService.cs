@@ -13,11 +13,12 @@ using GovUk.Education.ExploreEducationStatistics.Publisher.Model.ViewModels;
 using GovUk.Education.ExploreEducationStatistics.Publisher.Models;
 using GovUk.Education.ExploreEducationStatistics.Publisher.Services.Interfaces;
 using Microsoft.EntityFrameworkCore;
+using static GovUk.Education.ExploreEducationStatistics.Common.Model.FileType;
 using Microsoft.Extensions.Logging;
 using static GovUk.Education.ExploreEducationStatistics.Common.BlobContainerNames;
 using static GovUk.Education.ExploreEducationStatistics.Common.Services.FileStoragePathUtils;
 using IReleaseService = GovUk.Education.ExploreEducationStatistics.Publisher.Services.Interfaces.IReleaseService;
-using static GovUk.Education.ExploreEducationStatistics.Publisher.Utils.PublisherUtils;
+using static GovUk.Education.ExploreEducationStatistics.Publisher.Extensions.PublisherExtensions;
 
 namespace GovUk.Education.ExploreEducationStatistics.Publisher.Services
 {
@@ -99,7 +100,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Publisher.Services
                 .ToListAsync();
 
             return releases
-                .Where(release => IsLatestVersionOfRelease(release.Publication.Releases, release, includedReleaseIds))
+                .Where(release => release.IsReleasePublished(includedReleaseIds))
                 .OrderBy(release => release.Year)
                 .ThenBy(release => release.TimePeriodCoverage)
                 .LastOrDefault();
@@ -166,20 +167,20 @@ namespace GovUk.Education.ExploreEducationStatistics.Publisher.Services
             }
         }
 
-        public async Task<List<ReleaseFileReference>> GetFiles(Guid releaseId, params ReleaseFileTypes[] types)
+        public async Task<List<File>> GetFiles(Guid releaseId, params FileType[] types)
         {
             return await _contentDbContext
                 .ReleaseFiles
-                .Include(rf => rf.ReleaseFileReference)
+                .Include(rf => rf.File)
                 .Where(rf => rf.ReleaseId == releaseId)
-                .Select(rf => rf.ReleaseFileReference)
-                .Where(file => types.Contains(file.ReleaseFileType))
+                .Select(rf => rf.File)
+                .Where(file => types.Contains(file.Type))
                 .ToListAsync();
         }
 
         public async Task<List<FileInfo>> GetDownloadFiles(Release release)
         {
-            var files = await GetFiles(release.Id, ReleaseFileTypes.Ancillary, ReleaseFileTypes.Data);
+            var files = await GetFiles(release.Id, Ancillary, FileType.Data);
 
             var filesWithInfo = files.Select(async file => await GetPublicFileInfo(release, file));
 
@@ -212,9 +213,32 @@ namespace GovUk.Education.ExploreEducationStatistics.Publisher.Services
 
         private async Task<FileInfo> GetAllFilesZip(Release release)
         {
+            var path = PublicReleaseAllFilesZipPath(release.Publication.Slug, release.Slug);
+
+            var exists = await _fileStorageService.CheckBlobExists(
+                containerName: PublicFilesContainerName,
+                path: path);
+
+            // EES-1755 we should throw an exception here and not be as lenient.
+            // Temporarily to collect a list of missing files and not halt publishing while regenerating
+            // content for all releases, we log an error and continue.
+            if (!exists)
+            {
+                _logger.LogError("Public blob not found for 'All files' zip at: {0}", path);
+                return new FileInfo
+                {
+                    Id = null,
+                    FileName = null,
+                    Name = "Unknown",
+                    Path = null,
+                    Size = "0.00 B",
+                    Type = Ancillary
+                };
+            }
+
             var blob = await _fileStorageService.GetBlob(
                 containerName: PublicFilesContainerName,
-                path: PublicReleaseAllFilesZipPath(release.Publication.Slug, release.Slug));
+                path: path);
 
             return new FileInfo
             {
@@ -223,11 +247,11 @@ namespace GovUk.Education.ExploreEducationStatistics.Publisher.Services
                 Name = blob.Name,
                 Path = blob.Path,
                 Size = blob.Size,
-                Type = ReleaseFileTypes.Ancillary
+                Type = Ancillary
             };
         }
 
-        private async Task<FileInfo> GetPublicFileInfo(Release release, ReleaseFileReference file)
+        private async Task<FileInfo> GetPublicFileInfo(Release release, File file)
         {
             var exists = await _fileStorageService.CheckBlobExists(
                 containerName: PublicFilesContainerName,

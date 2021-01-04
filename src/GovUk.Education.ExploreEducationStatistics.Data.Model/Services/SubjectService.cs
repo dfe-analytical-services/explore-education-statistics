@@ -25,14 +25,14 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Model.Services
             var publication = await GetPublicationForSubject(subjectId);
             var latestRelease = _releaseService.GetLatestPublishedRelease(publication.Id);
 
-            if (!latestRelease.HasValue)
+            if (latestRelease == null)
             {
                 return false;
             }
 
             return _context
                 .ReleaseSubject
-                .Any(r => r.ReleaseId == latestRelease.Value && r.SubjectId == subjectId);
+                .Any(r => r.ReleaseId == latestRelease.Id && r.SubjectId == subjectId);
         }
 
         public async Task<Subject?> Get(Guid subjectId)

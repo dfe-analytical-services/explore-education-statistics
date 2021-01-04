@@ -3,10 +3,7 @@ import {
   AsyncStateSetterParam,
 } from '@common/hooks/useAsyncCallback';
 import { AsyncRetryState } from '@common/hooks/useAsyncRetry';
-import useTableQuery, {
-  TableQueryOptions,
-} from '@common/modules/find-statistics/hooks/useTableQuery';
-import { ReleaseTableDataQuery } from '@common/services/tableBuilderService';
+import useTableQuery from '@common/modules/find-statistics/hooks/useTableQuery';
 import formatPretty from '@common/utils/number/formatPretty';
 import { useCallback, useEffect, useMemo, useState } from 'react';
 
@@ -16,20 +13,14 @@ interface KeyStatResult {
 }
 
 export default function useKeyStatQuery(
-  query: ReleaseTableDataQuery,
-  options: TableQueryOptions = {},
+  releaseId: string,
+  dataBlockId: string,
 ): AsyncRetryState<KeyStatResult> {
   const {
     value: tableData,
     setState: setTableQueryState,
     ...tableQueryState
-  } = useTableQuery(
-    {
-      ...query,
-      includeGeoJson: false,
-    },
-    options,
-  );
+  } = useTableQuery(releaseId, dataBlockId);
 
   const [value, setValue] = useState<KeyStatResult>();
 

@@ -20,7 +20,7 @@ interface EditableContentBlockProps
 }
 
 const EditableContentBlock = ({
-  editable,
+  editable = true,
   hideLabel = true,
   useMarkdown,
   value,

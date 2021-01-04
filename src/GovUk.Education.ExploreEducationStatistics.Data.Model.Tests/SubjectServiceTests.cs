@@ -38,7 +38,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Model.Tests
 
                 releaseService
                     .Setup(s => s.GetLatestPublishedRelease(releaseSubject.Release.PublicationId))
-                    .Returns(releaseSubject.ReleaseId);
+                    .Returns(releaseSubject.Release);
 
                 var service = BuildSubjectService(context, releaseService: releaseService.Object);
                 var result = await service.IsSubjectForLatestPublishedRelease(releaseSubject.SubjectId);
@@ -74,7 +74,10 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Model.Tests
 
                 releaseService
                     .Setup(s => s.GetLatestPublishedRelease(releaseSubject.Release.PublicationId))
-                    .Returns(Guid.NewGuid());
+                    .Returns(new Release
+                    {
+                        Id = Guid.NewGuid()
+                    });
 
                 var service = BuildSubjectService(context, releaseService: releaseService.Object);
                 var result = await service.IsSubjectForLatestPublishedRelease(releaseSubject.SubjectId);
@@ -110,7 +113,10 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Model.Tests
 
                 releaseService
                     .Setup(s => s.GetLatestPublishedRelease(releaseSubject.Release.PublicationId))
-                    .Returns(Guid.NewGuid());
+                    .Returns(new Release
+                    {
+                        Id = Guid.NewGuid()
+                    });
 
                 var service = BuildSubjectService(context, releaseService: releaseService.Object);
                 var result = await service.IsSubjectForLatestPublishedRelease(releaseSubject.SubjectId);

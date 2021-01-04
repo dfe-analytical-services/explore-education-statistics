@@ -171,7 +171,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Services
 
         private async Task<List<Subject>> GetSubjectsWithNoFootnotes(
             Release release,
-            IEnumerable<ReleaseFileReference> dataFiles)
+            IEnumerable<File> dataFiles)
         {
             var allowedSubjectIds = dataFiles
                 .Where(dataFile => dataFile.SubjectId.HasValue)

@@ -2,6 +2,7 @@ using System;
 using System.Text.RegularExpressions;
 using GovUk.Education.ExploreEducationStatistics.Common.Extensions;
 using GovUk.Education.ExploreEducationStatistics.Common.Model;
+using static GovUk.Education.ExploreEducationStatistics.Common.Model.FileType;
 
 namespace GovUk.Education.ExploreEducationStatistics.Common.Services
 {
@@ -95,14 +96,14 @@ namespace GovUk.Education.ExploreEducationStatistics.Common.Services
         /**
          * The admin directory path where files, of a particular type, on a release are stored.
          */
-        public static string AdminReleaseDirectoryPath(string releaseId, ReleaseFileTypes type)
+        public static string AdminReleaseDirectoryPath(string releaseId, FileType type)
         {
             return $"{AdminReleaseDirectoryPath(releaseId)}{GetUploadFolderForType(type).GetEnumLabel()}/";
         }
 
-        private static ReleaseFileTypes GetUploadFolderForType(ReleaseFileTypes type)
+        private static FileType GetUploadFolderForType(FileType type)
         {
-            return type == ReleaseFileTypes.Metadata ? ReleaseFileTypes.Data : type;
+            return type == Metadata ? Data : type;
         }
 
         /**
@@ -118,13 +119,13 @@ namespace GovUk.Education.ExploreEducationStatistics.Common.Services
          */
         public static string AdminReleaseBatchesDirectoryPath(string releaseId)
         {
-            return $"{AdminReleaseDirectoryPath(releaseId)}{ReleaseFileTypes.Data.GetEnumLabel()}/{BatchesDir}/";
+            return $"{AdminReleaseDirectoryPath(releaseId)}{Data.GetEnumLabel()}/{BatchesDir}/";
         }
 
         /**
          * The admin file path, for a file of a particular type and name, on a release.
          */
-        public static string AdminReleasePath(string releaseId, ReleaseFileTypes type, string fileName)
+        public static string AdminReleasePath(string releaseId, FileType type, string fileName)
         {
             return $"{AdminReleaseDirectoryPath(releaseId, type)}{fileName}";
         }
@@ -138,25 +139,25 @@ namespace GovUk.Education.ExploreEducationStatistics.Common.Services
         /**
          * The admin file path, for a file of a particular type and id, on a release.
          */
-        public static string AdminReleasePath(Guid releaseId, ReleaseFileTypes type, Guid fileId)
+        public static string AdminReleasePath(Guid releaseId, FileType type, Guid fileId)
             => AdminReleasePath(releaseId.ToString(), type, fileId.ToString());
 
         /**
          * The admin file path, for a file of a particular type and name, on a release.
          */
-        public static string AdminReleasePath(Guid releaseId, ReleaseFileTypes type, string fileName)
+        public static string AdminReleasePath(Guid releaseId, FileType type, string fileName)
             => AdminReleasePath(releaseId.ToString(), type, fileName);
 
         /**
          * The admin directory path where files, of a particular type, on a release are stored.
          */
-        public static string AdminReleaseDirectoryPath(Guid releaseId, ReleaseFileTypes type) =>
+        public static string AdminReleaseDirectoryPath(Guid releaseId, FileType type) =>
             AdminReleaseDirectoryPath(releaseId.ToString(), type);
 
         /**
          * The public file path, for a file of a particular type and id, on a release.
          */
-        public static string PublicReleasePath(string publicationSlug, string releaseSlug, ReleaseFileTypes type,
+        public static string PublicReleasePath(string publicationSlug, string releaseSlug, FileType type,
             Guid fileId)
         {
             return $"{PublicReleaseDirectoryPath(publicationSlug, releaseSlug, type)}{fileId}";
@@ -165,7 +166,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Common.Services
         /**
          * The public file path, for a file of a particular type and name, on a release.
          */
-        public static string PublicReleasePath(string publicationSlug, string releaseSlug, ReleaseFileTypes type,
+        public static string PublicReleasePath(string publicationSlug, string releaseSlug, FileType type,
             string fileName)
         {
             return $"{PublicReleaseDirectoryPath(publicationSlug, releaseSlug, type)}{fileName}";
@@ -175,7 +176,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Common.Services
          * The public directory path where files, of a particular type, on a release are stored.
          */
         public static string PublicReleaseDirectoryPath(string publicationSlug, string releaseSlug,
-            ReleaseFileTypes type)
+            FileType type)
         {
             return $"{PublicReleaseDirectoryPath(publicationSlug, releaseSlug)}{type.GetEnumLabel()}/";
         }
@@ -194,7 +195,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Common.Services
         public static string PublicReleaseAllFilesZipPath(string publicationSlug, string releaseSlug)
         {
             return
-                $"{PublicReleaseDirectoryPath(publicationSlug, releaseSlug, ReleaseFileTypes.Ancillary)}{publicationSlug}_{releaseSlug}.zip";
+                $"{PublicReleaseDirectoryPath(publicationSlug, releaseSlug, Ancillary)}{publicationSlug}_{releaseSlug}.zip";
         }
 
         /**

@@ -5,7 +5,7 @@ using GovUk.Education.ExploreEducationStatistics.Common.Model;
 using GovUk.Education.ExploreEducationStatistics.Content.Api.Services.Interfaces;
 using Microsoft.AspNetCore.Mvc;
 using static GovUk.Education.ExploreEducationStatistics.Common.BlobContainerNames;
-using static GovUk.Education.ExploreEducationStatistics.Common.Model.ReleaseFileTypes;
+using static GovUk.Education.ExploreEducationStatistics.Common.Model.FileType;
 using static GovUk.Education.ExploreEducationStatistics.Common.Services.FileStoragePathUtils;
 
 namespace GovUk.Education.ExploreEducationStatistics.Content.Api.Controllers
@@ -24,7 +24,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Content.Api.Controllers
         [HttpGet("download/{publication}/{release}/data/{filename}")]
         public async Task<ActionResult> GetDataFile(string publication, string release, string filename)
         {
-            return await GetFile(PublicReleasePath(publication, release, ReleaseFileTypes.Data, filename));
+            return await GetFile(PublicReleasePath(publication, release, FileType.Data, filename));
         }
 
         [HttpGet("download/{publication}/{release}/ancillary/{fileNameOrId}")]

@@ -13,6 +13,7 @@ using GovUk.Education.ExploreEducationStatistics.Content.Model;
 using GovUk.Education.ExploreEducationStatistics.Content.Model.Database;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
+using static GovUk.Education.ExploreEducationStatistics.Common.Model.FileType;
 
 namespace GovUk.Education.ExploreEducationStatistics.Admin.Services.ManageContent
 {
@@ -47,8 +48,8 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Services.ManageConten
                 .OnSuccess(release => _contentService.GetUnattachedContentBlocksAsync<DataBlock>(releaseId)
                     .OnSuccess(blocks => _releaseFileService.ListAll(
                             releaseId,
-                            ReleaseFileTypes.Ancillary,
-                            ReleaseFileTypes.Data)
+                            Ancillary,
+                            FileType.Data)
                         .OnSuccess(files =>
                         {
                             var releaseViewModel =

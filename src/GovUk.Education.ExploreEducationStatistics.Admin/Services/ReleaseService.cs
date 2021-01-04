@@ -23,7 +23,6 @@ using Newtonsoft.Json;
 using static GovUk.Education.ExploreEducationStatistics.Admin.Validators.ValidationErrorMessages;
 using static GovUk.Education.ExploreEducationStatistics.Admin.Validators.ValidationUtils;
 using static GovUk.Education.ExploreEducationStatistics.Common.TableStorageTableNames;
-using IFootnoteService = GovUk.Education.ExploreEducationStatistics.Admin.Services.Interfaces.IFootnoteService;
 using IReleaseService = GovUk.Education.ExploreEducationStatistics.Admin.Services.Interfaces.IReleaseService;
 using Publication = GovUk.Education.ExploreEducationStatistics.Content.Model.Publication;
 using Release = GovUk.Education.ExploreEducationStatistics.Content.Model.Release;
@@ -183,8 +182,8 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Services
                 .OnSuccess(originalRelease =>
                     CreateBasicReleaseAmendment(originalRelease)
                     .OnSuccess(CreateStatisticsReleaseAmendment)
-                    .OnSuccessDo(amendment => _footnoteService.CopyFootnotes(releaseId, amendment.Id))
                     .OnSuccess(amendment => CopyReleaseTeam(releaseId, amendment))
+                    .OnSuccessDo(amendment => _footnoteService.CopyFootnotes(releaseId, amendment.Id))
                     .OnSuccess(amendment => CopyFileLinks(originalRelease, amendment))
                     .OnSuccess(amendment => GetRelease(amendment.Id)));
         }
@@ -239,7 +238,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Services
         {
             var releaseFileCopies = _context
                 .ReleaseFiles
-                .Include(f => f.ReleaseFileReference)
+                .Include(f => f.File)
                 .Where(f => f.ReleaseId == originalRelease.Id)
                 .Select(f => f.CreateReleaseAmendment(newRelease)).ToList();
 
@@ -391,13 +390,13 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Services
                 });
         }
 
-        private async Task<Either<ActionResult, ReleaseFileReference>> CheckReleaseFileReferenceExists(Guid id)
+        private async Task<Either<ActionResult, File>> CheckFileExists(Guid id)
         {
-            return await _persistenceHelper.CheckEntityExists<ReleaseFileReference>(id)
-                .OnSuccess(releaseFileReference => releaseFileReference.ReleaseFileType != ReleaseFileTypes.Data
-                    ? new Either<ActionResult, ReleaseFileReference>(
+            return await _persistenceHelper.CheckEntityExists<File>(id)
+                .OnSuccess(file => file.Type != FileType.Data
+                    ? new Either<ActionResult, File>(
                         ValidationActionResult(FileTypeMustBeData))
-                    : releaseFileReference);
+                    : file);
         }
 
         private async Task<Either<ActionResult, Unit>> ValidateReleaseSlugUniqueToPublication(string slug,
@@ -432,11 +431,11 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Services
         {
             return await _persistenceHelper.CheckEntityExists<Release>(releaseId)
                 .OnSuccess(_userService.CheckCanUpdateRelease)
-                .OnSuccess(() => CheckReleaseFileReferenceExists(fileId))
-                .OnSuccess(async releaseFileReference =>
+                .OnSuccess(() => CheckFileExists(fileId))
+                .OnSuccess(async file =>
                 {
-                    var subject = releaseFileReference.SubjectId.HasValue
-                        ? await _subjectService.Get(releaseFileReference.SubjectId.Value)
+                    var subject = file.SubjectId.HasValue
+                        ? await _subjectService.Get(file.SubjectId.Value)
                         : null;
 
                     var footnotes = subject == null
@@ -447,7 +446,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Services
                     {
                         ReleaseId = releaseId,
                         SubjectId = subject?.Id ?? Guid.Empty,
-                        TableStorageItem = new DatafileImport(releaseId.ToString(), releaseFileReference.Filename),
+                        TableStorageItem = new DatafileImport(releaseId.ToString(), file.Filename),
                         DeleteDataBlockPlan = await _dataBlockService.GetDeletePlan(releaseId, subject),
                         FootnoteIds = footnotes.Select(footnote => footnote.Id).ToList()
                     };
@@ -459,16 +458,16 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Services
             return await _persistenceHelper
                 .CheckEntityExists<Release>(releaseId)
                 .OnSuccess(_userService.CheckCanUpdateRelease)
-                .OnSuccess(() => CheckReleaseFileReferenceExists(fileId))
-                .OnSuccess(releaseFileReference =>
+                .OnSuccess(() => CheckFileExists(fileId))
+                .OnSuccess(file =>
                 {
-                    return CheckCanDeleteDataFiles(releaseId, releaseFileReference)
+                    return CheckCanDeleteDataFiles(releaseId, file)
                         .OnSuccessDo(async _ =>
                         {
                             // Delete any replacement that might exist
-                            if (releaseFileReference.ReplacedById.HasValue)
+                            if (file.ReplacedById.HasValue)
                             {
-                                return await RemoveDataFiles(releaseId, releaseFileReference.ReplacedById.Value);
+                                return await RemoveDataFiles(releaseId, file.ReplacedById.Value);
                             }
                             return Unit.Instance;
                         })
@@ -503,8 +502,8 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Services
                 {
                     var fileLink = _context
                             .ReleaseFiles
-                            .Include(f => f.ReleaseFileReference)
-                            .FirstOrDefault(f => f.ReleaseId == releaseId && f.ReleaseFileReference.Filename == dataFileName);
+                            .Include(f => f.File)
+                            .FirstOrDefault(f => f.ReleaseId == releaseId && f.File.Filename == dataFileName);
 
                     if (fileLink == null)
                     {
@@ -514,9 +513,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Services
                         };
                     }
 
-                    var fileReference = fileLink.ReleaseFileReference;
-
-                    return await _importStatusService.GetImportStatus(fileReference.ReleaseId, dataFileName);
+                    return await _importStatusService.GetImportStatus(fileLink.File.ReleaseId, dataFileName);
                 });
         }
 
@@ -526,11 +523,10 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Services
             return release.Status != ReleaseStatus.Approved;
         }
 
-        private async Task<Either<ActionResult, Unit>> CheckCanDeleteDataFiles(Guid releaseId,
-            ReleaseFileReference releaseFileReference)
+        private async Task<Either<ActionResult, Unit>> CheckCanDeleteDataFiles(Guid releaseId, File file)
         {
-            var importFinished = await _importStatusService.IsImportFinished(releaseFileReference.ReleaseId,
-                releaseFileReference.Filename);
+            var importFinished = await _importStatusService.IsImportFinished(file.ReleaseId,
+                file.Filename);
 
             if (!importFinished)
             {
