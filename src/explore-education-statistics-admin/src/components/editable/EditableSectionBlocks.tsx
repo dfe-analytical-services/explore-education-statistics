@@ -83,7 +83,7 @@ const EditableSectionBlocks = (props: EditableSectionBlockProps) => {
             key={block.id}
             id={`editableSectionBlocks-${block.id}`}
             className={classNames('govuk-!-margin-bottom-9', {
-              openSectionBlocks: openedCommentIds.includes(block.id),
+              openSectionBlock: openedCommentIds.includes(block.id),
             })}
             data-testid="editableSectionBlock"
           >
