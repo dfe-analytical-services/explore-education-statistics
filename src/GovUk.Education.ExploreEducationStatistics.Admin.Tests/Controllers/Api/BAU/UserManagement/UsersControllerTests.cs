@@ -67,43 +67,6 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Controllers.Api
         }
 
         [Fact]
-        public async void GetUserReleaseRoles_Returns_Ok()
-        {
-            var userId = Guid.NewGuid();
-            var userManagementService = new Mock<IUserManagementService>();
-            userManagementService.Setup(s => s.GetUserReleaseRoles(userId.ToString()))
-                .ReturnsAsync(new List<UserReleaseRoleViewModel>
-                {
-                    new UserReleaseRoleViewModel {Publication = new IdTitlePair {Id = Guid.NewGuid(), Title = "Pub a"}},
-                    new UserReleaseRoleViewModel {Publication = new IdTitlePair {Id = Guid.NewGuid(), Title = "Pub b"}}
-                });
-
-            var controller = new UsersController(userManagementService.Object);
-
-            var actionResult = await controller.GetUserReleaseRoles(userId.ToString());
-            var result = actionResult.Value;
-
-            Assert.IsType<List<UserReleaseRoleViewModel>>(result);
-            Assert.Equal(2, result.Count);
-        }
-
-        [Fact]
-        public async void GetUserReleaseRoles_Returns_Empty()
-        {
-            var userId = Guid.NewGuid();
-            var userManagementService = new Mock<IUserManagementService>();
-            userManagementService.Setup(s => s.GetUserReleaseRoles(userId.ToString()))
-                .ReturnsAsync(new List<UserReleaseRoleViewModel>());
-
-            var controller = new UsersController(userManagementService.Object);
-
-            var result = await controller.GetUserReleaseRoles(userId.ToString());
-
-            Assert.IsType<List<UserReleaseRoleViewModel>>(result.Value);
-            Assert.Empty(result.Value);
-        }
-
-        [Fact]
         public async void GetReleases_Returns_Ok()
         {
             var userManagementService = new Mock<IUserManagementService>();
