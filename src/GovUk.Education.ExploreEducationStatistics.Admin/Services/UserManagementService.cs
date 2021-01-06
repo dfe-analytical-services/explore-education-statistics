@@ -223,7 +223,27 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Services
                         return ValidationActionResult(UserDoesNotExist);
                     }
 
-                    var userReleaseRoles = await GetUserReleaseRoles(user.Id);
+                    var userReleaseRoles = _contentDbContext.UserReleaseRoles
+                        .Include(urr => urr.Release)
+                        .ThenInclude(r => r.Publication)
+                        .ToList()
+                        .Where(urr => urr.UserId == Guid.Parse(userId) &&
+                                      IsLatestVersionOfRelease(urr.Release.Publication.Releases, urr.Release.Id))
+                        .Select(x => new UserReleaseRoleViewModel
+                        {
+                            Id = x.Id,
+                            Publication = _contentDbContext.Publications
+                                .Where(p => p.Releases.Any(r => r.Id == x.ReleaseId))
+                                .Select(p => new IdTitlePair {Id = p.Id, Title = p.Title}).FirstOrDefault(),
+                            Release = _contentDbContext.Releases
+                                .Where(r => r.Id == x.ReleaseId)
+                                .Select(r => new IdTitlePair {Id = r.Id, Title = r.Title}).FirstOrDefault(),
+                            ReleaseRole = new EnumExtensions.EnumValue {Name = x.Role.GetEnumLabel(), Value = 0}
+                        })
+                        .ToList()
+                        .OrderBy(x => x.Publication.Title)
+                        .ThenBy(x => x.Release.Title)
+                        .ToList();
 
                     return new UserViewModel
                     {
@@ -231,7 +251,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Services
                         Name = user.FirstName + " " + user.LastName,
                         Email = user.Email,
                         Role = GetUserRoleId(user.Id),
-                        UserReleaseRoles = userReleaseRoles.IsRight ? userReleaseRoles.Right : null
+                        UserReleaseRoles = userReleaseRoles
                     };
                 });
         }
@@ -331,36 +351,6 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Services
                     await _userManager.AddToRoleAsync(user, GetRoleName(roleId));
 
                     return Unit.Instance;
-                });
-        }
-
-        public async Task<Either<ActionResult, List<UserReleaseRoleViewModel>>> GetUserReleaseRoles(string userId)
-        {
-            return await _userService
-                .CheckCanManageAllUsers()
-                .OnSuccess(_ =>
-                {
-                    return _contentDbContext.UserReleaseRoles
-                        .Include(urr => urr.Release)
-                        .ThenInclude(r => r.Publication)
-                        .ToList()
-                        .Where(urr => urr.UserId == Guid.Parse(userId) &&
-                                      IsLatestVersionOfRelease(urr.Release.Publication.Releases, urr.Release.Id))
-                        .Select(x => new UserReleaseRoleViewModel
-                        {
-                            Id = x.Id,
-                            Publication = _contentDbContext.Publications
-                                .Where(p => p.Releases.Any(r => r.Id == x.ReleaseId))
-                                .Select(p => new IdTitlePair {Id = p.Id, Title = p.Title}).FirstOrDefault(),
-                            Release = _contentDbContext.Releases
-                                .Where(r => r.Id == x.ReleaseId)
-                                .Select(r => new IdTitlePair {Id = r.Id, Title = r.Title}).FirstOrDefault(),
-                            ReleaseRole = new EnumExtensions.EnumValue {Name = x.Role.GetEnumLabel(), Value = 0}
-                        })
-                        .ToList()
-                        .OrderBy(x => x.Publication.Title)
-                        .ThenBy(x => x.Release.Title)
-                        .ToList();
                 });
         }
 
