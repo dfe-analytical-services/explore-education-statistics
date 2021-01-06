@@ -403,6 +403,7 @@ Replace data files for amendment
     user chooses file   id:dataFileUploadForm-dataFile       ${FILES_DIR}dates.csv
     user chooses file   id:dataFileUploadForm-metadataFile   ${FILES_DIR}dates.meta.csv
     user clicks button  Upload data files
+    user waits until page contains  Footnotes: ERROR  120
     user opens details dropdown  Footnote 2 ${SUBJECT_NAME}
     user clicks button  Delete footnote
     user clicks button  Confirm
