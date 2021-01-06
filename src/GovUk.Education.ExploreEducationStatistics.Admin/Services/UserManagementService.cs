@@ -181,21 +181,32 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Services
 
         public async Task<List<UserViewModel>> ListPreReleaseUsersAsync()
         {
-            var users = await _usersAndRolesDbContext.Users.Select(u => new UserViewModel
-                {
-                    Id = u.Id,
-                    Name = u.FirstName + " " + u.LastName,
-                    Email = u.Email
-                }).OrderBy(x => x.Name)
+            return await _usersAndRolesDbContext.Users
+                .Join(
+                    _usersAndRolesDbContext.UserRoles,
+                    user => user.Id,
+                    userRole => userRole.UserId,
+                    (user, userRole) => new
+                    {
+                        user,
+                        userRoleId = userRole.RoleId
+                    }
+                )
+                .Join(
+                    _usersAndRolesDbContext.Roles,
+                    prev => prev.userRoleId,
+                    role => role.Id,
+                    (prev, role) => new UserViewModel
+                    {
+                        Id = prev.user.Id,
+                        Name = prev.user.FirstName + " " + prev.user.LastName,
+                        Email = prev.user.Email,
+                        Role = role.Name
+                    }
+                )
+                .OrderBy(x => x.Name)
+                .Where(u => u.Role == "Prerelease User")
                 .ToListAsync();
-
-            // Potentially user role could be null in the above result in an empty array so assign role afterwards
-            foreach (var user in users)
-            {
-                user.Role = GetUserRoleName(user.Id);
-            }
-
-            return users.Where(u => u.Role == "Prerelease User").ToList();
         }
 
         public async Task<Either<ActionResult, UserViewModel>> GetUser(string userId)
