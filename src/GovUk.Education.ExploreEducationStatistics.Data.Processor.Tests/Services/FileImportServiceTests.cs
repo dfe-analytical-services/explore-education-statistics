@@ -2,11 +2,11 @@ using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
-using GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services;
 using GovUk.Education.ExploreEducationStatistics.Common.Extensions;
 using GovUk.Education.ExploreEducationStatistics.Common.Model;
 using GovUk.Education.ExploreEducationStatistics.Common.Services;
 using GovUk.Education.ExploreEducationStatistics.Common.Services.Interfaces;
+using GovUk.Education.ExploreEducationStatistics.Common.Tests.Utils;
 using GovUk.Education.ExploreEducationStatistics.Data.Importer.Services.Interfaces;
 using GovUk.Education.ExploreEducationStatistics.Data.Model;
 using GovUk.Education.ExploreEducationStatistics.Data.Model.Database;
@@ -27,7 +27,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Processor.Tests.Servic
             .GetEnumValues<IStatus>()
             .Where(ImportStatus.IsFinishedState)
             .ToList();
-        
+
         private static readonly List<IStatus> AbortingStatuses = EnumUtil
             .GetEnumValues<IStatus>()
             .Where(ImportStatus.IsAbortingState)
@@ -44,9 +44,9 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Processor.Tests.Servic
                 TotalRows = 2,
                 SubjectId = Guid.NewGuid()
             };
-            
+
             var importStatusService = new Mock<IImportStatusService>(Strict);
-            
+
             var service = BuildFileImportService(
                 importStatusService: importStatusService.Object);
 
@@ -56,7 +56,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Processor.Tests.Servic
                 {
                     Status = STAGE_4
                 });
-            
+
             importStatusService
                 .Setup(s => s.UpdateStatus(
                     message.ReleaseId, message.DataFileName, COMPLETE, 100))
@@ -81,13 +81,13 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Processor.Tests.Servic
                     });
 
                 await dbContext.SaveChangesAsync();
-                
+
                 await service.CheckComplete(message.ReleaseId, message, dbContext);
             }
 
             MockUtils.VerifyAllMocks(importStatusService);
         }
-        
+
         [Fact]
         public async Task CheckComplete_LastBatchFileCompleted()
         {
@@ -99,10 +99,10 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Processor.Tests.Servic
                 TotalRows = 2,
                 SubjectId = Guid.NewGuid()
             };
-            
+
             var importStatusService = new Mock<IImportStatusService>(Strict);
             var fileStorageService = new Mock<IFileStorageService>();
-            
+
             var service = BuildFileImportService(
                 importStatusService: importStatusService.Object,
                 fileStorageService: fileStorageService.Object);
@@ -117,7 +117,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Processor.Tests.Servic
             fileStorageService
                 .Setup(s => s.GetNumBatchesRemaining(message.ReleaseId, message.DataFileName))
                 .ReturnsAsync(0);
-            
+
             importStatusService
                 .Setup(s => s.UpdateStatus(
                     message.ReleaseId, message.DataFileName, COMPLETE, 100))
@@ -138,13 +138,13 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Processor.Tests.Servic
                     });
 
                 await dbContext.SaveChangesAsync();
-                
+
                 await service.CheckComplete(message.ReleaseId, message, dbContext);
             }
 
             MockUtils.VerifyAllMocks(importStatusService, fileStorageService);
         }
-        
+
         [Fact]
         public async Task CheckComplete_BatchedFilesStillProcessing()
         {
@@ -157,10 +157,10 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Processor.Tests.Servic
                 SubjectId = Guid.NewGuid(),
                 BatchNo = 1
             };
-            
+
             var importStatusService = new Mock<IImportStatusService>(Strict);
             var fileStorageService = new Mock<IFileStorageService>();
-            
+
             var service = BuildFileImportService(
                 importStatusService: importStatusService.Object,
                 fileStorageService: fileStorageService.Object);
@@ -175,7 +175,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Processor.Tests.Servic
             fileStorageService
                 .Setup(s => s.GetNumBatchesRemaining(message.ReleaseId, message.DataFileName))
                 .ReturnsAsync(1);
-            
+
             importStatusService
                 .Setup(s => s.UpdateStatus(
                     message.ReleaseId, message.DataFileName, STAGE_4, 50))
@@ -190,7 +190,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Processor.Tests.Servic
 
             MockUtils.VerifyAllMocks(importStatusService, fileStorageService);
         }
-        
+
         [Fact]
         public async Task CheckComplete_SingleDataFileCompleted_HasErrors()
         {
@@ -202,7 +202,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Processor.Tests.Servic
                 TotalRows = 2,
                 SubjectId = Guid.NewGuid()
             };
-            
+
             var importStatusService = new Mock<IImportStatusService>(Strict);
 
             var service = BuildFileImportService(
@@ -215,7 +215,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Processor.Tests.Servic
                     Status = STAGE_4,
                     Errors = "an error"
                 });
-            
+
             importStatusService
                 .Setup(s => s.UpdateStatus(
                     message.ReleaseId, message.DataFileName, FAILED, 100))
@@ -236,13 +236,13 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Processor.Tests.Servic
                     });
 
                 await dbContext.SaveChangesAsync();
-                
+
                 await service.CheckComplete(message.ReleaseId, message, dbContext);
             }
 
             MockUtils.VerifyAllMocks(importStatusService);
         }
-        
+
         [Fact]
         public async Task CheckComplete_SingleDataFileCompleted_HasIncorrectObservationCount()
         {
@@ -254,7 +254,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Processor.Tests.Servic
                 TotalRows = 3,
                 SubjectId = Guid.NewGuid()
             };
-            
+
             var importStatusService = new Mock<IImportStatusService>(Strict);
             var batchService = new Mock<IBatchService>(Strict);
 
@@ -294,13 +294,13 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Processor.Tests.Servic
                     });
 
                 await dbContext.SaveChangesAsync();
-                
+
                 await service.CheckComplete(message.ReleaseId, message, dbContext);
             }
 
             MockUtils.VerifyAllMocks(importStatusService, batchService);
         }
-        
+
         [Fact]
         public async Task CheckComplete_LastBatchFileCompleted_HasErrors()
         {
@@ -312,10 +312,10 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Processor.Tests.Servic
                 TotalRows = 2,
                 SubjectId = Guid.NewGuid()
             };
-            
+
             var importStatusService = new Mock<IImportStatusService>(Strict);
             var fileStorageService = new Mock<IFileStorageService>();
-            
+
             var service = BuildFileImportService(
                 importStatusService: importStatusService.Object,
                 fileStorageService: fileStorageService.Object);
@@ -331,7 +331,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Processor.Tests.Servic
             fileStorageService
                 .Setup(s => s.GetNumBatchesRemaining(message.ReleaseId, message.DataFileName))
                 .ReturnsAsync(0);
-            
+
             importStatusService
                 .Setup(s => s.UpdateStatus(
                     message.ReleaseId, message.DataFileName, FAILED, 100))
@@ -352,13 +352,13 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Processor.Tests.Servic
                     });
 
                 await dbContext.SaveChangesAsync();
-                
+
                 await service.CheckComplete(message.ReleaseId, message, dbContext);
             }
 
             MockUtils.VerifyAllMocks(importStatusService, fileStorageService);
         }
-        
+
         [Fact]
         public async Task CheckComplete_LastBatchFileCompleted_HasIncorrectObservationCount()
         {
@@ -370,7 +370,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Processor.Tests.Servic
                 TotalRows = 3,
                 SubjectId = Guid.NewGuid()
             };
-            
+
             var importStatusService = new Mock<IImportStatusService>(Strict);
             var fileStorageService = new Mock<IFileStorageService>();
             var batchService = new Mock<IBatchService>();
@@ -390,7 +390,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Processor.Tests.Servic
             fileStorageService
                 .Setup(s => s.GetNumBatchesRemaining(message.ReleaseId, message.DataFileName))
                 .ReturnsAsync(0);
-            
+
             batchService
                 .Setup(s => s.FailImport(message.ReleaseId, message.DataFileName, new List<ValidationError>
                 {
@@ -400,7 +400,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Processor.Tests.Servic
                     )
                 }))
                 .Returns(Task.CompletedTask);
-            
+
             var dbContext = StatisticsDbUtils.InMemoryStatisticsDbContext();
 
             await using (dbContext)
@@ -416,13 +416,13 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Processor.Tests.Servic
                     });
 
                 await dbContext.SaveChangesAsync();
-                
+
                 await service.CheckComplete(message.ReleaseId, message, dbContext);
             }
 
             MockUtils.VerifyAllMocks(importStatusService, fileStorageService, batchService);
         }
-        
+
         [Fact]
         public async Task CheckComplete_SingleDataFileCompleted_AlreadyFinished()
         {
@@ -436,9 +436,9 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Processor.Tests.Servic
                     TotalRows = 2,
                     SubjectId = Guid.NewGuid()
                 };
-            
+
                 var importStatusService = new Mock<IImportStatusService>(Strict);
-            
+
                 var service = BuildFileImportService(
                     importStatusService: importStatusService.Object);
 
@@ -448,7 +448,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Processor.Tests.Servic
                     {
                         Status = finishedStatus
                     });
-            
+
                 var dbContext = StatisticsDbUtils.InMemoryStatisticsDbContext();
 
                 await using (dbContext)
@@ -456,10 +456,10 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Processor.Tests.Servic
                     await service.CheckComplete(message.ReleaseId, message, dbContext);
                 }
 
-                MockUtils.VerifyAllMocks(importStatusService);       
+                MockUtils.VerifyAllMocks(importStatusService);
             });
         }
-        
+
         [Fact]
         public async Task CheckComplete_LastBatchFileCompleted_AlreadyFinished()
         {
@@ -473,10 +473,10 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Processor.Tests.Servic
                     TotalRows = 2,
                     SubjectId = Guid.NewGuid()
                 };
-            
+
                 var importStatusService = new Mock<IImportStatusService>(Strict);
                 var fileStorageService = new Mock<IFileStorageService>();
-            
+
                 var service = BuildFileImportService(
                     importStatusService: importStatusService.Object,
                     fileStorageService: fileStorageService.Object);
@@ -495,10 +495,10 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Processor.Tests.Servic
                     await service.CheckComplete(message.ReleaseId, message, dbContext);
                 }
 
-                MockUtils.VerifyAllMocks(importStatusService, fileStorageService);       
+                MockUtils.VerifyAllMocks(importStatusService, fileStorageService);
             });
         }
-        
+
         [Fact]
         public async Task CheckComplete_SingleDataFileCompleted_Aborting()
         {
@@ -512,9 +512,9 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Processor.Tests.Servic
                     TotalRows = 2,
                     SubjectId = Guid.NewGuid()
                 };
-            
+
                 var importStatusService = new Mock<IImportStatusService>(Strict);
-            
+
                 var service = BuildFileImportService(
                     importStatusService: importStatusService.Object);
 
@@ -522,16 +522,16 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Processor.Tests.Servic
                 {
                     Status = abortingStatus
                 };
-                
+
                 importStatusService
                     .Setup(s => s.GetImportStatus(message.ReleaseId, message.DataFileName))
                     .ReturnsAsync(currentStatus);
-                
+
                 importStatusService
                     .Setup(s => s.UpdateStatus(
                         message.ReleaseId, message.DataFileName, currentStatus.GetFinishingStateOfAbortProcess(), 100))
                     .Returns(Task.CompletedTask);
-            
+
                 var dbContext = StatisticsDbUtils.InMemoryStatisticsDbContext();
 
                 await using (dbContext)
@@ -542,7 +542,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Processor.Tests.Servic
                 MockUtils.VerifyAllMocks(importStatusService);
             });
         }
-        
+
         [Fact]
         public async Task CheckComplete_LastBatchFileCompleted_Aborting()
         {
@@ -556,10 +556,10 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Processor.Tests.Servic
                     TotalRows = 2,
                     SubjectId = Guid.NewGuid()
                 };
-            
+
                 var importStatusService = new Mock<IImportStatusService>(Strict);
                 var fileStorageService = new Mock<IFileStorageService>();
-            
+
                 var service = BuildFileImportService(
                     importStatusService: importStatusService.Object,
                     fileStorageService: fileStorageService.Object);
@@ -568,7 +568,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Processor.Tests.Servic
                 {
                     Status = abortingStatus
                 };
-                
+
                 importStatusService
                     .Setup(s => s.GetImportStatus(message.ReleaseId, message.DataFileName))
                     .ReturnsAsync(currentStatus);
@@ -585,10 +585,10 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Processor.Tests.Servic
                     await service.CheckComplete(message.ReleaseId, message, dbContext);
                 }
 
-                MockUtils.VerifyAllMocks(importStatusService, fileStorageService);       
+                MockUtils.VerifyAllMocks(importStatusService, fileStorageService);
             });
         }
-        
+
         private FileImportService BuildFileImportService(
             IFileStorageService fileStorageService = null,
             IImporterService importerService = null,

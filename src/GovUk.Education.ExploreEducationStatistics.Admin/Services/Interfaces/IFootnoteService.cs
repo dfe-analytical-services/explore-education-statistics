@@ -19,7 +19,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Services.Interfaces
             IReadOnlyCollection<Guid> indicatorIds,
             IReadOnlyCollection<Guid> subjectIds);
 
-        Task<Either<ActionResult, Unit>> CopyFootnotes(Guid sourceReleaseId, Guid destinationReleaseId);
+        Task<Either<ActionResult, List<Footnote>>> CopyFootnotes(Guid sourceReleaseId, Guid destinationReleaseId);
 
         Task<Either<ActionResult, Unit>> DeleteFootnote(Guid releaseId, Guid id);
 

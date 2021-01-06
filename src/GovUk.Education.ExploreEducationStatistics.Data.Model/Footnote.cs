@@ -8,11 +8,11 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Model
         public Guid Id { get; set; }
         public string Content { get; set; }
 
-        public ICollection<IndicatorFootnote> Indicators { get; set; }
-        public ICollection<FilterFootnote> Filters { get; set; }
-        public ICollection<FilterGroupFootnote> FilterGroups { get; set; }
-        public ICollection<FilterItemFootnote> FilterItems { get; set; }
-        public ICollection<SubjectFootnote> Subjects { get; set; }
-        public ICollection<ReleaseFootnote> Releases { get; set; }
+        public List<IndicatorFootnote> Indicators { get; set; }
+        public List<FilterFootnote> Filters { get; set; }
+        public List<FilterGroupFootnote> FilterGroups { get; set; }
+        public List<FilterItemFootnote> FilterItems { get; set; }
+        public List<SubjectFootnote> Subjects { get; set; }
+        public List<ReleaseFootnote> Releases { get; set; }
     }
 }

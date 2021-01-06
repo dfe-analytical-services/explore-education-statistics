@@ -360,17 +360,7 @@ const PublicationReleasePage: NextPage<Props> = ({ data }) => {
           {data.content.map(({ heading, caption, order, content }) => {
             return (
               <AccordionSection heading={heading} caption={caption} key={order}>
-                <PublicationSectionBlocks
-                  content={content}
-                  release={data}
-                  onToggle={(section: { id: string; title: string }) => {
-                    logEvent(
-                      'Publication Release Data Tabs',
-                      `${section.title} (${section.id}) tab opened`,
-                      window.location.pathname,
-                    );
-                  }}
-                />
+                <PublicationSectionBlocks blocks={content} release={data} />
               </AccordionSection>
             );
           })}

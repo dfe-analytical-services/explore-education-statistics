@@ -6,6 +6,7 @@ using GovUk.Education.ExploreEducationStatistics.Admin.Services.Interfaces.Secur
 using GovUk.Education.ExploreEducationStatistics.Admin.Services.ManageContent;
 using GovUk.Education.ExploreEducationStatistics.Common.Model;
 using GovUk.Education.ExploreEducationStatistics.Common.Services.Interfaces.Security;
+using GovUk.Education.ExploreEducationStatistics.Common.Tests.Utils;
 using GovUk.Education.ExploreEducationStatistics.Common.Utils;
 using GovUk.Education.ExploreEducationStatistics.Content.Model;
 using GovUk.Education.ExploreEducationStatistics.Content.Model.Database;
@@ -25,34 +26,34 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services.Manage
         [Fact]
         public void AddRelatedInformationAsync()
         {
-            AssertSecurityPoliciesChecked(service => 
+            AssertSecurityPoliciesChecked(service =>
                     service.AddRelatedInformationAsync(
                         _release.Id,
-                        new CreateUpdateLinkRequest()), 
+                        new CreateUpdateLinkRequest()),
                 SecurityPolicies.CanUpdateSpecificRelease);
         }
 
         [Fact]
         public void DeleteRelatedInformationAsync()
         {
-            AssertSecurityPoliciesChecked(service => 
+            AssertSecurityPoliciesChecked(service =>
                     service.DeleteRelatedInformationAsync(
                         _release.Id,
-                        Guid.NewGuid()), 
+                        Guid.NewGuid()),
                 SecurityPolicies.CanUpdateSpecificRelease);
         }
 
         [Fact]
         public void UpdateRelatedInformationAsync()
         {
-            AssertSecurityPoliciesChecked(service => 
+            AssertSecurityPoliciesChecked(service =>
                     service.UpdateRelatedInformationAsync(
                         _release.Id,
-                        Guid.NewGuid(), 
-                        new CreateUpdateLinkRequest()), 
+                        Guid.NewGuid(),
+                        new CreateUpdateLinkRequest()),
                 SecurityPolicies.CanUpdateSpecificRelease);
         }
-        
+
         private void AssertSecurityPoliciesChecked<T>(
             Func<RelatedInformationService, Task<Either<ActionResult, T>>> protectedAction, params SecurityPolicies[] policies)
         {
@@ -62,15 +63,15 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services.Manage
 
             PermissionTestUtil.AssertSecurityPoliciesChecked(protectedAction, _release, userService, service, policies);
         }
-        
+
         private (
             Mock<ContentDbContext>,
             Mock<IPersistenceHelper<ContentDbContext>>,
             Mock<IUserService>) Mocks()
         {
             return (
-                new Mock<ContentDbContext>(), 
-                MockUtils.MockPersistenceHelper<ContentDbContext, Release>(_release.Id, _release), 
+                new Mock<ContentDbContext>(),
+                MockUtils.MockPersistenceHelper<ContentDbContext, Release>(_release.Id, _release),
                 new Mock<IUserService>());
         }
     }

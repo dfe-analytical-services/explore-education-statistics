@@ -4,13 +4,16 @@ using GovUk.Education.ExploreEducationStatistics.Admin.Services;
 using GovUk.Education.ExploreEducationStatistics.Admin.Services.Interfaces;
 using GovUk.Education.ExploreEducationStatistics.Admin.ViewModels;
 using GovUk.Education.ExploreEducationStatistics.Common.Services.Interfaces.Security;
+using GovUk.Education.ExploreEducationStatistics.Common.Tests.Utils;
 using GovUk.Education.ExploreEducationStatistics.Common.Utils;
 using GovUk.Education.ExploreEducationStatistics.Content.Model;
 using GovUk.Education.ExploreEducationStatistics.Content.Model.Database;
+using GovUk.Education.ExploreEducationStatistics.Content.Security;
 using GovUk.Education.ExploreEducationStatistics.Data.Model.Database;
 using GovUk.Education.ExploreEducationStatistics.Data.Services.Interfaces;
 using Moq;
 using Xunit;
+using static GovUk.Education.ExploreEducationStatistics.Common.Tests.Utils.PermissionTestUtils;
 
 namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
 {
@@ -24,8 +27,8 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
         [Fact]
         public void Get()
         {
-            PermissionTestUtil.PolicyCheckBuilder()
-                .ExpectResourceCheckToFail(_release, SecurityPolicies.CanViewSpecificRelease)
+            PolicyCheckBuilder<ContentSecurityPolicies>()
+                .ExpectResourceCheckToFail(_release, ContentSecurityPolicies.CanViewRelease)
                 .AssertForbidden(
                     userService =>
                     {
@@ -38,7 +41,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
         [Fact]
         public void Update()
         {
-            PermissionTestUtil.PolicyCheckBuilder()
+            PolicyCheckBuilder<SecurityPolicies>()
                 .ExpectResourceCheckToFail(_release, SecurityPolicies.CanUpdateSpecificRelease)
                 .AssertForbidden(
                     userService =>

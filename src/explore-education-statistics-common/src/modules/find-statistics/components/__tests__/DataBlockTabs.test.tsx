@@ -9,9 +9,7 @@ import {
 import getDefaultTableHeaderConfig from '@common/modules/table-tool/utils/getDefaultTableHeadersConfig';
 import mapFullTable from '@common/modules/table-tool/utils/mapFullTable';
 import mapUnmappedTableHeaders from '@common/modules/table-tool/utils/mapUnmappedTableHeaders';
-import _tableBuilderService, {
-  ReleaseTableDataQuery,
-} from '@common/services/tableBuilderService';
+import _tableBuilderService from '@common/services/tableBuilderService';
 import { Chart, DataBlock } from '@common/services/types/blocks';
 import { screen, waitFor } from '@testing-library/dom';
 import { render } from '@testing-library/react';
@@ -30,7 +28,7 @@ const tableBuilderService = _tableBuilderService as jest.Mocked<
 
 describe('DataBlockTabs', () => {
   const testDataBlock: DataBlock = {
-    id: 'test-id',
+    id: 'block-1',
     type: 'DataBlock',
     heading: '',
     order: 0,
@@ -85,7 +83,7 @@ describe('DataBlockTabs', () => {
   };
 
   const testDataBlockMap: DataBlock = {
-    id: 'test-id',
+    id: 'block-1',
     type: 'DataBlock',
     heading: '',
     order: 0,
@@ -134,20 +132,17 @@ describe('DataBlockTabs', () => {
   };
 
   test('renders error message if table response is error', async () => {
-    tableBuilderService.getTableData.mockImplementation(() =>
-      // eslint-disable-next-line prefer-promise-reject-errors
-      Promise.reject({
-        isAxiosError: true,
-        message: 'Something went wrong',
-        response: {
-          status: 500,
-        },
-      } as AxiosError),
-    );
+    tableBuilderService.getDataBlockTableData.mockRejectedValue({
+      isAxiosError: true,
+      message: 'Something went wrong',
+      response: {
+        status: 500,
+      },
+    } as AxiosError);
 
     render(
       <DataBlockTabs
-        releaseId="test-release-id"
+        releaseId="release-1"
         id="test-datablock"
         dataBlock={{
           ...testDataBlock,
@@ -159,31 +154,27 @@ describe('DataBlockTabs', () => {
     forceVisible();
 
     await waitFor(() => {
-      expect(tableBuilderService.getTableData).toBeCalledWith({
-        ...testDataBlock.query,
-        releaseId: 'test-release-id',
-        includeGeoJson: false,
-      } as ReleaseTableDataQuery);
+      expect(tableBuilderService.getDataBlockTableData).toBeCalledWith(
+        'release-1',
+        'block-1',
+      );
 
       expect(screen.getAllByText('Could not load content')).toHaveLength(2);
     });
   });
 
   test('renders nothing if table response is 403', async () => {
-    tableBuilderService.getTableData.mockImplementation(() =>
-      // eslint-disable-next-line prefer-promise-reject-errors
-      Promise.reject({
-        isAxiosError: true,
-        message: 'Forbidden',
-        response: {
-          status: 403,
-        },
-      } as AxiosError),
-    );
+    tableBuilderService.getDataBlockTableData.mockRejectedValue({
+      isAxiosError: true,
+      message: 'Forbidden',
+      response: {
+        status: 403,
+      },
+    } as AxiosError);
 
     render(
       <DataBlockTabs
-        releaseId="test-release-id"
+        releaseId="release-1"
         id="test-datablock"
         dataBlock={{
           ...testDataBlock,
@@ -195,11 +186,10 @@ describe('DataBlockTabs', () => {
     forceVisible();
 
     await waitFor(() => {
-      expect(tableBuilderService.getTableData).toBeCalledWith({
-        ...testDataBlock.query,
-        releaseId: 'test-release-id',
-        includeGeoJson: false,
-      } as ReleaseTableDataQuery);
+      expect(tableBuilderService.getDataBlockTableData).toBeCalledWith(
+        'release-1',
+        'block-1',
+      );
 
       expect(
         screen.queryByText('Could not load content'),
@@ -209,13 +199,13 @@ describe('DataBlockTabs', () => {
   });
 
   test('renders line chart', async () => {
-    tableBuilderService.getTableData.mockImplementation(() =>
-      Promise.resolve(testChartTableData),
+    tableBuilderService.getDataBlockTableData.mockResolvedValue(
+      testChartTableData,
     );
 
     const { container } = render(
       <DataBlockTabs
-        releaseId="test-release-id"
+        releaseId="release-1"
         id="test-datablock"
         dataBlock={{
           ...testDataBlock,
@@ -227,11 +217,10 @@ describe('DataBlockTabs', () => {
     forceVisible();
 
     await waitFor(() => {
-      expect(tableBuilderService.getTableData).toBeCalledWith({
-        ...testDataBlock.query,
-        releaseId: 'test-release-id',
-        includeGeoJson: false,
-      } as ReleaseTableDataQuery);
+      expect(tableBuilderService.getDataBlockTableData).toBeCalledWith(
+        'release-1',
+        'block-1',
+      );
 
       expect(screen.getAllByRole('tab')).toHaveLength(2);
 
@@ -240,13 +229,13 @@ describe('DataBlockTabs', () => {
   });
 
   test('renders horizontal chart', async () => {
-    tableBuilderService.getTableData.mockImplementation(() =>
-      Promise.resolve(testChartTableData),
+    tableBuilderService.getDataBlockTableData.mockResolvedValue(
+      testChartTableData,
     );
 
     const { container } = render(
       <DataBlockTabs
-        releaseId="test-release-id"
+        releaseId="release-1"
         id="test-block"
         dataBlock={{
           ...testDataBlock,
@@ -263,11 +252,10 @@ describe('DataBlockTabs', () => {
     forceVisible();
 
     await waitFor(() => {
-      expect(tableBuilderService.getTableData).toBeCalledWith({
-        ...testDataBlock.query,
-        releaseId: 'test-release-id',
-        includeGeoJson: false,
-      } as ReleaseTableDataQuery);
+      expect(tableBuilderService.getDataBlockTableData).toBeCalledWith(
+        'release-1',
+        'block-1',
+      );
 
       expect(screen.getAllByRole('tab')).toHaveLength(2);
       expect(container.querySelectorAll('.recharts-bar')).toHaveLength(3);
@@ -275,13 +263,13 @@ describe('DataBlockTabs', () => {
   });
 
   test('renders vertical chart', async () => {
-    tableBuilderService.getTableData.mockImplementation(() => {
-      return Promise.resolve(testChartTableData);
-    });
+    tableBuilderService.getDataBlockTableData.mockResolvedValue(
+      testChartTableData,
+    );
 
     const { container } = render(
       <DataBlockTabs
-        releaseId="test-release-id"
+        releaseId="release-1"
         id="test-block"
         dataBlock={{
           ...testDataBlock,
@@ -298,11 +286,10 @@ describe('DataBlockTabs', () => {
     forceVisible();
 
     await waitFor(() => {
-      expect(tableBuilderService.getTableData).toBeCalledWith({
-        ...testDataBlock.query,
-        releaseId: 'test-release-id',
-        includeGeoJson: false,
-      } as ReleaseTableDataQuery);
+      expect(tableBuilderService.getDataBlockTableData).toBeCalledWith(
+        'release-1',
+        'block-1',
+      );
 
       expect(screen.getAllByRole('tab')).toHaveLength(2);
       expect(container.querySelectorAll('.recharts-bar')).toHaveLength(3);
@@ -310,15 +297,15 @@ describe('DataBlockTabs', () => {
   });
 
   test('renders table', async () => {
-    tableBuilderService.getTableData.mockImplementation(() => {
-      return Promise.resolve(testChartTableData);
-    });
+    tableBuilderService.getDataBlockTableData.mockResolvedValue(
+      testChartTableData,
+    );
 
     const fullTable = mapFullTable(testChartTableData);
 
     render(
       <DataBlockTabs
-        releaseId="test-release-id"
+        releaseId="release-1"
         id="test-block"
         dataBlock={{
           ...testDataBlock,
@@ -339,11 +326,10 @@ describe('DataBlockTabs', () => {
     forceVisible();
 
     await waitFor(() => {
-      expect(tableBuilderService.getTableData).toBeCalledWith({
-        ...testDataBlock.query,
-        releaseId: 'test-release-id',
-        includeGeoJson: false,
-      } as ReleaseTableDataQuery);
+      expect(tableBuilderService.getDataBlockTableData).toBeCalledWith(
+        'release-1',
+        'block-1',
+      );
 
       expect(screen.getByRole('table')).toBeInTheDocument();
       expect(screen.getAllByRole('row')).toHaveLength(4);
@@ -352,13 +338,13 @@ describe('DataBlockTabs', () => {
   });
 
   test('renders map', async () => {
-    const getDataBlockForSubject = tableBuilderService.getTableData.mockImplementation(
-      () => Promise.resolve(testMapTableData),
+    tableBuilderService.getDataBlockTableData.mockResolvedValue(
+      testMapTableData,
     );
 
     const { container } = render(
       <DataBlockTabs
-        releaseId="test-release-id"
+        releaseId="release-1"
         id="test-block"
         dataBlock={testDataBlockMap}
       />,
@@ -367,19 +353,18 @@ describe('DataBlockTabs', () => {
     forceVisible();
 
     await waitFor(() => {
-      expect(getDataBlockForSubject).toBeCalledWith({
-        ...testDataBlockMap.query,
-        releaseId: 'test-release-id',
-        includeGeoJson: true,
-      } as ReleaseTableDataQuery);
+      expect(tableBuilderService.getDataBlockTableData).toBeCalledWith(
+        'release-1',
+        'block-1',
+      );
 
       expect(container.querySelector('.leaflet-container')).toBeInTheDocument();
     });
   });
 
   test('re-rendering with new data block does not throw error', async () => {
-    tableBuilderService.getTableData.mockImplementation(() =>
-      Promise.resolve(testChartTableData),
+    tableBuilderService.getDataBlockTableData.mockResolvedValue(
+      testChartTableData,
     );
 
     const fullTable = mapFullTable(testChartTableData);
@@ -387,6 +372,7 @@ describe('DataBlockTabs', () => {
     const { rerender } = render(
       <DataBlockTabs
         id="test-block"
+        releaseId="release-1"
         dataBlock={{
           ...testDataBlock,
           table: {
@@ -411,40 +397,40 @@ describe('DataBlockTabs', () => {
       expect(screen.getAllByRole('cell')).toHaveLength(16);
     });
 
-    tableBuilderService.getTableData.mockImplementation(() =>
-      Promise.resolve({
-        subjectMeta: {
-          ...testChartTableData.subjectMeta,
-          indicators: [
-            {
-              label: 'Number of authorised absence sessions',
-              unit: '',
-              value: 'authorised-absence-sessions',
-              name: 'absence_sess',
-            },
-          ],
-          timePeriodRange: [{ code: 'AY', label: '2018/19', year: 2018 }],
-        },
-        results: [
+    tableBuilderService.getDataBlockTableData.mockResolvedValue({
+      subjectMeta: {
+        ...testChartTableData.subjectMeta,
+        indicators: [
           {
-            filters: ['characteristic-total', 'school-type-total'],
-            geographicLevel: 'Country',
-            location: { country: { code: 'E92000001', name: 'England' } },
-            measures: {
-              'authorised-absence-sessions': '500000',
-            },
-            timePeriod: '2018_AY',
+            label: 'Number of authorised absence sessions',
+            unit: '',
+            value: 'authorised-absence-sessions',
+            name: 'absence_sess',
           },
         ],
-      }),
-    );
+        timePeriodRange: [{ code: 'AY', label: '2018/19', year: 2018 }],
+      },
+      results: [
+        {
+          filters: ['characteristic-total', 'school-type-total'],
+          geographicLevel: 'Country',
+          location: { country: { code: 'E92000001', name: 'England' } },
+          measures: {
+            'authorised-absence-sessions': '500000',
+          },
+          timePeriod: '2018_AY',
+        },
+      ],
+    });
 
     expect(() => {
       rerender(
         <DataBlockTabs
           id="test-block"
+          releaseId="release-1"
           dataBlock={{
             ...testDataBlock,
+            id: 'block-2-id',
             query: {
               subjectId: '1',
               geographicLevel: 'country',

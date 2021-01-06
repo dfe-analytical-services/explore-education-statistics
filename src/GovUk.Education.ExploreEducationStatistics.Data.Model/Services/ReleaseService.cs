@@ -1,3 +1,4 @@
+#nullable enable
 using System;
 using System.Linq;
 using GovUk.Education.ExploreEducationStatistics.Data.Model.Database;
@@ -14,7 +15,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Model.Services
         {
         }
 
-        public Guid? GetLatestPublishedRelease(Guid publicationId)
+        public Release? GetLatestPublishedRelease(Guid publicationId)
         {
             return DbSet()
                 .Include(release => release.Publication)
@@ -23,9 +24,9 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Model.Services
                 .Where(release => release.Live && IsLatestVersionOfRelease(release.Publication, release.Id))
                 .OrderBy(release => release.Year)
                 .ThenBy(release => release.TimeIdentifier)
-                .LastOrDefault()?.Id;
+                .LastOrDefault();
         }
-        
+
         private static bool IsLatestVersionOfRelease(Publication publication, Guid releaseId)
         {
             return !publication.Releases.Any(r => r.PreviousVersionId == releaseId && r.Live && r.Id != releaseId);

@@ -57,9 +57,14 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Api.Services
         public async Task<Either<ActionResult, PermalinkViewModel>> CreateAsync(CreatePermalinkRequest request)
         {
             var publicationId = _subjectService.GetPublicationForSubject(request.Query.SubjectId).Result.Id;
-            var releaseId = _releaseService.GetLatestPublishedRelease(publicationId);
+            var release = _releaseService.GetLatestPublishedRelease(publicationId);
 
-            return await CreateAsync(releaseId.Value, request);
+            if (release == null)
+            {
+                return new NotFoundResult();
+            }
+
+            return await CreateAsync(release.Id, request);
         }
 
         public async Task<Either<ActionResult, PermalinkViewModel>> CreateAsync(Guid releaseId,

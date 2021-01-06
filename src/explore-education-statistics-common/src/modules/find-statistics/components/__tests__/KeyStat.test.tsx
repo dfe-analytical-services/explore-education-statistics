@@ -1,6 +1,5 @@
 import KeyStat from '@common/modules/find-statistics/components/KeyStat';
 import _tableBuilderService, {
-  TableDataQuery,
   TableDataResponse,
 } from '@common/services/tableBuilderService';
 import { render, screen, waitFor } from '@testing-library/react';
@@ -13,21 +12,6 @@ const tableBuilderService = _tableBuilderService as jest.Mocked<
 >;
 
 describe('KeyStat', () => {
-  const testQuery: TableDataQuery = {
-    filters: ['filter-1'],
-    indicators: ['indicator-1'],
-    subjectId: 'subject-1',
-    timePeriod: {
-      startCode: 'AY',
-      startYear: 2020,
-      endCode: 'AY',
-      endYear: 2020,
-    },
-    locations: {
-      country: ['england'],
-    },
-  };
-
   const testTableDataResponse: TableDataResponse = {
     subjectMeta: {
       publicationName: 'Test publication',
@@ -88,11 +72,14 @@ describe('KeyStat', () => {
   };
 
   test('renders correctly with summary', async () => {
-    tableBuilderService.getTableData.mockResolvedValue(testTableDataResponse);
+    tableBuilderService.getDataBlockTableData.mockResolvedValue(
+      testTableDataResponse,
+    );
 
     render(
       <KeyStat
-        query={testQuery}
+        releaseId="release-1"
+        dataBlockId="block-1"
         summary={{
           dataSummary: ['Down from 620,330 in 2017'],
           dataDefinitionTitle: ['What is the number of applications received?'],
@@ -105,7 +92,9 @@ describe('KeyStat', () => {
     );
 
     await waitFor(() => {
-      expect(tableBuilderService.getTableData).toHaveBeenCalledTimes(1);
+      expect(tableBuilderService.getDataBlockTableData).toHaveBeenCalledTimes(
+        1,
+      );
 
       expect(screen.getByTestId('keyStat-title')).toHaveTextContent(
         'Number of applications received',
@@ -130,12 +119,16 @@ describe('KeyStat', () => {
   });
 
   test('renders correctly without summary', async () => {
-    tableBuilderService.getTableData.mockResolvedValue(testTableDataResponse);
+    tableBuilderService.getDataBlockTableData.mockResolvedValue(
+      testTableDataResponse,
+    );
 
-    render(<KeyStat query={testQuery} />);
+    render(<KeyStat releaseId="release-1" dataBlockId="block-1" />);
 
     await waitFor(() => {
-      expect(tableBuilderService.getTableData).toHaveBeenCalledTimes(1);
+      expect(tableBuilderService.getDataBlockTableData).toHaveBeenCalledTimes(
+        1,
+      );
 
       expect(screen.getByTestId('keyStat-title')).toHaveTextContent(
         'Number of applications received',
@@ -152,13 +145,14 @@ describe('KeyStat', () => {
   });
 
   test('does not render if there was an error fetching the table data', async () => {
-    tableBuilderService.getTableData.mockRejectedValue(
+    tableBuilderService.getDataBlockTableData.mockRejectedValue(
       new Error('Something went wrong'),
     );
 
     render(
       <KeyStat
-        query={testQuery}
+        releaseId="release-1"
+        dataBlockId="block-1"
         summary={{
           dataSummary: ['Down from 620,330 in 2017'],
           dataDefinitionTitle: ['What is the number of applications received?'],
@@ -171,7 +165,9 @@ describe('KeyStat', () => {
     );
 
     await waitFor(() => {
-      expect(tableBuilderService.getTableData).toHaveBeenCalledTimes(1);
+      expect(tableBuilderService.getDataBlockTableData).toHaveBeenCalledTimes(
+        1,
+      );
       expect(screen.queryByTestId('keyStat-title')).not.toBeInTheDocument();
       expect(screen.queryByTestId('keyStat-value')).not.toBeInTheDocument();
       expect(screen.queryByTestId('keyStat-summary')).not.toBeInTheDocument();
@@ -183,7 +179,7 @@ describe('KeyStat', () => {
   });
 
   test('does not render if there is no matching result in the response', async () => {
-    tableBuilderService.getTableData.mockResolvedValue({
+    tableBuilderService.getDataBlockTableData.mockResolvedValue({
       ...testTableDataResponse,
       subjectMeta: {
         ...testTableDataResponse.subjectMeta,
@@ -201,7 +197,8 @@ describe('KeyStat', () => {
 
     render(
       <KeyStat
-        query={testQuery}
+        releaseId="release-1"
+        dataBlockId="block-1"
         summary={{
           dataSummary: ['Down from 620,330 in 2017'],
           dataDefinitionTitle: ['What is the number of applications received?'],
@@ -214,7 +211,9 @@ describe('KeyStat', () => {
     );
 
     await waitFor(() => {
-      expect(tableBuilderService.getTableData).toHaveBeenCalledTimes(1);
+      expect(tableBuilderService.getDataBlockTableData).toHaveBeenCalledTimes(
+        1,
+      );
       expect(screen.queryByTestId('keyStat-title')).not.toBeInTheDocument();
       expect(screen.queryByTestId('keyStat-value')).not.toBeInTheDocument();
       expect(screen.queryByTestId('keyStat-summary')).not.toBeInTheDocument();

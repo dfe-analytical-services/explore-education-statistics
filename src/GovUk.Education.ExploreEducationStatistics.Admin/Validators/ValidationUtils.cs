@@ -89,8 +89,9 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Validators
         UserAlreadyHasReleaseRole,
 
         // Invite
-        UnableToCancelInvite,
+        InviteNotFound,
         InvalidEmailAddress,
+        InvalidUserRole,
 
         // Publication
         PublicationDoesNotExist,

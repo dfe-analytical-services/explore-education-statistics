@@ -6,7 +6,9 @@ import { useConfig } from '@admin/contexts/ConfigContext';
 import { useEditingContext } from '@admin/contexts/EditingContext';
 import BasicReleaseSummary from '@admin/pages/release/content/components/BasicReleaseSummary';
 import RelatedInformationSection from '@admin/pages/release/content/components/RelatedInformationSection';
+import ReleaseBlock from '@admin/pages/release/content/components/ReleaseBlock';
 import ReleaseContentAccordion from '@admin/pages/release/content/components/ReleaseContentAccordion';
+import ReleaseEditableBlock from '@admin/pages/release/content/components/ReleaseEditableBlock';
 import ReleaseHeadlines from '@admin/pages/release/content/components/ReleaseHeadlines';
 import ReleaseHelpAndSupportSection from '@admin/pages/release/content/components/ReleaseHelpAndSupportSection';
 import ReleaseNotesSection from '@admin/pages/release/content/components/ReleaseNotesSection';
@@ -113,13 +115,21 @@ const ReleaseContent = () => {
             {release.summarySection && (
               <>
                 <EditableSectionBlocks
-                  releaseId={release.id}
                   allowComments
+                  blocks={release.summarySection.content}
                   sectionId={release.summarySection.id}
-                  content={release.summarySection.content}
-                  onBlockContentSave={updateBlock}
-                  onBlockDelete={removeBlock}
                   onBlockCommentsChange={updateBlockComments}
+                  renderBlock={block => (
+                    <ReleaseBlock block={block} releaseId={release.id} />
+                  )}
+                  renderEditableBlock={block => (
+                    <ReleaseEditableBlock
+                      block={block}
+                      releaseId={release.id}
+                      onSave={updateBlock}
+                      onDelete={removeBlock}
+                    />
+                  )}
                 />
                 {isEditing && release.summarySection.content?.length === 0 && (
                   <div className="govuk-!-margin-bottom-8 dfe-align--centre">

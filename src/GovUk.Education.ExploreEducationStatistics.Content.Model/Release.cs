@@ -4,6 +4,7 @@ using System.Collections.Immutable;
 using System.ComponentModel.DataAnnotations.Schema;
 using System.Linq;
 using GovUk.Education.ExploreEducationStatistics.Common.Converters;
+using GovUk.Education.ExploreEducationStatistics.Common.Extensions;
 using GovUk.Education.ExploreEducationStatistics.Common.Model;
 using GovUk.Education.ExploreEducationStatistics.Common.Services;
 using Newtonsoft.Json;
@@ -261,7 +262,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Content.Model
         // Bit cheeky to re-use the clone context, but it's a nice
         // easy way to access and modify all of the content blocks
         // that we used during the clone.
-        private void UpdateAmendmentContent(CloneContext context)
+        private static void UpdateAmendmentContent(CloneContext context)
         {
             var dataBlocks = context.ContentBlocks
                 .Where(pair => pair.Key is DataBlock && pair.Value is DataBlock)
@@ -281,8 +282,13 @@ namespace GovUk.Education.ExploreEducationStatistics.Content.Model
             }
         }
 
-        private string UpdateFastTrackLinks(string content, Dictionary<DataBlock, DataBlock> dataBlocks)
+        private static string UpdateFastTrackLinks(string content, Dictionary<DataBlock, DataBlock> dataBlocks)
         {
+            if (content.IsNullOrEmpty())
+            {
+                return content;
+            }
+
             var nextContent = content;
 
             foreach (var (oldDataBlock, newDataBlock) in dataBlocks)

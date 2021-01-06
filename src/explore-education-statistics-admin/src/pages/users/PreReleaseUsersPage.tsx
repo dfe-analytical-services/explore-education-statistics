@@ -49,6 +49,7 @@ const PreReleaseUsersPage = () => {
                   </th>
                   <td className="govuk-table__cell">{user.email}</td>
                   <td className="govuk-table__cell">
+                    <Link to={`/administration/users/${user.id}`}>Manage</Link>
                     {/* <ButtonText onClick={removeAccessHander}>Remove</ButtonText> */}
                   </td>
                 </tr>

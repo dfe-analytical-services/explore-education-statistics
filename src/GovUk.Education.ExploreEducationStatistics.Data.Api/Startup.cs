@@ -9,6 +9,8 @@ using GovUk.Education.ExploreEducationStatistics.Common.Services.Interfaces.Secu
 using GovUk.Education.ExploreEducationStatistics.Common.Services.Security;
 using GovUk.Education.ExploreEducationStatistics.Common.Utils;
 using GovUk.Education.ExploreEducationStatistics.Content.Model.Database;
+using GovUk.Education.ExploreEducationStatistics.Content.Security;
+using GovUk.Education.ExploreEducationStatistics.Content.Security.AuthorizationHandlers;
 using GovUk.Education.ExploreEducationStatistics.Data.Api.ModelBinding;
 using GovUk.Education.ExploreEducationStatistics.Data.Api.Security;
 using GovUk.Education.ExploreEducationStatistics.Data.Api.Services;
@@ -108,7 +110,6 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Api
                     );
                 }
             );
-            services.AddTransient<IFilterGroupService, FilterGroupService>();
             services.AddTransient<IFilterItemService, FilterItemService>();
             services.AddTransient<IFilterService, FilterService>();
             services.AddTransient<IFootnoteRepository, FootnoteRepository>();
@@ -137,17 +138,23 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Api
 
             services.AddAuthorization(options =>
             {
+                // does this use have permission to view a specific Release?
+                options.AddPolicy(ContentSecurityPolicies.CanViewRelease.ToString(), policy =>
+                    policy.Requirements.Add(new ViewReleaseRequirement()));
+
                 // does this user have permission to view the subject data of a specific Release?
                 options.AddPolicy(DataSecurityPolicies.CanViewSubjectData.ToString(), policy =>
                     policy.Requirements.Add(new ViewSubjectDataRequirement()));
             });
 
+            services.AddTransient<IAuthorizationHandler, ViewReleaseAuthorizationHandler>();
             services.AddTransient<IAuthorizationHandler, ViewSubjectDataForPublishedReleasesAuthorizationHandler>();
 
             services.AddCors();
             services.AddAutoMapper(AppDomain.CurrentDomain.GetAssemblies());
 
             AddPersistenceHelper<StatisticsDbContext>(services);
+            AddPersistenceHelper<ContentDbContext>(services);
         }
 
         // This method gets called by the runtime. Use this method to configure the HTTP request pipeline.

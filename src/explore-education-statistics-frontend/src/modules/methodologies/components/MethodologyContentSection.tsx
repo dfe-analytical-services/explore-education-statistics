@@ -1,12 +1,12 @@
+import ContentSectionIndex from '@common/components/ContentSectionIndex';
 import { useMobileMedia } from '@common/hooks/useMedia';
 import useMounted from '@common/hooks/useMounted';
-import SectionBlocks from '@common/modules/find-statistics/components/SectionBlocks';
-import { Block } from '@common/services/types/blocks';
-import ContentSectionIndex from '@common/components/ContentSectionIndex';
+import MethodologySectionBlocks from '@common/modules/methodology/components/MethodologySectionBlocks';
+import { ContentBlock } from '@common/services/types/blocks';
 import React, { useRef } from 'react';
 
 interface MethodologySectionProps {
-  content: Block[];
+  content: ContentBlock[];
   open: boolean;
   id: string;
 }
@@ -23,7 +23,7 @@ const MethodologyContentSection = ({
   const { isMounted } = useMounted();
 
   if (!isMounted) {
-    return <SectionBlocks content={content} />;
+    return <MethodologySectionBlocks blocks={content} />;
   }
 
   return (
@@ -38,7 +38,7 @@ const MethodologyContentSection = ({
       </div>
 
       <div className="govuk-grid-column-three-quarters" ref={contentRef}>
-        <SectionBlocks content={content} />
+        <MethodologySectionBlocks blocks={content} />
       </div>
     </div>
   );

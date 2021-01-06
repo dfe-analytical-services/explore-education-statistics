@@ -182,8 +182,8 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Services
                 .OnSuccess(originalRelease =>
                     CreateBasicReleaseAmendment(originalRelease)
                     .OnSuccess(CreateStatisticsReleaseAmendment)
-                    .OnSuccessDo(amendment => _footnoteService.CopyFootnotes(releaseId, amendment.Id))
                     .OnSuccess(amendment => CopyReleaseTeam(releaseId, amendment))
+                    .OnSuccessDo(amendment => _footnoteService.CopyFootnotes(releaseId, amendment.Id))
                     .OnSuccess(amendment => CopyFileLinks(originalRelease, amendment))
                     .OnSuccess(amendment => GetRelease(amendment.Id)));
         }

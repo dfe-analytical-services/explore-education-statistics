@@ -2,8 +2,6 @@ import Details from '@common/components/Details';
 import LoadingSpinner from '@common/components/LoadingSpinner';
 import KeyStatTile from '@common/modules/find-statistics/components/KeyStatTile';
 import useKeyStatQuery from '@common/modules/find-statistics/hooks/useKeyStatQuery';
-import { TableQueryOptions } from '@common/modules/find-statistics/hooks/useTableQuery';
-import { ReleaseTableDataQuery } from '@common/services/tableBuilderService';
 import { Summary } from '@common/services/types/blocks';
 import React, { ReactNode } from 'react';
 import ReactMarkdown from 'react-markdown';
@@ -32,25 +30,22 @@ export const KeyStatColumn = ({ children, testId }: KeyStatColumnProps) => {
 
 export interface KeyStatProps {
   children?: ReactNode;
-  query: ReleaseTableDataQuery;
-  queryOptions?: TableQueryOptions;
+  releaseId: string;
+  dataBlockId: string;
   summary?: Summary;
   testId?: string;
 }
 
 const KeyStat = ({
   children,
-  query,
-  queryOptions,
   summary,
+  releaseId,
+  dataBlockId,
   testId = 'keyStat',
 }: KeyStatProps) => {
   const { value: keyStat, isLoading, error } = useKeyStatQuery(
-    {
-      ...query,
-      includeGeoJson: false,
-    },
-    queryOptions,
+    releaseId,
+    dataBlockId,
   );
 
   if (error) {

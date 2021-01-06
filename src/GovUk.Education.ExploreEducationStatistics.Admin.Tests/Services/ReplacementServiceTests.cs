@@ -7,6 +7,7 @@ using GovUk.Education.ExploreEducationStatistics.Common.Model;
 using GovUk.Education.ExploreEducationStatistics.Common.Model.Chart;
 using GovUk.Education.ExploreEducationStatistics.Common.Model.Data;
 using GovUk.Education.ExploreEducationStatistics.Common.Model.Data.Query;
+using GovUk.Education.ExploreEducationStatistics.Common.Tests.Utils;
 using GovUk.Education.ExploreEducationStatistics.Common.Utils;
 using GovUk.Education.ExploreEducationStatistics.Content.Model;
 using GovUk.Education.ExploreEducationStatistics.Content.Model.Database;
@@ -2257,10 +2258,10 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
 
         private static Footnote CreateFootnote(Release release,
             string content,
-            ICollection<FilterFootnote> filterFootnotes = null,
-            ICollection<FilterGroupFootnote> filterGroupFootnotes = null,
-            ICollection<FilterItemFootnote> filterItemFootnotes = null,
-            ICollection<IndicatorFootnote> indicatorFootnotes = null,
+            List<FilterFootnote> filterFootnotes = null,
+            List<FilterGroupFootnote> filterGroupFootnotes = null,
+            List<FilterItemFootnote> filterItemFootnotes = null,
+            List<IndicatorFootnote> indicatorFootnotes = null,
             Subject subject = null)
         {
             return new Footnote
