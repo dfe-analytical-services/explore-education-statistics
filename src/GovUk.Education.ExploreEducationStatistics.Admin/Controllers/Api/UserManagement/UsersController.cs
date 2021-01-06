@@ -59,7 +59,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Controllers.Api.UserM
 
         [HttpPost("user-management/users/{userId}/release-role")]
         [ProducesResponseType(200)]
-        public async Task<ActionResult<UserReleaseRoleViewModel>> AddUserReleaseRole(Guid userId,
+        public async Task<ActionResult<Unit>> AddUserReleaseRole(Guid userId,
             UserReleaseRoleRequest releaseRole)
         {
             return await _userManagementService
