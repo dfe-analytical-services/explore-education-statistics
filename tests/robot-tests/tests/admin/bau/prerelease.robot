@@ -1,6 +1,7 @@
 *** Settings ***
-Resource  ../../libs/admin-common.robot
-Library  ../../libs/admin_api.py
+Resource    ../../libs/admin-common.robot
+Resource    ../../libs/tables.robot
+Library     ../../libs/admin_api.py
 
 Force Tags  Admin  Local  Dev  AltersData
 
@@ -8,18 +9,19 @@ Suite Setup       user signs in as bau1
 Suite Teardown    user closes the browser
 
 *** Variables ***
-${RELEASE_NAME}  Calendar Year 2000
-${PUBLICATION_NAME}  UI tests - public release visibility %{RUN_IDENTIFIER}
+${TOPIC_NAME}        %{TEST_TOPIC_NAME}
+${PUBLICATION_NAME}  UI tests - prerelease %{RUN_IDENTIFIER}
+${RELEASE_URL}
 
 *** Test Cases ***
 Create test publication and release via API
     [Tags]  HappyPath
     ${PUBLICATION_ID}=  user creates test publication via api   ${PUBLICATION_NAME}
     user create test release via api  ${PUBLICATION_ID}   CY    2000
-    
+
 Verify release summary
     [Tags]  HappyPath
-    user navigates to release summary from admin dashboard  ${PUBLICATION_NAME}   ${RELEASE_NAME} (not Live)
+    user navigates to release summary from admin dashboard  ${PUBLICATION_NAME}  Calendar Year 2000 (not Live)
     user waits until h2 is visible  Release summary
     user checks page contains element   xpath://li/a[text()="Summary" and contains(@aria-current, 'page')]
     user checks summary list contains  Publication title  ${PUBLICATION_NAME}
@@ -45,36 +47,39 @@ Upload subject
     user checks headed table body row contains  Data file size   15 Kb  ${section}
     user checks headed table body row contains  Status           Complete  ${section}  180
 
-Go to 'Sign Off' page
+Add metadata guidance
     [Tags]  HappyPath
-    user clicks link  Sign off
-    user waits for page to finish loading
-    user waits until page contains testid  public-release-url
-    ${PUBLIC_RELEASE_LINK}=  Get Text  xpath://*[@data-testid="public-release-url"]
-    Set Suite Variable  ${PUBLIC_RELEASE_LINK}
+    user clicks link  Metadata guidance
+    user waits until h2 is visible  Public metadata guidance document
 
-Go to Public Release Link
-    [Tags]  HappyPath  NotAgainstLocal
-    # To get around basic auth on public frontend
-    user goes to url  %{PUBLIC_URL}
-    user goes to url  ${PUBLIC_RELEASE_LINK}
-    user waits until page contains  Page not found
-    user checks page does not contain  ${RELEASE_NAME}
+    user waits until page contains accordion section  UI test subject
+    user opens accordion section  UI test subject
+    user checks summary list contains  Filename             upload-file-test.csv
+    user checks summary list contains  Geographic levels
+    ...  Local Authority; Local Authority District; Local Enterprise Partnership; Opportunity Area; Parliamentary Constituency; RSC Region; Regional; Ward
+    user checks summary list contains  Time period          2005 to 2020
 
-Return to admin
+    user opens details dropdown  Variable names and descriptions
+
+    user checks table column heading contains  1  1  Variable name
+    user checks table column heading contains  1  2  Variable description
+
+    user checks results table cell contains  1  1   admission_numbers   id:metaGuidance-dataFiles
+    user checks results table cell contains  1  2   Admission Numbers   id:metaGuidance-dataFiles
+
+    user enters text into element  id:metaGuidanceForm-content  Test metadata guidance content
+    user enters text into element  id:metaGuidanceForm-subjects0Content  Test file guidance content
+
+    user clicks button  Save guidance
+
+    user waits until page contains button  Edit guidance
+
+Add basic release content
     [Tags]  HappyPath
-    user goes to url  %{ADMIN_URL}
-
-Select release from admin dashboard
-    [Tags]  HappyPath
-    user selects theme and topic from admin dashboard  %{TEST_THEME_NAME}  %{TEST_TOPIC_NAME}
-    user waits until page contains accordion section   ${PUBLICATION_NAME}
-    user opens accordion section  ${PUBLICATION_NAME}
-    ${accordion}=  user gets accordion section content element  ${PUBLICATION_NAME}
-    user opens details dropdown  ${RELEASE_NAME} (not Live)  ${accordion}
-    ${details}=  user gets details content element  ${RELEASE_NAME} (not Live)  ${accordion}
-    user waits until parent contains element   ${details}   xpath:.//a[text()="Edit this release"]
-    user clicks link  Edit this release
+    user clicks link  Content
+    user waits until h1 is visible  ${PUBLICATION_NAME}
+    user waits until h2 is visible  ${PUBLICATION_NAME}
+    user adds basic release content  ${PUBLICATION_NAME}
 
 Add public prerelease access list
     [Tags]  HappyPath
@@ -85,16 +90,6 @@ Add public prerelease access list
 Update public prerelease access list
     [Tags]  HappyPath
     user updates public prerelease access list  Updated test public access list
-
-Add meta guidance to ${PUBLICATION_NAME} subject
-    [Tags]  HappyPath
-    user clicks link  Data and files
-    user clicks link  Metadata guidance
-    user waits until h2 is visible  Public metadata guidance document  90
-    user enters text into element  id:metaGuidanceForm-content  Test meta guidance content
-    user waits until page contains accordion section  UI test subject
-    user enters text into meta guidance data file content editor  UI test subject  metaguidance content
-    user clicks button  Save guidance
 
 Go to "Sign off" page
     [Tags]  HappyPath
@@ -111,7 +106,7 @@ Approve release and wait for it to be Scheduled
 
     user clicks button  Edit release status
     user clicks radio   Approved for publication
-    user enters text into element  id:releaseStatusForm-internalReleaseNote     Approved by UI tests
+    user enters text into element  id:releaseStatusForm-internalReleaseNote     Approved by prerelease UI tests
     user waits until page contains element   xpath://label[text()="On a specific date"]/../input
     user clicks radio   On a specific date
     user waits until page contains   Publish date
@@ -128,62 +123,247 @@ Approve release and wait for it to be Scheduled
     user checks summary list contains  Next release expected  January 2001
     user waits for release process status to be  Scheduled  90
 
-Go to Public release page and ensure release isn't visible
+Navigate to prerelease page
     [Tags]  HappyPath
-    # To get around basic auth on public frontend
-    user goes to url  %{PUBLIC_URL}
-    user goes to url  ${PUBLIC_RELEASE_LINK}
+    ${current_url}=  get location
+    ${RELEASE_URL}=  remove substring from right of string  ${current_url}  /status
+    set suite variable  ${RELEASE_URL}
+    user goes to url   ${RELEASE_URL}/prerelease
 
-Go to Table Tool page
+Validate prerelease has not started
     [Tags]  HappyPath
-    user goes to url  %{PUBLIC_URL}/data-tables
-    user waits until h1 is visible  Create your own tables online
+    user waits until h1 is visible  Pre-release access is not yet available
+    user checks breadcrumb count should be   2
+    user checks nth breadcrumb contains   1    Home
+    user checks nth breadcrumb contains   2    Pre-release access
 
-Check scheduled release isn't visible
+    ${day}=         get current datetime  %d   1
+    ${month}=       get current datetime  %m   1
+    ${year}=        get current datetime  %Y   1
+    ${time_start}=  format uk to local datetime  ${year}-${month}-${day}T00:00:00  %-d %B %Y at %H:%M
+    ${time_end}=    format uk to local datetime  ${year}-${month}-${day}T23:59:00  %-d %B %Y at %H:%M
+    user checks page contains   Pre-release access will be available from ${time_start} until ${time_end}.
+
+Go to prerelease access page
     [Tags]  HappyPath
-    environment variable should be set  TEST_THEME_NAME
-    user opens details dropdown    %{TEST_THEME_NAME}
-    user checks page does not contain  UI test topic %{RUN_IDENTIFIER}
+    user goes to url   ${RELEASE_URL}/prerelease-access
+    user waits until h2 is visible  Manage pre-release user access
 
-Go to release URL and check release isn't visible
-    [Tags]  HappyPath  NotAgainstLocal
-    user goes to url  ${PUBLIC_RELEASE_LINK}
-    user waits until page contains  Page not found
-
-Return to admin dashboard
+Invite users to prerelease for scheduled release
     [Tags]  HappyPath
-    user goes to url  %{ADMIN_URL}
+    # This is GOV.UK Notify's test email address
+    user enters text into element  css:input[name="email"]  simulate-delivered@notifications.service.gov.uk
+    user clicks button  Invite new user
 
-Go to release from admin dashboard
-    [Tags]  HappyPath
-    user selects theme and topic from admin dashboard  %{TEST_THEME_NAME}  %{TEST_TOPIC_NAME}
-    user waits until page contains accordion section   ${PUBLICATION_NAME}
-    user opens accordion section  ${PUBLICATION_NAME}
-    ${accordion}=  user gets accordion section content element  ${PUBLICATION_NAME}
-    user opens details dropdown  ${RELEASE_NAME} (not Live)  ${accordion}
-    ${details}=  user gets details content element  ${RELEASE_NAME} (not Live)  ${accordion}
-    user waits until parent contains element   ${details}   xpath:.//a[text()="Edit this release"]
-    user clicks link  Edit this release
+    user checks table column heading contains  1  1  User email
 
-Approve release for immediate publication
+    user checks results table cell contains  1  1  simulate-delivered@notifications.service.gov.uk
+
+    user enters text into element  css:input[name="email"]  analyst1@example.com
+    user clicks button  Invite new user
+    user checks results table cell contains  2  1  analyst1@example.com
+
+Validate prerelease has not started for Analyst user
     [Tags]  HappyPath
-    user clicks link  Sign off
+    user changes to analyst1
+    user goes to url   ${RELEASE_URL}/prerelease
+
+    user waits until h1 is visible  Pre-release access is not yet available
+    user checks breadcrumb count should be   2
+    user checks nth breadcrumb contains   1    Home
+    user checks nth breadcrumb contains   2    Pre-release access
+
+    ${day}=         get current datetime  %d   1
+    ${month}=       get current datetime  %m   1
+    ${year}=        get current datetime  %Y   1
+    ${time_start}=  format uk to local datetime  ${year}-${month}-${day}T00:00:00  %-d %B %Y at %H:%M
+    ${time_end}=    format uk to local datetime  ${year}-${month}-${day}T23:59:00  %-d %B %Y at %H:%M
+    user checks page contains   Pre-release access will be available from ${time_start} until ${time_end}.
+
+Start prerelease
+    [Tags]  HappyPath
+    user changes to bau1
+    ${day}=         get current datetime  %-d  1
+    ${month}=       get current datetime  %-m  1
+    ${month_word}=  get current datetime  %B  1
+    ${year}=        get current datetime  %Y  1
+    user goes to url  ${RELEASE_URL}/status
     user clicks button  Edit release status
-    user waits until h2 is visible  Edit release status
-    user clicks radio   Approved for publication
-    user enters text into element  id:releaseStatusForm-internalReleaseNote  Approved by UI tests
-    user clicks radio   As soon as possible
+    user enters text into element  id:releaseStatusForm-publishScheduled-day    ${day}
+    user enters text into element  id:releaseStatusForm-publishScheduled-month  ${month}
+    user enters text into element  id:releaseStatusForm-publishScheduled-year   ${year}
     user clicks button   Update status
 
-Check release is approved
-    [Tags]  HappyPath
-    # EES-1007 - Release process status doesn't automatically update
     user waits until h2 is visible  Sign off
     user checks summary list contains  Current status  Approved
-    user reloads page  # EES-1448
-    user checks page does not contain button  Edit release status
+    user checks summary list contains  Scheduled release  ${day} ${month_word} ${year}
+    user waits for release process status to be  Scheduled  90
 
-Go to public release URL and check release isn't visible
-    [Tags]  HappyPath  NotAgainstLocal
-    user goes to url  ${PUBLIC_RELEASE_LINK}
-    user waits until page contains  Page not found
+Validate prerelease has started
+    [Tags]  HappyPath
+    ${current_url}=  get location
+    ${RELEASE_URL}=  remove substring from right of string  ${current_url}  /status
+    set suite variable  ${RELEASE_URL}
+    user goes to url   ${RELEASE_URL}/prerelease
+
+    user checks breadcrumb count should be   2
+    user checks nth breadcrumb contains   1    Home
+    user checks nth breadcrumb contains   2    Pre-release access
+
+    user waits until page contains title caption  Calendar Year 2000
+    user waits until h1 is visible  ${PUBLICATION_NAME}
+
+    user waits until element contains  id:releaseSummary  Test summary text for ${PUBLICATION_NAME}
+    user waits until element contains  id:releaseHeadlines  Test headlines summary text for ${PUBLICATION_NAME}
+
+Validate metadata guidance page
+    [Tags]  HappyPath
+    user opens details dropdown  Download associated files
+    user clicks link  Metadata guidance
+
+    user checks breadcrumb count should be   2
+    user checks nth breadcrumb contains   1    Home
+    user checks nth breadcrumb contains   2    Metadata guidance document
+
+    user waits until page contains title caption  Calendar Year 2000
+    user waits until h1 is visible  ${PUBLICATION_NAME}
+
+    user waits until h2 is visible  Metadata guidance document
+    user waits until page contains  Test metadata guidance content
+
+    user waits until page contains accordion section  UI test subject
+    user checks there are x accordion sections  1
+
+    user opens accordion section  UI test subject
+    user checks summary list contains  Filename             upload-file-test.csv
+    user checks summary list contains  Geographic levels
+    ...  Local Authority; Local Authority District; Local Enterprise Partnership; Opportunity Area; Parliamentary Constituency; RSC Region; Regional; Ward
+    user checks summary list contains  Time period          2005 to 2020
+    user checks summary list contains  Content              Test file guidance content
+
+    user opens details dropdown  Variable names and descriptions
+
+    user checks table column heading contains  1  1  Variable name
+    user checks table column heading contains  1  2  Variable description
+
+    user checks results table cell contains  1  1   admission_numbers
+    user checks results table cell contains  1  2   Admission Numbers
+
+Go back to prerelease page
+    [Tags]  HappyPath
+    user clicks link  Back
+    user checks breadcrumb count should be   2
+    user checks nth breadcrumb contains   1    Home
+    user checks nth breadcrumb contains   2    Pre-release access
+
+    user waits until page contains title caption  Calendar Year 2000
+    user waits until h1 is visible  ${PUBLICATION_NAME}
+
+Validate public prerelease access list
+    [Tags]  HappyPath
+    user opens details dropdown  Download associated files
+    user clicks link  Pre-release access list
+
+    user checks breadcrumb count should be   2
+    user checks nth breadcrumb contains   1    Home
+    user checks nth breadcrumb contains   2    Pre-release access list
+
+    user waits until page contains title caption  Calendar Year 2000
+    user waits until h1 is visible  ${PUBLICATION_NAME}
+
+    user waits until h2 is visible  Pre-release access list
+    user waits until page contains  Updated test public access list
+
+Go back to prerelease page again
+    [Tags]  HappyPath
+    user clicks link  Back
+    user checks breadcrumb count should be   2
+    user checks nth breadcrumb contains   1    Home
+    user checks nth breadcrumb contains   2    Pre-release access
+
+    user waits until page contains title caption  Calendar Year 2000
+    user waits until h1 is visible  ${PUBLICATION_NAME}
+
+Validate prerelease has started for Analyst user
+    [Tags]  HappyPath
+    user changes to analyst1
+    user goes to url   ${RELEASE_URL}/prerelease
+
+    user checks breadcrumb count should be   2
+    user checks nth breadcrumb contains   1    Home
+    user checks nth breadcrumb contains   2    Pre-release access
+
+    user waits until page contains title caption  Calendar Year 2000
+    user waits until h1 is visible  ${PUBLICATION_NAME}
+
+    user waits until element contains  id:releaseSummary  Test summary text for ${PUBLICATION_NAME}
+    user waits until element contains  id:releaseHeadlines  Test headlines summary text for ${PUBLICATION_NAME}
+
+Validate public metdata guidance for Analyst user
+    [Tags]  HappyPath
+    user opens details dropdown  Download associated files
+    user clicks link  Metadata guidance
+
+    user checks breadcrumb count should be   2
+    user checks nth breadcrumb contains   1    Home
+    user checks nth breadcrumb contains   2    Metadata guidance document
+
+    user waits until page contains title caption  Calendar Year 2000
+    user waits until h1 is visible  ${PUBLICATION_NAME}
+
+    user waits until h2 is visible  Metadata guidance document
+    user waits until page contains  Test metadata guidance content
+
+    user waits until page contains accordion section  UI test subject
+    user checks there are x accordion sections  1
+
+    user opens accordion section  UI test subject
+    user checks summary list contains  Filename             upload-file-test.csv
+    user checks summary list contains  Geographic levels
+    ...  Local Authority; Local Authority District; Local Enterprise Partnership; Opportunity Area; Parliamentary Constituency; RSC Region; Regional; Ward
+    user checks summary list contains  Time period          2005 to 2020
+    user checks summary list contains  Content              Test file guidance content
+
+    user opens details dropdown  Variable names and descriptions
+
+    user checks table column heading contains  1  1  Variable name
+    user checks table column heading contains  1  2  Variable description
+
+    user checks results table cell contains  1  1   admission_numbers
+    user checks results table cell contains  1  2   Admission Numbers
+
+Go back to prerelease page as Analyst user
+    [Tags]  HappyPath
+    user clicks link  Back
+    user checks breadcrumb count should be   2
+    user checks nth breadcrumb contains   1    Home
+    user checks nth breadcrumb contains   2    Pre-release access
+
+    user waits until page contains title caption  Calendar Year 2000
+    user waits until h1 is visible  ${PUBLICATION_NAME}
+
+Validate public prerelease access list for Analyst user
+    [Tags]  HappyPath
+    user opens details dropdown  Download associated files
+    user clicks link  Pre-release access list
+
+    user checks breadcrumb count should be   2
+    user checks nth breadcrumb contains   1    Home
+    user checks nth breadcrumb contains   2    Pre-release access list
+
+    user waits until page contains title caption  Calendar Year 2000
+    user waits until h1 is visible  ${PUBLICATION_NAME}
+
+    user waits until h2 is visible  Pre-release access list
+    user waits until page contains  Updated test public access list
+
+Go back to prerelease page again as Analyst user
+    [Tags]  HappyPath
+    user clicks link  Back
+
+    user checks breadcrumb count should be   2
+    user checks nth breadcrumb contains   1    Home
+    user checks nth breadcrumb contains   2    Pre-release access
+
+    user waits until page contains title caption  Calendar Year 2000
+    user waits until h1 is visible  ${PUBLICATION_NAME}

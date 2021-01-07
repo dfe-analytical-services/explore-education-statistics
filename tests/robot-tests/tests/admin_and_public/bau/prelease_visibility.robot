@@ -8,7 +8,7 @@ Suite Setup       user signs in as bau1
 Suite Teardown    user closes the browser
 
 *** Variables ***
-${RELEASE_NAME}  Academic Year Q1 2020/21
+${RELEASE_NAME}  Calendar Year 2000
 ${PUBLICATION_NAME}  UI tests - public release visibility %{RUN_IDENTIFIER}
 
 *** Test Cases ***
@@ -19,7 +19,7 @@ Create test publication and release via API
     
 Verify release summary
     [Tags]  HappyPath
-    user navigates to release summary from admin dashboard  ${PUBLICATION_NAME}  Calendar Year 2000 (not Live)
+    user navigates to release summary from admin dashboard  ${PUBLICATION_NAME}   ${RELEASE_NAME} (not Live)
     user waits until h2 is visible  Release summary
     user checks page contains element   xpath://li/a[text()="Summary" and contains(@aria-current, 'page')]
     user checks summary list contains  Publication title  ${PUBLICATION_NAME}
@@ -55,7 +55,8 @@ Go to 'Sign Off' page
 
 Go to Public Release Link
     [Tags]  HappyPath  NotAgainstLocal
-    user goes to url  %{PUBLIC_URL} # To get around basic auth on public frontend
+    # To get around basic auth on public frontend
+    user goes to url  %{PUBLIC_URL}
     user goes to url  ${PUBLIC_RELEASE_LINK}
     user waits until page contains  Page not found
     user checks page does not contain  ${RELEASE_NAME}
@@ -70,8 +71,8 @@ Select release from admin dashboard
     user waits until page contains accordion section   ${PUBLICATION_NAME}
     user opens accordion section  ${PUBLICATION_NAME}
     ${accordion}=  user gets accordion section content element  ${PUBLICATION_NAME}
-    user opens details dropdown  Calendar Year 2000 (not Live)  ${accordion}
-    ${details}=  user gets details content element  Calendar Year 2000 (not Live)  ${accordion}
+    user opens details dropdown  ${RELEASE_NAME} (not Live)  ${accordion}
+    ${details}=  user gets details content element  ${RELEASE_NAME} (not Live)  ${accordion}
     user waits until parent contains element   ${details}   xpath:.//a[text()="Edit this release"]
     user clicks link  Edit this release
 
@@ -129,7 +130,8 @@ Approve release and wait for it to be Scheduled
 
 Go to Public release page and ensure release isn't visible
     [Tags]  HappyPath
-    user goes to url  %{PUBLIC_URL} # To get around basic auth on public frontend
+    # To get around basic auth on public frontend
+    user goes to url  %{PUBLIC_URL}
     user goes to url  ${PUBLIC_RELEASE_LINK}
 
 Go to Table Tool page
@@ -158,8 +160,8 @@ Go to release from admin dashboard
     user waits until page contains accordion section   ${PUBLICATION_NAME}
     user opens accordion section  ${PUBLICATION_NAME}
     ${accordion}=  user gets accordion section content element  ${PUBLICATION_NAME}
-    user opens details dropdown  Calendar Year 2000 (not Live)  ${accordion}
-    ${details}=  user gets details content element  Calendar Year 2000 (not Live)  ${accordion}
+    user opens details dropdown  ${RELEASE_NAME} (not Live)  ${accordion}
+    ${details}=  user gets details content element  ${RELEASE_NAME} (not Live)  ${accordion}
     user waits until parent contains element   ${details}   xpath:.//a[text()="Edit this release"]
     user clicks link  Edit this release
 
