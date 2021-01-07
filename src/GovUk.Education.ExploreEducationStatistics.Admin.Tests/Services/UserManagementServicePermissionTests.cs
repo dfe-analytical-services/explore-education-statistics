@@ -348,10 +348,10 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
                 .ExpectCheck(SecurityPolicies.CanManageUsersOnSystem)
                 .AssertSuccess(async userService =>
                 {
-                        var userManagementService = BuildUserManagementService(
-                            userService: userService.Object
-                        );
-                        return await userManagementService.ListReleaseRoles();
+                    var userManagementService = BuildUserManagementService(
+                        userService: userService.Object
+                    );
+                    return await userManagementService.ListReleaseRoles();
                 });
         }
 

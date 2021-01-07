@@ -83,11 +83,10 @@ const ManageUserPage = ({ match }: RouteComponentProps<{ userId: string }>) => {
 
   const handleSubmit = useFormSubmit<UpdateRoleFormValues>(async values => {
     const submission: UserUpdate = {
-      id: userId,
       roleId: values.selectedRoleId,
     };
 
-    await userService.updateUser(submission);
+    await userService.updateUser(userId, submission);
     getUser();
   }, updateRoleFormErrorMappings);
 
