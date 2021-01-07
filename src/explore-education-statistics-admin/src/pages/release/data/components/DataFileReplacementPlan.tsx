@@ -12,7 +12,6 @@ import dataReplacementService, {
   FootnoteReplacementPlan,
 } from '@admin/services/dataReplacementService';
 import footnoteService from '@admin/services/footnoteService';
-import releaseDataFileService from '@admin/services/releaseDataFileService';
 import Button from '@common/components/Button';
 import ButtonGroup from '@common/components/ButtonGroup';
 import CollapsibleList from '@common/components/CollapsibleList';
@@ -48,7 +47,6 @@ const DataFileReplacementPlan = ({
   onReplacement,
 }: Props) => {
   const [isSubmitting, toggleSubmitting] = useToggle(false);
-  const [isCancelling, toggleCancelling] = useToggle(false);
 
   const [deleteDataBlock, setDeleteDataBlock] = useState<
     DataBlockReplacementPlan
@@ -79,9 +77,13 @@ const DataFileReplacementPlan = ({
 
   if (error) {
     return (
-      <WarningMessage>
-        There was a problem loading the data replacement information.
-      </WarningMessage>
+      <>
+        <WarningMessage>
+          There was a problem loading the data replacement information.
+        </WarningMessage>
+
+        <Button onClick={onCancel}>Cancel data replacement</Button>
+      </>
     );
   }
 
@@ -390,33 +392,10 @@ const DataFileReplacementPlan = ({
               </Button>
             )}
 
-            <Button variant="secondary" onClick={toggleCancelling.on}>
+            <Button variant="secondary" onClick={onCancel}>
               Cancel data replacement
             </Button>
           </ButtonGroup>
-
-          <ModalConfirm
-            title="Cancel data replacement"
-            mounted={isCancelling}
-            onExit={toggleCancelling.off}
-            onConfirm={async () => {
-              toggleCancelling.off();
-
-              await releaseDataFileService.deleteDataFiles(
-                releaseId,
-                replacementFileId,
-              );
-
-              if (onCancel) {
-                onCancel();
-              }
-            }}
-          >
-            <p>
-              Are you sure you want to cancel this data replacement? The pending
-              replacement data file will be deleted.
-            </p>
-          </ModalConfirm>
 
           {deleteDataBlock && (
             <ModalConfirm
