@@ -53,7 +53,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Content.Model
                 .LastOrDefault();
         }
 
-        private bool IsLatestVersionOfRelease(Guid releaseId)
+        public bool IsLatestVersionOfRelease(Guid releaseId)
         {
             return !Releases.Any(r => r.PreviousVersionId == releaseId && r.Id != releaseId);
         }

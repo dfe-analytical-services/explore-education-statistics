@@ -177,61 +177,6 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
         }
 
         [Fact]
-        public void GetUserReleaseRoles()
-        {
-            PolicyCheckBuilder()
-                .ExpectCheck(SecurityPolicies.CanManageUsersOnSystem)
-                .AssertSuccess(async userService =>
-                {
-                    var contentDbContextId = Guid.NewGuid().ToString();
-                    var publication = new Publication
-                    {
-                        Id = Guid.NewGuid(),
-                        Title = "Test Publication"
-                    };
-                    var release = new Release
-                    {
-                        Id = Guid.NewGuid(),
-                        TimePeriodCoverage = TimeIdentifier.CalendarYear,
-                        ReleaseName = "2000",
-                        PublicationId = publication.Id,
-                        Publication = publication
-                    };
-                    var user = new User
-                    {
-                        Id = Guid.NewGuid(),
-                        FirstName = "TestFirstName",
-                        LastName = "TestLastName",
-                        Email = "test@test.com"
-                    };
-                    var userReleaseRole = new UserReleaseRole
-                    {
-                        Id = Guid.NewGuid(),
-                        User = user,
-                        UserId = user.Id,
-                        Release = release,
-                        ReleaseId = release.Id,
-                        Role = ReleaseRole.Lead,
-                    };
-                    await using (var contentDbContext = InMemoryApplicationDbContext(contentDbContextId))
-                    {
-                        await contentDbContext.AddAsync(publication);
-                        await contentDbContext.AddAsync(release);
-                        await contentDbContext.AddAsync(userReleaseRole);
-                        await contentDbContext.SaveChangesAsync();
-                    }
-
-                    await using (var contentDbContext = InMemoryApplicationDbContext(contentDbContextId))
-                    {
-                        var userManagementService = BuildUserManagementService(
-                            userService: userService.Object,
-                            contentDbContext: contentDbContext);
-                        return await userManagementService.GetUserReleaseRoles(user.Id.ToString());
-                    }
-                });
-        }
-
-        [Fact]
         public void AddUserReleaseRole()
         {
             PolicyCheckBuilder()
