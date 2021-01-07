@@ -146,7 +146,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Services
                     return _contentDbContext.Releases
                         .Include(r => r.Publication)
                         .ToList()
-                        .Where(r => IsLatestVersionOfRelease(r.Publication.Releases, r.Id))
+                        .Where(r => r.Publication.IsLatestVersionOfRelease(r.Id))
                         .Select(r => new IdTitlePair
                         {
                             Id = r.Id,
@@ -228,7 +228,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Services
                         .ThenInclude(r => r.Publication)
                         .ToList()
                         .Where(urr => urr.UserId == Guid.Parse(userId) &&
-                                      IsLatestVersionOfRelease(urr.Release.Publication.Releases, urr.Release.Id))
+                                      urr.Release.Publication.IsLatestVersionOfRelease(urr.Release.Id))
                         .Select(x => new UserReleaseRoleViewModel
                         {
                             Id = x.Id,
@@ -361,15 +361,6 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Services
             return userRole?.Name;
         }
 
-        private string GetUserRoleName(string userId)
-        {
-            var userRole = _usersAndRolesDbContext.UserRoles.FirstOrDefault(r => r.UserId == userId);
-
-            return userRole == null
-                ? null
-                : _usersAndRolesDbContext.Roles.FirstOrDefault(r => r.Id == userRole.RoleId)?.Name;
-        }
-
         private string GetUserRoleId(string userId)
         {
             var userRole = _usersAndRolesDbContext.UserRoles.FirstOrDefault(r => r.UserId == userId);
@@ -422,11 +413,6 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Services
             }
 
             return true;
-        }
-
-        private static bool IsLatestVersionOfRelease(IEnumerable<Release> releases, Guid releaseId)
-        {
-            return !releases.Any(r => r.PreviousVersionId == releaseId && r.Id != releaseId);
         }
     }
 }
