@@ -15,7 +15,6 @@ import FormattedDate from '@common/components/FormattedDate';
 import Yup from '@common/validation/yup';
 import { Formik } from 'formik';
 import React, { useState } from 'react';
-import classNames from 'classnames';
 import styles from './Comments.module.scss';
 
 interface FormValues {
@@ -99,7 +98,7 @@ const Comments = ({
   };
 
   return (
-    <div className={classNames(styles.container)}>
+    <div className={styles.container}>
       <Details
         onToggle={isOpen => onToggle(isOpen)}
         className="govuk-!-margin-bottom-1 govuk-body-s"
