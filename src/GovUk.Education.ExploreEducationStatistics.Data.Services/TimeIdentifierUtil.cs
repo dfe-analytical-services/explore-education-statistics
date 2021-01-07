@@ -6,6 +6,11 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Services
 {
     public static class TimeIdentifierUtil
     {
+        public static TimeIdentifier[] GetCustomPeriods()
+        {
+            return Category.CustomPeriod.GetTimeIdentifiers();
+        }
+
         public static TimeIdentifier[] GetMonths()
         {
             return Category.Month.GetTimeIdentifiers();
