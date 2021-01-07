@@ -28,6 +28,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Services.Tests.Extensi
             Assert.True(SpringTerm.IsAlike(SpringTerm));
             Assert.True(ReportingYear.IsAlike(ReportingYear));
             Assert.True(Week1.IsAlike(Week1));
+            Assert.True(CustomPeriod1.IsAlike(CustomPeriod1));
         }
 
         [Fact]
@@ -73,6 +74,12 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Services.Tests.Extensi
         }
 
         [Fact]
+        public void CustomPeriodsAreAlike()
+        {
+            AssertTimeIdentifiersAreAlike(TimeIdentifierUtil.GetCustomPeriods());
+        }
+
+        [Fact]
         public void TimeIdentifiersAreAcademicQuarters()
         {
             AssertTimeIdentifiersMeetCondition(identifier => identifier.IsAcademicQuarter(),
@@ -103,25 +110,36 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Services.Tests.Extensi
         [Fact]
         public void TimeIdentifiersAreYears()
         {
-            AssertTimeIdentifiersMeetCondition(identifier => identifier.IsYear(), TimeIdentifierUtil.GetYears());
+            AssertTimeIdentifiersMeetCondition(identifier => identifier.IsYear(),
+                TimeIdentifierUtil.GetYears());
         }
 
         [Fact]
         public void TimeIdentifiersAreMonths()
         {
-            AssertTimeIdentifiersMeetCondition(identifier => identifier.IsMonth(), TimeIdentifierUtil.GetMonths());
+            AssertTimeIdentifiersMeetCondition(identifier => identifier.IsMonth(),
+                TimeIdentifierUtil.GetMonths());
         }
 
         [Fact]
         public void TimeIdentifiersAreWeeks()
         {
-            AssertTimeIdentifiersMeetCondition(identifier => identifier.IsWeek(), TimeIdentifierUtil.GetWeeks());
+            AssertTimeIdentifiersMeetCondition(identifier => identifier.IsWeek(),
+                TimeIdentifierUtil.GetWeeks());
         }
 
         [Fact]
         public void TimeIdentifiersAreTerms()
         {
-            AssertTimeIdentifiersMeetCondition(identifier => identifier.IsTerm(), TimeIdentifierUtil.GetTerms());
+            AssertTimeIdentifiersMeetCondition(identifier => identifier.IsTerm(),
+                TimeIdentifierUtil.GetTerms());
+        }
+
+        [Fact]
+        public void TimeIdentifiersAreCustomPeriods()
+        {
+            AssertTimeIdentifiersMeetCondition(identifier => identifier.IsCustomPeriod(),
+                TimeIdentifierUtil.GetCustomPeriods());
         }
 
         [Fact]
@@ -177,9 +195,15 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Services.Tests.Extensi
         }
 
         [Fact]
-        public void GetAssociatedRangeForTermReturnsAssociatedRange()
+        public void GetAssociatedRangeForTermsReturnsAssociatedRange()
         {
             Assert.Equal(TimeIdentifierUtil.GetTerms(), AutumnTerm.GetAssociatedRange());
+        }
+
+        [Fact]
+        public void GetAssociatedRangeForCustomPeriodsReturnsAssociatedRange()
+        {
+            Assert.Equal(TimeIdentifierUtil.GetCustomPeriods(), CustomPeriod1.GetAssociatedRange());
         }
 
         private void AssertTimeIdentifiersMeetCondition(Func<TimeIdentifier, bool> condition,

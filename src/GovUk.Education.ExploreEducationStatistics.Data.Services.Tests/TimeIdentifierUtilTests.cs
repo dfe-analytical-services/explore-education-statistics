@@ -157,5 +157,15 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Services.Tests
                 SummerTerm
             }, TimeIdentifierUtil.GetTerms());
         }
+
+        [Fact]
+        public void GetCustomPeriodsReturnsCustomPeriods()
+        {
+            Assert.Equal(new[]
+            {
+                CustomPeriod1,
+                CustomPeriod2
+            }, TimeIdentifierUtil.GetCustomPeriods());
+        }
     }
 }

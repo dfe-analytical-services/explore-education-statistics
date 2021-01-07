@@ -10,13 +10,13 @@ namespace GovUk.Education.ExploreEducationStatistics.Common.Model
         [EnumLabelValue("Calendar year")]
         CalendarYear,
 
-        [EnumLabelValue("Financial Year")]
+        [EnumLabelValue("Financial year")]
         FinancialYear,
 
-        [EnumLabelValue("Tax Year")]
+        [EnumLabelValue("Tax year")]
         TaxYear,
 
-        [EnumLabelValue("Reporting Year")]
+        [EnumLabelValue("Reporting year")]
         ReportingYear,
 
         [EnumLabelValue("Term")]
@@ -26,6 +26,9 @@ namespace GovUk.Education.ExploreEducationStatistics.Common.Model
         Month,
 
         [EnumLabelValue("Week")]
-        Week
+        Week,
+
+        [EnumLabelValue("Other")]
+        CustomPeriod
     }
 }
