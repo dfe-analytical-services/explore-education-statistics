@@ -32,7 +32,7 @@ interface Props {
   comments: Comment[];
   canComment?: boolean;
   onChange: CommentsChangeHandler;
-  onToggle: (opened: boolean) => void;
+  onToggle?: (opened: boolean) => void;
 }
 
 const Comments = ({
@@ -100,7 +100,7 @@ const Comments = ({
   return (
     <div className={styles.container}>
       <Details
-        onToggle={isOpen => onToggle(isOpen)}
+        onToggle={isOpen => onToggle && onToggle(isOpen)}
         className="govuk-!-margin-bottom-1 govuk-body-s"
         summary={`${canComment ? `Add / ` : ''}View comments (${
           comments.length

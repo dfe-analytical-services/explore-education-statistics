@@ -67,7 +67,6 @@ describe('Comments', () => {
             },
           ]}
           onChange={noop}
-          onToggle={noop}
         />
       </ManageReleaseContext.Provider>,
     );
@@ -115,7 +114,6 @@ describe('Comments', () => {
             },
           ]}
           onChange={handleChange}
-          onToggle={noop}
         />
       </ManageReleaseContext.Provider>,
     );
@@ -227,7 +225,6 @@ describe('Comments', () => {
               sectionId="section-1"
               comments={testComments}
               onChange={noop}
-              onToggle={noop}
             />
           </ManageReleaseContext.Provider>
         </AuthContext.Provider>,
@@ -265,7 +262,6 @@ describe('Comments', () => {
               sectionId="section-1"
               comments={testComments}
               onChange={noop}
-              onToggle={noop}
             />
           </ManageReleaseContext.Provider>
         </AuthContext.Provider>,
@@ -312,7 +308,6 @@ describe('Comments', () => {
               sectionId="section-1"
               comments={testComments}
               onChange={noop}
-              onToggle={noop}
             />
           </ManageReleaseContext.Provider>
         </AuthContext.Provider>,
@@ -368,7 +363,6 @@ describe('Comments', () => {
               sectionId="section-1"
               comments={testComments}
               onChange={handleChange}
-              onToggle={opened => opened}
             />
           </ManageReleaseContext.Provider>
         </AuthContext.Provider>,
@@ -497,7 +491,6 @@ describe('Comments', () => {
               sectionId="section-1"
               comments={testComments}
               onChange={noop}
-              onToggle={noop}
             />
           </ManageReleaseContext.Provider>
         </AuthContext.Provider>,
@@ -537,7 +530,6 @@ describe('Comments', () => {
               sectionId="section-1"
               comments={testComments}
               onChange={handleChange}
-              onToggle={noop}
             />
           </ManageReleaseContext.Provider>
         </AuthContext.Provider>,
