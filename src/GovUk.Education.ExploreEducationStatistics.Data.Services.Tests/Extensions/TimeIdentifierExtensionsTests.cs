@@ -28,7 +28,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Services.Tests.Extensi
             Assert.True(SpringTerm.IsAlike(SpringTerm));
             Assert.True(ReportingYear.IsAlike(ReportingYear));
             Assert.True(Week1.IsAlike(Week1));
-            Assert.True(CustomPeriod1.IsAlike(CustomPeriod1));
+            Assert.True(FinancialYearPart1.IsAlike(FinancialYearPart1));
         }
 
         [Fact]
@@ -76,7 +76,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Services.Tests.Extensi
         [Fact]
         public void CustomPeriodsAreAlike()
         {
-            AssertTimeIdentifiersAreAlike(TimeIdentifierUtil.GetCustomPeriods());
+            AssertTimeIdentifiersAreAlike(TimeIdentifierUtil.GetFinancialYearParts());
         }
 
         [Fact]
@@ -139,7 +139,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Services.Tests.Extensi
         public void TimeIdentifiersAreCustomPeriods()
         {
             AssertTimeIdentifiersMeetCondition(identifier => identifier.IsCustomPeriod(),
-                TimeIdentifierUtil.GetCustomPeriods());
+                TimeIdentifierUtil.GetFinancialYearParts());
         }
 
         [Fact]
@@ -203,7 +203,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Services.Tests.Extensi
         [Fact]
         public void GetAssociatedRangeForCustomPeriodsReturnsAssociatedRange()
         {
-            Assert.Equal(TimeIdentifierUtil.GetCustomPeriods(), CustomPeriod1.GetAssociatedRange());
+            Assert.Equal(TimeIdentifierUtil.GetFinancialYearParts(), FinancialYearPart1.GetAssociatedRange());
         }
 
         private void AssertTimeIdentifiersMeetCondition(Func<TimeIdentifier, bool> condition,

@@ -163,9 +163,9 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Services.Tests
         {
             Assert.Equal(new[]
             {
-                CustomPeriod1,
-                CustomPeriod2
-            }, TimeIdentifierUtil.GetCustomPeriods());
+                FinancialYearPart1,
+                FinancialYearPart2
+            }, TimeIdentifierUtil.GetFinancialYearParts());
         }
     }
 }

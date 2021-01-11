@@ -28,7 +28,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Common.Model
         [EnumLabelValue("Week")]
         Week,
 
-        [EnumLabelValue("Other")]
-        CustomPeriod
+        [EnumLabelValue("Financial year part")]
+        FinancialYearPart
     }
 }

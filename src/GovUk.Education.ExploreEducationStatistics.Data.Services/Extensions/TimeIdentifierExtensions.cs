@@ -66,7 +66,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Services.Extensions
 
         public static bool IsCustomPeriod(this TimeIdentifier timeIdentifier)
         {
-            return GetCustomPeriods().Contains(timeIdentifier);
+            return GetFinancialYearParts().Contains(timeIdentifier);
         }
 
         public static bool HasAssociatedRange(this TimeIdentifier timeIdentifier)
@@ -113,7 +113,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Services.Extensions
 
             if (timeIdentifier.IsCustomPeriod())
             {
-                return GetCustomPeriods();
+                return GetFinancialYearParts();
             }
 
             throw new ArgumentOutOfRangeException(nameof(timeIdentifier),
