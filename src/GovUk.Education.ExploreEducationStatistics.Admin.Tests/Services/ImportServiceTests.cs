@@ -88,7 +88,6 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
                 logger ?? new Mock<ILogger<ImportService>>().Object,
                 queueService ?? new Mock<IStorageQueueService>().Object,
                 tableStorageService ?? new Mock<ITableStorageService>().Object,
-                guidGenerator ?? new Mock<IGuidGenerator>().Object,
                 userService ?? MockUtils.AlwaysTrueUserService().Object);
         }
     }

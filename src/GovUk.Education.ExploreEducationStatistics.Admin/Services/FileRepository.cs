@@ -24,12 +24,18 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Services
             string filename,
             FileType type,
             File replacingFile = null,
-            File source = null)
+            File source = null,
+            Guid? subjectId = null)
         {
             if (type == DataZip)
             {
                 throw new ArgumentException($"Cannot use generic Create method for type {DataZip}",
                     nameof(type));
+            }
+
+            if ((type == FileType.Data || type == Metadata) && subjectId == null)
+            {
+                throw new ArgumentException("If creating data or metadata File, subjectId must not be null.");
             }
 
             var releaseFile = new ReleaseFile
@@ -38,6 +44,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Services
                 File = new File
                 {
                     ReleaseId = releaseId,
+                    SubjectId = subjectId,
                     Filename = filename,
                     // Mark any new ancillary or chart files as already migrated while this flag temporarily exists 
                     FilenameMigrated = type == Ancillary || type == Chart,

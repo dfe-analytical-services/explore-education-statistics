@@ -13,7 +13,8 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Services.Interfaces
             string filename,
             FileType type,
             File replacingFile = null,
-            File source = null);
+            File source = null,
+            Guid? subjectId = null);
 
         public Task<File> CreateZip(
             Guid releaseId,
