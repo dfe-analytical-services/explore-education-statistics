@@ -582,7 +582,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Services.Tests
         }
 
         [Fact]
-        public void RangeIsGeneratedForCustomPeriodQuery()
+        public void RangeIsGeneratedForFinancialYearPartQuery()
         {
             CollectionAssert.AreEquivalent(
                 new List<(int Year, TimeIdentifier TimeIdentifier)>

@@ -149,7 +149,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Common.Tests.Services
         }
 
         [Fact]
-        public void FormatTimePeriodUsingCustomPeriodIdentifiers()
+        public void FormatTimePeriodUsingFinancialYearPartIdentifiers()
         {
             Assert.Equal($"{FormattedFiscalYear} Part 1 (Apr to Sep)", Format(Year, FinancialYearPart1));
             Assert.Equal($"{FormattedFiscalYear} Part 2 (Oct to Mar)", Format(Year, FinancialYearPart2));

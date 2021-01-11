@@ -74,7 +74,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Services.Tests.Extensi
         }
 
         [Fact]
-        public void CustomPeriodsAreAlike()
+        public void FinancialYearPartsAreAlike()
         {
             AssertTimeIdentifiersAreAlike(TimeIdentifierUtil.GetFinancialYearParts());
         }
@@ -136,9 +136,9 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Services.Tests.Extensi
         }
 
         [Fact]
-        public void TimeIdentifiersAreCustomPeriods()
+        public void TimeIdentifiersAreFinancialYearParts()
         {
-            AssertTimeIdentifiersMeetCondition(identifier => identifier.IsCustomPeriod(),
+            AssertTimeIdentifiersMeetCondition(identifier => identifier.IsFinancialYearPart(),
                 TimeIdentifierUtil.GetFinancialYearParts());
         }
 
@@ -201,7 +201,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Services.Tests.Extensi
         }
 
         [Fact]
-        public void GetAssociatedRangeForCustomPeriodsReturnsAssociatedRange()
+        public void GetAssociatedRangeForFinancialYearPartsReturnsAssociatedRange()
         {
             Assert.Equal(TimeIdentifierUtil.GetFinancialYearParts(), FinancialYearPart1.GetAssociatedRange());
         }

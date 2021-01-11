@@ -159,7 +159,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Services.Tests
         }
 
         [Fact]
-        public void GetCustomPeriodsReturnsCustomPeriods()
+        public void GetFinancialYearPartsReturnsFinancialYearParts()
         {
             Assert.Equal(new[]
             {
