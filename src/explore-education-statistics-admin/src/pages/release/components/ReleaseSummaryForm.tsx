@@ -140,9 +140,13 @@ const ReleaseSummaryForm = <
                 name="timePeriodCoverageStartYear"
                 label={`
                       ${
-                        ['Month', 'Term', 'Week', 'Other'].includes(
-                          timePeriodLabel,
-                        )
+                        [
+                          'Month',
+                          'Term',
+                          'Week',
+                          'Other',
+                          'Financial year part',
+                        ].includes(timePeriodLabel)
                           ? 'Year'
                           : timePeriodLabel
                       }
