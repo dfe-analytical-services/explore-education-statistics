@@ -149,10 +149,10 @@ namespace GovUk.Education.ExploreEducationStatistics.Common.Tests.Services
         }
 
         [Fact]
-        public void FormatTimePeriodUsingCustomPeriodIdentifiers()
+        public void FormatTimePeriodUsingFinancialYearPartIdentifiers()
         {
-            Assert.Equal($"{FormattedAcademicYear} Apr to Sep", Format(Year, CustomPeriod1));
-            Assert.Equal($"{FormattedAcademicYear} Oct to Mar", Format(Year, CustomPeriod2));
+            Assert.Equal($"{FormattedFiscalYear} Part 1 (Apr to Sep)", Format(Year, FinancialYearPart1));
+            Assert.Equal($"{FormattedFiscalYear} Part 2 (Oct to Mar)", Format(Year, FinancialYearPart2));
         }
 
         [Fact]
@@ -166,7 +166,8 @@ namespace GovUk.Education.ExploreEducationStatistics.Common.Tests.Services
             Assert.Equal($"{Year} Reporting Year", Format(Year, ReportingYear, FullLabel));
             Assert.Equal($"{Year} January", Format(Year, January, FullLabel));
             Assert.Equal($"{FormattedAcademicYear} Autumn Term", Format(Year, AutumnTerm, FullLabel));
-            Assert.Equal($"{FormattedAcademicYear} April to September", Format(Year, CustomPeriod1, FullLabel));
+            Assert.Equal($"{FormattedFiscalYear} Part 1 (April to September)", Format(Year, FinancialYearPart1, FullLabel));
+            Assert.Equal($"{FormattedFiscalYear} Part 2 (October to March)", Format(Year, FinancialYearPart2, FullLabel));
         }
 
         [Fact]
@@ -180,7 +181,8 @@ namespace GovUk.Education.ExploreEducationStatistics.Common.Tests.Services
             Assert.Equal($"Reporting Year {Year}", Format(Year, ReportingYear, FullLabelBeforeYear));
             Assert.Equal($"January {Year}", Format(Year, January, FullLabelBeforeYear));
             Assert.Equal($"Autumn Term {FormattedAcademicYear}", Format(Year, AutumnTerm, FullLabelBeforeYear));
-            Assert.Equal($"April to September {FormattedAcademicYear}", Format(Year, CustomPeriod1, FullLabelBeforeYear));
+            Assert.Equal($"Part 1 (April to September) {FormattedFiscalYear}", Format(Year, FinancialYearPart1, FullLabelBeforeYear));
+            Assert.Equal($"Part 2 (October to March) {FormattedFiscalYear}", Format(Year, FinancialYearPart2, FullLabelBeforeYear));
         }
 
         [Fact]
@@ -194,7 +196,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Common.Tests.Services
             Assert.Equal($"{Year}", Format(Year, ReportingYear, NoLabel));
             Assert.Equal($"{Year}", Format(Year, January, NoLabel));
             Assert.Equal($"{FormattedAcademicYear}", Format(Year, AutumnTerm, NoLabel));
-            Assert.Equal($"{FormattedAcademicYear}", Format(Year, CustomPeriod1, NoLabel));
+            Assert.Equal($"{FormattedFiscalYear}", Format(Year, FinancialYearPart1, NoLabel));
         }
 
         [Fact]
@@ -208,7 +210,8 @@ namespace GovUk.Education.ExploreEducationStatistics.Common.Tests.Services
             Assert.Equal($"{Year}", Format(Year, ReportingYear, ShortLabel));
             Assert.Equal($"{Year}", Format(Year, January, ShortLabel));
             Assert.Equal($"{FormattedAcademicYear}", Format(Year, AutumnTerm, ShortLabel));
-            Assert.Equal($"{FormattedAcademicYear} Apr to Sep", Format(Year, CustomPeriod1, ShortLabel));
+            Assert.Equal($"{FormattedFiscalYear} Part 1 (Apr to Sep)", Format(Year, FinancialYearPart1, ShortLabel));
+            Assert.Equal($"{FormattedFiscalYear} Part 2 (Oct to Mar)", Format(Year, FinancialYearPart2, ShortLabel));
         }
 
         [Fact(Skip = "Use this to debug")]
@@ -304,8 +307,8 @@ namespace GovUk.Education.ExploreEducationStatistics.Common.Tests.Services
             _testOutputHelper.WriteLine($"Format({Year}, Week50)            {Format(Year, Week50)}");
             _testOutputHelper.WriteLine($"Format({Year}, Week51)            {Format(Year, Week51)}");
             _testOutputHelper.WriteLine($"Format({Year}, Week52)            {Format(Year, Week52)}");
-            _testOutputHelper.WriteLine($"Format({Year}, CustomPeriod1)     {Format(Year, CustomPeriod1)}");
-            _testOutputHelper.WriteLine($"Format({Year}, CustomPeriod2)     {Format(Year, CustomPeriod2)}");
+            _testOutputHelper.WriteLine($"Format({Year}, FinancialYearPart1)     {Format(Year, FinancialYearPart1)}");
+            _testOutputHelper.WriteLine($"Format({Year}, FinancialYearPart2)     {Format(Year, FinancialYearPart2)}");
         }
     }
 }

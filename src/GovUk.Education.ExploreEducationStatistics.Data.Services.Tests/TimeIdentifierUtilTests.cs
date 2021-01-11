@@ -159,13 +159,13 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Services.Tests
         }
 
         [Fact]
-        public void GetCustomPeriodsReturnsCustomPeriods()
+        public void GetFinancialYearPartsReturnsFinancialYearParts()
         {
             Assert.Equal(new[]
             {
-                CustomPeriod1,
-                CustomPeriod2
-            }, TimeIdentifierUtil.GetCustomPeriods());
+                FinancialYearPart1,
+                FinancialYearPart2
+            }, TimeIdentifierUtil.GetFinancialYearParts());
         }
     }
 }

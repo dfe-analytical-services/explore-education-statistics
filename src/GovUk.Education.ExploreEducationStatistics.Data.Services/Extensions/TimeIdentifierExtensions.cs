@@ -21,7 +21,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Services.Extensions
                    IsMonth(timeIdentifier) && IsMonth(compare) ||
                    IsWeek(timeIdentifier) && IsWeek(compare) ||
                    IsTerm(timeIdentifier) && IsTerm(compare) ||
-                   IsCustomPeriod(timeIdentifier) && IsCustomPeriod(compare);
+                   IsFinancialYearPart(timeIdentifier) && IsFinancialYearPart(compare);
         }
 
         public static bool IsYear(this TimeIdentifier timeIdentifier)
@@ -64,9 +64,9 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Services.Extensions
             return GetTerms().Contains(timeIdentifier);
         }
 
-        public static bool IsCustomPeriod(this TimeIdentifier timeIdentifier)
+        public static bool IsFinancialYearPart(this TimeIdentifier timeIdentifier)
         {
-            return GetCustomPeriods().Contains(timeIdentifier);
+            return GetFinancialYearParts().Contains(timeIdentifier);
         }
 
         public static bool HasAssociatedRange(this TimeIdentifier timeIdentifier)
@@ -111,9 +111,9 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Services.Extensions
                 return GetTerms();
             }
 
-            if (timeIdentifier.IsCustomPeriod())
+            if (timeIdentifier.IsFinancialYearPart())
             {
-                return GetCustomPeriods();
+                return GetFinancialYearParts();
             }
 
             throw new ArgumentOutOfRangeException(nameof(timeIdentifier),

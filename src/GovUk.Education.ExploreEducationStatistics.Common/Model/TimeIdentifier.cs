@@ -277,10 +277,10 @@ namespace GovUk.Education.ExploreEducationStatistics.Common.Model
         [TimeIdentifierMeta("Week 52", "W52", Week)]
         Week52,
 
-        [TimeIdentifierMeta("April to September", "P1", CustomPeriod, Academic, ShortLabel, "Apr to Sep")]
-        CustomPeriod1,
+        [TimeIdentifierMeta("Part 1 (April to September)", "P1", FinancialYearPart, Fiscal, ShortLabel, "Part 1 (Apr to Sep)")]
+        FinancialYearPart1,
 
-        [TimeIdentifierMeta("October to March", "P2", CustomPeriod, Academic, ShortLabel, "Oct to Mar")]
-        CustomPeriod2
+        [TimeIdentifierMeta("Part 2 (October to March)", "P2", FinancialYearPart, Fiscal, ShortLabel, "Part 2 (Oct to Mar)")]
+        FinancialYearPart2
     }
 }

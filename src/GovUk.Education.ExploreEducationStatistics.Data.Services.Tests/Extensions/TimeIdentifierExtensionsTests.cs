@@ -28,7 +28,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Services.Tests.Extensi
             Assert.True(SpringTerm.IsAlike(SpringTerm));
             Assert.True(ReportingYear.IsAlike(ReportingYear));
             Assert.True(Week1.IsAlike(Week1));
-            Assert.True(CustomPeriod1.IsAlike(CustomPeriod1));
+            Assert.True(FinancialYearPart1.IsAlike(FinancialYearPart1));
         }
 
         [Fact]
@@ -74,9 +74,9 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Services.Tests.Extensi
         }
 
         [Fact]
-        public void CustomPeriodsAreAlike()
+        public void FinancialYearPartsAreAlike()
         {
-            AssertTimeIdentifiersAreAlike(TimeIdentifierUtil.GetCustomPeriods());
+            AssertTimeIdentifiersAreAlike(TimeIdentifierUtil.GetFinancialYearParts());
         }
 
         [Fact]
@@ -136,10 +136,10 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Services.Tests.Extensi
         }
 
         [Fact]
-        public void TimeIdentifiersAreCustomPeriods()
+        public void TimeIdentifiersAreFinancialYearParts()
         {
-            AssertTimeIdentifiersMeetCondition(identifier => identifier.IsCustomPeriod(),
-                TimeIdentifierUtil.GetCustomPeriods());
+            AssertTimeIdentifiersMeetCondition(identifier => identifier.IsFinancialYearPart(),
+                TimeIdentifierUtil.GetFinancialYearParts());
         }
 
         [Fact]
@@ -201,9 +201,9 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Services.Tests.Extensi
         }
 
         [Fact]
-        public void GetAssociatedRangeForCustomPeriodsReturnsAssociatedRange()
+        public void GetAssociatedRangeForFinancialYearPartsReturnsAssociatedRange()
         {
-            Assert.Equal(TimeIdentifierUtil.GetCustomPeriods(), CustomPeriod1.GetAssociatedRange());
+            Assert.Equal(TimeIdentifierUtil.GetFinancialYearParts(), FinancialYearPart1.GetAssociatedRange());
         }
 
         private void AssertTimeIdentifiersMeetCondition(Func<TimeIdentifier, bool> condition,
