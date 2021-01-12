@@ -48,18 +48,9 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Controllers.Api.UserM
                 .HandleFailuresOrOk();
         }
 
-        [HttpGet("user-management/users/{userId}/release-role")]
-        [ProducesResponseType(200)]
-        public Task<ActionResult<List<UserReleaseRoleViewModel>>> GetUserReleaseRoles(string userId)
-        {
-            return _userManagementService
-                .GetUserReleaseRoles(userId)
-                .HandleFailuresOrOk();
-        }
-
         [HttpPost("user-management/users/{userId}/release-role")]
         [ProducesResponseType(200)]
-        public async Task<ActionResult<UserReleaseRoleViewModel>> AddUserReleaseRole(Guid userId,
+        public async Task<ActionResult<Unit>> AddUserReleaseRole(Guid userId,
             UserReleaseRoleRequest releaseRole)
         {
             return await _userManagementService

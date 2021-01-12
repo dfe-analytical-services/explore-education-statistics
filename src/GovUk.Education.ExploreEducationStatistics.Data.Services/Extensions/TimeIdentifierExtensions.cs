@@ -20,7 +20,8 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Services.Extensions
                    IsTaxQuarter(timeIdentifier) && IsTaxQuarter(compare) ||
                    IsMonth(timeIdentifier) && IsMonth(compare) ||
                    IsWeek(timeIdentifier) && IsWeek(compare) ||
-                   IsTerm(timeIdentifier) && IsTerm(compare);
+                   IsTerm(timeIdentifier) && IsTerm(compare) ||
+                   IsFinancialYearPart(timeIdentifier) && IsFinancialYearPart(compare);
         }
 
         public static bool IsYear(this TimeIdentifier timeIdentifier)
@@ -63,6 +64,11 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Services.Extensions
             return GetTerms().Contains(timeIdentifier);
         }
 
+        public static bool IsFinancialYearPart(this TimeIdentifier timeIdentifier)
+        {
+            return GetFinancialYearParts().Contains(timeIdentifier);
+        }
+
         public static bool HasAssociatedRange(this TimeIdentifier timeIdentifier)
         {
             return !timeIdentifier.IsYear();
@@ -103,6 +109,11 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Services.Extensions
             if (timeIdentifier.IsTerm())
             {
                 return GetTerms();
+            }
+
+            if (timeIdentifier.IsFinancialYearPart())
+            {
+                return GetFinancialYearParts();
             }
 
             throw new ArgumentOutOfRangeException(nameof(timeIdentifier),

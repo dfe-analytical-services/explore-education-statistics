@@ -86,7 +86,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Services
                 });
         }
 
-        public async Task<Either<ActionResult, UserReleaseRoleViewModel>> AddUserReleaseRole(Guid userId,
+        public async Task<Either<ActionResult, Unit>> AddUserReleaseRole(Guid userId,
             UserReleaseRoleRequest userReleaseRole)
         {
             return await _userService
@@ -94,26 +94,29 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Services
                 .OnSuccess(async () =>
                 {
                     return await _persistenceHelper
-                        .CheckEntityExists<Release>(userReleaseRole.ReleaseId)
-                        .OnSuccess(() => ValidateUserReleaseRoleCanBeAdded(userId, userReleaseRole))
-                        .OnSuccess(async () =>
+                        .CheckEntityExists<Release>(
+                            userReleaseRole.ReleaseId,
+                            q => q.Include(r => r.Publication)
+                        )
+                        .OnSuccess(release =>
                         {
-                            var newReleaseRole = new UserReleaseRole
-                            {
-                                ReleaseId = userReleaseRole.ReleaseId,
-                                Role = userReleaseRole.ReleaseRole,
-                                UserId = userId
-                            };
+                            return ValidateUserReleaseRoleCanBeAdded(userId, userReleaseRole)
+                                .OnSuccessVoid(async () =>
+                                {
+                                    await ValidateUserReleaseRoleCanBeAdded(userId, userReleaseRole);
 
-                            await _contentDbContext.AddAsync(newReleaseRole);
-                            await _contentDbContext.SaveChangesAsync();
+                                    var newReleaseRole = new UserReleaseRole
+                                    {
+                                        ReleaseId = userReleaseRole.ReleaseId,
+                                        Role = userReleaseRole.ReleaseRole,
+                                        UserId = userId
+                                    };
 
-                            var response = await GetUserReleaseRole(newReleaseRole.Id);
+                                    await _contentDbContext.AddAsync(newReleaseRole);
+                                    await _contentDbContext.SaveChangesAsync();
 
-                            SendNewReleaseRoleEmail(userId, response.Publication, response.Release,
-                                response.ReleaseRole);
-
-                            return response;
+                                    SendNewReleaseRoleEmail(userId, release, newReleaseRole.Role);
+                                });
                         });
                 });
         }
@@ -143,7 +146,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Services
                     return _contentDbContext.Releases
                         .Include(r => r.Publication)
                         .ToList()
-                        .Where(r => IsLatestVersionOfRelease(r.Publication.Releases, r.Id))
+                        .Where(r => r.Publication.IsLatestVersionOfRelease(r.Id))
                         .Select(r => new IdTitlePair
                         {
                             Id = r.Id,
@@ -178,21 +181,32 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Services
 
         public async Task<List<UserViewModel>> ListPreReleaseUsersAsync()
         {
-            var users = await _usersAndRolesDbContext.Users.Select(u => new UserViewModel
-                {
-                    Id = u.Id,
-                    Name = u.FirstName + " " + u.LastName,
-                    Email = u.Email
-                }).OrderBy(x => x.Name)
+            return await _usersAndRolesDbContext.Users
+                .Join(
+                    _usersAndRolesDbContext.UserRoles,
+                    user => user.Id,
+                    userRole => userRole.UserId,
+                    (user, userRole) => new
+                    {
+                        user,
+                        userRoleId = userRole.RoleId
+                    }
+                )
+                .Join(
+                    _usersAndRolesDbContext.Roles,
+                    prev => prev.userRoleId,
+                    role => role.Id,
+                    (prev, role) => new UserViewModel
+                    {
+                        Id = prev.user.Id,
+                        Name = prev.user.FirstName + " " + prev.user.LastName,
+                        Email = prev.user.Email,
+                        Role = role.Name
+                    }
+                )
+                .OrderBy(x => x.Name)
+                .Where(u => u.Role == "Prerelease User")
                 .ToListAsync();
-
-            // Potentially user role could be null in the above result in an empty array so assign role afterwards
-            foreach (var user in users)
-            {
-                user.Role = GetUserRoleName(user.Id);
-            }
-
-            return users.Where(u => u.Role == "Prerelease User").ToList();
         }
 
         public async Task<Either<ActionResult, UserViewModel>> GetUser(string userId)
@@ -209,7 +223,27 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Services
                         return ValidationActionResult(UserDoesNotExist);
                     }
 
-                    var userReleaseRoles = await GetUserReleaseRoles(user.Id);
+                    var userReleaseRoles = _contentDbContext.UserReleaseRoles
+                        .Include(urr => urr.Release)
+                        .ThenInclude(r => r.Publication)
+                        .ToList()
+                        .Where(urr => urr.UserId == Guid.Parse(userId) &&
+                                      urr.Release.Publication.IsLatestVersionOfRelease(urr.Release.Id))
+                        .Select(x => new UserReleaseRoleViewModel
+                        {
+                            Id = x.Id,
+                            Publication = _contentDbContext.Publications
+                                .Where(p => p.Releases.Any(r => r.Id == x.ReleaseId))
+                                .Select(p => new IdTitlePair {Id = p.Id, Title = p.Title}).FirstOrDefault(),
+                            Release = _contentDbContext.Releases
+                                .Where(r => r.Id == x.ReleaseId)
+                                .Select(r => new IdTitlePair {Id = r.Id, Title = r.Title}).FirstOrDefault(),
+                            ReleaseRole = new EnumExtensions.EnumValue {Name = x.Role.GetEnumLabel(), Value = 0}
+                        })
+                        .ToList()
+                        .OrderBy(x => x.Publication.Title)
+                        .ThenBy(x => x.Release.Title)
+                        .ToList();
 
                     return new UserViewModel
                     {
@@ -217,7 +251,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Services
                         Name = user.FirstName + " " + user.LastName,
                         Email = user.Email,
                         Role = GetUserRoleId(user.Id),
-                        UserReleaseRoles = userReleaseRoles.IsRight ? userReleaseRoles.Right : null
+                        UserReleaseRoles = userReleaseRoles
                     };
                 });
         }
@@ -320,67 +354,11 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Services
                 });
         }
 
-        public async Task<Either<ActionResult, List<UserReleaseRoleViewModel>>> GetUserReleaseRoles(string userId)
-        {
-            return await _userService
-                .CheckCanManageAllUsers()
-                .OnSuccess(_ =>
-                {
-                    return _contentDbContext.UserReleaseRoles
-                        .Include(urr => urr.Release)
-                        .ThenInclude(r => r.Publication)
-                        .ToList()
-                        .Where(urr => urr.UserId == Guid.Parse(userId) &&
-                                      IsLatestVersionOfRelease(urr.Release.Publication.Releases, urr.Release.Id))
-                        .Select(x => new UserReleaseRoleViewModel
-                        {
-                            Id = x.Id,
-                            Publication = _contentDbContext.Publications
-                                .Where(p => p.Releases.Any(r => r.Id == x.ReleaseId))
-                                .Select(p => new IdTitlePair {Id = p.Id, Title = p.Title}).FirstOrDefault(),
-                            Release = _contentDbContext.Releases
-                                .Where(r => r.Id == x.ReleaseId)
-                                .Select(r => new IdTitlePair {Id = r.Id, Title = r.Title}).FirstOrDefault(),
-                            ReleaseRole = new EnumExtensions.EnumValue {Name = x.Role.GetEnumLabel(), Value = 0}
-                        })
-                        .ToList()
-                        .OrderBy(x => x.Publication.Title)
-                        .ThenBy(x => x.Release.Title)
-                        .ToList();
-                });
-        }
-
-        private async Task<UserReleaseRoleViewModel> GetUserReleaseRole(Guid userReleaseRoleId)
-        {
-            return await _contentDbContext.UserReleaseRoles
-                .Where(x => x.Id == userReleaseRoleId)
-                .Select(x => new UserReleaseRoleViewModel
-                {
-                    Id = x.Id,
-                    Publication = _contentDbContext.Publications
-                        .Where(p => p.Releases.Any(r => r.Id == x.ReleaseId))
-                        .Select(p => new IdTitlePair {Id = p.Id, Title = p.Title}).FirstOrDefault(),
-                    Release = _contentDbContext.Releases
-                        .Where(r => r.Id == x.ReleaseId)
-                        .Select(r => new IdTitlePair {Id = r.Id, Title = r.Title}).FirstOrDefault(),
-                    ReleaseRole = new EnumExtensions.EnumValue {Name = x.Role.GetEnumLabel(), Value = 0}
-                }).FirstOrDefaultAsync();
-        }
-
         private string GetRoleName(string roleId)
         {
             var userRole = _usersAndRolesDbContext.Roles.FirstOrDefault(r => r.Id == roleId);
 
             return userRole?.Name;
-        }
-
-        private string GetUserRoleName(string userId)
-        {
-            var userRole = _usersAndRolesDbContext.UserRoles.FirstOrDefault(r => r.UserId == userId);
-
-            return userRole == null
-                ? null
-                : _usersAndRolesDbContext.Roles.FirstOrDefault(r => r.Id == userRole.RoleId)?.Name;
         }
 
         private string GetUserRoleId(string userId)
@@ -401,8 +379,8 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Services
             _emailService.SendEmail(email, template, emailValues);
         }
 
-        private void SendNewReleaseRoleEmail(Guid userId, IdTitlePair publication, IdTitlePair release,
-            EnumExtensions.EnumValue role)
+        private void SendNewReleaseRoleEmail(Guid userId, Release release,
+            ReleaseRole role)
         {
             var uri = _configuration.GetValue<string>("AdminUri");
             var template = _configuration.GetValue<string>("NotifyReleaseRoleTemplateId");
@@ -410,12 +388,12 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Services
                 .First(x => x.Id == userId.ToString())
                 .Email;
 
-            var link = (role.Name == ReleaseRole.PrereleaseViewer.GetEnumLabel() ? "prerelease " : "summary");
+            var link = (role == ReleaseRole.PrereleaseViewer ? "prerelease " : "summary");
             var emailValues = new Dictionary<string, dynamic>
             {
-                {"url", $"https://{uri}/publication/{publication.Id}/release/{release.Id}/{link}"},
-                {"role", role.Name},
-                {"publication", publication.Title},
+                {"url", $"https://{uri}/publication/{release.Publication.Id}/release/{release.Id}/{link}"},
+                {"role", role.ToString()},
+                {"publication", release.Publication.Title},
                 {"release", release.Title}
             };
 
@@ -435,11 +413,6 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Services
             }
 
             return true;
-        }
-
-        private static bool IsLatestVersionOfRelease(IEnumerable<Release> releases, Guid releaseId)
-        {
-            return !releases.Any(r => r.PreviousVersionId == releaseId && r.Id != releaseId);
         }
     }
 }

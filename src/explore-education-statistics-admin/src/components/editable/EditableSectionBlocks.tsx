@@ -7,8 +7,10 @@ import { useEditingContext } from '@admin/contexts/EditingContext';
 import { EditableBlock } from '@admin/services/types/content';
 import InsetText from '@common/components/InsetText';
 import reorder from '@common/utils/reorder';
-import React, { Fragment, ReactNode, useCallback } from 'react';
 import { DragDropContext, DropResult } from 'react-beautiful-dnd';
+import classNames from 'classnames';
+import React, { Fragment, ReactNode, useCallback, useState } from 'react';
+import styles from './EditableSectionBlocks.module.scss';
 
 export interface EditableSectionBlockProps<
   T extends EditableBlock = EditableBlock
@@ -34,6 +36,8 @@ const EditableSectionBlocks = <T extends EditableBlock = EditableBlock>({
   onBlockCommentsChange,
 }: EditableSectionBlockProps<T>) => {
   const { isEditing } = useEditingContext();
+
+  const [openedCommentIds, setOpenedCommentIds] = useState<string[]>([]);
 
   const handleDragEnd = useCallback(
     ({ source, destination }: DropResult) => {
@@ -80,7 +84,9 @@ const EditableSectionBlocks = <T extends EditableBlock = EditableBlock>({
           <div
             key={block.id}
             id={`editableSectionBlocks-${block.id}`}
-            className="govuk-!-margin-bottom-9"
+            className={classNames('govuk-!-margin-bottom-9', {
+              [styles.openSectionBlock]: openedCommentIds.includes(block.id),
+            })}
             data-testid="editableSectionBlock"
           >
             <BlockDraggable
@@ -96,6 +102,13 @@ const EditableSectionBlocks = <T extends EditableBlock = EditableBlock>({
                   comments={block.comments}
                   canComment
                   onChange={handleCommentsChange}
+                  onToggle={opened =>
+                    opened
+                      ? setOpenedCommentIds([block.id, ...openedCommentIds])
+                      : setOpenedCommentIds(
+                          openedCommentIds.filter(id => id !== block.id),
+                        )
+                  }
                 />
               )}
 

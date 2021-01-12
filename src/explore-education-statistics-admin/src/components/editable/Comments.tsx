@@ -32,6 +32,7 @@ interface Props {
   comments: Comment[];
   canComment?: boolean;
   onChange: CommentsChangeHandler;
+  onToggle?: (opened: boolean) => void;
 }
 
 const Comments = ({
@@ -39,10 +40,10 @@ const Comments = ({
   sectionId,
   comments = [],
   onChange,
+  onToggle,
   canComment = true,
 }: Props) => {
   const [editingComment, setEditingComment] = useState<Comment>();
-
   const { user } = useAuthContext();
   const { releaseId } = useManageReleaseContext();
 
@@ -99,6 +100,7 @@ const Comments = ({
   return (
     <div className={styles.container}>
       <Details
+        onToggle={isOpen => onToggle && onToggle(isOpen)}
         className="govuk-!-margin-bottom-1 govuk-body-s"
         summary={`${canComment ? `Add / ` : ''}View comments (${
           comments.length
