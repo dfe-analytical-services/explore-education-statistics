@@ -27,8 +27,8 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Services
 
         public IEnumerable<Observation> FindObservations(ObservationQueryContext query)
         {
-            var stopwatch = Stopwatch.StartNew();
-            stopwatch.Start();
+            var totalStopwatch = Stopwatch.StartNew();
+            var phasesStopwatch = Stopwatch.StartNew();
 
             var locationsQuery = query.Locations;
             
@@ -109,41 +109,36 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Services
                     planningAreaListParam,
                     filterItemListParam);
 
-            _logger.LogTrace("Executed inner stored procedure in {Time} ms", stopwatch.Elapsed.TotalMilliseconds);
-            stopwatch.Restart();
+            _logger.LogDebug($"Executed FilteredObservations stored procedure in {phasesStopwatch.Elapsed.Milliseconds} ms");
+            phasesStopwatch.Restart();
 
             var ids = inner.Select(obs => obs.Id).ToArray();
 
-            _logger.LogTrace("Fetched Observation id's from inner result in {Time} ms", stopwatch.Elapsed.TotalMilliseconds);
-            stopwatch.Restart();
+            _logger.LogDebug($"Fetched {ids.Length} Observation ids from inner result in {phasesStopwatch.Elapsed.Milliseconds} ms");
+            phasesStopwatch.Restart();
+            
+            var observations = _context
+                .Observation
+                .AsNoTracking()
+                .Include(o => o.FilterItems)
+                .Where(o => ids.Contains(o.Id))
+                .ToList();
 
-            var batches = ids.Batch(10000);
+            var locationIds = observations
+                .Select(o => o.LocationId);
+            
+            var locations = _context
+                .Location
+                .AsNoTracking()
+                .Where(l => locationIds.Contains(l.Id))
+                .ToDictionary(l => l.Id);
 
-            var result = new List<Observation>();
+            observations.ForEach(o => o.Location = locations[o.LocationId]);
 
-            foreach (var batch in batches)
-            {
-                result.AddRange(DbSet()
-                    .AsNoTracking()
-                    .Where(observation => batch.Contains(observation.Id))
-                    .Include(observation => observation.FilterItems)
-                    .ThenInclude(item => item.FilterItem.FilterGroup.Filter));
-
-                // load of the Location owned entities is removed from the query above as it was generating
-                // very inefficient sql.
-                var locationIds = result.Select(o => o.LocationId);
-                var locations = _context.Location.AsNoTracking().Where(l => locationIds.Contains(l.Id));
-                result.ForEach(observation =>
-                    {
-                        observation.Location = locations.SingleOrDefault(l => l.Id == observation.LocationId);
-                    });
-            }
-
-            _logger.LogTrace("Fetched Observations by id from {Count} batches in {Time} ms", batches.Count(),
-                stopwatch.Elapsed.TotalMilliseconds);
-            stopwatch.Stop();
-
-            return result;
+            _logger.LogDebug($"Finished fetching {observations.Count} Observations in a total of {totalStopwatch.Elapsed.Milliseconds} ms");
+            phasesStopwatch.Stop();
+            
+            return observations;
         }
 
         public IEnumerable<Observation> FindObservations(SubjectMetaQueryContext query)
@@ -151,9 +146,6 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Services
             return DbSet()
                 .AsNoTracking()
                 .Include(observation => observation.FilterItems)
-                .ThenInclude(filterItem => filterItem.FilterItem)
-                .ThenInclude(filterItem => filterItem.FilterGroup)
-                .ThenInclude(filterGroup => filterGroup.Filter)
                 .Where(ObservationPredicateBuilder.Build(query));
         }
 
