@@ -124,6 +124,9 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Services
                 .Where(o => ids.Contains(o.Id))
                 .ToList();
 
+            _logger.LogDebug($"Fetched {ids.Length} Observations from their ids in {phasesStopwatch.Elapsed.Milliseconds} ms");
+            phasesStopwatch.Restart();
+
             var locationIds = observations
                 .Select(o => o.LocationId);
             
@@ -135,7 +138,11 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Services
 
             observations.ForEach(o => o.Location = locations[o.LocationId]);
 
+            _logger.LogDebug($"Assigned Locations to {ids.Length} Observations in {phasesStopwatch.Elapsed.Milliseconds} ms");
+            phasesStopwatch.Restart();
+
             _logger.LogDebug($"Finished fetching {observations.Count} Observations in a total of {totalStopwatch.Elapsed.Milliseconds} ms");
+            totalStopwatch.Stop();
             phasesStopwatch.Stop();
             
             return observations;
