@@ -127,6 +127,8 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Services
             _logger.LogDebug($"Fetched {ids.Length} Observations from their ids in {phasesStopwatch.Elapsed.Milliseconds} ms");
             phasesStopwatch.Restart();
 
+            // Load of the Location owned entities is removed from the Observation fetching code above as another
+            // "Include" as it was generating very inefficient sql.	
             var locationIds = observations
                 .Select(o => o.LocationId);
             
