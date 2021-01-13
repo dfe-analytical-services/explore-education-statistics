@@ -116,7 +116,6 @@ export type ReleaseChecklistError =
         | 'DataFileImportsMustBeCompleted'
         | 'DataFileReplacementsMustBeCompleted'
         | 'PublicMetaGuidanceRequired'
-        | 'PublicPreReleaseAccessListRequired'
         | 'ReleaseNoteRequired';
     }
   | {
@@ -130,7 +129,8 @@ export type ReleaseChecklistWarning =
         | 'NoMethodology'
         | 'NoNextReleaseDate'
         | 'NoDataFiles'
-        | 'NoTableHighlights';
+        | 'NoTableHighlights'
+        | 'NoPublicPreReleaseAccessList';
     }
   | {
       code: 'NoFootnotesOnSubjects';

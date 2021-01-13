@@ -48,7 +48,6 @@ describe('ReleaseStatusChecklist', () => {
                 methodologyId: 'methodology-1',
               },
               { code: 'PublicMetaGuidanceRequired' },
-              { code: 'PublicPreReleaseAccessListRequired' },
               { code: 'ReleaseNoteRequired' },
             ],
           }}
@@ -65,7 +64,7 @@ describe('ReleaseStatusChecklist', () => {
       screen.queryByRole('heading', { name: 'Warnings' }),
     ).not.toBeInTheDocument();
 
-    expect(screen.getByText('6 issues')).toBeInTheDocument();
+    expect(screen.getByText('5 issues')).toBeInTheDocument();
 
     expect(
       screen.getByRole('link', {
@@ -102,15 +101,6 @@ describe('ReleaseStatusChecklist', () => {
 
     expect(
       screen.getByRole('link', {
-        name: 'Public pre-release access list is required',
-      }),
-    ).toHaveAttribute(
-      'href',
-      '/publication/publication-1/release/release-1/prerelease-access#preReleaseAccess-publicList',
-    );
-
-    expect(
-      screen.getByRole('link', {
         name: 'Public release note for this amendment is required',
       }),
     ).toHaveAttribute(
@@ -131,6 +121,7 @@ describe('ReleaseStatusChecklist', () => {
               { code: 'NoFootnotesOnSubjects', totalSubjects: 3 },
               { code: 'NoTableHighlights' },
               { code: 'NoDataFiles' },
+              { code: 'NoPublicPreReleaseAccessList' },
             ],
             errors: [],
           }}
@@ -149,7 +140,7 @@ describe('ReleaseStatusChecklist', () => {
       screen.getByRole('heading', { name: 'Warnings' }),
     ).toBeInTheDocument();
 
-    expect(screen.getByText('5 potential issues')).toBeInTheDocument();
+    expect(screen.getByText('6 potential issues')).toBeInTheDocument();
 
     expect(
       screen.getByRole('link', {
@@ -188,6 +179,15 @@ describe('ReleaseStatusChecklist', () => {
     ).toHaveAttribute(
       'href',
       '/publication/publication-1/release/release-1/data#data-uploads',
+    );
+
+    expect(
+      screen.getByRole('link', {
+        name: 'No public pre-release access list',
+      }),
+    ).toHaveAttribute(
+      'href',
+      '/publication/publication-1/release/release-1/prerelease-access#preReleaseAccess-publicList',
     );
   });
 
