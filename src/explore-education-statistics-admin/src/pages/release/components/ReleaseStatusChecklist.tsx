@@ -82,14 +82,6 @@ const ReleaseStatusChecklist = ({ checklist, release }: Props) => {
               releaseRouteParams,
             )}#${releaseDataPageTabIds.metaGuidance}`,
           };
-        case 'PublicPreReleaseAccessListRequired':
-          return {
-            message: 'Public pre-release access list is required',
-            link: `${generatePath<ReleaseRouteParams>(
-              releasePreReleaseAccessRoute.path,
-              releaseRouteParams,
-            )}#${releasePreReleaseAccessPageTabs.publicAccessList}`,
-          };
         case 'ReleaseNoteRequired':
           return {
             message: 'Public release note for this amendment is required',
@@ -149,6 +141,14 @@ const ReleaseStatusChecklist = ({ checklist, release }: Props) => {
               releaseDataBlocksRoute.path,
               releaseRouteParams,
             ),
+          };
+        case 'NoPublicPreReleaseAccessList':
+          return {
+            message: 'No public pre-release access list',
+            link: `${generatePath<ReleaseRouteParams>(
+              releasePreReleaseAccessRoute.path,
+              releaseRouteParams,
+            )}#${releasePreReleaseAccessPageTabs.publicAccessList}`,
           };
         default:
           // Show warning code, even if there is no mapping,

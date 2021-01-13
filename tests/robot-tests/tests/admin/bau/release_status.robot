@@ -40,21 +40,23 @@ Go to release sign off page
     user clicks link  Sign off
     user waits until h2 is visible  Sign off
 
-Verify release checklist with errors
+Verify initial release checklist
     [Tags]  HappyPath
     user clicks button  Edit release status
     user waits until h2 is visible  Edit release status
 
-    user waits until page contains testid  releaseChecklist-errors
-    user checks checklist errors contains  1 issue that must be resolved before this release can be published
-    user checks checklist errors contains link  Public pre-release access list is required
+    # EES-1807 May be re-instated as error pending further decisions on release types
+#    user waits until page contains testid  releaseChecklist-errors
+#    user checks checklist errors contains  1 issue that must be resolved before this release can be published
+#    user checks checklist errors contains link  Public pre-release access list is required
 
     user waits until page contains testid  releaseChecklist-warnings
-    user checks checklist warnings contains  3 potential issues that do not need to be resolved to publish this release
+    user checks checklist warnings contains  4 potential issues that do not need to be resolved to publish this release
     user checks checklist warnings contains link  No methodology attached to publication
     user checks checklist warnings contains link  No next release expected date
     user checks checklist warnings contains link  No data files uploaded
 
+    user checks page does not contain testid  releaseChecklist-errors
     user checks page does not contain testid  releaseChecklist-success
 
 Submit release for Higher Review
@@ -72,28 +74,32 @@ Verify release status is Higher Review
     user checks summary list contains  Scheduled release  Not scheduled
     user checks summary list contains  Next release expected  December 3001
 
-Verify updated release checklist
+Verify release checklist has not been updated by status
     [Tags]  HappyPath
     user clicks button  Edit release status
     user waits until h2 is visible  Edit release status
 
-    user waits until page contains testid  releaseChecklist-errors
-    user checks checklist errors contains  1 issue that must be resolved before this release can be published
-    user checks checklist errors contains link  Public pre-release access list is required
+    # EES-1807 May be re-instated as error pending further decisions on release types
+#    user waits until page contains testid  releaseChecklist-errors
+#    user checks checklist errors contains  1 issue that must be resolved before this release can be published
+#    user checks checklist errors contains link  Public pre-release access list is required
 
     user waits until page contains testid  releaseChecklist-warnings
-    user checks checklist warnings contains  2 potential issues that do not need to be resolved to publish this release
+    user checks checklist warnings contains  3 potential issues that do not need to be resolved to publish this release
     user checks checklist warnings contains link  No methodology attached to publication
     user checks checklist warnings contains link  No data files uploaded
+    # EES-1807 May be re-instated as error pending further decisions on release types
+    user checks checklist warnings contains link  No public pre-release access list
 
+    user checks page does not contain testid  releaseChecklist-errors
     user checks page does not contain testid  releaseChecklist-success
 
 Add public prerelease access list via release checklist
     [Tags]  HappyPath
-    user clicks link  Public pre-release access list is required
+    user clicks link  No public pre-release access list
     user creates public prerelease access list   Test public access list
 
-Verify release checklist does not contain errors
+Verify release checklist has been updated
     [Tags]  HappyPath
     user clicks link  Sign off
     user clicks button  Edit release status
