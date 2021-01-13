@@ -13,7 +13,6 @@ import { TableHeadersConfig } from '@common/modules/table-tool/types/tableHeader
 import { TableDataResult } from '@common/services/tableBuilderService';
 import cartesian from '@common/utils/cartesian';
 import formatPretty from '@common/utils/number/formatPretty';
-import camelCase from 'lodash/camelCase';
 import last from 'lodash/last';
 import React, { forwardRef, memo } from 'react';
 import DataTableCaption from './DataTableCaption';
@@ -106,7 +105,7 @@ const TimePeriodDataTableInternal = forwardRef<HTMLElement, Props>(
                 }
 
                 if (filter instanceof LocationFilter) {
-                  const geographicLevel = camelCase(result.geographicLevel);
+                  const { geographicLevel } = result;
 
                   return (
                     result.location[geographicLevel] &&

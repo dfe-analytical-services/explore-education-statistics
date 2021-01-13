@@ -358,7 +358,7 @@ export const testMapTableData: TableDataResponse = {
   results: [
     {
       filters: ['characteristic-total', 'school-type-total'],
-      geographicLevel: 'LocalAuthorityDistrict',
+      geographicLevel: 'localAuthorityDistrict',
       location: {
         country: { code: 'E92000001', name: 'England' },
         localAuthority: { code: '383', name: 'Leeds' },
@@ -374,7 +374,7 @@ export const testMapTableData: TableDataResponse = {
     },
     {
       filters: ['characteristic-total', 'school-type-total'],
-      geographicLevel: 'LocalAuthorityDistrict',
+      geographicLevel: 'localAuthorityDistrict',
       location: {
         country: { code: 'E92000001', name: 'England' },
         localAuthority: { code: '352', name: 'Manchester' },
@@ -390,7 +390,7 @@ export const testMapTableData: TableDataResponse = {
     },
     {
       filters: ['characteristic-total', 'school-type-total'],
-      geographicLevel: 'LocalAuthorityDistrict',
+      geographicLevel: 'localAuthorityDistrict',
       location: {
         country: { code: 'E92000001', name: 'England' },
         localAuthority: { code: '373', name: 'Sheffield' },

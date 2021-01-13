@@ -7,7 +7,6 @@ import {
 } from '@common/modules/table-tool/types/filters';
 import { FullTable } from '@common/modules/table-tool/types/fullTable';
 import cartesian from '@common/utils/cartesian';
-import camelCase from 'lodash/camelCase';
 import React from 'react';
 import { utils, writeFile } from 'xlsx';
 
@@ -44,7 +43,7 @@ export const getCsvData = (fullTable: FullTable): string[][] => {
 
       const indicatorCells = indicators.map(indicator => {
         const matchingResult = results.find(result => {
-          const geographicLevel = camelCase(result.geographicLevel);
+          const { geographicLevel } = result;
 
           return (
             filterOptions.every(filter =>
