@@ -98,7 +98,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
 
                 Assert.False(checklist.Right.Valid);
 
-                Assert.Equal(6, checklist.Right.Errors.Count);
+                Assert.Equal(5, checklist.Right.Errors.Count);
 
                 Assert.Equal(DataFileImportsMustBeCompleted, checklist.Right.Errors[0].Code);
                 Assert.Equal(DataFileReplacementsMustBeCompleted, checklist.Right.Errors[1].Code);
@@ -109,8 +109,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
                 Assert.Equal(publication.MethodologyId, methodologyMustBeApprovedError.MethodologyId);
 
                 Assert.Equal(PublicMetaGuidanceRequired, checklist.Right.Errors[3].Code);
-                Assert.Equal(PublicPreReleaseAccessListRequired, checklist.Right.Errors[4].Code);
-                Assert.Equal(ReleaseNoteRequired, checklist.Right.Errors[5].Code);
+                Assert.Equal(ReleaseNoteRequired, checklist.Right.Errors[4].Code);
             }
         }
 
@@ -160,10 +159,11 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
 
                 Assert.False(checklist.Right.Valid);
 
-                Assert.Equal(3, checklist.Right.Warnings.Count);
+                Assert.Equal(4, checklist.Right.Warnings.Count);
                 Assert.Equal(NoMethodology, checklist.Right.Warnings[0].Code);
                 Assert.Equal(NoNextReleaseDate, checklist.Right.Warnings[1].Code);
                 Assert.Equal(NoDataFiles, checklist.Right.Warnings[2].Code);
+                Assert.Equal(NoPublicPreReleaseAccessList, checklist.Right.Warnings[3].Code);
             }
         }
 
@@ -269,7 +269,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
 
                 Assert.False(checklist.Right.Valid);
 
-                Assert.Equal(4, checklist.Right.Warnings.Count);
+                Assert.Equal(5, checklist.Right.Warnings.Count);
                 Assert.Equal(NoMethodology, checklist.Right.Warnings[0].Code);
                 Assert.Equal(NoNextReleaseDate, checklist.Right.Warnings[1].Code);
 
@@ -278,6 +278,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
                 Assert.Equal(1, noFootnotesWarning.TotalSubjects);
 
                 Assert.Equal(NoTableHighlights, checklist.Right.Warnings[3].Code);
+                Assert.Equal(NoPublicPreReleaseAccessList, checklist.Right.Warnings[4].Code);
             }
         }
 

@@ -153,7 +153,6 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Validators
         DataFileReplacementsMustBeCompleted,
         ReleaseNoteRequired,
         PublicMetaGuidanceRequired,
-        PublicPreReleaseAccessListRequired,
 
         // Release checklist warnings
         NoMethodology,
@@ -161,5 +160,6 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Validators
         NoDataFiles,
         NoFootnotesOnSubjects,
         NoTableHighlights,
+        NoPublicPreReleaseAccessList,
     }
 }
