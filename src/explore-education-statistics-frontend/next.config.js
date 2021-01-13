@@ -130,7 +130,15 @@ const nextConfig = {
 };
 
 module.exports = compose(
-  withTranspileModules(['explore-education-statistics-common', '@common']),
+  withTranspileModules([
+    'explore-education-statistics-common',
+    // Need to add explicit dependencies as they
+    // may be un-transpiled (ES6+) and cause
+    // IE11 to throw syntax errors.
+    'sanitize-html',
+    'sanitize-html/node_modules',
+    'nanoid',
+  ]),
   withFonts,
   withImages,
   withESLint,
