@@ -19,7 +19,6 @@ import { Reducer } from 'use-immer';
 export interface ChartOptions extends ChartDefinitionOptions {
   file?: File;
   fileId?: string;
-  geographicId?: string;
 }
 
 export interface ChartBuilderState {

@@ -215,7 +215,6 @@ export interface MapBlockProps extends ChartProps {
   id: string;
   position?: { lat: number; lng: number };
   maxBounds?: LatLngBounds;
-  geographicId?: string;
   legend: LegendConfiguration;
   axes: {
     major: AxisConfiguration;

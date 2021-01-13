@@ -2,7 +2,7 @@ import ChartBuilderSaveActions from '@admin/pages/release/datablocks/components/
 import { useChartBuilderFormsContext } from '@admin/pages/release/datablocks/components/chart/contexts/ChartBuilderFormsContext';
 import { ChartOptions } from '@admin/pages/release/datablocks/components/chart/reducers/chartBuilderReducer';
 import Effect from '@common/components/Effect';
-import { Form, FormFieldSelect, FormGroup } from '@common/components/form';
+import { Form, FormGroup, FormSelect } from '@common/components/form';
 import FormFieldCheckbox from '@common/components/form/FormFieldCheckbox';
 import FormFieldFileInput from '@common/components/form/FormFieldFileInput';
 import FormFieldNumberInput from '@common/components/form/FormFieldNumberInput';
@@ -44,6 +44,7 @@ const replaceNewLines = (event: ChangeEvent<HTMLTextAreaElement>) => {
 };
 
 interface Props {
+  boundaryLevel?: number;
   buttons?: ReactNode;
   chartOptions: ChartOptions;
   definition: ChartDefinition;
@@ -57,6 +58,7 @@ interface Props {
 const formId = 'chartConfigurationForm';
 
 const ChartConfiguration = ({
+  boundaryLevel,
   buttons,
   chartOptions,
   definition,
@@ -254,35 +256,27 @@ const ChartConfiguration = ({
             )}
 
             {definition.type === 'map' && meta.boundaryLevels && (
-              <>
-                {meta.boundaryLevels.length === 1 && (
-                  <div>
-                    Using <em>{meta.boundaryLevels[0].label}</em>
-                  </div>
-                )}
-                {meta.boundaryLevels.length > 1 && (
-                  <FormGroup>
-                    <FormFieldSelect<FormValues>
-                      id={`${formId}-geographicId`}
-                      label="Select a version of geographical data to use"
-                      name="geographicId"
-                      order={[]}
-                      options={[
-                        { label: 'Latest', value: '' },
-                        ...meta.boundaryLevels.map(({ id, label }) => ({
-                          value: id,
-                          label,
-                        })),
-                      ]}
-                      onChange={e => {
-                        if (onBoundaryLevelChange) {
-                          onBoundaryLevelChange(e.target.value);
-                        }
-                      }}
-                    />
-                  </FormGroup>
-                )}
-              </>
+              <FormGroup>
+                <FormSelect
+                  id={`${formId}-boundaryLevel`}
+                  label="Select a version of geographical data to use"
+                  name="boundaryLevel"
+                  order={[]}
+                  value={boundaryLevel?.toString()}
+                  options={[
+                    { label: 'Latest', value: '' },
+                    ...meta.boundaryLevels.map(({ id, label }) => ({
+                      value: id,
+                      label,
+                    })),
+                  ]}
+                  onChange={e => {
+                    if (onBoundaryLevelChange) {
+                      onBoundaryLevelChange(e.target.value);
+                    }
+                  }}
+                />
+              </FormGroup>
             )}
 
             <ChartBuilderSaveActions formId={formId} formKey="options">
