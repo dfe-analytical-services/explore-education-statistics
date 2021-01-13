@@ -225,18 +225,18 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Services
                                             dataFormFile.FileName.ToLower(),
                                             validSubjectName);
 
-                                        var dataFile = await _fileRepository.Create(
+                                        var dataFile = await _fileRepository.CreateDataOrMetadata(
                                             releaseId: releaseId,
+                                            subjectId: subjectId,
                                             filename: dataFormFile.FileName.ToLower(),
                                             type: FileType.Data,
-                                            replacingFile: replacingFile,
-                                            subjectId: subjectId);
+                                            replacingFile: replacingFile);
 
-                                        var metaFile = await _fileRepository.Create(
+                                        var metaFile = await _fileRepository.CreateDataOrMetadata(
                                             releaseId: releaseId,
+                                            subjectId: subjectId,
                                             filename: metaFormFile.FileName.ToLower(),
-                                            type: Metadata,
-                                            subjectId: subjectId);
+                                            type: Metadata);
 
                                         var dataInfo = GetDataFileMetaValues(
                                             name: validSubjectName,
@@ -328,20 +328,20 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Services
                                                         filename: zipFormFile.FileName.ToLower(),
                                                         releaseId: releaseId);
 
-                                                    var dataFile = await _fileRepository.Create(
+                                                    var dataFile = await _fileRepository.CreateDataOrMetadata(
                                                         releaseId: releaseId,
+                                                        subjectId: subjectId,
                                                         filename: archiveFile.DataFileName,
                                                         type: FileType.Data,
                                                         replacingFile: replacingFile,
-                                                        source: zipFile,
-                                                        subjectId: subjectId);
+                                                        source: zipFile);
 
-                                                    var metaFile = await _fileRepository.Create(
+                                                    var metaFile = await _fileRepository.CreateDataOrMetadata(
                                                         releaseId: releaseId,
+                                                        subjectId: subjectId,
                                                         filename: archiveFile.MetaFileName,
                                                         type: Metadata,
-                                                        source: zipFile,
-                                                        subjectId: subjectId);
+                                                        source: zipFile);
 
                                                     await UploadFileToStorage(zipFile, zipFormFile, dataInfo);
 
