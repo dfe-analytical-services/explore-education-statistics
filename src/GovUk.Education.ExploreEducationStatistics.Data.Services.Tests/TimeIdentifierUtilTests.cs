@@ -157,5 +157,15 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Services.Tests
                 SummerTerm
             }, TimeIdentifierUtil.GetTerms());
         }
+
+        [Fact]
+        public void GetFinancialYearPartsReturnsFinancialYearParts()
+        {
+            Assert.Equal(new[]
+            {
+                FinancialYearPart1,
+                FinancialYearPart2
+            }, TimeIdentifierUtil.GetFinancialYearParts());
+        }
     }
 }

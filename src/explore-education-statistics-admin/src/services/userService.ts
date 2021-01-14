@@ -34,7 +34,6 @@ export interface UserInvite {
 }
 
 export interface UserUpdate {
-  id: string;
   roleId: string;
 }
 
@@ -70,7 +69,7 @@ export interface UsersService {
   getInvitedUsers(): Promise<UserStatus[]>;
   inviteUser: (invite: UserInvite) => Promise<boolean>;
   cancelInvite: (email: string) => Promise<boolean>;
-  updateUser: (user: UserUpdate) => Promise<boolean>;
+  updateUser: (userId: string, update: UserUpdate) => Promise<boolean>;
 }
 
 const userService: UsersService = {
@@ -91,8 +90,8 @@ const userService: UsersService = {
   getUser(userId: string): Promise<User> {
     return client.get<User>(`/user-management/users/${userId}`);
   },
-  updateUser(user: UserUpdate): Promise<boolean> {
-    return client.put(`/user-management/users/${user.id}`, user);
+  updateUser(userId: string, update: UserUpdate): Promise<boolean> {
+    return client.put(`/user-management/users/${userId}`, update);
   },
 
   addUserReleaseRole(

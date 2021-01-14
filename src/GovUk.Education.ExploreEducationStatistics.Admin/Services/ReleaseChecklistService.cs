@@ -101,11 +101,6 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Services
                 errors.Add(new ReleaseChecklistIssue(ValidationErrorMessages.PublicMetaGuidanceRequired));
             }
 
-            if (release.PreReleaseAccessList.IsNullOrEmpty())
-            {
-                errors.Add(new ReleaseChecklistIssue(ValidationErrorMessages.PublicPreReleaseAccessListRequired));
-            }
-
             if (release.Amendment && release.Updates.All(update => update.ReleaseId != release.Id))
             {
                 errors.Add(new ReleaseChecklistIssue(ValidationErrorMessages.ReleaseNoteRequired));
@@ -164,6 +159,11 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Services
                 {
                     warnings.Add(new ReleaseChecklistIssue(ValidationErrorMessages.NoTableHighlights));
                 }
+            }
+
+            if (release.PreReleaseAccessList.IsNullOrEmpty())
+            {
+                warnings.Add(new ReleaseChecklistIssue(ValidationErrorMessages.NoPublicPreReleaseAccessList));
             }
 
             return warnings;
