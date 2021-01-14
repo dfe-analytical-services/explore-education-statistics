@@ -51,6 +51,12 @@ const ReleasePreReleaseAccessPage = () => {
                 preview will show a holding page until 24 hours before the
                 scheduled publication date.
               </p>
+              <p>
+                Pre-release access via Explore Education Statistics is currently
+                limited to DFE users only, if you need to share your release
+                with external users you will need to do so outside of the
+                system.
+              </p>
             </InsetText>
 
             {!release.live && (
