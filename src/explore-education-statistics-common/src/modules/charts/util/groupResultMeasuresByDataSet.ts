@@ -14,7 +14,7 @@ export function getIndicatorPath(dataSet: DataSet): string[] {
   return compact([locationKey, timePeriod, ...sortedFilters, indicator]);
 }
 
-interface MeasuresGroupedByDataSet {
+export interface MeasuresGroupedByDataSet {
   [location: string]: {
     // This will nest the more filters there are, so it's
     // not possible to know the data structure beyond this.

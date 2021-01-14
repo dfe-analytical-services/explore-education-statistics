@@ -1,5 +1,8 @@
 import ErrorBoundary from '@common/components/ErrorBoundary';
 import WarningMessage from '@common/components/WarningMessage';
+import { ExpandedDataSet } from '@common/modules/charts/types/dataSet';
+import { getIndicatorPath } from '@common/modules/charts/util/groupResultMeasuresByDataSet';
+import groupResultMeasuresByCombination from '@common/modules/table-tool/components/utils/groupResultMeasuresByCombination';
 import Header from '@common/modules/table-tool/components/utils/Header';
 import {
   CategoryFilter,
@@ -8,11 +11,15 @@ import {
   LocationFilter,
   TimePeriodFilter,
 } from '@common/modules/table-tool/types/filters';
-import { FullTable } from '@common/modules/table-tool/types/fullTable';
+import {
+  FullTable,
+  FullTableMeta,
+} from '@common/modules/table-tool/types/fullTable';
 import { TableHeadersConfig } from '@common/modules/table-tool/types/tableHeaders';
-import { TableDataResult } from '@common/services/tableBuilderService';
+import { Dictionary, PartialBy } from '@common/types';
 import cartesian from '@common/utils/cartesian';
 import formatPretty from '@common/utils/number/formatPretty';
+import get from 'lodash/get';
 import last from 'lodash/last';
 import React, { forwardRef, memo } from 'react';
 import DataTableCaption from './DataTableCaption';
@@ -29,22 +36,61 @@ class FilterGroup extends Filter {
   }
 }
 
-const getCellText = (
-  result: TableDataResult | undefined,
-  indicator: Indicator,
-): string => {
-  if (!result) {
+function getExcludedFilters(
+  tableHeadersConfig: TableHeadersConfig,
+  subjectMeta: FullTableMeta,
+): string[] {
+  const tableHeaderFilters = [
+    ...tableHeadersConfig.columnGroups.flatMap(filterGroup => filterGroup),
+    ...tableHeadersConfig.rowGroups.flatMap(filterGroup => filterGroup),
+    ...tableHeadersConfig.columns,
+    ...tableHeadersConfig.rows,
+  ].map(filter => filter.id);
+
+  const subjectMetaFilters = [
+    ...Object.values(subjectMeta.filters).flatMap(
+      filterGroup => filterGroup.options,
+    ),
+    ...subjectMeta.timePeriodRange,
+    ...subjectMeta.locations,
+    ...subjectMeta.indicators,
+  ].map(filter => filter.id);
+
+  return subjectMetaFilters.filter(
+    subjectMetaFilter => !tableHeaderFilters.includes(subjectMetaFilter),
+  );
+}
+
+function getCellText(
+  measuresByDataSet: Dictionary<unknown>,
+  dataSet: ExpandedDataSet,
+): string {
+  const { location, timePeriod, filters, indicator } = dataSet;
+
+  const path = getIndicatorPath({
+    filters: filters.map(filter => filter.value),
+    location: location
+      ? {
+          value: location.value,
+          level: location.level,
+        }
+      : undefined,
+    timePeriod: timePeriod?.value,
+    indicator: indicator?.value,
+  });
+
+  const value = get(measuresByDataSet, path);
+
+  if (typeof value === 'undefined') {
     return EMPTY_CELL_TEXT;
   }
-
-  const value = result.measures[indicator.value];
 
   if (Number.isNaN(Number(value))) {
     return value;
   }
 
   return formatPretty(value, indicator.unit, indicator.decimalPlaces);
-};
+}
 
 interface TableCell {
   text: string;
@@ -60,10 +106,10 @@ interface Props {
 }
 
 const TimePeriodDataTableInternal = forwardRef<HTMLElement, Props>(
-  (
+  function TimePeriodDataTableInternal(
     { fullTable, tableHeadersConfig, captionTitle, source }: Props,
     dataTableRef,
-  ) => {
+  ) {
     const { subjectMeta, results } = fullTable;
 
     if (results.length === 0) {
@@ -89,6 +135,14 @@ const TimePeriodDataTableInternal = forwardRef<HTMLElement, Props>(
     // as we want to remove empty ones later.
     const columnsWithText = columnHeadersCartesian.map(() => false);
 
+    const excludedFilters = getExcludedFilters(tableHeadersConfig, subjectMeta);
+    // Group measures by their respective combination of filters
+    // allowing lookups later on to be MUCH faster.
+    const measuresByDataSet = groupResultMeasuresByCombination(
+      results,
+      excludedFilters,
+    );
+
     const tableCartesian: TableCell[][] = rowHeadersCartesian.map(
       rowFilterCombination => {
         return columnHeadersCartesian.map(
@@ -98,39 +152,41 @@ const TimePeriodDataTableInternal = forwardRef<HTMLElement, Props>(
               ...columnFilterCombination,
             ];
 
-            const matchingResult = results.find(result => {
-              return filterCombination.every(filter => {
+            const dataSet = filterCombination.reduce<
+              PartialBy<ExpandedDataSet, 'indicator'>
+            >(
+              (acc, filter) => {
                 if (filter instanceof CategoryFilter) {
-                  return result.filters.includes(filter.value);
-                }
-
-                if (filter instanceof LocationFilter) {
-                  const { geographicLevel } = result;
-
-                  return (
-                    result.location[geographicLevel] &&
-                    result.location[geographicLevel].code === filter.value &&
-                    filter.level === geographicLevel
-                  );
+                  acc.filters.push(filter);
                 }
 
                 if (filter instanceof TimePeriodFilter) {
-                  return result.timePeriod === filter.value;
+                  acc.timePeriod = filter;
                 }
 
-                return filter instanceof Indicator;
-              });
-            });
+                if (filter instanceof LocationFilter) {
+                  acc.location = filter;
+                }
 
-            const indicator = filterCombination.find(
-              filter => filter instanceof Indicator,
-            ) as Indicator | undefined;
+                if (filter instanceof Indicator) {
+                  acc.indicator = filter;
+                }
 
-            if (!indicator) {
+                return acc;
+              },
+              {
+                filters: [],
+              },
+            );
+
+            if (!dataSet.indicator) {
               throw new Error('No indicator for filter combination');
             }
 
-            const text = getCellText(matchingResult, indicator);
+            const text = getCellText(
+              measuresByDataSet,
+              dataSet as ExpandedDataSet,
+            );
 
             // There is at least one cell in this
             // column that has a text value.
@@ -275,8 +331,6 @@ const TimePeriodDataTableInternal = forwardRef<HTMLElement, Props>(
     );
   },
 );
-
-TimePeriodDataTableInternal.displayName = 'TimePeriodDataTableInternal';
 
 const TimePeriodDataTable = forwardRef<HTMLElement, Props>((props, ref) => {
   return (

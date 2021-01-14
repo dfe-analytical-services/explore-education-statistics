@@ -254,9 +254,7 @@ describe('TimePeriodDataTable', () => {
             decimalPlaces: 1,
           },
         ],
-        locations: [
-          { value: 'E92000001', label: 'England', level: 'localAuthority' },
-        ],
+        locations: [{ value: 'E92000001', label: 'England', level: 'country' }],
         boundaryLevels: [],
         publicationName: 'Pupil absence in schools in England',
         subjectName: 'Absence in prus',
@@ -266,8 +264,8 @@ describe('TimePeriodDataTable', () => {
       results: [
         {
           filters: ['598ed9fd-b37e-4e08-baec-08d78f6f2c4d'],
-          geographicLevel: 'localAuthority',
-          location: { localAuthority: { code: 'E92000001', name: 'England' } },
+          geographicLevel: 'country',
+          location: { country: { code: 'E92000001', name: 'England' } },
           measures: { '6160c4f8-4c9f-40f0-a623-2a4f742860af': '18.3' },
           timePeriod: '2014_AY',
         },
@@ -285,7 +283,7 @@ describe('TimePeriodDataTable', () => {
           ],
         ],
         rowGroups: [
-          [{ value: 'E92000001', type: 'Location', level: 'localAuthority' }],
+          [{ value: 'E92000001', type: 'Location', level: 'country' }],
         ],
         columns: [{ value: '2014_AY', type: 'TimePeriod' }],
         rows: [
@@ -349,9 +347,7 @@ describe('TimePeriodDataTable', () => {
             decimalPlaces: 1,
           },
         ],
-        locations: [
-          { value: 'E92000001', label: 'England', level: 'localAuthority' },
-        ],
+        locations: [{ value: 'E92000001', label: 'England', level: 'country' }],
         boundaryLevels: [],
         publicationName: 'Pupil absence in schools in England',
         subjectName: 'Absence in prus',
@@ -361,8 +357,8 @@ describe('TimePeriodDataTable', () => {
       results: [
         {
           filters: [],
-          geographicLevel: 'localAuthority',
-          location: { localAuthority: { code: 'E92000001', name: 'England' } },
+          geographicLevel: 'country',
+          location: { country: { code: 'E92000001', name: 'England' } },
           measures: { '6160c4f8-4c9f-40f0-a623-2a4f742860af': '18.3' },
           timePeriod: '2014_AY',
         },
@@ -373,7 +369,7 @@ describe('TimePeriodDataTable', () => {
       {
         columnGroups: [],
         rowGroups: [
-          [{ value: 'E92000001', level: 'localAuthority', type: 'Location' }],
+          [{ value: 'E92000001', level: 'country', type: 'Location' }],
         ],
         columns: [{ value: '2014_AY', type: 'TimePeriod' }],
         rows: [
@@ -436,9 +432,7 @@ describe('TimePeriodDataTable', () => {
             unit: '%',
           },
         ],
-        locations: [
-          { value: 'E92000001', label: 'England', level: 'localAuthority' },
-        ],
+        locations: [{ value: 'E92000001', label: 'England', level: 'country' }],
         boundaryLevels: [],
         publicationName: 'Pupil absence in schools in England',
         subjectName: 'Absence in prus',
@@ -448,8 +442,8 @@ describe('TimePeriodDataTable', () => {
       results: [
         {
           filters: [],
-          geographicLevel: 'localAuthority',
-          location: { localAuthority: { code: 'E92000001', name: 'England' } },
+          geographicLevel: 'country',
+          location: { country: { code: 'E92000001', name: 'England' } },
           measures: { '6160c4f8-4c9f-40f0-a623-2a4f742860af': '18.3' },
           timePeriod: '2014_AY',
         },
@@ -460,7 +454,7 @@ describe('TimePeriodDataTable', () => {
       {
         columnGroups: [],
         rowGroups: [
-          [{ value: 'E92000001', type: 'Location', level: 'localAuthority' }],
+          [{ value: 'E92000001', type: 'Location', level: 'country' }],
         ],
         columns: [{ value: '2014_AY', type: 'TimePeriod' }],
         rows: [
