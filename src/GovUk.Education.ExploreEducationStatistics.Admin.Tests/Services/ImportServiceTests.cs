@@ -78,7 +78,6 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
             IMapper mapper = null,
             ILogger<ImportService> logger = null,
             ITableStorageService tableStorageService = null,
-            IGuidGenerator guidGenerator = null,
             IStorageQueueService queueService = null,
             IUserService userService = null)
         {

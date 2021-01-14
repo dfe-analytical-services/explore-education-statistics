@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
+using GovUk.Education.ExploreEducationStatistics.Admin.Mappings;
 using GovUk.Education.ExploreEducationStatistics.Admin.Security;
 using GovUk.Education.ExploreEducationStatistics.Admin.Services;
 using GovUk.Education.ExploreEducationStatistics.Admin.Services.Interfaces;
@@ -166,6 +167,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
             IDataArchiveValidationService dataArchiveValidationService = null,
             IFileUploadsValidatorService fileUploadsValidatorService = null,
             IFileRepository fileRepository = null,
+            IReleaseRepository releaseRepository = null,
             IReleaseFileRepository releaseFileRepository = null,
             IImportService importService = null,
             IImportStatusService importStatusService = null,
@@ -179,6 +181,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
                 dataArchiveValidationService ?? new Mock<IDataArchiveValidationService>().Object,
                 fileUploadsValidatorService ?? new Mock<IFileUploadsValidatorService>().Object,
                 fileRepository ?? new FileRepository(contentDbContext),
+                releaseRepository ?? new ReleaseRepository(contentDbContext, statisticsDbContext, Common.Services.MapperUtils.MapperForProfile<MappingProfiles>()),
                 releaseFileRepository ?? new ReleaseFileRepository(contentDbContext),
                 importService ?? new Mock<IImportService>().Object,
                 importStatusService ?? new Mock<IImportStatusService>().Object,
