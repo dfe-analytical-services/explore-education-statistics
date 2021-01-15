@@ -109,12 +109,12 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Services
                     planningAreaListParam,
                     filterItemListParam);
 
-            _logger.LogDebug($"Executed FilteredObservations stored procedure in {phasesStopwatch.Elapsed.Milliseconds} ms");
+            _logger.LogDebug($"Executed FilteredObservations stored procedure in {phasesStopwatch.Elapsed.TotalMilliseconds} ms");
             phasesStopwatch.Restart();
 
             var ids = inner.Select(obs => obs.Id).ToArray();
 
-            _logger.LogDebug($"Fetched {ids.Length} Observation ids from inner result in {phasesStopwatch.Elapsed.Milliseconds} ms");
+            _logger.LogDebug($"Fetched {ids.Length} Observation ids from inner result in {phasesStopwatch.Elapsed.TotalMilliseconds} ms");
             phasesStopwatch.Restart();
             
             var observations = _context
@@ -124,7 +124,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Services
                 .Where(o => ids.Contains(o.Id))
                 .ToList();
 
-            _logger.LogDebug($"Fetched {ids.Length} Observations from their ids in {phasesStopwatch.Elapsed.Milliseconds} ms");
+            _logger.LogDebug($"Fetched {ids.Length} Observations from their ids in {phasesStopwatch.Elapsed.TotalMilliseconds} ms");
             phasesStopwatch.Restart();
 
             // Load of the Location owned entities is removed from the Observation fetching code above as another
@@ -140,13 +140,9 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Services
 
             observations.ForEach(o => o.Location = locations[o.LocationId]);
 
-            _logger.LogDebug($"Assigned Locations to {ids.Length} Observations in {phasesStopwatch.Elapsed.Milliseconds} ms");
-            phasesStopwatch.Restart();
-
-            _logger.LogDebug($"Finished fetching {observations.Count} Observations in a total of {totalStopwatch.Elapsed.Milliseconds} ms");
-            totalStopwatch.Stop();
-            phasesStopwatch.Stop();
+            _logger.LogDebug($"Assigned Locations to {ids.Length} Observations in {phasesStopwatch.Elapsed.TotalMilliseconds} ms");
             
+            _logger.LogDebug($"Finished fetching {observations.Count} Observations in a total of {totalStopwatch.Elapsed.TotalMilliseconds} ms");
             return observations;
         }
 
