@@ -5,6 +5,9 @@ import {
   DataSetCategory,
 } from '@common/modules/charts/types/dataSet';
 import generateDataSetKey from '@common/modules/charts/util/generateDataSetKey';
+import groupResultMeasuresByDataSet, {
+  getIndicatorPath,
+} from '@common/modules/charts/util/groupResultMeasuresByDataSet';
 import {
   Filter,
   LocationFilter,
@@ -15,8 +18,7 @@ import { TableDataResult } from '@common/services/tableBuilderService';
 import { Dictionary, Pair } from '@common/types';
 import cartesian from '@common/utils/cartesian';
 import parseNumber from '@common/utils/number/parseNumber';
-import camelCase from 'lodash/camelCase';
-import difference from 'lodash/difference';
+import get from 'lodash/get';
 import groupBy from 'lodash/groupBy';
 import orderBy from 'lodash/orderBy';
 
@@ -182,34 +184,6 @@ function getCategoryFilters(
   return filters;
 }
 
-function isResultForDataSet(
-  result: TableDataResult,
-  dataSet: DataSet,
-): boolean {
-  if (typeof result.measures[dataSet.indicator] === 'undefined') {
-    return false;
-  }
-
-  if (difference(dataSet.filters, result.filters).length !== 0) {
-    return false;
-  }
-
-  if (
-    dataSet.location &&
-    (dataSet.location.level !== camelCase(result.geographicLevel) ||
-      dataSet.location.value !==
-        result.location?.[dataSet.location.level]?.code)
-  ) {
-    return false;
-  }
-
-  if (dataSet.timePeriod && dataSet.timePeriod !== result.timePeriod) {
-    return false;
-  }
-
-  return true;
-}
-
 /**
  * Create a map of data sets to their respective key
  * so they can be used in the chart data.
@@ -304,18 +278,18 @@ export default function createDataSetCategories(
   const childDataSets = getChildDataSets(axisConfiguration, meta);
   const dedupedChildDataSets = dedupeDataSets(childDataSets);
 
+  // Group result measures by data set key first to
+  // allow result lookups to be MUCH faster.
+  const measuresByDataSet = groupResultMeasuresByDataSet(results);
+
   const childDataSetsWithValues: Pair<
     ChildDataSet,
     number
   >[] = dedupedChildDataSets
     .map(childDataSet => {
-      const matchingResult = results.find(result =>
-        isResultForDataSet(result, childDataSet.dataSet),
-      );
+      const { dataSet } = childDataSet;
 
-      const value = Number(
-        matchingResult?.measures[childDataSet.dataSet.indicator],
-      );
+      const value = Number(get(measuresByDataSet, getIndicatorPath(dataSet)));
 
       return [childDataSet, value] as Pair<ChildDataSet, number>;
     })

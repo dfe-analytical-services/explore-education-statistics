@@ -6,7 +6,6 @@ import {
   LocationOption,
   TimePeriodOption,
 } from '@common/services/tableBuilderService';
-import camelCase from 'lodash/camelCase';
 
 interface GroupedFilterOption extends FilterOption {
   group?: string;
@@ -76,7 +75,7 @@ export class LocationFilter extends Filter {
   }: GroupedFilterOption & LocationOption) {
     super({ value, label, group });
 
-    this.level = camelCase(level);
+    this.level = level;
     this.geoJson = geoJson;
   }
 

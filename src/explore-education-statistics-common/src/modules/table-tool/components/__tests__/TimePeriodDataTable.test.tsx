@@ -264,7 +264,7 @@ describe('TimePeriodDataTable', () => {
       results: [
         {
           filters: ['598ed9fd-b37e-4e08-baec-08d78f6f2c4d'],
-          geographicLevel: 'Country',
+          geographicLevel: 'country',
           location: { country: { code: 'E92000001', name: 'England' } },
           measures: { '6160c4f8-4c9f-40f0-a623-2a4f742860af': '18.3' },
           timePeriod: '2014_AY',
@@ -357,7 +357,7 @@ describe('TimePeriodDataTable', () => {
       results: [
         {
           filters: [],
-          geographicLevel: 'Country',
+          geographicLevel: 'country',
           location: { country: { code: 'E92000001', name: 'England' } },
           measures: { '6160c4f8-4c9f-40f0-a623-2a4f742860af': '18.3' },
           timePeriod: '2014_AY',
@@ -442,7 +442,7 @@ describe('TimePeriodDataTable', () => {
       results: [
         {
           filters: [],
-          geographicLevel: 'Country',
+          geographicLevel: 'country',
           location: { country: { code: 'E92000001', name: 'England' } },
           measures: { '6160c4f8-4c9f-40f0-a623-2a4f742860af': '18.3' },
           timePeriod: '2014_AY',

@@ -85,7 +85,7 @@ export const testData1 = {
           '598ed9fd-b37e-4e08-baec-08d78f6f2c4d',
           'd7e7e412-f462-444f-84ac-3454fa471cb8',
         ],
-        geographicLevel: 'LocalAuthority',
+        geographicLevel: 'localAuthority',
         location: {
           country: { code: 'E92000001', name: 'England' },
           localAuthority: { code: 'E09000003', name: 'Barnet' },
@@ -102,7 +102,7 @@ export const testData1 = {
           '067de12b-014b-4bbd-baf1-08d78f6f2c4d',
           'd7e7e412-f462-444f-84ac-3454fa471cb8',
         ],
-        geographicLevel: 'LocalAuthority',
+        geographicLevel: 'localAuthority',
         location: {
           country: { code: 'E92000001', name: 'England' },
           localAuthority: { code: 'E09000003', name: 'Barnet' },
@@ -119,7 +119,7 @@ export const testData1 = {
           '067de12b-014b-4bbd-baf1-08d78f6f2c4d',
           'a9fe9fa6-e91f-460b-a0b1-66877b97c581',
         ],
-        geographicLevel: 'LocalAuthority',
+        geographicLevel: 'localAuthority',
         location: {
           country: { code: 'E92000001', name: 'England' },
           localAuthority: { code: 'E08000016', name: 'Barnsley' },
@@ -136,7 +136,7 @@ export const testData1 = {
           '598ed9fd-b37e-4e08-baec-08d78f6f2c4d',
           'd7e7e412-f462-444f-84ac-3454fa471cb8',
         ],
-        geographicLevel: 'LocalAuthority',
+        geographicLevel: 'localAuthority',
         location: {
           country: { code: 'E92000001', name: 'England' },
           localAuthority: { code: 'E08000016', name: 'Barnsley' },
@@ -153,7 +153,7 @@ export const testData1 = {
           '598ed9fd-b37e-4e08-baec-08d78f6f2c4d',
           'a9fe9fa6-e91f-460b-a0b1-66877b97c581',
         ],
-        geographicLevel: 'LocalAuthority',
+        geographicLevel: 'localAuthority',
         location: {
           country: { code: 'E92000001', name: 'England' },
           localAuthority: { code: 'E08000016', name: 'Barnsley' },
@@ -170,7 +170,7 @@ export const testData1 = {
           '067de12b-014b-4bbd-baf1-08d78f6f2c4d',
           'd7e7e412-f462-444f-84ac-3454fa471cb8',
         ],
-        geographicLevel: 'LocalAuthority',
+        geographicLevel: 'localAuthority',
         location: {
           country: { code: 'E92000001', name: 'England' },
           localAuthority: { code: 'E08000016', name: 'Barnsley' },
@@ -187,7 +187,7 @@ export const testData1 = {
           '598ed9fd-b37e-4e08-baec-08d78f6f2c4d',
           'd7e7e412-f462-444f-84ac-3454fa471cb8',
         ],
-        geographicLevel: 'LocalAuthority',
+        geographicLevel: 'localAuthority',
         location: {
           country: { code: 'E92000001', name: 'England' },
           localAuthority: { code: 'E09000003', name: 'Barnet' },
@@ -204,7 +204,7 @@ export const testData1 = {
           '598ed9fd-b37e-4e08-baec-08d78f6f2c4d',
           'a9fe9fa6-e91f-460b-a0b1-66877b97c581',
         ],
-        geographicLevel: 'LocalAuthority',
+        geographicLevel: 'localAuthority',
         location: {
           country: { code: 'E92000001', name: 'England' },
           localAuthority: { code: 'E09000003', name: 'Barnet' },
@@ -221,7 +221,7 @@ export const testData1 = {
           '067de12b-014b-4bbd-baf1-08d78f6f2c4d',
           'a9fe9fa6-e91f-460b-a0b1-66877b97c581',
         ],
-        geographicLevel: 'LocalAuthority',
+        geographicLevel: 'localAuthority',
         location: {
           country: { code: 'E92000001', name: 'England' },
           localAuthority: { code: 'E09000003', name: 'Barnet' },
@@ -238,7 +238,7 @@ export const testData1 = {
           '598ed9fd-b37e-4e08-baec-08d78f6f2c4d',
           'a9fe9fa6-e91f-460b-a0b1-66877b97c581',
         ],
-        geographicLevel: 'LocalAuthority',
+        geographicLevel: 'localAuthority',
         location: {
           country: { code: 'E92000001', name: 'England' },
           localAuthority: { code: 'E09000003', name: 'Barnet' },
@@ -255,7 +255,7 @@ export const testData1 = {
           '067de12b-014b-4bbd-baf1-08d78f6f2c4d',
           'd7e7e412-f462-444f-84ac-3454fa471cb8',
         ],
-        geographicLevel: 'LocalAuthority',
+        geographicLevel: 'localAuthority',
         location: {
           country: { code: 'E92000001', name: 'England' },
           localAuthority: { code: 'E08000016', name: 'Barnsley' },
@@ -272,7 +272,7 @@ export const testData1 = {
           '067de12b-014b-4bbd-baf1-08d78f6f2c4d',
           'd7e7e412-f462-444f-84ac-3454fa471cb8',
         ],
-        geographicLevel: 'LocalAuthority',
+        geographicLevel: 'localAuthority',
         location: {
           country: { code: 'E92000001', name: 'England' },
           localAuthority: { code: 'E09000003', name: 'Barnet' },
@@ -289,7 +289,7 @@ export const testData1 = {
           '598ed9fd-b37e-4e08-baec-08d78f6f2c4d',
           'd7e7e412-f462-444f-84ac-3454fa471cb8',
         ],
-        geographicLevel: 'LocalAuthority',
+        geographicLevel: 'localAuthority',
         location: {
           country: { code: 'E92000001', name: 'England' },
           localAuthority: { code: 'E08000016', name: 'Barnsley' },
@@ -306,7 +306,7 @@ export const testData1 = {
           '067de12b-014b-4bbd-baf1-08d78f6f2c4d',
           'a9fe9fa6-e91f-460b-a0b1-66877b97c581',
         ],
-        geographicLevel: 'LocalAuthority',
+        geographicLevel: 'localAuthority',
         location: {
           country: { code: 'E92000001', name: 'England' },
           localAuthority: { code: 'E09000003', name: 'Barnet' },
@@ -323,7 +323,7 @@ export const testData1 = {
           '067de12b-014b-4bbd-baf1-08d78f6f2c4d',
           'a9fe9fa6-e91f-460b-a0b1-66877b97c581',
         ],
-        geographicLevel: 'LocalAuthority',
+        geographicLevel: 'localAuthority',
         location: {
           country: { code: 'E92000001', name: 'England' },
           localAuthority: { code: 'E08000016', name: 'Barnsley' },
@@ -340,7 +340,7 @@ export const testData1 = {
           '598ed9fd-b37e-4e08-baec-08d78f6f2c4d',
           'a9fe9fa6-e91f-460b-a0b1-66877b97c581',
         ],
-        geographicLevel: 'LocalAuthority',
+        geographicLevel: 'localAuthority',
         location: {
           country: { code: 'E92000001', name: 'England' },
           localAuthority: { code: 'E08000016', name: 'Barnsley' },
@@ -476,7 +476,7 @@ export const testData2 = {
           '598ed9fd-b37e-4e08-baec-08d78f6f2c4d',
           'd7e7e412-f462-444f-84ac-3454fa471cb8',
         ],
-        geographicLevel: 'LocalAuthority',
+        geographicLevel: 'localAuthority',
         location: {
           country: { code: 'E92000001', name: 'England' },
           localAuthority: { code: 'E09000003', name: 'Barnet' },
@@ -490,7 +490,7 @@ export const testData2 = {
           '067de12b-014b-4bbd-baf1-08d78f6f2c4d',
           'd7e7e412-f462-444f-84ac-3454fa471cb8',
         ],
-        geographicLevel: 'LocalAuthority',
+        geographicLevel: 'localAuthority',
         location: {
           country: { code: 'E92000001', name: 'England' },
           localAuthority: { code: 'E09000003', name: 'Barnet' },
@@ -504,7 +504,7 @@ export const testData2 = {
           '067de12b-014b-4bbd-baf1-08d78f6f2c4d',
           'a9fe9fa6-e91f-460b-a0b1-66877b97c581',
         ],
-        geographicLevel: 'LocalAuthority',
+        geographicLevel: 'localAuthority',
         location: {
           country: { code: 'E92000001', name: 'England' },
           localAuthority: { code: 'E08000016', name: 'Barnsley' },
@@ -518,7 +518,7 @@ export const testData2 = {
           '598ed9fd-b37e-4e08-baec-08d78f6f2c4d',
           'd7e7e412-f462-444f-84ac-3454fa471cb8',
         ],
-        geographicLevel: 'LocalAuthority',
+        geographicLevel: 'localAuthority',
         location: {
           country: { code: 'E92000001', name: 'England' },
           localAuthority: { code: 'E08000016', name: 'Barnsley' },
@@ -532,7 +532,7 @@ export const testData2 = {
           '598ed9fd-b37e-4e08-baec-08d78f6f2c4d',
           'a9fe9fa6-e91f-460b-a0b1-66877b97c581',
         ],
-        geographicLevel: 'LocalAuthority',
+        geographicLevel: 'localAuthority',
         location: {
           country: { code: 'E92000001', name: 'England' },
           localAuthority: { code: 'E08000016', name: 'Barnsley' },
@@ -546,7 +546,7 @@ export const testData2 = {
           '067de12b-014b-4bbd-baf1-08d78f6f2c4d',
           'd7e7e412-f462-444f-84ac-3454fa471cb8',
         ],
-        geographicLevel: 'LocalAuthority',
+        geographicLevel: 'localAuthority',
         location: {
           country: { code: 'E92000001', name: 'England' },
           localAuthority: { code: 'E08000016', name: 'Barnsley' },
@@ -560,7 +560,7 @@ export const testData2 = {
           '598ed9fd-b37e-4e08-baec-08d78f6f2c4d',
           'd7e7e412-f462-444f-84ac-3454fa471cb8',
         ],
-        geographicLevel: 'LocalAuthority',
+        geographicLevel: 'localAuthority',
         location: {
           country: { code: 'E92000001', name: 'England' },
           localAuthority: { code: 'E09000003', name: 'Barnet' },
@@ -574,7 +574,7 @@ export const testData2 = {
           '598ed9fd-b37e-4e08-baec-08d78f6f2c4d',
           'a9fe9fa6-e91f-460b-a0b1-66877b97c581',
         ],
-        geographicLevel: 'LocalAuthority',
+        geographicLevel: 'localAuthority',
         location: {
           country: { code: 'E92000001', name: 'England' },
           localAuthority: { code: 'E09000003', name: 'Barnet' },
@@ -588,7 +588,7 @@ export const testData2 = {
           '067de12b-014b-4bbd-baf1-08d78f6f2c4d',
           'a9fe9fa6-e91f-460b-a0b1-66877b97c581',
         ],
-        geographicLevel: 'LocalAuthority',
+        geographicLevel: 'localAuthority',
         location: {
           country: { code: 'E92000001', name: 'England' },
           localAuthority: { code: 'E09000003', name: 'Barnet' },
@@ -602,7 +602,7 @@ export const testData2 = {
           '598ed9fd-b37e-4e08-baec-08d78f6f2c4d',
           'a9fe9fa6-e91f-460b-a0b1-66877b97c581',
         ],
-        geographicLevel: 'LocalAuthority',
+        geographicLevel: 'localAuthority',
         location: {
           country: { code: 'E92000001', name: 'England' },
           localAuthority: { code: 'E09000003', name: 'Barnet' },
@@ -616,7 +616,7 @@ export const testData2 = {
           '067de12b-014b-4bbd-baf1-08d78f6f2c4d',
           'd7e7e412-f462-444f-84ac-3454fa471cb8',
         ],
-        geographicLevel: 'LocalAuthority',
+        geographicLevel: 'localAuthority',
         location: {
           country: { code: 'E92000001', name: 'England' },
           localAuthority: { code: 'E08000016', name: 'Barnsley' },
@@ -630,7 +630,7 @@ export const testData2 = {
           '067de12b-014b-4bbd-baf1-08d78f6f2c4d',
           'd7e7e412-f462-444f-84ac-3454fa471cb8',
         ],
-        geographicLevel: 'LocalAuthority',
+        geographicLevel: 'localAuthority',
         location: {
           country: { code: 'E92000001', name: 'England' },
           localAuthority: { code: 'E09000003', name: 'Barnet' },
@@ -644,7 +644,7 @@ export const testData2 = {
           '598ed9fd-b37e-4e08-baec-08d78f6f2c4d',
           'd7e7e412-f462-444f-84ac-3454fa471cb8',
         ],
-        geographicLevel: 'LocalAuthority',
+        geographicLevel: 'localAuthority',
         location: {
           country: { code: 'E92000001', name: 'England' },
           localAuthority: { code: 'E08000016', name: 'Barnsley' },
@@ -658,7 +658,7 @@ export const testData2 = {
           '067de12b-014b-4bbd-baf1-08d78f6f2c4d',
           'a9fe9fa6-e91f-460b-a0b1-66877b97c581',
         ],
-        geographicLevel: 'LocalAuthority',
+        geographicLevel: 'localAuthority',
         location: {
           country: { code: 'E92000001', name: 'England' },
           localAuthority: { code: 'E09000003', name: 'Barnet' },
@@ -672,7 +672,7 @@ export const testData2 = {
           '067de12b-014b-4bbd-baf1-08d78f6f2c4d',
           'a9fe9fa6-e91f-460b-a0b1-66877b97c581',
         ],
-        geographicLevel: 'LocalAuthority',
+        geographicLevel: 'localAuthority',
         location: {
           country: { code: 'E92000001', name: 'England' },
           localAuthority: { code: 'E08000016', name: 'Barnsley' },
@@ -686,7 +686,7 @@ export const testData2 = {
           '598ed9fd-b37e-4e08-baec-08d78f6f2c4d',
           'a9fe9fa6-e91f-460b-a0b1-66877b97c581',
         ],
-        geographicLevel: 'LocalAuthority',
+        geographicLevel: 'localAuthority',
         location: {
           country: { code: 'E92000001', name: 'England' },
           localAuthority: { code: 'E08000016', name: 'Barnsley' },
@@ -812,7 +812,7 @@ export const testData3 = {
           '598ed9fd-b37e-4e08-baec-08d78f6f2c4d',
           'd7e7e412-f462-444f-84ac-3454fa471cb8',
         ],
-        geographicLevel: 'LocalAuthority',
+        geographicLevel: 'localAuthority',
         location: {
           country: { code: 'E92000001', name: 'England' },
           localAuthority: { code: 'E09000003', name: 'Barnet' },
@@ -826,7 +826,7 @@ export const testData3 = {
           '598ed9fd-b37e-4e08-baec-08d78f6f2c4d',
           'd7e7e412-f462-444f-84ac-3454fa471cb8',
         ],
-        geographicLevel: 'LocalAuthority',
+        geographicLevel: 'localAuthority',
         location: {
           country: { code: 'E92000001', name: 'England' },
           localAuthority: { code: 'E08000016', name: 'Barnsley' },
@@ -840,7 +840,7 @@ export const testData3 = {
           '598ed9fd-b37e-4e08-baec-08d78f6f2c4d',
           'a9fe9fa6-e91f-460b-a0b1-66877b97c581',
         ],
-        geographicLevel: 'LocalAuthority',
+        geographicLevel: 'localAuthority',
         location: {
           country: { code: 'E92000001', name: 'England' },
           localAuthority: { code: 'E09000003', name: 'Barnet' },
@@ -854,7 +854,7 @@ export const testData3 = {
           '067de12b-014b-4bbd-baf1-08d78f6f2c4d',
           'a9fe9fa6-e91f-460b-a0b1-66877b97c581',
         ],
-        geographicLevel: 'LocalAuthority',
+        geographicLevel: 'localAuthority',
         location: {
           country: { code: 'E92000001', name: 'England' },
           localAuthority: { code: 'E09000003', name: 'Barnet' },
@@ -868,7 +868,7 @@ export const testData3 = {
           '067de12b-014b-4bbd-baf1-08d78f6f2c4d',
           'd7e7e412-f462-444f-84ac-3454fa471cb8',
         ],
-        geographicLevel: 'LocalAuthority',
+        geographicLevel: 'localAuthority',
         location: {
           country: { code: 'E92000001', name: 'England' },
           localAuthority: { code: 'E08000016', name: 'Barnsley' },
@@ -882,7 +882,7 @@ export const testData3 = {
           '067de12b-014b-4bbd-baf1-08d78f6f2c4d',
           'd7e7e412-f462-444f-84ac-3454fa471cb8',
         ],
-        geographicLevel: 'LocalAuthority',
+        geographicLevel: 'localAuthority',
         location: {
           country: { code: 'E92000001', name: 'England' },
           localAuthority: { code: 'E09000003', name: 'Barnet' },
@@ -896,7 +896,7 @@ export const testData3 = {
           '067de12b-014b-4bbd-baf1-08d78f6f2c4d',
           'a9fe9fa6-e91f-460b-a0b1-66877b97c581',
         ],
-        geographicLevel: 'LocalAuthority',
+        geographicLevel: 'localAuthority',
         location: {
           country: { code: 'E92000001', name: 'England' },
           localAuthority: { code: 'E08000016', name: 'Barnsley' },
@@ -910,7 +910,7 @@ export const testData3 = {
           '598ed9fd-b37e-4e08-baec-08d78f6f2c4d',
           'a9fe9fa6-e91f-460b-a0b1-66877b97c581',
         ],
-        geographicLevel: 'LocalAuthority',
+        geographicLevel: 'localAuthority',
         location: {
           country: { code: 'E92000001', name: 'England' },
           localAuthority: { code: 'E08000016', name: 'Barnsley' },
@@ -1002,7 +1002,7 @@ export const testDataNoFilters = {
     results: [
       {
         filters: [],
-        geographicLevel: 'Country',
+        geographicLevel: 'country',
         location: { country: { code: 'E92000001', name: 'England' } },
         measures: {
           '9cf0dcf1-367e-4207-2b50-08d78f6f2b08': '2453340',
@@ -1013,7 +1013,7 @@ export const testDataNoFilters = {
       },
       {
         filters: [],
-        geographicLevel: 'Country',
+        geographicLevel: 'country',
         location: { country: { code: 'E92000001', name: 'England' } },
         measures: {
           '9cf0dcf1-367e-4207-2b50-08d78f6f2b08': '2212399',
@@ -1024,7 +1024,7 @@ export const testDataNoFilters = {
       },
       {
         filters: [],
-        geographicLevel: 'Country',
+        geographicLevel: 'country',
         location: { country: { code: 'E92000001', name: 'England' } },
         measures: {
           '9cf0dcf1-367e-4207-2b50-08d78f6f2b08': '2637752',
@@ -1141,7 +1141,7 @@ export const testDataFiltersWithNoResults = {
           '5675d1fa-77fd-4dfd-bb1f-08d78f6f2c4d',
           'b3207d77-143b-43d5-8b48-32d29727e96f',
         ],
-        geographicLevel: 'LocalAuthority',
+        geographicLevel: 'localAuthority',
         location: {
           country: { code: 'E92000001', name: 'England' },
           localAuthority: { code: 'E08000026', name: 'Coventry' },
@@ -1158,7 +1158,7 @@ export const testDataFiltersWithNoResults = {
           '53da1e17-184f-43f6-bb27-08d78f6f2c4d',
           'b3207d77-143b-43d5-8b48-32d29727e96f',
         ],
-        geographicLevel: 'LocalAuthority',
+        geographicLevel: 'localAuthority',
         location: {
           country: { code: 'E92000001', name: 'England' },
           localAuthority: { code: 'E09000008', name: 'Croydon' },
@@ -1175,7 +1175,7 @@ export const testDataFiltersWithNoResults = {
           '5675d1fa-77fd-4dfd-bb1f-08d78f6f2c4d',
           'b3207d77-143b-43d5-8b48-32d29727e96f',
         ],
-        geographicLevel: 'LocalAuthority',
+        geographicLevel: 'localAuthority',
         location: {
           country: { code: 'E92000001', name: 'England' },
           localAuthority: { code: 'E08000026', name: 'Coventry' },
@@ -1192,7 +1192,7 @@ export const testDataFiltersWithNoResults = {
           '5675d1fa-77fd-4dfd-bb1f-08d78f6f2c4d',
           'b3207d77-143b-43d5-8b48-32d29727e96f',
         ],
-        geographicLevel: 'LocalAuthority',
+        geographicLevel: 'localAuthority',
         location: {
           country: { code: 'E92000001', name: 'England' },
           localAuthority: { code: 'E09000008', name: 'Croydon' },
@@ -1209,7 +1209,7 @@ export const testDataFiltersWithNoResults = {
           '5675d1fa-77fd-4dfd-bb1f-08d78f6f2c4d',
           'b3207d77-143b-43d5-8b48-32d29727e96f',
         ],
-        geographicLevel: 'LocalAuthority',
+        geographicLevel: 'localAuthority',
         location: {
           country: { code: 'E92000001', name: 'England' },
           localAuthority: { code: 'E09000008', name: 'Croydon' },
@@ -1226,7 +1226,7 @@ export const testDataFiltersWithNoResults = {
           '5675d1fa-77fd-4dfd-bb1f-08d78f6f2c4d',
           'b3207d77-143b-43d5-8b48-32d29727e96f',
         ],
-        geographicLevel: 'LocalAuthority',
+        geographicLevel: 'localAuthority',
         location: {
           country: { code: 'E92000001', name: 'England' },
           localAuthority: { code: 'E08000026', name: 'Coventry' },
@@ -1243,7 +1243,7 @@ export const testDataFiltersWithNoResults = {
           '5675d1fa-77fd-4dfd-bb1f-08d78f6f2c4d',
           'b3207d77-143b-43d5-8b48-32d29727e96f',
         ],
-        geographicLevel: 'LocalAuthority',
+        geographicLevel: 'localAuthority',
         location: {
           country: { code: 'E92000001', name: 'England' },
           localAuthority: { code: 'E09000008', name: 'Croydon' },

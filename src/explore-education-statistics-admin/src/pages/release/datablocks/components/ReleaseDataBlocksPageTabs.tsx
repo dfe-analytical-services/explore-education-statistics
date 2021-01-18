@@ -293,6 +293,7 @@ const ReleaseDataBlocksPageTabs = ({
                 title="Table"
                 key="table"
                 id="manageDataBlocks-table"
+                lazy
               >
                 <TableTabSection
                   table={response.table}
