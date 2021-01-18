@@ -4,6 +4,7 @@ using System.Threading.Tasks;
 using GovUk.Education.ExploreEducationStatistics.Common.Model;
 using Microsoft.AspNetCore.Http;
 using Microsoft.Azure.Storage.DataMovement;
+using Newtonsoft.Json;
 
 namespace GovUk.Education.ExploreEducationStatistics.Common.Services.Interfaces
 {
@@ -55,6 +56,12 @@ namespace GovUk.Education.ExploreEducationStatistics.Common.Services.Interfaces
             string content,
             string contentType,
             UploadTextOptions options = null);
+
+        public Task UploadAsJson<T>(
+            string containerName,
+            string path,
+            T content,
+            JsonSerializerSettings settings = null);
 
         public Task<bool> IsAppendSupported(string containerName, string path);
 

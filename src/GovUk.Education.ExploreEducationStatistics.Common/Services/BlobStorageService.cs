@@ -1,6 +1,7 @@
 using System;
 using System.Collections.Generic;
 using System.IO;
+using System.Net.Mime;
 using System.Text;
 using System.Text.RegularExpressions;
 using System.Threading.Tasks;
@@ -304,6 +305,22 @@ namespace GovUk.Education.ExploreEducationStatistics.Common.Services
                     ContentType = contentType,
                 },
                 options?.MetaValues
+            );
+        }
+
+        public async Task UploadAsJson<T>(
+            string containerName,
+            string path,
+            T content,
+            JsonSerializerSettings settings)
+        {
+            var json = JsonConvert.SerializeObject(content, typeof(T), settings);
+
+            await UploadText(
+                containerName: containerName,
+                path: path,
+                content: json,
+                contentType: MediaTypeNames.Application.Json
             );
         }
 
