@@ -89,6 +89,8 @@ namespace GovUk.Education.ExploreEducationStatistics.Common.Services.Interfaces
 
         public Task<string> DownloadBlobText(string containerName, string path);
 
+        Task<T> GetDeserializedJson<T>(string containerName, string path);
+
         public class CopyDirectoryOptions
         {
             public string DestinationConnectionString { get; set; }

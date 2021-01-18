@@ -15,6 +15,7 @@ using Microsoft.Azure.Storage;
 using Microsoft.Azure.Storage.Blob;
 using Microsoft.Azure.Storage.DataMovement;
 using Microsoft.Extensions.Logging;
+using Newtonsoft.Json;
 using static GovUk.Education.ExploreEducationStatistics.Common.Services.FileStorageUtils;
 using BlobInfo = GovUk.Education.ExploreEducationStatistics.Common.Model.BlobInfo;
 using BlobProperties = Azure.Storage.Blobs.Models.BlobProperties;
@@ -208,7 +209,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Common.Services
                 return false;
             }
 
-            // Lease the source blob for the copy operation 
+            // Lease the source blob for the copy operation
             // to prevent another client from modifying it.
             var lease = sourceBlob.GetBlobLeaseClient();
 
@@ -227,7 +228,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Common.Services
                     _logger.LogInformation("Copy progress: {progress}", destinationProperties.CopyProgress);
                     destinationProperties = await destinationBlob.GetPropertiesAsync();
                 }
-                
+
                 if (destinationProperties.CopyStatus != CopyStatus.Success)
                 {
                     return false;
@@ -416,6 +417,25 @@ namespace GovUk.Education.ExploreEducationStatistics.Common.Services
             var streamReader = new StreamReader(stream);
 
             return await streamReader.ReadToEndAsync();
+        }
+
+        public async Task<T> GetDeserializedJson<T>(string containerName, string path)
+        {
+            var text = await DownloadBlobText(containerName, path);
+
+            if (string.IsNullOrWhiteSpace(text))
+            {
+                throw new JsonException(
+                    $"Found empty file when trying to deserialize JSON for path: {path}");
+            }
+
+            return JsonConvert.DeserializeObject<T>(
+                text,
+                new JsonSerializerSettings
+                {
+                    TypeNameHandling = TypeNameHandling.Auto
+                }
+            );
         }
 
         public async Task<List<BlobInfo>> CopyDirectory(
