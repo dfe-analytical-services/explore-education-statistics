@@ -12,7 +12,7 @@ import permalinkService from '@common/services/permalinkService';
 import publicationService from '@common/services/publicationService';
 import { TableDataQuery } from '@common/services/tableBuilderService';
 import Link from '@frontend/components/Link';
-import React, { useEffect, useRef, useState } from 'react';
+import React, { memo, useEffect, useRef, useState } from 'react';
 import DownloadCsvButton from '@common/modules/table-tool/components/DownloadCsvButton';
 import { logEvent } from '@frontend/services/googleAnalyticsService';
 import DownloadExcelButton from '@common/modules/table-tool/components/DownloadExcelButton';
@@ -212,4 +212,4 @@ const TableToolFinalStep = ({
   );
 };
 
-export default TableToolFinalStep;
+export default memo(TableToolFinalStep);

@@ -82,7 +82,7 @@ describe('createDataSetCategories', () => {
     results: [
       {
         filters: ['ethnicity-major-chinese', 'state-funded-primary'],
-        geographicLevel: 'LocalAuthority',
+        geographicLevel: 'localAuthority',
         location: {
           localAuthority: { code: 'barnet', name: 'Barnet' },
         },
@@ -94,7 +94,7 @@ describe('createDataSetCategories', () => {
       },
       {
         filters: ['ethnicity-major-black-total', 'state-funded-primary'],
-        geographicLevel: 'LocalAuthority',
+        geographicLevel: 'localAuthority',
         location: {
           localAuthority: { code: 'barnet', name: 'Barnet' },
         },
@@ -106,7 +106,7 @@ describe('createDataSetCategories', () => {
       },
       {
         filters: ['ethnicity-major-chinese', 'state-funded-secondary'],
-        geographicLevel: 'LocalAuthority',
+        geographicLevel: 'localAuthority',
         location: {
           localAuthority: { code: 'barnsley', name: 'Barnsley' },
         },
@@ -118,7 +118,7 @@ describe('createDataSetCategories', () => {
       },
       {
         filters: ['ethnicity-major-black-total', 'state-funded-secondary'],
-        geographicLevel: 'LocalAuthority',
+        geographicLevel: 'localAuthority',
         location: {
           localAuthority: { code: 'barnsley', name: 'Barnsley' },
         },
@@ -130,7 +130,7 @@ describe('createDataSetCategories', () => {
       },
       {
         filters: ['ethnicity-major-chinese', 'state-funded-secondary'],
-        geographicLevel: 'LocalAuthority',
+        geographicLevel: 'localAuthority',
         location: {
           localAuthority: { code: 'barnet', name: 'Barnet' },
         },
@@ -142,7 +142,7 @@ describe('createDataSetCategories', () => {
       },
       {
         filters: ['ethnicity-major-black-total', 'state-funded-secondary'],
-        geographicLevel: 'LocalAuthority',
+        geographicLevel: 'localAuthority',
         location: {
           localAuthority: { code: 'barnet', name: 'Barnet' },
         },
@@ -154,7 +154,7 @@ describe('createDataSetCategories', () => {
       },
       {
         filters: ['ethnicity-major-chinese', 'state-funded-primary'],
-        geographicLevel: 'LocalAuthority',
+        geographicLevel: 'localAuthority',
         location: {
           localAuthority: { code: 'barnsley', name: 'Barnsley' },
         },
@@ -166,7 +166,7 @@ describe('createDataSetCategories', () => {
       },
       {
         filters: ['ethnicity-major-black-total', 'state-funded-primary'],
-        geographicLevel: 'LocalAuthority',
+        geographicLevel: 'localAuthority',
         location: {
           localAuthority: { code: 'barnsley', name: 'Barnsley' },
         },
@@ -178,7 +178,7 @@ describe('createDataSetCategories', () => {
       },
       {
         filters: ['ethnicity-major-black-total', 'state-funded-secondary'],
-        geographicLevel: 'LocalAuthority',
+        geographicLevel: 'localAuthority',
         location: {
           localAuthority: { code: 'barnet', name: 'Barnet' },
         },
@@ -190,7 +190,7 @@ describe('createDataSetCategories', () => {
       },
       {
         filters: ['ethnicity-major-chinese', 'state-funded-primary'],
-        geographicLevel: 'LocalAuthority',
+        geographicLevel: 'localAuthority',
         location: {
           localAuthority: { code: 'barnsley', name: 'Barnsley' },
         },
@@ -202,7 +202,7 @@ describe('createDataSetCategories', () => {
       },
       {
         filters: ['ethnicity-major-black-total', 'state-funded-primary'],
-        geographicLevel: 'LocalAuthority',
+        geographicLevel: 'localAuthority',
         location: {
           localAuthority: { code: 'barnet', name: 'Barnet' },
         },
@@ -214,7 +214,7 @@ describe('createDataSetCategories', () => {
       },
       {
         filters: ['ethnicity-major-chinese', 'state-funded-primary'],
-        geographicLevel: 'LocalAuthority',
+        geographicLevel: 'localAuthority',
         location: {
           localAuthority: { code: 'barnet', name: 'Barnet' },
         },
@@ -226,7 +226,7 @@ describe('createDataSetCategories', () => {
       },
       {
         filters: ['ethnicity-major-chinese', 'state-funded-secondary'],
-        geographicLevel: 'LocalAuthority',
+        geographicLevel: 'localAuthority',
         location: {
           localAuthority: { code: 'barnet', name: 'Barnet' },
         },
@@ -238,7 +238,7 @@ describe('createDataSetCategories', () => {
       },
       {
         filters: ['ethnicity-major-black-total', 'state-funded-secondary'],
-        geographicLevel: 'LocalAuthority',
+        geographicLevel: 'localAuthority',
         location: {
           localAuthority: { code: 'barnsley', name: 'Barnsley' },
         },
@@ -250,7 +250,7 @@ describe('createDataSetCategories', () => {
       },
       {
         filters: ['ethnicity-major-black-total', 'state-funded-primary'],
-        geographicLevel: 'LocalAuthority',
+        geographicLevel: 'localAuthority',
         location: {
           localAuthority: { code: 'barnsley', name: 'Barnsley' },
         },
@@ -262,7 +262,7 @@ describe('createDataSetCategories', () => {
       },
       {
         filters: ['ethnicity-major-chinese', 'state-funded-secondary'],
-        geographicLevel: 'LocalAuthority',
+        geographicLevel: 'localAuthority',
         location: {
           localAuthority: { code: 'barnsley', name: 'Barnsley' },
         },
@@ -1244,7 +1244,7 @@ describe('createDataSetCategories', () => {
       results: [
         {
           filters: ['state-funded-primary'],
-          geographicLevel: 'Region',
+          geographicLevel: 'region',
           location: {
             country: { code: 'E92000001', name: 'England' },
             region: { code: 'E12000001', name: 'North East' },
@@ -1254,14 +1254,14 @@ describe('createDataSetCategories', () => {
         },
         {
           filters: ['state-funded-primary'],
-          geographicLevel: 'Country',
+          geographicLevel: 'country',
           location: { country: { code: 'E92000001', name: 'England' } },
           measures: { 'authorised-absence-sessions': '42219483' },
           timePeriod: '2015_AY',
         },
         {
           filters: ['state-funded-secondary'],
-          geographicLevel: 'Region',
+          geographicLevel: 'region',
           location: {
             country: { code: 'E92000001', name: 'England' },
             region: { code: 'E12000001', name: 'North East' },
@@ -1271,7 +1271,7 @@ describe('createDataSetCategories', () => {
         },
         {
           filters: ['state-funded-secondary'],
-          geographicLevel: 'Country',
+          geographicLevel: 'country',
           location: { country: { code: 'E92000001', name: 'England' } },
           measures: { 'authorised-absence-sessions': '37997247' },
           timePeriod: '2015_AY',

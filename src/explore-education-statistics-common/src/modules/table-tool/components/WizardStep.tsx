@@ -55,9 +55,7 @@ const WizardStep = ({ children, id, ...restProps }: WizardStepProps) => {
         </span>
 
         {typeof children === 'function'
-          ? children({
-              ...injectedWizardProps,
-            })
+          ? children(injectedWizardProps)
           : children}
       </div>
     </li>
