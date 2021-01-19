@@ -1,5 +1,4 @@
 using System;
-using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
 using GovUk.Education.ExploreEducationStatistics.Common.Model;
@@ -80,7 +79,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Services
                 .OnSuccessDo(CheckCanViewSubjectData)
                 .OnSuccess(async () =>
                 {
-                    var observations = GetObservations(queryContext).AsQueryable();
+                    var observations = _observationService.FindObservations(queryContext).AsQueryable();
 
                     if (!observations.Any())
                     {
@@ -110,11 +109,6 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Services
             }
 
             return new ForbidResult();
-        }
-
-        private IEnumerable<Observation> GetObservations(ObservationQueryContext queryContext)
-        {
-            return _observationService.FindObservations(queryContext);
         }
     }
 }
