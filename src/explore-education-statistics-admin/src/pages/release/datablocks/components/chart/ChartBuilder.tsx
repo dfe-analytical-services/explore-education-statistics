@@ -92,22 +92,24 @@ export type TableQueryUpdateHandler = (
 ) => Promise<void>;
 
 interface Props {
+  boundaryLevel?: number;
   data: TableDataResult[];
   meta: FullTableMeta;
   releaseId: string;
-  initialConfiguration?: Chart;
+  initialChart?: Chart;
   onChartSave: (chart: Chart, file?: File) => Promise<void>;
   onChartDelete: (chart: Chart) => void;
   onTableQueryUpdate: TableQueryUpdateHandler;
 }
 
 const ChartBuilder = ({
+  boundaryLevel,
   data,
   meta,
   releaseId,
+  initialChart,
   onChartSave,
   onChartDelete,
-  initialConfiguration,
   onTableQueryUpdate,
 }: Props) => {
   const containerRef = useRef<HTMLDivElement>(null);
@@ -118,7 +120,7 @@ const ChartBuilder = ({
   const [isDeleting, setDeleting] = useState(false);
 
   const { state: chartBuilderState, actions } = useChartBuilderReducer(
-    initialConfiguration,
+    initialChart,
   );
 
   const { axes, definition, options, legend } = chartBuilderState;
@@ -253,11 +255,11 @@ const ChartBuilder = ({
   );
 
   const handleBoundaryLevelChange = useCallback(
-    async (boundaryLevel: string) => {
+    async (nextBoundaryLevel: string) => {
       setDataLoading(true);
 
       await onTableQueryUpdate({
-        boundaryLevel: parseNumber(boundaryLevel),
+        boundaryLevel: parseNumber(nextBoundaryLevel),
       });
 
       setDataLoading(false);
@@ -267,7 +269,7 @@ const ChartBuilder = ({
 
   const deleteButton = useMemo(
     () =>
-      initialConfiguration && (
+      initialChart && (
         <Button
           variant="warning"
           onClick={toggleDeleteModal.on}
@@ -276,7 +278,7 @@ const ChartBuilder = ({
           Delete chart
         </Button>
       ),
-    [initialConfiguration, isDeleting, toggleDeleteModal.on],
+    [initialChart, isDeleting, toggleDeleteModal.on],
   );
 
   return (
@@ -311,6 +313,7 @@ const ChartBuilder = ({
                   id={forms.options.id}
                 >
                   <ChartConfiguration
+                    boundaryLevel={boundaryLevel}
                     buttons={deleteButton}
                     submitError={submitError}
                     definition={definition}

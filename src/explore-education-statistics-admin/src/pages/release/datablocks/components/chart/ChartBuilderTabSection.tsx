@@ -110,10 +110,11 @@ const ChartBuilderTabSection = ({
 
   return (
     <ChartBuilder
+      boundaryLevel={query.boundaryLevel}
       releaseId={releaseId}
       data={table.results}
       meta={meta}
-      initialConfiguration={dataBlock.charts[0]}
+      initialChart={dataBlock.charts[0]}
       onChartSave={handleChartSave}
       onChartDelete={handleChartDelete}
       onTableQueryUpdate={handleTableQueryUpdate}
