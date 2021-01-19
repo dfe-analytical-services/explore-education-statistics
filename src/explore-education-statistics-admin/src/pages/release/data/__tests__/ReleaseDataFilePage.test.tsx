@@ -10,9 +10,10 @@ import _permissionService from '@admin/services/permissionService';
 import _releaseDataFileService, {
   DataFile,
 } from '@admin/services/releaseDataFileService';
-import { render, screen, waitFor } from '@testing-library/react';
+import { render, screen, waitFor, within } from '@testing-library/react';
 import React from 'react';
 import { generatePath, MemoryRouter, Route } from 'react-router';
+import userEvent from '@testing-library/user-event';
 
 jest.mock('@admin/services/dataReplacementService');
 jest.mock('@admin/services/releaseDataFileService');
@@ -482,6 +483,223 @@ describe('ReleaseDataFilePage', () => {
 
       expect(screen.queryByText('Data blocks: OK')).not.toBeInTheDocument();
       expect(screen.queryByText('Footnotes: OK')).not.toBeInTheDocument();
+    });
+  });
+
+  test('confirming replacement cancellation hides modal and calls service to delete replacement file', async () => {
+    releaseDataFileService.getDataFile.mockResolvedValueOnce({
+      ...testOriginalFile,
+      replacedBy: testReplacementFile.id,
+    });
+    releaseDataFileService.getDataFile.mockResolvedValueOnce(
+      testReplacementFile,
+    );
+    dataReplacementService.getReplacementPlan.mockResolvedValue(
+      testValidReplacementPlan,
+    );
+
+    render(
+      <MemoryRouter
+        initialEntries={[
+          generatePath<ReleaseDataFileRouteParams>(releaseDataFileRoute.path, {
+            releaseId: 'release-1',
+            publicationId: 'publication-1',
+            fileId: 'file-1',
+          }),
+        ]}
+      >
+        <Route
+          path={releaseDataFileRoute.path}
+          component={ReleaseDataFilePage}
+        />
+      </MemoryRouter>,
+    );
+
+    await waitFor(() => {
+      expect(
+        screen.getByText(
+          /Please check the information below before confirming/,
+        ),
+      ).toBeInTheDocument();
+      expect(
+        screen.getByRole('button', { name: 'Cancel data replacement' }),
+      ).toBeInTheDocument();
+    });
+
+    userEvent.click(
+      screen.getByRole('button', { name: 'Cancel data replacement' }),
+    );
+
+    await waitFor(() => {
+      expect(screen.getByRole('dialog')).toBeInTheDocument();
+    });
+
+    expect(releaseDataFileService.deleteDataFiles).not.toHaveBeenCalled();
+
+    userEvent.click(
+      within(screen.getByRole('dialog')).getByRole('button', {
+        name: 'Confirm',
+      }),
+    );
+
+    await waitFor(() => {
+      expect(screen.queryByRole('dialog')).not.toBeInTheDocument();
+
+      expect(releaseDataFileService.deleteDataFiles).toHaveBeenCalledWith(
+        'release-1',
+        'data-2',
+      );
+    });
+  });
+
+  test('renders confirmation modal when cancelling FAILED replacement', async () => {
+    releaseDataFileService.getDataFile.mockResolvedValueOnce({
+      ...testOriginalFile,
+      replacedBy: testReplacementFile.id,
+    });
+    releaseDataFileService.getDataFile.mockResolvedValueOnce({
+      ...testReplacementFile,
+      status: 'FAILED',
+    });
+    releaseDataFileService.getDataFileImportStatus.mockResolvedValue({
+      status: 'FAILED',
+      percentageComplete: 0,
+      phasePercentageComplete: 0,
+      phaseComplete: false,
+      numberOfRows: 0,
+    });
+
+    render(
+      <MemoryRouter
+        initialEntries={[
+          generatePath<ReleaseDataFileRouteParams>(releaseDataFileRoute.path, {
+            releaseId: 'release-1',
+            publicationId: 'publication-1',
+            fileId: 'file-1',
+          }),
+        ]}
+      >
+        <Route
+          path={releaseDataFileRoute.path}
+          component={ReleaseDataFilePage}
+        />
+      </MemoryRouter>,
+    );
+
+    await waitFor(() => {
+      expect(
+        screen.getByText(/Replacement data file import failed/),
+      ).toBeInTheDocument();
+      expect(
+        screen.getByRole('button', { name: 'Cancel data replacement' }),
+      ).toBeInTheDocument();
+    });
+
+    userEvent.click(
+      screen.getByRole('button', { name: 'Cancel data replacement' }),
+    );
+
+    await waitFor(() => {
+      expect(screen.getByRole('dialog')).toBeInTheDocument();
+
+      const modal = within(screen.getByRole('dialog'));
+
+      expect(modal.getByRole('heading')).toHaveTextContent(
+        'Cancel data replacement',
+      );
+      expect(
+        modal.getByText(
+          /Are you sure you want to cancel this data replacement/,
+        ),
+      ).toBeInTheDocument();
+    });
+
+    await waitFor(() => {
+      expect(
+        screen.getByText(/Replacement data file import failed/),
+      ).toBeInTheDocument();
+      expect(
+        screen.getByRole('button', { name: 'Cancel data replacement' }),
+      ).toBeInTheDocument();
+    });
+
+    userEvent.click(
+      screen.getByRole('button', { name: 'Cancel data replacement' }),
+    );
+
+    await waitFor(() => {
+      expect(screen.getByRole('dialog')).toBeInTheDocument();
+
+      const modal = within(screen.getByRole('dialog'));
+
+      expect(modal.getByRole('heading')).toHaveTextContent(
+        'Cancel data replacement',
+      );
+      expect(
+        modal.getByText(
+          /Are you sure you want to cancel this data replacement/,
+        ),
+      ).toBeInTheDocument();
+    });
+  });
+
+  test('renders confirmation modal when cancelling after replacement plan error', async () => {
+    releaseDataFileService.getDataFile.mockResolvedValueOnce({
+      ...testOriginalFile,
+      replacedBy: testReplacementFile.id,
+    });
+    releaseDataFileService.getDataFile.mockResolvedValueOnce(
+      testReplacementFile,
+    );
+    dataReplacementService.getReplacementPlan.mockRejectedValue(
+      new Error('Something went wrong'),
+    );
+
+    render(
+      <MemoryRouter
+        initialEntries={[
+          generatePath<ReleaseDataFileRouteParams>(releaseDataFileRoute.path, {
+            releaseId: 'release-1',
+            publicationId: 'publication-1',
+            fileId: 'file-1',
+          }),
+        ]}
+      >
+        <Route
+          path={releaseDataFileRoute.path}
+          component={ReleaseDataFilePage}
+        />
+      </MemoryRouter>,
+    );
+
+    await waitFor(() => {
+      expect(
+        screen.getByText(
+          /There was a problem loading the data replacement information/,
+        ),
+      ).toBeInTheDocument();
+      expect(
+        screen.getByRole('button', { name: 'Cancel data replacement' }),
+      ).toBeInTheDocument();
+    });
+
+    userEvent.click(
+      screen.getByRole('button', { name: 'Cancel data replacement' }),
+    );
+
+    await waitFor(() => {
+      expect(screen.getByRole('dialog')).toBeInTheDocument();
+
+      const modal = within(screen.getByRole('dialog'));
+
+      expect(modal.getByRole('heading')).toHaveTextContent(
+        'Cancel data replacement',
+      );
+      expect(
+        modal.getByText(
+          /Are you sure you want to cancel this data replacement/,
+        ),
+      ).toBeInTheDocument();
     });
   });
 });

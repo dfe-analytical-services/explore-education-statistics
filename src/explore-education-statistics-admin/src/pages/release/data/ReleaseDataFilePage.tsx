@@ -14,9 +14,11 @@ import releaseDataFileService, {
 } from '@admin/services/releaseDataFileService';
 import Button from '@common/components/Button';
 import LoadingSpinner from '@common/components/LoadingSpinner';
+import ModalConfirm from '@common/components/ModalConfirm';
 import WarningMessage from '@common/components/WarningMessage';
 import useAsyncHandledRetry from '@common/hooks/useAsyncHandledRetry';
 import useAsyncRetry from '@common/hooks/useAsyncRetry';
+import useToggle from '@common/hooks/useToggle';
 import React from 'react';
 import { generatePath, RouteComponentProps } from 'react-router';
 
@@ -26,6 +28,7 @@ const ReleaseDataFilePage = ({
     params: { publicationId, releaseId, fileId },
   },
 }: RouteComponentProps<ReleaseDataFileRouteParams>) => {
+  const [isCancelling, toggleCancelling] = useToggle(false);
   const {
     value: dataFile,
     isLoading: dataFileLoading,
@@ -50,11 +53,23 @@ const ReleaseDataFilePage = ({
   }, [dataFile]);
 
   const getReplacementPlanMessage = () => {
+    if (replacementDataFile?.status === 'COMPLETE') {
+      return null;
+    }
+
+    const replacementCancelButton = (
+      <Button onClick={toggleCancelling.on}>Cancel data replacement</Button>
+    );
+
     if (replacementDataFileError) {
       return (
-        <WarningMessage>
-          There was a problem loading the data replacement information.
-        </WarningMessage>
+        <>
+          <WarningMessage>
+            There was a problem loading the data replacement information.
+          </WarningMessage>
+
+          {replacementCancelButton}
+        </>
       );
     }
 
@@ -64,31 +79,18 @@ const ReleaseDataFilePage = ({
           <WarningMessage>
             Replacement data file import failed. Please cancel and try again.
           </WarningMessage>
-          <Button
-            onClick={async () => {
-              await releaseDataFileService.deleteDataFiles(
-                releaseId,
-                replacementDataFile.id,
-              );
-              fetchDataFile();
-            }}
-          >
-            Cancel data replacement
-          </Button>
+
+          {replacementCancelButton}
         </>
       );
     }
 
-    if (replacementDataFile?.status !== 'COMPLETE') {
-      return (
-        <WarningMessage>
-          The replacement data file is still being processed. Data replacement
-          cannot continue until it has completed.
-        </WarningMessage>
-      );
-    }
-
-    return null;
+    return (
+      <WarningMessage>
+        The replacement data file is still being processed. Data replacement
+        cannot continue until it has completed.
+      </WarningMessage>
+    );
   };
 
   return (
@@ -204,7 +206,7 @@ const ReleaseDataFilePage = ({
                     releaseId={releaseId}
                     fileId={dataFile.id}
                     replacementFileId={replacementDataFile.id}
-                    onCancel={fetchDataFile}
+                    onCancel={toggleCancelling.on}
                     onReplacement={() => {
                       history.push(
                         generatePath<ReleaseDataFileRouteParams>(
@@ -224,6 +226,28 @@ const ReleaseDataFilePage = ({
           </>
         )}
       </LoadingSpinner>
+      <ModalConfirm
+        title="Cancel data replacement"
+        mounted={isCancelling}
+        onExit={toggleCancelling.off}
+        onConfirm={async () => {
+          toggleCancelling.off();
+
+          if (replacementDataFile?.id) {
+            await releaseDataFileService.deleteDataFiles(
+              releaseId,
+              replacementDataFile.id,
+            );
+          }
+
+          fetchDataFile();
+        }}
+      >
+        <p>
+          Are you sure you want to cancel this data replacement? The pending
+          replacement data file will be deleted.
+        </p>
+      </ModalConfirm>
     </>
   );
 };
