@@ -116,17 +116,25 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Services
 
             _logger.LogDebug($"Fetched {ids.Length} Observation ids from inner result in {phasesStopwatch.Elapsed.TotalMilliseconds} ms");
             phasesStopwatch.Restart();
+
+            var batchesOfIds = ids.Batch(10000).ToList();
             
-            var observations = _context
-                .Observation
-                .AsNoTracking()
-                .Include(o => o.FilterItems)
-                .Where(o => ids.Contains(o.Id))
+            var observations = batchesOfIds.SelectMany(batch =>
+            {
+                var observationBatch = _context
+                    .Observation
+                    .AsNoTracking()
+                    .Include(o => o.FilterItems)
+                    .Where(o => ids.Contains(o.Id))
+                    .ToList();
+
+                _logger.LogDebug($"Fetched batch of {batch.Count()} Observations from their ids in {phasesStopwatch.Elapsed.TotalMilliseconds} ms");
+                phasesStopwatch.Restart();
+
+                return observationBatch;
+            })
                 .ToList();
-
-            _logger.LogDebug($"Fetched {ids.Length} Observations from their ids in {phasesStopwatch.Elapsed.TotalMilliseconds} ms");
-            phasesStopwatch.Restart();
-
+            
             // Load of the Location owned entities is removed from the Observation fetching code above as another
             // "Include" as it was generating very inefficient sql.	
             var locationIds = observations
@@ -141,9 +149,9 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Services
             observations.ForEach(o => o.Location = locations[o.LocationId]);
 
             _logger.LogDebug($"Assigned Locations to {ids.Length} Observations in {phasesStopwatch.Elapsed.TotalMilliseconds} ms");
-            
-            _logger.LogDebug($"Finished fetching {observations.Count} Observations in a total of {totalStopwatch.Elapsed.TotalMilliseconds} ms");
-            return observations;
+
+            _logger.LogDebug($"Finished fetching {ids.Length} Observations in a total of {totalStopwatch.Elapsed.TotalMilliseconds} ms");
+            return observations;           
         }
 
         public IEnumerable<Observation> FindObservations(SubjectMetaQueryContext query)
