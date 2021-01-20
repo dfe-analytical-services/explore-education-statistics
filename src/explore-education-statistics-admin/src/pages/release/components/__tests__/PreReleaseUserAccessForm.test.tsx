@@ -140,7 +140,33 @@ describe('PreReleaseUserAccessForm', () => {
 
       await waitFor(() => {
         expect(
-          screen.getByText('Enter a valid email address', {
+          screen.getByText('Enter a valid @education.gov.uk email address', {
+            selector: '#preReleaseUserAccessForm-email-error',
+          }),
+        ).toBeInTheDocument();
+      });
+    });
+
+    test('shows validation message when email format is not valid', async () => {
+      preReleaseUserService.getUsers.mockResolvedValue(testUsers);
+
+      render(<PreReleaseUserAccessForm releaseId="release-1" />);
+
+      await waitFor(() => {
+        expect(
+          screen.getByLabelText('Invite new user by email'),
+        ).toBeInTheDocument();
+      });
+
+      await userEvent.type(
+        screen.getByLabelText('Invite new user by email'),
+        'email@example.com',
+      );
+      userEvent.tab();
+
+      await waitFor(() => {
+        expect(
+          screen.getByText('Enter a valid @education.gov.uk email address', {
             selector: '#preReleaseUserAccessForm-email-error',
           }),
         ).toBeInTheDocument();

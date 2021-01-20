@@ -86,7 +86,13 @@ const PreReleaseUserAccessForm = ({
           validationSchema={Yup.object<FormValues>({
             email: Yup.string()
               .required('Enter an email address')
-              .email('Enter a valid email address'),
+              .email('Enter a valid @education.gov.uk email address')
+              .test({
+                name: 'email format',
+                message: 'Enter a valid @education.gov.uk email address',
+                test: (value: string) =>
+                  value.split('@', 2)[1] === 'education.gov.uk',
+              }),
           })}
           onSubmit={handleSubmit}
         >
