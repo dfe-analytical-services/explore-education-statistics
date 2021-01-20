@@ -173,6 +173,32 @@ describe('PreReleaseUserAccessForm', () => {
       });
     });
 
+    test('shows validation message when email format has more than one @', async () => {
+      preReleaseUserService.getUsers.mockResolvedValue(testUsers);
+
+      render(<PreReleaseUserAccessForm releaseId="release-1" />);
+
+      await waitFor(() => {
+        expect(
+          screen.getByLabelText('Invite new user by email'),
+        ).toBeInTheDocument();
+      });
+
+      await userEvent.type(
+        screen.getByLabelText('Invite new user by email'),
+        'test@education.gov.uk@test',
+      );
+      userEvent.tab();
+
+      await waitFor(() => {
+        expect(
+          screen.getByText('Enter a valid @education.gov.uk email address', {
+            selector: '#preReleaseUserAccessForm-email-error',
+          }),
+        ).toBeInTheDocument();
+      });
+    });
+
     test('submitting form with invalid values shows validation messages', async () => {
       preReleaseUserService.getUsers.mockResolvedValue(testUsers);
 

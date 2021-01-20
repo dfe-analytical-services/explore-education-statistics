@@ -91,7 +91,8 @@ const PreReleaseUserAccessForm = ({
                 name: 'email format',
                 message: 'Enter a valid @education.gov.uk email address',
                 test: (value: string) =>
-                  value.split('@', 2)[1] === 'education.gov.uk',
+                  value.split('@').length === 2 &&
+                  value.split('@')[1] === 'education.gov.uk',
               }),
           })}
           onSubmit={handleSubmit}
