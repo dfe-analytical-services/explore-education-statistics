@@ -1,4 +1,6 @@
-﻿using System.Collections.Generic;
+﻿#nullable enable
+using System;
+using System.Collections.Generic;
 using System.Diagnostics.CodeAnalysis;
 using Newtonsoft.Json;
 using Newtonsoft.Json.Converters;
@@ -22,7 +24,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Common.Model.Chart
 
     public class ChartLegendItem
     {
-        public ChartDataSet DataSet;
+        public ChartLegendItemDataSet DataSet;
         public string Label;
         public string Colour;
 
@@ -31,5 +33,13 @@ namespace GovUk.Education.ExploreEducationStatistics.Common.Model.Chart
 
         [JsonConverter(typeof(StringEnumConverter))]
         public ChartLineStyle? LineStyle;
+    }
+
+    public class ChartLegendItemDataSet
+    {
+        public Guid? Indicator;
+        public List<Guid> Filters = new List<Guid>();
+        public ChartDataSetLocation? Location;
+        public string? TimePeriod;
     }
 }

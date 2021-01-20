@@ -1032,7 +1032,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
                     replacementPrimarySchoolsFilterItem
                 }
             };
-            
+
             var replacementCombinedSchoolTypeFilterGroup = new FilterGroup
             {
                 Label = "Combined",
@@ -1358,7 +1358,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
 
                 Assert.Equal(2, dataBlockSchoolTypeFilterPlan.Value.Groups.Count);
 
-                var dataBlockIndividualSchoolTypeFilterGroupPlan = 
+                var dataBlockIndividualSchoolTypeFilterGroupPlan =
                     dataBlockSchoolTypeFilterPlan.Value.Groups.First(g => g.Key == originalIndividualSchoolTypeFilterGroup.Id);
 
                 Assert.Equal(originalIndividualSchoolTypeFilterGroup.Id, dataBlockIndividualSchoolTypeFilterGroupPlan.Value.Id);
@@ -1366,7 +1366,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
                 Assert.Single(dataBlockIndividualSchoolTypeFilterGroupPlan.Value.Filters);
                 Assert.True(dataBlockIndividualSchoolTypeFilterGroupPlan.Value.Valid);
 
-                var dataBlockCombinedSchoolTypeFilterGroupPlan = 
+                var dataBlockCombinedSchoolTypeFilterGroupPlan =
                     dataBlockSchoolTypeFilterPlan.Value.Groups.First(g => g.Key == originalCombinedSchoolTypeFilterGroup.Id);
 
                 Assert.Equal(originalCombinedSchoolTypeFilterGroup.Id, dataBlockCombinedSchoolTypeFilterGroupPlan.Value.Id);
@@ -1979,7 +1979,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
                             {
                                 new ChartLegendItem
                                 {
-                                    DataSet = new ChartDataSet
+                                    DataSet = new ChartLegendItemDataSet
                                     {
                                         Filters = new List<Guid>
                                         {
