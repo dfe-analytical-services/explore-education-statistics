@@ -740,7 +740,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Content.Model.Database
                                 {
                                     new ChartLegendItem
                                     {
-                                        DataSet = new ChartDataSet
+                                        DataSet = new ChartLegendItemDataSet
                                         {
                                             Indicator = Indicator(SubjectIds[SubjectName.AbsenceByCharacteristic], IndicatorName.Unauthorised_absence_rate),
                                             Filters = new List<Guid>
@@ -757,7 +757,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Content.Model.Database
                                     },
                                     new ChartLegendItem
                                     {
-                                        DataSet = new ChartDataSet
+                                        DataSet = new ChartLegendItemDataSet
                                         {
                                             Indicator = Indicator(SubjectIds[SubjectName.AbsenceByCharacteristic], IndicatorName.Overall_absence_rate),
                                             Filters = new List<Guid>
@@ -773,7 +773,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Content.Model.Database
                                     },
                                     new ChartLegendItem
                                     {
-                                        DataSet = new ChartDataSet
+                                        DataSet = new ChartLegendItemDataSet
                                         {
                                             Indicator = Indicator(SubjectIds[SubjectName.AbsenceByCharacteristic], IndicatorName.Authorised_absence_rate),
                                             Filters = new List<Guid>
@@ -929,7 +929,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Content.Model.Database
                                 {
                                     new ChartLegendItem
                                     {
-                                        DataSet = new ChartDataSet
+                                        DataSet = new ChartLegendItemDataSet
                                         {
                                             Indicator = Indicator(SubjectIds[SubjectName.AbsenceByCharacteristic], IndicatorName.Unauthorised_absence_rate),
                                             Filters = new List<Guid>
@@ -945,7 +945,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Content.Model.Database
                                     },
                                     new ChartLegendItem
                                     {
-                                        DataSet = new ChartDataSet
+                                        DataSet = new ChartLegendItemDataSet
                                         {
                                             Indicator = Indicator(SubjectIds[SubjectName.AbsenceByCharacteristic], IndicatorName.Overall_absence_rate),
                                             Filters = new List<Guid>
@@ -961,7 +961,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Content.Model.Database
                                     },
                                     new ChartLegendItem
                                     {
-                                        DataSet = new ChartDataSet
+                                        DataSet = new ChartLegendItemDataSet
                                         {
                                             Indicator = Indicator(SubjectIds[SubjectName.AbsenceByCharacteristic], IndicatorName.Authorised_absence_rate),
                                             Filters = new List<Guid>
