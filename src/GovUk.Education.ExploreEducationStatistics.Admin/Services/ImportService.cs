@@ -29,7 +29,6 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Services
         private readonly IMapper _mapper;
         private readonly ILogger _logger;
         private readonly IStorageQueueService _queueService;
-        private readonly IGuidGenerator _guidGenerator;
         private readonly ITableStorageService _tableStorageService;
         private readonly IUserService _userService;
 
@@ -38,7 +37,6 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Services
             ILogger<ImportService> logger,
             IStorageQueueService queueService,
             ITableStorageService tableStorageService,
-            IGuidGenerator guidGenerator, 
             IUserService userService)
         {
             _context = contentDbContext;
@@ -46,11 +44,11 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Services
             _logger = logger;
             _queueService = queueService;
             _tableStorageService = tableStorageService;
-            _guidGenerator = guidGenerator;
             _userService = userService;
         }
 
         public async Task Import(Guid releaseId,
+            Guid subjectId,
             string dataFileName,
             string metaFileName,
             IFormFile dataFile,
@@ -58,7 +56,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Services
         {
             // TODO - EES-1250
             var numRows = isZip ? 0 : FileStorageUtils.CalculateNumberOfRows(dataFile.OpenReadStream());
-            var message = BuildMessage(dataFileName, metaFileName, releaseId, isZip ? dataFile.FileName.ToLower() : "");
+            var message = BuildMessage(subjectId, dataFileName, metaFileName, releaseId, isZip ? dataFile.FileName.ToLower() : "");
 
             await UpdateImportTableRow(
                 releaseId,
@@ -107,11 +105,11 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Services
                 new DatafileImport(releaseId.ToString(), dataFileName));
         }
 
-        public async Task FailImport(Guid releaseId, string dataFileName, string metaFileName,
+        public async Task FailImport(Guid releaseId, Guid subjectId, string dataFileName, string metaFileName,
             IEnumerable<ValidationError> errors)
         {
             var importReleaseMessage =
-                JsonConvert.SerializeObject(BuildMessage(dataFileName, metaFileName, releaseId));
+                JsonConvert.SerializeObject(BuildMessage(subjectId, dataFileName, metaFileName, releaseId));
 
             await _tableStorageService.CreateOrUpdateEntity(DatafileImportsTableName,
                 new DatafileImport(releaseId.ToString(), dataFileName, 0, importReleaseMessage,
@@ -125,7 +123,8 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Services
                     JsonConvert.SerializeObject(message), IStatus.QUEUED));
         }
 
-        private ImportMessage BuildMessage(string dataFileName,
+        private ImportMessage BuildMessage(Guid subjectId, 
+            string dataFileName,
             string metaFileName,
             Guid releaseId,
             string zipFileName = "")
@@ -141,7 +140,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Services
 
             return new ImportMessage
             {
-                SubjectId = _guidGenerator.NewGuid(),
+                SubjectId = subjectId,
                 DataFileName = dataFileName,
                 MetaFileName = metaFileName,
                 Release = importMessageRelease,

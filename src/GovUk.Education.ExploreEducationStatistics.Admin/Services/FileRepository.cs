@@ -20,16 +20,15 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Services
             _contentDbContext = contentDbContext;
         }
 
-        public async Task<File> Create(Guid releaseId,
+        public async Task<File> CreateAncillaryOrChart(
+            Guid releaseId,
             string filename,
-            FileType type,
-            File replacingFile = null,
-            File source = null)
+            FileType type)
         {
-            if (type == DataZip)
+            if (type != Ancillary && type != Chart)
             {
-                throw new ArgumentException($"Cannot use generic Create method for type {DataZip}",
-                    nameof(type));
+                throw new ArgumentException(
+                    "CreateAncillaryOrChart only used to create Files of type Ancillary or Chart");
             }
 
             var releaseFile = new ReleaseFile
@@ -40,23 +39,56 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Services
                     ReleaseId = releaseId,
                     Filename = filename,
                     // Mark any new ancillary or chart files as already migrated while this flag temporarily exists 
-                    FilenameMigrated = type == Ancillary || type == Chart,
+                    FilenameMigrated = true,
+                    Type = type
+                }
+            };
+            var created = (await _contentDbContext.ReleaseFiles.AddAsync(releaseFile)).Entity;
+            await _contentDbContext.SaveChangesAsync();
+            return created.File;
+        }
+
+        public async Task<File> CreateDataOrMetadata(
+            Guid releaseId,
+            Guid subjectId,
+            string filename,
+            FileType type,
+            File replacingFile = null,
+            File source = null)
+        {
+            if (type != FileType.Data && type != Metadata)
+            {
+                throw new ArgumentException(
+                    "CreateDataOrMetadata only used to create Files of type Data and Metadata");
+            }
+
+            if (type == Metadata && replacingFile != null)
+            {
+                throw new ArgumentException("replacingFile only used with Files of type Data, not Metadata.");
+            }
+
+            var releaseFile = new ReleaseFile
+            {
+                ReleaseId = releaseId,
+                File = new File
+                {
+                    ReleaseId = releaseId,
+                    SubjectId = subjectId,
+                    Filename = filename,
+                    // Mark any new ancillary or chart files as already migrated while this flag temporarily exists 
+                    FilenameMigrated = false,
                     Type = type,
                     Replacing = replacingFile,
                     Source = source
                 }
             };
-
             var created = (await _contentDbContext.ReleaseFiles.AddAsync(releaseFile)).Entity;
-
             if (replacingFile != null)
             {
                 _contentDbContext.Update(replacingFile);
                 replacingFile.ReplacedBy = releaseFile.File;
             }
-
             await _contentDbContext.SaveChangesAsync();
-
             return created.File;
         }
 
