@@ -94,7 +94,7 @@ const PreReleaseUserAccessForm = ({
                   const emailSegments = value.split('@');
                   return (
                     emailSegments.length === 2 &&
-                    emailSegments[1] === 'education.gov.uk}'
+                    emailSegments[1] === 'education.gov.uk'
                   );
                 },
               }),
