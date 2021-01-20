@@ -314,7 +314,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Common.Services
             T content,
             JsonSerializerSettings settings)
         {
-            var json = JsonConvert.SerializeObject(content, typeof(T), settings);
+            var json = JsonConvert.SerializeObject(content, null, settings);
 
             await UploadText(
                 containerName: containerName,
