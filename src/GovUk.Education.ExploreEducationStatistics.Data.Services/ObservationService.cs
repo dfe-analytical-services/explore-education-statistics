@@ -119,16 +119,16 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Services
 
             var batchesOfIds = ids.Batch(10000).ToList();
             
-            var observations = batchesOfIds.SelectMany(batch =>
+            var observations = batchesOfIds.SelectMany(batchOfIds =>
             {
                 var observationBatch = _context
                     .Observation
                     .AsNoTracking()
                     .Include(o => o.FilterItems)
-                    .Where(o => ids.Contains(o.Id))
+                    .Where(o => batchOfIds.Contains(o.Id))
                     .ToList();
 
-                _logger.LogDebug($"Fetched batch of {batch.Count()} Observations from their ids in {phasesStopwatch.Elapsed.TotalMilliseconds} ms");
+                _logger.LogDebug($"Fetched batch of {observationBatch.Count()} Observations from their ids in {phasesStopwatch.Elapsed.TotalMilliseconds} ms");
                 phasesStopwatch.Restart();
 
                 return observationBatch;
