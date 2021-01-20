@@ -164,6 +164,10 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Api.Tests.Controllers
                             {
                                 HeaderNames.IfModifiedSince,
                                 DateTime.Parse("2019-11-11T12:00:00Z").ToUniversalTime().ToString("R")
+                            },
+                            {
+                                HeaderNames.IfNoneMatch,
+                                $"W/\"{TableBuilderController.ApiVersion}\""
                             }
                         }
                     }
@@ -179,7 +183,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Api.Tests.Controllers
         }
 
         [Fact]
-        public async Task QueryForDataBlock_IsModified()
+        public async Task QueryForDataBlock_ETagChanged()
         {
             var releaseContentBlock = new ReleaseContentBlock
             {
@@ -233,6 +237,83 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Api.Tests.Controllers
                             {
                                 HeaderNames.IfModifiedSince,
                                 DateTime.Parse("2019-11-11T12:00:00Z").ToUniversalTime().ToString("R")
+                            },
+                            {
+                                HeaderNames.IfNoneMatch,
+                                "\"not the same etag\""
+                            }
+                        }
+                    }
+                }
+            };
+
+            var result = await controller.QueryForDataBlock(_releaseId, _dataBlockId);
+
+            Assert.IsType<TableBuilderResultViewModel>(result.Value);
+            Assert.Single(result.Value.Results);
+
+            MockUtils.VerifyAllMocks(dataBlockService, contentPersistenceHelper);
+        }
+
+        [Fact]
+        public async Task QueryForDataBlock_LastModifiedChanged()
+        {
+            var releaseContentBlock = new ReleaseContentBlock
+            {
+                ReleaseId = _releaseId,
+                Release = new Release
+                {
+                    Id = _releaseId,
+                    Published = DateTime.Parse("2020-11-11T12:00:00Z")
+                },
+                ContentBlockId = _dataBlockId,
+                ContentBlock = new DataBlock
+                {
+                    Id = _dataBlockId,
+                    Query = _query,
+                    Charts = new List<IChart>()
+                }
+            };
+
+            var dataBlockService = new Mock<IDataBlockService>();
+
+            dataBlockService
+                .Setup(s => s.GetDataBlockTableResult(releaseContentBlock))
+                .ReturnsAsync(
+                    new TableBuilderResultViewModel
+                    {
+                        Results = new List<ObservationViewModel>
+                        {
+                            new ObservationViewModel()
+                        }
+                    }
+                );
+
+            var contentPersistenceHelper =
+                MockUtils.MockPersistenceHelper<ContentDbContext, ReleaseContentBlock>(
+                    releaseContentBlock
+                );
+
+            var controller = BuildTableBuilderController(
+                dataBlockService: dataBlockService.Object,
+                contentPersistenceHelper: contentPersistenceHelper.Object
+            );
+
+            controller.ControllerContext = new ControllerContext
+            {
+                HttpContext = new DefaultHttpContext()
+                {
+                    Request =
+                    {
+                        Headers =
+                        {
+                            {
+                                HeaderNames.IfModifiedSince,
+                                DateTime.Parse("2019-11-11T12:00:00Z").ToUniversalTime().ToString("R")
+                            },
+                            {
+                                HeaderNames.IfNoneMatch,
+                                $"W/\"{TableBuilderController.ApiVersion}\""
                             }
                         }
                     }
