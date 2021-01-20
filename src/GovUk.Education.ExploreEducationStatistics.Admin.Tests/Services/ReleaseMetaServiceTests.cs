@@ -39,20 +39,20 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
             var releaseSubject1 = new ReleaseSubject
             {
                 Release = statisticsRelease,
+                SubjectName = "Subject 1",
                 Subject = new Subject
                 {
                     Id = Guid.NewGuid(),
-                    Name = "Subject 1"
                 }
             };
 
             var releaseSubject2 = new ReleaseSubject
             {
                 Release = statisticsRelease,
+                SubjectName = "Subject 2",
                 Subject = new Subject
                 {
                     Id = Guid.NewGuid(),
-                    Name = "Subject 2"
                 }
             };
 
@@ -127,9 +127,9 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
                 Assert.NotNull(subjects);
                 Assert.Equal(2, subjects.Count);
                 Assert.Equal(releaseSubject1.Subject.Id, subjects[0].Id);
-                Assert.Equal(releaseSubject1.Subject.Name, subjects[0].Label);
+                Assert.Equal(releaseSubject1.SubjectName, subjects[0].Label);
                 Assert.Equal(releaseSubject2.Subject.Id, subjects[1].Id);
-                Assert.Equal(releaseSubject2.Subject.Name, subjects[1].Label);
+                Assert.Equal(releaseSubject2.SubjectName, subjects[1].Label);
             }
         }
 
@@ -151,30 +151,30 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
             var releaseSubject1 = new ReleaseSubject
             {
                 Release = statisticsRelease,
+                SubjectName = "Subject 1",
                 Subject = new Subject
                 {
                     Id = Guid.NewGuid(),
-                    Name = "Subject 1"
                 }
             };
 
             var releaseSubject2 = new ReleaseSubject
             {
                 Release = statisticsRelease,
+                SubjectName = "Subject 2",
                 Subject = new Subject
                 {
                     Id = Guid.NewGuid(),
-                    Name = "Subject 2"
                 }
             };
 
             var releaseSubject2Replacement = new ReleaseSubject
             {
                 Release = statisticsRelease,
+                SubjectName = "Subject 2 Replacement",
                 Subject = new Subject
                 {
                     Id = Guid.NewGuid(),
-                    Name = "Subject 2 Replacement"
                 }
             };
 
@@ -268,9 +268,9 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
                 Assert.NotNull(subjects);
                 Assert.Equal(2, subjects.Count);
                 Assert.Equal(releaseSubject1.Subject.Id, subjects[0].Id);
-                Assert.Equal(releaseSubject1.Subject.Name, subjects[0].Label);
+                Assert.Equal(releaseSubject1.SubjectName, subjects[0].Label);
                 Assert.Equal(releaseSubject2.Subject.Id, subjects[1].Id);
-                Assert.Equal(releaseSubject2.Subject.Name, subjects[1].Label);
+                Assert.Equal(releaseSubject2.SubjectName, subjects[1].Label);
             }
         }
 
@@ -292,20 +292,20 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
             var releaseSubject1 = new ReleaseSubject
             {
                 Release = statisticsRelease,
+                SubjectName = "Subject 1",
                 Subject = new Subject
                 {
                     Id = Guid.NewGuid(),
-                    Name = "Subject 1"
                 }
             };
 
             var releaseSubject2 = new ReleaseSubject
             {
                 Release = statisticsRelease,
+                SubjectName = "Subject 2",
                 Subject = new Subject
                 {
                     Id = Guid.NewGuid(),
-                    Name = "Subject 2"
                 }
             };
 
@@ -390,7 +390,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
 
                 Assert.Single(subjects);
                 Assert.Equal(releaseSubject2.Subject.Id, subjects[0].Id);
-                Assert.Equal(releaseSubject2.Subject.Name, subjects[0].Label);
+                Assert.Equal(releaseSubject2.SubjectName, subjects[0].Label);
             }
         }
 

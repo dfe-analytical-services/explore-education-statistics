@@ -59,49 +59,53 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Services.Tests
             var publicationRelease1Subject1 = new Subject
             {
                 Id = Guid.NewGuid(),
-                Name = "Release 1 subject 1",
             };
 
             var publicationRelease1Subject1Link = new ReleaseSubject
             {
                 ReleaseId = publicationRelease1.Id,
-                SubjectId = publicationRelease1Subject1.Id
+                SubjectId = publicationRelease1Subject1.Id,
+                SubjectName = "Release 1 subject 1",
+                Subject = publicationRelease1Subject1
             };
 
             var publicationRelease1Subject2 = new Subject
             {
                 Id = Guid.NewGuid(),
-                Name = "Release 1 subject 2"
             };
 
             var publicationRelease1Subject2Link = new ReleaseSubject
             {
                 ReleaseId = publicationRelease1.Id,
-                SubjectId = publicationRelease1Subject2.Id
+                SubjectId = publicationRelease1Subject2.Id,
+                SubjectName = "Release 1 subject 2",
+                Subject = publicationRelease1Subject2
             };
 
             var publicationRelease2Subject = new Subject
             {
                 Id = Guid.NewGuid(),
-                Name = "Release 2 subject"
             };
 
             var publicationRelease2SubjectLink = new ReleaseSubject
             {
                 ReleaseId = publicationRelease2.Id,
-                SubjectId = publicationRelease2Subject.Id
+                SubjectId = publicationRelease2Subject.Id,
+                SubjectName = "Release 2 subject",
+                Subject = publicationRelease2Subject
             };
 
             var publicationRelease3Subject = new Subject
             {
                 Id = Guid.NewGuid(),
-                Name = "Release 3 subject"
             };
 
             var publicationRelease3SubjectLink = new ReleaseSubject
             {
                 ReleaseId = publicationRelease3.Id,
-                SubjectId = publicationRelease3Subject.Id
+                SubjectId = publicationRelease3Subject.Id,
+                SubjectName = "Release 3 subject",
+                Subject = publicationRelease3Subject
             };
 
             var releaseFastTrack1 = new ReleaseFastTrack(publicationRelease1.Id, Guid.NewGuid(), "table 1");
@@ -161,9 +165,9 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Services.Tests
                 Assert.Equal(releaseFastTrack2.HighlightName, highlights[1].Label);
                 Assert.Equal(2, subjects.Count);
                 Assert.Equal(publicationRelease1Subject1.Id, subjects[0].Id);
-                Assert.Equal(publicationRelease1Subject1.Name, subjects[0].Label);
+                Assert.Equal(publicationRelease1Subject1Link.SubjectName, subjects[0].Label);
                 Assert.Equal(publicationRelease1Subject2.Id, subjects[1].Id);
-                Assert.Equal(publicationRelease1Subject2.Name, subjects[1].Label);
+                Assert.Equal(publicationRelease1Subject2Link.SubjectName, subjects[1].Label);
             }
         }
 

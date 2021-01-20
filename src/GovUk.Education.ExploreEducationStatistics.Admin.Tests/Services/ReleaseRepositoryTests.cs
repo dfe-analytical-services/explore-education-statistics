@@ -210,11 +210,11 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
                 var subjects = statisticsDbContext.Subject.ToList();
                 Assert.Single(subjects);
                 Assert.Equal(subjectFilename, subjects[0].Filename);
-                Assert.Equal(subjectName, subjects[0].Name);
 
                 var releaseSubjects = statisticsDbContext.ReleaseSubject.ToList();
                 Assert.Single(releaseSubjects);
                 Assert.Equal(subjects[0].Id, releaseSubjects[0].SubjectId);
+                Assert.Equal(subjectName, releaseSubjects[0].SubjectName);
                 Assert.Equal(release.Id, releaseSubjects[0].ReleaseId);
             }
         }

@@ -17,16 +17,26 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Model.Tests
         {
             var release = new Release();
 
+            var releaseSubject1Id = Guid.NewGuid();
             var releaseSubject1 = new ReleaseSubject
             {
                 Release = release,
-                Subject = new Subject()
+                SubjectId = releaseSubject1Id,
+                Subject = new Subject
+                {
+                    Id = releaseSubject1Id
+                }
             };
 
+            var releaseSubject2Id = Guid.NewGuid();
             var releaseSubject2 = new ReleaseSubject
             {
                 Release = release,
-                Subject = new Subject()
+                SubjectId = releaseSubject2Id,
+                Subject = new Subject
+                {
+                    Id = releaseSubject2Id
+                }
             };
 
             var footnote = new Footnote
@@ -43,11 +53,11 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Model.Tests
                 {
                     new SubjectFootnote
                     {
-                        Subject = releaseSubject1.Subject
+                        SubjectId = releaseSubject1.SubjectId
                     },
                     new SubjectFootnote
                     {
-                        Subject = releaseSubject2.Subject
+                        SubjectId = releaseSubject2.SubjectId
                     },
                 },
                 Filters = new List<FilterFootnote>
@@ -203,19 +213,22 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Model.Tests
         [Fact]
         public async Task GetFootnotes_FiltersByRelease()
         {
-            var release = new Release();
+            var release = new Release
+            {
+                Id = Guid.NewGuid()
+            };
             var otherRelease = new Release();
 
             var releaseSubject1 = new ReleaseSubject
             {
-                Release = release,
-                Subject = new Subject()
+                ReleaseId = release.Id,
+                SubjectId = Guid.NewGuid()
             };
 
             var releaseSubject2 = new ReleaseSubject
             {
-                Release = release,
-                Subject = new Subject()
+                ReleaseId = release.Id,
+                SubjectId = Guid.NewGuid()
             };
 
             var footnote1 = new Footnote
@@ -238,7 +251,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Model.Tests
                 {
                     new SubjectFootnote
                     {
-                        Subject = releaseSubject1.Subject
+                        SubjectId = releaseSubject1.SubjectId
                     }
                 },
             };
@@ -257,7 +270,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Model.Tests
                 {
                     new SubjectFootnote
                     {
-                        Subject = releaseSubject2.Subject
+                        SubjectId = releaseSubject2.SubjectId
                     }
                 },
             };
@@ -326,18 +339,21 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Model.Tests
         [Fact]
         public async Task GetFootnotes_FiltersBySubjectId()
         {
-            var release = new Release();
+            var release = new Release
+            {
+                Id = Guid.NewGuid()
+            };
 
             var releaseSubject1 = new ReleaseSubject
             {
-                Release = release,
-                Subject = new Subject()
+                ReleaseId = release.Id,
+                SubjectId = Guid.NewGuid()
             };
 
             var releaseSubject2 = new ReleaseSubject
             {
-                Release = release,
-                Subject = new Subject()
+                ReleaseId = release.Id,
+                SubjectId = Guid.NewGuid()
             };
 
             var footnote1 = new Footnote
@@ -354,7 +370,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Model.Tests
                 {
                     new SubjectFootnote
                     {
-                        Subject = releaseSubject1.Subject
+                        SubjectId = releaseSubject1.SubjectId
                     }
                 },
             };
@@ -373,7 +389,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Model.Tests
                 {
                     new SubjectFootnote
                     {
-                        Subject = releaseSubject2.Subject
+                        SubjectId = releaseSubject2.SubjectId
                     }
                 },
             };
@@ -401,24 +417,27 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Model.Tests
         [Fact]
         public async Task GetFootnotes_FiltersBySubjectIds()
         {
-            var release = new Release();
+            var release = new Release
+            {
+                Id = Guid.NewGuid()
+            };
 
             var releaseSubject1 = new ReleaseSubject
             {
-                Release = release,
-                Subject = new Subject()
+                ReleaseId = release.Id,
+                SubjectId = Guid.NewGuid()
             };
 
             var releaseSubject2 = new ReleaseSubject
             {
-                Release = release,
-                Subject = new Subject()
+                ReleaseId = release.Id,
+                SubjectId = Guid.NewGuid()
             };
 
             var releaseSubject3 = new ReleaseSubject
             {
-                Release = release,
-                Subject = new Subject()
+                ReleaseId = release.Id,
+                SubjectId = Guid.NewGuid()
             };
 
             var footnote1 = new Footnote
@@ -435,7 +454,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Model.Tests
                 {
                     new SubjectFootnote
                     {
-                        Subject = releaseSubject1.Subject
+                        SubjectId = releaseSubject1.SubjectId
                     }
                 },
             };
@@ -454,7 +473,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Model.Tests
                 {
                     new SubjectFootnote
                     {
-                        Subject = releaseSubject2.Subject
+                        SubjectId = releaseSubject2.SubjectId
                     }
                 },
             };
@@ -473,7 +492,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Model.Tests
                 {
                     new SubjectFootnote
                     {
-                        Subject = releaseSubject3.Subject
+                        SubjectId = releaseSubject3.SubjectId
                     }
                 },
             };
@@ -507,24 +526,35 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Model.Tests
         [Fact]
         public async Task GetFootnotes_FiltersCriteriaBySubjectId()
         {
-            var release = new Release();
-            var otherRelease = new Release();
-
+            var release = new Release
+            {
+                Id = Guid.NewGuid()
+            };
+            var otherRelease = new Release
+            {
+                Id = Guid.NewGuid()
+            };
+            var releaseSubjectId = Guid.NewGuid();
             var releaseSubject = new ReleaseSubject
             {
-                Release = release,
+                ReleaseId = release.Id,
+                SubjectName = "Test subject for release",
+                SubjectId = releaseSubjectId,
                 Subject = new Subject
                 {
-                    Name = "Test subject for release"
+                    Id = releaseSubjectId
                 }
             };
 
+            var otherReleaseSubjectId = Guid.NewGuid();
             var otherReleaseSubject = new ReleaseSubject
             {
-                Release = otherRelease,
+                ReleaseId = otherRelease.Id,
+                SubjectName = "Test subject for other release",
+                SubjectId = otherReleaseSubjectId,
                 Subject = new Subject
                 {
-                    Name = "Test subject for other release"
+                    Id = otherReleaseSubjectId
                 }
             };
 
@@ -546,11 +576,11 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Model.Tests
                 {
                     new SubjectFootnote
                     {
-                        Subject = releaseSubject.Subject
+                        SubjectId = releaseSubject.SubjectId
                     },
                     new SubjectFootnote
                     {
-                        Subject = otherReleaseSubject.Subject
+                        SubjectId = otherReleaseSubject.SubjectId
                     },
                 },
                 Filters = new List<FilterFootnote>
@@ -677,7 +707,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Model.Tests
 
                 var footnoteFilters = results[0].Filters.ToList();
 
-                Assert.Single(footnoteSubjects);
+                Assert.Single(footnoteFilters);
                 Assert.Equal(releaseSubject.SubjectId, footnoteFilters[0].Filter.SubjectId);
 
                 var footnoteFilterGroups = results[0].FilterGroups.ToList();
@@ -702,52 +732,70 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Model.Tests
         {
             var release = new Release();
 
+            var releaseSubject1Id = Guid.NewGuid();
             var releaseSubject1 = new ReleaseSubject
             {
                 Release = release,
+                SubjectId = releaseSubject1Id,
+                SubjectName = "Test subject 1",
                 Subject = new Subject
                 {
-                    Name = "Test subject 1"
+                    Id = releaseSubject1Id
                 }
             };
+            var releaseSubject2Id = Guid.NewGuid();
             var releaseSubject2 = new ReleaseSubject
             {
                 Release = release,
+                SubjectId = releaseSubject2Id,
+                SubjectName = "Test subject 2",
                 Subject = new Subject
                 {
-                    Name = "Test subject 2"
+                    Id = releaseSubject2Id
                 }
             };
+            var releaseSubject3Id = Guid.NewGuid();
             var releaseSubject3 = new ReleaseSubject
             {
                 Release = release,
+                SubjectId = releaseSubject3Id,
+                SubjectName = "Test subject 3",
                 Subject = new Subject
                 {
-                    Name = "Test subject 3"
+                    Id = releaseSubject3Id
                 }
             };
+            var releaseSubject4Id = Guid.NewGuid();
             var releaseSubject4 = new ReleaseSubject
             {
                 Release = release,
+                SubjectId = releaseSubject4Id,
+                SubjectName = "Test subject 4",
                 Subject = new Subject
                 {
-                    Name = "Test subject 4"
+                    Id = releaseSubject4Id
                 }
             };
+            var releaseSubject5Id = Guid.NewGuid();
             var releaseSubject5 = new ReleaseSubject
             {
                 Release = release,
+                SubjectId = releaseSubject5Id,
+                SubjectName = "Test subject 5",
                 Subject = new Subject
                 {
-                    Name = "Test subject 5",
+                    Id = releaseSubject5Id
                 }
             };
+            var releaseSubjectWithNoFootnotesId = Guid.NewGuid();
             var releaseSubjectWithNoFootnotes = new ReleaseSubject
             {
                 Release = release,
+                SubjectId = releaseSubjectWithNoFootnotesId,
+                SubjectName = "Test subject with no footnotes",
                 Subject = new Subject
                 {
-                    Name = "Test subject with no footnotes"
+                    Id = releaseSubjectWithNoFootnotesId
                 }
             };
 
@@ -765,7 +813,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Model.Tests
                 {
                     new SubjectFootnote
                     {
-                        Subject = releaseSubject1.Subject,
+                        SubjectId = releaseSubject1.SubjectId
                     }
                 }
             };
@@ -890,8 +938,8 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Model.Tests
 
                 Assert.Single(results);
 
-                Assert.Equal(releaseSubjectWithNoFootnotes.Subject.Id, results[0].Id);
-                Assert.Equal(releaseSubjectWithNoFootnotes.Subject.Name, results[0].Name);
+                Assert.Equal(releaseSubjectWithNoFootnotes.Subject.Id, results[0].SubjectId);
+                Assert.Equal(releaseSubjectWithNoFootnotes.SubjectName, results[0].SubjectName);
             }
         }
 
@@ -900,52 +948,69 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Model.Tests
         {
             var release = new Release();
 
+            var releaseSubject1Id = Guid.NewGuid();
             var releaseSubject1 = new ReleaseSubject
             {
                 Release = release,
+                SubjectName = "Test subject 1",
+                SubjectId = releaseSubject1Id,
                 Subject = new Subject
                 {
-                    Name = "Test subject 1"
+                    Id = releaseSubject1Id
                 }
             };
+            var releaseSubject2Id = Guid.NewGuid();
             var releaseSubject2 = new ReleaseSubject
             {
                 Release = release,
+                SubjectId = releaseSubject2Id,
+                SubjectName = "Test subject 2",
                 Subject = new Subject
                 {
-                    Name = "Test subject 2"
+                    Id = releaseSubject2Id
                 }
             };
+            var releaseSubject3Id = Guid.NewGuid();
             var releaseSubject3 = new ReleaseSubject
             {
                 Release = release,
+                SubjectId = releaseSubject3Id,
+                SubjectName = "Test subject 3",
                 Subject = new Subject
                 {
-                    Name = "Test subject 3"
+                    Id = releaseSubject3Id
                 }
             };
+            var releaseSubject4Id = Guid.NewGuid();
             var releaseSubject4 = new ReleaseSubject
             {
                 Release = release,
+                SubjectId = releaseSubject4Id,
+                SubjectName = "Test subject 4",
                 Subject = new Subject
                 {
-                    Name = "Test subject 4"
+                    Id = releaseSubject4Id
                 }
             };
+            var releaseSubject5Id = Guid.NewGuid();
             var releaseSubject5 = new ReleaseSubject
             {
                 Release = release,
+                SubjectId = releaseSubject5Id,
+                SubjectName = "Test subject 5",
                 Subject = new Subject
                 {
-                    Name = "Test subject 5",
+                    Id = releaseSubject5Id
                 }
             };
+            var releaseSubjectWithNoFootnotesId = Guid.NewGuid();
             var releaseSubjectWithNoFootnotes = new ReleaseSubject
             {
                 Release = release,
+                SubjectName = "Test subject with no footnotes",
                 Subject = new Subject
                 {
-                    Name = "Test subject with no footnotes"
+                    Id = releaseSubjectWithNoFootnotesId
                 }
             };
 
@@ -963,7 +1028,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Model.Tests
                 {
                     new SubjectFootnote
                     {
-                        Subject = releaseSubject1.Subject,
+                        SubjectId = releaseSubject1.SubjectId,
                     }
                 },
                 Filters = new List<FilterFootnote>
@@ -1044,8 +1109,8 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Model.Tests
 
                 Assert.Single(results);
 
-                Assert.Equal(releaseSubjectWithNoFootnotes.Subject.Id, results[0].Id);
-                Assert.Equal(releaseSubjectWithNoFootnotes.Subject.Name, results[0].Name);
+                Assert.Equal(releaseSubjectWithNoFootnotes.SubjectId, results[0].SubjectId);
+                Assert.Equal(releaseSubjectWithNoFootnotes.SubjectName, results[0].SubjectName);
             }
         }
 

@@ -311,13 +311,11 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
             var subject1 = new Subject
             {
                 Id = Guid.NewGuid(),
-                Name = "Subject 1"
             };
 
             var subject2 = new Subject
             {
                 Id = Guid.NewGuid(),
-                Name = "Subject 2"
             };
 
             using (var contentDbContext = InMemoryApplicationDbContext("CreateReleaseAmendment"))
@@ -365,12 +363,14 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
                     new ReleaseSubject
                     {
                         ReleaseId = releaseId,
-                        SubjectId = subject1.Id
+                        SubjectId = subject1.Id,
+                        SubjectName = "Subject 1"
                     },
                     new ReleaseSubject
                     {
                         ReleaseId = releaseId,
-                        SubjectId = subject2.Id
+                        SubjectId = subject2.Id,
+                        SubjectName = "Subject 2"
                     }
                 );
 

@@ -104,7 +104,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
             var (subjectService, fileTypeService) = Mocks();
 
             subjectService.Setup(service => service.Get(It.IsAny<Guid>(), "Subject Title"))
-                .ReturnsAsync(new Subject());
+                .ReturnsAsync(new ReleaseSubject());
 
             await using (var context = InMemoryApplicationDbContext())
             {

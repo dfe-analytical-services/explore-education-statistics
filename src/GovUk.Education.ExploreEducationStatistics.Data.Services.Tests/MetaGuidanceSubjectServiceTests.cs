@@ -25,13 +25,11 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Services.Tests
             var subject1 = new Subject
             {
                 Filename = "file1.csv",
-                Name = "Subject 1"
             };
 
             var subject2 = new Subject
             {
                 Filename = "file2.csv",
-                Name = "Subject 2"
             };
 
             var subject1Filter = new Filter
@@ -79,6 +77,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Services.Tests
             var releaseSubject1 = new ReleaseSubject
             {
                 Release = release,
+                SubjectName = "Subject 1",
                 Subject = subject1,
                 MetaGuidance = "Subject 1 Meta Guidance"
             };
@@ -86,6 +85,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Services.Tests
             var releaseSubject2 = new ReleaseSubject
             {
                 Release = release,
+                SubjectName = "Subject 2",
                 Subject = subject2,
                 MetaGuidance = "Subject 2 Meta Guidance"
             };
@@ -205,30 +205,30 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Services.Tests
             var releaseSubject1 = new ReleaseSubject
             {
                 Release = release,
+                SubjectName = "Subject 1",
                 Subject = new Subject
                 {
                     Filename = "file1.csv",
-                    Name = "Subject 1"
                 },
                 MetaGuidance = "Subject 1 Meta Guidance"
             };
             var releaseSubject2 = new ReleaseSubject
             {
                 Release = release,
+                SubjectName = "Subject 2",
                 Subject = new Subject
                 {
                     Filename = "file2.csv",
-                    Name = "Subject 2"
                 },
                 MetaGuidance = "Subject 2 Meta Guidance"
             };
             var releaseSubject3 = new ReleaseSubject
             {
                 Release = release,
+                SubjectName = "Subject 3",
                 Subject = new Subject
                 {
                     Filename = "file3.csv",
-                    Name = "Subject 3"
                 },
                 MetaGuidance = "Subject 3 Meta Guidance"
             };
@@ -266,40 +266,46 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Services.Tests
 
             var subject1 = new Subject
             {
-                Filename = "file1.csv",
-                Name = "Subject 1"
+                Id = Guid.NewGuid(),
+                Filename = "file1.csv"
             };
 
             var subject2 = new Subject
             {
-                Filename = "file2.csv",
-                Name = "Subject 2"
+                Id = Guid.NewGuid(),
+                Filename = "file2.csv"
             };
 
             var subject3 = new Subject
             {
-                Filename = "file3.csv",
-                Name = "Subject 3"
+                Id = Guid.NewGuid(),
+                Filename = "file3.csv"
             };
 
             var releaseSubject1 = new ReleaseSubject
             {
                 Release = release,
+                SubjectId = subject1.Id,
                 Subject = subject1,
+                SubjectName = "Subject 1",
                 MetaGuidance = "Subject 1 Meta Guidance"
             };
 
             var releaseSubject2 = new ReleaseSubject
             {
                 Release = release,
+                SubjectId = subject2.Id,
                 Subject = subject2,
+                SubjectName = "Subject 2",
                 MetaGuidance = "Subject 2 Meta Guidance"
             };
 
             var releaseSubject3 = new ReleaseSubject
             {
                 Release = release,
+                SubjectId = subject3.Id,
                 Subject = subject3,
+                SubjectName = "Subject 3",
                 MetaGuidance = "Subject 3 Meta Guidance"
             };
 
@@ -404,14 +410,14 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Services.Tests
 
             var subject1 = new Subject
             {
-                Filename = "file1.csv",
-                Name = "Subject 1"
+                Id = Guid.NewGuid(),
+                Filename = "file1.csv"
             };
 
             var subject2 = new Subject
             {
-                Filename = "file2.csv",
-                Name = "Subject 2"
+                Id = Guid.NewGuid(),
+                Filename = "file2.csv"
             };
 
             // Version 1 has one Subject, Version 2 adds another Subject
@@ -419,21 +425,27 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Services.Tests
             var releaseVersion1Subject1 = new ReleaseSubject
             {
                 Release = releaseVersion1,
+                SubjectId = subject1.Id,
                 Subject = subject1,
+                SubjectName = "Subject 1",
                 MetaGuidance = "Version 1 Subject 1 Meta Guidance"
             };
 
             var releaseVersion2Subject1 = new ReleaseSubject
             {
                 Release = releaseVersion2,
+                SubjectId = subject1.Id,
                 Subject = subject1,
+                SubjectName = "Subject 1",
                 MetaGuidance = "Version 2 Subject 1 Meta Guidance"
             };
 
             var releaseVersion2Subject2 = new ReleaseSubject
             {
                 Release = releaseVersion2,
+                SubjectId = subject2.Id,
                 Subject = subject2,
+                SubjectName = "Subject 2",
                 MetaGuidance = "Version 2 Subject 2 Meta Guidance"
             };
 
@@ -543,10 +555,10 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Services.Tests
             {
                 MetaGuidance = "Subject 1 Meta Guidance",
                 Release = release,
+                SubjectName = "Subject 1",
                 Subject = new Subject
                 {
-                    Filename = "file1.csv",
-                    Name = "Subject 1"
+                    Filename = "file1.csv"
                 }
             };
 
@@ -554,10 +566,10 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Services.Tests
             {
                 MetaGuidance = "Subject 2 Meta Guidance",
                 Release = release,
+                SubjectName = "Subject 2",
                 Subject = new Subject
                 {
-                    Filename = "file2.csv",
-                    Name = "Subject 2",
+                    Filename = "file2.csv"
                 }
             };
 
@@ -590,10 +602,10 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Services.Tests
             {
                 MetaGuidance = "Subject 1 Meta Guidance",
                 Release = release,
+                SubjectName = "Subject 1",
                 Subject = new Subject
                 {
-                    Filename = "file1.csv",
-                    Name = "Subject 1"
+                    Filename = "file1.csv"
                 }
             };
 
@@ -602,10 +614,10 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Services.Tests
             {
                 MetaGuidance = null,
                 Release = release,
+                SubjectName = "Subject 2",
                 Subject = new Subject
                 {
-                    Filename = "file2.csv",
-                    Name = "Subject 2",
+                    Filename = "file2.csv"
                 }
             };
 

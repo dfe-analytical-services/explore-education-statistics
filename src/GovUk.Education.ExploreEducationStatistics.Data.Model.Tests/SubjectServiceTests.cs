@@ -168,10 +168,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Model.Tests
             var releaseSubject = new ReleaseSubject
             {
                 Release = new Release(),
-                Subject = new Subject
-                {
-                    Name = "Test subject"
-                }
+                SubjectName = "Test subject",
             };
 
             var contextId = Guid.NewGuid().ToString();
@@ -188,8 +185,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Model.Tests
                 var result = await service.Get(releaseSubject.ReleaseId, "Test subject");
 
                 Assert.NotNull(result);
-                Assert.Equal(releaseSubject.SubjectId, result.Id);
-                Assert.Equal("Test subject", result.Name);
+                Assert.Equal(releaseSubject.SubjectId, result.SubjectId);
             }
         }
 
@@ -199,10 +195,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Model.Tests
             var releaseSubject = new ReleaseSubject
             {
                 Release = new Release(),
-                Subject = new Subject
-                {
-                    Name = "Test subject"
-                }
+                SubjectName = "Test subject"
             };
 
             var contextId = Guid.NewGuid().ToString();
@@ -241,6 +234,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Model.Tests
         {
             var releaseSubject = new ReleaseSubject
             {
+                SubjectName = "Test subject",
                 Release = new Release
                 {
                     Publication = new Publication
@@ -248,10 +242,6 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Model.Tests
                         Title = "Test publication"
                     },
                 },
-                Subject = new Subject
-                {
-                    Name = "Test subject"
-                }
             };
 
             var contextId = Guid.NewGuid().ToString();
@@ -292,16 +282,13 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Model.Tests
         {
             var releaseSubject = new ReleaseSubject
             {
+                SubjectName = "Test subject",
                 Release = new Release
                 {
                     Publication = new Publication
                     {
                         Title = "Test publication"
-                    },
-                },
-                Subject = new Subject
-                {
-                    Name = "Test subject"
+                    }
                 }
             };
 

@@ -33,7 +33,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
 
             var subject = new Subject
             {
-                Name = "Test subject 1"
+                Filename = "test-subject-1.csv"
             };
 
             var filter = new Filter
@@ -284,7 +284,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
 
             var subject = new Subject
             {
-                Name = "Test subject 1"
+                Filename = "test-subject-1.csv"
             };
 
             var filter = new Filter

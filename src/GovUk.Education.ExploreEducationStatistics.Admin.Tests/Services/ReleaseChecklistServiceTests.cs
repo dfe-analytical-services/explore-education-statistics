@@ -186,13 +186,15 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
 
             await using (var context = ContentDbUtils.InMemoryContentDbContext(contextId))
             {
-                var subject = new Subject
+                var releaseSubject = new ReleaseSubject
                 {
-                    Id = Guid.NewGuid()
+                    SubjectId = Guid.NewGuid(),
+                    ReleaseId = release.Id
                 };
-                var otherSubject = new Subject
+                var otherReleaseSubject = new ReleaseSubject
                 {
-                    Id = Guid.NewGuid(),
+                    SubjectId = Guid.NewGuid(),
+                    ReleaseId = release.Id
                 };
 
                 var fileRepository = new Mock<IFileRepository>();
@@ -209,7 +211,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
                                 Type = FileType.Data,
                                 Release = release,
                                 ReleaseId = release.Id,
-                                SubjectId = subject.Id
+                                SubjectId = releaseSubject.SubjectId
                             },
                             new File
                             {
@@ -218,7 +220,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
                                 Type = FileType.Data,
                                 Release = release,
                                 ReleaseId = release.Id,
-                                SubjectId = otherSubject.Id
+                                SubjectId = otherReleaseSubject.SubjectId
                             }
                         }
                     );
@@ -234,9 +236,9 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
                 footnoteRepository
                     .Setup(r => r.GetSubjectsWithNoFootnotes(release.Id))
                     .ReturnsAsync(
-                        new List<Subject>
+                        new List<ReleaseSubject>
                         {
-                            subject,
+                            releaseSubject,
                         }
                     );
 
@@ -372,7 +374,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
 
                 footnoteRepository
                     .Setup(r => r.GetSubjectsWithNoFootnotes(release.Id))
-                    .ReturnsAsync(new List<Subject>());
+                    .ReturnsAsync(new List<ReleaseSubject>());
 
                 var dataBlockService = new Mock<IDataBlockService>();
 

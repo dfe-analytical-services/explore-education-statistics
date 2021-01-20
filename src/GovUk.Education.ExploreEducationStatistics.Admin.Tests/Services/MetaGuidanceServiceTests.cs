@@ -377,14 +377,12 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
             {
                 Id = Guid.NewGuid(),
                 Filename = "file1.csv",
-                Name = "Subject 1"
             };
 
             var subject2 = new Subject
             {
                 Id = Guid.NewGuid(),
                 Filename = "file2.csv",
-                Name = "Subject 2"
             };
 
             var releaseFile1 = new ReleaseFile
@@ -414,6 +412,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
             var releaseSubject1 = new ReleaseSubject
             {
                 Release = statsRelease,
+                SubjectName = "Subject 1",
                 Subject = subject1,
                 MetaGuidance = "Subject 1 Meta Guidance"
             };
@@ -421,6 +420,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
             var releaseSubject2 = new ReleaseSubject
             {
                 Release = statsRelease,
+                SubjectName = "Subject 2",
                 Subject = subject2,
                 MetaGuidance = "Subject 2 Meta Guidance"
             };
@@ -542,14 +542,12 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
             {
                 Id = Guid.NewGuid(),
                 Filename = "file1.csv",
-                Name = "Subject 1"
             };
 
             var subject2 = new Subject
             {
                 Id = Guid.NewGuid(),
                 Filename = "file2.csv",
-                Name = "Subject 2"
             };
 
             // Version 1 has one Subject, version 2 adds another Subject
@@ -600,6 +598,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
             var releaseVersion2Subject1 = new ReleaseSubject
             {
                 Release = statsReleaseVersion2,
+                SubjectName = "Subject 1",
                 Subject = subject1,
                 MetaGuidance = "Version 2 Subject 1 Meta Guidance"
             };
@@ -607,6 +606,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
             var releaseVersion2Subject2 = new ReleaseSubject
             {
                 Release = statsReleaseVersion2,
+                SubjectName = "Subject 2",
                 Subject = subject2,
                 MetaGuidance = "Version 2 Subject 2 Meta Guidance"
             };
