@@ -95,6 +95,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Api
             services.AddTransient<IResultBuilder<Observation, ObservationViewModel>, ResultBuilder>();
             services.AddTransient<IBoundaryLevelService, BoundaryLevelService>();
             services.AddTransient<ITableBuilderService, TableBuilderService>();
+            services.AddTransient<IDataBlockService, DataBlockService>();
             services.AddTransient<IPublicationMetaService, PublicationMetaService>();
             services.AddTransient<IThemeMetaService, ThemeMetaService>();
             services.AddTransient<IResultSubjectMetaService, ResultSubjectMetaService>();

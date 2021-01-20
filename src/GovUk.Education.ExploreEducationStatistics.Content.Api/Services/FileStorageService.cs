@@ -6,7 +6,6 @@ using GovUk.Education.ExploreEducationStatistics.Common.Model;
 using GovUk.Education.ExploreEducationStatistics.Common.Services.Interfaces;
 using GovUk.Education.ExploreEducationStatistics.Content.Api.Services.Interfaces;
 using Microsoft.AspNetCore.Mvc;
-using Newtonsoft.Json;
 
 namespace GovUk.Education.ExploreEducationStatistics.Content.Api.Services
 {
@@ -21,11 +20,9 @@ namespace GovUk.Education.ExploreEducationStatistics.Content.Api.Services
 
         public async Task<Either<ActionResult, T>> GetDeserialized<T>(string path)
         {
-            var text = "";
-
             try
             {
-                text = await _blobStorageService.DownloadBlobText(
+                return await _blobStorageService.GetDeserializedJson<T>(
                     BlobContainerNames.PublicContentContainerName,
                     path
                 );
@@ -34,20 +31,6 @@ namespace GovUk.Education.ExploreEducationStatistics.Content.Api.Services
             {
                 return new NotFoundResult();
             }
-
-            if (string.IsNullOrWhiteSpace(text))
-            {
-                throw new JsonException(
-                    $"Found empty file when trying to deserialize JSON for path: {path}");
-            }
-
-            return JsonConvert.DeserializeObject<T>(
-                text,
-                new JsonSerializerSettings
-                {
-                    TypeNameHandling = TypeNameHandling.Auto
-                }
-            );
         }
 
         public async Task<bool> IsBlobReleased(string containerName, string path)
