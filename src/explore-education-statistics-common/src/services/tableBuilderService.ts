@@ -215,7 +215,7 @@ const tableBuilderService = {
     dataBlockId: string,
   ): Promise<TableDataResponse> {
     return dataApi.get(
-      `/tablebuilder/release/${releaseId}/datablock/${dataBlockId}`,
+      `/tablebuilder/release/${releaseId}/data-block/${dataBlockId}`,
     );
   },
 };

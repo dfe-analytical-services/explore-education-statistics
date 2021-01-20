@@ -52,7 +52,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Api.Controllers
         }
 
         [ResponseCache(Duration = 300)]
-        [HttpGet("release/{releaseId}/datablock/{dataBlockId}")]
+        [HttpGet("release/{releaseId}/data-block/{dataBlockId}")]
         public async Task<ActionResult<TableBuilderResultViewModel>> QueryForDataBlock(
             Guid releaseId,
             Guid dataBlockId)
