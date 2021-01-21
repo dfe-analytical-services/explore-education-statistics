@@ -19,6 +19,10 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Api.Controllers
     [ApiController]
     public class TableBuilderController : ControllerBase
     {
+        // Change this whenever there is a breaking change
+        // that requires cache invalidation.
+        public const string ApiVersion = "1";
+
         private readonly ITableBuilderService _tableBuilderService;
         private readonly IDataBlockService _dataBlockService;
         private readonly IPersistenceHelper<ContentDbContext> _contentPersistenceHelper;
@@ -48,7 +52,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Api.Controllers
         }
 
         [ResponseCache(Duration = 300)]
-        [HttpGet("release/{releaseId}/datablock/{dataBlockId}")]
+        [HttpGet("release/{releaseId}/data-block/{dataBlockId}")]
         public async Task<ActionResult<TableBuilderResultViewModel>> QueryForDataBlock(
             Guid releaseId,
             Guid dataBlockId)
@@ -62,7 +66,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Api.Controllers
                                    && rcb.ContentBlockId == dataBlockId
                         )
                 )
-                .OnSuccessDo(block => this.CacheWithLastModified(block.Release.Published))
+                .OnSuccessDo(block => this.CacheWithLastModifiedAndETag(block.Release.Published, ApiVersion))
                 .OnSuccess(block => _dataBlockService.GetDataBlockTableResult(block))
                 .HandleFailuresOrOk();
         }
