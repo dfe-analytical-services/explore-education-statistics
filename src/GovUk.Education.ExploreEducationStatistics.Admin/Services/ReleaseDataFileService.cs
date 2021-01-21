@@ -499,8 +499,12 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Services
         {
             if (file.SubjectId.HasValue)
             {
-                var subject = await _statisticsDbContext.Subject.FindAsync(file.SubjectId.Value);
-                return subject.Name;
+                var releaseSubject = await _statisticsDbContext.ReleaseSubject
+                    .Where(rs =>
+                        rs.ReleaseId == file.ReleaseId
+                        && rs.SubjectId == file.SubjectId.Value)
+                    .FirstOrDefaultAsync();
+                return releaseSubject.SubjectName;
             }
 
             return "Unknown";

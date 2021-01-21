@@ -126,10 +126,10 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Services
             var releaseSubject = (await _statisticsDbContext.ReleaseSubject.AddAsync(new ReleaseSubject
             {
                 ReleaseId = release.Id,
+                SubjectName = subjectName,
                 Subject = new Subject
                 {
                     Filename = subjectFilename,
-                    Name = subjectName
                 }
             })).Entity;
 

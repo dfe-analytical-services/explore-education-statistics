@@ -52,7 +52,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Services
                     }
 
                     var releaseSubjects = await releaseSubjectsQueryable
-                        .OrderBy(rs => rs.Subject.Name)
+                        .OrderBy(rs => rs.SubjectName)
                         .ToListAsync();
 
                     var result = new List<MetaGuidanceSubjectViewModel>();
@@ -139,7 +139,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Services
                 Id = subject.Id,
                 Content = releaseSubject.MetaGuidance ?? "",
                 Filename = subject.Filename ?? "Unknown",
-                Name = subject.Name,
+                Name = releaseSubject.SubjectName,
                 GeographicLevels = geographicLevels,
                 TimePeriods = timePeriods,
                 Variables = variables

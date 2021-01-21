@@ -22,7 +22,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Model.Services.Interfa
 
         IEnumerable<Footnote> GetFootnotes(Guid releaseId, IEnumerable<Guid> subjectIds);
 
-        Task<IList<Subject>> GetSubjectsWithNoFootnotes(Guid releaseId);
+        Task<IList<ReleaseSubject>> GetSubjectsWithNoFootnotes(Guid releaseId);
 
         Task DeleteFootnote(Guid releaseId, Guid id);
 

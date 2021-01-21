@@ -183,7 +183,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Model.Services
                 .Include(footnote => footnote.Subjects);
         }
 
-        public async Task<IList<Subject>> GetSubjectsWithNoFootnotes(Guid releaseId)
+        public async Task<IList<ReleaseSubject>> GetSubjectsWithNoFootnotes(Guid releaseId)
         {
             return await _context.ReleaseSubject
                 .Where(releaseSubject => releaseSubject.ReleaseId == releaseId)
@@ -205,7 +205,6 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Model.Services
                             .SelectMany(indicator => indicator.Footnotes)
                             .Any()
                 )
-                .Select(releaseSubject => releaseSubject.Subject)
                 .ToListAsync();
         }
 

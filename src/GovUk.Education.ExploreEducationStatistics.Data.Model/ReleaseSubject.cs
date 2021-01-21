@@ -7,6 +7,8 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Model
         public Subject Subject { get; set; }
 
         public Guid SubjectId { get; set; }
+        
+        public string SubjectName { get; set; }
 
         public Release Release { get; set; }
 

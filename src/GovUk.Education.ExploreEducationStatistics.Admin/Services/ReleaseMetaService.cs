@@ -76,13 +76,12 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Services
                         .ToList();
 
                     var subjects = _statisticsDbContext.ReleaseSubject
-                        .Include(subject => subject.Subject)
-                        .Where(subject => subject.ReleaseId == releaseId
-                                          && subjectIds.Contains(subject.SubjectId))
-                        .Select(subject =>
+                        .Where(rs => rs.ReleaseId == releaseId
+                                          && subjectIds.Contains(rs.SubjectId))
+                        .Select(rs =>
                             new IdLabel(
-                                subject.Subject.Id,
-                                subject.Subject.Name))
+                                rs.SubjectId,
+                                rs.SubjectName))
                         .ToList();
 
                     return new SubjectsMetaViewModel

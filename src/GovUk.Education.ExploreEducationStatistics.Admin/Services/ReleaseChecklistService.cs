@@ -169,7 +169,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Services
             return warnings;
         }
 
-        private async Task<List<Subject>> GetSubjectsWithNoFootnotes(
+        private async Task<List<ReleaseSubject>> GetSubjectsWithNoFootnotes(
             Release release,
             IEnumerable<File> dataFiles)
         {
@@ -178,7 +178,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Services
                 .Select(dataFile => dataFile.SubjectId.Value);
 
             return (await _footnoteRepository.GetSubjectsWithNoFootnotes(release.Id))
-                .Where(subject => allowedSubjectIds.Contains(subject.Id))
+                .Where(rs => allowedSubjectIds.Contains(rs.SubjectId))
                 .ToList();
         }
 

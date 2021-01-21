@@ -68,8 +68,8 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Services
 
         private async Task<IEnumerable<IdLabel>> GetSubjects(Guid releaseId)
         {
-            var subjects = await _subjectService.GetSubjectsForRelease(releaseId);
-            return _mapper.Map<IEnumerable<IdLabel>>(subjects);
+            var releaseSubjects = await _subjectService.GetSubjectsForRelease(releaseId);
+            return _mapper.Map<IEnumerable<IdLabel>>(releaseSubjects);
         }
     }
 }

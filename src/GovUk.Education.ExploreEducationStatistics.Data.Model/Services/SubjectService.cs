@@ -42,14 +42,12 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Model.Services
                 .FindAsync(subjectId);
         }
 
-        public async Task<Subject?> Get(Guid releaseId, string subjectName)
+        public async Task<ReleaseSubject?> Get(Guid releaseId, string subjectName)
         {
-            return await _context
-                .ReleaseSubject
-                .Include(r => r.Subject)
-                .Where(r => r.ReleaseId == releaseId && r.Subject.Name == subjectName)
-                .Select(r => r.Subject)
-                .FirstOrDefaultAsync();
+            return await _context.ReleaseSubject
+                .FirstOrDefaultAsync(r => 
+                    r.ReleaseId == releaseId 
+                    && r.SubjectName == subjectName);
         }
 
         public Task<Publication> GetPublicationForSubject(Guid subjectId)
@@ -72,13 +70,11 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Model.Services
                 .Select(r => r.Release.Publication);
         }
 
-        public Task<List<Subject>> GetSubjectsForRelease(Guid releaseId)
+        public Task<List<ReleaseSubject>> GetSubjectsForRelease(Guid releaseId)
         {
             return _context
                 .ReleaseSubject
-                .Include(s => s.Subject)
                 .Where(s => s.ReleaseId == releaseId)
-                .Select(s => s.Subject)
                 .ToListAsync();
         }
     }
