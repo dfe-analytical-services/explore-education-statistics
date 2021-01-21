@@ -15,10 +15,10 @@ jest.mock('@admin/services/preReleaseUserService');
 describe('PreReleaseUserAccessForm', () => {
   const testUsers: PreReleaseUser[] = [
     {
-      email: 'test1@test.com',
+      email: 'test1@education.gov.uk',
     },
     {
-      email: 'test2@test.com',
+      email: 'test2@education.gov.uk',
     },
   ];
 
@@ -36,11 +36,11 @@ describe('PreReleaseUserAccessForm', () => {
 
       const row1Cells = within(rows[1]).getAllByRole('cell');
 
-      expect(row1Cells[0]).toHaveTextContent('test1@test.com');
+      expect(row1Cells[0]).toHaveTextContent('test1@education.gov.uk');
 
       const row2Cells = within(rows[2]).getAllByRole('cell');
 
-      expect(row2Cells[0]).toHaveTextContent('test2@test.com');
+      expect(row2Cells[0]).toHaveTextContent('test2@education.gov.uk');
     });
   });
 
@@ -234,11 +234,11 @@ describe('PreReleaseUserAccessForm', () => {
 
       await userEvent.type(
         screen.getByLabelText('Invite new user by email'),
-        'test3@test.com',
+        'test3@education.gov.uk',
       );
 
       preReleaseUserService.inviteUser.mockResolvedValue({
-        email: 'test3@test.com',
+        email: 'test3@education.gov.uk',
       });
 
       userEvent.click(screen.getByRole('button', { name: 'Invite new user' }));
@@ -249,15 +249,15 @@ describe('PreReleaseUserAccessForm', () => {
 
         const row1Cells = within(rows[1]).getAllByRole('cell');
 
-        expect(row1Cells[0]).toHaveTextContent('test1@test.com');
+        expect(row1Cells[0]).toHaveTextContent('test1@education.gov.uk');
 
         const row2Cells = within(rows[2]).getAllByRole('cell');
 
-        expect(row2Cells[0]).toHaveTextContent('test2@test.com');
+        expect(row2Cells[0]).toHaveTextContent('test2@education.gov.uk');
 
         const row3Cells = within(rows[3]).getAllByRole('cell');
 
-        expect(row3Cells[0]).toHaveTextContent('test3@test.com');
+        expect(row3Cells[0]).toHaveTextContent('test3@education.gov.uk');
       });
     });
   });
@@ -283,7 +283,7 @@ describe('PreReleaseUserAccessForm', () => {
 
         const row1Cells = within(rows[1]).getAllByRole('cell');
 
-        expect(row1Cells[0]).toHaveTextContent('test1@test.com');
+        expect(row1Cells[0]).toHaveTextContent('test1@education.gov.uk');
       });
     });
   });

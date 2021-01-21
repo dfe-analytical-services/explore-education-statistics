@@ -91,11 +91,14 @@ const PreReleaseUserAccessForm = ({
                 name: 'email format',
                 message: 'Enter a valid @education.gov.uk email address',
                 test: (value: string) => {
-                  const emailSegments = value.split('@');
-                  return (
-                    emailSegments.length === 2 &&
-                    emailSegments[1] === 'education.gov.uk'
-                  );
+                  if (value) {
+                    const emailSegments = value.split('@');
+                    return (
+                      emailSegments.length === 2 &&
+                      emailSegments[1] === 'education.gov.uk'
+                    );
+                  }
+                  return false;
                 },
               }),
           })}
