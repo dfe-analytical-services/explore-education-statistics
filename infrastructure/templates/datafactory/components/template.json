@@ -2051,16 +2051,6 @@
                                             "name": "Filename",
                                             "type": "String"
                                         }
-                                    },
-                                    {
-                                        "source": {
-                                            "name": "Name",
-                                            "type": "String"
-                                        },
-                                        "sink": {
-                                            "name": "Name",
-                                            "type": "String"
-                                        }
                                     }
                                 ]
                             }
@@ -2369,6 +2359,16 @@
                                         },
                                         "sink": {
                                             "name": "MetaGuidance",
+                                            "type": "String"
+                                        }
+                                    },
+                                    {
+                                        "source": {
+                                            "name": "SubjectName",
+                                            "type": "String"
+                                        },
+                                        "sink": {
+                                            "name": "SubjectName",
                                             "type": "String"
                                         }
                                     }
