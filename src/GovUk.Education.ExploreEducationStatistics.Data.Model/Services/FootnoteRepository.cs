@@ -22,8 +22,12 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Model.Services
             IQueryable<Observation> observations,
             IEnumerable<Guid> indicatorIds)
         {
-            var filterItemIds = observations.SelectMany(observation => observation.FilterItems)
-                .Select(item => item.FilterItemId).Distinct();
+            var filterItemIds = observations
+                .ToList()
+                .SelectMany(observation => observation
+                    .GetFilterItemIdList()
+                    .Select(Guid.Parse))
+                .Distinct();
 
             var releaseIdParam = new SqlParameter("releaseId", releaseId);
             var subjectIdParam = new SqlParameter("subjectId", subjectId);

@@ -243,7 +243,13 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Model.Migrations
 
             modelBuilder.Entity("GovUk.Education.ExploreEducationStatistics.Data.Model.Observation", b =>
                 {
-                    b.Property<Guid>("Id")
+                    
+                    b.Property<long>("Id")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("bigint")
+                        .HasAnnotation("SqlServer:ValueGenerationStrategy", SqlServerValueGenerationStrategy.IdentityColumn);
+                    
+                    b.Property<Guid>("ObservationId")
                         .ValueGeneratedOnAdd()
                         .HasColumnType("uniqueidentifier");
 
@@ -283,28 +289,11 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Model.Migrations
                     b.HasIndex("TimeIdentifier");
 
                     b.HasIndex("Year");
+                    
+                    b.Property<string>("FilterItemIds")
+                        .HasColumnType("nvarchar(max)");
 
-                    b.ToTable("Observation");
-                });
-
-            modelBuilder.Entity("GovUk.Education.ExploreEducationStatistics.Data.Model.ObservationFilterItem", b =>
-                {
-                    b.Property<Guid>("ObservationId")
-                        .HasColumnType("uniqueidentifier");
-
-                    b.Property<Guid>("FilterItemId")
-                        .HasColumnType("uniqueidentifier");
-
-                    b.Property<Guid?>("FilterId")
-                        .HasColumnType("uniqueidentifier");
-
-                    b.HasKey("ObservationId", "FilterItemId");
-
-                    b.HasIndex("FilterId");
-
-                    b.HasIndex("FilterItemId");
-
-                    b.ToTable("ObservationFilterItem");
+                    b.ToTable("ObservationRow");
                 });
 
             modelBuilder.Entity("GovUk.Education.ExploreEducationStatistics.Data.Model.Publication", b =>

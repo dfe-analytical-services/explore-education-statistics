@@ -41,7 +41,6 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Model.Database
         public DbSet<IndicatorGroup> IndicatorGroup { get; set; }
         public DbSet<Location> Location { get; set; }
         public DbSet<Observation> Observation { get; set; }
-        public DbSet<ObservationFilterItem> ObservationFilterItem { get; set; }
         public DbSet<Publication> Publication { get; set; }
         public DbSet<Release> Release { get; set; }
         public DbSet<Subject> Subject { get; set; }
@@ -65,7 +64,6 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Model.Database
             ConfigureLocation(modelBuilder);
             ConfigureMeasures(modelBuilder);
             ConfigureObservation(modelBuilder);
-            ConfigureObservationFilterItem(modelBuilder);
             ConfigurePublication(modelBuilder);
             ConfigureRelease(modelBuilder);
             ConfigureReleaseSubject(modelBuilder);
@@ -109,29 +107,6 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Model.Database
                 .HasOne(observation => observation.Location)
                 .WithMany()
                 .HasForeignKey(observation => observation.LocationId)
-                .OnDelete(DeleteBehavior.Restrict);
-        }
-
-        private static void ConfigureObservationFilterItem(ModelBuilder modelBuilder)
-        {
-            modelBuilder.Entity<ObservationFilterItem>()
-                .HasKey(item => new {item.ObservationId, item.FilterItemId});
-
-            modelBuilder.Entity<ObservationFilterItem>()
-                .HasOne(observationFilterItem => observationFilterItem.Observation)
-                .WithMany(observation => observation.FilterItems)
-                .HasForeignKey(observationFilterItem => observationFilterItem.ObservationId);
-
-            modelBuilder.Entity<ObservationFilterItem>()
-                .HasOne(observationFilterItem => observationFilterItem.FilterItem)
-                .WithMany()
-                .HasForeignKey(observationFilterItem => observationFilterItem.FilterItemId)
-                .OnDelete(DeleteBehavior.Restrict);
-            
-            modelBuilder.Entity<ObservationFilterItem>()
-                .HasOne(observationFilterItem => observationFilterItem.Filter)
-                .WithMany()
-                .HasForeignKey(observationFilterItem => observationFilterItem.FilterId)
                 .OnDelete(DeleteBehavior.Restrict);
         }
 

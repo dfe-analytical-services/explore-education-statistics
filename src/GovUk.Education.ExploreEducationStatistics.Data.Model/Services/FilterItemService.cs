@@ -17,31 +17,16 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Model.Services
 
         public IEnumerable<FilterItem> GetFilterItems(Guid subjectId, IQueryable<Observation> observations, bool listFilterItems)
         {
-            // Temporary measure hopefully!
-            // The following query is optimal but since IQueryable observations can contain n number of conditions then LINQ
-            // may not be capable of converting it so allow a less efficient query to be executed
+            var allFilterItemIdsPresent = observations
+                .ToList()
+                .SelectMany(o => o.GetFilterItemIdList())
+                .Distinct();
             
-            if (!listFilterItems)
-            {
-                // optimal query
-                return _context.FilterItem
-                    .Include(fi => fi.FilterGroup)
-                    .ThenInclude(fg => fg.Filter).AsNoTracking()
-                    .Where(fi => fi.FilterGroup.Filter.SubjectId == subjectId &&
-                           observations.Any(o => o.FilterItems.Any(
-                               ofi => ofi.FilterItemId == fi.Id)));
-            }
-            
-            // sub-optimal query
-            var allFilterItemsForSubject = _context.FilterItem
+            return _context.FilterItem
                 .Include(fi => fi.FilterGroup)
-                .ThenInclude(fg => fg.Filter).AsNoTracking()
-                .Where(fi => fi.FilterGroup.Filter.SubjectId == subjectId)
-                .ToList();
-
-            return allFilterItemsForSubject.Where(
-                fi => observations.Any(o => o.FilterItems.Any(
-                    ofi => ofi.FilterItemId == fi.Id)));
+                .ThenInclude(fg => fg.Filter)
+                .AsNoTracking()
+                .Where(fi => allFilterItemIdsPresent.Contains(fi.Id.ToString()));
         }
 
         public FilterItem GetTotal(Filter filter)

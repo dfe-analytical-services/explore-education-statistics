@@ -22,17 +22,12 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Services
         {
             return new ObservationViewModel
             {
-                Filters = FilterItems(observation),
+                Filters = observation.GetFilterItemIdList(),
                 GeographicLevel = observation.GeographicLevel,
                 Location = _mapper.Map<LocationViewModel>(observation.Location),
                 Measures = Measures(observation, indicators),
                 TimePeriod = observation.GetTimePeriod()
             };
-        }
-
-        private static IEnumerable<string> FilterItems(Observation observation)
-        {
-            return observation.FilterItems.Select(item => item.FilterItemId).OrderBy(l => l).Select(l => l.ToString());
         }
 
         private static Dictionary<string, string> Measures(Observation observation, IEnumerable<Guid> indicators)

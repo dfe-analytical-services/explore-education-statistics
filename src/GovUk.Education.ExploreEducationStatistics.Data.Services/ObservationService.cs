@@ -65,6 +65,27 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Services
                 CreateIdListType("wardList", locationsQuery?.Ward);
             var filterItemListParam = CreateIdListType("filterItemList", query.Filters);
 
+            var filterItemsByFilters = _context
+                .FilterItem
+                .Include(f => f.FilterGroup)
+                .ThenInclude(f => f.Filter)
+                .Where(f => query.Filters.Contains(f.Id))
+                .ToLookup(f => f.FilterGroup.Filter)
+                .ToList();
+            
+            var filterItemSearchTermsQuery = filterItemsByFilters
+                .Select(filterAndItems =>
+                {
+                    var filterItems = filterAndItems.AsQueryable();
+                    var filterItemsClause = filterItems
+                        .Select(fi => fi.Id)
+                        .Aggregate("", (current, next) => current + (current.Length > 0 ? " OR " : "") + next);
+                    return $"Contains(FilterItemIds, '{filterItemsClause}')";
+                })
+                .Aggregate("", (current, next) => current + (current.Length > 0 ? " AND " : "") + next);
+
+            var filterItemSearchTermsParam = new SqlParameter("filterItemSearchTerms", filterItemSearchTermsQuery);
+            
             // EES-745 It's ok to use Observation as the return type here, as long as only the Id field is selected
 
             var inner = _context
@@ -88,7 +109,8 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Services
                             "@sponsorList," +
                             "@wardList," +
                             "@planningAreaList," +
-                            "@filterItemList",
+                            "@filterItemList," +
+                            "@filterItemSearchTerms",
                     subjectIdParam,
                     geographicLevelParam,
                     timePeriodListParam,
@@ -107,7 +129,8 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Services
                     sponsorListParam,
                     wardListParam,
                     planningAreaListParam,
-                    filterItemListParam);
+                    filterItemListParam,
+                    filterItemSearchTermsParam);
 
             _logger.LogDebug($"Executed FilteredObservations stored procedure in {phasesStopwatch.Elapsed.TotalMilliseconds} ms");
             phasesStopwatch.Restart();
@@ -119,16 +142,15 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Services
 
             var batchesOfIds = ids.Batch(10000).ToList();
             
-            var observations = batchesOfIds.SelectMany(batch =>
+            var observations = batchesOfIds.SelectMany(batchOfIds =>
             {
                 var observationBatch = _context
                     .Observation
                     .AsNoTracking()
-                    .Include(o => o.FilterItems)
-                    .Where(o => ids.Contains(o.Id))
+                    .Where(o => batchOfIds.Contains(o.Id))
                     .ToList();
 
-                _logger.LogDebug($"Fetched batch of {batch.Count()} Observations from their ids in {phasesStopwatch.Elapsed.TotalMilliseconds} ms");
+                _logger.LogDebug($"Fetched batch of {observationBatch.Count()} Observations from their ids in {phasesStopwatch.Elapsed.TotalMilliseconds} ms");
                 phasesStopwatch.Restart();
 
                 return observationBatch;
@@ -159,7 +181,6 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Services
         {
             return DbSet()
                 .AsNoTracking()
-                .Include(observation => observation.FilterItems)
                 .Where(ObservationPredicateBuilder.Build(query));
         }
 

@@ -178,12 +178,8 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Importer.Services
                 batchNo,
                 rowsPerBatch).ToList();
 
-            await DbUtils.ExecuteWithExclusiveLock(context, "InsertObservations", async ctx =>
-            {
-                await context.Observation.AddRangeAsync(observations);
-                await context.SaveChangesAsync();
-                return Unit.Instance;
-            });
+            await context.Observation.AddRangeAsync(observations);
+            await context.SaveChangesAsync();
         }
 
         public static GeographicLevel GetGeographicLevel(IReadOnlyList<string> line, List<string> headers)
@@ -274,8 +270,8 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Importer.Services
             return new Observation
             {
                 ObservationId = observationId,
-                FilterItems = GetFilterItems(context, line, headers, subjectMeta.Filters),
-                GeographicLevel = GetGeographicLevel(line, headers),
+                FilterItemIds = GetFilterItemIds(context, line, headers, subjectMeta.Filters),
+                GeographicLevel = GetGeographicLevel(line, headers),	                
                 LocationId = GetLocationId(line, headers, context),
                 Measures = GetMeasures(line, headers, subjectMeta.Indicators),
                 SubjectId = subject.Id,
@@ -306,11 +302,11 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Importer.Services
                 var filterItemLabel = CsvUtil.Value(line, headers, filterMeta.Column);
                 var filterGroupLabel = CsvUtil.Value(line, headers, filterMeta.FilterGroupingColumn);
 
-                _importerFilterService.Find(filterItemLabel, filterGroupLabel, filterMeta.Filter, context);
+                _importerFilterService.GetOrCreate(filterItemLabel, filterGroupLabel, filterMeta.Filter, context);
             }
         }
 
-        private ICollection<ObservationFilterItem> GetFilterItems(
+        private string GetFilterItemIds(
             StatisticsDbContext context,
             IReadOnlyList<string> line,
             List<string> headers,
@@ -321,13 +317,10 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Importer.Services
                 var filterItemLabel = CsvUtil.Value(line, headers, filterMeta.Column);
                 var filterGroupLabel = CsvUtil.Value(line, headers, filterMeta.FilterGroupingColumn);
 
-                return new ObservationFilterItem
-                {
-                    FilterItemId = _importerFilterService
-                        .Find(filterItemLabel, filterGroupLabel, filterMeta.Filter, context).Id,
-                    FilterId = filterMeta.Filter.Id
-                };
-            }).ToList();
+                return _importerFilterService
+                    .GetOrCreate(filterItemLabel, filterGroupLabel, filterMeta.Filter, context).Id;
+            })
+                .Aggregate("", (current, next) => current + (current.Length > 0 ? " " : "") + next);
         }
 
         private Guid GetLocationId(IReadOnlyList<string> line, List<string> headers, StatisticsDbContext context)
