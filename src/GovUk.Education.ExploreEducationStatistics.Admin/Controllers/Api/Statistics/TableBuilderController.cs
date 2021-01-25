@@ -56,7 +56,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Controllers.Api.Stati
             return tableBuilderResultViewModel.HandleFailuresOrOk();
         }
 
-        [HttpGet("release/{releaseId}/datablock/{dataBlockId}")]
+        [HttpGet("release/{releaseId}/data-block/{dataBlockId}")]
         public async Task<ActionResult<TableBuilderResultViewModel>> QueryForDataBlock(
             Guid releaseId,
             Guid dataBlockId)
