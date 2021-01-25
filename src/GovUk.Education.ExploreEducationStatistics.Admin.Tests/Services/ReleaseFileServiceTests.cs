@@ -1340,7 +1340,6 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
                     f.ReleaseId == release.Id
                     && f.Filename == filename
                     && f.Type == Ancillary
-                    && f.FilenameMigrated
                 );
 
                 Assert.NotNull(file);
@@ -1439,7 +1438,6 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
                     f.ReleaseId == release.Id
                     && f.Filename == filename
                     && f.Type == Chart
-                    && f.FilenameMigrated
                 );
 
                 Assert.NotNull(file);

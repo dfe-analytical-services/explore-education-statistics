@@ -38,8 +38,6 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Services
                 {
                     ReleaseId = releaseId,
                     Filename = filename,
-                    // Mark any new ancillary or chart files as already migrated while this flag temporarily exists 
-                    FilenameMigrated = true,
                     Type = type
                 }
             };
@@ -75,8 +73,6 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Services
                     ReleaseId = releaseId,
                     SubjectId = subjectId,
                     Filename = filename,
-                    // Mark any new ancillary or chart files as already migrated while this flag temporarily exists 
-                    FilenameMigrated = false,
                     Type = type,
                     Replacing = replacingFile,
                     Source = source

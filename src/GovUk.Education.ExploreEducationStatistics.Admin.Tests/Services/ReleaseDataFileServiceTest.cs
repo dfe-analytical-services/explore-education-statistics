@@ -2400,11 +2400,9 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
 
                 Assert.Equal(FileType.Data, dataFile.Type);
                 Assert.Equal(release.Id, dataFile.ReleaseId);
-                Assert.False(dataFile.FilenameMigrated);
 
                 Assert.Equal(Metadata, metaFile.Type);
                 Assert.Equal(release.Id, metaFile.ReleaseId);
-                Assert.False(metaFile.FilenameMigrated);
 
                 var releaseFiles = contentDbContext.ReleaseFiles.ToList();
 
@@ -2800,15 +2798,12 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
                 Assert.Equal(FileType.Data, dataFile.Type);
                 Assert.Equal(release.Id, dataFile.ReleaseId);
                 Assert.Equal(zipFile.Id, dataFile.SourceId);
-                Assert.False(dataFile.FilenameMigrated);
 
                 Assert.Equal(Metadata, metaFile.Type);
                 Assert.Equal(release.Id, metaFile.ReleaseId);
-                Assert.False(metaFile.FilenameMigrated);
 
                 Assert.Equal(DataZip, zipFile.Type);
                 Assert.Equal(release.Id, zipFile.ReleaseId);
-                Assert.False(zipFile.FilenameMigrated);
 
                 var releaseFiles = contentDbContext.ReleaseFiles.ToList();
 
