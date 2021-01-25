@@ -22,20 +22,20 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Controllers.Api.Manag
         }
 
         [HttpPost("release/{releaseId}/content/release-note")]
-        public async Task<ActionResult<List<ReleaseNoteViewModel>>> AddReleaseNote(CreateOrUpdateReleaseNoteRequest request,
+        public async Task<ActionResult<List<ReleaseNoteViewModel>>> AddReleaseNote(ReleaseNoteSaveRequest saveRequest,
             Guid releaseId)
         {
             return await _releaseNoteService
-                .AddReleaseNoteAsync(releaseId, request)
+                .AddReleaseNoteAsync(releaseId, saveRequest)
                 .HandleFailuresOr(result => Created(HttpContext.Request.Path, result));
         }
 
         [HttpPut("release/{releaseId}/content/release-note/{releaseNoteId}")]
         public async Task<ActionResult<List<ReleaseNoteViewModel>>> UpdateReleaseNote(
-            CreateOrUpdateReleaseNoteRequest request, Guid releaseId, Guid releaseNoteId)
+            ReleaseNoteSaveRequest saveRequest, Guid releaseId, Guid releaseNoteId)
         {
             return await _releaseNoteService
-                .UpdateReleaseNoteAsync(releaseId, releaseNoteId, request)
+                .UpdateReleaseNoteAsync(releaseId, releaseNoteId, saveRequest)
                 .HandleFailuresOr(Ok);
         }
 

@@ -1,6 +1,6 @@
 namespace GovUk.Education.ExploreEducationStatistics.Admin.ViewModels
 {
-    public class EditUserViewModel
+    public class UserEditViewModel
     {
         public string RoleId { get; set; }
     }

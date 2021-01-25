@@ -12,7 +12,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Controllers.Api
         [Fact]
         public async void CreateTopic_Returns_Ok()
         {
-            var request = new SaveTopicViewModel
+            var request = new TopicSaveViewModel
             {
                 Title = "Test topic",
                 ThemeId =  Guid.NewGuid()

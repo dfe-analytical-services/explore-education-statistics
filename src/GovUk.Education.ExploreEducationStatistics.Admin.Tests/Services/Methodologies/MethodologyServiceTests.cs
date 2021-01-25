@@ -24,7 +24,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services.Method
         [Fact]
         public async Task CreateAsync()
         {
-            var request = new CreateMethodologyRequest
+            var request = new MethodologyCreateRequest
             {
                 Title = "Pupil absence statistics: methodology"
             };
@@ -52,7 +52,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services.Method
         [Fact]
         public async Task CreateAsync_SlugNotUnique()
         {
-            var request = new CreateMethodologyRequest
+            var request = new MethodologyCreateRequest
             {
                 Title = "Pupil absence statistics: methodology"
             };
@@ -166,7 +166,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services.Method
                 Title = "Pupil absence statistics: methodology"
             };
 
-            var request = new UpdateMethodologyRequest
+            var request = new MethodologyUpdateRequest
             {
                 InternalReleaseNote = null,
                 Status = Draft,
@@ -213,7 +213,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services.Method
                 Title = "Pupil absence statistics: methodology"
             };
 
-            var request = new UpdateMethodologyRequest
+            var request = new MethodologyUpdateRequest
             {
                 InternalReleaseNote = null,
                 Status = Draft,
@@ -271,7 +271,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services.Method
                 Title = "Pupil exclusion statistics: methodology"
             };
 
-            var request = new UpdateMethodologyRequest
+            var request = new MethodologyUpdateRequest
             {
                 InternalReleaseNote = null,
                 Status = Draft,

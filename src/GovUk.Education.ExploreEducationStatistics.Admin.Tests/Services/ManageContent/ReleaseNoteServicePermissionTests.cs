@@ -30,7 +30,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services.Manage
             AssertSecurityPoliciesChecked(service =>
                     service.AddReleaseNoteAsync(
                         _release.Id,
-                        new CreateOrUpdateReleaseNoteRequest()),
+                        new ReleaseNoteSaveRequest()),
                 SecurityPolicies.CanUpdateSpecificRelease);
         }
 
@@ -51,7 +51,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services.Manage
                     service.UpdateReleaseNoteAsync(
                         _release.Id,
                         Guid.NewGuid(),
-                        new CreateOrUpdateReleaseNoteRequest()),
+                        new ReleaseNoteSaveRequest()),
                 SecurityPolicies.CanUpdateSpecificRelease);
         }
 

@@ -5,7 +5,7 @@ using Newtonsoft.Json.Converters;
 
 namespace GovUk.Education.ExploreEducationStatistics.Admin.ViewModels.Methodology
 {
-    public class UpdateMethodologyRequest
+    public class MethodologyUpdateRequest
     {
         public string InternalReleaseNote { get; set; }
 

@@ -34,14 +34,14 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
         public void Create()
         {
             AssertSecurityPoliciesChecked(service =>
-                service.Create(_release.Id, new CreateDataBlockViewModel()), CanUpdateSpecificRelease);
+                service.Create(_release.Id, new DataBlockCreateViewModel()), CanUpdateSpecificRelease);
         }
 
         [Fact]
         public void Update()
         {
             AssertSecurityPoliciesChecked(service =>
-                service.Update(_dataBlock.Id, new UpdateDataBlockViewModel()), CanUpdateSpecificRelease);
+                service.Update(_dataBlock.Id, new DataBlockUpdateViewModel()), CanUpdateSpecificRelease);
         }
 
         [Fact]

@@ -10,9 +10,9 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Services.Interfaces
 {
     public interface IThemeService
     {
-        Task<Either<ActionResult, ThemeViewModel>> CreateTheme(SaveThemeViewModel createdTheme);
+        Task<Either<ActionResult, ThemeViewModel>> CreateTheme(ThemeSaveViewModel created);
 
-        Task<Either<ActionResult, ThemeViewModel>> UpdateTheme(Guid id, SaveThemeViewModel updatedTheme);
+        Task<Either<ActionResult, ThemeViewModel>> UpdateTheme(Guid id, ThemeSaveViewModel updated);
 
         Task<Either<ActionResult, ThemeViewModel>> GetTheme(Guid id);
 

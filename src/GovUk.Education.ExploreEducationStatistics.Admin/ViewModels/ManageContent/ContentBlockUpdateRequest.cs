@@ -1,6 +1,6 @@
 namespace GovUk.Education.ExploreEducationStatistics.Admin.ViewModels.ManageContent
 {
-    public class UpdateTextBasedContentBlockRequest
+    public class ContentBlockUpdateRequest
     {
         public string? Heading { get; set; }
 

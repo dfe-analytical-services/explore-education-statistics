@@ -44,7 +44,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Services.Methodologie
         }
 
         public async Task<Either<ActionResult, MethodologySummaryViewModel>> CreateMethodologyAsync(
-            CreateMethodologyRequest request)
+            MethodologyCreateRequest request)
         {
             var slug = SlugFromTitle(request.Title);
             return await _userService.CheckCanCreateMethodology()
@@ -97,7 +97,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Services.Methodologie
         }
 
         public async Task<Either<ActionResult, MethodologySummaryViewModel>> UpdateMethodologyAsync(Guid id,
-            UpdateMethodologyRequest request)
+            MethodologyUpdateRequest request)
         {
             return await _persistenceHelper.CheckEntityExists<Methodology>(id)
                 .OnSuccess(methodology => CheckCanUpdateMethodologyStatus(methodology, request.Status))

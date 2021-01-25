@@ -22,7 +22,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Services.Interfaces.M
             Guid releaseId, Dictionary<Guid, int> newSectionOrder);
 
         Task<Either<ActionResult, ContentSectionViewModel>> AddContentSectionAsync(
-            Guid releaseId, AddContentSectionRequest request,
+            Guid releaseId, ContentSectionAddRequest request,
             MethodologyContentService.ContentListType contentType);
 
         Task<Either<ActionResult, ContentSectionViewModel>> UpdateContentSectionHeadingAsync(
@@ -39,12 +39,12 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Services.Interfaces.M
 
         Task<Either<ActionResult, IContentBlockViewModel>> AddContentBlockAsync(
             Guid releaseId, Guid contentSectionId,
-            AddContentBlockRequest request);
+            ContentBlockAddRequest request);
 
         Task<Either<ActionResult, List<IContentBlockViewModel>>> RemoveContentBlockAsync(
             Guid releaseId, Guid contentSectionId, Guid contentBlockId);
 
         Task<Either<ActionResult, IContentBlockViewModel>> UpdateTextBasedContentBlockAsync(
-            Guid releaseId, Guid contentSectionId, Guid contentBlockId, UpdateTextBasedContentBlockRequest request);
+            Guid releaseId, Guid contentSectionId, Guid contentBlockId, ContentBlockUpdateRequest request);
     }
 }

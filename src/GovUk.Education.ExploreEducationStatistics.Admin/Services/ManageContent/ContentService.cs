@@ -72,7 +72,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Services.ManageConten
         }
 
         public Task<Either<ActionResult, ContentSectionViewModel>> AddContentSectionAsync(
-            Guid releaseId, AddContentSectionRequest request)
+            Guid releaseId, ContentSectionAddRequest request)
         {
             return _persistenceHelper
                 .CheckEntityExists<Release>(releaseId, HydrateContentSectionsAndBlocks)
@@ -184,7 +184,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Services.ManageConten
 
         public Task<Either<ActionResult, IContentBlockViewModel>> AddContentBlockAsync(Guid releaseId,
             Guid contentSectionId,
-            AddContentBlockRequest request)
+            ContentBlockAddRequest request)
         {
             if (request.Type != ContentBlockType.HtmlBlock)
             {
@@ -244,7 +244,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Services.ManageConten
         }
 
         public Task<Either<ActionResult, DataBlockViewModel>> UpdateDataBlockAsync(
-            Guid releaseId, Guid contentSectionId, Guid contentBlockId, UpdateDataBlockRequest request)
+            Guid releaseId, Guid contentSectionId, Guid contentBlockId, DataBlockUpdateRequest request)
         {
             return CheckContentSectionExists(releaseId, contentSectionId)
                 .OnSuccess(CheckCanUpdateRelease)
@@ -269,7 +269,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Services.ManageConten
         }
 
         public Task<Either<ActionResult, IContentBlockViewModel>> UpdateTextBasedContentBlockAsync(
-            Guid releaseId, Guid contentSectionId, Guid contentBlockId, UpdateTextBasedContentBlockRequest request)
+            Guid releaseId, Guid contentSectionId, Guid contentBlockId, ContentBlockUpdateRequest request)
         {
             return CheckContentSectionExists(releaseId, contentSectionId)
                 .OnSuccess(CheckCanUpdateRelease)
@@ -319,7 +319,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Services.ManageConten
         }
 
         public Task<Either<ActionResult, IContentBlockViewModel>> AttachDataBlock(Guid releaseId, Guid contentSectionId,
-            AttachContentBlockRequest request)
+            ContentBlockAttachRequest request)
         {
             return CheckContentSectionExists(releaseId, contentSectionId)
                 .OnSuccess(CheckCanUpdateRelease)
@@ -380,7 +380,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Services.ManageConten
         public Task<Either<ActionResult, CommentViewModel>> AddCommentAsync(Guid releaseId,
             Guid contentSectionId,
             Guid contentBlockId,
-            AddOrUpdateCommentRequest request)
+            CommentSaveRequest saveRequest)
         {
             return CheckContentSectionExists(releaseId, contentSectionId)
                 .OnSuccess(CheckCanUpdateRelease)
@@ -399,7 +399,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Services.ManageConten
                     {
                         Id = new Guid(),
                         ContentBlockId = contentBlockId,
-                        Content = request.Content,
+                        Content = saveRequest.Content,
                         Created = DateTime.UtcNow,
                         CreatedById = _userService.GetUserId()
                     };
@@ -412,14 +412,14 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Services.ManageConten
         }
 
         public Task<Either<ActionResult, CommentViewModel>> UpdateCommentAsync(Guid commentId,
-            AddOrUpdateCommentRequest request)
+            CommentSaveRequest saveRequest)
         {
             return _persistenceHelper.CheckEntityExists<Comment>(commentId)
                 .OnSuccess(_userService.CheckCanUpdateComment)
                 .OnSuccess(async comment =>
                     {
                         _context.Comment.Update(comment);
-                        comment.Content = request.Content;
+                        comment.Content = saveRequest.Content;
                         comment.Updated = DateTime.UtcNow;
                         await _context.SaveChangesAsync();
                         return await GetCommentAsync(commentId);
@@ -527,7 +527,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Services.ManageConten
         }
 
         private async Task<Either<ActionResult, DataBlockViewModel>> UpdateDataBlock(DataBlock blockToUpdate,
-            UpdateDataBlockRequest request)
+            DataBlockUpdateRequest request)
         {
             if (blockToUpdate.Summary == null)
             {

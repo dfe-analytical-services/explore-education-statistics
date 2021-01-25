@@ -39,7 +39,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Controllers.Api.Stati
         }
 
         [HttpPost("releases/{releaseId}/footnotes")]
-        public async Task<ActionResult<FootnoteViewModel>> CreateFootnote(Guid releaseId, CreateFootnoteViewModel footnote)
+        public async Task<ActionResult<FootnoteViewModel>> CreateFootnote(Guid releaseId, FootnoteCreateViewModel footnote)
         {
             return await _footnoteService
                 .CreateFootnote(
@@ -82,7 +82,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Controllers.Api.Stati
         }
 
         [HttpPut("releases/{releaseId}/footnotes/{id}")]
-        public async Task<ActionResult<FootnoteViewModel>> UpdateFootnote(Guid releaseId, Guid id, UpdateFootnoteViewModel footnote)
+        public async Task<ActionResult<FootnoteViewModel>> UpdateFootnote(Guid releaseId, Guid id, FootnoteUpdateViewModel footnote)
         {
             return await _footnoteService
                 .UpdateFootnote(

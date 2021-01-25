@@ -18,7 +18,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Controllers.Api
         [Fact]
         public async void CreateMethodologyAsync_Returns_Ok()
         {
-            var request = new CreateMethodologyRequest();
+            var request = new MethodologyCreateRequest();
 
             var methodologyService = new Mock<IMethodologyService>();
 
@@ -77,7 +77,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Controllers.Api
         [Fact]
         public async void UpdateMethodologyAsync_Returns_Ok()
         {
-            var request = new UpdateMethodologyRequest();
+            var request = new MethodologyUpdateRequest();
 
             var methodologyService = new Mock<IMethodologyService>();
 

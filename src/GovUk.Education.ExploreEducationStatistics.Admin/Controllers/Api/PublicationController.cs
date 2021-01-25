@@ -42,7 +42,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Controllers.Api
 
         [HttpPost("api/publications")]
         public async Task<ActionResult<PublicationViewModel>> CreatePublication(
-            SavePublicationViewModel publication)
+            PublicationSaveViewModel publication)
         {
             return await _publicationService
                 .CreatePublication(publication)
@@ -52,7 +52,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Controllers.Api
         [HttpPut("api/publications/{publicationId}")]
         public async Task<ActionResult<PublicationViewModel>> UpdatePublication(
             Guid publicationId,
-            SavePublicationViewModel updatedPublication)
+            PublicationSaveViewModel updatedPublication)
         {
             return await _publicationService
                 .UpdatePublication(publicationId, updatedPublication)
@@ -66,7 +66,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Controllers.Api
         [HttpPatch("api/publications/{publicationId}/legacy-releases")]
         public async Task<ActionResult<List<LegacyReleaseViewModel>>> PartialUpdateLegacyReleases(
             Guid publicationId,
-            List<PartialUpdateLegacyReleaseViewModel> legacyReleases)
+            List<LegacyReleasePartialUpdateViewModel> legacyReleases)
         {
             return await _publicationService
                 .PartialUpdateLegacyReleases(publicationId, legacyReleases)

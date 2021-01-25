@@ -42,7 +42,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Controllers.Api.Manag
 
         [HttpPost("release/{releaseId}/content/sections/add")]
         public async Task<ActionResult<ContentSectionViewModel>> AddContentSection(
-            Guid releaseId, AddContentSectionRequest request = null)
+            Guid releaseId, ContentSectionAddRequest request = null)
         {
             return await _contentService
                 .AddContentSectionAsync(releaseId, request)
@@ -51,7 +51,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Controllers.Api.Manag
 
         [HttpPut("release/{releaseId}/content/section/{contentSectionId}/heading")]
         public async Task<ActionResult<ContentSectionViewModel>> UpdateContentSectionHeading(
-            Guid releaseId, Guid contentSectionId, UpdateContentSectionHeadingRequest request)
+            Guid releaseId, Guid contentSectionId, ContentSectionHeadingUpdateRequest request)
         {
             return await _contentService
                 .UpdateContentSectionHeadingAsync(releaseId, contentSectionId, request.Heading)
@@ -86,7 +86,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Controllers.Api.Manag
 
         [HttpPost("release/{releaseId}/content/section/{contentSectionId}/blocks/add")]
         public async Task<ActionResult<IContentBlockViewModel>> AddContentBlock(
-            Guid releaseId, Guid contentSectionId, AddContentBlockRequest request)
+            Guid releaseId, Guid contentSectionId, ContentBlockAddRequest request)
         {
             return await _contentService
                 .AddContentBlockAsync(releaseId, contentSectionId, request)
@@ -104,7 +104,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Controllers.Api.Manag
 
         [HttpPut("release/{releaseId}/content/section/{contentSectionId}/data-block/{contentBlockId}")]
         public async Task<ActionResult<ContentBlock>> UpdateDataBlock(
-            Guid releaseId, Guid contentSectionId, Guid contentBlockId, UpdateDataBlockRequest request)
+            Guid releaseId, Guid contentSectionId, Guid contentBlockId, DataBlockUpdateRequest request)
         {
             return await _contentService
                 .UpdateDataBlockAsync(releaseId, contentSectionId, contentBlockId, request)
@@ -113,7 +113,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Controllers.Api.Manag
 
         [HttpPut("release/{releaseId}/content/section/{contentSectionId}/block/{contentBlockId}")]
         public async Task<ActionResult<IContentBlockViewModel>> UpdateTextBasedContentBlock(
-            Guid releaseId, Guid contentSectionId, Guid contentBlockId, UpdateTextBasedContentBlockRequest request)
+            Guid releaseId, Guid contentSectionId, Guid contentBlockId, ContentBlockUpdateRequest request)
         {
             return await _contentService
                 .UpdateTextBasedContentBlockAsync(releaseId, contentSectionId, contentBlockId, request)
@@ -130,7 +130,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Controllers.Api.Manag
 
         [HttpPost("release/{releaseId}/content/section/{contentSectionId}/blocks/attach")]
         public async Task<ActionResult<IContentBlockViewModel>> AttachDataBlock(
-            Guid releaseId, Guid contentSectionId, AttachContentBlockRequest request)
+            Guid releaseId, Guid contentSectionId, ContentBlockAttachRequest request)
         {
             return await _contentService
                 .AttachDataBlock(releaseId, contentSectionId, request)
@@ -149,19 +149,19 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Controllers.Api.Manag
         
         [HttpPost("release/{releaseId}/content/section/{contentSectionId}/block/{contentBlockId}/comments/add")]
         public async Task<ActionResult<CommentViewModel>> AddComment(
-            Guid releaseId, Guid contentSectionId, Guid contentBlockId, AddOrUpdateCommentRequest request)
+            Guid releaseId, Guid contentSectionId, Guid contentBlockId, CommentSaveRequest saveRequest)
         {
             return await _contentService
-                .AddCommentAsync(releaseId, contentSectionId, contentBlockId, request)
+                .AddCommentAsync(releaseId, contentSectionId, contentBlockId, saveRequest)
                 .HandleFailuresOrOk();
         }
         
                 
         [HttpPut("comment/{commentId}")]
-        public async Task<ActionResult<CommentViewModel>> UpdateComment(Guid commentId, AddOrUpdateCommentRequest request)
+        public async Task<ActionResult<CommentViewModel>> UpdateComment(Guid commentId, CommentSaveRequest saveRequest)
         {
             return await _contentService
-                .UpdateCommentAsync(commentId, request)
+                .UpdateCommentAsync(commentId, saveRequest)
                 .HandleFailuresOrOk();
         }
         

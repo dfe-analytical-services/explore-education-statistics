@@ -25,7 +25,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Controllers.Api
         [HttpPost("release/{releaseId}/datablocks")]
         public async Task<ActionResult<DataBlockViewModel>> CreateDataBlock(
             Guid releaseId,
-            CreateDataBlockViewModel dataBlock)
+            DataBlockCreateViewModel dataBlock)
         {
             return await _dataBlockService.Create(releaseId, dataBlock)
                 .HandleFailuresOrOk();
@@ -61,7 +61,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Controllers.Api
 
         [HttpPut("datablocks/{id}")]
         public async Task<ActionResult<DataBlockViewModel>> UpdateDataBlock(Guid id,
-            UpdateDataBlockViewModel dataBlock)
+            DataBlockUpdateViewModel dataBlock)
         {
             return await _dataBlockService.Update(id, dataBlock)
                 .HandleFailuresOrOk();

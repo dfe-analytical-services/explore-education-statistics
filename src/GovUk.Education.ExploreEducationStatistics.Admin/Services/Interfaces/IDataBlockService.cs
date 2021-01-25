@@ -14,7 +14,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Services.Interfaces
 {
     public interface IDataBlockService
     {
-        Task<Either<ActionResult, DataBlockViewModel>> Create(ReleaseId releaseId, CreateDataBlockViewModel createDataBlock);
+        Task<Either<ActionResult, DataBlockViewModel>> Create(ReleaseId releaseId, DataBlockCreateViewModel dataBlockCreate);
 
         Task<Either<ActionResult, Unit>> Delete(ReleaseId releaseId, DataBlockId id);
 
@@ -22,7 +22,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Services.Interfaces
 
         Task<Either<ActionResult, List<DataBlockViewModel>>> List(ReleaseId releaseId);
 
-        Task<Either<ActionResult, DataBlockViewModel>> Update(DataBlockId id, UpdateDataBlockViewModel updateDataBlock);
+        Task<Either<ActionResult, DataBlockViewModel>> Update(DataBlockId id, DataBlockUpdateViewModel dataBlockUpdate);
 
         Task DeleteDataBlocks(DeleteDataBlockPlan deletePlan);
 

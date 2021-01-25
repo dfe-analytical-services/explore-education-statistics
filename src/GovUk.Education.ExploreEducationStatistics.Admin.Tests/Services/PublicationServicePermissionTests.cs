@@ -153,7 +153,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
 
             PermissionTestUtil.AssertSecurityPoliciesChecked(
                 async service =>
-                    await service.CreatePublication(new SavePublicationViewModel
+                    await service.CreatePublication(new PublicationSaveViewModel
                     {
                         TopicId = _topic.Id,
                     }),
@@ -177,11 +177,11 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
 
             PermissionTestUtil.AssertSecurityPoliciesChecked(
                 async service =>
-                    await service.UpdatePublication(_publication.Id, new SavePublicationViewModel
+                    await service.UpdatePublication(_publication.Id, new PublicationSaveViewModel
                     {
                         TopicId = _topic.Id,
                         Title = "Updated publication",
-                        Contact = new SaveContactViewModel
+                        Contact = new ContactSaveViewModel
                         {
                             TeamName = "Test team",
                             TeamEmail = "team@test.com",
@@ -209,11 +209,11 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
 
             PermissionTestUtil.AssertSecurityPoliciesChecked(
                 async service =>
-                    await service.UpdatePublication(_publication.Id, new SavePublicationViewModel
+                    await service.UpdatePublication(_publication.Id, new PublicationSaveViewModel
                     {
                         TopicId = _topic.Id,
                         Title = "Updated publication",
-                        Contact = new SaveContactViewModel
+                        Contact = new ContactSaveViewModel
                         {
                             TeamName = "Test team",
                             TeamEmail = "team@test.com",

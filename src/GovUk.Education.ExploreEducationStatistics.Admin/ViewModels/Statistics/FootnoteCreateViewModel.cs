@@ -3,7 +3,7 @@ using System.Collections.Generic;
 
 namespace GovUk.Education.ExploreEducationStatistics.Admin.ViewModels.Statistics
 {
-    public class CreateFootnoteViewModel
+    public class FootnoteCreateViewModel
     {
         public string Content { get; set; }
         public IReadOnlyCollection<Guid> Filters { get; set; }

@@ -6,7 +6,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.ViewModels
     public class ContactViewModel
     {
         public Guid Id { get; set; }
-        
+
         public string TeamName { get; set; }
 
         public string TeamEmail { get; set; }
@@ -15,8 +15,8 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.ViewModels
 
         public string ContactTelNo { get; set; }
     }
-    
-    public class SaveContactViewModel
+
+    public class ContactSaveViewModel
     {
         [Required]
         public string TeamName { get; set; }

@@ -10,7 +10,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Services.Interfaces
 {
     public interface IReleaseService
     {
-        Task<Either<ActionResult, ReleaseViewModel>> CreateReleaseAsync(CreateReleaseViewModel release);
+        Task<Either<ActionResult, ReleaseViewModel>> CreateReleaseAsync(ReleaseCreateViewModel release);
 
         Task<Either<ActionResult, Unit>> DeleteRelease(Guid releaseId);
 
@@ -20,7 +20,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Services.Interfaces
 
         Task<Either<ActionResult, ReleasePublicationStatusViewModel>> GetReleasePublicationStatusAsync(Guid releaseId);
 
-        Task<Either<ActionResult, ReleaseViewModel>> UpdateRelease(Guid releaseId, UpdateReleaseViewModel request);
+        Task<Either<ActionResult, ReleaseViewModel>> UpdateRelease(Guid releaseId, ReleaseUpdateViewModel request);
 
         Task<Either<ActionResult, TitleAndIdViewModel>> GetLatestReleaseAsync(Guid publicationId);
 

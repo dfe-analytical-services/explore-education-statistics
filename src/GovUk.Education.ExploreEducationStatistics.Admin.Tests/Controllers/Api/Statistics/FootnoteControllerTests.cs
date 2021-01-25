@@ -152,7 +152,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Controllers.Api
         [Fact]
         public async void Post_CreateFootnote_Returns_Ok()
         {
-            var result = await _controller.CreateFootnote(ReleaseId, new CreateFootnoteViewModel()
+            var result = await _controller.CreateFootnote(ReleaseId, new FootnoteCreateViewModel()
             {
                 Content = "Sample footnote",
                 Filters = new List<Guid>(),
@@ -175,7 +175,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Controllers.Api
         [Fact]
         public async void Put_UpdateFootnote_Returns_Ok()
         {
-            var result = await _controller.UpdateFootnote(ReleaseId, FootnoteId, new UpdateFootnoteViewModel
+            var result = await _controller.UpdateFootnote(ReleaseId, FootnoteId, new FootnoteUpdateViewModel
             {
                 Content = "Updated sample footnote",
                 Filters = new List<Guid>(),

@@ -657,7 +657,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
                 await context.SaveChangesAsync();
             }
 
-            var updateRequest = new UpdateDataBlockViewModel
+            var updateRequest = new DataBlockUpdateViewModel
             {
                 Heading = "New heading",
                 Name = "New name",
@@ -774,7 +774,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
                 await context.SaveChangesAsync();
             }
 
-            var updateRequest = new UpdateDataBlockViewModel
+            var updateRequest = new DataBlockUpdateViewModel
             {
                 Charts = new List<IChart>
                 {

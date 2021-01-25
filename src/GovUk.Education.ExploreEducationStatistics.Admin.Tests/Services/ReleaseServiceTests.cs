@@ -61,7 +61,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
                 var releaseService = BuildReleaseService(context);
 
                 var result = releaseService.CreateReleaseAsync(
-                    new CreateReleaseViewModel
+                    new ReleaseCreateViewModel
                     {
                         PublicationId = publication.Id,
                         ReleaseName = "2018",
@@ -200,7 +200,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
                 var releaseService = BuildReleaseService(context);
 
                 var result = releaseService.CreateReleaseAsync(
-                    new CreateReleaseViewModel
+                    new ReleaseCreateViewModel
                     {
                         PublicationId = new Guid("403d3c5d-a8cd-4d54-a029-0c74c86c55b2"),
                         TemplateReleaseId = templateReleaseId,
@@ -697,7 +697,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
                 var result = await releaseService
                     .UpdateRelease(
                         releaseId,
-                        new UpdateReleaseViewModel
+                        new ReleaseUpdateViewModel
                         {
                             PublishScheduled = "2051-06-30",
                             NextReleaseDate = nextReleaseDateEdited,
@@ -788,7 +788,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
                 var result = await releaseService
                     .UpdateRelease(
                         releaseId,
-                        new UpdateReleaseViewModel
+                        new ReleaseUpdateViewModel
                         {
                             PublishScheduled = "2051-06-30",
                             TypeId = releaseType.Id,
@@ -856,7 +856,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
                 var result = await releaseService
                     .UpdateRelease(
                         amendedRelease.Id,
-                        new UpdateReleaseViewModel
+                        new ReleaseUpdateViewModel
                         {
                             PublishScheduled = "2051-06-30",
                             TypeId = releaseType.Id,
@@ -921,7 +921,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
                 var result = await releaseService
                     .UpdateRelease(
                         release.Id,
-                        new UpdateReleaseViewModel
+                        new ReleaseUpdateViewModel
                         {
                             PublishScheduled = "2051-06-30",
                             TypeId = release.Type.Id,
@@ -972,7 +972,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
                 var result = await releaseService
                     .UpdateRelease(
                         release.Id,
-                        new UpdateReleaseViewModel
+                        new ReleaseUpdateViewModel
                         {
                             PublishScheduled = "2051-06-30",
                             TypeId = release.Type.Id,
@@ -1022,7 +1022,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
                 var result = await releaseService
                     .UpdateRelease(
                         release.Id,
-                        new UpdateReleaseViewModel
+                        new ReleaseUpdateViewModel
                         {
                             TypeId = release.Type.Id,
                             ReleaseName = "2030",

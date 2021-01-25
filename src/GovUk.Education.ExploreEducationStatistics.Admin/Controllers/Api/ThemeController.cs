@@ -25,7 +25,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Controllers.Api
         }
 
         [HttpPost("themes")]
-        public async Task<ActionResult<ThemeViewModel>> CreateTheme(SaveThemeViewModel theme)
+        public async Task<ActionResult<ThemeViewModel>> CreateTheme(ThemeSaveViewModel theme)
         {
             return await _themeService
                 .CreateTheme(theme)
@@ -35,7 +35,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Controllers.Api
         [HttpPut("themes/{themeId}")]
         public async Task<ActionResult<ThemeViewModel>> UpdateTheme(
             [Required] Guid themeId,
-            SaveThemeViewModel theme)
+            ThemeSaveViewModel theme)
         {
             return await _themeService
                 .UpdateTheme(themeId, theme)

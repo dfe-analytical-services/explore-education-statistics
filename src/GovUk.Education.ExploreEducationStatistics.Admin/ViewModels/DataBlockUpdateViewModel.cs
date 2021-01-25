@@ -7,7 +7,7 @@ using GovUk.Education.ExploreEducationStatistics.Content.Model;
 
 namespace GovUk.Education.ExploreEducationStatistics.Admin.ViewModels
 {
-    public class UpdateDataBlockViewModel
+    public class DataBlockUpdateViewModel
     {
         [Required]
         public string Heading { get; set; }

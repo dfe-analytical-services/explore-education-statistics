@@ -12,16 +12,16 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Services.Interfaces
         Task<Either<ActionResult, List<MyPublicationViewModel>>> GetMyPublicationsAndReleasesByTopic(Guid topicId);
 
         Task<Either<ActionResult, PublicationViewModel>> CreatePublication(
-            SavePublicationViewModel publication);
+            PublicationSaveViewModel publication);
 
         Task<Either<ActionResult, PublicationViewModel>> UpdatePublication(
             Guid publicationId,
-            SavePublicationViewModel updatedPublication);
+            PublicationSaveViewModel updatedPublication);
 
         Task<Either<ActionResult, PublicationViewModel>> GetViewModel(Guid publicationId);
         
         Task<Either<ActionResult, List<LegacyReleaseViewModel>>> PartialUpdateLegacyReleases(
             Guid publicationId, 
-            List<PartialUpdateLegacyReleaseViewModel> updatedLegacyReleases);
+            List<LegacyReleasePartialUpdateViewModel> updatedLegacyReleases);
     }
 }

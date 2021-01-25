@@ -1,3 +1,4 @@
+
 using System.Collections.Generic;
 using System.ComponentModel.DataAnnotations;
 using GovUk.Education.ExploreEducationStatistics.Common.Model.Chart;
@@ -7,7 +8,7 @@ using GovUk.Education.ExploreEducationStatistics.Content.Model;
 
 namespace GovUk.Education.ExploreEducationStatistics.Admin.ViewModels
 {
-    public class CreateDataBlockViewModel
+    public class DataBlockCreateViewModel
     {
         [Required]
         public string Heading { get; set; }

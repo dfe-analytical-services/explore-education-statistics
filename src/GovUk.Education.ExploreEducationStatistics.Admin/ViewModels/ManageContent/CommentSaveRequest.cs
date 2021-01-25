@@ -1,7 +1,7 @@
 namespace GovUk.Education.ExploreEducationStatistics.Admin.ViewModels.ManageContent
 {
-    public class AddContentSectionRequest
+    public class CommentSaveRequest
     {
-        public int Order { get; set; }
+        public string Content { get; set; }
     }
 }

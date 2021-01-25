@@ -60,7 +60,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Mappings
                             : (DateTime?) null))
                 .ForMember(dest => dest.Permissions, exp => exp.MapFrom<IMyReleasePermissionSetPropertyResolver>());
 
-            CreateMap<CreateReleaseViewModel, Release>()
+            CreateMap<ReleaseCreateViewModel, Release>()
                 .ForMember(dest => dest.PublishScheduled, m => m.MapFrom(model =>
                     model.PublishScheduledDate));
 
@@ -100,8 +100,8 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Mappings
             CreateMap<Contact, ContactViewModel>();
 
             CreateContentBlockMap();
-            CreateMap<CreateDataBlockViewModel, DataBlock>();
-            CreateMap<UpdateDataBlockViewModel, DataBlock>();
+            CreateMap<DataBlockCreateViewModel, DataBlock>();
+            CreateMap<DataBlockUpdateViewModel, DataBlock>();
 
             CreateMap<Theme, Data.Model.Theme>()
                 .ForMember(dest => dest.Topics, m => m.Ignore());

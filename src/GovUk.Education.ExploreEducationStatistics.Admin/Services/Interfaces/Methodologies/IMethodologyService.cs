@@ -18,9 +18,9 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Services.Interfaces.M
         Task<Either<ActionResult, MethodologySummaryViewModel>> GetSummaryAsync(Guid id);
 
         Task<Either<ActionResult, MethodologySummaryViewModel>>
-            CreateMethodologyAsync(CreateMethodologyRequest request);
+            CreateMethodologyAsync(MethodologyCreateRequest request);
 
         Task<Either<ActionResult, MethodologySummaryViewModel>> UpdateMethodologyAsync(Guid id,
-            UpdateMethodologyRequest request);
+            MethodologyUpdateRequest request);
     }
 }

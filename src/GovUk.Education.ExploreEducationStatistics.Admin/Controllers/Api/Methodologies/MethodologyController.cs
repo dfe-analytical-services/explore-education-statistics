@@ -35,7 +35,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Controllers.Api.Metho
         [ProducesResponseType(typeof(ValidationProblemDetails), 400)]
         [HttpPost("api/methodologies")]
         public Task<ActionResult<MethodologySummaryViewModel>> CreateMethodologyAsync(
-            CreateMethodologyRequest methodology)
+            MethodologyCreateRequest methodology)
         {
             return _methodologyService
                 .CreateMethodologyAsync(methodology)
@@ -54,7 +54,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Controllers.Api.Metho
         [Produces("application/json")]
         [HttpPut("api/methodology/{methodologyId}")]
         public async Task<ActionResult<MethodologySummaryViewModel>> UpdateMethodologyAsync(Guid methodologyId,
-            UpdateMethodologyRequest request)
+            MethodologyUpdateRequest request)
         {
             return await _methodologyService
                 .UpdateMethodologyAsync(methodologyId, request)

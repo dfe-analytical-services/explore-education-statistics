@@ -62,7 +62,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Services
         }
 
         public async Task<Either<ActionResult, PublicationViewModel>> CreatePublication(
-            SavePublicationViewModel publication)
+            PublicationSaveViewModel publication)
         {
             return await ValidateSelectedTopic(publication.TopicId)
                 .OnSuccess(_ => ValidateSelectedMethodology(
@@ -102,7 +102,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Services
 
         public async Task<Either<ActionResult, PublicationViewModel>> UpdatePublication(
             Guid publicationId,
-            SavePublicationViewModel updatedPublication)
+            PublicationSaveViewModel updatedPublication)
         {
             return await _persistenceHelper
                 .CheckEntityExists<Publication>(publicationId)
@@ -213,7 +213,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Services
 
         public async Task<Either<ActionResult, List<LegacyReleaseViewModel>>> PartialUpdateLegacyReleases(
             Guid publicationId,
-            List<PartialUpdateLegacyReleaseViewModel> updatedLegacyReleases)
+            List<LegacyReleasePartialUpdateViewModel> updatedLegacyReleases)
         {
             return await _persistenceHelper
                 .CheckEntityExists<Publication>(

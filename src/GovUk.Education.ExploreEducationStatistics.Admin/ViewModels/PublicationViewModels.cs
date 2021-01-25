@@ -19,7 +19,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.ViewModels
         public List<LegacyReleaseViewModel> LegacyReleases { get; set; }
 
         public MethodologyTitleViewModel Methodology { get; set; }
-        
+
         public ExternalMethodology ExternalMethodology { get; set; }
 
         public Guid TopicId { get; set; }
@@ -29,7 +29,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.ViewModels
         public ContactViewModel Contact { get; set; }
     }
 
-    public class SavePublicationViewModel
+    public class PublicationSaveViewModel
     {
         [Required] public string Title { get; set; }
 
@@ -39,7 +39,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.ViewModels
 
         public ExternalMethodology ExternalMethodology { get; set; }
 
-        [Required] public SaveContactViewModel Contact { get; set; }
+        [Required] public ContactSaveViewModel Contact { get; set; }
 
         private string _slug;
 

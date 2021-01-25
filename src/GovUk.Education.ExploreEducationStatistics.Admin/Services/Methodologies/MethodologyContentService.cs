@@ -100,7 +100,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Services.Methodologie
         }
 
         public Task<Either<ActionResult, ContentSectionViewModel>> AddContentSectionAsync(
-            Guid methodologyId, AddContentSectionRequest request, ContentListType contentType)
+            Guid methodologyId, ContentSectionAddRequest request, ContentListType contentType)
         {
             return _persistenceHelper
                 .CheckEntityExists<Methodology>(methodologyId)
@@ -213,7 +213,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Services.Methodologie
 
         public Task<Either<ActionResult, IContentBlockViewModel>> AddContentBlockAsync(Guid methodologyId,
             Guid contentSectionId,
-            AddContentBlockRequest request)
+            ContentBlockAddRequest request)
         {
             return CheckContentSectionExists(methodologyId, contentSectionId)
                 .OnSuccess(CheckCanUpdateMethodology)
@@ -253,7 +253,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Services.Methodologie
         }
 
         public Task<Either<ActionResult, IContentBlockViewModel>> UpdateTextBasedContentBlockAsync(
-            Guid methodologyId, Guid contentSectionId, Guid contentBlockId, UpdateTextBasedContentBlockRequest request)
+            Guid methodologyId, Guid contentSectionId, Guid contentBlockId, ContentBlockUpdateRequest request)
         {
             return CheckContentSectionExists(methodologyId, contentSectionId)
                 .OnSuccess(CheckCanUpdateMethodology)

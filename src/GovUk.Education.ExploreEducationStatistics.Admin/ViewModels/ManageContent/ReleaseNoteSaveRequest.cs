@@ -2,7 +2,7 @@
 
 namespace GovUk.Education.ExploreEducationStatistics.Admin.ViewModels.ManageContent
 {
-    public class CreateOrUpdateReleaseNoteRequest
+    public class ReleaseNoteSaveRequest
     {
         public DateTime? On { get; set; }
         public string Reason { get; set; }

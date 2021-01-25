@@ -64,7 +64,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.ViewModels
         public Guid? PreviousVersionId { get; set; }
     }
 
-    public class CreateReleaseViewModel
+    public class ReleaseCreateViewModel
     {
         public Guid PublicationId { get; set; }
 
@@ -110,7 +110,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.ViewModels
         public Guid? TemplateReleaseId { get; set; }
     }
 
-    public class UpdateReleaseViewModel
+    public class ReleaseUpdateViewModel
     {
         [Required] public Guid TypeId { get; set; }
 
