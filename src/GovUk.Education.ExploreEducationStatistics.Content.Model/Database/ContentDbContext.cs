@@ -1,6 +1,5 @@
 using System;
 using System.Collections.Generic;
-using System.IO;
 using System.Text;
 using GovUk.Education.ExploreEducationStatistics.Common.Converters;
 using GovUk.Education.ExploreEducationStatistics.Common.Model;
@@ -177,6 +176,12 @@ namespace GovUk.Education.ExploreEducationStatistics.Content.Model.Database
                 .HasOne(r => r.Release)
                 .WithMany()
                 .OnDelete(DeleteBehavior.NoAction);
+
+            // @MarkFix
+            //modelBuilder.Entity<File>()
+            //    .HasOne(r => r.ReleaseFile)
+            //    .WithOne()
+            //    .OnDelete(DeleteBehavior.NoAction);
 
             modelBuilder.Entity<File>()
                 .HasOne(r => r.Release)

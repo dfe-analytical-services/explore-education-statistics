@@ -30,7 +30,6 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Services
     public class ReleaseDataFileService : IReleaseDataFileService
     {
         private readonly ContentDbContext _contentDbContext;
-        private readonly StatisticsDbContext _statisticsDbContext;
         private readonly IPersistenceHelper<ContentDbContext> _persistenceHelper;
         private readonly IBlobStorageService _blobStorageService;
         private readonly IDataArchiveValidationService _dataArchiveValidationService;
@@ -43,7 +42,6 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Services
         private readonly IUserService _userService;
 
         public ReleaseDataFileService(ContentDbContext contentDbContext,
-            StatisticsDbContext statisticsDbContext,
             IPersistenceHelper<ContentDbContext> persistenceHelper,
             IBlobStorageService blobStorageService,
             IDataArchiveValidationService dataArchiveValidationService,
@@ -56,7 +54,6 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Services
             IUserService userService)
         {
             _contentDbContext = contentDbContext;
-            _statisticsDbContext = statisticsDbContext;
             _persistenceHelper = persistenceHelper;
             _blobStorageService = blobStorageService;
             _dataArchiveValidationService = dataArchiveValidationService;
@@ -228,6 +225,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Services
                                         var dataFile = await _fileRepository.CreateDataOrMetadata(
                                             releaseId: releaseId,
                                             subjectId: subjectId,
+                                            name: validSubjectName,
                                             filename: dataFormFile.FileName.ToLower(),
                                             type: FileType.Data,
                                             replacingFile: replacingFile);
@@ -235,11 +233,11 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Services
                                         var metaFile = await _fileRepository.CreateDataOrMetadata(
                                             releaseId: releaseId,
                                             subjectId: subjectId,
+                                            name: validSubjectName,  // @MarkFix meta has no name?
                                             filename: metaFormFile.FileName.ToLower(),
                                             type: Metadata);
 
                                         var dataInfo = GetDataFileMetaValues(
-                                            name: validSubjectName,
                                             metaFileName: metaFile.Filename,
                                             userName: userName,
                                             numberOfRows: CalculateNumberOfRows(dataFormFile.OpenReadStream())
@@ -305,7 +303,6 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Services
                                         .OnSuccess(async archiveFile =>
                                         {
                                             var dataInfo = GetDataFileMetaValues(
-                                                name: validSubjectName,
                                                 metaFileName: archiveFile.MetaFileName,
                                                 userName: userName,
                                                 numberOfRows: 0
@@ -331,6 +328,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Services
                                                     var dataFile = await _fileRepository.CreateDataOrMetadata(
                                                         releaseId: releaseId,
                                                         subjectId: subjectId,
+                                                        name: validSubjectName,
                                                         filename: archiveFile.DataFileName,
                                                         type: FileType.Data,
                                                         replacingFile: replacingFile,
@@ -339,6 +337,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Services
                                                     var metaFile = await _fileRepository.CreateDataOrMetadata(
                                                         releaseId: releaseId,
                                                         subjectId: subjectId,
+                                                        name: validSubjectName, // @MarkFix meta has no name?
                                                         filename: archiveFile.MetaFileName,
                                                         type: Metadata,
                                                         source: zipFile);
@@ -410,7 +409,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Services
             {
                 Id = dataFile.Id,
                 FileName = dataFile.Filename,
-                Name = dataFile.SubjectId.HasValue ? await GetSubjectName(dataFile) : blob.Name,
+                Name = await GetSubjectName(dataFile),
                 Path = blob.Path,
                 Size = blob.Size,
                 MetaFileId = metaFile.Id,
@@ -497,10 +496,12 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Services
 
         private async Task<string> GetSubjectName(File file)
         {
-            if (file.SubjectId.HasValue)
+            // @MarkFix Check that file is FileType.Data
+            
+            var releaseFile = await _contentDbContext.ReleaseFiles.SingleOrDefaultAsync(rf => rf.FileId == file.Id);
+            if (releaseFile != null)
             {
-                var subject = await _statisticsDbContext.Subject.FindAsync(file.SubjectId.Value);
-                return subject.Name;
+                return releaseFile.Name;
             }
 
             return "Unknown";

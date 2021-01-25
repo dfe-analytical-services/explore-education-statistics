@@ -36,6 +36,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Common.Model
             Created = created;
         }
 
+        // @MarkFix Removed to stop getting subject name from blob
         public string Name => Meta.TryGetValue(NameKey, out var name) ? name : string.Empty;
 
         /// <summary>

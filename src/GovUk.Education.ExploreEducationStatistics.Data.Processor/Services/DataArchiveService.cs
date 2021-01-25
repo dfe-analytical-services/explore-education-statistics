@@ -46,7 +46,6 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Processor.Services
                     fileName: dataFile.Name.ToLower(),
                     contentType: "text/csv",
                     metaValues: GetDataFileMetaValues(
-                        name: blob.Name,
                         metaFileName: metadataFile.Name,
                         userName: blob.GetUserName(),
                         numberOfRows: CalculateNumberOfRows(rowStream)
@@ -54,7 +53,6 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Processor.Services
                 );
             }
 
-            await using (var rowStream = metadataFile.Open())
             await using (var stream = metadataFile.Open())
             {
                 await _fileStorageService.UploadStream(

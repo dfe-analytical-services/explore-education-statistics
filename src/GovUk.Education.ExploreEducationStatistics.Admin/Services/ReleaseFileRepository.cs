@@ -63,9 +63,10 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Services
         public async Task<List<ReleaseFile>> GetByFileType(Guid releaseId, params FileType[] types)
         {
             return await _contentDbContext.ReleaseFiles
-                .Include(f => f.File)
+                .Include(rf => rf.File)
                 .Where(releaseFile =>
-                    releaseFile.ReleaseId == releaseId
+                    releaseFile.FileId == releaseFile.File.Id  // @MarkFix
+                    && releaseFile.ReleaseId == releaseId
                     && types.Contains(releaseFile.File.Type))
                 .ToListAsync();
         }

@@ -101,6 +101,8 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Services
                     stopwatch.Stop();
 
                     var publication = await _subjectService.GetPublicationForSubject(subject.Id);
+
+                    var subjectName = await _subjectService.GetName(releaseId, subject.Id);
                     
                     return new ResultSubjectMetaViewModel
                     {
@@ -111,7 +113,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Services
                         Locations = locations,
                         BoundaryLevels = boundaryLevels,
                         PublicationName = publication.Title,
-                        SubjectName = subject.Name,
+                        SubjectName = subjectName,
                         TimePeriodRange = timePeriodRange
                     };
                 });

@@ -1,5 +1,4 @@
 ﻿using System;
-using GovUk.Education.ExploreEducationStatistics.Common.Extensions;
 using GovUk.Education.ExploreEducationStatistics.Common.Model;
 using static GovUk.Education.ExploreEducationStatistics.Common.Services.FileStoragePathUtils;
 
@@ -48,8 +47,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Content.Model.Extensions
             {
                 Id = file.Id,
                 FileName = file.Filename,
-                // EES-1637 Prefer name field on blob
-                Name = blobInfo.Name.IsNullOrEmpty() ? file.Filename : blobInfo.Name,
+                Name = blobInfo.Name,
                 Path = file.Path(),
                 Size = blobInfo.Size,
                 Type = file.Type
@@ -61,8 +59,8 @@ namespace GovUk.Education.ExploreEducationStatistics.Content.Model.Extensions
             return new FileInfo
             {
                 Id = file.Id,
-                FileName = file.Filename,
                 Name = "Unknown",
+                FileName = file.Filename,
                 Path = null,
                 Size = "0.00 B",
                 Type = file.Type
@@ -74,8 +72,8 @@ namespace GovUk.Education.ExploreEducationStatistics.Content.Model.Extensions
             return new FileInfo
             {
                 Id = file.Id,
-                FileName = file.Filename,
                 Name = blobInfo.Name,
+                FileName = file.Filename,
                 Path = blobInfo.Path,
                 Size = blobInfo.Size,
                 Type = file.Type

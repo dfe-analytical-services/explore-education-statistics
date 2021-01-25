@@ -3,21 +3,28 @@ using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
+using GovUk.Education.ExploreEducationStatistics.Content.Model.Database;
 using GovUk.Education.ExploreEducationStatistics.Data.Model.Database;
 using GovUk.Education.ExploreEducationStatistics.Data.Model.Services.Interfaces;
+using HeyRed.Mime;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Logging;
+using FileType = GovUk.Education.ExploreEducationStatistics.Common.Model.FileType;
 
 namespace GovUk.Education.ExploreEducationStatistics.Data.Model.Services
 {
     public class SubjectService : AbstractRepository<Subject, Guid>, ISubjectService
     {
         private readonly IReleaseService _releaseService;
+        private readonly ContentDbContext _contentDbContext;
 
-        public SubjectService(StatisticsDbContext context,
-            ILogger<SubjectService> logger, IReleaseService releaseService) : base(context, logger)
+        public SubjectService(StatisticsDbContext statisticsDbContext,
+            ILogger<SubjectService> logger, 
+            IReleaseService releaseService,
+            ContentDbContext contentDbContext) : base(statisticsDbContext, logger)
         {
             _releaseService = releaseService;
+            _contentDbContext = contentDbContext;
         }
 
         public async Task<bool> IsSubjectForLatestPublishedRelease(Guid subjectId)
@@ -42,14 +49,16 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Model.Services
                 .FindAsync(subjectId);
         }
 
-        public async Task<Subject?> Get(Guid releaseId, string subjectName)
+        public async Task<string> GetName(Guid releaseId, Guid subjectId)
         {
-            return await _context
-                .ReleaseSubject
-                .Include(r => r.Subject)
-                .Where(r => r.ReleaseId == releaseId && r.Subject.Name == subjectName)
-                .Select(r => r.Subject)
-                .FirstOrDefaultAsync();
+            var releaseFile = await _contentDbContext.ReleaseFiles
+                .Include(rf => rf.File)
+                .FirstAsync(rf =>
+                    rf.FileId == rf.File.Id
+                    && rf.ReleaseId == releaseId
+                    && rf.File.Type == FileType.Data
+                    && rf.File.SubjectId == subjectId);
+            return releaseFile.Name ?? "Unknown";
         }
 
         public Task<Publication> GetPublicationForSubject(Guid subjectId)

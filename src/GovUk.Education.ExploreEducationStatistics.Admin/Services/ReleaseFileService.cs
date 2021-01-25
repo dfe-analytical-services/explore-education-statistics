@@ -166,7 +166,8 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Services
                     var file = await _fileRepository.CreateAncillaryOrChart(
                         releaseId,
                         formFile.FileName,
-                        Ancillary);
+                        Ancillary,
+                        name);
 
                     await _contentDbContext.SaveChangesAsync();
 

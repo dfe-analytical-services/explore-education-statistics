@@ -11,11 +11,13 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Services.Interfaces
         public Task<File> CreateAncillaryOrChart(
             Guid releaseId,
             string filename,
-            FileType type);
+            FileType type,
+            string name = null);
 
         public Task<File> CreateDataOrMetadata(
             Guid releaseId,
             Guid subjectId,
+            string name,
             string filename,
             FileType type,
             File replacingFile = null,

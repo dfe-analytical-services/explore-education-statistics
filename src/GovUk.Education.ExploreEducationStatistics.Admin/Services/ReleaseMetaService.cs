@@ -50,8 +50,10 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Services
                 {
                     var files = _contentDbContext.ReleaseFiles
                         .Include(file => file.File)
-                        .Where(file => file.ReleaseId == releaseId
-                                       && file.File.Type == FileType.Data)
+                        .Where(file => 
+                            file.FileId == file.File.Id  // @MarkFix
+                            && file.ReleaseId == releaseId
+                            && file.File.Type == FileType.Data)
                         .Select(file => file.File);
 
                     // Exclude files that are replacements in progress
@@ -75,15 +77,29 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Services
                         .Select(file => file.SubjectId)
                         .ToList();
 
-                    var subjects = _statisticsDbContext.ReleaseSubject
-                        .Include(subject => subject.Subject)
-                        .Where(subject => subject.ReleaseId == releaseId
-                                          && subjectIds.Contains(subject.SubjectId))
-                        .Select(subject =>
+                    // @MarkFix
+                    //var subjects = _statisticsDbContext.ReleaseSubject
+                    //    .Include(subject => subject.Subject)
+                    //    .Where(subject => subject.ReleaseId == releaseId
+                    //                      && subjectIds.Contains(subject.SubjectId))
+                    //    .Select(subject =>
+                    //        new IdLabel(
+                    //            subject.Subject.Id,
+                    //            subject.Subject.Name))
+                    //    .ToList();
+                    var subjects = _contentDbContext.ReleaseFiles
+                        .Include(rf => rf.File)
+                        .Where(rf =>
+                            rf.FileId == rf.File.Id // @MarkFix
+                            && rf.ReleaseId == releaseId
+                            && rf.File.Type == FileType.Data
+                            && subjectIds.Contains(rf.File.SubjectId))
+                        .Select(releaseFile =>
                             new IdLabel(
-                                subject.Subject.Id,
-                                subject.Subject.Name))
+                                releaseFile.File.SubjectId.Value,
+                                releaseFile.Name))
                         .ToList();
+                                
 
                     return new SubjectsMetaViewModel
                     {

@@ -207,7 +207,6 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Processor.Services
                     stream: stream,
                     contentType: "text/csv",
                     FileStorageUtils.GetDataFileMetaValues(
-                        name: subjectData.DataBlob.Name,
                         metaFileName: subjectData.DataBlob.GetMetaFileName(),
                         userName: subjectData.DataBlob.GetUserName(),
                         numberOfRows: numRows

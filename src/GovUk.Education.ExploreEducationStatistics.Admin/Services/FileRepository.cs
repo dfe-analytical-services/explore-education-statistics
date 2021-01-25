@@ -23,7 +23,8 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Services
         public async Task<File> CreateAncillaryOrChart(
             Guid releaseId,
             string filename,
-            FileType type)
+            FileType type,
+            string name = null)
         {
             if (type != Ancillary && type != Chart)
             {
@@ -34,6 +35,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Services
             var releaseFile = new ReleaseFile
             {
                 ReleaseId = releaseId,
+                Name = name,
                 File = new File
                 {
                     ReleaseId = releaseId,
@@ -49,6 +51,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Services
         public async Task<File> CreateDataOrMetadata(
             Guid releaseId,
             Guid subjectId,
+            string name,
             string filename,
             FileType type,
             File replacingFile = null,
@@ -68,6 +71,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Services
             var releaseFile = new ReleaseFile
             {
                 ReleaseId = releaseId,
+                Name = name,
                 File = new File
                 {
                     ReleaseId = releaseId,

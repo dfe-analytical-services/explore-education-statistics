@@ -129,7 +129,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Services
                 Subject = new Subject
                 {
                     Filename = subjectFilename,
-                    Name = subjectName
+                    // Name = subjectName // @MarkFix When does the subjectname get added to ReleaseFiles?
                 }
             })).Entity;
 

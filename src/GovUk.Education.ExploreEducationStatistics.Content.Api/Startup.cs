@@ -90,6 +90,8 @@ namespace GovUk.Education.ExploreEducationStatistics.Content.Api
             services.AddTransient<IIndicatorService, IndicatorService>();
             services.AddTransient<IMetaGuidanceService, MetaGuidanceService>();
             services.AddTransient<IMetaGuidanceSubjectService, MetaGuidanceSubjectService>();
+            services.AddTransient<ISubjectService, SubjectService>();
+            services.AddTransient<IReleaseService, ReleaseService>();
 
             AddPersistenceHelper<StatisticsDbContext>(services);
         }

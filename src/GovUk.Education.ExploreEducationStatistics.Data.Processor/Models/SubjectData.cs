@@ -8,8 +8,6 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Processor.Models
 
         public BlobInfo MetaBlob { get; }
 
-        public string Name => DataBlob.Name;
-
         public SubjectData(
             BlobInfo dataBlob,
             BlobInfo metaBlob)

@@ -10,11 +10,14 @@ namespace GovUk.Education.ExploreEducationStatistics.Content.Model
         public Guid Id { get; set; }
 
         [JsonIgnore]
+        public ReleaseFile ReleaseFile { get; set; }
+
+    [JsonIgnore]
         public Release Release { get; set; }
 
         public Guid ReleaseId { get; set; }
 
-        public Guid? SubjectId { get; set; }
+        public Guid? SubjectId { get; set; }  // @MarkFix doesn't need to be nullable
 
         public string Filename { get; set; }
 

@@ -30,13 +30,15 @@ namespace GovUk.Education.ExploreEducationStatistics.Publisher.Services
         private readonly IReleaseSubjectService _releaseSubjectService;
         private readonly ILogger<ReleaseService> _logger;
         private readonly IMapper _mapper;
+        private readonly ISubjectService _subjectService;
 
         public ReleaseService(ContentDbContext contentDbContext,
             StatisticsDbContext statisticsDbContext,
             IFileStorageService fileStorageService,
             IReleaseSubjectService releaseSubjectService,
             ILogger<ReleaseService> logger,
-            IMapper mapper)
+            IMapper mapper,
+            ISubjectService subjectService)
         {
             _contentDbContext = contentDbContext;
             _statisticsDbContext = statisticsDbContext;
@@ -44,6 +46,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Publisher.Services
             _releaseSubjectService = releaseSubjectService;
             _logger = logger;
             _mapper = mapper;
+            _subjectService = subjectService;
         }
 
         public async Task<Release> GetAsync(Guid id)
@@ -240,11 +243,19 @@ namespace GovUk.Education.ExploreEducationStatistics.Publisher.Services
                 containerName: PublicFilesContainerName,
                 path: path);
 
+            // @MarkFix null check
+            var file = await _contentDbContext.Files
+                .Include(f => f.ReleaseFile)
+                .SingleOrDefaultAsync(f =>
+                    f.Id == f.ReleaseFile.FileId // @MarkFix
+                    && f.ReleaseId == release.Id
+                    && f.Filename == blob.FileName);
+
             return new FileInfo
             {
                 Id = null,
                 FileName = blob.FileName,
-                Name = blob.Name,
+                Name = file.ReleaseFile.Name,
                 Path = blob.Path,
                 Size = blob.Size,
                 Type = Ancillary
