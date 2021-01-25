@@ -28,14 +28,14 @@ export interface DeleteDataBlockPlan {
 const dataBlockService = {
   async getDataBlocks(releaseId: string) {
     return client.get<ReleaseDataBlock[]>(
-      `/release/${releaseId}/datablocks`,
+      `/releases/${releaseId}/data-blocks`,
       {},
     );
   },
 
   async createDataBlock(releaseId: string, dataBlock: CreateReleaseDataBlock) {
     return client.post<ReleaseDataBlock>(
-      `/release/${releaseId}/datablocks`,
+      `/releases/${releaseId}/data-blocks`,
       dataBlock,
     );
   },
@@ -45,18 +45,18 @@ const dataBlockService = {
     dataBlock: UpdateReleaseDataBlock,
   ) {
     return client.put<ReleaseDataBlock>(
-      `/datablocks/${dataBlockId}`,
+      `/data-blocks/${dataBlockId}`,
       dataBlock,
     );
   },
 
   async deleteDataBlock(releaseId: string, id: string) {
-    return client.delete(`/release/${releaseId}/datablocks/${id}`);
+    return client.delete(`/releases/${releaseId}/data-blocks/${id}`);
   },
 
   async getDeleteBlockPlan(releaseId: string, id: string) {
     return client.get<DeleteDataBlockPlan>(
-      `/release/${releaseId}/datablocks/${id}/delete-plan`,
+      `/releases/${releaseId}/data-blocks/${id}/delete-plan`,
       {},
     );
   },

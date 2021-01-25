@@ -22,7 +22,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Controllers.Api
             _dataBlockService = dataBlockService;
         }
 
-        [HttpPost("release/{releaseId}/datablocks")]
+        [HttpPost("releases/{releaseId}/data-blocks")]
         public async Task<ActionResult<DataBlockViewModel>> CreateDataBlock(
             Guid releaseId,
             DataBlockCreateViewModel dataBlock)
@@ -31,35 +31,35 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Controllers.Api
                 .HandleFailuresOrOk();
         }
 
-        [HttpDelete("release/{releaseId}/datablocks/{id}")]
+        [HttpDelete("releases/{releaseId}/data-blocks/{id}")]
         public async Task<ActionResult> DeleteDataBlock(Guid releaseId, Guid id)
         {
             return await _dataBlockService.Delete(releaseId, id)
                 .HandleFailuresOrNoContent();
         }
 
-        [HttpGet("release/{releaseId}/datablocks/{id}/delete-plan")]
+        [HttpGet("releases/{releaseId}/data-blocks/{id}/delete-plan")]
         public async Task<ActionResult<DeleteDataBlockPlan>> GetDeletePlan(Guid releaseId, Guid id)
         {
             return await _dataBlockService.GetDeletePlan(releaseId, id)
                 .HandleFailuresOrOk();
         }
 
-        [HttpGet("release/{releaseId}/datablocks")]
+        [HttpGet("releases/{releaseId}/data-blocks")]
         public async Task<ActionResult<List<DataBlockViewModel>>> GetDataBlocks(Guid releaseId)
         {
             return await _dataBlockService.List(releaseId)
                 .HandleFailuresOrOk();
         }
 
-        [HttpGet("datablocks/{id}")]
+        [HttpGet("data-blocks/{id}")]
         public async Task<ActionResult<DataBlockViewModel>> GetDataBlock(Guid id)
         {
             return await _dataBlockService.Get(id)
                 .HandleFailuresOrOk();
         }
 
-        [HttpPut("datablocks/{id}")]
+        [HttpPut("data-blocks/{id}")]
         public async Task<ActionResult<DataBlockViewModel>> UpdateDataBlock(Guid id,
             DataBlockUpdateViewModel dataBlock)
         {
