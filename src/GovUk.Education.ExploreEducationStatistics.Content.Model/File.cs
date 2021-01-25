@@ -45,8 +45,5 @@ namespace GovUk.Education.ExploreEducationStatistics.Content.Model
 
         public Guid? SourceId { get; set; }
         public File? Source { get; set; }
-
-        // EES-1560 Temporary field used to track the filename migration to guids.
-        public bool FilenameMigrated { get; set; }
     }
 }
