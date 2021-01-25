@@ -44,7 +44,6 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Processor
                 .AddTransient<ImporterFilterService>()
                 .AddTransient<ImporterLocationService>()
                 .AddTransient<IImporterMetaService, ImporterMetaService>()
-                .AddTransient<IReleaseProcessorService, ReleaseProcessorService>()
                 .AddTransient<ImporterMemoryCache>()
                 .AddTransient<ITableStorageService, TableStorageService>(provider =>
                     new TableStorageService(GetConfigurationValue(provider, "CoreStorage")))

@@ -279,13 +279,11 @@ namespace GovUk.Education.ExploreEducationStatistics.Publisher.Services
 
         public async Task UploadAsJson(string filePath, object value, JsonSerializerSettings settings = null)
         {
-            var json = JsonConvert.SerializeObject(value, null, settings);
-
-            await _publicBlobStorageService.UploadText(
+            await _publicBlobStorageService.UploadAsJson(
                 PublicContentContainerName,
-                path: filePath,
-                content: json,
-                contentType: MediaTypeNames.Application.Json
+                filePath,
+                value,
+                settings
             );
         }
     }

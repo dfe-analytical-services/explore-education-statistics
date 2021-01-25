@@ -1,9 +1,7 @@
 using System.Threading.Tasks;
 using GovUk.Education.ExploreEducationStatistics.Common.Model;
-using GovUk.Education.ExploreEducationStatistics.Content.Model.Database;
 using GovUk.Education.ExploreEducationStatistics.Data.Importer.Services.Interfaces;
 using GovUk.Education.ExploreEducationStatistics.Data.Importer.Utils;
-using GovUk.Education.ExploreEducationStatistics.Data.Model.Database;
 using GovUk.Education.ExploreEducationStatistics.Data.Processor.Model;
 using GovUk.Education.ExploreEducationStatistics.Data.Processor.Models;
 using GovUk.Education.ExploreEducationStatistics.Data.Processor.Services.Interfaces;
@@ -21,7 +19,6 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Processor.Services
         private readonly IFileImportService _fileImportService;
         private readonly IFileStorageService _fileStorageService;
         private readonly IImporterService _importerService;
-        private readonly IReleaseProcessorService _releaseProcessorService;
         private readonly ISplitFileService _splitFileService;
         private readonly IValidatorService _validatorService;
         private readonly IDataArchiveService _dataArchiveService;
@@ -29,7 +26,6 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Processor.Services
         public ProcessorService(
             ILogger<ProcessorService> logger,
             IFileImportService fileImportService,
-            IReleaseProcessorService releaseProcessorService,
             IFileStorageService fileStorageService,
             ISplitFileService splitFileService,
             IImporterService importerService,
@@ -39,7 +35,6 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Processor.Services
         {
             _logger = logger;
             _fileImportService = fileImportService;
-            _releaseProcessorService = releaseProcessorService;
             _fileStorageService = fileStorageService;
             _splitFileService = splitFileService;
             _importerService = importerService;
@@ -79,10 +74,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Processor.Services
         {
             var subjectData = await GetSubjectDataFromMainDataFile(message);
 
-            await ProcessSubject(message,
-                DbUtils.CreateStatisticsDbContext(),
-                DbUtils.CreateContentDbContext(),
-                subjectData);
+            await ProcessSubject(message, subjectData);
 
         }
 
@@ -100,24 +92,19 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Processor.Services
         
         private async Task ProcessSubject(
             ImportMessage message,
-            StatisticsDbContext statisticsDbContext,
-            ContentDbContext contentDbContext,
             SubjectData subjectData)
         {
-            var subject = _releaseProcessorService.CreateOrUpdateRelease(subjectData,
-                message,
-                statisticsDbContext,
-                contentDbContext);
+            var statisticsDbContext = DbUtils.CreateStatisticsDbContext();
+
+            var subject = await statisticsDbContext.Subject.FindAsync(message.SubjectId);
 
             await using var metaFileStream = await _fileStorageService.StreamBlob(subjectData.MetaBlob);
             var metaFileTable = DataTableUtils.CreateFromStream(metaFileStream);
 
             _importerService.ImportMeta(metaFileTable, subject, statisticsDbContext);
-
             await statisticsDbContext.SaveChangesAsync();
 
             await _fileImportService.ImportFiltersAndLocations(message, statisticsDbContext);
-
             await statisticsDbContext.SaveChangesAsync();
         }
 

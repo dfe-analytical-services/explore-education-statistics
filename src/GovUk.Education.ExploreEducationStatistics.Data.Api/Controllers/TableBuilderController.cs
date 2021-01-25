@@ -3,13 +3,11 @@ using System.Linq;
 using System.Threading.Tasks;
 using GovUk.Education.ExploreEducationStatistics.Common.Extensions;
 using GovUk.Education.ExploreEducationStatistics.Common.Model;
-using GovUk.Education.ExploreEducationStatistics.Common.Model.Chart;
 using GovUk.Education.ExploreEducationStatistics.Common.Model.Data.Query;
-using GovUk.Education.ExploreEducationStatistics.Common.Services.Interfaces.Security;
 using GovUk.Education.ExploreEducationStatistics.Common.Utils;
 using GovUk.Education.ExploreEducationStatistics.Content.Model;
 using GovUk.Education.ExploreEducationStatistics.Content.Model.Database;
-using GovUk.Education.ExploreEducationStatistics.Content.Security.Extensions;
+using GovUk.Education.ExploreEducationStatistics.Data.Api.Services.Interfaces;
 using GovUk.Education.ExploreEducationStatistics.Data.Services.Interfaces;
 using GovUk.Education.ExploreEducationStatistics.Data.Services.ViewModels;
 using Microsoft.AspNetCore.Mvc;
@@ -21,18 +19,22 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Api.Controllers
     [ApiController]
     public class TableBuilderController : ControllerBase
     {
+        // Change this whenever there is a breaking change
+        // that requires cache invalidation.
+        public const string ApiVersion = "1";
+
         private readonly ITableBuilderService _tableBuilderService;
+        private readonly IDataBlockService _dataBlockService;
         private readonly IPersistenceHelper<ContentDbContext> _contentPersistenceHelper;
-        private readonly IUserService _userService;
 
         public TableBuilderController(
             ITableBuilderService tableBuilderService,
-            IPersistenceHelper<ContentDbContext> contentPersistenceHelper,
-            IUserService userService)
+            IDataBlockService dataBlockService,
+            IPersistenceHelper<ContentDbContext> contentPersistenceHelper)
         {
             _tableBuilderService = tableBuilderService;
+            _dataBlockService = dataBlockService;
             _contentPersistenceHelper = contentPersistenceHelper;
-            _userService = userService;
         }
 
         [HttpPost]
@@ -50,7 +52,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Api.Controllers
         }
 
         [ResponseCache(Duration = 300)]
-        [HttpGet("release/{releaseId}/datablock/{dataBlockId}")]
+        [HttpGet("release/{releaseId}/data-block/{dataBlockId}")]
         public async Task<ActionResult<TableBuilderResultViewModel>> QueryForDataBlock(
             Guid releaseId,
             Guid dataBlockId)
@@ -64,22 +66,8 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Api.Controllers
                                    && rcb.ContentBlockId == dataBlockId
                         )
                 )
-                .OnSuccessDo(block => this.CacheWithLastModified(block.Release.Published))
-                .OnSuccess(
-                    async block =>
-                    {
-                        if (block.ContentBlock is DataBlock dataBlock)
-                        {
-                            var query = dataBlock.Query.Clone();
-                            query.IncludeGeoJson = dataBlock.Charts.Any(chart => chart.Type == ChartType.Map);
-
-                            return await _userService.CheckCanViewRelease(block.Release)
-                                .OnSuccess(_ => _tableBuilderService.Query(block.ReleaseId, query));
-                        }
-
-                        return new NotFoundResult();
-                    }
-                )
+                .OnSuccessDo(block => this.CacheWithLastModifiedAndETag(block.Release.Published, ApiVersion))
+                .OnSuccess(block => _dataBlockService.GetDataBlockTableResult(block))
                 .HandleFailuresOrOk();
         }
     }

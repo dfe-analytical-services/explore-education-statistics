@@ -13,7 +13,13 @@ import WizardStepHeading from '@common/modules/table-tool/components/WizardStepH
 import { FullTable } from '@common/modules/table-tool/types/fullTable';
 import { TableHeadersConfig } from '@common/modules/table-tool/types/tableHeaders';
 import { ReleaseTableDataQuery } from '@common/services/tableBuilderService';
-import React, { createRef, useCallback, useEffect, useState } from 'react';
+import React, {
+  createRef,
+  memo,
+  useCallback,
+  useEffect,
+  useState,
+} from 'react';
 
 export type DataBlockSourceWizardSaveHandler = (params: {
   details: DataBlockDetailsFormValues;
@@ -105,6 +111,10 @@ const DataBlockSourceWizardFinalStep = ({
   );
 };
 
+const DataBlockSourceWizardFinalStepWrapped = memo(
+  DataBlockSourceWizardFinalStep,
+);
+
 interface DataBlockSourceWizardProps {
   dataBlock?: ReleaseDataBlock;
   tableToolState: InitialTableToolState;
@@ -132,7 +142,7 @@ const DataBlockSourceWizard = ({
                 </WizardStepHeading>
 
                 {query && response && (
-                  <DataBlockSourceWizardFinalStep
+                  <DataBlockSourceWizardFinalStepWrapped
                     dataBlock={dataBlock}
                     query={query}
                     table={response.table}

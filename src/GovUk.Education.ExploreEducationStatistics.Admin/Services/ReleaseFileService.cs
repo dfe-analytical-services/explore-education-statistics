@@ -163,7 +163,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Services
                 .OnSuccess(async () => await _fileUploadsValidatorService.ValidateFileForUpload(formFile, Ancillary))
                 .OnSuccess(async () =>
                 {
-                    var file = await _fileRepository.Create(
+                    var file = await _fileRepository.CreateAncillaryOrChart(
                         releaseId,
                         formFile.FileName,
                         Ancillary);
@@ -205,7 +205,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Services
                             releaseId,
                             replacingId.Value,
                             formFile.FileName)
-                        : await _fileRepository.Create(
+                        : await _fileRepository.CreateAncillaryOrChart(
                             releaseId,
                             formFile.FileName,
                             Chart);

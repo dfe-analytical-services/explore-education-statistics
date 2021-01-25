@@ -29,7 +29,6 @@ import { unsafeCountDecimals } from '@common/utils/number/countDecimals';
 import formatPretty, {
   defaultMaxDecimalPlaces,
 } from '@common/utils/number/formatPretty';
-import getMinMax from '@common/utils/number/getMinMax';
 import { roundDownToNearest } from '@common/utils/number/roundNearest';
 import classNames from 'classnames';
 import { Feature, FeatureCollection, Geometry } from 'geojson';
@@ -80,18 +79,96 @@ function calculateScaledColour({
   return lighten(colour, 90 - (scale / groupSize) * 30);
 }
 
-function getDefaultDecimalPlaces(values: number[]): number {
-  const maxDecimals = values.reduce<number>((acc, value) => {
-    const decimals = unsafeCountDecimals(value?.toString() ?? 0);
+interface MinMax {
+  min: number;
+  max: number;
+}
 
-    if (decimals > acc) {
-      return decimals;
-    }
+interface MinMaxDecimalPlaces extends MinMax {
+  decimalPlaces: number;
+}
 
-    return acc;
-  }, 0);
+/**
+ * Extracts the min, max and decimal places that are being used in
+ * some {@param dataSetCategories}. A {@param selectedDataSetKey} must
+ * be provided to select which data set category to use.
+ *
+ * As an optimization, if {@param explicitDecimalPlaces} is provided,
+ * then we don't do further work to find the decimal places using the data.
+ *
+ * Note that this function does several things simultaneously for
+ * performance reasons as the number of data sets can be quite large.
+ */
+function getMinMaxDecimalPlaces(
+  dataSetCategories: MapDataSetCategory[],
+  selectedDataSetKey: string,
+  explicitDecimalPlaces?: number,
+): MinMaxDecimalPlaces {
+  const reduce = (
+    initialAcc: MinMaxDecimalPlaces,
+    callback?: (acc: MinMaxDecimalPlaces, value: number) => MinMaxDecimalPlaces,
+  ) => {
+    const { min, max, decimalPlaces } = dataSetCategories.reduce<
+      MinMaxDecimalPlaces
+    >((acc, category) => {
+      const value = category.dataSets[selectedDataSetKey]?.value;
 
-  return clamp(maxDecimals, 0, defaultMaxDecimalPlaces);
+      if (typeof value !== 'number') {
+        return acc;
+      }
+
+      if (value < acc.min) {
+        acc.min = value;
+      }
+
+      if (value > acc.max) {
+        acc.max = value;
+      }
+
+      if (callback) {
+        return callback(acc, value);
+      }
+
+      return acc;
+    }, initialAcc);
+
+    return {
+      min: Number.isFinite(min) ? min : 0,
+      max: Number.isFinite(max) ? max : 0,
+      decimalPlaces,
+    };
+  };
+
+  if (typeof explicitDecimalPlaces === 'number') {
+    return reduce({
+      min: Number.POSITIVE_INFINITY,
+      max: Number.NEGATIVE_INFINITY,
+      decimalPlaces: explicitDecimalPlaces,
+    });
+  }
+
+  const { min, max, decimalPlaces } = reduce(
+    {
+      min: Number.POSITIVE_INFINITY,
+      max: Number.NEGATIVE_INFINITY,
+      decimalPlaces: 0,
+    },
+    (acc, value) => {
+      const decimals = unsafeCountDecimals(value?.toString() ?? 0);
+
+      if (decimals > acc.decimalPlaces) {
+        acc.decimalPlaces = decimals;
+      }
+
+      return acc;
+    },
+  );
+
+  return {
+    min,
+    max,
+    decimalPlaces: clamp(decimalPlaces, 0, defaultMaxDecimalPlaces),
+  };
 }
 
 function generateGeometryAndLegend(
@@ -102,22 +179,16 @@ function generateGeometryAndLegend(
   legend: LegendEntry[];
 } {
   const selectedDataSetKey = selectedDataSetConfiguration.dataKey;
-
-  // Use reduce to be more efficient than map/filter
-  const values = dataSetCategories.reduce<number[]>((acc, category) => {
-    if (typeof category.dataSets[selectedDataSetKey]?.value !== 'undefined') {
-      acc.push(category.dataSets[selectedDataSetKey]?.value);
-    }
-
-    return acc;
-  }, []);
-
   const {
     unit,
-    decimalPlaces = getDefaultDecimalPlaces(values),
+    decimalPlaces: explicitDecimalPlaces,
   } = selectedDataSetConfiguration.dataSet.indicator;
 
-  const { min = 0, max = 0 } = getMinMax(values);
+  const { min, max, decimalPlaces } = getMinMaxDecimalPlaces(
+    dataSetCategories,
+    selectedDataSetKey,
+    explicitDecimalPlaces,
+  );
 
   const range = max - min;
 
@@ -172,7 +243,7 @@ function generateGeometryAndLegend(
   const geometry: FeatureCollection<Geometry, MapFeatureProperties> = {
     type: 'FeatureCollection',
     features: dataSetCategories.map(({ dataSets, filter, geoJson }) => {
-      const data = dataSets?.[selectedDataSetKey]?.value;
+      const value = dataSets?.[selectedDataSetKey]?.value;
 
       // Create a scale for the colour. This goes from 0 to
       // the last group's minimum e.g. 0.8 (when there are 5 groups).
@@ -181,9 +252,9 @@ function generateGeometryAndLegend(
       // the colours shown in the legend.
       const scale =
         // Avoid divisions by 0
-        range !== 0
+        range !== 0 && typeof value !== 'undefined'
           ? clamp(
-              roundDownToNearest((data - min) / range, groupSize),
+              roundDownToNearest((value - min) / range, groupSize),
               0,
               lastGroupMin,
             )
@@ -191,7 +262,7 @@ function generateGeometryAndLegend(
 
       // Defaults to white if there is no data
       const scaledColour =
-        typeof data !== 'undefined'
+        typeof value !== 'undefined'
           ? calculateScaledColour({ colour, groupSize, scale })
           : '#fff';
 
@@ -202,7 +273,7 @@ function generateGeometryAndLegend(
           ...geoJson.properties,
           dataSets,
           colour: scaledColour,
-          data,
+          data: value,
         },
       };
     }),
@@ -215,7 +286,6 @@ export interface MapBlockProps extends ChartProps {
   id: string;
   position?: { lat: number; lng: number };
   maxBounds?: LatLngBounds;
-  geographicId?: string;
   legend: LegendConfiguration;
   axes: {
     major: AxisConfiguration;

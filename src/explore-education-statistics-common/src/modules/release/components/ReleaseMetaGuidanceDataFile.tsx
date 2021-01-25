@@ -4,6 +4,7 @@ import SummaryList from '@common/components/SummaryList';
 import SummaryListItem from '@common/components/SummaryListItem';
 import { SubjectMetaGuidance } from '@common/services/releaseMetaGuidanceService';
 import React, { ReactNode, useMemo } from 'react';
+import styles from './ReleaseMetaGuidanceDataFile.module.scss';
 
 interface Props {
   subject: SubjectMetaGuidance;
@@ -79,7 +80,7 @@ const ReleaseMetaGuidanceDataFile = ({ subject, renderContent }: Props) => {
           <tbody>
             {variables.map(({ value, label }) => (
               <tr key={value}>
-                <td>{value}</td>
+                <td className={styles.tableOverflowWrap}>{value}</td>
                 <td>{label}</td>
               </tr>
             ))}

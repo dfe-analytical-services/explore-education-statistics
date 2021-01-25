@@ -14,7 +14,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Common.Services
         {
             return "staging";
         }
-        
+
         private static string PublicContentDownloadPath(string prefix = null)
         {
             return $"{AppendPathSeparator(prefix)}download";
@@ -44,7 +44,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Common.Services
         {
             return $"{PublicContentFastTrackPath(prefix)}/{releaseId}";
         }
-        
+
         public static string PublicContentFastTrackPath(string releaseId, string id, string prefix = null)
         {
             return $"{PublicContentReleaseFastTrackPath(releaseId, prefix)}/{id}.json";
@@ -70,6 +70,11 @@ namespace GovUk.Education.ExploreEducationStatistics.Common.Services
             return $"{PublicContentPublicationsPath(prefix)}/{slug}";
         }
 
+        public static string PublicContentReleaseParentPath(string publicationSlug, string releaseSlug, string prefix = null)
+        {
+            return $"{PublicContentPublicationParentPath(publicationSlug, prefix)}/releases/{releaseSlug}";
+        }
+
         public static string PublicContentPublicationPath(string slug, string prefix = null)
         {
             return $"{PublicContentPublicationParentPath(slug, prefix)}/publication.json";
@@ -79,10 +84,19 @@ namespace GovUk.Education.ExploreEducationStatistics.Common.Services
         {
             return $"{PublicContentPublicationParentPath(slug, prefix)}/latest-release.json";
         }
-        
+
         public static string PublicContentReleasePath(string publicationSlug, string releaseSlug, string prefix = null)
         {
             return $"{PublicContentPublicationParentPath(publicationSlug, prefix)}/releases/{releaseSlug}.json";
+        }
+
+        public static string PublicContentDataBlockPath(
+            string publicationSlug,
+            string releaseSlug,
+            Guid dataBlockId,
+            string prefix = null)
+        {
+            return $"{PublicContentReleaseParentPath(publicationSlug, releaseSlug, prefix)}/data-blocks/{dataBlockId}.json";
         }
 
         /**
@@ -210,7 +224,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Common.Services
 
             return batchFileRegex.IsMatch(fullFilePath);
         }
-        
+
         private static string AppendPathSeparator(string segment = null)
         {
             return segment == null ? "" : segment + "/";

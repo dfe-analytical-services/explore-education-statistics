@@ -190,6 +190,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Processor.Services
                 // lines in total in which case create a zero lines batch
                 if (table.Rows.Count == 0 && (batchCount != numBatches || batchFilesExist))
                 {
+                    _logger.LogInformation($"Skipping batch file for row count {table.Rows.Count} with batchCount {batchCount} and numBatches {numBatches} and batchFilesExist {batchFilesExist} and batch {batch.Count()}");
                     batchCount++;
                     continue;
                 }

@@ -8,8 +8,14 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Services.Interfaces
 {
     public interface IFileRepository
     {
-        public Task<File> Create(
+        public Task<File> CreateAncillaryOrChart(
             Guid releaseId,
+            string filename,
+            FileType type);
+
+        public Task<File> CreateDataOrMetadata(
+            Guid releaseId,
+            Guid subjectId,
             string filename,
             FileType type,
             File replacingFile = null,

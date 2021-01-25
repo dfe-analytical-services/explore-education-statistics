@@ -22,6 +22,8 @@ using static GovUk.Education.ExploreEducationStatistics.Common.Services.FileStor
 using static GovUk.Education.ExploreEducationStatistics.Common.BlobContainerNames;
 using static GovUk.Education.ExploreEducationStatistics.Common.Model.FileType;
 using static GovUk.Education.ExploreEducationStatistics.Common.Services.FileStoragePathUtils;
+using Release = GovUk.Education.ExploreEducationStatistics.Content.Model.Release;
+using Unit = GovUk.Education.ExploreEducationStatistics.Common.Model.Unit;
 
 namespace GovUk.Education.ExploreEducationStatistics.Admin.Services
 {
@@ -34,6 +36,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Services
         private readonly IDataArchiveValidationService _dataArchiveValidationService;
         private readonly IFileUploadsValidatorService _fileUploadsValidatorService;
         private readonly IFileRepository _fileRepository;
+        private readonly IReleaseRepository _releaseRepository;
         private readonly IReleaseFileRepository _releaseFileRepository;
         private readonly IImportService _importService;
         private readonly IImportStatusService _importStatusService;
@@ -46,6 +49,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Services
             IDataArchiveValidationService dataArchiveValidationService,
             IFileUploadsValidatorService fileUploadsValidatorService,
             IFileRepository fileRepository,
+            IReleaseRepository releaseRepository,
             IReleaseFileRepository releaseFileRepository,
             IImportService importService,
             IImportStatusService importStatusService,
@@ -58,6 +62,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Services
             _dataArchiveValidationService = dataArchiveValidationService;
             _fileUploadsValidatorService = fileUploadsValidatorService;
             _fileRepository = fileRepository;
+            _releaseRepository = releaseRepository;
             _releaseFileRepository = releaseFileRepository;
             _importService = importService;
             _importStatusService = importStatusService;
@@ -215,16 +220,23 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Services
                                             dataFormFile.FileName.ToLower()))
                                     .OnSuccess(async () =>
                                     {
-                                        var dataFile = await _fileRepository.Create(
+                                        var subjectId = await _releaseRepository.CreateReleaseAndSubjectHierarchy(
+                                            releaseId,
+                                            dataFormFile.FileName.ToLower(),
+                                            validSubjectName);
+
+                                        var dataFile = await _fileRepository.CreateDataOrMetadata(
                                             releaseId: releaseId,
+                                            subjectId: subjectId,
                                             filename: dataFormFile.FileName.ToLower(),
                                             type: FileType.Data,
                                             replacingFile: replacingFile);
 
-                                        var metaFile = await _fileRepository.Create(
+                                        var metaFile = await _fileRepository.CreateDataOrMetadata(
                                             releaseId: releaseId,
+                                            subjectId: subjectId,
                                             filename: metaFormFile.FileName.ToLower(),
-                                            Metadata);
+                                            type: Metadata);
 
                                         var dataInfo = GetDataFileMetaValues(
                                             name: validSubjectName,
@@ -242,6 +254,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Services
 
                                         await _importService.Import(
                                             releaseId: releaseId,
+                                            subjectId: subjectId,
                                             dataFileName: dataFile.Filename,
                                             metaFileName: metaFile.Filename,
                                             dataFile: dataFormFile,
@@ -306,19 +319,26 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Services
                                                         archiveFile.DataFileName))
                                                 .OnSuccess(async () =>
                                                 {
+                                                    var subjectId = await _releaseRepository.CreateReleaseAndSubjectHierarchy(
+                                                        releaseId,
+                                                        archiveFile.DataFileName.ToLower(),
+                                                        validSubjectName);
+
                                                     var zipFile = await _fileRepository.CreateZip(
                                                         filename: zipFormFile.FileName.ToLower(),
                                                         releaseId: releaseId);
 
-                                                    var dataFile = await _fileRepository.Create(
+                                                    var dataFile = await _fileRepository.CreateDataOrMetadata(
                                                         releaseId: releaseId,
+                                                        subjectId: subjectId,
                                                         filename: archiveFile.DataFileName,
                                                         type: FileType.Data,
                                                         replacingFile: replacingFile,
                                                         source: zipFile);
 
-                                                    var metaFile = await _fileRepository.Create(
+                                                    var metaFile = await _fileRepository.CreateDataOrMetadata(
                                                         releaseId: releaseId,
+                                                        subjectId: subjectId,
                                                         filename: archiveFile.MetaFileName,
                                                         type: Metadata,
                                                         source: zipFile);
@@ -326,6 +346,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Services
                                                     await UploadFileToStorage(zipFile, zipFormFile, dataInfo);
 
                                                     await _importService.Import(
+                                                        subjectId: subjectId,
                                                         releaseId: releaseId,
                                                         dataFileName: archiveFile.DataFileName,
                                                         metaFileName: archiveFile.MetaFileName,
@@ -449,6 +470,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Services
             // Fail the import if this was a datafile upload
             await _importService.FailImport(
                 releaseId,
+                file.SubjectId ?? Guid.Empty,
                 dataFileName,
                 metaFileName,
                 new List<ValidationError>

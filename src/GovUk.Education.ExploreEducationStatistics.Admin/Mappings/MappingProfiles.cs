@@ -103,6 +103,17 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Mappings
             CreateMap<CreateDataBlockViewModel, DataBlock>();
             CreateMap<UpdateDataBlockViewModel, DataBlock>();
 
+            CreateMap<Theme, Data.Model.Theme>()
+                .ForMember(dest => dest.Topics, m => m.Ignore());
+            CreateMap<Topic, Data.Model.Topic>()
+                .ForMember(dest => dest.Publications, m => m.Ignore())
+                .ForMember(dest => dest.Theme, m => m.Ignore());
+            CreateMap<Publication, Data.Model.Publication>()
+                .ForMember(dest => dest.Releases, m => m.Ignore())
+                .ForMember(dest => dest.Topic, m => m.Ignore());
+            CreateMap<Release, Data.Model.Release>()
+                .ForMember(dest => dest.Publication, m => m.Ignore());
+
             CreateMap<Theme, ThemeViewModel>()
                 .ForMember(theme => theme.Topics, m => m.MapFrom(t => t.Topics.OrderBy(topic => topic.Title)));
             CreateMap<Topic, TopicViewModel>();

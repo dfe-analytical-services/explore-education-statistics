@@ -165,7 +165,7 @@ export const testChartTableData: TableDataResponse = {
   results: [
     {
       filters: ['characteristic-total', 'school-type-total'],
-      geographicLevel: 'Country',
+      geographicLevel: 'country',
       location: { country: { code: 'england', name: 'England' } },
       measures: {
         'authorised-absence-rate': '3.5',
@@ -176,7 +176,7 @@ export const testChartTableData: TableDataResponse = {
     },
     {
       filters: ['characteristic-total', 'school-type-total'],
-      geographicLevel: 'Country',
+      geographicLevel: 'country',
       location: { country: { code: 'england', name: 'England' } },
       measures: {
         'authorised-absence-rate': '4.2',
@@ -187,7 +187,7 @@ export const testChartTableData: TableDataResponse = {
     },
     {
       filters: ['characteristic-total', 'school-type-total'],
-      geographicLevel: 'Country',
+      geographicLevel: 'country',
       location: { country: { code: 'england', name: 'England' } },
       measures: {
         'authorised-absence-rate': '3.5',
@@ -198,7 +198,7 @@ export const testChartTableData: TableDataResponse = {
     },
     {
       filters: ['characteristic-total', 'school-type-total'],
-      geographicLevel: 'Country',
+      geographicLevel: 'country',
       location: { country: { code: 'england', name: 'England' } },
       measures: {
         'authorised-absence-rate': '3.4',
@@ -209,7 +209,7 @@ export const testChartTableData: TableDataResponse = {
     },
     {
       filters: ['characteristic-total', 'school-type-total'],
-      geographicLevel: 'Country',
+      geographicLevel: 'country',
       location: { country: { code: 'england', name: 'England' } },
       measures: {
         'authorised-absence-rate': '3.4',

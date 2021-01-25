@@ -10,11 +10,11 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Services.Interfaces
 {
     public interface IImportService
     {
-        Task Import(Guid releaseId, string dataFileName, string metaFileName, IFormFile dataFile, bool isZip);
+        Task Import(Guid releaseId, Guid subjectId, string dataFileName, string metaFileName, IFormFile dataFile, bool isZip);
 
         Task<Either<ActionResult, Unit>> CreateImportTableRow(Guid releaseId, string dataFileName);
 
-        Task FailImport(Guid releaseId, string dataFileName, string metaFileName, IEnumerable<ValidationError> errors);
+        Task FailImport(Guid releaseId, Guid subjectId, string dataFileName, string metaFileName, IEnumerable<ValidationError> errors);
 
         Task RemoveImportTableRowIfExists(Guid releaseId, string dataFileName);
 

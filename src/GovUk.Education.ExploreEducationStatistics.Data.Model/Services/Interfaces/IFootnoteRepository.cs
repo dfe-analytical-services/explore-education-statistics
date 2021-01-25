@@ -11,7 +11,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Model.Services.Interfa
             Guid releaseId,
             Guid subjectId,
             IQueryable<Observation> observations,
-            IEnumerable<Guid> indicators
+            IEnumerable<Guid> indicatorIds
         );
 
         Task<Footnote> GetFootnote(Guid id);

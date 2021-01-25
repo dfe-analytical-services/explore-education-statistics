@@ -4,6 +4,7 @@ using System.Threading.Tasks;
 using GovUk.Education.ExploreEducationStatistics.Common.Model;
 using Microsoft.AspNetCore.Http;
 using Microsoft.Azure.Storage.DataMovement;
+using Newtonsoft.Json;
 
 namespace GovUk.Education.ExploreEducationStatistics.Common.Services.Interfaces
 {
@@ -56,6 +57,12 @@ namespace GovUk.Education.ExploreEducationStatistics.Common.Services.Interfaces
             string contentType,
             UploadTextOptions options = null);
 
+        public Task UploadAsJson<T>(
+            string containerName,
+            string path,
+            T content,
+            JsonSerializerSettings settings = null);
+
         public Task<bool> IsAppendSupported(string containerName, string path);
 
         public Task AppendText(string containerName, string path, string content);
@@ -88,6 +95,8 @@ namespace GovUk.Education.ExploreEducationStatistics.Common.Services.Interfaces
         public Task<Stream> StreamBlob(string containerName, string path, int? bufferSize = null);
 
         public Task<string> DownloadBlobText(string containerName, string path);
+
+        Task<T> GetDeserializedJson<T>(string containerName, string path);
 
         public class CopyDirectoryOptions
         {

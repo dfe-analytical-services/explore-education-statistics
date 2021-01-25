@@ -718,7 +718,13 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Services
                         }
                     ).ToList();
 
-                    if (indicatorTargets.TryGetValue(dataSet.Indicator, out var targetIndicatorId))
+
+                    if (!dataSet.Indicator.HasValue)
+                    {
+                        return;
+                    }
+
+                    if (indicatorTargets.TryGetValue(dataSet.Indicator.Value, out var targetIndicatorId))
                     {
                         dataSet.Indicator = targetIndicatorId;
                     }
