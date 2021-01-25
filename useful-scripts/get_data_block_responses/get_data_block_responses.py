@@ -21,6 +21,12 @@ SELECT ContentBlock.Id AS ContentBlockId, Releases.Id AS ReleaseId, JSON_VALUE([
 	       
 And then save the results as a CSV in MS SQL Server Management Studio. 
 Place it in the same directory as this script.
+
+Find blocks that took over 10 seconds to respond:
+grep -r "time for response: [0-9][0-9][0-9]*" * | awk '{split($0,a,":"); print a[1];}' | zip -@ test.zip
+
+Compare two result directories for differences, but ignoring response time:
+diff -I"^time for response:.*" -r results_dev1/ results_dev2/
 """
 
 parser = argparse.ArgumentParser(prog="python get_data_block_responses.py",
@@ -84,16 +90,23 @@ for datablock in datablocks:
                          headers=headers,
                          data=query
                          )
+    block_time_end = time.perf_counter()
 
     file_path = results_dir
     if resp.status_code != 200:
         print(
-            f'response status wasn\'t 200 for block {guid}\n'
+            f'Response status wasn\'t 200 for block {guid} '
             f'subject {subjectId}\n'
-            f'{resp.text}\n'
+            f'{resp.text}'
         )
         file_path = f'{results_dir}/fails'
-    block_time_end = time.perf_counter()
+
+    try:
+        jsonResponse = json.loads(resp.text)
+    except:
+        print(f'json.loads(resp.text) failed with block {guid} '
+              f'subject {subjectId}')
+        jsonResponse = {'error': 'get_data_block_responeses script failed to process response text'}
 
     try:
         with open(f'{file_path}/block_{guid}', 'w') as file:
@@ -105,10 +118,11 @@ for datablock in datablocks:
                 f'{query}\n'
                 f'response status: {resp.status_code}\n'
                 f'time for response: {block_time_end - block_time_start}\n'
-                f'response:\n{resp.text}'
+                f'response:\n{json.dumps(jsonResponse, sort_keys=True)}'
             )
+        print(f'Successfully processed block {guid} for subject {subjectId}!')
     except:
-        print(f'file.write failed with block {guid}\n'
+        print(f'file.write failed with block {guid} '
               f'subject {subjectId}\n{resp.text}')
 
     time.sleep(args.sleep_duration)
