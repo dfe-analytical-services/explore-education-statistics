@@ -248,10 +248,10 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
                 dataBlockService
                     .Setup(s => s.List(release.Id))
                     .ReturnsAsync(
-                        new List<DataBlockViewModel>
+                        new List<DataBlockSummaryViewModel>
                         {
-                            new DataBlockViewModel(),
-                            new DataBlockViewModel(),
+                            new DataBlockSummaryViewModel(),
+                            new DataBlockSummaryViewModel(),
                         }
                     );
 
@@ -378,9 +378,9 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
                 dataBlockService
                     .Setup(s => s.List(release.Id))
                     .ReturnsAsync(
-                        new List<DataBlockViewModel>
+                        new List<DataBlockSummaryViewModel>
                         {
-                            new DataBlockViewModel
+                            new DataBlockSummaryViewModel
                             {
                                 HighlightName = "Test highlight name"
                             },

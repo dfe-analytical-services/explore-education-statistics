@@ -20,7 +20,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Services.Interfaces
 
         Task<Either<ActionResult, DataBlockViewModel>> Get(DataBlockId id);
 
-        Task<Either<ActionResult, List<DataBlockViewModel>>> List(ReleaseId releaseId);
+        Task<Either<ActionResult, List<DataBlockSummaryViewModel>>> List(ReleaseId releaseId);
 
         Task<Either<ActionResult, DataBlockViewModel>> Update(DataBlockId id, DataBlockUpdateViewModel dataBlockUpdate);
 

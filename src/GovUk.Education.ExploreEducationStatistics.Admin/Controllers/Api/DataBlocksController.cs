@@ -46,7 +46,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Controllers.Api
         }
 
         [HttpGet("releases/{releaseId}/data-blocks")]
-        public async Task<ActionResult<List<DataBlockViewModel>>> GetDataBlocks(Guid releaseId)
+        public async Task<ActionResult<List<DataBlockSummaryViewModel>>> List(Guid releaseId)
         {
             return await _dataBlockService.List(releaseId)
                 .HandleFailuresOrOk();
