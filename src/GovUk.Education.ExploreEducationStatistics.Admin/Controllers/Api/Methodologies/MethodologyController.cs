@@ -60,5 +60,13 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Controllers.Api.Metho
                 .UpdateMethodologyAsync(methodologyId, request)
                 .HandleFailuresOrOk();
         }
+        
+        [HttpGet("api/me/methodologies")]
+        public async Task<ActionResult<List<MethodologyPublicationsViewModel>>> GetMyMethodologyList()
+        {
+            return await _methodologyService
+                .ListWithPublicationsAsync()
+                .HandleFailuresOr(Ok);
+        }
     }
 }

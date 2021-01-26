@@ -77,7 +77,7 @@ const MethodologiesPage = () => {
   const [model, setModel] = useState<Model>();
 
   useEffect(() => {
-    methodologyService.getBauMethodologies().then(methodologies => {
+    methodologyService.getMyMethodologies().then(methodologies => {
       const liveMethodologies: MethodologyStatusListItem[] = methodologies.filter(
         methodology => {
           return methodology.status === 'Live';

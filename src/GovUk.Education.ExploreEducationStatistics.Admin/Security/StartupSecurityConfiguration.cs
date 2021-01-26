@@ -38,10 +38,6 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Security
                 options.AddPolicy(SecurityPolicies.CanManageUsersOnSystem.ToString(), policy =>
                     policy.RequireClaim(SecurityClaimTypes.ManageAnyUser.ToString()));
 
-                // does this user have permissions to manage all methodologies on the system?
-                options.AddPolicy(SecurityPolicies.CanManageMethodologiesOnSystem.ToString(), policy =>
-                    policy.RequireClaim(SecurityClaimTypes.ManageAnyMethodology.ToString()));
-
                 options.AddPolicy(SecurityPolicies.CanAccessAllImports.ToString(), policy =>
                     policy.RequireClaim(SecurityClaimTypes.AccessAllImports.ToString()));
 
