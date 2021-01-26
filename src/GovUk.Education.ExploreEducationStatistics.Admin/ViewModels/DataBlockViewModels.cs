@@ -1,5 +1,6 @@
 using System;
 using System.Collections.Generic;
+using System.ComponentModel.DataAnnotations;
 using GovUk.Education.ExploreEducationStatistics.Common.Model.Chart;
 using GovUk.Education.ExploreEducationStatistics.Common.Model.Data;
 using GovUk.Education.ExploreEducationStatistics.Common.Model.Data.Query;
@@ -28,6 +29,48 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.ViewModels
         public List<IChart> Charts { get; set; }
 
         public int Order { get; set; }
+
+        public DataBlockSummary Summary { get; set; }
+
+        public TableBuilderConfiguration Table { get; set; }
+    }
+
+    public class DataBlockCreateViewModel
+    {
+        [Required]
+        public string Heading { get; set; }
+
+        [Required]
+        public string Name { get; set; }
+
+        public string HighlightName { get; set; }
+
+        public string Source { get; set; }
+
+        public ObservationQueryContext Query { get; set; }
+
+        public List<IChart> Charts { get; set; }
+
+        public DataBlockSummary Summary { get; set; }
+
+        public TableBuilderConfiguration Table { get; set; }
+    }
+
+    public class DataBlockUpdateViewModel
+    {
+        [Required]
+        public string Heading { get; set; }
+
+        [Required]
+        public string Name { get; set; }
+
+        public string HighlightName { get; set; }
+
+        public string Source { get; set; }
+
+        public ObservationQueryContext Query { get; set; }
+
+        public List<IChart> Charts { get; set; }
 
         public DataBlockSummary Summary { get; set; }
 
