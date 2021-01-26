@@ -1,6 +1,8 @@
+import ButtonLink from '@admin/components/ButtonLink';
 import Link from '@admin/components/Link';
 import DataBlockDeletePlanModal from '@admin/pages/release/datablocks/components/DataBlockDeletePlanModal';
 import {
+  releaseDataBlockCreateRoute,
   releaseDataBlockEditRoute,
   ReleaseDataBlockRouteParams,
   ReleaseRouteParams,
@@ -9,7 +11,6 @@ import dataBlocksService, {
   ReleaseDataBlockSummary,
 } from '@admin/services/dataBlockService';
 import permissionService from '@admin/services/permissionService';
-import Button from '@common/components/Button';
 import ButtonText from '@common/components/ButtonText';
 import InsetText from '@common/components/InsetText';
 import LoadingSpinner from '@common/components/LoadingSpinner';
@@ -59,6 +60,14 @@ const ReleaseDataBlocksPage = ({
     setDeleteDataBlock(undefined);
   }, []);
 
+  const createPath = generatePath<ReleaseRouteParams>(
+    releaseDataBlockCreateRoute.path,
+    {
+      publicationId,
+      releaseId,
+    },
+  );
+
   const hasHighlightNames = dataBlocks.some(
     dataBlock => !!dataBlock.highlightName,
   );
@@ -85,7 +94,9 @@ const ReleaseDataBlocksPage = ({
       <LoadingSpinner loading={isLoading}>
         {dataBlocks.length > 0 ? (
           <>
-            {canUpdateRelease && <Button>Create data block</Button>}
+            {canUpdateRelease && dataBlocks.length > 5 && (
+              <ButtonLink to={createPath}>Create data block</ButtonLink>
+            )}
 
             <table>
               <thead>
@@ -148,7 +159,9 @@ const ReleaseDataBlocksPage = ({
           <InsetText>No data blocks have been created.</InsetText>
         )}
 
-        {canUpdateRelease && <Button>Create data block</Button>}
+        {canUpdateRelease && (
+          <ButtonLink to={createPath}>Create data block</ButtonLink>
+        )}
 
         {deleteDataBlock && (
           <DataBlockDeletePlanModal
