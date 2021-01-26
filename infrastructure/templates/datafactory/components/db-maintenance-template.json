@@ -384,7 +384,8 @@
             "defaultValue": 10
           }
         },
-        "annotations": []
+        "annotations": [],
+        "concurrency": 1
       },
       "dependsOn": [
         "[concat(variables('factoryId'), '/linkedServices/ls_sql_statistics')]"
@@ -432,7 +433,8 @@
             "defaultValue": 10
           }
         },
-        "annotations": []
+        "annotations": [],
+        "concurrency": 1
       },
       "dependsOn": [
         "[concat(variables('factoryId'), '/linkedServices/ls_sql_public_statistics')]"
