@@ -547,7 +547,7 @@
               "type": "PipelineReference"
             },
             "parameters": {
-              "SubjectsBatchSize": "[variables('subjectsToMigrate')]",
+              "SubjectsBatchSize": "[variables('subjectsToMigrate')]"
             }
           }
         ],
