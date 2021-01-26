@@ -1,8 +1,6 @@
 CREATE OR
 ALTER PROCEDURE MigrateObservationsAndObservationFilterItems 
-                                          @TotalObservationLimit INT,
-                                          @ObservationCommitBatchSize INT,
-                                          @ObservationFilterItemCommitBatchSize INT
+    @SubjectsBatchSize INT
 AS
 BEGIN
     -- Create a temporary table of Subjects to migrate
@@ -29,7 +27,8 @@ BEGIN
     LEFT JOIN Observation ON Subject.Id = Observation.SubjectId
     WHERE Subject.SoftDeleted = 0 
     AND NOT EXISTS (SELECT 1 FROM ObservationRow WHERE SubjectId = Subject.Id)
-    GROUP BY Subject.Id, Subject.Filename, Subject.Name;
+    GROUP BY Subject.Id, Subject.Filename, Subject.Name
+    ORDER BY 4 DESC;
     
     -- If any Subjects are found to migrate
     IF EXISTS(SELECT 1 from #SubjectsToMigrate)
@@ -76,16 +75,18 @@ BEGIN
                                        o.CsvRow
                                 FROM Observation o
                                 WHERE o.SubjectId = @SubjectId
-                                ORDER BY o.CsvRow ASC
-                           ) as existing;
+                           ) AS existing
+                           ORDER BY existing.CsvRow ASC;
     
                     INSERT INTO ObservationRowFilterItem (ObservationId, OldObservationId, FilterItemId, FilterId)
-                    SELECT existing.Id, existing.ObservationId, existing.FilterItemId, existing.FilterId FROM (
-                      SELECT row.Id, ofi.ObservationId, ofi.FilterItemId, ofi.FilterId
-                      FROM ObservationFilterItem ofi
-                      JOIN ObservationRow row ON row.ObservationId = ofi.ObservationId
-                      WHERE row.SubjectId = @SubjectId)
-                    ) as existing;
+                    SELECT observationrow.Id, observationrow.ObservationId, observationrow.FilterItemId, observationrow.FilterId 
+                    FROM (
+                        SELECT row.Id, ofi.ObservationId, ofi.FilterItemId, ofi.FilterId
+                        FROM ObservationFilterItem ofi
+                        JOIN ObservationRow row ON row.ObservationId = ofi.ObservationId
+                        WHERE row.SubjectId = @SubjectId
+                    ) AS observationrow
+                    ORDER BY observationrow.Id ASC;
     
                 COMMIT;
                 

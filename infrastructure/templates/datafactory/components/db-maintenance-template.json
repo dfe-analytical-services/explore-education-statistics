@@ -21,7 +21,8 @@
     "fragmentationTables": "Observation,ObservationFilterItem",
     "removeSoftDeletedSubjectsObservationLimit": "1500000",
     "removeSoftDeletedSubjectsObservationCommitBatchSize": "1000",
-    "removeSoftDeletedSubjectsObservationFilterItemCommitBatchSize": "20000"
+    "removeSoftDeletedSubjectsObservationFilterItemCommitBatchSize": "20000",
+    "subjectsToMigrate": "10"
   },
   "resources": [
     {
@@ -342,6 +343,102 @@
       ]
     },
     {
+      "name": "[concat(parameters('factoryName'), '/pl_migrate_observations_and_observationfilteritems_statistics')]",
+      "type": "Microsoft.DataFactory/factories/pipelines",
+      "apiVersion": "2018-06-01",
+      "properties": {
+        "activities": [
+          {
+            "name": "sp_migrate_observations_and_observationfilteritems",
+            "type": "SqlServerStoredProcedure",
+            "dependsOn": [],
+            "policy": {
+              "timeout": "0.04:00:00",
+              "retry": 0,
+              "retryIntervalInSeconds": 30,
+              "secureOutput": false,
+              "secureInput": false
+            },
+            "userProperties": [],
+            "typeProperties": {
+              "storedProcedureName": "[[dbo].[MigrateObservationsAndObservationFilterItems]",
+              "storedProcedureParameters": {
+                "TotalObservationLimit": {
+                  "value": {
+                    "value": "@pipeline().parameters.SubjectsBatchSize",
+                    "type": "Expression"
+                  },
+                  "type": "Int32"
+                }
+              }
+            },
+            "linkedServiceName": {
+              "referenceName": "ls_sql_statistics",
+              "type": "LinkedServiceReference"
+            }
+          }
+        ],
+        "parameters": {
+          "SubjectsBatchSize": {
+            "type": "int",
+            "defaultValue": 10
+          }
+        },
+        "annotations": []
+      },
+      "dependsOn": [
+        "[concat(variables('factoryId'), '/linkedServices/ls_sql_statistics')]"
+      ]
+    },
+    {
+      "name": "[concat(parameters('factoryName'), '/pl_migrate_observations_and_observationfilteritems_public_statistics')]",
+      "type": "Microsoft.DataFactory/factories/pipelines",
+      "apiVersion": "2018-06-01",
+      "properties": {
+        "activities": [
+          {
+            "name": "sp_migrate_observations_and_observationfilteritems",
+            "type": "SqlServerStoredProcedure",
+            "dependsOn": [],
+            "policy": {
+              "timeout": "0.04:00:00",
+              "retry": 0,
+              "retryIntervalInSeconds": 30,
+              "secureOutput": false,
+              "secureInput": false
+            },
+            "userProperties": [],
+            "typeProperties": {
+              "storedProcedureName": "[[dbo].[MigrateObservationsAndObservationFilterItems]",
+              "storedProcedureParameters": {
+                "TotalObservationLimit": {
+                  "value": {
+                    "value": "@pipeline().parameters.SubjectsBatchSize",
+                    "type": "Expression"
+                  },
+                  "type": "Int32"
+                }
+              }
+            },
+            "linkedServiceName": {
+              "referenceName": "ls_sql_public_statistics",
+              "type": "LinkedServiceReference"
+            }
+          }
+        ],
+        "parameters": {
+          "SubjectsBatchSize": {
+            "type": "int",
+            "defaultValue": 10
+          }
+        },
+        "annotations": []
+      },
+      "dependsOn": [
+        "[concat(variables('factoryId'), '/linkedServices/ls_sql_public_statistics')]"
+      ]
+    },
+    {
       "name": "[concat(parameters('factoryName'), '/purge_soft_deleted_subjects_trigger')]",
       "type": "Microsoft.DataFactory/factories/triggers",
       "apiVersion": "2018-06-01",
@@ -427,6 +524,47 @@
       "dependsOn": [
         "[concat(variables('factoryId'), '/pipelines/pl_rebuild_statistics_indexes')]",
         "[concat(variables('factoryId'), '/pipelines/pl_rebuild_public_statistics_indexes')]"
+      ]
+    },
+    {
+      "name": "[concat(parameters('factoryName'), '/migrate_observations_and_observationfilteritems_trigger')]",
+      "type": "Microsoft.DataFactory/factories/triggers",
+      "apiVersion": "2018-06-01",
+      "properties": {
+        "annotations": [],
+        "runtimeState": "Stopped",
+        "pipelines": [
+          {
+            "pipelineReference": {
+              "referenceName": "pl_migrate_observations_and_observationfilteritems_statistics",
+              "type": "PipelineReference"
+            },
+            "parameters": {}
+          },
+          {
+            "pipelineReference": {
+              "referenceName": "pl_migrate_observations_and_observationfilteritems_public_statistics",
+              "type": "PipelineReference"
+            },
+            "parameters": {
+              "SubjectsBatchSize": "[variables('subjectsToMigrate')]",
+            }
+          }
+        ],
+        "type": "ScheduleTrigger",
+        "typeProperties": {
+          "recurrence": {
+            "frequency": "Day",
+            "interval": 1,
+            "startTime": "2020-11-23T19:00:00",
+            "timeZone": "GMT Standard Time",
+            "schedule": {}
+          }
+        }
+      },
+      "dependsOn": [
+        "[concat(variables('factoryId'), '/pipelines/pl_migrate_observations_and_observationfilteritems_statistics')]",
+        "[concat(variables('factoryId'), '/pipelines/pl_migrate_observations_and_observationfilteritems_public_statistics')]"
       ]
     }
   ]
