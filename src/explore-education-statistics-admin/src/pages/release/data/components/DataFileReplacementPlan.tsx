@@ -1,8 +1,8 @@
 import ButtonLink from '@admin/components/ButtonLink';
 import mergeReplacementFootnoteFilters from '@admin/pages/release/data/components/utils/mergeReplacementFootnoteFilters';
 import {
-  releaseDataBlocksRoute,
-  ReleaseDataBlocksRouteParams,
+  releaseDataBlockEditRoute,
+  ReleaseDataBlockRouteParams,
   ReleaseFootnoteRouteParams,
   releaseFootnotesEditRoute,
 } from '@admin/routes/releaseRoutes';
@@ -220,8 +220,8 @@ const DataFileReplacementPlan = ({
 
                   <ButtonGroup>
                     <ButtonLink
-                      to={generatePath<ReleaseDataBlocksRouteParams>(
-                        releaseDataBlocksRoute.path,
+                      to={generatePath<ReleaseDataBlockRouteParams>(
+                        releaseDataBlockEditRoute.path,
                         {
                           publicationId,
                           releaseId,

@@ -2,6 +2,7 @@ import ReleaseContentPage from '@admin/pages/release/content/ReleaseContentPage'
 import ReleaseDataFilePage from '@admin/pages/release/data/ReleaseDataFilePage';
 import ReleaseDataFileReplacementCompletePage from '@admin/pages/release/data/ReleaseDataFileReplacementCompletePage';
 import ReleaseDataPage from '@admin/pages/release/data/ReleaseDataPage';
+import ReleaseDataBlockEditPage from '@admin/pages/release/datablocks/ReleaseDataBlockEditPage';
 import ReleaseDataBlocksPage from '@admin/pages/release/datablocks/ReleaseDataBlocksPage';
 import ReleaseFootnoteCreatePage from '@admin/pages/release/footnotes/ReleaseFootnoteCreatePage';
 import ReleaseFootnoteEditPage from '@admin/pages/release/footnotes/ReleaseFootnoteEditPage';
@@ -17,8 +18,8 @@ export type ReleaseRouteParams = {
   releaseId: string;
 };
 
-export type ReleaseDataBlocksRouteParams = ReleaseRouteParams & {
-  dataBlockId?: string;
+export type ReleaseDataBlockRouteParams = ReleaseRouteParams & {
+  dataBlockId: string;
 };
 
 export type ReleaseDataFileRouteParams = ReleaseRouteParams & {
@@ -84,10 +85,16 @@ export const releaseFootnotesEditRoute: ReleaseRouteProps = {
 };
 
 export const releaseDataBlocksRoute: ReleaseRouteProps = {
-  path:
-    '/publication/:publicationId/release/:releaseId/datablocks/:dataBlockId?',
+  path: '/publication/:publicationId/release/:releaseId/data-blocks',
   title: 'Data blocks',
   component: ReleaseDataBlocksPage,
+};
+
+export const releaseDataBlockEditRoute: ReleaseRouteProps = {
+  path:
+    '/publication/:publicationId/release/:releaseId/data-blocks/:dataBlockId',
+  title: 'Edit data block',
+  component: ReleaseDataBlockEditPage,
 };
 
 export const releaseContentRoute: ReleaseRouteProps = {

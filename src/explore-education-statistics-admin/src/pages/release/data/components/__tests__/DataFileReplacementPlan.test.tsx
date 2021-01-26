@@ -4,7 +4,6 @@ import _dataReplacementService, {
   DataReplacementPlan,
 } from '@admin/services/dataReplacementService';
 import _footnoteService from '@admin/services/footnoteService';
-import _releaseDataFileService from '@admin/services/releaseDataFileService';
 import { render, screen, waitFor, within } from '@testing-library/react';
 import React from 'react';
 import { MemoryRouter } from 'react-router';
@@ -23,9 +22,6 @@ const dataReplacementService = _dataReplacementService as jest.Mocked<
 >;
 const footnoteService = _footnoteService as jest.Mocked<
   typeof _footnoteService
->;
-const releaseDataFileService = _releaseDataFileService as jest.Mocked<
-  typeof _releaseDataFileService
 >;
 
 describe('DataReplacementPlan', () => {
@@ -491,7 +487,7 @@ describe('DataReplacementPlan', () => {
         dataBlock1.getByRole('link', { name: 'Edit data block', hidden: true }),
       ).toHaveAttribute(
         'href',
-        '/publication/publication-1/release/release-1/datablocks/block-1',
+        '/publication/publication-1/release/release-1/data-blocks/block-1',
       );
       expect(
         dataBlock1.getByRole('button', {
@@ -754,7 +750,7 @@ describe('DataReplacementPlan', () => {
       screen.getByRole('link', { name: 'Edit data block' }),
     ).toHaveAttribute(
       'href',
-      '/publication/publication-1/release/release-1/datablocks/block-1',
+      '/publication/publication-1/release/release-1/data-blocks/block-1',
     );
   });
 
