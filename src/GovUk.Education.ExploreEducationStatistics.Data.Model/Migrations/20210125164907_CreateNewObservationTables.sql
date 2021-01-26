@@ -1,9 +1,9 @@
 create table ObservationRow
 (
-    Id       bigint identity(1,1) PRIMARY KEY NOT NULL,
-    ObservationId              uniqueidentifier not null,
+    Id              bigint identity(1,1) NOT NULL,
+    ObservationId   uniqueidentifier not null,
     SubjectId       uniqueidentifier not null
-        constraint FK_ObservationRow_Subject_SubjectId
+        CONSTRAINT FK_ObservationRow_Subject_SubjectId
             references Subject
             on delete cascade,
     GeographicLevel nvarchar(6)      not null,
@@ -13,7 +13,8 @@ create table ObservationRow
     Year            int              not null,
     TimeIdentifier  nvarchar(6)      not null,
     Measures        nvarchar(max),
-    CsvRow          bigint           not null
+    CsvRow          bigint           not null,
+    CONSTRAINT PK_ObservationRow PRIMARY KEY (Id)
 )
 go
 
@@ -43,6 +44,7 @@ go
 
 create table ObservationRowFilterItem
 (
+    Id            bigint identity(1,1) NOT NULL,
     ObservationId bigint not null
         constraint FK_ObservationRowFilterItem_ObservationRow_Id
             references ObservationRow (Id)
@@ -55,9 +57,12 @@ create table ObservationRowFilterItem
         constraint FK_ObservationRowFilterItem_Filter_FilterId
             references Filter,
     constraint PK_ObservationRowFilterItem
-        primary key (ObservationId, FilterItemId)
+        primary key (Id)
 )
 go
+
+create index IX_ObservationRowFilterItem_FilterItemId_ObservationId
+    on ObservationRowFilterItem (FilterItemId, ObservationId)
 
 create index IX_ObservationRowFilterItem_FilterItemId
     on ObservationRowFilterItem (FilterItemId)
