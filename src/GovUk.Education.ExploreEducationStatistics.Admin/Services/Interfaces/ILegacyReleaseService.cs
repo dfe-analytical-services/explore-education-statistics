@@ -11,12 +11,12 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Services.Interfaces
         Task<Either<ActionResult, LegacyReleaseViewModel>> GetLegacyRelease(Guid id);
 
         Task<Either<ActionResult, LegacyReleaseViewModel>> CreateLegacyRelease(
-            CreateLegacyReleaseViewModel legacyRelease
+            LegacyReleaseCreateViewModel legacyRelease
         );
 
         Task<Either<ActionResult, LegacyReleaseViewModel>> UpdateLegacyRelease(
             Guid id, 
-            UpdateLegacyReleaseViewModel legacyRelease
+            LegacyReleaseUpdateViewModel legacyRelease
         );
 
         Task<Either<ActionResult, bool>> DeleteLegacyRelease(Guid id);

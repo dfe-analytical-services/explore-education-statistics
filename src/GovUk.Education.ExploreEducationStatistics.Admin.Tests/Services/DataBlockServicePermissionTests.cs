@@ -1,9 +1,9 @@
 using System;
 using System.Threading.Tasks;
-using GovUk.Education.ExploreEducationStatistics.Admin.Models.Api;
 using GovUk.Education.ExploreEducationStatistics.Admin.Security;
 using GovUk.Education.ExploreEducationStatistics.Admin.Services;
 using GovUk.Education.ExploreEducationStatistics.Admin.Services.Interfaces;
+using GovUk.Education.ExploreEducationStatistics.Admin.ViewModels;
 using GovUk.Education.ExploreEducationStatistics.Common.Model;
 using GovUk.Education.ExploreEducationStatistics.Common.Services.Interfaces.Security;
 using GovUk.Education.ExploreEducationStatistics.Common.Tests.Utils;
@@ -34,14 +34,14 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
         public void Create()
         {
             AssertSecurityPoliciesChecked(service =>
-                service.Create(_release.Id, new CreateDataBlockViewModel()), CanUpdateSpecificRelease);
+                service.Create(_release.Id, new DataBlockCreateViewModel()), CanUpdateSpecificRelease);
         }
 
         [Fact]
         public void Update()
         {
             AssertSecurityPoliciesChecked(service =>
-                service.Update(_dataBlock.Id, new UpdateDataBlockViewModel()), CanUpdateSpecificRelease);
+                service.Update(_dataBlock.Id, new DataBlockUpdateViewModel()), CanUpdateSpecificRelease);
         }
 
         [Fact]

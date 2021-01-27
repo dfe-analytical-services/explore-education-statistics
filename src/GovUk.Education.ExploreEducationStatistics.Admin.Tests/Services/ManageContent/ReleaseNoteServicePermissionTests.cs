@@ -4,6 +4,7 @@ using AutoMapper;
 using GovUk.Education.ExploreEducationStatistics.Admin.Controllers.Api.ManageContent;
 using GovUk.Education.ExploreEducationStatistics.Admin.Security;
 using GovUk.Education.ExploreEducationStatistics.Admin.Services.ManageContent;
+using GovUk.Education.ExploreEducationStatistics.Admin.ViewModels.ManageContent;
 using GovUk.Education.ExploreEducationStatistics.Common.Model;
 using GovUk.Education.ExploreEducationStatistics.Common.Services.Interfaces.Security;
 using GovUk.Education.ExploreEducationStatistics.Common.Tests.Utils;
@@ -29,7 +30,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services.Manage
             AssertSecurityPoliciesChecked(service =>
                     service.AddReleaseNoteAsync(
                         _release.Id,
-                        new CreateOrUpdateReleaseNoteRequest()),
+                        new ReleaseNoteSaveRequest()),
                 SecurityPolicies.CanUpdateSpecificRelease);
         }
 
@@ -50,7 +51,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services.Manage
                     service.UpdateReleaseNoteAsync(
                         _release.Id,
                         Guid.NewGuid(),
-                        new CreateOrUpdateReleaseNoteRequest()),
+                        new ReleaseNoteSaveRequest()),
                 SecurityPolicies.CanUpdateSpecificRelease);
         }
 

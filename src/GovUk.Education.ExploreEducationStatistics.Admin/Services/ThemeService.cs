@@ -43,13 +43,13 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Services
             _publishingService = publishingService;
         }
 
-        public async Task<Either<ActionResult, ThemeViewModel>> CreateTheme(SaveThemeViewModel createdTheme)
+        public async Task<Either<ActionResult, ThemeViewModel>> CreateTheme(ThemeSaveViewModel created)
         {
             return await _userService.CheckCanManageAllTaxonomy()
                 .OnSuccess(
                     async _ =>
                     {
-                        if (_context.Themes.Any(theme => theme.Slug == createdTheme.Slug))
+                        if (_context.Themes.Any(theme => theme.Slug == created.Slug))
                         {
                             return ValidationActionResult(ValidationErrorMessages.SlugNotUnique);
                         }
@@ -57,9 +57,9 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Services
                         var saved = await _context.Themes.AddAsync(
                             new Theme
                             {
-                                Slug = createdTheme.Slug,
-                                Summary = createdTheme.Summary,
-                                Title = createdTheme.Title,
+                                Slug = created.Slug,
+                                Summary = created.Summary,
+                                Title = created.Title,
                             }
                         );
 
@@ -74,21 +74,21 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Services
 
         public async Task<Either<ActionResult, ThemeViewModel>> UpdateTheme(
             Guid themeId,
-            SaveThemeViewModel updatedTheme)
+            ThemeSaveViewModel updated)
         {
             return await _persistenceHelper.CheckEntityExists<Theme>(themeId)
                 .OnSuccessDo(_userService.CheckCanManageAllTaxonomy)
                 .OnSuccess(
                     async theme =>
                     {
-                        if (_context.Themes.Any(t => t.Slug == updatedTheme.Slug && t.Id != themeId))
+                        if (_context.Themes.Any(t => t.Slug == updated.Slug && t.Id != themeId))
                         {
                             return ValidationActionResult(ValidationErrorMessages.SlugNotUnique);
                         }
 
-                        theme.Title = updatedTheme.Title;
-                        theme.Slug = updatedTheme.Slug;
-                        theme.Summary = updatedTheme.Summary;
+                        theme.Title = updated.Title;
+                        theme.Slug = updated.Slug;
+                        theme.Summary = updated.Summary;
 
                         await _context.SaveChangesAsync();
 

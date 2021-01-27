@@ -1,8 +1,9 @@
 using System;
 using System.Collections.Generic;
 using GovUk.Education.ExploreEducationStatistics.Admin.Controllers.Api.Methodologies;
-using GovUk.Education.ExploreEducationStatistics.Admin.Models.Api;
 using GovUk.Education.ExploreEducationStatistics.Admin.Services.Interfaces.Methodologies;
+using GovUk.Education.ExploreEducationStatistics.Admin.ViewModels;
+using GovUk.Education.ExploreEducationStatistics.Admin.ViewModels.Methodology;
 using GovUk.Education.ExploreEducationStatistics.Common.Model;
 using Microsoft.AspNetCore.Mvc;
 using Moq;
@@ -17,7 +18,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Controllers.Api
         [Fact]
         public async void CreateMethodologyAsync_Returns_Ok()
         {
-            var request = new CreateMethodologyRequest();
+            var request = new MethodologyCreateRequest();
 
             var methodologyService = new Mock<IMethodologyService>();
 
@@ -76,7 +77,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Controllers.Api
         [Fact]
         public async void UpdateMethodologyAsync_Returns_Ok()
         {
-            var request = new UpdateMethodologyRequest();
+            var request = new MethodologyUpdateRequest();
 
             var methodologyService = new Mock<IMethodologyService>();
 

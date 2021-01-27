@@ -56,16 +56,16 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Services
             _publishingService = publishingService;
         }
 
-        public async Task<Either<ActionResult, TopicViewModel>> CreateTopic(SaveTopicViewModel createdTopic)
+        public async Task<Either<ActionResult, TopicViewModel>> CreateTopic(TopicSaveViewModel created)
         {
             return await _userService.CheckCanManageAllTaxonomy()
-                .OnSuccessDo(() => ValidateSelectedTheme(createdTopic.ThemeId))
+                .OnSuccessDo(() => ValidateSelectedTheme(created.ThemeId))
                 .OnSuccess(
                     async _ =>
                     {
                         if (_contentContext.Topics.Any(
-                            topic => topic.Slug == createdTopic.Slug
-                                     && topic.ThemeId == createdTopic.ThemeId
+                            topic => topic.Slug == created.Slug
+                                     && topic.ThemeId == created.ThemeId
                         ))
                         {
                             return ValidationActionResult(ValidationErrorMessages.SlugNotUnique);
@@ -74,9 +74,9 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Services
                         var saved = await _contentContext.Topics.AddAsync(
                             new Topic
                             {
-                                Title = createdTopic.Title,
-                                Slug = createdTopic.Slug,
-                                ThemeId = createdTopic.ThemeId,
+                                Title = created.Title,
+                                Slug = created.Slug,
+                                ThemeId = created.ThemeId,
                             }
                         );
 
@@ -91,26 +91,26 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Services
 
         public async Task<Either<ActionResult, TopicViewModel>> UpdateTopic(
             Guid topicId,
-            SaveTopicViewModel updatedTopic)
+            TopicSaveViewModel updated)
         {
             return await _userService.CheckCanManageAllTaxonomy()
                 .OnSuccess(() => _persistenceHelper.CheckEntityExists<Topic>(topicId))
-                .OnSuccessDo(() => ValidateSelectedTheme(updatedTopic.ThemeId))
+                .OnSuccessDo(() => ValidateSelectedTheme(updated.ThemeId))
                 .OnSuccess(
                     async topic =>
                     {
                         if (_contentContext.Topics.Any(
-                            t => t.Slug == updatedTopic.Slug
+                            t => t.Slug == updated.Slug
                                  && t.Id != topicId
-                                 && t.ThemeId == updatedTopic.ThemeId
+                                 && t.ThemeId == updated.ThemeId
                         ))
                         {
                             return ValidationActionResult(ValidationErrorMessages.SlugNotUnique);
                         }
 
-                        topic.Title = updatedTopic.Title;
-                        topic.Slug = updatedTopic.Slug;
-                        topic.ThemeId = updatedTopic.ThemeId;
+                        topic.Title = updated.Title;
+                        topic.Slug = updated.Slug;
+                        topic.ThemeId = updated.ThemeId;
 
                         _contentContext.Topics.Update(topic);
                         await _contentContext.SaveChangesAsync();

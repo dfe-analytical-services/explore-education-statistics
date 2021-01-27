@@ -3,7 +3,6 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
 using AutoMapper;
-using GovUk.Education.ExploreEducationStatistics.Admin.Models.Api;
 using GovUk.Education.ExploreEducationStatistics.Admin.Services.Interfaces;
 using GovUk.Education.ExploreEducationStatistics.Admin.Services.Interfaces.Security;
 using GovUk.Education.ExploreEducationStatistics.Admin.ViewModels;
@@ -63,7 +62,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Services
         }
 
         public async Task<Either<ActionResult, PublicationViewModel>> CreatePublication(
-            SavePublicationViewModel publication)
+            PublicationSaveViewModel publication)
         {
             return await ValidateSelectedTopic(publication.TopicId)
                 .OnSuccess(_ => ValidateSelectedMethodology(
@@ -103,7 +102,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Services
 
         public async Task<Either<ActionResult, PublicationViewModel>> UpdatePublication(
             Guid publicationId,
-            SavePublicationViewModel updatedPublication)
+            PublicationSaveViewModel updatedPublication)
         {
             return await _persistenceHelper
                 .CheckEntityExists<Publication>(publicationId)
@@ -214,7 +213,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Services
 
         public async Task<Either<ActionResult, List<LegacyReleaseViewModel>>> PartialUpdateLegacyReleases(
             Guid publicationId,
-            List<PartialUpdateLegacyReleaseViewModel> updatedLegacyReleases)
+            List<LegacyReleasePartialUpdateViewModel> updatedLegacyReleases)
         {
             return await _persistenceHelper
                 .CheckEntityExists<Publication>(

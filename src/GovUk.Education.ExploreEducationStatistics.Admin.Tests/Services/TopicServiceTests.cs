@@ -45,7 +45,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
                 var service = SetupTopicService(context);
 
                 var result = await service.CreateTopic(
-                    new SaveTopicViewModel
+                    new TopicSaveViewModel
                     {
                         Title = "Test topic",
                         ThemeId = theme.Id
@@ -73,7 +73,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
             var service = SetupTopicService(context);
 
             var result = await service.CreateTopic(
-                new SaveTopicViewModel
+                new TopicSaveViewModel
                 {
                     Title = "Test topic",
                     ThemeId = Guid.NewGuid()
@@ -117,7 +117,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
                 var service = SetupTopicService(context);
 
                 var result = await service.CreateTopic(
-                    new SaveTopicViewModel
+                    new TopicSaveViewModel
                     {
                         Title = "Test topic",
                         ThemeId = theme.Id
@@ -166,7 +166,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
 
                 var result = await service.UpdateTopic(
                     topic.Id,
-                    new SaveTopicViewModel
+                    new TopicSaveViewModel
                     {
                         Title = "New title",
                         ThemeId = theme.Id
@@ -214,7 +214,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
 
                 var result = await service.UpdateTopic(
                     topic.Id,
-                    new SaveTopicViewModel
+                    new TopicSaveViewModel
                     {
                         Title = "Test topic",
                         ThemeId = Guid.NewGuid()
@@ -266,7 +266,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
 
                 var result = await service.UpdateTopic(
                     topic.Id,
-                    new SaveTopicViewModel
+                    new TopicSaveViewModel
                     {
                         Title = "Other topic",
                         ThemeId = topic.ThemeId

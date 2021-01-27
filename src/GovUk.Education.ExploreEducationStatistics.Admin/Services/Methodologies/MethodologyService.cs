@@ -4,10 +4,11 @@ using System.Linq;
 using System.Threading.Tasks;
 using AutoMapper;
 using GovUk.Education.ExploreEducationStatistics.Admin.Controllers.Api.Methodologies;
-using GovUk.Education.ExploreEducationStatistics.Admin.Models.Api;
 using GovUk.Education.ExploreEducationStatistics.Admin.Services.Interfaces;
 using GovUk.Education.ExploreEducationStatistics.Admin.Services.Interfaces.Methodologies;
 using GovUk.Education.ExploreEducationStatistics.Admin.Services.Interfaces.Security;
+using GovUk.Education.ExploreEducationStatistics.Admin.ViewModels;
+using GovUk.Education.ExploreEducationStatistics.Admin.ViewModels.Methodology;
 using GovUk.Education.ExploreEducationStatistics.Common.Model;
 using GovUk.Education.ExploreEducationStatistics.Common.Services.Interfaces.Security;
 using GovUk.Education.ExploreEducationStatistics.Common.Utils;
@@ -43,7 +44,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Services.Methodologie
         }
 
         public async Task<Either<ActionResult, MethodologySummaryViewModel>> CreateMethodologyAsync(
-            CreateMethodologyRequest request)
+            MethodologyCreateRequest request)
         {
             var slug = SlugFromTitle(request.Title);
             return await _userService.CheckCanCreateMethodology()
@@ -96,7 +97,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Services.Methodologie
         }
 
         public async Task<Either<ActionResult, MethodologySummaryViewModel>> UpdateMethodologyAsync(Guid id,
-            UpdateMethodologyRequest request)
+            MethodologyUpdateRequest request)
         {
             return await _persistenceHelper.CheckEntityExists<Methodology>(id)
                 .OnSuccess(methodology => CheckCanUpdateMethodologyStatus(methodology, request.Status))

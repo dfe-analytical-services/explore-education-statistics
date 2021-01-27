@@ -1,9 +1,9 @@
 using System;
 using System.Collections.Generic;
 using System.Threading.Tasks;
-using GovUk.Education.ExploreEducationStatistics.Admin.Models.Api;
 using GovUk.Education.ExploreEducationStatistics.Admin.Services;
 using GovUk.Education.ExploreEducationStatistics.Admin.Services.Interfaces;
+using GovUk.Education.ExploreEducationStatistics.Admin.ViewModels;
 using GovUk.Education.ExploreEducationStatistics.Common.Extensions;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
@@ -25,7 +25,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Controllers.Api
         [HttpPost("release/{releaseId}/datablocks")]
         public async Task<ActionResult<DataBlockViewModel>> CreateDataBlock(
             Guid releaseId,
-            CreateDataBlockViewModel dataBlock)
+            DataBlockCreateViewModel dataBlock)
         {
             return await _dataBlockService.Create(releaseId, dataBlock)
                 .HandleFailuresOrOk();
@@ -61,7 +61,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Controllers.Api
 
         [HttpPut("datablocks/{id}")]
         public async Task<ActionResult<DataBlockViewModel>> UpdateDataBlock(Guid id,
-            UpdateDataBlockViewModel dataBlock)
+            DataBlockUpdateViewModel dataBlock)
         {
             return await _dataBlockService.Update(id, dataBlock)
                 .HandleFailuresOrOk();

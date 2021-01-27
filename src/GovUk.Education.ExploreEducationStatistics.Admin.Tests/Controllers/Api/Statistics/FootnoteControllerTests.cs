@@ -3,8 +3,8 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
 using GovUk.Education.ExploreEducationStatistics.Admin.Controllers.Api.Statistics;
-using GovUk.Education.ExploreEducationStatistics.Admin.Models.Api.Statistics;
 using GovUk.Education.ExploreEducationStatistics.Admin.Services.Interfaces;
+using GovUk.Education.ExploreEducationStatistics.Admin.ViewModels.Statistics;
 using GovUk.Education.ExploreEducationStatistics.Common.Model;
 using GovUk.Education.ExploreEducationStatistics.Data.Model;
 using GovUk.Education.ExploreEducationStatistics.Data.Model.Services.Interfaces;
@@ -152,7 +152,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Controllers.Api
         [Fact]
         public async void Post_CreateFootnote_Returns_Ok()
         {
-            var result = await _controller.CreateFootnote(ReleaseId, new CreateFootnoteViewModel()
+            var result = await _controller.CreateFootnote(ReleaseId, new FootnoteCreateViewModel()
             {
                 Content = "Sample footnote",
                 Filters = new List<Guid>(),
@@ -175,7 +175,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Controllers.Api
         [Fact]
         public async void Put_UpdateFootnote_Returns_Ok()
         {
-            var result = await _controller.UpdateFootnote(ReleaseId, FootnoteId, new UpdateFootnoteViewModel
+            var result = await _controller.UpdateFootnote(ReleaseId, FootnoteId, new FootnoteUpdateViewModel
             {
                 Content = "Updated sample footnote",
                 Filters = new List<Guid>(),

@@ -43,7 +43,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Services
         }
 
         public async Task<Either<ActionResult, LegacyReleaseViewModel>> CreateLegacyRelease(
-            CreateLegacyReleaseViewModel legacyRelease)
+            LegacyReleaseCreateViewModel legacyRelease)
         {
             return await _persistenceHelper
                 .CheckEntityExists<Publication>(
@@ -71,7 +71,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Services
 
         public async Task<Either<ActionResult, LegacyReleaseViewModel>> UpdateLegacyRelease(
             Guid id,
-            UpdateLegacyReleaseViewModel updateLegacyRelease)
+            LegacyReleaseUpdateViewModel legacyReleaseUpdate)
         {
             return await _persistenceHelper
                 .CheckEntityExists<LegacyRelease>(
@@ -82,20 +82,20 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Services
                 .OnSuccess(_userService.CheckCanUpdateLegacyRelease)
                 .OnSuccess(async legacyRelease =>
                 {
-                    legacyRelease.Description = updateLegacyRelease.Description;
-                    legacyRelease.Url = updateLegacyRelease.Url;
-                    legacyRelease.PublicationId = updateLegacyRelease.PublicationId;
+                    legacyRelease.Description = legacyReleaseUpdate.Description;
+                    legacyRelease.Url = legacyReleaseUpdate.Url;
+                    legacyRelease.PublicationId = legacyReleaseUpdate.PublicationId;
 
                     var publication = legacyRelease.Publication;
 
-                    if (updateLegacyRelease.Order != legacyRelease.Order)
+                    if (legacyReleaseUpdate.Order != legacyRelease.Order)
                     {
-                        legacyRelease.Order = updateLegacyRelease.Order;
+                        legacyRelease.Order = legacyReleaseUpdate.Order;
 
                         // Shift up orders of existing legacy releases
                         // to make space for updated legacy release.
                         publication.LegacyReleases
-                            .FindAll(release => release.Order >= updateLegacyRelease.Order && release.Id != id)
+                            .FindAll(release => release.Order >= legacyReleaseUpdate.Order && release.Id != id)
                             .ForEach(release => release.Order++);
 
                         var currentOrder = 0;

@@ -3,10 +3,10 @@ using System.Collections.Generic;
 using System.Linq;
 using AutoMapper;
 using GovUk.Education.ExploreEducationStatistics.Admin.Mappings.Interfaces;
-using GovUk.Education.ExploreEducationStatistics.Admin.Models.Api;
 using GovUk.Education.ExploreEducationStatistics.Admin.Services.Methodologies;
 using GovUk.Education.ExploreEducationStatistics.Admin.ViewModels;
 using GovUk.Education.ExploreEducationStatistics.Admin.ViewModels.ManageContent;
+using GovUk.Education.ExploreEducationStatistics.Admin.ViewModels.Methodology;
 using GovUk.Education.ExploreEducationStatistics.Common.Extensions;
 using GovUk.Education.ExploreEducationStatistics.Common.Model;
 using GovUk.Education.ExploreEducationStatistics.Content.Model;
@@ -60,7 +60,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Mappings
                             : (DateTime?) null))
                 .ForMember(dest => dest.Permissions, exp => exp.MapFrom<IMyReleasePermissionSetPropertyResolver>());
 
-            CreateMap<CreateReleaseViewModel, Release>()
+            CreateMap<ReleaseCreateViewModel, Release>()
                 .ForMember(dest => dest.PublishScheduled, m => m.MapFrom(model =>
                     model.PublishScheduledDate));
 
@@ -100,8 +100,8 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Mappings
             CreateMap<Contact, ContactViewModel>();
 
             CreateContentBlockMap();
-            CreateMap<CreateDataBlockViewModel, DataBlock>();
-            CreateMap<UpdateDataBlockViewModel, DataBlock>();
+            CreateMap<DataBlockCreateViewModel, DataBlock>();
+            CreateMap<DataBlockUpdateViewModel, DataBlock>();
 
             CreateMap<Theme, Data.Model.Theme>()
                 .ForMember(dest => dest.Topics, m => m.Ignore());

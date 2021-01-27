@@ -186,6 +186,7 @@
   
   <ItemGroup>
     <Folder Include="Services\Security" />
+    <Folder Include="ViewModels\Blocks" />
   </ItemGroup>
 
   <PropertyGroup>
