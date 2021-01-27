@@ -3,11 +3,9 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
 using AutoMapper;
-using GovUk.Education.ExploreEducationStatistics.Admin.Controllers.Api.Methodologies;
 using GovUk.Education.ExploreEducationStatistics.Admin.Services.Interfaces;
 using GovUk.Education.ExploreEducationStatistics.Admin.Services.Interfaces.Methodologies;
 using GovUk.Education.ExploreEducationStatistics.Admin.Services.Interfaces.Security;
-using GovUk.Education.ExploreEducationStatistics.Admin.ViewModels;
 using GovUk.Education.ExploreEducationStatistics.Admin.ViewModels.Methodology;
 using GovUk.Education.ExploreEducationStatistics.Common.Model;
 using GovUk.Education.ExploreEducationStatistics.Common.Services.Interfaces.Security;
@@ -65,7 +63,8 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Services.Methodologie
 
         public async Task<Either<ActionResult, MethodologySummaryViewModel>> GetSummaryAsync(Guid id)
         {
-            return await _persistenceHelper.CheckEntityExists<Methodology>(id)
+            return await _persistenceHelper
+                .CheckEntityExists<Methodology>(id)
                 .OnSuccess(_userService.CheckCanViewMethodology)
                 .OnSuccess(_mapper.Map<MethodologySummaryViewModel>);
         }
@@ -93,6 +92,33 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Services.Methodologie
                         .ToListAsync();
 
                     return _mapper.Map<List<MethodologyPublicationsViewModel>>(result);
+                })
+                .OrElse(async () =>
+                {
+                    var userId = _userService.GetUserId();
+                    var viewablePublications = await _context.UserReleaseRoles
+                        .Include(urr => urr.Release)
+                        .ThenInclude(r => r.Publication)
+                        .Where(urr =>
+                            urr.UserId == userId
+                            && urr.Role != ReleaseRole.PrereleaseViewer)
+                        .Select(urr => urr.Release.Publication)
+                        .Distinct()
+                        .ToListAsync();
+
+                    var allMethodologies = await _context.Methodologies
+                        .Include(m => m.Publications)
+                        .ToListAsync();
+
+                    var viewableMethodologies = allMethodologies
+                        .Where(m => viewablePublications
+                            .Any(p1 => m.Publications
+                                .Select(p2 => p2.Id)
+                                .Contains(p1.Id)))
+                        .OrderBy(m => m.Title)
+                        .ToList();
+
+                    return _mapper.Map<List<MethodologyPublicationsViewModel>>(viewableMethodologies);
                 });
         }
 

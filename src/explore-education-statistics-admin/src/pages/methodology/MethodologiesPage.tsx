@@ -138,7 +138,9 @@ const MethodologiesPage = () => {
           {model && model.liveMethodologies.length ? (
             <MethodologiesTable methodologies={model.liveMethodologies} />
           ) : (
-            <InsetText>There are currently no live methodologies</InsetText>
+            <InsetText>
+              There are currently no live methodologies for you to view.
+            </InsetText>
           )}
           <Link to="/methodologies/create" className="govuk-button">
             Create new methodology
@@ -155,7 +157,9 @@ const MethodologiesPage = () => {
           {model && model.draftMethodologies.length ? (
             <MethodologiesTable methodologies={model.draftMethodologies} />
           ) : (
-            <InsetText>There are currently no draft methodologies</InsetText>
+            <InsetText>
+              There are currently no draft methodologies for you to view.
+            </InsetText>
           )}
         </TabsSection>
         <TabsSection
@@ -169,7 +173,9 @@ const MethodologiesPage = () => {
           {model && model.approvedMethodologies.length ? (
             <MethodologiesTable methodologies={model.approvedMethodologies} />
           ) : (
-            <InsetText>There are currently no approved methodologies</InsetText>
+            <InsetText>
+              There are currently no approved methodologies for you to view.
+            </InsetText>
           )}
         </TabsSection>
       </Tabs>
