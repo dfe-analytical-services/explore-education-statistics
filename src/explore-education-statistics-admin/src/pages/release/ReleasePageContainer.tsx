@@ -150,7 +150,12 @@ const ReleasePageContainer = ({
             </div>
           </div>
 
-          <Tag>{getReleaseStatusLabel(releasePublicationStatus.status)}</Tag>
+          <Tag>
+            {getReleaseStatusLabel(
+              releasePublicationStatus.status,
+              releasePublicationStatus.live,
+            )}
+          </Tag>
 
           {releasePublicationStatus.amendment && (
             <Tag className="govuk-!-margin-left-2">Amendment</Tag>

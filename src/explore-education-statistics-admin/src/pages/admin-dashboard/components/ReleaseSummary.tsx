@@ -22,6 +22,7 @@ interface Props {
   release: Release;
   actions: ReactNode;
   secondaryActions?: ReactNode;
+  open?: boolean;
   children?: ReactNode;
 }
 
@@ -29,15 +30,17 @@ const ReleaseSummary = ({
   release,
   actions,
   secondaryActions,
+  open = false,
   children,
 }: Props) => {
   return (
     <Details
+      open={open}
       className="govuk-!-margin-bottom-0"
       summary={getReleaseSummaryLabel(release)}
       summaryAfter={
         <TagGroup className="govuk-!-margin-left-2">
-          <Tag>{getReleaseStatusLabel(release.status)}</Tag>
+          <Tag>{getReleaseStatusLabel(release.status, release.live)}</Tag>
 
           {release.amendment && <Tag>Amendment</Tag>}
 
