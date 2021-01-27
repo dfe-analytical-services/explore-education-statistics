@@ -45,7 +45,6 @@ const PublicationSummary = ({ publication, onChangePublication }: Props) => {
   const noAmendmentInProgressFilter = (release: Release) =>
     !releases.some(r => r.amendment && r.previousVersionId === release.id);
 
-  console.log(releases);
   return (
     <>
       <table>
