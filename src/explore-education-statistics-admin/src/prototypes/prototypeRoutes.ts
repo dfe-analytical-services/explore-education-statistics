@@ -6,6 +6,7 @@ import PrototypePublicMetadata from './PrototypePublicMetadata';
 import PrototypeBauGlossary from './PrototypeBauGlossary';
 import PrototypePreRelease from './PrototypePreRelease';
 import PrototypePublicPreRelease from './PrototypePublicPreRelease';
+import PrototypeTableHighlights from './PrototypeTableHighlights';
 
 interface PrototypeRoute extends RouteProps {
   name: string;
@@ -47,6 +48,11 @@ const prototypeRoutes: PrototypeRoute[] = [
     name: 'Public Pre release list',
     path: '/prototypes/public-pre-release',
     component: PrototypePublicPreRelease,
+  },
+  {
+    name: 'Table highlights',
+    path: '/prototypes/table-highlights',
+    component: PrototypeTableHighlights,
   },
 ];
 
