@@ -1,6 +1,6 @@
 import Link from '@admin/components/Link';
-import PreReleaseUserAccessForm from '@admin/pages/release/components/PreReleaseUserAccessForm';
-import PublicPreReleaseAccessForm from '@admin/pages/release/components/PublicPreReleaseAccessForm';
+import PreReleaseUserAccessForm from '@admin/pages/release/pre-release/components/PreReleaseUserAccessForm';
+import PublicPreReleaseAccessForm from '@admin/pages/release/pre-release/components/PublicPreReleaseAccessForm';
 import { useManageReleaseContext } from '@admin/pages/release/contexts/ManageReleaseContext';
 import {
   ReleaseRouteParams,

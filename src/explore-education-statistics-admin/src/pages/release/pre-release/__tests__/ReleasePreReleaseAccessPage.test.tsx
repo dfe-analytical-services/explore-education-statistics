@@ -7,7 +7,7 @@ import ManageReleaseContext, {
 import noop from 'lodash/noop';
 import { MemoryRouter } from 'react-router';
 import { TestConfigContextProvider } from '@admin/contexts/ConfigContext';
-import ReleasePreReleaseAccessPage from '../ReleasePreReleaseAccessPage';
+import ReleasePreReleaseAccessPage from '@admin/pages/release/pre-release/ReleasePreReleaseAccessPage';
 
 jest.mock('@admin/services/releaseService');
 const releaseService = _releaseService as jest.Mocked<typeof _releaseService>;

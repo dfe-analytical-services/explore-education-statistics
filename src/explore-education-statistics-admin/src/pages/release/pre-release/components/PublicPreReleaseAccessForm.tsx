@@ -1,7 +1,7 @@
 import FormFieldEditor from '@admin/components/form/FormFieldEditor';
 import PreviewHtml from '@admin/components/PreviewHtml';
 import useFormSubmit from '@admin/hooks/useFormSubmit';
-import styles from '@admin/pages/release/components/PublicPreReleaseAccessForm.module.scss';
+import styles from '@admin/pages/release/pre-release/components/PublicPreReleaseAccessForm.module.scss';
 import Button from '@common/components/Button';
 import ButtonGroup from '@common/components/ButtonGroup';
 import { Form } from '@common/components/form';
