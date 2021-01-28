@@ -3,7 +3,8 @@
 .navigation {
   background: govuk-colour('light-grey');
   display: block;
-  margin-bottom: 2rem;
+  margin-bottom: govuk-spacing(8);
+  margin-top: govuk-spacing(6);
 }
 
 .list {
@@ -13,19 +14,19 @@
   margin: 0;
   padding: 0;
   width: 100%;
-}
 
-.list li {
-  margin-bottom: 0;
-  padding: 1rem 0.5rem;
-}
+  li {
+    margin-bottom: 0;
+    padding: 1rem 0.5rem;
+  }
 
-.list li a {
-  font-weight: 700;
-  padding: 1rem 1rem 0.7rem;
-  text-decoration: none;
-}
+  li a {
+    font-weight: 700;
+    padding: 1rem 1rem 0.7rem;
+    text-decoration: none;
+  }
 
-.list li a:hover {
-  border-bottom: 0.3rem solid $govuk-link-hover-colour;
+  li a:hover {
+    border-bottom: 0.3rem solid $govuk-link-hover-colour;
+  }
 }
