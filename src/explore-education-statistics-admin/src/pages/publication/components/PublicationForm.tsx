@@ -18,6 +18,9 @@ import Yup from '@common/validation/yup';
 import { Formik } from 'formik';
 import orderBy from 'lodash/orderBy';
 import React, { ReactNode, useMemo } from 'react';
+import ButtonLink from '@admin/components/ButtonLink';
+import { generatePath } from 'react-router';
+import { legacyReleasesRoute } from '@admin/routes/routes';
 
 interface FormValues {
   title: string;
@@ -333,6 +336,14 @@ const PublicationForm = ({
 
           <ButtonGroup>
             <Button type="submit">Save publication</Button>
+            <ButtonLink
+              to={generatePath(legacyReleasesRoute.path, {
+                publicationId: id,
+              })}
+              variant="secondary"
+            >
+              Manage legacy releases
+            </ButtonLink>
             {cancelButton}
           </ButtonGroup>
         </Form>

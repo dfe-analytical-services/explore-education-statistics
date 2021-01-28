@@ -52,6 +52,7 @@ const PublicationEditPage = ({
             Cancel
           </Link>
         }
+        id={publication.id}
         initialValues={{
           title: publication.title,
           topicId: publication.topicId,

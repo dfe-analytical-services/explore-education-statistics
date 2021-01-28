@@ -5,14 +5,12 @@ import {
   releaseSummaryRoute,
 } from '@admin/routes/releaseRoutes';
 import {
-  legacyReleasesRoute,
   publicationEditRoute,
   PublicationRouteParams,
   releaseCreateRoute,
 } from '@admin/routes/routes';
 import { MyPublication } from '@admin/services/publicationService';
 import releaseService, { Release } from '@admin/services/releaseService';
-import ButtonGroup from '@common/components/ButtonGroup';
 import ModalConfirm from '@common/components/ModalConfirm';
 import React, { useState } from 'react';
 import { generatePath, useHistory } from 'react-router';
@@ -165,6 +163,17 @@ const PublicationSummary = ({ publication, onChangePublication }: Props) => {
           <tr>
             <th>Releases</th>
             <td colSpan={2} data-testid={`Releases for ${publication.title}`}>
+              {permissions.canCreateReleases && (
+                <ButtonLink
+                  className="govuk-!-margin-bottom-3"
+                  to={generatePath(releaseCreateRoute.path, {
+                    publicationId: id,
+                  })}
+                  data-testid={`Create new release link for ${title}`}
+                >
+                  Create new release
+                </ButtonLink>
+              )}
               {releases.length > 0 ? (
                 <ul className="govuk-list">
                   {releases.filter(noAmendmentInProgressFilter).map(release => (
@@ -180,30 +189,6 @@ const PublicationSummary = ({ publication, onChangePublication }: Props) => {
               ) : (
                 <p>No releases created</p>
               )}
-
-              <ButtonGroup className="govuk-!-margin-bottom-2">
-                {permissions.canCreateReleases && (
-                  <ButtonLink
-                    to={generatePath(releaseCreateRoute.path, {
-                      publicationId: id,
-                    })}
-                    data-testid={`Create new release link for ${title}`}
-                  >
-                    Create new release
-                  </ButtonLink>
-                )}
-                {permissions.canUpdatePublication && (
-                  <ButtonLink
-                    to={generatePath(legacyReleasesRoute.path, {
-                      publicationId: id,
-                    })}
-                    variant="secondary"
-                    data-testid={`Legacy releases link for ${title}`}
-                  >
-                    Manage legacy releases
-                  </ButtonLink>
-                )}
-              </ButtonGroup>
             </td>
           </tr>
         </tbody>
