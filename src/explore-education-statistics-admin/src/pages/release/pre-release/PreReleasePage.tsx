@@ -74,7 +74,7 @@ const PreReleasePage = ({ match }: RouteComponentProps<MatchProps>) => {
 
   return (
     <Page
-      wide
+      wide={false}
       breadcrumbs={
         user && user.permissions.canAccessAnalystPages
           ? [{ name: 'Pre-release access' }]

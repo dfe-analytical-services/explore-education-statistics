@@ -43,7 +43,7 @@ const ReleaseMetaGuidancePage = ({
 
   return (
     <Page
-      wide
+      wide={false}
       breadcrumbs={
         user && user.permissions.canAccessAnalystPages
           ? [{ name: 'Metadata guidance document' }]

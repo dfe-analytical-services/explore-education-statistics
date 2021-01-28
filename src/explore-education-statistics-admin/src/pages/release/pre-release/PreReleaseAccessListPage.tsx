@@ -29,7 +29,7 @@ const PreReleaseAccessListPage = ({
 
   return (
     <Page
-      wide
+      wide={false}
       breadcrumbs={
         user && user.permissions.canAccessAnalystPages
           ? [{ name: 'Pre-release access list' }]
