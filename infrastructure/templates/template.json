@@ -547,6 +547,7 @@
     "loggingStorageAccountName": "[concat(parameters('subscription'), 'saeeslogging')]",
 
     "vNetName": "[concat(parameters('subscription'), '-vnet-', parameters('environment'))]",
+    "vNetRef": "[resourceId('Microsoft.Network/virtualNetworks', variables('vNetName'))]",
     "adminSubnetName": "[concat(parameters('subscription'), '-snet-', parameters('environment'), '-admin')]",
     "adminSubnetRef": "[resourceId('Microsoft.Network/virtualNetworks/subnets', variables('vNetName'), variables('adminSubnetName'))]",
     "importerSubnetName": "[concat(parameters('subscription'), '-snet-', parameters('environment'), '-importer')]",
@@ -1700,7 +1701,7 @@
       },
       "dependsOn": [
         "[resourceId('Microsoft.Sql/servers', variables('sqlserverName'))]",
-        "[variables('sqlAllowedSubnets')[copyIndex()].id]"
+        "[variables('vNetRef')]"
       ],
       "copy": {
         "name": "networkRuleLoop",
@@ -1898,7 +1899,7 @@
       },
       "dependsOn": [
         "[resourceId('Microsoft.Sql/servers', variables('publicSqlServerName'))]",
-        "[variables('publicSqlAllowedSubnets')[copyIndex()].id]"
+        "[variables('vNetRef')]"
       ],
       "copy": {
         "name": "networkRuleLoop",
