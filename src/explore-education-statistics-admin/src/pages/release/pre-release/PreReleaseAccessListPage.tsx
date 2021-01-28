@@ -1,6 +1,5 @@
 import Page from '@admin/components/Page';
 import PageTitle from '@admin/components/PageTitle';
-import { useAuthContext } from '@admin/contexts/AuthContext';
 import { ReleaseRouteParams } from '@admin/routes/releaseRoutes';
 import releaseService from '@admin/services/releaseService';
 import FormattedDate from '@common/components/FormattedDate';
@@ -20,24 +19,13 @@ const PreReleaseAccessListPage = ({
 }: RouteComponentProps<ReleaseRouteParams, StaticContext, LocationState>) => {
   const { releaseId } = match.params;
 
-  const { user } = useAuthContext();
-
   const { value: release, isLoading } = useAsyncHandledRetry(
     () => releaseService.getRelease(releaseId),
     [releaseId],
   );
 
   return (
-    <Page
-      wide={false}
-      breadcrumbs={
-        user && user.permissions.canAccessAnalystPages
-          ? [{ name: 'Pre-release access list' }]
-          : []
-      }
-      homePath={user?.permissions.canAccessAnalystPages ? '/' : ''}
-      backLink={location.state?.backLink}
-    >
+    <Page wide={false} backLink={location.state?.backLink} homePath="">
       <LoadingSpinner loading={isLoading}>
         {release && (
           <>
