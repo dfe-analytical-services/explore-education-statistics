@@ -335,7 +335,6 @@ const PublicationForm = ({
           </FormFieldset>
 
           <ButtonGroup>
-            <Button type="submit">Save publication</Button>
             <ButtonLink
               to={generatePath(legacyReleasesRoute.path, {
                 publicationId: id,
@@ -344,6 +343,7 @@ const PublicationForm = ({
             >
               Manage legacy releases
             </ButtonLink>
+            <Button type="submit">Save publication</Button>
             {cancelButton}
           </ButtonGroup>
         </Form>
