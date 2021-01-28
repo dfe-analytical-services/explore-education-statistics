@@ -1690,6 +1690,7 @@
       }
     },
     {
+      "condition": "[parameters('useSubnets')]",
       "name": "[concat(variables('sqlserverName'), '/', variables('sqlAllowedSubnets')[copyIndex()].name)]",
       "type": "Microsoft.Sql/servers/virtualNetworkRules",
       "apiVersion": "2015-05-01-preview",
@@ -1698,7 +1699,8 @@
         "ignoreMissingVnetServiceEndpoint": false
       },
       "dependsOn": [
-        "[resourceId('Microsoft.Sql/servers', variables('sqlserverName'))]"
+        "[resourceId('Microsoft.Sql/servers', variables('sqlserverName'))]",
+        "[variables('sqlAllowedSubnets')[copyIndex()].id]"
       ],
       "copy": {
         "name": "networkRuleLoop",
@@ -1886,6 +1888,7 @@
       }
     },
     {
+      "condition": "[parameters('useSubnets')]",
       "name": "[concat(variables('publicSqlserverName'), '/', variables('publicSqlAllowedSubnets')[copyIndex()].name)]",
       "type": "Microsoft.Sql/servers/virtualNetworkRules",
       "apiVersion": "2015-05-01-preview",
@@ -1894,7 +1897,8 @@
         "ignoreMissingVnetServiceEndpoint": false
       },
       "dependsOn": [
-        "[resourceId('Microsoft.Sql/servers', variables('publicSqlServerName'))]"
+        "[resourceId('Microsoft.Sql/servers', variables('publicSqlServerName'))]",
+        "[variables('publicSqlAllowedSubnets')[copyIndex()].id]"
       ],
       "copy": {
         "name": "networkRuleLoop",
