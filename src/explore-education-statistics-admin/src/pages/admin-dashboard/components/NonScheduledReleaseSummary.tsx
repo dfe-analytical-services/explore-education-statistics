@@ -24,6 +24,7 @@ const NonScheduledReleaseSummary = ({
   return (
     <ReleaseSummary
       release={release}
+      open={release.live && release.latestRelease}
       actions={
         <>
           {release.amendment ? (
