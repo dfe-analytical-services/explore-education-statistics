@@ -76,7 +76,7 @@ describe('ReleasePreReleaseAccessPage', () => {
     });
 
     expect(screen.getByTestId('prerelease-url')).toHaveTextContent(
-      'http://localhost/publication/publication-1/release/release-1/prerelease',
+      'http://localhost/publication/publication-1/release/release-1/prerelease/content',
     );
   });
 });

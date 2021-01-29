@@ -8,7 +8,7 @@ import MethodologyCreatePage from '@admin/pages/methodology/MethodologyCreatePag
 import PublicationCreatePage from '@admin/pages/publication/PublicationCreatePage';
 import PublicationEditPage from '@admin/pages/publication/PublicationEditPage';
 import PreReleaseAccessListPage from '@admin/pages/release/pre-release/PreReleaseAccessListPage';
-import PreReleasePage from '@admin/pages/release/pre-release/PreReleasePage';
+import PreReleasePageContainer from '@admin/pages/release/pre-release/PreReleasePageContainer';
 import ReleaseCreatePage from '@admin/pages/release/ReleaseCreatePage';
 import ReleaseMetaGuidancePage from '@admin/pages/release/ReleaseMetaGuidancePage';
 import ReleasePageContainer from '@admin/pages/release/ReleasePageContainer';
@@ -19,6 +19,7 @@ import TopicCreatePage from '@admin/pages/themes/topics/TopicCreatePage';
 import TopicEditPage from '@admin/pages/themes/topics/TopicEditPage';
 import administrationRoutes from '@admin/routes/administrationRoutes';
 import documentationRoutes from '@admin/routes/documentationRoutes';
+import { preReleaseContentRoute } from '@admin/routes/preReleaseRoutes';
 
 export type PublicationRouteParams = {
   publicationId: string;
@@ -144,9 +145,8 @@ export const legacyReleasesRoute: ProtectedRouteProps = {
 
 export const preReleaseRoute: ProtectedRouteProps = {
   path: '/publication/:publicationId/release/:releaseId/prerelease',
-  component: PreReleasePage,
+  component: PreReleasePageContainer,
   protectionAction: user => user.permissions.canAccessPrereleasePages,
-  exact: true,
 };
 
 export const preReleaseAccessListRoute: ProtectedRouteProps = {
@@ -180,6 +180,7 @@ const routes = {
   methodologyCreateRoute,
   methodologyRoute,
   preReleaseRoute,
+  preReleaseContentRoute,
   preReleaseAccessListRoute,
   releaseMetaGuidanceRoute,
   releaseRoute,
