@@ -170,15 +170,12 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Security
                 options.AddPolicy(SecurityPolicies.CanCreateMethodologies.ToString(), policy =>
                     policy.RequireClaim(SecurityClaimTypes.CreateAnyMethodology.ToString()));
 
-                // does this user have permissions to view all methodologies on the system?
                 options.AddPolicy(SecurityPolicies.CanViewAllMethodologies.ToString(), policy =>
                     policy.RequireClaim(SecurityClaimTypes.AccessAllMethodologies.ToString()));
 
-                // does this user have permission to view a specific Methodology?
                 options.AddPolicy(SecurityPolicies.CanViewSpecificMethodology.ToString(), policy =>
                     policy.Requirements.Add(new ViewSpecificMethodologyRequirement()));
 
-                // does this user have permissions to update all methodologies on the system?
                 options.AddPolicy(SecurityPolicies.CanUpdateSpecificMethodology.ToString(), policy =>
                     policy.Requirements.Add(new UpdateSpecificMethodologyRequirement()));
 
