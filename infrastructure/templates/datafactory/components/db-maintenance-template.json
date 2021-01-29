@@ -22,7 +22,7 @@
     "removeSoftDeletedSubjectsObservationLimit": "1500000",
     "removeSoftDeletedSubjectsObservationCommitBatchSize": "1000",
     "removeSoftDeletedSubjectsObservationFilterItemCommitBatchSize": "20000",
-    "subjectsToMigrate": "10"
+    "subjectsToMigrate": "5"
   },
   "resources": [
     {
@@ -529,7 +529,7 @@
       ]
     },
     {
-      "name": "[concat(parameters('factoryName'), '/migrate_observations_and_observationfilteritems_trigger')]",
+      "name": "[concat(parameters('factoryName'), '/migrate_observations_and_observationfilteritems_weekday_trigger')]",
       "type": "Microsoft.DataFactory/factories/triggers",
       "apiVersion": "2018-06-01",
       "properties": {
@@ -556,11 +556,85 @@
         "type": "ScheduleTrigger",
         "typeProperties": {
           "recurrence": {
-            "frequency": "Day",
+            "frequency": "Week",
             "interval": 1,
-            "startTime": "2020-11-23T19:00:00",
+            "startTime": "2021-01-29T00:00:00",
             "timeZone": "GMT Standard Time",
-            "schedule": {}
+            "schedule": {
+              "minutes": [
+                0,
+                30
+              ],
+              "hours": [
+                0,
+                1,
+                2,
+                3,
+                4,
+                5,
+                6,
+                21,
+                22,
+                23
+              ],
+              "weekDays": [
+                "Monday",
+                "Tuesday",
+                "Wednesday",
+                "Thursday",
+                "Friday"
+              ]
+            }
+          }
+        }
+      },
+      "dependsOn": [
+        "[concat(variables('factoryId'), '/pipelines/pl_migrate_observations_and_observationfilteritems_statistics')]",
+        "[concat(variables('factoryId'), '/pipelines/pl_migrate_observations_and_observationfilteritems_public_statistics')]"
+      ]
+    },
+    {
+      "name": "[concat(parameters('factoryName'), '/migrate_observations_and_observationfilteritems_weekend_trigger')]",
+      "type": "Microsoft.DataFactory/factories/triggers",
+      "apiVersion": "2018-06-01",
+      "properties": {
+        "annotations": [],
+        "runtimeState": "Stopped",
+        "pipelines": [
+          {
+            "pipelineReference": {
+              "referenceName": "pl_migrate_observations_and_observationfilteritems_statistics",
+              "type": "PipelineReference"
+            },
+            "parameters": {}
+          },
+          {
+            "pipelineReference": {
+              "referenceName": "pl_migrate_observations_and_observationfilteritems_public_statistics",
+              "type": "PipelineReference"
+            },
+            "parameters": {
+              "SubjectsBatchSize": "[variables('subjectsToMigrate')]"
+            }
+          }
+        ],
+        "type": "ScheduleTrigger",
+        "typeProperties": {
+          "recurrence": {
+            "frequency": "Week",
+            "interval": 1,
+            "startTime": "2021-01-29T00:00:00",
+            "timeZone": "GMT Standard Time",
+            "schedule": {
+              "minutes": [
+                0,
+                30
+              ],
+              "weekDays": [
+                "Saturday",
+                "Sunday"
+              ]
+            }
           }
         }
       },
