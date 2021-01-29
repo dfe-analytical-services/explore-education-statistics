@@ -4,7 +4,7 @@ using static GovUk.Education.ExploreEducationStatistics.Data.Model.Migrations.Mi
 
 namespace GovUk.Education.ExploreEducationStatistics.Data.Model.Migrations
 {
-    public partial class EES1830_MigrateObservationsAndObservationFilterItems : Migration
+    public partial class EES1830_Routine_MigrateObservationsAndObservationFilterItems : Migration
     {
         private const string MigrationId = "20210126094900";
         
