@@ -1,8 +1,7 @@
 import classNames from 'classnames';
 import React from 'react';
-import Accordion from '@common/components/Accordion';
-import AccordionSection from '@common/components/AccordionSection';
 import Button from '@common/components/Button';
+import ButtonGroup from '@common/components/ButtonGroup';
 import Details from '@common/components/Details';
 import SummaryList from '@common/components/SummaryList';
 import SummaryListItem from '@common/components/SummaryListItem';
@@ -16,21 +15,46 @@ const PrototypeMoreDetails = () => {
       >
         <SummaryList className="govuk-!-margin-bottom-9">
           <SummaryListItem term="Filename">
-            Absence_3term201819_nat_reg_la_sch
-          </SummaryListItem>
-          <SummaryListItem term="Content">
-            Absence information for all enrolments in state-funded primary,
-            secondary and special schools including information on overall
-            absence, persistent absence and reason for absence for pupils aged
-            5-15, based on all 5 half terms data from 2006/07 to 2011/12
-            inclusive and based on 6 half term data from 2012/13 onwards
+            <a href="#">la_care_leavers_accommodation.csv</a> (csv, 2 Mb)
           </SummaryListItem>
           <SummaryListItem term="Geographical levels">
-            National; Regional; Local authority; School
+            Local Authority; National; Regional
           </SummaryListItem>
-          <SummaryListItem term="Years">2006/07 to 2018/19</SummaryListItem>
+          <SummaryListItem term="Time period">Time period</SummaryListItem>
+          <SummaryListItem term="Content">
+            <p>
+              Local authority level data on care leavers aged 17 to 21, by
+              accommodation type (as measured on or around their birthday).
+            </p>
+            <p>Footnotes:</p>
+            <p>
+              1. National and regional numbers have been rounded to the nearest
+              10. Percentages rounded to the nearest whole number. Figures
+              exclude young people who were looked after under an agreed series
+              of short term placements, those who have died since leaving care,
+              those who have returned home to parents or someone with parental
+              responsibility for a continuous period of at least 6 months and
+              those whose care was transferred to another local authority.
+            </p>
+            <p>
+              2. 'Local authority not in touch' excludes young people where
+              activity information is known, as a third party provided it even
+              though the local authority is not directly in touch with the young
+              person.
+            </p>
+            <p>
+              3. Accommodated with parents or relatives is likely to be an under
+              count - if a young person's former foster carer is a relative they
+              should be recorded as accommodated with their former foster carer.
+            </p>
+            <p>
+              4. For some local authorities, such as Kent, the figures may be
+              impacted by significant numbers of unaccompanied asylum seeking
+              children.
+            </p>
+          </SummaryListItem>
           <SummaryListItem term="Variable names and descriptions">
-            test
+            Do we need the variables here?
           </SummaryListItem>
         </SummaryList>
       </Details>
@@ -49,6 +73,7 @@ const PrototypePreviewSubjects = () => {
                 className={classNames(
                   'govuk-fieldset__legend',
                   'govuk-fieldset__legend--m',
+                  'govuk-!-margin-bottom-6',
                 )}
               >
                 Choose a subject
@@ -119,7 +144,10 @@ const PrototypePreviewSubjects = () => {
                   <PrototypeMoreDetails />
                 </div>
               </div>
-              <Button>Next step</Button>
+              <ButtonGroup>
+                <Button variant="secondary">Previous step</Button>
+                <Button>Next step</Button>
+              </ButtonGroup>
             </fieldset>
           </div>
         </div>

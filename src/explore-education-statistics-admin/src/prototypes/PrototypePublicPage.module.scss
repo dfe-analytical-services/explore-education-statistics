@@ -1,0 +1,10 @@
+.prototypePublicPage {
+  :global(.govuk-header__navigation) {
+    display: none !important;
+  }
+}
+.prototypeTableTool {
+  :global(.dfe-width-container--wide) {
+    max-width: 90vw;
+  }
+}

@@ -1,18 +1,19 @@
 import classNames from 'classnames';
 import React from 'react';
+import PageSearchForm from '@common/components/PageSearchForm';
 
 const PrototypeHighlightsLinks = () => {
   return (
     <>
       <div className="govuk-grid-row">
         <div className="govuk-grid-column-three-quarters">
-          <h3 className="govuk-heading-s">View popular tables</h3>
+          <h3 className="govuk-heading-m">Choose a table</h3>
           <div className="govuk-inset-text">
             Use the links below to quickly select existing popular tables for
-            this publication, you can also download the data in .xls and .csv
-            formats. After viewing you can also adjust and change filters to
-            quickly see different results.
+            this publication. After viewing a table you can also adjust and
+            change filters to quickly see different results.
           </div>
+          <PageSearchForm inputLabel="Search popular tables" />
           <ul
             className={classNames(
               'govuk-list',
@@ -73,6 +74,29 @@ const PrototypeHighlightsLinks = () => {
                 and those looked after continuously for at least 12 months at 31
                 March, in England, 2018 to 2020
               </p>
+            </li>
+            <li>
+              <a href="#" className="govuk-!-font-weight-bold">
+                B2 - Number of new placement for children looked after during
+                the year
+              </a>
+              <p>
+                by locality of placement and distance between home and
+                placement, in England, 2018 to 2020
+              </p>
+            </li>
+            <li>
+              <a href="#" className="govuk-!-font-weight-bold">
+                B3 - Duration of placements ceasing during the year
+              </a>
+              <p>in England, 2018 to 2020</p>
+            </li>
+            <li>
+              <a href="#" className="govuk-!-font-weight-bold">
+                B4 - Reason for placement change for children who moved
+                placements in the year
+              </a>
+              <p>in England, 2018 to 2020</p>
             </li>
           </ul>
           <p>
