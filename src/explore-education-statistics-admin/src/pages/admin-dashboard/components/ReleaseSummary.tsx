@@ -40,7 +40,7 @@ const ReleaseSummary = ({
       summary={getReleaseSummaryLabel(release)}
       summaryAfter={
         <TagGroup className="govuk-!-margin-left-2">
-          <Tag>{getReleaseStatusLabel(release.status, release.live)}</Tag>
+          <Tag>{getReleaseStatusLabel(release.status)}</Tag>
 
           {release.amendment && <Tag>Amendment</Tag>}
 

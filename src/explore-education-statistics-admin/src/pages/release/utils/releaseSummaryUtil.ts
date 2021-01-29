@@ -3,7 +3,6 @@ import { ReleaseApprovalStatus } from '@common/services/publicationService';
 
 export const getReleaseStatusLabel = (
   approvalStatus: ReleaseApprovalStatus,
-  isLive?: boolean,
 ) => {
   switch (approvalStatus) {
     case 'Draft':
@@ -12,8 +11,6 @@ export const getReleaseStatusLabel = (
       return 'In Review';
     case 'Approved':
       return 'Approved';
-    case isLive && 'Approved':
-      return 'Live';
     default:
       return undefined;
   }
