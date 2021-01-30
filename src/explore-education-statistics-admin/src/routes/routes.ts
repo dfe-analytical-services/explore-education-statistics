@@ -19,7 +19,10 @@ import TopicCreatePage from '@admin/pages/themes/topics/TopicCreatePage';
 import TopicEditPage from '@admin/pages/themes/topics/TopicEditPage';
 import administrationRoutes from '@admin/routes/administrationRoutes';
 import documentationRoutes from '@admin/routes/documentationRoutes';
-import { preReleaseContentRoute } from '@admin/routes/preReleaseRoutes';
+import {
+  preReleaseContentRoute,
+  preReleaseTableToolRoute,
+} from '@admin/routes/preReleaseRoutes';
 
 export type PublicationRouteParams = {
   publicationId: string;
@@ -181,6 +184,7 @@ const routes = {
   methodologyRoute,
   preReleaseRoute,
   preReleaseContentRoute,
+  preReleaseTableToolRoute,
   preReleaseAccessListRoute,
   releaseMetaGuidanceRoute,
   releaseRoute,

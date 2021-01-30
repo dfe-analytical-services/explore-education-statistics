@@ -30,6 +30,7 @@ export interface MyPublication {
 export interface BasicPublicationDetails {
   id: string;
   title: string;
+  slug: string;
   contact?: ContactDetails;
   methodology?: BasicMethodology;
   externalMethodology?: ExternalMethodology;
