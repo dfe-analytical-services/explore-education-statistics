@@ -14,6 +14,8 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.ViewModels
 
         public string Title { get; set; }
 
+        public string Slug { get; set; }
+
         public List<ReleaseViewModel> Releases { get; set; }
 
         public List<LegacyReleaseViewModel> LegacyReleases { get; set; }
