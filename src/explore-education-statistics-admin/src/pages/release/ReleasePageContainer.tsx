@@ -166,7 +166,6 @@ const ReleasePageContainer = ({
 
           <NavBar
             routes={navRoutes.map(route => ({
-              path: route.path,
               title: route.title,
               to: generatePath<ReleaseRouteParams>(route.path, {
                 publicationId,

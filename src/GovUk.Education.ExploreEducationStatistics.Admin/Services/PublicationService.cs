@@ -96,7 +96,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Services
 
                     await _context.SaveChangesAsync();
 
-                    return await GetViewModel(saved.Entity.Id);
+                    return await GetPublication(saved.Entity.Id);
                 });
         }
 
@@ -157,7 +157,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Services
                         await _publishingService.PublicationChanged(publication.Id);
                     }
 
-                    return await GetViewModel(publication.Id);
+                    return await GetPublication(publication.Id);
                 });
         }
 
@@ -203,7 +203,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Services
             return Unit.Instance;
         }
 
-        public async Task<Either<ActionResult, PublicationViewModel>> GetViewModel(Guid publicationId)
+        public async Task<Either<ActionResult, PublicationViewModel>> GetPublication(Guid publicationId)
         {
             return await _persistenceHelper
                 .CheckEntityExists<Publication>(publicationId, HydratePublicationForPublicationViewModel)

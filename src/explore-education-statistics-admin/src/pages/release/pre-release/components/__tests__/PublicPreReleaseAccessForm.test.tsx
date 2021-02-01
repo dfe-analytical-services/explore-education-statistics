@@ -1,5 +1,5 @@
 import { TestConfigContextProvider } from '@admin/contexts/ConfigContext';
-import PublicPreReleaseAccessForm from '@admin/pages/release/components/PublicPreReleaseAccessForm';
+import PublicPreReleaseAccessForm from '@admin/pages/release/pre-release/components/PublicPreReleaseAccessForm';
 import { render, screen, waitFor } from '@testing-library/react';
 import noop from 'lodash/noop';
 import React from 'react';

@@ -1,6 +1,5 @@
 import Page from '@admin/components/Page';
 import PageTitle from '@admin/components/PageTitle';
-import { useAuthContext } from '@admin/contexts/AuthContext';
 import { ReleaseRouteParams } from '@admin/routes/releaseRoutes';
 import releaseMetaGuidanceService, {
   ReleaseMetaGuidance,
@@ -27,8 +26,6 @@ const ReleaseMetaGuidancePage = ({
 }: RouteComponentProps<ReleaseRouteParams, StaticContext, LocationState>) => {
   const { releaseId } = match.params;
 
-  const { user } = useAuthContext();
-
   const { value: model, isLoading } = useAsyncHandledRetry<Model>(async () => {
     const [metaGuidance, release] = await Promise.all([
       releaseMetaGuidanceService.getMetaGuidance(releaseId),
@@ -42,16 +39,7 @@ const ReleaseMetaGuidancePage = ({
   }, [releaseId]);
 
   return (
-    <Page
-      wide
-      breadcrumbs={
-        user && user.permissions.canAccessAnalystPages
-          ? [{ name: 'Metadata guidance document' }]
-          : []
-      }
-      homePath={user?.permissions.canAccessAnalystPages ? '/' : ''}
-      backLink={location.state?.backLink}
-    >
+    <Page wide={false} backLink={location.state?.backLink} homePath="">
       <LoadingSpinner loading={isLoading}>
         {model && (
           <>

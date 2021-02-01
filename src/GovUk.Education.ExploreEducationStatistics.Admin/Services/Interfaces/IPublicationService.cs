@@ -18,7 +18,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Services.Interfaces
             Guid publicationId,
             PublicationSaveViewModel updatedPublication);
 
-        Task<Either<ActionResult, PublicationViewModel>> GetViewModel(Guid publicationId);
+        Task<Either<ActionResult, PublicationViewModel>> GetPublication(Guid publicationId);
         
         Task<Either<ActionResult, List<LegacyReleaseViewModel>>> PartialUpdateLegacyReleases(
             Guid publicationId, 

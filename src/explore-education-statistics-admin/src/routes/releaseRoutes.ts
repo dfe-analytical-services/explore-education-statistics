@@ -8,7 +8,7 @@ import ReleaseDataBlocksPage from '@admin/pages/release/datablocks/ReleaseDataBl
 import ReleaseFootnoteCreatePage from '@admin/pages/release/footnotes/ReleaseFootnoteCreatePage';
 import ReleaseFootnoteEditPage from '@admin/pages/release/footnotes/ReleaseFootnoteEditPage';
 import ReleaseFootnotesPage from '@admin/pages/release/footnotes/ReleaseFootnotesPage';
-import ReleasePreReleaseAccessPage from '@admin/pages/release/ReleasePreReleaseAccessPage';
+import ReleasePreReleaseAccessPage from '@admin/pages/release/pre-release/ReleasePreReleaseAccessPage';
 import ReleasePublishStatusPage from '@admin/pages/release/ReleaseStatusPage';
 import ReleaseSummaryEditPage from '@admin/pages/release/ReleaseSummaryEditPage';
 import ReleaseSummaryPage from '@admin/pages/release/ReleaseSummaryPage';

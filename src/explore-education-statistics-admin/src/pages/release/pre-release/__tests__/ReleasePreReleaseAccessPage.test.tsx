@@ -7,7 +7,7 @@ import ManageReleaseContext, {
 import noop from 'lodash/noop';
 import { MemoryRouter } from 'react-router';
 import { TestConfigContextProvider } from '@admin/contexts/ConfigContext';
-import ReleasePreReleaseAccessPage from '../ReleasePreReleaseAccessPage';
+import ReleasePreReleaseAccessPage from '@admin/pages/release/pre-release/ReleasePreReleaseAccessPage';
 
 jest.mock('@admin/services/releaseService');
 const releaseService = _releaseService as jest.Mocked<typeof _releaseService>;
@@ -54,6 +54,7 @@ describe('ReleasePreReleaseAccessPage', () => {
       themeId: 'theme-1',
       topicId: 'topic-1',
       title: 'Test publication',
+      slug: 'test-publication',
       legacyReleases: [],
     },
   };
@@ -76,7 +77,7 @@ describe('ReleasePreReleaseAccessPage', () => {
     });
 
     expect(screen.getByTestId('prerelease-url')).toHaveTextContent(
-      'http://localhost/publication/publication-1/release/release-1/prerelease',
+      'http://localhost/publication/publication-1/release/release-1/prerelease/content',
     );
   });
 });

@@ -183,8 +183,8 @@ const tableBuilderService = {
   getThemes(): Promise<ThemeMeta[]> {
     return dataApi.get(`/meta/themes`);
   },
-  getPublicationMeta(publicationUuid: string): Promise<PublicationMeta> {
-    return dataApi.get(`/meta/publication/${publicationUuid}`);
+  getPublicationMeta(publicationId: string): Promise<PublicationMeta> {
+    return dataApi.get(`/meta/publication/${publicationId}`);
   },
   getReleaseMeta(releaseId: string): Promise<ReleaseMeta> {
     return dataApi.get(`/meta/release/${releaseId}`);

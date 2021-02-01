@@ -2,6 +2,7 @@
 Resource    ../../libs/admin-common.robot
 Resource    ../../libs/tables.robot
 Library     ../../libs/admin_api.py
+Library     Collections
 
 Force Tags  Admin  Local  Dev  AltersData
 
@@ -12,6 +13,69 @@ Suite Teardown    user closes the browser
 ${TOPIC_NAME}        %{TEST_TOPIC_NAME}
 ${PUBLICATION_NAME}  UI tests - prerelease %{RUN_IDENTIFIER}
 ${RELEASE_URL}
+
+*** Keywords ***
+user creates table
+    user waits until page contains   UI test subject
+    user clicks radio    UI test subject
+    user clicks element   id:publicationSubjectForm-submit
+    user waits until h2 is visible  Choose locations    90
+    user checks previous table tool step contains  1    Subject     UI test subject
+
+    user opens details dropdown   Ward
+    user clicks checkbox   Nailsea Youngwood
+    user clicks checkbox   Syon
+    user clicks element     id:locationFiltersForm-submit
+    user waits until h2 is visible  Choose time period  90
+
+    ${timePeriodStartList}=   get list items  id:timePeriodForm-start
+    ${timePeriodEndList}=   get list items  id:timePeriodForm-end
+    ${expectedList}=   create list   Please select  2005  2007  2008  2010  2011  2012  2016  2017
+    lists should be equal  ${timePeriodStartList}   ${expectedList}
+    lists should be equal  ${timePeriodEndList}   ${expectedList}
+
+    user selects from list by label  id:timePeriodForm-start  2005
+    user selects from list by label  id:timePeriodForm-end  2017
+    user clicks element     id:timePeriodForm-submit
+    user waits until h2 is visible  Choose your filters
+    user checks previous table tool step contains  3    Start date    2005
+    user checks previous table tool step contains  3    End date      2017
+
+    user clicks indicator checkbox    Admission Numbers
+
+    user clicks element   id:filtersForm-submit
+    user waits until results table appears     180
+    user waits until element contains  css:[data-testid="dataTableCaption"]
+    ...  Table showing Admission Numbers for 'UI test subject' from '${PUBLICATION_NAME}' in Nailsea Youngwood and Syon between 2005 and 2017
+
+user validates table rows
+    user checks table column heading contains  1  1  Admission Numbers
+
+    ${row}=  user gets row number with heading  Nailsea Youngwood
+    user checks table heading in offset row contains  ${row}  0  2  2005
+    user checks table heading in offset row contains  ${row}  1  1  2010
+    user checks table heading in offset row contains  ${row}  2  1  2011
+    user checks table heading in offset row contains  ${row}  3  1  2012
+    user checks table heading in offset row contains  ${row}  4  1  2016
+
+    user checks table cell in offset row contains  ${row}  0  1  3,612
+    user checks table cell in offset row contains  ${row}  1  1  9,304
+    user checks table cell in offset row contains  ${row}  2  1  9,603
+    user checks table cell in offset row contains  ${row}  3  1  8,150
+    user checks table cell in offset row contains  ${row}  4  1  4,198
+
+    ${row}=  user gets row number with heading  Syon
+    user checks table heading in offset row contains  ${row}  0  2  2007
+    user checks table heading in offset row contains  ${row}  1  1  2008
+    user checks table heading in offset row contains  ${row}  2  1  2010
+    user checks table heading in offset row contains  ${row}  3  1  2012
+    user checks table heading in offset row contains  ${row}  4  1  2017
+
+    user checks table cell in offset row contains  ${row}  0  1  9,914
+    user checks table cell in offset row contains  ${row}  1  1  5,505
+    user checks table cell in offset row contains  ${row}  2  1  6,060
+    user checks table cell in offset row contains  ${row}  3  1  1,109
+    user checks table cell in offset row contains  ${row}  4  1  1,959
 
 *** Test Cases ***
 Create test publication and release via API
@@ -128,7 +192,7 @@ Navigate to prerelease page
     ${current_url}=  get location
     ${RELEASE_URL}=  remove substring from right of string  ${current_url}  /status
     set suite variable  ${RELEASE_URL}
-    user goes to url   ${RELEASE_URL}/prerelease
+    user goes to url   ${RELEASE_URL}/prerelease/content
 
 Validate prerelease has not started
     [Tags]  HappyPath
@@ -166,7 +230,7 @@ Invite users to prerelease for scheduled release
 Validate prerelease has not started for Analyst user
     [Tags]  HappyPath
     user changes to analyst1
-    user goes to url   ${RELEASE_URL}/prerelease
+    user goes to url   ${RELEASE_URL}/prerelease/content
 
     user waits until h1 is visible  Pre-release access is not yet available
     user checks breadcrumb count should be   2
@@ -204,7 +268,7 @@ Validate prerelease has started
     ${current_url}=  get location
     ${RELEASE_URL}=  remove substring from right of string  ${current_url}  /status
     set suite variable  ${RELEASE_URL}
-    user goes to url   ${RELEASE_URL}/prerelease
+    user goes to url   ${RELEASE_URL}/prerelease/content
 
     user checks breadcrumb count should be   2
     user checks nth breadcrumb contains   1    Home
@@ -221,10 +285,6 @@ Validate metadata guidance page
     user opens details dropdown  Download associated files
     user clicks link  Metadata guidance
 
-    user checks breadcrumb count should be   2
-    user checks nth breadcrumb contains   1    Home
-    user checks nth breadcrumb contains   2    Metadata guidance document
-
     user waits until page contains title caption  Calendar Year 2000
     user waits until h1 is visible  ${PUBLICATION_NAME}
 
@@ -249,7 +309,7 @@ Validate metadata guidance page
     user checks results table cell contains  1  1   admission_numbers
     user checks results table cell contains  1  2   Admission Numbers
 
-Go back to prerelease page
+Go back to prerelease content page
     [Tags]  HappyPath
     user clicks link  Back
     user checks breadcrumb count should be   2
@@ -264,17 +324,13 @@ Validate public prerelease access list
     user opens details dropdown  Download associated files
     user clicks link  Pre-release access list
 
-    user checks breadcrumb count should be   2
-    user checks nth breadcrumb contains   1    Home
-    user checks nth breadcrumb contains   2    Pre-release access list
-
     user waits until page contains title caption  Calendar Year 2000
     user waits until h1 is visible  ${PUBLICATION_NAME}
 
     user waits until h2 is visible  Pre-release access list
     user waits until page contains  Updated test public access list
 
-Go back to prerelease page again
+Go back to prerelease content page again
     [Tags]  HappyPath
     user clicks link  Back
     user checks breadcrumb count should be   2
@@ -284,10 +340,23 @@ Go back to prerelease page again
     user waits until page contains title caption  Calendar Year 2000
     user waits until h1 is visible  ${PUBLICATION_NAME}
 
+Go to prerelease table tool page
+    [Tags]  HappyPath
+    user clicks link  Table tool
+
+    user waits until h1 is visible  Create your own tables online
+    user waits until h2 is visible  Choose a subject
+
+Create and validate table
+    [Tags]  HappyPath
+    user creates table
+    user validates table rows
+
+
 Validate prerelease has started for Analyst user
     [Tags]  HappyPath
     user changes to analyst1
-    user goes to url   ${RELEASE_URL}/prerelease
+    user goes to url   ${RELEASE_URL}/prerelease/content
 
     user checks breadcrumb count should be   2
     user checks nth breadcrumb contains   1    Home
@@ -304,10 +373,6 @@ Validate public metdata guidance for Analyst user
     user opens details dropdown  Download associated files
     user clicks link  Metadata guidance
 
-    user checks breadcrumb count should be   2
-    user checks nth breadcrumb contains   1    Home
-    user checks nth breadcrumb contains   2    Metadata guidance document
-
     user waits until page contains title caption  Calendar Year 2000
     user waits until h1 is visible  ${PUBLICATION_NAME}
 
@@ -332,7 +397,7 @@ Validate public metdata guidance for Analyst user
     user checks results table cell contains  1  1   admission_numbers
     user checks results table cell contains  1  2   Admission Numbers
 
-Go back to prerelease page as Analyst user
+Go back to prerelease content page as Analyst user
     [Tags]  HappyPath
     user clicks link  Back
     user checks breadcrumb count should be   2
@@ -342,14 +407,10 @@ Go back to prerelease page as Analyst user
     user waits until page contains title caption  Calendar Year 2000
     user waits until h1 is visible  ${PUBLICATION_NAME}
 
-Validate public prerelease access list for Analyst user
+Validate public prerelease access list as Analyst user
     [Tags]  HappyPath
     user opens details dropdown  Download associated files
     user clicks link  Pre-release access list
-
-    user checks breadcrumb count should be   2
-    user checks nth breadcrumb contains   1    Home
-    user checks nth breadcrumb contains   2    Pre-release access list
 
     user waits until page contains title caption  Calendar Year 2000
     user waits until h1 is visible  ${PUBLICATION_NAME}
@@ -357,7 +418,7 @@ Validate public prerelease access list for Analyst user
     user waits until h2 is visible  Pre-release access list
     user waits until page contains  Updated test public access list
 
-Go back to prerelease page again as Analyst user
+Go back to prerelease content page again as Analyst user
     [Tags]  HappyPath
     user clicks link  Back
 
@@ -367,3 +428,15 @@ Go back to prerelease page again as Analyst user
 
     user waits until page contains title caption  Calendar Year 2000
     user waits until h1 is visible  ${PUBLICATION_NAME}
+
+Go to prerelease table tool page as Analyst user
+    [Tags]  HappyPath
+    user clicks link  Table tool
+
+    user waits until h1 is visible  Create your own tables online
+    user waits until h2 is visible  Choose a subject
+
+Create and validate table as Analyst user
+    [Tags]  HappyPath
+    user creates table
+    user validates table rows

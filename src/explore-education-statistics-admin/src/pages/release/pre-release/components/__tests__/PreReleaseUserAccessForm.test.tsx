@@ -4,7 +4,7 @@ import _preReleaseUserService, {
 import { render, screen, waitFor, within } from '@testing-library/react';
 import userEvent from '@testing-library/user-event';
 import React from 'react';
-import PreReleaseUserAccessForm from '../PreReleaseUserAccessForm';
+import PreReleaseUserAccessForm from '@admin/pages/release/pre-release/components/PreReleaseUserAccessForm';
 
 const preReleaseUserService = _preReleaseUserService as jest.Mocked<
   typeof _preReleaseUserService

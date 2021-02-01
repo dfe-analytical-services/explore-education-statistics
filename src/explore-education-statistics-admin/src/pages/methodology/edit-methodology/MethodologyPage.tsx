@@ -109,7 +109,6 @@ const MethodologyPage = ({
 
             <NavBar
               routes={navRoutes.map(route => ({
-                path: route.path,
                 title: route.title,
                 to: generatePath<MethodologyRouteParams>(route.path, {
                   methodologyId,

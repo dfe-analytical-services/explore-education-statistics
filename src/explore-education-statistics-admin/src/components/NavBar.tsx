@@ -4,25 +4,20 @@ import React from 'react';
 import styles from './NavBar.module.scss';
 
 interface Props {
+  className?: string;
   routes: {
-    path: string;
     to: string;
     title: string;
   }[];
 }
 
-const NavBar = ({ routes }: Props) => {
+const NavBar = ({ className, routes }: Props) => {
   return (
-    <nav
-      className={classNames(
-        styles.navigation,
-        'govuk-!-margin-top-6 govuk-!-margin-bottom-9',
-      )}
-    >
-      <ul className={classNames(styles.list, 'govuk-!-margin-bottom-0')}>
+    <nav className={classNames(styles.navigation, className)}>
+      <ul className={styles.list}>
         {routes.map(route => (
-          <li key={route.path}>
-            <NavLink key={route.path} to={route.to}>
+          <li key={route.to}>
+            <NavLink key={route.to} to={route.to}>
               {route.title}
             </NavLink>
           </li>

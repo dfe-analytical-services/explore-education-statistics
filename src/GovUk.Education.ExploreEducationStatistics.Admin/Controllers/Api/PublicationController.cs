@@ -36,7 +36,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Controllers.Api
             [Required] Guid publicationId)
         {
             return await _publicationService
-                .GetViewModel(publicationId)
+                .GetPublication(publicationId)
                 .HandleFailuresOrOk();
         }
 
