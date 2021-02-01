@@ -591,6 +591,10 @@
       {
         "name": "data",
         "id": "[variables('dataSubnetRef')]"
+      },
+      {
+        "name": "publisher",
+        "id": "[variables('publisherSubnetRef')]"
       }
     ],
 
