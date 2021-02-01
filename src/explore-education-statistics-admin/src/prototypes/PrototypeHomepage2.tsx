@@ -11,58 +11,124 @@ const PrototypeHomepage = () => {
           Select an option to find the national and regional level statistics
           and data you’re looking for.
         </p>
-        <div className={styles.prototypeCardContainer}>
-          <div className={styles.prototypeCard}>
-            <h2 className="govuk-heading-m govuk-!-margin-bottom-2">
-              <a href="#">Find statistics and data</a>
+        <div
+          className={classNames(
+            styles.prototypeCardContainer,
+            styles.prototypeCardBg,
+          )}
+        >
+          <div
+            className={classNames(
+              styles.prototypeCard,
+              styles.prototypeCardWithButton,
+            )}
+          >
+            <h2
+              className={classNames(
+                'govuk-heading-l',
+                'govuk-!-margin-bottom-2',
+              )}
+            >
+              Find statistics and data
             </h2>
-            <p className="govuk-caption-m">
+            <p>
               Browse to find statistical summaries and explanations to help you
               understand and analyse our range of national and regional
               statistics and data.
             </p>
+            <a
+              href="#"
+              role="button"
+              draggable="false"
+              className="govuk-button govuk-button--start"
+              data-module="govuk-button"
+            >
+              Start now
+              <svg
+                className="govuk-button__start-icon"
+                xmlns="http://www.w3.org/2000/svg"
+                width="17.5"
+                height="19"
+                viewBox="0 0 33 40"
+                aria-hidden="true"
+                focusable="false"
+              >
+                <path fill="currentColor" d="M0 0h13l20 20-20 20H0l20-20z" />
+              </svg>
+            </a>
           </div>
-          <div className={styles.prototypeCard}>
-            <h2 className="govuk-heading-m govuk-!-margin-bottom-2">
-              <a href="#">Create your own tables</a>
+          <div
+            className={classNames(
+              styles.prototypeCard,
+              styles.prototypeCardWithButton,
+            )}
+          >
+            <h2
+              className={classNames(
+                'govuk-heading-l',
+                'govuk-!-margin-bottom-2',
+              )}
+            >
+              Create your own tables
             </h2>
-            <p className="govuk-caption-m">
+            <p>
               Use our online tool to build tables using our range of national
               and regional data.
             </p>
+            <a
+              href="#"
+              role="button"
+              draggable="false"
+              className="govuk-button govuk-button--start"
+              data-module="govuk-button"
+            >
+              Start now
+              <svg
+                className="govuk-button__start-icon"
+                xmlns="http://www.w3.org/2000/svg"
+                width="17.5"
+                height="19"
+                viewBox="0 0 33 40"
+                aria-hidden="true"
+                focusable="false"
+              >
+                <path fill="currentColor" d="M0 0h13l20 20-20 20H0l20-20z" />
+              </svg>
+            </a>
           </div>
         </div>
-        <h2 className="govuk-heading-m">Supporting information</h2>
-        <div className={styles.prototypeCardContainer}>
-          <div className={styles.prototypeCard}>
-            <h3 className="govuk-heading-s govuk-!-margin-bottom-2">
+        <h2 className="govuk-heading-l">Supporting information</h2>
+        <div className="govuk-grid-row1">
+          <div className="govuk-grid-column-one-half1">
+            <h3>
               <a href="#">Education statistics: methodology</a>
             </h3>
-            <p className="govuk-caption-m">
+            <p>
               Browse to find out more about the methodology behind education
               statistics and data and how and why they're collected and
               published.
             </p>
           </div>
-          <div className={styles.prototypeCard}>
-            <h3 className="govuk-heading-s govuk-!-margin-bottom-2">
+          <div className="govuk-grid-column-one-half1">
+            <h3>
               <a href="#">Education statistics: glossary</a>
             </h3>
-            <p className="govuk-caption-m">
+            <p>
               Browse our A to Z list of definitions for terms used across
               education statistics and data.
             </p>
           </div>
         </div>
-        <h3 className="govuk-heading-m govuk-!-margin-top-9">
+        <hr />
+        <h3 className="govuk-heading-l govuk-!-margin-top-9">
           Related services
         </h3>
         <p className="govuk-body">
           Use these services to find specific performance and other information
           about schools and colleges in England:
         </p>
-        <div className="govuk-grid-row1 govuk-!-margin-bottom-3">
-          <div className="govuk-grid-column-one-half1">
+        <div className="govuk-grid-row govuk-!-margin-bottom-3">
+          <div className="govuk-grid-column-one-half">
             <h4 className="govuk-heading-s govuk-!-margin-bottom-0">
               <a
                 className="govuk-link"
@@ -76,7 +142,7 @@ const PrototypeHomepage = () => {
               special needs schools and colleges.
             </p>
           </div>
-          <div className="govuk-grid-column-one-half1">
+          <div className="govuk-grid-column-one-half">
             <h4 className="govuk-heading-s govuk-!-margin-bottom-0">
               <a
                 className="govuk-link"
@@ -91,8 +157,8 @@ const PrototypeHomepage = () => {
             </p>
           </div>
         </div>
-        <div className="govuk-grid-row1 govuk-!-margin-bottom-9">
-          <div className="govuk-grid-column-one-half1">
+        <div className="govuk-grid-row govuk-!-margin-bottom-9">
+          <div className="govuk-grid-column-one-half">
             <h4 className="govuk-heading-s govuk-!-margin-bottom-0">
               <a
                 className="govuk-link"
@@ -106,7 +172,7 @@ const PrototypeHomepage = () => {
               England.
             </p>
           </div>
-          <div className="govuk-grid-column-one-half1">
+          <div className="govuk-grid-column-one-half">
             <h4 className="govuk-heading-s govuk-!-margin-bottom-0">
               <a
                 className="govuk-link"
@@ -123,7 +189,7 @@ const PrototypeHomepage = () => {
           </div>
         </div>
         <hr />
-        <h3 className="govuk-heading-l govuk-!-margin-top-9">Contact Us</h3>
+        <h2 className="govuk-heading-l govuk-!-margin-top-9">Contact Us</h2>
         <p className="govuk-body govuk-!-margin-top-1">
           If you need help and support or have a question about education
           statistics and data contact:

@@ -8,6 +8,8 @@ import PrototypePreRelease from './PrototypePreRelease';
 import PrototypePublicPreRelease from './PrototypePublicPreRelease';
 import PrototypeTableHighlights from './PrototypeTableHighlights';
 import PrototypeHomepage from './PrototypeHomepage';
+import PrototypeHomepage2 from './PrototypeHomepage2';
+import PrototypeRelease from './PrototypeRelease';
 
 interface PrototypeRoute extends RouteProps {
   name: string;
@@ -51,14 +53,24 @@ const prototypeRoutes: PrototypeRoute[] = [
     component: PrototypePublicPreRelease,
   },
   {
-    name: 'Homepage',
+    name: 'Homepage A',
     path: '/prototypes/homepage',
     component: PrototypeHomepage,
+  },
+  {
+    name: 'Homepage B',
+    path: '/prototypes/homepage2',
+    component: PrototypeHomepage2,
   },
   {
     name: 'Table highlights',
     path: '/prototypes/table-highlights',
     component: PrototypeTableHighlights,
+  },
+  {
+    name: 'Release',
+    path: '/prototypes/release',
+    component: PrototypeRelease,
   },
 ];
 

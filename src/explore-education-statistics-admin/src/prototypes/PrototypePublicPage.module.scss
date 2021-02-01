@@ -1,3 +1,5 @@
+@import '~govuk-frontend/govuk/base';
+
 .prototypePublicPage {
   :global(.govuk-header__navigation) {
     display: none !important;
@@ -6,5 +8,33 @@
 .prototypeTableTool {
   :global(.dfe-width-container--wide) {
     max-width: 90vw;
+  }
+}
+.prototypeCardContainer {
+  display: flex;
+  justify-content: space-between;
+  margin-bottom: 3rem;
+  //padding: 1rem;
+}
+.prototypeCard {
+  //background: govuk-colour('light-grey');
+  //@function: 1px solid $govuk-border-colour;
+  border-bottom: 3px solid $govuk-brand-colour;
+  flex: 0 1 48.5%;
+  //padding: 1rem;
+
+  .prototypeCardBg & {
+    background: govuk-colour('light-grey');
+    padding: 1.6rem;
+  }
+}
+.prototypeCardWithButton {
+  display: flex;
+  flex-direction: column;
+  justify-content: space-between;
+
+  :global(.govuk-button--start) {
+    margin-bottom: 1rem;
+    width: fit-content;
   }
 }
