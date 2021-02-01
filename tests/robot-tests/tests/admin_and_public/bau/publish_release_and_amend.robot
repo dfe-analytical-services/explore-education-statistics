@@ -92,6 +92,11 @@ Add ancillary file
 Create data block table
     [Tags]  HappyPath
     user clicks link    Data blocks
+
+    user waits until h2 is visible  Data blocks
+    user clicks link  Create data block
+
+    user waits until h2 is visible  Create data block
     user waits until h2 is visible   Choose a subject
 
     user waits until page contains   Dates test subject
@@ -132,6 +137,8 @@ Save data block
     user enters text into element  id:dataBlockDetailsForm-source       Dates source
 
     user clicks button   Save data block
+
+    user waits until h2 is visible  Edit data block
     user waits until page contains button    Delete this data block
 
 Create chart for data block
@@ -139,11 +146,14 @@ Create chart for data block
     user waits until page contains link  Chart
     user waits until page does not contain loading spinner
     user clicks element   id:manageDataBlocks-chart-tab
+
     user clicks button  Choose an infographic as alternative
     user chooses file  id:chartConfigurationForm-file       ${FILES_DIR}test-infographic.png
     user enters text into element  id:chartConfigurationForm-title  Sample title
     user enters text into element  id:chartConfigurationForm-alt  Sample alt text
+
     user clicks button   Save chart options
+
     user waits until page contains  Chart preview
     user checks infographic chart contains alt  id:chartBuilderPreview  Sample alt text
 
@@ -488,8 +498,20 @@ Add ancillary file to amendment
 Edit data block for amendment
     [Tags]  HappyPath
     user clicks link    Data blocks
-    user selects from list by label  id:selectedDataBlock  ${DATABLOCK_NAME}
-    user waits until h2 is visible   Data block details
+
+    user waits until h2 is visible  Data blocks
+
+    user waits until table is visible
+    user checks table body has x rows  1
+    user checks results table cell contains  1  1  ${DATABLOCK_NAME}
+    user checks results table cell contains  1  2  Yes
+    user checks results table cell contains  1  3  Yes
+    user checks results table cell contains  1  4  None
+
+    user clicks link  Edit block    css:tbody > tr:first-child
+
+    user waits until h2 is visible  ${DATABLOCK_NAME}
+    user waits until h2 is visible  Data block details
 
     user clicks element  css:[data-testid="wizardStep-4-goToButton"]
     user clicks button  Confirm
@@ -521,11 +543,13 @@ Update data block chart for amendment
     user waits until page contains link  Chart
     user waits until page does not contain loading spinner
     user clicks element   id:manageDataBlocks-chart-tab
+
     user waits until page contains element  id:chartConfigurationForm-title
     user enters text into element  id:chartConfigurationForm-title  Updated sample title
     user checks textarea contains   id:chartConfigurationForm-title  Updated sample title
     user enters text into element  id:chartConfigurationForm-alt  Updated sample alt text
     user checks textarea contains   id:chartConfigurationForm-alt    Updated sample alt text
+
     user clicks button   Save chart options
     user waits until page does not contain loading spinner
     user waits until page contains element   id:chartBuilderPreview

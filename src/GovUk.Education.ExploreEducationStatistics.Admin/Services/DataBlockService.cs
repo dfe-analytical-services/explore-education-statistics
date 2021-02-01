@@ -96,7 +96,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Services
                 .OnSuccess(dataBlock => _mapper.Map<DataBlockViewModel>(dataBlock));
         }
 
-        public async Task<Either<ActionResult, List<DataBlockViewModel>>> List(Guid releaseId)
+        public async Task<Either<ActionResult, List<DataBlockSummaryViewModel>>> List(Guid releaseId)
         {
             return await _persistenceHelper.CheckEntityExists<Release>(releaseId)
                 .OnSuccess(_userService.CheckCanViewRelease)
@@ -111,7 +111,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Services
                             .OrderBy(dataBlock => dataBlock.Name)
                             .ToListAsync();
 
-                        return _mapper.Map<List<DataBlockViewModel>>(dataBlocks);
+                        return _mapper.Map<List<DataBlockSummaryViewModel>>(dataBlocks);
                     }
                 );
         }

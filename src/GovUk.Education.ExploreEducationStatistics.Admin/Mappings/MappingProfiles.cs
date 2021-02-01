@@ -102,6 +102,10 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Mappings
             CreateContentBlockMap();
             CreateMap<DataBlockCreateViewModel, DataBlock>();
             CreateMap<DataBlockUpdateViewModel, DataBlock>();
+            CreateMap<DataBlock, DataBlockSummaryViewModel>()
+                .ForMember(
+                    dest => dest.ChartsCount,
+                    m => m.MapFrom(d => d.Charts.Count));
 
             CreateMap<Theme, Data.Model.Theme>()
                 .ForMember(dest => dest.Topics, m => m.Ignore());

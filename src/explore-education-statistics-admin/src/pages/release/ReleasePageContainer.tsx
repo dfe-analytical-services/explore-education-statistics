@@ -19,6 +19,8 @@ import {
   releaseFootnotesCreateRoute,
   releaseFootnotesEditRoute,
   releaseDataFileReplacementCompleteRoute,
+  releaseDataBlockEditRoute,
+  releaseDataBlockCreateRoute,
 } from '@admin/routes/releaseRoutes';
 import publicationService, {
   BasicPublicationDetails,
@@ -50,6 +52,8 @@ const routes = [
   releaseSummaryEditRoute,
   releaseFootnotesCreateRoute,
   releaseFootnotesEditRoute,
+  releaseDataBlockCreateRoute,
+  releaseDataBlockEditRoute,
 ];
 
 interface MatchProps {

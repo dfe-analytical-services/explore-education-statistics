@@ -44,3 +44,25 @@ table,
 .govuk-table__row--striped {
   background: govuk-colour('light-grey');
 }
+
+.govuk-table__header--actions {
+  text-align: right;
+}
+
+.govuk-table__cell--actions {
+  text-align: right;
+
+  > a,
+  > button {
+    display: inline-block;
+    margin-bottom: govuk-spacing(2);
+    margin-right: 0;
+    text-align: right;
+  }
+
+  > :not(:last-child) {
+    @include govuk-media-query($from: desktop) {
+      margin-right: govuk-spacing(3);
+    }
+  }
+}

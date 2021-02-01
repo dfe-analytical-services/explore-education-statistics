@@ -109,7 +109,11 @@ Create Random Filter Select all footnote for new subject
 Navigate to 'Data blocks' page
     [Tags]  HappyPath
     user clicks link    Data blocks
-    user waits until h2 is visible   Choose a subject
+    user waits until h2 is visible  Data blocks
+
+    user clicks link  Create data block
+    user waits until h2 is visible  Create data block
+    user waits until h2 is visible  Choose a subject
 
 Select subject "UI test subject"
     [Tags]  HappyPath

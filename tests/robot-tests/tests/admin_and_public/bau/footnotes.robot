@@ -100,10 +100,15 @@ Confirm created footnotes
     user waits until page contains  ${FOOTNOTE_TEXT_1}
     user waits until page contains  ${FOOTNOTE_TEXT_2}
 
-Navigate to 'Data blocks' tab
+Navigate to 'Create data block' page
     [Tags]  HappyPath
     user clicks link    Data blocks
-    user waits until h2 is visible   Choose a subject
+
+    user waits until h2 is visible  Data blocks
+    user clicks link  Create data block
+
+    user waits until h2 is visible  Create data block
+    user waits until h2 is visible  Choose a subject
 
 Select subject "${SUBJECT_NAME}" (data block)
     [Tags]  HappyPath
