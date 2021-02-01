@@ -27,17 +27,20 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Services.Methodologie
         private readonly IMapper _mapper;
         private readonly IPublishingService _publishingService;
         private readonly IUserService _userService;
+        private readonly IMethodologyRepository _methodologyRepository;
 
         public MethodologyService(ContentDbContext context,
             IMapper mapper,
             IPublishingService publishingService,
             IUserService userService,
+            IMethodologyRepository methodologyRepository,
             IPersistenceHelper<ContentDbContext> persistenceHelper)
         {
             _context = context;
             _mapper = mapper;
             _publishingService = publishingService;
             _userService = userService;
+            _methodologyRepository = methodologyRepository;
             _persistenceHelper = persistenceHelper;
         }
 
@@ -96,28 +99,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Services.Methodologie
                 .OrElse(async () =>
                 {
                     var userId = _userService.GetUserId();
-                    var viewablePublications = await _context.UserReleaseRoles
-                        .Include(urr => urr.Release)
-                        .ThenInclude(r => r.Publication)
-                        .Where(urr =>
-                            urr.UserId == userId
-                            && urr.Role != ReleaseRole.PrereleaseViewer)
-                        .Select(urr => urr.Release.Publication)
-                        .Distinct()
-                        .ToListAsync();
-
-                    var allMethodologies = await _context.Methodologies
-                        .Include(m => m.Publications)
-                        .ToListAsync();
-
-                    var viewableMethodologies = allMethodologies
-                        .Where(m => viewablePublications
-                            .Any(p1 => m.Publications
-                                .Select(p2 => p2.Id)
-                                .Contains(p1.Id)))
-                        .OrderBy(m => m.Title)
-                        .ToList();
-
+                    var viewableMethodologies = await _methodologyRepository.GetMethodologiesForUser(userId);
                     return _mapper.Map<List<MethodologyPublicationsViewModel>>(viewableMethodologies);
                 });
         }

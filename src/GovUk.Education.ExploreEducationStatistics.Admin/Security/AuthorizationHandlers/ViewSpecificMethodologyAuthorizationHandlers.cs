@@ -1,5 +1,7 @@
+using System.Dynamic;
 using System.Linq;
 using System.Threading.Tasks;
+using GovUk.Education.ExploreEducationStatistics.Admin.Services.Interfaces.Methodologies;
 using GovUk.Education.ExploreEducationStatistics.Common.Services.Security;
 using GovUk.Education.ExploreEducationStatistics.Content.Model;
 using GovUk.Education.ExploreEducationStatistics.Content.Model.Database;
@@ -14,9 +16,9 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Security.Authorizatio
     public class ViewSpecificMethodologyAuthorizationHandler
         : CompoundAuthorizationHandler<ViewSpecificMethodologyRequirement, Methodology>
     {
-        public ViewSpecificMethodologyAuthorizationHandler(ContentDbContext context) : base(
+        public ViewSpecificMethodologyAuthorizationHandler(IMethodologyRepository methodologyRepository) : base(
             new CanViewAllMethodologiesAuthorizationHandler(),
-            new HasRoleOnAnyAssociatedReleaseAuthorizationHandler(context)) {}
+            new HasRoleOnAnyAssociatedReleaseAuthorizationHandler(methodologyRepository)) {}
     
         public class CanViewAllMethodologiesAuthorizationHandler 
             : HasClaimAuthorizationHandler<ViewSpecificMethodologyRequirement>
@@ -28,10 +30,10 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Security.Authorizatio
         public class HasRoleOnAnyAssociatedReleaseAuthorizationHandler
             : AuthorizationHandler<ViewSpecificMethodologyRequirement, Methodology>
         {
-            private readonly ContentDbContext _context;
-            public HasRoleOnAnyAssociatedReleaseAuthorizationHandler(ContentDbContext context)
+            private readonly IMethodologyRepository _methodologyRepository;
+            public HasRoleOnAnyAssociatedReleaseAuthorizationHandler(IMethodologyRepository methodologyRepository)
             {
-                _context = context;
+                _methodologyRepository = methodologyRepository;
             }
 
             protected override async Task HandleRequirementAsync(
@@ -39,29 +41,9 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Security.Authorizatio
                 ViewSpecificMethodologyRequirement requirement,
                 Methodology methodology)
             {
-                if (methodology.Publications == null)
-                {
-                    methodology = await _context.Methodologies
-                        .Include(m => m.Publications)
-                        .Where(m => m.Id == methodology.Id)
-                        .SingleAsync();
-                }
-                
-                var userId = authContext.User.GetUserId();
-                var viewablePublications = await _context.UserReleaseRoles
-                    .Include(urr => urr.Release)
-                    .ThenInclude(r => r.Publication)
-                    .Where(urr => 
-                        urr.UserId == userId
-                        && urr.Role != ReleaseRole.PrereleaseViewer)
-                    .Select(urr => urr.Release.Publication)
-                    .Distinct()
-                    .ToListAsync();
-
-                if (viewablePublications
-                    .Any(p1 => methodology.Publications
-                        .Select(p2 => p2.Id)
-                        .Contains(p1.Id)))
+                if(await _methodologyRepository.UserHasReleaseRoleAssociatedWithMethodology(
+                    authContext.User.GetUserId(),
+                    methodology))
                 {
                     authContext.Succeed(requirement);
                 }
