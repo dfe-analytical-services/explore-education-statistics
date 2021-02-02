@@ -170,6 +170,8 @@ Go back and delete a footnote
 Add data block to release
     [Tags]  HappyPath
     user clicks link  Content
+    user waits until button is enabled  Add secondary stats
+    user scrolls to element  xpath://button[text()="Add secondary stats"]
     user clicks button  Add secondary stats
     user waits until page contains element  secondaryStats-dataBlockSelectForm-selectedDataBlock
     user selects from list by label  secondaryStats-dataBlockSelectForm-selectedDataBlock  ${FOOTNOTE_DATABLOCK_NAME}
