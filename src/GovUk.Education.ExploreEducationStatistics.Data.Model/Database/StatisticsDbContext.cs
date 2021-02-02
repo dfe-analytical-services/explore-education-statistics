@@ -115,9 +115,6 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Model.Database
         private static void ConfigureObservationFilterItem(ModelBuilder modelBuilder)
         {
             modelBuilder.Entity<ObservationFilterItem>()
-                .HasKey(item => new {item.ObservationId, item.FilterItemId});
-
-            modelBuilder.Entity<ObservationFilterItem>()
                 .HasOne(observationFilterItem => observationFilterItem.Observation)
                 .WithMany(observation => observation.FilterItems)
                 .HasForeignKey(observationFilterItem => observationFilterItem.ObservationId);
@@ -439,6 +436,13 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Model.Database
         private static void ConfigureGeoJson(ModelBuilder modelBuilder)
         {
             modelBuilder.Entity<GeoJson>().HasNoKey().ToView("geojson");
+        }
+
+        public class ObservationIds
+        {
+            public long Id { get; set; }
+            
+            public Guid ObservationId { get; set; }
         }
     }
 }

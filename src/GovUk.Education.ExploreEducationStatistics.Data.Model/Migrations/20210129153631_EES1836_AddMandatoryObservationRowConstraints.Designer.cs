@@ -4,14 +4,16 @@ using GovUk.Education.ExploreEducationStatistics.Data.Model.Database;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Infrastructure;
 using Microsoft.EntityFrameworkCore.Metadata;
+using Microsoft.EntityFrameworkCore.Migrations;
 using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 
 namespace GovUk.Education.ExploreEducationStatistics.Data.Model.Migrations
 {
     [DbContext(typeof(StatisticsDbContext))]
-    partial class StatisticsDbContextModelSnapshot : ModelSnapshot
+    [Migration("20210129153631_EES1836_AddMandatoryObservationRowConstraints")]
+    partial class EES1836_AddMandatoryObservationRowConstraints
     {
-        protected override void BuildModel(ModelBuilder modelBuilder)
+        protected override void BuildTargetModel(ModelBuilder modelBuilder)
         {
 #pragma warning disable 612, 618
             modelBuilder
@@ -293,30 +295,23 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Model.Migrations
 
             modelBuilder.Entity("GovUk.Education.ExploreEducationStatistics.Data.Model.ObservationFilterItem", b =>
                 {
-                    b.Property<long>("Id")
-                        .ValueGeneratedOnAdd()
-                        .HasColumnType("bigint")
-                        .HasAnnotation("SqlServer:ValueGenerationStrategy", SqlServerValueGenerationStrategy.IdentityColumn);
-
-                    b.Property<Guid?>("FilterId")
-                        .HasColumnType("uniqueidentifier");
+                    b.Property<long>("ObservationId")
+                        .HasColumnType("bigint");
 
                     b.Property<Guid>("FilterItemId")
                         .HasColumnType("uniqueidentifier");
 
-                    b.Property<long>("ObservationId")
-                        .HasColumnType("bigint");
+                    b.Property<Guid?>("FilterId")
+                        .HasColumnType("uniqueidentifier");
 
                     b.Property<Guid>("OldObservationId")
                         .HasColumnType("uniqueidentifier");
 
-                    b.HasKey("Id");
+                    b.HasKey("ObservationId", "FilterItemId");
 
                     b.HasIndex("FilterId");
 
                     b.HasIndex("FilterItemId");
-
-                    b.HasIndex("ObservationId");
 
                     b.ToTable("ObservationRowFilterItem");
                 });

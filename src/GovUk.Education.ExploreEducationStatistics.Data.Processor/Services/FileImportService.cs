@@ -1,5 +1,6 @@
 using System;
 using System.Collections.Generic;
+using System.Diagnostics;
 using System.Linq;
 using System.Threading.Tasks;
 using GovUk.Education.ExploreEducationStatistics.Common.Extensions;
@@ -72,9 +73,9 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Processor.Services
             await using var metaFileStream = await _fileStorageService.StreamBlob(subjectData.MetaBlob);
             var metaFileTable = DataTableUtils.CreateFromStream(metaFileStream);
 
-            await context.Database.CreateExecutionStrategy().Execute(async () =>
-            {
-                await using var transaction = await context.Database.BeginTransactionAsync();
+            // await context.Database.CreateExecutionStrategy().Execute(async () =>
+            // {
+            //     await using var transaction = await context.Database.BeginTransactionAsync();
 
                 await _importerService.ImportObservations(
                     dataFileTable.Columns,
@@ -86,9 +87,9 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Processor.Services
                     context
                 );
 
-                await transaction.CommitAsync();
-                await context.Database.CloseConnectionAsync();
-            });
+            //     await transaction.CommitAsync();
+            //     await context.Database.CloseConnectionAsync();
+            // });
             
             if (message.NumBatches > 1)
             {
@@ -157,6 +158,8 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Processor.Services
                 return;
             }
 
+            var w = Stopwatch.StartNew();
+
             if (message.NumBatches == 1 || 
                 await _fileStorageService.GetNumBatchesRemaining(releaseId, message.DataFileName) == 0)
             {
@@ -197,6 +200,9 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Processor.Services
                     STAGE_4,
                     percentageComplete);
             }
+            
+            _logger.LogInformation($"Took {w.Elapsed.TotalMilliseconds} millis to check if {message.DataFileName} " +
+                                   $"was complete");
         }
     }
 }
