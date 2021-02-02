@@ -19,7 +19,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Content.Model
     {
         public Guid Id { get; set; }
 
-        [JsonIgnore] public ContentSection ContentSection { get; set; }
+        [JsonIgnore] public ContentSection? ContentSection { get; set; }
 
         [JsonIgnore] public Guid? ContentSectionId { get; set; }
 
@@ -27,7 +27,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Content.Model
 
         public List<Comment> Comments { get; set; }
 
-        public ContentBlock Clone(Release.CloneContext context, ContentSection newContentSection)
+        public ContentBlock Clone(Release.CloneContext context, ContentSection? newContentSection)
         {
             var copy = MemberwiseClone() as ContentBlock;
             copy.Id = Guid.NewGuid();
@@ -75,7 +75,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Content.Model
 
         public string Name { get; set; }
 
-        public string HighlightName { get; set; }
+        public string? HighlightName { get; set; }
 
         public string Source { get; set; }
 

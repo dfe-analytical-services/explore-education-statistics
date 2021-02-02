@@ -21,7 +21,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
         };
 
         [Fact]
-        public void GetSubjects()
+        public void GetSubjectsMeta()
         {
             PermissionTestUtils.PolicyCheckBuilder<ContentSecurityPolicies>()
                 .ExpectResourceCheckToFail(_release, ContentSecurityPolicies.CanViewRelease)
@@ -29,7 +29,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
                     userService =>
                     {
                         var service = BuildReleaseMetaService(userService: userService.Object);
-                        return service.GetSubjects(_release.Id);
+                        return service.GetSubjectsMeta(_release.Id);
                     }
                 );
         }
