@@ -42,7 +42,13 @@ const TableToolPage: NextPage<TableToolPageProps> = ({
       return undefined;
     }
 
-    const { publicationId, subjects, highlights } = publicationMeta;
+    const { publicationId, subjects } = publicationMeta;
+
+    const highlights = orderBy(
+      publicationMeta.highlights,
+      ['label'],
+      ['asc'],
+    ).filter(highlight => highlight.id !== fastTrack?.id);
 
     if (fastTrack && subjectMeta) {
       const fullTable = mapFullTable(fastTrack.fullTable);
@@ -102,18 +108,16 @@ const TableToolPage: NextPage<TableToolPageProps> = ({
             <p>View popular tables related to this publication:</p>
 
             <ul>
-              {orderBy(highlights, ['label'], ['asc'])
-                .filter(highlight => highlight.id !== fastTrack?.id)
-                .map(highlight => (
-                  <li key={highlight.id}>
-                    <Link
-                      to="/data-tables/fast-track/[fastTrackId]"
-                      as={`/data-tables/fast-track/${highlight.id}`}
-                    >
-                      {highlight.label}
-                    </Link>
-                  </li>
-                ))}
+              {highlights.map(highlight => (
+                <li key={highlight.id}>
+                  <Link
+                    to="/data-tables/fast-track/[fastTrackId]"
+                    as={`/data-tables/fast-track/${highlight.id}`}
+                  >
+                    {highlight.label}
+                  </Link>
+                </li>
+              ))}
             </ul>
           </aside>
         )}
