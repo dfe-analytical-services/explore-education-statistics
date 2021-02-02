@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
 using GovUk.Education.ExploreEducationStatistics.Admin.Security.AuthorizationHandlers;
+using GovUk.Education.ExploreEducationStatistics.Admin.Services.Methodologies;
 using GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services;
 using GovUk.Education.ExploreEducationStatistics.Content.Model;
 using Microsoft.AspNetCore.Authorization;
@@ -59,7 +60,8 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Security.Author
 
             await using (var contentDbContext = DbUtils.InMemoryApplicationDbContext(contentDbContextId))
             {
-                var handler = new UpdateSpecificMethodologyAuthorizationHandler(contentDbContext);
+                var methodologyRepository = new MethodologyRepository(contentDbContext);
+                var handler = new UpdateSpecificMethodologyAuthorizationHandler(methodologyRepository);
                 var authContext = new AuthorizationHandlerContext(
                     new IAuthorizationRequirement[] {new UpdateSpecificMethodologyRequirement()},
                     CreateClaimsPrincipal(userId),
@@ -106,7 +108,8 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Security.Author
 
             await using (var contentDbContext = DbUtils.InMemoryApplicationDbContext(contentDbContextId))
             {
-                var handler = new UpdateSpecificMethodologyAuthorizationHandler(contentDbContext);
+                var methodologyRepository = new MethodologyRepository(contentDbContext);
+                var handler = new UpdateSpecificMethodologyAuthorizationHandler(methodologyRepository);
                 var authContext = new AuthorizationHandlerContext(
                     new IAuthorizationRequirement[] {new UpdateSpecificMethodologyRequirement()},
                     CreateClaimsPrincipal(userId),
@@ -158,7 +161,8 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Security.Author
 
             await using (var contentDbContext = DbUtils.InMemoryApplicationDbContext(contentDbContextId))
             {
-                var handler = new UpdateSpecificMethodologyAuthorizationHandler(contentDbContext);
+                var methodologyRepository = new MethodologyRepository(contentDbContext);
+                var handler = new UpdateSpecificMethodologyAuthorizationHandler(methodologyRepository);
                 var authContext = new AuthorizationHandlerContext(
                     new IAuthorizationRequirement[] {new UpdateSpecificMethodologyRequirement()},
                     CreateClaimsPrincipal(userId),
