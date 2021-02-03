@@ -43,7 +43,7 @@ const PrototypeHomepage = () => {
               className="govuk-button govuk-button--start"
               data-module="govuk-button"
             >
-              Start now
+              Explore
               <svg
                 className="govuk-button__start-icon"
                 xmlns="http://www.w3.org/2000/svg"
@@ -82,7 +82,7 @@ const PrototypeHomepage = () => {
               className="govuk-button govuk-button--start"
               data-module="govuk-button"
             >
-              Start now
+              Create
               <svg
                 className="govuk-button__start-icon"
                 xmlns="http://www.w3.org/2000/svg"
@@ -100,20 +100,20 @@ const PrototypeHomepage = () => {
         <h2 className="govuk-heading-l">Supporting information</h2>
         <div className="govuk-grid-row1">
           <div className="govuk-grid-column-one-half1">
-            <h3>
+            <h3 className="govuk-!-margin-bottom-1">
               <a href="#">Education statistics: methodology</a>
             </h3>
-            <p>
+            <p className="govuk-caption-m">
               Browse to find out more about the methodology behind education
               statistics and data and how and why they're collected and
               published.
             </p>
           </div>
           <div className="govuk-grid-column-one-half1">
-            <h3>
+            <h3 className="govuk-!-margin-bottom-1">
               <a href="#">Education statistics: glossary</a>
             </h3>
-            <p>
+            <p className="govuk-caption-m">
               Browse our A to Z list of definitions for terms used across
               education statistics and data.
             </p>

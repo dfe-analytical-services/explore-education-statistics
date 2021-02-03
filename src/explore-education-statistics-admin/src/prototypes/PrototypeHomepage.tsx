@@ -34,7 +34,12 @@ const PrototypeHomepage = () => {
         </div>
         <h2 className="govuk-heading-m">Supporting information</h2>
         <div className={styles.prototypeCardContainer}>
-          <div className={styles.prototypeCard}>
+          <div
+            className={classNames(
+              styles.prototypeCard,
+              styles.prototypeCardNoBorder,
+            )}
+          >
             <h3 className="govuk-heading-s govuk-!-margin-bottom-2">
               <a href="#">Education statistics: methodology</a>
             </h3>
@@ -44,7 +49,12 @@ const PrototypeHomepage = () => {
               published.
             </p>
           </div>
-          <div className={styles.prototypeCard}>
+          <div
+            className={classNames(
+              styles.prototypeCard,
+              styles.prototypeCardNoBorder,
+            )}
+          >
             <h3 className="govuk-heading-s govuk-!-margin-bottom-2">
               <a href="#">Education statistics: glossary</a>
             </h3>

@@ -28,6 +28,9 @@
     padding: 1.6rem;
   }
 }
+.prototypeCardNoBorder {
+  border: 0;
+}
 .prototypeCardWithButton {
   display: flex;
   flex-direction: column;
@@ -37,4 +40,10 @@
     margin-bottom: 1rem;
     width: fit-content;
   }
+}
+.prototypeFlexContainer {
+  align-items: center;
+  display: flex;
+  justify-content: space-between;
+  margin-left: 15px;
 }
