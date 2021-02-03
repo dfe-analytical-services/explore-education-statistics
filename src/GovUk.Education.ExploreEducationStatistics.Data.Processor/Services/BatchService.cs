@@ -1,52 +1,46 @@
 using System;
 using System.Collections.Generic;
+using System.Linq;
 using System.Threading.Tasks;
 using GovUk.Education.ExploreEducationStatistics.Common.Model;
-using GovUk.Education.ExploreEducationStatistics.Common.Services;
 using GovUk.Education.ExploreEducationStatistics.Common.Services.Interfaces;
-using GovUk.Education.ExploreEducationStatistics.Data.Processor.Model;
+using GovUk.Education.ExploreEducationStatistics.Content.Model.Database;
 using GovUk.Education.ExploreEducationStatistics.Data.Processor.Services.Interfaces;
-using Microsoft.Azure.Cosmos.Table;
-using Newtonsoft.Json;
-using static GovUk.Education.ExploreEducationStatistics.Common.TableStorageTableNames;
+using static GovUk.Education.ExploreEducationStatistics.Common.BlobContainerNames;
+using static GovUk.Education.ExploreEducationStatistics.Common.Services.FileStoragePathUtils;
 
 namespace GovUk.Education.ExploreEducationStatistics.Data.Processor.Services
 {
     public class BatchService : IBatchService
     {
-        private readonly CloudTable _table;
+        private readonly ContentDbContext _contentDbContext;
+        private readonly IBlobStorageService _blobStorageService;
 
-        public BatchService(ITableStorageService tblStorageService)
+        public BatchService(ContentDbContext contentDbContext,
+            IBlobStorageService blobStorageService)
         {
-            _table = tblStorageService.GetTableAsync(DatafileImportsTableName).Result;
+            _contentDbContext = contentDbContext;
+            _blobStorageService = blobStorageService;
         }
 
-        public async Task UpdateStoredMessage(ImportMessage message)
+        public async Task<int> GetNumBatchesRemaining(Guid fileId)
         {
-            var import = await GetImport(message.Release.Id, message.DataFileName);
-            import.Message = JsonConvert.SerializeObject(message);
-            await _table.ExecuteAsync(TableOperation.InsertOrReplace(import));
+            var batchFiles = await GetBatchFilesForDataFile(fileId);
+            return batchFiles.Count;
         }
 
-        public async Task FailImport(Guid releaseId, string dataFileName, IEnumerable<ValidationError> errors)
+        public async Task<List<BlobInfo>> GetBatchFilesForDataFile(Guid fileId)
         {
-            var import = await GetImport(releaseId, dataFileName);
-            if (import.Status != IStatus.COMPLETE && import.Status != IStatus.FAILED)
-            {
-                import.Status = IStatus.FAILED;
-                import.Errors = JsonConvert.SerializeObject(errors);
-                await _table.ExecuteAsync(TableOperation.InsertOrReplace(import));
-            }
-        }
+            var file = await _contentDbContext.Files.FindAsync(fileId);
 
-        private async Task<DatafileImport> GetImport(Guid releaseId, string dataFileName)
-        {
-            var result = await _table.ExecuteAsync(TableOperation.Retrieve<DatafileImport>(
-                releaseId.ToString(),
-                dataFileName,
-                new List<string> {"NumBatches", "Status", "NumberOfRows", "Errors", "Message", "PercentageComplete"}));
+            var blobs = await _blobStorageService.ListBlobs(
+                PrivateFilesContainerName,
+                AdminReleaseBatchesDirectoryPath(file.ReleaseId)
+            );
 
-            return (DatafileImport) result.Result;
+            return blobs.Where(blob =>
+                    IsBatchFileForDataFile(file.ReleaseId, file.Filename, blob.Path))
+                .ToList();
         }
     }
 }

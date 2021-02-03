@@ -1,25 +1,16 @@
 using System;
-using System.Collections.Generic;
 using System.Threading.Tasks;
 using GovUk.Education.ExploreEducationStatistics.Admin.Services;
 using GovUk.Education.ExploreEducationStatistics.Common.Model;
-using GovUk.Education.ExploreEducationStatistics.Common.Services;
-using GovUk.Education.ExploreEducationStatistics.Common.Services.Interfaces;
 using GovUk.Education.ExploreEducationStatistics.Common.Services.Interfaces.Security;
 using GovUk.Education.ExploreEducationStatistics.Common.Tests.Utils;
 using GovUk.Education.ExploreEducationStatistics.Content.Model;
 using GovUk.Education.ExploreEducationStatistics.Content.Model.Database;
-using GovUk.Education.ExploreEducationStatistics.Data.Processor.Model;
-using Microsoft.Azure.Cosmos.Table;
-using Microsoft.Extensions.Logging;
 using Moq;
-using Newtonsoft.Json;
 using Xunit;
-using static GovUk.Education.ExploreEducationStatistics.Common.TableStorageTableNames;
-using Publication = GovUk.Education.ExploreEducationStatistics.Data.Processor.Model.Publication;
-using Release = GovUk.Education.ExploreEducationStatistics.Data.Processor.Model.Release;
-using Theme = GovUk.Education.ExploreEducationStatistics.Data.Processor.Model.Theme;
-using Topic = GovUk.Education.ExploreEducationStatistics.Data.Processor.Model.Topic;
+using static GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services.DbUtils;
+using static GovUk.Education.ExploreEducationStatistics.Content.Model.ImportStatus;
+using static GovUk.Education.ExploreEducationStatistics.Common.Model.TimeIdentifier;
 
 namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
 {
@@ -28,273 +19,9 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
         [Fact]
         public async Task GetIncompleteImports_NoResults()
         {
-            var tableStorageService = new Mock<ITableStorageService>(MockBehavior.Strict);
-            tableStorageService
-                .Setup(storageService =>
-                    storageService.ExecuteQueryAsync(DatafileImportsTableName,
-                        It.IsAny<TableQuery<DatafileImport>>()))
-                .ReturnsAsync(new List<DatafileImport>());
-            var importStatusBauService = BuildImportStatusBauService(tableStorageService.Object);
-            var result = await importStatusBauService.GetAllIncompleteImports();
-            Assert.True(result.IsRight);
-            Assert.Empty(result.Right);
-        }
-
-        [Fact]
-        public async Task GetIncompleteImports_TwoResults()
-        {
-            var testTheme = new Theme
+            await using (var contentDbContext = InMemoryApplicationDbContext())
             {
-                Id = Guid.NewGuid(),
-                Title = "Test theme",
-                Slug = "test-theme"
-            };
-
-            var testTopic = new Topic
-            {
-                Id = Guid.NewGuid(),
-                Title = "Test topic",
-                Slug = "test-topic",
-                Theme = testTheme
-            };
-
-            var testPublication = new Publication
-            {
-                Id = Guid.NewGuid(),
-                Title = "Test Publication",
-                Slug = "test-publication",
-                Topic = testTopic
-            };
-
-            var testRelease = new Release
-            {
-                Id = Guid.NewGuid(),
-                Slug = "test-release",
-                Publication = testPublication,
-                TimeIdentifier = TimeIdentifier.CalendarYear,
-                Year = 2000
-            };
-
-            var testImportMessage1 = new ImportMessage
-            {
-                SubjectId = Guid.NewGuid(),
-                DataFileName = "one.csv",
-                MetaFileName = "one.meta.csv",
-                Release = testRelease,
-                NumBatches = 0,
-                BatchNo = 0,
-                RowsPerBatch = 0,
-                Seeding = false,
-                TotalRows = 0,
-                ArchiveFileName = "",
-            };
-
-            var testImportMessage2 = new ImportMessage
-            {
-                SubjectId = Guid.NewGuid(),
-                DataFileName = "two.csv",
-                MetaFileName = "two.meta.csv",
-                Release = testRelease,
-                NumBatches = 0,
-                BatchNo = 0,
-                RowsPerBatch = 0,
-                Seeding = false,
-                TotalRows = 0,
-                ArchiveFileName = "",
-            };
-
-            var testDatafileImport1 = new DatafileImport
-            {
-                PartitionKey = testRelease.Id.ToString(),
-                RowKey = testImportMessage1.DataFileName,
-                NumberOfRows = testImportMessage1.TotalRows,
-                Message = JsonConvert.SerializeObject(testImportMessage1),
-                Status = IStatus.FAILED,
-                Errors = "",
-                PercentageComplete = 99,
-            };
-
-            var testDatafileImport2 = new DatafileImport
-            {
-                PartitionKey = testRelease.Id.ToString(),
-                RowKey = testImportMessage2.DataFileName,
-                NumberOfRows = testImportMessage2.TotalRows,
-                Message = JsonConvert.SerializeObject(testImportMessage2),
-                Status = IStatus.STAGE_1,
-                Errors = "Test error!",
-                PercentageComplete = 54,
-            };
-
-            var queryResults = new List<DatafileImport>()
-            {
-                testDatafileImport1,
-                testDatafileImport2
-            };
-
-            var contextId = Guid.NewGuid().ToString();
-            await using (var contentDbContext = DbUtils.InMemoryApplicationDbContext(contextId))
-            {
-                await contentDbContext.AddAsync(new Content.Model.Release
-                {
-                    Id = testRelease.Id,
-                    TimePeriodCoverage = TimeIdentifier.CalendarYear,
-                    PublicationId = testPublication.Id,
-                    Publication = new Content.Model.Publication
-                    {
-                        Id = testPublication.Id,
-                        Title = testPublication.Title,
-                    },
-                    ReleaseName = testRelease.Year.ToString(),
-                });
-                await contentDbContext.AddAsync(new File
-                {
-                    ReleaseId = testRelease.Id,
-                    SubjectId = testImportMessage1.SubjectId,
-                    Filename = testDatafileImport1.RowKey,
-                    Type = FileType.Data
-                });
-                await contentDbContext.AddAsync(new File
-                {
-                    ReleaseId = testRelease.Id,
-                    SubjectId = testImportMessage2.SubjectId,
-                    Filename = testDatafileImport2.RowKey,
-                    Type = FileType.Data,
-                });
-                await contentDbContext.SaveChangesAsync();
-            }
-
-            await using (var contentDbContext = DbUtils.InMemoryApplicationDbContext(contextId))
-            {
-                var tableStorageService = new Mock<ITableStorageService>(MockBehavior.Strict);
-                tableStorageService
-                    .Setup(storageService =>
-                        storageService.ExecuteQueryAsync(DatafileImportsTableName,
-                            It.IsAny<TableQuery<DatafileImport>>()))
-                    .ReturnsAsync(queryResults);
-                var importStatusBauService =
-                    BuildImportStatusBauService(tableStorageService.Object, contentDbContext: contentDbContext);
-
-                var result = await importStatusBauService.GetAllIncompleteImports();
-                Assert.True(result.IsRight);
-                Assert.Equal(2, result.Right.Count);
-
-                var result1 = result.Right.Find(r => r.SubjectId == testImportMessage1.SubjectId);
-                Assert.NotNull(result1);
-                Assert.Equal(testPublication.Id, result1.PublicationId);
-                Assert.Equal(testPublication.Title, result1.PublicationTitle);
-                Assert.Equal(testRelease.Id, result1.ReleaseId);
-                Assert.Equal("Calendar Year 2000", result1.ReleaseTitle);
-                Assert.Equal(testDatafileImport1.RowKey, result1.DataFileName);
-                Assert.Equal(testDatafileImport1.NumberOfRows, result1.NumberOfRows);
-                Assert.Equal(testDatafileImport1.Status, result1.Status);
-                Assert.Equal(testDatafileImport1.PercentageComplete, result1.StagePercentageComplete);
-
-                var result2 = result.Right.Find(r => r.SubjectId == testImportMessage2.SubjectId);
-                Assert.NotNull(result2);
-                Assert.Equal(testPublication.Id, result2.PublicationId);
-                Assert.Equal(testPublication.Title, result2.PublicationTitle);
-                Assert.Equal(testRelease.Id, result2.ReleaseId);
-                Assert.Equal($"Calendar Year 2000", result2.ReleaseTitle);
-                Assert.Equal(testDatafileImport2.RowKey, result2.DataFileName);
-                Assert.Equal(testDatafileImport2.NumberOfRows, result2.NumberOfRows);
-                Assert.Equal(testDatafileImport2.Status, result2.Status);
-                Assert.Equal(testDatafileImport2.PercentageComplete, result2.StagePercentageComplete);
-            }
-        }
-
-        [Fact]
-        public async Task GetIncompleteImports_NoReleaseFileReferencesTableRow()
-        {
-            var testTheme = new Theme
-            {
-                Id = Guid.NewGuid(),
-                Title = "Test theme",
-                Slug = "test-theme"
-            };
-
-            var testTopic = new Topic
-            {
-                Id = Guid.NewGuid(),
-                Title = "Test topic",
-                Slug = "test-topic",
-                Theme = testTheme
-            };
-
-            var testPublication = new Publication
-            {
-                Id = Guid.NewGuid(),
-                Title = "Test Publication",
-                Slug = "test-publication",
-                Topic = testTopic
-            };
-
-            var testRelease = new Release
-            {
-                Id = Guid.NewGuid(),
-                Slug = "test-release",
-                Publication = testPublication,
-                TimeIdentifier = TimeIdentifier.CalendarYear,
-                Year = 2000
-            };
-
-            var testImportMessage1 = new ImportMessage
-            {
-                SubjectId = Guid.NewGuid(),
-                DataFileName = "one.csv",
-                MetaFileName = "one.meta.csv",
-                Release = testRelease,
-                NumBatches = 0,
-                BatchNo = 0,
-                RowsPerBatch = 0,
-                Seeding = false,
-                TotalRows = 0,
-                ArchiveFileName = "",
-            };
-
-            var testDatafileImport1 = new DatafileImport
-            {
-                PartitionKey = testRelease.Id.ToString(),
-                RowKey = testImportMessage1.DataFileName,
-                NumberOfRows = testImportMessage1.TotalRows,
-                Message = JsonConvert.SerializeObject(testImportMessage1),
-                Status = IStatus.FAILED,
-                Errors = "",
-                PercentageComplete = 99,
-            };
-
-            var queryResults = new List<DatafileImport>()
-            {
-                testDatafileImport1,
-            };
-
-            var contextId = Guid.NewGuid().ToString();
-            await using (var contentDbContext = DbUtils.InMemoryApplicationDbContext(contextId))
-            {
-                await contentDbContext.AddAsync(new Content.Model.Release
-                {
-                    Id = testRelease.Id,
-                    TimePeriodCoverage = TimeIdentifier.CalendarYear,
-                    PublicationId = testPublication.Id,
-                    Publication = new Content.Model.Publication
-                    {
-                        Id = testPublication.Id,
-                        Title = testPublication.Title,
-                    },
-                    ReleaseName = testRelease.Year.ToString(),
-                });
-                await contentDbContext.SaveChangesAsync();
-            }
-
-            await using (var contentDbContext = DbUtils.InMemoryApplicationDbContext(contextId))
-            {
-                var tableStorageService = new Mock<ITableStorageService>(MockBehavior.Strict);
-                tableStorageService
-                    .Setup(storageService =>
-                        storageService.ExecuteQueryAsync(DatafileImportsTableName,
-                            It.IsAny<TableQuery<DatafileImport>>()))
-                    .ReturnsAsync(queryResults);
-                var importStatusBauService =
-                    BuildImportStatusBauService(tableStorageService.Object, contentDbContext: contentDbContext);
+                var importStatusBauService = BuildImportStatusBauService(contentDbContext: contentDbContext);
 
                 var result = await importStatusBauService.GetAllIncompleteImports();
                 Assert.True(result.IsRight);
@@ -302,17 +29,139 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
             }
         }
 
+        [Fact]
+        public async Task GetIncompleteImports()
+        {
+            var release = new Release
+            {
+                Slug = "test-release",
+                Publication = new Publication
+                {
+                    Title = "Test Publication"
+                },
+                TimePeriodCoverage = CalendarYear,
+                ReleaseName = "2000"
+            };
+
+            var import1 = new Import
+            {
+                File = new File
+                {
+                    Release = release,
+                    Filename = "file1.csv",
+                    Type = FileType.Data
+                },
+                NumBatches = 1,
+                Rows = 100,
+                StagePercentageComplete = 99,
+                Status = FAILED,
+                SubjectId = Guid.NewGuid(),
+                Created = DateTime.UtcNow.AddHours(-1)
+            };
+
+            var import2 = new Import
+            {
+                File = new File
+                {
+                    Release = release,
+                    Filename = "file2.csv",
+                    Type = FileType.Data
+                },
+                NumBatches = 2,
+                Rows = 200,
+                StagePercentageComplete = 54,
+                Status = STAGE_1,
+                SubjectId = Guid.NewGuid(),
+                Created = DateTime.UtcNow
+            };
+
+            var import3 = new Import
+            {
+                File = new File
+                {
+                    Release = release,
+                    Filename = "file3.csv",
+                    Type = FileType.Data
+                },
+                NumBatches = 3,
+                Rows = 300,
+                StagePercentageComplete = 76,
+                Status = STAGE_4,
+                SubjectId = Guid.NewGuid(),
+                Created = DateTime.UtcNow.AddDays(-1)
+            };
+
+            var contextId = Guid.NewGuid().ToString();
+            await using (var contentDbContext = InMemoryApplicationDbContext(contextId))
+            {
+                await contentDbContext.Releases.AddAsync(release);
+                await contentDbContext.Imports.AddRangeAsync(import1, import2, import3);
+                await contentDbContext.SaveChangesAsync();
+            }
+
+            await using (var contentDbContext = InMemoryApplicationDbContext(contextId))
+            {
+                var importStatusBauService = BuildImportStatusBauService(contentDbContext: contentDbContext);
+
+                var result = await importStatusBauService.GetAllIncompleteImports();
+
+                Assert.True(result.IsRight);
+
+                var imports = result.Right;
+                Assert.Equal(3, imports.Count);
+
+                // Assert they are in descending timestamp order - import2, import1, import3
+
+                Assert.Equal(import2.File.Id, imports[0].FileId);
+                Assert.Null(imports[0].SubjectTitle);
+                Assert.Equal(import2.SubjectId, imports[0].SubjectId);
+                Assert.Equal(release.Publication.Id, imports[0].PublicationId);
+                Assert.Equal(release.Publication.Title, imports[0].PublicationTitle);
+                Assert.Equal(release.Id, imports[0].ReleaseId);
+                Assert.Equal(release.Title, imports[0].ReleaseTitle);
+                Assert.Equal(import2.File.Filename, imports[0].DataFileName);
+                Assert.Equal(import2.Rows, imports[0].Rows);
+                Assert.Equal(import2.NumBatches, imports[0].Batches);
+                Assert.Equal(import2.Status, imports[0].Status);
+                Assert.Equal(import2.StagePercentageComplete, imports[0].StagePercentageComplete);
+                Assert.Equal(import2.PercentageComplete(), imports[0].PercentageComplete);
+
+                Assert.Equal(import1.File.Id, imports[1].FileId);
+                Assert.Null(imports[1].SubjectTitle);
+                Assert.Equal(import1.SubjectId, imports[1].SubjectId);
+                Assert.Equal(release.Publication.Id, imports[1].PublicationId);
+                Assert.Equal(release.Publication.Title, imports[1].PublicationTitle);
+                Assert.Equal(release.Id, imports[1].ReleaseId);
+                Assert.Equal(release.Title, imports[1].ReleaseTitle);
+                Assert.Equal(import1.File.Filename, imports[1].DataFileName);
+                Assert.Equal(import1.Rows, imports[1].Rows);
+                Assert.Equal(import1.NumBatches, imports[1].Batches);
+                Assert.Equal(import1.Status, imports[1].Status);
+                Assert.Equal(import1.StagePercentageComplete, imports[1].StagePercentageComplete);
+                Assert.Equal(import1.PercentageComplete(), imports[1].PercentageComplete);
+
+                Assert.Equal(import3.File.Id, imports[2].FileId);
+                Assert.Null(imports[2].SubjectTitle);
+                Assert.Equal(import3.SubjectId, imports[2].SubjectId);
+                Assert.Equal(release.Publication.Id, imports[2].PublicationId);
+                Assert.Equal(release.Publication.Title, imports[2].PublicationTitle);
+                Assert.Equal(release.Id, imports[2].ReleaseId);
+                Assert.Equal(release.Title, imports[2].ReleaseTitle);
+                Assert.Equal(import3.File.Filename, imports[2].DataFileName);
+                Assert.Equal(import3.Rows, imports[2].Rows);
+                Assert.Equal(import3.NumBatches, imports[2].Batches);
+                Assert.Equal(import3.StagePercentageComplete, imports[2].StagePercentageComplete);
+                Assert.Equal(import3.PercentageComplete(), imports[2].PercentageComplete);
+            }
+        }
+
         internal static ImportStatusBauService BuildImportStatusBauService(
-            ITableStorageService tableStorageService,
             IUserService userService = null,
-            ContentDbContext contentDbContext = null,
-            ILogger<ImportStatusBauService> logger = null)
+            ContentDbContext contentDbContext = null)
         {
             return new ImportStatusBauService(
-                tableStorageService,
                 userService ?? MockUtils.AlwaysTrueUserService().Object,
-                contentDbContext ?? new Mock<ContentDbContext>().Object,
-                logger ?? new Mock<ILogger<ImportStatusBauService>>().Object
+                contentDbContext ?? new Mock<ContentDbContext>().Object
             );
         }
     }

@@ -1,6 +1,4 @@
-using System;
 using System.Threading.Tasks;
-using GovUk.Education.ExploreEducationStatistics.Admin.Models;
 using GovUk.Education.ExploreEducationStatistics.Admin.Security;
 using GovUk.Education.ExploreEducationStatistics.Common.Model;
 using GovUk.Education.ExploreEducationStatistics.Common.Services.Interfaces.Security;
@@ -237,10 +235,10 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Services.Interfaces.S
             return userService.CheckPolicy(comment, SecurityPolicies.CanUpdateSpecificComment);
         }
 
-        public static Task<Either<ActionResult, ReleaseFileImportInfo>> CheckCanCancelFileImport(
-            this IUserService userService, ReleaseFileImportInfo import)
+        public static Task<Either<ActionResult, File>> CheckCanCancelFileImport(
+            this IUserService userService, File file)
         {
-            return userService.CheckPolicy(import, SecurityPolicies.CanCancelOngoingImports);
+            return userService.CheckPolicy(file, SecurityPolicies.CanCancelOngoingImports);
         }
 
         public static Task<Either<ActionResult, Publication>> CheckCanCreateLegacyRelease(
@@ -267,16 +265,11 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Services.Interfaces.S
             return userService.CheckPolicy(legacyRelease, SecurityPolicies.CanDeleteLegacyRelease);
         }
 
-        public static async Task<DataFilePermissions> GetDataFilePermissions(this IUserService userService,
-            Guid releaseId, string dataFileName)
+        public static async Task<DataFilePermissions> GetDataFilePermissions(this IUserService userService, File file)
         {
             return new DataFilePermissions
             {
-                CanCancelImport = (await userService.CheckCanCancelFileImport(new ReleaseFileImportInfo
-                {
-                    ReleaseId = releaseId,
-                    DataFileName = dataFileName
-                })).IsRight
+                CanCancelImport = (await userService.CheckCanCancelFileImport(file)).IsRight
             };
         }
     }

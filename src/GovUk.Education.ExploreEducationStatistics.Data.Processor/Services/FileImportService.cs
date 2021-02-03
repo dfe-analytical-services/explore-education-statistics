@@ -1,75 +1,68 @@
 using System;
-using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
-using GovUk.Education.ExploreEducationStatistics.Common.Extensions;
-using GovUk.Education.ExploreEducationStatistics.Common.Model;
-using GovUk.Education.ExploreEducationStatistics.Common.Services;
 using GovUk.Education.ExploreEducationStatistics.Common.Services.Interfaces;
-using GovUk.Education.ExploreEducationStatistics.Data.Importer.Services.Interfaces;
-using GovUk.Education.ExploreEducationStatistics.Data.Model;
+using GovUk.Education.ExploreEducationStatistics.Content.Model;
+using GovUk.Education.ExploreEducationStatistics.Content.Model.Extensions;
 using GovUk.Education.ExploreEducationStatistics.Data.Model.Database;
 using GovUk.Education.ExploreEducationStatistics.Data.Processor.Model;
 using GovUk.Education.ExploreEducationStatistics.Data.Processor.Services.Interfaces;
 using GovUk.Education.ExploreEducationStatistics.Data.Processor.Utils;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Logging;
-using static GovUk.Education.ExploreEducationStatistics.Common.Services.IStatus;
+using static GovUk.Education.ExploreEducationStatistics.Common.BlobContainerNames;
+using static GovUk.Education.ExploreEducationStatistics.Content.Model.ImportStatus;
 
 namespace GovUk.Education.ExploreEducationStatistics.Data.Processor.Services
 {
     public class FileImportService : IFileImportService
     {
-        private readonly IBatchService _batchService;
-        private readonly IFileStorageService _fileStorageService;
-        private readonly IImporterService _importerService;
         private readonly ILogger<IFileImportService> _logger;
-        private readonly IImportStatusService _importStatusService;
+        private readonly IBatchService _batchService;
+        private readonly IBlobStorageService _blobStorageService;
+        private readonly IImportService _importService;
+        private readonly IImporterService _importerService;
 
-        public FileImportService(
-            IFileStorageService fileStorageService,
-            IImporterService importerService,
+        public FileImportService(ILogger<IFileImportService> logger,
             IBatchService batchService,
-            ILogger<IFileImportService> logger,
-            IImportStatusService importStatusService)
+            IBlobStorageService blobStorageService,
+            IImportService importService,
+            IImporterService importerService)
         {
-            _fileStorageService = fileStorageService;
-            _importerService = importerService;
-            _batchService = batchService;
             _logger = logger;
-            _importStatusService = importStatusService;
+            _batchService = batchService;
+            _blobStorageService = blobStorageService;
+            _importService = importService;
+            _importerService = importerService;
         }
 
         public async Task ImportObservations(ImportObservationsMessage message, StatisticsDbContext context)
         {
-            var releaseId = message.ReleaseId;
+            var import = await _importService.GetImport(message.Id);
 
-            var status = await _importStatusService.GetImportStatus(releaseId, message.DataFileName);
-
-            if (status.IsFinished())
+            if (import.Status.IsFinished())
             {
-                _logger.LogInformation($"Import for {message.DataFileName} already finished with state " +
-                                       $"{status.Status} - ignoring Observations in file {message.ObservationsFilePath}");
-                return;
-            }
-            
-            if (status.Status == CANCELLING)
-            {
-                _logger.LogInformation($"Import for {message.DataFileName} is CANCELLING " +
-                                       $"{status.Status} - ignoring Observations in file {message.ObservationsFilePath} " +
-                                       $"and marking import as CANCELLED");
-
-                await _importStatusService.UpdateStatus(releaseId, message.DataFileName, CANCELLED, 100);
+                _logger.LogInformation($"Import for {import.File.Filename} already finished with state " +
+                                       $"{import.Status} - ignoring Observations in file {message.ObservationsFilePath}");
                 return;
             }
 
-            var subjectData = await _fileStorageService.GetSubjectData(message.ReleaseId, message.ObservationsFilePath);
-            var releaseSubject = GetReleaseSubjectLink(message.ReleaseId, message.SubjectId, context);
+            if (import.Status == CANCELLING)
+            {
+                _logger.LogInformation($"Import for {import.File.Filename} is CANCELLING " +
+                                       $"{import.Status} - ignoring Observations in file {message.ObservationsFilePath} " +
+                                       "and marking import as CANCELLED");
 
-            await using var datafileStream = await _fileStorageService.StreamBlob(subjectData.DataBlob);
+                await _importService.UpdateStatus(message.Id, CANCELLED, 100);
+                return;
+            }
+
+            var subject = await context.Subject.FindAsync(import.SubjectId);
+
+            var datafileStream = await _blobStorageService.StreamBlob(PrivateFilesContainerName, message.ObservationsFilePath);
             var dataFileTable = DataTableUtils.CreateFromStream(datafileStream);
 
-            await using var metaFileStream = await _fileStorageService.StreamBlob(subjectData.MetaBlob);
+            var metaFileStream = await _blobStorageService.StreamBlob(PrivateFilesContainerName, import.MetaFile.Path());
             var metaFileTable = DataTableUtils.CreateFromStream(metaFileStream);
 
             await context.Database.CreateExecutionStrategy().Execute(async () =>
@@ -79,123 +72,96 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Processor.Services
                 await _importerService.ImportObservations(
                     dataFileTable.Columns,
                     dataFileTable.Rows,
-                    releaseSubject.Subject,
-                    _importerService.GetMeta(metaFileTable, releaseSubject.Subject, context),
+                    subject,
+                    _importerService.GetMeta(metaFileTable, subject, context),
                     message.BatchNo,
-                    message.RowsPerBatch,
+                    import.RowsPerBatch,
                     context
                 );
 
                 await transaction.CommitAsync();
                 await context.Database.CloseConnectionAsync();
             });
-            
-            if (message.NumBatches > 1)
+
+            if (import.NumBatches > 1)
             {
-                await _fileStorageService.DeleteBlobByPath(message.ObservationsFilePath);
+                await _blobStorageService.DeleteBlob(PrivateFilesContainerName, message.ObservationsFilePath);
             }
 
-            await CheckComplete(releaseId, message, context);
+            await CheckComplete(message, context);
         }
 
-        public async Task ImportFiltersAndLocations(ImportMessage message, StatisticsDbContext context)
+        public async Task ImportFiltersAndLocations(Guid importId, StatisticsDbContext context)
         {
-            var dataFileBlobPath = FileStoragePathUtils.AdminReleasePath(message.Release.Id, FileType.Data, message.DataFileName);
+            var import = await _importService.GetImport(importId);
 
-            var subjectData = await _fileStorageService.GetSubjectData(message.Release.Id, dataFileBlobPath);
-            var releaseSubject = GetReleaseSubjectLink(message.Release.Id, message.SubjectId, context);
+            var subject = await context.Subject.FindAsync(import.SubjectId);
 
-            await using var dataFileStream = await _fileStorageService.StreamBlob(subjectData.DataBlob);
+            var dataFileStream = await _blobStorageService.StreamBlob(PrivateFilesContainerName, import.File.Path());
             var dataFileTable = DataTableUtils.CreateFromStream(dataFileStream);
 
-            await using var metaFileStream = await _fileStorageService.StreamBlob(subjectData.MetaBlob);
+            var metaFileStream = await _blobStorageService.StreamBlob(PrivateFilesContainerName,import.MetaFile.Path());
             var metaFileTable = DataTableUtils.CreateFromStream(metaFileStream);
 
             await _importerService.ImportFiltersAndLocations(
+                import,
                 dataFileTable.Columns,
                 dataFileTable.Rows,
-                _importerService.GetMeta(metaFileTable, releaseSubject.Subject, context),
-                context,
-                message.Release.Id,
-                message.DataFileName);
+                _importerService.GetMeta(metaFileTable, subject, context),
+                context);
         }
 
-        private static ReleaseSubject GetReleaseSubjectLink(Guid releaseId, Guid subjectId, StatisticsDbContext context)
+        public async Task CheckComplete(ImportObservationsMessage message, StatisticsDbContext context)
         {
-            return context
-                .ReleaseSubject
-                .Include(r => r.Subject)
-                .Include(r => r.Release)
-                .ThenInclude(r => r.Publication)
-                .ThenInclude(p => p.Topic)
-                .ThenInclude(t => t.Theme)
-                .FirstOrDefault(r => r.Subject.Id == subjectId && r.ReleaseId == releaseId);
-        }
-        
-        public async Task CheckComplete(Guid releaseId, ImportObservationsMessage message, StatisticsDbContext context)
-        {
-            var import = await _importStatusService.GetImportStatus(releaseId, message.DataFileName);
+            var import = await _importService.GetImport(message.Id);
 
-            if (import.IsFinished())
+            if (import.Status.IsFinished())
             {
-                _logger.LogInformation($"Import for {message.DataFileName} is already finished in " +
+                _logger.LogInformation($"Import for {import.File.Filename} is already finished in " +
                                        $"state {import.Status} - not attempting to mark as completed or failed");
                 return;
             }
-            
-            if (import.IsAborting())
+
+            if (import.Status.IsAborting())
             {
-                _logger.LogInformation($"Import for {message.DataFileName} is trying to abort in " +
+                _logger.LogInformation($"Import for {import.File.Filename} is trying to abort in " +
                                        $"state {import.Status} - not attempting to mark as completed or failed, but " +
-                                       $"instead marking as {import.GetFinishingStateOfAbortProcess()}, the final " +
+                                       $"instead marking as {import.Status.GetFinishingStateOfAbortProcess()}, the final " +
                                        $"state of the aborting process");
-                
-                await _importStatusService.UpdateStatus(releaseId,
-                    message.DataFileName,
-                    import.GetFinishingStateOfAbortProcess(),
-                    100);
+
+                await _importService.UpdateStatus(message.Id, import.Status.GetFinishingStateOfAbortProcess(), 100);
                 return;
             }
 
-            if (message.NumBatches == 1 || 
-                await _fileStorageService.GetNumBatchesRemaining(releaseId, message.DataFileName) == 0)
+            if (import.NumBatches == 1 || await _batchService.GetNumBatchesRemaining(import.FileId) == 0)
             {
-                var observationCount = context.Observation.Count(o => o.SubjectId.Equals(message.SubjectId));
+                var observationCount = context.Observation.Count(o => o.SubjectId.Equals(import.SubjectId));
 
-                if (!observationCount.Equals(message.TotalRows))
+                if (!observationCount.Equals(import.TotalRows))
                 {
-                    await _batchService.FailImport(releaseId, message.DataFileName,
-                        new List<ValidationError>
-                        {
-                            new ValidationError(
-                                $"Number of observations inserted ({observationCount}) " +
-                                $"does not equal that expected ({message.TotalRows}) : Please delete & retry"
-                            )
-                        }.AsEnumerable());
+                    await _importService.FailImport(message.Id,
+                        $"Number of observations inserted ({observationCount}) " +
+                                $"does not equal that expected ({import.TotalRows}) : Please delete & retry");
                 }
                 else
                 {
-                    if (import.Errors.IsNullOrEmpty())
+                    if (import.Errors.Count == 0)
                     {
-                        await _importStatusService.UpdateStatus(releaseId, message.DataFileName, COMPLETE, 100);
+                        await _importService.UpdateStatus(message.Id, COMPLETE, 100);
                     }
                     else
                     {
-                        await _importStatusService.UpdateStatus(releaseId, message.DataFileName, FAILED, 100);
+                        await _importService.UpdateStatus(message.Id, FAILED, 100);
                     }
                 }
             }
             else
             {
-                var numBatchesRemaining =
-                    await _fileStorageService.GetNumBatchesRemaining(releaseId, message.DataFileName);
-                
-                var percentageComplete = (double) (message.NumBatches - numBatchesRemaining) / message.NumBatches * 100;
+                var numBatchesRemaining = await _batchService.GetNumBatchesRemaining(import.FileId);
 
-                await _importStatusService.UpdateStatus(releaseId,
-                    message.DataFileName,
-                    STAGE_4,
-                    percentageComplete);
+                var percentageComplete = (double) (import.NumBatches - numBatchesRemaining) / import.NumBatches * 100;
+
+                await _importService.UpdateStatus(message.Id, STAGE_4, percentageComplete);
             }
         }
     }

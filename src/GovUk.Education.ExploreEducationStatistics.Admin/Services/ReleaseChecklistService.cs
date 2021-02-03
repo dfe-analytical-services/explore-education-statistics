@@ -6,11 +6,8 @@ using GovUk.Education.ExploreEducationStatistics.Admin.Services.Interfaces;
 using GovUk.Education.ExploreEducationStatistics.Admin.Services.Interfaces.Security;
 using GovUk.Education.ExploreEducationStatistics.Admin.Validators;
 using GovUk.Education.ExploreEducationStatistics.Admin.ViewModels;
-using GovUk.Education.ExploreEducationStatistics.Common;
 using GovUk.Education.ExploreEducationStatistics.Common.Extensions;
 using GovUk.Education.ExploreEducationStatistics.Common.Model;
-using GovUk.Education.ExploreEducationStatistics.Common.Services;
-using GovUk.Education.ExploreEducationStatistics.Common.Services.Interfaces;
 using GovUk.Education.ExploreEducationStatistics.Common.Services.Interfaces.Security;
 using GovUk.Education.ExploreEducationStatistics.Common.Utils;
 using GovUk.Education.ExploreEducationStatistics.Content.Model;
@@ -18,7 +15,6 @@ using GovUk.Education.ExploreEducationStatistics.Content.Model.Database;
 using GovUk.Education.ExploreEducationStatistics.Data.Model;
 using GovUk.Education.ExploreEducationStatistics.Data.Model.Services.Interfaces;
 using Microsoft.AspNetCore.Mvc;
-using Microsoft.Azure.Cosmos.Table;
 using Microsoft.EntityFrameworkCore;
 using Release = GovUk.Education.ExploreEducationStatistics.Content.Model.Release;
 
@@ -27,7 +23,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Services
     public class ReleaseChecklistService : IReleaseChecklistService
     {
         private readonly IPersistenceHelper<ContentDbContext> _persistenceHelper;
-        private readonly ITableStorageService _tableStorageService;
+        private readonly IImportService _importService;
         private readonly IUserService _userService;
         private readonly IMetaGuidanceService _metaGuidanceService;
         private readonly IFileRepository _fileRepository;
@@ -36,7 +32,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Services
 
         public ReleaseChecklistService(
             IPersistenceHelper<ContentDbContext> persistenceHelper,
-            ITableStorageService tableStorageService,
+            IImportService importService,
             IUserService userService,
             IMetaGuidanceService metaGuidanceService,
             IFileRepository fileRepository,
@@ -44,7 +40,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Services
             IDataBlockService dataBlockService)
         {
             _persistenceHelper = persistenceHelper;
-            _tableStorageService = tableStorageService;
+            _importService = importService;
             _userService = userService;
             _metaGuidanceService = metaGuidanceService;
             _fileRepository = fileRepository;
@@ -75,7 +71,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Services
         {
             var errors = new List<ReleaseChecklistIssue>();
 
-            if (await HasDataFilesUploading(release))
+            if (await _importService.HasIncompleteImports(release.Id))
             {
                 errors.Add(new ReleaseChecklistIssue(ValidationErrorMessages.DataFileImportsMustBeCompleted));
             }
@@ -106,21 +102,6 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Services
             }
 
             return errors;
-        }
-
-        private async Task<bool> HasDataFilesUploading(Release release)
-        {
-            var filters = TableQuery.CombineFilters(
-                TableQuery.GenerateFilterCondition("PartitionKey", QueryComparisons.Equal, release.Id.ToString()),
-                TableOperators.And,
-                TableQuery.GenerateFilterCondition("Status", QueryComparisons.NotEqual, IStatus.COMPLETE.ToString())
-            );
-
-            var query = new TableQuery<DatafileImport>().Where(filters);
-            var cloudTable = await _tableStorageService.GetTableAsync(TableStorageTableNames.DatafileImportsTableName);
-            var results = await cloudTable.ExecuteQuerySegmentedAsync(query, null);
-
-            return results.Results.Any();
         }
 
         public async Task<List<ReleaseChecklistIssue>> GetWarnings(Release release)

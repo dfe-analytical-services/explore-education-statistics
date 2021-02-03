@@ -10,5 +10,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Common.Services.Interfaces
         Task AddMessageAsync(string queueName, object value);
 
         Task AddMessages(string queueName, IEnumerable<object> values);
+
+        Task Clear(string queueName);
     }
 }

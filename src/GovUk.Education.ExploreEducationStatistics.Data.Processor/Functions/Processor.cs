@@ -1,103 +1,94 @@
 using System;
-using System.Collections.Generic;
 using System.Threading.Tasks;
-using GovUk.Education.ExploreEducationStatistics.Common.Services;
-using GovUk.Education.ExploreEducationStatistics.Common.Services.Interfaces;
-using GovUk.Education.ExploreEducationStatistics.Data.Importer.Utils;
+using GovUk.Education.ExploreEducationStatistics.Content.Model;
 using GovUk.Education.ExploreEducationStatistics.Data.Processor.Model;
 using GovUk.Education.ExploreEducationStatistics.Data.Processor.Services.Interfaces;
+using GovUk.Education.ExploreEducationStatistics.Data.Processor.Utils;
 using Microsoft.Azure.WebJobs;
 using Microsoft.Data.SqlClient;
 using Microsoft.Extensions.Logging;
+using static GovUk.Education.ExploreEducationStatistics.Data.Processor.Model.ImporterQueues;
 
 namespace GovUk.Education.ExploreEducationStatistics.Data.Processor.Functions
 {
     // ReSharper disable once UnusedMember.Global
     public class Processor
     {
-        private readonly IBatchService _batchService;
         private readonly IFileImportService _fileImportService;
-        private readonly IImportStatusService _importStatusService;
+        private readonly IImportService _importService;
         private readonly IProcessorService _processorService;
         private readonly ILogger<Processor> _logger;
 
         public Processor(
             IFileImportService fileImportService,
-            IBatchService batchService,
-            IImportStatusService importStatusService,
+            IImportService importService,
             IProcessorService processorService,
             ILogger<Processor> logger
         )
         {
             _fileImportService = fileImportService;
-            _batchService = batchService;
-            _importStatusService = importStatusService;
+            _importService = importService;
             _processorService = processorService;
             _logger = logger;
         }
 
         [FunctionName("ProcessUploads")]
-        public async void ProcessUploads(
-            [QueueTrigger("imports-pending")] ImportMessage message,
+        public async Task ProcessUploads(
+            [QueueTrigger(ImportsPendingQueue)] ImportMessage message,
             ExecutionContext executionContext,
-            [Queue("imports-pending")] ICollector<ImportMessage> importStagesMessageQueue,
-            [Queue("imports-available")] ICollector<ImportObservationsMessage> importObservationsMessageQueue
+            [Queue(ImportsPendingQueue)] ICollector<ImportMessage> importStagesMessageQueue,
+            [Queue(ImportsAvailableQueue)] ICollector<ImportObservationsMessage> importObservationsMessageQueue
         )
         {
             try
             {
-                var status = await _importStatusService.GetImportStatus(message.Release.Id, message.DataFileName);
+                var import = await _importService.GetImport(message.Id);
 
                 _logger.LogInformation($"Processor Function processing import message for " +
-                                       $"{message.DataFileName} at stage {status.Status}");
+                                       $"{import.File.Filename} at stage {import.Status}");
 
-                switch (status.Status)
+                switch (import.Status)
                 {
-                    case IStatus.CANCELLING:
-                        _logger.LogInformation($"Import for {message.DataFileName} is in the process of being " +
-                                               $"cancelled, so not processing to the next import stage - marking as " +
-                                               $"CANCELLED");
-                        await _importStatusService.UpdateStatus(message.Release.Id, message.DataFileName, IStatus.CANCELLED,
-                            100);
+                    case ImportStatus.CANCELLING:
+                        _logger.LogInformation($"Import for {import.File.Filename} is in the process of being " +
+                                               "cancelled, so not processing to the next import stage - marking as " +
+                                               "CANCELLED");
+                        await _importService.UpdateStatus(import.Id, ImportStatus.CANCELLED, 100);
                         break;
-                    case IStatus.CANCELLED:
-                        _logger.LogInformation($"Import for {message.DataFileName} is cancelled, so not " +
-                                               $"processing any further");
+                    case ImportStatus.CANCELLED:
+                        _logger.LogInformation($"Import for {import.File.Filename} is cancelled, so not " +
+                                               "processing any further");
                         break;
-                    case IStatus.QUEUED:
-                    case IStatus.PROCESSING_ARCHIVE_FILE:
+                    case ImportStatus.QUEUED:
+                    case ImportStatus.PROCESSING_ARCHIVE_FILE:
                     {
-                        if (message.ArchiveFileName != "")
+                        if (import.ZipFile != null)
                         {
-                            _logger.LogInformation($"Unpacking archive for {message.DataFileName}");
-                            await _processorService.ProcessUnpackingArchive(message);
+                            _logger.LogInformation($"Unpacking archive for {import.ZipFile.Filename}");
+                            await _processorService.ProcessUnpackingArchive(import.Id);
                         }
 
-                        await _importStatusService.UpdateStatus(message.Release.Id, message.DataFileName,
-                            IStatus.STAGE_1);
+                        await _importService.UpdateStatus(import.Id, ImportStatus.STAGE_1, 0);
                         importStagesMessageQueue.Add(message);
                         break;
                     }
-                    case IStatus.STAGE_1:
-                        await _processorService.ProcessStage1(message, executionContext);
-                        await _importStatusService.UpdateStatus(message.Release.Id, message.DataFileName,
-                            IStatus.STAGE_2);
+                    case ImportStatus.STAGE_1:
+                        await _processorService.ProcessStage1(import.Id, executionContext);
+                        await _importService.UpdateStatus(import.Id, ImportStatus.STAGE_2, 0);
                         importStagesMessageQueue.Add(message);
                         break;
-                    case IStatus.STAGE_2:
-                        await _processorService.ProcessStage2(message);
-                        await _importStatusService.UpdateStatus(message.Release.Id, message.DataFileName,
-                            IStatus.STAGE_3);
+                    case ImportStatus.STAGE_2:
+                        await _processorService.ProcessStage2(import.Id);
+                        await _importService.UpdateStatus(import.Id, ImportStatus.STAGE_3, 0);
                         importStagesMessageQueue.Add(message);
                         break;
-                    case IStatus.STAGE_3:
-                        await _processorService.ProcessStage3(message);
-                        await _importStatusService.UpdateStatus(message.Release.Id, message.DataFileName,
-                            IStatus.STAGE_4);
+                    case ImportStatus.STAGE_3:
+                        await _processorService.ProcessStage3(import.Id);
+                        await _importService.UpdateStatus(import.Id, ImportStatus.STAGE_4, 0);
                         importStagesMessageQueue.Add(message);
                         break;
-                    case IStatus.STAGE_4:
-                        await _processorService.ProcessStage4Messages(message, importObservationsMessageQueue);
+                    case ImportStatus.STAGE_4:
+                        await _processorService.ProcessStage4Messages(import.Id, importObservationsMessageQueue);
                         break;
                 }
             }
@@ -105,22 +96,17 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Processor.Functions
             {
                 var ex = GetInnerException(e);
 
-                await _batchService.FailImport(message.Release.Id,
-                    message.DataFileName,
-                    new List<ValidationError>
-                    {
-                        new ValidationError(ex.Message)
-                    });
+                await _importService.FailImport(message.Id, ex.Message);
 
-                _logger.LogError(ex, $"{GetType().Name} function FAILED for : Datafile: " +
-                                     $"{message.DataFileName} : {ex.Message}");
+                _logger.LogError(ex, $"{GetType().Name} function FAILED for Import: " +
+                                     $"{message.Id} : {ex.Message}");
                 _logger.LogError(ex.StackTrace);
             }
         }
 
         [FunctionName("ImportObservations")]
         public async Task ImportObservations(
-            [QueueTrigger("imports-available")] ImportObservationsMessage message)
+            [QueueTrigger(ImportsAvailableQueue)] ImportObservationsMessage message)
         {
             try
             {
@@ -131,35 +117,25 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Processor.Functions
                 // If deadlock exception then throw & try up to 3 times
                 if (e is SqlException exception && exception.Number == 1205)
                 {
-                    _logger.LogInformation($"{GetType().Name} : Handling known exception when processing Datafile: " +
-                                           $"{message.DataFileName} : {exception.Message} : transaction will be retried");
+                    _logger.LogInformation($"{GetType().Name} : Handling known exception when processing Import: " +
+                                           $"{message.Id} : {exception.Message} : transaction will be retried");
                     throw;
                 }
 
                 var ex = GetInnerException(e);
 
-                await _batchService.FailImport(message.ReleaseId,
-                    message.DataFileName,
-                    new List<ValidationError>
-                    {
-                        new ValidationError(ex.Message)
-                    });
+                await _importService.FailImport(message.Id, ex.Message);
 
-                _logger.LogError(ex, $"{GetType().Name} function FAILED for : Datafile: " +
-                                     $"{message.DataFileName} : {ex.Message}");
+                _logger.LogError(ex, $"{GetType().Name} function FAILED for : Import: " +
+                                     $"{message.Id} : {ex.Message}");
             }
         }
 
         [FunctionName("CancelImports")]
-        public async void CancelImports(
-            [QueueTrigger("imports-cancelling")] CancelImportMessage message,
-            ExecutionContext executionContext
-        )
+        public async Task CancelImports([QueueTrigger(ImportsCancellingQueue)] CancelImportMessage message)
         {
-            var currentStatus = await _importStatusService.GetImportStatus(message.ReleaseId, message.DataFileName);
-            await _importStatusService.UpdateStatus(message.ReleaseId, message.DataFileName, IStatus.CANCELLING, currentStatus.PercentageComplete);
+            await _importService.UpdateStatus(message.Id, ImportStatus.CANCELLING, 0);
         }
-
 
         private static Exception GetInnerException(Exception ex)
         {

@@ -260,19 +260,15 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Controllers.Api
         {
             var mocks = Mocks();
 
-            var cancelRequest = new ReleaseFileImportInfo
-            {
-                ReleaseId = Guid.NewGuid(),
-                DataFileName = "my_data_file.csv"
-            };
+            var fileId = Guid.NewGuid();
 
             mocks.ImportService
-                .Setup(s => s.CancelImport(cancelRequest))
+                .Setup(s => s.CancelImport(_releaseId, fileId))
                 .ReturnsAsync(Unit.Instance);
 
             var controller = ReleasesControllerWithMocks(mocks);
 
-            var result = await controller.CancelFileImport(cancelRequest);
+            var result = await controller.CancelFileImport(_releaseId, fileId);
             Assert.IsType<AcceptedResult>(result);
 
             MockUtils.VerifyAllMocks(mocks.ImportService);
@@ -282,20 +278,16 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Controllers.Api
         public async void CancelFileImportButNotAllowed()
         {
             var mocks = Mocks();
-
-            var cancelRequest = new ReleaseFileImportInfo
-            {
-                ReleaseId = Guid.NewGuid(),
-                DataFileName = "my_data_file.csv"
-            };
+            
+            var fileId = Guid.NewGuid();
 
             mocks.ImportService
-                .Setup(s => s.CancelImport(cancelRequest))
+                .Setup(s => s.CancelImport(_releaseId, fileId))
                 .ReturnsAsync(new ForbidResult());
 
             var controller = ReleasesControllerWithMocks(mocks);
 
-            var result = await controller.CancelFileImport(cancelRequest);
+            var result = await controller.CancelFileImport(_releaseId, fileId);
             Assert.IsType<ForbidResult>(result);
 
             MockUtils.VerifyAllMocks(mocks.ImportService);

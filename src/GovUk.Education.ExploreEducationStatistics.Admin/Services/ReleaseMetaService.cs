@@ -1,12 +1,10 @@
 ﻿using System;
+using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
 using GovUk.Education.ExploreEducationStatistics.Admin.Services.Interfaces;
 using GovUk.Education.ExploreEducationStatistics.Admin.Services.Interfaces.Security;
-using GovUk.Education.ExploreEducationStatistics.Common.Extensions;
 using GovUk.Education.ExploreEducationStatistics.Common.Model;
-using GovUk.Education.ExploreEducationStatistics.Common.Services;
-using GovUk.Education.ExploreEducationStatistics.Common.Services.Interfaces;
 using GovUk.Education.ExploreEducationStatistics.Common.Services.Interfaces.Security;
 using GovUk.Education.ExploreEducationStatistics.Common.Utils;
 using GovUk.Education.ExploreEducationStatistics.Content.Model;
@@ -25,21 +23,21 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Services
         private readonly ContentDbContext _contentDbContext;
         private readonly IPersistenceHelper<ContentDbContext> _contentPersistenceHelper;
         private readonly StatisticsDbContext _statisticsDbContext;
+        private readonly IImportRepository _importRepository;
         private readonly IUserService _userService;
-        private readonly IImportStatusService _importStatusService;
 
         public ReleaseMetaService(
             ContentDbContext contentDbContext,
             IPersistenceHelper<ContentDbContext> contentPersistenceHelper,
             StatisticsDbContext statisticsDbContext,
-            IUserService userService,
-            IImportStatusService importStatusService)
+            IImportRepository importRepository,
+            IUserService userService)
         {
             _contentDbContext = contentDbContext;
             _contentPersistenceHelper = contentPersistenceHelper;
             _statisticsDbContext = statisticsDbContext;
+            _importRepository = importRepository;
             _userService = userService;
-            _importStatusService = importStatusService;
         }
 
         public async Task<Either<ActionResult, ReleaseSubjectsMetaViewModel>> GetSubjectsMeta(Guid releaseId)
@@ -47,39 +45,31 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Services
             return await _contentPersistenceHelper
                 .CheckEntityExists<Release>(releaseId)
                 .OnSuccess(_userService.CheckCanViewRelease)
-                .OnSuccess(release =>
+                .OnSuccess(async release =>
                 {
                     var files = _contentDbContext.ReleaseFiles
-                        .Include(file => file.File)
-                        .Where(file => file.ReleaseId == releaseId
-                                       && file.File.Type == FileType.Data)
-                        .Select(file => file.File);
-
-                    // Exclude files that are replacements in progress
-                    var filesExcludingReplacements = files
-                        .Where(file => !file.ReplacingId.HasValue)
+                        .Include(rf => rf.File)
+                        .Where(rf => rf.ReleaseId == releaseId
+                                       && rf.File.Type == FileType.Data
+                                       // Exclude files that are replacements in progress
+                                       && !rf.File.ReplacingId.HasValue)
+                        .Select(file => file.File)
                         .ToList();
 
-                    var subjectIds = filesExcludingReplacements
-                        .WhereAsync(
-                            async file =>
-                            {
-                                // Not optimal, ideally we should be able to fetch
-                                // the status with the file reference itself.
-                                // TODO EES-1231 Move imports table into database
-                                var importStatus = await _importStatusService
-                                    .GetImportStatus(file.ReleaseId, file.Filename);
-
-                                return importStatus.Status == IStatus.COMPLETE;
-                            }
-                        )
-                        .Select(file => file.SubjectId)
-                        .ToList();
+                    var subjectsToInclude = new List<Guid>();
+                    foreach (var file in files)
+                    {
+                        var importStatus = await _importRepository.GetStatusByFileId(file.Id);
+                        if (importStatus == ImportStatus.COMPLETE && file.SubjectId.HasValue)
+                        {
+                            subjectsToInclude.Add(file.SubjectId.Value);
+                        }
+                    }
 
                     var subjects = _statisticsDbContext.ReleaseSubject
                         .Include(subject => subject.Subject)
                         .Where(subject => subject.ReleaseId == releaseId
-                                          && subjectIds.Contains(subject.SubjectId))
+                                          && subjectsToInclude.Contains(subject.SubjectId))
                         .Select(subject =>
                             new IdLabel(
                                 subject.Subject.Id,
@@ -94,7 +84,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Services
                         .Where(dataBlock => !string.IsNullOrEmpty(dataBlock.HighlightName))
                         .ToList()
                         // Need to query on materialized list due to JSON serialized query
-                        .Where(dataBlock => subjectIds.Contains(dataBlock.Query.SubjectId))
+                        .Where(dataBlock => subjectsToInclude.Contains(dataBlock.Query.SubjectId))
                         .Select(dataBlock => new IdLabel(dataBlock.Id, dataBlock.HighlightName))
                         .ToList();
 

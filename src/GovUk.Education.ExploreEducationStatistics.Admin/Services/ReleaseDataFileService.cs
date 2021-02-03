@@ -7,7 +7,6 @@ using GovUk.Education.ExploreEducationStatistics.Admin.Services.Interfaces;
 using GovUk.Education.ExploreEducationStatistics.Admin.Services.Interfaces.Security;
 using GovUk.Education.ExploreEducationStatistics.Common.Extensions;
 using GovUk.Education.ExploreEducationStatistics.Common.Model;
-using GovUk.Education.ExploreEducationStatistics.Common.Services;
 using GovUk.Education.ExploreEducationStatistics.Common.Services.Interfaces;
 using GovUk.Education.ExploreEducationStatistics.Common.Services.Interfaces.Security;
 using GovUk.Education.ExploreEducationStatistics.Common.Utils;
@@ -39,7 +38,6 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Services
         private readonly IReleaseRepository _releaseRepository;
         private readonly IReleaseFileRepository _releaseFileRepository;
         private readonly IImportService _importService;
-        private readonly IImportStatusService _importStatusService;
         private readonly IUserService _userService;
 
         public ReleaseDataFileService(ContentDbContext contentDbContext,
@@ -52,7 +50,6 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Services
             IReleaseRepository releaseRepository,
             IReleaseFileRepository releaseFileRepository,
             IImportService importService,
-            IImportStatusService importStatusService,
             IUserService userService)
         {
             _contentDbContext = contentDbContext;
@@ -65,7 +62,6 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Services
             _releaseRepository = releaseRepository;
             _releaseFileRepository = releaseFileRepository;
             _importService = importService;
-            _importStatusService = importStatusService;
             _userService = userService;
         }
 
@@ -103,7 +99,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Services
                         }
                         else
                         {
-                            await _importService.RemoveImportTableRowIfExists(releaseId, file.Filename);
+                            await _importService.DeleteImport(file.Id);
                             await _blobStorageService.DeleteBlob(
                                 PrivateFilesContainerName,
                                 file.Path()
@@ -216,9 +212,6 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Services
                                     .ValidateDataFilesForUpload(releaseId, dataFormFile, metaFormFile)
                                     // First, create with status uploading to prevent other users uploading the same datafile
                                     .OnSuccess(async () =>
-                                        await _importService.CreateImportTableRow(releaseId,
-                                            dataFormFile.FileName.ToLower()))
-                                    .OnSuccess(async () =>
                                     {
                                         var subjectId = await _releaseRepository.CreateReleaseAndSubjectHierarchy(
                                             releaseId,
@@ -253,12 +246,10 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Services
                                         await UploadFileToStorage(metaFile, metaFormFile, metaDataInfo);
 
                                         await _importService.Import(
-                                            releaseId: releaseId,
                                             subjectId: subjectId,
-                                            dataFileName: dataFile.Filename,
-                                            metaFileName: metaFile.Filename,
-                                            dataFile: dataFormFile,
-                                            isZip: false);
+                                            dataFile: dataFile,
+                                            metaFile: metaFile,
+                                            formFile: dataFormFile);
 
                                         var blob = await _blobStorageService.GetBlob(
                                             PrivateFilesContainerName,
@@ -276,9 +267,9 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Services
                                             MetaFileName = blob.GetMetaFileName(),
                                             Rows = blob.GetNumberOfRows(),
                                             UserName = blob.GetUserName(),
-                                            Status = IStatus.QUEUED,
+                                            Status = ImportStatus.QUEUED,
                                             Created = blob.Created,
-                                            Permissions = await _userService.GetDataFilePermissions(releaseId, blob.FileName)
+                                            Permissions = await _userService.GetDataFilePermissions(dataFile)
                                         };
                                     }));
                         });
@@ -314,10 +305,6 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Services
                                             return await _fileUploadsValidatorService
                                                 .ValidateDataArchiveEntriesForUpload(releaseId, archiveFile)
                                                 .OnSuccess(async () =>
-                                                    await _importService.CreateImportTableRow(
-                                                        releaseId,
-                                                        archiveFile.DataFileName))
-                                                .OnSuccess(async () =>
                                                 {
                                                     var subjectId = await _releaseRepository.CreateReleaseAndSubjectHierarchy(
                                                         releaseId,
@@ -345,13 +332,11 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Services
 
                                                     await UploadFileToStorage(zipFile, zipFormFile, dataInfo);
 
-                                                    await _importService.Import(
+                                                    await _importService.ImportZip(
                                                         subjectId: subjectId,
-                                                        releaseId: releaseId,
-                                                        dataFileName: archiveFile.DataFileName,
-                                                        metaFileName: archiveFile.MetaFileName,
-                                                        dataFile: zipFormFile,
-                                                        isZip: true);
+                                                        dataFile: dataFile,
+                                                        metaFile: metaFile,
+                                                        zipFile: zipFile);
 
                                                     var blob = await _blobStorageService.GetBlob(
                                                         PrivateFilesContainerName,
@@ -371,10 +356,9 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Services
                                                         MetaFileName = metaFile.Filename,
                                                         Rows = blob.GetNumberOfRows(),
                                                         UserName = blob.GetUserName(),
-                                                        Status = IStatus.QUEUED,
+                                                        Status = ImportStatus.QUEUED,
                                                         Created = blob.Created,
-                                                        Permissions = await _userService.
-                                                            GetDataFilePermissions(releaseId, archiveFile.DataFileName)
+                                                        Permissions = await _userService.GetDataFilePermissions(dataFile)
                                                     };
                                                 });
                                         }));
@@ -390,7 +374,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Services
 
             if (!blobExists)
             {
-                return await GetFallbackDataFileInfo(releaseId, dataFile);
+                return await GetFallbackDataFileInfo(dataFile);
             }
 
             var blob = await _blobStorageService.GetBlob(PrivateFilesContainerName, dataFile.Path());
@@ -399,12 +383,10 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Services
             // partially uploaded so make sure meta data exists for it
             if (string.IsNullOrEmpty(blob.GetUserName()))
             {
-                return await GetFallbackDataFileInfo(releaseId, dataFile);
+                return await GetFallbackDataFileInfo(dataFile);
             }
 
             var metaFile = await GetAssociatedReleaseFileReference(dataFile, Metadata);
-
-            var importStatus = await _importStatusService.GetImportStatus(dataFile.ReleaseId, dataFile.Filename);
 
             return new DataFileInfo
             {
@@ -418,13 +400,13 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Services
                 ReplacedBy = dataFile.ReplacedById,
                 Rows = blob.GetNumberOfRows(),
                 UserName = blob.GetUserName(),
-                Status = importStatus.Status,
+                Status = await _importService.GetStatus(dataFile.Id),
                 Created = blob.Created,
-                Permissions = await _userService.GetDataFilePermissions(releaseId, blob.FileName)
+                Permissions = await _userService.GetDataFilePermissions(dataFile)
             };
         }
 
-        private async Task<DataFileInfo> GetFallbackDataFileInfo(Guid releaseId, File file)
+        private async Task<DataFileInfo> GetFallbackDataFileInfo(File file)
         {
             // Try to get the name from the zip file if existing
             if (file.SourceId != null)
@@ -434,7 +416,6 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Services
                 if (await _blobStorageService.CheckBlobExists(PrivateFilesContainerName, source.Path()))
                 {
                     var zipBlob = await _blobStorageService.GetBlob(PrivateFilesContainerName, source.Path());
-                    var importStatus = await _importStatusService.GetImportStatus(releaseId, file.Filename);
 
                     return new DataFileInfo
                     {
@@ -450,34 +431,16 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Services
                                 : string.Empty,
                         Rows = 0,
                         UserName = zipBlob.GetUserName(),
-                        Status = importStatus.Status,
+                        Status = await _importService.GetStatus(file.Id),
                         Created = zipBlob.Created,
-                        Permissions = await _userService.GetDataFilePermissions(releaseId, file.Filename)
+                        Permissions = await _userService.GetDataFilePermissions(file)
                     };
                 }
             }
 
-            var dataFileName = file.Type == FileType.Data
-                ? file.Filename
-                : (await GetAssociatedReleaseFileReference(file, FileType.Data)).Filename;
-
             var metaFileReference = file.Type == FileType.Data
                 ? await GetAssociatedReleaseFileReference(file, Metadata)
                 : null;
-
-            var metaFileName = metaFileReference?.Filename ?? "";
-
-            // Fail the import if this was a datafile upload
-            await _importService.FailImport(
-                releaseId,
-                file.SubjectId ?? Guid.Empty,
-                dataFileName,
-                metaFileName,
-                new List<ValidationError>
-                {
-                    new ValidationError("Files not uploaded correctly. Please delete and retry")
-                }.AsEnumerable()
-            );
 
             return new DataFileInfo
             {
@@ -490,8 +453,8 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Services
                 MetaFileName = metaFileReference?.Filename ?? "",
                 Rows = 0,
                 UserName = "",
-                Status = IStatus.NOT_FOUND,
-                Permissions = await _userService.GetDataFilePermissions(releaseId, dataFileName)
+                Status = await _importService.GetStatus(file.Id),
+                Permissions = await _userService.GetDataFilePermissions(file)
             };
         }
 

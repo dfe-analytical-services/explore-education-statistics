@@ -33,6 +33,6 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Services.Interfaces
 
         Task<Either<ActionResult, Unit>> RemoveDataFiles(Guid releaseId, Guid fileId);
 
-        Task<Either<ActionResult, ImportStatus>> GetDataFileImportStatus(Guid releaseId, string dataFileName);
+        Task<Either<ActionResult, ImportViewModel>> GetDataFileImportStatus(Guid releaseId, Guid fileId);
     }
 }

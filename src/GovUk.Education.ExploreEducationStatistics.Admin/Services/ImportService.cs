@@ -1,163 +1,125 @@
 using System;
-using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
-using AutoMapper;
-using GovUk.Education.ExploreEducationStatistics.Admin.Models;
 using GovUk.Education.ExploreEducationStatistics.Admin.Services.Interfaces;
 using GovUk.Education.ExploreEducationStatistics.Admin.Services.Interfaces.Security;
+using GovUk.Education.ExploreEducationStatistics.Admin.ViewModels;
 using GovUk.Education.ExploreEducationStatistics.Common.Model;
-using GovUk.Education.ExploreEducationStatistics.Common.Services;
 using GovUk.Education.ExploreEducationStatistics.Common.Services.Interfaces;
 using GovUk.Education.ExploreEducationStatistics.Common.Services.Interfaces.Security;
+using GovUk.Education.ExploreEducationStatistics.Content.Model;
 using GovUk.Education.ExploreEducationStatistics.Content.Model.Database;
 using GovUk.Education.ExploreEducationStatistics.Data.Processor.Model;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
-using Microsoft.Extensions.Logging;
-using Newtonsoft.Json;
-using static GovUk.Education.ExploreEducationStatistics.Admin.Validators.ValidationErrorMessages;
-using static GovUk.Education.ExploreEducationStatistics.Admin.Validators.ValidationUtils;
-using static GovUk.Education.ExploreEducationStatistics.Common.TableStorageTableNames;
+using static GovUk.Education.ExploreEducationStatistics.Common.Services.FileStorageUtils;
+using static GovUk.Education.ExploreEducationStatistics.Data.Processor.Model.ImporterQueues;
 
 namespace GovUk.Education.ExploreEducationStatistics.Admin.Services
 {
     public class ImportService : IImportService
     {
-        private readonly ContentDbContext _context;
-        private readonly IMapper _mapper;
-        private readonly ILogger _logger;
+        private readonly ContentDbContext _contentDbContext;
+        private readonly IImportRepository _importRepository;
+        private readonly IReleaseFileRepository _releaseFileRepository;
         private readonly IStorageQueueService _queueService;
-        private readonly ITableStorageService _tableStorageService;
         private readonly IUserService _userService;
 
-        public ImportService(ContentDbContext contentDbContext,
-            IMapper mapper,
-            ILogger<ImportService> logger,
+        public ImportService(
+            ContentDbContext contentDbContext,
+            IImportRepository importRepository,
+            IReleaseFileRepository releaseFileRepository,
             IStorageQueueService queueService,
-            ITableStorageService tableStorageService,
             IUserService userService)
         {
-            _context = contentDbContext;
-            _mapper = mapper;
-            _logger = logger;
+            _contentDbContext = contentDbContext;
+            _importRepository = importRepository;
+            _releaseFileRepository = releaseFileRepository;
             _queueService = queueService;
-            _tableStorageService = tableStorageService;
             _userService = userService;
         }
 
-        public async Task Import(Guid releaseId,
-            Guid subjectId,
-            string dataFileName,
-            string metaFileName,
-            IFormFile dataFile,
-            bool isZip)
+        public async Task<ImportStatus> GetStatus(Guid fileId)
         {
-            // TODO - EES-1250
-            var numRows = isZip ? 0 : FileStorageUtils.CalculateNumberOfRows(dataFile.OpenReadStream());
-            var message = BuildMessage(subjectId, dataFileName, metaFileName, releaseId, isZip ? dataFile.FileName.ToLower() : "");
-
-            await UpdateImportTableRow(
-                releaseId,
-                dataFileName,
-                numRows,
-                message);
-
-            await _queueService.AddMessageAsync("imports-pending", message);
-
-            _logger.LogInformation($"Sent import message for data file: {dataFileName}, releaseId: {releaseId}");
+            return await _importRepository.GetStatusByFileId(fileId);
         }
 
-        public Task<Either<ActionResult, Unit>> CancelImport(ReleaseFileImportInfo import)
+        public async Task<Either<ActionResult, Unit>> CancelImport(Guid releaseId, Guid fileId)
         {
-            return _userService
-                .CheckCanCancelFileImport(import)
-                .OnSuccessVoid(async () =>
+            return await _releaseFileRepository.CheckFileExists(releaseId, fileId, FileType.Data)
+                .OnSuccess(_userService.CheckCanCancelFileImport)
+                .OnSuccessVoid(async file =>
                 {
-                    await _queueService.AddMessageAsync("imports-cancelling", new CancelImportMessage
-                    {
-                        ReleaseId = import.ReleaseId,
-                        DataFileName = import.DataFileName
-                    });
+                    var import = await _importRepository.GetByFileId(file.Id);
+                    await _queueService.AddMessageAsync(ImportsCancellingQueue, new CancelImportMessage(import.Id));
                 });
         }
 
-        public async Task<Either<ActionResult, Unit>> CreateImportTableRow(Guid releaseId, string dataFileName)
+        public async Task DeleteImport(Guid fileId)
         {
-            var result = await _tableStorageService.RetrieveEntity(DatafileImportsTableName,
-                new DatafileImport(releaseId.ToString(), dataFileName), new List<string>());
+            await _importRepository.DeleteByFileId(fileId);
+        }
 
-            if (result.Result != null)
+        public async Task<bool> HasIncompleteImports(Guid releaseId)
+        {
+            return await _contentDbContext.ReleaseFiles
+                .Join(_contentDbContext.Imports,
+                    rf => rf.FileId,
+                    i => i.FileId,
+                    (file, import) => import)
+                .AnyAsync(import => import.Status != ImportStatus.COMPLETE);
+        }
+
+        public async Task<ImportViewModel> GetImport(Guid fileId)
+        {
+            var import = await _importRepository.GetByFileId(fileId);
+
+            if (import == null)
             {
-                return ValidationActionResult(DataFileAlreadyUploaded);
+                return ImportViewModel.NotFound();
             }
 
-            await _tableStorageService.CreateOrUpdateEntity(DatafileImportsTableName,
-                new DatafileImport(releaseId.ToString(), dataFileName));
-
-            return Unit.Instance;
-        }
-
-        public async Task RemoveImportTableRowIfExists(Guid releaseId, string dataFileName)
-        {
-            await _tableStorageService.DeleteEntityAsync(DatafileImportsTableName,
-                new DatafileImport(releaseId.ToString(), dataFileName));
-        }
-
-        public async Task FailImport(Guid releaseId, Guid subjectId, string dataFileName, string metaFileName,
-            IEnumerable<ValidationError> errors)
-        {
-            var importReleaseMessage =
-                JsonConvert.SerializeObject(BuildMessage(subjectId, dataFileName, metaFileName, releaseId));
-
-            await _tableStorageService.CreateOrUpdateEntity(DatafileImportsTableName,
-                new DatafileImport(releaseId.ToString(), dataFileName, 0, importReleaseMessage,
-                    IStatus.FAILED, JsonConvert.SerializeObject(errors)));
-        }
-
-        private async Task UpdateImportTableRow(Guid releaseId, string dataFileName, int numberOfRows, ImportMessage message)
-        {
-            await _tableStorageService.CreateOrUpdateEntity(DatafileImportsTableName,
-                new DatafileImport(releaseId.ToString(), dataFileName, numberOfRows,
-                    JsonConvert.SerializeObject(message), IStatus.QUEUED));
-        }
-
-        private ImportMessage BuildMessage(Guid subjectId, 
-            string dataFileName,
-            string metaFileName,
-            Guid releaseId,
-            string zipFileName = "")
-        {
-            var release = _context.Releases
-                .Where(r => r.Id.Equals(releaseId))
-                .Include(r => r.Publication)
-                .ThenInclude(p => p.Topic)
-                .ThenInclude(t => t.Theme)
-                .FirstOrDefault();
-
-            var importMessageRelease = _mapper.Map<Release>(release);
-
-            return new ImportMessage
+            return new ImportViewModel
             {
-                SubjectId = subjectId,
-                DataFileName = dataFileName,
-                MetaFileName = metaFileName,
-                Release = importMessageRelease,
-                NumBatches = 1,
-                BatchNo = 1,
-                ArchiveFileName = zipFileName
+                Errors = import.Errors.Select(error => error.Message).ToList(),
+                PercentageComplete = import.PercentageComplete(),
+                StagePercentageComplete = import.StagePercentageComplete,
+                NumberOfRows = import.Rows,
+                Status = import.Status
             };
         }
-    }
 
-    public class ValidationError
-    {
-        public string Message { get; set; }
-
-        public ValidationError(string message)
+        public async Task Import(Guid subjectId, File dataFile, File metaFile, IFormFile formFile)
         {
-            Message = message;
+            var import = await _importRepository.Add(new Import
+            {
+                Created = DateTime.UtcNow,
+                FileId = dataFile.Id,
+                MetaFileId = metaFile.Id,
+                SubjectId = subjectId,
+                Rows = CalculateNumberOfRows(formFile.OpenReadStream()),
+                Status = ImportStatus.QUEUED,
+                Migrated = false
+            });
+
+            await _queueService.AddMessageAsync(ImportsPendingQueue, new ImportMessage(import.Id));
+        }
+
+        public async Task ImportZip(Guid subjectId, File dataFile, File metaFile, File zipFile)
+        {
+            var import = await _importRepository.Add(new Import
+            {
+                Created = DateTime.UtcNow,
+                FileId = dataFile.Id,
+                MetaFileId = metaFile.Id,
+                ZipFileId = zipFile.Id,
+                SubjectId = subjectId,
+                Status = ImportStatus.QUEUED,
+                Migrated = false
+            });
+
+            await _queueService.AddMessageAsync(ImportsPendingQueue, new ImportMessage(import.Id));
         }
     }
 }

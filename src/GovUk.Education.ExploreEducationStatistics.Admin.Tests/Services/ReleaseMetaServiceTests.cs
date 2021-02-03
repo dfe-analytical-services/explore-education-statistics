@@ -1,10 +1,9 @@
 ﻿using System;
 using System.Threading.Tasks;
 using GovUk.Education.ExploreEducationStatistics.Admin.Services;
+using GovUk.Education.ExploreEducationStatistics.Admin.Services.Interfaces;
 using GovUk.Education.ExploreEducationStatistics.Common.Model;
 using GovUk.Education.ExploreEducationStatistics.Common.Model.Data.Query;
-using GovUk.Education.ExploreEducationStatistics.Common.Services;
-using GovUk.Education.ExploreEducationStatistics.Common.Services.Interfaces;
 using GovUk.Education.ExploreEducationStatistics.Common.Services.Interfaces.Security;
 using GovUk.Education.ExploreEducationStatistics.Common.Tests.Utils;
 using GovUk.Education.ExploreEducationStatistics.Common.Utils;
@@ -81,6 +80,18 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
                 }
             };
 
+            var import1 = new Import
+            {
+                File = releaseFile1.File,
+                Status = ImportStatus.COMPLETE
+            };
+
+            var import2 = new Import
+            {
+                File = releaseFile2.File,
+                Status = ImportStatus.COMPLETE
+            };
+
             var dataBlock = new DataBlock
             {
                 Name = "Test data block",
@@ -98,6 +109,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
             {
                 await contentDbContext.AddAsync(contentRelease);
                 await contentDbContext.AddRangeAsync(releaseFile1, releaseFile2);
+                await contentDbContext.AddRangeAsync(import1, import2);
                 await contentDbContext.AddAsync(
                     new ReleaseContentBlock
                     {
@@ -117,21 +129,9 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
             await using (var contentDbContext = InMemoryApplicationDbContext(contentDbContextId))
             await using (var statisticsDbContext = InMemoryStatisticsDbContext(statisticsDbContextId))
             {
-                var importStatusService = new Mock<IImportStatusService>();
-
-                importStatusService
-                    .Setup(s => s.GetImportStatus(It.IsAny<Guid>(), It.IsAny<string>()))
-                    .ReturnsAsync(
-                        new ImportStatus()
-                        {
-                            Status = IStatus.COMPLETE
-                        }
-                    );
-
                 var replacementService = BuildReleaseMetaService(
                     contentDbContext: contentDbContext,
-                    statisticsDbContext: statisticsDbContext,
-                    importStatusService: importStatusService.Object
+                    statisticsDbContext: statisticsDbContext
                 );
 
                 var result = await replacementService.GetSubjectsMeta(contentRelease.Id);
@@ -247,6 +247,18 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
                 File = file2Replacement
             };
 
+            var import1 = new Import
+            {
+                File = releaseFile1.File,
+                Status = ImportStatus.COMPLETE
+            };
+
+            var import2 = new Import
+            {
+                File = releaseFile2.File,
+                Status = ImportStatus.COMPLETE
+            };
+
             var contentDbContextId = Guid.NewGuid().ToString();
             var statisticsDbContextId = Guid.NewGuid().ToString();
 
@@ -254,6 +266,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
             {
                 await contentDbContext.AddAsync(contentRelease);
                 await contentDbContext.AddRangeAsync(releaseFile1, releaseFile2, releaseFile2Replacement);
+                await contentDbContext.AddRangeAsync(import1, import2);
                 await contentDbContext.SaveChangesAsync();
             }
 
@@ -266,21 +279,9 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
             await using (var contentDbContext = InMemoryApplicationDbContext(contentDbContextId))
             await using (var statisticsDbContext = InMemoryStatisticsDbContext(statisticsDbContextId))
             {
-                var importStatusService = new Mock<IImportStatusService>();
-
-                importStatusService
-                    .Setup(s => s.GetImportStatus(It.IsAny<Guid>(), It.IsAny<string>()))
-                    .ReturnsAsync(
-                        new ImportStatus()
-                        {
-                            Status = IStatus.COMPLETE
-                        }
-                    );
-
                 var replacementService = BuildReleaseMetaService(
                     contentDbContext: contentDbContext,
-                    statisticsDbContext: statisticsDbContext,
-                    importStatusService: importStatusService.Object
+                    statisticsDbContext: statisticsDbContext
                 );
 
                 var result = await replacementService.GetSubjectsMeta(contentRelease.Id);
@@ -359,6 +360,18 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
                 }
             };
 
+            var import1 = new Import
+            {
+                File = releaseFile1.File,
+                Status = ImportStatus.STAGE_1
+            };
+
+            var import2 = new Import
+            {
+                File = releaseFile2.File,
+                Status = ImportStatus.COMPLETE
+            };
+
             var contentDbContextId = Guid.NewGuid().ToString();
             var statisticsDbContextId = Guid.NewGuid().ToString();
 
@@ -366,6 +379,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
             {
                 await contentDbContext.AddAsync(contentRelease);
                 await contentDbContext.AddRangeAsync(releaseFile1, releaseFile2);
+                await contentDbContext.AddRangeAsync(import1, import2);
                 await contentDbContext.SaveChangesAsync();
             }
 
@@ -378,32 +392,9 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
             await using (var contentDbContext = InMemoryApplicationDbContext(contentDbContextId))
             await using (var statisticsDbContext = InMemoryStatisticsDbContext(statisticsDbContextId))
             {
-                var importStatusService = new Mock<IImportStatusService>();
-
-                importStatusService
-                    .Setup(s =>
-                        s.GetImportStatus(releaseSubject1.ReleaseId, releaseFile1.File.Filename))
-                    .ReturnsAsync(
-                        new ImportStatus()
-                        {
-                            Status = IStatus.STAGE_1
-                        }
-                    );
-
-                importStatusService
-                    .Setup(s =>
-                        s.GetImportStatus(releaseSubject2.ReleaseId, releaseFile2.File.Filename))
-                    .ReturnsAsync(
-                        new ImportStatus()
-                        {
-                            Status = IStatus.COMPLETE
-                        }
-                    );
-
                 var replacementService = BuildReleaseMetaService(
                     contentDbContext: contentDbContext,
-                    statisticsDbContext: statisticsDbContext,
-                    importStatusService: importStatusService.Object
+                    statisticsDbContext: statisticsDbContext
                 );
 
                 var result = await replacementService.GetSubjectsMeta(contentRelease.Id);
@@ -457,6 +448,12 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
                 }
             };
 
+            var import1 = new Import
+            {
+                File = releaseFile1.File,
+                Status = ImportStatus.COMPLETE
+            };
+
             // Has highlight name and subject matches
             var dataBlock1 = new DataBlock
             {
@@ -495,7 +492,8 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
             await using (var contentDbContext = InMemoryApplicationDbContext(contentDbContextId))
             {
                 await contentDbContext.AddAsync(contentRelease);
-                await contentDbContext.AddRangeAsync(releaseFile1);
+                await contentDbContext.AddAsync(releaseFile1);
+                await contentDbContext.AddAsync(import1);
                 await contentDbContext.AddRangeAsync(
                     new ReleaseContentBlock
                     {
@@ -525,21 +523,9 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
             await using (var contentDbContext = InMemoryApplicationDbContext(contentDbContextId))
             await using (var statisticsDbContext = InMemoryStatisticsDbContext(statisticsDbContextId))
             {
-                var importStatusService = new Mock<IImportStatusService>();
-
-                importStatusService
-                    .Setup(s => s.GetImportStatus(It.IsAny<Guid>(), It.IsAny<string>()))
-                    .ReturnsAsync(
-                        new ImportStatus()
-                        {
-                            Status = IStatus.COMPLETE
-                        }
-                    );
-
                 var replacementService = BuildReleaseMetaService(
                     contentDbContext: contentDbContext,
-                    statisticsDbContext: statisticsDbContext,
-                    importStatusService: importStatusService.Object
+                    statisticsDbContext: statisticsDbContext
                 );
 
                 var result = await replacementService.GetSubjectsMeta(contentRelease.Id);
@@ -562,15 +548,15 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
             ContentDbContext contentDbContext = null,
             IPersistenceHelper<ContentDbContext> persistenceHelper = null,
             StatisticsDbContext statisticsDbContext = null,
-            IUserService userService = null,
-            IImportStatusService importStatusService = null)
+            IImportRepository importRepository = null,
+            IUserService userService = null)
         {
             return new ReleaseMetaService(
                 contentDbContext ?? new Mock<ContentDbContext>().Object,
                 persistenceHelper ?? new PersistenceHelper<ContentDbContext>(contentDbContext),
                 statisticsDbContext ?? new Mock<StatisticsDbContext>().Object,
-                userService ?? MockUtils.AlwaysTrueUserService().Object,
-                importStatusService ?? new Mock<IImportStatusService>().Object
+                importRepository ?? new ImportRepository(contentDbContext),
+                userService ?? MockUtils.AlwaysTrueUserService().Object
             );
         }
     }

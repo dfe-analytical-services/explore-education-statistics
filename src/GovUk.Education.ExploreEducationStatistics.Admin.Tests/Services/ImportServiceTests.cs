@@ -1,49 +1,75 @@
 using System;
 using System.Threading.Tasks;
-using AutoMapper;
-using GovUk.Education.ExploreEducationStatistics.Admin.Models;
 using GovUk.Education.ExploreEducationStatistics.Admin.Security;
 using GovUk.Education.ExploreEducationStatistics.Admin.Services;
+using GovUk.Education.ExploreEducationStatistics.Admin.Services.Interfaces;
+using GovUk.Education.ExploreEducationStatistics.Common.Model;
 using GovUk.Education.ExploreEducationStatistics.Common.Services.Interfaces;
 using GovUk.Education.ExploreEducationStatistics.Common.Services.Interfaces.Security;
 using GovUk.Education.ExploreEducationStatistics.Common.Tests.Utils;
+using GovUk.Education.ExploreEducationStatistics.Content.Model;
 using GovUk.Education.ExploreEducationStatistics.Content.Model.Database;
 using GovUk.Education.ExploreEducationStatistics.Data.Processor.Model;
 using Microsoft.AspNetCore.Mvc;
-using Microsoft.Extensions.Logging;
 using Moq;
 using Xunit;
+using static GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services.DbUtils;
+using static GovUk.Education.ExploreEducationStatistics.Data.Processor.Model.ImporterQueues;
 
 namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
 {
     public class ImportServiceTests
     {
         [Fact]
-        public async void CancelFileImport()
+        public async void CancelImport()
         {
+            var release = new Release();
+
+            var file = new File
+            {
+                Type = FileType.Data
+            };
+
+            var import = new Import
+            {
+                File = file
+            };
+
+            var contentDbContextId = Guid.NewGuid().ToString();
+
+            await using (var contentDbContext = InMemoryApplicationDbContext(contentDbContextId))
+            {
+                await contentDbContext.ReleaseFiles.AddAsync(new ReleaseFile
+                {
+                    Release = release,
+                    File = file
+                });
+                await contentDbContext.Imports.AddAsync(import);
+                await contentDbContext.SaveChangesAsync();
+            }
+
             var userService = new Mock<IUserService>(MockBehavior.Strict);
             var queueService = new Mock<IStorageQueueService>(MockBehavior.Strict);
 
-            var cancelRequest = new ReleaseFileImportInfo
-            {
-                ReleaseId = Guid.NewGuid(),
-                DataFileName = "my_data_file.csv"
-            };
-
             userService
-                .Setup(s => s.MatchesPolicy(cancelRequest, SecurityPolicies.CanCancelOngoingImports))
+                .Setup(s => s.MatchesPolicy(It.Is<File>(f => f.Id == file.Id),
+                    SecurityPolicies.CanCancelOngoingImports))
                 .ReturnsAsync(true);
 
             queueService
-                .Setup(s => s.AddMessageAsync("imports-cancelling",
-                    It.Is<CancelImportMessage>(m => m.ReleaseId == cancelRequest.ReleaseId
-                                                    && m.DataFileName == cancelRequest.DataFileName))).
-                Returns(Task.CompletedTask);
+                .Setup(s => s.AddMessageAsync(ImportsCancellingQueue,
+                    It.Is<CancelImportMessage>(m => m.Id == import.Id)))
+                .Returns(Task.CompletedTask);
 
-            var service = BuildImportService(queueService: queueService.Object, userService: userService.Object);
+            await using (var contentDbContext = InMemoryApplicationDbContext(contentDbContextId))
+            {
+                var service = BuildImportService(contentDbContext: contentDbContext,
+                    queueService: queueService.Object,
+                    userService: userService.Object);
 
-            var result = await service.CancelImport(cancelRequest);
-            Assert.True(result.IsRight);
+                var result = await service.CancelImport(release.Id, file.Id);
+                Assert.True(result.IsRight);
+            }
 
             MockUtils.VerifyAllMocks(userService, queueService);
         }
@@ -51,42 +77,197 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
         [Fact]
         public async void CancelFileImportButNotAllowed()
         {
-            var userService = new Mock<IUserService>();
-            var queueService = new Mock<IStorageQueueService>(MockBehavior.Strict);
+            var release = new Release();
 
-            var cancelRequest = new ReleaseFileImportInfo
+            var file = new File
             {
-                ReleaseId = Guid.NewGuid(),
-                DataFileName = "my_data_file.csv"
+                Type = FileType.Data
             };
 
+            var import = new Import
+            {
+                File = file
+            };
+
+            var contentDbContextId = Guid.NewGuid().ToString();
+
+            await using (var contentDbContext = InMemoryApplicationDbContext(contentDbContextId))
+            {
+                await contentDbContext.ReleaseFiles.AddAsync(new ReleaseFile
+                {
+                    Release = release,
+                    File = file
+                });
+                await contentDbContext.Imports.AddAsync(import);
+                await contentDbContext.SaveChangesAsync();
+            }
+
+            var userService = new Mock<IUserService>(MockBehavior.Strict);
+            var queueService = new Mock<IStorageQueueService>(MockBehavior.Strict);
+
             userService
-                .Setup(s => s.MatchesPolicy(cancelRequest, SecurityPolicies.CanCancelOngoingImports))
+                .Setup(s => s.MatchesPolicy(It.Is<File>(f => f.Id == file.Id),
+                    SecurityPolicies.CanCancelOngoingImports))
                 .ReturnsAsync(false);
 
-            var service = BuildImportService(queueService: queueService.Object, userService: userService.Object);
+            await using (var contentDbContext = InMemoryApplicationDbContext(contentDbContextId))
+            {
+                var service = BuildImportService(contentDbContext: contentDbContext,
+                    queueService: queueService.Object,
+                    userService: userService.Object);
 
-            var result = await service.CancelImport(cancelRequest);
-            Assert.True(result.IsLeft);
-            Assert.IsType<ForbidResult>(result.Left);
+                var result = await service.CancelImport(release.Id, file.Id);
+                Assert.True(result.IsLeft);
+                Assert.IsType<ForbidResult>(result.Left);
+            }
 
             MockUtils.VerifyAllMocks(userService, queueService);
         }
 
+        [Fact]
+        public async Task HasIncompleteImports_NoReleaseFiles()
+        {
+            var release = new Release();
+
+            var contentDbContextId = Guid.NewGuid().ToString();
+
+            await using (var contentDbContext = InMemoryApplicationDbContext(contentDbContextId))
+            {
+                await contentDbContext.Releases.AddAsync(release);
+                await contentDbContext.SaveChangesAsync();
+            }
+
+            await using (var contentDbContext = InMemoryApplicationDbContext(contentDbContextId))
+            {
+                var service = BuildImportService(contentDbContext: contentDbContext);
+
+                var result = await service.HasIncompleteImports(release.Id);
+                Assert.False(result);
+            }
+        }
+
+        [Fact]
+        public async Task HasIncompleteImports_ReleaseHasCompletedImports()
+        {
+            var release = new Release();
+
+            var file1 = new File
+            {
+                Type = FileType.Data
+            };
+
+            var file2 = new File
+            {
+                Type = FileType.Data
+            };
+
+            var import1 = new Import
+            {
+                File = file1,
+                Status = ImportStatus.COMPLETE
+            };
+
+            var import2 = new Import
+            {
+                File = file2,
+                Status = ImportStatus.COMPLETE
+            };
+
+            var contentDbContextId = Guid.NewGuid().ToString();
+
+            await using (var contentDbContext = InMemoryApplicationDbContext(contentDbContextId))
+            {
+                await contentDbContext.ReleaseFiles.AddRangeAsync(
+                    new ReleaseFile
+                    {
+                        Release = release,
+                        File = file1
+                    },
+                    new ReleaseFile
+                    {
+                        Release = release,
+                        File = file2
+                    });
+                await contentDbContext.Imports.AddRangeAsync(import1, import2);
+                await contentDbContext.SaveChangesAsync();
+            }
+
+            await using (var contentDbContext = InMemoryApplicationDbContext(contentDbContextId))
+            {
+                var service = BuildImportService(contentDbContext: contentDbContext);
+
+                var result = await service.HasIncompleteImports(release.Id);
+                Assert.False(result);
+            }
+        }
+
+        [Fact]
+        public async Task HasIncompleteImports_ReleaseHasIncompleteImports()
+        {
+            var release = new Release();
+
+            var file1 = new File
+            {
+                Type = FileType.Data
+            };
+
+            var file2 = new File
+            {
+                Type = FileType.Data
+            };
+
+            var import1 = new Import
+            {
+                File = file1,
+                Status = ImportStatus.COMPLETE
+            };
+
+            var import2 = new Import
+            {
+                File = file2,
+                Status = ImportStatus.STAGE_1
+            };
+
+            var contentDbContextId = Guid.NewGuid().ToString();
+
+            await using (var contentDbContext = InMemoryApplicationDbContext(contentDbContextId))
+            {
+                await contentDbContext.ReleaseFiles.AddRangeAsync(
+                    new ReleaseFile
+                    {
+                        Release = release,
+                        File = file1
+                    },
+                    new ReleaseFile
+                    {
+                        Release = release,
+                        File = file2
+                    });
+                await contentDbContext.Imports.AddRangeAsync(import1, import2);
+                await contentDbContext.SaveChangesAsync();
+            }
+
+            await using (var contentDbContext = InMemoryApplicationDbContext(contentDbContextId))
+            {
+                var service = BuildImportService(contentDbContext: contentDbContext);
+
+                var result = await service.HasIncompleteImports(release.Id);
+                Assert.True(result);
+            }
+        }
+
         private static ImportService BuildImportService(
-            ContentDbContext context = null,
-            IMapper mapper = null,
-            ILogger<ImportService> logger = null,
-            ITableStorageService tableStorageService = null,
+            ContentDbContext contentDbContext,
+            IImportRepository importRepository = null,
+            IReleaseFileRepository releaseFileRepository = null,
             IStorageQueueService queueService = null,
             IUserService userService = null)
         {
             return new ImportService(
-                context ?? DbUtils.InMemoryApplicationDbContext(),
-                mapper ?? new Mock<IMapper>().Object,
-                logger ?? new Mock<ILogger<ImportService>>().Object,
+                contentDbContext,
+                importRepository ?? new ImportRepository(contentDbContext),
+                releaseFileRepository ?? new ReleaseFileRepository(contentDbContext),
                 queueService ?? new Mock<IStorageQueueService>().Object,
-                tableStorageService ?? new Mock<ITableStorageService>().Object,
                 userService ?? MockUtils.AlwaysTrueUserService().Object);
         }
     }

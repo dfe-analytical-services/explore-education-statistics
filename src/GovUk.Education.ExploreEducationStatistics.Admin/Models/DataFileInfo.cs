@@ -1,7 +1,7 @@
 using System;
 using GovUk.Education.ExploreEducationStatistics.Common.Converters;
 using GovUk.Education.ExploreEducationStatistics.Common.Model;
-using GovUk.Education.ExploreEducationStatistics.Common.Services;
+using GovUk.Education.ExploreEducationStatistics.Content.Model;
 using Newtonsoft.Json;
 
 namespace GovUk.Education.ExploreEducationStatistics.Admin.Models
@@ -18,8 +18,8 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Models
         public DateTimeOffset? Created { get; set; }
         public Guid? ReplacedBy { get; set; }
 
-        [JsonConverter(typeof(EnumToEnumValueJsonConverter<IStatus>))]
-        public IStatus Status { get; set; }
+        [JsonConverter(typeof(EnumToEnumValueJsonConverter<ImportStatus>))]
+        public ImportStatus Status { get; set; }
         public DataFilePermissions Permissions { get; set; }
     }
 }

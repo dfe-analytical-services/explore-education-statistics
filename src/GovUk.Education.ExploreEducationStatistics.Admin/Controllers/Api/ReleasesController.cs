@@ -256,11 +256,11 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Controllers.Api
                 .HandleFailuresOrOk();
         }
 
-        [HttpGet("release/{releaseId}/data/{fileName}/import/status")]
-        public Task<ActionResult<ImportStatus>> GetDataUploadStatus(Guid releaseId, string fileName)
+        [HttpGet("release/{releaseId}/data/{fileId}/import/status")]
+        public Task<ActionResult<ImportViewModel>> GetDataUploadStatus(Guid releaseId, Guid fileId)
         {
             return _releaseService
-                .GetDataFileImportStatus(releaseId, fileName)
+                .GetDataFileImportStatus(releaseId, fileId)
                 .HandleFailuresOrOk();
         }
 
@@ -273,19 +273,18 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Controllers.Api
         }
 
         [HttpDelete("release/{releaseId}/data/{fileId}")]
-        public async Task<ActionResult> DeleteDataFiles(Guid releaseId,
-            Guid fileId)
+        public async Task<ActionResult> DeleteDataFiles(Guid releaseId, Guid fileId)
         {
             return await _releaseService
                 .RemoveDataFiles(releaseId, fileId)
                 .HandleFailuresOrNoContent();
         }
 
-        [HttpPost("release/{releaseId}/data/{dataFileName}/import/cancel")]
-        public async Task<IActionResult> CancelFileImport([FromRoute] ReleaseFileImportInfo file)
+        [HttpPost("release/{releaseId}/data/{fileId}/import/cancel")]
+        public async Task<IActionResult> CancelFileImport(Guid releaseId, Guid fileId)
         {
             return await _importService
-                .CancelImport(file)
+                .CancelImport(releaseId, fileId)
                 .HandleFailuresOr(result => new AcceptedResult());
         }
 
