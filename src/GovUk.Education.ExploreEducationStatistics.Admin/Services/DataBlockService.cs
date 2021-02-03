@@ -32,7 +32,8 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Services
 
         public DataBlockService(
             ContentDbContext context,
-            IMapper mapper, IPersistenceHelper<ContentDbContext> persistenceHelper,
+            IMapper mapper,
+            IPersistenceHelper<ContentDbContext> persistenceHelper,
             IUserService userService,
             IReleaseFileService releaseFileService)
         {
@@ -67,15 +68,9 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Services
         {
             return await _persistenceHelper
                 .CheckEntityExists<Release>(releaseId)
-                .OnSuccess(
-                    async release => await _persistenceHelper
-                        .CheckEntityExists<DataBlock>(id)
-                        .OnSuccess(CheckCanUpdateReleaseForDataBlock)
-                        .OnSuccessVoid(
-                            block => GetDeletePlan(release.Id, id)
-                                .OnSuccessVoid(DeleteDataBlocks)
-                        )
-                );
+                .OnSuccessDo(_userService.CheckCanUpdateRelease)
+                .OnSuccess(release => GetDeletePlan(release.Id, id))
+                .OnSuccessVoid(DeleteDataBlocks);
         }
 
         public async Task DeleteDataBlocks(DeleteDataBlockPlan deletePlan)
@@ -92,8 +87,9 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Services
 
         public async Task<Either<ActionResult, DataBlockViewModel>> Get(Guid id)
         {
-            return await _persistenceHelper.CheckEntityExists<DataBlock>(id)
-                .OnSuccess(CheckCanUpdateReleaseForDataBlock)
+            return await GetReleaseContentBlock(id)
+                .OnSuccessDo(rcb => _userService.CheckCanViewRelease(rcb.Release))
+                .OnSuccess(CheckIsDataBlock)
                 .OnSuccess(dataBlock => _mapper.Map<DataBlockViewModel>(dataBlock));
         }
 
@@ -117,57 +113,64 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Services
                 );
         }
 
-        public async Task<Either<ActionResult, DataBlockViewModel>> Update(Guid id,
+        public async Task<Either<ActionResult, DataBlockViewModel>> Update(
+            Guid id,
             DataBlockUpdateViewModel dataBlockUpdate)
         {
-            return await _persistenceHelper
-                .CheckEntityExists<DataBlock>(id)
-                .OnSuccess(CheckCanUpdateReleaseForDataBlock)
-                .OnSuccess(async existing =>
-                {
-                    // TODO EES-753 Alter this when multiple charts are supported
-                    var infographicChart = existing.Charts.OfType<InfographicChart>().FirstOrDefault();
-                    var updatedInfographicChart = dataBlockUpdate.Charts.OfType<InfographicChart>().FirstOrDefault();
+            return await GetReleaseContentBlock(id)
+                .OnSuccessDo(rcb => _userService.CheckCanUpdateRelease(rcb.Release))
+                .OnSuccess(
+                    rcb => CheckIsDataBlock(rcb)
+                        .OnSuccess(
+                            async dataBlock =>
+                            {
+                                // TODO EES-753 Alter this when multiple charts are supported
+                                var infographicChart = dataBlock.Charts.OfType<InfographicChart>().FirstOrDefault();
+                                var updatedInfographicChart =
+                                    dataBlockUpdate.Charts.OfType<InfographicChart>().FirstOrDefault();
 
-                    if (infographicChart != null && infographicChart.FileId != updatedInfographicChart?.FileId)
-                    {
-                        var release = _context.ReleaseContentBlocks
-                            .Include(join => join.Release)
-                            .First(join => join.ContentBlockId == id)
-                            .Release;
+                                if (infographicChart != null &&
+                                    infographicChart.FileId != updatedInfographicChart?.FileId)
+                                {
+                                    await _releaseFileService.Delete(rcb.ReleaseId, new Guid(infographicChart.FileId));
+                                }
 
-                        await _releaseFileService.Delete(release.Id, new Guid(infographicChart.FileId));
-                    }
+                                _mapper.Map(dataBlockUpdate, dataBlock);
 
-                    _mapper.Map(dataBlockUpdate, existing);
+                                _context.DataBlocks.Update(dataBlock);
+                                await _context.SaveChangesAsync();
 
-                    _context.DataBlocks.Update(existing);
-                    await _context.SaveChangesAsync();
-
-                    return await Get(id);
-                });
+                                return await Get(id);
+                            }
+                        )
+                );
         }
 
         public async Task<Either<ActionResult, DeleteDataBlockPlan>> GetDeletePlan(Guid releaseId, Guid id)
         {
             return await _persistenceHelper
-                .CheckEntityExists<Release>(releaseId)
-                .OnSuccess(
-                    release => _persistenceHelper
-                        .CheckEntityExists<DataBlock>(id)
-                        .OnSuccess(CheckCanUpdateReleaseForDataBlock)
-                        .OnSuccess(block => GetDataBlock(release.Id, block.Id))
-                        .OnSuccess(
-                            async block => new DeleteDataBlockPlan
-                            {
-                                ReleaseId = releaseId,
-                                DependentDataBlocks = new List<DependentDataBlock>()
-                                {
-                                    await CreateDependentDataBlock(block)
-                                }
-                            }
+                        .CheckEntityExists<ReleaseContentBlock>(
+                            query => query
+                                .Include(rcb => rcb.Release)
+                                .Include(rcb => rcb.ContentBlock)
+                                .ThenInclude(block => block.ContentSection)
+                                .Where(rcb => rcb.ReleaseId == releaseId && rcb.ContentBlockId == id)
                         )
-                );
+                        .OnSuccessDo(rcb => _userService.CheckCanUpdateRelease(rcb.Release))
+                        .OnSuccess(
+                            rcb => CheckIsDataBlock(rcb)
+                                .OnSuccess(
+                                    async dataBlock =>
+                                        new DeleteDataBlockPlan
+                                        {
+                                            ReleaseId = releaseId,
+                                            DependentDataBlocks = new List<DependentDataBlock>()
+                                            {
+                                                await CreateDependentDataBlock(dataBlock)
+                                            }
+                                        }
+                                )
+                        );
         }
 
         public async Task<DeleteDataBlockPlan> GetDeletePlan(Guid releaseId, Subject? subject)
@@ -289,33 +292,24 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Services
                 .ToList();
         }
 
-        private DataBlock GetDataBlock(Guid releaseId, Guid id)
+        private async Task<Either<ActionResult, ReleaseContentBlock>> GetReleaseContentBlock(Guid dataBlockId)
         {
-            return _context
-                .ReleaseContentBlocks
-                .Include(join => join.ContentBlock)
-                .ThenInclude(block => block.ContentSection)
-                .Where(join => join.ReleaseId == releaseId)
-                .ToList()
-                .Select(join => join.ContentBlock)
-                .OfType<DataBlock>()
-                .First(block => block.Id == id);
+            return await _persistenceHelper.CheckEntityExists<ReleaseContentBlock>(
+                query => query
+                    .Include(rcb => rcb.Release)
+                    .Include(rcb => rcb.ContentBlock)
+                    .Where(rcb => rcb.ContentBlockId == dataBlockId && rcb.Release != null)
+            );
         }
 
-        private async Task<Either<ActionResult, DataBlock>> CheckCanUpdateReleaseForDataBlock(DataBlock dataBlock)
+        private async Task<Either<ActionResult, DataBlock>> CheckIsDataBlock(ReleaseContentBlock releaseContentBlock)
         {
-            var releaseContentBlock = _context.ReleaseContentBlocks
-                .Include(join => join.Release)
-                .FirstOrDefault(join => join.ContentBlockId == dataBlock.Id);
-
-            if (releaseContentBlock == null)
+            if (releaseContentBlock.ContentBlock is DataBlock dataBlock)
             {
-                return new ForbidResult();
+                return await Task.FromResult(dataBlock);
             }
 
-            return await _userService
-                .CheckCanUpdateRelease(releaseContentBlock.Release)
-                .OnSuccess(_ => dataBlock);
+            return new NotFoundResult();
         }
     }
 

@@ -139,7 +139,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
                 var result = await service.Get(dataBlock.Id);
 
                 Assert.True(result.IsLeft);
-                Assert.IsType<ForbidResult>(result.Left);
+                Assert.IsType<NotFoundResult>(result.Left);
             }
         }
 
@@ -581,6 +581,58 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
         }
 
         [Fact]
+        public async Task Delete_NotFound()
+        {
+            var release = new Release();
+
+            var contextId = Guid.NewGuid().ToString();
+
+            await using (var context = ContentDbUtils.InMemoryContentDbContext(contextId))
+            {
+                await context.AddAsync(release);
+                await context.SaveChangesAsync();
+            }
+
+            await using (var context = ContentDbUtils.InMemoryContentDbContext(contextId))
+            {
+                var service = BuildDataBlockService(context);
+                var result = await service.Delete(release.Id, Guid.NewGuid());
+
+                Assert.True(result.IsLeft);
+                Assert.IsType<NotFoundResult>(result.Left);
+            }
+        }
+
+        [Fact]
+        public async Task Delete_ReleaseNotFound()
+        {
+            var dataBlock = new DataBlock();
+
+            var contextId = Guid.NewGuid().ToString();
+
+            await using (var context = ContentDbUtils.InMemoryContentDbContext(contextId))
+            {
+                await context.AddAsync(
+                    new ReleaseContentBlock
+                    {
+                        Release = new Release(),
+                        ContentBlock = dataBlock
+                    }
+                );
+                await context.SaveChangesAsync();
+            }
+
+            await using (var context = ContentDbUtils.InMemoryContentDbContext(contextId))
+            {
+                var service = BuildDataBlockService(context);
+                var result = await service.Delete(Guid.NewGuid(), dataBlock.Id);
+
+                Assert.True(result.IsLeft);
+                Assert.IsType<NotFoundResult>(result.Left);
+            }
+        }
+
+        [Fact]
         public async Task Update()
         {
             var release = new Release();
@@ -716,6 +768,20 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
                 Assert.Equal(updateRequest.Table, updatedDataBlock.Table);
                 Assert.Equal(updateRequest.Charts, updatedDataBlock.Charts);
             }
+        }
+
+        [Fact]
+        public async Task Update_NotFound()
+        {
+            var contextId = Guid.NewGuid().ToString();
+
+            await using var context = ContentDbUtils.InMemoryContentDbContext(contextId);
+
+            var service = BuildDataBlockService(context);
+            var result = await service.Update(Guid.NewGuid(), new DataBlockUpdateViewModel());
+
+            Assert.True(result.IsLeft);
+            Assert.IsType<NotFoundResult>(result.Left);
         }
 
         [Fact]
