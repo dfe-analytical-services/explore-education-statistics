@@ -1,5 +1,4 @@
 ﻿using System;
-using System.Collections.Generic;
 using GovUk.Education.ExploreEducationStatistics.Admin.Security.AuthorizationHandlers;
 using GovUk.Education.ExploreEducationStatistics.Admin.Services.Methodologies;
 using GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services;
@@ -27,7 +26,11 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Security.Author
         public async void HasNonPrereleaseRoleOnAnyAssociatedReleaseAuthorizationHandler_Succeed()
         {
             var userId = Guid.NewGuid();
-            var publication = new Publication();
+            var methodology = new Methodology();
+            var publication = new Publication
+            {
+                Methodology = methodology
+            };
             var release = new Release
             {
                 Publication = publication
@@ -38,18 +41,11 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Security.Author
                 Release = release,
                 Role = ReleaseRole.Lead
             };
-            var methodology = new Methodology
-            {
-                Publications = new List<Publication> { publication }
-            };
 
             var contentDbContextId = Guid.NewGuid().ToString();
             await using (var contentDbContext = DbUtils.InMemoryApplicationDbContext(contentDbContextId))
             {
-                await contentDbContext.AddAsync(publication);
-                await contentDbContext.AddAsync(release);
                 await contentDbContext.AddAsync(userReleaseRole);
-                await contentDbContext.AddAsync(methodology);
                 await contentDbContext.SaveChangesAsync();
             }
 
@@ -70,7 +66,11 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Security.Author
         public async void HasNonPrereleaseRoleOnAnyAssociatedReleaseAuthorizationHandler_PrereleaseRole_NoSucceed()
         {
             var userId = Guid.NewGuid();
-            var publication = new Publication();
+            var methodology = new Methodology();
+            var publication = new Publication
+            {
+                Methodology = methodology
+            };
             var release = new Release
             {
                 Publication = publication
@@ -81,18 +81,11 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Security.Author
                 Release = release,
                 Role = ReleaseRole.PrereleaseViewer
             };
-            var methodology = new Methodology
-            {
-                Publications = new List<Publication> { publication }
-            };
 
             var contentDbContextId = Guid.NewGuid().ToString();
             await using (var contentDbContext = DbUtils.InMemoryApplicationDbContext(contentDbContextId))
             {
-                await contentDbContext.AddAsync(publication);
-                await contentDbContext.AddAsync(release);
                 await contentDbContext.AddAsync(userReleaseRole);
-                await contentDbContext.AddAsync(methodology);
                 await contentDbContext.SaveChangesAsync();
             }
 
@@ -113,7 +106,11 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Security.Author
         public async void HasNonPrereleaseRoleOnAnyAssociatedReleaseAuthorizationHandler_NoRole_NoSucceed()
         {
             var userId = Guid.NewGuid();
-            var publicationAttached = new Publication();
+            var methodology = new Methodology();
+            var publicationAttached = new Publication
+            {
+                Methodology = methodology
+            };
             var publicationUnattached = new Publication();
             var release = new Release
             {
@@ -125,19 +122,12 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Security.Author
                 Release = release,
                 Role = ReleaseRole.Lead
             };
-            var methodology = new Methodology
-            {
-                Publications = new List<Publication> { publicationAttached }
-            };
 
             var contentDbContextId = Guid.NewGuid().ToString();
             await using (var contentDbContext = DbUtils.InMemoryApplicationDbContext(contentDbContextId))
             {
                 await contentDbContext.AddAsync(publicationAttached);
-                await contentDbContext.AddAsync(publicationUnattached);
-                await contentDbContext.AddAsync(release);
                 await contentDbContext.AddAsync(userReleaseRole);
-                await contentDbContext.AddAsync(methodology);
                 await contentDbContext.SaveChangesAsync();
             }
 

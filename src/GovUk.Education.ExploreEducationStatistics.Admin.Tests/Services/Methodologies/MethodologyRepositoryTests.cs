@@ -1,5 +1,4 @@
 ﻿using System;
-using System.Collections.Generic;
 using System.Threading.Tasks;
 using GovUk.Education.ExploreEducationStatistics.Admin.Services.Methodologies;
 using GovUk.Education.ExploreEducationStatistics.Content.Model;
@@ -13,7 +12,14 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services.Method
         public async Task UserHasReleaseRoleAssociatedWithMethodology_ReleaseRoleLead()
         {
             var userId = Guid.NewGuid();
-            var publication = new Publication();
+            var methodology = new Methodology
+            {
+                Title = "Test methodology",
+            };
+            var publication = new Publication
+            {
+                Methodology = methodology
+            };
             var release = new Release
             {
                 Publication = publication
@@ -24,19 +30,11 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services.Method
                 Release = release,
                 Role = ReleaseRole.Lead,
             };
-            var methodology = new Methodology
-            {
-                Title = "Test methodology",
-                Publications = new List<Publication> {publication}
-            };
 
             var contentDbContextId = Guid.NewGuid().ToString();
             await using (var contentDbContext = DbUtils.InMemoryApplicationDbContext(contentDbContextId))
             {
-                await contentDbContext.AddAsync(publication);
-                await contentDbContext.AddAsync(release);
                 await contentDbContext.AddAsync(userReleaseRole);
-                await contentDbContext.AddAsync(methodology);
                 await contentDbContext.SaveChangesAsync();
             }
 
@@ -52,7 +50,14 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services.Method
         public async Task GetMethodologiesForUser_ReleaseRoleLead()
         {
             var userId = Guid.NewGuid();
-            var publication = new Publication();
+            var methodology = new Methodology
+            {
+                Title = "Test methodology",
+            };
+            var publication = new Publication
+            {
+                Methodology = methodology
+            };
             var release = new Release
             {
                 Publication = publication
@@ -63,19 +68,11 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services.Method
                 Release = release,
                 Role = ReleaseRole.Lead,
             };
-            var methodology = new Methodology
-            {
-                Title = "Test methodology",
-                Publications = new List<Publication> {publication}
-            };
 
             var contentDbContextId = Guid.NewGuid().ToString();
             await using (var contentDbContext = DbUtils.InMemoryApplicationDbContext(contentDbContextId))
             {
-                await contentDbContext.AddAsync(publication);
-                await contentDbContext.AddAsync(release);
                 await contentDbContext.AddAsync(userReleaseRole);
-                await contentDbContext.AddAsync(methodology);
                 await contentDbContext.SaveChangesAsync();
             }
 
@@ -94,7 +91,11 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services.Method
         public async Task UserHasReleaseRoleAssociatedWithMethodology_ReleaseRolePrerelease()
         {
             var userId = Guid.NewGuid();
-            var publication = new Publication();
+            var methodology = new Methodology();
+            var publication = new Publication
+            {
+                Methodology = methodology
+            };
             var release = new Release
             {
                 Publication = publication
@@ -105,19 +106,11 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services.Method
                 Release = release,
                 Role = ReleaseRole.PrereleaseViewer,
             };
-            var methodology = new Methodology
-            {
-                Title = "Test methodology",
-                Publications = new List<Publication> {publication}
-            };
 
             var contentDbContextId = Guid.NewGuid().ToString();
             await using (var contentDbContext = DbUtils.InMemoryApplicationDbContext(contentDbContextId))
             {
-                await contentDbContext.AddAsync(publication);
-                await contentDbContext.AddAsync(release);
                 await contentDbContext.AddAsync(userReleaseRole);
-                await contentDbContext.AddAsync(methodology);
                 await contentDbContext.SaveChangesAsync();
             }
 
@@ -133,7 +126,11 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services.Method
         public async Task GetMethodologiesForUser_ReleaseRolePrerelease()
         {
             var userId = Guid.NewGuid();
-            var publication = new Publication();
+            var methodology = new Methodology();
+            var publication = new Publication
+            {
+                Methodology = methodology
+            };
             var release = new Release
             {
                 Publication = publication
@@ -144,19 +141,11 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services.Method
                 Release = release,
                 Role = ReleaseRole.PrereleaseViewer,
             };
-            var methodology = new Methodology
-            {
-                Title = "Test methodology",
-                Publications = new List<Publication> {publication}
-            };
 
             var contentDbContextId = Guid.NewGuid().ToString();
             await using (var contentDbContext = DbUtils.InMemoryApplicationDbContext(contentDbContextId))
             {
-                await contentDbContext.AddAsync(publication);
-                await contentDbContext.AddAsync(release);
                 await contentDbContext.AddAsync(userReleaseRole);
-                await contentDbContext.AddAsync(methodology);
                 await contentDbContext.SaveChangesAsync();
             }
 
@@ -173,9 +162,14 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services.Method
         public async Task GetMethodologiesForUser_Multiple()
         {
             var userId = Guid.NewGuid();
+            var methodology1 = new Methodology
+            {
+                Title = "Test methodology 1",
+            };
             var publication1 = new Publication
             {
-                Title = "Test pub 1"
+                Title = "Test pub 1",
+                Methodology = methodology1
             };
             var release1 = new Release
             {
@@ -187,15 +181,15 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services.Method
                 Release = release1,
                 Role = ReleaseRole.Lead,
             };
-            var methodology1 = new Methodology
-            {
-                Title = "Test methodology 1",
-                Publications = new List<Publication> {publication1}
-            };
 
+            var methodology2 = new Methodology
+            {
+                Title = "Test methodology 2",
+            };
             var publication2 = new Publication
             {
-                Title = "Test pub 2"
+                Title = "Test pub 2",
+                Methodology = methodology2
             };
             var release2 = new Release
             {
@@ -207,15 +201,15 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services.Method
                 Release = release2,
                 Role = ReleaseRole.Contributor,
             };
-            var methodology2 = new Methodology
-            {
-                Title = "Test methodology 2",
-                Publications = new List<Publication> {publication2}
-            };
             
+            var methodology3 = new Methodology
+            {
+                Title = "Ignored methodology 3",
+            };
             var publication3 = new Publication
             {
-                Title = "Test pub 3"
+                Title = "Test pub 3",
+                Methodology = methodology3
             };
             var release3 = new Release
             {
@@ -227,38 +221,19 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services.Method
                 Release = release3,
                 Role = ReleaseRole.Lead,
             };
-            var methodology3 = new Methodology
-            {
-                Title = "Ignored methodology 3",
-                Publications = new List<Publication> {publication3}
-            };
             
             var methodology4 = new Methodology
             {
                 Title = "Ignored methodology 4",
-                Publications = new List<Publication>()
             };
             
             var contentDbContextId = Guid.NewGuid().ToString();
             await using (var contentDbContext = DbUtils.InMemoryApplicationDbContext(contentDbContextId))
             {
-                await contentDbContext.AddAsync(publication1);
-                await contentDbContext.AddAsync(release1);
                 await contentDbContext.AddAsync(userReleaseRole1);
-                await contentDbContext.AddAsync(methodology1);
-                
-                await contentDbContext.AddAsync(publication2);
-                await contentDbContext.AddAsync(release2);
                 await contentDbContext.AddAsync(userReleaseRole2);
-                await contentDbContext.AddAsync(methodology2);
-                
-                await contentDbContext.AddAsync(publication3);
-                await contentDbContext.AddAsync(release3);
                 await contentDbContext.AddAsync(userReleaseRole3);
-                await contentDbContext.AddAsync(methodology3);
-                
                 await contentDbContext.AddAsync(methodology4);
-                
                 await contentDbContext.SaveChangesAsync();
             }
 
