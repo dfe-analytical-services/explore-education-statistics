@@ -1,3 +1,4 @@
+#nullable enable
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -130,11 +131,12 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Services
 
                     if (infographicChart != null && infographicChart.FileId != updatedInfographicChart?.FileId)
                     {
-                        var release = GetReleaseForDataBlock(existing.Id);
-                        await _releaseFileService.Delete(
-                            release.Id,
-                            new Guid(infographicChart.FileId)
-                        );
+                        var release = _context.ReleaseContentBlocks
+                            .Include(join => join.Release)
+                            .First(join => join.ContentBlockId == id)
+                            .Release;
+
+                        await _releaseFileService.Delete(release.Id, new Guid(infographicChart.FileId));
                     }
 
                     _mapper.Map(dataBlockUpdate, existing);
@@ -168,7 +170,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Services
                 );
         }
 
-        public async Task<DeleteDataBlockPlan> GetDeletePlan(Guid releaseId, Subject subject)
+        public async Task<DeleteDataBlockPlan> GetDeletePlan(Guid releaseId, Subject? subject)
         {
             var blocks = (subject == null ? new List<DataBlock>() : GetDataBlocks(releaseId, subject.Id));
             var dependentBlocks = new List<DependentDataBlock>();
@@ -209,7 +211,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Services
             };
         }
 
-        private string GetContentSectionHeading(DataBlock block)
+        private string? GetContentSectionHeading(DataBlock block)
         {
             var section = block.ContentSection;
 
@@ -300,26 +302,19 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Services
                 .First(block => block.Id == id);
         }
 
-        private Release GetReleaseForDataBlock(Guid dataBlockId)
-        {
-            return _context
-                .ReleaseContentBlocks
-                .Include(join => join.Release)
-                .FirstOrDefault(join => join.ContentBlockId == dataBlockId)
-                ?.Release;
-        }
-
         private async Task<Either<ActionResult, DataBlock>> CheckCanUpdateReleaseForDataBlock(DataBlock dataBlock)
         {
-            var release = GetReleaseForDataBlock(dataBlock.Id);
+            var releaseContentBlock = _context.ReleaseContentBlocks
+                .Include(join => join.Release)
+                .FirstOrDefault(join => join.ContentBlockId == dataBlock.Id);
 
-            if (release == null)
+            if (releaseContentBlock == null)
             {
                 return new ForbidResult();
             }
 
             return await _userService
-                .CheckCanUpdateRelease(release)
+                .CheckCanUpdateRelease(releaseContentBlock.Release)
                 .OnSuccess(_ => dataBlock);
         }
     }
@@ -328,21 +323,23 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Services
     {
         [JsonIgnore]
         public Guid Id { get; set; }
-        public string Name { get; set; }
+
+        public string Name { get; set; } = "";
         public string? ContentSectionHeading { get; set; }
-        public List<InfographicFileInfo> InfographicFilesInfo { get; set; }
+        public List<InfographicFileInfo> InfographicFilesInfo { get; set; } = new List<InfographicFileInfo>();
     }
 
     public class InfographicFileInfo
     {
         public Guid Id { get; set; }
-        public string Filename { get; set; }
+        public string Filename { get; set; } = "";
     }
 
     public class DeleteDataBlockPlan
     {
         [JsonIgnore]
         public Guid ReleaseId { get; set; }
-        public List<DependentDataBlock> DependentDataBlocks { get; set; }
+
+        public List<DependentDataBlock> DependentDataBlocks { get; set; } = new List<DependentDataBlock>();
     }
 }
