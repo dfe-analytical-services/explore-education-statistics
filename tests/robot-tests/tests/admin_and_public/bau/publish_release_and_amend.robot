@@ -145,7 +145,7 @@ Create chart for data block
     [Tags]  HappyPath
     user waits until page contains link  Chart
     user waits until page does not contain loading spinner
-    user clicks element   id:manageDataBlocks-chart-tab
+    user clicks link  Chart
 
     user clicks button  Choose an infographic as alternative
     user chooses file  id:chartConfigurationForm-file       ${FILES_DIR}test-infographic.png
@@ -542,7 +542,7 @@ Update data block chart for amendment
     [Tags]  HappyPath
     user waits until page contains link  Chart
     user waits until page does not contain loading spinner
-    user clicks element   id:manageDataBlocks-chart-tab
+    user clicks link  Chart
 
     user waits until page contains element  id:chartConfigurationForm-title
     user enters text into element  id:chartConfigurationForm-title  Updated sample title

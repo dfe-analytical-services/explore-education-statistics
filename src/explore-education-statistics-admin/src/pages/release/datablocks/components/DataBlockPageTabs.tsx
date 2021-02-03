@@ -40,7 +40,7 @@ interface Props {
   onDataBlockSave: (dataBlock: ReleaseDataBlock) => void;
 }
 
-const ReleaseDataBlocksPageTabs = ({
+const DataBlockPageTabs = ({
   releaseId,
   selectedDataBlock,
   onDataBlockSave,
@@ -274,8 +274,8 @@ const ReleaseDataBlocksPageTabs = ({
       )}
 
       {!error ? (
-        <Tabs id="manageDataBlocks">
-          <TabsSection title="Data source" id="manageDataBlocks-dataSource">
+        <Tabs id="dataBlockTabs">
+          <TabsSection title="Data source" id="dataBlockTabs-dataSource">
             {!isLoading && tableState && (
               <DataBlockSourceWizard
                 key={saveNumber}
@@ -292,7 +292,7 @@ const ReleaseDataBlocksPageTabs = ({
               <TabsSection
                 title="Table"
                 key="table"
-                id="manageDataBlocks-table"
+                id="dataBlockTabs-table"
                 lazy
               >
                 <TableTabSection
@@ -301,11 +301,7 @@ const ReleaseDataBlocksPageTabs = ({
                   onSave={handleTableHeadersSave}
                 />
               </TabsSection>,
-              <TabsSection
-                title="Chart"
-                key="chart"
-                id="manageDataBlocks-chart"
-              >
+              <TabsSection title="Chart" key="chart" id="dataBlockTabs-chart">
                 <ChartBuilderTabSection
                   key={saveNumber}
                   dataBlock={selectedDataBlock}
@@ -327,4 +323,4 @@ const ReleaseDataBlocksPageTabs = ({
   );
 };
 
-export default ReleaseDataBlocksPageTabs;
+export default DataBlockPageTabs;

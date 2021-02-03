@@ -1,4 +1,4 @@
-import ReleaseDataBlocksPageTabs from '@admin/pages/release/datablocks/components/ReleaseDataBlocksPageTabs';
+import DataBlockPageTabs from '@admin/pages/release/datablocks/components/DataBlockPageTabs';
 import _dataBlockService, {
   ReleaseDataBlock,
 } from '@admin/services/dataBlockService';
@@ -21,7 +21,7 @@ const tableBuilderService = _tableBuilderService as jest.Mocked<
   typeof _tableBuilderService
 >;
 
-describe('ReleaseDataBlocksPageTabs', () => {
+describe('DataBlockPageTabs', () => {
   const testSubjectMeta: SubjectMeta = {
     filters: {
       Characteristic: {
@@ -172,12 +172,7 @@ describe('ReleaseDataBlocksPageTabs', () => {
       highlights: [],
     });
 
-    render(
-      <ReleaseDataBlocksPageTabs
-        releaseId="release-1"
-        onDataBlockSave={noop}
-      />,
-    );
+    render(<DataBlockPageTabs releaseId="release-1" onDataBlockSave={noop} />);
 
     await waitFor(() => {
       const stepHeadings = screen.queryAllByRole('heading', { name: /Step/ });
@@ -198,12 +193,7 @@ describe('ReleaseDataBlocksPageTabs', () => {
       highlights: [],
     });
 
-    render(
-      <ReleaseDataBlocksPageTabs
-        releaseId="release-1"
-        onDataBlockSave={noop}
-      />,
-    );
+    render(<DataBlockPageTabs releaseId="release-1" onDataBlockSave={noop} />);
 
     await waitFor(() => {
       const tabs = screen.getAllByRole('tab');
@@ -224,7 +214,7 @@ describe('ReleaseDataBlocksPageTabs', () => {
     tableBuilderService.getTableData.mockResolvedValue(testTableData);
 
     render(
-      <ReleaseDataBlocksPageTabs
+      <DataBlockPageTabs
         releaseId="release-1"
         selectedDataBlock={testDataBlock}
         onDataBlockSave={noop}
@@ -260,7 +250,7 @@ describe('ReleaseDataBlocksPageTabs', () => {
     tableBuilderService.getTableData.mockResolvedValue(testTableData);
 
     render(
-      <ReleaseDataBlocksPageTabs
+      <DataBlockPageTabs
         releaseId="release-1"
         selectedDataBlock={testDataBlock}
         onDataBlockSave={noop}
@@ -291,7 +281,7 @@ describe('ReleaseDataBlocksPageTabs', () => {
     });
 
     render(
-      <ReleaseDataBlocksPageTabs
+      <DataBlockPageTabs
         releaseId="release-1"
         selectedDataBlock={testDataBlock}
         onDataBlockSave={noop}
@@ -326,7 +316,7 @@ describe('ReleaseDataBlocksPageTabs', () => {
     tableBuilderService.getTableData.mockResolvedValue(testTableData);
 
     render(
-      <ReleaseDataBlocksPageTabs
+      <DataBlockPageTabs
         releaseId="release-1"
         selectedDataBlock={{
           ...testDataBlock,
@@ -374,7 +364,7 @@ describe('ReleaseDataBlocksPageTabs', () => {
       tableBuilderService.getTableData.mockResolvedValue(testTableData);
 
       render(
-        <ReleaseDataBlocksPageTabs
+        <DataBlockPageTabs
           releaseId="release-1"
           selectedDataBlock={testDataBlock}
           onDataBlockSave={noop}

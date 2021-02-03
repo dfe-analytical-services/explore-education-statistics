@@ -2,7 +2,7 @@ import Link from '@admin/components/Link';
 import { useConfig } from '@admin/contexts/ConfigContext';
 import DataBlockDeletePlanModal from '@admin/pages/release/datablocks/components/DataBlockDeletePlanModal';
 import DataBlockSelector from '@admin/pages/release/datablocks/components/DataBlockSelector';
-import ReleaseDataBlocksPageTabs from '@admin/pages/release/datablocks/components/ReleaseDataBlocksPageTabs';
+import DataBlockPageTabs from '@admin/pages/release/datablocks/components/DataBlockPageTabs';
 import {
   ReleaseDataBlockRouteParams,
   releaseDataBlocksRoute,
@@ -112,7 +112,7 @@ const ReleaseDataBlockEditPage = ({
                 Delete this data block
               </Button>
 
-              <ReleaseDataBlocksPageTabs
+              <DataBlockPageTabs
                 key={dataBlockId}
                 releaseId={releaseId}
                 selectedDataBlock={dataBlock}
