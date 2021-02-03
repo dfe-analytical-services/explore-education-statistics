@@ -3,6 +3,7 @@ using System.Linq;
 using System.Threading.Tasks;
 using GovUk.Education.ExploreEducationStatistics.Admin.Mappings;
 using GovUk.Education.ExploreEducationStatistics.Admin.Services;
+using GovUk.Education.ExploreEducationStatistics.Common.Model;
 using GovUk.Education.ExploreEducationStatistics.Content.Model;
 using Xunit;
 using static GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services.DbUtils;
@@ -20,6 +21,9 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
             var release = new Release
             {
                 ReleaseName = "2000",
+                Published = DateTime.Now,
+                TimePeriodCoverage = TimeIdentifier.April,
+                PreviousVersionId = Guid.NewGuid(),
                 Publication = new Publication
                 {
                     Title = "Test publication",
@@ -70,7 +74,12 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
 
                 var statsRelease = await statisticsDbContext.Release.FindAsync(release.Id);
                 Assert.NotNull(statsRelease);
+                Assert.Equal(release.Published, statsRelease.Published);
+                Assert.Equal(release.Slug, statsRelease.Slug);
+                Assert.Equal(release.PublicationId, statsRelease.PublicationId);
+                Assert.Equal(release.TimePeriodCoverage, statsRelease.TimeIdentifier);
                 Assert.Equal(release.Year, statsRelease.Year);
+                Assert.Equal(release.PreviousVersionId, statsRelease.PreviousVersionId);
             }
             
         }
@@ -83,6 +92,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
             var release = new Release
             {
                 ReleaseName = "2000",
+                TimePeriodCoverage = TimeIdentifier.Week5,
                 Publication = new Publication
                 {
                     Title = "Test publication",
@@ -126,7 +136,8 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
                 await statisticsDbContext.AddAsync(new Data.Model.Release
                 {
                     Id = release.Id,
-                    Year = 1234
+                    Year = 1234,
+                    TimeIdentifier = TimeIdentifier.CalendarYearQ1
                 });
                 await statisticsDbContext.SaveChangesAsync();
             }
@@ -160,6 +171,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
                 var statsRelease = await statisticsDbContext.Release.FindAsync(release.Id);
                 Assert.NotNull(statsRelease);
                 Assert.Equal(release.Year, statsRelease.Year);
+                Assert.Equal(release.TimePeriodCoverage, statsRelease.TimeIdentifier);
             }
         }
         
@@ -171,6 +183,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
             var release = new Release
             {
                 ReleaseName = "2000",
+                TimePeriodCoverage = TimeIdentifier.April,
                 Publication = new Publication
                 {
                     Title = "Test publication",
