@@ -47,6 +47,41 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services.Method
         }
 
         [Fact]
+        public async Task UserHasReleaseRoleAssociatedWithMethodology_ReleaseRolePrerelease()
+        {
+            var userId = Guid.NewGuid();
+            var methodology = new Methodology();
+            var publication = new Publication
+            {
+                Methodology = methodology
+            };
+            var release = new Release
+            {
+                Publication = publication
+            };
+            var userReleaseRole = new UserReleaseRole
+            {
+                UserId = userId,
+                Release = release,
+                Role = ReleaseRole.PrereleaseViewer,
+            };
+
+            var contentDbContextId = Guid.NewGuid().ToString();
+            await using (var contentDbContext = DbUtils.InMemoryApplicationDbContext(contentDbContextId))
+            {
+                await contentDbContext.AddAsync(userReleaseRole);
+                await contentDbContext.SaveChangesAsync();
+            }
+
+            await using (var contentDbContext = DbUtils.InMemoryApplicationDbContext(contentDbContextId))
+            {
+                var methodologyRepository = new MethodologyRepository(contentDbContext);
+                Assert.False(
+                    await methodologyRepository.UserHasReleaseRoleAssociatedWithMethodology(userId, methodology));
+            }
+        }
+
+        [Fact]
         public async Task GetMethodologiesForUser_ReleaseRoleLead()
         {
             var userId = Guid.NewGuid();
@@ -84,41 +119,6 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services.Method
                 Assert.Single(methodologies);
                 Assert.Equal(methodology.Id, methodologies[0].Id);
                 Assert.Equal(methodology.Title, methodologies[0].Title);
-            }
-        }
-
-        [Fact]
-        public async Task UserHasReleaseRoleAssociatedWithMethodology_ReleaseRolePrerelease()
-        {
-            var userId = Guid.NewGuid();
-            var methodology = new Methodology();
-            var publication = new Publication
-            {
-                Methodology = methodology
-            };
-            var release = new Release
-            {
-                Publication = publication
-            };
-            var userReleaseRole = new UserReleaseRole
-            {
-                UserId = userId,
-                Release = release,
-                Role = ReleaseRole.PrereleaseViewer,
-            };
-
-            var contentDbContextId = Guid.NewGuid().ToString();
-            await using (var contentDbContext = DbUtils.InMemoryApplicationDbContext(contentDbContextId))
-            {
-                await contentDbContext.AddAsync(userReleaseRole);
-                await contentDbContext.SaveChangesAsync();
-            }
-
-            await using (var contentDbContext = DbUtils.InMemoryApplicationDbContext(contentDbContextId))
-            {
-                var methodologyRepository = new MethodologyRepository(contentDbContext);
-                Assert.False(
-                    await methodologyRepository.UserHasReleaseRoleAssociatedWithMethodology(userId, methodology));
             }
         }
 
