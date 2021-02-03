@@ -18,7 +18,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Security.Author
         public void UpdateAllSpecificMethodologies()
         {
             AssertReleaseHandlerSucceedsWithCorrectClaims<UpdateSpecificMethodologyRequirement>(
-                new UpdateAllSpecificMethodologiesAuthorizationHandler(),
+                new CanUpdateAllSpecificMethodologies(),
                 UpdateAllMethodologies
             );
         }
@@ -107,11 +107,14 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Security.Author
         public async void HasNonPrereleaseRoleOnAnyAssociatedRelease_NoRole_NoSucceed()
         {
             var userId = Guid.NewGuid();
+
             var methodology = new Methodology();
             var publicationAttached = new Publication
             {
                 Methodology = methodology
             };
+
+            // userId associated publication unattached to methodology
             var publicationUnattached = new Publication();
             var release = new Release
             {

@@ -163,6 +163,8 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services.Method
         public async Task GetMethodologiesForUser_Multiple()
         {
             var userId = Guid.NewGuid();
+
+            // Associated with userId
             var methodology1 = new Methodology
             {
                 Title = "Test methodology 1",
@@ -203,6 +205,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services.Method
                 Role = ReleaseRole.Contributor,
             };
 
+            // Not associated with userId
             var methodology3 = new Methodology
             {
                 Title = "Ignored methodology 3",

@@ -13,21 +13,21 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Security.Authorizatio
         : CompoundAuthorizationHandler<ViewSpecificMethodologyRequirement, Methodology>
     {
         public ViewSpecificMethodologyAuthorizationHandler(IMethodologyRepository methodologyRepository) : base(
-            new CanViewAllMethodologiesAuthorizationHandler(),
-            new HasRoleOnAnyAssociatedReleaseAuthorizationHandler(methodologyRepository)) {}
+            new CanViewAllMethodologies(),
+            new HasRoleOnAnyAssociatedRelease(methodologyRepository)) {}
     
-        public class CanViewAllMethodologiesAuthorizationHandler 
+        public class CanViewAllMethodologies
             : HasClaimAuthorizationHandler<ViewSpecificMethodologyRequirement>
         {
-            public CanViewAllMethodologiesAuthorizationHandler()
+            public CanViewAllMethodologies()
                 : base(SecurityClaimTypes.AccessAllMethodologies) {}
         }
 
-        public class HasRoleOnAnyAssociatedReleaseAuthorizationHandler
+        public class HasRoleOnAnyAssociatedRelease
             : AuthorizationHandler<ViewSpecificMethodologyRequirement, Methodology>
         {
             private readonly IMethodologyRepository _methodologyRepository;
-            public HasRoleOnAnyAssociatedReleaseAuthorizationHandler(IMethodologyRepository methodologyRepository)
+            public HasRoleOnAnyAssociatedRelease(IMethodologyRepository methodologyRepository)
             {
                 _methodologyRepository = methodologyRepository;
             }

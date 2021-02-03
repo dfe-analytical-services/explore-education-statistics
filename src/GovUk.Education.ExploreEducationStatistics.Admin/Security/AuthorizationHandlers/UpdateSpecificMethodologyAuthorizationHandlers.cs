@@ -1,4 +1,3 @@
-using System.Linq;
 using System.Threading.Tasks;
 using GovUk.Education.ExploreEducationStatistics.Admin.Services.Interfaces.Methodologies;
 using GovUk.Education.ExploreEducationStatistics.Common.Services.Security;
@@ -16,23 +15,23 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Security.Authorizatio
     {
         public UpdateSpecificMethodologyAuthorizationHandler(IMethodologyRepository methodologyRepository)
             : base(
-                new UpdateAllSpecificMethodologiesAuthorizationHandler(),
-                new HasNonPrereleaseRoleOnAnyAssociatedReleaseAuthorizationHandler(methodologyRepository)) {}
+                new CanUpdateAllSpecificMethodologies(),
+                new HasNonPrereleaseRoleOnAnyAssociatedRelease(methodologyRepository)) {}
     }
 
-    public class UpdateAllSpecificMethodologiesAuthorizationHandler
+    public class CanUpdateAllSpecificMethodologies
         : HasClaimAuthorizationHandler<UpdateSpecificMethodologyRequirement>
     {
-        public UpdateAllSpecificMethodologiesAuthorizationHandler()
+        public CanUpdateAllSpecificMethodologies()
             : base(SecurityClaimTypes.UpdateAllMethodologies) {}
     }
 
-    public class HasNonPrereleaseRoleOnAnyAssociatedReleaseAuthorizationHandler
+    public class HasNonPrereleaseRoleOnAnyAssociatedRelease
         : AuthorizationHandler<UpdateSpecificMethodologyRequirement, Methodology>
     {
         private readonly IMethodologyRepository _methodologyRepository;
 
-        public HasNonPrereleaseRoleOnAnyAssociatedReleaseAuthorizationHandler(
+        public HasNonPrereleaseRoleOnAnyAssociatedRelease(
             IMethodologyRepository methodologyRepository)
         {
             _methodologyRepository = methodologyRepository;
