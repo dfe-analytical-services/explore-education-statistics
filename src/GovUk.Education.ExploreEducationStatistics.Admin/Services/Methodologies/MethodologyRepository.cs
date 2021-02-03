@@ -21,17 +21,14 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Services.Methodologie
 
         public async Task<bool> UserHasReleaseRoleAssociatedWithMethodology(
             Guid userId,
-            Methodology methodology)
+            Guid methodologyId)
         {
-            if (methodology.Publications == null)
-            {
-                methodology = await _contentDbContext.Methodologies
-                    .Include(m => m.Publications)
-                    .Where(m => m.Id == methodology.Id)
-                    .SingleAsync();
-            }
+            var methodology = await _contentDbContext.Methodologies.FindAsync(methodologyId);
+            await _contentDbContext.Entry(methodology)
+                .Collection(m => m.Publications)
+                .LoadAsync();
 
-            var viewablePublications = await GetViewAblePublications(userId);
+            var viewablePublications = await GetViewablePublications(userId);
 
             return viewablePublications
                 .Any(p1 => methodology.Publications
@@ -41,7 +38,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Services.Methodologie
 
         public async Task<List<Methodology>> GetMethodologiesForUser(Guid userId)
         {
-            var viewablePublications = await GetViewAblePublications(userId);
+            var viewablePublications = await GetViewablePublications(userId);
 
             var allMethodologies = await _contentDbContext.Methodologies
                 .Include(m => m.Publications)
@@ -56,7 +53,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Services.Methodologie
                 .ToList();
         }
 
-        private async Task<List<Publication>> GetViewAblePublications(Guid userId)
+        private async Task<List<Publication>> GetViewablePublications(Guid userId)
         {
             return await _contentDbContext.UserReleaseRoles
                 .Include(urr => urr.Release)

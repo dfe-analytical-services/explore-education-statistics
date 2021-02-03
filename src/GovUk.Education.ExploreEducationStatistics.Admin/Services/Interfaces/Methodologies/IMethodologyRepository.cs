@@ -9,7 +9,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Services.Interfaces.M
     {
         Task<bool> UserHasReleaseRoleAssociatedWithMethodology(
             Guid userId,
-            Methodology methodology);
+            Guid methodologyId);
 
         Task<List<Methodology>> GetMethodologiesForUser(Guid userId);
     }

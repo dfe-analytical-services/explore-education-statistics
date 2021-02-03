@@ -37,9 +37,9 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Security.Authorizatio
                 ViewSpecificMethodologyRequirement requirement,
                 Methodology methodology)
             {
-                if(await _methodologyRepository.UserHasReleaseRoleAssociatedWithMethodology(
+                if (await _methodologyRepository.UserHasReleaseRoleAssociatedWithMethodology(
                     authContext.User.GetUserId(),
-                    methodology))
+                    methodology.Id))
                 {
                     authContext.Succeed(requirement);
                 }

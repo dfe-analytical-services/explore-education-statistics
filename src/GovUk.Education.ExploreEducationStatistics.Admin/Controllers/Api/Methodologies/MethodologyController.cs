@@ -65,7 +65,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Controllers.Api.Metho
         {
             return await _methodologyService
                 .ListWithPublicationsAsync()
-                .HandleFailuresOr(Ok);
+                .HandleFailuresOrOk();
         }
     }
 }
