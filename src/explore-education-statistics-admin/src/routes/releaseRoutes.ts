@@ -92,7 +92,7 @@ export const releaseDataBlocksRoute: ReleaseRouteProps = {
 };
 
 export const releaseDataBlockCreateRoute: ReleaseRouteProps = {
-  path: '/publication/:publicationId/release/:releaseId/create-data-block',
+  path: '/publication/:publicationId/release/:releaseId/data-blocks/create',
   title: 'Create data block',
   component: ReleaseDataBlockCreatePage,
 };
