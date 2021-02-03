@@ -15,7 +15,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Security.Author
     public class ViewSpecificMethodologyAuthorizationHandlerTests
     {
         [Fact]
-        public void CanViewAllMethodologiesAuthorizationHandler()
+        public void CanViewAllMethodologies()
         {
             AssertReleaseHandlerSucceedsWithCorrectClaims<ViewSpecificMethodologyRequirement>(
                 new ViewSpecificMethodologyAuthorizationHandler.CanViewAllMethodologiesAuthorizationHandler(),
@@ -23,7 +23,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Security.Author
         }
 
         [Fact]
-        public async void HasRoleOnAnyAssociatedReleaseAuthorizationHandler_Succeed()
+        public async void HasRoleOnAnyAssociatedRelease_Succeed()
         {
             var userId = Guid.NewGuid();
             var methodology = new Methodology();
@@ -63,7 +63,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Security.Author
         }
 
         [Fact]
-        public async void HasRoleOnAnyAssociatedReleaseAuthorizationHandler_PrereleaseRole_NoSucceed()
+        public async void HasRoleOnAnyAssociatedRelease_PrereleaseRole_NoSucceed()
         {
             var userId = Guid.NewGuid();
             var methodology = new Methodology();
@@ -103,7 +103,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Security.Author
         }
 
         [Fact]
-        public async void HasRoleOnAnyAssociatedReleaseAuthorizationHandler_NoRole_NoSucceed()
+        public async void HasRoleOnAnyAssociatedRelease_NoRole_NoSucceed()
         {
             var userId = Guid.NewGuid();
             var methodology = new Methodology();

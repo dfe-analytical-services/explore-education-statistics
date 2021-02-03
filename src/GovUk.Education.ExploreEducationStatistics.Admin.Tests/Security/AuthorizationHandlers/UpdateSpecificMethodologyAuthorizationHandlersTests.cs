@@ -15,7 +15,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Security.Author
     public class UpdateSpecificMethodologyAuthorizationHandlersTests
     {
         [Fact]
-        public void UpdateAllSpecificMethodologiesAuthorizationHandler()
+        public void UpdateAllSpecificMethodologies()
         {
             AssertReleaseHandlerSucceedsWithCorrectClaims<UpdateSpecificMethodologyRequirement>(
                 new UpdateAllSpecificMethodologiesAuthorizationHandler(),
@@ -24,7 +24,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Security.Author
         }
 
         [Fact]
-        public async void HasNonPrereleaseRoleOnAnyAssociatedReleaseAuthorizationHandler_Succeed()
+        public async void HasNonPrereleaseRoleOnAnyAssociatedRelease_Succeed()
         {
             var userId = Guid.NewGuid();
             var methodology = new Methodology();
@@ -64,7 +64,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Security.Author
         }
 
         [Fact]
-        public async void HasNonPrereleaseRoleOnAnyAssociatedReleaseAuthorizationHandler_PrereleaseRole_NoSucceed()
+        public async void HasNonPrereleaseRoleOnAnyAssociatedRelease_PrereleaseRole_NoSucceed()
         {
             var userId = Guid.NewGuid();
             var methodology = new Methodology();
@@ -104,7 +104,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Security.Author
         }
 
         [Fact]
-        public async void HasNonPrereleaseRoleOnAnyAssociatedReleaseAuthorizationHandler_NoRole_NoSucceed()
+        public async void HasNonPrereleaseRoleOnAnyAssociatedRelease_NoRole_NoSucceed()
         {
             var userId = Guid.NewGuid();
             var methodology = new Methodology();
