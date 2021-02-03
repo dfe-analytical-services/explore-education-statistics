@@ -116,7 +116,8 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Mappings
                 .ForMember(dest => dest.Releases, m => m.Ignore())
                 .ForMember(dest => dest.Topic, m => m.Ignore());
             CreateMap<Release, Data.Model.Release>()
-                .ForMember(dest => dest.Publication, m => m.Ignore());
+                .ForMember(dest => dest.Publication, m => m.Ignore())
+                .ForMember(dest => dest.TimeIdentifier, m => m.MapFrom(r => r.TimePeriodCoverage));
 
             CreateMap<Theme, ThemeViewModel>()
                 .ForMember(theme => theme.Topics, m => m.MapFrom(t => t.Topics.OrderBy(topic => topic.Title)));
