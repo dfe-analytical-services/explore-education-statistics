@@ -230,10 +230,11 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services.Method
             var contentDbContextId = Guid.NewGuid().ToString();
             await using (var contentDbContext = DbUtils.InMemoryApplicationDbContext(contentDbContextId))
             {
-                await contentDbContext.AddAsync(userReleaseRole1);
-                await contentDbContext.AddAsync(userReleaseRole2);
-                await contentDbContext.AddAsync(userReleaseRole3);
-                await contentDbContext.AddAsync(methodology4);
+                await contentDbContext.AddRangeAsync(
+                    userReleaseRole1,
+                    userReleaseRole2,
+                    userReleaseRole3,
+                    methodology4);
                 await contentDbContext.SaveChangesAsync();
             }
 

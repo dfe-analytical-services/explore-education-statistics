@@ -126,8 +126,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Security.Author
             var contentDbContextId = Guid.NewGuid().ToString();
             await using (var contentDbContext = DbUtils.InMemoryApplicationDbContext(contentDbContextId))
             {
-                await contentDbContext.AddAsync(publicationAttached);
-                await contentDbContext.AddAsync(userReleaseRole);
+                await contentDbContext.AddRangeAsync(publicationAttached, userReleaseRole);
                 await contentDbContext.SaveChangesAsync();
             }
 

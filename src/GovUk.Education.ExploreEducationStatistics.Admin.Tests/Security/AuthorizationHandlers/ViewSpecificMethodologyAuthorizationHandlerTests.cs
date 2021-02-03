@@ -1,5 +1,4 @@
 ﻿using System;
-using System.Collections.Generic;
 using GovUk.Education.ExploreEducationStatistics.Admin.Security.AuthorizationHandlers;
 using GovUk.Education.ExploreEducationStatistics.Admin.Services.Methodologies;
 using GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services;
@@ -126,8 +125,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Security.Author
             var contentDbContextId = Guid.NewGuid().ToString();
             await using (var contentDbContext = DbUtils.InMemoryApplicationDbContext(contentDbContextId))
             {
-                await contentDbContext.AddAsync(publicationAttached);
-                await contentDbContext.AddAsync(userReleaseRole);
+                await contentDbContext.AddRangeAsync(publicationAttached, userReleaseRole);
                 await contentDbContext.SaveChangesAsync();
             }
 
