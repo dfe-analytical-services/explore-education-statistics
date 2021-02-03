@@ -3,6 +3,7 @@ using GovUk.Education.ExploreEducationStatistics.Admin.Security.AuthorizationHan
 using GovUk.Education.ExploreEducationStatistics.Admin.Services.Methodologies;
 using GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services;
 using GovUk.Education.ExploreEducationStatistics.Content.Model;
+using GovUk.Education.ExploreEducationStatistics.Content.Model.Database;
 using Microsoft.AspNetCore.Authorization;
 using Xunit;
 using static GovUk.Education.ExploreEducationStatistics.Admin.Security.SecurityClaimTypes;
@@ -50,7 +51,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Security.Author
 
             await using (var contentDbContext = DbUtils.InMemoryApplicationDbContext(contentDbContextId))
             {
-                var methodologyRepository = new MethodologyRepository(contentDbContext);
+                var methodologyRepository = BuildMethodologyRepository(contentDbContext);
                 var handler = new ViewSpecificMethodologyAuthorizationHandler(methodologyRepository);
                 var authContext = new AuthorizationHandlerContext(
                     new IAuthorizationRequirement[] {new ViewSpecificMethodologyRequirement()},
@@ -90,7 +91,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Security.Author
 
             await using (var contentDbContext = DbUtils.InMemoryApplicationDbContext(contentDbContextId))
             {
-                var methodologyRepository = new MethodologyRepository(contentDbContext);
+                var methodologyRepository = BuildMethodologyRepository(contentDbContext);
                 var handler = new ViewSpecificMethodologyAuthorizationHandler(methodologyRepository);
                 var authContext = new AuthorizationHandlerContext(
                     new IAuthorizationRequirement[] {new ViewSpecificMethodologyRequirement()},
@@ -131,7 +132,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Security.Author
 
             await using (var contentDbContext = DbUtils.InMemoryApplicationDbContext(contentDbContextId))
             {
-                var methodologyRepository = new MethodologyRepository(contentDbContext);
+                var methodologyRepository = BuildMethodologyRepository(contentDbContext);
                 var handler = new ViewSpecificMethodologyAuthorizationHandler(methodologyRepository);
                 var authContext = new AuthorizationHandlerContext(
                     new IAuthorizationRequirement[] {new ViewSpecificMethodologyRequirement()},
@@ -140,6 +141,11 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Security.Author
                 await handler.HandleAsync(authContext);
                 Assert.False(authContext.HasSucceeded);
             }
+        }
+
+        private MethodologyRepository BuildMethodologyRepository(ContentDbContext contentDbContext)
+        {
+            return new MethodologyRepository(contentDbContext);
         }
     }
 }

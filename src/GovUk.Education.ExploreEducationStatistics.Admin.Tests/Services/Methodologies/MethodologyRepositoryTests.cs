@@ -2,6 +2,7 @@
 using System.Threading.Tasks;
 using GovUk.Education.ExploreEducationStatistics.Admin.Services.Methodologies;
 using GovUk.Education.ExploreEducationStatistics.Content.Model;
+using GovUk.Education.ExploreEducationStatistics.Content.Model.Database;
 using Xunit;
 
 namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services.Methodologies
@@ -40,9 +41,9 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services.Method
 
             await using (var contentDbContext = DbUtils.InMemoryApplicationDbContext(contentDbContextId))
             {
-                var methodologyRepository = new MethodologyRepository(contentDbContext);
+                var methodologyRepository = BuildMethodologyRepository(contentDbContext);
                 Assert.True(
-                    await methodologyRepository.UserHasReleaseRoleAssociatedWithMethodology(userId, methodology));
+                    await methodologyRepository.UserHasReleaseRoleAssociatedWithMethodology(userId, methodology.Id));
             }
         }
 
@@ -75,9 +76,9 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services.Method
 
             await using (var contentDbContext = DbUtils.InMemoryApplicationDbContext(contentDbContextId))
             {
-                var methodologyRepository = new MethodologyRepository(contentDbContext);
+                var methodologyRepository = BuildMethodologyRepository(contentDbContext);
                 Assert.False(
-                    await methodologyRepository.UserHasReleaseRoleAssociatedWithMethodology(userId, methodology));
+                    await methodologyRepository.UserHasReleaseRoleAssociatedWithMethodology(userId, methodology.Id));
             }
         }
 
@@ -113,7 +114,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services.Method
 
             await using (var contentDbContext = DbUtils.InMemoryApplicationDbContext(contentDbContextId))
             {
-                var methodologyRepository = new MethodologyRepository(contentDbContext);
+                var methodologyRepository = BuildMethodologyRepository(contentDbContext);
                 var methodologies = await methodologyRepository.GetMethodologiesForUser(userId);
 
                 Assert.Single(methodologies);
@@ -151,13 +152,13 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services.Method
 
             await using (var contentDbContext = DbUtils.InMemoryApplicationDbContext(contentDbContextId))
             {
-                var methodologyRepository = new MethodologyRepository(contentDbContext);
+                var methodologyRepository = BuildMethodologyRepository(contentDbContext);
                 var methodologies = await methodologyRepository.GetMethodologiesForUser(userId);
 
                 Assert.Empty(methodologies);
             }
         }
-        
+
         [Fact]
         public async Task GetMethodologiesForUser_Multiple()
         {
@@ -201,7 +202,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services.Method
                 Release = release2,
                 Role = ReleaseRole.Contributor,
             };
-            
+
             var methodology3 = new Methodology
             {
                 Title = "Ignored methodology 3",
@@ -221,12 +222,12 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services.Method
                 Release = release3,
                 Role = ReleaseRole.Lead,
             };
-            
+
             var methodology4 = new Methodology
             {
                 Title = "Ignored methodology 4",
             };
-            
+
             var contentDbContextId = Guid.NewGuid().ToString();
             await using (var contentDbContext = DbUtils.InMemoryApplicationDbContext(contentDbContextId))
             {
@@ -240,7 +241,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services.Method
 
             await using (var contentDbContext = DbUtils.InMemoryApplicationDbContext(contentDbContextId))
             {
-                var methodologyRepository = new MethodologyRepository(contentDbContext);
+                var methodologyRepository = BuildMethodologyRepository(contentDbContext);
                 var methodologies = await methodologyRepository.GetMethodologiesForUser(userId);
 
                 Assert.Equal(2, methodologies.Count);
@@ -249,6 +250,11 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services.Method
                 Assert.DoesNotContain(methodologies, m => m.Id == methodology3.Id);
                 Assert.DoesNotContain(methodologies, m => m.Id == methodology4.Id);
             }
+        }
+
+        private MethodologyRepository BuildMethodologyRepository(ContentDbContext contentDbContext)
+        {
+            return new MethodologyRepository(contentDbContext);
         }
     }
 }
