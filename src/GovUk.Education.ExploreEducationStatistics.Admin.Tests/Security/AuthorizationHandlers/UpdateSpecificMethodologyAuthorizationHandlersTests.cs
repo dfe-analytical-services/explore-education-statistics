@@ -27,14 +27,10 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Security.Author
         public async void HasNonPrereleaseRoleOnAnyAssociatedReleaseAuthorizationHandler_Succeed()
         {
             var userId = Guid.NewGuid();
-            var publication = new Publication
-            {
-                Id = Guid.NewGuid()
-            };
+            var publication = new Publication();
             var release = new Release
             {
-                Id = Guid.NewGuid(),
-                PublicationId = publication.Id
+                Publication = publication
             };
             var userReleaseRole = new UserReleaseRole
             {
@@ -44,7 +40,6 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Security.Author
             };
             var methodology = new Methodology
             {
-                Id = Guid.NewGuid(),
                 Publications = new List<Publication> { publication }
             };
 
@@ -75,14 +70,10 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Security.Author
         public async void HasNonPrereleaseRoleOnAnyAssociatedReleaseAuthorizationHandler_PrereleaseRole_NoSucceed()
         {
             var userId = Guid.NewGuid();
-            var publication = new Publication
-            {
-                Id = Guid.NewGuid()
-            };
+            var publication = new Publication();
             var release = new Release
             {
-                Id = Guid.NewGuid(),
-                PublicationId = publication.Id
+                Publication = publication
             };
             var userReleaseRole = new UserReleaseRole
             {
@@ -92,7 +83,6 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Security.Author
             };
             var methodology = new Methodology
             {
-                Id = Guid.NewGuid(),
                 Publications = new List<Publication> { publication }
             };
 
@@ -123,18 +113,11 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Security.Author
         public async void HasNonPrereleaseRoleOnAnyAssociatedReleaseAuthorizationHandler_NoRole_NoSucceed()
         {
             var userId = Guid.NewGuid();
-            var publicationAttached = new Publication
-            {
-                Id = Guid.NewGuid(),
-            };
-            var publicationUnattached = new Publication
-            {
-                Id = Guid.NewGuid(),
-            };
+            var publicationAttached = new Publication();
+            var publicationUnattached = new Publication();
             var release = new Release
             {
-                Id = Guid.NewGuid(),
-                PublicationId = publicationUnattached.Id
+                Publication = publicationUnattached
             };
             var userReleaseRole = new UserReleaseRole
             {
@@ -144,7 +127,6 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Security.Author
             };
             var methodology = new Methodology
             {
-                Id = Guid.NewGuid(),
                 Publications = new List<Publication> { publicationAttached }
             };
 

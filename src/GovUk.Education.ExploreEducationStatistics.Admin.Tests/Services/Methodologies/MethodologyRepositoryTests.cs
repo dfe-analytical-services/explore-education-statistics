@@ -13,14 +13,10 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services.Method
         public async Task UserHasReleaseRoleAssociatedWithMethodology_ReleaseRoleLead()
         {
             var userId = Guid.NewGuid();
-            var publication = new Publication
-            {
-                Id = Guid.NewGuid()
-            };
+            var publication = new Publication();
             var release = new Release
             {
-                Id = Guid.NewGuid(),
-                PublicationId = publication.Id
+                Publication = publication
             };
             var userReleaseRole = new UserReleaseRole
             {
@@ -30,7 +26,6 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services.Method
             };
             var methodology = new Methodology
             {
-                Id = Guid.NewGuid(),
                 Title = "Test methodology",
                 Publications = new List<Publication> {publication}
             };
@@ -57,14 +52,10 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services.Method
         public async Task GetMethodologiesForUser_ReleaseRoleLead()
         {
             var userId = Guid.NewGuid();
-            var publication = new Publication
-            {
-                Id = Guid.NewGuid()
-            };
+            var publication = new Publication();
             var release = new Release
             {
-                Id = Guid.NewGuid(),
-                PublicationId = publication.Id
+                Publication = publication
             };
             var userReleaseRole = new UserReleaseRole
             {
@@ -74,7 +65,6 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services.Method
             };
             var methodology = new Methodology
             {
-                Id = Guid.NewGuid(),
                 Title = "Test methodology",
                 Publications = new List<Publication> {publication}
             };
@@ -104,14 +94,10 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services.Method
         public async Task UserHasReleaseRoleAssociatedWithMethodology_ReleaseRolePrerelease()
         {
             var userId = Guid.NewGuid();
-            var publication = new Publication
-            {
-                Id = Guid.NewGuid()
-            };
+            var publication = new Publication();
             var release = new Release
             {
-                Id = Guid.NewGuid(),
-                PublicationId = publication.Id
+                Publication = publication
             };
             var userReleaseRole = new UserReleaseRole
             {
@@ -121,7 +107,6 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services.Method
             };
             var methodology = new Methodology
             {
-                Id = Guid.NewGuid(),
                 Title = "Test methodology",
                 Publications = new List<Publication> {publication}
             };
@@ -148,14 +133,10 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services.Method
         public async Task GetMethodologiesForUser_ReleaseRolePrerelease()
         {
             var userId = Guid.NewGuid();
-            var publication = new Publication
-            {
-                Id = Guid.NewGuid()
-            };
+            var publication = new Publication();
             var release = new Release
             {
-                Id = Guid.NewGuid(),
-                PublicationId = publication.Id
+                Publication = publication
             };
             var userReleaseRole = new UserReleaseRole
             {
@@ -165,7 +146,6 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services.Method
             };
             var methodology = new Methodology
             {
-                Id = Guid.NewGuid(),
                 Title = "Test methodology",
                 Publications = new List<Publication> {publication}
             };
@@ -195,13 +175,11 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services.Method
             var userId = Guid.NewGuid();
             var publication1 = new Publication
             {
-                Id = Guid.NewGuid(),
                 Title = "Test pub 1"
             };
             var release1 = new Release
             {
-                Id = Guid.NewGuid(),
-                PublicationId = publication1.Id
+                Publication = publication1
             };
             var userReleaseRole1 = new UserReleaseRole
             {
@@ -211,20 +189,17 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services.Method
             };
             var methodology1 = new Methodology
             {
-                Id = Guid.NewGuid(),
                 Title = "Test methodology 1",
                 Publications = new List<Publication> {publication1}
             };
 
             var publication2 = new Publication
             {
-                Id = Guid.NewGuid(),
                 Title = "Test pub 2"
             };
             var release2 = new Release
             {
-                Id = Guid.NewGuid(),
-                PublicationId = publication2.Id
+                Publication = publication2
             };
             var userReleaseRole2 = new UserReleaseRole
             {
@@ -234,20 +209,17 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services.Method
             };
             var methodology2 = new Methodology
             {
-                Id = Guid.NewGuid(),
                 Title = "Test methodology 2",
                 Publications = new List<Publication> {publication2}
             };
             
             var publication3 = new Publication
             {
-                Id = Guid.NewGuid(),
                 Title = "Test pub 3"
             };
             var release3 = new Release
             {
-                Id = Guid.NewGuid(),
-                PublicationId = publication3.Id
+                Publication = publication3
             };
             var userReleaseRole3 = new UserReleaseRole
             {
@@ -257,15 +229,13 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services.Method
             };
             var methodology3 = new Methodology
             {
-                Id = Guid.NewGuid(),
                 Title = "Ignored methodology 3",
                 Publications = new List<Publication> {publication3}
             };
             
             var methodology4 = new Methodology
             {
-                Id = Guid.NewGuid(),
-                Title = "Ignored methodology 3",
+                Title = "Ignored methodology 4",
                 Publications = new List<Publication>()
             };
             
@@ -304,7 +274,5 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services.Method
                 Assert.DoesNotContain(methodologies, m => m.Id == methodology4.Id);
             }
         }
-        
-        
     }
 }
