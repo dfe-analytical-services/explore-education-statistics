@@ -169,6 +169,7 @@ describe('ReleaseDataBlocksPageTabs', () => {
     tableBuilderService.getReleaseMeta.mockResolvedValue({
       releaseId: 'release-1',
       subjects: [],
+      highlights: [],
     });
 
     render(
@@ -194,6 +195,7 @@ describe('ReleaseDataBlocksPageTabs', () => {
     tableBuilderService.getReleaseMeta.mockResolvedValue({
       releaseId: 'release-1',
       subjects: [],
+      highlights: [],
     });
 
     render(
@@ -215,6 +217,7 @@ describe('ReleaseDataBlocksPageTabs', () => {
     tableBuilderService.getReleaseMeta.mockResolvedValue({
       releaseId: 'release-1',
       subjects: [],
+      highlights: [],
     });
 
     tableBuilderService.getSubjectMeta.mockResolvedValue(testSubjectMeta);
@@ -250,6 +253,7 @@ describe('ReleaseDataBlocksPageTabs', () => {
     tableBuilderService.getReleaseMeta.mockResolvedValue({
       releaseId: 'release-1',
       subjects: [],
+      highlights: [],
     });
 
     tableBuilderService.getSubjectMeta.mockResolvedValue(testSubjectMeta);
@@ -277,6 +281,7 @@ describe('ReleaseDataBlocksPageTabs', () => {
     tableBuilderService.getReleaseMeta.mockResolvedValue({
       releaseId: 'release-1',
       subjects: [],
+      highlights: [],
     });
 
     tableBuilderService.getSubjectMeta.mockResolvedValue(testSubjectMeta);
@@ -314,6 +319,7 @@ describe('ReleaseDataBlocksPageTabs', () => {
     tableBuilderService.getReleaseMeta.mockResolvedValue({
       releaseId: 'release-1',
       subjects: [],
+      highlights: [],
     });
 
     tableBuilderService.getSubjectMeta.mockResolvedValue(testSubjectMeta);
@@ -361,6 +367,7 @@ describe('ReleaseDataBlocksPageTabs', () => {
       tableBuilderService.getReleaseMeta.mockResolvedValue({
         releaseId: 'release-1',
         subjects: [],
+        highlights: [],
       });
 
       tableBuilderService.getSubjectMeta.mockResolvedValue(testSubjectMeta);
