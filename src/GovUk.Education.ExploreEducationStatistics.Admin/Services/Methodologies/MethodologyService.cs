@@ -3,11 +3,9 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
 using AutoMapper;
-using GovUk.Education.ExploreEducationStatistics.Admin.Controllers.Api.Methodologies;
 using GovUk.Education.ExploreEducationStatistics.Admin.Services.Interfaces;
 using GovUk.Education.ExploreEducationStatistics.Admin.Services.Interfaces.Methodologies;
 using GovUk.Education.ExploreEducationStatistics.Admin.Services.Interfaces.Security;
-using GovUk.Education.ExploreEducationStatistics.Admin.ViewModels;
 using GovUk.Education.ExploreEducationStatistics.Admin.ViewModels.Methodology;
 using GovUk.Education.ExploreEducationStatistics.Common.Model;
 using GovUk.Education.ExploreEducationStatistics.Common.Services.Interfaces.Security;
@@ -29,17 +27,20 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Services.Methodologie
         private readonly IMapper _mapper;
         private readonly IPublishingService _publishingService;
         private readonly IUserService _userService;
+        private readonly IMethodologyRepository _methodologyRepository;
 
         public MethodologyService(ContentDbContext context,
             IMapper mapper,
             IPublishingService publishingService,
             IUserService userService,
+            IMethodologyRepository methodologyRepository,
             IPersistenceHelper<ContentDbContext> persistenceHelper)
         {
             _context = context;
             _mapper = mapper;
             _publishingService = publishingService;
             _userService = userService;
+            _methodologyRepository = methodologyRepository;
             _persistenceHelper = persistenceHelper;
         }
 
@@ -65,7 +66,8 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Services.Methodologie
 
         public async Task<Either<ActionResult, MethodologySummaryViewModel>> GetSummaryAsync(Guid id)
         {
-            return await _persistenceHelper.CheckEntityExists<Methodology>(id)
+            return await _persistenceHelper
+                .CheckEntityExists<Methodology>(id)
                 .OnSuccess(_userService.CheckCanViewMethodology)
                 .OnSuccess(_mapper.Map<MethodologySummaryViewModel>);
         }
@@ -93,6 +95,12 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Services.Methodologie
                         .ToListAsync();
 
                     return _mapper.Map<List<MethodologyPublicationsViewModel>>(result);
+                })
+                .OrElse(async () =>
+                {
+                    var userId = _userService.GetUserId();
+                    var viewableMethodologies = await _methodologyRepository.GetMethodologiesForUser(userId);
+                    return _mapper.Map<List<MethodologyPublicationsViewModel>>(viewableMethodologies);
                 });
         }
 

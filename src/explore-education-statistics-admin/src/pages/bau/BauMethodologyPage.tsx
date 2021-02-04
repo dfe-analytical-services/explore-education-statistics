@@ -13,7 +13,7 @@ const BauMethodologyPage = () => {
   const [model, setModel] = useState<Model>();
 
   useEffect(() => {
-    methodologyService.getBauMethodologies().then(methodologies => {
+    methodologyService.getMyMethodologies().then(methodologies => {
       setModel({
         methodologies,
       });

@@ -2,7 +2,6 @@ using System;
 using System.Collections.Generic;
 using System.Threading.Tasks;
 using GovUk.Education.ExploreEducationStatistics.Admin.Services.Interfaces.Methodologies;
-using GovUk.Education.ExploreEducationStatistics.Admin.ViewModels;
 using GovUk.Education.ExploreEducationStatistics.Admin.ViewModels.Methodology;
 using GovUk.Education.ExploreEducationStatistics.Common.Extensions;
 using Microsoft.AspNetCore.Authorization;
@@ -58,6 +57,14 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Controllers.Api.Metho
         {
             return await _methodologyService
                 .UpdateMethodologyAsync(methodologyId, request)
+                .HandleFailuresOrOk();
+        }
+
+        [HttpGet("api/me/methodologies")]
+        public async Task<ActionResult<List<MethodologyPublicationsViewModel>>> GetMyMethodologyList()
+        {
+            return await _methodologyService
+                .ListWithPublicationsAsync()
                 .HandleFailuresOrOk();
         }
     }
