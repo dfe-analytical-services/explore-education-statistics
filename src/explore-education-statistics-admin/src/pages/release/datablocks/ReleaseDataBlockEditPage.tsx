@@ -115,7 +115,7 @@ const ReleaseDataBlockEditPage = ({
               <DataBlockPageTabs
                 key={dataBlockId}
                 releaseId={releaseId}
-                selectedDataBlock={dataBlock}
+                dataBlock={dataBlock}
                 onDataBlockSave={handleDataBlockSave}
               />
             </section>

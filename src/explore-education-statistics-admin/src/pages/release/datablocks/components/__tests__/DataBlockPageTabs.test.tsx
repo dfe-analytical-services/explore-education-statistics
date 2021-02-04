@@ -216,7 +216,7 @@ describe('DataBlockPageTabs', () => {
     render(
       <DataBlockPageTabs
         releaseId="release-1"
-        selectedDataBlock={testDataBlock}
+        dataBlock={testDataBlock}
         onDataBlockSave={noop}
       />,
     );
@@ -252,7 +252,7 @@ describe('DataBlockPageTabs', () => {
     render(
       <DataBlockPageTabs
         releaseId="release-1"
-        selectedDataBlock={testDataBlock}
+        dataBlock={testDataBlock}
         onDataBlockSave={noop}
       />,
     );
@@ -283,7 +283,7 @@ describe('DataBlockPageTabs', () => {
     render(
       <DataBlockPageTabs
         releaseId="release-1"
-        selectedDataBlock={testDataBlock}
+        dataBlock={testDataBlock}
         onDataBlockSave={noop}
       />,
     );
@@ -318,7 +318,7 @@ describe('DataBlockPageTabs', () => {
     render(
       <DataBlockPageTabs
         releaseId="release-1"
-        selectedDataBlock={{
+        dataBlock={{
           ...testDataBlock,
           table: {
             indicators: [],
@@ -366,7 +366,7 @@ describe('DataBlockPageTabs', () => {
       render(
         <DataBlockPageTabs
           releaseId="release-1"
-          selectedDataBlock={testDataBlock}
+          dataBlock={testDataBlock}
           onDataBlockSave={noop}
         />,
       );

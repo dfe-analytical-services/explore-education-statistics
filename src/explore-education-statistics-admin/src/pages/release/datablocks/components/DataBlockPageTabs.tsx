@@ -36,13 +36,13 @@ export type SavedDataBlock = CreateReleaseDataBlock & {
 
 interface Props {
   releaseId: string;
-  selectedDataBlock?: ReleaseDataBlock;
-  onDataBlockSave: (dataBlock: ReleaseDataBlock) => void;
+  dataBlock?: ReleaseDataBlock;
+  onDataBlockSave?: (dataBlock: ReleaseDataBlock) => void;
 }
 
 const DataBlockPageTabs = ({
   releaseId,
-  selectedDataBlock,
+  dataBlock,
   onDataBlockSave,
 }: Props) => {
   // Track number of saves as we can use this to
@@ -58,7 +58,7 @@ const DataBlockPageTabs = ({
   } = useAsyncRetry<InitialTableToolState>(async () => {
     const { subjects } = await tableBuilderService.getReleaseMeta(releaseId);
 
-    if (!selectedDataBlock) {
+    if (!dataBlock) {
       return {
         initialStep: 1,
         subjects,
@@ -74,11 +74,9 @@ const DataBlockPageTabs = ({
     }
 
     const query: ReleaseTableDataQuery = {
-      ...selectedDataBlock.query,
+      ...dataBlock.query,
       releaseId,
-      includeGeoJson: selectedDataBlock.charts.some(
-        chart => chart.type === 'map',
-      ),
+      includeGeoJson: dataBlock.charts.some(chart => chart.type === 'map'),
     };
 
     const tableData = await tableBuilderService.getTableData(query);
@@ -103,7 +101,7 @@ const DataBlockPageTabs = ({
 
     try {
       const tableHeaders = mapTableHeadersConfig(
-        selectedDataBlock.table.tableHeaders,
+        dataBlock.table.tableHeaders,
         table.subjectMeta,
       );
 
@@ -131,18 +129,20 @@ const DataBlockPageTabs = ({
   }, []);
 
   const handleDataBlockSave = useCallback(
-    async (dataBlock: SavedDataBlock) => {
+    async (nextDataBlock: SavedDataBlock) => {
       setIsSaving(true);
 
       const dataBlockToSave: SavedDataBlock = {
-        ...dataBlock,
+        ...nextDataBlock,
         query: {
-          ...(omit(dataBlock.query, ['releaseId']) as SavedDataBlock['query']),
-          includeGeoJson: dataBlock.charts[0]?.type === 'map',
+          ...(omit(nextDataBlock.query, [
+            'releaseId',
+          ]) as SavedDataBlock['query']),
+          includeGeoJson: nextDataBlock.charts[0]?.type === 'map',
         },
       };
 
-      const newDataBlock = await minDelay(() => {
+      const savedDataBlock = await minDelay(() => {
         if (dataBlockToSave.id) {
           return dataBlocksService.updateDataBlock(
             dataBlockToSave.id,
@@ -153,7 +153,9 @@ const DataBlockPageTabs = ({
         return dataBlocksService.createDataBlock(releaseId, dataBlockToSave);
       }, 500);
 
-      onDataBlockSave(newDataBlock);
+      if (onDataBlockSave) {
+        onDataBlockSave(savedDataBlock);
+      }
 
       setIsSaving(false);
       setSaveNumber(saveNumber + 1);
@@ -163,7 +165,7 @@ const DataBlockPageTabs = ({
 
   const handleDataBlockSourceSave: DataBlockSourceWizardSaveHandler = useCallback(
     async ({ query, table, tableHeaders, details }) => {
-      const charts = produce(selectedDataBlock?.charts ?? [], draft => {
+      const charts = produce(dataBlock?.charts ?? [], draft => {
         const majorAxis = draft[0]?.axes?.major;
 
         if (majorAxis?.dataSets) {
@@ -186,7 +188,7 @@ const DataBlockPageTabs = ({
       });
 
       await handleDataBlockSave({
-        ...(selectedDataBlock ?? {}),
+        ...(dataBlock ?? {}),
         ...details,
         query,
         charts,
@@ -196,12 +198,12 @@ const DataBlockPageTabs = ({
         },
       });
     },
-    [handleDataBlockSave, selectedDataBlock, setTableState],
+    [handleDataBlockSave, dataBlock, setTableState],
   );
 
   const handleTableHeadersSave = useCallback(
     async (tableHeaders: TableHeadersConfig) => {
-      if (!selectedDataBlock) {
+      if (!dataBlock) {
         throw new Error(
           'Cannot save table headers when no data block has been selected',
         );
@@ -224,14 +226,14 @@ const DataBlockPageTabs = ({
       });
 
       await handleDataBlockSave({
-        ...selectedDataBlock,
+        ...dataBlock,
         table: {
           tableHeaders: mapUnmappedTableHeaders(tableHeaders),
           indicators: [],
         },
       });
     },
-    [handleDataBlockSave, selectedDataBlock, setTableState, tableState],
+    [handleDataBlockSave, dataBlock, setTableState, tableState],
   );
 
   const handleChartTableUpdate: ChartBuilderTableUpdateHandler = useCallback(
@@ -265,7 +267,7 @@ const DataBlockPageTabs = ({
         />
       )}
 
-      {selectedDataBlock && tableState && tableState?.initialStep < 5 && (
+      {dataBlock && tableState && tableState?.initialStep < 5 && (
         <WarningMessage>
           There is a problem with this data block as we could not render a table
           with the selected options. Please re-check your choices to ensure the
@@ -279,14 +281,14 @@ const DataBlockPageTabs = ({
             {!isLoading && tableState && (
               <DataBlockSourceWizard
                 key={saveNumber}
-                dataBlock={selectedDataBlock}
+                dataBlock={dataBlock}
                 tableToolState={tableState}
                 onSave={handleDataBlockSourceSave}
               />
             )}
           </TabsSection>
 
-          {selectedDataBlock &&
+          {dataBlock &&
             query &&
             response && [
               <TabsSection
@@ -304,7 +306,7 @@ const DataBlockPageTabs = ({
               <TabsSection title="Chart" key="chart" id="dataBlockTabs-chart">
                 <ChartBuilderTabSection
                   key={saveNumber}
-                  dataBlock={selectedDataBlock}
+                  dataBlock={dataBlock}
                   query={query}
                   releaseId={releaseId}
                   table={response.table}
