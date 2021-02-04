@@ -80,7 +80,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
                 
                 // Service method under test
                 var result = await legacyReleaseService.CreateLegacyRelease(
-                    new CreateLegacyReleaseViewModel()
+                    new LegacyReleaseCreateViewModel()
                     {
                         Description = "Test description",
                         Url = "http://test.com",
@@ -135,7 +135,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
                 
                 // Service method under test
                 var result = await legacyReleaseService.CreateLegacyRelease(
-                    new CreateLegacyReleaseViewModel()
+                    new LegacyReleaseCreateViewModel()
                     {
                         Description = "Test description 2",
                         Url = "http://test2.com",
@@ -186,7 +186,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
                 // Service method under test
                 var result = await legacyReleaseService.UpdateLegacyRelease(
                     id,
-                    new UpdateLegacyReleaseViewModel()
+                    new LegacyReleaseUpdateViewModel()
                     {
                         Description = "Updated test description",
                         Url = "http://updated-test.com",
@@ -255,7 +255,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
                 // Service method under test
                 var result = await legacyReleaseService.UpdateLegacyRelease(
                     id,
-                    new UpdateLegacyReleaseViewModel()
+                    new LegacyReleaseUpdateViewModel()
                     {
                         Description = "Updated test description 3",
                         Url = "http://updated-test3.com",
@@ -328,7 +328,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
                 // Service method under test
                 var result = await legacyReleaseService.UpdateLegacyRelease(
                     id,
-                    new UpdateLegacyReleaseViewModel()
+                    new LegacyReleaseUpdateViewModel()
                     {
                         Description = "Updated test description 1",
                         Url = "http://updated-test1.com",

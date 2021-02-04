@@ -49,9 +49,13 @@ Upload subject
     user checks headed table body row contains  Data file size   15 Kb  ${section}
     user checks headed table body row contains  Status           Complete  ${section}  180
 
-Navigate to 'Data and files' page
+Start creating a data block
     [Tags]  HappyPath
     user clicks link    Data blocks
+    user waits until h2 is visible  Data blocks
+    user waits until page contains  No data blocks have been created.
+
+    user clicks link  Create data block
     user waits until h2 is visible   Choose a subject
 
 Select subject "UI test subject"
@@ -165,8 +169,31 @@ Save data block
     user enters text into element  id:dataBlockDetailsForm-name         ${DATABLOCK_NAME}
     user enters text into element  id:dataBlockDetailsForm-heading      UI test table title
     user enters text into element  id:dataBlockDetailsForm-source       UI test source
+
+    user clicks checkbox  Set as a table highlight for this publication
+    user waits until page contains element  id:dataBlockDetailsForm-highlightName
+    user enters text into element  id:dataBlockDetailsForm-highlightName    UI test highlight name
+
     user clicks button   Save data block
     user waits until page contains    Delete this data block
+
+Validate data block is in list
+    [Tags]  HappyPath
+    user clicks link  Back
+    user waits until h2 is visible  Data blocks
+
+    user waits until table is visible
+    user checks table column heading contains  1  1  Name
+    user checks table column heading contains  1  2  Has chart
+    user checks table column heading contains  1  3  In content
+    user checks table column heading contains  1  4  Highlight name
+    user checks table column heading contains  1  5  Actions
+
+    user checks table body has x rows  1
+    user checks results table cell contains  1  1  ${DATABLOCK_NAME}
+    user checks results table cell contains  1  2  No
+    user checks results table cell contains  1  3  No
+    user checks results table cell contains  1  4  UI test highlight name
 
 Embed data block into release content
     [Tags]  HappyPath
@@ -245,12 +272,33 @@ Validate embedded table rows
     user checks table cell in offset row contains  ${row}  3  1  1,109  ${table}
     user checks table cell in offset row contains  ${row}  4  1  1,959  ${table}
 
-Navigate to Chart tab
+Validate marked as 'In content' on data block list
     [Tags]  HappyPath
     user clicks link  Data blocks
-    user selects from list by label  id:selectedDataBlock  ${DATABLOCK_NAME}
+    user waits until h2 is visible  Data blocks
+
+    user waits until table is visible
+    user checks table column heading contains  1  1  Name
+    user checks table column heading contains  1  3  In content
+
+    user checks table body has x rows  1
+    user checks results table cell contains  1  1  ${DATABLOCK_NAME}
+    user checks results table cell contains  1  3  Yes
+
+Navigate to Chart tab
+    [Tags]  HappyPath
+    user clicks link  Edit block
+
+    user waits until h2 is visible  Edit data block
     user waits until h2 is visible  ${DATABLOCK_NAME}
+
     user waits until page does not contain loading spinner
+
+    # Set url in suite variable so that we
+    # can get back to this page quickly
+    ${url}=  user gets url
+    set suite variable  ${DATABLOCK_URL}  ${url}
+
     user clicks link   Chart
     user waits until h3 is visible  Choose chart type
 
@@ -301,12 +349,25 @@ Validate basic line chart preview
     user checks chart tooltip label contains  ${preview}  2016
     user checks chart tooltip item contains  ${preview}  1  Admission Numbers (Nailsea Youngwood): 4,198
 
-Save and validate line chart embeds correctly
+Save chart and validate marked as 'Has chart' in data blocks list
     [Tags]  HappyPath
     user clicks link  Chart configuration
     user clicks button  Save chart options
     user waits until button is enabled  Save chart options
 
+    user clicks link  Back
+    user waits until h2 is visible  Data blocks
+
+    user waits until table is visible
+    user checks table column heading contains  1  1  Name
+    user checks table column heading contains  1  2  Has chart
+
+    user checks table body has x rows  1
+    user checks results table cell contains  1  1  ${DATABLOCK_NAME}
+    user checks results table cell contains  1  2  Yes
+
+Validate line chart embeds correctly
+    [Tags]  HappyPath
     user clicks link  Content
     user waits until h2 is visible  ${PUBLICATION_NAME}
     user opens accordion section  ${CONTENT_SECTION_NAME}
@@ -346,10 +407,11 @@ Save and validate line chart embeds correctly
 
 Configure basic vertical bar chart
     [Tags]  HappyPath
-    user clicks link  Data blocks
-    user selects from list by label  id:selectedDataBlock  ${DATABLOCK_NAME}
+    user goes to url  ${DATABLOCK_URL}
+
     user waits until h2 is visible  ${DATABLOCK_NAME}
     user waits until page does not contain loading spinner
+
     user clicks link  Chart
     user waits until h3 is visible  Choose chart type
     user clicks button  Vertical bar
@@ -452,10 +514,11 @@ Save and validate vertical bar chart embeds correctly
 
 Configure basic horizontal bar chart
     [Tags]  HappyPath
-    user clicks link  Data blocks
-    user selects from list by label  id:selectedDataBlock  ${DATABLOCK_NAME}
+    user goes to url  ${DATABLOCK_URL}
+
     user waits until h2 is visible  ${DATABLOCK_NAME}
     user waits until page does not contain loading spinner
+
     user clicks link  Chart
     user waits until h3 is visible  Choose chart type
     user clicks button  Horizontal bar
@@ -545,10 +608,11 @@ Save and validate horizontal bar chart embeds correctly
 
 Configure basic geographic chart
     [Tags]  HappyPath
-    user clicks link  Data blocks
-    user selects from list by label  id:selectedDataBlock  ${DATABLOCK_NAME}
+    user goes to url  ${DATABLOCK_URL}
+
     user waits until h2 is visible  ${DATABLOCK_NAME}
     user waits until page does not contain loading spinner
+
     user clicks link  Chart
     user waits until h3 is visible  Choose chart type
     user clicks button  Geographic
@@ -642,10 +706,11 @@ Save and validate geographic chart embeds correctly
 
 Configure basic infographic chart
     [Tags]  HappyPath
-    user clicks link  Data blocks
-    user selects from list by label  id:selectedDataBlock  ${DATABLOCK_NAME}
+    user goes to url  ${DATABLOCK_URL}
+
     user waits until h2 is visible  ${DATABLOCK_NAME}
     user waits until page does not contain loading spinner
+
     user clicks link  Chart
     user waits until h3 is visible  Choose chart type
     user clicks button  Choose an infographic as alternative
@@ -677,10 +742,11 @@ Delete embedded data block
 
 Delete chart from data block
     [Tags]  HappyPath
-    user clicks link  Data blocks
-    user selects from list by label  id:selectedDataBlock  ${DATABLOCK_NAME}
+    user goes to url  ${DATABLOCK_URL}
+
     user waits until h2 is visible  ${DATABLOCK_NAME}
     user waits until page does not contain loading spinner
+
     user clicks link  Chart
     user clicks button  Delete chart
     user clicks button  Confirm
@@ -691,4 +757,6 @@ Delete data block
     user clicks button  Delete this data block
     user waits until page does not contain loading spinner
     user clicks button  Confirm
-    user waits until h2 is visible  Create new data block
+
+    user waits until h2 is visible  Data blocks
+    user waits until page contains  No data blocks have been created.

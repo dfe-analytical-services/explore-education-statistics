@@ -19,6 +19,8 @@ import {
   releaseFootnotesCreateRoute,
   releaseFootnotesEditRoute,
   releaseDataFileReplacementCompleteRoute,
+  releaseDataBlockEditRoute,
+  releaseDataBlockCreateRoute,
 } from '@admin/routes/releaseRoutes';
 import publicationService, {
   BasicPublicationDetails,
@@ -50,6 +52,8 @@ const routes = [
   releaseSummaryEditRoute,
   releaseFootnotesCreateRoute,
   releaseFootnotesEditRoute,
+  releaseDataBlockCreateRoute,
+  releaseDataBlockEditRoute,
 ];
 
 interface MatchProps {
@@ -162,7 +166,6 @@ const ReleasePageContainer = ({
 
           <NavBar
             routes={navRoutes.map(route => ({
-              path: route.path,
               title: route.title,
               to: generatePath<ReleaseRouteParams>(route.path, {
                 publicationId,

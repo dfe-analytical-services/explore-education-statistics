@@ -1,7 +1,8 @@
 using System.Collections.Generic;
 using System.Threading.Tasks;
-using GovUk.Education.ExploreEducationStatistics.Admin.Models.Api;
 using GovUk.Education.ExploreEducationStatistics.Admin.Services.Interfaces.Methodologies;
+using GovUk.Education.ExploreEducationStatistics.Admin.ViewModels;
+using GovUk.Education.ExploreEducationStatistics.Admin.ViewModels.Methodology;
 using GovUk.Education.ExploreEducationStatistics.Common.Extensions;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;

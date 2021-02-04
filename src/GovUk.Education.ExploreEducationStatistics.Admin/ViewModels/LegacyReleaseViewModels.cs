@@ -16,7 +16,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.ViewModels
         public Guid PublicationId { get; set; }
     }
 
-    public class CreateLegacyReleaseViewModel
+    public class LegacyReleaseCreateViewModel
     {
         [Required]
         public string Description { get; set; }
@@ -29,7 +29,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.ViewModels
         public Guid PublicationId { get; set; }
     }
 
-    public class UpdateLegacyReleaseViewModel
+    public class LegacyReleaseUpdateViewModel
     {
         [Required]
         public string Description { get; set; }
@@ -46,8 +46,8 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.ViewModels
     }
 
     #nullable enable
-    public class PartialUpdateLegacyReleaseViewModel
-    {   
+    public class LegacyReleasePartialUpdateViewModel
+    {
         [Required]
         public Guid Id { get; set; }
 

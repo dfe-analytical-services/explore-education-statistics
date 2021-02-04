@@ -1,7 +1,6 @@
 using System;
 using System.Collections.Generic;
 using System.Threading.Tasks;
-using GovUk.Education.ExploreEducationStatistics.Admin.Models.Api;
 using GovUk.Education.ExploreEducationStatistics.Admin.Services;
 using GovUk.Education.ExploreEducationStatistics.Admin.Services.Interfaces;
 using GovUk.Education.ExploreEducationStatistics.Admin.ViewModels;
@@ -249,10 +248,10 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
                 dataBlockService
                     .Setup(s => s.List(release.Id))
                     .ReturnsAsync(
-                        new List<DataBlockViewModel>
+                        new List<DataBlockSummaryViewModel>
                         {
-                            new DataBlockViewModel(),
-                            new DataBlockViewModel(),
+                            new DataBlockSummaryViewModel(),
+                            new DataBlockSummaryViewModel(),
                         }
                     );
 
@@ -379,9 +378,9 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
                 dataBlockService
                     .Setup(s => s.List(release.Id))
                     .ReturnsAsync(
-                        new List<DataBlockViewModel>
+                        new List<DataBlockSummaryViewModel>
                         {
-                            new DataBlockViewModel
+                            new DataBlockSummaryViewModel
                             {
                                 HighlightName = "Test highlight name"
                             },

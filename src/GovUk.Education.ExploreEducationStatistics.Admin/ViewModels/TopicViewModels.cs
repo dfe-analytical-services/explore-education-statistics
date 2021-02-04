@@ -15,7 +15,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.ViewModels
         public Guid ThemeId { get; set; }
     }
 
-    public class SaveTopicViewModel
+    public class TopicSaveViewModel
     {
         [Required]
         public string Title { get; set; }

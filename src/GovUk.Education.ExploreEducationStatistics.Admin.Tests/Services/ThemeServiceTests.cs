@@ -27,7 +27,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
 
             var service = SetupThemeService(context);
             var result = await service.CreateTheme(
-                new SaveThemeViewModel
+                new ThemeSaveViewModel
                 {
                     Title = "Test theme",
                     Summary = "Test summary"
@@ -69,7 +69,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
             {
                 var service = SetupThemeService(context);
                 var result = await service.CreateTheme(
-                    new SaveThemeViewModel
+                    new ThemeSaveViewModel
                     {
                         Title = "Test theme",
                         Summary = "Test summary"
@@ -107,7 +107,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
                 var service = SetupThemeService(context);
                 var result = await service.UpdateTheme(
                     theme.Id,
-                    new SaveThemeViewModel
+                    new ThemeSaveViewModel
                     {
                         Title = "Updated theme",
                         Summary = "Updated summary"
@@ -159,7 +159,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
                 var service = SetupThemeService(context);
                 var result = await service.UpdateTheme(
                     theme.Id,
-                    new SaveThemeViewModel
+                    new ThemeSaveViewModel
                     {
                         Title = "Other theme",
                         Summary = "Updated summary"

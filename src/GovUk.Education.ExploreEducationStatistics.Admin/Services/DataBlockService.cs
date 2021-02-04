@@ -3,9 +3,9 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
 using AutoMapper;
-using GovUk.Education.ExploreEducationStatistics.Admin.Models.Api;
 using GovUk.Education.ExploreEducationStatistics.Admin.Services.Interfaces;
 using GovUk.Education.ExploreEducationStatistics.Admin.Services.Interfaces.Security;
+using GovUk.Education.ExploreEducationStatistics.Admin.ViewModels;
 using GovUk.Education.ExploreEducationStatistics.Common.Model;
 using GovUk.Education.ExploreEducationStatistics.Common.Model.Chart;
 using GovUk.Education.ExploreEducationStatistics.Common.Services.Interfaces.Security;
@@ -42,14 +42,14 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Services
             _releaseFileService = releaseFileService;
         }
 
-        public async Task<Either<ActionResult, DataBlockViewModel>> Create(Guid releaseId, CreateDataBlockViewModel createDataBlock)
+        public async Task<Either<ActionResult, DataBlockViewModel>> Create(Guid releaseId, DataBlockCreateViewModel dataBlockCreate)
         {
             return await _persistenceHelper
                 .CheckEntityExists<Release>(releaseId)
                 .OnSuccess(_userService.CheckCanUpdateRelease)
                 .OnSuccess(async release =>
                 {
-                    var dataBlock = _mapper.Map<DataBlock>(createDataBlock);
+                    var dataBlock = _mapper.Map<DataBlock>(dataBlockCreate);
 
                     var added = (await _context.DataBlocks.AddAsync(dataBlock)).Entity;
 
@@ -96,7 +96,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Services
                 .OnSuccess(dataBlock => _mapper.Map<DataBlockViewModel>(dataBlock));
         }
 
-        public async Task<Either<ActionResult, List<DataBlockViewModel>>> List(Guid releaseId)
+        public async Task<Either<ActionResult, List<DataBlockSummaryViewModel>>> List(Guid releaseId)
         {
             return await _persistenceHelper.CheckEntityExists<Release>(releaseId)
                 .OnSuccess(_userService.CheckCanViewRelease)
@@ -111,13 +111,13 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Services
                             .OrderBy(dataBlock => dataBlock.Name)
                             .ToListAsync();
 
-                        return _mapper.Map<List<DataBlockViewModel>>(dataBlocks);
+                        return _mapper.Map<List<DataBlockSummaryViewModel>>(dataBlocks);
                     }
                 );
         }
 
         public async Task<Either<ActionResult, DataBlockViewModel>> Update(Guid id,
-            UpdateDataBlockViewModel updateDataBlock)
+            DataBlockUpdateViewModel dataBlockUpdate)
         {
             return await _persistenceHelper
                 .CheckEntityExists<DataBlock>(id)
@@ -126,7 +126,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Services
                 {
                     // TODO EES-753 Alter this when multiple charts are supported
                     var infographicChart = existing.Charts.OfType<InfographicChart>().FirstOrDefault();
-                    var updatedInfographicChart = updateDataBlock.Charts.OfType<InfographicChart>().FirstOrDefault();
+                    var updatedInfographicChart = dataBlockUpdate.Charts.OfType<InfographicChart>().FirstOrDefault();
 
                     if (infographicChart != null && infographicChart.FileId != updatedInfographicChart?.FileId)
                     {
@@ -137,7 +137,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Services
                         );
                     }
 
-                    _mapper.Map(updateDataBlock, existing);
+                    _mapper.Map(dataBlockUpdate, existing);
 
                     _context.DataBlocks.Update(existing);
                     await _context.SaveChangesAsync();

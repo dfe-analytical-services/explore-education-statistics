@@ -2,9 +2,10 @@ using System;
 using System.Collections.Generic;
 using System.Threading.Tasks;
 using GovUk.Education.ExploreEducationStatistics.Admin.Controllers.Api.ManageContent;
-using GovUk.Education.ExploreEducationStatistics.Admin.Models.Api;
 using GovUk.Education.ExploreEducationStatistics.Admin.Services.Interfaces.Methodologies;
 using GovUk.Education.ExploreEducationStatistics.Admin.Services.Methodologies;
+using GovUk.Education.ExploreEducationStatistics.Admin.ViewModels;
+using GovUk.Education.ExploreEducationStatistics.Admin.ViewModels.ManageContent;
 using GovUk.Education.ExploreEducationStatistics.Common.Extensions;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
@@ -54,7 +55,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Controllers.Api.Metho
         public async Task<ActionResult<ContentSectionViewModel>> AddContentSection(
             Guid methodologyId,
             [FromQuery] MethodologyContentService.ContentListType type,
-            AddContentSectionRequest request = null)
+            ContentSectionAddRequest request = null)
         {
             return await _contentService
                 .AddContentSectionAsync(methodologyId, request, type)
@@ -63,7 +64,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Controllers.Api.Metho
 
         [HttpPut("methodology/{methodologyId}/content/section/{contentSectionId}/heading")]
         public async Task<ActionResult<ContentSectionViewModel>> UpdateContentSectionHeading(
-            Guid methodologyId, Guid contentSectionId, UpdateContentSectionHeadingRequest request)
+            Guid methodologyId, Guid contentSectionId, ContentSectionHeadingUpdateRequest request)
         {
             return await _contentService
                 .UpdateContentSectionHeadingAsync(methodologyId, contentSectionId, request.Heading)
@@ -99,7 +100,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Controllers.Api.Metho
 
         [HttpPost("methodology/{methodologyId}/content/section/{contentSectionId}/blocks/add")]
         public async Task<ActionResult<IContentBlockViewModel>> AddContentBlock(
-            Guid methodologyId, Guid contentSectionId, AddContentBlockRequest request)
+            Guid methodologyId, Guid contentSectionId, ContentBlockAddRequest request)
         {
             return await _contentService
                 .AddContentBlockAsync(methodologyId, contentSectionId, request)
@@ -117,7 +118,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Controllers.Api.Metho
 
         [HttpPut("methodology/{methodologyId}/content/section/{contentSectionId}/block/{contentBlockId}")]
         public async Task<ActionResult<IContentBlockViewModel>> UpdateTextBasedContentBlock(
-            Guid methodologyId, Guid contentSectionId, Guid contentBlockId, UpdateTextBasedContentBlockRequest request)
+            Guid methodologyId, Guid contentSectionId, Guid contentBlockId, ContentBlockUpdateRequest request)
         {
             return await _contentService
                 .UpdateTextBasedContentBlockAsync(methodologyId, contentSectionId, contentBlockId, request)

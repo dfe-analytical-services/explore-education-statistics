@@ -8,9 +8,9 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Services.Interfaces
 {
     public interface ITopicService
     {
-        Task<Either<ActionResult, TopicViewModel>> CreateTopic(SaveTopicViewModel createdTopic);
+        Task<Either<ActionResult, TopicViewModel>> CreateTopic(TopicSaveViewModel created);
 
-        Task<Either<ActionResult, TopicViewModel>> UpdateTopic(Guid id, SaveTopicViewModel updatedTopic);
+        Task<Either<ActionResult, TopicViewModel>> UpdateTopic(Guid id, TopicSaveViewModel updated);
 
         Task<Either<ActionResult, TopicViewModel>> GetTopic(Guid topicId);
 

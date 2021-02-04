@@ -3,7 +3,6 @@ using System.Collections.Generic;
 using System.ComponentModel.DataAnnotations;
 using System.Threading.Tasks;
 using GovUk.Education.ExploreEducationStatistics.Admin.Models;
-using GovUk.Education.ExploreEducationStatistics.Admin.Models.Api;
 using GovUk.Education.ExploreEducationStatistics.Admin.Services;
 using GovUk.Education.ExploreEducationStatistics.Admin.Services.Interfaces;
 using GovUk.Education.ExploreEducationStatistics.Admin.ViewModels;
@@ -39,7 +38,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Controllers.Api
             IReleaseStatusService releaseStatusService,
             IReleaseChecklistService releaseChecklistService,
             UserManager<ApplicationUser> userManager,
-            IDataBlockService dataBlockService, 
+            IDataBlockService dataBlockService,
             IImportService importService)
         {
             _releaseService = releaseService;
@@ -61,7 +60,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Controllers.Api
         }
 
         [HttpPost("publications/{publicationId}/releases")]
-        public async Task<ActionResult<ReleaseViewModel>> CreateReleaseAsync(CreateReleaseViewModel release,
+        public async Task<ActionResult<ReleaseViewModel>> CreateReleaseAsync(ReleaseCreateViewModel release,
             Guid publicationId)
         {
             release.PublicationId = publicationId;
@@ -224,7 +223,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Controllers.Api
         }
 
         [HttpPut("releases/{releaseId}")]
-        public async Task<ActionResult<ReleaseViewModel>> UpdateRelease(UpdateReleaseViewModel request,
+        public async Task<ActionResult<ReleaseViewModel>> UpdateRelease(ReleaseUpdateViewModel request,
             Guid releaseId)
         {
             return await _releaseService

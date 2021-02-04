@@ -41,7 +41,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Controllers.Api.UserM
         }
 
         [HttpPut("user-management/users/{userId}")]
-        public async Task<ActionResult<Unit>> UpdateUser(string userId, EditUserViewModel model)
+        public async Task<ActionResult<Unit>> UpdateUser(string userId, UserEditViewModel model)
         {
             return await _userManagementService
                 .UpdateUser(userId, model.RoleId)

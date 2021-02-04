@@ -3,9 +3,9 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
 using AutoMapper;
-using GovUk.Education.ExploreEducationStatistics.Admin.Models.Api;
 using GovUk.Education.ExploreEducationStatistics.Admin.Services;
 using GovUk.Education.ExploreEducationStatistics.Admin.Services.Interfaces;
+using GovUk.Education.ExploreEducationStatistics.Admin.ViewModels;
 using GovUk.Education.ExploreEducationStatistics.Common.Model;
 using GovUk.Education.ExploreEducationStatistics.Common.Model.Chart;
 using GovUk.Education.ExploreEducationStatistics.Common.Model.Data;
@@ -155,6 +155,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
                 HighlightName = "Test highlight name 1",
                 Source = "Test source 1",
                 Order = 5,
+                ContentSectionId = Guid.NewGuid(),
                 Query = new ObservationQueryContext
                 {
                     Filters = new List<Guid>
@@ -223,15 +224,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
                         }
                     }
                 },
-                Charts = new List<IChart>
-                {
-                    new VerticalBarChart
-                    {
-                        Title = "Test chart 2",
-                        Height = 600,
-                        Width = 400,
-                    }
-                },
+                Charts = new List<IChart>()
             };
 
             var contextId = Guid.NewGuid().ToString();
@@ -266,21 +259,15 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
                 Assert.Equal(dataBlock1.Name, result.Right[0].Name);
                 Assert.Equal(dataBlock1.HighlightName, result.Right[0].HighlightName);
                 Assert.Equal(dataBlock1.Source, result.Right[0].Source);
-                Assert.Equal(dataBlock1.Order, result.Right[0].Order);
-
-                Assert.Equal(dataBlock1.Query, result.Right[0].Query);
-                Assert.Equal(dataBlock1.Table, result.Right[0].Table);
-                Assert.Equal(dataBlock1.Charts, result.Right[0].Charts);
+                Assert.Equal(1, result.Right[0].ChartsCount);
+                Assert.Equal(dataBlock1.ContentSectionId, result.Right[0].ContentSectionId);
 
                 Assert.Equal(dataBlock2.Heading, result.Right[1].Heading);
                 Assert.Equal(dataBlock2.Name, result.Right[1].Name);
                 Assert.Equal(dataBlock2.HighlightName, result.Right[1].HighlightName);
                 Assert.Equal(dataBlock2.Source, result.Right[1].Source);
-                Assert.Equal(dataBlock2.Order, result.Right[1].Order);
-
-                Assert.Equal(dataBlock2.Query, result.Right[1].Query);
-                Assert.Equal(dataBlock2.Table, result.Right[1].Table);
-                Assert.Equal(dataBlock2.Charts, result.Right[1].Charts);
+                Assert.Equal(0, result.Right[1].ChartsCount);
+                Assert.Null(result.Right[1].ContentSectionId);
             }
         }
 
@@ -296,6 +283,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
                 HighlightName = "Test highlight name 1",
                 Source = "Test source 1",
                 Order = 5,
+                ContentSectionId = Guid.NewGuid(),
                 Query = new ObservationQueryContext
                 {
                     Filters = new List<Guid>
@@ -369,11 +357,8 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
                 Assert.Equal(dataBlock1.Name, result.Right[0].Name);
                 Assert.Equal(dataBlock1.HighlightName, result.Right[0].HighlightName);
                 Assert.Equal(dataBlock1.Source, result.Right[0].Source);
-                Assert.Equal(dataBlock1.Order, result.Right[0].Order);
-
-                Assert.Equal(dataBlock1.Query, result.Right[0].Query);
-                Assert.Equal(dataBlock1.Table, result.Right[0].Table);
-                Assert.Equal(dataBlock1.Charts, result.Right[0].Charts);
+                Assert.Equal(1, result.Right[0].ChartsCount);
+                Assert.Equal(dataBlock1.ContentSectionId, result.Right[0].ContentSectionId);
             }
         }
 
@@ -657,7 +642,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
                 await context.SaveChangesAsync();
             }
 
-            var updateRequest = new UpdateDataBlockViewModel
+            var updateRequest = new DataBlockUpdateViewModel
             {
                 Heading = "New heading",
                 Name = "New name",
@@ -774,7 +759,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
                 await context.SaveChangesAsync();
             }
 
-            var updateRequest = new UpdateDataBlockViewModel
+            var updateRequest = new DataBlockUpdateViewModel
             {
                 Charts = new List<IChart>
                 {

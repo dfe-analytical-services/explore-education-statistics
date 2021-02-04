@@ -1,6 +1,6 @@
 import Link from '@admin/components/Link';
 import { releaseDataPageTabIds } from '@admin/pages/release/data/ReleaseDataPage';
-import { releasePreReleaseAccessPageTabs } from '@admin/pages/release/ReleasePreReleaseAccessPage';
+import { releasePreReleaseAccessPageTabs } from '@admin/pages/release/pre-release/ReleasePreReleaseAccessPage';
 import {
   MethodologyRouteParams,
   methodologyStatusRoute,

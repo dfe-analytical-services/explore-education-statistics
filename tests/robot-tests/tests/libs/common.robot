@@ -93,6 +93,10 @@ user goes to url
     [Arguments]   ${destination}
     go to   ${destination}
 
+user gets url
+    ${url}=  get location
+    [Return]  ${url}
+
 user goes back
     go back
 

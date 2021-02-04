@@ -79,7 +79,7 @@ const DataBlockDetailsForm = ({
                 id={`${formId}-name`}
                 name="name"
                 label="Name"
-                hint="Name of the data block"
+                hint="Name of the data block. This will not be visible to users."
                 className="govuk-!-width-one-half"
               />
 
@@ -88,6 +88,7 @@ const DataBlockDetailsForm = ({
                 name="heading"
                 className="govuk-!-width-two-thirds"
                 label="Table title"
+                hint="Use a concise descriptive title that summarises the main message in the table."
                 rows={2}
                 onChange={e => {
                   if (onTitleChange) onTitleChange(e.target.value);
@@ -98,6 +99,7 @@ const DataBlockDetailsForm = ({
                 id={`${formId}-source`}
                 name="source"
                 label="Source"
+                hint="The data source used to create this data."
                 className="govuk-!-width-two-thirds"
               />
 
