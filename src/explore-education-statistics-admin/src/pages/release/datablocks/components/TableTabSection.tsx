@@ -1,3 +1,4 @@
+import { ReleaseDataBlock } from '@admin/services/dataBlockService';
 import TableHeadersForm from '@common/modules/table-tool/components/TableHeadersForm';
 import TimePeriodDataTable from '@common/modules/table-tool/components/TimePeriodDataTable';
 import { FullTable } from '@common/modules/table-tool/types/fullTable';
@@ -5,12 +6,13 @@ import { TableHeadersConfig } from '@common/modules/table-tool/types/tableHeader
 import React, { useRef } from 'react';
 
 interface Props {
+  dataBlock: ReleaseDataBlock;
   table: FullTable;
   tableHeaders: TableHeadersConfig;
   onSave: (tableHeaders: TableHeadersConfig) => void;
 }
 
-const TableTabSection = ({ table, tableHeaders, onSave }: Props) => {
+const TableTabSection = ({ dataBlock, table, tableHeaders, onSave }: Props) => {
   const dataTableRef = useRef<HTMLElement>(null);
 
   return (
@@ -33,6 +35,8 @@ const TableTabSection = ({ table, tableHeaders, onSave }: Props) => {
       <TimePeriodDataTable
         fullTable={table}
         tableHeadersConfig={tableHeaders}
+        captionTitle={dataBlock.heading}
+        source={dataBlock.source}
         ref={dataTableRef}
       />
     </>

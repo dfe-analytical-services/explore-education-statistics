@@ -298,6 +298,7 @@ const DataBlockPageTabs = ({
                 lazy
               >
                 <TableTabSection
+                  dataBlock={dataBlock}
                   table={response.table}
                   tableHeaders={response.tableHeaders}
                   onSave={handleTableHeadersSave}
