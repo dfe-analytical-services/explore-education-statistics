@@ -160,6 +160,10 @@ describe('ReleaseDataBlocksPage', () => {
     expect(
       screen.queryByRole('link', { name: 'Create data block' }),
     ).not.toBeInTheDocument();
+
+    expect(
+      screen.queryByRole('link', { name: 'Go to table tool' }),
+    ).toBeInTheDocument();
   });
 
   test('clicking `Delete block` button shows modal', async () => {

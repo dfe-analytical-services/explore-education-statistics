@@ -5,6 +5,7 @@ import ReleaseDataPage from '@admin/pages/release/data/ReleaseDataPage';
 import ReleaseDataBlockCreatePage from '@admin/pages/release/datablocks/ReleaseDataBlockCreatePage';
 import ReleaseDataBlockEditPage from '@admin/pages/release/datablocks/ReleaseDataBlockEditPage';
 import ReleaseDataBlocksPage from '@admin/pages/release/datablocks/ReleaseDataBlocksPage';
+import ReleaseTableToolPage from '@admin/pages/release/datablocks/ReleaseTableToolPage';
 import ReleaseFootnoteCreatePage from '@admin/pages/release/footnotes/ReleaseFootnoteCreatePage';
 import ReleaseFootnoteEditPage from '@admin/pages/release/footnotes/ReleaseFootnoteEditPage';
 import ReleaseFootnotesPage from '@admin/pages/release/footnotes/ReleaseFootnotesPage';
@@ -89,6 +90,12 @@ export const releaseDataBlocksRoute: ReleaseRouteProps = {
   path: '/publication/:publicationId/release/:releaseId/data-blocks',
   title: 'Data blocks',
   component: ReleaseDataBlocksPage,
+};
+
+export const releaseTableToolRoute: ReleaseRouteProps = {
+  path: '/publication/:publicationId/release/:releaseId/data-blocks/table-tool',
+  title: 'Table tool',
+  component: ReleaseTableToolPage,
 };
 
 export const releaseDataBlockCreateRoute: ReleaseRouteProps = {

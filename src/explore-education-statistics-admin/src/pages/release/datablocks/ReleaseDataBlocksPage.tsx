@@ -6,6 +6,7 @@ import {
   releaseDataBlockEditRoute,
   ReleaseDataBlockRouteParams,
   ReleaseRouteParams,
+  releaseTableToolRoute,
 } from '@admin/routes/releaseRoutes';
 import dataBlocksService, {
   ReleaseDataBlockSummary,
@@ -85,10 +86,21 @@ const ReleaseDataBlocksPage = ({
         </p>
       </InsetText>
 
-      {!canUpdateRelease && (
-        <WarningMessage>
-          This release has been approved, and can no longer be updated.
-        </WarningMessage>
+      {!canUpdateRelease && !isLoading && (
+        <>
+          <WarningMessage>
+            This release has been approved, and can no longer be updated.
+          </WarningMessage>
+
+          <ButtonLink
+            to={generatePath<ReleaseRouteParams>(releaseTableToolRoute.path, {
+              publicationId,
+              releaseId,
+            })}
+          >
+            Go to table tool
+          </ButtonLink>
+        </>
       )}
 
       <LoadingSpinner loading={isLoading}>

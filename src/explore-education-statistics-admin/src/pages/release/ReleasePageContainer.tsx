@@ -21,6 +21,7 @@ import {
   releaseStatusRoute,
   releaseSummaryEditRoute,
   releaseSummaryRoute,
+  releaseTableToolRoute,
 } from '@admin/routes/releaseRoutes';
 import publicationService, {
   BasicPublicationDetails,
@@ -52,6 +53,7 @@ const routes = [
   releaseSummaryEditRoute,
   releaseFootnotesCreateRoute,
   releaseFootnotesEditRoute,
+  releaseTableToolRoute,
   releaseDataBlockCreateRoute,
   releaseDataBlockEditRoute,
 ];
