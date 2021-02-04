@@ -14,12 +14,14 @@ import { generatePath, useHistory } from 'react-router';
 const emptyDataBlocks: ReleaseDataBlockSummary[] = [];
 
 interface Props {
+  canUpdate?: boolean;
   publicationId: string;
   releaseId: string;
   dataBlockId: string;
 }
 
 const DataBlockSelector = ({
+  canUpdate = true,
   publicationId,
   releaseId,
   dataBlockId,
@@ -47,7 +49,11 @@ const DataBlockSelector = ({
       id="selectedDataBlock"
       name="selectedDataBlock"
       className="govuk-!-margin-bottom-4"
-      label="Select a data block to edit"
+      label={
+        canUpdate
+          ? 'Select a data block to edit'
+          : 'Select a data block to view'
+      }
       disabled={isLoading}
       order={FormSelect.unordered}
       value={dataBlockId}

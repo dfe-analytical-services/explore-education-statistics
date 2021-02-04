@@ -9,7 +9,7 @@ interface Props {
   dataBlock: ReleaseDataBlock;
   table: FullTable;
   tableHeaders: TableHeadersConfig;
-  onSave: (tableHeaders: TableHeadersConfig) => void;
+  onSave?: (tableHeaders: TableHeadersConfig) => void;
 }
 
 const TableTabSection = ({ dataBlock, table, tableHeaders, onSave }: Props) => {
@@ -17,20 +17,22 @@ const TableTabSection = ({ dataBlock, table, tableHeaders, onSave }: Props) => {
 
   return (
     <>
-      <TableHeadersForm
-        initialValues={tableHeaders}
-        id="dataBlockContentTabs-tableHeadersForm"
-        onSubmit={async nextTableHeaders => {
-          await onSave(nextTableHeaders);
+      {onSave && (
+        <TableHeadersForm
+          initialValues={tableHeaders}
+          id="dataBlockTabs-tableHeadersForm"
+          onSubmit={async nextTableHeaders => {
+            await onSave(nextTableHeaders);
 
-          if (dataTableRef.current) {
-            dataTableRef.current.scrollIntoView({
-              behavior: 'smooth',
-              block: 'start',
-            });
-          }
-        }}
-      />
+            if (dataTableRef.current) {
+              dataTableRef.current.scrollIntoView({
+                behavior: 'smooth',
+                block: 'start',
+              });
+            }
+          }}
+        />
+      )}
 
       <TimePeriodDataTable
         fullTable={table}

@@ -114,11 +114,9 @@ const ReleaseDataBlocksPage = ({
                   >
                     Highlight name
                   </th>
-                  {canUpdateRelease && (
-                    <th scope="col" className="govuk-table__header--actions">
-                      Actions
-                    </th>
-                  )}
+                  <th scope="col" className="govuk-table__header--actions">
+                    Actions
+                  </th>
                 </tr>
               </thead>
               <tbody>
@@ -128,28 +126,28 @@ const ReleaseDataBlocksPage = ({
                     <td>{dataBlock.chartsCount > 0 ? 'Yes' : 'No'}</td>
                     <td>{dataBlock.contentSectionId ? 'Yes' : 'No'}</td>
                     <td>{dataBlock.highlightName || 'None'}</td>
-                    {canUpdateRelease && (
-                      <td className="govuk-table__cell--actions">
-                        <Link
-                          unvisited
-                          to={generatePath<ReleaseDataBlockRouteParams>(
-                            releaseDataBlockEditRoute.path,
-                            {
-                              publicationId,
-                              releaseId,
-                              dataBlockId: dataBlock.id,
-                            },
-                          )}
-                        >
-                          Edit block
-                        </Link>
+                    <td className="govuk-table__cell--actions">
+                      <Link
+                        unvisited
+                        to={generatePath<ReleaseDataBlockRouteParams>(
+                          releaseDataBlockEditRoute.path,
+                          {
+                            publicationId,
+                            releaseId,
+                            dataBlockId: dataBlock.id,
+                          },
+                        )}
+                      >
+                        {canUpdateRelease ? 'Edit block' : 'View block'}
+                      </Link>
+                      {canUpdateRelease && (
                         <ButtonText
                           onClick={() => setDeleteDataBlock(dataBlock)}
                         >
                           Delete block
                         </ButtonText>
-                      </td>
-                    )}
+                      )}
+                    </td>
                   </tr>
                 ))}
               </tbody>

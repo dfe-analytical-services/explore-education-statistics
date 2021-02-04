@@ -80,10 +80,15 @@ describe('ReleaseDataBlocksPage', () => {
     expect(row1Cells[1]).toHaveTextContent('Yes');
     expect(row1Cells[2]).toHaveTextContent('Yes');
     expect(row1Cells[3]).toHaveTextContent('Block 1 highlight name');
-    expect(within(row1Cells[4]).getByRole('link')).toHaveAttribute(
+    expect(
+      within(row1Cells[4]).getByRole('link', { name: 'Edit block' }),
+    ).toHaveAttribute(
       'href',
       '/publication/publication-1/release/release-1/data-blocks/block-1',
     );
+    expect(
+      within(row1Cells[4]).getByRole('button', { name: 'Delete block' }),
+    ).toBeInTheDocument();
 
     const row2Cells = within(rows[2]).getAllByRole('cell');
 
@@ -92,10 +97,15 @@ describe('ReleaseDataBlocksPage', () => {
     expect(row2Cells[1]).toHaveTextContent('No');
     expect(row2Cells[2]).toHaveTextContent('No');
     expect(row2Cells[3]).toHaveTextContent('None');
-    expect(within(row2Cells[4]).getByRole('link')).toHaveAttribute(
+    expect(
+      within(row2Cells[4]).getByRole('link', { name: 'Edit block' }),
+    ).toHaveAttribute(
       'href',
       '/publication/publication-1/release/release-1/data-blocks/block-2',
     );
+    expect(
+      within(row2Cells[4]).getByRole('button', { name: 'Delete block' }),
+    ).toBeInTheDocument();
   });
 
   test('renders page correctly when release cannot be updated', async () => {
@@ -121,22 +131,34 @@ describe('ReleaseDataBlocksPage', () => {
 
     const row1Cells = within(rows[1]).getAllByRole('cell');
 
-    expect(row1Cells).toHaveLength(4);
+    expect(row1Cells).toHaveLength(5);
     expect(row1Cells[0]).toHaveTextContent('Block 1');
     expect(row1Cells[1]).toHaveTextContent('Yes');
     expect(row1Cells[2]).toHaveTextContent('Yes');
     expect(row1Cells[3]).toHaveTextContent('Block 1 highlight name');
+    expect(
+      within(row1Cells[4]).getByRole('link', { name: 'View block' }),
+    ).toBeInTheDocument();
+    expect(
+      within(row1Cells[4]).queryByRole('button', { name: 'Delete block' }),
+    ).not.toBeInTheDocument();
 
     const row2Cells = within(rows[2]).getAllByRole('cell');
 
-    expect(row2Cells).toHaveLength(4);
+    expect(row2Cells).toHaveLength(5);
     expect(row2Cells[0]).toHaveTextContent('Block 2');
     expect(row2Cells[1]).toHaveTextContent('No');
     expect(row2Cells[2]).toHaveTextContent('No');
     expect(row2Cells[3]).toHaveTextContent('None');
+    expect(
+      within(row2Cells[4]).getByRole('link', { name: 'View block' }),
+    ).toBeInTheDocument();
+    expect(
+      within(row2Cells[4]).queryByRole('button', { name: 'Delete block' }),
+    ).not.toBeInTheDocument();
 
     expect(
-      screen.queryByRole('button', { name: 'Create data block' }),
+      screen.queryByRole('link', { name: 'Create data block' }),
     ).not.toBeInTheDocument();
   });
 
