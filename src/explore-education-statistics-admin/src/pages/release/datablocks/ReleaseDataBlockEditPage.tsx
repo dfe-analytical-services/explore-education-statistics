@@ -1,8 +1,9 @@
 import Link from '@admin/components/Link';
 import { useConfig } from '@admin/contexts/ConfigContext';
 import DataBlockDeletePlanModal from '@admin/pages/release/datablocks/components/DataBlockDeletePlanModal';
+import DataBlockPageReadOnlyTabs from '@admin/pages/release/datablocks/components/DataBlockPageReadOnlyTabs';
+import DataBlockPageTabs from '@admin/pages/release/datablocks/components/DataBlockPageTabs';
 import DataBlockSelector from '@admin/pages/release/datablocks/components/DataBlockSelector';
-import ReleaseDataBlocksPageTabs from '@admin/pages/release/datablocks/components/ReleaseDataBlocksPageTabs';
 import {
   ReleaseDataBlockRouteParams,
   releaseDataBlocksRoute,
@@ -11,8 +12,11 @@ import {
 import dataBlocksService, {
   ReleaseDataBlock,
 } from '@admin/services/dataBlockService';
+import permissionService from '@admin/services/permissionService';
 import Button from '@common/components/Button';
 import LoadingSpinner from '@common/components/LoadingSpinner';
+import SummaryList from '@common/components/SummaryList';
+import SummaryListItem from '@common/components/SummaryListItem';
 import UrlContainer from '@common/components/UrlContainer';
 import useAsyncHandledRetry from '@common/hooks/useAsyncHandledRetry';
 import useToggle from '@common/hooks/useToggle';
@@ -31,6 +35,11 @@ const ReleaseDataBlockEditPage = ({
   const pageRef = useRef<HTMLDivElement>(null);
 
   const [isDeleting, toggleDeleting] = useToggle(false);
+
+  const { value: canUpdate = false } = useAsyncHandledRetry(
+    () => permissionService.canUpdateRelease(releaseId),
+    [releaseId],
+  );
 
   const {
     value: dataBlock,
@@ -78,9 +87,10 @@ const ReleaseDataBlockEditPage = ({
         Back
       </Link>
 
-      <h2>Edit data block</h2>
+      <h2>{canUpdate ? 'Edit data block' : 'View data block'}</h2>
 
       <DataBlockSelector
+        canUpdate={canUpdate}
         publicationId={publicationId}
         releaseId={releaseId}
         dataBlockId={dataBlockId}
@@ -94,33 +104,43 @@ const ReleaseDataBlockEditPage = ({
             <h2 className="govuk-heading-m">{dataBlock.name}</h2>
 
             <section>
-              <p className="govuk-!-margin-bottom-6">
-                <strong>Fast track URL:</strong>
+              <SummaryList smallKey noBorder>
+                {!canUpdate && (
+                  <SummaryListItem term="Highlight name">
+                    {dataBlock.highlightName}
+                  </SummaryListItem>
+                )}
 
-                <UrlContainer
-                  className="govuk-!-margin-left-4"
-                  data-testid="fastTrackUrl"
-                  url={`${config.PublicAppUrl}/data-tables/fast-track/${dataBlockId}`}
+                <SummaryListItem term="Fast track URL">
+                  <UrlContainer
+                    data-testid="fastTrackUrl"
+                    url={`${config.PublicAppUrl}/data-tables/fast-track/${dataBlockId}`}
+                  />
+                </SummaryListItem>
+              </SummaryList>
+
+              {canUpdate && (
+                <Button variant="warning" onClick={toggleDeleting.on}>
+                  Delete this data block
+                </Button>
+              )}
+
+              {canUpdate ? (
+                <DataBlockPageTabs
+                  key={dataBlockId}
+                  releaseId={releaseId}
+                  dataBlock={dataBlock}
+                  onDataBlockSave={handleDataBlockSave}
                 />
-              </p>
-
-              <Button
-                type="button"
-                variant="warning"
-                onClick={toggleDeleting.on}
-              >
-                Delete this data block
-              </Button>
-
-              <ReleaseDataBlocksPageTabs
-                key={dataBlockId}
-                releaseId={releaseId}
-                selectedDataBlock={dataBlock}
-                onDataBlockSave={handleDataBlockSave}
-              />
+              ) : (
+                <DataBlockPageReadOnlyTabs
+                  releaseId={releaseId}
+                  dataBlock={dataBlock}
+                />
+              )}
             </section>
 
-            {isDeleting && (
+            {isDeleting && canUpdate && (
               <DataBlockDeletePlanModal
                 releaseId={releaseId}
                 dataBlockId={dataBlockId}

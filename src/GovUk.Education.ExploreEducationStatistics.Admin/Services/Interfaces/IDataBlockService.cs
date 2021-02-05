@@ -1,3 +1,4 @@
+#nullable enable
 using System;
 using System.Collections.Generic;
 using System.Threading.Tasks;
@@ -28,7 +29,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Services.Interfaces
 
         Task<Either<ActionResult, DeleteDataBlockPlan>> GetDeletePlan(Guid releaseId, Guid id);
 
-        Task<DeleteDataBlockPlan> GetDeletePlan(Guid releaseId, Subject subject);
+        Task<DeleteDataBlockPlan> GetDeletePlan(Guid releaseId, Subject? subject);
 
         Task<Either<ActionResult, Unit>> RemoveChartFile(Guid releaseId, Guid id);
     }

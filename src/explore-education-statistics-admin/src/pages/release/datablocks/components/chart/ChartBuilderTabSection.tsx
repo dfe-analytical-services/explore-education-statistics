@@ -1,7 +1,7 @@
 import ChartBuilder, {
   TableQueryUpdateHandler,
 } from '@admin/pages/release/datablocks/components/chart/ChartBuilder';
-import { SavedDataBlock } from '@admin/pages/release/datablocks/components/ReleaseDataBlocksPageTabs';
+import { SavedDataBlock } from '@admin/pages/release/datablocks/components/DataBlockPageTabs';
 import { ReleaseDataBlock } from '@admin/services/dataBlockService';
 import releaseChartFileService from '@admin/services/releaseChartFileService';
 import { FullTable } from '@common/modules/table-tool/types/fullTable';

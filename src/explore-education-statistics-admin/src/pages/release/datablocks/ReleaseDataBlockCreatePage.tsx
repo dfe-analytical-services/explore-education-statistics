@@ -1,5 +1,5 @@
 import Link from '@admin/components/Link';
-import ReleaseDataBlocksPageTabs from '@admin/pages/release/datablocks/components/ReleaseDataBlocksPageTabs';
+import DataBlockPageTabs from '@admin/pages/release/datablocks/components/DataBlockPageTabs';
 import {
   releaseDataBlockEditRoute,
   ReleaseDataBlockRouteParams,
@@ -59,7 +59,7 @@ const ReleaseDataBlockCreatePage = ({
 
       <section>
         {canUpdateRelease ? (
-          <ReleaseDataBlocksPageTabs
+          <DataBlockPageTabs
             releaseId={releaseId}
             onDataBlockSave={handleDataBlockSave}
           />
