@@ -41,6 +41,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Services.Methodologie
                 .ThenInclude(p => p.Methodology)
                 .Where(urr =>
                     urr.UserId == userId
+                    && urr.Release.Publication.MethodologyId != null
                     && urr.Role != ReleaseRole.PrereleaseViewer)
                 .Select(urr => urr.Release.Publication.Methodology)
                 .Distinct()
