@@ -92,6 +92,12 @@ const PreReleaseUserAccessForm = ({
                 message: 'Enter a valid @education.gov.uk email address',
                 test: (value: string) => {
                   if (value) {
+                    if (
+                      value ===
+                      'simulate-delivered@notifications.service.gov.uk'
+                    ) {
+                      return true;
+                    }
                     const emailSegments = value.split('@');
                     return (
                       emailSegments.length === 2 &&
