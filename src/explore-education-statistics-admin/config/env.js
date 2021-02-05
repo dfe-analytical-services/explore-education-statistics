@@ -76,6 +76,10 @@ function getClientEnvironment(publicUrl) {
         // This should only be used as an escape hatch. Normally you would put
         // images into the `src` and `import` them in code to get their paths.
         PUBLIC_URL: publicUrl,
+        // Defines the `id` used for the root div element. This is
+        // particularly important for components such as modals.
+        // This should be left as the default in most cases.
+        APP_ROOT_ID: process.env.APP_ROOT_ID || 'root',
         // We support configuring the sockjs pathname during development.
         // These settings let a developer run multiple simultaneous projects.
         // They are used as the connection `hostname`, `pathname` and `port`
