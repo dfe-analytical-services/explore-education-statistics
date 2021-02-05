@@ -124,6 +124,41 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services.Method
         }
 
         [Fact]
+        public async Task GetMethodologiesForUser_ReleaseRoleWithNullMethodology()
+        {
+            var userId = Guid.NewGuid();
+            var publication = new Publication
+            {
+                MethodologyId = null
+            };
+            var release = new Release
+            {
+                Publication = publication
+            };
+            var userReleaseRole = new UserReleaseRole
+            {
+                UserId = userId,
+                Release = release,
+                Role = ReleaseRole.Lead,
+            };
+
+            var contentDbContextId = Guid.NewGuid().ToString();
+            await using (var contentDbContext = DbUtils.InMemoryApplicationDbContext(contentDbContextId))
+            {
+                await contentDbContext.AddAsync(userReleaseRole);
+                await contentDbContext.SaveChangesAsync();
+            }
+
+            await using (var contentDbContext = DbUtils.InMemoryApplicationDbContext(contentDbContextId))
+            {
+                var methodologyRepository = BuildMethodologyRepository(contentDbContext);
+                var methodologies = await methodologyRepository.GetMethodologiesForUser(userId);
+
+                Assert.Empty(methodologies);
+            }
+        }
+
+        [Fact]
         public async Task GetMethodologiesForUser_ReleaseRolePrerelease()
         {
             var userId = Guid.NewGuid();
