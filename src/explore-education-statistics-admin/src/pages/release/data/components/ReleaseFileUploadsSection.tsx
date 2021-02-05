@@ -257,7 +257,7 @@ const ReleaseFileUploadsSection = ({ releaseId, canUpdateRelease }: Props) => {
 
       {deleteFile && (
         <ModalConfirm
-          mounted
+          open
           title="Confirm deletion of file"
           onExit={() => setDeleteFile(undefined)}
           onCancel={() => setDeleteFile(undefined)}

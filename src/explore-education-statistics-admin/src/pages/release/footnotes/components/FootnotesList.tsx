@@ -112,7 +112,7 @@ const FootnotesList = ({
       {deleteFootnote && (
         <ModalConfirm
           title="Delete footnote"
-          mounted={!!deleteFootnote}
+          open={!!deleteFootnote}
           onExit={() => setDeleteFootnote(undefined)}
           onConfirm={async () => {
             if (!deleteFootnote) {

@@ -28,7 +28,7 @@ describe('ModalConfirm', () => {
 
       render(
         <ModalConfirm
-          mounted
+          open
           onConfirm={handleConfirm}
           onCancel={handleCancel}
           onExit={handleExit}
@@ -49,7 +49,7 @@ describe('ModalConfirm', () => {
 
       render(
         <ModalConfirm
-          mounted
+          open
           onConfirm={handleConfirm}
           onCancel={handleCancel}
           onExit={handleExit}
@@ -73,7 +73,7 @@ describe('ModalConfirm', () => {
 
       const { baseElement } = render(
         <ModalConfirm
-          mounted
+          open
           underlayClass="underlay"
           onConfirm={handleConfirm}
           onCancel={handleCancel}
@@ -101,7 +101,7 @@ describe('ModalConfirm', () => {
 
       render(
         <ModalConfirm
-          mounted
+          open
           onConfirm={handleConfirm}
           onCancel={handleCancel}
           onExit={handleExit}
@@ -133,7 +133,7 @@ describe('ModalConfirm', () => {
 
       render(
         <ModalConfirm
-          mounted
+          open
           onConfirm={handleConfirm}
           onCancel={handleCancel}
           onExit={handleExit}
@@ -168,7 +168,7 @@ describe('ModalConfirm', () => {
 
       render(
         <ModalConfirm
-          mounted
+          open
           onConfirm={handleConfirm}
           onCancel={handleCancel}
           onExit={handleExit}
@@ -189,7 +189,7 @@ describe('ModalConfirm', () => {
 
       render(
         <ModalConfirm
-          mounted
+          open
           onConfirm={handleConfirm}
           onCancel={handleCancel}
           onExit={handleExit}
@@ -216,7 +216,7 @@ describe('ModalConfirm', () => {
 
       const { baseElement } = render(
         <ModalConfirm
-          mounted
+          open
           underlayClass="underlay"
           onConfirm={handleConfirm}
           onCancel={handleCancel}
@@ -244,7 +244,7 @@ describe('ModalConfirm', () => {
 
       render(
         <ModalConfirm
-          mounted
+          open
           onConfirm={handleConfirm}
           onCancel={handleCancel}
           onExit={handleExit}
@@ -276,7 +276,7 @@ describe('ModalConfirm', () => {
 
       render(
         <ModalConfirm
-          mounted
+          open
           onConfirm={handleConfirm}
           onCancel={handleCancel}
           onExit={handleExit}

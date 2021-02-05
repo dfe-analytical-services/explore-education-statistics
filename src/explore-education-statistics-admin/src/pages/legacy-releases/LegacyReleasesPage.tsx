@@ -184,7 +184,7 @@ const LegacyReleasesPage = () => {
       )}
 
       <ModalConfirm
-        mounted={!!deleteLegacyRelease}
+        open={!!deleteLegacyRelease}
         onConfirm={async () => {
           if (deleteLegacyRelease) {
             await legacyReleaseService.deleteLegacyRelease(

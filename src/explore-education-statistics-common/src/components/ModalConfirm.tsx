@@ -10,7 +10,7 @@ interface Props {
   className?: string;
   cancelText?: string;
   confirmText?: string;
-  mounted?: boolean;
+  open?: boolean;
   onConfirm(): void;
   onCancel?(): void;
   onExit(): void;
@@ -23,7 +23,7 @@ const ModalConfirm = ({
   className,
   confirmText = 'Confirm',
   cancelText = 'Cancel',
-  mounted,
+  open,
   onConfirm,
   onExit,
   onCancel = onExit,
@@ -55,7 +55,7 @@ const ModalConfirm = ({
       closeOnOutsideClick={!isDisabled}
       closeOnEsc={!isDisabled}
       title={title}
-      open={mounted}
+      open={open}
       onExit={onExit}
       underlayClass={underlayClass}
     >
