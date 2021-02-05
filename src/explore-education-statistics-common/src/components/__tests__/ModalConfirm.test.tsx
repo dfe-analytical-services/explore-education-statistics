@@ -1,10 +1,25 @@
 import ModalConfirm from '@common/components/ModalConfirm';
 import delay from '@common/utils/delay';
-import { fireEvent, render, screen, waitFor } from '@testing-library/react';
+import {
+  fireEvent,
+  render as baseRender,
+  screen,
+  waitFor,
+} from '@testing-library/react';
 import userEvent from '@testing-library/user-event';
-import React from 'react';
+import React, { ReactElement } from 'react';
 
 describe('ModalConfirm', () => {
+  const originalAppRootId = process.env.APP_ROOT_ID;
+
+  beforeAll(() => {
+    process.env.APP_ROOT_ID = 'root';
+  });
+
+  afterAll(() => {
+    process.env.APP_ROOT_ID = originalAppRootId;
+  });
+
   describe('confirming', () => {
     test('clicking Confirm button disables all buttons', () => {
       const handleExit = jest.fn();
@@ -13,6 +28,7 @@ describe('ModalConfirm', () => {
 
       render(
         <ModalConfirm
+          mounted
           onConfirm={handleConfirm}
           onCancel={handleCancel}
           onExit={handleExit}
@@ -33,6 +49,7 @@ describe('ModalConfirm', () => {
 
       render(
         <ModalConfirm
+          mounted
           onConfirm={handleConfirm}
           onCancel={handleCancel}
           onExit={handleExit}
@@ -56,6 +73,7 @@ describe('ModalConfirm', () => {
 
       const { baseElement } = render(
         <ModalConfirm
+          mounted
           underlayClass="underlay"
           onConfirm={handleConfirm}
           onCancel={handleCancel}
@@ -65,10 +83,7 @@ describe('ModalConfirm', () => {
       );
 
       userEvent.click(screen.getByRole('button', { name: 'Confirm' }));
-
-      fireEvent.mouseDown(
-        baseElement.querySelector('.underlay') as HTMLElement,
-      );
+      userEvent.click(baseElement.querySelector('.underlay') as HTMLElement);
 
       await waitFor(() => {
         expect(handleExit).not.toHaveBeenCalled();
@@ -86,6 +101,7 @@ describe('ModalConfirm', () => {
 
       render(
         <ModalConfirm
+          mounted
           onConfirm={handleConfirm}
           onCancel={handleCancel}
           onExit={handleExit}
@@ -115,8 +131,9 @@ describe('ModalConfirm', () => {
         await delay(500);
       });
 
-      const { container } = render(
+      render(
         <ModalConfirm
+          mounted
           onConfirm={handleConfirm}
           onCancel={handleCancel}
           onExit={handleExit}
@@ -132,7 +149,10 @@ describe('ModalConfirm', () => {
         expect(screen.getByRole('button', { name: 'Confirm' })).toBeEnabled();
       });
 
-      fireEvent.keyDown(container, { key: 'Esc' });
+      fireEvent.keyDown(screen.getByRole('dialog'), {
+        key: 'Esc',
+        keyCode: 27,
+      });
 
       await waitFor(() => {
         expect(handleExit).toHaveBeenCalled();
@@ -148,6 +168,7 @@ describe('ModalConfirm', () => {
 
       render(
         <ModalConfirm
+          mounted
           onConfirm={handleConfirm}
           onCancel={handleCancel}
           onExit={handleExit}
@@ -168,6 +189,7 @@ describe('ModalConfirm', () => {
 
       render(
         <ModalConfirm
+          mounted
           onConfirm={handleConfirm}
           onCancel={handleCancel}
           onExit={handleExit}
@@ -177,7 +199,10 @@ describe('ModalConfirm', () => {
 
       userEvent.click(screen.getByRole('button', { name: 'Cancel' }));
 
-      fireEvent.keyDown(screen.getByRole('dialog'), { key: 'Esc' });
+      fireEvent.keyDown(screen.getByRole('dialog'), {
+        key: 'Esc',
+        keyCode: 27,
+      });
 
       await waitFor(() => {
         expect(handleExit).not.toHaveBeenCalled();
@@ -191,6 +216,7 @@ describe('ModalConfirm', () => {
 
       const { baseElement } = render(
         <ModalConfirm
+          mounted
           underlayClass="underlay"
           onConfirm={handleConfirm}
           onCancel={handleCancel}
@@ -200,10 +226,7 @@ describe('ModalConfirm', () => {
       );
 
       userEvent.click(screen.getByRole('button', { name: 'Cancel' }));
-
-      fireEvent.mouseDown(
-        baseElement.querySelector('.underlay') as HTMLElement,
-      );
+      userEvent.click(baseElement.querySelector('.underlay') as HTMLElement);
 
       await waitFor(() => {
         expect(handleExit).not.toHaveBeenCalled();
@@ -221,6 +244,7 @@ describe('ModalConfirm', () => {
 
       render(
         <ModalConfirm
+          mounted
           onConfirm={handleConfirm}
           onCancel={handleCancel}
           onExit={handleExit}
@@ -250,8 +274,9 @@ describe('ModalConfirm', () => {
       });
       const handleConfirm = jest.fn();
 
-      const { container } = render(
+      render(
         <ModalConfirm
+          mounted
           onConfirm={handleConfirm}
           onCancel={handleCancel}
           onExit={handleExit}
@@ -267,11 +292,26 @@ describe('ModalConfirm', () => {
         expect(screen.getByRole('button', { name: 'Cancel' })).toBeEnabled();
       });
 
-      fireEvent.keyDown(container, { key: 'Esc' });
+      fireEvent.keyDown(screen.getByRole('dialog'), {
+        key: 'Esc',
+        keyCode: 27,
+      });
 
       await waitFor(() => {
         expect(handleExit).toHaveBeenCalled();
       });
     });
   });
+
+  const render = (element: ReactElement) => {
+    const container = document.createElement('div');
+    container.id = process.env.APP_ROOT_ID;
+
+    document.body.appendChild(container);
+
+    return baseRender(element, {
+      container,
+      baseElement: document.body,
+    });
+  };
 });
