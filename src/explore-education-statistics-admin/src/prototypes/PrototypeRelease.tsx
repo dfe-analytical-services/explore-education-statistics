@@ -10,10 +10,13 @@ import RelatedAside from '@common/components/RelatedAside';
 import RelatedInformation from '@common/components/RelatedInformation';
 import classNames from 'classnames';
 import PageSearchForm from '@common/components/PageSearchForm';
+import stylesKeyStat from '@common/modules/find-statistics/components/KeyStat.module.scss';
+import stylesKeyStatTile from '@common/modules/find-statistics/components/KeyStatTile.module.scss';
 import styles from './PrototypePublicPage.module.scss';
 import PrototypeDownloadPopular from './components/PrototypeDownloadPopular';
 import PrototypeDownloadUnderlying from './components/PrototypeDownloadUnderlying';
 import PrototypeDownloadAncillary from './components/PrototypeDownloadAncillary';
+import PrototypeTableBuilder from './components/PrototypeTableBuilder';
 
 const PrototypeRelease = () => {
   return (
@@ -58,12 +61,12 @@ const PrototypeRelease = () => {
                   <time>10 December 2020</time>
                 </dd>
               </div>
-              {/*<div className="govuk-summary-list__row">
+              <div className="govuk-summary-list__row">
                 <dt className="govuk-summary-list__key">Next update: </dt>
                 <dd className="govuk-summary-list__value">
                   <time>01 December 2021</time>
                 </dd>
-              </div>*/}
+              </div>
               <div className="govuk-summary-list__row">
                 <dt className="govuk-summary-list__key">Last updated: </dt>
                 <dd className="govuk-summary-list__value">
@@ -137,10 +140,10 @@ const PrototypeRelease = () => {
               <ul className="govuk-list">
                 <li>
                   <a
-                    href="#downloads-1"
+                    href="#data-1"
                     className="govuk-button govuk-!-margin-bottom-0"
                   >
-                    Download files
+                    Download associated files
                   </a>
                 </li>
               </ul>
@@ -173,19 +176,81 @@ const PrototypeRelease = () => {
           </div>
         </div>
         <Tabs id="test">
-          <TabsSection title="Summary">HIGHLIGHTS</TabsSection>
+          <TabsSection title="Summary">
+            <div className={stylesKeyStat.container}>
+              <div className={stylesKeyStat.column}>
+                <div className={stylesKeyStatTile.tile}>
+                  <h3 className="govuk-heading-s">
+                    Children in need at 31 March
+                  </h3>
+                  <p className="govuk-heading-xl">389,260</p>
+                  <p className="govuk-body-s">
+                    a decrease of 2.6% from the same point in 2019
+                  </p>
+                </div>
+              </div>
+              <div className={stylesKeyStat.column}>
+                <div className={stylesKeyStatTile.tile}>
+                  <h3 className="govuk-heading-s">
+                    Children in need at 31 March
+                  </h3>
+                  <p className="govuk-heading-xl">389,260</p>
+                  <p className="govuk-body-s">
+                    a decrease of 2.6% from the same point in 2019
+                  </p>
+                </div>
+              </div>
+              <div className={stylesKeyStat.column}>
+                <div className={stylesKeyStatTile.tile}>
+                  <h3 className="govuk-heading-s">
+                    Children in need at 31 March
+                  </h3>
+                  <p className="govuk-heading-xl">389,260</p>
+                  <p className="govuk-body-s">
+                    a decrease of 2.6% from the same point in 2019
+                  </p>
+                </div>
+              </div>
+            </div>
+          </TabsSection>
         </Tabs>
+        <Accordion id="data">
+          <AccordionSection
+            heading="Download data and metadata"
+            goToTop={false}
+          >
+            <p>
+              Find and download files used in the production of this release.
+            </p>
+            <PrototypeDownloadPopular />
+            <PrototypeDownloadUnderlying />
+            <PrototypeDownloadAncillary />
+            <PrototypeTableBuilder />
+          </AccordionSection>
+        </Accordion>
         <Accordion id="content">
-          <AccordionSection heading="Section 1" goToTop={false}>
+          <AccordionSection
+            heading="Children looked after on 31 March"
+            goToTop={false}
+          >
             This is a test
           </AccordionSection>
-          <AccordionSection heading="Section 2" goToTop={false}>
+          <AccordionSection
+            heading="Children starting to be looked after"
+            goToTop={false}
+          >
             This is a test
           </AccordionSection>
-          <AccordionSection heading="Section 3" goToTop={false}>
+          <AccordionSection
+            heading="Health outcomes for children looked after for at least 12 months on 31 March"
+            goToTop={false}
+          >
             This is a test
           </AccordionSection>
-          <AccordionSection heading="Section 4" goToTop={false}>
+          <AccordionSection
+            heading="Children looked after who were missing"
+            goToTop={false}
+          >
             This is a test
           </AccordionSection>
         </Accordion>
@@ -197,37 +262,33 @@ const PrototypeRelease = () => {
         </h2>
         <Accordion id="downloads">
           <AccordionSection heading="Download associated files" goToTop={false}>
-            <div className="govuk-grid-row">
-              <div className="govuk-grid-column-three-quarters">
-                <PrototypeDownloadPopular />
-                <PrototypeDownloadUnderlying />
-                <PrototypeDownloadAncillary />
-                <h3 className="govuk-heading-m">
-                  Create your own tables online
-                </h3>
-                <p>
-                  Use our tool to build tables using our range of national and
-                  regional data
-                </p>
-                <a href="#" className="govuk-button">
-                  Create table
-                </a>
-              </div>
-            </div>
+            <PrototypeDownloadPopular />
+            <PrototypeDownloadUnderlying />
+            <PrototypeDownloadAncillary />
+            <PrototypeTableBuilder />
           </AccordionSection>
           <AccordionSection
             heading="Download associated files (Example 2)"
             goToTop={false}
           >
+            <PrototypeDownloadPopular viewAsList />
+            <PrototypeDownloadUnderlying viewAsList />
+            <PrototypeDownloadAncillary />
+            <PrototypeTableBuilder />
+          </AccordionSection>
+          <AccordionSection
+            heading="Download associated files (Example 3)"
+            goToTop={false}
+          >
             <Tabs id="download">
               <TabsSection title="Popular tables">
-                <PrototypeDownloadPopular />
+                <PrototypeDownloadPopular viewAsList />
               </TabsSection>
               <TabsSection title="Underlying data">
-                <PrototypeDownloadUnderlying />
+                <PrototypeDownloadUnderlying viewAsList />
               </TabsSection>
               <TabsSection title="Ancillary files">
-                <PrototypeDownloadAncillary />
+                <PrototypeDownloadAncillary viewAsList />
               </TabsSection>
             </Tabs>
             <h3 className="govuk-heading-m">Create your own tables online</h3>
@@ -238,6 +299,15 @@ const PrototypeRelease = () => {
             <a href="#" className="govuk-button">
               Create table
             </a>
+          </AccordionSection>
+          <AccordionSection heading="Methodology" goToTop={false}>
+            Methodology section
+          </AccordionSection>
+          <AccordionSection heading="National statistics" goToTop={false}>
+            National statistics
+          </AccordionSection>
+          <AccordionSection heading="Contact us" goToTop={false}>
+            Contact us
           </AccordionSection>
         </Accordion>
       </PrototypePage>

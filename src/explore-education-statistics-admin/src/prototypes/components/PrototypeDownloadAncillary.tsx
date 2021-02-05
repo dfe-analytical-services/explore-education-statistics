@@ -1,35 +1,39 @@
 import classNames from 'classnames';
 import React from 'react';
+import Details from '@common/components/Details';
+import PrototypeDownloadAncillaryLinks from './PrototypeDownloadAncillaryLinks';
+import styles from '../PrototypePublicPage.module.scss';
 
-const PrototypeDownloadAncillary = () => {
+interface Props {
+  viewAsList?: boolean;
+}
+
+const PrototypeDownloadAncillary = ({ viewAsList }: Props) => {
   return (
     <>
-      <h3 className="govuk-heading-m">Ancillary files</h3>
-      <p>
-        <a
-          href="#"
-          className="govuk-button govuk-button--secondary govuk-!-margin-bottom-0 govuk-!-margin-right-3"
-        >
-          Download all as zip
-        </a>
-      </p>
-      <ul className="govuk-list govuk-list--bullet govuk-list--spaced govuk-!-margin-bottom-6">
-        <li>
-          <a href="#" className="govuk-link">
-            File 1
+      <div className={styles.prototypeDownloadContainer}>
+        <h3 className="govuk-heading-m">Ancillary files</h3>
+        <p>
+          <a
+            href="#"
+            className="govuk-button govuk-button--secondary  govuk-!-margin-bottom-0"
+          >
+            <span className="govuk-visually-hidden">ancillary files </span> ZIP
+            (1Mb)
           </a>
-        </li>
-        <li>
-          <a href="#" className="govuk-link">
-            File 2
-          </a>
-        </li>
-        <li>
-          <a href="#" className="govuk-link">
-            File 3
-          </a>
-        </li>
-      </ul>
+        </p>
+      </div>
+      <div className="govuk-!-margin-bottom-9">
+        {viewAsList && <PrototypeDownloadAncillaryLinks />}
+        {!viewAsList && (
+          <Details
+            summary="Select specific files"
+            className="govuk-!-margin-bottom-9"
+          >
+            <PrototypeDownloadAncillaryLinks />
+          </Details>
+        )}
+      </div>
     </>
   );
 };
