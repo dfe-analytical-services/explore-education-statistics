@@ -1,17 +1,8 @@
 import TableToolWizard from '@common/modules/table-tool/components/TableToolWizard';
-import _tableBuilderService, {
-  SubjectMeta,
-  ThemeMeta,
-} from '@common/services/tableBuilderService';
+import { SubjectMeta, ThemeMeta } from '@common/services/tableBuilderService';
 import { within } from '@testing-library/dom';
 import { render, screen, waitFor } from '@testing-library/react';
 import React from 'react';
-
-jest.mock('@common/services/tableBuilderService');
-
-const tableBuilderService = _tableBuilderService as jest.Mocked<
-  typeof _tableBuilderService
->;
 
 describe('TableToolWizard', () => {
   const testThemeMeta: ThemeMeta[] = [
@@ -161,11 +152,6 @@ describe('TableToolWizard', () => {
   });
 
   test('does not render publication step if `initialState.query.releaseId` is set', async () => {
-    tableBuilderService.getReleaseMeta.mockResolvedValue({
-      releaseId: 'release-1',
-      subjects: [{ id: 'subject-2', label: 'Subject 2' }],
-    });
-
     render(
       <TableToolWizard
         themeMeta={testThemeMeta}

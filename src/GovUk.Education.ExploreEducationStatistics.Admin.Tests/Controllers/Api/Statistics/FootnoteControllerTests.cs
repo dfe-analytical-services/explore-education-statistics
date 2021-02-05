@@ -86,8 +86,8 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Controllers.Api
 
             footnoteService.Setup(s => s.DeleteFootnote(ReleaseId, FootnoteId)).ReturnsAsync(Unit.Instance);
 
-            releaseMetaService.Setup(s => s.GetSubjects(ReleaseId))
-                .ReturnsAsync(new SubjectsMetaViewModel
+            releaseMetaService.Setup(s => s.GetSubjectsMeta(ReleaseId))
+                .ReturnsAsync(new ReleaseSubjectsMetaViewModel
                 {
                     ReleaseId = ReleaseId,
                     Subjects = subjectIds.Select(id => new IdLabel(id, $"Subject {id}")).ToList()

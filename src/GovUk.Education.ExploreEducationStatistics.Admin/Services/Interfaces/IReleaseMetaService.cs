@@ -8,6 +8,6 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Services.Interfaces
 {
     public interface IReleaseMetaService
     {
-        Task<Either<ActionResult, SubjectsMetaViewModel>> GetSubjects(Guid releaseId);
+        Task<Either<ActionResult, ReleaseSubjectsMetaViewModel>> GetSubjectsMeta(Guid releaseId);
     }
 }

@@ -16,7 +16,7 @@ import useAsyncRetry from '@common/hooks/useAsyncRetry';
 import { format } from 'date-fns';
 import React from 'react';
 import { generatePath } from 'react-router';
-import { Route, RouteComponentProps } from 'react-router-dom';
+import { Route, RouteComponentProps, Switch } from 'react-router-dom';
 
 interface Model {
   preReleaseWindowStatus: PreReleaseWindowStatus;
@@ -143,9 +143,11 @@ const PreReleasePageContainer = ({
             }))}
           />
 
-          {preReleaseNavRoutes.map(route => (
-            <Route key={route.path} {...route} />
-          ))}
+          <Switch>
+            {preReleaseNavRoutes.map(route => (
+              <Route key={route.path} {...route} />
+            ))}
+          </Switch>
         </>
       );
     }
