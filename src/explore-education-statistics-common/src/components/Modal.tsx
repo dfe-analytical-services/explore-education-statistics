@@ -1,31 +1,54 @@
-import { OmitStrict } from '@common/types';
+import styles from '@common/components/Modal.module.scss';
 import classNames from 'classnames';
 import React, { ReactNode } from 'react';
-import AriaModal, { AriaModalProps } from 'react-aria-modal';
-import styles from './Modal.module.scss';
+import BaseModal from 'react-modal';
 
-type Props = {
+export interface ModalProps {
   children: ReactNode;
+  className?: string;
+  closeOnOutsideClick?: boolean;
+  closeOnEsc?: boolean;
+  disabled?: boolean;
+  open?: boolean;
+  onOpen?: () => void;
+  onExit?: () => void;
   title: string;
-} & OmitStrict<
-  AriaModalProps,
-  'getApplicationNode' | 'verticallyCenter' | 'titleText' | 'titleId'
->;
+  underlayClass?: string;
+}
 
-const Modal = ({ children, dialogClass, title, ...props }: Props) => {
+const Modal = ({
+  children,
+  className,
+  closeOnOutsideClick = true,
+  closeOnEsc = true,
+  open = true,
+  onOpen,
+  onExit,
+  title,
+  underlayClass,
+}: ModalProps) => {
+  const appElement =
+    typeof document !== 'undefined'
+      ? (document.getElementById(process.env.APP_ROOT_ID) as HTMLElement)
+      : undefined;
+
   return (
-    <AriaModal
-      {...props}
-      dialogClass={classNames(styles.dialog, dialogClass)}
-      titleText={title}
-      verticallyCenter
-      getApplicationNode={() => {
-        return document.getElementById(process.env.APP_ROOT_ID) as HTMLElement;
-      }}
+    <BaseModal
+      appElement={appElement}
+      ariaHideApp={!!appElement}
+      contentLabel={title}
+      className={classNames(styles.dialog, className)}
+      isOpen={open}
+      overlayClassName={classNames(styles.underlay, underlayClass)}
+      shouldFocusAfterRender
+      shouldCloseOnOverlayClick={closeOnOutsideClick}
+      shouldCloseOnEsc={closeOnEsc}
+      onRequestClose={onExit}
+      onAfterOpen={onOpen}
     >
       <h1 className="govuk-heading-l">{title}</h1>
       {children}
-    </AriaModal>
+    </BaseModal>
   );
 };
 

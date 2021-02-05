@@ -167,7 +167,7 @@ const EditableAccordionSection = (props: EditableAccordionSectionProps) => {
 
                   <ModalConfirm
                     title="Are you sure?"
-                    mounted={showRemoveModal}
+                    open={showRemoveModal}
                     onConfirm={onRemoveSection}
                     onExit={toggleRemoveModal.off}
                     onCancel={toggleRemoveModal.off}
