@@ -15,11 +15,19 @@ const PrototypeMoreDetails = ({ title }: Props) => {
         summary={title || 'Example file'}
       >
         <SummaryList>
-          <SummaryListItem term="Download CSV">
-            <a href="#">{`${title}.csv`}</a> (2Mb)
-          </SummaryListItem>
-          <SummaryListItem term="Download ODS">
-            <a href="#">{`${title}.ods`}</a> (2Mb)
+          <SummaryListItem term="Download data">
+            <a
+              href="#"
+              className="govuk-button govuk-button--secondary govuk-!-margin-bottom-0 govuk-!-margin-right-3"
+            >
+              CSV (2Mb)
+            </a>{' '}
+            <a
+              href="#"
+              className="govuk-button govuk-button--secondary govuk-!-margin-bottom-0"
+            >
+              ODS (2Mb)
+            </a>
           </SummaryListItem>
           <SummaryListItem term="Geographical levels">
             Local Authority; National; Regional

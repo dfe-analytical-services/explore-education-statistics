@@ -33,7 +33,7 @@ const PrototypeRelease = () => {
             link: '#',
           },
         ]}
-        title="Children looked after in England including adoptions"
+        title="Children looked after in England"
         caption="Reporting year 2020"
         wide={false}
       >
@@ -120,18 +120,7 @@ const PrototypeRelease = () => {
               children who are missing. Data is taken from the annual SSDA903
               data collection.
             </p>
-            <p>
-              Although the majority of this data relates to before the
-              coronavirus (COVID-19) pandemic, there could be a small effect on
-              these figures due to the impact the pandemic had on social work
-              practice in the second half of March 2020. The{' '}
-              <a href="https://www.gov.uk/government/publications/vulnerable-children-and-young-people-survey">
-                vulnerable children and young people survey
-              </a>{' '}
-              has been collecting information from local authorities in England
-              to help understand the how the coronavirus (COVID-19) outbreak
-              affected children’s social care.
-            </p>
+
             <PageSearchForm inputLabel="Search this page" />
           </div>
           <div className="govuk-grid-column-one-third">
@@ -143,7 +132,7 @@ const PrototypeRelease = () => {
                     href="#data-1"
                     className="govuk-button govuk-!-margin-bottom-0"
                   >
-                    Download associated files
+                    Download data
                   </a>
                 </li>
               </ul>
@@ -211,6 +200,35 @@ const PrototypeRelease = () => {
                   </p>
                 </div>
               </div>
+            </div>
+            <div>
+              <ul>
+                <li>
+                  there were 389,260 children in need at 31 March 2020, a
+                  decrease of 2.6% from the same point in 2019
+                </li>
+                <li>
+                  this was a rate of 323.7 per 10,000 children, down from 334.2
+                  last year and the lowest rate in the last 8 years
+                </li>
+                <li>
+                  there were 51,510 children in need on child protection plans,
+                  a decrease of 1.4% from the same point in 2019
+                </li>
+                <li>
+                  this was a rate of 42.8 per 10,000 children, down from 43.7
+                  last year
+                </li>
+                <li>
+                  there were 642,980 referrals during the year, a decrease of
+                  1.0% compared to 2019
+                </li>
+                <li>
+                  domestic violence by the parent was identified as a factor at
+                  the end of assessment in 169,860 episodes of need and remains
+                  the most common factor
+                </li>
+              </ul>
             </div>
           </TabsSection>
         </Tabs>
