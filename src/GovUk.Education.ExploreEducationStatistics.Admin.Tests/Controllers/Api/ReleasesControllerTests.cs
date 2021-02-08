@@ -32,12 +32,12 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Controllers.Api
         {
             var mocks = Mocks();
 
-            mocks.ReleaseService.Setup(s => s.CreateReleaseAsync(It.IsAny<CreateReleaseViewModel>()))
+            mocks.ReleaseService.Setup(s => s.CreateReleaseAsync(It.IsAny<ReleaseCreateViewModel>()))
                 .ReturnsAsync(new Either<ActionResult, ReleaseViewModel>(new ReleaseViewModel()));
             var controller = ReleasesControllerWithMocks(mocks);
 
             // Call the method under test
-            var result = await controller.CreateReleaseAsync(new CreateReleaseViewModel(), _publicationId);
+            var result = await controller.CreateReleaseAsync(new ReleaseCreateViewModel(), _publicationId);
             AssertOkResult(result);
         }
 
@@ -228,13 +228,13 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Controllers.Api
             mocks.ReleaseService
                 .Setup(s => s.UpdateRelease(
                     It.Is<Guid>(id => id.Equals(_releaseId)),
-                    It.IsAny<UpdateReleaseViewModel>())
+                    It.IsAny<ReleaseUpdateViewModel>())
                 )
                 .ReturnsAsync(new ReleaseViewModel {Id = _releaseId});
             var controller = ReleasesControllerWithMocks(mocks);
 
             // Method under test
-            var result = await controller.UpdateRelease(new UpdateReleaseViewModel(), _releaseId);
+            var result = await controller.UpdateRelease(new ReleaseUpdateViewModel(), _releaseId);
             var unboxed = AssertOkResult(result);
             Assert.Equal(_releaseId, unboxed.Id);
         }

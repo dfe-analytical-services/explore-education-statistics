@@ -169,7 +169,7 @@ describe('ReleaseStatusChecklist', () => {
       }),
     ).toHaveAttribute(
       'href',
-      '/publication/publication-1/release/release-1/datablocks',
+      '/publication/publication-1/release/release-1/data-blocks',
     );
 
     expect(

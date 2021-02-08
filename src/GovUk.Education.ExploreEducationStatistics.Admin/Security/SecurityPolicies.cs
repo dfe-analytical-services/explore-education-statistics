@@ -9,7 +9,6 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Security
         CanAccessAnalystPages,
         CanAccessPrereleasePages,
         CanManageUsersOnSystem,
-        CanManageMethodologiesOnSystem,
         CanAccessAllImports,
 
         /**

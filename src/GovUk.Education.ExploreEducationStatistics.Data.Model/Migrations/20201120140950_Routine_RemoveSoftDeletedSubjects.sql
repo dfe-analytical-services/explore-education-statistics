@@ -1,4 +1,4 @@
-﻿CREATE OR
+﻿﻿CREATE OR
 ALTER PROCEDURE RemoveSoftDeletedSubjects @TotalObservationLimit INT,
                                           @ObservationCommitBatchSize INT,
                                           @ObservationFilterItemCommitBatchSize INT

@@ -2,6 +2,7 @@
 using System.Threading.Tasks;
 using GovUk.Education.ExploreEducationStatistics.Admin.Services;
 using GovUk.Education.ExploreEducationStatistics.Common.Model;
+using GovUk.Education.ExploreEducationStatistics.Common.Model.Data.Query;
 using GovUk.Education.ExploreEducationStatistics.Common.Services;
 using GovUk.Education.ExploreEducationStatistics.Common.Services.Interfaces;
 using GovUk.Education.ExploreEducationStatistics.Common.Services.Interfaces.Security;
@@ -22,7 +23,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
     public class ReleaseMetaServiceTests
     {
         [Fact]
-        public async Task GetSubjects()
+        public async Task GetSubjectsMeta()
         {
             var releaseId = Guid.NewGuid();
 
@@ -80,6 +81,16 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
                 }
             };
 
+            var dataBlock = new DataBlock
+            {
+                Name = "Test data block",
+                HighlightName = "Test highlight name",
+                Query = new ObservationQueryContext
+                {
+                    SubjectId = releaseSubject1.Subject.Id,
+                }
+            };
+
             var contentDbContextId = Guid.NewGuid().ToString();
             var statisticsDbContextId = Guid.NewGuid().ToString();
 
@@ -87,6 +98,13 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
             {
                 await contentDbContext.AddAsync(contentRelease);
                 await contentDbContext.AddRangeAsync(releaseFile1, releaseFile2);
+                await contentDbContext.AddAsync(
+                    new ReleaseContentBlock
+                    {
+                        Release = contentRelease,
+                        ContentBlock = dataBlock
+                    }
+                );
                 await contentDbContext.SaveChangesAsync();
             }
 
@@ -116,7 +134,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
                     importStatusService: importStatusService.Object
                 );
 
-                var result = await replacementService.GetSubjects(contentRelease.Id);
+                var result = await replacementService.GetSubjectsMeta(contentRelease.Id);
 
                 Assert.True(result.IsRight);
 
@@ -130,11 +148,19 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
                 Assert.Equal(releaseSubject1.Subject.Name, subjects[0].Label);
                 Assert.Equal(releaseSubject2.Subject.Id, subjects[1].Id);
                 Assert.Equal(releaseSubject2.Subject.Name, subjects[1].Label);
+
+                var highlights = result.Right.Highlights;
+
+                Assert.NotNull(highlights);
+                Assert.Single(highlights);
+
+                Assert.Equal(dataBlock.Id, highlights[0].Id);
+                Assert.Equal(dataBlock.HighlightName, highlights[0].Label);
             }
         }
 
         [Fact]
-        public async Task GetSubjects_FiltersPendingReplacementSubjects()
+        public async Task GetSubjectsMeta_FiltersPendingReplacementSubjects()
         {
             var releaseId = Guid.NewGuid();
 
@@ -257,7 +283,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
                     importStatusService: importStatusService.Object
                 );
 
-                var result = await replacementService.GetSubjects(contentRelease.Id);
+                var result = await replacementService.GetSubjectsMeta(contentRelease.Id);
 
                 Assert.True(result.IsRight);
 
@@ -275,7 +301,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
         }
 
         [Fact]
-        public async Task GetSubjects_FiltersImportingSubjects()
+        public async Task GetSubjectsMeta_FiltersImportingSubjects()
         {
             var releaseId = Guid.NewGuid();
 
@@ -380,7 +406,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
                     importStatusService: importStatusService.Object
                 );
 
-                var result = await replacementService.GetSubjects(contentRelease.Id);
+                var result = await replacementService.GetSubjectsMeta(contentRelease.Id);
 
                 Assert.True(result.IsRight);
 
@@ -391,6 +417,144 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
                 Assert.Single(subjects);
                 Assert.Equal(releaseSubject2.Subject.Id, subjects[0].Id);
                 Assert.Equal(releaseSubject2.Subject.Name, subjects[0].Label);
+            }
+        }
+
+        [Fact]
+        public async Task GetSubjectsMeta_FiltersHighlights()
+        {
+            var releaseId = Guid.NewGuid();
+
+            var contentRelease = new Release
+            {
+                Id = releaseId
+            };
+
+            var statisticsRelease = new Data.Model.Release
+            {
+                Id = releaseId
+            };
+
+            var releaseSubject1 = new ReleaseSubject
+            {
+                Release = statisticsRelease,
+                Subject = new Subject
+                {
+                    Id = Guid.NewGuid(),
+                    Name = "Subject 1"
+                }
+            };
+
+            var releaseFile1 = new ReleaseFile
+            {
+                Release = contentRelease,
+                File = new File
+                {
+                    Release = contentRelease,
+                    Filename = "data1.csv",
+                    Type = FileType.Data,
+                    SubjectId = releaseSubject1.Subject.Id
+                }
+            };
+
+            // Has highlight name and subject matches
+            var dataBlock1 = new DataBlock
+            {
+                Name = "Test data block 1",
+                HighlightName = "Test highlight name",
+                Query = new ObservationQueryContext
+                {
+                    SubjectId = releaseSubject1.Subject.Id,
+                }
+            };
+
+            // No highlight name
+            var dataBlock2 = new DataBlock
+            {
+                Name = "Test data block 2",
+                Query = new ObservationQueryContext
+                {
+                    SubjectId = releaseSubject1.Subject.Id,
+                }
+            };
+
+            // Subject does not match
+            var dataBlock3 = new DataBlock
+            {
+                Name = "Test data block 3",
+                HighlightName = "Test highlight name",
+                Query = new ObservationQueryContext
+                {
+                    SubjectId = Guid.NewGuid(),
+                }
+            };
+
+            var contentDbContextId = Guid.NewGuid().ToString();
+            var statisticsDbContextId = Guid.NewGuid().ToString();
+
+            await using (var contentDbContext = InMemoryApplicationDbContext(contentDbContextId))
+            {
+                await contentDbContext.AddAsync(contentRelease);
+                await contentDbContext.AddRangeAsync(releaseFile1);
+                await contentDbContext.AddRangeAsync(
+                    new ReleaseContentBlock
+                    {
+                        Release = contentRelease,
+                        ContentBlock = dataBlock1
+                    },
+                    new ReleaseContentBlock
+                    {
+                        Release = contentRelease,
+                        ContentBlock = dataBlock2
+                    },
+                    new ReleaseContentBlock
+                    {
+                        Release = contentRelease,
+                        ContentBlock = dataBlock3
+                    }
+                );
+                await contentDbContext.SaveChangesAsync();
+            }
+
+            await using (var statisticsDbContext = InMemoryStatisticsDbContext(statisticsDbContextId))
+            {
+                await statisticsDbContext.AddAsync(releaseSubject1);
+                await statisticsDbContext.SaveChangesAsync();
+            }
+
+            await using (var contentDbContext = InMemoryApplicationDbContext(contentDbContextId))
+            await using (var statisticsDbContext = InMemoryStatisticsDbContext(statisticsDbContextId))
+            {
+                var importStatusService = new Mock<IImportStatusService>();
+
+                importStatusService
+                    .Setup(s => s.GetImportStatus(It.IsAny<Guid>(), It.IsAny<string>()))
+                    .ReturnsAsync(
+                        new ImportStatus()
+                        {
+                            Status = IStatus.COMPLETE
+                        }
+                    );
+
+                var replacementService = BuildReleaseMetaService(
+                    contentDbContext: contentDbContext,
+                    statisticsDbContext: statisticsDbContext,
+                    importStatusService: importStatusService.Object
+                );
+
+                var result = await replacementService.GetSubjectsMeta(contentRelease.Id);
+
+                Assert.True(result.IsRight);
+
+                Assert.Equal(contentRelease.Id, result.Right.ReleaseId);
+
+                var highlights = result.Right.Highlights;
+
+                Assert.NotNull(highlights);
+                Assert.Single(highlights);
+
+                Assert.Equal(dataBlock1.Id, highlights[0].Id);
+                Assert.Equal(dataBlock1.HighlightName, highlights[0].Label);
             }
         }
 

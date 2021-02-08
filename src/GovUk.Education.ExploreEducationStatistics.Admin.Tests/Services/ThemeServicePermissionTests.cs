@@ -161,7 +161,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
                         var service = SetupThemeService(userService: userService.Object);
 
                         return await service.CreateTheme(
-                            new SaveThemeViewModel
+                            new ThemeSaveViewModel
                             {
                                 Title = "Test title",
                                 Summary = "Test summary"
@@ -183,7 +183,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
 
                         return await service.UpdateTheme(
                             _theme.Id,
-                            new SaveThemeViewModel
+                            new ThemeSaveViewModel
                             {
                                 Title = "Test title",
                                 Summary = "Test summary"

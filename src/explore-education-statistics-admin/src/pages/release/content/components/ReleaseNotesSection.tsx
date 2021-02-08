@@ -247,7 +247,7 @@ const ReleaseNotesSection = ({ release }: Props) => {
         </dl>
 
         <ModalConfirm
-          mounted={deletedReleaseNote.id.length > 0}
+          open={deletedReleaseNote.id.length > 0}
           title="Confirm deletion of release note"
           onExit={() => setDeletedReleaseNote(emptyReleaseNote)}
           onCancel={() => setDeletedReleaseNote(emptyReleaseNote)}

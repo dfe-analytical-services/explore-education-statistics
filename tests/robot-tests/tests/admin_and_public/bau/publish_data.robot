@@ -116,9 +116,14 @@ Add meta guidance to subject
     ...  ${SUBJECT_NAME} meta guidance content
     user clicks button  Save guidance
 
-Navigate to 'Data blocks' page
+Navigate to 'Create data block' page
     [Tags]  HappyPath
     user clicks link    Data blocks
+
+    user waits until h2 is visible  Data blocks
+    user clicks link  Create data block
+
+    user waits until h2 is visible  Create data block
     user waits until h2 is visible   Choose a subject
 
 Select subject "${SUBJECT_NAME}"

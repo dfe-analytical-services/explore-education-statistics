@@ -73,7 +73,7 @@ const AddSecondaryStats = ({ release, updating = false }: Props) => {
             setShowConfirmation(false);
           }}
           title="Remove secondary statistics section"
-          mounted={showConfirmation}
+          open={showConfirmation}
         >
           <p>
             Are you sure you want to remove this this secondary stats section?

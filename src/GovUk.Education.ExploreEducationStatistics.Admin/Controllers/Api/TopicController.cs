@@ -22,7 +22,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Controllers.Api
 
         [HttpPost("topics")]
         public async Task<ActionResult<TopicViewModel>> CreateTopic(
-            SaveTopicViewModel topic)
+            TopicSaveViewModel topic)
         {
             return await _topicService
                 .CreateTopic(topic)
@@ -32,7 +32,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Controllers.Api
         [HttpPut("topics/{topicId}")]
         public async Task<ActionResult<TopicViewModel>> UpdateTopic(
             Guid topicId,
-            SaveTopicViewModel topic)
+            TopicSaveViewModel topic)
         {
             return await _topicService
                 .UpdateTopic(topicId, topic)

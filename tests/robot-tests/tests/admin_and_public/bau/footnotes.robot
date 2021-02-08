@@ -100,10 +100,15 @@ Confirm created footnotes
     user waits until page contains  ${FOOTNOTE_TEXT_1}
     user waits until page contains  ${FOOTNOTE_TEXT_2}
 
-Navigate to 'Data blocks' tab
+Navigate to 'Create data block' page
     [Tags]  HappyPath
     user clicks link    Data blocks
-    user waits until h2 is visible   Choose a subject
+
+    user waits until h2 is visible  Data blocks
+    user clicks link  Create data block
+
+    user waits until h2 is visible  Create data block
+    user waits until h2 is visible  Choose a subject
 
 Select subject "${SUBJECT_NAME}" (data block)
     [Tags]  HappyPath
@@ -165,6 +170,8 @@ Go back and delete a footnote
 Add data block to release
     [Tags]  HappyPath
     user clicks link  Content
+    user waits until button is enabled  Add secondary stats
+    user scrolls to element  xpath://button[text()="Add secondary stats"]
     user clicks button  Add secondary stats
     user waits until page contains element  secondaryStats-dataBlockSelectForm-selectedDataBlock
     user selects from list by label  secondaryStats-dataBlockSelectForm-selectedDataBlock  ${FOOTNOTE_DATABLOCK_NAME}

@@ -7,18 +7,21 @@ import ManageReleaseContext from '@admin/pages/release/contexts/ManageReleaseCon
 import { getReleaseStatusLabel } from '@admin/pages/release/utils/releaseSummaryUtil';
 import {
   releaseContentRoute,
+  releaseDataBlockCreateRoute,
+  releaseDataBlockEditRoute,
   releaseDataBlocksRoute,
+  releaseDataFileReplacementCompleteRoute,
   releaseDataFileRoute,
-  releaseFootnotesRoute,
   releaseDataRoute,
+  releaseFootnotesCreateRoute,
+  releaseFootnotesEditRoute,
+  releaseFootnotesRoute,
   releasePreReleaseAccessRoute,
   ReleaseRouteParams,
   releaseStatusRoute,
   releaseSummaryEditRoute,
   releaseSummaryRoute,
-  releaseFootnotesCreateRoute,
-  releaseFootnotesEditRoute,
-  releaseDataFileReplacementCompleteRoute,
+  releaseTableToolRoute,
 } from '@admin/routes/releaseRoutes';
 import publicationService, {
   BasicPublicationDetails,
@@ -31,7 +34,7 @@ import RelatedInformation from '@common/components/RelatedInformation';
 import Tag from '@common/components/Tag';
 import useAsyncHandledRetry from '@common/hooks/useAsyncHandledRetry';
 import React from 'react';
-import { generatePath, Route, RouteComponentProps } from 'react-router';
+import { generatePath, Route, RouteComponentProps, Switch } from 'react-router';
 
 const navRoutes = [
   releaseSummaryRoute,
@@ -50,6 +53,9 @@ const routes = [
   releaseSummaryEditRoute,
   releaseFootnotesCreateRoute,
   releaseFootnotesEditRoute,
+  releaseTableToolRoute,
+  releaseDataBlockCreateRoute,
+  releaseDataBlockEditRoute,
 ];
 
 interface MatchProps {
@@ -162,7 +168,6 @@ const ReleasePageContainer = ({
 
           <NavBar
             routes={navRoutes.map(route => ({
-              path: route.path,
               title: route.title,
               to: generatePath<ReleaseRouteParams>(route.path, {
                 publicationId,
@@ -178,9 +183,11 @@ const ReleasePageContainer = ({
               onChangeReleaseStatus: reloadRelease,
             }}
           >
-            {routes.map(route => (
-              <Route exact key={route.path} {...route} />
-            ))}
+            <Switch>
+              {routes.map(route => (
+                <Route exact key={route.path} {...route} />
+              ))}
+            </Switch>
           </ManageReleaseContext.Provider>
 
           <PreviousNextLinks

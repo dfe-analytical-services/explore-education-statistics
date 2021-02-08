@@ -5,6 +5,7 @@ using AutoMapper;
 using GovUk.Education.ExploreEducationStatistics.Admin.Controllers.Api.ManageContent;
 using GovUk.Education.ExploreEducationStatistics.Admin.Security;
 using GovUk.Education.ExploreEducationStatistics.Admin.Services.ManageContent;
+using GovUk.Education.ExploreEducationStatistics.Admin.ViewModels.ManageContent;
 using GovUk.Education.ExploreEducationStatistics.Common.Model;
 using GovUk.Education.ExploreEducationStatistics.Common.Services.Interfaces.Security;
 using GovUk.Education.ExploreEducationStatistics.Common.Tests.Utils;
@@ -57,7 +58,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services.Manage
                         _release.Id,
                         ContentSectionId,
                         ContentBlockId,
-                        new AddOrUpdateCommentRequest()),
+                        new CommentSaveRequest()),
                 _release,
                 SecurityPolicies.CanUpdateSpecificRelease);
         }
@@ -77,7 +78,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services.Manage
             AssertSecurityPoliciesChecked(service =>
                     service.UpdateCommentAsync(
                         _comment.Id,
-                        new AddOrUpdateCommentRequest()),
+                        new CommentSaveRequest()),
                 _comment,
                 SecurityPolicies.CanUpdateSpecificComment);
         }
@@ -89,7 +90,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services.Manage
                     service.AddContentBlockAsync(
                         _release.Id,
                         ContentSectionId,
-                        new AddContentBlockRequest()),
+                        new ContentBlockAddRequest()),
                 _release,
                 SecurityPolicies.CanUpdateSpecificRelease);
         }
@@ -100,7 +101,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services.Manage
             AssertSecurityPoliciesChecked(service =>
                     service.AddContentSectionAsync(
                         _release.Id,
-                        new AddContentSectionRequest()),
+                        new ContentSectionAddRequest()),
                 _release,
                 SecurityPolicies.CanUpdateSpecificRelease);
         }
@@ -112,7 +113,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services.Manage
                     service.AttachDataBlock(
                         _release.Id,
                         ContentSectionId,
-                        new AttachContentBlockRequest()),
+                        new ContentBlockAttachRequest()),
                 _release,
                 SecurityPolicies.CanUpdateSpecificRelease);
         }
@@ -183,7 +184,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services.Manage
                         _release.Id,
                         ContentSectionId,
                         ContentBlockId,
-                        new UpdateTextBasedContentBlockRequest()),
+                        new ContentBlockUpdateRequest()),
                 _release,
                 SecurityPolicies.CanUpdateSpecificRelease);
         }
@@ -196,7 +197,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services.Manage
                         _release.Id,
                         ContentSectionId,
                         ContentBlockId,
-                        new UpdateDataBlockRequest()),
+                        new DataBlockUpdateRequest()),
                 _release,
                 SecurityPolicies.CanUpdateSpecificRelease);
         }

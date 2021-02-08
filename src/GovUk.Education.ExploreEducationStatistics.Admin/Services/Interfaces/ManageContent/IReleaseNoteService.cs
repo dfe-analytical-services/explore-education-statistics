@@ -11,10 +11,10 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Services.Interfaces.M
     public interface IReleaseNoteService
     {
         Task<Either<ActionResult, List<ReleaseNoteViewModel>>> AddReleaseNoteAsync(Guid releaseId,
-            CreateOrUpdateReleaseNoteRequest request);
+            ReleaseNoteSaveRequest saveRequest);
 
         Task<Either<ActionResult, List<ReleaseNoteViewModel>>> UpdateReleaseNoteAsync(Guid releaseId,
-            Guid releaseNoteId, CreateOrUpdateReleaseNoteRequest request);
+            Guid releaseNoteId, ReleaseNoteSaveRequest saveRequest);
 
         Task<Either<ActionResult, List<ReleaseNoteViewModel>>> DeleteReleaseNoteAsync(Guid releaseId,
             Guid releaseNoteId);

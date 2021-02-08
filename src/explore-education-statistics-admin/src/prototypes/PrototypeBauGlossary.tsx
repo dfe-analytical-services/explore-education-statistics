@@ -132,7 +132,7 @@ const PrototypeBauGlossary = () => {
                       Delete this item
                     </Button>
                     <ModalConfirm
-                      mounted={showDeleteModal}
+                      open={showDeleteModal}
                       title="Confirm delete"
                       onExit={() => toggleDeleteModal(false)}
                       onConfirm={() => toggleDeleteModal(false)}

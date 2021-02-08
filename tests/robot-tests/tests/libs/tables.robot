@@ -2,6 +2,10 @@
 Resource  ./common.robot
 
 *** Keywords ***
+user waits until table is visible
+    [Arguments]  ${parent}=css:body  ${wait}=${timeout}
+    user waits until parent contains element  ${parent}  xpath:.//table  timeout=${wait}
+
 user checks table column heading contains
     [Arguments]  ${row}   ${column}   ${expected}  ${parent}=css:table   ${wait}=30
     user waits until parent contains element  ${parent}
@@ -39,6 +43,10 @@ user gets table row with heading
     [Arguments]   ${heading}  ${parent}=css:table
     ${elem}=   get child element  ${parent}  xpath:.//tbody/tr/th[text()="${heading}"]/..
     [Return]   ${elem}
+
+user checks table body has x rows
+    [Arguments]  ${number}  ${parent}=css:table  ${wait}=${timeout}
+    user waits until parent contains element  ${parent}  xpath:.//tbody/tr  timeout=${wait}  limit=${number}
 
 user checks headed table body row contains
     [Arguments]  ${row_heading}  ${content}  ${parent}=css:table  ${wait}=${timeout}

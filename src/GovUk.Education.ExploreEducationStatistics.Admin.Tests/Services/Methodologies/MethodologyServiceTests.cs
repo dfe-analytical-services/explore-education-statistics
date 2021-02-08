@@ -4,6 +4,7 @@ using System.Threading.Tasks;
 using GovUk.Education.ExploreEducationStatistics.Admin.Controllers.Api.Methodologies;
 using GovUk.Education.ExploreEducationStatistics.Admin.Services.Interfaces;
 using GovUk.Education.ExploreEducationStatistics.Admin.Services.Methodologies;
+using GovUk.Education.ExploreEducationStatistics.Admin.ViewModels.Methodology;
 using GovUk.Education.ExploreEducationStatistics.Common.Services.Interfaces.Security;
 using GovUk.Education.ExploreEducationStatistics.Common.Tests.Utils;
 using GovUk.Education.ExploreEducationStatistics.Common.Utils;
@@ -23,7 +24,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services.Method
         [Fact]
         public async Task CreateAsync()
         {
-            var request = new CreateMethodologyRequest
+            var request = new MethodologyCreateRequest
             {
                 Title = "Pupil absence statistics: methodology"
             };
@@ -51,7 +52,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services.Method
         [Fact]
         public async Task CreateAsync_SlugNotUnique()
         {
-            var request = new CreateMethodologyRequest
+            var request = new MethodologyCreateRequest
             {
                 Title = "Pupil absence statistics: methodology"
             };
@@ -165,7 +166,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services.Method
                 Title = "Pupil absence statistics: methodology"
             };
 
-            var request = new UpdateMethodologyRequest
+            var request = new MethodologyUpdateRequest
             {
                 InternalReleaseNote = null,
                 Status = Draft,
@@ -212,7 +213,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services.Method
                 Title = "Pupil absence statistics: methodology"
             };
 
-            var request = new UpdateMethodologyRequest
+            var request = new MethodologyUpdateRequest
             {
                 InternalReleaseNote = null,
                 Status = Draft,
@@ -270,7 +271,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services.Method
                 Title = "Pupil exclusion statistics: methodology"
             };
 
-            var request = new UpdateMethodologyRequest
+            var request = new MethodologyUpdateRequest
             {
                 InternalReleaseNote = null,
                 Status = Draft,
@@ -309,6 +310,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services.Method
                 AdminMapper(),
                 publishingService.Object,
                 userService.Object,
+                new MethodologyRepository(context),
                 new PersistenceHelper<ContentDbContext>(context));
         }
 

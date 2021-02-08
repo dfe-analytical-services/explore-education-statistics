@@ -5,8 +5,6 @@ import React from 'react';
 import ReactDOM from 'react-dom';
 import * as serviceWorker from './serviceWorker';
 
-process.env.APP_ROOT_ID = 'root';
-
 enableES5();
 configureAxios();
 

@@ -497,6 +497,18 @@
         "master",
         "dev"
       ]
+    },
+    "minCapacityStatisticsDb": {
+      "type": "string",
+      "defaultValue": "0.75"
+    },
+    "maxCapacityStatisticsDb": {
+      "type": "int",
+      "defaultValue": 1
+    },
+    "autoPauseDelayStatisticsDb": {
+      "type": "int",
+      "defaultValue": 60
     }
   },
   "variables": {
@@ -533,7 +545,9 @@
     "publisherStorageAccountName": "[concat(parameters('subscription'), 'saeespublisher')]",
     "publisherStorageAccountId": "[concat(resourceGroup().id,'/providers/','Microsoft.Storage/storageAccounts/', variables('publisherStorageAccountName'))]",
     "loggingStorageAccountName": "[concat(parameters('subscription'), 'saeeslogging')]",
+
     "vNetName": "[concat(parameters('subscription'), '-vnet-', parameters('environment'))]",
+    "vNetRef": "[resourceId('Microsoft.Network/virtualNetworks', variables('vNetName'))]",
     "adminSubnetName": "[concat(parameters('subscription'), '-snet-', parameters('environment'), '-admin')]",
     "adminSubnetRef": "[resourceId('Microsoft.Network/virtualNetworks/subnets', variables('vNetName'), variables('adminSubnetName'))]",
     "importerSubnetName": "[concat(parameters('subscription'), '-snet-', parameters('environment'), '-importer')]",
@@ -546,6 +560,44 @@
     "contentSubnetRef": "[resourceId('Microsoft.Network/virtualNetworks/subnets', variables('vNetName'), variables('contentSubnetName'))]",
     "dataSubnetName": "[concat(parameters('subscription'), '-snet-', parameters('environment'), '-data')]",
     "dataSubnetRef": "[resourceId('Microsoft.Network/virtualNetworks/subnets', variables('vNetName'), variables('dataSubnetName'))]",
+
+    "sqlAllowedSubnets": [
+      {
+        "name": "admin",
+        "id": "[variables('adminSubnetRef')]"
+      },
+      {
+        "name": "importer",
+        "id": "[variables('importerSubnetRef')]"
+      },
+      {
+        "name": "publisher",
+        "id": "[variables('publisherSubnetRef')]"
+      },
+      {
+        "name": "content",
+        "id": "[variables('contentSubnetRef')]"
+      },
+      {
+        "name": "data",
+        "id": "[variables('dataSubnetRef')]"
+      }
+    ],
+    "publicSqlAllowedSubnets": [
+      {
+        "name": "content",
+        "id": "[variables('contentSubnetRef')]"
+      },
+      {
+        "name": "data",
+        "id": "[variables('dataSubnetRef')]"
+      },
+      {
+        "name": "publisher",
+        "id": "[variables('publisherSubnetRef')]"
+      }
+    ],
+
     "dataFactoryName": "[concat(parameters('subscription'), '-df-', parameters('environment'), '-release')]",
     "keyVaultName": "[concat(parameters('subscription'), '-kv-', parameters('environment'), '-01')]",
 
@@ -1425,7 +1477,7 @@
     {
       "name": "[variables('sqlserverName')]",
       "type": "Microsoft.Sql/servers",
-      "apiVersion": "2018-06-01-preview",
+      "apiVersion": "2019-06-01-preview",
       "location": "[resourceGroup().location]",
       "properties": {
         "administratorLogin": "[parameters('sqlAdministratorLogin')]",
@@ -1434,8 +1486,8 @@
       },
       "resources": [
         {
-          "name": "statistics",
           "type": "databases",
+          "name": "statistics",
           "location": "[resourceGroup().location]",
           "tags": {
             "Department": "[parameters('departmentName')]",
@@ -1454,11 +1506,22 @@
           "dependsOn": [
             "[variables('sqlserverName')]"
           ],
+          "sku": {
+            "name": "GP_S_Gen5",
+            "tier": "GeneralPurpose",
+            "family": "Gen5",
+            "capacity": "[parameters('maxCapacityStatisticsDb')]"
+          },
+          "kind": "v12.0,user,vcore,serverless",
           "properties": {
-            "edition": "Standard",
             "collation": "SQL_Latin1_General_CP1_CI_AS",
-            "maxSizeBytes": "268435456000",
-            "requestedServiceObjectiveName": "S3"
+            "maxSizeBytes": 268435456000,
+            "catalogCollation": "SQL_Latin1_General_CP1_CI_AS",
+            "zoneRedundant": false,
+            "readScale": "Disabled",
+            "autoPauseDelay": "[parameters('autoPauseDelayStatisticsDb')]",
+            "storageAccountType": "GRS",
+            "minCapacity": "[parameters('minCapacityStatisticsDb')]"
           }
         },
         {
@@ -1503,20 +1566,6 @@
             "tenantId": "[subscription().tenantId]"
           }
         },
-        {
-          "type": "firewallrules",
-          "apiVersion": "2018-06-01-preview",
-          "dependsOn": [
-            "[variables('sqlserverName')]"
-          ],
-          "location": "[resourceGroup().location]",
-          "name": "AllowAllWindowsAzureIps",
-          "properties": {
-            "endIpAddress": "0.0.0.0",
-            "startIpAddress": "0.0.0.0"
-          }
-        },
-
         {
           "name": "[concat(string(variables('sqlserverName')), '/statistics/current')]",
           "type": "Microsoft.Sql/servers/databases/transparentDataEncryption",
@@ -1646,9 +1695,27 @@
       }
     },
     {
+      "condition": "[parameters('useSubnets')]",
+      "name": "[concat(variables('sqlserverName'), '/', variables('sqlAllowedSubnets')[copyIndex()].name)]",
+      "type": "Microsoft.Sql/servers/virtualNetworkRules",
+      "apiVersion": "2015-05-01-preview",
+      "properties": {
+        "virtualNetworkSubnetId": "[variables('sqlAllowedSubnets')[copyIndex()].id]",
+        "ignoreMissingVnetServiceEndpoint": false
+      },
+      "dependsOn": [
+        "[resourceId('Microsoft.Sql/servers', variables('sqlserverName'))]",
+        "[variables('vNetRef')]"
+      ],
+      "copy": {
+        "name": "networkRuleLoop",
+        "count":  "[length(variables('sqlAllowedSubnets'))]"
+      }
+    },
+    {
       "name": "[variables('publicSqlServerName')]",
       "type": "Microsoft.Sql/servers",
-      "apiVersion": "2018-06-01-preview",
+      "apiVersion": "2019-06-01-preview",
       "location": "[resourceGroup().location]",
       "properties": {
         "administratorLogin": "[parameters('sqlAdministratorLogin')]",
@@ -1657,8 +1724,8 @@
       },
       "resources": [
         {
-          "name": "public-statistics",
           "type": "databases",
+          "name": "public-statistics",
           "location": "[resourceGroup().location]",
           "tags": {
             "Department": "[parameters('departmentName')]",
@@ -1677,11 +1744,22 @@
           "dependsOn": [
             "[variables('publicSqlServerName')]"
           ],
+          "sku": {
+            "name": "GP_S_Gen5",
+            "tier": "GeneralPurpose",
+            "family": "Gen5",
+            "capacity": "[parameters('maxCapacityStatisticsDb')]"
+          },
+          "kind": "v12.0,user,vcore,serverless",
           "properties": {
-            "edition": "Standard",
             "collation": "SQL_Latin1_General_CP1_CI_AS",
-            "maxSizeBytes": "268435456000",
-            "requestedServiceObjectiveName": "S3"
+            "maxSizeBytes": 268435456000,
+            "catalogCollation": "SQL_Latin1_General_CP1_CI_AS",
+            "zoneRedundant": false,
+            "readScale": "Disabled",
+            "autoPauseDelay": "[parameters('autoPauseDelayStatisticsDb')]",
+            "storageAccountType": "GRS",
+            "minCapacity": "[parameters('minCapacityStatisticsDb')]"
           }
         },
         {
@@ -1698,20 +1776,6 @@
             "tenantId": "[subscription().tenantId]"
           }
         },
-        {
-          "type": "firewallrules",
-          "apiVersion": "2018-06-01-preview",
-          "dependsOn": [
-            "[variables('publicSqlServerName')]"
-          ],
-          "location": "[resourceGroup().location]",
-          "name": "AllowAllWindowsAzureIps",
-          "properties": {
-            "endIpAddress": "0.0.0.0",
-            "startIpAddress": "0.0.0.0"
-          }
-        },
-
         {
           "name": "[concat(string(variables('publicSqlServerName')), '/public-statistics/current')]",
           "type": "Microsoft.Sql/servers/databases/transparentDataEncryption",
@@ -1826,6 +1890,24 @@
       "copy": {
         "name": "firewallloop",
         "count": "[length(parameters('sqlFirewallRules'))]"
+      }
+    },
+    {
+      "condition": "[parameters('useSubnets')]",
+      "name": "[concat(variables('publicSqlserverName'), '/', variables('publicSqlAllowedSubnets')[copyIndex()].name)]",
+      "type": "Microsoft.Sql/servers/virtualNetworkRules",
+      "apiVersion": "2015-05-01-preview",
+      "properties": {
+        "virtualNetworkSubnetId": "[variables('publicSqlAllowedSubnets')[copyIndex()].id]",
+        "ignoreMissingVnetServiceEndpoint": false
+      },
+      "dependsOn": [
+        "[resourceId('Microsoft.Sql/servers', variables('publicSqlServerName'))]",
+        "[variables('vNetRef')]"
+      ],
+      "copy": {
+        "name": "networkRuleLoop",
+        "count":  "[length(variables('publicSqlAllowedSubnets'))]"
       }
     },
     {
@@ -2562,6 +2644,9 @@
               "addressPrefix": "10.0.0.0/24",
               "serviceEndpoints": [
                 {
+                  "service": "Microsoft.Sql"
+                },
+                {
                   "service": "Microsoft.Storage"
                 }
               ],
@@ -2583,6 +2668,9 @@
             "properties": {
               "addressPrefix": "10.0.1.0/24",
               "serviceEndpoints": [
+                {
+                  "service": "Microsoft.Sql"
+                },
                 {
                   "service": "Microsoft.Storage"
                 }
@@ -2606,6 +2694,9 @@
               "addressPrefix": "10.0.2.0/24",
               "serviceEndpoints": [
                 {
+                  "service": "Microsoft.Sql"
+                },
+                {
                   "service": "Microsoft.Storage"
                 }
               ],
@@ -2627,6 +2718,9 @@
             "properties": {
               "addressPrefix": "10.0.3.0/24",
               "serviceEndpoints": [
+                {
+                  "service": "Microsoft.Sql"
+                },
                 {
                   "service": "Microsoft.Storage"
                 }
@@ -2650,6 +2744,9 @@
               "addressPrefix": "10.0.4.0/24",
               "serviceEndpoints": [
                 {
+                  "service": "Microsoft.Sql"
+                },
+                {
                   "service": "Microsoft.Storage"
                 }
               ],
@@ -2671,6 +2768,9 @@
             "properties": {
               "addressPrefix": "10.0.5.0/24",
               "serviceEndpoints": [
+                {
+                  "service": "Microsoft.Sql"
+                },
                 {
                   "service": "Microsoft.Storage"
                 }

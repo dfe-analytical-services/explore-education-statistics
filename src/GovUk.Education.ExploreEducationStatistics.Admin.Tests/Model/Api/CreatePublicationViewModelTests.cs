@@ -8,7 +8,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Model.Api
         [Fact]
         public void ManualSlugOverride()
         {
-            Assert.Equal("slug", new SavePublicationViewModel {Title = "title", Slug = "slug"}.Slug);
+            Assert.Equal("slug", new PublicationSaveViewModel {Title = "title", Slug = "slug"}.Slug);
         }
     }
 }

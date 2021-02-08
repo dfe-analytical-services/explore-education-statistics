@@ -1,7 +1,7 @@
 import Link from '@admin/components/Link';
 import {
+  ReleaseDataBlockRouteParams,
   releaseDataBlocksRoute,
-  ReleaseDataBlocksRouteParams,
   releaseDataFileRoute,
   ReleaseDataFileRouteParams,
   ReleaseFootnoteRouteParams,
@@ -62,7 +62,7 @@ const ReleaseDataFileReplacementCompletePage = ({
                     <li key={dataBlock.id}>
                       <Link
                         unvisited
-                        to={generatePath<ReleaseDataBlocksRouteParams>(
+                        to={generatePath<ReleaseDataBlockRouteParams>(
                           releaseDataBlocksRoute.path,
                           {
                             publicationId,
