@@ -116,7 +116,8 @@ export type ReleaseChecklistError =
         | 'DataFileImportsMustBeCompleted'
         | 'DataFileReplacementsMustBeCompleted'
         | 'PublicMetaGuidanceRequired'
-        | 'ReleaseNoteRequired';
+        | 'ReleaseNoteRequired'
+        | 'EmptyContentSectionExists';
     }
   | {
       code: 'MethodologyMustBeApproved';

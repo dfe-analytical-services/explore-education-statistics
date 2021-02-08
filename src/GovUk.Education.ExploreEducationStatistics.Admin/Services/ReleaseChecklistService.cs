@@ -22,6 +22,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Services
 {
     public class ReleaseChecklistService : IReleaseChecklistService
     {
+        private readonly ContentDbContext _contentDbContext;
         private readonly IPersistenceHelper<ContentDbContext> _persistenceHelper;
         private readonly IDataImportService _dataImportService;
         private readonly IUserService _userService;
@@ -31,6 +32,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Services
         private readonly IDataBlockService _dataBlockService;
 
         public ReleaseChecklistService(
+            ContentDbContext contentDbContext,
             IPersistenceHelper<ContentDbContext> persistenceHelper,
             IDataImportService dataImportService,
             IUserService userService,
@@ -39,6 +41,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Services
             IFootnoteRepository footnoteRepository,
             IDataBlockService dataBlockService)
         {
+            _contentDbContext = contentDbContext;
             _persistenceHelper = persistenceHelper;
             _dataImportService = dataImportService;
             _userService = userService;
@@ -101,7 +104,48 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Services
                 errors.Add(new ReleaseChecklistIssue(ValidationErrorMessages.ReleaseNoteRequired));
             }
 
+            if (await ReleaseHasEmptyGenericContentSection(release.Id))
+            {
+                errors.Add(new ReleaseChecklistIssue(ValidationErrorMessages.EmptyContentSectionExists));
+            }
+
             return errors;
+        }
+
+        private async Task<bool> ReleaseHasEmptyGenericContentSection(Guid releaseId)
+        {
+            var sectionBlocksList = await _contentDbContext.ReleaseContentSections
+                .Include(rcs => rcs.ContentSection)
+                .ThenInclude(cs => cs.Content)
+                .Where(rcs =>
+                    rcs.ReleaseId == releaseId
+                    && rcs.ContentSection.Type == ContentSectionType.Generic)
+                .Select(rcs => rcs.ContentSection.Content)
+                .ToListAsync();
+
+            if (sectionBlocksList.Any(blocks => blocks.Count == 0))
+            {
+                return true;
+            }
+
+            // Section is considered empty if it only contains HtmlBlocks that are blank
+            if (sectionBlocksList.Any(blocks =>
+                blocks.All(block =>
+                {
+                    if (block is HtmlBlock htmlBlock)
+                    {
+                        if (htmlBlock.Body.IsNullOrEmpty())
+                        {
+                            return true;
+                        }
+                    }
+                    return false;
+                })))
+            {
+                return true;
+            }
+
+            return false;
         }
 
         public async Task<List<ReleaseChecklistIssue>> GetWarnings(Release release)

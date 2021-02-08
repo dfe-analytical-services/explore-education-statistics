@@ -90,6 +90,14 @@ const ReleaseStatusChecklist = ({ checklist, release }: Props) => {
               releaseRouteParams,
             ),
           };
+        case 'EmptyContentSectionExists':
+          return {
+            message: 'Generic content sections cannot be empty',
+            link: generatePath<ReleaseRouteParams>(
+              releaseContentRoute.path,
+              releaseRouteParams,
+            ),
+          };
         default:
           // Show error code, even if there is no mapping,
           // as this is better than having invisible errors.
