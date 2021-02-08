@@ -1,4 +1,5 @@
 import Button from '@common/components/Button';
+import ButtonText from '@common/components/ButtonText';
 import { Form, FormFieldRadioGroup, FormGroup } from '@common/components/form';
 import useMounted from '@common/hooks/useMounted';
 import { Dictionary } from '@common/types';
@@ -8,6 +9,7 @@ import Page from '@frontend/components/Page';
 import { useCookies } from '@frontend/hooks/useCookies';
 import { Formik } from 'formik';
 import { GetServerSideProps } from 'next';
+import { useRouter } from 'next/router';
 import { parseCookies } from 'nookies';
 import React, { useState } from 'react';
 import styles from './CookiesPage.module.scss';
@@ -22,6 +24,7 @@ interface Props {
 
 function CookiesPage({ cookies }: Props) {
   const [submitted, setSubmitted] = useState(false);
+  const { back } = useRouter();
 
   const { getCookie, setBannerSeenCookie, setGADisabledCookie } = useCookies(
     cookies,
@@ -37,24 +40,22 @@ function CookiesPage({ cookies }: Props) {
     >
       <div className="govuk-grid-row">
         <div className="govuk-grid-column-two-thirds">
-          {!submitted ? null : (
+          {submitted && (
             <div
               id="submit-notification"
-              className={`${styles.submitNotification} govuk-!-margin-bottom-6 govuk-!-margin-top-2`}
+              className={styles.submitNotification}
+              role="alert"
             >
               <h2>Your cookie settings were saved</h2>
               <p>We have stored your cookie settings.</p>
               <p>
-                <a
-                  href="#"
-                  onClick={() => window.history.back()}
-                  title="Go back to the previous page"
-                >
+                <ButtonText onClick={() => back()}>
                   Go back to the page you were looking at
-                </a>
+                </ButtonText>
               </p>
             </div>
           )}
+
           <p>
             Cookies are files saved on your phone, tablet or computer when you
             visit a website.
