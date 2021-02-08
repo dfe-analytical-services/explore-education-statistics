@@ -1,22 +1,20 @@
+import Link from '@admin/components/Link';
 import PrototypePage from '@admin/prototypes/components/PrototypePage';
-import React from 'react';
 import Accordion from '@common/components/Accordion';
 import AccordionSection from '@common/components/AccordionSection';
 import Details from '@common/components/Details';
-import Link from '@admin/components/Link';
+import PageSearchForm from '@common/components/PageSearchForm';
+import RelatedAside from '@common/components/RelatedAside';
 import Tabs from '@common/components/Tabs';
 import TabsSection from '@common/components/TabsSection';
-import RelatedAside from '@common/components/RelatedAside';
-import RelatedInformation from '@common/components/RelatedInformation';
-import classNames from 'classnames';
-import PageSearchForm from '@common/components/PageSearchForm';
 import stylesKeyStat from '@common/modules/find-statistics/components/KeyStat.module.scss';
 import stylesKeyStatTile from '@common/modules/find-statistics/components/KeyStatTile.module.scss';
-import styles from './PrototypePublicPage.module.scss';
+import React from 'react';
+import PrototypeDownloadAncillary from './components/PrototypeDownloadAncillary';
 import PrototypeDownloadPopular from './components/PrototypeDownloadPopular';
 import PrototypeDownloadUnderlying from './components/PrototypeDownloadUnderlying';
-import PrototypeDownloadAncillary from './components/PrototypeDownloadAncillary';
 import PrototypeTableBuilder from './components/PrototypeTableBuilder';
+import styles from './PrototypePublicPage.module.scss';
 
 const PrototypeRelease = () => {
   return (

@@ -1,14 +1,7 @@
-import classNames from 'classnames';
 import React from 'react';
-import Details from '@common/components/Details';
-import PrototypeDownloadAncillaryLinks from './PrototypeDownloadAncillaryLinks';
 import styles from '../PrototypePublicPage.module.scss';
 
-interface Props {
-  viewAsList?: boolean;
-}
-
-const PrototypeDownloadAncillary = ({ viewAsList }: Props) => {
+const PrototypeDownloadAncillary = () => {
   return (
     <>
       <div className={styles.prototypeDownloadContainer}>

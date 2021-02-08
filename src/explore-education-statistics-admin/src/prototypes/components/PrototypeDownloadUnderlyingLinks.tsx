@@ -1,8 +1,4 @@
-import classNames from 'classnames';
 import React from 'react';
-import ModalConfirm from '@common/components/ModalConfirm';
-import useToggle from '@common/hooks/useToggle';
-import Details from '@common/components/Details';
 import PrototypeMoreDetails from './PrototypeMoreDetails';
 
 const PrototypeDownloadUnderlyingLinks = () => {

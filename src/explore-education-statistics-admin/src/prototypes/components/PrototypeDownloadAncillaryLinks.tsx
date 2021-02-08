@@ -1,6 +1,4 @@
-import classNames from 'classnames';
 import React from 'react';
-import Details from '@common/components/Details';
 
 const PrototypeDownloadAncillaryLinks = () => {
   return (

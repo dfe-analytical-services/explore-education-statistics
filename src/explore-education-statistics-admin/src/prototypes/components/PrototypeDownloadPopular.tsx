@@ -1,8 +1,7 @@
-import classNames from 'classnames';
-import React from 'react';
 import Details from '@common/components/Details';
-import PrototypeDownloadPopularLinks from './PrototypeDownloadPopularLinks';
+import React from 'react';
 import styles from '../PrototypePublicPage.module.scss';
+import PrototypeDownloadPopularLinks from './PrototypeDownloadPopularLinks';
 
 interface Props {
   viewAsList?: boolean;

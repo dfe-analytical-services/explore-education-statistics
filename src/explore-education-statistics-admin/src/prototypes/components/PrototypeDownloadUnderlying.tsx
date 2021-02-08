@@ -1,10 +1,7 @@
-import classNames from 'classnames';
-import React from 'react';
-import ModalConfirm from '@common/components/ModalConfirm';
-import useToggle from '@common/hooks/useToggle';
 import Details from '@common/components/Details';
-import PrototypeDownloadUnderlyingLinks from './PrototypeDownloadUnderlyingLinks';
+import React from 'react';
 import styles from '../PrototypePublicPage.module.scss';
+import PrototypeDownloadUnderlyingLinks from './PrototypeDownloadUnderlyingLinks';
 
 interface Props {
   viewAsList?: boolean;

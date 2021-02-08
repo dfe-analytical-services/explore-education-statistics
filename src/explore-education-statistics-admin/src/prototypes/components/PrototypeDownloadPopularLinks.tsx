@@ -1,8 +1,7 @@
-import classNames from 'classnames';
-import React from 'react';
 import ModalConfirm from '@common/components/ModalConfirm';
 import useToggle from '@common/hooks/useToggle';
-import Details from '@common/components/Details';
+import classNames from 'classnames';
+import React from 'react';
 
 const PrototypeDownloadPopularLinks = () => {
   const [showDownloadModal, toggleDownloadModal] = useToggle(false);
@@ -75,7 +74,7 @@ const PrototypeDownloadPopularLinks = () => {
           </li>
         </ul>
         <ModalConfirm
-          mounted={showDownloadModal}
+          open={showDownloadModal}
           title="Download file"
           onExit={() => toggleDownloadModal(false)}
           onConfirm={() => toggleDownloadModal(false)}
