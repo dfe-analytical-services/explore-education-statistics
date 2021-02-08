@@ -1,13 +1,7 @@
 import Button from '@common/components/Button';
-import {
-  Form,
-  FormFieldRadioGroup,
-  FormFieldset,
-  FormGroup,
-} from '@common/components/form';
+import { Form, FormFieldRadioGroup, FormGroup } from '@common/components/form';
 import useMounted from '@common/hooks/useMounted';
 import { Dictionary } from '@common/types';
-import createErrorHelper from '@common/validation/createErrorHelper';
 import Yup from '@common/validation/yup';
 import Link from '@frontend/components/Link';
 import Page from '@frontend/components/Page';
@@ -19,7 +13,7 @@ import React, { useState } from 'react';
 import styles from './CookiesPage.module.scss';
 
 interface FormValues {
-  googleAnalytics: string;
+  googleAnalytics: 'on' | 'off';
 }
 
 interface Props {
@@ -90,9 +84,7 @@ function CookiesPage({ cookies }: Props) {
                   .oneOf(['on', 'off']),
               })}
             >
-              {form => {
-                const { getError } = createErrorHelper(form);
-
+              {() => {
                 return (
                   <Form id="cookieSettingsForm">
                     <h2 className="govuk-!-margin-top-6">Cookie settings</h2>
@@ -124,35 +116,28 @@ function CookiesPage({ cookies }: Props) {
                         We do not allow Google to use or share the data about
                         how you use this site.
                       </p>
-                      <FormFieldset
-                        error={getError('googleAnalytics')}
-                        id="cookieSettingsForm-googleAnalytics"
-                        legend=""
-                      >
-                        <FormGroup>
-                          <FormFieldRadioGroup
-                            legend="Google analytics and cookies"
-                            legendHidden
-                            inline
-                            orderDirection={['desc']}
-                            showError={false}
-                            name="googleAnalytics"
-                            id="cookieSettingsForm-googleAnalytics"
-                            options={[
-                              {
-                                id: 'googleAnalytics-on',
-                                label: 'On',
-                                value: 'on',
-                              },
-                              {
-                                id: 'googleAnalytics-off',
-                                label: 'Off',
-                                value: 'off',
-                              },
-                            ]}
-                          />
-                        </FormGroup>
-                      </FormFieldset>
+
+                      <FormGroup>
+                        <FormFieldRadioGroup<FormValues>
+                          legend="Allow Google Analytics cookies"
+                          legendHidden
+                          inline
+                          orderDirection={['desc']}
+                          showError={false}
+                          name="googleAnalytics"
+                          id="cookieSettingsForm-googleAnalytics"
+                          options={[
+                            {
+                              label: 'On',
+                              value: 'on',
+                            },
+                            {
+                              label: 'Off',
+                              value: 'off',
+                            },
+                          ]}
+                        />
+                      </FormGroup>
                     </section>
                     <section className="govuk-!-margin-bottom-6">
                       <h3>Strictly necessary cookies</h3>
