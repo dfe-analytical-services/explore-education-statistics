@@ -32,6 +32,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
                 Heading = "Test heading",
                 Name = "Test name",
                 HighlightName = "Test highlight name",
+                HighlightDescription = "Test highlight description",
                 Source = "Test source",
                 Order = 5,
                 Query = new ObservationQueryContext
@@ -94,6 +95,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
                 Assert.Equal(dataBlock.Heading, result.Right.Heading);
                 Assert.Equal(dataBlock.Name, result.Right.Name);
                 Assert.Equal(dataBlock.HighlightName, result.Right.HighlightName);
+                Assert.Equal(dataBlock.HighlightDescription, result.Right.HighlightDescription);
                 Assert.Equal(dataBlock.Source, result.Right.Source);
                 Assert.Equal(dataBlock.Order, result.Right.Order);
 
@@ -154,6 +156,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
                 Heading = "Test heading 1",
                 Name = "Test name 1",
                 HighlightName = "Test highlight name 1",
+                HighlightDescription = "Test highlight description 1",
                 Source = "Test source 1",
                 Order = 5,
                 ContentSectionId = Guid.NewGuid(),
@@ -198,6 +201,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
                 Heading = "Test heading 2",
                 Name = "Test name 2",
                 HighlightName = "Test highlight name 2",
+                HighlightDescription = "Test highlight description 2",
                 Source = "Test source 2",
                 Order = 7,
                 Query = new ObservationQueryContext
@@ -259,6 +263,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
                 Assert.Equal(dataBlock1.Heading, result.Right[0].Heading);
                 Assert.Equal(dataBlock1.Name, result.Right[0].Name);
                 Assert.Equal(dataBlock1.HighlightName, result.Right[0].HighlightName);
+                Assert.Equal(dataBlock1.HighlightDescription, result.Right[0].HighlightDescription);
                 Assert.Equal(dataBlock1.Source, result.Right[0].Source);
                 Assert.Equal(1, result.Right[0].ChartsCount);
                 Assert.Equal(dataBlock1.ContentSectionId, result.Right[0].ContentSectionId);
@@ -266,6 +271,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
                 Assert.Equal(dataBlock2.Heading, result.Right[1].Heading);
                 Assert.Equal(dataBlock2.Name, result.Right[1].Name);
                 Assert.Equal(dataBlock2.HighlightName, result.Right[1].HighlightName);
+                Assert.Equal(dataBlock2.HighlightDescription, result.Right[1].HighlightDescription);
                 Assert.Equal(dataBlock2.Source, result.Right[1].Source);
                 Assert.Equal(0, result.Right[1].ChartsCount);
                 Assert.Null(result.Right[1].ContentSectionId);
@@ -282,6 +288,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
                 Heading = "Test heading 1",
                 Name = "Test name 1",
                 HighlightName = "Test highlight name 1",
+                HighlightDescription = "Test highlight description 1",
                 Source = "Test source 1",
                 Order = 5,
                 ContentSectionId = Guid.NewGuid(),
@@ -357,6 +364,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
                 Assert.Equal(dataBlock1.Heading, result.Right[0].Heading);
                 Assert.Equal(dataBlock1.Name, result.Right[0].Name);
                 Assert.Equal(dataBlock1.HighlightName, result.Right[0].HighlightName);
+                Assert.Equal(dataBlock1.HighlightDescription, result.Right[0].HighlightDescription);
                 Assert.Equal(dataBlock1.Source, result.Right[0].Source);
                 Assert.Equal(1, result.Right[0].ChartsCount);
                 Assert.Equal(dataBlock1.ContentSectionId, result.Right[0].ContentSectionId);
@@ -651,6 +659,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
                 Heading = "Test heading",
                 Name = "Test name",
                 HighlightName = "Test highlight name",
+                HighlightDescription = "Test highlight description",
                 Source = "Test source",
                 Query = new ObservationQueryContext
                 {
@@ -698,6 +707,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
                 Assert.Equal(createRequest.Heading, result.Right.Heading);
                 Assert.Equal(createRequest.Name, result.Right.Name);
                 Assert.Equal(createRequest.HighlightName, result.Right.HighlightName);
+                Assert.Equal(createRequest.HighlightDescription, result.Right.HighlightDescription);
                 Assert.Equal(createRequest.Source, result.Right.Source);
 
                 Assert.Equal(createRequest.Query, result.Right.Query);
@@ -716,6 +726,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
                 Assert.Equal(createRequest.Heading, dataBlock.Heading);
                 Assert.Equal(createRequest.Name, dataBlock.Name);
                 Assert.Equal(createRequest.HighlightName, dataBlock.HighlightName);
+                Assert.Equal(createRequest.HighlightDescription, dataBlock.HighlightDescription);
                 Assert.Equal(createRequest.Source, dataBlock.Source);
 
                 Assert.Equal(createRequest.Query, dataBlock.Query);
@@ -766,6 +777,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
                 Heading = "Old heading",
                 Name = "Old name",
                 HighlightName = "Old highlight name",
+                HighlightDescription = "Old highlight description",
                 Source = "Old source",
                 Order = 5,
                 Query = new ObservationQueryContext
@@ -823,6 +835,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
                 Heading = "New heading",
                 Name = "New name",
                 HighlightName = "New highlight name",
+                HighlightDescription = "New highlight description",
                 Source = "New source",
                 Charts = new List<IChart>
                 {
@@ -846,6 +859,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
                 Assert.Equal(updateRequest.Heading, result.Right.Heading);
                 Assert.Equal(updateRequest.Name, result.Right.Name);
                 Assert.Equal(updateRequest.HighlightName, result.Right.HighlightName);
+                Assert.Equal(updateRequest.HighlightDescription, result.Right.HighlightDescription);
                 Assert.Equal(updateRequest.Source, result.Right.Source);
                 Assert.Equal(dataBlock.Order, result.Right.Order);
 
@@ -861,6 +875,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
                 Assert.Equal(updateRequest.Heading, updatedDataBlock.Heading);
                 Assert.Equal(updateRequest.Name, updatedDataBlock.Name);
                 Assert.Equal(updateRequest.HighlightName, updatedDataBlock.HighlightName);
+                Assert.Equal(updateRequest.HighlightDescription, updatedDataBlock.HighlightDescription);
                 Assert.Equal(updateRequest.Source, updatedDataBlock.Source);
 
                 Assert.Equal(updateRequest.Query, updatedDataBlock.Query);

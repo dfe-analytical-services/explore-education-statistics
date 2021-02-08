@@ -263,6 +263,10 @@ namespace GovUk.Education.ExploreEducationStatistics.Content.Model.Database
                 .HasColumnName("DataBlock_HighlightName");
 
             modelBuilder.Entity<DataBlock>()
+                .Property(block => block.HighlightDescription)
+                .HasColumnName("DataBlock_HighlightDescription");
+
+            modelBuilder.Entity<DataBlock>()
                 .Property(block => block.Query)
                 .HasColumnName("DataBlock_Query")
                 .HasConversion(

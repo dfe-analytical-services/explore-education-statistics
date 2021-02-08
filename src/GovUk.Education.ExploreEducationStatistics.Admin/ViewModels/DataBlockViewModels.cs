@@ -20,7 +20,9 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.ViewModels
 
         public string Name { get; set; }
 
-        public string HighlightName { get; set; }
+        public string? HighlightName { get; set; }
+
+        public string? HighlightDescription { get; set; }
 
         public string Source { get; set; }
 
@@ -43,7 +45,9 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.ViewModels
         [Required]
         public string Name { get; set; }
 
-        public string HighlightName { get; set; }
+        public string? HighlightName { get; set; }
+
+        public string? HighlightDescription { get; set; }
 
         public string Source { get; set; }
 
@@ -64,7 +68,9 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.ViewModels
         [Required]
         public string Name { get; set; }
 
-        public string HighlightName { get; set; }
+        public string? HighlightName { get; set; }
+
+        public string? HighlightDescription { get; set; }
 
         public string Source { get; set; }
 
