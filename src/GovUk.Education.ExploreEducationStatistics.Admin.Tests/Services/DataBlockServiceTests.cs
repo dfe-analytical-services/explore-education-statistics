@@ -16,6 +16,7 @@ using GovUk.Education.ExploreEducationStatistics.Common.Utils;
 using GovUk.Education.ExploreEducationStatistics.Content.Model;
 using GovUk.Education.ExploreEducationStatistics.Content.Model.Database;
 using Microsoft.AspNetCore.Mvc;
+using Microsoft.EntityFrameworkCore;
 using Moq;
 using Xunit;
 
@@ -633,6 +634,129 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
         }
 
         [Fact]
+        public async Task Create()
+        {
+            var release = new Release();
+
+            var contextId = Guid.NewGuid().ToString();
+
+            await using (var context = ContentDbUtils.InMemoryContentDbContext(contextId))
+            {
+                await context.AddAsync(release);
+                await context.SaveChangesAsync();
+            }
+
+            var createRequest = new DataBlockCreateViewModel
+            {
+                Heading = "Test heading",
+                Name = "Test name",
+                HighlightName = "Test highlight name",
+                Source = "Test source",
+                Query = new ObservationQueryContext
+                {
+                    Filters = new List<Guid>
+                    {
+                        Guid.NewGuid(),
+                    },
+                    Indicators = new List<Guid>
+                    {
+                        Guid.NewGuid(),
+                    },
+                },
+                Table = new TableBuilderConfiguration
+                {
+                    TableHeaders = new TableHeaders
+                    {
+                        Rows = new List<TableHeader>
+                        {
+                            new TableHeader(Guid.NewGuid().ToString(), TableHeaderType.Indicator)
+                        },
+                        Columns = new List<TableHeader>
+                        {
+                            new TableHeader(Guid.NewGuid().ToString(), TableHeaderType.Filter)
+                        }
+                    }
+                },
+                Charts = new List<IChart>
+                {
+                    new LineChart
+                    {
+                        Title = "Test chart",
+                        Height = 600,
+                        Width = 700,
+                    }
+                },
+            };
+
+            await using (var context = ContentDbUtils.InMemoryContentDbContext(contextId))
+            {
+                var service = BuildDataBlockService(context);
+                var result = await service.Create(release.Id, createRequest);
+
+                Assert.True(result.IsRight);
+
+                Assert.Equal(createRequest.Heading, result.Right.Heading);
+                Assert.Equal(createRequest.Name, result.Right.Name);
+                Assert.Equal(createRequest.HighlightName, result.Right.HighlightName);
+                Assert.Equal(createRequest.Source, result.Right.Source);
+
+                Assert.Equal(createRequest.Query, result.Right.Query);
+                Assert.Equal(createRequest.Table, result.Right.Table);
+                Assert.Equal(createRequest.Charts, result.Right.Charts);
+            }
+
+            await using (var context = ContentDbUtils.InMemoryContentDbContext(contextId))
+            {
+                var dataBlocks = context.DataBlocks.ToList();
+
+                Assert.Single(dataBlocks);
+
+                var dataBlock = dataBlocks[0];
+
+                Assert.Equal(createRequest.Heading, dataBlock.Heading);
+                Assert.Equal(createRequest.Name, dataBlock.Name);
+                Assert.Equal(createRequest.HighlightName, dataBlock.HighlightName);
+                Assert.Equal(createRequest.Source, dataBlock.Source);
+
+                Assert.Equal(createRequest.Query, dataBlock.Query);
+                Assert.Equal(createRequest.Table, dataBlock.Table);
+                Assert.Equal(createRequest.Charts, dataBlock.Charts);
+
+                var savedRelease = await context.Releases
+                    .Include(r => r.ContentBlocks)
+                    .FirstOrDefaultAsync(r => r.Id == release.Id);
+
+                Assert.NotNull(savedRelease);
+                Assert.Single(savedRelease.ContentBlocks);
+                Assert.Equal(dataBlock, savedRelease.ContentBlocks[0].ContentBlock);
+            }
+        }
+
+        [Fact]
+        public async Task Create_ReleaseNotFound()
+        {
+            var contextId = Guid.NewGuid().ToString();
+
+            var createRequest = new DataBlockCreateViewModel();
+
+            await using (var context = ContentDbUtils.InMemoryContentDbContext(contextId))
+            {
+                var service = BuildDataBlockService(context);
+                var result = await service.Create(Guid.NewGuid(), createRequest);
+
+                Assert.True(result.IsLeft);
+                Assert.IsType<NotFoundResult>(result.Left);
+            }
+
+            await using (var context = ContentDbUtils.InMemoryContentDbContext(contextId))
+            {
+                var dataBlocks = context.DataBlocks.ToList();
+
+                Assert.Empty(dataBlocks);
+            }
+        }
+
+        [Fact]
         public async Task Update()
         {
             var release = new Release();
@@ -700,31 +824,6 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
                 Name = "New name",
                 HighlightName = "New highlight name",
                 Source = "New source",
-                Query = new ObservationQueryContext
-                {
-                    Filters = new List<Guid>
-                    {
-                        Guid.NewGuid(),
-                    },
-                    Indicators = new List<Guid>
-                    {
-                        Guid.NewGuid(),
-                    },
-                },
-                Table = new TableBuilderConfiguration
-                {
-                    TableHeaders = new TableHeaders
-                    {
-                        Rows = new List<TableHeader>
-                        {
-                            new TableHeader(Guid.NewGuid().ToString(), TableHeaderType.Indicator)
-                        },
-                        Columns = new List<TableHeader>
-                        {
-                            new TableHeader(Guid.NewGuid().ToString(), TableHeaderType.Filter)
-                        }
-                    }
-                },
                 Charts = new List<IChart>
                 {
                     new LineChart
