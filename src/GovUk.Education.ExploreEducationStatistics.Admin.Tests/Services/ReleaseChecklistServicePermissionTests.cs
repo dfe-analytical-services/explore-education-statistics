@@ -37,6 +37,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
         }
 
         private ReleaseChecklistService BuildReleaseChecklistService(
+            ContentDbContext contentDbContext = null,
             IPersistenceHelper<ContentDbContext> persistenceHelper = null,
             IDataImportService dataImportService = null,
             IUserService userService = null,
@@ -47,6 +48,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
         {
 
             return new ReleaseChecklistService(
+                contentDbContext ?? new Mock<ContentDbContext>().Object,
                 persistenceHelper ?? DefaultPersistenceHelperMock().Object,
                 dataImportService ?? new Mock<IDataImportService>().Object,
                 userService ?? MockUtils.AlwaysTrueUserService().Object,
