@@ -40,6 +40,8 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Processor.Services
         {
             var import = await _dataImportService.GetImport(message.Id);
 
+            _logger.LogInformation($"Importing Observations for {import.File.Filename} batchNo {message.BatchNo}");
+
             if (import.Status.IsFinished())
             {
                 _logger.LogInformation($"Import for {import.File.Filename} already finished with state " +
@@ -49,7 +51,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Processor.Services
 
             if (import.Status == CANCELLING)
             {
-                _logger.LogInformation($"Import for {import.File.Filename} is CANCELLING " +
+                _logger.LogInformation($"Import for {import.File.Filename} is " +
                                        $"{import.Status} - ignoring Observations in file {message.ObservationsFilePath} " +
                                        "and marking import as CANCELLED");
 
