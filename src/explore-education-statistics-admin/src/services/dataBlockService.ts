@@ -4,6 +4,16 @@ import { OmitStrict } from '@common/types';
 
 export type ReleaseDataBlock = OmitStrict<DataBlock, 'order' | 'type'>;
 
+export interface ReleaseDataBlockSummary {
+  id: string;
+  name: string;
+  highlightName?: string;
+  heading: string;
+  source: string;
+  chartsCount: number;
+  contentSectionId?: string;
+}
+
 export type UpdateReleaseDataBlock = ReleaseDataBlock;
 export type CreateReleaseDataBlock = OmitStrict<
   DataBlock,
@@ -26,37 +36,41 @@ export interface DeleteDataBlockPlan {
 }
 
 const dataBlockService = {
-  async getDataBlocks(releaseId: string) {
-    return client.get<ReleaseDataBlock[]>(
-      `/release/${releaseId}/datablocks`,
-      {},
-    );
+  listDataBlocks(releaseId: string): Promise<ReleaseDataBlockSummary[]> {
+    return client.get(`/releases/${releaseId}/data-blocks`);
   },
 
-  async createDataBlock(releaseId: string, dataBlock: CreateReleaseDataBlock) {
-    return client.post<ReleaseDataBlock>(
-      `/release/${releaseId}/datablocks`,
-      dataBlock,
-    );
+  getDataBlock(dataBlockId: string): Promise<ReleaseDataBlock> {
+    return client.get<ReleaseDataBlock>(`/data-blocks/${dataBlockId}`);
   },
 
-  async updateDataBlock(
+  createDataBlock(
+    releaseId: string,
+    dataBlock: CreateReleaseDataBlock,
+  ): Promise<ReleaseDataBlock> {
+    return client.post(`/releases/${releaseId}/data-blocks`, dataBlock);
+  },
+
+  updateDataBlock(
     dataBlockId: string,
     dataBlock: UpdateReleaseDataBlock,
-  ) {
+  ): Promise<ReleaseDataBlock> {
     return client.put<ReleaseDataBlock>(
-      `/datablocks/${dataBlockId}`,
+      `/data-blocks/${dataBlockId}`,
       dataBlock,
     );
   },
 
-  async deleteDataBlock(releaseId: string, id: string) {
-    return client.delete(`/release/${releaseId}/datablocks/${id}`);
+  deleteDataBlock(releaseId: string, id: string): Promise<void> {
+    return client.delete(`/releases/${releaseId}/data-blocks/${id}`);
   },
 
-  async getDeleteBlockPlan(releaseId: string, id: string) {
-    return client.get<DeleteDataBlockPlan>(
-      `/release/${releaseId}/datablocks/${id}/delete-plan`,
+  getDeleteBlockPlan(
+    releaseId: string,
+    id: string,
+  ): Promise<DeleteDataBlockPlan> {
+    return client.get(
+      `/releases/${releaseId}/data-blocks/${id}/delete-plan`,
       {},
     );
   },

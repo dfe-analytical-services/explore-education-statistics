@@ -1,118 +1,77 @@
-import { useConfig } from '@admin/contexts/ConfigContext';
-import ReleaseDataBlocksPageTabs from '@admin/pages/release/datablocks/components/ReleaseDataBlocksPageTabs';
+import ButtonLink from '@admin/components/ButtonLink';
+import Link from '@admin/components/Link';
+import DataBlockDeletePlanModal from '@admin/pages/release/datablocks/components/DataBlockDeletePlanModal';
 import {
-  releaseDataBlocksRoute,
-  ReleaseDataBlocksRouteParams,
+  releaseDataBlockCreateRoute,
+  releaseDataBlockEditRoute,
+  ReleaseDataBlockRouteParams,
+  ReleaseRouteParams,
+  releaseTableToolRoute,
 } from '@admin/routes/releaseRoutes';
 import dataBlocksService, {
-  DeleteDataBlockPlan,
-  ReleaseDataBlock,
+  ReleaseDataBlockSummary,
 } from '@admin/services/dataBlockService';
 import permissionService from '@admin/services/permissionService';
-import Button from '@common/components/Button';
-import { FormSelect } from '@common/components/form';
-import Gate from '@common/components/Gate';
+import ButtonText from '@common/components/ButtonText';
 import InsetText from '@common/components/InsetText';
 import LoadingSpinner from '@common/components/LoadingSpinner';
-import ModalConfirm from '@common/components/ModalConfirm';
-import UrlContainer from '@common/components/UrlContainer';
-import useAsyncRetry from '@common/hooks/useAsyncRetry';
-import React, { useCallback, useMemo, useRef, useState } from 'react';
+import WarningMessage from '@common/components/WarningMessage';
+import useAsyncHandledRetry from '@common/hooks/useAsyncHandledRetry';
+import classNames from 'classnames';
+import React, { useCallback, useState } from 'react';
 import { generatePath, RouteComponentProps } from 'react-router';
 
-const emptyDataBlocks: ReleaseDataBlock[] = [];
-
-const ReleaseDataBlocksPageInternal = ({
+const ReleaseDataBlocksPage = ({
   match,
-  history,
-}: RouteComponentProps<ReleaseDataBlocksRouteParams>) => {
-  const { publicationId, releaseId, dataBlockId } = match.params;
+}: RouteComponentProps<ReleaseRouteParams>) => {
+  const { publicationId, releaseId } = match.params;
 
-  const pageRef = useRef<HTMLDivElement>(null);
+  const [deleteDataBlock, setDeleteDataBlock] = useState<
+    ReleaseDataBlockSummary
+  >();
 
-  const config = useConfig();
-
-  const [deletePlan, setDeletePlan] = useState<DeleteDataBlockPlan>();
+  const { value: canUpdateRelease } = useAsyncHandledRetry(
+    () => permissionService.canUpdateRelease(releaseId),
+    [releaseId],
+  );
 
   const {
-    value: dataBlocks = emptyDataBlocks,
+    value: dataBlocks = [],
     isLoading,
-    retry: fetchDataBlocks,
     setState: setDataBlocks,
-  } = useAsyncRetry(() => dataBlocksService.getDataBlocks(releaseId), [
+  } = useAsyncHandledRetry(() => dataBlocksService.listDataBlocks(releaseId), [
     releaseId,
   ]);
 
-  const dataBlockOptions = useMemo(
-    () =>
-      dataBlocks.map(({ name, id }, index) => ({
-        label: `${name || index}`,
-        value: `${id}`,
-      })),
-    [dataBlocks],
-  );
-
-  const selectedDataBlock = useMemo<ReleaseDataBlock | undefined>(() => {
-    return dataBlocks.find(({ id }) => dataBlockId === id);
-  }, [dataBlockId, dataBlocks]);
-
-  const handleDataBlockSave = useCallback(
-    async (dataBlock: ReleaseDataBlock) => {
-      const currentBlockIndex = dataBlocks.findIndex(
-        db => db.id === dataBlock.id,
-      );
-
-      const nextDataBlocks = [...dataBlocks];
-
-      if (currentBlockIndex > -1) {
-        nextDataBlocks[currentBlockIndex] = dataBlock;
-      } else {
-        nextDataBlocks.push(dataBlock);
-
-        history.push(
-          generatePath<ReleaseDataBlocksRouteParams>(
-            releaseDataBlocksRoute.path,
-            {
-              publicationId,
-              releaseId,
-              dataBlockId: dataBlock.id,
-            },
-          ),
-        );
-      }
-
-      setDataBlocks({
-        isLoading: false,
-        value: nextDataBlocks,
-      });
-
-      if (pageRef.current) {
-        pageRef.current.scrollIntoView({
-          behavior: 'smooth',
-          block: 'start',
-        });
-      }
-    },
-    [dataBlocks, setDataBlocks, history, publicationId, releaseId],
-  );
-
-  const handleDataBlockDelete = useCallback(async () => {
-    if (!selectedDataBlock) {
+  const handleDelete = useCallback(async () => {
+    if (!deleteDataBlock) {
       return;
     }
 
-    setDeletePlan(undefined);
+    setDataBlocks({
+      value: dataBlocks.filter(
+        dataBlock => dataBlock.id !== deleteDataBlock.id,
+      ),
+    });
 
-    await dataBlocksService.deleteDataBlock(releaseId, selectedDataBlock.id);
-    await fetchDataBlocks();
+    setDeleteDataBlock(undefined);
+  }, [dataBlocks, deleteDataBlock, setDataBlocks]);
 
-    history.push(
-      generatePath<ReleaseDataBlocksRouteParams>(releaseDataBlocksRoute.path, {
-        publicationId,
-        releaseId,
-      }),
-    );
-  }, [fetchDataBlocks, history, publicationId, releaseId, selectedDataBlock]);
+  const handleDeleteCancel = useCallback(() => {
+    setDeleteDataBlock(undefined);
+  }, []);
+
+  const createPath = generatePath<ReleaseRouteParams>(
+    releaseDataBlockCreateRoute.path,
+    {
+      publicationId,
+      releaseId,
+    },
+  );
+
+  const hasHighlightNames = dataBlocks.some(
+    dataBlock => !!dataBlock.highlightName,
+  );
 
   return (
     <>
@@ -127,141 +86,104 @@ const ReleaseDataBlocksPageInternal = ({
         </p>
       </InsetText>
 
-      <div ref={pageRef}>
-        {dataBlockOptions.length > 0 && (
+      {!canUpdateRelease && !isLoading && (
+        <>
+          <WarningMessage>
+            This release has been approved, and can no longer be updated.
+          </WarningMessage>
+
+          <ButtonLink
+            to={generatePath<ReleaseRouteParams>(releaseTableToolRoute.path, {
+              publicationId,
+              releaseId,
+            })}
+          >
+            Go to table tool
+          </ButtonLink>
+        </>
+      )}
+
+      <LoadingSpinner loading={isLoading}>
+        {dataBlocks.length > 0 ? (
           <>
-            <FormSelect
-              id="selectedDataBlock"
-              name="selectedDataBlock"
-              label="Select an existing data block to edit or create a new one"
-              disabled={isLoading}
-              order={[]}
-              value={dataBlockId}
-              optGroups={{
-                'Create data block': [
-                  {
-                    label: 'Create new data block',
-                    value: '',
-                  },
-                ],
-                'Edit existing': dataBlockOptions,
-              }}
-              onChange={e => {
-                history.push(
-                  generatePath<ReleaseDataBlocksRouteParams>(
-                    releaseDataBlocksRoute.path,
-                    {
-                      publicationId,
-                      releaseId,
-                      dataBlockId: e.target.value ? e.target.value : undefined,
-                    },
-                  ),
-                );
-              }}
-            />
-            <hr />
+            {canUpdateRelease && dataBlocks.length > 5 && (
+              <ButtonLink to={createPath}>Create data block</ButtonLink>
+            )}
+
+            <table>
+              <thead>
+                <tr>
+                  <th scope="col" className="govuk-!-width-one-quarter">
+                    Name
+                  </th>
+                  <th scope="col">Has chart</th>
+                  <th scope="col">In content</th>
+                  <th
+                    scope="col"
+                    className={classNames({
+                      'govuk-!-width-one-quarter': hasHighlightNames,
+                    })}
+                  >
+                    Highlight name
+                  </th>
+                  <th scope="col" className="govuk-table__header--actions">
+                    Actions
+                  </th>
+                </tr>
+              </thead>
+              <tbody>
+                {dataBlocks.map(dataBlock => (
+                  <tr key={dataBlock.id}>
+                    <td>{dataBlock.name}</td>
+                    <td>{dataBlock.chartsCount > 0 ? 'Yes' : 'No'}</td>
+                    <td>{dataBlock.contentSectionId ? 'Yes' : 'No'}</td>
+                    <td>{dataBlock.highlightName || 'None'}</td>
+                    <td className="govuk-table__cell--actions">
+                      <Link
+                        unvisited
+                        to={generatePath<ReleaseDataBlockRouteParams>(
+                          releaseDataBlockEditRoute.path,
+                          {
+                            publicationId,
+                            releaseId,
+                            dataBlockId: dataBlock.id,
+                          },
+                        )}
+                      >
+                        {canUpdateRelease ? 'Edit block' : 'View block'}
+                      </Link>
+                      {canUpdateRelease && (
+                        <ButtonText
+                          onClick={() => setDeleteDataBlock(dataBlock)}
+                        >
+                          Delete block
+                        </ButtonText>
+                      )}
+                    </td>
+                  </tr>
+                ))}
+              </tbody>
+            </table>
           </>
+        ) : (
+          <InsetText>No data blocks have been created.</InsetText>
         )}
 
-        <LoadingSpinner loading={isLoading}>
-          {selectedDataBlock?.name ? (
-            <h2>{selectedDataBlock.name}</h2>
-          ) : (
-            <h2>Create new data block</h2>
-          )}
+        {canUpdateRelease && (
+          <ButtonLink to={createPath}>Create data block</ButtonLink>
+        )}
 
-          {selectedDataBlock && (
-            <>
-              {config && (
-                <p className="govuk-!-margin-bottom-6">
-                  <strong>Fast track URL:</strong>
-
-                  <UrlContainer
-                    className="govuk-!-margin-left-4"
-                    url={`${config.PublicAppUrl}/data-tables/fast-track/${selectedDataBlock.id}`}
-                  />
-                </p>
-              )}
-
-              <Button
-                type="button"
-                variant="warning"
-                onClick={() => {
-                  dataBlocksService
-                    .getDeleteBlockPlan(releaseId, selectedDataBlock.id)
-                    .then(setDeletePlan);
-                }}
-              >
-                Delete this data block
-              </Button>
-
-              {deletePlan && (
-                <ModalConfirm
-                  title="Delete data block"
-                  mounted
-                  onConfirm={handleDataBlockDelete}
-                  onExit={() => setDeletePlan(undefined)}
-                  onCancel={() => setDeletePlan(undefined)}
-                >
-                  <p>Are you sure you wish to delete this data block?</p>
-                  <ul>
-                    {deletePlan.dependentDataBlocks.map(block => (
-                      <li key={block.name}>
-                        <p>{block.name}</p>
-                        {block.contentSectionHeading && (
-                          <p>
-                            {`It will be removed from the "${block.contentSectionHeading}" content section.`}
-                          </p>
-                        )}
-                        {block.infographicFilesInfo.length > 0 && (
-                          <p>
-                            The following infographic files will also be
-                            removed:
-                            <ul>
-                              {block.infographicFilesInfo.map(finfo => (
-                                <li key={finfo.filename}>
-                                  <p>{finfo.filename}</p>
-                                </li>
-                              ))}
-                            </ul>
-                          </p>
-                        )}
-                      </li>
-                    ))}
-                  </ul>
-                </ModalConfirm>
-              )}
-            </>
-          )}
-
-          <ReleaseDataBlocksPageTabs
-            key={selectedDataBlock?.id}
+        {deleteDataBlock && (
+          <DataBlockDeletePlanModal
             releaseId={releaseId}
-            selectedDataBlock={selectedDataBlock}
-            onDataBlockSave={handleDataBlockSave}
+            dataBlockId={deleteDataBlock.id}
+            onConfirm={handleDelete}
+            onCancel={handleDeleteCancel}
+            onExit={handleDeleteCancel}
           />
-        </LoadingSpinner>
-      </div>
+        )}
+      </LoadingSpinner>
     </>
-  );
-};
-
-const ReleaseDataBlocksPage = (
-  props: RouteComponentProps<ReleaseDataBlocksRouteParams>,
-) => {
-  const {
-    match: {
-      params: { releaseId },
-    },
-  } = props;
-
-  return (
-    <Gate
-      condition={() => permissionService.canUpdateRelease(releaseId)}
-      fallback={<p>This release is currently not editable.</p>}
-    >
-      <ReleaseDataBlocksPageInternal {...props} />
-    </Gate>
   );
 };
 

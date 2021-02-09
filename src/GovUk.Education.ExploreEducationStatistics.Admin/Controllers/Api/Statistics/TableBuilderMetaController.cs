@@ -41,9 +41,9 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Controllers.Api.Stati
         }
 
         [HttpGet("release/{releaseId}")]
-        public async Task<ActionResult<SubjectsMetaViewModel>> GetSubjectsForRelease(Guid releaseId)
+        public async Task<ActionResult<ReleaseSubjectsMetaViewModel>> GetReleaseSubjectsMeta(Guid releaseId)
         {
-            return await _releaseMetaService.GetSubjects(releaseId)
+            return await _releaseMetaService.GetSubjectsMeta(releaseId)
                 .HandleFailuresOrOk();
         }
     }

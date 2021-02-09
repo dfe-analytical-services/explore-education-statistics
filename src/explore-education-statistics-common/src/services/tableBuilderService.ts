@@ -93,6 +93,7 @@ export interface PublicationMeta {
 export interface ReleaseMeta {
   releaseId: string;
   subjects: PublicationSubject[];
+  highlights: TableHighlight[];
 }
 
 export interface SubjectMeta {
@@ -183,8 +184,8 @@ const tableBuilderService = {
   getThemes(): Promise<ThemeMeta[]> {
     return dataApi.get(`/meta/themes`);
   },
-  getPublicationMeta(publicationUuid: string): Promise<PublicationMeta> {
-    return dataApi.get(`/meta/publication/${publicationUuid}`);
+  getPublicationMeta(publicationId: string): Promise<PublicationMeta> {
+    return dataApi.get(`/meta/publication/${publicationId}`);
   },
   getReleaseMeta(releaseId: string): Promise<ReleaseMeta> {
     return dataApi.get(`/meta/release/${releaseId}`);

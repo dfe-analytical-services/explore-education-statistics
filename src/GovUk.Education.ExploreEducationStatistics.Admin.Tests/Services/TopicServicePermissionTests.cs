@@ -36,7 +36,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
                         var service = SetupTopicService(userService: userService.Object);
 
                         return await service.CreateTopic(
-                            new SaveTopicViewModel
+                            new TopicSaveViewModel
                             {
                                 Title = "Test title",
                             }
@@ -57,7 +57,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
 
                         return await service.UpdateTopic(
                             _topic.Id,
-                            new SaveTopicViewModel
+                            new TopicSaveViewModel
                             {
                                 Title = "Test title",
                             }

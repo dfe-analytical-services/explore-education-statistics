@@ -384,7 +384,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
                             {"publication name", "Test publication"},
                             {
                                 "prerelease link",
-                                $"http://localhost/publication/{release.PublicationId}/release/{release.Id}/prerelease"
+                                $"http://localhost/publication/{release.PublicationId}/release/{release.Id}/prerelease/content"
                             },
                             {"prerelease day", "Tuesday 08 September 2020"},
                             {"prerelease time", "09:30"},
@@ -483,7 +483,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
                             {"publication name", "Test publication"},
                             {
                                 "prerelease link",
-                                $"http://localhost/publication/{release.PublicationId}/release/{release.Id}/prerelease"
+                                $"http://localhost/publication/{release.PublicationId}/release/{release.Id}/prerelease/content"
                             },
                             {"prerelease day", "Tuesday 08 September 2020"},
                             {"prerelease time", "09:30"},

@@ -29,7 +29,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Controllers.Api
 
         [HttpPost("api/legacy-releases")]
         public async Task<ActionResult<LegacyReleaseViewModel>> CreateLegacyRelease(
-            CreateLegacyReleaseViewModel legacyRelease)
+            LegacyReleaseCreateViewModel legacyRelease)
         {
             return await _legacyReleaseService
                 .CreateLegacyRelease(legacyRelease)
@@ -39,7 +39,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Controllers.Api
         [HttpPut("api/legacy-releases/{id}")]
         public async Task<ActionResult<LegacyReleaseViewModel>> UpdateLegacyRelease(
             Guid id,
-            UpdateLegacyReleaseViewModel legacyRelease)
+            LegacyReleaseUpdateViewModel legacyRelease)
         {
             return await _legacyReleaseService
                 .UpdateLegacyRelease(id, legacyRelease)

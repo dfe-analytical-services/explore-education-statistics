@@ -2,7 +2,6 @@ using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
-using GovUk.Education.ExploreEducationStatistics.Admin.Models.Api;
 using GovUk.Education.ExploreEducationStatistics.Admin.Services.Interfaces;
 using GovUk.Education.ExploreEducationStatistics.Admin.Services.Interfaces.Security;
 using GovUk.Education.ExploreEducationStatistics.Admin.Validators;
@@ -182,14 +181,14 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Services
                 .ToList();
         }
 
-        private async Task<List<DataBlockViewModel>> GetDataBlocksWithHighlights(Release release)
+        private async Task<List<DataBlockSummaryViewModel>> GetDataBlocksWithHighlights(Release release)
         {
             return (await _dataBlockService.List(release.Id))
                 .FoldRight(
                     dataBlocks => dataBlocks
                         .Where(dataBlock => !dataBlock.HighlightName.IsNullOrEmpty())
                         .ToList(),
-                    new List<DataBlockViewModel>()
+                    new List<DataBlockSummaryViewModel>()
                 );
         }
     }

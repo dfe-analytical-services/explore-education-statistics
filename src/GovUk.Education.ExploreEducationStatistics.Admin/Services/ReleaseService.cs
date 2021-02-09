@@ -3,7 +3,6 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
 using AutoMapper;
-using GovUk.Education.ExploreEducationStatistics.Admin.Models.Api;
 using GovUk.Education.ExploreEducationStatistics.Admin.Services.Interfaces;
 using GovUk.Education.ExploreEducationStatistics.Admin.Services.Interfaces.Security;
 using GovUk.Education.ExploreEducationStatistics.Admin.ViewModels;
@@ -98,21 +97,21 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Services
                 .OnSuccess(release => _mapper.Map<ReleaseViewModel>(release));
         }
 
-        public async Task<Either<ActionResult, ReleaseViewModel>> CreateReleaseAsync(CreateReleaseViewModel createRelease)
+        public async Task<Either<ActionResult, ReleaseViewModel>> CreateReleaseAsync(ReleaseCreateViewModel releaseCreate)
         {
             return await _persistenceHelper
-                .CheckEntityExists<Publication>(createRelease.PublicationId)
+                .CheckEntityExists<Publication>(releaseCreate.PublicationId)
                 .OnSuccess(_userService.CheckCanCreateReleaseForPublication)
-                .OnSuccess(async _ => await ValidateReleaseSlugUniqueToPublication(createRelease.Slug, createRelease.PublicationId))
+                .OnSuccess(async _ => await ValidateReleaseSlugUniqueToPublication(releaseCreate.Slug, releaseCreate.PublicationId))
                 .OnSuccess(async () =>
                 {
-                    var release = _mapper.Map<Release>(createRelease);
+                    var release = _mapper.Map<Release>(releaseCreate);
 
                     release.Id = _guidGenerator.NewGuid();
 
-                    if (createRelease.TemplateReleaseId.HasValue)
+                    if (releaseCreate.TemplateReleaseId.HasValue)
                     {
-                        CreateGenericContentFromTemplate(createRelease.TemplateReleaseId.Value, release);
+                        CreateGenericContentFromTemplate(releaseCreate.TemplateReleaseId.Value, release);
                     }
                     else
                     {
@@ -256,7 +255,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Services
         }
 
         public async Task<Either<ActionResult, ReleaseViewModel>> UpdateRelease(
-            Guid releaseId, UpdateReleaseViewModel request)
+            Guid releaseId, ReleaseUpdateViewModel request)
         {
             return await _persistenceHelper
                 .CheckEntityExists<Release>(releaseId, ReleaseChecklistService.HydrateReleaseForChecklist)

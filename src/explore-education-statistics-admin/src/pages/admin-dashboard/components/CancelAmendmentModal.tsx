@@ -13,7 +13,7 @@ const CancelAmendmentModal = ({ onConfirm, onCancel }: Props) => {
       onConfirm={onConfirm}
       onExit={onCancel}
       onCancel={onCancel}
-      mounted
+      open
     >
       <p>
         By cancelling the amendments you will lose any changes made, and the

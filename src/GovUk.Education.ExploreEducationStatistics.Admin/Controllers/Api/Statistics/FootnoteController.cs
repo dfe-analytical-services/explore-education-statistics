@@ -2,8 +2,8 @@
 using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
-using GovUk.Education.ExploreEducationStatistics.Admin.Models.Api.Statistics;
 using GovUk.Education.ExploreEducationStatistics.Admin.Services.Interfaces;
+using GovUk.Education.ExploreEducationStatistics.Admin.ViewModels.Statistics;
 using GovUk.Education.ExploreEducationStatistics.Common.Extensions;
 using GovUk.Education.ExploreEducationStatistics.Common.Model;
 using GovUk.Education.ExploreEducationStatistics.Data.Model;
@@ -39,7 +39,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Controllers.Api.Stati
         }
 
         [HttpPost("releases/{releaseId}/footnotes")]
-        public async Task<ActionResult<FootnoteViewModel>> CreateFootnote(Guid releaseId, CreateFootnoteViewModel footnote)
+        public async Task<ActionResult<FootnoteViewModel>> CreateFootnote(Guid releaseId, FootnoteCreateViewModel footnote)
         {
             return await _footnoteService
                 .CreateFootnote(
@@ -82,7 +82,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Controllers.Api.Stati
         }
 
         [HttpPut("releases/{releaseId}/footnotes/{id}")]
-        public async Task<ActionResult<FootnoteViewModel>> UpdateFootnote(Guid releaseId, Guid id, UpdateFootnoteViewModel footnote)
+        public async Task<ActionResult<FootnoteViewModel>> UpdateFootnote(Guid releaseId, Guid id, FootnoteUpdateViewModel footnote)
         {
             return await _footnoteService
                 .UpdateFootnote(
@@ -102,7 +102,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Controllers.Api.Stati
         [HttpGet("releases/{releaseId}/footnotes-meta")]
         public async Task<ActionResult<FootnotesMetaViewModel>> GetFootnotesMeta(Guid releaseId)
         {
-            return await _releaseMetaService.GetSubjects(releaseId)
+            return await _releaseMetaService.GetSubjectsMeta(releaseId)
                 .OnSuccess(model =>
                 {
                     return new FootnotesMetaViewModel

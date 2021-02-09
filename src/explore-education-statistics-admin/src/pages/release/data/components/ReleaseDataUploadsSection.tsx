@@ -312,7 +312,7 @@ const ReleaseDataUploadsSection = ({
       </LoadingSpinner>
       {deleteDataFile && (
         <ModalConfirm
-          mounted
+          open
           title="Confirm deletion of selected data files"
           onExit={() => setDeleteDataFile(undefined)}
           onCancel={() => setDeleteDataFile(undefined)}
@@ -381,7 +381,7 @@ const ReleaseDataUploadsSection = ({
 
       {cancelDataFile && (
         <ModalConfirm
-          mounted
+          open
           title="Confirm cancellation of selected data file"
           onExit={() => setCancelDataFile(undefined)}
           onCancel={() => setCancelDataFile(undefined)}

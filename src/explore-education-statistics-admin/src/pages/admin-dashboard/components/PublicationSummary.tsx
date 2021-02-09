@@ -226,7 +226,7 @@ const PublicationSummary = ({ publication, onChangePublication }: Props) => {
           }}
           onExit={() => setAmendReleaseId(undefined)}
           onCancel={() => setAmendReleaseId(undefined)}
-          mounted
+          open
         >
           <p>
             Please note, any changes made to this live release must be approved

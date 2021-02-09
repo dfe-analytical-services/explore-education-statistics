@@ -8,6 +8,7 @@ using GovUk.Education.ExploreEducationStatistics.Common.Tests.Utils;
 using GovUk.Education.ExploreEducationStatistics.Common.Utils;
 using GovUk.Education.ExploreEducationStatistics.Content.Model;
 using GovUk.Education.ExploreEducationStatistics.Content.Model.Database;
+using Microsoft.AspNetCore.Mvc;
 using Moq;
 using Xunit;
 using static GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services.DbUtils;
@@ -19,6 +20,81 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
 {
     public class PublicationServiceTests
     {
+        [Fact]
+        public async void GetPublication()
+        {
+            var publication = new Publication
+            {
+                Title = "Test publication",
+                Slug = "test-publication",
+                Topic = new Topic
+                {
+                    Title = "Test topic",
+                    Theme = new Theme
+                    {
+                        Title = "Test theme"
+                    }
+                },
+                Methodology = new Methodology
+                {
+                    Title = "Test methodology",
+                    Status = MethodologyStatus.Approved,
+                },
+                Contact = new Contact
+                {
+                    ContactName = "Test contact",
+                    ContactTelNo = "0123456789",
+                    TeamName = "Test team",
+                    TeamEmail = "team@test.com",
+                }
+            };
+
+            var contextId = Guid.NewGuid().ToString();
+
+            await using (var context = InMemoryApplicationDbContext(contextId))
+            {
+                await context.AddAsync(publication);
+                await context.SaveChangesAsync();
+            }
+
+            await using (var context = InMemoryApplicationDbContext(contextId))
+            {
+                var publicationService = BuildPublicationService(context, Mocks());
+
+                var result = await publicationService.GetPublication(publication.Id);
+
+                Assert.True(result.IsRight);
+
+                Assert.Equal(publication.Id, result.Right.Id);
+                Assert.Equal(publication.Title, result.Right.Title);
+                Assert.Equal(publication.Slug, result.Right.Slug);
+
+                Assert.Equal(publication.Topic.Id, result.Right.TopicId);
+                Assert.Equal(publication.Topic.ThemeId, result.Right.ThemeId);
+
+                Assert.Equal(publication.Methodology.Id, result.Right.Methodology.Id);
+                Assert.Equal(publication.Methodology.Title, result.Right.Methodology.Title);
+
+                Assert.Equal(publication.Contact.Id, result.Right.Contact.Id);
+                Assert.Equal(publication.Contact.ContactName, result.Right.Contact.ContactName);
+                Assert.Equal(publication.Contact.ContactTelNo, result.Right.Contact.ContactTelNo);
+                Assert.Equal(publication.Contact.TeamEmail, result.Right.Contact.TeamEmail);
+                Assert.Equal(publication.Contact.TeamName, result.Right.Contact.TeamName);
+            }
+        }
+
+        [Fact]
+        public async void GetPublication_NotFound()
+        {
+            await using var context = InMemoryApplicationDbContext();
+            var publicationService = BuildPublicationService(context, Mocks());
+
+            var result = await publicationService.GetPublication(Guid.NewGuid());
+
+            Assert.True(result.IsLeft);
+            Assert.IsType<NotFoundResult>(result.Left);
+        }
+
         [Fact]
         public async void CreatePublication()
         {
@@ -47,10 +123,10 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
 
                 // Service method under test
                 var result = await publicationService.CreatePublication(
-                    new SavePublicationViewModel
+                    new PublicationSaveViewModel
                     {
                         Title = "Test publication",
-                        Contact = new SaveContactViewModel
+                        Contact = new ContactSaveViewModel
                         {
                             ContactName = "John Smith",
                             ContactTelNo = "0123456789",
@@ -104,7 +180,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
 
             // Service method under test
             var result = await publicationService.CreatePublication(
-                new SavePublicationViewModel
+                new PublicationSaveViewModel
                 {
                     Title = "Test publication",
                     TopicId = Guid.NewGuid()
@@ -136,7 +212,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
 
                 // Service method under test
                 var result = await publicationService.CreatePublication(
-                    new SavePublicationViewModel()
+                    new PublicationSaveViewModel()
                     {
                         Title = "Test title",
                         TopicId = topic.Id,
@@ -177,7 +253,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
 
                 // Service method under test
                 var result = await publicationService.CreatePublication(
-                    new SavePublicationViewModel()
+                    new PublicationSaveViewModel()
                     {
                         Title = "Test title",
                         TopicId = topic.Id,
@@ -224,7 +300,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
 
                 // Service method under test
                 var result = await publicationService.CreatePublication(
-                    new SavePublicationViewModel()
+                    new PublicationSaveViewModel()
                     {
                         Title = "Test title",
                         TopicId = topic.Id,
@@ -268,7 +344,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
 
                 // Service method under test
                 var result = await publicationService.CreatePublication(
-                    new SavePublicationViewModel()
+                    new PublicationSaveViewModel()
                     {
                         Title = "Test publication",
                         TopicId = topic.Id
@@ -330,10 +406,10 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
                 // Service method under test
                 var result = await publicationService.UpdatePublication(
                     publication.Id,
-                    new SavePublicationViewModel()
+                    new PublicationSaveViewModel()
                     {
                         Title = "New title",
-                        Contact = new SaveContactViewModel
+                        Contact = new ContactSaveViewModel
                         {
                             ContactName = "John Smith",
                             ContactTelNo = "0123456789",
@@ -430,10 +506,10 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
                 // Service method under test
                 var result = await publicationService.UpdatePublication(
                     publication.Id,
-                    new SavePublicationViewModel()
+                    new PublicationSaveViewModel()
                     {
                         Title = "New title",
-                        Contact = new SaveContactViewModel
+                        Contact = new ContactSaveViewModel
                         {
                             ContactName = "John Smith",
                             ContactTelNo = "0123456789",
@@ -511,10 +587,10 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
                 // Service method under test
                 var result = await publicationService.UpdatePublication(
                     publication.Id,
-                    new SavePublicationViewModel()
+                    new PublicationSaveViewModel()
                     {
                         Title = "New title",
-                        Contact = new SaveContactViewModel
+                        Contact = new ContactSaveViewModel
                         {
                             ContactName = "John Smith",
                             ContactTelNo = "0123456789",
@@ -581,10 +657,10 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
                 // Service method under test
                 var result = await publicationService.UpdatePublication(
                     publication.Id,
-                    new SavePublicationViewModel()
+                    new PublicationSaveViewModel()
                     {
                         Title = "New title",
-                        Contact = new SaveContactViewModel
+                        Contact = new ContactSaveViewModel
                         {
                             ContactName = "John Smith",
                             ContactTelNo = "0123456789",
@@ -637,7 +713,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
                 // Service method under test
                 var result = await publicationService.UpdatePublication(
                     publication.Id,
-                    new SavePublicationViewModel()
+                    new PublicationSaveViewModel()
                     {
                         Title = "Test publication",
                         TopicId = Guid.NewGuid(),
@@ -675,7 +751,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
                 // Service method under test
                 var result = await publicationService.UpdatePublication(
                     publication.Id,
-                    new SavePublicationViewModel()
+                    new PublicationSaveViewModel()
                     {
                         Title = "Test publication",
                         TopicId = publication.TopicId,
@@ -714,7 +790,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
                 // Service method under test
                 var result = await publicationService.UpdatePublication(
                     publication.Id,
-                    new SavePublicationViewModel()
+                    new PublicationSaveViewModel()
                     {
                         Title = "Test publication",
                         TopicId = publication.TopicId,
@@ -765,7 +841,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
                 // Service method under test
                 var result = await publicationService.UpdatePublication(
                     publication.Id,
-                    new SavePublicationViewModel()
+                    new PublicationSaveViewModel()
                     {
                         Title = "Test publication",
                         TopicId = publication.TopicId,
@@ -814,7 +890,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
                 // Service method under test
                 var result = await publicationService.UpdatePublication(
                     publication.Id,
-                    new SavePublicationViewModel()
+                    new PublicationSaveViewModel()
                     {
                         Title = "Duplicated title",
                         TopicId = topic.Id,
@@ -862,9 +938,9 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
 
                 var result = await publicationService.PartialUpdateLegacyReleases(
                     publication.Id,
-                    new List<PartialUpdateLegacyReleaseViewModel>
+                    new List<LegacyReleasePartialUpdateViewModel>
                     {
-                        new PartialUpdateLegacyReleaseViewModel
+                        new LegacyReleasePartialUpdateViewModel
                         {
                             Id = publication.LegacyReleases[0].Id,
                             Description = "Updated description 1",
@@ -920,9 +996,9 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
 
                 var result = await publicationService.PartialUpdateLegacyReleases(
                     publication.Id,
-                    new List<PartialUpdateLegacyReleaseViewModel>
+                    new List<LegacyReleasePartialUpdateViewModel>
                     {
-                        new PartialUpdateLegacyReleaseViewModel
+                        new LegacyReleasePartialUpdateViewModel
                         {
                             Id = publication.LegacyReleases[0].Id,
                             Description = "Updated description 1",

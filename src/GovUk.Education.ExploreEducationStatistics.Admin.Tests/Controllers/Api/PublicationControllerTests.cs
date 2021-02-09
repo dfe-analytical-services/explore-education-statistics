@@ -20,8 +20,8 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Controllers.Api
             var publicationService = new Mock<IPublicationService>();
 
             publicationService
-                .Setup(s => s.CreatePublication(It.IsAny<SavePublicationViewModel>()))
-                .Returns<SavePublicationViewModel>(p => 
+                .Setup(s => s.CreatePublication(It.IsAny<PublicationSaveViewModel>()))
+                .Returns<PublicationSaveViewModel>(p => 
                     Task.FromResult(new Either<ActionResult, PublicationViewModel>(
                         new PublicationViewModel 
                         {
@@ -35,7 +35,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Controllers.Api
             var topicId = Guid.NewGuid();
 
             // Method under test
-            var result = await controller.CreatePublication(new SavePublicationViewModel() 
+            var result = await controller.CreatePublication(new PublicationSaveViewModel() 
             {
                 TopicId = topicId
             });
@@ -54,15 +54,15 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Controllers.Api
                     ValidationUtils.ValidationActionResult(ValidationErrorMessages.SlugNotUnique));
             
             publicationService
-                .Setup(s => s.CreatePublication(It.IsAny<SavePublicationViewModel>()))
-                .Returns<SavePublicationViewModel>(p => Task.FromResult(validationResponse));
+                .Setup(s => s.CreatePublication(It.IsAny<PublicationSaveViewModel>()))
+                .Returns<PublicationSaveViewModel>(p => Task.FromResult(validationResponse));
             
             var controller = new PublicationController(publicationService.Object);
 
             var topicId = Guid.NewGuid();
 
             // Method under test
-            var result = await controller.CreatePublication(new SavePublicationViewModel()
+            var result = await controller.CreatePublication(new PublicationSaveViewModel()
             {
                 TopicId = topicId
             });

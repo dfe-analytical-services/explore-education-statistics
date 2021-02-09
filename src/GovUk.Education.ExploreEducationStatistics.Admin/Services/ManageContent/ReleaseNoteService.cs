@@ -38,7 +38,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Services.ManageConten
         }
 
         public Task<Either<ActionResult, List<ReleaseNoteViewModel>>> AddReleaseNoteAsync(Guid releaseId,
-            CreateOrUpdateReleaseNoteRequest request)
+            ReleaseNoteSaveRequest saveRequest)
         {
             return _persistenceHelper
                 .CheckEntityExists<Release>(releaseId, HydrateReleaseForUpdates)
@@ -47,8 +47,8 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Services.ManageConten
                 {
                     _context.Update.Add(new Update
                     {
-                        On = request.On ?? DateTime.Now,
-                        Reason = request.Reason,
+                        On = saveRequest.On ?? DateTime.Now,
+                        Reason = saveRequest.Reason,
                         ReleaseId = release.Id
                     });
 
@@ -58,7 +58,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Services.ManageConten
         }
 
         public Task<Either<ActionResult, List<ReleaseNoteViewModel>>> UpdateReleaseNoteAsync(Guid releaseId,
-            Guid releaseNoteId, CreateOrUpdateReleaseNoteRequest request)
+            Guid releaseNoteId, ReleaseNoteSaveRequest saveRequest)
         {
             return _persistenceHelper
                 .CheckEntityExists<Release>(releaseId, HydrateReleaseForUpdates)
@@ -74,8 +74,8 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Services.ManageConten
                         return NotFound<List<ReleaseNoteViewModel>>();
                     }
 
-                    releaseNote.On = request.On ?? DateTime.Now;
-                    releaseNote.Reason = request.Reason;
+                    releaseNote.On = saveRequest.On ?? DateTime.Now;
+                    releaseNote.Reason = saveRequest.Reason;
 
                     _context.Update.Update(releaseNote);
                     await _context.SaveChangesAsync();

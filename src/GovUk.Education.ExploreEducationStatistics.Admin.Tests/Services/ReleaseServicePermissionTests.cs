@@ -1,7 +1,6 @@
 using System;
 using System.Collections.Generic;
 using AutoMapper;
-using GovUk.Education.ExploreEducationStatistics.Admin.Models.Api;
 using GovUk.Education.ExploreEducationStatistics.Admin.Security;
 using GovUk.Education.ExploreEducationStatistics.Admin.Services;
 using GovUk.Education.ExploreEducationStatistics.Admin.Services.Interfaces;
@@ -67,7 +66,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
                     {
                         var service = BuildReleaseService(userService: userService.Object);
                         return service.CreateReleaseAsync(
-                            new CreateReleaseViewModel
+                            new ReleaseCreateViewModel
                             {
                                 PublicationId = Publication.Id,
                             }
@@ -87,7 +86,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
                         var service = BuildReleaseService(userService: userService.Object);
                         return service.UpdateRelease(
                             _release.Id,
-                            new UpdateReleaseViewModel()
+                            new ReleaseUpdateViewModel()
                         );
                     }
                 );
@@ -105,7 +104,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
                         var service = BuildReleaseService(userService: userService.Object);
                         return service.UpdateRelease(
                             _release.Id,
-                            new UpdateReleaseViewModel
+                            new ReleaseUpdateViewModel
                             {
                                 Status = ReleaseStatus.Draft
                             }
@@ -126,7 +125,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
                         var service = BuildReleaseService(userService: userService.Object);
                         return service.UpdateRelease(
                             _release.Id,
-                            new UpdateReleaseViewModel
+                            new ReleaseUpdateViewModel
                             {
                                 Status = ReleaseStatus.HigherLevelReview
                             }
@@ -147,7 +146,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
                         var service = BuildReleaseService(userService: userService.Object);
                         return service.UpdateRelease(
                             _release.Id,
-                            new UpdateReleaseViewModel
+                            new ReleaseUpdateViewModel
                             {
                                 Status = ReleaseStatus.Approved
                             }

@@ -7,9 +7,10 @@ import Modal from './Modal';
 
 interface Props {
   children?: ReactNode;
+  className?: string;
   cancelText?: string;
   confirmText?: string;
-  mounted?: boolean;
+  open?: boolean;
   onConfirm(): void;
   onCancel?(): void;
   onExit(): void;
@@ -19,9 +20,10 @@ interface Props {
 
 const ModalConfirm = ({
   children,
+  className,
   confirmText = 'Confirm',
   cancelText = 'Cancel',
-  mounted,
+  open,
   onConfirm,
   onExit,
   onCancel = onExit,
@@ -49,13 +51,13 @@ const ModalConfirm = ({
 
   return (
     <Modal
-      focusDialog
+      className={className}
+      closeOnOutsideClick={!isDisabled}
+      closeOnEsc={!isDisabled}
       title={title}
-      mounted={mounted}
-      underlayClass={underlayClass}
-      underlayClickExits={!isDisabled}
-      escapeExits={!isDisabled}
+      open={open}
       onExit={onExit}
+      underlayClass={underlayClass}
     >
       {children}
 

@@ -11,7 +11,7 @@ const PreviousStepModalConfirm = () => {
       onExit={cancel}
       onConfirm={confirm}
       onCancel={cancel}
-      mounted={isConfirming}
+      open={isConfirming}
     >
       <p>You'll need to reselect some of the options you've already chosen.</p>
     </ModalConfirm>

@@ -31,6 +31,7 @@ describe('Comments', () => {
       themeId: 'theme-1',
       topicId: 'topic-1',
       title: 'Test publication',
+      slug: 'test-publication',
       legacyReleases: [],
     },
   };
