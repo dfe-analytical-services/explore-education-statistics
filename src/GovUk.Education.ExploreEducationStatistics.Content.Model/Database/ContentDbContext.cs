@@ -1048,49 +1048,49 @@ namespace GovUk.Education.ExploreEducationStatistics.Content.Model.Database
                         Id = analystMvcUser1Id,
                         FirstName = "Analyst1",
                         LastName = "User1",
-                        Email = "analyst1@example.com"
+                        Email = "ees-analyst1@education.gov.uk"
                     },
                     new User
                     {
                         Id = analystMvcUser2Id,
                         FirstName = "Analyst2",
                         LastName = "User2",
-                        Email = "analyst2@example.com"
+                        Email = "ees-analyst2@education.gov.uk"
                     },
                     new User
                     {
                         Id = analystMvcUser3Id,
                         FirstName = "Analyst3",
                         LastName = "User3",
-                        Email = "analyst3@example.com"
+                        Email = "ees-analyst3@education.gov.uk"
                     },
                     new User
                     {
                         Id = bauMvcUser1Id,
                         FirstName = "Bau1",
                         LastName = "User1",
-                        Email = "bau1@example.com"
+                        Email = "ees-bau1@education.gov.uk"
                     },
                     new User
                     {
                         Id = bauMvcUser2Id,
                         FirstName = "Bau2",
                         LastName = "User2",
-                        Email = "bau2@example.com"
+                        Email = "ees-bau2@education.gov.uk"
                     },
                     new User
                     {
                         Id = prereleaseMvcUser1Id,
                         FirstName = "Prerelease1",
                         LastName = "User1",
-                        Email = "prerelease1@example.com"
+                        Email = "ees-prerelease1@education.gov.uk"
                     },
                     new User
                     {
                         Id = prereleaseMvcUser2Id,
                         FirstName = "Prerelease2",
                         LastName = "User2",
-                        Email = "prerelease2@example.com"
+                        Email = "ees-prerelease2@education.gov.uk"
                     }
                 );
 

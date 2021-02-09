@@ -704,49 +704,49 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Migrations.ContentMig
                         new
                         {
                             Id = new Guid("e7f7c82e-aaf3-43db-a5ab-755678f67d04"),
-                            Email = "analyst1@example.com",
+                            Email = "ees-analyst1@education.gov.uk",
                             FirstName = "Analyst1",
                             LastName = "User1"
                         },
                         new
                         {
                             Id = new Guid("6620bccf-2433-495e-995d-fc76c59d9c62"),
-                            Email = "analyst2@example.com",
+                            Email = "ees-analyst2@education.gov.uk",
                             FirstName = "Analyst2",
                             LastName = "User2"
                         },
                         new
                         {
                             Id = new Guid("b390b405-ef90-4b9d-8770-22948e53189a"),
-                            Email = "analyst3@example.com",
+                            Email = "ees-analyst3@education.gov.uk",
                             FirstName = "Analyst3",
                             LastName = "User3"
                         },
                         new
                         {
                             Id = new Guid("b99e8358-9a5e-4a3a-9288-6f94c7e1e3dd"),
-                            Email = "bau1@example.com",
+                            Email = "ees-bau1@education.gov.uk",
                             FirstName = "Bau1",
                             LastName = "User1"
                         },
                         new
                         {
                             Id = new Guid("b6f0dfa5-0102-4b91-9aa8-f23b7d8aca63"),
-                            Email = "bau2@example.com",
+                            Email = "ees-bau2@education.gov.uk",
                             FirstName = "Bau2",
                             LastName = "User2"
                         },
                         new
                         {
                             Id = new Guid("d5c85378-df85-482c-a1ce-09654dae567d"),
-                            Email = "prerelease1@example.com",
+                            Email = "ees-prerelease1@education.gov.uk",
                             FirstName = "Prerelease1",
                             LastName = "User1"
                         },
                         new
                         {
                             Id = new Guid("ee9a02c1-b3f9-402c-9e9b-4fb78d737050"),
-                            Email = "prerelease2@example.com",
+                            Email = "ees-prerelease2@education.gov.uk",
                             FirstName = "Prerelease2",
                             LastName = "User2"
                         });

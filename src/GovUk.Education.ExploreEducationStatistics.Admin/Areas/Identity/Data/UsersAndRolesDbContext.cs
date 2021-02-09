@@ -272,20 +272,6 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Areas.Identity.Data
                     },
                     new IdentityRoleClaim<string>
                     {
-                        Id = -26,
-                        RoleId = analystRoleId,
-                        ClaimType = SecurityClaimTypes.UpdateAllMethodologies.ToString(),
-                        ClaimValue = "",
-                    },
-                    new IdentityRoleClaim<string>
-                    {
-                        Id = -27,
-                        RoleId = analystRoleId,
-                        ClaimType = SecurityClaimTypes.AccessAllMethodologies.ToString(),
-                        ClaimValue = "",
-                    },
-                    new IdentityRoleClaim<string>
-                    {
                         Id = -28,
                         RoleId = analystRoleId,
                         ClaimType = SecurityClaimTypes.ApproveAllMethodologies.ToString(),
@@ -370,43 +356,43 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Areas.Identity.Data
                 .HasData(
                     CreateApplicationUser(
                         analystUser1Id,
-                        "analyst1@example.com",
+                        "ees-analyst1@education.gov.uk",
                         "Analyst1",
                         "User1"
                     ),
                     CreateApplicationUser(
                         analystUser2Id,
-                        "analyst2@example.com",
+                        "ees-analyst2@education.gov.uk",
                         "Analyst2",
                         "User2"
                     ),
                     CreateApplicationUser(
                         analystUser3Id,
-                        "analyst3@example.com",
+                        "ees-analyst3@education.gov.uk",
                         "Analyst3",
                         "User3"
                     ),
                     CreateApplicationUser(
                         bauUser1Id,
-                        "bau1@example.com",
+                        "ees-bau1@education.gov.uk",
                         "Bau1",
                         "User1"
                     ),
                     CreateApplicationUser(
                         bauUser2Id,
-                        "bau2@example.com",
+                        "ees-bau2@education.gov.uk",
                         "Bau2",
                         "User2"
                     ),
                     CreateApplicationUser(
                         prereleaseUser1Id,
-                        "prerelease1@example.com",
+                        "ees-prerelease1@education.gov.uk",
                         "Prerelease1",
                         "User1"
                     ),
                     CreateApplicationUser(
                         prereleaseUser2Id,
-                        "prerelease2@example.com",
+                        "ees-prerelease2@education.gov.uk",
                         "Prerelease2",
                         "User2"
                     )

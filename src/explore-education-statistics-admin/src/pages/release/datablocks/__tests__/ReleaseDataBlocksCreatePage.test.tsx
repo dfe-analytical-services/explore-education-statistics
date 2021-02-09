@@ -1,10 +1,5 @@
 import { TestConfigContextProvider } from '@admin/contexts/ConfigContext';
 import {
-  testSubjectMeta,
-  testTableData,
-} from '@admin/pages/release/datablocks/__data__/tableToolServiceData';
-import ReleaseDataBlockEditPage from '@admin/pages/release/datablocks/ReleaseDataBlockEditPage';
-import {
   releaseDataBlockEditRoute,
   ReleaseDataBlockRouteParams,
 } from '@admin/routes/releaseRoutes';

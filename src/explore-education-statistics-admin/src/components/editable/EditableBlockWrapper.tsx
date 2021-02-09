@@ -36,7 +36,7 @@ const EditableBlockWrapper = ({
 
             <ModalConfirm
               title="Remove block"
-              mounted={showConfirmDelete}
+              open={showConfirmDelete}
               onConfirm={async () => {
                 await onDelete();
                 toggleConfirmDelete.off();

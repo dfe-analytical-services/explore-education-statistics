@@ -102,7 +102,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Controllers.Api.Stati
         [HttpGet("releases/{releaseId}/footnotes-meta")]
         public async Task<ActionResult<FootnotesMetaViewModel>> GetFootnotesMeta(Guid releaseId)
         {
-            return await _releaseMetaService.GetSubjects(releaseId)
+            return await _releaseMetaService.GetSubjectsMeta(releaseId)
                 .OnSuccess(model =>
                 {
                     return new FootnotesMetaViewModel

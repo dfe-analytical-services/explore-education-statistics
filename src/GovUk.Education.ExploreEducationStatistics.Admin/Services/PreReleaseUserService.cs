@@ -252,7 +252,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Services
             var host = _httpContextAccessor.HttpContext.Request.Host;
 
             var prereleaseUrl =
-                $"{scheme}://{host}/publication/{release.PublicationId}/release/{release.Id}/prerelease";
+                $"{scheme}://{host}/publication/{release.PublicationId}/release/{release.Id}/prerelease/content";
 
             var preReleaseWindow = _preReleaseService.GetPreReleaseWindow(release);
             var preReleaseWindowStart = preReleaseWindow.Start.ConvertUtcToUkTimeZone();

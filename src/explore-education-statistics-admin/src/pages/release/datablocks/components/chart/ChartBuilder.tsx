@@ -400,7 +400,7 @@ const ChartBuilder = ({
 
       <ModalConfirm
         title="Delete chart"
-        mounted={showDeleteModal}
+        open={showDeleteModal}
         onConfirm={handleChartDelete}
         onExit={toggleDeleteModal.off}
       >

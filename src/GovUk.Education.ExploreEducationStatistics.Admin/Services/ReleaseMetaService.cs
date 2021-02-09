@@ -9,6 +9,7 @@ using GovUk.Education.ExploreEducationStatistics.Common.Services;
 using GovUk.Education.ExploreEducationStatistics.Common.Services.Interfaces;
 using GovUk.Education.ExploreEducationStatistics.Common.Services.Interfaces.Security;
 using GovUk.Education.ExploreEducationStatistics.Common.Utils;
+using GovUk.Education.ExploreEducationStatistics.Content.Model;
 using GovUk.Education.ExploreEducationStatistics.Content.Model.Database;
 using GovUk.Education.ExploreEducationStatistics.Data.Model;
 using GovUk.Education.ExploreEducationStatistics.Data.Model.Database;
@@ -41,7 +42,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Services
             _importStatusService = importStatusService;
         }
 
-        public async Task<Either<ActionResult, SubjectsMetaViewModel>> GetSubjects(Guid releaseId)
+        public async Task<Either<ActionResult, ReleaseSubjectsMetaViewModel>> GetSubjectsMeta(Guid releaseId)
         {
             return await _contentPersistenceHelper
                 .CheckEntityExists<Release>(releaseId)
@@ -85,10 +86,23 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Services
                                 subject.Subject.Name))
                         .ToList();
 
-                    return new SubjectsMetaViewModel
+                    var highlights = _contentDbContext.ReleaseContentBlocks
+                        .Include(rcb => rcb.ContentBlock)
+                        .Where(rcb => rcb.ReleaseId == release.Id)
+                        .Select(rcb => rcb.ContentBlock)
+                        .OfType<DataBlock>()
+                        .Where(dataBlock => !string.IsNullOrEmpty(dataBlock.HighlightName))
+                        .ToList()
+                        // Need to query on materialized list due to JSON serialized query
+                        .Where(dataBlock => subjectIds.Contains(dataBlock.Query.SubjectId))
+                        .Select(dataBlock => new IdLabel(dataBlock.Id, dataBlock.HighlightName))
+                        .ToList();
+
+                    return new ReleaseSubjectsMetaViewModel
                     {
                         ReleaseId = releaseId,
-                        Subjects = subjects
+                        Highlights = highlights,
+                        Subjects = subjects,
                     };
                 });
         }

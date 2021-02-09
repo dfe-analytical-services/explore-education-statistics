@@ -55,7 +55,6 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Controllers.Api.Secur
                 CanAccessAllImports = _userService.CheckCanViewAllImports().Result.IsRight,
                 CanAccessPrereleasePages = _userService.CheckCanAccessPrereleasePages().Result.IsRight,
                 CanAccessUserAdministrationPages = _userService.CheckCanManageAllUsers().Result.IsRight,
-                CanAccessMethodologyAdministrationPages = _userService.CheckCanManageAllMethodologies().Result.IsRight,
                 CanManageAllTaxonomy = _userService.CheckCanManageAllTaxonomy().Result.IsRight
             };
         }

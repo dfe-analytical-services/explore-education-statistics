@@ -223,9 +223,9 @@ Invite users to prerelease for scheduled release
 
     user checks results table cell contains  1  1  simulate-delivered@notifications.service.gov.uk
 
-    user enters text into element  css:input[name="email"]  analyst1@example.com
+    user enters text into element  css:input[name="email"]  ees-analyst1@education.gov.uk
     user clicks button  Invite new user
-    user checks results table cell contains  2  1  analyst1@example.com
+    user checks results table cell contains  2  1  ees-analyst1@education.gov.uk
 
 Validate prerelease has not started for Analyst user
     [Tags]  HappyPath

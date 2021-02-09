@@ -228,7 +228,7 @@ const ReleaseDataFilePage = ({
       </LoadingSpinner>
       <ModalConfirm
         title="Cancel data replacement"
-        mounted={isCancelling}
+        open={isCancelling}
         onExit={toggleCancelling.off}
         onConfirm={async () => {
           toggleCancelling.off();

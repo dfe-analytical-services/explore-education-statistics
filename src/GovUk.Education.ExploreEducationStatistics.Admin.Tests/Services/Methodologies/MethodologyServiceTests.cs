@@ -310,6 +310,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services.Method
                 AdminMapper(),
                 publishingService.Object,
                 userService.Object,
+                new MethodologyRepository(context),
                 new PersistenceHelper<ContentDbContext>(context));
         }
 

@@ -30,7 +30,7 @@ const DataBlockDeletePlanModal = ({
   return (
     <ModalConfirm
       title="Delete data block"
-      mounted
+      open
       onConfirm={async () => {
         await dataBlocksService.deleteDataBlock(releaseId, dataBlockId);
         onConfirm();

@@ -363,7 +363,7 @@
             "typeProperties": {
               "storedProcedureName": "[[dbo].[MigrateObservationsAndObservationFilterItems]",
               "storedProcedureParameters": {
-                "TotalObservationLimit": {
+                "SubjectsBatchSize": {
                   "value": {
                     "value": "@pipeline().parameters.SubjectsBatchSize",
                     "type": "Expression"
@@ -412,7 +412,7 @@
             "typeProperties": {
               "storedProcedureName": "[[dbo].[MigrateObservationsAndObservationFilterItems]",
               "storedProcedureParameters": {
-                "TotalObservationLimit": {
+                "SubjectsBatchSize": {
                   "value": {
                     "value": "@pipeline().parameters.SubjectsBatchSize",
                     "type": "Expression"

@@ -37,8 +37,8 @@ const methodologyService = {
     return client.get<BasicMethodology[]>('/methodologies');
   },
 
-  getBauMethodologies(): Promise<MethodologyStatusListItem[]> {
-    return client.get<MethodologyStatusListItem[]>('/bau/methodology');
+  getMyMethodologies(): Promise<MethodologyStatusListItem[]> {
+    return client.get<MethodologyStatusListItem[]>('/me/methodologies');
   },
 
   createMethodology(data: CreateMethodology): Promise<IdTitlePair> {

@@ -10,8 +10,12 @@ import {
 } from '@admin/routes/releaseRoutes';
 import _dataBlockService, {
   ReleaseDataBlock,
+  ReleaseDataBlockSummary,
 } from '@admin/services/dataBlockService';
-import _tableBuilderService from '@common/services/tableBuilderService';
+import _permissionService from '@admin/services/permissionService';
+import _tableBuilderService, {
+  ReleaseMeta,
+} from '@common/services/tableBuilderService';
 import { waitFor } from '@testing-library/dom';
 import { render, screen, within } from '@testing-library/react';
 import userEvent from '@testing-library/user-event';
@@ -26,6 +30,9 @@ jest.mock('@common/services/tableBuilderService');
 const dataBlockService = _dataBlockService as jest.Mocked<
   typeof _dataBlockService
 >;
+const permissionService = _permissionService as jest.Mocked<
+  typeof _permissionService
+>;
 const tableBuilderService = _tableBuilderService as jest.Mocked<
   typeof _tableBuilderService
 >;
@@ -38,65 +45,146 @@ describe('ReleaseDataBlockEditPage', () => {
     highlightName: 'Test highlight name 1',
     source: 'Test source 1',
     query: {
+      includeGeoJson: false,
       subjectId: 'subject-1',
-      locations: {},
-      filters: [],
-      indicators: [],
+      locations: {
+        localAuthority: ['barnet'],
+      },
+      timePeriod: {
+        startYear: 2020,
+        startCode: 'AY',
+        endYear: 2020,
+        endCode: 'AY',
+      },
+      filters: ['gender-female'],
+      indicators: ['authorised-absence-sessions'],
     },
     table: {
       indicators: [],
       tableHeaders: {
-        columnGroups: [],
-        columns: [],
-        rowGroups: [],
-        rows: [],
+        columnGroups: [[{ type: 'TimePeriod', value: '2020_AY' }]],
+        columns: [{ type: 'Filter', value: 'gender-female' }],
+        rowGroups: [
+          [{ type: 'Location', value: 'barnet', level: 'localAuthority' }],
+        ],
+        rows: [{ type: 'Indicator', value: 'authorised-absence-sessions' }],
       },
     },
-    charts: [],
+    charts: [
+      {
+        title: 'Test chart title',
+        alt: 'Test chart alt',
+        type: 'verticalbar',
+        height: 300,
+        width: 600,
+        axes: {
+          major: {
+            type: 'major',
+            visible: true,
+            groupBy: 'timePeriod',
+            min: 0,
+            sortAsc: true,
+            size: 50,
+            showGrid: true,
+            tickConfig: 'default',
+            referenceLines: [],
+            dataSets: [
+              {
+                filters: ['gender-female'],
+                indicator: 'authorised-absence-sessions',
+              },
+            ],
+          },
+          minor: {
+            type: 'minor',
+            visible: true,
+            min: 0,
+            sortAsc: true,
+            size: 50,
+            showGrid: true,
+            tickConfig: 'default',
+            referenceLines: [],
+            dataSets: [],
+          },
+        },
+        legend: {
+          position: 'top',
+          items: [],
+        },
+      },
+    ],
+  };
+
+  const testDataBlockSummaries: ReleaseDataBlockSummary[] = [
+    {
+      id: 'block-2',
+      name: 'Test name 2',
+      heading: 'Test title 2',
+      highlightName: 'Test highlight name 2',
+      source: 'Test source 2',
+      chartsCount: 0,
+    },
+    {
+      id: testDataBlock.id,
+      name: testDataBlock.name,
+      heading: testDataBlock.heading,
+      highlightName: testDataBlock.highlightName,
+      source: testDataBlock.source,
+      chartsCount: 0,
+    },
+  ];
+
+  const testReleaseMeta: ReleaseMeta = {
+    releaseId: 'release-1',
+    subjects: [{ id: 'subject-1', label: 'Subject 1' }],
+    highlights: [],
   };
 
   beforeEach(() => {
     tableBuilderService.getSubjectMeta.mockResolvedValue(testSubjectMeta);
     tableBuilderService.getTableData.mockResolvedValue(testTableData);
+
+    dataBlockService.getDataBlock.mockResolvedValue(testDataBlock);
+    dataBlockService.listDataBlocks.mockResolvedValue(testDataBlockSummaries);
+
+    permissionService.canUpdateRelease.mockResolvedValue(true);
+  });
+
+  test('renders page elements correctly', async () => {
+    tableBuilderService.getReleaseMeta.mockResolvedValue(testReleaseMeta);
+
+    renderPage();
+
+    await waitFor(() => {
+      expect(
+        screen.getByRole('heading', { name: 'Edit data block' }),
+      ).toBeInTheDocument();
+
+      const tabs = screen.getAllByRole('tab');
+
+      expect(tabs).toHaveLength(3);
+      expect(tabs[0]).toHaveTextContent('Data source');
+      expect(tabs[1]).toHaveTextContent('Table');
+      expect(tabs[2]).toHaveTextContent('Chart');
+    });
   });
 
   test('renders with correct data block details', async () => {
-    dataBlockService.getDataBlock.mockResolvedValue(testDataBlock);
-    dataBlockService.listDataBlocks.mockResolvedValue([]);
-
     renderPage();
 
     await waitFor(() => {
       expect(
         screen.getByRole('heading', { name: 'Test name 1' }),
       ).toBeInTheDocument();
-      expect(screen.getByTestId('fastTrackUrl')).toHaveTextContent(
+
+      expect(screen.queryByTestId('Highlight name')).not.toBeInTheDocument();
+      expect(screen.getByTestId('Fast track URL')).toHaveTextContent(
         'http://localhost/data-tables/fast-track/block-1',
       );
     });
   });
 
-  test('renders selector with list of data blocks', async () => {
-    dataBlockService.getDataBlock.mockResolvedValue(testDataBlock);
-    dataBlockService.listDataBlocks.mockResolvedValue([
-      {
-        id: 'block-2',
-        name: 'Test name 2',
-        heading: 'Test title 2',
-        highlightName: 'Test highlight name 2',
-        source: 'Test source 2',
-        chartsCount: 0,
-      },
-      {
-        id: testDataBlock.id,
-        name: testDataBlock.name,
-        heading: testDataBlock.heading,
-        highlightName: testDataBlock.highlightName,
-        source: testDataBlock.source,
-        chartsCount: 0,
-      },
-    ]);
-
+  test('renders page selector with list of data blocks', async () => {
     renderPage();
 
     await waitFor(() => {
@@ -116,8 +204,6 @@ describe('ReleaseDataBlockEditPage', () => {
   });
 
   test('clicking `Delete this data block` button shows modal', async () => {
-    dataBlockService.getDataBlock.mockResolvedValue(testDataBlock);
-    dataBlockService.listDataBlocks.mockResolvedValue([]);
     dataBlockService.getDeleteBlockPlan.mockResolvedValue({
       dependentDataBlocks: [
         {
@@ -156,8 +242,6 @@ describe('ReleaseDataBlockEditPage', () => {
   });
 
   test('clicking `Confirm` on modal deletes data block', async () => {
-    dataBlockService.getDataBlock.mockResolvedValue(testDataBlock);
-    dataBlockService.listDataBlocks.mockResolvedValue([]);
     dataBlockService.getDeleteBlockPlan.mockResolvedValue({
       dependentDataBlocks: [
         {
@@ -198,8 +282,6 @@ describe('ReleaseDataBlockEditPage', () => {
   });
 
   test('clicking `Cancel` on modal hides it', async () => {
-    dataBlockService.getDataBlock.mockResolvedValue(testDataBlock);
-    dataBlockService.listDataBlocks.mockResolvedValue([]);
     dataBlockService.getDeleteBlockPlan.mockResolvedValue({
       dependentDataBlocks: [
         {
@@ -234,6 +316,111 @@ describe('ReleaseDataBlockEditPage', () => {
 
     await waitFor(() => {
       expect(screen.queryByRole('dialog')).not.toBeInTheDocument();
+    });
+  });
+
+  describe('read-only view', () => {
+    beforeEach(() => {
+      permissionService.canUpdateRelease.mockResolvedValue(false);
+    });
+
+    test('renders page elements correctly', async () => {
+      tableBuilderService.getReleaseMeta.mockResolvedValue(testReleaseMeta);
+
+      renderPage();
+
+      await waitFor(() => {
+        expect(screen.getByRole('heading', { name: 'View data block' }));
+
+        expect(
+          screen.queryByRole('button', { name: 'Delete this data block' }),
+        ).not.toBeInTheDocument();
+
+        const tabs = screen.getAllByRole('tab');
+
+        expect(tabs).toHaveLength(2);
+        expect(tabs[0]).toHaveTextContent('Table');
+        expect(tabs[1]).toHaveTextContent('Chart');
+      });
+    });
+
+    test('renders with correct data block details', async () => {
+      renderPage();
+
+      await waitFor(() => {
+        expect(
+          screen.getByRole('heading', { name: 'Test name 1' }),
+        ).toBeInTheDocument();
+
+        expect(screen.getByTestId('Highlight name')).toHaveTextContent(
+          'Test highlight name 1',
+        );
+        expect(screen.getByTestId('Fast track URL')).toHaveTextContent(
+          'http://localhost/data-tables/fast-track/block-1',
+        );
+      });
+    });
+
+    test('renders page selector with list of data blocks', async () => {
+      renderPage();
+
+      await waitFor(() => {
+        expect(
+          screen.getByLabelText('Select a data block to view'),
+        ).toBeInTheDocument();
+      });
+
+      const selector = screen.getByLabelText('Select a data block to view');
+
+      expect(selector).toHaveValue('block-1');
+
+      const options = within(selector).getAllByRole('option');
+
+      expect(options[0]).toHaveTextContent('Test name 2');
+      expect(options[1]).toHaveTextContent('Test name 1');
+    });
+
+    test('renders table in `Table` tab', async () => {
+      renderPage();
+
+      await waitFor(() => {
+        expect(screen.getAllByRole('tab')).toHaveLength(2);
+      });
+
+      const tabPanel = within(screen.getByRole('tabpanel'));
+      expect(tabPanel.getByRole('table')).toBeInTheDocument();
+
+      const rows = screen.getAllByRole('row');
+      expect(rows).toHaveLength(2);
+
+      expect(within(rows[0]).getByRole('columnheader')).toHaveTextContent(
+        '2020/21',
+      );
+      expect(within(rows[1]).getByRole('rowheader')).toHaveTextContent(
+        'Barnet',
+      );
+      expect(within(rows[1]).getByRole('cell')).toHaveTextContent('123.00');
+    });
+
+    test('renders chart in `Chart` tab', async () => {
+      renderPage();
+
+      await waitFor(() => {
+        expect(screen.getAllByRole('tab')).toHaveLength(2);
+      });
+
+      userEvent.click(screen.getByRole('tab', { name: 'Chart' }));
+
+      await waitFor(() => {
+        const tabPanel = screen.getByRole('tabpanel');
+
+        expect(
+          tabPanel.querySelector('.recharts-cartesian-axis.xAxis'),
+        ).toBeInTheDocument();
+        expect(
+          tabPanel.querySelector('.recharts-cartesian-axis.yAxis'),
+        ).toBeInTheDocument();
+      });
     });
   });
 

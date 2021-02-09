@@ -32,11 +32,6 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Services.Interfaces.S
             return userService.CheckPolicy(SecurityPolicies.CanManageUsersOnSystem);
         }
 
-        public static Task<Either<ActionResult, Unit>> CheckCanManageAllMethodologies(this IUserService userService)
-        {
-            return userService.CheckPolicy(SecurityPolicies.CanManageMethodologiesOnSystem);
-        }
-
         public static Task<Either<ActionResult, Unit>> CheckCanViewAllImports(this IUserService userService)
         {
             return userService.CheckPolicy(SecurityPolicies.CanAccessAllImports);

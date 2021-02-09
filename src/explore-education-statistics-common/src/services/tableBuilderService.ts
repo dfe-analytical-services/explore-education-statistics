@@ -93,6 +93,7 @@ export interface PublicationMeta {
 export interface ReleaseMeta {
   releaseId: string;
   subjects: PublicationSubject[];
+  highlights: TableHighlight[];
 }
 
 export interface SubjectMeta {
