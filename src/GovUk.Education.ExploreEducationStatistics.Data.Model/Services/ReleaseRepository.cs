@@ -8,10 +8,10 @@ using Microsoft.Extensions.Logging;
 
 namespace GovUk.Education.ExploreEducationStatistics.Data.Model.Services
 {
-    public class ReleaseService : AbstractRepository<Release, Guid>, IReleaseService
+    public class ReleaseRepository : AbstractRepository<Release, Guid>, IReleaseRepository
     {
-        public ReleaseService(StatisticsDbContext context,
-            ILogger<ReleaseService> logger) : base(context, logger)
+        public ReleaseRepository(StatisticsDbContext context,
+            ILogger<ReleaseRepository> logger) : base(context, logger)
         {
         }
 

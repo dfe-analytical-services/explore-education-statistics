@@ -1,11 +1,10 @@
 ﻿using System;
 using System.Threading.Tasks;
-using GovUk.Education.ExploreEducationStatistics.Admin.Services.Interfaces;
-using GovUk.Education.ExploreEducationStatistics.Content.Model;
 using GovUk.Education.ExploreEducationStatistics.Content.Model.Database;
+using GovUk.Education.ExploreEducationStatistics.Content.Model.Repository.Interfaces;
 using Microsoft.EntityFrameworkCore;
 
-namespace GovUk.Education.ExploreEducationStatistics.Admin.Services
+namespace GovUk.Education.ExploreEducationStatistics.Content.Model.Repository
 {
     public class DataImportRepository : IDataImportRepository
     {
@@ -26,7 +25,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Services
         public async Task DeleteByFileId(Guid fileId)
         {
             var import = await GetByFileId(fileId);
-            
+
             if (import != null)
             {
                 _contentDbContext.DataImports.Remove(import);

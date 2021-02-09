@@ -23,19 +23,19 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Api.Services
         private readonly ITableBuilderService _tableBuilderService;
         private readonly IBlobStorageService _blobStorageService;
         private readonly ISubjectService _subjectService;
-        private readonly IReleaseService _releaseService;
+        private readonly IReleaseRepository _releaseRepository;
         private readonly IMapper _mapper;
 
         public PermalinkService(ITableBuilderService tableBuilderService,
             IBlobStorageService blobStorageService,
             ISubjectService subjectService,
-            IReleaseService releaseService,
+            IReleaseRepository releaseRepository,
             IMapper mapper)
         {
             _tableBuilderService = tableBuilderService;
             _blobStorageService = blobStorageService;
             _subjectService = subjectService;
-            _releaseService = releaseService;
+            _releaseRepository = releaseRepository;
             _mapper = mapper;
         }
 
@@ -57,7 +57,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Api.Services
         public async Task<Either<ActionResult, PermalinkViewModel>> CreateAsync(CreatePermalinkRequest request)
         {
             var publicationId = _subjectService.GetPublicationForSubject(request.Query.SubjectId).Result.Id;
-            var release = _releaseService.GetLatestPublishedRelease(publicationId);
+            var release = _releaseRepository.GetLatestPublishedRelease(publicationId);
 
             if (release == null)
             {

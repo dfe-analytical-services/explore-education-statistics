@@ -1,7 +1,5 @@
 ﻿using System;
 using System.Threading.Tasks;
-using GovUk.Education.ExploreEducationStatistics.Admin.Services;
-using GovUk.Education.ExploreEducationStatistics.Admin.Services.Interfaces;
 using GovUk.Education.ExploreEducationStatistics.Common.Model;
 using GovUk.Education.ExploreEducationStatistics.Common.Model.Data.Query;
 using GovUk.Education.ExploreEducationStatistics.Common.Services.Interfaces.Security;
@@ -9,20 +7,22 @@ using GovUk.Education.ExploreEducationStatistics.Common.Tests.Utils;
 using GovUk.Education.ExploreEducationStatistics.Common.Utils;
 using GovUk.Education.ExploreEducationStatistics.Content.Model;
 using GovUk.Education.ExploreEducationStatistics.Content.Model.Database;
+using GovUk.Education.ExploreEducationStatistics.Content.Model.Repository;
+using GovUk.Education.ExploreEducationStatistics.Content.Model.Repository.Interfaces;
 using GovUk.Education.ExploreEducationStatistics.Data.Model;
 using GovUk.Education.ExploreEducationStatistics.Data.Model.Database;
 using Moq;
 using Xunit;
-using static GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services.DbUtils;
+using static GovUk.Education.ExploreEducationStatistics.Content.Model.Database.ContentDbUtils;
 using static GovUk.Education.ExploreEducationStatistics.Data.Model.Database.StatisticsDbUtils;
 using Release = GovUk.Education.ExploreEducationStatistics.Content.Model.Release;
 
-namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
+namespace GovUk.Education.ExploreEducationStatistics.Data.Services.Tests
 {
-    public class ReleaseMetaServiceTests
+    public class ReleaseServiceTests
     {
         [Fact]
-        public async Task GetSubjectsMeta()
+        public async Task GetRelease()
         {
             var releaseId = Guid.NewGuid();
 
@@ -105,7 +105,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
             var contentDbContextId = Guid.NewGuid().ToString();
             var statisticsDbContextId = Guid.NewGuid().ToString();
 
-            await using (var contentDbContext = InMemoryApplicationDbContext(contentDbContextId))
+            await using (var contentDbContext = InMemoryContentDbContext(contentDbContextId))
             {
                 await contentDbContext.AddAsync(contentRelease);
                 await contentDbContext.AddRangeAsync(releaseFile1, releaseFile2);
@@ -126,15 +126,15 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
                 await statisticsDbContext.SaveChangesAsync();
             }
 
-            await using (var contentDbContext = InMemoryApplicationDbContext(contentDbContextId))
+            await using (var contentDbContext = InMemoryContentDbContext(contentDbContextId))
             await using (var statisticsDbContext = InMemoryStatisticsDbContext(statisticsDbContextId))
             {
-                var replacementService = BuildReleaseMetaService(
+                var service = BuildReleaseService(
                     contentDbContext: contentDbContext,
                     statisticsDbContext: statisticsDbContext
                 );
 
-                var result = await replacementService.GetSubjectsMeta(contentRelease.Id);
+                var result = await service.GetRelease(contentRelease.Id);
 
                 Assert.True(result.IsRight);
 
@@ -160,7 +160,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
         }
 
         [Fact]
-        public async Task GetSubjectsMeta_FiltersPendingReplacementSubjects()
+        public async Task GetRelease_FiltersPendingReplacementSubjects()
         {
             var releaseId = Guid.NewGuid();
 
@@ -262,7 +262,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
             var contentDbContextId = Guid.NewGuid().ToString();
             var statisticsDbContextId = Guid.NewGuid().ToString();
 
-            await using (var contentDbContext = InMemoryApplicationDbContext(contentDbContextId))
+            await using (var contentDbContext = InMemoryContentDbContext(contentDbContextId))
             {
                 await contentDbContext.AddAsync(contentRelease);
                 await contentDbContext.AddRangeAsync(releaseFile1, releaseFile2, releaseFile2Replacement);
@@ -276,15 +276,15 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
                 await statisticsDbContext.SaveChangesAsync();
             }
 
-            await using (var contentDbContext = InMemoryApplicationDbContext(contentDbContextId))
+            await using (var contentDbContext = InMemoryContentDbContext(contentDbContextId))
             await using (var statisticsDbContext = InMemoryStatisticsDbContext(statisticsDbContextId))
             {
-                var replacementService = BuildReleaseMetaService(
+                var service = BuildReleaseService(
                     contentDbContext: contentDbContext,
                     statisticsDbContext: statisticsDbContext
                 );
 
-                var result = await replacementService.GetSubjectsMeta(contentRelease.Id);
+                var result = await service.GetRelease(contentRelease.Id);
 
                 Assert.True(result.IsRight);
 
@@ -302,7 +302,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
         }
 
         [Fact]
-        public async Task GetSubjectsMeta_FiltersImportingSubjects()
+        public async Task GetRelease_FiltersImportingSubjects()
         {
             var releaseId = Guid.NewGuid();
 
@@ -375,7 +375,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
             var contentDbContextId = Guid.NewGuid().ToString();
             var statisticsDbContextId = Guid.NewGuid().ToString();
 
-            await using (var contentDbContext = InMemoryApplicationDbContext(contentDbContextId))
+            await using (var contentDbContext = InMemoryContentDbContext(contentDbContextId))
             {
                 await contentDbContext.AddAsync(contentRelease);
                 await contentDbContext.AddRangeAsync(releaseFile1, releaseFile2);
@@ -389,15 +389,15 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
                 await statisticsDbContext.SaveChangesAsync();
             }
 
-            await using (var contentDbContext = InMemoryApplicationDbContext(contentDbContextId))
+            await using (var contentDbContext = InMemoryContentDbContext(contentDbContextId))
             await using (var statisticsDbContext = InMemoryStatisticsDbContext(statisticsDbContextId))
             {
-                var replacementService = BuildReleaseMetaService(
+                var service = BuildReleaseService(
                     contentDbContext: contentDbContext,
                     statisticsDbContext: statisticsDbContext
                 );
 
-                var result = await replacementService.GetSubjectsMeta(contentRelease.Id);
+                var result = await service.GetRelease(contentRelease.Id);
 
                 Assert.True(result.IsRight);
 
@@ -412,7 +412,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
         }
 
         [Fact]
-        public async Task GetSubjectsMeta_FiltersHighlights()
+        public async Task GetRelease_FiltersHighlights()
         {
             var releaseId = Guid.NewGuid();
 
@@ -489,7 +489,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
             var contentDbContextId = Guid.NewGuid().ToString();
             var statisticsDbContextId = Guid.NewGuid().ToString();
 
-            await using (var contentDbContext = InMemoryApplicationDbContext(contentDbContextId))
+            await using (var contentDbContext = InMemoryContentDbContext(contentDbContextId))
             {
                 await contentDbContext.AddAsync(contentRelease);
                 await contentDbContext.AddAsync(releaseFile1);
@@ -520,15 +520,15 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
                 await statisticsDbContext.SaveChangesAsync();
             }
 
-            await using (var contentDbContext = InMemoryApplicationDbContext(contentDbContextId))
+            await using (var contentDbContext = InMemoryContentDbContext(contentDbContextId))
             await using (var statisticsDbContext = InMemoryStatisticsDbContext(statisticsDbContextId))
             {
-                var replacementService = BuildReleaseMetaService(
+                var service = BuildReleaseService(
                     contentDbContext: contentDbContext,
                     statisticsDbContext: statisticsDbContext
                 );
 
-                var result = await replacementService.GetSubjectsMeta(contentRelease.Id);
+                var result = await service.GetRelease(contentRelease.Id);
 
                 Assert.True(result.IsRight);
 
@@ -544,14 +544,14 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
             }
         }
 
-        private static ReleaseMetaService BuildReleaseMetaService(
+        private static ReleaseService BuildReleaseService(
             ContentDbContext contentDbContext = null,
             IPersistenceHelper<ContentDbContext> persistenceHelper = null,
             StatisticsDbContext statisticsDbContext = null,
             IDataImportRepository dataImportRepository = null,
             IUserService userService = null)
         {
-            return new ReleaseMetaService(
+            return new ReleaseService(
                 contentDbContext ?? new Mock<ContentDbContext>().Object,
                 persistenceHelper ?? new PersistenceHelper<ContentDbContext>(contentDbContext),
                 statisticsDbContext ?? new Mock<StatisticsDbContext>().Object,

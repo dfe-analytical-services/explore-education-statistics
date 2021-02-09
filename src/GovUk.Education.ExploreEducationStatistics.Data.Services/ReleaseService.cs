@@ -2,23 +2,24 @@
 using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
-using GovUk.Education.ExploreEducationStatistics.Admin.Services.Interfaces;
-using GovUk.Education.ExploreEducationStatistics.Admin.Services.Interfaces.Security;
 using GovUk.Education.ExploreEducationStatistics.Common.Model;
 using GovUk.Education.ExploreEducationStatistics.Common.Services.Interfaces.Security;
 using GovUk.Education.ExploreEducationStatistics.Common.Utils;
 using GovUk.Education.ExploreEducationStatistics.Content.Model;
 using GovUk.Education.ExploreEducationStatistics.Content.Model.Database;
+using GovUk.Education.ExploreEducationStatistics.Content.Model.Repository.Interfaces;
+using GovUk.Education.ExploreEducationStatistics.Content.Security.Extensions;
 using GovUk.Education.ExploreEducationStatistics.Data.Model;
 using GovUk.Education.ExploreEducationStatistics.Data.Model.Database;
-using GovUk.Education.ExploreEducationStatistics.Data.Services.ViewModels.Meta;
+using GovUk.Education.ExploreEducationStatistics.Data.Services.Interfaces;
+using GovUk.Education.ExploreEducationStatistics.Data.Services.ViewModels;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
 using Release = GovUk.Education.ExploreEducationStatistics.Content.Model.Release;
 
-namespace GovUk.Education.ExploreEducationStatistics.Admin.Services
+namespace GovUk.Education.ExploreEducationStatistics.Data.Services
 {
-    public class ReleaseMetaService : IReleaseMetaService
+    public class ReleaseService : IReleaseService
     {
         private readonly ContentDbContext _contentDbContext;
         private readonly IPersistenceHelper<ContentDbContext> _contentPersistenceHelper;
@@ -26,7 +27,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Services
         private readonly IDataImportRepository _dataImportRepository;
         private readonly IUserService _userService;
 
-        public ReleaseMetaService(
+        public ReleaseService(
             ContentDbContext contentDbContext,
             IPersistenceHelper<ContentDbContext> contentPersistenceHelper,
             StatisticsDbContext statisticsDbContext,
@@ -40,7 +41,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Services
             _userService = userService;
         }
 
-        public async Task<Either<ActionResult, ReleaseSubjectsMetaViewModel>> GetSubjectsMeta(Guid releaseId)
+        public async Task<Either<ActionResult, ReleaseViewModel>> GetRelease(Guid releaseId)
         {
             return await _contentPersistenceHelper
                 .CheckEntityExists<Release>(releaseId)
@@ -88,7 +89,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Services
                         .Select(dataBlock => new IdLabel(dataBlock.Id, dataBlock.HighlightName))
                         .ToList();
 
-                    return new ReleaseSubjectsMetaViewModel
+                    return new ReleaseViewModel
                     {
                         ReleaseId = releaseId,
                         Highlights = highlights,

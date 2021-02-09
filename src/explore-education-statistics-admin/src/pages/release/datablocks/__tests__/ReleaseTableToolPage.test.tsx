@@ -16,8 +16,8 @@ const tableBuilderService = _tableBuilderService as jest.Mocked<
 
 describe('ReleaseTableToolPage', () => {
   test('renders correctly on step 1', async () => {
-    tableBuilderService.getReleaseMeta.mockResolvedValue({
-      releaseId: 'release-1',
+    tableBuilderService.getRelease.mockResolvedValue({
+      id: 'release-1',
       subjects: [
         {
           id: 'subject-1',

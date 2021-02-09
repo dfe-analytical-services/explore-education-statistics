@@ -185,11 +185,11 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Services.Tests
         }
 
         private static PublicationService BuildPublicationService(StatisticsDbContext context,
-            (Mock<ILogger<ReleaseService>> LoggerReleaseService,
+            (Mock<ILogger<ReleaseRepository>> LoggerReleaseService,
                 Mock<ILogger<SubjectService>> LoggerSubjectService,
                 Mock<ITableStorageService> TableStorageService) mocks)
         {
-            var releaseService = new ReleaseService(context, mocks.LoggerReleaseService.Object);
+            var releaseService = new ReleaseRepository(context, mocks.LoggerReleaseService.Object);
             var subjectService = new SubjectService(context, mocks.LoggerSubjectService.Object, releaseService);
             return new PublicationService(releaseService,
                 subjectService,
@@ -197,11 +197,11 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Services.Tests
                 MapperUtils.MapperForProfile<DataServiceMappingProfiles>());
         }
 
-        private static (Mock<ILogger<ReleaseService>> LoggerReleaseService,
+        private static (Mock<ILogger<ReleaseRepository>> LoggerReleaseService,
             Mock<ILogger<SubjectService>> LoggerSubjectService,
             Mock<ITableStorageService> TableStorageService) Mocks()
         {
-            return (new Mock<ILogger<ReleaseService>>(),
+            return (new Mock<ILogger<ReleaseRepository>>(),
                 new Mock<ILogger<SubjectService>>(),
                 new Mock<ITableStorageService>());
         }

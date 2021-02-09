@@ -1,19 +1,18 @@
 ﻿using System;
-using GovUk.Education.ExploreEducationStatistics.Admin.Services;
-using GovUk.Education.ExploreEducationStatistics.Admin.Services.Interfaces;
 using GovUk.Education.ExploreEducationStatistics.Common.Services.Interfaces.Security;
 using GovUk.Education.ExploreEducationStatistics.Common.Tests.Utils;
 using GovUk.Education.ExploreEducationStatistics.Common.Utils;
 using GovUk.Education.ExploreEducationStatistics.Content.Model;
 using GovUk.Education.ExploreEducationStatistics.Content.Model.Database;
+using GovUk.Education.ExploreEducationStatistics.Content.Model.Repository.Interfaces;
 using GovUk.Education.ExploreEducationStatistics.Content.Security;
 using GovUk.Education.ExploreEducationStatistics.Data.Model.Database;
 using Moq;
 using Xunit;
 
-namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
+namespace GovUk.Education.ExploreEducationStatistics.Data.Services.Tests
 {
-    public class ReleaseMetaServicePermissionTests
+    public class ReleaseServicePermissionTests
     {
         private readonly Release _release = new Release
         {
@@ -29,19 +28,19 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
                     userService =>
                     {
                         var service = BuildReleaseMetaService(userService: userService.Object);
-                        return service.GetSubjectsMeta(_release.Id);
+                        return service.GetRelease(_release.Id);
                     }
                 );
         }
 
-        private ReleaseMetaService BuildReleaseMetaService(
+        private ReleaseService BuildReleaseMetaService(
             ContentDbContext contentDbContext = null,
             IPersistenceHelper<ContentDbContext> persistenceHelper = null,
             StatisticsDbContext statisticsDbContext = null,
             IDataImportRepository dataImportRepository = null,
             IUserService userService = null)
         {
-            return new ReleaseMetaService(
+            return new ReleaseService(
                 contentDbContext ?? new Mock<ContentDbContext>().Object,
                 persistenceHelper ?? DefaultPersistenceHelperMock().Object,
                 statisticsDbContext ?? new Mock<StatisticsDbContext>().Object,

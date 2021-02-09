@@ -119,7 +119,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Api
             services.AddTransient<IIndicatorService, IndicatorService>();
             services.AddTransient<ILocationService, LocationService>();
             services.AddTransient<IObservationService, ObservationService>();
-            services.AddTransient<IReleaseService, ReleaseService>();
+            services.AddTransient<IReleaseRepository, ReleaseRepository>();
             services.AddTransient<ISubjectService, SubjectService>();
             services.AddTransient<ITimePeriodService, TimePeriodService>();
             services.AddTransient<IPermalinkService, PermalinkService>();

@@ -34,13 +34,13 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Model.Tests
 
             await using (var context = StatisticsDbUtils.InMemoryStatisticsDbContext(contextId))
             {
-                var releaseService = new Mock<IReleaseService>();
+                var releaseRepository = new Mock<IReleaseRepository>();
 
-                releaseService
+                releaseRepository
                     .Setup(s => s.GetLatestPublishedRelease(releaseSubject.Release.PublicationId))
                     .Returns(releaseSubject.Release);
 
-                var service = BuildSubjectService(context, releaseService: releaseService.Object);
+                var service = BuildSubjectService(context, releaseRepository: releaseRepository.Object);
                 var result = await service.IsSubjectForLatestPublishedRelease(releaseSubject.SubjectId);
 
                 Assert.True(result);
@@ -70,7 +70,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Model.Tests
 
             await using (var context = StatisticsDbUtils.InMemoryStatisticsDbContext(contextId))
             {
-                var releaseService = new Mock<IReleaseService>();
+                var releaseService = new Mock<IReleaseRepository>();
 
                 releaseService
                     .Setup(s => s.GetLatestPublishedRelease(releaseSubject.Release.PublicationId))
@@ -79,7 +79,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Model.Tests
                         Id = Guid.NewGuid()
                     });
 
-                var service = BuildSubjectService(context, releaseService: releaseService.Object);
+                var service = BuildSubjectService(context, releaseRepository: releaseService.Object);
                 var result = await service.IsSubjectForLatestPublishedRelease(releaseSubject.SubjectId);
 
                 Assert.False(result);
@@ -109,16 +109,16 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Model.Tests
 
             await using (var context = StatisticsDbUtils.InMemoryStatisticsDbContext(contextId))
             {
-                var releaseService = new Mock<IReleaseService>();
+                var releaseRepository = new Mock<IReleaseRepository>();
 
-                releaseService
+                releaseRepository
                     .Setup(s => s.GetLatestPublishedRelease(releaseSubject.Release.PublicationId))
                     .Returns(new Release
                     {
                         Id = Guid.NewGuid()
                     });
 
-                var service = BuildSubjectService(context, releaseService: releaseService.Object);
+                var service = BuildSubjectService(context, releaseRepository: releaseRepository.Object);
                 var result = await service.IsSubjectForLatestPublishedRelease(releaseSubject.SubjectId);
 
                 Assert.False(result);
@@ -339,12 +339,12 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Model.Tests
 
         private SubjectService BuildSubjectService(
             StatisticsDbContext statisticsDbContext,
-            IReleaseService releaseService = null)
+            IReleaseRepository releaseRepository = null)
         {
             return new SubjectService(
                 statisticsDbContext,
                 new Mock<ILogger<SubjectService>>().Object,
-                releaseService ?? new Mock<IReleaseService>().Object
+                releaseRepository ?? new Mock<IReleaseRepository>().Object
             );
         }
     }

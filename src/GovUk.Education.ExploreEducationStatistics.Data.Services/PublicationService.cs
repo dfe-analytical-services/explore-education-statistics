@@ -17,18 +17,18 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Services
 {
     public class PublicationService : IPublicationService
     {
-        private readonly IReleaseService _releaseService;
+        private readonly IReleaseRepository _releaseRepository;
         private readonly ISubjectService _subjectService;
         private readonly ITableStorageService _tableStorageService;
         private readonly IMapper _mapper;
 
         public PublicationService(
-            IReleaseService releaseService,
+            IReleaseRepository releaseRepository,
             ISubjectService subjectService,
             ITableStorageService tableStorageService,
             IMapper mapper)
         {
-            _releaseService = releaseService;
+            _releaseRepository = releaseRepository;
             _subjectService = subjectService;
             _tableStorageService = tableStorageService;
             _mapper = mapper;
@@ -37,7 +37,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Services
         public async Task<Either<ActionResult, PublicationViewModel>> GetPublication(
             Guid publicationId)
         {
-            var release = _releaseService.GetLatestPublishedRelease(publicationId);
+            var release = _releaseRepository.GetLatestPublishedRelease(publicationId);
 
             if (release == null)
             {

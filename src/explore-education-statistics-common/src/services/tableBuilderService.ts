@@ -90,8 +90,8 @@ export interface Publication {
   highlights: TableHighlight[];
 }
 
-export interface ReleaseMeta {
-  releaseId: string;
+export interface Release {
+  id: string;
   subjects: PublicationSubject[];
   highlights: TableHighlight[];
 }
@@ -187,8 +187,8 @@ const tableBuilderService = {
   getPublication(publicationId: string): Promise<Publication> {
     return dataApi.get(`/publications/${publicationId}`);
   },
-  getReleaseMeta(releaseId: string): Promise<ReleaseMeta> {
-    return dataApi.get(`/meta/release/${releaseId}`);
+  getRelease(releaseId: string): Promise<Release> {
+    return dataApi.get(`/releases/${releaseId}`);
   },
   getSubjectMeta(subjectId: string): Promise<SubjectMeta> {
     return dataApi.get(`/meta/subject/${subjectId}`);
