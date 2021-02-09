@@ -78,16 +78,14 @@ describe('ReleaseDataUploadsSection', () => {
   const testQueuedImportStatus: DataFileImportStatus = {
     status: 'QUEUED',
     percentageComplete: 0,
-    phasePercentageComplete: 0,
-    phaseComplete: false,
+    stagePercentageComplete: 0,
     numberOfRows: 0,
   };
 
   const testCompleteImportStatus: DataFileImportStatus = {
     status: 'COMPLETE',
     percentageComplete: 100,
-    phasePercentageComplete: 100,
-    phaseComplete: true,
+    stagePercentageComplete: 100,
     numberOfRows: 100,
   };
 
@@ -979,7 +977,7 @@ describe('ReleaseDataUploadsSection', () => {
         await waitFor(() => {
           expect(releaseDataFileService.cancelImport).toHaveBeenCalledWith(
             'release-1',
-            testUploadedDataFile.fileName,
+            testUploadedDataFile.id,
           );
         });
 

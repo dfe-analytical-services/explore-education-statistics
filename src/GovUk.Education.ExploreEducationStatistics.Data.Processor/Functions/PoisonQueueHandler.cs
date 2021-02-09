@@ -1,50 +1,36 @@
-using System.Collections.Generic;
-using System.Linq;
+using System.Threading.Tasks;
 using GovUk.Education.ExploreEducationStatistics.Data.Processor.Model;
 using GovUk.Education.ExploreEducationStatistics.Data.Processor.Services.Interfaces;
 using Microsoft.Azure.WebJobs;
-using Microsoft.Extensions.Logging;
+using static GovUk.Education.ExploreEducationStatistics.Data.Processor.Model.ImporterQueues;
 
 namespace GovUk.Education.ExploreEducationStatistics.Data.Processor.Functions
 {
     public class PoisonQueueHandler
     {
-        private readonly IBatchService _batchService;
+        private readonly IDataImportService _dataImportService;
 
-        public PoisonQueueHandler(IBatchService batchService)
+        public PoisonQueueHandler(IDataImportService dataImportService)
         {
-            _batchService = batchService;
+            _dataImportService = dataImportService;
         }
 
         [FunctionName("ProcessUploadsPoisonHandler")]
-        public async void ProcessUploadsPoisonQueueHandler(
-            [QueueTrigger("imports-pending-poison")]
-            ImportMessage message,
-            ILogger logger
-        )
+        public async Task ProcessUploadsPoisonQueueHandler(
+            [QueueTrigger(ImportsPendingPoisonQueue)]
+            ImportMessage message)
         {
-            await _batchService.FailImport(
-                message.Release.Id, message.DataFileName,
-                new List<ValidationError>
-                {
-                    new ValidationError("File failed to import for unknown reason in upload processing stage.")
-                }.AsEnumerable()
-            );
+            await _dataImportService.FailImport(message.Id,
+                "File failed to import for unknown reason in upload processing stage.");
         }
 
         [FunctionName("ImportObservationsPoisonHandler")]
-        public async void ImportObservationsPoisonQueueHandler(
-            [QueueTrigger("imports-available-poison")]
-            ImportMessage message,
-            ILogger logger)
+        public async Task ImportObservationsPoisonQueueHandler(
+            [QueueTrigger(ImportsAvailablePoisonQueue)]
+            ImportMessage message)
         {
-            await _batchService.FailImport(
-                message.Release.Id, message.DataFileName,
-                new List<ValidationError>
-                {
-                    new ValidationError("File failed to import for unknown reason in upload processing stage.")
-                }.AsEnumerable()
-            );
+            await _dataImportService.FailImport(message.Id,
+                "File failed to import for unknown reason in upload processing stage.");
         }
     }
 }

@@ -37,6 +37,12 @@ namespace GovUk.Education.ExploreEducationStatistics.Common.Services
             }
         }
 
+        public async Task Clear(string queueName)
+        {
+            var queue = await GetQueueReferenceAsync(queueName);
+            await queue.ClearAsync();
+        }
+
         private CloudQueue GetQueueReference(string queueName)
         {
             var storageAccount = CloudStorageAccount.Parse(_storageConnectionString);

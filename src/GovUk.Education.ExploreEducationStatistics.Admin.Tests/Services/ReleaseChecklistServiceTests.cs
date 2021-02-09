@@ -5,7 +5,6 @@ using GovUk.Education.ExploreEducationStatistics.Admin.Services;
 using GovUk.Education.ExploreEducationStatistics.Admin.Services.Interfaces;
 using GovUk.Education.ExploreEducationStatistics.Admin.ViewModels;
 using GovUk.Education.ExploreEducationStatistics.Common.Model;
-using GovUk.Education.ExploreEducationStatistics.Common.Services.Interfaces;
 using GovUk.Education.ExploreEducationStatistics.Common.Services.Interfaces.Security;
 using GovUk.Education.ExploreEducationStatistics.Common.Tests.Utils;
 using GovUk.Education.ExploreEducationStatistics.Common.Utils;
@@ -14,10 +13,8 @@ using GovUk.Education.ExploreEducationStatistics.Content.Model.Database;
 using GovUk.Education.ExploreEducationStatistics.Data.Model;
 using GovUk.Education.ExploreEducationStatistics.Data.Model.Services.Interfaces;
 using Microsoft.AspNetCore.Mvc;
-using Microsoft.Azure.Cosmos.Table;
 using Moq;
 using Xunit;
-using static GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services.Utils.TableStorageTestUtils;
 using static GovUk.Education.ExploreEducationStatistics.Admin.Validators.ValidationErrorMessages;
 using static GovUk.Education.ExploreEducationStatistics.Admin.Validators.ValidationUtils;
 using Publication = GovUk.Education.ExploreEducationStatistics.Content.Model.Publication;
@@ -72,25 +69,24 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
                         }
                     );
 
+                var dataImportService = new Mock<IDataImportService>();
                 var metaGuidanceService = new Mock<IMetaGuidanceService>();
+
+                dataImportService
+                    .Setup(s => s.HasIncompleteImports(release.Id))
+                    .ReturnsAsync(true);
 
                 metaGuidanceService
                     .Setup(s => s.Validate(release.Id))
                     .ReturnsAsync(ValidationActionResult(PublicMetaGuidanceRequired));
 
-                var tableStorageService = MockTableStorageService(
-                    new List<DatafileImport>
-                    {
-                        new DatafileImport()
-                    }
-                );
-
                 var service = BuildReleaseChecklistService(
                     context,
                     fileRepository: fileRepository.Object,
-                    metaGuidanceService: metaGuidanceService.Object,
-                    tableStorageService: tableStorageService.Object
+                    dataImportService: dataImportService.Object,
+                    metaGuidanceService: metaGuidanceService.Object
                 );
+
                 var checklist = await service.GetChecklist(release.Id);
 
                 Assert.True(checklist.IsRight);
@@ -428,28 +424,9 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
             }
         }
 
-        private Mock<ITableStorageService> MockTableStorageService(List<DatafileImport> expectedResults)
-        {
-            var cloudTable = MockCloudTable();
-
-            cloudTable
-                .Setup(
-                    t => t.ExecuteQuerySegmentedAsync(It.IsAny<TableQuery<DatafileImport>>(), null)
-                )
-                .ReturnsAsync(CreateTableQuerySegment(expectedResults));
-
-            var tableStorageService = new Mock<ITableStorageService>();
-
-            tableStorageService
-                .Setup(s => s.GetTableAsync(It.IsAny<string>(), true))
-                .ReturnsAsync(cloudTable.Object);
-
-            return tableStorageService;
-        }
-
-        private ReleaseChecklistService BuildReleaseChecklistService(
+        private static ReleaseChecklistService BuildReleaseChecklistService(
             ContentDbContext contentDbContext,
-            ITableStorageService tableStorageService = null,
+            IDataImportService dataImportService = null,
             IUserService userService = null,
             IMetaGuidanceService metaGuidanceService = null,
             IFileRepository fileRepository = null,
@@ -458,7 +435,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
         {
             return new ReleaseChecklistService(
                 new PersistenceHelper<ContentDbContext>(contentDbContext),
-                tableStorageService ?? MockTableStorageService(new List<DatafileImport>()).Object,
+                dataImportService ?? new Mock<IDataImportService>().Object,
                 userService ?? MockUtils.AlwaysTrueUserService().Object,
                 metaGuidanceService ?? new Mock<IMetaGuidanceService>().Object,
                 fileRepository ?? new Mock<IFileRepository>().Object,

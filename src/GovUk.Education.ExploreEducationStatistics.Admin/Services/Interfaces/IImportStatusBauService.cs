@@ -8,6 +8,6 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Services.Interfaces
 {
     public interface IImportStatusBauService
     {
-        Task<Either<ActionResult, List<ImportStatusBau>>> GetAllIncompleteImports();
+        Task<Either<ActionResult, List<ImportStatusBauViewModel>>> GetAllIncompleteImports();
     }
 }

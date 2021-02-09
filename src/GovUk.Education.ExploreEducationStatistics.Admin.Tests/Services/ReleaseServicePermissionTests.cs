@@ -7,7 +7,6 @@ using GovUk.Education.ExploreEducationStatistics.Admin.Services.Interfaces;
 using GovUk.Education.ExploreEducationStatistics.Admin.ViewModels;
 using GovUk.Education.ExploreEducationStatistics.Common.Model;
 using GovUk.Education.ExploreEducationStatistics.Common.Services;
-using GovUk.Education.ExploreEducationStatistics.Common.Services.Interfaces;
 using GovUk.Education.ExploreEducationStatistics.Common.Services.Interfaces.Security;
 using GovUk.Education.ExploreEducationStatistics.Common.Tests.Utils;
 using GovUk.Education.ExploreEducationStatistics.Common.Utils;
@@ -314,11 +313,11 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
             IPersistenceHelper<ContentDbContext> persistenceHelper = null,
             IUserService userService = null,
             IReleaseRepository releaseRepository = null,
+            IReleaseFileRepository releaseFileRepository = null,
             ISubjectService subjectService = null,
-            ITableStorageService tableStorageService = null,
             IReleaseFileService releaseFileService = null,
             IReleaseDataFileService releaseDataFileService = null,
-            IImportStatusService importStatusService = null,
+            IDataImportService dataImportService = null,
             IFootnoteService footnoteService = null,
             StatisticsDbContext statisticsDbContext = null,
             IDataBlockService dataBlockService = null,
@@ -332,11 +331,11 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
                 persistenceHelper ?? DefaultPersistenceHelperMock().Object,
                 userService ?? new Mock<IUserService>().Object,
                 releaseRepository ?? new Mock<IReleaseRepository>().Object,
+                releaseFileRepository ?? new Mock<IReleaseFileRepository>().Object,
                 subjectService ?? new Mock<ISubjectService>().Object,
-                tableStorageService ?? new Mock<ITableStorageService>().Object,
                 releaseDataFileService ?? new Mock<IReleaseDataFileService>().Object,
                 releaseFileService ?? new Mock<IReleaseFileService>().Object,
-                importStatusService ?? new Mock<IImportStatusService>().Object,
+                dataImportService ?? new Mock<IDataImportService>().Object,
                 footnoteService ?? new Mock<IFootnoteService>().Object,
                 statisticsDbContext ?? new Mock<StatisticsDbContext>().Object,
                 dataBlockService ?? new Mock<IDataBlockService>().Object,

@@ -1,6 +1,6 @@
 ﻿using System;
 using GovUk.Education.ExploreEducationStatistics.Admin.Services;
-using GovUk.Education.ExploreEducationStatistics.Common.Services.Interfaces;
+using GovUk.Education.ExploreEducationStatistics.Admin.Services.Interfaces;
 using GovUk.Education.ExploreEducationStatistics.Common.Services.Interfaces.Security;
 using GovUk.Education.ExploreEducationStatistics.Common.Tests.Utils;
 using GovUk.Education.ExploreEducationStatistics.Common.Utils;
@@ -38,15 +38,15 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
             ContentDbContext contentDbContext = null,
             IPersistenceHelper<ContentDbContext> persistenceHelper = null,
             StatisticsDbContext statisticsDbContext = null,
-            IUserService userService = null,
-            IImportStatusService importStatusService = null)
+            IDataImportRepository dataImportRepository = null,
+            IUserService userService = null)
         {
             return new ReleaseMetaService(
                 contentDbContext ?? new Mock<ContentDbContext>().Object,
                 persistenceHelper ?? DefaultPersistenceHelperMock().Object,
                 statisticsDbContext ?? new Mock<StatisticsDbContext>().Object,
-                userService ?? new Mock<IUserService>().Object,
-                importStatusService ?? new Mock<IImportStatusService>().Object
+                dataImportRepository ?? new Mock<IDataImportRepository>().Object,
+                userService ?? new Mock<IUserService>().Object
             );
         }
 

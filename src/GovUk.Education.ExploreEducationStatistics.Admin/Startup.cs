@@ -204,11 +204,14 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin
             services.AddSpaStaticFiles(configuration => { configuration.RootPath = "wwwroot"; });
 
             services.AddTransient<IFileRepository, FileRepository>();
+            services.AddTransient<IDataImportRepository, DataImportRepository>();
             services.AddTransient<IReleaseFileRepository, ReleaseFileRepository>();
+            
             services.AddTransient<IReleaseDataFileService, ReleaseDataFileService>();
             services.AddTransient<IReleaseFileService, ReleaseFileService>();
-            services.AddTransient<IImportService, ImportService>();
+            services.AddTransient<IDataImportService, DataImportService>();
             services.AddTransient<IImportStatusBauService, ImportStatusBauService>();
+            services.AddTransient<IMigrateImportsService, MigrateImportsService>();
 
             services.AddTransient<IPublishingService, PublishingService>(provider =>
                 new PublishingService(
@@ -292,7 +295,6 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin
             services.AddTransient<ITimePeriodService, TimePeriodService>();
             services.AddTransient<ISubjectMetaService, SubjectMetaService>();
             services.AddTransient<IResultSubjectMetaService, ResultSubjectMetaService>();
-            services.AddTransient<IImportStatusService, ImportStatusService>();
             services.AddSingleton<DataServiceMemoryCache<BoundaryLevel>, DataServiceMemoryCache<BoundaryLevel>>();
             services.AddSingleton<DataServiceMemoryCache<GeoJson>, DataServiceMemoryCache<GeoJson>>();
             services.AddTransient<IUserManagementService, UserManagementService>();

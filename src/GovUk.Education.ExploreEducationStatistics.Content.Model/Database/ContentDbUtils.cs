@@ -5,16 +5,27 @@ namespace GovUk.Education.ExploreEducationStatistics.Content.Model.Database
 {
     public static class ContentDbUtils
     {
+        public static DbContextOptions<ContentDbContext> InMemoryContentDbContextOptions(string dbName)
+        {
+            var builder = new DbContextOptionsBuilder<ContentDbContext>()
+                .UseInMemoryDatabase(databaseName: dbName);
+
+            return builder.Options;
+        }
+
+        public static DbContextOptions<ContentDbContext> InMemoryContentDbContextOptions()
+        {
+            return InMemoryContentDbContextOptions(Guid.NewGuid().ToString());
+        }
+
         public static ContentDbContext InMemoryContentDbContext(string dbName)
         {
-            var builder = new DbContextOptionsBuilder<ContentDbContext>();
-            builder.UseInMemoryDatabase(databaseName: dbName);
-            return new ContentDbContext(builder.Options);
+            return new ContentDbContext(InMemoryContentDbContextOptions(dbName));
         }
 
         public static ContentDbContext InMemoryContentDbContext()
         {
-            return InMemoryContentDbContext(Guid.NewGuid().ToString());
+            return new ContentDbContext(InMemoryContentDbContextOptions());
         }
     }
 }

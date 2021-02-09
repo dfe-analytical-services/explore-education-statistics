@@ -125,6 +125,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Validators
         CannotRemoveDataFilesUntilImportComplete,
         CannotRemoveDataFilesOnceReleaseApproved,
         FileTypeMustBeData,
+        DataFileImportsMigrationAlreadyRun,
 
         // Data zip file
         DataFileMustBeZipFile,
@@ -160,6 +161,6 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Validators
         NoDataFiles,
         NoFootnotesOnSubjects,
         NoTableHighlights,
-        NoPublicPreReleaseAccessList,
+        NoPublicPreReleaseAccessList
     }
 }

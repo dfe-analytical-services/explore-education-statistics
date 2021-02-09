@@ -7,7 +7,6 @@ using GovUk.Education.ExploreEducationStatistics.Admin.Services.Interfaces;
 using GovUk.Education.ExploreEducationStatistics.Admin.Services.Interfaces.Security;
 using GovUk.Education.ExploreEducationStatistics.Admin.ViewModels;
 using GovUk.Education.ExploreEducationStatistics.Common.Model;
-using GovUk.Education.ExploreEducationStatistics.Common.Services;
 using GovUk.Education.ExploreEducationStatistics.Common.Services.Interfaces;
 using GovUk.Education.ExploreEducationStatistics.Common.Services.Interfaces.Security;
 using GovUk.Education.ExploreEducationStatistics.Common.Utils;
@@ -21,7 +20,6 @@ using Microsoft.EntityFrameworkCore;
 using Newtonsoft.Json;
 using static GovUk.Education.ExploreEducationStatistics.Admin.Validators.ValidationErrorMessages;
 using static GovUk.Education.ExploreEducationStatistics.Admin.Validators.ValidationUtils;
-using static GovUk.Education.ExploreEducationStatistics.Common.TableStorageTableNames;
 using IReleaseService = GovUk.Education.ExploreEducationStatistics.Admin.Services.Interfaces.IReleaseService;
 using Publication = GovUk.Education.ExploreEducationStatistics.Content.Model.Publication;
 using Release = GovUk.Education.ExploreEducationStatistics.Content.Model.Release;
@@ -38,11 +36,11 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Services
         private readonly IPersistenceHelper<ContentDbContext> _persistenceHelper;
         private readonly IUserService _userService;
         private readonly IReleaseRepository _repository;
+        private readonly IReleaseFileRepository _releaseFileRepository;
         private readonly ISubjectService _subjectService;
-        private readonly ITableStorageService _coreTableStorageService;
         private readonly IReleaseDataFileService _releaseDataFileService;
         private readonly IReleaseFileService _releaseFileService;
-        private readonly IImportStatusService _importStatusService;
+        private readonly IDataImportService _dataImportService;
 	    private readonly IFootnoteService _footnoteService;
         private readonly IDataBlockService _dataBlockService;
         private readonly IReleaseChecklistService _releaseChecklistService;
@@ -58,11 +56,11 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Services
             IPersistenceHelper<ContentDbContext> persistenceHelper,
             IUserService userService,
             IReleaseRepository repository,
+            IReleaseFileRepository releaseFileRepository,
             ISubjectService subjectService,
-            ITableStorageService coreTableStorageService,
             IReleaseDataFileService releaseDataFileService,
             IReleaseFileService releaseFileService,
-            IImportStatusService importStatusService,
+            IDataImportService dataImportService,
             IFootnoteService footnoteService,
             StatisticsDbContext statisticsDbContext,
             IDataBlockService dataBlockService,
@@ -76,11 +74,11 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Services
             _persistenceHelper = persistenceHelper;
             _userService = userService;
             _repository = repository;
+            _releaseFileRepository = releaseFileRepository;
             _subjectService = subjectService;
-            _coreTableStorageService = coreTableStorageService;
             _releaseDataFileService = releaseDataFileService;
             _releaseFileService = releaseFileService;
-            _importStatusService = importStatusService;
+            _dataImportService = dataImportService;
             _footnoteService = footnoteService;
             _statisticsDbContext = statisticsDbContext;
             _dataBlockService = dataBlockService;
@@ -445,7 +443,6 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Services
                     {
                         ReleaseId = releaseId,
                         SubjectId = subject?.Id ?? Guid.Empty,
-                        TableStorageItem = new DatafileImport(releaseId.ToString(), file.Filename),
                         DeleteDataBlockPlan = await _dataBlockService.GetDeletePlan(releaseId, subject),
                         FootnoteIds = footnotes.Select(footnote => footnote.Id).ToList()
                     };
@@ -477,42 +474,26 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Services
                             await _releaseSubjectService.SoftDeleteReleaseSubject(releaseId,
                                 deletePlan.SubjectId);
 
-                            return await _releaseDataFileService
-                                .Delete(releaseId, fileId)
-                                .OnSuccessVoid(async () => await RemoveFileImportEntryIfOrphaned(deletePlan));
+                            return await _releaseDataFileService.Delete(releaseId, fileId);
                         });
                 });
         }
 
-        private async Task RemoveFileImportEntryIfOrphaned(DeleteDataFilePlan deletePlan)
-        {
-            if (await _subjectService.Get(deletePlan.SubjectId) == null)
-            {
-                await _coreTableStorageService.DeleteEntityAsync(DatafileImportsTableName, deletePlan.TableStorageItem);
-            }
-        }
-
-        public async Task<Either<ActionResult, ImportStatus>> GetDataFileImportStatus(Guid releaseId, string dataFileName)
+        public async Task<Either<ActionResult, DataImportViewModel>> GetDataFileImportStatus(Guid releaseId, Guid fileId)
         {
             return await _persistenceHelper
                 .CheckEntityExists<Release>(releaseId)
                 .OnSuccess(_userService.CheckCanViewRelease)
                 .OnSuccess(async _ =>
                 {
-                    var fileLink = _context
-                            .ReleaseFiles
-                            .Include(f => f.File)
-                            .FirstOrDefault(f => f.ReleaseId == releaseId && f.File.Filename == dataFileName);
-
-                    if (fileLink == null)
+                    // Ensure file is linked to the Release by getting the ReleaseFile first
+                    var releaseFile = await _releaseFileRepository.Get(releaseId, fileId);
+                    if (releaseFile == null || releaseFile.File.Type != FileType.Data)
                     {
-                        return new ImportStatus
-                        {
-                            Status = IStatus.NOT_FOUND
-                        };
+                        return DataImportViewModel.NotFound();
                     }
 
-                    return await _importStatusService.GetImportStatus(fileLink.File.ReleaseId, dataFileName);
+                    return await _dataImportService.GetImport(fileId);
                 });
         }
 
@@ -524,10 +505,9 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Services
 
         private async Task<Either<ActionResult, Unit>> CheckCanDeleteDataFiles(Guid releaseId, File file)
         {
-            var importFinished = await _importStatusService.IsImportFinished(file.ReleaseId,
-                file.Filename);
+            var importStatus = await _dataImportService.GetStatus(file.Id);
 
-            if (!importFinished)
+            if (!importStatus.IsFinished())
             {
                 return ValidationActionResult(CannotRemoveDataFilesUntilImportComplete);
             }
@@ -576,9 +556,6 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Services
 
         [JsonIgnore]
         public Guid SubjectId { get; set; }
-
-        [JsonIgnore]
-        public DatafileImport TableStorageItem { get; set; }
 
         public DeleteDataBlockPlan DeleteDataBlockPlan { get; set; }
 

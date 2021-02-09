@@ -120,7 +120,7 @@ const ReleaseDataUploadsSection = ({
   ) => {
     const permissions = await permissionService.getDataFilePermissions(
       releaseId,
-      dataFile.fileName,
+      dataFile.id,
     );
 
     setDataFiles(
@@ -389,7 +389,7 @@ const ReleaseDataUploadsSection = ({
             try {
               await releaseDataFileService.cancelImport(
                 releaseId,
-                cancelDataFile.fileName,
+                cancelDataFile.id,
               );
 
               setCancelDataFile(undefined);

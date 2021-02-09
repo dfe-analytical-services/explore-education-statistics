@@ -1,9 +1,8 @@
 ﻿using System.Threading.Tasks;
-using GovUk.Education.ExploreEducationStatistics.Admin.Models;
-using GovUk.Education.ExploreEducationStatistics.Common.Model;
-using GovUk.Education.ExploreEducationStatistics.Common.Services.Interfaces;
+using GovUk.Education.ExploreEducationStatistics.Admin.Services.Interfaces;
 using GovUk.Education.ExploreEducationStatistics.Content.Model;
 using Microsoft.AspNetCore.Authorization;
+using static GovUk.Education.ExploreEducationStatistics.Admin.Security.SecurityClaimTypes;
 
 namespace GovUk.Education.ExploreEducationStatistics.Admin.Security.AuthorizationHandlers
 {
@@ -12,27 +11,27 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Security.Authorizatio
     }
 
     public class CancelSpecificFileImportAuthorizationHandler 
-        : AuthorizationHandler<CancelSpecificFileImportRequirement, ReleaseFileImportInfo>
+        : AuthorizationHandler<CancelSpecificFileImportRequirement, File>
     {
-        private readonly IImportStatusService _importStatusService;
+        private readonly IDataImportRepository _dataImportRepository;
 
-        public CancelSpecificFileImportAuthorizationHandler(IImportStatusService importStatusService)
+        public CancelSpecificFileImportAuthorizationHandler(IDataImportRepository dataImportRepository)
         {
-            _importStatusService = importStatusService;
+            _dataImportRepository = dataImportRepository;
         }
 
         protected override async Task HandleRequirementAsync(AuthorizationHandlerContext ctx,
             CancelSpecificFileImportRequirement requirement,
-            ReleaseFileImportInfo import)
+            File file)
         {
-            var status = await _importStatusService.GetImportStatus(import.ReleaseId, import.DataFileName);
+            var status = await _dataImportRepository.GetStatusByFileId(file.Id);
             
             if (status.IsFinishedOrAborting())
             {
                 return;
             }
-
-            if (SecurityUtils.HasClaim(ctx.User, SecurityClaimTypes.CancelAllFileImports))
+            
+            if (SecurityUtils.HasClaim(ctx.User, CancelAllFileImports))
             {
                 ctx.Succeed(requirement);
             }

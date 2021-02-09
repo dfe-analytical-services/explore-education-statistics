@@ -1,19 +1,19 @@
 ﻿using System;
-using AutoMapper;
 using Azure.Storage.Blobs;
+using GovUk.Education.ExploreEducationStatistics.Common.Functions;
 using GovUk.Education.ExploreEducationStatistics.Common.Services;
 using GovUk.Education.ExploreEducationStatistics.Common.Services.Interfaces;
-using GovUk.Education.ExploreEducationStatistics.Data.Importer.Services;
-using GovUk.Education.ExploreEducationStatistics.Data.Importer.Services.Interfaces;
+using GovUk.Education.ExploreEducationStatistics.Content.Model.Database;
 using GovUk.Education.ExploreEducationStatistics.Data.Processor;
+using GovUk.Education.ExploreEducationStatistics.Data.Processor.Model;
 using GovUk.Education.ExploreEducationStatistics.Data.Processor.Services;
 using GovUk.Education.ExploreEducationStatistics.Data.Processor.Services.Interfaces;
 using Microsoft.Azure.Functions.Extensions.DependencyInjection;
+using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Logging;
-using FileStorageService = GovUk.Education.ExploreEducationStatistics.Data.Processor.Services.FileStorageService;
-using IFileStorageService = GovUk.Education.ExploreEducationStatistics.Data.Processor.Services.Interfaces.IFileStorageService;
+using static GovUk.Education.ExploreEducationStatistics.Data.Processor.Model.ImporterQueues;
 
 [assembly: FunctionsStartup(typeof(Startup))]
 
@@ -24,7 +24,8 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Processor
         public override void Configure(IFunctionsHostBuilder builder)
         {
             var serviceProvider = builder.Services
-                .AddAutoMapper(typeof(Startup).Assembly)
+                .AddDbContext<ContentDbContext>(options =>
+                    options.UseSqlServer(ConnectionUtils.GetAzureSqlConnectionString("ContentDb")))
                 .AddSingleton<IBlobStorageService, BlobStorageService>(
                     provider =>
                     {
@@ -37,7 +38,8 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Processor
                         );
                         return blobStorageService;
                     })
-                .AddSingleton<IFileStorageService, FileStorageService>()
+                .AddSingleton<IStorageQueueService, StorageQueueService>(provider =>
+                    new StorageQueueService(GetConfigurationValue(provider, "CoreStorage")))
                 .AddTransient<IFileImportService, FileImportService>()
                 .AddTransient<IImporterService, ImporterService>()
                 .AddTransient<ISplitFileService, SplitFileService>()
@@ -45,18 +47,25 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Processor
                 .AddTransient<ImporterLocationService>()
                 .AddTransient<IImporterMetaService, ImporterMetaService>()
                 .AddTransient<ImporterMemoryCache>()
-                .AddTransient<ITableStorageService, TableStorageService>(provider =>
-                    new TableStorageService(GetConfigurationValue(provider, "CoreStorage")))
                 .AddTransient<IBatchService, BatchService>()
-                .AddTransient<IImportStatusService, ImportStatusService>()
-                .AddSingleton<IValidatorService, ValidatorService>()
+                .AddTransient<IDataImportService, DataImportService>()
+                .AddTransient<IValidatorService, ValidatorService>()
                 .AddSingleton<IDataArchiveService, DataArchiveService>()
                 .AddSingleton<IFileTypeService, FileTypeService>()
                 .AddSingleton<IGuidGenerator, SequentialGuidGenerator>()
                 .AddTransient<IProcessorService, ProcessorService>()
                 .BuildServiceProvider();
 
-            ImportRecoveryHandler.CheckIncompleteImports(GetConfigurationValue(serviceProvider, "CoreStorage"));
+            HandleRestart(serviceProvider.GetRequiredService<IStorageQueueService>());
+        }
+
+        private static void HandleRestart(IStorageQueueService storageQueueService)
+        {
+            storageQueueService.Clear(ImportsAvailableQueue).Wait();
+            storageQueueService.Clear(ImportsPendingQueue).Wait();
+            storageQueueService.Clear(RestartImportsQueue).Wait();
+
+            storageQueueService.AddMessage(RestartImportsQueue, new RestartImportsMessage());
         }
 
         private static string GetConfigurationValue(IServiceProvider provider, string key)

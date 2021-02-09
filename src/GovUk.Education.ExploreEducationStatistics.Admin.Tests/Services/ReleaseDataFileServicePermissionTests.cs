@@ -169,8 +169,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
             IFileRepository fileRepository = null,
             IReleaseRepository releaseRepository = null,
             IReleaseFileRepository releaseFileRepository = null,
-            IImportService importService = null,
-            IImportStatusService importStatusService = null,
+            IDataImportService dataImportService = null,
             IUserService userService = null)
         {
             return new ReleaseDataFileService(
@@ -183,8 +182,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
                 fileRepository ?? new FileRepository(contentDbContext),
                 releaseRepository ?? new ReleaseRepository(contentDbContext, statisticsDbContext, Common.Services.MapperUtils.MapperForProfile<MappingProfiles>()),
                 releaseFileRepository ?? new ReleaseFileRepository(contentDbContext),
-                importService ?? new Mock<IImportService>().Object,
-                importStatusService ?? new Mock<IImportStatusService>().Object,
+                dataImportService ?? new Mock<IDataImportService>().Object,
                 userService ?? new Mock<IUserService>().Object
             );
         }

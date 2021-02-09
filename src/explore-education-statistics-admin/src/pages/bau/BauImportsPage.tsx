@@ -28,11 +28,13 @@ const BauImportsPage = () => {
               {/* <th scope="col" className="govuk-table__header">
               Subject title
             </th> */}
-              <th scope="col">Subject ID</th>
-              <th scope="col">Data file name</th>
-              <th scope="col">Data file rows</th>
               <th scope="col">Status</th>
-              <th scope="col">Stage percentage complete</th>
+              <th scope="col">Subject Id</th>
+              <th scope="col">Data filename</th>
+              <th scope="col">Rows</th>
+              <th scope="col">Batches</th>
+              <th scope="col">Stage complete</th>
+              <th scope="col">Overall complete</th>
               <th scope="col">Go to release data files</th>
             </tr>
           </thead>
@@ -44,11 +46,13 @@ const BauImportsPage = () => {
                   {/* <th scope="row" className="govuk-table__header">
                     {subject.subjectTitle}
                   </th> */}
+                  <td>{subject.status}</td>
                   <td>{subject.subjectId}</td>
                   <td>{subject.dataFileName}</td>
-                  <td>{subject.numberOfRows}</td>
-                  <td>{subject.status}</td>
-                  <td>{subject.stagePercentageComplete}</td>
+                  <td>{subject.rows}</td>
+                  <td>{subject.batches}</td>
+                  <td>{subject.stagePercentageComplete}%</td>
+                  <td>{subject.percentageComplete}%</td>
                   <td>
                     <Link
                       to={`/publication/${subject.publicationId}/release/${subject.releaseId}/data`}

@@ -87,8 +87,7 @@ describe('ReleaseDataFilePage', () => {
     releaseDataFileService.getDataFileImportStatus.mockResolvedValue({
       status: 'COMPLETE',
       percentageComplete: 100,
-      phasePercentageComplete: 100,
-      phaseComplete: true,
+      stagePercentageComplete: 100,
       numberOfRows: 100,
     });
 
@@ -134,8 +133,7 @@ describe('ReleaseDataFilePage', () => {
     releaseDataFileService.getDataFileImportStatus.mockResolvedValue({
       status: 'COMPLETE',
       percentageComplete: 100,
-      phasePercentageComplete: 100,
-      phaseComplete: true,
+      stagePercentageComplete: 100,
       numberOfRows: 100,
     });
     dataReplacementService.getReplacementPlan.mockResolvedValue(
@@ -183,8 +181,7 @@ describe('ReleaseDataFilePage', () => {
     releaseDataFileService.getDataFileImportStatus.mockResolvedValue({
       status: 'COMPLETE',
       percentageComplete: 100,
-      phasePercentageComplete: 100,
-      phaseComplete: true,
+      stagePercentageComplete: 100,
       numberOfRows: 100,
     });
     dataReplacementService.getReplacementPlan.mockResolvedValue(
@@ -268,8 +265,7 @@ describe('ReleaseDataFilePage', () => {
     releaseDataFileService.getDataFileImportStatus.mockResolvedValue({
       status: 'COMPLETE',
       percentageComplete: 100,
-      phasePercentageComplete: 100,
-      phaseComplete: true,
+      stagePercentageComplete: 100,
       numberOfRows: 100,
     });
 
@@ -339,8 +335,7 @@ describe('ReleaseDataFilePage', () => {
     releaseDataFileService.getDataFileImportStatus.mockResolvedValue({
       status: 'COMPLETE',
       percentageComplete: 100,
-      phasePercentageComplete: 100,
-      phaseComplete: true,
+      stagePercentageComplete: 100,
       numberOfRows: 100,
     });
     dataReplacementService.getReplacementPlan.mockResolvedValue(
@@ -391,15 +386,13 @@ describe('ReleaseDataFilePage', () => {
     releaseDataFileService.getDataFileImportStatus.mockResolvedValueOnce({
       status: 'COMPLETE',
       percentageComplete: 100,
-      phasePercentageComplete: 100,
-      phaseComplete: true,
+      stagePercentageComplete: 100,
       numberOfRows: 100,
     });
     releaseDataFileService.getDataFileImportStatus.mockResolvedValueOnce({
       status: 'STAGE_1',
       percentageComplete: 10,
-      phasePercentageComplete: 100,
-      phaseComplete: true,
+      stagePercentageComplete: 100,
       numberOfRows: 110,
     });
 
@@ -445,8 +438,7 @@ describe('ReleaseDataFilePage', () => {
     releaseDataFileService.getDataFileImportStatus.mockResolvedValue({
       status: 'COMPLETE',
       percentageComplete: 100,
-      phasePercentageComplete: 100,
-      phaseComplete: true,
+      stagePercentageComplete: 100,
       numberOfRows: 100,
     });
     dataReplacementService.getReplacementPlan.mockRejectedValue(
@@ -564,8 +556,7 @@ describe('ReleaseDataFilePage', () => {
     releaseDataFileService.getDataFileImportStatus.mockResolvedValue({
       status: 'FAILED',
       percentageComplete: 0,
-      phasePercentageComplete: 0,
-      phaseComplete: false,
+      stagePercentageComplete: 0,
       numberOfRows: 0,
     });
 

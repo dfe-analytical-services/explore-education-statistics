@@ -1,117 +1,98 @@
+using System;
 using System.Threading.Tasks;
 using GovUk.Education.ExploreEducationStatistics.Common.Model;
-using GovUk.Education.ExploreEducationStatistics.Data.Importer.Services.Interfaces;
-using GovUk.Education.ExploreEducationStatistics.Data.Importer.Utils;
+using GovUk.Education.ExploreEducationStatistics.Common.Services.Interfaces;
+using GovUk.Education.ExploreEducationStatistics.Content.Model.Extensions;
 using GovUk.Education.ExploreEducationStatistics.Data.Processor.Model;
-using GovUk.Education.ExploreEducationStatistics.Data.Processor.Models;
 using GovUk.Education.ExploreEducationStatistics.Data.Processor.Services.Interfaces;
 using GovUk.Education.ExploreEducationStatistics.Data.Processor.Utils;
 using Microsoft.Azure.WebJobs;
 using Microsoft.Extensions.Logging;
-using static GovUk.Education.ExploreEducationStatistics.Common.Services.FileStoragePathUtils;
+using static GovUk.Education.ExploreEducationStatistics.Common.BlobContainerNames;
 
 namespace GovUk.Education.ExploreEducationStatistics.Data.Processor.Services
 {
     public class ProcessorService : IProcessorService
     {
         private readonly ILogger<ProcessorService> _logger;
-        private readonly IBatchService _batchService;
+        private readonly IBlobStorageService _blobStorageService;
         private readonly IFileImportService _fileImportService;
-        private readonly IFileStorageService _fileStorageService;
         private readonly IImporterService _importerService;
+        private readonly IDataImportService _dataImportService;
         private readonly ISplitFileService _splitFileService;
         private readonly IValidatorService _validatorService;
         private readonly IDataArchiveService _dataArchiveService;
 
         public ProcessorService(
             ILogger<ProcessorService> logger,
+            IBlobStorageService blobStorageService,
             IFileImportService fileImportService,
-            IFileStorageService fileStorageService,
             ISplitFileService splitFileService,
             IImporterService importerService,
-            IBatchService batchService,
+            IDataImportService dataImportService,
             IValidatorService validatorService,
             IDataArchiveService dataArchiveService)
         {
             _logger = logger;
+            _blobStorageService = blobStorageService;
             _fileImportService = fileImportService;
-            _fileStorageService = fileStorageService;
             _splitFileService = splitFileService;
             _importerService = importerService;
-            _batchService = batchService;
+            _dataImportService = dataImportService;
             _validatorService = validatorService;
             _dataArchiveService = dataArchiveService;
         }
 
-        public async Task ProcessUnpackingArchive(ImportMessage message)
+        public async Task ProcessUnpackingArchive(Guid importId)
         {
-            await _dataArchiveService.ExtractDataFiles(message.Release.Id, message.ArchiveFileName);
+            var import = await _dataImportService.GetImport(importId);
+            await _dataArchiveService.ExtractDataFiles(import.ZipFile);
         }
 
-        public async Task ProcessStage1(ImportMessage message, ExecutionContext executionContext)
+        public async Task ProcessStage1(Guid importId, ExecutionContext executionContext)
         {
-            var subjectData = await GetSubjectDataFromMainDataFile(message);
-
-            await _validatorService.Validate(subjectData, executionContext, message)
+            await _validatorService.Validate(importId, executionContext)
                 .OnSuccessDo(async result =>
                 {
-                    message.RowsPerBatch = result.RowsPerBatch;
-                    message.TotalRows = result.FilteredObservationCount;
-                    message.NumBatches = result.NumBatches;
-                    await _batchService.UpdateStoredMessage(message);
+                    await _dataImportService.Update(importId, 
+                        rowsPerBatch: result.RowsPerBatch,
+                        totalRows: result.FilteredObservationCount,
+                        numBatches: result.NumBatches);
                 })
                 .OnFailureDo(async errors =>
                 {
-                    await _batchService.FailImport(message.Release.Id,
-                        message.DataFileName,
-                        errors);
+                    await _dataImportService.FailImport(importId, errors);
 
-                    _logger.LogError($"Import FAILED for {message.DataFileName}...check log");
+                    _logger.LogError($"Import {importId} FAILED ...check log");
                 });
         }
 
-        public async Task ProcessStage2(ImportMessage message)
-        {
-            var subjectData = await GetSubjectDataFromMainDataFile(message);
-
-            await ProcessSubject(message, subjectData);
-
-        }
-
-        public async Task ProcessStage3(ImportMessage message)
-        {
-            var subjectData = await GetSubjectDataFromMainDataFile(message);
-
-            await _splitFileService.SplitDataFile(message, subjectData);
-        }
-
-        public async Task ProcessStage4Messages(ImportMessage message, ICollector<ImportObservationsMessage> collector)
-        {
-            await _splitFileService.AddBatchDataFileMessages(collector, message);
-        }
-        
-        private async Task ProcessSubject(
-            ImportMessage message,
-            SubjectData subjectData)
+        public async Task ProcessStage2(Guid importId)
         {
             var statisticsDbContext = DbUtils.CreateStatisticsDbContext();
 
-            var subject = await statisticsDbContext.Subject.FindAsync(message.SubjectId);
+            var import = await _dataImportService.GetImport(importId);
 
-            await using var metaFileStream = await _fileStorageService.StreamBlob(subjectData.MetaBlob);
+            var subject = await statisticsDbContext.Subject.FindAsync(import.SubjectId);
+
+            var metaFileStream = await _blobStorageService.StreamBlob(PrivateFilesContainerName, import.MetaFile.Path());
             var metaFileTable = DataTableUtils.CreateFromStream(metaFileStream);
 
             _importerService.ImportMeta(metaFileTable, subject, statisticsDbContext);
             await statisticsDbContext.SaveChangesAsync();
 
-            await _fileImportService.ImportFiltersAndLocations(message, statisticsDbContext);
+            await _fileImportService.ImportFiltersAndLocations(import.Id, statisticsDbContext);
             await statisticsDbContext.SaveChangesAsync();
         }
 
-        private async Task<SubjectData> GetSubjectDataFromMainDataFile(ImportMessage message)
+        public async Task ProcessStage3(Guid importId)
         {
-            var dataFileBlobPath = AdminReleasePath(message.Release.Id, FileType.Data, message.DataFileName);
-            return await _fileStorageService.GetSubjectData(message.Release.Id, dataFileBlobPath);
+            await _splitFileService.SplitDataFile(importId);
+        }
+
+        public async Task ProcessStage4Messages(Guid importId, ICollector<ImportObservationsMessage> collector)
+        {
+            await _splitFileService.AddBatchDataFileMessages(importId, collector);
         }
     }
 }

@@ -12,24 +12,26 @@ using GovUk.Education.ExploreEducationStatistics.Common.Model;
 using GovUk.Education.ExploreEducationStatistics.Common.Model.Data;
 using GovUk.Education.ExploreEducationStatistics.Common.Services;
 using GovUk.Education.ExploreEducationStatistics.Common.Services.Interfaces;
-using GovUk.Education.ExploreEducationStatistics.Data.Importer.Exceptions;
-using GovUk.Education.ExploreEducationStatistics.Data.Importer.Services;
+using GovUk.Education.ExploreEducationStatistics.Content.Model;
+using GovUk.Education.ExploreEducationStatistics.Content.Model.Extensions;
+using GovUk.Education.ExploreEducationStatistics.Data.Processor.Exceptions;
 using GovUk.Education.ExploreEducationStatistics.Data.Processor.Extensions;
 using GovUk.Education.ExploreEducationStatistics.Data.Processor.Model;
-using GovUk.Education.ExploreEducationStatistics.Data.Processor.Models;
 using GovUk.Education.ExploreEducationStatistics.Data.Processor.Services.Interfaces;
 using GovUk.Education.ExploreEducationStatistics.Data.Processor.Utils;
 using Microsoft.Azure.WebJobs;
 using Microsoft.Extensions.Logging;
+using static GovUk.Education.ExploreEducationStatistics.Common.BlobContainerNames;
 using static GovUk.Education.ExploreEducationStatistics.Common.Services.FileStoragePathUtils;
 
 namespace GovUk.Education.ExploreEducationStatistics.Data.Processor.Services
 {
     public class SplitFileService : ISplitFileService
     {
-        private readonly IFileStorageService _fileStorageService;
+        private readonly IBatchService _batchService;
+        private readonly IBlobStorageService _blobStorageService;
         private readonly ILogger<ISplitFileService> _logger;
-        private readonly IImportStatusService _importStatusService;
+        private readonly IDataImportService _dataImportService;
 
         private static readonly List<GeographicLevel> IgnoredGeographicLevels = new List<GeographicLevel>
         {
@@ -40,64 +42,57 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Processor.Services
         };
 
         public SplitFileService(
-            IFileStorageService fileStorageService,
+            IBatchService batchService,
+            IBlobStorageService blobStorageService,
             ILogger<ISplitFileService> logger,
-            IImportStatusService importStatusService
+            IDataImportService dataImportService
             )
         {
-            _fileStorageService = fileStorageService;
+            _batchService = batchService;
+            _blobStorageService = blobStorageService;
             _logger = logger;
-            _importStatusService = importStatusService;
+            _dataImportService = dataImportService;
         }
 
-        public async Task SplitDataFile(
-            ImportMessage message,
-            SubjectData subjectData)
+        public async Task SplitDataFile(Guid importId)
         {
-            await using var dataFileStream = await _fileStorageService.StreamBlob(subjectData.DataBlob);
-            
+            var import = await _dataImportService.GetImport(importId);
+            var dataFileStream = await _blobStorageService.StreamBlob(PrivateFilesContainerName, import.File.Path());
+
             var dataFileTable = DataTableUtils.CreateFromStream(dataFileStream);
 
-            if (dataFileTable.Rows.Count > message.RowsPerBatch)
+            if (dataFileTable.Rows.Count > import.RowsPerBatch)
             {
-                _logger.LogInformation($"Splitting Datafile: {message.DataFileName}");
-                await SplitFiles(message, subjectData, dataFileTable);
-                _logger.LogInformation($"Split of Datafile: {message.DataFileName} complete");
+                _logger.LogInformation($"Splitting Datafile: {import.File.Filename}");
+                await SplitFiles(import, dataFileTable);
+                _logger.LogInformation($"Split of Datafile: {import.File.Filename} complete");
             }
             else
             {
-                _logger.LogInformation($"No splitting of datafile: {message.DataFileName} was necessary");
+                _logger.LogInformation($"No splitting of datafile: {import.File.Filename} was necessary");
             }
         }
 
         public async Task AddBatchDataFileMessages(
-            ICollector<ImportObservationsMessage> collector, 
-            ImportMessage message)
+            Guid importId,
+            ICollector<ImportObservationsMessage> collector)
         {
-            var batchFilesForDataFile = await _fileStorageService.GetBatchFilesForDataFile(
-                message.Release.Id, 
-                message.DataFileName);
+            var import = await _dataImportService.GetImport(importId);
+
+            var batchFilesForDataFile = await _batchService.GetBatchFilesForDataFile(import.FileId);
 
             // If no batching was necessary, simply add a message to process the lone data file
             if (!batchFilesForDataFile.Any())
             {
-                var observationsFilePath = 
-                    AdminReleasePath(message.Release.Id, FileType.Data, message.DataFileName);
-                
                 collector.Add(new ImportObservationsMessage
                 {
-                    ReleaseId = message.Release.Id,
-                    SubjectId = message.SubjectId,
-                    DataFileName = message.DataFileName,
-                    ObservationsFilePath = observationsFilePath,
+                    Id = import.Id,
                     BatchNo = 1,
-                    NumBatches = 1,
-                    TotalRows = message.TotalRows,
-                    RowsPerBatch = message.RowsPerBatch
+                    ObservationsFilePath = import.File.Path()
                 });
                 return;
             }
-            
+
             // Otherwise create a message per batch file to process
             var importBatchFileMessages = batchFilesForDataFile.Select(blobInfo =>
             {
@@ -107,17 +102,12 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Processor.Services
                 
                 return new ImportObservationsMessage
                 {
-                    ReleaseId = message.Release.Id,
-                    SubjectId = message.SubjectId,
-                    ObservationsFilePath = batchFilePath,
-                    DataFileName = message.DataFileName,
+                    Id = import.Id,
                     BatchNo = batchNo,
-                    NumBatches = message.NumBatches,
-                    RowsPerBatch = message.RowsPerBatch,
-                    TotalRows = message.TotalRows
+                    ObservationsFilePath = batchFilePath
                 };
             });
-            
+
             foreach (var importMessage in importBatchFileMessages)
             {
                 collector.Add(importMessage);
@@ -125,19 +115,16 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Processor.Services
         }
 
         private async Task SplitFiles(
-            ImportMessage message,
-            SubjectData subjectData,
+            DataImport dataImport,
             DataTable dataFileTable)
         {
             var headerList = CsvUtil.GetColumnValues(dataFileTable.Columns);
-            var batches = dataFileTable.Rows.OfType<DataRow>().Batch(message.RowsPerBatch);
+            var batches = dataFileTable.Rows.OfType<DataRow>().Batch(dataImport.RowsPerBatch);
             var batchCount = 1;
             var numRows = dataFileTable.Rows.Count + 1;
-            var numBatches = (int)Math.Ceiling((double)dataFileTable.Rows.Count / message.RowsPerBatch);
+            var numBatches = (int)Math.Ceiling((double)dataFileTable.Rows.Count / dataImport.RowsPerBatch);
 
-            var existingBatchFiles = await _fileStorageService.GetBatchFilesForDataFile(
-                message.Release.Id, 
-                message.DataFileName);
+            var existingBatchFiles = await _batchService.GetBatchFilesForDataFile(dataImport.FileId);
 
             var existingBatchFileNumbers = existingBatchFiles
                 .AsQueryable()
@@ -148,19 +135,19 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Processor.Services
             // EES-1608 will investigate what the circumstances are that could lead to a "no rows" batch file
             // situation, and whether this check can actually be entirely removed or not.
             var batchFilesExist = existingBatchFileNumbers.Any();
-            
+
             foreach (var batch in batches)
             {
-                var currentStatus = await _importStatusService.GetImportStatus(message.Release.Id, message.DataFileName);
+                var currentStatus = await _dataImportService.GetImportStatus(dataImport.Id);
 
                 if (currentStatus.IsFinishedOrAborting())
                 {
-                    _logger.LogInformation($"Import for {message.DataFileName} is finished or aborting - " +
-                                           $"stopping creating batch files");
+                    _logger.LogInformation(
+                        $"Import for {dataImport.File.Filename} is finished or aborting - stopping creating batch files");
                     return;
                 }
-                
-                var batchFileName = $"{message.DataFileName}_{batchCount:000000}";
+
+                var batchFileName = $"{dataImport.File.Filename}_{batchCount:000000}";
 
                 if (existingBatchFileNumbers.Contains(batchCount))
                 {
@@ -168,7 +155,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Processor.Services
                     batchCount++;
                     continue;    
                 }
-                
+
                 var batchFilePath = $"{BatchesDir}/{batchFileName}";
 
                 await using var stream = new MemoryStream();
@@ -181,12 +168,9 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Processor.Services
 
                 var percentageComplete = (double) batchCount / numBatches * 100;
 
-                await _importStatusService.UpdateStatus(message.Release.Id,
-                    message.DataFileName,
-                    IStatus.STAGE_3,
-                    percentageComplete);
+                await _dataImportService.UpdateStatus(dataImport.Id, DataImportStatus.STAGE_3, percentageComplete);
 
-                // If no lines then don't create a batch or message unless it's the last one & there are zero
+                // If no lines then don't create a batch unless it's the last one & there are zero
                 // lines in total in which case create a zero lines batch
                 if (table.Rows.Count == 0 && (batchCount != numBatches || batchFilesExist))
                 {
@@ -200,18 +184,22 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Processor.Services
 
                 stream.Seek(0, SeekOrigin.Begin);
 
-                await _fileStorageService.UploadStream(
-                    message.Release.Id,
-                    fileType: FileType.Data,
-                    fileName: batchFilePath,
+                var dataBlob = await _blobStorageService.GetBlob(PrivateFilesContainerName, dataImport.File.Path());
+
+                await _blobStorageService.UploadStream(
+                    containerName: PrivateFilesContainerName,
+                    path: AdminReleasePath(dataImport.File.ReleaseId, FileType.Data, batchFilePath),
                     stream: stream,
                     contentType: "text/csv",
-                    FileStorageUtils.GetDataFileMetaValues(
-                        name: subjectData.DataBlob.Name,
-                        metaFileName: subjectData.DataBlob.GetMetaFileName(),
-                        userName: subjectData.DataBlob.GetUserName(),
-                        numberOfRows: numRows
-                    )
+                    options: new IBlobStorageService.UploadStreamOptions
+                    {
+                        MetaValues = FileStorageUtils.GetDataFileMetaValues(
+                            name: dataBlob.Name,
+                            metaFileName: dataImport.MetaFile.Filename,
+                            userName: dataBlob.GetUserName(),
+                            numberOfRows: numRows
+                        )
+                    }
                 );
 
                 batchFilesExist = true;
