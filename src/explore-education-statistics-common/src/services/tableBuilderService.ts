@@ -182,7 +182,7 @@ export interface TableDataResponse {
 
 const tableBuilderService = {
   getThemes(): Promise<ThemeMeta[]> {
-    return dataApi.get(`/meta/themes`);
+    return dataApi.get('/themes');
   },
   getPublication(publicationId: string): Promise<Publication> {
     return dataApi.get(`/publications/${publicationId}`);

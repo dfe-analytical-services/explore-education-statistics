@@ -55,8 +55,10 @@ using FootnoteService = GovUk.Education.ExploreEducationStatistics.Admin.Service
 using IFootnoteService = GovUk.Education.ExploreEducationStatistics.Admin.Services.Interfaces.IFootnoteService;
 using IPublicationService = GovUk.Education.ExploreEducationStatistics.Admin.Services.Interfaces.IPublicationService;
 using IReleaseService = GovUk.Education.ExploreEducationStatistics.Admin.Services.Interfaces.IReleaseService;
+using IThemeService = GovUk.Education.ExploreEducationStatistics.Admin.Services.Interfaces.IThemeService;
 using PublicationService = GovUk.Education.ExploreEducationStatistics.Admin.Services.PublicationService;
 using ReleaseService = GovUk.Education.ExploreEducationStatistics.Admin.Services.ReleaseService;
+using ThemeService = GovUk.Education.ExploreEducationStatistics.Admin.Services.ThemeService;
 
 namespace GovUk.Education.ExploreEducationStatistics.Admin
 {
@@ -314,7 +316,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin
             );
             services.AddTransient<ITableStorageService, TableStorageService>(s =>
                 new TableStorageService(Configuration.GetValue<string>("CoreStorage")));
-            services.AddTransient<IStorageQueueService, StorageQueueService>(s => 
+            services.AddTransient<IStorageQueueService, StorageQueueService>(s =>
                 new StorageQueueService(Configuration.GetValue<string>("CoreStorage")));
             services.AddSingleton<IGuidGenerator, SequentialGuidGenerator>();
             AddPersistenceHelper<ContentDbContext>(services);
