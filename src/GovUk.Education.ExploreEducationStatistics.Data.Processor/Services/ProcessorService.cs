@@ -18,7 +18,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Processor.Services
         private readonly IBlobStorageService _blobStorageService;
         private readonly IFileImportService _fileImportService;
         private readonly IImporterService _importerService;
-        private readonly IImportService _importService;
+        private readonly IDataImportService _dataImportService;
         private readonly ISplitFileService _splitFileService;
         private readonly IValidatorService _validatorService;
         private readonly IDataArchiveService _dataArchiveService;
@@ -29,7 +29,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Processor.Services
             IFileImportService fileImportService,
             ISplitFileService splitFileService,
             IImporterService importerService,
-            IImportService importService,
+            IDataImportService dataImportService,
             IValidatorService validatorService,
             IDataArchiveService dataArchiveService)
         {
@@ -38,14 +38,14 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Processor.Services
             _fileImportService = fileImportService;
             _splitFileService = splitFileService;
             _importerService = importerService;
-            _importService = importService;
+            _dataImportService = dataImportService;
             _validatorService = validatorService;
             _dataArchiveService = dataArchiveService;
         }
 
         public async Task ProcessUnpackingArchive(Guid importId)
         {
-            var import = await _importService.GetImport(importId);
+            var import = await _dataImportService.GetImport(importId);
             await _dataArchiveService.ExtractDataFiles(import.ZipFile);
         }
 
@@ -54,14 +54,14 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Processor.Services
             await _validatorService.Validate(importId, executionContext)
                 .OnSuccessDo(async result =>
                 {
-                    await _importService.Update(importId, 
+                    await _dataImportService.Update(importId, 
                         rowsPerBatch: result.RowsPerBatch,
                         totalRows: result.FilteredObservationCount,
                         numBatches: result.NumBatches);
                 })
                 .OnFailureDo(async errors =>
                 {
-                    await _importService.FailImport(importId, errors);
+                    await _dataImportService.FailImport(importId, errors);
 
                     _logger.LogError($"Import {importId} FAILED ...check log");
                 });
@@ -71,7 +71,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Processor.Services
         {
             var statisticsDbContext = DbUtils.CreateStatisticsDbContext();
 
-            var import = await _importService.GetImport(importId);
+            var import = await _dataImportService.GetImport(importId);
 
             var subject = await statisticsDbContext.Subject.FindAsync(import.SubjectId);
 

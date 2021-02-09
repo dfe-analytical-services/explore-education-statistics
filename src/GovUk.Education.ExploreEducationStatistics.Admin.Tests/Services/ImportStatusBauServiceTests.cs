@@ -9,7 +9,7 @@ using GovUk.Education.ExploreEducationStatistics.Content.Model.Database;
 using Moq;
 using Xunit;
 using static GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services.DbUtils;
-using static GovUk.Education.ExploreEducationStatistics.Content.Model.ImportStatus;
+using static GovUk.Education.ExploreEducationStatistics.Content.Model.DataImportStatus;
 using static GovUk.Education.ExploreEducationStatistics.Common.Model.TimeIdentifier;
 
 namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
@@ -43,7 +43,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
                 ReleaseName = "2000"
             };
 
-            var import1 = new Import
+            var import1 = new DataImport
             {
                 File = new File
                 {
@@ -59,7 +59,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
                 Created = DateTime.UtcNow.AddHours(-1)
             };
 
-            var import2 = new Import
+            var import2 = new DataImport
             {
                 File = new File
                 {
@@ -75,7 +75,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
                 Created = DateTime.UtcNow
             };
 
-            var import3 = new Import
+            var import3 = new DataImport
             {
                 File = new File
                 {
@@ -95,7 +95,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
             await using (var contentDbContext = InMemoryApplicationDbContext(contextId))
             {
                 await contentDbContext.Releases.AddAsync(release);
-                await contentDbContext.Imports.AddRangeAsync(import1, import2, import3);
+                await contentDbContext.DataImports.AddRangeAsync(import1, import2, import3);
                 await contentDbContext.SaveChangesAsync();
             }
 

@@ -8,9 +8,9 @@ using Microsoft.AspNetCore.Mvc;
 
 namespace GovUk.Education.ExploreEducationStatistics.Admin.Services.Interfaces
 {
-    public interface IImportService
+    public interface IDataImportService
     {
-        Task<ImportStatus> GetStatus(Guid fileId);
+        Task<DataImportStatus> GetStatus(Guid fileId);
 
         Task<Either<ActionResult, Unit>> CancelImport(Guid releaseId, Guid fileId);
 
@@ -18,7 +18,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Services.Interfaces
 
         Task<bool> HasIncompleteImports(Guid releaseId);
 
-        Task<ImportViewModel> GetImport(Guid fileId);
+        Task<DataImportViewModel> GetImport(Guid fileId);
 
         Task Import(Guid subjectId, File dataFile, File metaFile, IFormFile formFile);
 

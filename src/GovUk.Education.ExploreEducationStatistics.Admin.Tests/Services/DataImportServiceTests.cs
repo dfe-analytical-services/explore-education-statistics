@@ -18,7 +18,7 @@ using static GovUk.Education.ExploreEducationStatistics.Data.Processor.Model.Imp
 
 namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
 {
-    public class ImportServiceTests
+    public class DataImportServiceTests
     {
         [Fact]
         public async void CancelImport()
@@ -30,7 +30,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
                 Type = FileType.Data
             };
 
-            var import = new Import
+            var import = new DataImport
             {
                 File = file
             };
@@ -44,7 +44,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
                     Release = release,
                     File = file
                 });
-                await contentDbContext.Imports.AddAsync(import);
+                await contentDbContext.DataImports.AddAsync(import);
                 await contentDbContext.SaveChangesAsync();
             }
 
@@ -63,7 +63,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
 
             await using (var contentDbContext = InMemoryApplicationDbContext(contentDbContextId))
             {
-                var service = BuildImportService(contentDbContext: contentDbContext,
+                var service = BuildDataImportService(contentDbContext: contentDbContext,
                     queueService: queueService.Object,
                     userService: userService.Object);
 
@@ -84,7 +84,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
                 Type = FileType.Data
             };
 
-            var import = new Import
+            var import = new DataImport
             {
                 File = file
             };
@@ -98,7 +98,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
                     Release = release,
                     File = file
                 });
-                await contentDbContext.Imports.AddAsync(import);
+                await contentDbContext.DataImports.AddAsync(import);
                 await contentDbContext.SaveChangesAsync();
             }
 
@@ -112,7 +112,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
 
             await using (var contentDbContext = InMemoryApplicationDbContext(contentDbContextId))
             {
-                var service = BuildImportService(contentDbContext: contentDbContext,
+                var service = BuildDataImportService(contentDbContext: contentDbContext,
                     queueService: queueService.Object,
                     userService: userService.Object);
 
@@ -139,7 +139,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
 
             await using (var contentDbContext = InMemoryApplicationDbContext(contentDbContextId))
             {
-                var service = BuildImportService(contentDbContext: contentDbContext);
+                var service = BuildDataImportService(contentDbContext: contentDbContext);
 
                 var result = await service.HasIncompleteImports(release.Id);
                 Assert.False(result);
@@ -161,16 +161,16 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
                 Type = FileType.Data
             };
 
-            var import1 = new Import
+            var import1 = new DataImport
             {
                 File = file1,
-                Status = ImportStatus.COMPLETE
+                Status = DataImportStatus.COMPLETE
             };
 
-            var import2 = new Import
+            var import2 = new DataImport
             {
                 File = file2,
-                Status = ImportStatus.COMPLETE
+                Status = DataImportStatus.COMPLETE
             };
 
             var contentDbContextId = Guid.NewGuid().ToString();
@@ -188,13 +188,13 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
                         Release = release,
                         File = file2
                     });
-                await contentDbContext.Imports.AddRangeAsync(import1, import2);
+                await contentDbContext.DataImports.AddRangeAsync(import1, import2);
                 await contentDbContext.SaveChangesAsync();
             }
 
             await using (var contentDbContext = InMemoryApplicationDbContext(contentDbContextId))
             {
-                var service = BuildImportService(contentDbContext: contentDbContext);
+                var service = BuildDataImportService(contentDbContext: contentDbContext);
 
                 var result = await service.HasIncompleteImports(release.Id);
                 Assert.False(result);
@@ -216,16 +216,16 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
                 Type = FileType.Data
             };
 
-            var import1 = new Import
+            var import1 = new DataImport
             {
                 File = file1,
-                Status = ImportStatus.COMPLETE
+                Status = DataImportStatus.COMPLETE
             };
 
-            var import2 = new Import
+            var import2 = new DataImport
             {
                 File = file2,
-                Status = ImportStatus.STAGE_1
+                Status = DataImportStatus.STAGE_1
             };
 
             var contentDbContextId = Guid.NewGuid().ToString();
@@ -243,29 +243,29 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
                         Release = release,
                         File = file2
                     });
-                await contentDbContext.Imports.AddRangeAsync(import1, import2);
+                await contentDbContext.DataImports.AddRangeAsync(import1, import2);
                 await contentDbContext.SaveChangesAsync();
             }
 
             await using (var contentDbContext = InMemoryApplicationDbContext(contentDbContextId))
             {
-                var service = BuildImportService(contentDbContext: contentDbContext);
+                var service = BuildDataImportService(contentDbContext: contentDbContext);
 
                 var result = await service.HasIncompleteImports(release.Id);
                 Assert.True(result);
             }
         }
 
-        private static ImportService BuildImportService(
+        private static DataImportService BuildDataImportService(
             ContentDbContext contentDbContext,
-            IImportRepository importRepository = null,
+            IDataImportRepository dataImportRepository = null,
             IReleaseFileRepository releaseFileRepository = null,
             IStorageQueueService queueService = null,
             IUserService userService = null)
         {
-            return new ImportService(
+            return new DataImportService(
                 contentDbContext,
-                importRepository ?? new ImportRepository(contentDbContext),
+                dataImportRepository ?? new DataImportRepository(contentDbContext),
                 releaseFileRepository ?? new ReleaseFileRepository(contentDbContext),
                 queueService ?? new Mock<IStorageQueueService>().Object,
                 userService ?? MockUtils.AlwaysTrueUserService().Object);

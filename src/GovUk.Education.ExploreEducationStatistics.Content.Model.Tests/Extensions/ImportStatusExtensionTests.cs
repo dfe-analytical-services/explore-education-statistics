@@ -2,13 +2,13 @@ using System;
 using System.Collections.Generic;
 using GovUk.Education.ExploreEducationStatistics.Common.Services;
 using Xunit;
-using static GovUk.Education.ExploreEducationStatistics.Content.Model.ImportStatus;
+using static GovUk.Education.ExploreEducationStatistics.Content.Model.DataImportStatus;
 
 namespace GovUk.Education.ExploreEducationStatistics.Content.Model.Tests.Extensions
 {
     public class ImportStatusExtensionTests
     {
-        private static readonly List<ImportStatus> ExpectedFinishedStatuses = new List<ImportStatus>
+        private static readonly List<DataImportStatus> ExpectedFinishedStatuses = new List<DataImportStatus>
         {
             COMPLETE,
             FAILED,
@@ -16,7 +16,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Content.Model.Tests.Extensi
             CANCELLED
         };
 
-        private static readonly List<ImportStatus> ExpectedAbortingStatuses = new List<ImportStatus>
+        private static readonly List<DataImportStatus> ExpectedAbortingStatuses = new List<DataImportStatus>
         {
             CANCELLING
         };
@@ -24,7 +24,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Content.Model.Tests.Extensi
         [Fact]
         public void FinishedAndAbortingStatuses()
         {
-            EnumUtil.GetEnumValues<ImportStatus>().ForEach(importStatus =>
+            EnumUtil.GetEnumValues<DataImportStatus>().ForEach(importStatus =>
             {
                 var expectingToBeFinished = ExpectedFinishedStatuses.Contains(importStatus);
                 var expectingToBeAborting = ExpectedAbortingStatuses.Contains(importStatus);
@@ -44,7 +44,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Content.Model.Tests.Extensi
         [Fact]
         public void NoOtherAbortingFinishStates()
         {
-            EnumUtil.GetEnumValues<ImportStatus>().ForEach(status =>
+            EnumUtil.GetEnumValues<DataImportStatus>().ForEach(status =>
             {
                 if (status != CANCELLING)
                 {

@@ -18,7 +18,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.ViewModels
         public int Rows { get; set; }
         public int Batches { get; set; }
         [JsonConverter(typeof(StringEnumConverter))]
-        public ImportStatus Status { get; set; }
+        public DataImportStatus Status { get; set; }
         public int StagePercentageComplete { get; set; }
         public int PercentageComplete { get; set; }
     }

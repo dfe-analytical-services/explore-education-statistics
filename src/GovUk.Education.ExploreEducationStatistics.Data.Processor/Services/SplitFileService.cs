@@ -31,7 +31,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Processor.Services
         private readonly IBatchService _batchService;
         private readonly IBlobStorageService _blobStorageService;
         private readonly ILogger<ISplitFileService> _logger;
-        private readonly IImportService _importService;
+        private readonly IDataImportService _dataImportService;
 
         private static readonly List<GeographicLevel> IgnoredGeographicLevels = new List<GeographicLevel>
         {
@@ -45,18 +45,18 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Processor.Services
             IBatchService batchService,
             IBlobStorageService blobStorageService,
             ILogger<ISplitFileService> logger,
-            IImportService importService
+            IDataImportService dataImportService
             )
         {
             _batchService = batchService;
             _blobStorageService = blobStorageService;
             _logger = logger;
-            _importService = importService;
+            _dataImportService = dataImportService;
         }
 
         public async Task SplitDataFile(Guid importId)
         {
-            var import = await _importService.GetImport(importId);
+            var import = await _dataImportService.GetImport(importId);
             var dataFileStream = await _blobStorageService.StreamBlob(PrivateFilesContainerName, import.File.Path());
 
             var dataFileTable = DataTableUtils.CreateFromStream(dataFileStream);
@@ -77,7 +77,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Processor.Services
             Guid importId,
             ICollector<ImportObservationsMessage> collector)
         {
-            var import = await _importService.GetImport(importId);
+            var import = await _dataImportService.GetImport(importId);
 
             var batchFilesForDataFile = await _batchService.GetBatchFilesForDataFile(import.FileId);
 
@@ -115,16 +115,16 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Processor.Services
         }
 
         private async Task SplitFiles(
-            Import import,
+            DataImport dataImport,
             DataTable dataFileTable)
         {
             var headerList = CsvUtil.GetColumnValues(dataFileTable.Columns);
-            var batches = dataFileTable.Rows.OfType<DataRow>().Batch(import.RowsPerBatch);
+            var batches = dataFileTable.Rows.OfType<DataRow>().Batch(dataImport.RowsPerBatch);
             var batchCount = 1;
             var numRows = dataFileTable.Rows.Count + 1;
-            var numBatches = (int)Math.Ceiling((double)dataFileTable.Rows.Count / import.RowsPerBatch);
+            var numBatches = (int)Math.Ceiling((double)dataFileTable.Rows.Count / dataImport.RowsPerBatch);
 
-            var existingBatchFiles = await _batchService.GetBatchFilesForDataFile(import.FileId);
+            var existingBatchFiles = await _batchService.GetBatchFilesForDataFile(dataImport.FileId);
 
             var existingBatchFileNumbers = existingBatchFiles
                 .AsQueryable()
@@ -138,16 +138,16 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Processor.Services
 
             foreach (var batch in batches)
             {
-                var currentStatus = await _importService.GetImportStatus(import.Id);
+                var currentStatus = await _dataImportService.GetImportStatus(dataImport.Id);
 
                 if (currentStatus.IsFinishedOrAborting())
                 {
                     _logger.LogInformation(
-                        $"Import for {import.File.Filename} is finished or aborting - stopping creating batch files");
+                        $"Import for {dataImport.File.Filename} is finished or aborting - stopping creating batch files");
                     return;
                 }
 
-                var batchFileName = $"{import.File.Filename}_{batchCount:000000}";
+                var batchFileName = $"{dataImport.File.Filename}_{batchCount:000000}";
 
                 if (existingBatchFileNumbers.Contains(batchCount))
                 {
@@ -168,7 +168,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Processor.Services
 
                 var percentageComplete = (double) batchCount / numBatches * 100;
 
-                await _importService.UpdateStatus(import.Id, ImportStatus.STAGE_3, percentageComplete);
+                await _dataImportService.UpdateStatus(dataImport.Id, DataImportStatus.STAGE_3, percentageComplete);
 
                 // If no lines then don't create a batch unless it's the last one & there are zero
                 // lines in total in which case create a zero lines batch
@@ -184,18 +184,18 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Processor.Services
 
                 stream.Seek(0, SeekOrigin.Begin);
 
-                var dataBlob = await _blobStorageService.GetBlob(PrivateFilesContainerName, import.File.Path());
+                var dataBlob = await _blobStorageService.GetBlob(PrivateFilesContainerName, dataImport.File.Path());
 
                 await _blobStorageService.UploadStream(
                     containerName: PrivateFilesContainerName,
-                    path: AdminReleasePath(import.File.ReleaseId, FileType.Data, batchFilePath),
+                    path: AdminReleasePath(dataImport.File.ReleaseId, FileType.Data, batchFilePath),
                     stream: stream,
                     contentType: "text/csv",
                     options: new IBlobStorageService.UploadStreamOptions
                     {
                         MetaValues = FileStorageUtils.GetDataFileMetaValues(
                             name: dataBlob.Name,
-                            metaFileName: import.MetaFile.Filename,
+                            metaFileName: dataImport.MetaFile.Filename,
                             userName: dataBlob.GetUserName(),
                             numberOfRows: numRows
                         )

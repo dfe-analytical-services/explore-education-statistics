@@ -31,11 +31,11 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Services
                 .CheckCanViewAllImports()
                 .OnSuccess(async () =>
                 {
-                    var imports = await _contentDbContext.Imports
+                    var imports = await _contentDbContext.DataImports
                         .Include(import => import.File)
                         .ThenInclude(file => file.Release)
                         .ThenInclude(release => release.Publication)
-                        .Where(import => import.Status != ImportStatus.COMPLETE)
+                        .Where(import => import.Status != DataImportStatus.COMPLETE)
                         .OrderByDescending(import => import.Created)
                         .ToListAsync();
 
@@ -43,26 +43,26 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Services
                 });
         }
 
-        private static ImportStatusBauViewModel BuildViewModel(Import import)
+        private static ImportStatusBauViewModel BuildViewModel(DataImport dataImport)
         {
-            var file = import.File;
+            var file = dataImport.File;
             var release = file.Release;
             var publication = release.Publication;
             return new ImportStatusBauViewModel
             {
                 SubjectTitle = null, // EES-1655
-                SubjectId = import.SubjectId,
+                SubjectId = dataImport.SubjectId,
                 PublicationId = publication.Id,
                 PublicationTitle = publication.Title,
                 ReleaseId = release.Id,
                 ReleaseTitle = release.Title,
                 FileId = file.Id,
                 DataFileName = file.Filename,
-                Rows = import.Rows,
-                Batches = import.NumBatches,
-                Status = import.Status,
-                StagePercentageComplete = import.StagePercentageComplete,
-                PercentageComplete = import.PercentageComplete()
+                Rows = dataImport.Rows,
+                Batches = dataImport.NumBatches,
+                Status = dataImport.Status,
+                StagePercentageComplete = dataImport.StagePercentageComplete,
+                PercentageComplete = dataImport.PercentageComplete()
             };
         }
     }

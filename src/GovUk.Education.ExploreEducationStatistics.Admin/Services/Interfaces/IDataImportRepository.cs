@@ -4,14 +4,14 @@ using GovUk.Education.ExploreEducationStatistics.Content.Model;
 
 namespace GovUk.Education.ExploreEducationStatistics.Admin.Services.Interfaces
 {
-    public interface IImportRepository
+    public interface IDataImportRepository
     {
-        Task<Import> Add(Import import);
+        Task<DataImport> Add(DataImport dataImport);
 
         Task DeleteByFileId(Guid fileId);
 
-        Task<Import> GetByFileId(Guid fileId);
+        Task<DataImport> GetByFileId(Guid fileId);
 
-        Task<ImportStatus> GetStatusByFileId(Guid fileId);
+        Task<DataImportStatus> GetStatusByFileId(Guid fileId);
     }
 }

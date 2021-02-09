@@ -40,7 +40,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Services
         private readonly ISubjectService _subjectService;
         private readonly IReleaseDataFileService _releaseDataFileService;
         private readonly IReleaseFileService _releaseFileService;
-        private readonly IImportService _importService;
+        private readonly IDataImportService _dataImportService;
 	    private readonly IFootnoteService _footnoteService;
         private readonly IDataBlockService _dataBlockService;
         private readonly IReleaseChecklistService _releaseChecklistService;
@@ -60,7 +60,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Services
             ISubjectService subjectService,
             IReleaseDataFileService releaseDataFileService,
             IReleaseFileService releaseFileService,
-            IImportService importService,
+            IDataImportService dataImportService,
             IFootnoteService footnoteService,
             StatisticsDbContext statisticsDbContext,
             IDataBlockService dataBlockService,
@@ -78,7 +78,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Services
             _subjectService = subjectService;
             _releaseDataFileService = releaseDataFileService;
             _releaseFileService = releaseFileService;
-            _importService = importService;
+            _dataImportService = dataImportService;
             _footnoteService = footnoteService;
             _statisticsDbContext = statisticsDbContext;
             _dataBlockService = dataBlockService;
@@ -479,7 +479,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Services
                 });
         }
 
-        public async Task<Either<ActionResult, ImportViewModel>> GetDataFileImportStatus(Guid releaseId, Guid fileId)
+        public async Task<Either<ActionResult, DataImportViewModel>> GetDataFileImportStatus(Guid releaseId, Guid fileId)
         {
             return await _persistenceHelper
                 .CheckEntityExists<Release>(releaseId)
@@ -490,10 +490,10 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Services
                     var releaseFile = await _releaseFileRepository.Get(releaseId, fileId);
                     if (releaseFile == null || releaseFile.File.Type != FileType.Data)
                     {
-                        return ImportViewModel.NotFound();
+                        return DataImportViewModel.NotFound();
                     }
 
-                    return await _importService.GetImport(fileId);
+                    return await _dataImportService.GetImport(fileId);
                 });
         }
 
@@ -505,7 +505,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Services
 
         private async Task<Either<ActionResult, Unit>> CheckCanDeleteDataFiles(Guid releaseId, File file)
         {
-            var importStatus = await _importService.GetStatus(file.Id);
+            var importStatus = await _dataImportService.GetStatus(file.Id);
 
             if (!importStatus.IsFinished())
             {

@@ -7,18 +7,18 @@ using Microsoft.EntityFrameworkCore;
 
 namespace GovUk.Education.ExploreEducationStatistics.Admin.Services
 {
-    public class ImportRepository : IImportRepository
+    public class DataImportRepository : IDataImportRepository
     {
         private readonly ContentDbContext _contentDbContext;
 
-        public ImportRepository(ContentDbContext contentDbContext)
+        public DataImportRepository(ContentDbContext contentDbContext)
         {
             _contentDbContext = contentDbContext;
         }
 
-        public async Task<Import> Add(Import import)
+        public async Task<DataImport> Add(DataImport dataImport)
         {
-            var added = await _contentDbContext.Imports.AddAsync(import);
+            var added = await _contentDbContext.DataImports.AddAsync(dataImport);
             await _contentDbContext.SaveChangesAsync();
             return added.Entity;
         }
@@ -26,27 +26,27 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Services
         public async Task DeleteByFileId(Guid fileId)
         {
             var import = await GetByFileId(fileId);
-
+            
             if (import != null)
             {
-                _contentDbContext.Imports.Remove(import);
+                _contentDbContext.DataImports.Remove(import);
                 await _contentDbContext.SaveChangesAsync();
             }
         }
 
-        public async Task<Import> GetByFileId(Guid fileId)
+        public async Task<DataImport> GetByFileId(Guid fileId)
         {
-            return await _contentDbContext.Imports
+            return await _contentDbContext.DataImports
                 .Include(i => i.Errors)
                 .SingleOrDefaultAsync(i => i.FileId == fileId);
         }
 
-        public async Task<ImportStatus> GetStatusByFileId(Guid fileId)
+        public async Task<DataImportStatus> GetStatusByFileId(Guid fileId)
         {
-            var import = await _contentDbContext.Imports
+            var import = await _contentDbContext.DataImports
                 .SingleOrDefaultAsync(i => i.FileId == fileId);
 
-            return import?.Status ?? ImportStatus.NOT_FOUND;
+            return import?.Status ?? DataImportStatus.NOT_FOUND;
         }
     }
 }

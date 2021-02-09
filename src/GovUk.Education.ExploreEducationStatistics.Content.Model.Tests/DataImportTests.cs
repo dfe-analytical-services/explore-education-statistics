@@ -1,12 +1,12 @@
 ﻿using System.Collections.Generic;
 using Xunit;
-using static GovUk.Education.ExploreEducationStatistics.Content.Model.ImportStatus;
+using static GovUk.Education.ExploreEducationStatistics.Content.Model.DataImportStatus;
 
 namespace GovUk.Education.ExploreEducationStatistics.Content.Model.Tests
 {
-    public class ImportTests
+    public class DataImportTests
     {
-        private static readonly List<ImportStatus> StatusesWithZeroProgress = new List<ImportStatus>
+        private static readonly List<DataImportStatus> StatusesWithZeroProgress = new List<DataImportStatus>
         {
             CANCELLING,
             QUEUED,
@@ -20,7 +20,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Content.Model.Tests
         [Fact]
         public void PercentageComplete_Stage1()
         {
-            var import = new Import
+            var import = new DataImport
             {
                 StagePercentageComplete = StagePercentageComplete,
                 Status = STAGE_1
@@ -32,7 +32,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Content.Model.Tests
         [Fact]
         public void PercentageComplete_Stage2()
         {
-            var import = new Import
+            var import = new DataImport
             {
                 StagePercentageComplete = StagePercentageComplete,
                 Status = STAGE_2
@@ -44,7 +44,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Content.Model.Tests
         [Fact]
         public void PercentageComplete_Stage3()
         {
-            var import = new Import
+            var import = new DataImport
             {
                 StagePercentageComplete = StagePercentageComplete,
                 Status = STAGE_3
@@ -56,7 +56,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Content.Model.Tests
         [Fact]
         public void PercentageComplete_Stage4()
         {
-            var import = new Import
+            var import = new DataImport
             {
                 StagePercentageComplete = StagePercentageComplete,
                 Status = STAGE_4
@@ -69,7 +69,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Content.Model.Tests
         [Fact]
         public void PercentageComplete_Cancelled()
         {
-            var import = new Import
+            var import = new DataImport
             {
                 StagePercentageComplete = StagePercentageComplete,
                 Status = CANCELLED
@@ -81,7 +81,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Content.Model.Tests
         [Fact]
         public void PercentageComplete_Complete()
         {
-            var import = new Import
+            var import = new DataImport
             {
                 StagePercentageComplete = StagePercentageComplete,
                 Status = COMPLETE
@@ -95,7 +95,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Content.Model.Tests
         {
             StatusesWithZeroProgress.ForEach(status =>
             {
-                var import = new Import
+                var import = new DataImport
                 {
                     StagePercentageComplete = StagePercentageComplete,
                     Status = status

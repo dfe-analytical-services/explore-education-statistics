@@ -18,12 +18,12 @@ using Microsoft.Extensions.Logging;
 using static GovUk.Education.ExploreEducationStatistics.Admin.Validators.ValidationErrorMessages;
 using static GovUk.Education.ExploreEducationStatistics.Admin.Validators.ValidationUtils;
 using static GovUk.Education.ExploreEducationStatistics.Common.Model.FileType;
-using static GovUk.Education.ExploreEducationStatistics.Content.Model.ImportStatus;
+using static GovUk.Education.ExploreEducationStatistics.Content.Model.DataImportStatus;
 
 namespace GovUk.Education.ExploreEducationStatistics.Admin.Services
 {
     /**
-     * Temporary service for migrating Import rows in table storage to the database
+     * Temporary service for migrating Import rows in Azure Table Storage to DataImports in the database
      */
     public class MigrateImportsService : IMigrateImportsService
     {
@@ -52,11 +52,11 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Services
                     var tableImports = await GetTableImports();
                     _logger.LogInformation($"Found {tableImports.Count} table imports");
 
-                    var imports = await tableImports.SelectAsync(async tableImport =>
-                        await GetImport(tableImport));
+                    var dataImports = await tableImports.SelectAsync(async tableImport =>
+                        await GetDataImport(tableImport));
 
                     _logger.LogInformation("Saving database imports");
-                    await _contentDbContext.AddRangeAsync(imports);
+                    await _contentDbContext.DataImports.AddRangeAsync(dataImports);
                     await _contentDbContext.SaveChangesAsync();
 
                     _logger.LogInformation($"Table import migration complete");
@@ -65,7 +65,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Services
 
         private async Task<Either<ActionResult, Unit>> CheckFirstRun()
         {
-            if (await _contentDbContext.Imports.AnyAsync(import => import.Migrated))
+            if (await _contentDbContext.DataImports.AnyAsync(import => import.Migrated))
             {
                 return ValidationActionResult(DataFileImportsMigrationAlreadyRun);
             }
@@ -81,14 +81,14 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Services
 
             // Filter out failed imports with no message. Lots of these exist in the Dev environment.
             return imports.Where(import => 
-                    !(import.ImportStatus == FAILED && import.Message.IsNullOrEmpty()))
+                    !(import.DataImportStatus == FAILED && import.Message.IsNullOrEmpty()))
                 .ToList();
         }
 
-        private async Task<Import> GetImport(TableImport tableImport)
+        private async Task<DataImport> GetDataImport(TableImport tableImport)
         {
             var timestamp = tableImport.Timestamp.UtcDateTime;
-            var errors = GetImportErrors(timestamp, tableImport.ImportErrors);
+            var errors = GetDataImportErrors(timestamp, tableImport.ImportErrors);
             var message = tableImport.ImportMessage;
 
             var file = await GetFile(tableImport.ReleaseId, message.SubjectId, FileType.Data, message.DataFileName);
@@ -101,15 +101,15 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Services
                                    $"Expected file {file.Id} to have a SourceId for filename: {message.ArchiveFileName}");
             }
 
-            return new Import
+            return new DataImport
             {
                 FileId = file.Id,
                 MetaFileId = metaFile.Id,
                 ZipFileId = file.SourceId,
                 SubjectId = message.SubjectId,
                 Errors = errors,
-                StagePercentageComplete = tableImport.ImportStatus == COMPLETE ? 100 : tableImport.PercentageComplete,
-                Status = tableImport.ImportStatus,
+                StagePercentageComplete = tableImport.DataImportStatus == COMPLETE ? 100 : tableImport.PercentageComplete,
+                Status = tableImport.DataImportStatus,
                 Created = timestamp,
                 NumBatches = message.NumBatches,
                 Rows = tableImport.NumberOfRows,
@@ -119,10 +119,10 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Services
             };
         }
 
-        private static List<ImportError> GetImportErrors(DateTime created,
+        private static List<DataImportError> GetDataImportErrors(DateTime created,
             IEnumerable<TableImportError> tableImportErrors)
         {
-            return tableImportErrors.Select(tableImportError => new ImportError(tableImportError.Message)
+            return tableImportErrors.Select(tableImportError => new DataImportError(tableImportError.Message)
             {
                 Created = created
             }).ToList();

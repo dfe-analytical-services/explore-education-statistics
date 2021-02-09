@@ -5,17 +5,17 @@ using GovUk.Education.ExploreEducationStatistics.Content.Model;
 
 namespace GovUk.Education.ExploreEducationStatistics.Data.Processor.Services.Interfaces
 {
-    public interface IImportService
+    public interface IDataImportService
     {
-        Task FailImport(Guid id, List<ImportError> errors);
+        Task FailImport(Guid id, List<DataImportError> errors);
 
         Task FailImport(Guid id, params string[] errors);
 
-        Task<Import> GetImport(Guid id);
+        Task<DataImport> GetImport(Guid id);
 
-        Task<ImportStatus> GetImportStatus(Guid id);
+        Task<DataImportStatus> GetImportStatus(Guid id);
 
-        Task UpdateStatus(Guid id, ImportStatus newStatus, double percentageComplete);
+        Task UpdateStatus(Guid id, DataImportStatus newStatus, double percentageComplete);
 
         Task Update(Guid id, int rowsPerBatch, int totalRows, int numBatches);
     }

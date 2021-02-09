@@ -8,7 +8,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Migrations.ContentMig
         protected override void Up(MigrationBuilder migrationBuilder)
         {
             migrationBuilder.CreateTable(
-                name: "Imports",
+                name: "DataImports",
                 columns: table => new
                 {
                     Id = table.Column<Guid>(nullable: false),
@@ -27,21 +27,21 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Migrations.ContentMig
                 },
                 constraints: table =>
                 {
-                    table.PrimaryKey("PK_Imports", x => x.Id);
+                    table.PrimaryKey("PK_DataImports", x => x.Id);
                     table.ForeignKey(
-                        name: "FK_Imports_Files_FileId",
+                        name: "FK_DataImports_Files_FileId",
                         column: x => x.FileId,
                         principalTable: "Files",
                         principalColumn: "Id",
                         onDelete: ReferentialAction.Restrict);
                     table.ForeignKey(
-                        name: "FK_Imports_Files_MetaFileId",
+                        name: "FK_DataImports_Files_MetaFileId",
                         column: x => x.MetaFileId,
                         principalTable: "Files",
                         principalColumn: "Id",
                         onDelete: ReferentialAction.Restrict);
                     table.ForeignKey(
-                        name: "FK_Imports_Files_ZipFileId",
+                        name: "FK_DataImports_Files_ZipFileId",
                         column: x => x.ZipFileId,
                         principalTable: "Files",
                         principalColumn: "Id",
@@ -49,45 +49,45 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Migrations.ContentMig
                 });
 
             migrationBuilder.CreateTable(
-                name: "ImportErrors",
+                name: "DataImportErrors",
                 columns: table => new
                 {
                     Id = table.Column<Guid>(nullable: false),
-                    ImportId = table.Column<Guid>(nullable: false),
+                    DataImportId = table.Column<Guid>(nullable: false),
                     Created = table.Column<DateTime>(nullable: false),
                     Message = table.Column<string>(nullable: true)
                 },
                 constraints: table =>
                 {
-                    table.PrimaryKey("PK_ImportErrors", x => x.Id);
+                    table.PrimaryKey("PK_DataImportErrors", x => x.Id);
                     table.ForeignKey(
-                        name: "FK_ImportErrors_Imports_ImportId",
-                        column: x => x.ImportId,
-                        principalTable: "Imports",
+                        name: "FK_DataImportErrors_DataImports_DataImportId",
+                        column: x => x.DataImportId,
+                        principalTable: "DataImports",
                         principalColumn: "Id",
                         onDelete: ReferentialAction.Cascade);
                 });
 
             migrationBuilder.CreateIndex(
-                name: "IX_ImportErrors_ImportId",
-                table: "ImportErrors",
-                column: "ImportId");
+                name: "IX_DataImportErrors_DataImportId",
+                table: "DataImportErrors",
+                column: "DataImportId");
 
             migrationBuilder.CreateIndex(
-                name: "IX_Imports_FileId",
-                table: "Imports",
+                name: "IX_DataImports_FileId",
+                table: "DataImports",
                 column: "FileId",
                 unique: true);
 
             migrationBuilder.CreateIndex(
-                name: "IX_Imports_MetaFileId",
-                table: "Imports",
+                name: "IX_DataImports_MetaFileId",
+                table: "DataImports",
                 column: "MetaFileId",
                 unique: true);
 
             migrationBuilder.CreateIndex(
-                name: "IX_Imports_ZipFileId",
-                table: "Imports",
+                name: "IX_DataImports_ZipFileId",
+                table: "DataImports",
                 column: "ZipFileId",
                 unique: true,
                 filter: "[ZipFileId] IS NOT NULL");
@@ -96,10 +96,10 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Migrations.ContentMig
         protected override void Down(MigrationBuilder migrationBuilder)
         {
             migrationBuilder.DropTable(
-                name: "ImportErrors");
+                name: "DataImportErrors");
 
             migrationBuilder.DropTable(
-                name: "Imports");
+                name: "DataImports");
         }
     }
 }

@@ -11,7 +11,7 @@ using GovUk.Education.ExploreEducationStatistics.Data.Processor.Utils;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Logging;
 using static GovUk.Education.ExploreEducationStatistics.Common.BlobContainerNames;
-using static GovUk.Education.ExploreEducationStatistics.Content.Model.ImportStatus;
+using static GovUk.Education.ExploreEducationStatistics.Content.Model.DataImportStatus;
 
 namespace GovUk.Education.ExploreEducationStatistics.Data.Processor.Services
 {
@@ -20,25 +20,25 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Processor.Services
         private readonly ILogger<IFileImportService> _logger;
         private readonly IBatchService _batchService;
         private readonly IBlobStorageService _blobStorageService;
-        private readonly IImportService _importService;
+        private readonly IDataImportService _dataImportService;
         private readonly IImporterService _importerService;
 
         public FileImportService(ILogger<IFileImportService> logger,
             IBatchService batchService,
             IBlobStorageService blobStorageService,
-            IImportService importService,
+            IDataImportService dataImportService,
             IImporterService importerService)
         {
             _logger = logger;
             _batchService = batchService;
             _blobStorageService = blobStorageService;
-            _importService = importService;
+            _dataImportService = dataImportService;
             _importerService = importerService;
         }
 
         public async Task ImportObservations(ImportObservationsMessage message, StatisticsDbContext context)
         {
-            var import = await _importService.GetImport(message.Id);
+            var import = await _dataImportService.GetImport(message.Id);
 
             if (import.Status.IsFinished())
             {
@@ -53,7 +53,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Processor.Services
                                        $"{import.Status} - ignoring Observations in file {message.ObservationsFilePath} " +
                                        "and marking import as CANCELLED");
 
-                await _importService.UpdateStatus(message.Id, CANCELLED, 100);
+                await _dataImportService.UpdateStatus(message.Id, CANCELLED, 100);
                 return;
             }
 
@@ -93,7 +93,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Processor.Services
 
         public async Task ImportFiltersAndLocations(Guid importId, StatisticsDbContext context)
         {
-            var import = await _importService.GetImport(importId);
+            var import = await _dataImportService.GetImport(importId);
 
             var subject = await context.Subject.FindAsync(import.SubjectId);
 
@@ -113,7 +113,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Processor.Services
 
         public async Task CheckComplete(ImportObservationsMessage message, StatisticsDbContext context)
         {
-            var import = await _importService.GetImport(message.Id);
+            var import = await _dataImportService.GetImport(message.Id);
 
             if (import.Status.IsFinished())
             {
@@ -129,7 +129,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Processor.Services
                                        $"instead marking as {import.Status.GetFinishingStateOfAbortProcess()}, the final " +
                                        $"state of the aborting process");
 
-                await _importService.UpdateStatus(message.Id, import.Status.GetFinishingStateOfAbortProcess(), 100);
+                await _dataImportService.UpdateStatus(message.Id, import.Status.GetFinishingStateOfAbortProcess(), 100);
                 return;
             }
 
@@ -139,7 +139,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Processor.Services
 
                 if (!observationCount.Equals(import.TotalRows))
                 {
-                    await _importService.FailImport(message.Id,
+                    await _dataImportService.FailImport(message.Id,
                         $"Number of observations inserted ({observationCount}) " +
                                 $"does not equal that expected ({import.TotalRows}) : Please delete & retry");
                 }
@@ -147,11 +147,11 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Processor.Services
                 {
                     if (import.Errors.Count == 0)
                     {
-                        await _importService.UpdateStatus(message.Id, COMPLETE, 100);
+                        await _dataImportService.UpdateStatus(message.Id, COMPLETE, 100);
                     }
                     else
                     {
-                        await _importService.UpdateStatus(message.Id, FAILED, 100);
+                        await _dataImportService.UpdateStatus(message.Id, FAILED, 100);
                     }
                 }
             }
@@ -161,7 +161,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Processor.Services
 
                 var percentageComplete = (double) (import.NumBatches - numBatchesRemaining) / import.NumBatches * 100;
 
-                await _importService.UpdateStatus(message.Id, STAGE_4, percentageComplete);
+                await _dataImportService.UpdateStatus(message.Id, STAGE_4, percentageComplete);
             }
         }
     }

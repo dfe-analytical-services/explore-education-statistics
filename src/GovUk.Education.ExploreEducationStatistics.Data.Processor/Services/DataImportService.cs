@@ -7,25 +7,25 @@ using GovUk.Education.ExploreEducationStatistics.Content.Model.Database;
 using GovUk.Education.ExploreEducationStatistics.Data.Processor.Services.Interfaces;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Logging;
-using static GovUk.Education.ExploreEducationStatistics.Content.Model.ImportStatus;
+using static GovUk.Education.ExploreEducationStatistics.Content.Model.DataImportStatus;
 using static GovUk.Education.ExploreEducationStatistics.Data.Processor.Utils.DbUtils;
 
 namespace GovUk.Education.ExploreEducationStatistics.Data.Processor.Services
 {
-    public class ImportService : IImportService
+    public class DataImportService : IDataImportService
     {
         private readonly ContentDbContext _contentDbContext;
-        private readonly ILogger<ImportService> _logger;
+        private readonly ILogger<DataImportService> _logger;
 
-        public ImportService(
+        public DataImportService(
             ContentDbContext contentDbContext,
-            ILogger<ImportService> logger)
+            ILogger<DataImportService> logger)
         {
             _contentDbContext = contentDbContext;
             _logger = logger;
         }
 
-        public async Task FailImport(Guid id, List<ImportError> errors)
+        public async Task FailImport(Guid id, List<DataImportError> errors)
         {
             var import = await GetImport(id);
             if (import.Status != COMPLETE && import.Status != FAILED)
@@ -39,12 +39,12 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Processor.Services
 
         public async Task FailImport(Guid id, params string[] errors)
         {
-            await FailImport(id, errors.Select(error => new ImportError(error)).ToList());
+            await FailImport(id, errors.Select(error => new DataImportError(error)).ToList());
         }
 
-        public async Task<Import> GetImport(Guid id)
+        public async Task<DataImport> GetImport(Guid id)
         {
-            return await _contentDbContext.Imports
+            return await _contentDbContext.DataImports
                 .Include(import => import.Errors)
                 .Include(import => import.File)
                 .Include(import => import.MetaFile)
@@ -52,9 +52,9 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Processor.Services
                 .SingleAsync(import => import.Id == id);
         }
 
-        public async Task<ImportStatus> GetImportStatus(Guid id)
+        public async Task<DataImportStatus> GetImportStatus(Guid id)
         {
-            var import = await _contentDbContext.Imports.FindAsync(id);
+            var import = await _contentDbContext.DataImports.FindAsync(id);
 
             if (import == null)
             {
@@ -66,7 +66,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Processor.Services
 
         public async Task Update(Guid id, int rowsPerBatch, int totalRows, int numBatches)
         {
-            var import = await _contentDbContext.Imports.FindAsync(id);
+            var import = await _contentDbContext.DataImports.FindAsync(id);
             _contentDbContext.Update(import);
 
             import.RowsPerBatch = rowsPerBatch;
@@ -76,14 +76,14 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Processor.Services
             await _contentDbContext.SaveChangesAsync();
         }
 
-        public async Task UpdateStatus(Guid id, ImportStatus newStatus, double percentageComplete)
+        public async Task UpdateStatus(Guid id, DataImportStatus newStatus, double percentageComplete)
         {
             await ExecuteWithExclusiveLock(
                 _contentDbContext,
                 $"LockForImport-{id}",
                 async context =>
                 {
-                    var import = await context.Imports
+                    var import = await context.DataImports
                         .Include(i => i.File)
                         .SingleAsync(i => i.Id == id);
 
@@ -133,7 +133,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Processor.Services
 
                     import.StagePercentageComplete = percentageCompleteAfter;
                     import.Status = newStatus;
-                    context.Imports.Update(import);
+                    context.DataImports.Update(import);
                     await context.SaveChangesAsync();
                 }
             );

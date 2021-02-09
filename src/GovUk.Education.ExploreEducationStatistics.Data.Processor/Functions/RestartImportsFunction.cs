@@ -8,7 +8,7 @@ using GovUk.Education.ExploreEducationStatistics.Data.Processor.Model;
 using Microsoft.Azure.WebJobs;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Logging;
-using static GovUk.Education.ExploreEducationStatistics.Content.Model.ImportStatus;
+using static GovUk.Education.ExploreEducationStatistics.Content.Model.DataImportStatus;
 using static GovUk.Education.ExploreEducationStatistics.Data.Processor.Model.ImporterQueues;
 
 namespace GovUk.Education.ExploreEducationStatistics.Data.Processor.Functions
@@ -19,7 +19,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Processor.Functions
         private readonly ContentDbContext _contentDbContext;
         private readonly IStorageQueueService _storageQueueService;
 
-        private static readonly List<ImportStatus> IncompleteStatuses = new List<ImportStatus>
+        private static readonly List<DataImportStatus> IncompleteStatuses = new List<DataImportStatus>
         {
             QUEUED,
             PROCESSING_ARCHIVE_FILE,
@@ -45,7 +45,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Processor.Functions
         {
             logger.LogInformation($"{executionContext.FunctionName} triggered: {message}");
 
-            var incompleteImports = await _contentDbContext.Imports
+            var incompleteImports = await _contentDbContext.DataImports
                 .Where(import => IncompleteStatuses.Contains(import.Status))
                 .ToListAsync();
 

@@ -48,7 +48,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Processor
                 .AddTransient<IImporterMetaService, ImporterMetaService>()
                 .AddTransient<ImporterMemoryCache>()
                 .AddTransient<IBatchService, BatchService>()
-                .AddTransient<IImportService, ImportService>()
+                .AddTransient<IDataImportService, DataImportService>()
                 .AddTransient<IValidatorService, ValidatorService>()
                 .AddSingleton<IDataArchiveService, DataArchiveService>()
                 .AddSingleton<IFileTypeService, FileTypeService>()

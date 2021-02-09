@@ -8,16 +8,16 @@ using Microsoft.Extensions.Logging;
 using Moq;
 using Xunit;
 using static GovUk.Education.ExploreEducationStatistics.Content.Model.Database.ContentDbUtils;
-using static GovUk.Education.ExploreEducationStatistics.Content.Model.ImportStatus;
+using static GovUk.Education.ExploreEducationStatistics.Content.Model.DataImportStatus;
 
 namespace GovUk.Education.ExploreEducationStatistics.Data.Processor.Tests.Services
 {
-    public class ImportServiceTests
+    public class DataImportServiceTests
     {
         [Fact]
         public async Task GetImportStatus()
         {
-            var import = new Import
+            var import = new DataImport
             {
                 Status = STAGE_1
             };
@@ -31,7 +31,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Processor.Tests.Servic
 
             await using (var contentDbContext = InMemoryContentDbContext(contentDbContextId))
             {
-                var service = BuildImportService(contentDbContext: contentDbContext);
+                var service = BuildDataImportService(contentDbContext: contentDbContext);
                 var result = await service.GetImportStatus(import.Id);
 
                 Assert.Equal(STAGE_1, result);
@@ -43,7 +43,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Processor.Tests.Servic
         {
             await using (var contentDbContext = InMemoryContentDbContext())
             {
-                var service = BuildImportService(contentDbContext: contentDbContext);
+                var service = BuildDataImportService(contentDbContext: contentDbContext);
                 var result = await service.GetImportStatus(Guid.NewGuid());
 
                 Assert.Equal(NOT_FOUND, result);
@@ -53,7 +53,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Processor.Tests.Servic
         [Fact]
         public async Task GetImport()
         {
-            var import = new Import
+            var import = new DataImport
             {
                 File = new File(),
                 MetaFile = new File(),
@@ -70,7 +70,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Processor.Tests.Servic
 
             await using (var contentDbContext = InMemoryContentDbContext(contentDbContextId))
             {
-                var service = BuildImportService(contentDbContext: contentDbContext);
+                var service = BuildDataImportService(contentDbContext: contentDbContext);
                 var result = await service.GetImport(import.Id);
 
                 Assert.Equal(import.Id, result.Id);
@@ -91,12 +91,12 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Processor.Tests.Servic
         [Fact]
         public async Task GetImport_ImportHasErrors()
         {
-            var import = new Import
+            var import = new DataImport
             {
-                Errors = new List<ImportError>
+                Errors = new List<DataImportError>
                 {
-                    new ImportError("error 1"),
-                    new ImportError("error 2")
+                    new DataImportError("error 1"),
+                    new DataImportError("error 2")
                 },
                 File = new File(),
                 MetaFile = new File(),
@@ -113,7 +113,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Processor.Tests.Servic
 
             await using (var contentDbContext = InMemoryContentDbContext(contentDbContextId))
             {
-                var service = BuildImportService(contentDbContext: contentDbContext);
+                var service = BuildDataImportService(contentDbContext: contentDbContext);
                 var result = await service.GetImport(import.Id);
 
                 Assert.Equal(import.Id, result.Id);
@@ -128,7 +128,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Processor.Tests.Servic
         [Fact]
         public async Task Update()
         {
-            var import = new Import
+            var import = new DataImport
             {
                 RowsPerBatch = 1,
                 TotalRows = 1,
@@ -144,7 +144,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Processor.Tests.Servic
 
             await using (var contentDbContext = InMemoryContentDbContext(contentDbContextId))
             {
-                var service = BuildImportService(contentDbContext: contentDbContext);
+                var service = BuildDataImportService(contentDbContext: contentDbContext);
 
                 await service.Update(import.Id,
                     rowsPerBatch: 1000,
@@ -154,18 +154,18 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Processor.Tests.Servic
 
             await using (var contentDbContext = InMemoryContentDbContext(contentDbContextId))
             {
-                var updated = await contentDbContext.Imports.FindAsync(import.Id);
+                var updated = await contentDbContext.DataImports.FindAsync(import.Id);
                 Assert.Equal(1000, updated.RowsPerBatch);
                 Assert.Equal(10000, updated.TotalRows);
                 Assert.Equal(10, updated.NumBatches);
             }
         }
 
-        private static ImportService BuildImportService(ContentDbContext contentDbContext)
+        private static DataImportService BuildDataImportService(ContentDbContext contentDbContext)
         {
-            return new ImportService(
+            return new DataImportService(
                 contentDbContext,
-                new Mock<ILogger<ImportService>>().Object
+                new Mock<ILogger<DataImportService>>().Object
             );
         }
     }

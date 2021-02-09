@@ -80,16 +80,16 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
                 }
             };
 
-            var import1 = new Import
+            var import1 = new DataImport
             {
                 File = releaseFile1.File,
-                Status = ImportStatus.COMPLETE
+                Status = DataImportStatus.COMPLETE
             };
 
-            var import2 = new Import
+            var import2 = new DataImport
             {
                 File = releaseFile2.File,
-                Status = ImportStatus.COMPLETE
+                Status = DataImportStatus.COMPLETE
             };
 
             var dataBlock = new DataBlock
@@ -247,16 +247,16 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
                 File = file2Replacement
             };
 
-            var import1 = new Import
+            var import1 = new DataImport
             {
                 File = releaseFile1.File,
-                Status = ImportStatus.COMPLETE
+                Status = DataImportStatus.COMPLETE
             };
 
-            var import2 = new Import
+            var import2 = new DataImport
             {
                 File = releaseFile2.File,
-                Status = ImportStatus.COMPLETE
+                Status = DataImportStatus.COMPLETE
             };
 
             var contentDbContextId = Guid.NewGuid().ToString();
@@ -360,16 +360,16 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
                 }
             };
 
-            var import1 = new Import
+            var import1 = new DataImport
             {
                 File = releaseFile1.File,
-                Status = ImportStatus.STAGE_1
+                Status = DataImportStatus.STAGE_1
             };
 
-            var import2 = new Import
+            var import2 = new DataImport
             {
                 File = releaseFile2.File,
-                Status = ImportStatus.COMPLETE
+                Status = DataImportStatus.COMPLETE
             };
 
             var contentDbContextId = Guid.NewGuid().ToString();
@@ -448,10 +448,10 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
                 }
             };
 
-            var import1 = new Import
+            var import1 = new DataImport
             {
                 File = releaseFile1.File,
-                Status = ImportStatus.COMPLETE
+                Status = DataImportStatus.COMPLETE
             };
 
             // Has highlight name and subject matches
@@ -548,14 +548,14 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
             ContentDbContext contentDbContext = null,
             IPersistenceHelper<ContentDbContext> persistenceHelper = null,
             StatisticsDbContext statisticsDbContext = null,
-            IImportRepository importRepository = null,
+            IDataImportRepository dataImportRepository = null,
             IUserService userService = null)
         {
             return new ReleaseMetaService(
                 contentDbContext ?? new Mock<ContentDbContext>().Object,
                 persistenceHelper ?? new PersistenceHelper<ContentDbContext>(contentDbContext),
                 statisticsDbContext ?? new Mock<StatisticsDbContext>().Object,
-                importRepository ?? new ImportRepository(contentDbContext),
+                dataImportRepository ?? new DataImportRepository(contentDbContext),
                 userService ?? MockUtils.AlwaysTrueUserService().Object
             );
         }

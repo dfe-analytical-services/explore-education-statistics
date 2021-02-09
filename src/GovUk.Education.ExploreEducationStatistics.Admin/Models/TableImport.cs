@@ -33,7 +33,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Models
             ? null 
             : JsonConvert.DeserializeObject<TableImportMessage>(Message);
         
-        public ImportStatus ImportStatus => Enum.Parse<ImportStatus>(Status);
+        public DataImportStatus DataImportStatus => Enum.Parse<DataImportStatus>(Status);
 
         public Guid ReleaseId => Guid.Parse(PartitionKey);
     }

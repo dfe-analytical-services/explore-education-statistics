@@ -28,13 +28,13 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
         {
             var release = new Release
             {
-                Id = ImportSampleJson.ReleaseId
+                Id = TableImportSampleJson.ReleaseId
             };
 
             // Test the migration won't run if there's already been an attempt to run it,
             // until the migrated data is removed
             var migratedImportSubjectId = Guid.NewGuid();
-            var migratedImport = new Import
+            var migratedImport = new DataImport
             {
                 File = new File
                 {
@@ -50,12 +50,12 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
                     Type = Metadata,
                     SubjectId = migratedImportSubjectId
                 },
-                Status = ImportStatus.COMPLETE,
+                Status = DataImportStatus.COMPLETE,
                 Migrated = true
             };
 
             var nonMigratedImportSubjectId = Guid.NewGuid();
-            var nonMigratedImport = new Import
+            var nonMigratedImport = new DataImport
             {
                 File = new File
                 {
@@ -71,7 +71,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
                     Type = Metadata,
                     SubjectId = nonMigratedImportSubjectId
                 },
-                Status = ImportStatus.QUEUED,
+                Status = DataImportStatus.QUEUED,
                 Migrated = false
             };
 
@@ -79,7 +79,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
             await using (var contentDbContext = DbUtils.InMemoryApplicationDbContext(contentDbContextId))
             {
                 await contentDbContext.Releases.AddAsync(release);
-                await contentDbContext.Imports.AddRangeAsync(migratedImport, nonMigratedImport);
+                await contentDbContext.DataImports.AddRangeAsync(migratedImport, nonMigratedImport);
                 await contentDbContext.SaveChangesAsync();
             }
 
@@ -103,36 +103,36 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
         {
             var release = new Release
             {
-                Id = ImportSampleJson.ReleaseId
+                Id = TableImportSampleJson.ReleaseId
             };
 
             var zipFile1 = new File
             {
-                Filename = ImportSampleJson.ZipFilename,
+                Filename = TableImportSampleJson.ZipFilename,
                 Release = release,
                 Type = DataZip
             };
 
             var dataFile1 = new File
             {
-                Filename = ImportSampleJson.DataFilename,
+                Filename = TableImportSampleJson.DataFilename,
                 Release = release,
                 Type = FileType.Data,
                 Source = zipFile1,
-                SubjectId = ImportSampleJson.SubjectId
+                SubjectId = TableImportSampleJson.SubjectId
             };
 
             var metaFile1 = new File
             {
-                Filename = ImportSampleJson.MetaFilename,
+                Filename = TableImportSampleJson.MetaFilename,
                 Release = release,
                 Type = Metadata,
-                SubjectId = ImportSampleJson.SubjectId
+                SubjectId = TableImportSampleJson.SubjectId
             };
 
             // Test the migration won't affect non-migrated imports which may exist from new uploads
             var nonMigratedSubjectId = Guid.NewGuid();
-            var nonMigratedImport = new Import
+            var nonMigratedImport = new DataImport
             {
                 Created = DateTime.UtcNow,
                 File = new File
@@ -149,7 +149,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
                     Type = Metadata,
                     SubjectId = nonMigratedSubjectId
                 },
-                Status = ImportStatus.QUEUED,
+                Status = DataImportStatus.QUEUED,
                 Migrated = false
             };
 
@@ -157,10 +157,10 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
             {
                 new TableImport
                 {
-                    PartitionKey = ImportSampleJson.ReleaseId.ToString(),
-                    RowKey = ImportSampleJson.DataFilename,
+                    PartitionKey = TableImportSampleJson.ReleaseId.ToString(),
+                    RowKey = TableImportSampleJson.DataFilename,
                     Errors = @"[{""Message"":""error1""},{""Message"": ""error2""}]",
-                    Message = ImportSampleJson.MessageJson,
+                    Message = TableImportSampleJson.MessageJson,
                     Status = "COMPLETE",
                     PercentageComplete = 100,
                     NumberOfRows = 10000,
@@ -185,7 +185,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
             {
                 await contentDbContext.Releases.AddAsync(release);
                 await contentDbContext.Files.AddRangeAsync(zipFile1, dataFile1, metaFile1);
-                await contentDbContext.Imports.AddAsync(nonMigratedImport);
+                await contentDbContext.DataImports.AddAsync(nonMigratedImport);
                 await contentDbContext.SaveChangesAsync();
             }
 
@@ -206,7 +206,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
 
             await using (var contentDbContext = DbUtils.InMemoryApplicationDbContext(contentDbContextId))
             {
-                var imports = await contentDbContext.Imports
+                var imports = await contentDbContext.DataImports
                     .Include(i => i.Errors)
                     .ToListAsync();
 
@@ -218,9 +218,9 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
 
                 // Expect the migrated import to be next
                 Assert.Equal(tableImports[0].Timestamp.UtcDateTime, imports[1].Created);
-                Assert.Equal(ImportStatus.COMPLETE, imports[1].Status);
+                Assert.Equal(DataImportStatus.COMPLETE, imports[1].Status);
                 Assert.Equal(100, imports[1].StagePercentageComplete);
-                Assert.Equal(ImportSampleJson.SubjectId, imports[1].SubjectId);
+                Assert.Equal(TableImportSampleJson.SubjectId, imports[1].SubjectId);
                 Assert.Equal(dataFile1.Id, imports[1].FileId);
                 Assert.Equal(metaFile1.Id, imports[1].MetaFileId);
                 Assert.Equal(zipFile1.Id, imports[1].ZipFileId);
@@ -267,7 +267,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
                 Status = "COMPLETE"
             };
 
-            Assert.Equal(ImportStatus.COMPLETE, tableImport.ImportStatus);
+            Assert.Equal(DataImportStatus.COMPLETE, tableImport.DataImportStatus);
         }
 
         [Fact]
@@ -363,11 +363,11 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
         {
             var tableImport = new TableImport
             {
-                Message = ImportSampleJson.MessageJson
+                Message = TableImportSampleJson.MessageJson
             };
 
             Assert.NotNull(tableImport.ImportMessage);
-            Assert.Equal(ImportSampleJson.SubjectId, tableImport.ImportMessage.SubjectId);
+            Assert.Equal(TableImportSampleJson.SubjectId, tableImport.ImportMessage.SubjectId);
             Assert.Equal("data.csv", tableImport.ImportMessage.DataFileName);
             Assert.Equal("data.meta.csv", tableImport.ImportMessage.MetaFileName);
             Assert.Equal("data.zip", tableImport.ImportMessage.ArchiveFileName);
@@ -377,7 +377,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
         }
     }
 
-    public static class ImportSampleJson
+    public static class TableImportSampleJson
     {
         public static Guid SubjectId = Guid.NewGuid();
         public static readonly Guid ReleaseId = Guid.NewGuid();

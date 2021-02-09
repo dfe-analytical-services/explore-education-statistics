@@ -69,10 +69,10 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
                         }
                     );
 
-                var importService = new Mock<IImportService>();
+                var dataImportService = new Mock<IDataImportService>();
                 var metaGuidanceService = new Mock<IMetaGuidanceService>();
 
-                importService
+                dataImportService
                     .Setup(s => s.HasIncompleteImports(release.Id))
                     .ReturnsAsync(true);
 
@@ -83,7 +83,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
                 var service = BuildReleaseChecklistService(
                     context,
                     fileRepository: fileRepository.Object,
-                    importService: importService.Object,
+                    dataImportService: dataImportService.Object,
                     metaGuidanceService: metaGuidanceService.Object
                 );
 
@@ -426,7 +426,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
 
         private static ReleaseChecklistService BuildReleaseChecklistService(
             ContentDbContext contentDbContext,
-            IImportService importService = null,
+            IDataImportService dataImportService = null,
             IUserService userService = null,
             IMetaGuidanceService metaGuidanceService = null,
             IFileRepository fileRepository = null,
@@ -435,7 +435,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
         {
             return new ReleaseChecklistService(
                 new PersistenceHelper<ContentDbContext>(contentDbContext),
-                importService ?? new Mock<IImportService>().Object,
+                dataImportService ?? new Mock<IDataImportService>().Object,
                 userService ?? MockUtils.AlwaysTrueUserService().Object,
                 metaGuidanceService ?? new Mock<IMetaGuidanceService>().Object,
                 fileRepository ?? new Mock<IFileRepository>().Object,

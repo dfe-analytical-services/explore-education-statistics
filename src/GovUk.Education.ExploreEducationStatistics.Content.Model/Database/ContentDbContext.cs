@@ -1,13 +1,11 @@
 using System;
 using System.Collections.Generic;
-using System.IO;
 using System.Text;
 using GovUk.Education.ExploreEducationStatistics.Common.Converters;
 using GovUk.Education.ExploreEducationStatistics.Common.Model;
 using GovUk.Education.ExploreEducationStatistics.Common.Model.Chart;
 using GovUk.Education.ExploreEducationStatistics.Common.Model.Data;
 using GovUk.Education.ExploreEducationStatistics.Common.Model.Data.Query;
-using GovUk.Education.ExploreEducationStatistics.Common.Services;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 using Newtonsoft.Json;
@@ -100,8 +98,8 @@ namespace GovUk.Education.ExploreEducationStatistics.Content.Model.Database
         public DbSet<ContentSection> ContentSections { get; set; }
         public DbSet<ContentBlock> ContentBlocks { get; set; }
         public DbSet<DataBlock> DataBlocks { get; set; }
-        public DbSet<Import> Imports { get; set; }
-        public DbSet<ImportError> ImportErrors { get; set; }
+        public DbSet<DataImport> DataImports { get; set; }
+        public DbSet<DataImportError> DataImportErrors { get; set; }
         public DbSet<HtmlBlock> HtmlBlocks { get; set; }
         public DbSet<MarkDownBlock> MarkDownBlocks { get; set; }
         public DbSet<ReleaseType> ReleaseTypes { get; set; }
@@ -129,26 +127,26 @@ namespace GovUk.Education.ExploreEducationStatistics.Content.Model.Database
                     v => v,
                     v => v.HasValue ? DateTime.SpecifyKind(v.Value, DateTimeKind.Utc) : (DateTime?) null);
 
-            modelBuilder.Entity<Import>()
+            modelBuilder.Entity<DataImport>()
                 .HasOne(import => import.File)
                 .WithOne()
                 .OnDelete(DeleteBehavior.Restrict);
 
-            modelBuilder.Entity<Import>()
+            modelBuilder.Entity<DataImport>()
                 .HasOne(import => import.MetaFile)
                 .WithOne()
                 .OnDelete(DeleteBehavior.Restrict);
 
-            modelBuilder.Entity<Import>()
+            modelBuilder.Entity<DataImport>()
                 .HasOne(import => import.ZipFile)
                 .WithOne()
                 .OnDelete(DeleteBehavior.Restrict);
 
-            modelBuilder.Entity<Import>()
+            modelBuilder.Entity<DataImport>()
                 .Property(import => import.Status)
-                .HasConversion(new EnumToStringConverter<ImportStatus>());
+                .HasConversion(new EnumToStringConverter<DataImportStatus>());
 
-            modelBuilder.Entity<ImportError>()
+            modelBuilder.Entity<DataImportError>()
                 .Property(importError => importError.Created)
                 .HasConversion(
                     v => v,

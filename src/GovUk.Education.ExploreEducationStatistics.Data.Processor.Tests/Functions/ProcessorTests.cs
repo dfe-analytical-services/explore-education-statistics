@@ -10,7 +10,7 @@ using Microsoft.Azure.WebJobs;
 using Microsoft.Extensions.Logging;
 using Moq;
 using Xunit;
-using static GovUk.Education.ExploreEducationStatistics.Content.Model.ImportStatus;
+using static GovUk.Education.ExploreEducationStatistics.Content.Model.DataImportStatus;
 
 namespace GovUk.Education.ExploreEducationStatistics.Data.Processor.Tests.Functions
 {
@@ -24,7 +24,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Processor.Tests.Functi
             var importStagesMessageQueue = new Mock<ICollector<ImportMessage>>();
             var datafileProcessingMessageQueue = new Mock<ICollector<ImportObservationsMessage>>();
 
-            var import = new Import
+            var import = new DataImport
             {
                 Id = Guid.NewGuid(),
                 File = new File
@@ -80,7 +80,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Processor.Tests.Functi
             var importStagesMessageQueue = new Mock<ICollector<ImportMessage>>();
             var datafileProcessingMessageQueue = new Mock<ICollector<ImportObservationsMessage>>();
 
-            var import = new Import
+            var import = new DataImport
             {
                 Id = Guid.NewGuid(),
                 File = new File
@@ -124,7 +124,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Processor.Tests.Functi
         public void ProcessUploadsButImportIsFinished()
         {
             var finishedStates = EnumUtil
-                .GetEnumValues<ImportStatus>()
+                .GetEnumValues<DataImportStatus>()
                 .Where(status => status.IsFinished())
                 .ToList();
 
@@ -135,7 +135,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Processor.Tests.Functi
                 var importStagesMessageQueue = new Mock<ICollector<ImportMessage>>();
                 var datafileProcessingMessageQueue = new Mock<ICollector<ImportObservationsMessage>>();
 
-                var import = new Import
+                var import = new DataImport
                 {
                     Id = Guid.NewGuid(),
                     File = new File
@@ -179,7 +179,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Processor.Tests.Functi
             var importStagesMessageQueue = new Mock<ICollector<ImportMessage>>();
             var datafileProcessingMessageQueue = new Mock<ICollector<ImportObservationsMessage>>();
 
-            var import = new Import
+            var import = new DataImport
             {
                 Id = Guid.NewGuid(),
                 File = new File
@@ -226,7 +226,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Processor.Tests.Functi
             var importStagesMessageQueue = new Mock<ICollector<ImportMessage>>();
             var datafileProcessingMessageQueue = new Mock<ICollector<ImportObservationsMessage>>();
 
-            var import = new Import
+            var import = new DataImport
             {
                 Id = Guid.NewGuid(),
                 File = new File
@@ -280,7 +280,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Processor.Tests.Functi
             var importStagesMessageQueue = new Mock<ICollector<ImportMessage>>();
             var datafileProcessingMessageQueue = new Mock<ICollector<ImportObservationsMessage>>();
 
-            var import = new Import
+            var import = new DataImport
             {
                 Id = Guid.NewGuid(),
                 File = new File
@@ -332,7 +332,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Processor.Tests.Functi
             var importStagesMessageQueue = new Mock<ICollector<ImportMessage>>();
             var datafileProcessingMessageQueue = new Mock<ICollector<ImportObservationsMessage>>();
 
-            var import = new Import
+            var import = new DataImport
             {
                 Id = Guid.NewGuid(),
                 File = new File
@@ -384,7 +384,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Processor.Tests.Functi
             var importStagesMessageQueue = new Mock<ICollector<ImportMessage>>();
             var datafileProcessingMessageQueue = new Mock<ICollector<ImportObservationsMessage>>();
 
-            var import = new Import
+            var import = new DataImport
             {
                 Id = Guid.NewGuid(),
                 File = new File
@@ -447,13 +447,13 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Processor.Tests.Functi
 
         private static (
             Mock<IProcessorService>,
-            Mock<IImportService>,
+            Mock<IDataImportService>,
             Mock<IFileImportService>
             ) Mocks()
         {
             return (
                 new Mock<IProcessorService>(),
-                new Mock<IImportService>(),
+                new Mock<IDataImportService>(),
                 new Mock<IFileImportService>()
             );
         }

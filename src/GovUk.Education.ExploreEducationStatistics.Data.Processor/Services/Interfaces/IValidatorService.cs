@@ -9,7 +9,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Processor.Services.Int
 {
     public interface IValidatorService
     {
-        Task<Either<List<ImportError>, ProcessorStatistics>> Validate(
+        Task<Either<List<DataImportError>, ProcessorStatistics>> Validate(
             Guid importId,
             ExecutionContext executionContext);
     }

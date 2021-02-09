@@ -331,7 +331,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
             }
 
             var dataBlockService = new Mock<IDataBlockService>(MockBehavior.Strict);
-            var importService = new Mock<IImportService>(MockBehavior.Strict);
+            var dataImportService = new Mock<IDataImportService>(MockBehavior.Strict);
             var subjectService = new Mock<ISubjectService>(MockBehavior.Strict);
             var releaseDataFileService = new Mock<IReleaseDataFileService>(MockBehavior.Strict);
             var releaseSubjectService = new Mock<IReleaseSubjectService>(MockBehavior.Strict);
@@ -342,8 +342,8 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
             dataBlockService.Setup(service => service.DeleteDataBlocks(It.IsAny<DeleteDataBlockPlan>()))
                 .Returns(Task.CompletedTask);
 
-            importService.Setup(service => service.GetStatus(file.Id))
-                .ReturnsAsync(ImportStatus.COMPLETE);
+            dataImportService.Setup(service => service.GetStatus(file.Id))
+                .ReturnsAsync(DataImportStatus.COMPLETE);
 
             subjectService.Setup(service => service.Get(subject.Id)).ReturnsAsync(subject);
 
@@ -357,7 +357,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
             {
                 var releaseService = BuildReleaseService(context,
                     dataBlockService: dataBlockService.Object,
-                    importService: importService.Object,
+                    dataImportService: dataImportService.Object,
                     subjectService: subjectService.Object,
                     releaseDataFileService: releaseDataFileService.Object,
                     releaseSubjectService: releaseSubjectService.Object);
@@ -372,7 +372,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
                 releaseDataFileService.Verify(mock =>
                     mock.Delete(release.Id, file.Id, false), Times.Once());
 
-                importService.Verify(
+                dataImportService.Verify(
                     mock => mock.GetStatus(file.Id),
                     Times.Once());
 
@@ -416,14 +416,14 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
             }
 
             var dataBlockService = new Mock<IDataBlockService>(MockBehavior.Strict);
-            var importService = new Mock<IImportService>(MockBehavior.Strict);
+            var dataImportService = new Mock<IDataImportService>(MockBehavior.Strict);
             var subjectService = new Mock<ISubjectService>(MockBehavior.Strict);
             var fileStorageService = new Mock<IReleaseFileService>(MockBehavior.Strict);
             var releaseSubjectService = new Mock<IReleaseSubjectService>(MockBehavior.Strict);
 
-            importService.Setup(service =>
+            dataImportService.Setup(service =>
                     service.GetStatus(file.Id))
-                .ReturnsAsync(ImportStatus.STAGE_1);
+                .ReturnsAsync(DataImportStatus.STAGE_1);
 
             subjectService.Setup(service => service.Get(subject.Id)).ReturnsAsync(subject);
 
@@ -431,13 +431,13 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
             {
                 var releaseService = BuildReleaseService(context,
                     dataBlockService: dataBlockService.Object,
-                    importService: importService.Object,
+                    dataImportService: dataImportService.Object,
                     subjectService: subjectService.Object,
                     releaseFileService: fileStorageService.Object,
                     releaseSubjectService: releaseSubjectService.Object);
                 var result = await releaseService.RemoveDataFiles(release.Id, file.Id);
 
-                importService.Verify(
+                dataImportService.Verify(
                     mock => mock.GetStatus(file.Id),
                     Times.Once());
 
@@ -495,7 +495,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
             }
 
             var dataBlockService = new Mock<IDataBlockService>(MockBehavior.Strict);
-            var importService = new Mock<IImportService>(MockBehavior.Strict);
+            var dataImportService = new Mock<IDataImportService>(MockBehavior.Strict);
             var subjectService = new Mock<ISubjectService>(MockBehavior.Strict);
             var releaseDataFileService = new Mock<IReleaseDataFileService>(MockBehavior.Strict);
             var releaseSubjectService = new Mock<IReleaseSubjectService>(MockBehavior.Strict);
@@ -507,9 +507,9 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
             dataBlockService.Setup(service => service.DeleteDataBlocks(It.IsAny<DeleteDataBlockPlan>()))
                 .Returns(Task.CompletedTask);
 
-            importService.Setup(service =>
+            dataImportService.Setup(service =>
                     service.GetStatus(It.IsIn(file.Id, replacementFile.Id)))
-                .ReturnsAsync(ImportStatus.COMPLETE);
+                .ReturnsAsync(DataImportStatus.COMPLETE);
 
             subjectService.Setup(service => service.Get(subject.Id)).ReturnsAsync(subject);
             subjectService.Setup(service => service.Get(replacementSubject.Id)).ReturnsAsync(replacementSubject);
@@ -526,7 +526,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
             {
                 var releaseService = BuildReleaseService(context,
                     dataBlockService: dataBlockService.Object,
-                    importService: importService.Object,
+                    dataImportService: dataImportService.Object,
                     subjectService: subjectService.Object,
                     releaseDataFileService: releaseDataFileService.Object,
                     releaseSubjectService: releaseSubjectService.Object);
@@ -548,7 +548,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
                     Times.Exactly(2)
                 );
 
-                importService.Verify(
+                dataImportService.Verify(
                     mock => mock.GetStatus(It.IsIn(file.Id, replacementFile.Id)), Times.Exactly(2));
 
                 releaseSubjectService.Verify(
@@ -608,27 +608,27 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
             }
 
             var dataBlockService = new Mock<IDataBlockService>(MockBehavior.Strict);
-            var importService = new Mock<IImportService>(MockBehavior.Strict);
+            var dataImportService = new Mock<IDataImportService>(MockBehavior.Strict);
             var subjectService = new Mock<ISubjectService>(MockBehavior.Strict);
             var fileStorageService = new Mock<IReleaseFileService>(MockBehavior.Strict);
             var releaseSubjectService = new Mock<IReleaseSubjectService>(MockBehavior.Strict);
 
-            importService.Setup(service => service.GetStatus(file.Id))
-                .ReturnsAsync(ImportStatus.COMPLETE);
-            importService.Setup(service => service.GetStatus(replacementFile.Id))
-                .ReturnsAsync(ImportStatus.STAGE_1);
+            dataImportService.Setup(service => service.GetStatus(file.Id))
+                .ReturnsAsync(DataImportStatus.COMPLETE);
+            dataImportService.Setup(service => service.GetStatus(replacementFile.Id))
+                .ReturnsAsync(DataImportStatus.STAGE_1);
 
             await using (var context = InMemoryApplicationDbContext(contentDbContextId))
             {
                 var releaseService = BuildReleaseService(context,
                     dataBlockService: dataBlockService.Object,
-                    importService: importService.Object,
+                    dataImportService: dataImportService.Object,
                     subjectService: subjectService.Object,
                     releaseFileService: fileStorageService.Object,
                     releaseSubjectService: releaseSubjectService.Object);
                 var result = await releaseService.RemoveDataFiles(release.Id, file.Id);
 
-                importService.Verify(
+                dataImportService.Verify(
                     mock => mock.GetStatus(It.IsIn(file.Id, replacementFile.Id)), Times.Exactly(2));
 
                 Assert.True(result.IsLeft);
@@ -1359,7 +1359,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
             ISubjectService subjectService = null,
             IReleaseFileService releaseFileService = null,
             IReleaseDataFileService releaseDataFileService = null,
-            IImportService importService = null,
+            IDataImportService dataImportService = null,
             IFootnoteService footnoteService = null,
             IDataBlockService dataBlockService = null,
             IReleaseChecklistService releaseChecklistService = null,
@@ -1382,7 +1382,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
                 subjectService ?? new Mock<ISubjectService>().Object,
                 releaseDataFileService ?? new Mock<IReleaseDataFileService>().Object,
                 releaseFileService ?? new Mock<IReleaseFileService>().Object,
-                importService ?? new Mock<IImportService>().Object,
+                dataImportService ?? new Mock<IDataImportService>().Object,
                 footnoteService ?? new Mock<IFootnoteService>().Object,
                 statisticsDbContext ?? new Mock<StatisticsDbContext>().Object,
                 dataBlockService ?? new Mock<IDataBlockService>().Object,

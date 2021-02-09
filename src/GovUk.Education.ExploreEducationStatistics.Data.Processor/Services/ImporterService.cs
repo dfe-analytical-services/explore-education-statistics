@@ -26,7 +26,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Processor.Services
         private readonly ImporterLocationService _importerLocationService;
         private readonly ImporterFilterService _importerFilterService;
         private readonly IImporterMetaService _importerMetaService;
-        private readonly IImportService _importService;
+        private readonly IDataImportService _dataImportService;
         private readonly ILogger<ImporterService> _logger;
 
         private const int Stage2RowCheck = 1000;
@@ -109,14 +109,14 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Processor.Services
             ImporterFilterService importerFilterService,
             ImporterLocationService importerLocationService,
             IImporterMetaService importerMetaService,
-            IImportService importService, 
+            IDataImportService dataImportService, 
             ILogger<ImporterService> logger)
         {
             _guidGenerator = guidGenerator;
             _importerFilterService = importerFilterService;
             _importerLocationService = importerLocationService;
             _importerMetaService = importerMetaService;
-            _importService = importService;
+            _dataImportService = dataImportService;
             _logger = logger;
         }
 
@@ -130,7 +130,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Processor.Services
             return _importerMetaService.Get(table.Columns, table.Rows, subject, context);
         }
 
-        public async Task ImportFiltersAndLocations(Import import,
+        public async Task ImportFiltersAndLocations(DataImport dataImport,
             DataColumnCollection cols,
             DataRowCollection rows,
             SubjectMeta subjectMeta,
@@ -148,17 +148,17 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Processor.Services
             {
                 if (rowCount % Stage2RowCheck == 0)
                 {
-                    var currentStatus = await _importService.GetImportStatus(import.Id);
+                    var currentStatus = await _dataImportService.GetImportStatus(dataImport.Id);
 
                     if (currentStatus.IsFinishedOrAborting())
                     {
-                        _logger.LogInformation($"Import for {import.File.Filename} has finished or is being aborted, " +
+                        _logger.LogInformation($"Import for {dataImport.File.Filename} has finished or is being aborted, " +
                                                "so finishing importing Filters and Locations early");
                         return;
                     }
                     
-                    await _importService.UpdateStatus(import.Id,
-                        ImportStatus.STAGE_2,
+                    await _dataImportService.UpdateStatus(dataImport.Id,
+                        DataImportStatus.STAGE_2,
                         (double) rowCount / totalRows * 100);
                 }
 

@@ -13,18 +13,18 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Security.Authorizatio
     public class CancelSpecificFileImportAuthorizationHandler 
         : AuthorizationHandler<CancelSpecificFileImportRequirement, File>
     {
-        private readonly IImportRepository _importRepository;
+        private readonly IDataImportRepository _dataImportRepository;
 
-        public CancelSpecificFileImportAuthorizationHandler(IImportRepository importRepository)
+        public CancelSpecificFileImportAuthorizationHandler(IDataImportRepository dataImportRepository)
         {
-            _importRepository = importRepository;
+            _dataImportRepository = dataImportRepository;
         }
 
         protected override async Task HandleRequirementAsync(AuthorizationHandlerContext ctx,
             CancelSpecificFileImportRequirement requirement,
             File file)
         {
-            var status = await _importRepository.GetStatusByFileId(file.Id);
+            var status = await _dataImportRepository.GetStatusByFileId(file.Id);
             
             if (status.IsFinishedOrAborting())
             {

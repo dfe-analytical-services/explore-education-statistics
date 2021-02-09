@@ -23,20 +23,20 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Services
         private readonly ContentDbContext _contentDbContext;
         private readonly IPersistenceHelper<ContentDbContext> _contentPersistenceHelper;
         private readonly StatisticsDbContext _statisticsDbContext;
-        private readonly IImportRepository _importRepository;
+        private readonly IDataImportRepository _dataImportRepository;
         private readonly IUserService _userService;
 
         public ReleaseMetaService(
             ContentDbContext contentDbContext,
             IPersistenceHelper<ContentDbContext> contentPersistenceHelper,
             StatisticsDbContext statisticsDbContext,
-            IImportRepository importRepository,
+            IDataImportRepository dataImportRepository,
             IUserService userService)
         {
             _contentDbContext = contentDbContext;
             _contentPersistenceHelper = contentPersistenceHelper;
             _statisticsDbContext = statisticsDbContext;
-            _importRepository = importRepository;
+            _dataImportRepository = dataImportRepository;
             _userService = userService;
         }
 
@@ -59,8 +59,8 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Services
                     var subjectsToInclude = new List<Guid>();
                     foreach (var file in files)
                     {
-                        var importStatus = await _importRepository.GetStatusByFileId(file.Id);
-                        if (importStatus == ImportStatus.COMPLETE && file.SubjectId.HasValue)
+                        var importStatus = await _dataImportRepository.GetStatusByFileId(file.Id);
+                        if (importStatus == DataImportStatus.COMPLETE && file.SubjectId.HasValue)
                         {
                             subjectsToInclude.Add(file.SubjectId.Value);
                         }

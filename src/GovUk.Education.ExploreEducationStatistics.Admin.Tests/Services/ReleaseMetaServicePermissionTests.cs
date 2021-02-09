@@ -38,14 +38,14 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
             ContentDbContext contentDbContext = null,
             IPersistenceHelper<ContentDbContext> persistenceHelper = null,
             StatisticsDbContext statisticsDbContext = null,
-            IImportRepository importRepository = null,
+            IDataImportRepository dataImportRepository = null,
             IUserService userService = null)
         {
             return new ReleaseMetaService(
                 contentDbContext ?? new Mock<ContentDbContext>().Object,
                 persistenceHelper ?? DefaultPersistenceHelperMock().Object,
                 statisticsDbContext ?? new Mock<StatisticsDbContext>().Object,
-                importRepository ?? new Mock<IImportRepository>().Object,
+                dataImportRepository ?? new Mock<IDataImportRepository>().Object,
                 userService ?? new Mock<IUserService>().Object
             );
         }

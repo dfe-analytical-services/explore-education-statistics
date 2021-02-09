@@ -21,7 +21,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Processor.Services.Int
             int rowsPerBatch,
             StatisticsDbContext context);
 
-        Task ImportFiltersAndLocations(Import import,
+        Task ImportFiltersAndLocations(DataImport dataImport,
             DataColumnCollection cols,
             DataRowCollection rows,
             SubjectMeta subjectMeta,

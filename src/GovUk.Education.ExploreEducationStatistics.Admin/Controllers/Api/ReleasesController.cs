@@ -29,7 +29,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Controllers.Api
         private readonly IReleaseChecklistService _releaseChecklistService;
         private readonly UserManager<ApplicationUser> _userManager;
         private readonly IDataBlockService _dataBlockService;
-        private readonly IImportService _importService;
+        private readonly IDataImportService _dataImportService;
 
         public ReleasesController(
             IReleaseService releaseService,
@@ -39,7 +39,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Controllers.Api
             IReleaseChecklistService releaseChecklistService,
             UserManager<ApplicationUser> userManager,
             IDataBlockService dataBlockService,
-            IImportService importService)
+            IDataImportService dataImportService)
         {
             _releaseService = releaseService;
             _releaseDataFileService = releaseDataFileService;
@@ -48,7 +48,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Controllers.Api
             _releaseChecklistService = releaseChecklistService;
             _userManager = userManager;
             _dataBlockService = dataBlockService;
-            _importService = importService;
+            _dataImportService = dataImportService;
         }
 
         [HttpGet("release/{releaseId}/file/{id}")]
@@ -257,7 +257,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Controllers.Api
         }
 
         [HttpGet("release/{releaseId}/data/{fileId}/import/status")]
-        public Task<ActionResult<ImportViewModel>> GetDataUploadStatus(Guid releaseId, Guid fileId)
+        public Task<ActionResult<DataImportViewModel>> GetDataUploadStatus(Guid releaseId, Guid fileId)
         {
             return _releaseService
                 .GetDataFileImportStatus(releaseId, fileId)
@@ -283,7 +283,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Controllers.Api
         [HttpPost("release/{releaseId}/data/{fileId}/import/cancel")]
         public async Task<IActionResult> CancelFileImport(Guid releaseId, Guid fileId)
         {
-            return await _importService
+            return await _dataImportService
                 .CancelImport(releaseId, fileId)
                 .HandleFailuresOr(result => new AcceptedResult());
         }

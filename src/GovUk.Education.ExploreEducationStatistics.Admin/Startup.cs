@@ -204,12 +204,12 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin
             services.AddSpaStaticFiles(configuration => { configuration.RootPath = "wwwroot"; });
 
             services.AddTransient<IFileRepository, FileRepository>();
-            services.AddTransient<IImportRepository, ImportRepository>();
+            services.AddTransient<IDataImportRepository, DataImportRepository>();
             services.AddTransient<IReleaseFileRepository, ReleaseFileRepository>();
             
             services.AddTransient<IReleaseDataFileService, ReleaseDataFileService>();
             services.AddTransient<IReleaseFileService, ReleaseFileService>();
-            services.AddTransient<IImportService, ImportService>();
+            services.AddTransient<IDataImportService, DataImportService>();
             services.AddTransient<IImportStatusBauService, ImportStatusBauService>();
             services.AddTransient<IMigrateImportsService, MigrateImportsService>();
 

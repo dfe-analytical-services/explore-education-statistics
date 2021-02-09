@@ -37,7 +37,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Services
         private readonly IFileRepository _fileRepository;
         private readonly IReleaseRepository _releaseRepository;
         private readonly IReleaseFileRepository _releaseFileRepository;
-        private readonly IImportService _importService;
+        private readonly IDataImportService _dataImportService;
         private readonly IUserService _userService;
 
         public ReleaseDataFileService(ContentDbContext contentDbContext,
@@ -49,7 +49,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Services
             IFileRepository fileRepository,
             IReleaseRepository releaseRepository,
             IReleaseFileRepository releaseFileRepository,
-            IImportService importService,
+            IDataImportService dataImportService,
             IUserService userService)
         {
             _contentDbContext = contentDbContext;
@@ -61,7 +61,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Services
             _fileRepository = fileRepository;
             _releaseRepository = releaseRepository;
             _releaseFileRepository = releaseFileRepository;
-            _importService = importService;
+            _dataImportService = dataImportService;
             _userService = userService;
         }
 
@@ -99,7 +99,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Services
                         }
                         else
                         {
-                            await _importService.DeleteImport(file.Id);
+                            await _dataImportService.DeleteImport(file.Id);
                             await _blobStorageService.DeleteBlob(
                                 PrivateFilesContainerName,
                                 file.Path()
@@ -245,7 +245,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Services
                                         await UploadFileToStorage(dataFile, dataFormFile, dataInfo);
                                         await UploadFileToStorage(metaFile, metaFormFile, metaDataInfo);
 
-                                        await _importService.Import(
+                                        await _dataImportService.Import(
                                             subjectId: subjectId,
                                             dataFile: dataFile,
                                             metaFile: metaFile,
@@ -267,7 +267,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Services
                                             MetaFileName = blob.GetMetaFileName(),
                                             Rows = blob.GetNumberOfRows(),
                                             UserName = blob.GetUserName(),
-                                            Status = ImportStatus.QUEUED,
+                                            Status = DataImportStatus.QUEUED,
                                             Created = blob.Created,
                                             Permissions = await _userService.GetDataFilePermissions(dataFile)
                                         };
@@ -332,7 +332,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Services
 
                                                     await UploadFileToStorage(zipFile, zipFormFile, dataInfo);
 
-                                                    await _importService.ImportZip(
+                                                    await _dataImportService.ImportZip(
                                                         subjectId: subjectId,
                                                         dataFile: dataFile,
                                                         metaFile: metaFile,
@@ -356,7 +356,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Services
                                                         MetaFileName = metaFile.Filename,
                                                         Rows = blob.GetNumberOfRows(),
                                                         UserName = blob.GetUserName(),
-                                                        Status = ImportStatus.QUEUED,
+                                                        Status = DataImportStatus.QUEUED,
                                                         Created = blob.Created,
                                                         Permissions = await _userService.GetDataFilePermissions(dataFile)
                                                     };
@@ -400,7 +400,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Services
                 ReplacedBy = dataFile.ReplacedById,
                 Rows = blob.GetNumberOfRows(),
                 UserName = blob.GetUserName(),
-                Status = await _importService.GetStatus(dataFile.Id),
+                Status = await _dataImportService.GetStatus(dataFile.Id),
                 Created = blob.Created,
                 Permissions = await _userService.GetDataFilePermissions(dataFile)
             };
@@ -431,7 +431,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Services
                                 : string.Empty,
                         Rows = 0,
                         UserName = zipBlob.GetUserName(),
-                        Status = await _importService.GetStatus(file.Id),
+                        Status = await _dataImportService.GetStatus(file.Id),
                         Created = zipBlob.Created,
                         Permissions = await _userService.GetDataFilePermissions(file)
                     };
@@ -453,7 +453,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Services
                 MetaFileName = metaFileReference?.Filename ?? "",
                 Rows = 0,
                 UserName = "",
-                Status = await _importService.GetStatus(file.Id),
+                Status = await _dataImportService.GetStatus(file.Id),
                 Permissions = await _userService.GetDataFilePermissions(file)
             };
         }

@@ -322,7 +322,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Controllers.Api
             Mock<IReleaseChecklistService> ReleaseChecklistService,
             Mock<UserManager<ApplicationUser>> UserManager,
             Mock<IDataBlockService> DataBlockService,
-            Mock<IImportService> ImportService) Mocks()
+            Mock<IDataImportService> ImportService) Mocks()
         {
             return (new Mock<IReleaseService>(),
                     new Mock<IReleaseFileService>(),
@@ -331,7 +331,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Controllers.Api
                     new Mock<IReleaseChecklistService>(),
                     MockUserManager(),
                     new Mock<IDataBlockService>(),
-                    new Mock<IImportService>()
+                    new Mock<IDataImportService>()
                 );
         }
 
@@ -343,7 +343,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Controllers.Api
             Mock<IReleaseChecklistService> ReleaseChecklistService,
             Mock<UserManager<ApplicationUser>> UserManager,
             Mock<IDataBlockService> DataBlockService,
-            Mock<IImportService> ImportService
+            Mock<IDataImportService> ImportService
             ) mocks)
         {
             return new ReleasesController(

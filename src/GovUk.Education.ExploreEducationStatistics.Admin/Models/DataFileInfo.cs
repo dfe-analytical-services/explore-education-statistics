@@ -18,8 +18,8 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Models
         public DateTimeOffset? Created { get; set; }
         public Guid? ReplacedBy { get; set; }
 
-        [JsonConverter(typeof(EnumToEnumValueJsonConverter<ImportStatus>))]
-        public ImportStatus Status { get; set; }
+        [JsonConverter(typeof(EnumToEnumValueJsonConverter<DataImportStatus>))]
+        public DataImportStatus Status { get; set; }
         public DataFilePermissions Permissions { get; set; }
     }
 }

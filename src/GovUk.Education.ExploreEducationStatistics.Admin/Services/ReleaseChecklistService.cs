@@ -23,7 +23,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Services
     public class ReleaseChecklistService : IReleaseChecklistService
     {
         private readonly IPersistenceHelper<ContentDbContext> _persistenceHelper;
-        private readonly IImportService _importService;
+        private readonly IDataImportService _dataImportService;
         private readonly IUserService _userService;
         private readonly IMetaGuidanceService _metaGuidanceService;
         private readonly IFileRepository _fileRepository;
@@ -32,7 +32,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Services
 
         public ReleaseChecklistService(
             IPersistenceHelper<ContentDbContext> persistenceHelper,
-            IImportService importService,
+            IDataImportService dataImportService,
             IUserService userService,
             IMetaGuidanceService metaGuidanceService,
             IFileRepository fileRepository,
@@ -40,7 +40,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Services
             IDataBlockService dataBlockService)
         {
             _persistenceHelper = persistenceHelper;
-            _importService = importService;
+            _dataImportService = dataImportService;
             _userService = userService;
             _metaGuidanceService = metaGuidanceService;
             _fileRepository = fileRepository;
@@ -71,7 +71,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Services
         {
             var errors = new List<ReleaseChecklistIssue>();
 
-            if (await _importService.HasIncompleteImports(release.Id))
+            if (await _dataImportService.HasIncompleteImports(release.Id))
             {
                 errors.Add(new ReleaseChecklistIssue(ValidationErrorMessages.DataFileImportsMustBeCompleted));
             }

@@ -14,7 +14,7 @@ using GovUk.Education.ExploreEducationStatistics.Data.Processor.Services.Interfa
 using Microsoft.Extensions.Logging;
 using Moq;
 using Xunit;
-using static GovUk.Education.ExploreEducationStatistics.Content.Model.ImportStatus;
+using static GovUk.Education.ExploreEducationStatistics.Content.Model.DataImportStatus;
 using static GovUk.Education.ExploreEducationStatistics.Data.Model.Database.StatisticsDbUtils;
 using static Moq.MockBehavior;
 
@@ -22,13 +22,13 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Processor.Tests.Servic
 {
     public class FileImportServiceTests
     {
-        private static readonly List<ImportStatus> FinishedStatuses = EnumUtil
-            .GetEnumValues<ImportStatus>()
+        private static readonly List<DataImportStatus> FinishedStatuses = EnumUtil
+            .GetEnumValues<DataImportStatus>()
             .Where(status => status.IsFinished())
             .ToList();
 
-        private static readonly List<ImportStatus> AbortingStatuses = EnumUtil
-            .GetEnumValues<ImportStatus>()
+        private static readonly List<DataImportStatus> AbortingStatuses = EnumUtil
+            .GetEnumValues<DataImportStatus>()
             .Where(status => status.IsAborting())
             .ToList();
 
@@ -41,10 +41,10 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Processor.Tests.Servic
                 Filename = "my_data_file.csv"
             };
 
-            var import = new Import
+            var import = new DataImport
             {
                 Id = Guid.NewGuid(),
-                Errors = new List<ImportError>(),
+                Errors = new List<DataImportError>(),
                 FileId = file.Id,
                 File = file,
                 SubjectId = Guid.NewGuid(),
@@ -53,13 +53,13 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Processor.Tests.Servic
                 TotalRows = 2
             };
 
-            var importService = new Mock<IImportService>(Strict);
+            var dataImportService = new Mock<IDataImportService>(Strict);
 
-            importService
+            dataImportService
                 .Setup(s => s.GetImport(import.Id))
                 .ReturnsAsync(import);
 
-            importService
+            dataImportService
                 .Setup(s => s.UpdateStatus(
                     import.Id, COMPLETE, 100))
                 .Returns(Task.CompletedTask);
@@ -87,7 +87,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Processor.Tests.Servic
 
             await using (var statisticsDbContext = InMemoryStatisticsDbContext(statisticsDbContextId))
             {
-                var service = BuildFileImportService(importService: importService.Object);
+                var service = BuildFileImportService(dataImportService: dataImportService.Object);
 
                 var message = new ImportObservationsMessage
                 {
@@ -97,7 +97,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Processor.Tests.Servic
                 await service.CheckComplete(message, statisticsDbContext);
             }
 
-            MockUtils.VerifyAllMocks(importService);
+            MockUtils.VerifyAllMocks(dataImportService);
         }
 
         [Fact]
@@ -109,10 +109,10 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Processor.Tests.Servic
                 Filename = "my_data_file.csv"
             };
 
-            var import = new Import
+            var import = new DataImport
             {
                 Id = Guid.NewGuid(),
-                Errors = new List<ImportError>(),
+                Errors = new List<DataImportError>(),
                 FileId = file.Id,
                 File = file,
                 SubjectId = Guid.NewGuid(),
@@ -122,17 +122,17 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Processor.Tests.Servic
             };
 
             var batchService = new Mock<IBatchService>(Strict);
-            var importService = new Mock<IImportService>(Strict);
+            var dataImportService = new Mock<IDataImportService>(Strict);
 
             batchService
                 .Setup(s => s.GetNumBatchesRemaining(import.FileId))
                 .ReturnsAsync(0);
 
-            importService
+            dataImportService
                 .Setup(s => s.GetImport(import.Id))
                 .ReturnsAsync(import);
 
-            importService
+            dataImportService
                 .Setup(s => s.UpdateStatus(
                     import.Id, COMPLETE, 100))
                 .Returns(Task.CompletedTask);
@@ -157,7 +157,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Processor.Tests.Servic
             await using (var statisticsDbContext = InMemoryStatisticsDbContext(statisticsDbContextId))
             {
                 var service = BuildFileImportService(batchService: batchService.Object,
-                    importService: importService.Object);
+                    dataImportService: dataImportService.Object);
 
                 var message = new ImportObservationsMessage
                 {
@@ -167,7 +167,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Processor.Tests.Servic
                 await service.CheckComplete(message, statisticsDbContext);
             }
 
-            MockUtils.VerifyAllMocks(batchService, importService);
+            MockUtils.VerifyAllMocks(batchService, dataImportService);
         }
 
         [Fact]
@@ -179,10 +179,10 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Processor.Tests.Servic
                 Filename = "my_data_file.csv"
             };
 
-            var import = new Import
+            var import = new DataImport
             {
                 Id = Guid.NewGuid(),
-                Errors = new List<ImportError>(),
+                Errors = new List<DataImportError>(),
                 FileId = file.Id,
                 File = file,
                 SubjectId = Guid.NewGuid(),
@@ -192,17 +192,17 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Processor.Tests.Servic
             };
 
             var batchService = new Mock<IBatchService>(Strict);
-            var importService = new Mock<IImportService>(Strict);
+            var dataImportService = new Mock<IDataImportService>(Strict);
 
             batchService
                 .Setup(s => s.GetNumBatchesRemaining(import.FileId))
                 .ReturnsAsync(1);
 
-            importService
+            dataImportService
                 .Setup(s => s.GetImport(import.Id))
                 .ReturnsAsync(import);
 
-            importService
+            dataImportService
                 .Setup(s => s.UpdateStatus(
                     import.Id, STAGE_4, 50))
                 .Returns(Task.CompletedTask);
@@ -212,7 +212,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Processor.Tests.Servic
             await using (var statisticsDbContext = InMemoryStatisticsDbContext(statisticsDbContextId))
             {
                 var service = BuildFileImportService(batchService: batchService.Object,
-                    importService: importService.Object);
+                    dataImportService: dataImportService.Object);
 
                 var message = new ImportObservationsMessage
                 {
@@ -222,7 +222,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Processor.Tests.Servic
                 await service.CheckComplete(message, statisticsDbContext);
             }
 
-            MockUtils.VerifyAllMocks(batchService, importService);
+            MockUtils.VerifyAllMocks(batchService, dataImportService);
         }
 
         [Fact]
@@ -234,12 +234,12 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Processor.Tests.Servic
                 Filename = "my_data_file.csv"
             };
 
-            var import = new Import
+            var import = new DataImport
             {
                 Id = Guid.NewGuid(),
-                Errors = new List<ImportError>
+                Errors = new List<DataImportError>
                 {
-                    new ImportError("an error")
+                    new DataImportError("an error")
                 },
                 FileId = file.Id,
                 File = file,
@@ -249,13 +249,13 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Processor.Tests.Servic
                 TotalRows = 2
             };
 
-            var importService = new Mock<IImportService>(Strict);
+            var dataImportService = new Mock<IDataImportService>(Strict);
 
-            importService
+            dataImportService
                 .Setup(s => s.GetImport(import.Id))
                 .ReturnsAsync(import);
 
-            importService
+            dataImportService
                 .Setup(s => s.UpdateStatus(
                     import.Id, FAILED, 100))
                 .Returns(Task.CompletedTask);
@@ -279,7 +279,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Processor.Tests.Servic
 
             await using (var statisticsDbContext = InMemoryStatisticsDbContext(statisticsDbContextId))
             {
-                var service = BuildFileImportService(importService: importService.Object);
+                var service = BuildFileImportService(dataImportService: dataImportService.Object);
 
                 var message = new ImportObservationsMessage
                 {
@@ -289,7 +289,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Processor.Tests.Servic
                 await service.CheckComplete(message, statisticsDbContext);
             }
 
-            MockUtils.VerifyAllMocks(importService);
+            MockUtils.VerifyAllMocks(dataImportService);
         }
 
         [Fact]
@@ -301,10 +301,10 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Processor.Tests.Servic
                 Filename = "my_data_file.csv"
             };
 
-            var import = new Import
+            var import = new DataImport
             {
                 Id = Guid.NewGuid(),
-                Errors = new List<ImportError>(),
+                Errors = new List<DataImportError>(),
                 FileId = file.Id,
                 File = file,
                 SubjectId = Guid.NewGuid(),
@@ -313,13 +313,13 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Processor.Tests.Servic
                 TotalRows = 3
             };
 
-            var importService = new Mock<IImportService>(Strict);
+            var dataImportService = new Mock<IDataImportService>(Strict);
 
-            importService
+            dataImportService
                 .Setup(s => s.GetImport(import.Id))
                 .ReturnsAsync(import);
 
-            importService
+            dataImportService
                 .Setup(s => s.FailImport(import.Id, 
                     $"Number of observations inserted (2) does not equal that expected ({import.TotalRows}) : Please delete & retry"))
                 .Returns(Task.CompletedTask);
@@ -343,7 +343,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Processor.Tests.Servic
 
             await using (var statisticsDbContext = InMemoryStatisticsDbContext(statisticsDbContextId))
             {
-                var service = BuildFileImportService(importService: importService.Object);
+                var service = BuildFileImportService(dataImportService: dataImportService.Object);
 
                 var message = new ImportObservationsMessage
                 {
@@ -353,7 +353,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Processor.Tests.Servic
                 await service.CheckComplete(message, statisticsDbContext);
             }
 
-            MockUtils.VerifyAllMocks(importService);
+            MockUtils.VerifyAllMocks(dataImportService);
         }
 
         [Fact]
@@ -365,12 +365,12 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Processor.Tests.Servic
                 Filename = "my_data_file.csv"
             };
 
-            var import = new Import
+            var import = new DataImport
             {
                 Id = Guid.NewGuid(),
-                Errors = new List<ImportError>
+                Errors = new List<DataImportError>
                 {
-                    new ImportError("an error")
+                    new DataImportError("an error")
                 },
                 FileId = file.Id,
                 File = file,
@@ -381,17 +381,17 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Processor.Tests.Servic
             };
             
             var batchService = new Mock<IBatchService>(Strict);
-            var importService = new Mock<IImportService>(Strict);
+            var dataImportService = new Mock<IDataImportService>(Strict);
 
             batchService
                 .Setup(s => s.GetNumBatchesRemaining(import.FileId))
                 .ReturnsAsync(0);
 
-            importService
+            dataImportService
                 .Setup(s => s.GetImport(import.Id))
                 .ReturnsAsync(import);
 
-            importService
+            dataImportService
                 .Setup(s => s.UpdateStatus(
                     import.Id, FAILED, 100))
                 .Returns(Task.CompletedTask);
@@ -416,7 +416,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Processor.Tests.Servic
             await using (var statisticsDbContext = InMemoryStatisticsDbContext(statisticsDbContextId))
             {
                 var service = BuildFileImportService(batchService: batchService.Object,
-                    importService: importService.Object);
+                    dataImportService: dataImportService.Object);
 
                 var message = new ImportObservationsMessage
                 {
@@ -426,7 +426,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Processor.Tests.Servic
                 await service.CheckComplete(message, statisticsDbContext);
             }
 
-            MockUtils.VerifyAllMocks(batchService, importService);
+            MockUtils.VerifyAllMocks(batchService, dataImportService);
         }
 
         [Fact]
@@ -438,10 +438,10 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Processor.Tests.Servic
                 Filename = "my_data_file.csv"
             };
 
-            var import = new Import
+            var import = new DataImport
             {
                 Id = Guid.NewGuid(),
-                Errors = new List<ImportError>(),
+                Errors = new List<DataImportError>(),
                 FileId = file.Id,
                 File = file,
                 SubjectId = Guid.NewGuid(),
@@ -451,17 +451,17 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Processor.Tests.Servic
             };
             
             var batchService = new Mock<IBatchService>(Strict);
-            var importService = new Mock<IImportService>(Strict);
+            var dataImportService = new Mock<IDataImportService>(Strict);
 
             batchService
                 .Setup(s => s.GetNumBatchesRemaining(import.FileId))
                 .ReturnsAsync(0);
 
-            importService
+            dataImportService
                 .Setup(s => s.GetImport(import.Id))
                 .ReturnsAsync(import);
 
-            importService
+            dataImportService
                 .Setup(s => s.FailImport(import.Id,
                     $"Number of observations inserted (2) does not equal that expected ({import.TotalRows}) : Please delete & retry"))
                 .Returns(Task.CompletedTask);
@@ -486,7 +486,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Processor.Tests.Servic
             await using (var statisticsDbContext = InMemoryStatisticsDbContext(statisticsDbContextId))
             {
                 var service = BuildFileImportService(batchService: batchService.Object,
-                    importService: importService.Object);
+                    dataImportService: dataImportService.Object);
 
                 var message = new ImportObservationsMessage
                 {
@@ -496,7 +496,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Processor.Tests.Servic
                 await service.CheckComplete(message, statisticsDbContext);
             }
 
-            MockUtils.VerifyAllMocks(batchService, importService);
+            MockUtils.VerifyAllMocks(batchService, dataImportService);
         }
 
         [Fact]
@@ -510,10 +510,10 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Processor.Tests.Servic
                     Filename = "my_data_file.csv"
                 };
 
-                var import = new Import
+                var import = new DataImport
                 {
                     Id = Guid.NewGuid(),
-                    Errors = new List<ImportError>(),
+                    Errors = new List<DataImportError>(),
                     FileId = file.Id,
                     File = file,
                     SubjectId = Guid.NewGuid(),
@@ -522,9 +522,9 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Processor.Tests.Servic
                     TotalRows = 2
                 };
 
-                var importService = new Mock<IImportService>(Strict);
+                var dataImportService = new Mock<IDataImportService>(Strict);
 
-                importService
+                dataImportService
                     .Setup(s => s.GetImport(import.Id))
                     .ReturnsAsync(import);
 
@@ -532,7 +532,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Processor.Tests.Servic
 
                 await using (var statisticsDbContext = InMemoryStatisticsDbContext(statisticsDbContextId))
                 {
-                    var service = BuildFileImportService(importService: importService.Object);
+                    var service = BuildFileImportService(dataImportService: dataImportService.Object);
 
                     var message = new ImportObservationsMessage
                     {
@@ -542,7 +542,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Processor.Tests.Servic
                     await service.CheckComplete(message, statisticsDbContext);
                 }
 
-                MockUtils.VerifyAllMocks(importService);
+                MockUtils.VerifyAllMocks(dataImportService);
             });
         }
 
@@ -557,10 +557,10 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Processor.Tests.Servic
                     Filename = "my_data_file.csv"
                 };
 
-                var import = new Import
+                var import = new DataImport
                 {
                     Id = Guid.NewGuid(),
-                    Errors = new List<ImportError>(),
+                    Errors = new List<DataImportError>(),
                     FileId = file.Id,
                     File = file,
                     SubjectId = Guid.NewGuid(),
@@ -569,9 +569,9 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Processor.Tests.Servic
                     TotalRows = 2
                 };
 
-                var importService = new Mock<IImportService>(Strict);
+                var dataImportService = new Mock<IDataImportService>(Strict);
 
-                importService
+                dataImportService
                     .Setup(s => s.GetImport(import.Id))
                     .ReturnsAsync(import);
 
@@ -579,7 +579,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Processor.Tests.Servic
 
                 await using (var statisticsDbContext = InMemoryStatisticsDbContext(statisticsDbContextId))
                 {
-                    var service = BuildFileImportService(importService: importService.Object);
+                    var service = BuildFileImportService(dataImportService: dataImportService.Object);
 
                     var message = new ImportObservationsMessage
                     {
@@ -589,7 +589,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Processor.Tests.Servic
                     await service.CheckComplete(message, statisticsDbContext);
                 }
 
-                MockUtils.VerifyAllMocks(importService);
+                MockUtils.VerifyAllMocks(dataImportService);
             });
         }
 
@@ -604,10 +604,10 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Processor.Tests.Servic
                     Filename = "my_data_file.csv"
                 };
 
-                var import = new Import
+                var import = new DataImport
                 {
                     Id = Guid.NewGuid(),
-                    Errors = new List<ImportError>(),
+                    Errors = new List<DataImportError>(),
                     FileId = file.Id,
                     File = file,
                     SubjectId = Guid.NewGuid(),
@@ -616,13 +616,13 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Processor.Tests.Servic
                     TotalRows = 2
                 };
 
-                var importService = new Mock<IImportService>(Strict);
+                var dataImportService = new Mock<IDataImportService>(Strict);
 
-                importService
+                dataImportService
                     .Setup(s => s.GetImport(import.Id))
                     .ReturnsAsync(import);
 
-                importService
+                dataImportService
                     .Setup(s => s.UpdateStatus(
                         import.Id, abortingStatus.GetFinishingStateOfAbortProcess(), 100))
                     .Returns(Task.CompletedTask);
@@ -631,7 +631,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Processor.Tests.Servic
 
                 await using (var statisticsDbContext = InMemoryStatisticsDbContext(statisticsDbContextId))
                 {
-                    var service = BuildFileImportService(importService: importService.Object);
+                    var service = BuildFileImportService(dataImportService: dataImportService.Object);
 
                     var message = new ImportObservationsMessage
                     {
@@ -641,7 +641,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Processor.Tests.Servic
                     await service.CheckComplete(message, statisticsDbContext);
                 }
 
-                MockUtils.VerifyAllMocks(importService);
+                MockUtils.VerifyAllMocks(dataImportService);
             });
         }
 
@@ -656,10 +656,10 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Processor.Tests.Servic
                     Filename = "my_data_file.csv"
                 };
                 
-                var import = new Import
+                var import = new DataImport
                 {
                     Id = Guid.NewGuid(),
-                    Errors = new List<ImportError>(),
+                    Errors = new List<DataImportError>(),
                     FileId = file.Id,
                     File = file,
                     SubjectId = Guid.NewGuid(),
@@ -668,13 +668,13 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Processor.Tests.Servic
                     TotalRows = 2
                 };
 
-                var importService = new Mock<IImportService>(Strict);
+                var dataImportService = new Mock<IDataImportService>(Strict);
 
-                importService
+                dataImportService
                     .Setup(s => s.GetImport(import.Id))
                     .ReturnsAsync(import);
 
-                importService
+                dataImportService
                     .Setup(s => s.UpdateStatus(
                         import.Id, abortingStatus.GetFinishingStateOfAbortProcess(), 100))
                     .Returns(Task.CompletedTask);
@@ -683,7 +683,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Processor.Tests.Servic
 
                 await using (var statisticsDbContext = InMemoryStatisticsDbContext(statisticsDbContextId))
                 {
-                    var service = BuildFileImportService(importService: importService.Object);
+                    var service = BuildFileImportService(dataImportService: dataImportService.Object);
 
                     var message = new ImportObservationsMessage
                     {
@@ -693,7 +693,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Processor.Tests.Servic
                     await service.CheckComplete(message, statisticsDbContext);
                 }
 
-                MockUtils.VerifyAllMocks(importService);
+                MockUtils.VerifyAllMocks(dataImportService);
             });
         }
 
@@ -702,14 +702,14 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Processor.Tests.Servic
             IBlobStorageService blobStorageService = null,
             IImporterService importerService = null,
             ILogger<FileImportService> logger = null,
-            IImportService importService = null
+            IDataImportService dataImportService = null
             )
         {
             return new FileImportService(
                 logger ?? new Mock<ILogger<FileImportService>>().Object,
                 batchService ?? new Mock<IBatchService>(Strict).Object,
                 blobStorageService ?? new Mock<IBlobStorageService>(Strict).Object,
-                importService ?? new Mock<IImportService>(Strict).Object,
+                dataImportService ?? new Mock<IDataImportService>(Strict).Object,
                 importerService ?? new Mock<IImporterService>(Strict).Object
                 );
         }

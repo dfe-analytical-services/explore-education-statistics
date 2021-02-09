@@ -8,11 +8,11 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Processor.Functions
 {
     public class PoisonQueueHandler
     {
-        private readonly IImportService _importService;
+        private readonly IDataImportService _dataImportService;
 
-        public PoisonQueueHandler(IImportService importService)
+        public PoisonQueueHandler(IDataImportService dataImportService)
         {
-            _importService = importService;
+            _dataImportService = dataImportService;
         }
 
         [FunctionName("ProcessUploadsPoisonHandler")]
@@ -20,7 +20,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Processor.Functions
             [QueueTrigger(ImportsPendingPoisonQueue)]
             ImportMessage message)
         {
-            await _importService.FailImport(message.Id,
+            await _dataImportService.FailImport(message.Id,
                 "File failed to import for unknown reason in upload processing stage.");
         }
 
@@ -29,7 +29,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Processor.Functions
             [QueueTrigger(ImportsAvailablePoisonQueue)]
             ImportMessage message)
         {
-            await _importService.FailImport(message.Id,
+            await _dataImportService.FailImport(message.Id,
                 "File failed to import for unknown reason in upload processing stage.");
         }
     }

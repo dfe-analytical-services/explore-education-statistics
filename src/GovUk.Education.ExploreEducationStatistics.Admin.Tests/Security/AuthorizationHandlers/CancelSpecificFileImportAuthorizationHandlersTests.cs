@@ -17,7 +17,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Security.Author
         public void CannotCancelFinishedOrAbortingImport()
         {
             var finishedOrAbortingStatuses = EnumUtil
-                .GetEnumValues<ImportStatus>()
+                .GetEnumValues<DataImportStatus>()
                 .Where(status => status.IsFinishedOrAborting())
                 .ToList();
 
@@ -28,7 +28,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Security.Author
                     Id = Guid.NewGuid()
                 };
 
-                var importRepository = new Mock<IImportRepository>();
+                var importRepository = new Mock<IDataImportRepository>();
 
                 importRepository
                     .Setup(s => s.GetStatusByFileId(file.Id))
@@ -44,7 +44,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Security.Author
         public void CanCancelHealthyOngoingImportWithCorrectClaim()
         {
             var nonFinishedOrAbortingStatuses = EnumUtil
-                .GetEnumValues<ImportStatus>()
+                .GetEnumValues<DataImportStatus>()
                 .Where(status => !status.IsFinishedOrAborting())
                 .ToList();
 
@@ -55,7 +55,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Security.Author
                     Id = Guid.NewGuid()
                 };
 
-                var importRepository = new Mock<IImportRepository>();
+                var importRepository = new Mock<IDataImportRepository>();
 
                 importRepository
                     .Setup(s => s.GetStatusByFileId(file.Id))
