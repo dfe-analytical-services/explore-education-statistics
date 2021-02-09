@@ -21,6 +21,11 @@ import classNames from 'classnames';
 import React, { useCallback, useState } from 'react';
 import { generatePath, RouteComponentProps } from 'react-router';
 
+interface Model {
+  dataBlocks: ReleaseDataBlockSummary[];
+  canUpdateRelease: boolean;
+}
+
 const ReleaseDataBlocksPage = ({
   match,
 }: RouteComponentProps<ReleaseRouteParams>) => {
@@ -30,32 +35,36 @@ const ReleaseDataBlocksPage = ({
     ReleaseDataBlockSummary
   >();
 
-  const { value: canUpdateRelease } = useAsyncHandledRetry(
-    () => permissionService.canUpdateRelease(releaseId),
-    [releaseId],
-  );
+  const { value: model, isLoading, setState: setModel } = useAsyncHandledRetry<
+    Model
+  >(async () => {
+    const [dataBlocks, canUpdateRelease] = await Promise.all([
+      dataBlocksService.listDataBlocks(releaseId),
+      permissionService.canUpdateRelease(releaseId),
+    ]);
 
-  const {
-    value: dataBlocks = [],
-    isLoading,
-    setState: setDataBlocks,
-  } = useAsyncHandledRetry(() => dataBlocksService.listDataBlocks(releaseId), [
-    releaseId,
-  ]);
+    return {
+      dataBlocks,
+      canUpdateRelease,
+    };
+  }, [releaseId]);
 
   const handleDelete = useCallback(async () => {
-    if (!deleteDataBlock) {
+    if (!deleteDataBlock || !model) {
       return;
     }
 
-    setDataBlocks({
-      value: dataBlocks.filter(
-        dataBlock => dataBlock.id !== deleteDataBlock.id,
-      ),
+    setModel({
+      value: {
+        ...model,
+        dataBlocks: model.dataBlocks.filter(
+          dataBlock => dataBlock.id !== deleteDataBlock.id,
+        ),
+      },
     });
 
     setDeleteDataBlock(undefined);
-  }, [dataBlocks, deleteDataBlock, setDataBlocks]);
+  }, [model, deleteDataBlock, setModel]);
 
   const handleDeleteCancel = useCallback(() => {
     setDeleteDataBlock(undefined);
@@ -68,6 +77,12 @@ const ReleaseDataBlocksPage = ({
       releaseId,
     },
   );
+
+  if (isLoading || !model) {
+    return <LoadingSpinner />;
+  }
+
+  const { canUpdateRelease, dataBlocks } = model;
 
   const hasHighlightNames = dataBlocks.some(
     dataBlock => !!dataBlock.highlightName,
@@ -103,86 +118,82 @@ const ReleaseDataBlocksPage = ({
         </>
       )}
 
-      <LoadingSpinner loading={isLoading}>
-        {dataBlocks.length > 0 ? (
-          <>
-            {canUpdateRelease && dataBlocks.length > 5 && (
-              <ButtonLink to={createPath}>Create data block</ButtonLink>
-            )}
+      {dataBlocks.length > 0 ? (
+        <>
+          {canUpdateRelease && dataBlocks.length > 5 && (
+            <ButtonLink to={createPath}>Create data block</ButtonLink>
+          )}
 
-            <table>
-              <thead>
-                <tr>
-                  <th scope="col" className="govuk-!-width-one-quarter">
-                    Name
-                  </th>
-                  <th scope="col">Has chart</th>
-                  <th scope="col">In content</th>
-                  <th
-                    scope="col"
-                    className={classNames({
-                      'govuk-!-width-one-quarter': hasHighlightNames,
-                    })}
-                  >
-                    Highlight name
-                  </th>
-                  <th scope="col" className="govuk-table__header--actions">
-                    Actions
-                  </th>
-                </tr>
-              </thead>
-              <tbody>
-                {dataBlocks.map(dataBlock => (
-                  <tr key={dataBlock.id}>
-                    <td>{dataBlock.name}</td>
-                    <td>{dataBlock.chartsCount > 0 ? 'Yes' : 'No'}</td>
-                    <td>{dataBlock.contentSectionId ? 'Yes' : 'No'}</td>
-                    <td>{dataBlock.highlightName || 'None'}</td>
-                    <td className="govuk-table__cell--actions">
-                      <Link
-                        unvisited
-                        to={generatePath<ReleaseDataBlockRouteParams>(
-                          releaseDataBlockEditRoute.path,
-                          {
-                            publicationId,
-                            releaseId,
-                            dataBlockId: dataBlock.id,
-                          },
-                        )}
-                      >
-                        {canUpdateRelease ? 'Edit block' : 'View block'}
-                      </Link>
-                      {canUpdateRelease && (
-                        <ButtonText
-                          onClick={() => setDeleteDataBlock(dataBlock)}
-                        >
-                          Delete block
-                        </ButtonText>
+          <table>
+            <thead>
+              <tr>
+                <th scope="col" className="govuk-!-width-one-quarter">
+                  Name
+                </th>
+                <th scope="col">Has chart</th>
+                <th scope="col">In content</th>
+                <th
+                  scope="col"
+                  className={classNames({
+                    'govuk-!-width-one-quarter': hasHighlightNames,
+                  })}
+                >
+                  Highlight name
+                </th>
+                <th scope="col" className="govuk-table__header--actions">
+                  Actions
+                </th>
+              </tr>
+            </thead>
+            <tbody>
+              {dataBlocks.map(dataBlock => (
+                <tr key={dataBlock.id}>
+                  <td>{dataBlock.name}</td>
+                  <td>{dataBlock.chartsCount > 0 ? 'Yes' : 'No'}</td>
+                  <td>{dataBlock.contentSectionId ? 'Yes' : 'No'}</td>
+                  <td>{dataBlock.highlightName || 'None'}</td>
+                  <td className="govuk-table__cell--actions">
+                    <Link
+                      unvisited
+                      to={generatePath<ReleaseDataBlockRouteParams>(
+                        releaseDataBlockEditRoute.path,
+                        {
+                          publicationId,
+                          releaseId,
+                          dataBlockId: dataBlock.id,
+                        },
                       )}
-                    </td>
-                  </tr>
-                ))}
-              </tbody>
-            </table>
-          </>
-        ) : (
-          <InsetText>No data blocks have been created.</InsetText>
-        )}
+                    >
+                      {canUpdateRelease ? 'Edit block' : 'View block'}
+                    </Link>
+                    {canUpdateRelease && (
+                      <ButtonText onClick={() => setDeleteDataBlock(dataBlock)}>
+                        Delete block
+                      </ButtonText>
+                    )}
+                  </td>
+                </tr>
+              ))}
+            </tbody>
+          </table>
+        </>
+      ) : (
+        <InsetText>No data blocks have been created.</InsetText>
+      )}
 
-        {canUpdateRelease && (
-          <ButtonLink to={createPath}>Create data block</ButtonLink>
-        )}
+      {canUpdateRelease && (
+        <ButtonLink to={createPath}>Create data block</ButtonLink>
+      )}
 
-        {deleteDataBlock && (
-          <DataBlockDeletePlanModal
-            releaseId={releaseId}
-            dataBlockId={deleteDataBlock.id}
-            onConfirm={handleDelete}
-            onCancel={handleDeleteCancel}
-            onExit={handleDeleteCancel}
-          />
-        )}
-      </LoadingSpinner>
+      {deleteDataBlock && (
+        <DataBlockDeletePlanModal
+          releaseId={releaseId}
+          dataBlockId={deleteDataBlock.id}
+          onConfirm={handleDelete}
+          onCancel={handleDeleteCancel}
+          onExit={handleDeleteCancel}
+        />
+      )}
     </>
   );
 };

@@ -23,6 +23,11 @@ import useToggle from '@common/hooks/useToggle';
 import React, { useCallback, useRef } from 'react';
 import { generatePath, RouteComponentProps } from 'react-router';
 
+interface Model {
+  dataBlock: ReleaseDataBlock;
+  canUpdateRelease: boolean;
+}
+
 const ReleaseDataBlockEditPage = ({
   match,
   history,
@@ -36,23 +41,31 @@ const ReleaseDataBlockEditPage = ({
 
   const [isDeleting, toggleDeleting] = useToggle(false);
 
-  const { value: canUpdate = false } = useAsyncHandledRetry(
-    () => permissionService.canUpdateRelease(releaseId),
-    [releaseId],
-  );
+  const { value: model, isLoading, setState: setModel } = useAsyncHandledRetry<
+    Model
+  >(async () => {
+    const [dataBlock, canUpdateRelease] = await Promise.all([
+      dataBlocksService.getDataBlock(dataBlockId),
+      permissionService.canUpdateRelease(releaseId),
+    ]);
 
-  const {
-    value: dataBlock,
-    isLoading,
-    setState: setDataBlock,
-  } = useAsyncHandledRetry(() => dataBlocksService.getDataBlock(dataBlockId), [
-    dataBlockId,
-  ]);
+    return {
+      dataBlock,
+      canUpdateRelease,
+    };
+  }, [releaseId, dataBlockId]);
 
   const handleDataBlockSave = useCallback(
     async (nextDataBlock: ReleaseDataBlock) => {
-      setDataBlock({
-        value: nextDataBlock,
+      if (!model) {
+        return;
+      }
+
+      setModel({
+        value: {
+          ...model,
+          dataBlock: nextDataBlock,
+        },
       });
 
       if (pageRef.current) {
@@ -62,7 +75,7 @@ const ReleaseDataBlockEditPage = ({
         });
       }
     },
-    [setDataBlock],
+    [model, setModel],
   );
 
   const handleDataBlockDelete = useCallback(() => {
@@ -73,6 +86,8 @@ const ReleaseDataBlockEditPage = ({
       }),
     );
   }, [history, publicationId, releaseId]);
+
+  const { canUpdateRelease, dataBlock } = model ?? {};
 
   return (
     <div ref={pageRef}>
@@ -87,25 +102,25 @@ const ReleaseDataBlockEditPage = ({
         Back
       </Link>
 
-      <h2>{canUpdate ? 'Edit data block' : 'View data block'}</h2>
-
-      <DataBlockSelector
-        canUpdate={canUpdate}
-        publicationId={publicationId}
-        releaseId={releaseId}
-        dataBlockId={dataBlockId}
-      />
-
-      <hr className="govuk-!-margin-bottom-6" />
-
       <LoadingSpinner loading={isLoading}>
+        <h2>{canUpdateRelease ? 'Edit data block' : 'View data block'}</h2>
+
+        <DataBlockSelector
+          canUpdate={canUpdateRelease}
+          publicationId={publicationId}
+          releaseId={releaseId}
+          dataBlockId={dataBlockId}
+        />
+
+        <hr className="govuk-!-margin-bottom-6" />
+
         {dataBlock && (
           <>
             <h2 className="govuk-heading-m">{dataBlock.name}</h2>
 
             <section>
               <SummaryList smallKey noBorder>
-                {!canUpdate && (
+                {!canUpdateRelease && (
                   <SummaryListItem term="Highlight name">
                     {dataBlock.highlightName}
                   </SummaryListItem>
@@ -119,13 +134,13 @@ const ReleaseDataBlockEditPage = ({
                 </SummaryListItem>
               </SummaryList>
 
-              {canUpdate && (
+              {canUpdateRelease && (
                 <Button variant="warning" onClick={toggleDeleting.on}>
                   Delete this data block
                 </Button>
               )}
 
-              {canUpdate ? (
+              {canUpdateRelease ? (
                 <DataBlockPageTabs
                   key={dataBlockId}
                   releaseId={releaseId}
@@ -140,7 +155,7 @@ const ReleaseDataBlockEditPage = ({
               )}
             </section>
 
-            {isDeleting && canUpdate && (
+            {isDeleting && canUpdateRelease && (
               <DataBlockDeletePlanModal
                 releaseId={releaseId}
                 dataBlockId={dataBlockId}
