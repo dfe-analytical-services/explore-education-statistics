@@ -67,23 +67,15 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Processor.Services
             var metaFileStream = await _blobStorageService.StreamBlob(PrivateReleaseFiles, import.MetaFile.Path());
             var metaFileTable = DataTableUtils.CreateFromStream(metaFileStream);
 
-            await context.Database.CreateExecutionStrategy().Execute(async () =>
-            {
-                await using var transaction = await context.Database.BeginTransactionAsync();
-
-                await _importerService.ImportObservations(
-                    dataFileTable.Columns,
-                    dataFileTable.Rows,
-                    subject,
-                    _importerService.GetMeta(metaFileTable, subject, context),
-                    message.BatchNo,
-                    import.RowsPerBatch,
-                    context
-                );
-
-                await transaction.CommitAsync();
-                await context.Database.CloseConnectionAsync();
-            });
+            await _importerService.ImportObservations(
+                dataFileTable.Columns,
+                dataFileTable.Rows,
+                subject,
+                _importerService.GetMeta(metaFileTable, subject, context),
+                message.BatchNo,
+                import.RowsPerBatch,
+                context
+            );
 
             if (import.NumBatches > 1)
             {
