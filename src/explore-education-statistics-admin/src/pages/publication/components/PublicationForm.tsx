@@ -225,12 +225,10 @@ const PublicationForm = ({
                     label="Select methodology"
                     placeholder="Choose a methodology"
                     options={orderBy(
-                      methodologies
-                        .filter(methodology => methodology.status !== 'Draft')
-                        .map(methodology => ({
-                          label: `${methodology.title} [${methodology.status}]`,
-                          value: methodology.id,
-                        })),
+                      methodologies.map(methodology => ({
+                        label: `${methodology.title} [${methodology.status}]`,
+                        value: methodology.id,
+                      })),
                       'label',
                     )}
                     order={[]}
