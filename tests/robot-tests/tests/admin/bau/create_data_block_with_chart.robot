@@ -173,6 +173,7 @@ Save data block
     user clicks checkbox  Set as a table highlight for this publication
     user waits until page contains element  id:dataBlockDetailsForm-highlightName
     user enters text into element  id:dataBlockDetailsForm-highlightName    UI test highlight name
+    user enters text into element  id:dataBlockDetailsForm-highlightDescription    UI test highlight description
 
     user clicks button   Save data block
     user waits until page contains    Delete this data block
