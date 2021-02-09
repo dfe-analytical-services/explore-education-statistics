@@ -7,7 +7,7 @@ import mapFullTable from '@common/modules/table-tool/utils/mapFullTable';
 import mapTableHeadersConfig from '@common/modules/table-tool/utils/mapTableHeadersConfig';
 import { FastTrackTable } from '@common/services/fastTrackService';
 import tableBuilderService, {
-  PublicationMeta,
+  Publication,
   SubjectMeta,
   ThemeMeta,
 } from '@common/services/tableBuilderService';
@@ -25,27 +25,27 @@ const TableToolFinalStep = dynamic(
 );
 
 export interface TableToolPageProps {
-  publicationMeta?: PublicationMeta;
+  publication?: Publication;
   fastTrack?: FastTrackTable;
   subjectMeta?: SubjectMeta;
   themeMeta: ThemeMeta[];
 }
 
 const TableToolPage: NextPage<TableToolPageProps> = ({
-  publicationMeta,
+  publication: initialPublication,
   fastTrack,
   subjectMeta,
   themeMeta,
 }) => {
   const initialState = useMemo<InitialTableToolState | undefined>(() => {
-    if (!publicationMeta) {
+    if (!initialPublication) {
       return undefined;
     }
 
-    const { publicationId, subjects } = publicationMeta;
+    const { id: publicationId, subjects } = initialPublication;
 
     const highlights = orderBy(
-      publicationMeta.highlights,
+      initialPublication.highlights,
       ['label'],
       ['asc'],
     ).filter(highlight => highlight.id !== fastTrack?.id);
@@ -82,7 +82,7 @@ const TableToolPage: NextPage<TableToolPageProps> = ({
         locations: {},
       },
     };
-  }, [fastTrack, publicationMeta, subjectMeta]);
+  }, [fastTrack, initialPublication, subjectMeta]);
 
   return (
     <Page title="Create your own tables online" caption="Table Tool" wide>
@@ -167,15 +167,15 @@ export const getServerSideProps: GetServerSideProps<TableToolPageProps> = async 
       .flatMap(option => option.publications)
       .find(option => option.slug === publicationSlug)?.id ?? '';
 
-  const publicationMeta = publicationId
-    ? await tableBuilderService.getPublicationMeta(publicationId)
+  const publication = publicationId
+    ? await tableBuilderService.getPublication(publicationId)
     : undefined;
 
-  if (publicationMeta) {
+  if (publication) {
     return {
       props: {
         themeMeta,
-        publicationMeta,
+        publication,
       },
     };
   }

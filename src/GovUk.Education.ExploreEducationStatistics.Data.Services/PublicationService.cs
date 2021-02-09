@@ -8,21 +8,22 @@ using GovUk.Education.ExploreEducationStatistics.Common.Services.Interfaces;
 using GovUk.Education.ExploreEducationStatistics.Data.Model;
 using GovUk.Education.ExploreEducationStatistics.Data.Model.Services.Interfaces;
 using GovUk.Education.ExploreEducationStatistics.Data.Services.Interfaces;
-using GovUk.Education.ExploreEducationStatistics.Data.Services.ViewModels.Meta;
+using GovUk.Education.ExploreEducationStatistics.Data.Services.ViewModels;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.Azure.Cosmos.Table;
 using static GovUk.Education.ExploreEducationStatistics.Common.TableStorageTableNames;
 
 namespace GovUk.Education.ExploreEducationStatistics.Data.Services
 {
-    public class PublicationMetaService : IPublicationMetaService
+    public class PublicationService : IPublicationService
     {
         private readonly IReleaseService _releaseService;
         private readonly ISubjectService _subjectService;
         private readonly ITableStorageService _tableStorageService;
         private readonly IMapper _mapper;
 
-        public PublicationMetaService(IReleaseService releaseService,
+        public PublicationService(
+            IReleaseService releaseService,
             ISubjectService subjectService,
             ITableStorageService tableStorageService,
             IMapper mapper)
@@ -33,7 +34,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Services
             _mapper = mapper;
         }
 
-        public async Task<Either<ActionResult, PublicationSubjectsMetaViewModel>> GetSubjectsForLatestRelease(
+        public async Task<Either<ActionResult, PublicationViewModel>> GetPublication(
             Guid publicationId)
         {
             var release = _releaseService.GetLatestPublishedRelease(publicationId);
@@ -43,9 +44,9 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Services
                 return new NotFoundResult();
             }
 
-            return new PublicationSubjectsMetaViewModel
+            return new PublicationViewModel
             {
-                PublicationId = publicationId,
+                Id = publicationId,
                 Highlights = await GetHighlights(release.Id),
                 Subjects = await GetSubjects(release.Id)
             };

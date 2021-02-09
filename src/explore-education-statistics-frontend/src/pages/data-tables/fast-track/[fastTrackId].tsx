@@ -26,8 +26,8 @@ export const getServerSideProps: GetServerSideProps<TableToolPageProps> = async 
     throw new Error('Fast track table does not have `query.subjectId`');
   }
 
-  const [publicationMeta, subjectMeta] = await Promise.all([
-    tableBuilderService.getPublicationMeta(fastTrack.query.publicationId),
+  const [publication, subjectMeta] = await Promise.all([
+    tableBuilderService.getPublication(fastTrack.query.publicationId),
     tableBuilderService.getSubjectMeta(fastTrack.query.subjectId),
   ]);
 
@@ -35,7 +35,7 @@ export const getServerSideProps: GetServerSideProps<TableToolPageProps> = async 
     props: {
       fastTrack,
       subjectMeta,
-      publicationMeta,
+      publication,
       themeMeta,
     },
   };
