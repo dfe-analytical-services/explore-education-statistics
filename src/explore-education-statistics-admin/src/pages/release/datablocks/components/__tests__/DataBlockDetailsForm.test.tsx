@@ -14,6 +14,7 @@ describe('DataBlockDetailsForm', () => {
           name: 'Test name',
           heading: 'Test heading',
           highlightName: 'Test highlight name',
+          highlightDescription: 'Test highlight description',
           source: 'Test source',
         }}
         onSubmit={noop}
@@ -23,8 +24,11 @@ describe('DataBlockDetailsForm', () => {
     expect(screen.getByLabelText('Name')).toHaveValue('Test name');
     expect(screen.getByLabelText('Table title')).toHaveValue('Test heading');
     expect(screen.getByLabelText('Source')).toHaveValue('Test source');
-    expect(screen.getByLabelText('Table highlight name')).toHaveValue(
+    expect(screen.getByLabelText('Highlight name')).toHaveValue(
       'Test highlight name',
+    );
+    expect(screen.getByLabelText('Highlight description')).toHaveValue(
+      'Test highlight description',
     );
   });
 
@@ -54,26 +58,45 @@ describe('DataBlockDetailsForm', () => {
     });
   });
 
-  test('shows validation error if no table highlight when checkbox is checked', async () => {
+  test('shows validation error if no name when table highlight checkbox is checked', async () => {
     render(<DataBlockDetailsForm onSubmit={noop} />);
 
     userEvent.click(
       screen.getByLabelText('Set as a table highlight for this publication'),
     );
 
-    expect(screen.getByLabelText('Table highlight name')).toBeInTheDocument();
+    expect(screen.getByLabelText('Highlight name')).toBeInTheDocument();
 
-    userEvent.click(screen.getByLabelText('Table highlight name'));
+    userEvent.click(screen.getByLabelText('Highlight name'));
     userEvent.tab();
 
     await waitFor(() => {
       expect(
-        screen.getByRole('link', { name: 'Enter a table highlight name' }),
+        screen.getByRole('link', { name: 'Enter a highlight name' }),
       ).toHaveAttribute('href', '#dataBlockDetailsForm-highlightName');
     });
   });
 
-  test('submitting form with invalid values and highlight name shows error messages', async () => {
+  test('shows validation error if no description when table highlight checkbox is checked', async () => {
+    render(<DataBlockDetailsForm onSubmit={noop} />);
+
+    userEvent.click(
+      screen.getByLabelText('Set as a table highlight for this publication'),
+    );
+
+    expect(screen.getByLabelText('Highlight description')).toBeInTheDocument();
+
+    userEvent.click(screen.getByLabelText('Highlight description'));
+    userEvent.tab();
+
+    await waitFor(() => {
+      expect(
+        screen.getByRole('link', { name: 'Enter a highlight description' }),
+      ).toHaveAttribute('href', '#dataBlockDetailsForm-highlightDescription');
+    });
+  });
+
+  test('submitting form with invalid values and table highlight checked shows error messages', async () => {
     render(<DataBlockDetailsForm onSubmit={noop} />);
 
     userEvent.click(
@@ -85,25 +108,31 @@ describe('DataBlockDetailsForm', () => {
       const alert = screen.getByRole('alert');
       const errors = within(alert).getAllByRole('link');
 
-      expect(errors).toHaveLength(3);
+      expect(errors).toHaveLength(4);
       expect(errors[0]).toHaveTextContent('Enter a data block name');
       expect(errors[0]).toHaveAttribute('href', '#dataBlockDetailsForm-name');
 
-      expect(errors[1]).toHaveTextContent('Enter a table highlight name');
+      expect(errors[1]).toHaveTextContent('Enter a highlight name');
       expect(errors[1]).toHaveAttribute(
         'href',
         '#dataBlockDetailsForm-highlightName',
       );
 
-      expect(errors[2]).toHaveTextContent('Enter a table title');
+      expect(errors[2]).toHaveTextContent('Enter a highlight description');
       expect(errors[2]).toHaveAttribute(
+        'href',
+        '#dataBlockDetailsForm-highlightDescription',
+      );
+
+      expect(errors[3]).toHaveTextContent('Enter a table title');
+      expect(errors[3]).toHaveAttribute(
         'href',
         '#dataBlockDetailsForm-heading',
       );
     });
   });
 
-  test('submitting form with invalid values and no highlight name shows error messages', async () => {
+  test('submitting form with invalid values and table highlight unchecked shows error messages', async () => {
     render(<DataBlockDetailsForm onSubmit={noop} />);
 
     userEvent.click(screen.getByRole('button', { name: 'Save data block' }));
@@ -138,8 +167,12 @@ describe('DataBlockDetailsForm', () => {
     );
 
     await userEvent.type(
-      screen.getByLabelText('Table highlight name'),
+      screen.getByLabelText('Highlight name'),
       'Test highlight name',
+    );
+    await userEvent.type(
+      screen.getByLabelText('Highlight description'),
+      'Test highlight description',
     );
 
     expect(handleSubmit).not.toHaveBeenCalled();
@@ -150,6 +183,7 @@ describe('DataBlockDetailsForm', () => {
       name: 'Test name',
       heading: 'Test title',
       highlightName: 'Test highlight name',
+      highlightDescription: 'Test highlight description',
       source: 'Test source',
     };
 

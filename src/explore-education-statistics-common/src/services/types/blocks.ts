@@ -69,6 +69,7 @@ export interface DataBlock extends BaseBlock {
   type: 'DataBlock';
   name: string;
   highlightName?: string;
+  highlightDescription?: string;
   heading: string;
   source: string;
   query: TableDataQuery;

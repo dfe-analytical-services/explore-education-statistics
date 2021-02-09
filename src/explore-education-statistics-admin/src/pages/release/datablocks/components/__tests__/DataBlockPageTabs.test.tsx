@@ -29,6 +29,7 @@ describe('DataBlockPageTabs', () => {
     id: 'block-1',
     source: 'Test source',
     highlightName: '',
+    highlightDescription: '',
     query: {
       includeGeoJson: false,
       subjectId: 'subject-1',

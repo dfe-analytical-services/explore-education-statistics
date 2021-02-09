@@ -8,6 +8,7 @@ export interface ReleaseDataBlockSummary {
   id: string;
   name: string;
   highlightName?: string;
+  highlightDescription?: string;
   heading: string;
   source: string;
   chartsCount: number;
