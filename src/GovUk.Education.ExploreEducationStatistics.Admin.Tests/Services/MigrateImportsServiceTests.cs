@@ -28,7 +28,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
         {
             var release = new Release
             {
-                Id = TableImportSampleJson.ReleaseId
+                Id = Guid.NewGuid()
             };
 
             // Test the migration won't run if there's already been an attempt to run it,
@@ -99,35 +99,314 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
         }
 
         [Fact]
-        public async Task MigrateImports()
+        public async Task MigrateImports_SuccessfullyMigrateTableImports()
         {
             var release = new Release
             {
-                Id = TableImportSampleJson.ReleaseId
+                Id = Guid.NewGuid()
             };
 
-            var zipFile1 = new File
+            var importedSubjectId = Guid.NewGuid();
+
+            var zipFile = new File
             {
-                Filename = TableImportSampleJson.ZipFilename,
+                Filename = "imported1.zip",
                 Release = release,
                 Type = DataZip
             };
 
-            var dataFile1 = new File
+            var dataFile = new File
             {
-                Filename = TableImportSampleJson.DataFilename,
+                Filename = "imported1.csv",
                 Release = release,
                 Type = FileType.Data,
-                Source = zipFile1,
-                SubjectId = TableImportSampleJson.SubjectId
+                Source = zipFile,
+                SubjectId = importedSubjectId
             };
 
-            var metaFile1 = new File
+            var metaFile = new File
             {
-                Filename = TableImportSampleJson.MetaFilename,
+                Filename = "imported1.meta.csv",
                 Release = release,
                 Type = Metadata,
-                SubjectId = TableImportSampleJson.SubjectId
+                SubjectId = importedSubjectId
+            };
+
+            var tableImports = new List<TableImport>
+            {
+                new TableImport
+                {
+                    PartitionKey = release.Id.ToString(),
+                    RowKey = dataFile.Filename,
+                    Errors = "",
+                    Message = TableImportSampleJson.Message(
+                        releaseId: release.Id,
+                        subjectId: importedSubjectId,
+                        dataFilename: dataFile.Filename,
+                        metaFilename: metaFile.Filename,
+                        zipFilename: zipFile.Filename
+                    ),
+                    Status = "COMPLETE",
+                    PercentageComplete = 100,
+                    NumberOfRows = 10000,
+                    Timestamp = DateTimeOffset.Now
+                }
+            };
+
+            var contentDbContextId = Guid.NewGuid().ToString();
+            await using (var contentDbContext = DbUtils.InMemoryApplicationDbContext(contentDbContextId))
+            {
+                await contentDbContext.Releases.AddAsync(release);
+                await contentDbContext.Files.AddRangeAsync(zipFile, dataFile, metaFile);
+                await contentDbContext.SaveChangesAsync();
+            }
+
+            var tableStorageService = new Mock<ITableStorageService>(MockBehavior.Strict);
+
+            tableStorageService.Setup(service =>
+                    service.ExecuteQueryAsync("imports", It.IsAny<TableQuery<TableImport>>()))
+                .ReturnsAsync(tableImports);
+
+            await using (var contentDbContext = DbUtils.InMemoryApplicationDbContext(contentDbContextId))
+            {
+                var service = BuildMigrateImportsService(contentDbContext: contentDbContext,
+                    tableStorageService: tableStorageService.Object);
+
+                var result = await service.MigrateImports();
+                Assert.True(result.IsRight);
+            }
+
+            await using (var contentDbContext = DbUtils.InMemoryApplicationDbContext(contentDbContextId))
+            {
+                var imports = await contentDbContext.DataImports
+                    .Include(i => i.Errors)
+                    .ToListAsync();
+
+                Assert.Single(imports);
+
+                Assert.Equal(tableImports[0].Timestamp.UtcDateTime, imports[0].Created);
+                Assert.Equal(DataImportStatus.COMPLETE, imports[0].Status);
+                Assert.Equal(100, imports[0].StagePercentageComplete);
+                Assert.Equal(importedSubjectId, imports[0].SubjectId);
+                Assert.Equal(dataFile.Id, imports[0].FileId);
+                Assert.Equal(metaFile.Id, imports[0].MetaFileId);
+                Assert.Equal(zipFile.Id, imports[0].ZipFileId);
+                Assert.Equal(10000, imports[0].Rows);
+                Assert.Equal(10, imports[0].NumBatches);
+                Assert.Equal(1000, imports[0].RowsPerBatch);
+                Assert.Equal(10000, imports[0].TotalRows);
+                Assert.True(imports[0].Migrated);
+
+                Assert.NotNull(imports[0].Errors);
+                Assert.Empty(imports[0].Errors);
+            }
+
+            MockUtils.VerifyAllMocks(tableStorageService);
+        }
+
+        [Fact]
+        public async Task MigrateImports_FailedImportsWithNoMessagesAreIgnored()
+        {
+            var tableImports = new List<TableImport>
+            {
+                // Failed imports with no message, should be ignored
+                new TableImport
+                {
+                    PartitionKey = Guid.NewGuid().ToString(),
+                    RowKey = "null-message.csv",
+                    Errors = null,
+                    Message = null,
+                    Status = "FAILED",
+                    PercentageComplete = 0,
+                    NumberOfRows = 10000,
+                    Timestamp = DateTimeOffset.Now
+                },
+                new TableImport
+                {
+                    PartitionKey = Guid.NewGuid().ToString(),
+                    RowKey = "empty-message.csv",
+                    Errors = null,
+                    Message = "",
+                    Status = "FAILED",
+                    PercentageComplete = 0,
+                    NumberOfRows = 10000,
+                    Timestamp = DateTimeOffset.Now
+                }
+            };
+
+            var tableStorageService = new Mock<ITableStorageService>(MockBehavior.Strict);
+
+            tableStorageService.Setup(service =>
+                    service.ExecuteQueryAsync("imports", It.IsAny<TableQuery<TableImport>>()))
+                .ReturnsAsync(tableImports);
+
+            var contentDbContextId = Guid.NewGuid().ToString();
+            await using (var contentDbContext = DbUtils.InMemoryApplicationDbContext(contentDbContextId))
+            {
+                var service = BuildMigrateImportsService(contentDbContext: contentDbContext,
+                    tableStorageService: tableStorageService.Object);
+
+                var result = await service.MigrateImports();
+                Assert.True(result.IsRight);
+            }
+
+            await using (var contentDbContext = DbUtils.InMemoryApplicationDbContext(contentDbContextId))
+            {
+                var imports = await contentDbContext.DataImports
+                    .Include(i => i.Errors)
+                    .ToListAsync();
+
+                Assert.Empty(imports);
+            }
+
+            MockUtils.VerifyAllMocks(tableStorageService);
+        }
+
+        [Fact]
+        public async Task MigrateImports_TableImportWithErrorsCreatesDataImportErrors()
+        {
+            var release = new Release
+            {
+                Id = Guid.NewGuid()
+            };
+
+            var importedSubjectId = Guid.NewGuid();
+
+            var zipFile = new File
+            {
+                Filename = "imported1.zip",
+                Release = release,
+                Type = DataZip
+            };
+
+            var dataFile = new File
+            {
+                Filename = "imported1.csv",
+                Release = release,
+                Type = FileType.Data,
+                Source = zipFile,
+                SubjectId = importedSubjectId
+            };
+
+            var metaFile = new File
+            {
+                Filename = "imported1.meta.csv",
+                Release = release,
+                Type = Metadata,
+                SubjectId = importedSubjectId
+            };
+
+            var tableImports = new List<TableImport>
+            {
+                // Import with errors
+                new TableImport
+                {
+                    PartitionKey = release.Id.ToString(),
+                    RowKey = dataFile.Filename,
+                    Errors = @"[{""Message"":""error1""},{""Message"": ""error2""}]",
+                    Message = TableImportSampleJson.Message(
+                        releaseId: release.Id,
+                        subjectId: importedSubjectId,
+                        dataFilename: dataFile.Filename,
+                        metaFilename: metaFile.Filename,
+                        zipFilename: zipFile.Filename
+                    ),
+                    Status = "COMPLETE",
+                    PercentageComplete = 100,
+                    NumberOfRows = 10000,
+                    Timestamp = DateTimeOffset.Now
+                }
+            };
+
+            var contentDbContextId = Guid.NewGuid().ToString();
+            await using (var contentDbContext = DbUtils.InMemoryApplicationDbContext(contentDbContextId))
+            {
+                await contentDbContext.Releases.AddAsync(release);
+                await contentDbContext.Files.AddRangeAsync(zipFile, dataFile, metaFile);
+                await contentDbContext.SaveChangesAsync();
+            }
+
+            var tableStorageService = new Mock<ITableStorageService>(MockBehavior.Strict);
+
+            tableStorageService.Setup(service =>
+                    service.ExecuteQueryAsync("imports", It.IsAny<TableQuery<TableImport>>()))
+                .ReturnsAsync(tableImports);
+
+            await using (var contentDbContext = DbUtils.InMemoryApplicationDbContext(contentDbContextId))
+            {
+                var service = BuildMigrateImportsService(contentDbContext: contentDbContext,
+                    tableStorageService: tableStorageService.Object);
+
+                var result = await service.MigrateImports();
+                Assert.True(result.IsRight);
+            }
+
+            await using (var contentDbContext = DbUtils.InMemoryApplicationDbContext(contentDbContextId))
+            {
+                var imports = await contentDbContext.DataImports
+                    .Include(i => i.Errors)
+                    .ToListAsync();
+
+                Assert.Single(imports);
+
+                Assert.Equal(tableImports[0].Timestamp.UtcDateTime, imports[0].Created);
+                Assert.Equal(DataImportStatus.COMPLETE, imports[0].Status);
+                Assert.Equal(100, imports[0].StagePercentageComplete);
+                Assert.Equal(importedSubjectId, imports[0].SubjectId);
+                Assert.Equal(dataFile.Id, imports[0].FileId);
+                Assert.Equal(metaFile.Id, imports[0].MetaFileId);
+                Assert.Equal(zipFile.Id, imports[0].ZipFileId);
+                Assert.Equal(10000, imports[0].Rows);
+                Assert.Equal(10, imports[0].NumBatches);
+                Assert.Equal(1000, imports[0].RowsPerBatch);
+                Assert.Equal(10000, imports[0].TotalRows);
+                Assert.True(imports[0].Migrated);
+
+                Assert.NotNull(imports[0].Errors);
+                Assert.Equal(2, imports[0].Errors.Count);
+
+                Assert.Equal(tableImports[0].Timestamp.UtcDateTime, imports[0].Errors[0].Created);
+                Assert.Equal("error1", imports[0].Errors[0].Message);
+
+                Assert.Equal(tableImports[0].Timestamp.UtcDateTime, imports[0].Errors[1].Created);
+                Assert.Equal("error2", imports[0].Errors[1].Message);
+            }
+
+            MockUtils.VerifyAllMocks(tableStorageService);
+        }
+
+        [Fact]
+        public async Task MigrateImports_NewDataImportsAreNotTouchedByMigration()
+        {
+            var release = new Release
+            {
+                Id = Guid.NewGuid()
+            };
+
+            var importedSubjectId = Guid.NewGuid();
+
+            var zipFile = new File
+            {
+                Filename = "imported1.zip",
+                Release = release,
+                Type = DataZip
+            };
+
+            var dataFile = new File
+            {
+                Filename = "imported1.csv",
+                Release = release,
+                Type = FileType.Data,
+                Source = zipFile,
+                SubjectId = importedSubjectId
+            };
+
+            var metaFile = new File
+            {
+                Filename = "imported1.meta.csv",
+                Release = release,
+                Type = Metadata,
+                SubjectId = importedSubjectId
             };
 
             // Test the migration won't affect non-migrated imports which may exist from new uploads
@@ -157,24 +436,18 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
             {
                 new TableImport
                 {
-                    PartitionKey = TableImportSampleJson.ReleaseId.ToString(),
-                    RowKey = TableImportSampleJson.DataFilename,
-                    Errors = @"[{""Message"":""error1""},{""Message"": ""error2""}]",
-                    Message = TableImportSampleJson.MessageJson,
+                    PartitionKey = release.Id.ToString(),
+                    RowKey = dataFile.Filename,
+                    Errors = "",
+                    Message = TableImportSampleJson.Message(
+                        releaseId: release.Id,
+                        subjectId: importedSubjectId,
+                        dataFilename: dataFile.Filename,
+                        metaFilename: metaFile.Filename,
+                        zipFilename: zipFile.Filename
+                    ),
                     Status = "COMPLETE",
                     PercentageComplete = 100,
-                    NumberOfRows = 10000,
-                    Timestamp = DateTimeOffset.Now
-                },
-                // Failed import with no message, should be ignored
-                new TableImport
-                {
-                    PartitionKey = Guid.NewGuid().ToString(),
-                    RowKey = "data2.csv",
-                    Errors = null,
-                    Message = null,
-                    Status = "FAILED",
-                    PercentageComplete = 0,
                     NumberOfRows = 10000,
                     Timestamp = DateTimeOffset.Now
                 }
@@ -184,7 +457,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
             await using (var contentDbContext = DbUtils.InMemoryApplicationDbContext(contentDbContextId))
             {
                 await contentDbContext.Releases.AddAsync(release);
-                await contentDbContext.Files.AddRangeAsync(zipFile1, dataFile1, metaFile1);
+                await contentDbContext.Files.AddRangeAsync(zipFile, dataFile, metaFile);
                 await contentDbContext.DataImports.AddAsync(nonMigratedImport);
                 await contentDbContext.SaveChangesAsync();
             }
@@ -220,10 +493,10 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
                 Assert.Equal(tableImports[0].Timestamp.UtcDateTime, imports[1].Created);
                 Assert.Equal(DataImportStatus.COMPLETE, imports[1].Status);
                 Assert.Equal(100, imports[1].StagePercentageComplete);
-                Assert.Equal(TableImportSampleJson.SubjectId, imports[1].SubjectId);
-                Assert.Equal(dataFile1.Id, imports[1].FileId);
-                Assert.Equal(metaFile1.Id, imports[1].MetaFileId);
-                Assert.Equal(zipFile1.Id, imports[1].ZipFileId);
+                Assert.Equal(importedSubjectId, imports[1].SubjectId);
+                Assert.Equal(dataFile.Id, imports[1].FileId);
+                Assert.Equal(metaFile.Id, imports[1].MetaFileId);
+                Assert.Equal(zipFile.Id, imports[1].ZipFileId);
                 Assert.Equal(10000, imports[1].Rows);
                 Assert.Equal(10, imports[1].NumBatches);
                 Assert.Equal(1000, imports[1].RowsPerBatch);
@@ -231,13 +504,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
                 Assert.True(imports[1].Migrated);
 
                 Assert.NotNull(imports[1].Errors);
-                Assert.Equal(2, imports[1].Errors.Count);
-
-                Assert.Equal(tableImports[0].Timestamp.UtcDateTime, imports[1].Errors[0].Created);
-                Assert.Equal("error1", imports[1].Errors[0].Message);
-
-                Assert.Equal(tableImports[0].Timestamp.UtcDateTime, imports[1].Errors[1].Created);
-                Assert.Equal("error2", imports[1].Errors[1].Message);
+                Assert.Empty(imports[1].Errors);
             }
 
             MockUtils.VerifyAllMocks(tableStorageService);
@@ -323,6 +590,18 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
         }
 
         [Fact]
+        public void ImportErrors_MalformedErrorsJsonIsSingleTableImportError()
+        {
+            var tableImport = new TableImport
+            {
+                Errors = "malformed errors json causing exception"
+            };
+
+            var errors = tableImport.ImportErrors.ToList();
+            Assert.Equal("malformed errors json causing exception", errors[0].Message);
+        }
+
+        [Fact]
         public void ImportErrors_NonEmptyErrorsJsonIsDeserialized()
         {
             var tableImport = new TableImport
@@ -361,13 +640,20 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
         [Fact]
         public void ImportMessage_MessageJsonIsDeserialized()
         {
+            var subjectId = Guid.NewGuid();
             var tableImport = new TableImport
             {
-                Message = TableImportSampleJson.MessageJson
+                Message = TableImportSampleJson.Message(
+                    releaseId: Guid.NewGuid(),
+                    subjectId: subjectId,
+                    dataFilename: "data.csv",
+                    metaFilename: "data.meta.csv",
+                    zipFilename: "data.zip"
+                )
             };
 
             Assert.NotNull(tableImport.ImportMessage);
-            Assert.Equal(TableImportSampleJson.SubjectId, tableImport.ImportMessage.SubjectId);
+            Assert.Equal(subjectId, tableImport.ImportMessage.SubjectId);
             Assert.Equal("data.csv", tableImport.ImportMessage.DataFileName);
             Assert.Equal("data.meta.csv", tableImport.ImportMessage.MetaFileName);
             Assert.Equal("data.zip", tableImport.ImportMessage.ArchiveFileName);
@@ -379,19 +665,19 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
 
     public static class TableImportSampleJson
     {
-        public static Guid SubjectId = Guid.NewGuid();
-        public static readonly Guid ReleaseId = Guid.NewGuid();
-        public static readonly string DataFilename = "data.csv";
-        public static readonly string MetaFilename = "data.meta.csv";
-        public static readonly string ZipFilename = "data.zip";
-
-        public static readonly string MessageJson = @$"
+        public static string Message(Guid releaseId,
+            Guid subjectId,
+            string dataFilename,
+            string metaFilename,
+            string zipFilename)
+        {
+            return @$"
 {{
-  ""SubjectId"": ""{SubjectId}"",
-  ""DataFileName"": ""{DataFilename}"",
-  ""MetaFileName"": ""{MetaFilename}"",
+  ""SubjectId"": ""{subjectId}"",
+  ""DataFileName"": ""{dataFilename}"",
+  ""MetaFileName"": ""{metaFilename}"",
   ""Release"": {{
-    ""Id"": ""{ReleaseId}"",
+    ""Id"": ""{releaseId}"",
     ""Slug"": ""2076-77"",
     ""Publication"": {{
       ""Id"": ""a325a5b9-55c4-4282-17a9-08d8b9416e3d"",
@@ -417,8 +703,9 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
   ""RowsPerBatch"": 1000,
   ""Seeding"": false,
   ""TotalRows"": 10000,
-  ""ArchiveFileName"": ""{ZipFilename}""
+  ""ArchiveFileName"": ""{zipFilename}""
 }}
 ";
+        }
     }
 }

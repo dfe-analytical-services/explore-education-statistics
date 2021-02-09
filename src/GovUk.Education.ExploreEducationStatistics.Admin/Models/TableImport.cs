@@ -25,9 +25,32 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Models
 
         public string DataFilename => RowKey;
 
-        public IEnumerable<TableImportError> ImportErrors => Errors.IsNullOrEmpty()
-            ? new List<TableImportError>()
-            : JsonConvert.DeserializeObject<IEnumerable<TableImportError>>(Errors);
+        public IEnumerable<TableImportError> ImportErrors
+        {
+            get
+            {
+                if (Errors.IsNullOrEmpty())
+                {
+                    return new List<TableImportError>();
+                }
+
+                try
+                {
+                    return JsonConvert.DeserializeObject<IEnumerable<TableImportError>>(Errors);
+                }
+                catch (JsonException)
+                {
+                    // Handle exception deserializing Errors json as a single TableImportError with json as message
+                    return new List<TableImportError>
+                    {
+                        new TableImportError
+                        {
+                            Message = Errors
+                        }
+                    };
+                }
+            }
+        }
 
         public TableImportMessage ImportMessage => Message.IsNullOrEmpty()
             ? null 
