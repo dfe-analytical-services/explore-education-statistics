@@ -14,26 +14,27 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Processor.Services
 {
     public class DataImportService : IDataImportService
     {
-        private readonly ContentDbContext _contentDbContext;
+        private readonly DbContextOptions<ContentDbContext> _contentDbContextOptions;
         private readonly ILogger<DataImportService> _logger;
 
         public DataImportService(
-            ContentDbContext contentDbContext,
+            DbContextOptions<ContentDbContext> contentDbContextOptions,
             ILogger<DataImportService> logger)
         {
-            _contentDbContext = contentDbContext;
+            _contentDbContextOptions = contentDbContextOptions;
             _logger = logger;
         }
 
         public async Task FailImport(Guid id, List<DataImportError> errors)
         {
-            var import = await GetImport(id);
+            await using var contentDbContext = new ContentDbContext(_contentDbContextOptions);
+            var import = await contentDbContext.DataImports.FindAsync(id);
             if (import.Status != COMPLETE && import.Status != FAILED)
             {
-                _contentDbContext.Update(import);
+                contentDbContext.Update(import);
                 import.Status = FAILED;
                 import.Errors.AddRange(errors);
-                await _contentDbContext.SaveChangesAsync();
+                await contentDbContext.SaveChangesAsync();
             }
         }
 
@@ -44,7 +45,9 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Processor.Services
 
         public async Task<DataImport> GetImport(Guid id)
         {
-            return await _contentDbContext.DataImports
+            await using var contentDbContext = new ContentDbContext(_contentDbContextOptions);
+            return await contentDbContext.DataImports
+                .AsNoTracking()
                 .Include(import => import.Errors)
                 .Include(import => import.File)
                 .Include(import => import.MetaFile)
@@ -54,7 +57,10 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Processor.Services
 
         public async Task<DataImportStatus> GetImportStatus(Guid id)
         {
-            var import = await _contentDbContext.DataImports.FindAsync(id);
+            await using var contentDbContext = new ContentDbContext(_contentDbContextOptions);
+            var import = await contentDbContext.DataImports
+                .AsNoTracking()
+                .SingleOrDefaultAsync(i => i.Id == id);
 
             if (import == null)
             {
@@ -66,20 +72,22 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Processor.Services
 
         public async Task Update(Guid id, int rowsPerBatch, int totalRows, int numBatches)
         {
-            var import = await _contentDbContext.DataImports.FindAsync(id);
-            _contentDbContext.Update(import);
+            await using var contentDbContext = new ContentDbContext(_contentDbContextOptions);
+            var import = await contentDbContext.DataImports.FindAsync(id);
+            contentDbContext.Update(import);
 
             import.RowsPerBatch = rowsPerBatch;
             import.TotalRows = totalRows;
             import.NumBatches = numBatches;
 
-            await _contentDbContext.SaveChangesAsync();
+            await contentDbContext.SaveChangesAsync();
         }
 
         public async Task UpdateStatus(Guid id, DataImportStatus newStatus, double percentageComplete)
         {
+            await using var contentDbContext = new ContentDbContext(_contentDbContextOptions);
             await ExecuteWithExclusiveLock(
-                _contentDbContext,
+                contentDbContext,
                 $"LockForImport-{id}",
                 async context =>
                 {

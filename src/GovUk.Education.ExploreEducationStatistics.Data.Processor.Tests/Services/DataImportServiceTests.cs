@@ -2,7 +2,6 @@
 using System.Collections.Generic;
 using System.Threading.Tasks;
 using GovUk.Education.ExploreEducationStatistics.Content.Model;
-using GovUk.Education.ExploreEducationStatistics.Content.Model.Database;
 using GovUk.Education.ExploreEducationStatistics.Data.Processor.Services;
 using Microsoft.Extensions.Logging;
 using Moq;
@@ -29,25 +28,19 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Processor.Tests.Servic
                 await contentDbContext.SaveChangesAsync();
             }
 
-            await using (var contentDbContext = InMemoryContentDbContext(contentDbContextId))
-            {
-                var service = BuildDataImportService(contentDbContext: contentDbContext);
-                var result = await service.GetImportStatus(import.Id);
+            var service = BuildDataImportService(contentDbContextId: contentDbContextId);
+            var result = await service.GetImportStatus(import.Id);
 
-                Assert.Equal(STAGE_1, result);
-            }
+            Assert.Equal(STAGE_1, result);
         }
 
         [Fact]
         public async Task GetImportStatus_NotFound()
         {
-            await using (var contentDbContext = InMemoryContentDbContext())
-            {
-                var service = BuildDataImportService(contentDbContext: contentDbContext);
-                var result = await service.GetImportStatus(Guid.NewGuid());
+            var service = BuildDataImportService();
+            var result = await service.GetImportStatus(Guid.NewGuid());
 
-                Assert.Equal(NOT_FOUND, result);
-            }
+            Assert.Equal(NOT_FOUND, result);
         }
 
         [Fact]
@@ -68,24 +61,21 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Processor.Tests.Servic
                 await contentDbContext.SaveChangesAsync();
             }
 
-            await using (var contentDbContext = InMemoryContentDbContext(contentDbContextId))
-            {
-                var service = BuildDataImportService(contentDbContext: contentDbContext);
-                var result = await service.GetImport(import.Id);
+            var service = BuildDataImportService(contentDbContextId: contentDbContextId);
+            var result = await service.GetImport(import.Id);
 
-                Assert.Equal(import.Id, result.Id);
+            Assert.Equal(import.Id, result.Id);
 
-                Assert.Empty(result.Errors);
+            Assert.Empty(result.Errors);
 
-                Assert.NotNull(import.File);
-                Assert.Equal(import.File.Id, result.File.Id);
+            Assert.NotNull(import.File);
+            Assert.Equal(import.File.Id, result.File.Id);
 
-                Assert.NotNull(import.MetaFile);
-                Assert.Equal(import.MetaFile.Id, result.MetaFile.Id);
+            Assert.NotNull(import.MetaFile);
+            Assert.Equal(import.MetaFile.Id, result.MetaFile.Id);
 
-                Assert.NotNull(import.ZipFile);
-                Assert.Equal(import.ZipFile.Id, result.ZipFile.Id);
-            }
+            Assert.NotNull(import.ZipFile);
+            Assert.Equal(import.ZipFile.Id, result.ZipFile.Id);
         }
 
         [Fact]
@@ -111,18 +101,15 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Processor.Tests.Servic
                 await contentDbContext.SaveChangesAsync();
             }
 
-            await using (var contentDbContext = InMemoryContentDbContext(contentDbContextId))
-            {
-                var service = BuildDataImportService(contentDbContext: contentDbContext);
-                var result = await service.GetImport(import.Id);
+            var service = BuildDataImportService(contentDbContextId: contentDbContextId);
+            var result = await service.GetImport(import.Id);
 
-                Assert.Equal(import.Id, result.Id);
+            Assert.Equal(import.Id, result.Id);
 
-                Assert.NotNull(result.Errors);
-                Assert.Equal(2, result.Errors.Count);
-                Assert.Equal("error 1", result.Errors[0].Message);
-                Assert.Equal("error 2", result.Errors[1].Message);
-            }
+            Assert.NotNull(result.Errors);
+            Assert.Equal(2, result.Errors.Count);
+            Assert.Equal("error 1", result.Errors[0].Message);
+            Assert.Equal("error 2", result.Errors[1].Message);
         }
 
         [Fact]
@@ -142,15 +129,13 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Processor.Tests.Servic
                 await contentDbContext.SaveChangesAsync();
             }
 
-            await using (var contentDbContext = InMemoryContentDbContext(contentDbContextId))
-            {
-                var service = BuildDataImportService(contentDbContext: contentDbContext);
 
-                await service.Update(import.Id,
-                    rowsPerBatch: 1000,
-                    totalRows: 10000,
-                    numBatches: 10);
-            }
+            var service = BuildDataImportService(contentDbContextId: contentDbContextId);
+
+            await service.Update(import.Id,
+                rowsPerBatch: 1000,
+                totalRows: 10000,
+                numBatches: 10);
 
             await using (var contentDbContext = InMemoryContentDbContext(contentDbContextId))
             {
@@ -161,10 +146,12 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Processor.Tests.Servic
             }
         }
 
-        private static DataImportService BuildDataImportService(ContentDbContext contentDbContext)
+        private static DataImportService BuildDataImportService(string contentDbContextId = null)
         {
             return new DataImportService(
-                contentDbContext,
+                contentDbContextId == null
+                    ? InMemoryContentDbContextOptions()
+                    : InMemoryContentDbContextOptions(contentDbContextId),
                 new Mock<ILogger<DataImportService>>().Object
             );
         }
