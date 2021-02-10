@@ -14,9 +14,6 @@ ALTER TABLE ObservationRow
 ADD CONSTRAINT FK_ObservationRow_Location_LocationId
 FOREIGN KEY (LocationId) REFERENCES Location (Id);
 
-
-
-
 -- constraint FK_ObservationRowFilterItem_ObservationRow_Id
 -- references ObservationRow (Id)
 -- on delete cascade,

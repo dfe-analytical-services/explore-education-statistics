@@ -167,7 +167,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Processor.Services
         public async Task ImportObservations(DataColumnCollection cols, DataRowCollection rows, Subject subject,
             SubjectMeta subjectMeta, int batchNo, int rowsPerBatch, StatisticsDbContext context)
         {
-            var w = Stopwatch.StartNew();
+            var stopwatch = Stopwatch.StartNew();
 
             _importerFilterService.ClearCache();
             _importerLocationService.ClearCache();
@@ -181,8 +181,8 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Processor.Services
                 batchNo,
                 rowsPerBatch).ToList();
 
-            _logger.LogInformation($"Took {w.Elapsed.TotalMilliseconds} millis to read {observations.Count} " +
-                                   $"Observations from CSV");
+            _logger.LogDebug($"Took {stopwatch.Elapsed.TotalMilliseconds} millis to read {observations.Count} " +
+                             $"Observations from CSV");
             await InsertObservations(context, observations);
         }
 
@@ -460,7 +460,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Processor.Services
 
         private async Task InsertObservations(StatisticsDbContext context, IEnumerable<Observation> observations)
         {
-            var w = Stopwatch.StartNew();
+            var stopwatch = Stopwatch.StartNew();
             
             var observationsTable = new DataTable();
             observationsTable.Columns.Add("ObservationId", typeof(Guid));
@@ -486,12 +486,12 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Processor.Services
                 );
             }
 
-            _logger.LogInformation($"Took {w.Elapsed.TotalMilliseconds} to prepare {observations.Count()} Observation rows");
-            w.Restart();
+            _logger.LogDebug($"Took {stopwatch.Elapsed.TotalMilliseconds} to prepare {observations.Count()} Observation rows");
+            stopwatch.Restart();
             
             var observationsParam = new SqlParameter("@Observations", SqlDbType.Structured)
             {
-                Value = observationsTable, TypeName = "[dbo].[ObservationType]"
+                Value = observationsTable, TypeName = "[dbo].[ObservationRowType]"
             };
             
             var observationsFilterItemsTable = new DataTable();
@@ -513,15 +513,15 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Processor.Services
             
             var observationFilterItemsParam = new SqlParameter("@ObservationFilterItems", SqlDbType.Structured)
             {
-                Value = observationsFilterItemsTable, TypeName = "[dbo].[ObservationFilterItemType]"
+                Value = observationsFilterItemsTable, TypeName = "[dbo].[ObservationRowFilterItemType]"
             };
 
             await context.Database.ExecuteSqlRawAsync(
-                "EXEC [dbo].[InsertObservations] @Observations, @ObservationFilterItems", 
+                "EXEC [dbo].[InsertObservationRows] @Observations, @ObservationFilterItems", 
                 observationsParam, 
                 observationFilterItemsParam);
 
-            _logger.LogInformation($"Took {w.Elapsed.TotalMilliseconds} to insert {observations.Count()} Observation rows");
+            _logger.LogDebug($"Took {stopwatch.Elapsed.TotalMilliseconds} to insert {observations.Count()} Observation rows");
         }
     }
 }

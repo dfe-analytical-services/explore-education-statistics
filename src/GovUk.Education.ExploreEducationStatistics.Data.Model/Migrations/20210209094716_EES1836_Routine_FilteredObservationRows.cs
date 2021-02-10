@@ -4,19 +4,18 @@ using static GovUk.Education.ExploreEducationStatistics.Data.Model.Migrations.Mi
 
 namespace GovUk.Education.ExploreEducationStatistics.Data.Model.Migrations
 {
-    public partial class EES1836_Routine_FilteredObservations : Migration
+    public partial class EES1836_Routine_FilteredObservationRows : Migration
     {
         private const string MigrationId = "20210209094716";
-        private const string PreviousMigrationId = "20200930085741";
 
         protected override void Up(MigrationBuilder migrationBuilder)
         {
-            migrationBuilder.SqlFromFile(MigrationsPath, $"{MigrationId}_Routine_FilteredObservations.sql");
+            migrationBuilder.SqlFromFile(MigrationsPath, $"{MigrationId}_Routine_FilteredObservationRows.sql");
         }
 
         protected override void Down(MigrationBuilder migrationBuilder)
         {
-            migrationBuilder.SqlFromFile(MigrationsPath, $"{PreviousMigrationId}_Routine_FilteredObservations.sql");
+            migrationBuilder.Sql("DROP PROCEDURE FilteredObservationRows");
         }
     }
 }

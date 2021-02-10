@@ -1,6 +1,6 @@
-CREATE PROCEDURE InsertObservations
-    @Observations dbo.ObservationType READONLY,
-    @ObservationFilterItems dbo.ObservationFilterItemType READONLY
+CREATE OR ALTER PROCEDURE InsertObservationRows
+    @Observations dbo.ObservationRowType READONLY,
+    @ObservationFilterItems dbo.ObservationRowFilterItemType READONLY
 AS
 BEGIN TRANSACTION 
 

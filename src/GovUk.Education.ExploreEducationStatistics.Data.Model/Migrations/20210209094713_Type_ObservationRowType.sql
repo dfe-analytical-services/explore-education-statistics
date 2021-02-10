@@ -1,4 +1,4 @@
-﻿CREATE TYPE ObservationType AS TABLE
+﻿CREATE TYPE ObservationRowType AS TABLE
 (
     ObservationId   uniqueidentifier not null,
     SubjectId       uniqueidentifier not null,
