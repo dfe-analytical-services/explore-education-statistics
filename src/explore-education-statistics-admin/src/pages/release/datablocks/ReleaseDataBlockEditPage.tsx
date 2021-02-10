@@ -121,9 +121,19 @@ const ReleaseDataBlockEditPage = ({
             <section>
               <SummaryList smallKey noBorder>
                 {!canUpdateRelease && (
-                  <SummaryListItem term="Highlight name">
-                    {dataBlock.highlightName}
-                  </SummaryListItem>
+                  <>
+                    {dataBlock.highlightName && (
+                      <SummaryListItem term="Highlight name">
+                        {dataBlock.highlightName || 'None'}
+                      </SummaryListItem>
+                    )}
+
+                    {dataBlock.highlightDescription && (
+                      <SummaryListItem term="Highlight description">
+                        {dataBlock.highlightDescription || 'None'}
+                      </SummaryListItem>
+                    )}
+                  </>
                 )}
 
                 <SummaryListItem term="Fast track URL">

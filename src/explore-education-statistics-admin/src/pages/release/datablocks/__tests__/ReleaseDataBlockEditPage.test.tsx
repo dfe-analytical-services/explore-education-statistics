@@ -43,6 +43,7 @@ describe('ReleaseDataBlockEditPage', () => {
     name: 'Test name 1',
     heading: 'Test title 1',
     highlightName: 'Test highlight name 1',
+    highlightDescription: 'Test highlight description 1',
     source: 'Test source 1',
     query: {
       includeGeoJson: false,
@@ -121,6 +122,7 @@ describe('ReleaseDataBlockEditPage', () => {
       name: 'Test name 2',
       heading: 'Test title 2',
       highlightName: 'Test highlight name 2',
+      highlightDescription: 'Test highlight description 2',
       source: 'Test source 2',
       chartsCount: 0,
     },
@@ -129,6 +131,7 @@ describe('ReleaseDataBlockEditPage', () => {
       name: testDataBlock.name,
       heading: testDataBlock.heading,
       highlightName: testDataBlock.highlightName,
+      highlightDescription: testDataBlock.highlightDescription,
       source: testDataBlock.source,
       chartsCount: 0,
     },
@@ -344,7 +347,7 @@ describe('ReleaseDataBlockEditPage', () => {
       });
     });
 
-    test('renders with correct data block details', async () => {
+    test('renders with correct data block details with highlight name and description', async () => {
       renderPage();
 
       await waitFor(() => {
@@ -355,6 +358,34 @@ describe('ReleaseDataBlockEditPage', () => {
         expect(screen.getByTestId('Highlight name')).toHaveTextContent(
           'Test highlight name 1',
         );
+        expect(screen.getByTestId('Highlight description')).toHaveTextContent(
+          'Test highlight description 1',
+        );
+        expect(screen.getByTestId('Fast track URL')).toHaveTextContent(
+          'http://localhost/data-tables/fast-track/block-1',
+        );
+      });
+    });
+
+    test('renders with correct data block details without highlight name and description', async () => {
+      dataBlockService.getDataBlock.mockResolvedValue({
+        ...testDataBlock,
+        highlightName: '',
+        highlightDescription: '',
+      });
+
+      renderPage();
+
+      await waitFor(() => {
+        expect(
+          screen.getByRole('heading', { name: 'Test name 1' }),
+        ).toBeInTheDocument();
+
+        expect(screen.queryByTestId('Highlight name')).not.toBeInTheDocument();
+        expect(
+          screen.queryByTestId('Highlight description'),
+        ).not.toBeInTheDocument();
+
         expect(screen.getByTestId('Fast track URL')).toHaveTextContent(
           'http://localhost/data-tables/fast-track/block-1',
         );
