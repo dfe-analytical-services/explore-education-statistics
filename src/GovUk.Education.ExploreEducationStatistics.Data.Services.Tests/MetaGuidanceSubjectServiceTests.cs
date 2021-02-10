@@ -629,6 +629,219 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Services.Tests
             }
         }
 
+        [Fact]
+        public async Task GetTimePeriods()
+        {
+            var release = new Release();
+
+            var subject = new Subject
+            {
+                Filename = "file1.csv",
+                Name = "Subject 1"
+            };
+
+            var releaseSubject = new ReleaseSubject
+            {
+                Release = release,
+                Subject = subject,
+                MetaGuidance = "Subject 1 Meta Guidance"
+            };
+
+            var subjectObservation1 = new Observation
+            {
+                GeographicLevel = GeographicLevel.Country,
+                Subject = subject,
+                Year = 2030,
+                TimeIdentifier = TimeIdentifier.AcademicYearQ3
+            };
+
+            var subjectObservation2 = new Observation
+            {
+                GeographicLevel = GeographicLevel.LocalAuthority,
+                Subject = subject,
+                Year = 2020,
+                TimeIdentifier = TimeIdentifier.AcademicYearQ4
+            };
+
+            var subjectObservation3 = new Observation
+            {
+                GeographicLevel = GeographicLevel.LocalAuthorityDistrict,
+                Subject = subject,
+                Year = 2021,
+                TimeIdentifier = TimeIdentifier.AcademicYearQ1
+            };
+
+            var statisticsDbContextId = Guid.NewGuid().ToString();
+
+            await using (var statisticsDbContext = InMemoryStatisticsDbContext(statisticsDbContextId))
+            {
+                await statisticsDbContext.AddAsync(release);
+                await statisticsDbContext.AddAsync(subject);
+                await statisticsDbContext.AddAsync(releaseSubject);
+                await statisticsDbContext.AddRangeAsync(
+                    subjectObservation1,
+                    subjectObservation2,
+                    subjectObservation3);
+                await statisticsDbContext.SaveChangesAsync();
+            }
+
+            await using (var statisticsDbContext = InMemoryStatisticsDbContext(statisticsDbContextId))
+            {
+                var service = SetupMetaGuidanceSubjectService(context: statisticsDbContext);
+
+                var result = await service.GetTimePeriods(subject.Id);
+
+                Assert.Equal("2020/21 Q4", result.From);
+                Assert.Equal("2030/31 Q3", result.To);
+            }
+        }
+
+        [Fact]
+        public async Task GetTimePeriods_NoObservations()
+        {
+            var release = new Release();
+
+            var subject = new Subject
+            {
+                Filename = "file1.csv",
+                Name = "Subject 1"
+            };
+
+            var releaseSubject1 = new ReleaseSubject
+            {
+                Release = release,
+                Subject = subject,
+                MetaGuidance = "Subject 1 Meta Guidance"
+            };
+
+            var statisticsDbContextId = Guid.NewGuid().ToString();
+
+            await using (var statisticsDbContext = InMemoryStatisticsDbContext(statisticsDbContextId))
+            {
+                await statisticsDbContext.AddAsync(release);
+                await statisticsDbContext.AddAsync(subject);
+                await statisticsDbContext.AddAsync(releaseSubject1);
+                await statisticsDbContext.SaveChangesAsync();
+            }
+
+            await using (var statisticsDbContext = InMemoryStatisticsDbContext(statisticsDbContextId))
+            {
+                var service = SetupMetaGuidanceSubjectService(context: statisticsDbContext);
+
+                var result = await service.GetTimePeriods(subject.Id);
+
+                Assert.Null(result.From);
+                Assert.Null(result.To);
+            }
+        }
+
+        [Fact]
+        public async Task GetGeographicLevels()
+        {
+            var release = new Release();
+
+            var subject = new Subject
+            {
+                Filename = "file1.csv",
+                Name = "Subject 1"
+            };
+
+            var releaseSubject = new ReleaseSubject
+            {
+                Release = release,
+                Subject = subject,
+                MetaGuidance = "Subject 1 Meta Guidance"
+            };
+
+            var subjectObservation1 = new Observation
+            {
+                GeographicLevel = GeographicLevel.Country,
+                Subject = subject,
+                Year = 2020,
+                TimeIdentifier = TimeIdentifier.AcademicYearQ3
+            };
+
+            var subjectObservation2 = new Observation
+            {
+                GeographicLevel = GeographicLevel.LocalAuthority,
+                Subject = subject,
+                Year = 2020,
+                TimeIdentifier = TimeIdentifier.AcademicYearQ4
+            };
+
+            var subjectObservation3 = new Observation
+            {
+                GeographicLevel = GeographicLevel.LocalAuthorityDistrict,
+                Subject = subject,
+                Year = 2021,
+                TimeIdentifier = TimeIdentifier.AcademicYearQ1
+            };
+
+            var statisticsDbContextId = Guid.NewGuid().ToString();
+
+            await using (var statisticsDbContext = InMemoryStatisticsDbContext(statisticsDbContextId))
+            {
+                await statisticsDbContext.AddAsync(release);
+                await statisticsDbContext.AddAsync(subject);
+                await statisticsDbContext.AddAsync(releaseSubject);
+                await statisticsDbContext.AddRangeAsync(
+                    subjectObservation1,
+                    subjectObservation2,
+                    subjectObservation3);
+                await statisticsDbContext.SaveChangesAsync();
+            }
+
+            await using (var statisticsDbContext = InMemoryStatisticsDbContext(statisticsDbContextId))
+            {
+                var service = SetupMetaGuidanceSubjectService(context: statisticsDbContext);
+
+                var result = await service.GetGeographicLevels(subject.Id);
+
+                Assert.Equal(3, result.Count);
+                Assert.Equal("National", result[0]);
+                Assert.Equal("Local Authority", result[1]);
+                Assert.Equal("Local Authority District", result[2]);
+            }
+        }
+
+        [Fact]
+        public async Task GetGeographicLevels_NoObservations()
+        {
+            var release = new Release();
+
+            var subject = new Subject
+            {
+                Filename = "file1.csv",
+                Name = "Subject 1"
+            };
+
+            var releaseSubject = new ReleaseSubject
+            {
+                Release = release,
+                Subject = subject,
+                MetaGuidance = "Subject 1 Meta Guidance"
+            };
+
+            var statisticsDbContextId = Guid.NewGuid().ToString();
+
+            await using (var statisticsDbContext = InMemoryStatisticsDbContext(statisticsDbContextId))
+            {
+                await statisticsDbContext.AddAsync(release);
+                await statisticsDbContext.AddAsync(subject);
+                await statisticsDbContext.AddAsync(releaseSubject);
+                await statisticsDbContext.SaveChangesAsync();
+            }
+
+            await using (var statisticsDbContext = InMemoryStatisticsDbContext(statisticsDbContextId))
+            {
+                var service = SetupMetaGuidanceSubjectService(context: statisticsDbContext);
+
+                var result = await service.GetGeographicLevels(subject.Id);
+
+                Assert.Empty(result);
+            }
+        }
+
         private static MetaGuidanceSubjectService SetupMetaGuidanceSubjectService(
             StatisticsDbContext context,
             IFilterService filterService = null,

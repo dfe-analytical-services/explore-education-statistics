@@ -79,7 +79,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Services
                 rs => string.IsNullOrWhiteSpace(rs.MetaGuidance));
         }
 
-        private async Task<MetaGuidanceSubjectTimePeriodsViewModel> GetTimePeriods(Guid subjectId)
+        public async Task<MetaGuidanceSubjectTimePeriodsViewModel> GetTimePeriods(Guid subjectId)
         {
             var orderedTimePeriods = _context
                 .Observation
@@ -101,7 +101,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Services
                 TimePeriodLabelFormatter.Format(last.Year, last.TimeIdentifier));
         }
 
-        private async Task<List<string>> GetGeographicLevels(Guid subjectId)
+        public async Task<List<string>> GetGeographicLevels(Guid subjectId)
         {
             return await _context
                 .Observation
