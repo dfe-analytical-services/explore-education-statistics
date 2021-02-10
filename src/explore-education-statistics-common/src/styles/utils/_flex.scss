@@ -6,8 +6,20 @@
   flex-wrap: wrap;
 }
 
+.dfe-align-items--center {
+  align-content: center;
+}
+
 .dfe-justify-content--center {
   justify-content: center;
+}
+
+.dfe-justify-content--flex-start {
+  justify-content: flex-start;
+}
+
+.dfe-justify-content--flex-end {
+  justify-content: flex-end;
 }
 
 .dfe-justify-content--space-between {
