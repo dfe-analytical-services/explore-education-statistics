@@ -127,50 +127,20 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
         [Fact]
         public async Task HasIncompleteImports_NoReleaseFiles()
         {
-            var release = new Release();
+            var release1 = new Release();
+            var release2 = new Release();
 
-            var contentDbContextId = Guid.NewGuid().ToString();
-
-            await using (var contentDbContext = InMemoryApplicationDbContext(contentDbContextId))
-            {
-                await contentDbContext.Releases.AddAsync(release);
-                await contentDbContext.SaveChangesAsync();
-            }
-
-            await using (var contentDbContext = InMemoryApplicationDbContext(contentDbContextId))
-            {
-                var service = BuildDataImportService(contentDbContext: contentDbContext);
-
-                var result = await service.HasIncompleteImports(release.Id);
-                Assert.False(result);
-            }
-        }
-
-        [Fact]
-        public async Task HasIncompleteImports_ReleaseHasCompletedImports()
-        {
-            var release = new Release();
-
-            var file1 = new File
+            var release2File1 = new File
             {
                 Type = FileType.Data
             };
 
-            var file2 = new File
-            {
-                Type = FileType.Data
-            };
+            // Incomplete imports for other Releases should be ignored
 
-            var import1 = new DataImport
+            var release2Import1 = new DataImport
             {
-                File = file1,
-                Status = DataImportStatus.COMPLETE
-            };
-
-            var import2 = new DataImport
-            {
-                File = file2,
-                Status = DataImportStatus.COMPLETE
+                File = release2File1,
+                Status = DataImportStatus.STAGE_1
             };
 
             var contentDbContextId = Guid.NewGuid().ToString();
@@ -180,15 +150,10 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
                 await contentDbContext.ReleaseFiles.AddRangeAsync(
                     new ReleaseFile
                     {
-                        Release = release,
-                        File = file1
-                    },
-                    new ReleaseFile
-                    {
-                        Release = release,
-                        File = file2
+                        Release = release2,
+                        File = release2File1
                     });
-                await contentDbContext.DataImports.AddRangeAsync(import1, import2);
+                await contentDbContext.DataImports.AddRangeAsync(release2Import1);
                 await contentDbContext.SaveChangesAsync();
             }
 
@@ -196,7 +161,81 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
             {
                 var service = BuildDataImportService(contentDbContext: contentDbContext);
 
-                var result = await service.HasIncompleteImports(release.Id);
+                var result = await service.HasIncompleteImports(release1.Id);
+                Assert.False(result);
+            }
+        }
+
+        [Fact]
+        public async Task HasIncompleteImports_ReleaseHasCompletedImports()
+        {
+            var release1 = new Release();
+            var release2 = new Release();
+
+            var release1File1 = new File
+            {
+                Type = FileType.Data
+            };
+
+            var release1File2 = new File
+            {
+                Type = FileType.Data
+            };
+
+            var release2File1 = new File
+            {
+                Type = FileType.Data
+            };
+
+            var release1Import1 = new DataImport
+            {
+                File = release1File1,
+                Status = DataImportStatus.COMPLETE
+            };
+
+            var release1Import2 = new DataImport
+            {
+                File = release1File2,
+                Status = DataImportStatus.COMPLETE
+            };
+
+            // Incomplete imports for other Releases should be ignored
+
+            var release2Import1 = new DataImport
+            {
+                File = release2File1,
+                Status = DataImportStatus.STAGE_1
+            };
+
+            var contentDbContextId = Guid.NewGuid().ToString();
+
+            await using (var contentDbContext = InMemoryApplicationDbContext(contentDbContextId))
+            {
+                await contentDbContext.ReleaseFiles.AddRangeAsync(
+                    new ReleaseFile
+                    {
+                        Release = release1,
+                        File = release1File1
+                    },
+                    new ReleaseFile
+                    {
+                        Release = release1,
+                        File = release1File2
+                    },
+                    new ReleaseFile
+                    {
+                        Release = release2,
+                        File = release2File1
+                    });
+                await contentDbContext.DataImports.AddRangeAsync(release1Import1, release1Import2, release2Import1);
+                await contentDbContext.SaveChangesAsync();
+            }
+
+            await using (var contentDbContext = InMemoryApplicationDbContext(contentDbContextId))
+            {
+                var service = BuildDataImportService(contentDbContext: contentDbContext);
+
+                var result = await service.HasIncompleteImports(release1.Id);
                 Assert.False(result);
             }
         }
