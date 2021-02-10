@@ -17,8 +17,8 @@ BEGIN TRANSACTION
     SELECT * FROM @Observations;
 
     INSERT INTO ObservationRowFilterItem
-    (observation.ObservationId, ofi.OldObservationId, ofi.FilterItemId, ofi.FilterId)
-    SELECT observation.Id, ofi.OldObservationId, ofi.FilterItemId, ofi.FilterId
+    (observation.ObservationId, ofi.OldObservationId, ofi.FilterItemId)
+    SELECT observation.Id, ofi.OldObservationId, ofi.FilterItemId
     FROM @ObservationFilterItems ofi
     JOIN #InsertedObservations observation ON ofi.CsvRow = observation.CsvRow;
 

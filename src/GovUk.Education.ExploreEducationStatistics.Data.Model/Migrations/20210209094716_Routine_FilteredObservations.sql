@@ -44,6 +44,7 @@ DECLARE
                                'JOIN Location l ON o.LocationId = l.Id ' +
                                'LEFT JOIN ObservationRowFilterItem ofi ON o.Id = ofi.ObservationId ' +
                                'AND ofi.FilterItemId IN (SELECT id FROM @filterItemList) ' +
+                               'WITH (NOLOCK) ' +
                                'WHERE o.SubjectId = @subjectId '
     IF (@geographicLevel IS NOT NULL)
         SET @sqlString = @sqlString + N'AND o.GeographicLevel = @geographicLevel '

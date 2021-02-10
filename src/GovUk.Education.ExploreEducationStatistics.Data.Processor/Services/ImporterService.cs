@@ -326,8 +326,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Processor.Services
                 {
                     OldObservationId = observationId,
                     FilterItemId = _importerFilterService
-                        .GetOrCreateFilterItem(filterItemLabel, filterGroupLabel, filterMeta.Filter, context).Id,
-                    FilterId = filterMeta.Filter.Id
+                        .GetOrCreateFilterItem(filterItemLabel, filterGroupLabel, filterMeta.Filter, context).Id
                 };
             }).ToList();
         }
@@ -499,7 +498,6 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Processor.Services
             observationsFilterItemsTable.Columns.Add("CsvRow", typeof(long));
             observationsFilterItemsTable.Columns.Add("OldObservationId", typeof(Guid));
             observationsFilterItemsTable.Columns.Add("FilterItemId", typeof(Guid));
-            observationsFilterItemsTable.Columns.Add("FilterId", typeof(Guid));
 
             foreach (Observation observation in observations)
             {
@@ -508,8 +506,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Processor.Services
                     observationsFilterItemsTable.Rows.Add(
                         observation.CsvRow,
                         item.OldObservationId,
-                        item.FilterItemId,
-                        item.FilterId
+                        item.FilterItemId
                     );
                 }    
             }

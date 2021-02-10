@@ -45,12 +45,6 @@ CREATE INDEX IX_ObservationRow_SubjectId_GeographicLevel_LocationId_TimeIdentifi
 IF NOT EXISTS(SELECT * FROM sys.indexes WHERE Name = 'IX_ObservationRowFilterItem_FilterItemId')
 CREATE INDEX IX_ObservationRowFilterItem_FilterItemId ON ObservationRowFilterItem (FilterItemId);
 
--- create index IX_ObservationFilterItem_FilterId
---     on ObservationFilterItem (FilterId)
--- go
-IF NOT EXISTS(SELECT * FROM sys.indexes WHERE Name = 'IX_ObservationRowFilterItem_FilterId')
-CREATE INDEX IX_ObservationRowFilterItem_FilterId ON ObservationRowFilterItem (FilterId);
-
 -- create index IX_ObservationFilterItem_FilterItemId_ObservationId
 --     on ObservationFilterItem (FilterItemId, ObservationId)
 -- 

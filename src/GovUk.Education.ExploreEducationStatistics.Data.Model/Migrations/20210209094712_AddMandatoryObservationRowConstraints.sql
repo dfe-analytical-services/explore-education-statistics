@@ -32,10 +32,3 @@ IF NOT EXISTS(SELECT * FROM sys.indexes WHERE Name = 'FK_ObservationRowFilterIte
 ALTER TABLE ObservationRowFilterItem
 ADD CONSTRAINT FK_ObservationRowFilterItem_FilterItem_FilterItemId
 FOREIGN KEY (FilterItemId) REFERENCES FilterItem (Id);
-
--- constraint FK_ObservationRowFilterItem_Filter_FilterId
--- references Filter,
-IF NOT EXISTS(SELECT * FROM sys.indexes WHERE Name = 'FK_ObservationRowFilterItem_Filter_FilterId')
-ALTER TABLE ObservationRowFilterItem
-ADD CONSTRAINT FK_ObservationRowFilterItem_Filter_FilterId
-FOREIGN KEY (FilterId) REFERENCES Filter (Id);
