@@ -92,7 +92,7 @@ const ReleaseStatusChecklist = ({ checklist, release }: Props) => {
           };
         case 'EmptyContentSectionExists':
           return {
-            message: 'Release content sections should not be empty',
+            message: 'Release content should not contain any empty sections',
             link: generatePath<ReleaseRouteParams>(
               releaseContentRoute.path,
               releaseRouteParams,
