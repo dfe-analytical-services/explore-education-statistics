@@ -7,7 +7,9 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Services.ViewModels
     public class PublicationViewModel
     {
         public Guid Id { get; set; }
+
         public IEnumerable<IdLabel> Highlights { get; set; }
+
         public IEnumerable<IdLabel> Subjects { get; set; }
     }
 }

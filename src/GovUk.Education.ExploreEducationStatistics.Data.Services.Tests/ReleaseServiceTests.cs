@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Collections.Generic;
 using System.Threading.Tasks;
 using GovUk.Education.ExploreEducationStatistics.Common.Model;
 using GovUk.Education.ExploreEducationStatistics.Common.Model.Data.Query;
@@ -11,6 +12,8 @@ using GovUk.Education.ExploreEducationStatistics.Content.Model.Repository;
 using GovUk.Education.ExploreEducationStatistics.Content.Model.Repository.Interfaces;
 using GovUk.Education.ExploreEducationStatistics.Data.Model;
 using GovUk.Education.ExploreEducationStatistics.Data.Model.Database;
+using GovUk.Education.ExploreEducationStatistics.Data.Services.Interfaces;
+using GovUk.Education.ExploreEducationStatistics.Data.Services.ViewModels;
 using Moq;
 using Xunit;
 using static GovUk.Education.ExploreEducationStatistics.Content.Model.Database.ContentDbUtils;
@@ -43,7 +46,9 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Services.Tests
                 {
                     Id = Guid.NewGuid(),
                     Name = "Subject 1"
-                }
+                },
+                MetaGuidance = "Guidance 1"
+
             };
 
             var releaseSubject2 = new ReleaseSubject
@@ -53,7 +58,8 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Services.Tests
                 {
                     Id = Guid.NewGuid(),
                     Name = "Subject 2"
-                }
+                },
+                MetaGuidance = "Guidance 2"
             };
 
             var releaseFile1 = new ReleaseFile
@@ -129,25 +135,67 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Services.Tests
             await using (var contentDbContext = InMemoryContentDbContext(contentDbContextId))
             await using (var statisticsDbContext = InMemoryStatisticsDbContext(statisticsDbContextId))
             {
+                var metaGuidanceSubjectService = new Mock<IMetaGuidanceSubjectService>();
+
+                metaGuidanceSubjectService
+                    .Setup(s => s.GetTimePeriods(releaseSubject1.SubjectId))
+                    .ReturnsAsync(new TimePeriodLabels("2020/21", "2021/22"));
+
+                metaGuidanceSubjectService
+                    .Setup(s => s.GetTimePeriods(releaseSubject2.SubjectId))
+                    .ReturnsAsync(new TimePeriodLabels("2030", "2031"));
+
+                metaGuidanceSubjectService
+                    .Setup(s => s.GetGeographicLevels(releaseSubject1.SubjectId))
+                    .ReturnsAsync(new List<string>
+                    {
+                        "Local Authority",
+                        "Local Authority District"
+                    });
+
+                metaGuidanceSubjectService
+                    .Setup(s => s.GetGeographicLevels(releaseSubject2.SubjectId))
+                    .ReturnsAsync(new List<string>
+                    {
+                        "National"
+                    });
+
                 var service = BuildReleaseService(
                     contentDbContext: contentDbContext,
-                    statisticsDbContext: statisticsDbContext
+                    statisticsDbContext: statisticsDbContext,
+                    metaGuidanceSubjectService: metaGuidanceSubjectService.Object
                 );
 
                 var result = await service.GetRelease(contentRelease.Id);
 
                 Assert.True(result.IsRight);
 
-                Assert.Equal(contentRelease.Id, result.Right.ReleaseId);
+                Assert.Equal(contentRelease.Id, result.Right.Id);
 
                 var subjects = result.Right.Subjects;
 
                 Assert.NotNull(subjects);
                 Assert.Equal(2, subjects.Count);
                 Assert.Equal(releaseSubject1.Subject.Id, subjects[0].Id);
-                Assert.Equal(releaseSubject1.Subject.Name, subjects[0].Label);
+                Assert.Equal(releaseSubject1.Subject.Name, subjects[0].Name);
+                Assert.Equal(releaseSubject1.MetaGuidance, subjects[0].Content);
+
+                Assert.Equal("2020/21", subjects[0].TimePeriods.From);
+                Assert.Equal("2021/22", subjects[0].TimePeriods.To);
+
+                Assert.Equal(2, subjects[0].GeographicLevels.Count);
+                Assert.Equal("Local Authority", subjects[0].GeographicLevels[0]);
+                Assert.Equal("Local Authority District", subjects[0].GeographicLevels[1]);
+
                 Assert.Equal(releaseSubject2.Subject.Id, subjects[1].Id);
-                Assert.Equal(releaseSubject2.Subject.Name, subjects[1].Label);
+                Assert.Equal(releaseSubject2.Subject.Name, subjects[1].Name);
+                Assert.Equal(releaseSubject2.MetaGuidance, subjects[1].Content);
+
+                Assert.Equal("2030", subjects[1].TimePeriods.From);
+                Assert.Equal("2031", subjects[1].TimePeriods.To);
+
+                Assert.Single(subjects[1].GeographicLevels);
+                Assert.Equal("National", subjects[1].GeographicLevels[0]);
 
                 var highlights = result.Right.Highlights;
 
@@ -156,6 +204,8 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Services.Tests
 
                 Assert.Equal(dataBlock.Id, highlights[0].Id);
                 Assert.Equal(dataBlock.HighlightName, highlights[0].Label);
+
+                MockUtils.VerifyAllMocks(metaGuidanceSubjectService);
             }
         }
 
@@ -288,16 +338,16 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Services.Tests
 
                 Assert.True(result.IsRight);
 
-                Assert.Equal(contentRelease.Id, result.Right.ReleaseId);
+                Assert.Equal(contentRelease.Id, result.Right.Id);
 
                 var subjects = result.Right.Subjects;
 
                 Assert.NotNull(subjects);
                 Assert.Equal(2, subjects.Count);
                 Assert.Equal(releaseSubject1.Subject.Id, subjects[0].Id);
-                Assert.Equal(releaseSubject1.Subject.Name, subjects[0].Label);
+                Assert.Equal(releaseSubject1.Subject.Name, subjects[0].Name);
                 Assert.Equal(releaseSubject2.Subject.Id, subjects[1].Id);
-                Assert.Equal(releaseSubject2.Subject.Name, subjects[1].Label);
+                Assert.Equal(releaseSubject2.Subject.Name, subjects[1].Name);
             }
         }
 
@@ -401,13 +451,13 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Services.Tests
 
                 Assert.True(result.IsRight);
 
-                Assert.Equal(contentRelease.Id, result.Right.ReleaseId);
+                Assert.Equal(contentRelease.Id, result.Right.Id);
 
                 var subjects = result.Right.Subjects;
 
                 Assert.Single(subjects);
                 Assert.Equal(releaseSubject2.Subject.Id, subjects[0].Id);
-                Assert.Equal(releaseSubject2.Subject.Name, subjects[0].Label);
+                Assert.Equal(releaseSubject2.Subject.Name, subjects[0].Name);
             }
         }
 
@@ -532,7 +582,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Services.Tests
 
                 Assert.True(result.IsRight);
 
-                Assert.Equal(contentRelease.Id, result.Right.ReleaseId);
+                Assert.Equal(contentRelease.Id, result.Right.Id);
 
                 var highlights = result.Right.Highlights;
 
@@ -549,14 +599,16 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Services.Tests
             IPersistenceHelper<ContentDbContext> persistenceHelper = null,
             StatisticsDbContext statisticsDbContext = null,
             IDataImportRepository dataImportRepository = null,
-            IUserService userService = null)
+            IUserService userService = null,
+            IMetaGuidanceSubjectService metaGuidanceSubjectService = null)
         {
             return new ReleaseService(
                 contentDbContext ?? new Mock<ContentDbContext>().Object,
                 persistenceHelper ?? new PersistenceHelper<ContentDbContext>(contentDbContext),
                 statisticsDbContext ?? new Mock<StatisticsDbContext>().Object,
                 dataImportRepository ?? new DataImportRepository(contentDbContext),
-                userService ?? MockUtils.AlwaysTrueUserService().Object
+                userService ?? MockUtils.AlwaysTrueUserService().Object,
+                metaGuidanceSubjectService ?? new Mock<IMetaGuidanceSubjectService>().Object
             );
         }
     }

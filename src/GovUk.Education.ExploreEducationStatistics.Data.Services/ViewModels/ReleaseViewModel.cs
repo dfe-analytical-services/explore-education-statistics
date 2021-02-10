@@ -6,8 +6,10 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Services.ViewModels
 {
     public class ReleaseViewModel
     {
-        public Guid ReleaseId { get; set; }
+        public Guid Id { get; set; }
+
         public List<IdLabel> Highlights { get; set; }
-        public List<IdLabel> Subjects { get; set; }
+
+        public List<SubjectViewModel> Subjects { get; set; }
     }
 }

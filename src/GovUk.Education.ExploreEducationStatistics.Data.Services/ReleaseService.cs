@@ -2,6 +2,7 @@
 using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
+using GovUk.Education.ExploreEducationStatistics.Common.Extensions;
 using GovUk.Education.ExploreEducationStatistics.Common.Model;
 using GovUk.Education.ExploreEducationStatistics.Common.Services.Interfaces.Security;
 using GovUk.Education.ExploreEducationStatistics.Common.Utils;
@@ -26,19 +27,22 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Services
         private readonly StatisticsDbContext _statisticsDbContext;
         private readonly IDataImportRepository _dataImportRepository;
         private readonly IUserService _userService;
+        private readonly IMetaGuidanceSubjectService _metaGuidanceSubjectService;
 
         public ReleaseService(
             ContentDbContext contentDbContext,
             IPersistenceHelper<ContentDbContext> contentPersistenceHelper,
             StatisticsDbContext statisticsDbContext,
             IDataImportRepository dataImportRepository,
-            IUserService userService)
+            IUserService userService,
+            IMetaGuidanceSubjectService metaGuidanceSubjectService)
         {
             _contentDbContext = contentDbContext;
             _contentPersistenceHelper = contentPersistenceHelper;
             _statisticsDbContext = statisticsDbContext;
             _dataImportRepository = dataImportRepository;
             _userService = userService;
+            _metaGuidanceSubjectService = metaGuidanceSubjectService;
         }
 
         public async Task<Either<ActionResult, ReleaseViewModel>> GetRelease(Guid releaseId)
@@ -67,15 +71,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Services
                         }
                     }
 
-                    var subjects = _statisticsDbContext.ReleaseSubject
-                        .Include(subject => subject.Subject)
-                        .Where(subject => subject.ReleaseId == releaseId
-                                          && subjectsToInclude.Contains(subject.SubjectId))
-                        .Select(subject =>
-                            new IdLabel(
-                                subject.Subject.Id,
-                                subject.Subject.Name))
-                        .ToList();
+                    var subjects = await GetSubjects(releaseId, subjectsToInclude);
 
                     var highlights = _contentDbContext.ReleaseContentBlocks
                         .Include(rcb => rcb.ContentBlock)
@@ -91,11 +87,36 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Services
 
                     return new ReleaseViewModel
                     {
-                        ReleaseId = releaseId,
+                        Id = releaseId,
                         Highlights = highlights,
                         Subjects = subjects,
                     };
                 });
+        }
+
+        private async Task<List<SubjectViewModel>> GetSubjects(Guid releaseId, List<Guid> subjectsToInclude)
+        {
+            var releaseSubjects = await _statisticsDbContext.ReleaseSubject
+                .Include(subject => subject.Subject)
+                .Where(
+                    rs => rs.ReleaseId == releaseId
+                          && subjectsToInclude.Contains(rs.SubjectId)
+                )
+                .OrderBy(rs => rs.Subject.Name)
+                .ToListAsync();
+
+            return (await releaseSubjects
+                .SelectAsync(
+                    async rs =>
+                        new SubjectViewModel(
+                            id: rs.Subject.Id,
+                            name: rs.Subject.Name,
+                            content: rs.MetaGuidance,
+                            timePeriods: await _metaGuidanceSubjectService.GetTimePeriods(rs.SubjectId),
+                            geographicLevels: await _metaGuidanceSubjectService.GetGeographicLevels(rs.SubjectId)
+                        )
+                ))
+                .ToList();
         }
     }
 }
