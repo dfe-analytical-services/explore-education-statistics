@@ -44,7 +44,17 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
                 Version = 1,
             };
 
-            var releaseContentSection = new ReleaseContentSection
+            var releaseContentSection1 = new ReleaseContentSection
+            {
+                Release = release,
+                ContentSection = new ContentSection
+                {
+                    Type = ContentSectionType.Generic,
+                    Content = new List<ContentBlock>()
+                }
+            };
+
+            var releaseContentSection2 = new ReleaseContentSection
             {
                 Release = release,
                 ContentSection = new ContentSection
@@ -52,6 +62,11 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
                     Type = ContentSectionType.Generic,
                     Content = new List<ContentBlock>
                     {
+                        new HtmlBlock
+                        {
+                            Body = "<p>Test</p>"
+                        },
+                        new DataBlock(),
                         new HtmlBlock
                         {
                             Body = ""
@@ -64,7 +79,10 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
 
             await using (var context = ContentDbUtils.InMemoryContentDbContext(contextId))
             {
-                await context.AddRangeAsync(releaseContentSection, originalRelease);
+                await context.AddRangeAsync(
+                    releaseContentSection1,
+                    releaseContentSection2,
+                    originalRelease);
                 await context.SaveChangesAsync();
             }
 
@@ -109,7 +127,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
 
                 Assert.False(checklist.Right.Valid);
 
-                Assert.Equal(6, checklist.Right.Errors.Count);
+                Assert.Equal(7, checklist.Right.Errors.Count);
 
                 Assert.Equal(DataFileImportsMustBeCompleted, checklist.Right.Errors[0].Code);
                 Assert.Equal(DataFileReplacementsMustBeCompleted, checklist.Right.Errors[1].Code);
@@ -122,6 +140,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
                 Assert.Equal(PublicMetaGuidanceRequired, checklist.Right.Errors[3].Code);
                 Assert.Equal(ReleaseNoteRequired, checklist.Right.Errors[4].Code);
                 Assert.Equal(EmptyContentSectionExists, checklist.Right.Errors[5].Code);
+                Assert.Equal(GenericSectionsContainEmptyHtmlBlock, checklist.Right.Errors[6].Code);
             }
         }
 
@@ -347,10 +366,6 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
                         new HtmlBlock
                         {
                             Body = "<p>test</p>"
-                        },
-                        new HtmlBlock
-                        {
-                            Body = ""
                         }
                     }
                 }

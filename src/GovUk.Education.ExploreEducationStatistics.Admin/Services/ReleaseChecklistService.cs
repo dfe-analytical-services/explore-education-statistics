@@ -109,43 +109,43 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Services
                 errors.Add(new ReleaseChecklistIssue(ValidationErrorMessages.EmptyContentSectionExists));
             }
 
+            if (ReleaseGenericContentSectionsContainEmptyContentBlock(release.Id))
+            {
+                errors.Add(new ReleaseChecklistIssue(ValidationErrorMessages.GenericSectionsContainEmptyHtmlBlock));
+            }
+
             return errors;
         }
 
         private async Task<bool> ReleaseHasEmptyGenericContentSection(Guid releaseId)
         {
-            var sectionBlocksList = await _contentDbContext.ReleaseContentSections
+            return await _contentDbContext.ReleaseContentSections
                 .Include(rcs => rcs.ContentSection)
                 .ThenInclude(cs => cs.Content)
                 .Where(rcs =>
                     rcs.ReleaseId == releaseId
                     && rcs.ContentSection.Type == ContentSectionType.Generic)
-                .Select(rcs => rcs.ContentSection.Content)
-                .ToListAsync();
+                .AnyAsync(rcs => rcs.ContentSection.Content.Count == 0);
+        }
 
-            if (sectionBlocksList.Any(blocks => blocks.Count == 0))
-            {
-                return true;
-            }
-
-            // Section is considered empty if it only contains HtmlBlocks that are blank
-            if (sectionBlocksList.Any(blocks =>
-                blocks.All(block =>
+        private bool ReleaseGenericContentSectionsContainEmptyContentBlock(Guid releaseId)
+        {
+            return _contentDbContext.ReleaseContentSections
+                .Include(rcs => rcs.ContentSection)
+                .ThenInclude(cs => cs.Content)
+                .Where(rcs =>
+                    rcs.ReleaseId == releaseId
+                    && rcs.ContentSection.Type == ContentSectionType.Generic)
+                .SelectMany(rcs => rcs.ContentSection.Content)
+                .ToList()
+                .Any(block =>
                 {
                     if (block is HtmlBlock htmlBlock)
                     {
-                        if (htmlBlock.Body.IsNullOrEmpty())
-                        {
-                            return true;
-                        }
+                        return htmlBlock.Body.IsNullOrEmpty();
                     }
                     return false;
-                })))
-            {
-                return true;
-            }
-
-            return false;
+                });
         }
 
         public async Task<List<ReleaseChecklistIssue>> GetWarnings(Release release)
