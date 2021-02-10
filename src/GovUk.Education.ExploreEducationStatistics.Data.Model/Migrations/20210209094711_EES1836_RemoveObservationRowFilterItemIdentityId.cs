@@ -10,7 +10,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Model.Migrations
 
         protected override void Up(MigrationBuilder migrationBuilder)
         {
-            migrationBuilder.SqlFromFile(MigrationsPath, $"{MigrationId}_20210209094711_RemoveObservationRowFilterItemIdentityId.sql");
+            migrationBuilder.SqlFromFile(MigrationsPath, $"{MigrationId}_RemoveObservationRowFilterItemIdentityId.sql");
         }
 
         protected override void Down(MigrationBuilder migrationBuilder)
