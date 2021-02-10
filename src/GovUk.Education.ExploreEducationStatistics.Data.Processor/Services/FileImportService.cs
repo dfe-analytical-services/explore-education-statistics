@@ -127,6 +127,8 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Processor.Services
                 return;
             }
 
+            var stopwatch = Stopwatch.StartNew();
+
             if (import.NumBatches == 1 || await _batchService.GetNumBatchesRemaining(import.File) == 0)
             {
                 var observationCount = context.Observation.Count(o => o.SubjectId.Equals(import.SubjectId));
@@ -157,6 +159,9 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Processor.Services
 
                 await _dataImportService.UpdateStatus(message.Id, STAGE_4, percentageComplete);
             }
+            
+            _logger.LogInformation($"Took {stopwatch.Elapsed.TotalMilliseconds} millis to check if {message.DataFileName} " +
+                                   $"was complete");
         }
     }
 }
