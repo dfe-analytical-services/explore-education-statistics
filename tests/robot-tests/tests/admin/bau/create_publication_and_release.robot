@@ -137,8 +137,6 @@ Verify created release summary
     user checks summary list contains  Time period  Spring Term
     user checks summary list contains  Release period  2025/26
     user checks summary list contains  Lead statistician  Sean Gibson
-    user checks summary list contains  Scheduled release  Not scheduled
-    user checks summary list contains  Next release expected  Not set
     user checks summary list contains  Release type  National Statistics
 
 Edit release summary
@@ -160,6 +158,4 @@ Verify updated release summary
     user checks summary list contains  Time period  Summer Term
     user checks summary list contains  Release period  2026/27
     user checks summary list contains  Lead statistician  Sean Gibson
-    user checks summary list contains  Scheduled release  Not scheduled
-    user checks summary list contains  Next release expected  Not set
     user checks summary list contains  Release type  Official Statistics

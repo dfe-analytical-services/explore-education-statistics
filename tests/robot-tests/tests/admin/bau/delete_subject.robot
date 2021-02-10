@@ -26,8 +26,6 @@ Verify Release summary
     user checks summary list contains  Time period            Tax Year
     user checks summary list contains  Release period         2020-21
     user checks summary list contains  Lead statistician      UI test contact name
-    user checks summary list contains  Scheduled release      Not scheduled
-    user checks summary list contains  Next release expected  Not set
     user checks summary list contains  Release type           National Statistics
 
 Upload subject
