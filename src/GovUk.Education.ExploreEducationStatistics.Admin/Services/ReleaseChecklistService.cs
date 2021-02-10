@@ -109,7 +109,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Services
                 errors.Add(new ReleaseChecklistIssue(ValidationErrorMessages.EmptyContentSectionExists));
             }
 
-            if (ReleaseGenericContentSectionsContainEmptyContentBlock(release.Id))
+            if (await ReleaseGenericContentSectionsContainEmptyContentBlock(release.Id))
             {
                 errors.Add(new ReleaseChecklistIssue(ValidationErrorMessages.GenericSectionsContainEmptyHtmlBlock));
             }
@@ -128,16 +128,18 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Services
                 .AnyAsync(rcs => rcs.ContentSection.Content.Count == 0);
         }
 
-        private bool ReleaseGenericContentSectionsContainEmptyContentBlock(Guid releaseId)
+        private async Task<bool> ReleaseGenericContentSectionsContainEmptyContentBlock(Guid releaseId)
         {
-            return _contentDbContext.ReleaseContentSections
+            var releaseGenericContentBlocks = await _contentDbContext.ReleaseContentSections
                 .Include(rcs => rcs.ContentSection)
                 .ThenInclude(cs => cs.Content)
                 .Where(rcs =>
                     rcs.ReleaseId == releaseId
                     && rcs.ContentSection.Type == ContentSectionType.Generic)
                 .SelectMany(rcs => rcs.ContentSection.Content)
-                .ToList()
+                .ToListAsync();
+                
+            return releaseGenericContentBlocks 
                 .Any(block =>
                 {
                     if (block is HtmlBlock htmlBlock)
