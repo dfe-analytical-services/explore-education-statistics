@@ -79,7 +79,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Services
                 rs => string.IsNullOrWhiteSpace(rs.MetaGuidance));
         }
 
-        public async Task<MetaGuidanceSubjectTimePeriodsViewModel> GetTimePeriods(Guid subjectId)
+        public async Task<TimePeriodLabels> GetTimePeriods(Guid subjectId)
         {
             var orderedTimePeriods = _context
                 .Observation
@@ -90,13 +90,13 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Services
 
             if (!orderedTimePeriods.Any())
             {
-                return new MetaGuidanceSubjectTimePeriodsViewModel();
+                return new TimePeriodLabels();
             }
 
             var first = await orderedTimePeriods.FirstAsync();
             var last = await orderedTimePeriods.LastAsync();
 
-            return new MetaGuidanceSubjectTimePeriodsViewModel(
+            return new TimePeriodLabels(
                 TimePeriodLabelFormatter.Format(first.Year, first.TimeIdentifier),
                 TimePeriodLabelFormatter.Format(last.Year, last.TimeIdentifier));
         }

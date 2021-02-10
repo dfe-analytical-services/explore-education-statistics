@@ -12,10 +12,10 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Services.Interfaces
         Task<Either<ActionResult, List<MetaGuidanceSubjectViewModel>>> GetSubjects(Guid releaseId,
             List<Guid> subjectIds = null);
 
-        Task<MetaGuidanceSubjectTimePeriodsViewModel> GetTimePeriods(Guid subjectId);
+        Task<TimePeriodLabels> GetTimePeriods(Guid subjectId);
 
         Task<List<string>> GetGeographicLevels(Guid subjectId);
-        
+
         Task<Either<ActionResult, bool>> Validate(Guid releaseId);
     }
 }
