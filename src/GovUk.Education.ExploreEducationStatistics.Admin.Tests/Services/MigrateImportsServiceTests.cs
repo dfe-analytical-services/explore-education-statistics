@@ -263,6 +263,127 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
         }
 
         [Fact]
+        public async Task MigrateImports_ImportsWithoutCorrespondingFilesAreIgnored()
+        {
+            var release = new Release
+            {
+                Id = Guid.NewGuid()
+            };
+
+            // Add data file and meta files belonging to different subjects
+            // Each subject will be missing a corresponding file type
+
+            var dataFile = new File
+            {
+                Filename = "data.csv",
+                Release = release,
+                Type = FileType.Data,
+                SubjectId = Guid.NewGuid()
+            };
+
+            var metaFile = new File
+            {
+                Filename = "meta.csv",
+                Release = release,
+                Type = Metadata,
+                SubjectId = Guid.NewGuid()
+            };
+
+            var tableImports = new List<TableImport>
+            {
+                // Using unknown subject id - Neither data file or meta file should be found
+                new TableImport
+                {
+                    PartitionKey = release.Id.ToString(),
+                    RowKey = dataFile.Filename,
+                    Errors = "",
+                    Message = TableImportSampleJson.Message(
+                        releaseId: release.Id,
+                        subjectId: Guid.NewGuid(),
+                        dataFilename: dataFile.Filename,
+                        metaFilename: metaFile.Filename,
+                        zipFilename: null
+                    ),
+                    Status = "COMPLETE",
+                    PercentageComplete = 100,
+                    NumberOfRows = 10000,
+                    Timestamp = DateTimeOffset.Now
+                },
+                // Using data file subject id - Only data file should be found
+                new TableImport
+                {
+                    PartitionKey = release.Id.ToString(),
+                    RowKey = dataFile.Filename,
+                    Errors = "",
+                    Message = TableImportSampleJson.Message(
+                        releaseId: release.Id,
+                        subjectId: dataFile.SubjectId.Value,
+                        dataFilename: dataFile.Filename,
+                        metaFilename: metaFile.Filename,
+                        zipFilename: null
+                    ),
+                    Status = "COMPLETE",
+                    PercentageComplete = 100,
+                    NumberOfRows = 10000,
+                    Timestamp = DateTimeOffset.Now
+                },
+                // Using meta file subject id - Only meta file should be found
+                new TableImport
+                {
+                    PartitionKey = release.Id.ToString(),
+                    RowKey = dataFile.Filename,
+                    Errors = "",
+                    Message = TableImportSampleJson.Message(
+                        releaseId: release.Id,
+                        subjectId: metaFile.SubjectId.Value,
+                        dataFilename: dataFile.Filename,
+                        metaFilename: metaFile.Filename,
+                        zipFilename: null
+                    ),
+                    Status = "COMPLETE",
+                    PercentageComplete = 100,
+                    NumberOfRows = 10000,
+                    Timestamp = DateTimeOffset.Now
+                }
+            };
+
+            var contentDbContextId = Guid.NewGuid().ToString();
+            await using (var contentDbContext = DbUtils.InMemoryApplicationDbContext(contentDbContextId))
+            {
+                await contentDbContext.Releases.AddAsync(release);
+                await contentDbContext.Files.AddRangeAsync(dataFile, metaFile);
+                await contentDbContext.SaveChangesAsync();
+            }
+
+            var tableStorageService = new Mock<ITableStorageService>(MockBehavior.Strict);
+
+            tableStorageService.Setup(service =>
+                    service.ExecuteQueryAsync("imports", It.IsAny<TableQuery<TableImport>>()))
+                .ReturnsAsync(tableImports);
+
+            await using (var contentDbContext = DbUtils.InMemoryApplicationDbContext(contentDbContextId))
+            {
+                var service = BuildMigrateImportsService(contentDbContext: contentDbContext,
+                    tableStorageService: tableStorageService.Object);
+
+                var result = await service.MigrateImports();
+                Assert.True(result.IsRight);
+            }
+
+            await using (var contentDbContext = DbUtils.InMemoryApplicationDbContext(contentDbContextId))
+            {
+                var imports = await contentDbContext.DataImports
+                    .Include(i => i.Errors)
+                    .ToListAsync();
+
+                // All three table imports are ignored since they were all missing one or both files
+                Assert.Empty(imports);
+            }
+
+            MockUtils.VerifyAllMocks(tableStorageService);
+        }
+
+        [Fact]
         public async Task MigrateImports_TableImportWithErrorsCreatesDataImportErrors()
         {
             var release = new Release

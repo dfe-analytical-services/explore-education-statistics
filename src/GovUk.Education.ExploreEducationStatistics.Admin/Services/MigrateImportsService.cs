@@ -1,4 +1,5 @@
-﻿using System;
+﻿#nullable enable
+using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
@@ -52,8 +53,10 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Services
                     var tableImports = await GetTableImports();
                     _logger.LogInformation($"Found {tableImports.Count} table imports");
 
-                    var dataImports = await tableImports.SelectAsync(async tableImport =>
-                        await GetDataImport(tableImport));
+                    var dataImports = (await tableImports
+                            .SelectAsync(GetDataImport))
+                        .Where(import => import != null)
+                        .ToList();
 
                     _logger.LogInformation("Saving database imports");
                     await _contentDbContext.DataImports.AddRangeAsync(dataImports);
@@ -80,19 +83,24 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Services
                 query: new TableQuery<TableImport>())).ToList();
 
             // Filter out failed imports with no message. Lots of these exist in the Dev environment.
-            return imports.Where(import => 
+            return imports.Where(import =>
                     !(import.DataImportStatus == FAILED && import.Message.IsNullOrEmpty()))
                 .ToList();
         }
 
-        private async Task<DataImport> GetDataImport(TableImport tableImport)
+        private async Task<DataImport?> GetDataImport(TableImport tableImport)
         {
             var timestamp = tableImport.Timestamp.UtcDateTime;
             var errors = GetDataImportErrors(timestamp, tableImport.ImportErrors);
             var message = tableImport.ImportMessage;
 
-            var file = await GetFile(tableImport.ReleaseId, message.SubjectId, FileType.Data, message.DataFileName);
-            var metaFile = await GetFile(tableImport.ReleaseId, message.SubjectId, Metadata, message.MetaFileName);
+            var file = await GetFile(tableImport, message, FileType.Data);
+            var metaFile = await GetFile(tableImport, message, Metadata);
+
+            if (file == null || metaFile == null)
+            {
+                return null;
+            }
 
             if (!message.ArchiveFileName.IsNullOrEmpty() && !file.SourceId.HasValue)
             {
@@ -128,17 +136,33 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Services
             }).ToList();
         }
 
-        private async Task<File> GetFile(Guid releaseId, Guid subjectId, FileType type, string expectedFilename)
+        private async Task<File?> GetFile(TableImport tableImport, TableImportMessage message, FileType fileType)
         {
+            var expectedFilename = fileType switch
+            {
+                FileType.Data => message.DataFileName,
+                Metadata => message.MetaFileName,
+                _ => throw new ArgumentOutOfRangeException(nameof(fileType), fileType, "Unexpected file type")
+            };
+
             var file = await _contentDbContext.Files
-                .SingleAsync(f => f.Type == type
-                                  && f.ReleaseId == releaseId
-                                  && f.SubjectId == subjectId);
+                .SingleOrDefaultAsync(f => f.Type == fileType
+                                           && f.ReleaseId == tableImport.ReleaseId
+                                           && f.SubjectId == message.SubjectId);
+
+            if (file == null)
+            {
+                _logger.LogWarning($"{fileType} file not found by Subject id while migrating imports " +
+                                   $"for Release: {tableImport.ReleaseId}, Subject: {message.SubjectId}, " +
+                                   $"Timestamp: {tableImport.Timestamp}, Status: {tableImport.Status}, " +
+                                   $"Filename: {expectedFilename}");
+                return null;
+            }
 
             if (file.Filename != expectedFilename)
             {
                 _logger.LogWarning("Unexpected file returned while migrating imports " +
-                                   $"for Release: {releaseId}, Subject: {subjectId}. " +
+                                   $"for Release: {tableImport.ReleaseId}, Subject: {message.SubjectId}. " +
                                    $"Expected: {expectedFilename}, found: {file.Filename}");
             }
 
