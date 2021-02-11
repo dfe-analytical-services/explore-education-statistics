@@ -45,8 +45,7 @@ describe('ImporterStatus', () => {
     releaseDataFileService.getDataFileImportStatus.mockResolvedValue({
       status: 'COMPLETE',
       percentageComplete: 100,
-      phasePercentageComplete: 100,
-      phaseComplete: true,
+      stagePercentageComplete: 100,
       numberOfRows: 100,
     });
 
@@ -61,8 +60,7 @@ describe('ImporterStatus', () => {
     releaseDataFileService.getDataFileImportStatus.mockResolvedValue({
       status: 'STAGE_1',
       percentageComplete: 100,
-      phasePercentageComplete: 100,
-      phaseComplete: true,
+      stagePercentageComplete: 100,
       numberOfRows: 100,
     });
 
@@ -93,8 +91,7 @@ describe('ImporterStatus', () => {
     releaseDataFileService.getDataFileImportStatus.mockResolvedValue({
       status: 'STAGE_1',
       percentageComplete: 10,
-      phasePercentageComplete: 100,
-      phaseComplete: true,
+      stagePercentageComplete: 100,
       numberOfRows: 100,
     });
 
@@ -126,8 +123,7 @@ describe('ImporterStatus', () => {
     releaseDataFileService.getDataFileImportStatus.mockResolvedValue({
       status: 'STAGE_2',
       percentageComplete: 50,
-      phasePercentageComplete: 100,
-      phaseComplete: true,
+      stagePercentageComplete: 100,
       numberOfRows: 100,
     });
 
@@ -149,8 +145,7 @@ describe('ImporterStatus', () => {
     releaseDataFileService.getDataFileImportStatus.mockResolvedValue({
       status: 'COMPLETE',
       percentageComplete: 100,
-      phasePercentageComplete: 100,
-      phaseComplete: true,
+      stagePercentageComplete: 100,
       numberOfRows: 100,
     });
 
@@ -173,8 +168,7 @@ describe('ImporterStatus', () => {
     releaseDataFileService.getDataFileImportStatus.mockResolvedValue({
       status: 'FAILED',
       percentageComplete: 0,
-      phasePercentageComplete: 100,
-      phaseComplete: true,
+      stagePercentageComplete: 100,
       numberOfRows: 100,
       errors: ['Some error 1', 'Some error 2'],
     });

@@ -31,6 +31,11 @@ namespace GovUk.Education.ExploreEducationStatistics.Common.Extensions
             return string.IsNullOrEmpty(value);
         }
 
+        public static string NullIfWhiteSpace(this string value)
+        {
+            return string.IsNullOrWhiteSpace(value) ? null : value;
+        }
+
         public static string PascalCase(this string input)
         {
             if (input.IsNullOrEmpty())

@@ -117,7 +117,7 @@ const TableToolWizard = ({
   const handlePublicationFormSubmit: PublicationFormSubmitHandler = async ({
     publicationId: selectedPublicationId,
   }) => {
-    const publicationMeta = await tableBuilderService.getPublicationMeta(
+    const publicationMeta = await tableBuilderService.getPublication(
       selectedPublicationId,
     );
 

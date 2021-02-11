@@ -21,7 +21,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Controllers.Api
         }
 
         [HttpGet("imports/incomplete")]
-        public async Task<ActionResult<List<ImportStatusBau>>> GetAllIncompleteImports()
+        public async Task<ActionResult<List<ImportStatusBauViewModel>>> GetAllIncompleteImports()
         {
             return await _importStatusBauService
                 .GetAllIncompleteImports()

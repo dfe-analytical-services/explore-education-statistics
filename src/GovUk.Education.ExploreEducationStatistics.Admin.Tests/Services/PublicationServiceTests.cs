@@ -273,47 +273,6 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
 
 
         [Fact]
-        public async void CreatePublication_FailsWithUnapprovedMethodology()
-        {
-            var topic = new Topic
-            {
-                Title = "Test topic"
-            };
-            var methodology = new Methodology
-            {
-                Title = "Test methodology",
-                Status = MethodologyStatus.Draft,
-            };
-
-            var contextId = Guid.NewGuid().ToString();
-
-            await using (var context = InMemoryApplicationDbContext(contextId))
-            {
-                context.Add(topic);
-                context.Add(methodology);
-                await context.SaveChangesAsync();
-            }
-
-            await using (var context = InMemoryApplicationDbContext(contextId))
-            {
-                var publicationService = BuildPublicationService(context, Mocks());
-
-                // Service method under test
-                var result = await publicationService.CreatePublication(
-                    new PublicationSaveViewModel()
-                    {
-                        Title = "Test title",
-                        TopicId = topic.Id,
-                        MethodologyId = methodology.Id,
-                    }
-                );
-
-                Assert.True(result.IsLeft);
-                AssertValidationProblem(result.Left, MethodologyMustBeApproved);
-            }
-        }
-
-        [Fact]
         public async void CreatePublication_FailsWithNonUniqueSlug()
         {
             var topic = new Topic
@@ -805,52 +764,6 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
 
                 Assert.True(result.IsLeft);
                 AssertValidationProblem(result.Left, CannotSpecifyMethodologyAndExternalMethodology);
-            }
-        }
-
-        [Fact]
-        public async void UpdatePublication_FailsWithUnapprovedMethodology()
-        {
-            var methodology = new Methodology
-            {
-                Title = "Test methodology",
-                Status = MethodologyStatus.Draft,
-            };
-            var publication = new Publication
-            {
-                Topic = new Topic
-                {
-                    Title = "Test topic"
-                },
-            };
-
-            var contextId = Guid.NewGuid().ToString();
-
-            await using (var context = InMemoryApplicationDbContext(contextId))
-            {
-                context.Add(methodology);
-                context.Add(publication);
-                await context.SaveChangesAsync();
-            }
-
-            await using (var context = InMemoryApplicationDbContext(contextId))
-            {
-
-                var publicationService = BuildPublicationService(context, Mocks());
-
-                // Service method under test
-                var result = await publicationService.UpdatePublication(
-                    publication.Id,
-                    new PublicationSaveViewModel()
-                    {
-                        Title = "Test publication",
-                        TopicId = publication.TopicId,
-                        MethodologyId = methodology.Id,
-                    }
-                );
-
-                Assert.True(result.IsLeft);
-                AssertValidationProblem(result.Left, MethodologyMustBeApproved);
             }
         }
 

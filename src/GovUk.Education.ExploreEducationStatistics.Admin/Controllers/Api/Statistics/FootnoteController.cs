@@ -2,7 +2,6 @@
 using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
-using GovUk.Education.ExploreEducationStatistics.Admin.Services.Interfaces;
 using GovUk.Education.ExploreEducationStatistics.Admin.ViewModels.Statistics;
 using GovUk.Education.ExploreEducationStatistics.Common.Extensions;
 using GovUk.Education.ExploreEducationStatistics.Common.Model;
@@ -13,6 +12,7 @@ using GovUk.Education.ExploreEducationStatistics.Data.Services.ViewModels.Meta;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using IFootnoteService = GovUk.Education.ExploreEducationStatistics.Admin.Services.Interfaces.IFootnoteService;
+using IReleaseService = GovUk.Education.ExploreEducationStatistics.Data.Services.Interfaces.IReleaseService;
 
 namespace GovUk.Education.ExploreEducationStatistics.Admin.Controllers.Api.Statistics
 {
@@ -24,18 +24,18 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Controllers.Api.Stati
         private readonly IFilterService _filterService;
         private readonly IFootnoteService _footnoteService;
         private readonly IIndicatorGroupService _indicatorGroupService;
-        private readonly IReleaseMetaService _releaseMetaService;
+        private readonly IReleaseService _releaseService;
         private static IComparer<string> LabelComparer { get; } = new LabelRelationalComparer();
 
         public FootnoteController(IFilterService filterService,
             IFootnoteService footnoteService,
             IIndicatorGroupService indicatorGroupService,
-            IReleaseMetaService releaseMetaService)
+            IReleaseService releaseService)
         {
             _filterService = filterService;
             _footnoteService = footnoteService;
             _indicatorGroupService = indicatorGroupService;
-            _releaseMetaService = releaseMetaService;
+            _releaseService = releaseService;
         }
 
         [HttpPost("releases/{releaseId}/footnotes")]
@@ -102,7 +102,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Controllers.Api.Stati
         [HttpGet("releases/{releaseId}/footnotes-meta")]
         public async Task<ActionResult<FootnotesMetaViewModel>> GetFootnotesMeta(Guid releaseId)
         {
-            return await _releaseMetaService.GetSubjectsMeta(releaseId)
+            return await _releaseService.GetRelease(releaseId)
                 .OnSuccess(model =>
                 {
                     return new FootnotesMetaViewModel

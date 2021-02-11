@@ -5,7 +5,6 @@ using GovUk.Education.ExploreEducationStatistics.Admin.Services;
 using GovUk.Education.ExploreEducationStatistics.Admin.Services.Interfaces;
 using GovUk.Education.ExploreEducationStatistics.Admin.ViewModels;
 using GovUk.Education.ExploreEducationStatistics.Common.Model;
-using GovUk.Education.ExploreEducationStatistics.Common.Services.Interfaces;
 using GovUk.Education.ExploreEducationStatistics.Common.Services.Interfaces.Security;
 using GovUk.Education.ExploreEducationStatistics.Common.Tests.Utils;
 using GovUk.Education.ExploreEducationStatistics.Common.Utils;
@@ -14,10 +13,8 @@ using GovUk.Education.ExploreEducationStatistics.Content.Model.Database;
 using GovUk.Education.ExploreEducationStatistics.Data.Model;
 using GovUk.Education.ExploreEducationStatistics.Data.Model.Services.Interfaces;
 using Microsoft.AspNetCore.Mvc;
-using Microsoft.Azure.Cosmos.Table;
 using Moq;
 using Xunit;
-using static GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services.Utils.TableStorageTestUtils;
 using static GovUk.Education.ExploreEducationStatistics.Admin.Validators.ValidationErrorMessages;
 using static GovUk.Education.ExploreEducationStatistics.Admin.Validators.ValidationUtils;
 using Publication = GovUk.Education.ExploreEducationStatistics.Content.Model.Publication;
@@ -47,11 +44,45 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
                 Version = 1,
             };
 
+            var releaseContentSection1 = new ReleaseContentSection
+            {
+                Release = release,
+                ContentSection = new ContentSection
+                {
+                    Type = ContentSectionType.Generic,
+                    Content = new List<ContentBlock>()
+                }
+            };
+
+            var releaseContentSection2 = new ReleaseContentSection
+            {
+                Release = release,
+                ContentSection = new ContentSection
+                {
+                    Type = ContentSectionType.Generic,
+                    Content = new List<ContentBlock>
+                    {
+                        new HtmlBlock
+                        {
+                            Body = "<p>Test</p>"
+                        },
+                        new DataBlock(),
+                        new HtmlBlock
+                        {
+                            Body = ""
+                        }
+                    }
+                }
+            };
+
             var contextId = Guid.NewGuid().ToString();
 
             await using (var context = ContentDbUtils.InMemoryContentDbContext(contextId))
             {
-                await context.AddRangeAsync(release, originalRelease);
+                await context.AddRangeAsync(
+                    releaseContentSection1,
+                    releaseContentSection2,
+                    originalRelease);
                 await context.SaveChangesAsync();
             }
 
@@ -72,32 +103,31 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
                         }
                     );
 
+                var dataImportService = new Mock<IDataImportService>();
                 var metaGuidanceService = new Mock<IMetaGuidanceService>();
+
+                dataImportService
+                    .Setup(s => s.HasIncompleteImports(release.Id))
+                    .ReturnsAsync(true);
 
                 metaGuidanceService
                     .Setup(s => s.Validate(release.Id))
                     .ReturnsAsync(ValidationActionResult(PublicMetaGuidanceRequired));
 
-                var tableStorageService = MockTableStorageService(
-                    new List<DatafileImport>
-                    {
-                        new DatafileImport()
-                    }
-                );
-
                 var service = BuildReleaseChecklistService(
                     context,
                     fileRepository: fileRepository.Object,
-                    metaGuidanceService: metaGuidanceService.Object,
-                    tableStorageService: tableStorageService.Object
+                    dataImportService: dataImportService.Object,
+                    metaGuidanceService: metaGuidanceService.Object
                 );
+
                 var checklist = await service.GetChecklist(release.Id);
 
                 Assert.True(checklist.IsRight);
 
                 Assert.False(checklist.Right.Valid);
 
-                Assert.Equal(5, checklist.Right.Errors.Count);
+                Assert.Equal(7, checklist.Right.Errors.Count);
 
                 Assert.Equal(DataFileImportsMustBeCompleted, checklist.Right.Errors[0].Code);
                 Assert.Equal(DataFileReplacementsMustBeCompleted, checklist.Right.Errors[1].Code);
@@ -109,6 +139,8 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
 
                 Assert.Equal(PublicMetaGuidanceRequired, checklist.Right.Errors[3].Code);
                 Assert.Equal(ReleaseNoteRequired, checklist.Right.Errors[4].Code);
+                Assert.Equal(EmptyContentSectionExists, checklist.Right.Errors[5].Code);
+                Assert.Equal(GenericSectionsContainEmptyHtmlBlock, checklist.Right.Errors[6].Code);
             }
         }
 
@@ -322,12 +354,61 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
                     }
                 },
             };
+            
+            var releaseContentSection1 = new ReleaseContentSection
+            {
+                Release = release,
+                ContentSection = new ContentSection
+                {
+                    Type = ContentSectionType.Generic,
+                    Content = new List<ContentBlock>
+                    {
+                        new HtmlBlock
+                        {
+                            Body = "<p>test</p>"
+                        }
+                    }
+                }
+            };
+
+            var releaseContentSection2 = new ReleaseContentSection
+            {
+                Release = release,
+                ContentSection = new ContentSection
+                {
+                    Type = ContentSectionType.Generic,
+                    Content = new List<ContentBlock>
+                    {
+                        new DataBlock()
+                    }
+                }
+            };
+
+            var releaseContentSection3 = new ReleaseContentSection
+            {
+                Release = release,
+                ContentSection = new ContentSection
+                {
+                    Type = ContentSectionType.Headlines,
+                    Content = new List<ContentBlock>
+                    {
+                        new HtmlBlock
+                        {
+                            Body = ""
+                        }
+                    }
+                }
+            };
 
             var contextId = Guid.NewGuid().ToString();
 
             await using (var context = ContentDbUtils.InMemoryContentDbContext(contextId))
             {
-                await context.AddRangeAsync(release, originalRelease);
+                await context.AddRangeAsync(
+                    releaseContentSection1,
+                    releaseContentSection2,
+                    releaseContentSection3,
+                    originalRelease);
                 await context.SaveChangesAsync();
             }
 
@@ -428,28 +509,9 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
             }
         }
 
-        private Mock<ITableStorageService> MockTableStorageService(List<DatafileImport> expectedResults)
-        {
-            var cloudTable = MockCloudTable();
-
-            cloudTable
-                .Setup(
-                    t => t.ExecuteQuerySegmentedAsync(It.IsAny<TableQuery<DatafileImport>>(), null)
-                )
-                .ReturnsAsync(CreateTableQuerySegment(expectedResults));
-
-            var tableStorageService = new Mock<ITableStorageService>();
-
-            tableStorageService
-                .Setup(s => s.GetTableAsync(It.IsAny<string>(), true))
-                .ReturnsAsync(cloudTable.Object);
-
-            return tableStorageService;
-        }
-
-        private ReleaseChecklistService BuildReleaseChecklistService(
+        private static ReleaseChecklistService BuildReleaseChecklistService(
             ContentDbContext contentDbContext,
-            ITableStorageService tableStorageService = null,
+            IDataImportService dataImportService = null,
             IUserService userService = null,
             IMetaGuidanceService metaGuidanceService = null,
             IFileRepository fileRepository = null,
@@ -457,8 +519,9 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
             IDataBlockService dataBlockService = null)
         {
             return new ReleaseChecklistService(
+                contentDbContext,
                 new PersistenceHelper<ContentDbContext>(contentDbContext),
-                tableStorageService ?? MockTableStorageService(new List<DatafileImport>()).Object,
+                dataImportService ?? new Mock<IDataImportService>().Object,
                 userService ?? MockUtils.AlwaysTrueUserService().Object,
                 metaGuidanceService ?? new Mock<IMetaGuidanceService>().Object,
                 fileRepository ?? new Mock<IFileRepository>().Object,

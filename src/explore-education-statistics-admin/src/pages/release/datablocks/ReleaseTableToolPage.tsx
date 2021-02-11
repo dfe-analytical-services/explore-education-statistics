@@ -70,7 +70,7 @@ const ReleaseTableToolPage = ({
   const { value: initialState, isLoading } = useAsyncHandledRetry<
     InitialTableToolState | undefined
   >(async () => {
-    const { subjects } = await tableBuilderService.getReleaseMeta(releaseId);
+    const { subjects } = await tableBuilderService.getRelease(releaseId);
 
     return {
       initialStep: 1,

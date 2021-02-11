@@ -1,13 +1,11 @@
 using System;
-using System.Collections.Generic;
 using System.Linq;
-using GovUk.Education.ExploreEducationStatistics.Admin.Models;
 using GovUk.Education.ExploreEducationStatistics.Admin.Security;
 using GovUk.Education.ExploreEducationStatistics.Admin.Security.AuthorizationHandlers;
-using GovUk.Education.ExploreEducationStatistics.Common.Extensions;
-using GovUk.Education.ExploreEducationStatistics.Common.Model;
+using GovUk.Education.ExploreEducationStatistics.Admin.Services.Interfaces;
 using GovUk.Education.ExploreEducationStatistics.Common.Services;
-using GovUk.Education.ExploreEducationStatistics.Common.Services.Interfaces;
+using GovUk.Education.ExploreEducationStatistics.Content.Model;
+using GovUk.Education.ExploreEducationStatistics.Content.Model.Repository.Interfaces;
 using Moq;
 using Xunit;
 using static GovUk.Education.ExploreEducationStatistics.Admin.Tests.Security.AuthorizationHandlers.Utils.AuthorizationHandlersTestUtil;
@@ -20,32 +18,26 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Security.Author
         public void CannotCancelFinishedOrAbortingImport()
         {
             var finishedOrAbortingStatuses = EnumUtil
-                .GetEnumValues<IStatus>()
-                .Where(ImportStatus.IsFinishedOrAbortingState)
+                .GetEnumValues<DataImportStatus>()
+                .Where(status => status.IsFinishedOrAborting())
                 .ToList();
 
-            finishedOrAbortingStatuses.ForEach(state =>
+            finishedOrAbortingStatuses.ForEach(status =>
             {
-                var releaseId = Guid.NewGuid();
-                var dataFileName = "my_data_file.csv";
+                var file = new File
+                {
+                    Id = Guid.NewGuid()
+                };
 
-                var importStatusService = new Mock<IImportStatusService>();
+                var importRepository = new Mock<IDataImportRepository>();
 
-                importStatusService
-                    .Setup(s => s.GetImportStatus(releaseId, dataFileName))
-                    .ReturnsAsync(new ImportStatus
-                    {
-                        Status = state
-                    });
+                importRepository
+                    .Setup(s => s.GetStatusByFileId(file.Id))
+                    .ReturnsAsync(status);
 
                 // Assert that no users can cancel a finished or aborting Import
-                AssertHandlerSucceedsWithCorrectClaims<ReleaseFileImportInfo, CancelSpecificFileImportRequirement>(
-                    new CancelSpecificFileImportAuthorizationHandler(importStatusService.Object),
-                    new ReleaseFileImportInfo
-                    {
-                        ReleaseId = releaseId,
-                        DataFileName = dataFileName,
-                    });
+                AssertHandlerSucceedsWithCorrectClaims<File, CancelSpecificFileImportRequirement>(
+                    new CancelSpecificFileImportAuthorizationHandler(importRepository.Object), file);
             });
         }
         
@@ -53,31 +45,27 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Security.Author
         public void CanCancelHealthyOngoingImportWithCorrectClaim()
         {
             var nonFinishedOrAbortingStatuses = EnumUtil
-                .GetEnumValues<IStatus>()
-                .Where(s => !ImportStatus.IsFinishedOrAbortingState(s))
+                .GetEnumValues<DataImportStatus>()
+                .Where(status => !status.IsFinishedOrAborting())
                 .ToList();
-            
-            nonFinishedOrAbortingStatuses.ForEach(state =>
-            {
-                var releaseId = Guid.NewGuid();
-                var dataFileName = "my_data_file.csv";
-            
-                var importStatusService = new Mock<IImportStatusService>();
 
-                importStatusService
-                    .Setup(s => s.GetImportStatus(releaseId, dataFileName))
-                    .ReturnsAsync(new ImportStatus
-                    {
-                        Status = state
-                    });
+            nonFinishedOrAbortingStatuses.ForEach(status =>
+            {
+                var file = new File
+                {
+                    Id = Guid.NewGuid()
+                };
+
+                var importRepository = new Mock<IDataImportRepository>();
+
+                importRepository
+                    .Setup(s => s.GetStatusByFileId(file.Id))
+                    .ReturnsAsync(status);
 
                 // Assert that users with the CancelAllFileImports claim can cancel a non-finished-or-aborting Import
-                AssertHandlerSucceedsWithCorrectClaims<ReleaseFileImportInfo, CancelSpecificFileImportRequirement>(
-                    new CancelSpecificFileImportAuthorizationHandler(importStatusService.Object), new ReleaseFileImportInfo
-                    {
-                        ReleaseId = releaseId,
-                        DataFileName = dataFileName,
-                    },
+                AssertHandlerSucceedsWithCorrectClaims<File, CancelSpecificFileImportRequirement>(
+                    new CancelSpecificFileImportAuthorizationHandler(importRepository.Object),
+                    file,
                     SecurityClaimTypes.CancelAllFileImports);
             });
         }

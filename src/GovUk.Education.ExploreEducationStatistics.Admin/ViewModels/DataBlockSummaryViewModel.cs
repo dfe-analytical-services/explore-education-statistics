@@ -13,6 +13,8 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.ViewModels
 
         public string? HighlightName { get; set; }
 
+        public string? HighlightDescription { get; set; }
+
         public string Source { get; set; } = "";
 
         public Guid? ContentSectionId { get; set; }

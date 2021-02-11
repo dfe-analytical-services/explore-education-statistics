@@ -101,6 +101,7 @@ const DataBlockSourceWizardFinalStep = ({
         initialValues={{
           heading: dataBlock?.heading ?? generateTableTitle(table.subjectMeta),
           highlightName: dataBlock?.highlightName ?? '',
+          highlightDescription: dataBlock?.highlightDescription ?? '',
           name: dataBlock?.name ?? '',
           source: dataBlock?.source ?? '',
         }}

@@ -8,6 +8,27 @@ namespace GovUk.Education.ExploreEducationStatistics.Common.Tests.Extensions
         public class CamelCaseTests
         {
             [Fact]
+            public void NullIfWhitespace_IsNullForNullString()
+            {
+                const string input = null;
+                Assert.Null(input.NullIfWhiteSpace());
+            }
+
+            [Fact]
+            public void NullIfWhitespace_RemainsUntouchedForNonWhiteSpaceString()
+            {
+                const string input = "foo";
+                Assert.Equal(input, input.NullIfWhiteSpace());
+            }
+
+            [Fact]
+            public void NullIfWhitespace_IsNullForWhiteSpaceString()
+            {
+                Assert.Null("".NullIfWhiteSpace());
+                Assert.Null(" ".NullIfWhiteSpace());
+            }
+
+            [Fact]
             public void NullStringCanAppendTrailingSlash()
             {
                 string input = null;

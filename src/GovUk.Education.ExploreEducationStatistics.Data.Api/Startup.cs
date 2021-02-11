@@ -96,8 +96,8 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Api
             services.AddTransient<IBoundaryLevelService, BoundaryLevelService>();
             services.AddTransient<ITableBuilderService, TableBuilderService>();
             services.AddTransient<IDataBlockService, DataBlockService>();
-            services.AddTransient<IPublicationMetaService, PublicationMetaService>();
-            services.AddTransient<IThemeMetaService, ThemeMetaService>();
+            services.AddTransient<IPublicationService, PublicationService>();
+            services.AddTransient<IThemeService, ThemeService>();
             services.AddTransient<IResultSubjectMetaService, ResultSubjectMetaService>();
             services.AddTransient<ISubjectMetaService, SubjectMetaService>();
             services.AddSingleton<IBlobStorageService, BlobStorageService>(provider =>
@@ -119,7 +119,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Api
             services.AddTransient<IIndicatorService, IndicatorService>();
             services.AddTransient<ILocationService, LocationService>();
             services.AddTransient<IObservationService, ObservationService>();
-            services.AddTransient<IReleaseService, ReleaseService>();
+            services.AddTransient<IReleaseRepository, ReleaseRepository>();
             services.AddTransient<ISubjectService, SubjectService>();
             services.AddTransient<ITimePeriodService, TimePeriodService>();
             services.AddTransient<IPermalinkService, PermalinkService>();

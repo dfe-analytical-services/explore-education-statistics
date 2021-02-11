@@ -81,8 +81,7 @@ export type ImportStatusCode =
 export interface DataFileImportStatus {
   status: ImportStatusCode;
   percentageComplete: number;
-  phaseComplete: boolean;
-  phasePercentageComplete: number;
+  stagePercentageComplete: number;
   errors?: string[];
   numberOfRows: number;
 }
@@ -155,25 +154,11 @@ const releaseDataFileService = {
   },
   getDataFileImportStatus(
     releaseId: string,
-    dataFileName: string,
+    dataFile: DataFile,
   ): Promise<DataFileImportStatus> {
-    return client
-      .get<
-        Overwrite<
-          DataFileImportStatus,
-          {
-            errors?: string;
-          }
-        >
-      >(`/release/${releaseId}/data/${dataFileName}/import/status`)
-      .then(importStatus => {
-        return {
-          ...importStatus,
-          errors: JSON.parse(importStatus.errors || '[]').map(
-            ({ Message }: { Message: string }) => Message,
-          ),
-        };
-      });
+    return client.get<DataFileImportStatus>(
+      `/release/${releaseId}/data/${dataFile.id}/import/status`,
+    );
   },
 
   getDeleteDataFilePlan(

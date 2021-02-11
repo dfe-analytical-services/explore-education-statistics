@@ -3,15 +3,16 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
 using GovUk.Education.ExploreEducationStatistics.Admin.Controllers.Api.Statistics;
-using GovUk.Education.ExploreEducationStatistics.Admin.Services.Interfaces;
 using GovUk.Education.ExploreEducationStatistics.Admin.ViewModels.Statistics;
 using GovUk.Education.ExploreEducationStatistics.Common.Model;
 using GovUk.Education.ExploreEducationStatistics.Data.Model;
 using GovUk.Education.ExploreEducationStatistics.Data.Model.Services.Interfaces;
-using GovUk.Education.ExploreEducationStatistics.Data.Services.ViewModels.Meta;
+using GovUk.Education.ExploreEducationStatistics.Data.Services.Interfaces;
+using GovUk.Education.ExploreEducationStatistics.Data.Services.ViewModels;
 using Microsoft.AspNetCore.Mvc;
 using Moq;
 using Xunit;
+using FootnoteViewModel = GovUk.Education.ExploreEducationStatistics.Admin.ViewModels.Statistics.FootnoteViewModel;
 using IFootnoteService = GovUk.Education.ExploreEducationStatistics.Admin.Services.Interfaces.IFootnoteService;
 using Unit = GovUk.Education.ExploreEducationStatistics.Common.Model.Unit;
 
@@ -43,7 +44,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Controllers.Api
             var filterService = new Mock<IFilterService>();
             var indicatorGroupService = new Mock<IIndicatorGroupService>();
             var footnoteService = new Mock<IFootnoteService>();
-            var releaseMetaService = new Mock<IReleaseMetaService>();
+            var releaseService = new Mock<IReleaseService>();
 
             var createFootnoteResult = Task.FromResult(new Either<ActionResult, Footnote>(footnote));
 
@@ -86,8 +87,8 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Controllers.Api
 
             footnoteService.Setup(s => s.DeleteFootnote(ReleaseId, FootnoteId)).ReturnsAsync(Unit.Instance);
 
-            releaseMetaService.Setup(s => s.GetSubjectsMeta(ReleaseId))
-                .ReturnsAsync(new ReleaseSubjectsMetaViewModel
+            releaseService.Setup(s => s.GetRelease(ReleaseId))
+                .ReturnsAsync(new ReleaseViewModel
                 {
                     ReleaseId = ReleaseId,
                     Subjects = subjectIds.Select(id => new IdLabel(id, $"Subject {id}")).ToList()
@@ -146,7 +147,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Controllers.Api
             _controller = new FootnoteController(filterService.Object,
                 footnoteService.Object,
                 indicatorGroupService.Object,
-                releaseMetaService.Object);
+                releaseService.Object);
         }
 
         [Fact]

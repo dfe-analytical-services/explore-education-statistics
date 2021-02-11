@@ -12,18 +12,18 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Model.Services
 {
     public class SubjectService : AbstractRepository<Subject, Guid>, ISubjectService
     {
-        private readonly IReleaseService _releaseService;
+        private readonly IReleaseRepository _releaseRepository;
 
         public SubjectService(StatisticsDbContext context,
-            ILogger<SubjectService> logger, IReleaseService releaseService) : base(context, logger)
+            ILogger<SubjectService> logger, IReleaseRepository releaseRepository) : base(context, logger)
         {
-            _releaseService = releaseService;
+            _releaseRepository = releaseRepository;
         }
 
         public async Task<bool> IsSubjectForLatestPublishedRelease(Guid subjectId)
         {
             var publication = await GetPublicationForSubject(subjectId);
-            var latestRelease = _releaseService.GetLatestPublishedRelease(publication.Id);
+            var latestRelease = _releaseRepository.GetLatestPublishedRelease(publication.Id);
 
             if (latestRelease == null)
             {

@@ -21,6 +21,8 @@ using GovUk.Education.ExploreEducationStatistics.Common.Services.Interfaces;
 using GovUk.Education.ExploreEducationStatistics.Common.Services.Interfaces.Security;
 using GovUk.Education.ExploreEducationStatistics.Common.Utils;
 using GovUk.Education.ExploreEducationStatistics.Content.Model.Database;
+using GovUk.Education.ExploreEducationStatistics.Content.Model.Repository;
+using GovUk.Education.ExploreEducationStatistics.Content.Model.Repository.Interfaces;
 using GovUk.Education.ExploreEducationStatistics.Data.Model;
 using GovUk.Education.ExploreEducationStatistics.Data.Model.Database;
 using GovUk.Education.ExploreEducationStatistics.Data.Model.Services;
@@ -53,8 +55,14 @@ using Notify.Client;
 using Notify.Interfaces;
 using FootnoteService = GovUk.Education.ExploreEducationStatistics.Admin.Services.FootnoteService;
 using IFootnoteService = GovUk.Education.ExploreEducationStatistics.Admin.Services.Interfaces.IFootnoteService;
+using IPublicationService = GovUk.Education.ExploreEducationStatistics.Admin.Services.Interfaces.IPublicationService;
+using IReleaseRepository = GovUk.Education.ExploreEducationStatistics.Admin.Services.Interfaces.IReleaseRepository;
 using IReleaseService = GovUk.Education.ExploreEducationStatistics.Admin.Services.Interfaces.IReleaseService;
+using IThemeService = GovUk.Education.ExploreEducationStatistics.Admin.Services.Interfaces.IThemeService;
+using PublicationService = GovUk.Education.ExploreEducationStatistics.Admin.Services.PublicationService;
+using ReleaseRepository = GovUk.Education.ExploreEducationStatistics.Admin.Services.ReleaseRepository;
 using ReleaseService = GovUk.Education.ExploreEducationStatistics.Admin.Services.ReleaseService;
+using ThemeService = GovUk.Education.ExploreEducationStatistics.Admin.Services.ThemeService;
 
 namespace GovUk.Education.ExploreEducationStatistics.Admin
 {
@@ -204,11 +212,14 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin
             services.AddSpaStaticFiles(configuration => { configuration.RootPath = "wwwroot"; });
 
             services.AddTransient<IFileRepository, FileRepository>();
+            services.AddTransient<IDataImportRepository, DataImportRepository>();
             services.AddTransient<IReleaseFileRepository, ReleaseFileRepository>();
+
             services.AddTransient<IReleaseDataFileService, ReleaseDataFileService>();
             services.AddTransient<IReleaseFileService, ReleaseFileService>();
-            services.AddTransient<IImportService, ImportService>();
+            services.AddTransient<IDataImportService, DataImportService>();
             services.AddTransient<IImportStatusBauService, ImportStatusBauService>();
+            services.AddTransient<IMigrateImportsService, MigrateImportsService>();
 
             services.AddTransient<IPublishingService, PublishingService>(provider =>
                 new PublishingService(
@@ -284,15 +295,14 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin
             services.AddTransient<IMetaGuidanceService, MetaGuidanceService>();
             services.AddTransient<IMetaGuidanceSubjectService, MetaGuidanceSubjectService>();
             services.AddTransient<IObservationService, ObservationService>();
-            services.AddTransient<IReleaseMetaService, ReleaseMetaService>();
+            services.AddTransient<Data.Services.Interfaces.IReleaseService, Data.Services.ReleaseService>();
             services.AddTransient<IReleaseNoteService, ReleaseNoteService>();
             services.AddTransient<IResultBuilder<Observation, ObservationViewModel>, ResultBuilder>();
-            services.AddTransient<Data.Model.Services.Interfaces.IReleaseService, Data.Model.Services.ReleaseService>();
+            services.AddTransient<Data.Model.Services.Interfaces.IReleaseRepository, Data.Model.Services.ReleaseRepository>();
             services.AddTransient<ISubjectService, SubjectService>();
             services.AddTransient<ITimePeriodService, TimePeriodService>();
             services.AddTransient<ISubjectMetaService, SubjectMetaService>();
             services.AddTransient<IResultSubjectMetaService, ResultSubjectMetaService>();
-            services.AddTransient<IImportStatusService, ImportStatusService>();
             services.AddSingleton<DataServiceMemoryCache<BoundaryLevel>, DataServiceMemoryCache<BoundaryLevel>>();
             services.AddSingleton<DataServiceMemoryCache<GeoJson>, DataServiceMemoryCache<GeoJson>>();
             services.AddTransient<IUserManagementService, UserManagementService>();
@@ -310,7 +320,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin
             );
             services.AddTransient<ITableStorageService, TableStorageService>(s =>
                 new TableStorageService(Configuration.GetValue<string>("CoreStorage")));
-            services.AddTransient<IStorageQueueService, StorageQueueService>(s => 
+            services.AddTransient<IStorageQueueService, StorageQueueService>(s =>
                 new StorageQueueService(Configuration.GetValue<string>("CoreStorage")));
             services.AddSingleton<IGuidGenerator, SequentialGuidGenerator>();
             AddPersistenceHelper<ContentDbContext>(services);

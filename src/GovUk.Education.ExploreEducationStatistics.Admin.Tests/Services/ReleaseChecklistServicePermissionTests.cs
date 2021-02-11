@@ -1,8 +1,6 @@
 using System;
-using GovUk.Education.ExploreEducationStatistics.Admin.Security;
 using GovUk.Education.ExploreEducationStatistics.Admin.Services;
 using GovUk.Education.ExploreEducationStatistics.Admin.Services.Interfaces;
-using GovUk.Education.ExploreEducationStatistics.Common.Services.Interfaces;
 using GovUk.Education.ExploreEducationStatistics.Common.Services.Interfaces.Security;
 using GovUk.Education.ExploreEducationStatistics.Common.Tests.Utils;
 using GovUk.Education.ExploreEducationStatistics.Common.Utils;
@@ -39,8 +37,9 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
         }
 
         private ReleaseChecklistService BuildReleaseChecklistService(
+            ContentDbContext contentDbContext = null,
             IPersistenceHelper<ContentDbContext> persistenceHelper = null,
-            ITableStorageService tableStorageService = null,
+            IDataImportService dataImportService = null,
             IUserService userService = null,
             IMetaGuidanceService metaGuidanceService = null,
             IFileRepository fileRepository = null,
@@ -49,8 +48,9 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
         {
 
             return new ReleaseChecklistService(
+                contentDbContext ?? new Mock<ContentDbContext>().Object,
                 persistenceHelper ?? DefaultPersistenceHelperMock().Object,
-                tableStorageService ?? new Mock<ITableStorageService>().Object,
+                dataImportService ?? new Mock<IDataImportService>().Object,
                 userService ?? MockUtils.AlwaysTrueUserService().Object,
                 metaGuidanceService ?? new Mock<IMetaGuidanceService>().Object,
                 fileRepository ?? new Mock<IFileRepository>().Object,

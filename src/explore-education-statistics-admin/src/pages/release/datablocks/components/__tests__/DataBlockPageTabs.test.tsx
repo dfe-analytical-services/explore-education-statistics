@@ -6,7 +6,9 @@ import DataBlockPageTabs from '@admin/pages/release/datablocks/components/DataBl
 import _dataBlockService, {
   ReleaseDataBlock,
 } from '@admin/services/dataBlockService';
-import _tableBuilderService from '@common/services/tableBuilderService';
+import _tableBuilderService, {
+  Release,
+} from '@common/services/tableBuilderService';
 import { render, screen, waitFor } from '@testing-library/react';
 import userEvent from '@testing-library/user-event';
 import noop from 'lodash/noop';
@@ -29,6 +31,7 @@ describe('DataBlockPageTabs', () => {
     id: 'block-1',
     source: 'Test source',
     highlightName: '',
+    highlightDescription: '',
     query: {
       includeGeoJson: false,
       subjectId: 'subject-1',
@@ -58,12 +61,14 @@ describe('DataBlockPageTabs', () => {
     charts: [],
   };
 
+  const testRelease: Release = {
+    id: 'release-1',
+    subjects: [],
+    highlights: [],
+  };
+
   test('renders uninitialised table tool when no data block is selected', async () => {
-    tableBuilderService.getReleaseMeta.mockResolvedValue({
-      releaseId: 'release-1',
-      subjects: [],
-      highlights: [],
-    });
+    tableBuilderService.getRelease.mockResolvedValue(testRelease);
 
     render(<DataBlockPageTabs releaseId="release-1" onDataBlockSave={noop} />);
 
@@ -80,11 +85,7 @@ describe('DataBlockPageTabs', () => {
   });
 
   test('does not render table or chart tabs when no data block is selected', async () => {
-    tableBuilderService.getReleaseMeta.mockResolvedValue({
-      releaseId: 'release-1',
-      subjects: [],
-      highlights: [],
-    });
+    tableBuilderService.getRelease.mockResolvedValue(testRelease);
 
     render(<DataBlockPageTabs releaseId="release-1" onDataBlockSave={noop} />);
 
@@ -97,11 +98,7 @@ describe('DataBlockPageTabs', () => {
   });
 
   test('renders fully initialised table tool when data block is selected', async () => {
-    tableBuilderService.getReleaseMeta.mockResolvedValue({
-      releaseId: 'release-1',
-      subjects: [],
-      highlights: [],
-    });
+    tableBuilderService.getRelease.mockResolvedValue(testRelease);
 
     tableBuilderService.getSubjectMeta.mockResolvedValue(testSubjectMeta);
     tableBuilderService.getTableData.mockResolvedValue(testTableData);
@@ -133,11 +130,7 @@ describe('DataBlockPageTabs', () => {
   });
 
   test('renders table and chart tabs when data block is selected', async () => {
-    tableBuilderService.getReleaseMeta.mockResolvedValue({
-      releaseId: 'release-1',
-      subjects: [],
-      highlights: [],
-    });
+    tableBuilderService.getRelease.mockResolvedValue(testRelease);
 
     tableBuilderService.getSubjectMeta.mockResolvedValue(testSubjectMeta);
     tableBuilderService.getTableData.mockResolvedValue(testTableData);
@@ -161,11 +154,7 @@ describe('DataBlockPageTabs', () => {
   });
 
   test('renders partially initialised table tool when there are no table results', async () => {
-    tableBuilderService.getReleaseMeta.mockResolvedValue({
-      releaseId: 'release-1',
-      subjects: [],
-      highlights: [],
-    });
+    tableBuilderService.getRelease.mockResolvedValue(testRelease);
 
     tableBuilderService.getSubjectMeta.mockResolvedValue(testSubjectMeta);
     tableBuilderService.getTableData.mockResolvedValue({
@@ -199,11 +188,7 @@ describe('DataBlockPageTabs', () => {
   });
 
   test('renders partially initialised table tool when table header configuration would be invalid', async () => {
-    tableBuilderService.getReleaseMeta.mockResolvedValue({
-      releaseId: 'release-1',
-      subjects: [],
-      highlights: [],
-    });
+    tableBuilderService.getRelease.mockResolvedValue(testRelease);
 
     tableBuilderService.getSubjectMeta.mockResolvedValue(testSubjectMeta);
     tableBuilderService.getTableData.mockResolvedValue(testTableData);
@@ -247,11 +232,7 @@ describe('DataBlockPageTabs', () => {
 
   describe('updating data block', () => {
     test('submitting data source form calls correct service to update data block', async () => {
-      tableBuilderService.getReleaseMeta.mockResolvedValue({
-        releaseId: 'release-1',
-        subjects: [],
-        highlights: [],
-      });
+      tableBuilderService.getRelease.mockResolvedValue(testRelease);
 
       tableBuilderService.getSubjectMeta.mockResolvedValue(testSubjectMeta);
       tableBuilderService.getTableData.mockResolvedValue(testTableData);

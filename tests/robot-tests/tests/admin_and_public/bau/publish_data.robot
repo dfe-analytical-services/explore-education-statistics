@@ -171,6 +171,7 @@ Save data block as a highlight
     user clicks checkbox  Set as a table highlight for this publication
     user waits until page contains element  id:dataBlockDetailsForm-highlightName
     user enters text into element  id:dataBlockDetailsForm-highlightName    Test highlight name
+    user enters text into element  id:dataBlockDetailsForm-highlightDescription    Test highlight description
 
     user clicks button   Save data block
     user waits until page contains    Delete this data block

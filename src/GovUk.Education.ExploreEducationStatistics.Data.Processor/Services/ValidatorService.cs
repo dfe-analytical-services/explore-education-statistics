@@ -10,17 +10,17 @@ using GovUk.Education.ExploreEducationStatistics.Common.Extensions;
 using GovUk.Education.ExploreEducationStatistics.Common.Model;
 using GovUk.Education.ExploreEducationStatistics.Common.Services;
 using GovUk.Education.ExploreEducationStatistics.Common.Services.Interfaces;
-using GovUk.Education.ExploreEducationStatistics.Data.Importer.Services;
-using GovUk.Education.ExploreEducationStatistics.Data.Processor.Model;
-using GovUk.Education.ExploreEducationStatistics.Data.Processor.Models;
+using GovUk.Education.ExploreEducationStatistics.Content.Model;
+using GovUk.Education.ExploreEducationStatistics.Content.Model.Extensions;
 using GovUk.Education.ExploreEducationStatistics.Data.Processor.Services.Interfaces;
 using GovUk.Education.ExploreEducationStatistics.Data.Processor.Utils;
 using Microsoft.Azure.WebJobs;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.Logging;
-using static GovUk.Education.ExploreEducationStatistics.Common.Services.ImportStatusService;
+using static GovUk.Education.ExploreEducationStatistics.Common.BlobContainerNames;
 using static GovUk.Education.ExploreEducationStatistics.Data.Processor.Services.ValidationErrorMessages;
 using static GovUk.Education.ExploreEducationStatistics.Common.Validators.FileTypeValidationUtils;
+using File = GovUk.Education.ExploreEducationStatistics.Content.Model.File;
 
 namespace GovUk.Education.ExploreEducationStatistics.Data.Processor.Services
 {
@@ -54,26 +54,23 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Processor.Services
     public class ValidatorService : IValidatorService
     {
         private readonly ILogger<IValidatorService> _logger;
-        private readonly IFileStorageService _fileStorageService;
+        private readonly IBlobStorageService _blobStorageService;
         private readonly IFileTypeService _fileTypeService;
-        private readonly IImportStatusService _importStatusService;
+        private readonly IDataImportService _dataImportService;
         
         public ValidatorService(
             ILogger<IValidatorService> logger,
-            IFileStorageService fileStorageService,
+            IBlobStorageService blobStorageService,
             IFileTypeService fileTypeService,
-            IImportStatusService importStatusService)
+            IDataImportService dataImportService)
         {
             _logger = logger;
-            _fileStorageService = fileStorageService;
+            _blobStorageService = blobStorageService;
             _fileTypeService = fileTypeService;
-            _importStatusService = importStatusService;
+            _dataImportService = dataImportService;
         }
 
-        public ValidatorService(ILogger<IValidatorService> logger)
-        {
-            _logger = logger;
-        }
+        private const int Stage1RowCheck = 1000;
 
         private static readonly List<string> MandatoryObservationColumns = new List<string>
         {
@@ -82,36 +79,41 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Processor.Services
             "geographic_level"
         };
         
-        public async Task<Either<IEnumerable<ValidationError>, ProcessorStatistics>>
-            Validate(SubjectData subjectData, ExecutionContext executionContext, ImportMessage message)
+        public async Task<Either<List<DataImportError>, ProcessorStatistics>> Validate(
+            Guid importId,
+            ExecutionContext executionContext)
         {
-            _logger.LogInformation($"Validating: {message.DataFileName}");
+            var import = await _dataImportService.GetImport(importId);
 
-            await _importStatusService.UpdateStatus(message.Release.Id, message.DataFileName, IStatus.STAGE_1);
+            _logger.LogInformation($"Validating: {import.File.Filename}");
 
-            return await ValidateCsvFile(subjectData.DataBlob, false)
-                .OnSuccessDo(async () => await ValidateCsvFile(subjectData.MetaBlob, true))
+            await _dataImportService.UpdateStatus(import.Id, DataImportStatus.STAGE_1, 0);
+
+            return await ValidateCsvFile(import.File, false)
+                .OnSuccessDo(async () => await ValidateCsvFile(import.MetaFile, true))
                 .OnSuccess(
                     async () =>
                     {
-                        await using var dataFileStream = await _fileStorageService.StreamBlob(subjectData.DataBlob);
+                        var dataFileStream = await _blobStorageService.StreamBlob(PrivateFilesContainerName, 
+                            import.File.Path());
                         var dataFileTable = DataTableUtils.CreateFromStream(dataFileStream);
 
-                        await using var metaFileStream = await _fileStorageService.StreamBlob(subjectData.MetaBlob);
+                        var metaFileStream = await _blobStorageService.StreamBlob(PrivateFilesContainerName,
+                            import.MetaFile.Path());
                         var metaFileTable = DataTableUtils.CreateFromStream(metaFileStream);
-                        
+
                         return await ValidateMetaHeader(metaFileTable.Columns)
                             .OnSuccess(() => ValidateMetaRows(metaFileTable.Columns, metaFileTable.Rows))
                             .OnSuccess(() => ValidateObservationHeaders(dataFileTable.Columns))
                             .OnSuccess(
                                 () =>
                                     ValidateAndCountObservations(dataFileTable.Columns, dataFileTable.Rows,
-                                            executionContext, message.Release.Id, message.DataFileName)
+                                            executionContext, import.Id)
                                         .OnSuccess(
                                             result =>
                                             {
                                                 _logger.LogInformation(
-                                                    $"Validating: {message.DataFileName} complete");
+                                                    $"Validating: {import.File.Filename} complete");
                                                 return result;
                                             }
                                         )
@@ -119,18 +121,18 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Processor.Services
                 });
         }
 
-        private async Task<Either<IEnumerable<ValidationError>, Unit>> ValidateCsvFile(BlobInfo blob, bool isMetaFile)
+        private async Task<Either<List<DataImportError>, Unit>> ValidateCsvFile(File file, bool isMetaFile)
         {
-            var errors = new List<ValidationError>();
+            var errors = new List<DataImportError>();
 
-            if (!await IsCsvFile(blob))
+            if (!await IsCsvFile(file))
             {
-                errors.Add(isMetaFile ? new ValidationError($"{MetaFileMustBeCsvFile.GetEnumLabel()}") :
-                    new ValidationError($"{DataFileMustBeCsvFile.GetEnumLabel()}"));
+                errors.Add(isMetaFile ? new DataImportError($"{MetaFileMustBeCsvFile.GetEnumLabel()}") :
+                    new DataImportError($"{DataFileMustBeCsvFile.GetEnumLabel()}"));
             }
             else
             {
-                await using var stream = await _fileStorageService.StreamBlob(blob);
+                var stream = await _blobStorageService.StreamBlob(PrivateFilesContainerName, file.Path());
 
                 using var reader = new StreamReader(stream);
                 using var csv = new CsvReader(reader, CultureInfo.InvariantCulture);
@@ -144,8 +146,8 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Processor.Services
                     idx++;
                     if (colCount >= 0 && dr.FieldCount != colCount)
                     {
-                        errors.Add(isMetaFile ? new ValidationError($"error at row {idx}: {MetaFileHasInvalidNumberOfColumns.GetEnumLabel()}") :
-                            new ValidationError($"error at row {idx}: {DataFileHasInvalidNumberOfColumns.GetEnumLabel()}"));
+                        errors.Add(isMetaFile ? new DataImportError($"error at row {idx}: {MetaFileHasInvalidNumberOfColumns.GetEnumLabel()}") :
+                            new DataImportError($"error at row {idx}: {DataFileHasInvalidNumberOfColumns.GetEnumLabel()}"));
                         break;
                     }
                     colCount = dr.FieldCount;
@@ -160,15 +162,15 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Processor.Services
             return Unit.Instance;
         }
 
-        private static async Task<Either<IEnumerable<ValidationError>, Unit>> ValidateMetaHeader(DataColumnCollection header)
+        private static async Task<Either<List<DataImportError>, Unit>> ValidateMetaHeader(DataColumnCollection header)
         {
-            var errors = new List<ValidationError>();
+            var errors = new List<DataImportError>();
             // Check for unexpected column names
             Array.ForEach(Enum.GetNames(typeof(MetaColumns)), col =>
             {
                 if (!header.Contains(col))
                 {
-                    errors.Add(new ValidationError($"{MetaFileMissingExpectedColumn.GetEnumLabel()} : {col}"));
+                    errors.Add(new DataImportError($"{MetaFileMissingExpectedColumn.GetEnumLabel()} : {col}"));
                 }
             });
 
@@ -180,10 +182,10 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Processor.Services
             return Unit.Instance;
         }
 
-        private static async Task<Either<IEnumerable<ValidationError>, Unit>> ValidateMetaRows(
+        private static async Task<Either<List<DataImportError>, Unit>> ValidateMetaRows(
             DataColumnCollection cols, DataRowCollection rows)
         {
-            var errors = new List<ValidationError>();
+            var errors = new List<DataImportError>();
             var idx = 0;
             foreach (DataRow row in rows)
             {
@@ -195,7 +197,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Processor.Services
                 }
                 catch (Exception e)
                 {
-                    errors.Add(new ValidationError($"error at row {idx}: {MetaFileHasInvalidValues.GetEnumLabel()} : {e.Message}"));
+                    errors.Add(new DataImportError($"error at row {idx}: {MetaFileHasInvalidValues.GetEnumLabel()} : {e.Message}"));
                 }
             }
 
@@ -207,20 +209,20 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Processor.Services
             return Unit.Instance;
         }
 
-        private static async Task<Either<IEnumerable<ValidationError>, Unit>> ValidateObservationHeaders(DataColumnCollection cols)
+        private static async Task<Either<List<DataImportError>, Unit>> ValidateObservationHeaders(DataColumnCollection cols)
         {
-            var errors = new List<ValidationError>();
+            var errors = new List<DataImportError>();
 
             foreach (var mandatoryCol in MandatoryObservationColumns)
             {
                 if (!cols.Contains(mandatoryCol))
                 {
-                    errors.Add(new ValidationError($"{DataFileMissingExpectedColumn.GetEnumLabel()} : {mandatoryCol}"));
+                    errors.Add(new DataImportError($"{DataFileMissingExpectedColumn.GetEnumLabel()} : {mandatoryCol}"));
                 }
 
                 if (errors.Count == 100)
                 {
-                    errors.Add(new ValidationError(FirstOneHundredErrors.GetEnumLabel()));
+                    errors.Add(new DataImportError(FirstOneHundredErrors.GetEnumLabel()));
                     break;
                 }
             }
@@ -233,18 +235,17 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Processor.Services
             return Unit.Instance;
         }
 
-        private async Task<Either<IEnumerable<ValidationError>, ProcessorStatistics>>
+        private async Task<Either<List<DataImportError>, ProcessorStatistics>>
             ValidateAndCountObservations(
                 DataColumnCollection cols,
                 DataRowCollection rows,
                 ExecutionContext executionContext,
-                Guid releaseId,
-                string dataFileName)
+                Guid importId)
         {
             var idx = 0;
             var filteredRows = 0;
             var totalRowCount = 0;
-            var errors = new List<ValidationError>();
+            var errors = new List<DataImportError>();
             var dataRows = rows.Count;
 
             foreach (DataRow row in rows)
@@ -252,7 +253,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Processor.Services
                 idx++;
                 if (errors.Count == 100)
                 {
-                    errors.Add(new ValidationError(FirstOneHundredErrors.GetEnumLabel()));
+                    errors.Add(new DataImportError(FirstOneHundredErrors.GetEnumLabel()));
                     break;
                 }
 
@@ -272,16 +273,15 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Processor.Services
                 }
                 catch (Exception e)
                 {
-                    errors.Add(new ValidationError($"error at row {idx}: {e.Message}"));
+                    errors.Add(new DataImportError($"error at row {idx}: {e.Message}"));
                 }
                 
                 totalRowCount++;
 
-                if (totalRowCount % STAGE_1_ROW_CHECK == 0)
+                if (totalRowCount % Stage1RowCheck == 0)
                 {
-                    await _importStatusService.UpdateStatus(releaseId,
-                        dataFileName,
-                        IStatus.STAGE_1,
+                    await _dataImportService.UpdateStatus(importId,
+                        DataImportStatus.STAGE_1,
                         (double) totalRowCount / dataRows * 100);
                 }
             }
@@ -291,9 +291,8 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Processor.Services
                 return errors;
             }
 
-            await _importStatusService.UpdateStatus(releaseId,
-                dataFileName,
-                IStatus.STAGE_1,
+            await _dataImportService.UpdateStatus(importId,
+                DataImportStatus.STAGE_1,
                 100);
 
             var rowsPerBatch = Convert.ToInt32(LoadAppSettings(executionContext).GetValue<string>("RowsPerBatch"));
@@ -321,9 +320,9 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Processor.Services
                 .Build();
         }
 
-        private async Task<bool> IsCsvFile(BlobInfo blob)
+        private async Task<bool> IsCsvFile(File file)
         {
-            await using var mimeTypeStream = await _fileStorageService.StreamBlob(blob);
+            var mimeTypeStream = await _blobStorageService.StreamBlob(PrivateFilesContainerName, file.Path());
 
             var hasMatchingMimeType = await _fileTypeService.HasMatchingMimeType(
                 mimeTypeStream,
@@ -335,8 +334,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Processor.Services
                 return false;
             }
 
-            await using var encodingStream = await _fileStorageService.StreamBlob(blob);
-
+            var encodingStream = await _blobStorageService.StreamBlob(PrivateFilesContainerName, file.Path());
             return _fileTypeService.HasMatchingEncodingType(encodingStream, CsvEncodingTypes);
         }
     }

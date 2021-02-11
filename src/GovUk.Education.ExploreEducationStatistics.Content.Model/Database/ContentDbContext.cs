@@ -1,6 +1,5 @@
 using System;
 using System.Collections.Generic;
-using System.IO;
 using System.Text;
 using GovUk.Education.ExploreEducationStatistics.Common.Converters;
 using GovUk.Education.ExploreEducationStatistics.Common.Model;
@@ -99,6 +98,8 @@ namespace GovUk.Education.ExploreEducationStatistics.Content.Model.Database
         public DbSet<ContentSection> ContentSections { get; set; }
         public DbSet<ContentBlock> ContentBlocks { get; set; }
         public DbSet<DataBlock> DataBlocks { get; set; }
+        public DbSet<DataImport> DataImports { get; set; }
+        public DbSet<DataImportError> DataImportErrors { get; set; }
         public DbSet<HtmlBlock> HtmlBlocks { get; set; }
         public DbSet<MarkDownBlock> MarkDownBlocks { get; set; }
         public DbSet<ReleaseType> ReleaseTypes { get; set; }
@@ -125,6 +126,31 @@ namespace GovUk.Education.ExploreEducationStatistics.Content.Model.Database
                 .HasConversion(
                     v => v,
                     v => v.HasValue ? DateTime.SpecifyKind(v.Value, DateTimeKind.Utc) : (DateTime?) null);
+
+            modelBuilder.Entity<DataImport>()
+                .HasOne(import => import.File)
+                .WithOne()
+                .OnDelete(DeleteBehavior.Restrict);
+
+            modelBuilder.Entity<DataImport>()
+                .HasOne(import => import.MetaFile)
+                .WithOne()
+                .OnDelete(DeleteBehavior.Restrict);
+
+            modelBuilder.Entity<DataImport>()
+                .HasOne(import => import.ZipFile)
+                .WithOne()
+                .OnDelete(DeleteBehavior.Restrict);
+
+            modelBuilder.Entity<DataImport>()
+                .Property(import => import.Status)
+                .HasConversion(new EnumToStringConverter<DataImportStatus>());
+
+            modelBuilder.Entity<DataImportError>()
+                .Property(importError => importError.Created)
+                .HasConversion(
+                    v => v,
+                    v => DateTime.SpecifyKind(v, DateTimeKind.Utc));
 
             modelBuilder.Entity<Methodology>()
                 .Property(b => b.Content)
@@ -235,6 +261,10 @@ namespace GovUk.Education.ExploreEducationStatistics.Content.Model.Database
             modelBuilder.Entity<DataBlock>()
                 .Property(block => block.HighlightName)
                 .HasColumnName("DataBlock_HighlightName");
+
+            modelBuilder.Entity<DataBlock>()
+                .Property(block => block.HighlightDescription)
+                .HasColumnName("DataBlock_HighlightDescription");
 
             modelBuilder.Entity<DataBlock>()
                 .Property(block => block.Query)

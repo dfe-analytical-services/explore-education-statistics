@@ -8,9 +8,11 @@ export interface ImportStatus {
   releaseId: string;
   releaseTitle: string;
   dataFileName: string;
-  numberOfRows: number;
+  rows: number;
+  batches: number;
   status: number;
   stagePercentageComplete: number;
+  percentageComplete: number;
 }
 
 const importStatusService = {

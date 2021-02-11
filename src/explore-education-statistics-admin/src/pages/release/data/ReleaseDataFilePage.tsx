@@ -129,7 +129,7 @@ const ReleaseDataFilePage = ({
                       status,
                       permissions: await permissionService.getDataFilePermissions(
                         releaseId,
-                        file.fileName,
+                        file.id,
                       ),
                     },
                   });
@@ -141,7 +141,7 @@ const ReleaseDataFilePage = ({
                       status,
                       permissions: await permissionService.getDataFilePermissions(
                         releaseId,
-                        file.fileName,
+                        file.id,
                       ),
                     },
                   });
@@ -187,7 +187,7 @@ const ReleaseDataFilePage = ({
                         ...file,
                         permissions: await permissionService.getDataFilePermissions(
                           releaseId,
-                          file.fileName,
+                          file.id,
                         ),
                       },
                     });
