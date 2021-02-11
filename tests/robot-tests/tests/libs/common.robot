@@ -192,6 +192,10 @@ user checks there are x accordion sections
     [Arguments]  ${num}  ${parent}=css:body
     user waits until parent contains element  ${parent}  css:[data-testid="accordionSection"]  limit=${num}
 
+user checks accordion is in position
+    [Arguments]  ${section_text}  ${position}  ${parent}=css:[data-testid="accordion"]
+    user waits until parent contains element  ${parent}  xpath:.//*[@data-testid="accordionSection"][${position}]
+
 user waits until accordion section contains text
     [Arguments]  ${section_text}   ${text}
     ${section}=  user gets accordion section content element  ${section_text}

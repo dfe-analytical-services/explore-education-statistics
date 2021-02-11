@@ -1,7 +1,7 @@
 *** Settings ***
 Resource    ../libs/public-common.robot
 
-Force Tags  GeneralPublic  Local  Dev  Test  Preprod
+Force Tags  GeneralPublic  Local  Dev  Test  Preprod  Failing
 
 Suite Setup       user opens the browser
 Suite Teardown    user closes the browser

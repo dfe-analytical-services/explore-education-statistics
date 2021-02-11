@@ -27,20 +27,19 @@ Verify can accept cookie banner
 
 Validate homepage
     [Tags]  HappyPath
-    user checks page contains element  link:Find statistics and data
-    user checks page contains element  link:Create your own tables online
-    user checks page contains element  link:Download latest data files
+    user checks page contains element  link:Explore
+    user checks page contains element  link:Create
 
-    user checks page contains element  xpath://h3[text()="Supporting information"]
+    user waits until h2 is visible  Supporting information
     user checks page contains element  link:Education statistics: methodology
     user checks page contains element  link:Education statistics: glossary
 
-    user checks page contains element  xpath://h3[text()="Related services"]
+    user waits until h2 is visible  Related services
     user checks page contains element  link:Find and compare schools in England
     user checks page contains element  link:Get information about schools
     user checks page contains element  link:Schools financial benchmarking
 
-    user checks page contains element  xpath://h3[text()="Contact Us"]
+    user waits until h2 is visible  Contact Us
     user checks page contains link with text and url  explore.statistics@education.gov.uk   mailto:explore.statistics@education.gov.uk
 
     user checks breadcrumb count should be  1

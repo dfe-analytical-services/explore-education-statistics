@@ -168,15 +168,6 @@ def user_should_be_at_top_of_page():
             f"Windows position Y is {y} not 0! User should be at the top of the page!")
 
 
-def user_checks_accordion_is_in_position(header_starts_with, position):
-    elem = sl.get_webelement(
-        # NOTE(mark): When nth-child won't do, you need to do the unholy equivalent of css .class in xpath...
-        f'xpath:(.//*[contains(concat(" ", normalize-space(@class), " "), " govuk-accordion__section ")])[{position}]')
-    if not elem.text.strip().startswith(header_starts_with):
-        raise_assertion_error(
-            f'Accordion in position {position} expected start with text "{header_starts_with}". Actual found text: "{elem.text}"')
-
-
 def capture_large_screenshot():
     currentWindow = sl.get_window_size()
     page_height = sl.driver.execute_script(

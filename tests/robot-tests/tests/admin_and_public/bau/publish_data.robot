@@ -247,9 +247,9 @@ Check latest release is correct
     [Tags]  HappyPath
     user waits until page contains title caption  Financial Year 3001-02
     user checks page contains   This is the latest data
-    user checks page contains   See 1 other releases
+    user checks page contains   See other releases (1)
 
-    user opens details dropdown  See 1 other releases
+    user opens details dropdown  See other releases (1)
     user checks page contains other release   Financial Year 3000-01
     user checks page does not contain other release   Financial Year 3001-02
 
@@ -260,7 +260,7 @@ Check other release is correct
     user waits until page contains title caption  Financial Year 3000-01
 
     user waits until page contains link    View latest data: Financial Year 3001-02
-    user checks page contains   See 1 other releases
+    user checks page contains   See other releases (1)
     user checks page contains other release    Financial Year 3001-02
     user checks page does not contain other release   Financial Year 3000-01
 

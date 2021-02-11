@@ -95,11 +95,11 @@ const PublicationReleasePage: NextPage<Props> = ({ data }) => {
           </div>
 
           <SummaryList>
-            <SummaryListItem term="Published" testId="published-date">
+            <SummaryListItem term="Published">
               <FormattedDate>{data.published}</FormattedDate>
             </SummaryListItem>
             {isValidPartialDate(data.nextReleaseDate) && (
-              <SummaryListItem term="Next update" testId="next-update">
+              <SummaryListItem term="Next update">
                 <time>{formatPartialDate(data.nextReleaseDate)}</time>
               </SummaryListItem>
             )}
@@ -108,7 +108,7 @@ const PublicationReleasePage: NextPage<Props> = ({ data }) => {
                 <FormattedDate>{data.updates[0].on}</FormattedDate>
 
                 <Details
-                  id="releaseLastUpdated"
+                  id="releaseLastUpdates"
                   onToggle={open => {
                     if (open) {
                       logEvent(
@@ -327,23 +327,21 @@ const PublicationReleasePage: NextPage<Props> = ({ data }) => {
               <ul className="govuk-list govuk-!-width-full">
                 {data.downloadFiles.map(({ extension, name, path, size }) => (
                   <li key={path}>
-                    <div className="dfe-flex dfe-justify-content--space-between dfe-align-items--center">
-                      <h3 className="govuk-heading-s">{name}</h3>
-                      <p className="govuk-!-width-one-quarter dfe-flex-shrink--0">
-                        <ButtonLink
-                          to={`${process.env.CONTENT_API_BASE_URL}/download/${path}`}
-                          analytics={{
-                            category: 'Downloads',
-                            action: `Release page ${name} file downloaded`,
-                            label: `File URL: /api/download/${path}`,
-                          }}
-                        >
-                          {`${extension}, ${size}`}
-                        </ButtonLink>
-                      </p>
-                    </div>
+                    <Link
+                      to={`${process.env.CONTENT_API_BASE_URL}/download/${path}`}
+                      analytics={{
+                        category: 'Downloads',
+                        action: `Release page ${name} file downloaded`,
+                        label: `File URL: /api/download/${path}`,
+                      }}
+                    >
+                      {name}
+                    </Link>
+
+                    {` (${extension}, ${size})`}
                   </li>
                 ))}
+
                 <li className="govuk-!-margin-top-9">
                   <div className="dfe-flex dfe-justify-content--space-between dfe-align-items--center">
                     <div>
