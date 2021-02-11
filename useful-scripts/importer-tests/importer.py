@@ -66,7 +66,7 @@ def create_publication(api_url):
         verify=False,
     )
     if response.status_code not in {200, 300}:
-        print(f'create_publication status code was {response.status_code}. JWT needs updating?')
+        print(f'{colors.FAIL}create_publication status code was {response.status_code}. JWT needs updating?')
         sys.exit()
 
     publication_id = (response.json()['id'])
@@ -118,6 +118,10 @@ def add_subject(random_identifier, final_data_file, api_url, release_id):
         }
     )
     subject_id = response.json()['id']
+    print(f'{colors.CYAN}===========================================')
+    print(f'Subject Size: >', response.json()['size'])
+    print(f'Num of rows: >', response.json()['rows'])
+    print(f'{colors.CYAN}===========================================')
     return subject_id 
 
 def check_subject_status(random_identifier, api_url, release_id):
@@ -136,11 +140,10 @@ def check_subject_status(random_identifier, api_url, release_id):
 
     elif(response.json()['status'] == 'COMPLETE'):
         subject_end_time = time.perf_counter()
+        print(f'{colors.WARNING}====================================================================================')
         print(f'PUBLICATION URL > {api_url}/publication/{publication_id}/release/{release_id}/data')
         print(f'elapsed time > ', subject_end_time - subject_start_time)
-        print(f'Subject size: >', response.json()['size'])
-        print(f'Num of rows: >', response.json()['rows'])
-
+        print('====================================================================================')
     else:
         status = response.json()['status']
         if response.json()['errors']:
@@ -148,11 +151,11 @@ def check_subject_status(random_identifier, api_url, release_id):
             sys.exit()
         else: 
             percentageComplete = response.json()['percentageComplete']
-            print(f'subject is in stage >', status, flush=True)
+            print(f'{colors.SUCCESS}subject is in stage >', status, flush=True)
             print(f'percentage > {percentageComplete}% ', flush=True)
             time.sleep(2)
         # uncomment the below to send STDOUT to log file
-        # log = open(f'test-results/importer-log-{datetime.date.today()}.txt', 'a+')
+        # log = open(f'test-results/importer-log-{datetime.date.today()}-{random_identifier}.txt', 'a+')
         # sys.stdout = log
         check_subject_status(random_identifier, api_url, release_id)
 
@@ -190,6 +193,13 @@ def rename_csv_file(random_identifier):
 if __name__ == "__main__":
     # To prevent InsecureRequestWarning
     requests.packages.urllib3.disable_warnings()
+    class colors:
+        WARNING = '\033[93m' 
+        FAIL = '\033[91m' 
+        SUCCESS = '\033[92m'
+        CYAN = '\033[96m'
+
+
 
     load_dotenv('.env')
     api_url = os.getenv('API_URL')
