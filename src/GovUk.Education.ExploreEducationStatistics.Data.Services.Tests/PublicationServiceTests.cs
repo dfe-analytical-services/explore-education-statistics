@@ -19,10 +19,10 @@ using static GovUk.Education.ExploreEducationStatistics.Common.TableStorageTable
 
 namespace GovUk.Education.ExploreEducationStatistics.Data.Services.Tests
 {
-    public class PublicationMetaServiceTests
+    public class PublicationServiceTests
     {
         [Fact]
-        public async Task GetSubjectsForLatestRelease()
+        public async Task GetPublication()
         {
             var publication = new Publication
             {
@@ -147,13 +147,13 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Services.Tests
                     releaseFastTrack1, releaseFastTrack2
                 });
 
-                var service = BuildPublicationMetaService(context, mocks);
+                var service = BuildPublicationService(context, mocks);
 
-                var result = (await service.GetSubjectsForLatestRelease(publication.Id)).Right;
+                var result = (await service.GetPublication(publication.Id)).Right;
                 var highlights = result.Highlights.ToList();
                 var subjects = result.Subjects.ToList();
 
-                Assert.Equal(publication.Id, result.PublicationId);
+                Assert.Equal(publication.Id, result.Id);
                 Assert.Equal(2, highlights.Count);
                 Assert.Equal(releaseFastTrack1.FastTrackId, highlights[0].Id);
                 Assert.Equal(releaseFastTrack1.HighlightName, highlights[0].Label);
@@ -168,7 +168,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Services.Tests
         }
 
         [Fact]
-        public async Task GetSubjectsForLatestRelease_PublicationNotFound()
+        public async Task GetPublication_PublicationNotFound()
         {
             var builder = new DbContextOptionsBuilder<StatisticsDbContext>();
             builder.UseInMemoryDatabase(Guid.NewGuid().ToString());
@@ -177,31 +177,31 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Services.Tests
             await using (var context = new StatisticsDbContext(options, null))
             {
                 var mocks = Mocks();
-                var service = BuildPublicationMetaService(context, mocks);
+                var service = BuildPublicationService(context, mocks);
 
-                var result = await service.GetSubjectsForLatestRelease(Guid.NewGuid());
+                var result = await service.GetPublication(Guid.NewGuid());
                 Assert.IsAssignableFrom<NotFoundResult>(result.Left);
             }
         }
 
-        private static PublicationMetaService BuildPublicationMetaService(StatisticsDbContext context,
-            (Mock<ILogger<ReleaseService>> LoggerReleaseService,
+        private static PublicationService BuildPublicationService(StatisticsDbContext context,
+            (Mock<ILogger<ReleaseRepository>> LoggerReleaseService,
                 Mock<ILogger<SubjectService>> LoggerSubjectService,
                 Mock<ITableStorageService> TableStorageService) mocks)
         {
-            var releaseService = new ReleaseService(context, mocks.LoggerReleaseService.Object);
+            var releaseService = new ReleaseRepository(context, mocks.LoggerReleaseService.Object);
             var subjectService = new SubjectService(context, mocks.LoggerSubjectService.Object, releaseService);
-            return new PublicationMetaService(releaseService,
+            return new PublicationService(releaseService,
                 subjectService,
                 mocks.TableStorageService.Object,
                 MapperUtils.MapperForProfile<DataServiceMappingProfiles>());
         }
 
-        private static (Mock<ILogger<ReleaseService>> LoggerReleaseService,
+        private static (Mock<ILogger<ReleaseRepository>> LoggerReleaseService,
             Mock<ILogger<SubjectService>> LoggerSubjectService,
             Mock<ITableStorageService> TableStorageService) Mocks()
         {
-            return (new Mock<ILogger<ReleaseService>>(),
+            return (new Mock<ILogger<ReleaseRepository>>(),
                 new Mock<ILogger<SubjectService>>(),
                 new Mock<ITableStorageService>());
         }

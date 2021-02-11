@@ -1,8 +1,8 @@
 using System;
 
-namespace GovUk.Education.ExploreEducationStatistics.Data.Services.ViewModels.Meta
+namespace GovUk.Education.ExploreEducationStatistics.Data.Services.ViewModels
 {
-    public class PublicationMetaViewModel
+    public class TopicPublicationViewModel
     {
         public Guid Id { get; set; }
         public string Title { get; set; }

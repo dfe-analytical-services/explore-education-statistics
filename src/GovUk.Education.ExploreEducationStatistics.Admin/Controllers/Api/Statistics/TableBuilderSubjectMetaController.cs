@@ -1,6 +1,5 @@
 using System;
 using System.Threading.Tasks;
-using GovUk.Education.ExploreEducationStatistics.Admin.Services.Interfaces;
 using GovUk.Education.ExploreEducationStatistics.Common.Extensions;
 using GovUk.Education.ExploreEducationStatistics.Data.Model.Query;
 using GovUk.Education.ExploreEducationStatistics.Data.Services.Interfaces;
@@ -15,13 +14,10 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Controllers.Api.Stati
     [Authorize]
     public class TableBuilderMetaController : ControllerBase
     {
-        private readonly IReleaseMetaService _releaseMetaService;
         private readonly ISubjectMetaService _subjectMetaService;
 
-        public TableBuilderMetaController(IReleaseMetaService releaseMetaService,
-            ISubjectMetaService subjectMetaService)
+        public TableBuilderMetaController(ISubjectMetaService subjectMetaService)
         {
-            _releaseMetaService = releaseMetaService;
             _subjectMetaService = subjectMetaService;
         }
 
@@ -37,13 +33,6 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Controllers.Api.Stati
             [FromBody] SubjectMetaQueryContext query)
         {
             return _subjectMetaService.GetSubjectMetaRestricted(query)
-                .HandleFailuresOrOk();
-        }
-
-        [HttpGet("release/{releaseId}")]
-        public async Task<ActionResult<ReleaseSubjectsMetaViewModel>> GetReleaseSubjectsMeta(Guid releaseId)
-        {
-            return await _releaseMetaService.GetSubjectsMeta(releaseId)
                 .HandleFailuresOrOk();
         }
     }

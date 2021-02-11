@@ -10,10 +10,10 @@ using Xunit;
 
 namespace GovUk.Education.ExploreEducationStatistics.Data.Services.Tests
 {
-    public class ThemeMetaServiceTests
+    public class ThemeServiceTests
     {
         [Fact]
-        public void GetThemes()
+        public void ListThemes()
         {
             var builder = new DbContextOptionsBuilder<StatisticsDbContext>();
             builder.UseInMemoryDatabase(Guid.NewGuid().ToString());
@@ -224,9 +224,9 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Services.Tests
                 context.SaveChanges();
 
                 var service =
-                    new ThemeMetaService(context, MapperUtils.MapperForProfile<DataServiceMappingProfiles>());
+                    new ThemeService(context, MapperUtils.MapperForProfile<DataServiceMappingProfiles>());
 
-                var result = service.GetThemes().ToList();
+                var result = service.ListThemes().ToList();
 
                 Assert.Equal(2, result.Count);
                 Assert.Equal(themeA.Id, result[0].Id);
@@ -296,7 +296,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Services.Tests
         }
 
         [Fact]
-        public void GetThemes_ThemeHasNoTopics()
+        public void ListThemes_ThemeHasNoTopics()
         {
             var builder = new DbContextOptionsBuilder<StatisticsDbContext>();
             builder.UseInMemoryDatabase(Guid.NewGuid().ToString());
@@ -316,13 +316,13 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Services.Tests
                 context.SaveChanges();
 
                 var service =
-                    new ThemeMetaService(context, MapperUtils.MapperForProfile<DataServiceMappingProfiles>());
-                Assert.Empty(service.GetThemes());
+                    new ThemeService(context, MapperUtils.MapperForProfile<DataServiceMappingProfiles>());
+                Assert.Empty(service.ListThemes());
             }
         }
 
         [Fact]
-        public void GetThemes_TopicHasNoPublications()
+        public void ListThemes_TopicHasNoPublications()
         {
             var builder = new DbContextOptionsBuilder<StatisticsDbContext>();
             builder.UseInMemoryDatabase(Guid.NewGuid().ToString());
@@ -351,13 +351,13 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Services.Tests
                 context.SaveChanges();
 
                 var service =
-                    new ThemeMetaService(context, MapperUtils.MapperForProfile<DataServiceMappingProfiles>());
-                Assert.Empty(service.GetThemes());
+                    new ThemeService(context, MapperUtils.MapperForProfile<DataServiceMappingProfiles>());
+                Assert.Empty(service.ListThemes());
             }
         }
 
         [Fact]
-        public void GetThemes_PublicationHasNoReleases()
+        public void ListThemes_PublicationHasNoReleases()
         {
             var builder = new DbContextOptionsBuilder<StatisticsDbContext>();
             builder.UseInMemoryDatabase(Guid.NewGuid().ToString());
@@ -395,13 +395,13 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Services.Tests
                 context.SaveChanges();
 
                 var service =
-                    new ThemeMetaService(context, MapperUtils.MapperForProfile<DataServiceMappingProfiles>());
-                Assert.Empty(service.GetThemes());
+                    new ThemeService(context, MapperUtils.MapperForProfile<DataServiceMappingProfiles>());
+                Assert.Empty(service.ListThemes());
             }
         }
 
         [Fact]
-        public void GetThemes_PublicationHasReleasesNotPublished()
+        public void ListThemes_PublicationHasReleasesNotPublished()
         {
             var builder = new DbContextOptionsBuilder<StatisticsDbContext>();
             builder.UseInMemoryDatabase(Guid.NewGuid().ToString());
@@ -470,9 +470,9 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Services.Tests
                 context.SaveChanges();
 
                 var service =
-                    new ThemeMetaService(context, MapperUtils.MapperForProfile<DataServiceMappingProfiles>());
+                    new ThemeService(context, MapperUtils.MapperForProfile<DataServiceMappingProfiles>());
 
-                var result = service.GetThemes().ToList();
+                var result = service.ListThemes().ToList();
 
                 Assert.Single(result);
                 Assert.Equal(theme.Id, result[0].Id);

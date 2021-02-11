@@ -35,16 +35,13 @@ const PreReleaseTableToolPage = ({
   const { value: tableToolState, isLoading } = useAsyncHandledRetry<
     InitialTableToolState | undefined
   >(async () => {
-    const {
-      subjects,
-      ...releaseMeta
-    } = await tableBuilderService.getReleaseMeta(releaseId);
+    const { subjects, ...release } = await tableBuilderService.getRelease(
+      releaseId,
+    );
 
-    const highlights = orderBy(
-      releaseMeta.highlights,
-      ['label'],
-      ['asc'],
-    ).filter(highlight => highlight.id !== dataBlockId);
+    const highlights = orderBy(release.highlights, ['label'], ['asc']).filter(
+      highlight => highlight.id !== dataBlockId,
+    );
 
     if (dataBlockId) {
       const { table, query } = await dataBlockService.getDataBlock(dataBlockId);

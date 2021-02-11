@@ -14,7 +14,7 @@ import _dataBlockService, {
 } from '@admin/services/dataBlockService';
 import _permissionService from '@admin/services/permissionService';
 import _tableBuilderService, {
-  ReleaseMeta,
+  Release,
 } from '@common/services/tableBuilderService';
 import { waitFor } from '@testing-library/dom';
 import { render, screen, within } from '@testing-library/react';
@@ -137,8 +137,8 @@ describe('ReleaseDataBlockEditPage', () => {
     },
   ];
 
-  const testReleaseMeta: ReleaseMeta = {
-    releaseId: 'release-1',
+  const testRelease: Release = {
+    id: 'release-1',
     subjects: [{ id: 'subject-1', label: 'Subject 1' }],
     highlights: [],
   };
@@ -154,7 +154,7 @@ describe('ReleaseDataBlockEditPage', () => {
   });
 
   test('renders page elements correctly', async () => {
-    tableBuilderService.getReleaseMeta.mockResolvedValue(testReleaseMeta);
+    tableBuilderService.getRelease.mockResolvedValue(testRelease);
 
     renderPage();
 
@@ -328,7 +328,7 @@ describe('ReleaseDataBlockEditPage', () => {
     });
 
     test('renders page elements correctly', async () => {
-      tableBuilderService.getReleaseMeta.mockResolvedValue(testReleaseMeta);
+      tableBuilderService.getRelease.mockResolvedValue(testRelease);
 
       renderPage();
 

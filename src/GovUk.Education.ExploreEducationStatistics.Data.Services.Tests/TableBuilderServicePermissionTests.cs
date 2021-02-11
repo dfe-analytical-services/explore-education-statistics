@@ -58,7 +58,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Services.Tests
                             .Setup(s => s.GetPublicationForSubject(_subject.Id))
                             .ReturnsAsync(publication);
 
-                        var releaseService = new Mock<IReleaseService>();
+                        var releaseService = new Mock<IReleaseRepository>();
 
                         releaseService
                             .Setup(s => s.GetLatestPublishedRelease(publication.Id))
@@ -67,7 +67,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Services.Tests
                         var service = BuildTableBuilderService(
                             userService: userService.Object,
                             subjectService: subjectService.Object,
-                            releaseService: releaseService.Object
+                            releaseRepository: releaseService.Object
                         );
 
                         return await service.Query(
@@ -129,7 +129,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Services.Tests
             ISubjectService subjectService = null,
             IUserService userService = null,
             IResultBuilder<Observation, ObservationViewModel> resultBuilder = null,
-            IReleaseService releaseService = null)
+            IReleaseRepository releaseRepository = null)
         {
             return new TableBuilderService(
                 observationService ?? new Mock<IObservationService>().Object,
@@ -138,7 +138,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Services.Tests
                 subjectService ?? new Mock<ISubjectService>().Object,
                 userService ?? new Mock<IUserService>().Object,
                 resultBuilder ?? new ResultBuilder(DataServiceMapperUtils.DataServiceMapper()),
-                releaseService ?? new Mock<IReleaseService>().Object
+                releaseRepository ?? new Mock<IReleaseRepository>().Object
             );
         }
 

@@ -4,57 +4,57 @@ using AutoMapper;
 using GovUk.Education.ExploreEducationStatistics.Data.Model;
 using GovUk.Education.ExploreEducationStatistics.Data.Model.Database;
 using GovUk.Education.ExploreEducationStatistics.Data.Services.Interfaces;
-using GovUk.Education.ExploreEducationStatistics.Data.Services.ViewModels.Meta;
+using GovUk.Education.ExploreEducationStatistics.Data.Services.ViewModels;
 using Microsoft.EntityFrameworkCore;
 
 namespace GovUk.Education.ExploreEducationStatistics.Data.Services
 {
-    public class ThemeMetaService : IThemeMetaService
+    public class ThemeService : IThemeService
     {
-        private StatisticsDbContext _context;
+        private readonly StatisticsDbContext _context;
         private readonly IMapper _mapper;
 
-        public ThemeMetaService(StatisticsDbContext context,
+        public ThemeService(StatisticsDbContext context,
             IMapper mapper)
         {
             _context = context;
             _mapper = mapper;
         }
 
-        public IEnumerable<ThemeMetaViewModel> GetThemes()
+        public IEnumerable<ThemeViewModel> ListThemes()
         {
             return _context.Theme
                 .Include(theme => theme.Topics)
                 .ThenInclude(topic => topic.Publications)
                 .ThenInclude(publication => publication.Releases)
                 .Where(IsThemePublished)
-                .Select(BuildThemeMetaViewModel)
+                .Select(BuildThemeViewModel)
                 .OrderBy(theme => theme.Title);
         }
 
-        private ThemeMetaViewModel BuildThemeMetaViewModel(Theme theme)
+        private ThemeViewModel BuildThemeViewModel(Theme theme)
         {
-            var viewModel = _mapper.Map<ThemeMetaViewModel>(theme);
+            var viewModel = _mapper.Map<ThemeViewModel>(theme);
             viewModel.Topics = theme.Topics
                 .Where(IsTopicPublished)
-                .Select(BuildTopicMetaViewModel)
+                .Select(BuildTopicViewModel)
                 .OrderBy(publication => publication.Title);
             return viewModel;
         }
 
-        private TopicMetaViewModel BuildTopicMetaViewModel(Topic topic)
+        private TopicViewModel BuildTopicViewModel(Topic topic)
         {
-            var viewModel = _mapper.Map<TopicMetaViewModel>(topic);
+            var viewModel = _mapper.Map<TopicViewModel>(topic);
             viewModel.Publications = topic.Publications
                 .Where(IsPublicationPublished)
-                .Select(BuildPublicationMetaViewModel)
+                .Select(BuildPublicationViewModel)
                 .OrderBy(publication => publication.Title);
             return viewModel;
         }
 
-        private PublicationMetaViewModel BuildPublicationMetaViewModel(Publication publication)
+        private TopicPublicationViewModel BuildPublicationViewModel(Publication publication)
         {
-            return _mapper.Map<PublicationMetaViewModel>(publication);
+            return _mapper.Map<TopicPublicationViewModel>(publication);
         }
 
         private static bool IsThemePublished(Theme theme)

@@ -25,7 +25,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Services
         private readonly ISubjectService _subjectService;
         private readonly IUserService _userService;
         private readonly IResultBuilder<Observation, ObservationViewModel> _resultBuilder;
-        private readonly IReleaseService _releaseService;
+        private readonly IReleaseRepository _releaseRepository;
 
         public TableBuilderService(
             IObservationService observationService,
@@ -34,7 +34,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Services
             ISubjectService subjectService,
             IUserService userService,
             IResultBuilder<Observation, ObservationViewModel> resultBuilder,
-            IReleaseService releaseService)
+            IReleaseRepository releaseRepository)
         {
             _observationService = observationService;
             _statisticsPersistenceHelper = statisticsPersistenceHelper;
@@ -42,13 +42,13 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Services
             _subjectService = subjectService;
             _userService = userService;
             _resultBuilder = resultBuilder;
-            _releaseService = releaseService;
+            _releaseRepository = releaseRepository;
         }
 
         public async Task<Either<ActionResult, TableBuilderResultViewModel>> Query(ObservationQueryContext queryContext)
         {
             var publication = await _subjectService.GetPublicationForSubject(queryContext.SubjectId);
-            var release = _releaseService.GetLatestPublishedRelease(publication.Id);
+            var release = _releaseRepository.GetLatestPublishedRelease(publication.Id);
 
             if (release == null)
             {

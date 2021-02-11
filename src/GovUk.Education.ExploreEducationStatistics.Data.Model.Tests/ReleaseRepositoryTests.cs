@@ -10,7 +10,7 @@ using static GovUk.Education.ExploreEducationStatistics.Common.Model.TimeIdentif
 
 namespace GovUk.Education.ExploreEducationStatistics.Data.Model.Tests
 {
-    public class ReleaseServiceTests
+    public class ReleaseRepositoryTests
     {
         [Fact]
         public void GetLatestPublishedRelease()
@@ -87,9 +87,9 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Model.Tests
 
                 context.SaveChanges();
 
-                var service = new ReleaseService(context, new Mock<ILogger<ReleaseService>>().Object);
+                var repository = new ReleaseRepository(context, new Mock<ILogger<ReleaseRepository>>().Object);
 
-                var result = service.GetLatestPublishedRelease(publicationA.Id);
+                var result = repository.GetLatestPublishedRelease(publicationA.Id);
                 Assert.Equal(publicationARelease1, result);
             }
         }
@@ -103,9 +103,9 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Model.Tests
 
             using (var context = new StatisticsDbContext(options, null))
             {
-                var service = new ReleaseService(context, new Mock<ILogger<ReleaseService>>().Object);
+                var repository = new ReleaseRepository(context, new Mock<ILogger<ReleaseRepository>>().Object);
 
-                var result = service.GetLatestPublishedRelease(Guid.NewGuid());
+                var result = repository.GetLatestPublishedRelease(Guid.NewGuid());
                 Assert.Null(result);
             }
         }
