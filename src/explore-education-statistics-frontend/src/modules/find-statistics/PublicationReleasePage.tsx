@@ -184,7 +184,7 @@ const PublicationReleasePage: NextPage<Props> = ({ data }) => {
               Related information
             </h2>
             <nav role="navigation" aria-labelledby="related-information">
-              <ul className="govuk-list">
+              <ul className="govuk-list govuk-!-margin-bottom-0">
                 <li>
                   <a
                     href="#dataDownloads-1"
@@ -339,15 +339,18 @@ const PublicationReleasePage: NextPage<Props> = ({ data }) => {
             }}
           >
             <AccordionSection heading="Download data">
-              <ul className="govuk-list govuk-!-width-three-quarters">
+              <p className="govuk-caption-m">
+                Find and download files used in the production of this release.
+              </p>
+              <ul className="govuk-list govuk-!-width-full">
                 {data.downloadFiles.map(({ extension, name, path, size }) => (
                   <li key={path}>
                     <div className="dfe-flex dfe-justify-content--space-between dfe-align-items--center">
                       <h3 className="govuk-heading-s">{name}</h3>
-                      <p className="govuk-!-width-one-quarter">
+                      <p className="govuk-!-width-one-quarter dfe-flex-shrink--0">
                         <Link
                           to={`${process.env.CONTENT_API_BASE_URL}/download/${path}`}
-                          className="govuk-button govuk-button--secondary govuk-!-width-full govuk-!-margin-bottom-0"
+                          className="govuk-button govuk-button--secondary"
                           analytics={{
                             category: 'Downloads',
                             action: `Release page ${name} file downloaded`,
@@ -360,6 +363,28 @@ const PublicationReleasePage: NextPage<Props> = ({ data }) => {
                     </div>
                   </li>
                 ))}
+                <li className="govuk-!-margin-top-9">
+                  <div className="dfe-flex dfe-justify-content--space-between dfe-align-items--center">
+                    <div>
+                      <h2 className="govuk-heading-m">
+                        Create your own tables online
+                      </h2>
+                      <p>
+                        Use our tool to build tables using our range of national
+                        and regional data.
+                      </p>
+                    </div>
+                    <p className="govuk-!-width-one-quarter dfe-flex-shrink--0">
+                      <ButtonLink
+                        className="govuk-!-width-full"
+                        to="/data-tables/[publication]"
+                        as={`/data-tables/${data.publication.slug}`}
+                      >
+                        Create tables
+                      </ButtonLink>
+                    </p>
+                  </div>
+                </li>
               </ul>
             </AccordionSection>
           </Accordion>
