@@ -25,7 +25,6 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Services
         private readonly ContentDbContext _contentDbContext;
         private readonly IPersistenceHelper<ContentDbContext> _contentPersistenceHelper;
         private readonly StatisticsDbContext _statisticsDbContext;
-        private readonly IDataImportRepository _dataImportRepository;
         private readonly IUserService _userService;
         private readonly IMetaGuidanceSubjectService _metaGuidanceSubjectService;
 
@@ -33,14 +32,12 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Services
             ContentDbContext contentDbContext,
             IPersistenceHelper<ContentDbContext> contentPersistenceHelper,
             StatisticsDbContext statisticsDbContext,
-            IDataImportRepository dataImportRepository,
             IUserService userService,
             IMetaGuidanceSubjectService metaGuidanceSubjectService)
         {
             _contentDbContext = contentDbContext;
             _contentPersistenceHelper = contentPersistenceHelper;
             _statisticsDbContext = statisticsDbContext;
-            _dataImportRepository = dataImportRepository;
             _userService = userService;
             _metaGuidanceSubjectService = metaGuidanceSubjectService;
         }
@@ -52,24 +49,26 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Services
                 .OnSuccess(_userService.CheckCanViewRelease)
                 .OnSuccess(async release =>
                 {
-                    var files = _contentDbContext.ReleaseFiles
+                    var subjectsToInclude = _contentDbContext.ReleaseFiles
                         .Include(rf => rf.File)
                         .Where(rf => rf.ReleaseId == releaseId
-                                       && rf.File.Type == FileType.Data
-                                       // Exclude files that are replacements in progress
-                                       && !rf.File.ReplacingId.HasValue)
-                        .Select(file => file.File)
+                                     && rf.File.Type == FileType.Data
+                                     // Exclude files that are replacements in progress
+                                     && !rf.File.ReplacingId.HasValue
+                                     && rf.File.SubjectId.HasValue)
+                        .Join(
+                            _contentDbContext.DataImports,
+                            releaseFile => releaseFile.File,
+                            import => import.File,
+                            (releaseFile, import) => new
+                            {
+                                ReleaseFile = releaseFile,
+                                DataImport = import
+                            }
+                        )
+                        .Where(join => join.DataImport.Status == DataImportStatus.COMPLETE)
+                        .Select(join => join.ReleaseFile.File.SubjectId.Value)
                         .ToList();
-
-                    var subjectsToInclude = new List<Guid>();
-                    foreach (var file in files)
-                    {
-                        var importStatus = await _dataImportRepository.GetStatusByFileId(file.Id);
-                        if (importStatus == DataImportStatus.COMPLETE && file.SubjectId.HasValue)
-                        {
-                            subjectsToInclude.Add(file.SubjectId.Value);
-                        }
-                    }
 
                     var subjects = await GetSubjects(releaseId, subjectsToInclude);
 
@@ -96,6 +95,11 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Services
 
         private async Task<List<SubjectViewModel>> GetSubjects(Guid releaseId, List<Guid> subjectsToInclude)
         {
+            if (subjectsToInclude.Count == 0)
+            {
+                return new List<SubjectViewModel>();
+            }
+
             var releaseSubjects = await _statisticsDbContext.ReleaseSubject
                 .Include(subject => subject.Subject)
                 .Where(

@@ -4,7 +4,6 @@ using GovUk.Education.ExploreEducationStatistics.Common.Tests.Utils;
 using GovUk.Education.ExploreEducationStatistics.Common.Utils;
 using GovUk.Education.ExploreEducationStatistics.Content.Model;
 using GovUk.Education.ExploreEducationStatistics.Content.Model.Database;
-using GovUk.Education.ExploreEducationStatistics.Content.Model.Repository.Interfaces;
 using GovUk.Education.ExploreEducationStatistics.Content.Security;
 using GovUk.Education.ExploreEducationStatistics.Data.Model.Database;
 using GovUk.Education.ExploreEducationStatistics.Data.Services.Interfaces;
@@ -38,7 +37,6 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Services.Tests
             ContentDbContext contentDbContext = null,
             IPersistenceHelper<ContentDbContext> persistenceHelper = null,
             StatisticsDbContext statisticsDbContext = null,
-            IDataImportRepository dataImportRepository = null,
             IUserService userService = null,
             IMetaGuidanceSubjectService metaGuidanceSubjectService = null)
         {
@@ -46,7 +44,6 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Services.Tests
                 contentDbContext ?? new Mock<ContentDbContext>().Object,
                 persistenceHelper ?? DefaultPersistenceHelperMock().Object,
                 statisticsDbContext ?? new Mock<StatisticsDbContext>().Object,
-                dataImportRepository ?? new Mock<IDataImportRepository>().Object,
                 userService ?? new Mock<IUserService>().Object,
                 metaGuidanceSubjectService ?? new Mock<IMetaGuidanceSubjectService>().Object
             );

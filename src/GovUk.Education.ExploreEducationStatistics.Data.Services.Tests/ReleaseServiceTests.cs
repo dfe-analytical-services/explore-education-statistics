@@ -8,8 +8,6 @@ using GovUk.Education.ExploreEducationStatistics.Common.Tests.Utils;
 using GovUk.Education.ExploreEducationStatistics.Common.Utils;
 using GovUk.Education.ExploreEducationStatistics.Content.Model;
 using GovUk.Education.ExploreEducationStatistics.Content.Model.Database;
-using GovUk.Education.ExploreEducationStatistics.Content.Model.Repository;
-using GovUk.Education.ExploreEducationStatistics.Content.Model.Repository.Interfaces;
 using GovUk.Education.ExploreEducationStatistics.Data.Model;
 using GovUk.Education.ExploreEducationStatistics.Data.Model.Database;
 using GovUk.Education.ExploreEducationStatistics.Data.Services.Interfaces;
@@ -462,6 +460,132 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Services.Tests
         }
 
         [Fact]
+        public async Task GetRelease_FiltersSubjectsWithNoImport()
+        {
+            var releaseId = Guid.NewGuid();
+
+            var contentRelease = new Release
+            {
+                Id = releaseId
+            };
+
+            var statisticsRelease = new Data.Model.Release
+            {
+                Id = releaseId
+            };
+
+            var releaseSubject = new ReleaseSubject
+            {
+                Release = statisticsRelease,
+                Subject = new Subject
+                {
+                    Id = Guid.NewGuid(),
+                    Name = "Subject 1"
+                }
+            };
+
+            var releaseFile = new ReleaseFile
+            {
+                Release = contentRelease,
+                File = new File
+                {
+                    Release = contentRelease,
+                    Filename = "data1.csv",
+                    Type = FileType.Data,
+                    SubjectId = releaseSubject.Subject.Id
+                }
+            };
+
+            var contentDbContextId = Guid.NewGuid().ToString();
+            var statisticsDbContextId = Guid.NewGuid().ToString();
+
+            await using (var contentDbContext = InMemoryContentDbContext(contentDbContextId))
+            {
+                await contentDbContext.AddAsync(contentRelease);
+                await contentDbContext.AddRangeAsync(releaseFile);
+                await contentDbContext.SaveChangesAsync();
+            }
+
+            await using (var statisticsDbContext = InMemoryStatisticsDbContext(statisticsDbContextId))
+            {
+                await statisticsDbContext.AddRangeAsync(releaseSubject);
+                await statisticsDbContext.SaveChangesAsync();
+            }
+
+            await using (var contentDbContext = InMemoryContentDbContext(contentDbContextId))
+            await using (var statisticsDbContext = InMemoryStatisticsDbContext(statisticsDbContextId))
+            {
+                var service = BuildReleaseService(
+                    contentDbContext: contentDbContext,
+                    statisticsDbContext: statisticsDbContext
+                );
+
+                var result = await service.GetRelease(contentRelease.Id);
+
+                Assert.True(result.IsRight);
+
+                Assert.Equal(contentRelease.Id, result.Right.Id);
+
+                var subjects = result.Right.Subjects;
+
+                Assert.Empty(subjects);
+            }
+        }
+
+        [Fact]
+        public async Task GetRelease_FiltersSubjectsWithNoFileSubjectId()
+        {
+            var releaseId = Guid.NewGuid();
+
+            var release = new Release
+            {
+                Id = releaseId
+            };
+
+            var releaseFile = new ReleaseFile
+            {
+                Release = release,
+                File = new File
+                {
+                    Release = release,
+                    Filename = "data1.csv",
+                    Type = FileType.Data,
+                }
+            };
+
+            var import = new DataImport
+            {
+                File = releaseFile.File,
+                Status = DataImportStatus.COMPLETE
+            };
+
+            var contentDbContextId = Guid.NewGuid().ToString();
+
+            await using (var contentDbContext = InMemoryContentDbContext(contentDbContextId))
+            {
+                await contentDbContext.AddAsync(release);
+                await contentDbContext.AddRangeAsync(releaseFile);
+                await contentDbContext.AddRangeAsync(import);
+                await contentDbContext.SaveChangesAsync();
+            }
+
+            await using (var contentDbContext = InMemoryContentDbContext(contentDbContextId))
+            {
+                var service = BuildReleaseService(contentDbContext: contentDbContext);
+
+                var result = await service.GetRelease(release.Id);
+
+                Assert.True(result.IsRight);
+
+                Assert.Equal(release.Id, result.Right.Id);
+
+                var subjects = result.Right.Subjects;
+
+                Assert.Empty(subjects);
+            }
+        }
+
+        [Fact]
         public async Task GetRelease_FiltersHighlights()
         {
             var releaseId = Guid.NewGuid();
@@ -598,7 +722,6 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Services.Tests
             ContentDbContext contentDbContext = null,
             IPersistenceHelper<ContentDbContext> persistenceHelper = null,
             StatisticsDbContext statisticsDbContext = null,
-            IDataImportRepository dataImportRepository = null,
             IUserService userService = null,
             IMetaGuidanceSubjectService metaGuidanceSubjectService = null)
         {
@@ -606,7 +729,6 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Services.Tests
                 contentDbContext ?? new Mock<ContentDbContext>().Object,
                 persistenceHelper ?? new PersistenceHelper<ContentDbContext>(contentDbContext),
                 statisticsDbContext ?? new Mock<StatisticsDbContext>().Object,
-                dataImportRepository ?? new DataImportRepository(contentDbContext),
                 userService ?? MockUtils.AlwaysTrueUserService().Object,
                 metaGuidanceSubjectService ?? new Mock<IMetaGuidanceSubjectService>().Object
             );
