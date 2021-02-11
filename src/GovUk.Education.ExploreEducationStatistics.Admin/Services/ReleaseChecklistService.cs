@@ -22,6 +22,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Services
 {
     public class ReleaseChecklistService : IReleaseChecklistService
     {
+        private readonly ContentDbContext _contentDbContext;
         private readonly IPersistenceHelper<ContentDbContext> _persistenceHelper;
         private readonly IDataImportService _dataImportService;
         private readonly IUserService _userService;
@@ -31,6 +32,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Services
         private readonly IDataBlockService _dataBlockService;
 
         public ReleaseChecklistService(
+            ContentDbContext contentDbContext,
             IPersistenceHelper<ContentDbContext> persistenceHelper,
             IDataImportService dataImportService,
             IUserService userService,
@@ -39,6 +41,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Services
             IFootnoteRepository footnoteRepository,
             IDataBlockService dataBlockService)
         {
+            _contentDbContext = contentDbContext;
             _persistenceHelper = persistenceHelper;
             _dataImportService = dataImportService;
             _userService = userService;
@@ -101,7 +104,50 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Services
                 errors.Add(new ReleaseChecklistIssue(ValidationErrorMessages.ReleaseNoteRequired));
             }
 
+            if (await ReleaseHasEmptyGenericContentSection(release.Id))
+            {
+                errors.Add(new ReleaseChecklistIssue(ValidationErrorMessages.EmptyContentSectionExists));
+            }
+
+            if (await ReleaseGenericContentSectionsContainEmptyContentBlock(release.Id))
+            {
+                errors.Add(new ReleaseChecklistIssue(ValidationErrorMessages.GenericSectionsContainEmptyHtmlBlock));
+            }
+
             return errors;
+        }
+
+        private async Task<bool> ReleaseHasEmptyGenericContentSection(Guid releaseId)
+        {
+            return await _contentDbContext.ReleaseContentSections
+                .Include(rcs => rcs.ContentSection)
+                .ThenInclude(cs => cs.Content)
+                .Where(rcs =>
+                    rcs.ReleaseId == releaseId
+                    && rcs.ContentSection.Type == ContentSectionType.Generic)
+                .AnyAsync(rcs => rcs.ContentSection.Content.Count == 0);
+        }
+
+        private async Task<bool> ReleaseGenericContentSectionsContainEmptyContentBlock(Guid releaseId)
+        {
+            var releaseGenericContentBlocks = await _contentDbContext.ReleaseContentSections
+                .Include(rcs => rcs.ContentSection)
+                .ThenInclude(cs => cs.Content)
+                .Where(rcs =>
+                    rcs.ReleaseId == releaseId
+                    && rcs.ContentSection.Type == ContentSectionType.Generic)
+                .SelectMany(rcs => rcs.ContentSection.Content)
+                .ToListAsync();
+                
+            return releaseGenericContentBlocks 
+                .Any(block =>
+                {
+                    if (block is HtmlBlock htmlBlock)
+                    {
+                        return htmlBlock.Body.IsNullOrEmpty();
+                    }
+                    return false;
+                });
         }
 
         public async Task<List<ReleaseChecklistIssue>> GetWarnings(Release release)

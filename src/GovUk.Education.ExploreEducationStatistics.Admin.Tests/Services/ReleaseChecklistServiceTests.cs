@@ -44,11 +44,45 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
                 Version = 1,
             };
 
+            var releaseContentSection1 = new ReleaseContentSection
+            {
+                Release = release,
+                ContentSection = new ContentSection
+                {
+                    Type = ContentSectionType.Generic,
+                    Content = new List<ContentBlock>()
+                }
+            };
+
+            var releaseContentSection2 = new ReleaseContentSection
+            {
+                Release = release,
+                ContentSection = new ContentSection
+                {
+                    Type = ContentSectionType.Generic,
+                    Content = new List<ContentBlock>
+                    {
+                        new HtmlBlock
+                        {
+                            Body = "<p>Test</p>"
+                        },
+                        new DataBlock(),
+                        new HtmlBlock
+                        {
+                            Body = ""
+                        }
+                    }
+                }
+            };
+
             var contextId = Guid.NewGuid().ToString();
 
             await using (var context = ContentDbUtils.InMemoryContentDbContext(contextId))
             {
-                await context.AddRangeAsync(release, originalRelease);
+                await context.AddRangeAsync(
+                    releaseContentSection1,
+                    releaseContentSection2,
+                    originalRelease);
                 await context.SaveChangesAsync();
             }
 
@@ -93,7 +127,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
 
                 Assert.False(checklist.Right.Valid);
 
-                Assert.Equal(5, checklist.Right.Errors.Count);
+                Assert.Equal(7, checklist.Right.Errors.Count);
 
                 Assert.Equal(DataFileImportsMustBeCompleted, checklist.Right.Errors[0].Code);
                 Assert.Equal(DataFileReplacementsMustBeCompleted, checklist.Right.Errors[1].Code);
@@ -105,6 +139,8 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
 
                 Assert.Equal(PublicMetaGuidanceRequired, checklist.Right.Errors[3].Code);
                 Assert.Equal(ReleaseNoteRequired, checklist.Right.Errors[4].Code);
+                Assert.Equal(EmptyContentSectionExists, checklist.Right.Errors[5].Code);
+                Assert.Equal(GenericSectionsContainEmptyHtmlBlock, checklist.Right.Errors[6].Code);
             }
         }
 
@@ -318,12 +354,61 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
                     }
                 },
             };
+            
+            var releaseContentSection1 = new ReleaseContentSection
+            {
+                Release = release,
+                ContentSection = new ContentSection
+                {
+                    Type = ContentSectionType.Generic,
+                    Content = new List<ContentBlock>
+                    {
+                        new HtmlBlock
+                        {
+                            Body = "<p>test</p>"
+                        }
+                    }
+                }
+            };
+
+            var releaseContentSection2 = new ReleaseContentSection
+            {
+                Release = release,
+                ContentSection = new ContentSection
+                {
+                    Type = ContentSectionType.Generic,
+                    Content = new List<ContentBlock>
+                    {
+                        new DataBlock()
+                    }
+                }
+            };
+
+            var releaseContentSection3 = new ReleaseContentSection
+            {
+                Release = release,
+                ContentSection = new ContentSection
+                {
+                    Type = ContentSectionType.Headlines,
+                    Content = new List<ContentBlock>
+                    {
+                        new HtmlBlock
+                        {
+                            Body = ""
+                        }
+                    }
+                }
+            };
 
             var contextId = Guid.NewGuid().ToString();
 
             await using (var context = ContentDbUtils.InMemoryContentDbContext(contextId))
             {
-                await context.AddRangeAsync(release, originalRelease);
+                await context.AddRangeAsync(
+                    releaseContentSection1,
+                    releaseContentSection2,
+                    releaseContentSection3,
+                    originalRelease);
                 await context.SaveChangesAsync();
             }
 
@@ -434,6 +519,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
             IDataBlockService dataBlockService = null)
         {
             return new ReleaseChecklistService(
+                contentDbContext,
                 new PersistenceHelper<ContentDbContext>(contentDbContext),
                 dataImportService ?? new Mock<IDataImportService>().Object,
                 userService ?? MockUtils.AlwaysTrueUserService().Object,
