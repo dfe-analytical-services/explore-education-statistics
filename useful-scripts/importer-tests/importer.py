@@ -9,54 +9,53 @@ import datetime
 import random 
 import sys
 from pathlib import Path
-import logging
 from dotenv import load_dotenv
 import zipfile
-import subprocess
 import glob 
 from os.path import basename
-
 
 """ 
 Instructions
 
 - place a zip file (containing a data and a meta file) in an archive file called 'archive.zip' in the root of ~/importer-tests
-- move the .env.example to .env ('mv .env.example .env')
-- get a jwt token from Admin EES & place in .env file
-- Command to run importer script: pipenv run python importer.py 
-- use the -c option if you want to import more than one subject (i.e. 'pipenv run python importer.py -c 5')
 
+- move the .env.example to .env ('mv .env.example .env')
+
+- get a jwt token from Admin EES & place in .env file
+
+- get the topic ID from the &topicid query parameter on Admin EES 
+
+- place the API url value in the .env file (i.e. https://localhost:5021, dev Admin URL etc.). Do not leave a leading slash at the end of this URL. 
+
+- Command to run importer script: pipenv run python importer.py 
+
+- use the -c option if you want to import more than one subject (i.e. 'pipenv run python importer.py -c 5')
 """ 
 
+parser = argparse.ArgumentParser(prog="pipenv run python importer.py", description="Used to load test importer")
 
-parser = argparse.ArgumentParser(prog="python authenticate.py", description="Used to load test importer")
 parser.add_argument("-c", "--count",
                     dest="count",
                     default=1,
                     type=int,
                     help="num of subjects to upload")
-parser.add_argument("-e", "--env",
-                    dest="env",
-                    default='dev',
-                    choices=['local', 'dev'],
-                    type=str,
-                    help="the environment to run tests against")
+
 args = parser.parse_args()
 
 
-def create_publication(API_URL):
+def create_publication(api_url):
     run_identifier = datetime.datetime.utcnow().strftime('%Y%m%d-%H%M%S')
     print(f'Starting load test with RUN_IDENTIFIER: {run_identifier}')
     response = requests.request(
         "POST",
-        url=f'{API_URL}/api/publications',
+        url=f'{api_url}/api/publications',
         headers={
             "Content-Type": "application/json",
-            "Authorization": f"Bearer {os.getenv('JWT_TOKEN')}",
+            "Authorization": f"Bearer {jwt_token}",
         },
         json={
             "title": f"importer-test_{run_identifier}",
-            "topicId": "3cd51f1d-6d9a-4c1e-3bfd-08d8b3c1d3dc", 
+            "topicId": f"{topic_id}", 
             "contact": {
                 "contactName": f"import-test_{run_identifier}",
                 "contactTelNo": "123456789",
@@ -74,14 +73,13 @@ def create_publication(API_URL):
     return publication_id
 
 
-# creates a new release for a given publication 
-def create_release(API_URL, publication_id):
+def create_release(api_url, publication_id):
     response = requests.request(
         "POST",
-        url=f'{API_URL}/api/publications/{publication_id}/releases',
+        url=f'{api_url}/api/publications/{publication_id}/releases',
         headers={
             "Content-Type": "application/json",
-            "Authorization": f"Bearer {os.getenv('JWT_TOKEN')}",
+            "Authorization": f"Bearer {jwt_token}",
         },
         verify=False,
         json={
@@ -105,51 +103,58 @@ def create_release(API_URL, publication_id):
     return release_id
 
 
-def add_subject(random_identifier, file_z, API_URL, release_id):
+def add_subject(random_identifier, final_data_file, api_url, release_id):
     global subject_start_time
     subject_start_time = time.perf_counter()
     response = requests.request(
         "POST",
-        url=f'{API_URL}/api/release/{release_id}/zip-data?name=test-subject-{random_identifier}',
+        url=f'{api_url}/api/release/{release_id}/zip-data?name=test-subject-{random_identifier}',
         verify=False,
         headers={
-            "Authorization": f"Bearer {os.getenv('JWT_TOKEN')}",
+            "Authorization": f"Bearer {jwt_token}",
         },
         files = {
-            "zipFile": file_z
+            "zipFile": final_data_file
         }
     )
+    subject_id = response.json()['id']
+    return subject_id 
 
-
-def check_subject_status(random_identifier, API_URL, release_id):
+def check_subject_status(random_identifier, api_url, release_id):
     response = requests.request(
         "GET",
-        url=f'https://admin.dev.explore-education-statistics.service.gov.uk/api/release/{release_id}/data/subject-{random_identifier}.csv/import/status',
+        url=f'{api_url}/api/release/{release_id}/data/{subject_id}/import/status',
         verify=False,
         headers={
-            "Authorization": f"Bearer {os.getenv('JWT_TOKEN')}",
+            "Authorization": f"Bearer {jwt_token}",
             "Content-Type": "application/json",
         },
     )
     if(response.json()['status'] == 'NOT_FOUND'): 
         print('failed to find subject. Trying again to find import status')
-        check_subject_status(random_identifier, API_URL, release_id)
+        check_subject_status(random_identifier, api_url, release_id)
 
     elif(response.json()['status'] == 'COMPLETE'):
         subject_end_time = time.perf_counter()
-        print(f'PUBLICATION URL > {API_URL}/publication/{publication_id}/release/{release_id}/data')
+        print(f'PUBLICATION URL > {api_url}/publication/{publication_id}/release/{release_id}/data')
         print(f'elapsed time > ', subject_end_time - subject_start_time)
+        print(f'Subject size: >', response.json()['size'])
+        print(f'Num of rows: >', response.json()['rows'])
 
     else:
         status = response.json()['status']
-        percentageComplete = response.json()['percentageComplete']
-        print(f'subject is in stage >', status, flush=True)
-        print(f'percentage > {percentageComplete}% ', flush=True)
-        time.sleep(2)
+        if response.json()['errors']:
+            print(f'errors occured:', response.json()['errors'])
+            sys.exit()
+        else: 
+            percentageComplete = response.json()['percentageComplete']
+            print(f'subject is in stage >', status, flush=True)
+            print(f'percentage > {percentageComplete}% ', flush=True)
+            time.sleep(2)
         # uncomment the below to send STDOUT to log file
         # log = open(f'test-results/importer-log-{datetime.date.today()}.txt', 'a+')
         # sys.stdout = log
-        check_subject_status(random_identifier, API_URL, release_id)
+        check_subject_status(random_identifier, api_url, release_id)
 
 
 def rename_csv_file(random_identifier):
@@ -172,7 +177,7 @@ def rename_csv_file(random_identifier):
         data_filepath = glob.glob(f'./test-files/*.csv')[0]
         data_filename = os.path.basename(data_filepath)
         os.rename(f'./test-files/{data_filename}', f'./test-files/subject-{random_identifier}.csv')
- 
+
         with zipfile.ZipFile(f'test-{random_identifier}.zip', 'w') as zip: 
             test_dir = './test-files'
             file_path = get_all_file_paths(test_dir)
@@ -186,9 +191,14 @@ if __name__ == "__main__":
     # To prevent InsecureRequestWarning
     requests.packages.urllib3.disable_warnings()
 
-    API_URL = 'https://admin.dev.explore-education-statistics.service.gov.uk'
     load_dotenv('.env')
-
+    api_url = os.getenv('API_URL')
+    jwt_token = os.getenv('JWT_TOKEN')
+    topic_id = os.getenv('TOPIC_ID')
+    assert api_url is not None
+    assert jwt_token is not None
+    assert topic_id is not None
+    
     # clean zip files
     for zip_file in Path('.').glob('test-*.zip'):
         if(zip_file):
@@ -201,8 +211,8 @@ if __name__ == "__main__":
     if not os.path.exists(f'test-files'): 
         os.makedirs('test-files')
 
-    publication_id = create_publication(API_URL)
-    release_id = create_release(API_URL, publication_id)
+    publication_id = create_publication(api_url)
+    release_id = create_release(api_url, publication_id)
 
     for i in range (args.count):
         random_identifier = random.randint(0, 1000000)
@@ -211,7 +221,7 @@ if __name__ == "__main__":
         for file in Path("./test-files").glob("*.csv"):
             os.remove(file)
 
-        file_z = open(f'test-{random_identifier}.zip', 'rb')
+        final_data_file = open(f'test-{random_identifier}.zip', 'rb')
 
-        add_subject(random_identifier, file_z, API_URL, release_id)
-        check_subject_status(random_identifier, API_URL, release_id)
+        subject_id = add_subject(random_identifier, final_data_file, api_url, release_id)
+        check_subject_status(random_identifier, api_url, release_id)
