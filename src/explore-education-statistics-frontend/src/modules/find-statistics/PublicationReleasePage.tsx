@@ -1,7 +1,10 @@
+import Accordion from '@common/components/Accordion';
 import AccordionSection from '@common/components/AccordionSection';
 import Details from '@common/components/Details';
 import FormattedDate from '@common/components/FormattedDate';
 import RelatedAside from '@common/components/RelatedAside';
+import SummaryList from '@common/components/SummaryList';
+import SummaryListItem from '@common/components/SummaryListItem';
 import ContentBlockRenderer from '@common/modules/find-statistics/components/ContentBlockRenderer';
 import publicationService, {
   Release,
@@ -22,7 +25,6 @@ import { logEvent } from '@frontend/services/googleAnalyticsService';
 import classNames from 'classnames';
 import { GetServerSideProps, NextPage } from 'next';
 import React from 'react';
-import Accordion from '@common/components/Accordion';
 import PublicationReleaseHeadlinesSection from './components/PublicationReleaseHeadlinesSection';
 import styles from './PublicationReleasePage.module.scss';
 
@@ -92,81 +94,61 @@ const PublicationReleasePage: NextPage<Props> = ({ data }) => {
             </div>
           </div>
 
-          <dl className="govuk-summary-list">
-            <div className="govuk-summary-list__row">
-              <dt className="govuk-summary-list__key">Published </dt>
-              <dd
-                className="govuk-summary-list__value"
-                data-testid="published-date"
-              >
-                <FormattedDate>{data.published}</FormattedDate>
-              </dd>
-            </div>
+          <SummaryList>
+            <SummaryListItem term="Published" testId="published-date">
+              <FormattedDate>{data.published}</FormattedDate>
+            </SummaryListItem>
             {isValidPartialDate(data.nextReleaseDate) && (
-              <div className="govuk-summary-list__row">
-                <dt className="govuk-summary-list__key">Next update </dt>
-                <dd
-                  className="govuk-summary-list__value"
-                  data-testid="next-update"
-                >
-                  <time>{formatPartialDate(data.nextReleaseDate)}</time>
-                </dd>
-              </div>
+              <SummaryListItem term="Next update" testId="next-update">
+                <time>{formatPartialDate(data.nextReleaseDate)}</time>
+              </SummaryListItem>
             )}
             {data.updates && data.updates.length > 0 && (
-              <div className="govuk-summary-list__row">
-                <dt className="govuk-summary-list__key">Last updated</dt>
-                <dd
-                  className="govuk-summary-list__value"
+              <SummaryListItem term="Last updated">
+                <FormattedDate>{data.updates[0].on}</FormattedDate>
+
+                <Details
                   id="releaseLastUpdated"
-                >
-                  <FormattedDate>{data.updates[0].on}</FormattedDate>
-                  <Details
-                    id="releaseNotes"
-                    onToggle={open => {
-                      if (open) {
-                        logEvent(
-                          'Last Updates',
-                          'Release page last updates dropdown opened',
-                          window.location.pathname,
-                        );
-                      }
-                    }}
-                    summary={`See all updates (${data.updates.length})`}
-                  >
-                    <ol className="govuk-list">
-                      {data.updates.map(note => (
-                        <li key={note.id}>
-                          <FormattedDate className="govuk-body govuk-!-font-weight-bold">
-                            {note.on}
-                          </FormattedDate>
-                          <p>{note.reason}</p>
-                        </li>
-                      ))}
-                      down
-                    </ol>
-                  </Details>
-                </dd>
-              </div>
-            )}
-            <div className="govuk-summary-list__row">
-              <dt className="govuk-summary-list__key">Receive updates </dt>
-              <dd className="govuk-summary-list__value">
-                <Link
-                  className="dfe-print-hidden govuk-!-font-weight-bold"
-                  unvisited
-                  analytics={{
-                    category: 'Subscribe',
-                    action: 'Email subscription',
+                  onToggle={open => {
+                    if (open) {
+                      logEvent(
+                        'Last Updates',
+                        'Release page last updates dropdown opened',
+                        window.location.pathname,
+                      );
+                    }
                   }}
-                  to={`/subscriptions?slug=${data.publication.slug}`}
-                  data-testid={`subscription-${data.publication.slug}`}
+                  summary={`See all updates (${data.updates.length})`}
                 >
-                  Sign up for email alerts
-                </Link>
-              </dd>
-            </div>
-          </dl>
+                  <ol className="govuk-list">
+                    {data.updates.map(note => (
+                      <li key={note.id}>
+                        <FormattedDate className="govuk-body govuk-!-font-weight-bold">
+                          {note.on}
+                        </FormattedDate>
+                        <p>{note.reason}</p>
+                      </li>
+                    ))}
+                    down
+                  </ol>
+                </Details>
+              </SummaryListItem>
+            )}
+            <SummaryListItem term="Receive updates">
+              <Link
+                className="dfe-print-hidden govuk-!-font-weight-bold"
+                unvisited
+                analytics={{
+                  category: 'Subscribe',
+                  action: 'Email subscription',
+                }}
+                to={`/subscriptions?slug=${data.publication.slug}`}
+                data-testid={`subscription-${data.publication.slug}`}
+              >
+                Sign up for email alerts
+              </Link>
+            </SummaryListItem>
+          </SummaryList>
 
           {data.summarySection.content.map(block => (
             <ContentBlockRenderer key={block.id} block={block} />
@@ -348,9 +330,8 @@ const PublicationReleasePage: NextPage<Props> = ({ data }) => {
                     <div className="dfe-flex dfe-justify-content--space-between dfe-align-items--center">
                       <h3 className="govuk-heading-s">{name}</h3>
                       <p className="govuk-!-width-one-quarter dfe-flex-shrink--0">
-                        <Link
+                        <ButtonLink
                           to={`${process.env.CONTENT_API_BASE_URL}/download/${path}`}
-                          className="govuk-button govuk-button--secondary"
                           analytics={{
                             category: 'Downloads',
                             action: `Release page ${name} file downloaded`,
@@ -358,7 +339,7 @@ const PublicationReleasePage: NextPage<Props> = ({ data }) => {
                           }}
                         >
                           {`${extension}, ${size}`}
-                        </Link>
+                        </ButtonLink>
                       </p>
                     </div>
                   </li>
