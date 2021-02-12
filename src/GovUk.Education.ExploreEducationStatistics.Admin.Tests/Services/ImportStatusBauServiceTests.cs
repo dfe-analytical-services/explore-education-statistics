@@ -43,14 +43,39 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
                 ReleaseName = "2000"
             };
 
-            var import1 = new DataImport
+            var releaseFile1 = new ReleaseFile
             {
                 File = new File
                 {
-                    Release = release,
                     Filename = "file1.csv",
                     Type = FileType.Data
                 },
+                Release = release
+            };
+
+            var releaseFile2 = new ReleaseFile
+            {
+                File = new File
+                {
+                    Filename = "file2.csv",
+                    Type = FileType.Data
+                },
+                Release = release
+            };
+
+            var releaseFile3 = new ReleaseFile
+            {
+                File = new File
+                {
+                    Filename = "file3.csv",
+                    Type = FileType.Data
+                },
+                Release = release
+            };
+
+            var import1 = new DataImport
+            {
+                File = releaseFile1.File,
                 NumBatches = 1,
                 Rows = 100,
                 StagePercentageComplete = 99,
@@ -61,12 +86,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
 
             var import2 = new DataImport
             {
-                File = new File
-                {
-                    Release = release,
-                    Filename = "file2.csv",
-                    Type = FileType.Data
-                },
+                File = releaseFile2.File,
                 NumBatches = 2,
                 Rows = 200,
                 StagePercentageComplete = 54,
@@ -77,12 +97,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
 
             var import3 = new DataImport
             {
-                File = new File
-                {
-                    Release = release,
-                    Filename = "file3.csv",
-                    Type = FileType.Data
-                },
+                File = releaseFile3.File,
                 NumBatches = 3,
                 Rows = 300,
                 StagePercentageComplete = 76,
@@ -95,6 +110,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
             await using (var contentDbContext = InMemoryApplicationDbContext(contextId))
             {
                 await contentDbContext.Releases.AddAsync(release);
+                await contentDbContext.ReleaseFiles.AddRangeAsync(releaseFile1, releaseFile2, releaseFile3);
                 await contentDbContext.DataImports.AddRangeAsync(import1, import2, import3);
                 await contentDbContext.SaveChangesAsync();
             }

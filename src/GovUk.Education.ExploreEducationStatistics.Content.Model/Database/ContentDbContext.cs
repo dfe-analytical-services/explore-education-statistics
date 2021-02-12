@@ -205,11 +205,6 @@ namespace GovUk.Education.ExploreEducationStatistics.Content.Model.Database
                 .OnDelete(DeleteBehavior.NoAction);
 
             modelBuilder.Entity<File>()
-                .HasOne(r => r.Release)
-                .WithMany()
-                .OnDelete(DeleteBehavior.Cascade);
-
-            modelBuilder.Entity<File>()
                 .Property(b => b.Type)
                 .HasConversion(new EnumToStringConverter<FileType>());
 

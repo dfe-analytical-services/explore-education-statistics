@@ -1,6 +1,5 @@
 using System;
 using GovUk.Education.ExploreEducationStatistics.Common.Model;
-using Newtonsoft.Json;
 using static GovUk.Education.ExploreEducationStatistics.Common.Model.FileType;
 
 namespace GovUk.Education.ExploreEducationStatistics.Content.Model
@@ -9,11 +8,10 @@ namespace GovUk.Education.ExploreEducationStatistics.Content.Model
     {
         public Guid Id { get; set; }
 
-        [JsonIgnore]
-        public Release Release { get; set; }
-
-        public Guid ReleaseId { get; set; }
-
+        // TODO EES-1703 will reconsider the filesystem layout
+        // and potentially migrate BlobPath to be a String of the full blob path
+        public Guid BlobPath { get; set; }
+        
         public Guid? SubjectId { get; set; }
 
         public string Filename { get; set; }

@@ -5,6 +5,6 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Processor.Services.Int
 {
     public interface IDataArchiveService
     {
-        Task ExtractDataFiles(File zipFile);
+        Task ExtractDataFiles(DataImport import);
     }
 }

@@ -4,8 +4,6 @@ using System.Diagnostics.CodeAnalysis;
 using System.Globalization;
 using System.IO;
 using GovUk.Education.ExploreEducationStatistics.Common.Extensions;
-using Microsoft.Azure.Storage.Blob;
-using static GovUk.Education.ExploreEducationStatistics.Common.Services.FileStoragePathUtils;
 
 namespace GovUk.Education.ExploreEducationStatistics.Common.Services
 {
@@ -62,12 +60,9 @@ namespace GovUk.Education.ExploreEducationStatistics.Common.Services
             };
         }
 
-        public static IDictionary<string, string> GetMetaDataFileMetaValues(string dataFileName)
+        public static IDictionary<string, string> GetMetaDataFileMetaValues()
         {
-            return new Dictionary<string, string>
-            {
-                {BlobInfoExtensions.DataFileKey, dataFileName.ToLower()}
-            };
+            return new Dictionary<string, string>();
         }
 
         public static string GetExtension(string fileName)
@@ -86,17 +81,6 @@ namespace GovUk.Education.ExploreEducationStatistics.Common.Services
             }
 
             return $"{fileSize:0.##} {unit}";
-        }
-
-        public static bool IsBatchedDataFile(IListBlobItem blobItem, Guid releaseId)
-        {
-            return blobItem.Parent.Prefix.Equals(AdminReleaseBatchesDirectoryPath(releaseId));
-        }
-
-        public static bool IsMetaDataFile(CloudBlob blob)
-        {
-            // The meta data file contains a metadata attribute referencing it's corresponding data file
-            return blob.Metadata.ContainsKey(BlobInfoExtensions.DataFileKey);
         }
 
         public static int CalculateNumberOfRows(Stream fileStream)

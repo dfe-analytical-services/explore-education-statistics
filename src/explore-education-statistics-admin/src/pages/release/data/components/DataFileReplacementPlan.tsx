@@ -61,7 +61,12 @@ const DataFileReplacementPlan = ({
     error,
     setState: setPlan,
   } = useAsyncRetry(
-    () => dataReplacementService.getReplacementPlan(fileId, replacementFileId),
+    () =>
+      dataReplacementService.getReplacementPlan(
+        releaseId,
+        fileId,
+        replacementFileId,
+      ),
     [fileId],
   );
 
@@ -377,6 +382,7 @@ const DataFileReplacementPlan = ({
                   toggleSubmitting.on();
 
                   await dataReplacementService.replaceData(
+                    releaseId,
                     fileId,
                     replacementFileId,
                   );

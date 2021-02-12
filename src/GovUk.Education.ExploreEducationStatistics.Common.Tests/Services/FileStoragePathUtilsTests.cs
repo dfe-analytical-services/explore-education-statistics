@@ -8,23 +8,32 @@ namespace GovUk.Education.ExploreEducationStatistics.Common.Tests.Services
     public class FileStoragePathUtilsTests
     {
         [Fact]
+        public void TestAdminReleaseBatchesDirectoryPath()
+        {
+            var blobPath = Guid.NewGuid();
+            var fileId = Guid.NewGuid();
+            Assert.Equal($"{blobPath}/data/batches/{fileId}/", AdminReleaseBatchesDirectoryPath(blobPath, fileId));
+        }
+        
+        [Fact]
         public void TestAdminReleaseDirectoryPath()
         {
-            var releaseId = Guid.NewGuid();
-            Assert.Equal($"{releaseId}/", AdminReleaseDirectoryPath(releaseId));
-            Assert.Equal($"{releaseId}/ancillary/", AdminReleaseDirectoryPath(releaseId, Ancillary));
-            Assert.Equal($"{releaseId}/data/", AdminReleaseDirectoryPath(releaseId, Data));
-            Assert.Equal($"{releaseId}/chart/", AdminReleaseDirectoryPath(releaseId, Chart));
+            var blobPath = Guid.NewGuid();
+            Assert.Equal($"{blobPath}/ancillary/", AdminReleaseDirectoryPath(blobPath, Ancillary));
+            Assert.Equal($"{blobPath}/data/", AdminReleaseDirectoryPath(blobPath, Data));
+            Assert.Equal($"{blobPath}/chart/", AdminReleaseDirectoryPath(blobPath, Chart));
+            Assert.Equal($"{blobPath}/image/", AdminReleaseDirectoryPath(blobPath, Image));
         }
 
         [Fact]
         public void TestAdminReleasePath()
         {
-            var releaseId = Guid.NewGuid();
+            var blobPath = Guid.NewGuid();
             var fileId = Guid.NewGuid();
-            Assert.Equal($"{releaseId}/ancillary/{fileId}", AdminReleasePath(releaseId, Ancillary, fileId));
-            Assert.Equal($"{releaseId}/data/{fileId}", AdminReleasePath(releaseId, Data, fileId));
-            Assert.Equal($"{releaseId}/chart/{fileId}", AdminReleasePath(releaseId, Chart, fileId));
+            Assert.Equal($"{blobPath}/ancillary/{fileId}", AdminReleasePath(blobPath, Ancillary, fileId));
+            Assert.Equal($"{blobPath}/data/{fileId}", AdminReleasePath(blobPath, Data, fileId));
+            Assert.Equal($"{blobPath}/chart/{fileId}", AdminReleasePath(blobPath, Chart, fileId));
+            Assert.Equal($"{blobPath}/image/{fileId}", AdminReleasePath(blobPath, Image, fileId));
         }
 
         [Fact]
@@ -56,27 +65,6 @@ namespace GovUk.Education.ExploreEducationStatistics.Common.Tests.Services
             const string publicationSlug = "publication-slug";
             Assert.Equal($"{publicationSlug}/{releaseSlug}/ancillary/{publicationSlug}_{releaseSlug}.zip",
                 PublicReleaseAllFilesZipPath(publicationSlug, releaseSlug));
-        }
-
-        [Fact]
-        public void TestIsBatchFileForDataFile()
-        {
-            var releaseId = Guid.NewGuid();
-            const string originalDataFileName = "my_data_file.csv";
-         
-            Assert.True(IsBatchFileForDataFile(releaseId, originalDataFileName, 
-                $"{AdminReleaseBatchesDirectoryPath(releaseId)}{originalDataFileName}_000001"));
-            Assert.True(IsBatchFileForDataFile(releaseId, originalDataFileName, 
-                $"{AdminReleaseBatchesDirectoryPath(releaseId)}{originalDataFileName}_999999"));
-            
-            Assert.False(IsBatchFileForDataFile(Guid.NewGuid(), originalDataFileName, 
-                $"{AdminReleaseBatchesDirectoryPath(releaseId)}{originalDataFileName}_000001"));
-            Assert.False(IsBatchFileForDataFile(releaseId, originalDataFileName, 
-                $"{AdminReleaseBatchesDirectoryPath(releaseId)}another_file_name.csv_000001"));
-            Assert.False(IsBatchFileForDataFile(releaseId, originalDataFileName, 
-                $"{AdminReleaseBatchesDirectoryPath(releaseId)}{originalDataFileName}_000001.csv"));
-            Assert.False(IsBatchFileForDataFile(releaseId, originalDataFileName, 
-                $"{AdminReleaseBatchesDirectoryPath(releaseId)}{originalDataFileName}.csv_000001"));
         }
     }
 }

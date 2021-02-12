@@ -125,7 +125,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Processor.Tests.Servic
             var dataImportService = new Mock<IDataImportService>(Strict);
 
             batchService
-                .Setup(s => s.GetNumBatchesRemaining(import.FileId))
+                .Setup(s => s.GetNumBatchesRemaining(import.File))
                 .ReturnsAsync(0);
 
             dataImportService
@@ -195,7 +195,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Processor.Tests.Servic
             var dataImportService = new Mock<IDataImportService>(Strict);
 
             batchService
-                .Setup(s => s.GetNumBatchesRemaining(import.FileId))
+                .Setup(s => s.GetNumBatchesRemaining(import.File))
                 .ReturnsAsync(1);
 
             dataImportService
@@ -384,7 +384,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Processor.Tests.Servic
             var dataImportService = new Mock<IDataImportService>(Strict);
 
             batchService
-                .Setup(s => s.GetNumBatchesRemaining(import.FileId))
+                .Setup(s => s.GetNumBatchesRemaining(import.File))
                 .ReturnsAsync(0);
 
             dataImportService
@@ -454,7 +454,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Processor.Tests.Servic
             var dataImportService = new Mock<IDataImportService>(Strict);
 
             batchService
-                .Setup(s => s.GetNumBatchesRemaining(import.FileId))
+                .Setup(s => s.GetNumBatchesRemaining(import.File))
                 .ReturnsAsync(0);
 
             dataImportService

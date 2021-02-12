@@ -15,9 +15,19 @@ namespace GovUk.Education.ExploreEducationStatistics.Content.Model.Extensions
         public static string Path(this File file)
         {
             return AdminReleasePath(
-                file.ReleaseId,
+                file.BlobPath,
                 file.Type,
                 file.BlobStorageName);
+        }
+
+        public static string BatchesPath(this File file)
+        { 
+            return $"{AdminReleaseBatchesDirectoryPath(file.BlobPath, file.Id)}";
+        }
+
+        public static string BatchPath(this File file, int batchNumber)
+        { 
+            return $"{file.BatchesPath()}{file.BlobStorageName}_{batchNumber:000000}";
         }
 
         public static string PublicPath(this ReleaseFile releaseFile)

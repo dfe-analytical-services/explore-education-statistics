@@ -65,7 +65,6 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Services.Tests
                 Release = contentRelease,
                 File = new File
                 {
-                    Release = contentRelease,
                     Filename = "data1.csv",
                     Type = FileType.Data,
                     SubjectId = releaseSubject1.Subject.Id
@@ -77,7 +76,6 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Services.Tests
                 Release = contentRelease,
                 File = new File
                 {
-                    Release = contentRelease,
                     Filename = "data2.csv",
                     Type = FileType.Data,
                     SubjectId = releaseSubject2.Subject.Id,
@@ -254,7 +252,6 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Services.Tests
 
             var file2 = new File
             {
-                Release = contentRelease,
                 Filename = "data2.csv",
                 Type = FileType.Data,
                 SubjectId = releaseSubject2.Subject.Id,
@@ -262,7 +259,6 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Services.Tests
 
             var file2Replacement = new File
             {
-                Release = contentRelease,
                 Filename = "data2_replacement.csv",
                 Type = FileType.Data,
                 SubjectId =  releaseSubject2Replacement.Subject.Id,
@@ -276,7 +272,6 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Services.Tests
                 Release = contentRelease,
                 File = new File
                 {
-                    Release = contentRelease,
                     Filename = "data1.csv",
                     Type = FileType.Data,
                     SubjectId = releaseSubject1.Subject.Id
@@ -389,7 +384,6 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Services.Tests
                 Release = contentRelease,
                 File = new File
                 {
-                    Release = contentRelease,
                     Filename = "data1.csv",
                     Type = FileType.Data,
                     SubjectId = releaseSubject1.Subject.Id
@@ -401,7 +395,6 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Services.Tests
                 Release = contentRelease,
                 File = new File
                 {
-                    Release = contentRelease,
                     Filename = "data2.csv",
                     Type = FileType.Data,
                     SubjectId = releaseSubject2.Subject.Id,
@@ -489,7 +482,6 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Services.Tests
                 Release = contentRelease,
                 File = new File
                 {
-                    Release = contentRelease,
                     Filename = "data1.csv",
                     Type = FileType.Data,
                     SubjectId = releaseSubject.Subject.Id
@@ -547,7 +539,6 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Services.Tests
                 Release = release,
                 File = new File
                 {
-                    Release = release,
                     Filename = "data1.csv",
                     Type = FileType.Data,
                 }
@@ -615,7 +606,6 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Services.Tests
                 Release = contentRelease,
                 File = new File
                 {
-                    Release = contentRelease,
                     Filename = "data1.csv",
                     Type = FileType.Data,
                     SubjectId = releaseSubject1.Subject.Id

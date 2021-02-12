@@ -41,9 +41,9 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
                 Release = release,
                 File = new File
                 {
+                    BlobPath = Guid.NewGuid(),
                     Filename = "ancillary.pdf",
-                    Type = Ancillary,
-                    Release = release
+                    Type = Ancillary
                 }
             };
 
@@ -52,9 +52,9 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
                 Release = release,
                 File = new File
                 {
+                    BlobPath = Guid.NewGuid(),
                     Filename = "chart.png",
-                    Type = Chart,
-                    Release = release
+                    Type = Chart
                 }
             };
 
@@ -111,9 +111,9 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
 
             var ancillaryFile = new File
             {
+                BlobPath = Guid.NewGuid(),
                 Filename = "ancillary.pdf",
                 Type = Ancillary,
-                Release = release
             };
 
             var releaseFile = new ReleaseFile
@@ -172,9 +172,9 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
                 Release = release,
                 File = new File
                 {
+                    BlobPath = Guid.NewGuid(),
                     Filename = "data.csv",
                     Type = FileType.Data,
-                    Release = release,
                     SubjectId = Guid.NewGuid()
                 }
             };
@@ -220,9 +220,9 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
                 Release = release,
                 File = new File
                 {
+                    BlobPath = Guid.NewGuid(),
                     Filename = "ancillary.pdf",
-                    Type = Ancillary,
-                    Release = release
+                    Type = Ancillary
                 }
             };
 
@@ -294,9 +294,9 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
                 Release = release,
                 File = new File
                 {
+                    BlobPath = Guid.NewGuid(),
                     Filename = "ancillary.pdf",
-                    Type = Ancillary,
-                    Release = release
+                    Type = Ancillary
                 }
             };
 
@@ -305,9 +305,9 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
                 Release = release,
                 File = new File
                 {
+                    BlobPath = Guid.NewGuid(),
                     Filename = "chart.png",
-                    Type = Chart,
-                    Release = release
+                    Type = Chart
                 }
             };
 
@@ -371,9 +371,9 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
                 Release = release,
                 File = new File
                 {
+                    BlobPath = Guid.NewGuid(),
                     Filename = "ancillary.pdf",
-                    Type = Ancillary,
-                    Release = release
+                    Type = Ancillary
                 }
             };
 
@@ -382,9 +382,9 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
                 Release = release,
                 File = new File
                 {
+                    BlobPath = Guid.NewGuid(),
                     Filename = "data.csv",
                     Type = FileType.Data,
-                    Release = release,
                     SubjectId = Guid.NewGuid()
                 }
             };
@@ -434,9 +434,9 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
                 Release = release,
                 File = new File
                 {
+                    BlobPath = Guid.NewGuid(),
                     Filename = "ancillary.pdf",
-                    Type = Ancillary,
-                    Release = release
+                    Type = Ancillary
                 }
             };
 
@@ -445,9 +445,9 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
                 Release = release,
                 File = new File
                 {
+                    BlobPath = Guid.NewGuid(),
                     Filename = "chart.png",
-                    Type = Chart,
-                    Release = release
+                    Type = Chart
                 }
             };
 
@@ -496,9 +496,9 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
                 Release = release,
                 File = new File
                 {
+                    BlobPath = Guid.NewGuid(),
                     Filename = "ancillary.pdf",
-                    Type = Ancillary,
-                    Release = release
+                    Type = Ancillary
                 }
             };
 
@@ -550,16 +550,16 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
 
             var ancillaryFile = new File
             {
+                BlobPath = Guid.NewGuid(),
                 Filename = "ancillary.pdf",
-                Type = Ancillary,
-                Release = release
+                Type = Ancillary
             };
 
             var chartFile = new File
             {
+                BlobPath = Guid.NewGuid(),
                 Filename = "chart.png",
-                Type = Chart,
-                Release = amendmentRelease
+                Type = Chart
             };
 
             var ancillaryReleaseFile = new ReleaseFile
@@ -640,9 +640,9 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
                 Release = release,
                 File = new File
                 {
+                    BlobPath = Guid.NewGuid(),
                     Filename = "ancillary.pdf",
-                    Type = Ancillary,
-                    Release = release
+                    Type = Ancillary
                 }
             };
 
@@ -651,9 +651,9 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
                 Release = release,
                 File = new File
                 {
+                    BlobPath = Guid.NewGuid(),
                     Filename = "chart.png",
-                    Type = Chart,
-                    Release = release
+                    Type = Chart
                 }
             };
 
@@ -662,9 +662,9 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
                 Release = release,
                 File = new File
                 {
+                    BlobPath = Guid.NewGuid(),
                     Filename = "data.csv",
                     Type = FileType.Data,
-                    Release = release,
                     SubjectId = Guid.NewGuid()
                 }
             };
@@ -775,16 +775,16 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
 
             var ancillaryFile = new File
             {
+                BlobPath = Guid.NewGuid(),
                 Filename = "ancillary.pdf",
-                Type = Ancillary,
-                Release = release
+                Type = Ancillary
             };
 
             var chartFile = new File
             {
+                BlobPath = Guid.NewGuid(),
                 Filename = "chart.png",
-                Type = Chart,
-                Release = amendmentRelease
+                Type = Chart
             };
 
             var ancillaryReleaseFile = new ReleaseFile
@@ -904,9 +904,9 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
                 Release = release,
                 File = new File
                 {
+                    BlobPath = Guid.NewGuid(),
                     Filename = "ancillary_1.pdf",
-                    Type = Ancillary,
-                    Release = release
+                    Type = Ancillary
                 }
             };
 
@@ -915,9 +915,9 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
                 Release = release,
                 File = new File
                 {
+                    BlobPath = Guid.NewGuid(),
                     Filename = "Ancillary 2.pdf",
-                    Type = Ancillary,
-                    Release = release
+                    Type = Ancillary
                 }
             };
 
@@ -926,9 +926,9 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
                 Release = release,
                 File = new File
                 {
+                    BlobPath = Guid.NewGuid(),
                     Filename = "chart.png",
-                    Type = Chart,
-                    Release = release
+                    Type = Chart
                 }
             };
 
@@ -937,9 +937,9 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
                 Release = release,
                 File = new File
                 {
+                    BlobPath = Guid.NewGuid(),
                     Filename = "data.csv",
                     Type = FileType.Data,
-                    Release = release,
                     SubjectId = Guid.NewGuid()
                 }
             };
@@ -1056,9 +1056,9 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
                 Release = release,
                 File = new File
                 {
+                    BlobPath = Guid.NewGuid(),
                     Filename = "ancillary.pdf",
-                    Type = Ancillary,
-                    Release = release
+                    Type = Ancillary
                 }
             };
 
@@ -1123,9 +1123,9 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
                 Release = release,
                 File = new File
                 {
+                    BlobPath = Guid.NewGuid(),
                     Filename = "Ancillary 1.pdf",
-                    Type = Ancillary,
-                    Release = release
+                    Type = Ancillary
                 }
             };
 
@@ -1190,9 +1190,9 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
                 Release = release,
                 File = new File
                 {
+                    BlobPath = Guid.NewGuid(),
                     Filename = "ancillary.pdf",
-                    Type = Ancillary,
-                    Release = release
+                    Type = Ancillary
                 }
             };
 
@@ -1336,18 +1336,15 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
 
             await using (var contentDbContext = InMemoryApplicationDbContext(contentDbContextId))
             {
-                var file = await contentDbContext.Files.SingleOrDefaultAsync(f =>
-                    f.ReleaseId == release.Id
-                    && f.Filename == filename
-                    && f.Type == Ancillary
-                );
-
-                Assert.NotNull(file);
-
-                Assert.NotNull(await contentDbContext.ReleaseFiles.SingleOrDefaultAsync(rf =>
+                var releaseFile = await contentDbContext.ReleaseFiles
+                    .Include(rf => rf.File)
+                    .SingleOrDefaultAsync(rf =>
                     rf.ReleaseId == release.Id
-                    && rf.FileId == file.Id
-                ));
+                    && rf.File.Filename == filename
+                    && rf.File.Type == Ancillary
+                );
+                
+                Assert.NotNull(releaseFile);
             }
         }
 
@@ -1434,18 +1431,15 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
 
             await using (var contentDbContext = InMemoryApplicationDbContext(contentDbContextId))
             {
-                var file = await contentDbContext.Files.SingleOrDefaultAsync(f =>
-                    f.ReleaseId == release.Id
-                    && f.Filename == filename
-                    && f.Type == Chart
-                );
-
-                Assert.NotNull(file);
-
-                Assert.NotNull(await contentDbContext.ReleaseFiles.SingleOrDefaultAsync(rf =>
-                    rf.ReleaseId == release.Id
-                    && rf.FileId == file.Id
-                ));
+                var releaseFile = await contentDbContext.ReleaseFiles
+                    .Include(rf => rf.File)
+                    .SingleOrDefaultAsync(rf =>
+                        rf.ReleaseId == release.Id
+                        && rf.File.Filename == filename
+                        && rf.File.Type == Chart
+                    );
+                
+                Assert.NotNull(releaseFile);
             }
         }
 

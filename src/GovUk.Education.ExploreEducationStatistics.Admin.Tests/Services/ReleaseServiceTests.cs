@@ -318,7 +318,6 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
             {
                 Filename = "data.csv",
                 Type = FileType.Data,
-                Release = release,
                 SubjectId = subject.Id
             };
 
@@ -403,7 +402,6 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
             {
                 Filename = "data.csv",
                 Type = FileType.Data,
-                Release = release,
                 SubjectId = subject.Id
             };
 
@@ -471,7 +469,6 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
             {
                 Filename = "data.csv",
                 Type = FileType.Data,
-                Release =  release,
                 SubjectId = subject.Id
             };
 
@@ -479,7 +476,6 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
             {
                 Filename = "replacement.csv",
                 Type = FileType.Data,
-                Release = release,
                 SubjectId = replacementSubject.Id,
                 Replacing = file
             };
@@ -584,7 +580,6 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
             {
                 Filename = "data.csv",
                 Type = FileType.Data,
-                Release =  release,
                 SubjectId = subject.Id
             };
 
@@ -592,7 +587,6 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
             {
                 Filename = "replacement.csv",
                 Type = FileType.Data,
-                Release = release,
                 SubjectId = replacementSubject.Id,
                 Replacing = file
             };

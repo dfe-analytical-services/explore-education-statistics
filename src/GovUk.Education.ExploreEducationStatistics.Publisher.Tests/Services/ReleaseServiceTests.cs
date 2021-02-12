@@ -505,7 +505,6 @@ namespace GovUk.Education.ExploreEducationStatistics.Publisher.Tests.Services
             File = new File
             {
                 Filename = "ancillary.pdf",
-                Release = PublicationARelease2,
                 Type = Ancillary
             }
         };
@@ -516,7 +515,6 @@ namespace GovUk.Education.ExploreEducationStatistics.Publisher.Tests.Services
             File = new File
             {
                 Filename = "chart.png",
-                Release = PublicationARelease2,
                 Type = Chart
             }
         };
@@ -527,7 +525,6 @@ namespace GovUk.Education.ExploreEducationStatistics.Publisher.Tests.Services
             File = new File
             {
                 Filename = "data.csv",
-                Release = PublicationARelease2,
                 Type = FileType.Data
             }
         };
@@ -543,7 +540,6 @@ namespace GovUk.Education.ExploreEducationStatistics.Publisher.Tests.Services
                 File = new File
                 {
                     Filename = "data.meta.csv",
-                    Release = PublicationARelease2,
                     Type = Metadata
                 }
             }

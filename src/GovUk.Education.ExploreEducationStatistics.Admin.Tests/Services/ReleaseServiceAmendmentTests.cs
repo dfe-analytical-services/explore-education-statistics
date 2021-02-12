@@ -275,8 +275,6 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
             {
                 Id = Guid.NewGuid(),
                 Filename = "Filename 1",
-                Release = release,
-                ReleaseId = releaseId,
                 SubjectId = Guid.NewGuid()
             };
 
@@ -284,8 +282,6 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
             {
                 Id = Guid.NewGuid(),
                 Filename = "Filename 2",
-                Release = release,
-                ReleaseId = releaseId,
                 SubjectId = Guid.NewGuid()
             };
 
