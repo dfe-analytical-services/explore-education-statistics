@@ -219,7 +219,6 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin
             services.AddTransient<IReleaseFileService, ReleaseFileService>();
             services.AddTransient<IDataImportService, DataImportService>();
             services.AddTransient<IImportStatusBauService, ImportStatusBauService>();
-            services.AddTransient<IMigrateImportsService, MigrateImportsService>();
 
             services.AddTransient<IPublishingService, PublishingService>(provider =>
                 new PublishingService(
