@@ -23,7 +23,7 @@ import getDefaultTableHeaderConfig from '@common/modules/table-tool/utils/getDef
 import mapFullTable from '@common/modules/table-tool/utils/mapFullTable';
 import parseYearCodeTuple from '@common/modules/table-tool/utils/parseYearCodeTuple';
 import tableBuilderService, {
-  PublicationSubject,
+  Subject,
   ReleaseTableDataQuery,
   SubjectMeta,
   TableHighlight,
@@ -41,7 +41,7 @@ interface Publication {
 
 export interface InitialTableToolState {
   initialStep: number;
-  subjects?: PublicationSubject[];
+  subjects?: Subject[];
   highlights?: TableHighlight[];
   subjectMeta?: SubjectMeta;
   query?: ReleaseTableDataQuery;
@@ -52,7 +52,7 @@ export interface InitialTableToolState {
 }
 
 interface TableToolState extends InitialTableToolState {
-  subjects: PublicationSubject[];
+  subjects: Subject[];
   highlights: TableHighlight[];
   subjectMeta: SubjectMeta;
   query: ReleaseTableDataQuery;

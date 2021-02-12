@@ -1,16 +1,18 @@
+import Details from '@common/components/Details';
 import { Form, FormFieldRadioGroup } from '@common/components/form';
+import SanitizeHtml from '@common/components/SanitizeHtml';
 import SummaryList from '@common/components/SummaryList';
 import SummaryListItem from '@common/components/SummaryListItem';
 import ResetFormOnPreviousStep from '@common/modules/table-tool/components/ResetFormOnPreviousStep';
-import { PublicationSubject } from '@common/services/tableBuilderService';
+import { Subject } from '@common/services/tableBuilderService';
 import Yup from '@common/validation/yup';
 import { Formik } from 'formik';
-import React from 'react';
+import React, { useMemo } from 'react';
 import { InjectedWizardProps } from './Wizard';
 import WizardStepFormActions from './WizardStepFormActions';
 import WizardStepHeading from './WizardStepHeading';
 
-interface FormValues {
+export interface PublicationSubjectFormValues {
   subjectId: string;
 }
 
@@ -23,7 +25,7 @@ const formId = 'publicationSubjectForm';
 interface Props {
   initialValues?: { subjectId: string };
   onSubmit: PublicationSubjectFormSubmitHandler;
-  options: PublicationSubject[];
+  options: Subject[];
 }
 
 const PublicationSubjectForm = (props: Props & InjectedWizardProps) => {
@@ -41,8 +43,62 @@ const PublicationSubjectForm = (props: Props & InjectedWizardProps) => {
 
   const getSubjectName = (subjectId: string): string => {
     const matching = options.find(({ id }) => subjectId === id);
-    return matching?.label ?? '';
+    return matching?.name ?? '';
   };
+
+  const getTimePeriod = (subject: Subject) => {
+    const { from, to } = subject.timePeriods;
+
+    if (from && to) {
+      return from === to ? from : `${from} to ${to}`;
+    }
+
+    return from || to;
+  };
+
+  const radioOptions = useMemo(
+    () =>
+      options.map(option => {
+        const { content } = option;
+        const geographicLevels = [...option.geographicLevels].sort().join('; ');
+
+        const timePeriod = getTimePeriod(option);
+
+        const hasDetails = content || geographicLevels || timePeriod;
+
+        return {
+          label: option.name,
+          value: `${option.id}`,
+          hint: hasDetails ? (
+            <Details
+              summary="More details"
+              className="govuk-!-margin-bottom-2 govuk-!-margin-top-2"
+            >
+              <SummaryList>
+                {geographicLevels && (
+                  <SummaryListItem term="Geographic levels">
+                    {geographicLevels}
+                  </SummaryListItem>
+                )}
+
+                {timePeriod && (
+                  <SummaryListItem term="Time period">
+                    {timePeriod}
+                  </SummaryListItem>
+                )}
+
+                {content && (
+                  <SummaryListItem term="Content">
+                    <SanitizeHtml dirtyHtml={content} />
+                  </SummaryListItem>
+                )}
+              </SummaryList>
+            </Details>
+          ) : null,
+        };
+      }),
+    [options],
+  );
 
   const stepHeading = (
     <WizardStepHeading {...props} fieldsetHeading>
@@ -51,11 +107,11 @@ const PublicationSubjectForm = (props: Props & InjectedWizardProps) => {
   );
 
   return (
-    <Formik<FormValues>
+    <Formik<PublicationSubjectFormValues>
       enableReinitialize
       initialValues={initialValues}
       validateOnBlur={false}
-      validationSchema={Yup.object<FormValues>({
+      validationSchema={Yup.object<PublicationSubjectFormValues>({
         subjectId: Yup.string().required('Choose a subject'),
       })}
       onSubmit={async ({ subjectId }) => {
@@ -68,22 +124,19 @@ const PublicationSubjectForm = (props: Props & InjectedWizardProps) => {
       {form => {
         return isActive ? (
           <Form {...form} id={formId} showSubmitError>
-            <FormFieldRadioGroup<FormValues>
+            <FormFieldRadioGroup<PublicationSubjectFormValues>
               name="subjectId"
               legend={stepHeading}
               legendSize="l"
-              options={options.map(option => ({
-                label: option.label,
-                value: `${option.id}`,
-              }))}
               id={`${formId}-subjectId`}
               disabled={form.isSubmitting}
+              options={radioOptions}
             />
 
-            {options.length > 0 ? (
+            {radioOptions.length > 0 ? (
               <WizardStepFormActions {...props} formId={formId} />
             ) : (
-              <p>No subjects available for this release.</p>
+              <p>No subjects available.</p>
             )}
           </Form>
         ) : (
@@ -97,7 +150,7 @@ const PublicationSubjectForm = (props: Props & InjectedWizardProps) => {
 
             <SummaryList noBorder>
               <SummaryListItem term="Subject">
-                {getSubjectName(form.values.subjectId)}
+                {getSubjectName(form.values.subjectId) || 'None'}
               </SummaryListItem>
             </SummaryList>
           </>

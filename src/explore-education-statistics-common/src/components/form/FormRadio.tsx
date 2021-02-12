@@ -13,7 +13,7 @@ export interface FormRadioProps {
   checked?: boolean;
   defaultChecked?: boolean;
   conditional?: ReactNode;
-  hint?: string;
+  hint?: string | ReactNode;
   id: string;
   label: string;
   name: string;
