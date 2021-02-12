@@ -7,11 +7,11 @@ import { DependencyList, useEffect, useMemo } from 'react';
 
 export type AsyncHandledRetryStateSetterParam<T> =
   | {
-      isLoading: boolean;
+      isLoading: true;
     }
   | {
       isLoading?: false;
-      value?: T;
+      value: T;
     };
 
 export type AsyncHandledRetryState<T> = OmitStrict<
