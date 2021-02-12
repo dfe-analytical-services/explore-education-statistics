@@ -61,12 +61,19 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Services
                 });
         }
 
-        public Task<Either<ActionResult, MyPublicationViewModel>> GetMyPublication(Guid publicationId)
+        public async Task<Either<ActionResult, MyPublicationViewModel>> GetMyPublication(Guid publicationId)
         {
-            return _persistenceHelper
-                .CheckEntityExists<Publication>(publicationId, HydratePublicationForPublicationViewModel)
-                .OnSuccess(_userService.CheckCanViewPublication)
-                .OnSuccess(_mapper.Map<MyPublicationViewModel>);
+            return await _userService
+                .CheckCanAccessSystem()
+                .OnSuccess(_ =>
+                {
+                    return _userService
+                        .CheckCanViewAllReleases()
+                        .OnSuccess(() =>
+                            _publicationRepository.GetPublicationWithAllReleases(publicationId))
+                        .OrElse(() =>
+                            _publicationRepository.GetPublicationForUser(publicationId, _userService.GetUserId()));
+                });
         }
 
         public async Task<Either<ActionResult, PublicationViewModel>> CreatePublication(
