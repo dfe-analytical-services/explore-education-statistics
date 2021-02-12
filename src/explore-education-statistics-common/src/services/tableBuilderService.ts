@@ -58,7 +58,7 @@ export interface LocationOption {
   geoJson?: GeoJsonFeature[];
 }
 
-export interface ThemeMeta {
+export interface Theme {
   id: string;
   title: string;
   slug: string;
@@ -181,7 +181,7 @@ export interface TableDataResponse {
 }
 
 const tableBuilderService = {
-  getThemes(): Promise<ThemeMeta[]> {
+  getThemes(): Promise<Theme[]> {
     return dataApi.get('/themes');
   },
   getPublication(publicationId: string): Promise<Publication> {

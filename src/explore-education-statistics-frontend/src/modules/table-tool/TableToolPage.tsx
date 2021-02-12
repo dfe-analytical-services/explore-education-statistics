@@ -9,7 +9,7 @@ import { FastTrackTable } from '@common/services/fastTrackService';
 import tableBuilderService, {
   Publication,
   SubjectMeta,
-  ThemeMeta,
+  Theme,
 } from '@common/services/tableBuilderService';
 import { Dictionary } from '@common/types';
 import Link from '@frontend/components/Link';
@@ -28,7 +28,7 @@ export interface TableToolPageProps {
   publication?: Publication;
   fastTrack?: FastTrackTable;
   subjectMeta?: SubjectMeta;
-  themeMeta: ThemeMeta[];
+  themeMeta: Theme[];
 }
 
 const TableToolPage: NextPage<TableToolPageProps> = ({

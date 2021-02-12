@@ -27,7 +27,7 @@ import tableBuilderService, {
   ReleaseTableDataQuery,
   SubjectMeta,
   TableHighlight,
-  ThemeMeta,
+  Theme,
 } from '@common/services/tableBuilderService';
 import classNames from 'classnames';
 import React, { ReactElement, ReactNode, useMemo } from 'react';
@@ -68,7 +68,7 @@ export interface FinalStepRenderProps {
 }
 
 export interface TableToolWizardProps {
-  themeMeta?: ThemeMeta[];
+  themeMeta?: Theme[];
   initialState?: Partial<InitialTableToolState>;
   finalStep?: (props: FinalStepRenderProps) => ReactElement;
   renderHighlights?: (highlights: TableHighlight[]) => ReactNode;

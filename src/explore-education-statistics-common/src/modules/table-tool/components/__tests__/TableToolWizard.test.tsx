@@ -1,11 +1,11 @@
 import TableToolWizard from '@common/modules/table-tool/components/TableToolWizard';
-import { SubjectMeta, ThemeMeta } from '@common/services/tableBuilderService';
+import { SubjectMeta, Theme } from '@common/services/tableBuilderService';
 import { within } from '@testing-library/dom';
 import { render, screen, waitFor } from '@testing-library/react';
 import React from 'react';
 
 describe('TableToolWizard', () => {
-  const testThemeMeta: ThemeMeta[] = [
+  const testThemeMeta: Theme[] = [
     {
       id: 'theme-1',
       title: 'Theme 1',
