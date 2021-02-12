@@ -18,14 +18,16 @@ import { InjectedWizardProps } from './Wizard';
 import WizardStepFormActions from './WizardStepFormActions';
 import WizardStepHeading from './WizardStepHeading';
 
-interface FormValues {
+export interface PublicationFormValues {
   publicationId: string;
 }
 
-export type PublicationFormSubmitHandler = (values: FormValues) => void;
+export type PublicationFormSubmitHandler = (
+  values: PublicationFormValues,
+) => void;
 
 interface Props {
-  initialValues?: FormValues;
+  initialValues?: PublicationFormValues;
   onSubmit: PublicationFormSubmitHandler;
   options: Theme[];
 }
@@ -53,12 +55,12 @@ const PublicationForm = (props: Props & InjectedWizardProps) => {
   );
 
   return (
-    <Formik<FormValues>
+    <Formik<PublicationFormValues>
       enableReinitialize
       initialValues={initialValues}
       validateOnBlur={false}
       validateOnChange={false}
-      validationSchema={Yup.object<FormValues>({
+      validationSchema={Yup.object<PublicationFormValues>({
         publicationId: Yup.string().required('Choose publication'),
       })}
       onSubmit={async values => {
