@@ -12,23 +12,21 @@ import { InjectedWizardProps } from './Wizard';
 import WizardStepFormActions from './WizardStepFormActions';
 import WizardStepHeading from './WizardStepHeading';
 
-export interface PublicationSubjectFormValues {
+export interface SubjectFormValues {
   subjectId: string;
 }
 
-export type PublicationSubjectFormSubmitHandler = (values: {
-  subjectId: string;
-}) => void;
+export type SubjectFormSubmitHandler = (values: { subjectId: string }) => void;
 
 const formId = 'publicationSubjectForm';
 
 interface Props {
   initialValues?: { subjectId: string };
-  onSubmit: PublicationSubjectFormSubmitHandler;
+  onSubmit: SubjectFormSubmitHandler;
   options: Subject[];
 }
 
-const PublicationSubjectForm = (props: Props & InjectedWizardProps) => {
+const SubjectForm = (props: Props & InjectedWizardProps) => {
   const {
     isActive,
     onSubmit,
@@ -107,11 +105,11 @@ const PublicationSubjectForm = (props: Props & InjectedWizardProps) => {
   );
 
   return (
-    <Formik<PublicationSubjectFormValues>
+    <Formik<SubjectFormValues>
       enableReinitialize
       initialValues={initialValues}
       validateOnBlur={false}
-      validationSchema={Yup.object<PublicationSubjectFormValues>({
+      validationSchema={Yup.object<SubjectFormValues>({
         subjectId: Yup.string().required('Choose a subject'),
       })}
       onSubmit={async ({ subjectId }) => {
@@ -124,7 +122,7 @@ const PublicationSubjectForm = (props: Props & InjectedWizardProps) => {
       {form => {
         return isActive ? (
           <Form {...form} id={formId} showSubmitError>
-            <FormFieldRadioGroup<PublicationSubjectFormValues>
+            <FormFieldRadioGroup<SubjectFormValues>
               name="subjectId"
               legend={stepHeading}
               legendSize="l"
@@ -160,4 +158,4 @@ const PublicationSubjectForm = (props: Props & InjectedWizardProps) => {
   );
 };
 
-export default PublicationSubjectForm;
+export default SubjectForm;

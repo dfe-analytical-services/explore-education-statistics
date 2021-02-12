@@ -9,9 +9,9 @@ import PreviousStepModalConfirm from '@common/modules/table-tool/components/Prev
 import PublicationForm, {
   PublicationFormSubmitHandler,
 } from '@common/modules/table-tool/components/PublicationForm';
-import PublicationSubjectForm, {
-  PublicationSubjectFormSubmitHandler,
-} from '@common/modules/table-tool/components/PublicationSubjectForm';
+import SubjectForm, {
+  SubjectFormSubmitHandler,
+} from '@common/modules/table-tool/components/SubjectForm';
 import TimePeriodForm, {
   TimePeriodFormSubmitHandler,
 } from '@common/modules/table-tool/components/TimePeriodForm';
@@ -129,7 +129,7 @@ const TableToolWizard = ({
     });
   };
 
-  const handlePublicationSubjectFormSubmit: PublicationSubjectFormSubmitHandler = async ({
+  const handlePublicationSubjectFormSubmit: SubjectFormSubmitHandler = async ({
     subjectId: selectedSubjectId,
   }) => {
     const nextSubjectMeta = await tableBuilderService.getSubjectMeta(
@@ -302,7 +302,7 @@ const TableToolWizard = ({
                       'govuk-grid-column-full': !stepProps.isActive,
                     })}
                   >
-                    <PublicationSubjectForm
+                    <SubjectForm
                       {...stepProps}
                       initialValues={{
                         subjectId: state.query.subjectId,

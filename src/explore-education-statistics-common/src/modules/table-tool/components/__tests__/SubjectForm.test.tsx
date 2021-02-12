@@ -1,7 +1,7 @@
 import { getDescribedBy } from '@common-test/queries';
-import PublicationSubjectForm, {
-  PublicationSubjectFormValues,
-} from '@common/modules/table-tool/components/PublicationSubjectForm';
+import SubjectForm, {
+  SubjectFormValues,
+} from '@common/modules/table-tool/components/SubjectForm';
 import { InjectedWizardProps } from '@common/modules/table-tool/components/Wizard';
 import { Subject } from '@common/services/tableBuilderService';
 import { waitFor } from '@testing-library/dom';
@@ -10,7 +10,7 @@ import userEvent from '@testing-library/user-event';
 import noop from 'lodash/noop';
 import React from 'react';
 
-describe('PublicationSubjectForm', () => {
+describe('SubjectForm', () => {
   const testOptions: Subject[] = [
     {
       id: 'subject-1',
@@ -49,11 +49,7 @@ describe('PublicationSubjectForm', () => {
     jest.useFakeTimers();
 
     const { container } = render(
-      <PublicationSubjectForm
-        {...wizardProps}
-        onSubmit={noop}
-        options={testOptions}
-      />,
+      <SubjectForm {...wizardProps} onSubmit={noop} options={testOptions} />,
     );
 
     const radios = screen.getAllByLabelText(/Subject/);
@@ -92,9 +88,7 @@ describe('PublicationSubjectForm', () => {
   });
 
   test('renders empty message when there are no publication options', () => {
-    render(
-      <PublicationSubjectForm {...wizardProps} onSubmit={noop} options={[]} />,
-    );
+    render(<SubjectForm {...wizardProps} onSubmit={noop} options={[]} />);
 
     expect(screen.queryAllByRole('radio')).toHaveLength(0);
     expect(screen.getByText(/No subjects available/)).toBeInTheDocument();
@@ -102,7 +96,7 @@ describe('PublicationSubjectForm', () => {
 
   test('renders read-only view with initial `subjectId` when step is not active', () => {
     render(
-      <PublicationSubjectForm
+      <SubjectForm
         {...wizardProps}
         initialValues={{
           subjectId: 'subject-1',
@@ -119,7 +113,7 @@ describe('PublicationSubjectForm', () => {
 
   test('renders read-only view without initial `subjectId` when step is not active', () => {
     render(
-      <PublicationSubjectForm
+      <SubjectForm
         {...wizardProps}
         isActive={false}
         onSubmit={noop}
@@ -133,11 +127,7 @@ describe('PublicationSubjectForm', () => {
 
   test('renders read-only view with selected subject when step is not active', () => {
     const { rerender } = render(
-      <PublicationSubjectForm
-        {...wizardProps}
-        onSubmit={noop}
-        options={testOptions}
-      />,
+      <SubjectForm {...wizardProps} onSubmit={noop} options={testOptions} />,
     );
 
     expect(screen.queryByTestId('Subject')).not.toBeInTheDocument();
@@ -145,7 +135,7 @@ describe('PublicationSubjectForm', () => {
     userEvent.click(screen.getByLabelText('Subject 1'));
 
     rerender(
-      <PublicationSubjectForm
+      <SubjectForm
         {...wizardProps}
         isActive={false}
         onSubmit={noop}
@@ -161,7 +151,7 @@ describe('PublicationSubjectForm', () => {
     const handleSubmit = jest.fn();
 
     render(
-      <PublicationSubjectForm
+      <SubjectForm
         {...wizardProps}
         onSubmit={handleSubmit}
         options={testOptions}
@@ -174,7 +164,7 @@ describe('PublicationSubjectForm', () => {
 
     userEvent.click(screen.getByRole('button', { name: 'Next step' }));
 
-    const expected: PublicationSubjectFormValues = {
+    const expected: SubjectFormValues = {
       subjectId: 'subject-1',
     };
 
