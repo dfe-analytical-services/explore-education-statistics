@@ -61,6 +61,14 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Services
                 });
         }
 
+        public Task<Either<ActionResult, MyPublicationViewModel>> GetMyPublication(Guid publicationId)
+        {
+            return _persistenceHelper
+                .CheckEntityExists<Publication>(publicationId, HydratePublicationForPublicationViewModel)
+                .OnSuccess(_userService.CheckCanViewPublication)
+                .OnSuccess(_mapper.Map<MyPublicationViewModel>);
+        }
+
         public async Task<Either<ActionResult, PublicationViewModel>> CreatePublication(
             PublicationSaveViewModel publication)
         {
