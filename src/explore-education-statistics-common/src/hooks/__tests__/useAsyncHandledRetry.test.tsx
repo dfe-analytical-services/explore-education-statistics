@@ -5,14 +5,14 @@ import noop from 'lodash/noop';
 import React, { FunctionComponent } from 'react';
 
 describe('useAsyncHandledRetry', () => {
-  test('calls `handleApiErrors` if callback promise is rejected', async () => {
-    const handleApiErrors = jest.fn();
+  test('calls `handleError` if callback promise is rejected', async () => {
+    const handleError = jest.fn();
 
     const wrapper: FunctionComponent = ({ children }) => (
       <ErrorControlContextProvider
         value={{
-          handleApiErrors,
-          handleManualErrors: {
+          handleError,
+          errorPages: {
             forbidden: noop,
           },
         }}
@@ -28,20 +28,20 @@ describe('useAsyncHandledRetry', () => {
 
     await waitForNextUpdate();
 
-    expect(handleApiErrors).toHaveBeenCalled();
+    expect(handleError).toHaveBeenCalled();
 
     expect(result.current.isLoading).toBe(false);
     expect(result.current.value).toBeUndefined();
   });
 
-  test('does not call `handleApiErrors` if callback promise is resolved', async () => {
-    const handleApiErrors = jest.fn();
+  test('does not call `handleError` if callback promise is resolved', async () => {
+    const handleError = jest.fn();
 
     const wrapper: FunctionComponent = ({ children }) => (
       <ErrorControlContextProvider
         value={{
-          handleApiErrors,
-          handleManualErrors: {
+          handleError,
+          errorPages: {
             forbidden: noop,
           },
         }}
@@ -57,7 +57,7 @@ describe('useAsyncHandledRetry', () => {
 
     await waitForNextUpdate();
 
-    expect(handleApiErrors).not.toHaveBeenCalled();
+    expect(handleError).not.toHaveBeenCalled();
 
     expect(result.current.isLoading).toBe(false);
     expect(result.current.value).toBe('some value');
@@ -67,8 +67,8 @@ describe('useAsyncHandledRetry', () => {
     const wrapper: FunctionComponent = ({ children }) => (
       <ErrorControlContextProvider
         value={{
-          handleApiErrors: noop,
-          handleManualErrors: {
+          handleError: noop,
+          errorPages: {
             forbidden: noop,
           },
         }}
@@ -96,8 +96,8 @@ describe('useAsyncHandledRetry', () => {
     const wrapper: FunctionComponent = ({ children }) => (
       <ErrorControlContextProvider
         value={{
-          handleApiErrors: noop,
-          handleManualErrors: {
+          handleError: noop,
+          errorPages: {
             forbidden: noop,
           },
         }}

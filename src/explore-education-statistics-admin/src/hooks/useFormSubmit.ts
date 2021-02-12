@@ -18,7 +18,7 @@ function useFormSubmit<FormValues>(
     | FieldMessageMapper<FormValues>[]
     | ((values: FormValues) => FieldMessageMapper<FormValues>[]) = [],
 ) {
-  const { handleApiErrors } = useErrorControl();
+  const { handleError } = useErrorControl();
 
   return useMemo(
     () => async (values: FormValues, actions: FormikHelpers<FormValues>) => {
@@ -36,14 +36,14 @@ function useFormSubmit<FormValues>(
           if (Object.values(errors).length) {
             actions.setErrors(errors);
           } else {
-            handleApiErrors(error);
+            handleError(error);
           }
         } else {
-          handleApiErrors(error);
+          handleError(error);
         }
       }
     },
-    [onSubmit, handleApiErrors, errorMappers],
+    [onSubmit, handleError, errorMappers],
   );
 }
 

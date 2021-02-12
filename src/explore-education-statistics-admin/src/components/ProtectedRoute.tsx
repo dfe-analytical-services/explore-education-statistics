@@ -26,7 +26,7 @@ const ProtectedRoute = ({
 }: ProtectedRouteProps) => {
   const { user } = useAuthContext();
 
-  const { handleManualErrors } = useErrorControl();
+  const { errorPages } = useErrorControl();
 
   let hasAccess = allowAnonymousUsers;
 
@@ -47,7 +47,7 @@ const ProtectedRoute = ({
   }
 
   if (!hasAccess) {
-    handleManualErrors.forbidden();
+    errorPages.forbidden();
     return null;
   }
 
