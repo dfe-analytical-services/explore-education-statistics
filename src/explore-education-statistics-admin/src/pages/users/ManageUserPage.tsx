@@ -1,6 +1,5 @@
 import Link from '@admin/components/Link';
 import Page from '@admin/components/Page';
-import useFormSubmit from '@admin/hooks/useFormSubmit';
 import userService, {
   User,
   UserReleaseRoleSubmission,
@@ -14,6 +13,7 @@ import LoadingSpinner from '@common/components/LoadingSpinner';
 import SummaryList from '@common/components/SummaryList';
 import SummaryListItem from '@common/components/SummaryListItem';
 import useAsyncRetry from '@common/hooks/useAsyncRetry';
+import useFormSubmit from '@common/hooks/useFormSubmit';
 import { mapFieldErrors } from '@common/validation/serverValidations';
 import Yup from '@common/validation/yup';
 import { Formik } from 'formik';

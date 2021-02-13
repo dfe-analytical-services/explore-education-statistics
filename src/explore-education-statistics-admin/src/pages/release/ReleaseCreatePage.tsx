@@ -1,7 +1,6 @@
 import Link from '@admin/components/Link';
 import Page from '@admin/components/Page';
 import PageTitle from '@admin/components/PageTitle';
-import useFormSubmit from '@admin/hooks/useFormSubmit';
 import ReleaseSummaryForm, {
   ReleaseSummaryFormValues,
 } from '@admin/pages/release/components/ReleaseSummaryForm';
@@ -15,6 +14,7 @@ import { IdTitlePair } from '@admin/services/types/common';
 import FormFieldRadioGroup from '@common/components/form/FormFieldRadioGroup';
 import RelatedInformation from '@common/components/RelatedInformation';
 import useAsyncRetry from '@common/hooks/useAsyncRetry';
+import useFormSubmit from '@common/hooks/useFormSubmit';
 import { mapFieldErrors } from '@common/validation/serverValidations';
 import Yup from '@common/validation/yup';
 import React from 'react';
