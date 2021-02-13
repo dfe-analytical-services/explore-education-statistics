@@ -15,8 +15,10 @@ function useMounted(effect?: EffectCallback, initialState = false) {
     setMounted(true);
 
     if (effect) {
-      effect();
+      return effect();
     }
+
+    return undefined;
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
 
