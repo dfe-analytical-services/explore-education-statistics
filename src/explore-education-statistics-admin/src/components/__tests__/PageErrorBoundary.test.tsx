@@ -6,17 +6,17 @@ import React, { useEffect } from 'react';
 import { MemoryRouter } from 'react-router';
 
 describe('PageErrorBoundary', () => {
-  test('calling `handleApiErrors` renders generic error page', async () => {
+  test('calling `handleError` renders generic error page', async () => {
     const error = new Error('Something went wrong');
 
     const TestComponent = () => {
-      const { handleApiErrors } = useErrorControl();
+      const { handleError } = useErrorControl();
 
       useEffect(() => {
         Promise.reject(error).catch(err => {
-          handleApiErrors(err);
+          handleError(err);
         });
-      }, [handleApiErrors]);
+      }, [handleError]);
 
       return null;
     };
@@ -37,7 +37,7 @@ describe('PageErrorBoundary', () => {
     });
   });
 
-  test('calling `handleApiErrors` with 401 error renders Forbidden page', async () => {
+  test('calling `handleError` with 401 error renders Forbidden page', async () => {
     const error: Partial<AxiosError> = {
       name: '',
       message: 'Forbidden',
@@ -54,13 +54,13 @@ describe('PageErrorBoundary', () => {
     };
 
     const TestComponent = () => {
-      const { handleApiErrors } = useErrorControl();
+      const { handleError } = useErrorControl();
 
       useEffect(() => {
         Promise.reject(error).catch(err => {
-          handleApiErrors(err);
+          handleError(err);
         });
-      }, [handleApiErrors]);
+      }, [handleError]);
 
       return null;
     };
@@ -81,7 +81,7 @@ describe('PageErrorBoundary', () => {
     });
   });
 
-  test('calling `handleApiErrors` with 404 error renders Not Found page', async () => {
+  test('calling `handleError` with 404 error renders Not Found page', async () => {
     const error: Partial<AxiosError> = {
       name: '',
       message: 'Not Found',
@@ -98,13 +98,13 @@ describe('PageErrorBoundary', () => {
     };
 
     const TestComponent = () => {
-      const { handleApiErrors } = useErrorControl();
+      const { handleError } = useErrorControl();
 
       useEffect(() => {
         Promise.reject(error).catch(err => {
-          handleApiErrors(err);
+          handleError(err);
         });
-      }, [handleApiErrors]);
+      }, [handleError]);
 
       return null;
     };

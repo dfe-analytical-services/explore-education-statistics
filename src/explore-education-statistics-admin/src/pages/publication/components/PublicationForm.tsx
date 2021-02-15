@@ -1,5 +1,4 @@
 import FormFieldThemeTopicSelect from '@admin/components/form/FormFieldThemeTopicSelect';
-import useFormSubmit from '@admin/hooks/useFormSubmit';
 import methodologyService from '@admin/services/methodologyService';
 import { ExternalMethodology } from '@admin/services/publicationService';
 import themeService from '@admin/services/themeService';
@@ -12,6 +11,7 @@ import FormFieldSelect from '@common/components/form/FormFieldSelect';
 import FormFieldTextInput from '@common/components/form/FormFieldTextInput';
 import LoadingSpinner from '@common/components/LoadingSpinner';
 import useAsyncHandledRetry from '@common/hooks/useAsyncHandledRetry';
+import useFormSubmit from '@common/hooks/useFormSubmit';
 import { OmitStrict } from '@common/types';
 import { mapFieldErrors } from '@common/validation/serverValidations';
 import Yup from '@common/validation/yup';

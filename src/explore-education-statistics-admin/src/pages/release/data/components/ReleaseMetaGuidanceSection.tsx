@@ -1,6 +1,5 @@
 import { toolbarConfigs } from '@admin/components/form/FormEditor';
 import FormFieldEditor from '@admin/components/form/FormFieldEditor';
-import useFormSubmit from '@admin/hooks/useFormSubmit';
 import releaseMetaGuidanceService from '@admin/services/releaseMetaGuidanceService';
 import Accordion from '@common/components/Accordion';
 import AccordionSection from '@common/components/AccordionSection';
@@ -13,6 +12,7 @@ import LoadingSpinner from '@common/components/LoadingSpinner';
 import SanitizeHtml from '@common/components/SanitizeHtml';
 import WarningMessage from '@common/components/WarningMessage';
 import useAsyncHandledRetry from '@common/hooks/useAsyncHandledRetry';
+import useFormSubmit from '@common/hooks/useFormSubmit';
 import useToggle from '@common/hooks/useToggle';
 import ReleaseMetaGuidanceDataFile from '@common/modules/release/components/ReleaseMetaGuidanceDataFile';
 import minDelay from '@common/utils/minDelay';

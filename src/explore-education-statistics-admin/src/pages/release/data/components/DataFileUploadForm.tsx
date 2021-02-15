@@ -1,10 +1,10 @@
-import useFormSubmit from '@admin/hooks/useFormSubmit';
 import Button from '@common/components/Button';
 import ButtonGroup from '@common/components/ButtonGroup';
 import ButtonText from '@common/components/ButtonText';
 import { Form, FormFieldRadioGroup } from '@common/components/form';
 import FormFieldFileInput from '@common/components/form/FormFieldFileInput';
 import LoadingSpinner from '@common/components/LoadingSpinner';
+import useFormSubmit from '@common/hooks/useFormSubmit';
 import {
   FieldMessageMapper,
   mapFieldErrors,

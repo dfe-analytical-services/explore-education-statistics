@@ -1,12 +1,12 @@
 import FormFieldEditor from '@admin/components/form/FormFieldEditor';
 import PreviewHtml from '@admin/components/PreviewHtml';
-import useFormSubmit from '@admin/hooks/useFormSubmit';
 import styles from '@admin/pages/release/pre-release/components/PublicPreReleaseAccessForm.module.scss';
 import Button from '@common/components/Button';
 import ButtonGroup from '@common/components/ButtonGroup';
 import { Form } from '@common/components/form';
 import InsetText from '@common/components/InsetText';
 import WarningMessage from '@common/components/WarningMessage';
+import useFormSubmit from '@common/hooks/useFormSubmit';
 import useToggle from '@common/hooks/useToggle';
 import { Formik } from 'formik';
 import React from 'react';

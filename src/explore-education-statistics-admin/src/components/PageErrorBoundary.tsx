@@ -21,7 +21,7 @@ class PageErrorBoundary extends Component<RouteComponentProps, State> {
 
   private unregisterCallback?: () => void;
 
-  private handleManualErrors = {
+  private errorPages = {
     forbidden: () => {
       this.setState({
         errorCode: 403,
@@ -56,10 +56,10 @@ class PageErrorBoundary extends Component<RouteComponentProps, State> {
   }
 
   private handlePromiseRejections = (event: PromiseRejectionEvent) => {
-    this.handleApiErrors(event.reason);
+    this.handleError(event.reason);
   };
 
-  private handleApiErrors = (error: Error) => {
+  private handleError = (error: Error) => {
     logger.error(error);
 
     const axiosError = error as AxiosError;
@@ -78,7 +78,7 @@ class PageErrorBoundary extends Component<RouteComponentProps, State> {
   }
 
   public render() {
-    const { handleApiErrors, handleManualErrors } = this;
+    const { handleError, errorPages } = this;
     const { children } = this.props;
     const { errorCode } = this.state;
 
@@ -86,8 +86,8 @@ class PageErrorBoundary extends Component<RouteComponentProps, State> {
       return (
         <ErrorControlContextProvider
           value={{
-            handleApiErrors,
-            handleManualErrors,
+            handleError,
+            errorPages,
           }}
         >
           {children}

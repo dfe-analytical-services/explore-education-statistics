@@ -1,4 +1,3 @@
-import useFormSubmit from '@admin/hooks/useFormSubmit';
 import ReleaseSummaryForm, {
   ReleaseSummaryFormValues,
 } from '@admin/pages/release/components/ReleaseSummaryForm';
@@ -8,6 +7,7 @@ import {
   releaseSummaryRoute,
 } from '@admin/routes/releaseRoutes';
 import releaseService from '@admin/services/releaseService';
+import useFormSubmit from '@common/hooks/useFormSubmit';
 import { mapFieldErrors } from '@common/validation/serverValidations';
 import LoadingSpinner from '@common/components/LoadingSpinner';
 import useAsyncRetry from '@common/hooks/useAsyncRetry';
