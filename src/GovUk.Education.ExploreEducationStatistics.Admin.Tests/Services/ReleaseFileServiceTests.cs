@@ -1273,9 +1273,9 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
                     It.Is<string>(path =>
                         path.Contains(AdminReleaseDirectoryPath(release.Id, Ancillary))),
                     formFile,
-                    It.Is<IBlobStorageService.UploadFileOptions>(options =>
-                        options.MetaValues[BlobInfoExtensions.FilenameKey] == filename
-                        && options.MetaValues[BlobInfoExtensions.NameKey] == uploadName)
+                    It.Is<IDictionary<string, string>>(metadata =>
+                        metadata[BlobInfoExtensions.FilenameKey] == filename
+                        && metadata[BlobInfoExtensions.NameKey] == uploadName)
                 )).Returns(Task.CompletedTask);
 
             blobStorageService.Setup(mock =>
@@ -1311,12 +1311,12 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
 
                 blobStorageService.Verify(mock =>
                     mock.UploadFile(PrivateFilesContainerName,
-                        It.Is<string>(path => 
+                        It.Is<string>(path =>
                             path.Contains(AdminReleaseDirectoryPath(release.Id, Ancillary))),
                         formFile,
-                        It.Is<IBlobStorageService.UploadFileOptions>(options =>
-                            options.MetaValues[BlobInfoExtensions.FilenameKey] == filename &&
-                            options.MetaValues[BlobInfoExtensions.NameKey] == uploadName)
+                        It.Is<IDictionary<string, string>>(metadata =>
+                            metadata[BlobInfoExtensions.FilenameKey] == filename &&
+                            metadata[BlobInfoExtensions.NameKey] == uploadName)
                     ), Times.Once);
 
                 blobStorageService.Verify(mock =>
@@ -1343,7 +1343,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
                     && rf.File.Filename == filename
                     && rf.File.Type == Ancillary
                 );
-                
+
                 Assert.NotNull(releaseFile);
             }
         }
@@ -1378,8 +1378,8 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
                 )).Returns(Task.CompletedTask);
 
             blobStorageService.Setup(mock =>
-                    mock.GetBlob(PrivateFilesContainerName, 
-                        It.Is<string>(path => 
+                    mock.GetBlob(PrivateFilesContainerName,
+                        It.Is<string>(path =>
                             path.Contains(AdminReleaseDirectoryPath(release.Id, Chart)))))
                 .ReturnsAsync(new BlobInfo(
                     filePath,
@@ -1438,7 +1438,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
                         && rf.File.Filename == filename
                         && rf.File.Type == Chart
                     );
-                
+
                 Assert.NotNull(releaseFile);
             }
         }

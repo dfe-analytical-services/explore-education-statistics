@@ -256,13 +256,9 @@ namespace GovUk.Education.ExploreEducationStatistics.Publisher.Services
                 memoryStream,
                 // Should this be MetaTypeNames.Application.Zip?
                 contentType: "application/x-zip-compressed",
-                options: new IBlobStorageService.UploadStreamOptions
-                {
-                    MetaValues = GetAllFilesZipMetaValues(
-                        name: zipFileName,
-                        releaseDateTime: copyReleaseFilesCommand.PublishScheduled)
-                }
-            );
+                metadata: GetAllFilesZipMetaValues(
+                    name: zipFileName,
+                    releaseDateTime: copyReleaseFilesCommand.PublishScheduled));
         }
 
         public async Task UploadAsJson(string filePath, object value, JsonSerializerSettings settings = null)

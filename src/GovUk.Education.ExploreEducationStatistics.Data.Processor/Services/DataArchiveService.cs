@@ -40,15 +40,12 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Processor.Services
                     path: import.File.Path(),
                     stream: stream,
                     contentType: "text/csv",
-                    options: new IBlobStorageService.UploadStreamOptions
-                    {
-                        MetaValues = GetDataFileMetaValues(
+                    metadata: GetDataFileMetaValues(
                             name: blob.Name,
                             metaFileName: metadataFile.Name,
                             userName: blob.GetUserName(),
                             numberOfRows: CalculateNumberOfRows(rowStream)
-                        )
-                    });
+                        ));
             }
 
             await using (var stream = metadataFile.Open())
@@ -57,11 +54,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Processor.Services
                     containerName: PrivateFilesContainerName,
                     path: import.MetaFile.Path(),
                     stream: stream,
-                    contentType: "text/csv",
-                    options: new IBlobStorageService.UploadStreamOptions
-                    {
-                        MetaValues = GetMetaDataFileMetaValues()
-                    });
+                    contentType: "text/csv");
             }
         }
     }

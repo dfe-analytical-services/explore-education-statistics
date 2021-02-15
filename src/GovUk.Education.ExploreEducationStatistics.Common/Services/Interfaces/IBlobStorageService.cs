@@ -22,40 +22,25 @@ namespace GovUk.Education.ExploreEducationStatistics.Common.Services.Interfaces
 
         public Task<bool> MoveBlob(string containerName, string sourcePath, string destinationPath);
 
-        public class UploadFileOptions
-        {
-            public IDictionary<string, string> MetaValues { get; set; }
-        }
-
         public Task UploadFile(
             string containerName,
             string path,
             IFormFile file,
-            UploadFileOptions options = null);
-
-        public class UploadStreamOptions
-        {
-            public IDictionary<string, string> MetaValues { get; set; }
-        }
+            IDictionary<string, string> metadata = null);
 
         public Task UploadStream(
             string containerName,
             string path,
             Stream stream,
             string contentType,
-            UploadStreamOptions options = null);
-
-        public class UploadTextOptions
-        {
-            public IDictionary<string, string> MetaValues { get; set; }
-        }
+            IDictionary<string, string> metadata = null);
 
         public Task UploadText(
             string containerName,
             string path,
             string content,
             string contentType,
-            UploadTextOptions options = null);
+            IDictionary<string, string> metadata = null);
 
         public Task UploadAsJson<T>(
             string containerName,

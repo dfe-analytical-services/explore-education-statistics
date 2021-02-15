@@ -30,7 +30,10 @@ using static GovUk.Education.ExploreEducationStatistics.Common.Services.FileStor
 using static GovUk.Education.ExploreEducationStatistics.Content.Model.DataImportStatus;
 using static GovUk.Education.ExploreEducationStatistics.Data.Model.Database.StatisticsDbUtils;
 using File = GovUk.Education.ExploreEducationStatistics.Content.Model.File;
+using Publication = GovUk.Education.ExploreEducationStatistics.Content.Model.Publication;
 using Release = GovUk.Education.ExploreEducationStatistics.Content.Model.Release;
+using Theme = GovUk.Education.ExploreEducationStatistics.Content.Model.Theme;
+using Topic = GovUk.Education.ExploreEducationStatistics.Content.Model.Topic;
 using Unit = GovUk.Education.ExploreEducationStatistics.Common.Model.Unit;
 
 namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
@@ -2196,14 +2199,14 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
             var release = new Release
             {
                 ReleaseName = "2000",
-                Publication = new Content.Model.Publication
+                Publication = new Publication
                 {
                     Title = "Test publication",
-                    Topic = new Content.Model.Topic
+                    Topic = new Topic
                     {
                         Id = Guid.NewGuid(),
                         Title = "Test topic",
-                        Theme = new Content.Model.Theme
+                        Theme = new Theme
                         {
                             Id = Guid.NewGuid(),
                             Title = "Test theme"
@@ -2254,11 +2257,11 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
                         It.Is<string>(path => 
                             path.Contains(AdminReleaseDirectoryPath(release.Id, FileType.Data))),
                         dataFormFile,
-                        It.Is<IBlobStorageService.UploadFileOptions>(options =>
-                            options.MetaValues[BlobInfoExtensions.NameKey] == subjectName
-                            && options.MetaValues[BlobInfoExtensions.MetaFileKey] == metaFileName
-                            && options.MetaValues[BlobInfoExtensions.UserNameKey] == "test@test.com"
-                            && options.MetaValues[BlobInfoExtensions.NumberOfRowsKey] == "2")
+                        It.Is<IDictionary<string, string>>(metadata =>
+                            metadata[BlobInfoExtensions.NameKey] == subjectName
+                            && metadata[BlobInfoExtensions.MetaFileKey] == metaFileName
+                            && metadata[BlobInfoExtensions.UserNameKey] == "test@test.com"
+                            && metadata[BlobInfoExtensions.NumberOfRowsKey] == "2")
                     )).Returns(Task.CompletedTask);
 
                 blobStorageService.Setup(mock =>
@@ -2266,7 +2269,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
                         It.Is<string>(path =>
                             path.Contains(AdminReleaseDirectoryPath(release.Id, FileType.Data))),
                         metaFormFile,
-                        It.Is<IBlobStorageService.UploadFileOptions>(options => !options.MetaValues.Any())
+                        null
                     )).Returns(Task.CompletedTask);
 
                 var dataFilePath = AdminReleasePath(release.Id, FileType.Data, Guid.NewGuid());
@@ -2358,14 +2361,14 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
             var release = new Release
             {
                 ReleaseName = "2000",
-                Publication = new Content.Model.Publication
+                Publication = new Publication
                 {
                     Title = "Test publication",
-                    Topic = new Content.Model.Topic
+                    Topic = new Topic
                     {
                         Id = Guid.NewGuid(),
                         Title = "Test topic",
-                        Theme = new Content.Model.Theme
+                        Theme = new Theme
                         {
                             Id = Guid.NewGuid(),
                             Title = "Test theme"
@@ -2442,11 +2445,11 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
                         It.Is<string>(path =>
                             path.Contains(AdminReleaseDirectoryPath(release.Id, FileType.Data))),
                         dataFormFile,
-                        It.Is<IBlobStorageService.UploadFileOptions>(options =>
-                            options.MetaValues[BlobInfoExtensions.NameKey] == originalSubject.Name
-                            && options.MetaValues[BlobInfoExtensions.MetaFileKey] == metaFileName
-                            && options.MetaValues[BlobInfoExtensions.UserNameKey] == "test@test.com"
-                            && options.MetaValues[BlobInfoExtensions.NumberOfRowsKey] == "2")
+                        It.Is<IDictionary<string, string>>(metadata =>
+                            metadata[BlobInfoExtensions.NameKey] == originalSubject.Name
+                            && metadata[BlobInfoExtensions.MetaFileKey] == metaFileName
+                            && metadata[BlobInfoExtensions.UserNameKey] == "test@test.com"
+                            && metadata[BlobInfoExtensions.NumberOfRowsKey] == "2")
                     )).Returns(Task.CompletedTask);
 
                 blobStorageService.Setup(mock =>
@@ -2454,7 +2457,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
                         It.Is<string>(path =>
                             path.Contains(AdminReleaseDirectoryPath(release.Id, FileType.Data))),
                         metaFormFile,
-                        It.Is<IBlobStorageService.UploadFileOptions>(options => !options.MetaValues.Any())
+                        null
                         )).Returns(Task.CompletedTask);
 
                 var dataFilePath = AdminReleasePath(release.Id, FileType.Data, Guid.NewGuid());
@@ -2579,14 +2582,14 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
             {
                 Id = Guid.NewGuid(),
                 ReleaseName = "2000",
-                Publication = new Content.Model.Publication
+                Publication = new Publication
                 {
                     Title = "Test publication",
-                    Topic = new Content.Model.Topic
+                    Topic = new Topic
                     {
                         Id = Guid.NewGuid(),
                         Title = "Test topic",
-                        Theme = new Content.Model.Theme
+                        Theme = new Theme
                         {
                             Id = Guid.NewGuid(),
                             Title = "Test theme"
@@ -2640,11 +2643,11 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
                         It.Is<string>(path =>
                             path.Contains(AdminReleaseDirectoryPath(release.Id, DataZip))),
                         zipFormFile,
-                        It.Is<IBlobStorageService.UploadFileOptions>(options =>
-                            options.MetaValues[BlobInfoExtensions.NameKey] == subjectName
-                            && options.MetaValues[BlobInfoExtensions.MetaFileKey] == metaFileName
-                            && options.MetaValues[BlobInfoExtensions.UserNameKey] == "test@test.com"
-                            && options.MetaValues[BlobInfoExtensions.NumberOfRowsKey] == "0")
+                        It.Is<IDictionary<string, string>>(metadata =>
+                            metadata[BlobInfoExtensions.NameKey] == subjectName
+                            && metadata[BlobInfoExtensions.MetaFileKey] == metaFileName
+                            && metadata[BlobInfoExtensions.UserNameKey] == "test@test.com"
+                            && metadata[BlobInfoExtensions.NumberOfRowsKey] == "0")
                     )).Returns(Task.CompletedTask);
 
                 blobStorageService
@@ -2743,14 +2746,14 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
             var release = new Release
             {
                 ReleaseName = "2000",
-                Publication = new Content.Model.Publication
+                Publication = new Publication
                 {
                     Title = "Test publication",
-                    Topic = new Content.Model.Topic
+                    Topic = new Topic
                     {
                         Id = Guid.NewGuid(),
                         Title = "Test topic",
-                        Theme = new Content.Model.Theme
+                        Theme = new Theme
                         {
                             Id = Guid.NewGuid(),
                             Title = "Test theme"
@@ -2830,11 +2833,11 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
                         It.Is<string>(path =>
                             path.Contains(AdminReleaseDirectoryPath(release.Id, DataZip))),
                         zipFormFile,
-                        It.Is<IBlobStorageService.UploadFileOptions>(options =>
-                            options.MetaValues[BlobInfoExtensions.NameKey] == originalSubject.Name
-                            && options.MetaValues[BlobInfoExtensions.MetaFileKey] == metaFileName
-                            && options.MetaValues[BlobInfoExtensions.UserNameKey] == "test@test.com"
-                            && options.MetaValues[BlobInfoExtensions.NumberOfRowsKey] == "0")
+                        It.Is<IDictionary<string, string>>(metadata =>
+                            metadata[BlobInfoExtensions.NameKey] == originalSubject.Name
+                            && metadata[BlobInfoExtensions.MetaFileKey] == metaFileName
+                            && metadata[BlobInfoExtensions.UserNameKey] == "test@test.com"
+                            && metadata[BlobInfoExtensions.NumberOfRowsKey] == "0")
                     )).Returns(Task.CompletedTask);
 
                 blobStorageService

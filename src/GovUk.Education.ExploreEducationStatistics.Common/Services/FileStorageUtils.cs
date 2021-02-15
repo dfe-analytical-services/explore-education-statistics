@@ -60,11 +60,6 @@ namespace GovUk.Education.ExploreEducationStatistics.Common.Services
             };
         }
 
-        public static IDictionary<string, string> GetMetaDataFileMetaValues()
-        {
-            return new Dictionary<string, string>();
-        }
-
         public static string GetExtension(string fileName)
         {
             return Path.GetExtension(fileName)?.TrimStart('.') ?? string.Empty;

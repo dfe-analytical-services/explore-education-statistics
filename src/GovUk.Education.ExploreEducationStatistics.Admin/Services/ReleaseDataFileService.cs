@@ -238,7 +238,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Services
                                         );
 
                                         await UploadFileToStorage(dataFile, dataFormFile, dataInfo);
-                                        await UploadFileToStorage(metaFile, metaFormFile, GetMetaDataFileMetaValues());
+                                        await UploadFileToStorage(metaFile, metaFormFile);
 
                                         await _dataImportService.Import(
                                             subjectId: subjectId,
@@ -474,16 +474,13 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Services
         private async Task UploadFileToStorage(
             File file,
             IFormFile formFile,
-            IDictionary<string, string> metaValues)
+            IDictionary<string, string> metadata = null)
         {
             await _blobStorageService.UploadFile(
                 containerName: PrivateFilesContainerName,
                 path: file.Path(),
                 file: formFile,
-                options: new IBlobStorageService.UploadFileOptions
-                {
-                    MetaValues = metaValues
-                }
+                metadata: metadata
             );
         }
 
