@@ -108,8 +108,10 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
 
             // test that the deletion of any remaining batch files went ahead for this particular data file
             blobStorageService
-                .Setup(mock => mock.DeleteBlobs(PrivateFilesContainerName,
-                        AdminDataFileBatchesDirectoryPath(releaseDataFile.File.RootPath, releaseDataFile.FileId), null))
+                .Setup(mock => mock.DeleteBlobs(
+                    PrivateFilesContainerName, 
+                    releaseDataFile.BatchesPath(),
+                    null))
                 .Returns(Task.CompletedTask);
 
             await using (var contentDbContext = InMemoryApplicationDbContext(contentDbContextId))
@@ -205,8 +207,10 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
                 .Returns(Task.CompletedTask);
 
             blobStorageService
-                .Setup(mock => mock.DeleteBlobs(PrivateFilesContainerName,
-                    AdminDataFileBatchesDirectoryPath(releaseDataFile.File.RootPath, releaseDataFile.FileId), null))
+                .Setup(mock => mock.DeleteBlobs(
+                    PrivateFilesContainerName,
+                    releaseDataFile.BatchesPath(),
+                    null))
                 .Returns(Task.CompletedTask);
 
             await using (var contentDbContext = InMemoryApplicationDbContext(contentDbContextId))
@@ -354,8 +358,10 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
                 .Returns(Task.CompletedTask);
 
             blobStorageService
-                .Setup(mock => mock.DeleteBlobs(PrivateFilesContainerName,
-                    AdminDataFileBatchesDirectoryPath(replacementDataFile.RootPath, replacementDataFile.Id), null))
+                .Setup(mock => mock.DeleteBlobs(
+                    PrivateFilesContainerName,
+                    replacementDataFile.BatchesPath(), 
+                    null))
                 .Returns(Task.CompletedTask);
 
             await using (var contentDbContext = InMemoryApplicationDbContext(contentDbContextId))
@@ -488,8 +494,10 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
             var dataImportService = new Mock<IDataImportService>(MockBehavior.Strict);
 
             blobStorageService
-                .Setup(mock => mock.DeleteBlobs(PrivateFilesContainerName,
-                    AdminDataFileBatchesDirectoryPath(dataFile.RootPath, dataFile.Id), null))
+                .Setup(mock => mock.DeleteBlobs(
+                    PrivateFilesContainerName,
+                    dataFile.BatchesPath(),
+                    null))
                 .Returns(Task.CompletedTask);
 
             await using (var contentDbContext = InMemoryApplicationDbContext(contentDbContextId))
@@ -607,8 +615,10 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
                 .Returns(Task.CompletedTask);
 
             blobStorageService
-                .Setup(mock => mock.DeleteBlobs(PrivateFilesContainerName,
-                    AdminDataFileBatchesDirectoryPath(dataReleaseFile.File.RootPath, dataReleaseFile.FileId), null))
+                .Setup(mock => mock.DeleteBlobs(
+                    PrivateFilesContainerName,
+                    dataReleaseFile.BatchesPath(),
+                    null))
                 .Returns(Task.CompletedTask);
 
             await using (var contentDbContext = InMemoryApplicationDbContext(contentDbContextId))
@@ -736,8 +746,10 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
             var blobStorageService = new Mock<IBlobStorageService>(MockBehavior.Strict);
             var dataImportService = new Mock<IDataImportService>(MockBehavior.Strict);
 
-            blobStorageService.Setup(mock => mock.DeleteBlobs(PrivateFilesContainerName,
-                    AdminDataFileBatchesDirectoryPath(dataFile.RootPath, dataFile.Id), null))
+            blobStorageService.Setup(mock => mock.DeleteBlobs(
+                    PrivateFilesContainerName,
+                    dataFile.BatchesPath(), 
+                    null))
                 .Returns(Task.CompletedTask);
 
             await using (var contentDbContext = InMemoryApplicationDbContext(contentDbContextId))
@@ -2255,7 +2267,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
                 blobStorageService.Setup(mock =>
                     mock.UploadFile(PrivateFilesContainerName,
                         It.Is<string>(path => 
-                            path.Contains(AdminReleaseDirectoryPath(release.Id, FileType.Data))),
+                            path.Contains(AdminFilesPath(release.Id, FileType.Data))),
                         dataFormFile,
                         It.Is<IDictionary<string, string>>(metadata =>
                             metadata[BlobInfoExtensions.NameKey] == subjectName
@@ -2267,20 +2279,18 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
                 blobStorageService.Setup(mock =>
                     mock.UploadFile(PrivateFilesContainerName,
                         It.Is<string>(path =>
-                            path.Contains(AdminReleaseDirectoryPath(release.Id, FileType.Data))),
+                            path.Contains(AdminFilesPath(release.Id, FileType.Data))),
                         metaFormFile,
                         null
                     )).Returns(Task.CompletedTask);
 
-                var dataFilePath = AdminReleasePath(release.Id, FileType.Data, Guid.NewGuid());
-
                 blobStorageService
                     .Setup(s => s.GetBlob(PrivateFilesContainerName, 
                         It.Is<string>(path =>
-                            path.Contains(AdminReleaseDirectoryPath(release.Id, FileType.Data)))))
+                            path.Contains(AdminFilesPath(release.Id, FileType.Data)))))
                     .ReturnsAsync(
                         new BlobInfo(
-                            path: dataFilePath,
+                            path: "data/file/path",
                             size: "1 Mb",
                             contentType: "application/zip",
                             contentLength: 1000L,
@@ -2317,7 +2327,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
                 Assert.Equal(subjectName, result.Right.Name);
                 Assert.Equal(dataFileName, result.Right.FileName);
                 Assert.Equal("csv", result.Right.Extension);
-                Assert.Equal(dataFilePath, result.Right.Path);
+                Assert.Equal("data/file/path", result.Right.Path);
                 Assert.True(result.Right.MetaFileId.HasValue);
                 Assert.Equal(metaFileName, result.Right.MetaFileName);
                 Assert.Equal("test@test.com", result.Right.UserName);
@@ -2443,7 +2453,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
                 blobStorageService.Setup(mock =>
                     mock.UploadFile(PrivateFilesContainerName,
                         It.Is<string>(path =>
-                            path.Contains(AdminReleaseDirectoryPath(release.Id, FileType.Data))),
+                            path.Contains(AdminFilesPath(release.Id, FileType.Data))),
                         dataFormFile,
                         It.Is<IDictionary<string, string>>(metadata =>
                             metadata[BlobInfoExtensions.NameKey] == originalSubject.Name
@@ -2455,20 +2465,18 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
                 blobStorageService.Setup(mock =>
                     mock.UploadFile(PrivateFilesContainerName,
                         It.Is<string>(path =>
-                            path.Contains(AdminReleaseDirectoryPath(release.Id, FileType.Data))),
+                            path.Contains(AdminFilesPath(release.Id, FileType.Data))),
                         metaFormFile,
                         null
                         )).Returns(Task.CompletedTask);
 
-                var dataFilePath = AdminReleasePath(release.Id, FileType.Data, Guid.NewGuid());
-
                 blobStorageService
                     .Setup(s => s.GetBlob(PrivateFilesContainerName, 
                             It.Is<string>(path => 
-                                path.Contains(AdminReleaseDirectoryPath(release.Id, FileType.Data)))))
+                                path.Contains(AdminFilesPath(release.Id, FileType.Data)))))
                     .ReturnsAsync(
                         new BlobInfo(
-                            path: dataFilePath,
+                            path: "data/file/path",
                             size: "1 Mb",
                             contentType: "application/zip",
                             contentLength: 1000L,
@@ -2505,7 +2513,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
                 Assert.Equal(originalSubject.Name, result.Right.Name);
                 Assert.Equal(dataFileName, result.Right.FileName);
                 Assert.Equal("csv", result.Right.Extension);
-                Assert.Equal(dataFilePath, result.Right.Path);
+                Assert.Equal("data/file/path", result.Right.Path);
                 Assert.True(result.Right.MetaFileId.HasValue);
                 Assert.Equal(metaFileName, result.Right.MetaFileName);
                 Assert.Equal("test@test.com", result.Right.UserName);
@@ -2641,7 +2649,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
                 blobStorageService.Setup(mock =>
                     mock.UploadFile(PrivateFilesContainerName,
                         It.Is<string>(path =>
-                            path.Contains(AdminReleaseDirectoryPath(release.Id, DataZip))),
+                            path.Contains(AdminFilesPath(release.Id, DataZip))),
                         zipFormFile,
                         It.Is<IDictionary<string, string>>(metadata =>
                             metadata[BlobInfoExtensions.NameKey] == subjectName
@@ -2653,10 +2661,10 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
                 blobStorageService
                     .Setup(s => s.GetBlob(PrivateFilesContainerName, 
                         It.Is<string>(path => 
-                            path.Contains(AdminReleaseDirectoryPath(release.Id, DataZip)))))
+                            path.Contains(AdminFilesPath(release.Id, DataZip)))))
                     .ReturnsAsync(
                         new BlobInfo(
-                            path: AdminReleasePath(release.Id, DataZip, Guid.NewGuid()),
+                            path: "zip/file/path",
                             size: "1 Mb",
                             contentType: "application/zip",
                             contentLength: 1000L,
@@ -2831,7 +2839,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
                 blobStorageService.Setup(mock =>
                     mock.UploadFile(PrivateFilesContainerName,
                         It.Is<string>(path =>
-                            path.Contains(AdminReleaseDirectoryPath(release.Id, DataZip))),
+                            path.Contains(AdminFilesPath(release.Id, DataZip))),
                         zipFormFile,
                         It.Is<IDictionary<string, string>>(metadata =>
                             metadata[BlobInfoExtensions.NameKey] == originalSubject.Name
@@ -2843,10 +2851,10 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
                 blobStorageService
                     .Setup(s => s.GetBlob(PrivateFilesContainerName,
                         It.Is<string>(path =>
-                            path.Contains(AdminReleaseDirectoryPath(release.Id, DataZip)))))
+                            path.Contains(AdminFilesPath(release.Id, DataZip)))))
                     .ReturnsAsync(
                         new BlobInfo(
-                            path: AdminReleasePath(release.Id, DataZip, Guid.NewGuid()),
+                            path: "zip/file/path",
                             size: "1 Mb",
                             contentType: "application/zip",
                             contentLength: 1000L,

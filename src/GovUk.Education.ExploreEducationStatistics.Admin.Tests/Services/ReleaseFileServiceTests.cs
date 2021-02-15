@@ -1266,12 +1266,10 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
             var blobStorageService = new Mock<IBlobStorageService>(MockBehavior.Strict);
             var fileUploadsValidatorService = new Mock<IFileUploadsValidatorService>(MockBehavior.Strict);
 
-            var filePath = AdminReleasePath(release.Id, Ancillary, Guid.NewGuid());
-
             blobStorageService.Setup(mock =>
                 mock.UploadFile(PrivateFilesContainerName,
                     It.Is<string>(path =>
-                        path.Contains(AdminReleaseDirectoryPath(release.Id, Ancillary))),
+                        path.Contains(AdminFilesPath(release.Id, Ancillary))),
                     formFile,
                     It.Is<IDictionary<string, string>>(metadata =>
                         metadata[BlobInfoExtensions.FilenameKey] == filename
@@ -1281,9 +1279,9 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
             blobStorageService.Setup(mock =>
                     mock.GetBlob(PrivateFilesContainerName,
                         It.Is<string>(path =>
-                            path.Contains(AdminReleaseDirectoryPath(release.Id, Ancillary)))))
+                            path.Contains(AdminFilesPath(release.Id, Ancillary)))))
                 .ReturnsAsync(new BlobInfo(
-                    path: filePath,
+                    path: "ancillary/file/path",
                     size: "10 Kb",
                     contentType: "application/pdf",
                     contentLength: 0L,
@@ -1312,7 +1310,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
                 blobStorageService.Verify(mock =>
                     mock.UploadFile(PrivateFilesContainerName,
                         It.Is<string>(path =>
-                            path.Contains(AdminReleaseDirectoryPath(release.Id, Ancillary))),
+                            path.Contains(AdminFilesPath(release.Id, Ancillary))),
                         formFile,
                         It.Is<IDictionary<string, string>>(metadata =>
                             metadata[BlobInfoExtensions.FilenameKey] == filename &&
@@ -1322,14 +1320,14 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
                 blobStorageService.Verify(mock =>
                         mock.GetBlob(PrivateFilesContainerName,
                             It.Is<string>(path =>
-                                path.Contains(AdminReleaseDirectoryPath(release.Id, Ancillary)))),
+                                path.Contains(AdminFilesPath(release.Id, Ancillary)))),
                     Times.Once);
 
                 Assert.True(result.Right.Id.HasValue);
                 Assert.Equal("pdf", result.Right.Extension);
                 Assert.Equal("ancillary.pdf", result.Right.FileName);
                 Assert.Equal("Ancillary Test File", result.Right.Name);
-                Assert.Contains(AdminReleaseDirectoryPath(release.Id, Ancillary), result.Right.Path);
+                Assert.Contains(AdminFilesPath(release.Id, Ancillary), result.Right.Path);
                 Assert.Equal("10 Kb", result.Right.Size);
                 Assert.Equal(Ancillary, result.Right.Type);
             }
@@ -1367,12 +1365,10 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
             var blobStorageService = new Mock<IBlobStorageService>(MockBehavior.Strict);
             var fileUploadsValidatorService = new Mock<IFileUploadsValidatorService>(MockBehavior.Strict);
 
-            var filePath = AdminReleasePath(release.Id, Chart, Guid.NewGuid());
-
             blobStorageService.Setup(mock =>
                 mock.UploadFile(PrivateFilesContainerName,
                     It.Is<string>(path =>
-                        path.Contains(AdminReleaseDirectoryPath(release.Id, Chart))),
+                        path.Contains(AdminFilesPath(release.Id, Chart))),
                     formFile,
                     null
                 )).Returns(Task.CompletedTask);
@@ -1380,9 +1376,9 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
             blobStorageService.Setup(mock =>
                     mock.GetBlob(PrivateFilesContainerName,
                         It.Is<string>(path =>
-                            path.Contains(AdminReleaseDirectoryPath(release.Id, Chart)))))
+                            path.Contains(AdminFilesPath(release.Id, Chart)))))
                 .ReturnsAsync(new BlobInfo(
-                    filePath,
+                    path: "chart/file/path",
                     size: "20 Kb",
                     contentType: "image/png",
                     contentLength: 0L,
@@ -1409,7 +1405,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
                 blobStorageService.Verify(mock =>
                     mock.UploadFile(PrivateFilesContainerName, 
                         It.Is<string>(path => 
-                            path.Contains(AdminReleaseDirectoryPath(release.Id, Chart))),
+                            path.Contains(AdminFilesPath(release.Id, Chart))),
                         formFile,
                         null
                     ), Times.Once);
@@ -1417,14 +1413,14 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
                 blobStorageService.Verify(mock =>
                     mock.GetBlob(PrivateFilesContainerName,
                         It.Is<string>(path => 
-                            path.Contains(AdminReleaseDirectoryPath(release.Id, Chart)))),
+                            path.Contains(AdminFilesPath(release.Id, Chart)))),
                     Times.Once);
 
                 Assert.True(result.Right.Id.HasValue);
                 Assert.Equal("png", result.Right.Extension);
                 Assert.Equal("chart.png", result.Right.FileName);
                 Assert.Equal("chart.png", result.Right.Name);
-                Assert.Contains(AdminReleaseDirectoryPath(release.Id, Chart), result.Right.Path);
+                Assert.Contains(AdminFilesPath(release.Id, Chart), result.Right.Path);
                 Assert.Equal("20 Kb", result.Right.Size);
                 Assert.Equal(Chart, result.Right.Type);
             }

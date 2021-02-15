@@ -497,8 +497,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Services
 
         private async Task DeleteBatchFiles(File dataFile)
         {
-            await _blobStorageService.DeleteBlobs(PrivateFilesContainerName,
-                AdminDataFileBatchesDirectoryPath(dataFile.RootPath, dataFile.Id));
+            await _blobStorageService.DeleteBlobs(PrivateFilesContainerName, dataFile.BatchesPath());
         }
     }
 }

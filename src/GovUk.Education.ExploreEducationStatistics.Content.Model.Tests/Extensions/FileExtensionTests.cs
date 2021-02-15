@@ -23,6 +23,23 @@ namespace GovUk.Education.ExploreEducationStatistics.Content.Model.Tests.Extensi
         };
 
         [Fact]
+        public void Batches_ReleaseFile()
+        {
+            var releaseFile = new ReleaseFile
+            {
+                File = new File
+                {
+                    Id = Guid.NewGuid(),
+                    RootPath = Guid.NewGuid(),
+                    Filename = "data.csv",
+                    Type = Data
+                }
+            };
+ 
+            Assert.Equal(releaseFile.File.BatchesPath(), releaseFile.BatchesPath());
+        }
+
+        [Fact]
         public void BatchesPath()
         {
             var dataFile = new File
@@ -64,7 +81,60 @@ namespace GovUk.Education.ExploreEducationStatistics.Content.Model.Tests.Extensi
         [Fact]
         public void Path()
         {
-            Assert.Equal(AdminReleasePath(_file.RootPath, _file.Type, _file.BlobStorageName), _file.Path());
+            var ancillaryFile = new File
+            {
+                Id = Guid.NewGuid(),
+                RootPath = Guid.NewGuid(),
+                Filename = "ancillary.pdf",
+                Type = Ancillary
+            };
+
+            var chartFile = new File
+            {
+                Id = Guid.NewGuid(),
+                RootPath = Guid.NewGuid(),
+                Filename = "chart.png",
+                Type = Chart
+            };
+
+            var dataFile = new File
+            {
+                Id = Guid.NewGuid(),
+                RootPath = Guid.NewGuid(),
+                Filename = "data.csv",
+                Type = Data
+            };
+
+            var imageFile = new File
+            {
+                Id = Guid.NewGuid(),
+                RootPath = Guid.NewGuid(),
+                Filename = "image.png",
+                Type = Image
+            };
+
+            var metaFile = new File
+            {
+                Id = Guid.NewGuid(),
+                RootPath = Guid.NewGuid(),
+                Filename = "data.meta.csv",
+                Type = Metadata
+            };
+
+            var zipFile = new File
+            {
+                Id = Guid.NewGuid(),
+                RootPath = Guid.NewGuid(),
+                Filename = "data.zip",
+                Type = DataZip
+            };
+
+            Assert.Equal($"{ancillaryFile.RootPath}/ancillary/{ancillaryFile.BlobStorageName}", ancillaryFile.Path());
+            Assert.Equal($"{chartFile.RootPath}/chart/{chartFile.BlobStorageName}", chartFile.Path());
+            Assert.Equal($"{dataFile.RootPath}/data/{dataFile.BlobStorageName}", dataFile.Path());
+            Assert.Equal($"{imageFile.RootPath}/image/{imageFile.BlobStorageName}", imageFile.Path());
+            Assert.Equal($"{metaFile.RootPath}/data/{metaFile.BlobStorageName}", metaFile.Path());
+            Assert.Equal($"{zipFile.RootPath}/zip/{zipFile.BlobStorageName}", zipFile.Path());
         }
 
         [Fact]

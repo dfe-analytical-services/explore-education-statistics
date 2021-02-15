@@ -8,32 +8,15 @@ namespace GovUk.Education.ExploreEducationStatistics.Common.Tests.Services
     public class FileStoragePathUtilsTests
     {
         [Fact]
-        public void TestAdminDataFileBatchesDirectoryPath()
-        {
-            var releaseId = Guid.NewGuid();
-            var fileId = Guid.NewGuid();
-            Assert.Equal($"{releaseId}/data/batches/{fileId}/", AdminDataFileBatchesDirectoryPath(releaseId, fileId));
-        }
-
-        [Fact]
-        public void TestAdminReleaseDirectoryPath()
+        public void TestAdminFilesPath()
         {
             var rootPath = Guid.NewGuid();
-            Assert.Equal($"{rootPath}/ancillary/", AdminReleaseDirectoryPath(rootPath, Ancillary));
-            Assert.Equal($"{rootPath}/data/", AdminReleaseDirectoryPath(rootPath, Data));
-            Assert.Equal($"{rootPath}/chart/", AdminReleaseDirectoryPath(rootPath, Chart));
-            Assert.Equal($"{rootPath}/image/", AdminReleaseDirectoryPath(rootPath, Image));
-        }
-
-        [Fact]
-        public void TestAdminReleasePath()
-        {
-            var rootPath = Guid.NewGuid();
-            var fileId = Guid.NewGuid();
-            Assert.Equal($"{rootPath}/ancillary/{fileId}", AdminReleasePath(rootPath, Ancillary, fileId));
-            Assert.Equal($"{rootPath}/data/{fileId}", AdminReleasePath(rootPath, Data, fileId));
-            Assert.Equal($"{rootPath}/chart/{fileId}", AdminReleasePath(rootPath, Chart, fileId));
-            Assert.Equal($"{rootPath}/image/{fileId}", AdminReleasePath(rootPath, Image, fileId));
+            Assert.Equal($"{rootPath}/ancillary/", AdminFilesPath(rootPath, Ancillary));
+            Assert.Equal($"{rootPath}/chart/", AdminFilesPath(rootPath, Chart));
+            Assert.Equal($"{rootPath}/data/", AdminFilesPath(rootPath, Data));
+            Assert.Equal($"{rootPath}/zip/", AdminFilesPath(rootPath, DataZip));
+            Assert.Equal($"{rootPath}/image/", AdminFilesPath(rootPath, Image));
+            Assert.Equal($"{rootPath}/data/", AdminFilesPath(rootPath, Metadata));
         }
 
         [Fact]
