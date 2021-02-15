@@ -39,9 +39,11 @@ const PreReleaseTableToolPage = ({
       releaseId,
     );
 
-    const highlights = orderBy(release.highlights, ['label'], ['asc']).filter(
-      highlight => highlight.id !== dataBlockId,
-    );
+    const highlights = orderBy(
+      release.highlights,
+      [highlight => highlight.name],
+      ['asc'],
+    ).filter(highlight => highlight.id !== dataBlockId);
 
     if (dataBlockId) {
       const { table, query } = await dataBlockService.getDataBlock(dataBlockId);
@@ -112,31 +114,19 @@ const PreReleaseTableToolPage = ({
             scrollOnMount
             themeMeta={[]}
             initialState={tableToolState}
-            renderHighlights={highlights => (
-              <aside>
-                <h3>Table highlights</h3>
-
-                <p>View popular tables related to this publication:</p>
-
-                <ul>
-                  {highlights.map(highlight => (
-                    <li key={highlight.id}>
-                      <Link
-                        to={generatePath<PreReleaseTableToolRouteParams>(
-                          preReleaseTableToolRoute.path,
-                          {
-                            publicationId,
-                            releaseId,
-                            dataBlockId: highlight.id,
-                          },
-                        )}
-                      >
-                        {highlight.name}
-                      </Link>
-                    </li>
-                  ))}
-                </ul>
-              </aside>
+            renderHighlightLink={highlight => (
+              <Link
+                to={generatePath<PreReleaseTableToolRouteParams>(
+                  preReleaseTableToolRoute.path,
+                  {
+                    publicationId,
+                    releaseId,
+                    dataBlockId: highlight.id,
+                  },
+                )}
+              >
+                {highlight.name}
+              </Link>
             )}
             finalStep={({ response, query }) => (
               <WizardStep>

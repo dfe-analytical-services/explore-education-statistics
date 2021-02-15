@@ -46,7 +46,7 @@ const TableToolPage: NextPage<TableToolPageProps> = ({
 
     const highlights = orderBy(
       initialPublication.highlights,
-      ['label'],
+      [highlight => highlight.name],
       ['asc'],
     ).filter(highlight => highlight.id !== fastTrack?.id);
 
@@ -101,30 +101,18 @@ const TableToolPage: NextPage<TableToolPageProps> = ({
         scrollOnMount
         themeMeta={themeMeta}
         initialState={initialState}
-        renderHighlights={highlights => (
-          <aside>
-            <h3>Table highlights</h3>
-
-            <p>View popular tables related to this publication:</p>
-
-            <ul>
-              {highlights.map(highlight => (
-                <li key={highlight.id}>
-                  <Link
-                    to="/data-tables/fast-track/[fastTrackId]"
-                    as={`/data-tables/fast-track/${highlight.id}`}
-                    analytics={{
-                      category: 'Table tool',
-                      action: 'Clicked to view Table highlight',
-                      label: `Table highlight label: ${highlight.label}`,
-                    }}
-                  >
-                    {highlight.name}
-                  </Link>
-                </li>
-              ))}
-            </ul>
-          </aside>
+        renderHighlightLink={highlight => (
+          <Link
+            to="/data-tables/fast-track/[fastTrackId]"
+            as={`/data-tables/fast-track/${highlight.id}`}
+            analytics={{
+              category: 'Table tool',
+              action: 'Clicked to view Table highlight',
+              label: `Table highlight name: ${highlight.name}`,
+            }}
+          >
+            {highlight.name}
+          </Link>
         )}
         finalStep={({ publication, query, response }) => (
           <WizardStep>

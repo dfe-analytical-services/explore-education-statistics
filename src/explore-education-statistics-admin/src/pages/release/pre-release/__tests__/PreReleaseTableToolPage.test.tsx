@@ -266,17 +266,23 @@ describe('PreReleaseTableToolPage', () => {
       );
 
       const step1 = within(screen.getByTestId('wizardStep-1'));
+      const tabs = step1.getAllByRole('tabpanel', { hidden: true });
 
-      expect(step1.getByLabelText('Test subject')).toBeInTheDocument();
+      expect(tabs).toHaveLength(2);
+
       expect(
-        step1.getByRole('heading', { name: 'Table highlights' }),
+        within(tabs[0]).getByRole('heading', { name: 'Choose a table' }),
       ).toBeInTheDocument();
       expect(
-        step1.getByRole('link', { name: 'Test highlight' }),
+        within(tabs[0]).getByRole('link', { name: 'Test highlight' }),
       ).toHaveAttribute(
         'href',
         '/publication/publication-1/release/release-1/prerelease/table-tool/block-1',
       );
+
+      expect(
+        within(tabs[1]).getByLabelText('Test subject'),
+      ).toBeInTheDocument();
 
       expect(screen.queryByTestId('dataTableCaption')).not.toBeInTheDocument();
       expect(screen.queryByRole('table')).not.toBeInTheDocument();
