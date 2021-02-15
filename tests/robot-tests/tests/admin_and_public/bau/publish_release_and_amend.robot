@@ -259,13 +259,13 @@ Verify release URL and page caption
 
 Verify publish and update dates
     [Tags]  HappyPath
-    user checks testid element contains   published-date   ${PUBLISH_DATE_DAY} ${PUBLISH_DATE_MONTH} ${PUBLISH_DATE_YEAR}
-    user waits until element contains  css:[data-testid="next-update"] time   December 3001
+    user checks summary list contains  Published  ${PUBLISH_DATE_DAY} ${PUBLISH_DATE_MONTH} ${PUBLISH_DATE_YEAR}
+    user checks summary list contains  Next update   December 3001
 
 Verify release associated files
     [Tags]  HappyPath
-    user opens details dropdown     Download associated files
-    ${downloads}=  user gets details content element  Download associated files
+    user opens accordion section  Download data
+    ${downloads}=  user gets accordion section content element  Download data
     user checks element should contain  ${downloads}  All files (zip, 3 Kb)
     user waits until element contains link  ${downloads}  All files
     user checks link has url  All files  %{CONTENT_API_URL}/download/ui-tests-publish-release-${RUN_IDENTIFIER}/3000-01/ancillary/ui-tests-publish-release-${RUN_IDENTIFIER}_3000-01.zip   ${downloads}
@@ -323,7 +323,6 @@ Verify public metadata guidance document
 
 Verify public pre-release access list
     [Tags]  HappyPath
-    user opens details dropdown     Download associated files
     user clicks link  Pre-release access list
 
     user checks breadcrumb count should be   4
@@ -343,16 +342,17 @@ Verify public pre-release access list
 
 Verify accordions are correct
     [Tags]  HappyPath
-    user checks accordion is in position   Dates data block     1
-    user checks accordion is in position   Test text            2
-    user checks accordion is in position   National Statistics  3
-    user checks accordion is in position   Contact us           4
+    user checks accordion is in position   Dates data block     1  id:content
+    user checks accordion is in position   Test text            2  id:content
+
+    user checks accordion is in position   National Statistics  1  id:help-and-support
+    user checks accordion is in position   Contact us           2  id:help-and-support
 
 Verify Dates data block accordion section
     [Tags]  HappyPath
-    user opens accordion section  Dates data block
-    user scrolls to accordion section content  Dates data block
-    ${section}=  user gets accordion section content element  Dates data block
+    user opens accordion section  Dates data block  id:content
+    user scrolls to accordion section content  Dates data block  id:content
+    ${section}=  user gets accordion section content element  Dates data block  id:content
 
     user checks chart title contains  ${section}  Sample title
     user checks infographic chart contains alt  ${section}  Sample alt text
@@ -365,14 +365,14 @@ Verify Dates data block accordion section
     user checks headed table body row cell contains  Number of open settings        1  22,900  ${section}
     user checks headed table body row cell contains  Proportion of settings open    1  1%      ${section}
 
-    user closes accordion section  Dates data block
+    user closes accordion section  Dates data block  id:content
 
 Verify Test text accordion section contains correct text
     [Tags]  HappyPath
-    user opens accordion section   Test text
-    ${section}=  get webelement  xpath://*[contains(@class, "govuk-accordion__section-button") and text()="Test text"]/../../..
+    user opens accordion section   Test text  id:content
+    ${section}=  user gets accordion section content element  Test text  id:content
     user waits until parent contains element  ${section}   xpath:.//p[text()="Some test text!"]
-    user closes accordion section  Test text
+    user closes accordion section  Test text  id:content
 
 Return to Admin to start creating an amendment
     [Tags]  HappyPath
@@ -647,17 +647,17 @@ Verify amendment is displayed as the latest release
     [Tags]  HappyPath   Failing
     [Documentation]  EES-1301
     user checks page does not contain  View latest data:
-    user checks page does not contain  See 1 other releases
+    user checks page does not contain  See other releases (1)
 
 Verify amendment publish and update dates
     [Tags]  HappyPath
-    user checks testid element contains    published-date   ${PUBLISH_DATE_DAY} ${PUBLISH_DATE_MONTH} ${PUBLISH_DATE_YEAR}
-    user waits until element contains  css:[data-testid="next-update"] time   January 3002
+    user checks summary list contains  Published  ${PUBLISH_DATE_DAY} ${PUBLISH_DATE_MONTH} ${PUBLISH_DATE_YEAR}
+    user checks summary list contains  Next update  January 3002
 
 Verify amendment files
     [Tags]  HappyPath
-    user opens details dropdown     Download associated files
-    ${downloads}=  user gets details content element  Download associated files
+    user opens accordion section  Download data
+    ${downloads}=  user gets accordion section content element  Download data
     user checks element should contain  ${downloads}  All files (zip, 3 Kb)
     user waits until element contains link  ${downloads}  All files
     user checks link has url  All files  %{CONTENT_API_URL}/download/ui-tests-publish-release-${RUN_IDENTIFIER}/3000-01/ancillary/ui-tests-publish-release-${RUN_IDENTIFIER}_3000-01.zip   ${downloads}
@@ -720,7 +720,6 @@ Verify amendment public metadata guidance document
 
 Verify amendment public pre-release access list
     [Tags]  HappyPath
-    user opens details dropdown     Download associated files
     user clicks link  Pre-release access list
 
     user checks breadcrumb count should be   4
@@ -740,16 +739,17 @@ Verify amendment public pre-release access list
 
 Verify amendment accordions are correct
     [Tags]  HappyPath
-    user checks accordion is in position   Dates data block     1
-    user checks accordion is in position   Test text            2
-    user checks accordion is in position   National Statistics  3
-    user checks accordion is in position   Contact us           4
+    user checks accordion is in position   Dates data block     1  id:content
+    user checks accordion is in position   Test text            2  id:content
+
+    user checks accordion is in position   National Statistics  1  id:help-and-support
+    user checks accordion is in position   Contact us           2  id:help-and-support
 
 Verify amendment Dates data block accordion section
     [Tags]  HappyPath
-    user opens accordion section  Dates data block
-    user scrolls to accordion section content  Dates data block
-    ${section}=  user gets accordion section content element  Dates data block
+    user opens accordion section  Dates data block  id:content
+    user scrolls to accordion section content  Dates data block  id:content
+    ${section}=  user gets accordion section content element  Dates data block  id:content
 
     user checks chart title contains  ${section}  Updated sample title
     user checks infographic chart contains alt  ${section}  Updated sample alt text
@@ -763,11 +763,10 @@ Verify amendment Dates data block accordion section
     user checks headed table body row cell contains  Proportion of settings open    1  2%      ${section}
     user checks headed table body row cell contains  Number of open settings        1  23,600  ${section}
     user checks headed table body row cell contains  Proportion of settings open    1  1%      ${section}
-    user closes accordion section  Dates data block
+    user closes accordion section  Dates data block  id:content
 
 Verify amendment Test text accordion section contains correct text
     [Tags]  HappyPath
-    user opens accordion section   Test text
-    ${section}=  get webelement  xpath://*[contains(@class, "govuk-accordion__section-button") and text()="Test text"]/../../..
-    user waits until parent contains element  ${section}   xpath:.//p[text()="Updated test text!"]
-    user closes accordion section  Test text
+    user opens accordion section   Test text  id:content
+    ${section}=  user gets accordion section content element  Test text  id:content
+    user closes accordion section  Test text  id:content

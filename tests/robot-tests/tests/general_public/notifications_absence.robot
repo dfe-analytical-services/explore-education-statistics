@@ -13,7 +13,7 @@ Navigate to Absence publication
     user goes to url  %{PUBLIC_URL}
     user waits until page contains  Select an option to find the national and regional
 
-    user clicks link  Find statistics and data
+    user clicks link  Explore
     user waits until page contains  Browse to find the statistics and data you’re looking for
     user waits for page to finish loading
 

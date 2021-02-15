@@ -9,13 +9,13 @@ user checks headline summary contains
 
 user checks number of release updates
     [Arguments]  ${number}
-    user waits until element is visible  id:releaseNotes
-    user waits until page contains element  css:#releaseNotes li  limit=${number}
+    user waits until element is visible  id:releaseLastUpdates
+    user waits until page contains element  css:#releaseLastUpdates li  limit=${number}
 
 user checks release update
     [Arguments]  ${number}  ${date}  ${text}
-    user waits until element contains  css:#releaseNotes li:nth-of-type(${number}) time  ${date}
-    user waits until element contains  css:#releaseNotes li:nth-of-type(${number}) p     ${text}
+    user waits until element contains  css:#releaseLastUpdates li:nth-of-type(${number}) time  ${date}
+    user waits until element contains  css:#releaseLastUpdates li:nth-of-type(${number}) p     ${text}
 
 user waits until details dropdown contains publication
     [Arguments]  ${details_heading}  ${publication_name}  ${wait}=3

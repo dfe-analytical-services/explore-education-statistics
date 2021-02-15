@@ -1,7 +1,10 @@
+import Accordion from '@common/components/Accordion';
 import AccordionSection from '@common/components/AccordionSection';
 import Details from '@common/components/Details';
 import FormattedDate from '@common/components/FormattedDate';
 import RelatedAside from '@common/components/RelatedAside';
+import SummaryList from '@common/components/SummaryList';
+import SummaryListItem from '@common/components/SummaryListItem';
 import ContentBlockRenderer from '@common/modules/find-statistics/components/ContentBlockRenderer';
 import publicationService, {
   Release,
@@ -22,7 +25,6 @@ import { logEvent } from '@frontend/services/googleAnalyticsService';
 import classNames from 'classnames';
 import { GetServerSideProps, NextPage } from 'next';
 import React from 'react';
-import Accordion from '@common/components/Accordion';
 import PublicationReleaseHeadlinesSection from './components/PublicationReleaseHeadlinesSection';
 import styles from './PublicationReleasePage.module.scss';
 
@@ -59,8 +61,8 @@ const PublicationReleasePage: NextPage<Props> = ({ data }) => {
     >
       <div className={classNames('govuk-grid-row', styles.releaseIntro)}>
         <div className="govuk-grid-column-two-thirds">
-          <div className="govuk-grid-row">
-            <div className="govuk-grid-column-three-quarters">
+          <div className="dfe-flex dfe-align-items--center dfe-justify-content--space-between">
+            <div className="dfe-flex govuk-!-margin-bottom-3">
               {data.latestRelease ? (
                 <strong className="govuk-tag govuk-!-margin-right-6">
                   This is the latest data
@@ -78,26 +80,63 @@ const PublicationReleasePage: NextPage<Props> = ({ data }) => {
                   </span>
                 </Link>
               )}
-              <dl className="dfe-meta-content govuk-!-margin-top-3 govuk-!-margin-bottom-1">
-                <dt className="govuk-caption-m">Published: </dt>
-                <dd data-testid="published-date">
-                  <strong>
-                    <FormattedDate>{data.published}</FormattedDate>
-                  </strong>
-                </dd>
-                {isValidPartialDate(data.nextReleaseDate) && (
-                  <div>
-                    <dt className="govuk-caption-m">Next update: </dt>
-                    <dd data-testid="next-update">
-                      <strong>
-                        <time>{formatPartialDate(data.nextReleaseDate)}</time>
-                      </strong>
-                    </dd>
-                  </div>
+            </div>
+            <div className="dfe-flex">
+              {data.type &&
+                data.type.title === ReleaseType.NationalStatistics && (
+                  <img
+                    src="/assets/images/UKSA-quality-mark2.jpg"
+                    alt="UK statistics authority quality mark"
+                    height="60"
+                    width="60"
+                  />
                 )}
-              </dl>
+            </div>
+          </div>
+
+          <SummaryList>
+            <SummaryListItem term="Published">
+              <FormattedDate>{data.published}</FormattedDate>
+            </SummaryListItem>
+            {isValidPartialDate(data.nextReleaseDate) && (
+              <SummaryListItem term="Next update">
+                <time>{formatPartialDate(data.nextReleaseDate)}</time>
+              </SummaryListItem>
+            )}
+            {data.updates && data.updates.length > 0 && (
+              <SummaryListItem term="Last updated">
+                <FormattedDate>{data.updates[0].on}</FormattedDate>
+
+                <Details
+                  id="releaseLastUpdates"
+                  onToggle={open => {
+                    if (open) {
+                      logEvent(
+                        'Last Updates',
+                        'Release page last updates dropdown opened',
+                        window.location.pathname,
+                      );
+                    }
+                  }}
+                  summary={`See all updates (${data.updates.length})`}
+                >
+                  <ol className="govuk-list">
+                    {data.updates.map(note => (
+                      <li key={note.id}>
+                        <FormattedDate className="govuk-body govuk-!-font-weight-bold">
+                          {note.on}
+                        </FormattedDate>
+                        <p>{note.reason}</p>
+                      </li>
+                    ))}
+                    down
+                  </ol>
+                </Details>
+              </SummaryListItem>
+            )}
+            <SummaryListItem term="Receive updates">
               <Link
-                className="dfe-print-hidden"
+                className="dfe-print-hidden govuk-!-font-weight-bold"
                 unvisited
                 analytics={{
                   category: 'Subscribe',
@@ -108,54 +147,55 @@ const PublicationReleasePage: NextPage<Props> = ({ data }) => {
               >
                 Sign up for email alerts
               </Link>
-            </div>
-            <div className="govuk-grid-column-one-quarter">
-              {data.type &&
-                data.type.title === ReleaseType.NationalStatistics && (
-                  <img
-                    src="/assets/images/UKSA-quality-mark.jpg"
-                    alt="UK statistics authority quality mark"
-                    height="120"
-                    width="120"
-                  />
-                )}
-            </div>
-          </div>
+            </SummaryListItem>
+          </SummaryList>
 
           {data.summarySection.content.map(block => (
             <ContentBlockRenderer key={block.id} block={block} />
           ))}
 
-          {data.downloadFiles && (
-            <Details
-              summary="Download associated files"
-              onToggle={open => {
-                if (open) {
-                  logEvent(
-                    'Downloads',
-                    'Release page download associated files dropdown opened',
-                    window.location.pathname,
-                  );
-                }
-              }}
-            >
-              <ul className="govuk-list govuk-list--bullet">
-                {data.downloadFiles.map(({ extension, name, path, size }) => (
-                  <li key={path}>
-                    <Link
-                      to={`${process.env.CONTENT_API_BASE_URL}/download/${path}`}
-                      analytics={{
-                        category: 'Downloads',
-                        action: `Release page ${name} file downloaded`,
-                        label: `File URL: /api/download/${path}`,
-                      }}
-                    >
-                      {name}
-                    </Link>
+          <PageSearchFormWithAnalytics
+            inputLabel="Search in this release page."
+            className="govuk-!-margin-top-3 govuk-!-margin-bottom-3"
+          />
+        </div>
 
-                    {` (${extension}, ${size})`}
+        <div className="govuk-grid-column-one-third">
+          <RelatedAside>
+            <h2 className="govuk-heading-m" id="related-information">
+              Related information
+            </h2>
+            <nav role="navigation" aria-labelledby="related-information">
+              <ul className="govuk-list govuk-!-margin-bottom-0">
+                <li>
+                  <a
+                    href="#dataDownloads-1"
+                    className="govuk-button govuk-!-margin-bottom-3"
+                  >
+                    Download data
+                  </a>
+                </li>
+                {data.publication.methodology && (
+                  <li>
+                    <Link
+                      to="/methodology/[methodology]"
+                      as={`/methodology/${data.publication.methodology.slug}`}
+                    >
+                      Methodology
+                    </Link>
                   </li>
-                ))}
+                )}
+                {data.publication.externalMethodology && (
+                  <li>
+                    <a
+                      href={data.publication.externalMethodology.url}
+                      target="_blank"
+                      rel="noopener noreferrer"
+                    >
+                      {data.publication.externalMethodology.title}
+                    </a>
+                  </li>
+                )}
                 {data.hasMetaGuidance && (
                   <li>
                     <Link
@@ -193,138 +233,59 @@ const PublicationReleasePage: NextPage<Props> = ({ data }) => {
                   </li>
                 )}
               </ul>
-            </Details>
-          )}
-          <PageSearchFormWithAnalytics
-            inputLabel="Search in this release page."
-            className="govuk-!-margin-top-3 govuk-!-margin-bottom-3"
-          />
-        </div>
-
-        <div className="govuk-grid-column-one-third">
-          <PrintThisPage
-            analytics={{
-              category: 'Page print',
-              action: 'Print this page link selected',
-            }}
-          />
-          <RelatedAside>
-            <h2 className="govuk-heading-m">About these statistics</h2>
-
-            <dl className="dfe-meta-content">
-              <div className="govuk-!-margin-bottom-2">
-                <dt className="govuk-caption-m">For {data.coverageTitle}: </dt>
-                <dd data-testid="release-name">
-                  <strong>{data.yearTitle}</strong>
-                  {!!releaseCount && (
-                    <Details
-                      summary={`See ${releaseCount} other releases`}
-                      onToggle={open =>
-                        open &&
-                        logEvent(
-                          'Other Releases',
-                          'Release page other releases dropdown opened',
-                          window.location.pathname,
-                        )
-                      }
-                    >
-                      <ul className="govuk-list">
-                        {[
-                          ...data.publication.otherReleases.map(
-                            ({ id, slug, title }) => (
-                              <li key={id} data-testid="other-release-item">
-                                <Link
-                                  to="/find-statistics/[publication]/[release]"
-                                  as={`/find-statistics/${data.publication.slug}/${slug}`}
-                                >
-                                  {title}
-                                </Link>
-                              </li>
-                            ),
-                          ),
-                          ...data.publication.legacyReleases.map(
-                            ({ id, description, url }) => (
-                              <li key={id} data-testid="other-release-item">
-                                <a href={url}>{description}</a>
-                              </li>
-                            ),
-                          ),
-                        ]}
-                      </ul>
-                    </Details>
-                  )}
-                </dd>
-              </div>
-
-              {data.updates && data.updates.length > 0 && (
-                <>
-                  <dt className="govuk-caption-m">Last updated: </dt>
-                  <dd id="releaseLastUpdated">
-                    <strong>
-                      <FormattedDate>{data.updates[0].on}</FormattedDate>
-                    </strong>
-                    <Details
-                      id="releaseNotes"
-                      onToggle={open => {
-                        if (open) {
-                          logEvent(
-                            'Last Updates',
-                            'Release page last updates dropdown opened',
-                            window.location.pathname,
-                          );
-                        }
-                      }}
-                      summary={`See all ${data.updates.length} updates`}
-                    >
-                      <ol className="govuk-list">
-                        {data.updates.map(note => (
-                          <li key={note.id}>
-                            <FormattedDate className="govuk-body govuk-!-font-weight-bold">
-                              {note.on}
-                            </FormattedDate>
-                            <p>{note.reason}</p>
-                          </li>
-                        ))}
-                      </ol>
-                    </Details>
-                  </dd>
-                </>
-              )}
-            </dl>
-
-            {(data.publication.methodology ||
-              data.publication.externalMethodology ||
-              data.relatedInformation.length !== 0) && (
+            </nav>
+            {!!releaseCount && (
+              <Details
+                summary={`See other releases (${releaseCount})`}
+                onToggle={open =>
+                  open &&
+                  logEvent(
+                    'Other Releases',
+                    'Release page other releases dropdown opened',
+                    window.location.pathname,
+                  )
+                }
+              >
+                <h3 className="govuk-heading-s govuk-!-margin-bottom-1">
+                  This release
+                </h3>
+                <p>{`${data.coverageTitle} ${data.yearTitle}`}</p>
+                <hr />
+                <ul className="govuk-list">
+                  {[
+                    ...data.publication.otherReleases.map(
+                      ({ id, slug, title }) => (
+                        <li key={id} data-testid="other-release-item">
+                          <Link
+                            to="/find-statistics/[publication]/[release]"
+                            as={`/find-statistics/${data.publication.slug}/${slug}`}
+                          >
+                            {title}
+                          </Link>
+                        </li>
+                      ),
+                    ),
+                    ...data.publication.legacyReleases.map(
+                      ({ id, description, url }) => (
+                        <li key={id} data-testid="other-release-item">
+                          <a href={url}>{description}</a>
+                        </li>
+                      ),
+                    ),
+                  ]}
+                </ul>
+              </Details>
+            )}
+            {data.relatedInformation.length !== 0 && (
               <>
                 <h2
-                  className="govuk-heading-m govuk-!-margin-top-6"
-                  id="related-content"
+                  className="govuk-heading-s govuk-!-margin-top-6"
+                  id="related-pages"
                 >
-                  Related guidance
+                  Related pages
                 </h2>
-                <nav role="navigation" aria-labelledby="related-content">
+                <nav role="navigation" aria-labelledby="related-pages">
                   <ul className="govuk-list">
-                    {data.publication.methodology && (
-                      <li>
-                        <Link
-                          to="/methodology/[methodology]"
-                          as={`/methodology/${data.publication.methodology.slug}`}
-                        >
-                          {`${data.publication.title}: methodology`}
-                        </Link>
-                      </li>
-                    )}
-                    {data.publication.externalMethodology && (
-                      <li>
-                        <a
-                          href={data.publication.externalMethodology.url}
-                          target="_blank"
-                          rel="noopener noreferrer"
-                        >
-                          {data.publication.externalMethodology.title}
-                        </a>
-                      </li>
-                    )}
                     {data.relatedInformation &&
                       data.relatedInformation.map(link => (
                         <li key={link.id}>
@@ -345,6 +306,69 @@ const PublicationReleasePage: NextPage<Props> = ({ data }) => {
       </h2>
 
       <PublicationReleaseHeadlinesSection release={data} />
+
+      {data.downloadFiles && (
+        <div className={styles.downloadSection}>
+          <Accordion
+            id="dataDownloads"
+            showOpenAll={false}
+            onSectionOpen={accordionSection => {
+              logEvent(
+                `${data.publication.title} release page`,
+                `Content accordion opened`,
+                `${accordionSection.title}`,
+              );
+            }}
+          >
+            <AccordionSection heading="Download data">
+              <p className="govuk-caption-m">
+                Find and download files used in the production of this release.
+              </p>
+              <ul className="govuk-list govuk-!-width-full">
+                {data.downloadFiles.map(({ extension, name, path, size }) => (
+                  <li key={path}>
+                    <Link
+                      to={`${process.env.CONTENT_API_BASE_URL}/download/${path}`}
+                      analytics={{
+                        category: 'Downloads',
+                        action: `Release page ${name} file downloaded`,
+                        label: `File URL: /api/download/${path}`,
+                      }}
+                    >
+                      {name}
+                    </Link>
+
+                    {` (${extension}, ${size})`}
+                  </li>
+                ))}
+
+                <li className="govuk-!-margin-top-9">
+                  <div className="dfe-flex dfe-justify-content--space-between dfe-align-items--center">
+                    <div>
+                      <h2 className="govuk-heading-m">
+                        Create your own tables online
+                      </h2>
+                      <p>
+                        Use our tool to build tables using our range of national
+                        and regional data.
+                      </p>
+                    </div>
+                    <p className="govuk-!-width-one-quarter dfe-flex-shrink--0">
+                      <ButtonLink
+                        className="govuk-!-width-full"
+                        to="/data-tables/[publication]"
+                        as={`/data-tables/${data.publication.slug}`}
+                      >
+                        Create tables
+                      </ButtonLink>
+                    </p>
+                  </div>
+                </li>
+              </ul>
+            </AccordionSection>
+          </Accordion>
+        </div>
+      )}
 
       {data.content.length > 0 && (
         <Accordion
