@@ -67,7 +67,7 @@ const DataFileReplacementPlan = ({
         fileId,
         replacementFileId,
       ),
-    [fileId],
+    [releaseId, fileId, replacementFileId],
   );
 
   const hasInvalidDataBlocks = useMemo<boolean>(

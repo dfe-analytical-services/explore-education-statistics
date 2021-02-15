@@ -22,7 +22,7 @@ const ReleaseDataFileReplacementCompletePage = ({
   // data blocks and footnotes in a convenient way.
   const { value: plan, isLoading } = useAsyncRetry(
     () => dataReplacementService.getReplacementPlan(releaseId, fileId, fileId),
-    [fileId],
+    [releaseId, fileId],
   );
 
   const dataFilePath = generatePath<ReleaseDataFileRouteParams>(
