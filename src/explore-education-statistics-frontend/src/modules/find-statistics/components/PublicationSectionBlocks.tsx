@@ -49,6 +49,13 @@ const PublicationSectionBlocks = ({
                   <ButtonLink
                     to="/data-tables/fast-track/[fastTrackId]"
                     as={`/data-tables/fast-track/${block.id}`}
+                    onClick={() => {
+                      logEvent(
+                        `Publication Release Data Tabs`,
+                        `Explore data button clicked`,
+                        `Explore data block name: ${block.name}`,
+                      );
+                    }}
                   >
                     Explore data
                   </ButtonLink>
