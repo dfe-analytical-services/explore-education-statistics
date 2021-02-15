@@ -90,8 +90,16 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Controllers.Api
             releaseService.Setup(s => s.GetRelease(ReleaseId))
                 .ReturnsAsync(new ReleaseViewModel
                 {
-                    ReleaseId = ReleaseId,
-                    Subjects = subjectIds.Select(id => new IdLabel(id, $"Subject {id}")).ToList()
+                    Id = ReleaseId,
+                    Subjects = subjectIds
+                        .Select(id => new SubjectViewModel(
+                            id: id,
+                            name: $"Subject {id}",
+                            content: "Test content",
+                            timePeriods: new TimePeriodLabels(),
+                            geographicLevels: new List<string>()
+                        ))
+                        .ToList()
                 });
 
             filterService.Setup(s => s.GetFiltersIncludingItems(It.IsIn(subjectIds))).Returns(

@@ -115,7 +115,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Controllers.Api.Stati
                                     Filters = GetFilters(subject.Id),
                                     Indicators = GetIndicators(subject.Id),
                                     SubjectId = subject.Id,
-                                    SubjectName = subject.Label
+                                    SubjectName = subject.Name
                                 }
                         )
                     };

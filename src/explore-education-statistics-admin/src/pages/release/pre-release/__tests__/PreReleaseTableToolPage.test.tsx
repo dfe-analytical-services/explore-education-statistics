@@ -191,7 +191,18 @@ describe('PreReleaseTableToolPage', () => {
   const testRelease: Release = {
     id: 'release-1',
     highlights: [{ id: 'block-1', label: 'Test highlight' }],
-    subjects: [{ id: 'subject-1', label: 'Test subject' }],
+    subjects: [
+      {
+        id: 'subject-1',
+        name: 'Test subject',
+        content: '<p>Test content</p>',
+        timePeriods: {
+          from: '2018',
+          to: '2020',
+        },
+        geographicLevels: ['National'],
+      },
+    ],
   };
 
   const testDataBlock: ReleaseDataBlock = {

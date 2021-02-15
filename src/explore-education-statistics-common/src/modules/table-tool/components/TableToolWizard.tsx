@@ -9,9 +9,9 @@ import PreviousStepModalConfirm from '@common/modules/table-tool/components/Prev
 import PublicationForm, {
   PublicationFormSubmitHandler,
 } from '@common/modules/table-tool/components/PublicationForm';
-import PublicationSubjectForm, {
-  PublicationSubjectFormSubmitHandler,
-} from '@common/modules/table-tool/components/PublicationSubjectForm';
+import SubjectForm, {
+  SubjectFormSubmitHandler,
+} from '@common/modules/table-tool/components/SubjectForm';
 import TimePeriodForm, {
   TimePeriodFormSubmitHandler,
 } from '@common/modules/table-tool/components/TimePeriodForm';
@@ -23,11 +23,11 @@ import getDefaultTableHeaderConfig from '@common/modules/table-tool/utils/getDef
 import mapFullTable from '@common/modules/table-tool/utils/mapFullTable';
 import parseYearCodeTuple from '@common/modules/table-tool/utils/parseYearCodeTuple';
 import tableBuilderService, {
-  PublicationSubject,
+  Subject,
   ReleaseTableDataQuery,
   SubjectMeta,
   TableHighlight,
-  ThemeMeta,
+  Theme,
 } from '@common/services/tableBuilderService';
 import classNames from 'classnames';
 import React, { ReactElement, ReactNode, useMemo } from 'react';
@@ -41,7 +41,7 @@ interface Publication {
 
 export interface InitialTableToolState {
   initialStep: number;
-  subjects?: PublicationSubject[];
+  subjects?: Subject[];
   highlights?: TableHighlight[];
   subjectMeta?: SubjectMeta;
   query?: ReleaseTableDataQuery;
@@ -52,7 +52,7 @@ export interface InitialTableToolState {
 }
 
 interface TableToolState extends InitialTableToolState {
-  subjects: PublicationSubject[];
+  subjects: Subject[];
   highlights: TableHighlight[];
   subjectMeta: SubjectMeta;
   query: ReleaseTableDataQuery;
@@ -68,7 +68,7 @@ export interface FinalStepRenderProps {
 }
 
 export interface TableToolWizardProps {
-  themeMeta?: ThemeMeta[];
+  themeMeta?: Theme[];
   initialState?: Partial<InitialTableToolState>;
   finalStep?: (props: FinalStepRenderProps) => ReactElement;
   renderHighlights?: (highlights: TableHighlight[]) => ReactNode;
@@ -129,7 +129,7 @@ const TableToolWizard = ({
     });
   };
 
-  const handlePublicationSubjectFormSubmit: PublicationSubjectFormSubmitHandler = async ({
+  const handlePublicationSubjectFormSubmit: SubjectFormSubmitHandler = async ({
     subjectId: selectedSubjectId,
   }) => {
     const nextSubjectMeta = await tableBuilderService.getSubjectMeta(
@@ -302,7 +302,7 @@ const TableToolWizard = ({
                       'govuk-grid-column-full': !stepProps.isActive,
                     })}
                   >
-                    <PublicationSubjectForm
+                    <SubjectForm
                       {...stepProps}
                       initialValues={{
                         subjectId: state.query.subjectId,

@@ -139,7 +139,18 @@ describe('ReleaseDataBlockEditPage', () => {
 
   const testRelease: Release = {
     id: 'release-1',
-    subjects: [{ id: 'subject-1', label: 'Subject 1' }],
+    subjects: [
+      {
+        id: 'subject-1',
+        name: 'Test subject',
+        content: '<p>Test content</p>',
+        timePeriods: {
+          from: '2018',
+          to: '2020',
+        },
+        geographicLevels: ['National'],
+      },
+    ],
     highlights: [],
   };
 

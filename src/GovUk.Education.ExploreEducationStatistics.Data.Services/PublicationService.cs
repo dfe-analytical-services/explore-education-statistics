@@ -1,37 +1,25 @@
+#nullable enable
 using System;
-using System.Collections.Generic;
-using System.Linq;
 using System.Threading.Tasks;
-using AutoMapper;
 using GovUk.Education.ExploreEducationStatistics.Common.Model;
-using GovUk.Education.ExploreEducationStatistics.Common.Services.Interfaces;
-using GovUk.Education.ExploreEducationStatistics.Data.Model;
 using GovUk.Education.ExploreEducationStatistics.Data.Model.Services.Interfaces;
 using GovUk.Education.ExploreEducationStatistics.Data.Services.Interfaces;
 using GovUk.Education.ExploreEducationStatistics.Data.Services.ViewModels;
 using Microsoft.AspNetCore.Mvc;
-using Microsoft.Azure.Cosmos.Table;
-using static GovUk.Education.ExploreEducationStatistics.Common.TableStorageTableNames;
 
 namespace GovUk.Education.ExploreEducationStatistics.Data.Services
 {
     public class PublicationService : IPublicationService
     {
         private readonly IReleaseRepository _releaseRepository;
-        private readonly ISubjectService _subjectService;
-        private readonly ITableStorageService _tableStorageService;
-        private readonly IMapper _mapper;
+        private readonly IReleaseService _releaseService;
 
         public PublicationService(
             IReleaseRepository releaseRepository,
-            ISubjectService subjectService,
-            ITableStorageService tableStorageService,
-            IMapper mapper)
+            IReleaseService releaseService)
         {
             _releaseRepository = releaseRepository;
-            _subjectService = subjectService;
-            _tableStorageService = tableStorageService;
-            _mapper = mapper;
+            _releaseService = releaseService;
         }
 
         public async Task<Either<ActionResult, PublicationViewModel>> GetPublication(
@@ -44,33 +32,16 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Services
                 return new NotFoundResult();
             }
 
-            return new PublicationViewModel
-            {
-                Id = publicationId,
-                Highlights = await GetHighlights(release.Id),
-                Subjects = await GetSubjects(release.Id)
-            };
-        }
-
-        private async Task<IEnumerable<IdLabel>> GetHighlights(Guid releaseId)
-        {
-            var releaseFilter = TableQuery.GenerateFilterCondition(nameof(ReleaseFastTrack.PartitionKey),
-                QueryComparisons.Equal, releaseId.ToString());
-
-            var highlightFilter = TableQuery.GenerateFilterCondition(nameof(ReleaseFastTrack.HighlightName), QueryComparisons.NotEqual,
-                    string.Empty);
-
-            var combineFilter = TableQuery.CombineFilters(releaseFilter, TableOperators.And, highlightFilter);
-            var query = new TableQuery<ReleaseFastTrack>().Where(combineFilter);
-
-            return (await _tableStorageService.ExecuteQueryAsync(PublicReleaseFastTrackTableName, query))
-                .Select(releaseFastTrack => new IdLabel(releaseFastTrack.FastTrackId, releaseFastTrack.HighlightName));
-        }
-
-        private async Task<IEnumerable<IdLabel>> GetSubjects(Guid releaseId)
-        {
-            var subjects = await _subjectService.GetSubjectsForRelease(releaseId);
-            return _mapper.Map<IEnumerable<IdLabel>>(subjects);
+            return await _releaseService.GetRelease(release.Id)
+                .OnSuccess(
+                    viewModel => new PublicationViewModel
+                    {
+                        Id = publicationId,
+                        LatestReleaseId = release.Id,
+                        Highlights = viewModel.Highlights,
+                        Subjects = viewModel.Subjects,
+                    }
+                );
         }
     }
 }

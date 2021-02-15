@@ -58,7 +58,7 @@ export interface LocationOption {
   geoJson?: GeoJsonFeature[];
 }
 
-export interface ThemeMeta {
+export interface Theme {
   id: string;
   title: string;
   slug: string;
@@ -74,9 +74,15 @@ export interface ThemeMeta {
   }[];
 }
 
-export interface PublicationSubject {
+export interface Subject {
   id: string;
-  label: string;
+  name: string;
+  content: string;
+  timePeriods: {
+    from?: string;
+    to?: string;
+  };
+  geographicLevels: string[];
 }
 
 export interface TableHighlight {
@@ -86,13 +92,13 @@ export interface TableHighlight {
 
 export interface Publication {
   id: string;
-  subjects: PublicationSubject[];
+  subjects: Subject[];
   highlights: TableHighlight[];
 }
 
 export interface Release {
   id: string;
-  subjects: PublicationSubject[];
+  subjects: Subject[];
   highlights: TableHighlight[];
 }
 
@@ -181,7 +187,7 @@ export interface TableDataResponse {
 }
 
 const tableBuilderService = {
-  getThemes(): Promise<ThemeMeta[]> {
+  getThemes(): Promise<Theme[]> {
     return dataApi.get('/themes');
   },
   getPublication(publicationId: string): Promise<Publication> {
