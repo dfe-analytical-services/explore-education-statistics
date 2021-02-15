@@ -113,6 +113,11 @@ const TableToolPage: NextPage<TableToolPageProps> = ({
                   <Link
                     to="/data-tables/fast-track/[fastTrackId]"
                     as={`/data-tables/fast-track/${highlight.id}`}
+                    analytics={{
+                      category: 'Table tool',
+                      action: 'Clicked to view Table highlight',
+                      label: `Table highlight label: ${highlight.label}`,
+                    }}
                   >
                     {highlight.label}
                   </Link>
