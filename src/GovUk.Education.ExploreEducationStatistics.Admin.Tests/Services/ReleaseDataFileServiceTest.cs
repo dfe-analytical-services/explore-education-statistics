@@ -52,7 +52,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
 
             var zipFile = new File
             {
-                BlobPath = Guid.NewGuid(),
+                RootPath = Guid.NewGuid(),
                 Filename = "data.zip",
                 Type = DataZip,
                 SubjectId = subject.Id
@@ -63,7 +63,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
                 Release = release,
                 File = new File
                 {
-                    BlobPath = Guid.NewGuid(),
+                    RootPath = Guid.NewGuid(),
                     Filename = "data.csv",
                     Type = FileType.Data,
                     SubjectId = subject.Id,
@@ -76,7 +76,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
                 Release = release,
                 File = new File
                 {
-                    BlobPath = Guid.NewGuid(),
+                    RootPath = Guid.NewGuid(),
                     Filename = "data.meta.csv",
                     Type = Metadata,
                     SubjectId = subject.Id
@@ -109,7 +109,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
             // test that the deletion of any remaining batch files went ahead for this particular data file
             blobStorageService
                 .Setup(mock => mock.DeleteBlobs(PrivateFilesContainerName,
-                        AdminReleaseBatchesDirectoryPath(releaseDataFile.File.BlobPath, releaseDataFile.FileId), null))
+                        AdminDataFileBatchesDirectoryPath(releaseDataFile.File.RootPath, releaseDataFile.FileId), null))
                 .Returns(Task.CompletedTask);
 
             await using (var contentDbContext = InMemoryApplicationDbContext(contentDbContextId))
@@ -164,7 +164,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
                 Release = release,
                 File = new File
                 {
-                    BlobPath = Guid.NewGuid(),
+                    RootPath = Guid.NewGuid(),
                     Filename = "Data 1.csv",
                     Type = FileType.Data,
                     SubjectId = subject.Id
@@ -176,7 +176,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
                 Release = release,
                 File = new File
                 {
-                    BlobPath = Guid.NewGuid(),
+                    RootPath = Guid.NewGuid(),
                     Filename = "Data 1.meta.csv",
                     Type = Metadata,
                     SubjectId = subject.Id
@@ -206,7 +206,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
 
             blobStorageService
                 .Setup(mock => mock.DeleteBlobs(PrivateFilesContainerName,
-                    AdminReleaseBatchesDirectoryPath(releaseDataFile.File.BlobPath, releaseDataFile.FileId), null))
+                    AdminDataFileBatchesDirectoryPath(releaseDataFile.File.RootPath, releaseDataFile.FileId), null))
                 .Returns(Task.CompletedTask);
 
             await using (var contentDbContext = InMemoryApplicationDbContext(contentDbContextId))
@@ -281,7 +281,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
 
             var replacementZipFile = new File
             {
-                BlobPath = Guid.NewGuid(),
+                RootPath = Guid.NewGuid(),
                 Filename = "replacement.zip",
                 Type = DataZip,
                 SubjectId = replacementSubject.Id
@@ -289,7 +289,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
 
             var replacementDataFile = new File
             {
-                BlobPath = Guid.NewGuid(),
+                RootPath = Guid.NewGuid(),
                 Filename = "replacement.csv",
                 Type = FileType.Data,
                 SubjectId = replacementSubject.Id,
@@ -301,7 +301,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
 
             var replacementMetaFile = new File
             {
-                BlobPath = Guid.NewGuid(),
+                RootPath = Guid.NewGuid(),
                 Filename = "replacement.meta.csv",
                 Type = Metadata,
                 SubjectId = replacementSubject.Id
@@ -355,7 +355,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
 
             blobStorageService
                 .Setup(mock => mock.DeleteBlobs(PrivateFilesContainerName,
-                    AdminReleaseBatchesDirectoryPath(replacementDataFile.BlobPath, replacementDataFile.Id), null))
+                    AdminDataFileBatchesDirectoryPath(replacementDataFile.RootPath, replacementDataFile.Id), null))
                 .Returns(Task.CompletedTask);
 
             await using (var contentDbContext = InMemoryApplicationDbContext(contentDbContextId))
@@ -426,7 +426,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
 
             var zipFile = new File
             {
-                BlobPath = Guid.NewGuid(),
+                RootPath = Guid.NewGuid(),
                 Filename = "data.zip",
                 Type = DataZip,
                 SubjectId = subject.Id
@@ -434,7 +434,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
 
             var dataFile = new File
             {
-                BlobPath = Guid.NewGuid(),
+                RootPath = Guid.NewGuid(),
                 Filename = "data.csv",
                 Type = FileType.Data,
                 SubjectId = subject.Id,
@@ -443,7 +443,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
 
             var metaFile = new File
             {
-                BlobPath = Guid.NewGuid(),
+                RootPath = Guid.NewGuid(),
                 Filename = "data.meta.csv",
                 Type = Metadata,
                 SubjectId = subject.Id
@@ -489,7 +489,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
 
             blobStorageService
                 .Setup(mock => mock.DeleteBlobs(PrivateFilesContainerName,
-                    AdminReleaseBatchesDirectoryPath(dataFile.BlobPath, dataFile.Id), null))
+                    AdminDataFileBatchesDirectoryPath(dataFile.RootPath, dataFile.Id), null))
                 .Returns(Task.CompletedTask);
 
             await using (var contentDbContext = InMemoryApplicationDbContext(contentDbContextId))
@@ -554,7 +554,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
 
             var zipFile = new File
             {
-                BlobPath = Guid.NewGuid(),
+                RootPath = Guid.NewGuid(),
                 Filename = "data.zip",
                 Type = DataZip,
                 SubjectId = subject.Id
@@ -565,7 +565,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
                 Release = release,
                 File = new File
                 {
-                    BlobPath = Guid.NewGuid(),
+                    RootPath = Guid.NewGuid(),
                     Filename = "data.csv",
                     Type = FileType.Data,
                     SubjectId = subject.Id,
@@ -578,7 +578,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
                 Release = release,
                 File = new File
                 {
-                    BlobPath = Guid.NewGuid(),
+                    RootPath = Guid.NewGuid(),
                     Filename = "data.meta.csv",
                     Type = Metadata,
                     SubjectId = subject.Id
@@ -608,7 +608,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
 
             blobStorageService
                 .Setup(mock => mock.DeleteBlobs(PrivateFilesContainerName,
-                    AdminReleaseBatchesDirectoryPath(dataReleaseFile.File.BlobPath, dataReleaseFile.FileId), null))
+                    AdminDataFileBatchesDirectoryPath(dataReleaseFile.File.RootPath, dataReleaseFile.FileId), null))
                 .Returns(Task.CompletedTask);
 
             await using (var contentDbContext = InMemoryApplicationDbContext(contentDbContextId))
@@ -675,7 +675,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
 
             var zipFile = new File
             {
-                BlobPath = Guid.NewGuid(),
+                RootPath = Guid.NewGuid(),
                 Filename = "data.zip",
                 Type = DataZip,
                 SubjectId = subject.Id,
@@ -683,7 +683,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
 
             var dataFile = new File
             {
-                BlobPath = Guid.NewGuid(),
+                RootPath = Guid.NewGuid(),
                 Filename = "data.csv",
                 Type = FileType.Data,
                 SubjectId = subject.Id,
@@ -692,7 +692,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
 
             var metaFile = new File
             {
-                BlobPath = Guid.NewGuid(),
+                RootPath = Guid.NewGuid(),
                 Filename = "data.meta.csv",
                 Type = Metadata,
                 SubjectId = subject.Id
@@ -737,7 +737,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
             var dataImportService = new Mock<IDataImportService>(MockBehavior.Strict);
 
             blobStorageService.Setup(mock => mock.DeleteBlobs(PrivateFilesContainerName,
-                    AdminReleaseBatchesDirectoryPath(dataFile.BlobPath, dataFile.Id), null))
+                    AdminDataFileBatchesDirectoryPath(dataFile.RootPath, dataFile.Id), null))
                 .Returns(Task.CompletedTask);
 
             await using (var contentDbContext = InMemoryApplicationDbContext(contentDbContextId))
@@ -837,14 +837,14 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
 
             var dataFile = new File
             {
-                BlobPath = Guid.NewGuid(),
+                RootPath = Guid.NewGuid(),
                 Filename = "test-data.csv",
                 Type = FileType.Data,
                 SubjectId = subject.Id
             };
             var metaFile = new File
             {
-                BlobPath = Guid.NewGuid(),
+                RootPath = Guid.NewGuid(),
                 Filename = "test-data.meta.csv",
                 Type = Metadata,
                 SubjectId = subject.Id
@@ -954,14 +954,14 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
 
             var dataFile = new File
             {
-                BlobPath = Guid.NewGuid(),
+                RootPath = Guid.NewGuid(),
                 Filename = "Test data 1.csv",
                 Type = FileType.Data,
                 SubjectId = subject.Id
             };
             var metaFile = new File
             {
-                BlobPath = Guid.NewGuid(),
+                RootPath = Guid.NewGuid(),
                 Filename = "Test data 1.meta.csv",
                 Type = Metadata,
                 SubjectId = subject.Id
@@ -1075,7 +1075,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
                         Release = anotherRelease,
                         File = new File
                         {
-                            BlobPath = Guid.NewGuid(),
+                            RootPath = Guid.NewGuid(),
                             Filename = "test-data.csv",
                             Type = Metadata
                         }
@@ -1106,13 +1106,13 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
 
             var dataFile = new File
             {
-                BlobPath = Guid.NewGuid(),
+                RootPath = Guid.NewGuid(),
                 Filename = "test-data.csv",
                 Type = FileType.Data
             };
             var metaFile = new File
             {
-                BlobPath = Guid.NewGuid(),
+                RootPath = Guid.NewGuid(),
                 Filename = "test-data.meta.csv",
                 Type = Metadata
             };
@@ -1162,14 +1162,14 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
             };
             var dataFile = new File
             {
-                BlobPath = Guid.NewGuid(),
+                RootPath = Guid.NewGuid(),
                 SubjectId = subject.Id,
                 Filename = "test-data.csv",
                 Type = FileType.Data
             };
             var metaFile = new File
             {
-                BlobPath = Guid.NewGuid(),
+                RootPath = Guid.NewGuid(),
                 SubjectId = subject.Id,
                 Filename = "test-data.meta.csv",
                 Type = Metadata
@@ -1255,13 +1255,13 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
 
             var zipFile = new File
             {
-                BlobPath = Guid.NewGuid(),
+                RootPath = Guid.NewGuid(),
                 Filename = "test-data-archive.zip",
                 Type = DataZip,
             };
             var dataFile = new File
             {
-                BlobPath = Guid.NewGuid(),
+                RootPath = Guid.NewGuid(),
                 Filename = "test-data.csv",
                 Type = FileType.Data,
                 Source = zipFile
@@ -1287,7 +1287,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
                         Release = release,
                         File = new File
                         {
-                            BlobPath = Guid.NewGuid(),
+                            RootPath = Guid.NewGuid(),
                             Filename = "test-data.meta.csv",
                             Type = Metadata,
                             Source = zipFile
@@ -1378,14 +1378,14 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
 
             var dataFile = new File
             {
-                BlobPath = Guid.NewGuid(),
+                RootPath = Guid.NewGuid(),
                 Filename = "test-data.csv",
                 Type = FileType.Data,
                 SubjectId = subject.Id
             };
             var metaFile = new File
             {
-                BlobPath = Guid.NewGuid(),
+                RootPath = Guid.NewGuid(),
                 Filename = "test-data.meta.csv",
                 Type = Metadata,
                 SubjectId = subject.Id
@@ -1513,28 +1513,28 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
 
             var dataFile1 = new File
             {
-                BlobPath = Guid.NewGuid(),
+                RootPath = Guid.NewGuid(),
                 Filename = "test-data-1.csv",
                 Type = FileType.Data,
                 SubjectId = subject1.Id
             };
             var metaFile1 = new File
             {
-                BlobPath = Guid.NewGuid(),
+                RootPath = Guid.NewGuid(),
                 Filename = "test-data-1.meta.csv",
                 Type = Metadata,
                 SubjectId = subject1.Id
             };
             var dataFile2 = new File
             {
-                BlobPath = Guid.NewGuid(),
+                RootPath = Guid.NewGuid(),
                 Filename = "Test data 2.csv",
                 Type = FileType.Data,
                 SubjectId = subject2.Id
             };
             var metaFile2 = new File
             {
-                BlobPath = Guid.NewGuid(),
+                RootPath = Guid.NewGuid(),
                 Filename = "Test data 2.meta.csv",
                 Type = Metadata,
                 SubjectId = subject2.Id
@@ -1687,14 +1687,14 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
 
             var dataFile = new File
             {
-                BlobPath = Guid.NewGuid(),
+                RootPath = Guid.NewGuid(),
                 Filename = "test-data-1.csv",
                 Type = FileType.Data,
                 SubjectId = subject.Id
             };
             var metaFile = new File
             {
-                BlobPath = Guid.NewGuid(),
+                RootPath = Guid.NewGuid(),
                 Filename = "test-data-1.meta.csv",
                 Type = Metadata,
                 SubjectId = subject.Id
@@ -1724,7 +1724,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
                         Release = otherRelease,
                         File = new File
                         {
-                            BlobPath = Guid.NewGuid(),
+                            RootPath = Guid.NewGuid(),
                             Filename = "test-data-2.csv",
                             Type = FileType.Data
                         }
@@ -1734,7 +1734,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
                         Release = otherRelease,
                         File = new File
                         {
-                            BlobPath = Guid.NewGuid(),
+                            RootPath = Guid.NewGuid(),
                             Filename = "test-data-2.meta.csv",
                             Type = Metadata
                         }
@@ -1745,7 +1745,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
                         Release = release,
                         File = new File
                         {
-                            BlobPath = Guid.NewGuid(),
+                            RootPath = Guid.NewGuid(),
                             Filename = "ancillary-file.pdf",
                             Type = Ancillary
                         }
@@ -1841,28 +1841,28 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
 
             var dataFile1 = new File
             {
-                BlobPath = Guid.NewGuid(),
+                RootPath = Guid.NewGuid(),
                 Filename = "test-data-1.csv",
                 Type = FileType.Data,
                 SubjectId = subject1.Id
             };
             var metaFile1 = new File
             {
-                BlobPath = Guid.NewGuid(),
+                RootPath = Guid.NewGuid(),
                 Filename = "test-data-1.meta.csv",
                 Type = Metadata,
                 SubjectId = subject1.Id
             };
             var dataFile2 = new File
             {
-                BlobPath = Guid.NewGuid(),
+                RootPath = Guid.NewGuid(),
                 Filename = "test-data-2.csv",
                 Type = FileType.Data,
                 SubjectId = subject2.Id
             };
             var metaFile2 = new File
             {
-                BlobPath = Guid.NewGuid(),
+                RootPath = Guid.NewGuid(),
                 Filename = "test-data-2.meta.csv",
                 Type = Metadata,
                 SubjectId = subject2.Id
@@ -1991,14 +1991,14 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
             };
             var dataFile = new File
             {
-                BlobPath = Guid.NewGuid(),
+                RootPath = Guid.NewGuid(),
                 Filename = "test-data.csv",
                 Type = FileType.Data,
                 SubjectId = subject.Id
             };
             var metaFile = new File
             {
-                BlobPath = Guid.NewGuid(),
+                RootPath = Guid.NewGuid(),
                 Filename = "test-data.meta.csv",
                 Type = Metadata,
                 SubjectId = subject.Id
@@ -2081,13 +2081,13 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
 
             var zipFile = new File
             {
-                BlobPath = Guid.NewGuid(),
+                RootPath = Guid.NewGuid(),
                 Filename = "test-data-archive.zip",
                 Type = DataZip
             };
             var dataFile = new File
             {
-                BlobPath = Guid.NewGuid(),
+                RootPath = Guid.NewGuid(),
                 Filename = "test-data.csv",
                 Type = FileType.Data,
                 Source = zipFile
@@ -2113,7 +2113,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
                         Release = release,
                         File = new File
                         {
-                            BlobPath = Guid.NewGuid(),
+                            RootPath = Guid.NewGuid(),
                             Filename = "test-data.meta.csv",
                             Type = Metadata,
                             Source = zipFile
@@ -2388,7 +2388,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
                 Release = release,
                 File = new File
                 {
-                    BlobPath = Guid.NewGuid(),
+                    RootPath = Guid.NewGuid(),
                     Filename = "original-data.csv",
                     Type = FileType.Data,
                     SubjectId = originalSubject.Id
@@ -2773,7 +2773,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
                 Release = release,
                 File = new File
                 {
-                    BlobPath = Guid.NewGuid(),
+                    RootPath = Guid.NewGuid(),
                     Filename = "original-data.csv",
                     Type = FileType.Data,
                     SubjectId = originalSubject.Id

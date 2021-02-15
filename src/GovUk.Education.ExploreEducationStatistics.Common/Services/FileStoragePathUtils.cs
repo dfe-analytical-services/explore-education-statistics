@@ -104,28 +104,28 @@ namespace GovUk.Education.ExploreEducationStatistics.Common.Services
         /**
          * The admin directory path where data files are batched for importing
          */
-        public static string AdminReleaseBatchesDirectoryPath(Guid blobPath, Guid fileId)
+        public static string AdminDataFileBatchesDirectoryPath(Guid releaseId, Guid fileId)
         {
-            return $"{blobPath}/{Data.GetEnumLabel()}/batches/{fileId}/";
+            return $"{releaseId}/{Data.GetEnumLabel()}/batches/{fileId}/";
         }
 
         /**
          * The admin file path, for a file of a particular type and id, on a release.
          */
-        public static string AdminReleasePath(Guid blobPath, FileType type, Guid fileId)
-            => AdminReleasePath(blobPath, type, fileId.ToString());
+        public static string AdminReleasePath(Guid rootPath, FileType type, Guid fileId)
+            => AdminReleasePath(rootPath, type, fileId.ToString());
 
         /**
          * The admin file path, for a file of a particular type and name, on a release.
          */
-        public static string AdminReleasePath(Guid blobPath, FileType type, string fileName)
-            => $"{AdminReleaseDirectoryPath(blobPath, type)}{fileName}";
+        public static string AdminReleasePath(Guid rootPath, FileType type, string fileName)
+            => $"{AdminReleaseDirectoryPath(rootPath, type)}{fileName}";
 
         /**
          * The admin directory path where files, of a particular type, on a release are stored.
          */
-        public static string AdminReleaseDirectoryPath(Guid blobPath, FileType type)
-            => $"{blobPath}/{GetUploadFolderForType(type).GetEnumLabel()}/";
+        public static string AdminReleaseDirectoryPath(Guid rootPath, FileType type)
+            => $"{rootPath}/{GetUploadFolderForType(type).GetEnumLabel()}/";
 
         /**
          * The public file path, for a file of a particular type and id, on a release.

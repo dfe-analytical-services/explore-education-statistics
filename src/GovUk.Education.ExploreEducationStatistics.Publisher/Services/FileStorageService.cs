@@ -97,16 +97,16 @@ namespace GovUk.Education.ExploreEducationStatistics.Publisher.Services
 
             await _publicBlobStorageService.DeleteBlobs(PublicFilesContainerName, destinationDirectoryPath);
 
-            var referencedBlobPaths = copyReleaseFilesCommand.Files
-                .Select(f => f.BlobPath)
+            var referencedRootPaths = copyReleaseFilesCommand.Files
+                .Select(f => f.RootPath)
                 .Distinct();
 
             var transferredFiles = new List<BlobInfo>();
 
-            foreach (var blobPath in referencedBlobPaths)
+            foreach (var rootPath in referencedRootPaths)
             {
                 var files = await CopyPrivateFilesToPublic(
-                    sourceDirectoryPath: $"{blobPath}/",
+                    sourceDirectoryPath: $"{rootPath}/",
                     destinationDirectoryPath: destinationDirectoryPath,
                     copyReleaseFilesCommand
                 );

@@ -8,10 +8,8 @@ namespace GovUk.Education.ExploreEducationStatistics.Content.Model
     {
         public Guid Id { get; set; }
 
-        // TODO EES-1703 will reconsider the filesystem layout
-        // and potentially migrate BlobPath to be a String of the full blob path
-        public Guid BlobPath { get; set; }
-        
+        public Guid RootPath { get; set; }
+
         public Guid? SubjectId { get; set; }
 
         public string Filename { get; set; }

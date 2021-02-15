@@ -8,32 +8,32 @@ namespace GovUk.Education.ExploreEducationStatistics.Common.Tests.Services
     public class FileStoragePathUtilsTests
     {
         [Fact]
-        public void TestAdminReleaseBatchesDirectoryPath()
+        public void TestAdminDataFileBatchesDirectoryPath()
         {
-            var blobPath = Guid.NewGuid();
+            var releaseId = Guid.NewGuid();
             var fileId = Guid.NewGuid();
-            Assert.Equal($"{blobPath}/data/batches/{fileId}/", AdminReleaseBatchesDirectoryPath(blobPath, fileId));
+            Assert.Equal($"{releaseId}/data/batches/{fileId}/", AdminDataFileBatchesDirectoryPath(releaseId, fileId));
         }
-        
+
         [Fact]
         public void TestAdminReleaseDirectoryPath()
         {
-            var blobPath = Guid.NewGuid();
-            Assert.Equal($"{blobPath}/ancillary/", AdminReleaseDirectoryPath(blobPath, Ancillary));
-            Assert.Equal($"{blobPath}/data/", AdminReleaseDirectoryPath(blobPath, Data));
-            Assert.Equal($"{blobPath}/chart/", AdminReleaseDirectoryPath(blobPath, Chart));
-            Assert.Equal($"{blobPath}/image/", AdminReleaseDirectoryPath(blobPath, Image));
+            var rootPath = Guid.NewGuid();
+            Assert.Equal($"{rootPath}/ancillary/", AdminReleaseDirectoryPath(rootPath, Ancillary));
+            Assert.Equal($"{rootPath}/data/", AdminReleaseDirectoryPath(rootPath, Data));
+            Assert.Equal($"{rootPath}/chart/", AdminReleaseDirectoryPath(rootPath, Chart));
+            Assert.Equal($"{rootPath}/image/", AdminReleaseDirectoryPath(rootPath, Image));
         }
 
         [Fact]
         public void TestAdminReleasePath()
         {
-            var blobPath = Guid.NewGuid();
+            var rootPath = Guid.NewGuid();
             var fileId = Guid.NewGuid();
-            Assert.Equal($"{blobPath}/ancillary/{fileId}", AdminReleasePath(blobPath, Ancillary, fileId));
-            Assert.Equal($"{blobPath}/data/{fileId}", AdminReleasePath(blobPath, Data, fileId));
-            Assert.Equal($"{blobPath}/chart/{fileId}", AdminReleasePath(blobPath, Chart, fileId));
-            Assert.Equal($"{blobPath}/image/{fileId}", AdminReleasePath(blobPath, Image, fileId));
+            Assert.Equal($"{rootPath}/ancillary/{fileId}", AdminReleasePath(rootPath, Ancillary, fileId));
+            Assert.Equal($"{rootPath}/data/{fileId}", AdminReleasePath(rootPath, Data, fileId));
+            Assert.Equal($"{rootPath}/chart/{fileId}", AdminReleasePath(rootPath, Chart, fileId));
+            Assert.Equal($"{rootPath}/image/{fileId}", AdminReleasePath(rootPath, Image, fileId));
         }
 
         [Fact]

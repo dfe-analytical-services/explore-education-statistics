@@ -10,7 +10,7 @@ using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 namespace GovUk.Education.ExploreEducationStatistics.Admin.Migrations.ContentMigrations
 {
     [DbContext(typeof(ContentDbContext))]
-    [Migration("20210212150802_EES1702RemoveReleaseFromFile")]
+    [Migration("20210215161241_EES1702RemoveReleaseFromFile")]
     partial class EES1702RemoveReleaseFromFile
     {
         protected override void BuildTargetModel(ModelBuilder modelBuilder)
@@ -268,9 +268,6 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Migrations.ContentMig
                         .ValueGeneratedOnAdd()
                         .HasColumnType("uniqueidentifier");
 
-                    b.Property<Guid>("BlobPath")
-                        .HasColumnType("uniqueidentifier");
-
                     b.Property<string>("Filename")
                         .HasColumnType("nvarchar(max)");
 
@@ -278,6 +275,9 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Migrations.ContentMig
                         .HasColumnType("uniqueidentifier");
 
                     b.Property<Guid?>("ReplacingId")
+                        .HasColumnType("uniqueidentifier");
+
+                    b.Property<Guid>("RootPath")
                         .HasColumnType("uniqueidentifier");
 
                     b.Property<Guid?>("SourceId")

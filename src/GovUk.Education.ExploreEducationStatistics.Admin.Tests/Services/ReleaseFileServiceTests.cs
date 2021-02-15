@@ -41,7 +41,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
                 Release = release,
                 File = new File
                 {
-                    BlobPath = Guid.NewGuid(),
+                    RootPath = Guid.NewGuid(),
                     Filename = "ancillary.pdf",
                     Type = Ancillary
                 }
@@ -52,7 +52,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
                 Release = release,
                 File = new File
                 {
-                    BlobPath = Guid.NewGuid(),
+                    RootPath = Guid.NewGuid(),
                     Filename = "chart.png",
                     Type = Chart
                 }
@@ -111,7 +111,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
 
             var ancillaryFile = new File
             {
-                BlobPath = Guid.NewGuid(),
+                RootPath = Guid.NewGuid(),
                 Filename = "ancillary.pdf",
                 Type = Ancillary,
             };
@@ -172,7 +172,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
                 Release = release,
                 File = new File
                 {
-                    BlobPath = Guid.NewGuid(),
+                    RootPath = Guid.NewGuid(),
                     Filename = "data.csv",
                     Type = FileType.Data,
                     SubjectId = Guid.NewGuid()
@@ -220,7 +220,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
                 Release = release,
                 File = new File
                 {
-                    BlobPath = Guid.NewGuid(),
+                    RootPath = Guid.NewGuid(),
                     Filename = "ancillary.pdf",
                     Type = Ancillary
                 }
@@ -294,7 +294,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
                 Release = release,
                 File = new File
                 {
-                    BlobPath = Guid.NewGuid(),
+                    RootPath = Guid.NewGuid(),
                     Filename = "ancillary.pdf",
                     Type = Ancillary
                 }
@@ -305,7 +305,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
                 Release = release,
                 File = new File
                 {
-                    BlobPath = Guid.NewGuid(),
+                    RootPath = Guid.NewGuid(),
                     Filename = "chart.png",
                     Type = Chart
                 }
@@ -371,7 +371,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
                 Release = release,
                 File = new File
                 {
-                    BlobPath = Guid.NewGuid(),
+                    RootPath = Guid.NewGuid(),
                     Filename = "ancillary.pdf",
                     Type = Ancillary
                 }
@@ -382,7 +382,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
                 Release = release,
                 File = new File
                 {
-                    BlobPath = Guid.NewGuid(),
+                    RootPath = Guid.NewGuid(),
                     Filename = "data.csv",
                     Type = FileType.Data,
                     SubjectId = Guid.NewGuid()
@@ -434,7 +434,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
                 Release = release,
                 File = new File
                 {
-                    BlobPath = Guid.NewGuid(),
+                    RootPath = Guid.NewGuid(),
                     Filename = "ancillary.pdf",
                     Type = Ancillary
                 }
@@ -445,7 +445,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
                 Release = release,
                 File = new File
                 {
-                    BlobPath = Guid.NewGuid(),
+                    RootPath = Guid.NewGuid(),
                     Filename = "chart.png",
                     Type = Chart
                 }
@@ -496,7 +496,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
                 Release = release,
                 File = new File
                 {
-                    BlobPath = Guid.NewGuid(),
+                    RootPath = Guid.NewGuid(),
                     Filename = "ancillary.pdf",
                     Type = Ancillary
                 }
@@ -550,14 +550,14 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
 
             var ancillaryFile = new File
             {
-                BlobPath = Guid.NewGuid(),
+                RootPath = Guid.NewGuid(),
                 Filename = "ancillary.pdf",
                 Type = Ancillary
             };
 
             var chartFile = new File
             {
-                BlobPath = Guid.NewGuid(),
+                RootPath = Guid.NewGuid(),
                 Filename = "chart.png",
                 Type = Chart
             };
@@ -640,7 +640,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
                 Release = release,
                 File = new File
                 {
-                    BlobPath = Guid.NewGuid(),
+                    RootPath = Guid.NewGuid(),
                     Filename = "ancillary.pdf",
                     Type = Ancillary
                 }
@@ -651,7 +651,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
                 Release = release,
                 File = new File
                 {
-                    BlobPath = Guid.NewGuid(),
+                    RootPath = Guid.NewGuid(),
                     Filename = "chart.png",
                     Type = Chart
                 }
@@ -662,7 +662,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
                 Release = release,
                 File = new File
                 {
-                    BlobPath = Guid.NewGuid(),
+                    RootPath = Guid.NewGuid(),
                     Filename = "data.csv",
                     Type = FileType.Data,
                     SubjectId = Guid.NewGuid()
@@ -775,14 +775,14 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
 
             var ancillaryFile = new File
             {
-                BlobPath = Guid.NewGuid(),
+                RootPath = Guid.NewGuid(),
                 Filename = "ancillary.pdf",
                 Type = Ancillary
             };
 
             var chartFile = new File
             {
-                BlobPath = Guid.NewGuid(),
+                RootPath = Guid.NewGuid(),
                 Filename = "chart.png",
                 Type = Chart
             };
@@ -904,7 +904,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
                 Release = release,
                 File = new File
                 {
-                    BlobPath = Guid.NewGuid(),
+                    RootPath = Guid.NewGuid(),
                     Filename = "ancillary_1.pdf",
                     Type = Ancillary
                 }
@@ -915,7 +915,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
                 Release = release,
                 File = new File
                 {
-                    BlobPath = Guid.NewGuid(),
+                    RootPath = Guid.NewGuid(),
                     Filename = "Ancillary 2.pdf",
                     Type = Ancillary
                 }
@@ -926,7 +926,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
                 Release = release,
                 File = new File
                 {
-                    BlobPath = Guid.NewGuid(),
+                    RootPath = Guid.NewGuid(),
                     Filename = "chart.png",
                     Type = Chart
                 }
@@ -937,7 +937,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
                 Release = release,
                 File = new File
                 {
-                    BlobPath = Guid.NewGuid(),
+                    RootPath = Guid.NewGuid(),
                     Filename = "data.csv",
                     Type = FileType.Data,
                     SubjectId = Guid.NewGuid()
@@ -1056,7 +1056,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
                 Release = release,
                 File = new File
                 {
-                    BlobPath = Guid.NewGuid(),
+                    RootPath = Guid.NewGuid(),
                     Filename = "ancillary.pdf",
                     Type = Ancillary
                 }
@@ -1123,7 +1123,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
                 Release = release,
                 File = new File
                 {
-                    BlobPath = Guid.NewGuid(),
+                    RootPath = Guid.NewGuid(),
                     Filename = "Ancillary 1.pdf",
                     Type = Ancillary
                 }
@@ -1190,7 +1190,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
                 Release = release,
                 File = new File
                 {
-                    BlobPath = Guid.NewGuid(),
+                    RootPath = Guid.NewGuid(),
                     Filename = "ancillary.pdf",
                     Type = Ancillary
                 }

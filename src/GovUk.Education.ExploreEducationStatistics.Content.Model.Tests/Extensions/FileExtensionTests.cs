@@ -17,7 +17,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Content.Model.Tests.Extensi
         private readonly File _file = new File
         {
             Id = Guid.NewGuid(),
-            BlobPath = Guid.NewGuid(),
+            RootPath = Guid.NewGuid(),
             Filename = "ancillary.pdf",
             Type = Ancillary
         };
@@ -28,12 +28,12 @@ namespace GovUk.Education.ExploreEducationStatistics.Content.Model.Tests.Extensi
             var dataFile = new File
             {
                 Id = Guid.NewGuid(),
-                BlobPath = Guid.NewGuid(),
+                RootPath = Guid.NewGuid(),
                 Filename = "data.csv",
                 Type = Data
             };
 
-            Assert.Equal($"{dataFile.BlobPath}/data/batches/{dataFile.Id}/", dataFile.BatchesPath());
+            Assert.Equal($"{dataFile.RootPath}/data/batches/{dataFile.Id}/", dataFile.BatchesPath());
         }
 
         [Fact]
@@ -42,12 +42,12 @@ namespace GovUk.Education.ExploreEducationStatistics.Content.Model.Tests.Extensi
             var dataFile = new File
             {
                 Id = Guid.NewGuid(),
-                BlobPath = Guid.NewGuid(),
+                RootPath = Guid.NewGuid(),
                 Filename = "data.csv",
                 Type = Data
             };
 
-            Assert.Equal($"{dataFile.BlobPath}/data/batches/{dataFile.Id}/data.csv_000999", dataFile.BatchPath(999));
+            Assert.Equal($"{dataFile.RootPath}/data/batches/{dataFile.Id}/data.csv_000999", dataFile.BatchPath(999));
         }
 
         [Fact]
@@ -64,7 +64,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Content.Model.Tests.Extensi
         [Fact]
         public void Path()
         {
-            Assert.Equal(AdminReleasePath(_file.BlobPath, _file.Type, _file.BlobStorageName), _file.Path());
+            Assert.Equal(AdminReleasePath(_file.RootPath, _file.Type, _file.BlobStorageName), _file.Path());
         }
 
         [Fact]

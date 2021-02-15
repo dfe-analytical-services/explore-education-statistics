@@ -17,13 +17,13 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Migrations.ContentMig
             migrationBuilder.RenameColumn(
                 name: "ReleaseId",
                 table: "Files",
-                newName: "BlobPath");
+                newName: "RootPath");
         }
 
         protected override void Down(MigrationBuilder migrationBuilder)
         {
             migrationBuilder.RenameColumn(
-                name: "BlobPath",
+                name: "RootPath",
                 table: "Files",
                 newName: "ReleaseId");
 

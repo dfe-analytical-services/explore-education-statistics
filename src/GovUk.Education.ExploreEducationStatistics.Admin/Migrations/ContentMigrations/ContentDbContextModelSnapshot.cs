@@ -266,9 +266,6 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Migrations.ContentMig
                         .ValueGeneratedOnAdd()
                         .HasColumnType("uniqueidentifier");
 
-                    b.Property<Guid>("BlobPath")
-                        .HasColumnType("uniqueidentifier");
-
                     b.Property<string>("Filename")
                         .HasColumnType("nvarchar(max)");
 
@@ -276,6 +273,9 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Migrations.ContentMig
                         .HasColumnType("uniqueidentifier");
 
                     b.Property<Guid?>("ReplacingId")
+                        .HasColumnType("uniqueidentifier");
+
+                    b.Property<Guid>("RootPath")
                         .HasColumnType("uniqueidentifier");
 
                     b.Property<Guid?>("SourceId")
