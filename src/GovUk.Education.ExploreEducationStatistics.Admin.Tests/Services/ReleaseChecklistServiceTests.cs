@@ -88,13 +88,13 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
 
             await using (var context = ContentDbUtils.InMemoryContentDbContext(contextId))
             {
-                var fileRepository = new Mock<IFileRepository>();
+                var releaseDataFileRepository = new Mock<IReleaseDataFileRepository>();
 
-                fileRepository
+                releaseDataFileRepository
                     .Setup(r => r.ListDataFiles(release.Id))
                     .ReturnsAsync(new List<File>());
 
-                fileRepository
+                releaseDataFileRepository
                     .Setup(r => r.ListReplacementDataFiles(release.Id))
                     .ReturnsAsync(
                         new List<File>
@@ -116,7 +116,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
 
                 var service = BuildReleaseChecklistService(
                     context,
-                    fileRepository: fileRepository.Object,
+                    releaseDataFileRepository: releaseDataFileRepository.Object,
                     dataImportService: dataImportService.Object,
                     metaGuidanceService: metaGuidanceService.Object
                 );
@@ -163,13 +163,13 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
 
             await using (var context = ContentDbUtils.InMemoryContentDbContext(contextId))
             {
-                var fileRepository = new Mock<IFileRepository>();
+                var releaseDataFileRepository = new Mock<IReleaseDataFileRepository>();
 
-                fileRepository
+                releaseDataFileRepository
                     .Setup(r => r.ListDataFiles(release.Id))
                     .ReturnsAsync(new List<File>());
 
-                fileRepository
+                releaseDataFileRepository
                     .Setup(r => r.ListReplacementDataFiles(release.Id))
                     .ReturnsAsync(new List<File>());
 
@@ -181,7 +181,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
 
                 var service = BuildReleaseChecklistService(
                     context,
-                    fileRepository: fileRepository.Object,
+                    releaseDataFileRepository: releaseDataFileRepository.Object,
                     metaGuidanceService: metaGuidanceService.Object
                 );
                 var checklist = await service.GetChecklist(release.Id);
@@ -226,9 +226,9 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
                     Id = Guid.NewGuid(),
                 };
 
-                var fileRepository = new Mock<IFileRepository>();
+                var releaseDataFileRepository = new Mock<IReleaseDataFileRepository>();
 
-                fileRepository
+                releaseDataFileRepository
                     .Setup(r => r.ListDataFiles(release.Id))
                     .ReturnsAsync(
                         new List<File>
@@ -267,7 +267,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
                         }
                     );
 
-                fileRepository
+                releaseDataFileRepository
                     .Setup(r => r.ListReplacementDataFiles(release.Id))
                     .ReturnsAsync(new List<File>());
 
@@ -285,7 +285,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
 
                 var service = BuildReleaseChecklistService(
                     context,
-                    fileRepository: fileRepository.Object,
+                    releaseDataFileRepository: releaseDataFileRepository.Object,
                     metaGuidanceService: metaGuidanceService.Object,
                     footnoteRepository: footnoteRepository.Object,
                     dataBlockService: dataBlockService.Object
@@ -415,9 +415,9 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
                     Id = Guid.NewGuid()
                 };
 
-                var fileRepository = new Mock<IFileRepository>();
+                var releaseDataFileRepository = new Mock<IReleaseDataFileRepository>();
 
-                fileRepository
+                releaseDataFileRepository
                     .Setup(r => r.ListDataFiles(release.Id))
                     .ReturnsAsync(
                         new List<File>
@@ -432,7 +432,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
                         }
                     );
 
-                fileRepository
+                releaseDataFileRepository
                     .Setup(r => r.ListReplacementDataFiles(release.Id))
                     .ReturnsAsync(new List<File>());
 
@@ -465,7 +465,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
                 var service = BuildReleaseChecklistService(
                     context,
                     metaGuidanceService: metaGuidanceService.Object,
-                    fileRepository: fileRepository.Object,
+                    releaseDataFileRepository: releaseDataFileRepository.Object,
                     footnoteRepository: footnoteRepository.Object,
                     dataBlockService: dataBlockService.Object
                 );
@@ -508,7 +508,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
             IDataImportService dataImportService = null,
             IUserService userService = null,
             IMetaGuidanceService metaGuidanceService = null,
-            IFileRepository fileRepository = null,
+            IReleaseDataFileRepository releaseDataFileRepository = null,
             IFootnoteRepository footnoteRepository = null,
             IDataBlockService dataBlockService = null)
         {
@@ -518,7 +518,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
                 dataImportService ?? new Mock<IDataImportService>().Object,
                 userService ?? MockUtils.AlwaysTrueUserService().Object,
                 metaGuidanceService ?? new Mock<IMetaGuidanceService>().Object,
-                fileRepository ?? new Mock<IFileRepository>().Object,
+                releaseDataFileRepository ?? new Mock<IReleaseDataFileRepository>().Object,
                 footnoteRepository ?? new Mock<IFootnoteRepository>().Object,
                 dataBlockService ?? new Mock<IDataBlockService>().Object
             );

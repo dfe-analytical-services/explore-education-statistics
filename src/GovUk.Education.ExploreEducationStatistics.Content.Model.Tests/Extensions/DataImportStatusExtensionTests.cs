@@ -6,7 +6,7 @@ using static GovUk.Education.ExploreEducationStatistics.Content.Model.DataImport
 
 namespace GovUk.Education.ExploreEducationStatistics.Content.Model.Tests.Extensions
 {
-    public class ImportStatusExtensionTests
+    public class DataImportStatusExtensionTests
     {
         private static readonly List<DataImportStatus> ExpectedFinishedStatuses = new List<DataImportStatus>
         {

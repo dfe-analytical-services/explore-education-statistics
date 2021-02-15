@@ -17,7 +17,7 @@ using Microsoft.Extensions.Logging;
 using Moq;
 using Newtonsoft.Json;
 using Xunit;
-using static GovUk.Education.ExploreEducationStatistics.Common.BlobContainerNames;
+using static GovUk.Education.ExploreEducationStatistics.Common.BlobContainers;
 
 namespace GovUk.Education.ExploreEducationStatistics.Data.Api.Tests.Services
 {

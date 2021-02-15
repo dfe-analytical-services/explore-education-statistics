@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
 using AutoMapper;
+using GovUk.Education.ExploreEducationStatistics.Common;
 using GovUk.Education.ExploreEducationStatistics.Common.Model;
 using GovUk.Education.ExploreEducationStatistics.Content.Model;
 using GovUk.Education.ExploreEducationStatistics.Content.Model.Database;
@@ -15,8 +16,7 @@ using GovUk.Education.ExploreEducationStatistics.Publisher.Services.Interfaces;
 using Microsoft.EntityFrameworkCore;
 using static GovUk.Education.ExploreEducationStatistics.Common.Model.FileType;
 using Microsoft.Extensions.Logging;
-using static GovUk.Education.ExploreEducationStatistics.Common.BlobContainerNames;
-using static GovUk.Education.ExploreEducationStatistics.Common.Services.FileStoragePathUtils;
+using static GovUk.Education.ExploreEducationStatistics.Common.BlobContainers;
 using IReleaseService = GovUk.Education.ExploreEducationStatistics.Publisher.Services.Interfaces.IReleaseService;
 using static GovUk.Education.ExploreEducationStatistics.Publisher.Extensions.PublisherExtensions;
 
@@ -213,10 +213,10 @@ namespace GovUk.Education.ExploreEducationStatistics.Publisher.Services
 
         private async Task<FileInfo> GetAllFilesZip(Release release)
         {
-            var path = PublicReleaseAllFilesZipPath(release.Publication.Slug, release.Slug);
+            var path = release.AllFilesZipPath();
 
             var exists = await _fileStorageService.CheckBlobExists(
-                containerName: PublicFilesContainerName,
+                containerName: PublicReleaseFiles,
                 path: path);
 
             // EES-1755 we should throw an exception here and not be as lenient.
@@ -237,7 +237,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Publisher.Services
             }
 
             var blob = await _fileStorageService.GetBlob(
-                containerName: PublicFilesContainerName,
+                containerName: BlobContainers.PublicReleaseFiles,
                 path: path);
 
             return new FileInfo
@@ -254,7 +254,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Publisher.Services
         private async Task<FileInfo> GetPublicFileInfo(Release release, File file)
         {
             var exists = await _fileStorageService.CheckBlobExists(
-                containerName: PublicFilesContainerName,
+                containerName: PublicReleaseFiles,
                 path: file.PublicPath(release));
 
             if (!exists)
@@ -265,7 +265,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Publisher.Services
             }
 
             var blob = await _fileStorageService.GetBlob(
-                containerName: PublicFilesContainerName,
+                containerName: PublicReleaseFiles,
                 path: file.PublicPath(release));
 
             return file.ToPublicFileInfo(blob);

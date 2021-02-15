@@ -324,22 +324,33 @@ const PublicationReleasePage: NextPage<Props> = ({ data }) => {
                 Find and download files used in the production of this release.
               </p>
               <ul className="govuk-list govuk-!-width-full">
-                {data.downloadFiles.map(({ extension, name, path, size }) => (
-                  <li key={path}>
-                    <Link
-                      to={`${process.env.CONTENT_API_BASE_URL}/download/${path}`}
-                      analytics={{
-                        category: 'Downloads',
-                        action: `Release page ${name} file downloaded`,
-                        label: `File URL: /api/download/${path}`,
-                      }}
-                    >
-                      {name}
-                    </Link>
+                {data.downloadFiles.map(
+                  ({ id: fileId, fileName, extension, name, size }) => {
+                    const isAllFiles = !fileId && name === 'All files';
 
-                    {` (${extension}, ${size})`}
-                  </li>
-                ))}
+                    const url = `${process.env.CONTENT_API_BASE_URL}/releases/${
+                      data.id
+                    }/files/${isAllFiles ? 'all' : fileId}`;
+
+                    return (
+                      <li key={isAllFiles ? 'all' : fileId}>
+                        <Link
+                          to={url}
+                          analytics={{
+                            category: 'Downloads',
+                            action: `Release page ${
+                              isAllFiles ? 'all files' : 'file'
+                            } downloaded`,
+                            label: `Publication: ${data.title}, File: ${fileName}`,
+                          }}
+                        >
+                          {name}
+                        </Link>
+                        {` (${extension}, ${size})`}
+                      </li>
+                    );
+                  },
+                )}
 
                 <li className="govuk-!-margin-top-9">
                   <div className="dfe-flex dfe-justify-content--space-between dfe-align-items--center">

@@ -35,14 +35,21 @@ namespace GovUk.Education.ExploreEducationStatistics.Common.Services
         }
 
         public static IDictionary<string, string> GetAncillaryFileMetaValues(
-            string filename,
-            string name)
+            string name,
+            DateTime? releaseDateTime = null)
         {
-            return new Dictionary<string, string>
+            var values = new Dictionary<string, string>
             {
-                {BlobInfoExtensions.FilenameKey, filename},
                 {BlobInfoExtensions.NameKey, name}
             };
+
+            if (releaseDateTime.HasValue)
+            {
+                values.Add(BlobInfoExtensions.ReleaseDateTimeKey, 
+                    releaseDateTime.Value.ToString("o", CultureInfo.InvariantCulture));
+            }
+
+            return values;
         }
 
         public static IDictionary<string, string> GetDataFileMetaValues(

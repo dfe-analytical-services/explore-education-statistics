@@ -122,7 +122,6 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Validators
         DataAndMetadataFilesCannotHaveTheSameName,
         DataFileCannotBeEmpty,
         DataFileMustBeCsvFile,
-        DataFileAlreadyUploaded,
         DataFilenameCannotContainSpacesOrSpecialCharacters,
         CannotRemoveDataFilesUntilImportComplete,
         CannotRemoveDataFilesOnceReleaseApproved,
@@ -132,7 +131,6 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Validators
         DataFileMustBeZipFile,
         DataZipFileCanOnlyContainTwoFiles,
         DataZipFileDoesNotContainCsvFiles,
-        DataZipFileAlreadyExists,
 
         ReplacementFileTypesMustBeData,
         ReplacementMustBeValid,

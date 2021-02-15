@@ -27,7 +27,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Services
         private readonly IDataImportService _dataImportService;
         private readonly IUserService _userService;
         private readonly IMetaGuidanceService _metaGuidanceService;
-        private readonly IFileRepository _fileRepository;
+        private readonly IReleaseDataFileRepository _fileRepository;
         private readonly IFootnoteRepository _footnoteRepository;
         private readonly IDataBlockService _dataBlockService;
 
@@ -37,7 +37,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Services
             IDataImportService dataImportService,
             IUserService userService,
             IMetaGuidanceService metaGuidanceService,
-            IFileRepository fileRepository,
+            IReleaseDataFileRepository fileRepository,
             IFootnoteRepository footnoteRepository,
             IDataBlockService dataBlockService)
         {

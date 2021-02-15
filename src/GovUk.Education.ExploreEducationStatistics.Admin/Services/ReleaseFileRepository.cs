@@ -10,12 +10,20 @@ using GovUk.Education.ExploreEducationStatistics.Content.Model.Database;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
 using static GovUk.Education.ExploreEducationStatistics.Admin.Validators.ValidationErrorMessages;
+using static GovUk.Education.ExploreEducationStatistics.Common.Model.FileType;
 
 namespace GovUk.Education.ExploreEducationStatistics.Admin.Services
 {
     public class ReleaseFileRepository : IReleaseFileRepository
     {
         private readonly ContentDbContext _contentDbContext;
+
+        private static readonly List<FileType> SupportedFileTypes = new List<FileType>
+        {
+            Ancillary,
+            Chart,
+            Image
+        };
 
         public ReleaseFileRepository(ContentDbContext contentDbContext)
         {
@@ -39,6 +47,35 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Services
             }
 
             return releaseFile.File;
+        }
+
+        public async Task<File> Create(
+            Guid releaseId,
+            string filename,
+            FileType type)
+        {
+            if (!SupportedFileTypes.Contains(type))
+            {
+                throw new ArgumentOutOfRangeException(nameof(type), type, "Cannot create file for file type");
+            }
+
+            var releaseFile = new ReleaseFile
+            {
+                ReleaseId = releaseId,
+                File = new File
+                {
+                    // Mark any new files as already migrated while these flags temporarily exist
+                    PrivateBlobPathMigrated = true,
+                    PublicBlobPathMigrated = true,
+                    RootPath = releaseId,
+                    Filename = filename,
+                    Type = type
+                }
+            };
+
+            var created = (await _contentDbContext.ReleaseFiles.AddAsync(releaseFile)).Entity;
+            await _contentDbContext.SaveChangesAsync();
+            return created.File;
         }
 
         public async Task Delete(Guid releaseId, Guid fileId)
@@ -76,6 +113,26 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Services
                 .AnyAsync(releaseFile =>
                     releaseFile.ReleaseId != releaseId
                     && releaseFile.FileId == fileId);
+        }
+
+        public async Task<File> UpdateFilename(Guid releaseId,
+            Guid fileId,
+            string filename)
+        {
+            // Ensure file is linked to the Release by getting the ReleaseFile first
+            var releaseFile = await _contentDbContext.ReleaseFiles
+                .Include(rf => rf.File)
+                .SingleAsync(rf =>
+                    rf.ReleaseId == releaseId
+                    && rf.FileId == fileId);
+
+            var file = releaseFile.File;
+            _contentDbContext.Update(file);
+            file.Filename = filename;
+
+            await _contentDbContext.SaveChangesAsync();
+
+            return file;
         }
     }
 }

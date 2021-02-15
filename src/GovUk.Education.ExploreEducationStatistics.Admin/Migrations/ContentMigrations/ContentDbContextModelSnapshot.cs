@@ -269,6 +269,12 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Migrations.ContentMig
                     b.Property<string>("Filename")
                         .HasColumnType("nvarchar(max)");
 
+                    b.Property<bool>("PrivateBlobPathMigrated")
+                        .HasColumnType("bit");
+
+                    b.Property<bool>("PublicBlobPathMigrated")
+                        .HasColumnType("bit");
+
                     b.Property<Guid?>("ReplacedById")
                         .HasColumnType("uniqueidentifier");
 

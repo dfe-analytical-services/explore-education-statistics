@@ -6,6 +6,7 @@ using System.Reflection;
 using System.Text.RegularExpressions;
 using GovUk.Education.ExploreEducationStatistics.Admin.Services;
 using GovUk.Education.ExploreEducationStatistics.Common.Services.Interfaces;
+using GovUk.Education.ExploreEducationStatistics.Common.Tests.Utils;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
 using Moq;
@@ -18,9 +19,9 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
         [Fact]
         public void UploadedZippedDatafileIsValid()
         {
-            var (fileTypeService, blobStorageService) = Mocks();
+            var fileTypeService = new Mock<IFileTypeService>(MockBehavior.Strict);
 
-            var service = new DataArchiveValidationService(blobStorageService.Object, fileTypeService.Object);
+            var service = SetupDataArchiveValidationService(fileTypeService: fileTypeService.Object);
             var archive = CreateFormFileFromResource("data-zip-valid.zip");
 
             fileTypeService
@@ -33,14 +34,16 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
             var result = service.ValidateDataArchiveFile(Guid.NewGuid(), archive).Result;
 
             Assert.True(result.IsRight);
+
+            MockUtils.VerifyAllMocks(fileTypeService);
         }
 
         [Fact]
         public void UploadedZippedDatafileIsInvalid()
         {
-            var (fileTypeService, blobStorageService) = Mocks();
+            var fileTypeService = new Mock<IFileTypeService>(MockBehavior.Strict);
 
-            var service = new DataArchiveValidationService(blobStorageService.Object, fileTypeService.Object);
+            var service = SetupDataArchiveValidationService(fileTypeService: fileTypeService.Object);
             var archive = CreateFormFileFromResource("data-zip-invalid.zip");
 
             fileTypeService
@@ -56,14 +59,8 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
             Assert.IsAssignableFrom<BadRequestObjectResult>(result.Left);
             var details = (ValidationProblemDetails) ((BadRequestObjectResult) result.Left).Value;
             Assert.Equal("DATA_ZIP_FILE_DOES_NOT_CONTAIN_CSV_FILES", details.Errors[""].First());
-        }
 
-        private (Mock<IFileTypeService>, Mock<IBlobStorageService>) Mocks()
-        {
-            return (
-                new Mock<IFileTypeService>(),
-                new Mock<IBlobStorageService>()
-            );
+            MockUtils.VerifyAllMocks(fileTypeService);
         }
 
         private static IFormFile CreateFormFileFromResource(string fileName)
@@ -81,6 +78,14 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
                 .Returns(() => fileName);
 
             return formFile.Object;
+        }
+
+        private static DataArchiveValidationService SetupDataArchiveValidationService(
+            IFileTypeService fileTypeService = null)
+        {
+            return new DataArchiveValidationService(
+                fileTypeService ?? new Mock<IFileTypeService>().Object
+            );
         }
     }
 }

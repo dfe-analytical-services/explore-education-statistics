@@ -14,7 +14,7 @@ using GovUk.Education.ExploreEducationStatistics.Data.Services.Interfaces;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.Azure.Storage;
 using Newtonsoft.Json;
-using static GovUk.Education.ExploreEducationStatistics.Common.BlobContainerNames;
+using static GovUk.Education.ExploreEducationStatistics.Common.BlobContainers;
 
 namespace GovUk.Education.ExploreEducationStatistics.Data.Api.Services
 {
@@ -43,7 +43,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Api.Services
         {
             try
             {
-                var text = await _blobStorageService.DownloadBlobText(PublicPermalinkContainerName, id.ToString());
+                var text = await _blobStorageService.DownloadBlobText(Permalinks, id.ToString());
                 var permalink = JsonConvert.DeserializeObject<Permalink>(text);
                 return await BuildViewModel(permalink);
             }
@@ -73,7 +73,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Api.Services
             return await _tableBuilderService.Query(releaseId, request.Query).OnSuccess(async result =>
             {
                 var permalink = new Permalink(request.Configuration, result, request.Query);
-                await _blobStorageService.UploadText(containerName: PublicPermalinkContainerName,
+                await _blobStorageService.UploadText(containerName: Permalinks,
                     path: permalink.Id.ToString(),
                     content: JsonConvert.SerializeObject(permalink),
                     contentType: MediaTypeNames.Application.Json);

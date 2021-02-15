@@ -3,7 +3,6 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
 using GovUk.Education.ExploreEducationStatistics.Common.Extensions;
-using GovUk.Education.ExploreEducationStatistics.Common.Model;
 using GovUk.Education.ExploreEducationStatistics.Content.Model;
 using GovUk.Education.ExploreEducationStatistics.Content.Model.Database;
 using GovUk.Education.ExploreEducationStatistics.Publisher.Model.ViewModels;
@@ -81,22 +80,19 @@ namespace GovUk.Education.ExploreEducationStatistics.Publisher.Services
                 .ThenBy(r => r.TimePeriodCoverage)
                 .ToList();
 
+            var latestRelease = await _releaseService.GetLatestRelease(publication.Id, includedReleaseIds);
+
             return new PublicationDownloadTreeNode
             {
                 Id = publication.Id,
                 Title = publication.Title,
                 Summary = publication.Summary,
                 Slug = publication.Slug,
-                DownloadFiles = await GetDownloadFiles(publication, includedReleaseIds),
+                DownloadFiles = await _releaseService.GetDownloadFiles(latestRelease),
                 EarliestReleaseTime = releases.FirstOrDefault()?.Title,
-                LatestReleaseTime = releases.LastOrDefault()?.Title
+                LatestReleaseTime = releases.LastOrDefault()?.Title,
+                LatestReleaseId = latestRelease.Id
             };
-        }
-
-        private async Task<List<FileInfo>> GetDownloadFiles(Publication publication, IEnumerable<Guid> includedReleaseIds)
-        {
-            var latestRelease = await _releaseService.GetLatestRelease(publication.Id, includedReleaseIds);
-            return await _releaseService.GetDownloadFiles(latestRelease);
         }
 
         private static bool IsThemePublished(Theme theme, IEnumerable<Guid> includedReleaseIds)

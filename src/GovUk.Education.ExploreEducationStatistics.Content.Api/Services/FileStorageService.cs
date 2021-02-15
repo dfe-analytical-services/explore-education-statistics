@@ -1,7 +1,6 @@
 using System.IO;
 using System.Threading.Tasks;
 using GovUk.Education.ExploreEducationStatistics.Common;
-using GovUk.Education.ExploreEducationStatistics.Common.Extensions;
 using GovUk.Education.ExploreEducationStatistics.Common.Model;
 using GovUk.Education.ExploreEducationStatistics.Common.Services.Interfaces;
 using GovUk.Education.ExploreEducationStatistics.Content.Api.Services.Interfaces;
@@ -23,7 +22,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Content.Api.Services
             try
             {
                 return await _blobStorageService.GetDeserializedJson<T>(
-                    BlobContainerNames.PublicContentContainerName,
+                    BlobContainers.PublicContentContainerName,
                     path
                 );
             }
@@ -31,26 +30,6 @@ namespace GovUk.Education.ExploreEducationStatistics.Content.Api.Services
             {
                 return new NotFoundResult();
             }
-        }
-
-        public async Task<bool> IsBlobReleased(string containerName, string path)
-        {
-            var blob = await _blobStorageService.GetBlob(containerName, path);
-
-            return blob.IsReleased();
-        }
-
-        public async Task<FileStreamResult> StreamFile(string containerName, string path)
-        {
-            var blob = await _blobStorageService.GetBlob(containerName, path);
-
-            var stream = new MemoryStream();
-            await _blobStorageService.DownloadToStream(containerName, path, stream);
-
-            return new FileStreamResult(stream, blob.ContentType)
-            {
-                FileDownloadName = blob.FileName
-            };
         }
     }
 }
