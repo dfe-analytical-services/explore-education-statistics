@@ -73,8 +73,17 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Services.Tests
                     }
                 );
 
-                var highlight1 = new IdLabel(Guid.NewGuid(), "Highlight 1");
-                var highlight2 = new IdLabel(Guid.NewGuid(), "Highlight 2");
+                var highlight1 = new TableHighlightViewModel(
+                    id: Guid.NewGuid(),
+                    name: "Highlight 1",
+                    description: "Highlight 1 description"
+                );
+
+                var highlight2 = new TableHighlightViewModel(
+                    id: Guid.NewGuid(),
+                    name: "Highlight 2",
+                    description: "Highlight 2 description"
+                );
 
                 var releaseService = new Mock<IReleaseService>();
 
@@ -87,7 +96,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Services.Tests
                             subject1,
                             subject2
                         },
-                        Highlights = new List<IdLabel>
+                        Highlights = new List<TableHighlightViewModel>
                         {
                             highlight1,
                             highlight2,

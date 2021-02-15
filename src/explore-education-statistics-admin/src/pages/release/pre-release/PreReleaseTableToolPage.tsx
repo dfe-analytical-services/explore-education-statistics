@@ -131,7 +131,7 @@ const PreReleaseTableToolPage = ({
                           },
                         )}
                       >
-                        {highlight.label}
+                        {highlight.name}
                       </Link>
                     </li>
                   ))}

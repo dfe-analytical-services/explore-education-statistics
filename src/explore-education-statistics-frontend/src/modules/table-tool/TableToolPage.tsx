@@ -119,7 +119,7 @@ const TableToolPage: NextPage<TableToolPageProps> = ({
                       label: `Table highlight label: ${highlight.label}`,
                     }}
                   >
-                    {highlight.label}
+                    {highlight.name}
                   </Link>
                 </li>
               ))}

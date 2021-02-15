@@ -98,6 +98,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Services.Tests
             {
                 Name = "Test data block",
                 HighlightName = "Test highlight name",
+                HighlightDescription = "Test highlight description",
                 Query = new ObservationQueryContext
                 {
                     SubjectId = releaseSubject1.Subject.Id,
@@ -199,7 +200,8 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Services.Tests
                 Assert.Single(highlights);
 
                 Assert.Equal(dataBlock.Id, highlights[0].Id);
-                Assert.Equal(dataBlock.HighlightName, highlights[0].Label);
+                Assert.Equal(dataBlock.HighlightName, highlights[0].Name);
+                Assert.Equal(dataBlock.HighlightDescription, highlights[0].Description);
 
                 MockUtils.VerifyAllMocks(metaGuidanceSubjectService);
             }
@@ -622,7 +624,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Services.Tests
             var dataBlock1 = new DataBlock
             {
                 Name = "Test data block 1",
-                HighlightName = "Test highlight name",
+                HighlightName = "Test highlight name 1",
                 Query = new ObservationQueryContext
                 {
                     SubjectId = releaseSubject1.Subject.Id,
@@ -643,7 +645,8 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Services.Tests
             var dataBlock3 = new DataBlock
             {
                 Name = "Test data block 3",
-                HighlightName = "Test highlight name",
+                HighlightName = "Test highlight name 3",
+                HighlightDescription = "Test highlight description 3",
                 Query = new ObservationQueryContext
                 {
                     SubjectId = Guid.NewGuid(),
@@ -704,7 +707,8 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Services.Tests
                 Assert.Single(highlights);
 
                 Assert.Equal(dataBlock1.Id, highlights[0].Id);
-                Assert.Equal(dataBlock1.HighlightName, highlights[0].Label);
+                Assert.Equal(dataBlock1.HighlightName, highlights[0].Name);
+                Assert.Equal(dataBlock1.HighlightDescription, highlights[0].Description);
             }
         }
 

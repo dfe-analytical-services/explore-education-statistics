@@ -190,7 +190,13 @@ describe('PreReleaseTableToolPage', () => {
 
   const testRelease: Release = {
     id: 'release-1',
-    highlights: [{ id: 'block-1', label: 'Test highlight' }],
+    highlights: [
+      {
+        id: 'block-1',
+        name: 'Test highlight',
+        description: 'Test highlight description',
+      },
+    ],
     subjects: [
       {
         id: 'subject-1',

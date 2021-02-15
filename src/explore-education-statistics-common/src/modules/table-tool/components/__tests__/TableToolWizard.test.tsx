@@ -210,9 +210,21 @@ describe('TableToolWizard', () => {
           initialStep: 2,
           subjects: [testSubjects[0]],
           highlights: [
-            { id: 'highlight-1', label: 'Test highlight 1' },
-            { id: 'highlight-2', label: 'Test highlight 2' },
-            { id: 'highlight-3', label: 'Test highlight 3' },
+            {
+              id: 'highlight-1',
+              name: 'Test highlight 1',
+              description: 'Test highlight description 1',
+            },
+            {
+              id: 'highlight-2',
+              name: 'Test highlight 2',
+              description: 'Test highlight description 2',
+            },
+            {
+              id: 'highlight-3',
+              name: 'Test highlight 3',
+              description: 'Test highlight description 3',
+            },
           ],
           query: {
             publicationId: 'publication-1',
@@ -226,7 +238,7 @@ describe('TableToolWizard', () => {
           <ul>
             {highlights.map(highlight => (
               <li key={highlight.id} id={highlight.id}>
-                {highlight.label}
+                {highlight.name}
               </li>
             ))}
           </ul>
@@ -265,9 +277,21 @@ describe('TableToolWizard', () => {
           initialStep: 3,
           subjects: [testSubjects[0]],
           highlights: [
-            { id: 'highlight-1', label: 'Test highlight 1' },
-            { id: 'highlight-2', label: 'Test highlight 2' },
-            { id: 'highlight-3', label: 'Test highlight 3' },
+            {
+              id: 'highlight-1',
+              name: 'Test highlight 1',
+              description: 'Test highlight description 1',
+            },
+            {
+              id: 'highlight-2',
+              name: 'Test highlight 2',
+              description: 'Test highlight description 2',
+            },
+            {
+              id: 'highlight-3',
+              name: 'Test highlight 3',
+              description: 'Test highlight description 3',
+            },
           ],
           query: {
             publicationId: 'publication-1',
@@ -281,7 +305,7 @@ describe('TableToolWizard', () => {
           <ul>
             {highlights.map(highlight => (
               <li key={highlight.id} id={highlight.id}>
-                {highlight.label}
+                {highlight.name}
               </li>
             ))}
           </ul>

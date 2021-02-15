@@ -1,6 +1,5 @@
 using System;
 using System.Collections.Generic;
-using GovUk.Education.ExploreEducationStatistics.Data.Model;
 
 namespace GovUk.Education.ExploreEducationStatistics.Data.Services.ViewModels
 {
@@ -10,8 +9,8 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Services.ViewModels
 
         public Guid LatestReleaseId { get; set; }
 
-        public IEnumerable<IdLabel> Highlights { get; set; }
+        public List<TableHighlightViewModel> Highlights { get; set; }
 
-        public IEnumerable<SubjectViewModel> Subjects { get; set; }
+        public List<SubjectViewModel> Subjects { get; set; }
     }
 }

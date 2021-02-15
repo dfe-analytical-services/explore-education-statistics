@@ -8,9 +8,7 @@ using GovUk.Education.ExploreEducationStatistics.Common.Services.Interfaces.Secu
 using GovUk.Education.ExploreEducationStatistics.Common.Utils;
 using GovUk.Education.ExploreEducationStatistics.Content.Model;
 using GovUk.Education.ExploreEducationStatistics.Content.Model.Database;
-using GovUk.Education.ExploreEducationStatistics.Content.Model.Repository.Interfaces;
 using GovUk.Education.ExploreEducationStatistics.Content.Security.Extensions;
-using GovUk.Education.ExploreEducationStatistics.Data.Model;
 using GovUk.Education.ExploreEducationStatistics.Data.Model.Database;
 using GovUk.Education.ExploreEducationStatistics.Data.Services.Interfaces;
 using GovUk.Education.ExploreEducationStatistics.Data.Services.ViewModels;
@@ -71,18 +69,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Services
                         .ToList();
 
                     var subjects = await GetSubjects(releaseId, subjectsToInclude);
-
-                    var highlights = _contentDbContext.ReleaseContentBlocks
-                        .Include(rcb => rcb.ContentBlock)
-                        .Where(rcb => rcb.ReleaseId == release.Id)
-                        .Select(rcb => rcb.ContentBlock)
-                        .OfType<DataBlock>()
-                        .Where(dataBlock => !string.IsNullOrEmpty(dataBlock.HighlightName))
-                        .ToList()
-                        // Need to query on materialized list due to JSON serialized query
-                        .Where(dataBlock => subjectsToInclude.Contains(dataBlock.Query.SubjectId))
-                        .Select(dataBlock => new IdLabel(dataBlock.Id, dataBlock.HighlightName))
-                        .ToList();
+                    var highlights = await GetHighlights(releaseId, subjectsToInclude);
 
                     return new ReleaseViewModel
                     {
@@ -120,6 +107,30 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Services
                             geographicLevels: await _metaGuidanceSubjectService.GetGeographicLevels(rs.SubjectId)
                         )
                 ))
+                .ToList();
+        }
+
+        private async Task<List<TableHighlightViewModel>> GetHighlights(Guid releaseId, List<Guid> subjectsToInclude)
+        {
+            var releaseContentBlocks = await _contentDbContext.ReleaseContentBlocks
+                .Include(rcb => rcb.ContentBlock)
+                .Where(rcb => rcb.ReleaseId == releaseId)
+                .Select(rcb => rcb.ContentBlock)
+                .OfType<DataBlock>()
+                .Where(dataBlock => !string.IsNullOrEmpty(dataBlock.HighlightName))
+                .ToListAsync();
+
+            // Need to query on materialized list due to JSON serialized query
+            return releaseContentBlocks
+                .Where(dataBlock => subjectsToInclude.Contains(dataBlock.Query.SubjectId))
+                .Select(
+                    dataBlock => new TableHighlightViewModel(
+                        id: dataBlock.Id,
+                        name: dataBlock.HighlightName,
+                        description: dataBlock.HighlightDescription
+                    )
+                )
+                .OrderBy(dataBlock => dataBlock.Name)
                 .ToList();
         }
     }
