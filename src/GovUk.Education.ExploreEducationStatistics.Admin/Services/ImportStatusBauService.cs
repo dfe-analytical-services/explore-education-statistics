@@ -10,6 +10,7 @@ using GovUk.Education.ExploreEducationStatistics.Content.Model;
 using GovUk.Education.ExploreEducationStatistics.Content.Model.Database;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
+using static GovUk.Education.ExploreEducationStatistics.Content.Model.DataImportStatus;
 
 namespace GovUk.Education.ExploreEducationStatistics.Admin.Services
 {
@@ -31,22 +32,30 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Services
                 .CheckCanViewAllImports()
                 .OnSuccess(async () =>
                 {
-                    var imports = await _contentDbContext.DataImports
-                        .Include(import => import.File)
-                        .ThenInclude(file => file.Release)
-                        .ThenInclude(release => release.Publication)
-                        .Where(import => import.Status != DataImportStatus.COMPLETE)
-                        .OrderByDescending(import => import.Created)
-                        .ToListAsync();
+                    var releaseFilesQueryable = _contentDbContext.ReleaseFiles
+                        .Include(rf => rf.Release)
+                        .ThenInclude(r => r.Publication);
 
-                    return imports.Select(BuildViewModel).ToList();
+                    return await _contentDbContext.DataImports
+                        .Include(dataImport => dataImport.File)
+                        .Join(releaseFilesQueryable,
+                            dataImport => dataImport.FileId,
+                            releaseFile => releaseFile.FileId,
+                            (dataImport, releaseFile) => new
+                            {
+                                DataImport = dataImport,
+                                Release = releaseFile.Release
+                            })
+                        .Where(join => join.DataImport.Status != COMPLETE)
+                        .OrderByDescending(join => join.DataImport.Created)
+                        .Select(join => BuildViewModel(join.DataImport, join.Release))
+                        .ToListAsync();
                 });
         }
 
-        private static ImportStatusBauViewModel BuildViewModel(DataImport dataImport)
+        private static ImportStatusBauViewModel BuildViewModel(DataImport dataImport, Release release)
         {
             var file = dataImport.File;
-            var release = file.Release;
             var publication = release.Publication;
             return new ImportStatusBauViewModel
             {

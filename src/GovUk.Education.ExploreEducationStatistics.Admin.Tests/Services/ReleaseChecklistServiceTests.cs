@@ -238,8 +238,6 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
                                 Id = Guid.NewGuid(),
                                 Filename = "test-file-1.csv",
                                 Type = FileType.Data,
-                                Release = release,
-                                ReleaseId = release.Id,
                                 SubjectId = subject.Id
                             },
                             new File
@@ -247,8 +245,6 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
                                 Id = Guid.NewGuid(),
                                 Filename = "test-file-2.csv",
                                 Type = FileType.Data,
-                                Release = release,
-                                ReleaseId = release.Id,
                                 SubjectId = otherSubject.Id
                             }
                         }
@@ -431,8 +427,6 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
                                 Id = Guid.NewGuid(),
                                 Filename = "test-file-1.csv",
                                 Type = FileType.Data,
-                                Release = release,
-                                ReleaseId = release.Id,
                                 SubjectId = subject.Id,
                             },
                         }

@@ -168,7 +168,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Common.Services
             string containerName,
             string path,
             IFormFile file,
-            IBlobStorageService.UploadFileOptions options = null)
+            IDictionary<string, string> metadata = null)
         {
             var blob = await GetBlobClient(containerName, path);
 
@@ -177,12 +177,12 @@ namespace GovUk.Education.ExploreEducationStatistics.Common.Services
             _logger.LogInformation($"Uploading file to blob {containerName}/{path}");
 
             await blob.UploadAsync(
-                tempFilePath,
-                new BlobHttpHeaders
+                path: tempFilePath,
+                httpHeaders: new BlobHttpHeaders
                 {
                     ContentType = file.ContentType
                 },
-                options?.MetaValues
+                metadata: metadata
             );
         }
 
@@ -262,7 +262,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Common.Services
             string path,
             Stream stream,
             string contentType,
-            IBlobStorageService.UploadStreamOptions options = null)
+            IDictionary<string, string> metadata = null)
         {
             var blobContainer = await GetBlobContainer(containerName);
             var blob = blobContainer.GetBlockBlobClient(path);
@@ -275,12 +275,12 @@ namespace GovUk.Education.ExploreEducationStatistics.Common.Services
             }
 
             await blob.UploadAsync(
-                stream,
-                new BlobHttpHeaders
+                content: stream,
+                httpHeaders: new BlobHttpHeaders
                 {
                     ContentType = contentType,
                 },
-                options?.MetaValues
+                metadata: metadata
             );
         }
 
@@ -289,7 +289,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Common.Services
             string path,
             string content,
             string contentType,
-            IBlobStorageService.UploadTextOptions options = null)
+            IDictionary<string, string> metadata = null)
         {
             var blobContainer = await GetBlobContainer(containerName);
             var blob = blobContainer.GetBlockBlobClient(path);
@@ -299,12 +299,12 @@ namespace GovUk.Education.ExploreEducationStatistics.Common.Services
             await using var stream = new MemoryStream(Encoding.UTF8.GetBytes(content));
 
             await blob.UploadAsync(
-                stream,
-                new BlobHttpHeaders
+                content: stream,
+                httpHeaders: new BlobHttpHeaders
                 {
                     ContentType = contentType,
                 },
-                options?.MetaValues
+                metadata: metadata
             );
         }
 

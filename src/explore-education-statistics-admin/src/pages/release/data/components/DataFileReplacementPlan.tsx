@@ -61,8 +61,13 @@ const DataFileReplacementPlan = ({
     error,
     setState: setPlan,
   } = useAsyncRetry(
-    () => dataReplacementService.getReplacementPlan(fileId, replacementFileId),
-    [fileId],
+    () =>
+      dataReplacementService.getReplacementPlan(
+        releaseId,
+        fileId,
+        replacementFileId,
+      ),
+    [releaseId, fileId, replacementFileId],
   );
 
   const hasInvalidDataBlocks = useMemo<boolean>(
@@ -377,6 +382,7 @@ const DataFileReplacementPlan = ({
                   toggleSubmitting.on();
 
                   await dataReplacementService.replaceData(
+                    releaseId,
                     fileId,
                     replacementFileId,
                   );

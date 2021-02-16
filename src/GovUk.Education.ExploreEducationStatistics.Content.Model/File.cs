@@ -1,6 +1,5 @@
 using System;
 using GovUk.Education.ExploreEducationStatistics.Common.Model;
-using Newtonsoft.Json;
 using static GovUk.Education.ExploreEducationStatistics.Common.Model.FileType;
 
 namespace GovUk.Education.ExploreEducationStatistics.Content.Model
@@ -9,10 +8,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Content.Model
     {
         public Guid Id { get; set; }
 
-        [JsonIgnore]
-        public Release Release { get; set; }
-
-        public Guid ReleaseId { get; set; }
+        public Guid RootPath { get; set; }
 
         public Guid? SubjectId { get; set; }
 

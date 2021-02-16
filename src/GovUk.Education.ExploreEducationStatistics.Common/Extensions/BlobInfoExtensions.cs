@@ -13,11 +13,6 @@ namespace GovUk.Education.ExploreEducationStatistics.Common.Extensions
         public const string ReleaseDateTimeKey = "releasedatetime";
 
         /**
-         * Property key on a metadata file to point at the data file
-         */
-        public const string DataFileKey = "datafile";
-
-        /**
          * Property key on a data file to point at the metadata file
          */
         public const string MetaFileKey = "metafile";

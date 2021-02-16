@@ -26,6 +26,7 @@ using static GovUk.Education.ExploreEducationStatistics.Admin.Validators.Validat
 using static GovUk.Education.ExploreEducationStatistics.Common.Services.EnumUtil;
 using static GovUk.Education.ExploreEducationStatistics.Data.Model.Services.LocationService;
 using IReleaseService = GovUk.Education.ExploreEducationStatistics.Admin.Services.Interfaces.IReleaseService;
+using Release = GovUk.Education.ExploreEducationStatistics.Content.Model.Release;
 using Unit = GovUk.Education.ExploreEducationStatistics.Common.Model.Unit;
 
 namespace GovUk.Education.ExploreEducationStatistics.Admin.Services
@@ -69,24 +70,19 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Services
         }
 
         public async Task<Either<ActionResult, DataReplacementPlanViewModel>> GetReplacementPlan(
+            Guid releaseId,
             Guid originalFileId,
             Guid replacementFileId)
         {
-            return await CheckFileExists(originalFileId)
+            return await _contentPersistenceHelper
+                .CheckEntityExists<Release>(releaseId)
+                .OnSuccess(_userService.CheckCanUpdateRelease)
+                .OnSuccess(() => CheckFileExists(releaseId, originalFileId)
                 .OnSuccess(async originalFile =>
                 {
-                    return await CheckFileExists(replacementFileId)
-                        .OnSuccessDo(replacementFile =>
-                            _userService.CheckCanUpdateRelease(replacementFile.Release))
-                        .OnSuccessDo(replacementFile =>
-                            CheckFilesAreForRelatedReleases(
-                                originalFile,
-                                replacementFile
-                            )
-                        )
+                    return await CheckFileExists(releaseId, replacementFileId)
                         .OnSuccess(replacementFile =>
                         {
-                            var releaseId = replacementFile.ReleaseId;
                             var originalSubjectId = originalFile.SubjectId.Value;
                             var replacementSubjectId = replacementFile.SubjectId.Value;
 
@@ -101,24 +97,21 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Services
                                 originalSubjectId,
                                 replacementSubjectId);
                         });
-                });
+                }));
         }
 
         public async Task<Either<ActionResult, Unit>> Replace(
+            Guid releaseId,
             Guid originalFileId,
             Guid replacementFileId)
         {
-            return await GetReplacementPlan(originalFileId, replacementFileId)
+            return await GetReplacementPlan(releaseId, originalFileId, replacementFileId)
                 .OnSuccess(async replacementPlan =>
                 {
                     if (!replacementPlan.Valid)
                     {
                         return ValidationActionResult(ReplacementMustBeValid);
                     }
-
-                    // This Release Id can be found on the File
-                    var releaseId = (await _contentDbContext.Files
-                        .FindAsync(replacementFileId)).ReleaseId;
 
                     await replacementPlan.DataBlocks.ForEachAsync(plan =>
                         ReplaceLinksForDataBlock(plan, replacementPlan.ReplacementSubjectId));
@@ -135,48 +128,22 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Services
                 });
         }
 
-        private async Task<Either<ActionResult, File>> CheckFileExists(Guid id)
+        private async Task<Either<ActionResult, File>> CheckFileExists(Guid releaseId, Guid fileId)
         {
-            return await _contentPersistenceHelper.CheckEntityExists<File>(
-                    id,
-                    q => q.Include(f => f.Release)
+            return await _contentPersistenceHelper.CheckEntityExists<ReleaseFile>(
+                    q => q.Include(rf => rf.File)
+                        .Where(rf => rf.ReleaseId == releaseId && rf.FileId == fileId)
                 )
-                .OnSuccess<ActionResult, File, File>(file =>
+                .OnSuccess<ActionResult, ReleaseFile, File>(releaseFile =>
                     {
-                        if (file.Type != FileType.Data)
+                        if (releaseFile.File.Type != FileType.Data)
                         {
                             return ValidationActionResult(ReplacementFileTypesMustBeData);
                         }
 
-                        return file;
+                        return releaseFile.File;
                     }
                 );
-        }
-
-        private async Task<Either<ActionResult, Unit>> CheckFilesAreForRelatedReleases(
-            File originalFile,
-            File replacementFile)
-        {
-            // Get the latest Release referencing the original File
-            var originalReleaseId = await _contentDbContext.ReleaseFiles
-                .GroupJoin(_contentDbContext.Releases, releaseFile => releaseFile.ReleaseId,
-                    newerVersion => newerVersion.PreviousVersionId,
-                    (releaseFile, newerVersionGroup) => new {releaseFile, newerVersionGroup})
-                .SelectMany(tuple => tuple.newerVersionGroup.DefaultIfEmpty(),
-                    (tuple, newerVersion) => new {tuple.releaseFile, newerVersion})
-                .Where(tuple =>
-                    tuple.releaseFile.FileId == originalFile.Id
-                    && tuple.newerVersion == null)
-                .Select(tuple => tuple.releaseFile.ReleaseId)
-                .SingleAsync();
-
-            // Check the replacement is for the same Release
-            if (replacementFile.ReleaseId != originalReleaseId)
-            {
-                return new NotFoundResult();
-            }
-
-            return Unit.Instance;
         }
 
         private ReplacementSubjectMeta GetReplacementSubjectMeta(Guid subjectId)
@@ -895,10 +862,10 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Services
             // First, unlink the original file from the replacement before removing it.
             // Ordinarily, removing a file from a Release deletes any associated replacement
             // so that there's no possibility of abandoned replacements being orphaned from their original files.
-            return await CheckFileExists(originalFileId)
+            return await CheckFileExists(releaseId, originalFileId)
                 .OnSuccessVoid(async originalFile =>
                 {
-                    await CheckFileExists(replacementFileId)
+                    await CheckFileExists(releaseId, replacementFileId)
                         .OnSuccessVoid(
                             async replacementFile =>
                             {

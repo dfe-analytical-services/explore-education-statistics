@@ -14,10 +14,22 @@ namespace GovUk.Education.ExploreEducationStatistics.Content.Model.Extensions
 
         public static string Path(this File file)
         {
-            return AdminReleasePath(
-                file.ReleaseId,
-                file.Type,
-                file.BlobStorageName);
+            return $"{AdminFilesPath(file.RootPath, file.Type)}{file.BlobStorageName}";
+        }
+
+        public static string BatchesPath(this ReleaseFile releaseFile)
+        {
+            return releaseFile.File.BatchesPath();
+        }
+
+        public static string BatchesPath(this File file)
+        { 
+            return $"{file.RootPath}/{FileType.Data.GetEnumLabel()}/batches/{file.Id}/";
+        }
+
+        public static string BatchPath(this File file, int batchNumber)
+        { 
+            return $"{file.BatchesPath()}{file.BlobStorageName}_{batchNumber:000000}";
         }
 
         public static string PublicPath(this ReleaseFile releaseFile)
@@ -34,8 +46,8 @@ namespace GovUk.Education.ExploreEducationStatistics.Content.Model.Extensions
             
             // Files are located in blob storage on path .../<publication-slug>/<release-Slug>/...
             // where Publication slug and Release slug are those of the latest Release version.
-            // Don't use file.Release here to locate the blob as that's the Release at the time of uploading,
-            // which is not the same if the file belongs to a Release amendment.
+            // They are not necessarily the same as the Release at the time of uploading,
+            // if the file belongs to a Release amendment.
             return PublicReleasePath(release.Publication.Slug,
                 release.Slug,
                 file.Type,
@@ -48,7 +60,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Content.Model.Extensions
             {
                 Id = file.Id,
                 FileName = file.Filename,
-                // EES-1637 Prefer name field on blob
+                // EES-1815 Change to use Subject name rather than BlobInfo.Name
                 Name = blobInfo.Name.IsNullOrEmpty() ? file.Filename : blobInfo.Name,
                 Path = file.Path(),
                 Size = blobInfo.Size,

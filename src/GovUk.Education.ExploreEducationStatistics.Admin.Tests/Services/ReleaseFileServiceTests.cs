@@ -41,9 +41,9 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
                 Release = release,
                 File = new File
                 {
+                    RootPath = Guid.NewGuid(),
                     Filename = "ancillary.pdf",
-                    Type = Ancillary,
-                    Release = release
+                    Type = Ancillary
                 }
             };
 
@@ -52,9 +52,9 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
                 Release = release,
                 File = new File
                 {
+                    RootPath = Guid.NewGuid(),
                     Filename = "chart.png",
-                    Type = Chart,
-                    Release = release
+                    Type = Chart
                 }
             };
 
@@ -111,9 +111,9 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
 
             var ancillaryFile = new File
             {
+                RootPath = Guid.NewGuid(),
                 Filename = "ancillary.pdf",
                 Type = Ancillary,
-                Release = release
             };
 
             var releaseFile = new ReleaseFile
@@ -172,9 +172,9 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
                 Release = release,
                 File = new File
                 {
+                    RootPath = Guid.NewGuid(),
                     Filename = "data.csv",
                     Type = FileType.Data,
-                    Release = release,
                     SubjectId = Guid.NewGuid()
                 }
             };
@@ -220,9 +220,9 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
                 Release = release,
                 File = new File
                 {
+                    RootPath = Guid.NewGuid(),
                     Filename = "ancillary.pdf",
-                    Type = Ancillary,
-                    Release = release
+                    Type = Ancillary
                 }
             };
 
@@ -294,9 +294,9 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
                 Release = release,
                 File = new File
                 {
+                    RootPath = Guid.NewGuid(),
                     Filename = "ancillary.pdf",
-                    Type = Ancillary,
-                    Release = release
+                    Type = Ancillary
                 }
             };
 
@@ -305,9 +305,9 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
                 Release = release,
                 File = new File
                 {
+                    RootPath = Guid.NewGuid(),
                     Filename = "chart.png",
-                    Type = Chart,
-                    Release = release
+                    Type = Chart
                 }
             };
 
@@ -371,9 +371,9 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
                 Release = release,
                 File = new File
                 {
+                    RootPath = Guid.NewGuid(),
                     Filename = "ancillary.pdf",
-                    Type = Ancillary,
-                    Release = release
+                    Type = Ancillary
                 }
             };
 
@@ -382,9 +382,9 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
                 Release = release,
                 File = new File
                 {
+                    RootPath = Guid.NewGuid(),
                     Filename = "data.csv",
                     Type = FileType.Data,
-                    Release = release,
                     SubjectId = Guid.NewGuid()
                 }
             };
@@ -434,9 +434,9 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
                 Release = release,
                 File = new File
                 {
+                    RootPath = Guid.NewGuid(),
                     Filename = "ancillary.pdf",
-                    Type = Ancillary,
-                    Release = release
+                    Type = Ancillary
                 }
             };
 
@@ -445,9 +445,9 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
                 Release = release,
                 File = new File
                 {
+                    RootPath = Guid.NewGuid(),
                     Filename = "chart.png",
-                    Type = Chart,
-                    Release = release
+                    Type = Chart
                 }
             };
 
@@ -496,9 +496,9 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
                 Release = release,
                 File = new File
                 {
+                    RootPath = Guid.NewGuid(),
                     Filename = "ancillary.pdf",
-                    Type = Ancillary,
-                    Release = release
+                    Type = Ancillary
                 }
             };
 
@@ -550,16 +550,16 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
 
             var ancillaryFile = new File
             {
+                RootPath = Guid.NewGuid(),
                 Filename = "ancillary.pdf",
-                Type = Ancillary,
-                Release = release
+                Type = Ancillary
             };
 
             var chartFile = new File
             {
+                RootPath = Guid.NewGuid(),
                 Filename = "chart.png",
-                Type = Chart,
-                Release = amendmentRelease
+                Type = Chart
             };
 
             var ancillaryReleaseFile = new ReleaseFile
@@ -640,9 +640,9 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
                 Release = release,
                 File = new File
                 {
+                    RootPath = Guid.NewGuid(),
                     Filename = "ancillary.pdf",
-                    Type = Ancillary,
-                    Release = release
+                    Type = Ancillary
                 }
             };
 
@@ -651,9 +651,9 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
                 Release = release,
                 File = new File
                 {
+                    RootPath = Guid.NewGuid(),
                     Filename = "chart.png",
-                    Type = Chart,
-                    Release = release
+                    Type = Chart
                 }
             };
 
@@ -662,9 +662,9 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
                 Release = release,
                 File = new File
                 {
+                    RootPath = Guid.NewGuid(),
                     Filename = "data.csv",
                     Type = FileType.Data,
-                    Release = release,
                     SubjectId = Guid.NewGuid()
                 }
             };
@@ -775,16 +775,16 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
 
             var ancillaryFile = new File
             {
+                RootPath = Guid.NewGuid(),
                 Filename = "ancillary.pdf",
-                Type = Ancillary,
-                Release = release
+                Type = Ancillary
             };
 
             var chartFile = new File
             {
+                RootPath = Guid.NewGuid(),
                 Filename = "chart.png",
-                Type = Chart,
-                Release = amendmentRelease
+                Type = Chart
             };
 
             var ancillaryReleaseFile = new ReleaseFile
@@ -904,9 +904,9 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
                 Release = release,
                 File = new File
                 {
+                    RootPath = Guid.NewGuid(),
                     Filename = "ancillary_1.pdf",
-                    Type = Ancillary,
-                    Release = release
+                    Type = Ancillary
                 }
             };
 
@@ -915,9 +915,9 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
                 Release = release,
                 File = new File
                 {
+                    RootPath = Guid.NewGuid(),
                     Filename = "Ancillary 2.pdf",
-                    Type = Ancillary,
-                    Release = release
+                    Type = Ancillary
                 }
             };
 
@@ -926,9 +926,9 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
                 Release = release,
                 File = new File
                 {
+                    RootPath = Guid.NewGuid(),
                     Filename = "chart.png",
-                    Type = Chart,
-                    Release = release
+                    Type = Chart
                 }
             };
 
@@ -937,9 +937,9 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
                 Release = release,
                 File = new File
                 {
+                    RootPath = Guid.NewGuid(),
                     Filename = "data.csv",
                     Type = FileType.Data,
-                    Release = release,
                     SubjectId = Guid.NewGuid()
                 }
             };
@@ -1056,9 +1056,9 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
                 Release = release,
                 File = new File
                 {
+                    RootPath = Guid.NewGuid(),
                     Filename = "ancillary.pdf",
-                    Type = Ancillary,
-                    Release = release
+                    Type = Ancillary
                 }
             };
 
@@ -1123,9 +1123,9 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
                 Release = release,
                 File = new File
                 {
+                    RootPath = Guid.NewGuid(),
                     Filename = "Ancillary 1.pdf",
-                    Type = Ancillary,
-                    Release = release
+                    Type = Ancillary
                 }
             };
 
@@ -1190,9 +1190,9 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
                 Release = release,
                 File = new File
                 {
+                    RootPath = Guid.NewGuid(),
                     Filename = "ancillary.pdf",
-                    Type = Ancillary,
-                    Release = release
+                    Type = Ancillary
                 }
             };
 
@@ -1266,24 +1266,22 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
             var blobStorageService = new Mock<IBlobStorageService>(MockBehavior.Strict);
             var fileUploadsValidatorService = new Mock<IFileUploadsValidatorService>(MockBehavior.Strict);
 
-            var filePath = AdminReleasePath(release.Id, Ancillary, Guid.NewGuid());
-
             blobStorageService.Setup(mock =>
                 mock.UploadFile(PrivateFilesContainerName,
                     It.Is<string>(path =>
-                        path.Contains(AdminReleaseDirectoryPath(release.Id, Ancillary))),
+                        path.Contains(AdminFilesPath(release.Id, Ancillary))),
                     formFile,
-                    It.Is<IBlobStorageService.UploadFileOptions>(options =>
-                        options.MetaValues[BlobInfoExtensions.FilenameKey] == filename
-                        && options.MetaValues[BlobInfoExtensions.NameKey] == uploadName)
+                    It.Is<IDictionary<string, string>>(metadata =>
+                        metadata[BlobInfoExtensions.FilenameKey] == filename
+                        && metadata[BlobInfoExtensions.NameKey] == uploadName)
                 )).Returns(Task.CompletedTask);
 
             blobStorageService.Setup(mock =>
                     mock.GetBlob(PrivateFilesContainerName,
                         It.Is<string>(path =>
-                            path.Contains(AdminReleaseDirectoryPath(release.Id, Ancillary)))))
+                            path.Contains(AdminFilesPath(release.Id, Ancillary)))))
                 .ReturnsAsync(new BlobInfo(
-                    path: filePath,
+                    path: "ancillary/file/path",
                     size: "10 Kb",
                     contentType: "application/pdf",
                     contentLength: 0L,
@@ -1311,43 +1309,40 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
 
                 blobStorageService.Verify(mock =>
                     mock.UploadFile(PrivateFilesContainerName,
-                        It.Is<string>(path => 
-                            path.Contains(AdminReleaseDirectoryPath(release.Id, Ancillary))),
+                        It.Is<string>(path =>
+                            path.Contains(AdminFilesPath(release.Id, Ancillary))),
                         formFile,
-                        It.Is<IBlobStorageService.UploadFileOptions>(options =>
-                            options.MetaValues[BlobInfoExtensions.FilenameKey] == filename &&
-                            options.MetaValues[BlobInfoExtensions.NameKey] == uploadName)
+                        It.Is<IDictionary<string, string>>(metadata =>
+                            metadata[BlobInfoExtensions.FilenameKey] == filename &&
+                            metadata[BlobInfoExtensions.NameKey] == uploadName)
                     ), Times.Once);
 
                 blobStorageService.Verify(mock =>
                         mock.GetBlob(PrivateFilesContainerName,
                             It.Is<string>(path =>
-                                path.Contains(AdminReleaseDirectoryPath(release.Id, Ancillary)))),
+                                path.Contains(AdminFilesPath(release.Id, Ancillary)))),
                     Times.Once);
 
                 Assert.True(result.Right.Id.HasValue);
                 Assert.Equal("pdf", result.Right.Extension);
                 Assert.Equal("ancillary.pdf", result.Right.FileName);
                 Assert.Equal("Ancillary Test File", result.Right.Name);
-                Assert.Contains(AdminReleaseDirectoryPath(release.Id, Ancillary), result.Right.Path);
+                Assert.Contains(AdminFilesPath(release.Id, Ancillary), result.Right.Path);
                 Assert.Equal("10 Kb", result.Right.Size);
                 Assert.Equal(Ancillary, result.Right.Type);
             }
 
             await using (var contentDbContext = InMemoryApplicationDbContext(contentDbContextId))
             {
-                var file = await contentDbContext.Files.SingleOrDefaultAsync(f =>
-                    f.ReleaseId == release.Id
-                    && f.Filename == filename
-                    && f.Type == Ancillary
+                var releaseFile = await contentDbContext.ReleaseFiles
+                    .Include(rf => rf.File)
+                    .SingleOrDefaultAsync(rf =>
+                    rf.ReleaseId == release.Id
+                    && rf.File.Filename == filename
+                    && rf.File.Type == Ancillary
                 );
 
-                Assert.NotNull(file);
-
-                Assert.NotNull(await contentDbContext.ReleaseFiles.SingleOrDefaultAsync(rf =>
-                    rf.ReleaseId == release.Id
-                    && rf.FileId == file.Id
-                ));
+                Assert.NotNull(releaseFile);
             }
         }
 
@@ -1370,22 +1365,20 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
             var blobStorageService = new Mock<IBlobStorageService>(MockBehavior.Strict);
             var fileUploadsValidatorService = new Mock<IFileUploadsValidatorService>(MockBehavior.Strict);
 
-            var filePath = AdminReleasePath(release.Id, Chart, Guid.NewGuid());
-
             blobStorageService.Setup(mock =>
                 mock.UploadFile(PrivateFilesContainerName,
                     It.Is<string>(path =>
-                        path.Contains(AdminReleaseDirectoryPath(release.Id, Chart))),
+                        path.Contains(AdminFilesPath(release.Id, Chart))),
                     formFile,
                     null
                 )).Returns(Task.CompletedTask);
 
             blobStorageService.Setup(mock =>
-                    mock.GetBlob(PrivateFilesContainerName, 
-                        It.Is<string>(path => 
-                            path.Contains(AdminReleaseDirectoryPath(release.Id, Chart)))))
+                    mock.GetBlob(PrivateFilesContainerName,
+                        It.Is<string>(path =>
+                            path.Contains(AdminFilesPath(release.Id, Chart)))))
                 .ReturnsAsync(new BlobInfo(
-                    filePath,
+                    path: "chart/file/path",
                     size: "20 Kb",
                     contentType: "image/png",
                     contentLength: 0L,
@@ -1412,7 +1405,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
                 blobStorageService.Verify(mock =>
                     mock.UploadFile(PrivateFilesContainerName, 
                         It.Is<string>(path => 
-                            path.Contains(AdminReleaseDirectoryPath(release.Id, Chart))),
+                            path.Contains(AdminFilesPath(release.Id, Chart))),
                         formFile,
                         null
                     ), Times.Once);
@@ -1420,32 +1413,29 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
                 blobStorageService.Verify(mock =>
                     mock.GetBlob(PrivateFilesContainerName,
                         It.Is<string>(path => 
-                            path.Contains(AdminReleaseDirectoryPath(release.Id, Chart)))),
+                            path.Contains(AdminFilesPath(release.Id, Chart)))),
                     Times.Once);
 
                 Assert.True(result.Right.Id.HasValue);
                 Assert.Equal("png", result.Right.Extension);
                 Assert.Equal("chart.png", result.Right.FileName);
                 Assert.Equal("chart.png", result.Right.Name);
-                Assert.Contains(AdminReleaseDirectoryPath(release.Id, Chart), result.Right.Path);
+                Assert.Contains(AdminFilesPath(release.Id, Chart), result.Right.Path);
                 Assert.Equal("20 Kb", result.Right.Size);
                 Assert.Equal(Chart, result.Right.Type);
             }
 
             await using (var contentDbContext = InMemoryApplicationDbContext(contentDbContextId))
             {
-                var file = await contentDbContext.Files.SingleOrDefaultAsync(f =>
-                    f.ReleaseId == release.Id
-                    && f.Filename == filename
-                    && f.Type == Chart
-                );
+                var releaseFile = await contentDbContext.ReleaseFiles
+                    .Include(rf => rf.File)
+                    .SingleOrDefaultAsync(rf =>
+                        rf.ReleaseId == release.Id
+                        && rf.File.Filename == filename
+                        && rf.File.Type == Chart
+                    );
 
-                Assert.NotNull(file);
-
-                Assert.NotNull(await contentDbContext.ReleaseFiles.SingleOrDefaultAsync(rf =>
-                    rf.ReleaseId == release.Id
-                    && rf.FileId == file.Id
-                ));
+                Assert.NotNull(releaseFile);
             }
         }
 

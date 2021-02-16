@@ -1,5 +1,4 @@
 using System;
-using System.Text.RegularExpressions;
 using GovUk.Education.ExploreEducationStatistics.Common.Extensions;
 using GovUk.Education.ExploreEducationStatistics.Common.Model;
 using static GovUk.Education.ExploreEducationStatistics.Common.Model.FileType;
@@ -8,8 +7,6 @@ namespace GovUk.Education.ExploreEducationStatistics.Common.Services
 {
     public static class FileStoragePathUtils
     {
-        public const string BatchesDir = "batches";
-
         public static string PublicContentStagingPath()
         {
             return "staging";
@@ -100,73 +97,13 @@ namespace GovUk.Education.ExploreEducationStatistics.Common.Services
         }
 
         /**
-         * The top level admin directory path where files on a release are stored.
+         * The admin directory path where files of a particular type are stored.
          */
-        private static string AdminReleaseDirectoryPath(string releaseId)
+        public static string AdminFilesPath(Guid rootPath, FileType type)
         {
-            return $"{releaseId}/";
+            var typeFolder = (type == Metadata ? Data : type).GetEnumLabel();
+            return $"{rootPath}/{typeFolder}/";
         }
-
-        /**
-         * The admin directory path where files, of a particular type, on a release are stored.
-         */
-        public static string AdminReleaseDirectoryPath(string releaseId, FileType type)
-        {
-            return $"{AdminReleaseDirectoryPath(releaseId)}{GetUploadFolderForType(type).GetEnumLabel()}/";
-        }
-
-        private static FileType GetUploadFolderForType(FileType type)
-        {
-            return type == Metadata ? Data : type;
-        }
-
-        /**
-         * The admin directory path where data files are batched for importing
-         */
-        public static string AdminReleaseBatchesDirectoryPath(Guid releaseId)
-        {
-            return AdminReleaseBatchesDirectoryPath(releaseId.ToString());
-        }
-
-        /**
-         * The admin directory path where data files are batched for importing
-         */
-        public static string AdminReleaseBatchesDirectoryPath(string releaseId)
-        {
-            return $"{AdminReleaseDirectoryPath(releaseId)}{Data.GetEnumLabel()}/{BatchesDir}/";
-        }
-
-        /**
-         * The admin file path, for a file of a particular type and name, on a release.
-         */
-        public static string AdminReleasePath(string releaseId, FileType type, string fileName)
-        {
-            return $"{AdminReleaseDirectoryPath(releaseId, type)}{fileName}";
-        }
-
-        /**
-         * The top level admin directory path where files on a release are stored.
-         */
-        public static string AdminReleaseDirectoryPath(Guid releaseId) =>
-            AdminReleaseDirectoryPath(releaseId.ToString());
-
-        /**
-         * The admin file path, for a file of a particular type and id, on a release.
-         */
-        public static string AdminReleasePath(Guid releaseId, FileType type, Guid fileId)
-            => AdminReleasePath(releaseId.ToString(), type, fileId.ToString());
-
-        /**
-         * The admin file path, for a file of a particular type and name, on a release.
-         */
-        public static string AdminReleasePath(Guid releaseId, FileType type, string fileName)
-            => AdminReleasePath(releaseId.ToString(), type, fileName);
-
-        /**
-         * The admin directory path where files, of a particular type, on a release are stored.
-         */
-        public static string AdminReleaseDirectoryPath(Guid releaseId, FileType type) =>
-            AdminReleaseDirectoryPath(releaseId.ToString(), type);
 
         /**
          * The public file path, for a file of a particular type and id, on a release.
@@ -210,19 +147,6 @@ namespace GovUk.Education.ExploreEducationStatistics.Common.Services
         {
             return
                 $"{PublicReleaseDirectoryPath(publicationSlug, releaseSlug, Ancillary)}{publicationSlug}_{releaseSlug}.zip";
-        }
-
-        /**
-         * Given a Release ID and a data file's original filename, this method will check to see if the fullFilePath
-         * given represents a batch file for that data file.
-         */
-        public static bool IsBatchFileForDataFile(Guid releaseId, string originalDataFileName, string fullFilePath)
-        {
-            var folderPath = Regex.Escape(AdminReleaseBatchesDirectoryPath(releaseId));
-            var dataFileName = Regex.Escape(originalDataFileName);
-            var batchFileRegex = new Regex(@$"^{folderPath}{dataFileName}_\d{{6}}$");
-
-            return batchFileRegex.IsMatch(fullFilePath);
         }
 
         private static string AppendPathSeparator(string segment = null)

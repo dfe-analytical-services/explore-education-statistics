@@ -11,6 +11,7 @@ using Azure.Storage.Blobs.Specialized;
 using GovUk.Education.ExploreEducationStatistics.Common.Model;
 using GovUk.Education.ExploreEducationStatistics.Common.Services.Interfaces;
 using GovUk.Education.ExploreEducationStatistics.Content.Model;
+using GovUk.Education.ExploreEducationStatistics.Content.Model.Extensions;
 using GovUk.Education.ExploreEducationStatistics.Publisher.Models;
 using GovUk.Education.ExploreEducationStatistics.Publisher.Services.Interfaces;
 using ICSharpCode.SharpZipLib.Zip;
@@ -96,16 +97,16 @@ namespace GovUk.Education.ExploreEducationStatistics.Publisher.Services
 
             await _publicBlobStorageService.DeleteBlobs(PublicFilesContainerName, destinationDirectoryPath);
 
-            var referencedReleaseVersions = copyReleaseFilesCommand.Files
-                .Select(f => f.ReleaseId)
+            var referencedRootPaths = copyReleaseFilesCommand.Files
+                .Select(f => f.RootPath)
                 .Distinct();
 
             var transferredFiles = new List<BlobInfo>();
 
-            foreach (var version in referencedReleaseVersions)
+            foreach (var rootPath in referencedRootPaths)
             {
                 var files = await CopyPrivateFilesToPublic(
-                    sourceDirectoryPath: AdminReleaseDirectoryPath(version),
+                    sourceDirectoryPath: $"{rootPath}/",
                     destinationDirectoryPath: destinationDirectoryPath,
                     copyReleaseFilesCommand
                 );
@@ -189,19 +190,18 @@ namespace GovUk.Education.ExploreEducationStatistics.Publisher.Services
                 {
                     DestinationConnectionString = _publicStorageConnectionString,
                     SetAttributesCallbackAsync = (destination) =>
-                        SetAttributesCallbackAsync(destination, copyReleaseFilesCommand.PublishScheduled),
+                        SetAttributesCallback(destination, copyReleaseFilesCommand.PublishScheduled),
                     ShouldTransferCallbackAsync = (source, _) =>
-                        CopyFileUnlessBatchedOrMeta(
+                        ShouldTransferCallback(
                             source: source,
                             sourceContainerName: PrivateFilesContainerName,
-                            releaseId: copyReleaseFilesCommand.ReleaseId,
                             files: copyReleaseFilesCommand.Files)
                 }
             );
         }
 
 #pragma warning disable 1998
-        private static async Task SetAttributesCallbackAsync(object destination, DateTime releasePublished)
+        private static async Task SetAttributesCallback(object destination, DateTime releasePublished)
 #pragma warning restore 1998
         {
             if (destination is CloudBlockBlob cloudBlockBlob)
@@ -210,27 +210,16 @@ namespace GovUk.Education.ExploreEducationStatistics.Publisher.Services
             }
         }
 
-        private async Task<bool> CopyFileUnlessBatchedOrMeta(object source,
+        private async Task<bool> ShouldTransferCallback(object source,
             string sourceContainerName,
-            Guid releaseId,
             List<File> files)
         {
-            var item = source as CloudBlockBlob;
-            if (item == null)
+            if (!(source is CloudBlockBlob item))
             {
                 return false;
             }
 
-            await item.FetchAttributesAsync();
-
-            if (IsBatchedDataFile(item, releaseId) || IsMetaDataFile(item))
-            {
-                return false;
-            }
-
-            var filename = Path.GetFileName(item.Name);
-
-            if (files.Exists(file => file.BlobStorageName == filename))
+            if (files.Exists(file => file.Path() == item.Name))
             {
                 return true;
             }
@@ -267,13 +256,9 @@ namespace GovUk.Education.ExploreEducationStatistics.Publisher.Services
                 memoryStream,
                 // Should this be MetaTypeNames.Application.Zip?
                 contentType: "application/x-zip-compressed",
-                options: new IBlobStorageService.UploadStreamOptions
-                {
-                    MetaValues = GetAllFilesZipMetaValues(
-                        name: zipFileName,
-                        releaseDateTime: copyReleaseFilesCommand.PublishScheduled)
-                }
-            );
+                metadata: GetAllFilesZipMetaValues(
+                    name: zipFileName,
+                    releaseDateTime: copyReleaseFilesCommand.PublishScheduled));
         }
 
         public async Task UploadAsJson(string filePath, object value, JsonSerializerSettings settings = null)

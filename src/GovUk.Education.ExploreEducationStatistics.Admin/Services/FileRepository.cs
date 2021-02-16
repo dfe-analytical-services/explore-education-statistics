@@ -36,7 +36,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Services
                 ReleaseId = releaseId,
                 File = new File
                 {
-                    ReleaseId = releaseId,
+                    RootPath = releaseId,
                     Filename = filename,
                     Type = type
                 }
@@ -70,7 +70,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Services
                 ReleaseId = releaseId,
                 File = new File
                 {
-                    ReleaseId = releaseId,
+                    RootPath = releaseId,
                     SubjectId = subjectId,
                     Filename = filename,
                     Type = type,
@@ -92,7 +92,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Services
         {
             var file = (await _contentDbContext.Files.AddAsync(new File
             {
-                ReleaseId = releaseId,
+                RootPath = releaseId,
                 Filename = filename,
                 Type = DataZip
             })).Entity;

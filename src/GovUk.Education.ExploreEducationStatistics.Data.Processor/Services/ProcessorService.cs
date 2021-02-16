@@ -46,7 +46,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Processor.Services
         public async Task ProcessUnpackingArchive(Guid importId)
         {
             var import = await _dataImportService.GetImport(importId);
-            await _dataArchiveService.ExtractDataFiles(import.ZipFile);
+            await _dataArchiveService.ExtractDataFiles(import);
         }
 
         public async Task ProcessStage1(Guid importId, ExecutionContext executionContext)
