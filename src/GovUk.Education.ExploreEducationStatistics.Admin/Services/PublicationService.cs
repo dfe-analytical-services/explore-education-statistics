@@ -192,6 +192,12 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Services
                 {
                     return ValidationActionResult(MethodologyDoesNotExist);
                 }
+
+                // TODO: this will want updating when methodology status is fully implemented
+                if (methodology.Status != MethodologyStatus.Approved)
+                {
+                    return ValidationActionResult(MethodologyMustBeApproved);
+                }
             }
 
             return Unit.Instance;
