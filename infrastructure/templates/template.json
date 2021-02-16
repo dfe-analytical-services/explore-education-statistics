@@ -508,7 +508,7 @@
     },
     "autoPauseDelayStatisticsDb": {
       "type": "int",
-      "defaultValue": 60
+      "defaultValue": -1
     }
   },
   "variables": {
