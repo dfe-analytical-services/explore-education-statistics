@@ -1,3 +1,4 @@
+import { getDescribedBy } from '@common-test/queries';
 import TableHighlightsList from '@common/modules/table-tool/components/TableHighlightsList';
 import { TableHighlight } from '@common/services/tableBuilderService';
 import { render, screen, waitFor, within } from '@testing-library/react';
@@ -46,20 +47,32 @@ describe('TableHighlightsList', () => {
     const listItems = screen.getAllByRole('listitem');
 
     expect(listItems).toHaveLength(3);
-    expect(
-      within(listItems[0]).getByRole('link', { name: '1 - Unique name' }),
-    ).toBeInTheDocument();
-    expect(listItems[0]).toHaveTextContent('1 - Same description');
 
-    expect(
-      within(listItems[1]).getByRole('link', { name: '2 - Similar name' }),
-    ).toBeInTheDocument();
-    expect(listItems[1]).toHaveTextContent('2 - Unique description');
+    const link1 = within(listItems[0]).getByRole('link', {
+      name: '1 - Unique name',
+    });
 
-    expect(
-      within(listItems[2]).getByRole('link', { name: '3 - Similar name' }),
-    ).toBeInTheDocument();
-    expect(listItems[2]).toHaveTextContent('3 - Same description');
+    expect(link1).toBeInTheDocument();
+    expect(getDescribedBy(listItems[0], link1)).toHaveTextContent(
+      '1 - Same description',
+    );
+
+    const link2 = within(listItems[1]).getByRole('link', {
+      name: '2 - Similar name',
+    });
+
+    expect(link2).toBeInTheDocument();
+    expect(getDescribedBy(listItems[1], link2)).toHaveTextContent(
+      '2 - Unique description',
+    );
+
+    const link3 = within(listItems[2]).getByRole('link', {
+      name: '3 - Similar name',
+    });
+    expect(link3).toBeInTheDocument();
+    expect(getDescribedBy(listItems[2], link3)).toHaveTextContent(
+      '3 - Same description',
+    );
   });
 
   test('renders empty message if no highlights', () => {

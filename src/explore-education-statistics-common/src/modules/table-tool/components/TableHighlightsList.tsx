@@ -1,6 +1,6 @@
 import { FormTextSearchInput } from '@common/components/form';
 import { TableHighlight } from '@common/services/tableBuilderService';
-import React, { ReactNode, useState } from 'react';
+import React, { cloneElement, ReactElement, ReactNode, useState } from 'react';
 
 interface Props {
   highlights: TableHighlight[];
@@ -49,14 +49,24 @@ const TableHighlightsList = ({ highlights = [], renderLink }: Props) => {
 
         {filteredHighlights.length > 0 && (
           <ul className="govuk-!-margin-bottom-6">
-            {filteredHighlights.map(highlight => (
-              <li key={highlight.id}>
-                <p className="govuk-!-font-weight-bold govuk-!-margin-bottom-1">
-                  {renderLink(highlight)}
-                </p>
-                <p>{highlight.description}</p>
-              </li>
-            ))}
+            {filteredHighlights.map(highlight => {
+              const link = renderLink(highlight);
+              const descriptionId = `highlight-description-${highlight.id}`;
+
+              return (
+                <li key={highlight.id}>
+                  <p className="govuk-!-font-weight-bold govuk-!-margin-bottom-1">
+                    {link
+                      ? cloneElement(link as ReactElement, {
+                          'aria-describedby': descriptionId,
+                        })
+                      : null}
+                  </p>
+
+                  <p id={descriptionId}>{highlight.description}</p>
+                </li>
+              );
+            })}
           </ul>
         )}
       </div>
