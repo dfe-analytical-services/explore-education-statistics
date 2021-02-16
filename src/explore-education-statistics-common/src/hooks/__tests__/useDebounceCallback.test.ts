@@ -23,6 +23,27 @@ describe('useDebounceCallback', () => {
     expect(callback).toHaveBeenCalled();
   });
 
+  test('does not run callback if unmounted', () => {
+    const callback = jest.fn();
+
+    const { result, unmount } = renderHook(() =>
+      useDebouncedCallback(callback, 10),
+    );
+    const [run] = result.current;
+
+    run();
+
+    expect(callback).not.toHaveBeenCalled();
+
+    jest.advanceTimersByTime(9);
+    expect(callback).not.toHaveBeenCalled();
+
+    unmount();
+
+    jest.advanceTimersByTime(1);
+    expect(callback).not.toHaveBeenCalled();
+  });
+
   test('calling run function repeatedly resets the timeout', () => {
     const callback = jest.fn();
 
