@@ -12,20 +12,20 @@ Suite Teardown    user closes the browser
 *** Variables ***
 ${TOPIC_NAME}        %{TEST_TOPIC_NAME}
 ${PUBLICATION_NAME}  UI tests - prerelease %{RUN_IDENTIFIER}
+${DATABLOCK_NAME}    UI test table
+${DATABLOCK_HIGHLIGHT_NAME}  UI test table highlight name
+${DATABLOCK_HIGHLIGHT_DESCRIPTION}  UI test highlight description
 ${RELEASE_URL}
 
 *** Keywords ***
-user creates table
-    user waits until page contains   UI test subject
-    user clicks radio    UI test subject
-    user clicks element   id:publicationSubjectForm-submit
+user chooses location, time period and filters
     user waits until h2 is visible  Choose locations    90
-    user checks previous table tool step contains  1    Subject     UI test subject
 
     user opens details dropdown   Ward
     user clicks checkbox   Nailsea Youngwood
     user clicks checkbox   Syon
     user clicks element     id:locationFiltersForm-submit
+
     user waits until h2 is visible  Choose time period  90
 
     ${timePeriodStartList}=   get list items  id:timePeriodForm-start
@@ -37,18 +37,19 @@ user creates table
     user selects from list by label  id:timePeriodForm-start  2005
     user selects from list by label  id:timePeriodForm-end  2017
     user clicks element     id:timePeriodForm-submit
+
     user waits until h2 is visible  Choose your filters
     user checks previous table tool step contains  3    Start date    2005
-    user checks previous table tool step contains  3    End date      2017
 
     user clicks indicator checkbox    Admission Numbers
 
     user clicks element   id:filtersForm-submit
+
+user validates table rows
     user waits until results table appears     180
     user waits until element contains  css:[data-testid="dataTableCaption"]
     ...  Table showing Admission Numbers for 'UI test subject' from '${PUBLICATION_NAME}' in Nailsea Youngwood and Syon between 2005 and 2017
 
-user validates table rows
     user checks table column heading contains  1  1  Admission Numbers
 
     ${row}=  user gets row number with heading  Nailsea Youngwood
@@ -137,6 +138,33 @@ Add metadata guidance
     user clicks button  Save guidance
 
     user waits until page contains button  Edit guidance
+
+Add table highlight
+    [Tags]  HappyPath
+    user clicks link  Data blocks
+    user waits until h2 is visible  Data blocks
+
+    user clicks link  Create data block
+    user waits until h2 is visible   Choose a subject
+
+    user waits until page contains   UI test subject
+    user clicks radio    UI test subject
+    user clicks element   id:publicationSubjectForm-submit
+
+    user chooses location, time period and filters
+    user validates table rows
+
+    user enters text into element  id:dataBlockDetailsForm-name         ${DATABLOCK_NAME}
+    user enters text into element  id:dataBlockDetailsForm-heading      UI test table title
+    user enters text into element  id:dataBlockDetailsForm-source       UI test source
+
+    user clicks checkbox  Set as a table highlight for this publication
+    user waits until page contains element  id:dataBlockDetailsForm-highlightName
+    user enters text into element  id:dataBlockDetailsForm-highlightName    ${DATABLOCK_HIGHLIGHT_NAME}
+    user enters text into element  id:dataBlockDetailsForm-highlightDescription    ${DATABLOCK_HIGHLIGHT_DESCRIPTION}
+
+    user clicks button   Save data block
+    user waits until page contains    Delete this data block
 
 Add basic release content
     [Tags]  HappyPath
@@ -345,13 +373,36 @@ Go to prerelease table tool page
     user clicks link  Table tool
 
     user waits until h1 is visible  Create your own tables online
-    user waits until h2 is visible  Choose a subject
+    user waits until h2 is visible  View a popular table or create your own
 
-Create and validate table
+Validate table highlights
     [Tags]  HappyPath
-    user creates table
+    user checks element count is x  css:#popularTables li  1
+    user checks element should contain  css:#popularTables li:first-child a  ${DATABLOCK_HIGHLIGHT_NAME}
+    user checks element should contain  css:#popularTables li:first-child [id^="highlight-description"]
+    ...  ${DATABLOCK_HIGHLIGHT_DESCRIPTION}
+
+Go to table highlight and validate table
+    [Tags]  HappyPath
+    user clicks link  ${DATABLOCK_HIGHLIGHT_NAME}
     user validates table rows
 
+Create and validate custom table
+    [Tags]  HappyPath
+    user clicks link  Table tool
+
+    user waits until h1 is visible  Create your own tables online
+    user waits until h2 is visible  View a popular table or create your own
+
+    user clicks link  Create your own table
+    user waits until h3 is visible  Choose a subject
+
+    user waits until page contains   UI test subject
+    user clicks radio    UI test subject
+    user clicks element   id:publicationSubjectForm-submit
+
+    user chooses location, time period and filters
+    user validates table rows
 
 Validate prerelease has started for Analyst user
     [Tags]  HappyPath
@@ -434,9 +485,33 @@ Go to prerelease table tool page as Analyst user
     user clicks link  Table tool
 
     user waits until h1 is visible  Create your own tables online
-    user waits until h2 is visible  Choose a subject
+    user waits until h2 is visible  View a popular table or create your own
 
-Create and validate table as Analyst user
+Validate table highlights as Analyst user
     [Tags]  HappyPath
-    user creates table
+    user checks element count is x  css:#popularTables li  1
+    user checks element should contain  css:#popularTables li:first-child a  ${DATABLOCK_HIGHLIGHT_NAME}
+    user checks element should contain  css:#popularTables li:first-child [id^="highlight-description"]
+    ...  ${DATABLOCK_HIGHLIGHT_DESCRIPTION}
+
+Go to table highlight and validate table as Analyst user
+    [Tags]  HappyPath
+    user clicks link  ${DATABLOCK_HIGHLIGHT_NAME}
+    user validates table rows
+
+Create and validate custom table as Analyst user
+    [Tags]  HappyPath
+    user clicks link  Table tool
+
+    user waits until h1 is visible  Create your own tables online
+    user waits until h2 is visible  View a popular table or create your own
+
+    user clicks link  Create your own table
+    user waits until h3 is visible  Choose a subject
+
+    user waits until page contains   UI test subject
+    user clicks radio    UI test subject
+    user clicks element   id:publicationSubjectForm-submit
+
+    user chooses location, time period and filters
     user validates table rows

@@ -96,8 +96,8 @@ user creates release for publication
     user waits until page contains element  id:releaseSummaryForm-timePeriodCoverage
     user selects from list by label  id:releaseSummaryForm-timePeriodCoverage  ${time_period_coverage}
     user enters text into element  id:releaseSummaryForm-timePeriodCoverageStartYear  ${start_year}
-    user clicks element if exists   css:[data-testid="Create new template"]
     user clicks radio   National Statistics
+    user clicks radio if exists  Create new template
     user clicks button  Create new release
     user waits until page contains element  xpath://span[text()="Edit release"]
     user waits until h2 is visible  Release summary

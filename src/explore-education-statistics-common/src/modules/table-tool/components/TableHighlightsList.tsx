@@ -48,7 +48,7 @@ const TableHighlightsList = ({ highlights = [], renderLink }: Props) => {
         )}
 
         {filteredHighlights.length > 0 && (
-          <ul className="govuk-!-margin-bottom-6">
+          <ul className="govuk-!-margin-bottom-6" id="popularTables">
             {filteredHighlights.map(highlight => {
               const link = renderLink(highlight);
               const descriptionId = `highlight-description-${highlight.id}`;
