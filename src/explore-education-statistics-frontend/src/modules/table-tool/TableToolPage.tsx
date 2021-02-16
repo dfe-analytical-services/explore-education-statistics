@@ -14,7 +14,6 @@ import tableBuilderService, {
 import { Dictionary } from '@common/types';
 import Link from '@frontend/components/Link';
 import Page from '@frontend/components/Page';
-import orderBy from 'lodash/orderBy';
 import { GetServerSideProps, NextPage } from 'next';
 import dynamic from 'next/dynamic';
 import React, { useMemo } from 'react';
@@ -44,11 +43,9 @@ const TableToolPage: NextPage<TableToolPageProps> = ({
 
     const { id: publicationId, subjects } = initialPublication;
 
-    const highlights = orderBy(
-      initialPublication.highlights,
-      [highlight => highlight.name],
-      ['asc'],
-    ).filter(highlight => highlight.id !== fastTrack?.id);
+    const highlights = initialPublication.highlights.filter(
+      highlight => highlight.id !== fastTrack?.id,
+    );
 
     if (fastTrack && subjectMeta) {
       const fullTable = mapFullTable(fastTrack.fullTable);
