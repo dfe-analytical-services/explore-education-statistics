@@ -24,7 +24,7 @@ const ReleaseHelpAndSupportSection = ({
         Help and support
       </h2>
 
-      <Accordion id="static-content-section">
+      <Accordion id="helpAndSupport">
         <AccordionSection
           heading="Methodology"
           caption="Find out how and why we collect, process and publish these statistics"

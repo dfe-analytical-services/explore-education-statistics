@@ -238,7 +238,7 @@ user opens nth editable accordion section
     user checks element attribute value should be  ${header_button}  aria-expanded  true
 
 user changes accordion section title
-    [Arguments]  ${section_num}  ${title}  ${parent}=id:releaseContentAccordion
+    [Arguments]  ${section_num}  ${title}  ${parent}=id:releaseMainContent
     user opens nth editable accordion section  ${section_num}  ${parent}
     ${section}=  get child element  ${parent}  xpath:.//*[@data-testid="editableAccordionSection"][${section_num}]
     user clicks button  Edit section title  ${section}
