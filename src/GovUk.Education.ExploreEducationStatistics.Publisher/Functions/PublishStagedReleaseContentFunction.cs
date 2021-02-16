@@ -50,7 +50,9 @@ namespace GovUk.Education.ExploreEducationStatistics.Publisher.Functions
             ExecutionContext executionContext,
             ILogger logger)
         {
-            logger.LogInformation($"{executionContext.FunctionName} triggered at: {DateTime.Now}");
+            logger.LogInformation("{0} triggered at: {1}",
+                executionContext.FunctionName,
+                DateTime.Now);
 
             var scheduled = (await QueryScheduledReleases()).ToList();
             if (scheduled.Any())
@@ -58,7 +60,8 @@ namespace GovUk.Education.ExploreEducationStatistics.Publisher.Functions
                 var published = new List<ReleaseStatus>();
                 foreach (var releaseStatus in scheduled)
                 {
-                    logger.LogInformation($"Moving content for release: {releaseStatus.ReleaseId}");
+                    logger.LogInformation("Moving content for release: {0}",
+                        releaseStatus.ReleaseId);
                     await UpdateStage(releaseStatus, Started);
                     try
                     {
@@ -68,7 +71,8 @@ namespace GovUk.Education.ExploreEducationStatistics.Publisher.Functions
                     }
                     catch (Exception e)
                     {
-                        logger.LogError(e, $"Exception occured while executing {executionContext.FunctionName}");
+                        logger.LogError(e, "Exception occured while executing {0}",
+                            executionContext.FunctionName);
                         await UpdateStage(releaseStatus, Failed,
                             new ReleaseStatusLogMessage($"Exception in publishing stage: {e.Message}"));
                     }
@@ -90,14 +94,17 @@ namespace GovUk.Education.ExploreEducationStatistics.Publisher.Functions
                 }
                 catch (Exception e)
                 {
-                    logger.LogError(e, $"Exception occured while executing {executionContext.FunctionName}");
+                    logger.LogError(e, "Exception occured while executing {0}",
+                        executionContext.FunctionName);
                     await UpdateStage(published, Failed,
                         new ReleaseStatusLogMessage($"Exception in publishing stage: {e.Message}"));
                 }
             }
 
             logger.LogInformation(
-                $"{executionContext.FunctionName} completed. {timer.FormatNextOccurrences(1)}");
+                "{0} completed. {1}",
+                executionContext.FunctionName,
+                timer.FormatNextOccurrences((1)));
         }
 
         private async Task<IEnumerable<ReleaseStatus>> QueryScheduledReleases()

@@ -201,7 +201,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Mappings
 
             CreateMap<Update, ReleaseNoteViewModel>();
 
-            CreateMap<LegacyRelease, ViewModels.LegacyReleaseViewModel>();
+            CreateMap<LegacyRelease, LegacyReleaseViewModel>();
 
             CreateMap<Comment, CommentViewModel>()
                 .ForMember(dest => dest.CreatedBy,

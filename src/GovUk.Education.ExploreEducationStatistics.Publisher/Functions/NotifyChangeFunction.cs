@@ -49,7 +49,9 @@ namespace GovUk.Education.ExploreEducationStatistics.Publisher.Functions
             ExecutionContext executionContext,
             ILogger logger)
         {
-            logger.LogInformation($"{executionContext.FunctionName} triggered: {message}");
+            logger.LogInformation("{0} triggered: {1}",
+                executionContext.FunctionName,
+                message);
             var lease = await _fileStorageService.AcquireLease(message.ReleaseId.ToString());
             try
             {
@@ -82,7 +84,8 @@ namespace GovUk.Education.ExploreEducationStatistics.Publisher.Functions
                 await lease.Release();
             }
 
-            logger.LogInformation($"{executionContext.FunctionName} completed");
+            logger.LogInformation("{0} completed",
+                executionContext.FunctionName);
         }
 
         private async Task<ReleaseStatus> CreateReleaseStatusAsync(NotifyChangeMessage message,

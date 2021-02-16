@@ -60,7 +60,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Services
                     await _storageQueueService.AddMessageAsync(
                         RetryStageQueue, new RetryStageMessage(releaseId, stage));
 
-                    _logger.LogTrace($"Sent retry stage message for Release: {releaseId}");
+                    _logger.LogTrace("Sent retry stage message for Release: {0}", releaseId);
                     return new Either<ActionResult, Unit>(Unit.Instance);
                 });
         }
@@ -93,7 +93,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Services
                     await _storageQueueService.AddMessageAsync(
                         NotifyChangeQueue, new NotifyChangeMessage(immediate, release.Id));
 
-                    _logger.LogTrace($"Sent message for Release: {releaseId}");
+                    _logger.LogTrace("Sent message for Release: {0}", releaseId);
                     return Unit.Instance;
                 });
         }
@@ -112,7 +112,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Services
                     await _storageQueueService.AddMessageAsync(PublishMethodologyQueue,
                         new PublishMethodologyMessage(id));
 
-                    _logger.LogTrace($"Sent message for Methodology: {id}");
+                    _logger.LogTrace("Sent message for Methodology: {0}", id);
                     return Unit.Instance;
                 });
         }
@@ -132,7 +132,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Services
                     await _storageQueueService.AddMessageAsync(
                         PublishPublicationQueue, new PublishPublicationMessage(id));
 
-                    _logger.LogTrace($"Sent message for Publication: {id}");
+                    _logger.LogTrace("Sent message for Publication: {0}", id);
                     return Unit.Instance;
                 });
         }
@@ -146,7 +146,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Services
         {
             await _storageQueueService.AddMessageAsync(PublishTaxonomyQueue, new PublishTaxonomyMessage());
 
-            _logger.LogTrace($"Sent PublishTaxonomy message");
+            _logger.LogTrace("Sent PublishTaxonomy message");
 
             return Unit.Instance;
         }

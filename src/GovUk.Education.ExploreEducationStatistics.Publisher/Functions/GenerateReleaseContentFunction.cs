@@ -42,7 +42,9 @@ namespace GovUk.Education.ExploreEducationStatistics.Publisher.Functions
             ExecutionContext executionContext,
             ILogger logger)
         {
-            logger.LogInformation($"{executionContext.FunctionName} triggered: {message}");
+            logger.LogInformation("{0} triggered: {1}",
+                executionContext.FunctionName,
+                message);
             await UpdateStage(message, Started);
             try
             {
@@ -52,13 +54,15 @@ namespace GovUk.Education.ExploreEducationStatistics.Publisher.Functions
             }
             catch (Exception e)
             {
-                logger.LogError(e, $"Exception occured while executing {executionContext.FunctionName}");
-                logger.LogError(e.StackTrace);
+                logger.LogError(e, "Exception occured while executing {0}",
+                    executionContext.FunctionName);
+                logger.LogError("{0}", e.StackTrace);
                 await UpdateStage(message, Failed,
                     new ReleaseStatusLogMessage($"Exception in content stage: {e.Message}"));
             }
 
-            logger.LogInformation($"{executionContext.FunctionName} completed");
+            logger.LogInformation("{0} completed",
+                executionContext.FunctionName);
         }
 
         private async Task UpdateStage(GenerateReleaseContentMessage message, ReleaseStatusContentStage stage,

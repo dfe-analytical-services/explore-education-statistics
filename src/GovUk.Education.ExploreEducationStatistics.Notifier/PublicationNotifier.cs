@@ -52,7 +52,8 @@ namespace GovUk.Education.ExploreEducationStatistics.Notifier
             ILogger logger,
             ExecutionContext context)
         {
-            logger.LogInformation($"{context.FunctionName} triggered");
+            logger.LogInformation("{0} triggered",
+                context.FunctionName);
             
             var config = LoadAppSettings(context);
             var emailTemplateId = config.GetValue<string>(NotificationEmailTemplateIdName);
@@ -72,7 +73,8 @@ namespace GovUk.Education.ExploreEducationStatistics.Notifier
                     table.ExecuteQuerySegmentedAsync(query, token).Result;
                 token = resultSegment.ContinuationToken;
 
-                logger.LogInformation($"Emailing {resultSegment.Results.Count} subscribers");
+                logger.LogInformation("Emailing {0} subscribers",
+                    resultSegment.Results.Count);
                 foreach (var entity in resultSegment.Results)
                 {
                     var unsubscribeToken =
@@ -98,7 +100,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Notifier
             ILogger logger,
             ExecutionContext context)
         {
-            logger.LogInformation($"{context.FunctionName} triggered");
+            logger.LogInformation("{0} triggered", context.FunctionName);
 
             var config = LoadAppSettings(context);
             var baseUrl = config.GetValue<string>(BaseUrlName);
@@ -134,7 +136,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Notifier
                         .RetrieveSubscriber(pendingSubscriptionsTable, new SubscriptionEntity(id, email)).Result !=
                     null;
 
-                logger.LogDebug($"Pending subscription found?: {subscriptionPending}");
+                logger.LogDebug("Pending subscription found?: {0}", subscriptionPending);
 
                 // If already existing and pending then don't send another one
                 if (!subscriptionPending)
@@ -210,7 +212,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Notifier
             string id,
             string token)
         {
-            logger.LogInformation($"{context.FunctionName} triggered");
+            logger.LogInformation("{0} triggered", context.FunctionName);
 
             var config = LoadAppSettings(context);
             var tokenSecretKey = config.GetValue<string>(TokenSecretKeyName);
@@ -244,7 +246,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Notifier
             string id,
             string token)
         {
-            logger.LogInformation($"{context.FunctionName} triggered");
+            logger.LogInformation("{0} triggered", context.FunctionName);
 
             var config = LoadAppSettings(context);
             var emailTemplateId = config.GetValue<string>(ConfirmationEmailTemplateIdName);
@@ -264,11 +266,11 @@ namespace GovUk.Education.ExploreEducationStatistics.Notifier
                 if (sub != null)
                 {
                     // Remove the pending subscription from the the file now verified
-                    logger.LogDebug($"Removing address from pending subscribers");
+                    logger.LogDebug("Removing address from pending subscribers");
                     await _storageTableService.RemoveSubscriber(pendingSubscriptionsTbl, sub);
                     
                     // Add them to the verified subscribers table
-                    logger.LogDebug($"Adding address to the verified subscribers");
+                    logger.LogDebug("Adding address to the verified subscribers");
                     sub.DateTimeCreated = DateTime.UtcNow;
                     await _storageTableService.UpdateSubscriber(subscriptionsTbl, sub);
                     var unsubscribeToken =
@@ -297,7 +299,9 @@ namespace GovUk.Education.ExploreEducationStatistics.Notifier
             ExecutionContext context,
             ILogger logger)
         {
-            logger.LogInformation($"{context.FunctionName} triggered at: {DateTime.Now}");
+            logger.LogInformation("{0} triggered at: {1}",
+                context.FunctionName,
+                DateTime.Now);
 
             var config = LoadAppSettings(context);
             var pendingSubscriptionsTbl = GetCloudTable(_storageTableService, config, PendingSubscriptionsTblName);

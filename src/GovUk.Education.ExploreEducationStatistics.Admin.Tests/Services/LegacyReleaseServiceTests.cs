@@ -253,7 +253,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
                 );
                 
                 // Service method under test
-                var result = await legacyReleaseService.UpdateLegacyRelease(
+                await legacyReleaseService.UpdateLegacyRelease(
                     id,
                     new LegacyReleaseUpdateViewModel()
                     {
@@ -326,7 +326,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
                 );
                 
                 // Service method under test
-                var result = await legacyReleaseService.UpdateLegacyRelease(
+                await legacyReleaseService.UpdateLegacyRelease(
                     id,
                     new LegacyReleaseUpdateViewModel()
                     {
@@ -384,7 +384,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
                 );
                 
                 // Service method under test
-                var result = await legacyReleaseService.DeleteLegacyRelease(id);
+                await legacyReleaseService.DeleteLegacyRelease(id);
 
                 Assert.Empty(context.LegacyReleases);
                 Assert.Empty(
@@ -442,7 +442,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
                 );
                 
                 // Service method under test
-                var result = await legacyReleaseService.DeleteLegacyRelease(id);
+                await legacyReleaseService.DeleteLegacyRelease(id);
 
                 var legacyReleases = context.LegacyReleases
                     .OrderBy(release => release.Order)

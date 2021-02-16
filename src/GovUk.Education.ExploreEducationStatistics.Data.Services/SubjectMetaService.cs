@@ -3,7 +3,6 @@ using System.Collections.Generic;
 using System.Diagnostics;
 using System.Linq;
 using System.Threading.Tasks;
-using AutoMapper;
 using GovUk.Education.ExploreEducationStatistics.Common.Extensions;
 using GovUk.Education.ExploreEducationStatistics.Common.Model;
 using GovUk.Education.ExploreEducationStatistics.Common.Model.Data;
@@ -29,7 +28,6 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Services
         private readonly IIndicatorGroupService _indicatorGroupService;
         private readonly ILocationService _locationService;
         private readonly ILogger _logger;
-        private readonly IMapper _mapper;
         private readonly IObservationService _observationService;
         private readonly IPersistenceHelper<StatisticsDbContext> _persistenceHelper;
         private readonly ITimePeriodService _timePeriodService;
@@ -42,7 +40,6 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Services
             IIndicatorGroupService indicatorGroupService,
             ILocationService locationService,
             ILogger<SubjectMetaService> logger,
-            IMapper mapper,
             IObservationService observationService,
             IPersistenceHelper<StatisticsDbContext> persistenceHelper,
             ITimePeriodService timePeriodService,
@@ -53,7 +50,6 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Services
             _indicatorGroupService = indicatorGroupService;
             _locationService = locationService;
             _logger = logger;
-            _mapper = mapper;
             _observationService = observationService;
             _persistenceHelper = persistenceHelper;
             _timePeriodService = timePeriodService;
