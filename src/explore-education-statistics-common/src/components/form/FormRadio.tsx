@@ -41,7 +41,10 @@ const FormRadio = ({
   /* eslint-disable jsx-a11y/role-supports-aria-props */
   return (
     <>
-      <div className="govuk-radios__item">
+      <div
+        className="govuk-radios__item"
+        data-testid={`Radio item for ${label}`}
+      >
         <input
           aria-describedby={hint ? `${id}-item-hint` : undefined}
           aria-controls={onMounted(
@@ -51,6 +54,7 @@ const FormRadio = ({
           className="govuk-radios__input"
           checked={checked}
           defaultChecked={defaultChecked}
+          disabled={disabled}
           id={id}
           name={name}
           onBlur={onBlur}
@@ -61,8 +65,6 @@ const FormRadio = ({
           }}
           type="radio"
           value={value}
-          data-testid={label}
-          disabled={disabled}
         />
         <label className="govuk-label govuk-radios__label" htmlFor={id}>
           {label}

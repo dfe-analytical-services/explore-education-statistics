@@ -1,12 +1,13 @@
 // Jest Snapshot v1, https://goo.gl/fbAQLP
 
 exports[`FormRadio does not render conditional content when not checked 1`] = `
-<div class="govuk-radios__item">
+<div class="govuk-radios__item"
+     data-testid="Radio item for Test radio"
+>
   <input class="govuk-radios__input"
          id="test-radio"
          name="test"
          type="radio"
-         data-testid="Test radio"
          value="true"
          aria-controls="test-radio-conditional"
   >
@@ -26,12 +27,13 @@ exports[`FormRadio does not render conditional content when not checked 1`] = `
 `;
 
 exports[`FormRadio renders conditional content when checked 1`] = `
-<div class="govuk-radios__item">
+<div class="govuk-radios__item"
+     data-testid="Radio item for Test radio"
+>
   <input class="govuk-radios__input"
          id="test-radio"
          name="test"
          type="radio"
-         data-testid="Test radio"
          value="true"
          checked
          aria-controls="test-radio-conditional"
@@ -53,13 +55,14 @@ exports[`FormRadio renders conditional content when checked 1`] = `
 `;
 
 exports[`FormRadio renders correctly when \`hint\` is provided 1`] = `
-<div class="govuk-radios__item">
+<div class="govuk-radios__item"
+     data-testid="Radio item for Test radio"
+>
   <input aria-describedby="test-radio-item-hint"
          class="govuk-radios__input"
          id="test-radio"
          name="test"
          type="radio"
-         data-testid="Test radio"
          value="true"
   >
   <label class="govuk-label govuk-radios__label"
@@ -76,12 +79,13 @@ exports[`FormRadio renders correctly when \`hint\` is provided 1`] = `
 `;
 
 exports[`FormRadio renders correctly with required props 1`] = `
-<div class="govuk-radios__item">
+<div class="govuk-radios__item"
+     data-testid="Radio item for Test radio"
+>
   <input class="govuk-radios__input"
          id="test-radio"
          name="test"
          type="radio"
-         data-testid="Test radio"
          value="true"
   >
   <label class="govuk-label govuk-radios__label"

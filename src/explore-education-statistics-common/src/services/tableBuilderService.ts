@@ -87,7 +87,8 @@ export interface Subject {
 
 export interface TableHighlight {
   id: string;
-  label: string;
+  name: string;
+  description: string;
 }
 
 export interface Publication {

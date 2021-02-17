@@ -1,5 +1,7 @@
 import Details from '@common/components/Details';
 import { Form, FormFieldRadioGroup } from '@common/components/form';
+import { FormFieldsetProps } from '@common/components/form/FormFieldset';
+import { RadioOption } from '@common/components/form/FormRadioGroup';
 import SanitizeHtml from '@common/components/SanitizeHtml';
 import SummaryList from '@common/components/SummaryList';
 import SummaryListItem from '@common/components/SummaryListItem';
@@ -7,10 +9,9 @@ import ResetFormOnPreviousStep from '@common/modules/table-tool/components/Reset
 import { Subject } from '@common/services/tableBuilderService';
 import Yup from '@common/validation/yup';
 import { Formik } from 'formik';
-import React, { useMemo } from 'react';
+import React, { ReactNode, useMemo } from 'react';
 import { InjectedWizardProps } from './Wizard';
 import WizardStepFormActions from './WizardStepFormActions';
-import WizardStepHeading from './WizardStepHeading';
 
 export interface SubjectFormValues {
   subjectId: string;
@@ -21,28 +22,25 @@ export type SubjectFormSubmitHandler = (values: { subjectId: string }) => void;
 const formId = 'publicationSubjectForm';
 
 interface Props {
+  legend?: ReactNode;
+  legendSize?: FormFieldsetProps['legendSize'];
   initialValues?: { subjectId: string };
   onSubmit: SubjectFormSubmitHandler;
   options: Subject[];
 }
 
-const SubjectForm = (props: Props & InjectedWizardProps) => {
-  const {
-    isActive,
-    onSubmit,
-    options,
-    goToNextStep,
-    currentStep,
-    stepNumber,
-    initialValues = {
-      subjectId: '',
-    },
-  } = props;
-
-  const getSubjectName = (subjectId: string): string => {
-    const matching = options.find(({ id }) => subjectId === id);
-    return matching?.name ?? '';
-  };
+const SubjectForm = ({
+  goToNextStep,
+  legend,
+  legendSize = 'l',
+  initialValues = {
+    subjectId: '',
+  },
+  onSubmit,
+  options,
+  ...stepProps
+}: Props & InjectedWizardProps) => {
+  const { isActive, currentStep, stepNumber } = stepProps;
 
   const getTimePeriod = (subject: Subject) => {
     const { from, to } = subject.timePeriods;
@@ -54,7 +52,7 @@ const SubjectForm = (props: Props & InjectedWizardProps) => {
     return from || to;
   };
 
-  const radioOptions = useMemo(
+  const radioOptions = useMemo<RadioOption[]>(
     () =>
       options.map(option => {
         const { content } = option;
@@ -66,7 +64,7 @@ const SubjectForm = (props: Props & InjectedWizardProps) => {
 
         return {
           label: option.name,
-          value: `${option.id}`,
+          value: option.id,
           hint: hasDetails ? (
             <Details
               summary="More details"
@@ -97,13 +95,6 @@ const SubjectForm = (props: Props & InjectedWizardProps) => {
       }),
     [options],
   );
-
-  const stepHeading = (
-    <WizardStepHeading {...props} fieldsetHeading>
-      Choose a subject
-    </WizardStepHeading>
-  );
-
   return (
     <Formik<SubjectFormValues>
       enableReinitialize
@@ -124,34 +115,24 @@ const SubjectForm = (props: Props & InjectedWizardProps) => {
           <Form {...form} id={formId} showSubmitError>
             <FormFieldRadioGroup<SubjectFormValues>
               name="subjectId"
-              legend={stepHeading}
-              legendSize="l"
+              legend={legend}
+              legendSize={legendSize}
               id={`${formId}-subjectId`}
               disabled={form.isSubmitting}
               options={radioOptions}
             />
 
             {radioOptions.length > 0 ? (
-              <WizardStepFormActions {...props} formId={formId} />
+              <WizardStepFormActions {...stepProps} formId={formId} />
             ) : (
               <p>No subjects available.</p>
             )}
           </Form>
         ) : (
-          <>
-            {stepHeading}
-
-            <ResetFormOnPreviousStep
-              currentStep={currentStep}
-              stepNumber={stepNumber}
-            />
-
-            <SummaryList noBorder>
-              <SummaryListItem term="Subject">
-                {getSubjectName(form.values.subjectId) || 'None'}
-              </SummaryListItem>
-            </SummaryList>
-          </>
+          <ResetFormOnPreviousStep
+            currentStep={currentStep}
+            stepNumber={stepNumber}
+          />
         );
       }}
     </Formik>

@@ -23,6 +23,13 @@ Select "Pupil absence" publication
     user waits until h2 is visible  Choose a subject
     user checks previous table tool step contains  1   Publication   Pupil absence in schools in England
 
+Validate "Absence by characteristic" subject details
+    [Tags]  HappyPath
+    user opens details dropdown  More details  css:[data-testid="Radio item for Absence by characteristic"]
+    ${details}=  user gets details content element  More details  css:[data-testid="Radio item for Absence by characteristic"]
+    user checks summary list contains  Geographic levels  Local Authority; Local Authority District; National  ${details}
+    user checks summary list contains  Time period  2012/13 to 2016/17  ${details}
+
 Select subject "Absence by characteristic"
     [Tags]  HappyPath
     user clicks radio   Absence by characteristic

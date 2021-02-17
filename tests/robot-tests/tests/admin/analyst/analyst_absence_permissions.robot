@@ -75,16 +75,17 @@ Validate Analyst1 can see 'Content' page key stats
 
 Validate Analyst1 can see 'Content' page accordion sections
     [Tags]  HappyPath
-    user waits until page contains accordion section  About these statistics
-    user checks accordion is in position  About these statistics            1
-    user checks accordion is in position  Pupil absence rates               2
-    user checks accordion is in position  Persistent absence                3
-    user checks accordion is in position  Reasons for absence               4
-    user checks accordion is in position  Distribution of absence           5
-    user checks accordion is in position  Absence by pupil characteristics  6
-    user checks accordion is in position  Absence for 4-year-olds           7
-    user checks accordion is in position  Pupil referral unit absence       8
-    user checks accordion is in position  Regional and local authority (LA) breakdown  9
-    user checks accordion is in position  Methodology                       10
-    user checks accordion is in position  Contact us                        11
-    user checks there are x accordion sections  11
+    user checks accordion is in position  About these statistics            1  id:releaseMainContent
+    user checks accordion is in position  Pupil absence rates               2  id:releaseMainContent
+    user checks accordion is in position  Persistent absence                3  id:releaseMainContent
+    user checks accordion is in position  Reasons for absence               4  id:releaseMainContent
+    user checks accordion is in position  Distribution of absence           5  id:releaseMainContent
+    user checks accordion is in position  Absence by pupil characteristics  6  id:releaseMainContent
+    user checks accordion is in position  Absence for 4-year-olds           7  id:releaseMainContent
+    user checks accordion is in position  Pupil referral unit absence       8  id:releaseMainContent
+    user checks accordion is in position  Regional and local authority (LA) breakdown  9  id:releaseMainContent
+    user checks there are x accordion sections  9  id:releaseMainContent
+
+    user checks accordion is in position  Methodology                       1  id:helpAndSupport
+    user checks accordion is in position  Contact us                        2  id:helpAndSupport
+    user checks there are x accordion sections  2  id:helpAndSupport

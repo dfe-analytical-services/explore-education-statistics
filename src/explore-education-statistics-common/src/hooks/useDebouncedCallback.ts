@@ -1,3 +1,4 @@
+import useMountedRef from '@common/hooks/useMountedRef';
 import { useCallback, useEffect, useRef } from 'react';
 
 export type UseDebouncedCallbackReturn<Args extends unknown[]> = [
@@ -15,6 +16,7 @@ export default function useDebouncedCallback<Args extends unknown[] = []>(
   callback: (...args: Args) => void,
   timeout = 0,
 ): UseDebouncedCallbackReturn<Args> {
+  const isMounted = useMountedRef();
   const currentTimeout = useRef<ReturnType<typeof setTimeout>>();
   const cb = useRef(callback);
 
@@ -27,10 +29,12 @@ export default function useDebouncedCallback<Args extends unknown[] = []>(
       }
 
       currentTimeout.current = setTimeout(() => {
-        cb.current(...args);
+        if (isMounted.current) {
+          cb.current(...args);
+        }
       }, timeout);
     },
-    [timeout],
+    [isMounted, timeout],
   );
 
   const cancel = useCallback(() => {

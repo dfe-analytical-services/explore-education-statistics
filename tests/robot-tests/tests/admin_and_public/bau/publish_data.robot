@@ -277,11 +277,14 @@ Select publication in table tool
     user opens details dropdown    ${TOPIC_NAME}
     user clicks radio      ${PUBLICATION_NAME}
     user clicks element    id:publicationForm-submit
-    user waits until h2 is visible   Choose a subject
+    user waits until h2 is visible   View a popular table or create your own
     user checks previous table tool step contains  1    Publication    ${PUBLICATION_NAME}
 
 Select subject "${SUBJECT_NAME}" in table tool
     [Tags]  HappyPath
+    user clicks link  Create your own table
+    user waits until h3 is visible  Choose a subject
+
     user waits until page contains   ${SUBJECT_NAME}
     user clicks radio    ${SUBJECT_NAME}
     user clicks element   id:publicationSubjectForm-submit
@@ -339,7 +342,16 @@ Select table highlight from subjects step
     user waits until h1 is visible  Go back to previous step
     user clicks button  Confirm
 
-    user waits until element is visible  xpath://h3[text()="Table highlights"]
+    user waits until h3 is visible  Choose a subject
+
+    user clicks link  Popular tables
+    user waits until h3 is visible  Choose a table
+
+    user checks element count is x  css:#popularTables li  1
+    user checks element should contain  css:#popularTables li:first-child a  Test highlight name
+    user checks element should contain  css:#popularTables li:first-child [id^="highlight-description"]
+    ...  Test highlight description
+
     user clicks link  Test highlight name
     user waits until results table appears  180
     user waits until page contains element   xpath://*[@data-testid="dataTableCaption" and text()="Table showing Admission Numbers for '${SUBJECT_NAME}' from '${PUBLICATION_NAME}' in Bolton 001 (E02000984), Bolton 001 (E05000364), Bolton 004 (E02000987), Bolton 004 (E05010450), Nailsea Youngwood and Syon between 2005 and 2020"]

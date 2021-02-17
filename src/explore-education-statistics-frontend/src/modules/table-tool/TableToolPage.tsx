@@ -14,7 +14,6 @@ import tableBuilderService, {
 import { Dictionary } from '@common/types';
 import Link from '@frontend/components/Link';
 import Page from '@frontend/components/Page';
-import orderBy from 'lodash/orderBy';
 import { GetServerSideProps, NextPage } from 'next';
 import dynamic from 'next/dynamic';
 import React, { useMemo } from 'react';
@@ -44,11 +43,9 @@ const TableToolPage: NextPage<TableToolPageProps> = ({
 
     const { id: publicationId, subjects } = initialPublication;
 
-    const highlights = orderBy(
-      initialPublication.highlights,
-      ['label'],
-      ['asc'],
-    ).filter(highlight => highlight.id !== fastTrack?.id);
+    const highlights = initialPublication.highlights.filter(
+      highlight => highlight.id !== fastTrack?.id,
+    );
 
     if (fastTrack && subjectMeta) {
       const fullTable = mapFullTable(fastTrack.fullTable);
@@ -101,30 +98,18 @@ const TableToolPage: NextPage<TableToolPageProps> = ({
         scrollOnMount
         themeMeta={themeMeta}
         initialState={initialState}
-        renderHighlights={highlights => (
-          <aside>
-            <h3>Table highlights</h3>
-
-            <p>View popular tables related to this publication:</p>
-
-            <ul>
-              {highlights.map(highlight => (
-                <li key={highlight.id}>
-                  <Link
-                    to="/data-tables/fast-track/[fastTrackId]"
-                    as={`/data-tables/fast-track/${highlight.id}`}
-                    analytics={{
-                      category: 'Table tool',
-                      action: 'Clicked to view Table highlight',
-                      label: `Table highlight label: ${highlight.label}`,
-                    }}
-                  >
-                    {highlight.label}
-                  </Link>
-                </li>
-              ))}
-            </ul>
-          </aside>
+        renderHighlightLink={highlight => (
+          <Link
+            to="/data-tables/fast-track/[fastTrackId]"
+            as={`/data-tables/fast-track/${highlight.id}`}
+            analytics={{
+              category: 'Table tool',
+              action: 'Clicked to view Table highlight',
+              label: `Table highlight name: ${highlight.name}`,
+            }}
+          >
+            {highlight.name}
+          </Link>
         )}
         finalStep={({ publication, query, response }) => (
           <WizardStep>

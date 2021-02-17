@@ -14,7 +14,7 @@ interface ReleaseContentAccordionProps {
 
 const ReleaseContentAccordion = ({
   release,
-  id = 'releaseContentAccordion',
+  id = 'releaseMainContent',
   sectionName,
 }: ReleaseContentAccordionProps) => {
   const {
