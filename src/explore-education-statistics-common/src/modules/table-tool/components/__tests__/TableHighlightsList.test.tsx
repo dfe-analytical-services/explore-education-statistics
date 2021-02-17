@@ -75,6 +75,25 @@ describe('TableHighlightsList', () => {
     );
   });
 
+  test('does not add `aria-describedby` to highlight link if `description` is empty', () => {
+    render(
+      <TableHighlightsList
+        highlights={[
+          {
+            id: 'highlight-1',
+            name: 'Highlight 1',
+            description: '',
+          },
+        ]}
+        renderLink={renderLink}
+      />,
+    );
+
+    expect(
+      screen.getByRole('link', { name: 'Highlight 1' }),
+    ).not.toHaveAttribute('aria-describedby');
+  });
+
   test('renders empty message if no highlights', () => {
     render(<TableHighlightsList highlights={[]} renderLink={renderLink} />);
 

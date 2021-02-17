@@ -58,12 +58,16 @@ const TableHighlightsList = ({ highlights = [], renderLink }: Props) => {
                   <p className="govuk-!-font-weight-bold govuk-!-margin-bottom-1">
                     {link
                       ? cloneElement(link as ReactElement, {
-                          'aria-describedby': descriptionId,
+                          'aria-describedby': highlight.description
+                            ? descriptionId
+                            : undefined,
                         })
                       : null}
                   </p>
 
-                  <p id={descriptionId}>{highlight.description}</p>
+                  {highlight.description && (
+                    <p id={descriptionId}>{highlight.description}</p>
+                  )}
                 </li>
               );
             })}
