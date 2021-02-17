@@ -200,7 +200,6 @@ if __name__ == "__main__":
         CYAN = '\033[96m'
 
 
-
     load_dotenv('.env')
     api_url = os.getenv('API_URL')
     jwt_token = os.getenv('JWT_TOKEN')
