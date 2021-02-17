@@ -121,15 +121,14 @@ const PublicationReleasePage: NextPage<Props> = ({ data }) => {
                   summary={`See all updates (${data.updates.length})`}
                 >
                   <ol className="govuk-list">
-                    {data.updates.map(note => (
-                      <li key={note.id}>
+                    {data.updates.map(update => (
+                      <li key={update.id}>
                         <FormattedDate className="govuk-body govuk-!-font-weight-bold">
-                          {note.on}
+                          {update.on}
                         </FormattedDate>
-                        <p>{note.reason}</p>
+                        <p>{update.reason}</p>
                       </li>
                     ))}
-                    down
                   </ol>
                 </Details>
               </SummaryListItem>
