@@ -44,21 +44,27 @@ namespace GovUk.Education.ExploreEducationStatistics.Publisher.Functions
             ExecutionContext executionContext,
             ILogger logger)
         {
-            logger.LogInformation($"{executionContext.FunctionName} triggered at: {DateTime.Now}");
+            logger.LogInformation("{0} triggered at: {1}",
+                executionContext.FunctionName,
+                DateTime.Now);
 
             var releaseStatus = await _releaseStatusService.GetLatestAsync(message.ReleaseId);
 
             if (releaseStatus == null)
             {
                 logger.LogError(
-                    $"Latest status not found for Release: {message.ReleaseId} while attempting to retry.");
+                    "Latest status not found for Release: {0} while attempting to retry",
+                    message.ReleaseId);
             }
             else
             {
                 if (!ValidStates.Contains(releaseStatus.State.Overall))
                 {
-                    logger.LogError($"Can only attempt a retry of Release: {message.ReleaseId} if the latest " +
-                                    $"status is in ({string.Join(", ", ValidStates)}). Found: {releaseStatus.State.Overall}");
+                    logger.LogError("Can only attempt a retry of Release: {0} if the latest " +
+                                    "status is in ({1}). Found: {2}",
+                        message.ReleaseId,
+                        string.Join(", ", ValidStates),
+                        releaseStatus.State.Overall);
                 }
                 else
                 {
@@ -78,7 +84,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Publisher.Functions
                 }
             }
 
-            logger.LogInformation($"{executionContext.FunctionName} completed");
+            logger.LogInformation("{0} completed", executionContext.FunctionName);
         }
     }
 }

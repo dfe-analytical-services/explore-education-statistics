@@ -38,10 +38,14 @@ namespace GovUk.Education.ExploreEducationStatistics.Publisher.Functions
             ExecutionContext executionContext,
             ILogger logger)
         {
-            logger.LogInformation($"{executionContext.FunctionName} triggered at: {DateTime.Now}");
+            logger.LogInformation("{0} triggered at: {1}",
+                executionContext.FunctionName,
+                DateTime.Now);
             PublishReleases().Wait();
             logger.LogInformation(
-                $"{executionContext.FunctionName} completed. {timer.FormatNextOccurrences(1)}");
+                "{0} completed. {1}",
+                executionContext.FunctionName,
+                timer.FormatNextOccurrences(1));
         }
 
         private async Task PublishReleases()

@@ -29,14 +29,17 @@ namespace GovUk.Education.ExploreEducationStatistics.Publisher.Functions
             ExecutionContext executionContext,
             ILogger logger)
         {
-            logger.LogInformation($"{executionContext.FunctionName} triggered: {message}");
+            logger.LogInformation("{0} triggered: {1}",
+                executionContext.FunctionName,
+                message.ToString());
 
             var context = new PublishContext(DateTime.UtcNow, false);
 
             await _contentService.UpdateTaxonomy(context);
             await _taxonomyService.SyncTaxonomy();
 
-            logger.LogInformation($"{executionContext.FunctionName} completed");
+            logger.LogInformation("{0} completed",
+                executionContext.FunctionName);
         }
     }
 }

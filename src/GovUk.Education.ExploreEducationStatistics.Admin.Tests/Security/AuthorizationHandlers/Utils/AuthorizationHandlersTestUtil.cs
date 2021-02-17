@@ -4,10 +4,8 @@ using System.Linq;
 using System.Security.Claims;
 using GovUk.Education.ExploreEducationStatistics.Admin.Security;
 using GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services;
-using GovUk.Education.ExploreEducationStatistics.Content.Model;
 using GovUk.Education.ExploreEducationStatistics.Content.Model.Database;
 using Microsoft.AspNetCore.Authorization;
-using Moq;
 using Xunit;
 using static GovUk.Education.ExploreEducationStatistics.Common.Services.EnumUtil;
 

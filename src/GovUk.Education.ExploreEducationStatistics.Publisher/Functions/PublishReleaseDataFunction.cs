@@ -48,7 +48,9 @@ namespace GovUk.Education.ExploreEducationStatistics.Publisher.Functions
             ExecutionContext executionContext,
             ILogger logger)
         {
-            logger.LogInformation($"{executionContext.FunctionName} triggered: {message}");
+            logger.LogInformation("{0} triggered: {1}",
+                executionContext.FunctionName,
+                message);
 
             if (PublisherUtils.IsDevelopment())
             {
@@ -73,13 +75,15 @@ namespace GovUk.Education.ExploreEducationStatistics.Publisher.Functions
                 }
                 catch (Exception e)
                 {
-                    logger.LogError(e, $"Exception occured while executing {executionContext.FunctionName}");
+                    logger.LogError(e, "Exception occured while executing {0}",
+                        executionContext.FunctionName);
                     await UpdateStage(message, Failed,
                         new ReleaseStatusLogMessage($"Exception in data stage: {e.Message}"));
                 }
             }
 
-            logger.LogInformation($"{executionContext.FunctionName} completed");
+            logger.LogInformation("{0} completed",
+                executionContext.FunctionName);
         }
 
         private async Task UpdateStage(PublishReleaseDataMessage message, ReleaseStatusDataStage stage,
@@ -99,7 +103,9 @@ namespace GovUk.Education.ExploreEducationStatistics.Publisher.Functions
                 configuration.DataFactoryName, configuration.PipelineName, parameters: parameters).Result;
 
             logger.LogInformation(
-                $"Pipeline status code: {runResponse.Response.StatusCode}, run Id: {runResponse.Body.RunId}");
+                "Pipeline status code: {0}, run Id: {1}",
+                runResponse.Response.StatusCode,
+                runResponse.Body.RunId);
 
             return runResponse.Response.IsSuccessStatusCode;
         }

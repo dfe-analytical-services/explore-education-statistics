@@ -3,7 +3,7 @@ using System.Collections.Generic;
 
 namespace GovUk.Education.ExploreEducationStatistics.Publisher.Model.ViewModels
 {
-    public class TopicTree<TreeNode> where TreeNode : IPublicationTreeNode
+    public class TopicTree<TNode> where TNode : IPublicationTreeNode
     {
         public Guid Id { get; set; }
 
@@ -11,6 +11,6 @@ namespace GovUk.Education.ExploreEducationStatistics.Publisher.Model.ViewModels
 
         public string Summary { get; set; }
 
-        public List<TreeNode> Publications { get; set; }
+        public List<TNode> Publications { get; set; }
     }
 }

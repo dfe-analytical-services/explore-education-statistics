@@ -1,6 +1,5 @@
 using System;
 using System.Collections.Generic;
-using System.Linq;
 using System.Net.Http;
 using System.Threading.Tasks;
 using Microsoft.Extensions.Logging;
@@ -23,7 +22,6 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Services
             Dictionary<string, dynamic> personalisation = null,
             string clientReference = null, string emailReplyToId = null)
         {
-            _logger.Log(LogLevel.Debug, $"Sending email to {emailAddress} with template id {templateId}");
             return new EmailNotificationResponse();
         }
         

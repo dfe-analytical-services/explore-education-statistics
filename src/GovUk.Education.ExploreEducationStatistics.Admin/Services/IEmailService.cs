@@ -1,5 +1,4 @@
 using System.Collections.Generic;
-using Notify.Client;
 
 namespace GovUk.Education.ExploreEducationStatistics.Admin.Services
 {
