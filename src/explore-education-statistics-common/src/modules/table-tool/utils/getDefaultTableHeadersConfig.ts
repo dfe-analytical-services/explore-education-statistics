@@ -1,12 +1,26 @@
-import { Filter } from '@common/modules/table-tool/types/filters';
+import {
+  Filter,
+  TimePeriodFilter,
+} from '@common/modules/table-tool/types/filters';
 import { FullTableMeta } from '@common/modules/table-tool/types/fullTable';
 import { TableHeadersConfig } from '@common/modules/table-tool/types/tableHeaders';
+import naturalOrderBy from '@common/utils/array/naturalOrderBy';
 import last from 'lodash/last';
-import sortBy from 'lodash/sortBy';
+import orderBy from 'lodash/orderBy';
 
-const removeSiblinglessFilters = (filters: Filter[][]): Filter[][] => {
+const removeSingleOptionFilterGroups = (filters: Filter[][]): Filter[][] => {
   return filters.filter(filterGroup => filterGroup.length > 1);
 };
+
+function sortSubGroup(filters: Filter[]): Filter[] {
+  return naturalOrderBy(filters, filter => {
+    if (filter instanceof TimePeriodFilter) {
+      return filter.order;
+    }
+
+    return filter.label;
+  });
+}
 
 /**
  * Distributes a list of {@param filters} into row groups
@@ -16,7 +30,7 @@ const removeSiblinglessFilters = (filters: Filter[][]): Filter[][] => {
 function getSortedRowColGroups(
   filters: Filter[][],
 ): Pick<TableHeadersConfig, 'rowGroups' | 'columnGroups'> {
-  const sortedFilters = sortBy(filters, [
+  const sortedFilters = orderBy(filters, [
     // Sort groups by number of options and total label length as we want
     // to place wordier filters as rows to avoid having to scroll horizontally.
     options => options.length,
@@ -28,13 +42,22 @@ function getSortedRowColGroups(
   // Re-sort by number of options. We want to avoid cases where groups
   // with small number of options repeat many times, causing the
   // table headers for that direction to look more 'dense'.
+  const columnGroups = orderBy(
+    sortedFilters.slice(0, halfwayIndex),
+    options => options.length,
+  );
+
+  const rowGroups = orderBy(
+    sortedFilters.slice(halfwayIndex),
+    options => options.length,
+  );
+
+  // Finally, we just need to sort the individual
+  // sub groups of the filter group so that
+  // they're in ascending order.
   return {
-    columnGroups: sortBy(sortedFilters.slice(0, halfwayIndex), [
-      options => options.length,
-    ]),
-    rowGroups: sortBy(sortedFilters.slice(halfwayIndex), [
-      options => options.length,
-    ]),
+    columnGroups: columnGroups.map(sortSubGroup),
+    rowGroups: rowGroups.map(sortSubGroup),
   };
 }
 
@@ -44,7 +67,7 @@ function getFixedTimePeriodAndIndicatorTableHeadersConfig(
   const { indicators, filters, locations, timePeriodRange } = fullTableMeta;
 
   const { columnGroups, rowGroups } = getSortedRowColGroups(
-    removeSiblinglessFilters([
+    removeSingleOptionFilterGroups([
       ...Object.values(filters).map(group => group.options),
       locations,
     ]),
@@ -84,7 +107,7 @@ export default function getDefaultTableHeaderConfig(
     // Can potentially remove all other groups, but should
     // at least show the time period and indicator as these
     // should provide the most information to the user.
-    ...removeSiblinglessFilters([
+    ...removeSingleOptionFilterGroups([
       ...Object.values(filters).map(group => group.options),
       locations,
     ]),
@@ -95,7 +118,7 @@ export default function getDefaultTableHeaderConfig(
   return {
     columnGroups: columnGroups.length > 1 ? columnGroups.slice(0, -1) : [],
     rowGroups: rowGroups.length > 1 ? rowGroups.slice(0, -1) : [],
-    columns: last(columnGroups) as Filter[],
-    rows: last(rowGroups) as Filter[],
+    columns: sortSubGroup(last(columnGroups) ?? []),
+    rows: sortSubGroup(last(rowGroups) ?? []),
   };
 }
