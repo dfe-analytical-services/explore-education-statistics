@@ -1,12 +1,7 @@
 import styles from '@admin/components/form/FormEditor.module.scss';
-// No types available for CKEditor 5
-// eslint-disable-next-line @typescript-eslint/ban-ts-comment
-// @ts-ignore
+import { EditorConfig, HeadingOption } from '@admin/types/ckeditor';
 import ClassicEditor from '@ckeditor/ckeditor5-build-classic';
-// No types available for CKEditor 5
-// eslint-disable-next-line @typescript-eslint/ban-ts-comment
-// @ts-ignore
-import { CKEditor } from '@ckeditor/ckeditor5-react';
+import { CKEditor, CKEditorProps } from '@ckeditor/ckeditor5-react';
 import ErrorMessage from '@common/components/ErrorMessage';
 import FormLabel from '@common/components/form/FormLabel';
 import SanitizeHtml from '@common/components/SanitizeHtml';
@@ -14,7 +9,6 @@ import useToggle from '@common/hooks/useToggle';
 import isBrowser from '@common/utils/isBrowser';
 import classNames from 'classnames';
 import React, {
-  ChangeEvent,
   MutableRefObject,
   useCallback,
   useEffect,
@@ -54,7 +48,7 @@ export const toolbarConfigs = {
 
 const defaultAllowedHeadings = ['h3', 'h4', 'h5'];
 
-const headingOptions = [
+const headingOptions: HeadingOption[] = [
   {
     model: 'heading1',
     view: 'h1',
@@ -120,7 +114,7 @@ const FormEditor = ({
 
   const [isFocused, toggleFocused] = useToggle(false);
 
-  const config = useMemo(
+  const config = useMemo<EditorConfig>(
     () => ({
       toolbar: toolbarConfig,
       heading: toolbarConfig?.includes('heading')
@@ -132,7 +126,7 @@ const FormEditor = ({
                 class: 'ck-heading_paragraph',
               },
               ...headingOptions.filter(option =>
-                allowedHeadings?.includes(option.view),
+                allowedHeadings?.includes(option.view ?? ''),
               ),
             ],
           }
@@ -181,14 +175,14 @@ const FormEditor = ({
     editorRef.current.focus();
   }, []);
 
-  const handleChange = useCallback(
-    (event: ChangeEvent, editor: { getData(): string }) => {
+  const handleChange = useCallback<CKEditorProps['onChange']>(
+    (event, editor) => {
       onChange(editor.getData());
     },
     [onChange],
   );
 
-  const handleBlur = useCallback(() => {
+  const handleBlur = useCallback<CKEditorProps['onBlur']>(() => {
     toggleFocused.off();
 
     if (onBlur) {
@@ -196,8 +190,8 @@ const FormEditor = ({
     }
   }, [onBlur, toggleFocused]);
 
-  const handleReady = useCallback(
-    (editor: { editing: { view: { focus(): void } } }) => {
+  const handleReady = useCallback<CKEditorProps['onReady']>(
+    editor => {
       if (focusOnInit) {
         editor.editing.view.focus();
       }
