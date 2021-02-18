@@ -6,7 +6,7 @@ import ClassicEditor from '@ckeditor/ckeditor5-build-classic';
 // No types available for CKEditor 5
 // eslint-disable-next-line @typescript-eslint/ban-ts-comment
 // @ts-ignore
-import CKEditor from '@ckeditor/ckeditor5-react';
+import { CKEditor } from '@ckeditor/ckeditor5-react';
 import ErrorMessage from '@common/components/ErrorMessage';
 import FormLabel from '@common/components/form/FormLabel';
 import SanitizeHtml from '@common/components/SanitizeHtml';
@@ -196,7 +196,7 @@ const FormEditor = ({
     }
   }, [onBlur, toggleFocused]);
 
-  const handleInit = useCallback(
+  const handleReady = useCallback(
     (editor: { editing: { view: { focus(): void } } }) => {
       if (focusOnInit) {
         editor.editing.view.focus();
@@ -259,7 +259,7 @@ const FormEditor = ({
               onChange={handleChange}
               onFocus={toggleFocused.on}
               onBlur={handleBlur}
-              onInit={handleInit}
+              onReady={handleReady}
             />
           ) : (
             <textarea
