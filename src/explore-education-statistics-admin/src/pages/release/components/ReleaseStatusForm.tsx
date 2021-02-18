@@ -161,7 +161,7 @@ const ReleaseStatusForm = ({
             legend="Status"
             name="status"
             id={`${formId}-status`}
-            orderDirection={[]}
+            order={[]}
             options={[
               {
                 label: 'In draft',

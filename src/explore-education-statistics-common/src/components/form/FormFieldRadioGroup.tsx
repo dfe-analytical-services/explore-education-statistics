@@ -13,9 +13,9 @@ function FormFieldRadioGroup<FormValues, Value extends string = string>(
   props: Props<FormValues, Value>,
 ) {
   return (
-    <FormField<string> {...props}>
+    <FormField<Value> {...props}>
       {({ field }) => (
-        <FormRadioGroup
+        <FormRadioGroup<Value>
           {...props}
           {...field}
           onChange={(event, option) => {
