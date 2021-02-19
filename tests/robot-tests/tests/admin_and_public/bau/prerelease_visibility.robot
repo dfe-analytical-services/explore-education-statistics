@@ -43,7 +43,7 @@ Upload subject
     user checks headed table body row contains  Metadata file    upload-file-test.meta.csv  ${section}
     user checks headed table body row contains  Number of rows   159  ${section}
     user checks headed table body row contains  Data file size   15 Kb  ${section}
-    user checks headed table body row contains  Status           Complete  ${section}  180
+    user checks headed table body row contains  Status           Complete  ${section}  360
 
 Go to 'Sign Off' page
     [Tags]  HappyPath
