@@ -302,17 +302,43 @@ These can only be run from a sub-project `package.json`.
 
 ### Code style
 
-We use ESLint with the [Airbnb style guide](https://github.com/airbnb/javascript) for the project
-code style.
+We enforce the project code style via ESLint and Stylelint. Both are configured with the following
+rule sets:
+
+- [Airbnb style guide](https://github.com/airbnb/javascript) for TypeScript/JavaScript.
+- [typescript-eslint](https://github.com/typescript-eslint/typescript-eslint/tree/master/packages/eslint-plugin) recommended rules for TypeScript.
+- [stylelint-config-sass-guidelines](https://github.com/bjankord/stylelint-config-sass-guidelines) for SCSS.
+
+We also combine this with [Prettier](https://prettier.io/) to format our code to avoid disagreements 
+on formatting.
+
+To enforce these code styles, we run linting and formatting tasks upon save, commit and build.
+
+#### Code style exceptions
+
+Typically, we should aim to stick as close as possible to the rule set defaults. However, we do
+allow exceptions for rules that:
+
+- Are incompatible with existing/legacy code
+- Make the developer experience considerably worse
+- Are buggy and don't work correctly
+- The team generally disagrees with
 
 #### Disabling linting upon save
 
-During development, code is linted upon save, but if required this can be disabled by adding the
-following in your `.env.local`:
+If required, you can disable linting upon save by adding one (or both) of the following to your
+`.env.local`:
 
 ```
 ESLINT_DISABLE=true
+STYLELINT_DISABLE=true
 ```
+
+Of course, we don't recommend that you do this as it's usually a good idea to get immediate feedback
+that something is wrong.
+
+Note that linting will still run upon commit. Ideally, every commit should have the project in a
+buildable state (rather than be completely broken).
 
 ## Backend development
 
