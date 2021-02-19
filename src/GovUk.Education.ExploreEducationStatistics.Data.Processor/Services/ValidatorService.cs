@@ -93,7 +93,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Processor.Services
 
             await _dataImportService.UpdateStatus(import.Id, DataImportStatus.STAGE_1, 0);
 
-            return await _logger.WithTimingTrace(async () => 
+            return await _logger.TraceTime(async () => 
                 await ValidateCsvFile(import.File, false)
                 .OnSuccessDo(async () => await ValidateCsvFile(import.MetaFile, true))
                 .OnSuccess(async () =>

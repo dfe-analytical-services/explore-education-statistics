@@ -174,7 +174,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Processor.Services
             _importerFilterService.ClearCache();
             _importerLocationService.ClearCache();
 
-            var observations = _logger.WithTimingDebug(() =>
+            var observations = _logger.DebugTime(() =>
                 GetObservations(
                     context,
                     rows,
@@ -185,7 +185,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Processor.Services
                     rowsPerBatch).ToList(),
             $"to read batch {batchNo} of Observations");
 
-            await _logger.WithTimingDebug(async () =>
+            await _logger.DebugTime(async () =>
             {
                 await InsertObservations(context, observations);
             },
@@ -250,7 +250,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Processor.Services
 
             foreach (DataRow row in rows)
             {
-                _logger.WithTimingTrace(() =>
+                _logger.TraceTime(() =>
                     {
                         var o = ObservationFromCsv(
                             context,

@@ -52,7 +52,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Processor.Services
 
         public async Task ProcessStage1(Guid importId, ExecutionContext executionContext)
         {
-            await _logger.WithTimingDebug(() => 
+            await _logger.DebugTime(() => 
                 _validatorService.Validate(importId, executionContext)
                 .OnSuccessDo(async result =>
                 {
@@ -72,7 +72,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Processor.Services
 
         public async Task ProcessStage2(Guid importId)
         {
-            await _logger.WithTimingDebug(async () =>
+            await _logger.DebugTime(async () =>
             {
                 var statisticsDbContext = DbUtils.CreateStatisticsDbContext();
 
@@ -94,7 +94,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Processor.Services
 
         public async Task ProcessStage3(Guid importId)
         {
-            await _logger.WithTimingDebug(
+            await _logger.DebugTime(
                 () => _splitFileService.SplitDataFile(importId), 
                 "complete Stage 3");
         }
@@ -102,7 +102,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Processor.Services
         public async Task ProcessStage4Messages(Guid importId, ICollector<ImportObservationsMessage> collector)
         {
             
-            await _logger.WithTimingDebug(
+            await _logger.DebugTime(
                 () => _splitFileService.AddBatchDataFileMessages(importId, collector), 
                 "complete Stage 4 message creation");
         }

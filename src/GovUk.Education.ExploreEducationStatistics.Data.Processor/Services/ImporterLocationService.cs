@@ -42,7 +42,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Processor.Services
             Ward ward = null,
             PlanningArea planningArea = null)
         {
-            return _logger.WithTimingTrace(() =>
+            return _logger.TraceTime(() =>
             {
                 var cacheKey = GetCacheKey(country, institution, localAuthority, localAuthorityDistrict,
                     localEnterprisePartnership, mayoralCombinedAuthority, multiAcademyTrust, opportunityArea,
@@ -109,7 +109,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Processor.Services
             Ward ward = null,
             PlanningArea planningArea = null)
         {
-            var location = _logger.WithTimingTrace(() => Lookup(
+            var location = _logger.TraceTime(() => Lookup(
                 context,
                 country,
                 institution,
@@ -129,7 +129,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Processor.Services
 
             if (location == null)
             {
-                var entityEntry = _logger.WithTimingTrace(() => context.Location.Add(new Location
+                var entityEntry = _logger.TraceTime(() => context.Location.Add(new Location
                 {
                     Id = _guidGenerator.NewGuid(),
                     Country = country ?? Country.Empty(),
