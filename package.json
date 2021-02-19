@@ -28,6 +28,7 @@
   },
   "scripts": {
     "bootstrap": "lerna bootstrap --ci --force-local",
+    "bootstrap:install": "lerna bootstrap --force-local",
     "bootstrap:prod": "lerna bootstrap --ci --force-local -- --only=prod",
     "clean": "lerna clean -y",
     "fix": "npm run fix:js && npm run fix:style",
