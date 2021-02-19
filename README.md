@@ -204,34 +204,53 @@ adopted a monorepo project structure and have dependencies between sub-projects.
 are established using symlinks that Lerna creates.
 
 - `explore-education-statistics-admin`
-
   - Contains the admin frontend application.
   - Single page application based on Create React App.
 
 - `explore-education-statistics-frontend`
   - Contains the public frontend application.
   - This is a server side rendered Next application.
+    
 - `explore-education-statistics-common`
   - Contains common code between the other sub-projects for re-use.
 
 #### Adding dependencies
 
+When adding new NPM dependencies, be aware that we need to be careful about where we add them in the
+`package.json` file. We very deliberately add our dependencies to either `devDependencies` or 
+`dependencies` depending on the subproject.
+
+- `explore-education-statistics-frontend` dependencies are in either `dependencies` or 
+  `devDependencies` to avoid including build dependencies in the `node_modules` that are deployed to
+  environments.
+  
+  This is beneficial for cutting down build times, but in the past, we've also experienced weird 
+  issues with being unable to deploy to the Azure App Service when there are too many `node_modules` 
+  (related to Windows).
+
+- `explore-education-statistics-commmon` dependencies are in `dependencies` as these must all be 
+  included in the final build (admin or public).
+  
+- `explore-education-statistics-admin` dependencies are in `dependencies` simply for consistency
+  and simplicity. We need all dependencies to create the build, so it doesn't make sense to split 
+  out separate `devDependencies`.
+
 **DO NOT** install (`npm install`) any dependencies directly into the sub-projects as this will
 most likely break the sub-project's `package-lock.json` and cause your installation to fail.
 
-Instead you will need to use Lerna itself to do this, for example:
+Instead, you will need to use Lerna to do this, with the following steps:
 
-```bash
-# Using global Lerna install
-lerna add your-dep src/explore-education-statistics-frontend
+1. Directly add dependencies to any required `package.json` file(s).
 
-# Or, using local Lerna install
-./node_modules/.bin/lerna add your-dep src/explore-education-statistics-frontend
-```
+2. Run the following from the project root:
+
+    ```bash
+    npm run bootstrap:install
+    ```
 
 #### Cleaning dependencies
 
-During development you might end up in an inconsistent state where your sub-project `node_modules`
+During development, you might end up in an inconsistent state where your sub-project `node_modules`
 are broken for whatever reason. Consequently, it is advisable to clean down your sub-project
 `node_modules` by running the following from the project root.
 
@@ -261,8 +280,14 @@ These scripts can generally be run from most `package.json` files across the pro
 
 These can only be run from the project root `package.json`.
 
-- `npm run bootstrap` - Install NPM dependencies across entire project and symlink any dependent
-  modules (only from project root).
+- `npm run bootstrap` - Install NPM dependencies to match `package-lock.json` files across entire 
+  project and symlink any dependent modules. This should be used when you want your dependencies to 
+  exactly match the project's requirements (e.g. in a fresh repo, or you changed to a different 
+  branch).
+
+- `npm run bootstrap:install` - Install NPM dependencies to match `package.json` files across entire
+  project and symlink any dependent modules. This should be used when you need to add new 
+  dependencies to the project.
 
 - `npm run clean` - Remove any `node_modules` directories across any sub-projects.
 
