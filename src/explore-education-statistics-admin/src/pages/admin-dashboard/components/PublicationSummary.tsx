@@ -70,22 +70,6 @@ const PublicationSummary = ({ publication, onChangePublication }: Props) => {
                 </p>
               )}
             </td>
-            <td className="dfe-align--right govuk-!-width-one-quarter">
-              {permissions.canUpdatePublication && (
-                <Link
-                  data-testid={`Edit publication link for ${publication.title}`}
-                  unvisited
-                  to={generatePath<PublicationRouteParams>(
-                    publicationEditRoute.path,
-                    {
-                      publicationId: publication.id,
-                    },
-                  )}
-                >
-                  Change <span className="govuk-visually-hidden">team</span>
-                </Link>
-              )}
-            </td>
           </tr>
           <tr>
             <th>Contact</th>
@@ -108,22 +92,6 @@ const PublicationSummary = ({ publication, onChangePublication }: Props) => {
                 </p>
               )}
             </td>
-            <td className="dfe-align--right">
-              {permissions.canUpdatePublication && (
-                <Link
-                  data-testid={`Edit publication link for ${publication.title}`}
-                  unvisited
-                  to={generatePath<PublicationRouteParams>(
-                    publicationEditRoute.path,
-                    {
-                      publicationId: publication.id,
-                    },
-                  )}
-                >
-                  Change <span className="govuk-visually-hidden">contact</span>
-                </Link>
-              )}
-            </td>
           </tr>
           <tr>
             <th>Methodology</th>
@@ -144,27 +112,41 @@ const PublicationSummary = ({ publication, onChangePublication }: Props) => {
                 </>
               )}
             </td>
-            <td className="dfe-align--right">
-              {permissions.canUpdatePublication && (
-                <Link
-                  data-testid={`Edit publication link for ${publication.title}`}
-                  unvisited
-                  to={generatePath<PublicationRouteParams>(
-                    publicationEditRoute.path,
-                    {
-                      publicationId: publication.id,
-                    },
-                  )}
-                >
-                  Change{' '}
-                  <span className="govuk-visually-hidden">methodology</span>
-                </Link>
-              )}
-            </td>
           </tr>
+          {permissions.canUpdatePublication && (
+            <tr>
+              <th>Manage</th>
+              <td>
+                <ButtonGroup className="govuk-!-margin-bottom-2">
+                  <ButtonLink
+                    to={generatePath<PublicationRouteParams>(
+                      publicationEditRoute.path,
+                      {
+                        publicationId: publication.id,
+                      },
+                    )}
+                  >
+                    Manage this publication
+                  </ButtonLink>
+                </ButtonGroup>
+              </td>
+            </tr>
+          )}
           <tr>
             <th>Releases</th>
             <td colSpan={2} data-testid={`Releases for ${publication.title}`}>
+              <ButtonGroup className="govuk-!-margin-bottom-2">
+                {permissions.canCreateReleases && (
+                  <ButtonLink
+                    to={generatePath(releaseCreateRoute.path, {
+                      publicationId: id,
+                    })}
+                    data-testid={`Create new release link for ${title}`}
+                  >
+                    Create new release
+                  </ButtonLink>
+                )}
+              </ButtonGroup>
               {releases.length > 0 ? (
                 <ul className="govuk-list">
                   {releases.filter(noAmendmentInProgressFilter).map(release => (
@@ -180,30 +162,6 @@ const PublicationSummary = ({ publication, onChangePublication }: Props) => {
               ) : (
                 <p>No releases created</p>
               )}
-
-              <ButtonGroup className="govuk-!-margin-bottom-2">
-                {permissions.canCreateReleases && (
-                  <ButtonLink
-                    to={generatePath(releaseCreateRoute.path, {
-                      publicationId: id,
-                    })}
-                    data-testid={`Create new release link for ${title}`}
-                  >
-                    Create new release
-                  </ButtonLink>
-                )}
-                {permissions.canUpdatePublication && (
-                  <ButtonLink
-                    to={generatePath(legacyReleasesRoute.path, {
-                      publicationId: id,
-                    })}
-                    variant="secondary"
-                    data-testid={`Legacy releases link for ${title}`}
-                  >
-                    Manage legacy releases
-                  </ButtonLink>
-                )}
-              </ButtonGroup>
             </td>
           </tr>
         </tbody>
