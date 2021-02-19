@@ -83,7 +83,6 @@ const DataBlockDetailsForm = ({
 
             <FormGroup>
               <FormFieldTextInput<FormValues>
-                id={`${formId}-name`}
                 name="name"
                 label="Name"
                 hint="Name of the data block. This will not be visible to users."
@@ -91,7 +90,6 @@ const DataBlockDetailsForm = ({
               />
 
               <FormFieldTextArea<FormValues>
-                id={`${formId}-heading`}
                 name="heading"
                 className="govuk-!-width-two-thirds"
                 label="Table title"
@@ -103,7 +101,6 @@ const DataBlockDetailsForm = ({
               />
 
               <FormFieldTextInput<FormValues>
-                id={`${formId}-source`}
                 name="source"
                 label="Source"
                 hint="The data source used to create this data."
@@ -111,27 +108,24 @@ const DataBlockDetailsForm = ({
               />
 
               <FormFieldset
-                id={`${formId}-highlight`}
+                id="highlight"
                 legend="Would you like to make this a table highlight?"
                 legendSize="s"
                 hint="Checking this option will make this table available as a popular table when the publication is selected via the table builder"
               >
                 <FormFieldCheckbox<FormValues>
                   name="isHighlight"
-                  id={`${formId}-isHighlight`}
                   label="Set as a table highlight for this publication"
                   conditional={
                     <>
                       <FormFieldTextInput<FormValues>
                         name="highlightName"
-                        id={`${formId}-highlightName`}
                         label="Highlight name"
                         hint="We will show this name to table builder users as a popular table"
                         className="govuk-!-width-two-thirds"
                       />
                       <FormFieldTextArea<FormValues>
                         name="highlightDescription"
-                        id={`${formId}-highlightDescription`}
                         label="Highlight description"
                         hint="Describe the contents of this highlight to table builder users"
                         className="govuk-!-width-two-thirds"

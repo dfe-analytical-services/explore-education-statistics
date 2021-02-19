@@ -119,7 +119,6 @@ const SubscriptionPage: NextPage<Props> = ({
               {form => (
                 <Form id={formId} showSubmitError>
                   <FormFieldTextInput<FormValues>
-                    id={`${formId}-email`}
                     label="Enter your email address"
                     hint="This will only be used to subscribe you to updates. You can unsubscribe at any time"
                     name="email"

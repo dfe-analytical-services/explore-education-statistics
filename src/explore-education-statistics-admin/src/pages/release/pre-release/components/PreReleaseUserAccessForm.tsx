@@ -113,7 +113,6 @@ const PreReleaseUserAccessForm = ({
           {form => (
             <Form id={formId}>
               <FormFieldTextInput<FormValues>
-                id={`${formId}-email`}
                 label="Invite new user by email"
                 name="email"
                 className="govuk-!-width-one-third"

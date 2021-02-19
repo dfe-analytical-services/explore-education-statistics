@@ -145,7 +145,6 @@ const ReleaseMetaGuidanceSection = ({ releaseId, canUpdateRelease }: Props) => {
                     <Form id={formId}>
                       {isEditing ? (
                         <FormFieldEditor<MetaGuidanceFormValues>
-                          id={`${formId}-content`}
                           name="content"
                           label="Main guidance content"
                         />
@@ -184,7 +183,6 @@ const ReleaseMetaGuidanceSection = ({ releaseId, canUpdateRelease }: Props) => {
                                     isEditing ? (
                                       <FormFieldEditor<MetaGuidanceFormValues>
                                         toolbarConfig={toolbarConfigs.simple}
-                                        id={`${formId}-subjects${index}Content`}
                                         name={`subjects[${index}].content`}
                                         label="File guidance content"
                                         testId="fileGuidanceContent"

@@ -177,7 +177,6 @@ const DataFileUploadForm = <FormValues extends DataFileUploadFormValues>({
               {beforeFields}
 
               <FormFieldRadioGroup<DataFileUploadFormValues>
-                id={`${id}-uploadType`}
                 name="uploadType"
                 legend="Choose upload method"
                 options={[
@@ -187,14 +186,12 @@ const DataFileUploadForm = <FormValues extends DataFileUploadFormValues>({
                     conditional: (
                       <>
                         <FormFieldFileInput<DataFileUploadFormValues>
-                          id={`${id}-dataFile`}
                           name="dataFile"
                           label="Upload data file"
                           accept=".csv"
                         />
 
                         <FormFieldFileInput<DataFileUploadFormValues>
-                          id={`${id}-metadataFile`}
                           name="metadataFile"
                           label="Upload metadata file"
                           accept=".csv"
@@ -208,7 +205,6 @@ const DataFileUploadForm = <FormValues extends DataFileUploadFormValues>({
                     value: 'zip',
                     conditional: (
                       <FormFieldFileInput<DataFileUploadFormValues>
-                        id={`${id}-zipFile`}
                         hint="Must contain both the data and metadata CSV files"
                         name="zipFile"
                         label="Upload ZIP file"

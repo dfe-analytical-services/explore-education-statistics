@@ -83,14 +83,12 @@ const MethodologySummaryForm = ({
         return (
           <Form id={id}>
             <FormFieldTextInput<MethodologySummaryFormValues>
-              id={`${id}-title`}
               label="Enter methodology title"
               name="title"
             />
 
             {isContactEnabled && (
               <FormFieldSelect<MethodologySummaryFormValues>
-                id={`${id}-contactId`}
                 hint="They will be the main point of contact for this methodology and its associated publications."
                 label="Choose the contact for this methodology"
                 name="contactId"

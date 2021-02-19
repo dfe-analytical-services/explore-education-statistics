@@ -322,14 +322,9 @@ const ChartAxisConfiguration = ({
 
           <div className="govuk-grid-row">
             <div className="govuk-grid-column-one-half govuk-!-margin-bottom-6">
-              <FormFieldset
-                id={`${id}-general`}
-                legend="General"
-                legendSize="s"
-              >
+              <FormFieldset id="general" legend="General" legendSize="s">
                 {validationSchema.fields.size && (
                   <FormFieldNumberInput<AxisConfiguration>
-                    id={`${id}-size`}
                     name="size"
                     min={0}
                     label="Size of axis (px)"
@@ -339,7 +334,6 @@ const ChartAxisConfiguration = ({
 
                 {validationSchema.fields.groupBy && (
                   <FormFieldSelect<AxisConfiguration>
-                    id={`${id}-groupBy`}
                     label="Group data by"
                     name="groupBy"
                     options={groupByOptions}
@@ -348,7 +342,6 @@ const ChartAxisConfiguration = ({
 
                 {validationSchema.fields.showGrid && (
                   <FormFieldCheckbox<AxisConfiguration>
-                    id={`${id}-showGrid`}
                     name="showGrid"
                     label="Show grid lines"
                   />
@@ -356,13 +349,11 @@ const ChartAxisConfiguration = ({
 
                 {validationSchema.fields.visible && (
                   <FormFieldCheckbox<AxisConfiguration>
-                    id={`${id}-visible`}
                     name="visible"
                     label="Show axis"
                     conditional={
                       <>
                         <FormFieldTextInput<AxisConfiguration>
-                          id={`${id}-unit`}
                           label="Displayed unit"
                           name="unit"
                           hint="Leave blank to set default from metadata"
@@ -373,15 +364,10 @@ const ChartAxisConfiguration = ({
                   />
                 )}
 
-                <FormFieldset id={`${id}-axis`} legend="Labels" legendSize="s">
-                  <FormFieldTextInput
-                    id={`${id}-label-text`}
-                    label="Label"
-                    name="label.text"
-                  />
+                <FormFieldset id="labels" legend="Labels" legendSize="s">
+                  <FormFieldTextInput label="Label" name="label.text" />
 
                   <FormFieldNumberInput
-                    id={`${id}-label-width`}
                     label="Width (px)"
                     name="label.width"
                     width={5}
@@ -391,7 +377,6 @@ const ChartAxisConfiguration = ({
                   {(validationSchema.fields.label as ObjectSchema<Label>).fields
                     .rotated && (
                     <FormFieldCheckbox
-                      id={`${id}-label-rotated`}
                       name="label.rotated"
                       label="Rotate 90 degrees"
                     />
@@ -402,7 +387,7 @@ const ChartAxisConfiguration = ({
 
             <div className="govuk-grid-column-one-half govuk-!-margin-bottom-6">
               {validationSchema.fields.sortAsc && (
-                <FormFieldset id={`${id}-sort`} legend="Sorting" legendSize="s">
+                <FormFieldset id="sort" legend="Sorting" legendSize="s">
                   {/* <FormFieldSelect<AxisConfiguration>*/}
                   {/*  id={`${id}-sortBy`}*/}
                   {/*  name="sortBy"*/}
@@ -410,7 +395,6 @@ const ChartAxisConfiguration = ({
                   {/*  options={sortOptions}*/}
                   {/* />*/}
                   <FormFieldCheckbox<AxisConfiguration>
-                    id={`${id}-sortAsc`}
                     name="sortAsc"
                     label="Sort ascending"
                   />
@@ -419,7 +403,6 @@ const ChartAxisConfiguration = ({
 
               {validationSchema.fields.tickConfig && (
                 <FormFieldRadioGroup<AxisConfiguration>
-                  id={`${id}-tickConfig`}
                   name="tickConfig"
                   legend="Tick display type"
                   legendSize="s"
@@ -438,7 +421,6 @@ const ChartAxisConfiguration = ({
                       value: 'custom',
                       conditional: (
                         <FormFieldNumberInput<AxisConfiguration>
-                          id={`${id}-tickSpacing`}
                           name="tickSpacing"
                           width={10}
                           label="Every nth value"
@@ -453,7 +435,7 @@ const ChartAxisConfiguration = ({
                 (validationSchema.fields.min ||
                   validationSchema.fields.max) && (
                   <FormFieldset
-                    id={`${id}-minorAxisRange`}
+                    id="minorAxisRange"
                     legend="Axis range"
                     legendSize="s"
                     hint="Leaving these values blank will set them to 'auto'"
@@ -461,7 +443,6 @@ const ChartAxisConfiguration = ({
                     <div className={styles.axisRange}>
                       {validationSchema.fields.min && (
                         <FormFieldNumberInput<AxisConfiguration>
-                          id={`${id}-minorMin`}
                           name="min"
                           width={10}
                           label="Minimum value"
@@ -470,7 +451,6 @@ const ChartAxisConfiguration = ({
                       )}
                       {validationSchema.fields.max && (
                         <FormFieldNumberInput<AxisConfiguration>
-                          id={`${id}-minorMax`}
                           name="max"
                           width={10}
                           label="Maximum value"
@@ -484,13 +464,12 @@ const ChartAxisConfiguration = ({
                 (validationSchema.fields.min ||
                   validationSchema.fields.max) && (
                   <FormFieldset
-                    id={`${id}-majorAxisRange`}
+                    id="majorAxisRange"
                     legend="Axis range"
                     legendSize="s"
                   >
                     {validationSchema.fields.min && (
                       <FormFieldSelect<AxisConfiguration>
-                        id={`${id}-majorMin`}
                         label="Minimum"
                         name="min"
                         placeholder="Default"
@@ -499,7 +478,6 @@ const ChartAxisConfiguration = ({
                     )}
                     {validationSchema.fields.max && (
                       <FormFieldSelect<AxisConfiguration>
-                        id={`${id}-majorMax`}
                         label="Maximum"
                         name="max"
                         placeholder="Default"

@@ -160,7 +160,6 @@ const ReleaseStatusForm = ({
           <FormFieldRadioGroup<ReleaseStatusFormValues>
             legend="Status"
             name="status"
-            id={`${formId}-status`}
             order={[]}
             options={[
               {
@@ -184,14 +183,12 @@ const ReleaseStatusForm = ({
           <FormFieldTextArea<ReleaseStatusFormValues>
             name="internalReleaseNote"
             className="govuk-!-width-one-half"
-            id={`${formId}-internalReleaseNote`}
             label="Internal release note"
             rows={3}
           />
 
           {form.values.status === 'Approved' && (
             <FormFieldRadioGroup<ReleaseStatusFormValues>
-              id={`${formId}-publishMethod`}
               name="publishMethod"
               legend="When to publish"
               legendSize="m"
@@ -203,7 +200,6 @@ const ReleaseStatusForm = ({
                   value: 'Scheduled',
                   conditional: (
                     <FormFieldDateInput<ReleaseStatusFormValues>
-                      id={`${formId}-publishScheduled`}
                       name="publishScheduled"
                       legend="Publish date"
                       legendSize="s"
@@ -226,7 +222,6 @@ const ReleaseStatusForm = ({
           )}
 
           <FormFieldDateInput<ReleaseStatusFormValues>
-            id={`${formId}-nextReleaseDate`}
             name="nextReleaseDate"
             legend="Next release expected (optional)"
             legendSize="m"

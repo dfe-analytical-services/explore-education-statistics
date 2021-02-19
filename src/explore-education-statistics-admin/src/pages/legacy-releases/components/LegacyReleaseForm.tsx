@@ -50,14 +50,12 @@ const LegacyReleaseForm = ({
         <Form id={formId}>
           <FormFieldTextInput<FormValues>
             name="description"
-            id={`${formId}-description`}
             label="Description"
             className="govuk-!-width-two-thirds"
           />
 
           <FormFieldTextInput<FormValues>
             name="url"
-            id={`${formId}-url`}
             label="URL"
             className="govuk-!-width-two-thirds"
           />
@@ -65,7 +63,6 @@ const LegacyReleaseForm = ({
           {typeof initialValues?.order !== 'undefined' && (
             <FormFieldNumberInput<FormValues>
               name="order"
-              id={`${formId}-order`}
               label="Order"
               width={2}
             />

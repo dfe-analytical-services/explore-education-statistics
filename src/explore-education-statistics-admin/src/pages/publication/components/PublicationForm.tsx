@@ -193,7 +193,6 @@ const PublicationForm = ({
       {form => (
         <Form id={id}>
           <FormFieldTextInput<FormValues>
-            id={`${id}-title`}
             label="Publication title"
             name="title"
             className="govuk-!-width-two-thirds"
@@ -210,7 +209,6 @@ const PublicationForm = ({
           )}
 
           <FormFieldRadioGroup<FormValues, FormValues['methodologyChoice']>
-            id={`${id}-methodologyChoice`}
             legend="Choose a methodology for this publication"
             legendSize="m"
             name="methodologyChoice"
@@ -220,7 +218,6 @@ const PublicationForm = ({
                 label: 'Choose an existing methodology',
                 conditional: (
                   <FormFieldSelect<FormValues>
-                    id={`${id}-methodologyId`}
                     name="methodologyId"
                     label="Select methodology"
                     placeholder="Choose a methodology"
@@ -244,13 +241,11 @@ const PublicationForm = ({
                   <FormGroup>
                     <FormFieldTextInput
                       label="Link title"
-                      id={`${id}-externalMethodologyTitle`}
                       name="externalMethodology.title"
                       className="govuk-!-width-two-thirds"
                     />
                     <FormFieldTextInput
                       label="URL"
-                      id={`${id}-externalMethodologyUrl`}
                       name="externalMethodology.url"
                       className="govuk-!-width-two-thirds"
                     />
@@ -297,35 +292,31 @@ const PublicationForm = ({
             }}
           />
           <FormFieldset
-            id={`${id}-contact`}
+            id="contact"
             legend="Contact for this publication"
             legendSize="m"
             hint="They will be the main point of contact for data and methodology enquiries for this publication and its releases."
           >
             <FormFieldTextInput<FormValues>
               name="teamName"
-              id={`${id}-teamName`}
               label="Team name"
               className="govuk-!-width-one-half"
             />
 
             <FormFieldTextInput<FormValues>
               name="teamEmail"
-              id={`${id}-teamEmail`}
               label="Team email address"
               className="govuk-!-width-one-half"
             />
 
             <FormFieldTextInput<FormValues>
               name="contactName"
-              id={`${id}-contactName`}
               label="Contact name"
               className="govuk-!-width-one-half"
             />
 
             <FormFieldTextInput<FormValues>
               name="contactTelNo"
-              id={`${id}-contactTelNo`}
               label="Contact telephone number"
               width={10}
             />

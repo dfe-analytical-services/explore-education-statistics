@@ -18,13 +18,13 @@ function FormFieldCheckbox<FormValues>({
 }: Props<FormValues>) {
   return (
     <FormField<string> {...props} type="checkbox" formGroup={formGroup}>
-      {({ field }) => (
+      {({ field, id }) => (
         <div
           className={classNames('govuk-checkboxes', {
             'govuk-checkboxes--small': small,
           })}
         >
-          <FormCheckbox {...props} {...field} />
+          <FormCheckbox {...props} {...field} id={id} />
         </div>
       )}
     </FormField>

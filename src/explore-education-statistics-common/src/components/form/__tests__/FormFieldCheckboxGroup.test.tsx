@@ -1,8 +1,10 @@
+import { Form } from '@common/components/form';
 import Yup from '@common/validation/yup';
 import { waitFor } from '@testing-library/dom';
-import { fireEvent, render, screen } from '@testing-library/react';
+import { render, screen } from '@testing-library/react';
 import userEvent from '@testing-library/user-event';
 import { Formik } from 'formik';
+import noop from 'lodash/noop';
 import React from 'react';
 import FormFieldCheckboxGroup from '../FormFieldCheckboxGroup';
 
@@ -11,13 +13,157 @@ describe('FormFieldCheckboxGroup', () => {
     test: string[];
   }
 
+  test('renders with correct default ids without form', () => {
+    render(
+      <Formik<FormValues>
+        initialValues={{
+          test: [],
+        }}
+        onSubmit={noop}
+      >
+        <FormFieldCheckboxGroup<FormValues>
+          name="test"
+          legend="Test checkboxes"
+          selectAll
+          options={[
+            { label: 'Checkbox 1', value: '1' },
+            { label: 'Checkbox 2', value: '2' },
+            { label: 'Checkbox 3', value: '3' },
+          ]}
+        />
+      </Formik>,
+    );
+
+    expect(screen.getByRole('group')).toHaveAttribute('id', 'test');
+    expect(screen.getByLabelText('Checkbox 1')).toHaveAttribute('id', 'test-1');
+    expect(screen.getByLabelText('Checkbox 2')).toHaveAttribute('id', 'test-2');
+    expect(screen.getByLabelText('Checkbox 3')).toHaveAttribute('id', 'test-3');
+  });
+
+  test('renders with correct default ids with form', () => {
+    render(
+      <Formik<FormValues>
+        initialValues={{
+          test: [],
+        }}
+        onSubmit={noop}
+      >
+        <Form id="testForm">
+          <FormFieldCheckboxGroup<FormValues>
+            name="test"
+            legend="Test checkboxes"
+            selectAll
+            options={[
+              { label: 'Checkbox 1', value: '1' },
+              { label: 'Checkbox 2', value: '2' },
+              { label: 'Checkbox 3', value: '3' },
+            ]}
+          />
+        </Form>
+      </Formik>,
+    );
+
+    expect(screen.getByRole('group')).toHaveAttribute('id', 'testForm-test');
+    expect(screen.getByLabelText('Checkbox 1')).toHaveAttribute(
+      'id',
+      'testForm-test-1',
+    );
+    expect(screen.getByLabelText('Checkbox 2')).toHaveAttribute(
+      'id',
+      'testForm-test-2',
+    );
+    expect(screen.getByLabelText('Checkbox 3')).toHaveAttribute(
+      'id',
+      'testForm-test-3',
+    );
+  });
+
+  test('renders with correct custom ids with form', () => {
+    render(
+      <Formik<FormValues>
+        initialValues={{
+          test: [],
+        }}
+        onSubmit={noop}
+      >
+        <Form id="testForm">
+          <FormFieldCheckboxGroup<FormValues>
+            id="customId"
+            name="test"
+            legend="Test checkboxes"
+            selectAll
+            options={[
+              { label: 'Checkbox 1', value: '1' },
+              { label: 'Checkbox 2', value: '2' },
+              { id: 'customOption', label: 'Checkbox 3', value: '3' },
+            ]}
+          />
+        </Form>
+      </Formik>,
+    );
+
+    expect(screen.getByRole('group')).toHaveAttribute(
+      'id',
+      'testForm-customId',
+    );
+    expect(screen.getByLabelText('Checkbox 1')).toHaveAttribute(
+      'id',
+      'testForm-customId-1',
+    );
+    expect(screen.getByLabelText('Checkbox 2')).toHaveAttribute(
+      'id',
+      'testForm-customId-2',
+    );
+    expect(screen.getByLabelText('Checkbox 3')).toHaveAttribute(
+      'id',
+      'testForm-customId-customOption',
+    );
+  });
+
+  test('renders with correct custom ids without form', () => {
+    render(
+      <Formik<FormValues>
+        initialValues={{
+          test: [],
+        }}
+        onSubmit={noop}
+      >
+        <FormFieldCheckboxGroup<FormValues>
+          id="customId"
+          name="test"
+          legend="Test checkboxes"
+          selectAll
+          options={[
+            { label: 'Checkbox 1', value: '1' },
+            { label: 'Checkbox 2', value: '2' },
+            { id: 'customOption', label: 'Checkbox 3', value: '3' },
+          ]}
+        />
+      </Formik>,
+    );
+
+    expect(screen.getByRole('group')).toHaveAttribute('id', 'customId');
+    expect(screen.getByLabelText('Checkbox 1')).toHaveAttribute(
+      'id',
+      'customId-1',
+    );
+    expect(screen.getByLabelText('Checkbox 2')).toHaveAttribute(
+      'id',
+      'customId-2',
+    );
+    expect(screen.getByLabelText('Checkbox 3')).toHaveAttribute(
+      'id',
+      'customId-customOption',
+    );
+  });
+
   test('checking option checks it', () => {
     render(
       <Formik
         initialValues={{
           test: [],
         }}
-        onSubmit={() => undefined}
+        onSubmit={noop}
       >
         {() => (
           <FormFieldCheckboxGroup<FormValues>
@@ -49,7 +195,7 @@ describe('FormFieldCheckboxGroup', () => {
         initialValues={{
           test: ['1'],
         }}
-        onSubmit={() => undefined}
+        onSubmit={noop}
       >
         {() => (
           <FormFieldCheckboxGroup<FormValues>
@@ -81,7 +227,7 @@ describe('FormFieldCheckboxGroup', () => {
         initialValues={{
           test: [],
         }}
-        onSubmit={() => undefined}
+        onSubmit={noop}
       >
         {() => (
           <FormFieldCheckboxGroup<FormValues>
@@ -120,7 +266,7 @@ describe('FormFieldCheckboxGroup', () => {
         initialValues={{
           test: ['1', '2', '3'],
         }}
-        onSubmit={() => undefined}
+        onSubmit={noop}
       >
         {() => (
           <FormFieldCheckboxGroup<FormValues>
@@ -161,7 +307,7 @@ describe('FormFieldCheckboxGroup', () => {
         initialValues={{
           test: [],
         }}
-        onSubmit={() => undefined}
+        onSubmit={noop}
       >
         {() => (
           <FormFieldCheckboxGroup<FormValues>
@@ -212,7 +358,7 @@ describe('FormFieldCheckboxGroup', () => {
         initialValues={{
           test: ['1', '2', '3'],
         }}
-        onSubmit={() => undefined}
+        onSubmit={noop}
       >
         {() => (
           <FormFieldCheckboxGroup<FormValues>
@@ -258,7 +404,7 @@ describe('FormFieldCheckboxGroup', () => {
           initialValues={{
             test: [],
           }}
-          onSubmit={() => undefined}
+          onSubmit={noop}
           validationSchema={Yup.object({
             test: Yup.array().required('Select at least one option'),
           })}
@@ -287,7 +433,7 @@ describe('FormFieldCheckboxGroup', () => {
           initialValues={{
             test: [],
           }}
-          onSubmit={() => undefined}
+          onSubmit={noop}
           validationSchema={Yup.object({
             test: Yup.array().required('Select at least one option'),
           })}
@@ -313,7 +459,7 @@ describe('FormFieldCheckboxGroup', () => {
 
       expect(screen.queryByText('Select at least one option')).toBeNull();
 
-      fireEvent.click(screen.getByRole('button', { name: 'Submit' }));
+      userEvent.click(screen.getByRole('button', { name: 'Submit' }));
 
       await waitFor(() => {
         expect(
@@ -328,7 +474,7 @@ describe('FormFieldCheckboxGroup', () => {
           initialValues={{
             test: [],
           }}
-          onSubmit={() => undefined}
+          onSubmit={noop}
           validationSchema={Yup.object({
             test: Yup.array().required('Select at least one option'),
           })}
@@ -364,7 +510,7 @@ describe('FormFieldCheckboxGroup', () => {
           initialValues={{
             test: [],
           }}
-          onSubmit={() => undefined}
+          onSubmit={noop}
           validationSchema={Yup.object({
             test: Yup.array().required('Select at least one option'),
           })}
@@ -409,7 +555,7 @@ describe('FormFieldCheckboxGroup', () => {
           initialTouched={{
             test: true,
           }}
-          onSubmit={() => undefined}
+          onSubmit={noop}
           validationSchema={Yup.object({
             test: Yup.array().required('Select at least one option'),
           })}
@@ -451,7 +597,7 @@ describe('FormFieldCheckboxGroup', () => {
           initialValues={{
             test: ['1'],
           }}
-          onSubmit={() => undefined}
+          onSubmit={noop}
           validationSchema={Yup.object({
             test: Yup.array().required('Select at least one option'),
           })}

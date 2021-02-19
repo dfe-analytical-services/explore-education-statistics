@@ -162,14 +162,12 @@ const ReleaseFileUploadsSection = ({ releaseId, canUpdateRelease }: Props) => {
                   )}
 
                   <FormFieldTextInput<FormValues>
-                    id={`${formId}-name`}
                     name="name"
                     label="Name"
                     width={20}
                   />
 
                   <FormFieldFileInput<FormValues>
-                    id={`${formId}-file`}
                     name="file"
                     label="Upload file"
                   />

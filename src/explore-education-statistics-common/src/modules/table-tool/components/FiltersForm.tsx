@@ -13,7 +13,6 @@ import { Dictionary } from '@common/types';
 import createErrorHelper from '@common/validation/createErrorHelper';
 import Yup from '@common/validation/yup';
 import { Formik } from 'formik';
-import camelCase from 'lodash/camelCase';
 import mapValues from 'lodash/mapValues';
 import React, { useMemo } from 'react';
 import FormFieldCheckboxGroupsMenu from './FormFieldCheckboxGroupsMenu';
@@ -119,7 +118,6 @@ const FiltersForm = (props: Props & InjectedWizardProps) => {
                   <div className="govuk-grid-column-one-half-from-desktop">
                     <FormFieldCheckboxSearchSubGroups
                       name="indicators"
-                      id={`${formId}-indicators`}
                       legend={
                         <>
                           Indicators
@@ -140,7 +138,7 @@ const FiltersForm = (props: Props & InjectedWizardProps) => {
 
                     {Object.entries(subjectMeta.filters).length > 0 && (
                       <FormFieldset
-                        id={`${formId}-filters`}
+                        id="filters"
                         legend="Categories"
                         legendSize="m"
                         hint="Select at least one option from all categories"
@@ -154,7 +152,6 @@ const FiltersForm = (props: Props & InjectedWizardProps) => {
                               <FormFieldCheckboxGroupsMenu
                                 key={filterKey}
                                 name={filterName}
-                                id={`${formId}-${camelCase(filterKey)}`}
                                 legend={filterGroup.legend}
                                 hint={filterGroup.hint}
                                 disabled={form.isSubmitting}
@@ -176,7 +173,6 @@ const FiltersForm = (props: Props & InjectedWizardProps) => {
 
               <WizardStepFormActions
                 {...props}
-                formId={formId}
                 submitText="Create table"
                 submittingText="Creating table"
                 onSubmitClick={() => {

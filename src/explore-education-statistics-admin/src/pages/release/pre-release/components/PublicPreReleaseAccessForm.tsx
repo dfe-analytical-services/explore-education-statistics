@@ -72,7 +72,6 @@ const PublicPreReleaseAccessForm = ({
           <Form id={formId}>
             <FormFieldEditor<FormValues>
               name="preReleaseAccessList"
-              id={`${formId}-preReleaseAccessList`}
               label="Public access list"
               focusOnInit
             />

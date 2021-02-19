@@ -105,7 +105,6 @@ const ReleaseNotesSection = ({ release }: Props) => {
           return (
             <Form id={formId}>
               <FormFieldTextArea<CreateFormValues>
-                id={`${formId}-reason`}
                 label="New release note"
                 name="reason"
                 rows={3}
@@ -162,13 +161,11 @@ const ReleaseNotesSection = ({ release }: Props) => {
           return (
             <Form id={formId}>
               <FormFieldDateInput<EditFormValues>
-                id={`${formId}-on`}
                 name="on"
                 legend="Edit date"
                 legendSize="s"
               />
               <FormFieldTextArea<EditFormValues>
-                id={`${formId}-reason`}
                 label="Edit release note"
                 name="reason"
                 rows={3}

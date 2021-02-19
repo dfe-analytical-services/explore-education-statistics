@@ -122,7 +122,6 @@ const Comments = ({
               <FormFieldTextArea<FormValues>
                 label="Comment"
                 name="content"
-                id={`${blockId}-addCommentForm-content`}
                 rows={3}
               />
 

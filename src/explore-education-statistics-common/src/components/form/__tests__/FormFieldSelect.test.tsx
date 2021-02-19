@@ -1,6 +1,10 @@
+import { Form } from '@common/components/form';
 import Yup from '@common/validation/yup';
-import { fireEvent, render, wait } from '@testing-library/react';
+import { waitFor } from '@testing-library/dom';
+import { render, screen } from '@testing-library/react';
+import userEvent from '@testing-library/user-event';
 import { Formik, FormikProps } from 'formik';
+import noop from 'lodash/noop';
 import React from 'react';
 import FormFieldSelect from '../FormFieldSelect';
 
@@ -9,13 +13,141 @@ describe('FormFieldSelect', () => {
     test: string;
   }
 
-  test('changing options changes the select value', async () => {
-    const { getByLabelText } = render(
+  test('renders with correct defaults ids with form', () => {
+    render(
       <Formik
         initialValues={{
           test: '',
         }}
-        onSubmit={() => undefined}
+        onSubmit={noop}
+      >
+        <Form id="testForm">
+          <FormFieldSelect<FormValues>
+            name="test"
+            label="Test values"
+            hint="Test hint"
+            options={[
+              { value: '', label: '' },
+              { value: '1', label: 'Option 1' },
+              { value: '2', label: 'Option 2' },
+              { value: '3', label: 'Option 3' },
+            ]}
+          />
+        </Form>
+      </Formik>,
+    );
+
+    expect(screen.getByText('Test hint')).toHaveAttribute(
+      'id',
+      'testForm-test-hint',
+    );
+    expect(screen.getByLabelText('Test values')).toHaveAttribute(
+      'id',
+      'testForm-test',
+    );
+  });
+
+  test('renders with correct defaults ids without form', () => {
+    render(
+      <Formik
+        initialValues={{
+          test: '',
+        }}
+        onSubmit={noop}
+      >
+        <FormFieldSelect<FormValues>
+          name="test"
+          label="Test values"
+          hint="Test hint"
+          options={[
+            { value: '', label: '' },
+            { value: '1', label: 'Option 1' },
+            { value: '2', label: 'Option 2' },
+            { value: '3', label: 'Option 3' },
+          ]}
+        />
+      </Formik>,
+    );
+
+    expect(screen.getByText('Test hint')).toHaveAttribute('id', 'test-hint');
+    expect(screen.getByLabelText('Test values')).toHaveAttribute('id', 'test');
+  });
+
+  test('renders with correct custom ids with form', () => {
+    render(
+      <Formik
+        initialValues={{
+          test: '',
+        }}
+        onSubmit={noop}
+      >
+        <Form id="testForm">
+          <FormFieldSelect<FormValues>
+            name="test"
+            id="customId"
+            label="Test values"
+            hint="Test hint"
+            options={[
+              { value: '', label: '' },
+              { value: '1', label: 'Option 1' },
+              { value: '2', label: 'Option 2' },
+              { value: '3', label: 'Option 3' },
+            ]}
+          />
+        </Form>
+      </Formik>,
+    );
+
+    expect(screen.getByText('Test hint')).toHaveAttribute(
+      'id',
+      'testForm-customId-hint',
+    );
+    expect(screen.getByLabelText('Test values')).toHaveAttribute(
+      'id',
+      'testForm-customId',
+    );
+  });
+
+  test('renders with correct custom ids without form', () => {
+    render(
+      <Formik
+        initialValues={{
+          test: '',
+        }}
+        onSubmit={noop}
+      >
+        <FormFieldSelect<FormValues>
+          name="test"
+          id="customId"
+          label="Test values"
+          hint="Test hint"
+          options={[
+            { value: '', label: '' },
+            { value: '1', label: 'Option 1' },
+            { value: '2', label: 'Option 2' },
+            { value: '3', label: 'Option 3' },
+          ]}
+        />
+      </Formik>,
+    );
+
+    expect(screen.getByText('Test hint')).toHaveAttribute(
+      'id',
+      'customId-hint',
+    );
+    expect(screen.getByLabelText('Test values')).toHaveAttribute(
+      'id',
+      'customId',
+    );
+  });
+
+  test('changing options changes the select value', async () => {
+    render(
+      <Formik
+        initialValues={{
+          test: '',
+        }}
+        onSubmit={noop}
       >
         {() => (
           <FormFieldSelect<FormValues>
@@ -33,29 +165,25 @@ describe('FormFieldSelect', () => {
       </Formik>,
     );
 
-    const select = getByLabelText('Test values') as HTMLInputElement;
+    const select = screen.getByLabelText('Test values') as HTMLInputElement;
 
     expect(select.value).toBe('');
 
-    fireEvent.change(select, {
-      target: {
-        value: '1',
-      },
+    userEvent.selectOptions(select, '1');
+
+    await waitFor(() => {
+      expect(select.value).toBe('1');
     });
-
-    await wait();
-
-    expect(select.value).toBe('1');
   });
 
   describe('error messages', () => {
     test('does not display validation message when select is untouched', async () => {
-      const { queryByText } = render(
+      render(
         <Formik
           initialValues={{
             test: '',
           }}
-          onSubmit={() => undefined}
+          onSubmit={noop}
           validationSchema={Yup.object({
             test: Yup.string().required('Select an option'),
           })}
@@ -76,16 +204,16 @@ describe('FormFieldSelect', () => {
         </Formik>,
       );
 
-      expect(queryByText('Select an option')).toBeNull();
+      expect(screen.queryByText('Select an option')).not.toBeInTheDocument();
     });
 
     test('displays validation message when an invalid option is selected', async () => {
-      const { getByLabelText, queryByText } = render(
+      render(
         <Formik
           initialValues={{
             test: '1',
           }}
-          onSubmit={() => undefined}
+          onSubmit={noop}
           validationSchema={Yup.object({
             test: Yup.string().required('Select an option'),
           })}
@@ -113,30 +241,26 @@ describe('FormFieldSelect', () => {
         </Formik>,
       );
 
-      const select = getByLabelText('Test values') as HTMLInputElement;
+      const select = screen.getByLabelText('Test values') as HTMLInputElement;
 
       expect(select.value).toBe('1');
-      expect(queryByText('Select an option')).toBeNull();
+      expect(screen.queryByText('Select an option')).not.toBeInTheDocument();
 
-      fireEvent.change(select, {
-        target: {
-          value: '',
-        },
+      userEvent.selectOptions(select, '');
+
+      await waitFor(() => {
+        expect(select.value).toBe('');
+        expect(screen.queryByText('Select an option')).toBeInTheDocument();
       });
-
-      await wait();
-
-      expect(select.value).toBe('');
-      expect(queryByText('Select an option')).not.toBeNull();
     });
 
     test('displays validation message when form is submitted', async () => {
-      const { getByText, queryByText } = render(
+      render(
         <Formik
           initialValues={{
             test: '',
           }}
-          onSubmit={() => undefined}
+          onSubmit={noop}
           validationSchema={Yup.object({
             test: Yup.string().required('Select an option'),
           })}
@@ -161,22 +285,22 @@ describe('FormFieldSelect', () => {
         </Formik>,
       );
 
-      expect(queryByText('Select an option')).toBeNull();
+      expect(screen.queryByText('Select an option')).not.toBeInTheDocument();
 
-      fireEvent.click(getByText('Submit'));
+      userEvent.click(screen.getByText('Submit'));
 
-      await wait();
-
-      expect(queryByText('Select an option')).not.toBeNull();
+      await waitFor(() => {
+        expect(screen.queryByText('Select an option')).toBeInTheDocument();
+      });
     });
 
     test('does not display validation message when `showError` is false and invalid option is selected', async () => {
-      const { getByLabelText, queryByText } = render(
+      render(
         <Formik
           initialValues={{
             test: '1',
           }}
-          onSubmit={() => undefined}
+          onSubmit={noop}
           validationSchema={Yup.object({
             test: Yup.string().required('Select an option'),
           })}
@@ -205,30 +329,26 @@ describe('FormFieldSelect', () => {
         </Formik>,
       );
 
-      const select = getByLabelText('Test values') as HTMLInputElement;
+      const select = screen.getByLabelText('Test values') as HTMLInputElement;
 
       expect(select.value).toBe('1');
-      expect(queryByText('Select an option')).toBeNull();
+      expect(screen.queryByText('Select an option')).not.toBeInTheDocument();
 
-      fireEvent.change(select, {
-        target: {
-          value: '',
-        },
+      userEvent.selectOptions(select, '');
+
+      await waitFor(() => {
+        expect(select.value).toBe('');
+        expect(screen.queryByText('Select an option')).not.toBeInTheDocument();
       });
-
-      await wait();
-
-      expect(select.value).toBe('');
-      expect(queryByText('Select an option')).toBeNull();
     });
 
     test('does not display validation message when `showError` is false and form is submitted', async () => {
-      const { getByLabelText, getByText, queryByText } = render(
+      render(
         <Formik
           initialValues={{
             test: '',
           }}
-          onSubmit={() => undefined}
+          onSubmit={noop}
           validationSchema={Yup.object({
             test: Yup.string().required('Select an option'),
           })}
@@ -254,17 +374,17 @@ describe('FormFieldSelect', () => {
         </Formik>,
       );
 
-      const select = getByLabelText('Test values') as HTMLInputElement;
+      const select = screen.getByLabelText('Test values') as HTMLInputElement;
 
       expect(select.value).toBe('');
-      expect(queryByText('Select an option')).toBeNull();
+      expect(screen.queryByText('Select an option')).not.toBeInTheDocument();
 
-      fireEvent.click(getByText('Submit'));
+      userEvent.click(screen.getByText('Submit'));
 
-      await wait();
-
-      expect(select.value).toBe('');
-      expect(queryByText('Select an option')).toBeNull();
+      await waitFor(() => {
+        expect(select.value).toBe('');
+        expect(screen.queryByText('Select an option')).not.toBeInTheDocument();
+      });
     });
   });
 });

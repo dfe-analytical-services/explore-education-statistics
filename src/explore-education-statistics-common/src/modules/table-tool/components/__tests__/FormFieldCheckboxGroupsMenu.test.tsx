@@ -1,5 +1,6 @@
 import { fireEvent, render, screen } from '@testing-library/react';
 import { Formik } from 'formik';
+import noop from 'lodash/noop';
 import React from 'react';
 import FormFieldCheckboxGroupsMenu from '../FormFieldCheckboxGroupsMenu';
 
@@ -10,7 +11,7 @@ describe('FormFieldCheckboxGroupsMenu', () => {
         initialValues={{
           test: '',
         }}
-        onSubmit={() => undefined}
+        onSubmit={noop}
       >
         <FormFieldCheckboxGroupsMenu
           id="test"
@@ -54,7 +55,7 @@ describe('FormFieldCheckboxGroupsMenu', () => {
         initialValues={{
           test: '',
         }}
-        onSubmit={() => undefined}
+        onSubmit={noop}
       >
         <FormFieldCheckboxGroupsMenu
           id="test"
@@ -89,7 +90,7 @@ describe('FormFieldCheckboxGroupsMenu', () => {
         initialValues={{
           test: '',
         }}
-        onSubmit={() => undefined}
+        onSubmit={noop}
       >
         <FormFieldCheckboxGroupsMenu
           id="test"
@@ -122,7 +123,7 @@ describe('FormFieldCheckboxGroupsMenu', () => {
         initialTouched={{
           test: true,
         }}
-        onSubmit={() => undefined}
+        onSubmit={noop}
       >
         <FormFieldCheckboxGroupsMenu
           id="test"
@@ -158,7 +159,7 @@ describe('FormFieldCheckboxGroupsMenu', () => {
         initialTouched={{
           test: true,
         }}
-        onSubmit={() => undefined}
+        onSubmit={noop}
       >
         <FormFieldCheckboxGroupsMenu
           id="test"

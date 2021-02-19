@@ -29,7 +29,8 @@ export type FormRadioGroupProps<Value extends string = string> = {
   order?: OrderKeys<RadioOption<Value>>;
   orderDirection?: OrderDirection | OrderDirection[];
   value?: string;
-} & OmitStrict<FormFieldsetProps, 'onBlur' | 'onFocus'> & {
+} & OmitStrict<FormFieldsetProps, 'useFormId' | 'onBlur' | 'onFocus'> & {
+    useFieldsetFormId?: boolean;
     onFieldsetBlur?: FocusEventHandler<HTMLFieldSetElement>;
     onFieldsetFocus?: FocusEventHandler<HTMLFieldSetElement>;
   };
@@ -54,6 +55,7 @@ const FormRadioGroup = <Value extends string = string>({
       {...props}
       hint={hint}
       legendSize={legendSize}
+      useFormId={false}
       onBlur={onFieldsetBlur}
       onFocus={onFieldsetFocus}
     >
@@ -69,7 +71,7 @@ const FormRadioGroup = <Value extends string = string>({
             {...option}
             id={
               option.id
-                ? option.id
+                ? `${id}-${option.id}`
                 : `${id}-${option.value.replace(/\s/g, '-')}`
             }
             checked={value === option.value}
