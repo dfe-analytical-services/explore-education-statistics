@@ -173,102 +173,102 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Processor.Services
             PlanningArea planningArea = null)
         {
             var predicateBuilder = PredicateBuilder.True<Location>()
-                .And(location => location.Country.Code == country.Code 
-                                 && location.Country.Name == country.Name);
+                .And(location => location.Country_Code == country.Code 
+                                 && location.Country_Name == country.Name);
 
             if (institution != null)
             {
                 predicateBuilder = predicateBuilder
-                    .And(location => location.Institution.Code == institution.Code 
-                                     && location.Institution.Name == institution.Name);
+                    .And(location => location.Institution_Code == institution.Code 
+                                     && location.Institution_Name == institution.Name);
             }
 
             if (localAuthority != null)
             {
                 // Also match the old LA code even if blank
                 predicateBuilder = predicateBuilder
-                    .And(location => location.LocalAuthority.Code == localAuthority.Code
-                        && location.LocalAuthority.OldCode == localAuthority.OldCode
-                        && location.LocalAuthority.Name == localAuthority.Name);
+                    .And(location => location.LocalAuthority_Code == localAuthority.Code
+                        && location.LocalAuthority_OldCode == localAuthority.OldCode
+                        && location.LocalAuthority_Name == localAuthority.Name);
             }
 
             if (localAuthorityDistrict != null)
             {
                 predicateBuilder = predicateBuilder
                     .And(location =>
-                        location.LocalAuthorityDistrict.Code == localAuthorityDistrict.Code
-                        && location.LocalAuthorityDistrict.Name == localAuthorityDistrict.Name);
+                        location.LocalAuthorityDistrict_Code == localAuthorityDistrict.Code
+                        && location.LocalAuthorityDistrict_Name == localAuthorityDistrict.Name);
             }
 
             if (localEnterprisePartnership != null)
             {
                 predicateBuilder = predicateBuilder
                     .And(location =>
-                        location.LocalEnterprisePartnership.Code == localEnterprisePartnership.Code
-                        && location.LocalEnterprisePartnership.Name == localEnterprisePartnership.Name);
+                        location.LocalEnterprisePartnership_Code == localEnterprisePartnership.Code
+                        && location.LocalEnterprisePartnership_Name == localEnterprisePartnership.Name);
             }
 
             if (mayoralCombinedAuthority != null)
             {
                 predicateBuilder = predicateBuilder
-                    .And(location => location.MayoralCombinedAuthority.Code == mayoralCombinedAuthority.Code
-                                     && location.MayoralCombinedAuthority.Name == mayoralCombinedAuthority.Name);
+                    .And(location => location.MayoralCombinedAuthority_Code == mayoralCombinedAuthority.Code
+                                     && location.MayoralCombinedAuthority_Name == mayoralCombinedAuthority.Name);
             }
 
             if (multiAcademyTrust != null)
             {
                 predicateBuilder = predicateBuilder
-                    .And(location => location.MultiAcademyTrust.Code == multiAcademyTrust.Code
-                                     && location.MultiAcademyTrust.Name == multiAcademyTrust.Name);
+                    .And(location => location.MultiAcademyTrust_Code == multiAcademyTrust.Code
+                                     && location.MultiAcademyTrust_Name == multiAcademyTrust.Name);
             }
 
             if (opportunityArea != null)
             {
                 predicateBuilder = predicateBuilder
-                    .And(location => location.OpportunityArea.Code == opportunityArea.Code
-                                     && location.OpportunityArea.Name == opportunityArea.Name);
+                    .And(location => location.OpportunityArea_Code == opportunityArea.Code
+                                     && location.OpportunityArea_Name == opportunityArea.Name);
             }
 
             if (parliamentaryConstituency != null)
             {
                 predicateBuilder = predicateBuilder
-                    .And(location => location.ParliamentaryConstituency.Code == parliamentaryConstituency.Code
-                                     && location.ParliamentaryConstituency.Name == parliamentaryConstituency.Name);
+                    .And(location => location.ParliamentaryConstituency_Code == parliamentaryConstituency.Code
+                                     && location.ParliamentaryConstituency_Name == parliamentaryConstituency.Name);
             }
 
             if (region != null)
             {
                 predicateBuilder = predicateBuilder
-                    .And(location => location.Region.Code == region.Code
-                                     && location.Region.Name == region.Name);
+                    .And(location => location.Region_Code == region.Code
+                                     && location.Region_Name == region.Name);
             }
             
             // Note that Name is not included in the predicate here as it is the same as the code
             if (rscRegion != null)
             {
                 predicateBuilder = predicateBuilder
-                    .And(location => location.RscRegion.Code == rscRegion.Code);
+                    .And(location => location.RscRegion_Code == rscRegion.Code);
             }
 
             if (sponsor != null)
             {
                 predicateBuilder = predicateBuilder
-                    .And(location => location.Sponsor.Code == sponsor.Code
-                                     && location.Sponsor.Name == sponsor.Name);
+                    .And(location => location.Sponsor_Code == sponsor.Code
+                                     && location.Sponsor_Name == sponsor.Name);
             }
 
             if (ward != null)
             {
                 predicateBuilder = predicateBuilder
-                    .And(location => location.Ward.Code == ward.Code
-                                     && location.Ward.Name == ward.Name);
+                    .And(location => location.Ward_Code == ward.Code
+                                     && location.Ward_Name == ward.Name);
             }
 
             if (planningArea != null)
             {
                 predicateBuilder = predicateBuilder
-                    .And(location => location.PlanningArea.Code == planningArea.Code
-                                     && location.PlanningArea.Name == planningArea.Name);
+                    .And(location => location.PlanningArea_Code == planningArea.Code
+                                     && location.PlanningArea_Name == planningArea.Name);
             }
             
             return context.Location.AsNoTracking().FirstOrDefault(predicateBuilder);

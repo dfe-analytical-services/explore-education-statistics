@@ -268,9 +268,9 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Processor.Services
                     var rowValues = CsvUtil.GetRowValues(row);
                     var colValues = CsvUtil.GetColumnValues(cols);
 
-                    ImporterService.GetGeographicLevel(rowValues, colValues);
-                    ImporterService.GetTimeIdentifier(rowValues, colValues);
-                    ImporterService.GetYear(rowValues, colValues);
+                    _importerService.GetGeographicLevel(rowValues, colValues);
+                    _importerService.GetTimeIdentifier(rowValues, colValues);
+                    _importerService.GetYear(rowValues, colValues);
                     
                     if (!IsGeographicLevelIgnored(rowValues, colValues))
                     {
