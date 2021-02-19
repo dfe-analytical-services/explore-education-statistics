@@ -2,6 +2,7 @@ using System;
 using System.Threading.Tasks;
 using GovUk.Education.ExploreEducationStatistics.Common.Model;
 using GovUk.Education.ExploreEducationStatistics.Common.Services.Interfaces;
+using GovUk.Education.ExploreEducationStatistics.Common.Utils;
 using GovUk.Education.ExploreEducationStatistics.Content.Model.Extensions;
 using GovUk.Education.ExploreEducationStatistics.Data.Processor.Model;
 using GovUk.Education.ExploreEducationStatistics.Data.Processor.Services.Interfaces;
@@ -51,7 +52,8 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Processor.Services
 
         public async Task ProcessStage1(Guid importId, ExecutionContext executionContext)
         {
-            await _validatorService.Validate(importId, executionContext)
+            await _logger.WithTimingDebug(() => 
+                _validatorService.Validate(importId, executionContext)
                 .OnSuccessDo(async result =>
                 {
                     await _dataImportService.Update(importId, 
@@ -64,35 +66,45 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Processor.Services
                     await _dataImportService.FailImport(importId, errors);
 
                     _logger.LogError($"Import {importId} FAILED ...check log");
-                });
+                }), 
+                "complete Stage 1");
         }
 
         public async Task ProcessStage2(Guid importId)
         {
-            var statisticsDbContext = DbUtils.CreateStatisticsDbContext();
+            await _logger.WithTimingDebug(async () =>
+            {
+                var statisticsDbContext = DbUtils.CreateStatisticsDbContext();
 
-            var import = await _dataImportService.GetImport(importId);
+                var import = await _dataImportService.GetImport(importId);
 
-            var subject = await statisticsDbContext.Subject.FindAsync(import.SubjectId);
+                var subject = await statisticsDbContext.Subject.FindAsync(import.SubjectId);
 
-            var metaFileStream = await _blobStorageService.StreamBlob(PrivateFilesContainerName, import.MetaFile.Path());
-            var metaFileTable = DataTableUtils.CreateFromStream(metaFileStream);
+                var metaFileStream =
+                    await _blobStorageService.StreamBlob(PrivateFilesContainerName, import.MetaFile.Path());
+                var metaFileTable = DataTableUtils.CreateFromStream(metaFileStream);
 
-            _importerService.ImportMeta(metaFileTable, subject, statisticsDbContext);
-            await statisticsDbContext.SaveChangesAsync();
+                _importerService.ImportMeta(metaFileTable, subject, statisticsDbContext);
+                await statisticsDbContext.SaveChangesAsync();
 
-            await _fileImportService.ImportFiltersAndLocations(import.Id, statisticsDbContext);
-            await statisticsDbContext.SaveChangesAsync();
+                await _fileImportService.ImportFiltersAndLocations(import.Id, statisticsDbContext);
+                await statisticsDbContext.SaveChangesAsync();
+            }, "complete Stage 2");
         }
 
         public async Task ProcessStage3(Guid importId)
         {
-            await _splitFileService.SplitDataFile(importId);
+            await _logger.WithTimingDebug(
+                () => _splitFileService.SplitDataFile(importId), 
+                "complete Stage 3");
         }
 
         public async Task ProcessStage4Messages(Guid importId, ICollector<ImportObservationsMessage> collector)
         {
-            await _splitFileService.AddBatchDataFileMessages(importId, collector);
+            
+            await _logger.WithTimingDebug(
+                () => _splitFileService.AddBatchDataFileMessages(importId, collector), 
+                "complete Stage 4 message creation");
         }
     }
 }

@@ -55,7 +55,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Content.Model
         // EES-1231 Temporary column to differentiate rows migrated from table storage from newer imports 
         public bool Migrated { get; set; }
 
-        public List<DataImportError> Errors { get; set; }
+        public List<DataImportError> Errors { get; set; } = new List<DataImportError>();
 
         public int PercentageComplete()
         {

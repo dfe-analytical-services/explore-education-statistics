@@ -10,6 +10,7 @@ using GovUk.Education.ExploreEducationStatistics.Common.Extensions;
 using GovUk.Education.ExploreEducationStatistics.Common.Model;
 using GovUk.Education.ExploreEducationStatistics.Common.Services;
 using GovUk.Education.ExploreEducationStatistics.Common.Services.Interfaces;
+using GovUk.Education.ExploreEducationStatistics.Common.Utils;
 using GovUk.Education.ExploreEducationStatistics.Content.Model;
 using GovUk.Education.ExploreEducationStatistics.Content.Model.Extensions;
 using GovUk.Education.ExploreEducationStatistics.Data.Processor.Services.Interfaces;
@@ -57,17 +58,20 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Processor.Services
         private readonly IBlobStorageService _blobStorageService;
         private readonly IFileTypeService _fileTypeService;
         private readonly IDataImportService _dataImportService;
+        private readonly IImporterService _importerService;
         
         public ValidatorService(
             ILogger<IValidatorService> logger,
             IBlobStorageService blobStorageService,
             IFileTypeService fileTypeService,
-            IDataImportService dataImportService)
+            IDataImportService dataImportService, 
+            IImporterService importerService)
         {
             _logger = logger;
             _blobStorageService = blobStorageService;
             _fileTypeService = fileTypeService;
             _dataImportService = dataImportService;
+            _importerService = importerService;
         }
 
         private const int Stage1RowCheck = 1000;
@@ -89,12 +93,12 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Processor.Services
 
             await _dataImportService.UpdateStatus(import.Id, DataImportStatus.STAGE_1, 0);
 
-            return await ValidateCsvFile(import.File, false)
+            return await _logger.WithTimingTrace(async () => 
+                await ValidateCsvFile(import.File, false)
                 .OnSuccessDo(async () => await ValidateCsvFile(import.MetaFile, true))
-                .OnSuccess(
-                    async () =>
+                .OnSuccess(async () =>
                     {
-                        var dataFileStream = await _blobStorageService.StreamBlob(PrivateFilesContainerName, 
+                        var dataFileStream = await _blobStorageService.StreamBlob(PrivateFilesContainerName,
                             import.File.Path());
                         var dataFileTable = DataTableUtils.CreateFromStream(dataFileStream);
 
@@ -118,7 +122,9 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Processor.Services
                                             }
                                         )
                             );
-                });
+                    }
+                ), 
+                "validate a complete CSV");
         }
 
         private async Task<Either<List<DataImportError>, Unit>> ValidateCsvFile(File file, bool isMetaFile)
@@ -305,9 +311,9 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Processor.Services
             };
         }
 
-        private static bool IsGeographicLevelIgnored(IReadOnlyList<string> line, List<string> headers)
+        private bool IsGeographicLevelIgnored(IReadOnlyList<string> line, List<string> headers)
         {
-            var geographicLevel = ImporterService.GetGeographicLevel(line, headers);
+            var geographicLevel = _importerService.GetGeographicLevel(line, headers);
             return ImporterService.IgnoredGeographicLevels.Contains(geographicLevel);
         }
 

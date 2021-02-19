@@ -7,6 +7,7 @@ using GovUk.Education.ExploreEducationStatistics.Common.Extensions;
 using GovUk.Education.ExploreEducationStatistics.Common.Model;
 using GovUk.Education.ExploreEducationStatistics.Common.Model.Data;
 using GovUk.Education.ExploreEducationStatistics.Common.Services.Interfaces;
+using GovUk.Education.ExploreEducationStatistics.Common.Utils;
 using GovUk.Education.ExploreEducationStatistics.Content.Model;
 using GovUk.Education.ExploreEducationStatistics.Data.Model;
 using GovUk.Education.ExploreEducationStatistics.Data.Model.Database;
@@ -173,19 +174,25 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Processor.Services
             _importerFilterService.ClearCache();
             _importerLocationService.ClearCache();
 
-            var observations = GetObservations(
-                context,
-                rows,
-                CsvUtil.GetColumnValues(cols),
-                subject,
-                subjectMeta,
-                batchNo,
-                rowsPerBatch).ToList();
+            var observations = _logger.WithTimingDebug(() =>
+                GetObservations(
+                    context,
+                    rows,
+                    CsvUtil.GetColumnValues(cols),
+                    subject,
+                    subjectMeta,
+                    batchNo,
+                    rowsPerBatch).ToList(),
+            $"to read batch {batchNo} of Observations");
 
-            await InsertObservations(context, observations);
+            await _logger.WithTimingDebug(async () =>
+            {
+                await InsertObservations(context, observations);
+            },
+                $"to insert batch {batchNo} of Observations");
         }
 
-        public static GeographicLevel GetGeographicLevel(IReadOnlyList<string> line, List<string> headers)
+        public GeographicLevel GetGeographicLevel(IReadOnlyList<string> line, List<string> headers)
         {
             return GetGeographicLevelFromString(CsvUtil.Value(line, headers, "geographic_level"));
         }
@@ -203,7 +210,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Processor.Services
             throw new InvalidGeographicLevelException(value);
         }
 
-        public static TimeIdentifier GetTimeIdentifier(IReadOnlyList<string> line, List<string> headers)
+        public TimeIdentifier GetTimeIdentifier(IReadOnlyList<string> line, List<string> headers)
         {
             var timeIdentifier = CsvUtil.Value(line, headers, "time_identifier").ToLower();
             foreach (var value in Enum.GetValues(typeof(TimeIdentifier)).Cast<TimeIdentifier>())
@@ -217,7 +224,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Processor.Services
             throw new InvalidTimeIdentifierException(timeIdentifier);
         }
 
-        public static int GetYear(IReadOnlyList<string> line, List<string> headers)
+        public int GetYear(IReadOnlyList<string> line, List<string> headers)
         {
             var tp = CsvUtil.Value(line, headers, "time_period");
             if (tp == null)
@@ -243,18 +250,22 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Processor.Services
 
             foreach (DataRow row in rows)
             {
-                var o = ObservationFromCsv(
-                    context,
-                    CsvUtil.GetRowValues(row).ToArray(),
-                    headers,
-                    subject,
-                    subjectMeta,
-                    ((batchNo - 1) * rowsPerBatch) + i++ + 2);
+                _logger.WithTimingTrace(() =>
+                    {
+                        var o = ObservationFromCsv(
+                            context,
+                            CsvUtil.GetRowValues(row).ToArray(),
+                            headers,
+                            subject,
+                            subjectMeta,
+                            ((batchNo - 1) * rowsPerBatch) + i++ + 2);
 
-                if (!IgnoredGeographicLevels.Contains(o.GeographicLevel))
-                {
-                    observations.Add(o);
-                }
+                        if (!IgnoredGeographicLevels.Contains(o.GeographicLevel))
+                        {
+                            observations.Add(o);
+                        }
+                    },
+                    "to read an observation");
             }
 
             return observations;
