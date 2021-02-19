@@ -1,6 +1,7 @@
 import ErrorSummary, {
   ErrorSummaryMessage,
 } from '@common/components/ErrorSummary';
+import useMountedRef from '@common/hooks/useMountedRef';
 import useToggle from '@common/hooks/useToggle';
 import createErrorHelper from '@common/validation/createErrorHelper';
 import { useFormikContext } from 'formik';
@@ -48,6 +49,8 @@ const Form = ({
   showErrorSummary = true,
   showSubmitError = false,
 }: Props) => {
+  const isMounted = useMountedRef();
+
   const formik = useFormikContext();
   const { errors, touched, values, submitCount, submitForm } = formik;
 
@@ -62,13 +65,17 @@ const Form = ({
   const [submitError, setSubmitError] = useState<ErrorSummaryMessage>();
 
   useEffect(() => {
+    if (!isMounted.current) {
+      return;
+    }
+
     // If form has changed at all, we should remove the submit error
     if (!submitCount || !isEqual(values, previousValues.current)) {
       setSubmitError(undefined);
     }
 
     previousValues.current = values;
-  }, [submitError, submitCount, values]);
+  }, [submitError, submitCount, values, isMounted]);
 
   const allErrors = useMemo(() => {
     const summaryErrors: ErrorSummaryMessage[] = Object.entries(getAllErrors())
@@ -90,21 +97,27 @@ const Form = ({
       try {
         await submitForm();
       } catch (error) {
-        if (error) {
-          if (showSubmitError) {
+        if (!error) {
+          return;
+        }
+
+        if (showSubmitError) {
+          if (isMounted.current) {
             setSubmitError({
               id: submitId,
               message: error.message,
             });
-          } else {
-            throw error;
           }
+        } else {
+          throw error;
         }
       } finally {
-        toggleSummaryFocus.on();
+        if (isMounted.current) {
+          toggleSummaryFocus.on();
+        }
       }
     },
-    [toggleSummaryFocus, submitForm, showSubmitError, submitId],
+    [toggleSummaryFocus, submitForm, showSubmitError, isMounted, submitId],
   );
 
   return (
