@@ -94,7 +94,7 @@ user creates release for publication
     user waits until page contains title caption  ${publication}
     user waits until h1 is visible  Create new release
     user waits until page contains element  id:releaseSummaryForm-timePeriodCoverage
-    user selects from list by label  id:releaseSummaryForm-timePeriodCoverage  ${time_period_coverage}
+    user selects from list by label  id:releaseSummaryForm-timePeriodCoverageCode  ${time_period_coverage}
     user enters text into element  id:releaseSummaryForm-timePeriodCoverageStartYear  ${start_year}
     user clicks radio   National Statistics
     user clicks radio if exists  Create new template

@@ -427,9 +427,9 @@ Change vertical bar chart legend
     user waits until h3 is visible  Legend
 
     user counts legend form item rows  1
-    user checks element value should be  id:chartLegendConfigurationForm-items0Label  Admission Numbers (Nailsea Youngwood)
+    user checks element value should be  id:chartLegendConfigurationForm-items-0-label  Admission Numbers (Nailsea Youngwood)
 
-    user enters text into element  id:chartLegendConfigurationForm-items0Label  Admissions
+    user enters text into element  id:chartLegendConfigurationForm-items-0-label  Admissions
 
     user waits for chart preview to update
 
@@ -633,17 +633,17 @@ Change geographic chart legend
     user waits until h3 is visible  Legend
 
     user counts legend form item rows  5
-    user checks element value should be  id:chartLegendConfigurationForm-items0Label  Admission Numbers (2005)
-    user checks element value should be  id:chartLegendConfigurationForm-items1Label  Admission Numbers (2010)
-    user checks element value should be  id:chartLegendConfigurationForm-items2Label  Admission Numbers (2011)
-    user checks element value should be  id:chartLegendConfigurationForm-items3Label  Admission Numbers (2012)
-    user checks element value should be  id:chartLegendConfigurationForm-items4Label  Admission Numbers (2016)
+    user checks element value should be  id:chartLegendConfigurationForm-items-0-label  Admission Numbers (2005)
+    user checks element value should be  id:chartLegendConfigurationForm-items-1-label  Admission Numbers (2010)
+    user checks element value should be  id:chartLegendConfigurationForm-items-2-label  Admission Numbers (2011)
+    user checks element value should be  id:chartLegendConfigurationForm-items-3-label  Admission Numbers (2012)
+    user checks element value should be  id:chartLegendConfigurationForm-items-4-label  Admission Numbers (2016)
 
-    user enters text into element  id:chartLegendConfigurationForm-items0Label  Admissions in 2005
-    user enters text into element  id:chartLegendConfigurationForm-items1Label  Admissions in 2010
-    user enters text into element  id:chartLegendConfigurationForm-items2Label  Admissions in 2011
-    user enters text into element  id:chartLegendConfigurationForm-items3Label  Admissions in 2012
-    user enters text into element  id:chartLegendConfigurationForm-items4Label  Admissions in 2016
+    user enters text into element  id:chartLegendConfigurationForm-items-0-label  Admissions in 2005
+    user enters text into element  id:chartLegendConfigurationForm-items-1-label  Admissions in 2010
+    user enters text into element  id:chartLegendConfigurationForm-items-2-label  Admissions in 2011
+    user enters text into element  id:chartLegendConfigurationForm-items-3-label  Admissions in 2012
+    user enters text into element  id:chartLegendConfigurationForm-items-4-label  Admissions in 2016
 
     user waits for chart preview to update
 
