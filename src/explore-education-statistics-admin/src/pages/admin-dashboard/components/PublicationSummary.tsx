@@ -5,7 +5,6 @@ import {
   releaseSummaryRoute,
 } from '@admin/routes/releaseRoutes';
 import {
-  legacyReleasesRoute,
   publicationEditRoute,
   PublicationRouteParams,
   releaseCreateRoute,
@@ -119,6 +118,7 @@ const PublicationSummary = ({ publication, onChangePublication }: Props) => {
               <td>
                 <ButtonGroup className="govuk-!-margin-bottom-2">
                   <ButtonLink
+                    data-testid={`Edit publication link for ${publication.title}`}
                     to={generatePath<PublicationRouteParams>(
                       publicationEditRoute.path,
                       {

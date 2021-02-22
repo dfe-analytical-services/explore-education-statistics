@@ -6,7 +6,7 @@ import MethodologyPage from '@admin/pages/methodology/edit-methodology/Methodolo
 import MethodologiesPage from '@admin/pages/methodology/MethodologiesPage';
 import MethodologyCreatePage from '@admin/pages/methodology/MethodologyCreatePage';
 import PublicationCreatePage from '@admin/pages/publication/PublicationCreatePage';
-import PublicationManagePage from '@admin/pages/publication/PublicationManagePage';
+import PublicationEditPage from '@admin/pages/publication/PublicationEditPage';
 import PreReleaseAccessListPage from '@admin/pages/release/pre-release/PreReleaseAccessListPage';
 import PreReleasePageContainer from '@admin/pages/release/pre-release/PreReleasePageContainer';
 import ReleaseCreatePage from '@admin/pages/release/ReleaseCreatePage';
@@ -102,7 +102,7 @@ export const publicationCreateRoute: ProtectedRouteProps = {
 
 export const publicationEditRoute: ProtectedRouteProps = {
   path: '/publication/:publicationId/edit',
-  component: PublicationManagePage,
+  component: PublicationEditPage,
   protectionAction: user => user.permissions.canAccessAnalystPages,
   exact: true,
 };

@@ -15,7 +15,7 @@ import React from 'react';
 import { generatePath, RouteComponentProps, useHistory } from 'react-router';
 import RelatedInformation from '@common/components/RelatedInformation';
 
-const PublicationManagePage = ({
+const PublicationEditPage = ({
   match,
 }: RouteComponentProps<PublicationRouteParams>) => {
   const { publicationId } = match.params;
@@ -38,9 +38,9 @@ const PublicationManagePage = ({
 
   return (
     <Page
-      title="Manage publication"
+      title="Edit publication"
       caption={publication.title}
-      breadcrumbs={[{ name: 'Manage publication' }]}
+      breadcrumbs={[{ name: 'Edit publication' }]}
     >
       <div className="govuk-grid-row">
         <div className="govuk-grid-column-three-quarters">
@@ -101,12 +101,12 @@ const PublicationManagePage = ({
             <ul className="govuk-list">
               <li>
                 <Link
+                  data-testid="manage-legacy-releases"
                   to={generatePath(legacyReleasesRoute.path, {
                     publicationId,
                   })}
-                  target="_blank"
                 >
-                  Manage legacy releases{' '}
+                  Manage legacy releases
                 </Link>
               </li>
             </ul>
@@ -117,4 +117,4 @@ const PublicationManagePage = ({
   );
 };
 
-export default PublicationManagePage;
+export default PublicationEditPage;
