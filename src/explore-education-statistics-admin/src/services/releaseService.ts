@@ -25,6 +25,7 @@ export interface Release {
   internalReleaseNote?: string;
   previousVersionId: string;
   preReleaseAccessList: string;
+  yearTitle?: string;
 }
 
 export interface MyRelease extends Release {

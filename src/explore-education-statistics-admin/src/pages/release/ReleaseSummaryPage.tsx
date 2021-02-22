@@ -49,7 +49,7 @@ const ReleaseSummaryPage = () => {
               {release.timePeriodCoverage.label}
             </SummaryListItem>
             <SummaryListItem term="Release period">
-              <time>{release.title}</time>
+              <time>{release.yearTitle}</time>
             </SummaryListItem>
             <SummaryListItem term="Release type">
               {release.type.title}
