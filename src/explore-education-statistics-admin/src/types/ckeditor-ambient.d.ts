@@ -6,24 +6,24 @@
 // Real CKEditor module declarations (for values that
 // we can actually import) should go here.
 
-declare module '@ckeditor/ckeditor5-build-classic' {
+declare module 'explore-education-statistics-ckeditor' {
   import { EditorClass, EditorConfig } from '@admin/types/ckeditor';
 
   // https://ckeditor.com/docs/ckeditor5/latest/api/module_editor-classic_classiceditor-ClassicEditor.html
-  interface ClassicEditor extends EditorClass {
+  interface CustomEditor extends EditorClass {
     new (
       element: string | HTMLElement,
       config: EditorConfig,
-    ): ClassicEditorInstance;
+    ): CustomEditorInstance;
 
-    create(element: string | HTMLElement): Promise<ClassicEditorInstance>;
+    create(element: string | HTMLElement): Promise<CustomEditorInstance>;
   }
 
-  interface ClassicEditorInstance {
+  interface CustomEditorInstance {
     destroy: () => void;
   }
 
-  const editor: ClassicEditor;
+  const editor: CustomEditor;
   export default editor;
 }
 

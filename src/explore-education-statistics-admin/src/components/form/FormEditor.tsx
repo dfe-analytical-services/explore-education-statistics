@@ -5,7 +5,6 @@ import {
   ImageUploadHandler,
 } from '@admin/utils/ckeditor/CustomUploadAdapter';
 import customUploadAdapterPlugin from '@admin/utils/ckeditor/customUploadAdapterPlugin';
-import ClassicEditor from '@ckeditor/ckeditor5-build-classic';
 import { CKEditor, CKEditorProps } from '@ckeditor/ckeditor5-react';
 import ErrorMessage from '@common/components/ErrorMessage';
 import FormLabel from '@common/components/form/FormLabel';
@@ -13,6 +12,7 @@ import SanitizeHtml from '@common/components/SanitizeHtml';
 import useToggle from '@common/hooks/useToggle';
 import isBrowser from '@common/utils/isBrowser';
 import classNames from 'classnames';
+import Editor from 'explore-education-statistics-ckeditor';
 import React, {
   MutableRefObject,
   useCallback,
@@ -267,7 +267,7 @@ const FormEditor = ({
         >
           {process.env.NODE_ENV !== 'test' ? (
             <CKEditor
-              editor={ClassicEditor}
+              editor={Editor}
               config={config}
               data={value}
               onChange={handleChange}
