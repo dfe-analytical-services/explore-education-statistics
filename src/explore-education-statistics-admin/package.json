@@ -11,6 +11,7 @@
     "@ckeditor/ckeditor5-build-balloon-block": "^25.0.0",
     "@ckeditor/ckeditor5-build-classic": "^25.0.0",
     "@ckeditor/ckeditor5-react": "^3.0.1",
+    "@ckeditor/ckeditor5-upload": "^25.0.0",
     "@svgr/webpack": "^5.4.0",
     "@testing-library/dom": "^7.24.4",
     "@testing-library/jest-dom": "^5.11.4",

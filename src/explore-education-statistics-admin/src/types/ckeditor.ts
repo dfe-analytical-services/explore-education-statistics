@@ -7,6 +7,7 @@ export interface EditorClass {
 }
 
 export interface Editor {
+  plugins: PluginCollection;
   editing: {
     view: {
       focus(): void;
@@ -18,6 +19,7 @@ export interface Editor {
 
 export interface EditorConfig {
   toolbar: string[];
+  extraPlugins?: Plugin[];
   image?: {
     toolbar: string[];
   };
@@ -25,6 +27,13 @@ export interface EditorConfig {
     options: HeadingOption[];
   };
 }
+
+export interface PluginCollection {
+  get<T extends Plugin>(key: string): T;
+}
+
+// eslint-disable-next-line @typescript-eslint/no-empty-interface
+export interface Plugin {}
 
 export interface HeadingOption {
   model:

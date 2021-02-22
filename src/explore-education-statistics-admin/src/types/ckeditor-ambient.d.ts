@@ -33,7 +33,7 @@ declare module '@ckeditor/ckeditor5-react' {
 
   export interface CKEditorProps {
     editor: EditorClass;
-    config: EditorConfig;
+    config?: EditorConfig;
     data: string;
     // TODO: Don't think this actually emits `ChangeEvent`
     onChange: (event: ChangeEvent, editor: Editor) => void;
@@ -43,4 +43,27 @@ declare module '@ckeditor/ckeditor5-react' {
   }
 
   export const CKEditor: (props: CKEditorProps) => ReactElement<CKEditorProps>;
+}
+
+declare module '@ckeditor/ckeditor5-upload' {
+  import { Plugin, UploadAdapter } from '@admin/types/ckeditor';
+
+  // https://ckeditor.com/docs/ckeditor5/latest/api/module_upload_filerepository-FileLoader.html
+  export interface FileLoader {
+    id: number;
+    file: Promise<File>;
+    data?: File;
+    status: 'idle' | 'reading' | 'uploading' | 'aborted' | 'error';
+    uploaded: number;
+    uploadTotal: number | null;
+    uploadedPercent: number;
+
+    abort(): void;
+    read(): Promise<string>;
+  }
+
+  // https://ckeditor.com/docs/ckeditor5/latest/api/module_upload_filerepository-FileRepository.html
+  export interface FileRepository extends Plugin {
+    createUploadAdapter(loader: FileLoader): UploadAdapter;
+  }
 }

@@ -1,5 +1,10 @@
 import styles from '@admin/components/form/FormEditor.module.scss';
 import { EditorConfig, HeadingOption } from '@admin/types/ckeditor';
+import {
+  ImageUploadCancelHandler,
+  ImageUploadHandler,
+} from '@admin/utils/ckeditor/CustomUploadAdapter';
+import customUploadAdapterPlugin from '@admin/utils/ckeditor/customUploadAdapterPlugin';
 import ClassicEditor from '@ckeditor/ckeditor5-build-classic';
 import { CKEditor, CKEditorProps } from '@ckeditor/ckeditor5-react';
 import ErrorMessage from '@common/components/ErrorMessage';
@@ -29,6 +34,7 @@ export const toolbarConfigs = {
     '|',
     'blockQuote',
     'insertTable',
+    'imageUpload',
     '|',
     'redo',
     'undo',
@@ -94,6 +100,8 @@ export interface FormEditorProps {
   testId?: string;
   onBlur?: () => void;
   onChange: (content: string) => void;
+  onImageUpload?: ImageUploadHandler;
+  onImageUploadCancel?: ImageUploadCancelHandler;
 }
 
 const FormEditor = ({
@@ -109,14 +117,23 @@ const FormEditor = ({
   testId,
   onBlur,
   onChange,
+  onImageUpload,
+  onImageUploadCancel,
 }: FormEditorProps) => {
   const editorRef: MutableRefObject<HTMLDivElement | null> = useRef(null);
 
   const [isFocused, toggleFocused] = useToggle(false);
 
-  const config = useMemo<EditorConfig>(
-    () => ({
-      toolbar: toolbarConfig,
+  const config = useMemo<EditorConfig>(() => {
+    return {
+      toolbar: toolbarConfig?.filter(tool => {
+        // Disable image upload if no callback provided
+        if (tool === 'imageUpload' && !onImageUpload) {
+          return false;
+        }
+
+        return true;
+      }),
       heading: toolbarConfig?.includes('heading')
         ? {
             options: [
@@ -131,9 +148,12 @@ const FormEditor = ({
             ],
           }
         : undefined,
-    }),
-    [allowedHeadings, toolbarConfig],
-  );
+      extraPlugins:
+        toolbarConfig?.includes('imageUpload') && onImageUpload
+          ? [customUploadAdapterPlugin(onImageUpload, onImageUploadCancel)]
+          : undefined,
+    };
+  }, [allowedHeadings, onImageUpload, onImageUploadCancel, toolbarConfig]);
 
   useEffect(() => {
     if (process.env.NODE_ENV === 'test') {
