@@ -22,6 +22,7 @@ export interface EditorConfig {
   extraPlugins?: Plugin[];
   image?: {
     toolbar: string[];
+    resizeOptions?: ResizeOption[];
   };
   heading?: {
     options: HeadingOption[];

@@ -1,5 +1,9 @@
 import styles from '@admin/components/form/FormEditor.module.scss';
-import { EditorConfig, HeadingOption } from '@admin/types/ckeditor';
+import {
+  EditorConfig,
+  HeadingOption,
+  ResizeOption,
+} from '@admin/types/ckeditor';
 import {
   ImageUploadCancelHandler,
   ImageUploadHandler,
@@ -87,6 +91,35 @@ const headingOptions: HeadingOption[] = [
   },
 ];
 
+const imageToolbar: string[] = [
+  'imageTextAlternative',
+  '|',
+  'imageResize:50',
+  'imageResize:75',
+  'imageResize:original',
+];
+
+const resizeOptions: ResizeOption[] = [
+  {
+    name: 'imageResize:original',
+    value: null,
+    label: 'Original',
+    icon: 'original',
+  },
+  {
+    name: 'imageResize:50',
+    value: '50',
+    label: '50%',
+    icon: 'medium',
+  },
+  {
+    name: 'imageResize:75',
+    value: '75',
+    label: '75%',
+    icon: 'large',
+  },
+];
+
 export interface FormEditorProps {
   allowedHeadings?: string[];
   error?: string;
@@ -125,16 +158,20 @@ const FormEditor = ({
   const [isFocused, toggleFocused] = useToggle(false);
 
   const config = useMemo<EditorConfig>(() => {
-    return {
-      toolbar: toolbarConfig?.filter(tool => {
-        // Disable image upload if no callback provided
-        if (tool === 'imageUpload' && !onImageUpload) {
-          return false;
-        }
+    const toolbar = toolbarConfig?.filter(tool => {
+      // Disable image upload if no callback provided
+      if (tool === 'imageUpload' && !onImageUpload) {
+        return false;
+      }
 
-        return true;
-      }),
-      heading: toolbarConfig?.includes('heading')
+      return true;
+    });
+
+    const hasImageUpload = toolbar.includes('imageUpload');
+
+    return {
+      toolbar,
+      heading: toolbar.includes('heading')
         ? {
             options: [
               {
@@ -148,8 +185,14 @@ const FormEditor = ({
             ],
           }
         : undefined,
+      image: hasImageUpload
+        ? {
+            toolbar: imageToolbar,
+            resizeOptions,
+          }
+        : undefined,
       extraPlugins:
-        toolbarConfig?.includes('imageUpload') && onImageUpload
+        hasImageUpload && onImageUpload
           ? [customUploadAdapterPlugin(onImageUpload, onImageUploadCancel)]
           : undefined,
     };
