@@ -142,7 +142,7 @@ Go to Table Tool page
 Check scheduled release isn't visible
     [Tags]  HappyPath
     environment variable should be set  TEST_THEME_NAME
-    user checks page does not contain  UI test topic %{RUN_IDENTIFIER}
+    user checks page does not contain  ${PUBLICATION_NAME}
 
 Go to release URL and check release isn't visible
     [Tags]  HappyPath  NotAgainstLocal
