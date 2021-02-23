@@ -1,9 +1,10 @@
 import Link from '@frontend/components/Link';
-import React from 'react';
-import classNames from 'classnames';
+import React, { useEffect, useState } from 'react';
 import useMounted from '@common/hooks/useMounted';
-import ButtonText from '@common/components/ButtonText';
 import { useCookies } from '@frontend/hooks/useCookies';
+import ButtonGroup from '@common/components/ButtonGroup';
+import Button from '@common/components/Button';
+import classNames from 'classnames';
 import styles from './CookieBanner.module.scss';
 
 interface Props {
@@ -12,38 +13,106 @@ interface Props {
 
 function CookieBanner({ wide }: Props) {
   const { getCookie, setBannerSeenCookie, setGADisabledCookie } = useCookies();
+  const isBannerSeen = getCookie('bannerSeen') === 'true';
+  const [isVisible, setVisible] = useState(!isBannerSeen);
+  const { isMounted } = useMounted();
 
-  const { isMounted } = useMounted(() => {
-    if (getCookie('disableGA') === 'true') {
-      setGADisabledCookie(true);
-    }
-  });
+  useEffect(() => {
+    setVisible(!isBannerSeen);
+  }, [isBannerSeen]);
 
-  return isMounted && getCookie('bannerSeen') !== 'true' ? (
+  return isMounted && isVisible ? (
     <div className={styles.container}>
       <div
-        className={classNames('govuk-width-container', 'dfe-width-container', {
-          'dfe-width-container--wide': wide,
-        })}
+        className={classNames(
+          'govuk-cookie-banner',
+          'govuk-width-container',
+          'dfe-width-container',
+          {
+            'dfe-width-container--wide': wide,
+          },
+        )}
+        role="region"
+        aria-label="Cookies on Explore Education Statistics"
       >
-        <p>
-          <span>GOV.UK uses cookies to make the site simpler.</span>{' '}
-          <ButtonText
-            onClick={() => {
-              setBannerSeenCookie(true);
-              if (typeof getCookie('disableGA') === 'undefined') {
-                setGADisabledCookie(false);
-              }
-            }}
+        {typeof getCookie('disableGA') === 'undefined' && (
+          <div className="govuk-cookie-banner__message govuk-width-container">
+            <div className="govuk-grid-row">
+              <div className="govuk-grid-column-two-thirds">
+                <h2 className="govuk-cookie-banner__heading govuk-heading-m">
+                  Cookies on Explore Education Statistics
+                </h2>
+
+                <div className="govuk-cookie-banner__content">
+                  <p>
+                    We use some essential cookies to make this service work.
+                  </p>
+                  <p>
+                    We’d also like to use analytics cookies so we can understand
+                    how you use the service and make improvements.
+                  </p>
+                </div>
+              </div>
+            </div>
+
+            <ButtonGroup>
+              <Button
+                onClick={() => {
+                  setBannerSeenCookie(true);
+                  if (typeof getCookie('disableGA') === 'undefined') {
+                    setGADisabledCookie(false);
+                  }
+                }}
+              >
+                Accept analytics cookies
+              </Button>{' '}
+              <Button
+                onClick={() => {
+                  setBannerSeenCookie(true);
+                  if (typeof getCookie('disableGA') === 'undefined') {
+                    setGADisabledCookie(true);
+                  }
+                }}
+              >
+                Reject analytics cookies
+              </Button>{' '}
+              <Link to="/cookies">View cookies</Link>
+            </ButtonGroup>
+          </div>
+        )}
+        {typeof getCookie('disableGA') !== 'undefined' && (
+          <div
+            className="govuk-cookie-banner__message govuk-width-container"
+            role="alert"
           >
-            Accept Cookies
-          </ButtonText>{' '}
-          or{' '}
-          <Link to="/cookies">
-            find out more about cookies and cookie settings
-          </Link>
-          .
-        </p>
+            <div className="govuk-grid-row">
+              <div className="govuk-grid-column-two-thirds">
+                <div className="govuk-cookie-banner__content">
+                  <p>
+                    You’ve{' '}
+                    {getCookie('disableGA') === 'false'
+                      ? 'accepted'
+                      : 'rejected'}{' '}
+                    analytics cookies. You can{' '}
+                    <Link to="/cookies">change your cookie settings</Link> at
+                    any time.
+                  </p>
+                </div>
+              </div>
+            </div>
+
+            <div className="govuk-button-group">
+              <Button
+                data-module="govuk-button"
+                onClick={() => {
+                  setVisible(false);
+                }}
+              >
+                Hide this message
+              </Button>
+            </div>
+          </div>
+        )}
       </div>
     </div>
   ) : null;
