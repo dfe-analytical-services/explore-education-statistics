@@ -2,7 +2,6 @@ using System;
 using System.Threading.Tasks;
 using GovUk.Education.ExploreEducationStatistics.Common.Model;
 using GovUk.Education.ExploreEducationStatistics.Common.Services.Interfaces;
-using GovUk.Education.ExploreEducationStatistics.Common.Utils;
 using GovUk.Education.ExploreEducationStatistics.Content.Model.Extensions;
 using GovUk.Education.ExploreEducationStatistics.Data.Processor.Model;
 using GovUk.Education.ExploreEducationStatistics.Data.Processor.Services.Interfaces;
@@ -76,8 +75,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Processor.Services
 
             var subject = await statisticsDbContext.Subject.FindAsync(import.SubjectId);
 
-            var metaFileStream =
-                await _blobStorageService.StreamBlob(PrivateFilesContainerName, import.MetaFile.Path());
+            var metaFileStream = await _blobStorageService.StreamBlob(PrivateFilesContainerName, import.MetaFile.Path());
             var metaFileTable = DataTableUtils.CreateFromStream(metaFileStream);
 
             _importerService.ImportMeta(metaFileTable, subject, statisticsDbContext);

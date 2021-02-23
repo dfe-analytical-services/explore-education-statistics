@@ -7,7 +7,6 @@ using GovUk.Education.ExploreEducationStatistics.Common.Extensions;
 using GovUk.Education.ExploreEducationStatistics.Common.Model;
 using GovUk.Education.ExploreEducationStatistics.Common.Model.Data;
 using GovUk.Education.ExploreEducationStatistics.Common.Services.Interfaces;
-using GovUk.Education.ExploreEducationStatistics.Common.Utils;
 using GovUk.Education.ExploreEducationStatistics.Content.Model;
 using GovUk.Education.ExploreEducationStatistics.Data.Model;
 using GovUk.Education.ExploreEducationStatistics.Data.Model.Database;
@@ -174,15 +173,14 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Processor.Services
             _importerFilterService.ClearCache();
             _importerLocationService.ClearCache();
 
-            var observations = 
-                GetObservations(
-                    context,
-                    rows,
-                    CsvUtil.GetColumnValues(cols),
-                    subject,
-                    subjectMeta,
-                    batchNo,
-                    rowsPerBatch).ToList();
+            var observations = GetObservations(
+                context,
+                rows,
+                CsvUtil.GetColumnValues(cols),
+                subject,
+                subjectMeta,
+                batchNo,
+                rowsPerBatch).ToList();
 
             await InsertObservations(context, observations);
         }
