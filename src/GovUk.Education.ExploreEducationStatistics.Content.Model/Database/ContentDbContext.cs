@@ -88,6 +88,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Content.Model.Database
         private const string CountryCodeEngland = "E92000001";
 
         public DbSet<Methodology> Methodologies { get; set; }
+        public DbSet<MethodologyFile> MethodologyFiles { get; set; }
         public DbSet<Theme> Themes { get; set; }
         public DbSet<Topic> Topics { get; set; }
         public DbSet<Publication> Publications { get; set; }
@@ -167,6 +168,11 @@ namespace GovUk.Education.ExploreEducationStatistics.Content.Model.Database
             modelBuilder.Entity<Methodology>()
                 .Property(b => b.Status)
                 .HasConversion(new EnumToStringConverter<MethodologyStatus>());
+
+            modelBuilder.Entity<MethodologyFile>()
+                .HasOne(r => r.Methodology)
+                .WithMany()
+                .OnDelete(DeleteBehavior.NoAction);
 
             modelBuilder.Entity<Publication>()
                 .Property(p => p.LegacyPublicationUrl)

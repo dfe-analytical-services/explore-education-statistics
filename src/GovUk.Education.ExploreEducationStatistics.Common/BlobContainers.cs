@@ -14,9 +14,6 @@
         public static readonly BlobContainer Permalinks = new BlobContainer("permalinks");
         public static readonly BlobContainer PermalinkMigrations = new BlobContainer("permalink-migrations");
         public static readonly BlobContainer PublisherLeases = new BlobContainer("leases");
-
-        // TODO EES-1706 Methodology images - Not used yet but an example of how new containers used in
-        // different Azure storage accounts will have the same name but still work with the emulator as different containers
         public static readonly BlobContainer PrivateMethodologyFiles = new PrivateBlobContainer("methodologies");
         public static readonly BlobContainer PublicMethodologyFiles = new PublicBlobContainer("methodologies");
     }
