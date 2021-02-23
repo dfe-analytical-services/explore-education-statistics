@@ -4,6 +4,8 @@ import sanitize from 'sanitize-html';
 export type SanitizeHtmlOptions = {
   allowedTags?: string[];
   allowedAttributes?: Dictionary<string[]>;
+  allowedSchemesByTag?: Dictionary<string[]>;
+  allowedStyles?: Dictionary<Dictionary<RegExp[]>>;
 };
 
 export const defaultSanitizeOptions: SanitizeHtmlOptions = {
@@ -22,22 +24,34 @@ export const defaultSanitizeOptions: SanitizeHtmlOptions = {
     'li',
     'blockquote',
     'figure',
+    'figcaption',
     'table',
     'thead',
     'tbody',
     'tr',
     'td',
     'th',
+    'img',
   ],
+  allowedStyles: {
+    figure: {
+      width: [/^\d+%$/],
+    },
+  },
   allowedAttributes: {
-    figure: ['class'],
+    figure: ['class', 'style'],
     a: ['href'],
+    img: ['alt', 'src', 'srcset', 'sizes', 'width'],
     th: ['colspan', 'rowspan'],
     td: ['colspan', 'rowspan'],
     h2: ['id'],
     h3: ['id'],
     h4: ['id'],
     h5: ['id'],
+  },
+  allowedSchemesByTag: {
+    a: ['http', 'https', 'mailto', 'tel'],
+    img: ['http', 'https'],
   },
 };
 
