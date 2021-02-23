@@ -123,7 +123,9 @@ export const BaseFormCheckboxGroup = ({
           disabled={disabled}
           {...option}
           id={
-            option.id ? option.id : `${id}-${option.value.replace(/\s/g, '-')}`
+            option.id
+              ? `${id}-${option.id}`
+              : `${id}-${option.value.replace(/\s/g, '-')}`
           }
           name={name}
           key={option.value}
@@ -139,7 +141,7 @@ export const BaseFormCheckboxGroup = ({
 };
 
 export type FormCheckboxGroupProps = BaseFormCheckboxGroupProps &
-  OmitStrict<FormFieldsetProps, 'onBlur' | 'onFocus'> & {
+  OmitStrict<FormFieldsetProps, 'useFormId' | 'onBlur' | 'onFocus'> & {
     onFieldsetBlur?: FocusEventHandler<HTMLFieldSetElement>;
     onFieldsetFocus?: FocusEventHandler<HTMLFieldSetElement>;
   };
@@ -150,7 +152,12 @@ const FormCheckboxGroup = ({
   ...props
 }: FormCheckboxGroupProps) => {
   return (
-    <FormFieldset {...props} onBlur={onFieldsetBlur} onFocus={onFieldsetFocus}>
+    <FormFieldset
+      {...props}
+      useFormId={false}
+      onBlur={onFieldsetBlur}
+      onFocus={onFieldsetFocus}
+    >
       <BaseFormCheckboxGroup {...props} />
     </FormFieldset>
   );

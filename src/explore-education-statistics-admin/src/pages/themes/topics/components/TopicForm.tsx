@@ -52,7 +52,6 @@ const TopicForm = ({
       {form => (
         <Form id={id}>
           <FormFieldTextInput<TopicFormValues>
-            id={`${id}-title`}
             label="Title"
             name="title"
             className="govuk-!-width-two-thirds"

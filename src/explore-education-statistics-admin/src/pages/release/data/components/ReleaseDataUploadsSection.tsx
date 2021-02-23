@@ -224,7 +224,6 @@ const ReleaseDataUploadsSection = ({
           }
           beforeFields={
             <FormFieldTextInput<FormValues>
-              id={`${formId}-subjectTitle`}
               name="subjectTitle"
               label="Subject title"
               width={20}

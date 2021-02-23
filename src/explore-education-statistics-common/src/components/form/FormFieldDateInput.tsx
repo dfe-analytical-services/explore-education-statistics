@@ -1,3 +1,4 @@
+import { useFormContext } from '@common/components/form/contexts/FormContext';
 import FormFieldset from '@common/components/form/FormFieldset';
 import FormNumberInput from '@common/components/form/FormNumberInput';
 import { FormGroup } from '@common/components/form/index';
@@ -11,7 +12,7 @@ import React, { ChangeEvent, useCallback, useRef, useState } from 'react';
 
 interface Props<FormValues> {
   hint?: string;
-  id: string;
+  id?: string;
   legend: string;
   legendSize?: 'xl' | 'l' | 'm' | 's';
   name: keyof FormValues | string;
@@ -21,7 +22,7 @@ interface Props<FormValues> {
 }
 
 function FormFieldDateInput<FormValues>({
-  id,
+  id: customId,
   name,
   showError = true,
   hint,
@@ -30,6 +31,9 @@ function FormFieldDateInput<FormValues>({
   partialDateType = 'dayMonthYear',
   type = 'date',
 }: Props<FormValues>) {
+  const { prefixFormId, fieldId } = useFormContext();
+  const id = customId ? prefixFormId(customId) : fieldId(name as string);
+
   const isFocused = useRef(false);
 
   const [field, meta, helpers] = useField<
@@ -99,6 +103,7 @@ function FormFieldDateInput<FormValues>({
       legendSize={legendSize}
       hint={hint}
       error={errorMessage}
+      useFormId={false}
       onBlur={async event => {
         event.persist();
 

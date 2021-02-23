@@ -140,7 +140,6 @@ const ChartDataSetsConfiguration = ({
                 .map(([categoryName, filters]) => (
                   <FormFieldSelect
                     key={categoryName}
-                    id={`${formId}-filters${categoryName}`}
                     name={`filters.${categoryName}`}
                     label={categoryName}
                     formGroupClass={styles.formSelectGroup}
@@ -156,7 +155,6 @@ const ChartDataSetsConfiguration = ({
 
               {indicatorOptions.length > 1 && (
                 <FormFieldSelect<FormValues>
-                  id={`${formId}-indicator`}
                   name="indicator"
                   label="Indicator"
                   formGroupClass={styles.formSelectGroup}
@@ -168,7 +166,6 @@ const ChartDataSetsConfiguration = ({
 
               {locationOptions.length > 1 && (
                 <FormFieldSelect<FormValues>
-                  id={`${formId}-location`}
                   name="location"
                   label="Location"
                   formGroupClass={styles.formSelectGroup}
@@ -180,7 +177,6 @@ const ChartDataSetsConfiguration = ({
 
               {meta.timePeriodRange.length > 1 && (
                 <FormFieldSelect<FormValues>
-                  id={`${formId}-timePeriod`}
                   name="timePeriod"
                   label="Time period"
                   formGroupClass={styles.formSelectGroup}

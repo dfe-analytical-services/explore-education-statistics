@@ -13,13 +13,13 @@ exports[`FormRadioGroup renders correctly with legend 1`] = `
            data-testid="Radio item for Test radio 1"
       >
         <input class="govuk-radios__input"
-               id="radio-1"
+               id="test-radios-radio-1"
                name="test-radios"
                type="radio"
                value="1"
         >
         <label class="govuk-label govuk-radios__label"
-               for="radio-1"
+               for="test-radios-radio-1"
         >
           Test radio 1
         </label>
@@ -52,14 +52,14 @@ exports[`FormRadioGroup renders correctly with small size variants 1`] = `
         >
           <input
             class="govuk-radios__input"
-            id="radio-1"
+            id="test-radios-radio-1"
             name="test-radios"
             type="radio"
             value="1"
           />
           <label
             class="govuk-label govuk-radios__label"
-            for="radio-1"
+            for="test-radios-radio-1"
           >
             Test radio 1
           </label>
@@ -83,13 +83,13 @@ exports[`FormRadioGroup renders list of radios in correct order 1`] = `
            data-testid="Radio item for Test radio 1"
       >
         <input class="govuk-radios__input"
-               id="radio-1"
+               id="test-radios-radio-1"
                name="test-radios"
                type="radio"
                value="1"
         >
         <label class="govuk-label govuk-radios__label"
-               for="radio-1"
+               for="test-radios-radio-1"
         >
           Test radio 1
         </label>
@@ -98,13 +98,13 @@ exports[`FormRadioGroup renders list of radios in correct order 1`] = `
            data-testid="Radio item for Test radio 2"
       >
         <input class="govuk-radios__input"
-               id="radio-2"
+               id="test-radios-radio-2"
                name="test-radios"
                type="radio"
                value="2"
         >
         <label class="govuk-label govuk-radios__label"
-               for="radio-2"
+               for="test-radios-radio-2"
         >
           Test radio 2
         </label>
@@ -113,13 +113,13 @@ exports[`FormRadioGroup renders list of radios in correct order 1`] = `
            data-testid="Radio item for Test radio 3"
       >
         <input class="govuk-radios__input"
-               id="radio-3"
+               id="test-radios-radio-3"
                name="test-radios"
                type="radio"
                value="3"
         >
         <label class="govuk-label govuk-radios__label"
-               for="radio-3"
+               for="test-radios-radio-3"
         >
           Test radio 3
         </label>
@@ -142,21 +142,21 @@ exports[`FormRadioGroup renders option with conditional contents 1`] = `
            data-testid="Radio item for Test radio 1"
       >
         <input class="govuk-radios__input"
-               id="radio-1"
+               id="test-radios-radio-1"
                name="test-radios"
                type="radio"
                value="1"
-               aria-controls="radio-1-conditional"
+               aria-controls="test-radios-radio-1-conditional"
                aria-expanded="false"
         >
         <label class="govuk-label govuk-radios__label"
-               for="radio-1"
+               for="test-radios-radio-1"
         >
           Test radio 1
         </label>
       </div>
       <div class="govuk-radios__conditional govuk-radios__conditional--hidden"
-           id="radio-1-conditional"
+           id="test-radios-radio-1-conditional"
       >
         <p>
           Conditional 1
@@ -166,22 +166,22 @@ exports[`FormRadioGroup renders option with conditional contents 1`] = `
            data-testid="Radio item for Test radio 2"
       >
         <input class="govuk-radios__input"
-               id="radio-2"
+               id="test-radios-radio-2"
                name="test-radios"
                type="radio"
                value="2"
                checked
-               aria-controls="radio-2-conditional"
+               aria-controls="test-radios-radio-2-conditional"
                aria-expanded="true"
         >
         <label class="govuk-label govuk-radios__label"
-               for="radio-2"
+               for="test-radios-radio-2"
         >
           Test radio 2
         </label>
       </div>
       <div class="govuk-radios__conditional"
-           id="radio-2-conditional"
+           id="test-radios-radio-2-conditional"
       >
         <p>
           Conditional 2
@@ -191,21 +191,21 @@ exports[`FormRadioGroup renders option with conditional contents 1`] = `
            data-testid="Radio item for Test radio 3"
       >
         <input class="govuk-radios__input"
-               id="radio-3"
+               id="test-radios-radio-3"
                name="test-radios"
                type="radio"
                value="3"
-               aria-controls="radio-3-conditional"
+               aria-controls="test-radios-radio-3-conditional"
                aria-expanded="false"
         >
         <label class="govuk-label govuk-radios__label"
-               for="radio-3"
+               for="test-radios-radio-3"
         >
           Test radio 3
         </label>
       </div>
       <div class="govuk-radios__conditional govuk-radios__conditional--hidden"
-           id="radio-3-conditional"
+           id="test-radios-radio-3-conditional"
       >
         <p>
           Conditional 3

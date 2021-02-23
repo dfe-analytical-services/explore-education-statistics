@@ -99,7 +99,7 @@ const LocationFiltersForm = (props: Props & InjectedWizardProps) => {
           return (
             <Form {...form} id={formId} showSubmitError>
               <FormFieldset
-                id={`${formId}-levels`}
+                id="levels"
                 legend={stepHeading}
                 hint="Select at least one"
                 error={
@@ -116,7 +116,6 @@ const LocationFiltersForm = (props: Props & InjectedWizardProps) => {
                           name={`locations.${levelKey}`}
                           key={levelKey}
                           options={level.options}
-                          id={`${formId}-levels-${levelKey}`}
                           legend={level.legend}
                           legendHidden
                           disabled={form.isSubmitting}
@@ -127,7 +126,7 @@ const LocationFiltersForm = (props: Props & InjectedWizardProps) => {
                 </div>
               </FormFieldset>
 
-              <WizardStepFormActions {...props} formId={formId} />
+              <WizardStepFormActions {...props} />
             </Form>
           );
         }

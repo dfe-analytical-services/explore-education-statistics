@@ -223,7 +223,7 @@ describe('PublicationForm', () => {
     await waitFor(() => {
       expect(
         screen.getByText('Enter an external methodology link title', {
-          selector: '#publicationForm-externalMethodologyTitle-error',
+          selector: '#publicationForm-externalMethodology-title-error',
         }),
       ).toBeInTheDocument();
     });
@@ -248,7 +248,7 @@ describe('PublicationForm', () => {
     await waitFor(() => {
       expect(
         screen.getByText('Enter an external methodology URL', {
-          selector: '#publicationForm-externalMethodologyUrl-error',
+          selector: '#publicationForm-externalMethodology-url-error',
         }),
       ).toBeInTheDocument();
     });
@@ -273,7 +273,7 @@ describe('PublicationForm', () => {
     await waitFor(() => {
       expect(
         screen.getByText('Enter a valid external methodology URL', {
-          selector: '#publicationForm-externalMethodologyUrl-error',
+          selector: '#publicationForm-externalMethodology-url-error',
         }),
       ).toBeInTheDocument();
     });

@@ -133,7 +133,7 @@ Add metadata guidance
     user checks results table cell contains  1  2   Admission Numbers   id:metaGuidance-dataFiles
 
     user enters text into element  id:metaGuidanceForm-content  Test metadata guidance content
-    user enters text into element  id:metaGuidanceForm-subjects0Content  Test file guidance content
+    user enters text into element  id:metaGuidanceForm-subjects-0-content  Test file guidance content
 
     user clicks button  Save guidance
 

@@ -192,7 +192,6 @@ const ChartConfiguration = ({
 
             {validationSchema.fields.file && (
               <FormFieldFileInput<FormValues>
-                id={`${formId}-file`}
                 name="file"
                 label="Upload new infographic"
                 accept="image/*"
@@ -200,7 +199,6 @@ const ChartConfiguration = ({
             )}
 
             <FormFieldTextArea<FormValues>
-              id={`${formId}-title`}
               name="title"
               label="Title"
               className="govuk-!-width-three-quarters"
@@ -210,7 +208,6 @@ const ChartConfiguration = ({
             />
 
             <FormFieldTextArea<FormValues>
-              id={`${formId}-alt`}
               className="govuk-!-width-three-quarters"
               name="alt"
               label="Alt text"
@@ -221,7 +218,6 @@ const ChartConfiguration = ({
 
             {validationSchema.fields.stacked && (
               <FormFieldCheckbox<FormValues>
-                id={`${formId}-stacked`}
                 name="stacked"
                 label="Stacked bars"
               />
@@ -229,7 +225,6 @@ const ChartConfiguration = ({
 
             {validationSchema.fields.height && (
               <FormFieldNumberInput<FormValues>
-                id={`${formId}-height`}
                 name="height"
                 label="Height (px)"
                 width={5}
@@ -238,7 +233,6 @@ const ChartConfiguration = ({
 
             {validationSchema.fields.width && (
               <FormFieldNumberInput<FormValues>
-                id={`${formId}-width`}
                 name="width"
                 label="Width (px)"
                 hint="Leave blank to set as full width"
@@ -248,7 +242,6 @@ const ChartConfiguration = ({
 
             {validationSchema.fields.barThickness && (
               <FormFieldNumberInput<FormValues>
-                id={`${formId}-barThickness`}
                 name="barThickness"
                 label="Bar thickness (px)"
                 width={5}

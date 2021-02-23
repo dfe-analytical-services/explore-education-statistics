@@ -14,10 +14,11 @@ function FormFieldRadioGroup<FormValues, Value extends string = string>(
 ) {
   return (
     <FormField<Value> {...props}>
-      {({ field }) => (
-        <FormRadioGroup<Value>
+      {({ id, field }) => (
+        <FormRadioGroup
           {...props}
           {...field}
+          id={id}
           onChange={(event, option) => {
             if (props.onChange) {
               props.onChange(event, option);

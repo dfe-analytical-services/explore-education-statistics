@@ -117,13 +117,12 @@ const SubjectForm = ({
               name="subjectId"
               legend={legend}
               legendSize={legendSize}
-              id={`${formId}-subjectId`}
               disabled={form.isSubmitting}
               options={radioOptions}
             />
 
             {radioOptions.length > 0 ? (
-              <WizardStepFormActions {...stepProps} formId={formId} />
+              <WizardStepFormActions {...stepProps} />
             ) : (
               <p>No subjects available.</p>
             )}

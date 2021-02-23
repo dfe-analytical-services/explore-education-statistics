@@ -49,10 +49,8 @@ Add release note to release
 Add related guidance link to release
     [Tags]  HappyPath
     user clicks button  Add related information
-    user clicks element  css:input#title
-    user presses keys   Test link one
-    user clicks element  css:input#link-url
-    user presses keys   http://test1.example.com/test1
+    user enters text into element  id:relatedInformationForm-description  Test link one
+    user enters text into element  id:relatedInformationForm-url  http://test1.example.com/test1
     user clicks button  Create link
 
 # TODO: Add Secondary Stats

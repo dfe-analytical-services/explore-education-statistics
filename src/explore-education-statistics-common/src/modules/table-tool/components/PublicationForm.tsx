@@ -111,7 +111,7 @@ const PublicationForm = (props: Props & InjectedWizardProps) => {
             <Form {...form} id={formId} showSubmitError>
               <FormFieldset
                 error={getError('publicationId')}
-                id={`${formId}-publicationId`}
+                id="publicationId"
                 legend={stepHeading}
               >
                 <FormGroup>
@@ -167,9 +167,6 @@ const PublicationForm = (props: Props & InjectedWizardProps) => {
                                 small
                                 showError={false}
                                 name="publicationId"
-                                id={`${formId}-publicationId-${camelCase(
-                                  topic.title,
-                                )}`}
                                 disabled={form.isSubmitting}
                                 options={topic.publications.map(
                                   publication => ({
@@ -189,7 +186,7 @@ const PublicationForm = (props: Props & InjectedWizardProps) => {
                 </FormGroup>
               </FormFieldset>
 
-              <WizardStepFormActions {...props} formId={formId} />
+              <WizardStepFormActions {...props} />
             </Form>
           );
         }

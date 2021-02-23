@@ -55,14 +55,12 @@ const ThemeForm = ({
       {form => (
         <Form id={id}>
           <FormFieldTextInput<ThemeFormValues>
-            id={`${id}-title`}
             label="Title"
             name="title"
             className="govuk-!-width-two-thirds"
           />
 
           <FormFieldTextInput<ThemeFormValues>
-            id={`${id}-summary`}
             label="Summary"
             name="summary"
             className="govuk-!-width-two-thirds"

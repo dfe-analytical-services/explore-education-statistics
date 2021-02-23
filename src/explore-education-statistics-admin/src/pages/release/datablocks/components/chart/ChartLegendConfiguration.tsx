@@ -260,7 +260,6 @@ const ChartLegendConfiguration = ({
 
           {validationSchema.fields.position && (
             <FormFieldSelect<FormValues>
-              id={`${formId}-position`}
               name="position"
               label="Position"
               options={positionOptions}
@@ -274,7 +273,7 @@ const ChartLegendConfiguration = ({
             {form.values.items?.length > 0 ? (
               <>
                 {form.values.items?.map((dataSet, index) => {
-                  const itemId = `${formId}-items${index}`;
+                  const itemId = `items-${index}`;
                   const itemName = `items[${index}]`;
 
                   const itemErrors: string[] = Object.values(
@@ -292,7 +291,6 @@ const ChartLegendConfiguration = ({
                         <div className="dfe-flex dfe-justify-content--space-between">
                           <div className={styles.labelInput}>
                             <FormFieldTextInput
-                              id={`${itemId}Label`}
                               name={`${itemName}.label`}
                               label="Label"
                               formGroup={false}
@@ -302,7 +300,6 @@ const ChartLegendConfiguration = ({
 
                           <div className={styles.colourInput}>
                             <FormFieldColourInput
-                              id={`${itemId}Colour`}
                               name={`${itemName}.colour`}
                               label="Colour"
                               colours={colours}
@@ -314,7 +311,6 @@ const ChartLegendConfiguration = ({
                           {capabilities.hasSymbols && (
                             <div className={styles.configurationInput}>
                               <FormFieldSelect
-                                id={`${itemId}Symbol`}
                                 name={`${itemName}.symbol`}
                                 label="Symbol"
                                 placeholder="None"
@@ -328,7 +324,6 @@ const ChartLegendConfiguration = ({
                           {capabilities.hasLineStyle && (
                             <div className={styles.configurationInput}>
                               <FormFieldSelect
-                                id={`${itemId}LineStyle`}
                                 name={`${itemName}.lineStyle`}
                                 label="Style"
                                 order={FormSelect.unordered}

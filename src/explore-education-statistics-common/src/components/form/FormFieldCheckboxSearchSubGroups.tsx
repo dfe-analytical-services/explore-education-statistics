@@ -20,11 +20,12 @@ function FormFieldCheckboxSearchSubGroups<FormValues>(
 
   return (
     <FormField<string[]> {...props}>
-      {({ field, helpers, meta }) => {
+      {({ id, field, helpers, meta }) => {
         return (
           <FormCheckboxSearchSubGroups
             {...props}
             {...field}
+            id={id}
             small
             onAllChange={(event, checked) => {
               if (event.isDefaultPrevented()) {

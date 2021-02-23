@@ -26,7 +26,7 @@ function FormFieldFileInput<FormValues>(props: Props<FormValues>) {
 
   return (
     <FormField<File | null> {...props}>
-      {({ field, helpers, meta }) => (
+      {({ id, field, helpers, meta }) => (
         <>
           <Effect
             value={meta.touched}
@@ -42,6 +42,7 @@ function FormFieldFileInput<FormValues>(props: Props<FormValues>) {
           <FormFileInput
             {...props}
             {...field}
+            id={id}
             onClick={toggleClicked.on}
             onChange={event => {
               if (props.onChange) {

@@ -140,7 +140,6 @@ const MethodologyStatusPage = ({
                           'Once approved, changes will be available to the public immediately.'
                         }
                         name="status"
-                        id={`${formId}-status`}
                         options={[
                           {
                             label: 'In draft',
@@ -153,7 +152,6 @@ const MethodologyStatusPage = ({
                               <FormFieldTextArea<FormValues>
                                 name="internalReleaseNote"
                                 className="govuk-!-width-one-half"
-                                id={`${formId}-internalReleaseNote`}
                                 label="Internal release note"
                                 rows={2}
                               />

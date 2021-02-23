@@ -10,7 +10,6 @@ describe('WizardStepFormActions', () => {
       <Formik onSubmit={() => {}} initialValues={{}}>
         <Form>
           <WizardStepFormActions
-            formId="form"
             goToPreviousStep={() => {}}
             onPreviousStep={() => {}}
             stepNumber={1}
@@ -30,7 +29,6 @@ describe('WizardStepFormActions', () => {
       <Formik onSubmit={() => {}} initialValues={{}}>
         <Form>
           <WizardStepFormActions
-            formId="form"
             goToPreviousStep={() => {}}
             onPreviousStep={() => {}}
             stepNumber={1}
@@ -51,7 +49,6 @@ describe('WizardStepFormActions', () => {
       <Formik onSubmit={() => {}} initialValues={{}}>
         <Form>
           <WizardStepFormActions
-            formId="form"
             goToPreviousStep={() => {}}
             onPreviousStep={() => {}}
             stepNumber={1}
@@ -66,7 +63,6 @@ describe('WizardStepFormActions', () => {
       <Formik onSubmit={() => {}} initialValues={{}}>
         <Form>
           <WizardStepFormActions
-            formId="form"
             goToPreviousStep={() => {}}
             onPreviousStep={() => {}}
             stepNumber={2}
@@ -85,7 +81,6 @@ describe('WizardStepFormActions', () => {
       <Formik onSubmit={() => {}} initialValues={{}}>
         <Form>
           <WizardStepFormActions
-            formId="form"
             goToPreviousStep={goToPreviousStep}
             onPreviousStep={() => {}}
             stepNumber={2}
@@ -108,7 +103,6 @@ describe('WizardStepFormActions', () => {
       <Formik onSubmit={() => {}} initialValues={{}}>
         <Form>
           <WizardStepFormActions
-            formId="form"
             goToPreviousStep={goToPreviousStep}
             onPreviousStep={event => event.preventDefault()}
             stepNumber={2}

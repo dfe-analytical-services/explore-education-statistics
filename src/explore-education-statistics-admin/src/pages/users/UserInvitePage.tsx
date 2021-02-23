@@ -112,26 +112,24 @@ const UserInvitePage = ({
             return (
               <Form id={formId}>
                 <FormFieldset
-                  id={`${formId}-userEmailFieldset`}
+                  id="email-fieldset"
                   legend="Provide the email address for the user"
                   legendSize="m"
                   hint="The invited user must have a @education.gov.uk email address"
                 >
                   <FormFieldTextInput<FormValues>
-                    id={`${formId}-userEmail`}
                     label="User email"
                     name="userEmail"
                   />
                 </FormFieldset>
 
                 <FormFieldset
-                  id={`${formId}-selectedRoleIdFieldset`}
+                  id="role-fieldset"
                   legend="Role"
                   legendSize="m"
                   hint="The users role within the service."
                 >
                   <FormFieldSelect<FormValues>
-                    id={`${formId}-selectedRoleId`}
                     label="Role"
                     name="selectedRoleId"
                     placeholder="Choose role"

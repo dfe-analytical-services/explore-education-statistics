@@ -1,6 +1,7 @@
 import ErrorSummary, {
   ErrorSummaryMessage,
 } from '@common/components/ErrorSummary';
+import { FormContextProvider } from '@common/components/form/contexts/FormContext';
 import useMountedRef from '@common/hooks/useMountedRef';
 import useToggle from '@common/hooks/useToggle';
 import createErrorHelper from '@common/validation/createErrorHelper';
@@ -121,18 +122,20 @@ const Form = ({
   );
 
   return (
-    <form id={id} onSubmit={handleSubmit}>
-      {showErrorSummary && (
-        <ErrorSummary
-          errors={allErrors}
-          id={`${id}-summary`}
-          focusOnError={hasSummaryFocus}
-          onFocus={toggleSummaryFocus.off}
-        />
-      )}
+    <FormContextProvider id={id}>
+      <form id={id} onSubmit={handleSubmit}>
+        {showErrorSummary && (
+          <ErrorSummary
+            errors={allErrors}
+            id={`${id}-summary`}
+            focusOnError={hasSummaryFocus}
+            onFocus={toggleSummaryFocus.off}
+          />
+        )}
 
-      {children}
-    </form>
+        {children}
+      </form>
+    </FormContextProvider>
   );
 };
 
