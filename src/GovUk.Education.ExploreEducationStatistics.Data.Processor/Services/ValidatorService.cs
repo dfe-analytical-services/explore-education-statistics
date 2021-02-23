@@ -93,8 +93,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Processor.Services
 
             await _dataImportService.UpdateStatus(import.Id, DataImportStatus.STAGE_1, 0);
 
-            return await _logger.TraceTime(async () => 
-                await ValidateCsvFile(import.File, false)
+            return await ValidateCsvFile(import.File, false)
                 .OnSuccessDo(async () => await ValidateCsvFile(import.MetaFile, true))
                 .OnSuccess(async () =>
                     {
@@ -123,8 +122,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Processor.Services
                                         )
                             );
                     }
-                ), 
-                "validate a complete CSV");
+                );
         }
 
         private async Task<Either<List<DataImportError>, Unit>> ValidateCsvFile(File file, bool isMetaFile)

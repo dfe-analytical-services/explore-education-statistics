@@ -40,25 +40,21 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Processor.Services
             Ward ward = null,
             PlanningArea planningArea = null)
         {
-            return _logger.TraceTime(() =>
+            var cacheKey = GetCacheKey(country, institution, localAuthority, localAuthorityDistrict,
+                    localEnterprisePartnership, mayoralCombinedAuthority, multiAcademyTrust, opportunityArea,
+                    parliamentaryConstituency, region, rscRegion, sponsor, ward, planningArea);
+
+            if (GetCache().TryGetValue(cacheKey, out Location location))
             {
-                var cacheKey = GetCacheKey(country, institution, localAuthority, localAuthorityDistrict,
-                    localEnterprisePartnership, mayoralCombinedAuthority, multiAcademyTrust, opportunityArea,
-                    parliamentaryConstituency, region, rscRegion, sponsor, ward, planningArea);
-
-                if (GetCache().TryGetValue(cacheKey, out Location location))
-                {
-                    return location;
-                }
-                
-                location = LookupOrCreate(context, country, institution, localAuthority, localAuthorityDistrict,
-                    localEnterprisePartnership, mayoralCombinedAuthority, multiAcademyTrust, opportunityArea,
-                    parliamentaryConstituency, region, rscRegion, sponsor, ward, planningArea);
-                GetCache().Set(cacheKey, location);
-
                 return location;
-                
-            }, "look up a location or create a new one", true);
+            }
+            
+            location = LookupOrCreate(context, country, institution, localAuthority, localAuthorityDistrict,
+                localEnterprisePartnership, mayoralCombinedAuthority, multiAcademyTrust, opportunityArea,
+                parliamentaryConstituency, region, rscRegion, sponsor, ward, planningArea);
+            GetCache().Set(cacheKey, location);
+
+            return location;
         }
 
         private static string GetCacheKey(Country country,
@@ -107,7 +103,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Processor.Services
             Ward ward = null,
             PlanningArea planningArea = null)
         {
-            var location = _logger.TraceTime(() => Lookup(
+            var location = Lookup(
                 context,
                 country,
                 institution,
@@ -122,12 +118,11 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Processor.Services
                 rscRegion,
                 sponsor,
                 ward,
-                planningArea),
-                "look up a possibly existing Location");
+                planningArea);
 
             if (location == null)
             {
-                var entityEntry = _logger.TraceTime(() => context.Location.Add(new Location
+                var entityEntry = context.Location.Add(new Location
                 {
                     Id = _guidGenerator.NewGuid(),
                     Country = country ?? Country.Empty(),
@@ -144,8 +139,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Processor.Services
                     Sponsor = sponsor ?? Sponsor.Empty(),
                     Ward = ward ?? Ward.Empty(),
                     PlanningArea = planningArea ?? PlanningArea.Empty()
-                }), 
-                    "add a new Location to the db context");
+                });
 
                 return entityEntry.Entity;
             }

@@ -174,7 +174,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Processor.Services
             _importerFilterService.ClearCache();
             _importerLocationService.ClearCache();
 
-            var observations = _logger.DebugTime(() =>
+            var observations = 
                 GetObservations(
                     context,
                     rows,
@@ -182,14 +182,9 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Processor.Services
                     subject,
                     subjectMeta,
                     batchNo,
-                    rowsPerBatch).ToList(),
-            $"to read batch {batchNo} of Observations");
+                    rowsPerBatch).ToList();
 
-            await _logger.DebugTime(async () =>
-            {
-                await InsertObservations(context, observations);
-            },
-                $"to insert batch {batchNo} of Observations");
+            await InsertObservations(context, observations);
         }
 
         public GeographicLevel GetGeographicLevel(IReadOnlyList<string> line, List<string> headers)
@@ -250,22 +245,18 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Processor.Services
 
             foreach (DataRow row in rows)
             {
-                _logger.TraceTime(() =>
-                    {
-                        var o = ObservationFromCsv(
-                            context,
-                            CsvUtil.GetRowValues(row).ToArray(),
-                            headers,
-                            subject,
-                            subjectMeta,
-                            ((batchNo - 1) * rowsPerBatch) + i++ + 2);
+                var o = ObservationFromCsv(
+                    context,
+                    CsvUtil.GetRowValues(row).ToArray(),
+                    headers,
+                    subject,
+                    subjectMeta,
+                    ((batchNo - 1) * rowsPerBatch) + i++ + 2);
 
-                        if (!IgnoredGeographicLevels.Contains(o.GeographicLevel))
-                        {
-                            observations.Add(o);
-                        }
-                    },
-                    "to read an observation");
+                if (!IgnoredGeographicLevels.Contains(o.GeographicLevel))
+                {
+                    observations.Add(o);
+                }
             }
 
             return observations;
