@@ -8,6 +8,7 @@ import isBrowser from '@common/utils/isBrowser';
 import React, { useCallback } from 'react';
 
 interface Props {
+  allowImages?: boolean;
   releaseId: string;
   block: EditableBlock;
   editable?: boolean;
@@ -16,6 +17,7 @@ interface Props {
 }
 
 const ReleaseEditableBlock = ({
+  allowImages = false,
   releaseId,
   block,
   editable = true,
@@ -66,8 +68,10 @@ const ReleaseEditableBlock = ({
           useMarkdown={block.type === 'MarkDownBlock'}
           onSave={handleSave}
           onDelete={handleDelete}
-          onImageUpload={handleImageUpload}
-          onImageUploadCancel={handleImageUploadCancel}
+          onImageUpload={allowImages ? handleImageUpload : undefined}
+          onImageUploadCancel={
+            allowImages ? handleImageUploadCancel : undefined
+          }
         />
       );
     default:
