@@ -12,7 +12,7 @@ import customUploadAdapterPlugin from '@admin/utils/ckeditor/customUploadAdapter
 import { CKEditor, CKEditorProps } from '@ckeditor/ckeditor5-react';
 import ErrorMessage from '@common/components/ErrorMessage';
 import FormLabel from '@common/components/form/FormLabel';
-import SanitizeHtml from '@common/components/SanitizeHtml';
+import ContentHtml from '@common/components/ContentHtml';
 import useToggle from '@common/hooks/useToggle';
 import isBrowser from '@common/utils/isBrowser';
 import classNames from 'classnames';
@@ -340,7 +340,7 @@ const FormEditor = ({
           id={id}
           tabIndex={0}
         >
-          <SanitizeHtml dirtyHtml={value} />
+          <ContentHtml html={value} />
         </div>
       )}
     </>

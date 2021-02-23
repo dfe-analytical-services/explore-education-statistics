@@ -1,7 +1,7 @@
 import Accordion from '@common/components/Accordion';
 import AccordionSection from '@common/components/AccordionSection';
 import FormattedDate from '@common/components/FormattedDate';
-import SanitizeHtml from '@common/components/SanitizeHtml';
+import ContentHtml from '@common/components/ContentHtml';
 import ReleaseMetaGuidanceDataFile from '@common/modules/release/components/ReleaseMetaGuidanceDataFile';
 import { SubjectMetaGuidance } from '@common/services/releaseMetaGuidanceService';
 import React from 'react';
@@ -28,7 +28,7 @@ const ReleaseMetaGuidancePageContent = ({
       )}
 
       {metaGuidance && (
-        <SanitizeHtml dirtyHtml={metaGuidance} testId="metaGuidance-content" />
+        <ContentHtml html={metaGuidance} testId="metaGuidance-content" />
       )}
 
       {subjects.length > 0 && (

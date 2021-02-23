@@ -3,7 +3,7 @@ import FormEditor, { FormEditorProps } from '@admin/components/form/FormEditor';
 import toHtml from '@admin/utils/markdown/toHtml';
 import Button from '@common/components/Button';
 import ButtonGroup from '@common/components/ButtonGroup';
-import SanitizeHtml from '@common/components/SanitizeHtml';
+import ContentHtml from '@common/components/ContentHtml';
 import useToggle from '@common/hooks/useToggle';
 import { OmitStrict } from '@common/types';
 import classNames from 'classnames';
@@ -108,12 +108,10 @@ const EditableContentBlock = ({
               }
             }}
           >
-            <SanitizeHtml
-              dirtyHtml={content || '<p>This section is empty</p>'}
-            />
+            <ContentHtml html={content || '<p>This section is empty</p>'} />
           </div>
         ) : (
-          <SanitizeHtml dirtyHtml={content || '<p>This section is empty</p>'} />
+          <ContentHtml html={content || '<p>This section is empty</p>'} />
         )}
       </div>
     </EditableBlockWrapper>

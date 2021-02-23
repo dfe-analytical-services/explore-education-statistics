@@ -1,7 +1,7 @@
 import { ContentBlock } from '@common/services/types/blocks';
 import React from 'react';
 import ReactMarkdown from 'react-markdown';
-import SanitizeHtml from '@common/components/SanitizeHtml';
+import ContentHtml from '@common/components/ContentHtml';
 
 interface Props {
   block: ContentBlock;
@@ -14,7 +14,7 @@ const ContentBlockRenderer = ({ block }: Props) => {
     case 'MarkDownBlock':
       return <ReactMarkdown className="dfe-content" source={body} />;
     case 'HtmlBlock':
-      return <SanitizeHtml dirtyHtml={body} />;
+      return <ContentHtml html={body} />;
     default:
       return null;
   }

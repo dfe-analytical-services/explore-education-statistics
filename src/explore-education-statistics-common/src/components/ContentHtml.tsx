@@ -2,22 +2,22 @@ import sanitizeHtml, { SanitizeHtmlOptions } from '@common/utils/sanitizeHtml';
 import classNames from 'classnames';
 import React, { useMemo } from 'react';
 
-export interface SanitizeHtmlProps {
+export interface ContentHtmlProps {
   className?: string;
-  dirtyHtml: string;
-  options?: SanitizeHtmlOptions;
+  html: string;
+  sanitizeOptions?: SanitizeHtmlOptions;
   testId?: string;
 }
 
-const SanitizeHtml = ({
+const ContentHtml = ({
   className,
-  dirtyHtml,
-  options,
+  html,
+  sanitizeOptions,
   testId,
-}: SanitizeHtmlProps) => {
+}: ContentHtmlProps) => {
   const cleanHtml = useMemo(() => {
-    return sanitizeHtml(dirtyHtml, options);
-  }, [dirtyHtml, options]);
+    return sanitizeHtml(html, sanitizeOptions);
+  }, [html, sanitizeOptions]);
 
   return (
     <div
@@ -29,4 +29,4 @@ const SanitizeHtml = ({
   );
 };
 
-export default SanitizeHtml;
+export default ContentHtml;

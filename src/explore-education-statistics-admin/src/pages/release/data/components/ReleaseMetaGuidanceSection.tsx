@@ -9,7 +9,7 @@ import ButtonText from '@common/components/ButtonText';
 import { Form } from '@common/components/form';
 import InsetText from '@common/components/InsetText';
 import LoadingSpinner from '@common/components/LoadingSpinner';
-import SanitizeHtml from '@common/components/SanitizeHtml';
+import ContentHtml from '@common/components/ContentHtml';
 import WarningMessage from '@common/components/WarningMessage';
 import useAsyncHandledRetry from '@common/hooks/useAsyncHandledRetry';
 import useFormSubmit from '@common/hooks/useFormSubmit';
@@ -155,8 +155,8 @@ const ReleaseMetaGuidanceSection = ({ releaseId, canUpdateRelease }: Props) => {
                               No guidance content was saved.
                             </InsetText>
                           ) : (
-                            <SanitizeHtml
-                              dirtyHtml={form.values.content}
+                            <ContentHtml
+                              html={form.values.content}
                               testId="mainGuidanceContent"
                             />
                           )}
@@ -188,8 +188,8 @@ const ReleaseMetaGuidanceSection = ({ releaseId, canUpdateRelease }: Props) => {
                                         testId="fileGuidanceContent"
                                       />
                                     ) : (
-                                      <SanitizeHtml
-                                        dirtyHtml={
+                                      <ContentHtml
+                                        html={
                                           form.values.subjects[index].content
                                         }
                                         testId="fileGuidanceContent"
