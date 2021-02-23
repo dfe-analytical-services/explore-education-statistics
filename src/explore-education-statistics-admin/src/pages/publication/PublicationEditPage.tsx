@@ -101,7 +101,7 @@ const PublicationEditPage = ({
             <ul className="govuk-list">
               <li>
                 <Link
-                  data-testid="manage-legacy-releases"
+                  data-testid={`Legacy releases link for ${publication.title}`}
                   to={generatePath(legacyReleasesRoute.path, {
                     publicationId,
                   })}
