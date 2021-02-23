@@ -1,6 +1,4 @@
-using System;
 using System.Linq;
-using GovUk.Education.ExploreEducationStatistics.Common.Extensions;
 using GovUk.Education.ExploreEducationStatistics.Common.Services.Interfaces;
 using GovUk.Education.ExploreEducationStatistics.Common.Utils;
 using GovUk.Education.ExploreEducationStatistics.Data.Model;
@@ -176,100 +174,60 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Processor.Services
                 .And(location => location.Country_Code == country.Code 
                                  && location.Country_Name == country.Name);
 
-            if (institution != null)
-            {
-                predicateBuilder = predicateBuilder
-                    .And(location => location.Institution_Code == institution.Code 
-                                     && location.Institution_Name == institution.Name);
-            }
+            predicateBuilder = predicateBuilder
+                .And(location => location.Institution_Code == (institution != null ? institution.Code : null) 
+                                 && location.Institution_Name == (institution != null ? institution.Name : null));
 
-            if (localAuthority != null)
-            {
-                // Also match the old LA code even if blank
-                predicateBuilder = predicateBuilder
-                    .And(location => location.LocalAuthority_Code == localAuthority.Code
-                        && location.LocalAuthority_OldCode == localAuthority.OldCode
-                        && location.LocalAuthority_Name == localAuthority.Name);
-            }
+            // Also match the old LA code even if blank
+            predicateBuilder = predicateBuilder
+                .And(location =>
+                    location.LocalAuthority_Code == (localAuthority != null && localAuthority.Code != null ? localAuthority.Code : null)
+                    && location.LocalAuthority_OldCode == (localAuthority != null && localAuthority.OldCode != null ? localAuthority.OldCode : null)
+                    && location.LocalAuthority_Name == (localAuthority != null ? localAuthority.Name : null));
 
-            if (localAuthorityDistrict != null)
-            {
-                predicateBuilder = predicateBuilder
-                    .And(location =>
-                        location.LocalAuthorityDistrict_Code == localAuthorityDistrict.Code
-                        && location.LocalAuthorityDistrict_Name == localAuthorityDistrict.Name);
-            }
+            predicateBuilder = predicateBuilder
+                .And(location => location.LocalAuthorityDistrict_Code == (localAuthorityDistrict != null ? localAuthorityDistrict.Code : null)
+                                 && location.LocalAuthorityDistrict_Name == (localAuthorityDistrict != null ? localAuthorityDistrict.Name : null));
 
-            if (localEnterprisePartnership != null)
-            {
-                predicateBuilder = predicateBuilder
-                    .And(location =>
-                        location.LocalEnterprisePartnership_Code == localEnterprisePartnership.Code
-                        && location.LocalEnterprisePartnership_Name == localEnterprisePartnership.Name);
-            }
+            predicateBuilder = predicateBuilder
+                .And(location => location.LocalEnterprisePartnership_Code == (localEnterprisePartnership != null ? localEnterprisePartnership.Code : null)
+                                 && location.LocalEnterprisePartnership_Name == (localEnterprisePartnership != null ? localEnterprisePartnership.Name : null));
 
-            if (mayoralCombinedAuthority != null)
-            {
-                predicateBuilder = predicateBuilder
-                    .And(location => location.MayoralCombinedAuthority_Code == mayoralCombinedAuthority.Code
-                                     && location.MayoralCombinedAuthority_Name == mayoralCombinedAuthority.Name);
-            }
+            predicateBuilder = predicateBuilder
+                .And(location => location.MayoralCombinedAuthority_Code == (mayoralCombinedAuthority != null ? mayoralCombinedAuthority.Code : null)
+                                 && location.MayoralCombinedAuthority_Name == (mayoralCombinedAuthority != null ? mayoralCombinedAuthority.Name : null));
 
-            if (multiAcademyTrust != null)
-            {
-                predicateBuilder = predicateBuilder
-                    .And(location => location.MultiAcademyTrust_Code == multiAcademyTrust.Code
-                                     && location.MultiAcademyTrust_Name == multiAcademyTrust.Name);
-            }
+            predicateBuilder = predicateBuilder
+                .And(location => location.MultiAcademyTrust_Code == (multiAcademyTrust != null ? multiAcademyTrust.Code : null)
+                                 && location.MultiAcademyTrust_Name == (multiAcademyTrust != null ? multiAcademyTrust.Name : null));
 
-            if (opportunityArea != null)
-            {
-                predicateBuilder = predicateBuilder
-                    .And(location => location.OpportunityArea_Code == opportunityArea.Code
-                                     && location.OpportunityArea_Name == opportunityArea.Name);
-            }
+            predicateBuilder = predicateBuilder
+                .And(location => location.OpportunityArea_Code == (opportunityArea != null ? opportunityArea.Code : null)
+                                 && location.OpportunityArea_Name == (opportunityArea != null ? opportunityArea.Name : null));
 
-            if (parliamentaryConstituency != null)
-            {
-                predicateBuilder = predicateBuilder
-                    .And(location => location.ParliamentaryConstituency_Code == parliamentaryConstituency.Code
-                                     && location.ParliamentaryConstituency_Name == parliamentaryConstituency.Name);
-            }
+            predicateBuilder = predicateBuilder
+                .And(location => location.ParliamentaryConstituency_Code == (parliamentaryConstituency != null ? parliamentaryConstituency.Code : null)
+                                 && location.ParliamentaryConstituency_Name == (parliamentaryConstituency != null ? parliamentaryConstituency.Name : null));
 
-            if (region != null)
-            {
-                predicateBuilder = predicateBuilder
-                    .And(location => location.Region_Code == region.Code
-                                     && location.Region_Name == region.Name);
-            }
-            
+            predicateBuilder = predicateBuilder
+                .And(location => location.Region_Code == (region != null ? region.Code : null)
+                                 && location.Region_Name == (region != null ? region.Name : null));
+
             // Note that Name is not included in the predicate here as it is the same as the code
-            if (rscRegion != null)
-            {
-                predicateBuilder = predicateBuilder
-                    .And(location => location.RscRegion_Code == rscRegion.Code);
-            }
+            predicateBuilder = predicateBuilder
+                .And(location => location.RscRegion_Code == (rscRegion != null ? rscRegion.Code : null));
 
-            if (sponsor != null)
-            {
-                predicateBuilder = predicateBuilder
-                    .And(location => location.Sponsor_Code == sponsor.Code
-                                     && location.Sponsor_Name == sponsor.Name);
-            }
+            predicateBuilder = predicateBuilder
+                .And(location => location.Sponsor_Code == (sponsor != null ? sponsor.Code : null)
+                                 && location.Sponsor_Name == (sponsor != null ? sponsor.Name : null));
 
-            if (ward != null)
-            {
-                predicateBuilder = predicateBuilder
-                    .And(location => location.Ward_Code == ward.Code
-                                     && location.Ward_Name == ward.Name);
-            }
-
-            if (planningArea != null)
-            {
-                predicateBuilder = predicateBuilder
-                    .And(location => location.PlanningArea_Code == planningArea.Code
-                                     && location.PlanningArea_Name == planningArea.Name);
-            }
+            predicateBuilder = predicateBuilder
+                .And(location => location.Ward_Code == (ward != null ? ward.Code : null)
+                                 && location.Ward_Name == (ward != null ? ward.Name : null));
+            
+            predicateBuilder = predicateBuilder
+                .And(location => location.PlanningArea_Code == (planningArea != null ? planningArea.Code : null)
+                                 && location.PlanningArea_Name == (planningArea != null ? planningArea.Name : null));
             
             return context.Location.AsNoTracking().FirstOrDefault(predicateBuilder);
         }
