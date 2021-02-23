@@ -1,8 +1,11 @@
 import ButtonText from '@common/components/ButtonText';
 import useMounted from '@common/hooks/useMounted';
 import { OmitStrict, PartialBy } from '@common/types/util';
+import naturalOrderBy, {
+  OrderDirection,
+  OrderKeys,
+} from '@common/utils/array/naturalOrderBy';
 import classNames from 'classnames';
-import orderBy from 'lodash/orderBy';
 import React, {
   FocusEventHandler,
   memo,
@@ -39,10 +42,8 @@ interface BaseFormCheckboxGroupProps {
   selectAll?: boolean;
   selectAllText?: (isAllChecked: boolean, options: CheckboxOption[]) => string;
   small?: boolean;
-  order?:
-    | (keyof CheckboxOption)[]
-    | ((option: CheckboxOption) => CheckboxOption[keyof CheckboxOption])[];
-  orderDirection?: ('asc' | 'desc')[];
+  order?: OrderKeys<CheckboxOption>;
+  orderDirection?: OrderDirection | OrderDirection[];
   value: string[];
   onAllChange?: CheckboxGroupAllChangeEventHandler;
   onBlur?: FocusEventHandler<HTMLInputElement>;
@@ -117,7 +118,7 @@ export const BaseFormCheckboxGroup = ({
         </ButtonText>
       )}
 
-      {orderBy(options, order, orderDirection).map(option => (
+      {naturalOrderBy(options, order, orderDirection).map(option => (
         <FormCheckbox
           disabled={disabled}
           {...option}

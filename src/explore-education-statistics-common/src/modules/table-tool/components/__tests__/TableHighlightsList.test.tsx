@@ -14,13 +14,13 @@ describe('TableHighlightsList', () => {
     },
     {
       id: 'highlight-2',
-      name: '2 - Similar name',
-      description: '2 - Unique description',
+      name: '10 - Similar name',
+      description: '10 - Unique description',
     },
     {
       id: 'highlight-3',
-      name: '3 - Similar name',
-      description: '3 - Same description',
+      name: '2 - Similar name',
+      description: '2 - Same description',
     },
   ];
 
@@ -60,18 +60,18 @@ describe('TableHighlightsList', () => {
     const link2 = within(listItems[1]).getByRole('link', {
       name: '2 - Similar name',
     });
-
     expect(link2).toBeInTheDocument();
     expect(getDescribedBy(listItems[1], link2)).toHaveTextContent(
-      '2 - Unique description',
+      '2 - Same description',
     );
 
     const link3 = within(listItems[2]).getByRole('link', {
-      name: '3 - Similar name',
+      name: '10 - Similar name',
     });
+
     expect(link3).toBeInTheDocument();
     expect(getDescribedBy(listItems[2], link3)).toHaveTextContent(
-      '3 - Same description',
+      '10 - Unique description',
     );
   });
 
@@ -142,7 +142,7 @@ describe('TableHighlightsList', () => {
 
       expect(listItems).toHaveLength(2);
       expect(listItems[0]).toHaveTextContent('2 - Similar name');
-      expect(listItems[1]).toHaveTextContent('3 - Similar name');
+      expect(listItems[1]).toHaveTextContent('10 - Similar name');
     });
   });
 
@@ -164,30 +164,7 @@ describe('TableHighlightsList', () => {
       const listItems = screen.getAllByRole('listitem');
 
       expect(listItems).toHaveLength(1);
-      expect(listItems[0]).toHaveTextContent('2 - Unique description');
-    });
-  });
-
-  test('renders multiple results for search term on name', async () => {
-    render(
-      <TableHighlightsList
-        highlights={testHighlights}
-        renderLink={renderLink}
-      />,
-    );
-
-    await userEvent.type(screen.getByRole('textbox'), 'same description');
-
-    jest.runOnlyPendingTimers();
-
-    await waitFor(() => {
-      expect(screen.getByText(/Found 2 matching tables/)).toBeInTheDocument();
-
-      const listItems = screen.getAllByRole('listitem');
-
-      expect(listItems).toHaveLength(2);
-      expect(listItems[0]).toHaveTextContent('1 - Same description');
-      expect(listItems[1]).toHaveTextContent('3 - Same description');
+      expect(listItems[0]).toHaveTextContent('10 - Unique description');
     });
   });
 

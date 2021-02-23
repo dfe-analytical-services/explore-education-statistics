@@ -1,5 +1,6 @@
 import { FormTextSearchInput } from '@common/components/form';
 import { TableHighlight } from '@common/services/tableBuilderService';
+import naturalOrderBy from '@common/utils/array/naturalOrderBy';
 import React, { cloneElement, ReactElement, ReactNode, useState } from 'react';
 
 interface Props {
@@ -10,13 +11,14 @@ interface Props {
 const TableHighlightsList = ({ highlights = [], renderLink }: Props) => {
   const [highlightSearch, setHighlightSearch] = useState('');
 
-  const filteredHighlights = highlights
-    .filter(
+  const filteredHighlights = naturalOrderBy(
+    highlights.filter(
       highlight =>
         highlight.name.toLowerCase().includes(highlightSearch) ||
         highlight.description.toLowerCase().includes(highlightSearch),
-    )
-    .sort();
+    ),
+    'name',
+  );
 
   if (!highlights.length) {
     return (
