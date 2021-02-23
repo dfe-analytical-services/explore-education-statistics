@@ -1,0 +1,48 @@
+@import '~govuk-frontend/govuk/base';
+
+// Styles related to dynamic HTML content (from CKEditor)
+
+.dfe-content {
+  .table {
+    margin: govuk-spacing(6) govuk-spacing(4);
+    overflow: auto;
+  }
+
+  figcaption {
+    font-size: 1rem;
+  }
+
+  .image {
+    margin: govuk-spacing(6) auto;
+    text-align: center;
+  }
+
+  .image img {
+    display: block;
+    margin: 0 auto govuk-spacing(2);
+    max-width: 100%;
+    min-width: 50px;
+  }
+}
+
+.dfe-content-overflow {
+  overflow: auto;
+  padding-bottom: 0.5em;
+  width: 100%;
+
+  // Forces visible scrollbar on browser/OS that might hide it by default
+  &::-webkit-scrollbar {
+    // -webkit-appearance: none;
+    background-color: rgba(0, 0, 0, 0.1);
+    height: 8px;
+  }
+
+  &::-webkit-scrollbar-thumb {
+    background-color: rgba(0, 0, 0, 0.4);
+    border-radius: 20px;
+  }
+
+  table {
+    max-width: 100%;
+  }
+}

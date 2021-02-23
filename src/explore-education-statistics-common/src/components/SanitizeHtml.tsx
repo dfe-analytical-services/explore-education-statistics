@@ -1,4 +1,5 @@
 import sanitizeHtml, { SanitizeHtmlOptions } from '@common/utils/sanitizeHtml';
+import classNames from 'classnames';
 import React, { useMemo } from 'react';
 
 export interface SanitizeHtmlProps {
@@ -20,7 +21,7 @@ const SanitizeHtml = ({
 
   return (
     <div
-      className={className}
+      className={classNames('dfe-content', className)}
       data-testid={testId}
       // eslint-disable-next-line react/no-danger
       dangerouslySetInnerHTML={{ __html: cleanHtml }}

@@ -12,7 +12,7 @@ const ContentBlockRenderer = ({ block }: Props) => {
 
   switch (block.type) {
     case 'MarkDownBlock':
-      return <ReactMarkdown className="govuk-body" source={body} />;
+      return <ReactMarkdown className="dfe-content" source={body} />;
     case 'HtmlBlock':
       return <SanitizeHtml dirtyHtml={body} />;
     default:
