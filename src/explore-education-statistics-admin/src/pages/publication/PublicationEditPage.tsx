@@ -38,9 +38,9 @@ const PublicationEditPage = ({
 
   return (
     <Page
-      title="Edit publication"
+      title="Manage publication"
       caption={publication.title}
-      breadcrumbs={[{ name: 'Edit publication' }]}
+      breadcrumbs={[{ name: 'Manage publication' }]}
     >
       <div className="govuk-grid-row">
         <div className="govuk-grid-column-three-quarters">
