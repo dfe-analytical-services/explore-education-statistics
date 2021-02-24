@@ -119,7 +119,7 @@ Test paragraph
     expect(screen.getByLabelText('Block content')).toBeInTheDocument();
   });
 
-  test('clicking `Edit block` and `Save` buttons calls `onSave` handler', () => {
+  test('clicking `Edit block` and `Save` buttons calls `onSave` handler', async () => {
     const handleSave = jest.fn();
 
     render(
@@ -138,7 +138,10 @@ Test paragraph
 
     userEvent.click(screen.getByRole('button', { name: 'Save' }));
 
-    expect(handleSave).toHaveBeenCalledWith('<p>Test content</p>');
+    await waitFor(() => {
+      expect(handleSave).toHaveBeenCalledTimes(1);
+      expect(handleSave).toHaveBeenCalledWith('<p>Test content</p>');
+    });
   });
 
   test('clicking `Remove block` and `Confirm` buttons calls `onDelete` handler', async () => {
@@ -166,6 +169,9 @@ Test paragraph
 
     userEvent.click(screen.getByRole('button', { name: 'Confirm' }));
 
-    expect(handleDelete).toHaveBeenCalled();
+    await waitFor(() => {
+      expect(handleDelete).toHaveBeenCalledTimes(1);
+      expect(handleDelete).toHaveBeenCalled();
+    });
   });
 });
