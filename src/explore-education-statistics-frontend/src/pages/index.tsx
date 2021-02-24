@@ -6,11 +6,6 @@ import Page from '../components/Page';
 function HomePage() {
   return (
     <Page title="Explore our statistics and data" isHomepage>
-      <p className="govuk-body-l">
-        Select an option to find the national and regional level statistics and
-        data you’re looking for.
-      </p>
-
       <div className="govuk-grid-row dfe-card__container">
         <div className="govuk-grid-column-one-half dfe-card__item">
           <div className="dfe-card">
@@ -19,9 +14,8 @@ function HomePage() {
             </h2>
 
             <p className="govuk-!-margin-top-2">
-              Browse to find statistical summaries and explanations to help you
-              understand and analyse our range of national and regional
-              statistics and data.
+              Browse statistical summaries and download associated data to help
+              you understand and analyse our range of statistics.
             </p>
             <ButtonLink
               to="/find-statistics"
@@ -48,8 +42,7 @@ function HomePage() {
             <h2 className="govuk-!-margin-bottom-0">Create your own tables</h2>
 
             <p className="govuk-!-margin-top-2">
-              Use our tool to build tables using our range of national and
-              regional data.
+              Explore our range of data and build your own tables from it.
             </p>
             <ButtonLink
               to="/data-tables"
@@ -78,18 +71,18 @@ function HomePage() {
       <div className="govuk-grid-row">
         <div className="govuk-grid-column-two-thirds">
           <h3 className="govuk-!-margin-bottom-1">
-            <Link to="/methodology">Education statistics: methodology</Link>
+            <Link to="/methodology">Methodology</Link>
           </h3>
           <p className="govuk-caption-m">
-            Browse to find out more about the methodology behind education
-            statistics and data and how and why they're collected and published.
+            Browse to find out more about the methodology behind our statistics
+            and how and why they&apos;re collected and published.
           </p>
           <h3 className="govuk-!-margin-bottom-1">
-            <Link to="/glossary">Education statistics: glossary</Link>
+            <Link to="/glossary">Glossary</Link>
           </h3>
           <p className="govuk-caption-m">
-            Browse our A to Z list of definitions for terms used across
-            education statistics and data.
+            Browse our A to Z list of definitions for terms used across our
+            statistics.
           </p>
         </div>
       </div>
@@ -98,69 +91,49 @@ function HomePage() {
 
       <h2 className="govuk-!-margin-top-9">Related services</h2>
 
-      <p>
-        Use these services to find specific performance and other information
-        about schools and colleges in England:
-      </p>
-
       <div className="govuk-grid-row govuk-!-margin-bottom-3">
-        <div className="govuk-grid-column-one-half">
-          <h4 className="govuk-!-margin-bottom-0">
+        <div className="govuk-grid-column-two-thirds">
+          <p>
+            Use these services to find specific performance and other
+            information about schools and colleges in England:
+          </p>
+          <h3 className="govuk-heading-s govuk-!-margin-bottom-0">
             <a href="https://www.gov.uk/school-performance-tables">
               Find and compare schools in England
             </a>
-          </h4>
+          </h3>
           <p className="govuk-caption-m govuk-!-margin-top-1">
             Search for and check the performance of primary, secondary and
             special needs schools and colleges.
           </p>
-        </div>
-        <div className="govuk-grid-column-one-half">
-          <h4 className="govuk-!-margin-bottom-0">
+          <h3 className="govuk-heading-s govuk-!-margin-bottom-0">
             <a href="https://www.get-information-schools.service.gov.uk/">
               Get information about schools
             </a>
-          </h4>
+          </h3>
           <p className="govuk-caption-m govuk-!-margin-top-1">
             Search to find and download information about schools, colleges,
             educational organisations and governors in England.
           </p>
-        </div>
-      </div>
-
-      <div className="govuk-grid-row govuk-!-margin-bottom-9">
-        <div className="govuk-grid-column-one-half">
-          <h4 className="govuk-!-margin-bottom-0">
+          <h3 className="govuk-heading-s govuk-!-margin-bottom-0">
             <a href="https://schools-financial-benchmarking.service.gov.uk/">
               Schools financial benchmarking
             </a>
-          </h4>
+          </h3>
           <p className="govuk-caption-m govuk-!-margin-top-1">
-            Compare your school's income and expenditure with other schools in
-            England.
-          </p>
-        </div>
-        <div className="govuk-grid-column-one-half">
-          <h4 className="govuk-!-margin-bottom-0">
-            <a href="https://www.gov.uk/government/organisations/department-for-education/about/statistics">
-              Statistics at DfE
-            </a>
-          </h4>
-          <p className="govuk-caption-m govuk-!-margin-top-1">
-            Browse to find and download statistics and data on education and
-            children which are not currently available through explore education
-            statistics.
+            Compare your school&apos;s income and expenditure with other schools
+            in England.
           </p>
         </div>
       </div>
 
       <hr />
 
-      <h2 className="govuk-!-margin-top-9">Contact Us</h2>
+      <h2 className="govuk-!-margin-top-9">Contact us</h2>
 
       <p className="govuk-!-margin-top-1">
-        If you need help and support or have a question about education
-        statistics and data contact:
+        If you need help and support or have a question about Explore education
+        statistics contact:
       </p>
 
       <p className="govuk-!-margin-top-1">
