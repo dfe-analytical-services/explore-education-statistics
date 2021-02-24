@@ -1,6 +1,7 @@
 import styles from '@admin/components/form/FormEditor.module.scss';
 import {
   EditorConfig,
+  Element,
   HeadingOption,
   ResizeOption,
 } from '@admin/types/ckeditor';
@@ -120,6 +121,9 @@ const resizeOptions: ResizeOption[] = [
   },
 ];
 
+export type EditorChangeHandler = (value: string) => void;
+export type EditorElementsHandler = (elements: Element[]) => void;
+
 export interface FormEditorProps {
   allowedHeadings?: string[];
   error?: string;
@@ -132,7 +136,9 @@ export interface FormEditorProps {
   value: string;
   testId?: string;
   onBlur?: () => void;
-  onChange: (content: string) => void;
+  onElementsChange?: EditorElementsHandler;
+  onElementsReady?: EditorElementsHandler;
+  onChange: EditorChangeHandler;
   onImageUpload?: ImageUploadHandler;
   onImageUploadCancel?: ImageUploadCancelHandler;
 }
@@ -150,6 +156,8 @@ const FormEditor = ({
   testId,
   onBlur,
   onChange,
+  onElementsChange,
+  onElementsReady,
   onImageUpload,
   onImageUploadCancel,
 }: FormEditorProps) => {
@@ -240,9 +248,15 @@ const FormEditor = ({
 
   const handleChange = useCallback<CKEditorProps['onChange']>(
     (event, editor) => {
+      if (onElementsChange) {
+        onElementsChange(
+          Array.from(editor.model.document.getRoot('main').getChildren()),
+        );
+      }
+
       onChange(editor.getData());
     },
-    [onChange],
+    [onChange, onElementsChange],
   );
 
   const handleBlur = useCallback<CKEditorProps['onBlur']>(() => {
@@ -258,8 +272,14 @@ const FormEditor = ({
       if (focusOnInit) {
         editor.editing.view.focus();
       }
+
+      if (onElementsReady) {
+        onElementsReady(
+          Array.from(editor.model.document.getRoot('main').getChildren()),
+        );
+      }
     },
-    [focusOnInit],
+    [focusOnInit, onElementsReady],
   );
 
   const isReadOnly = isBrowser('IE');

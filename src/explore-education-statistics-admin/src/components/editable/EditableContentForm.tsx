@@ -1,4 +1,5 @@
 import FormFieldEditor from '@admin/components/form/FormFieldEditor';
+import { Element } from '@admin/types/ckeditor';
 import {
   ImageUploadCancelHandler,
   ImageUploadHandler,
@@ -8,7 +9,7 @@ import ButtonGroup from '@common/components/ButtonGroup';
 import { Form } from '@common/components/form';
 import Yup from '@common/validation/yup';
 import { Formik } from 'formik';
-import React from 'react';
+import React, { useCallback } from 'react';
 
 interface FormValues {
   content: string;
@@ -33,12 +34,28 @@ const EditableContentForm = ({
   onCancel,
   onSubmit,
 }: Props) => {
+  const validateElements = useCallback((elements: Element[]) => {
+    let error: string | undefined;
+
+    elements.some(element => {
+      if (element.name === 'image' && !element.getAttribute('alt')) {
+        error = 'All images must have alternative (alt) text';
+        return true;
+      }
+
+      return false;
+    });
+
+    return error;
+  }, []);
+
   return (
     <Formik<FormValues>
       initialValues={{
         content,
       }}
-      validationSchema={Yup.object<FormValues>({
+      validateOnChange={false}
+      validationSchema={Yup.object({
         content: Yup.string().required('Enter content'),
       })}
       onSubmit={values => {
@@ -50,6 +67,7 @@ const EditableContentForm = ({
           name="content"
           label={label}
           focusOnInit
+          validateElements={validateElements}
           onImageUpload={onImageUpload}
           onImageUploadCancel={onImageUploadCancel}
         />
