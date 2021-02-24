@@ -24,18 +24,13 @@ function CookieBanner({ wide }: Props) {
   return isMounted && isVisible ? (
     <div className={styles.container}>
       <div
-        className={classNames(
-          'govuk-cookie-banner',
-          'govuk-width-container',
-          'dfe-width-container',
-          {
-            'dfe-width-container--wide': wide,
-          },
-        )}
+        className={classNames('govuk-cookie-banner', 'govuk-width-container', {
+          'dfe-width-container--wide': wide,
+        })}
         role="region"
         aria-label="Cookies on Explore Education Statistics"
       >
-        {typeof getCookie('disableGA') === 'undefined' && (
+        {typeof getCookie('disableGA') === 'undefined' ? (
           <div className="govuk-cookie-banner__message govuk-width-container">
             <div className="govuk-grid-row">
               <div className="govuk-grid-column-two-thirds">
@@ -59,9 +54,7 @@ function CookieBanner({ wide }: Props) {
               <Button
                 onClick={() => {
                   setBannerSeenCookie(true);
-                  if (typeof getCookie('disableGA') === 'undefined') {
-                    setGADisabledCookie(false);
-                  }
+                  setGADisabledCookie(false);
                 }}
               >
                 Accept analytics cookies
@@ -69,9 +62,7 @@ function CookieBanner({ wide }: Props) {
               <Button
                 onClick={() => {
                   setBannerSeenCookie(true);
-                  if (typeof getCookie('disableGA') === 'undefined') {
-                    setGADisabledCookie(true);
-                  }
+                  setGADisabledCookie(true);
                 }}
               >
                 Reject analytics cookies
@@ -79,8 +70,7 @@ function CookieBanner({ wide }: Props) {
               <Link to="/cookies">View cookies</Link>
             </ButtonGroup>
           </div>
-        )}
-        {typeof getCookie('disableGA') !== 'undefined' && (
+        ) : (
           <div
             className="govuk-cookie-banner__message govuk-width-container"
             role="alert"
@@ -89,11 +79,12 @@ function CookieBanner({ wide }: Props) {
               <div className="govuk-grid-column-two-thirds">
                 <div className="govuk-cookie-banner__content">
                   <p>
-                    You’ve{' '}
-                    {getCookie('disableGA') === 'false'
-                      ? 'accepted'
-                      : 'rejected'}{' '}
-                    analytics cookies. You can{' '}
+                    {`You’ve ${
+                      getCookie('disableGA') === 'false'
+                        ? 'accepted'
+                        : 'rejected'
+                    } analytics cookies. `}
+                    You can{' '}
                     <Link to="/cookies">change your cookie settings</Link> at
                     any time.
                   </p>
@@ -101,16 +92,15 @@ function CookieBanner({ wide }: Props) {
               </div>
             </div>
 
-            <div className="govuk-button-group">
+            <ButtonGroup>
               <Button
-                data-module="govuk-button"
                 onClick={() => {
                   setVisible(false);
                 }}
               >
                 Hide this message
               </Button>
-            </div>
+            </ButtonGroup>
           </div>
         )}
       </div>
