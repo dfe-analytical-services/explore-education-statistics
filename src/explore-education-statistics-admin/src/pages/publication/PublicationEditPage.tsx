@@ -3,6 +3,7 @@ import Page from '@admin/components/Page';
 import PublicationForm from '@admin/pages/publication/components/PublicationForm';
 import {
   dashboardRoute,
+  legacyReleasesRoute,
   PublicationRouteParams,
   ThemeTopicParams,
 } from '@admin/routes/routes';
@@ -11,7 +12,8 @@ import appendQuery from '@admin/utils/url/appendQuery';
 import LoadingSpinner from '@common/components/LoadingSpinner';
 import useAsyncHandledRetry from '@common/hooks/useAsyncHandledRetry';
 import React from 'react';
-import { RouteComponentProps, useHistory } from 'react-router';
+import { generatePath, RouteComponentProps, useHistory } from 'react-router';
+import RelatedInformation from '@common/components/RelatedInformation';
 
 const PublicationEditPage = ({
   match,
@@ -36,61 +38,81 @@ const PublicationEditPage = ({
 
   return (
     <Page
-      title="Edit publication"
+      title="Manage publication"
       caption={publication.title}
-      breadcrumbs={[{ name: 'Edit publication' }]}
+      breadcrumbs={[{ name: 'Manage publication' }]}
     >
-      <PublicationForm
-        cancelButton={
-          <Link
-            unvisited
-            to={appendQuery<ThemeTopicParams>(dashboardRoute.path, {
-              themeId: publication.themeId,
+      <div className="govuk-grid-row">
+        <div className="govuk-grid-column-three-quarters">
+          <PublicationForm
+            cancelButton={
+              <Link
+                unvisited
+                to={appendQuery<ThemeTopicParams>(dashboardRoute.path, {
+                  themeId: publication.themeId,
+                  topicId: publication.topicId,
+                })}
+              >
+                Cancel
+              </Link>
+            }
+            initialValues={{
+              title: publication.title,
               topicId: publication.topicId,
-            })}
-          >
-            Cancel
-          </Link>
-        }
-        initialValues={{
-          title: publication.title,
-          topicId: publication.topicId,
-          teamName: contact?.teamName ?? '',
-          teamEmail: contact?.teamEmail ?? '',
-          contactName: contact?.contactName ?? '',
-          contactTelNo: contact?.contactTelNo ?? '',
-          externalMethodology: publication.externalMethodology,
-          methodologyId: publication.methodology?.id,
-        }}
-        onSubmit={async ({
-          teamName,
-          teamEmail,
-          contactName,
-          contactTelNo,
-          ...values
-        }) => {
-          const updatedPublication = await publicationService.updatePublication(
-            publication.id,
-            {
-              ...values,
-              topicId: values.topicId ?? publication?.topicId,
-              contact: {
-                teamName,
-                teamEmail,
-                contactName,
-                contactTelNo,
-              },
-            },
-          );
+              teamName: contact?.teamName ?? '',
+              teamEmail: contact?.teamEmail ?? '',
+              contactName: contact?.contactName ?? '',
+              contactTelNo: contact?.contactTelNo ?? '',
+              externalMethodology: publication.externalMethodology,
+              methodologyId: publication.methodology?.id,
+            }}
+            onSubmit={async ({
+              teamName,
+              teamEmail,
+              contactName,
+              contactTelNo,
+              ...values
+            }) => {
+              const updatedPublication = await publicationService.updatePublication(
+                publication.id,
+                {
+                  ...values,
+                  topicId: values.topicId ?? publication?.topicId,
+                  contact: {
+                    teamName,
+                    teamEmail,
+                    contactName,
+                    contactTelNo,
+                  },
+                },
+              );
 
-          history.push(
-            appendQuery<ThemeTopicParams>(dashboardRoute.path, {
-              themeId: updatedPublication.themeId,
-              topicId: updatedPublication.topicId,
-            }),
-          );
-        }}
-      />
+              history.push(
+                appendQuery<ThemeTopicParams>(dashboardRoute.path, {
+                  themeId: updatedPublication.themeId,
+                  topicId: updatedPublication.topicId,
+                }),
+              );
+            }}
+          />
+        </div>
+        <div className="govuk-grid-column-one-quarter">
+          <RelatedInformation heading="Further actions">
+            <ul className="govuk-list">
+              <li>
+                <Link
+                  data-testid={`Legacy releases link for ${publication.title}`}
+                  to={generatePath(legacyReleasesRoute.path, {
+                    publicationId,
+                  })}
+                >
+                  Manage legacy releases
+                </Link>
+              </li>
+            </ul>
+          </RelatedInformation>
+        </div>
+      </div>
     </Page>
   );
 };

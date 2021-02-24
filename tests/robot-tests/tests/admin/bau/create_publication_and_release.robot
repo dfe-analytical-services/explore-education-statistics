@@ -88,7 +88,7 @@ Go to edit publication
     [Tags]  HappyPath
     user clicks testid element  Edit publication link for ${PUBLICATION_NAME} (created)
     user waits until page contains title caption  ${PUBLICATION_NAME} (created)
-    user waits until h1 is visible    Edit publication
+    user waits until h1 is visible  Manage publication
 
 Update publication
     [Tags]  HappyPath
