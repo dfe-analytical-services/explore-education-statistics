@@ -102,6 +102,8 @@ const FootnoteForm = ({
             areas and then add your footnote (shown at the bottom of the page).
           </p>
 
+          <FormFieldTextArea<BaseFootnote> name="content" label="Footnote" />
+
           {orderBy(
             Object.values(footnoteMeta.subjects),
             subject => subject.subjectName,
@@ -171,8 +173,6 @@ const FootnoteForm = ({
               </fieldset>
             );
           })}
-
-          <FormFieldTextArea<BaseFootnote> name="content" label="Footnote" />
 
           <ButtonGroup>
             <Button type="submit">Save footnote</Button>
