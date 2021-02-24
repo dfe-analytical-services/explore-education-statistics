@@ -161,17 +161,17 @@ const PublicationReleasePage: NextPage<Props> = ({ data }) => {
 
         <div className="govuk-grid-column-one-third">
           <RelatedAside>
-            <h2 className="govuk-heading-m" id="related-information">
-              Related information
+            <h2 className="govuk-heading-m" id="useful-information">
+              Useful information
             </h2>
-            <nav role="navigation" aria-labelledby="related-information">
-              <ul className="govuk-list govuk-!-margin-bottom-0">
+            <nav role="navigation" aria-labelledby="useful-information">
+              <ul className="govuk-list govuk-list--spaced govuk-!-margin-bottom-0">
                 <li>
                   <a
                     href="#dataDownloads-1"
                     className="govuk-button govuk-!-margin-bottom-3"
                   >
-                    Download data
+                    View data and files
                   </a>
                 </li>
                 {data.publication.methodology && (
@@ -231,50 +231,50 @@ const PublicationReleasePage: NextPage<Props> = ({ data }) => {
                     </Link>
                   </li>
                 )}
+                {!!releaseCount && (
+                  <>
+                    <p className="govuk-!-margin-bottom-0">
+                      {data.coverageTitle} <strong>{data.yearTitle}</strong>
+                    </p>
+                    <Details
+                      summary={`See other releases (${releaseCount})`}
+                      onToggle={open =>
+                        open &&
+                        logEvent(
+                          'Other Releases',
+                          'Release page other releases dropdown opened',
+                          window.location.pathname,
+                        )
+                      }
+                    >
+                      <ul className="govuk-list">
+                        {[
+                          ...data.publication.otherReleases.map(
+                            ({ id, slug, title }) => (
+                              <li key={id} data-testid="other-release-item">
+                                <Link
+                                  to="/find-statistics/[publication]/[release]"
+                                  as={`/find-statistics/${data.publication.slug}/${slug}`}
+                                >
+                                  {title}
+                                </Link>
+                              </li>
+                            ),
+                          ),
+                          ...data.publication.legacyReleases.map(
+                            ({ id, description, url }) => (
+                              <li key={id} data-testid="other-release-item">
+                                <a href={url}>{description}</a>
+                              </li>
+                            ),
+                          ),
+                        ]}
+                      </ul>
+                    </Details>
+                  </>
+                )}
               </ul>
             </nav>
-            {!!releaseCount && (
-              <Details
-                summary={`See other releases (${releaseCount})`}
-                onToggle={open =>
-                  open &&
-                  logEvent(
-                    'Other Releases',
-                    'Release page other releases dropdown opened',
-                    window.location.pathname,
-                  )
-                }
-              >
-                <h3 className="govuk-heading-s govuk-!-margin-bottom-1">
-                  This release
-                </h3>
-                <p>{`${data.coverageTitle} ${data.yearTitle}`}</p>
-                <hr />
-                <ul className="govuk-list">
-                  {[
-                    ...data.publication.otherReleases.map(
-                      ({ id, slug, title }) => (
-                        <li key={id} data-testid="other-release-item">
-                          <Link
-                            to="/find-statistics/[publication]/[release]"
-                            as={`/find-statistics/${data.publication.slug}/${slug}`}
-                          >
-                            {title}
-                          </Link>
-                        </li>
-                      ),
-                    ),
-                    ...data.publication.legacyReleases.map(
-                      ({ id, description, url }) => (
-                        <li key={id} data-testid="other-release-item">
-                          <a href={url}>{description}</a>
-                        </li>
-                      ),
-                    ),
-                  ]}
-                </ul>
-              </Details>
-            )}
             {data.relatedInformation.length !== 0 && (
               <>
                 <h2
@@ -319,7 +319,7 @@ const PublicationReleasePage: NextPage<Props> = ({ data }) => {
               );
             }}
           >
-            <AccordionSection heading="Download data">
+            <AccordionSection heading="Download data and files">
               <p className="govuk-caption-m">
                 Find and download files used in the production of this release.
               </p>
@@ -348,8 +348,8 @@ const PublicationReleasePage: NextPage<Props> = ({ data }) => {
                         Create your own tables online
                       </h2>
                       <p>
-                        Use our tool to build tables using our range of national
-                        and regional data.
+                        Explore our range of data and build your own tables from
+                        it.
                       </p>
                     </div>
                     <p className="govuk-!-width-one-quarter dfe-flex-shrink--0">
@@ -400,12 +400,9 @@ const PublicationReleasePage: NextPage<Props> = ({ data }) => {
       />
 
       <h2 className="govuk-heading-m govuk-!-margin-top-9">
-        Create your own tables online
+        Create your own tables
       </h2>
-      <p>
-        Use our tool to build tables using our range of national and regional
-        data.
-      </p>
+      <p>Explore our range of data and build your own tables from it.</p>
       <ButtonLink
         to="/data-tables/[publication]"
         as={`/data-tables/${data.publication.slug}`}
