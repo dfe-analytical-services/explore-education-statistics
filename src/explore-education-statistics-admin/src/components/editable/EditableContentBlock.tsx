@@ -7,6 +7,11 @@ import {
 import toHtml from '@admin/utils/markdown/toHtml';
 import ContentHtml from '@common/components/ContentHtml';
 import useToggle from '@common/hooks/useToggle';
+import { Dictionary } from '@common/types';
+import {
+  defaultSanitizeOptions,
+  SanitizeHtmlOptions,
+} from '@common/utils/sanitizeHtml';
 import classNames from 'classnames';
 import React, { useCallback, useMemo } from 'react';
 import styles from './EditableContentBlock.module.scss';
@@ -20,6 +25,9 @@ interface EditableContentBlockProps {
   onImageUploadCancel?: ImageUploadCancelHandler;
   onSave: (value: string) => void;
   onDelete: () => void;
+  transformImageAttributes?: (
+    attributes: Dictionary<string>,
+  ) => Dictionary<string>;
   useMarkdown?: boolean;
 }
 
@@ -32,6 +40,7 @@ const EditableContentBlock = ({
   onImageUploadCancel,
   onSave,
   onDelete,
+  transformImageAttributes,
   useMarkdown,
 }: EditableContentBlockProps) => {
   const content = useMemo(() => (useMarkdown ? toHtml(value) : value), [
@@ -40,6 +49,22 @@ const EditableContentBlock = ({
   ]);
 
   const [isEditing, toggleEditing] = useToggle(false);
+
+  const sanitizeOptions: SanitizeHtmlOptions = useMemo(() => {
+    return {
+      ...defaultSanitizeOptions,
+      transformTags: {
+        img: (tagName, attribs) => {
+          return {
+            tagName,
+            attribs: transformImageAttributes
+              ? transformImageAttributes(attribs)
+              : attribs,
+          };
+        },
+      },
+    };
+  }, [transformImageAttributes]);
 
   const handleSave = useCallback(
     (nextValue: string) => {
@@ -95,10 +120,16 @@ const EditableContentBlock = ({
               }
             }}
           >
-            <ContentHtml html={content || '<p>This section is empty</p>'} />
+            <ContentHtml
+              html={content || '<p>This section is empty</p>'}
+              sanitizeOptions={sanitizeOptions}
+            />
           </div>
         ) : (
-          <ContentHtml html={content || '<p>This section is empty</p>'} />
+          <ContentHtml
+            html={content || '<p>This section is empty</p>'}
+            sanitizeOptions={sanitizeOptions}
+          />
         )}
       </div>
     </EditableBlockWrapper>

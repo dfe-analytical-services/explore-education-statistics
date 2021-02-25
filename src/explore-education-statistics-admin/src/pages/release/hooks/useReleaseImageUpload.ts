@@ -4,7 +4,9 @@ import {
   ImageUploadCancelHandler,
   ImageUploadHandler,
 } from '@admin/utils/ckeditor/CustomUploadAdapter';
+import { insertReleaseIdPlaceholders } from '@common/modules/release/utils/releaseImageUrls';
 import { CancellablePromise } from '@common/types/promise';
+import mapValues from 'lodash/mapValues';
 import { useCallback, useRef } from 'react';
 
 interface UseImageUploadReturn {
@@ -19,11 +21,11 @@ export default function useReleaseImageUpload(
 
   const handleImageUpload: ImageUploadHandler = useCallback(
     async (file, updateProgress) => {
-      promise.current = releaseImageService.upload(
-        releaseId,
-        file,
-        updateProgress,
-      );
+      promise.current = releaseImageService
+        .upload(releaseId, file, updateProgress)
+        .then(result =>
+          mapValues(result, insertReleaseIdPlaceholders),
+        ) as CancellablePromise<ImageUploadResult>;
 
       return promise.current;
     },

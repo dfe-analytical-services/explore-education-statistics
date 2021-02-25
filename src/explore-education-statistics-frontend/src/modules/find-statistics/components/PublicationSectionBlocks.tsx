@@ -2,6 +2,7 @@ import InsetText from '@common/components/InsetText';
 import useGetChartFile from '@common/modules/charts/hooks/useGetChartFile';
 import ContentBlockRenderer from '@common/modules/find-statistics/components/ContentBlockRenderer';
 import DataBlockTabs from '@common/modules/find-statistics/components/DataBlockTabs';
+import useReleaseImageAttributeTransformer from '@common/modules/release/hooks/useReleaseImageAttributeTransformer';
 import { Release } from '@common/services/publicationService';
 import { Block } from '@common/services/types/blocks';
 import ButtonLink from '@frontend/components/ButtonLink';
@@ -20,6 +21,11 @@ const PublicationSectionBlocks = ({
   const { slug, publication } = release;
 
   const getChartFile = useGetChartFile(publication.slug, slug);
+
+  const transformImageAttributes = useReleaseImageAttributeTransformer({
+    releaseId: release.id,
+    rootUrl: process.env.CONTENT_API_BASE_URL,
+  });
 
   return blocks.length > 0 ? (
     <>
@@ -65,7 +71,13 @@ const PublicationSectionBlocks = ({
           );
         }
 
-        return <ContentBlockRenderer key={block.id} block={block} />;
+        return (
+          <ContentBlockRenderer
+            key={block.id}
+            block={block}
+            transformImageAttributes={transformImageAttributes}
+          />
+        );
       })}
     </>
   ) : (

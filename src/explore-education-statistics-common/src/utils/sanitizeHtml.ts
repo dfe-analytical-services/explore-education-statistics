@@ -6,6 +6,7 @@ export type SanitizeHtmlOptions = {
   allowedAttributes?: Dictionary<string[]>;
   allowedSchemesByTag?: Dictionary<string[]>;
   allowedStyles?: Dictionary<Dictionary<RegExp[]>>;
+  transformTags?: Dictionary<string | sanitize.Transformer>;
 };
 
 export const defaultSanitizeOptions: SanitizeHtmlOptions = {

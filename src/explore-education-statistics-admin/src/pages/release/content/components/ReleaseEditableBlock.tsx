@@ -4,6 +4,7 @@ import useGetChartFile from '@admin/hooks/useGetChartFile';
 import useReleaseImageUpload from '@admin/pages/release/hooks/useReleaseImageUpload';
 import { EditableBlock } from '@admin/services/types/content';
 import DataBlockTabs from '@common/modules/find-statistics/components/DataBlockTabs';
+import useReleaseImageAttributeTransformer from '@common/modules/release/hooks/useReleaseImageAttributeTransformer';
 import isBrowser from '@common/utils/isBrowser';
 import React, { useCallback } from 'react';
 
@@ -31,6 +32,10 @@ const ReleaseEditableBlock = ({
   const { handleImageUpload, handleImageUploadCancel } = useReleaseImageUpload(
     releaseId,
   );
+
+  const transformImageAttributes = useReleaseImageAttributeTransformer({
+    releaseId,
+  });
 
   const handleSave = useCallback(
     (content: string) => {
@@ -66,6 +71,7 @@ const ReleaseEditableBlock = ({
           label="Block content"
           value={block.body}
           useMarkdown={block.type === 'MarkDownBlock'}
+          transformImageAttributes={transformImageAttributes}
           onSave={handleSave}
           onDelete={handleDelete}
           onImageUpload={allowImages ? handleImageUpload : undefined}
