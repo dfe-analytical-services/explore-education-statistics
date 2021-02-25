@@ -117,7 +117,9 @@ const ReleasePageContainer = ({
             <div className="govuk-grid-column-two-thirds">
               <PageTitle
                 title={release.publicationTitle}
-                caption={release.amendment ? 'Amend release' : 'Edit release'}
+                caption={`${
+                  release.amendment ? 'Amend release' : 'Edit release'
+                } for ${release.title}`}
               />
             </div>
 
