@@ -1,7 +1,7 @@
 import ReleaseSummaryForm, {
   ReleaseSummaryFormValues,
 } from '@admin/pages/release/components/ReleaseSummaryForm';
-import { useManageReleaseContext } from '@admin/pages/release/contexts/ManageReleaseContext';
+import { useReleaseContext } from '@admin/pages/release/contexts/ReleaseContext';
 import {
   ReleaseRouteParams,
   releaseSummaryRoute,
@@ -25,9 +25,13 @@ const errorMappings = [
 ];
 
 const ReleaseSummaryEditPage = ({ history }: RouteComponentProps) => {
-  const { releaseId, publication } = useManageReleaseContext();
+  const {
+    releaseId,
+    release: contextRelease,
+    onReleaseChange,
+  } = useReleaseContext();
 
-  const { value: release, isLoading } = useAsyncRetry(
+  const { value: release = contextRelease, isLoading } = useAsyncRetry(
     () => releaseService.getRelease(releaseId),
     [releaseId],
   );
@@ -37,7 +41,7 @@ const ReleaseSummaryEditPage = ({ history }: RouteComponentProps) => {
       throw new Error('Could not update missing release');
     }
 
-    await releaseService.updateRelease(releaseId, {
+    const nextRelease = await releaseService.updateRelease(releaseId, {
       ...release,
       timePeriodCoverage: {
         value: values.timePeriodCoverageCode,
@@ -46,27 +50,34 @@ const ReleaseSummaryEditPage = ({ history }: RouteComponentProps) => {
       typeId: values.releaseTypeId,
     });
 
+    onReleaseChange(nextRelease);
+
     history.push(
       generatePath<ReleaseRouteParams>(releaseSummaryRoute.path, {
-        publicationId: publication.id,
+        publicationId: release.publicationId,
         releaseId,
       }),
     );
   }, errorMappings);
 
-  const handleCancel = () =>
+  const handleCancel = () => {
+    if (!release) {
+      return;
+    }
+
     history.push(
       generatePath<ReleaseRouteParams>(releaseSummaryRoute.path, {
-        publicationId: publication.id,
+        publicationId: release.publicationId,
         releaseId,
       }),
     );
+  };
 
   return (
     <LoadingSpinner loading={isLoading}>
       {release && (
         <>
-          <h2 className="govuk-heading-l">Edit release summary</h2>
+          <h2>Edit release summary</h2>
 
           <ReleaseSummaryForm<ReleaseSummaryFormValues>
             submitText="Update release summary"

@@ -1,5 +1,5 @@
 import Link from '@admin/components/Link';
-import { useManageReleaseContext } from '@admin/pages/release/contexts/ManageReleaseContext';
+import { useReleaseContext } from '@admin/pages/release/contexts/ReleaseContext';
 import PreReleaseUserAccessForm from '@admin/pages/release/pre-release/components/PreReleaseUserAccessForm';
 import PublicPreReleaseAccessForm from '@admin/pages/release/pre-release/components/PublicPreReleaseAccessForm';
 import { preReleaseContentRoute } from '@admin/routes/preReleaseRoutes';
@@ -24,7 +24,7 @@ export const releasePreReleaseAccessPageTabs = {
 };
 
 const ReleasePreReleaseAccessPage = () => {
-  const { releaseId } = useManageReleaseContext();
+  const { releaseId } = useReleaseContext();
 
   const {
     value: release,

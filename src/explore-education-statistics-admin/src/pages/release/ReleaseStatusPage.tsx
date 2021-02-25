@@ -1,7 +1,7 @@
 import ReleaseServiceStatus from '@admin/components/ReleaseServiceStatus';
 import StatusBlock from '@admin/components/StatusBlock';
 import { useConfig } from '@admin/contexts/ConfigContext';
-import { useManageReleaseContext } from '@admin/pages/release/contexts/ManageReleaseContext';
+import { useReleaseContext } from '@admin/pages/release/contexts/ReleaseContext';
 import ReleaseStatusEditPage from '@admin/pages/release/ReleaseStatusEditPage';
 import permissionService, {
   ReleaseStatusPermissions,
@@ -34,12 +34,18 @@ const statusMap: {
 const ReleaseStatusPage = () => {
   const [isEditing, toggleEditing] = useToggle(false);
 
-  const { releaseId, onChangeReleaseStatus } = useManageReleaseContext();
+  const {
+    releaseId,
+    release: contextRelease,
+    onReleaseChange,
+  } = useReleaseContext();
 
-  const { value: release, setState: setRelease } = useAsyncHandledRetry(
-    () => releaseService.getRelease(releaseId),
-    [isEditing],
-  );
+  const {
+    value: release = contextRelease,
+    setState: setRelease,
+  } = useAsyncHandledRetry(() => releaseService.getRelease(releaseId), [
+    releaseId,
+  ]);
 
   const { value: statusPermissions } = useAsyncRetry<ReleaseStatusPermissions>(
     () => permissionService.getReleaseStatusPermissions(releaseId),
@@ -63,9 +69,8 @@ const ReleaseStatusPage = () => {
         onCancel={toggleEditing.off}
         onUpdate={nextRelease => {
           setRelease({ value: nextRelease });
-
+          onReleaseChange(nextRelease);
           toggleEditing.off();
-          onChangeReleaseStatus();
         }}
       />
     );

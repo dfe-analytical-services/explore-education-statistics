@@ -1,5 +1,5 @@
 import ButtonLink from '@admin/components/ButtonLink';
-import { useManageReleaseContext } from '@admin/pages/release/contexts/ManageReleaseContext';
+import { useReleaseContext } from '@admin/pages/release/contexts/ReleaseContext';
 import {
   ReleaseRouteParams,
   releaseSummaryEditRoute,
@@ -16,16 +16,16 @@ import React from 'react';
 import { generatePath } from 'react-router';
 
 const ReleaseSummaryPage = () => {
-  const { publication, releaseId } = useManageReleaseContext();
+  const { release: contextRelease, releaseId } = useReleaseContext();
 
-  const { value: release, isLoading } = useAsyncRetry(
+  const { value: release = contextRelease, isLoading } = useAsyncRetry(
     () => releaseService.getRelease(releaseId),
     [releaseId],
   );
 
   return (
     <LoadingSpinner loading={isLoading}>
-      <h2 className="govuk-heading-l">Release summary</h2>
+      <h2>Release summary</h2>
 
       {release ? (
         <>
@@ -36,10 +36,10 @@ const ReleaseSummaryPage = () => {
           <h3>Publication details</h3>
           <SummaryList>
             <SummaryListItem term="Publication title">
-              {publication.title}
+              {release.publicationTitle}
             </SummaryListItem>
             <SummaryListItem term="Lead statistician">
-              {publication.contact && publication.contact.contactName}
+              {release.contact?.contactName}
             </SummaryListItem>
           </SummaryList>
 
@@ -61,7 +61,7 @@ const ReleaseSummaryPage = () => {
               to={generatePath<ReleaseRouteParams>(
                 releaseSummaryEditRoute.path,
                 {
-                  publicationId: publication.id,
+                  publicationId: release.publicationId,
                   releaseId,
                 },
               )}

@@ -3,7 +3,7 @@ import NavBar from '@admin/components/NavBar';
 import Page from '@admin/components/Page';
 import PageTitle from '@admin/components/PageTitle';
 import PreviousNextLinks from '@admin/components/PreviousNextLinks';
-import ManageReleaseContext from '@admin/pages/release/contexts/ManageReleaseContext';
+import { ReleaseContextProvider } from '@admin/pages/release/contexts/ReleaseContext';
 import { getReleaseStatusLabel } from '@admin/pages/release/utils/releaseSummaryUtil';
 import {
   releaseContentRoute,
@@ -23,12 +23,7 @@ import {
   releaseSummaryRoute,
   releaseTableToolRoute,
 } from '@admin/routes/releaseRoutes';
-import publicationService, {
-  BasicPublicationDetails,
-} from '@admin/services/publicationService';
-import releaseService, {
-  ReleasePublicationStatus,
-} from '@admin/services/releaseService';
+import releaseService from '@admin/services/releaseService';
 import LoadingSpinner from '@common/components/LoadingSpinner';
 import RelatedInformation from '@common/components/RelatedInformation';
 import Tag from '@common/components/Tag';
@@ -70,22 +65,12 @@ const ReleasePageContainer = ({
   const { publicationId, releaseId } = match.params;
 
   const {
-    value = [],
+    value: release,
+    setState: setRelease,
     isLoading: loadingRelease,
-    retry: reloadRelease,
-  } = useAsyncHandledRetry(
-    () =>
-      Promise.all([
-        publicationService.getPublication(publicationId),
-        releaseService.getReleasePublicationStatus(releaseId),
-      ]),
-    [publicationId, releaseId],
-  );
-
-  const [publication, releasePublicationStatus] = value as [
-    BasicPublicationDetails,
-    ReleasePublicationStatus,
-  ];
+  } = useAsyncHandledRetry(() => releaseService.getRelease(releaseId), [
+    releaseId,
+  ]);
 
   const currentRouteIndex =
     navRoutes.findIndex(
@@ -126,17 +111,13 @@ const ReleasePageContainer = ({
 
   return (
     <LoadingSpinner loading={loadingRelease}>
-      {publication && releasePublicationStatus && (
+      {release && (
         <Page wide breadcrumbs={[{ name: 'Edit release' }]}>
           <div className="govuk-grid-row">
             <div className="govuk-grid-column-two-thirds">
               <PageTitle
-                title={publication.title}
-                caption={
-                  releasePublicationStatus.amendment
-                    ? 'Amend release'
-                    : 'Edit release'
-                }
+                title={release.publicationTitle}
+                caption={release.amendment ? 'Amend release' : 'Edit release'}
               />
             </div>
 
@@ -156,15 +137,13 @@ const ReleasePageContainer = ({
             </div>
           </div>
 
-          <Tag>{getReleaseStatusLabel(releasePublicationStatus.status)}</Tag>
+          <Tag>{getReleaseStatusLabel(release.status)}</Tag>
 
-          {releasePublicationStatus.amendment && (
+          {release.amendment && (
             <Tag className="govuk-!-margin-left-2">Amendment</Tag>
           )}
 
-          {releasePublicationStatus.live && (
-            <Tag className="govuk-!-margin-left-2">Live</Tag>
-          )}
+          {release.live && <Tag className="govuk-!-margin-left-2">Live</Tag>}
 
           <NavBar
             routes={navRoutes.map(route => ({
@@ -176,11 +155,10 @@ const ReleasePageContainer = ({
             }))}
           />
 
-          <ManageReleaseContext.Provider
-            value={{
-              publication,
-              releaseId,
-              onChangeReleaseStatus: reloadRelease,
+          <ReleaseContextProvider
+            release={release}
+            onReleaseChange={nextRelease => {
+              setRelease({ value: nextRelease });
             }}
           >
             <Switch>
@@ -188,7 +166,7 @@ const ReleasePageContainer = ({
                 <Route exact key={route.path} {...route} />
               ))}
             </Switch>
-          </ManageReleaseContext.Provider>
+          </ReleaseContextProvider>
 
           <PreviousNextLinks
             previousSection={previousSection}
