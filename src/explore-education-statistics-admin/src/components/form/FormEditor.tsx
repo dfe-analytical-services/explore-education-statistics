@@ -121,6 +121,8 @@ const resizeOptions: ResizeOption[] = [
   },
 ];
 
+const tableContentToolbar = ['tableColumn', 'tableRow', 'mergeTableCells'];
+
 export type EditorChangeHandler = (value: string) => void;
 export type EditorElementsHandler = (elements: Element[]) => void;
 
@@ -199,6 +201,9 @@ const FormEditor = ({
             resizeOptions,
           }
         : undefined,
+      table: {
+        contentToolbar: tableContentToolbar,
+      },
       extraPlugins:
         hasImageUpload && onImageUpload
           ? [customUploadAdapterPlugin(onImageUpload, onImageUploadCancel)]

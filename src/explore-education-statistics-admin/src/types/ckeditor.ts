@@ -24,6 +24,9 @@ export interface EditorConfig {
     toolbar: string[];
     resizeOptions?: ResizeOption[];
   };
+  table?: {
+    contentToolbar?: string[];
+  };
   heading?: {
     options: HeadingOption[];
   };
