@@ -66,10 +66,8 @@ const SubjectForm = ({
           label: option.name,
           value: option.id,
           hint: hasDetails ? (
-            <Details
-              summary="More details"
-              className="govuk-!-margin-bottom-2 govuk-!-margin-top-2"
-            >
+            <Details summary="More details" className="govuk-!-margin-bottom-2">
+              <h4>This subject includes the following data:</h4>
               <SummaryList>
                 {geographicLevels && (
                   <SummaryListItem term="Geographic levels">

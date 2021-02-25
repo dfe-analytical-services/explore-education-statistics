@@ -72,12 +72,12 @@ const SubjectStep = ({
 
         <Tabs id={subjectTabsId}>
           <TabsSection
-            title="Popular tables"
+            title="Featured tables"
             id={subjectTabIds.popularTables}
             headingTitle="Choose a table"
           >
             <InsetText>
-              Use the links below to quickly select existing popular tables for
+              Use the links below to quickly select existing featured tables for
               this publication. After viewing a table you can also adjust and
               change filters to quickly see different results.
             </InsetText>
