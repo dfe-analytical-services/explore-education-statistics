@@ -1,4 +1,5 @@
 import ButtonLink from '@admin/components/ButtonLink';
+import { useLastLocation } from '@admin/contexts/LastLocationContext';
 import { useReleaseContext } from '@admin/pages/release/contexts/ReleaseContext';
 import {
   ReleaseRouteParams,
@@ -13,13 +14,19 @@ import SummaryListItem from '@common/components/SummaryListItem';
 import WarningMessage from '@common/components/WarningMessage';
 import useAsyncRetry from '@common/hooks/useAsyncRetry';
 import React from 'react';
-import { generatePath } from 'react-router';
+import { generatePath, useLocation } from 'react-router';
 
 const ReleaseSummaryPage = () => {
+  const location = useLocation();
+  const lastLocation = useLastLocation();
+
   const { release: contextRelease, releaseId } = useReleaseContext();
 
-  const { value: release = contextRelease, isLoading } = useAsyncRetry(
-    () => releaseService.getRelease(releaseId),
+  const { value: release, isLoading } = useAsyncRetry(
+    async () =>
+      lastLocation && lastLocation !== location
+        ? releaseService.getRelease(releaseId)
+        : contextRelease,
     [releaseId],
   );
 

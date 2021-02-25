@@ -1,6 +1,7 @@
 import ReleaseServiceStatus from '@admin/components/ReleaseServiceStatus';
 import StatusBlock from '@admin/components/StatusBlock';
 import { useConfig } from '@admin/contexts/ConfigContext';
+import { useLastLocation } from '@admin/contexts/LastLocationContext';
 import { useReleaseContext } from '@admin/pages/release/contexts/ReleaseContext';
 import ReleaseStatusEditPage from '@admin/pages/release/ReleaseStatusEditPage';
 import permissionService, {
@@ -22,6 +23,7 @@ import {
 } from '@common/utils/date/partialDate';
 import { parseISO } from 'date-fns';
 import React from 'react';
+import { useLocation } from 'react-router';
 
 const statusMap: {
   [keyof: string]: string;
@@ -34,6 +36,9 @@ const statusMap: {
 const ReleaseStatusPage = () => {
   const [isEditing, toggleEditing] = useToggle(false);
 
+  const location = useLocation();
+  const lastLocation = useLastLocation();
+
   const {
     releaseId,
     release: contextRelease,
@@ -41,11 +46,15 @@ const ReleaseStatusPage = () => {
   } = useReleaseContext();
 
   const {
-    value: release = contextRelease,
+    value: release,
     setState: setRelease,
-  } = useAsyncHandledRetry(() => releaseService.getRelease(releaseId), [
-    releaseId,
-  ]);
+  } = useAsyncHandledRetry(
+    async () =>
+      lastLocation && lastLocation !== location
+        ? releaseService.getRelease(releaseId)
+        : contextRelease,
+    [releaseId],
+  );
 
   const { value: statusPermissions } = useAsyncRetry<ReleaseStatusPermissions>(
     () => permissionService.getReleaseStatusPermissions(releaseId),

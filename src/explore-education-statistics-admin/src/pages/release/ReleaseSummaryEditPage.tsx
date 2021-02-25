@@ -1,3 +1,4 @@
+import { useLastLocation } from '@admin/contexts/LastLocationContext';
 import ReleaseSummaryForm, {
   ReleaseSummaryFormValues,
 } from '@admin/pages/release/components/ReleaseSummaryForm';
@@ -12,7 +13,7 @@ import { mapFieldErrors } from '@common/validation/serverValidations';
 import LoadingSpinner from '@common/components/LoadingSpinner';
 import useAsyncRetry from '@common/hooks/useAsyncRetry';
 import React from 'react';
-import { generatePath, RouteComponentProps } from 'react-router';
+import { generatePath, RouteComponentProps, useLocation } from 'react-router';
 
 const errorMappings = [
   mapFieldErrors<ReleaseSummaryFormValues>({
@@ -25,14 +26,20 @@ const errorMappings = [
 ];
 
 const ReleaseSummaryEditPage = ({ history }: RouteComponentProps) => {
+  const location = useLocation();
+  const lastLocation = useLastLocation();
+
   const {
     releaseId,
     release: contextRelease,
     onReleaseChange,
   } = useReleaseContext();
 
-  const { value: release = contextRelease, isLoading } = useAsyncRetry(
-    () => releaseService.getRelease(releaseId),
+  const { value: release, isLoading } = useAsyncRetry(
+    async () =>
+      lastLocation && lastLocation !== location
+        ? releaseService.getRelease(releaseId)
+        : contextRelease,
     [releaseId],
   );
 

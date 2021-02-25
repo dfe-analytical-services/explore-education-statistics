@@ -4,7 +4,7 @@ import { ReleaseContextProvider } from '@admin/pages/release/contexts/ReleaseCon
 import _permissionService, {
   ReleaseStatusPermissions,
 } from '@admin/services/permissionService';
-import _releaseService from '@admin/services/releaseService';
+import _releaseService, { Release } from '@admin/services/releaseService';
 import { render, screen, waitFor } from '@testing-library/react';
 import userEvent from '@testing-library/user-event';
 import React from 'react';
@@ -27,17 +27,7 @@ describe('ReleaseStatusPage', () => {
   };
 
   test('renders public release link correctly', async () => {
-    releaseService.getRelease.mockResolvedValue(testRelease);
-
-    render(
-      <MemoryRouter>
-        <TestConfigContextProvider>
-          <ReleaseContextProvider release={testRelease}>
-            <ReleaseStatusPage />
-          </ReleaseContextProvider>
-        </TestConfigContextProvider>
-      </MemoryRouter>,
-    );
+    renderPage();
 
     await waitFor(() => {
       expect(screen.getByText('Sign off')).toBeInTheDocument();
@@ -49,17 +39,7 @@ describe('ReleaseStatusPage', () => {
   });
 
   test('renders Draft status details correctly', async () => {
-    releaseService.getRelease.mockResolvedValue(testRelease);
-
-    render(
-      <MemoryRouter>
-        <TestConfigContextProvider>
-          <ReleaseContextProvider release={testRelease}>
-            <ReleaseStatusPage />
-          </ReleaseContextProvider>
-        </TestConfigContextProvider>
-      </MemoryRouter>,
-    );
+    renderPage();
 
     await waitFor(() => {
       expect(screen.getByText('Sign off')).toBeInTheDocument();
@@ -81,7 +61,8 @@ describe('ReleaseStatusPage', () => {
     releaseService.getReleaseStatus.mockResolvedValue({
       overallStage: 'Scheduled',
     });
-    releaseService.getRelease.mockResolvedValue({
+
+    renderPage({
       ...testRelease,
       status: 'Approved',
       publishScheduled: '2021-01-15',
@@ -90,16 +71,6 @@ describe('ReleaseStatusPage', () => {
         year: 2022,
       },
     });
-
-    render(
-      <MemoryRouter>
-        <TestConfigContextProvider>
-          <ReleaseContextProvider release={testRelease}>
-            <ReleaseStatusPage />
-          </ReleaseContextProvider>
-        </TestConfigContextProvider>
-      </MemoryRouter>,
-    );
 
     await waitFor(() => {
       expect(screen.getByText('Sign off')).toBeInTheDocument();
@@ -118,20 +89,11 @@ describe('ReleaseStatusPage', () => {
   });
 
   test('renders status form when Edit button is clicked', async () => {
-    releaseService.getRelease.mockResolvedValue(testRelease);
     permissionService.getReleaseStatusPermissions.mockResolvedValue(
       testStatusPermissions,
     );
 
-    render(
-      <MemoryRouter>
-        <TestConfigContextProvider>
-          <ReleaseContextProvider release={testRelease}>
-            <ReleaseStatusPage />
-          </ReleaseContextProvider>
-        </TestConfigContextProvider>
-      </MemoryRouter>,
-    );
+    renderPage();
 
     await waitFor(() => {
       expect(
@@ -152,22 +114,13 @@ describe('ReleaseStatusPage', () => {
   });
 
   test('does not render Edit button if status cannot be changed', async () => {
-    releaseService.getRelease.mockResolvedValue(testRelease);
     permissionService.getReleaseStatusPermissions.mockResolvedValue({
       canMarkDraft: false,
       canMarkHigherLevelReview: false,
       canMarkApproved: false,
     });
 
-    render(
-      <MemoryRouter>
-        <TestConfigContextProvider>
-          <ReleaseContextProvider release={testRelease}>
-            <ReleaseStatusPage />
-          </ReleaseContextProvider>
-        </TestConfigContextProvider>
-      </MemoryRouter>,
-    );
+    renderPage();
 
     await waitFor(() => {
       expect(screen.getByText('Sign off')).toBeInTheDocument();
@@ -175,4 +128,16 @@ describe('ReleaseStatusPage', () => {
 
     expect(screen.queryByText('Edit release status')).not.toBeInTheDocument();
   });
+
+  function renderPage(release: Release = testRelease) {
+    return render(
+      <MemoryRouter>
+        <TestConfigContextProvider>
+          <ReleaseContextProvider release={release}>
+            <ReleaseStatusPage />
+          </ReleaseContextProvider>
+        </TestConfigContextProvider>
+      </MemoryRouter>,
+    );
+  }
 });
