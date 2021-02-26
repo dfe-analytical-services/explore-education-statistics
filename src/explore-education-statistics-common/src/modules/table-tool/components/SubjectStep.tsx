@@ -90,10 +90,10 @@ const SubjectStep = ({
               />
             )}
 
-            <p>
-              If you can't find the table you're looking for, then you can{' '}
-              <a href={`#${subjectTabIds.createTable}`}>create your own</a>.
-            </p>
+            <p>If you can't find the table you're looking for, then you can </p>
+            <a className="govuk-button" href={`#${subjectTabIds.createTable}`}>
+              Create your own table
+            </a>
           </TabsSection>
           <TabsSection
             title="Create your own table"
