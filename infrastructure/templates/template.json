@@ -783,7 +783,7 @@
           "httpLoggingEnabled": true,
           "detailedErrorLoggingEnabled": true,
           "requestTracingEnabled": true,
-          "vnetName": "[variables('dataSubnetRef')]",
+          "vnetName": "[variables('dataSubnetName')]",
           "cors": {
             "allowedOrigins": [
               "[concat('https://', parameters('domain'))]",
@@ -796,8 +796,7 @@
         }
       },
       "dependsOn": [
-        "[resourceId('Microsoft.Web/Sites', variables('dataAppName'))]",
-        "[variables('dataSubnetRef')]"
+        "[resourceId('Microsoft.Web/Sites', variables('dataAppName'))]"
       ]
     },
     {
@@ -989,7 +988,7 @@
           "httpLoggingEnabled": true,
           "detailedErrorLoggingEnabled": true,
           "requestTracingEnabled": true,
-          "vnetName": "[variables('contentSubnetRef')]",
+          "vnetName": "[variables('contentSubnetName')]",
           "cors": {
             "allowedOrigins": [
               "[concat('https://', parameters('domain'))]",
@@ -1002,8 +1001,7 @@
         }
       },
       "dependsOn": [
-        "[resourceId('Microsoft.Web/Sites', variables('contentAppName'))]",
-        "[variables('contentSubnetRef')]"
+        "[resourceId('Microsoft.Web/Sites', variables('contentAppName'))]"
       ]
     },
     {
@@ -1215,7 +1213,7 @@
           "detailedErrorLoggingEnabled": true,
           "requestTracingEnabled": true,
           "use32BitWorkerProcess": false,
-          "vnetName": "[variables('adminSubnetRef')]",
+          "vnetName": "[variables('adminSubnetName')]",
           "cors": {
             "allowedOrigins": [
               "https://localhost:3000",
@@ -1225,8 +1223,7 @@
         }
       },
       "dependsOn": [
-        "[resourceId('Microsoft.Web/Sites', variables('adminAppName'))]",
-        "[variables('adminSubnetRef')]"
+        "[resourceId('Microsoft.Web/Sites', variables('adminAppName'))]"
       ]
     },
     {
