@@ -24,6 +24,7 @@ const formId = 'publicationSubjectForm';
 interface Props {
   legend?: ReactNode;
   legendSize?: FormFieldsetProps['legendSize'];
+  legendHint?: string;
   initialValues?: { subjectId: string };
   onSubmit: SubjectFormSubmitHandler;
   options: Subject[];
@@ -33,6 +34,7 @@ const SubjectForm = ({
   goToNextStep,
   legend,
   legendSize = 'l',
+  legendHint,
   initialValues = {
     subjectId: '',
   },
@@ -115,6 +117,7 @@ const SubjectForm = ({
               name="subjectId"
               legend={legend}
               legendSize={legendSize}
+              hint={legendHint}
               disabled={form.isSubmitting}
               options={radioOptions}
             />

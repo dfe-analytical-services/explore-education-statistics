@@ -63,6 +63,7 @@ const SubjectStep = ({
             heading
           )
         }
+        legendHint="Choose a subject to create your table from, more information on the data coverage can be found by viewing more details"
       />
     );
 
@@ -76,11 +77,11 @@ const SubjectStep = ({
             id={subjectTabIds.popularTables}
             headingTitle="Choose a table"
           >
-            <InsetText>
+            <span className="govuk-hint">
               Use the links below to quickly select existing featured tables for
               this publication. After viewing a table you can also adjust and
               change filters to quickly see different results.
-            </InsetText>
+            </span>
 
             {renderHighlightLink && (
               <TableHighlightsList
