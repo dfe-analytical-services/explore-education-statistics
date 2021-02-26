@@ -277,7 +277,7 @@ Select publication in table tool
     user opens details dropdown    ${TOPIC_NAME}
     user clicks radio      ${PUBLICATION_NAME}
     user clicks element    id:publicationForm-submit
-    user waits until h2 is visible   View a popular table or create your own
+    user waits until h2 is visible   View a featured table or create your own
     user checks previous table tool step contains  1    Publication    ${PUBLICATION_NAME}
 
 Select subject "${SUBJECT_NAME}" in table tool
@@ -344,12 +344,12 @@ Select table highlight from subjects step
 
     user waits until h3 is visible  Choose a subject
 
-    user clicks link  Popular tables
+    user clicks link  Featured tables
     user waits until h3 is visible  Choose a table
 
-    user checks element count is x  css:#popularTables li  1
-    user checks element should contain  css:#popularTables li:first-child a  Test highlight name
-    user checks element should contain  css:#popularTables li:first-child [id^="highlight-description"]
+    user checks element count is x  css:#featuredTables li  1
+    user checks element should contain  css:#featuredTables li:first-child a  Test highlight name
+    user checks element should contain  css:#featuredTables li:first-child [id^="highlight-description"]
     ...  Test highlight description
 
     user clicks link  Test highlight name

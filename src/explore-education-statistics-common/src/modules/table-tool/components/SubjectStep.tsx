@@ -14,7 +14,7 @@ import React, { ReactNode } from 'react';
 
 const subjectTabsId = 'subjectTabs';
 const subjectTabIds = {
-  popularTables: `${subjectTabsId}-popularTables`,
+  featuredTables: `${subjectTabsId}-featuredTables`,
   createTable: `${subjectTabsId}-createTable`,
 };
 
@@ -41,7 +41,7 @@ const SubjectStep = ({
   const heading = (
     <WizardStepHeading {...stepProps} fieldsetHeading={!hasHighlights}>
       {hasHighlights
-        ? 'View a popular table or create your own'
+        ? 'View a featured table or create your own'
         : 'Choose a subject'}
     </WizardStepHeading>
   );
@@ -74,7 +74,7 @@ const SubjectStep = ({
         <Tabs id={subjectTabsId}>
           <TabsSection
             title="Featured tables"
-            id={subjectTabIds.popularTables}
+            id={subjectTabIds.featuredTables}
             headingTitle="Choose a table"
           >
             <span className="govuk-hint">

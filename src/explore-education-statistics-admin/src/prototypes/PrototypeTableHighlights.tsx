@@ -84,10 +84,10 @@ const PrototypeTableHighlights = () => {
                   <span className={styles.numberInner}>{2}</span>
                 </span>
                 <h2 className={classNames('govuk-heading-m')}>
-                  View a popular table or create your own
+                  View a featured table or create your own
                 </h2>
                 <Tabs id="test">
-                  <TabsSection title="Popular tables (30)">
+                  <TabsSection title="Featured tables (30)">
                     <HighlightsLinks />
                   </TabsSection>
                   <TabsSection title="Create your own table">
