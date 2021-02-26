@@ -751,7 +751,7 @@
       }
     },
     {
-      "apiVersion": "2016-08-01",
+      "apiVersion": "2018-11-01",
       "type": "Microsoft.Web/sites/slots",
       "name": "[concat(variables('dataAppName'), '/deploy')]",
       "kind": "app",
@@ -955,7 +955,7 @@
       }
     },
     {
-      "apiVersion": "2016-08-01",
+      "apiVersion": "2018-11-01",
       "type": "Microsoft.Web/sites/slots",
       "name": "[concat(variables('contentAppName'), '/deploy')]",
       "kind": "app",
@@ -1178,7 +1178,7 @@
       }
     },
     {
-      "apiVersion": "2016-08-01",
+      "apiVersion": "2018-11-01",
       "type": "Microsoft.Web/sites/slots",
       "name": "[concat(variables('adminAppName'), '/deploy')]",
       "kind": "app",
@@ -2610,7 +2610,7 @@
     },
     {
       "condition": "[parameters('deploySubnets')]",
-      "apiVersion": "2018-10-01",
+      "apiVersion": "2020-05-01",
       "type": "Microsoft.Network/virtualNetworks",
       "name": "[variables('vNetName')]",
       "location": "[resourceGroup().location]",
