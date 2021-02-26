@@ -783,7 +783,7 @@
           "httpLoggingEnabled": true,
           "detailedErrorLoggingEnabled": true,
           "requestTracingEnabled": true,
-          "vnetName": "[variables('vNetName')]",
+          "vnetName": "[variables('vNetRef')]",
           "cors": {
             "allowedOrigins": [
               "[concat('https://', parameters('domain'))]",
@@ -989,7 +989,7 @@
           "httpLoggingEnabled": true,
           "detailedErrorLoggingEnabled": true,
           "requestTracingEnabled": true,
-          "vnetName": "[variables('vNetName')]",
+          "vnetName": "[variables('vNetRef')]",
           "cors": {
             "allowedOrigins": [
               "[concat('https://', parameters('domain'))]",
@@ -1215,7 +1215,7 @@
           "detailedErrorLoggingEnabled": true,
           "requestTracingEnabled": true,
           "use32BitWorkerProcess": false,
-          "vnetName": "[variables('vNetName')]",
+          "vnetName": "[variables('vNetRef')]",
           "cors": {
             "allowedOrigins": [
               "https://localhost:3000",
