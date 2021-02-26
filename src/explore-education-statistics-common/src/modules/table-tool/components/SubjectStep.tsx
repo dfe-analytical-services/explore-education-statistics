@@ -14,7 +14,7 @@ import React, { ReactNode } from 'react';
 
 const subjectTabsId = 'subjectTabs';
 const subjectTabIds = {
-  popularTables: `${subjectTabsId}-popularTables`,
+  featuredTables: `${subjectTabsId}-featuredTables`,
   createTable: `${subjectTabsId}-createTable`,
 };
 
@@ -41,7 +41,7 @@ const SubjectStep = ({
   const heading = (
     <WizardStepHeading {...stepProps} fieldsetHeading={!hasHighlights}>
       {hasHighlights
-        ? 'View a popular table or create your own'
+        ? 'View a featured table or create your own'
         : 'Choose a subject'}
     </WizardStepHeading>
   );
@@ -63,6 +63,7 @@ const SubjectStep = ({
             heading
           )
         }
+        legendHint="Choose a subject to create your table from, more information on the data coverage can be found by viewing more details"
       />
     );
 
@@ -72,15 +73,15 @@ const SubjectStep = ({
 
         <Tabs id={subjectTabsId}>
           <TabsSection
-            title="Popular tables"
-            id={subjectTabIds.popularTables}
+            title="Featured tables"
+            id={subjectTabIds.featuredTables}
             headingTitle="Choose a table"
           >
-            <InsetText>
-              Use the links below to quickly select existing popular tables for
+            <span className="govuk-hint">
+              Use the links below to quickly select existing featured tables for
               this publication. After viewing a table you can also adjust and
               change filters to quickly see different results.
-            </InsetText>
+            </span>
 
             {renderHighlightLink && (
               <TableHighlightsList
@@ -89,10 +90,10 @@ const SubjectStep = ({
               />
             )}
 
-            <p>
-              If you can't find the table you're looking for, then you can{' '}
-              <a href={`#${subjectTabIds.createTable}`}>create your own</a>.
-            </p>
+            <p>If you can't find the table you're looking for, then you can </p>
+            <a className="govuk-button" href={`#${subjectTabIds.createTable}`}>
+              Create your own table
+            </a>
           </TabsSection>
           <TabsSection
             title="Create your own table"

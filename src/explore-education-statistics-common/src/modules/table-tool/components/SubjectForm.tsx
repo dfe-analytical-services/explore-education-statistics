@@ -24,6 +24,7 @@ const formId = 'publicationSubjectForm';
 interface Props {
   legend?: ReactNode;
   legendSize?: FormFieldsetProps['legendSize'];
+  legendHint?: string;
   initialValues?: { subjectId: string };
   onSubmit: SubjectFormSubmitHandler;
   options: Subject[];
@@ -33,6 +34,7 @@ const SubjectForm = ({
   goToNextStep,
   legend,
   legendSize = 'l',
+  legendHint,
   initialValues = {
     subjectId: '',
   },
@@ -66,10 +68,8 @@ const SubjectForm = ({
           label: option.name,
           value: option.id,
           hint: hasDetails ? (
-            <Details
-              summary="More details"
-              className="govuk-!-margin-bottom-2 govuk-!-margin-top-2"
-            >
+            <Details summary="More details" className="govuk-!-margin-bottom-2">
+              <h4>This subject includes the following data:</h4>
               <SummaryList>
                 {geographicLevels && (
                   <SummaryListItem term="Geographic levels">
@@ -117,6 +117,7 @@ const SubjectForm = ({
               name="subjectId"
               legend={legend}
               legendSize={legendSize}
+              hint={legendHint}
               disabled={form.isSubmitting}
               options={radioOptions}
             />

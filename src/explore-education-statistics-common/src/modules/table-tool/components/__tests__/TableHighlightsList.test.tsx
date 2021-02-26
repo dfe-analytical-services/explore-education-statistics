@@ -97,7 +97,9 @@ describe('TableHighlightsList', () => {
   test('renders empty message if no highlights', () => {
     render(<TableHighlightsList highlights={[]} renderLink={renderLink} />);
 
-    expect(screen.getByText(/No popular tables available/)).toBeInTheDocument();
+    expect(
+      screen.getByText(/No featured tables available/),
+    ).toBeInTheDocument();
     expect(screen.queryAllByRole('listitem')).toHaveLength(0);
   });
 

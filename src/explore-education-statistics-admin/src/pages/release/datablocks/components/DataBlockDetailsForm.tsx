@@ -111,7 +111,7 @@ const DataBlockDetailsForm = ({
                 id="highlight"
                 legend="Would you like to make this a table highlight?"
                 legendSize="s"
-                hint="Checking this option will make this table available as a popular table when the publication is selected via the table builder"
+                hint="Checking this option will make this table available as a featured table when the publication is selected via the table builder"
               >
                 <FormFieldCheckbox<FormValues>
                   name="isHighlight"
@@ -121,7 +121,7 @@ const DataBlockDetailsForm = ({
                       <FormFieldTextInput<FormValues>
                         name="highlightName"
                         label="Highlight name"
-                        hint="We will show this name to table builder users as a popular table"
+                        hint="We will show this name to table builder users as a featured table"
                         className="govuk-!-width-two-thirds"
                       />
                       <FormFieldTextArea<FormValues>

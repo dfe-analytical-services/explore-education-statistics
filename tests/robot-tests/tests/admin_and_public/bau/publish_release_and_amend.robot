@@ -264,8 +264,8 @@ Verify publish and update dates
 
 Verify release associated files
     [Tags]  HappyPath
-    user opens accordion section  Download data
-    ${downloads}=  user gets accordion section content element  Download data
+    user opens accordion section  Download data and files
+    ${downloads}=  user gets accordion section content element  Download data and files
     user checks element should contain  ${downloads}  All files (zip, 3 Kb)
     user waits until element contains link  ${downloads}  All files
     user checks link has url  All files  %{CONTENT_API_URL}/download/ui-tests-publish-release-${RUN_IDENTIFIER}/3000-01/ancillary/ui-tests-publish-release-${RUN_IDENTIFIER}_3000-01.zip   ${downloads}
@@ -656,8 +656,8 @@ Verify amendment publish and update dates
 
 Verify amendment files
     [Tags]  HappyPath
-    user opens accordion section  Download data
-    ${downloads}=  user gets accordion section content element  Download data
+    user opens accordion section  Download data and files
+    ${downloads}=  user gets accordion section content element  Download data and files
     user checks element should contain  ${downloads}  All files (zip, 3 Kb)
     user waits until element contains link  ${downloads}  All files
     user checks link has url  All files  %{CONTENT_API_URL}/download/ui-tests-publish-release-${RUN_IDENTIFIER}/3000-01/ancillary/ui-tests-publish-release-${RUN_IDENTIFIER}_3000-01.zip   ${downloads}

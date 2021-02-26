@@ -22,7 +22,7 @@ const TableHighlightsList = ({ highlights = [], renderLink }: Props) => {
 
   if (!highlights.length) {
     return (
-      <p className="govuk-!-font-weight-bold">No popular tables available.</p>
+      <p className="govuk-!-font-weight-bold">No featured tables available.</p>
     );
   }
 
@@ -32,7 +32,7 @@ const TableHighlightsList = ({ highlights = [], renderLink }: Props) => {
         <FormTextSearchInput
           id="tableHighlightsList-search"
           name="search"
-          label="Search popular tables"
+          label="Search featured tables"
           className="govuk-!-width-one-third"
           onChange={event => {
             setHighlightSearch(event.target.value.toLowerCase());
@@ -50,7 +50,7 @@ const TableHighlightsList = ({ highlights = [], renderLink }: Props) => {
         )}
 
         {filteredHighlights.length > 0 && (
-          <ul className="govuk-!-margin-bottom-6" id="popularTables">
+          <ul className="govuk-!-margin-bottom-6" id="featuredTables">
             {filteredHighlights.map(highlight => {
               const link = renderLink(highlight);
               const descriptionId = `highlight-description-${highlight.id}`;

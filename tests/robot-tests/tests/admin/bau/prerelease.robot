@@ -373,13 +373,13 @@ Go to prerelease table tool page
     user clicks link  Table tool
 
     user waits until h1 is visible  Create your own tables online
-    user waits until h2 is visible  View a popular table or create your own
+    user waits until h2 is visible  View a featured table or create your own
 
 Validate table highlights
     [Tags]  HappyPath
-    user checks element count is x  css:#popularTables li  1
-    user checks element should contain  css:#popularTables li:first-child a  ${DATABLOCK_HIGHLIGHT_NAME}
-    user checks element should contain  css:#popularTables li:first-child [id^="highlight-description"]
+    user checks element count is x  css:#featuredTables li  1
+    user checks element should contain  css:#featuredTables li:first-child a  ${DATABLOCK_HIGHLIGHT_NAME}
+    user checks element should contain  css:#featuredTables li:first-child [id^="highlight-description"]
     ...  ${DATABLOCK_HIGHLIGHT_DESCRIPTION}
 
 Go to table highlight and validate table
@@ -392,7 +392,7 @@ Create and validate custom table
     user clicks link  Table tool
 
     user waits until h1 is visible  Create your own tables online
-    user waits until h2 is visible  View a popular table or create your own
+    user waits until h2 is visible  View a featured table or create your own
 
     user clicks link  Create your own table
     user waits until h3 is visible  Choose a subject
@@ -485,13 +485,13 @@ Go to prerelease table tool page as Analyst user
     user clicks link  Table tool
 
     user waits until h1 is visible  Create your own tables online
-    user waits until h2 is visible  View a popular table or create your own
+    user waits until h2 is visible  View a featured table or create your own
 
 Validate table highlights as Analyst user
     [Tags]  HappyPath
-    user checks element count is x  css:#popularTables li  1
-    user checks element should contain  css:#popularTables li:first-child a  ${DATABLOCK_HIGHLIGHT_NAME}
-    user checks element should contain  css:#popularTables li:first-child [id^="highlight-description"]
+    user checks element count is x  css:#featuredTables li  1
+    user checks element should contain  css:#featuredTables li:first-child a  ${DATABLOCK_HIGHLIGHT_NAME}
+    user checks element should contain  css:#featuredTables li:first-child [id^="highlight-description"]
     ...  ${DATABLOCK_HIGHLIGHT_DESCRIPTION}
 
 Go to table highlight and validate table as Analyst user
@@ -504,7 +504,7 @@ Create and validate custom table as Analyst user
     user clicks link  Table tool
 
     user waits until h1 is visible  Create your own tables online
-    user waits until h2 is visible  View a popular table or create your own
+    user waits until h2 is visible  View a featured table or create your own
 
     user clicks link  Create your own table
     user waits until h3 is visible  Choose a subject

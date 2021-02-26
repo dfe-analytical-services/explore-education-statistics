@@ -9,11 +9,11 @@ const PrototypeHighlightsLinks = () => {
         <div className="govuk-grid-column-three-quarters">
           <h3 className="govuk-heading-m">Choose a table</h3>
           <div className="govuk-inset-text">
-            Use the links below to quickly select existing popular tables for
+            Use the links below to quickly select existing featured tables for
             this publication. After viewing a table you can also adjust and
             change filters to quickly see different results.
           </div>
-          <PageSearchForm inputLabel="Search popular tables" />
+          <PageSearchForm inputLabel="Search featured tables" />
           <ul
             className={classNames(
               'govuk-list',
