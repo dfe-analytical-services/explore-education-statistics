@@ -9,11 +9,12 @@ const PageSearchFormWithAnalytics = (props: PageSearchFormProps) => {
     <PageSearchForm
       {...props}
       onSearch={(searchTerm: string) => {
-        logEvent(
-          window.location.pathname,
-          props.id || 'PageSearchForm',
-          searchTerm,
-        );
+        logEvent({
+          category: window.location.pathname,
+          action: props.id || 'PageSearchForm',
+          label: searchTerm,
+        });
+
         if (typeof props.onSearch === 'function') {
           props.onSearch(searchTerm);
         }

@@ -111,11 +111,11 @@ const PublicationReleasePage: NextPage<Props> = ({ data }) => {
                   id="releaseLastUpdates"
                   onToggle={open => {
                     if (open) {
-                      logEvent(
-                        'Last Updates',
-                        'Release page last updates dropdown opened',
-                        window.location.pathname,
-                      );
+                      logEvent({
+                        category: 'Last Updates',
+                        action: 'Release page last updates dropdown opened',
+                        label: window.location.pathname,
+                      });
                     }
                   }}
                   summary={`See all updates (${data.updates.length})`}
@@ -137,12 +137,14 @@ const PublicationReleasePage: NextPage<Props> = ({ data }) => {
               <Link
                 className="dfe-print-hidden govuk-!-font-weight-bold"
                 unvisited
-                analytics={{
-                  category: 'Subscribe',
-                  action: 'Email subscription',
-                }}
                 to={`/subscriptions?slug=${data.publication.slug}`}
                 data-testid={`subscription-${data.publication.slug}`}
+                onClick={() => {
+                  logEvent({
+                    category: 'Subscribe',
+                    action: 'Email subscription',
+                  });
+                }}
               >
                 Sign up for email alerts
               </Link>
@@ -240,11 +242,11 @@ const PublicationReleasePage: NextPage<Props> = ({ data }) => {
                       summary={`See other releases (${releaseCount})`}
                       onToggle={open =>
                         open &&
-                        logEvent(
-                          'Other Releases',
-                          'Release page other releases dropdown opened',
-                          window.location.pathname,
-                        )
+                        logEvent({
+                          category: 'Other Releases',
+                          action: 'Release page other releases dropdown opened',
+                          label: window.location.pathname,
+                        })
                       }
                     >
                       <ul className="govuk-list">
@@ -312,11 +314,11 @@ const PublicationReleasePage: NextPage<Props> = ({ data }) => {
             id="dataDownloads"
             showOpenAll={false}
             onSectionOpen={accordionSection => {
-              logEvent(
-                `${data.publication.title} release page`,
-                `Content accordion opened`,
-                `${accordionSection.title}`,
-              );
+              logEvent({
+                category: `${data.publication.title} release page`,
+                action: `Content accordion opened`,
+                label: `${accordionSection.title}`,
+              });
             }}
           >
             <AccordionSection heading="Download data and files">
@@ -336,12 +338,14 @@ const PublicationReleasePage: NextPage<Props> = ({ data }) => {
                       <li key={isAllFiles ? 'all' : fileId}>
                         <Link
                           to={url}
-                          analytics={{
-                            category: 'Downloads',
-                            action: `Release page ${
-                              isAllFiles ? 'all files' : 'file'
-                            } downloaded`,
-                            label: `Publication: ${data.title}, File: ${fileName}`,
+                          onClick={() => {
+                            logEvent({
+                              category: 'Downloads',
+                              action: `Release page ${
+                                isAllFiles ? 'all files' : 'file'
+                              } downloaded`,
+                              label: `Publication: ${data.title}, File: ${fileName}`,
+                            });
                           }}
                         >
                           {name}
@@ -384,11 +388,11 @@ const PublicationReleasePage: NextPage<Props> = ({ data }) => {
         <Accordion
           id="content"
           onSectionOpen={accordionSection => {
-            logEvent(
-              `${data.publication.title} release page`,
-              `Content accordion opened`,
-              `${accordionSection.title}`,
-            );
+            logEvent({
+              category: `${data.publication.title} release page`,
+              action: `Content accordion opened`,
+              label: `${accordionSection.title}`,
+            });
           }}
         >
           {data.content.map(({ heading, caption, order, content }) => {
@@ -422,9 +426,12 @@ const PublicationReleasePage: NextPage<Props> = ({ data }) => {
       </ButtonLink>
 
       <PrintThisPage
-        analytics={{
-          category: 'Page print',
-          action: 'Print this page link selected',
+        onClick={() => {
+          logEvent({
+            category: 'Page print',
+            action: 'Print this page link selected',
+            label: window.location.pathname,
+          });
         }}
       />
     </Page>

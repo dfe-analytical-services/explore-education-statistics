@@ -4,6 +4,7 @@ import {
   Topic,
 } from '@common/services/themeService';
 import Link from '@frontend/components/Link';
+import { logEvent } from '@frontend/services/googleAnalyticsService';
 import React from 'react';
 
 interface Props {
@@ -46,12 +47,14 @@ function TopicDownloadList({ topic }: Props) {
                     <li key={isAllFiles ? 'all' : fileId}>
                       <Link
                         to={url}
-                        analytics={{
-                          category: 'Downloads',
-                          action: `Download latest data page ${
-                            isAllFiles ? 'all files' : 'file'
-                          } downloaded`,
-                          label: `Publication: ${title}, File: ${fileName}`,
+                        onClick={() => {
+                          logEvent({
+                            category: 'Downloads',
+                            action: `Download latest data page ${
+                              isAllFiles ? 'all files' : 'file'
+                            } downloaded`,
+                            label: `Publication: ${title}, File: ${fileName}`,
+                          });
                         }}
                       >
                         {name}

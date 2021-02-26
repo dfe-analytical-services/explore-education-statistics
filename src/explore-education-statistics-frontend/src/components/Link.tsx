@@ -2,10 +2,6 @@ import { OmitStrict } from '@common/types';
 import classNames from 'classnames';
 import RouterLink, { LinkProps as RouterLinkProps } from 'next/link';
 import React, { AnchorHTMLAttributes, ReactNode } from 'react';
-import {
-  AnalyticProps,
-  logEvent,
-} from '@frontend/services/googleAnalyticsService';
 
 export type LinkProps = {
   as?: RouterLinkProps['as'];
@@ -14,8 +10,7 @@ export type LinkProps = {
   prefetch?: boolean;
   to: RouterLinkProps['href'];
   unvisited?: boolean;
-} & OmitStrict<AnchorHTMLAttributes<HTMLAnchorElement>, 'href'> &
-  AnalyticProps;
+} & OmitStrict<AnchorHTMLAttributes<HTMLAnchorElement>, 'href'>;
 
 const Link = ({
   as,
@@ -23,20 +18,9 @@ const Link = ({
   className,
   prefetch,
   to,
-  analytics,
   unvisited = false,
   ...props
 }: LinkProps) => {
-  const handleAnalytics = () => {
-    if (analytics) {
-      logEvent(
-        analytics.category,
-        analytics.action,
-        analytics.label ? analytics.label : window.location.pathname,
-      );
-    }
-  };
-
   const isAbsolute = typeof to === 'string' && to.startsWith('http');
 
   const link = (
@@ -51,14 +35,6 @@ const Link = ({
         },
         className,
       )}
-      onClick={() => {
-        handleAnalytics();
-      }}
-      onKeyDown={event => {
-        if (event.key === 'Enter' || event.key === ' ') {
-          handleAnalytics();
-        }
-      }}
     >
       {children}
     </a>

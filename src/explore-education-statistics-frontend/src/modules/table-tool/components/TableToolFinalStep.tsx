@@ -153,17 +153,17 @@ const TableToolFinalStep = ({
               fileName={`data-${publication.slug}`}
               fullTable={table}
               onClick={() =>
-                logEvent(
-                  'Table tool',
-                  'CSV download button clicked',
-                  `${table.subjectMeta.publicationName} between ${
+                logEvent({
+                  category: 'Table tool',
+                  action: 'CSV download button clicked',
+                  label: `${table.subjectMeta.publicationName} between ${
                     table.subjectMeta.timePeriodRange[0].label
                   } and ${
                     table.subjectMeta.timePeriodRange[
                       table.subjectMeta.timePeriodRange.length - 1
                     ].label
                   }`,
-                )
+                })
               }
             />
           </li>
@@ -173,17 +173,17 @@ const TableToolFinalStep = ({
               tableRef={dataTableRef}
               subjectMeta={table.subjectMeta}
               onClick={() =>
-                logEvent(
-                  'Table tool',
-                  'Excel download button clicked',
-                  `${table.subjectMeta.publicationName} between ${
+                logEvent({
+                  category: 'Table tool',
+                  action: 'Excel download button clicked',
+                  label: `${table.subjectMeta.publicationName} between ${
                     table.subjectMeta.timePeriodRange[0].label
                   } and ${
                     table.subjectMeta.timePeriodRange[
                       table.subjectMeta.timePeriodRange.length - 1
                     ].label
                   }`,
-                )
+                })
               }
             />
           </li>
