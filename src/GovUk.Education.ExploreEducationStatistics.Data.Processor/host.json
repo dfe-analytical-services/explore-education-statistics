@@ -4,7 +4,6 @@
   "logging": {
     "logLevel": {
       "default": "Information",
-      "GovUk.Education": "Information",
       "Microsoft": "Warning"
     }
   },
