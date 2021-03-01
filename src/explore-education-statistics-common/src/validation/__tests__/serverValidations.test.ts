@@ -7,7 +7,7 @@ import {
 
 describe('serverValidations', () => {
   describe('mapFieldErrors', () => {
-    test('maps error with the same `code`', () => {
+    test('maps non-field error to `target` field based on its message matching one of its `messages`', () => {
       const mapper = mapFieldErrors({
         target: 'test',
         messages: {
@@ -15,15 +15,17 @@ describe('serverValidations', () => {
         },
       });
 
-      expect(mapper({ message: 'TEST_CODE' })).toEqual<
-        ReturnType<FieldMessageMapper>
-      >({
+      expect(
+        mapper({
+          message: 'TEST_CODE',
+        }),
+      ).toEqual<ReturnType<FieldMessageMapper>>({
         targetField: 'test',
         message: 'Test message',
       });
     });
 
-    test('maps error with the same `code` and `sourceField`', () => {
+    test('maps field error to a `target` field when `source` and one of its `messages` match', () => {
       const mapper = mapFieldErrors({
         target: 'test',
         source: 'test2',
@@ -32,15 +34,35 @@ describe('serverValidations', () => {
         },
       });
 
-      expect(mapper({ sourceField: 'test2', message: 'TEST_CODE' })).toEqual<
-        ReturnType<FieldMessageMapper>
-      >({
+      expect(
+        mapper({
+          sourceField: 'test2',
+          message: 'TEST_CODE',
+        }),
+      ).toEqual<ReturnType<FieldMessageMapper>>({
         targetField: 'test',
         message: 'Test message',
       });
     });
 
-    test('does not map error with `code` that does not match', () => {
+    test('maps field error to `target` field with original message if `source` matches and no `messages` are provided', () => {
+      const mapper = mapFieldErrors({
+        target: 'test',
+        source: 'test2',
+      });
+
+      expect(
+        mapper({
+          sourceField: 'test2',
+          message: 'The original error message',
+        }),
+      ).toEqual<ReturnType<FieldMessageMapper>>({
+        targetField: 'test',
+        message: 'The original error message',
+      });
+    });
+
+    test('does not map non-field error with message that does not match any of its `messages`', () => {
       const mapper = mapFieldErrors({
         target: 'test',
         messages: {
@@ -51,7 +73,15 @@ describe('serverValidations', () => {
       expect(mapper({ message: 'WRONG_CODE' })).toBeUndefined();
     });
 
-    test('does not map errors with `code` and `sourceField` that do not match', () => {
+    test('does not map non-field error when there are no `messages`', () => {
+      const mapper = mapFieldErrors({
+        target: 'test',
+      });
+
+      expect(mapper({ message: 'WRONG_CODE' })).toBeUndefined();
+    });
+
+    test('does not map any errors that do not match the `source`', () => {
       const mapper = mapFieldErrors({
         target: 'test',
         source: 'test2',
@@ -61,11 +91,23 @@ describe('serverValidations', () => {
       });
 
       expect(
-        mapper({ sourceField: 'test2', message: 'WRONG_CODE' }),
+        mapper({
+          sourceField: 'test2',
+          message: 'WRONG_CODE',
+        }),
       ).toBeUndefined();
-      expect(mapper({ message: 'TEST_CODE' })).toBeUndefined();
+
       expect(
-        mapper({ sourceField: 'test3', message: 'TEST_CODE' }),
+        mapper({
+          message: 'TEST_CODE',
+        }),
+      ).toBeUndefined();
+
+      expect(
+        mapper({
+          sourceField: 'test3',
+          message: 'TEST_CODE',
+        }),
       ).toBeUndefined();
     });
   });

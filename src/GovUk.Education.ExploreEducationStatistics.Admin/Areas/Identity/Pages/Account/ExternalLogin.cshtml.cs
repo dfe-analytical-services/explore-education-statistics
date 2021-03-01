@@ -14,7 +14,6 @@ using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.RazorPages;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Logging;
-using static System.StringComparison;
 
 namespace GovUk.Education.ExploreEducationStatistics.Admin.Areas.Identity.Pages.Account
 {
@@ -83,7 +82,8 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Areas.Identity.Pages.
                 isPersistent: false, bypassTwoFactor: true);
             if (result.Succeeded)
             {
-                _logger.LogInformation("{Name} logged in with {LoginProvider} provider.", info.Principal.Identity.Name,
+                _logger.LogInformation("{0} logged in with {1} provider", 
+                    info.Principal.Identity.Name,
                     info.LoginProvider);
                 return LocalRedirect(returnUrl);
             }
@@ -163,7 +163,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Areas.Identity.Pages.
                     if (createdUserResult.Succeeded)
                     {
                         await _signInManager.SignInAsync(user, isPersistent: false);
-                        _logger.LogInformation("User created an account using {Name} provider.", info.LoginProvider);
+                        _logger.LogInformation("User created an account using {0} provider", info.LoginProvider);
 
                         inviteToSystem.Accepted = true;
                         _usersAndRolesDbContext.UserInvites.Update(inviteToSystem);

@@ -112,8 +112,8 @@ describe('getDefaultTableHeadersConfig', () => {
 
     expect(columnGroups).toHaveLength(1);
     expect(columnGroups[0]).toHaveLength(2);
-    expect(columnGroups[0][0].label).toBe('Barnsley');
-    expect(columnGroups[0][1].label).toBe('Barnet');
+    expect(columnGroups[0][0].label).toBe('Barnet');
+    expect(columnGroups[0][1].label).toBe('Barnsley');
 
     expect(columns).toHaveLength(2);
     expect(columns[0].label).toBe('2014/15');
@@ -121,13 +121,13 @@ describe('getDefaultTableHeadersConfig', () => {
 
     expect(rowGroups).toHaveLength(2);
     expect(rowGroups[0]).toHaveLength(2);
-    expect(rowGroups[0][0].label).toBe('Ethnicity Major Black Total');
-    expect(rowGroups[0][1].label).toBe('Ethnicity Major Asian Total');
+    expect(rowGroups[0][0].label).toBe('Ethnicity Major Asian Total');
+    expect(rowGroups[0][1].label).toBe('Ethnicity Major Black Total');
 
     expect(rowGroups[1]).toHaveLength(3);
-    expect(rowGroups[1][0].label).toBe('State-funded secondary');
-    expect(rowGroups[1][1].label).toBe('Special');
-    expect(rowGroups[1][2].label).toBe('State-funded primary');
+    expect(rowGroups[1][0].label).toBe('Special');
+    expect(rowGroups[1][1].label).toBe('State-funded primary');
+    expect(rowGroups[1][2].label).toBe('State-funded secondary');
 
     expect(rows).toHaveLength(4);
     expect(rows[0].label).toBe('Number of overall absence sessions');
@@ -241,8 +241,8 @@ describe('getDefaultTableHeadersConfig', () => {
 
     expect(columnGroups).toHaveLength(1);
     expect(columnGroups[0]).toHaveLength(2);
-    expect(columnGroups[0][0].label).toBe('Barnsley');
-    expect(columnGroups[0][1].label).toBe('Barnet');
+    expect(columnGroups[0][0].label).toBe('Barnet');
+    expect(columnGroups[0][1].label).toBe('Barnsley');
 
     expect(columns).toHaveLength(5);
     expect(columns[0].label).toBe('2014/15');
@@ -253,13 +253,13 @@ describe('getDefaultTableHeadersConfig', () => {
 
     expect(rowGroups).toHaveLength(2);
     expect(rowGroups[0]).toHaveLength(2);
-    expect(rowGroups[0][0].label).toBe('Ethnicity Major Black Total');
-    expect(rowGroups[0][1].label).toBe('Ethnicity Major Asian Total');
+    expect(rowGroups[0][0].label).toBe('Ethnicity Major Asian Total');
+    expect(rowGroups[0][1].label).toBe('Ethnicity Major Black Total');
 
     expect(rowGroups[1]).toHaveLength(3);
-    expect(rowGroups[1][0].label).toBe('State-funded secondary');
-    expect(rowGroups[1][1].label).toBe('Special');
-    expect(rowGroups[1][2].label).toBe('State-funded primary');
+    expect(rowGroups[1][0].label).toBe('Special');
+    expect(rowGroups[1][1].label).toBe('State-funded primary');
+    expect(rowGroups[1][2].label).toBe('State-funded secondary');
 
     expect(rows).toHaveLength(3);
     expect(rows[0].label).toBe('Number of overall absence sessions');
@@ -358,8 +358,8 @@ describe('getDefaultTableHeadersConfig', () => {
 
     expect(columnGroups).toHaveLength(1);
     expect(columnGroups[0]).toHaveLength(2);
-    expect(columnGroups[0][0].label).toBe('Barnsley');
-    expect(columnGroups[0][1].label).toBe('Barnet');
+    expect(columnGroups[0][0].label).toBe('Barnet');
+    expect(columnGroups[0][1].label).toBe('Barnsley');
 
     expect(columns).toHaveLength(2);
     expect(columns[0].label).toBe('2014/15');
@@ -367,12 +367,12 @@ describe('getDefaultTableHeadersConfig', () => {
 
     expect(rowGroups).toHaveLength(2);
     expect(rowGroups[0]).toHaveLength(2);
-    expect(rowGroups[0][0].label).toBe('State-funded secondary');
-    expect(rowGroups[0][1].label).toBe('Special');
+    expect(rowGroups[0][0].label).toBe('Special');
+    expect(rowGroups[0][1].label).toBe('State-funded secondary');
 
     expect(rowGroups[1]).toHaveLength(2);
-    expect(rowGroups[1][0].label).toBe('Ethnicity Major Black Total');
-    expect(rowGroups[1][1].label).toBe('Ethnicity Major Asian Total');
+    expect(rowGroups[1][0].label).toBe('Ethnicity Major Asian Total');
+    expect(rowGroups[1][1].label).toBe('Ethnicity Major Black Total');
 
     expect(rows).toHaveLength(2);
     expect(rows[0].label).toBe('Number of overall absence sessions');

@@ -219,7 +219,6 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin
             services.AddTransient<IReleaseFileService, ReleaseFileService>();
             services.AddTransient<IDataImportService, DataImportService>();
             services.AddTransient<IImportStatusBauService, ImportStatusBauService>();
-            services.AddTransient<IMigrateImportsService, MigrateImportsService>();
 
             services.AddTransient<IPublishingService, PublishingService>(provider =>
                 new PublishingService(
@@ -385,11 +384,11 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin
             else
             {
                 app.UseExceptionHandler("/Error");
-                app.UseHsts(options =>
+                app.UseHsts(opts =>
                 {
-                    options.MaxAge(365);
-                    options.IncludeSubdomains();
-                    options.Preload();
+                    opts.MaxAge(365);
+                    opts.IncludeSubdomains();
+                    opts.Preload();
                 });
             }
 
@@ -405,9 +404,9 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin
 
             // Security Headers
             app.UseXContentTypeOptions();
-            app.UseXXssProtection(options => options.EnabledWithBlockMode());
-            app.UseXfo(options => options.SameOrigin());
-            app.UseReferrerPolicy(options => options.NoReferrerWhenDowngrade());
+            app.UseXXssProtection(opts => opts.EnabledWithBlockMode());
+            app.UseXfo(opts => opts.SameOrigin());
+            app.UseReferrerPolicy(opts => opts.NoReferrerWhenDowngrade());
             app.UseCsp(opts => opts
                 .BlockAllMixedContent()
                 .StyleSources(s => s.Self())

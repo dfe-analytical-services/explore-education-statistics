@@ -125,18 +125,16 @@ const ReleaseSummaryForm = <
         return (
           <Form id={formId}>
             <FormFieldset
-              id={`${formId}-timePeriodCoverageFieldset`}
+              id="timePeriodCoverage"
               legend="Select time period coverage"
               legendSize="m"
             >
               <FormFieldSelect<ReleaseSummaryFormValues>
-                id={`${formId}-timePeriodCoverage`}
                 label="Type"
                 name="timePeriodCoverageCode"
                 optGroups={timePeriodOptions}
               />
               <FormFieldNumberInput<ReleaseSummaryFormValues>
-                id={`${formId}-timePeriodCoverageStartYear`}
                 name="timePeriodCoverageStartYear"
                 label={`
                       ${
@@ -156,7 +154,6 @@ const ReleaseSummaryForm = <
             </FormFieldset>
 
             <FormFieldRadioGroup<ReleaseSummaryFormValues>
-              id={`${formId}-releaseTypeId`}
               legend="Release Type"
               name="releaseTypeId"
               options={releaseTypes.map(type => ({

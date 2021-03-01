@@ -23,6 +23,9 @@ exports[`Form does not render errors for fields that do not have errors 1`] = `
     </div>
   </div>
   The form
+  <button type="submit">
+    Submit
+  </button>
 </form>
 `;
 
@@ -54,6 +57,9 @@ exports[`Form renders error summary from form errors when form is submitted 1`] 
     </div>
   </div>
   The form
+  <button type="submit">
+    Submit
+  </button>
 </form>
 `;
 
@@ -80,5 +86,8 @@ exports[`Form renders submit error 1`] = `
     </div>
   </div>
   The form
+  <button type="submit">
+    Submit
+  </button>
 </form>
 `;

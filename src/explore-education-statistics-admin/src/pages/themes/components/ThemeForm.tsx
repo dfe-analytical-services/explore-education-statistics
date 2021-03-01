@@ -1,7 +1,7 @@
-import useFormSubmit from '@admin/hooks/useFormSubmit';
 import Button from '@common/components/Button';
 import ButtonGroup from '@common/components/ButtonGroup';
 import { Form, FormFieldTextInput } from '@common/components/form';
+import useFormSubmit from '@common/hooks/useFormSubmit';
 import { mapFieldErrors } from '@common/validation/serverValidations';
 import Yup from '@common/validation/yup';
 import { Formik } from 'formik';
@@ -55,14 +55,12 @@ const ThemeForm = ({
       {form => (
         <Form id={id}>
           <FormFieldTextInput<ThemeFormValues>
-            id={`${id}-title`}
             label="Title"
             name="title"
             className="govuk-!-width-two-thirds"
           />
 
           <FormFieldTextInput<ThemeFormValues>
-            id={`${id}-summary`}
             label="Summary"
             name="summary"
             className="govuk-!-width-two-thirds"

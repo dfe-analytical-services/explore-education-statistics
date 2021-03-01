@@ -43,7 +43,7 @@ Upload subject
     user checks headed table body row contains  Metadata file    upload-file-test.meta.csv  ${section}
     user checks headed table body row contains  Number of rows   159  ${section}
     user checks headed table body row contains  Data file size   15 Kb  ${section}
-    user checks headed table body row contains  Status           Complete  ${section}  180
+    user checks headed table body row contains  Status           Complete  ${section}  360
 
 Go to 'Sign Off' page
     [Tags]  HappyPath
@@ -142,8 +142,7 @@ Go to Table Tool page
 Check scheduled release isn't visible
     [Tags]  HappyPath
     environment variable should be set  TEST_THEME_NAME
-    user opens details dropdown    %{TEST_THEME_NAME}
-    user checks page does not contain  UI test topic %{RUN_IDENTIFIER}
+    user checks page does not contain  ${PUBLICATION_NAME}
 
 Go to release URL and check release isn't visible
     [Tags]  HappyPath  NotAgainstLocal

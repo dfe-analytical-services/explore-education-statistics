@@ -151,10 +151,9 @@ const TimePeriodForm = (props: Props & InjectedWizardProps) => {
       {form => {
         return isActive ? (
           <Form id={formId} showSubmitError>
-            <FormFieldset id={`${formId}-timePeriod`} legend={stepHeading}>
+            <FormFieldset id="timePeriod" legend={stepHeading}>
               <FormFieldSelect
                 name="start"
-                id={`${formId}-start`}
                 label="Start date"
                 disabled={form.isSubmitting}
                 options={timePeriodOptions}
@@ -162,7 +161,6 @@ const TimePeriodForm = (props: Props & InjectedWizardProps) => {
               />
               <FormFieldSelect
                 name="end"
-                id={`${formId}-end`}
                 label="End date"
                 disabled={form.isSubmitting}
                 options={timePeriodOptions}
@@ -170,7 +168,7 @@ const TimePeriodForm = (props: Props & InjectedWizardProps) => {
               />
             </FormFieldset>
 
-            <WizardStepFormActions {...props} formId={formId} />
+            <WizardStepFormActions {...props} />
           </Form>
         ) : (
           <>

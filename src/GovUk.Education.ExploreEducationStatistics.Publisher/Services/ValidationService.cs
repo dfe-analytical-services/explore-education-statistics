@@ -31,7 +31,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Publisher.Services
 
         public async Task<Either<IEnumerable<ReleaseStatusLogMessage>, Unit>> ValidateRelease(Guid releaseId)
         {
-            _logger.LogTrace($"Validating release: {releaseId}");
+            _logger.LogTrace("Validating release: {0}", releaseId);
 
             var release = await GetReleaseAsync(releaseId);
 
@@ -49,7 +49,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Publisher.Services
 
         public async Task<bool> ValidatePublishingState(Guid releaseId)
         {
-            _logger.LogTrace($"Validating publishing state: {releaseId}");
+            _logger.LogTrace("Validating publishing state: {0}", releaseId);
 
             var releaseStatuses =
                 (await _releaseStatusService.GetAllByOverallStage(releaseId, Scheduled, Started)).ToList();
@@ -59,8 +59,10 @@ namespace GovUk.Education.ExploreEducationStatistics.Publisher.Services
             if (scheduled != null)
             {
                 _logger.LogError(
-                    $"Validating {ValidationStage.ReleasePublishingStateNotScheduledOrStarted.ToString()} failed: " +
-                    $"Publishing is already scheduled. ReleaseStatus: {scheduled.Id}");
+                    "Validating {0} failed: " +
+                    "Publishing is already scheduled. ReleaseStatus: {1}",
+                    ValidationStage.ReleasePublishingStateNotScheduledOrStarted.ToString(),
+                    scheduled.Id);
                 return false;
             }
 
@@ -68,8 +70,10 @@ namespace GovUk.Education.ExploreEducationStatistics.Publisher.Services
             if (started != null)
             {
                 _logger.LogError(
-                    $"Validating {ValidationStage.ReleasePublishingStateNotScheduledOrStarted.ToString()} failed: " +
-                    $"Publishing has already started. ReleaseStatus: {started.Id}");
+                    "Validating {0} failed: " +
+                    "Publishing has already started. ReleaseStatus: {1}",
+                    ValidationStage.ReleasePublishingStateNotScheduledOrStarted.ToString(),
+                    started.Id);
                 return false;
             }
 

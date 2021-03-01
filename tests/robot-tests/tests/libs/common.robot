@@ -192,6 +192,10 @@ user checks there are x accordion sections
     [Arguments]  ${num}  ${parent}=css:body
     user waits until parent contains element  ${parent}  css:[data-testid="accordionSection"]  limit=${num}
 
+user checks accordion is in position
+    [Arguments]  ${section_text}  ${position}  ${parent}=css:[data-testid="accordion"]
+    user waits until parent contains element  ${parent}  xpath:.//*[@data-testid="accordionSection"][${position}]
+
 user waits until accordion section contains text
     [Arguments]  ${section_text}   ${text}
     ${section}=  user gets accordion section content element  ${section_text}
@@ -241,6 +245,12 @@ user checks page does not contain testid
 user checks testid element contains
     [Arguments]  ${id}  ${text}
     user waits until element contains  css:[data-testid="${id}"]   ${text}
+
+user gets testid element
+    [Arguments]  ${id}  ${wait}=${timeout}  ${parent}=css:body
+    user waits until parent contains element  ${parent}  css:[data-testid="${id}"]
+    ${element}=  get child element  ${parent}  css:[data-testid="${id}"]
+    [Return]  ${element}
 
 user checks element does not contain
     [Arguments]   ${element}    ${text}
@@ -498,6 +508,10 @@ user checks key stat definition
 user clicks radio
     [Arguments]  ${label}
     user clicks element  xpath://label[text()="${label}"]/../input[@type="radio"]
+
+user clicks radio if exists
+    [Arguments]  ${label}
+    user clicks element if exists  xpath://label[text()="${label}"]/../input[@type="radio"]
 
 user checks radio is checked
     [Arguments]  ${label}

@@ -1,12 +1,13 @@
+import { render, screen } from '@testing-library/react';
+import userEvent from '@testing-library/user-event';
 import React from 'react';
-import { fireEvent, render } from '@testing-library/react';
 import FormCheckboxSearchGroup from '../FormCheckboxSearchGroup';
 
 jest.mock('lodash/debounce');
 
 describe('FormCheckboxSearchGroup', () => {
   test('renders list of checkboxes in correct order', () => {
-    const { container, getAllByLabelText } = render(
+    const { container } = render(
       <FormCheckboxSearchGroup
         name="testCheckboxes"
         id="test-checkboxes"
@@ -20,7 +21,9 @@ describe('FormCheckboxSearchGroup', () => {
       />,
     );
 
-    const checkboxes = getAllByLabelText(/Test checkbox/) as HTMLInputElement[];
+    const checkboxes = screen.getAllByLabelText(
+      /Test checkbox/,
+    ) as HTMLInputElement[];
 
     expect(checkboxes).toHaveLength(3);
     expect(checkboxes[0]).toHaveAttribute('value', '1');
@@ -30,10 +33,10 @@ describe('FormCheckboxSearchGroup', () => {
     expect(container.innerHTML).toMatchSnapshot();
   });
 
-  test('providing a search term renders only relevant checkboxes', () => {
+  test('providing a search term renders only relevant checkboxes', async () => {
     jest.useFakeTimers();
 
-    const { getByLabelText, getAllByLabelText } = render(
+    render(
       <FormCheckboxSearchGroup
         name="testCheckboxes"
         id="test-checkboxes"
@@ -48,26 +51,24 @@ describe('FormCheckboxSearchGroup', () => {
       />,
     );
 
-    const searchInput = getByLabelText('Search options');
+    const searchInput = screen.getByLabelText('Search options');
 
-    fireEvent.change(searchInput, {
-      target: {
-        value: '2',
-      },
-    });
+    await userEvent.type(searchInput, '2');
 
     jest.runAllTimers();
 
-    const checkboxes = getAllByLabelText(/Test checkbox/) as HTMLInputElement[];
+    const checkboxes = screen.getAllByLabelText(
+      /Test checkbox/,
+    ) as HTMLInputElement[];
 
     expect(checkboxes).toHaveLength(1);
     expect(checkboxes[0]).toHaveAttribute('value', '2');
   });
 
-  test('does not throw error if search term that is invalid regex is used', () => {
+  test('does not throw error if search term that is invalid regex is used', async () => {
     jest.useFakeTimers();
 
-    const { getByLabelText, queryAllByLabelText } = render(
+    render(
       <FormCheckboxSearchGroup
         name="testCheckboxes"
         id="test-checkboxes"
@@ -82,29 +83,25 @@ describe('FormCheckboxSearchGroup', () => {
       />,
     );
 
-    const searchInput = getByLabelText('Search options');
+    const searchInput = screen.getByLabelText('Search options');
 
-    fireEvent.change(searchInput, {
-      target: {
-        value: '[',
-      },
-    });
+    await userEvent.type(searchInput, '[');
 
     expect(() => {
       jest.runAllTimers();
     }).not.toThrow();
 
-    const checkboxes = queryAllByLabelText(
+    const checkboxes = screen.queryAllByLabelText(
       /Test checkbox/,
     ) as HTMLInputElement[];
 
     expect(checkboxes).toHaveLength(0);
   });
 
-  test('providing a search term does not remove checkboxes that have already been checked', () => {
+  test('providing a search term does not remove checkboxes that have already been checked', async () => {
     jest.useFakeTimers();
 
-    const { getByLabelText, getAllByLabelText } = render(
+    render(
       <FormCheckboxSearchGroup
         name="testCheckboxes"
         id="test-checkboxes"
@@ -119,17 +116,15 @@ describe('FormCheckboxSearchGroup', () => {
       />,
     );
 
-    const searchInput = getByLabelText('Search options');
+    const searchInput = screen.getByLabelText('Search options');
 
-    fireEvent.change(searchInput, {
-      target: {
-        value: '2',
-      },
-    });
+    await userEvent.type(searchInput, '2');
 
     jest.runAllTimers();
 
-    const checkboxes = getAllByLabelText(/Test checkbox/) as HTMLInputElement[];
+    const checkboxes = screen.getAllByLabelText(
+      /Test checkbox/,
+    ) as HTMLInputElement[];
 
     expect(checkboxes).toHaveLength(2);
     expect(checkboxes[0]).toHaveAttribute('value', '1');

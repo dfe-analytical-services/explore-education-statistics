@@ -1,3 +1,4 @@
+import { useFormContext } from '@common/components/form/contexts/FormContext';
 import { FormGroup } from '@common/components/form/index';
 import {
   FieldHelperProps,
@@ -18,9 +19,12 @@ import React, {
 export type FormFieldComponentProps<Props, FormValues> = FormFieldProps<
   FormValues
 > &
-  Omit<Props, 'value' | 'error'>;
+  Omit<Props, 'id' | 'value' | 'error'> & {
+    id?: string;
+  };
 
 export interface FormFieldProps<FormValues = unknown> {
+  id?: string;
   formGroup?: boolean;
   formGroupClass?: string;
   name: FormValues extends Record<string, unknown> ? keyof FormValues : string;
@@ -29,17 +33,20 @@ export interface FormFieldProps<FormValues = unknown> {
 
 interface FormFieldInputProps<Value> extends FieldInputProps<Value> {
   error?: ReactNode | string;
+  id: string;
 }
 
-type InternalFormFieldProps<P, Value> = Omit<P, 'value' | 'error'> & {
+type InternalFormFieldProps<P, Value> = Omit<P, 'id' | 'value' | 'error'> & {
   as?: ComponentType<FormFieldInputProps<Value> & P>;
   children?:
     | ((props: {
+        id: string;
         field: FieldInputProps<Value> & { error?: string };
         meta: FieldMetaProps<Value>;
         helpers: FieldHelperProps<Value>;
       }) => ReactNode)
     | ReactNode;
+  id?: string;
   type?: 'checkbox' | 'radio' | 'text' | 'number';
 };
 
@@ -48,11 +55,15 @@ function FormField<Value, Props = Record<string, unknown>>({
   children,
   formGroup = true,
   formGroupClass,
+  id: customId,
   name,
   showError = true,
   type,
   ...props
 }: FormFieldProps & InternalFormFieldProps<Props, Value>) {
+  const { prefixFormId, fieldId } = useFormContext();
+  const id = customId ? prefixFormId(customId) : fieldId(name);
+
   const [field, meta, helpers] = useField({
     name,
     type,
@@ -72,6 +83,7 @@ function FormField<Value, Props = Record<string, unknown>>({
         <Component
           {...props}
           {...field}
+          id={customId ? prefixFormId(customId) : fieldId(name)}
           name={name}
           error={error}
           onChange={(event: ChangeEvent) => {
@@ -98,6 +110,7 @@ function FormField<Value, Props = Record<string, unknown>>({
 
     return typeof children === 'function'
       ? children({
+          id,
           field: {
             ...field,
             error,
@@ -106,7 +119,20 @@ function FormField<Value, Props = Record<string, unknown>>({
           meta,
         })
       : children;
-  }, [as, children, error, field, helpers, meta, name, props]);
+  }, [
+    as,
+    children,
+    prefixFormId,
+    customId,
+    error,
+    field,
+    fieldId,
+    helpers,
+    id,
+    meta,
+    name,
+    props,
+  ]);
 
   return formGroup ? (
     <FormGroup hasError={!!error} className={formGroupClass}>

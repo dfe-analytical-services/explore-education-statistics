@@ -127,7 +127,6 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Validators
         CannotRemoveDataFilesUntilImportComplete,
         CannotRemoveDataFilesOnceReleaseApproved,
         FileTypeMustBeData,
-        DataFileImportsMigrationAlreadyRun,
 
         // Data zip file
         DataFileMustBeZipFile,

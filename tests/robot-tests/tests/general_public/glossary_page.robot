@@ -11,7 +11,7 @@ Navigate to glossary page
     [Tags]  HappyPath
     environment variable should be set   PUBLIC_URL
     user goes to url   %{PUBLIC_URL}
-    user waits until h1 is visible  Choose how to explore our statistics and data
+    user waits until h1 is visible  Explore our statistics and data
 
     user clicks link   Education statistics: glossary
     user waits until h1 is visible   Glossary

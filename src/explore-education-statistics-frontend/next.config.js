@@ -2,7 +2,7 @@
 
 const DotEnv = require('dotenv');
 const fs = require('fs');
-const compose = require('lodash/fp/compose');
+const flowRight = require('lodash/fp/flowRight');
 const withImages = require('next-images');
 const withTranspileModules = require('next-transpile-modules');
 const path = require('path');
@@ -102,7 +102,7 @@ const nextConfig = {
 
       config.plugins.push(new CaseSensitivePathsPlugin());
 
-      if (envConfig.ESLINT_DISABLE !== 'true') {
+      if (envConfig.STYLELINT_DISABLE !== 'true') {
         config.plugins.push(
           new StylelintPlugin({
             // Next doesn't play nicely with emitted errors
@@ -129,7 +129,12 @@ const nextConfig = {
   },
 };
 
-module.exports = compose(
+// Plugins are applied to the
+// Next config from left to right
+module.exports = flowRight(
+  withESLint,
+  withImages,
+  withFonts,
   withTranspileModules([
     'explore-education-statistics-common',
     // Need to add explicit dependencies as they
@@ -139,7 +144,4 @@ module.exports = compose(
     'sanitize-html/node_modules',
     'nanoid',
   ]),
-  withFonts,
-  withImages,
-  withESLint,
 )(nextConfig);

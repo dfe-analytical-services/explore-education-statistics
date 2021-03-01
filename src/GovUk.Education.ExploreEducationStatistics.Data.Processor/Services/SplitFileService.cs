@@ -8,9 +8,7 @@ using System.Threading.Tasks;
 using CsvHelper;
 using CsvHelper.Configuration;
 using GovUk.Education.ExploreEducationStatistics.Common.Extensions;
-using GovUk.Education.ExploreEducationStatistics.Common.Model;
 using GovUk.Education.ExploreEducationStatistics.Common.Model.Data;
-using GovUk.Education.ExploreEducationStatistics.Common.Services;
 using GovUk.Education.ExploreEducationStatistics.Common.Services.Interfaces;
 using GovUk.Education.ExploreEducationStatistics.Content.Model;
 using GovUk.Education.ExploreEducationStatistics.Content.Model.Extensions;
@@ -22,7 +20,7 @@ using GovUk.Education.ExploreEducationStatistics.Data.Processor.Utils;
 using Microsoft.Azure.WebJobs;
 using Microsoft.Extensions.Logging;
 using static GovUk.Education.ExploreEducationStatistics.Common.BlobContainerNames;
-using static GovUk.Education.ExploreEducationStatistics.Common.Services.FileStoragePathUtils;
+using static GovUk.Education.ExploreEducationStatistics.Common.Services.FileStorageUtils;
 
 namespace GovUk.Education.ExploreEducationStatistics.Data.Processor.Services
 {
@@ -79,7 +77,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Processor.Services
         {
             var import = await _dataImportService.GetImport(importId);
 
-            var batchFilesForDataFile = await _batchService.GetBatchFilesForDataFile(import.FileId);
+            var batchFilesForDataFile = await _batchService.GetBatchFilesForDataFile(import.File);
 
             // If no batching was necessary, simply add a message to process the lone data file
             if (!batchFilesForDataFile.Any())
@@ -124,7 +122,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Processor.Services
             var numRows = dataFileTable.Rows.Count + 1;
             var numBatches = (int)Math.Ceiling((double)dataFileTable.Rows.Count / dataImport.RowsPerBatch);
 
-            var existingBatchFiles = await _batchService.GetBatchFilesForDataFile(dataImport.FileId);
+            var existingBatchFiles = await _batchService.GetBatchFilesForDataFile(dataImport.File);
 
             var existingBatchFileNumbers = existingBatchFiles
                 .AsQueryable()
@@ -147,16 +145,12 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Processor.Services
                     return;
                 }
 
-                var batchFileName = $"{dataImport.File.Filename}_{batchCount:000000}";
-
                 if (existingBatchFileNumbers.Contains(batchCount))
                 {
-                    _logger.LogInformation($"Batch file {batchFileName} already exists - not recreating");
+                    _logger.LogInformation($"Batch {batchCount} already exists - not recreating");
                     batchCount++;
-                    continue;    
+                    continue;
                 }
-
-                var batchFilePath = $"{BatchesDir}/{batchFileName}";
 
                 await using var stream = new MemoryStream();
                 var writer = new StreamWriter(stream);
@@ -188,19 +182,15 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Processor.Services
 
                 await _blobStorageService.UploadStream(
                     containerName: PrivateFilesContainerName,
-                    path: AdminReleasePath(dataImport.File.ReleaseId, FileType.Data, batchFilePath),
+                    path: dataImport.File.BatchPath(batchCount),
                     stream: stream,
                     contentType: "text/csv",
-                    options: new IBlobStorageService.UploadStreamOptions
-                    {
-                        MetaValues = FileStorageUtils.GetDataFileMetaValues(
-                            name: dataBlob.Name,
-                            metaFileName: dataImport.MetaFile.Filename,
-                            userName: dataBlob.GetUserName(),
-                            numberOfRows: numRows
-                        )
-                    }
-                );
+                    metadata: GetDataFileMetaValues(
+                        name: dataBlob.Name,
+                        metaFileName: dataImport.MetaFile.Filename,
+                        userName: dataBlob.GetUserName(),
+                        numberOfRows: numRows
+                    ));
 
                 batchFilesExist = true;
                 batchCount++;

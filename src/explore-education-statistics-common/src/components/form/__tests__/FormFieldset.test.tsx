@@ -1,25 +1,25 @@
+import { getAllDescribedBy } from '@common-test/queries';
+import { FormContextProvider } from '@common/components/form/contexts/FormContext';
 import React from 'react';
-import { render } from '@testing-library/react';
+import { render, screen } from '@testing-library/react';
 import FormFieldset from '../FormFieldset';
 
 describe('FormFieldset', () => {
   test('renders correctly with required props', () => {
-    const { container } = render(
+    render(
       <FormFieldset id="test-fieldset" legend="Fill the form">
         <input type="text" name="test-input-1" />
         <input type="text" name="test-input-2" />
       </FormFieldset>,
     );
 
-    const legend = container.querySelector('legend') as HTMLLegendElement;
-
-    expect(legend.textContent).toBe('Fill the form');
-    expect(container.querySelector('#test-fieldset')).not.toBeNull();
-    expect(container.innerHTML).toMatchSnapshot();
+    const legend = screen.getByRole('group', { name: 'Fill the form' });
+    expect(legend).toBeInTheDocument();
+    expect(legend.innerHTML).toMatchSnapshot();
   });
 
   test('renders correctly with hint', () => {
-    const { container, getByText } = render(
+    const { container } = render(
       <FormFieldset
         id="test-fieldset"
         legend="Fill the form"
@@ -30,12 +30,12 @@ describe('FormFieldset', () => {
       </FormFieldset>,
     );
 
-    expect(getByText('All fields are required')).toBeDefined();
+    expect(screen.getByText('All fields are required')).toBeInTheDocument();
     expect(container.innerHTML).toMatchSnapshot();
   });
 
   test('renders correctly with error', () => {
-    const { container, getByText } = render(
+    const { container } = render(
       <FormFieldset
         id="test-fieldset"
         legend="Fill the form"
@@ -46,12 +46,12 @@ describe('FormFieldset', () => {
       </FormFieldset>,
     );
 
-    expect(getByText('There was an error')).toBeDefined();
+    expect(screen.getByText('There was an error')).toBeInTheDocument();
     expect(container.innerHTML).toMatchSnapshot();
   });
 
   test('aria-describedby is equal to the hint id', () => {
-    const { container } = render(
+    render(
       <FormFieldset
         id="test-fieldset"
         legend="Fill the form"
@@ -59,14 +59,14 @@ describe('FormFieldset', () => {
       />,
     );
 
-    expect(container.querySelector('fieldset')).toHaveAttribute(
+    expect(screen.getByRole('group')).toHaveAttribute(
       'aria-describedby',
       'test-fieldset-hint',
     );
   });
 
   test('aria-describedby is equal to the error id', () => {
-    const { container } = render(
+    render(
       <FormFieldset
         id="test-fieldset"
         legend="Fill the form"
@@ -74,14 +74,14 @@ describe('FormFieldset', () => {
       />,
     );
 
-    expect(container.querySelector('fieldset')).toHaveAttribute(
+    expect(screen.getByRole('group')).toHaveAttribute(
       'aria-describedby',
       'test-fieldset-error',
     );
   });
 
   test('aria-describedby contains both hint and error ids', () => {
-    const { container } = render(
+    render(
       <FormFieldset
         id="test-fieldset"
         legend="Fill the form"
@@ -90,13 +90,17 @@ describe('FormFieldset', () => {
       />,
     );
 
-    const fieldset = container.querySelector('fieldset');
-    const ariaDescribedBy = fieldset
-      ? fieldset.getAttribute('aria-describedby')
-      : '';
+    const group = screen.getByRole('group');
+    expect(group).toHaveAttribute('id', 'test-fieldset');
 
-    expect(ariaDescribedBy).toContain('test-fieldset-error');
-    expect(ariaDescribedBy).toContain('test-fieldset-hint');
+    const describingElements = getAllDescribedBy(group, group);
+
+    expect(describingElements).toHaveLength(2);
+    expect(describingElements[0]).toHaveAttribute('id', 'test-fieldset-error');
+    expect(describingElements[0]).toHaveTextContent('There was an error');
+
+    expect(describingElements[1]).toHaveAttribute('id', 'test-fieldset-hint');
+    expect(describingElements[1]).toHaveTextContent('All fields are required');
   });
 
   test('setting `legendSize` to xl applies class correctly', () => {
@@ -133,5 +137,37 @@ describe('FormFieldset', () => {
     expect(container.querySelector('legend')).toHaveClass(
       'govuk-visually-hidden',
     );
+  });
+
+  test('renders with correct ids with form context', () => {
+    render(
+      <FormContextProvider id="testForm">
+        <FormFieldset
+          id="test-fieldset"
+          legend="Fill the form"
+          hint="All fields are required"
+          error="There was an error"
+          legendHidden
+        />
+      </FormContextProvider>,
+    );
+
+    const group = screen.getByRole('group');
+    expect(group).toHaveAttribute('id', 'testForm-test-fieldset');
+
+    const describingElements = getAllDescribedBy(group, group);
+
+    expect(describingElements).toHaveLength(2);
+    expect(describingElements[0]).toHaveAttribute(
+      'id',
+      'testForm-test-fieldset-error',
+    );
+    expect(describingElements[0]).toHaveTextContent('There was an error');
+
+    expect(describingElements[1]).toHaveAttribute(
+      'id',
+      'testForm-test-fieldset-hint',
+    );
+    expect(describingElements[1]).toHaveTextContent('All fields are required');
   });
 });

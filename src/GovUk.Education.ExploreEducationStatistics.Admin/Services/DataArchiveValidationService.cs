@@ -43,8 +43,8 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Services
                 return ValidationActionResult(DataFileMustBeZipFile);
             }
 
-            var path = AdminReleasePath(releaseId, DataZip, zipFile.FileName);
-
+            // TODO EES-1704 No need for this validation when the zip file is uploaded by Id rather than filename
+            var path = $"{AdminFilesPath(releaseId, DataZip)}{zipFile.FileName}";
             if (await _blobStorageService.CheckBlobExists(BlobContainerNames.PrivateFilesContainerName, path))
             {
                 return ValidationActionResult(DataZipFileAlreadyExists);

@@ -31,7 +31,7 @@ const PreReleasePageContainer = ({
   const config = useConfig();
   const { user } = useAuthContext();
 
-  const { handleManualErrors, handleApiErrors } = useErrorControl();
+  const { errorPages, handleError } = useErrorControl();
 
   const { value: model, isLoading } = useAsyncRetry<
     Model | undefined
@@ -42,7 +42,7 @@ const PreReleasePageContainer = ({
       );
 
       if (preReleaseWindowStatus.access === 'NoneSet') {
-        handleManualErrors.forbidden();
+        errorPages.forbidden();
         return undefined;
       }
 
@@ -55,10 +55,10 @@ const PreReleasePageContainer = ({
         preReleaseSummary,
       };
     } catch (err) {
-      handleApiErrors(err);
+      handleError(err);
       return undefined;
     }
-  }, [handleManualErrors, releaseId]);
+  }, [errorPages, releaseId]);
 
   const renderPage = () => {
     if (!model) {

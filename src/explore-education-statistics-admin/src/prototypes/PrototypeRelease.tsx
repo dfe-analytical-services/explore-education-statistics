@@ -297,7 +297,7 @@ const PrototypeRelease = () => {
             goToTop={false}
           >
             <Tabs id="download">
-              <TabsSection title="Popular tables">
+              <TabsSection title="Featured tables">
                 <PrototypeDownloadPopular viewAsList />
               </TabsSection>
               <TabsSection title="Underlying data">

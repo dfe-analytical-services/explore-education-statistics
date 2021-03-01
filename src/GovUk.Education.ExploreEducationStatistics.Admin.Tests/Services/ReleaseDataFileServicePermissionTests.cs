@@ -68,8 +68,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
                 File = new File
                 {
                     Filename = "ancillary.pdf",
-                    Type = Ancillary,
-                    Release = _release
+                    Type = Ancillary
                 }
             };
 

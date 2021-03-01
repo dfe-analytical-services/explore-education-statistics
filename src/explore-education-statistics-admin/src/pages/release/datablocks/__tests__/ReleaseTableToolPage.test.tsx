@@ -21,11 +21,23 @@ describe('ReleaseTableToolPage', () => {
       subjects: [
         {
           id: 'subject-1',
-          label: 'Subject 1',
+          name: 'Subject 1',
+          content: '<p>Test content 1</p>',
+          timePeriods: {
+            from: '2018',
+            to: '2020',
+          },
+          geographicLevels: ['National'],
         },
         {
           id: 'subject-2',
-          label: 'Subject 2',
+          name: 'Subject 2',
+          content: '<p>Test content 2</p>',
+          timePeriods: {
+            from: '2015/16',
+            to: '2018/19',
+          },
+          geographicLevels: ['National'],
         },
       ],
       highlights: [],

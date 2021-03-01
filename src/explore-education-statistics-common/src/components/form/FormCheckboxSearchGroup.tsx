@@ -62,11 +62,7 @@ const FormCheckboxSearchGroup = ({
   }
 
   return (
-    <FormFieldset
-      {...fieldsetProps}
-      onBlur={onFieldsetBlur}
-      onFocus={onFieldsetFocus}
-    >
+    <FormFieldset {...fieldsetProps} useFormId={false}>
       <FormTextSearchInput
         id={`${id}-search`}
         name={`${name}-search`}
@@ -83,7 +79,7 @@ const FormCheckboxSearchGroup = ({
       <div aria-live="assertive" className={styles.optionsContainer}>
         <BaseFormCheckboxGroup
           {...groupProps}
-          id={`${id}-checkboxes`}
+          id={`${id}-options`}
           value={value}
           name={name}
           options={filteredOptions}

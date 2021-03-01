@@ -106,7 +106,6 @@ const EditableKeyStat = ({
                 value={keyStat.value}
               >
                 <FormFieldTextInput<KeyStatsFormValues>
-                  id={`${formId}-dataSummary`}
                   name="dataSummary"
                   label={<span className={styles.trendText}>Trend</span>}
                 />
@@ -114,7 +113,6 @@ const EditableKeyStat = ({
 
               <FormFieldTextInput<KeyStatsFormValues>
                 formGroupClass="govuk-!-margin-top-2"
-                id={`${formId}-dataDefinitionTitle`}
                 name="dataDefinitionTitle"
                 label="Guidance title"
               />
@@ -122,7 +120,6 @@ const EditableKeyStat = ({
               <FormFieldEditor<KeyStatsFormValues>
                 name="dataDefinition"
                 toolbarConfig={toolbarConfigs.simple}
-                id={`${formId}-dataDefinition`}
                 label="Guidance text"
               />
 

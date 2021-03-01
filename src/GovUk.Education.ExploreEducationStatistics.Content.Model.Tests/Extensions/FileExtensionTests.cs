@@ -17,10 +17,55 @@ namespace GovUk.Education.ExploreEducationStatistics.Content.Model.Tests.Extensi
         private readonly File _file = new File
         {
             Id = Guid.NewGuid(),
+            RootPath = Guid.NewGuid(),
             Filename = "ancillary.pdf",
-            ReleaseId = Guid.NewGuid(),
             Type = Ancillary
         };
+
+        [Fact]
+        public void Batches_ReleaseFile()
+        {
+            var releaseFile = new ReleaseFile
+            {
+                File = new File
+                {
+                    Id = Guid.NewGuid(),
+                    RootPath = Guid.NewGuid(),
+                    Filename = "data.csv",
+                    Type = Data
+                }
+            };
+ 
+            Assert.Equal(releaseFile.File.BatchesPath(), releaseFile.BatchesPath());
+        }
+
+        [Fact]
+        public void BatchesPath()
+        {
+            var dataFile = new File
+            {
+                Id = Guid.NewGuid(),
+                RootPath = Guid.NewGuid(),
+                Filename = "data.csv",
+                Type = Data
+            };
+
+            Assert.Equal($"{dataFile.RootPath}/data/batches/{dataFile.Id}/", dataFile.BatchesPath());
+        }
+
+        [Fact]
+        public void BatchPath()
+        {
+            var dataFile = new File
+            {
+                Id = Guid.NewGuid(),
+                RootPath = Guid.NewGuid(),
+                Filename = "data.csv",
+                Type = Data
+            };
+
+            Assert.Equal($"{dataFile.RootPath}/data/batches/{dataFile.Id}/data.csv_000999", dataFile.BatchPath(999));
+        }
 
         [Fact]
         public void Path_ReleaseFile()
@@ -36,7 +81,60 @@ namespace GovUk.Education.ExploreEducationStatistics.Content.Model.Tests.Extensi
         [Fact]
         public void Path()
         {
-            Assert.Equal(AdminReleasePath(_file.ReleaseId, _file.Type, _file.BlobStorageName), _file.Path());
+            var ancillaryFile = new File
+            {
+                Id = Guid.NewGuid(),
+                RootPath = Guid.NewGuid(),
+                Filename = "ancillary.pdf",
+                Type = Ancillary
+            };
+
+            var chartFile = new File
+            {
+                Id = Guid.NewGuid(),
+                RootPath = Guid.NewGuid(),
+                Filename = "chart.png",
+                Type = Chart
+            };
+
+            var dataFile = new File
+            {
+                Id = Guid.NewGuid(),
+                RootPath = Guid.NewGuid(),
+                Filename = "data.csv",
+                Type = Data
+            };
+
+            var imageFile = new File
+            {
+                Id = Guid.NewGuid(),
+                RootPath = Guid.NewGuid(),
+                Filename = "image.png",
+                Type = Image
+            };
+
+            var metaFile = new File
+            {
+                Id = Guid.NewGuid(),
+                RootPath = Guid.NewGuid(),
+                Filename = "data.meta.csv",
+                Type = Metadata
+            };
+
+            var zipFile = new File
+            {
+                Id = Guid.NewGuid(),
+                RootPath = Guid.NewGuid(),
+                Filename = "data.zip",
+                Type = DataZip
+            };
+
+            Assert.Equal($"{ancillaryFile.RootPath}/ancillary/{ancillaryFile.BlobStorageName}", ancillaryFile.Path());
+            Assert.Equal($"{chartFile.RootPath}/chart/{chartFile.BlobStorageName}", chartFile.Path());
+            Assert.Equal($"{dataFile.RootPath}/data/{dataFile.BlobStorageName}", dataFile.Path());
+            Assert.Equal($"{imageFile.RootPath}/image/{imageFile.BlobStorageName}", imageFile.Path());
+            Assert.Equal($"{metaFile.RootPath}/data/{metaFile.BlobStorageName}", metaFile.Path());
+            Assert.Equal($"{zipFile.RootPath}/zip/{zipFile.BlobStorageName}", zipFile.Path());
         }
 
         [Fact]
@@ -102,11 +200,12 @@ namespace GovUk.Education.ExploreEducationStatistics.Content.Model.Tests.Extensi
         }
 
         [Fact]
+        // TODO EES-1815 Remove this when the name is changed to use the database Subject name
         public void ToFileInfo_BlobWithNoNameKey()
         {
-            // Name is retrieved from the blob meta properties due to EES-1637 (Subject doesn't exist early on and Name on Data files is Subject name persisted on blob)
+            // Name is retrieved from the blob meta properties due to EES-1637 (Subject didn't exist early on and Name on Data files is Subject name persisted on blob)
             // Chart files don't have any meta properties added to avoid duplicating data unnecessarily since nothing requires the filename or name of them
-            // Nevertheless test that we populate the name from the database file reference when the blob name property is missing
+            // Nevertheless test that we populate the name from the database File as a fallback when the blob name property is missing
 
             var result = _file.ToFileInfo(new BlobInfo
             (

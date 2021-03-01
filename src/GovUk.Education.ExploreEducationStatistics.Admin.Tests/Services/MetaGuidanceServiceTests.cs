@@ -41,7 +41,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
                     {
                         "National", "Local Authority", "Local Authority District"
                     },
-                    TimePeriods = new MetaGuidanceSubjectTimePeriodsViewModel("2020/21 Q3", "2021/22 Q1"),
+                    TimePeriods = new TimePeriodLabels("2020/21 Q3", "2021/22 Q1"),
                     Variables = new List<LabelValue>
                     {
                         new LabelValue("Filter label", "test_filter"),
@@ -64,7 +64,6 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
                 File = new File
                 {
                     Filename = "file1.csv",
-                    Release = release,
                     Type = FileType.Data,
                     SubjectId = Guid.NewGuid()
                 }
@@ -122,7 +121,6 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
                 File = new File
                 {
                     Filename = "file1.csv",
-                    Release = release,
                     Type = FileType.Data,
                     SubjectId = Guid.NewGuid()
                 }
@@ -134,7 +132,6 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
                 File = new File
                 {
                     Filename = "file1.csv",
-                    Release = release,
                     Type = FileType.Data,
                     SubjectId = Guid.NewGuid(),
                     Replacing = originalFile.File
@@ -293,7 +290,6 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
                 File = new File
                 {
                     Filename = "file1.csv",
-                    Release = release,
                     Type = FileType.Data,
                     SubjectId = Guid.NewGuid()
                 }
@@ -393,7 +389,6 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
                 File = new File
                 {
                     Filename = "file1.csv",
-                    Release = contentRelease,
                     Type = FileType.Data,
                     SubjectId = subject1.Id
                 }
@@ -405,7 +400,6 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
                 File = new File
                 {
                     Filename = "file2.csv",
-                    Release = contentRelease,
                     Type = FileType.Data,
                     SubjectId = subject2.Id
                 }
@@ -560,7 +554,6 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
                 File = new File
                 {
                     Filename = "file1.csv",
-                    Release = contentReleaseVersion1,
                     Type = FileType.Data,
                     SubjectId = subject1.Id
                 }
@@ -572,7 +565,6 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
                 File = new File
                 {
                     Filename = "file1.csv",
-                    Release = contentReleaseVersion2,
                     Type = FileType.Data,
                     SubjectId = subject1.Id
                 }
@@ -584,7 +576,6 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
                 File = new File
                 {
                     Filename = "file2.csv",
-                    Release = contentReleaseVersion2,
                     Type = FileType.Data,
                     SubjectId = subject2.Id
                 }
@@ -765,7 +756,6 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
                 File = new File
                 {
                     Filename = "file1.csv",
-                    Release = release,
                     Type = FileType.Data,
                     SubjectId = Guid.NewGuid()
                 }
@@ -812,7 +802,6 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
                 File = new File
                 {
                     Filename = "file1.csv",
-                    Release = release,
                     Type = FileType.Data,
                     SubjectId = Guid.NewGuid()
                 }
@@ -855,7 +844,6 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
                 File = new File
                 {
                     Filename = "file1.csv",
-                    Release = release,
                     Type = FileType.Data,
                     SubjectId = Guid.NewGuid()
                 }

@@ -1,7 +1,7 @@
 *** Settings ***
 Resource    ../libs/public-common.robot
 
-Force Tags  GeneralPublic  Local  Dev  Test  Preprod
+Force Tags  GeneralPublic  Local  Dev  Preprod
 
 Suite Setup       user opens the browser
 Suite Teardown    user closes the browser
@@ -22,6 +22,13 @@ Select Exclusions publication
     user clicks element    id:publicationForm-submit
     user waits until h2 is visible  Choose a subject
     user checks previous table tool step contains  1   Publication   Permanent and fixed-period exclusions in England
+
+Validate "Exclusions by geographic level" subject details
+    [Tags]  HappyPath
+    user opens details dropdown  More details  css:[data-testid="Radio item for Exclusions by geographic level"]
+    ${details}=  user gets details content element  More details  css:[data-testid="Radio item for Exclusions by geographic level"]
+    user checks summary list contains  Geographic levels  Local Authority; National; Regional  ${details}
+    user checks summary list contains  Time period  2006/07 to 2016/17  ${details}
 
 Select subject "Exclusions by geographic level"
     [Tags]  HappyPath

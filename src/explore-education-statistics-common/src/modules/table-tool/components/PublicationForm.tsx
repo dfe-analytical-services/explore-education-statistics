@@ -8,7 +8,7 @@ import {
 } from '@common/components/form';
 import SummaryList from '@common/components/SummaryList';
 import SummaryListItem from '@common/components/SummaryListItem';
-import { ThemeMeta } from '@common/services/tableBuilderService';
+import { Theme } from '@common/services/tableBuilderService';
 import createErrorHelper from '@common/validation/createErrorHelper';
 import Yup from '@common/validation/yup';
 import { Formik } from 'formik';
@@ -18,16 +18,18 @@ import { InjectedWizardProps } from './Wizard';
 import WizardStepFormActions from './WizardStepFormActions';
 import WizardStepHeading from './WizardStepHeading';
 
-interface FormValues {
+export interface PublicationFormValues {
   publicationId: string;
 }
 
-export type PublicationFormSubmitHandler = (values: FormValues) => void;
+export type PublicationFormSubmitHandler = (
+  values: PublicationFormValues,
+) => void;
 
 interface Props {
-  initialValues?: FormValues;
+  initialValues?: PublicationFormValues;
   onSubmit: PublicationFormSubmitHandler;
-  options: ThemeMeta[];
+  options: Theme[];
 }
 
 const formId = 'publicationForm';
@@ -53,12 +55,12 @@ const PublicationForm = (props: Props & InjectedWizardProps) => {
   );
 
   return (
-    <Formik<FormValues>
+    <Formik<PublicationFormValues>
       enableReinitialize
       initialValues={initialValues}
       validateOnBlur={false}
       validateOnChange={false}
-      validationSchema={Yup.object<FormValues>({
+      validationSchema={Yup.object<PublicationFormValues>({
         publicationId: Yup.string().required('Choose publication'),
       })}
       onSubmit={async values => {
@@ -70,7 +72,7 @@ const PublicationForm = (props: Props & InjectedWizardProps) => {
         const { values } = form;
         const { getError } = createErrorHelper(form);
 
-        const filteredOptions: ThemeMeta[] = options
+        const filteredOptions: Theme[] = options
           .filter(theme =>
             theme.topics.some(topic =>
               topic.publications.some(
@@ -109,7 +111,7 @@ const PublicationForm = (props: Props & InjectedWizardProps) => {
             <Form {...form} id={formId} showSubmitError>
               <FormFieldset
                 error={getError('publicationId')}
-                id={`${formId}-publicationId`}
+                id="publicationId"
                 legend={stepHeading}
               >
                 <FormGroup>
@@ -165,9 +167,6 @@ const PublicationForm = (props: Props & InjectedWizardProps) => {
                                 small
                                 showError={false}
                                 name="publicationId"
-                                id={`${formId}-publicationId-${camelCase(
-                                  topic.title,
-                                )}`}
                                 disabled={form.isSubmitting}
                                 options={topic.publications.map(
                                   publication => ({
@@ -187,7 +186,7 @@ const PublicationForm = (props: Props & InjectedWizardProps) => {
                 </FormGroup>
               </FormFieldset>
 
-              <WizardStepFormActions {...props} formId={formId} />
+              <WizardStepFormActions {...props} />
             </Form>
           );
         }

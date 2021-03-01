@@ -70,9 +70,38 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Services
                         .Releases
                         .FindAll(r => releaseIds.Contains(r.Id));
                     
-                    return _mapper.Map<MyPublicationViewModel>(publication);
+                    return _mapper.Map<MyPublicationViewModel>(hydratedPublication);
                 })
                 .ToList();
+        }
+
+        public async Task<MyPublicationViewModel> GetPublicationForUser(Guid publicationId, Guid userId)
+        {
+            var userReleaseIdsForPublication = await _context
+                .UserReleaseRoles
+                .Include(r => r.Release)
+                .Where(r => r.UserId == userId && r.Release.PublicationId == publicationId && r.Role != ReleaseRole.PrereleaseViewer)
+                .Select(r => r.ReleaseId)
+                .Distinct()
+                .ToListAsync();
+
+            var hydratedPublication =
+                HydratePublicationForPublicationViewModel(_context.Publications)
+                    .First(p => p.Id == publicationId);
+            
+            hydratedPublication.Releases = hydratedPublication
+                .Releases
+                .FindAll(r => userReleaseIdsForPublication.Contains(r.Id));
+            
+            return _mapper.Map<MyPublicationViewModel>(hydratedPublication);
+        }
+
+        public async Task<MyPublicationViewModel> GetPublicationWithAllReleases(Guid publicationId)
+        {
+            var hydratedPublication = await HydratePublicationForPublicationViewModel(_context.Publications)
+                .FirstAsync(p => p.Id == publicationId);
+
+            return _mapper.Map<MyPublicationViewModel>(hydratedPublication);
         }
     }
 }

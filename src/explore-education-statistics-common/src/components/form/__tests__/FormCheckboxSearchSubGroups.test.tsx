@@ -1,5 +1,6 @@
+import { render, screen, within } from '@testing-library/react';
+import userEvent from '@testing-library/user-event';
 import React from 'react';
-import { fireEvent, render, screen, within } from '@testing-library/react';
 import FormCheckboxSearchSubGroups from '../FormCheckboxSearchSubGroups';
 
 describe('FormCheckboxSearchSubGroups', () => {
@@ -83,7 +84,7 @@ describe('FormCheckboxSearchSubGroups', () => {
   });
 
   test('generates group IDs if none provided', () => {
-    const { container } = render(
+    render(
       <FormCheckboxSearchSubGroups
         id="test-checkboxes"
         name="test-checkboxes"
@@ -103,9 +104,15 @@ describe('FormCheckboxSearchSubGroups', () => {
       />,
     );
 
-    expect(container.querySelector('#test-checkboxes-1')).not.toBeNull();
-    expect(container.querySelector('#test-checkboxes-2')).toBeNull();
-    expect(container.querySelector('#custom-group-id')).not.toBeNull();
+    expect(screen.getByRole('group', { name: 'Group A' })).toHaveAttribute(
+      'id',
+      'test-checkboxes-options-1',
+    );
+
+    expect(screen.getByRole('group', { name: 'Group B' })).toHaveAttribute(
+      'id',
+      'test-checkboxes-custom-group-id',
+    );
   });
 
   test('renders `Select all options` button correctly', () => {
@@ -235,7 +242,7 @@ describe('FormCheckboxSearchSubGroups', () => {
     ).toBeInTheDocument();
   });
 
-  test('providing a search term renders only relevant checkboxes', () => {
+  test('providing a search term renders only relevant checkboxes', async () => {
     jest.useFakeTimers();
 
     render(
@@ -264,11 +271,7 @@ describe('FormCheckboxSearchSubGroups', () => {
       />,
     );
 
-    fireEvent.change(screen.getByLabelText('Search options'), {
-      target: {
-        value: '2',
-      },
-    });
+    await userEvent.type(screen.getByLabelText('Search options'), '2');
 
     jest.runAllTimers();
 
@@ -280,7 +283,7 @@ describe('FormCheckboxSearchSubGroups', () => {
     expect(checkboxes[0]).toHaveAttribute('value', '2');
   });
 
-  test('does not throw error if search term that is invalid regex is used', () => {
+  test('does not throw error if search term that is invalid regex is used', async () => {
     jest.useFakeTimers();
 
     render(
@@ -309,11 +312,7 @@ describe('FormCheckboxSearchSubGroups', () => {
       />,
     );
 
-    fireEvent.change(screen.getByLabelText('Search options'), {
-      target: {
-        value: '[',
-      },
-    });
+    await userEvent.type(screen.getByLabelText('Search options'), '[');
 
     jest.runAllTimers();
 
@@ -324,7 +323,7 @@ describe('FormCheckboxSearchSubGroups', () => {
     expect(checkboxes).toHaveLength(0);
   });
 
-  test('providing a search term does not remove checkboxes that have already been checked', () => {
+  test('providing a search term does not remove checkboxes that have already been checked', async () => {
     jest.useFakeTimers();
 
     render(
@@ -355,11 +354,7 @@ describe('FormCheckboxSearchSubGroups', () => {
 
     const searchInput = screen.getByLabelText('Search options');
 
-    fireEvent.change(searchInput, {
-      target: {
-        value: '2',
-      },
-    });
+    await userEvent.type(searchInput, '2');
 
     jest.runAllTimers();
 

@@ -30,7 +30,8 @@ namespace GovUk.Education.ExploreEducationStatistics.Publisher.Services
         {
             var releasesList = releases.ToList();
             _logger.LogInformation(
-                $"Queuing generate content message for releases: {string.Join(", ", releasesList.Select(tuple => tuple.ReleaseId))}");
+                "Queuing generate content message for releases: {0}",
+                string.Join(", ", releasesList.Select(tuple => tuple.ReleaseId)));
             await _storageQueueService.AddMessageAsync(
                 GenerateReleaseContentQueue, new GenerateReleaseContentMessage(releasesList));
             foreach (var (releaseId, releaseStatusId) in releasesList)
@@ -42,7 +43,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Publisher.Services
 
         public async Task QueuePublishReleaseContentMessageAsync(Guid releaseId, Guid releaseStatusId)
         {
-            _logger.LogInformation($"Queuing publish content message for release: {releaseId}");
+            _logger.LogInformation("Queuing publish content message for release: {0}", releaseId);
             await _storageQueueService.AddMessageAsync(
                 PublishReleaseContentQueue, new PublishReleaseContentMessage(releaseId, releaseStatusId));
             await _releaseStatusService.UpdateContentStageAsync(releaseId, releaseStatusId,
@@ -59,7 +60,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Publisher.Services
         {
             foreach (var (releaseId, releaseStatusId) in releases)
             {
-                _logger.LogInformation($"Queuing data message for release: {releaseId}");
+                _logger.LogInformation("Queuing data message for release: {0}", releaseId);
                 await _storageQueueService.AddMessageAsync(
                     PublishReleaseDataQueue, new PublishReleaseDataMessage(releaseId, releaseStatusId));
                 await _releaseStatusService.UpdateDataStageAsync(releaseId, releaseStatusId,
@@ -77,7 +78,8 @@ namespace GovUk.Education.ExploreEducationStatistics.Publisher.Services
         {
             var releasesList = releases.ToList();
             _logger.LogInformation(
-                $"Queuing files message for releases: {string.Join(", ", releasesList.Select(tuple => tuple.ReleaseId))}");
+                "Queuing files message for releases: {0}",
+                string.Join(", ", releasesList.Select(tuple => tuple.ReleaseId)));
             await _storageQueueService.AddMessageAsync(
                 PublishReleaseFilesQueue, new PublishReleaseFilesMessage(releasesList));
             foreach (var (releaseId, releaseStatusId) in releasesList)

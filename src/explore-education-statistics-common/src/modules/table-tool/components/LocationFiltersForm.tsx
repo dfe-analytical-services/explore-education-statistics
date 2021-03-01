@@ -26,6 +26,8 @@ export type LocationFiltersFormSubmitHandler = (values: {
   locations: Dictionary<string[]>;
 }) => void;
 
+const formId = 'locationFiltersForm';
+
 interface Props {
   options: SubjectMeta['locations'];
   initialValues?: Dictionary<string[]>;
@@ -42,8 +44,6 @@ const LocationFiltersForm = (props: Props & InjectedWizardProps) => {
     stepNumber,
     initialValues = {},
   } = props;
-
-  const formId = 'locationFiltersForm';
 
   const formOptions = useMemo(() => options, [options]);
 
@@ -99,7 +99,7 @@ const LocationFiltersForm = (props: Props & InjectedWizardProps) => {
           return (
             <Form {...form} id={formId} showSubmitError>
               <FormFieldset
-                id={`${formId}-levels`}
+                id="levels"
                 legend={stepHeading}
                 hint="Select at least one"
                 error={
@@ -116,8 +116,6 @@ const LocationFiltersForm = (props: Props & InjectedWizardProps) => {
                           name={`locations.${levelKey}`}
                           key={levelKey}
                           options={level.options}
-                          order={[]}
-                          id={`${formId}-levels-${levelKey}`}
                           legend={level.legend}
                           legendHidden
                           disabled={form.isSubmitting}
@@ -128,7 +126,7 @@ const LocationFiltersForm = (props: Props & InjectedWizardProps) => {
                 </div>
               </FormFieldset>
 
-              <WizardStepFormActions {...props} formId={formId} />
+              <WizardStepFormActions {...props} />
             </Form>
           );
         }

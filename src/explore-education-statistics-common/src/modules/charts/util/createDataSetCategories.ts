@@ -16,11 +16,11 @@ import {
 import { FullTableMeta } from '@common/modules/table-tool/types/fullTable';
 import { TableDataResult } from '@common/services/tableBuilderService';
 import { Dictionary, Pair } from '@common/types';
+import naturalOrderBy from '@common/utils/array/naturalOrderBy';
 import cartesian from '@common/utils/cartesian';
 import parseNumber from '@common/utils/number/parseNumber';
 import get from 'lodash/get';
 import groupBy from 'lodash/groupBy';
-import orderBy from 'lodash/orderBy';
 
 /**
  * We use this form of a data set as it's
@@ -218,7 +218,7 @@ function sortDataSetCategories(
     return dataSetCategories;
   }
 
-  return orderBy(
+  return naturalOrderBy(
     dataSetCategories,
     data => {
       if (sortBy === 'name') {
@@ -231,7 +231,7 @@ function sortDataSetCategories(
 
       return parseNumber(data.dataSets[sortBy]) ?? 0;
     },
-    [sortAsc ? 'asc' : 'desc'],
+    sortAsc ? 'asc' : 'desc',
   );
 }
 

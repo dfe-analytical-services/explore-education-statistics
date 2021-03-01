@@ -30,13 +30,13 @@ exports[`FormCheckboxSearchSubGroups renders groups of checkboxes in correct ord
     >
       <div class="govuk-form-group">
         <fieldset class="govuk-fieldset"
-                  id="test-checkboxes-1"
+                  id="test-checkboxes-options-1"
         >
           <legend class="govuk-fieldset__legend govuk-fieldset__legend--s">
             Group A
           </legend>
           <div class="govuk-checkboxes">
-            <button id="test-checkboxes-1-all"
+            <button id="test-checkboxes-options-1-all"
                     class="button noUnderline selectAll"
                     type="button"
             >
@@ -44,26 +44,26 @@ exports[`FormCheckboxSearchSubGroups renders groups of checkboxes in correct ord
             </button>
             <div class="govuk-checkboxes__item">
               <input class="govuk-checkboxes__input"
-                     id="test-checkboxes-1-1"
+                     id="test-checkboxes-options-1-1"
                      name="testCheckboxes"
                      type="checkbox"
                      value="1"
               >
               <label class="govuk-label govuk-checkboxes__label"
-                     for="test-checkboxes-1-1"
+                     for="test-checkboxes-options-1-1"
               >
                 Checkbox 1
               </label>
             </div>
             <div class="govuk-checkboxes__item">
               <input class="govuk-checkboxes__input"
-                     id="test-checkboxes-1-2"
+                     id="test-checkboxes-options-1-2"
                      name="testCheckboxes"
                      type="checkbox"
                      value="2"
               >
               <label class="govuk-label govuk-checkboxes__label"
-                     for="test-checkboxes-1-2"
+                     for="test-checkboxes-options-1-2"
               >
                 Checkbox 2
               </label>
@@ -73,13 +73,13 @@ exports[`FormCheckboxSearchSubGroups renders groups of checkboxes in correct ord
       </div>
       <div class="govuk-form-group">
         <fieldset class="govuk-fieldset"
-                  id="test-checkboxes-2"
+                  id="test-checkboxes-options-2"
         >
           <legend class="govuk-fieldset__legend govuk-fieldset__legend--s">
             Group B
           </legend>
           <div class="govuk-checkboxes">
-            <button id="test-checkboxes-2-all"
+            <button id="test-checkboxes-options-2-all"
                     class="button noUnderline selectAll"
                     type="button"
             >
@@ -87,26 +87,26 @@ exports[`FormCheckboxSearchSubGroups renders groups of checkboxes in correct ord
             </button>
             <div class="govuk-checkboxes__item">
               <input class="govuk-checkboxes__input"
-                     id="test-checkboxes-2-3"
+                     id="test-checkboxes-options-2-3"
                      name="testCheckboxes"
                      type="checkbox"
                      value="3"
               >
               <label class="govuk-label govuk-checkboxes__label"
-                     for="test-checkboxes-2-3"
+                     for="test-checkboxes-options-2-3"
               >
                 Checkbox 3
               </label>
             </div>
             <div class="govuk-checkboxes__item">
               <input class="govuk-checkboxes__input"
-                     id="test-checkboxes-2-4"
+                     id="test-checkboxes-options-2-4"
                      name="testCheckboxes"
                      type="checkbox"
                      value="4"
               >
               <label class="govuk-label govuk-checkboxes__label"
-                     for="test-checkboxes-2-4"
+                     for="test-checkboxes-options-2-4"
               >
                 Checkbox 4
               </label>

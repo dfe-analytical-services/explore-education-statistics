@@ -135,7 +135,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Processor.Services
                 return;
             }
 
-            if (import.NumBatches == 1 || await _batchService.GetNumBatchesRemaining(import.FileId) == 0)
+            if (import.NumBatches == 1 || await _batchService.GetNumBatchesRemaining(import.File) == 0)
             {
                 var observationCount = context.Observation.Count(o => o.SubjectId.Equals(import.SubjectId));
 
@@ -159,7 +159,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Processor.Services
             }
             else
             {
-                var numBatchesRemaining = await _batchService.GetNumBatchesRemaining(import.FileId);
+                var numBatchesRemaining = await _batchService.GetNumBatchesRemaining(import.File);
 
                 var percentageComplete = (double) (import.NumBatches - numBatchesRemaining) / import.NumBatches * 100;
 

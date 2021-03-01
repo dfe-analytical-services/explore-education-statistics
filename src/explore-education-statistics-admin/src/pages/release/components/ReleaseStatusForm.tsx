@@ -1,4 +1,3 @@
-import useFormSubmit from '@admin/hooks/useFormSubmit';
 import { ReleaseStatusPermissions } from '@admin/services/permissionService';
 import { Release } from '@admin/services/releaseService';
 import Button from '@common/components/Button';
@@ -8,6 +7,7 @@ import { Form, FormFieldRadioGroup } from '@common/components/form';
 import FormFieldDateInput from '@common/components/form/FormFieldDateInput';
 import FormFieldTextArea from '@common/components/form/FormFieldTextArea';
 import WarningMessage from '@common/components/WarningMessage';
+import useFormSubmit from '@common/hooks/useFormSubmit';
 import { ReleaseApprovalStatus } from '@common/services/publicationService';
 import {
   isPartialDateEmpty,
@@ -160,8 +160,7 @@ const ReleaseStatusForm = ({
           <FormFieldRadioGroup<ReleaseStatusFormValues>
             legend="Status"
             name="status"
-            id={`${formId}-status`}
-            orderDirection={[]}
+            order={[]}
             options={[
               {
                 label: 'In draft',
@@ -184,14 +183,12 @@ const ReleaseStatusForm = ({
           <FormFieldTextArea<ReleaseStatusFormValues>
             name="internalReleaseNote"
             className="govuk-!-width-one-half"
-            id={`${formId}-internalReleaseNote`}
             label="Internal release note"
             rows={3}
           />
 
           {form.values.status === 'Approved' && (
             <FormFieldRadioGroup<ReleaseStatusFormValues>
-              id={`${formId}-publishMethod`}
               name="publishMethod"
               legend="When to publish"
               legendSize="m"
@@ -203,7 +200,6 @@ const ReleaseStatusForm = ({
                   value: 'Scheduled',
                   conditional: (
                     <FormFieldDateInput<ReleaseStatusFormValues>
-                      id={`${formId}-publishScheduled`}
                       name="publishScheduled"
                       legend="Publish date"
                       legendSize="s"
@@ -226,7 +222,6 @@ const ReleaseStatusForm = ({
           )}
 
           <FormFieldDateInput<ReleaseStatusFormValues>
-            id={`${formId}-nextReleaseDate`}
             name="nextReleaseDate"
             legend="Next release expected (optional)"
             legendSize="m"

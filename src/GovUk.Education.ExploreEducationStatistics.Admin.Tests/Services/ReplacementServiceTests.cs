@@ -81,7 +81,6 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
             {
                 Filename = "original.csv",
                 Type = Ancillary,
-                Release = contentReleaseVersion1,
                 SubjectId = originalSubject.Id
             };
 
@@ -89,7 +88,6 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
             {
                 Filename = "replacement.csv",
                 Type = FileType.Data,
-                Release = contentReleaseVersion2,
                 SubjectId = replacementSubject.Id
             };
 
@@ -137,8 +135,10 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
             {
                 var replacementService = BuildReplacementService(contentDbContext, statisticsDbContext, mocks);
 
-                var result = await replacementService.GetReplacementPlan(originalFile.Id,
-                    replacementFile.Id);
+                var result = await replacementService.GetReplacementPlan(
+                    releaseId: contentReleaseVersion2.Id,
+                    originalFileId: originalFile.Id,
+                    replacementFileId: replacementFile.Id);
 
                 Assert.True(result.IsLeft);
                 AssertValidationProblem(result.Left, ReplacementFileTypesMustBeData);
@@ -201,7 +201,6 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
             {
                 Filename = "original.csv",
                 Type = FileType.Data,
-                Release = contentRelease1Version1,
                 SubjectId = originalSubject.Id
             };
 
@@ -209,7 +208,6 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
             {
                 Filename = "replacement.csv",
                 Type = FileType.Data,
-                Release = contentRelease2,
                 SubjectId = replacementSubject.Id
             };
 
@@ -258,8 +256,10 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
             {
                 var replacementService = BuildReplacementService(contentDbContext, statisticsDbContext, mocks);
 
-                var result = await replacementService.GetReplacementPlan(originalFile.Id,
-                    replacementFile.Id);
+                var result = await replacementService.GetReplacementPlan(
+                    releaseId: contentRelease2.Id,
+                    originalFileId: originalFile.Id,
+                    replacementFileId: replacementFile.Id);
 
                 Assert.True(result.IsLeft);
                 Assert.IsType<NotFoundResult>(result.Left);
@@ -309,7 +309,6 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
             {
                 Filename = "original.csv",
                 Type = FileType.Data,
-                Release = contentReleaseVersion1,
                 SubjectId = originalSubject.Id
             };
 
@@ -317,7 +316,6 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
             {
                 Filename = "replacement.csv",
                 Type = FileType.Data,
-                Release = contentReleaseVersion2,
                 SubjectId = replacementSubject.Id
             };
 
@@ -365,8 +363,10 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
             {
                 var replacementService = BuildReplacementService(contentDbContext, statisticsDbContext, mocks);
 
-                var result = await replacementService.GetReplacementPlan(originalFile.Id,
-                    replacementFile.Id);
+                var result = await replacementService.GetReplacementPlan(
+                    releaseId: contentReleaseVersion2.Id,
+                    originalFileId: originalFile.Id,
+                    replacementFileId: replacementFile.Id);
 
                 Assert.True(result.IsRight);
                 var replacementPlan = result.Right;
@@ -423,7 +423,6 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
             {
                 Filename = "original.csv",
                 Type = FileType.Data,
-                Release = contentReleaseVersion1,
                 SubjectId = originalSubject.Id
             };
 
@@ -431,7 +430,6 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
             {
                 Filename = "replacement.csv",
                 Type = FileType.Data,
-                Release = contentReleaseVersion2,
                 SubjectId = replacementSubject.Id
             };
 
@@ -689,8 +687,10 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
             {
                 var replacementService = BuildReplacementService(contentDbContext, statisticsDbContext, mocks);
 
-                var result = await replacementService.GetReplacementPlan(originalFile.Id,
-                    replacementFile.Id);
+                var result = await replacementService.GetReplacementPlan(
+                    releaseId: contentReleaseVersion2.Id,
+                    originalFileId: originalFile.Id,
+                    replacementFileId: replacementFile.Id);
 
                 Assert.True(result.IsRight);
                 var replacementPlan = result.Right;
@@ -925,7 +925,6 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
             {
                 Filename = "original.csv",
                 Type = FileType.Data,
-                Release = contentReleaseVersion1,
                 SubjectId = originalSubject.Id
             };
 
@@ -933,7 +932,6 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
             {
                 Filename = "replacement.csv",
                 Type = FileType.Data,
-                Release = contentReleaseVersion2,
                 SubjectId = replacementSubject.Id
             };
 
@@ -1292,8 +1290,10 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
             {
                 var replacementService = BuildReplacementService(contentDbContext, statisticsDbContext, mocks);
 
-                var result = await replacementService.GetReplacementPlan(originalFile.Id,
-                    replacementFile.Id);
+                var result = await replacementService.GetReplacementPlan(
+                    releaseId: contentReleaseVersion2.Id,
+                    originalFileId: originalFile.Id,
+                    replacementFileId: replacementFile.Id);
 
                 Assert.True(result.IsRight);
                 var replacementPlan = result.Right;
@@ -1545,7 +1545,6 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
             {
                 Filename = "original.csv",
                 Type = FileType.Data,
-                Release = contentRelease,
                 SubjectId = originalSubject.Id
             };
 
@@ -1553,7 +1552,6 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
             {
                 Filename = "replacement.csv",
                 Type = FileType.Data,
-                Release = contentRelease,
                 SubjectId = replacementSubject.Id,
                 Replacing = originalFile
             };
@@ -1656,8 +1654,10 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
             {
                 var replacementService = BuildReplacementService(contentDbContext, statisticsDbContext, mocks);
 
-                var result = await replacementService.Replace(originalFile.Id,
-                    replacementFile.Id);
+                var result = await replacementService.Replace(
+                    releaseId: contentRelease.Id,
+                    originalFileId: originalFile.Id,
+                    replacementFileId: replacementFile.Id);
 
                 mocks.ReleaseService.VerifyNoOtherCalls();
 
@@ -1709,7 +1709,6 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
             {
                 Filename = "original.csv",
                 Type = FileType.Data,
-                Release = contentReleaseVersion1,
                 SubjectId = originalSubject.Id
             };
 
@@ -1717,7 +1716,6 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
             {
                 Filename = "replacement.csv",
                 Type = FileType.Data,
-                Release = contentReleaseVersion2,
                 SubjectId = replacementSubject.Id,
                 Replacing = originalFile
             };
@@ -2101,8 +2099,10 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
             {
                 var replacementService = BuildReplacementService(contentDbContext, statisticsDbContext, mocks);
 
-                var result = await replacementService.Replace(originalFile.Id,
-                    replacementFile.Id);
+                var result = await replacementService.Replace(
+                    releaseId: contentReleaseVersion2.Id,
+                    originalFileId: originalFile.Id,
+                    replacementFileId: replacementFile.Id);
 
                 mocks.ReleaseService.Verify(
                     mock => mock.RemoveDataFiles(contentReleaseVersion2.Id, originalFile.Id),

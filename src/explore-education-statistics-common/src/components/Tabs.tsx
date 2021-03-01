@@ -95,11 +95,7 @@ const Tabs = ({ children, id, modifyHash = true, testId, onToggle }: Props) => {
   );
 
   useEffect(() => {
-    if (window) {
-      if (selectedTabIndex >= sections.length) {
-        selectTab(sections.length - 1);
-      }
-
+    const handleHashChange = () => {
       if (window.location.hash) {
         const matchingTabIndex = sections.findIndex(
           element => element.props.id === window.location.hash.substr(1),
@@ -111,7 +107,22 @@ const Tabs = ({ children, id, modifyHash = true, testId, onToggle }: Props) => {
           setSelectedTabIndex(matchingTabIndex);
         }
       }
+    };
+
+    if (window) {
+      if (selectedTabIndex >= sections.length) {
+        selectTab(sections.length - 1);
+      }
+
+      handleHashChange();
+      window.addEventListener('hashchange', handleHashChange);
     }
+
+    return () => {
+      if (window) {
+        window.removeEventListener('hashchange', handleHashChange);
+      }
+    };
   }, [sections, selectTab, selectedTabIndex]);
 
   return (

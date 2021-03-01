@@ -29,20 +29,20 @@ Validate Published date, Last updated date
 
 Validate accordion sections order
     [Tags]  HappyPath
-    user checks accordion is in position  1. Overview of absence statistics         1
-    user checks accordion is in position  2. National Statistics badging            2
-    user checks accordion is in position  3. Methodology                            3
-    user checks accordion is in position  4. Data collection                        4
-    user checks accordion is in position  5. Data processing                        5
-    user checks accordion is in position  6. Data quality                           6
-    user checks accordion is in position  7. Contacts                               7
+    user checks accordion is in position  1. Overview of absence statistics         1  id:content
+    user checks accordion is in position  2. National Statistics badging            2  id:content
+    user checks accordion is in position  3. Methodology                            3  id:content
+    user checks accordion is in position  4. Data collection                        4  id:content
+    user checks accordion is in position  5. Data processing                        5  id:content
+    user checks accordion is in position  6. Data quality                           6  id:content
+    user checks accordion is in position  7. Contacts                               7  id:content
 
-    user checks accordion is in position  Annex A - Calculations                    8
-    user checks accordion is in position  Annex B - School attendance codes         9
-    user checks accordion is in position  Annex C - Links to pupil absence national statistics and data   10
-    user checks accordion is in position  Annex D - Standard breakdowns             11
-    user checks accordion is in position  Annex E - Timeline                        12
-    user checks accordion is in position  Annex F - Absence rates over time         13
+    user checks accordion is in position  Annex A - Calculations                    1  id:annexes
+    user checks accordion is in position  Annex B - School attendance codes         2  id:annexes
+    user checks accordion is in position  Annex C - Links to pupil absence national statistics and data   3  id:annexes
+    user checks accordion is in position  Annex D - Standard breakdowns             4  id:annexes
+    user checks accordion is in position  Annex E - Timeline                        5  id:annexes
+    user checks accordion is in position  Annex F - Absence rates over time         6  id:annexes
 
 Validate page has Print this page link
     [Tags]  HappyPath

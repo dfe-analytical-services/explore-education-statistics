@@ -1,6 +1,9 @@
 import { OmitStrict, PartialBy } from '@common/types/util';
+import naturalOrderBy, {
+  OrderDirection,
+  OrderKeys,
+} from '@common/utils/array/naturalOrderBy';
 import classNames from 'classnames';
-import orderBy from 'lodash/orderBy';
 import React, { FocusEventHandler, memo } from 'react';
 import FormFieldset, { FormFieldsetProps } from './FormFieldset';
 import FormRadio, {
@@ -23,12 +26,11 @@ export type FormRadioGroupProps<Value extends string = string> = {
   onChange?: RadioChangeEventHandler;
   options: RadioOption<Value>[];
   small?: boolean;
-  order?:
-    | (keyof RadioOption)[]
-    | ((option: RadioOption) => RadioOption[keyof RadioOption])[];
-  orderDirection?: ('asc' | 'desc')[];
+  order?: OrderKeys<RadioOption<Value>>;
+  orderDirection?: OrderDirection | OrderDirection[];
   value?: string;
-} & OmitStrict<FormFieldsetProps, 'onBlur' | 'onFocus'> & {
+} & OmitStrict<FormFieldsetProps, 'useFormId' | 'onBlur' | 'onFocus'> & {
+    useFieldsetFormId?: boolean;
     onFieldsetBlur?: FocusEventHandler<HTMLFieldSetElement>;
     onFieldsetFocus?: FocusEventHandler<HTMLFieldSetElement>;
   };
@@ -48,16 +50,12 @@ const FormRadioGroup = <Value extends string = string>({
 }: FormRadioGroupProps<Value>) => {
   const { id } = props;
 
-  const orderedOptions =
-    orderDirection && orderDirection.length === 0
-      ? options
-      : orderBy(options, order, orderDirection);
-
   return (
     <FormFieldset
       {...props}
       hint={hint}
       legendSize={legendSize}
+      useFormId={false}
       onBlur={onFieldsetBlur}
       onFocus={onFieldsetFocus}
     >
@@ -67,13 +65,13 @@ const FormRadioGroup = <Value extends string = string>({
           'govuk-radios--small': small,
         })}
       >
-        {orderedOptions.map(option => (
+        {naturalOrderBy(options, order, orderDirection).map(option => (
           <FormRadio
             {...props}
             {...option}
             id={
               option.id
-                ? option.id
+                ? `${id}-${option.id}`
                 : `${id}-${option.value.replace(/\s/g, '-')}`
             }
             checked={value === option.value}
@@ -85,4 +83,4 @@ const FormRadioGroup = <Value extends string = string>({
   );
 };
 
-export default memo(FormRadioGroup);
+export default memo(FormRadioGroup) as typeof FormRadioGroup;

@@ -1,4 +1,5 @@
 import { FormFieldset } from '@common/components/form';
+import { useFormContext } from '@common/components/form/contexts/FormContext';
 import useToggle from '@common/hooks/useToggle';
 import classNames from 'classnames';
 import { useField } from 'formik';
@@ -8,18 +9,21 @@ import FormFieldSortableList from './FormFieldSortableList';
 import styles from './FormFieldSortableListGroup.module.scss';
 
 interface Props<FormValues> {
-  id: string;
+  id?: string;
   name: FormValues extends Record<string, unknown> ? keyof FormValues : string;
   legend: string;
   groupLegend: string;
 }
 
 function FormFieldSortableListGroup<FormValues>({
-  id,
+  id: customId,
   name,
   legend,
   groupLegend,
 }: Props<FormValues>) {
+  const { prefixFormId, fieldId } = useFormContext();
+  const id = customId ? prefixFormId(customId) : fieldId(name as string);
+
   const [field, meta] = useField(name as string);
   const [isDragDisabled, toggleDragDisabled] = useToggle(false);
 
@@ -68,7 +72,6 @@ function FormFieldSortableListGroup<FormValues>({
                     >
                       <FormFieldSortableList
                         name={`${name}[${index}]`}
-                        id={`${id}-${index}`}
                         legend={`${groupLegend} ${index + 1}`}
                         legendSize="s"
                         onMouseEnter={toggleDragDisabled.on}

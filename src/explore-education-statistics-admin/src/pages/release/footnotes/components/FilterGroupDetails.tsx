@@ -41,7 +41,6 @@ const FilterGroupDetails = ({
       <div className={styles.filterOverflow}>
         {selectAll && groupId && (
           <FormFieldCheckbox
-            id={`select-all-${groupId}`}
             name={`${groupPath}.selected`}
             disabled={parentSelected}
             label="Select all"
@@ -66,7 +65,6 @@ const FilterGroupDetails = ({
             <div key={filterGroupId}>
               {!hideGrouping && (
                 <FormFieldCheckbox
-                  id={`filterGroup-${filterGroupId}`}
                   name={`${groupPath}.filterGroups[${filterGroupId}].selected`}
                   label={`${filterGroup.label} ${groupValue ? '(All)' : ''}`}
                   small

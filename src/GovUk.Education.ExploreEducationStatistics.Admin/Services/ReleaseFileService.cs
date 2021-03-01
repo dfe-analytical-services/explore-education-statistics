@@ -174,13 +174,9 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Services
                         containerName: PrivateFilesContainerName,
                         path: file.Path(),
                         file: formFile,
-                        options: new IBlobStorageService.UploadFileOptions
-                        {
-                            MetaValues = GetAncillaryFileMetaValues(
-                                filename: file.Filename,
-                                name: name)
-                        }
-                    );
+                        metadata: GetAncillaryFileMetaValues(
+                            filename: file.Filename,
+                            name: name));
 
                     var blob = await _blobStorageService.GetBlob(
                         PrivateFilesContainerName,
