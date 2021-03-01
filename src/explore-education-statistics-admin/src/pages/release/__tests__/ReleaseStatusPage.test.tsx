@@ -1,14 +1,12 @@
 import { TestConfigContextProvider } from '@admin/contexts/ConfigContext';
-import ManageReleaseContext, {
-  ManageRelease,
-} from '@admin/pages/release/contexts/ManageReleaseContext';
+import { testRelease } from '@admin/pages/release/__data__/testRelease';
+import { ReleaseContextProvider } from '@admin/pages/release/contexts/ReleaseContext';
 import _permissionService, {
   ReleaseStatusPermissions,
 } from '@admin/services/permissionService';
 import _releaseService, { Release } from '@admin/services/releaseService';
 import { render, screen, waitFor } from '@testing-library/react';
 import userEvent from '@testing-library/user-event';
-import noop from 'lodash/noop';
 import React from 'react';
 import { MemoryRouter } from 'react-router';
 import ReleaseStatusPage from '../ReleaseStatusPage';
@@ -22,47 +20,6 @@ const permissionService = _permissionService as jest.Mocked<
 const releaseService = _releaseService as jest.Mocked<typeof _releaseService>;
 
 describe('ReleaseStatusPage', () => {
-  const testRelease: Release = {
-    id: 'release-1',
-    slug: 'release-1-slug',
-    status: 'Draft',
-    latestRelease: false,
-    live: false,
-    amendment: false,
-    releaseName: 'Release 1',
-    publicationId: 'publication-1',
-    publicationTitle: 'Publication 1',
-    publicationSlug: 'publication-1-slug',
-    timePeriodCoverage: { value: 'W51', label: 'Week 51' },
-    title: 'Release Title',
-    type: {
-      id: 'type-1',
-      title: 'Official Statistics',
-    },
-    contact: {
-      id: 'contact-1',
-      teamName: 'Test name',
-      teamEmail: 'test@test.com',
-      contactName: 'Test contact name',
-      contactTelNo: '1111 1111 1111',
-    },
-    previousVersionId: '',
-    preReleaseAccessList: '',
-  };
-
-  const testManageRelease: ManageRelease = {
-    releaseId: 'release-1',
-    onChangeReleaseStatus: noop,
-    publication: {
-      id: 'publication-1',
-      themeId: 'theme-1',
-      topicId: 'topic-1',
-      title: 'Test publication',
-      slug: 'test-publication',
-      legacyReleases: [],
-    },
-  };
-
   const testStatusPermissions: ReleaseStatusPermissions = {
     canMarkDraft: true,
     canMarkHigherLevelReview: true,
@@ -70,17 +27,7 @@ describe('ReleaseStatusPage', () => {
   };
 
   test('renders public release link correctly', async () => {
-    releaseService.getRelease.mockResolvedValue(testRelease);
-
-    render(
-      <MemoryRouter>
-        <TestConfigContextProvider>
-          <ManageReleaseContext.Provider value={testManageRelease}>
-            <ReleaseStatusPage />
-          </ManageReleaseContext.Provider>
-        </TestConfigContextProvider>
-      </MemoryRouter>,
-    );
+    renderPage();
 
     await waitFor(() => {
       expect(screen.getByText('Sign off')).toBeInTheDocument();
@@ -92,17 +39,7 @@ describe('ReleaseStatusPage', () => {
   });
 
   test('renders Draft status details correctly', async () => {
-    releaseService.getRelease.mockResolvedValue(testRelease);
-
-    render(
-      <MemoryRouter>
-        <TestConfigContextProvider>
-          <ManageReleaseContext.Provider value={testManageRelease}>
-            <ReleaseStatusPage />
-          </ManageReleaseContext.Provider>
-        </TestConfigContextProvider>
-      </MemoryRouter>,
-    );
+    renderPage();
 
     await waitFor(() => {
       expect(screen.getByText('Sign off')).toBeInTheDocument();
@@ -124,7 +61,8 @@ describe('ReleaseStatusPage', () => {
     releaseService.getReleaseStatus.mockResolvedValue({
       overallStage: 'Scheduled',
     });
-    releaseService.getRelease.mockResolvedValue({
+
+    renderPage({
       ...testRelease,
       status: 'Approved',
       publishScheduled: '2021-01-15',
@@ -133,16 +71,6 @@ describe('ReleaseStatusPage', () => {
         year: 2022,
       },
     });
-
-    render(
-      <MemoryRouter>
-        <TestConfigContextProvider>
-          <ManageReleaseContext.Provider value={testManageRelease}>
-            <ReleaseStatusPage />
-          </ManageReleaseContext.Provider>
-        </TestConfigContextProvider>
-      </MemoryRouter>,
-    );
 
     await waitFor(() => {
       expect(screen.getByText('Sign off')).toBeInTheDocument();
@@ -161,20 +89,11 @@ describe('ReleaseStatusPage', () => {
   });
 
   test('renders status form when Edit button is clicked', async () => {
-    releaseService.getRelease.mockResolvedValue(testRelease);
     permissionService.getReleaseStatusPermissions.mockResolvedValue(
       testStatusPermissions,
     );
 
-    render(
-      <MemoryRouter>
-        <TestConfigContextProvider>
-          <ManageReleaseContext.Provider value={testManageRelease}>
-            <ReleaseStatusPage />
-          </ManageReleaseContext.Provider>
-        </TestConfigContextProvider>
-      </MemoryRouter>,
-    );
+    renderPage();
 
     await waitFor(() => {
       expect(
@@ -195,22 +114,13 @@ describe('ReleaseStatusPage', () => {
   });
 
   test('does not render Edit button if status cannot be changed', async () => {
-    releaseService.getRelease.mockResolvedValue(testRelease);
     permissionService.getReleaseStatusPermissions.mockResolvedValue({
       canMarkDraft: false,
       canMarkHigherLevelReview: false,
       canMarkApproved: false,
     });
 
-    render(
-      <MemoryRouter>
-        <TestConfigContextProvider>
-          <ManageReleaseContext.Provider value={testManageRelease}>
-            <ReleaseStatusPage />
-          </ManageReleaseContext.Provider>
-        </TestConfigContextProvider>
-      </MemoryRouter>,
-    );
+    renderPage();
 
     await waitFor(() => {
       expect(screen.getByText('Sign off')).toBeInTheDocument();
@@ -218,4 +128,16 @@ describe('ReleaseStatusPage', () => {
 
     expect(screen.queryByText('Edit release status')).not.toBeInTheDocument();
   });
+
+  function renderPage(release: Release = testRelease) {
+    return render(
+      <MemoryRouter>
+        <TestConfigContextProvider>
+          <ReleaseContextProvider release={release}>
+            <ReleaseStatusPage />
+          </ReleaseContextProvider>
+        </TestConfigContextProvider>
+      </MemoryRouter>,
+    );
+  }
 });

@@ -1,7 +1,6 @@
 import { AuthContext, User } from '@admin/contexts/AuthContext';
-import ManageReleaseContext, {
-  ManageRelease,
-} from '@admin/pages/release/contexts/ManageReleaseContext';
+import { testRelease } from '@admin/pages/release/__data__/testRelease';
+import { ReleaseContextProvider } from '@admin/pages/release/contexts/ReleaseContext';
 import { GlobalPermissions } from '@admin/services/permissionService';
 import _releaseContentCommentService from '@admin/services/releaseContentCommentService';
 import { Comment } from '@admin/services/types/content';
@@ -23,22 +22,9 @@ const releaseContentCommentService = _releaseContentCommentService as jest.Mocke
 >;
 
 describe('Comments', () => {
-  const testRelease: ManageRelease = {
-    releaseId: 'release-1',
-    onChangeReleaseStatus: noop,
-    publication: {
-      id: 'publication-1',
-      themeId: 'theme-1',
-      topicId: 'topic-1',
-      title: 'Test publication',
-      slug: 'test-publication',
-      legacyReleases: [],
-    },
-  };
-
   test('renders list of comments when comments are opened', () => {
     render(
-      <ManageReleaseContext.Provider value={testRelease}>
+      <ReleaseContextProvider release={testRelease}>
         <Comments
           blockId="test-block"
           sectionId="section-1"
@@ -69,7 +55,7 @@ describe('Comments', () => {
           ]}
           onChange={noop}
         />
-      </ManageReleaseContext.Provider>,
+      </ReleaseContextProvider>,
     );
 
     fireEvent.click(
@@ -97,7 +83,7 @@ describe('Comments', () => {
     const handleChange = jest.fn();
 
     render(
-      <ManageReleaseContext.Provider value={testRelease}>
+      <ReleaseContextProvider release={testRelease}>
         <Comments
           blockId="test-block"
           sectionId="section-1"
@@ -116,7 +102,7 @@ describe('Comments', () => {
           ]}
           onChange={handleChange}
         />
-      </ManageReleaseContext.Provider>,
+      </ReleaseContextProvider>,
     );
 
     fireEvent.change(
@@ -220,14 +206,14 @@ describe('Comments', () => {
             user: testUser,
           }}
         >
-          <ManageReleaseContext.Provider value={testRelease}>
+          <ReleaseContextProvider release={testRelease}>
             <Comments
               blockId="test-block"
               sectionId="section-1"
               comments={testComments}
               onChange={noop}
             />
-          </ManageReleaseContext.Provider>
+          </ReleaseContextProvider>
         </AuthContext.Provider>,
       );
 
@@ -257,14 +243,14 @@ describe('Comments', () => {
             user: testUser,
           }}
         >
-          <ManageReleaseContext.Provider value={testRelease}>
+          <ReleaseContextProvider release={testRelease}>
             <Comments
               blockId="test-block"
               sectionId="section-1"
               comments={testComments}
               onChange={noop}
             />
-          </ManageReleaseContext.Provider>
+          </ReleaseContextProvider>
         </AuthContext.Provider>,
       );
 
@@ -303,14 +289,14 @@ describe('Comments', () => {
             user: testUser,
           }}
         >
-          <ManageReleaseContext.Provider value={testRelease}>
+          <ReleaseContextProvider release={testRelease}>
             <Comments
               blockId="test-block"
               sectionId="section-1"
               comments={testComments}
               onChange={noop}
             />
-          </ManageReleaseContext.Provider>
+          </ReleaseContextProvider>
         </AuthContext.Provider>,
       );
 
@@ -358,14 +344,14 @@ describe('Comments', () => {
             user: testUser,
           }}
         >
-          <ManageReleaseContext.Provider value={testRelease}>
+          <ReleaseContextProvider release={testRelease}>
             <Comments
               blockId="test-block"
               sectionId="section-1"
               comments={testComments}
               onChange={handleChange}
             />
-          </ManageReleaseContext.Provider>
+          </ReleaseContextProvider>
         </AuthContext.Provider>,
       );
 
@@ -486,14 +472,14 @@ describe('Comments', () => {
             user: testUser,
           }}
         >
-          <ManageReleaseContext.Provider value={testRelease}>
+          <ReleaseContextProvider release={testRelease}>
             <Comments
               blockId="test-block"
               sectionId="section-1"
               comments={testComments}
               onChange={noop}
             />
-          </ManageReleaseContext.Provider>
+          </ReleaseContextProvider>
         </AuthContext.Provider>,
       );
 
@@ -525,14 +511,14 @@ describe('Comments', () => {
             user: testUser,
           }}
         >
-          <ManageReleaseContext.Provider value={testRelease}>
+          <ReleaseContextProvider release={testRelease}>
             <Comments
               blockId="test-block"
               sectionId="section-1"
               comments={testComments}
               onChange={handleChange}
             />
-          </ManageReleaseContext.Provider>
+          </ReleaseContextProvider>
         </AuthContext.Provider>,
       );
 
