@@ -30,7 +30,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Controllers.Api.Manag
                 .GetContentSectionsAsync(releaseId)
                 .HandleFailuresOrOk();
         }
-        
+
         [HttpPut("release/{releaseId}/content/sections/order")]
         public async Task<ActionResult<List<ContentSectionViewModel>>> ReorderSections(
             Guid releaseId, Dictionary<Guid, int> newSectionOrder)
@@ -74,7 +74,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Controllers.Api.Manag
                 .GetContentSectionAsync(releaseId, contentSectionId)
                 .HandleFailuresOrOk();
         }
-        
+
         [HttpPut("release/{releaseId}/content/section/{contentSectionId}/blocks/order")]
         public async Task<ActionResult<List<IContentBlockViewModel>>> ReorderContentBlocks(
             Guid releaseId, Guid contentSectionId, Dictionary<Guid, int> newBlocksOrder)
@@ -103,12 +103,12 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Controllers.Api.Manag
         }
 
         [HttpPut("release/{releaseId}/content/section/{contentSectionId}/data-block/{contentBlockId}")]
-        public async Task<ActionResult<ContentBlock>> UpdateDataBlock(
+        public async Task<ActionResult<DataBlockViewModel>> UpdateDataBlock(
             Guid releaseId, Guid contentSectionId, Guid contentBlockId, DataBlockUpdateRequest request)
         {
             return await _contentService
                 .UpdateDataBlockAsync(releaseId, contentSectionId, contentBlockId, request)
-                .HandleFailuresOr(Ok);
+                .HandleFailuresOrOk();
         }
 
         [HttpPut("release/{releaseId}/content/section/{contentSectionId}/block/{contentBlockId}")]
@@ -145,8 +145,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Controllers.Api.Manag
                 .GetCommentsAsync(releaseId, contentSectionId, contentBlockId)
                 .HandleFailuresOrOk();
         }
-        
-        
+
         [HttpPost("release/{releaseId}/content/section/{contentSectionId}/block/{contentBlockId}/comments/add")]
         public async Task<ActionResult<CommentViewModel>> AddComment(
             Guid releaseId, Guid contentSectionId, Guid contentBlockId, CommentSaveRequest saveRequest)
@@ -155,8 +154,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Controllers.Api.Manag
                 .AddCommentAsync(releaseId, contentSectionId, contentBlockId, saveRequest)
                 .HandleFailuresOrOk();
         }
-        
-                
+
         [HttpPut("comment/{commentId}")]
         public async Task<ActionResult<CommentViewModel>> UpdateComment(Guid commentId, CommentSaveRequest saveRequest)
         {
@@ -164,7 +162,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Controllers.Api.Manag
                 .UpdateCommentAsync(commentId, saveRequest)
                 .HandleFailuresOrOk();
         }
-        
+
         [HttpDelete("comment/{commentId}")]
         public async Task<ActionResult> DeleteComment(Guid commentId)
         {
