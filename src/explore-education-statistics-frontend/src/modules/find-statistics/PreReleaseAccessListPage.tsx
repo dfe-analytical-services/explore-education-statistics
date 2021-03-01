@@ -1,5 +1,5 @@
 import FormattedDate from '@common/components/FormattedDate';
-import SanitizeHtml from '@common/components/SanitizeHtml';
+import ContentHtml from '@common/components/ContentHtml';
 import publicationService, {
   PreReleaseAccessListSummary,
 } from '@common/services/publicationService';
@@ -38,7 +38,7 @@ const PreReleaseAccessListPage = ({ release }: Props) => {
       )}
 
       {release.preReleaseAccessList && (
-        <SanitizeHtml dirtyHtml={release.preReleaseAccessList} />
+        <ContentHtml html={release.preReleaseAccessList} />
       )}
     </Page>
   );

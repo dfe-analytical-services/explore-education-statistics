@@ -1,5 +1,6 @@
 import '@testing-library/jest-dom';
 import 'core-js/features/array/flat-map';
+import 'core-js/features/string/replace-all';
 import './setupGlobals';
 import './extend-expect';
 

@@ -2,7 +2,7 @@ import Details from '@common/components/Details';
 import { Form, FormFieldRadioGroup } from '@common/components/form';
 import { FormFieldsetProps } from '@common/components/form/FormFieldset';
 import { RadioOption } from '@common/components/form/FormRadioGroup';
-import SanitizeHtml from '@common/components/SanitizeHtml';
+import ContentHtml from '@common/components/ContentHtml';
 import SummaryList from '@common/components/SummaryList';
 import SummaryListItem from '@common/components/SummaryListItem';
 import ResetFormOnPreviousStep from '@common/modules/table-tool/components/ResetFormOnPreviousStep';
@@ -85,7 +85,7 @@ const SubjectForm = ({
 
                 {content && (
                   <SummaryListItem term="Content">
-                    <SanitizeHtml dirtyHtml={content} />
+                    <ContentHtml html={content} />
                   </SummaryListItem>
                 )}
               </SummaryList>

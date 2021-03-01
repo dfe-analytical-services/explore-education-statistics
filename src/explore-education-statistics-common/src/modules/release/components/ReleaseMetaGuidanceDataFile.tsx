@@ -1,5 +1,5 @@
 import Details from '@common/components/Details';
-import SanitizeHtml from '@common/components/SanitizeHtml';
+import ContentHtml from '@common/components/ContentHtml';
 import SummaryList from '@common/components/SummaryList';
 import SummaryListItem from '@common/components/SummaryListItem';
 import { SubjectMetaGuidance } from '@common/services/releaseMetaGuidanceService';
@@ -44,10 +44,7 @@ const ReleaseMetaGuidanceDataFile = ({ subject, renderContent }: Props) => {
 
     return (
       <SummaryListItem term="Content">
-        <SanitizeHtml
-          dirtyHtml={subject.content}
-          testId="fileGuidanceContent"
-        />
+        <ContentHtml html={subject.content} testId="fileGuidanceContent" />
       </SummaryListItem>
     );
   }, [renderContent, subject]);

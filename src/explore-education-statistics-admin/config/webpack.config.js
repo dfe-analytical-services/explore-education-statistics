@@ -353,8 +353,8 @@ module.exports = webpackEnv => {
               test: /\.(js|mjs|jsx|ts|tsx)$/,
               include: [
                 paths.appSrc,
+                // added the common directory to be built and include source maps
                 path.resolve(
-                  // added the common directory to be built and include source maps
                   paths.appPath,
                   '../explore-education-statistics-common/src',
                 ),
@@ -390,7 +390,10 @@ module.exports = webpackEnv => {
             // Unlike the application JS, we only compile the standard ES features.
             {
               test: /\.(js|mjs|jsx|ts|tsx)$/,
-              exclude: /@babel(?:\/|\\{1,2})runtime/,
+              exclude: [
+                /@babel(?:\/|\\{1,2})runtime/,
+                /explore-education-statistics-ckeditor/,
+              ],
               loader: require.resolve('babel-loader'),
               options: {
                 compact: false,

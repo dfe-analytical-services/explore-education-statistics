@@ -1,83 +1,95 @@
-import ButtonGroup from '@common/components/ButtonGroup';
-import SanitizeHtml from '@common/components/SanitizeHtml';
 import EditableBlockWrapper from '@admin/components/editable/EditableBlockWrapper';
-import FormEditor, { FormEditorProps } from '@admin/components/form/FormEditor';
+import EditableContentForm from '@admin/components/editable/EditableContentForm';
+import {
+  ImageUploadCancelHandler,
+  ImageUploadHandler,
+} from '@admin/utils/ckeditor/CustomUploadAdapter';
 import toHtml from '@admin/utils/markdown/toHtml';
-import Button from '@common/components/Button';
+import ContentHtml from '@common/components/ContentHtml';
 import useToggle from '@common/hooks/useToggle';
-import { OmitStrict } from '@common/types';
+import { Dictionary } from '@common/types';
+import {
+  defaultSanitizeOptions,
+  SanitizeHtmlOptions,
+} from '@common/utils/sanitizeHtml';
 import classNames from 'classnames';
-import React, { useCallback, useState } from 'react';
+import React, { useCallback, useMemo } from 'react';
 import styles from './EditableContentBlock.module.scss';
 
-interface EditableContentBlockProps
-  extends OmitStrict<FormEditorProps, 'onChange'> {
+interface EditableContentBlockProps {
   editable?: boolean;
   id: string;
+  label: string;
+  value: string;
+  onImageUpload?: ImageUploadHandler;
+  onImageUploadCancel?: ImageUploadCancelHandler;
   onSave: (value: string) => void;
   onDelete: () => void;
+  transformImageAttributes?: (
+    attributes: Dictionary<string>,
+  ) => Dictionary<string>;
   useMarkdown?: boolean;
 }
 
 const EditableContentBlock = ({
   editable = true,
-  hideLabel = true,
-  useMarkdown,
+  id,
+  label,
   value,
+  onImageUpload,
+  onImageUploadCancel,
   onSave,
   onDelete,
-  ...props
+  transformImageAttributes,
+  useMarkdown,
 }: EditableContentBlockProps) => {
-  const [content, setContent] = useState(() => {
-    if (useMarkdown) {
-      return toHtml(value);
-    }
+  const content = useMemo(() => (useMarkdown ? toHtml(value) : value), [
+    useMarkdown,
+    value,
+  ]);
 
-    return value;
-  });
+  const [isEditing, toggleEditing] = useToggle(false);
 
-  const [editing, toggleEditing] = useToggle(false);
+  const sanitizeOptions: SanitizeHtmlOptions = useMemo(() => {
+    return {
+      ...defaultSanitizeOptions,
+      transformTags: {
+        img: (tagName, attribs) => {
+          return {
+            tagName,
+            attribs: transformImageAttributes
+              ? transformImageAttributes(attribs)
+              : attribs,
+          };
+        },
+      },
+    };
+  }, [transformImageAttributes]);
 
-  const handleSave = useCallback(() => {
-    toggleEditing.off();
+  const handleSave = useCallback(
+    (nextValue: string) => {
+      toggleEditing.off();
 
-    // No need to handle useMarkdown case
-    // as Admin API now converts MarkDownBlocks
-    // to HtmlBlocks
+      // No need to handle useMarkdown case
+      // as Admin API now converts MarkDownBlocks
+      // to HtmlBlocks
 
-    onSave(content);
-  }, [onSave, content, toggleEditing]);
+      onSave(nextValue);
+    },
+    [onSave, toggleEditing],
+  );
 
-  const handleCancel = useCallback(() => {
-    toggleEditing.off();
-
-    let nextContent = value;
-
-    if (useMarkdown) {
-      nextContent = toHtml(nextContent);
-    }
-
-    setContent(nextContent);
-  }, [toggleEditing, useMarkdown, value]);
-
-  if (onSave && editing) {
+  if (onSave && isEditing) {
     return (
-      <>
-        <FormEditor
-          {...props}
-          hideLabel={hideLabel}
-          value={content}
-          focusOnInit
-          onChange={setContent}
-        />
-
-        <ButtonGroup>
-          <Button onClick={handleSave}>Save</Button>
-          <Button variant="secondary" onClick={handleCancel}>
-            Cancel
-          </Button>
-        </ButtonGroup>
-      </>
+      <EditableContentForm
+        id={id}
+        label={label}
+        content={content}
+        onImageUpload={onImageUpload}
+        onImageUploadCancel={onImageUploadCancel}
+        onCancel={toggleEditing.off}
+        onSubmit={handleSave}
+      />
     );
   }
 
@@ -88,7 +100,7 @@ const EditableContentBlock = ({
     >
       <div
         className={classNames(styles.preview, {
-          [styles.readOnly]: !editing,
+          [styles.readOnly]: !isEditing,
         })}
       >
         {editable ? (
@@ -108,12 +120,16 @@ const EditableContentBlock = ({
               }
             }}
           >
-            <SanitizeHtml
-              dirtyHtml={content || '<p>This section is empty</p>'}
+            <ContentHtml
+              html={content || '<p>This section is empty</p>'}
+              sanitizeOptions={sanitizeOptions}
             />
           </div>
         ) : (
-          <SanitizeHtml dirtyHtml={content || '<p>This section is empty</p>'} />
+          <ContentHtml
+            html={content || '<p>This section is empty</p>'}
+            sanitizeOptions={sanitizeOptions}
+          />
         )}
       </div>
     </EditableBlockWrapper>
