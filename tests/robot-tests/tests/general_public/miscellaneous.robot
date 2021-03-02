@@ -15,15 +15,17 @@ Verify public page loads
 
 Verify can accept cookie banner
     [Tags]  HappyPath   NotAgainstLocal
-    user checks page contains  GOV.UK uses cookies to make the site simpler.
+    user checks page contains  We use some essential cookies to make this service work.
 
     cookie should not exist   ees_banner_seen
     cookie should not exist   ees_disable_google_analytics
 
-    user clicks element  xpath://button[text()="Accept Cookies"]
+    user clicks element  xpath://button[text()="Accept analytics cookies"]
 
     cookie should have value  ees_banner_seen   true
     cookie should have value  ees_disable_google_analytics   false
+    user clicks button  Hide this message
+    user checks page does not contain button  Hide this message
 
 Validate homepage
     [Tags]  HappyPath
@@ -31,15 +33,16 @@ Validate homepage
     user checks page contains element  link:Create
 
     user waits until h2 is visible  Supporting information
-    user checks page contains element  link:Education statistics: methodology
-    user checks page contains element  link:Education statistics: glossary
-
+    user checks page contains element  link:Methodology
+    user checks page contains element  link:Glossary
     user waits until h2 is visible  Related services
     user checks page contains element  link:Find and compare schools in England
     user checks page contains element  link:Get information about schools
     user checks page contains element  link:Schools financial benchmarking
 
-    user waits until h2 is visible  Contact Us
+
+    user checks page contains element  xpath://h2[text()="Contact us"]
+
     user checks page contains link with text and url  explore.statistics@education.gov.uk   mailto:explore.statistics@education.gov.uk
 
     user checks breadcrumb count should be  1
@@ -51,6 +54,7 @@ Validate homepage
 Validate Cookies page
     [Tags]  HappyPath
     user clicks link   Cookies
+
     user waits until h1 is visible   Cookies on Explore education statistics
     user checks url contains   %{PUBLIC_URL}/cookies
 
@@ -70,7 +74,6 @@ Disable google analytics
 Enable google analytics
     [Tags]  HappyPath    NotAgainstLocal
     user reloads page
-
     user checks page does not contain  Your cookie settings were saved
     user waits until h1 is visible   Cookies on Explore education statistics
 
@@ -78,7 +81,6 @@ Enable google analytics
     user clicks element   id:cookieSettingsForm-googleAnalytics-on
     user clicks element   xpath://button[text()="Save changes"]
     user waits until page contains   Your cookie settings were saved
-
     cookie should have value  ees_banner_seen   true
     cookie should have value  ees_disable_google_analytics   false
 
