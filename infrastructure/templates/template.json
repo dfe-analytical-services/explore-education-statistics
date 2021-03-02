@@ -561,6 +561,10 @@
     "dataSubnetName": "[concat(parameters('subscription'), '-snet-', parameters('environment'), '-data')]",
     "dataSubnetRef": "[resourceId('Microsoft.Network/virtualNetworks/subnets', variables('vNetName'), variables('dataSubnetName'))]",
 
+    "adminAppDeploySlotName": "[concat(variables('adminAppName'), '/deploy')]",
+    "contentAppDeploySlotName": "[concat(variables('contentAppName'), '/deploy')]",
+    "dataAppDeploySlotName": "[concat(variables('dataAppName'), '/deploy')]",
+
     "sqlAllowedSubnets": [
       {
         "name": "admin",
@@ -753,7 +757,7 @@
     {
       "apiVersion": "2018-11-01",
       "type": "Microsoft.Web/sites/slots",
-      "name": "[concat(variables('dataAppName'), '/deploy')]",
+      "name": "[variables('dataAppDeploySlotName')]",
       "kind": "app",
       "location": "[resourceGroup().location]",
       "comments": "This specifies the web app slots.",
@@ -794,6 +798,23 @@
           }
         }
       },
+      "resources": [
+        {
+          "condition": "[parameters('useSubnets')]",
+          "name": "virtualNetwork",
+          "type": "config",
+          "apiVersion": "2018-11-01",
+          "location": "[resourceGroup().location]",
+          "properties": {
+            "subnetResourceId": "[variables('dataSubnetRef')]",
+            "swiftSupported": true
+          },
+          "dependsOn": [
+            "[resourceId('Microsoft.Web/sites/slots', variables('dataAppDeploySlotName'))]",
+            "[variables('vNetRef')]"
+          ]
+        }
+      ],
       "dependsOn": [
         "[resourceId('Microsoft.Web/Sites', variables('dataAppName'))]"
       ]
@@ -957,7 +978,7 @@
     {
       "apiVersion": "2018-11-01",
       "type": "Microsoft.Web/sites/slots",
-      "name": "[concat(variables('contentAppName'), '/deploy')]",
+      "name": "[variables('contentAppDeploySlotName')]",
       "kind": "app",
       "location": "[resourceGroup().location]",
       "comments": "This specifies the web app slots.",
@@ -998,6 +1019,23 @@
           }
         }
       },
+      "resources": [
+        {
+          "condition": "[parameters('useSubnets')]",
+          "name": "virtualNetwork",
+          "type": "config",
+          "apiVersion": "2018-11-01",
+          "location": "[resourceGroup().location]",
+          "properties": {
+            "subnetResourceId": "[variables('contentSubnetRef')]",
+            "swiftSupported": true
+          },
+          "dependsOn": [
+            "[resourceId('Microsoft.Web/sites/slots', variables('contentAppDeploySlotName'))]",
+            "[variables('vNetRef')]"
+          ]
+        }
+      ],
       "dependsOn": [
         "[resourceId('Microsoft.Web/Sites', variables('contentAppName'))]"
       ]
@@ -1180,7 +1218,7 @@
     {
       "apiVersion": "2018-11-01",
       "type": "Microsoft.Web/sites/slots",
-      "name": "[concat(variables('adminAppName'), '/deploy')]",
+      "name": "[variables('adminAppDeploySlotName')]",
       "kind": "app",
       "location": "[resourceGroup().location]",
       "comments": "This specifies the web app slots.",
@@ -1219,6 +1257,23 @@
           }
         }
       },
+      "resources": [
+        {
+          "condition": "[parameters('useSubnets')]",
+          "name": "virtualNetwork",
+          "type": "config",
+          "apiVersion": "2018-11-01",
+          "location": "[resourceGroup().location]",
+          "properties": {
+            "subnetResourceId": "[variables('adminSubnetRef')]",
+            "swiftSupported": true
+          },
+          "dependsOn": [
+            "[resourceId('Microsoft.Web/sites/slots', variables('adminAppDeploySlotName'))]",
+            "[variables('vNetRef')]"
+          ]
+        }
+      ],
       "dependsOn": [
         "[resourceId('Microsoft.Web/Sites', variables('adminAppName'))]"
       ]
@@ -1464,7 +1519,7 @@
         "DeploymentScript": "[parameters('deploymentScript')]"
       },
       "dependsOn": [
-        "[concat('Microsoft.Network/virtualNetworks/', variables('vnetName'))]"
+        "[variables('vNetRef')]"
       ],
       "sku": {
         "name": "Standard_RAGRS"
