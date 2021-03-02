@@ -263,7 +263,33 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin
             services.AddTransient<IContentService, ContentService>();
             services.AddTransient<IRelatedInformationService, RelatedInformationService>();
             services.AddTransient<IReplacementService, ReplacementService>();
-            services.AddTransient<IMigrateFilesService, MigrateFilesService>();
+            services.AddTransient<IMigrateFilesService, MigrateFilesService>(provider =>
+                {
+                    var privateStorageConnectionString = Configuration.GetValue<string>("CoreStorage");
+                    var publicStorageConnectionString = Configuration.GetValue<string>("PublicStorage");
+
+                    var privateBlobStorageService = new BlobStorageService(
+                        privateStorageConnectionString,
+                        new BlobServiceClient(privateStorageConnectionString),
+                        provider.GetRequiredService<ILogger<BlobStorageService>>()
+                    );
+
+                    var publicBlobStorageService = new BlobStorageService(
+                        publicStorageConnectionString,
+                        new BlobServiceClient(publicStorageConnectionString),
+                        provider.GetRequiredService<ILogger<BlobStorageService>>()
+                    );
+
+                    return new MigrateFilesService(
+                        provider.GetRequiredService<ContentDbContext>(),
+                        privateBlobStorageService: privateBlobStorageService,
+                        publicBlobStorageService: publicBlobStorageService,
+                        provider.GetRequiredService<IReleaseFileRepository>(),
+                        provider.GetRequiredService<IUserService>(),
+                        provider.GetRequiredService<ILogger<MigrateFilesService>>()
+                    );
+                }
+            );
 
             services.AddTransient<INotificationClient>(s =>
             {
