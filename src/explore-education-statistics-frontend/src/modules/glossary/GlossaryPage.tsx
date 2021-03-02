@@ -48,7 +48,11 @@ function GlossaryPage({ entries }: GlossaryPageProps) {
       <Accordion
         id="glossary"
         onSectionOpen={accordionSection => {
-          logEvent('Glossary', 'Accordion opened', accordionSection.title);
+          logEvent({
+            category: 'Glossary',
+            action: 'Accordion opened',
+            label: accordionSection.title,
+          });
         }}
       >
         {entries.map(entry => (

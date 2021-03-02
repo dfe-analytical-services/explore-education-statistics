@@ -36,11 +36,11 @@ const PublicationSectionBlocks = ({
               releaseId={release.id}
               getInfographic={getReleaseFile}
               onToggle={section => {
-                logEvent(
-                  'Publication Release Data Tabs',
-                  `${section.title} (${section.id}) tab opened`,
-                  window.location.pathname,
-                );
+                logEvent({
+                  category: 'Publication Release Data Tabs',
+                  action: `${section.title} (${section.id}) tab opened`,
+                  label: window.location.pathname,
+                });
               }}
               additionalTabContent={
                 <div className="dfe-print-hidden">
@@ -54,11 +54,11 @@ const PublicationSectionBlocks = ({
                     to="/data-tables/fast-track/[fastTrackId]"
                     as={`/data-tables/fast-track/${block.id}`}
                     onClick={() => {
-                      logEvent(
-                        `Publication Release Data Tabs`,
-                        `Explore data button clicked`,
-                        `Explore data block name: ${block.name}`,
-                      );
+                      logEvent({
+                        category: `Publication Release Data Tabs`,
+                        action: `Explore data button clicked`,
+                        label: `Explore data block name: ${block.name}`,
+                      });
                     }}
                   >
                     Explore data
