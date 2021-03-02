@@ -509,6 +509,10 @@
     "autoPauseDelayStatisticsDb": {
       "type": "int",
       "defaultValue": -1
+    },
+    "deploySlotName": {
+      "type": "string",
+      "defaultValue": "deploy"
     }
   },
   "variables": {
@@ -560,10 +564,6 @@
     "contentSubnetRef": "[resourceId('Microsoft.Network/virtualNetworks/subnets', variables('vNetName'), variables('contentSubnetName'))]",
     "dataSubnetName": "[concat(parameters('subscription'), '-snet-', parameters('environment'), '-data')]",
     "dataSubnetRef": "[resourceId('Microsoft.Network/virtualNetworks/subnets', variables('vNetName'), variables('dataSubnetName'))]",
-
-    "adminAppDeploySlotName": "[concat(variables('adminAppName'), '-deploy')]",
-    "contentAppDeploySlotName": "[concat(variables('contentAppName'), '-deploy')]",
-    "dataAppDeploySlotName": "[concat(variables('dataAppName'), '-deploy')]",
 
     "sqlAllowedSubnets": [
       {
@@ -756,7 +756,7 @@
     {
       "apiVersion": "2018-11-01",
       "type": "Microsoft.Web/sites/slots",
-      "name": "[variables('dataAppDeploySlotName')]",
+      "name": "[concat(variables('dataAppName'), '/', parameters('deploySlotName'))]",
       "kind": "app",
       "location": "[resourceGroup().location]",
       "comments": "This specifies the web app slots.",
@@ -809,7 +809,7 @@
             "swiftSupported": true
           },
           "dependsOn": [
-            "[resourceId('Microsoft.Web/sites/slots', variables('dataAppName'), variables('dataAppDeploySlotName'))]",
+            "[resourceId('Microsoft.Web/sites/slots', variables('dataAppName'), parameters('deploySlotName'))]",
             "[variables('vNetRef')]"
           ]
         }
@@ -976,7 +976,7 @@
     {
       "apiVersion": "2018-11-01",
       "type": "Microsoft.Web/sites/slots",
-      "name": "[variables('contentAppDeploySlotName')]",
+      "name": "[concat(variables('contentAppName'), '/', parameters('deploySlotName'))]",
       "kind": "app",
       "location": "[resourceGroup().location]",
       "comments": "This specifies the web app slots.",
@@ -1029,7 +1029,7 @@
             "swiftSupported": true
           },
           "dependsOn": [
-            "[resourceId('Microsoft.Web/sites/slots', variables('contentAppName'), variables('contentAppDeploySlotName'))]",
+            "[resourceId('Microsoft.Web/sites/slots', variables('contentAppName'), parameters('deploySlotName'))]",
             "[variables('vNetRef')]"
           ]
         }
@@ -1214,7 +1214,7 @@
     {
       "apiVersion": "2018-11-01",
       "type": "Microsoft.Web/sites/slots",
-      "name": "[variables('adminAppDeploySlotName')]",
+      "name": "[concat(variables('adminAppName'), '/', parameters('deploySlotName'))]",
       "kind": "app",
       "location": "[resourceGroup().location]",
       "comments": "This specifies the web app slots.",
@@ -1265,7 +1265,7 @@
             "swiftSupported": true
           },
           "dependsOn": [
-            "[resourceId('Microsoft.Web/sites/slots', variables('adminAppName'), variables('adminAppDeploySlotName'))]",
+            "[resourceId('Microsoft.Web/sites/slots', variables('adminAppName'), parameters('deploySlotName'))]",
             "[variables('vNetRef')]"
           ]
         }
