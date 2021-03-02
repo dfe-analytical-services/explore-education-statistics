@@ -679,6 +679,7 @@
             "swiftSupported": true
           },
           "dependsOn": [
+            "[resourceId('Microsoft.Web/sites', variables('dataAppName'))]",
             "[variables('vNetRef')]"
           ]
         }
@@ -883,6 +884,7 @@
             "swiftSupported": true
           },
           "dependsOn": [
+            "[resourceId('Microsoft.Web/sites', variables('contentAppName'))]",
             "[variables('vNetRef')]"
           ]
         }
@@ -1086,6 +1088,7 @@
             "swiftSupported": true
           },
           "dependsOn": [
+            "[resourceId('Microsoft.Web/sites', variables('adminAppName'))]",
             "[variables('vNetRef')]"
           ]
         }
@@ -1461,7 +1464,7 @@
         "DeploymentScript": "[parameters('deploymentScript')]"
       },
       "dependsOn": [
-        "[variables('vNetRef')]"
+        "[concat('Microsoft.Network/virtualNetworks/', variables('vnetName'))]"
       ],
       "sku": {
         "name": "Standard_RAGRS"
@@ -2123,6 +2126,7 @@
             "swiftSupported": true
           },
           "dependsOn": [
+            "[resourceId('Microsoft.Web/sites', variables('notificationsAppName'))]",
             "[variables('vNetRef')]"
           ]
         }
@@ -2270,6 +2274,7 @@
             "swiftSupported": true
           },
           "dependsOn": [
+            "[resourceId('Microsoft.Web/sites', variables('importerAppName'))]",
             "[variables('vNetRef')]"
           ]
         }
@@ -2426,6 +2431,7 @@
             "swiftSupported": true
           },
           "dependsOn": [
+            "[resourceId('Microsoft.Web/sites', variables('publisherAppName'))]",
             "[variables('vNetRef')]"
           ]
         }
