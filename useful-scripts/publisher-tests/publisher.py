@@ -220,6 +220,7 @@ def get_final_release_details(api_url, release_id):
     response = requests.request(
         "GET",
         url=f'{api_url}/api/releases/{release_id}',
+        verify=False, 
         headers={
         "Authorization": f'Bearer {jwt_token}',
         "Content-Type": "application/json",
@@ -325,7 +326,7 @@ def get_release_status(api_url, release_id):
 
 if __name__ == "__main__":
     # To prevent InsecureRequestWarning
-    requests.packages.urllib3.disable_warnings()
+    requests.packages.urllib3.disable_warnings(urllib3.exceptions.InsecureRequestWarning)
     class colors:
         WARNING = '\033[93m' 
         FAIL = '\033[91m' 
