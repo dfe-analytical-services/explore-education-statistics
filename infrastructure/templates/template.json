@@ -810,7 +810,7 @@
             "swiftSupported": true
           },
           "dependsOn": [
-            "[resourceId('Microsoft.Web/sites/slots', variables('dataAppDeploySlotName'))]",
+            "[resourceId('Microsoft.Web/sites/slots', variables('dataAppName'), variables('dataAppDeploySlotName'))]",
             "[variables('vNetRef')]"
           ]
         }
@@ -1031,7 +1031,7 @@
             "swiftSupported": true
           },
           "dependsOn": [
-            "[resourceId('Microsoft.Web/sites/slots', variables('contentAppDeploySlotName'))]",
+            "[resourceId('Microsoft.Web/sites/slots', variables('contentAppName'), variables('contentAppDeploySlotName'))]",
             "[variables('vNetRef')]"
           ]
         }
@@ -1269,7 +1269,7 @@
             "swiftSupported": true
           },
           "dependsOn": [
-            "[resourceId('Microsoft.Web/sites/slots', variables('adminAppDeploySlotName'))]",
+            "[resourceId('Microsoft.Web/sites/slots', variables('adminAppName'), variables('adminAppDeploySlotName'))]",
             "[variables('vNetRef')]"
           ]
         }
