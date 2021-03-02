@@ -561,9 +561,9 @@
     "dataSubnetName": "[concat(parameters('subscription'), '-snet-', parameters('environment'), '-data')]",
     "dataSubnetRef": "[resourceId('Microsoft.Network/virtualNetworks/subnets', variables('vNetName'), variables('dataSubnetName'))]",
 
-    "adminAppDeploySlotName": "[concat(variables('adminAppName'), '/deploy')]",
-    "contentAppDeploySlotName": "[concat(variables('contentAppName'), '/deploy')]",
-    "dataAppDeploySlotName": "[concat(variables('dataAppName'), '/deploy')]",
+    "adminAppDeploySlotName": "[concat(variables('adminAppName'), '-deploy')]",
+    "contentAppDeploySlotName": "[concat(variables('contentAppName'), '-deploy')]",
+    "dataAppDeploySlotName": "[concat(variables('dataAppName'), '-deploy')]",
 
     "sqlAllowedSubnets": [
       {
