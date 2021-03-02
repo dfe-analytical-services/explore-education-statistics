@@ -25,6 +25,7 @@ Verify can accept cookie banner
     cookie should have value  ees_banner_seen   true
     cookie should have value  ees_disable_google_analytics   false
     user clicks button  Hide this message
+    user checks page does not contain button  Hide this message
 
 Validate homepage
     [Tags]  HappyPath
@@ -63,8 +64,7 @@ Validate Cookies page
 
 Disable google analytics
     [Tags]  HappyPath   NotAgainstLocal
-    # NOTE: think there is a problem with the frontend. You'd think cookieSettingsForm would only be in the id once...
-    user clicks element   id:cookieSettingsForm-cookieSettingsForm-googleAnalytics-off
+    user clicks element   id:cookieSettingsForm-googleAnalytics-off
     user clicks element   xpath://button[text()="Save changes"]
     user waits until page contains   Your cookie settings were saved
 
@@ -78,7 +78,7 @@ Enable google analytics
     user waits until h1 is visible   Cookies on Explore education statistics
 
     sleep  1   # NOTE(mark): Without the wait, the click doesn't select the radio despite the DOM being loaded
-    user clicks element   id:cookieSettingsForm-cookieSettingsForm-googleAnalytics-on
+    user clicks element   id:cookieSettingsForm-googleAnalytics-on
     user clicks element   xpath://button[text()="Save changes"]
     user waits until page contains   Your cookie settings were saved
     cookie should have value  ees_banner_seen   true

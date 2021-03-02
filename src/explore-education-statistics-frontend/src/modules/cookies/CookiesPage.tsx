@@ -126,7 +126,7 @@ function CookiesPage({ cookies }: Props) {
                           orderDirection={['desc']}
                           showError={false}
                           name="googleAnalytics"
-                          id="cookieSettingsForm-googleAnalytics"
+                          id="googleAnalytics"
                           options={[
                             {
                               label: 'On',
