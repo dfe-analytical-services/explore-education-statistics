@@ -706,7 +706,6 @@
           "httpLoggingEnabled": true,
           "detailedErrorLoggingEnabled": true,
           "requestTracingEnabled": true,
-          // "scmIpSecurityRestrictions": "[variables('ipWhiteList').addresses]",
           "cors": {
             "allowedOrigins": [
               "[concat('https://', parameters('domain'))]",
@@ -928,7 +927,6 @@
           "httpLoggingEnabled": true,
           "detailedErrorLoggingEnabled": true,
           "requestTracingEnabled": true,
-          // "scmIpSecurityRestrictions": "[variables('ipWhiteList').addresses]",
           "cors": {
             "allowedOrigins": [
               "[concat('https://', parameters('domain'))]",
@@ -1150,8 +1148,6 @@
           "detailedErrorLoggingEnabled": true,
           "requestTracingEnabled": true,
           "use32BitWorkerProcess": false,
-          // "ipSecurityRestrictions": "[variables('ipWhiteList').addresses]",
-          // "scmIpSecurityRestrictionsUseMain": true,
           "cors": {
             "allowedOrigins": [
               "https://localhost:3000",
@@ -1370,7 +1366,6 @@
           "httpLoggingEnabled": true,
           "detailedErrorLoggingEnabled": true,
           "requestTracingEnabled": true
-          // "scmIpSecurityRestrictions": "[variables('ipWhiteList').addresses]",
         }
       },
       "dependsOn": [
@@ -2197,7 +2192,6 @@
         "remoteDebuggingEnabled": false,
         "httpLoggingEnabled": true,
         "detailedErrorLoggingEnabled": true,
-        // // "scmIpSecurityRestrictions": "[variables('ipWhiteList').addresses]",
         "cors": {
           "allowedOrigins": [
             "[concat('https://', parameters('domain'))]",
@@ -2349,7 +2343,6 @@
           "httpLoggingEnabled": true,
           "detailedErrorLoggingEnabled": true,
           "requestTracingEnabled": true,
-          // "scmIpSecurityRestrictions": "[variables('ipWhiteList').addresses]",
           "cors": {
             "allowedOrigins": [
             ]
@@ -2506,7 +2499,6 @@
           "httpLoggingEnabled": true,
           "detailedErrorLoggingEnabled": true,
           "requestTracingEnabled": true,
-          // "scmIpSecurityRestrictions": "[variables('ipWhiteList').addresses]",
           "cors": {
             "allowedOrigins": [
             ]
