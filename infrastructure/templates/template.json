@@ -672,15 +672,15 @@
           "condition": "[parameters('useSubnets')]",
           "name": "virtualNetwork",
           "type": "config",
-          "apiVersion": "2018-02-01",
+          "apiVersion": "2018-11-01",
           "location": "[resourceGroup().location]",
           "properties": {
-            "subnetResourceid": "[variables('dataSubnetRef')]",
+            "subnetResourceId": "[variables('dataSubnetRef')]",
             "swiftSupported": true
           },
           "dependsOn": [
             "[resourceId('Microsoft.Web/sites', variables('dataAppName'))]",
-            "[concat('Microsoft.Network/virtualNetworks/', variables('vnetName'))]"
+            "[concat('Microsoft.Network/virtualNetworks/subnets/', variables('dataSubnetName'))]"
           ]
         }
       ],
@@ -877,15 +877,15 @@
           "condition": "[parameters('useSubnets')]",
           "name": "virtualNetwork",
           "type": "config",
-          "apiVersion": "2018-02-01",
+          "apiVersion": "2018-11-01",
           "location": "[resourceGroup().location]",
           "properties": {
-            "subnetResourceid": "[variables('contentSubnetRef')]",
+            "subnetResourceId": "[variables('contentSubnetRef')]",
             "swiftSupported": true
           },
           "dependsOn": [
             "[resourceId('Microsoft.Web/sites', variables('contentAppName'))]",
-            "[concat('Microsoft.Network/virtualNetworks/', variables('vnetName'))]"
+            "[concat('Microsoft.Network/virtualNetworks/subnets/', variables('contentSubnetName'))]"
           ]
         }
       ],
@@ -1081,15 +1081,15 @@
           "condition": "[parameters('useSubnets')]",
           "name": "virtualNetwork",
           "type": "config",
-          "apiVersion": "2018-02-01",
+          "apiVersion": "2018-11-01",
           "location": "[resourceGroup().location]",
           "properties": {
-            "subnetResourceid": "[variables('adminSubnetRef')]",
+            "subnetResourceId": "[variables('adminSubnetRef')]",
             "swiftSupported": true
           },
           "dependsOn": [
             "[resourceId('Microsoft.Web/sites', variables('adminAppName'))]",
-            "[concat('Microsoft.Network/virtualNetworks/', variables('vnetName'))]"
+            "[concat('Microsoft.Network/virtualNetworks/subnets/', variables('adminSubnetName'))]"
           ]
         }
       ],
@@ -2119,15 +2119,15 @@
           "condition": "[parameters('useSubnets')]",
           "name": "virtualNetwork",
           "type": "config",
-          "apiVersion": "2018-02-01",
+          "apiVersion": "2018-11-01",
           "location": "[resourceGroup().location]",
           "properties": {
-            "subnetResourceid": "[variables('notifySubnetRef')]",
+            "subnetResourceId": "[variables('notifySubnetRef')]",
             "swiftSupported": true
           },
           "dependsOn": [
             "[resourceId('Microsoft.Web/sites', variables('notificationsAppName'))]",
-            "[concat('Microsoft.Network/virtualNetworks/', variables('vnetName'))]"
+            "[concat('Microsoft.Network/virtualNetworks/subnets/', variables('notifySubnetName'))]"
           ]
         }
       ],
@@ -2267,15 +2267,15 @@
           "condition": "[parameters('useSubnets')]",
           "name": "virtualNetwork",
           "type": "config",
-          "apiVersion": "2018-02-01",
+          "apiVersion": "2018-11-01",
           "location": "[resourceGroup().location]",
           "properties": {
-            "subnetResourceid": "[variables('importerSubnetRef')]",
+            "subnetResourceId": "[variables('importerSubnetRef')]",
             "swiftSupported": true
           },
           "dependsOn": [
             "[resourceId('Microsoft.Web/sites', variables('importerAppName'))]",
-            "[concat('Microsoft.Network/virtualNetworks/', variables('vnetName'))]"
+            "[concat('Microsoft.Network/virtualNetworks/subnets/', variables('importerSubnetName'))]"
           ]
         }
       ],
@@ -2424,15 +2424,15 @@
           "condition": "[parameters('useSubnets')]",
           "name": "virtualNetwork",
           "type": "config",
-          "apiVersion": "2018-02-01",
+          "apiVersion": "2018-11-01",
           "location": "[resourceGroup().location]",
           "properties": {
-            "subnetResourceid": "[variables('publisherSubnetRef')]",
+            "subnetResourceId": "[variables('publisherSubnetRef')]",
             "swiftSupported": true
           },
           "dependsOn": [
             "[resourceId('Microsoft.Web/sites', variables('publisherAppName'))]",
-            "[concat('Microsoft.Network/virtualNetworks/', variables('vnetName'))]"
+            "[concat('Microsoft.Network/virtualNetworks/subnets/', variables('publisherSubnetName'))]"
           ]
         }
       ],
