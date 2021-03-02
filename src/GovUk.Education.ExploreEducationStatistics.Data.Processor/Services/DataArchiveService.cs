@@ -5,7 +5,7 @@ using GovUk.Education.ExploreEducationStatistics.Common.Services.Interfaces;
 using GovUk.Education.ExploreEducationStatistics.Content.Model;
 using GovUk.Education.ExploreEducationStatistics.Content.Model.Extensions;
 using GovUk.Education.ExploreEducationStatistics.Data.Processor.Services.Interfaces;
-using static GovUk.Education.ExploreEducationStatistics.Common.BlobContainerNames;
+using static GovUk.Education.ExploreEducationStatistics.Common.BlobContainers;
 using static GovUk.Education.ExploreEducationStatistics.Common.Services.FileStorageUtils;
 
 namespace GovUk.Education.ExploreEducationStatistics.Data.Processor.Services
@@ -22,9 +22,9 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Processor.Services
         public async Task ExtractDataFiles(DataImport import)
         {
             var path = import.ZipFile.Path();
-            var blob = await _blobStorageService.GetBlob(PrivateFilesContainerName, path);
+            var blob = await _blobStorageService.GetBlob(PrivateReleaseFiles, path);
 
-            await using var zipBlobFileStream = await _blobStorageService.StreamBlob(PrivateFilesContainerName, path);
+            await using var zipBlobFileStream = await _blobStorageService.StreamBlob(PrivateReleaseFiles, path);
             using var archive = new ZipArchive(zipBlobFileStream);
 
             var file1 = archive.Entries[0];
@@ -36,7 +36,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Processor.Services
             await using (var stream = dataFile.Open())
             {
                 await _blobStorageService.UploadStream(
-                    containerName: PrivateFilesContainerName,
+                    containerName: PrivateReleaseFiles,
                     path: import.File.Path(),
                     stream: stream,
                     contentType: "text/csv",
@@ -51,7 +51,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Processor.Services
             await using (var stream = metadataFile.Open())
             {
                 await _blobStorageService.UploadStream(
-                    containerName: PrivateFilesContainerName,
+                    containerName: PrivateReleaseFiles,
                     path: import.MetaFile.Path(),
                     stream: stream,
                     contentType: "text/csv");

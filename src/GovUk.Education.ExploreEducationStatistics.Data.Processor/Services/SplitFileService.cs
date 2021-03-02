@@ -19,7 +19,7 @@ using GovUk.Education.ExploreEducationStatistics.Data.Processor.Services.Interfa
 using GovUk.Education.ExploreEducationStatistics.Data.Processor.Utils;
 using Microsoft.Azure.WebJobs;
 using Microsoft.Extensions.Logging;
-using static GovUk.Education.ExploreEducationStatistics.Common.BlobContainerNames;
+using static GovUk.Education.ExploreEducationStatistics.Common.BlobContainers;
 using static GovUk.Education.ExploreEducationStatistics.Common.Services.FileStorageUtils;
 
 namespace GovUk.Education.ExploreEducationStatistics.Data.Processor.Services
@@ -55,7 +55,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Processor.Services
         public async Task SplitDataFile(Guid importId)
         {
             var import = await _dataImportService.GetImport(importId);
-            var dataFileStream = await _blobStorageService.StreamBlob(PrivateFilesContainerName, import.File.Path());
+            var dataFileStream = await _blobStorageService.StreamBlob(PrivateReleaseFiles, import.File.Path());
 
             var dataFileTable = DataTableUtils.CreateFromStream(dataFileStream);
 
@@ -178,10 +178,10 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Processor.Services
 
                 stream.Seek(0, SeekOrigin.Begin);
 
-                var dataBlob = await _blobStorageService.GetBlob(PrivateFilesContainerName, dataImport.File.Path());
+                var dataBlob = await _blobStorageService.GetBlob(PrivateReleaseFiles, dataImport.File.Path());
 
                 await _blobStorageService.UploadStream(
-                    containerName: PrivateFilesContainerName,
+                    containerName: PrivateReleaseFiles,
                     path: dataImport.File.BatchPath(batchCount),
                     stream: stream,
                     contentType: "text/csv",

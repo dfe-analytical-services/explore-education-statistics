@@ -96,57 +96,15 @@ namespace GovUk.Education.ExploreEducationStatistics.Common.Services
             return $"{PublicContentReleaseParentPath(publicationSlug, releaseSlug, prefix)}/data-blocks/{dataBlockId}.json";
         }
 
-        /**
-         * The admin directory path where files of a particular type are stored.
-         */
-        public static string AdminFilesPath(Guid rootPath, FileType type)
+        public static string FilesPath(Guid rootPath, FileType type)
         {
             var typeFolder = (type == Metadata ? Data : type).GetEnumLabel();
             return $"{rootPath}/{typeFolder}/";
         }
 
-        /**
-         * The public file path, for a file of a particular type and id, on a release.
-         */
-        public static string PublicReleasePath(string publicationSlug, string releaseSlug, FileType type,
-            Guid fileId)
+        public static string PublicReleaseAllFilesZipPath(Guid releaseId, string publicationSlug, string releaseSlug)
         {
-            return $"{PublicReleaseDirectoryPath(publicationSlug, releaseSlug, type)}{fileId}";
-        }
-
-        /**
-         * The public file path, for a file of a particular type and name, on a release.
-         */
-        public static string PublicReleasePath(string publicationSlug, string releaseSlug, FileType type,
-            string fileName)
-        {
-            return $"{PublicReleaseDirectoryPath(publicationSlug, releaseSlug, type)}{fileName}";
-        }
-
-        /**
-         * The public directory path where files, of a particular type, on a release are stored.
-         */
-        public static string PublicReleaseDirectoryPath(string publicationSlug, string releaseSlug,
-            FileType type)
-        {
-            return $"{PublicReleaseDirectoryPath(publicationSlug, releaseSlug)}{type.GetEnumLabel()}/";
-        }
-
-        /**
-         * The top level public directory path where files on a release are stored.
-         */
-        public static string PublicReleaseDirectoryPath(string publicationSlug, string releaseSlug)
-        {
-            return $"{publicationSlug}/{releaseSlug}/";
-        }
-
-        /**
-         * The public file path of the "All files" zip file on a release.
-         */
-        public static string PublicReleaseAllFilesZipPath(string publicationSlug, string releaseSlug)
-        {
-            return
-                $"{PublicReleaseDirectoryPath(publicationSlug, releaseSlug, Ancillary)}{publicationSlug}_{releaseSlug}.zip";
+            return $"{FilesPath(releaseId, Ancillary)}{publicationSlug}_{releaseSlug}.zip";
         }
 
         private static string AppendPathSeparator(string segment = null)

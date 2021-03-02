@@ -8,6 +8,7 @@ using System.Threading.Tasks;
 using Azure.Core;
 using Azure.Storage.Blobs;
 using Azure.Storage.Blobs.Specialized;
+using GovUk.Education.ExploreEducationStatistics.Common;
 using GovUk.Education.ExploreEducationStatistics.Common.Model;
 using GovUk.Education.ExploreEducationStatistics.Common.Services.Interfaces;
 using GovUk.Education.ExploreEducationStatistics.Content.Model;
@@ -19,7 +20,7 @@ using Microsoft.Azure.Storage.Blob;
 using Microsoft.Extensions.Logging;
 using Newtonsoft.Json;
 using static GovUk.Education.ExploreEducationStatistics.Common.Model.FileType;
-using static GovUk.Education.ExploreEducationStatistics.Common.BlobContainerNames;
+using static GovUk.Education.ExploreEducationStatistics.Common.BlobContainers;
 using static GovUk.Education.ExploreEducationStatistics.Common.Extensions.BlobInfoExtensions;
 using static GovUk.Education.ExploreEducationStatistics.Common.Services.FileStoragePathUtils;
 using static GovUk.Education.ExploreEducationStatistics.Common.Services.FileStorageUtils;
@@ -67,7 +68,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Publisher.Services
                 }
             });
 
-            var blobContainer = client.GetBlobContainerClient(PublisherLeasesContainerName);
+            var blobContainer = client.GetBlobContainerClient(PublisherLeases.Name);
             await blobContainer.CreateIfNotExistsAsync();
 
             var blob = blobContainer.GetBlobClient(blobName);
@@ -85,48 +86,40 @@ namespace GovUk.Education.ExploreEducationStatistics.Publisher.Services
             return new BlobLease(leaseClient);
         }
 
-        public async Task<bool> CheckBlobExists(string containerName, string path)
+        public async Task<bool> CheckBlobExists(IBlobContainer containerName, string path)
         {
             return await _publicBlobStorageService.CheckBlobExists(containerName, path);
         }
 
         public async Task CopyReleaseFilesToPublicContainer(CopyReleaseFilesCommand copyReleaseFilesCommand)
         {
-            var destinationDirectoryPath =
-                PublicReleaseDirectoryPath(copyReleaseFilesCommand.PublicationSlug, copyReleaseFilesCommand.ReleaseSlug);
+            var destinationDirectoryPath = $"{copyReleaseFilesCommand.ReleaseId}/";
 
-            await _publicBlobStorageService.DeleteBlobs(PublicFilesContainerName, destinationDirectoryPath);
+            await _publicBlobStorageService.DeleteBlobs(
+                containerName: PublicReleaseFiles,
+                directoryPath: destinationDirectoryPath);
 
             var referencedRootPaths = copyReleaseFilesCommand.Files
                 .Select(f => f.RootPath)
                 .Distinct();
 
-            var transferredFiles = new List<BlobInfo>();
-
             foreach (var rootPath in referencedRootPaths)
             {
-                var files = await CopyPrivateFilesToPublic(
+                await CopyPrivateFilesToPublic(
                     sourceDirectoryPath: $"{rootPath}/",
                     destinationDirectoryPath: destinationDirectoryPath,
                     copyReleaseFilesCommand
                 );
-
-                transferredFiles.AddRange(files);
             }
 
-            var chartDirectory = PublicReleaseDirectoryPath(
-                copyReleaseFilesCommand.PublicationSlug,
-                copyReleaseFilesCommand.ReleaseSlug,
-                Chart
-            );
-
-            var zipFiles = transferredFiles
-                .Where(blob => !blob.Path.StartsWith(chartDirectory))
+            var zipFiles = copyReleaseFilesCommand.Files
+                .Where(file => file.Type != Chart && file.Type != Image)
                 .ToList();
 
             await UploadZippedFiles(
-                PublicFilesContainerName,
+                PublicReleaseFiles,
                 destinationPath: PublicReleaseAllFilesZipPath(
+                    copyReleaseFilesCommand.ReleaseId,
                     copyReleaseFilesCommand.PublicationSlug,
                     copyReleaseFilesCommand.ReleaseSlug),
                 zipFileName: "All files",
@@ -137,11 +130,13 @@ namespace GovUk.Education.ExploreEducationStatistics.Publisher.Services
 
         public async Task DeleteDownloadFilesForPreviousVersion(Release release)
         {
-            if (release.PreviousVersion != null && release.Slug != release.PreviousVersion.Slug)
+            if (release.PreviousVersion != null)
             {
-                var directoryPath = PublicReleaseDirectoryPath(release.Publication.Slug, release.PreviousVersion.Slug);
+                var directoryPath = $"{release.PreviousVersion.Id}/";
 
-                await _publicBlobStorageService.DeleteBlobs(PublicFilesContainerName, directoryPath);
+                await _publicBlobStorageService.DeleteBlobs(
+                    containerName: PublicReleaseFiles,
+                    directoryPath: directoryPath);
             }
         }
 
@@ -161,12 +156,12 @@ namespace GovUk.Education.ExploreEducationStatistics.Publisher.Services
             await _publicBlobStorageService.DeleteBlob(PublicContentContainerName, path);
         }
 
-        public async Task<BlobInfo> GetBlob(string containerName, string path)
+        public async Task<BlobInfo> GetBlob(IBlobContainer containerName, string path)
         {
             return await _publicBlobStorageService.GetBlob(containerName, path);
         }
 
-        public async Task MovePublicDirectory(string containerName, string sourceDirectoryPath, string destinationDirectoryPath)
+        public async Task MovePublicDirectory(IBlobContainer containerName, string sourceDirectoryPath, string destinationDirectoryPath)
         {
             await _publicBlobStorageService.MoveDirectory(
                 sourceContainerName: containerName,
@@ -176,15 +171,15 @@ namespace GovUk.Education.ExploreEducationStatistics.Publisher.Services
             );
         }
 
-        private async Task<List<BlobInfo>> CopyPrivateFilesToPublic(
+        private async Task CopyPrivateFilesToPublic(
             string sourceDirectoryPath,
             string destinationDirectoryPath,
             CopyReleaseFilesCommand copyReleaseFilesCommand)
         {
-            return await _privateBlobStorageService.CopyDirectory(
-                sourceContainerName: PrivateFilesContainerName,
+            await _privateBlobStorageService.CopyDirectory(
+                sourceContainerName: PrivateReleaseFiles,
                 sourceDirectoryPath: sourceDirectoryPath,
-                destinationContainerName: PublicFilesContainerName,
+                destinationContainerName: PublicReleaseFiles,
                 destinationDirectoryPath: destinationDirectoryPath,
                 new IBlobStorageService.CopyDirectoryOptions
                 {
@@ -194,7 +189,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Publisher.Services
                     ShouldTransferCallbackAsync = (source, _) =>
                         ShouldTransferCallback(
                             source: source,
-                            sourceContainerName: PrivateFilesContainerName,
+                            sourceContainerName: PrivateReleaseFiles,
                             files: copyReleaseFilesCommand.Files)
                 }
             );
@@ -211,7 +206,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Publisher.Services
         }
 
         private async Task<bool> ShouldTransferCallback(object source,
-            string sourceContainerName,
+            IBlobContainer sourceContainerName,
             List<File> files)
         {
             if (!(source is CloudBlockBlob item))
@@ -229,10 +224,10 @@ namespace GovUk.Education.ExploreEducationStatistics.Publisher.Services
         }
 
         private async Task UploadZippedFiles(
-            string containerName,
+            IBlobContainer containerName,
             string destinationPath,
             string zipFileName,
-            IEnumerable<BlobInfo> files,
+            IEnumerable<File> files,
             CopyReleaseFilesCommand copyReleaseFilesCommand)
         {
             await using var memoryStream = new MemoryStream();
@@ -242,10 +237,13 @@ namespace GovUk.Education.ExploreEducationStatistics.Publisher.Services
 
             foreach (var file in files)
             {
-                var zipEntry = new ZipEntry(file.FileName);
+                var zipEntry = new ZipEntry(file.Filename);
                 zipOutputStream.PutNextEntry(zipEntry);
 
-                await _publicBlobStorageService.DownloadToStream(containerName, file.Path, zipOutputStream);
+                await _publicBlobStorageService.DownloadToStream(
+                    containerName: containerName,
+                    path: file.MigratedPublicPath(copyReleaseFilesCommand.ReleaseId),
+                    stream: zipOutputStream);
             }
 
             zipOutputStream.Finish();

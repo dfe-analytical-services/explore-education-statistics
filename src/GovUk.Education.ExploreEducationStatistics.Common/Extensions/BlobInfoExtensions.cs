@@ -6,7 +6,6 @@ namespace GovUk.Education.ExploreEducationStatistics.Common.Extensions
 {
     public static class BlobInfoExtensions
     {
-        public const string FilenameKey = BlobInfo.FilenameKey;
         public const string NameKey = BlobInfo.NameKey;
         public const string NumberOfRowsKey = "NumberOfRows";
         public const string UserNameKey = "userName";

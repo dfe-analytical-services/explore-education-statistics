@@ -297,7 +297,6 @@ const basicRelease: EditableRelease = {
       extension: 'csv',
       fileName: 'prma.csv',
       name: 'prma',
-      path: '6a97c9b6-eaa2-4d22-7ba9-08d7bec1ba1a/data/prma.csv',
       size: '268 Kb',
       type: 'Data',
     },

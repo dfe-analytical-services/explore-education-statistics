@@ -884,7 +884,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
             IPersistenceHelper<ContentDbContext> contentPersistenceHelper = null,
             IMetaGuidanceSubjectService metaGuidanceSubjectService = null,
             IUserService userService = null,
-            IFileRepository fileRepository = null)
+            IReleaseDataFileRepository releaseDataFileRepository = null)
         {
             return new MetaGuidanceService(
                 contentDbContext,
@@ -892,7 +892,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
                 metaGuidanceSubjectService ?? new Mock<IMetaGuidanceSubjectService>().Object,
                 statisticsDbContext ?? new Mock<StatisticsDbContext>().Object,
                 userService ?? MockUtils.AlwaysTrueUserService().Object,
-                fileRepository ?? new FileRepository(contentDbContext)
+                releaseDataFileRepository ?? new ReleaseDataFileRepository(contentDbContext)
             );
         }
     }

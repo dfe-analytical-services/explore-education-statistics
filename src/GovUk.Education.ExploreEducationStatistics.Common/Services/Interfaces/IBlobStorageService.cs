@@ -10,47 +10,47 @@ namespace GovUk.Education.ExploreEducationStatistics.Common.Services.Interfaces
 {
     public interface IBlobStorageService
     {
-        public Task<IEnumerable<BlobInfo>> ListBlobs(string containerName, string path = null);
+        public Task<IEnumerable<BlobInfo>> ListBlobs(IBlobContainer containerName, string path = null);
 
-        public Task<bool> CheckBlobExists(string containerName, string path);
+        public Task<bool> CheckBlobExists(IBlobContainer containerName, string path);
 
-        public Task<BlobInfo> GetBlob(string containerName, string path);
+        public Task<BlobInfo> GetBlob(IBlobContainer containerName, string path);
 
-        public Task DeleteBlobs(string containerName, string directoryPath, string excludePattern = null);
+        public Task DeleteBlobs(IBlobContainer containerName, string directoryPath, string excludePattern = null);
 
-        public Task DeleteBlob(string containerName, string path);
+        public Task DeleteBlob(IBlobContainer containerName, string path);
 
-        public Task<bool> MoveBlob(string containerName, string sourcePath, string destinationPath);
+        public Task<bool> MoveBlob(IBlobContainer containerName, string sourcePath, string destinationPath);
 
         public Task UploadFile(
-            string containerName,
+            IBlobContainer containerName,
             string path,
             IFormFile file,
             IDictionary<string, string> metadata = null);
 
         public Task UploadStream(
-            string containerName,
+            IBlobContainer containerName,
             string path,
             Stream stream,
             string contentType,
             IDictionary<string, string> metadata = null);
 
         public Task UploadText(
-            string containerName,
+            IBlobContainer containerName,
             string path,
             string content,
             string contentType,
             IDictionary<string, string> metadata = null);
 
         public Task UploadAsJson<T>(
-            string containerName,
+            IBlobContainer containerName,
             string path,
             T content,
             JsonSerializerSettings settings = null);
 
-        public Task<bool> IsAppendSupported(string containerName, string path);
+        public Task<bool> IsAppendSupported(IBlobContainer containerName, string path);
 
-        public Task AppendText(string containerName, string path, string content);
+        public Task AppendText(IBlobContainer containerName, string path, string content);
 
         /// <summary>
         /// Download the entirety of a blob to a target stream.
@@ -59,9 +59,9 @@ namespace GovUk.Education.ExploreEducationStatistics.Common.Services.Interfaces
         /// <param name="path">path to the blob within the container</param>
         /// <param name="stream">stream to output blob to</param>
         /// <returns>the blob stream</returns>
-        public Task<Stream> DownloadToStream(string containerName, string path, Stream stream);
+        public Task<Stream> DownloadToStream(IBlobContainer containerName, string path, Stream stream);
 
-        public Task SetMetadata(string containerName, string path, IDictionary<string, string> metadata);
+        public Task SetMetadata(IBlobContainer containerName, string path, IDictionary<string, string> metadata);
 
         /// <summary>
         /// Stream a blob in chunks.
@@ -77,11 +77,11 @@ namespace GovUk.Education.ExploreEducationStatistics.Common.Services.Interfaces
         /// <param name="path">path to the blob within the container</param>
         /// <param name="bufferSize">size of the stream buffer</param>
         /// <returns>the chunked blob stream</returns>
-        public Task<Stream> StreamBlob(string containerName, string path, int? bufferSize = null);
+        public Task<Stream> StreamBlob(IBlobContainer containerName, string path, int? bufferSize = null);
 
-        public Task<string> DownloadBlobText(string containerName, string path);
+        public Task<string> DownloadBlobText(IBlobContainer containerName, string path);
 
-        Task<T> GetDeserializedJson<T>(string containerName, string path);
+        Task<T> GetDeserializedJson<T>(IBlobContainer containerName, string path);
 
         public class CopyDirectoryOptions
         {
@@ -92,9 +92,9 @@ namespace GovUk.Education.ExploreEducationStatistics.Common.Services.Interfaces
         }
 
         public Task<List<BlobInfo>> CopyDirectory(
-            string sourceContainerName,
+            IBlobContainer sourceContainerName,
             string sourceDirectoryPath,
-            string destinationContainerName,
+            IBlobContainer destinationContainerName,
             string destinationDirectoryPath,
             CopyDirectoryOptions options = null);
 
@@ -107,9 +107,9 @@ namespace GovUk.Education.ExploreEducationStatistics.Common.Services.Interfaces
         }
 
         public Task MoveDirectory(
-            string sourceContainerName,
+            IBlobContainer sourceContainerName,
             string sourceDirectoryPath,
-            string destinationContainerName,
+            IBlobContainer destinationContainerName,
             string destinationDirectoryPath,
             MoveDirectoryOptions options = null);
     }

@@ -3,7 +3,6 @@ export interface FileInfo {
   extension: string;
   fileName: string;
   name: string;
-  path: string;
   size: string;
-  type: 'Data' | 'DataZip' | 'Metadata' | 'Ancillary' | 'Chart';
+  type: 'Data' | 'DataZip' | 'Metadata' | 'Ancillary' | 'Chart' | 'Image';
 }

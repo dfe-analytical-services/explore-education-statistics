@@ -5,7 +5,6 @@ namespace GovUk.Education.ExploreEducationStatistics.Common.Model
 {
     public class BlobInfo
     {
-        public const string FilenameKey = "filename";
         public const string NameKey = "name";
 
         public readonly string Path;
@@ -38,11 +37,6 @@ namespace GovUk.Education.ExploreEducationStatistics.Common.Model
 
         public string Name => Meta.TryGetValue(NameKey, out var name) ? name : string.Empty;
 
-        /// <summary>
-        /// In the case of the Public API's which have no access to the Content Db,
-        /// this is the only method of retrieving the filename
-        /// </summary>
-        public string FileName =>
-            Meta.TryGetValue(FilenameKey, out var filename) ? filename : Path.Substring(Path.LastIndexOf('/') + 1);
+        public string FileName => Path.Substring(Path.LastIndexOf('/') + 1);
     }
 }

@@ -214,9 +214,11 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin
             services.AddTransient<IFileRepository, FileRepository>();
             services.AddTransient<IDataImportRepository, DataImportRepository>();
             services.AddTransient<IReleaseFileRepository, ReleaseFileRepository>();
+            services.AddTransient<IReleaseDataFileRepository, ReleaseDataFileRepository>();
 
             services.AddTransient<IReleaseDataFileService, ReleaseDataFileService>();
             services.AddTransient<IReleaseFileService, ReleaseFileService>();
+            services.AddTransient<IReleaseImageService, ReleaseImageService>();
             services.AddTransient<IDataImportService, DataImportService>();
             services.AddTransient<IImportStatusBauService, ImportStatusBauService>();
 
@@ -261,6 +263,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin
             services.AddTransient<IContentService, ContentService>();
             services.AddTransient<IRelatedInformationService, RelatedInformationService>();
             services.AddTransient<IReplacementService, ReplacementService>();
+            services.AddTransient<IMigrateFilesService, MigrateFilesService>();
 
             services.AddTransient<INotificationClient>(s =>
             {

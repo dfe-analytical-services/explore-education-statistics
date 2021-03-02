@@ -1,5 +1,5 @@
 import InsetText from '@common/components/InsetText';
-import useGetChartFile from '@common/modules/charts/hooks/useGetChartFile';
+import useGetReleaseFile from '@common/modules/release/hooks/useGetReleaseFile';
 import ContentBlockRenderer from '@common/modules/find-statistics/components/ContentBlockRenderer';
 import DataBlockTabs from '@common/modules/find-statistics/components/DataBlockTabs';
 import useReleaseImageAttributeTransformer from '@common/modules/release/hooks/useReleaseImageAttributeTransformer';
@@ -18,9 +18,7 @@ const PublicationSectionBlocks = ({
   release,
   blocks,
 }: PublicationSectionBlocksProps) => {
-  const { slug, publication } = release;
-
-  const getChartFile = useGetChartFile(publication.slug, slug);
+  const getReleaseFile = useGetReleaseFile(release.id);
 
   const transformImageAttributes = useReleaseImageAttributeTransformer({
     releaseId: release.id,
@@ -36,7 +34,7 @@ const PublicationSectionBlocks = ({
               key={block.id}
               dataBlock={block}
               releaseId={release.id}
-              getInfographic={getChartFile}
+              getInfographic={getReleaseFile}
               onToggle={section => {
                 logEvent(
                   'Publication Release Data Tabs',
