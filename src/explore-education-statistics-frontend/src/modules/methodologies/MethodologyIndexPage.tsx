@@ -50,11 +50,11 @@ const MethodologyIndexPage: NextPage<Props> = ({ themes = [] }) => {
         <Accordion
           id="publications"
           onSectionOpen={accordionSection => {
-            logEvent(
-              'Methodologies',
-              'Publications accordion opened',
-              accordionSection.title,
-            );
+            logEvent({
+              category: 'Methodologies',
+              action: 'Publications accordion opened',
+              label: accordionSection.title,
+            });
           }}
         >
           {themes.map(
