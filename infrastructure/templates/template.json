@@ -680,7 +680,7 @@
           },
           "dependsOn": [
             "[resourceId('Microsoft.Web/sites', variables('dataAppName'))]",
-            "[concat('Microsoft.Network/virtualNetworks/subnets/', variables('dataSubnetName'))]"
+            "[concat('Microsoft.Network/virtualNetworks/', variables('vNetName'), '/subnets/', variables('dataSubnetName'))]"
           ]
         }
       ],
@@ -885,7 +885,7 @@
           },
           "dependsOn": [
             "[resourceId('Microsoft.Web/sites', variables('contentAppName'))]",
-            "[concat('Microsoft.Network/virtualNetworks/subnets/', variables('contentSubnetName'))]"
+            "[concat('Microsoft.Network/virtualNetworks/', variables('vNetName'), '/subnets/', variables('contentSubnetName'))]"
           ]
         }
       ],
@@ -1089,7 +1089,7 @@
           },
           "dependsOn": [
             "[resourceId('Microsoft.Web/sites', variables('adminAppName'))]",
-            "[concat('Microsoft.Network/virtualNetworks/subnets/', variables('adminSubnetName'))]"
+            "[concat('Microsoft.Network/virtualNetworks/', variables('vNetName'), '/subnets/', variables('adminSubnetName'))]"
           ]
         }
       ],
@@ -2127,7 +2127,7 @@
           },
           "dependsOn": [
             "[resourceId('Microsoft.Web/sites', variables('notificationsAppName'))]",
-            "[concat('Microsoft.Network/virtualNetworks/subnets/', variables('notifySubnetName'))]"
+            "[concat('Microsoft.Network/virtualNetworks/', variables('vNetName'), '/subnets/', variables('notifySubnetName'))]"
           ]
         }
       ],
@@ -2275,7 +2275,7 @@
           },
           "dependsOn": [
             "[resourceId('Microsoft.Web/sites', variables('importerAppName'))]",
-            "[concat('Microsoft.Network/virtualNetworks/subnets/', variables('importerSubnetName'))]"
+            "[concat('Microsoft.Network/virtualNetworks/', variables('vNetName'), '/subnets/', variables('importerSubnetName'))]"
           ]
         }
       ],
@@ -2432,7 +2432,7 @@
           },
           "dependsOn": [
             "[resourceId('Microsoft.Web/sites', variables('publisherAppName'))]",
-            "[concat('Microsoft.Network/virtualNetworks/subnets/', variables('publisherSubnetName'))]"
+            "[concat('Microsoft.Network/virtualNetworks/', variables('vNetName'), '/subnets/', variables('publisherSubnetName'))]"
           ]
         }
       ],
