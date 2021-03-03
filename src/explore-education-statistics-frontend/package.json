@@ -124,6 +124,7 @@
       "src/**/*.{js,jsx,ts,tsx}",
       "!src/**/*.d.ts"
     ],
+    "setupFiles": ["dotenv/config"],
     "setupFilesAfterEnv": [
       "<rootDir>/test/setupTests.js"
     ],
