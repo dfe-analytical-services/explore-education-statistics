@@ -185,7 +185,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Processor.Services
             await InsertObservations(context, observations);
         }
 
-        public static GeographicLevel GetGeographicLevel(IReadOnlyList<string> line, List<string> headers)
+        public GeographicLevel GetGeographicLevel(IReadOnlyList<string> line, List<string> headers)
         {
             return GetGeographicLevelFromString(CsvUtil.Value(line, headers, "geographic_level"));
         }
@@ -203,7 +203,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Processor.Services
             throw new InvalidGeographicLevelException(value);
         }
 
-        public static TimeIdentifier GetTimeIdentifier(IReadOnlyList<string> line, List<string> headers)
+        public TimeIdentifier GetTimeIdentifier(IReadOnlyList<string> line, List<string> headers)
         {
             var timeIdentifier = CsvUtil.Value(line, headers, "time_identifier").ToLower();
             foreach (var value in Enum.GetValues(typeof(TimeIdentifier)).Cast<TimeIdentifier>())
@@ -217,7 +217,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Processor.Services
             throw new InvalidTimeIdentifierException(timeIdentifier);
         }
 
-        public static int GetYear(IReadOnlyList<string> line, List<string> headers)
+        public int GetYear(IReadOnlyList<string> line, List<string> headers)
         {
             var tp = CsvUtil.Value(line, headers, "time_period");
             if (tp == null)

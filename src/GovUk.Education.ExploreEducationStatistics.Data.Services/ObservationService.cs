@@ -125,6 +125,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Services
                     .Observation
                     .AsNoTracking()
                     .Include(o => o.FilterItems)
+                    .Include(o => o.Location)
                     .Where(o => batchOfIds.Contains(o.Id))
                     .ToList();
 
@@ -135,22 +136,6 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Services
             })
                 .ToList();
             
-            // Load of the Location owned entities is removed from the Observation fetching code above as another
-            // "Include" as it was generating very inefficient sql.	
-            var locationIds = observations
-                .Select(o => o.LocationId)
-                .Distinct();
-            
-            var locations = _context
-                .Location
-                .AsNoTracking()
-                .Where(l => locationIds.Contains(l.Id))
-                .ToDictionary(l => l.Id);
-
-            observations.ForEach(o => o.Location = locations[o.LocationId]);
-
-            _logger.LogDebug($"Assigned Locations to {ids.Length} Observations in {phasesStopwatch.Elapsed.TotalMilliseconds} ms");
-
             _logger.LogDebug($"Finished fetching {ids.Length} Observations in a total of {totalStopwatch.Elapsed.TotalMilliseconds} ms");
             return observations;           
         }
