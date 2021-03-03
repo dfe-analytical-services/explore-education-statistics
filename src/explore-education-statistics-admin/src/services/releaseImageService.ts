@@ -12,7 +12,7 @@ const releaseImageService = {
     const data = new FormData();
     data.append('file', file);
 
-    return client.post(`/api/releases/${releaseId}/images`, data, {
+    return client.post(`/releases/${releaseId}/images`, data, {
       onUploadProgress(event: ProgressEvent) {
         onProgress?.(event.loaded, event.total);
       },
