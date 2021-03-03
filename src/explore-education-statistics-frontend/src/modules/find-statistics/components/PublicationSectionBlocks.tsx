@@ -22,7 +22,7 @@ const PublicationSectionBlocks = ({
 
   const transformImageAttributes = useReleaseImageAttributeTransformer({
     releaseId: release.id,
-    rootUrl: process.env.CONTENT_API_BASE_URL,
+    rootUrl: process.env.CONTENT_API_BASE_URL.replace('/api', ''),
   });
 
   return blocks.length > 0 ? (
