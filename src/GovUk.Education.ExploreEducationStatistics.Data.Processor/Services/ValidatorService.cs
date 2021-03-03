@@ -10,7 +10,6 @@ using GovUk.Education.ExploreEducationStatistics.Common.Extensions;
 using GovUk.Education.ExploreEducationStatistics.Common.Model;
 using GovUk.Education.ExploreEducationStatistics.Common.Services;
 using GovUk.Education.ExploreEducationStatistics.Common.Services.Interfaces;
-using GovUk.Education.ExploreEducationStatistics.Common.Utils;
 using GovUk.Education.ExploreEducationStatistics.Content.Model;
 using GovUk.Education.ExploreEducationStatistics.Content.Model.Extensions;
 using GovUk.Education.ExploreEducationStatistics.Data.Processor.Services.Interfaces;
@@ -18,7 +17,7 @@ using GovUk.Education.ExploreEducationStatistics.Data.Processor.Utils;
 using Microsoft.Azure.WebJobs;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.Logging;
-using static GovUk.Education.ExploreEducationStatistics.Common.BlobContainerNames;
+using static GovUk.Education.ExploreEducationStatistics.Common.BlobContainers;
 using static GovUk.Education.ExploreEducationStatistics.Data.Processor.Services.ValidationErrorMessages;
 using static GovUk.Education.ExploreEducationStatistics.Common.Validators.FileTypeValidationUtils;
 using File = GovUk.Education.ExploreEducationStatistics.Content.Model.File;
@@ -97,11 +96,11 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Processor.Services
                 .OnSuccessDo(async () => await ValidateCsvFile(import.MetaFile, true))
                 .OnSuccess(async () =>
                     {
-                        var dataFileStream = await _blobStorageService.StreamBlob(PrivateFilesContainerName,
+                        var dataFileStream = await _blobStorageService.StreamBlob(PrivateReleaseFiles, 
                             import.File.Path());
                         var dataFileTable = DataTableUtils.CreateFromStream(dataFileStream);
 
-                        var metaFileStream = await _blobStorageService.StreamBlob(PrivateFilesContainerName,
+                        var metaFileStream = await _blobStorageService.StreamBlob(PrivateReleaseFiles,
                             import.MetaFile.Path());
                         var metaFileTable = DataTableUtils.CreateFromStream(metaFileStream);
 
@@ -121,8 +120,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Processor.Services
                                             }
                                         )
                             );
-                    }
-                );
+                });
         }
 
         private async Task<Either<List<DataImportError>, Unit>> ValidateCsvFile(File file, bool isMetaFile)
@@ -136,7 +134,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Processor.Services
             }
             else
             {
-                var stream = await _blobStorageService.StreamBlob(PrivateFilesContainerName, file.Path());
+                var stream = await _blobStorageService.StreamBlob(PrivateReleaseFiles, file.Path());
 
                 using var reader = new StreamReader(stream);
                 using var csv = new CsvReader(reader, CultureInfo.InvariantCulture);
@@ -326,7 +324,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Processor.Services
 
         private async Task<bool> IsCsvFile(File file)
         {
-            var mimeTypeStream = await _blobStorageService.StreamBlob(PrivateFilesContainerName, file.Path());
+            var mimeTypeStream = await _blobStorageService.StreamBlob(PrivateReleaseFiles, file.Path());
 
             var hasMatchingMimeType = await _fileTypeService.HasMatchingMimeType(
                 mimeTypeStream,
@@ -338,7 +336,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Processor.Services
                 return false;
             }
 
-            var encodingStream = await _blobStorageService.StreamBlob(PrivateFilesContainerName, file.Path());
+            var encodingStream = await _blobStorageService.StreamBlob(PrivateReleaseFiles, file.Path());
             return _fileTypeService.HasMatchingEncodingType(encodingStream, CsvEncodingTypes);
         }
     }

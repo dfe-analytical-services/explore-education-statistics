@@ -21,12 +21,13 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Controllers.Api
             _replacementService = replacementService;
         }
 
-        [HttpGet("data/{fileId}/replacement-plan/{replacementFileId}")]
-        public async Task<ActionResult<DataReplacementPlanViewModel>> GetReplacementPlan(
+        [HttpGet("releases/{releaseId}/data/{fileId}/replacement-plan/{replacementFileId}")]
+        public async Task<ActionResult<DataReplacementPlanViewModel>> GetReplacementPlan(Guid releaseId,
             Guid fileId,
             Guid replacementFileId)
         {
             return await _replacementService.GetReplacementPlan(
+                    releaseId: releaseId,
                     originalFileId: fileId,
                     replacementFileId: replacementFileId
                 )
@@ -34,10 +35,13 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Controllers.Api
                 .HandleFailuresOrOk();
         }
 
-        [HttpPost("data/{fileId}/replacement/{replacementFileId}")]
-        public async Task<ActionResult<Unit>> Replace(Guid fileId, Guid replacementFileId)
+        [HttpPost("releases/{releaseId}/data/{fileId}/replacement/{replacementFileId}")]
+        public async Task<ActionResult<Unit>> Replace(Guid releaseId,
+            Guid fileId,
+            Guid replacementFileId)
         {
             return await _replacementService.Replace(
+                    releaseId: releaseId,
                     originalFileId: fileId,
                     replacementFileId: replacementFileId
                 )

@@ -1,20 +1,24 @@
 import styles from '@admin/components/form/FormEditor.module.scss';
-// No types available for CKEditor 5
-// eslint-disable-next-line @typescript-eslint/ban-ts-comment
-// @ts-ignore
-import ClassicEditor from '@ckeditor/ckeditor5-build-classic';
-// No types available for CKEditor 5
-// eslint-disable-next-line @typescript-eslint/ban-ts-comment
-// @ts-ignore
-import CKEditor from '@ckeditor/ckeditor5-react';
+import {
+  EditorConfig,
+  Element,
+  HeadingOption,
+  ResizeOption,
+} from '@admin/types/ckeditor';
+import {
+  ImageUploadCancelHandler,
+  ImageUploadHandler,
+} from '@admin/utils/ckeditor/CustomUploadAdapter';
+import customUploadAdapterPlugin from '@admin/utils/ckeditor/customUploadAdapterPlugin';
+import { CKEditor, CKEditorProps } from '@ckeditor/ckeditor5-react';
 import ErrorMessage from '@common/components/ErrorMessage';
 import FormLabel from '@common/components/form/FormLabel';
-import SanitizeHtml from '@common/components/SanitizeHtml';
+import ContentHtml from '@common/components/ContentHtml';
 import useToggle from '@common/hooks/useToggle';
 import isBrowser from '@common/utils/isBrowser';
 import classNames from 'classnames';
+import Editor from 'explore-education-statistics-ckeditor';
 import React, {
-  ChangeEvent,
   MutableRefObject,
   useCallback,
   useEffect,
@@ -35,6 +39,7 @@ export const toolbarConfigs = {
     '|',
     'blockQuote',
     'insertTable',
+    'imageUpload',
     '|',
     'redo',
     'undo',
@@ -54,7 +59,7 @@ export const toolbarConfigs = {
 
 const defaultAllowedHeadings = ['h3', 'h4', 'h5'];
 
-const headingOptions = [
+const headingOptions: HeadingOption[] = [
   {
     model: 'heading1',
     view: 'h1',
@@ -87,6 +92,40 @@ const headingOptions = [
   },
 ];
 
+const imageToolbar: string[] = [
+  'imageTextAlternative',
+  '|',
+  'imageResize:50',
+  'imageResize:75',
+  'imageResize:original',
+];
+
+const resizeOptions: ResizeOption[] = [
+  {
+    name: 'imageResize:original',
+    value: null,
+    label: 'Original',
+    icon: 'original',
+  },
+  {
+    name: 'imageResize:50',
+    value: '50',
+    label: '50%',
+    icon: 'medium',
+  },
+  {
+    name: 'imageResize:75',
+    value: '75',
+    label: '75%',
+    icon: 'large',
+  },
+];
+
+const tableContentToolbar = ['tableColumn', 'tableRow', 'mergeTableCells'];
+
+export type EditorChangeHandler = (value: string) => void;
+export type EditorElementsHandler = (elements: Element[]) => void;
+
 export interface FormEditorProps {
   allowedHeadings?: string[];
   error?: string;
@@ -99,7 +138,11 @@ export interface FormEditorProps {
   value: string;
   testId?: string;
   onBlur?: () => void;
-  onChange: (content: string) => void;
+  onElementsChange?: EditorElementsHandler;
+  onElementsReady?: EditorElementsHandler;
+  onChange: EditorChangeHandler;
+  onImageUpload?: ImageUploadHandler;
+  onImageUploadCancel?: ImageUploadCancelHandler;
 }
 
 const FormEditor = ({
@@ -115,15 +158,30 @@ const FormEditor = ({
   testId,
   onBlur,
   onChange,
+  onElementsChange,
+  onElementsReady,
+  onImageUpload,
+  onImageUploadCancel,
 }: FormEditorProps) => {
   const editorRef: MutableRefObject<HTMLDivElement | null> = useRef(null);
 
   const [isFocused, toggleFocused] = useToggle(false);
 
-  const config = useMemo(
-    () => ({
-      toolbar: toolbarConfig,
-      heading: toolbarConfig?.includes('heading')
+  const config = useMemo<EditorConfig>(() => {
+    const toolbar = toolbarConfig?.filter(tool => {
+      // Disable image upload if no callback provided
+      if (tool === 'imageUpload' && !onImageUpload) {
+        return false;
+      }
+
+      return true;
+    });
+
+    const hasImageUpload = toolbar.includes('imageUpload');
+
+    return {
+      toolbar,
+      heading: toolbar.includes('heading')
         ? {
             options: [
               {
@@ -132,14 +190,26 @@ const FormEditor = ({
                 class: 'ck-heading_paragraph',
               },
               ...headingOptions.filter(option =>
-                allowedHeadings?.includes(option.view),
+                allowedHeadings?.includes(option.view ?? ''),
               ),
             ],
           }
         : undefined,
-    }),
-    [allowedHeadings, toolbarConfig],
-  );
+      image: hasImageUpload
+        ? {
+            toolbar: imageToolbar,
+            resizeOptions,
+          }
+        : undefined,
+      table: {
+        contentToolbar: tableContentToolbar,
+      },
+      extraPlugins:
+        hasImageUpload && onImageUpload
+          ? [customUploadAdapterPlugin(onImageUpload, onImageUploadCancel)]
+          : undefined,
+    };
+  }, [allowedHeadings, onImageUpload, onImageUploadCancel, toolbarConfig]);
 
   useEffect(() => {
     if (process.env.NODE_ENV === 'test') {
@@ -181,14 +251,20 @@ const FormEditor = ({
     editorRef.current.focus();
   }, []);
 
-  const handleChange = useCallback(
-    (event: ChangeEvent, editor: { getData(): string }) => {
+  const handleChange = useCallback<CKEditorProps['onChange']>(
+    (event, editor) => {
+      if (onElementsChange) {
+        onElementsChange(
+          Array.from(editor.model.document.getRoot('main').getChildren()),
+        );
+      }
+
       onChange(editor.getData());
     },
-    [onChange],
+    [onChange, onElementsChange],
   );
 
-  const handleBlur = useCallback(() => {
+  const handleBlur = useCallback<CKEditorProps['onBlur']>(() => {
     toggleFocused.off();
 
     if (onBlur) {
@@ -196,13 +272,19 @@ const FormEditor = ({
     }
   }, [onBlur, toggleFocused]);
 
-  const handleInit = useCallback(
-    (editor: { editing: { view: { focus(): void } } }) => {
+  const handleReady = useCallback<CKEditorProps['onReady']>(
+    editor => {
       if (focusOnInit) {
         editor.editing.view.focus();
       }
+
+      if (onElementsReady) {
+        onElementsReady(
+          Array.from(editor.model.document.getRoot('main').getChildren()),
+        );
+      }
     },
-    [focusOnInit],
+    [focusOnInit, onElementsReady],
   );
 
   const isReadOnly = isBrowser('IE');
@@ -253,13 +335,13 @@ const FormEditor = ({
         >
           {process.env.NODE_ENV !== 'test' ? (
             <CKEditor
-              editor={ClassicEditor}
+              editor={Editor}
               config={config}
               data={value}
               onChange={handleChange}
               onFocus={toggleFocused.on}
               onBlur={handleBlur}
-              onInit={handleInit}
+              onReady={handleReady}
             />
           ) : (
             <textarea
@@ -283,7 +365,7 @@ const FormEditor = ({
           id={id}
           tabIndex={0}
         >
-          <SanitizeHtml dirtyHtml={value} />
+          <ContentHtml html={value} />
         </div>
       )}
     </>

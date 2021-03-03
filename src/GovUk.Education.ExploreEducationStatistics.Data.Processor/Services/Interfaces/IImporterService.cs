@@ -31,9 +31,9 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Processor.Services.Int
             StatisticsDbContext context);
 
         GeographicLevel GetGeographicLevel(IReadOnlyList<string> line, List<string> headers);
-        
-	    TimeIdentifier GetTimeIdentifier(IReadOnlyList<string> line, List<string> headers);
-            
-	    int GetYear(IReadOnlyList<string> line, List<string> headers);
+
+        TimeIdentifier GetTimeIdentifier(IReadOnlyList<string> line, List<string> headers);
+
+        int GetYear(IReadOnlyList<string> line, List<string> headers);
     }
 }

@@ -1,6 +1,5 @@
 import Link from '@admin/components/Link';
 import Page from '@admin/components/Page';
-import useFormSubmit from '@admin/hooks/useFormSubmit';
 import userService, {
   User,
   UserReleaseRoleSubmission,
@@ -14,6 +13,7 @@ import LoadingSpinner from '@common/components/LoadingSpinner';
 import SummaryList from '@common/components/SummaryList';
 import SummaryListItem from '@common/components/SummaryListItem';
 import useAsyncRetry from '@common/hooks/useAsyncRetry';
+import useFormSubmit from '@common/hooks/useFormSubmit';
 import { mapFieldErrors } from '@common/validation/serverValidations';
 import Yup from '@common/validation/yup';
 import { Formik } from 'formik';
@@ -140,11 +140,7 @@ const ManageUserPage = ({ match }: RouteComponentProps<{ userId: string }>) => {
               {() => {
                 return (
                   <Form id={formId}>
-                    <FormFieldset
-                      id={`${formId}-details`}
-                      legend="Details"
-                      legendSize="m"
-                    >
+                    <FormFieldset id="user" legend="Details" legendSize="m">
                       <SummaryList>
                         <SummaryListItem term="Name">
                           {model.user.name}
@@ -158,7 +154,7 @@ const ManageUserPage = ({ match }: RouteComponentProps<{ userId: string }>) => {
                       </SummaryList>
                     </FormFieldset>
                     <FormFieldset
-                      id={`${formId}-role`}
+                      id="role"
                       legend="Role"
                       legendSize="m"
                       hint="The users role within the service."
@@ -166,7 +162,6 @@ const ManageUserPage = ({ match }: RouteComponentProps<{ userId: string }>) => {
                       <div className="govuk-grid-row">
                         <div className="govuk-grid-column-one-quarter">
                           <FormFieldSelect<UpdateRoleFormValues>
-                            id={`${formId}-selectedRoleId`}
                             label="Role"
                             name="selectedRoleId"
                             options={roles?.map(role => ({
@@ -204,7 +199,7 @@ const ManageUserPage = ({ match }: RouteComponentProps<{ userId: string }>) => {
                 return (
                   <Form id={`${formId}-releaseRole`}>
                     <FormFieldset
-                      id={`${formId}-role`}
+                      id="role"
                       legend="Release access"
                       legendSize="m"
                       hint="The releases a user can access within the service."
@@ -212,7 +207,6 @@ const ManageUserPage = ({ match }: RouteComponentProps<{ userId: string }>) => {
                       <div className="govuk-grid-row">
                         <div className="govuk-grid-column-one-half">
                           <FormFieldSelect<AddReleaseRoleFormValues>
-                            id={`${formId}-selectedReleaseId`}
                             label="Release"
                             name="selectedReleaseId"
                             options={releases?.map(release => ({
@@ -224,7 +218,6 @@ const ManageUserPage = ({ match }: RouteComponentProps<{ userId: string }>) => {
 
                         <div className="govuk-grid-column-one-quarter">
                           <FormFieldSelect<AddReleaseRoleFormValues>
-                            id={`${formId}-selectedReleaseRoleId`}
                             label="Release role"
                             name="selectedReleaseRoleId"
                             options={releaseRoles?.map(releaseRole => ({

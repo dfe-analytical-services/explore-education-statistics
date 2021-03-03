@@ -124,7 +124,7 @@ const FormCheckboxSearchSubGroups = ({
   }
 
   return (
-    <FormFieldset {...fieldsetProps}>
+    <FormFieldset {...fieldsetProps} useFormId={false}>
       {isMounted && (
         <>
           {totalOptions > 1 && options.length > 1 && (
@@ -168,7 +168,11 @@ const FormCheckboxSearchSubGroups = ({
                 {...groupProps}
                 key={optionGroup.legend}
                 name={name}
-                id={optionGroup.id ? optionGroup.id : `${id}-${index + 1}`}
+                id={
+                  optionGroup.id
+                    ? `${id}-${optionGroup.id}`
+                    : `${id}-options-${index + 1}`
+                }
                 legend={optionGroup.legend}
                 legendSize="s"
                 options={optionGroup.options}

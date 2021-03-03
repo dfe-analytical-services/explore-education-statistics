@@ -4,8 +4,6 @@ using System.Diagnostics.CodeAnalysis;
 using System.Globalization;
 using System.IO;
 using GovUk.Education.ExploreEducationStatistics.Common.Extensions;
-using Microsoft.Azure.Storage.Blob;
-using static GovUk.Education.ExploreEducationStatistics.Common.Services.FileStoragePathUtils;
 
 namespace GovUk.Education.ExploreEducationStatistics.Common.Services
 {
@@ -37,14 +35,21 @@ namespace GovUk.Education.ExploreEducationStatistics.Common.Services
         }
 
         public static IDictionary<string, string> GetAncillaryFileMetaValues(
-            string filename,
-            string name)
+            string name,
+            DateTime? releaseDateTime = null)
         {
-            return new Dictionary<string, string>
+            var values = new Dictionary<string, string>
             {
-                {BlobInfoExtensions.FilenameKey, filename},
                 {BlobInfoExtensions.NameKey, name}
             };
+
+            if (releaseDateTime.HasValue)
+            {
+                values.Add(BlobInfoExtensions.ReleaseDateTimeKey, 
+                    releaseDateTime.Value.ToString("o", CultureInfo.InvariantCulture));
+            }
+
+            return values;
         }
 
         public static IDictionary<string, string> GetDataFileMetaValues(
@@ -59,14 +64,6 @@ namespace GovUk.Education.ExploreEducationStatistics.Common.Services
                 {BlobInfoExtensions.MetaFileKey, metaFileName.ToLower()},
                 {BlobInfoExtensions.UserNameKey, userName},
                 {BlobInfoExtensions.NumberOfRowsKey, numberOfRows.ToString()}
-            };
-        }
-
-        public static IDictionary<string, string> GetMetaDataFileMetaValues(string dataFileName)
-        {
-            return new Dictionary<string, string>
-            {
-                {BlobInfoExtensions.DataFileKey, dataFileName.ToLower()}
             };
         }
 
@@ -86,17 +83,6 @@ namespace GovUk.Education.ExploreEducationStatistics.Common.Services
             }
 
             return $"{fileSize:0.##} {unit}";
-        }
-
-        public static bool IsBatchedDataFile(IListBlobItem blobItem, Guid releaseId)
-        {
-            return blobItem.Parent.Prefix.Equals(AdminReleaseBatchesDirectoryPath(releaseId));
-        }
-
-        public static bool IsMetaDataFile(CloudBlob blob)
-        {
-            // The meta data file contains a metadata attribute referencing it's corresponding data file
-            return blob.Metadata.ContainsKey(BlobInfoExtensions.DataFileKey);
         }
 
         public static int CalculateNumberOfRows(Stream fileStream)

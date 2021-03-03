@@ -17,6 +17,7 @@ import React, { lazy, Suspense, useEffect } from 'react';
 import { Route, Switch, useHistory } from 'react-router';
 import { BrowserRouter } from 'react-router-dom';
 import PageNotFoundPage from './pages/errors/PageNotFoundPage';
+import { LastLocationContextProvider } from './contexts/LastLocationContext';
 
 const PrototypeIndexPage = lazy(
   () => import('@admin/prototypes/PrototypeIndexPage'),
@@ -71,33 +72,35 @@ function App() {
             <ApplicationInsightsTracking />
 
             <AuthContextProvider>
-              <PageErrorBoundary>
-                <Switch>
-                  {Object.entries(apiAuthorizationRouteList).map(
-                    ([key, authRoute]) => (
-                      <Route exact key={key} {...authRoute} />
-                    ),
-                  )}
+              <LastLocationContextProvider>
+                <PageErrorBoundary>
+                  <Switch>
+                    {Object.entries(apiAuthorizationRouteList).map(
+                      ([key, authRoute]) => (
+                        <Route exact key={key} {...authRoute} />
+                      ),
+                    )}
 
-                  {Object.entries(routes).map(([key, route]) => (
-                    <ProtectedRoute key={key} {...route} />
-                  ))}
+                    {Object.entries(routes).map(([key, route]) => (
+                      <ProtectedRoute key={key} {...route} />
+                    ))}
 
-                  <ProtectedRoute
-                    path="/prototypes"
-                    protectionAction={user =>
-                      user.permissions.canAccessUserAdministrationPages
-                    }
-                    component={PrototypesEntry}
-                  />
+                    <ProtectedRoute
+                      path="/prototypes"
+                      protectionAction={user =>
+                        user.permissions.canAccessUserAdministrationPages
+                      }
+                      component={PrototypesEntry}
+                    />
 
-                  <ProtectedRoute
-                    path="*"
-                    allowAnonymousUsers
-                    component={PageNotFoundPage}
-                  />
-                </Switch>
-              </PageErrorBoundary>
+                    <ProtectedRoute
+                      path="*"
+                      allowAnonymousUsers
+                      component={PageNotFoundPage}
+                    />
+                  </Switch>
+                </PageErrorBoundary>
+              </LastLocationContextProvider>
             </AuthContextProvider>
           </BrowserRouter>
         </ApplicationInsightsContextProvider>

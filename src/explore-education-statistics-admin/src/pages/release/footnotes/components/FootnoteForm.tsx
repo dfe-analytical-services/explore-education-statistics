@@ -122,7 +122,6 @@ const FootnoteForm = ({
                 </legend>
 
                 <FormFieldCheckbox
-                  id={`subject-${subjectId}`}
                   label="Select all indicators and filters for this subject"
                   name={`subjects.${subjectId}.selected`}
                   small
@@ -173,11 +172,7 @@ const FootnoteForm = ({
             );
           })}
 
-          <FormFieldTextArea<BaseFootnote>
-            id={`${id}-content`}
-            name="content"
-            label="Footnote"
-          />
+          <FormFieldTextArea<BaseFootnote> name="content" label="Footnote" />
 
           <ButtonGroup>
             <Button type="submit">Save footnote</Button>

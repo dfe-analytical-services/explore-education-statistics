@@ -10,7 +10,7 @@ using GovUk.Education.ExploreEducationStatistics.Data.Processor.Services.Interfa
 using GovUk.Education.ExploreEducationStatistics.Data.Processor.Utils;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Logging;
-using static GovUk.Education.ExploreEducationStatistics.Common.BlobContainerNames;
+using static GovUk.Education.ExploreEducationStatistics.Common.BlobContainers;
 using static GovUk.Education.ExploreEducationStatistics.Content.Model.DataImportStatus;
 
 namespace GovUk.Education.ExploreEducationStatistics.Data.Processor.Services
@@ -61,10 +61,10 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Processor.Services
 
             var subject = await context.Subject.FindAsync(import.SubjectId);
 
-            var datafileStream = await _blobStorageService.StreamBlob(PrivateFilesContainerName, message.ObservationsFilePath);
+            var datafileStream = await _blobStorageService.StreamBlob(PrivateReleaseFiles, message.ObservationsFilePath);
             var dataFileTable = DataTableUtils.CreateFromStream(datafileStream);
 
-            var metaFileStream = await _blobStorageService.StreamBlob(PrivateFilesContainerName, import.MetaFile.Path());
+            var metaFileStream = await _blobStorageService.StreamBlob(PrivateReleaseFiles, import.MetaFile.Path());
             var metaFileTable = DataTableUtils.CreateFromStream(metaFileStream);
 
             await context.Database.CreateExecutionStrategy().Execute(async () =>
@@ -87,7 +87,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Processor.Services
 
             if (import.NumBatches > 1)
             {
-                await _blobStorageService.DeleteBlob(PrivateFilesContainerName, message.ObservationsFilePath);
+                await _blobStorageService.DeleteBlob(PrivateReleaseFiles, message.ObservationsFilePath);
             }
 
             await CheckComplete(message, context);
@@ -99,10 +99,10 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Processor.Services
 
             var subject = await context.Subject.FindAsync(import.SubjectId);
 
-            var dataFileStream = await _blobStorageService.StreamBlob(PrivateFilesContainerName, import.File.Path());
+            var dataFileStream = await _blobStorageService.StreamBlob(PrivateReleaseFiles, import.File.Path());
             var dataFileTable = DataTableUtils.CreateFromStream(dataFileStream);
 
-            var metaFileStream = await _blobStorageService.StreamBlob(PrivateFilesContainerName,import.MetaFile.Path());
+            var metaFileStream = await _blobStorageService.StreamBlob(PrivateReleaseFiles, import.MetaFile.Path());
             var metaFileTable = DataTableUtils.CreateFromStream(metaFileStream);
 
             await _importerService.ImportFiltersAndLocations(
@@ -135,7 +135,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Processor.Services
                 return;
             }
 
-            if (import.NumBatches == 1 || await _batchService.GetNumBatchesRemaining(import.FileId) == 0)
+            if (import.NumBatches == 1 || await _batchService.GetNumBatchesRemaining(import.File) == 0)
             {
                 var observationCount = context.Observation.Count(o => o.SubjectId.Equals(import.SubjectId));
 
@@ -159,7 +159,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Processor.Services
             }
             else
             {
-                var numBatchesRemaining = await _batchService.GetNumBatchesRemaining(import.FileId);
+                var numBatchesRemaining = await _batchService.GetNumBatchesRemaining(import.File);
 
                 var percentageComplete = (double) (import.NumBatches - numBatchesRemaining) / import.NumBatches * 100;
 

@@ -7,11 +7,11 @@ import { DependencyList, useEffect, useMemo } from 'react';
 
 export type AsyncHandledRetryStateSetterParam<T> =
   | {
-      isLoading: boolean;
+      isLoading: true;
     }
   | {
       isLoading?: false;
-      value?: T;
+      value: T;
     };
 
 export type AsyncHandledRetryState<T> = OmitStrict<
@@ -35,7 +35,7 @@ export default function useAsyncHandledRetry<T>(
     isLoading: true,
   },
 ): AsyncHandledRetryState<T> {
-  const { handleApiErrors } = useErrorControl();
+  const { handleError } = useErrorControl();
 
   const { error, setState, ...state } = useAsyncRetry(
     task,
@@ -45,9 +45,9 @@ export default function useAsyncHandledRetry<T>(
 
   useEffect(() => {
     if (error) {
-      handleApiErrors(error);
+      handleError(error);
     }
-  }, [error, handleApiErrors]);
+  }, [error, handleError]);
 
   return useMemo(() => {
     return {

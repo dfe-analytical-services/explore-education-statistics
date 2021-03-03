@@ -214,12 +214,13 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin
             services.AddTransient<IFileRepository, FileRepository>();
             services.AddTransient<IDataImportRepository, DataImportRepository>();
             services.AddTransient<IReleaseFileRepository, ReleaseFileRepository>();
+            services.AddTransient<IReleaseDataFileRepository, ReleaseDataFileRepository>();
 
             services.AddTransient<IReleaseDataFileService, ReleaseDataFileService>();
             services.AddTransient<IReleaseFileService, ReleaseFileService>();
+            services.AddTransient<IReleaseImageService, ReleaseImageService>();
             services.AddTransient<IDataImportService, DataImportService>();
             services.AddTransient<IImportStatusBauService, ImportStatusBauService>();
-            services.AddTransient<IMigrateImportsService, MigrateImportsService>();
 
             services.AddTransient<IPublishingService, PublishingService>(provider =>
                 new PublishingService(
@@ -262,6 +263,33 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin
             services.AddTransient<IContentService, ContentService>();
             services.AddTransient<IRelatedInformationService, RelatedInformationService>();
             services.AddTransient<IReplacementService, ReplacementService>();
+            services.AddTransient<IMigrateFilesService, MigrateFilesService>(provider =>
+                {
+                    var privateStorageConnectionString = Configuration.GetValue<string>("CoreStorage");
+                    var publicStorageConnectionString = Configuration.GetValue<string>("PublicStorage");
+
+                    var privateBlobStorageService = new BlobStorageService(
+                        privateStorageConnectionString,
+                        new BlobServiceClient(privateStorageConnectionString),
+                        provider.GetRequiredService<ILogger<BlobStorageService>>()
+                    );
+
+                    var publicBlobStorageService = new BlobStorageService(
+                        publicStorageConnectionString,
+                        new BlobServiceClient(publicStorageConnectionString),
+                        provider.GetRequiredService<ILogger<BlobStorageService>>()
+                    );
+
+                    return new MigrateFilesService(
+                        provider.GetRequiredService<ContentDbContext>(),
+                        privateBlobStorageService: privateBlobStorageService,
+                        publicBlobStorageService: publicBlobStorageService,
+                        provider.GetRequiredService<IReleaseFileRepository>(),
+                        provider.GetRequiredService<IUserService>(),
+                        provider.GetRequiredService<ILogger<MigrateFilesService>>()
+                    );
+                }
+            );
 
             services.AddTransient<INotificationClient>(s =>
             {
@@ -385,11 +413,11 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin
             else
             {
                 app.UseExceptionHandler("/Error");
-                app.UseHsts(options =>
+                app.UseHsts(opts =>
                 {
-                    options.MaxAge(365);
-                    options.IncludeSubdomains();
-                    options.Preload();
+                    opts.MaxAge(365);
+                    opts.IncludeSubdomains();
+                    opts.Preload();
                 });
             }
 
@@ -405,9 +433,9 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin
 
             // Security Headers
             app.UseXContentTypeOptions();
-            app.UseXXssProtection(options => options.EnabledWithBlockMode());
-            app.UseXfo(options => options.SameOrigin());
-            app.UseReferrerPolicy(options => options.NoReferrerWhenDowngrade());
+            app.UseXXssProtection(opts => opts.EnabledWithBlockMode());
+            app.UseXfo(opts => opts.SameOrigin());
+            app.UseReferrerPolicy(opts => opts.NoReferrerWhenDowngrade());
             app.UseCsp(opts => opts
                 .BlockAllMixedContent()
                 .StyleSources(s => s.Self())

@@ -1,10 +1,10 @@
-import useFormSubmit from '@admin/hooks/useFormSubmit';
 import Button from '@common/components/Button';
 import ButtonGroup from '@common/components/ButtonGroup';
 import ButtonText from '@common/components/ButtonText';
 import { Form, FormFieldRadioGroup } from '@common/components/form';
 import FormFieldFileInput from '@common/components/form/FormFieldFileInput';
 import LoadingSpinner from '@common/components/LoadingSpinner';
+import useFormSubmit from '@common/hooks/useFormSubmit';
 import {
   FieldMessageMapper,
   mapFieldErrors,
@@ -177,7 +177,6 @@ const DataFileUploadForm = <FormValues extends DataFileUploadFormValues>({
               {beforeFields}
 
               <FormFieldRadioGroup<DataFileUploadFormValues>
-                id={`${id}-uploadType`}
                 name="uploadType"
                 legend="Choose upload method"
                 options={[
@@ -187,14 +186,12 @@ const DataFileUploadForm = <FormValues extends DataFileUploadFormValues>({
                     conditional: (
                       <>
                         <FormFieldFileInput<DataFileUploadFormValues>
-                          id={`${id}-dataFile`}
                           name="dataFile"
                           label="Upload data file"
                           accept=".csv"
                         />
 
                         <FormFieldFileInput<DataFileUploadFormValues>
-                          id={`${id}-metadataFile`}
                           name="metadataFile"
                           label="Upload metadata file"
                           accept=".csv"
@@ -208,7 +205,6 @@ const DataFileUploadForm = <FormValues extends DataFileUploadFormValues>({
                     value: 'zip',
                     conditional: (
                       <FormFieldFileInput<DataFileUploadFormValues>
-                        id={`${id}-zipFile`}
                         hint="Must contain both the data and metadata CSV files"
                         name="zipFile"
                         label="Upload ZIP file"

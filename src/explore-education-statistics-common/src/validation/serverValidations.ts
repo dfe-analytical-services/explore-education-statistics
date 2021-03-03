@@ -39,24 +39,35 @@ export type FieldMessageMapper<FormValues = unknown> = (
 export function mapFieldErrors<FormValues>(options: {
   target: FieldName<FormValues>;
   source?: string;
-  messages: Dictionary<string>;
+  messages?: Dictionary<string>;
 }): FieldMessageMapper<FormValues> {
   const { target, source, messages } = options;
 
   return error => {
-    if (!messages[error.message]) {
-      return undefined;
-    }
-
     if (source) {
       if (source !== error.sourceField) {
         return undefined;
       }
+
+      // As we know what the source field is, and we
+      // have not provided any `messages` to map to,
+      // we can assume that it is safe to use the
+      // server validation error message instead.
+      if (!messages) {
+        return {
+          targetField: target,
+          message: error.message,
+        };
+      }
+      // Source field may be an empty string in many cases.
+      // This should probably not be happening as validation
+      // errors should usually be associated with a field.
+    } else if (error.sourceField && error.sourceField !== target) {
+      return undefined;
     }
-    // Source field may be an empty string in many cases.
-    // This should probably not be happening as validation
-    // errors should usually be associated with a field.
-    else if (error.sourceField && error.sourceField !== target) {
+
+    // This error message is unmapped
+    if (!messages?.[error.message]) {
       return undefined;
     }
 

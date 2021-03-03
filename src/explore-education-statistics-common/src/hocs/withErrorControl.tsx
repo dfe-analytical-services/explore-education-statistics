@@ -23,13 +23,13 @@ function withErrorControl<P extends ErrorControlState>(
   Component: ComponentType<P>,
 ): (props: Omit<P, keyof ErrorControlState>) => ReactElement {
   const WrappedComponent = (props: Omit<P, keyof ErrorControlState>) => {
-    const { handleApiErrors, handleManualErrors } = useErrorControl();
+    const { handleError, errorPages } = useErrorControl();
 
     return (
       <Component
         {...(props as P)}
-        handleApiErrors={handleApiErrors}
-        handleManualErrors={handleManualErrors}
+        handleError={handleError}
+        errorPages={errorPages}
       />
     );
   };

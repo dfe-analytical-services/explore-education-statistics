@@ -1,8 +1,11 @@
 import ButtonText from '@common/components/ButtonText';
 import useMounted from '@common/hooks/useMounted';
 import { OmitStrict, PartialBy } from '@common/types/util';
+import naturalOrderBy, {
+  OrderDirection,
+  OrderKeys,
+} from '@common/utils/array/naturalOrderBy';
 import classNames from 'classnames';
-import orderBy from 'lodash/orderBy';
 import React, {
   FocusEventHandler,
   memo,
@@ -39,10 +42,8 @@ interface BaseFormCheckboxGroupProps {
   selectAll?: boolean;
   selectAllText?: (isAllChecked: boolean, options: CheckboxOption[]) => string;
   small?: boolean;
-  order?:
-    | (keyof CheckboxOption)[]
-    | ((option: CheckboxOption) => CheckboxOption[keyof CheckboxOption])[];
-  orderDirection?: ('asc' | 'desc')[];
+  order?: OrderKeys<CheckboxOption>;
+  orderDirection?: OrderDirection | OrderDirection[];
   value: string[];
   onAllChange?: CheckboxGroupAllChangeEventHandler;
   onBlur?: FocusEventHandler<HTMLInputElement>;
@@ -117,12 +118,14 @@ export const BaseFormCheckboxGroup = ({
         </ButtonText>
       )}
 
-      {orderBy(options, order, orderDirection).map(option => (
+      {naturalOrderBy(options, order, orderDirection).map(option => (
         <FormCheckbox
           disabled={disabled}
           {...option}
           id={
-            option.id ? option.id : `${id}-${option.value.replace(/\s/g, '-')}`
+            option.id
+              ? `${id}-${option.id}`
+              : `${id}-${option.value.replace(/\s/g, '-')}`
           }
           name={name}
           key={option.value}
@@ -138,7 +141,7 @@ export const BaseFormCheckboxGroup = ({
 };
 
 export type FormCheckboxGroupProps = BaseFormCheckboxGroupProps &
-  OmitStrict<FormFieldsetProps, 'onBlur' | 'onFocus'> & {
+  OmitStrict<FormFieldsetProps, 'useFormId' | 'onBlur' | 'onFocus'> & {
     onFieldsetBlur?: FocusEventHandler<HTMLFieldSetElement>;
     onFieldsetFocus?: FocusEventHandler<HTMLFieldSetElement>;
   };
@@ -149,7 +152,12 @@ const FormCheckboxGroup = ({
   ...props
 }: FormCheckboxGroupProps) => {
   return (
-    <FormFieldset {...props} onBlur={onFieldsetBlur} onFocus={onFieldsetFocus}>
+    <FormFieldset
+      {...props}
+      useFormId={false}
+      onBlur={onFieldsetBlur}
+      onFocus={onFieldsetFocus}
+    >
       <BaseFormCheckboxGroup {...props} />
     </FormFieldset>
   );

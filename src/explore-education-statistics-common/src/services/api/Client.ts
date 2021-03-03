@@ -1,4 +1,5 @@
-import {
+import { CancellablePromise } from '@common/types/promise';
+import Axios, {
   AxiosError,
   AxiosInstance,
   AxiosPromise,
@@ -17,43 +18,53 @@ class Client {
   public get<T = unknown>(
     url: string,
     config?: AxiosRequestConfig,
-  ): Promise<T> {
-    return Client.unboxResponse(this.axios.get(url, config));
+  ): CancellablePromise<T> {
+    return Client.handlePromise(this.axios.get(url, config));
   }
 
   public post<T = unknown>(
     url: string,
     data?: unknown,
     config?: AxiosRequestConfig,
-  ): Promise<T> {
-    return Client.unboxResponse(this.axios.post(url, data, config));
+  ): CancellablePromise<T> {
+    return Client.handlePromise(this.axios.post(url, data, config));
   }
 
   public put<T = unknown>(
     url: string,
     data?: unknown,
     config?: AxiosRequestConfig,
-  ): Promise<T> {
-    return Client.unboxResponse(this.axios.put(url, data, config));
+  ): CancellablePromise<T> {
+    return Client.handlePromise(this.axios.put(url, data, config));
   }
 
   public patch<T = unknown>(
     url: string,
     data?: unknown,
     config?: AxiosRequestConfig,
-  ): Promise<T> {
-    return Client.unboxResponse(this.axios.patch(url, data, config));
+  ): CancellablePromise<T> {
+    return Client.handlePromise(this.axios.patch(url, data, config));
   }
 
   public delete<T = unknown>(
     url: string,
     config?: AxiosRequestConfig,
-  ): Promise<T> {
-    return Client.unboxResponse(this.axios.delete(url, config));
+  ): CancellablePromise<T> {
+    return Client.handlePromise(this.axios.delete(url, config));
   }
 
-  private static unboxResponse<T>(promise: AxiosPromise<T>) {
-    return promise.then(({ data }) => data);
+  private static handlePromise<T>(
+    promise: AxiosPromise<T>,
+  ): CancellablePromise<T> {
+    const cancelToken = Axios.CancelToken.source();
+
+    const cancellablePromise = promise.then(
+      ({ data }) => data,
+    ) as CancellablePromise<T>;
+
+    cancellablePromise.cancel = cancelToken.cancel;
+
+    return cancellablePromise;
   }
 }
 

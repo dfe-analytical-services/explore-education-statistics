@@ -1,5 +1,4 @@
 import FormFieldThemeTopicSelect from '@admin/components/form/FormFieldThemeTopicSelect';
-import useFormSubmit from '@admin/hooks/useFormSubmit';
 import methodologyService from '@admin/services/methodologyService';
 import { ExternalMethodology } from '@admin/services/publicationService';
 import themeService from '@admin/services/themeService';
@@ -12,6 +11,7 @@ import FormFieldSelect from '@common/components/form/FormFieldSelect';
 import FormFieldTextInput from '@common/components/form/FormFieldTextInput';
 import LoadingSpinner from '@common/components/LoadingSpinner';
 import useAsyncHandledRetry from '@common/hooks/useAsyncHandledRetry';
+import useFormSubmit from '@common/hooks/useFormSubmit';
 import { OmitStrict } from '@common/types';
 import { mapFieldErrors } from '@common/validation/serverValidations';
 import Yup from '@common/validation/yup';
@@ -193,7 +193,6 @@ const PublicationForm = ({
       {form => (
         <Form id={id}>
           <FormFieldTextInput<FormValues>
-            id={`${id}-title`}
             label="Publication title"
             name="title"
             className="govuk-!-width-two-thirds"
@@ -210,7 +209,6 @@ const PublicationForm = ({
           )}
 
           <FormFieldRadioGroup<FormValues, FormValues['methodologyChoice']>
-            id={`${id}-methodologyChoice`}
             legend="Choose a methodology for this publication"
             legendSize="m"
             name="methodologyChoice"
@@ -220,15 +218,16 @@ const PublicationForm = ({
                 label: 'Choose an existing methodology',
                 conditional: (
                   <FormFieldSelect<FormValues>
-                    id={`${id}-methodologyId`}
                     name="methodologyId"
                     label="Select methodology"
                     placeholder="Choose a methodology"
                     options={orderBy(
-                      methodologies.map(methodology => ({
-                        label: `${methodology.title} [${methodology.status}]`,
-                        value: methodology.id,
-                      })),
+                      methodologies
+                        .filter(methodology => methodology.status !== 'Draft')
+                        .map(methodology => ({
+                          label: `${methodology.title} [${methodology.status}]`,
+                          value: methodology.id,
+                        })),
                       'label',
                     )}
                     order={[]}
@@ -242,13 +241,11 @@ const PublicationForm = ({
                   <FormGroup>
                     <FormFieldTextInput
                       label="Link title"
-                      id={`${id}-externalMethodologyTitle`}
                       name="externalMethodology.title"
                       className="govuk-!-width-two-thirds"
                     />
                     <FormFieldTextInput
                       label="URL"
-                      id={`${id}-externalMethodologyUrl`}
                       name="externalMethodology.url"
                       className="govuk-!-width-two-thirds"
                     />
@@ -295,35 +292,31 @@ const PublicationForm = ({
             }}
           />
           <FormFieldset
-            id={`${id}-contact`}
+            id="contact"
             legend="Contact for this publication"
             legendSize="m"
             hint="They will be the main point of contact for data and methodology enquiries for this publication and its releases."
           >
             <FormFieldTextInput<FormValues>
               name="teamName"
-              id={`${id}-teamName`}
               label="Team name"
               className="govuk-!-width-one-half"
             />
 
             <FormFieldTextInput<FormValues>
               name="teamEmail"
-              id={`${id}-teamEmail`}
               label="Team email address"
               className="govuk-!-width-one-half"
             />
 
             <FormFieldTextInput<FormValues>
               name="contactName"
-              id={`${id}-contactName`}
               label="Contact name"
               className="govuk-!-width-one-half"
             />
 
             <FormFieldTextInput<FormValues>
               name="contactTelNo"
-              id={`${id}-contactTelNo`}
               label="Contact telephone number"
               width={10}
             />

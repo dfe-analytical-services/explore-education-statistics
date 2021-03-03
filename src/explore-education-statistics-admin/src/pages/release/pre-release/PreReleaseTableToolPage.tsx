@@ -17,7 +17,6 @@ import WizardStepHeading from '@common/modules/table-tool/components/WizardStepH
 import mapFullTable from '@common/modules/table-tool/utils/mapFullTable';
 import mapTableHeadersConfig from '@common/modules/table-tool/utils/mapTableHeadersConfig';
 import tableBuilderService from '@common/services/tableBuilderService';
-import orderBy from 'lodash/orderBy';
 import React from 'react';
 import { RouteComponentProps } from 'react-router';
 import { generatePath } from 'react-router-dom';
@@ -39,7 +38,7 @@ const PreReleaseTableToolPage = ({
       releaseId,
     );
 
-    const highlights = orderBy(release.highlights, ['label'], ['asc']).filter(
+    const highlights = release.highlights.filter(
       highlight => highlight.id !== dataBlockId,
     );
 
@@ -112,31 +111,19 @@ const PreReleaseTableToolPage = ({
             scrollOnMount
             themeMeta={[]}
             initialState={tableToolState}
-            renderHighlights={highlights => (
-              <aside>
-                <h3>Table highlights</h3>
-
-                <p>View popular tables related to this publication:</p>
-
-                <ul>
-                  {highlights.map(highlight => (
-                    <li key={highlight.id}>
-                      <Link
-                        to={generatePath<PreReleaseTableToolRouteParams>(
-                          preReleaseTableToolRoute.path,
-                          {
-                            publicationId,
-                            releaseId,
-                            dataBlockId: highlight.id,
-                          },
-                        )}
-                      >
-                        {highlight.label}
-                      </Link>
-                    </li>
-                  ))}
-                </ul>
-              </aside>
+            renderHighlightLink={highlight => (
+              <Link
+                to={generatePath<PreReleaseTableToolRouteParams>(
+                  preReleaseTableToolRoute.path,
+                  {
+                    publicationId,
+                    releaseId,
+                    dataBlockId: highlight.id,
+                  },
+                )}
+              >
+                {highlight.name}
+              </Link>
             )}
             finalStep={({ response, query }) => (
               <WizardStep>

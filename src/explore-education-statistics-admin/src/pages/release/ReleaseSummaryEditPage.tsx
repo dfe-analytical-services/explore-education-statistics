@@ -1,18 +1,19 @@
-import useFormSubmit from '@admin/hooks/useFormSubmit';
+import { useLastLocation } from '@admin/contexts/LastLocationContext';
 import ReleaseSummaryForm, {
   ReleaseSummaryFormValues,
 } from '@admin/pages/release/components/ReleaseSummaryForm';
-import { useManageReleaseContext } from '@admin/pages/release/contexts/ManageReleaseContext';
+import { useReleaseContext } from '@admin/pages/release/contexts/ReleaseContext';
 import {
   ReleaseRouteParams,
   releaseSummaryRoute,
 } from '@admin/routes/releaseRoutes';
 import releaseService from '@admin/services/releaseService';
+import useFormSubmit from '@common/hooks/useFormSubmit';
 import { mapFieldErrors } from '@common/validation/serverValidations';
 import LoadingSpinner from '@common/components/LoadingSpinner';
 import useAsyncRetry from '@common/hooks/useAsyncRetry';
 import React from 'react';
-import { generatePath, RouteComponentProps } from 'react-router';
+import { generatePath, RouteComponentProps, useLocation } from 'react-router';
 
 const errorMappings = [
   mapFieldErrors<ReleaseSummaryFormValues>({
@@ -25,10 +26,20 @@ const errorMappings = [
 ];
 
 const ReleaseSummaryEditPage = ({ history }: RouteComponentProps) => {
-  const { releaseId, publication } = useManageReleaseContext();
+  const location = useLocation();
+  const lastLocation = useLastLocation();
+
+  const {
+    releaseId,
+    release: contextRelease,
+    onReleaseChange,
+  } = useReleaseContext();
 
   const { value: release, isLoading } = useAsyncRetry(
-    () => releaseService.getRelease(releaseId),
+    async () =>
+      lastLocation && lastLocation !== location
+        ? releaseService.getRelease(releaseId)
+        : contextRelease,
     [releaseId],
   );
 
@@ -37,7 +48,7 @@ const ReleaseSummaryEditPage = ({ history }: RouteComponentProps) => {
       throw new Error('Could not update missing release');
     }
 
-    await releaseService.updateRelease(releaseId, {
+    const nextRelease = await releaseService.updateRelease(releaseId, {
       ...release,
       timePeriodCoverage: {
         value: values.timePeriodCoverageCode,
@@ -46,27 +57,34 @@ const ReleaseSummaryEditPage = ({ history }: RouteComponentProps) => {
       typeId: values.releaseTypeId,
     });
 
+    onReleaseChange(nextRelease);
+
     history.push(
       generatePath<ReleaseRouteParams>(releaseSummaryRoute.path, {
-        publicationId: publication.id,
+        publicationId: release.publicationId,
         releaseId,
       }),
     );
   }, errorMappings);
 
-  const handleCancel = () =>
+  const handleCancel = () => {
+    if (!release) {
+      return;
+    }
+
     history.push(
       generatePath<ReleaseRouteParams>(releaseSummaryRoute.path, {
-        publicationId: publication.id,
+        publicationId: release.publicationId,
         releaseId,
       }),
     );
+  };
 
   return (
     <LoadingSpinner loading={isLoading}>
       {release && (
         <>
-          <h2 className="govuk-heading-l">Edit release summary</h2>
+          <h2>Edit release summary</h2>
 
           <ReleaseSummaryForm<ReleaseSummaryFormValues>
             submitText="Update release summary"

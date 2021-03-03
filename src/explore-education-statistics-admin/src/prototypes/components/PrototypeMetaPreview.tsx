@@ -2,7 +2,7 @@ import PageTitle from '@admin/components/PageTitle';
 import React from 'react';
 import Accordion from '@common/components/Accordion';
 import AccordionSection from '@common/components/AccordionSection';
-import SanitizeHtml from '@common/components/SanitizeHtml';
+import ContentHtml from '@common/components/ContentHtml';
 import SummaryList from '@common/components/SummaryList';
 import SummaryListItem from '@common/components/SummaryListItem';
 import WarningMessage from '@common/components/WarningMessage';
@@ -34,7 +34,7 @@ const PrototypeMetaPreview = ({ description, showDialog }: Props) => {
         <h3 className="govuk-heading-s">Published 23 July 2020</h3>
 
         <div className="govuk-!-margin-top-9 govuk-!-margin-bottom-9">
-          <SanitizeHtml dirtyHtml={description || ''} />
+          <ContentHtml html={description || ''} />
         </div>
 
         <h2 className="govuk-heading-m govuk-!-margin-top-9">Data files</h2>

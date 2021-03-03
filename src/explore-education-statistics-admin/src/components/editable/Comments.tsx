@@ -1,5 +1,5 @@
 import { useAuthContext } from '@admin/contexts/AuthContext';
-import { useManageReleaseContext } from '@admin/pages/release/contexts/ManageReleaseContext';
+import { useReleaseContext } from '@admin/pages/release/contexts/ReleaseContext';
 import releaseContentCommentService, {
   AddComment,
   UpdateComment,
@@ -45,7 +45,7 @@ const Comments = ({
 }: Props) => {
   const [editingComment, setEditingComment] = useState<Comment>();
   const { user } = useAuthContext();
-  const { releaseId } = useManageReleaseContext();
+  const { releaseId } = useReleaseContext();
 
   const addComment = (content: string) => {
     const additionalComment: AddComment = {
@@ -122,7 +122,6 @@ const Comments = ({
               <FormFieldTextArea<FormValues>
                 label="Comment"
                 name="content"
-                id={`${blockId}-addCommentForm-content`}
                 rows={3}
               />
 

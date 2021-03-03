@@ -1,8 +1,10 @@
+import { Form } from '@common/components/form';
 import Yup from '@common/validation/yup';
 import { waitFor } from '@testing-library/dom';
 import { fireEvent, render, screen } from '@testing-library/react';
 import userEvent from '@testing-library/user-event';
 import { Formik } from 'formik';
+import noop from 'lodash/noop';
 import React from 'react';
 import FormFieldRadioGroup from '../FormFieldRadioGroup';
 
@@ -11,13 +13,153 @@ describe('FormFieldRadioGroup', () => {
     test: string;
   }
 
+  test('renders with correct default ids without form', () => {
+    render(
+      <Formik<FormValues>
+        initialValues={{
+          test: '',
+        }}
+        onSubmit={noop}
+      >
+        <FormFieldRadioGroup<FormValues>
+          name="test"
+          legend="Test radios"
+          options={[
+            { value: '1', label: 'Radio 1' },
+            { value: '2', label: 'Radio 2' },
+            { value: '3', label: 'Radio 3' },
+          ]}
+        />
+      </Formik>,
+    );
+
+    expect(screen.getByRole('group')).toHaveAttribute('id', 'test');
+    expect(screen.getByLabelText('Radio 1')).toHaveAttribute('id', 'test-1');
+    expect(screen.getByLabelText('Radio 2')).toHaveAttribute('id', 'test-2');
+    expect(screen.getByLabelText('Radio 3')).toHaveAttribute('id', 'test-3');
+  });
+
+  test('renders with correct default ids with form', () => {
+    render(
+      <Formik<FormValues>
+        initialValues={{
+          test: '',
+        }}
+        onSubmit={noop}
+      >
+        <Form id="testForm">
+          <FormFieldRadioGroup<FormValues>
+            name="test"
+            legend="Test radios"
+            options={[
+              { value: '1', label: 'Radio 1' },
+              { value: '2', label: 'Radio 2' },
+              { value: '3', label: 'Radio 3' },
+            ]}
+          />
+        </Form>
+      </Formik>,
+    );
+
+    expect(screen.getByRole('group')).toHaveAttribute('id', 'testForm-test');
+    expect(screen.getByLabelText('Radio 1')).toHaveAttribute(
+      'id',
+      'testForm-test-1',
+    );
+    expect(screen.getByLabelText('Radio 2')).toHaveAttribute(
+      'id',
+      'testForm-test-2',
+    );
+    expect(screen.getByLabelText('Radio 3')).toHaveAttribute(
+      'id',
+      'testForm-test-3',
+    );
+  });
+
+  test('renders with correct custom ids with form', () => {
+    render(
+      <Formik<FormValues>
+        initialValues={{
+          test: '',
+        }}
+        onSubmit={noop}
+      >
+        <Form id="testForm">
+          <FormFieldRadioGroup<FormValues>
+            name="test"
+            id="customId"
+            legend="Test radios"
+            options={[
+              { value: '1', label: 'Radio 1' },
+              { value: '2', label: 'Radio 2' },
+              { id: 'customOption', value: '3', label: 'Radio 3' },
+            ]}
+          />
+        </Form>
+      </Formik>,
+    );
+
+    expect(screen.getByRole('group')).toHaveAttribute(
+      'id',
+      'testForm-customId',
+    );
+    expect(screen.getByLabelText('Radio 1')).toHaveAttribute(
+      'id',
+      'testForm-customId-1',
+    );
+    expect(screen.getByLabelText('Radio 2')).toHaveAttribute(
+      'id',
+      'testForm-customId-2',
+    );
+    expect(screen.getByLabelText('Radio 3')).toHaveAttribute(
+      'id',
+      'testForm-customId-customOption',
+    );
+  });
+
+  test('renders with correct custom ids without form', () => {
+    render(
+      <Formik<FormValues>
+        initialValues={{
+          test: '',
+        }}
+        onSubmit={noop}
+      >
+        <FormFieldRadioGroup<FormValues>
+          name="test"
+          id="customId"
+          legend="Test radios"
+          options={[
+            { value: '1', label: 'Radio 1' },
+            { value: '2', label: 'Radio 2' },
+            { id: 'customOption', value: '3', label: 'Radio 3' },
+          ]}
+        />
+      </Formik>,
+    );
+
+    expect(screen.getByRole('group')).toHaveAttribute('id', 'customId');
+    expect(screen.getByLabelText('Radio 1')).toHaveAttribute(
+      'id',
+      'customId-1',
+    );
+    expect(screen.getByLabelText('Radio 2')).toHaveAttribute(
+      'id',
+      'customId-2',
+    );
+    expect(screen.getByLabelText('Radio 3')).toHaveAttribute(
+      'id',
+      'customId-customOption',
+    );
+  });
+
   test('checking an option checks it', async () => {
     render(
       <Formik
         initialValues={{
           test: '',
         }}
-        onSubmit={() => undefined}
+        onSubmit={noop}
       >
         {() => (
           <FormFieldRadioGroup<FormValues>
@@ -49,7 +191,7 @@ describe('FormFieldRadioGroup', () => {
         initialValues={{
           test: '1',
         }}
-        onSubmit={() => undefined}
+        onSubmit={noop}
       >
         {() => (
           <FormFieldRadioGroup<FormValues>
@@ -85,7 +227,7 @@ describe('FormFieldRadioGroup', () => {
           initialValues={{
             test: '',
           }}
-          onSubmit={() => undefined}
+          onSubmit={noop}
           validationSchema={Yup.object({
             test: Yup.array().required('Select at least one option'),
           })}
@@ -126,7 +268,7 @@ describe('FormFieldRadioGroup', () => {
           initialValues={{
             test: '',
           }}
-          onSubmit={() => undefined}
+          onSubmit={noop}
           validationSchema={Yup.object({
             test: Yup.array().required('Select at least one option'),
           })}
@@ -162,7 +304,7 @@ describe('FormFieldRadioGroup', () => {
           initialValues={{
             test: '',
           }}
-          onSubmit={() => undefined}
+          onSubmit={noop}
           validationSchema={Yup.object({
             test: Yup.array().required('Select at least one option'),
           })}
@@ -191,7 +333,7 @@ describe('FormFieldRadioGroup', () => {
           initialValues={{
             test: '',
           }}
-          onSubmit={() => undefined}
+          onSubmit={noop}
           validationSchema={Yup.object({
             test: Yup.array().required('Select at least one option'),
           })}

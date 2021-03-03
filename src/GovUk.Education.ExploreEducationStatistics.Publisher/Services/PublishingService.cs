@@ -3,7 +3,7 @@ using System.Threading.Tasks;
 using GovUk.Education.ExploreEducationStatistics.Common.Model;
 using GovUk.Education.ExploreEducationStatistics.Publisher.Models;
 using GovUk.Education.ExploreEducationStatistics.Publisher.Services.Interfaces;
-using static GovUk.Education.ExploreEducationStatistics.Common.BlobContainerNames;
+using static GovUk.Education.ExploreEducationStatistics.Common.BlobContainers;
 using static GovUk.Education.ExploreEducationStatistics.Common.Model.FileType;
 using static GovUk.Education.ExploreEducationStatistics.Common.Services.FileStoragePathUtils;
 
@@ -40,7 +40,8 @@ namespace GovUk.Education.ExploreEducationStatistics.Publisher.Services
                 Files = await _releaseService.GetFiles(releaseId,
                     Ancillary,
                     Chart,
-                    FileType.Data)
+                    FileType.Data,
+                    Image)
             };
             await _fileStorageService.CopyReleaseFilesToPublicContainer(copyReleaseCommand);
         }

@@ -16,10 +16,11 @@ function FormFieldCheckboxGroup<FormValues>(props: Props<FormValues>) {
 
   return (
     <FormField<string[]> {...props} formGroup={false}>
-      {({ field, helpers, meta }) => (
+      {({ id, field, helpers, meta }) => (
         <FormCheckboxGroup
           {...props}
           {...field}
+          id={id}
           onAllChange={(event, checked) => {
             if (props.onAllChange) {
               props.onAllChange(event, checked);

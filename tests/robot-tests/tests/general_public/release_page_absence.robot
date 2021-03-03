@@ -12,64 +12,62 @@ Navigate to Absence publication
     [Tags]  HappyPath
     environment variable should be set  PUBLIC_URL
     user goes to url  %{PUBLIC_URL}
-    user waits until page contains  Select an option to find the national and regional
+    user waits until page contains  Explore our statistics and data
 
-    user clicks link  Find statistics and data
+    user clicks link  Explore
     user waits until page contains  Browse to find the statistics and data you’re looking for
     user waits for page to finish loading
 
     user opens accordion section  Pupils and schools
     user opens details dropdown   Pupil absence
     user clicks testid element  View stats link for Pupil absence in schools in England
+
+Validate title
+    [Tags]  HappyPath
     user waits until h1 is visible  Pupil absence in schools in England
+    user waits until page contains title caption  Academic Year 2016/17
 
 Validate URL
-    [Documentation]  DFE-325
     [Tags]  HappyPath
     user checks url contains  %{PUBLIC_URL}/find-statistics/pupil-absence-in-schools-in-england
 
 Validate Published date
     [Tags]     HappyPath    NotAgainstPreProd    Failing
-    user checks testid element contains   published-date   25 April 2018
+    user checks summary list contains  Published date  25 April 2018
 
 Validate Next update date
     [Tags]     HappyPath    NotAgainstPreProd
-    user checks testid element contains   next-update      22 March 2019
+    user checks summary list contains  Next update  22 March 2019
 
 Validate Email alerts link
     [Tags]     HappyPath
     user checks page contains link with text and url  Sign up for email alerts    /subscriptions?slug=pupil-absence-in-schools-in-england
 
-Validate "About these statistics" -- "For Academic Year:"
-    [Documentation]  DFE-197 DFE-845
-    [Tags]  HappyPath
-    user checks testid element contains   release-name    2016/17
-
 Validate "About these statistics" -- Number of other releases
     [Tags]  HappyPath
     user checks number of other releases is correct   6
-    user opens details dropdown     See 6 other releases
+    user opens details dropdown     See other releases (6)
     user checks other release is shown in position  Academic Year 2014/15    1
     user checks other release is shown in position  Academic Year 2013/14    2
     user checks other release is shown in position  Academic Year 2012/13    3
     user checks other release is shown in position  Academic Year 2011/12    4
     user checks other release is shown in position  Academic Year 2010/11    5
     user checks other release is shown in position  Academic Year 2009/10    6
-    user closes details dropdown   See 6 other releases
+    user closes details dropdown   See other releases (6)
 
 Validate "About these statistics" -- "Last updated"
     [Tags]    HappyPath
-    user waits until element contains  id:releaseLastUpdated     19 April 2018
+    user checks summary list contains  Last updated  19 April 2018
 
     user checks number of release updates     2
-    user opens details dropdown   See all 2 updates
+    user opens details dropdown   See all updates (2)
     user checks release update   1  19 April 2018   Underlying data file updated to include absence
     user checks release update   2  22 March 2018   First published.
-    user closes details dropdown   See all 2 updates
+    user closes details dropdown   See all updates (2)
 
 Validate "Related guidance"
     [Tags]  HappyPath
-    user checks page contains link with text and url  Pupil absence in schools in England: methodology   /methodology/pupil-absence-in-schools-in-england
+    user checks page contains link with text and url  Methodology   /methodology/pupil-absence-in-schools-in-england
 
 Validate subject files file type and file unit style
     [Documentation]  DFE-958   DFE-562
@@ -191,22 +189,23 @@ Validate Key Statistics data block -- Data tables tab
 
 Validate accordion sections order
     [Tags]  HappyPath
-    user checks accordion is in position  About these statistics            1
-    user checks accordion is in position  Pupil absence rates               2
-    user checks accordion is in position  Persistent absence                3
-    user checks accordion is in position  Reasons for absence               4
-    user checks accordion is in position  Distribution of absence           5
-    user checks accordion is in position  Absence by pupil characteristics  6
-    user checks accordion is in position  Absence for 4-year-olds           7
-    user checks accordion is in position  Pupil referral unit absence       8
-    user checks accordion is in position  Regional and local authority (LA) breakdown  9
-    user checks accordion is in position  Methodology                       10
-    user checks accordion is in position  Contact us                        11
+    user checks accordion is in position  About these statistics            1  id:content
+    user checks accordion is in position  Pupil absence rates               2  id:content
+    user checks accordion is in position  Persistent absence                3  id:content
+    user checks accordion is in position  Reasons for absence               4  id:content
+    user checks accordion is in position  Distribution of absence           5  id:content
+    user checks accordion is in position  Absence by pupil characteristics  6  id:content
+    user checks accordion is in position  Absence for 4-year-olds           7  id:content
+    user checks accordion is in position  Pupil referral unit absence       8  id:content
+    user checks accordion is in position  Regional and local authority (LA) breakdown  9  id:content
+
+    user checks accordion is in position  Methodology                       1  id:help-and-support
+    user checks accordion is in position  Contact us                        2  id:help-and-support
 
 Validate Regional and local authority (LA) breakdown table
     [Tags]  HappyPath   Failing
     [Documentation]  BAU-540
-    user opens accordion section  Regional and local authority (LA) breakdown
+    user opens accordion section  Regional and local authority (LA) breakdown  id:content
     user waits until element contains  css:#content_9_datablock-tables [data-testid="dataTableCaption"]    Table showing 'Absence by characteristic' from 'Pupil absence in schools in England' in
 
     user checks table column heading contains  1   1   2016/17  css:#content_9_datablock-tables table
@@ -243,8 +242,8 @@ Validate Regional and local authority (LA) breakdown table
 
 Validate Regional and local authority (LA) breakdown chart
     [Tags]  HappyPath
-    user opens accordion section  Regional and local authority (LA) breakdown
-    user scrolls to accordion section content  Regional and local authority (LA) breakdown
+    user opens accordion section  Regional and local authority (LA) breakdown  id:content
+    user scrolls to accordion section content  Regional and local authority (LA) breakdown  id:content
 
     ${datablock}=  set variable  css:[data-testid="Data block - Generic data block - LA"]
     user waits until element contains map chart  ${datablock}

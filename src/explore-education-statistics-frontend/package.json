@@ -14,7 +14,7 @@
     "express": "^4.17.1",
     "express-basic-auth": "^1.2.0",
     "formik": "^2.1.7",
-    "govuk-frontend": "^3.9.1",
+    "govuk-frontend": "^3.11.0",
     "helmet": "^4.1.1",
     "immer": "^7.0.9",
     "leaflet": "^1.7.1",
@@ -124,6 +124,7 @@
       "src/**/*.{js,jsx,ts,tsx}",
       "!src/**/*.d.ts"
     ],
+    "setupFiles": ["dotenv/config"],
     "setupFilesAfterEnv": [
       "<rootDir>/test/setupTests.js"
     ],

@@ -1,46 +1,37 @@
-using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
 using GovUk.Education.ExploreEducationStatistics.Common.Model;
 using GovUk.Education.ExploreEducationStatistics.Common.Services.Interfaces;
-using GovUk.Education.ExploreEducationStatistics.Content.Model.Database;
+using GovUk.Education.ExploreEducationStatistics.Content.Model;
+using GovUk.Education.ExploreEducationStatistics.Content.Model.Extensions;
 using GovUk.Education.ExploreEducationStatistics.Data.Processor.Services.Interfaces;
-using static GovUk.Education.ExploreEducationStatistics.Common.BlobContainerNames;
-using static GovUk.Education.ExploreEducationStatistics.Common.Services.FileStoragePathUtils;
+using static GovUk.Education.ExploreEducationStatistics.Common.BlobContainers;
 
 namespace GovUk.Education.ExploreEducationStatistics.Data.Processor.Services
 {
     public class BatchService : IBatchService
     {
-        private readonly ContentDbContext _contentDbContext;
         private readonly IBlobStorageService _blobStorageService;
 
-        public BatchService(ContentDbContext contentDbContext,
-            IBlobStorageService blobStorageService)
+        public BatchService(IBlobStorageService blobStorageService)
         {
-            _contentDbContext = contentDbContext;
             _blobStorageService = blobStorageService;
         }
 
-        public async Task<int> GetNumBatchesRemaining(Guid fileId)
+        public async Task<int> GetNumBatchesRemaining(File dataFile)
         {
-            var batchFiles = await GetBatchFilesForDataFile(fileId);
+            var batchFiles = await GetBatchFilesForDataFile(dataFile);
             return batchFiles.Count;
         }
 
-        public async Task<List<BlobInfo>> GetBatchFilesForDataFile(Guid fileId)
+        public async Task<List<BlobInfo>> GetBatchFilesForDataFile(File dataFile)
         {
-            var file = await _contentDbContext.Files.FindAsync(fileId);
-
             var blobs = await _blobStorageService.ListBlobs(
-                PrivateFilesContainerName,
-                AdminReleaseBatchesDirectoryPath(file.ReleaseId)
-            );
+                PrivateReleaseFiles,
+                dataFile.BatchesPath());
 
-            return blobs.Where(blob =>
-                    IsBatchFileForDataFile(file.ReleaseId, file.Filename, blob.Path))
-                .ToList();
+            return blobs.ToList();
         }
     }
 }

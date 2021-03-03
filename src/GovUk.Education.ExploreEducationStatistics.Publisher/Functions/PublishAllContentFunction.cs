@@ -35,18 +35,22 @@ namespace GovUk.Education.ExploreEducationStatistics.Publisher.Functions
             ExecutionContext executionContext,
             ILogger logger)
         {
-            logger.LogInformation($"{executionContext.FunctionName} triggered: {message}");
+            logger.LogInformation("{0} triggered: {1}",
+                executionContext.FunctionName,
+                message.ToString());
             try
             {
                 await _contentService.UpdateAllContentAsync();
             }
             catch (Exception e)
             {
-                logger.LogError(e, $"Exception occured while executing {executionContext.FunctionName}");
+                logger.LogError(e, "Exception occured while executing {0}",
+                    executionContext.FunctionName);
                 throw;
             }
 
-            logger.LogInformation($"{executionContext.FunctionName} completed");
+            logger.LogInformation("{0} completed",
+                executionContext.FunctionName);
         }
     }
 }

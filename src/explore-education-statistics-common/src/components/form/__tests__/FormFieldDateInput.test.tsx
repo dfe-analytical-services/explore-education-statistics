@@ -1,6 +1,8 @@
+import { Form } from '@common/components/form';
 import FormFieldDateInput from '@common/components/form/FormFieldDateInput';
 import { PartialDate } from '@common/utils/date/partialDate';
-import { fireEvent, render, screen } from '@testing-library/react';
+import { render, screen, within } from '@testing-library/react';
+import userEvent from '@testing-library/user-event';
 import { Formik } from 'formik';
 import noop from 'lodash/noop';
 import React from 'react';
@@ -21,7 +23,7 @@ describe('FormFieldDateInput', () => {
   });
 
   test('renders with an error message correctly', () => {
-    const { container } = render(
+    render(
       <Formik
         initialValues={{}}
         initialErrors={{
@@ -40,7 +42,7 @@ describe('FormFieldDateInput', () => {
       </Formik>,
     );
 
-    expect(container.querySelector('fieldset')).toHaveAttribute(
+    expect(screen.getByRole('group')).toHaveAttribute(
       'aria-describedby',
       'startDate-error',
     );
@@ -51,7 +53,7 @@ describe('FormFieldDateInput', () => {
   });
 
   test('renders with a hint correctly', () => {
-    const { container } = render(
+    render(
       <Formik initialValues={{}} onSubmit={noop}>
         <FormFieldDateInput
           legend="Start date"
@@ -62,7 +64,7 @@ describe('FormFieldDateInput', () => {
       </Formik>,
     );
 
-    expect(container.querySelector('fieldset')).toHaveAttribute(
+    expect(screen.getByRole('group')).toHaveAttribute(
       'aria-describedby',
       'startDate-hint',
     );
@@ -73,7 +75,7 @@ describe('FormFieldDateInput', () => {
   });
 
   test('renders with a hint and error correctly', () => {
-    const { container } = render(
+    render(
       <Formik
         initialValues={{}}
         initialErrors={{
@@ -93,7 +95,7 @@ describe('FormFieldDateInput', () => {
       </Formik>,
     );
 
-    expect(container.querySelector('fieldset')).toHaveAttribute(
+    expect(screen.getByRole('group')).toHaveAttribute(
       'aria-describedby',
       'startDate-error startDate-hint',
     );
@@ -107,7 +109,177 @@ describe('FormFieldDateInput', () => {
     );
   });
 
-  test('sets a valid UTC date as a form value', () => {
+  test('renders with correct defaults ids with form', () => {
+    render(
+      <Formik
+        initialValues={{}}
+        initialErrors={{
+          startDate: 'The date is wrong',
+        }}
+        initialTouched={{
+          startDate: true,
+        }}
+        onSubmit={noop}
+      >
+        <Form id="testForm">
+          <FormFieldDateInput
+            legend="Start date"
+            hint="Test hint"
+            name="startDate"
+          />
+        </Form>
+      </Formik>,
+    );
+
+    const group = within(screen.getByRole('group'));
+
+    expect(group.getByText('Test hint')).toHaveAttribute(
+      'id',
+      'testForm-startDate-hint',
+    );
+    expect(group.getByText('The date is wrong')).toHaveAttribute(
+      'id',
+      'testForm-startDate-error',
+    );
+    expect(group.getByLabelText('Day')).toHaveAttribute(
+      'id',
+      'testForm-startDate-day',
+    );
+    expect(group.getByLabelText('Month')).toHaveAttribute(
+      'id',
+      'testForm-startDate-month',
+    );
+    expect(group.getByLabelText('Year')).toHaveAttribute(
+      'id',
+      'testForm-startDate-year',
+    );
+  });
+
+  test('renders with correct defaults ids without form', () => {
+    render(
+      <Formik
+        initialValues={{}}
+        initialErrors={{
+          startDate: 'The date is wrong',
+        }}
+        initialTouched={{
+          startDate: true,
+        }}
+        onSubmit={noop}
+      >
+        <FormFieldDateInput
+          legend="Start date"
+          hint="Test hint"
+          name="startDate"
+        />
+      </Formik>,
+    );
+
+    const group = within(screen.getByRole('group'));
+
+    expect(group.getByText('Test hint')).toHaveAttribute(
+      'id',
+      'startDate-hint',
+    );
+    expect(group.getByText('The date is wrong')).toHaveAttribute(
+      'id',
+      'startDate-error',
+    );
+    expect(group.getByLabelText('Day')).toHaveAttribute('id', 'startDate-day');
+    expect(group.getByLabelText('Month')).toHaveAttribute(
+      'id',
+      'startDate-month',
+    );
+    expect(group.getByLabelText('Year')).toHaveAttribute(
+      'id',
+      'startDate-year',
+    );
+  });
+
+  test('renders with correct custom ids with form', () => {
+    render(
+      <Formik
+        initialValues={{}}
+        initialErrors={{
+          startDate: 'The date is wrong',
+        }}
+        initialTouched={{
+          startDate: true,
+        }}
+        onSubmit={noop}
+      >
+        <Form id="testForm">
+          <FormFieldDateInput
+            legend="Start date"
+            hint="Test hint"
+            name="startDate"
+            id="customId"
+          />
+        </Form>
+      </Formik>,
+    );
+
+    const group = within(screen.getByRole('group'));
+
+    expect(group.getByText('Test hint')).toHaveAttribute(
+      'id',
+      'testForm-customId-hint',
+    );
+    expect(group.getByText('The date is wrong')).toHaveAttribute(
+      'id',
+      'testForm-customId-error',
+    );
+    expect(group.getByLabelText('Day')).toHaveAttribute(
+      'id',
+      'testForm-customId-day',
+    );
+    expect(group.getByLabelText('Month')).toHaveAttribute(
+      'id',
+      'testForm-customId-month',
+    );
+    expect(group.getByLabelText('Year')).toHaveAttribute(
+      'id',
+      'testForm-customId-year',
+    );
+  });
+
+  test('renders with correct custom ids without form', () => {
+    render(
+      <Formik
+        initialValues={{}}
+        initialErrors={{
+          startDate: 'The date is wrong',
+        }}
+        initialTouched={{
+          startDate: true,
+        }}
+        onSubmit={noop}
+      >
+        <FormFieldDateInput
+          legend="Start date"
+          hint="Test hint"
+          name="startDate"
+          id="customId"
+        />
+      </Formik>,
+    );
+
+    const group = within(screen.getByRole('group'));
+
+    expect(group.getByText('Test hint')).toHaveAttribute('id', 'customId-hint');
+    expect(group.getByText('The date is wrong')).toHaveAttribute(
+      'id',
+      'customId-error',
+    );
+    expect(group.getByLabelText('Day')).toHaveAttribute('id', 'customId-day');
+    expect(group.getByLabelText('Month')).toHaveAttribute(
+      'id',
+      'customId-month',
+    );
+    expect(group.getByLabelText('Year')).toHaveAttribute('id', 'customId-year');
+  });
+
+  test('sets a valid UTC date as a form value', async () => {
     const onChange = jest.fn();
 
     render(
@@ -126,23 +298,9 @@ describe('FormFieldDateInput', () => {
       </Formik>,
     );
 
-    fireEvent.change(screen.getByLabelText('Day'), {
-      target: {
-        value: 10,
-      },
-    });
-
-    fireEvent.change(screen.getByLabelText('Month'), {
-      target: {
-        value: 12,
-      },
-    });
-
-    fireEvent.change(screen.getByLabelText('Year'), {
-      target: {
-        value: 2020,
-      },
-    });
+    await userEvent.type(screen.getByLabelText('Day'), '10');
+    await userEvent.type(screen.getByLabelText('Month'), '12');
+    await userEvent.type(screen.getByLabelText('Year'), '2020');
 
     expect(screen.getByLabelText('Day')).toHaveValue(10);
     expect(screen.getByLabelText('Month')).toHaveValue(12);
@@ -151,7 +309,7 @@ describe('FormFieldDateInput', () => {
     expect(onChange).toHaveBeenCalledWith(new Date('2020-12-10T00:00:00.000Z'));
   });
 
-  test('does not set an invalid date as a form value', () => {
+  test('does not set an invalid date as a form value', async () => {
     const onChange = jest.fn();
 
     render(
@@ -170,23 +328,9 @@ describe('FormFieldDateInput', () => {
       </Formik>,
     );
 
-    fireEvent.change(screen.getByLabelText('Day'), {
-      target: {
-        value: 32,
-      },
-    });
-
-    fireEvent.change(screen.getByLabelText('Month'), {
-      target: {
-        value: 12,
-      },
-    });
-
-    fireEvent.change(screen.getByLabelText('Year'), {
-      target: {
-        value: 2020,
-      },
-    });
+    await userEvent.type(screen.getByLabelText('Day'), '32');
+    await userEvent.type(screen.getByLabelText('Month'), '12');
+    await userEvent.type(screen.getByLabelText('Year'), '2020');
 
     expect(screen.getByLabelText('Day')).toHaveValue(32);
     expect(screen.getByLabelText('Month')).toHaveValue(12);
@@ -195,7 +339,7 @@ describe('FormFieldDateInput', () => {
     expect(onChange).toHaveBeenCalledWith(undefined);
   });
 
-  test('does not set a partial date as a form value', () => {
+  test('does not set a partial date as a form value', async () => {
     const onChange = jest.fn();
 
     render(
@@ -214,11 +358,7 @@ describe('FormFieldDateInput', () => {
       </Formik>,
     );
 
-    fireEvent.change(screen.getByLabelText('Day'), {
-      target: {
-        value: 10,
-      },
-    });
+    await userEvent.type(screen.getByLabelText('Day'), '10');
 
     expect(screen.getByLabelText('Day')).toHaveValue(10);
     expect(onChange).toHaveBeenCalledWith(undefined);
@@ -260,7 +400,7 @@ describe('FormFieldDateInput', () => {
     expect(screen.getByLabelText('Year')).toBeInTheDocument();
   });
 
-  test('can set a full PartialDate as a form value when `type = partialDate`', () => {
+  test('can set a full PartialDate as a form value when `type = partialDate`', async () => {
     const onChange = jest.fn();
 
     render(
@@ -280,23 +420,9 @@ describe('FormFieldDateInput', () => {
       </Formik>,
     );
 
-    fireEvent.change(screen.getByLabelText('Day'), {
-      target: {
-        value: 15,
-      },
-    });
-
-    fireEvent.change(screen.getByLabelText('Month'), {
-      target: {
-        value: 6,
-      },
-    });
-
-    fireEvent.change(screen.getByLabelText('Year'), {
-      target: {
-        value: 2020,
-      },
-    });
+    await userEvent.type(screen.getByLabelText('Day'), '15');
+    await userEvent.type(screen.getByLabelText('Month'), '6');
+    await userEvent.type(screen.getByLabelText('Year'), '2020');
 
     expect(screen.getByLabelText('Day')).toHaveValue(15);
     expect(screen.getByLabelText('Month')).toHaveValue(6);
@@ -309,7 +435,7 @@ describe('FormFieldDateInput', () => {
     });
   });
 
-  test('can set only a day for a form value when `type = partialDate`', () => {
+  test('can set only a day for a form value when `type = partialDate`', async () => {
     const onChange = jest.fn();
 
     render(
@@ -329,11 +455,7 @@ describe('FormFieldDateInput', () => {
       </Formik>,
     );
 
-    fireEvent.change(screen.getByLabelText('Day'), {
-      target: {
-        value: 15,
-      },
-    });
+    await userEvent.type(screen.getByLabelText('Day'), '15');
 
     expect(screen.getByLabelText('Day')).toHaveValue(15);
 
@@ -342,7 +464,7 @@ describe('FormFieldDateInput', () => {
     });
   });
 
-  test('can set an invalid PartialDate as a form value when `type = partialDate`', () => {
+  test('can set an invalid PartialDate as a form value when `type = partialDate`', async () => {
     const onChange = jest.fn();
 
     render(
@@ -362,23 +484,9 @@ describe('FormFieldDateInput', () => {
       </Formik>,
     );
 
-    fireEvent.change(screen.getByLabelText('Day'), {
-      target: {
-        value: 32,
-      },
-    });
-
-    fireEvent.change(screen.getByLabelText('Month'), {
-      target: {
-        value: 6,
-      },
-    });
-
-    fireEvent.change(screen.getByLabelText('Year'), {
-      target: {
-        value: 2020,
-      },
-    });
+    await userEvent.type(screen.getByLabelText('Day'), '32');
+    await userEvent.type(screen.getByLabelText('Month'), '6');
+    await userEvent.type(screen.getByLabelText('Year'), '2020');
 
     expect(screen.getByLabelText('Day')).toHaveValue(32);
     expect(screen.getByLabelText('Month')).toHaveValue(6);

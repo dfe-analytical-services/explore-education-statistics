@@ -434,7 +434,7 @@ describe('ReleaseMetaGuidanceSection', () => {
 
         expect(fileGuidanceContent).toHaveAttribute(
           'id',
-          'metaGuidanceForm-subjects0Content',
+          'metaGuidanceForm-subjects-0-content',
         );
       });
     });

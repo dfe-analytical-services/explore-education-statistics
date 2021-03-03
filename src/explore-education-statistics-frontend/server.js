@@ -76,6 +76,7 @@ async function startServer(port = process.env.PORT || 3000) {
           styleSrc: ["'self'", "'unsafe-inline'"],
           imgSrc: [
             "'self'",
+            process.env.CONTENT_API_BASE_URL.replace('/api', ''),
             'data:',
             'https://www.google-analytics.com/',
             'https://insights.hotjar.com',

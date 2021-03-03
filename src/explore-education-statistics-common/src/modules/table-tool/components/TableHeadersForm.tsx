@@ -131,7 +131,6 @@ const TableHeadersForm = ({
                     <FormFieldSortableListGroup<
                       PickByType<TableHeadersConfig, Filter[][]>
                     >
-                      id={`${id}-rowGroups`}
                       name="rowGroups"
                       legend="Row groups"
                       groupLegend="Row group"
@@ -142,7 +141,6 @@ const TableHeadersForm = ({
                     <FormFieldSortableListGroup<
                       PickByType<TableHeadersConfig, Filter[][]>
                     >
-                      id={`${id}-columnGroups`}
                       name="columnGroups"
                       legend="Column groups"
                       groupLegend="Column group"

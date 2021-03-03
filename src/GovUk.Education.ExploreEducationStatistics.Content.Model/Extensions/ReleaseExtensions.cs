@@ -1,10 +1,26 @@
 ﻿using System;
 using System.Linq;
+using static GovUk.Education.ExploreEducationStatistics.Common.Services.FileStoragePathUtils;
 
 namespace GovUk.Education.ExploreEducationStatistics.Content.Model.Extensions
 {
     public static class ReleaseExtensions
     {
+        /// <summary>
+        /// The storage blob path of the "All files" zip file on a Release.
+        /// </summary>
+        /// <param name="release"></param>
+        /// <returns></returns>
+        public static string AllFilesZipPath(this Release release)
+        {
+            if (release.Publication == null)
+            {
+                throw new ArgumentException("Release must be hydrated with Publication to create All Files zip path");
+            }
+
+            return PublicReleaseAllFilesZipPath(release.Id, release.Publication.Slug, release.Slug);
+        }
+
         /// <summary>
         /// Determines whether a Release is the latest published version of a Release within its Publication, i.e. no newer published amendments of that Release exist.
         /// </summary>

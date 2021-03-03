@@ -1,6 +1,5 @@
 import { toolbarConfigs } from '@admin/components/form/FormEditor';
 import FormFieldEditor from '@admin/components/form/FormFieldEditor';
-import useFormSubmit from '@admin/hooks/useFormSubmit';
 import releaseMetaGuidanceService from '@admin/services/releaseMetaGuidanceService';
 import Accordion from '@common/components/Accordion';
 import AccordionSection from '@common/components/AccordionSection';
@@ -10,9 +9,10 @@ import ButtonText from '@common/components/ButtonText';
 import { Form } from '@common/components/form';
 import InsetText from '@common/components/InsetText';
 import LoadingSpinner from '@common/components/LoadingSpinner';
-import SanitizeHtml from '@common/components/SanitizeHtml';
+import ContentHtml from '@common/components/ContentHtml';
 import WarningMessage from '@common/components/WarningMessage';
 import useAsyncHandledRetry from '@common/hooks/useAsyncHandledRetry';
+import useFormSubmit from '@common/hooks/useFormSubmit';
 import useToggle from '@common/hooks/useToggle';
 import ReleaseMetaGuidanceDataFile from '@common/modules/release/components/ReleaseMetaGuidanceDataFile';
 import minDelay from '@common/utils/minDelay';
@@ -145,7 +145,6 @@ const ReleaseMetaGuidanceSection = ({ releaseId, canUpdateRelease }: Props) => {
                     <Form id={formId}>
                       {isEditing ? (
                         <FormFieldEditor<MetaGuidanceFormValues>
-                          id={`${formId}-content`}
                           name="content"
                           label="Main guidance content"
                         />
@@ -156,8 +155,8 @@ const ReleaseMetaGuidanceSection = ({ releaseId, canUpdateRelease }: Props) => {
                               No guidance content was saved.
                             </InsetText>
                           ) : (
-                            <SanitizeHtml
-                              dirtyHtml={form.values.content}
+                            <ContentHtml
+                              html={form.values.content}
                               testId="mainGuidanceContent"
                             />
                           )}
@@ -184,14 +183,13 @@ const ReleaseMetaGuidanceSection = ({ releaseId, canUpdateRelease }: Props) => {
                                     isEditing ? (
                                       <FormFieldEditor<MetaGuidanceFormValues>
                                         toolbarConfig={toolbarConfigs.simple}
-                                        id={`${formId}-subjects${index}Content`}
                                         name={`subjects[${index}].content`}
                                         label="File guidance content"
                                         testId="fileGuidanceContent"
                                       />
                                     ) : (
-                                      <SanitizeHtml
-                                        dirtyHtml={
+                                      <ContentHtml
+                                        html={
                                           form.values.subjects[index].content
                                         }
                                         testId="fileGuidanceContent"

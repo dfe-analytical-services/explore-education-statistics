@@ -62,18 +62,14 @@ const RelatedInformationSection = ({ release }: Props) => {
       >
         {form => {
           return (
-            <Form {...form} id="create-new-link-form">
+            <Form {...form} id="relatedInformationForm">
               <FormFieldset
-                id="allFieldsFieldset"
+                id="relatedLink"
                 legend="Add related information"
                 legendSize="m"
               >
-                <FormFieldTextInput
-                  id="title"
-                  label="Title"
-                  name="description"
-                />
-                <FormFieldTextInput id="link-url" label="Link url" name="url" />
+                <FormFieldTextInput label="Title" name="description" />
+                <FormFieldTextInput label="Link url" name="url" />
               </FormFieldset>
               <Button
                 type="submit"

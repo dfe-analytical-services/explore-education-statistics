@@ -23,14 +23,17 @@ using Microsoft.AspNetCore.Mvc;
 using Moq;
 using Xunit;
 using static GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services.DbUtils;
-using static GovUk.Education.ExploreEducationStatistics.Common.BlobContainerNames;
+using static GovUk.Education.ExploreEducationStatistics.Common.BlobContainers;
 using static GovUk.Education.ExploreEducationStatistics.Common.Model.FileType;
 using static GovUk.Education.ExploreEducationStatistics.Common.Services.FileStoragePathUtils;
 using static GovUk.Education.ExploreEducationStatistics.Common.Services.FileStorageUtils;
 using static GovUk.Education.ExploreEducationStatistics.Content.Model.DataImportStatus;
 using static GovUk.Education.ExploreEducationStatistics.Data.Model.Database.StatisticsDbUtils;
 using File = GovUk.Education.ExploreEducationStatistics.Content.Model.File;
+using Publication = GovUk.Education.ExploreEducationStatistics.Content.Model.Publication;
 using Release = GovUk.Education.ExploreEducationStatistics.Content.Model.Release;
+using Theme = GovUk.Education.ExploreEducationStatistics.Content.Model.Theme;
+using Topic = GovUk.Education.ExploreEducationStatistics.Content.Model.Topic;
 using Unit = GovUk.Education.ExploreEducationStatistics.Common.Model.Unit;
 
 namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
@@ -49,7 +52,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
 
             var zipFile = new File
             {
-                Release = release,
+                RootPath = Guid.NewGuid(),
                 Filename = "data.zip",
                 Type = DataZip,
                 SubjectId = subject.Id
@@ -60,7 +63,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
                 Release = release,
                 File = new File
                 {
-                    Release = release,
+                    RootPath = Guid.NewGuid(),
                     Filename = "data.csv",
                     Type = FileType.Data,
                     SubjectId = subject.Id,
@@ -73,7 +76,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
                 Release = release,
                 File = new File
                 {
-                    Release = release,
+                    RootPath = Guid.NewGuid(),
                     Filename = "data.meta.csv",
                     Type = Metadata,
                     SubjectId = subject.Id
@@ -99,34 +102,16 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
             // test that the deletion of the main data and metadata files completed, as well as any zip files that 
             // were uploaded
             blobStorageService.Setup(mock =>
-                    mock.DeleteBlob(PrivateFilesContainerName, It.IsIn(
-                        releaseDataFile.Path(),
-                        releaseMetaFile.Path(),
-                        zipFile.Path())))
+                    mock.DeleteBlob(PrivateReleaseFiles, It.IsIn(
+                        releaseDataFile.Path(), releaseMetaFile.Path(), zipFile.Path())))
                 .Returns(Task.CompletedTask);
 
-            // set up the returning of batch files, both for this data file being deleted and others not being
-            // deleted too
+            // test that the deletion of any remaining batch files went ahead for this particular data file
             blobStorageService
-                .Setup(mock =>
-                    mock.ListBlobs(PrivateFilesContainerName, AdminReleaseBatchesDirectoryPath(release.Id)))
-                .ReturnsAsync(new List<BlobInfo>
-                {
-                    new BlobInfo($"{AdminReleaseBatchesDirectoryPath(release.Id)}data.csv_000001", "", "", 0, new Dictionary<string, string>()),
-                    new BlobInfo($"{AdminReleaseBatchesDirectoryPath(release.Id)}data.csv_000002", "", "", 0, new Dictionary<string, string>()),
-                    new BlobInfo($"{AdminReleaseBatchesDirectoryPath(release.Id)}another_data_file.csv_000001", "", "", 0, new Dictionary<string, string>()),
-                    new BlobInfo($"{AdminReleaseBatchesDirectoryPath(release.Id)}another_data_file.csv_000002", "", "", 0, new Dictionary<string, string>())
-                });
-            
-            // test that the deletion of any remaining batch files went ahead and that it only affected batch files 
-            // for this particular data file
-            blobStorageService
-                .Setup(mock => 
-                    mock.DeleteBlob(PrivateFilesContainerName, $"{AdminReleaseBatchesDirectoryPath(release.Id)}data.csv_000001"))
-                .Returns(Task.CompletedTask);
-            blobStorageService
-                .Setup(mock => 
-                    mock.DeleteBlob(PrivateFilesContainerName, $"{AdminReleaseBatchesDirectoryPath(release.Id)}data.csv_000002"))
+                .Setup(mock => mock.DeleteBlobs(
+                    PrivateReleaseFiles, 
+                    releaseDataFile.BatchesPath(),
+                    null))
                 .Returns(Task.CompletedTask);
 
             await using (var contentDbContext = InMemoryApplicationDbContext(contentDbContextId))
@@ -141,11 +126,11 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
                 Assert.True(result.IsRight);
 
                 blobStorageService.Verify(mock =>
-                    mock.DeleteBlob(PrivateFilesContainerName, releaseDataFile.Path()), Times.Once());
+                    mock.DeleteBlob(PrivateReleaseFiles, releaseDataFile.Path()), Times.Once());
                 blobStorageService.Verify(mock =>
-                    mock.DeleteBlob(PrivateFilesContainerName, releaseMetaFile.Path()), Times.Once());
+                    mock.DeleteBlob(PrivateReleaseFiles, releaseMetaFile.Path()), Times.Once());
                 blobStorageService.Verify(mock =>
-                    mock.DeleteBlob(PrivateFilesContainerName, zipFile.Path()), Times.Once());
+                    mock.DeleteBlob(PrivateReleaseFiles, zipFile.Path()), Times.Once());
 
                 dataImportService.Verify(mock => mock.DeleteImport(releaseDataFile.File.Id), Times.Once());
 
@@ -181,7 +166,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
                 Release = release,
                 File = new File
                 {
-                    Release = release,
+                    RootPath = Guid.NewGuid(),
                     Filename = "Data 1.csv",
                     Type = FileType.Data,
                     SubjectId = subject.Id
@@ -193,7 +178,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
                 Release = release,
                 File = new File
                 {
-                    Release = release,
+                    RootPath = Guid.NewGuid(),
                     Filename = "Data 1.meta.csv",
                     Type = Metadata,
                     SubjectId = subject.Id
@@ -216,16 +201,18 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
                 .Returns(Task.CompletedTask);
 
             blobStorageService.Setup(mock =>
-                    mock.DeleteBlob(PrivateFilesContainerName, It.IsIn(
+                    mock.DeleteBlob(PrivateReleaseFiles, It.IsIn(
                         releaseDataFile.Path(),
                         releaseMetaFile.Path())))
                 .Returns(Task.CompletedTask);
 
             blobStorageService
-                .Setup(mock =>
-                    mock.ListBlobs(PrivateFilesContainerName, AdminReleaseBatchesDirectoryPath(release.Id)))
-                .ReturnsAsync(new List<BlobInfo>());
-            
+                .Setup(mock => mock.DeleteBlobs(
+                    PrivateReleaseFiles,
+                    releaseDataFile.BatchesPath(),
+                    null))
+                .Returns(Task.CompletedTask);
+
             await using (var contentDbContext = InMemoryApplicationDbContext(contentDbContextId))
             {
                 var service = SetupReleaseDataFileService(
@@ -238,9 +225,9 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
                 Assert.True(result.IsRight);
 
                 blobStorageService.Verify(mock =>
-                    mock.DeleteBlob(PrivateFilesContainerName, releaseDataFile.Path()), Times.Once());
+                    mock.DeleteBlob(PrivateReleaseFiles, releaseDataFile.Path()), Times.Once());
                 blobStorageService.Verify(mock =>
-                    mock.DeleteBlob(PrivateFilesContainerName, releaseMetaFile.Path()), Times.Once());
+                    mock.DeleteBlob(PrivateReleaseFiles, releaseMetaFile.Path()), Times.Once());
 
                 dataImportService.Verify(mock => mock.DeleteImport(releaseDataFile.File.Id), Times.Once());
 
@@ -276,7 +263,6 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
 
             var zipFile = new File
             {
-                Release = release,
                 Filename = "data.zip",
                 Type = DataZip,
                 SubjectId = subject.Id
@@ -284,7 +270,6 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
 
             var dataFile = new File
             {
-                Release = release,
                 Filename = "data.csv",
                 Type = FileType.Data,
                 SubjectId = subject.Id,
@@ -293,7 +278,6 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
 
             var metaFile = new File
             {
-                Release = release,
                 Filename = "data.meta.csv",
                 Type = Metadata,
                 SubjectId = subject.Id
@@ -301,7 +285,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
 
             var replacementZipFile = new File
             {
-                Release = release,
+                RootPath = Guid.NewGuid(),
                 Filename = "replacement.zip",
                 Type = DataZip,
                 SubjectId = replacementSubject.Id
@@ -309,9 +293,9 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
 
             var replacementDataFile = new File
             {
+                RootPath = Guid.NewGuid(),
                 Filename = "replacement.csv",
                 Type = FileType.Data,
-                Release = release,
                 SubjectId = replacementSubject.Id,
                 Replacing = dataFile,
                 Source = replacementZipFile
@@ -321,9 +305,9 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
 
             var replacementMetaFile = new File
             {
+                RootPath = Guid.NewGuid(),
                 Filename = "replacement.meta.csv",
                 Type = Metadata,
-                Release = release,
                 SubjectId = replacementSubject.Id
             };
 
@@ -369,13 +353,16 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
             dataImportService.Setup(mock => mock.DeleteImport(replacementDataFile.Id))
                 .Returns(Task.CompletedTask);
 
-            blobStorageService.Setup(mock => mock.DeleteBlob(PrivateFilesContainerName, It.IsAny<string>()))
+            blobStorageService.Setup(mock => mock.DeleteBlob(PrivateReleaseFiles,
+                    It.IsIn(replacementDataFile.Path(), replacementMetaFile.Path(), replacementZipFile.Path())))
                 .Returns(Task.CompletedTask);
 
             blobStorageService
-                .Setup(mock =>
-                    mock.ListBlobs(PrivateFilesContainerName, AdminReleaseBatchesDirectoryPath(release.Id)))
-                .ReturnsAsync(new List<BlobInfo>());
+                .Setup(mock => mock.DeleteBlobs(
+                    PrivateReleaseFiles,
+                    replacementDataFile.BatchesPath(), 
+                    null))
+                .Returns(Task.CompletedTask);
 
             await using (var contentDbContext = InMemoryApplicationDbContext(contentDbContextId))
             {
@@ -389,12 +376,12 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
                 Assert.True(result.IsRight);
 
                 blobStorageService.Verify(mock =>
-                    mock.DeleteBlob(PrivateFilesContainerName, replacementDataFile.Path()), Times.Once());
+                    mock.DeleteBlob(PrivateReleaseFiles, replacementDataFile.Path()), Times.Once());
                 blobStorageService.Verify(mock =>
-                        mock.DeleteBlob(PrivateFilesContainerName, replacementMetaFile.Path()),
+                        mock.DeleteBlob(PrivateReleaseFiles, replacementMetaFile.Path()),
                     Times.Once());
                 blobStorageService.Verify(mock =>
-                    mock.DeleteBlob(PrivateFilesContainerName, replacementZipFile.Path()), Times.Once());
+                    mock.DeleteBlob(PrivateReleaseFiles, replacementZipFile.Path()), Times.Once());
 
                 dataImportService.Verify(mock => mock.DeleteImport(replacementDataFile.Id), Times.Once());
 
@@ -445,7 +432,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
 
             var zipFile = new File
             {
-                Release = release,
+                RootPath = Guid.NewGuid(),
                 Filename = "data.zip",
                 Type = DataZip,
                 SubjectId = subject.Id
@@ -453,7 +440,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
 
             var dataFile = new File
             {
-                Release = release,
+                RootPath = Guid.NewGuid(),
                 Filename = "data.csv",
                 Type = FileType.Data,
                 SubjectId = subject.Id,
@@ -462,7 +449,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
 
             var metaFile = new File
             {
-                Release = release,
+                RootPath = Guid.NewGuid(),
                 Filename = "data.meta.csv",
                 Type = Metadata,
                 SubjectId = subject.Id
@@ -507,9 +494,11 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
             var dataImportService = new Mock<IDataImportService>(MockBehavior.Strict);
 
             blobStorageService
-                .Setup(mock =>
-                    mock.ListBlobs(PrivateFilesContainerName, AdminReleaseBatchesDirectoryPath(amendmentRelease.Id)))
-                .ReturnsAsync(new List<BlobInfo>());
+                .Setup(mock => mock.DeleteBlobs(
+                    PrivateReleaseFiles,
+                    dataFile.BatchesPath(),
+                    null))
+                .Returns(Task.CompletedTask);
 
             await using (var contentDbContext = InMemoryApplicationDbContext(contentDbContextId))
             {
@@ -557,8 +546,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
                 File = new File
                 {
                     Filename = "ancillary.pdf",
-                    Type = Ancillary,
-                    Release = release
+                    Type = Ancillary
                 }
             };
 
@@ -568,14 +556,13 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
                 File = new File
                 {
                     Filename = "chart.png",
-                    Type = Chart,
-                    Release = release
+                    Type = Chart
                 }
             };
 
             var zipFile = new File
             {
-                Release = release,
+                RootPath = Guid.NewGuid(),
                 Filename = "data.zip",
                 Type = DataZip,
                 SubjectId = subject.Id
@@ -586,7 +573,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
                 Release = release,
                 File = new File
                 {
-                    Release = release,
+                    RootPath = Guid.NewGuid(),
                     Filename = "data.csv",
                     Type = FileType.Data,
                     SubjectId = subject.Id,
@@ -599,7 +586,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
                 Release = release,
                 File = new File
                 {
-                    Release = release,
+                    RootPath = Guid.NewGuid(),
                     Filename = "data.meta.csv",
                     Type = Metadata,
                     SubjectId = subject.Id
@@ -623,13 +610,16 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
             dataImportService.Setup(mock => mock.DeleteImport(dataReleaseFile.File.Id))
                 .Returns(Task.CompletedTask);
 
-            blobStorageService.Setup(mock => mock.DeleteBlob(PrivateFilesContainerName, It.IsAny<string>()))
+            blobStorageService.Setup(mock => mock.DeleteBlob(PrivateReleaseFiles,
+                    It.IsIn(dataReleaseFile.Path(), metaReleaseFile.Path(), zipFile.Path())))
                 .Returns(Task.CompletedTask);
 
             blobStorageService
-                .Setup(mock =>
-                    mock.ListBlobs(PrivateFilesContainerName, AdminReleaseBatchesDirectoryPath(release.Id)))
-                .ReturnsAsync(new List<BlobInfo>());
+                .Setup(mock => mock.DeleteBlobs(
+                    PrivateReleaseFiles,
+                    dataReleaseFile.BatchesPath(),
+                    null))
+                .Returns(Task.CompletedTask);
 
             await using (var contentDbContext = InMemoryApplicationDbContext(contentDbContextId))
             {
@@ -643,11 +633,11 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
                 Assert.True(result.IsRight);
 
                 blobStorageService.Verify(mock =>
-                    mock.DeleteBlob(PrivateFilesContainerName, dataReleaseFile.Path()), Times.Once());
+                    mock.DeleteBlob(PrivateReleaseFiles, dataReleaseFile.Path()), Times.Once());
                 blobStorageService.Verify(mock =>
-                    mock.DeleteBlob(PrivateFilesContainerName, metaReleaseFile.Path()), Times.Once());
+                    mock.DeleteBlob(PrivateReleaseFiles, metaReleaseFile.Path()), Times.Once());
                 blobStorageService.Verify(mock =>
-                    mock.DeleteBlob(PrivateFilesContainerName, zipFile.Path()), Times.Once());
+                    mock.DeleteBlob(PrivateReleaseFiles, zipFile.Path()), Times.Once());
 
                 dataImportService.Verify(mock => mock.DeleteImport(dataReleaseFile.File.Id), Times.Once());
 
@@ -695,7 +685,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
 
             var zipFile = new File
             {
-                Release = release,
+                RootPath = Guid.NewGuid(),
                 Filename = "data.zip",
                 Type = DataZip,
                 SubjectId = subject.Id,
@@ -703,7 +693,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
 
             var dataFile = new File
             {
-                Release = release,
+                RootPath = Guid.NewGuid(),
                 Filename = "data.csv",
                 Type = FileType.Data,
                 SubjectId = subject.Id,
@@ -712,7 +702,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
 
             var metaFile = new File
             {
-                Release = release,
+                RootPath = Guid.NewGuid(),
                 Filename = "data.meta.csv",
                 Type = Metadata,
                 SubjectId = subject.Id
@@ -756,10 +746,11 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
             var blobStorageService = new Mock<IBlobStorageService>(MockBehavior.Strict);
             var dataImportService = new Mock<IDataImportService>(MockBehavior.Strict);
 
-            blobStorageService
-                .Setup(mock =>
-                    mock.ListBlobs(PrivateFilesContainerName, AdminReleaseBatchesDirectoryPath(amendmentRelease.Id)))
-                .ReturnsAsync(new List<BlobInfo>());
+            blobStorageService.Setup(mock => mock.DeleteBlobs(
+                    PrivateReleaseFiles,
+                    dataFile.BatchesPath(), 
+                    null))
+                .Returns(Task.CompletedTask);
 
             await using (var contentDbContext = InMemoryApplicationDbContext(contentDbContextId))
             {
@@ -858,14 +849,14 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
 
             var dataFile = new File
             {
-                Release = release,
+                RootPath = Guid.NewGuid(),
                 Filename = "test-data.csv",
                 Type = FileType.Data,
                 SubjectId = subject.Id
             };
             var metaFile = new File
             {
-                Release = release,
+                RootPath = Guid.NewGuid(),
                 Filename = "test-data.meta.csv",
                 Type = Metadata,
                 SubjectId = subject.Id
@@ -904,11 +895,11 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
             await using (var statisticsDbContext = InMemoryStatisticsDbContext(statisticsDbContextId))
             {
                 blobStorageService
-                    .Setup(s => s.CheckBlobExists(PrivateFilesContainerName, dataFile.Path()))
+                    .Setup(s => s.CheckBlobExists(PrivateReleaseFiles, dataFile.Path()))
                     .ReturnsAsync(true);
 
                 blobStorageService
-                    .Setup(s => s.GetBlob(PrivateFilesContainerName, dataFile.Path()))
+                    .Setup(s => s.GetBlob(PrivateReleaseFiles, dataFile.Path()))
                     .ReturnsAsync(
                         new BlobInfo(
                             path: dataFile.Path(),
@@ -975,14 +966,14 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
 
             var dataFile = new File
             {
-                Release = release,
+                RootPath = Guid.NewGuid(),
                 Filename = "Test data 1.csv",
                 Type = FileType.Data,
                 SubjectId = subject.Id
             };
             var metaFile = new File
             {
-                Release = release,
+                RootPath = Guid.NewGuid(),
                 Filename = "Test data 1.meta.csv",
                 Type = Metadata,
                 SubjectId = subject.Id
@@ -1021,11 +1012,11 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
             await using (var statisticsDbContext = InMemoryStatisticsDbContext(statisticsDbContextId))
             {
                 blobStorageService
-                    .Setup(s => s.CheckBlobExists(PrivateFilesContainerName, dataFile.Path()))
+                    .Setup(s => s.CheckBlobExists(PrivateReleaseFiles, dataFile.Path()))
                     .ReturnsAsync(true);
 
                 blobStorageService
-                    .Setup(s => s.GetBlob(PrivateFilesContainerName, dataFile.Path()))
+                    .Setup(s => s.GetBlob(PrivateReleaseFiles, dataFile.Path()))
                     .ReturnsAsync(
                         new BlobInfo(
                             path: dataFile.Path(),
@@ -1096,7 +1087,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
                         Release = anotherRelease,
                         File = new File
                         {
-                            Release = anotherRelease,
+                            RootPath = Guid.NewGuid(),
                             Filename = "test-data.csv",
                             Type = Metadata
                         }
@@ -1127,13 +1118,13 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
 
             var dataFile = new File
             {
-                Release = release,
+                RootPath = Guid.NewGuid(),
                 Filename = "test-data.csv",
                 Type = FileType.Data
             };
             var metaFile = new File
             {
-                Release = release,
+                RootPath = Guid.NewGuid(),
                 Filename = "test-data.meta.csv",
                 Type = Metadata
             };
@@ -1183,14 +1174,14 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
             };
             var dataFile = new File
             {
-                Release = release,
+                RootPath = Guid.NewGuid(),
                 SubjectId = subject.Id,
                 Filename = "test-data.csv",
                 Type = FileType.Data
             };
             var metaFile = new File
             {
-                Release = release,
+                RootPath = Guid.NewGuid(),
                 SubjectId = subject.Id,
                 Filename = "test-data.meta.csv",
                 Type = Metadata
@@ -1230,7 +1221,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
             await using (var statisticsDbContext = InMemoryStatisticsDbContext(statisticsDbContextId))
             {
                 blobStorageService
-                    .Setup(s => s.CheckBlobExists(PrivateFilesContainerName, dataFile.Path()))
+                    .Setup(s => s.CheckBlobExists(PrivateReleaseFiles, dataFile.Path()))
                     .ReturnsAsync(false);
 
                 dataImportService
@@ -1276,13 +1267,13 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
 
             var zipFile = new File
             {
-                Release = release,
+                RootPath = Guid.NewGuid(),
                 Filename = "test-data-archive.zip",
                 Type = DataZip,
             };
             var dataFile = new File
             {
-                Release = release,
+                RootPath = Guid.NewGuid(),
                 Filename = "test-data.csv",
                 Type = FileType.Data,
                 Source = zipFile
@@ -1308,7 +1299,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
                         Release = release,
                         File = new File
                         {
-                            Release = release,
+                            RootPath = Guid.NewGuid(),
                             Filename = "test-data.meta.csv",
                             Type = Metadata,
                             Source = zipFile
@@ -1325,15 +1316,15 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
             await using (var contentDbContext = InMemoryApplicationDbContext(contentDbContextId))
             {
                 blobStorageService
-                    .Setup(s => s.CheckBlobExists(PrivateFilesContainerName, dataFile.Path()))
+                    .Setup(s => s.CheckBlobExists(PrivateReleaseFiles, dataFile.Path()))
                     .ReturnsAsync(false);
 
                 blobStorageService
-                    .Setup(s => s.CheckBlobExists(PrivateFilesContainerName, zipFile.Path()))
+                    .Setup(s => s.CheckBlobExists(PrivateReleaseFiles, zipFile.Path()))
                     .ReturnsAsync(true);
 
                 blobStorageService
-                    .Setup(s => s.GetBlob(PrivateFilesContainerName, zipFile.Path()))
+                    .Setup(s => s.GetBlob(PrivateReleaseFiles, zipFile.Path()))
                     .ReturnsAsync(
                         new BlobInfo(
                             zipFile.Path(),
@@ -1399,14 +1390,14 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
 
             var dataFile = new File
             {
-                Release = originalRelease,
+                RootPath = Guid.NewGuid(),
                 Filename = "test-data.csv",
                 Type = FileType.Data,
                 SubjectId = subject.Id
             };
             var metaFile = new File
             {
-                Release = originalRelease,
+                RootPath = Guid.NewGuid(),
                 Filename = "test-data.meta.csv",
                 Type = Metadata,
                 SubjectId = subject.Id
@@ -1459,11 +1450,11 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
             await using (var statisticsDbContext = InMemoryStatisticsDbContext(statisticsDbContextId))
             {
                 blobStorageService
-                    .Setup(s => s.CheckBlobExists(PrivateFilesContainerName, dataFile.Path()))
+                    .Setup(s => s.CheckBlobExists(PrivateReleaseFiles, dataFile.Path()))
                     .ReturnsAsync(true);
 
                 blobStorageService
-                    .Setup(s => s.GetBlob(PrivateFilesContainerName, dataFile.Path()))
+                    .Setup(s => s.GetBlob(PrivateReleaseFiles, dataFile.Path()))
                     .ReturnsAsync(
                         new BlobInfo(
                             path: dataFile.Path(),
@@ -1534,28 +1525,28 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
 
             var dataFile1 = new File
             {
-                Release = release,
+                RootPath = Guid.NewGuid(),
                 Filename = "test-data-1.csv",
                 Type = FileType.Data,
                 SubjectId = subject1.Id
             };
             var metaFile1 = new File
             {
-                Release = release,
+                RootPath = Guid.NewGuid(),
                 Filename = "test-data-1.meta.csv",
                 Type = Metadata,
                 SubjectId = subject1.Id
             };
             var dataFile2 = new File
             {
-                Release = release,
+                RootPath = Guid.NewGuid(),
                 Filename = "Test data 2.csv",
                 Type = FileType.Data,
                 SubjectId = subject2.Id
             };
             var metaFile2 = new File
             {
-                Release = release,
+                RootPath = Guid.NewGuid(),
                 Filename = "Test data 2.meta.csv",
                 Type = Metadata,
                 SubjectId = subject2.Id
@@ -1604,12 +1595,12 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
             await using (var statisticsDbContext = InMemoryStatisticsDbContext(statisticsDbContextId))
             {
                 blobStorageService
-                    .Setup(s => s.CheckBlobExists(PrivateFilesContainerName, It.IsIn(
+                    .Setup(s => s.CheckBlobExists(PrivateReleaseFiles, It.IsIn(
                         dataFile1.Path(), dataFile2.Path())))
                     .ReturnsAsync(true);
 
                 blobStorageService
-                    .Setup(s => s.GetBlob(PrivateFilesContainerName, dataFile1.Path()))
+                    .Setup(s => s.GetBlob(PrivateReleaseFiles, dataFile1.Path()))
                     .ReturnsAsync(
                         new BlobInfo(
                             path: dataFile1.Path(),
@@ -1626,7 +1617,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
                     );
 
                 blobStorageService
-                    .Setup(s => s.GetBlob(PrivateFilesContainerName, dataFile2.Path()))
+                    .Setup(s => s.GetBlob(PrivateReleaseFiles, dataFile2.Path()))
                     .ReturnsAsync(
                         new BlobInfo(
                             path: dataFile2.Path(),
@@ -1708,14 +1699,14 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
 
             var dataFile = new File
             {
-                Release = release,
+                RootPath = Guid.NewGuid(),
                 Filename = "test-data-1.csv",
                 Type = FileType.Data,
                 SubjectId = subject.Id
             };
             var metaFile = new File
             {
-                Release = release,
+                RootPath = Guid.NewGuid(),
                 Filename = "test-data-1.meta.csv",
                 Type = Metadata,
                 SubjectId = subject.Id
@@ -1745,7 +1736,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
                         Release = otherRelease,
                         File = new File
                         {
-                            Release = otherRelease,
+                            RootPath = Guid.NewGuid(),
                             Filename = "test-data-2.csv",
                             Type = FileType.Data
                         }
@@ -1755,7 +1746,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
                         Release = otherRelease,
                         File = new File
                         {
-                            Release = otherRelease,
+                            RootPath = Guid.NewGuid(),
                             Filename = "test-data-2.meta.csv",
                             Type = Metadata
                         }
@@ -1766,7 +1757,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
                         Release = release,
                         File = new File
                         {
-                            Release = release,
+                            RootPath = Guid.NewGuid(),
                             Filename = "ancillary-file.pdf",
                             Type = Ancillary
                         }
@@ -1788,11 +1779,11 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
             await using (var statisticsDbContext = InMemoryStatisticsDbContext(statisticsDbContextId))
             {
                 blobStorageService
-                    .Setup(s => s.CheckBlobExists(PrivateFilesContainerName, dataFile.Path()))
+                    .Setup(s => s.CheckBlobExists(PrivateReleaseFiles, dataFile.Path()))
                     .ReturnsAsync(true);
 
                 blobStorageService
-                    .Setup(s => s.GetBlob(PrivateFilesContainerName, dataFile.Path()))
+                    .Setup(s => s.GetBlob(PrivateReleaseFiles, dataFile.Path()))
                     .ReturnsAsync(
                         new BlobInfo(
                             path: dataFile.Path(),
@@ -1862,28 +1853,28 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
 
             var dataFile1 = new File
             {
-                Release = originalRelease,
+                RootPath = Guid.NewGuid(),
                 Filename = "test-data-1.csv",
                 Type = FileType.Data,
                 SubjectId = subject1.Id
             };
             var metaFile1 = new File
             {
-                Release = originalRelease,
+                RootPath = Guid.NewGuid(),
                 Filename = "test-data-1.meta.csv",
                 Type = Metadata,
                 SubjectId = subject1.Id
             };
             var dataFile2 = new File
             {
-                Release = originalRelease,
+                RootPath = Guid.NewGuid(),
                 Filename = "test-data-2.csv",
                 Type = FileType.Data,
                 SubjectId = subject2.Id
             };
             var metaFile2 = new File
             {
-                Release = originalRelease,
+                RootPath = Guid.NewGuid(),
                 Filename = "test-data-2.meta.csv",
                 Type = Metadata,
                 SubjectId = subject2.Id
@@ -1946,11 +1937,11 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
             await using (var statisticsDbContext = InMemoryStatisticsDbContext(statisticsDbContextId))
             {
                 blobStorageService
-                    .Setup(s => s.CheckBlobExists(PrivateFilesContainerName, dataFile2.Path()))
+                    .Setup(s => s.CheckBlobExists(PrivateReleaseFiles, dataFile2.Path()))
                     .ReturnsAsync(true);
 
                 blobStorageService
-                    .Setup(s => s.GetBlob(PrivateFilesContainerName, dataFile2.Path()))
+                    .Setup(s => s.GetBlob(PrivateReleaseFiles, dataFile2.Path()))
                     .ReturnsAsync(
                         new BlobInfo(
                             path: dataFile2.Path(),
@@ -2012,14 +2003,14 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
             };
             var dataFile = new File
             {
-                Release = release,
+                RootPath = Guid.NewGuid(),
                 Filename = "test-data.csv",
                 Type = FileType.Data,
                 SubjectId = subject.Id
             };
             var metaFile = new File
             {
-                Release = release,
+                RootPath = Guid.NewGuid(),
                 Filename = "test-data.meta.csv",
                 Type = Metadata,
                 SubjectId = subject.Id
@@ -2059,7 +2050,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
             await using (var statisticsDbContext = InMemoryStatisticsDbContext(statisticsDbContextId))
             {
                 blobStorageService
-                    .Setup(s => s.CheckBlobExists(PrivateFilesContainerName, dataFile.Path()))
+                    .Setup(s => s.CheckBlobExists(PrivateReleaseFiles, dataFile.Path()))
                     .ReturnsAsync(false);
 
                 dataImportService
@@ -2102,13 +2093,13 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
 
             var zipFile = new File
             {
-                Release = release,
+                RootPath = Guid.NewGuid(),
                 Filename = "test-data-archive.zip",
                 Type = DataZip
             };
             var dataFile = new File
             {
-                Release = release,
+                RootPath = Guid.NewGuid(),
                 Filename = "test-data.csv",
                 Type = FileType.Data,
                 Source = zipFile
@@ -2134,7 +2125,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
                         Release = release,
                         File = new File
                         {
-                            Release = release,
+                            RootPath = Guid.NewGuid(),
                             Filename = "test-data.meta.csv",
                             Type = Metadata,
                             Source = zipFile
@@ -2151,15 +2142,15 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
             await using (var contentDbContext = InMemoryApplicationDbContext(contentDbContextId))
             {
                 blobStorageService
-                    .Setup(s => s.CheckBlobExists(PrivateFilesContainerName, dataFile.Path()))
+                    .Setup(s => s.CheckBlobExists(PrivateReleaseFiles, dataFile.Path()))
                     .ReturnsAsync(false);
 
                 blobStorageService
-                    .Setup(s => s.CheckBlobExists(PrivateFilesContainerName, zipFile.Path()))
+                    .Setup(s => s.CheckBlobExists(PrivateReleaseFiles, zipFile.Path()))
                     .ReturnsAsync(true);
 
                 blobStorageService
-                    .Setup(s => s.GetBlob(PrivateFilesContainerName, zipFile.Path()))
+                    .Setup(s => s.GetBlob(PrivateReleaseFiles, zipFile.Path()))
                     .ReturnsAsync(
                         new BlobInfo(
                             zipFile.Path(),
@@ -2220,14 +2211,14 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
             var release = new Release
             {
                 ReleaseName = "2000",
-                Publication = new Content.Model.Publication
+                Publication = new Publication
                 {
                     Title = "Test publication",
-                    Topic = new Content.Model.Topic
+                    Topic = new Topic
                     {
                         Id = Guid.NewGuid(),
                         Title = "Test topic",
-                        Theme = new Content.Model.Theme
+                        Theme = new Theme
                         {
                             Id = Guid.NewGuid(),
                             Title = "Test theme"
@@ -2274,35 +2265,32 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
                     .Returns(Task.CompletedTask);
 
                 blobStorageService.Setup(mock =>
-                    mock.UploadFile(PrivateFilesContainerName,
+                    mock.UploadFile(PrivateReleaseFiles,
                         It.Is<string>(path => 
-                            path.Contains(AdminReleaseDirectoryPath(release.Id, FileType.Data))),
+                            path.Contains(FilesPath(release.Id, FileType.Data))),
                         dataFormFile,
-                        It.Is<IBlobStorageService.UploadFileOptions>(options =>
-                            options.MetaValues[BlobInfoExtensions.NameKey] == subjectName
-                            && options.MetaValues[BlobInfoExtensions.MetaFileKey] == metaFileName
-                            && options.MetaValues[BlobInfoExtensions.UserNameKey] == "test@test.com"
-                            && options.MetaValues[BlobInfoExtensions.NumberOfRowsKey] == "2")
+                        It.Is<IDictionary<string, string>>(metadata =>
+                            metadata[BlobInfoExtensions.NameKey] == subjectName
+                            && metadata[BlobInfoExtensions.MetaFileKey] == metaFileName
+                            && metadata[BlobInfoExtensions.UserNameKey] == "test@test.com"
+                            && metadata[BlobInfoExtensions.NumberOfRowsKey] == "2")
                     )).Returns(Task.CompletedTask);
 
                 blobStorageService.Setup(mock =>
-                    mock.UploadFile(PrivateFilesContainerName,
+                    mock.UploadFile(PrivateReleaseFiles,
                         It.Is<string>(path =>
-                            path.Contains(AdminReleaseDirectoryPath(release.Id, FileType.Data))),
+                            path.Contains(FilesPath(release.Id, FileType.Data))),
                         metaFormFile,
-                        It.Is<IBlobStorageService.UploadFileOptions>(options =>
-                            options.MetaValues[BlobInfoExtensions.DataFileKey] == dataFileName)
+                        null
                     )).Returns(Task.CompletedTask);
 
-                var dataFilePath = AdminReleasePath(release.Id, FileType.Data, Guid.NewGuid());
-
                 blobStorageService
-                    .Setup(s => s.GetBlob(PrivateFilesContainerName, 
+                    .Setup(s => s.GetBlob(PrivateReleaseFiles, 
                         It.Is<string>(path =>
-                            path.Contains(AdminReleaseDirectoryPath(release.Id, FileType.Data)))))
+                            path.Contains(FilesPath(release.Id, FileType.Data)))))
                     .ReturnsAsync(
                         new BlobInfo(
-                            path: dataFilePath,
+                            path: "data/file/path",
                             size: "1 Mb",
                             contentType: "application/zip",
                             contentLength: 1000L,
@@ -2339,7 +2327,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
                 Assert.Equal(subjectName, result.Right.Name);
                 Assert.Equal(dataFileName, result.Right.FileName);
                 Assert.Equal("csv", result.Right.Extension);
-                Assert.Equal(dataFilePath, result.Right.Path);
+                Assert.Equal("data/file/path", result.Right.Path);
                 Assert.True(result.Right.MetaFileId.HasValue);
                 Assert.Equal(metaFileName, result.Right.MetaFileName);
                 Assert.Equal("test@test.com", result.Right.UserName);
@@ -2360,10 +2348,8 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
                     .Single(f => f.Filename == metaFileName);
 
                 Assert.Equal(FileType.Data, dataFile.Type);
-                Assert.Equal(release.Id, dataFile.ReleaseId);
 
                 Assert.Equal(Metadata, metaFile.Type);
-                Assert.Equal(release.Id, metaFile.ReleaseId);
 
                 var releaseFiles = contentDbContext.ReleaseFiles.ToList();
 
@@ -2385,14 +2371,14 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
             var release = new Release
             {
                 ReleaseName = "2000",
-                Publication = new Content.Model.Publication
+                Publication = new Publication
                 {
                     Title = "Test publication",
-                    Topic = new Content.Model.Topic
+                    Topic = new Topic
                     {
                         Id = Guid.NewGuid(),
                         Title = "Test topic",
-                        Theme = new Content.Model.Theme
+                        Theme = new Theme
                         {
                             Id = Guid.NewGuid(),
                             Title = "Test theme"
@@ -2412,7 +2398,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
                 Release = release,
                 File = new File
                 {
-                    Release = release,
+                    RootPath = Guid.NewGuid(),
                     Filename = "original-data.csv",
                     Type = FileType.Data,
                     SubjectId = originalSubject.Id
@@ -2465,35 +2451,32 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
                     .Returns(Task.CompletedTask);
 
                 blobStorageService.Setup(mock =>
-                    mock.UploadFile(PrivateFilesContainerName,
+                    mock.UploadFile(PrivateReleaseFiles,
                         It.Is<string>(path =>
-                            path.Contains(AdminReleaseDirectoryPath(release.Id, FileType.Data))),
+                            path.Contains(FilesPath(release.Id, FileType.Data))),
                         dataFormFile,
-                        It.Is<IBlobStorageService.UploadFileOptions>(options =>
-                            options.MetaValues[BlobInfoExtensions.NameKey] == originalSubject.Name
-                            && options.MetaValues[BlobInfoExtensions.MetaFileKey] == metaFileName
-                            && options.MetaValues[BlobInfoExtensions.UserNameKey] == "test@test.com"
-                            && options.MetaValues[BlobInfoExtensions.NumberOfRowsKey] == "2")
+                        It.Is<IDictionary<string, string>>(metadata =>
+                            metadata[BlobInfoExtensions.NameKey] == originalSubject.Name
+                            && metadata[BlobInfoExtensions.MetaFileKey] == metaFileName
+                            && metadata[BlobInfoExtensions.UserNameKey] == "test@test.com"
+                            && metadata[BlobInfoExtensions.NumberOfRowsKey] == "2")
                     )).Returns(Task.CompletedTask);
 
                 blobStorageService.Setup(mock =>
-                    mock.UploadFile(PrivateFilesContainerName,
+                    mock.UploadFile(PrivateReleaseFiles,
                         It.Is<string>(path =>
-                            path.Contains(AdminReleaseDirectoryPath(release.Id, FileType.Data))),
+                            path.Contains(FilesPath(release.Id, FileType.Data))),
                         metaFormFile,
-                        It.Is<IBlobStorageService.UploadFileOptions>(options =>
-                            options.MetaValues[BlobInfoExtensions.DataFileKey] == dataFileName)
-                    )).Returns(Task.CompletedTask);
-
-                var dataFilePath = AdminReleasePath(release.Id, FileType.Data, Guid.NewGuid());
+                        null
+                        )).Returns(Task.CompletedTask);
 
                 blobStorageService
-                    .Setup(s => s.GetBlob(PrivateFilesContainerName, 
+                    .Setup(s => s.GetBlob(PrivateReleaseFiles, 
                             It.Is<string>(path => 
-                                path.Contains(AdminReleaseDirectoryPath(release.Id, FileType.Data)))))
+                                path.Contains(FilesPath(release.Id, FileType.Data)))))
                     .ReturnsAsync(
                         new BlobInfo(
-                            path: dataFilePath,
+                            path: "data/file/path",
                             size: "1 Mb",
                             contentType: "application/zip",
                             contentLength: 1000L,
@@ -2530,7 +2513,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
                 Assert.Equal(originalSubject.Name, result.Right.Name);
                 Assert.Equal(dataFileName, result.Right.FileName);
                 Assert.Equal("csv", result.Right.Extension);
-                Assert.Equal(dataFilePath, result.Right.Path);
+                Assert.Equal("data/file/path", result.Right.Path);
                 Assert.True(result.Right.MetaFileId.HasValue);
                 Assert.Equal(metaFileName, result.Right.MetaFileName);
                 Assert.Equal("test@test.com", result.Right.UserName);
@@ -2562,27 +2545,24 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
             
             await using (var contentDbContext = InMemoryApplicationDbContext(contentDbContextId))
             {
-                var fileReferences = contentDbContext.Files.ToList();
+                var files = contentDbContext.Files.ToList();
 
-                Assert.Equal(3, fileReferences.Count);
+                Assert.Equal(3, files.Count);
 
-                var originalDataFile = fileReferences
+                var originalDataFile = files
                     .Single(f => f.Filename == originalDataReleaseFile.File.Filename);
-                var dataFile = fileReferences
+                var dataFile = files
                     .Single(f => f.Filename == dataFileName);
-                var metaFile = fileReferences
+                var metaFile = files
                     .Single(f => f.Filename == metaFileName);
 
                 Assert.Equal(FileType.Data, originalDataFile.Type);
-                Assert.Equal(release.Id, originalDataFile.ReleaseId);
                 Assert.Equal(dataFile.Id, originalDataFile.ReplacedById);
 
                 Assert.Equal(FileType.Data, dataFile.Type);
-                Assert.Equal(release.Id, dataFile.ReleaseId);
                 Assert.Equal(originalDataFile.Id, dataFile.ReplacingId);
 
                 Assert.Equal(Metadata, metaFile.Type);
-                Assert.Equal(release.Id, metaFile.ReleaseId);
 
                 var releaseFiles = contentDbContext.ReleaseFiles.ToList();
 
@@ -2610,14 +2590,14 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
             {
                 Id = Guid.NewGuid(),
                 ReleaseName = "2000",
-                Publication = new Content.Model.Publication
+                Publication = new Publication
                 {
                     Title = "Test publication",
-                    Topic = new Content.Model.Topic
+                    Topic = new Topic
                     {
                         Id = Guid.NewGuid(),
                         Title = "Test topic",
-                        Theme = new Content.Model.Theme
+                        Theme = new Theme
                         {
                             Id = Guid.NewGuid(),
                             Title = "Test theme"
@@ -2667,24 +2647,24 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
                     .Returns(Task.CompletedTask);
 
                 blobStorageService.Setup(mock =>
-                    mock.UploadFile(PrivateFilesContainerName,
+                    mock.UploadFile(PrivateReleaseFiles,
                         It.Is<string>(path =>
-                            path.Contains(AdminReleaseDirectoryPath(release.Id, DataZip))),
+                            path.Contains(FilesPath(release.Id, DataZip))),
                         zipFormFile,
-                        It.Is<IBlobStorageService.UploadFileOptions>(options =>
-                            options.MetaValues[BlobInfoExtensions.NameKey] == subjectName
-                            && options.MetaValues[BlobInfoExtensions.MetaFileKey] == metaFileName
-                            && options.MetaValues[BlobInfoExtensions.UserNameKey] == "test@test.com"
-                            && options.MetaValues[BlobInfoExtensions.NumberOfRowsKey] == "0")
+                        It.Is<IDictionary<string, string>>(metadata =>
+                            metadata[BlobInfoExtensions.NameKey] == subjectName
+                            && metadata[BlobInfoExtensions.MetaFileKey] == metaFileName
+                            && metadata[BlobInfoExtensions.UserNameKey] == "test@test.com"
+                            && metadata[BlobInfoExtensions.NumberOfRowsKey] == "0")
                     )).Returns(Task.CompletedTask);
 
                 blobStorageService
-                    .Setup(s => s.GetBlob(PrivateFilesContainerName, 
+                    .Setup(s => s.GetBlob(PrivateReleaseFiles, 
                         It.Is<string>(path => 
-                            path.Contains(AdminReleaseDirectoryPath(release.Id, DataZip)))))
+                            path.Contains(FilesPath(release.Id, DataZip)))))
                     .ReturnsAsync(
                         new BlobInfo(
-                            path: AdminReleasePath(release.Id, DataZip, Guid.NewGuid()),
+                            path: "zip/file/path",
                             size: "1 Mb",
                             contentType: "application/zip",
                             contentLength: 1000L,
@@ -2735,26 +2715,23 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
 
             await using (var contentDbContext = InMemoryApplicationDbContext(contentDbContextId))
             {
-                var fileReferences = contentDbContext.Files.ToList();
+                var files = contentDbContext.Files.ToList();
 
-                Assert.Equal(3, fileReferences.Count);
+                Assert.Equal(3, files.Count);
 
-                var dataFile = fileReferences
+                var dataFile = files
                     .Single(f => f.Filename == dataFileName);
-                var metaFile = fileReferences
+                var metaFile = files
                     .Single(f => f.Filename == metaFileName);
-                var zipFile = fileReferences
+                var zipFile = files
                     .Single(f => f.Filename == zipFileName);
 
                 Assert.Equal(FileType.Data, dataFile.Type);
-                Assert.Equal(release.Id, dataFile.ReleaseId);
                 Assert.Equal(zipFile.Id, dataFile.SourceId);
 
                 Assert.Equal(Metadata, metaFile.Type);
-                Assert.Equal(release.Id, metaFile.ReleaseId);
 
                 Assert.Equal(DataZip, zipFile.Type);
-                Assert.Equal(release.Id, zipFile.ReleaseId);
 
                 var releaseFiles = contentDbContext.ReleaseFiles.ToList();
 
@@ -2777,14 +2754,14 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
             var release = new Release
             {
                 ReleaseName = "2000",
-                Publication = new Content.Model.Publication
+                Publication = new Publication
                 {
                     Title = "Test publication",
-                    Topic = new Content.Model.Topic
+                    Topic = new Topic
                     {
                         Id = Guid.NewGuid(),
                         Title = "Test topic",
-                        Theme = new Content.Model.Theme
+                        Theme = new Theme
                         {
                             Id = Guid.NewGuid(),
                             Title = "Test theme"
@@ -2804,7 +2781,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
                 Release = release,
                 File = new File
                 {
-                    Release = release,
+                    RootPath = Guid.NewGuid(),
                     Filename = "original-data.csv",
                     Type = FileType.Data,
                     SubjectId = originalSubject.Id
@@ -2860,24 +2837,24 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
                     .Returns(Task.CompletedTask);
 
                 blobStorageService.Setup(mock =>
-                    mock.UploadFile(PrivateFilesContainerName,
+                    mock.UploadFile(PrivateReleaseFiles,
                         It.Is<string>(path =>
-                            path.Contains(AdminReleaseDirectoryPath(release.Id, DataZip))),
+                            path.Contains(FilesPath(release.Id, DataZip))),
                         zipFormFile,
-                        It.Is<IBlobStorageService.UploadFileOptions>(options =>
-                            options.MetaValues[BlobInfoExtensions.NameKey] == originalSubject.Name
-                            && options.MetaValues[BlobInfoExtensions.MetaFileKey] == metaFileName
-                            && options.MetaValues[BlobInfoExtensions.UserNameKey] == "test@test.com"
-                            && options.MetaValues[BlobInfoExtensions.NumberOfRowsKey] == "0")
+                        It.Is<IDictionary<string, string>>(metadata =>
+                            metadata[BlobInfoExtensions.NameKey] == originalSubject.Name
+                            && metadata[BlobInfoExtensions.MetaFileKey] == metaFileName
+                            && metadata[BlobInfoExtensions.UserNameKey] == "test@test.com"
+                            && metadata[BlobInfoExtensions.NumberOfRowsKey] == "0")
                     )).Returns(Task.CompletedTask);
 
                 blobStorageService
-                    .Setup(s => s.GetBlob(PrivateFilesContainerName,
+                    .Setup(s => s.GetBlob(PrivateReleaseFiles,
                         It.Is<string>(path =>
-                            path.Contains(AdminReleaseDirectoryPath(release.Id, DataZip)))))
+                            path.Contains(FilesPath(release.Id, DataZip)))))
                     .ReturnsAsync(
                         new BlobInfo(
-                            path: AdminReleasePath(release.Id, DataZip, Guid.NewGuid()),
+                            path: "zip/file/path",
                             size: "1 Mb",
                             contentType: "application/zip",
                             contentLength: 1000L,
@@ -2949,34 +2926,30 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
 
             await using (var contentDbContext = InMemoryApplicationDbContext(contentDbContextId))
             {
-                var fileReferences = contentDbContext.Files.ToList();
+                var files = contentDbContext.Files.ToList();
 
-                Assert.Equal(4, fileReferences.Count);
+                Assert.Equal(4, files.Count);
 
-                var originalDataFile = fileReferences
+                var originalDataFile = files
                     .Single(f => f.Filename == originalDataReleaseFile.File.Filename);
-                var dataFile = fileReferences
+                var dataFile = files
                     .Single(f => f.Filename == dataFileName);
-                var metaFile = fileReferences
+                var metaFile = files
                     .Single(f => f.Filename == metaFileName);
-                var zipFile = fileReferences
+                var zipFile = files
                     .Single(f => f.Filename == zipFileName);
 
                 Assert.Equal(FileType.Data, originalDataFile.Type);
-                Assert.Equal(release.Id, originalDataFile.ReleaseId);
                 Assert.Equal(dataFile.Id, originalDataFile.ReplacedById);
                 Assert.Null(originalDataFile.SourceId);
 
                 Assert.Equal(FileType.Data, dataFile.Type);
-                Assert.Equal(release.Id, dataFile.ReleaseId);
                 Assert.Equal(originalDataFile.Id, dataFile.ReplacingId);
                 Assert.Equal(zipFile.Id, dataFile.SourceId);
 
                 Assert.Equal(Metadata, metaFile.Type);
-                Assert.Equal(release.Id, metaFile.ReleaseId);
 
                 Assert.Equal(DataZip, zipFile.Type);
-                Assert.Equal(release.Id, zipFile.ReleaseId);
 
                 var releaseFiles = contentDbContext.ReleaseFiles.ToList();
 
@@ -2993,10 +2966,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
 
         private static Mock<IFormFile> CreateFormFileMock(string fileName)
         {
-            var formFile = new Mock<IFormFile>();
-
-            formFile.SetupGet(f => f.FileName)
-                .Returns(fileName);
+            var formFile = MockFormTestUtils.CreateFormFileMock(fileName);
 
             var filePath = Path.Combine(Path.GetDirectoryName(Assembly.GetExecutingAssembly().Location),
                 "Resources" + Path.DirectorySeparatorChar + fileName);
@@ -3034,6 +3004,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
             IFileRepository fileRepository = null,
             IReleaseRepository releaseRepository = null,
             IReleaseFileRepository releaseFileRepository = null,
+            IReleaseDataFileRepository releaseDataFileRepository = null,
             IDataImportService dataImportService = null,
             IUserService userService = null)
         {
@@ -3048,6 +3019,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
                 releaseRepository ?? new ReleaseRepository(contentDbContext, statisticsDbContext,
                     Common.Services.MapperUtils.MapperForProfile<MappingProfiles>()),
                 releaseFileRepository ?? new ReleaseFileRepository(contentDbContext),
+                releaseDataFileRepository ?? new ReleaseDataFileRepository(contentDbContext),
                 dataImportService ?? new Mock<IDataImportService>().Object,
                 userService ?? MockUtils.AlwaysTrueUserService().Object
             );

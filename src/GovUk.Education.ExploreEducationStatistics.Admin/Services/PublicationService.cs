@@ -61,6 +61,21 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Services
                 });
         }
 
+        public async Task<Either<ActionResult, MyPublicationViewModel>> GetMyPublication(Guid publicationId)
+        {
+            return await _userService
+                .CheckCanAccessSystem()
+                .OnSuccess(_ =>
+                {
+                    return _userService
+                        .CheckCanViewAllReleases()
+                        .OnSuccess(() =>
+                            _publicationRepository.GetPublicationWithAllReleases(publicationId))
+                        .OrElse(() =>
+                            _publicationRepository.GetPublicationForUser(publicationId, _userService.GetUserId()));
+                });
+        }
+
         public async Task<Either<ActionResult, PublicationViewModel>> CreatePublication(
             PublicationSaveViewModel publication)
         {
@@ -191,6 +206,12 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Services
                 if (methodology == null)
                 {
                     return ValidationActionResult(MethodologyDoesNotExist);
+                }
+
+                // TODO: this will want updating when methodology status is fully implemented
+                if (methodology.Status != MethodologyStatus.Approved)
+                {
+                    return ValidationActionResult(MethodologyMustBeApproved);
                 }
             }
 

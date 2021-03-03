@@ -9,9 +9,15 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Services.Interfaces
 {
     public interface IReleaseFileRepository
     {
-        public Task<Either<ActionResult, File>> CheckFileExists(Guid releaseId, Guid id,
+        public Task<Either<ActionResult, File>> CheckFileExists(Guid releaseId,
+            Guid id,
             params FileType[] allowedFileTypes);
-        
+
+        public Task<File> Create(
+            Guid releaseId,
+            string filename,
+            FileType type);
+
         public Task Delete(Guid releaseId, Guid fileId);
 
         public Task<ReleaseFile> Get(Guid releaseId, Guid fileId);
@@ -19,5 +25,10 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Services.Interfaces
         public Task<List<ReleaseFile>> GetByFileType(Guid releaseId, params FileType[] types);
 
         public Task<bool> FileIsLinkedToOtherReleases(Guid releaseId, Guid fileId);
+
+        public Task<File> UpdateFilename(
+            Guid releaseId,
+            Guid fileId,
+            string filename);
     }
 }

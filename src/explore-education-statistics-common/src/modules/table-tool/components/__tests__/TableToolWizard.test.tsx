@@ -1,11 +1,15 @@
 import TableToolWizard from '@common/modules/table-tool/components/TableToolWizard';
-import { SubjectMeta, ThemeMeta } from '@common/services/tableBuilderService';
+import {
+  Subject,
+  SubjectMeta,
+  Theme,
+} from '@common/services/tableBuilderService';
 import { within } from '@testing-library/dom';
 import { render, screen, waitFor } from '@testing-library/react';
 import React from 'react';
 
 describe('TableToolWizard', () => {
-  const testThemeMeta: ThemeMeta[] = [
+  const testThemeMeta: Theme[] = [
     {
       id: 'theme-1',
       title: 'Theme 1',
@@ -24,6 +28,29 @@ describe('TableToolWizard', () => {
           ],
         },
       ],
+    },
+  ];
+
+  const testSubjects: Subject[] = [
+    {
+      id: 'subject-1',
+      name: 'Subject 1',
+      content: 'Test content 1',
+      timePeriods: {
+        from: '2019/20',
+        to: '2020/21',
+      },
+      geographicLevels: ['National', 'Local Authority'],
+    },
+    {
+      id: 'subject-2',
+      name: 'Subject 2',
+      content: 'Test content 2',
+      timePeriods: {
+        from: '2015/16',
+        to: '2019/20',
+      },
+      geographicLevels: ['Local Authority District', 'Ward'],
     },
   ];
 
@@ -130,10 +157,7 @@ describe('TableToolWizard', () => {
         themeMeta={testThemeMeta}
         initialState={{
           initialStep: 2,
-          subjects: [
-            { id: 'subject-1', label: 'Subject 1' },
-            { id: 'subject-2', label: 'Subject 2' },
-          ],
+          subjects: testSubjects,
           query: {
             publicationId: 'publication-1',
             subjectId: '',
@@ -178,107 +202,6 @@ describe('TableToolWizard', () => {
     });
   });
 
-  test('renders `initialState.highlights` on step 2 when it is the current step', async () => {
-    render(
-      <TableToolWizard
-        themeMeta={testThemeMeta}
-        initialState={{
-          initialStep: 2,
-          subjects: [{ id: 'subject-1', label: 'Subject 1' }],
-          highlights: [
-            { id: 'highlight-1', label: 'Test highlight 1' },
-            { id: 'highlight-2', label: 'Test highlight 2' },
-            { id: 'highlight-3', label: 'Test highlight 3' },
-          ],
-          query: {
-            publicationId: 'publication-1',
-            subjectId: '',
-            locations: {},
-            filters: [],
-            indicators: [],
-          },
-        }}
-        renderHighlights={highlights => (
-          <ul>
-            {highlights.map(highlight => (
-              <li key={highlight.id} id={highlight.id}>
-                {highlight.label}
-              </li>
-            ))}
-          </ul>
-        )}
-      />,
-    );
-
-    await waitFor(() => {
-      expect(screen.getByTestId('wizardStep-2')).toHaveAttribute(
-        'aria-current',
-        'step',
-      );
-
-      const step2 = within(screen.getByTestId('wizardStep-2'));
-
-      expect(step2.getByText('Test highlight 1')).toHaveAttribute(
-        'id',
-        'highlight-1',
-      );
-      expect(step2.getByText('Test highlight 2')).toHaveAttribute(
-        'id',
-        'highlight-2',
-      );
-      expect(step2.getByText('Test highlight 3')).toHaveAttribute(
-        'id',
-        'highlight-3',
-      );
-    });
-  });
-
-  test('does not render `initialSate.highlights` when step 2 is not the current step', async () => {
-    render(
-      <TableToolWizard
-        themeMeta={testThemeMeta}
-        initialState={{
-          initialStep: 3,
-          subjects: [{ id: 'subject-1', label: 'Subject 1' }],
-          highlights: [
-            { id: 'highlight-1', label: 'Test highlight 1' },
-            { id: 'highlight-2', label: 'Test highlight 2' },
-            { id: 'highlight-3', label: 'Test highlight 3' },
-          ],
-          query: {
-            publicationId: 'publication-1',
-            subjectId: 'subject-1',
-            locations: {},
-            filters: [],
-            indicators: [],
-          },
-        }}
-        renderHighlights={highlights => (
-          <ul>
-            {highlights.map(highlight => (
-              <li key={highlight.id} id={highlight.id}>
-                {highlight.label}
-              </li>
-            ))}
-          </ul>
-        )}
-      />,
-    );
-
-    await waitFor(() => {
-      expect(screen.getByTestId('wizardStep-2')).not.toHaveAttribute(
-        'aria-current',
-        'step',
-      );
-
-      const step2 = within(screen.getByTestId('wizardStep-2'));
-
-      expect(step2.queryByText('Test highlight 1')).not.toBeInTheDocument();
-      expect(step2.queryByText('Test highlight 2')).not.toBeInTheDocument();
-      expect(step2.queryByText('Test highlight 3')).not.toBeInTheDocument();
-    });
-  });
-
   test('renders all steps correctly when full `initialState` is provided', async () => {
     render(
       <TableToolWizard
@@ -286,7 +209,7 @@ describe('TableToolWizard', () => {
         initialState={{
           initialStep: 5,
           subjectMeta: testSubjectMeta,
-          subjects: [{ id: 'subject-1', label: 'Subject 1' }],
+          subjects: [testSubjects[0]],
           highlights: [],
           query: {
             publicationId: 'publication-1',

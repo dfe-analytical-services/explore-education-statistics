@@ -1,14 +1,11 @@
 using System.IO.Compression;
 using System.Threading.Tasks;
 using GovUk.Education.ExploreEducationStatistics.Common.Extensions;
-using GovUk.Education.ExploreEducationStatistics.Common.Model;
 using GovUk.Education.ExploreEducationStatistics.Common.Services.Interfaces;
 using GovUk.Education.ExploreEducationStatistics.Content.Model;
 using GovUk.Education.ExploreEducationStatistics.Content.Model.Extensions;
 using GovUk.Education.ExploreEducationStatistics.Data.Processor.Services.Interfaces;
-using static GovUk.Education.ExploreEducationStatistics.Common.BlobContainerNames;
-using static GovUk.Education.ExploreEducationStatistics.Common.Model.FileType;
-using static GovUk.Education.ExploreEducationStatistics.Common.Services.FileStoragePathUtils;
+using static GovUk.Education.ExploreEducationStatistics.Common.BlobContainers;
 using static GovUk.Education.ExploreEducationStatistics.Common.Services.FileStorageUtils;
 
 namespace GovUk.Education.ExploreEducationStatistics.Data.Processor.Services
@@ -22,13 +19,12 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Processor.Services
             _blobStorageService = blobStorageService;
         }
 
-        public async Task ExtractDataFiles(File zipFile)
+        public async Task ExtractDataFiles(DataImport import)
         {
-            var path = zipFile.Path();
-            var releaseId = zipFile.ReleaseId;
-            var blob = await _blobStorageService.GetBlob(PrivateFilesContainerName, path);
+            var path = import.ZipFile.Path();
+            var blob = await _blobStorageService.GetBlob(PrivateReleaseFiles, path);
 
-            await using var zipBlobFileStream = await _blobStorageService.StreamBlob(PrivateFilesContainerName, path);
+            await using var zipBlobFileStream = await _blobStorageService.StreamBlob(PrivateReleaseFiles, path);
             using var archive = new ZipArchive(zipBlobFileStream);
 
             var file1 = archive.Entries[0];
@@ -40,34 +36,25 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Processor.Services
             await using (var stream = dataFile.Open())
             {
                 await _blobStorageService.UploadStream(
-                    containerName: PrivateFilesContainerName,
-                    path: AdminReleasePath(releaseId, FileType.Data, dataFile.Name.ToLower()),
+                    containerName: PrivateReleaseFiles,
+                    path: import.File.Path(),
                     stream: stream,
                     contentType: "text/csv",
-                    options: new IBlobStorageService.UploadStreamOptions
-                    {
-                        MetaValues = GetDataFileMetaValues(
+                    metadata: GetDataFileMetaValues(
                             name: blob.Name,
                             metaFileName: metadataFile.Name,
                             userName: blob.GetUserName(),
                             numberOfRows: CalculateNumberOfRows(rowStream)
-                        )
-                    });
+                        ));
             }
 
             await using (var stream = metadataFile.Open())
             {
                 await _blobStorageService.UploadStream(
-                    containerName: PrivateFilesContainerName,
-                    path: AdminReleasePath(releaseId, Metadata, metadataFile.Name.ToLower()),
+                    containerName: PrivateReleaseFiles,
+                    path: import.MetaFile.Path(),
                     stream: stream,
-                    contentType: "text/csv",
-                    options: new IBlobStorageService.UploadStreamOptions
-                    {
-                        MetaValues = GetMetaDataFileMetaValues(
-                            dataFileName: dataFile.Name
-                        )
-                    });
+                    contentType: "text/csv");
             }
         }
     }

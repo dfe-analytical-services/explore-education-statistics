@@ -1,5 +1,5 @@
-using System;
 using System.Threading.Tasks;
+using GovUk.Education.ExploreEducationStatistics.Common;
 using GovUk.Education.ExploreEducationStatistics.Common.Model;
 using GovUk.Education.ExploreEducationStatistics.Content.Model;
 using GovUk.Education.ExploreEducationStatistics.Publisher.Models;
@@ -11,7 +11,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Publisher.Services.Interfac
     {
         Task<BlobLease> AcquireLease(string blobName);
 
-        Task<bool> CheckBlobExists(string containerName, string path);
+        Task<bool> CheckBlobExists(IBlobContainer containerName, string path);
 
         Task CopyReleaseFilesToPublicContainer(CopyReleaseFilesCommand copyReleaseFilesCommand);
 
@@ -23,9 +23,9 @@ namespace GovUk.Education.ExploreEducationStatistics.Publisher.Services.Interfac
 
         Task DeletePublicBlob(string path);
 
-        Task<BlobInfo> GetBlob(string containerName, string path);
+        Task<BlobInfo> GetBlob(IBlobContainer containerName, string path);
 
-        Task MovePublicDirectory(string containerName, string sourceDirectoryPath, string destinationDirectoryPath);
+        Task MovePublicDirectory(IBlobContainer containerName, string sourceDirectoryPath, string destinationDirectoryPath);
 
         Task UploadAsJson(string filePath, object value, JsonSerializerSettings settings = null);
     }

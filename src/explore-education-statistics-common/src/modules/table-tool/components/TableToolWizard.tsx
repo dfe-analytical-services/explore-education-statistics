@@ -9,9 +9,8 @@ import PreviousStepModalConfirm from '@common/modules/table-tool/components/Prev
 import PublicationForm, {
   PublicationFormSubmitHandler,
 } from '@common/modules/table-tool/components/PublicationForm';
-import PublicationSubjectForm, {
-  PublicationSubjectFormSubmitHandler,
-} from '@common/modules/table-tool/components/PublicationSubjectForm';
+import { SubjectFormSubmitHandler } from '@common/modules/table-tool/components/SubjectForm';
+import SubjectStep from '@common/modules/table-tool/components/SubjectStep';
 import TimePeriodForm, {
   TimePeriodFormSubmitHandler,
 } from '@common/modules/table-tool/components/TimePeriodForm';
@@ -23,13 +22,12 @@ import getDefaultTableHeaderConfig from '@common/modules/table-tool/utils/getDef
 import mapFullTable from '@common/modules/table-tool/utils/mapFullTable';
 import parseYearCodeTuple from '@common/modules/table-tool/utils/parseYearCodeTuple';
 import tableBuilderService, {
-  PublicationSubject,
   ReleaseTableDataQuery,
+  Subject,
   SubjectMeta,
   TableHighlight,
-  ThemeMeta,
+  Theme,
 } from '@common/services/tableBuilderService';
-import classNames from 'classnames';
 import React, { ReactElement, ReactNode, useMemo } from 'react';
 import { useImmer } from 'use-immer';
 
@@ -41,7 +39,7 @@ interface Publication {
 
 export interface InitialTableToolState {
   initialStep: number;
-  subjects?: PublicationSubject[];
+  subjects?: Subject[];
   highlights?: TableHighlight[];
   subjectMeta?: SubjectMeta;
   query?: ReleaseTableDataQuery;
@@ -52,7 +50,7 @@ export interface InitialTableToolState {
 }
 
 interface TableToolState extends InitialTableToolState {
-  subjects: PublicationSubject[];
+  subjects: Subject[];
   highlights: TableHighlight[];
   subjectMeta: SubjectMeta;
   query: ReleaseTableDataQuery;
@@ -68,10 +66,10 @@ export interface FinalStepRenderProps {
 }
 
 export interface TableToolWizardProps {
-  themeMeta?: ThemeMeta[];
+  themeMeta?: Theme[];
   initialState?: Partial<InitialTableToolState>;
   finalStep?: (props: FinalStepRenderProps) => ReactElement;
-  renderHighlights?: (highlights: TableHighlight[]) => ReactNode;
+  renderHighlightLink?: (highlight: TableHighlight) => ReactNode;
   scrollOnMount?: boolean;
   onSubmit?: (table: FullTable) => void;
 }
@@ -80,7 +78,7 @@ const TableToolWizard = ({
   themeMeta = [],
   initialState = {},
   scrollOnMount,
-  renderHighlights,
+  renderHighlightLink,
   finalStep,
   onSubmit,
 }: TableToolWizardProps) => {
@@ -129,7 +127,7 @@ const TableToolWizard = ({
     });
   };
 
-  const handlePublicationSubjectFormSubmit: PublicationSubjectFormSubmitHandler = async ({
+  const handleSubjectFormSubmit: SubjectFormSubmitHandler = async ({
     subjectId: selectedSubjectId,
   }) => {
     const nextSubjectMeta = await tableBuilderService.getSubjectMeta(
@@ -248,6 +246,7 @@ const TableToolWizard = ({
 
     const table = mapFullTable(tableData);
     const tableHeaders = getDefaultTableHeaderConfig(table.subjectMeta);
+
     if (onSubmit) {
       onSubmit(table);
     }
@@ -294,31 +293,14 @@ const TableToolWizard = ({
             )}
             <WizardStep>
               {stepProps => (
-                <div className="govuk-grid-row">
-                  <div
-                    className={classNames({
-                      'govuk-grid-column-one-half':
-                        stepProps.isActive && state.highlights.length,
-                      'govuk-grid-column-full': !stepProps.isActive,
-                    })}
-                  >
-                    <PublicationSubjectForm
-                      {...stepProps}
-                      initialValues={{
-                        subjectId: state.query.subjectId,
-                      }}
-                      options={state.subjects}
-                      onSubmit={handlePublicationSubjectFormSubmit}
-                    />
-                  </div>
-                  {!!renderHighlights &&
-                    state.highlights.length > 0 &&
-                    stepProps.isActive && (
-                      <div className="govuk-grid-column-one-half">
-                        {renderHighlights(state.highlights)}
-                      </div>
-                    )}
-                </div>
+                <SubjectStep
+                  {...stepProps}
+                  highlights={state.highlights}
+                  subjects={state.subjects}
+                  subjectId={state.query.subjectId}
+                  renderHighlightLink={renderHighlightLink}
+                  onSubmit={handleSubjectFormSubmit}
+                />
               )}
             </WizardStep>
             <WizardStep onBack={handleLocationStepBack}>

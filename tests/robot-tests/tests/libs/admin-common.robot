@@ -94,10 +94,10 @@ user creates release for publication
     user waits until page contains title caption  ${publication}
     user waits until h1 is visible  Create new release
     user waits until page contains element  id:releaseSummaryForm-timePeriodCoverage
-    user selects from list by label  id:releaseSummaryForm-timePeriodCoverage  ${time_period_coverage}
+    user selects from list by label  id:releaseSummaryForm-timePeriodCoverageCode  ${time_period_coverage}
     user enters text into element  id:releaseSummaryForm-timePeriodCoverageStartYear  ${start_year}
-    user clicks element if exists   css:[data-testid="Create new template"]
     user clicks radio   National Statistics
+    user clicks radio if exists  Create new template
     user clicks button  Create new release
     user waits until page contains element  xpath://span[text()="Edit release"]
     user waits until h2 is visible  Release summary
@@ -238,7 +238,7 @@ user opens nth editable accordion section
     user checks element attribute value should be  ${header_button}  aria-expanded  true
 
 user changes accordion section title
-    [Arguments]  ${section_num}  ${title}  ${parent}=id:releaseContentAccordion
+    [Arguments]  ${section_num}  ${title}  ${parent}=id:releaseMainContent
     user opens nth editable accordion section  ${section_num}  ${parent}
     ${section}=  get child element  ${parent}  xpath:.//*[@data-testid="editableAccordionSection"][${section_num}]
     user clicks button  Edit section title  ${section}

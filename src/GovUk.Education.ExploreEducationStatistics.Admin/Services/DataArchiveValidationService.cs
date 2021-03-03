@@ -4,7 +4,6 @@ using System.IO.Compression;
 using System.Text.RegularExpressions;
 using System.Threading.Tasks;
 using GovUk.Education.ExploreEducationStatistics.Admin.Services.Interfaces;
-using GovUk.Education.ExploreEducationStatistics.Common;
 using GovUk.Education.ExploreEducationStatistics.Common.Model;
 using GovUk.Education.ExploreEducationStatistics.Common.Services.Interfaces;
 using Microsoft.AspNetCore.Http;
@@ -13,13 +12,11 @@ using static GovUk.Education.ExploreEducationStatistics.Admin.Validators.Validat
 using static GovUk.Education.ExploreEducationStatistics.Admin.Validators.ValidationUtils;
 using static GovUk.Education.ExploreEducationStatistics.Common.Model.FileType;
 using static GovUk.Education.ExploreEducationStatistics.Common.Validators.FileTypeValidationUtils;
-using static GovUk.Education.ExploreEducationStatistics.Common.Services.FileStoragePathUtils;
 
 namespace GovUk.Education.ExploreEducationStatistics.Admin.Services
 {
     public class DataArchiveValidationService : IDataArchiveValidationService
     {
-        private readonly IBlobStorageService _blobStorageService;
         private readonly IFileTypeService _fileTypeService;
 
         private static readonly Dictionary<FileType, IEnumerable<Regex>> AllowedMimeTypesByFileType =
@@ -28,9 +25,8 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Services
                 {DataZip, AllowedArchiveMimeTypes}
             };
 
-        public DataArchiveValidationService(IBlobStorageService blobStorageService, IFileTypeService fileTypeService)
+        public DataArchiveValidationService(IFileTypeService fileTypeService)
         {
-            _blobStorageService = blobStorageService;
             _fileTypeService = fileTypeService;
         }
 
@@ -41,13 +37,6 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Services
             if (!await IsZipFile(zipFile))
             {
                 return ValidationActionResult(DataFileMustBeZipFile);
-            }
-
-            var path = AdminReleasePath(releaseId, DataZip, zipFile.FileName);
-
-            if (await _blobStorageService.CheckBlobExists(BlobContainerNames.PrivateFilesContainerName, path))
-            {
-                return ValidationActionResult(DataZipFileAlreadyExists);
             }
 
             await using var stream = zipFile.OpenReadStream();

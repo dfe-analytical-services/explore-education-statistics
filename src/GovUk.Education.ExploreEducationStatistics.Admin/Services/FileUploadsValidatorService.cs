@@ -51,7 +51,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Services
 
         public async Task<Either<ActionResult, Unit>> ValidateFileForUpload(IFormFile file, FileType type)
         {
-            if (type != Ancillary && type != Chart)
+            if (type != Ancillary && type != Chart && type != Image)
             {
                 throw new ArgumentException("Cannot use generic function to validate data file", nameof(type));
             }

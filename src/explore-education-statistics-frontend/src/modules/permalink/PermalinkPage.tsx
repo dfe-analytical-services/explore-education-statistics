@@ -50,10 +50,13 @@ const PermalinkPage: NextPage<Props> = ({ data }) => {
         </dl>
 
         <PrintThisPage
-          analytics={{
-            category: 'Page print',
-            action: 'Print this page link selected',
-          }}
+          onClick={() =>
+            logEvent({
+              category: 'Page print',
+              action: 'Print this page link selected',
+              label: window.location.pathname,
+            })
+          }
         />
       </div>
 
@@ -78,17 +81,17 @@ const PermalinkPage: NextPage<Props> = ({ data }) => {
               fileName={`permalink-${data.id}`}
               fullTable={fullTable}
               onClick={() =>
-                logEvent(
-                  'Permalink page',
-                  'CSV download button clicked',
-                  `${fullTable.subjectMeta.publicationName} between ${
+                logEvent({
+                  category: 'Permalink page',
+                  action: 'CSV download button clicked',
+                  label: `${fullTable.subjectMeta.publicationName} between ${
                     fullTable.subjectMeta.timePeriodRange[0].label
                   } and ${
                     fullTable.subjectMeta.timePeriodRange[
                       fullTable.subjectMeta.timePeriodRange.length - 1
                     ].label
                   }`,
-                )
+                })
               }
             />
           </li>
@@ -98,17 +101,17 @@ const PermalinkPage: NextPage<Props> = ({ data }) => {
               fileName={`permalink-${data.id}`}
               subjectMeta={fullTable.subjectMeta}
               onClick={() =>
-                logEvent(
-                  'Permalink page',
-                  'Excel download button clicked',
-                  `${fullTable.subjectMeta.publicationName} between ${
+                logEvent({
+                  category: 'Permalink page',
+                  action: 'Excel download button clicked',
+                  label: `${fullTable.subjectMeta.publicationName} between ${
                     fullTable.subjectMeta.timePeriodRange[0].label
                   } and ${
                     fullTable.subjectMeta.timePeriodRange[
                       fullTable.subjectMeta.timePeriodRange.length - 1
                     ].label
                   }`,
-                )
+                })
               }
             />
           </li>

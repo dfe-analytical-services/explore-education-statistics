@@ -1,5 +1,4 @@
 import StatusBlock from '@admin/components/StatusBlock';
-import useFormSubmit from '@admin/hooks/useFormSubmit';
 import { MethodologyRouteParams } from '@admin/routes/methodologyRoutes';
 import methodologyService, {
   MethodologyStatus,
@@ -13,6 +12,7 @@ import FormFieldTextArea from '@common/components/form/FormFieldTextArea';
 import LoadingSpinner from '@common/components/LoadingSpinner';
 import WarningMessage from '@common/components/WarningMessage';
 import useAsyncRetry from '@common/hooks/useAsyncRetry';
+import useFormSubmit from '@common/hooks/useFormSubmit';
 import useToggle from '@common/hooks/useToggle';
 import { Dictionary } from '@common/types';
 import Yup from '@common/validation/yup';
@@ -140,7 +140,6 @@ const MethodologyStatusPage = ({
                           'Once approved, changes will be available to the public immediately.'
                         }
                         name="status"
-                        id={`${formId}-status`}
                         options={[
                           {
                             label: 'In draft',
@@ -153,7 +152,6 @@ const MethodologyStatusPage = ({
                               <FormFieldTextArea<FormValues>
                                 name="internalReleaseNote"
                                 className="govuk-!-width-one-half"
-                                id={`${formId}-internalReleaseNote`}
                                 label="Internal release note"
                                 rows={2}
                               />

@@ -5,6 +5,7 @@ using System.Globalization;
 using System.Linq;
 using System.Net.Mime;
 using System.Threading.Tasks;
+using GovUk.Education.ExploreEducationStatistics.Common;
 using GovUk.Education.ExploreEducationStatistics.Common.Extensions;
 using GovUk.Education.ExploreEducationStatistics.Common.Model;
 using GovUk.Education.ExploreEducationStatistics.Common.Services.Interfaces;
@@ -12,7 +13,7 @@ using GovUk.Education.ExploreEducationStatistics.Data.Api.Models;
 using GovUk.Education.ExploreEducationStatistics.Data.Api.Services.Interfaces;
 using Microsoft.Extensions.Logging;
 using Newtonsoft.Json;
-using static GovUk.Education.ExploreEducationStatistics.Common.BlobContainerNames;
+using static GovUk.Education.ExploreEducationStatistics.Common.BlobContainers;
 
 namespace GovUk.Education.ExploreEducationStatistics.Data.Api.Services
 {
@@ -33,7 +34,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Api.Services
             Func<T, Task<Either<string, Permalink>>> transformFunc)
         {
             var migrationHistoryWriter =
-                await MigrationHistoryWriter.Create(PublicPermalinkMigrationContainerName, migrationId, _blobStorageService);
+                await MigrationHistoryWriter.Create(PermalinkMigrations, migrationId, _blobStorageService);
             var shouldRun = await CheckMigrationShouldRunAndRecordHistory(migrationHistoryWriter);
             if (!shouldRun)
             {
@@ -93,16 +94,16 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Api.Services
 
         private async Task<List<T>> DownloadPermalinksAsync<T>()
         {
-            _logger.LogDebug("Listing blobs in container: {Container}", PublicPermalinkContainerName);
+            _logger.LogDebug("Listing blobs in container: {Container}", Permalinks);
 
-            var blobs = (await _blobStorageService.ListBlobs(PublicPermalinkContainerName)).ToList();
+            var blobs = (await _blobStorageService.ListBlobs(Permalinks)).ToList();
 
-            _logger.LogDebug("Found {Count} blobs in container: {Container}", blobs.Count, PublicPermalinkContainerName);
+            _logger.LogDebug("Found {Count} blobs in container: {Container}", blobs.Count, Permalinks);
 
             var strings = await Task.WhenAll(
                 blobs.Select(blob =>
                     _blobStorageService.DownloadBlobText(
-                        containerName: PublicPermalinkContainerName,
+                        containerName: Permalinks,
                         path: blob.Path
                     )
                 )
@@ -133,7 +134,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Api.Services
             _logger.LogDebug("Uploading {Count} Permalinks", permalinks.Count);
             await migrationHistoryWriter.WriteHistory($"Uploading {permalinks.Count} Permalinks");
             await Task.WhenAll(permalinks.Select(permalink =>
-                _blobStorageService.UploadText(containerName: PublicPermalinkContainerName,
+                _blobStorageService.UploadText(containerName: Permalinks,
                     path: permalink.Id.ToString(),
                     content: JsonConvert.SerializeObject(permalink),
                     contentType: MediaTypeNames.Application.Json)));
@@ -157,12 +158,12 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Api.Services
 
     internal class MigrationHistoryWriter
     {
-        private readonly string _containerName;
+        private readonly IBlobContainer _containerName;
         private readonly string _migrationId;
         private readonly IBlobStorageService _blobStorageService;
         private readonly bool _appendSupported;
 
-        private MigrationHistoryWriter(string containerName,
+        private MigrationHistoryWriter(IBlobContainer containerName,
             string migrationId,
             IBlobStorageService blobStorageService,
             bool appendSupported)
@@ -173,7 +174,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Api.Services
             _appendSupported = appendSupported;
         }
 
-        internal static async Task<MigrationHistoryWriter> Create(string containerName, string migrationId,
+        internal static async Task<MigrationHistoryWriter> Create(IBlobContainer containerName, string migrationId,
             IBlobStorageService blobStorageService)
         {
             var appendSupported = await blobStorageService.IsAppendSupported(containerName, migrationId);

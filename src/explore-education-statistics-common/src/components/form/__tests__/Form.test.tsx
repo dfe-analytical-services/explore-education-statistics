@@ -1,6 +1,7 @@
 import { FormFieldTextInput } from '@common/components/form';
 import Yup from '@common/validation/yup';
-import { fireEvent, render, wait } from '@testing-library/react';
+import { fireEvent, render, screen, waitFor } from '@testing-library/react';
+import userEvent from '@testing-library/user-event';
 import { Field, Formik } from 'formik';
 import noop from 'lodash/noop';
 import React from 'react';
@@ -8,7 +9,7 @@ import Form from '../Form';
 
 describe('Form', () => {
   test('renders error summary from form errors when form is submitted', async () => {
-    const { container, getByText } = render(
+    const { container } = render(
       <Formik
         initialValues={{
           firstName: '',
@@ -20,33 +21,31 @@ describe('Form', () => {
         })}
         onSubmit={() => {}}
       >
-        <Form id="test-form">The form</Form>
+        <Form id="test-form">
+          The form
+          <button type="submit">Submit</button>
+        </Form>
       </Formik>,
     );
 
-    const form = container.querySelector('#test-form') as HTMLFormElement;
+    userEvent.click(screen.getByRole('button', { name: 'Submit' }));
 
-    fireEvent.submit(form, {
-      current: form,
-      target: form,
+    await waitFor(() => {
+      expect(screen.getByText('First name is required')).toHaveAttribute(
+        'href',
+        '#test-form-firstName',
+      );
+      expect(screen.getByText('Last name is required')).toHaveAttribute(
+        'href',
+        '#test-form-lastName',
+      );
     });
-
-    await wait();
-
-    expect(getByText('First name is required')).toHaveAttribute(
-      'href',
-      '#test-form-firstName',
-    );
-    expect(getByText('Last name is required')).toHaveAttribute(
-      'href',
-      '#test-form-lastName',
-    );
 
     expect(container.innerHTML).toMatchSnapshot();
   });
 
   test('does not render errors for fields that do not have errors', async () => {
-    const { container, queryByText } = render(
+    const { container } = render(
       <Formik
         initialValues={{
           firstName: '',
@@ -58,27 +57,27 @@ describe('Form', () => {
         })}
         onSubmit={() => {}}
       >
-        <Form id="test-form">The form</Form>
+        <Form id="test-form">
+          The form
+          <button type="submit">Submit</button>
+        </Form>
       </Formik>,
     );
 
-    const form = container.querySelector('#test-form') as HTMLFormElement;
+    userEvent.click(screen.getByRole('button', { name: 'Submit' }));
 
-    fireEvent.submit(form, {
-      current: form,
-      target: form,
+    await waitFor(() => {
+      expect(screen.queryByText('First name is required')).toBeInTheDocument();
+      expect(
+        screen.queryByText('Last name is required'),
+      ).not.toBeInTheDocument();
     });
-
-    await wait();
-
-    expect(queryByText('First name is required')).not.toBeNull();
-    expect(queryByText('Last name is required')).toBeNull();
 
     expect(container.innerHTML).toMatchSnapshot();
   });
 
   test('renders nested error messages', async () => {
-    const { container, getByText } = render(
+    render(
       <Formik
         initialValues={{
           address: {
@@ -92,27 +91,25 @@ describe('Form', () => {
         })}
         onSubmit={() => {}}
       >
-        <Form id="test-form">The form</Form>
+        <Form id="test-form">
+          The form
+          <button type="submit">Submit</button>
+        </Form>
       </Formik>,
     );
 
-    const form = container.querySelector('#test-form') as HTMLFormElement;
+    userEvent.click(screen.getByRole('button', { name: 'Submit' }));
 
-    fireEvent.submit(form, {
-      current: form,
-      target: form,
+    await waitFor(() => {
+      expect(screen.getByText('Line 1 of address is required')).toHaveAttribute(
+        'href',
+        '#test-form-addressLine1',
+      );
     });
-
-    await wait();
-
-    expect(getByText('Line 1 of address is required')).toHaveAttribute(
-      'href',
-      '#test-form-addressLine1',
-    );
   });
 
   test('does not render nested error messages for fields that do not have errors', async () => {
-    const { container, queryByText } = render(
+    render(
       <Formik
         initialValues={{
           address: {
@@ -128,27 +125,29 @@ describe('Form', () => {
         })}
         onSubmit={() => {}}
       >
-        <Form id="test-form">The form</Form>
+        <Form id="test-form">
+          The form
+          <button type="submit">Submit</button>
+        </Form>
       </Formik>,
     );
 
-    const form = container.querySelector('#test-form') as HTMLFormElement;
+    userEvent.click(screen.getByRole('button', { name: 'Submit' }));
 
-    fireEvent.submit(form, {
-      current: form,
-      target: form,
+    await waitFor(() => {
+      expect(
+        screen.queryByText('Line 1 of address is required'),
+      ).not.toBeInTheDocument();
+      expect(
+        screen.queryByText('Line 2 of address is required'),
+      ).toBeInTheDocument();
     });
-
-    await wait();
-
-    expect(queryByText('Line 1 of address is required')).toBeNull();
-    expect(queryByText('Line 2 of address is required')).not.toBeNull();
   });
 
   test('calls `onSubmit` handler when form is submitted successfully', async () => {
     const handleSubmit = jest.fn();
 
-    const { container } = render(
+    render(
       <Formik
         initialValues={{
           firstName: 'Firstname',
@@ -158,24 +157,22 @@ describe('Form', () => {
         })}
         onSubmit={handleSubmit}
       >
-        <Form id="test-form">The form</Form>
+        <Form id="test-form">
+          The form
+          <button type="submit">Submit</button>
+        </Form>
       </Formik>,
     );
 
-    const form = container.querySelector('#test-form') as HTMLFormElement;
+    userEvent.click(screen.getByRole('button', { name: 'Submit' }));
 
-    fireEvent.submit(form, {
-      current: form,
-      target: form,
+    await waitFor(() => {
+      expect(handleSubmit).toHaveBeenCalledTimes(1);
     });
-
-    await wait();
-
-    expect(handleSubmit).toHaveBeenCalled();
   });
 
   test('renders submit error', async () => {
-    const { container, getByText } = render(
+    const { container } = render(
       <Formik
         initialValues={{
           firstName: 'Firstname',
@@ -189,23 +186,19 @@ describe('Form', () => {
       >
         <Form id="test-form" showSubmitError>
           The form
+          <button type="submit">Submit</button>
         </Form>
       </Formik>,
     );
 
-    const form = container.querySelector('#test-form') as HTMLFormElement;
+    userEvent.click(screen.getByRole('button', { name: 'Submit' }));
 
-    fireEvent.submit(form, {
-      current: form,
-      target: form,
+    await waitFor(() => {
+      expect(screen.getByText('Something went wrong')).toHaveAttribute(
+        'href',
+        '#test-form-submit',
+      );
     });
-
-    await wait();
-
-    expect(getByText('Something went wrong')).toHaveAttribute(
-      'href',
-      '#test-form-submit',
-    );
 
     expect(container.innerHTML).toMatchSnapshot();
   });
@@ -215,7 +208,7 @@ describe('Form', () => {
       throw new Error('Something went wrong');
     });
 
-    const { container, queryByText } = render(
+    render(
       <Formik
         initialValues={{
           firstName: 'Firstname',
@@ -227,36 +220,31 @@ describe('Form', () => {
       >
         <Form id="test-form" showSubmitError>
           The form
+          <button type="submit">Submit</button>
         </Form>
       </Formik>,
     );
 
-    const form = container.querySelector('#test-form') as HTMLFormElement;
+    userEvent.click(screen.getByRole('button', { name: 'Submit' }));
 
-    fireEvent.submit(form, {
-      current: form,
-      target: form,
+    await waitFor(() => {
+      expect(screen.queryByText('Something went wrong')).toBeInTheDocument();
     });
-
-    await wait();
-
-    expect(queryByText('Something went wrong')).not.toBeNull();
 
     // Stop the onSubmit from throwing error
     onSubmit.mockImplementation();
 
-    fireEvent.submit(form, {
-      current: form,
-      target: form,
+    userEvent.click(screen.getByRole('button', { name: 'Submit' }));
+
+    await waitFor(() => {
+      expect(
+        screen.queryByText('Something went wrong'),
+      ).not.toBeInTheDocument();
     });
-
-    await wait();
-
-    expect(queryByText('Something went wrong')).toBeNull();
   });
 
   test('removes submit error when form is reset', async () => {
-    const { container, queryByText, getByText } = render(
+    render(
       <Formik
         initialValues={{
           firstName: 'Firstname',
@@ -271,6 +259,7 @@ describe('Form', () => {
         {formik => (
           <Form id="test-form" showSubmitError>
             The form
+            <button type="submit">Submit</button>
             <button type="button" onClick={formik.handleReset}>
               Reset form
             </button>
@@ -279,26 +268,23 @@ describe('Form', () => {
       </Formik>,
     );
 
-    const form = container.querySelector('#test-form') as HTMLFormElement;
+    userEvent.click(screen.getByRole('button', { name: 'Submit' }));
 
-    fireEvent.submit(form, {
-      current: form,
-      target: form,
+    await waitFor(() => {
+      expect(screen.queryByText('Something went wrong')).toBeInTheDocument();
     });
 
-    await wait();
+    fireEvent.click(screen.getByText('Reset form'));
 
-    expect(queryByText('Something went wrong')).not.toBeNull();
-
-    fireEvent.click(getByText('Reset form'));
-
-    await wait();
-
-    expect(queryByText('Something went wrong')).toBeNull();
+    await waitFor(() => {
+      expect(
+        screen.queryByText('Something went wrong'),
+      ).not.toBeInTheDocument();
+    });
   });
 
   test('removes submit error when form values are changed', async () => {
-    const { container, queryByText, getByLabelText } = render(
+    render(
       <Formik
         initialValues={{
           firstName: 'Firstname',
@@ -313,32 +299,29 @@ describe('Form', () => {
         <Form id="test-form" showSubmitError>
           <label htmlFor="firstName">Firstname</label>
           <Field name="firstName" type="text" id="firstName" />
+
+          <button type="submit">Submit</button>
         </Form>
       </Formik>,
     );
 
-    const form = container.querySelector('#test-form') as HTMLFormElement;
+    userEvent.click(screen.getByRole('button', { name: 'Submit' }));
 
-    fireEvent.submit(form, {
-      current: form,
-      target: form,
+    await waitFor(() => {
+      expect(screen.queryByText('Something went wrong')).toBeInTheDocument();
     });
 
-    await wait();
-
-    expect(queryByText('Something went wrong')).not.toBeNull();
-
-    fireEvent.change(getByLabelText('Firstname'), {
+    fireEvent.change(screen.getByLabelText('Firstname'), {
       target: {
         value: 'Another firstname',
       },
     });
 
-    expect(queryByText('Something went wrong')).toBeNull();
+    expect(screen.queryByText('Something went wrong')).not.toBeInTheDocument();
   });
 
   test('focuses error summary on submit', async () => {
-    const { container, getByRole } = render(
+    render(
       <Formik
         initialValues={{
           firstName: '',
@@ -354,24 +337,21 @@ describe('Form', () => {
             label="First name"
             name="firstName"
           />
+
+          <button type="submit">Submit</button>
         </Form>
       </Formik>,
     );
 
-    const form = container.querySelector('#test-form') as HTMLFormElement;
+    userEvent.click(screen.getByRole('button', { name: 'Submit' }));
 
-    fireEvent.submit(form, {
-      current: form,
-      target: form,
+    await waitFor(() => {
+      expect(screen.getByRole('alert')).toHaveFocus();
     });
-
-    await wait();
-
-    expect(getByRole('alert')).toHaveFocus();
   });
 
   test('does not re-focus error summary when changing input', async () => {
-    const { container, getByRole, getByLabelText } = render(
+    render(
       <Formik
         initialValues={{
           firstName: '',
@@ -387,22 +367,19 @@ describe('Form', () => {
             label="First name"
             name="firstName"
           />
+
+          <button type="submit">Submit</button>
         </Form>
       </Formik>,
     );
 
-    const form = container.querySelector('#test-form') as HTMLFormElement;
+    userEvent.click(screen.getByRole('button', { name: 'Submit' }));
 
-    fireEvent.submit(form, {
-      current: form,
-      target: form,
+    await waitFor(() => {
+      expect(screen.getByRole('alert')).toHaveFocus();
     });
 
-    await wait();
-
-    expect(getByRole('alert')).toHaveFocus();
-
-    const input = getByLabelText('First name');
+    const input = screen.getByLabelText('First name');
 
     input.focus();
 
@@ -412,11 +389,11 @@ describe('Form', () => {
       },
     });
 
-    expect(getByRole('alert')).not.toHaveFocus();
+    expect(screen.getByRole('alert')).not.toHaveFocus();
   });
 
   test('re-focuses error summary on re-submit', async () => {
-    const { container, getByRole, getByLabelText } = render(
+    render(
       <Formik
         initialValues={{
           firstName: '',
@@ -433,32 +410,26 @@ describe('Form', () => {
               label="First name"
               name="firstName"
             />
+
+            <button type="submit">Submit</button>
           </Form>
         )}
       </Formik>,
     );
 
-    const form = container.querySelector('#test-form') as HTMLFormElement;
+    userEvent.click(screen.getByRole('button', { name: 'Submit' }));
 
-    fireEvent.submit(form, {
-      current: form,
-      target: form,
+    await waitFor(() => {
+      expect(screen.getByRole('alert')).toHaveFocus();
     });
 
-    await wait();
+    screen.getByLabelText('First name').focus();
+    expect(screen.getByRole('alert')).not.toHaveFocus();
 
-    expect(getByRole('alert')).toHaveFocus();
+    userEvent.click(screen.getByRole('button', { name: 'Submit' }));
 
-    getByLabelText('First name').focus();
-    expect(getByRole('alert')).not.toHaveFocus();
-
-    fireEvent.submit(form, {
-      current: form,
-      target: form,
+    await waitFor(() => {
+      expect(screen.getByRole('alert')).toHaveFocus();
     });
-
-    await wait();
-
-    expect(getByRole('alert')).toHaveFocus();
   });
 });

@@ -44,7 +44,8 @@ namespace GovUk.Education.ExploreEducationStatistics.Publisher.Functions
             ILogger logger,
             ExecutionContext executionContext)
         {
-            logger.LogInformation($"{executionContext.FunctionName} triggered");
+            logger.LogInformation("{0} triggered",
+                executionContext.FunctionName);
             var requestBody = await new StreamReader(req.Body).ReadToEndAsync();
             var response = JsonConvert.DeserializeObject<PipelineResponse>(requestBody);
 
@@ -61,13 +62,13 @@ namespace GovUk.Education.ExploreEducationStatistics.Publisher.Functions
             }
             else
             {
-                logger.LogError($"ADF pipeline failed: {response}");
+                logger.LogError("ADF pipeline failed: {0}", response);
                 await _releaseStatusService.UpdateDataStageAsync(response.ReleaseId, response.ReleaseStatusId, Failed,
                     new ReleaseStatusLogMessage(
                         $"Exception in data stage (ADF pipeline triggered: {response.PipelineTriggerTime}): {response.ErrorMessage}"));
             }
 
-            logger.LogInformation($"{executionContext.FunctionName} completed");
+            logger.LogInformation("{0} completed", executionContext.FunctionName);
 
             return response.Status != null
                 ? (ActionResult) new OkObjectResult($"status, {response.Status}")

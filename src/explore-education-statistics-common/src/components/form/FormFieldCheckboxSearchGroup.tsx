@@ -20,11 +20,12 @@ function FormFieldCheckboxSearchGroup<FormValues>(
 
   return (
     <FormField<string[]> {...props}>
-      {({ field, helpers, meta }) => {
+      {({ id, field, helpers, meta }) => {
         return (
           <FormCheckboxSearchGroup
             {...props}
             {...field}
+            id={id}
             onAllChange={(event, checked) => {
               if (props.onAllChange) {
                 props.onAllChange(event, checked);

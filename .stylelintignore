@@ -2,3 +2,5 @@
 build/
 node_modules/
 *.min.css
+
+src/explore-education-statistics-ckeditor/sample

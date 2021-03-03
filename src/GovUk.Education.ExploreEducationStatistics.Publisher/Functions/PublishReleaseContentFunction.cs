@@ -48,7 +48,9 @@ namespace GovUk.Education.ExploreEducationStatistics.Publisher.Functions
             ExecutionContext executionContext,
             ILogger logger)
         {
-            logger.LogInformation($"{executionContext.FunctionName} triggered at: {DateTime.Now}");
+            logger.LogInformation("{0} triggered at: {1}",
+                executionContext.FunctionName,
+                DateTime.Now);
 
             await UpdateStage(message.ReleaseId, message.ReleaseStatusId, State.Started);
 
@@ -71,14 +73,15 @@ namespace GovUk.Education.ExploreEducationStatistics.Publisher.Functions
             }
             catch (Exception e)
             {
-                logger.LogError(e, $"Exception occured while executing {executionContext.FunctionName}");
-                logger.LogError(e.StackTrace);
+                logger.LogError(e, "Exception occured while executing {0}",
+                    executionContext.FunctionName);
+                logger.LogError("{StackTrace}", e.StackTrace);
 
                 await UpdateStage(message.ReleaseId, message.ReleaseStatusId, State.Failed,
                     new ReleaseStatusLogMessage($"Exception publishing release immediately: {e.Message}"));
             }
 
-            logger.LogInformation($"{executionContext.FunctionName} completed");
+            logger.LogInformation("{0} completed", executionContext.FunctionName);
         }
 
         private async Task UpdateStage(Guid releaseId, Guid releaseStatusId, State state,

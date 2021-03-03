@@ -1,17 +1,14 @@
 import Button from '@common/components/Button';
-import React from 'react';
+import React, { MouseEventHandler } from 'react';
 import classNames from 'classnames';
-import {
-  AnalyticProps,
-  logEvent,
-} from '@frontend/services/googleAnalyticsService';
 import styles from './PrintThisPage.module.scss';
 
 interface Props {
   className?: string;
+  onClick?: MouseEventHandler<HTMLButtonElement>;
 }
 
-const PrintThisPage = ({ analytics, className }: AnalyticProps & Props) => {
+const PrintThisPage = ({ className, onClick }: Props) => {
   return (
     <div
       className={classNames(
@@ -23,15 +20,8 @@ const PrintThisPage = ({ analytics, className }: AnalyticProps & Props) => {
     >
       <Button
         variant="secondary"
-        onClick={() => {
-          if (analytics) {
-            logEvent(
-              analytics.category,
-              analytics.action,
-              window.location.pathname,
-            );
-          }
-
+        onClick={event => {
+          onClick?.(event);
           window.print();
         }}
       >

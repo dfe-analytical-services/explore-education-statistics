@@ -561,6 +561,20 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Migrations
                         },
                         new
                         {
+                            Id = -26,
+                            ClaimType = "UpdateAllMethodologies",
+                            ClaimValue = "",
+                            RoleId = "f9ddb43e-aa9e-41ed-837d-3062e130c425"
+                        },
+                        new
+                        {
+                            Id = -27,
+                            ClaimType = "AccessAllMethodologies",
+                            ClaimValue = "",
+                            RoleId = "f9ddb43e-aa9e-41ed-837d-3062e130c425"
+                        },
+                        new
+                        {
                             Id = -28,
                             ClaimType = "ApproveAllMethodologies",
                             ClaimValue = "",

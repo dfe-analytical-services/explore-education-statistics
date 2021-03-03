@@ -1,3 +1,4 @@
+import { useFormContext } from '@common/components/form/contexts/FormContext';
 import classNames from 'classnames';
 import React, { FocusEventHandler, ReactNode } from 'react';
 import ErrorMessage from '../ErrorMessage';
@@ -12,6 +13,11 @@ export interface FormFieldsetProps {
   legend: ReactNode | string;
   legendSize?: 'xl' | 'l' | 'm' | 's';
   legendHidden?: boolean;
+  /**
+   * Set to false to disable default prefixing
+   * of `id` with the current form context's form id.
+   */
+  useFormId?: boolean;
   onBlur?: FocusEventHandler<HTMLFieldSetElement>;
   onFocus?: FocusEventHandler<HTMLFieldSetElement>;
 }
@@ -25,20 +31,24 @@ const FormFieldset = ({
   legend,
   legendSize = 'l',
   legendHidden = false,
+  useFormId = true,
   onBlur,
   onFocus,
 }: FormFieldsetProps) => {
+  const { prefixFormId } = useFormContext();
+  const fieldId = useFormId ? prefixFormId(id) : id;
+
   return (
     <FormGroup hasError={!!error}>
       <fieldset
         aria-describedby={
           classNames({
-            [`${id}-error`]: !!error,
-            [`${id}-hint`]: !!hint,
+            [`${fieldId}-error`]: !!error,
+            [`${fieldId}-hint`]: !!hint,
           }) || undefined
         }
         className={classNames('govuk-fieldset', className)}
-        id={id}
+        id={fieldId}
         onBlur={onBlur}
         onFocus={onFocus}
       >
@@ -55,12 +65,12 @@ const FormFieldset = ({
         </legend>
 
         {hint && (
-          <span className="govuk-hint" id={`${id}-hint`}>
+          <span className="govuk-hint" id={`${fieldId}-hint`}>
             {hint}
           </span>
         )}
 
-        {error && <ErrorMessage id={`${id}-error`}>{error}</ErrorMessage>}
+        {error && <ErrorMessage id={`${fieldId}-error`}>{error}</ErrorMessage>}
 
         {children}
       </fieldset>

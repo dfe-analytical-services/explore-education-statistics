@@ -6,16 +6,10 @@ namespace GovUk.Education.ExploreEducationStatistics.Common.Extensions
 {
     public static class BlobInfoExtensions
     {
-        public const string FilenameKey = BlobInfo.FilenameKey;
         public const string NameKey = BlobInfo.NameKey;
         public const string NumberOfRowsKey = "NumberOfRows";
         public const string UserNameKey = "userName";
         public const string ReleaseDateTimeKey = "releasedatetime";
-
-        /**
-         * Property key on a metadata file to point at the data file
-         */
-        public const string DataFileKey = "datafile";
 
         /**
          * Property key on a data file to point at the metadata file

@@ -1,7 +1,7 @@
-import useFormSubmit from '@admin/hooks/useFormSubmit';
 import Button from '@common/components/Button';
 import ButtonGroup from '@common/components/ButtonGroup';
 import { Form, FormFieldTextInput } from '@common/components/form';
+import useFormSubmit from '@common/hooks/useFormSubmit';
 import { mapFieldErrors } from '@common/validation/serverValidations';
 import Yup from '@common/validation/yup';
 import { Formik } from 'formik';
@@ -52,7 +52,6 @@ const TopicForm = ({
       {form => (
         <Form id={id}>
           <FormFieldTextInput<TopicFormValues>
-            id={`${id}-title`}
             label="Title"
             name="title"
             className="govuk-!-width-two-thirds"

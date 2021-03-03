@@ -1,5 +1,6 @@
-import React from 'react';
+import { waitFor } from '@testing-library/dom';
 import { fireEvent, render, screen, within } from '@testing-library/react';
+import React from 'react';
 import Tabs from '../Tabs';
 import TabsSection from '../TabsSection';
 
@@ -268,6 +269,57 @@ describe('Tabs', () => {
 
     expect(tabSections[0]).not.toBeVisible();
     expect(tabSections[1]).toBeVisible();
+  });
+
+  test('changing location hash opens corresponding tab', async () => {
+    window.location.hash = '#tab2';
+
+    render(
+      <Tabs id="test-tabs">
+        <TabsSection title="Tab 1" id="tab1">
+          <p>Test section 1 content</p>
+        </TabsSection>
+        <TabsSection title="Tab 2" id="tab2">
+          <p>Test section 2 content</p>
+        </TabsSection>
+      </Tabs>,
+    );
+
+    expect(screen.getByRole('tab', { name: 'Tab 1' })).toHaveAttribute(
+      'aria-selected',
+      'false',
+    );
+    expect(screen.getByRole('tab', { name: 'Tab 2' })).toHaveAttribute(
+      'aria-selected',
+      'true',
+    );
+
+    let tabSections = screen.getAllByRole('tabpanel', {
+      hidden: true,
+    });
+
+    expect(tabSections[0]).not.toBeVisible();
+    expect(tabSections[1]).toBeVisible();
+
+    window.location.hash = '#tab1';
+
+    await waitFor(() => {
+      expect(screen.getByRole('tab', { name: 'Tab 1' })).toHaveAttribute(
+        'aria-selected',
+        'true',
+      );
+      expect(screen.getByRole('tab', { name: 'Tab 2' })).toHaveAttribute(
+        'aria-selected',
+        'false',
+      );
+
+      tabSections = screen.getAllByRole('tabpanel', {
+        hidden: true,
+      });
+
+      expect(tabSections[0]).toBeVisible();
+      expect(tabSections[1]).not.toBeVisible();
+    });
   });
 
   test('clicking tab reveals correct section', () => {

@@ -97,6 +97,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Api
             services.AddTransient<ITableBuilderService, TableBuilderService>();
             services.AddTransient<IDataBlockService, DataBlockService>();
             services.AddTransient<IPublicationService, PublicationService>();
+            services.AddTransient<IReleaseService, ReleaseService>();
             services.AddTransient<IThemeService, ThemeService>();
             services.AddTransient<IResultSubjectMetaService, ResultSubjectMetaService>();
             services.AddTransient<ISubjectMetaService, SubjectMetaService>();
@@ -121,6 +122,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Api
             services.AddTransient<IObservationService, ObservationService>();
             services.AddTransient<IReleaseRepository, ReleaseRepository>();
             services.AddTransient<ISubjectService, SubjectService>();
+            services.AddTransient<IMetaGuidanceSubjectService, MetaGuidanceSubjectService>();
             services.AddTransient<ITimePeriodService, TimePeriodService>();
             services.AddTransient<IPermalinkService, PermalinkService>();
             services.AddTransient<IPermalinkMigrationService, PermalinkMigrationService>();

@@ -47,7 +47,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Common.Services
             _logger = logger;
         }
 
-        public async Task<IEnumerable<BlobInfo>> ListBlobs(string containerName, string path)
+        public async Task<IEnumerable<BlobInfo>> ListBlobs(IBlobContainer containerName, string path)
         {
             var blobContainer = await GetBlobContainer(containerName);
             var blobInfos = new List<BlobInfo>();
@@ -87,13 +87,13 @@ namespace GovUk.Education.ExploreEducationStatistics.Common.Services
             return blobInfos;
         }
 
-        public async Task<bool> CheckBlobExists(string containerName, string path)
+        public async Task<bool> CheckBlobExists(IBlobContainer containerName, string path)
         {
             var blob = await GetBlobClient(containerName, path);
             return await blob.ExistsAsync();
         }
 
-        public async Task<BlobInfo> GetBlob(string containerName, string path)
+        public async Task<BlobInfo> GetBlob(IBlobContainer containerName, string path)
         {
             var blob = await GetBlobClient(containerName, path);
             var properties = (await blob.GetPropertiesAsync()).Value;
@@ -108,7 +108,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Common.Services
             );
         }
 
-        public async Task DeleteBlobs(string containerName, string directoryPath, string excludePattern = null)
+        public async Task DeleteBlobs(IBlobContainer containerName, string directoryPath, string excludePattern = null)
         {
             var prefix = directoryPath.AppendTrailingSlash();
 
@@ -155,7 +155,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Common.Services
             } while (continuationToken != string.Empty);
         }
 
-        public async Task DeleteBlob(string containerName, string path)
+        public async Task DeleteBlob(IBlobContainer containerName, string path)
         {
             var blob = await GetBlobClient(containerName, path);
 
@@ -165,10 +165,10 @@ namespace GovUk.Education.ExploreEducationStatistics.Common.Services
         }
 
         public async Task UploadFile(
-            string containerName,
+            IBlobContainer containerName,
             string path,
             IFormFile file,
-            IBlobStorageService.UploadFileOptions options = null)
+            IDictionary<string, string> metadata = null)
         {
             var blob = await GetBlobClient(containerName, path);
 
@@ -177,16 +177,16 @@ namespace GovUk.Education.ExploreEducationStatistics.Common.Services
             _logger.LogInformation($"Uploading file to blob {containerName}/{path}");
 
             await blob.UploadAsync(
-                tempFilePath,
-                new BlobHttpHeaders
+                path: tempFilePath,
+                httpHeaders: new BlobHttpHeaders
                 {
                     ContentType = file.ContentType
                 },
-                options?.MetaValues
+                metadata: metadata
             );
         }
 
-        public async Task<bool> MoveBlob(string containerName,
+        public async Task<bool> MoveBlob(IBlobContainer containerName,
             string sourcePath,
             string destinationPath)
         {
@@ -258,11 +258,11 @@ namespace GovUk.Education.ExploreEducationStatistics.Common.Services
         }
 
         public async Task UploadStream(
-            string containerName,
+            IBlobContainer containerName,
             string path,
             Stream stream,
             string contentType,
-            IBlobStorageService.UploadStreamOptions options = null)
+            IDictionary<string, string> metadata = null)
         {
             var blobContainer = await GetBlobContainer(containerName);
             var blob = blobContainer.GetBlockBlobClient(path);
@@ -275,21 +275,21 @@ namespace GovUk.Education.ExploreEducationStatistics.Common.Services
             }
 
             await blob.UploadAsync(
-                stream,
-                new BlobHttpHeaders
+                content: stream,
+                httpHeaders: new BlobHttpHeaders
                 {
                     ContentType = contentType,
                 },
-                options?.MetaValues
+                metadata: metadata
             );
         }
 
         public async Task UploadText(
-            string containerName,
+            IBlobContainer containerName,
             string path,
             string content,
             string contentType,
-            IBlobStorageService.UploadTextOptions options = null)
+            IDictionary<string, string> metadata = null)
         {
             var blobContainer = await GetBlobContainer(containerName);
             var blob = blobContainer.GetBlockBlobClient(path);
@@ -299,17 +299,17 @@ namespace GovUk.Education.ExploreEducationStatistics.Common.Services
             await using var stream = new MemoryStream(Encoding.UTF8.GetBytes(content));
 
             await blob.UploadAsync(
-                stream,
-                new BlobHttpHeaders
+                content: stream,
+                httpHeaders: new BlobHttpHeaders
                 {
                     ContentType = contentType,
                 },
-                options?.MetaValues
+                metadata: metadata
             );
         }
 
         public async Task UploadAsJson<T>(
-            string containerName,
+            IBlobContainer containerName,
             string path,
             T content,
             JsonSerializerSettings settings)
@@ -328,7 +328,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Common.Services
          * Storage Emulator doesn't support AppendBlob. This method checks if AppendBlob can be used by either checking
          * for its presence or creating a new one.
          */
-        public async Task<bool> IsAppendSupported(string containerName, string path)
+        public async Task<bool> IsAppendSupported(IBlobContainer containerName, string path)
         {
             var blobContainer = await GetBlobContainer(containerName);
             var blob = blobContainer.GetAppendBlobClient(path);
@@ -356,7 +356,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Common.Services
         }
 
 
-        public async Task AppendText(string containerName, string path, string content)
+        public async Task AppendText(IBlobContainer containerName, string path, string content)
         {
             var blobContainer = await GetBlobContainer(containerName);
             var blob = blobContainer.GetAppendBlobClient(path);
@@ -365,7 +365,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Common.Services
             await blob.AppendBlockAsync(stream);
         }
 
-        public async Task<Stream> DownloadToStream(string containerName, string path, Stream targetStream)
+        public async Task<Stream> DownloadToStream(IBlobContainer containerName, string path, Stream targetStream)
         {
             var blobContainer = await GetBlobContainer(containerName);
             var blob = blobContainer.GetAppendBlobClient(path);
@@ -385,13 +385,13 @@ namespace GovUk.Education.ExploreEducationStatistics.Common.Services
             return targetStream;
         }
 
-        public async Task SetMetadata(string containerName, string path, IDictionary<string, string> metadata)
+        public async Task SetMetadata(IBlobContainer containerName, string path, IDictionary<string, string> metadata)
         {
             var blob = await GetBlobClient(containerName, path);
             await blob.SetMetadataAsync(metadata);
         }
 
-        public async Task<Stream> StreamBlob(string containerName, string path, int? bufferSize = null)
+        public async Task<Stream> StreamBlob(IBlobContainer containerName, string path, int? bufferSize = null)
         {
             // Azure SDK v12 isn't compatible with how we want to use file
             // streams i.e. they need to be seekable. This is particularly
@@ -414,7 +414,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Common.Services
             return await blob.OpenReadAsync();
         }
 
-        public async Task<string> DownloadBlobText(string containerName, string path)
+        public async Task<string> DownloadBlobText(IBlobContainer containerName, string path)
         {
             var blob = await GetBlobClient(containerName, path);
 
@@ -436,7 +436,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Common.Services
             return await streamReader.ReadToEndAsync();
         }
 
-        public async Task<T> GetDeserializedJson<T>(string containerName, string path)
+        public async Task<T> GetDeserializedJson<T>(IBlobContainer containerName, string path)
         {
             var text = await DownloadBlobText(containerName, path);
 
@@ -456,9 +456,9 @@ namespace GovUk.Education.ExploreEducationStatistics.Common.Services
         }
 
         public async Task<List<BlobInfo>> CopyDirectory(
-            string sourceContainerName,
+            IBlobContainer sourceContainerName,
             string sourceDirectoryPath,
-            string destinationContainerName,
+            IBlobContainer destinationContainerName,
             string destinationDirectoryPath,
             IBlobStorageService.CopyDirectoryOptions options = null)
         {
@@ -506,9 +506,9 @@ namespace GovUk.Education.ExploreEducationStatistics.Common.Services
         }
 
         public async Task MoveDirectory(
-            string sourceContainerName,
+            IBlobContainer sourceContainerName,
             string sourceDirectoryPath,
-            string destinationContainerName,
+            IBlobContainer destinationContainerName,
             string destinationDirectoryPath,
             IBlobStorageService.MoveDirectoryOptions options = null)
         {
@@ -585,7 +585,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Common.Services
             );
         }
 
-        private async Task<BlobClient> GetBlobClient(string containerName, string path)
+        private async Task<BlobClient> GetBlobClient(IBlobContainer containerName, string path)
         {
             var blobContainer = await GetBlobContainer(containerName);
             return blobContainer.GetBlobClient(path);
@@ -597,25 +597,38 @@ namespace GovUk.Education.ExploreEducationStatistics.Common.Services
          * updated to work with Azure SDK 12 yet.
          */
         private async Task<CloudBlobContainer> GetCloudBlobContainer(
-            string containerName,
+            IBlobContainer containerName,
             string connectionString = null)
         {
             var storageAccount = CloudStorageAccount.Parse(connectionString ?? _connectionString);
             var blobClient = storageAccount.CreateCloudBlobClient();
 
-            var blobContainer = blobClient.GetContainerReference(containerName);
-            await blobContainer.CreateIfNotExistsAsync();
-
-            return blobContainer;
-        }
-
-        private async Task<BlobContainerClient> GetBlobContainer(string containerName)
-        {
-            var container = _client.GetBlobContainerClient(containerName);
+            var container = blobClient.GetContainerReference(
+                IsDevelopmentStorageAccount(blobClient) ? containerName.EmulatedName : containerName.Name);
 
             await container.CreateIfNotExistsAsync();
 
             return container;
+        }
+
+        private async Task<BlobContainerClient> GetBlobContainer(IBlobContainer containerName)
+        {
+            var container = _client.GetBlobContainerClient(
+                IsDevelopmentStorageAccount(_client) ? containerName.EmulatedName : containerName.Name);
+
+            await container.CreateIfNotExistsAsync();
+
+            return container;
+        }
+
+        private static bool IsDevelopmentStorageAccount(BlobServiceClient client)
+        {
+            return client.AccountName.ToLower() == "devstoreaccount1";
+        }
+
+        private static bool IsDevelopmentStorageAccount(CloudBlobClient client)
+        {
+            return client.Credentials.AccountName.ToLower() == "devstoreaccount1";
         }
     }
 }

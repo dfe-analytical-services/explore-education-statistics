@@ -1005,6 +1005,7 @@ describe('DataReplacementPlan', () => {
     );
 
     expect(dataReplacementService.replaceData).toHaveBeenCalledWith(
+      'release-1',
       'file-1',
       'file-2',
     );

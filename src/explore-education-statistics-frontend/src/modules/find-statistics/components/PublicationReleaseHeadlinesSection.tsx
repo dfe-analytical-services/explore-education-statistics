@@ -1,6 +1,6 @@
 import Tabs from '@common/components/Tabs';
 import TabsSection from '@common/components/TabsSection';
-import useGetChartFile from '@common/modules/charts/hooks/useGetChartFile';
+import useGetReleaseFile from '@common/modules/release/hooks/useGetReleaseFile';
 import ContentBlockRenderer from '@common/modules/find-statistics/components/ContentBlockRenderer';
 import DataBlockTabs from '@common/modules/find-statistics/components/DataBlockTabs';
 import KeyStat, {
@@ -20,11 +20,9 @@ const PublicationReleaseHeadlinesSection = ({
     keyStatisticsSecondarySection,
     keyStatisticsSection,
     headlinesSection,
-    publication,
-    slug,
   },
 }: Props) => {
-  const getChartFile = useGetChartFile(publication.slug, slug);
+  const getReleaseFile = useGetReleaseFile(id);
 
   const summaryTab = (
     <TabsSection title="Summary" id="releaseHeadlines-summary">
@@ -59,7 +57,7 @@ const PublicationReleaseHeadlinesSection = ({
     <DataBlockTabs
       id="releaseHeadlines"
       releaseId={id}
-      getInfographic={getChartFile}
+      getInfographic={getReleaseFile}
       dataBlock={keyStatisticsSecondarySection.content[0]}
       firstTabs={summaryTab}
     />

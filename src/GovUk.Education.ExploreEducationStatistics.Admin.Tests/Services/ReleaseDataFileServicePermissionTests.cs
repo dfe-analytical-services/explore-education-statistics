@@ -68,8 +68,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
                 File = new File
                 {
                     Filename = "ancillary.pdf",
-                    Type = Ancillary,
-                    Release = _release
+                    Type = Ancillary
                 }
             };
 
@@ -169,6 +168,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
             IFileRepository fileRepository = null,
             IReleaseRepository releaseRepository = null,
             IReleaseFileRepository releaseFileRepository = null,
+            IReleaseDataFileRepository releaseDataFileRepository = null,
             IDataImportService dataImportService = null,
             IUserService userService = null)
         {
@@ -182,6 +182,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
                 fileRepository ?? new FileRepository(contentDbContext),
                 releaseRepository ?? new ReleaseRepository(contentDbContext, statisticsDbContext, Common.Services.MapperUtils.MapperForProfile<MappingProfiles>()),
                 releaseFileRepository ?? new ReleaseFileRepository(contentDbContext),
+                releaseDataFileRepository ?? new ReleaseDataFileRepository(contentDbContext),
                 dataImportService ?? new Mock<IDataImportService>().Object,
                 userService ?? new Mock<IUserService>().Object
             );

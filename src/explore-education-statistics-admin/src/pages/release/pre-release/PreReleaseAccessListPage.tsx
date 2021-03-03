@@ -4,7 +4,7 @@ import { ReleaseRouteParams } from '@admin/routes/releaseRoutes';
 import releaseService from '@admin/services/releaseService';
 import FormattedDate from '@common/components/FormattedDate';
 import LoadingSpinner from '@common/components/LoadingSpinner';
-import SanitizeHtml from '@common/components/SanitizeHtml';
+import ContentHtml from '@common/components/ContentHtml';
 import useAsyncHandledRetry from '@common/hooks/useAsyncHandledRetry';
 import React from 'react';
 import { RouteComponentProps, StaticContext } from 'react-router';
@@ -44,7 +44,7 @@ const PreReleaseAccessListPage = ({
               </p>
             )}
 
-            <SanitizeHtml dirtyHtml={release?.preReleaseAccessList} />
+            <ContentHtml html={release?.preReleaseAccessList} />
           </>
         )}
       </LoadingSpinner>

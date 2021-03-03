@@ -2,7 +2,7 @@ import React, { useState } from 'react';
 import FormEditor from '@admin/components/form/FormEditor';
 import PageTitle from '@admin/components/PageTitle';
 import Button from '@common/components/Button';
-import SanitizeHtml from '@common/components/SanitizeHtml';
+import ContentHtml from '@common/components/ContentHtml';
 
 const PrototypeCreatePreRelease = () => {
   // const query = new URLSearchParams(window.location.search);
@@ -117,7 +117,7 @@ const PrototypeCreatePreRelease = () => {
             <h3 className="govuk-heading-s">Published 23 July 2020</h3>
 
             <div className="govuk-!-margin-top-9 govuk-!-margin-bottom-9">
-              <SanitizeHtml dirtyHtml={formText || ''} />
+              <ContentHtml html={formText || ''} />
             </div>
             <Button
               onClick={() => {

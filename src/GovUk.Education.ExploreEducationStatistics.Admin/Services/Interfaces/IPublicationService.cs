@@ -11,6 +11,8 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Services.Interfaces
     {
         Task<Either<ActionResult, List<MyPublicationViewModel>>> GetMyPublicationsAndReleasesByTopic(Guid topicId);
 
+        Task<Either<ActionResult, MyPublicationViewModel>> GetMyPublication(Guid publicationId);
+
         Task<Either<ActionResult, PublicationViewModel>> CreatePublication(
             PublicationSaveViewModel publication);
 

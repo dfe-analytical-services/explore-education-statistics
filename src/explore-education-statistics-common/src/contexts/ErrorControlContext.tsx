@@ -1,18 +1,18 @@
 import noop from 'lodash/noop';
 import React, { createContext, ReactNode, useContext } from 'react';
 
-export interface ManualErrorHandler {
+export interface ErrorPages {
   forbidden: () => void;
 }
 
 export interface ErrorControlState {
-  handleApiErrors: (error: Error) => void;
-  handleManualErrors: ManualErrorHandler;
+  handleError: (error: Error) => void;
+  errorPages: ErrorPages;
 }
 
 export const ErrorControlContext = createContext<ErrorControlState>({
-  handleApiErrors: noop,
-  handleManualErrors: {
+  handleError: noop,
+  errorPages: {
     forbidden: noop,
   },
 });
