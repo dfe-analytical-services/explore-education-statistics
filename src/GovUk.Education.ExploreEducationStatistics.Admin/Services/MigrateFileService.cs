@@ -174,7 +174,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Services
             var sourcePath = file.Path();
             var destinationPath = file.MigratedPath();
 
-            if (!await _publicBlobStorageService.CheckBlobExists(
+            if (!await _privateBlobStorageService.CheckBlobExists(
                 containerName: PrivateReleaseFiles,
                 path: sourcePath))
             {
