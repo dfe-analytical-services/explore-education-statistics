@@ -170,7 +170,12 @@ namespace GovUk.Education.ExploreEducationStatistics.Content.Model.Database
                 .HasConversion(new EnumToStringConverter<MethodologyStatus>());
 
             modelBuilder.Entity<MethodologyFile>()
-                .HasOne(r => r.Methodology)
+                .HasOne(mf => mf.Methodology)
+                .WithMany()
+                .OnDelete(DeleteBehavior.NoAction);
+
+            modelBuilder.Entity<MethodologyFile>()
+                .HasOne(mf => mf.File)
                 .WithMany()
                 .OnDelete(DeleteBehavior.NoAction);
 
@@ -206,7 +211,12 @@ namespace GovUk.Education.ExploreEducationStatistics.Content.Model.Database
                 .HasQueryFilter(r => !r.SoftDeleted);
 
             modelBuilder.Entity<ReleaseFile>()
-                .HasOne(r => r.Release)
+                .HasOne(rf => rf.Release)
+                .WithMany()
+                .OnDelete(DeleteBehavior.NoAction);
+
+            modelBuilder.Entity<ReleaseFile>()
+                .HasOne(rf => rf.File)
                 .WithMany()
                 .OnDelete(DeleteBehavior.NoAction);
 

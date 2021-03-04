@@ -7,6 +7,10 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Migrations.ContentMig
     {
         protected override void Up(MigrationBuilder migrationBuilder)
         {
+            migrationBuilder.DropForeignKey(
+                name: "FK_ReleaseFiles_Files_FileId",
+                table: "ReleaseFiles");
+
             migrationBuilder.CreateTable(
                 name: "MethodologyFiles",
                 columns: table => new
@@ -22,8 +26,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Migrations.ContentMig
                         name: "FK_MethodologyFiles_Files_FileId",
                         column: x => x.FileId,
                         principalTable: "Files",
-                        principalColumn: "Id",
-                        onDelete: ReferentialAction.Cascade);
+                        principalColumn: "Id");
                     table.ForeignKey(
                         name: "FK_MethodologyFiles_Methodologies_MethodologyId",
                         column: x => x.MethodologyId,
@@ -40,12 +43,31 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Migrations.ContentMig
                 name: "IX_MethodologyFiles_MethodologyId",
                 table: "MethodologyFiles",
                 column: "MethodologyId");
+
+            migrationBuilder.AddForeignKey(
+                name: "FK_ReleaseFiles_Files_FileId",
+                table: "ReleaseFiles",
+                column: "FileId",
+                principalTable: "Files",
+                principalColumn: "Id");
         }
 
         protected override void Down(MigrationBuilder migrationBuilder)
         {
+            migrationBuilder.DropForeignKey(
+                name: "FK_ReleaseFiles_Files_FileId",
+                table: "ReleaseFiles");
+
             migrationBuilder.DropTable(
                 name: "MethodologyFiles");
+
+            migrationBuilder.AddForeignKey(
+                name: "FK_ReleaseFiles_Files_FileId",
+                table: "ReleaseFiles",
+                column: "FileId",
+                principalTable: "Files",
+                principalColumn: "Id",
+                onDelete: ReferentialAction.Cascade);
         }
     }
 }
