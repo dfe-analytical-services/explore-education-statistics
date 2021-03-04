@@ -254,6 +254,8 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin
             services.AddTransient<IMethodologyService, MethodologyService>();
             services.AddTransient<IMethodologyRepository, MethodologyRepository>();
             services.AddTransient<IMethodologyContentService, MethodologyContentService>();
+            services.AddTransient<IMethodologyFileRepository, MethodologyFileRepository>();
+            services.AddTransient<IMethodologyImageService, MethodologyImageService>();
             services.AddTransient<IDataBlockService, DataBlockService>();
             services.AddTransient<IPreReleaseUserService, PreReleaseUserService>();
             services.AddTransient<IPreReleaseService, PreReleaseService>();

@@ -88,6 +88,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Content.Model.Database
         private const string CountryCodeEngland = "E92000001";
 
         public DbSet<Methodology> Methodologies { get; set; }
+        public DbSet<MethodologyFile> MethodologyFiles { get; set; }
         public DbSet<Theme> Themes { get; set; }
         public DbSet<Topic> Topics { get; set; }
         public DbSet<Publication> Publications { get; set; }
@@ -168,6 +169,16 @@ namespace GovUk.Education.ExploreEducationStatistics.Content.Model.Database
                 .Property(b => b.Status)
                 .HasConversion(new EnumToStringConverter<MethodologyStatus>());
 
+            modelBuilder.Entity<MethodologyFile>()
+                .HasOne(mf => mf.Methodology)
+                .WithMany()
+                .OnDelete(DeleteBehavior.NoAction);
+
+            modelBuilder.Entity<MethodologyFile>()
+                .HasOne(mf => mf.File)
+                .WithMany()
+                .OnDelete(DeleteBehavior.NoAction);
+
             modelBuilder.Entity<Publication>()
                 .Property(p => p.LegacyPublicationUrl)
                 .HasConversion(
@@ -200,7 +211,12 @@ namespace GovUk.Education.ExploreEducationStatistics.Content.Model.Database
                 .HasQueryFilter(r => !r.SoftDeleted);
 
             modelBuilder.Entity<ReleaseFile>()
-                .HasOne(r => r.Release)
+                .HasOne(rf => rf.Release)
+                .WithMany()
+                .OnDelete(DeleteBehavior.NoAction);
+
+            modelBuilder.Entity<ReleaseFile>()
+                .HasOne(rf => rf.File)
                 .WithMany()
                 .OnDelete(DeleteBehavior.NoAction);
 
