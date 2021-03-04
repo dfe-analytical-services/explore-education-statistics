@@ -95,6 +95,7 @@ function CookieBanner({ wide }: Props) {
             <ButtonGroup>
               <Button
                 onClick={() => {
+                  setBannerSeenCookie(true);
                   setVisible(false);
                 }}
               >
