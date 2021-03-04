@@ -108,8 +108,8 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services.Method
                 File = new File
                 {
                     RootPath = Guid.NewGuid(),
-                    Filename = "ancillary.pdf",
-                    Type = Ancillary
+                    Filename = "image.png",
+                    Type = Image
                 }
             };
 

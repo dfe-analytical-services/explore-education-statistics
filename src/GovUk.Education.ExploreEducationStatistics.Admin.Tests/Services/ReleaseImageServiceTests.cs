@@ -105,8 +105,8 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
                 File = new File
                 {
                     RootPath = Guid.NewGuid(),
-                    Filename = "ancillary.pdf",
-                    Type = Ancillary
+                    Filename = "image.png",
+                    Type = Image
                 }
             };
 
