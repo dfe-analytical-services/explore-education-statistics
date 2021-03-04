@@ -72,11 +72,8 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Services
                 {
                     foreach (var file in files)
                     {
-                        if (await _releaseFileRepository.FileIsLinkedToOtherReleases(releaseId, file.Id))
-                        {
-                            await _releaseFileRepository.Delete(releaseId, file.Id);
-                        }
-                        else
+                        await _releaseFileRepository.Delete(releaseId, file.Id);
+                        if (!await _releaseFileRepository.FileIsLinkedToOtherReleases(releaseId, file.Id))
                         {
                             await _blobStorageService.DeleteBlob(
                                 PrivateReleaseFiles,
