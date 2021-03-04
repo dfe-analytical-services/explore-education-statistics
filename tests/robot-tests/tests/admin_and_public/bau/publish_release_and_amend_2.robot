@@ -78,7 +78,7 @@ Create publication
 
 Create new release
     [Tags]  HappyPath
-    user waits until page contains accordion section   ${PUBLICATION_NAME}
+    user waits until page contains accordion section   ${PUBLICATION_NAME}  120
     user opens accordion section  ${PUBLICATION_NAME}
     user clicks link  Create new release
     user creates release for publication  ${PUBLICATION_NAME}  Academic Year Q1  2020

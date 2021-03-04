@@ -50,7 +50,7 @@ user signs out
 
 user selects theme and topic from admin dashboard
     [Arguments]  ${theme}  ${topic}
-    user waits until page contains link  Manage publications and releases  60
+    user waits until page contains link  Manage publications and releases  120
     user clicks link   Manage publications and releases
     user waits until page contains element   id:publicationsReleases-themeTopic-themeId
     user selects from list by label  id:publicationsReleases-themeTopic-themeId  ${theme}
