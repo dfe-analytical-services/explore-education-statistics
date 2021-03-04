@@ -8,12 +8,13 @@ import toHtml from '@admin/utils/markdown/toHtml';
 import ContentHtml from '@common/components/ContentHtml';
 import useToggle from '@common/hooks/useToggle';
 import { Dictionary } from '@common/types';
-import {
+import sanitizeHtml, {
   defaultSanitizeOptions,
   SanitizeHtmlOptions,
 } from '@common/utils/sanitizeHtml';
 import classNames from 'classnames';
 import React, { useCallback, useMemo } from 'react';
+import { insertReleaseIdPlaceholders } from '@common/modules/release/utils/releaseImageUrls';
 import styles from './EditableContentBlock.module.scss';
 
 interface EditableContentBlockProps {
@@ -74,7 +75,10 @@ const EditableContentBlock = ({
       // as Admin API now converts MarkDownBlocks
       // to HtmlBlocks
 
-      onSave(nextValue);
+      const contentWithImgRelIdPlaceholders = insertReleaseIdPlaceholders(
+        nextValue,
+      );
+      onSave(contentWithImgRelIdPlaceholders);
     },
     [onSave, toggleEditing],
   );
@@ -84,7 +88,7 @@ const EditableContentBlock = ({
       <EditableContentForm
         id={id}
         label={label}
-        content={content}
+        content={content ? sanitizeHtml(content, sanitizeOptions) : ''} // NOTE: Sanitize to transform img src attribs
         onImageUpload={onImageUpload}
         onImageUploadCancel={onImageUploadCancel}
         onCancel={toggleEditing.off}

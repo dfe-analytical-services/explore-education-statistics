@@ -23,9 +23,7 @@ export default function useReleaseImageUpload(
     async (file, updateProgress) => {
       promise.current = releaseImageService
         .upload(releaseId, file, updateProgress)
-        .then(result =>
-          mapValues(result, insertReleaseIdPlaceholders),
-        ) as CancellablePromise<ImageUploadResult>;
+        .then() as CancellablePromise<ImageUploadResult>;
 
       return promise.current;
     },

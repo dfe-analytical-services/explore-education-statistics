@@ -17,7 +17,9 @@ export default function useReleaseImageAttributeTransformer(options: {
       return {
         ...attributes,
         src: `${rootUrl}${replaceReleaseIdPlaceholders(src, releaseId)}`,
-        srcset: `${rootUrl}${replaceReleaseIdPlaceholders(srcset, releaseId)}`,
+        srcset:
+          srcset &&
+          `${rootUrl}${replaceReleaseIdPlaceholders(srcset, releaseId)}`,
       };
     },
     [releaseId, rootUrl],
