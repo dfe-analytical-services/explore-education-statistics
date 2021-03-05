@@ -96,11 +96,11 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Processor.Functions
             {
                 var ex = GetInnerException(e);
 
-                await _dataImportService.FailImport(message.Id, ex.Message);
-
                 _logger.LogError(ex, $"{GetType().Name} function FAILED for Import: " +
                                      $"{message.Id} : {ex.Message}");
                 _logger.LogError(ex.StackTrace);
+
+                await _dataImportService.FailImport(message.Id, ex.Message);
             }
         }
 
@@ -124,10 +124,10 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Processor.Functions
 
                 var ex = GetInnerException(e);
 
-                await _dataImportService.FailImport(message.Id, ex.Message);
-
                 _logger.LogError(ex, $"{GetType().Name} function FAILED for : Import: " +
                                      $"{message.Id} : {ex.Message}");
+
+                await _dataImportService.FailImport(message.Id, ex.Message);
             }
         }
 
