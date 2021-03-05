@@ -3,6 +3,7 @@ import ContentBlockRenderer from '@common/modules/find-statistics/components/Con
 import DataBlockTabs from '@common/modules/find-statistics/components/DataBlockTabs';
 import { Block } from '@common/services/types/blocks';
 import React from 'react';
+import useReleaseImageAttributeTransformer from '@common/modules/release/hooks/useReleaseImageAttributeTransformer';
 
 interface Props {
   block: Block;
@@ -11,6 +12,10 @@ interface Props {
 
 const ReleaseBlock = ({ block, releaseId }: Props) => {
   const getChartFile = useGetChartFile(releaseId);
+
+  const transformImageAttributes = useReleaseImageAttributeTransformer({
+    releaseId,
+  });
 
   if (block.type === 'DataBlock') {
     return (
@@ -23,7 +28,13 @@ const ReleaseBlock = ({ block, releaseId }: Props) => {
     );
   }
 
-  return <ContentBlockRenderer key={block.id} block={block} />;
+  return (
+    <ContentBlockRenderer
+      key={block.id}
+      block={block}
+      transformImageAttributes={transformImageAttributes}
+    />
+  );
 };
 
 export default ReleaseBlock;
