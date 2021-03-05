@@ -63,6 +63,21 @@ function ChartRenderer({
     }
   }, [id, props]);
 
+  const { type } = props;
+  const { footnotes } = meta;
+  if (type === 'map') {
+    const boundaryFootnoteLabel = `The boundary data used in this map includes${meta.boundaryLevels
+      .map((value, index, array) => {
+        let separator = index === 0 ? ' ' : ', ';
+        if (array.length - 1 === index) {
+          separator = ' and ';
+        }
+        return `${separator}${value.label}`;
+      })
+      .join('')}`;
+    footnotes.push({ id: `map-footnote`, label: boundaryFootnoteLabel });
+  }
+
   if (data && meta && data.length > 0) {
     return (
       <figure className="govuk-!-margin-0" id={id}>
@@ -70,7 +85,7 @@ function ChartRenderer({
 
         {chart}
 
-        <FigureFootnotes footnotes={meta.footnotes} />
+        <FigureFootnotes footnotes={footnotes} />
 
         {source && <p className="govuk-body-s">Source: {source}</p>}
       </figure>
