@@ -2,7 +2,7 @@ import client from '@admin/services/utils/service';
 import footnoteToFlatFootnote from './utils/footnote/footnoteToFlatFootnote';
 
 export interface FootnoteSubject {
-  selected: boolean;
+  selectionType: string;
   indicatorGroups: {
     [key: string]: {
       selected: boolean;

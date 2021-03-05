@@ -21,8 +21,11 @@ const footnoteToFlatFootnote = (footnote: BaseFootnote): FlatFootnote => {
     filterGroups: [],
   };
 
+  console.log(footnote);
+  console.log(flatFootnote);
+
   Object.entries(footnote.subjects).forEach(([subjectId, subject]) => {
-    if (subject.selected) {
+    if (subject.selectionType === 'All') {
       flatFootnote.subjects.push(subjectId);
     }
 

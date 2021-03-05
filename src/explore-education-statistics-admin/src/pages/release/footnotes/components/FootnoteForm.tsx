@@ -38,7 +38,7 @@ const FootnoteForm = ({
       const { indicators, filters } = subject;
 
       return {
-        selected: false,
+        selectionType: '',
         indicatorGroups: mapValues(indicators, () => ({
           selected: false,
           indicators: [],
@@ -116,8 +116,10 @@ const FootnoteForm = ({
             subject => subject.subjectName,
           ).map(subject => {
             const { subjectId, subjectName } = subject;
-            const subjectSelected =
-              get(form.values, `subjects.${subjectId}.selected`) || false;
+            const subjectSelected = get(
+              form.values,
+              `subjects.${subjectId}.selectionType`,
+            );
 
             return (
               <fieldset
@@ -135,11 +137,11 @@ const FootnoteForm = ({
                   small
                   inline
                   showError={false}
-                  name={`subjectArea-${subjectId}`}
+                  name={`subjects.${subjectId}.selectionType`}
                   order={[]}
                   options={[
-                    { value: '', label: 'Does not apply' },
-                    { value: 'All', label: 'Applies to all data' },
+                    { value: 'NA', label: 'Does not apply' },
+                    { value: `All`, label: 'Applies to all data' },
                     {
                       value: 'Specific',
                       label: 'Applies to specific data',
@@ -192,16 +194,31 @@ const FootnoteForm = ({
                     },
                   ]}
                   onChange={event => {
-                    if (event.target.value === 'All') {
-                      form.setFieldValue(
-                        `subjects.${subjectId}.selected`,
-                        true,
-                      );
-                    } else {
-                      form.setFieldValue(
-                        `subjects.${subjectId}.selected`,
-                        false,
-                      );
+                    switch (event.target.value) {
+                      case 'All':
+                        form.setFieldValue(
+                          `subjects.${subjectId}.selectionType`,
+                          'All',
+                        );
+                        break;
+                      case 'Specific':
+                        form.setFieldValue(
+                          `subjects.${subjectId}.selectionType`,
+                          'Specific',
+                        );
+                        break;
+                      case 'NA':
+                        form.setFieldValue(
+                          `subjects.${subjectId}.selectionType`,
+                          'NA',
+                        );
+                        break;
+                      default:
+                        form.setFieldValue(
+                          `subjects.${subjectId}.selectionType`,
+                          'NA',
+                        );
+                        break;
                     }
                   }}
                 />

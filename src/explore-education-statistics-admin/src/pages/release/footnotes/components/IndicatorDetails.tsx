@@ -11,7 +11,7 @@ import React from 'react';
 
 interface Props {
   summary: string;
-  parentSelected: boolean;
+  parentSelected: string;
   valuePath: string;
   indicatorGroups: FootnoteSubjectMeta['indicators'];
   form: FormikProps<BaseFootnote>;
@@ -19,14 +19,14 @@ interface Props {
 
 const IndicatorDetails = ({
   summary,
-  parentSelected = false,
+  parentSelected = 'Specific',
   valuePath,
   indicatorGroups,
   form,
 }: Props) => {
   return (
     <Details
-      summary={`${summary}${parentSelected ? ' (All)' : ''}`}
+      summary={`${summary}${parentSelected === 'All' ? ' (All)' : ''}`}
       className="govuk-!-margin-bottom-2"
     >
       <div className={styles.filterOverflow}>
@@ -79,7 +79,7 @@ const IndicatorDetails = ({
                         className="govuk-checkboxes--small"
                         name={`${valuePath}.indicatorGroups.${indicatorGroupId}.indicators`}
                         id={indicatorItem.value}
-                        disabled={parentSelected || groupValue}
+                        disabled={parentSelected === 'All' || groupValue}
                         checked={checked}
                         onChange={e => {
                           form.setFieldValue(

@@ -14,9 +14,15 @@ interface Item {
   label: string;
   selected: boolean;
 }
+
+interface SubjectItem {
+  id: string;
+  label: string;
+  selectionType: string;
+}
 /* eslint-enable react/no-unused-prop-types */
 
-interface Selection extends Item {
+interface Selection extends SubjectItem {
   indicatorGroups: {
     id: string;
     label: string;
@@ -53,7 +59,7 @@ const FootnoteSubjectSelection = ({
   const selectedOption = { id: '-1', label: '(All)', selected: false };
 
   function getIndicatorGroups(): Selection['indicatorGroups'] {
-    if (subject.selected) {
+    if (subject.selectionType === 'All') {
       return [{ ...selectedOption, indicators: [] }];
     }
     return Object.entries(subject.indicatorGroups).map(
@@ -77,7 +83,7 @@ const FootnoteSubjectSelection = ({
   }
 
   function getFilters(): Selection['filters'] {
-    if (subject.selected) {
+    if (subject.selectionType === 'All') {
       return [{ ...selectedOption, filterGroups: [] }];
     }
     return Object.entries(subject.filters).map(([filterId, filter]) => {
@@ -112,7 +118,7 @@ const FootnoteSubjectSelection = ({
   const subjectSelect: Selection = {
     id: subjectId,
     label: getSubject(subjectId).label,
-    selected: subject.selected,
+    selectionType: subject.selectionType,
     indicatorGroups: getIndicatorGroups(),
     filters: getFilters(),
   };
@@ -126,9 +132,25 @@ const FootnoteSubjectSelection = ({
     );
   }
 
+  function renderSubjectItem(
+    { id, selectionType, label }: SubjectItem,
+    children?: ReactNode,
+  ) {
+    return (
+      <li key={id}>
+        {selectionType === 'All' || selectionType === 'Specific' ? (
+          <strong>{label}</strong>
+        ) : (
+          label
+        )}
+        {children}
+      </li>
+    );
+  }
+
   return (
     <tr key={subjectId}>
-      <td>{renderItem(subjectSelect)}</td>
+      <td>{renderSubjectItem(subjectSelect)}</td>
       <td>
         <ul className="govuk-!-margin-top-0">
           {subjectSelect.indicatorGroups.map(indicatorGroup => {
