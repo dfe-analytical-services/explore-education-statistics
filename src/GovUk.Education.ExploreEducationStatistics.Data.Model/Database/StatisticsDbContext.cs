@@ -62,6 +62,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Model.Database
             ConfigureFilterGroupFootnote(modelBuilder);
             ConfigureFilterItemFootnote(modelBuilder);
             ConfigureIndicatorFootnote(modelBuilder);
+            ConfigureLocation(modelBuilder);
             ConfigureMeasures(modelBuilder);
             ConfigureObservation(modelBuilder);
             ConfigureObservationFilterItem(modelBuilder);
@@ -82,6 +83,57 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Model.Database
             modelBuilder.Entity<BoundaryLevel>()
                 .Property(boundaryLevel => boundaryLevel.Level)
                 .HasConversion(geographicLevelConverter);
+        }
+
+        private static void ConfigureLocation(ModelBuilder modelBuilder)
+        {
+            modelBuilder.Entity<Location>()
+                .HasIndex(location => location.Country_Code);
+
+            modelBuilder.Entity<Location>()
+                .HasIndex(location => location.EnglishDevolvedArea_Code);
+
+            modelBuilder.Entity<Location>()
+                .HasIndex(location => location.Institution_Code);
+
+            modelBuilder.Entity<Location>()
+                .HasIndex(location => location.LocalAuthority_Code);
+
+            modelBuilder.Entity<Location>()
+                .HasIndex(location => location.LocalAuthority_OldCode);
+
+            modelBuilder.Entity<Location>()
+                .HasIndex(location => location.LocalAuthorityDistrict_Code);
+
+            modelBuilder.Entity<Location>()
+                .HasIndex(location => location.LocalEnterprisePartnership_Code);
+
+            modelBuilder.Entity<Location>()
+                .HasIndex(location => location.MultiAcademyTrust_Code);
+
+            modelBuilder.Entity<Location>()
+                .HasIndex(location => location.MayoralCombinedAuthority_Code);
+
+            modelBuilder.Entity<Location>()
+                .HasIndex(location => location.OpportunityArea_Code);
+
+            modelBuilder.Entity<Location>()
+                .HasIndex(location => location.ParliamentaryConstituency_Code);
+
+            modelBuilder.Entity<Location>()
+                .HasIndex(location => location.PlanningArea_Code);
+
+            modelBuilder.Entity<Location>()
+                .HasIndex(location => location.Region_Code);
+
+            modelBuilder.Entity<Location>()
+                .HasIndex(location => location.RscRegion_Code);
+
+            modelBuilder.Entity<Location>()
+                .HasIndex(location => location.Sponsor_Code);
+
+            modelBuilder.Entity<Location>()
+                .HasIndex(location => location.Ward_Code);
         }
 
         private static void ConfigureObservation(ModelBuilder modelBuilder)
