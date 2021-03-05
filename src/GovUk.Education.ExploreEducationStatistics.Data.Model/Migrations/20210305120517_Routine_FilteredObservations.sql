@@ -1,4 +1,4 @@
-CREATE OR ALTER PROCEDURE FilteredObservations
+﻿CREATE OR ALTER PROCEDURE FilteredObservations
     @subjectId uniqueidentifier,
     @geographicLevel nvarchar(6) = NULL,
     @timePeriodList TimePeriodListType READONLY,
@@ -187,4 +187,3 @@ DECLARE
          @wardsList = @wardsList,
          @planningAreasList = @planningAreasList,
          @filterItemList = @filterItemList;
-

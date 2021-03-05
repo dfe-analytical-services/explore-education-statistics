@@ -40,6 +40,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Services
                 locationsQuery?.GeographicLevel?.GetEnumValue() ?? (object) DBNull.Value);
             var timePeriodListParam = CreateTimePeriodListType("timePeriodList", GetTimePeriodRange(query));
             var countriesListParam = CreateIdListType("countriesList", locationsQuery?.Country);
+            var englishDevolvedAreaListParam = CreateIdListType("englishDevolvedAreaList", locationsQuery?.EnglishDevolvedArea);
             var institutionListParam =
                 CreateIdListType("institutionList", locationsQuery?.Institution);
             var localAuthorityListParam = CreateIdListType("localAuthorityList", localAuthorityCodes);
@@ -74,6 +75,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Services
                             "@geographicLevel," +
                             "@timePeriodList," +
                             "@countriesList," +
+                            "@englishDevolvedAreaList," +
                             "@institutionList," +
                             "@localAuthorityList," +
                             "@localAuthorityOldCodeList," +
@@ -93,6 +95,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Services
                     geographicLevelParam,
                     timePeriodListParam,
                     countriesListParam,
+                    englishDevolvedAreaListParam,
                     institutionListParam,
                     localAuthorityListParam,
                     localAuthorityOldCodeListParam,
@@ -129,7 +132,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Services
                     .Where(o => batchOfIds.Contains(o.Id))
                     .ToList();
 
-                _logger.LogDebug($"Fetched batch of {observationBatch.Count()} Observations from their ids in {phasesStopwatch.Elapsed.TotalMilliseconds} ms");
+                _logger.LogDebug($"Fetched batch of {observationBatch.Count} Observations from their ids in {phasesStopwatch.Elapsed.TotalMilliseconds} ms");
                 phasesStopwatch.Restart();
 
                 return observationBatch;
@@ -137,7 +140,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Services
                 .ToList();
             
             _logger.LogDebug($"Finished fetching {ids.Length} Observations in a total of {totalStopwatch.Elapsed.TotalMilliseconds} ms");
-            return observations;           
+            return observations;
         }
 
         public IEnumerable<Observation> FindObservations(SubjectMetaQueryContext query)

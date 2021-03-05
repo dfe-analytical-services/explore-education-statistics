@@ -4,6 +4,9 @@ namespace GovUk.Education.ExploreEducationStatistics.Common.Model.Data
 {
     public enum GeographicLevel
     {
+        [EnumLabelValue("English Devolved Area", "EDA")]
+        EnglishDevolvedArea,
+
         [EnumLabelValue("Local Authority", "LA")]
         LocalAuthority,
 

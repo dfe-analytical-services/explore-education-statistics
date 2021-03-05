@@ -38,6 +38,11 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Model.Services
         {
             IQueryable<IObservationalUnit> query = level switch
             {
+                GeographicLevel.EnglishDevolvedArea =>
+                    _context.Location
+                        .Where(q => codes.Contains(q.EnglishDevolvedArea_Code))
+                        .GroupBy(q => new {q.EnglishDevolvedArea_Code, q.EnglishDevolvedArea_Name})
+                        .Select(q => new EnglishDevolvedArea(q.Key.EnglishDevolvedArea_Code, q.Key.EnglishDevolvedArea_Name)),
                 GeographicLevel.LocalAuthority =>
                     _context.Location
                         .Where(q => codes.Contains(q.LocalAuthority_Code))
@@ -127,6 +132,8 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Model.Services
         {
             switch (geographicLevel)
             {
+                case GeographicLevel.EnglishDevolvedArea:
+                    return location.EnglishDevolvedArea;
                 case GeographicLevel.LocalAuthority:
                     return location.LocalAuthority;
                 case GeographicLevel.LocalAuthorityDistrict:

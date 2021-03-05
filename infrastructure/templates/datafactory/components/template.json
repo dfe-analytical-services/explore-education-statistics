@@ -1683,6 +1683,26 @@
                                     },
                                     {
                                         "source": {
+                                            "name": "EnglishDevolvedArea_Code",
+                                            "type": "String"
+                                        },
+                                        "sink": {
+                                            "name": "EnglishDevolvedArea_Code",
+                                            "type": "String"
+                                        }
+                                    },
+                                    {
+                                        "source": {
+                                            "name": "EnglishDevolvedArea_Name",
+                                            "type": "String"
+                                        },
+                                        "sink": {
+                                            "name": "EnglishDevolvedArea_Name",
+                                            "type": "String"
+                                        }
+                                    },
+                                    {
+                                        "source": {
                                             "name": "Institution_Code",
                                             "type": "String"
                                         },
