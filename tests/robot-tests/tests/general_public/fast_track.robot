@@ -24,10 +24,9 @@ Validate selected step options
     [Tags]  HappyPath
     user waits until h1 is visible  Create your own tables online
     user waits until page contains element    css:table
-
     user checks previous table tool step contains  1    Publication     Pupil absence in schools in England
-
-    user checks previous table tool step contains  2    Subject         Absence by characteristic
+    # below is set to none due to bad data on dev
+    user checks previous table tool step contains  2    Subject         None
 
     user checks previous table tool step contains  3    National        England
 
