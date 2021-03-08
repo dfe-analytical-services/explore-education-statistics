@@ -12,6 +12,7 @@ import Essentials from '@ckeditor/ckeditor5-essentials/src/essentials.js';
 import Heading from '@ckeditor/ckeditor5-heading/src/heading.js';
 import Image from '@ckeditor/ckeditor5-image/src/image.js';
 import ImageCaption from '@ckeditor/ckeditor5-image/src/imagecaption.js';
+import ImageRemoveEventCallbackPlugin from 'ckeditor5-image-remove-event-callback-plugin';
 import ImageResize from '@ckeditor/ckeditor5-image/src/imageresize.js';
 import ImageStyle from '@ckeditor/ckeditor5-image/src/imagestyle.js';
 import ImageToolbar from '@ckeditor/ckeditor5-image/src/imagetoolbar.js';
@@ -40,6 +41,7 @@ Editor.builtinPlugins = [
   Heading,
   Image,
   ImageCaption,
+  ImageRemoveEventCallbackPlugin,
   ImageResize,
   ImageStyle,
   ImageToolbar,

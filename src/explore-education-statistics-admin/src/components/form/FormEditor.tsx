@@ -208,6 +208,15 @@ const FormEditor = ({
         hasImageUpload && onImageUpload
           ? [customUploadAdapterPlugin(onImageUpload, onImageUploadCancel)]
           : undefined,
+      imageRemoveEvent: {
+        callback: (imagesSrc: any, nodeObjects: any) => {
+          console.log(
+            'imageRemoveEvent callback called',
+            imagesSrc,
+            nodeObjects,
+          );
+        },
+      },
     };
   }, [allowedHeadings, onImageUpload, onImageUploadCancel, toolbarConfig]);
 
