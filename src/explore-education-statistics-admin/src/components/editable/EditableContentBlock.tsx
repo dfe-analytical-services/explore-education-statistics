@@ -14,7 +14,6 @@ import sanitizeHtml, {
 } from '@common/utils/sanitizeHtml';
 import classNames from 'classnames';
 import React, { useCallback, useMemo } from 'react';
-import { insertReleaseIdPlaceholders } from '@common/modules/release/utils/releaseImageUrls';
 import styles from './EditableContentBlock.module.scss';
 
 interface EditableContentBlockProps {
@@ -75,10 +74,7 @@ const EditableContentBlock = ({
       // as Admin API now converts MarkDownBlocks
       // to HtmlBlocks
 
-      const contentWithImgRelIdPlaceholders = insertReleaseIdPlaceholders(
-        nextValue,
-      );
-      onSave(contentWithImgRelIdPlaceholders);
+      onSave(nextValue);
     },
     [onSave, toggleEditing],
   );

@@ -151,8 +151,10 @@ const MethodologyAccordionSection = ({
         renderBlock={block => <ContentBlockRenderer block={block} />}
         renderEditableBlock={block => (
           <MethodologyEditableBlock
+            allowImages
             block={block}
             editable={!isReordering}
+            methodologyId={methodologyId}
             onSave={updateBlockInAccordionSection}
             onDelete={removeBlockFromAccordionSection}
           />
