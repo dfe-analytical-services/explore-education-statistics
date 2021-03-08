@@ -32,6 +32,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Services
             string filename,
             FileType type,
             Guid createdById,
+            string name = null,
             File replacingFile = null,
             File source = null)
         {
@@ -48,6 +49,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Services
             var releaseFile = new ReleaseFile
             {
                 ReleaseId = releaseId,
+                Name = name,
                 File = new File
                 {
                     Created = DateTime.UtcNow,

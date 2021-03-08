@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Threading.Tasks;
 using GovUk.Education.ExploreEducationStatistics.Admin.Services.Interfaces;
+using GovUk.Education.ExploreEducationStatistics.Common.Model;
 using GovUk.Education.ExploreEducationStatistics.Content.Model;
 using GovUk.Education.ExploreEducationStatistics.Content.Model.Database;
 using Microsoft.EntityFrameworkCore;
@@ -28,6 +29,18 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Services
         {
             return await _contentDbContext.Files
                 .SingleAsync(f => f.Id == id);
+        }
+
+        public async Task<string> GetSubjectName(Guid releaseId, Guid subjectId)
+        {
+            var releaseDataFile = await _contentDbContext
+                .ReleaseFiles
+                .Include(rf => rf.File)
+                .SingleOrDefaultAsync(rf => 
+                    rf.ReleaseId == releaseId
+                    && rf.File.SubjectId == subjectId
+                    && rf.File.Type == FileType.Data);
+            return releaseDataFile.Name;
         }
     }
 }

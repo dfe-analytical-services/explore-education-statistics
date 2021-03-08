@@ -60,8 +60,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Services
 
         public async Task<Guid> CreateReleaseAndSubjectHierarchy(
             Guid releaseId,
-            string subjectFilename,
-            string subjectName)
+            string subjectFilename)
         {
             var release = await _contentDbContext.Releases
                 .Include(r => r.Publication)
@@ -129,7 +128,6 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Services
                 Subject = new Subject
                 {
                     Filename = subjectFilename,
-                    Name = subjectName
                 }
             })).Entity;
 

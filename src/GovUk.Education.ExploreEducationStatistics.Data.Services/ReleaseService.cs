@@ -88,26 +88,39 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Services
             }
 
             var releaseSubjects = await _statisticsDbContext.ReleaseSubject
-                .Include(subject => subject.Subject)
                 .Where(
                     rs => rs.ReleaseId == releaseId
                           && subjectsToInclude.Contains(rs.SubjectId)
                 )
-                .OrderBy(rs => rs.Subject.Name)
                 .ToListAsync();
 
             return (await releaseSubjects
                 .SelectAsync(
                     async rs =>
                         new SubjectViewModel(
-                            id: rs.Subject.Id,
-                            name: rs.Subject.Name,
+                            id: rs.SubjectId,
+                            name: await GetSubjectName(releaseId, rs.SubjectId),
                             content: rs.MetaGuidance,
-                            timePeriods: await _metaGuidanceSubjectService.GetTimePeriods(rs.SubjectId),
-                            geographicLevels: await _metaGuidanceSubjectService.GetGeographicLevels(rs.SubjectId)
+                            timePeriods:
+                            await _metaGuidanceSubjectService.GetTimePeriods(rs.SubjectId),
+                            geographicLevels:
+                            await _metaGuidanceSubjectService.GetGeographicLevels(rs.SubjectId)
                         )
-                ))
+                    ))
+                .OrderBy(svm => svm.Name)
                 .ToList();
+        }
+
+        private async Task<string> GetSubjectName(Guid releaseId, Guid subjectId)
+        {
+            var rf = await _contentDbContext
+                .ReleaseFiles
+                .Include(rf => rf.File)
+                .SingleOrDefaultAsync(rf =>
+                    rf.ReleaseId == releaseId
+                    && rf.File.SubjectId == subjectId
+                    && rf.File.Type == FileType.Data);
+            return rf.Name;
         }
 
         private async Task<List<TableHighlightViewModel>> GetHighlights(Guid releaseId, List<Guid> subjectsToInclude)

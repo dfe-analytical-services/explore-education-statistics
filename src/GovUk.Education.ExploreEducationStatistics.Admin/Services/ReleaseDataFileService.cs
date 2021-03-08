@@ -28,7 +28,6 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Services
     public class ReleaseDataFileService : IReleaseDataFileService
     {
         private readonly ContentDbContext _contentDbContext;
-        private readonly StatisticsDbContext _statisticsDbContext;
         private readonly IPersistenceHelper<ContentDbContext> _persistenceHelper;
         private readonly IBlobStorageService _blobStorageService;
         private readonly IDataArchiveValidationService _dataArchiveValidationService;
@@ -41,7 +40,6 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Services
         private readonly IUserService _userService;
 
         public ReleaseDataFileService(ContentDbContext contentDbContext,
-            StatisticsDbContext statisticsDbContext,
             IPersistenceHelper<ContentDbContext> persistenceHelper,
             IBlobStorageService blobStorageService,
             IDataArchiveValidationService dataArchiveValidationService,
@@ -54,7 +52,6 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Services
             IUserService userService)
         {
             _contentDbContext = contentDbContext;
-            _statisticsDbContext = statisticsDbContext;
             _persistenceHelper = persistenceHelper;
             _blobStorageService = blobStorageService;
             _dataArchiveValidationService = dataArchiveValidationService;
@@ -216,8 +213,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Services
                                     {
                                         var subjectId = await _releaseRepository.CreateReleaseAndSubjectHierarchy(
                                             releaseId,
-                                            dataFormFile.FileName.ToLower(),
-                                            validSubjectName);
+                                            dataFormFile.FileName.ToLower());
 
                                         var dataFile = await _releaseDataFileRepository.Create(
                                             releaseId: releaseId,
@@ -225,6 +221,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Services
                                             filename: dataFormFile.FileName.ToLower(),
                                             type: FileType.Data,
                                             createdById: _userService.GetUserId(),
+                                            name: validSubjectName,
                                             replacingFile: replacingFile);
 
                                         var metaFile = await _releaseDataFileRepository.Create(
@@ -309,8 +306,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Services
                                                 {
                                                     var subjectId = await _releaseRepository.CreateReleaseAndSubjectHierarchy(
                                                         releaseId,
-                                                        archiveFile.DataFileName.ToLower(),
-                                                        validSubjectName);
+                                                        archiveFile.DataFileName.ToLower());
 
                                                     var zipFile = await _releaseDataFileRepository.CreateZip(
                                                         filename: zipFormFile.FileName.ToLower(),
@@ -323,6 +319,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Services
                                                         filename: archiveFile.DataFileName,
                                                         type: FileType.Data,
                                                         createdById: _userService.GetUserId(),
+                                                        name: validSubjectName,
                                                         replacingFile: replacingFile,
                                                         source: zipFile);
 
@@ -465,13 +462,19 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Services
 
         private async Task<string> GetSubjectName(File file)
         {
-            if (file.SubjectId.HasValue)
+            if (file.Type != FileType.Data)
             {
-                var subject = await _statisticsDbContext.Subject.FindAsync(file.SubjectId.Value);
-                return subject.Name;
+                throw new ArgumentException("file.Type should equal FileType.Data");
             }
 
-            return "Unknown";
+            var releaseFile = await _contentDbContext
+                .ReleaseFiles
+                .Include(rf => rf.File)
+                .SingleOrDefaultAsync(rf =>
+                rf.FileId == file.Id
+                && rf.File.Type == FileType.Data);
+
+            return releaseFile.Name ?? "Unknown";
         }
 
         private async Task<Either<ActionResult, string>> ValidateSubjectName(Guid releaseId,

@@ -14,6 +14,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Services.Interfaces
             string filename,
             FileType type,
             Guid createdById,
+            string name = null,
             File replacingFile = null,
             File source = null);
 

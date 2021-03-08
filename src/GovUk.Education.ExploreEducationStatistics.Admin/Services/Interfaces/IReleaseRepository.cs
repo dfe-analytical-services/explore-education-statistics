@@ -16,7 +16,6 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Services.Interfaces
 
         Task<Guid> CreateReleaseAndSubjectHierarchy(
             Guid releaseId,
-            string subjectFilename,
-            string subjectName);
+            string subjectFilename);
     }
 }

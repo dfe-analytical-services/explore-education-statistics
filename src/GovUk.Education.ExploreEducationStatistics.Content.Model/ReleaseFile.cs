@@ -15,6 +15,8 @@ namespace GovUk.Education.ExploreEducationStatistics.Content.Model
         public File File { get; set; }
 
         public Guid FileId { get; set; }
+        
+        public string Name { get; set; }
 
         public ReleaseFile CreateReleaseAmendment(Release amendment)
         {
