@@ -20,15 +20,18 @@ Click fast track link for 'Pupil absence rates' data block
     user waits until h3 is visible  Explore and edit this data online
     user clicks link  Explore data
 
-Validate selected step options
+Validate Publication selected step option
     [Tags]  HappyPath
     user waits until h1 is visible  Create your own tables online
     user waits until page contains element    css:table
-
     user checks previous table tool step contains  1    Publication     Pupil absence in schools in England
 
+Validate Subject selected step option
+    [Tags]  HappyPath  NotAgainstDev  NotAgainstTest
     user checks previous table tool step contains  2    Subject         Absence by characteristic
 
+Validate other selected step options
+    [Tags]  HappyPath
     user checks previous table tool step contains  3    National        England
 
     user checks previous table tool step contains  4    Start date      2012/13
