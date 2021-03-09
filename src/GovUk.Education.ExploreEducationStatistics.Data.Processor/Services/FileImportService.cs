@@ -1,4 +1,5 @@
 using System;
+using System.Diagnostics;
 using System.Linq;
 using System.Threading.Tasks;
 using GovUk.Education.ExploreEducationStatistics.Common.Services.Interfaces;
@@ -160,7 +161,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Processor.Services
                 await _dataImportService.UpdateStatus(message.Id, STAGE_4, percentageComplete);
             }
             
-            _logger.LogInformation($"Took {stopwatch.Elapsed.TotalMilliseconds} millis to check if {message.DataFileName} " +
+            _logger.LogInformation($"Took {stopwatch.Elapsed.TotalMilliseconds} millis to check if {message.ObservationsFilePath} " +
                                    $"was complete");
         }
     }
