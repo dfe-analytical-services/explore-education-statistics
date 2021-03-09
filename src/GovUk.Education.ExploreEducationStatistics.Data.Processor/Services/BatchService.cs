@@ -6,7 +6,7 @@ using GovUk.Education.ExploreEducationStatistics.Common.Services.Interfaces;
 using GovUk.Education.ExploreEducationStatistics.Content.Model;
 using GovUk.Education.ExploreEducationStatistics.Content.Model.Extensions;
 using GovUk.Education.ExploreEducationStatistics.Data.Processor.Services.Interfaces;
-using static GovUk.Education.ExploreEducationStatistics.Common.BlobContainerNames;
+using static GovUk.Education.ExploreEducationStatistics.Common.BlobContainers;
 
 namespace GovUk.Education.ExploreEducationStatistics.Data.Processor.Services
 {
@@ -28,7 +28,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Processor.Services
         public async Task<List<BlobInfo>> GetBatchFilesForDataFile(File dataFile)
         {
             var blobs = await _blobStorageService.ListBlobs(
-                PrivateFilesContainerName,
+                PrivateReleaseFiles,
                 dataFile.BatchesPath());
 
             return blobs.ToList();

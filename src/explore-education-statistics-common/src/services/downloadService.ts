@@ -1,16 +1,9 @@
 import { contentApi } from '@common/services/api';
 
 export default {
-  getChartFile(
-    publicationSlug: string,
-    releaseSlug: string,
-    fileName: string,
-  ): Promise<Blob> {
-    return contentApi.get<Blob>(
-      `/download/${publicationSlug}/${releaseSlug}/chart/${fileName}`,
-      {
-        responseType: 'blob',
-      },
-    );
+  getFile(releaseId: string, fileId: string): Promise<Blob> {
+    return contentApi.get<Blob>(`/releases/${releaseId}/files/${fileId}`, {
+      responseType: 'blob',
+    });
   },
 };

@@ -38,76 +38,81 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Model.Services
         {
             IQueryable<IObservationalUnit> query = level switch
             {
+                GeographicLevel.EnglishDevolvedArea =>
+                    _context.Location
+                        .Where(q => codes.Contains(q.EnglishDevolvedArea_Code))
+                        .GroupBy(q => new {q.EnglishDevolvedArea_Code, q.EnglishDevolvedArea_Name})
+                        .Select(q => new EnglishDevolvedArea(q.Key.EnglishDevolvedArea_Code, q.Key.EnglishDevolvedArea_Name)),
                 GeographicLevel.LocalAuthority =>
                     _context.Location
-                        .Where(q => codes.Contains(q.LocalAuthority.Code))
-                        .GroupBy(q => new {q.LocalAuthority.Code, q.LocalAuthority.OldCode, q.LocalAuthority.Name})
-                        .Select(q => new LocalAuthority(q.Key.Code, q.Key.OldCode, q.Key.Name)),
+                        .Where(q => codes.Contains(q.LocalAuthority_Code))
+                        .GroupBy(q => new {q.LocalAuthority_Code, q.LocalAuthority_OldCode, q.LocalAuthority_Name})
+                        .Select(q => new LocalAuthority(q.Key.LocalAuthority_Code, q.Key.LocalAuthority_OldCode, q.Key.LocalAuthority_Name)),
                 GeographicLevel.LocalAuthorityDistrict =>
                     _context.Location
-                        .Where(q => codes.Contains(q.LocalAuthorityDistrict.Code))
-                        .GroupBy(q => new {q.LocalAuthorityDistrict.Code, q.LocalAuthorityDistrict.Name})
-                        .Select(q => new LocalAuthorityDistrict(q.Key.Code, q.Key.Name)),
+                        .Where(q => codes.Contains(q.LocalAuthorityDistrict_Code))
+                        .GroupBy(q => new {q.LocalAuthorityDistrict_Code, q.LocalAuthorityDistrict_Name})
+                        .Select(q => new LocalAuthorityDistrict(q.Key.LocalAuthorityDistrict_Code, q.Key.LocalAuthorityDistrict_Name)),
                 GeographicLevel.LocalEnterprisePartnership =>
                     _context.Location
-                        .Where(q => codes.Contains(q.LocalEnterprisePartnership.Code))
-                        .GroupBy(q => new {q.LocalEnterprisePartnership.Code, q.LocalEnterprisePartnership.Name})
-                        .Select(q => new LocalEnterprisePartnership(q.Key.Code, q.Key.Name)),
+                        .Where(q => codes.Contains(q.LocalEnterprisePartnership_Code))
+                        .GroupBy(q => new {q.LocalEnterprisePartnership_Code, q.LocalEnterprisePartnership_Name})
+                        .Select(q => new LocalEnterprisePartnership(q.Key.LocalEnterprisePartnership_Code, q.Key.LocalEnterprisePartnership_Name)),
                 GeographicLevel.Institution =>
                     _context.Location
-                        .Where(q => codes.Contains(q.Institution.Code))
-                        .GroupBy(q => new {q.Institution.Code, q.Institution.Name})
-                        .Select(q => new Institution(q.Key.Code, q.Key.Name)),
+                        .Where(q => codes.Contains(q.Institution_Code))
+                        .GroupBy(q => new {q.Institution_Code, q.Institution_Name})
+                        .Select(q => new Institution(q.Key.Institution_Code, q.Key.Institution_Name)),
                 GeographicLevel.MayoralCombinedAuthority =>
                     _context.Location
-                        .Where(q => codes.Contains(q.MayoralCombinedAuthority.Code))
-                        .GroupBy(q => new {q.MayoralCombinedAuthority.Code, q.MayoralCombinedAuthority.Name})
-                        .Select(q => new MayoralCombinedAuthority(q.Key.Code, q.Key.Name)),
+                        .Where(q => codes.Contains(q.MayoralCombinedAuthority_Code))
+                        .GroupBy(q => new {q.MayoralCombinedAuthority_Code, q.MayoralCombinedAuthority_Name})
+                        .Select(q => new MayoralCombinedAuthority(q.Key.MayoralCombinedAuthority_Code, q.Key.MayoralCombinedAuthority_Name)),
                 GeographicLevel.MultiAcademyTrust =>
                     _context.Location
-                        .Where(q => codes.Contains(q.MultiAcademyTrust.Code))
-                        .GroupBy(q => new {q.MultiAcademyTrust.Code, q.MultiAcademyTrust.Name})
-                        .Select(q => new Mat(q.Key.Code, q.Key.Name)),
+                        .Where(q => codes.Contains(q.MultiAcademyTrust_Code))
+                        .GroupBy(q => new {q.MultiAcademyTrust_Code, q.MultiAcademyTrust_Name})
+                        .Select(q => new Mat(q.Key.MultiAcademyTrust_Code, q.Key.MultiAcademyTrust_Name)),
                 GeographicLevel.Country =>
                     _context.Location
-                        .Where(q => codes.Contains(q.Country.Code))
-                        .GroupBy(q => new {q.Country.Code, q.Country.Name})
-                        .Select(q => new Country(q.Key.Code, q.Key.Name)),
+                        .Where(q => codes.Contains(q.Country_Code))
+                        .GroupBy(q => new {q.Country_Code, q.Country_Name})
+                        .Select(q => new Country(q.Key.Country_Code, q.Key.Country_Name)),
                 GeographicLevel.OpportunityArea =>
                     _context.Location
-                        .Where(q => codes.Contains(q.OpportunityArea.Code))
-                        .GroupBy(q => new {q.OpportunityArea.Code, q.OpportunityArea.Name})
-                        .Select(q => new OpportunityArea(q.Key.Code, q.Key.Name)),
+                        .Where(q => codes.Contains(q.OpportunityArea_Code))
+                        .GroupBy(q => new {q.OpportunityArea_Code, q.OpportunityArea_Name})
+                        .Select(q => new OpportunityArea(q.Key.OpportunityArea_Code, q.Key.OpportunityArea_Name)),
                 GeographicLevel.ParliamentaryConstituency =>
                     _context.Location
-                        .Where(q => codes.Contains(q.ParliamentaryConstituency.Code))
-                        .GroupBy(q => new {q.ParliamentaryConstituency.Code, q.ParliamentaryConstituency.Name})
-                        .Select(q => new ParliamentaryConstituency(q.Key.Code, q.Key.Name)),
+                        .Where(q => codes.Contains(q.ParliamentaryConstituency_Code))
+                        .GroupBy(q => new {q.ParliamentaryConstituency_Code, q.ParliamentaryConstituency_Name})
+                        .Select(q => new ParliamentaryConstituency(q.Key.ParliamentaryConstituency_Code, q.Key.ParliamentaryConstituency_Name)),
                 GeographicLevel.Region =>
                     _context.Location
-                        .Where(q => codes.Contains(q.Region.Code))
-                        .GroupBy(q => new {q.Region.Code, q.Region.Name})
-                        .Select(q => new Region(q.Key.Code, q.Key.Name)),
+                        .Where(q => codes.Contains(q.Region_Code))
+                        .GroupBy(q => new {q.Region_Code, q.Region_Name})
+                        .Select(q => new Region(q.Key.Region_Code, q.Key.Region_Name)),
                 GeographicLevel.RscRegion =>
                     _context.Location
-                        .Where(q => codes.Contains(q.RscRegion.Code))
-                        .GroupBy(q => new {q.RscRegion.Code})
-                        .Select(q => new RscRegion(q.Key.Code)),
+                        .Where(q => codes.Contains(q.RscRegion_Code))
+                        .GroupBy(q => new {q.RscRegion_Code})
+                        .Select(q => new RscRegion(q.Key.RscRegion_Code)),
                 GeographicLevel.Sponsor =>
                     _context.Location
-                        .Where(q => codes.Contains(q.Sponsor.Code))
-                        .GroupBy(q => new {q.Sponsor.Code, q.Sponsor.Name})
-                        .Select(q => new Sponsor(q.Key.Code, q.Key.Name)),
+                        .Where(q => codes.Contains(q.Sponsor_Code))
+                        .GroupBy(q => new {q.Sponsor_Code, q.Sponsor_Name})
+                        .Select(q => new Sponsor(q.Key.Sponsor_Code, q.Key.Sponsor_Name)),
                 GeographicLevel.Ward =>
                     _context.Location
-                        .Where(q => codes.Contains(q.Ward.Code))
-                        .GroupBy(q => new {q.Ward.Code, q.Ward.Name})
-                        .Select(q => new Ward(q.Key.Code, q.Key.Name)),
+                        .Where(q => codes.Contains(q.Ward_Code))
+                        .GroupBy(q => new {q.Ward_Code, q.Ward_Name})
+                        .Select(q => new Ward(q.Key.Ward_Code, q.Key.Ward_Name)),
                 GeographicLevel.PlanningArea =>
                     _context.Location
-                        .Where(q => codes.Contains(q.PlanningArea.Code))
-                        .GroupBy(q => new {q.PlanningArea.Code, q.PlanningArea.Name})
-                        .Select(q => new PlanningArea(q.Key.Code, q.Key.Name)),
+                        .Where(q => codes.Contains(q.PlanningArea_Code))
+                        .GroupBy(q => new {q.PlanningArea_Code, q.PlanningArea_Name})
+                        .Select(q => new PlanningArea(q.Key.PlanningArea_Code, q.Key.PlanningArea_Name)),
                 _ => throw new ArgumentOutOfRangeException()
             };
 
@@ -127,6 +132,8 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Model.Services
         {
             switch (geographicLevel)
             {
+                case GeographicLevel.EnglishDevolvedArea:
+                    return location.EnglishDevolvedArea;
                 case GeographicLevel.LocalAuthority:
                     return location.LocalAuthority;
                 case GeographicLevel.LocalAuthorityDistrict:

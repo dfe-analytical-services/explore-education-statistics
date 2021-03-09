@@ -3,17 +3,24 @@ import AccordionSection from '@common/components/AccordionSection';
 import Details from '@common/components/Details';
 import Tabs from '@common/components/Tabs';
 import TabsSection from '@common/components/TabsSection';
-import { fireEvent, render, wait } from '@testing-library/react';
+import { fireEvent, render, screen, waitFor } from '@testing-library/react';
+import userEvent from '@testing-library/user-event';
 import React from 'react';
 import PageSearchForm from '../PageSearchForm';
 
 const labelText = 'Find on this page';
 
 describe('PageSearchForm', () => {
-  test('does not render results if input is less than default 3 characters', () => {
+  beforeEach(() => {
     jest.useFakeTimers();
+  });
 
-    const { container, getByLabelText } = render(
+  afterEach(() => {
+    jest.useRealTimers();
+  });
+
+  test('does not render results if input is less than default 3 characters', async () => {
+    const { container } = render(
       <div>
         <PageSearchForm inputLabel={labelText} />
 
@@ -46,11 +53,7 @@ describe('PageSearchForm', () => {
       </div>,
     );
 
-    fireEvent.change(getByLabelText(labelText), {
-      target: {
-        value: 'To',
-      },
-    });
+    await userEvent.type(screen.getByLabelText(labelText), 'To');
 
     jest.runOnlyPendingTimers();
 
@@ -61,10 +64,8 @@ describe('PageSearchForm', () => {
     expect(options).toHaveLength(0);
   });
 
-  test('does not render results if input is less the custom `minInput` prop', () => {
-    jest.useFakeTimers();
-
-    const { container, getByLabelText } = render(
+  test('does not render results if input is less the custom `minInput` prop', async () => {
+    const { container } = render(
       <div>
         <PageSearchForm inputLabel={labelText} minInput={5} />
 
@@ -97,11 +98,7 @@ describe('PageSearchForm', () => {
       </div>,
     );
 
-    fireEvent.change(getByLabelText(labelText), {
-      target: {
-        value: 'Test',
-      },
-    });
+    await userEvent.type(screen.getByLabelText(labelText), 'Test');
 
     jest.runOnlyPendingTimers();
 
@@ -112,10 +109,8 @@ describe('PageSearchForm', () => {
     expect(options).toHaveLength(0);
   });
 
-  test('renders correct results when input is an acronym', () => {
-    jest.useFakeTimers();
-
-    const { container, getByLabelText } = render(
+  test('renders correct results when input is an acronym', async () => {
+    const { container } = render(
       <div>
         <PageSearchForm inputLabel={labelText} />
 
@@ -148,11 +143,7 @@ describe('PageSearchForm', () => {
       </div>,
     );
 
-    fireEvent.change(getByLabelText(labelText), {
-      target: {
-        value: 'TEST',
-      },
-    });
+    await userEvent.type(screen.getByLabelText(labelText), 'TEST');
 
     jest.runOnlyPendingTimers();
 
@@ -167,10 +158,8 @@ describe('PageSearchForm', () => {
     expect(options[1]).toHaveTextContent('TEST 3');
   });
 
-  test('renders correct results when input is an acronym and is below `minInput`', () => {
-    jest.useFakeTimers();
-
-    const { container, getByLabelText } = render(
+  test('renders correct results when input is an acronym and is below `minInput`', async () => {
+    const { container } = render(
       <div>
         <PageSearchForm inputLabel={labelText} minInput={5} />
 
@@ -203,11 +192,7 @@ describe('PageSearchForm', () => {
       </div>,
     );
 
-    fireEvent.change(getByLabelText(labelText), {
-      target: {
-        value: 'TE',
-      },
-    });
+    await userEvent.type(screen.getByLabelText(labelText), 'TE');
 
     jest.runOnlyPendingTimers();
 
@@ -223,9 +208,7 @@ describe('PageSearchForm', () => {
   });
 
   test('renders results found in default elements', async () => {
-    jest.useFakeTimers();
-
-    const { container, getByLabelText } = render(
+    const { container } = render(
       <div>
         <PageSearchForm inputLabel={labelText} />
 
@@ -258,11 +241,7 @@ describe('PageSearchForm', () => {
       </div>,
     );
 
-    fireEvent.change(getByLabelText(labelText), {
-      target: {
-        value: 'Test',
-      },
-    });
+    await userEvent.type(screen.getByLabelText(labelText), 'Test');
 
     jest.runOnlyPendingTimers();
 
@@ -282,10 +261,8 @@ describe('PageSearchForm', () => {
     expect(container.querySelector('[role="listbox"]')).toMatchSnapshot();
   });
 
-  test('renders results found in custom selectors', () => {
-    jest.useFakeTimers();
-
-    const { container, getByLabelText } = render(
+  test('renders results found in custom selectors', async () => {
+    const { container } = render(
       <div>
         <PageSearchForm
           inputLabel={labelText}
@@ -322,11 +299,7 @@ describe('PageSearchForm', () => {
       </div>,
     );
 
-    fireEvent.change(getByLabelText(labelText), {
-      target: {
-        value: 'Test',
-      },
-    });
+    await userEvent.type(screen.getByLabelText(labelText), 'Test');
 
     jest.runOnlyPendingTimers();
 
@@ -344,9 +317,7 @@ describe('PageSearchForm', () => {
   });
 
   test('result locations uses nearest heading', async () => {
-    jest.useFakeTimers();
-
-    const { container, getByLabelText } = render(
+    const { container } = render(
       <div>
         <PageSearchForm inputLabel={labelText} />
 
@@ -366,11 +337,7 @@ describe('PageSearchForm', () => {
       </div>,
     );
 
-    fireEvent.change(getByLabelText(labelText), {
-      target: {
-        value: 'Test',
-      },
-    });
+    await userEvent.type(screen.getByLabelText(labelText), 'Test');
 
     jest.runOnlyPendingTimers();
 
@@ -389,10 +356,8 @@ describe('PageSearchForm', () => {
     expect(container.querySelector('[role="listbox"]')).toMatchSnapshot();
   });
 
-  test('result locations include heading hierarchy', () => {
-    jest.useFakeTimers();
-
-    const { container, getByLabelText } = render(
+  test('result locations include heading hierarchy', async () => {
+    const { container } = render(
       <div>
         <PageSearchForm inputLabel={labelText} />
 
@@ -409,11 +374,7 @@ describe('PageSearchForm', () => {
       </div>,
     );
 
-    fireEvent.change(getByLabelText(labelText), {
-      target: {
-        value: 'Test',
-      },
-    });
+    await userEvent.type(screen.getByLabelText(labelText), 'Test');
 
     jest.runOnlyPendingTimers();
 
@@ -430,10 +391,8 @@ describe('PageSearchForm', () => {
     expect(container.querySelector('[role="listbox"]')).toMatchSnapshot();
   });
 
-  test('result locations include accordion sections', () => {
-    jest.useFakeTimers();
-
-    const { container, getByLabelText } = render(
+  test('result locations include accordion sections', async () => {
+    const { container } = render(
       <div>
         <PageSearchForm inputLabel={labelText} />
 
@@ -456,11 +415,7 @@ describe('PageSearchForm', () => {
       </div>,
     );
 
-    fireEvent.change(getByLabelText(labelText), {
-      target: {
-        value: 'Test',
-      },
-    });
+    await userEvent.type(screen.getByLabelText(labelText), 'Test');
 
     jest.runOnlyPendingTimers();
 
@@ -484,9 +439,7 @@ describe('PageSearchForm', () => {
   });
 
   test('clicking result scrolls and focuses the element', async () => {
-    jest.useFakeTimers();
-
-    const { container, getByLabelText } = render(
+    const { container } = render(
       <div>
         <h2>Section 1</h2>
         <p id="target">Test</p>
@@ -495,19 +448,13 @@ describe('PageSearchForm', () => {
       </div>,
     );
 
-    fireEvent.change(getByLabelText(labelText), {
-      target: {
-        value: 'Test',
-      },
-    });
+    await userEvent.type(screen.getByLabelText(labelText), 'Test');
 
     jest.runOnlyPendingTimers();
 
-    jest.useRealTimers();
+    userEvent.click(container.querySelector('[role="option"]') as HTMLElement);
 
-    fireEvent.click(container.querySelector('[role="option"]') as HTMLElement);
-
-    await wait(() => {
+    await waitFor(() => {
       const target = container.querySelector('#target');
 
       expect(target).toHaveFocus();
@@ -516,9 +463,7 @@ describe('PageSearchForm', () => {
   });
 
   test('pressing Enter on result scrolls and focuses the element', async () => {
-    jest.useFakeTimers();
-
-    const { container, getByLabelText } = render(
+    const { container } = render(
       <div>
         <h2>Section 1</h2>
         <p id="target">Test</p>
@@ -527,22 +472,16 @@ describe('PageSearchForm', () => {
       </div>,
     );
 
-    fireEvent.change(getByLabelText(labelText), {
-      target: {
-        value: 'Test',
-      },
-    });
+    await userEvent.type(screen.getByLabelText(labelText), 'Test');
 
     jest.runOnlyPendingTimers();
-
-    jest.useRealTimers();
 
     const listBox = container.querySelector('[role="listbox"]') as HTMLElement;
 
     fireEvent.keyDown(listBox, { key: 'ArrowDown' });
     fireEvent.keyDown(listBox, { key: 'Enter' });
 
-    await wait(() => {
+    await waitFor(() => {
       const target = container.querySelector('#target');
 
       expect(target).toHaveFocus();
@@ -551,9 +490,7 @@ describe('PageSearchForm', () => {
   });
 
   test('opens parent accordion of selected result', async () => {
-    jest.useFakeTimers();
-
-    const { container, getByLabelText } = render(
+    const { container } = render(
       <div>
         <Accordion id="test-accordion">
           <AccordionSection heading="Section 1">
@@ -565,13 +502,11 @@ describe('PageSearchForm', () => {
       </div>,
     );
 
-    await wait();
-
-    fireEvent.change(getByLabelText(labelText), {
-      target: {
-        value: 'Test',
-      },
+    await waitFor(() => {
+      expect(screen.getByLabelText(labelText)).toBeInTheDocument();
     });
+
+    await userEvent.type(screen.getByLabelText(labelText), 'Test');
 
     jest.runOnlyPendingTimers();
 
@@ -589,9 +524,7 @@ describe('PageSearchForm', () => {
   });
 
   test('opens parent details of selected result', async () => {
-    jest.useFakeTimers();
-
-    const { container, getByLabelText } = render(
+    const { container } = render(
       <div>
         <Details summary="Details 1">
           <p id="target">Test</p>
@@ -601,13 +534,11 @@ describe('PageSearchForm', () => {
       </div>,
     );
 
-    await wait();
-
-    fireEvent.change(getByLabelText(labelText), {
-      target: {
-        value: 'Test',
-      },
+    await waitFor(() => {
+      expect(screen.getByLabelText(labelText)).toBeInTheDocument();
     });
+
+    await userEvent.type(screen.getByLabelText(labelText), 'Test');
 
     jest.runOnlyPendingTimers();
 
@@ -615,19 +546,15 @@ describe('PageSearchForm', () => {
 
     expect(summary).toHaveAttribute('aria-expanded', 'false');
 
-    jest.useRealTimers();
-
     fireEvent.click(container.querySelector('[role="option"]') as HTMLElement);
 
-    await wait(() => {
+    await waitFor(() => {
       expect(summary).toHaveAttribute('aria-expanded', 'true');
     });
   });
 
   test('opens parent tab section of selected result', async () => {
-    jest.useFakeTimers();
-
-    const { container, getByLabelText } = render(
+    const { container } = render(
       <div>
         <Tabs id="test-tabs">
           <TabsSection title="Tab 1">
@@ -642,13 +569,11 @@ describe('PageSearchForm', () => {
       </div>,
     );
 
-    await wait();
-
-    fireEvent.change(getByLabelText(labelText), {
-      target: {
-        value: 'Test',
-      },
+    await waitFor(() => {
+      expect(screen.getByLabelText(labelText)).toBeInTheDocument();
     });
+
+    await userEvent.type(screen.getByLabelText(labelText), 'Test');
 
     jest.runOnlyPendingTimers();
 
@@ -660,20 +585,16 @@ describe('PageSearchForm', () => {
     expect(tabs[0]).toHaveAttribute('aria-selected', 'true');
     expect(tabs[1]).toHaveAttribute('aria-selected', 'false');
 
-    jest.useRealTimers();
-
     fireEvent.click(container.querySelector('[role="option"]') as HTMLElement);
 
-    await wait(() => {
+    await waitFor(() => {
       expect(tabs[0]).toHaveAttribute('aria-selected', 'false');
       expect(tabs[1]).toHaveAttribute('aria-selected', 'true');
     });
   });
 
   test('opens nested sections of selected result', async () => {
-    jest.useFakeTimers();
-
-    const { container, getByLabelText } = render(
+    const { container } = render(
       <div>
         <Accordion id="test-accordion">
           <AccordionSection heading="Section 1">
@@ -694,13 +615,11 @@ describe('PageSearchForm', () => {
       </div>,
     );
 
-    await wait();
-
-    fireEvent.change(getByLabelText(labelText), {
-      target: {
-        value: 'Test',
-      },
+    await waitFor(() => {
+      expect(screen.getByLabelText(labelText)).toBeInTheDocument();
     });
+
+    await userEvent.type(screen.getByLabelText(labelText), 'Test');
 
     jest.runOnlyPendingTimers();
 
@@ -710,11 +629,9 @@ describe('PageSearchForm', () => {
     const tabs = container.querySelectorAll('[role="tab"]');
     const summary = container.querySelector('summary');
 
-    jest.useRealTimers();
-
     fireEvent.click(container.querySelector('[role="option"]') as HTMLElement);
 
-    await wait(() => {
+    await waitFor(() => {
       expect(accordionSection).toHaveAttribute('aria-expanded', 'true');
       expect(tabs[1]).toHaveAttribute('aria-selected', 'true');
       expect(summary).toHaveAttribute('aria-expanded', 'true');

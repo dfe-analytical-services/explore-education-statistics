@@ -11,8 +11,10 @@ namespace GovUk.Education.ExploreEducationStatistics.Common.Model
         public string Extension => FileStorageUtils.GetExtension(FileName);
         public string FileName { get; set; }
         public string Name { get; set; }
-        public string Path { get; set; }
         public string Size { get; set; }
+
+        [JsonIgnore]
+        public string Path { get; set; }
 
         [JsonConverter(typeof(EnumToEnumValueJsonConverter<FileType>))]
         public FileType Type { get; set; }

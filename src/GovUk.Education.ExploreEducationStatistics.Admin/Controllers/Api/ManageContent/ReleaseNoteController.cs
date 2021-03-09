@@ -36,7 +36,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Controllers.Api.Manag
         {
             return await _releaseNoteService
                 .UpdateReleaseNoteAsync(releaseId, releaseNoteId, saveRequest)
-                .HandleFailuresOr(Ok);
+                .HandleFailuresOrOk();
         }
 
         [HttpDelete("release/{releaseId}/content/release-note/{releaseNoteId}")]
@@ -44,7 +44,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Controllers.Api.Manag
         {
             return await _releaseNoteService
                 .DeleteReleaseNoteAsync(releaseId, releaseNoteId)
-                .HandleFailuresOr(Ok);
+                .HandleFailuresOrOk();
         }
     }
 }

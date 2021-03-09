@@ -126,7 +126,7 @@ Create new release
     user enters text into element  id:releaseSummaryForm-timePeriodCoverageStartYear  2025
     user clicks radio  National Statistics
     user clicks button   Create new release
-    user waits until page contains title caption  Edit release
+    user waits until page contains title caption  Edit release for Spring Term 2025/26
     user waits until h1 is visible  ${PUBLICATION_NAME}
 
 Verify created release summary

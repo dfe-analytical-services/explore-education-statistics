@@ -17,8 +17,6 @@ using static GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services.Val
 using static GovUk.Education.ExploreEducationStatistics.Admin.Tests.Utils.AdminMockUtils;
 using static GovUk.Education.ExploreEducationStatistics.Admin.Validators.ValidationErrorMessages;
 using static GovUk.Education.ExploreEducationStatistics.Admin.Validators.ValidationUtils;
-using static GovUk.Education.ExploreEducationStatistics.Common.Model.FileType;
-using FileInfo = GovUk.Education.ExploreEducationStatistics.Common.Model.FileInfo;
 
 namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Controllers.Api
 {
@@ -38,59 +36,6 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Controllers.Api
 
             // Call the method under test
             var result = await controller.CreateReleaseAsync(new ReleaseCreateViewModel(), _publicationId);
-            AssertOkResult(result);
-        }
-
-        [Fact]
-        public async Task AddAncillaryFilesAsync_UploadsTheFiles_Returns_Ok()
-        {
-            var testFile = new FileInfo
-            {
-                FileName = "ancillaryFile.doc",
-                Name = "File name",
-                Path = "ancillaryFile.doc",
-                Size = "1 Kb"
-            };
-
-            var mocks = Mocks();
-            var ancillaryFile = MockFile("ancillaryFile.doc");
-            mocks.ReleaseFileService
-                .Setup(service => service.UploadAncillary(_releaseId, ancillaryFile, "File name"))
-                .ReturnsAsync(new Either<ActionResult, FileInfo>(testFile));
-            var controller = ReleasesControllerWithMocks(mocks);
-
-            // Call the method under test
-            var result = await controller.AddAncillaryFileAsync(_releaseId, "File name", ancillaryFile);
-            AssertOkResult(result);
-        }
-
-        [Fact]
-        public async Task GetAncillaryFilesAsync_Returns_A_List_Of_Files()
-        {
-            IEnumerable<FileInfo> testFiles = new[]
-            {
-                new FileInfo
-                {
-                    FileName = "file1.doc",
-                    Name = "Ancillary 1",
-                    Path = "file1.doc",
-                    Size = "1 Kb"
-                },
-                new FileInfo
-                {
-                    FileName = "file2.doc",
-                    Name = "Ancillary 2",
-                    Path = "file2.doc",
-                    Size = "1 Kb"
-                }
-            };
-            var mocks = Mocks();
-            mocks.ReleaseFileService.Setup(s => s.ListAll(_releaseId, Ancillary))
-                .ReturnsAsync(new Either<ActionResult, IEnumerable<FileInfo>>(testFiles));
-            var controller = ReleasesControllerWithMocks(mocks);
-
-            // Call the method under test
-            var result = await controller.GetAncillaryFilesAsync(_releaseId);
             AssertOkResult(result);
         }
 
@@ -316,44 +261,36 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Controllers.Api
 
         private static (
             Mock<IReleaseService> ReleaseService,
-            Mock<IReleaseFileService> ReleaseFileService,
             Mock<IReleaseDataFileService> ReleaseDataFilesService,
             Mock<IReleaseStatusService> ReleaseStatusService,
             Mock<IReleaseChecklistService> ReleaseChecklistService,
             Mock<UserManager<ApplicationUser>> UserManager,
-            Mock<IDataBlockService> DataBlockService,
             Mock<IDataImportService> ImportService) Mocks()
         {
             return (new Mock<IReleaseService>(),
-                    new Mock<IReleaseFileService>(),
                     new Mock<IReleaseDataFileService>(),
                     new Mock<IReleaseStatusService>(),
                     new Mock<IReleaseChecklistService>(),
                     MockUserManager(),
-                    new Mock<IDataBlockService>(),
                     new Mock<IDataImportService>()
                 );
         }
 
         private static ReleasesController ReleasesControllerWithMocks((
             Mock<IReleaseService> ReleaseService,
-            Mock<IReleaseFileService> ReleaseFileService,
             Mock<IReleaseDataFileService> ReleaseDataFileService,
             Mock<IReleaseStatusService> ReleaseStatusService,
             Mock<IReleaseChecklistService> ReleaseChecklistService,
             Mock<UserManager<ApplicationUser>> UserManager,
-            Mock<IDataBlockService> DataBlockService,
             Mock<IDataImportService> ImportService
             ) mocks)
         {
             return new ReleasesController(
                 mocks.ReleaseService.Object,
-                mocks.ReleaseFileService.Object,
                 mocks.ReleaseDataFileService.Object,
                 mocks.ReleaseStatusService.Object,
                 mocks.ReleaseChecklistService.Object,
                 mocks.UserManager.Object,
-                mocks.DataBlockService.Object,
                 mocks.ImportService.Object);
         }
     }

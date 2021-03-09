@@ -5,7 +5,7 @@ using static GovUk.Education.ExploreEducationStatistics.Common.Model.FileType;
 
 namespace GovUk.Education.ExploreEducationStatistics.Common.Validators
 {
-    public class FileTypeValidationUtils
+    public static class FileTypeValidationUtils
     {
         public static readonly Regex[] AllowedCsvMimeTypes = {
             new Regex(@"^(application|text)/csv$"),
@@ -20,11 +20,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Common.Validators
         public static readonly string[] ZipEncodingTypes = {
             "binary",
         };
-        
-        public static readonly Regex[] AllowedChartFileTypes = {
-            new Regex(@"^image/.*") 
-        };
-        
+
         public static readonly Regex[] AllowedAncillaryFileTypes = {
             new Regex(@"^image/.*"),
             new Regex(@"^(application|text)/csv$"),
@@ -39,6 +35,14 @@ namespace GovUk.Education.ExploreEducationStatistics.Common.Validators
             new Regex(@"^(application)/x-compressed$")
         };
 
+        public static readonly Regex[] AllowedChartFileTypes = {
+            new Regex(@"^image/.*") 
+        };
+
+        public static readonly Regex[] AllowedImageMimeTypes = {
+            new Regex(@"^image/.*") 
+        };
+
         public static readonly Regex[] AllowedArchiveMimeTypes = {
             new Regex(@"^(application)/zip$"),
             new Regex(@"^(application)/x-compressed$")
@@ -50,7 +54,8 @@ namespace GovUk.Education.ExploreEducationStatistics.Common.Validators
                 { Ancillary, AllowedAncillaryFileTypes },
                 { Chart, AllowedChartFileTypes },
                 { Data, AllowedCsvMimeTypes },
-                { DataZip, AllowedArchiveMimeTypes }
+                { DataZip, AllowedArchiveMimeTypes },
+                { Image, AllowedImageMimeTypes }
             };
     }
 }

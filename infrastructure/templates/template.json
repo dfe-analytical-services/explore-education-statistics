@@ -509,6 +509,10 @@
     "autoPauseDelayStatisticsDb": {
       "type": "int",
       "defaultValue": -1
+    },
+    "deploySlotName": {
+      "type": "string",
+      "defaultValue": "deploy"
     }
   },
   "variables": {
@@ -672,15 +676,15 @@
           "condition": "[parameters('useSubnets')]",
           "name": "virtualNetwork",
           "type": "config",
-          "apiVersion": "2018-02-01",
+          "apiVersion": "2018-11-01",
           "location": "[resourceGroup().location]",
           "properties": {
-            "subnetResourceid": "[variables('dataSubnetRef')]",
+            "subnetResourceId": "[variables('dataSubnetRef')]",
             "swiftSupported": true
           },
           "dependsOn": [
             "[resourceId('Microsoft.Web/sites', variables('dataAppName'))]",
-            "[concat('Microsoft.Network/virtualNetworks/', variables('vnetName'))]"
+            "[variables('vNetRef')]"
           ]
         }
       ],
@@ -702,7 +706,6 @@
           "httpLoggingEnabled": true,
           "detailedErrorLoggingEnabled": true,
           "requestTracingEnabled": true,
-          // "scmIpSecurityRestrictions": "[variables('ipWhiteList').addresses]",
           "cors": {
             "allowedOrigins": [
               "[concat('https://', parameters('domain'))]",
@@ -753,7 +756,7 @@
     {
       "apiVersion": "2018-11-01",
       "type": "Microsoft.Web/sites/slots",
-      "name": "[concat(variables('dataAppName'), '/deploy')]",
+      "name": "[concat(variables('dataAppName'), '/', parameters('deploySlotName'))]",
       "kind": "app",
       "location": "[resourceGroup().location]",
       "comments": "This specifies the web app slots.",
@@ -794,6 +797,23 @@
           }
         }
       },
+      "resources": [
+        {
+          "condition": "[parameters('useSubnets')]",
+          "name": "virtualNetwork",
+          "type": "config",
+          "apiVersion": "2018-11-01",
+          "location": "[resourceGroup().location]",
+          "properties": {
+            "subnetResourceId": "[variables('dataSubnetRef')]",
+            "swiftSupported": true
+          },
+          "dependsOn": [
+            "[resourceId('Microsoft.Web/sites/slots', variables('dataAppName'), parameters('deploySlotName'))]",
+            "[variables('vNetRef')]"
+          ]
+        }
+      ],
       "dependsOn": [
         "[resourceId('Microsoft.Web/Sites', variables('dataAppName'))]"
       ]
@@ -877,15 +897,15 @@
           "condition": "[parameters('useSubnets')]",
           "name": "virtualNetwork",
           "type": "config",
-          "apiVersion": "2018-02-01",
+          "apiVersion": "2018-11-01",
           "location": "[resourceGroup().location]",
           "properties": {
-            "subnetResourceid": "[variables('contentSubnetRef')]",
+            "subnetResourceId": "[variables('contentSubnetRef')]",
             "swiftSupported": true
           },
           "dependsOn": [
             "[resourceId('Microsoft.Web/sites', variables('contentAppName'))]",
-            "[concat('Microsoft.Network/virtualNetworks/', variables('vnetName'))]"
+            "[variables('vNetRef')]"
           ]
         }
       ],
@@ -907,7 +927,6 @@
           "httpLoggingEnabled": true,
           "detailedErrorLoggingEnabled": true,
           "requestTracingEnabled": true,
-          // "scmIpSecurityRestrictions": "[variables('ipWhiteList').addresses]",
           "cors": {
             "allowedOrigins": [
               "[concat('https://', parameters('domain'))]",
@@ -957,7 +976,7 @@
     {
       "apiVersion": "2018-11-01",
       "type": "Microsoft.Web/sites/slots",
-      "name": "[concat(variables('contentAppName'), '/deploy')]",
+      "name": "[concat(variables('contentAppName'), '/', parameters('deploySlotName'))]",
       "kind": "app",
       "location": "[resourceGroup().location]",
       "comments": "This specifies the web app slots.",
@@ -998,6 +1017,23 @@
           }
         }
       },
+      "resources": [
+        {
+          "condition": "[parameters('useSubnets')]",
+          "name": "virtualNetwork",
+          "type": "config",
+          "apiVersion": "2018-11-01",
+          "location": "[resourceGroup().location]",
+          "properties": {
+            "subnetResourceId": "[variables('contentSubnetRef')]",
+            "swiftSupported": true
+          },
+          "dependsOn": [
+            "[resourceId('Microsoft.Web/sites/slots', variables('contentAppName'), parameters('deploySlotName'))]",
+            "[variables('vNetRef')]"
+          ]
+        }
+      ],
       "dependsOn": [
         "[resourceId('Microsoft.Web/Sites', variables('contentAppName'))]"
       ]
@@ -1081,15 +1117,15 @@
           "condition": "[parameters('useSubnets')]",
           "name": "virtualNetwork",
           "type": "config",
-          "apiVersion": "2018-02-01",
+          "apiVersion": "2018-11-01",
           "location": "[resourceGroup().location]",
           "properties": {
-            "subnetResourceid": "[variables('adminSubnetRef')]",
+            "subnetResourceId": "[variables('adminSubnetRef')]",
             "swiftSupported": true
           },
           "dependsOn": [
             "[resourceId('Microsoft.Web/sites', variables('adminAppName'))]",
-            "[concat('Microsoft.Network/virtualNetworks/', variables('vnetName'))]"
+            "[variables('vNetRef')]"
           ]
         }
       ],
@@ -1112,8 +1148,6 @@
           "detailedErrorLoggingEnabled": true,
           "requestTracingEnabled": true,
           "use32BitWorkerProcess": false,
-          // "ipSecurityRestrictions": "[variables('ipWhiteList').addresses]",
-          // "scmIpSecurityRestrictionsUseMain": true,
           "cors": {
             "allowedOrigins": [
               "https://localhost:3000",
@@ -1180,7 +1214,7 @@
     {
       "apiVersion": "2018-11-01",
       "type": "Microsoft.Web/sites/slots",
-      "name": "[concat(variables('adminAppName'), '/deploy')]",
+      "name": "[concat(variables('adminAppName'), '/', parameters('deploySlotName'))]",
       "kind": "app",
       "location": "[resourceGroup().location]",
       "comments": "This specifies the web app slots.",
@@ -1219,6 +1253,23 @@
           }
         }
       },
+      "resources": [
+        {
+          "condition": "[parameters('useSubnets')]",
+          "name": "virtualNetwork",
+          "type": "config",
+          "apiVersion": "2018-11-01",
+          "location": "[resourceGroup().location]",
+          "properties": {
+            "subnetResourceId": "[variables('adminSubnetRef')]",
+            "swiftSupported": true
+          },
+          "dependsOn": [
+            "[resourceId('Microsoft.Web/sites/slots', variables('adminAppName'), parameters('deploySlotName'))]",
+            "[variables('vNetRef')]"
+          ]
+        }
+      ],
       "dependsOn": [
         "[resourceId('Microsoft.Web/Sites', variables('adminAppName'))]"
       ]
@@ -1315,7 +1366,6 @@
           "httpLoggingEnabled": true,
           "detailedErrorLoggingEnabled": true,
           "requestTracingEnabled": true
-          // "scmIpSecurityRestrictions": "[variables('ipWhiteList').addresses]",
         }
       },
       "dependsOn": [
@@ -1464,7 +1514,7 @@
         "DeploymentScript": "[parameters('deploymentScript')]"
       },
       "dependsOn": [
-        "[concat('Microsoft.Network/virtualNetworks/', variables('vnetName'))]"
+        "[variables('vNetRef')]"
       ],
       "sku": {
         "name": "Standard_RAGRS"
@@ -2119,15 +2169,15 @@
           "condition": "[parameters('useSubnets')]",
           "name": "virtualNetwork",
           "type": "config",
-          "apiVersion": "2018-02-01",
+          "apiVersion": "2018-11-01",
           "location": "[resourceGroup().location]",
           "properties": {
-            "subnetResourceid": "[variables('notifySubnetRef')]",
+            "subnetResourceId": "[variables('notifySubnetRef')]",
             "swiftSupported": true
           },
           "dependsOn": [
             "[resourceId('Microsoft.Web/sites', variables('notificationsAppName'))]",
-            "[concat('Microsoft.Network/virtualNetworks/', variables('vnetName'))]"
+            "[variables('vNetRef')]"
           ]
         }
       ],
@@ -2142,7 +2192,6 @@
         "remoteDebuggingEnabled": false,
         "httpLoggingEnabled": true,
         "detailedErrorLoggingEnabled": true,
-        // // "scmIpSecurityRestrictions": "[variables('ipWhiteList').addresses]",
         "cors": {
           "allowedOrigins": [
             "[concat('https://', parameters('domain'))]",
@@ -2267,15 +2316,15 @@
           "condition": "[parameters('useSubnets')]",
           "name": "virtualNetwork",
           "type": "config",
-          "apiVersion": "2018-02-01",
+          "apiVersion": "2018-11-01",
           "location": "[resourceGroup().location]",
           "properties": {
-            "subnetResourceid": "[variables('importerSubnetRef')]",
+            "subnetResourceId": "[variables('importerSubnetRef')]",
             "swiftSupported": true
           },
           "dependsOn": [
             "[resourceId('Microsoft.Web/sites', variables('importerAppName'))]",
-            "[concat('Microsoft.Network/virtualNetworks/', variables('vnetName'))]"
+            "[variables('vNetRef')]"
           ]
         }
       ],
@@ -2294,7 +2343,6 @@
           "httpLoggingEnabled": true,
           "detailedErrorLoggingEnabled": true,
           "requestTracingEnabled": true,
-          // "scmIpSecurityRestrictions": "[variables('ipWhiteList').addresses]",
           "cors": {
             "allowedOrigins": [
             ]
@@ -2424,15 +2472,15 @@
           "condition": "[parameters('useSubnets')]",
           "name": "virtualNetwork",
           "type": "config",
-          "apiVersion": "2018-02-01",
+          "apiVersion": "2018-11-01",
           "location": "[resourceGroup().location]",
           "properties": {
-            "subnetResourceid": "[variables('publisherSubnetRef')]",
+            "subnetResourceId": "[variables('publisherSubnetRef')]",
             "swiftSupported": true
           },
           "dependsOn": [
             "[resourceId('Microsoft.Web/sites', variables('publisherAppName'))]",
-            "[concat('Microsoft.Network/virtualNetworks/', variables('vnetName'))]"
+            "[variables('vNetRef')]"
           ]
         }
       ],
@@ -2451,7 +2499,6 @@
           "httpLoggingEnabled": true,
           "detailedErrorLoggingEnabled": true,
           "requestTracingEnabled": true,
-          // "scmIpSecurityRestrictions": "[variables('ipWhiteList').addresses]",
           "cors": {
             "allowedOrigins": [
             ]

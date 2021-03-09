@@ -196,7 +196,7 @@ Edit footnote
 Check footnote was updated
     [Tags]  HappyPath
     user clicks link  Content
-    user waits until page contains element  id:releaseHeadlines
+    user waits until page contains element  id:releaseHeadlines  120
     user scrolls to element  id:releaseHeadlines
     user waits until page contains link  Table  180
     user clicks link  Table

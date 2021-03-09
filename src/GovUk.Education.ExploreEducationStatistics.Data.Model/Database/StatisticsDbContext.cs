@@ -87,20 +87,53 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Model.Database
 
         private static void ConfigureLocation(ModelBuilder modelBuilder)
         {
-            ConfigureCountry(modelBuilder);
-            ConfigureInstitution(modelBuilder);
-            ConfigureLocalAuthority(modelBuilder);
-            ConfigureLocalAuthorityDistrict(modelBuilder);
-            ConfigureLocalEnterprisePartnership(modelBuilder);
-            ConfigureMultiAcademyTrust(modelBuilder);
-            ConfigureMayoralCombinedAuthority(modelBuilder);
-            ConfigureOpportunityArea(modelBuilder);
-            ConfigureParliamentaryConstituency(modelBuilder);
-            ConfigureRegion(modelBuilder);
-            ConfigureRscRegion(modelBuilder);
-            ConfigureSponsor(modelBuilder);
-            ConfigureWard(modelBuilder);
-            ConfigurePlanningArea(modelBuilder);
+            modelBuilder.Entity<Location>()
+                .HasIndex(location => location.Country_Code);
+
+            modelBuilder.Entity<Location>()
+                .HasIndex(location => location.EnglishDevolvedArea_Code);
+
+            modelBuilder.Entity<Location>()
+                .HasIndex(location => location.Institution_Code);
+
+            modelBuilder.Entity<Location>()
+                .HasIndex(location => location.LocalAuthority_Code);
+
+            modelBuilder.Entity<Location>()
+                .HasIndex(location => location.LocalAuthority_OldCode);
+
+            modelBuilder.Entity<Location>()
+                .HasIndex(location => location.LocalAuthorityDistrict_Code);
+
+            modelBuilder.Entity<Location>()
+                .HasIndex(location => location.LocalEnterprisePartnership_Code);
+
+            modelBuilder.Entity<Location>()
+                .HasIndex(location => location.MultiAcademyTrust_Code);
+
+            modelBuilder.Entity<Location>()
+                .HasIndex(location => location.MayoralCombinedAuthority_Code);
+
+            modelBuilder.Entity<Location>()
+                .HasIndex(location => location.OpportunityArea_Code);
+
+            modelBuilder.Entity<Location>()
+                .HasIndex(location => location.ParliamentaryConstituency_Code);
+
+            modelBuilder.Entity<Location>()
+                .HasIndex(location => location.PlanningArea_Code);
+
+            modelBuilder.Entity<Location>()
+                .HasIndex(location => location.Region_Code);
+
+            modelBuilder.Entity<Location>()
+                .HasIndex(location => location.RscRegion_Code);
+
+            modelBuilder.Entity<Location>()
+                .HasIndex(location => location.Sponsor_Code);
+
+            modelBuilder.Entity<Location>()
+                .HasIndex(location => location.Ward_Code);
         }
 
         private static void ConfigureObservation(ModelBuilder modelBuilder)
@@ -233,29 +266,6 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Model.Database
                 .HasIndex(observation => observation.GeographicLevel);
         }
 
-        private static void ConfigureCountry(ModelBuilder modelBuilder)
-        {
-            modelBuilder.Entity<Location>()
-                .OwnsOne(level => level.Country,
-                    builder => builder.HasIndex(country => country.Code));
-        }
-
-        private static void ConfigureLocalAuthority(ModelBuilder modelBuilder)
-        {
-            modelBuilder.Entity<Location>()
-                .OwnsOne(level => level.LocalAuthority,
-                    builder => builder.HasIndex(localAuthority => localAuthority.Code))
-                .OwnsOne(level => level.LocalAuthority,
-                    builder => builder.HasIndex(localAuthority => localAuthority.OldCode));
-        }
-
-        private static void ConfigureLocalAuthorityDistrict(ModelBuilder modelBuilder)
-        {
-            modelBuilder.Entity<Location>()
-                .OwnsOne(level => level.LocalAuthorityDistrict,
-                    builder => builder.HasIndex(localAuthorityDistrict => localAuthorityDistrict.Code));
-        }
-
         private static void ConfigureIndicator(ModelBuilder modelBuilder)
         {
             modelBuilder.Entity<Indicator>()
@@ -336,69 +346,6 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Model.Database
                 .OnDelete(DeleteBehavior.Restrict);
         }
 
-        private static void ConfigureInstitution(ModelBuilder modelBuilder)
-        {
-            modelBuilder.Entity<Location>()
-                .OwnsOne(level => level.Institution,
-                    builder => builder.HasIndex(institution => institution.Code));
-        }
-
-        private static void ConfigureLocalEnterprisePartnership(ModelBuilder modelBuilder)
-        {
-            modelBuilder.Entity<Location>()
-                .OwnsOne(level => level.LocalEnterprisePartnership,
-                    builder => builder.HasIndex(localEnterprisePartnership => localEnterprisePartnership.Code));
-        }
-
-        private static void ConfigureMultiAcademyTrust(ModelBuilder modelBuilder)
-        {
-            modelBuilder.Entity<Location>()
-                .OwnsOne(level => level.MultiAcademyTrust,
-                    builder => builder.HasIndex(mat => mat.Code));
-        }
-
-        private static void ConfigureMayoralCombinedAuthority(ModelBuilder modelBuilder)
-        {
-            modelBuilder.Entity<Location>()
-                .OwnsOne(level => level.MayoralCombinedAuthority,
-                    builder => builder.HasIndex(mca => mca.Code));
-        }
-
-        private static void ConfigureOpportunityArea(ModelBuilder modelBuilder)
-        {
-            modelBuilder.Entity<Location>()
-                .OwnsOne(level => level.OpportunityArea,
-                    builder => builder.HasIndex(opportunityArea => opportunityArea.Code));
-        }
-
-        private static void ConfigureParliamentaryConstituency(ModelBuilder modelBuilder)
-        {
-            modelBuilder.Entity<Location>()
-                .OwnsOne(level => level.ParliamentaryConstituency,
-                    builder => builder.HasIndex(parliamentaryConstituency => parliamentaryConstituency.Code));
-        }
-
-        private static void ConfigureRegion(ModelBuilder modelBuilder)
-        {
-            modelBuilder.Entity<Location>()
-                .OwnsOne(level => level.Region,
-                    builder => builder.HasIndex(region => region.Code));
-        }
-
-        private static void ConfigureRscRegion(ModelBuilder modelBuilder)
-        {
-            modelBuilder.Entity<Location>()
-                .OwnsOne(level => level.RscRegion,
-                    builder => builder.HasIndex(rscRegion => rscRegion.Code));
-        }
-
-        private static void ConfigureSponsor(ModelBuilder modelBuilder)
-        {
-            modelBuilder.Entity<Location>()
-                .OwnsOne(level => level.Sponsor,
-                    builder => builder.HasIndex(sponsor => sponsor.Code));
-        }
-
         private static void ConfigureSubjectFootnote(ModelBuilder modelBuilder)
         {
             modelBuilder.Entity<SubjectFootnote>()
@@ -414,20 +361,6 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Model.Database
                 .WithMany(footnote => footnote.Subjects)
                 .HasForeignKey(subjectFootnote => subjectFootnote.FootnoteId)
                 .OnDelete(DeleteBehavior.Restrict);
-        }
-
-        private static void ConfigureWard(ModelBuilder modelBuilder)
-        {
-            modelBuilder.Entity<Location>()
-                .OwnsOne(level => level.Ward,
-                    builder => builder.HasIndex(ward => ward.Code));
-        }
-
-        private static void ConfigurePlanningArea(ModelBuilder modelBuilder)
-        {
-            modelBuilder.Entity<Location>()
-                .OwnsOne(level => level.PlanningArea,
-                    builder => builder.HasIndex(planningArea => planningArea.Code));
         }
 
         private static void ConfigureSubject(ModelBuilder modelBuilder)

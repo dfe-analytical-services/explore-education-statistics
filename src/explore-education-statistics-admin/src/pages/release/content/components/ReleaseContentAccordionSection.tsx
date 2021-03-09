@@ -171,6 +171,7 @@ const ReleaseContentAccordionSection = ({
         )}
         renderEditableBlock={block => (
           <ReleaseEditableBlock
+            //allowImages
             block={block}
             editable={!isReordering}
             releaseId={release.id}

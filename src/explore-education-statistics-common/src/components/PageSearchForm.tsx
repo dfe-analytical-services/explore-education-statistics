@@ -5,13 +5,13 @@ import {
 import { openAllParentDetails } from '@common/components/Details';
 import FormComboBox from '@common/components/form/FormComboBox';
 import { openAllParentTabSections } from '@common/components/TabsSection';
+import useDebouncedCallback from '@common/hooks/useDebouncedCallback';
 import delay from '@common/utils/delay';
 import findAllByText from '@common/utils/dom/findAllByText';
 import findAllParents from '@common/utils/dom/findAllParents';
 import findPreviousSibling from '@common/utils/dom/findPreviousSibling';
 import classNames from 'classnames';
-import debounce from 'lodash/debounce';
-import React, { Component, ReactNode } from 'react';
+import React, { ReactNode, useState } from 'react';
 import Highlighter from 'react-highlight-words';
 import styles from './PageSearchForm.module.scss';
 
@@ -24,31 +24,27 @@ interface SearchResult {
 
 export interface PageSearchFormProps {
   className?: string;
-  elementSelectors: string[];
-  id: string;
-  minInput: number;
+  elementSelectors?: string[];
+  id?: string;
+  minInput?: number;
   onSearch?: (s: string) => void;
   inputLabel: string;
 }
 
-interface State {
-  searchResults: SearchResult[];
-  searchComplete: boolean;
-}
+const defaultSelectors = ['p', 'li > strong', 'h2', 'h3', 'h4'];
 
-class PageSearchForm extends Component<PageSearchFormProps, State> {
-  public static defaultProps = {
-    elementSelectors: ['p', 'li > strong', 'h2', 'h3', 'h4'],
-    id: 'pageSearchForm',
-    minInput: 3,
-  };
+const PageSearchForm = ({
+  className,
+  elementSelectors = defaultSelectors,
+  id = 'pageSearchForm',
+  inputLabel,
+  minInput = 3,
+  onSearch,
+}: PageSearchFormProps) => {
+  const [searchResults, setSearchResults] = useState<SearchResult[]>([]);
+  const [searchComplete, setSearchComplete] = useState(false);
 
-  public state: State = {
-    searchResults: [],
-    searchComplete: false,
-  };
-
-  private static getLocationText(element: HTMLElement): string {
+  const getLocationText = (element: HTMLElement): string => {
     const location: string[] = [];
 
     const prependNearestHeading = (currentElement: HTMLElement) => {
@@ -85,16 +81,13 @@ class PageSearchForm extends Component<PageSearchFormProps, State> {
     });
 
     return location.join(' > ');
-  }
+  };
 
-  // eslint-disable-next-line react/sort-comp
-  private search = (value: string) => {
-    const { elementSelectors, minInput, onSearch } = this.props;
-
+  const [search] = useDebouncedCallback((value: string) => {
     const isAcronym = value === value.toUpperCase() && value.length > 1;
 
     if (!isAcronym && value.length < minInput) {
-      this.resetSearch();
+      resetSearch();
       return;
     }
 
@@ -108,8 +101,8 @@ class PageSearchForm extends Component<PageSearchFormProps, State> {
       !isAcronym,
     );
 
-    const searchResults = elements.map(element => {
-      const location = PageSearchForm.getLocationText(element);
+    const nextSearchResults = elements.map(element => {
+      const location = getLocationText(element);
 
       return {
         element,
@@ -131,7 +124,7 @@ class PageSearchForm extends Component<PageSearchFormProps, State> {
           await delay();
           openAllParentDetails(element);
 
-          this.resetSearch();
+          resetSearch();
 
           await delay();
 
@@ -165,86 +158,80 @@ class PageSearchForm extends Component<PageSearchFormProps, State> {
       };
     });
 
-    this.setState({ searchResults, searchComplete: true });
+    setSearchResults(nextSearchResults);
+    setSearchComplete(true);
+  }, 1000);
+
+  const resetSearch = () => {
+    setSearchResults([]);
+    setSearchComplete(false);
   };
 
-  // eslint-disable-next-line react/sort-comp
-  private debouncedSearch = debounce(this.search, 1000);
-
-  private resetSearch() {
-    this.setState({ searchResults: [], searchComplete: false });
-  }
-
-  public render() {
-    const { className, id, inputLabel } = this.props;
-    const { searchResults, searchComplete } = this.state;
-
-    return (
-      <form
-        className={classNames(
-          styles.container,
-          className,
-          'govuk-!-margin-bottom-6',
+  return (
+    <form
+      className={classNames(
+        styles.container,
+        className,
+        'govuk-!-margin-bottom-6',
+      )}
+      onSubmit={e => e.preventDefault()}
+      autoComplete="off"
+      role="search"
+    >
+      <FormComboBox
+        classes={{
+          inputLabel: 'govuk-visually-hidden',
+        }}
+        id={id}
+        inputProps={{
+          placeholder: 'Search this page',
+        }}
+        inputLabel={inputLabel}
+        afterInput={({ value }) => (
+          <button
+            type="submit"
+            className={styles.searchButton}
+            value="Search"
+            onClick={() => search(value)}
+          >
+            <span className="govuk-visually-hidden">Search</span>
+          </button>
         )}
-        onSubmit={e => e.preventDefault()}
-        autoComplete="off"
-        role="search"
-      >
-        <FormComboBox
-          classes={{
-            inputLabel: 'govuk-visually-hidden',
-          }}
-          id={id}
-          inputProps={{
-            placeholder: 'Search this page',
-          }}
-          inputLabel={inputLabel}
-          afterInput={({ value }) => (
-            <button
-              type="submit"
-              className={styles.searchButton}
-              value="Search"
-              onClick={() => this.search(value)}
-            >
-              <span className="govuk-visually-hidden">Search</span>
-            </button>
-          )}
-          listBoxLabelId={`${id}-resultsLabel`}
-          listBoxLabel={() => (
-            <div id={`${id}-resultsLabel`} className={styles.resultsLabel}>
-              Found <strong>{searchResults.length}</strong>
-              {` ${searchResults.length === 1 ? 'result' : 'results'}`}
-            </div>
-          )}
-          options={
-            searchComplete
-              ? searchResults.map(result => {
-                  return (
-                    <>
-                      <div className={styles.resultHeader}>{result.text}</div>
-                      {result.location && (
-                        <div className={styles.resultLocation}>
-                          {result.location}
-                        </div>
-                      )}
-                    </>
-                  );
-                })
-              : undefined
+        listBoxLabelId={`${id}-resultsLabel`}
+        listBoxLabel={() => (
+          <div id={`${id}-resultsLabel`} className={styles.resultsLabel}>
+            Found <strong>{searchResults.length}</strong>
+            {` ${searchResults.length === 1 ? 'result' : 'results'}`}
+          </div>
+        )}
+        options={
+          searchComplete
+            ? searchResults.map(result => {
+                return (
+                  <>
+                    <div className={styles.resultHeader}>{result.text}</div>
+                    {result.location && (
+                      <div className={styles.resultLocation}>
+                        {result.location}
+                      </div>
+                    )}
+                  </>
+                );
+              })
+            : undefined
+        }
+        onInputChange={event => {
+          search(event.target.value);
+        }}
+        onSelect={selectedItem => {
+          if (searchResults[selectedItem]) {
+            const selectedResult = searchResults[selectedItem];
+            selectedResult.scrollIntoView();
           }
-          onInputChange={event => {
-            this.debouncedSearch(event.target.value);
-          }}
-          onSelect={selectedItem => {
-            if (searchResults[selectedItem]) {
-              const selectedResult = searchResults[selectedItem];
-              selectedResult.scrollIntoView();
-            }
-          }}
-        />
-      </form>
-    );
-  }
-}
+        }}
+      />
+    </form>
+  );
+};
 
 export default PageSearchForm;

@@ -50,9 +50,12 @@ const MethodologyPage: NextPage<Props> = ({ data }) => {
             )}
           </dl>
           <PrintThisPage
-            analytics={{
-              category: 'Page print',
-              action: 'Print this page link selected',
+            onClick={() => {
+              logEvent({
+                category: 'Page print',
+                action: 'Print this page link selected',
+                label: window.location.pathname,
+              });
             }}
           />
           <PageSearchFormWithAnalytics inputLabel="Search in this methodology page." />
@@ -92,11 +95,11 @@ const MethodologyPage: NextPage<Props> = ({ data }) => {
         <Accordion
           id="content"
           onSectionOpen={accordionSection => {
-            logEvent(
-              `${data.title} methodology`,
-              `Content accordion opened`,
-              accordionSection.title,
-            );
+            logEvent({
+              category: `${data.title} methodology`,
+              action: `Content accordion opened`,
+              label: accordionSection.title,
+            });
           }}
         >
           {data.content.map(({ heading, caption, order, content }) => {
@@ -127,11 +130,11 @@ const MethodologyPage: NextPage<Props> = ({ data }) => {
           <Accordion
             id="annexes"
             onSectionOpen={accordionSection => {
-              logEvent(
-                `${data.title} methodology`,
-                `Annexes accordion opened`,
-                accordionSection.title,
-              );
+              logEvent({
+                category: `${data.title} methodology`,
+                action: `Annexes accordion opened`,
+                label: accordionSection.title,
+              });
             }}
           >
             {data.annexes.map(({ heading, caption, order, content }) => {
@@ -150,9 +153,12 @@ const MethodologyPage: NextPage<Props> = ({ data }) => {
       )}
 
       <PrintThisPage
-        analytics={{
-          category: 'Page print',
-          action: 'Print this page link selected',
+        onClick={() => {
+          logEvent({
+            category: 'Page print',
+            action: 'Print this page link selected',
+            label: window.location.pathname,
+          });
         }}
       />
     </Page>

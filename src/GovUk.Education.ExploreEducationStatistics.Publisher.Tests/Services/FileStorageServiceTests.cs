@@ -6,7 +6,7 @@ using GovUk.Education.ExploreEducationStatistics.Publisher.Services;
 using Microsoft.Extensions.Logging;
 using Moq;
 using Xunit;
-using static GovUk.Education.ExploreEducationStatistics.Common.BlobContainerNames;
+using static GovUk.Education.ExploreEducationStatistics.Common.BlobContainers;
 
 namespace GovUk.Education.ExploreEducationStatistics.Publisher.Tests.Services
 {
@@ -18,13 +18,13 @@ namespace GovUk.Education.ExploreEducationStatistics.Publisher.Tests.Services
             var publicBlobStorageService = new Mock<IBlobStorageService>(MockBehavior.Strict);
 
             publicBlobStorageService.Setup(s =>
-                    s.CheckBlobExists(PublicFilesContainerName, "path"))
+                    s.CheckBlobExists(PublicReleaseFiles, "path"))
                 .ReturnsAsync(true);
 
             var service = BuildFileStorageService(
                 publicBlobStorageService: publicBlobStorageService.Object);
 
-            Assert.True(await service.CheckBlobExists(PublicFilesContainerName, "path"));
+            Assert.True(await service.CheckBlobExists(PublicReleaseFiles, "path"));
         }
 
         [Fact]
@@ -33,13 +33,13 @@ namespace GovUk.Education.ExploreEducationStatistics.Publisher.Tests.Services
             var publicBlobStorageService = new Mock<IBlobStorageService>(MockBehavior.Strict);
 
             publicBlobStorageService.Setup(s =>
-                    s.CheckBlobExists(PublicFilesContainerName, "path"))
+                    s.CheckBlobExists(PublicReleaseFiles, "path"))
                 .ReturnsAsync(false);
 
             var service = BuildFileStorageService(
                 publicBlobStorageService: publicBlobStorageService.Object);
 
-            Assert.False(await service.CheckBlobExists(PublicFilesContainerName, "path"));
+            Assert.False(await service.CheckBlobExists(PublicReleaseFiles, "path"));
         }
 
         [Fact]
@@ -54,19 +54,18 @@ namespace GovUk.Education.ExploreEducationStatistics.Publisher.Tests.Services
                 contentType: "text/csv",
                 contentLength: 0L,
                 meta: FileStorageUtils.GetAncillaryFileMetaValues(
-                    name: "Test data file",
-                    filename: "data.csv"
+                    name: "Test data file"
                 )
             );
 
             publicBlobStorageService.Setup(s =>
-                    s.GetBlob(PublicFilesContainerName, "path"))
+                    s.GetBlob(PublicReleaseFiles, "path"))
                 .ReturnsAsync(blobInfo);
 
             var service = BuildFileStorageService(
                 publicBlobStorageService: publicBlobStorageService.Object);
 
-            Assert.Equal(blobInfo, await service.GetBlob(PublicFilesContainerName, "path"));
+            Assert.Equal(blobInfo, await service.GetBlob(PublicReleaseFiles, "path"));
         }
 
         private static FileStorageService BuildFileStorageService(

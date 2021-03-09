@@ -35,27 +35,28 @@ export const logPageView = () => {
   }
 };
 
-export const logEvent = (
-  category: string,
-  action: string,
-  label?: string,
-  value?: number,
-) => {
-  if (initialised) {
-    ReactGA.event({ category, action, label, value });
+export interface AnalyticsEvent {
+  category: string;
+  action: string;
+  label?: string;
+  value?: number;
+}
+
+export function logEvent({ category, action, label, value }: AnalyticsEvent) {
+  if (!initialised) {
+    return;
   }
-};
+
+  ReactGA.event({
+    category,
+    action,
+    label,
+    value,
+  });
+}
 
 export const logException = (description: string, fatal = false) => {
   if (initialised) {
     ReactGA.exception({ description, fatal });
   }
 };
-
-export interface AnalyticProps {
-  analytics?: {
-    category: string;
-    action: string;
-    label?: string;
-  };
-}

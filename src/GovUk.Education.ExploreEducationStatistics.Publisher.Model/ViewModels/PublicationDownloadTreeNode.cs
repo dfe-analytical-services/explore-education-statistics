@@ -1,4 +1,5 @@
-﻿using System.Collections.Generic;
+﻿using System;
+using System.Collections.Generic;
 using GovUk.Education.ExploreEducationStatistics.Common.Model;
 
 namespace GovUk.Education.ExploreEducationStatistics.Publisher.Model.ViewModels
@@ -10,5 +11,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Publisher.Model.ViewModels
         public string EarliestReleaseTime { get; set; }
 
         public string LatestReleaseTime { get; set; }
+
+        public Guid LatestReleaseId { get; set; }
     }
 }

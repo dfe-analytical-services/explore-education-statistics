@@ -18,9 +18,8 @@ using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
 using static GovUk.Education.ExploreEducationStatistics.Common.Services.FileStorageUtils;
-using static GovUk.Education.ExploreEducationStatistics.Common.BlobContainerNames;
+using static GovUk.Education.ExploreEducationStatistics.Common.BlobContainers;
 using static GovUk.Education.ExploreEducationStatistics.Common.Model.FileType;
-using static GovUk.Education.ExploreEducationStatistics.Common.Services.FileStoragePathUtils;
 using Release = GovUk.Education.ExploreEducationStatistics.Content.Model.Release;
 using Unit = GovUk.Education.ExploreEducationStatistics.Common.Model.Unit;
 
@@ -37,6 +36,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Services
         private readonly IFileRepository _fileRepository;
         private readonly IReleaseRepository _releaseRepository;
         private readonly IReleaseFileRepository _releaseFileRepository;
+        private readonly IReleaseDataFileRepository _releaseDataFileRepository;
         private readonly IDataImportService _dataImportService;
         private readonly IUserService _userService;
 
@@ -49,6 +49,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Services
             IFileRepository fileRepository,
             IReleaseRepository releaseRepository,
             IReleaseFileRepository releaseFileRepository,
+            IReleaseDataFileRepository releaseDataFileRepository,
             IDataImportService dataImportService,
             IUserService userService)
         {
@@ -61,6 +62,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Services
             _fileRepository = fileRepository;
             _releaseRepository = releaseRepository;
             _releaseFileRepository = releaseFileRepository;
+            _releaseDataFileRepository = releaseDataFileRepository;
             _dataImportService = dataImportService;
             _userService = userService;
         }
@@ -100,11 +102,11 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Services
                         {
                             await _dataImportService.DeleteImport(file.Id);
                             await _blobStorageService.DeleteBlob(
-                                PrivateFilesContainerName,
+                                PrivateReleaseFiles,
                                 file.Path()
                             );
                             await _blobStorageService.DeleteBlob(
-                                PrivateFilesContainerName,
+                                PrivateReleaseFiles,
                                 metaFile.Path()
                             );
 
@@ -127,7 +129,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Services
                             {
                                 var zipFile = await _fileRepository.Get(file.SourceId.Value);
                                 await _blobStorageService.DeleteBlob(
-                                    PrivateFilesContainerName,
+                                    PrivateReleaseFiles,
                                     zipFile.Path()
                                 );
                                 // N.B. No ReleaseFiles row for source links
@@ -217,14 +219,14 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Services
                                             dataFormFile.FileName.ToLower(),
                                             validSubjectName);
 
-                                        var dataFile = await _fileRepository.CreateDataOrMetadata(
+                                        var dataFile = await _releaseDataFileRepository.Create(
                                             releaseId: releaseId,
                                             subjectId: subjectId,
                                             filename: dataFormFile.FileName.ToLower(),
                                             type: FileType.Data,
                                             replacingFile: replacingFile);
 
-                                        var metaFile = await _fileRepository.CreateDataOrMetadata(
+                                        var metaFile = await _releaseDataFileRepository.Create(
                                             releaseId: releaseId,
                                             subjectId: subjectId,
                                             filename: metaFormFile.FileName.ToLower(),
@@ -247,7 +249,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Services
                                             formFile: dataFormFile);
 
                                         var blob = await _blobStorageService.GetBlob(
-                                            PrivateFilesContainerName,
+                                            PrivateReleaseFiles,
                                             dataFile.Path()
                                         );
 
@@ -306,11 +308,11 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Services
                                                         archiveFile.DataFileName.ToLower(),
                                                         validSubjectName);
 
-                                                    var zipFile = await _fileRepository.CreateZip(
+                                                    var zipFile = await _releaseDataFileRepository.CreateZip(
                                                         filename: zipFormFile.FileName.ToLower(),
                                                         releaseId: releaseId);
 
-                                                    var dataFile = await _fileRepository.CreateDataOrMetadata(
+                                                    var dataFile = await _releaseDataFileRepository.Create(
                                                         releaseId: releaseId,
                                                         subjectId: subjectId,
                                                         filename: archiveFile.DataFileName,
@@ -318,7 +320,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Services
                                                         replacingFile: replacingFile,
                                                         source: zipFile);
 
-                                                    var metaFile = await _fileRepository.CreateDataOrMetadata(
+                                                    var metaFile = await _releaseDataFileRepository.Create(
                                                         releaseId: releaseId,
                                                         subjectId: subjectId,
                                                         filename: archiveFile.MetaFileName,
@@ -334,7 +336,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Services
                                                         zipFile: zipFile);
 
                                                     var blob = await _blobStorageService.GetBlob(
-                                                        PrivateFilesContainerName,
+                                                        PrivateReleaseFiles,
                                                         zipFile.Path()
                                                     );
 
@@ -365,14 +367,14 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Services
         {
             // Files should exists in storage but if not then allow user to delete
             var blobExists =
-                await _blobStorageService.CheckBlobExists(PrivateFilesContainerName, dataFile.Path());
+                await _blobStorageService.CheckBlobExists(PrivateReleaseFiles, dataFile.Path());
 
             if (!blobExists)
             {
                 return await GetFallbackDataFileInfo(releaseId, dataFile);
             }
 
-            var blob = await _blobStorageService.GetBlob(PrivateFilesContainerName, dataFile.Path());
+            var blob = await _blobStorageService.GetBlob(PrivateReleaseFiles, dataFile.Path());
 
             // If the file does exist then it could possibly be
             // partially uploaded so make sure meta data exists for it
@@ -408,9 +410,9 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Services
             {
                 var source = await _fileRepository.Get(dataFile.SourceId.Value);
 
-                if (await _blobStorageService.CheckBlobExists(PrivateFilesContainerName, source.Path()))
+                if (await _blobStorageService.CheckBlobExists(PrivateReleaseFiles, source.Path()))
                 {
-                    var zipBlob = await _blobStorageService.GetBlob(PrivateFilesContainerName, source.Path());
+                    var zipBlob = await _blobStorageService.GetBlob(PrivateReleaseFiles, source.Path());
 
                     return new DataFileInfo
                     {
@@ -477,7 +479,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Services
             IDictionary<string, string> metadata = null)
         {
             await _blobStorageService.UploadFile(
-                containerName: PrivateFilesContainerName,
+                containerName: PrivateReleaseFiles,
                 path: file.Path(),
                 file: formFile,
                 metadata: metadata
@@ -497,7 +499,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Services
 
         private async Task DeleteBatchFiles(File dataFile)
         {
-            await _blobStorageService.DeleteBlobs(PrivateFilesContainerName, dataFile.BatchesPath());
+            await _blobStorageService.DeleteBlobs(PrivateReleaseFiles, dataFile.BatchesPath());
         }
     }
 }

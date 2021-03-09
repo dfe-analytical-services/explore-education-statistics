@@ -214,9 +214,11 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin
             services.AddTransient<IFileRepository, FileRepository>();
             services.AddTransient<IDataImportRepository, DataImportRepository>();
             services.AddTransient<IReleaseFileRepository, ReleaseFileRepository>();
+            services.AddTransient<IReleaseDataFileRepository, ReleaseDataFileRepository>();
 
             services.AddTransient<IReleaseDataFileService, ReleaseDataFileService>();
             services.AddTransient<IReleaseFileService, ReleaseFileService>();
+            services.AddTransient<IReleaseImageService, ReleaseImageService>();
             services.AddTransient<IDataImportService, DataImportService>();
             services.AddTransient<IImportStatusBauService, ImportStatusBauService>();
 
@@ -252,6 +254,8 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin
             services.AddTransient<IMethodologyService, MethodologyService>();
             services.AddTransient<IMethodologyRepository, MethodologyRepository>();
             services.AddTransient<IMethodologyContentService, MethodologyContentService>();
+            services.AddTransient<IMethodologyFileRepository, MethodologyFileRepository>();
+            services.AddTransient<IMethodologyImageService, MethodologyImageService>();
             services.AddTransient<IDataBlockService, DataBlockService>();
             services.AddTransient<IPreReleaseUserService, PreReleaseUserService>();
             services.AddTransient<IPreReleaseService, PreReleaseService>();
@@ -261,6 +265,33 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin
             services.AddTransient<IContentService, ContentService>();
             services.AddTransient<IRelatedInformationService, RelatedInformationService>();
             services.AddTransient<IReplacementService, ReplacementService>();
+            services.AddTransient<IMigrateFilesService, MigrateFilesService>(provider =>
+                {
+                    var privateStorageConnectionString = Configuration.GetValue<string>("CoreStorage");
+                    var publicStorageConnectionString = Configuration.GetValue<string>("PublicStorage");
+
+                    var privateBlobStorageService = new BlobStorageService(
+                        privateStorageConnectionString,
+                        new BlobServiceClient(privateStorageConnectionString),
+                        provider.GetRequiredService<ILogger<BlobStorageService>>()
+                    );
+
+                    var publicBlobStorageService = new BlobStorageService(
+                        publicStorageConnectionString,
+                        new BlobServiceClient(publicStorageConnectionString),
+                        provider.GetRequiredService<ILogger<BlobStorageService>>()
+                    );
+
+                    return new MigrateFilesService(
+                        provider.GetRequiredService<ContentDbContext>(),
+                        privateBlobStorageService: privateBlobStorageService,
+                        publicBlobStorageService: publicBlobStorageService,
+                        provider.GetRequiredService<IReleaseFileRepository>(),
+                        provider.GetRequiredService<IUserService>(),
+                        provider.GetRequiredService<ILogger<MigrateFilesService>>()
+                    );
+                }
+            );
 
             services.AddTransient<INotificationClient>(s =>
             {

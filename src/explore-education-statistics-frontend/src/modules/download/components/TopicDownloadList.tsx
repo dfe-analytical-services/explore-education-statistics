@@ -4,6 +4,7 @@ import {
   Topic,
 } from '@common/services/themeService';
 import Link from '@frontend/components/Link';
+import { logEvent } from '@frontend/services/googleAnalyticsService';
 import React from 'react';
 
 interface Props {
@@ -20,6 +21,7 @@ function TopicDownloadList({ topic }: Props) {
           downloadFiles,
           earliestReleaseTime,
           latestReleaseTime,
+          latestReleaseId,
         }) => (
           <React.Fragment key={id}>
             <h3 className="govuk-heading-s govuk-!-margin-bottom-2">{title}</h3>
@@ -31,22 +33,37 @@ function TopicDownloadList({ topic }: Props) {
             </p>
 
             <ul data-testid={title}>
-              {downloadFiles.map(({ extension, name, path, size }) => (
-                <li key={path}>
-                  <Link
-                    to={`${process.env.CONTENT_API_BASE_URL}/download/${path}`}
-                    data-testid={`download-stats-${path}`}
-                    analytics={{
-                      category: 'Downloads',
-                      action: `Download latest data page ${name} file downloaded`,
-                      label: `File URL: /api/download/${path}`,
-                    }}
-                  >
-                    {name}
-                  </Link>
-                  {` (${extension}, ${size})`}
-                </li>
-              ))}
+              {downloadFiles.map(
+                ({ id: fileId, fileName, extension, name, size }) => {
+                  const isAllFiles = !fileId && name === 'All files';
+
+                  const url = `${
+                    process.env.CONTENT_API_BASE_URL
+                  }/releases/${latestReleaseId}/files/${
+                    isAllFiles ? 'all' : fileId
+                  }`;
+
+                  return (
+                    <li key={isAllFiles ? 'all' : fileId}>
+                      <Link
+                        to={url}
+                        onClick={() => {
+                          logEvent({
+                            category: 'Downloads',
+                            action: `Download latest data page ${
+                              isAllFiles ? 'all files' : 'file'
+                            } downloaded`,
+                            label: `Publication: ${title}, File: ${fileName}`,
+                          });
+                        }}
+                      >
+                        {name}
+                      </Link>
+                      {` (${extension}, ${size})`}
+                    </li>
+                  );
+                },
+              )}
             </ul>
           </React.Fragment>
         ),

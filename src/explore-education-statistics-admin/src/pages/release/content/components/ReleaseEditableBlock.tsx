@@ -1,12 +1,16 @@
 import EditableBlockWrapper from '@admin/components/editable/EditableBlockWrapper';
 import EditableContentBlock from '@admin/components/editable/EditableContentBlock';
 import useGetChartFile from '@admin/hooks/useGetChartFile';
+import useReleaseImageUpload from '@admin/pages/release/hooks/useReleaseImageUpload';
 import { EditableBlock } from '@admin/services/types/content';
 import DataBlockTabs from '@common/modules/find-statistics/components/DataBlockTabs';
+import useReleaseImageAttributeTransformer from '@common/modules/release/hooks/useReleaseImageAttributeTransformer';
 import isBrowser from '@common/utils/isBrowser';
 import React, { useCallback } from 'react';
+import { insertReleaseIdPlaceholders } from '@common/modules/release/utils/releaseImageUrls';
 
 interface Props {
+  allowImages?: boolean;
   releaseId: string;
   block: EditableBlock;
   editable?: boolean;
@@ -15,6 +19,7 @@ interface Props {
 }
 
 const ReleaseEditableBlock = ({
+  allowImages = false,
   releaseId,
   block,
   editable = true,
@@ -25,9 +30,18 @@ const ReleaseEditableBlock = ({
 
   const getChartFile = useGetChartFile(releaseId);
 
+  const { handleImageUpload, handleImageUploadCancel } = useReleaseImageUpload(
+    releaseId,
+  );
+
+  const transformImageAttributes = useReleaseImageAttributeTransformer({
+    releaseId,
+  });
+
   const handleSave = useCallback(
     (content: string) => {
-      onSave(block.id, content);
+      const contentWithPlaceholders = insertReleaseIdPlaceholders(content);
+      onSave(block.id, contentWithPlaceholders);
     },
     [block.id, onSave],
   );
@@ -59,8 +73,13 @@ const ReleaseEditableBlock = ({
           label="Block content"
           value={block.body}
           useMarkdown={block.type === 'MarkDownBlock'}
+          transformImageAttributes={transformImageAttributes}
           onSave={handleSave}
           onDelete={handleDelete}
+          onImageUpload={allowImages ? handleImageUpload : undefined}
+          onImageUploadCancel={
+            allowImages ? handleImageUploadCancel : undefined
+          }
         />
       );
     default:

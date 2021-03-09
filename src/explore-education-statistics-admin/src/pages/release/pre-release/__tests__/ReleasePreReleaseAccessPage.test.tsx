@@ -1,9 +1,8 @@
+import { testRelease } from '@admin/pages/release/__data__/testRelease';
 import { render, screen, waitFor } from '@testing-library/react';
 import React from 'react';
 import _releaseService, { Release } from '@admin/services/releaseService';
-import ManageReleaseContext, {
-  ManageRelease,
-} from '@admin/pages/release/contexts/ManageReleaseContext';
+import { ReleaseContextProvider } from '@admin/pages/release/contexts/ReleaseContext';
 import noop from 'lodash/noop';
 import { MemoryRouter } from 'react-router';
 import { TestConfigContextProvider } from '@admin/contexts/ConfigContext';
@@ -46,28 +45,15 @@ const releaseData: Release = {
 };
 
 describe('ReleasePreReleaseAccessPage', () => {
-  const testRelease: ManageRelease = {
-    releaseId: 'release-1',
-    onChangeReleaseStatus: noop,
-    publication: {
-      id: 'publication-1',
-      themeId: 'theme-1',
-      topicId: 'topic-1',
-      title: 'Test publication',
-      slug: 'test-publication',
-      legacyReleases: [],
-    },
-  };
-
   test('renders prerelease page link correctly', async () => {
     releaseService.getRelease.mockResolvedValue(releaseData);
 
     render(
       <MemoryRouter>
         <TestConfigContextProvider>
-          <ManageReleaseContext.Provider value={testRelease}>
+          <ReleaseContextProvider release={testRelease}>
             <ReleasePreReleaseAccessPage />
-          </ManageReleaseContext.Provider>
+          </ReleaseContextProvider>
         </TestConfigContextProvider>
       </MemoryRouter>,
     );

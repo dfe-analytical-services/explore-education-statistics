@@ -1,7 +1,8 @@
 import InsetText from '@common/components/InsetText';
-import useGetChartFile from '@common/modules/charts/hooks/useGetChartFile';
+import useGetReleaseFile from '@common/modules/release/hooks/useGetReleaseFile';
 import ContentBlockRenderer from '@common/modules/find-statistics/components/ContentBlockRenderer';
 import DataBlockTabs from '@common/modules/find-statistics/components/DataBlockTabs';
+import useReleaseImageAttributeTransformer from '@common/modules/release/hooks/useReleaseImageAttributeTransformer';
 import { Release } from '@common/services/publicationService';
 import { Block } from '@common/services/types/blocks';
 import ButtonLink from '@frontend/components/ButtonLink';
@@ -17,9 +18,12 @@ const PublicationSectionBlocks = ({
   release,
   blocks,
 }: PublicationSectionBlocksProps) => {
-  const { slug, publication } = release;
+  const getReleaseFile = useGetReleaseFile(release.id);
 
-  const getChartFile = useGetChartFile(publication.slug, slug);
+  const transformImageAttributes = useReleaseImageAttributeTransformer({
+    releaseId: release.id,
+    rootUrl: process.env.CONTENT_API_BASE_URL.replace('/api', ''),
+  });
 
   return blocks.length > 0 ? (
     <>
@@ -30,13 +34,13 @@ const PublicationSectionBlocks = ({
               key={block.id}
               dataBlock={block}
               releaseId={release.id}
-              getInfographic={getChartFile}
+              getInfographic={getReleaseFile}
               onToggle={section => {
-                logEvent(
-                  'Publication Release Data Tabs',
-                  `${section.title} (${section.id}) tab opened`,
-                  window.location.pathname,
-                );
+                logEvent({
+                  category: 'Publication Release Data Tabs',
+                  action: `${section.title} (${section.id}) tab opened`,
+                  label: window.location.pathname,
+                });
               }}
               additionalTabContent={
                 <div className="dfe-print-hidden">
@@ -50,11 +54,11 @@ const PublicationSectionBlocks = ({
                     to="/data-tables/fast-track/[fastTrackId]"
                     as={`/data-tables/fast-track/${block.id}`}
                     onClick={() => {
-                      logEvent(
-                        `Publication Release Data Tabs`,
-                        `Explore data button clicked`,
-                        `Explore data block name: ${block.name}`,
-                      );
+                      logEvent({
+                        category: `Publication Release Data Tabs`,
+                        action: `Explore data button clicked`,
+                        label: `Explore data block name: ${block.name}`,
+                      });
                     }}
                   >
                     Explore data
@@ -65,7 +69,13 @@ const PublicationSectionBlocks = ({
           );
         }
 
-        return <ContentBlockRenderer key={block.id} block={block} />;
+        return (
+          <ContentBlockRenderer
+            key={block.id}
+            block={block}
+            transformImageAttributes={transformImageAttributes}
+          />
+        );
       })}
     </>
   ) : (

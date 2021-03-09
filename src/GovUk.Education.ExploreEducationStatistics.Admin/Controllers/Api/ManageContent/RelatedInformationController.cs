@@ -27,9 +27,9 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Controllers.Api.Manag
         {
             return await _relatedInformationService
                 .GetRelatedInformationAsync(releaseId)
-                .HandleFailuresOr(Ok);
+                .HandleFailuresOrOk();
         }
-        
+
         [HttpPost("release/{releaseId}/content/related-information")]
         public async Task<ActionResult<List<Link>>> AddRelatedInformation(CreateUpdateLinkRequest request, Guid releaseId)
         {
@@ -37,23 +37,23 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Controllers.Api.Manag
                 .AddRelatedInformationAsync(releaseId, request)
                 .HandleFailuresOr(result => Created(HttpContext.Request.Path, result));
         }
-        
+
         [HttpPut("release/{releaseId}/content/related-information/{relatedInformationId}")]
         public async Task<ActionResult<List<Link>>> UpdateRelatedInformation(
             CreateUpdateLinkRequest request, Guid releaseId, Guid relatedInformationId)
         {
             return await _relatedInformationService
                 .UpdateRelatedInformationAsync(releaseId, relatedInformationId, request)
-                .HandleFailuresOr(Ok);
+                .HandleFailuresOrOk();
         }
-        
+
         [HttpDelete("release/{releaseId}/content/related-information/{relatedInformationId}")]
         public async Task<ActionResult<List<Link>>> DeleteRelatedInformation(
             Guid releaseId, Guid relatedInformationId)
         {
             return await _relatedInformationService
                 .DeleteRelatedInformationAsync(releaseId, relatedInformationId)
-                .HandleFailuresOr(Ok);
+                .HandleFailuresOrOk();
         }
     }
 }

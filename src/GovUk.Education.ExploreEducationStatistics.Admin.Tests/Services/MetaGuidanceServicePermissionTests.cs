@@ -59,7 +59,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
             IPersistenceHelper<ContentDbContext> contentPersistenceHelper = null,
             IMetaGuidanceSubjectService metaGuidanceSubjectService = null,
             IUserService userService = null,
-            IFileRepository fileRepository = null)
+            IReleaseDataFileRepository releaseDataFileRepository = null)
         {
             return new MetaGuidanceService(
                 contentDbContext ?? new Mock<ContentDbContext>().Object,
@@ -67,7 +67,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
                 metaGuidanceSubjectService ?? new Mock<IMetaGuidanceSubjectService>().Object,
                 statisticsDbContext ?? new Mock<StatisticsDbContext>().Object,
                 userService ?? new Mock<IUserService>().Object,
-                fileRepository ?? new FileRepository(contentDbContext)
+                releaseDataFileRepository ?? new ReleaseDataFileRepository(contentDbContext)
             );
         }
 

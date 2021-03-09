@@ -9,6 +9,7 @@ class File(ABC):
         self.release = release
         self.id = id
         self.name = name
+        # EES-1704 Temporary field used for legacy path
         self.filename = filename
         # Create a timestamp matching "yyyy-MM-ddTHH:mm:ss.mmmmmmmZ"
         self.published = datetime.now(
@@ -19,11 +20,16 @@ class File(ABC):
         pass
 
     @abstractmethod
-    def private_path(self):
+    def path(self):
+        pass
+
+    # EES-1704 Temporary methods in case still generating legacy file structure
+    @abstractmethod
+    def legacy_private_path(self):
         pass
 
     @abstractmethod
-    def public_path(self):
+    def legacy_public_path(self):
         pass
 
 
@@ -34,10 +40,13 @@ class AncillaryFile(File):
             "releasedatetime": self.published
         }
 
-    def private_path(self):
+    def path(self):
         return f"{self.release.id}/ancillary/{self.id}"
 
-    def public_path(self):
+    def legacy_private_path(self):
+        return f"{self.release.id}/ancillary/{self.id}"
+
+    def legacy_public_path(self):
         return f"{self.release.publication_slug}/{self.release.slug}/ancillary/{self.id}"
 
 
@@ -50,10 +59,13 @@ class DataFile(File):
             "releasedatetime": self.published
         }
 
-    def private_path(self):
+    def path(self):
+        return f"{self.release.id}/data/{self.id}"
+
+    def legacy_private_path(self):
         return f"{self.release.id}/data/{self.filename}"
 
-    def public_path(self):
+    def legacy_public_path(self):
         return f"{self.release.publication_slug}/{self.release.slug}/data/{self.filename}"
 
 
@@ -61,10 +73,13 @@ class MetadataFile(File):
     def metadata(self):
         return {}
 
-    def private_path(self):
+    def path(self):
+        return f"{self.release.id}/data/{self.id}"
+
+    def legacy_private_path(self):
         return f"{self.release.id}/data/{self.filename}"
 
-    def public_path(self):
+    def legacy_public_path(self):
         return f"{self.release.publication_slug}/{self.release.slug}/data/{self.filename}"
 
 
@@ -77,7 +92,8 @@ class Release:
 
 class ReleaseFilesGenerator(object):
 
-    def __init__(self):
+    def __init__(self, legacy_structure):
+        self.legacy_structure = legacy_structure
 
         # Instantiate a new ContainerClient for the emulator
         self.blob_service_client = BlobServiceClient.from_connection_string(
@@ -235,13 +251,17 @@ class ReleaseFilesGenerator(object):
     def upload_files(self, container_client, files, public_storage):
         data = b'abcd'*128
         for file in files:
-            path = file.public_path() if public_storage else file.private_path()
+            path = file.path() if not self.legacy_structure else (
+                file.legacy_public_path() if public_storage else file.legacy_private_path())
             blob_client = container_client.get_blob_client(path)
             blob_client.upload_blob(
                 data, blob_type="BlockBlob", metadata=file.metadata())
 
 
 if __name__ == '__main__':
-    generator = ReleaseFilesGenerator()
+    # EES-1704 Release file structure migration
+    # In case database hasn't been manually migrated yet,
+    # allow setting legacy_structure to true to create the old structure
+    generator = ReleaseFilesGenerator(legacy_structure=False)
     generator.create_public_release_files()
     generator.create_private_release_files()

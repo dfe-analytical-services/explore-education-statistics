@@ -23,7 +23,7 @@ using Microsoft.AspNetCore.Mvc;
 using Moq;
 using Xunit;
 using static GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services.DbUtils;
-using static GovUk.Education.ExploreEducationStatistics.Common.BlobContainerNames;
+using static GovUk.Education.ExploreEducationStatistics.Common.BlobContainers;
 using static GovUk.Education.ExploreEducationStatistics.Common.Model.FileType;
 using static GovUk.Education.ExploreEducationStatistics.Common.Services.FileStoragePathUtils;
 using static GovUk.Education.ExploreEducationStatistics.Common.Services.FileStorageUtils;
@@ -102,14 +102,14 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
             // test that the deletion of the main data and metadata files completed, as well as any zip files that 
             // were uploaded
             blobStorageService.Setup(mock =>
-                    mock.DeleteBlob(PrivateFilesContainerName, It.IsIn(
+                    mock.DeleteBlob(PrivateReleaseFiles, It.IsIn(
                         releaseDataFile.Path(), releaseMetaFile.Path(), zipFile.Path())))
                 .Returns(Task.CompletedTask);
 
             // test that the deletion of any remaining batch files went ahead for this particular data file
             blobStorageService
                 .Setup(mock => mock.DeleteBlobs(
-                    PrivateFilesContainerName, 
+                    PrivateReleaseFiles, 
                     releaseDataFile.BatchesPath(),
                     null))
                 .Returns(Task.CompletedTask);
@@ -126,11 +126,11 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
                 Assert.True(result.IsRight);
 
                 blobStorageService.Verify(mock =>
-                    mock.DeleteBlob(PrivateFilesContainerName, releaseDataFile.Path()), Times.Once());
+                    mock.DeleteBlob(PrivateReleaseFiles, releaseDataFile.Path()), Times.Once());
                 blobStorageService.Verify(mock =>
-                    mock.DeleteBlob(PrivateFilesContainerName, releaseMetaFile.Path()), Times.Once());
+                    mock.DeleteBlob(PrivateReleaseFiles, releaseMetaFile.Path()), Times.Once());
                 blobStorageService.Verify(mock =>
-                    mock.DeleteBlob(PrivateFilesContainerName, zipFile.Path()), Times.Once());
+                    mock.DeleteBlob(PrivateReleaseFiles, zipFile.Path()), Times.Once());
 
                 dataImportService.Verify(mock => mock.DeleteImport(releaseDataFile.File.Id), Times.Once());
 
@@ -201,14 +201,14 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
                 .Returns(Task.CompletedTask);
 
             blobStorageService.Setup(mock =>
-                    mock.DeleteBlob(PrivateFilesContainerName, It.IsIn(
+                    mock.DeleteBlob(PrivateReleaseFiles, It.IsIn(
                         releaseDataFile.Path(),
                         releaseMetaFile.Path())))
                 .Returns(Task.CompletedTask);
 
             blobStorageService
                 .Setup(mock => mock.DeleteBlobs(
-                    PrivateFilesContainerName,
+                    PrivateReleaseFiles,
                     releaseDataFile.BatchesPath(),
                     null))
                 .Returns(Task.CompletedTask);
@@ -225,9 +225,9 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
                 Assert.True(result.IsRight);
 
                 blobStorageService.Verify(mock =>
-                    mock.DeleteBlob(PrivateFilesContainerName, releaseDataFile.Path()), Times.Once());
+                    mock.DeleteBlob(PrivateReleaseFiles, releaseDataFile.Path()), Times.Once());
                 blobStorageService.Verify(mock =>
-                    mock.DeleteBlob(PrivateFilesContainerName, releaseMetaFile.Path()), Times.Once());
+                    mock.DeleteBlob(PrivateReleaseFiles, releaseMetaFile.Path()), Times.Once());
 
                 dataImportService.Verify(mock => mock.DeleteImport(releaseDataFile.File.Id), Times.Once());
 
@@ -353,13 +353,13 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
             dataImportService.Setup(mock => mock.DeleteImport(replacementDataFile.Id))
                 .Returns(Task.CompletedTask);
 
-            blobStorageService.Setup(mock => mock.DeleteBlob(PrivateFilesContainerName,
+            blobStorageService.Setup(mock => mock.DeleteBlob(PrivateReleaseFiles,
                     It.IsIn(replacementDataFile.Path(), replacementMetaFile.Path(), replacementZipFile.Path())))
                 .Returns(Task.CompletedTask);
 
             blobStorageService
                 .Setup(mock => mock.DeleteBlobs(
-                    PrivateFilesContainerName,
+                    PrivateReleaseFiles,
                     replacementDataFile.BatchesPath(), 
                     null))
                 .Returns(Task.CompletedTask);
@@ -376,12 +376,12 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
                 Assert.True(result.IsRight);
 
                 blobStorageService.Verify(mock =>
-                    mock.DeleteBlob(PrivateFilesContainerName, replacementDataFile.Path()), Times.Once());
+                    mock.DeleteBlob(PrivateReleaseFiles, replacementDataFile.Path()), Times.Once());
                 blobStorageService.Verify(mock =>
-                        mock.DeleteBlob(PrivateFilesContainerName, replacementMetaFile.Path()),
+                        mock.DeleteBlob(PrivateReleaseFiles, replacementMetaFile.Path()),
                     Times.Once());
                 blobStorageService.Verify(mock =>
-                    mock.DeleteBlob(PrivateFilesContainerName, replacementZipFile.Path()), Times.Once());
+                    mock.DeleteBlob(PrivateReleaseFiles, replacementZipFile.Path()), Times.Once());
 
                 dataImportService.Verify(mock => mock.DeleteImport(replacementDataFile.Id), Times.Once());
 
@@ -495,7 +495,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
 
             blobStorageService
                 .Setup(mock => mock.DeleteBlobs(
-                    PrivateFilesContainerName,
+                    PrivateReleaseFiles,
                     dataFile.BatchesPath(),
                     null))
                 .Returns(Task.CompletedTask);
@@ -610,13 +610,13 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
             dataImportService.Setup(mock => mock.DeleteImport(dataReleaseFile.File.Id))
                 .Returns(Task.CompletedTask);
 
-            blobStorageService.Setup(mock => mock.DeleteBlob(PrivateFilesContainerName,
+            blobStorageService.Setup(mock => mock.DeleteBlob(PrivateReleaseFiles,
                     It.IsIn(dataReleaseFile.Path(), metaReleaseFile.Path(), zipFile.Path())))
                 .Returns(Task.CompletedTask);
 
             blobStorageService
                 .Setup(mock => mock.DeleteBlobs(
-                    PrivateFilesContainerName,
+                    PrivateReleaseFiles,
                     dataReleaseFile.BatchesPath(),
                     null))
                 .Returns(Task.CompletedTask);
@@ -633,11 +633,11 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
                 Assert.True(result.IsRight);
 
                 blobStorageService.Verify(mock =>
-                    mock.DeleteBlob(PrivateFilesContainerName, dataReleaseFile.Path()), Times.Once());
+                    mock.DeleteBlob(PrivateReleaseFiles, dataReleaseFile.Path()), Times.Once());
                 blobStorageService.Verify(mock =>
-                    mock.DeleteBlob(PrivateFilesContainerName, metaReleaseFile.Path()), Times.Once());
+                    mock.DeleteBlob(PrivateReleaseFiles, metaReleaseFile.Path()), Times.Once());
                 blobStorageService.Verify(mock =>
-                    mock.DeleteBlob(PrivateFilesContainerName, zipFile.Path()), Times.Once());
+                    mock.DeleteBlob(PrivateReleaseFiles, zipFile.Path()), Times.Once());
 
                 dataImportService.Verify(mock => mock.DeleteImport(dataReleaseFile.File.Id), Times.Once());
 
@@ -747,7 +747,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
             var dataImportService = new Mock<IDataImportService>(MockBehavior.Strict);
 
             blobStorageService.Setup(mock => mock.DeleteBlobs(
-                    PrivateFilesContainerName,
+                    PrivateReleaseFiles,
                     dataFile.BatchesPath(), 
                     null))
                 .Returns(Task.CompletedTask);
@@ -895,11 +895,11 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
             await using (var statisticsDbContext = InMemoryStatisticsDbContext(statisticsDbContextId))
             {
                 blobStorageService
-                    .Setup(s => s.CheckBlobExists(PrivateFilesContainerName, dataFile.Path()))
+                    .Setup(s => s.CheckBlobExists(PrivateReleaseFiles, dataFile.Path()))
                     .ReturnsAsync(true);
 
                 blobStorageService
-                    .Setup(s => s.GetBlob(PrivateFilesContainerName, dataFile.Path()))
+                    .Setup(s => s.GetBlob(PrivateReleaseFiles, dataFile.Path()))
                     .ReturnsAsync(
                         new BlobInfo(
                             path: dataFile.Path(),
@@ -1012,11 +1012,11 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
             await using (var statisticsDbContext = InMemoryStatisticsDbContext(statisticsDbContextId))
             {
                 blobStorageService
-                    .Setup(s => s.CheckBlobExists(PrivateFilesContainerName, dataFile.Path()))
+                    .Setup(s => s.CheckBlobExists(PrivateReleaseFiles, dataFile.Path()))
                     .ReturnsAsync(true);
 
                 blobStorageService
-                    .Setup(s => s.GetBlob(PrivateFilesContainerName, dataFile.Path()))
+                    .Setup(s => s.GetBlob(PrivateReleaseFiles, dataFile.Path()))
                     .ReturnsAsync(
                         new BlobInfo(
                             path: dataFile.Path(),
@@ -1221,7 +1221,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
             await using (var statisticsDbContext = InMemoryStatisticsDbContext(statisticsDbContextId))
             {
                 blobStorageService
-                    .Setup(s => s.CheckBlobExists(PrivateFilesContainerName, dataFile.Path()))
+                    .Setup(s => s.CheckBlobExists(PrivateReleaseFiles, dataFile.Path()))
                     .ReturnsAsync(false);
 
                 dataImportService
@@ -1316,15 +1316,15 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
             await using (var contentDbContext = InMemoryApplicationDbContext(contentDbContextId))
             {
                 blobStorageService
-                    .Setup(s => s.CheckBlobExists(PrivateFilesContainerName, dataFile.Path()))
+                    .Setup(s => s.CheckBlobExists(PrivateReleaseFiles, dataFile.Path()))
                     .ReturnsAsync(false);
 
                 blobStorageService
-                    .Setup(s => s.CheckBlobExists(PrivateFilesContainerName, zipFile.Path()))
+                    .Setup(s => s.CheckBlobExists(PrivateReleaseFiles, zipFile.Path()))
                     .ReturnsAsync(true);
 
                 blobStorageService
-                    .Setup(s => s.GetBlob(PrivateFilesContainerName, zipFile.Path()))
+                    .Setup(s => s.GetBlob(PrivateReleaseFiles, zipFile.Path()))
                     .ReturnsAsync(
                         new BlobInfo(
                             zipFile.Path(),
@@ -1450,11 +1450,11 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
             await using (var statisticsDbContext = InMemoryStatisticsDbContext(statisticsDbContextId))
             {
                 blobStorageService
-                    .Setup(s => s.CheckBlobExists(PrivateFilesContainerName, dataFile.Path()))
+                    .Setup(s => s.CheckBlobExists(PrivateReleaseFiles, dataFile.Path()))
                     .ReturnsAsync(true);
 
                 blobStorageService
-                    .Setup(s => s.GetBlob(PrivateFilesContainerName, dataFile.Path()))
+                    .Setup(s => s.GetBlob(PrivateReleaseFiles, dataFile.Path()))
                     .ReturnsAsync(
                         new BlobInfo(
                             path: dataFile.Path(),
@@ -1595,12 +1595,12 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
             await using (var statisticsDbContext = InMemoryStatisticsDbContext(statisticsDbContextId))
             {
                 blobStorageService
-                    .Setup(s => s.CheckBlobExists(PrivateFilesContainerName, It.IsIn(
+                    .Setup(s => s.CheckBlobExists(PrivateReleaseFiles, It.IsIn(
                         dataFile1.Path(), dataFile2.Path())))
                     .ReturnsAsync(true);
 
                 blobStorageService
-                    .Setup(s => s.GetBlob(PrivateFilesContainerName, dataFile1.Path()))
+                    .Setup(s => s.GetBlob(PrivateReleaseFiles, dataFile1.Path()))
                     .ReturnsAsync(
                         new BlobInfo(
                             path: dataFile1.Path(),
@@ -1617,7 +1617,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
                     );
 
                 blobStorageService
-                    .Setup(s => s.GetBlob(PrivateFilesContainerName, dataFile2.Path()))
+                    .Setup(s => s.GetBlob(PrivateReleaseFiles, dataFile2.Path()))
                     .ReturnsAsync(
                         new BlobInfo(
                             path: dataFile2.Path(),
@@ -1779,11 +1779,11 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
             await using (var statisticsDbContext = InMemoryStatisticsDbContext(statisticsDbContextId))
             {
                 blobStorageService
-                    .Setup(s => s.CheckBlobExists(PrivateFilesContainerName, dataFile.Path()))
+                    .Setup(s => s.CheckBlobExists(PrivateReleaseFiles, dataFile.Path()))
                     .ReturnsAsync(true);
 
                 blobStorageService
-                    .Setup(s => s.GetBlob(PrivateFilesContainerName, dataFile.Path()))
+                    .Setup(s => s.GetBlob(PrivateReleaseFiles, dataFile.Path()))
                     .ReturnsAsync(
                         new BlobInfo(
                             path: dataFile.Path(),
@@ -1937,11 +1937,11 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
             await using (var statisticsDbContext = InMemoryStatisticsDbContext(statisticsDbContextId))
             {
                 blobStorageService
-                    .Setup(s => s.CheckBlobExists(PrivateFilesContainerName, dataFile2.Path()))
+                    .Setup(s => s.CheckBlobExists(PrivateReleaseFiles, dataFile2.Path()))
                     .ReturnsAsync(true);
 
                 blobStorageService
-                    .Setup(s => s.GetBlob(PrivateFilesContainerName, dataFile2.Path()))
+                    .Setup(s => s.GetBlob(PrivateReleaseFiles, dataFile2.Path()))
                     .ReturnsAsync(
                         new BlobInfo(
                             path: dataFile2.Path(),
@@ -2050,7 +2050,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
             await using (var statisticsDbContext = InMemoryStatisticsDbContext(statisticsDbContextId))
             {
                 blobStorageService
-                    .Setup(s => s.CheckBlobExists(PrivateFilesContainerName, dataFile.Path()))
+                    .Setup(s => s.CheckBlobExists(PrivateReleaseFiles, dataFile.Path()))
                     .ReturnsAsync(false);
 
                 dataImportService
@@ -2142,15 +2142,15 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
             await using (var contentDbContext = InMemoryApplicationDbContext(contentDbContextId))
             {
                 blobStorageService
-                    .Setup(s => s.CheckBlobExists(PrivateFilesContainerName, dataFile.Path()))
+                    .Setup(s => s.CheckBlobExists(PrivateReleaseFiles, dataFile.Path()))
                     .ReturnsAsync(false);
 
                 blobStorageService
-                    .Setup(s => s.CheckBlobExists(PrivateFilesContainerName, zipFile.Path()))
+                    .Setup(s => s.CheckBlobExists(PrivateReleaseFiles, zipFile.Path()))
                     .ReturnsAsync(true);
 
                 blobStorageService
-                    .Setup(s => s.GetBlob(PrivateFilesContainerName, zipFile.Path()))
+                    .Setup(s => s.GetBlob(PrivateReleaseFiles, zipFile.Path()))
                     .ReturnsAsync(
                         new BlobInfo(
                             zipFile.Path(),
@@ -2265,9 +2265,9 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
                     .Returns(Task.CompletedTask);
 
                 blobStorageService.Setup(mock =>
-                    mock.UploadFile(PrivateFilesContainerName,
+                    mock.UploadFile(PrivateReleaseFiles,
                         It.Is<string>(path => 
-                            path.Contains(AdminFilesPath(release.Id, FileType.Data))),
+                            path.Contains(FilesPath(release.Id, FileType.Data))),
                         dataFormFile,
                         It.Is<IDictionary<string, string>>(metadata =>
                             metadata[BlobInfoExtensions.NameKey] == subjectName
@@ -2277,17 +2277,17 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
                     )).Returns(Task.CompletedTask);
 
                 blobStorageService.Setup(mock =>
-                    mock.UploadFile(PrivateFilesContainerName,
+                    mock.UploadFile(PrivateReleaseFiles,
                         It.Is<string>(path =>
-                            path.Contains(AdminFilesPath(release.Id, FileType.Data))),
+                            path.Contains(FilesPath(release.Id, FileType.Data))),
                         metaFormFile,
                         null
                     )).Returns(Task.CompletedTask);
 
                 blobStorageService
-                    .Setup(s => s.GetBlob(PrivateFilesContainerName, 
+                    .Setup(s => s.GetBlob(PrivateReleaseFiles, 
                         It.Is<string>(path =>
-                            path.Contains(AdminFilesPath(release.Id, FileType.Data)))))
+                            path.Contains(FilesPath(release.Id, FileType.Data)))))
                     .ReturnsAsync(
                         new BlobInfo(
                             path: "data/file/path",
@@ -2451,9 +2451,9 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
                     .Returns(Task.CompletedTask);
 
                 blobStorageService.Setup(mock =>
-                    mock.UploadFile(PrivateFilesContainerName,
+                    mock.UploadFile(PrivateReleaseFiles,
                         It.Is<string>(path =>
-                            path.Contains(AdminFilesPath(release.Id, FileType.Data))),
+                            path.Contains(FilesPath(release.Id, FileType.Data))),
                         dataFormFile,
                         It.Is<IDictionary<string, string>>(metadata =>
                             metadata[BlobInfoExtensions.NameKey] == originalSubject.Name
@@ -2463,17 +2463,17 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
                     )).Returns(Task.CompletedTask);
 
                 blobStorageService.Setup(mock =>
-                    mock.UploadFile(PrivateFilesContainerName,
+                    mock.UploadFile(PrivateReleaseFiles,
                         It.Is<string>(path =>
-                            path.Contains(AdminFilesPath(release.Id, FileType.Data))),
+                            path.Contains(FilesPath(release.Id, FileType.Data))),
                         metaFormFile,
                         null
                         )).Returns(Task.CompletedTask);
 
                 blobStorageService
-                    .Setup(s => s.GetBlob(PrivateFilesContainerName, 
+                    .Setup(s => s.GetBlob(PrivateReleaseFiles, 
                             It.Is<string>(path => 
-                                path.Contains(AdminFilesPath(release.Id, FileType.Data)))))
+                                path.Contains(FilesPath(release.Id, FileType.Data)))))
                     .ReturnsAsync(
                         new BlobInfo(
                             path: "data/file/path",
@@ -2647,9 +2647,9 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
                     .Returns(Task.CompletedTask);
 
                 blobStorageService.Setup(mock =>
-                    mock.UploadFile(PrivateFilesContainerName,
+                    mock.UploadFile(PrivateReleaseFiles,
                         It.Is<string>(path =>
-                            path.Contains(AdminFilesPath(release.Id, DataZip))),
+                            path.Contains(FilesPath(release.Id, DataZip))),
                         zipFormFile,
                         It.Is<IDictionary<string, string>>(metadata =>
                             metadata[BlobInfoExtensions.NameKey] == subjectName
@@ -2659,9 +2659,9 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
                     )).Returns(Task.CompletedTask);
 
                 blobStorageService
-                    .Setup(s => s.GetBlob(PrivateFilesContainerName, 
+                    .Setup(s => s.GetBlob(PrivateReleaseFiles, 
                         It.Is<string>(path => 
-                            path.Contains(AdminFilesPath(release.Id, DataZip)))))
+                            path.Contains(FilesPath(release.Id, DataZip)))))
                     .ReturnsAsync(
                         new BlobInfo(
                             path: "zip/file/path",
@@ -2837,9 +2837,9 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
                     .Returns(Task.CompletedTask);
 
                 blobStorageService.Setup(mock =>
-                    mock.UploadFile(PrivateFilesContainerName,
+                    mock.UploadFile(PrivateReleaseFiles,
                         It.Is<string>(path =>
-                            path.Contains(AdminFilesPath(release.Id, DataZip))),
+                            path.Contains(FilesPath(release.Id, DataZip))),
                         zipFormFile,
                         It.Is<IDictionary<string, string>>(metadata =>
                             metadata[BlobInfoExtensions.NameKey] == originalSubject.Name
@@ -2849,9 +2849,9 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
                     )).Returns(Task.CompletedTask);
 
                 blobStorageService
-                    .Setup(s => s.GetBlob(PrivateFilesContainerName,
+                    .Setup(s => s.GetBlob(PrivateReleaseFiles,
                         It.Is<string>(path =>
-                            path.Contains(AdminFilesPath(release.Id, DataZip)))))
+                            path.Contains(FilesPath(release.Id, DataZip)))))
                     .ReturnsAsync(
                         new BlobInfo(
                             path: "zip/file/path",
@@ -2966,10 +2966,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
 
         private static Mock<IFormFile> CreateFormFileMock(string fileName)
         {
-            var formFile = new Mock<IFormFile>();
-
-            formFile.SetupGet(f => f.FileName)
-                .Returns(fileName);
+            var formFile = MockFormTestUtils.CreateFormFileMock(fileName);
 
             var filePath = Path.Combine(Path.GetDirectoryName(Assembly.GetExecutingAssembly().Location),
                 "Resources" + Path.DirectorySeparatorChar + fileName);
@@ -3007,6 +3004,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
             IFileRepository fileRepository = null,
             IReleaseRepository releaseRepository = null,
             IReleaseFileRepository releaseFileRepository = null,
+            IReleaseDataFileRepository releaseDataFileRepository = null,
             IDataImportService dataImportService = null,
             IUserService userService = null)
         {
@@ -3021,6 +3019,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
                 releaseRepository ?? new ReleaseRepository(contentDbContext, statisticsDbContext,
                     Common.Services.MapperUtils.MapperForProfile<MappingProfiles>()),
                 releaseFileRepository ?? new ReleaseFileRepository(contentDbContext),
+                releaseDataFileRepository ?? new ReleaseDataFileRepository(contentDbContext),
                 dataImportService ?? new Mock<IDataImportService>().Object,
                 userService ?? MockUtils.AlwaysTrueUserService().Object
             );

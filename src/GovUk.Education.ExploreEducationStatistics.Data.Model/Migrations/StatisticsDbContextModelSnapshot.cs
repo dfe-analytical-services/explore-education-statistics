@@ -236,7 +236,129 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Model.Migrations
                         .ValueGeneratedOnAdd()
                         .HasColumnType("uniqueidentifier");
 
+                    b.Property<string>("Country_Code")
+                        .HasColumnType("nvarchar(450)");
+
+                    b.Property<string>("Country_Name")
+                        .HasColumnType("nvarchar(max)");
+
+                    b.Property<string>("EnglishDevolvedArea_Code")
+                        .HasColumnType("nvarchar(450)");
+
+                    b.Property<string>("EnglishDevolvedArea_Name")
+                        .HasColumnType("nvarchar(max)");
+
+                    b.Property<string>("Institution_Code")
+                        .HasColumnType("nvarchar(450)");
+
+                    b.Property<string>("Institution_Name")
+                        .HasColumnType("nvarchar(max)");
+
+                    b.Property<string>("LocalAuthorityDistrict_Code")
+                        .HasColumnType("nvarchar(450)");
+
+                    b.Property<string>("LocalAuthorityDistrict_Name")
+                        .HasColumnType("nvarchar(max)");
+
+                    b.Property<string>("LocalAuthority_Code")
+                        .HasColumnType("nvarchar(450)");
+
+                    b.Property<string>("LocalAuthority_Name")
+                        .HasColumnType("nvarchar(max)");
+
+                    b.Property<string>("LocalAuthority_OldCode")
+                        .HasColumnType("nvarchar(450)");
+
+                    b.Property<string>("LocalEnterprisePartnership_Code")
+                        .HasColumnType("nvarchar(450)");
+
+                    b.Property<string>("LocalEnterprisePartnership_Name")
+                        .HasColumnType("nvarchar(max)");
+
+                    b.Property<string>("MayoralCombinedAuthority_Code")
+                        .HasColumnType("nvarchar(450)");
+
+                    b.Property<string>("MayoralCombinedAuthority_Name")
+                        .HasColumnType("nvarchar(max)");
+
+                    b.Property<string>("MultiAcademyTrust_Code")
+                        .HasColumnType("nvarchar(450)");
+
+                    b.Property<string>("MultiAcademyTrust_Name")
+                        .HasColumnType("nvarchar(max)");
+
+                    b.Property<string>("OpportunityArea_Code")
+                        .HasColumnType("nvarchar(450)");
+
+                    b.Property<string>("OpportunityArea_Name")
+                        .HasColumnType("nvarchar(max)");
+
+                    b.Property<string>("ParliamentaryConstituency_Code")
+                        .HasColumnType("nvarchar(450)");
+
+                    b.Property<string>("ParliamentaryConstituency_Name")
+                        .HasColumnType("nvarchar(max)");
+
+                    b.Property<string>("PlanningArea_Code")
+                        .HasColumnType("nvarchar(450)");
+
+                    b.Property<string>("PlanningArea_Name")
+                        .HasColumnType("nvarchar(max)");
+
+                    b.Property<string>("Region_Code")
+                        .HasColumnType("nvarchar(450)");
+
+                    b.Property<string>("Region_Name")
+                        .HasColumnType("nvarchar(max)");
+
+                    b.Property<string>("RscRegion_Code")
+                        .HasColumnType("nvarchar(450)");
+
+                    b.Property<string>("Sponsor_Code")
+                        .HasColumnType("nvarchar(450)");
+
+                    b.Property<string>("Sponsor_Name")
+                        .HasColumnType("nvarchar(max)");
+
+                    b.Property<string>("Ward_Code")
+                        .HasColumnType("nvarchar(450)");
+
+                    b.Property<string>("Ward_Name")
+                        .HasColumnType("nvarchar(max)");
+
                     b.HasKey("Id");
+
+                    b.HasIndex("Country_Code");
+
+                    b.HasIndex("EnglishDevolvedArea_Code");
+
+                    b.HasIndex("Institution_Code");
+
+                    b.HasIndex("LocalAuthorityDistrict_Code");
+
+                    b.HasIndex("LocalAuthority_Code");
+
+                    b.HasIndex("LocalAuthority_OldCode");
+
+                    b.HasIndex("LocalEnterprisePartnership_Code");
+
+                    b.HasIndex("MayoralCombinedAuthority_Code");
+
+                    b.HasIndex("MultiAcademyTrust_Code");
+
+                    b.HasIndex("OpportunityArea_Code");
+
+                    b.HasIndex("ParliamentaryConstituency_Code");
+
+                    b.HasIndex("PlanningArea_Code");
+
+                    b.HasIndex("Region_Code");
+
+                    b.HasIndex("RscRegion_Code");
+
+                    b.HasIndex("Sponsor_Code");
+
+                    b.HasIndex("Ward_Code");
 
                     b.ToTable("Location");
                 });
@@ -574,305 +696,6 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Model.Migrations
                         .HasForeignKey("SubjectId")
                         .OnDelete(DeleteBehavior.Cascade)
                         .IsRequired();
-                });
-
-            modelBuilder.Entity("GovUk.Education.ExploreEducationStatistics.Data.Model.Location", b =>
-                {
-                    b.OwnsOne("GovUk.Education.ExploreEducationStatistics.Data.Model.Country", "Country", b1 =>
-                        {
-                            b1.Property<Guid>("LocationId")
-                                .HasColumnType("uniqueidentifier");
-
-                            b1.Property<string>("Code")
-                                .HasColumnType("nvarchar(450)");
-
-                            b1.Property<string>("Name")
-                                .HasColumnType("nvarchar(max)");
-
-                            b1.HasKey("LocationId");
-
-                            b1.HasIndex("Code");
-
-                            b1.ToTable("Location");
-
-                            b1.WithOwner()
-                                .HasForeignKey("LocationId");
-                        });
-
-                    b.OwnsOne("GovUk.Education.ExploreEducationStatistics.Data.Model.Institution", "Institution", b1 =>
-                        {
-                            b1.Property<Guid>("LocationId")
-                                .HasColumnType("uniqueidentifier");
-
-                            b1.Property<string>("Code")
-                                .HasColumnType("nvarchar(450)");
-
-                            b1.Property<string>("Name")
-                                .HasColumnType("nvarchar(max)");
-
-                            b1.HasKey("LocationId");
-
-                            b1.HasIndex("Code");
-
-                            b1.ToTable("Location");
-
-                            b1.WithOwner()
-                                .HasForeignKey("LocationId");
-                        });
-
-                    b.OwnsOne("GovUk.Education.ExploreEducationStatistics.Data.Model.LocalAuthority", "LocalAuthority", b1 =>
-                        {
-                            b1.Property<Guid>("LocationId")
-                                .HasColumnType("uniqueidentifier");
-
-                            b1.Property<string>("Code")
-                                .HasColumnType("nvarchar(450)");
-
-                            b1.Property<string>("Name")
-                                .HasColumnType("nvarchar(max)");
-
-                            b1.Property<string>("OldCode")
-                                .HasColumnType("nvarchar(450)");
-
-                            b1.HasKey("LocationId");
-
-                            b1.HasIndex("Code");
-
-                            b1.HasIndex("OldCode");
-
-                            b1.ToTable("Location");
-
-                            b1.WithOwner()
-                                .HasForeignKey("LocationId");
-                        });
-
-                    b.OwnsOne("GovUk.Education.ExploreEducationStatistics.Data.Model.LocalAuthorityDistrict", "LocalAuthorityDistrict", b1 =>
-                        {
-                            b1.Property<Guid>("LocationId")
-                                .HasColumnType("uniqueidentifier");
-
-                            b1.Property<string>("Code")
-                                .HasColumnType("nvarchar(450)");
-
-                            b1.Property<string>("Name")
-                                .HasColumnType("nvarchar(max)");
-
-                            b1.HasKey("LocationId");
-
-                            b1.HasIndex("Code");
-
-                            b1.ToTable("Location");
-
-                            b1.WithOwner()
-                                .HasForeignKey("LocationId");
-                        });
-
-                    b.OwnsOne("GovUk.Education.ExploreEducationStatistics.Data.Model.LocalEnterprisePartnership", "LocalEnterprisePartnership", b1 =>
-                        {
-                            b1.Property<Guid>("LocationId")
-                                .HasColumnType("uniqueidentifier");
-
-                            b1.Property<string>("Code")
-                                .HasColumnType("nvarchar(450)");
-
-                            b1.Property<string>("Name")
-                                .HasColumnType("nvarchar(max)");
-
-                            b1.HasKey("LocationId");
-
-                            b1.HasIndex("Code");
-
-                            b1.ToTable("Location");
-
-                            b1.WithOwner()
-                                .HasForeignKey("LocationId");
-                        });
-
-                    b.OwnsOne("GovUk.Education.ExploreEducationStatistics.Data.Model.Mat", "MultiAcademyTrust", b1 =>
-                        {
-                            b1.Property<Guid>("LocationId")
-                                .HasColumnType("uniqueidentifier");
-
-                            b1.Property<string>("Code")
-                                .HasColumnType("nvarchar(450)");
-
-                            b1.Property<string>("Name")
-                                .HasColumnType("nvarchar(max)");
-
-                            b1.HasKey("LocationId");
-
-                            b1.HasIndex("Code");
-
-                            b1.ToTable("Location");
-
-                            b1.WithOwner()
-                                .HasForeignKey("LocationId");
-                        });
-
-                    b.OwnsOne("GovUk.Education.ExploreEducationStatistics.Data.Model.MayoralCombinedAuthority", "MayoralCombinedAuthority", b1 =>
-                        {
-                            b1.Property<Guid>("LocationId")
-                                .HasColumnType("uniqueidentifier");
-
-                            b1.Property<string>("Code")
-                                .HasColumnType("nvarchar(450)");
-
-                            b1.Property<string>("Name")
-                                .HasColumnType("nvarchar(max)");
-
-                            b1.HasKey("LocationId");
-
-                            b1.HasIndex("Code");
-
-                            b1.ToTable("Location");
-
-                            b1.WithOwner()
-                                .HasForeignKey("LocationId");
-                        });
-
-                    b.OwnsOne("GovUk.Education.ExploreEducationStatistics.Data.Model.OpportunityArea", "OpportunityArea", b1 =>
-                        {
-                            b1.Property<Guid>("LocationId")
-                                .HasColumnType("uniqueidentifier");
-
-                            b1.Property<string>("Code")
-                                .HasColumnType("nvarchar(450)");
-
-                            b1.Property<string>("Name")
-                                .HasColumnType("nvarchar(max)");
-
-                            b1.HasKey("LocationId");
-
-                            b1.HasIndex("Code");
-
-                            b1.ToTable("Location");
-
-                            b1.WithOwner()
-                                .HasForeignKey("LocationId");
-                        });
-
-                    b.OwnsOne("GovUk.Education.ExploreEducationStatistics.Data.Model.ParliamentaryConstituency", "ParliamentaryConstituency", b1 =>
-                        {
-                            b1.Property<Guid>("LocationId")
-                                .HasColumnType("uniqueidentifier");
-
-                            b1.Property<string>("Code")
-                                .HasColumnType("nvarchar(450)");
-
-                            b1.Property<string>("Name")
-                                .HasColumnType("nvarchar(max)");
-
-                            b1.HasKey("LocationId");
-
-                            b1.HasIndex("Code");
-
-                            b1.ToTable("Location");
-
-                            b1.WithOwner()
-                                .HasForeignKey("LocationId");
-                        });
-
-                    b.OwnsOne("GovUk.Education.ExploreEducationStatistics.Data.Model.PlanningArea", "PlanningArea", b1 =>
-                        {
-                            b1.Property<Guid>("LocationId")
-                                .HasColumnType("uniqueidentifier");
-
-                            b1.Property<string>("Code")
-                                .HasColumnType("nvarchar(450)");
-
-                            b1.Property<string>("Name")
-                                .HasColumnType("nvarchar(max)");
-
-                            b1.HasKey("LocationId");
-
-                            b1.HasIndex("Code");
-
-                            b1.ToTable("Location");
-
-                            b1.WithOwner()
-                                .HasForeignKey("LocationId");
-                        });
-
-                    b.OwnsOne("GovUk.Education.ExploreEducationStatistics.Data.Model.Region", "Region", b1 =>
-                        {
-                            b1.Property<Guid>("LocationId")
-                                .HasColumnType("uniqueidentifier");
-
-                            b1.Property<string>("Code")
-                                .HasColumnType("nvarchar(450)");
-
-                            b1.Property<string>("Name")
-                                .HasColumnType("nvarchar(max)");
-
-                            b1.HasKey("LocationId");
-
-                            b1.HasIndex("Code");
-
-                            b1.ToTable("Location");
-
-                            b1.WithOwner()
-                                .HasForeignKey("LocationId");
-                        });
-
-                    b.OwnsOne("GovUk.Education.ExploreEducationStatistics.Data.Model.RscRegion", "RscRegion", b1 =>
-                        {
-                            b1.Property<Guid>("LocationId")
-                                .HasColumnType("uniqueidentifier");
-
-                            b1.Property<string>("Code")
-                                .HasColumnType("nvarchar(450)");
-
-                            b1.HasKey("LocationId");
-
-                            b1.HasIndex("Code");
-
-                            b1.ToTable("Location");
-
-                            b1.WithOwner()
-                                .HasForeignKey("LocationId");
-                        });
-
-                    b.OwnsOne("GovUk.Education.ExploreEducationStatistics.Data.Model.Sponsor", "Sponsor", b1 =>
-                        {
-                            b1.Property<Guid>("LocationId")
-                                .HasColumnType("uniqueidentifier");
-
-                            b1.Property<string>("Code")
-                                .HasColumnType("nvarchar(450)");
-
-                            b1.Property<string>("Name")
-                                .HasColumnType("nvarchar(max)");
-
-                            b1.HasKey("LocationId");
-
-                            b1.HasIndex("Code");
-
-                            b1.ToTable("Location");
-
-                            b1.WithOwner()
-                                .HasForeignKey("LocationId");
-                        });
-
-                    b.OwnsOne("GovUk.Education.ExploreEducationStatistics.Data.Model.Ward", "Ward", b1 =>
-                        {
-                            b1.Property<Guid>("LocationId")
-                                .HasColumnType("uniqueidentifier");
-
-                            b1.Property<string>("Code")
-                                .HasColumnType("nvarchar(450)");
-
-                            b1.Property<string>("Name")
-                                .HasColumnType("nvarchar(max)");
-
-                            b1.HasKey("LocationId");
-
-                            b1.HasIndex("Code");
-
-                            b1.ToTable("Location");
-
-                            b1.WithOwner()
-                                .HasForeignKey("LocationId");
-                        });
                 });
 
             modelBuilder.Entity("GovUk.Education.ExploreEducationStatistics.Data.Model.Observation", b =>

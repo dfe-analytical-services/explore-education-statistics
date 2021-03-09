@@ -1,4 +1,4 @@
-import { useManageReleaseContext } from '@admin/pages/release/contexts/ManageReleaseContext';
+import { useReleaseContext } from '@admin/pages/release/contexts/ReleaseContext';
 import ReleaseDataUploadsSection from '@admin/pages/release/data/components/ReleaseDataUploadsSection';
 import ReleaseFileUploadsSection from '@admin/pages/release/data/components/ReleaseFileUploadsSection';
 import ReleaseMetaGuidanceSection from '@admin/pages/release/data/components/ReleaseMetaGuidanceSection';
@@ -17,7 +17,7 @@ export const releaseDataPageTabIds = {
 };
 
 const ReleaseDataPage = () => {
-  const { publication, releaseId } = useManageReleaseContext();
+  const { release, releaseId } = useReleaseContext();
   const [dataFiles, setDataFiles] = useState<DataFile[]>([]);
 
   const {
@@ -36,7 +36,7 @@ const ReleaseDataPage = () => {
           title="Data uploads"
         >
           <ReleaseDataUploadsSection
-            publicationId={publication.id}
+            publicationId={release.publicationId}
             releaseId={releaseId}
             canUpdateRelease={canUpdateRelease}
             onDataFilesChange={setDataFiles}

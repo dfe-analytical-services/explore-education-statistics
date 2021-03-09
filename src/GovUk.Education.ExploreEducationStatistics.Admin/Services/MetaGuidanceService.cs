@@ -27,14 +27,14 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Services
         private readonly IMetaGuidanceSubjectService _metaGuidanceSubjectService;
         private readonly StatisticsDbContext _statisticsDbContext;
         private readonly IUserService _userService;
-        private readonly IFileRepository _fileRepository;
+        private readonly IReleaseDataFileRepository _fileRepository;
 
         public MetaGuidanceService(ContentDbContext contentDbContext,
             IPersistenceHelper<ContentDbContext> contentPersistenceHelper,
             IMetaGuidanceSubjectService metaGuidanceSubjectService,
             StatisticsDbContext statisticsDbContext,
             IUserService userService,
-            IFileRepository fileRepository)
+            IReleaseDataFileRepository fileRepository)
         {
             _contentDbContext = contentDbContext;
             _contentPersistenceHelper = contentPersistenceHelper;

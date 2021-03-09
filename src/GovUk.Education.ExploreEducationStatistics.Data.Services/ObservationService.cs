@@ -40,6 +40,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Services
                 locationsQuery?.GeographicLevel?.GetEnumValue() ?? (object) DBNull.Value);
             var timePeriodListParam = CreateTimePeriodListType("timePeriodList", GetTimePeriodRange(query));
             var countriesListParam = CreateIdListType("countriesList", locationsQuery?.Country);
+            var englishDevolvedAreaListParam = CreateIdListType("englishDevolvedAreaList", locationsQuery?.EnglishDevolvedArea);
             var institutionListParam =
                 CreateIdListType("institutionList", locationsQuery?.Institution);
             var localAuthorityListParam = CreateIdListType("localAuthorityList", localAuthorityCodes);
@@ -74,6 +75,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Services
                             "@geographicLevel," +
                             "@timePeriodList," +
                             "@countriesList," +
+                            "@englishDevolvedAreaList," +
                             "@institutionList," +
                             "@localAuthorityList," +
                             "@localAuthorityOldCodeList," +
@@ -93,6 +95,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Services
                     geographicLevelParam,
                     timePeriodListParam,
                     countriesListParam,
+                    englishDevolvedAreaListParam,
                     institutionListParam,
                     localAuthorityListParam,
                     localAuthorityOldCodeListParam,
@@ -125,34 +128,19 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Services
                     .Observation
                     .AsNoTracking()
                     .Include(o => o.FilterItems)
+                    .Include(o => o.Location)
                     .Where(o => batchOfIds.Contains(o.Id))
                     .ToList();
 
-                _logger.LogDebug($"Fetched batch of {observationBatch.Count()} Observations from their ids in {phasesStopwatch.Elapsed.TotalMilliseconds} ms");
+                _logger.LogDebug($"Fetched batch of {observationBatch.Count} Observations from their ids in {phasesStopwatch.Elapsed.TotalMilliseconds} ms");
                 phasesStopwatch.Restart();
 
                 return observationBatch;
             })
                 .ToList();
             
-            // Load of the Location owned entities is removed from the Observation fetching code above as another
-            // "Include" as it was generating very inefficient sql.	
-            var locationIds = observations
-                .Select(o => o.LocationId)
-                .Distinct();
-            
-            var locations = _context
-                .Location
-                .AsNoTracking()
-                .Where(l => locationIds.Contains(l.Id))
-                .ToDictionary(l => l.Id);
-
-            observations.ForEach(o => o.Location = locations[o.LocationId]);
-
-            _logger.LogDebug($"Assigned Locations to {ids.Length} Observations in {phasesStopwatch.Elapsed.TotalMilliseconds} ms");
-
             _logger.LogDebug($"Finished fetching {ids.Length} Observations in a total of {totalStopwatch.Elapsed.TotalMilliseconds} ms");
-            return observations;           
+            return observations;
         }
 
         public IEnumerable<Observation> FindObservations(SubjectMetaQueryContext query)

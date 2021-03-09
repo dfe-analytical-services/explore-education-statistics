@@ -7,13 +7,11 @@ using GovUk.Education.ExploreEducationStatistics.Admin.Services;
 using GovUk.Education.ExploreEducationStatistics.Admin.Services.Interfaces;
 using GovUk.Education.ExploreEducationStatistics.Admin.ViewModels;
 using GovUk.Education.ExploreEducationStatistics.Common.Extensions;
-using GovUk.Education.ExploreEducationStatistics.Common.Model;
 using GovUk.Education.ExploreEducationStatistics.Content.Model;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Mvc;
-using static GovUk.Education.ExploreEducationStatistics.Common.Model.FileType;
 
 namespace GovUk.Education.ExploreEducationStatistics.Admin.Controllers.Api
 {
@@ -23,40 +21,26 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Controllers.Api
     public class ReleasesController : ControllerBase
     {
         private readonly IReleaseService _releaseService;
-        private readonly IReleaseFileService _releaseFileService;
         private readonly IReleaseDataFileService _releaseDataFileService;
         private readonly IReleaseStatusService _releaseStatusService;
         private readonly IReleaseChecklistService _releaseChecklistService;
         private readonly UserManager<ApplicationUser> _userManager;
-        private readonly IDataBlockService _dataBlockService;
         private readonly IDataImportService _dataImportService;
 
         public ReleasesController(
             IReleaseService releaseService,
-            IReleaseFileService releaseFileService,
             IReleaseDataFileService releaseDataFileService,
             IReleaseStatusService releaseStatusService,
             IReleaseChecklistService releaseChecklistService,
             UserManager<ApplicationUser> userManager,
-            IDataBlockService dataBlockService,
             IDataImportService dataImportService)
         {
             _releaseService = releaseService;
             _releaseDataFileService = releaseDataFileService;
-            _releaseFileService = releaseFileService;
             _releaseStatusService = releaseStatusService;
             _releaseChecklistService = releaseChecklistService;
             _userManager = userManager;
-            _dataBlockService = dataBlockService;
             _dataImportService = dataImportService;
-        }
-
-        [HttpGet("release/{releaseId}/file/{id}")]
-        public async Task<ActionResult> GetFile(Guid releaseId, Guid id)
-        {
-            return await _releaseFileService
-                .Stream(releaseId, id)
-                .HandleFailures();
         }
 
         [HttpPost("publications/{publicationId}/releases")]
@@ -107,57 +91,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Controllers.Api
                 .ListAll(releaseId)
                 .HandleFailuresOrOk();
         }
-
-        [HttpGet("release/{releaseId}/ancillary")]
-        [Produces("application/json")]
-        [ProducesResponseType(200)]
-        [ProducesResponseType(404)]
-        public async Task<ActionResult<IEnumerable<FileInfo>>> GetAncillaryFilesAsync(Guid releaseId)
-        {
-            return await _releaseFileService
-                .ListAll(releaseId, Ancillary)
-                .HandleFailuresOrOk();
-        }
-
-        [HttpPost("release/{releaseId}/ancillary")]
-        [Produces("application/json")]
-        [ProducesResponseType(200)]
-        [ProducesResponseType(404)]
-        [RequestSizeLimit(int.MaxValue)]
-        [RequestFormLimits(ValueLengthLimit = int.MaxValue, MultipartBodyLengthLimit = int.MaxValue)]
-        public async Task<ActionResult<FileInfo>> AddAncillaryFileAsync(Guid releaseId,
-            [FromQuery(Name = "name"), Required] string name, IFormFile file)
-        {
-            return await _releaseFileService
-                .UploadAncillary(releaseId, file, name)
-                .HandleFailuresOrOk();
-        }
-
-        [HttpPost("release/{releaseId}/chart")]
-        [Produces("application/json")]
-        [ProducesResponseType(200)]
-        [ProducesResponseType(404)]
-        [RequestSizeLimit(int.MaxValue)]
-        [RequestFormLimits(ValueLengthLimit = int.MaxValue, MultipartBodyLengthLimit = int.MaxValue)]
-        public async Task<ActionResult<FileInfo>> AddChartFileAsync(Guid releaseId, IFormFile file)
-        {
-            return await _releaseFileService
-                .UploadChart(releaseId, file)
-                .HandleFailuresOrOk();
-        }
-
-        [HttpPut("release/{releaseId}/chart/{id}")]
-        [Produces("application/json")]
-        [ProducesResponseType(200)]
-        [ProducesResponseType(404)]
-        [RequestSizeLimit(int.MaxValue)]
-        [RequestFormLimits(ValueLengthLimit = int.MaxValue, MultipartBodyLengthLimit = int.MaxValue)]
-        public async Task<ActionResult<FileInfo>> UpdateChartFileAsync(Guid releaseId, Guid id, IFormFile file)
-        {
-            return await _releaseFileService
-                .UploadChart(releaseId, file, replacingId: id)
-                .HandleFailuresOrOk();
-        }
+        
 
         [HttpPost("release/{releaseId}/data")]
         [Produces("application/json")]
@@ -286,23 +220,6 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Controllers.Api
             return await _dataImportService
                 .CancelImport(releaseId, fileId)
                 .HandleFailuresOr(result => new AcceptedResult());
-        }
-
-        [HttpDelete("release/{releaseId}/ancillary/{fileId}")]
-        public async Task<ActionResult> DeleteAncillaryFile(
-            Guid releaseId, Guid fileId)
-        {
-            return await _releaseFileService
-                .Delete(releaseId, fileId)
-                .HandleFailuresOrNoContent();
-        }
-
-        [HttpDelete("release/{releaseId}/chart/{id}")]
-        public async Task<ActionResult> DeleteChartFile(
-            Guid releaseId, Guid id)
-        {
-            return await _dataBlockService.RemoveChartFile(releaseId, id)
-                .HandleFailuresOrNoContent();
         }
 
         [HttpGet("releases/{releaseId}/status")]

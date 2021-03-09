@@ -1,6 +1,5 @@
 using System;
 using GovUk.Education.ExploreEducationStatistics.Common.Model;
-using static GovUk.Education.ExploreEducationStatistics.Common.Model.FileType;
 
 namespace GovUk.Education.ExploreEducationStatistics.Content.Model
 {
@@ -16,23 +15,6 @@ namespace GovUk.Education.ExploreEducationStatistics.Content.Model
 
         public FileType Type { get; set; }
 
-        public string BlobStorageName
-        {
-            get
-            {
-                // Ideally all blob storage files should be
-                // saved by ID instead of file name to
-                // prevent naming collisions.
-                // Remove this BlobStorageName field and use Id when all types are migrated
-                if (Type == Ancillary || Type == Chart)
-                {
-                    return Id.ToString();
-                }
-
-                return Filename;
-            }
-        }
-
         public Guid? ReplacedById { get; set; }
         public File ReplacedBy { get; set; }
 
@@ -41,5 +23,9 @@ namespace GovUk.Education.ExploreEducationStatistics.Content.Model
 
         public Guid? SourceId { get; set; }
         public File? Source { get; set; }
+
+        // EES-1704 Temporary fields that will be removed after files migration
+        public bool PrivateBlobPathMigrated { get; set; }
+        public bool PublicBlobPathMigrated { get; set; }
     }
 }

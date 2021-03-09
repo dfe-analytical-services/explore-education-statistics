@@ -102,10 +102,12 @@ const TableToolPage: NextPage<TableToolPageProps> = ({
           <Link
             to="/data-tables/fast-track/[fastTrackId]"
             as={`/data-tables/fast-track/${highlight.id}`}
-            analytics={{
-              category: 'Table tool',
-              action: 'Clicked to view Table highlight',
-              label: `Table highlight name: ${highlight.name}`,
+            onClick={() => {
+              logEvent({
+                category: 'Table tool',
+                action: 'Clicked to view Table highlight',
+                label: `Table highlight name: ${highlight.name}`,
+              });
             }}
           >
             {highlight.name}
@@ -132,12 +134,16 @@ const TableToolPage: NextPage<TableToolPageProps> = ({
           </WizardStep>
         )}
         onSubmit={table => {
-          logEvent(
-            'Table tool',
-            'Publication and subject chosen',
-            `${table.subjectMeta.publicationName}/${table.subjectMeta.subjectName}`,
-          );
-          logEvent('Table tool', 'Table created', window.location.pathname);
+          logEvent({
+            category: 'Table tool',
+            action: 'Publication and subject chosen',
+            label: `${table.subjectMeta.publicationName}/${table.subjectMeta.subjectName}`,
+          });
+          logEvent({
+            category: 'Table tool',
+            action: 'Table created',
+            label: window.location.pathname,
+          });
         }}
       />
     </Page>

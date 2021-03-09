@@ -192,7 +192,7 @@ def rename_csv_file(random_identifier):
 
 if __name__ == "__main__":
     # To prevent InsecureRequestWarning
-    requests.packages.urllib3.disable_warnings()
+    requests.packages.urllib3.disable_warnings(urllib3.exceptions.InsecureRequestWarning)
     class colors:
         WARNING = '\033[93m' 
         FAIL = '\033[91m' 

@@ -1,20 +1,44 @@
+import ContentHtml from '@common/components/ContentHtml';
 import { ContentBlock } from '@common/services/types/blocks';
-import React from 'react';
+import { Dictionary } from '@common/types';
+import {
+  defaultSanitizeOptions,
+  SanitizeHtmlOptions,
+} from '@common/utils/sanitizeHtml';
+import React, { useMemo } from 'react';
 import ReactMarkdown from 'react-markdown';
-import SanitizeHtml from '@common/components/SanitizeHtml';
 
 interface Props {
   block: ContentBlock;
+  transformImageAttributes?: (
+    attributes: Dictionary<string>,
+  ) => Dictionary<string>;
 }
 
-const ContentBlockRenderer = ({ block }: Props) => {
-  const { body = '' } = block;
+const ContentBlockRenderer = ({ block, transformImageAttributes }: Props) => {
+  const { body = '', type } = block;
 
-  switch (block.type) {
+  const sanitizeOptions: SanitizeHtmlOptions = useMemo(() => {
+    return {
+      ...defaultSanitizeOptions,
+      transformTags: {
+        img: (tagName, attribs) => {
+          return {
+            tagName,
+            attribs: transformImageAttributes
+              ? transformImageAttributes(attribs)
+              : attribs,
+          };
+        },
+      },
+    };
+  }, [transformImageAttributes]);
+
+  switch (type) {
     case 'MarkDownBlock':
-      return <ReactMarkdown className="govuk-body" source={body} />;
+      return <ReactMarkdown className="dfe-content" source={body} />;
     case 'HtmlBlock':
-      return <SanitizeHtml dirtyHtml={body} />;
+      return <ContentHtml html={body} sanitizeOptions={sanitizeOptions} />;
     default:
       return null;
   }

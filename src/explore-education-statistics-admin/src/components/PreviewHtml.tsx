@@ -1,4 +1,4 @@
-import SanitizeHtml from '@common/components/SanitizeHtml';
+import ContentHtml from '@common/components/ContentHtml';
 import classNames from 'classnames';
 import React from 'react';
 import styles from './PreviewHtml.module.scss';
@@ -11,8 +11,8 @@ interface Props {
 
 const PreviewHtml = ({ className, html, testId }: Props) => {
   return (
-    <SanitizeHtml
-      dirtyHtml={html}
+    <ContentHtml
+      html={html}
       className={classNames(styles.preview, className)}
       testId={testId}
     />

@@ -2,4 +2,5 @@
 build/
 node_modules/
 *.min.js
-src/explore-education-statistics-data-import
+
+src/explore-education-statistics-ckeditor/sample
