@@ -4,9 +4,7 @@ import {
   ImageUploadCancelHandler,
   ImageUploadHandler,
 } from '@admin/utils/ckeditor/CustomUploadAdapter';
-import { insertReleaseIdPlaceholders } from '@common/modules/release/utils/releaseImageUrls';
 import { CancellablePromise } from '@common/types/promise';
-import mapValues from 'lodash/mapValues';
 import { useCallback, useRef } from 'react';
 
 interface UseImageUploadReturn {

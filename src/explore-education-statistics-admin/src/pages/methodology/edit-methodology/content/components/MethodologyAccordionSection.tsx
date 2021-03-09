@@ -4,10 +4,10 @@ import { useEditingContext } from '@admin/contexts/EditingContext';
 import MethodologyEditableBlock from '@admin/pages/methodology/edit-methodology/content/components/MethodologyEditableBlock';
 import { EditableContentBlock } from '@admin/services/types/content';
 import Button from '@common/components/Button';
-import ContentBlockRenderer from '@common/modules/find-statistics/components/ContentBlockRenderer';
 import { ContentSection } from '@common/services/publicationService';
 import { Dictionary } from '@common/types';
 import React, { memo, useCallback, useEffect, useState } from 'react';
+import MethodologyBlock from '@admin/pages/methodology/components/MethodologyBlock';
 import { ContentSectionKeys } from '../context/MethodologyContextActionTypes';
 import useMethodologyActions from '../context/useMethodologyActions';
 
@@ -148,10 +148,12 @@ const MethodologyAccordionSection = ({
         isReordering={isReordering}
         sectionId={sectionId}
         onBlocksChange={setBlocks}
-        renderBlock={block => <ContentBlockRenderer block={block} />}
+        renderBlock={block => (
+          <MethodologyBlock methodologyId={methodologyId} block={block} />
+        )}
         renderEditableBlock={block => (
           <MethodologyEditableBlock
-            allowImages
+            //allowImages
             block={block}
             editable={!isReordering}
             methodologyId={methodologyId}
