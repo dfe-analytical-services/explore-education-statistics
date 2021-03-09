@@ -10,8 +10,8 @@ using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 namespace GovUk.Education.ExploreEducationStatistics.Data.Model.Migrations
 {
     [DbContext(typeof(StatisticsDbContext))]
-    [Migration("20210209094715_EES1836_AddObservationRowConstraintsForQueryPerformance")]
-    partial class EES1836_AddObservationRowConstraintsForQueryPerformance
+    [Migration("20210302020000_EES1836_AddObservationRowConstraintsForImportPerformance")]
+    partial class EES1836_AddObservationRowConstraintsForImportPerformance
     {
         protected override void BuildTargetModel(ModelBuilder modelBuilder)
         {

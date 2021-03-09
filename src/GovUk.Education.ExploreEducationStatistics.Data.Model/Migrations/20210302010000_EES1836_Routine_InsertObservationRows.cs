@@ -6,7 +6,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Model.Migrations
 {
     public partial class EES1836_Routine_InsertObservationRows : Migration
     {
-        private const string MigrationId = "20210209094713";
+        private const string MigrationId = "20210302010000";
 
         protected override void Up(MigrationBuilder migrationBuilder)
         {

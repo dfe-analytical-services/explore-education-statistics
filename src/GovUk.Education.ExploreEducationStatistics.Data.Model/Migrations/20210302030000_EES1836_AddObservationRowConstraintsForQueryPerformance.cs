@@ -6,7 +6,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Model.Migrations
 {
     public partial class EES1836_AddObservationRowConstraintsForQueryPerformance : Migration
     {
-        private const string MigrationId = "20210209094715";
+        private const string MigrationId = "20210302030000";
 
         protected override void Up(MigrationBuilder migrationBuilder)
         {

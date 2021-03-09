@@ -6,7 +6,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Model.Migrations
 {
     public partial class EES1830_MigrateFinalObservationsAndObservationFilterItems : Migration
     {
-        private const string MigrationId = "20210209094717";
+        private const string MigrationId = "20210302050000";
         private const string PreviousMigrationId = "20210126094900";
 
         protected override void Up(MigrationBuilder migrationBuilder)
