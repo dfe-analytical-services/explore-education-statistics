@@ -41,12 +41,16 @@ DECLARE
                 OR EXISTS(SELECT TOP 1 1 FROM @planningAreasList), 1, 0) AS BIT),
     @paramDefinition NVARCHAR(2000),
     @idsList NVARCHAR(MAX),
-    @sqlString NVARCHAR(MAX) = N'SELECT o.id ' +
-                               'FROM ObservationRow o ' +
-                               'JOIN Location l ON o.LocationId = l.Id ' +
-                               'LEFT JOIN ObservationRowFilterItem ofi ON o.Id = ofi.ObservationId ' +
-                               'AND ofi.FilterItemId IN (SELECT id FROM @filterItemList) ' +
-                               'WHERE o.SubjectId = @subjectId '
+    @filterItemIdsList NVARCHAR(MAX),
+    @sqlString NVARCHAR(MAX)
+
+    SET @filterItemIdsList = (SELECT '''' + STRING_AGG(CAST(Id AS NVARCHAR(50)), ''',''') + '''' FROM @filterItemList)
+    SET @sqlString = N'SELECT o.id ' +
+                     'FROM ObservationRow o ' +
+                     'JOIN Location l ON o.LocationId = l.Id ' +
+                     'JOIN ObservationRowFilterItem ofi ON o.Id = ofi.ObservationId ' +
+                     'AND ofi.FilterItemId IN (' + @filterItemIdsList + ') ' +
+                     'WHERE o.SubjectId = @subjectId '
     IF (@geographicLevel IS NOT NULL)
         SET @sqlString = @sqlString + N'AND o.GeographicLevel = @geographicLevel '
     IF (@timePeriodCount > 0)
@@ -136,6 +140,7 @@ DECLARE
                 END
             SET @sqlString = left(@sqlString, len(@sqlString) - 3) + N') '
         END
+
     SET @sqlString = @sqlString + N'GROUP BY o.Id ' +
                      'HAVING COUNT(DISTINCT ofi.FilterItemId) = (' +
                      '    SELECT COUNT(DISTINCT f.id) AS filterCount' +
@@ -143,9 +148,9 @@ DECLARE
                      '    FilterItem fi' +
                      '    JOIN FilterGroup fg ON fi.FilterGroupId = fg.Id' +
                      '    JOIN Filter f ON fg.FilterId = f.Id' +
-                     '    WHERE fi.Id IN (SELECT id FROM @filterItemList)' +
-                     ') ' +
-                     'ORDER BY o.Id;'
+                     '    WHERE fi.Id IN (' + @filterItemIdsList + ')' +
+                     ');'
+                     
     SET @paramDefinition = N'@subjectId uniqueidentifier,
                            @geographicLevel nvarchar(6) = NULL,
                            @timePeriodList TimePeriodListType READONLY,
@@ -186,4 +191,4 @@ DECLARE
          @sponsorList = @sponsorList,
          @wardsList = @wardsList,
          @planningAreasList = @planningAreasList,
-         @filterItemList = @filterItemList; 
+         @filterItemList = @filterItemList;
