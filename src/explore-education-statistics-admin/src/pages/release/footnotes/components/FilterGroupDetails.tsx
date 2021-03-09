@@ -42,9 +42,10 @@ const FilterGroupDetails = ({
         {selectAll && groupId && (
           <FormFieldCheckbox
             name={`${groupPath}.selected`}
-            disabled={parentSelected === 'All'}
+            disabled={groupIsSelected}
             label="Select all"
             small
+            checked={groupIsSelected}
             boldLabel
             formGroup={false}
           />

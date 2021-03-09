@@ -80,7 +80,7 @@ const IndicatorDetails = ({
                         name={`${valuePath}.indicatorGroups.${indicatorGroupId}.indicators`}
                         id={indicatorItem.value}
                         disabled={parentSelected === 'All' || groupValue}
-                        checked={checked}
+                        checked={parentSelected === 'All' || checked}
                         onChange={e => {
                           form.setFieldValue(
                             `${valuePath}.indicatorGroups.${indicatorGroupId}.selected`,

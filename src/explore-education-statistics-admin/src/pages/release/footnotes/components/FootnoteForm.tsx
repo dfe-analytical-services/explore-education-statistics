@@ -67,6 +67,7 @@ const FootnoteForm = ({
         subjects: Yup.object(),
       })}
       onSubmit={async values => {
+        console.log(values);
         const {
           subjects,
           indicatorGroups,
@@ -141,7 +142,39 @@ const FootnoteForm = ({
                   order={[]}
                   options={[
                     { value: 'NA', label: 'Does not apply' },
-                    { value: `All`, label: 'Applies to all data' },
+                    {
+                      value: `All`,
+                      label: 'Applies to all data',
+                      conditional: (
+                        <>
+                          <IndicatorDetails
+                            summary="Indicators"
+                            parentSelected={subjectSelected}
+                            valuePath={`subjects.${subjectId}`}
+                            indicatorGroups={subject.indicators}
+                            form={form}
+                          />
+                          {Object.entries(subject.filters).map(
+                            ([filterId, filter]) => (
+                              <FilterGroupDetails
+                                key={filterId}
+                                summary={filter.legend}
+                                parentSelected={subjectSelected}
+                                valuePath={`subjects.${subjectId}`}
+                                groupId={filterId}
+                                filter={filter}
+                                selectAll
+                                value={get(
+                                  form.values,
+                                  `subjects.${subjectId}.filters.${filterId}.selected`,
+                                )}
+                                form={form}
+                              />
+                            ),
+                          )}
+                        </>
+                      ),
+                    },
                     {
                       value: 'Specific',
                       label: 'Applies to specific data',
@@ -193,34 +226,34 @@ const FootnoteForm = ({
                       ),
                     },
                   ]}
-                  onChange={event => {
-                    switch (event.target.value) {
-                      case 'All':
-                        form.setFieldValue(
-                          `subjects.${subjectId}.selectionType`,
-                          'All',
-                        );
-                        break;
-                      case 'Specific':
-                        form.setFieldValue(
-                          `subjects.${subjectId}.selectionType`,
-                          'Specific',
-                        );
-                        break;
-                      case 'NA':
-                        form.setFieldValue(
-                          `subjects.${subjectId}.selectionType`,
-                          'NA',
-                        );
-                        break;
-                      default:
-                        form.setFieldValue(
-                          `subjects.${subjectId}.selectionType`,
-                          'NA',
-                        );
-                        break;
-                    }
-                  }}
+                  // onChange={event => {
+                  //   switch (event.target.value) {
+                  //     case 'All':
+                  //       form.setFieldValue(
+                  //         `subjects.${subjectId}.selectionType`,
+                  //         'All',
+                  //       );
+                  //       break;
+                  //     case 'Specific':
+                  //       form.setFieldValue(
+                  //         `subjects.${subjectId}.selectionType`,
+                  //         'Specific',
+                  //       );
+                  //       break;
+                  //     case 'NA':
+                  //       form.setFieldValue(
+                  //         `subjects.${subjectId}.selectionType`,
+                  //         'NA',
+                  //       );
+                  //       break;
+                  //     default:
+                  //       form.setFieldValue(
+                  //         `subjects.${subjectId}.selectionType`,
+                  //         'NA',
+                  //       );
+                  //       break;
+                  //   }
+                  // }}
                 />
                 <hr className="govuk-!-margin-bottom-2" />
               </fieldset>
