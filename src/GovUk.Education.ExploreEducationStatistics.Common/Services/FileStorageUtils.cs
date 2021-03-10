@@ -96,10 +96,5 @@ namespace GovUk.Education.ExploreEducationStatistics.Common.Services
                 return numberOfLines;
             }
         }
-
-        public static int GetNumBatches(int rows, int rowsPerBatch)
-        {
-            return (int) Math.Ceiling(rows / (double) rowsPerBatch);
-        }
     }
 }

@@ -3,6 +3,8 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
 using GovUk.Education.ExploreEducationStatistics.Common.Model;
+using GovUk.Education.ExploreEducationStatistics.Common.Services.Interfaces;
+using GovUk.Education.ExploreEducationStatistics.Common.Tests.Utils;
 using GovUk.Education.ExploreEducationStatistics.Content.Model;
 using GovUk.Education.ExploreEducationStatistics.Content.Model.Database;
 using GovUk.Education.ExploreEducationStatistics.Content.Model.Extensions;
@@ -11,7 +13,6 @@ using GovUk.Education.ExploreEducationStatistics.Data.Model.Services.Interfaces;
 using GovUk.Education.ExploreEducationStatistics.Publisher.Model.ViewModels;
 using GovUk.Education.ExploreEducationStatistics.Publisher.Models;
 using GovUk.Education.ExploreEducationStatistics.Publisher.Services;
-using GovUk.Education.ExploreEducationStatistics.Publisher.Services.Interfaces;
 using Microsoft.Extensions.Logging;
 using Moq;
 using Xunit;
@@ -53,7 +54,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Publisher.Tests.Services
             Id = Guid.NewGuid(),
             Title = "Publication A",
             Contact = Contact,
-            Slug  = "publication-a",
+            Slug = "publication-a",
             Topic = Topic
         };
 
@@ -62,7 +63,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Publisher.Tests.Services
             Id = Guid.NewGuid(),
             Title = "Publication B",
             Contact = Contact,
-            Slug  = "publication-b",
+            Slug = "publication-b",
             Topic = Topic
         };
 
@@ -557,26 +558,26 @@ namespace GovUk.Education.ExploreEducationStatistics.Publisher.Tests.Services
                 await contentDbContext.SaveChangesAsync();
             }
 
-            var fileStorageService = new Mock<IFileStorageService>(MockBehavior.Strict);
+            var publicBlobStorageService = new Mock<IBlobStorageService>(MockBehavior.Strict);
 
             using (var contentDbContext = InMemoryContentDbContext(contentDbContextId))
             {
-                fileStorageService.Setup(s =>
+                publicBlobStorageService.Setup(s =>
                         s.CheckBlobExists(PublicReleaseFiles,
                             PublicationARelease2AncillaryReleaseFile.PublicPath()))
                     .ReturnsAsync(true);
 
-                fileStorageService.Setup(s =>
+                publicBlobStorageService.Setup(s =>
                         s.CheckBlobExists(PublicReleaseFiles,
                             PublicationARelease2DataReleaseFile.PublicPath()))
                     .ReturnsAsync(true);
 
-                fileStorageService.Setup(s =>
-                        s.CheckBlobExists(PublicReleaseFiles, 
+                publicBlobStorageService.Setup(s =>
+                        s.CheckBlobExists(PublicReleaseFiles,
                             PublicationARelease2.AllFilesZipPath()))
                     .ReturnsAsync(true);
 
-                fileStorageService.Setup(s =>
+                publicBlobStorageService.Setup(s =>
                         s.GetBlob(PublicReleaseFiles,
                             PublicationARelease2AncillaryReleaseFile.PublicPath()))
                     .ReturnsAsync(new BlobInfo
@@ -590,7 +591,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Publisher.Tests.Services
                         created: null
                     ));
 
-                fileStorageService.Setup(s =>
+                publicBlobStorageService.Setup(s =>
                         s.GetBlob(PublicReleaseFiles,
                             PublicationARelease2DataReleaseFile.PublicPath()))
                     .ReturnsAsync(new BlobInfo
@@ -606,7 +607,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Publisher.Tests.Services
                         created: null
                     ));
 
-                fileStorageService.Setup(s => s.GetBlob(PublicReleaseFiles, 
+                publicBlobStorageService.Setup(s => s.GetBlob(PublicReleaseFiles,
                         PublicationARelease2.AllFilesZipPath()))
                     .ReturnsAsync(new BlobInfo
                     (
@@ -621,11 +622,11 @@ namespace GovUk.Education.ExploreEducationStatistics.Publisher.Tests.Services
                     ));
 
                 var service = BuildReleaseService(contentDbContext: contentDbContext,
-                    fileStorageService: fileStorageService.Object);
+                    publicBlobStorageService: publicBlobStorageService.Object);
 
                 var result = await service.GetDownloadFiles(PublicationARelease2);
 
-                fileStorageService.VerifyAll();
+                MockUtils.VerifyAllMocks(publicBlobStorageService);
 
                 Assert.Equal(3, result.Count);
                 Assert.False(result[0].Id.HasValue);
@@ -718,26 +719,26 @@ namespace GovUk.Education.ExploreEducationStatistics.Publisher.Tests.Services
                 await contentDbContext.SaveChangesAsync();
             }
 
-            var fileStorageService = new Mock<IFileStorageService>(MockBehavior.Strict);
+            var publicBlobStorageService = new Mock<IBlobStorageService>(MockBehavior.Strict);
 
             using (var contentDbContext = InMemoryContentDbContext(contentDbContextId))
             {
-                fileStorageService.Setup(s =>
+                publicBlobStorageService.Setup(s =>
                         s.CheckBlobExists(PublicReleaseFiles,
                             PublicationARelease2AncillaryReleaseFile.PublicPath()))
                     .ReturnsAsync(true);
 
-                fileStorageService.Setup(s =>
+                publicBlobStorageService.Setup(s =>
                         s.CheckBlobExists(PublicReleaseFiles,
                             PublicationARelease2DataReleaseFile.PublicPath()))
                     .ReturnsAsync(true);
 
-                fileStorageService.Setup(s =>
-                        s.CheckBlobExists(PublicReleaseFiles, 
+                publicBlobStorageService.Setup(s =>
+                        s.CheckBlobExists(PublicReleaseFiles,
                             PublicationARelease2.AllFilesZipPath()))
                     .ReturnsAsync(true);
 
-                fileStorageService.Setup(s =>
+                publicBlobStorageService.Setup(s =>
                         s.GetBlob(PublicReleaseFiles,
                             PublicationARelease2AncillaryReleaseFile.PublicPath()))
                     .ReturnsAsync(new BlobInfo
@@ -751,7 +752,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Publisher.Tests.Services
                         created: null
                     ));
 
-                fileStorageService.Setup(s =>
+                publicBlobStorageService.Setup(s =>
                         s.GetBlob(PublicReleaseFiles,
                             PublicationARelease2DataReleaseFile.PublicPath()))
                     .ReturnsAsync(new BlobInfo
@@ -767,7 +768,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Publisher.Tests.Services
                         created: null
                     ));
 
-                fileStorageService.Setup(s => s.GetBlob(PublicReleaseFiles,
+                publicBlobStorageService.Setup(s => s.GetBlob(PublicReleaseFiles,
                         PublicationARelease2.AllFilesZipPath()))
                     .ReturnsAsync(new BlobInfo
                     (
@@ -782,13 +783,13 @@ namespace GovUk.Education.ExploreEducationStatistics.Publisher.Tests.Services
                     ));
 
                 var service = BuildReleaseService(contentDbContext: contentDbContext,
-                    fileStorageService: fileStorageService.Object);
+                    publicBlobStorageService: publicBlobStorageService.Object);
 
                 var result =
                     await service.GetLatestReleaseViewModel(PublicationA.Id, Enumerable.Empty<Guid>(),
                         PublishContext());
 
-                fileStorageService.VerifyAll();
+                MockUtils.VerifyAllMocks(publicBlobStorageService);
 
                 Assert.Equal(PublicationARelease2.Id, result.Id);
                 Assert.Equal("Academic Year Q2 2018/19", result.Title);
@@ -886,14 +887,14 @@ namespace GovUk.Education.ExploreEducationStatistics.Publisher.Tests.Services
                 await contentDbContext.SaveChangesAsync();
             }
 
-            var fileStorageService = new Mock<IFileStorageService>(MockBehavior.Strict);
+            var publicBlobStorageService = new Mock<IBlobStorageService>(MockBehavior.Strict);
 
-            fileStorageService.Setup(s =>
-                    s.CheckBlobExists(PublicReleaseFiles, 
+            publicBlobStorageService.Setup(s =>
+                    s.CheckBlobExists(PublicReleaseFiles,
                         PublicationARelease1V1.AllFilesZipPath()))
                 .ReturnsAsync(true);
 
-            fileStorageService.Setup(s => s.GetBlob(PublicReleaseFiles,
+            publicBlobStorageService.Setup(s => s.GetBlob(PublicReleaseFiles,
                     PublicationARelease1V1.AllFilesZipPath()))
                 .ReturnsAsync(new BlobInfo
                 (
@@ -910,11 +911,11 @@ namespace GovUk.Education.ExploreEducationStatistics.Publisher.Tests.Services
             using (var contentDbContext = InMemoryContentDbContext(contentDbContextId))
             {
                 var service = BuildReleaseService(contentDbContext: contentDbContext,
-                    fileStorageService: fileStorageService.Object);
+                    publicBlobStorageService: publicBlobStorageService.Object);
 
                 var result = await service.GetReleaseViewModel(PublicationARelease1V1.Id, PublishContext());
 
-                fileStorageService.VerifyAll();
+                MockUtils.VerifyAllMocks(publicBlobStorageService);
 
                 Assert.Equal(PublicationARelease1V1.Id, result.Id);
                 Assert.Equal("Academic Year Q1 2018/19", result.Title);
@@ -997,14 +998,14 @@ namespace GovUk.Education.ExploreEducationStatistics.Publisher.Tests.Services
                 await contentDbContext.SaveChangesAsync();
             }
 
-            var fileStorageService = new Mock<IFileStorageService>(MockBehavior.Strict);
+            var publicBlobStorageService = new Mock<IBlobStorageService>(MockBehavior.Strict);
 
-            fileStorageService.Setup(s =>
-                    s.CheckBlobExists(PublicReleaseFiles, 
+            publicBlobStorageService.Setup(s =>
+                    s.CheckBlobExists(PublicReleaseFiles,
                         PublicationARelease3.AllFilesZipPath()))
                 .ReturnsAsync(true);
 
-            fileStorageService.Setup(s => s.GetBlob(PublicReleaseFiles,
+            publicBlobStorageService.Setup(s => s.GetBlob(PublicReleaseFiles,
                     PublicationARelease3.AllFilesZipPath()))
                 .ReturnsAsync(new BlobInfo
                 (
@@ -1021,12 +1022,12 @@ namespace GovUk.Education.ExploreEducationStatistics.Publisher.Tests.Services
             using (var contentDbContext = InMemoryContentDbContext(contentDbContextId))
             {
                 var service = BuildReleaseService(contentDbContext: contentDbContext,
-                    fileStorageService: fileStorageService.Object);
+                    publicBlobStorageService: publicBlobStorageService.Object);
 
                 var context = PublishContext();
                 var result = await service.GetReleaseViewModel(PublicationARelease3.Id, context);
 
-                fileStorageService.VerifyAll();
+                MockUtils.VerifyAllMocks(publicBlobStorageService);
 
                 Assert.Equal(PublicationARelease3.Id, result.Id);
                 Assert.Equal("Academic Year Q3 2018/19", result.Title);
@@ -1058,13 +1059,13 @@ namespace GovUk.Education.ExploreEducationStatistics.Publisher.Tests.Services
         private static ReleaseService BuildReleaseService(
             ContentDbContext contentDbContext,
             StatisticsDbContext statisticsDbContext = null,
-            IFileStorageService fileStorageService = null,
+            IBlobStorageService publicBlobStorageService = null,
             IReleaseSubjectService releaseSubjectService = null)
         {
             return new ReleaseService(
                 contentDbContext,
                 statisticsDbContext ?? new Mock<StatisticsDbContext>().Object,
-                fileStorageService ?? new Mock<IFileStorageService>().Object,
+                publicBlobStorageService ?? new Mock<IBlobStorageService>().Object,
                 releaseSubjectService ?? new Mock<IReleaseSubjectService>().Object,
                 new Mock<ILogger<ReleaseService>>().Object,
                 MapperForProfile<MappingProfiles>());

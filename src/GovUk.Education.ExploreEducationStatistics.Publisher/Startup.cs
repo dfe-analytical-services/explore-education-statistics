@@ -16,10 +16,6 @@ using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Logging;
-using FileStorageService = GovUk.Education.ExploreEducationStatistics.Publisher.Services.FileStorageService;
-using IFileStorageService = GovUk.Education.ExploreEducationStatistics.Publisher.Services.Interfaces.IFileStorageService;
-using IReleaseService = GovUk.Education.ExploreEducationStatistics.Publisher.Services.Interfaces.IReleaseService;
-using ReleaseService = GovUk.Education.ExploreEducationStatistics.Publisher.Services.ReleaseService;
 
 [assembly: FunctionsStartup(typeof(Startup))]
 
@@ -36,59 +32,71 @@ namespace GovUk.Education.ExploreEducationStatistics.Publisher
                     options.UseSqlServer(ConnectionUtils.GetAzureSqlConnectionString("ContentDb")))
                 .AddDbContext<StatisticsDbContext>(options =>
                     options.UseSqlServer(ConnectionUtils.GetAzureSqlConnectionString("StatisticsDb")))
-                .AddSingleton<IFileStorageService, FileStorageService>(
-                    provider =>
-                    {
-                        var privateStorageConnectionString = GetConfigurationValue(provider, "CoreStorage");
-                        var publicStorageConnectionString = GetConfigurationValue(provider, "PublicStorage");
-                        var publisherStorageConnectionString = GetConfigurationValue(provider, "PublisherStorage");
-
-                        var privateBlobStorageService = new BlobStorageService(
-                            privateStorageConnectionString,
-                            new BlobServiceClient(privateStorageConnectionString),
-                            provider.GetRequiredService<ILogger<BlobStorageService>>());
-
-                        var publicBlobStorageService = new BlobStorageService(
-                            publicStorageConnectionString,
-                            new BlobServiceClient(publicStorageConnectionString),
-                            provider.GetRequiredService<ILogger<BlobStorageService>>());
-
-                        var publisherBlobStorageService = new BlobStorageService(
-                            publicStorageConnectionString,
-                            new BlobServiceClient(publisherStorageConnectionString),
-                            provider.GetRequiredService<ILogger<BlobStorageService>>());
-
-                        return new FileStorageService(
-                            privateBlobStorageService: privateBlobStorageService,
-                            publicBlobStorageService: publicBlobStorageService,
-                            publicStorageConnectionString: publicStorageConnectionString,
-                            publisherStorageConnectionString: publisherStorageConnectionString,
-                            logger: provider.GetRequiredService<ILogger<FileStorageService>>());
-                    })
-                .AddScoped<IPublishingService, PublishingService>()
-                .AddScoped<IContentService, ContentService>()
+                .AddSingleton<IFileStorageService, FileStorageService>(provider =>
+                    new FileStorageService(GetConfigurationValue(provider, "PublisherStorage")))
+                .AddScoped<IPublishingService, PublishingService>(provider =>
+                    new PublishingService(
+                        publicStorageConnectionString: GetConfigurationValue(provider, "PublicStorage"),
+                        privateBlobStorageService: GetBlobStorageService(provider, "CoreStorage"),
+                        publicBlobStorageService: GetBlobStorageService(provider, "PublicStorage"),
+                        methodologyService: provider.GetRequiredService<IMethodologyService>(),
+                        releaseService: provider.GetRequiredService<IReleaseService>(),
+                        zipFileService: provider.GetRequiredService<IZipFileService>(),
+                        logger: provider.GetRequiredService<ILogger<PublishingService>>()))
+                .AddScoped<IContentService, ContentService>(provider =>
+                    new ContentService(
+                        publicBlobStorageService: GetBlobStorageService(provider, "PublicStorage"),
+                        fastTrackService: provider.GetService<IFastTrackService>(),
+                        downloadService: provider.GetRequiredService<IDownloadService>(),
+                        methodologyService: provider.GetRequiredService<IMethodologyService>(),
+                        releaseService: provider.GetRequiredService<IReleaseService>(),
+                        publicationService: provider.GetRequiredService<IPublicationService>()
+                    ))
                 .AddScoped<ITaxonomyService, TaxonomyService>()
-                .AddScoped<IReleaseService, ReleaseService>()
+                .AddScoped<IReleaseService, ReleaseService>(provider =>
+                    new ReleaseService(
+                        contentDbContext: provider.GetService<ContentDbContext>(),
+                        statisticsDbContext: provider.GetService<StatisticsDbContext>(),
+                        publicBlobStorageService: GetBlobStorageService(provider, "PublicStorage"),
+                        releaseSubjectService: provider.GetService<IReleaseSubjectService>(),
+                        logger: provider.GetRequiredService<ILogger<ReleaseService>>(),
+                        mapper: provider.GetRequiredService<IMapper>()
+                    ))
                 .AddScoped<ITableStorageService, TableStorageService>(provider =>
                     new TableStorageService(GetConfigurationValue(provider, "PublisherStorage")))
                 .AddScoped<IPublicationService, PublicationService>()
                 .AddScoped<IDownloadService, DownloadService>()
                 .AddScoped<IFastTrackService, FastTrackService>(provider =>
-                    new FastTrackService(provider.GetService<ContentDbContext>(),
-                        provider.GetService<IFileStorageService>(),
-                        new TableStorageService(GetConfigurationValue(provider, "PublicStorage"))))
+                    new FastTrackService(
+                        contentDbContext: provider.GetService<ContentDbContext>(),
+                        publicBlobStorageService: GetBlobStorageService(provider, "PublicStorage"),
+                        tableStorageService: new TableStorageService(GetConfigurationValue(provider, "PublicStorage"))))
                 .AddScoped<IMethodologyService, MethodologyService>()
                 .AddScoped<INotificationsService, NotificationsService>(provider =>
-                    new NotificationsService(provider.GetService<ContentDbContext>(),
-                        new StorageQueueService(GetConfigurationValue(provider, "NotificationStorage"))))
-                .AddScoped<IQueueService, QueueService>(provider => new QueueService(
-                    new StorageQueueService(GetConfigurationValue(provider, "PublisherStorage")),
-                    provider.GetService<IReleaseStatusService>(),
-                    provider.GetRequiredService<ILogger<QueueService>>()))
+                    new NotificationsService(
+                        context: provider.GetService<ContentDbContext>(),
+                        storageQueueService: new StorageQueueService(GetConfigurationValue(provider,
+                            "NotificationStorage"))))
+                .AddScoped<IQueueService, QueueService>(provider =>
+                    new QueueService(
+                        storageQueueService: new StorageQueueService(
+                            storageConnectionString: GetConfigurationValue(provider, "PublisherStorage")),
+                        releaseStatusService: provider.GetService<IReleaseStatusService>(),
+                        logger: provider.GetRequiredService<ILogger<QueueService>>()))
                 .AddScoped<IReleaseStatusService, ReleaseStatusService>()
                 .AddScoped<IValidationService, ValidationService>()
                 .AddScoped<IReleaseSubjectService, ReleaseSubjectService>()
-                .AddScoped<IFootnoteRepository, FootnoteRepository>();
+                .AddScoped<IFootnoteRepository, FootnoteRepository>()
+                .AddScoped<IZipFileService, ZipFileService>();
+        }
+
+        private static IBlobStorageService GetBlobStorageService(IServiceProvider provider, string connectionStringKey)
+        {
+            var connectionString = GetConfigurationValue(provider, connectionStringKey);
+            return new BlobStorageService(
+                connectionString,
+                new BlobServiceClient(connectionString),
+                provider.GetRequiredService<ILogger<BlobStorageService>>());
         }
 
         private static string GetConfigurationValue(IServiceProvider provider, string key)

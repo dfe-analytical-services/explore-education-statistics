@@ -3,13 +3,13 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
 using GovUk.Education.ExploreEducationStatistics.Content.Model;
-using GovUk.Education.ExploreEducationStatistics.Content.Model.Database;
 using GovUk.Education.ExploreEducationStatistics.Publisher.Models;
 using GovUk.Education.ExploreEducationStatistics.Publisher.Services;
-using Microsoft.EntityFrameworkCore;
 using Xunit;
+using static GovUk.Education.ExploreEducationStatistics.Common.Model.FileType;
 using static GovUk.Education.ExploreEducationStatistics.Common.Model.TimeIdentifier;
 using static GovUk.Education.ExploreEducationStatistics.Common.Services.MapperUtils;
+using static GovUk.Education.ExploreEducationStatistics.Content.Model.Database.ContentDbUtils;
 using static GovUk.Education.ExploreEducationStatistics.Content.Model.ReleaseStatus;
 
 namespace GovUk.Education.ExploreEducationStatistics.Publisher.Tests.Services
@@ -109,38 +109,36 @@ namespace GovUk.Education.ExploreEducationStatistics.Publisher.Tests.Services
         };
 
         [Fact]
-        public void GetTree()
+        public async Task GetTree()
         {
-            var builder = new DbContextOptionsBuilder<ContentDbContext>();
-            builder.UseInMemoryDatabase("GetMethodologyTree");
-            var options = builder.Options;
+            var contentDbContextId = Guid.NewGuid().ToString();
 
-            using (var context = new ContentDbContext(options))
+            await using (var contentDbContext = InMemoryContentDbContext(contentDbContextId))
             {
-                context.AddRange(new List<Methodology>
+                await contentDbContext.AddRangeAsync(new List<Methodology>
                 {
                     MethodologyA, MethodologyB
                 });
 
-                context.Add(Theme);
-                context.Add(Topic);
+                await contentDbContext.AddAsync(Theme);
+                await contentDbContext.AddAsync(Topic);
 
-                context.AddRange(new List<Publication>
+                await contentDbContext.AddRangeAsync(new List<Publication>
                 {
                     PublicationA, PublicationB
                 });
 
-                context.AddRange(new List<Release>
+                await contentDbContext.AddRangeAsync(new List<Release>
                 {
                     PublicationARelease1, PublicationBRelease1
                 });
 
-                context.SaveChanges();
+                await contentDbContext.SaveChangesAsync();
             }
 
-            using (var context = new ContentDbContext(options))
+            await using (var contentDbContext = InMemoryContentDbContext(contentDbContextId))
             {
-                var service = new MethodologyService(context, MapperForProfile<MappingProfiles>());
+                var service = new MethodologyService(contentDbContext, MapperForProfile<MappingProfiles>());
 
                 var result = service.GetTree(Enumerable.Empty<Guid>());
 
@@ -164,19 +162,73 @@ namespace GovUk.Education.ExploreEducationStatistics.Publisher.Tests.Services
         }
 
         [Fact]
-        public async Task GetViewModelAsync()
+        public async Task GetFiles()
         {
-            var builder = new DbContextOptionsBuilder<ContentDbContext>();
-            builder.UseInMemoryDatabase("ViewModel");
-            var options = builder.Options;
+            var methodology = new Methodology();
 
-            await using (var context = new ContentDbContext(options))
+            var imageFile1 = new MethodologyFile
             {
-                context.Add(MethodologyA);
-                await context.SaveChangesAsync();
+                Methodology = methodology,
+                File = new File
+                {
+                    Filename = "image1.png",
+                    Type = Image
+                }
+            };
+
+            var imageFile2 = new MethodologyFile
+            {
+                Methodology = methodology,
+                File = new File
+                {
+                    Filename = "image2.png",
+                    Type = Image
+                }
+            };
+
+            var otherFile = new MethodologyFile
+            {
+                Methodology = methodology,
+                File = new File
+                {
+                    Filename = "ancillary.pdf",
+                    Type = Ancillary
+                }
+            };
+
+            var contentDbContextId = Guid.NewGuid().ToString();
+
+            await using (var contentDbContext = InMemoryContentDbContext(contentDbContextId))
+            {
+                await contentDbContext.Methodologies.AddAsync(methodology);
+                await contentDbContext.MethodologyFiles.AddRangeAsync(imageFile1, imageFile2, otherFile);
+                await contentDbContext.SaveChangesAsync();
             }
 
-            await using (var contentDbContext = new ContentDbContext(options))
+            await using (var contentDbContext = InMemoryContentDbContext(contentDbContextId))
+            {
+                var service = new MethodologyService(contentDbContext, MapperForProfile<MappingProfiles>());
+
+                var result = await service.GetFiles(methodology.Id, Image);
+
+                Assert.Equal(2, result.Count);
+                Assert.Equal(imageFile1.File.Id, result[0].Id);
+                Assert.Equal(imageFile2.File.Id, result[1].Id);
+            }
+        }
+
+        [Fact]
+        public async Task GetViewModelAsync()
+        {
+            var contentDbContextId = Guid.NewGuid().ToString();
+
+            await using (var contentDbContext = InMemoryContentDbContext(contentDbContextId))
+            {
+                await contentDbContext.AddAsync(MethodologyA);
+                await contentDbContext.SaveChangesAsync();
+            }
+
+            await using (var contentDbContext = InMemoryContentDbContext(contentDbContextId))
             {
                 var service = new MethodologyService(contentDbContext, MapperForProfile<MappingProfiles>());
 
@@ -201,17 +253,15 @@ namespace GovUk.Education.ExploreEducationStatistics.Publisher.Tests.Services
         [Fact]
         public async Task GetViewModelAsync_NotYetPublished()
         {
-            var builder = new DbContextOptionsBuilder<ContentDbContext>();
-            builder.UseInMemoryDatabase("ViewModel_NotYetPublished");
-            var options = builder.Options;
+            var contentDbContextId = Guid.NewGuid().ToString();
 
-            await using (var context = new ContentDbContext(options))
+            await using (var contentDbContext = InMemoryContentDbContext(contentDbContextId))
             {
-                context.Add(MethodologyC);
-                await context.SaveChangesAsync();
+                await contentDbContext.AddAsync(MethodologyC);
+                await contentDbContext.SaveChangesAsync();
             }
 
-            await using (var contentDbContext = new ContentDbContext(options))
+            await using (var contentDbContext = InMemoryContentDbContext(contentDbContextId))
             {
                 var service = new MethodologyService(contentDbContext, MapperForProfile<MappingProfiles>());
 
