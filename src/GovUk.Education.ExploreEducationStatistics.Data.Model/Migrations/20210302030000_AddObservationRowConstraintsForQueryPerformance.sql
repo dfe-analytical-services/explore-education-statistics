@@ -50,3 +50,6 @@ CREATE INDEX IX_ObservationRowFilterItem_FilterItemId ON ObservationRowFilterIte
 -- 
 IF NOT EXISTS(SELECT * FROM sys.indexes WHERE Name = 'IX_ObservationRowFilterItem_FilterItemId_ObservationId')
 CREATE INDEX IX_ObservationRowFilterItem_FilterItemId_ObservationId ON ObservationRowFilterItem (FilterItemId, ObservationId);
+
+IF NOT EXISTS(SELECT * FROM sys.indexes WHERE Name = 'IX_ObservationRowFilterItem_ObservationId')
+CREATE INDEX IX_ObservationRowFilterItem_ObservationId ON ObservationRowFilterItem (ObservationId);
