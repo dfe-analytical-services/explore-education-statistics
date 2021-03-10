@@ -5,6 +5,7 @@ import DataBlockPageReadOnlyTabs from '@admin/pages/release/datablocks/component
 import DataBlockPageTabs from '@admin/pages/release/datablocks/components/DataBlockPageTabs';
 import DataBlockSelector from '@admin/pages/release/datablocks/components/DataBlockSelector';
 import {
+  releaseDataBlockCreateRoute,
   ReleaseDataBlockRouteParams,
   releaseDataBlocksRoute,
   ReleaseRouteParams,
@@ -22,6 +23,7 @@ import useAsyncHandledRetry from '@common/hooks/useAsyncHandledRetry';
 import useToggle from '@common/hooks/useToggle';
 import React, { useCallback, useRef } from 'react';
 import { generatePath, RouteComponentProps } from 'react-router';
+import ButtonLink from '@admin/components/ButtonLink';
 
 interface Model {
   dataBlock: ReleaseDataBlock;
@@ -89,6 +91,14 @@ const ReleaseDataBlockEditPage = ({
 
   const { canUpdateRelease, dataBlock } = model ?? {};
 
+  const createPath = generatePath<ReleaseRouteParams>(
+    releaseDataBlockCreateRoute.path,
+    {
+      publicationId,
+      releaseId,
+    },
+  );
+
   return (
     <div ref={pageRef}>
       <Link
@@ -104,6 +114,10 @@ const ReleaseDataBlockEditPage = ({
 
       <LoadingSpinner loading={isLoading}>
         <h2>{canUpdateRelease ? 'Edit data block' : 'View data block'}</h2>
+
+        <ButtonLink to={createPath} onClick={toggleDeleting.on}>
+          Create another data block
+        </ButtonLink>
 
         <DataBlockSelector
           canUpdate={canUpdateRelease}
