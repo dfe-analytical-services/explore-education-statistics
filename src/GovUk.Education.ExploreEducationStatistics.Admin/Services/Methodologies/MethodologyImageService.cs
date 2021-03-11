@@ -90,9 +90,10 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Services.Methodologie
             IDictionary<string, string> metadata = null)
         {
             var file = await _methodologyFileRepository.Create(
-                methodologyId,
-                formFile.FileName,
-                type);
+                methodologyId: methodologyId,
+                filename: formFile.FileName,
+                type: type,
+                createdById: _userService.GetUserId());
 
             await _contentDbContext.SaveChangesAsync();
 

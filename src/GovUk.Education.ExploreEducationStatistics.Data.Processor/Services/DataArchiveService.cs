@@ -43,7 +43,6 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Processor.Services
                     metadata: GetDataFileMetaValues(
                             name: blob.Name,
                             metaFileName: metadataFile.Name,
-                            userName: blob.GetUserName(),
                             numberOfRows: CalculateNumberOfRows(rowStream)
                         ));
             }

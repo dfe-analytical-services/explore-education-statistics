@@ -52,7 +52,8 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Services
         public async Task<File> Create(
             Guid releaseId,
             string filename,
-            FileType type)
+            FileType type,
+            Guid createdById)
         {
             if (!SupportedFileTypes.Contains(type))
             {
@@ -67,6 +68,8 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Services
                     // Mark any new files as already migrated while these flags temporarily exist
                     PrivateBlobPathMigrated = true,
                     PublicBlobPathMigrated = true,
+                    Created = DateTime.UtcNow,
+                    CreatedById = createdById,
                     RootPath = releaseId,
                     Filename = filename,
                     Type = type

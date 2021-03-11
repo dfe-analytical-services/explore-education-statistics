@@ -28,6 +28,12 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services.Method
 {
     public class MethodologyImageServiceTests
     {
+        private readonly User _user = new User
+        {
+            Id = Guid.NewGuid(),
+            Email = "test@test.com"
+        };
+
         [Fact]
         public async Task Stream()
         {
@@ -249,6 +255,8 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services.Method
                     );
 
                 Assert.NotNull(methodologyFile);
+                Assert.InRange(DateTime.UtcNow.Subtract(methodologyFile.File.Created.Value).Milliseconds, 0, 1500);
+                Assert.Equal(_user.Id, methodologyFile.File.CreatedById);
             }
 
             MockUtils.VerifyAllMocks(blobStorageService, fileUploadsValidatorService);
@@ -277,7 +285,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services.Method
             MockUtils.VerifyAllMocks(blobStorageService, fileUploadsValidatorService);
         }
 
-        private static MethodologyImageService SetupMethodologyImageService(
+        private MethodologyImageService SetupMethodologyImageService(
             ContentDbContext contentDbContext,
             IPersistenceHelper<ContentDbContext> contentPersistenceHelper = null,
             IBlobStorageService blobStorageService = null,
@@ -285,13 +293,16 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services.Method
             IMethodologyFileRepository methodologyFileRepository = null,
             IUserService userService = null)
         {
+            contentDbContext.Users.Add(_user);
+            contentDbContext.SaveChanges();
+
             return new MethodologyImageService(
-                contentDbContext ?? new Mock<ContentDbContext>().Object,
+                contentDbContext,
                 contentPersistenceHelper ?? new PersistenceHelper<ContentDbContext>(contentDbContext),
                 blobStorageService ?? new Mock<IBlobStorageService>().Object,
                 fileUploadsValidatorService ?? new Mock<IFileUploadsValidatorService>().Object,
                 methodologyFileRepository ?? new MethodologyFileRepository(contentDbContext),
-                userService ?? MockUtils.AlwaysTrueUserService().Object
+                userService ?? MockUtils.AlwaysTrueUserService(_user.Id).Object
             );
         }
     }
