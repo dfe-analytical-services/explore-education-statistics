@@ -47,6 +47,33 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Services
             _logger = logger;
         }
 
+        public async Task<Either<ActionResult, Unit>> MigratePrivateFilesCreatedFields()
+        {
+            return await _userService.CheckCanRunMigrations()
+                .OnSuccessVoid(async () =>
+                {
+                    // Get all private data files
+                    // Include those that have already had their Path migrated since we want to attempt to run this in Dev/Test/PreProd
+                    // where that migration has already run
+                    var files = await _contentDbContext
+                        .Files
+                        .Where(file => file.Type == FileType.Data)
+                        .ToListAsync();
+
+                    await files.ForEachAsync(async file =>
+                    {
+                        try
+                        {
+                            await MigratePrivateFilesCreatedFields(file);
+                        }
+                        catch (Exception e)
+                        {
+                            _logger.LogError(e, "Caught exception migrating created fields");
+                        }
+                    });
+                });
+        }
+
         public async Task<Either<ActionResult, Unit>> MigratePrivateFiles(params FileType[] type)
         {
             return await _userService.CheckCanRunMigrations()
@@ -112,6 +139,48 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Services
                         }
                     });
                 });
+        }
+
+        private async Task MigratePrivateFilesCreatedFields(File file)
+        {
+            if (file.Type != FileType.Data)
+            {
+                throw new ArgumentException("Expected file of type Data");
+            }
+
+            if (!await _privateBlobStorageService.CheckBlobExists(
+                containerName: PrivateReleaseFiles,
+                path: file.Path()))
+            {
+                _logger.LogError("Private blob not found for file: {0} - {1}", file.Id, file.Path());
+                return;
+            }
+
+            var blob = await _privateBlobStorageService.GetBlob(
+                containerName: PrivateReleaseFiles,
+                path: file.Path());
+
+            _contentDbContext.Update(file);
+
+            // Should always be true
+            if (blob.Created.HasValue)
+            {
+                file.Created = blob.Created.Value.UtcDateTime;
+            }
+
+            if (blob.Meta.TryGetValue("userName", out var email))
+            {
+                if (!email.IsNullOrEmpty())
+                {
+                    // Case of the email shouldn't matter here since queries are case insensitive
+                    var user = await _contentDbContext.Users
+                        .SingleOrDefaultAsync(u => u.Email == email);
+
+                    file.CreatedById = user?.Id;
+                }
+            }
+
+            await _contentDbContext.SaveChangesAsync();
         }
 
         private async Task SetPrivateBlobMetadata(File file)
@@ -266,7 +335,8 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Services
         {
             if (release.Publication == null)
             {
-                throw new ArgumentException("Release must be hydrated with Publication to create legacy all files zip path");
+                throw new ArgumentException(
+                    "Release must be hydrated with Publication to create legacy all files zip path");
             }
 
             return
