@@ -23,7 +23,10 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Services.Methodologie
             _contentDbContext = contentDbContext;
         }
 
-        public async Task<File> Create(Guid methodologyId, string filename, FileType type)
+        public async Task<File> Create(Guid methodologyId,
+            string filename,
+            FileType type,
+            Guid createdById)
         {
             if (!SupportedFileTypes.Contains(type))
             {
@@ -38,6 +41,8 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Services.Methodologie
                     // Mark any new files as already migrated while these flags temporarily exist
                     PrivateBlobPathMigrated = true,
                     PublicBlobPathMigrated = true,
+                    Created = DateTime.UtcNow,
+                    CreatedById = createdById,
                     RootPath = methodologyId,
                     Filename = filename,
                     Type = type

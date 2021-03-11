@@ -602,7 +602,6 @@ namespace GovUk.Education.ExploreEducationStatistics.Publisher.Tests.Services
                         meta: GetDataFileMetaValues(
                             name: "Data Test File",
                             metaFileName: "data.meta.csv",
-                            userName: "test@test.com",
                             numberOfRows: 200),
                         created: null
                     ));
@@ -764,7 +763,6 @@ namespace GovUk.Education.ExploreEducationStatistics.Publisher.Tests.Services
                         meta: GetDataFileMetaValues(
                             name: "Data Test File",
                             metaFileName: "data.meta.csv",
-                            userName: "test@test.com",
                             numberOfRows: 200),
                         created: null
                     ));

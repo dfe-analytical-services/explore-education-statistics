@@ -236,6 +236,12 @@ namespace GovUk.Education.ExploreEducationStatistics.Content.Model.Database
                 .HasForeignKey<File>(b => b.ReplacedById)
                 .IsRequired(false);
 
+            modelBuilder.Entity<File>()
+                .Property(comment => comment.Created)
+                .HasConversion(
+                    v => v,
+                    v => v.HasValue ? DateTime.SpecifyKind(v.Value, DateTimeKind.Utc) : (DateTime?) null);
+
             modelBuilder.Entity<Release>()
                 .HasOne(r => r.PreviousVersion)
                 .WithMany()

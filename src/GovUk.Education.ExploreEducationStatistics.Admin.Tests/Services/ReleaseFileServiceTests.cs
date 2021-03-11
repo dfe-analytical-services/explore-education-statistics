@@ -31,6 +31,12 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
 {
     public class ReleaseFileServiceTests
     {
+        private readonly User _user = new User
+        {
+            Id = Guid.NewGuid(),
+            Email = "test@test.com"
+        };
+
         [Fact]
         public async Task Delete()
         {
@@ -1471,6 +1477,8 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
                 );
 
                 Assert.NotNull(releaseFile);
+                Assert.InRange(DateTime.UtcNow.Subtract(releaseFile.File.Created.Value).Milliseconds, 0, 1500);
+                Assert.Equal(_user.Id, releaseFile.File.CreatedById);
             }
 
             MockUtils.VerifyAllMocks(blobStorageService, fileUploadsValidatorService);
@@ -1566,12 +1574,14 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
                     );
 
                 Assert.NotNull(releaseFile);
+                Assert.InRange(DateTime.UtcNow.Subtract(releaseFile.File.Created.Value).Milliseconds, 0, 1500);
+                Assert.Equal(_user.Id, releaseFile.File.CreatedById);
             }
 
             MockUtils.VerifyAllMocks(blobStorageService, fileUploadsValidatorService);
         }
 
-        private static ReleaseFileService SetupReleaseFileService(
+        private ReleaseFileService SetupReleaseFileService(
             ContentDbContext contentDbContext,
             IPersistenceHelper<ContentDbContext> contentPersistenceHelper = null,
             IBlobStorageService blobStorageService = null,
@@ -1580,14 +1590,17 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
             IReleaseFileRepository releaseFileRepository = null,
             IUserService userService = null)
         {
+            contentDbContext.Users.Add(_user);
+            contentDbContext.SaveChanges();
+
             return new ReleaseFileService(
-                contentDbContext ?? new Mock<ContentDbContext>().Object,
+                contentDbContext,
                 contentPersistenceHelper ?? new PersistenceHelper<ContentDbContext>(contentDbContext),
                 blobStorageService ?? new Mock<IBlobStorageService>().Object,
                 fileRepository ?? new FileRepository(contentDbContext),
                 fileUploadsValidatorService ?? new Mock<IFileUploadsValidatorService>().Object,
                 releaseFileRepository ?? new ReleaseFileRepository(contentDbContext),
-                userService ?? MockUtils.AlwaysTrueUserService().Object
+                userService ?? MockUtils.AlwaysTrueUserService(_user.Id).Object
             );
         }
     }

@@ -6,6 +6,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Services.Interfaces
 {
     public interface IMigrateFilesService
     {
+        Task<Either<ActionResult, Unit>> MigratePrivateFilesCreatedFields();
         Task<Either<ActionResult, Unit>> MigratePrivateFiles(params FileType[] types);
         Task<Either<ActionResult, Unit>> MigratePublicFiles(FileType type);
     }

@@ -224,18 +224,19 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Services
                                             subjectId: subjectId,
                                             filename: dataFormFile.FileName.ToLower(),
                                             type: FileType.Data,
+                                            createdById: _userService.GetUserId(),
                                             replacingFile: replacingFile);
 
                                         var metaFile = await _releaseDataFileRepository.Create(
                                             releaseId: releaseId,
                                             subjectId: subjectId,
                                             filename: metaFormFile.FileName.ToLower(),
-                                            type: Metadata);
+                                            type: Metadata,
+                                            createdById: _userService.GetUserId());
 
                                         var dataInfo = GetDataFileMetaValues(
                                             name: validSubjectName,
                                             metaFileName: metaFile.Filename,
-                                            userName: userName,
                                             numberOfRows: CalculateNumberOfRows(dataFormFile.OpenReadStream())
                                         );
 
@@ -253,6 +254,10 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Services
                                             dataFile.Path()
                                         );
 
+                                        await _contentDbContext.Entry(dataFile)
+                                            .Reference(f => f.CreatedBy)
+                                            .LoadAsync();
+
                                         return new DataFileInfo
                                         {
                                             Id = dataFile.Id,
@@ -263,9 +268,9 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Services
                                             MetaFileId = metaFile.Id,
                                             MetaFileName = metaFile.Filename,
                                             Rows = blob.GetNumberOfRows(),
-                                            UserName = blob.GetUserName(),
+                                            UserName = dataFile.CreatedBy.Email,
                                             Status = DataImportStatus.QUEUED,
-                                            Created = blob.Created,
+                                            Created = dataFile.Created,
                                             Permissions = await _userService.GetDataFilePermissions(dataFile)
                                         };
                                     }));
@@ -295,7 +300,6 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Services
                                             var dataInfo = GetDataFileMetaValues(
                                                 name: validSubjectName,
                                                 metaFileName: archiveFile.MetaFileName,
-                                                userName: userName,
                                                 numberOfRows: 0
                                             );
 
@@ -310,13 +314,15 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Services
 
                                                     var zipFile = await _releaseDataFileRepository.CreateZip(
                                                         filename: zipFormFile.FileName.ToLower(),
-                                                        releaseId: releaseId);
+                                                        releaseId: releaseId,
+                                                        createdById: _userService.GetUserId());
 
                                                     var dataFile = await _releaseDataFileRepository.Create(
                                                         releaseId: releaseId,
                                                         subjectId: subjectId,
                                                         filename: archiveFile.DataFileName,
                                                         type: FileType.Data,
+                                                        createdById: _userService.GetUserId(),
                                                         replacingFile: replacingFile,
                                                         source: zipFile);
 
@@ -325,6 +331,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Services
                                                         subjectId: subjectId,
                                                         filename: archiveFile.MetaFileName,
                                                         type: Metadata,
+                                                        createdById: _userService.GetUserId(),
                                                         source: zipFile);
 
                                                     await UploadFileToStorage(zipFile, zipFormFile, dataInfo);
@@ -340,6 +347,10 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Services
                                                         zipFile.Path()
                                                     );
 
+                                                    await _contentDbContext.Entry(dataFile)
+                                                        .Reference(f => f.CreatedBy)
+                                                        .LoadAsync();
+
                                                     return new DataFileInfo
                                                     {
                                                         // TODO size and rows are for zip file but they need to be for
@@ -352,9 +363,9 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Services
                                                         MetaFileId = metaFile.Id,
                                                         MetaFileName = metaFile.Filename,
                                                         Rows = blob.GetNumberOfRows(),
-                                                        UserName = blob.GetUserName(),
+                                                        UserName = dataFile.CreatedBy.Email,
                                                         Status = DataImportStatus.QUEUED,
-                                                        Created = blob.Created,
+                                                        Created = dataFile.Created,
                                                         Permissions = await _userService.GetDataFilePermissions(dataFile)
                                                     };
                                                 });
@@ -376,14 +387,11 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Services
 
             var blob = await _blobStorageService.GetBlob(PrivateReleaseFiles, dataFile.Path());
 
-            // If the file does exist then it could possibly be
-            // partially uploaded so make sure meta data exists for it
-            if (string.IsNullOrEmpty(blob.GetUserName()))
-            {
-                return await GetFallbackDataFileInfo(releaseId, dataFile);
-            }
-
             var metaFile = await GetAssociatedMetaFile(releaseId, dataFile);
+
+            await _contentDbContext.Entry(dataFile)
+                .Reference(f => f.CreatedBy)
+                .LoadAsync();
 
             return new DataFileInfo
             {
@@ -396,15 +404,19 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Services
                 MetaFileName = metaFile.Filename,
                 ReplacedBy = dataFile.ReplacedById,
                 Rows = blob.GetNumberOfRows(),
-                UserName = blob.GetUserName(),
+                UserName = dataFile.CreatedBy?.Email ?? "",
                 Status = await _dataImportService.GetStatus(dataFile.Id),
-                Created = blob.Created,
+                Created = dataFile.Created,
                 Permissions = await _userService.GetDataFilePermissions(dataFile)
             };
         }
 
         private async Task<DataFileInfo> GetFallbackDataFileInfo(Guid releaseId, File dataFile)
         {
+            await _contentDbContext.Entry(dataFile)
+                .Reference(f => f.CreatedBy)
+                .LoadAsync();
+
             // Try to get the name from the zip file if existing
             if (dataFile.SourceId != null)
             {
@@ -424,9 +436,9 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Services
                         MetaFileId = null,
                         MetaFileName = zipBlob.GetMetaFileName(),
                         Rows = 0,
-                        UserName = zipBlob.GetUserName(),
+                        UserName = dataFile.CreatedBy?.Email ?? "",
                         Status = await _dataImportService.GetStatus(dataFile.Id),
-                        Created = zipBlob.Created,
+                        Created = dataFile.Created,
                         Permissions = await _userService.GetDataFilePermissions(dataFile)
                     };
                 }
@@ -444,8 +456,9 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Services
                 MetaFileId = metaFile.Id,
                 MetaFileName = metaFile.Filename ?? "",
                 Rows = 0,
-                UserName = "",
+                UserName = dataFile.CreatedBy?.Email ?? "",
                 Status = await _dataImportService.GetStatus(dataFile.Id),
+                Created = dataFile.Created,
                 Permissions = await _userService.GetDataFilePermissions(dataFile)
             };
         }
