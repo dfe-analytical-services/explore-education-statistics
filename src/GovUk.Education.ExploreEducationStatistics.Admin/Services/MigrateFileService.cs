@@ -162,21 +162,23 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Services
 
             _contentDbContext.Update(file);
 
-            // Should always be true
-            if (blob.Created.HasValue)
+            if (blob.Created.HasValue && !file.Created.HasValue)
             {
                 file.Created = blob.Created.Value.UtcDateTime;
             }
 
-            if (blob.Meta.TryGetValue("userName", out var email))
+            if (!file.CreatedById.HasValue)
             {
-                if (!email.IsNullOrEmpty())
+                if (blob.Meta.TryGetValue("userName", out var email))
                 {
-                    // Case of the email shouldn't matter here since queries are case insensitive
-                    var user = await _contentDbContext.Users
-                        .SingleOrDefaultAsync(u => u.Email == email);
+                    if (!email.IsNullOrEmpty())
+                    {
+                        // Case of the email shouldn't matter here since queries are case insensitive
+                        var user = await _contentDbContext.Users
+                            .SingleOrDefaultAsync(u => u.Email == email);
 
-                    file.CreatedById = user?.Id;
+                        file.CreatedById = user?.Id;
+                    }
                 }
             }
 
