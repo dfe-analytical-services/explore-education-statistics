@@ -87,7 +87,10 @@ namespace GovUk.Education.ExploreEducationStatistics.Publisher
                 .AddScoped<IValidationService, ValidationService>()
                 .AddScoped<IReleaseSubjectService, ReleaseSubjectService>()
                 .AddScoped<IFootnoteRepository, FootnoteRepository>()
-                .AddScoped<IZipFileService, ZipFileService>();
+                .AddScoped<IZipFileService, ZipFileService>(provider =>
+                    new ZipFileService(
+                        publicBlobStorageService: GetBlobStorageService(provider, "PublicStorage")
+                    ));
         }
 
         private static IBlobStorageService GetBlobStorageService(IServiceProvider provider, string connectionStringKey)
