@@ -18,12 +18,14 @@ interface Props {
   publicationId: string;
   releaseId: string;
   dataBlockId: string;
+  label?: boolean;
 }
 
 const DataBlockSelector = ({
   canUpdate = true,
   publicationId,
   releaseId,
+  label = true,
   dataBlockId,
 }: Props) => {
   const history = useHistory();
@@ -48,11 +50,11 @@ const DataBlockSelector = ({
     <FormSelect
       id="selectedDataBlock"
       name="selectedDataBlock"
-      className="govuk-!-margin-bottom-4"
       label={
-        canUpdate
+        label &&
+        (canUpdate
           ? 'Select a data block to edit'
-          : 'Select a data block to view'
+          : 'Select a data block to view')
       }
       disabled={isLoading}
       order={FormSelect.unordered}

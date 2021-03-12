@@ -1,0 +1,15 @@
+.dataBlockSelector {
+  align-items: center;
+  display: flex;
+  flex-direction: row;
+}
+
+.dataBlockSelector__or {
+  border-bottom: 2px solid;
+  font-weight: bold;
+  margin: 0 1.5rem;
+}
+
+.dataBlockSelector__button {
+  margin: 0;
+}
