@@ -1,3 +1,4 @@
+import Details from '@common/components/Details';
 import { Form, FormFieldSelect, FormFieldset } from '@common/components/form';
 import { SelectOption } from '@common/components/form/FormSelect';
 import SummaryList from '@common/components/SummaryList';
@@ -150,43 +151,57 @@ const TimePeriodForm = (props: Props & InjectedWizardProps) => {
     >
       {form => {
         return isActive ? (
-          <Form id={formId} showSubmitError>
-            <FormFieldset id="timePeriod" legend={stepHeading}>
-              <FormFieldSelect
-                name="start"
-                label="Start date"
-                disabled={form.isSubmitting}
-                options={timePeriodOptions}
-                order={[]}
-              />
-              <FormFieldSelect
-                name="end"
-                label="End date"
-                disabled={form.isSubmitting}
-                options={timePeriodOptions}
-                order={[]}
-              />
-            </FormFieldset>
+          <>
+            <Form id={formId} showSubmitError>
+              <FormFieldset id="timePeriod" legend={stepHeading}>
+                <FormFieldSelect
+                  name="start"
+                  label="Start date"
+                  disabled={form.isSubmitting}
+                  options={timePeriodOptions}
+                  order={[]}
+                />
+                <FormFieldSelect
+                  name="end"
+                  label="End date"
+                  disabled={form.isSubmitting}
+                  options={timePeriodOptions}
+                  order={[]}
+                />
+              </FormFieldset>
 
-            <WizardStepFormActions {...props} />
-          </Form>
+              <WizardStepFormActions {...props} />
+            </Form>
+            <h2 className="govuk-heading-m govuk-!-margin-top-9">
+              View or edit previous steps
+            </h2>
+          </>
         ) : (
           <>
-            {stepHeading}
-
-            <ResetFormOnPreviousStep
-              currentStep={currentStep}
-              stepNumber={stepNumber}
-            />
-
-            <SummaryList noBorder>
-              <SummaryListItem term="Start date">
-                {form.values.start && getOptionLabel(form.values.start)}
-              </SummaryListItem>
-              <SummaryListItem term="End date">
-                {form.values.end && getOptionLabel(form.values.end)}
-              </SummaryListItem>
-            </SummaryList>
+            <div className="govuk-grid-row">
+              <div className="govuk-grid-column-one-quarter">
+                {stepHeading}
+                <ResetFormOnPreviousStep
+                  currentStep={currentStep}
+                  stepNumber={stepNumber}
+                />
+              </div>
+              <div className="govuk-grid-column-three-quarters">
+                <Details
+                  summary="View details"
+                  className="govuk-!-margin-bottom-2"
+                >
+                  <SummaryList noBorder>
+                    <SummaryListItem term="Start date">
+                      {form.values.start && getOptionLabel(form.values.start)}
+                    </SummaryListItem>
+                    <SummaryListItem term="End date">
+                      {form.values.end && getOptionLabel(form.values.end)}
+                    </SummaryListItem>
+                  </SummaryList>
+                </Details>
+              </div>
+            </div>
           </>
         );
       }}

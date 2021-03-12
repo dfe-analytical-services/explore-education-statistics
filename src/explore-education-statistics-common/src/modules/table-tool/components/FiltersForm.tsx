@@ -1,4 +1,5 @@
 import CollapsibleList from '@common/components/CollapsibleList';
+import Details from '@common/components/Details';
 import {
   Form,
   FormFieldCheckboxSearchSubGroups,
@@ -110,134 +111,149 @@ const FiltersForm = (props: Props & InjectedWizardProps) => {
 
         if (isActive) {
           return (
-            <Form {...form} id={formId} showSubmitError>
-              {stepHeading}
+            <>
+              <Form {...form} id={formId} showSubmitError>
+                {stepHeading}
 
-              <FormGroup>
-                <div className="govuk-grid-row">
-                  <div className="govuk-grid-column-one-half-from-desktop">
-                    <FormFieldCheckboxSearchSubGroups
-                      name="indicators"
-                      legend={
-                        <>
-                          Indicators
-                          <FormCheckboxSelectedCount name="indicators" />
-                        </>
-                      }
-                      legendSize="m"
-                      hint="Select at least one indicator below"
-                      disabled={form.isSubmitting}
-                      order={[]}
-                      options={Object.values(subjectMeta.indicators).map(
-                        group => ({
-                          legend: group.label,
-                          options: group.options,
-                        }),
-                      )}
-                    />
-
-                    {Object.entries(subjectMeta.filters).length > 0 && (
-                      <FormFieldset
-                        id="filters"
-                        legend="Categories"
+                <FormGroup>
+                  <div className="govuk-grid-row">
+                    <div className="govuk-grid-column-one-half-from-desktop">
+                      <FormFieldCheckboxSearchSubGroups
+                        name="indicators"
+                        legend={
+                          <>
+                            Indicators
+                            <FormCheckboxSelectedCount name="indicators" />
+                          </>
+                        }
                         legendSize="m"
-                        hint="Select at least one option from all categories"
-                        error={getError('filters')}
-                      >
-                        {Object.entries(subjectMeta.filters).map(
-                          ([filterKey, filterGroup]) => {
-                            const filterName = `filters.${filterKey}`;
+                        hint="Select at least one indicator below"
+                        disabled={form.isSubmitting}
+                        order={[]}
+                        options={Object.values(subjectMeta.indicators).map(
+                          group => ({
+                            legend: group.label,
+                            options: group.options,
+                          }),
+                        )}
+                      />
 
-                            return (
-                              <FormFieldCheckboxGroupsMenu
-                                key={filterKey}
-                                name={filterName}
-                                legend={filterGroup.legend}
-                                hint={filterGroup.hint}
-                                disabled={form.isSubmitting}
-                                options={Object.values(filterGroup.options).map(
-                                  group => ({
+                      {Object.entries(subjectMeta.filters).length > 0 && (
+                        <FormFieldset
+                          id="filters"
+                          legend="Categories"
+                          legendSize="m"
+                          hint="Select at least one option from all categories"
+                          error={getError('filters')}
+                        >
+                          {Object.entries(subjectMeta.filters).map(
+                            ([filterKey, filterGroup]) => {
+                              const filterName = `filters.${filterKey}`;
+
+                              return (
+                                <FormFieldCheckboxGroupsMenu
+                                  key={filterKey}
+                                  name={filterName}
+                                  legend={filterGroup.legend}
+                                  hint={filterGroup.hint}
+                                  disabled={form.isSubmitting}
+                                  options={Object.values(
+                                    filterGroup.options,
+                                  ).map(group => ({
                                     legend: group.label,
                                     options: group.options,
-                                  }),
-                                )}
-                              />
-                            );
-                          },
-                        )}
-                      </FormFieldset>
-                    )}
+                                  }))}
+                                />
+                              );
+                            },
+                          )}
+                        </FormFieldset>
+                      )}
+                    </div>
                   </div>
-                </div>
-              </FormGroup>
+                </FormGroup>
 
-              <WizardStepFormActions
-                {...props}
-                submitText="Create table"
-                submittingText="Creating table"
-                onSubmitClick={() => {
-                  // Automatically select totalValue for filters that haven't had a selection made
-                  Object.keys(form.values.filters).forEach(filterName => {
-                    if (
-                      form.values.filters[filterName].length === 0 &&
-                      subjectMeta.filters[filterName].totalValue
-                    ) {
-                      form.setFieldValue(`filters.${filterName}`, [
-                        subjectMeta.filters[filterName].totalValue,
-                      ]);
-                    }
-                  });
-                }}
-              />
-            </Form>
+                <WizardStepFormActions
+                  {...props}
+                  submitText="Create table"
+                  submittingText="Creating table"
+                  onSubmitClick={() => {
+                    // Automatically select totalValue for filters that haven't had a selection made
+                    Object.keys(form.values.filters).forEach(filterName => {
+                      if (
+                        form.values.filters[filterName].length === 0 &&
+                        subjectMeta.filters[filterName].totalValue
+                      ) {
+                        form.setFieldValue(`filters.${filterName}`, [
+                          subjectMeta.filters[filterName].totalValue,
+                        ]);
+                      }
+                    });
+                  }}
+                />
+              </Form>
+              <h2 className="govuk-heading-m govuk-!-margin-top-9">
+                View or edit previous step
+              </h2>
+            </>
           );
         }
 
         return (
           <>
-            {stepHeading}
+            <div className="govuk-grid-row">
+              <div className="govuk-grid-column-one-quarter">
+                {stepHeading}
 
-            <ResetFormOnPreviousStep
-              currentStep={currentStep}
-              stepNumber={stepNumber}
-            />
+                <ResetFormOnPreviousStep
+                  currentStep={currentStep}
+                  stepNumber={stepNumber}
+                />
+              </div>
+              <div className="govuk-grid-column-three-quarters">
+                <Details
+                  summary="View details"
+                  className="govuk-!-margin-bottom-2"
+                >
+                  <SummaryList noBorder>
+                    <SummaryListItem term="Indicators">
+                      <CollapsibleList>
+                        {Object.values(subjectMeta.indicators)
+                          .flatMap(group => group.options)
+                          .filter(indicator =>
+                            form.values.indicators.includes(indicator.value),
+                          )
+                          .map(indicator => (
+                            <li key={indicator.value}>{indicator.label}</li>
+                          ))}
+                      </CollapsibleList>
+                    </SummaryListItem>
 
-            <SummaryList noBorder>
-              <SummaryListItem term="Indicators">
-                <CollapsibleList>
-                  {Object.values(subjectMeta.indicators)
-                    .flatMap(group => group.options)
-                    .filter(indicator =>
-                      form.values.indicators.includes(indicator.value),
-                    )
-                    .map(indicator => (
-                      <li key={indicator.value}>{indicator.label}</li>
-                    ))}
-                </CollapsibleList>
-              </SummaryListItem>
-
-              {Object.entries(subjectMeta.filters)
-                .filter(([groupKey]) => !!form.values.filters[groupKey])
-                .map(([filterGroupKey, filterGroup]) => (
-                  <SummaryListItem
-                    key={filterGroupKey}
-                    term={filterGroup.legend}
-                  >
-                    <CollapsibleList>
-                      {Object.values(filterGroup.options)
-                        .flatMap(group => group.options)
-                        .filter(option =>
-                          form.values.filters[filterGroupKey].includes(
-                            option.value,
-                          ),
-                        )
-                        .map(option => (
-                          <li key={option.value}>{option.label}</li>
-                        ))}
-                    </CollapsibleList>
-                  </SummaryListItem>
-                ))}
-            </SummaryList>
+                    {Object.entries(subjectMeta.filters)
+                      .filter(([groupKey]) => !!form.values.filters[groupKey])
+                      .map(([filterGroupKey, filterGroup]) => (
+                        <SummaryListItem
+                          key={filterGroupKey}
+                          term={filterGroup.legend}
+                        >
+                          <CollapsibleList>
+                            {Object.values(filterGroup.options)
+                              .flatMap(group => group.options)
+                              .filter(option =>
+                                form.values.filters[filterGroupKey].includes(
+                                  option.value,
+                                ),
+                              )
+                              .map(option => (
+                                <li key={option.value}>{option.label}</li>
+                              ))}
+                          </CollapsibleList>
+                        </SummaryListItem>
+                      ))}
+                  </SummaryList>
+                </Details>
+              </div>
+            </div>
           </>
         );
       }}

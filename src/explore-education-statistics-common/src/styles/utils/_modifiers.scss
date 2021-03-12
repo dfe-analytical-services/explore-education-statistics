@@ -12,3 +12,20 @@
 .dfe-multiline-content {
   white-space: pre-line;
 }
+
+.dfe-custom-details .govuk-details__summary {
+  background: govuk-colour('light-grey');
+  box-shadow: 0 2px 0 govuk-colour('mid-grey');
+  font-size: 1.2rem;
+  font-weight: 700;
+  padding: 0.5rem 1rem 0.5rem 2rem;
+
+  &-text {
+    text-decoration: none;
+  }
+
+  &::before {
+    left: 1rem !important;
+    //border-color: $govuk-link-colour;
+  }
+}

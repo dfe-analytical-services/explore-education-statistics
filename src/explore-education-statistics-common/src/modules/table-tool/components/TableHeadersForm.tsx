@@ -51,109 +51,119 @@ const TableHeadersForm = ({
   );
 
   return (
-    <Details summary="Re-order table headers">
-      <p className="govuk-hint">
-        Drag and drop the options below to re-order the table headers. For
-        keyboard users, select and deselect a draggable item with space and use
-        the arrow keys to move a selected item.
-      </p>
-      <div className="govuk-visually-hidden">
-        To move a draggable item, select and deselect the item with space and
-        use the arrow keys to move a selected item. If you are using a screen
-        reader disable scan mode.
-      </div>
+    <Details summary="Re-order table headers" className="dfe-custom-details">
+      <div className="govuk-!-width-one-half">
+        <p className="govuk-hint">
+          Drag and drop the options below to re-order the table headers. For
+          keyboard users, select and deselect a draggable item with space and
+          use the arrow keys to move a selected item.
+        </p>
+        <div className="govuk-visually-hidden">
+          To move a draggable item, select and deselect the item with space and
+          use the arrow keys to move a selected item. If you are using a screen
+          reader disable scan mode.
+        </div>
 
-      <Formik<FormValues>
-        enableReinitialize
-        initialValues={{
-          columnGroups: compact([
-            ...(initialValues?.columnGroups ?? []),
-            initialValues?.columns,
-          ]),
-          rowGroups: compact([
-            ...(initialValues?.rowGroups ?? []),
-            initialValues?.rows,
-          ]),
-        }}
-        validationSchema={Yup.object<FormValues>({
-          rowGroups: Yup.array()
-            .of(Yup.array().of<Filter>(Yup.object()).ensure())
-            .min(1, 'Must have at least one row group'),
-          columnGroups: Yup.array()
-            .of(Yup.array().of<Filter>(Yup.object()).ensure())
-            .min(1, 'Must have at least one column group'),
-        })}
-        onSubmit={handleSubmit}
-      >
-        {form => {
-          return (
-            <Form>
-              <DragDropContext
-                onDragEnd={result => {
-                  const { source, destination } = result;
+        <Formik<FormValues>
+          enableReinitialize
+          initialValues={{
+            columnGroups: compact([
+              ...(initialValues?.columnGroups ?? []),
+              initialValues?.columns,
+            ]),
+            rowGroups: compact([
+              ...(initialValues?.rowGroups ?? []),
+              initialValues?.rows,
+            ]),
+          }}
+          validationSchema={Yup.object<FormValues>({
+            rowGroups: Yup.array()
+              .of(Yup.array().of<Filter>(Yup.object()).ensure())
+              .min(1, 'Must have at least one row group'),
+            columnGroups: Yup.array()
+              .of(Yup.array().of<Filter>(Yup.object()).ensure())
+              .min(1, 'Must have at least one column group'),
+          })}
+          onSubmit={handleSubmit}
+        >
+          {form => {
+            return (
+              <Form>
+                <DragDropContext
+                  onDragEnd={result => {
+                    const { source, destination } = result;
 
-                  if (!destination) {
-                    return;
-                  }
+                    if (!destination) {
+                      return;
+                    }
 
-                  const destinationId = destination.droppableId as keyof FormValues;
-                  const sourceId = source.droppableId as keyof FormValues;
+                    const destinationId = destination.droppableId as keyof FormValues;
+                    const sourceId = source.droppableId as keyof FormValues;
 
-                  if (destinationId === sourceId) {
-                    form.setFieldTouched(destinationId);
-                    form.setFieldValue(
-                      destinationId,
-                      reorder(
-                        form.values[destinationId] as unknown[],
-                        source.index,
-                        destination.index,
-                      ),
+                    if (destinationId === sourceId) {
+                      form.setFieldTouched(destinationId);
+                      form.setFieldValue(
+                        destinationId,
+                        reorder(
+                          form.values[destinationId] as unknown[],
+                          source.index,
+                          destination.index,
+                        ),
+                      );
+
+                      return;
+                    }
+
+                    const nextSourceValue = [...form.values[sourceId]];
+                    const nextDestinationValue = [
+                      ...form.values[destinationId],
+                    ];
+
+                    const [sourceItem] = nextSourceValue.splice(
+                      source.index,
+                      1,
+                    );
+                    nextDestinationValue.splice(
+                      destination.index,
+                      0,
+                      sourceItem,
                     );
 
-                    return;
-                  }
+                    form.setFieldValue(sourceId, nextSourceValue);
+                    form.setFieldValue(destinationId, nextDestinationValue);
 
-                  const nextSourceValue = [...form.values[sourceId]];
-                  const nextDestinationValue = [...form.values[destinationId]];
+                    form.setFieldTouched(sourceId);
+                    form.setFieldTouched(destinationId);
+                  }}
+                >
+                  <FormGroup>
+                    <div className="govuk-!-margin-bottom-2 column-group">
+                      <FormFieldSortableListGroup<
+                        PickByType<TableHeadersConfig, Filter[][]>
+                      >
+                        name="columnGroups"
+                        legend="Column groups"
+                        groupLegend="Column group"
+                      />
+                    </div>
+                    <div className="govuk-!-margin-bottom-2 row-group">
+                      <FormFieldSortableListGroup<
+                        PickByType<TableHeadersConfig, Filter[][]>
+                      >
+                        name="rowGroups"
+                        legend="Row groups"
+                        groupLegend="Row group"
+                      />
+                    </div>
+                  </FormGroup>
+                </DragDropContext>
 
-                  const [sourceItem] = nextSourceValue.splice(source.index, 1);
-                  nextDestinationValue.splice(destination.index, 0, sourceItem);
-
-                  form.setFieldValue(sourceId, nextSourceValue);
-                  form.setFieldValue(destinationId, nextDestinationValue);
-
-                  form.setFieldTouched(sourceId);
-                  form.setFieldTouched(destinationId);
-                }}
-              >
-                <FormGroup>
-                  <div className="govuk-!-margin-bottom-2">
-                    <FormFieldSortableListGroup<
-                      PickByType<TableHeadersConfig, Filter[][]>
-                    >
-                      name="rowGroups"
-                      legend="Row groups"
-                      groupLegend="Row group"
-                    />
-                  </div>
-
-                  <div className="govuk-!-margin-bottom-2">
-                    <FormFieldSortableListGroup<
-                      PickByType<TableHeadersConfig, Filter[][]>
-                    >
-                      name="columnGroups"
-                      legend="Column groups"
-                      groupLegend="Column group"
-                    />
-                  </div>
-                </FormGroup>
-              </DragDropContext>
-
-              <Button type="submit">Re-order table</Button>
-            </Form>
-          );
-        }}
-      </Formik>
+                <Button type="submit">Re-order table</Button>
+              </Form>
+            );
+          }}
+        </Formik>
+      </div>
     </Details>
   );
 };

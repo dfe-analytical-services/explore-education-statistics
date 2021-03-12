@@ -29,9 +29,10 @@
   margin-bottom: govuk-spacing(2);
   margin-right: govuk-spacing(2);
   padding: govuk-spacing(2);
+  position: relative;
 
   @include govuk-media-query($from: desktop) {
-    flex-basis: 33%;
+    flex-basis: 100%;
   }
 
   &:focus {
@@ -46,6 +47,14 @@
     cursor: move;
     cursor: grab;
   }
+}
+
+.listDraggableGroupIcon {
+  font-size: 2rem;
+  font-weight: bold;
+  position: absolute;
+  right: 20px;
+  top: 0;
 }
 
 .isDragging {

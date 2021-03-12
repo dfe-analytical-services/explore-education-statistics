@@ -14,7 +14,7 @@ const WizardStepHeading = ({
   currentStep,
   fieldsetHeading = false,
   isActive,
-  size = 'l',
+  size = 's',
   stepNumber,
   setCurrentStep,
 }: Props & InjectedWizardProps) => {
@@ -24,35 +24,36 @@ const WizardStepHeading = ({
     <>
       {isActive ? (
         <h2
-          className={classNames(`govuk-heading-${size}`, {
+          className={classNames(`govuk-heading-l`, {
             'govuk-fieldset__heading': fieldsetHeading,
           })}
         >
-          <span className="govuk-visually-hidden">{`Step ${stepNumber} (current): `}</span>
+          <span className="govuk-visually-hidden">{`Step ${stepNumber}: `}</span>
           {children}
         </h2>
       ) : (
-        <h2
-          className={classNames(`govuk-heading-${size}`, {
-            [styles.stepEnabled]: stepEnabled,
-          })}
-        >
+        <>
+          <h2
+            className={classNames(
+              `govuk-heading-${size}`,
+              {
+                [styles.stepEnabled]: stepEnabled,
+              },
+              'govuk-!-margin-bottom-0',
+            )}
+          >
+            <span>{`Step ${stepNumber}: `}</span>
+            {children}
+          </h2>
           <button
             data-testid={`wizardStep-${stepNumber}-goToButton`}
             type="button"
             onClick={() => setCurrentStep(stepNumber)}
-            className={styles.stepButton}
+            className="govuk-button govuk-button--secondary govuk-!-margin-bottom-3 govuk-!-margin-top-1"
           >
-            <span className="govuk-visually-hidden">{`Step ${stepNumber}: `}</span>
-            {children}
-
-            {stepEnabled && (
-              <span className={styles.toggleText} aria-hidden>
-                Go to this step
-              </span>
-            )}
+            {stepEnabled && <>Edit this step</>}
           </button>
-        </h2>
+        </>
       )}
     </>
   );

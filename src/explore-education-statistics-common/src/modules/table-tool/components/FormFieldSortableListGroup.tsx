@@ -77,6 +77,12 @@ function FormFieldSortableListGroup<FormValues>({
                         onMouseEnter={toggleDragDisabled.on}
                         onMouseLeave={toggleDragDisabled.off}
                       />
+                      <span
+                        className={styles.listDraggableGroupIcon}
+                        title="Reposition this group by dragging and swapping positions with other groups. Groups can also be dragged between column and row groups."
+                      >
+                        ⋯
+                      </span>
                     </div>
                   )}
                 </Draggable>

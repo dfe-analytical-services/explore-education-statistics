@@ -82,13 +82,11 @@ const TableToolPage: NextPage<TableToolPageProps> = ({
   }, [fastTrack, initialPublication, subjectMeta]);
 
   return (
-    <Page title="Create your own tables online" caption="Table Tool" wide>
+    <Page title="Create your own tables" caption="Table Tool" wide>
       <p>
         Choose the data and area of interest you want to explore and then use
         filters to create your table.
-      </p>
-
-      <p>
+        <br />
         Once you've created your table, you can download the data it contains
         for your own offline analysis.
       </p>
@@ -129,6 +127,9 @@ const TableToolPage: NextPage<TableToolPageProps> = ({
                     tableHeaders={response.tableHeaders}
                   />
                 )}
+                <h3 className="govuk-!-margin-top-9" id="edit-table">
+                  Update your table by editing any of the steps below
+                </h3>
               </>
             )}
           </WizardStep>

@@ -1,3 +1,4 @@
+import Details from '@common/components/Details';
 import InsetText from '@common/components/InsetText';
 import SummaryList from '@common/components/SummaryList';
 import SummaryListItem from '@common/components/SummaryListItem';
@@ -48,23 +49,25 @@ const SubjectStep = ({
 
   if (isActive) {
     const form = (
-      <SubjectForm
-        {...stepProps}
-        initialValues={{
-          subjectId,
-        }}
-        options={subjects}
-        onSubmit={onSubmit}
-        legendSize={hasHighlights ? 'm' : 'l'}
-        legend={
-          hasHighlights ? (
-            <h3 className="govuk-fieldset__heading">Choose a subject</h3>
-          ) : (
-            heading
-          )
-        }
-        legendHint="Choose a subject to create your table from, more information on the data coverage can be found by viewing more details"
-      />
+      <>
+        <SubjectForm
+          {...stepProps}
+          initialValues={{
+            subjectId,
+          }}
+          options={subjects}
+          onSubmit={onSubmit}
+          legendSize={hasHighlights ? 'm' : 'l'}
+          legend={
+            hasHighlights ? (
+              <h3 className="govuk-fieldset__heading">Choose a subject</h3>
+            ) : (
+              heading
+            )
+          }
+          legendHint="Choose a subject to create your table from, more information on the data coverage can be found by viewing more details"
+        />
+      </>
     );
 
     return hasHighlights ? (
@@ -90,10 +93,17 @@ const SubjectStep = ({
               />
             )}
 
-            <p>If you can't find the table you're looking for, then you can </p>
-            <a className="govuk-button" href={`#${subjectTabIds.createTable}`}>
-              Create your own table
-            </a>
+            <InsetText>
+              <p>
+                If you can't find the table you're looking for, then you can{' '}
+              </p>
+              <a
+                className="govuk-button"
+                href={`#${subjectTabIds.createTable}`}
+              >
+                Create your own table
+              </a>
+            </InsetText>
           </TabsSection>
           <TabsSection
             title="Create your own table"
@@ -102,9 +112,17 @@ const SubjectStep = ({
             {form}
           </TabsSection>
         </Tabs>
+        <h2 className="govuk-heading-m govuk-!-margin-top-9">
+          View or edit previous step
+        </h2>
       </>
     ) : (
-      form
+      <>
+        {form}
+        <h2 className="govuk-heading-m govuk-!-margin-top-9">
+          View or edit previous step
+        </h2>
+      </>
     );
   }
 
@@ -113,11 +131,16 @@ const SubjectStep = ({
 
   return (
     <>
-      {heading}
-
-      <SummaryList noBorder>
-        <SummaryListItem term="Subject">{subjectName}</SummaryListItem>
-      </SummaryList>
+      <div className="govuk-grid-row">
+        <div className="govuk-grid-column-one-quarter">{heading}</div>
+        <div className="govuk-grid-column-three-quarters">
+          <Details summary="View details" className="govuk-!-margin-bottom-2">
+            <SummaryList noBorder>
+              <SummaryListItem term="Subject">{subjectName}</SummaryListItem>
+            </SummaryList>
+          </Details>
+        </div>
+      </div>
     </>
   );
 };

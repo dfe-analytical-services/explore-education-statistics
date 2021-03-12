@@ -11,6 +11,14 @@
   outline-offset: 0;
 }
 
+.listDraggableGroupIcon {
+  font-size: 2rem;
+  font-weight: bold;
+  position: absolute;
+  right: 20px;
+  top: 0;
+}
+
 .optionRow {
   background: #fff;
   border-bottom: 1px solid govuk-colour('mid-grey');
@@ -32,6 +40,13 @@
 .optionText {
   display: flex;
   justify-content: space-between;
+}
+
+.optionDraggableIcon {
+  color: govuk-colour('mid-grey');
+  font-size: 2rem;
+  font-weight: bold;
+  line-height: 1rem;
 }
 
 .optionActions {

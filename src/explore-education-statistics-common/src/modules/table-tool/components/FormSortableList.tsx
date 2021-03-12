@@ -76,7 +76,12 @@ const FormSortableList = ({
                     >
                       <div className={styles.optionText}>
                         <strong>{option.label}</strong>
-                        <span>⇅</span>
+                        <span
+                          className={styles.optionDraggableIcon}
+                          title="Reposition this element by dragging and dropping within this group"
+                        >
+                          ⋯
+                        </span>
                       </div>
                     </div>
                   )}

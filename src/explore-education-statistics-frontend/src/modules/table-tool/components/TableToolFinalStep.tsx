@@ -1,4 +1,5 @@
 import ButtonText from '@common/components/ButtonText';
+import Details from '@common/components/Details';
 import UrlContainer from '@common/components/UrlContainer';
 import LoadingSpinner from '@common/components/LoadingSpinner';
 import useAsyncRetry from '@common/hooks/useAsyncRetry';
@@ -16,6 +17,7 @@ import React, { memo, useEffect, useRef, useState } from 'react';
 import DownloadCsvButton from '@common/modules/table-tool/components/DownloadCsvButton';
 import { logEvent } from '@frontend/services/googleAnalyticsService';
 import DownloadExcelButton from '@common/modules/table-tool/components/DownloadExcelButton';
+// import { Details } from 'govuk-frontend';
 
 interface TableToolFinalStepProps {
   publication: FinalStepRenderProps['publication'];
@@ -93,33 +95,106 @@ const TableToolFinalStep = ({
           tableHeadersConfig={currentTableHeaders}
         />
       )}
-
-      <h3>Share your table</h3>
-      <ul className="govuk-list">
-        <li>
+      <div className="govuk-grid-row">
+        <div className="govuk-grid-column-one-half">
+          {publication && table && (
+            <Details summary="Download data">
+              <ul className="govuk-list">
+                <li>
+                  <DownloadCsvButton
+                    fileName={`data-${publication.slug}`}
+                    fullTable={table}
+                    onClick={() =>
+                      logEvent({
+                        category: 'Table tool',
+                        action: 'CSV download button clicked',
+                        label: `${table.subjectMeta.publicationName} between ${
+                          table.subjectMeta.timePeriodRange[0].label
+                        } and ${
+                          table.subjectMeta.timePeriodRange[
+                            table.subjectMeta.timePeriodRange.length - 1
+                          ].label
+                        }`,
+                      })
+                    }
+                  />
+                </li>
+                <li>
+                  <DownloadExcelButton
+                    fileName={`data-${publication.slug}`}
+                    tableRef={dataTableRef}
+                    subjectMeta={table.subjectMeta}
+                    onClick={() =>
+                      logEvent({
+                        category: 'Table tool',
+                        action: 'Excel download button clicked',
+                        label: `${table.subjectMeta.publicationName} between ${
+                          table.subjectMeta.timePeriodRange[0].label
+                        } and ${
+                          table.subjectMeta.timePeriodRange[
+                            table.subjectMeta.timePeriodRange.length - 1
+                          ].label
+                        }`,
+                      })
+                    }
+                  />
+                </li>
+                <li>
+                  {pubMethodology?.methodology?.slug && (
+                    <Link
+                      to="/methodology/[methodology]"
+                      as={`/methodology/${pubMethodology.methodology.slug}`}
+                    >
+                      Go to methodology
+                    </Link>
+                  )}
+                  {pubMethodology?.externalMethodology?.url && (
+                    <a href={pubMethodology.externalMethodology.url}>
+                      Go to methodology
+                    </a>
+                  )}
+                </li>
+              </ul>
+            </Details>
+          )}
+        </div>
+        <div className="govuk-grid-column-one-half dfe-align--right">
           {permalinkId ? (
             <>
-              <p className="govuk-!-margin-bottom-2">
-                Generated permanent link:
-              </p>
+              <div className="dfe-align--left">
+                <h3 className="govuk-heading-s">Generated share link</h3>
 
-              <p className="govuk-!-margin-top-0 govuk-!-margin-bottom-2">
-                <UrlContainer
-                  data-testid="permalink-generated-url"
-                  url={`${window.location.origin}/data-tables/permalink/${permalinkId}`}
-                />
-              </p>
+                <div className="govuk-inset-text">
+                  Use the link below to see a version of this page that you can
+                  bookmark for future reference, or copy the link to send on to
+                  somebody else to view.
+                </div>
 
-              <Link
-                className="govuk-!-margin-top-0"
-                to="/data-tables/permalink/[permalink]"
-                as={`/data-tables/permalink/${permalinkId}`}
-                title="View created table permalink"
-                target="_blank"
-                rel="noopener noreferrer"
-              >
-                View permanent link
-              </Link>
+                <p className="govuk-!-margin-top-0 govuk-!-margin-bottom-2">
+                  <UrlContainer
+                    data-testid="permalink-generated-url"
+                    url={`${window.location.origin}/data-tables/permalink/${permalinkId}`}
+                  />
+                </p>
+
+                <a
+                  href="#"
+                  className="govuk-button govuk-button--secondary govuk-!-margin-right-3"
+                >
+                  Copy link
+                </a>
+
+                <Link
+                  className="govuk-!-margin-top-0 govuk-button"
+                  to="/data-tables/permalink/[permalink]"
+                  as={`/data-tables/permalink/${permalinkId}`}
+                  title="View created table permalink"
+                  target="_blank"
+                  rel="noopener noreferrer"
+                >
+                  View share link
+                </Link>
+              </div>
             </>
           ) : (
             <LoadingSpinner
@@ -130,84 +205,27 @@ const TableToolFinalStep = ({
               text="Generating permanent link"
             >
               <ButtonText onClick={() => handlePermalinkClick()}>
-                Generate permanent link
+                Share your table
               </ButtonText>
             </LoadingSpinner>
           )}
-        </li>
-      </ul>
-
-      <h3>Additional options</h3>
-      {publication && table && (
-        <ul className="govuk-list">
-          <li>
+        </div>
+      </div>
+      <div className="govuk-inset-text">
+        <p className="govuk-body">
+          If you have a question about the data or methods used to create this
+          table contact the named statistician via the relevant release page.{' '}
+          <br />
+          {publication && table && (
             <Link
               to="/find-statistics/[publication]"
               as={`/find-statistics/${publication.slug}`}
             >
               View the release for this data
             </Link>
-          </li>
-          <li>
-            <DownloadCsvButton
-              fileName={`data-${publication.slug}`}
-              fullTable={table}
-              onClick={() =>
-                logEvent({
-                  category: 'Table tool',
-                  action: 'CSV download button clicked',
-                  label: `${table.subjectMeta.publicationName} between ${
-                    table.subjectMeta.timePeriodRange[0].label
-                  } and ${
-                    table.subjectMeta.timePeriodRange[
-                      table.subjectMeta.timePeriodRange.length - 1
-                    ].label
-                  }`,
-                })
-              }
-            />
-          </li>
-          <li>
-            <DownloadExcelButton
-              fileName={`data-${publication.slug}`}
-              tableRef={dataTableRef}
-              subjectMeta={table.subjectMeta}
-              onClick={() =>
-                logEvent({
-                  category: 'Table tool',
-                  action: 'Excel download button clicked',
-                  label: `${table.subjectMeta.publicationName} between ${
-                    table.subjectMeta.timePeriodRange[0].label
-                  } and ${
-                    table.subjectMeta.timePeriodRange[
-                      table.subjectMeta.timePeriodRange.length - 1
-                    ].label
-                  }`,
-                })
-              }
-            />
-          </li>
-          <li>
-            {pubMethodology?.methodology?.slug && (
-              <Link
-                to="/methodology/[methodology]"
-                as={`/methodology/${pubMethodology.methodology.slug}`}
-              >
-                Go to methodology
-              </Link>
-            )}
-            {pubMethodology?.externalMethodology?.url && (
-              <a href={pubMethodology.externalMethodology.url}>
-                Go to methodology
-              </a>
-            )}
-          </li>
-        </ul>
-      )}
-      <p className="govuk-body">
-        If you have a question about the data or methods used to create this
-        table contact the named statistician via the relevant release page.
-      </p>
+          )}
+        </p>
+      </div>
     </div>
   );
 };

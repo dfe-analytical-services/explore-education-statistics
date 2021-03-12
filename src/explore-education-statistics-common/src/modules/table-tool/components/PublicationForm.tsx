@@ -1,3 +1,4 @@
+import Details from '@common/components/Details';
 import DetailsMenu from '@common/components/DetailsMenu';
 import {
   Form,
@@ -12,7 +13,6 @@ import { Theme } from '@common/services/tableBuilderService';
 import createErrorHelper from '@common/validation/createErrorHelper';
 import Yup from '@common/validation/yup';
 import { Formik } from 'formik';
-import camelCase from 'lodash';
 import React, { useState } from 'react';
 import { InjectedWizardProps } from './Wizard';
 import WizardStepFormActions from './WizardStepFormActions';
@@ -198,12 +198,18 @@ const PublicationForm = (props: Props & InjectedWizardProps) => {
 
         return (
           <>
-            {stepHeading}
-            <SummaryList noBorder>
-              <SummaryListItem term="Publication">
-                {publication?.title}
-              </SummaryListItem>
-            </SummaryList>
+            <div className="govuk-grid-row">
+              <div className="govuk-grid-column-one-quarter">{stepHeading}</div>
+              <div className="govuk-grid-column-three-quarters">
+                <Details summary="View details">
+                  <SummaryList noBorder>
+                    <SummaryListItem term="Publication">
+                      {publication?.title}
+                    </SummaryListItem>
+                  </SummaryList>
+                </Details>
+              </div>
+            </div>
           </>
         );
       }}

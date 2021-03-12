@@ -2,23 +2,23 @@
 
 $circle-size: 40px;
 $circle-border-size: 4px;
-$step-padding-top: govuk-spacing(6);
+$step-padding-top: govuk-spacing(2);
 $step-padding-top-mobile: govuk-spacing(7);
 
 .step {
   align-items: flex-start;
   display: flex;
-  padding-left: govuk-spacing(8);
+  //padding-left: govuk-spacing(8);
   position: relative;
-  @include govuk-media-query($until: tablet) {
+  /* @include govuk-media-query($until: tablet) {
     padding-left: govuk-spacing(4);
-  }
+  }*/
 
   &.stepHidden {
     display: none;
   }
 
-  &::before {
+  /* &::before {
     border-left: $circle-border-size solid $govuk-border-colour;
     content: '';
     height: 100%;
@@ -36,7 +36,7 @@ $step-padding-top-mobile: govuk-spacing(7);
     position: absolute;
     width: $circle-size;
     z-index: 3;
-  }
+  }*/
 
   &:focus {
     outline: 0;
@@ -44,6 +44,8 @@ $step-padding-top-mobile: govuk-spacing(7);
 }
 
 .stepActive {
+  grid-area: main;
+
   &::before,
   &:last-child::after {
     border-color: govuk-colour('black');
@@ -51,10 +53,11 @@ $step-padding-top-mobile: govuk-spacing(7);
 
   .number {
     border-color: govuk-colour('black');
+    display: none;
   }
 }
 
-.number {
+/*.number {
   align-items: center;
   background: #fff;
   border: $circle-border-size solid $govuk-border-colour;
@@ -67,6 +70,10 @@ $step-padding-top-mobile: govuk-spacing(7);
   top: $step-padding-top;
   width: $circle-size;
   z-index: 3;
+}*/
+
+.number {
+  display: none;
 }
 
 .numberInner {
@@ -75,9 +82,9 @@ $step-padding-top-mobile: govuk-spacing(7);
 }
 
 .content {
-  border-top: 2px solid govuk-colour('light-grey');
+  border-bottom: 2px solid govuk-colour('light-grey');
   display: block;
-  padding-left: govuk-spacing(6);
+  //padding-left: govuk-spacing(6);
   padding-top: $step-padding-top;
   width: 100%;
   @include govuk-media-query($until: tablet) {
