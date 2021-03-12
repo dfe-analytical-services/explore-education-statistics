@@ -9,7 +9,5 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Services.Interfaces
         public Task Delete(Guid id);
 
         public Task<File> Get(Guid id);
-
-        public Task<string> GetSubjectName(Guid releaseId, Guid subjectId);
     }
 }

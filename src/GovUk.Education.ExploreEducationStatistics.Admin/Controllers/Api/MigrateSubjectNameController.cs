@@ -42,7 +42,9 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Controllers.Api
                 {
                     await _contentDbContext.ReleaseFiles
                         .Include(rf => rf.File)
-                        .Where(rf => rf.File.Type == FileType.Data)
+                        .Where(rf =>
+                            rf.File.Type == FileType.Data
+                            && rf.Name == null)
                         .ToList()
                         .ForEachAsync(async rf =>
                         {

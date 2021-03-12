@@ -116,7 +116,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Services
             var rf = await _contentDbContext
                 .ReleaseFiles
                 .Include(rf => rf.File)
-                .SingleOrDefaultAsync(rf =>
+                .SingleAsync(rf =>
                     rf.ReleaseId == releaseId
                     && rf.File.SubjectId == subjectId
                     && rf.File.Type == FileType.Data);

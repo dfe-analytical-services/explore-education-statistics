@@ -30,17 +30,5 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Services
             return await _contentDbContext.Files
                 .SingleAsync(f => f.Id == id);
         }
-
-        public async Task<string> GetSubjectName(Guid releaseId, Guid subjectId)
-        {
-            var releaseDataFile = await _contentDbContext
-                .ReleaseFiles
-                .Include(rf => rf.File)
-                .SingleOrDefaultAsync(rf => 
-                    rf.ReleaseId == releaseId
-                    && rf.File.SubjectId == subjectId
-                    && rf.File.Type == FileType.Data);
-            return releaseDataFile.Name;
-        }
     }
 }

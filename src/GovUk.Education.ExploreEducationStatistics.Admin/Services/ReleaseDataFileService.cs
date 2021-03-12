@@ -394,7 +394,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Services
             {
                 Id = dataFile.Id,
                 FileName = dataFile.Filename,
-                Name = dataFile.SubjectId.HasValue ? await GetSubjectName(dataFile) : blob.Name,
+                Name = await GetSubjectName(releaseId, dataFile),
                 Path = blob.Path,
                 Size = blob.Size,
                 MetaFileId = metaFile.Id,
@@ -427,7 +427,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Services
                     {
                         Id = dataFile.Id,
                         FileName = dataFile.Filename,
-                        Name = zipBlob.Name,
+                        Name = await GetSubjectName(releaseId, dataFile),
                         Path = dataFile.Filename,
                         Size = zipBlob.Size,
                         MetaFileId = null,
@@ -447,7 +447,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Services
             {
                 Id = dataFile.Id,
                 FileName = dataFile.Filename,
-                Name = await GetSubjectName(dataFile),
+                Name = await GetSubjectName(releaseId, dataFile),
                 Path = dataFile.Filename,
                 Size = "0.00 B",
                 MetaFileId = metaFile.Id,
@@ -460,21 +460,14 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Services
             };
         }
 
-        private async Task<string> GetSubjectName(File file)
+        private async Task<string> GetSubjectName(Guid releaseId, File file)
         {
             if (file.Type != FileType.Data)
             {
                 throw new ArgumentException("file.Type should equal FileType.Data");
             }
 
-            var releaseFile = await _contentDbContext
-                .ReleaseFiles
-                .Include(rf => rf.File)
-                .SingleOrDefaultAsync(rf =>
-                rf.FileId == file.Id
-                && rf.File.Type == FileType.Data);
-
-            return releaseFile.Name ?? "Unknown";
+            return (await _releaseFileRepository.Get(releaseId, file.Id)).Name ?? "Unknown";
         }
 
         private async Task<Either<ActionResult, string>> ValidateSubjectName(Guid releaseId,
@@ -486,7 +479,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Services
                     .OnSuccess(async () => await Task.FromResult(subjectName));
             }
 
-            return await GetSubjectName(replacingFile);
+            return await GetSubjectName(releaseId, replacingFile);
         }
 
         private async Task UploadFileToStorage(

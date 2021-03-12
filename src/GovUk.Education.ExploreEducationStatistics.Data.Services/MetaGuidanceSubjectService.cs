@@ -137,24 +137,24 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Services
         {
             var subject = releaseSubject.Subject;
 
-            var releaseFileData = await _contentDbContext
+            var releaseFile = await _contentDbContext
                 .ReleaseFiles
                 .Include(rf => rf.File)
-                .SingleOrDefaultAsync(rf =>
+                .SingleAsync(rf =>
                     rf.ReleaseId == releaseSubject.ReleaseId
                     && rf.File.SubjectId == releaseSubject.SubjectId
                     && rf.File.Type == FileType.Data);
-            var subjectName = releaseFileData.Name;
             
             var geographicLevels = await GetGeographicLevels(subject.Id);
             var timePeriods = await GetTimePeriods(subject.Id);
             var variables = GetVariables(subject.Id);
+
             return new MetaGuidanceSubjectViewModel
             {
                 Id = subject.Id,
                 Content = releaseSubject.MetaGuidance ?? "",
-                Filename = subject.Filename ?? "Unknown",
-                Name = subjectName,
+                Filename = releaseFile.File.Filename,
+                Name = releaseFile.Name ?? "Unknown",
                 GeographicLevels = geographicLevels,
                 TimePeriods = timePeriods,
                 Variables = variables
