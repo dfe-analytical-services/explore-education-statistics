@@ -116,7 +116,11 @@ const ReleaseDataBlockEditPage = ({
       <LoadingSpinner loading={isLoading}>
         <h2>{canUpdateRelease ? 'Edit data block' : 'View data block'}</h2>
 
-        <p className="govuk-!-margin-bottom-1">Select a data block to edit</p>
+        <p className="govuk-!-margin-bottom-1">
+          {canUpdateRelease
+            ? 'Select a data block to edit'
+            : 'Select a data block to view'}
+        </p>
         <div className={styles.dataBlockSelector}>
           <DataBlockSelector
             canUpdate={canUpdateRelease}
