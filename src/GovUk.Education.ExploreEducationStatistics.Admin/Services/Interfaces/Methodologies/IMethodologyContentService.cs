@@ -5,6 +5,7 @@ using GovUk.Education.ExploreEducationStatistics.Admin.Services.Methodologies;
 using GovUk.Education.ExploreEducationStatistics.Admin.ViewModels;
 using GovUk.Education.ExploreEducationStatistics.Admin.ViewModels.ManageContent;
 using GovUk.Education.ExploreEducationStatistics.Common.Model;
+using GovUk.Education.ExploreEducationStatistics.Content.Model;
 using Microsoft.AspNetCore.Mvc;
 
 namespace GovUk.Education.ExploreEducationStatistics.Admin.Services.Interfaces.Methodologies
@@ -12,6 +13,8 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Services.Interfaces.M
     public interface IMethodologyContentService
     {
         Task<Either<ActionResult, ManageMethodologyContentViewModel>> GetContentAsync(Guid methodologyId);
+
+        Task<Either<ActionResult, List<T>>> GetContentBlocks<T>(Guid methodologyId) where T : ContentBlock;
 
         Task<Either<ActionResult, List<ContentSectionViewModel>>> GetContentSectionsAsync(
             Guid releaseId,

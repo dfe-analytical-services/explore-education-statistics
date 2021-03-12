@@ -29,6 +29,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Services.Methodologie
         private readonly IPersistenceHelper<ContentDbContext> _persistenceHelper;
         private readonly IBlobStorageService _blobStorageService;
         private readonly IFileUploadsValidatorService _fileUploadsValidatorService;
+        private readonly IFileRepository _fileRepository;
         private readonly IMethodologyFileRepository _methodologyFileRepository;
         private readonly IUserService _userService;
 
@@ -36,6 +37,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Services.Methodologie
             IPersistenceHelper<ContentDbContext> persistenceHelper,
             IBlobStorageService blobStorageService,
             IFileUploadsValidatorService fileUploadsValidatorService,
+            IFileRepository fileRepository,
             IMethodologyFileRepository methodologyFileRepository,
             IUserService userService)
         {
@@ -43,8 +45,28 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Services.Methodologie
             _persistenceHelper = persistenceHelper;
             _blobStorageService = blobStorageService;
             _fileUploadsValidatorService = fileUploadsValidatorService;
+            _fileRepository = fileRepository;
             _methodologyFileRepository = methodologyFileRepository;
             _userService = userService;
+        }
+
+        public async Task<Either<ActionResult, Unit>> Delete(Guid methodologyId, IEnumerable<Guid> fileIds)
+        {
+            return await _persistenceHelper
+                .CheckEntityExists<Methodology>(methodologyId)
+                .OnSuccess(async release => await _userService.CheckCanUpdateMethodology(release))
+                .OnSuccess(async release =>
+                    await fileIds.Select(fileId =>
+                        _methodologyFileRepository.CheckFileExists(methodologyId, fileId, Image)).OnSuccessAll())
+                .OnSuccessVoid(async files =>
+                {
+                    foreach (var file in files)
+                    {
+                        await _methodologyFileRepository.Delete(methodologyId, file.Id);
+                        await _blobStorageService.DeleteBlob(PrivateMethodologyFiles, file.Path());
+                        await _fileRepository.Delete(file.Id);
+                    }
+                });
         }
 
         public async Task<Either<ActionResult, FileStreamResult>> Stream(Guid methodologyId, Guid fileId)

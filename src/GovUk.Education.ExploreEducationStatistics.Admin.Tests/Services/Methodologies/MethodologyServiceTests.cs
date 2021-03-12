@@ -1,7 +1,9 @@
 using System;
 using System.Collections.Generic;
 using System.Threading.Tasks;
+using GovUk.Education.ExploreEducationStatistics.Admin.Services;
 using GovUk.Education.ExploreEducationStatistics.Admin.Services.Interfaces;
+using GovUk.Education.ExploreEducationStatistics.Admin.Services.Interfaces.Methodologies;
 using GovUk.Education.ExploreEducationStatistics.Admin.Services.Methodologies;
 using GovUk.Education.ExploreEducationStatistics.Admin.ViewModels.Methodology;
 using GovUk.Education.ExploreEducationStatistics.Common.Services.Interfaces.Security;
@@ -11,6 +13,7 @@ using GovUk.Education.ExploreEducationStatistics.Content.Model;
 using GovUk.Education.ExploreEducationStatistics.Content.Model.Database;
 using Moq;
 using Xunit;
+using static GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services.DbUtils;
 using static GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services.MapperUtils;
 using static GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services.ValidationTestUtil;
 using static GovUk.Education.ExploreEducationStatistics.Admin.Validators.ValidationErrorMessages;
@@ -28,12 +31,11 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services.Method
                 Title = "Pupil absence statistics: methodology"
             };
 
-            await using (var context = DbUtils.InMemoryApplicationDbContext())
+            await using (var context = InMemoryApplicationDbContext())
             {
-                var viewModel = (await BuildMethodologyService(
-                        context,
-                        Mocks())
-                    .CreateMethodologyAsync(request)).Right;
+                var service = SetupMethodologyService(contentDbContext: context);
+
+                var viewModel = (await service.CreateMethodologyAsync(request)).Right;
 
                 var model = await context.Methodologies.FindAsync(viewModel.Id);
 
@@ -56,19 +58,22 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services.Method
                 Title = "Pupil absence statistics: methodology"
             };
 
-            await using (var context = DbUtils.InMemoryApplicationDbContext("CreateSlugNotUnique"))
+            var contentDbContextId = Guid.NewGuid().ToString();
+
+            await using (var context = InMemoryApplicationDbContext(contentDbContextId))
             {
-                var createResult = await BuildMethodologyService(
-                        context,
-                        Mocks())
-                    .CreateMethodologyAsync(request);
+                var service = SetupMethodologyService(contentDbContext: context);
+
+                var createResult = await service.CreateMethodologyAsync(request);
 
                 Assert.True(createResult.IsRight);
+            }
 
-                var repeatedCreateResult = await BuildMethodologyService(
-                        context,
-                        Mocks())
-                    .CreateMethodologyAsync(request);
+            await using (var context = InMemoryApplicationDbContext(contentDbContextId))
+            {
+                var service = SetupMethodologyService(contentDbContext: context);
+
+                var repeatedCreateResult = await service.CreateMethodologyAsync(request);
 
                 Assert.True(repeatedCreateResult.IsLeft);
                 AssertValidationProblem(repeatedCreateResult.Left, SlugNotUnique);
@@ -92,7 +97,9 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services.Method
                 Status = Draft
             };
 
-            using (var context = DbUtils.InMemoryApplicationDbContext("List"))
+            var contentDbContextId = Guid.NewGuid().ToString();
+
+            await using (var context = InMemoryApplicationDbContext(contentDbContextId))
             {
                 await context.AddRangeAsync(new List<Methodology>
                 {
@@ -101,12 +108,11 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services.Method
                 await context.SaveChangesAsync();
             }
 
-            using (var context = DbUtils.InMemoryApplicationDbContext("List"))
+            using (var context = InMemoryApplicationDbContext(contentDbContextId))
             {
-                var methodologies = (await BuildMethodologyService(
-                        context,
-                        Mocks())
-                    .ListAsync()).Right;
+                var service = SetupMethodologyService(contentDbContext: context);
+
+                var methodologies = (await service.ListAsync()).Right;
 
                 Assert.Contains(methodologies,
                     m => m.Id == methodology1.Id
@@ -133,18 +139,19 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services.Method
                 Title = "Pupil absence statistics: methodology"
             };
 
-            await using (var context = DbUtils.InMemoryApplicationDbContext("GetSummary"))
+            var contentDbContextId = Guid.NewGuid().ToString();
+
+            await using (var context = InMemoryApplicationDbContext(contentDbContextId))
             {
                 context.Add(methodology);
                 await context.SaveChangesAsync();
             }
 
-            await using (var context = DbUtils.InMemoryApplicationDbContext("GetSummary"))
+            await using (var context = InMemoryApplicationDbContext(contentDbContextId))
             {
-                var viewModel = (await BuildMethodologyService(
-                        context,
-                        Mocks())
-                    .GetSummaryAsync(methodology.Id)).Right;
+                var service = SetupMethodologyService(contentDbContext: context);
+
+                var viewModel = (await service.GetSummaryAsync(methodology.Id)).Right;
 
                 Assert.Equal(methodology.Id, viewModel.Id);
                 Assert.Equal(methodology.InternalReleaseNote, viewModel.InternalReleaseNote);
@@ -172,30 +179,35 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services.Method
                 Title = "Pupil absence statistics (updated): methodology"
             };
 
-            await using (var context = DbUtils.InMemoryApplicationDbContext("Update"))
+            var contentDbContextId = Guid.NewGuid().ToString();
+
+            await using (var context = InMemoryApplicationDbContext(contentDbContextId))
             {
                 context.Add(methodology);
                 await context.SaveChangesAsync();
             }
 
-            await using (var context = DbUtils.InMemoryApplicationDbContext("Update"))
+            await using (var context = InMemoryApplicationDbContext(contentDbContextId))
             {
-                var viewModel = (await BuildMethodologyService(context,
-                        Mocks())
-                    .UpdateMethodologyAsync(methodology.Id, request)).Right;
+                var service = SetupMethodologyService(contentDbContext: context);
 
-                var model = await context.Methodologies.FindAsync(methodology.Id);
-
-                Assert.False(model.Live);
-                Assert.Equal("pupil-absence-statistics-updated-methodology", model.Slug);
-                Assert.True(model.Updated.HasValue);
-                Assert.InRange(DateTime.UtcNow.Subtract(model.Updated.Value).Milliseconds, 0, 1500);
+                var viewModel = (await service.UpdateMethodologyAsync(methodology.Id, request)).Right;
 
                 Assert.Equal(methodology.Id, viewModel.Id);
                 Assert.Null(viewModel.InternalReleaseNote);
                 Assert.Null(viewModel.Published);
                 Assert.Equal(request.Status, viewModel.Status);
                 Assert.Equal(request.Title, viewModel.Title);
+            }
+
+            await using (var context = InMemoryApplicationDbContext(contentDbContextId))
+            {
+                var model = await context.Methodologies.FindAsync(methodology.Id);
+
+                Assert.False(model.Live);
+                Assert.Equal("pupil-absence-statistics-updated-methodology", model.Slug);
+                Assert.True(model.Updated.HasValue);
+                Assert.InRange(DateTime.UtcNow.Subtract(model.Updated.Value).Milliseconds, 0, 1500);
             }
         }
 
@@ -219,26 +231,20 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services.Method
                 Title = "Pupil absence statistics (updated): methodology"
             };
 
-            await using (var context = DbUtils.InMemoryApplicationDbContext("Update"))
+            var contentDbContextId = Guid.NewGuid().ToString();
+
+            await using (var context = InMemoryApplicationDbContext(contentDbContextId))
             {
                 context.Add(methodology);
                 await context.SaveChangesAsync();
             }
 
-            await using (var context = DbUtils.InMemoryApplicationDbContext("Update"))
+            await using (var context = InMemoryApplicationDbContext(contentDbContextId))
             {
-                var viewModel = (await BuildMethodologyService(context,
-                        Mocks())
-                    .UpdateMethodologyAsync(methodology.Id, request)).Right;
+                var service = SetupMethodologyService(contentDbContext: context);
 
-                var model = await context.Methodologies.FindAsync(methodology.Id);
-                
-                Assert.True(model.Live);
-                // Slug remains unchanged
-                Assert.Equal("pupil-absence-statistics-methodology", model.Slug);
-                Assert.True(model.Updated.HasValue);
-                Assert.InRange(DateTime.UtcNow.Subtract(model.Updated.Value).Milliseconds, 0, 1500);
-                
+                var viewModel = (await service.UpdateMethodologyAsync(methodology.Id, request)).Right;
+
                 Assert.Equal(methodology.Id, viewModel.Id);
                 // TODO EES-331 is this correct?
                 // Original release note is not cleared if the update is not altering it
@@ -247,8 +253,19 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services.Method
                 Assert.Equal(request.Status, viewModel.Status);
                 Assert.Equal(request.Title, viewModel.Title);
             }
+
+            await using (var context = InMemoryApplicationDbContext(contentDbContextId))
+            {
+                var model = await context.Methodologies.FindAsync(methodology.Id);
+
+                Assert.True(model.Live);
+                // Slug remains unchanged
+                Assert.Equal("pupil-absence-statistics-methodology", model.Slug);
+                Assert.True(model.Updated.HasValue);
+                Assert.InRange(DateTime.UtcNow.Subtract(model.Updated.Value).Milliseconds, 0, 1500);
+            }
         }
-        
+
         [Fact]
         public async Task UpdateAsync_SlugNotUnique()
         {
@@ -277,7 +294,9 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services.Method
                 Title = "Pupil exclusion statistics: methodology"
             };
 
-            await using (var context = DbUtils.InMemoryApplicationDbContext("UpdateSlugNotUnique"))
+            var contentDbContextId = Guid.NewGuid().ToString();
+
+            await using (var context = InMemoryApplicationDbContext(contentDbContextId))
             {
                 await context.AddRangeAsync(new List<Methodology>
                 {
@@ -286,38 +305,38 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services.Method
                 await context.SaveChangesAsync();
             }
 
-            await using (var context = DbUtils.InMemoryApplicationDbContext("UpdateSlugNotUnique"))
+            await using (var context = InMemoryApplicationDbContext(contentDbContextId))
             {
-                var result = await BuildMethodologyService(
-                        context,
-                        Mocks())
-                    .UpdateMethodologyAsync(methodology1.Id, request);
+                var service = SetupMethodologyService(contentDbContext: context);
+
+                var result = (await service.UpdateMethodologyAsync(methodology1.Id, request));
 
                 Assert.True(result.IsLeft);
                 AssertValidationProblem(result.Left, SlugNotUnique);
             }
         }
-        
-        private static MethodologyService BuildMethodologyService(ContentDbContext context,
-            (Mock<IPublishingService> publishingService,
-                Mock<IUserService> userService) mocks)
-        {
-            var (publishingService, userService) = mocks;
 
+        private static MethodologyService SetupMethodologyService(
+            ContentDbContext contentDbContext,
+            IMethodologyContentService methodologyContentService = null,
+            IMethodologyRepository methodologyRepository = null,
+            IMethodologyFileRepository methodologyFileRepository = null,
+            IMethodologyImageService methodologyImageService = null,
+            IPublishingService publishingService = null,
+            ITestService testService = null,
+            IUserService userService = null)
+        {
             return new MethodologyService(
-                context,
+                new PersistenceHelper<ContentDbContext>(contentDbContext),
+                contentDbContext,
                 AdminMapper(),
-                publishingService.Object,
-                userService.Object,
-                new MethodologyRepository(context),
-                new PersistenceHelper<ContentDbContext>(context));
-        }
-
-        private static (Mock<IPublishingService> PublishingService,
-            Mock<IUserService> UserService) Mocks()
-        {
-            return (new Mock<IPublishingService>(),
-                MockUtils.AlwaysTrueUserService());
+                methodologyContentService ?? new Mock<IMethodologyContentService>().Object,
+                methodologyRepository ?? new MethodologyRepository(contentDbContext),
+                methodologyFileRepository ?? new MethodologyFileRepository(contentDbContext),
+                methodologyImageService ?? new Mock<IMethodologyImageService>().Object,
+                publishingService ?? new Mock<IPublishingService>().Object,
+                testService ?? new Mock<ITestService>().Object,
+                userService ?? MockUtils.AlwaysTrueUserService().Object);
         }
     }
 }

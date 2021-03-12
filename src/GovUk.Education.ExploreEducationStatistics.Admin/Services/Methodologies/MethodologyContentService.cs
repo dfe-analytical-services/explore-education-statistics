@@ -57,6 +57,20 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Services.Methodologie
                 .OnSuccess(_mapper.Map<ManageMethodologyContentViewModel>);
         }
 
+        public Task<Either<ActionResult, List<T>>> GetContentBlocks<T>(Guid methodologyId) where T : ContentBlock
+        {
+            return _persistenceHelper
+                .CheckEntityExists<Methodology>(methodologyId)
+                .OnSuccess(CheckCanViewMethodology)
+                .OnSuccess(methodology =>
+                {
+                    return (methodology.Content ?? new List<ContentSection>())
+                        .SelectMany(section => section.Content)
+                        .OfType<T>()
+                        .ToList();
+                });
+        }
+
         public Task<Either<ActionResult, List<ContentSectionViewModel>>> GetContentSectionsAsync(
             Guid methodologyId, ContentListType contentType)
         {

@@ -353,6 +353,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin
             services.AddTransient<IStorageQueueService, StorageQueueService>(s =>
                 new StorageQueueService(Configuration.GetValue<string>("CoreStorage")));
             services.AddSingleton<IGuidGenerator, SequentialGuidGenerator>();
+            services.AddSingleton<ITestService, TestService>();
             AddPersistenceHelper<ContentDbContext>(services);
             AddPersistenceHelper<StatisticsDbContext>(services);
 
