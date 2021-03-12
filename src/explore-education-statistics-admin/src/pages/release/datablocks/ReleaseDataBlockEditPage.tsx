@@ -129,7 +129,7 @@ const ReleaseDataBlockEditPage = ({
             label={false}
             dataBlockId={dataBlockId}
           />
-          <p className={styles.dataBlockSelector__or}>OR</p>
+          <p className={styles.dataBlockSelector__or}>or</p>
           <ButtonLink
             className={styles.dataBlockSelector__button}
             to={createPath}
