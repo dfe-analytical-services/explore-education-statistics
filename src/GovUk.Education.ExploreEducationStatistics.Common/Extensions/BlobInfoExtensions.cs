@@ -8,7 +8,6 @@ namespace GovUk.Education.ExploreEducationStatistics.Common.Extensions
     {
         public const string NameKey = BlobInfo.NameKey;
         public const string NumberOfRowsKey = "NumberOfRows";
-        public const string UserNameKey = "userName";
         public const string ReleaseDateTimeKey = "releasedatetime";
 
         /**
@@ -29,11 +28,6 @@ namespace GovUk.Education.ExploreEducationStatistics.Common.Extensions
         public static string GetMetaFileName(this BlobInfo blob)
         {
             return blob.Meta[MetaFileKey];
-        }
-
-        public static string GetUserName(this BlobInfo blob)
-        {
-            return blob.Meta.TryGetValue(UserNameKey, out var name) ? name : string.Empty;
         }
 
         public static int GetNumberOfRows(this BlobInfo blob)

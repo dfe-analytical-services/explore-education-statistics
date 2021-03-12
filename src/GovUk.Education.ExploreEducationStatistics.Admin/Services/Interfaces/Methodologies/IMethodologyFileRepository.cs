@@ -8,8 +8,9 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Services.Interfaces.M
     public interface IMethodologyFileRepository
     {
         public Task<File> Create(
-            Guid releaseId,
+            Guid methodologyId,
             string filename,
-            FileType type);
+            FileType type,
+            Guid createdById);
     }
 }

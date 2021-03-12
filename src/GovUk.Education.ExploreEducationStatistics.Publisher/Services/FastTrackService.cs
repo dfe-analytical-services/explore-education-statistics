@@ -9,6 +9,7 @@ using GovUk.Education.ExploreEducationStatistics.Publisher.Models;
 using GovUk.Education.ExploreEducationStatistics.Publisher.Services.Interfaces;
 using Microsoft.Azure.Cosmos.Table;
 using Microsoft.EntityFrameworkCore;
+using static GovUk.Education.ExploreEducationStatistics.Common.BlobContainers;
 using static GovUk.Education.ExploreEducationStatistics.Common.Services.FileStoragePathUtils;
 using static GovUk.Education.ExploreEducationStatistics.Common.TableStorageTableNames;
 
@@ -17,15 +18,15 @@ namespace GovUk.Education.ExploreEducationStatistics.Publisher.Services
     public class FastTrackService : IFastTrackService
     {
         private readonly ContentDbContext _contentDbContext;
-        private readonly IFileStorageService _fileStorageService;
+        private readonly IBlobStorageService _publicBlobStorageService;
         private readonly ITableStorageService _tableStorageService;
 
         public FastTrackService(ContentDbContext contentDbContext,
-            IFileStorageService fileStorageService,
+            IBlobStorageService publicBlobStorageService,
             ITableStorageService tableStorageService)
         {
             _contentDbContext = contentDbContext;
-            _fileStorageService = fileStorageService;
+            _publicBlobStorageService = publicBlobStorageService;
             _tableStorageService = tableStorageService;
         }
 
@@ -70,7 +71,9 @@ namespace GovUk.Education.ExploreEducationStatistics.Publisher.Services
 
         public async Task DeleteAllFastTracksByRelease(Guid releaseId)
         {
-            await _fileStorageService.DeletePublicBlobs(PublicContentReleaseFastTrackPath(releaseId.ToString()));
+            await _publicBlobStorageService.DeleteBlobs(
+                PublicContentContainerName,
+                PublicContentReleaseFastTrackPath(releaseId.ToString()));
             await _tableStorageService.DeleteByPartitionKey(PublicReleaseFastTrackTableName, releaseId.ToString());
         }
 
@@ -79,7 +82,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Publisher.Services
             var blobName = context.Staging
                 ? PublicContentFastTrackPath(releaseId.ToString(), fastTrack.Id.ToString(), PublicContentStagingPath())
                 : PublicContentFastTrackPath(releaseId.ToString(), fastTrack.Id.ToString());
-            await _fileStorageService.UploadAsJson(blobName, fastTrack);
+            await _publicBlobStorageService.UploadAsJson(PublicContentContainerName, blobName, fastTrack);
         }
 
         private async Task<CloudTable> GetTableAsync()

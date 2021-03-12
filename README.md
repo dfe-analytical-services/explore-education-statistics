@@ -348,7 +348,7 @@ The backend c# projects use code first migrations to generate the application's 
 The entity framework tool will need to be installed as follows:
 
 ```
-dotnet tool install -g dotnet-ef --version 3.0.0`
+dotnet tool install -g dotnet-ef --version 3.1.5
 ```
 
 #### Content DB migrations

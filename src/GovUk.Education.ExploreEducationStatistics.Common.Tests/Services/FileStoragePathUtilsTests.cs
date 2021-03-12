@@ -18,15 +18,5 @@ namespace GovUk.Education.ExploreEducationStatistics.Common.Tests.Services
             Assert.Equal($"{rootPath}/image/", FilesPath(rootPath, Image));
             Assert.Equal($"{rootPath}/data/", FilesPath(rootPath, Metadata));
         }
-
-        [Fact]
-        public void TestPublicReleaseAllFilesZipPath()
-        {
-            var releaseId = Guid.NewGuid();
-            const string releaseSlug = "release-slug";
-            const string publicationSlug = "publication-slug";
-            Assert.Equal($"{releaseId}/ancillary/{publicationSlug}_{releaseSlug}.zip",
-                PublicReleaseAllFilesZipPath(releaseId, publicationSlug, releaseSlug));
-        }
     }
 }

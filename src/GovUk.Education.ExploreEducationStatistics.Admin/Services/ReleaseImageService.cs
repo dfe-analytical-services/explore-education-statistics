@@ -83,15 +83,16 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Services
                 });
         }
 
-        private async Task<Either<ActionResult, FileInfo>> Upload(Guid methodologyId,
+        private async Task<Either<ActionResult, FileInfo>> Upload(Guid releaseId,
             FileType type,
             IFormFile formFile,
             IDictionary<string, string> metadata = null)
         {
             var file = await _releaseFileRepository.Create(
-                methodologyId,
-                formFile.FileName,
-                type);
+                releaseId: releaseId,
+                filename: formFile.FileName,
+                type: type,
+                createdById: _userService.GetUserId());
 
             await _contentDbContext.SaveChangesAsync();
 

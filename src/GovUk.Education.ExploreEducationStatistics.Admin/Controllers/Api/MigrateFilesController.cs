@@ -22,6 +22,14 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Controllers.Api
             _migrateFilesService = migrateFilesService;
         }
 
+        [HttpPatch("api/files/private/data/migrate-created-fields")]
+        public async Task<ActionResult<Unit>> MigratePrivateDataFilesCreatedFields()
+        {
+            return await _migrateFilesService
+                .MigratePrivateFilesCreatedFields()
+                .HandleFailuresOrOk();
+        }
+
         [HttpPatch("api/files/private/data/migrate-files")]
         public async Task<ActionResult<Unit>> MigratePrivateDataFiles()
         {

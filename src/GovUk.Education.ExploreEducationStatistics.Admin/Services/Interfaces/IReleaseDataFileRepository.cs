@@ -13,12 +13,14 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Services.Interfaces
             Guid subjectId,
             string filename,
             FileType type,
+            Guid createdById,
             File replacingFile = null,
             File source = null);
 
         public Task<File> CreateZip(
             Guid releaseId,
-            string filename);
+            string filename,
+            Guid createdById);
 
         public Task<IList<File>> ListDataFiles(Guid releaseId);
 

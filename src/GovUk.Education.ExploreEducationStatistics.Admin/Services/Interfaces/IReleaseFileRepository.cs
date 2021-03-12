@@ -16,7 +16,8 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Services.Interfaces
         public Task<File> Create(
             Guid releaseId,
             string filename,
-            FileType type);
+            FileType type,
+            Guid createdById);
 
         public Task Delete(Guid releaseId, Guid fileId);
 

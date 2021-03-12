@@ -182,9 +182,10 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Services
                             replacingId.Value,
                             formFile.FileName)
                         : await _releaseFileRepository.Create(
-                            releaseId,
-                            formFile.FileName,
-                            Chart);
+                            releaseId: releaseId,
+                            filename: formFile.FileName,
+                            type: Chart,
+                            createdById: _userService.GetUserId());
 
                     await _blobStorageService.UploadFile(
                         containerName: PrivateReleaseFiles,
@@ -206,9 +207,10 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Services
             IDictionary<string, string> metadata = null)
         {
             var file = await _releaseFileRepository.Create(
-                releaseId,
-                formFile.FileName,
-                type);
+                releaseId: releaseId,
+                filename: formFile.FileName,
+                type: type,
+                createdById: _userService.GetUserId());
 
             await _contentDbContext.SaveChangesAsync();
 
