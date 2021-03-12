@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Collections.Generic;
 using System.Threading.Tasks;
 using GovUk.Education.ExploreEducationStatistics.Admin.ViewModels;
 using GovUk.Education.ExploreEducationStatistics.Common.Model;
@@ -9,6 +10,10 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Services.Interfaces.M
 {
     public interface IMethodologyImageService
     {
+        Task<Either<ActionResult, Unit>> Delete(
+            Guid methodologyId,
+            IEnumerable<Guid> fileIds);
+
         Task<Either<ActionResult, FileStreamResult>> Stream(Guid methodologyId, Guid fileId);
 
         Task<Either<ActionResult, ImageFileViewModel>> Upload(Guid methodologyId, IFormFile formFile);
