@@ -16,10 +16,9 @@ export default function useMethodologyImageAttributeTransformer(options: {
     ({ src, srcset, ...attributes }: Dictionary<string>) => {
       return {
         ...attributes,
-        src: `${rootUrl}${replaceMethodologyIdPlaceholders(
-          src,
-          methodologyId,
-        )}`,
+        src:
+          src &&
+          `${rootUrl}${replaceMethodologyIdPlaceholders(src, methodologyId)}`,
         srcset:
           srcset &&
           `${rootUrl}${replaceMethodologyIdPlaceholders(
