@@ -8,14 +8,14 @@
 
     public static class BlobContainers
     {
-        public static readonly BlobContainer PrivateReleaseFiles = new BlobContainer("releases");
-        public static readonly BlobContainer PublicReleaseFiles = new BlobContainer("downloads");
-        public static readonly BlobContainer PublicContentContainerName = new BlobContainer("cache");
-        public static readonly BlobContainer Permalinks = new BlobContainer("permalinks");
-        public static readonly BlobContainer PermalinkMigrations = new BlobContainer("permalink-migrations");
-        public static readonly BlobContainer PublisherLeases = new BlobContainer("leases");
-        public static readonly BlobContainer PrivateMethodologyFiles = new PrivateBlobContainer("methodologies");
-        public static readonly BlobContainer PublicMethodologyFiles = new PublicBlobContainer("methodologies");
+        public static readonly IBlobContainer PrivateReleaseFiles = new BlobContainer("releases");
+        public static readonly IBlobContainer PublicReleaseFiles = new BlobContainer("downloads");
+        public static readonly IBlobContainer PublicContentContainerName = new BlobContainer("cache");
+        public static readonly IBlobContainer Permalinks = new BlobContainer("permalinks");
+        public static readonly IBlobContainer PermalinkMigrations = new BlobContainer("permalink-migrations");
+        public static readonly IBlobContainer PublisherLeases = new BlobContainer("leases");
+        public static readonly IBlobContainer PrivateMethodologyFiles = new PrivateBlobContainer("methodologies");
+        public static readonly IBlobContainer PublicMethodologyFiles = new PublicBlobContainer("methodologies");
     }
 
     /// <summary>
@@ -32,30 +32,49 @@
 
         public string EmulatedName => Name;
 
-        public override string ToString() => Name;
+        public override string ToString()
+        {
+            return Name;
+        }
     }
 
     /// <summary>
     /// Blob container with a name prefixed by 'public-' when used with emulator storage
     /// </summary>
-    public class PublicBlobContainer : BlobContainer
+    public class PublicBlobContainer : IBlobContainer
     {
-        public PublicBlobContainer(string name) : base(name)
+        public string Name { get; }
+
+        public PublicBlobContainer(string name)
         {
+            Name = name;
         }
 
-        public new string EmulatedName => $"public-{Name}";
+        public string EmulatedName => $"public-{Name}";
+
+        public override string ToString()
+        {
+            return Name;
+        }
     }
 
     /// <summary>
     /// Blob container with a name prefixed by 'private-' when used with emulator storage
     /// </summary>
-    public class PrivateBlobContainer : BlobContainer
+    public class PrivateBlobContainer : IBlobContainer
     {
-        public PrivateBlobContainer(string name) : base(name)
+        public string Name { get; }
+
+        public PrivateBlobContainer(string name)
         {
+            Name = name;
         }
 
-        public new string EmulatedName => $"private-{Name}";
+        public string EmulatedName => $"private-{Name}";
+
+        public override string ToString()
+        {
+            return Name;
+        }
     }
 }
