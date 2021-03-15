@@ -68,9 +68,9 @@ namespace GovUk.Education.ExploreEducationStatistics.Publisher.Services
 
             // Copy the blobs from private to public storage
             await _privateBlobStorageService.CopyDirectory(
-                sourceContainerName: PrivateReleaseFiles,
+                sourceContainerName: PrivateMethodologyFiles,
                 sourceDirectoryPath: directoryPath,
-                destinationContainerName: PublicReleaseFiles,
+                destinationContainerName: PublicMethodologyFiles,
                 destinationDirectoryPath: directoryPath,
                 new IBlobStorageService.CopyDirectoryOptions
                 {
