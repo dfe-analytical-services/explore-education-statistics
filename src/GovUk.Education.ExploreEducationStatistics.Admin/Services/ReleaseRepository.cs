@@ -58,7 +58,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Services
             return _mapper.Map<List<MyReleaseViewModel>>(releases);
         }
 
-        public async Task<Guid> CreateReleaseAndSubjectHierarchy(
+        public async Task<Guid> CreateStatisticsDbReleaseAndSubjectHierarchy(
             Guid releaseId,
             string subjectFilename)
         {

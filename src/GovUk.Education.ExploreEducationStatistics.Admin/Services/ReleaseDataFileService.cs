@@ -39,7 +39,8 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Services
         private readonly IDataImportService _dataImportService;
         private readonly IUserService _userService;
 
-        public ReleaseDataFileService(ContentDbContext contentDbContext,
+        public ReleaseDataFileService(
+            ContentDbContext contentDbContext,
             IPersistenceHelper<ContentDbContext> persistenceHelper,
             IBlobStorageService blobStorageService,
             IDataArchiveValidationService dataArchiveValidationService,
@@ -211,7 +212,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Services
                                     // First, create with status uploading to prevent other users uploading the same datafile
                                     .OnSuccess(async () =>
                                     {
-                                        var subjectId = await _releaseRepository.CreateReleaseAndSubjectHierarchy(
+                                        var subjectId = await _releaseRepository.CreateStatisticsDbReleaseAndSubjectHierarchy(
                                             releaseId,
                                             dataFormFile.FileName.ToLower());
 
@@ -304,7 +305,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Services
                                                 .ValidateDataArchiveEntriesForUpload(releaseId, archiveFile)
                                                 .OnSuccess(async () =>
                                                 {
-                                                    var subjectId = await _releaseRepository.CreateReleaseAndSubjectHierarchy(
+                                                    var subjectId = await _releaseRepository.CreateStatisticsDbReleaseAndSubjectHierarchy(
                                                         releaseId,
                                                         archiveFile.DataFileName.ToLower());
 
