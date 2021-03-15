@@ -1,5 +1,7 @@
 ﻿using System;
+using System.Collections.Generic;
 using GovUk.Education.ExploreEducationStatistics.Admin.Security;
+using GovUk.Education.ExploreEducationStatistics.Admin.Services;
 using GovUk.Education.ExploreEducationStatistics.Admin.Services.Interfaces;
 using GovUk.Education.ExploreEducationStatistics.Admin.Services.Interfaces.Methodologies;
 using GovUk.Education.ExploreEducationStatistics.Admin.Services.Methodologies;
@@ -24,6 +26,21 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services.Method
         };
 
         [Fact]
+        public void Delete()
+        {
+            PolicyCheckBuilder<SecurityPolicies>()
+                .ExpectResourceCheckToFail(_methodology, SecurityPolicies.CanUpdateSpecificMethodology)
+                .AssertForbidden(
+                    userService =>
+                    {
+                        var service = SetupMethodologyImageService(userService: userService.Object);
+                        return service.Delete(methodologyId: _methodology.Id,
+                            fileIds: new List<Guid>());
+                    }
+                );
+        }
+
+        [Fact]
         public void Upload()
         {
             PolicyCheckBuilder<SecurityPolicies>()
@@ -43,6 +60,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services.Method
             IPersistenceHelper<ContentDbContext> contentPersistenceHelper = null,
             IBlobStorageService blobStorageService = null,
             IFileUploadsValidatorService fileUploadsValidatorService = null,
+            IFileRepository fileRepository = null,
             IMethodologyFileRepository methodologyFileRepository = null,
             IUserService userService = null)
         {
@@ -51,6 +69,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services.Method
                 contentPersistenceHelper ?? DefaultPersistenceHelperMock().Object,
                 blobStorageService ?? new Mock<IBlobStorageService>().Object,
                 fileUploadsValidatorService ?? new Mock<IFileUploadsValidatorService>().Object,
+                fileRepository ?? new FileRepository(contentDbContext),
                 methodologyFileRepository ?? new MethodologyFileRepository(contentDbContext),
                 userService ?? new Mock<IUserService>().Object
             );
