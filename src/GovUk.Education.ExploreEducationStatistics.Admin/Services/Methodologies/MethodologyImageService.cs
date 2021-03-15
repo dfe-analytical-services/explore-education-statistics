@@ -7,6 +7,7 @@ using GovUk.Education.ExploreEducationStatistics.Admin.Services.Interfaces;
 using GovUk.Education.ExploreEducationStatistics.Admin.Services.Interfaces.Methodologies;
 using GovUk.Education.ExploreEducationStatistics.Admin.Services.Interfaces.Security;
 using GovUk.Education.ExploreEducationStatistics.Admin.ViewModels;
+using GovUk.Education.ExploreEducationStatistics.Common.Extensions;
 using GovUk.Education.ExploreEducationStatistics.Common.Model;
 using GovUk.Education.ExploreEducationStatistics.Common.Services.Interfaces;
 using GovUk.Education.ExploreEducationStatistics.Common.Services.Interfaces.Security;
@@ -60,12 +61,12 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Services.Methodologie
                         _methodologyFileRepository.CheckFileExists(methodologyId, fileId, Image)).OnSuccessAll())
                 .OnSuccessVoid(async files =>
                 {
-                    foreach (var file in files)
+                    await files.ForEachAsync(async file =>
                     {
-                        await _methodologyFileRepository.Delete(methodologyId, file.Id);
                         await _blobStorageService.DeleteBlob(PrivateMethodologyFiles, file.Path());
+                        await _methodologyFileRepository.Delete(methodologyId, file.Id);
                         await _fileRepository.Delete(file.Id);
-                    }
+                    });
                 });
         }
 
