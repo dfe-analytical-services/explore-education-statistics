@@ -32,10 +32,7 @@
 
         public string EmulatedName => Name;
 
-        public override string ToString()
-        {
-            return Name;
-        }
+        public override string ToString() => Name;
     }
 
     /// <summary>
@@ -52,10 +49,7 @@
 
         public string EmulatedName => $"public-{Name}";
 
-        public override string ToString()
-        {
-            return Name;
-        }
+        public override string ToString() => Name;
     }
 
     /// <summary>
@@ -72,9 +66,6 @@
 
         public string EmulatedName => $"private-{Name}";
 
-        public override string ToString()
-        {
-            return Name;
-        }
+        public override string ToString() => Name;
     }
 }
