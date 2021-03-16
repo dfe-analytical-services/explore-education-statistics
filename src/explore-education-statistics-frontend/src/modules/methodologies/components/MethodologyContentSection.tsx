@@ -9,12 +9,14 @@ interface MethodologySectionProps {
   content: ContentBlock[];
   open: boolean;
   id: string;
+  methodologyId: string;
 }
 
 const MethodologyContentSection = ({
   content,
   open,
   id,
+  methodologyId,
 }: MethodologySectionProps) => {
   const contentRef = useRef<HTMLDivElement>(null);
 
@@ -23,7 +25,12 @@ const MethodologyContentSection = ({
   const { isMounted } = useMounted();
 
   if (!isMounted) {
-    return <MethodologySectionBlocks blocks={content} />;
+    return (
+      <MethodologySectionBlocks
+        blocks={content}
+        methodologyId={methodologyId}
+      />
+    );
   }
 
   return (
@@ -38,7 +45,10 @@ const MethodologyContentSection = ({
       </div>
 
       <div className="govuk-grid-column-three-quarters" ref={contentRef}>
-        <MethodologySectionBlocks blocks={content} />
+        <MethodologySectionBlocks
+          blocks={content}
+          methodologyId={methodologyId}
+        />
       </div>
     </div>
   );
