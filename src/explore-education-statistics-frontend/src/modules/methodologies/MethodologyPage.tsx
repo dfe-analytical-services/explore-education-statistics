@@ -115,6 +115,7 @@ const MethodologyPage: NextPage<Props> = ({ data }) => {
                     id={contentId}
                     open={open}
                     content={content}
+                    methodologyId={data.id}
                   />
                 )}
               </AccordionSection>
@@ -144,7 +145,10 @@ const MethodologyPage: NextPage<Props> = ({ data }) => {
                   caption={caption}
                   key={order}
                 >
-                  <MethodologySectionBlocks blocks={content} />
+                  <MethodologySectionBlocks
+                    blocks={content}
+                    methodologyId={data.id}
+                  />
                 </AccordionSection>
               );
             })}
