@@ -153,7 +153,7 @@ const MethodologyAccordionSection = ({
         )}
         renderEditableBlock={block => (
           <MethodologyEditableBlock
-            allowImages
+            //allowImages
             block={block}
             editable={!isReordering}
             methodologyId={methodologyId}
