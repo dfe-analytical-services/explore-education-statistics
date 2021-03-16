@@ -16,10 +16,12 @@ export default function useReleaseImageAttributeTransformer(options: {
     ({ src, srcset, ...attributes }: Dictionary<string>) => {
       return {
         ...attributes,
-        src: src && `${rootUrl}${replaceReleaseIdPlaceholders(src, releaseId)}`,
-        srcset:
-          srcset &&
-          `${rootUrl}${replaceReleaseIdPlaceholders(srcset, releaseId)}`,
+        src: src
+          ? `${rootUrl}${replaceReleaseIdPlaceholders(src, releaseId)}`
+          : '',
+        srcset: srcset
+          ? `${rootUrl}${replaceReleaseIdPlaceholders(srcset, releaseId)}`
+          : '',
       };
     },
     [releaseId, rootUrl],
