@@ -76,11 +76,11 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Api.Tests.Services
             var blobStorageService = new Mock<IBlobStorageService>();
 
             blobStorageService
-                .Setup(s => s.GetDeserializedJson<TableBuilderResultViewModel>(PublicContentContainerName, path))
+                .Setup(s => s.GetDeserializedJson<TableBuilderResultViewModel>(PublicContent, path))
                 .ThrowsAsync(new FileNotFoundException());
 
             blobStorageService
-                .Setup(s => s.UploadAsJson(PublicContentContainerName, path, tableResult, null));
+                .Setup(s => s.UploadAsJson(PublicContent, path, tableResult, null));
 
             var tableBuilderService = new Mock<ITableBuilderService>();
 
@@ -164,11 +164,11 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Api.Tests.Services
             var blobStorageService = new Mock<IBlobStorageService>();
 
             blobStorageService
-                .Setup(s => s.GetDeserializedJson<TableBuilderResultViewModel>(PublicContentContainerName, path))
+                .Setup(s => s.GetDeserializedJson<TableBuilderResultViewModel>(PublicContent, path))
                 .ThrowsAsync(new FileNotFoundException());
 
             blobStorageService
-                .Setup(s => s.UploadAsJson(PublicContentContainerName, path, tableResult, null));
+                .Setup(s => s.UploadAsJson(PublicContent, path, tableResult, null));
 
             var tableBuilderService = new Mock<ITableBuilderService>();
 
@@ -251,7 +251,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Api.Tests.Services
             var blobStorageService = new Mock<IBlobStorageService>();
 
             blobStorageService
-                .Setup(s => s.GetDeserializedJson<TableBuilderResultViewModel>(PublicContentContainerName, path))
+                .Setup(s => s.GetDeserializedJson<TableBuilderResultViewModel>(PublicContent, path))
                 .ReturnsAsync(tableResult);
 
             var tableBuilderService = new Mock<ITableBuilderService>();
@@ -323,14 +323,14 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Api.Tests.Services
 
             blobStorageService
                 .Setup(s =>
-                    s.GetDeserializedJson<TableBuilderResultViewModel>(PublicContentContainerName, path))
+                    s.GetDeserializedJson<TableBuilderResultViewModel>(PublicContent, path))
                 .ThrowsAsync(new JsonException("Could not deserialize the JSON"));
 
             blobStorageService
-                .Setup(s => s.DeleteBlob(PublicContentContainerName, path));
+                .Setup(s => s.DeleteBlob(PublicContent, path));
 
             blobStorageService
-                .Setup(s => s.UploadAsJson(PublicContentContainerName, path, tableResult, null));
+                .Setup(s => s.UploadAsJson(PublicContent, path, tableResult, null));
 
             var tableBuilderService = new Mock<ITableBuilderService>();
 

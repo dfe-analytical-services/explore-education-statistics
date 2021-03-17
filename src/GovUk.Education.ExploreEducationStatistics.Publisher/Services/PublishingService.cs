@@ -45,9 +45,9 @@ namespace GovUk.Education.ExploreEducationStatistics.Publisher.Services
         public async Task PublishStagedReleaseContent(Guid releaseId)
         {
             await _publicBlobStorageService.MoveDirectory(
-                sourceContainerName: PublicContentContainerName,
+                sourceContainerName: PublicContent,
                 sourceDirectoryPath: PublicContentStagingPath(),
-                destinationContainerName: PublicContentContainerName,
+                destinationContainerName: PublicContent,
                 destinationDirectoryPath: string.Empty
             );
 

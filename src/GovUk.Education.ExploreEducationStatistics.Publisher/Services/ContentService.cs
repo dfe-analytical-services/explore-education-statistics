@@ -57,7 +57,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Publisher.Services
                 if (release.Slug != release.PreviousVersion.Slug)
                 {
                     await _publicBlobStorageService.DeleteBlob(
-                        PublicContentContainerName,
+                        PublicContent,
                         PublicContentReleasePath(release.Publication.Slug, release.PreviousVersion.Slug)
                     );
                 }
@@ -236,7 +236,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Publisher.Services
         private async Task DeleteAllContentAsyncExcludingStaging()
         {
             var excludePattern = $"^{PublicContentStagingPath()}/.+$";
-            await _publicBlobStorageService.DeleteBlobs(PublicContentContainerName, string.Empty, excludePattern);
+            await _publicBlobStorageService.DeleteBlobs(PublicContent, string.Empty, excludePattern);
         }
 
         private static JsonSerializerSettings GetJsonSerializerSettings(NamingStrategy namingStrategy)
@@ -257,7 +257,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Publisher.Services
         {
             var pathPrefix = context.Staging ? PublicContentStagingPath() : null;
             var blobName = pathFunction.Invoke(pathPrefix);
-            await _publicBlobStorageService.UploadAsJson(PublicContentContainerName, blobName, value, settings);
+            await _publicBlobStorageService.UploadAsJson(PublicContent, blobName, value, settings);
         }
     }
 }
