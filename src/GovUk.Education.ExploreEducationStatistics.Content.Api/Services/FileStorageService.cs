@@ -1,10 +1,10 @@
 using System.IO;
 using System.Threading.Tasks;
-using GovUk.Education.ExploreEducationStatistics.Common;
 using GovUk.Education.ExploreEducationStatistics.Common.Model;
 using GovUk.Education.ExploreEducationStatistics.Common.Services.Interfaces;
 using GovUk.Education.ExploreEducationStatistics.Content.Api.Services.Interfaces;
 using Microsoft.AspNetCore.Mvc;
+using static GovUk.Education.ExploreEducationStatistics.Common.BlobContainers;
 
 namespace GovUk.Education.ExploreEducationStatistics.Content.Api.Services
 {
@@ -22,7 +22,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Content.Api.Services
             try
             {
                 return await _blobStorageService.GetDeserializedJson<T>(
-                    BlobContainers.PublicContentContainerName,
+                    PublicContent,
                     path
                 );
             }

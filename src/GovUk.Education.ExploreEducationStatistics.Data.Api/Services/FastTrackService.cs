@@ -73,7 +73,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Api.Services
             return await GetReleaseFastTrack(id)
                 .OnSuccess(async releaseFastTrack =>
                 {
-                    var text = await _blobStorageService.DownloadBlobText(PublicContentContainerName,
+                    var text = await _blobStorageService.DownloadBlobText(PublicContent,
                         PublicContentFastTrackPath(releaseFastTrack.ReleaseId.ToString(), id.ToString()));
                     return JsonConvert.DeserializeObject<FastTrack>(text);
                 });
