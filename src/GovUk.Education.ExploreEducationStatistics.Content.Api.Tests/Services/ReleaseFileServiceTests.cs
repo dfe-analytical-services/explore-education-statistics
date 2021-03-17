@@ -39,7 +39,6 @@ namespace GovUk.Education.ExploreEducationStatistics.Content.Api.Tests.Services
                 Release = release,
                 File = new File
                 {
-                    PublicBlobPathMigrated = true,
                     RootPath = Guid.NewGuid(),
                     Filename = "ancillary.pdf",
                     Type = Ancillary
@@ -117,7 +116,6 @@ namespace GovUk.Education.ExploreEducationStatistics.Content.Api.Tests.Services
                 Release = new Release(),
                 File = new File
                 {
-                    PublicBlobPathMigrated = true,
                     RootPath = Guid.NewGuid(),
                     Filename = "ancillary.pdf",
                     Type = Ancillary
@@ -192,7 +190,6 @@ namespace GovUk.Education.ExploreEducationStatistics.Content.Api.Tests.Services
                 Release = release,
                 File = new File
                 {
-                    PublicBlobPathMigrated = true,
                     RootPath = Guid.NewGuid(),
                     Filename = "ancillary.pdf",
                     Type = Ancillary
@@ -248,7 +245,6 @@ namespace GovUk.Education.ExploreEducationStatistics.Content.Api.Tests.Services
                 Release = release,
                 File = new File
                 {
-                    PublicBlobPathMigrated = true,
                     RootPath = Guid.NewGuid(),
                     Filename = "ancillary.pdf",
                     Type = Ancillary

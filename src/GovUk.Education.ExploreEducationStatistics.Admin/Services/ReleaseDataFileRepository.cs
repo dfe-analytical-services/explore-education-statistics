@@ -50,9 +50,6 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Services
                 ReleaseId = releaseId,
                 File = new File
                 {
-                    // Mark any new files as already migrated while these flags temporarily exist
-                    PrivateBlobPathMigrated = true,
-                    PublicBlobPathMigrated = true,
                     Created = DateTime.UtcNow,
                     CreatedById = createdById,
                     RootPath = releaseId,
@@ -80,9 +77,6 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Services
         {
             var file = (await _contentDbContext.Files.AddAsync(new File
             {
-                // Mark any new files as already migrated while these flags temporarily exist
-                PrivateBlobPathMigrated = true,
-                PublicBlobPathMigrated = true,
                 Created = DateTime.UtcNow,
                 CreatedById = createdById,
                 RootPath = releaseId,
