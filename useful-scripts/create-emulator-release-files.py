@@ -36,7 +36,6 @@ class AncillaryFile(File):
 class DataFile(File):
     def metadata(self):
         return {
-            "userName": "ees-analyst1@education.gov.uk",
             "NumberOfRows": "1000",
             "name": self.name,
             "releasedatetime": self.published
