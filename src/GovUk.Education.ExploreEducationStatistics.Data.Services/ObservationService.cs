@@ -70,7 +70,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Services
 
             var inner = _context
                 .Set<Observation>()
-                .FromSqlRaw("EXEC dbo.FilteredObservations " +
+                .FromSqlRaw("EXEC dbo.FilteredObservationRows " +
                             "@subjectId," +
                             "@geographicLevel," +
                             "@timePeriodList," +
@@ -112,7 +112,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Services
                     planningAreaListParam,
                     filterItemListParam);
 
-            _logger.LogDebug($"Executed FilteredObservations stored procedure in {phasesStopwatch.Elapsed.TotalMilliseconds} ms");
+            _logger.LogDebug($"Executed FilteredObservationRows stored procedure in {phasesStopwatch.Elapsed.TotalMilliseconds} ms");
             phasesStopwatch.Restart();
 
             var ids = inner.Select(obs => obs.Id).ToArray();

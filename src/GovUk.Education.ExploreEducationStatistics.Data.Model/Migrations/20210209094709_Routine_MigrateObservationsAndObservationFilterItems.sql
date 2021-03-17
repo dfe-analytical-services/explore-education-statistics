@@ -1,5 +1,4 @@
-CREATE OR
-ALTER PROCEDURE MigrateObservationsAndObservationFilterItems 
+CREATE OR ALTER PROCEDURE MigrateObservationsAndObservationFilterItems 
     @SubjectsBatchSize INT
 AS
 BEGIN
