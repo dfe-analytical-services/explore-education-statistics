@@ -67,6 +67,9 @@
     },
     "branch": {
        "value": "dev"
+    },
+    "maxDbSizeBytes": {
+      "value": 322122547200
     }
   }
 }
