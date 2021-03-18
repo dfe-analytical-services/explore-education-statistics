@@ -306,8 +306,6 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services.Method
                 Methodology = methodology,
                 File = new File
                 {
-                    PrivateBlobPathMigrated = true,
-                    PublicBlobPathMigrated = true,
                     RootPath = Guid.NewGuid(),
                     Filename = "image.png",
                     Type = Image

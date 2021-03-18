@@ -40,7 +40,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Publisher.Services
 
                 await _publicBlobStorageService.DownloadToStream(
                     containerName: containerName,
-                    path: file.MigratedPublicPath(releaseId),
+                    path: file.PublicPath(releaseId),
                     stream: zipOutputStream);
             }
 

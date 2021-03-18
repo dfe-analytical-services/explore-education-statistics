@@ -32,9 +32,5 @@ namespace GovUk.Education.ExploreEducationStatistics.Content.Model
         public User CreatedBy { get; set; }
 
         public Guid? CreatedById { get; set; }
-
-        // EES-1704 Temporary fields that will be removed after files migration
-        public bool PrivateBlobPathMigrated { get; set; }
-        public bool PublicBlobPathMigrated { get; set; }
     }
 }
