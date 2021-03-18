@@ -63,6 +63,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Services.Methodologie
                 {
                     await files.ForEachAsync(async file =>
                     {
+                        // TODO EES-1263 Methodology amendments - Check if file is linked to other methodolgies before deleting blob
                         await _blobStorageService.DeleteBlob(PrivateMethodologyFiles, file.Path());
                         await _methodologyFileRepository.Delete(methodologyId, file.Id);
                         await _fileRepository.Delete(file.Id);

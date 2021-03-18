@@ -177,7 +177,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Services.Methodologie
                 .OnSuccess(async contentBlocks =>
                 {
                     var contentImageIds = contentBlocks.SelectMany(contentBlock =>
-                            HtmlImageUtil.GetImages(contentBlock.Body))
+                            HtmlImageUtil.GetMethodologyImages(contentBlock.Body))
                         .Distinct();
 
                     var imageFiles = await _methodologyFileRepository.GetByFileType(methodologyId, Image);

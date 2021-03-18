@@ -299,6 +299,8 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin
             services.AddTransient<IMetaGuidanceSubjectService, MetaGuidanceSubjectService>();
             services.AddTransient<IObservationService, ObservationService>();
             services.AddTransient<Data.Services.Interfaces.IReleaseService, Data.Services.ReleaseService>();
+            services.AddTransient<IReleaseContentBlockRepository, ReleaseContentBlockRepository>();
+            services.AddTransient<IReleaseContentSectionRepository, ReleaseContentSectionRepository>();
             services.AddTransient<IReleaseNoteService, ReleaseNoteService>();
             services.AddTransient<IResultBuilder<Observation, ObservationViewModel>, ResultBuilder>();
             services.AddTransient<Data.Model.Services.Interfaces.IReleaseRepository, Data.Model.Services.ReleaseRepository>();
