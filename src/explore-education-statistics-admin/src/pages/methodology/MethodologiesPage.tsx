@@ -16,7 +16,6 @@ import React, { useEffect, useState } from 'react';
 import { generatePath } from 'react-router';
 
 interface Model {
-  liveMethodologies: MethodologyStatusListItem[];
   approvedMethodologies: MethodologyStatusListItem[];
   draftMethodologies: MethodologyStatusListItem[];
 }
@@ -78,11 +77,6 @@ const MethodologiesPage = () => {
 
   useEffect(() => {
     methodologyService.getMyMethodologies().then(methodologies => {
-      const liveMethodologies: MethodologyStatusListItem[] = methodologies.filter(
-        methodology => {
-          return methodology.status === 'Live';
-        },
-      );
       const approvedMethodologies: MethodologyStatusListItem[] = methodologies.filter(
         methodology => {
           return methodology.status === 'Approved';
@@ -94,7 +88,6 @@ const MethodologiesPage = () => {
         },
       );
       setModel({
-        liveMethodologies,
         approvedMethodologies,
         draftMethodologies,
       });
@@ -121,31 +114,6 @@ const MethodologiesPage = () => {
       </div>
 
       <Tabs id="methodologyTabs">
-        <TabsSection
-          id="live-methodologies"
-          title={`Live methodologies ${
-            model && model.liveMethodologies.length
-              ? `(${model.liveMethodologies.length})`
-              : '(0)'
-          }`}
-        >
-          <Link
-            to="/methodologies/create"
-            className="govuk-button govuk-!-margin-bottom-1"
-          >
-            Create new methodology
-          </Link>
-          {model && model.liveMethodologies.length ? (
-            <MethodologiesTable methodologies={model.liveMethodologies} />
-          ) : (
-            <InsetText>
-              There are currently no live methodologies for you to view.
-            </InsetText>
-          )}
-          <Link to="/methodologies/create" className="govuk-button">
-            Create new methodology
-          </Link>
-        </TabsSection>
         <TabsSection
           id="draft-methodologies"
           title={`Draft methodologies ${
