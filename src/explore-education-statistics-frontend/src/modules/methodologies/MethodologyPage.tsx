@@ -2,7 +2,7 @@ import Accordion from '@common/components/Accordion';
 import AccordionSection from '@common/components/AccordionSection';
 import FormattedDate from '@common/components/FormattedDate';
 import RelatedAside from '@common/components/RelatedAside';
-import MethodologySectionBlocks from '@common/modules/methodology/components/MethodologySectionBlocks';
+import MethodologySectionBlocks from '@frontend/modules/methodologies/components/MethodologySectionBlocks';
 import methodologyService, {
   Methodology,
 } from '@common/services/methodologyService';
