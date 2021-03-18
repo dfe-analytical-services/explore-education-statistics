@@ -2151,6 +2151,16 @@
                                     },
                                     {
                                         "source": {
+                                            "name": "ObservationId",
+                                            "type": "Guid"
+                                        },
+                                        "sink": {
+                                            "name": "ObservationId",
+                                            "type": "Guid"
+                                        }
+                                    },
+                                    {
+                                        "source": {
                                             "name": "SubjectId",
                                             "type": "Guid"
                                         },
