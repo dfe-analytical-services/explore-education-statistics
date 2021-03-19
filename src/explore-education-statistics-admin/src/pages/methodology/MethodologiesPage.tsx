@@ -113,6 +113,12 @@ const MethodologiesPage = () => {
         </div>
       </div>
 
+      <Link
+        to="/methodologies/create"
+        className="govuk-button govuk-!-margin-bottom-5"
+      >
+        Create new methodology
+      </Link>
       <Tabs id="methodologyTabs">
         <TabsSection
           id="draft-methodologies"
