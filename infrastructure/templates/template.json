@@ -517,7 +517,43 @@
     "maxDbSizeBytes": {
       "type": "int", 
       "defaultValue": 268435456000 
-    }
+    }, 
+    "metricAlerts_Content_DB_Log_IO_usage_name": {
+      "defaultValue": "Content DB Log IO usage",
+      "type": "String"
+    },
+  "metricAlerts_Publisher_response_time_name": {
+      "defaultValue": "Publisher response time",
+      "type": "String"
+    },
+    "metricAlerts_Importer_memory_usage_alert_name": {
+      "defaultValue": "Importer memory usage alert",
+      "type": "String"
+    },
+  "metricAlerts_Statistics___Data_IO_alert_name": {
+      "defaultValue": "Statistics - Data IO alert",
+      "type": "String"
+    },
+  "metricAlerts_Data_factory_failed_pipeline_run_name": {
+    "defaultValue": "Data factory failed pipeline run",
+    "type": "String"
+    },
+"metricAlerts_Public_statistics___Log_IO_usage_name": {
+    "defaultValue": "Public statistics - Log IO usage",
+    "type": "String"
+    },
+"metricAlerts_Public_statistics_database_alert_name": {
+    "defaultValue": "Public statistics database alert",
+    "type": "String"
+    },
+    "metricAlerts_Data_factory_failed_activity_runs_name": {
+      "defaultValue": "Data factory failed activity runs",
+      "type": "String"
+    },
+  "metricAlerts_Public_statistics___Data_IO_usage_name": {
+      "defaultValue": "Public statistics - Data IO usage",
+      "type": "String"
+    },
   },
   "variables": {
     "dataAppName": "[concat(parameters('subscription'), '-as-', parameters('environment'), '-data')]",
