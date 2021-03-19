@@ -5,6 +5,7 @@ using System.Threading.Tasks;
 using AutoMapper;
 using GovUk.Education.ExploreEducationStatistics.Admin.Services.Interfaces.Methodologies;
 using GovUk.Education.ExploreEducationStatistics.Admin.Services.Interfaces.Security;
+using GovUk.Education.ExploreEducationStatistics.Admin.Validators;
 using GovUk.Education.ExploreEducationStatistics.Admin.ViewModels;
 using GovUk.Education.ExploreEducationStatistics.Admin.ViewModels.ManageContent;
 using GovUk.Education.ExploreEducationStatistics.Common.Model;
@@ -417,12 +418,24 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Services.Methodologie
 
         private Task<Either<ActionResult, Methodology>> CheckCanUpdateMethodology(Methodology methodology)
         {
+            if (methodology.Status != MethodologyStatus.Draft)
+            {
+                return Task.Run<Either<ActionResult, Methodology>>(() =>
+                    ValidationActionResult(ValidationErrorMessages.MethodologyMustBeDraft));
+            }
+
             return _userService.CheckCanUpdateMethodology(methodology);
         }
 
         private Task<Either<ActionResult, Tuple<Methodology, ContentSection>>> CheckCanUpdateMethodology(
             Tuple<Methodology, ContentSection> tuple)
         {
+            if (tuple.Item1.Status != MethodologyStatus.Draft)
+            {
+                return Task.Run<Either<ActionResult, Tuple<Methodology, ContentSection>>>(() =>
+                    ValidationActionResult(ValidationErrorMessages.MethodologyMustBeDraft));
+            }
+
             return _userService
                 .CheckCanUpdateMethodology(tuple.Item1)
                 .OnSuccess(_ => tuple);

@@ -100,6 +100,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Validators
 
         // Methodology
         MethodologyDoesNotExist,
+        MethodologyMustBeDraft,
         MethodologyMustBeApproved,
         CannotSpecifyMethodologyAndExternalMethodology,
 
