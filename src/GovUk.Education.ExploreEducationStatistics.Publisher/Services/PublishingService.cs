@@ -76,7 +76,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Publisher.Services
                 {
                     DestinationConnectionString = _publicStorageConnectionString,
                     SetAttributesCallbackAsync = destination =>
-                        SetPublishedBlobAttributesCallback(destination, methodology.Published.Value),
+                        SetPublishedBlobAttributesCallback(destination, DateTime.UtcNow),
                     ShouldTransferCallbackAsync = (source, _) =>
                         // Filter by blobs with matching file paths
                         TransferBlobIfFileExistsCallback(

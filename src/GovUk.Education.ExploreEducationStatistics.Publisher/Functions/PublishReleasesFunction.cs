@@ -33,7 +33,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Publisher.Functions
         /// <param name="logger"></param>
         [FunctionName("PublishReleases")]
         // ReSharper disable once UnusedMember.Global
-        public void PublishReleases([TimerTrigger("%PublishReleasesCronSchedule%")]
+        public async Task PublishReleases([TimerTrigger("%PublishReleasesCronSchedule%")]
             TimerInfo timer,
             ExecutionContext executionContext,
             ILogger logger)
@@ -41,7 +41,9 @@ namespace GovUk.Education.ExploreEducationStatistics.Publisher.Functions
             logger.LogInformation("{0} triggered at: {1}",
                 executionContext.FunctionName,
                 DateTime.Now);
-            PublishReleases().Wait();
+
+            await PublishReleases();
+
             logger.LogInformation(
                 "{0} completed. {1}",
                 executionContext.FunctionName,

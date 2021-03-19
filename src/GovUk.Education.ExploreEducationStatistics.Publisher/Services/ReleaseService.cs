@@ -12,11 +12,11 @@ using GovUk.Education.ExploreEducationStatistics.Data.Model.Database;
 using GovUk.Education.ExploreEducationStatistics.Data.Model.Services.Interfaces;
 using GovUk.Education.ExploreEducationStatistics.Publisher.Model.ViewModels;
 using GovUk.Education.ExploreEducationStatistics.Publisher.Models;
+using GovUk.Education.ExploreEducationStatistics.Publisher.Services.Interfaces;
 using Microsoft.EntityFrameworkCore;
-using static GovUk.Education.ExploreEducationStatistics.Common.Model.FileType;
 using Microsoft.Extensions.Logging;
+using static GovUk.Education.ExploreEducationStatistics.Common.Model.FileType;
 using static GovUk.Education.ExploreEducationStatistics.Common.BlobContainers;
-using IReleaseService = GovUk.Education.ExploreEducationStatistics.Publisher.Services.Interfaces.IReleaseService;
 using static GovUk.Education.ExploreEducationStatistics.Publisher.Extensions.PublisherExtensions;
 
 namespace GovUk.Education.ExploreEducationStatistics.Publisher.Services

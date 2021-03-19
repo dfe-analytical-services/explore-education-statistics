@@ -12,6 +12,8 @@ namespace GovUk.Education.ExploreEducationStatistics.Publisher.Services.Interfac
     {
         Task<Methodology> Get(Guid id);
 
+        Task<Methodology> GetByRelease(Guid releaseId);
+
         Task<List<File>> GetFiles(Guid methodologyId, params FileType[] types);
 
         Task<MethodologyViewModel> GetViewModelAsync(Guid id, PublishContext context);

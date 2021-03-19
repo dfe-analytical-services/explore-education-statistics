@@ -131,6 +131,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Publisher.Services
                 }
             }
 
+            // Include Methodologies of the Publications if they are not already live
             foreach (var methodologyId in methodologyIds)
             {
                 var methodology = await _methodologyService.Get(methodologyId);
