@@ -19,20 +19,6 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Services.Methodologie
             _contentDbContext = contentDbContext;
         }
 
-        public async Task<bool> UserHasReleaseRoleAssociatedWithMethodology(
-            Guid userId,
-            Guid methodologyId)
-        {
-            return await _contentDbContext.UserReleaseRoles
-                .Include(urr => urr.Release)
-                .ThenInclude(r => r.Publication)
-                .Where(urr =>
-                    urr.UserId == userId
-                    && urr.Role != ReleaseRole.PrereleaseViewer
-                    && urr.Release.Publication.MethodologyId == methodologyId)
-                .AnyAsync();
-        }
-
         public async Task<List<Methodology>> GetMethodologiesForUser(Guid userId)
         {
             return await _contentDbContext.UserReleaseRoles

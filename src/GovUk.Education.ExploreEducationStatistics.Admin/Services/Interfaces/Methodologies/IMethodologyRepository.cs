@@ -7,10 +7,6 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Services.Interfaces.M
 {
     public interface IMethodologyRepository
     {
-        Task<bool> UserHasReleaseRoleAssociatedWithMethodology(
-            Guid userId,
-            Guid methodologyId);
-
         Task<List<Methodology>> GetMethodologiesForUser(Guid userId);
     }
 }
