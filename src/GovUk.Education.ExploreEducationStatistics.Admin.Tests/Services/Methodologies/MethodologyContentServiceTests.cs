@@ -60,7 +60,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services.Method
                     {
                         Id = Guid.NewGuid(),
                         Heading = "New section",
-                        Order = 1
+                        Order = 2
                     }
                 }
             };
