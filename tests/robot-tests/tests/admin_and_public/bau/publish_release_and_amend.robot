@@ -395,7 +395,7 @@ Create amendment
     user waits until h1 is visible  Confirm you want to amend this live release
     user clicks button   Confirm
     user waits until h1 is visible  ${PUBLICATION_NAME}
-    user waits until page contains title caption  Amend release
+    user waits until page contains title caption  Amend release  90
 
 Navigate to data replacement page
     [Tags]  HappyPath
