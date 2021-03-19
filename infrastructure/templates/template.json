@@ -299,6 +299,7 @@
         "description": "Email addresses for receiving alerts"
       }
     },
+    
 
     "departmentName": {
       "type": "string",
@@ -3414,6 +3415,45 @@
         ],
         "targetResourceLocation": ""
       }
-    }
+    },
+    {
+      "type": "microsoft.insights/actionGroups",
+      "apiVersion": "2019-06-01",
+      "name": "[parameters('actionGroups_email_notifications_name')]",
+      "location": "Global",
+      "tags": {
+          "Environment": "Dev",
+          "Parent Business": "Business Intelligence",
+          "Portfolio": "Data Directorate",
+          "Product": "Enterprise Data and Analytics Platform (EDAP)",
+          "Service Line": "Data Operations",
+          "Service Offering": "Enterprise Data and Analytics Platform (EDAP)",
+          "Service": "Business Intelligence (Data)"
+      },
+      "properties": {
+          "groupShortName": "email notifi",
+          "enabled": true,
+          "emailReceivers": [
+            {
+              "name": "email testing_-EmailAction-",
+              "emailAddress": "parameters('emailReceiverEmails')[copyIndex()].address)",
+              "useCommonAlertSchema": false, 
+              "copy": {
+                "name": "emailReceiversLoop",
+                "count": "1"
+              },
+            },
+          ],
+          "smsReceivers": [],
+          "webhookReceivers": [],
+          "itsmReceivers": [],
+          "azureAppPushReceivers": [],
+          "automationRunbookReceivers": [],
+          "voiceReceivers": [],
+          "logicAppReceivers": [],
+          "azureFunctionReceivers": [],
+          "armRoleReceivers": []
+      }, 
+    }, 
   ]
 }
