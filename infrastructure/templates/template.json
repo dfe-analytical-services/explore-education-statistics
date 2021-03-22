@@ -3443,7 +3443,7 @@
           "enabled": true,
           "emailReceivers": [
             {
-              "name": "[concat('email testing_-EmailAction-', parameters('emailReceiverEmails')[copyIndex()].name)]",
+              "name": "[concat('emailTestingEmailAction', parameters('emailReceiverEmails')[copyIndex()].name)]",
               "emailAddress": "[parameters('emailReceiverEmails')[copyIndex()].address)]",
               "useCommonAlertSchema": false, 
               "copy": {
