@@ -35,10 +35,25 @@ const FootnoteForm = ({
 }: Props) => {
   const initialValues = useMemo<BaseFootnote>(() => {
     const subjects = mapValues(footnoteMeta.subjects, subject => {
-      const { indicators, filters } = subject;
+      const { indicators, filters, subjectId } = subject;
+
+      let subjectSelectionType = 'NA';
+
+      if (footnote && Object.keys(footnote.subjects).includes(subjectId)) {
+        const foundSubject = footnote.subjects[subjectId];
+        if (foundSubject.selected) {
+          subjectSelectionType = 'All';
+        } else if (
+          !foundSubject.selected &&
+          (Object.keys(foundSubject.filters).length > 0 ||
+            Object.keys(foundSubject.indicatorGroups).length > 0)
+        ) {
+          subjectSelectionType = 'Specific';
+        }
+      }
 
       return {
-        selectionType: '',
+        selectionType: subjectSelectionType,
         indicatorGroups: mapValues(indicators, () => ({
           selected: false,
           indicators: [],
@@ -67,7 +82,6 @@ const FootnoteForm = ({
         subjects: Yup.object(),
       })}
       onSubmit={async values => {
-        console.log(values);
         const {
           subjects,
           indicatorGroups,
@@ -145,6 +159,7 @@ const FootnoteForm = ({
                     {
                       value: `All`,
                       label: 'Applies to all data',
+                      hiddenConditional: true,
                       conditional: (
                         <>
                           <IndicatorDetails

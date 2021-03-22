@@ -3,6 +3,7 @@ import footnoteToFlatFootnote from './utils/footnote/footnoteToFlatFootnote';
 
 export interface FootnoteSubject {
   selectionType: string;
+  selected?: boolean;
   indicatorGroups: {
     [key: string]: {
       selected: boolean;

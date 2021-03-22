@@ -79,7 +79,7 @@ const IndicatorDetails = ({
                         className="govuk-checkboxes--small"
                         name={`${valuePath}.indicatorGroups.${indicatorGroupId}.indicators`}
                         id={indicatorItem.value}
-                        disabled={parentSelected === 'All' || groupValue}
+                        disabled={groupValue}
                         checked={parentSelected === 'All' || checked}
                         onChange={e => {
                           form.setFieldValue(

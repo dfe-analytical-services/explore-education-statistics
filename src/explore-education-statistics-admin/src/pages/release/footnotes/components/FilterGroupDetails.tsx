@@ -93,7 +93,7 @@ const FilterGroupDetails = ({
                       className="govuk-checkboxes--small"
                       name={`${groupPath}.filterGroups[${filterGroupId}].filterItems`}
                       id={filterItem.value}
-                      disabled={groupIsSelected || groupValue}
+                      disabled={groupValue}
                       checked={checked}
                       onChange={e => {
                         form.setFieldValue(
