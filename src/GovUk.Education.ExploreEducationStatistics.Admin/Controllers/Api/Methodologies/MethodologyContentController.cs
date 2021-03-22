@@ -27,7 +27,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Controllers.Api.Metho
         public async Task<ActionResult<ManageMethodologyContentViewModel>> GetContent(Guid methodologyId)
         {
             return await _contentService
-                .GetContentAsync(methodologyId)
+                .GetContent(methodologyId)
                 .HandleFailuresOrOk();
         }
 
@@ -37,7 +37,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Controllers.Api.Metho
             [FromQuery] MethodologyContentService.ContentListType type)
         {
             return await _contentService
-                .GetContentSectionsAsync(methodologyId, type)
+                .GetContentSections(methodologyId, type)
                 .HandleFailuresOrOk();
         }
 
@@ -46,7 +46,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Controllers.Api.Metho
             Guid methodologyId, Dictionary<Guid, int> newSectionOrder)
         {
             return await _contentService
-                .ReorderContentSectionsAsync(methodologyId, newSectionOrder)
+                .ReorderContentSections(methodologyId, newSectionOrder)
                 .HandleFailuresOrOk();
         }
 
@@ -57,7 +57,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Controllers.Api.Metho
             ContentSectionAddRequest request = null)
         {
             return await _contentService
-                .AddContentSectionAsync(methodologyId, request, type)
+                .AddContentSection(methodologyId, request, type)
                 .HandleFailuresOrOk();
         }
 
@@ -66,7 +66,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Controllers.Api.Metho
             Guid methodologyId, Guid contentSectionId, ContentSectionHeadingUpdateRequest request)
         {
             return await _contentService
-                .UpdateContentSectionHeadingAsync(methodologyId, contentSectionId, request.Heading)
+                .UpdateContentSectionHeading(methodologyId, contentSectionId, request.Heading)
                 .HandleFailuresOrOk();
         }
 
@@ -75,7 +75,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Controllers.Api.Metho
             Guid methodologyId, Guid contentSectionId)
         {
             return await _contentService
-                .RemoveContentSectionAsync(methodologyId, contentSectionId)
+                .RemoveContentSection(methodologyId, contentSectionId)
                 .HandleFailuresOrOk();
         }
 
@@ -84,7 +84,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Controllers.Api.Metho
             Guid contentSectionId)
         {
             return await _contentService
-                .GetContentSectionAsync(methodologyId, contentSectionId)
+                .GetContentSection(methodologyId, contentSectionId)
                 .HandleFailuresOrOk();
         }
 
@@ -93,7 +93,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Controllers.Api.Metho
             Guid methodologyId, Guid contentSectionId, Dictionary<Guid, int> newBlocksOrder)
         {
             return await _contentService
-                .ReorderContentBlocksAsync(methodologyId, contentSectionId, newBlocksOrder)
+                .ReorderContentBlocks(methodologyId, contentSectionId, newBlocksOrder)
                 .HandleFailuresOrOk();
         }
 
@@ -102,7 +102,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Controllers.Api.Metho
             Guid methodologyId, Guid contentSectionId, ContentBlockAddRequest request)
         {
             return await _contentService
-                .AddContentBlockAsync(methodologyId, contentSectionId, request)
+                .AddContentBlock(methodologyId, contentSectionId, request)
                 .HandleFailuresOrOk();
         }
 
@@ -111,7 +111,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Controllers.Api.Metho
             Guid methodologyId, Guid contentSectionId, Guid contentBlockId)
         {
             return await _contentService
-                .RemoveContentBlockAsync(methodologyId, contentSectionId, contentBlockId)
+                .RemoveContentBlock(methodologyId, contentSectionId, contentBlockId)
                 .HandleFailuresOrOk();
         }
 
@@ -120,7 +120,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Controllers.Api.Metho
             Guid methodologyId, Guid contentSectionId, Guid contentBlockId, ContentBlockUpdateRequest request)
         {
             return await _contentService
-                .UpdateTextBasedContentBlockAsync(methodologyId, contentSectionId, contentBlockId, request)
+                .UpdateTextBasedContentBlock(methodologyId, contentSectionId, contentBlockId, request)
                 .HandleFailuresOrOk();
         }
     }
