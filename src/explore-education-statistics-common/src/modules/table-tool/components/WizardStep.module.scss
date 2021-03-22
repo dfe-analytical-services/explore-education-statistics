@@ -41,10 +41,15 @@ $step-padding-top-mobile: govuk-spacing(7);
   &:focus {
     outline: 0;
   }
+
+  :global(.govuk-summary-list) {
+    margin-bottom: 0;
+    margin-left: govuk-spacing(9) + govuk-spacing(5);
+  }
 }
 
 .stepActive {
-  grid-area: main;
+  order: -1;
 
   &::before,
   &:last-child::after {
@@ -54,6 +59,11 @@ $step-padding-top-mobile: govuk-spacing(7);
   .number {
     border-color: govuk-colour('black');
     display: none;
+  }
+
+  .content {
+    border-bottom: 0;
+    width: 100%;
   }
 }
 
@@ -85,8 +95,9 @@ $step-padding-top-mobile: govuk-spacing(7);
   border-bottom: 2px solid govuk-colour('light-grey');
   display: block;
   //padding-left: govuk-spacing(6);
-  padding-top: $step-padding-top;
-  width: 100%;
+  //padding-top: $step-padding-top;
+  position: relative;
+  width: 980px;
   @include govuk-media-query($until: tablet) {
     padding-top: $step-padding-top-mobile;
   }

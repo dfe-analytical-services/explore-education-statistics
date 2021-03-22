@@ -43,7 +43,10 @@ const FormSortableList = ({
           }
         }}
       >
-        <Droppable droppableId={id}>
+        <Droppable
+          droppableId={id}
+          direction={id.includes('columnGroups') ? 'horizontal' : 'vertical'}
+        >
           {(droppableProvided, droppableSnapshot) => (
             <div
               // eslint-disable-next-line react/jsx-props-no-spreading

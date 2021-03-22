@@ -3,6 +3,11 @@
 .list {
   max-height: 40vh;
   overflow: auto;
+
+  :global(.column-group) & {
+    display: flex;
+    justify-content: space-between;
+  }
 }
 
 .listDraggingOver {
@@ -22,6 +27,8 @@
 .optionRow {
   background: #fff;
   border-bottom: 1px solid govuk-colour('mid-grey');
+  flex-grow: 1;
+  margin: 0.5rem;
   padding: govuk-spacing(2);
   user-select: none;
 

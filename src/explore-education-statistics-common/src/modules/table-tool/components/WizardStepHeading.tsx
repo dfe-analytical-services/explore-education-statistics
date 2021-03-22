@@ -5,6 +5,7 @@ import styles from './WizardStepHeading.module.scss';
 
 interface Props {
   children: ReactNode;
+  editTitle?: string;
   fieldsetHeading?: boolean;
   size?: 'xl' | 'l' | 'm' | 's';
 }
@@ -12,6 +13,7 @@ interface Props {
 const WizardStepHeading = ({
   children,
   currentStep,
+  editTitle = '',
   fieldsetHeading = false,
   isActive,
   size = 's',
@@ -24,35 +26,42 @@ const WizardStepHeading = ({
     <>
       {isActive ? (
         <h2
-          className={classNames(`govuk-heading-l`, {
-            'govuk-fieldset__heading': fieldsetHeading,
-          })}
+          className={classNames(
+            `govuk-heading-l`,
+            `dfe-flex`,
+            `dfe-align-items--center`,
+            {
+              'govuk-fieldset__heading': fieldsetHeading,
+            },
+          )}
         >
-          <span className="govuk-visually-hidden">{`Step ${stepNumber}: `}</span>
-          {children}
+          <span>{children}</span>
+          <span className="govuk-tag govuk-tag--turquoise govuk-!-margin-left-3">{`Step  ${stepNumber} of 6`}</span>
         </h2>
       ) : (
         <>
           <h2
-            className={classNames(
-              `govuk-heading-${size}`,
-              {
-                [styles.stepEnabled]: stepEnabled,
-              },
-              'govuk-!-margin-bottom-0',
-            )}
+            className={classNames(`govuk-heading-${size}`, {
+              [styles.stepEnabled]: stepEnabled,
+            })}
           >
-            <span>{`Step ${stepNumber}: `}</span>
-            {children}
+            <span className="govuk-tag govuk-tag--grey">{`Step ${stepNumber} `}</span>
+            <span className="govuk-visually-hidden">{children}</span>
           </h2>
-          <button
+          <a
+            href="#"
             data-testid={`wizardStep-${stepNumber}-goToButton`}
             type="button"
             onClick={() => setCurrentStep(stepNumber)}
-            className="govuk-button govuk-button--secondary govuk-!-margin-bottom-3 govuk-!-margin-top-1"
+            className="govuk-link govuk-!-margin-top-1"
           >
-            {stepEnabled && <>Edit this step</>}
-          </button>
+            {stepEnabled && (
+              <>
+                {editTitle}{' '}
+                <span className="govuk-visually-hidden">{`Step ${stepNumber}`}</span>
+              </>
+            )}
+          </a>
         </>
       )}
     </>

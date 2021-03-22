@@ -52,7 +52,7 @@ const TableHeadersForm = ({
 
   return (
     <Details summary="Re-order table headers" className="dfe-custom-details">
-      <div className="govuk-!-width-one-half">
+      <div className="dfe-custom-details--content">
         <p className="govuk-hint">
           Drag and drop the options below to re-order the table headers. For
           keyboard users, select and deselect a draggable item with space and

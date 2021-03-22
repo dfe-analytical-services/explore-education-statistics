@@ -49,7 +49,11 @@ const PublicationForm = (props: Props & InjectedWizardProps) => {
   const lowercaseSearchTerm = searchTerm.toLowerCase();
 
   const stepHeading = (
-    <WizardStepHeading {...props} fieldsetHeading>
+    <WizardStepHeading
+      {...props}
+      fieldsetHeading
+      editTitle="Change publication"
+    >
       Choose a publication
     </WizardStepHeading>
   );
@@ -199,15 +203,15 @@ const PublicationForm = (props: Props & InjectedWizardProps) => {
         return (
           <>
             <div className="govuk-grid-row">
-              <div className="govuk-grid-column-one-quarter">{stepHeading}</div>
-              <div className="govuk-grid-column-three-quarters">
-                <Details summary="View details">
-                  <SummaryList noBorder>
-                    <SummaryListItem term="Publication">
-                      {publication?.title}
-                    </SummaryListItem>
-                  </SummaryList>
-                </Details>
+              <div className="govuk-grid-column-two-thirds">
+                <SummaryList noBorder>
+                  <SummaryListItem term="Publication">
+                    {publication?.title}
+                  </SummaryListItem>
+                </SummaryList>
+              </div>
+              <div className="govuk-grid-column-one-third dfe-align--right">
+                {stepHeading}
               </div>
             </div>
           </>

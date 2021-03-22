@@ -28,6 +28,10 @@ $step-padding-top: govuk-spacing(6);
 }
 
 .stepEnabled {
+  left: 0;
+  position: absolute;
+  top: (govuk-spacing(2) - 1px);
+
   .stepButton {
     cursor: pointer;
   }
@@ -45,3 +49,9 @@ $step-padding-top: govuk-spacing(6);
     text-decoration: underline;
   }
 }
+
+/*.editButton{
+  right: 0;
+  position: absolute;
+  top: 0;
+}*/

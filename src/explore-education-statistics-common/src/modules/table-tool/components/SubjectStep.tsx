@@ -40,7 +40,13 @@ const SubjectStep = ({
   const hasHighlights = renderHighlightLink && highlights.length > 0;
 
   const heading = (
-    <WizardStepHeading {...stepProps} fieldsetHeading={!hasHighlights}>
+    <WizardStepHeading
+      {...stepProps}
+      fieldsetHeading={!hasHighlights}
+      editTitle={
+        hasHighlights ? 'Change featured table or subject' : 'Change subject'
+      }
+    >
       {hasHighlights
         ? 'View a featured table or create your own'
         : 'Choose a subject'}
@@ -132,13 +138,13 @@ const SubjectStep = ({
   return (
     <>
       <div className="govuk-grid-row">
-        <div className="govuk-grid-column-one-quarter">{heading}</div>
-        <div className="govuk-grid-column-three-quarters">
-          <Details summary="View details" className="govuk-!-margin-bottom-2">
-            <SummaryList noBorder>
-              <SummaryListItem term="Subject">{subjectName}</SummaryListItem>
-            </SummaryList>
-          </Details>
+        <div className="govuk-grid-column-two-thirds">
+          <SummaryList noBorder>
+            <SummaryListItem term="Subject">{subjectName}</SummaryListItem>
+          </SummaryList>
+        </div>
+        <div className="govuk-grid-column-one-third dfe-align--right">
+          {heading}
         </div>
       </div>
     </>

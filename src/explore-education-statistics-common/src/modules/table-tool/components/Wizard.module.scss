@@ -2,7 +2,7 @@
 
 .stepNav {
   display: flex;
-  flex-direction: column-reverse;
+  flex-direction: column;
   list-style: none;
   padding-left: 0;
   @include govuk-media-query($until: tablet) {

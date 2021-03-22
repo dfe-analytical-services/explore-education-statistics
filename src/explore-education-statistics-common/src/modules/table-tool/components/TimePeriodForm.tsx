@@ -78,7 +78,7 @@ const TimePeriodForm = (props: Props & InjectedWizardProps) => {
   };
 
   const stepHeading = (
-    <WizardStepHeading {...props} fieldsetHeading>
+    <WizardStepHeading {...props} fieldsetHeading editTitle="Edit time period">
       Choose time period
     </WizardStepHeading>
   );
@@ -179,27 +179,21 @@ const TimePeriodForm = (props: Props & InjectedWizardProps) => {
         ) : (
           <>
             <div className="govuk-grid-row">
-              <div className="govuk-grid-column-one-quarter">
+              <div className="govuk-grid-column-two-thirds">
+                <SummaryList noBorder>
+                  <SummaryListItem term="Time period">
+                    {form.values.start && getOptionLabel(form.values.start)}
+                    {` to `}
+                    {form.values.end && getOptionLabel(form.values.end)}
+                  </SummaryListItem>
+                </SummaryList>
+              </div>
+              <div className="govuk-grid-column-one-third dfe-align--right">
                 {stepHeading}
                 <ResetFormOnPreviousStep
                   currentStep={currentStep}
                   stepNumber={stepNumber}
                 />
-              </div>
-              <div className="govuk-grid-column-three-quarters">
-                <Details
-                  summary="View details"
-                  className="govuk-!-margin-bottom-2"
-                >
-                  <SummaryList noBorder>
-                    <SummaryListItem term="Start date">
-                      {form.values.start && getOptionLabel(form.values.start)}
-                    </SummaryListItem>
-                    <SummaryListItem term="End date">
-                      {form.values.end && getOptionLabel(form.values.end)}
-                    </SummaryListItem>
-                  </SummaryList>
-                </Details>
               </div>
             </div>
           </>

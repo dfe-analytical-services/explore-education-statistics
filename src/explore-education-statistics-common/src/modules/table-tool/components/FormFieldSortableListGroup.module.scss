@@ -20,6 +20,10 @@
   @include govuk-media-query($from: desktop) {
     flex-direction: row;
   }
+
+  :global(.column-group) & {
+    flex-direction: column;
+  }
 }
 
 .list {
