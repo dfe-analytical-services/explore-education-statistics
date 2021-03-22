@@ -3453,7 +3453,7 @@
           "logicAppReceivers": [],
           "azureFunctionReceivers": [],
           "armRoleReceivers": []
-      }, 
-    }, 
+      }
+    }
   ]
 }
