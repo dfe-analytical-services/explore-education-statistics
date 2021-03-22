@@ -206,7 +206,8 @@ Validate Regional and local authority (LA) breakdown table
     [Tags]  HappyPath   Failing
     [Documentation]  BAU-540
     user opens accordion section  Regional and local authority (LA) breakdown  id:content
-    user waits until element contains  css:#content_9_datablock-tables [data-testid="dataTableCaption"]    Table showing 'Absence by characteristic' from 'Pupil absence in schools in England' in
+    user waits until element contains  css:#content_9_datablock-tables [data-testid="dataTableCaption"]
+    ...  Table showing 'Absence by characteristic' from 'Pupil absence in schools in England' in  90
 
     user checks table column heading contains  1   1   2016/17  css:#content_9_datablock-tables table
 
