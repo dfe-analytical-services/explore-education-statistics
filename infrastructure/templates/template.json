@@ -3440,8 +3440,7 @@
               "useCommonAlertSchema": false, 
               "copy": {
                 "name": "emailReceiversLoop",
-                "count": "1"
-              },
+                "count": "[length(parameters('emailReceiverEmails'))]"
             },
           ],
           "smsReceivers": [],
