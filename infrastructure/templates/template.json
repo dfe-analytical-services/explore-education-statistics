@@ -299,8 +299,6 @@
         "description": "Email addresses for receiving alerts"
       }
     },
-    
-
     "departmentName": {
       "type": "string",
       "defaultValue": "Unknown",
@@ -521,39 +519,49 @@
     }, 
     "metricAlerts_Content_DB_Log_IO_usage_name": {
       "defaultValue": "Content DB Log IO usage",
-      "type": "String"
+      "type": "string"
     },
-  "metricAlerts_Publisher_response_time_name": {
+    "metricAlerts_Publisher_response_time_name": {
       "defaultValue": "Publisher response time",
-      "type": "String"
+      "type": "string"
     },
     "metricAlerts_Importer_memory_usage_alert_name": {
       "defaultValue": "Importer memory usage alert",
-      "type": "String"
+      "type": "string"
     },
-  "metricAlerts_Statistics___Data_IO_alert_name": {
+    "metricAlerts_Statistics___Data_IO_alert_name": {
       "defaultValue": "Statistics - Data IO alert",
-      "type": "String"
+      "type": "string"
     },
-  "metricAlerts_Data_factory_failed_pipeline_run_name": {
-    "defaultValue": "Data factory failed pipeline run",
-    "type": "String"
+    "metricAlerts_Data_factory_failed_pipeline_run_name": {
+      "defaultValue": "Data factory failed pipeline run",
+      "type": "string"
     },
-"metricAlerts_Public_statistics___Log_IO_usage_name": {
-    "defaultValue": "Public statistics - Log IO usage",
-    "type": "String"
+    "metricAlerts_Public_statistics___Log_IO_usage_name": {
+      "defaultValue": "Public statistics - Log IO usage",
+      "type": "string"
     },
-"metricAlerts_Public_statistics_database_alert_name": {
-    "defaultValue": "Public statistics database alert",
-    "type": "String"
+    "metricAlerts_Public_statistics_database_alert_name": {
+      "defaultValue": "Public statistics database alert",
+      "type": "string"
     },
     "metricAlerts_Data_factory_failed_activity_runs_name": {
       "defaultValue": "Data factory failed activity runs",
-      "type": "String"
+      "type": "string"
     },
-  "metricAlerts_Public_statistics___Data_IO_usage_name": {
+    "metricAlerts_Public_statistics___Data_IO_usage_name": {
       "defaultValue": "Public statistics - Data IO usage",
-      "type": "String"
+      "type": "string"
+    },
+    "emailReceiverEmails": {
+      "type": "array",
+      "metadata": {
+        "description": "Emails to send alerts to"
+      }
+    },
+    "actionGroups_email_notifications_name": {
+      "type": "string",
+      "defaultValue": "Email alerts actionGroup TODO update"
     }
   },
   "variables": {
