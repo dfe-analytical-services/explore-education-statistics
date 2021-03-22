@@ -554,7 +554,7 @@
   "metricAlerts_Public_statistics___Data_IO_usage_name": {
       "defaultValue": "Public statistics - Data IO usage",
       "type": "String"
-    },
+    }
   },
   "variables": {
     "dataAppName": "[concat(parameters('subscription'), '-as-', parameters('environment'), '-data')]",
