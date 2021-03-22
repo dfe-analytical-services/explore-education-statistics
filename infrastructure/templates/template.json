@@ -3435,8 +3435,8 @@
           "enabled": true,
           "emailReceivers": [
             {
-              "name": "email testing_-EmailAction-",
-              "emailAddress": "parameters('emailReceiverEmails')[copyIndex()].address)",
+              "name": "[concat('email testing_-EmailAction-', parameters('emailReceiverEmails')[copyIndex()].name)]",
+              "emailAddress": "[parameters('emailReceiverEmails')[copyIndex()].address)]",
               "useCommonAlertSchema": false, 
               "copy": {
                 "name": "emailReceiversLoop",
