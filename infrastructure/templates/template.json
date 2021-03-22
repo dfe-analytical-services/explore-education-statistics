@@ -3441,7 +3441,8 @@
               "copy": {
                 "name": "emailReceiversLoop",
                 "count": "[length(parameters('emailReceiverEmails'))]"
-            },
+              }
+            }
           ],
           "smsReceivers": [],
           "webhookReceivers": [],
