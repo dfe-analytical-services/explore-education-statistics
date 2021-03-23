@@ -3412,10 +3412,10 @@
           "copy": [
             {
                 "name": "emailReceivers",
-                "count": "[length(parameters('actionGroup_emails'))]",
+                "count": "[length(parameters('emailReceiverEmails'))]",
                 "input": {
-                    "name": "[concat(split(parameters('actionGroup_emails'),'@')[0],'_EmailAction')] ",
-                    "emailAddress": "[parameters('actionGroup_emails')[copyIndex()]]",
+                    "name": "[concat(split(parameters('emailReceiverEmails'),'@')[0],'_EmailAction')] ",
+                    "emailAddress": "[parameters('emailReceiverEmails')[copyIndex()]]",
                     "useCommonAlertSchema": false
                 }
             }
