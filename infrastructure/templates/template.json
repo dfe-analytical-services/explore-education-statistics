@@ -3409,17 +3409,17 @@
       "properties": {
           "groupShortName": "email notifi",
           "enabled": true,
-          "emailReceivers": [
+          "copy": [
             {
-              "name": "[concat(split(parameters('actionGroup_emails'),'@')[0],'_EmailAction')] ",
-              "emailAddress": "[parameters('actionGroup_emails')[copyIndex()]]",
-              "useCommonAlertSchema": false,
-              "copy":{
-                  "name":"emails",
-                  "count":"[length(parameters('actionGroup_emails'))]"
-              }
-          }
-          ],
+                "name": "emailReceivers",
+                "count": "[length(parameters('actionGroup_emails'))]",
+                "input": {
+                    "name": "[concat(split(parameters('actionGroup_emails'),'@')[0],'_EmailAction')] ",
+                    "emailAddress": "[parameters('actionGroup_emails')[copyIndex()]]",
+                    "useCommonAlertSchema": false
+                }
+            }
+        ],
           "smsReceivers": [],
           "webhookReceivers": [],
           "itsmReceivers": [],
