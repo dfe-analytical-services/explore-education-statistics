@@ -3413,8 +3413,12 @@
             {
               "name": "[concat(split(parameters('actionGroup_emails'),'@')[0],'_EmailAction')] ",
               "emailAddress": "[parameters('actionGroup_emails')[copyIndex()]]",
-              "useCommonAlertSchema": false
-            }
+              "useCommonAlertSchema": false,
+              "copy":{
+                  "name":"emails",
+                  "count":"[length(parameters('actionGroup_emails'))]"
+              }
+          }
           ],
           "smsReceivers": [],
           "webhookReceivers": [],
