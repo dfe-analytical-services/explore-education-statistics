@@ -299,6 +299,7 @@
         "description": "Email addresses for receiving alerts"
       }
     },
+
     "departmentName": {
       "type": "string",
       "defaultValue": "Unknown",
@@ -516,20 +517,6 @@
     "maxDbSizeBytes": {
       "type": "int", 
       "defaultValue": 268435456000 
-    }, 
-    "actionGroups_email_notifications_name": {
-      "defaultValue": "Email notifications",
-      "type": "string"
-    },
-    "metricAlerts_Content_DB_Log_IO_usage_name": {
-      "defaultValue": "Content DB Log IO usage",
-      "type": "string"
-    },
-    "emailReceiverEmails": {
-      "type": "array",
-      "metadata": {
-        "description": "Emails to send alerts to"
-      }
     }
   },
   "variables": {
@@ -3390,96 +3377,6 @@
         "notifications": [
         ],
         "targetResourceLocation": ""
-      }
-    },
-    {
-      "type": "microsoft.insights/actionGroups",
-      "apiVersion": "2019-06-01",
-      "name": "[parameters('actionGroups_email_notifications_name')]",
-      "location": "Global",
-      "tags": {
-        "Environment": "Dev",
-        "Parent Business": "Business Intelligence",
-        "Portfolio": "Data Directorate",
-        "Product": "Enterprise Data and Analytics Platform (EDAP)",
-        "Service Line": "Data Operations",
-        "Service Offering": "Enterprise Data and Analytics Platform (EDAP)",
-        "Service": "Business Intelligence (Data)"
-      },
-      "properties": {
-        "groupShortName": "email notifi",
-        "enabled": true,
-        "copy": [
-          {
-            "name": "emailReceiverEmails",
-            "count": "[length(parameters('emailReceiverEmails'))]",
-            "input": {
-              "name": "[parameters('emailReceiverEmails')[copyIndex('emailReceiverEmails')].name]",
-              "emailAddress": "[parameters('emailReceiverEmails')[copyIndex('emailReceiverEmails')].address]",
-              "useCommonAlertSchema": false
-            }
-          }
-        ],
-        "smsReceivers": [],
-        "webhookReceivers": [],
-        "itsmReceivers": [],
-        "azureAppPushReceivers": [],
-        "automationRunbookReceivers": [],
-        "voiceReceivers": [],
-        "logicAppReceivers": [],
-        "azureFunctionReceivers": [],
-        "armRoleReceivers": []
-      }
-    },
-    {
-      "type": "microsoft.insights/metricAlerts",
-      "apiVersion": "2018-03-01",
-      "name": "[parameters('metricAlerts_Content_DB_Log_IO_usage_name')]",
-      "location": "global",
-      "dependsOn": [
-        "[resourceId('Microsoft.Sql/servers/databases', variables('sqlServerName'), 'content')]",
-        "[resourceId('microsoft.insights/actionGroups', parameters('actionGroups_email_notifications_name'))]"
-      ],
-      "tags": {
-        "Environment": "Dev",
-        "Parent Business": "Business Intelligence",
-        "Portfolio": "Data Directorate",
-        "Product": "Enterprise Data and Analytics Platform (EDAP)",
-        "Service Line": "Data Operations",
-        "Service Offering": "Enterprise Data and Analytics Platform (EDAP)",
-        "Service": "Business Intelligence (Data)"
-      },
-      "properties": {
-        "description": "[concat(parameters('metricAlerts_Content_DB_Log_IO_usage_name'), ' is above 80%')]",
-        "severity": 3,
-        "enabled": true,
-        "scopes": [
-          "[resourceId('Microsoft.Sql/servers/databases', variables('sqlServerName'), 'content')]"
-        ],
-        "evaluationFrequency": "PT1M",
-        "windowSize": "PT5M",
-        "criteria": {
-          "allOf": [
-            {
-              "threshold": 80,
-              "name": "Metric1",
-              "metricNamespace": "microsoft.sql/servers/databases",
-              "metricName": "log_write_percent",
-              "operator": "GreaterThan",
-              "timeAggregation": "Average",
-              "criterionType": "StaticThresholdCriterion"
-            }
-          ],
-          "odata.type": "Microsoft.Azure.Monitor.MultipleResourceMultipleMetricCriteria"
-        },
-        "autoMitigate": true,
-        "targetResourceType": "microsoft.sql/servers/databases",
-        "actions": [
-          {
-            "actionGroupId": "[resourceId('microsoft.insights/actionGroups', parameters('actionGroups_email_notifications_name'))]",
-            "webHookProperties": {}
-          }
-        ]
       }
     }
   ]
