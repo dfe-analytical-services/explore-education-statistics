@@ -3415,7 +3415,7 @@
             "count": "[length(parameters('emailReceiverEmails'))]",
             "input": {
               "name": "[parameters('emailReceiverEmails')[copyIndex('emailReceiverEmails')].name]",
-              "emailAddress": "[parameters('emailReceiverEmails')[copyIndex('emailRecieverEmails')].address]",
+              "emailAddress": "[parameters('emailReceiverEmails')[copyIndex('emailReceiverEmails')].address]",
               "useCommonAlertSchema": false
             }
           }
