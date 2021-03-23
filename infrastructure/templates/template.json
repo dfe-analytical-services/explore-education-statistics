@@ -3411,8 +3411,8 @@
           "enabled": true,
           "emailReceivers": [
             {
-              "name": "test account",
-              "emailAddress": "testing@email.com",
+              "name": "[concat(split(parameters('actionGroup_emails'),'@')[0],'_EmailAction')] ",
+              "emailAddress": "[parameters('actionGroup_emails')[copyIndex()]]",
               "useCommonAlertSchema": false
             }
           ],
