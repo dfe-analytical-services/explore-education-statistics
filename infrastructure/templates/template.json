@@ -3398,37 +3398,37 @@
       "name": "[parameters('actionGroups_email_notifications_name')]",
       "location": "Global",
       "tags": {
-          "Environment": "Dev",
-          "Parent Business": "Business Intelligence",
-          "Portfolio": "Data Directorate",
-          "Product": "Enterprise Data and Analytics Platform (EDAP)",
-          "Service Line": "Data Operations",
-          "Service Offering": "Enterprise Data and Analytics Platform (EDAP)",
-          "Service": "Business Intelligence (Data)"
+        "Environment": "Dev",
+        "Parent Business": "Business Intelligence",
+        "Portfolio": "Data Directorate",
+        "Product": "Enterprise Data and Analytics Platform (EDAP)",
+        "Service Line": "Data Operations",
+        "Service Offering": "Enterprise Data and Analytics Platform (EDAP)",
+        "Service": "Business Intelligence (Data)"
       },
       "properties": {
-          "groupShortName": "email notifi",
-          "enabled": true,
-          "copy": [
-            {
-                "name": "emailReceivers",
-                "count": "[length(parameters('emailReceiverEmails'))]",
-                "input": {
-                    "name": "[concat(split(parameters('emailReceiverEmails'),'@')[0],'_EmailAction')] ",
-                    "emailAddress": "[parameters('emailReceiverEmails')[copyIndex()]]",
-                    "useCommonAlertSchema": false
-                }
+        "groupShortName": "email notifi",
+        "enabled": true,
+        "copy": [
+          {
+            "name": "emailReceiverEmailsLoop",
+            "count": "[length(parameters('emailReceiverEmails'))]",
+            "input": {
+              "name": "[parameters('emailReceiverEmails')[copyIndex('emailReceiverEmailsLoop')].name]",
+              "emailAddress": "[parameters('emailReceiverEmails')[copyIndex('emailRecieverEmailsLoop')].address]",
+              "useCommonAlertSchema": false
             }
+          }
         ],
-          "smsReceivers": [],
-          "webhookReceivers": [],
-          "itsmReceivers": [],
-          "azureAppPushReceivers": [],
-          "automationRunbookReceivers": [],
-          "voiceReceivers": [],
-          "logicAppReceivers": [],
-          "azureFunctionReceivers": [],
-          "armRoleReceivers": []
+        "smsReceivers": [],
+        "webhookReceivers": [],
+        "itsmReceivers": [],
+        "azureAppPushReceivers": [],
+        "automationRunbookReceivers": [],
+        "voiceReceivers": [],
+        "logicAppReceivers": [],
+        "azureFunctionReceivers": [],
+        "armRoleReceivers": []
       }
     },
     {
