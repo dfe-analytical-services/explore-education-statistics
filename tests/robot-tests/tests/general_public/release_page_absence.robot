@@ -89,6 +89,8 @@ Validate absence_in_prus.csv file can be downloaded
 Validate headlines -- Summary tab key stats
     [Documentation]  DFE-915   EES-806   EES-1508
     [Tags]  HappyPath
+    user scrolls to element  xpath://h2[contains(text(), "Headline facts and figures")]
+
     user checks key stat contents    1  Overall absence rate         4.7%   Up from 4.6% in 2015/16   90
     user checks key stat definition  1  What is overall absence?  Total number of all authorised and unauthorised absences from possible school sessions for all pupils.
 
