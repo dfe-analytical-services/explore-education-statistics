@@ -3411,13 +3411,9 @@
           "enabled": true,
           "emailReceivers": [
             {
-              "name": "[concat('emailTestingEmailAction', parameters('emailReceiverEmails')[copyIndex()].name)]",
-              "emailAddress": "[parameters('emailReceiverEmails')[copyIndex()].address)]",
-              "useCommonAlertSchema": false, 
-              "copy": {
-                "name": "emailReceiversLoop",
-                "count": "[length(parameters('emailReceiverEmails'))]"
-              }
+              "name": "test account",
+              "emailAddress": "testing@email.com",
+              "useCommonAlertSchema": false
             }
           ],
           "smsReceivers": [],
