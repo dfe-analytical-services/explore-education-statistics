@@ -154,7 +154,6 @@ const ReleaseContent = () => {
         </div>
 
         <div className="govuk-grid-column-one-third">
-          <PrintThisPage />
           <RelatedAside>
             <h2 className="govuk-heading-m">Useful information</h2>
 
@@ -281,6 +280,7 @@ const ReleaseContent = () => {
       <ReleaseContentAccordion release={release} sectionName="Contents" />
 
       <ReleaseHelpAndSupportSection release={release} />
+      <PrintThisPage />
     </>
   );
 };
