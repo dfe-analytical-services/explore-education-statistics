@@ -100,31 +100,6 @@ const RelatedInformationSection = ({ release }: Props) => {
       </h2>
       <nav role="navigation" aria-labelledby="related-content">
         <ul className="govuk-list">
-          <li>
-            {release.publication.methodology &&
-              (isEditing ? (
-                <a>{release.publication.methodology.title}</a>
-              ) : (
-                <Link
-                  to={`/methodologies/${release.publication.methodology.id}`}
-                >
-                  {release.publication.methodology.title}
-                </Link>
-              ))}
-            {release.publication.externalMethodology &&
-              (isEditing ? (
-                <a>{release.publication.externalMethodology.title}</a>
-              ) : (
-                <Link to={release.publication.externalMethodology.url}>
-                  {release.publication.externalMethodology.title}
-                </Link>
-              ))}
-            {!release.publication.externalMethodology &&
-              !release.publication.methodology &&
-              'No methodology added.'}
-          </li>
-          {isEditing && <hr />}
-
           {links.map(({ id, description, url }) => (
             <li key={id}>
               <EditableLink removeOnClick={() => removeLink(id)} to={url}>
