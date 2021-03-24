@@ -11,7 +11,6 @@ import ReleaseContentAccordion from '@admin/pages/release/content/components/Rel
 import ReleaseEditableBlock from '@admin/pages/release/content/components/ReleaseEditableBlock';
 import ReleaseHeadlines from '@admin/pages/release/content/components/ReleaseHeadlines';
 import ReleaseHelpAndSupportSection from '@admin/pages/release/content/components/ReleaseHelpAndSupportSection';
-import ReleaseNotesSection from '@admin/pages/release/content/components/ReleaseNotesSection';
 import { useReleaseContentState } from '@admin/pages/release/content/contexts/ReleaseContentContext';
 import useReleaseContentActions from '@admin/pages/release/content/contexts/useReleaseContentActions';
 import { ReleaseRouteParams } from '@admin/routes/releaseRoutes';
@@ -157,7 +156,7 @@ const ReleaseContent = () => {
         <div className="govuk-grid-column-one-third">
           <PrintThisPage />
           <RelatedAside>
-            <h2 className="govuk-heading-m">About these statistics</h2>
+            <h2 className="govuk-heading-m">Useful information</h2>
 
             <dl className="dfe-meta-content">
               <dt className="govuk-caption-m">For {release.coverageTitle}: </dt>
@@ -192,7 +191,6 @@ const ReleaseContent = () => {
                 )}
               </dd>
             </dl>
-            <ReleaseNotesSection release={release} />
             <RelatedInformationSection release={release} />
           </RelatedAside>
         </div>

@@ -10,6 +10,9 @@ import {
 } from '@common/utils/date/partialDate';
 import { parseISO } from 'date-fns';
 import React, { useEffect, useState } from 'react';
+import SummaryList from '@common/components/SummaryList';
+import SummaryListItem from '@common/components/SummaryListItem';
+import ReleaseNotesSection from './ReleaseNotesSection';
 
 interface ReleaseTypeIcon {
   url: string;
@@ -55,28 +58,35 @@ const BasicReleaseSummary = ({ release }: Props) => {
           <div className="govuk-grid-column-three-quarters">
             <Tag>{getReleaseStatusLabel(release.status)}</Tag>
 
-            <dl className="dfe-meta-content">
-              <dt className="govuk-caption-m">Publish date: </dt>
-              <dd>
-                {release.publishScheduled && (
-                  <strong>
-                    <FormattedDate>
-                      {parseISO(release.publishScheduled)}
-                    </FormattedDate>
-                  </strong>
-                )}
-              </dd>
-              {isValidPartialDate(release.nextReleaseDate) && (
-                <div>
-                  <dt className="govuk-caption-m">Next update: </dt>
-                  <dd>
-                    <strong>
-                      <time>{formatPartialDate(release.nextReleaseDate)}</time>
-                    </strong>
-                  </dd>
-                </div>
+            <SummaryList>
+              {release.publishScheduled && (
+                <SummaryListItem term="Publish date">
+                  <FormattedDate>
+                    {parseISO(release.publishScheduled)}
+                  </FormattedDate>
+                </SummaryListItem>
               )}
-            </dl>
+              {isValidPartialDate(release.nextReleaseDate) && (
+                <SummaryListItem term="Next update">
+                  <time>{formatPartialDate(release.nextReleaseDate)}</time>
+                </SummaryListItem>
+              )}
+              {release.updates && release.updates.length > 0 && (
+                <SummaryListItem term="Last updated">
+                  <FormattedDate>{release.updates[0].on}</FormattedDate>
+
+                  <ReleaseNotesSection release={release} />
+                </SummaryListItem>
+              )}
+              <SummaryListItem term="Receive updates">
+                <a
+                  className="dfe-print-hidden govuk-!-font-weight-bold"
+                  href="#"
+                >
+                  Sign up for email alerts
+                </a>
+              </SummaryListItem>
+            </SummaryList>
           </div>
 
           {releaseTypeIdsToIcons[release.type.id] && (
