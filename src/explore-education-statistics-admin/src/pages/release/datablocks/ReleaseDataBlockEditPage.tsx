@@ -24,7 +24,6 @@ import useToggle from '@common/hooks/useToggle';
 import React, { useCallback, useRef } from 'react';
 import { generatePath, RouteComponentProps } from 'react-router';
 import ButtonLink from '@admin/components/ButtonLink';
-import styles from './ReleaseDataBlockEditPage.module.scss';
 
 interface Model {
   dataBlock: ReleaseDataBlock;
@@ -121,7 +120,7 @@ const ReleaseDataBlockEditPage = ({
             ? 'Select a data block to edit'
             : 'Select a data block to view'}
         </p>
-        <div className={styles.dataBlockSelector}>
+        <div className="dfe-flex dfe-align-items--center">
           <DataBlockSelector
             canUpdate={canUpdateRelease}
             publicationId={publicationId}
@@ -129,9 +128,11 @@ const ReleaseDataBlockEditPage = ({
             label={false}
             dataBlockId={dataBlockId}
           />
-          <p className={styles.dataBlockSelector__or}>or</p>
+          <p className="govuk-!-font-weight-bold govuk-!-margin-right-4 govuk-!-margin-left-4 govuk-!-margin-bottom-0">
+            or
+          </p>
           <ButtonLink
-            className={styles.dataBlockSelector__button}
+            className="govuk-!-margin-0"
             to={createPath}
             onClick={toggleDeleting.on}
           >

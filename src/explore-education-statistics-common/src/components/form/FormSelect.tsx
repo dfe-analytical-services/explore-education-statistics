@@ -56,7 +56,7 @@ const FormSelect = ({
   value,
 }: FormSelectProps) => {
   return (
-    <div>
+    <>
       <FormLabel id={id} label={label} hideLabel={hideLabel} />
 
       {hint && (
@@ -114,7 +114,7 @@ const FormSelect = ({
             </optgroup>
           ))}
       </select>
-    </div>
+    </>
   );
 };
 
