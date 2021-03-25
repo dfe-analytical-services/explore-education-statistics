@@ -46,11 +46,11 @@ Add release note to release
     user waits until element contains  css:#releaseNotes li:nth-of-type(1) time  ${date}
     user waits until element contains  css:#releaseNotes li:nth-of-type(1) p     Test release note one
 
-Add related guidance link to release
+Add Useful information related page link to release
     [Tags]  HappyPath
-    user clicks button  Add related information
-    user enters text into element  id:relatedInformationForm-description  Test link one
-    user enters text into element  id:relatedInformationForm-url  http://test1.example.com/test1
+    user clicks button  Add related page link
+    user enters text into element  id:relatedPageForm-description  Test link one
+    user enters text into element  id:relatedPageForm-url  http://test1.example.com/test1
     user clicks button  Create link
 
 # TODO: Add Secondary Stats

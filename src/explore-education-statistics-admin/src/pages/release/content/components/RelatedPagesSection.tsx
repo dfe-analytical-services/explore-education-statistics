@@ -19,7 +19,7 @@ interface Props {
   release: EditableRelease;
 }
 
-const RelatedInformationSection = ({ release }: Props) => {
+const RelatedPagesSection = ({ release }: Props) => {
   const [links, setLinks] = useState<BasicLink[]>(release.relatedInformation);
   const [formOpen, setFormOpen] = useState<boolean>(false);
 
@@ -44,7 +44,7 @@ const RelatedInformationSection = ({ release }: Props) => {
 
   const renderLinkForm = () => {
     return !formOpen ? (
-      <Button onClick={() => setFormOpen(true)}>Add related information</Button>
+      <Button onClick={() => setFormOpen(true)}>Add related page link</Button>
     ) : (
       <Formik<Omit<BasicLink, 'id'>>
         initialValues={{ description: '', url: '' }}
@@ -62,10 +62,10 @@ const RelatedInformationSection = ({ release }: Props) => {
       >
         {form => {
           return (
-            <Form {...form} id="relatedInformationForm">
+            <Form {...form} id="relatedPageForm">
               <FormFieldset
                 id="relatedLink"
-                legend="Add related information"
+                legend="Add related page link"
                 legendSize="m"
               >
                 <FormFieldTextInput label="Title" name="description" />
@@ -95,23 +95,30 @@ const RelatedInformationSection = ({ release }: Props) => {
 
   return (
     <>
-      <h2 className="govuk-heading-m govuk-!-margin-top-6" id="related-content">
-        Related guidance
-      </h2>
-      <nav role="navigation" aria-labelledby="related-content">
-        <ul className="govuk-list">
-          {links.map(({ id, description, url }) => (
-            <li key={id}>
-              <EditableLink removeOnClick={() => removeLink(id)} to={url}>
-                {description}
-              </EditableLink>
-            </li>
-          ))}
-        </ul>
-      </nav>
+      {(isEditing || links.length > 0) && (
+        <>
+          <h2
+            className="govuk-heading-s govuk-!-margin-top-6"
+            id="related-pages"
+          >
+            Related pages
+          </h2>
+          <nav role="navigation" aria-labelledby="related-content">
+            <ul className="govuk-list">
+              {links.map(({ id, description, url }) => (
+                <li key={id}>
+                  <EditableLink removeOnClick={() => removeLink(id)} to={url}>
+                    {description}
+                  </EditableLink>
+                </li>
+              ))}
+            </ul>
+          </nav>
+        </>
+      )}
       {isEditing && renderLinkForm()}
     </>
   );
 };
 
-export default RelatedInformationSection;
+export default RelatedPagesSection;

@@ -65,7 +65,7 @@ Validate "About these statistics" -- "Last updated"
     user checks release update   2  22 March 2018   First published.
     user closes details dropdown   See all updates (2)
 
-Validate "Related guidance"
+Validate "Useful information"
     [Tags]  HappyPath
     user checks page contains link with text and url  Methodology   /methodology/pupil-absence-in-schools-in-england
 

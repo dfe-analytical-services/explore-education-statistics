@@ -5,7 +5,7 @@ import PrintThisPage from '@admin/components/PrintThisPage';
 import { useConfig } from '@admin/contexts/ConfigContext';
 import { useEditingContext } from '@admin/contexts/EditingContext';
 import BasicReleaseSummary from '@admin/pages/release/content/components/BasicReleaseSummary';
-import RelatedInformationSection from '@admin/pages/release/content/components/RelatedInformationSection';
+import RelatedPagesSection from '@admin/pages/release/content/components/RelatedPagesSection';
 import ReleaseBlock from '@admin/pages/release/content/components/ReleaseBlock';
 import ReleaseContentAccordion from '@admin/pages/release/content/components/ReleaseContentAccordion';
 import ReleaseEditableBlock from '@admin/pages/release/content/components/ReleaseEditableBlock';
@@ -234,7 +234,7 @@ const ReleaseContent = () => {
                 <strong>{release.yearTitle}</strong>
 
                 {releaseCount > 0 && (
-                  <Details summary={`See ${releaseCount} other releases`}>
+                  <Details summary={`See other releases (${releaseCount})`}>
                     <ul className="govuk-list">
                       {[
                         ...release.publication.otherReleases.map(
@@ -261,7 +261,7 @@ const ReleaseContent = () => {
                 )}
               </dd>
             </dl>
-            <RelatedInformationSection release={release} />
+            <RelatedPagesSection release={release} />
           </RelatedAside>
         </div>
       </div>
