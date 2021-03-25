@@ -24,6 +24,7 @@ import useToggle from '@common/hooks/useToggle';
 import React, { useCallback, useRef } from 'react';
 import { generatePath, RouteComponentProps } from 'react-router';
 import ButtonLink from '@admin/components/ButtonLink';
+import FormLabel from '@common/components/form/FormLabel';
 
 interface Model {
   dataBlock: ReleaseDataBlock;
@@ -115,12 +116,15 @@ const ReleaseDataBlockEditPage = ({
       <LoadingSpinner loading={isLoading}>
         <h2>{canUpdateRelease ? 'Edit data block' : 'View data block'}</h2>
 
-        <p className="govuk-!-margin-bottom-1">
-          {canUpdateRelease
-            ? 'Select a data block to edit'
-            : 'Select a data block to view'}
-        </p>
-        <div className="dfe-flex dfe-align-items--center">
+        <FormLabel
+          id="selectedDataBlock"
+          label={
+            canUpdateRelease
+              ? 'Select a data block to edit'
+              : 'Select a data block to view'
+          }
+        />
+        <div className="dfe-flex dfe-align-items--center govuk-!-margin-top-1">
           <DataBlockSelector
             canUpdate={canUpdateRelease}
             publicationId={publicationId}
