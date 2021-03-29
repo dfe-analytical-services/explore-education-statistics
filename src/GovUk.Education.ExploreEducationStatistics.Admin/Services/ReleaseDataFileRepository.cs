@@ -31,6 +31,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Services
             Guid subjectId,
             string filename,
             FileType type,
+            Guid createdById,
             File replacingFile = null,
             File source = null)
         {
@@ -49,9 +50,8 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Services
                 ReleaseId = releaseId,
                 File = new File
                 {
-                    // Mark any new files as already migrated while these flags temporarily exist
-                    PrivateBlobPathMigrated = true,
-                    PublicBlobPathMigrated = true,
+                    Created = DateTime.UtcNow,
+                    CreatedById = createdById,
                     RootPath = releaseId,
                     SubjectId = subjectId,
                     Filename = filename,
@@ -71,13 +71,14 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Services
             return created.File;
         }
 
-        public async Task<File> CreateZip(Guid releaseId, string filename)
+        public async Task<File> CreateZip(Guid releaseId,
+            string filename,
+            Guid createdById)
         {
             var file = (await _contentDbContext.Files.AddAsync(new File
             {
-                // Mark any new files as already migrated while these flags temporarily exist
-                PrivateBlobPathMigrated = true,
-                PublicBlobPathMigrated = true,
+                Created = DateTime.UtcNow,
+                CreatedById = createdById,
                 RootPath = releaseId,
                 Filename = filename,
                 Type = DataZip

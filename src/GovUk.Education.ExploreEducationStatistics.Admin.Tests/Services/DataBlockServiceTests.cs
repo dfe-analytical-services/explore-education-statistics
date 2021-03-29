@@ -15,10 +15,13 @@ using GovUk.Education.ExploreEducationStatistics.Common.Tests.Utils;
 using GovUk.Education.ExploreEducationStatistics.Common.Utils;
 using GovUk.Education.ExploreEducationStatistics.Content.Model;
 using GovUk.Education.ExploreEducationStatistics.Content.Model.Database;
+using GovUk.Education.ExploreEducationStatistics.Content.Model.Repository;
+using GovUk.Education.ExploreEducationStatistics.Content.Model.Repository.Interfaces;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
 using Moq;
 using Xunit;
+using static GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services.MapperUtils;
 
 namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
 {
@@ -973,17 +976,19 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
 
         private static DataBlockService BuildDataBlockService(
             ContentDbContext contentDbContext,
-            IMapper mapper = null,
             IPersistenceHelper<ContentDbContext> persistenceHelper = null,
+            IReleaseFileService releaseFileService = null,
+            IReleaseContentBlockRepository releaseContentBlockRepository = null,
             IUserService userService = null,
-            IReleaseFileService releaseFileService = null)
+            IMapper mapper = null)
         {
             return new DataBlockService(
                 contentDbContext,
-                mapper ?? MapperUtils.AdminMapper(),
                 persistenceHelper ?? new PersistenceHelper<ContentDbContext>(contentDbContext),
+                releaseFileService ?? new Mock<IReleaseFileService>().Object,
+                releaseContentBlockRepository ?? new ReleaseContentBlockRepository(contentDbContext),
                 userService ?? MockUtils.AlwaysTrueUserService().Object,
-                releaseFileService ?? new Mock<IReleaseFileService>().Object
+                mapper ?? AdminMapper()
             );
         }
     }

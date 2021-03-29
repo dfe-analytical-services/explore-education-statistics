@@ -78,10 +78,10 @@ BEGIN
                            ) AS existing
                            ORDER BY existing.CsvRow ASC;
     
-                    INSERT INTO ObservationRowFilterItem (ObservationId, OldObservationId, FilterItemId, FilterId)
-                    SELECT observationrow.Id, observationrow.ObservationId, observationrow.FilterItemId, observationrow.FilterId 
+                    INSERT INTO ObservationRowFilterItem (ObservationId, OldObservationId, FilterItemId)
+                    SELECT observationrow.Id, observationrow.ObservationId, observationrow.FilterItemId
                     FROM (
-                        SELECT row.Id, ofi.ObservationId, ofi.FilterItemId, ofi.FilterId
+                        SELECT row.Id, ofi.ObservationId, ofi.FilterItemId
                         FROM ObservationFilterItem ofi
                         JOIN ObservationRow row ON row.ObservationId = ofi.ObservationId
                         WHERE row.SubjectId = @SubjectId

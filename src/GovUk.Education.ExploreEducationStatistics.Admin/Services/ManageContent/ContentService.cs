@@ -12,7 +12,7 @@ using GovUk.Education.ExploreEducationStatistics.Common.Services.Interfaces.Secu
 using GovUk.Education.ExploreEducationStatistics.Common.Utils;
 using GovUk.Education.ExploreEducationStatistics.Content.Model;
 using GovUk.Education.ExploreEducationStatistics.Content.Model.Database;
-using IdentityServer4.Extensions;
+using GovUk.Education.ExploreEducationStatistics.Content.Model.Repository.Interfaces;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
 using static GovUk.Education.ExploreEducationStatistics.Admin.Validators.ValidationErrorMessages;
@@ -23,19 +23,31 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Services.ManageConten
 {
     public class ContentService : IContentService
     {
-        private readonly IMapper _mapper;
         private readonly ContentDbContext _context;
         private readonly IPersistenceHelper<ContentDbContext> _persistenceHelper;
+        private readonly IReleaseContentSectionRepository _releaseContentSectionRepository;
         private readonly IUserService _userService;
+        private readonly IMapper _mapper;
 
         public ContentService(ContentDbContext context,
             IPersistenceHelper<ContentDbContext> persistenceHelper,
-            IMapper mapper, IUserService userService)
+            IReleaseContentSectionRepository releaseContentSectionRepository,
+            IUserService userService,
+            IMapper mapper)
         {
             _context = context;
             _persistenceHelper = persistenceHelper;
-            _mapper = mapper;
+            _releaseContentSectionRepository = releaseContentSectionRepository;
             _userService = userService;
+            _mapper = mapper;
+        }
+
+        public async Task<Either<ActionResult, List<T>>> GetContentBlocks<T>(Guid releaseId) where T : ContentBlock
+        {
+            return await _persistenceHelper
+                .CheckEntityExists<Release>(releaseId)
+                .OnSuccess(_userService.CheckCanViewRelease)
+                .OnSuccess(release => _releaseContentSectionRepository.GetAllContentBlocks<T>(release.Id));
         }
 
         public Task<Either<ActionResult, List<ContentSectionViewModel>>> GetContentSectionsAsync(
@@ -468,7 +480,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Services.ManageConten
                 return order.Value;
             }
 
-            if (!section.Content.IsNullOrEmpty())
+            if (!section.Content.Any())
             {
                 return section.Content.Max(contentBlock => contentBlock.Order) + 1;
             }

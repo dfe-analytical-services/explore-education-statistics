@@ -95,12 +95,12 @@ namespace GovUk.Education.ExploreEducationStatistics.Common.Tests.Utils
             };
         }
 
-        public static Mock<IUserService> AlwaysTrueUserService()
+        public static Mock<IUserService> AlwaysTrueUserService(Guid? userId = null)
         {
-            return AlwaysTrueUserService<Enum>();
+            return AlwaysTrueUserService<Enum>(userId);
         }
 
-        public static Mock<IUserService> AlwaysTrueUserService<T>()
+        public static Mock<IUserService> AlwaysTrueUserService<T>(Guid? userId = null)
             where T : Enum
         {
             var userService = new Mock<IUserService>();
@@ -112,6 +112,12 @@ namespace GovUk.Education.ExploreEducationStatistics.Common.Tests.Utils
             userService
                 .Setup(s => s.MatchesPolicy(It.IsAny<object>(), It.IsAny<T>()))
                 .ReturnsAsync(true);
+
+            if (userId.HasValue)
+            {
+                userService.Setup(s => s.GetUserId())
+                    .Returns(userId.Value);
+            }
 
             return userService;
         }

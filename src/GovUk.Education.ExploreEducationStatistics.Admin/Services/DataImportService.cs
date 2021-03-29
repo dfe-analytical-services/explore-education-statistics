@@ -101,8 +101,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Services
                 MetaFileId = metaFile.Id,
                 SubjectId = subjectId,
                 Rows = CalculateNumberOfRows(formFile.OpenReadStream()),
-                Status = DataImportStatus.QUEUED,
-                Migrated = false
+                Status = DataImportStatus.QUEUED
             });
 
             await _queueService.AddMessageAsync(ImportsPendingQueue, new ImportMessage(import.Id));
@@ -117,8 +116,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Services
                 MetaFileId = metaFile.Id,
                 ZipFileId = zipFile.Id,
                 SubjectId = subjectId,
-                Status = DataImportStatus.QUEUED,
-                Migrated = false
+                Status = DataImportStatus.QUEUED
             });
 
             await _queueService.AddMessageAsync(ImportsPendingQueue, new ImportMessage(import.Id));
