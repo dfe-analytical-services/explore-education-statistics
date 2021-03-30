@@ -31,7 +31,5 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Services.Interfaces
             Guid releaseId,
             Guid fileId,
             string filename);
-
-        public Task<ReleaseFile> GetBySubject(Guid releaseId, Guid subjectId);
     }
 }

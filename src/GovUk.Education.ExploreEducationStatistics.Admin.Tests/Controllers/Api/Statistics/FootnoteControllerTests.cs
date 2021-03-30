@@ -46,7 +46,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Controllers.Api
             var indicatorGroupService = new Mock<IIndicatorGroupService>();
             var footnoteService = new Mock<IFootnoteService>();
             var releaseService = new Mock<IReleaseService>();
-            var releaseFileRepository = new Mock<IReleaseFileRepository>();
+            var releaseDataFileRepository = new Mock<IReleaseDataFileRepository>();
 
             var createFootnoteResult = Task.FromResult(new Either<ActionResult, Footnote>(footnote));
 
@@ -158,7 +158,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Controllers.Api
                 footnoteService.Object,
                 indicatorGroupService.Object,
                 releaseService.Object,
-                releaseFileRepository.Object);
+                releaseDataFileRepository.Object);
         }
 
         [Fact]

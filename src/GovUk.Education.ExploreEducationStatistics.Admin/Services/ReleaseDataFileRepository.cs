@@ -116,6 +116,17 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Services
                 .ToListAsync();
         }
 
+        public async Task<ReleaseFile> GetBySubject(Guid releaseId, Guid subjectId)
+        {
+            return await _contentDbContext
+                .ReleaseFiles
+                .Include(rf => rf.File)
+                .SingleAsync(rf =>
+                    rf.ReleaseId == releaseId
+                    && rf.File.SubjectId == subjectId
+                    && rf.File.Type == FileType.Data);
+        }
+
         private IQueryable<File> ListDataFilesQuery(Guid releaseId)
         {
             return _contentDbContext

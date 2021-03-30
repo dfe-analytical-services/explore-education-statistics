@@ -28,5 +28,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Services.Interfaces
         public Task<bool> HasAnyDataFiles(Guid releaseId);
 
         public Task<IList<File>> ListReplacementDataFiles(Guid releaseId);
+
+        public Task<ReleaseFile> GetBySubject(Guid releaseId, Guid subjectId);
     }
 }

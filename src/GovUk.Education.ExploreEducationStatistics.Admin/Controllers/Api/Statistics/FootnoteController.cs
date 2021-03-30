@@ -26,20 +26,20 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Controllers.Api.Stati
         private readonly IFootnoteService _footnoteService;
         private readonly IIndicatorGroupService _indicatorGroupService;
         private readonly IReleaseService _releaseService;
-        private readonly IReleaseFileRepository _releaseFileRepository;
+        private readonly IReleaseDataFileRepository _releaseDataFileRepository;
         private static IComparer<string> LabelComparer { get; } = new LabelRelationalComparer();
 
         public FootnoteController(IFilterService filterService,
             IFootnoteService footnoteService,
             IIndicatorGroupService indicatorGroupService,
             IReleaseService releaseService,
-            IReleaseFileRepository releaseFileRepository)
+            IReleaseDataFileRepository releaseDataFileRepository)
         {
             _filterService = filterService;
             _footnoteService = footnoteService;
             _indicatorGroupService = indicatorGroupService;
             _releaseService = releaseService;
-            _releaseFileRepository = releaseFileRepository;
+            _releaseDataFileRepository = releaseDataFileRepository;
         }
 
         [HttpPost("releases/{releaseId}/footnotes")]
@@ -116,7 +116,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Controllers.Api.Stati
                                 Filters = GetFilters(subject.Id),
                                 Indicators = GetIndicators(subject.Id),
                                 SubjectId = subject.Id,
-                                SubjectName = (await _releaseFileRepository.GetBySubject(releaseId, subject.Id)).Name,
+                                SubjectName = (await _releaseDataFileRepository.GetBySubject(releaseId, subject.Id)).Name,
                             }
                         );
 
