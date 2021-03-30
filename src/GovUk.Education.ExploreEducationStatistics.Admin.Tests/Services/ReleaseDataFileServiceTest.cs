@@ -1252,15 +1252,11 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
         {
             var release = new Release();
 
-            var zipReleaseFile = new ReleaseFile
+            var zipFile = new File
             {
-                Release = release,
-                File = new File
-                {
-                    RootPath = Guid.NewGuid(),
-                    Filename = "test-data-archive.zip",
-                    Type = DataZip
-                }
+                RootPath = Guid.NewGuid(),
+                Filename = "test-data-archive.zip",
+                Type = DataZip
             };
             var dataReleaseFile = new ReleaseFile
             {
@@ -1271,7 +1267,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
                     RootPath = Guid.NewGuid(),
                     Filename = "test-data.csv",
                     Type = FileType.Data,
-                    Source = zipReleaseFile.File,
+                    Source = zipFile,
                     Created = DateTime.UtcNow,
                     CreatedById = _user.Id
                 }
@@ -1284,7 +1280,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
                     RootPath = Guid.NewGuid(),
                     Filename = "test-data.meta.csv",
                     Type = Metadata,
-                    Source = zipReleaseFile.File,
+                    Source = zipFile,
                 }
             };
 
@@ -1292,7 +1288,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
             await using (var contentDbContext = InMemoryApplicationDbContext(contentDbContextId))
             {
                 await contentDbContext.AddRangeAsync(
-                    zipReleaseFile,
+                    zipFile,
                     dataReleaseFile,
                     metaReleaseFile);
                 await contentDbContext.SaveChangesAsync();
@@ -1308,14 +1304,14 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
                     .ReturnsAsync(false);
 
                 blobStorageService
-                    .Setup(s => s.CheckBlobExists(PrivateReleaseFiles, zipReleaseFile.File.Path()))
+                    .Setup(s => s.CheckBlobExists(PrivateReleaseFiles, zipFile.Path()))
                     .ReturnsAsync(true);
 
                 blobStorageService
-                    .Setup(s => s.GetBlob(PrivateReleaseFiles, zipReleaseFile.File.Path()))
+                    .Setup(s => s.GetBlob(PrivateReleaseFiles, zipFile.Path()))
                     .ReturnsAsync(
                         new BlobInfo(
-                            zipReleaseFile.File.Path(),
+                            zipFile.Path(),
                             size: "1 Mb",
                             contentType: "application/zip",
                             contentLength: 1000L,
@@ -2067,15 +2063,11 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
         {
             var release = new Release();
 
-            var zipReleaseFile = new ReleaseFile
+            var zipFile = new File
             {
-                Release = release,
-                File = new File
-                {
-                    RootPath = Guid.NewGuid(),
-                    Filename = "test-data-archive.zip",
-                    Type = DataZip
-                }
+                RootPath = Guid.NewGuid(),
+                Filename = "test-data-archive.zip",
+                Type = DataZip
             };
             var dataReleaseFile = new ReleaseFile
             {
@@ -2086,7 +2078,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
                     RootPath = Guid.NewGuid(),
                     Filename = "test-data.csv",
                     Type = FileType.Data,
-                    Source = zipReleaseFile.File,
+                    Source = zipFile,
                     Created = DateTime.UtcNow,
                     CreatedById = _user.Id
                 }
@@ -2099,7 +2091,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
                     RootPath = Guid.NewGuid(),
                     Filename = "test-data.meta.csv",
                     Type = Metadata,
-                    Source = zipReleaseFile.File
+                    Source = zipFile
                 }
             };
 
@@ -2108,7 +2100,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
             await using (var contentDbContext = InMemoryApplicationDbContext(contentDbContextId))
             {
                 await contentDbContext.AddRangeAsync(
-                    zipReleaseFile,
+                    zipFile,
                     dataReleaseFile,
                     metaReleaseFile);
                 await contentDbContext.SaveChangesAsync();
@@ -2124,14 +2116,14 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
                     .ReturnsAsync(false);
 
                 blobStorageService
-                    .Setup(s => s.CheckBlobExists(PrivateReleaseFiles, zipReleaseFile.File.Path()))
+                    .Setup(s => s.CheckBlobExists(PrivateReleaseFiles, zipFile.Path()))
                     .ReturnsAsync(true);
 
                 blobStorageService
-                    .Setup(s => s.GetBlob(PrivateReleaseFiles, zipReleaseFile.File.Path()))
+                    .Setup(s => s.GetBlob(PrivateReleaseFiles, zipFile.Path()))
                     .ReturnsAsync(
                         new BlobInfo(
-                            zipReleaseFile.File.Path(),
+                            zipFile.Path(),
                             size: "1 Mb",
                             contentType: "application/zip",
                             contentLength: 1000L,
