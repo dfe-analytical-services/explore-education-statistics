@@ -103,10 +103,10 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
         [Fact]
         public async Task ValidateSubjectName_SubjectNameNotUnique()
         {
-            var releaseId = Guid.NewGuid();
+            var release = new Content.Model.Release();
             var dataReleaseFile = new ReleaseFile
             {
-                ReleaseId = releaseId,
+                Release = release,
                 Name = "Subject Title",
                 File = new Content.Model.File
                 {
@@ -116,6 +116,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
             var contentDbContextId = Guid.NewGuid().ToString();
             await using (var contentDbContext = InMemoryApplicationDbContext(contentDbContextId))
             {
+                await contentDbContext.AddAsync(release);
                 await contentDbContext.AddAsync(dataReleaseFile);
                 await contentDbContext.SaveChangesAsync();
             }
@@ -125,7 +126,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
             await using (var contentDbContext = InMemoryApplicationDbContext(contentDbContextId))
             {
                 var service = new FileUploadsValidatorService(subjectService.Object, fileTypeService.Object, contentDbContext);
-                var result = await service.ValidateSubjectName(releaseId,  "Subject Title");
+                var result = await service.ValidateSubjectName(release.Id,  "Subject Title");
 
                 Assert.True(result.IsLeft);
                 AssertValidationProblem(result.Left, SubjectTitleMustBeUnique);
