@@ -9,6 +9,7 @@ using GovUk.Education.ExploreEducationStatistics.Common.Model.Data;
 using GovUk.Education.ExploreEducationStatistics.Common.Services.Interfaces.Security;
 using GovUk.Education.ExploreEducationStatistics.Common.Utils;
 using GovUk.Education.ExploreEducationStatistics.Content.Model.Database;
+using GovUk.Education.ExploreEducationStatistics.Content.Model.Repository.Interfaces;
 using GovUk.Education.ExploreEducationStatistics.Data.Model;
 using GovUk.Education.ExploreEducationStatistics.Data.Model.Database;
 using GovUk.Education.ExploreEducationStatistics.Data.Model.Query;
@@ -35,7 +36,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Services
         private readonly ISubjectService _subjectService;
         private readonly ILogger _logger;
         private readonly IMapper _mapper;
-        private readonly ContentDbContext _contentDbContext;
+        private readonly IReleaseDataFileRepository _releaseDataFileRepository;
 
         public ResultSubjectMetaService(IBoundaryLevelService boundaryLevelService,
             IFilterItemService filterItemService,
@@ -49,7 +50,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Services
             ISubjectService subjectService,
             ILogger<ResultSubjectMetaService> logger,
             IMapper mapper,
-            ContentDbContext contentDbContext) : base(boundaryLevelService, filterItemService, geoJsonService)
+            IReleaseDataFileRepository releaseDataFileRepository) : base(boundaryLevelService, filterItemService, geoJsonService)
         {
             _boundaryLevelService = boundaryLevelService;
             _footnoteRepository = footnoteRepository;
@@ -61,7 +62,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Services
             _subjectService = subjectService;
             _logger = logger;
             _mapper = mapper;
-            _contentDbContext = contentDbContext;
+            _releaseDataFileRepository = releaseDataFileRepository;
         }
 
         public Task<Either<ActionResult, ResultSubjectMetaViewModel>> GetSubjectMeta(Guid releaseId, 
@@ -107,13 +108,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Services
 
                     var publication = await _subjectService.GetPublicationForSubject(subject.Id);
 
-                    var releaseFile = await _contentDbContext
-                        .ReleaseFiles
-                        .Include(rf => rf.File)
-                        .SingleAsync(rf =>
-                            rf.ReleaseId == releaseId
-                            && rf.File.SubjectId == subject.Id
-                            && rf.File.Type == FileType.Data);
+                    var releaseFile = await _releaseDataFileRepository.GetBySubject(releaseId, subject.Id);
                     var subjectName = releaseFile.Name;
                     
                     return new ResultSubjectMetaViewModel

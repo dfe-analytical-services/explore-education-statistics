@@ -7,6 +7,7 @@ using GovUk.Education.ExploreEducationStatistics.Common.Model;
 using GovUk.Education.ExploreEducationStatistics.Common.Services;
 using GovUk.Education.ExploreEducationStatistics.Common.Utils;
 using GovUk.Education.ExploreEducationStatistics.Content.Model.Database;
+using GovUk.Education.ExploreEducationStatistics.Content.Model.Repository.Interfaces;
 using GovUk.Education.ExploreEducationStatistics.Data.Model;
 using GovUk.Education.ExploreEducationStatistics.Data.Model.Database;
 using GovUk.Education.ExploreEducationStatistics.Data.Model.Services.Interfaces;
@@ -23,19 +24,19 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Services
         private readonly IIndicatorService _indicatorService;
         private readonly StatisticsDbContext _context;
         private readonly IPersistenceHelper<StatisticsDbContext> _statisticsPersistenceHelper;
-        private readonly ContentDbContext _contentDbContext;
+        private readonly IReleaseDataFileRepository _releaseDataFileRepository;
 
         public MetaGuidanceSubjectService(IFilterService filterService,
             IIndicatorService indicatorService,
             StatisticsDbContext context,
             IPersistenceHelper<StatisticsDbContext> statisticsPersistenceHelper,
-            ContentDbContext contentDbContext)
+            IReleaseDataFileRepository releaseDataFileRepository)
         {
             _filterService = filterService;
             _indicatorService = indicatorService;
             _context = context;
             _statisticsPersistenceHelper = statisticsPersistenceHelper;
-            _contentDbContext = contentDbContext;
+            _releaseDataFileRepository = releaseDataFileRepository;
         }
 
         public async Task<Either<ActionResult, List<MetaGuidanceSubjectViewModel>>> GetSubjects(Guid releaseId,
@@ -137,13 +138,10 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Services
         {
             var subject = releaseSubject.Subject;
 
-            var releaseFile = await _contentDbContext
-                .ReleaseFiles
-                .Include(rf => rf.File)
-                .SingleAsync(rf =>
-                    rf.ReleaseId == releaseSubject.ReleaseId
-                    && rf.File.SubjectId == releaseSubject.SubjectId
-                    && rf.File.Type == FileType.Data);
+            var releaseFile =
+                await _releaseDataFileRepository.GetBySubject(
+                    releaseSubject.ReleaseId,
+                    releaseSubject.SubjectId);
             
             var geographicLevels = await GetGeographicLevels(subject.Id);
             var timePeriods = await GetTimePeriods(subject.Id);
