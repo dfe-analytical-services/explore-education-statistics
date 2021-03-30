@@ -152,7 +152,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Services
                 Id = subject.Id,
                 Content = releaseSubject.MetaGuidance ?? "",
                 Filename = releaseFile.File.Filename,
-                Name = releaseFile.Name ?? "Unknown",
+                Name = releaseFile.Name,
                 GeographicLevels = geographicLevels,
                 TimePeriods = timePeriods,
                 Variables = variables

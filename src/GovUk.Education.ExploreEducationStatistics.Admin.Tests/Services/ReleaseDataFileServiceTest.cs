@@ -896,14 +896,14 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
             await using (var statisticsDbContext = InMemoryStatisticsDbContext(statisticsDbContextId))
             {
                 blobStorageService
-                    .Setup(s => s.CheckBlobExists(PrivateReleaseFiles, dataReleaseFile.File.Path()))
+                    .Setup(s => s.CheckBlobExists(PrivateReleaseFiles, dataReleaseFile.Path()))
                     .ReturnsAsync(true);
 
                 blobStorageService
-                    .Setup(s => s.GetBlob(PrivateReleaseFiles, dataReleaseFile.File.Path()))
+                    .Setup(s => s.GetBlob(PrivateReleaseFiles, dataReleaseFile.Path()))
                     .ReturnsAsync(
                         new BlobInfo(
-                            path: dataReleaseFile.File.Path(),
+                            path: dataReleaseFile.Path(),
                             size: "400 B",
                             contentType: "text/csv",
                             contentLength: 400L,
@@ -941,7 +941,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
                 Assert.Equal("Test data", fileInfo.Name);
                 Assert.Equal("test-data.csv", fileInfo.FileName);
                 Assert.Equal("csv", fileInfo.Extension);
-                Assert.Equal(dataReleaseFile.File.Path(), fileInfo.Path);
+                Assert.Equal(dataReleaseFile.Path(), fileInfo.Path);
                 Assert.Equal(metaReleaseFile.File.Id, fileInfo.MetaFileId);
                 Assert.Equal("test-data.meta.csv", fileInfo.MetaFileName);
                 Assert.Equal(_user.Email, fileInfo.UserName);
@@ -1007,14 +1007,14 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
             await using (var statisticsDbContext = InMemoryStatisticsDbContext(statisticsDbContextId))
             {
                 blobStorageService
-                    .Setup(s => s.CheckBlobExists(PrivateReleaseFiles, dataReleaseFile.File.Path()))
+                    .Setup(s => s.CheckBlobExists(PrivateReleaseFiles, dataReleaseFile.Path()))
                     .ReturnsAsync(true);
 
                 blobStorageService
-                    .Setup(s => s.GetBlob(PrivateReleaseFiles, dataReleaseFile.File.Path()))
+                    .Setup(s => s.GetBlob(PrivateReleaseFiles, dataReleaseFile.Path()))
                     .ReturnsAsync(
                         new BlobInfo(
-                            path: dataReleaseFile.File.Path(),
+                            path: dataReleaseFile.Path(),
                             size: "400 B",
                             contentType: "text/csv",
                             contentLength: 400L,
@@ -1054,7 +1054,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
                 Assert.Equal("Test data", fileInfo.Name);
                 Assert.Equal("Test data 1.csv", fileInfo.FileName);
                 Assert.Equal("csv", fileInfo.Extension);
-                Assert.Equal(dataReleaseFile.File.Path(), fileInfo.Path);
+                Assert.Equal(dataReleaseFile.Path(), fileInfo.Path);
                 Assert.Equal(metaReleaseFile.File.Id, fileInfo.MetaFileId);
                 Assert.Equal("Test data 1.meta.csv", fileInfo.MetaFileName);
                 Assert.Equal(_user.Email, fileInfo.UserName);
@@ -1209,7 +1209,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
             await using (var statisticsDbContext = InMemoryStatisticsDbContext(statisticsDbContextId))
             {
                 blobStorageService
-                    .Setup(s => s.CheckBlobExists(PrivateReleaseFiles, dataReleaseFile.File.Path()))
+                    .Setup(s => s.CheckBlobExists(PrivateReleaseFiles, dataReleaseFile.Path()))
                     .ReturnsAsync(false);
 
                 dataImportService
@@ -1302,7 +1302,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
             await using (var contentDbContext = InMemoryApplicationDbContext(contentDbContextId))
             {
                 blobStorageService
-                    .Setup(s => s.CheckBlobExists(PrivateReleaseFiles, dataReleaseFile.File.Path()))
+                    .Setup(s => s.CheckBlobExists(PrivateReleaseFiles, dataReleaseFile.Path()))
                     .ReturnsAsync(false);
 
                 blobStorageService
@@ -1574,14 +1574,14 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
             {
                 blobStorageService
                     .Setup(s => s.CheckBlobExists(PrivateReleaseFiles, It.IsIn(
-                        dataReleaseFile1.File.Path(), dataReleaseFile2.File.Path())))
+                        dataReleaseFile1.Path(), dataReleaseFile2.Path())))
                     .ReturnsAsync(true);
 
                 blobStorageService
-                    .Setup(s => s.GetBlob(PrivateReleaseFiles, dataReleaseFile1.File.Path()))
+                    .Setup(s => s.GetBlob(PrivateReleaseFiles, dataReleaseFile1.Path()))
                     .ReturnsAsync(
                         new BlobInfo(
-                            path: dataReleaseFile1.File.Path(),
+                            path: dataReleaseFile1.Path(),
                             size: "400 B",
                             contentType: "text/csv",
                             contentLength: 400L,
@@ -1594,10 +1594,10 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
                     );
 
                 blobStorageService
-                    .Setup(s => s.GetBlob(PrivateReleaseFiles, dataReleaseFile2.File.Path()))
+                    .Setup(s => s.GetBlob(PrivateReleaseFiles, dataReleaseFile2.Path()))
                     .ReturnsAsync(
                         new BlobInfo(
-                            path: dataReleaseFile2.File.Path(),
+                            path: dataReleaseFile2.Path(),
                             size: "800 B",
                             contentType: "text/csv",
                             contentLength: 800L,
@@ -1640,7 +1640,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
                 Assert.Equal("Test subject 1", files[0].Name);
                 Assert.Equal("test-data-1.csv", files[0].FileName);
                 Assert.Equal("csv", files[0].Extension);
-                Assert.Equal(dataReleaseFile1.File.Path(), files[0].Path);
+                Assert.Equal(dataReleaseFile1.Path(), files[0].Path);
                 Assert.Equal(metaReleaseFile1.File.Id, files[0].MetaFileId);
                 Assert.Equal("test-data-1.meta.csv", files[0].MetaFileName);
                 Assert.Equal(_user.Email, files[0].UserName);
@@ -1653,7 +1653,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
                 Assert.Equal("Test subject 2", files[1].Name);
                 Assert.Equal("Test data 2.csv", files[1].FileName);
                 Assert.Equal("csv", files[1].Extension);
-                Assert.Equal(dataReleaseFile2.File.Path(), files[1].Path);
+                Assert.Equal(dataReleaseFile2.Path(), files[1].Path);
                 Assert.Equal(metaReleaseFile2.File.Id, files[1].MetaFileId);
                 Assert.Equal("Test data 2.meta.csv", files[1].MetaFileName);
                 Assert.Equal(_user.Email, files[1].UserName);
@@ -1758,14 +1758,14 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
             await using (var statisticsDbContext = InMemoryStatisticsDbContext(statisticsDbContextId))
             {
                 blobStorageService
-                    .Setup(s => s.CheckBlobExists(PrivateReleaseFiles, dataRelease1File.File.Path()))
+                    .Setup(s => s.CheckBlobExists(PrivateReleaseFiles, dataRelease1File.Path()))
                     .ReturnsAsync(true);
 
                 blobStorageService
-                    .Setup(s => s.GetBlob(PrivateReleaseFiles, dataRelease1File.File.Path()))
+                    .Setup(s => s.GetBlob(PrivateReleaseFiles, dataRelease1File.Path()))
                     .ReturnsAsync(
                         new BlobInfo(
-                            path: dataRelease1File.File.Path(),
+                            path: dataRelease1File.Path(),
                             size: "400 B",
                             contentType: "text/csv",
                             contentLength: 400L,
@@ -1802,7 +1802,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
                 Assert.Equal("Test data", files[0].Name);
                 Assert.Equal("test-data-1.csv", files[0].FileName);
                 Assert.Equal("csv", files[0].Extension);
-                Assert.Equal(dataRelease1File.File.Path(), files[0].Path);
+                Assert.Equal(dataRelease1File.Path(), files[0].Path);
                 Assert.Equal(metaRelease1File.File.Id, files[0].MetaFileId);
                 Assert.Equal("test-data-1.meta.csv", files[0].MetaFileName);
                 Assert.Equal(_user.Email, files[0].UserName);
@@ -2023,7 +2023,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
             await using (var statisticsDbContext = InMemoryStatisticsDbContext(statisticsDbContextId))
             {
                 blobStorageService
-                    .Setup(s => s.CheckBlobExists(PrivateReleaseFiles, dataReleaseFile.File.Path()))
+                    .Setup(s => s.CheckBlobExists(PrivateReleaseFiles, dataReleaseFile.Path()))
                     .ReturnsAsync(false);
 
                 dataImportService
@@ -2114,7 +2114,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
             await using (var contentDbContext = InMemoryApplicationDbContext(contentDbContextId))
             {
                 blobStorageService
-                    .Setup(s => s.CheckBlobExists(PrivateReleaseFiles, dataReleaseFile.File.Path()))
+                    .Setup(s => s.CheckBlobExists(PrivateReleaseFiles, dataReleaseFile.Path()))
                     .ReturnsAsync(false);
 
                 blobStorageService
