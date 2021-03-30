@@ -1,5 +1,8 @@
 import { FootnoteMetaGetters } from '@admin/pages/release/footnotes/utils/generateFootnoteMetaMap';
-import { FootnoteSubject } from '@admin/services/footnoteService';
+import {
+  FootnoteSubject,
+  SubjectSelectionType,
+} from '@admin/services/footnoteService';
 import React, { ReactNode } from 'react';
 
 interface Props {
@@ -15,14 +18,10 @@ interface Item {
   selected: boolean;
 }
 
-interface SubjectItem {
+interface Selection {
   id: string;
   label: string;
-  selectionType: string;
-}
-/* eslint-enable react/no-unused-prop-types */
-
-interface Selection extends SubjectItem {
+  selectionType: SubjectSelectionType;
   indicatorGroups: {
     id: string;
     label: string;
@@ -133,7 +132,7 @@ const FootnoteSubjectSelection = ({
   }
 
   function renderSubjectItem(
-    { id, selectionType, label }: SubjectItem,
+    { id, selectionType, label }: Selection,
     children?: ReactNode,
   ) {
     return (

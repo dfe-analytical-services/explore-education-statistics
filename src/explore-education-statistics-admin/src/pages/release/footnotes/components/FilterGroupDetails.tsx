@@ -2,6 +2,7 @@ import styles from '@admin/pages/release/footnotes/components/FootnoteForm.modul
 import {
   BaseFootnote,
   FootnoteSubjectMeta,
+  SubjectSelectionType,
 } from '@admin/services/footnoteService';
 import Details from '@common/components/Details';
 import { FormCheckbox, FormFieldCheckbox } from '@common/components/form';
@@ -11,7 +12,7 @@ import React from 'react';
 
 interface Props {
   summary: string;
-  parentSelected: string;
+  parentSelectionType: SubjectSelectionType;
   selectAll?: boolean;
   valuePath: string;
   groupId?: number | string;
@@ -22,7 +23,7 @@ interface Props {
 
 const FilterGroupDetails = ({
   summary,
-  parentSelected = 'All',
+  parentSelectionType = 'All',
   selectAll = false,
   valuePath,
   groupId,
@@ -31,7 +32,7 @@ const FilterGroupDetails = ({
   form,
 }: Props) => {
   const groupPath = `${valuePath}.filters.${groupId}`;
-  const groupIsSelected = parentSelected === 'All' || value;
+  const groupIsSelected = parentSelectionType === 'All' || value;
 
   return (
     <Details

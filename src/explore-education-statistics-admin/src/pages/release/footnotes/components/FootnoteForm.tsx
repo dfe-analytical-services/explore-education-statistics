@@ -4,6 +4,7 @@ import {
   BaseFootnote,
   Footnote,
   FootnoteMeta,
+  SubjectSelectionType,
 } from '@admin/services/footnoteService';
 import footnoteToFlatFootnote from '@admin/services/utils/footnote/footnoteToFlatFootnote';
 import Button from '@common/components/Button';
@@ -37,23 +38,22 @@ const FootnoteForm = ({
     const subjects = mapValues(footnoteMeta.subjects, subject => {
       const { indicators, filters, subjectId } = subject;
 
-      let subjectSelectionType = 'NA';
+      let selectionType: SubjectSelectionType = 'NA';
 
       if (footnote && Object.keys(footnote.subjects).includes(subjectId)) {
         const foundSubject = footnote.subjects[subjectId];
         if (foundSubject.selected) {
-          subjectSelectionType = 'All';
+          selectionType = 'All';
         } else if (
-          !foundSubject.selected &&
-          (Object.keys(foundSubject.filters).length > 0 ||
-            Object.keys(foundSubject.indicatorGroups).length > 0)
+          Object.keys(foundSubject.filters).length ||
+          Object.keys(foundSubject.indicatorGroups).length
         ) {
-          subjectSelectionType = 'Specific';
+          selectionType = 'Specific';
         }
       }
 
       return {
-        selectionType: subjectSelectionType,
+        selectionType,
         indicatorGroups: mapValues(indicators, () => ({
           selected: false,
           indicators: [],
@@ -131,7 +131,7 @@ const FootnoteForm = ({
             subject => subject.subjectName,
           ).map(subject => {
             const { subjectId, subjectName } = subject;
-            const subjectSelected = get(
+            const selectionType = get(
               form.values,
               `subjects.${subjectId}.selectionType`,
             );
@@ -164,7 +164,7 @@ const FootnoteForm = ({
                         <>
                           <IndicatorDetails
                             summary="Indicators"
-                            parentSelected={subjectSelected}
+                            parentSelectionType={selectionType}
                             valuePath={`subjects.${subjectId}`}
                             indicatorGroups={subject.indicators}
                             form={form}
@@ -174,7 +174,7 @@ const FootnoteForm = ({
                               <FilterGroupDetails
                                 key={filterId}
                                 summary={filter.legend}
-                                parentSelected={subjectSelected}
+                                parentSelectionType={selectionType}
                                 valuePath={`subjects.${subjectId}`}
                                 groupId={filterId}
                                 filter={filter}
@@ -202,7 +202,7 @@ const FootnoteForm = ({
 
                             <IndicatorDetails
                               summary="Indicators"
-                              parentSelected={subjectSelected}
+                              parentSelectionType={selectionType}
                               valuePath={`subjects.${subjectId}`}
                               indicatorGroups={subject.indicators}
                               form={form}
@@ -221,7 +221,7 @@ const FootnoteForm = ({
                                     <FilterGroupDetails
                                       key={filterId}
                                       summary={filter.legend}
-                                      parentSelected={subjectSelected}
+                                      parentSelectionType={selectionType}
                                       valuePath={`subjects.${subjectId}`}
                                       groupId={filterId}
                                       filter={filter}
@@ -241,34 +241,6 @@ const FootnoteForm = ({
                       ),
                     },
                   ]}
-                  // onChange={event => {
-                  //   switch (event.target.value) {
-                  //     case 'All':
-                  //       form.setFieldValue(
-                  //         `subjects.${subjectId}.selectionType`,
-                  //         'All',
-                  //       );
-                  //       break;
-                  //     case 'Specific':
-                  //       form.setFieldValue(
-                  //         `subjects.${subjectId}.selectionType`,
-                  //         'Specific',
-                  //       );
-                  //       break;
-                  //     case 'NA':
-                  //       form.setFieldValue(
-                  //         `subjects.${subjectId}.selectionType`,
-                  //         'NA',
-                  //       );
-                  //       break;
-                  //     default:
-                  //       form.setFieldValue(
-                  //         `subjects.${subjectId}.selectionType`,
-                  //         'NA',
-                  //       );
-                  //       break;
-                  //   }
-                  // }}
                 />
                 <hr className="govuk-!-margin-bottom-2" />
               </fieldset>
