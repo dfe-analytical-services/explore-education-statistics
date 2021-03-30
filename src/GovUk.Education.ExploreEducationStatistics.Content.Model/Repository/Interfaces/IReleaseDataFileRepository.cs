@@ -2,9 +2,8 @@
 using System.Collections.Generic;
 using System.Threading.Tasks;
 using GovUk.Education.ExploreEducationStatistics.Common.Model;
-using GovUk.Education.ExploreEducationStatistics.Content.Model;
 
-namespace GovUk.Education.ExploreEducationStatistics.Admin.Services.Interfaces
+namespace GovUk.Education.ExploreEducationStatistics.Content.Model.Repository.Interfaces
 {
     public interface IReleaseDataFileRepository
     {

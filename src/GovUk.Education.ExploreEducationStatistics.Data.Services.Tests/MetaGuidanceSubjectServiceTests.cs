@@ -6,6 +6,8 @@ using GovUk.Education.ExploreEducationStatistics.Common.Model.Data;
 using GovUk.Education.ExploreEducationStatistics.Common.Utils;
 using GovUk.Education.ExploreEducationStatistics.Content.Model;
 using GovUk.Education.ExploreEducationStatistics.Content.Model.Database;
+using GovUk.Education.ExploreEducationStatistics.Content.Model.Repository;
+using GovUk.Education.ExploreEducationStatistics.Content.Model.Repository.Interfaces;
 using GovUk.Education.ExploreEducationStatistics.Data.Model;
 using GovUk.Education.ExploreEducationStatistics.Data.Model.Database;
 using GovUk.Education.ExploreEducationStatistics.Data.Model.Services;
@@ -1007,7 +1009,9 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Services.Tests
                 indicatorService ?? new IndicatorService(statisticsDbContext, new Mock<ILogger<IndicatorService>>().Object),
                 statisticsDbContext,
                 persistenceHelper ?? new PersistenceHelper<StatisticsDbContext>(statisticsDbContext),
-                contentDbContext ?? new Mock<ContentDbContext>().Object
+                contentDbContext != null 
+                    ? new ReleaseDataFileRepository(contentDbContext)
+                    : new Mock<IReleaseDataFileRepository>().Object
             );
         }
     }
