@@ -72,13 +72,15 @@ const BasicReleaseSummary = ({ release }: Props) => {
           </div>
 
           <SummaryList>
-            {release.publishScheduled && (
-              <SummaryListItem term="Publish date">
+            <SummaryListItem term="Publish date">
+              {release.publishScheduled ? (
                 <FormattedDate>
                   {parseISO(release.publishScheduled)}
                 </FormattedDate>
-              </SummaryListItem>
-            )}
+              ) : (
+                <p>TBA</p>
+              )}
+            </SummaryListItem>
             {isValidPartialDate(release.nextReleaseDate) && (
               <SummaryListItem term="Next update">
                 <time>{formatPartialDate(release.nextReleaseDate)}</time>
