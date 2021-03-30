@@ -1736,7 +1736,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
                 }
             };
 
-        var contentDbContextId = Guid.NewGuid().ToString();
+            var contentDbContextId = Guid.NewGuid().ToString();
             await using (var contentDbContext = InMemoryApplicationDbContext(contentDbContextId))
             {
 
@@ -2375,7 +2375,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
             var contentDbContextId = Guid.NewGuid().ToString();
             await using (var contentDbContext = InMemoryApplicationDbContext(contentDbContextId))
             {
-                await contentDbContext.AddRangeAsync(originalDataReleaseFile);
+                await contentDbContext.AddAsync(originalDataReleaseFile);
                 await contentDbContext.SaveChangesAsync();
             }
 
