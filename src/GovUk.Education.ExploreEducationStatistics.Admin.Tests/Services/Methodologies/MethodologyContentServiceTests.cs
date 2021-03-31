@@ -1,6 +1,5 @@
 ﻿using System;
 using System.Collections.Generic;
-using System.Linq;
 using System.Threading.Tasks;
 using GovUk.Education.ExploreEducationStatistics.Admin.Services.Methodologies;
 using GovUk.Education.ExploreEducationStatistics.Admin.ViewModels.ManageContent;
@@ -9,8 +8,8 @@ using GovUk.Education.ExploreEducationStatistics.Common.Tests.Utils;
 using GovUk.Education.ExploreEducationStatistics.Common.Utils;
 using GovUk.Education.ExploreEducationStatistics.Content.Model;
 using GovUk.Education.ExploreEducationStatistics.Content.Model.Database;
-using Microsoft.AspNetCore.Mvc;
 using Xunit;
+using static GovUk.Education.ExploreEducationStatistics.Admin.Validators.ValidationErrorMessages;
 using static GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services.DbUtils;
 using static GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services.MapperUtils;
 
@@ -254,9 +253,8 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services.Method
                     MethodologyContentService.ContentListType.Content);
 
                 Assert.True(result.IsLeft);
-                var badRequestObjectResult = Assert.IsType<BadRequestObjectResult>(result.Left);
-                var value = Assert.IsType<ValidationProblemDetails>(badRequestObjectResult.Value);
-                Assert.Contains("METHODOLOGY_MUST_BE_DRAFT", value.Errors.First().Value);
+                ValidationTestUtil.AssertValidationProblem(
+                    result.Left, MethodologyMustBeDraft);
             }
         }
 
