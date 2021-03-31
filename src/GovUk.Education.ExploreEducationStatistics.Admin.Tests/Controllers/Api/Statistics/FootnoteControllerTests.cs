@@ -5,15 +5,16 @@ using System.Threading.Tasks;
 using GovUk.Education.ExploreEducationStatistics.Admin.Controllers.Api.Statistics;
 using GovUk.Education.ExploreEducationStatistics.Admin.ViewModels.Statistics;
 using GovUk.Education.ExploreEducationStatistics.Common.Model;
+using GovUk.Education.ExploreEducationStatistics.Content.Model.Repository.Interfaces;
 using GovUk.Education.ExploreEducationStatistics.Data.Model;
 using GovUk.Education.ExploreEducationStatistics.Data.Model.Services.Interfaces;
-using GovUk.Education.ExploreEducationStatistics.Data.Services.Interfaces;
 using GovUk.Education.ExploreEducationStatistics.Data.Services.ViewModels;
 using Microsoft.AspNetCore.Mvc;
 using Moq;
 using Xunit;
 using FootnoteViewModel = GovUk.Education.ExploreEducationStatistics.Admin.ViewModels.Statistics.FootnoteViewModel;
 using IFootnoteService = GovUk.Education.ExploreEducationStatistics.Admin.Services.Interfaces.IFootnoteService;
+using IReleaseService = GovUk.Education.ExploreEducationStatistics.Data.Services.Interfaces.IReleaseService;
 using Unit = GovUk.Education.ExploreEducationStatistics.Common.Model.Unit;
 
 namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Controllers.Api.Statistics
@@ -45,6 +46,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Controllers.Api
             var indicatorGroupService = new Mock<IIndicatorGroupService>();
             var footnoteService = new Mock<IFootnoteService>();
             var releaseService = new Mock<IReleaseService>();
+            var releaseDataFileRepository = new Mock<IReleaseDataFileRepository>();
 
             var createFootnoteResult = Task.FromResult(new Either<ActionResult, Footnote>(footnote));
 
@@ -151,11 +153,12 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Controllers.Api
                         }
                     }
                 });
-
+            
             _controller = new FootnoteController(filterService.Object,
                 footnoteService.Object,
                 indicatorGroupService.Object,
-                releaseService.Object);
+                releaseService.Object,
+                releaseDataFileRepository.Object);
         }
 
         [Fact]
