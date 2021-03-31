@@ -13,7 +13,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Security.Author
         public void UpdateAllSpecificMethodologies()
         {
             AssertReleaseHandlerSucceedsWithCorrectClaims<UpdateSpecificMethodologyRequirement>(
-                new CanUpdateAllSpecificMethodologies(),
+                new CanUpdateAllMethodologies(),
                 UpdateAllMethodologies
             );
         }

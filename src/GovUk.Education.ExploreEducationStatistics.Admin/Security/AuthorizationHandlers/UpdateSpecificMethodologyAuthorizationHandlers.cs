@@ -11,13 +11,13 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Security.Authorizatio
         : CompoundAuthorizationHandler<UpdateSpecificMethodologyRequirement, Methodology>
     {
         public UpdateSpecificMethodologyAuthorizationHandler()
-            : base(new CanUpdateAllSpecificMethodologies())
+            : base(new CanUpdateAllMethodologies())
         {
         }
-        public class CanUpdateAllSpecificMethodologies
+        public class CanUpdateAllMethodologies
             : HasClaimAuthorizationHandler<UpdateSpecificMethodologyRequirement>
         {
-            public CanUpdateAllSpecificMethodologies()
+            public CanUpdateAllMethodologies()
                 : base(SecurityClaimTypes.UpdateAllMethodologies) {}
         }
 
