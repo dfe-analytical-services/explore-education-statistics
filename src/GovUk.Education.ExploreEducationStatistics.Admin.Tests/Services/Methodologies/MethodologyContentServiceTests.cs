@@ -226,8 +226,8 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services.Method
                     MethodologyContentService.ContentListType.Content);
 
                 Assert.True(result.IsRight);
-                Assert.True(result.Right.Content.Count == 0);
-                Assert.True(result.Right.Order == 0);
+                Assert.Equal(0, result.Right.Content.Count);
+                Assert.Equal(0, result.Right.Order);
             }
         }
 
