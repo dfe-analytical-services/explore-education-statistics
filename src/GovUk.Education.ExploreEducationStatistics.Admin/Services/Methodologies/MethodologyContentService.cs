@@ -420,7 +420,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Services.Methodologie
         {
             if (methodology.Status != MethodologyStatus.Draft)
             {
-                return Task.Run<Either<ActionResult, Methodology>>(() =>
+                return Task.FromResult<Either<ActionResult, Methodology>>(
                     ValidationActionResult(ValidationErrorMessages.MethodologyMustBeDraft));
             }
 
@@ -432,7 +432,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Services.Methodologie
         {
             if (tuple.Item1.Status != MethodologyStatus.Draft)
             {
-                return Task.Run<Either<ActionResult, Tuple<Methodology, ContentSection>>>(() =>
+                return Task.FromResult<Either<ActionResult, Tuple<Methodology, ContentSection>>>(
                     ValidationActionResult(ValidationErrorMessages.MethodologyMustBeDraft));
             }
 
