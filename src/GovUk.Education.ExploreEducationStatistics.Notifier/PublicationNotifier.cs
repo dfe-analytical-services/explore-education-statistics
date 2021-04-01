@@ -161,7 +161,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Notifier
                             }
                         };
                         _emailService.SendEmail(client, email, confirmationEmailTemplateId, confirmationValues);
-                        return new OkObjectResult("Thanks! Please check your email.");
+                        return new OkResult();
                     }
 
                     // Verification Token expires in 1 hour
@@ -180,11 +180,12 @@ namespace GovUk.Education.ExploreEducationStatistics.Notifier
                     _emailService.SendEmail(client, email, emailTemplateId, values);
                 }
 
-                return new OkObjectResult("Thanks! Please check your email.");
+                return new OkResult();
             }
             catch (NotifyClientException e)
             {
                 logger.LogError(e,"Caught exception sending email");
+
                 // Remove the subscriber from storage if we could not successfully send the email & just added it
                 if (!subscriptionPending)
                 {
@@ -192,13 +193,12 @@ namespace GovUk.Education.ExploreEducationStatistics.Notifier
                         new SubscriptionEntity(id, email));
                 }
 
-                return new BadRequestObjectResult(
-                    $"There are problems sending the subscription verification email: {e.Message}");
+                return new BadRequestResult();
             }
             catch (Exception e)
             {
                 logger.LogError(e,"Caught exception storing subscription");
-                return new BadRequestObjectResult($"There are problems storing your subscription: {e.Message}");
+                return new BadRequestResult();
             }
         }
 
