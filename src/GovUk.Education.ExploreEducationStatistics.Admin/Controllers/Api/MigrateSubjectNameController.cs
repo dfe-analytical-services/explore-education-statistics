@@ -9,6 +9,7 @@ using GovUk.Education.ExploreEducationStatistics.Data.Model.Database;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
+using Microsoft.Extensions.Logging;
 using Unit = GovUk.Education.ExploreEducationStatistics.Common.Model.Unit;
 
 namespace GovUk.Education.ExploreEducationStatistics.Admin.Controllers.Api
@@ -23,15 +24,18 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Controllers.Api
         private readonly ContentDbContext _contentDbContext;
         private readonly StatisticsDbContext _statisticsDbContext;
         private readonly IUserService _userService;
+        private readonly ILogger<MigrateSubjectNameController> _logger;
 
         public MigrateSubjectNameController(
             ContentDbContext contentDbContext,
             StatisticsDbContext statisticsDbContext,
-            IUserService userService)
+            IUserService userService,
+            ILogger<MigrateSubjectNameController> logger)
         {
             _contentDbContext = contentDbContext;
             _statisticsDbContext = statisticsDbContext;
             _userService = userService;
+            _logger = logger;
         }
 
         [HttpPatch("api/subjects/migrate-subject-names")]
@@ -50,8 +54,16 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Controllers.Api
                         {
                             var subject = await _statisticsDbContext.Subject
                                 .FindAsync(rf.File.SubjectId);
-                            _contentDbContext.Update(rf);
-                            rf.Name = subject.Name;
+                            if (subject != null)
+                            {
+                                _contentDbContext.Update(rf);
+                                rf.Name = subject.Name;
+                            }
+                            else
+                            {
+                                _logger.LogError(
+                                    $"MigrateSubjectNames - Could not find subject in statsDb - File:'{rf.FileId}' SubjectId:'{rf.File.SubjectId}'");
+                            }
                         });
                     await _contentDbContext.SaveChangesAsync();
                 })
