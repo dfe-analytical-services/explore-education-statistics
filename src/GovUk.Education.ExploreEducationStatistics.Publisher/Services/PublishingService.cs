@@ -45,9 +45,9 @@ namespace GovUk.Education.ExploreEducationStatistics.Publisher.Services
         public async Task PublishStagedReleaseContent(Guid releaseId)
         {
             await _publicBlobStorageService.MoveDirectory(
-                sourceContainerName: PublicContentContainerName,
+                sourceContainerName: PublicContent,
                 sourceDirectoryPath: PublicContentStagingPath(),
-                destinationContainerName: PublicContentContainerName,
+                destinationContainerName: PublicContent,
                 destinationDirectoryPath: string.Empty
             );
 
@@ -76,7 +76,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Publisher.Services
                 {
                     DestinationConnectionString = _publicStorageConnectionString,
                     SetAttributesCallbackAsync = destination =>
-                        SetPublishedBlobAttributesCallback(destination, methodology.Published.Value),
+                        SetPublishedBlobAttributesCallback(destination, DateTime.UtcNow),
                     ShouldTransferCallbackAsync = (source, _) =>
                         // Filter by blobs with matching file paths
                         TransferBlobIfFileExistsCallback(

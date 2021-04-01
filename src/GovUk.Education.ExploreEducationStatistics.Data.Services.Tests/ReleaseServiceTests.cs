@@ -25,26 +25,12 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Services.Tests
         [Fact]
         public async Task GetRelease()
         {
-            var releaseId = Guid.NewGuid();
-
-            var contentRelease = new Release
-            {
-                Id = releaseId
-            };
-
-            var statisticsRelease = new Data.Model.Release
-            {
-                Id = releaseId
-            };
+            var statisticsRelease = new Data.Model.Release();
 
             var releaseSubject1 = new ReleaseSubject
             {
                 Release = statisticsRelease,
-                Subject = new Subject
-                {
-                    Id = Guid.NewGuid(),
-                    Name = "Subject 1"
-                },
+                Subject = new Subject(),
                 MetaGuidance = "Guidance 1"
 
             };
@@ -52,28 +38,38 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Services.Tests
             var releaseSubject2 = new ReleaseSubject
             {
                 Release = statisticsRelease,
-                Subject = new Subject
-                {
-                    Id = Guid.NewGuid(),
-                    Name = "Subject 2"
-                },
+                Subject = new Subject(),
                 MetaGuidance = "Guidance 2"
+            };
+
+            var statisticsDbContextId = Guid.NewGuid().ToString();
+            await using (var statisticsDbContext = InMemoryStatisticsDbContext(statisticsDbContextId))
+            {
+                await statisticsDbContext.AddRangeAsync(releaseSubject1, releaseSubject2);
+                await statisticsDbContext.SaveChangesAsync();
+            }
+
+            var contentRelease = new Release
+            {
+                Id = statisticsRelease.Id,
             };
 
             var releaseFile1 = new ReleaseFile
             {
                 Release = contentRelease,
+                Name = "Subject 1",
                 File = new File
                 {
                     Filename = "data1.csv",
                     Type = FileType.Data,
                     SubjectId = releaseSubject1.Subject.Id
-                }
+                },
             };
 
             var releaseFile2 = new ReleaseFile
             {
                 Release = contentRelease,
+                Name = "Subject 2",
                 File = new File
                 {
                     Filename = "data2.csv",
@@ -105,28 +101,19 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Services.Tests
                 }
             };
 
-            var contentDbContextId = Guid.NewGuid().ToString();
-            var statisticsDbContextId = Guid.NewGuid().ToString();
+            var releaseContentBlock = new ReleaseContentBlock
+            {
+                Release = contentRelease,
+                ContentBlock = dataBlock,
+            };
 
+            var contentDbContextId = Guid.NewGuid().ToString();
             await using (var contentDbContext = InMemoryContentDbContext(contentDbContextId))
             {
-                await contentDbContext.AddAsync(contentRelease);
                 await contentDbContext.AddRangeAsync(releaseFile1, releaseFile2);
                 await contentDbContext.AddRangeAsync(import1, import2);
-                await contentDbContext.AddAsync(
-                    new ReleaseContentBlock
-                    {
-                        Release = contentRelease,
-                        ContentBlock = dataBlock
-                    }
-                );
+                await contentDbContext.AddAsync(releaseContentBlock);
                 await contentDbContext.SaveChangesAsync();
-            }
-
-            await using (var statisticsDbContext = InMemoryStatisticsDbContext(statisticsDbContextId))
-            {
-                await statisticsDbContext.AddRangeAsync(releaseSubject1, releaseSubject2);
-                await statisticsDbContext.SaveChangesAsync();
             }
 
             await using (var contentDbContext = InMemoryContentDbContext(contentDbContextId))
@@ -174,7 +161,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Services.Tests
                 Assert.NotNull(subjects);
                 Assert.Equal(2, subjects.Count);
                 Assert.Equal(releaseSubject1.Subject.Id, subjects[0].Id);
-                Assert.Equal(releaseSubject1.Subject.Name, subjects[0].Name);
+                Assert.Equal(releaseFile1.Name, subjects[0].Name);
                 Assert.Equal(releaseSubject1.MetaGuidance, subjects[0].Content);
 
                 Assert.Equal("2020/21", subjects[0].TimePeriods.From);
@@ -185,7 +172,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Services.Tests
                 Assert.Equal("Local Authority District", subjects[0].GeographicLevels[1]);
 
                 Assert.Equal(releaseSubject2.Subject.Id, subjects[1].Id);
-                Assert.Equal(releaseSubject2.Subject.Name, subjects[1].Name);
+                Assert.Equal(releaseFile2.Name, subjects[1].Name);
                 Assert.Equal(releaseSubject2.MetaGuidance, subjects[1].Content);
 
                 Assert.Equal("2030", subjects[1].TimePeriods.From);
@@ -210,45 +197,46 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Services.Tests
         [Fact]
         public async Task GetRelease_FiltersPendingReplacementSubjects()
         {
-            var releaseId = Guid.NewGuid();
-
-            var contentRelease = new Release
-            {
-                Id = releaseId
-            };
-
-            var statisticsRelease = new Data.Model.Release
-            {
-                Id = releaseId
-            };
+            var statisticsRelease = new Data.Model.Release();
 
             var releaseSubject1 = new ReleaseSubject
             {
                 Release = statisticsRelease,
-                Subject = new Subject
-                {
-                    Id = Guid.NewGuid(),
-                    Name = "Subject 1"
-                }
+                Subject = new Subject(),
             };
 
             var releaseSubject2 = new ReleaseSubject
             {
                 Release = statisticsRelease,
-                Subject = new Subject
-                {
-                    Id = Guid.NewGuid(),
-                    Name = "Subject 2"
-                }
+                Subject = new Subject(),
             };
 
             var releaseSubject2Replacement = new ReleaseSubject
             {
                 Release = statisticsRelease,
-                Subject = new Subject
+                Subject = new Subject(),
+            };
+            var statisticsDbContextId = Guid.NewGuid().ToString();
+            await using (var statisticsDbContext = InMemoryStatisticsDbContext(statisticsDbContextId))
+            {
+                await statisticsDbContext.AddRangeAsync(releaseSubject1, releaseSubject2, releaseSubject2Replacement);
+                await statisticsDbContext.SaveChangesAsync();
+            }
+
+            var contentRelease = new Release
+            {
+                Id = statisticsRelease.Id,
+            };
+
+            var releaseFile1 = new ReleaseFile
+            {
+                Release = contentRelease,
+                Name = "Subject 1",
+                File = new File
                 {
-                    Id = Guid.NewGuid(),
-                    Name = "Subject 2 Replacement"
+                    Filename = "data1.csv",
+                    Type = FileType.Data,
+                    SubjectId = releaseSubject1.Subject.Id
                 }
             };
 
@@ -269,26 +257,17 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Services.Tests
 
             file2.ReplacedBy = file2Replacement;
 
-            var releaseFile1 = new ReleaseFile
-            {
-                Release = contentRelease,
-                File = new File
-                {
-                    Filename = "data1.csv",
-                    Type = FileType.Data,
-                    SubjectId = releaseSubject1.Subject.Id
-                }
-            };
-
             var releaseFile2 = new ReleaseFile
             {
                 Release = contentRelease,
+                Name = "Subject 2",
                 File = file2
             };
 
             var releaseFile2Replacement = new ReleaseFile
             {
                 Release = contentRelease,
+                Name = "Subject 2 Replacement",
                 File = file2Replacement
             };
 
@@ -305,20 +284,11 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Services.Tests
             };
 
             var contentDbContextId = Guid.NewGuid().ToString();
-            var statisticsDbContextId = Guid.NewGuid().ToString();
-
             await using (var contentDbContext = InMemoryContentDbContext(contentDbContextId))
             {
-                await contentDbContext.AddAsync(contentRelease);
                 await contentDbContext.AddRangeAsync(releaseFile1, releaseFile2, releaseFile2Replacement);
                 await contentDbContext.AddRangeAsync(import1, import2);
                 await contentDbContext.SaveChangesAsync();
-            }
-
-            await using (var statisticsDbContext = InMemoryStatisticsDbContext(statisticsDbContextId))
-            {
-                await statisticsDbContext.AddRangeAsync(releaseSubject1, releaseSubject2, releaseSubject2Replacement);
-                await statisticsDbContext.SaveChangesAsync();
             }
 
             await using (var contentDbContext = InMemoryContentDbContext(contentDbContextId))
@@ -340,26 +310,16 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Services.Tests
                 Assert.NotNull(subjects);
                 Assert.Equal(2, subjects.Count);
                 Assert.Equal(releaseSubject1.Subject.Id, subjects[0].Id);
-                Assert.Equal(releaseSubject1.Subject.Name, subjects[0].Name);
+                Assert.Equal(releaseFile1.Name, subjects[0].Name);
                 Assert.Equal(releaseSubject2.Subject.Id, subjects[1].Id);
-                Assert.Equal(releaseSubject2.Subject.Name, subjects[1].Name);
+                Assert.Equal(releaseFile2.Name, subjects[1].Name);
             }
         }
 
         [Fact]
         public async Task GetRelease_FiltersImportingSubjects()
         {
-            var releaseId = Guid.NewGuid();
-
-            var contentRelease = new Release
-            {
-                Id = releaseId
-            };
-
-            var statisticsRelease = new Data.Model.Release
-            {
-                Id = releaseId
-            };
+            var statisticsRelease = new Data.Model.Release();
 
             var releaseSubject1 = new ReleaseSubject
             {
@@ -379,6 +339,18 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Services.Tests
                     Id = Guid.NewGuid(),
                     Name = "Subject 2"
                 }
+            };
+
+            var statisticsDbContextId = Guid.NewGuid().ToString();
+            await using (var statisticsDbContext = InMemoryStatisticsDbContext(statisticsDbContextId))
+            {
+                await statisticsDbContext.AddRangeAsync(releaseSubject1, releaseSubject2);
+                await statisticsDbContext.SaveChangesAsync();
+            }
+
+            var contentRelease = new Release
+            {
+                Id = statisticsRelease.Id,
             };
 
             var releaseFile1 = new ReleaseFile
@@ -416,20 +388,11 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Services.Tests
             };
 
             var contentDbContextId = Guid.NewGuid().ToString();
-            var statisticsDbContextId = Guid.NewGuid().ToString();
-
             await using (var contentDbContext = InMemoryContentDbContext(contentDbContextId))
             {
-                await contentDbContext.AddAsync(contentRelease);
                 await contentDbContext.AddRangeAsync(releaseFile1, releaseFile2);
                 await contentDbContext.AddRangeAsync(import1, import2);
                 await contentDbContext.SaveChangesAsync();
-            }
-
-            await using (var statisticsDbContext = InMemoryStatisticsDbContext(statisticsDbContextId))
-            {
-                await statisticsDbContext.AddRangeAsync(releaseSubject1, releaseSubject2);
-                await statisticsDbContext.SaveChangesAsync();
             }
 
             await using (var contentDbContext = InMemoryContentDbContext(contentDbContextId))
@@ -450,38 +413,36 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Services.Tests
 
                 Assert.Single(subjects);
                 Assert.Equal(releaseSubject2.Subject.Id, subjects[0].Id);
-                Assert.Equal(releaseSubject2.Subject.Name, subjects[0].Name);
+                Assert.Equal(releaseFile2.Name, subjects[0].Name);
             }
         }
 
         [Fact]
         public async Task GetRelease_FiltersSubjectsWithNoImport()
         {
-            var releaseId = Guid.NewGuid();
-
-            var contentRelease = new Release
-            {
-                Id = releaseId
-            };
-
-            var statisticsRelease = new Data.Model.Release
-            {
-                Id = releaseId
-            };
-
+            var statisticsRelease = new Data.Model.Release();
             var releaseSubject = new ReleaseSubject
             {
                 Release = statisticsRelease,
-                Subject = new Subject
-                {
-                    Id = Guid.NewGuid(),
-                    Name = "Subject 1"
-                }
+                Subject = new Subject(),
+            };
+
+            var statisticsDbContextId = Guid.NewGuid().ToString();
+            await using (var statisticsDbContext = InMemoryStatisticsDbContext(statisticsDbContextId))
+            {
+                await statisticsDbContext.AddRangeAsync(releaseSubject);
+                await statisticsDbContext.SaveChangesAsync();
+            }
+
+            var contentRelease = new Release
+            {
+                Id = statisticsRelease.Id,
             };
 
             var releaseFile = new ReleaseFile
             {
                 Release = contentRelease,
+                Name = "Subject 1",
                 File = new File
                 {
                     Filename = "data1.csv",
@@ -491,19 +452,11 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Services.Tests
             };
 
             var contentDbContextId = Guid.NewGuid().ToString();
-            var statisticsDbContextId = Guid.NewGuid().ToString();
-
             await using (var contentDbContext = InMemoryContentDbContext(contentDbContextId))
             {
                 await contentDbContext.AddAsync(contentRelease);
                 await contentDbContext.AddRangeAsync(releaseFile);
                 await contentDbContext.SaveChangesAsync();
-            }
-
-            await using (var statisticsDbContext = InMemoryStatisticsDbContext(statisticsDbContextId))
-            {
-                await statisticsDbContext.AddRangeAsync(releaseSubject);
-                await statisticsDbContext.SaveChangesAsync();
             }
 
             await using (var contentDbContext = InMemoryContentDbContext(contentDbContextId))

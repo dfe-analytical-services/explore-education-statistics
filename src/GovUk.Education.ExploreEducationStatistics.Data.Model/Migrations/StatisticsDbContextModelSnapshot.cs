@@ -365,9 +365,10 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Model.Migrations
 
             modelBuilder.Entity("GovUk.Education.ExploreEducationStatistics.Data.Model.Observation", b =>
                 {
-                    b.Property<Guid>("Id")
+                    b.Property<long>("Id")
                         .ValueGeneratedOnAdd()
-                        .HasColumnType("uniqueidentifier");
+                        .HasColumnType("bigint")
+                        .HasAnnotation("SqlServer:ValueGenerationStrategy", SqlServerValueGenerationStrategy.IdentityColumn);
 
                     b.Property<long>("CsvRow")
                         .HasColumnType("bigint");
@@ -382,6 +383,9 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Model.Migrations
 
                     b.Property<string>("Measures")
                         .HasColumnType("nvarchar(max)");
+
+                    b.Property<Guid>("ObservationId")
+                        .HasColumnType("uniqueidentifier");
 
                     b.Property<Guid>("SubjectId")
                         .HasColumnType("uniqueidentifier");
@@ -406,27 +410,25 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Model.Migrations
 
                     b.HasIndex("Year");
 
-                    b.ToTable("Observation");
+                    b.ToTable("ObservationRow");
                 });
 
             modelBuilder.Entity("GovUk.Education.ExploreEducationStatistics.Data.Model.ObservationFilterItem", b =>
                 {
-                    b.Property<Guid>("ObservationId")
-                        .HasColumnType("uniqueidentifier");
+                    b.Property<long>("ObservationId")
+                        .HasColumnType("bigint");
 
                     b.Property<Guid>("FilterItemId")
                         .HasColumnType("uniqueidentifier");
 
-                    b.Property<Guid?>("FilterId")
+                    b.Property<Guid>("OldObservationId")
                         .HasColumnType("uniqueidentifier");
 
                     b.HasKey("ObservationId", "FilterItemId");
 
-                    b.HasIndex("FilterId");
-
                     b.HasIndex("FilterItemId");
 
-                    b.ToTable("ObservationFilterItem");
+                    b.ToTable("ObservationRowFilterItem");
                 });
 
             modelBuilder.Entity("GovUk.Education.ExploreEducationStatistics.Data.Model.Publication", b =>
@@ -715,11 +717,6 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Model.Migrations
 
             modelBuilder.Entity("GovUk.Education.ExploreEducationStatistics.Data.Model.ObservationFilterItem", b =>
                 {
-                    b.HasOne("GovUk.Education.ExploreEducationStatistics.Data.Model.Filter", "Filter")
-                        .WithMany()
-                        .HasForeignKey("FilterId")
-                        .OnDelete(DeleteBehavior.Restrict);
-
                     b.HasOne("GovUk.Education.ExploreEducationStatistics.Data.Model.FilterItem", "FilterItem")
                         .WithMany()
                         .HasForeignKey("FilterItemId")

@@ -13,6 +13,7 @@ using GovUk.Education.ExploreEducationStatistics.Common.Services.Interfaces.Secu
 using GovUk.Education.ExploreEducationStatistics.Common.Utils;
 using GovUk.Education.ExploreEducationStatistics.Content.Model;
 using GovUk.Education.ExploreEducationStatistics.Content.Model.Database;
+using GovUk.Education.ExploreEducationStatistics.Content.Model.Repository.Interfaces;
 using GovUk.Education.ExploreEducationStatistics.Data.Model;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
@@ -25,23 +26,25 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Services
     public class DataBlockService : IDataBlockService
     {
         private readonly ContentDbContext _context;
-        private readonly IMapper _mapper;
         private readonly IPersistenceHelper<ContentDbContext> _persistenceHelper;
-        private readonly IUserService _userService;
         private readonly IReleaseFileService _releaseFileService;
+        private readonly IReleaseContentBlockRepository _releaseContentBlockRepository;
+        private readonly IUserService _userService;
+        private readonly IMapper _mapper;
 
-        public DataBlockService(
-            ContentDbContext context,
-            IMapper mapper,
+        public DataBlockService(ContentDbContext context,
             IPersistenceHelper<ContentDbContext> persistenceHelper,
+            IReleaseFileService releaseFileService,
+            IReleaseContentBlockRepository releaseContentBlockRepository,
             IUserService userService,
-            IReleaseFileService releaseFileService)
+            IMapper mapper)
         {
             _context = context;
-            _mapper = mapper;
             _persistenceHelper = persistenceHelper;
-            _userService = userService;
             _releaseFileService = releaseFileService;
+            _releaseContentBlockRepository = releaseContentBlockRepository;
+            _userService = userService;
+            _mapper = mapper;
         }
 
         public async Task<Either<ActionResult, DataBlockViewModel>> Create(Guid releaseId, DataBlockCreateViewModel dataBlockCreate)
@@ -97,18 +100,13 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Services
         {
             return await _persistenceHelper.CheckEntityExists<Release>(releaseId)
                 .OnSuccess(_userService.CheckCanViewRelease)
-                .OnSuccess(
-                    async release =>
+                .OnSuccess(async release =>
                     {
-                        var dataBlocks = await _context
-                            .ReleaseContentBlocks
-                            .Where(join => join.ReleaseId == release.Id)
-                            .Select(join => join.ContentBlock)
-                            .OfType<DataBlock>()
-                            .OrderBy(dataBlock => dataBlock.Name)
-                            .ToListAsync();
+                        var dataBlocks = await _releaseContentBlockRepository.GetAll<DataBlock>(release.Id);
 
-                        return _mapper.Map<List<DataBlockSummaryViewModel>>(dataBlocks);
+                        return _mapper.Map<List<DataBlockSummaryViewModel>>(dataBlocks)
+                            .OrderBy(model => model.Name)
+                            .ToList();
                     }
                 );
         }

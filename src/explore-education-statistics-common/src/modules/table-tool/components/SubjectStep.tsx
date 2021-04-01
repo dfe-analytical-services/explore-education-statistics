@@ -1,4 +1,3 @@
-import InsetText from '@common/components/InsetText';
 import SummaryList from '@common/components/SummaryList';
 import SummaryListItem from '@common/components/SummaryListItem';
 import Tabs from '@common/components/Tabs';

@@ -72,7 +72,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Publisher.Services
         public async Task DeleteAllFastTracksByRelease(Guid releaseId)
         {
             await _publicBlobStorageService.DeleteBlobs(
-                PublicContentContainerName,
+                PublicContent,
                 PublicContentReleaseFastTrackPath(releaseId.ToString()));
             await _tableStorageService.DeleteByPartitionKey(PublicReleaseFastTrackTableName, releaseId.ToString());
         }
@@ -82,7 +82,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Publisher.Services
             var blobName = context.Staging
                 ? PublicContentFastTrackPath(releaseId.ToString(), fastTrack.Id.ToString(), PublicContentStagingPath())
                 : PublicContentFastTrackPath(releaseId.ToString(), fastTrack.Id.ToString());
-            await _publicBlobStorageService.UploadAsJson(PublicContentContainerName, blobName, fastTrack);
+            await _publicBlobStorageService.UploadAsJson(PublicContent, blobName, fastTrack);
         }
 
         private async Task<CloudTable> GetTableAsync()

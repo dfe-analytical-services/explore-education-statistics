@@ -195,9 +195,6 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Migrations.ContentMig
                     b.Property<Guid>("MetaFileId")
                         .HasColumnType("uniqueidentifier");
 
-                    b.Property<bool>("Migrated")
-                        .HasColumnType("bit");
-
                     b.Property<int>("NumBatches")
                         .HasColumnType("int");
 
@@ -274,12 +271,6 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Migrations.ContentMig
 
                     b.Property<string>("Filename")
                         .HasColumnType("nvarchar(max)");
-
-                    b.Property<bool>("PrivateBlobPathMigrated")
-                        .HasColumnType("bit");
-
-                    b.Property<bool>("PublicBlobPathMigrated")
-                        .HasColumnType("bit");
 
                     b.Property<Guid?>("ReplacedById")
                         .HasColumnType("uniqueidentifier");
@@ -664,6 +655,9 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Migrations.ContentMig
 
                     b.Property<Guid>("FileId")
                         .HasColumnType("uniqueidentifier");
+
+                    b.Property<string>("Name")
+                        .HasColumnType("nvarchar(max)");
 
                     b.Property<Guid>("ReleaseId")
                         .HasColumnType("uniqueidentifier");

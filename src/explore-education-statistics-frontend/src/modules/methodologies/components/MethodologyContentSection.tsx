@@ -1,7 +1,7 @@
 import ContentSectionIndex from '@common/components/ContentSectionIndex';
 import { useMobileMedia } from '@common/hooks/useMedia';
 import useMounted from '@common/hooks/useMounted';
-import MethodologySectionBlocks from '@common/modules/methodology/components/MethodologySectionBlocks';
+import MethodologySectionBlocks from '@frontend/modules/methodologies/components/MethodologySectionBlocks';
 import { ContentBlock } from '@common/services/types/blocks';
 import React, { useRef } from 'react';
 

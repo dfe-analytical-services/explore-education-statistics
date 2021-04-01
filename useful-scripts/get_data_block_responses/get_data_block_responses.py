@@ -44,7 +44,8 @@ parser.add_argument("-f", "--file",
 parser.add_argument("-s", "-sleep",
                     dest="sleep_duration",
                     default=1,
-                    help="duration to sleep between requests")
+                    help="duration to sleep between requests",
+                    type=int)
 args = parser.parse_args()
 
 data_api_urls = {

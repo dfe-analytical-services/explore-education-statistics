@@ -2,14 +2,13 @@
 using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
-using GovUk.Education.ExploreEducationStatistics.Admin.Services.Interfaces;
 using GovUk.Education.ExploreEducationStatistics.Common.Model;
-using GovUk.Education.ExploreEducationStatistics.Content.Model;
 using GovUk.Education.ExploreEducationStatistics.Content.Model.Database;
+using GovUk.Education.ExploreEducationStatistics.Content.Model.Repository.Interfaces;
 using Microsoft.EntityFrameworkCore;
 using static GovUk.Education.ExploreEducationStatistics.Common.Model.FileType;
 
-namespace GovUk.Education.ExploreEducationStatistics.Admin.Services
+namespace GovUk.Education.ExploreEducationStatistics.Content.Model.Repository
 {
     public class ReleaseDataFileRepository : IReleaseDataFileRepository
     {
@@ -32,6 +31,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Services
             string filename,
             FileType type,
             Guid createdById,
+            string name = null,
             File replacingFile = null,
             File source = null)
         {
@@ -48,11 +48,9 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Services
             var releaseFile = new ReleaseFile
             {
                 ReleaseId = releaseId,
+                Name = name,
                 File = new File
                 {
-                    // Mark any new files as already migrated while these flags temporarily exist
-                    PrivateBlobPathMigrated = true,
-                    PublicBlobPathMigrated = true,
                     Created = DateTime.UtcNow,
                     CreatedById = createdById,
                     RootPath = releaseId,
@@ -80,9 +78,6 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Services
         {
             var file = (await _contentDbContext.Files.AddAsync(new File
             {
-                // Mark any new files as already migrated while these flags temporarily exist
-                PrivateBlobPathMigrated = true,
-                PublicBlobPathMigrated = true,
                 Created = DateTime.UtcNow,
                 CreatedById = createdById,
                 RootPath = releaseId,
@@ -118,6 +113,17 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Services
                 )
                 .Select(rf => rf.File)
                 .ToListAsync();
+        }
+
+        public async Task<ReleaseFile> GetBySubject(Guid releaseId, Guid subjectId)
+        {
+            return await _contentDbContext
+                .ReleaseFiles
+                .Include(rf => rf.File)
+                .SingleAsync(rf =>
+                    rf.ReleaseId == releaseId
+                    && rf.File.SubjectId == subjectId
+                    && rf.File.Type == FileType.Data);
         }
 
         private IQueryable<File> ListDataFilesQuery(Guid releaseId)

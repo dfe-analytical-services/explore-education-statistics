@@ -371,6 +371,7 @@ Verify Test text accordion section contains correct text
     ${section}=  user gets accordion section content element  Test text  id:content
     user waits until parent contains element  ${section}   xpath:.//p[text()="Some test text!"]
     user closes accordion section  Test text  id:content
+    user clicks link  Summary
 
 Return to Admin to start creating an amendment
     [Tags]  HappyPath
@@ -395,7 +396,7 @@ Create amendment
     user waits until h1 is visible  Confirm you want to amend this live release
     user clicks button   Confirm
     user waits until h1 is visible  ${PUBLICATION_NAME}
-    user waits until page contains title caption  Amend release
+    user waits until page contains title caption  Amend release  90
 
 Navigate to data replacement page
     [Tags]  HappyPath

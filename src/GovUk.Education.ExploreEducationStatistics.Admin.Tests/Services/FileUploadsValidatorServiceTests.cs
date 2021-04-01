@@ -8,6 +8,7 @@ using System.Threading.Tasks;
 using GovUk.Education.ExploreEducationStatistics.Admin.Services;
 using GovUk.Education.ExploreEducationStatistics.Common.Model;
 using GovUk.Education.ExploreEducationStatistics.Common.Services.Interfaces;
+using GovUk.Education.ExploreEducationStatistics.Content.Model;
 using GovUk.Education.ExploreEducationStatistics.Data.Model;
 using GovUk.Education.ExploreEducationStatistics.Data.Model.Services.Interfaces;
 using Microsoft.AspNetCore.Http;
@@ -17,6 +18,7 @@ using static GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services.DbU
 using static GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services.ValidationTestUtil;
 using static GovUk.Education.ExploreEducationStatistics.Admin.Validators.ValidationErrorMessages;
 using static GovUk.Education.ExploreEducationStatistics.Common.Model.FileType;
+using File = System.IO.File;
 
 namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
 {
@@ -101,16 +103,30 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
         [Fact]
         public async Task ValidateSubjectName_SubjectNameNotUnique()
         {
+            var release = new Content.Model.Release();
+            var dataReleaseFile = new ReleaseFile
+            {
+                Release = release,
+                Name = "Subject Title",
+                File = new Content.Model.File
+                {
+                    Type = FileType.Data,
+                }
+            };
+            var contentDbContextId = Guid.NewGuid().ToString();
+            await using (var contentDbContext = InMemoryApplicationDbContext(contentDbContextId))
+            {
+                await contentDbContext.AddAsync(release);
+                await contentDbContext.AddAsync(dataReleaseFile);
+                await contentDbContext.SaveChangesAsync();
+            }
+
             var (subjectService, fileTypeService) = Mocks();
 
-            subjectService.Setup(service => service.Get(It.IsAny<Guid>(), "Subject Title"))
-                .ReturnsAsync(new Subject());
-
-            await using (var context = InMemoryApplicationDbContext())
+            await using (var contentDbContext = InMemoryApplicationDbContext(contentDbContextId))
             {
-                var service = new FileUploadsValidatorService(subjectService.Object, fileTypeService.Object, context);
-
-                var result = await service.ValidateSubjectName(Guid.NewGuid(),  "Subject Title");
+                var service = new FileUploadsValidatorService(subjectService.Object, fileTypeService.Object, contentDbContext);
+                var result = await service.ValidateSubjectName(release.Id,  "Subject Title");
 
                 Assert.True(result.IsLeft);
                 AssertValidationProblem(result.Left, SubjectTitleMustBeUnique);

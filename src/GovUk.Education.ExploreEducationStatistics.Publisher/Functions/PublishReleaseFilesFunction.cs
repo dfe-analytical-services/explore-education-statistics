@@ -14,14 +14,17 @@ namespace GovUk.Education.ExploreEducationStatistics.Publisher.Functions
     // ReSharper disable once UnusedType.Global
     public class PublishReleaseFilesFunction
     {
+        private readonly IMethodologyService _methodologyService;
         private readonly IPublishingService _publishingService;
         private readonly IQueueService _queueService;
         private readonly IReleaseStatusService _releaseStatusService;
 
-        public PublishReleaseFilesFunction(IPublishingService publishingService,
+        public PublishReleaseFilesFunction(IMethodologyService methodologyService,
+            IPublishingService publishingService, 
             IQueueService queueService,
             IReleaseStatusService releaseStatusService)
         {
+            _methodologyService = methodologyService;
             _publishingService = publishingService;
             _queueService = queueService;
             _releaseStatusService = releaseStatusService;
@@ -57,7 +60,14 @@ namespace GovUk.Education.ExploreEducationStatistics.Publisher.Functions
                 await UpdateStage(releaseId, releaseStatusId, Started);
                 try
                 {
-                    _publishingService.PublishReleaseFiles(releaseId).Wait();
+                    var methodology = await _methodologyService.GetByRelease(releaseId);
+                    // Publish the files of the Methodology if it's not already live
+                    // Since the Methodology will be published for the first time with this Release
+                    if (methodology != null && !methodology.Live)
+                    {
+                        await _publishingService.PublishMethodologyFiles(methodology.Id);
+                    }
+                    await _publishingService.PublishReleaseFiles(releaseId);
                     published.Add((releaseId, releaseStatusId));
                 }
                 catch (Exception e)

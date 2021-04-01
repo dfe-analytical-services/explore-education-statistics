@@ -22,7 +22,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Content.Api.Tests.Services
             var blobStorageService = new Mock<IBlobStorageService>();
 
             blobStorageService
-                .Setup(s => s.GetDeserializedJson<TestModel>(PublicContentContainerName, "test-path"))
+                .Setup(s => s.GetDeserializedJson<TestModel>(PublicContent, "test-path"))
                 .ReturnsAsync(new TestModel
                 {
                     Name = "Test"
@@ -42,7 +42,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Content.Api.Tests.Services
             var blobStorageService = new Mock<IBlobStorageService>();
 
             blobStorageService
-                .Setup(s => s.GetDeserializedJson<TestModel>(PublicContentContainerName, "test-path"))
+                .Setup(s => s.GetDeserializedJson<TestModel>(PublicContent, "test-path"))
                 .ThrowsAsync(new FileNotFoundException("Blob not found"));
 
             var fileStorageService = new FileStorageService(blobStorageService.Object);

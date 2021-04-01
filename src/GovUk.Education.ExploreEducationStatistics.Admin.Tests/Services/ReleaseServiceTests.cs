@@ -5,6 +5,7 @@ using System.Linq;
 using System.Threading.Tasks;
 using GovUk.Education.ExploreEducationStatistics.Admin.Services;
 using GovUk.Education.ExploreEducationStatistics.Admin.Services.Interfaces;
+using GovUk.Education.ExploreEducationStatistics.Admin.Services.Interfaces.ManageContent;
 using GovUk.Education.ExploreEducationStatistics.Admin.ViewModels;
 using GovUk.Education.ExploreEducationStatistics.Common.Model;
 using GovUk.Education.ExploreEducationStatistics.Common.Services;
@@ -675,14 +676,23 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
                 await context.SaveChangesAsync();
             }
 
+            var contentService = new Mock<IContentService>(MockBehavior.Strict);
+            var releaseFileService = new Mock<IReleaseFileService>(MockBehavior.Strict);
+
+            contentService.Setup(mock =>
+                    mock.GetContentBlocks<HtmlBlock>(release.Id))
+                .ReturnsAsync(new List<HtmlBlock>());
+
+            var nextReleaseDateEdited = new PartialDate
+            {
+                Day = "1", Month = "1", Year = "2040"
+            };
+
             await using (var context = InMemoryApplicationDbContext(contextId))
             {
-                var releaseService = BuildReleaseService(context);
-
-                var nextReleaseDateEdited = new PartialDate
-                {
-                    Day = "1", Month = "1", Year = "2040"
-                };
+                var releaseService = BuildReleaseService(contentDbContext: context,
+                    contentService: contentService.Object,
+                    releaseFileService: releaseFileService.Object);
 
                 var result = await releaseService
                     .UpdateRelease(
@@ -696,31 +706,36 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
                             TimePeriodCoverage = TimeIdentifier.March,
                             PreReleaseAccessList = "New access list",
                             Status = ReleaseStatus.Draft
-
                         }
                     );
 
                 Assert.True(result.IsRight);
 
                 Assert.Equal(release.Publication.Id, result.Right.PublicationId);
-                Assert.Equal(new DateTime(2051, 6, 30, 0, 0, 0, DateTimeKind.Unspecified), result.Right.PublishScheduled);
+                Assert.Equal(new DateTime(2051, 6, 30, 0, 0, 0, DateTimeKind.Unspecified),
+                    result.Right.PublishScheduled);
                 Assert.Equal(nextReleaseDateEdited, result.Right.NextReleaseDate);
                 Assert.Equal(officialStatisticsReleaseType, result.Right.Type);
                 Assert.Equal("2035", result.Right.ReleaseName);
                 Assert.Equal(TimeIdentifier.March, result.Right.TimePeriodCoverage);
                 Assert.Equal("New access list", result.Right.PreReleaseAccessList);
+            }
 
-                var saved = await context.Releases.FindAsync(result.Right.Id);
+            await using (var context = InMemoryApplicationDbContext(contextId))
+            {
+                var saved = await context.Releases.FindAsync(releaseId);
 
                 Assert.Equal(release.Publication.Id, saved.PublicationId);
                 Assert.Equal(new DateTime(2051, 6, 29, 23, 0, 0, DateTimeKind.Utc), saved.PublishScheduled);
                 Assert.Equal(nextReleaseDateEdited, saved.NextReleaseDate);
-                Assert.Equal(officialStatisticsReleaseType, saved.Type);
+                Assert.Equal(officialStatisticsReleaseType.Id, saved.TypeId);
                 Assert.Equal("2035-march", saved.Slug);
                 Assert.Equal("2035", saved.ReleaseName);
                 Assert.Equal(TimeIdentifier.March, saved.TimePeriodCoverage);
                 Assert.Equal("New access list", saved.PreReleaseAccessList);
             }
+
+            MockUtils.VerifyAllMocks(contentService, releaseFileService);
         }
 
         [Fact]
@@ -771,9 +786,14 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
                 await context.SaveChangesAsync();
             }
 
+            var contentService = new Mock<IContentService>(MockBehavior.Strict);
+            var releaseFileService = new Mock<IReleaseFileService>(MockBehavior.Strict);
+
             await using (var context = InMemoryApplicationDbContext(contextId))
             {
-                var releaseService = BuildReleaseService(context);
+                var releaseService = BuildReleaseService(contentDbContext: context,
+                    contentService: contentService.Object,
+                    releaseFileService: releaseFileService.Object);
 
                 var result = await releaseService
                     .UpdateRelease(
@@ -791,6 +811,8 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
                 Assert.True(result.IsLeft);
                 AssertValidationProblem(result.Left, SlugNotUnique);
             }
+
+            MockUtils.VerifyAllMocks(contentService, releaseFileService);
         }
 
         [Fact]
@@ -839,9 +861,18 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
                 await context.SaveChangesAsync();
             }
 
+            var contentService = new Mock<IContentService>(MockBehavior.Strict);
+            var releaseFileService = new Mock<IReleaseFileService>(MockBehavior.Strict);
+
+            contentService.Setup(mock =>
+                    mock.GetContentBlocks<HtmlBlock>(amendedRelease.Id))
+                .ReturnsAsync(new List<HtmlBlock>());
+
             await using (var context = InMemoryApplicationDbContext(contextId))
             {
-                var releaseService = BuildReleaseService(context);
+                var releaseService = BuildReleaseService(contentDbContext: context,
+                    contentService: contentService.Object,
+                    releaseFileService: releaseFileService.Object);
 
                 var result = await releaseService
                     .UpdateRelease(
@@ -860,6 +891,8 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
                 Assert.Equal("2035", result.Right.ReleaseName);
                 Assert.Equal(TimeIdentifier.CalendarYear, result.Right.TimePeriodCoverage);
             }
+
+            MockUtils.VerifyAllMocks(contentService, releaseFileService);
         }
 
         [Fact]
@@ -889,10 +922,12 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
                 await context.SaveChangesAsync();
             }
 
+            var releaseChecklistService = new Mock<IReleaseChecklistService>(MockBehavior.Strict);
+            var contentService = new Mock<IContentService>(MockBehavior.Strict);
+            var releaseFileService = new Mock<IReleaseFileService>(MockBehavior.Strict);
+
             await using (var context = InMemoryApplicationDbContext(contextId))
             {
-                var releaseChecklistService = new Mock<IReleaseChecklistService>(MockBehavior.Strict);
-
                 releaseChecklistService
                     .Setup(s =>
                             s.GetErrors(It.Is<Release>(r => r.Id == release.Id)))
@@ -904,9 +939,10 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
                         }
                     );
 
-                var releaseService = BuildReleaseService(
-                    context,
-                    releaseChecklistService: releaseChecklistService.Object);
+                var releaseService = BuildReleaseService(contentDbContext: context,
+                    releaseChecklistService: releaseChecklistService.Object,
+                    contentService: contentService.Object,
+                    releaseFileService: releaseFileService.Object);
 
                 var result = await releaseService
                     .UpdateRelease(
@@ -925,6 +961,8 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
                 AssertValidationProblem(result.Left, DataFileImportsMustBeCompleted);
                 AssertValidationProblem(result.Left, DataFileReplacementsMustBeCompleted);
             }
+
+            MockUtils.VerifyAllMocks(releaseChecklistService, contentService, releaseFileService);
         }
 
         [Fact]
@@ -955,9 +993,14 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
                 await context.SaveChangesAsync();
             }
 
+            var contentService = new Mock<IContentService>(MockBehavior.Strict);
+            var releaseFileService = new Mock<IReleaseFileService>(MockBehavior.Strict);
+
             await using (var context = InMemoryApplicationDbContext(contextId))
             {
-                var releaseService = BuildReleaseService(context);
+                var releaseService = BuildReleaseService(contentDbContext: context,
+                    contentService: contentService.Object,
+                    releaseFileService: releaseFileService.Object);
 
                 var result = await releaseService
                     .UpdateRelease(
@@ -975,6 +1018,8 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
                 Assert.True(result.IsLeft);
                 AssertValidationProblem(result.Left, PublishedReleaseCannotBeUnapproved);
             }
+
+            MockUtils.VerifyAllMocks(contentService, releaseFileService);
         }
 
         [Fact]
@@ -1005,9 +1050,14 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
                 await context.SaveChangesAsync();
             }
 
+            var contentService = new Mock<IContentService>(MockBehavior.Strict);
+            var releaseFileService = new Mock<IReleaseFileService>(MockBehavior.Strict);
+
             await using (var context = InMemoryApplicationDbContext(contextId))
             {
-                var releaseService = BuildReleaseService(context);
+                var releaseService = BuildReleaseService(contentDbContext: context,
+                    contentService: contentService.Object,
+                    releaseFileService: releaseFileService.Object);
 
                 var result = await releaseService
                     .UpdateRelease(
@@ -1026,6 +1076,289 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
 
                 AssertValidationProblem(result.Left, ApprovedReleaseMustHavePublishScheduledDate);
             }
+
+            MockUtils.VerifyAllMocks(contentService, releaseFileService);
+        }
+
+        [Fact]
+        public async Task UpdateAsync_ReleaseHasImages()
+        {
+            var releaseId = Guid.NewGuid();
+
+            var adHocReleaseType = new ReleaseType
+            {
+                Title = "Ad Hoc"
+            };
+
+            var officialStatisticsReleaseType = new ReleaseType
+            {
+                Title = "Official Statistics"
+            };
+
+            var release = new Release
+            {
+                Id = releaseId,
+                Type = adHocReleaseType,
+                Publication = new Publication
+                {
+                    Title = "Old publication"
+                },
+                ReleaseName = "2030",
+                PublishScheduled = DateTime.UtcNow,
+                NextReleaseDate = new PartialDate
+                {
+                    Day = "15", Month = "6", Year = "2039"
+                },
+                PreReleaseAccessList = "Old access list",
+                Version = 0,
+                PreviousVersionId = releaseId
+            };
+
+            var imageFile1 = new ReleaseFile
+            {
+                Release = release,
+                File = new File
+                {
+                    RootPath = Guid.NewGuid(),
+                    Filename = "image1.png",
+                    Type = FileType.Image
+                }
+            };
+
+            var imageFile2 = new ReleaseFile
+            {
+                Release = release,
+                File = new File
+                {
+                    RootPath = Guid.NewGuid(),
+                    Filename = "image2.png",
+                    Type = FileType.Image
+                }
+            };
+
+            var contextId = Guid.NewGuid().ToString();
+
+            await using (var context = InMemoryApplicationDbContext(contextId))
+            {
+                await context.AddRangeAsync(adHocReleaseType, officialStatisticsReleaseType);
+                await context.Releases.AddAsync(release);
+                await context.ReleaseFiles.AddRangeAsync(imageFile1, imageFile2);
+                await context.SaveChangesAsync();
+            }
+
+            var contentService = new Mock<IContentService>(MockBehavior.Strict);
+            var releaseFileService = new Mock<IReleaseFileService>(MockBehavior.Strict);
+
+            contentService.Setup(mock =>
+                    mock.GetContentBlocks<HtmlBlock>(release.Id))
+                .ReturnsAsync(new List<HtmlBlock>
+                {
+                    new HtmlBlock
+                    {
+                        Body = $@"
+    <img src=""/api/releases/{{releaseId}}/images/{imageFile1.File.Id}""/>
+    <img src=""/api/releases/{{releaseId}}/images/{imageFile2.File.Id}""/>"
+                    }
+                });
+
+            var nextReleaseDateEdited = new PartialDate
+            {
+                Day = "1", Month = "1", Year = "2040"
+            };
+
+            await using (var context = InMemoryApplicationDbContext(contextId))
+            {
+                var releaseService = BuildReleaseService(contentDbContext: context,
+                    contentService: contentService.Object,
+                    releaseFileService: releaseFileService.Object);
+
+                var result = await releaseService
+                    .UpdateRelease(
+                        releaseId,
+                        new ReleaseUpdateViewModel
+                        {
+                            PublishScheduled = "2051-06-30",
+                            NextReleaseDate = nextReleaseDateEdited,
+                            TypeId = officialStatisticsReleaseType.Id,
+                            ReleaseName = "2035",
+                            TimePeriodCoverage = TimeIdentifier.March,
+                            PreReleaseAccessList = "New access list",
+                            Status = ReleaseStatus.Draft
+
+                        }
+                    );
+
+                Assert.True(result.IsRight);
+
+                Assert.Equal(release.Publication.Id, result.Right.PublicationId);
+                Assert.Equal(new DateTime(2051, 6, 30, 0, 0, 0, DateTimeKind.Unspecified),
+                    result.Right.PublishScheduled);
+                Assert.Equal(nextReleaseDateEdited, result.Right.NextReleaseDate);
+                Assert.Equal(officialStatisticsReleaseType, result.Right.Type);
+                Assert.Equal("2035", result.Right.ReleaseName);
+                Assert.Equal(TimeIdentifier.March, result.Right.TimePeriodCoverage);
+                Assert.Equal("New access list", result.Right.PreReleaseAccessList);
+            }
+            
+            await using (var context = InMemoryApplicationDbContext(contextId))
+            {
+                var saved = await context.Releases.FindAsync(releaseId);
+
+                Assert.Equal(release.Publication.Id, saved.PublicationId);
+                Assert.Equal(new DateTime(2051, 6, 29, 23, 0, 0, DateTimeKind.Utc), saved.PublishScheduled);
+                Assert.Equal(nextReleaseDateEdited, saved.NextReleaseDate);
+                Assert.Equal(officialStatisticsReleaseType.Id, saved.TypeId);
+                Assert.Equal("2035-march", saved.Slug);
+                Assert.Equal("2035", saved.ReleaseName);
+                Assert.Equal(TimeIdentifier.March, saved.TimePeriodCoverage);
+                Assert.Equal("New access list", saved.PreReleaseAccessList);
+            }
+
+            MockUtils.VerifyAllMocks(contentService, releaseFileService);
+        }
+
+        [Fact]
+        public async Task UpdateAsync_ReleaseHasUnusedImages()
+        {
+            var releaseId = Guid.NewGuid();
+
+            var adHocReleaseType = new ReleaseType
+            {
+                Title = "Ad Hoc"
+            };
+
+            var officialStatisticsReleaseType = new ReleaseType
+            {
+                Title = "Official Statistics"
+            };
+
+            var release = new Release
+            {
+                Id = releaseId,
+                Type = adHocReleaseType,
+                Publication = new Publication
+                {
+                    Title = "Old publication"
+                },
+                ReleaseName = "2030",
+                PublishScheduled = DateTime.UtcNow,
+                NextReleaseDate = new PartialDate
+                {
+                    Day = "15", Month = "6", Year = "2039"
+                },
+                PreReleaseAccessList = "Old access list",
+                Version = 0,
+                PreviousVersionId = releaseId
+            };
+
+            var imageFile1 = new ReleaseFile
+            {
+                Release = release,
+                File = new File
+                {
+                    RootPath = Guid.NewGuid(),
+                    Filename = "image1.png",
+                    Type = FileType.Image
+                }
+            };
+
+            var imageFile2 = new ReleaseFile
+            {
+                Release = release,
+                File = new File
+                {
+                    RootPath = Guid.NewGuid(),
+                    Filename = "image2.png",
+                    Type = FileType.Image
+                }
+            };
+
+            var contextId = Guid.NewGuid().ToString();
+
+            await using (var context = InMemoryApplicationDbContext(contextId))
+            {
+                await context.AddRangeAsync(adHocReleaseType, officialStatisticsReleaseType);
+                await context.Releases.AddAsync(release);
+                await context.ReleaseFiles.AddRangeAsync(imageFile1, imageFile2);
+                await context.SaveChangesAsync();
+            }
+
+            var contentService = new Mock<IContentService>(MockBehavior.Strict);
+            var releaseFileService = new Mock<IReleaseFileService>(MockBehavior.Strict);
+
+            contentService.Setup(mock =>
+                    mock.GetContentBlocks<HtmlBlock>(release.Id))
+                .ReturnsAsync(new List<HtmlBlock>());
+            
+            releaseFileService.Setup(mock =>
+                    mock.Delete(release.Id, new List<Guid>
+                    {
+                        imageFile1.File.Id,
+                        imageFile2.File.Id
+                    }, false))
+                .ReturnsAsync(Unit.Instance);
+
+            var nextReleaseDateEdited = new PartialDate
+            {
+                Day = "1", Month = "1", Year = "2040"
+            };
+
+            await using (var context = InMemoryApplicationDbContext(contextId))
+            {
+                var releaseService = BuildReleaseService(contentDbContext: context,
+                    contentService: contentService.Object,
+                    releaseFileService: releaseFileService.Object);
+
+                var result = await releaseService
+                    .UpdateRelease(
+                        releaseId,
+                        new ReleaseUpdateViewModel
+                        {
+                            PublishScheduled = "2051-06-30",
+                            NextReleaseDate = nextReleaseDateEdited,
+                            TypeId = officialStatisticsReleaseType.Id,
+                            ReleaseName = "2035",
+                            TimePeriodCoverage = TimeIdentifier.March,
+                            PreReleaseAccessList = "New access list",
+                            Status = ReleaseStatus.Draft
+
+                        }
+                    );
+
+                Assert.True(result.IsRight);
+
+                releaseFileService.Verify(mock =>
+                    mock.Delete(release.Id, new List<Guid>
+                    {
+                        imageFile1.File.Id,
+                        imageFile2.File.Id
+                    }, false), Times.Once);
+
+                Assert.Equal(release.Publication.Id, result.Right.PublicationId);
+                Assert.Equal(new DateTime(2051, 6, 30, 0, 0, 0, DateTimeKind.Unspecified),
+                    result.Right.PublishScheduled);
+                Assert.Equal(nextReleaseDateEdited, result.Right.NextReleaseDate);
+                Assert.Equal(officialStatisticsReleaseType, result.Right.Type);
+                Assert.Equal("2035", result.Right.ReleaseName);
+                Assert.Equal(TimeIdentifier.March, result.Right.TimePeriodCoverage);
+                Assert.Equal("New access list", result.Right.PreReleaseAccessList);
+            }
+            
+            await using (var context = InMemoryApplicationDbContext(contextId))
+            {
+                var saved = await context.Releases.FindAsync(releaseId);
+
+                Assert.Equal(release.Publication.Id, saved.PublicationId);
+                Assert.Equal(new DateTime(2051, 6, 29, 23, 0, 0, DateTimeKind.Utc), saved.PublishScheduled);
+                Assert.Equal(nextReleaseDateEdited, saved.NextReleaseDate);
+                Assert.Equal(officialStatisticsReleaseType.Id, saved.TypeId);
+                Assert.Equal("2035-march", saved.Slug);
+                Assert.Equal("2035", saved.ReleaseName);
+                Assert.Equal(TimeIdentifier.March, saved.TimePeriodCoverage);
+                Assert.Equal("New access list", saved.PreReleaseAccessList);
+            }
+
+            MockUtils.VerifyAllMocks(contentService, releaseFileService);
         }
 
         [Fact]
@@ -1358,6 +1691,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
             IFootnoteService footnoteService = null,
             IDataBlockService dataBlockService = null,
             IReleaseChecklistService releaseChecklistService = null,
+            IContentService contentService = null,
             IReleaseSubjectService releaseSubjectService = null)
         {
             var userService = MockUtils.AlwaysTrueUserService();
@@ -1373,7 +1707,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
                 new PersistenceHelper<ContentDbContext>(contentDbContext),
                 userService.Object,
                 releaseRepository ?? new Mock<IReleaseRepository>().Object,
-                releaseFileRepository ?? new Mock<IReleaseFileRepository>().Object,
+                releaseFileRepository ?? new ReleaseFileRepository(contentDbContext),
                 subjectService ?? new Mock<ISubjectService>().Object,
                 releaseDataFileService ?? new Mock<IReleaseDataFileService>().Object,
                 releaseFileService ?? new Mock<IReleaseFileService>().Object,
@@ -1382,6 +1716,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
                 statisticsDbContext ?? new Mock<StatisticsDbContext>().Object,
                 dataBlockService ?? new Mock<IDataBlockService>().Object,
                 releaseChecklistService ?? new Mock<IReleaseChecklistService>().Object,
+                contentService ?? new Mock<IContentService>().Object,
                 releaseSubjectService ?? new Mock<IReleaseSubjectService>().Object,
                 new SequentialGuidGenerator()
             );

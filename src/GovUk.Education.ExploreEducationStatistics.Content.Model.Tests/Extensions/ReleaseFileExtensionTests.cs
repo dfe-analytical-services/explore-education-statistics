@@ -32,8 +32,6 @@ namespace GovUk.Education.ExploreEducationStatistics.Content.Model.Tests.Extensi
                 File = new File
                 {
                     Id = Guid.NewGuid(),
-                    PrivateBlobPathMigrated = true,
-                    PublicBlobPathMigrated = true,
                     RootPath = Guid.NewGuid(),
                     Filename = "ancillary.pdf",
                     Type = FileType.Ancillary
@@ -57,8 +55,6 @@ namespace GovUk.Education.ExploreEducationStatistics.Content.Model.Tests.Extensi
                 File = new File
                 {
                     Id = Guid.NewGuid(),
-                    PrivateBlobPathMigrated = true,
-                    PublicBlobPathMigrated = true,
                     RootPath = Guid.NewGuid(),
                     Filename = "ancillary.pdf",
                     Type = FileType.Ancillary

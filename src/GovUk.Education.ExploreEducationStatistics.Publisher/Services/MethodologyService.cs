@@ -31,6 +31,14 @@ namespace GovUk.Education.ExploreEducationStatistics.Publisher.Services
             return await _context.Methodologies.FindAsync(id);
         }
 
+        public async Task<Methodology> GetByRelease(Guid releaseId)
+        {
+            return await _context.Releases
+                .Where(release => release.Id == releaseId)
+                .Select(release => release.Publication.Methodology)
+                .SingleOrDefaultAsync();
+        }
+
         public async Task<List<File>> GetFiles(Guid methodologyId, params FileType[] types)
         {
             return await _context.MethodologyFiles

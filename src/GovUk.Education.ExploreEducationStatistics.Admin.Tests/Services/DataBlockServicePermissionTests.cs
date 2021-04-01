@@ -8,6 +8,8 @@ using GovUk.Education.ExploreEducationStatistics.Common.Tests.Utils;
 using GovUk.Education.ExploreEducationStatistics.Common.Utils;
 using GovUk.Education.ExploreEducationStatistics.Content.Model;
 using GovUk.Education.ExploreEducationStatistics.Content.Model.Database;
+using GovUk.Education.ExploreEducationStatistics.Content.Model.Repository;
+using GovUk.Education.ExploreEducationStatistics.Content.Model.Repository.Interfaces;
 using GovUk.Education.ExploreEducationStatistics.Content.Security;
 using Moq;
 using Xunit;
@@ -36,7 +38,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
                 .AssertForbidden(
                     userService =>
                     {
-                        var service = BuildDataBlockService(userService.Object);
+                        var service = BuildDataBlockService(userService: userService.Object);
                         return service.Get(_dataBlock.Id);
                     });
         }
@@ -49,7 +51,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
                 .AssertForbidden(
                     userService =>
                     {
-                        var service = BuildDataBlockService(userService.Object);
+                        var service = BuildDataBlockService(userService: userService.Object);
                         return service.GetDeletePlan(_release.Id, _dataBlock.Id);
                     });
         }
@@ -62,7 +64,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
                 .AssertForbidden(
                     userService =>
                     {
-                        var service = BuildDataBlockService(userService.Object);
+                        var service = BuildDataBlockService(userService: userService.Object);
                         return service.Create(_release.Id, new DataBlockCreateViewModel());
                     });
         }
@@ -75,7 +77,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
                 .AssertForbidden(
                     userService =>
                     {
-                        var service = BuildDataBlockService(userService.Object);
+                        var service = BuildDataBlockService(userService: userService.Object);
                         return service.Update(_dataBlock.Id, new DataBlockUpdateViewModel());
                     });
         }
@@ -88,7 +90,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
                 .AssertForbidden(
                     userService =>
                     {
-                        var service = BuildDataBlockService(userService.Object);
+                        var service = BuildDataBlockService(userService: userService.Object);
                         return service.Delete(_release.Id, _dataBlock.Id);
                     });
         }
@@ -114,18 +116,21 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
         }
 
         private DataBlockService BuildDataBlockService(
-            IUserService userService,
+            ContentDbContext contentDbContext = null,
             IPersistenceHelper<ContentDbContext> persistenceHelper = null,
-            IReleaseFileService releaseFileService = null)
+            IReleaseFileService releaseFileService = null,
+            IReleaseContentBlockRepository releaseContentBlockRepository = null,
+            IUserService userService = null)
         {
             using var context = DbUtils.InMemoryApplicationDbContext();
 
             var service = new DataBlockService(
-                context,
-                AdminMapper(),
+                contentDbContext ?? new Mock<ContentDbContext>().Object,
                 persistenceHelper ?? PersistenceHelperMock().Object,
-                userService,
-                releaseFileService ?? new Mock<IReleaseFileService>().Object
+                releaseFileService ?? new Mock<IReleaseFileService>().Object,
+                releaseContentBlockRepository ?? new ReleaseContentBlockRepository(context),
+                userService ?? new Mock<IUserService>().Object,
+                AdminMapper()
             );
 
             return service;
