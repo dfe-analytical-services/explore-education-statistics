@@ -63,8 +63,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Publisher.Tests.Services
                     It.IsAny<MemoryStream>(),
                     "application/x-zip-compressed",
                     It.Is<IDictionary<string, string>>(metadata =>
-                        metadata[BlobInfoExtensions.NameKey] == "All files"
-                        && metadata[BlobInfoExtensions.ReleaseDateTimeKey] ==
+                        metadata[BlobInfoExtensions.ReleaseDateTimeKey] ==
                         release.PublishScheduled.Value.ToString("o", CultureInfo.InvariantCulture))))
                 .Returns(Task.CompletedTask);
 
@@ -73,7 +72,6 @@ namespace GovUk.Education.ExploreEducationStatistics.Publisher.Tests.Services
             await service.UploadZippedFiles(
                 containerName: PublicReleaseFiles,
                 destinationPath: "destination/path/test.zip",
-                zipFileName: "All files",
                 files: files,
                 releaseId: release.Id,
                 publishScheduled: release.PublishScheduled.Value);

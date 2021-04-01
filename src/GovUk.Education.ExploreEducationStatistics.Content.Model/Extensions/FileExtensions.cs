@@ -52,17 +52,28 @@ namespace GovUk.Education.ExploreEducationStatistics.Content.Model.Extensions
             return $"{FilesPath(releaseId, file.Type)}{file.Id}";
         }
 
-        public static FileInfo ToFileInfo(this File file, BlobInfo blobInfo)
+        public static FileInfo ToFileInfo(this ReleaseFile releaseFile, BlobInfo blobInfo)
         {
             return new FileInfo
             {
-                Id = file.Id,
-                FileName = file.Filename,
-                // EES-1815 Change to use Subject name rather than BlobInfo.Name
-                Name = blobInfo.Name.IsNullOrEmpty() ? file.Filename : blobInfo.Name,
-                Path = file.Path(),
+                Id = releaseFile.FileId,
+                FileName = releaseFile.File.Filename,
+                Name = releaseFile.Name ?? 
+                       (blobInfo.Name.IsNullOrEmpty() ? releaseFile.File.Filename : blobInfo.Name),
                 Size = blobInfo.Size,
-                Type = file.Type
+                Type = releaseFile.File.Type
+            };
+        }
+
+        public static FileInfo ToFileInfo(this MethodologyFile methodologyFile, BlobInfo blobInfo)
+        {
+            return new FileInfo
+            {
+                Id = methodologyFile.File.Id,
+                FileName = methodologyFile.File.Filename,
+                Name = null,
+                Size = blobInfo.Size,
+                Type = methodologyFile.File.Type
             };
         }
 
@@ -73,21 +84,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Content.Model.Extensions
                 Id = file.Id,
                 FileName = file.Filename,
                 Name = "Unknown",
-                Path = null,
                 Size = "0.00 B",
-                Type = file.Type
-            };
-        }
-
-        public static FileInfo ToPublicFileInfo(this File file, BlobInfo blobInfo)
-        {
-            return new FileInfo
-            {
-                Id = file.Id,
-                FileName = file.Filename,
-                Name = blobInfo.Name,
-                Path = blobInfo.Path,
-                Size = blobInfo.Size,
                 Type = file.Type
             };
         }

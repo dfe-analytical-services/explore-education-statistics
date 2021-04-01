@@ -522,6 +522,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Publisher.Tests.Services
         private static readonly ReleaseFile PublicationARelease2DataReleaseFile = new ReleaseFile
         {
             Release = PublicationARelease2,
+            Name = "Data Test File",
             File = new File
             {
                 Filename = "data.csv",
@@ -601,7 +602,6 @@ namespace GovUk.Education.ExploreEducationStatistics.Publisher.Tests.Services
                         contentType: "text/csv",
                         contentLength: 0L,
                         meta: GetDataFileMetaValues(
-                            name: "Data Test File",
                             metaFileName: "data.meta.csv",
                             numberOfRows: 200),
                         created: null
@@ -616,7 +616,6 @@ namespace GovUk.Education.ExploreEducationStatistics.Publisher.Tests.Services
                         contentType: "application/x-zip-compressed",
                         contentLength: 0L,
                         meta: GetAllFilesZipMetaValues(
-                            name: "All files",
                             releaseDateTime: DateTime.Now),
                         created: null
                     ));
@@ -633,21 +632,18 @@ namespace GovUk.Education.ExploreEducationStatistics.Publisher.Tests.Services
                 Assert.Equal("zip", result[0].Extension);
                 Assert.Equal("publication-a_2018-19-q2.zip", result[0].FileName);
                 Assert.Equal("All files", result[0].Name);
-                Assert.Equal(PublicationARelease2.AllFilesZipPath(), result[0].Path);
                 Assert.Equal("3 Mb", result[0].Size);
                 Assert.Equal(Ancillary, result[0].Type);
                 Assert.Equal(PublicationARelease2AncillaryReleaseFile.File.Id, result[1].Id);
                 Assert.Equal("pdf", result[1].Extension);
                 Assert.Equal("ancillary.pdf", result[1].FileName);
                 Assert.Equal("Ancillary Test File", result[1].Name);
-                Assert.Equal(PublicationARelease2AncillaryReleaseFile.PublicPath(), result[1].Path);
                 Assert.Equal("15 Kb", result[1].Size);
                 Assert.Equal(Ancillary, result[1].Type);
                 Assert.Equal(PublicationARelease2DataReleaseFile.File.Id, result[2].Id);
                 Assert.Equal("csv", result[2].Extension);
                 Assert.Equal("data.csv", result[2].FileName);
                 Assert.Equal("Data Test File", result[2].Name);
-                Assert.Equal(PublicationARelease2DataReleaseFile.PublicPath(), result[2].Path);
                 Assert.Equal("10 Mb", result[2].Size);
                 Assert.Equal(FileType.Data, result[2].Type);
             }
@@ -762,7 +758,6 @@ namespace GovUk.Education.ExploreEducationStatistics.Publisher.Tests.Services
                         contentType: "text/csv",
                         contentLength: 0L,
                         meta: GetDataFileMetaValues(
-                            name: "Data Test File",
                             metaFileName: "data.meta.csv",
                             numberOfRows: 200),
                         created: null
@@ -777,7 +772,6 @@ namespace GovUk.Education.ExploreEducationStatistics.Publisher.Tests.Services
                         contentType: "application/x-zip-compressed",
                         contentLength: 0L,
                         meta: GetAllFilesZipMetaValues(
-                            name: "All files",
                             releaseDateTime: DateTime.Now),
                         created: null
                     ));
@@ -846,21 +840,18 @@ namespace GovUk.Education.ExploreEducationStatistics.Publisher.Tests.Services
                 Assert.Equal("zip", result.DownloadFiles[0].Extension);
                 Assert.Equal("publication-a_2018-19-q2.zip", result.DownloadFiles[0].FileName);
                 Assert.Equal("All files", result.DownloadFiles[0].Name);
-                Assert.Equal(PublicationARelease2.AllFilesZipPath(), result.DownloadFiles[0].Path);
                 Assert.Equal("3 Mb", result.DownloadFiles[0].Size);
                 Assert.Equal(Ancillary, result.DownloadFiles[0].Type);
                 Assert.Equal(PublicationARelease2AncillaryReleaseFile.File.Id, result.DownloadFiles[1].Id);
                 Assert.Equal("pdf", result.DownloadFiles[1].Extension);
                 Assert.Equal("ancillary.pdf", result.DownloadFiles[1].FileName);
                 Assert.Equal("Ancillary Test File", result.DownloadFiles[1].Name);
-                Assert.Equal(PublicationARelease2AncillaryReleaseFile.PublicPath(), result.DownloadFiles[1].Path);
                 Assert.Equal("15 Kb", result.DownloadFiles[1].Size);
                 Assert.Equal(Ancillary, result.DownloadFiles[1].Type);
                 Assert.Equal(PublicationARelease2DataReleaseFile.File.Id, result.DownloadFiles[2].Id);
                 Assert.Equal("csv", result.DownloadFiles[2].Extension);
                 Assert.Equal("data.csv", result.DownloadFiles[2].FileName);
                 Assert.Equal("Data Test File", result.DownloadFiles[2].Name);
-                Assert.Equal(PublicationARelease2DataReleaseFile.PublicPath(), result.DownloadFiles[2].Path);
                 Assert.Equal("10 Mb", result.DownloadFiles[2].Size);
                 Assert.Equal(FileType.Data, result.DownloadFiles[2].Type);
 
@@ -903,7 +894,6 @@ namespace GovUk.Education.ExploreEducationStatistics.Publisher.Tests.Services
                     contentType: "application/x-zip-compressed",
                     contentLength: 0L,
                     meta: GetAllFilesZipMetaValues(
-                        name: "All files",
                         releaseDateTime: DateTime.Now),
                     created: null
                 ));
@@ -971,7 +961,6 @@ namespace GovUk.Education.ExploreEducationStatistics.Publisher.Tests.Services
                 Assert.Equal("zip", result.DownloadFiles[0].Extension);
                 Assert.Equal("publication-a_2018-19-q1.zip", result.DownloadFiles[0].FileName);
                 Assert.Equal("All files", result.DownloadFiles[0].Name);
-                Assert.Equal(PublicationARelease1V1.AllFilesZipPath(), result.DownloadFiles[0].Path);
                 Assert.Equal("0 b", result.DownloadFiles[0].Size);
                 Assert.Equal(Ancillary, result.DownloadFiles[0].Type);
 
@@ -1014,7 +1003,6 @@ namespace GovUk.Education.ExploreEducationStatistics.Publisher.Tests.Services
                     contentType: "application/x-zip-compressed",
                     contentLength: 0L,
                     meta: GetAllFilesZipMetaValues(
-                        name: "All files",
                         releaseDateTime: DateTime.Now),
                     created: null
                 ));
@@ -1041,7 +1029,6 @@ namespace GovUk.Education.ExploreEducationStatistics.Publisher.Tests.Services
                 Assert.Equal("zip", result.DownloadFiles[0].Extension);
                 Assert.Equal("publication-a_2018-19-q3.zip", result.DownloadFiles[0].FileName);
                 Assert.Equal("All files", result.DownloadFiles[0].Name);
-                Assert.Equal(PublicationARelease3.AllFilesZipPath(), result.DownloadFiles[0].Path);
                 Assert.Equal("0 b", result.DownloadFiles[0].Size);
                 Assert.Equal(Ancillary, result.DownloadFiles[0].Type);
 

@@ -233,7 +233,6 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Services
                                             createdById: _userService.GetUserId());
 
                                         var dataInfo = GetDataFileMetaValues(
-                                            name: validSubjectName,
                                             metaFileName: metaFile.Filename,
                                             numberOfRows: CalculateNumberOfRows(dataFormFile.OpenReadStream())
                                         );
@@ -261,7 +260,6 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Services
                                             Id = dataFile.Id,
                                             FileName = dataFile.Filename,
                                             Name = validSubjectName,
-                                            Path = blob.Path,
                                             Size = blob.Size,
                                             MetaFileId = metaFile.Id,
                                             MetaFileName = metaFile.Filename,
@@ -296,7 +294,6 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Services
                                         .OnSuccess(async archiveFile =>
                                         {
                                             var dataInfo = GetDataFileMetaValues(
-                                                name: validSubjectName,
                                                 metaFileName: archiveFile.MetaFileName,
                                                 numberOfRows: 0
                                             );
@@ -356,7 +353,6 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Services
                                                         Id = dataFile.Id,
                                                         FileName = dataFile.Filename,
                                                         Name = validSubjectName,
-                                                        Path = dataFile.Filename,
                                                         Size = blob.Size,
                                                         MetaFileId = metaFile.Id,
                                                         MetaFileName = metaFile.Filename,
@@ -396,7 +392,6 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Services
                 Id = dataFile.Id,
                 FileName = dataFile.Filename,
                 Name = await GetSubjectName(releaseId, dataFile),
-                Path = blob.Path,
                 Size = blob.Size,
                 MetaFileId = metaFile.Id,
                 MetaFileName = metaFile.Filename,
@@ -429,7 +424,6 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Services
                         Id = dataFile.Id,
                         FileName = dataFile.Filename,
                         Name = await GetSubjectName(releaseId, dataFile),
-                        Path = dataFile.Filename,
                         Size = zipBlob.Size,
                         MetaFileId = null,
                         MetaFileName = zipBlob.GetMetaFileName(),
@@ -449,7 +443,6 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Services
                 Id = dataFile.Id,
                 FileName = dataFile.Filename,
                 Name = await GetSubjectName(releaseId, dataFile),
-                Path = dataFile.Filename,
                 Size = "0.00 B",
                 MetaFileId = metaFile.Id,
                 MetaFileName = metaFile.Filename ?? "",

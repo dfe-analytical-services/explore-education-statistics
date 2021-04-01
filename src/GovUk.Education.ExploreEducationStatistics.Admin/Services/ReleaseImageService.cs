@@ -88,7 +88,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Services
             IFormFile formFile,
             IDictionary<string, string> metadata = null)
         {
-            var file = await _releaseFileRepository.Create(
+            var releaseFile = await _releaseFileRepository.Create(
                 releaseId: releaseId,
                 filename: formFile.FileName,
                 type: type,
@@ -98,15 +98,15 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Services
 
             await _blobStorageService.UploadFile(
                 containerName: PrivateReleaseFiles,
-                path: file.Path(),
+                path: releaseFile.Path(),
                 file: formFile,
                 metadata: metadata);
 
             var blob = await _blobStorageService.GetBlob(
                 PrivateReleaseFiles,
-                file.Path());
+                releaseFile.Path());
 
-            return file.ToFileInfo(blob);
+            return releaseFile.ToFileInfo(blob);
         }
     }
 }

@@ -1145,7 +1145,6 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
                 Assert.Equal("pdf", fileInfoList[0].Extension);
                 Assert.Equal("ancillary_1.pdf", fileInfoList[0].FileName);
                 Assert.Equal("Ancillary Test File 1", fileInfoList[0].Name);
-                Assert.Equal(ancillaryFile1.Path(), fileInfoList[0].Path);
                 Assert.Equal("10 Kb", fileInfoList[0].Size);
                 Assert.Equal(Ancillary, fileInfoList[0].Type);
 
@@ -1153,7 +1152,6 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
                 Assert.Equal("pdf", fileInfoList[1].Extension);
                 Assert.Equal("Ancillary 2.pdf", fileInfoList[1].FileName);
                 Assert.Equal("Ancillary Test File 2", fileInfoList[1].Name);
-                Assert.Equal(ancillaryFile2.Path(), fileInfoList[1].Path);
                 Assert.Equal("10 Kb", fileInfoList[1].Size);
                 Assert.Equal(Ancillary, fileInfoList[1].Type);
 
@@ -1161,7 +1159,6 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
                 Assert.Equal("png", fileInfoList[2].Extension);
                 Assert.Equal("chart.png", fileInfoList[2].FileName);
                 Assert.Equal("chart.png", fileInfoList[2].Name);
-                Assert.Equal(chartFile.Path(), fileInfoList[2].Path);
                 Assert.Equal("20 Kb", fileInfoList[2].Size);
                 Assert.Equal(Chart, fileInfoList[2].Type);
 
@@ -1169,7 +1166,6 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
                 Assert.Equal("png", fileInfoList[3].Extension);
                 Assert.Equal("image.png", fileInfoList[3].FileName);
                 Assert.Equal("image.png", fileInfoList[3].Name);
-                Assert.Equal(imageFile.Path(), fileInfoList[3].Path);
                 Assert.Equal("30 Kb", fileInfoList[3].Size);
                 Assert.Equal(Image, fileInfoList[3].Type);
             }
@@ -1461,7 +1457,6 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
                 Assert.Equal("pdf", result.Right.Extension);
                 Assert.Equal("ancillary.pdf", result.Right.FileName);
                 Assert.Equal("Ancillary Test File", result.Right.Name);
-                Assert.Contains(FilesPath(release.Id, Ancillary), result.Right.Path);
                 Assert.Equal("10 Kb", result.Right.Size);
                 Assert.Equal(Ancillary, result.Right.Type);
             }
@@ -1558,7 +1553,6 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
                 Assert.Equal("png", result.Right.Extension);
                 Assert.Equal("chart.png", result.Right.FileName);
                 Assert.Equal("chart.png", result.Right.Name);
-                Assert.Contains(FilesPath(release.Id, Chart), result.Right.Path);
                 Assert.Equal("20 Kb", result.Right.Size);
                 Assert.Equal(Chart, result.Right.Type);
             }

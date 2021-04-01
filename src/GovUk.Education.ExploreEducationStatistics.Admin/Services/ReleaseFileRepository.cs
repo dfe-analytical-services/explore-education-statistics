@@ -49,7 +49,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Services
             return releaseFile.File;
         }
 
-        public async Task<File> Create(
+        public async Task<ReleaseFile> Create(
             Guid releaseId,
             string filename,
             FileType type,
@@ -75,7 +75,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Services
 
             var created = (await _contentDbContext.ReleaseFiles.AddAsync(releaseFile)).Entity;
             await _contentDbContext.SaveChangesAsync();
-            return created.File;
+            return created;
         }
 
         public async Task Delete(Guid releaseId, Guid fileId)
@@ -115,7 +115,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Services
                     && releaseFile.FileId == fileId);
         }
 
-        public async Task<File> UpdateFilename(Guid releaseId,
+        public async Task<ReleaseFile> UpdateFilename(Guid releaseId,
             Guid fileId,
             string filename)
         {
@@ -132,7 +132,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Services
 
             await _contentDbContext.SaveChangesAsync();
 
-            return file;
+            return releaseFile;
         }
     }
 }

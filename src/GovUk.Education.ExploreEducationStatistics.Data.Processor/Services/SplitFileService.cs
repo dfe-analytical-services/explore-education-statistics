@@ -178,15 +178,12 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Processor.Services
 
                 stream.Seek(0, SeekOrigin.Begin);
 
-                var dataBlob = await _blobStorageService.GetBlob(PrivateReleaseFiles, dataImport.File.Path());
-
                 await _blobStorageService.UploadStream(
                     containerName: PrivateReleaseFiles,
                     path: dataImport.File.BatchPath(batchCount),
                     stream: stream,
                     contentType: "text/csv",
                     metadata: GetDataFileMetaValues(
-                        name: dataBlob.Name,
                         metaFileName: dataImport.MetaFile.Filename,
                         numberOfRows: numRows
                     ));

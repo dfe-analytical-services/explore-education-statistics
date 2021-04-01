@@ -13,7 +13,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Services.Interfaces
             Guid id,
             params FileType[] allowedFileTypes);
 
-        public Task<File> Create(
+        public Task<ReleaseFile> Create(
             Guid releaseId,
             string filename,
             FileType type,
@@ -27,7 +27,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Services.Interfaces
 
         public Task<bool> FileIsLinkedToOtherReleases(Guid releaseId, Guid fileId);
 
-        public Task<File> UpdateFilename(
+        public Task<ReleaseFile> UpdateFilename(
             Guid releaseId,
             Guid fileId,
             string filename);

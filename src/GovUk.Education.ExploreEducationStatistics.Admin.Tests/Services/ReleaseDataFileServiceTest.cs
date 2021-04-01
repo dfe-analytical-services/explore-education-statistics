@@ -908,7 +908,6 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
                             contentType: "text/csv",
                             contentLength: 400L,
                             meta: GetDataFileMetaValues(
-                                name: "Test data file name",
                                 metaFileName: "test-data.meta.csv",
                                 numberOfRows: 200
                             )
@@ -941,7 +940,6 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
                 Assert.Equal("Test data", fileInfo.Name);
                 Assert.Equal("test-data.csv", fileInfo.FileName);
                 Assert.Equal("csv", fileInfo.Extension);
-                Assert.Equal(dataReleaseFile.Path(), fileInfo.Path);
                 Assert.Equal(metaReleaseFile.File.Id, fileInfo.MetaFileId);
                 Assert.Equal("test-data.meta.csv", fileInfo.MetaFileName);
                 Assert.Equal(_user.Email, fileInfo.UserName);
@@ -1054,7 +1052,6 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
                 Assert.Equal("Test data", fileInfo.Name);
                 Assert.Equal("Test data 1.csv", fileInfo.FileName);
                 Assert.Equal("csv", fileInfo.Extension);
-                Assert.Equal(dataReleaseFile.Path(), fileInfo.Path);
                 Assert.Equal(metaReleaseFile.File.Id, fileInfo.MetaFileId);
                 Assert.Equal("Test data 1.meta.csv", fileInfo.MetaFileName);
                 Assert.Equal(_user.Email, fileInfo.UserName);
@@ -1238,7 +1235,6 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
                 Assert.Equal("Test data", fileInfo.Name);
                 Assert.Equal("test-data.csv", fileInfo.FileName);
                 Assert.Equal("csv", fileInfo.Extension);
-                Assert.Equal("test-data.csv", fileInfo.Path);
                 Assert.Equal(metaReleaseFile.File.Id, fileInfo.MetaFileId);
                 Assert.Equal("test-data.meta.csv", fileInfo.MetaFileName);
                 Assert.Equal(_user.Email, fileInfo.UserName);
@@ -1318,7 +1314,6 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
                             contentType: "application/zip",
                             contentLength: 1000L,
                             meta: GetDataFileMetaValues(
-                                name: "Test data",
                                 metaFileName: "test-data.meta.csv",
                                 numberOfRows: 0
                             )
@@ -1350,7 +1345,6 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
                 Assert.Equal("Test data", fileInfo.Name);
                 Assert.Equal("test-data.csv", fileInfo.FileName);
                 Assert.Equal("csv", fileInfo.Extension);
-                Assert.Equal("test-data.csv", fileInfo.Path);
                 Assert.False(fileInfo.MetaFileId.HasValue);
                 Assert.Equal("test-data.meta.csv", fileInfo.MetaFileName);
                 Assert.Equal(_user.Email, fileInfo.UserName);
@@ -1447,7 +1441,6 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
                             contentType: "text/csv",
                             contentLength: 400L,
                             meta: GetDataFileMetaValues(
-                                name: "Test data file name",
                                 metaFileName: "test-data.meta.csv",
                                 numberOfRows: 200
                             )
@@ -1480,7 +1473,6 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
                 Assert.Equal("Test data amended", fileInfo.Name);
                 Assert.Equal("test-data.csv", fileInfo.FileName);
                 Assert.Equal("csv", fileInfo.Extension);
-                Assert.Equal(dataFile.Path(), fileInfo.Path);
                 Assert.Equal(metaFile.Id, fileInfo.MetaFileId);
                 Assert.Equal("test-data.meta.csv", fileInfo.MetaFileName);
                 Assert.Equal(_user.Email, fileInfo.UserName);
@@ -1586,7 +1578,6 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
                             contentType: "text/csv",
                             contentLength: 400L,
                             GetDataFileMetaValues(
-                                name: "Test data file 1",
                                 metaFileName: "test-data-1.meta.csv",
                                 numberOfRows: 200
                             )
@@ -1604,7 +1595,6 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
                             // Don't use GetDataFileMetaValues here as it forces the filename to lower case
                             meta: new Dictionary<string, string>
                             {
-                                {BlobInfoExtensions.NameKey, "Test data file 2"},
                                 {BlobInfoExtensions.MetaFileKey, "Test data 2.meta.csv"},
                                 {BlobInfoExtensions.NumberOfRowsKey, "400"}
                             }
@@ -1640,7 +1630,6 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
                 Assert.Equal("Test subject 1", files[0].Name);
                 Assert.Equal("test-data-1.csv", files[0].FileName);
                 Assert.Equal("csv", files[0].Extension);
-                Assert.Equal(dataReleaseFile1.Path(), files[0].Path);
                 Assert.Equal(metaReleaseFile1.File.Id, files[0].MetaFileId);
                 Assert.Equal("test-data-1.meta.csv", files[0].MetaFileName);
                 Assert.Equal(_user.Email, files[0].UserName);
@@ -1653,7 +1642,6 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
                 Assert.Equal("Test subject 2", files[1].Name);
                 Assert.Equal("Test data 2.csv", files[1].FileName);
                 Assert.Equal("csv", files[1].Extension);
-                Assert.Equal(dataReleaseFile2.Path(), files[1].Path);
                 Assert.Equal(metaReleaseFile2.File.Id, files[1].MetaFileId);
                 Assert.Equal("Test data 2.meta.csv", files[1].MetaFileName);
                 Assert.Equal(_user.Email, files[1].UserName);
@@ -1770,7 +1758,6 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
                             contentType: "text/csv",
                             contentLength: 400L,
                             GetDataFileMetaValues(
-                                name: "Test data file 1",
                                 metaFileName: "test-data-1.meta.csv",
                                 numberOfRows: 200
                             )
@@ -1802,7 +1789,6 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
                 Assert.Equal("Test data", files[0].Name);
                 Assert.Equal("test-data-1.csv", files[0].FileName);
                 Assert.Equal("csv", files[0].Extension);
-                Assert.Equal(dataRelease1File.Path(), files[0].Path);
                 Assert.Equal(metaRelease1File.File.Id, files[0].MetaFileId);
                 Assert.Equal("test-data-1.meta.csv", files[0].MetaFileName);
                 Assert.Equal(_user.Email, files[0].UserName);
@@ -1927,7 +1913,6 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
                             contentType: "text/csv",
                             contentLength: 800L,
                             GetDataFileMetaValues(
-                                name: "Test data file 2",
                                 metaFileName: "test-data-2.meta.csv",
                                 numberOfRows: 400
                             )
@@ -1959,7 +1944,6 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
                 Assert.Equal("Test subject 2 name change", files[0].Name);
                 Assert.Equal("test-data-2.csv", files[0].FileName);
                 Assert.Equal("csv", files[0].Extension);
-                Assert.Equal(dataFile2.Path(), files[0].Path);
                 Assert.Equal(metaFile2.Id, files[0].MetaFileId);
                 Assert.Equal("test-data-2.meta.csv", files[0].MetaFileName);
                 Assert.Equal(_user.Email, files[0].UserName);
@@ -2049,7 +2033,6 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
                 Assert.Equal("Test subject name", files[0].Name);
                 Assert.Equal("test-data.csv", files[0].FileName);
                 Assert.Equal("csv", files[0].Extension);
-                Assert.Equal("test-data.csv", files[0].Path);
                 Assert.Equal(metaReleaseFile.File.Id, files[0].MetaFileId);
                 Assert.Equal("test-data.meta.csv", files[0].MetaFileName);
                 Assert.Equal(_user.Email, files[0].UserName);
@@ -2130,7 +2113,6 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
                             contentType: "application/zip",
                             contentLength: 1000L,
                             meta: GetDataFileMetaValues(
-                                name: "Test data",
                                 metaFileName: "test-data.meta.csv",
                                 numberOfRows: 0
                             )
@@ -2161,7 +2143,6 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
                 Assert.Equal("Test data", files[0].Name);
                 Assert.Equal("test-data.csv", files[0].FileName);
                 Assert.Equal("csv", files[0].Extension);
-                Assert.Equal("test-data.csv", files[0].Path);
                 Assert.False(files[0].MetaFileId.HasValue);
                 Assert.Equal("test-data.meta.csv", files[0].MetaFileName);
                 Assert.Equal(_user.Email, files[0].UserName);
@@ -2241,8 +2222,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
                             path.Contains(FilesPath(release.Id, FileType.Data))),
                         dataFormFile,
                         It.Is<IDictionary<string, string>>(metadata =>
-                            metadata[BlobInfoExtensions.NameKey] == subjectName
-                            && metadata[BlobInfoExtensions.MetaFileKey] == metaFileName
+                            metadata[BlobInfoExtensions.MetaFileKey] == metaFileName
                             && metadata[BlobInfoExtensions.NumberOfRowsKey] == "2")
                     )).Returns(Task.CompletedTask);
 
@@ -2265,7 +2245,6 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
                             contentType: "application/zip",
                             contentLength: 1000L,
                             meta: GetDataFileMetaValues(
-                                subjectName,
                                 metaFileName: metaFileName,
                                 numberOfRows: 0
                             )
@@ -2295,7 +2274,6 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
                 Assert.Equal(subjectName, result.Right.Name);
                 Assert.Equal(dataFileName, result.Right.FileName);
                 Assert.Equal("csv", result.Right.Extension);
-                Assert.Equal("data/file/path", result.Right.Path);
                 Assert.True(result.Right.MetaFileId.HasValue);
                 Assert.Equal(metaFileName, result.Right.MetaFileName);
                 Assert.Equal(_user.Email, result.Right.UserName);
@@ -2425,8 +2403,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
                             path.Contains(FilesPath(release.Id, FileType.Data))),
                         dataFormFile,
                         It.Is<IDictionary<string, string>>(metadata =>
-                            metadata[BlobInfoExtensions.NameKey] == originalDataReleaseFile.Name
-                            && metadata[BlobInfoExtensions.MetaFileKey] == metaFileName
+                            metadata[BlobInfoExtensions.MetaFileKey] == metaFileName
                             && metadata[BlobInfoExtensions.NumberOfRowsKey] == "2")
                     )).Returns(Task.CompletedTask);
 
@@ -2449,7 +2426,6 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
                             contentType: "application/zip",
                             contentLength: 1000L,
                             meta: GetDataFileMetaValues(
-                                originalSubject.Name,
                                 metaFileName: metaFileName,
                                 numberOfRows: 0
                             )
@@ -2479,7 +2455,6 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
                 Assert.Equal(originalDataReleaseFile.Name, result.Right.Name);
                 Assert.Equal(dataFileName, result.Right.FileName);
                 Assert.Equal("csv", result.Right.Extension);
-                Assert.Equal("data/file/path", result.Right.Path);
                 Assert.True(result.Right.MetaFileId.HasValue);
                 Assert.Equal(metaFileName, result.Right.MetaFileName);
                 Assert.Equal(_user.Email, result.Right.UserName);
@@ -2619,8 +2594,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
                             path.Contains(FilesPath(release.Id, DataZip))),
                         zipFormFile,
                         It.Is<IDictionary<string, string>>(metadata =>
-                            metadata[BlobInfoExtensions.NameKey] == subjectName
-                            && metadata[BlobInfoExtensions.MetaFileKey] == metaFileName
+                            metadata[BlobInfoExtensions.MetaFileKey] == metaFileName
                             && metadata[BlobInfoExtensions.NumberOfRowsKey] == "0")
                     )).Returns(Task.CompletedTask);
 
@@ -2635,7 +2609,6 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
                             contentType: "application/zip",
                             contentLength: 1000L,
                             meta: GetDataFileMetaValues(
-                                subjectName,
                                 metaFileName: metaFileName,
                                 numberOfRows: 0
                             )
@@ -2668,7 +2641,6 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
                 Assert.Equal(subjectName, result.Right.Name);
                 Assert.Equal(dataFileName, result.Right.FileName);
                 Assert.Equal("csv", result.Right.Extension);
-                Assert.Equal(dataFileName, result.Right.Path);
                 Assert.True(result.Right.MetaFileId.HasValue);
                 Assert.Equal(metaFileName, result.Right.MetaFileName);
                 Assert.Equal(_user.Email, result.Right.UserName);
@@ -2807,8 +2779,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
                             path.Contains(FilesPath(release.Id, DataZip))),
                         zipFormFile,
                         It.Is<IDictionary<string, string>>(metadata =>
-                            metadata[BlobInfoExtensions.NameKey] == originalDataReleaseFile.Name
-                            && metadata[BlobInfoExtensions.MetaFileKey] == metaFileName
+                            metadata[BlobInfoExtensions.MetaFileKey] == metaFileName
                             && metadata[BlobInfoExtensions.NumberOfRowsKey] == "0")
                     )).Returns(Task.CompletedTask);
 
@@ -2823,7 +2794,6 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
                             contentType: "application/zip",
                             contentLength: 1000L,
                             meta: GetDataFileMetaValues(
-                                name: originalDataReleaseFile.Name,
                                 metaFileName: metaFileName,
                                 numberOfRows: 0
                             )
@@ -2856,7 +2826,6 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
                 Assert.Equal(originalDataReleaseFile.Name, result.Right.Name);
                 Assert.Equal(dataFileName, result.Right.FileName);
                 Assert.Equal("csv", result.Right.Extension);
-                Assert.Equal(dataFileName, result.Right.Path);
                 Assert.True(result.Right.MetaFileId.HasValue);
                 Assert.Equal(metaFileName, result.Right.MetaFileName);
                 Assert.Equal(_user.Email, result.Right.UserName);

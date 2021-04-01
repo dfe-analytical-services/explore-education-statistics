@@ -11,7 +11,6 @@ namespace GovUk.Education.ExploreEducationStatistics.Publisher.Services.Interfac
         Task UploadZippedFiles(
             IBlobContainer containerName,
             string destinationPath,
-            string zipFileName,
             IEnumerable<File> files,
             Guid releaseId,
             DateTime publishScheduled);

@@ -113,7 +113,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Services.Methodologie
             IFormFile formFile,
             IDictionary<string, string> metadata = null)
         {
-            var file = await _methodologyFileRepository.Create(
+            var methodologyFile = await _methodologyFileRepository.Create(
                 methodologyId: methodologyId,
                 filename: formFile.FileName,
                 type: type,
@@ -123,15 +123,15 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Services.Methodologie
 
             await _blobStorageService.UploadFile(
                 containerName: PrivateMethodologyFiles,
-                path: file.Path(),
+                path: methodologyFile.Path(),
                 file: formFile,
                 metadata: metadata);
 
             var blob = await _blobStorageService.GetBlob(
                 PrivateMethodologyFiles,
-                file.Path());
+                methodologyFile.Path());
 
-            return file.ToFileInfo(blob);
+            return methodologyFile.ToFileInfo(blob);
         }
     }
 }
