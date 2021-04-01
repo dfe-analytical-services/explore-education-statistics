@@ -33,7 +33,7 @@
   user-select: none;
 
   :global(.column-group) & {
-    flex: 0 1 30vw;
+    flex-basis: 100%;
   }
 
   &:hover {
@@ -51,6 +51,9 @@
 .optionText {
   display: flex;
   justify-content: space-between;
+  :global(.column-group) & {
+    justify-content: center;
+  }
 }
 
 .optionDraggableIcon {
@@ -58,6 +61,7 @@
   font-size: 2rem;
   font-weight: bold;
   line-height: 1rem;
+  margin-left: 0.5rem;
 }
 
 .optionActions {

@@ -142,7 +142,7 @@ const TableHeadersForm = ({
                         PickByType<TableHeadersConfig, Filter[][]>
                       >
                         name="columnGroups"
-                        legend="Column groups"
+                        legend="Table column headers"
                         groupLegend="Column group"
                       />
                     </div>
@@ -151,7 +151,7 @@ const TableHeadersForm = ({
                         PickByType<TableHeadersConfig, Filter[][]>
                       >
                         name="rowGroups"
-                        legend="Row groups"
+                        legend="Table row headers"
                         groupLegend="Row group"
                       />
                     </div>
