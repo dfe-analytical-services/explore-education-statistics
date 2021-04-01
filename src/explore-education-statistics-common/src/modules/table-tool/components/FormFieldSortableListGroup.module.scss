@@ -36,7 +36,7 @@
   position: relative;
 
   @include govuk-media-query($from: desktop) {
-    flex-basis: 100%;
+    flex-basis: 25%;
   }
 
   &:focus {

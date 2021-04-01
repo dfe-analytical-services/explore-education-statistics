@@ -32,6 +32,10 @@
   padding: govuk-spacing(2);
   user-select: none;
 
+  :global(.column-group) & {
+    flex: 0 1 30vw;
+  }
+
   &:hover {
     background: govuk-colour('light-grey');
     // Fallback if grab is unsupported
