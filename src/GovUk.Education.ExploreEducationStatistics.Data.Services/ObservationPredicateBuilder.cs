@@ -57,6 +57,11 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Services
                 predicate = predicate.Or(CountryPredicate(query));
             }
 
+            if (query.EnglishDevolvedArea != null)
+            {
+                predicate = predicate.Or(EnglishDevolvedAreaPredicate(query));
+            }
+
             if (query.Institution != null)
             {
                 predicate = predicate.Or(InstitutionPredicate(query));
@@ -129,6 +134,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Services
         {
             return !(query == null ||
                      query.Country == null &&
+                     query.EnglishDevolvedArea == null &&
                      query.Institution == null &&
                      query.LocalAuthority == null &&
                      query.LocalAuthorityDistrict == null &&
@@ -148,6 +154,12 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Services
         {
             return ObservationalUnitPredicate(query, GeographicLevel.Country,
                 observation => query.Country.Contains(observation.Location.Country_Code));
+        }
+
+        private static Expression<Func<Observation, bool>> EnglishDevolvedAreaPredicate(LocationQuery query)
+        {
+            return ObservationalUnitPredicate(query, GeographicLevel.EnglishDevolvedArea,
+                observation => query.EnglishDevolvedArea.Contains(observation.Location.EnglishDevolvedArea_Code));
         }
 
         private static Expression<Func<Observation, bool>> InstitutionPredicate(LocationQuery query)

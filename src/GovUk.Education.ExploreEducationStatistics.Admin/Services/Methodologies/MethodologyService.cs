@@ -16,6 +16,7 @@ using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
 using static GovUk.Education.ExploreEducationStatistics.Admin.Validators.ValidationErrorMessages;
 using static GovUk.Education.ExploreEducationStatistics.Admin.Validators.ValidationUtils;
+using static GovUk.Education.ExploreEducationStatistics.Common.Model.FileType;
 using static GovUk.Education.ExploreEducationStatistics.Content.Model.NamingUtils;
 
 namespace GovUk.Education.ExploreEducationStatistics.Admin.Services.Methodologies
@@ -25,23 +26,32 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Services.Methodologie
         private readonly IPersistenceHelper<ContentDbContext> _persistenceHelper;
         private readonly ContentDbContext _context;
         private readonly IMapper _mapper;
+        private readonly IMethodologyContentService _methodologyContentService;
+        private readonly IMethodologyRepository _methodologyRepository;
+        private readonly IMethodologyFileRepository _methodologyFileRepository;
+        private readonly IMethodologyImageService _methodologyImageService;
         private readonly IPublishingService _publishingService;
         private readonly IUserService _userService;
-        private readonly IMethodologyRepository _methodologyRepository;
 
-        public MethodologyService(ContentDbContext context,
+        public MethodologyService(IPersistenceHelper<ContentDbContext> persistenceHelper,
+            ContentDbContext context,
             IMapper mapper,
-            IPublishingService publishingService,
-            IUserService userService,
+            IMethodologyContentService methodologyContentService,
             IMethodologyRepository methodologyRepository,
-            IPersistenceHelper<ContentDbContext> persistenceHelper)
+            IMethodologyFileRepository methodologyFileRepository,
+            IMethodologyImageService methodologyImageService,
+            IPublishingService publishingService,
+            IUserService userService)
         {
+            _persistenceHelper = persistenceHelper;
             _context = context;
             _mapper = mapper;
+            _methodologyContentService = methodologyContentService;
+            _methodologyRepository = methodologyRepository;
+            _methodologyFileRepository = methodologyFileRepository;
+            _methodologyImageService = methodologyImageService;
             _publishingService = publishingService;
             _userService = userService;
-            _methodologyRepository = methodologyRepository;
-            _persistenceHelper = persistenceHelper;
         }
 
         public async Task<Either<ActionResult, MethodologySummaryViewModel>> CreateMethodologyAsync(
@@ -110,6 +120,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Services.Methodologie
             return await _persistenceHelper.CheckEntityExists<Methodology>(id)
                 .OnSuccess(methodology => CheckCanUpdateMethodologyStatus(methodology, request.Status))
                 .OnSuccess(_userService.CheckCanUpdateMethodology)
+                .OnSuccessDo(methodology => RemoveUnusedImages(methodology.Id))
                 .OnSuccess(async methodology =>
                 {
                     if (methodology.Live)
@@ -158,6 +169,31 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Services.Methodologie
                 MethodologyStatus.Approved => _userService.CheckCanApproveMethodology(methodology),
                 _ => throw new ArgumentOutOfRangeException(nameof(status), "Unexpected status")
             };
+        }
+
+        private async Task<Either<ActionResult, Unit>> RemoveUnusedImages(Guid methodologyId)
+        {
+            return await _methodologyContentService.GetContentBlocks<HtmlBlock>(methodologyId)
+                .OnSuccess(async contentBlocks =>
+                {
+                    var contentImageIds = contentBlocks.SelectMany(contentBlock =>
+                            HtmlImageUtil.GetMethodologyImages(contentBlock.Body))
+                        .Distinct();
+
+                    var imageFiles = await _methodologyFileRepository.GetByFileType(methodologyId, Image);
+
+                    var unusedImages = imageFiles
+                        .Where(file => !contentImageIds.Contains(file.File.Id))
+                        .Select(file => file.File.Id)
+                        .ToList();
+
+                    if (unusedImages.Any())
+                    {
+                        return await _methodologyImageService.Delete(methodologyId, unusedImages);
+                    }
+
+                    return Unit.Instance;
+                });
         }
 
         private async Task<Either<ActionResult, Unit>> ValidateMethodologySlugUnique(string slug)

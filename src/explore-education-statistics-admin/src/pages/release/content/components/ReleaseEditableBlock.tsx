@@ -7,6 +7,7 @@ import DataBlockTabs from '@common/modules/find-statistics/components/DataBlockT
 import useReleaseImageAttributeTransformer from '@common/modules/release/hooks/useReleaseImageAttributeTransformer';
 import isBrowser from '@common/utils/isBrowser';
 import React, { useCallback } from 'react';
+import { insertReleaseIdPlaceholders } from '@common/modules/release/utils/releaseImageUrls';
 
 interface Props {
   allowImages?: boolean;
@@ -39,7 +40,8 @@ const ReleaseEditableBlock = ({
 
   const handleSave = useCallback(
     (content: string) => {
-      onSave(block.id, content);
+      const contentWithPlaceholders = insertReleaseIdPlaceholders(content);
+      onSave(block.id, contentWithPlaceholders);
     },
     [block.id, onSave],
   );

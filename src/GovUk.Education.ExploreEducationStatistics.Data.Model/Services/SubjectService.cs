@@ -14,8 +14,10 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Model.Services
     {
         private readonly IReleaseRepository _releaseRepository;
 
-        public SubjectService(StatisticsDbContext context,
-            ILogger<SubjectService> logger, IReleaseRepository releaseRepository) : base(context, logger)
+        public SubjectService(
+            StatisticsDbContext context,
+            ILogger<SubjectService> logger, 
+            IReleaseRepository releaseRepository) : base(context, logger)
         {
             _releaseRepository = releaseRepository;
         }
@@ -40,16 +42,6 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Model.Services
             return await _context
                 .Subject
                 .FindAsync(subjectId);
-        }
-
-        public async Task<Subject?> Get(Guid releaseId, string subjectName)
-        {
-            return await _context
-                .ReleaseSubject
-                .Include(r => r.Subject)
-                .Where(r => r.ReleaseId == releaseId && r.Subject.Name == subjectName)
-                .Select(r => r.Subject)
-                .FirstOrDefaultAsync();
         }
 
         public Task<Publication> GetPublicationForSubject(Guid subjectId)

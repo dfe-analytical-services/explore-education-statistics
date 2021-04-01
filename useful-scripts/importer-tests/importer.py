@@ -154,9 +154,6 @@ def check_subject_status(random_identifier, api_url, release_id):
             print(f'{colors.SUCCESS}subject is in stage >', status, flush=True)
             print(f'percentage > {percentageComplete}% ', flush=True)
             time.sleep(2)
-        # uncomment the below to send STDOUT to log file
-        # log = open(f'test-results/importer-log-{datetime.date.today()}-{random_identifier}.txt', 'a+')
-        # sys.stdout = log
         check_subject_status(random_identifier, api_url, release_id)
 
 
@@ -191,6 +188,24 @@ def rename_csv_file(random_identifier):
 
 
 if __name__ == "__main__":
+
+    for zip_file in Path('.').glob('test-*.zip'):
+        if(zip_file):
+            os.remove(zip_file)
+
+    if not os.path.exists('test-results'): 
+        os.makedirs('test-results')
+
+    if not os.path.exists(f'test-files'): 
+        os.makedirs('test-files')
+    
+    # uncomment the below to send STDOUT to log file
+
+    # rand_id = random.randint(0,100000)
+    # log = open(f'test-results/importer-test-results-{datetime.date.today()}-{rand_id}.txt', 'a+')
+    # sys.stdout = log
+
+
     # To prevent InsecureRequestWarning
     requests.packages.urllib3.disable_warnings(urllib3.exceptions.InsecureRequestWarning)
     class colors:
@@ -208,17 +223,6 @@ if __name__ == "__main__":
     assert jwt_token is not None
     assert topic_id is not None
     
-    # clean zip files
-    for zip_file in Path('.').glob('test-*.zip'):
-        if(zip_file):
-            os.remove(zip_file)
-
-    # make directory
-    if not os.path.exists('test-results'): 
-        os.makedirs('test-results')
-
-    if not os.path.exists(f'test-files'): 
-        os.makedirs('test-files')
 
     publication_id = create_publication(api_url)
     release_id = create_release(api_url, publication_id)

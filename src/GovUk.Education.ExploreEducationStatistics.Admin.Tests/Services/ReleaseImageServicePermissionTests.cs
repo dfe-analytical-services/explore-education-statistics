@@ -58,9 +58,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
 
         private Mock<IPersistenceHelper<ContentDbContext>> DefaultPersistenceHelperMock()
         {
-            var mock = MockUtils.MockPersistenceHelper<ContentDbContext, Release>();
-            MockUtils.SetupCall(mock, _release.Id, _release);
-            return mock;
+            return MockUtils.MockPersistenceHelper<ContentDbContext, Release>(_release.Id, _release);
         }
     }
 }

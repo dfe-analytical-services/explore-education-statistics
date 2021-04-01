@@ -6,6 +6,8 @@ using GovUk.Education.ExploreEducationStatistics.Common.Extensions;
 using GovUk.Education.ExploreEducationStatistics.Common.Model;
 using GovUk.Education.ExploreEducationStatistics.Common.Services;
 using GovUk.Education.ExploreEducationStatistics.Common.Utils;
+using GovUk.Education.ExploreEducationStatistics.Content.Model.Database;
+using GovUk.Education.ExploreEducationStatistics.Content.Model.Repository.Interfaces;
 using GovUk.Education.ExploreEducationStatistics.Data.Model;
 using GovUk.Education.ExploreEducationStatistics.Data.Model.Database;
 using GovUk.Education.ExploreEducationStatistics.Data.Model.Services.Interfaces;
@@ -21,23 +23,26 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Services
         private readonly IFilterService _filterService;
         private readonly IIndicatorService _indicatorService;
         private readonly StatisticsDbContext _context;
-        private readonly IPersistenceHelper<StatisticsDbContext> _persistenceHelper;
+        private readonly IPersistenceHelper<StatisticsDbContext> _statisticsPersistenceHelper;
+        private readonly IReleaseDataFileRepository _releaseDataFileRepository;
 
         public MetaGuidanceSubjectService(IFilterService filterService,
             IIndicatorService indicatorService,
             StatisticsDbContext context,
-            IPersistenceHelper<StatisticsDbContext> persistenceHelper)
+            IPersistenceHelper<StatisticsDbContext> statisticsPersistenceHelper,
+            IReleaseDataFileRepository releaseDataFileRepository)
         {
             _filterService = filterService;
             _indicatorService = indicatorService;
             _context = context;
-            _persistenceHelper = persistenceHelper;
+            _statisticsPersistenceHelper = statisticsPersistenceHelper;
+            _releaseDataFileRepository = releaseDataFileRepository;
         }
 
         public async Task<Either<ActionResult, List<MetaGuidanceSubjectViewModel>>> GetSubjects(Guid releaseId,
             List<Guid> subjectIds = null)
         {
-            return await _persistenceHelper.CheckEntityExists<Release>(releaseId)
+            return await _statisticsPersistenceHelper.CheckEntityExists<Release>(releaseId)
                 .OnSuccess(async release =>
                 {
                     var releaseSubjectsQueryable = _context
@@ -52,7 +57,6 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Services
                     }
 
                     var releaseSubjects = await releaseSubjectsQueryable
-                        .OrderBy(rs => rs.Subject.Name)
                         .ToListAsync();
 
                     var result = new List<MetaGuidanceSubjectViewModel>();
@@ -61,7 +65,9 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Services
                         result.Add(await BuildSubjectViewModel(releaseSubject));
                     });
 
-                    return result;
+                    return result
+                        .OrderBy(viewModel => viewModel.Name)
+                        .ToList();
                 })
                 // Currently we expect a failure checking the Release exists and succeed with an empty list.
                 // StatisticsDb Releases are not always in sync with ContentDb Releases.
@@ -131,15 +137,22 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Services
         private async Task<MetaGuidanceSubjectViewModel> BuildSubjectViewModel(ReleaseSubject releaseSubject)
         {
             var subject = releaseSubject.Subject;
+
+            var releaseFile =
+                await _releaseDataFileRepository.GetBySubject(
+                    releaseSubject.ReleaseId,
+                    releaseSubject.SubjectId);
+            
             var geographicLevels = await GetGeographicLevels(subject.Id);
             var timePeriods = await GetTimePeriods(subject.Id);
             var variables = GetVariables(subject.Id);
+
             return new MetaGuidanceSubjectViewModel
             {
                 Id = subject.Id,
                 Content = releaseSubject.MetaGuidance ?? "",
-                Filename = subject.Filename ?? "Unknown",
-                Name = subject.Name,
+                Filename = releaseFile.File.Filename,
+                Name = releaseFile.Name,
                 GeographicLevels = geographicLevels,
                 TimePeriods = timePeriods,
                 Variables = variables

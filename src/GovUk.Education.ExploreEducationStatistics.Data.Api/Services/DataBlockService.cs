@@ -71,7 +71,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Api.Services
                             try
                             {
                                 return await _blobStorageService.GetDeserializedJson<TableBuilderResultViewModel>(
-                                    PublicContentContainerName,
+                                    PublicContent,
                                     path
                                 );
                             }
@@ -79,7 +79,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Api.Services
                             {
                                 // If there's an error deserializing the blob, we should
                                 // assume it's not salvageable and just re-build it.
-                                await _blobStorageService.DeleteBlob(PublicContentContainerName, path);
+                                await _blobStorageService.DeleteBlob(PublicContent, path);
                             }
                             catch (FileNotFoundException)
                             {
@@ -98,7 +98,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Api.Services
 
                             return await _tableBuilderService.Query(block.ReleaseId, query)
                                 .OnSuccessDo(
-                                    result => _blobStorageService.UploadAsJson(PublicContentContainerName, path, result)
+                                    result => _blobStorageService.UploadAsJson(PublicContent, path, result)
                                 );
                         }
 

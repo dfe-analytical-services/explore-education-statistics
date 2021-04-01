@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
 using AutoMapper;
+using GovUk.Education.ExploreEducationStatistics.Common.Model;
 using GovUk.Education.ExploreEducationStatistics.Content.Model;
 using GovUk.Education.ExploreEducationStatistics.Content.Model.Database;
 using GovUk.Education.ExploreEducationStatistics.Publisher.Model.ViewModels;
@@ -28,6 +29,24 @@ namespace GovUk.Education.ExploreEducationStatistics.Publisher.Services
         public async Task<Methodology> Get(Guid id)
         {
             return await _context.Methodologies.FindAsync(id);
+        }
+
+        public async Task<Methodology> GetByRelease(Guid releaseId)
+        {
+            return await _context.Releases
+                .Where(release => release.Id == releaseId)
+                .Select(release => release.Publication.Methodology)
+                .SingleOrDefaultAsync();
+        }
+
+        public async Task<List<File>> GetFiles(Guid methodologyId, params FileType[] types)
+        {
+            return await _context.MethodologyFiles
+                .Include(mf => mf.File)
+                .Where(mf => mf.MethodologyId == methodologyId)
+                .Select(mf => mf.File)
+                .Where(file => types.Contains(file.Type))
+                .ToListAsync();
         }
 
         public async Task<MethodologyViewModel> GetViewModelAsync(Guid id, PublishContext context)

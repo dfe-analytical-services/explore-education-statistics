@@ -188,7 +188,6 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Processor.Services
                     metadata: GetDataFileMetaValues(
                         name: dataBlob.Name,
                         metaFileName: dataImport.MetaFile.Filename,
-                        userName: dataBlob.GetUserName(),
                         numberOfRows: numRows
                     ));
 

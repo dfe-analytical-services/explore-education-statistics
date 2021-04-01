@@ -1,37 +1,39 @@
 using System;
 using System.Linq;
 using System.Threading.Tasks;
+using GovUk.Education.ExploreEducationStatistics.Common.Services.Interfaces;
 using GovUk.Education.ExploreEducationStatistics.Content.Model;
 using GovUk.Education.ExploreEducationStatistics.Content.Model.Extensions;
 using GovUk.Education.ExploreEducationStatistics.Publisher.Models;
 using GovUk.Education.ExploreEducationStatistics.Publisher.Services.Interfaces;
 using Newtonsoft.Json;
 using Newtonsoft.Json.Serialization;
+using static GovUk.Education.ExploreEducationStatistics.Common.BlobContainers;
 using static GovUk.Education.ExploreEducationStatistics.Common.Services.FileStoragePathUtils;
 
 namespace GovUk.Education.ExploreEducationStatistics.Publisher.Services
 {
     public class ContentService : IContentService
     {
+        private readonly IBlobStorageService _publicBlobStorageService;
         private readonly IFastTrackService _fastTrackService;
         private readonly IReleaseService _releaseService;
         private readonly IPublicationService _publicationService;
         private readonly IDownloadService _downloadService;
         private readonly IMethodologyService _methodologyService;
-        private readonly IFileStorageService _fileStorageService;
 
         private readonly JsonSerializerSettings _jsonSerializerSettingsCamelCase =
             GetJsonSerializerSettings(new CamelCaseNamingStrategy());
 
-        public ContentService(IFastTrackService fastTrackService,
+        public ContentService(IBlobStorageService publicBlobStorageService,
+            IFastTrackService fastTrackService,
             IDownloadService downloadService,
-            IFileStorageService fileStorageService,
             IMethodologyService methodologyService,
             IReleaseService releaseService,
             IPublicationService publicationService)
         {
+            _publicBlobStorageService = publicBlobStorageService;
             _fastTrackService = fastTrackService;
-            _fileStorageService = fileStorageService;
             _releaseService = releaseService;
             _publicationService = publicationService;
             _downloadService = downloadService;
@@ -54,7 +56,8 @@ namespace GovUk.Education.ExploreEducationStatistics.Publisher.Services
                 // Delete content which hasn't been overwritten because the Slug has changed
                 if (release.Slug != release.PreviousVersion.Slug)
                 {
-                    await _fileStorageService.DeletePublicBlob(
+                    await _publicBlobStorageService.DeleteBlob(
+                        PublicContent,
                         PublicContentReleasePath(release.Publication.Slug, release.PreviousVersion.Slug)
                     );
                 }
@@ -67,7 +70,12 @@ namespace GovUk.Education.ExploreEducationStatistics.Publisher.Services
 
             foreach (var release in releases)
             {
-                await _fileStorageService.DeleteDownloadFilesForPreviousVersion(release);
+                if (release.PreviousVersion != null)
+                {
+                    await _publicBlobStorageService.DeleteBlobs(
+                        containerName: PublicReleaseFiles,
+                        directoryPath: $"{release.PreviousVersion.Id}/");
+                }
             }
         }
 
@@ -123,6 +131,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Publisher.Services
                 }
             }
 
+            // Include Methodologies of the Publications if they are not already live
             foreach (var methodologyId in methodologyIds)
             {
                 var methodology = await _methodologyService.Get(methodologyId);
@@ -167,7 +176,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Publisher.Services
         private async Task DeleteAllContent()
         {
             await _fastTrackService.DeleteAllReleaseFastTracks();
-            await _fileStorageService.DeleteAllContentAsyncExcludingStaging();
+            await DeleteAllContentAsyncExcludingStaging();
         }
 
         private async Task CacheDownloadTree(PublishContext context, params Guid[] includedReleaseIds)
@@ -225,6 +234,12 @@ namespace GovUk.Education.ExploreEducationStatistics.Publisher.Services
             await CachePublicationTree(context, includedReleaseIds);
         }
 
+        private async Task DeleteAllContentAsyncExcludingStaging()
+        {
+            var excludePattern = $"^{PublicContentStagingPath()}/.+$";
+            await _publicBlobStorageService.DeleteBlobs(PublicContent, string.Empty, excludePattern);
+        }
+
         private static JsonSerializerSettings GetJsonSerializerSettings(NamingStrategy namingStrategy)
         {
             return new JsonSerializerSettings
@@ -243,7 +258,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Publisher.Services
         {
             var pathPrefix = context.Staging ? PublicContentStagingPath() : null;
             var blobName = pathFunction.Invoke(pathPrefix);
-            await _fileStorageService.UploadAsJson(blobName, value, settings);
+            await _publicBlobStorageService.UploadAsJson(PublicContent, blobName, value, settings);
         }
     }
 }

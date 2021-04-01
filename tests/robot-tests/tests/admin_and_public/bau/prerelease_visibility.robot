@@ -137,6 +137,7 @@ Go to Public release page and ensure release isn't visible
 Go to Table Tool page
     [Tags]  HappyPath
     user goes to url  %{PUBLIC_URL}/data-tables
+    user waits for page to finish loading
     user waits until h1 is visible  Create your own tables online
 
 Check scheduled release isn't visible

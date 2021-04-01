@@ -33,14 +33,19 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Processor.Services
             {
                 contentDbContext.Update(import);
                 import.Status = FAILED;
-                import.Errors.AddRange(errors);
+                if (errors != null)
+                {
+                    import.Errors.AddRange(errors);                    
+                }
                 await contentDbContext.SaveChangesAsync();
             }
         }
 
         public async Task FailImport(Guid id, params string[] errors)
         {
-            await FailImport(id, errors.Select(error => new DataImportError(error)).ToList());
+            await FailImport(id, errors?
+                .Select(error => new DataImportError(error ?? "An unknown error occurred"))
+                .ToList());
         }
 
         public async Task<DataImport> GetImport(Guid id)

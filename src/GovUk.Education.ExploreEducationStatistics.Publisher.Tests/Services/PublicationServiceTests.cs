@@ -31,7 +31,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Publisher.Tests.Services
             Id = Guid.NewGuid(),
             Title = "Topic A",
             ThemeId = Theme.Id,
-            Slug = "topic-a",
+            Slug = "topic-a"
         };
 
         private static readonly Contact Contact1 = new Contact

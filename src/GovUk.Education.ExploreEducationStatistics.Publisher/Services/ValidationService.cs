@@ -114,7 +114,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Publisher.Services
         private static IEnumerable<ReleaseStatusLogMessage> CollateMessages(
             params Either<IEnumerable<ReleaseStatusLogMessage>, Unit>[] results)
         {
-            return results.SelectMany(either => either.IsLeft ? either.Left : new ReleaseStatusLogMessage[] {});
+            return results.SelectMany(either => either.IsLeft ? either.Left : new ReleaseStatusLogMessage[] { });
         }
 
         private enum ValidationStage

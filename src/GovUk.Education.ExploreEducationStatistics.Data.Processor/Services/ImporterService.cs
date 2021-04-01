@@ -1,6 +1,7 @@
 using System;
 using System.Collections.Generic;
 using System.Data;
+using System.Diagnostics;
 using System.Linq;
 using System.Threading.Tasks;
 using GovUk.Education.ExploreEducationStatistics.Common.Extensions;
@@ -30,70 +31,66 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Processor.Services
         private readonly ILogger<ImporterService> _logger;
 
         private const int Stage2RowCheck = 1000;
-        
-        private enum Columns
-        {
-            SCHOOL_COLS,
-            COUNTRY_COLS,
-            INSTITUTION_COLS,
-            LOCAL_AUTH_COLS,
-            LOCAL_AUTH_DISTRICT_COLS,
-            LOCAL_ENTERPRISE_PARTNERSHIP_COLS,
-            MAYORAL_COMBINED_AUTHORITY_COLS,
-            MULTI_ACADEMY_TRUST_COLS,
-            OPPORTUNITY_AREA_COLS,
-            PARLIAMENTARY_CONSTITUENCY_COLS,
-            PROVIDER_COLS,
-            REGION_COLS,
-            SPONSOR_COLS,
-            WARD_COLS,
-            PLANNING_AREA_COLS
-        }
 
-        private static readonly Dictionary<Columns, string[]> ColumnValues =
-            new Dictionary<Columns, string[]>
+        private static readonly Dictionary<GeographicLevel, string[]> ColumnValues =
+            new Dictionary<GeographicLevel, string[]>
             {
                 {
-                    Columns.COUNTRY_COLS, new[] {"country_code", "country_name"}
+                    GeographicLevel.Country,
+                    new[] {"country_code", "country_name"}
                 },
                 {
-                    Columns.INSTITUTION_COLS, new[] {"institution_id", "institution_name"}
+                    GeographicLevel.EnglishDevolvedArea,
+                    new[] {"english_devolved_area_code", "english_devolved_area_name"}
                 },
                 {
-                    Columns.LOCAL_AUTH_COLS, new[] {"new_la_code", "old_la_code", "la_name"}
+                    GeographicLevel.Institution,
+                    new[] {"institution_id", "institution_name"}
                 },
                 {
-                    Columns.LOCAL_AUTH_DISTRICT_COLS, new[] {"lad_code", "lad_name"}
+                    GeographicLevel.LocalAuthority,
+                    new[] {"new_la_code", "old_la_code", "la_name"}
                 },
                 {
-                    Columns.LOCAL_ENTERPRISE_PARTNERSHIP_COLS,
+                    GeographicLevel.LocalAuthorityDistrict,
+                    new[] {"lad_code", "lad_name"}
+                },
+                {
+                    GeographicLevel.LocalEnterprisePartnership,
                     new[] {"local_enterprise_partnership_code", "local_enterprise_partnership_name"}
                 },
                 {
-                    Columns.MAYORAL_COMBINED_AUTHORITY_COLS,
+                    GeographicLevel.MayoralCombinedAuthority,
                     new[] {"mayoral_combined_authority_code", "mayoral_combined_authority_name"}
                 },
                 {
-                    Columns.MULTI_ACADEMY_TRUST_COLS, new[] {"trust_id", "trust_name"}
+                    GeographicLevel.MultiAcademyTrust,
+                    new[] {"trust_id", "trust_name"}
                 },
                 {
-                    Columns.OPPORTUNITY_AREA_COLS, new[] {"opportunity_area_code", "opportunity_area_name"}
+                    GeographicLevel.OpportunityArea,
+                    new[] {"opportunity_area_code", "opportunity_area_name"}
                 },
                 {
-                    Columns.PARLIAMENTARY_CONSTITUENCY_COLS, new[] {"pcon_code", "pcon_name"}
+                    GeographicLevel.ParliamentaryConstituency,
+                    new[] {"pcon_code", "pcon_name"}
                 },
                 {
-                    Columns.REGION_COLS, new[] {"region_code", "region_name"}
+                    GeographicLevel.Region,
+                    new[] {"region_code", "region_name"}
                 },
                 {
-                    Columns.SPONSOR_COLS, new[] {"sponsor_id", "sponsor_name"}
+                    GeographicLevel.Sponsor,
+                    new[] {"sponsor_id", "sponsor_name"}
                 },
                 {
-                    Columns.WARD_COLS, new[] {"ward_code", "ward_name"}
+                    GeographicLevel.Ward,
+                    new[] {"ward_code", "ward_name"}
                 },
                 {
-                    Columns.PLANNING_AREA_COLS, new[] {"planning_area_code", "planning_area_name"}
-                },
+                    GeographicLevel.PlanningArea,
+                    new[] {"planning_area_code", "planning_area_name"}
+                }
             };
 
         public static readonly List<GeographicLevel> IgnoredGeographicLevels = new List<GeographicLevel>
@@ -170,6 +167,8 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Processor.Services
         public async Task ImportObservations(DataColumnCollection cols, DataRowCollection rows, Subject subject,
             SubjectMeta subjectMeta, int batchNo, int rowsPerBatch, StatisticsDbContext context)
         {
+            var stopwatch = Stopwatch.StartNew();
+
             _importerFilterService.ClearCache();
             _importerLocationService.ClearCache();
 
@@ -182,6 +181,8 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Processor.Services
                 batchNo,
                 rowsPerBatch).ToList();
 
+            _logger.LogDebug($"Took {stopwatch.Elapsed.TotalMilliseconds} millis to read {observations.Count} " +
+                             $"Observations from CSV");
             await InsertObservations(context, observations);
         }
 
@@ -272,7 +273,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Processor.Services
 
             return new Observation
             {
-                Id = observationId,
+                ObservationId = observationId,
                 FilterItems = GetFilterItems(context, line, headers, subjectMeta.Filters, observationId),
                 GeographicLevel = GetGeographicLevel(line, headers),
                 LocationId = GetLocationId(line, headers, context),
@@ -305,7 +306,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Processor.Services
                 var filterItemLabel = CsvUtil.Value(line, headers, filterMeta.Column);
                 var filterGroupLabel = CsvUtil.Value(line, headers, filterMeta.FilterGroupingColumn);
 
-                _importerFilterService.Find(filterItemLabel, filterGroupLabel, filterMeta.Filter, context);
+                _importerFilterService.GetOrCreateFilterItem(filterItemLabel, filterGroupLabel, filterMeta.Filter, context);
             }
         }
 
@@ -323,10 +324,9 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Processor.Services
 
                 return new ObservationFilterItem
                 {
-                    ObservationId = observationId,
+                    OldObservationId = observationId,
                     FilterItemId = _importerFilterService
-                        .Find(filterItemLabel, filterGroupLabel, filterMeta.Filter, context).Id,
-                    FilterId = filterMeta.Filter.Id
+                        .GetOrCreateFilterItem(filterItemLabel, filterGroupLabel, filterMeta.Filter, context).Id
                 };
             }).ToList();
         }
@@ -336,6 +336,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Processor.Services
             return _importerLocationService.Find(
                 context,
                 GetCountry(line, headers),
+                GetEnglishDevolvedArea(line, headers),
                 GetInstitution(line, headers),
                 GetLocalAuthority(line, headers),
                 GetLocalAuthorityDistrict(line, headers),
@@ -365,66 +366,72 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Processor.Services
 
         private static Country GetCountry(IReadOnlyList<string> line, List<string> headers)
         {
-            return CsvUtil.BuildType(line, headers, ColumnValues[Columns.COUNTRY_COLS], values =>
+            return CsvUtil.BuildType(line, headers, ColumnValues[GeographicLevel.Country], values =>
                 new Country(values[0], values[1]));
+        }
+
+        private static EnglishDevolvedArea GetEnglishDevolvedArea(IReadOnlyList<string> line, List<string> headers)
+        {
+            return CsvUtil.BuildType(line, headers, ColumnValues[GeographicLevel.EnglishDevolvedArea], values =>
+                new EnglishDevolvedArea(values[0], values[1]));
         }
 
         private static Institution GetInstitution(IReadOnlyList<string> line,
             List<string> headers)
         {
-            return CsvUtil.BuildType(line, headers, ColumnValues[Columns.INSTITUTION_COLS], values =>
+            return CsvUtil.BuildType(line, headers, ColumnValues[GeographicLevel.Institution], values =>
                 new Institution(values[0], values[1]));
         }
 
         private static LocalAuthority GetLocalAuthority(IReadOnlyList<string> line, List<string> headers)
         {
-            return CsvUtil.BuildType(line, headers, ColumnValues[Columns.LOCAL_AUTH_COLS], values =>
+            return CsvUtil.BuildType(line, headers, ColumnValues[GeographicLevel.LocalAuthority], values =>
                 new LocalAuthority(values[0], values[1], values[2]));
         }
 
         private static LocalAuthorityDistrict GetLocalAuthorityDistrict(IReadOnlyList<string> line,
             List<string> headers)
         {
-            return CsvUtil.BuildType(line, headers, ColumnValues[Columns.LOCAL_AUTH_DISTRICT_COLS], values =>
+            return CsvUtil.BuildType(line, headers, ColumnValues[GeographicLevel.LocalAuthorityDistrict], values =>
                 new LocalAuthorityDistrict(values[0], values[1]));
         }
 
         private static LocalEnterprisePartnership GetLocalEnterprisePartnership(IReadOnlyList<string> line,
             List<string> headers)
         {
-            return CsvUtil.BuildType(line, headers, ColumnValues[Columns.LOCAL_ENTERPRISE_PARTNERSHIP_COLS], values =>
+            return CsvUtil.BuildType(line, headers, ColumnValues[GeographicLevel.LocalEnterprisePartnership], values =>
                 new LocalEnterprisePartnership(values[0], values[1]));
         }
 
         private static MayoralCombinedAuthority GetMayoralCombinedAuthority(IReadOnlyList<string> line,
             List<string> headers)
         {
-            return CsvUtil.BuildType(line, headers, ColumnValues[Columns.MAYORAL_COMBINED_AUTHORITY_COLS], values =>
+            return CsvUtil.BuildType(line, headers, ColumnValues[GeographicLevel.MayoralCombinedAuthority], values =>
                 new MayoralCombinedAuthority(values[0], values[1]));
         }
 
         private static Mat GetMultiAcademyTrust(IReadOnlyList<string> line, List<string> headers)
         {
-            return CsvUtil.BuildType(line, headers, ColumnValues[Columns.MULTI_ACADEMY_TRUST_COLS], values =>
+            return CsvUtil.BuildType(line, headers, ColumnValues[GeographicLevel.MultiAcademyTrust], values =>
                 new Mat(values[0], values[1]));
         }
 
         private static OpportunityArea GetOpportunityArea(IReadOnlyList<string> line, List<string> headers)
         {
-            return CsvUtil.BuildType(line, headers, ColumnValues[Columns.OPPORTUNITY_AREA_COLS], values =>
+            return CsvUtil.BuildType(line, headers, ColumnValues[GeographicLevel.OpportunityArea], values =>
                 new OpportunityArea(values[0], values[1]));
         }
 
         private static ParliamentaryConstituency GetParliamentaryConstituency(IReadOnlyList<string> line,
             List<string> headers)
         {
-            return CsvUtil.BuildType(line, headers, ColumnValues[Columns.PARLIAMENTARY_CONSTITUENCY_COLS], values =>
+            return CsvUtil.BuildType(line, headers, ColumnValues[GeographicLevel.ParliamentaryConstituency], values =>
                 new ParliamentaryConstituency(values[0], values[1]));
         }
 
         private static Region GetRegion(IReadOnlyList<string> line, List<string> headers)
         {
-            return CsvUtil.BuildType(line, headers, ColumnValues[Columns.REGION_COLS], values =>
+            return CsvUtil.BuildType(line, headers, ColumnValues[GeographicLevel.Region], values =>
                 new Region(values[0], values[1]));
         }
 
@@ -435,26 +442,28 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Processor.Services
 
         private static Sponsor GetSponsor(IReadOnlyList<string> line, List<string> headers)
         {
-            return CsvUtil.BuildType(line, headers, ColumnValues[Columns.SPONSOR_COLS], values =>
+            return CsvUtil.BuildType(line, headers, ColumnValues[GeographicLevel.Sponsor], values =>
                 new Sponsor(values[0], values[1]));
         }
 
         private static Ward GetWard(IReadOnlyList<string> line, List<string> headers)
         {
-            return CsvUtil.BuildType(line, headers, ColumnValues[Columns.WARD_COLS], values =>
+            return CsvUtil.BuildType(line, headers, ColumnValues[GeographicLevel.Ward], values =>
                 new Ward(values[0], values[1]));
         }
 
         private static PlanningArea GetPlanningArea(IReadOnlyList<string> line, List<string> headers)
         {
-            return CsvUtil.BuildType(line, headers, ColumnValues[Columns.PLANNING_AREA_COLS], values =>
+            return CsvUtil.BuildType(line, headers, ColumnValues[GeographicLevel.PlanningArea], values =>
                 new PlanningArea(values[0], values[1]));
         }
 
-        private async Task InsertObservations(DbContext context, IEnumerable<Observation> observations)
+        private async Task InsertObservations(StatisticsDbContext context, IEnumerable<Observation> observations)
         {
+            var stopwatch = Stopwatch.StartNew();
+            
             var observationsTable = new DataTable();
-            observationsTable.Columns.Add("Id", typeof(Guid));
+            observationsTable.Columns.Add("ObservationId", typeof(Guid));
             observationsTable.Columns.Add("SubjectId", typeof(Guid));
             observationsTable.Columns.Add("GeographicLevel", typeof(string));
             observationsTable.Columns.Add("LocationId", typeof(Guid));
@@ -463,15 +472,10 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Processor.Services
             observationsTable.Columns.Add("Measures", typeof(string));
             observationsTable.Columns.Add("CsvRow", typeof(long));
 
-            var observationsFilterItemsTable = new DataTable();
-            observationsFilterItemsTable.Columns.Add("ObservationId", typeof(Guid));
-            observationsFilterItemsTable.Columns.Add("FilterItemId", typeof(Guid));
-            observationsFilterItemsTable.Columns.Add("FilterId", typeof(Guid));
-
             foreach (var o in observations)
             {
                 observationsTable.Rows.Add(
-                    o.Id,
+                    o.ObservationId,
                     o.SubjectId,
                     o.GeographicLevel.GetEnumValue(),
                     o.LocationId,
@@ -480,31 +484,44 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Processor.Services
                     "{" + string.Join(",", o.Measures.Select(x => $"\"{x.Key}\":\"{x.Value}\"")) + "}",
                     o.CsvRow
                 );
-
-                foreach (var item in o.FilterItems)
-                {
-                    observationsFilterItemsTable.Rows.Add(
-                        item.ObservationId,
-                        item.FilterItemId,
-                        item.FilterId
-                    );
-                }
             }
 
-            var parameter = new SqlParameter("@Observations", SqlDbType.Structured)
+            _logger.LogDebug($"Took {stopwatch.Elapsed.TotalMilliseconds} to prepare {observations.Count()} Observation rows");
+            stopwatch.Restart();
+            
+            var observationsParam = new SqlParameter("@Observations", SqlDbType.Structured)
             {
-                Value = observationsTable, TypeName = "[dbo].[ObservationType]"
+                Value = observationsTable, TypeName = "[dbo].[ObservationRowType]"
             };
+            
+            var observationsFilterItemsTable = new DataTable();
+            observationsFilterItemsTable.Columns.Add("CsvRow", typeof(long));
+            observationsFilterItemsTable.Columns.Add("OldObservationId", typeof(Guid));
+            observationsFilterItemsTable.Columns.Add("FilterItemId", typeof(Guid));
 
-            await context.Database.ExecuteSqlRawAsync("EXEC [dbo].[InsertObservations] @Observations", parameter);
-
-            parameter = new SqlParameter("@ObservationFilterItems", SqlDbType.Structured)
+            foreach (Observation observation in observations)
             {
-                Value = observationsFilterItemsTable, TypeName = "[dbo].[ObservationFilterItemType]"
+                foreach (var item in observation.FilterItems)
+                {
+                    observationsFilterItemsTable.Rows.Add(
+                        observation.CsvRow,
+                        item.OldObservationId,
+                        item.FilterItemId
+                    );
+                }    
+            }
+            
+            var observationFilterItemsParam = new SqlParameter("@ObservationFilterItems", SqlDbType.Structured)
+            {
+                Value = observationsFilterItemsTable, TypeName = "[dbo].[ObservationRowFilterItemType]"
             };
 
             await context.Database.ExecuteSqlRawAsync(
-                "EXEC [dbo].[InsertObservationFilterItems] @ObservationFilterItems", parameter);
+                "EXEC [dbo].[InsertObservationRows] @Observations, @ObservationFilterItems", 
+                observationsParam, 
+                observationFilterItemsParam);
+
+            _logger.LogDebug($"Took {stopwatch.Elapsed.TotalMilliseconds} to insert {observations.Count()} Observation rows");
         }
     }
 }

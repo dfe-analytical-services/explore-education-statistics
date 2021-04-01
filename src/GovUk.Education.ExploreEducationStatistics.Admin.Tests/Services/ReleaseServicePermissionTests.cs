@@ -4,6 +4,7 @@ using AutoMapper;
 using GovUk.Education.ExploreEducationStatistics.Admin.Security;
 using GovUk.Education.ExploreEducationStatistics.Admin.Services;
 using GovUk.Education.ExploreEducationStatistics.Admin.Services.Interfaces;
+using GovUk.Education.ExploreEducationStatistics.Admin.Services.Interfaces.ManageContent;
 using GovUk.Education.ExploreEducationStatistics.Admin.ViewModels;
 using GovUk.Education.ExploreEducationStatistics.Common.Model;
 using GovUk.Education.ExploreEducationStatistics.Common.Services;
@@ -323,6 +324,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
             StatisticsDbContext statisticsDbContext = null,
             IDataBlockService dataBlockService = null,
             IReleaseChecklistService releaseChecklistService = null,
+            IContentService contentService = null,
             IReleaseSubjectService releaseSubjectService = null)
         {
             return new ReleaseService(
@@ -341,6 +343,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
                 statisticsDbContext ?? new Mock<StatisticsDbContext>().Object,
                 dataBlockService ?? new Mock<IDataBlockService>().Object,
                 releaseChecklistService ?? new Mock<IReleaseChecklistService>().Object,
+                contentService ?? new Mock<IContentService>().Object,
                 releaseSubjectService ?? new Mock<IReleaseSubjectService>().Object,
                 new SequentialGuidGenerator()
             );

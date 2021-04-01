@@ -58,10 +58,9 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Services
             return _mapper.Map<List<MyReleaseViewModel>>(releases);
         }
 
-        public async Task<Guid> CreateReleaseAndSubjectHierarchy(
+        public async Task<Guid> CreateStatisticsDbReleaseAndSubjectHierarchy(
             Guid releaseId,
-            string subjectFilename,
-            string subjectName)
+            string subjectFilename)
         {
             var release = await _contentDbContext.Releases
                 .Include(r => r.Publication)
@@ -129,7 +128,6 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Services
                 Subject = new Subject
                 {
                     Filename = subjectFilename,
-                    Name = subjectName
                 }
             })).Entity;
 

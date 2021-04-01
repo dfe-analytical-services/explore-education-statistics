@@ -77,7 +77,13 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Services
                 return ValidationActionResult(SubjectTitleCannotContainSpecialCharacters);
             }
 
-            if (await _subjectService.Get(releaseId, name) != null)
+            var subjectNameExists = _context.ReleaseFiles
+                .Include(rf => rf.File)
+                .Any(rf =>
+                    rf.ReleaseId == releaseId
+                    && rf.File.Type == FileType.Data
+                    && rf.Name == name);
+            if (subjectNameExists)
             {
                 return ValidationActionResult(SubjectTitleMustBeUnique);
             }

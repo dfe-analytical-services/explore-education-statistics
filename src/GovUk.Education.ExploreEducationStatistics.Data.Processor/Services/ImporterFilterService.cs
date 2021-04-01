@@ -12,7 +12,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Processor.Services
         {
         }
 
-        public FilterItem Find(string filterItemLabel, string filterGroupLabel, Filter filter, StatisticsDbContext context)
+        public FilterItem GetOrCreateFilterItem(string filterItemLabel, string filterGroupLabel, Filter filter, StatisticsDbContext context)
         {
             var filterGroup = LookupOrCreateFilterGroup(filter, filterGroupLabel, context);
             return LookupOrCreateFilterItem(filter, filterGroup, filterItemLabel, context);

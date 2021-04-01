@@ -8,6 +8,8 @@ using GovUk.Education.ExploreEducationStatistics.Common.Model;
 using GovUk.Education.ExploreEducationStatistics.Common.Model.Data;
 using GovUk.Education.ExploreEducationStatistics.Common.Services.Interfaces.Security;
 using GovUk.Education.ExploreEducationStatistics.Common.Utils;
+using GovUk.Education.ExploreEducationStatistics.Content.Model.Database;
+using GovUk.Education.ExploreEducationStatistics.Content.Model.Repository.Interfaces;
 using GovUk.Education.ExploreEducationStatistics.Data.Model;
 using GovUk.Education.ExploreEducationStatistics.Data.Model.Database;
 using GovUk.Education.ExploreEducationStatistics.Data.Model.Query;
@@ -16,6 +18,7 @@ using GovUk.Education.ExploreEducationStatistics.Data.Services.Interfaces;
 using GovUk.Education.ExploreEducationStatistics.Data.Services.ViewModels;
 using GovUk.Education.ExploreEducationStatistics.Data.Services.ViewModels.Meta;
 using Microsoft.AspNetCore.Mvc;
+using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Logging;
 using static GovUk.Education.ExploreEducationStatistics.Data.Services.Security.DataSecurityPolicies;
 
@@ -33,6 +36,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Services
         private readonly ISubjectService _subjectService;
         private readonly ILogger _logger;
         private readonly IMapper _mapper;
+        private readonly IReleaseDataFileRepository _releaseDataFileRepository;
 
         public ResultSubjectMetaService(IBoundaryLevelService boundaryLevelService,
             IFilterItemService filterItemService,
@@ -45,7 +49,8 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Services
             IUserService userService,
             ISubjectService subjectService,
             ILogger<ResultSubjectMetaService> logger,
-            IMapper mapper) : base(boundaryLevelService, filterItemService, geoJsonService)
+            IMapper mapper,
+            IReleaseDataFileRepository releaseDataFileRepository) : base(boundaryLevelService, filterItemService, geoJsonService)
         {
             _boundaryLevelService = boundaryLevelService;
             _footnoteRepository = footnoteRepository;
@@ -57,6 +62,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Services
             _subjectService = subjectService;
             _logger = logger;
             _mapper = mapper;
+            _releaseDataFileRepository = releaseDataFileRepository;
         }
 
         public Task<Either<ActionResult, ResultSubjectMetaViewModel>> GetSubjectMeta(Guid releaseId, 
@@ -101,6 +107,9 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Services
                     stopwatch.Stop();
 
                     var publication = await _subjectService.GetPublicationForSubject(subject.Id);
+
+                    var releaseFile = await _releaseDataFileRepository.GetBySubject(releaseId, subject.Id);
+                    var subjectName = releaseFile.Name;
                     
                     return new ResultSubjectMetaViewModel
                     {
@@ -111,7 +120,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Services
                         Locations = locations,
                         BoundaryLevels = boundaryLevels,
                         PublicationName = publication.Title,
-                        SubjectName = subject.Name,
+                        SubjectName = subjectName,
                         TimePeriodRange = timePeriodRange
                     };
                 });

@@ -89,6 +89,8 @@ Validate absence_in_prus.csv file can be downloaded
 Validate headlines -- Summary tab key stats
     [Documentation]  DFE-915   EES-806   EES-1508
     [Tags]  HappyPath
+    user scrolls to element  xpath://h2[contains(text(), "Headline facts and figures")]
+
     user checks key stat contents    1  Overall absence rate         4.7%   Up from 4.6% in 2015/16   90
     user checks key stat definition  1  What is overall absence?  Total number of all authorised and unauthorised absences from possible school sessions for all pupils.
 
@@ -206,7 +208,8 @@ Validate Regional and local authority (LA) breakdown table
     [Tags]  HappyPath   Failing
     [Documentation]  BAU-540
     user opens accordion section  Regional and local authority (LA) breakdown  id:content
-    user waits until element contains  css:#content_9_datablock-tables [data-testid="dataTableCaption"]    Table showing 'Absence by characteristic' from 'Pupil absence in schools in England' in
+    user waits until element contains  css:#content_9_datablock-tables [data-testid="dataTableCaption"]
+    ...  Table showing 'Absence by characteristic' from 'Pupil absence in schools in England' in  90
 
     user checks table column heading contains  1   1   2016/17  css:#content_9_datablock-tables table
 

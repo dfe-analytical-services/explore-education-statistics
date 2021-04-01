@@ -5,6 +5,7 @@ using System.Threading.Tasks;
 using GovUk.Education.ExploreEducationStatistics.Admin.ViewModels.Statistics;
 using GovUk.Education.ExploreEducationStatistics.Common.Extensions;
 using GovUk.Education.ExploreEducationStatistics.Common.Model;
+using GovUk.Education.ExploreEducationStatistics.Content.Model.Repository.Interfaces;
 using GovUk.Education.ExploreEducationStatistics.Data.Model;
 using GovUk.Education.ExploreEducationStatistics.Data.Model.Services.Interfaces;
 using GovUk.Education.ExploreEducationStatistics.Data.Services;
@@ -25,17 +26,20 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Controllers.Api.Stati
         private readonly IFootnoteService _footnoteService;
         private readonly IIndicatorGroupService _indicatorGroupService;
         private readonly IReleaseService _releaseService;
+        private readonly IReleaseDataFileRepository _releaseDataFileRepository;
         private static IComparer<string> LabelComparer { get; } = new LabelRelationalComparer();
 
         public FootnoteController(IFilterService filterService,
             IFootnoteService footnoteService,
             IIndicatorGroupService indicatorGroupService,
-            IReleaseService releaseService)
+            IReleaseService releaseService,
+            IReleaseDataFileRepository releaseDataFileRepository)
         {
             _filterService = filterService;
             _footnoteService = footnoteService;
             _indicatorGroupService = indicatorGroupService;
             _releaseService = releaseService;
+            _releaseDataFileRepository = releaseDataFileRepository;
         }
 
         [HttpPost("releases/{releaseId}/footnotes")]
@@ -103,21 +107,25 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Controllers.Api.Stati
         public async Task<ActionResult<FootnotesMetaViewModel>> GetFootnotesMeta(Guid releaseId)
         {
             return await _releaseService.GetRelease(releaseId)
-                .OnSuccess(model =>
+                .OnSuccess(async model =>
                 {
+                    var subjectMetaViewModels = await model.Subjects
+                        .SelectAsync(async subject =>
+                            new FootnotesSubjectMetaViewModel
+                            {
+                                Filters = GetFilters(subject.Id),
+                                Indicators = GetIndicators(subject.Id),
+                                SubjectId = subject.Id,
+                                SubjectName = (await _releaseDataFileRepository.GetBySubject(releaseId, subject.Id)).Name,
+                            }
+                        );
+
                     return new FootnotesMetaViewModel
                     {
-                        Subjects = model.Subjects.ToDictionary(
-                            subject => subject.Id,
-                            subject =>
-                                new FootnotesSubjectMetaViewModel
-                                {
-                                    Filters = GetFilters(subject.Id),
-                                    Indicators = GetIndicators(subject.Id),
-                                    SubjectId = subject.Id,
-                                    SubjectName = subject.Name
-                                }
-                        )
+                        Subjects = subjectMetaViewModels
+                            .ToDictionary(
+                                result => result.SubjectId, 
+                                result => result)
                     };
                 })
                 .HandleFailuresOrOk();

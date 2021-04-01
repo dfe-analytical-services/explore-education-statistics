@@ -16,6 +16,8 @@ using GovUk.Education.ExploreEducationStatistics.Common.Utils;
 using GovUk.Education.ExploreEducationStatistics.Content.Model;
 using GovUk.Education.ExploreEducationStatistics.Content.Model.Database;
 using GovUk.Education.ExploreEducationStatistics.Content.Model.Extensions;
+using GovUk.Education.ExploreEducationStatistics.Content.Model.Repository;
+using GovUk.Education.ExploreEducationStatistics.Content.Model.Repository.Interfaces;
 using GovUk.Education.ExploreEducationStatistics.Data.Model;
 using GovUk.Education.ExploreEducationStatistics.Data.Model.Database;
 using Microsoft.AspNetCore.Http;
@@ -40,6 +42,12 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
 {
     public class ReleaseDataFileServiceTest
     {
+        private readonly User _user = new User
+        {
+            Id = Guid.NewGuid(),
+            Email = "test@test.com"
+        };
+
         [Fact]
         public async Task Delete()
         {
@@ -839,53 +847,46 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
         [Fact]
         public async Task GetInfo()
         {
-            var release = new Release();
-
-            var subject = new Subject
-            {
-                Id = Guid.NewGuid(),
-                Name = "Test data",
-            };
-
-            var dataFile = new File
-            {
-                RootPath = Guid.NewGuid(),
-                Filename = "test-data.csv",
-                Type = FileType.Data,
-                SubjectId = subject.Id
-            };
-            var metaFile = new File
-            {
-                RootPath = Guid.NewGuid(),
-                Filename = "test-data.meta.csv",
-                Type = Metadata,
-                SubjectId = subject.Id
-            };
-
-            var contentDbContextId = Guid.NewGuid().ToString();
+            var subject = new Subject();
             var statisticsDbContextId = Guid.NewGuid().ToString();
-
-            await using (var contentDbContext = InMemoryApplicationDbContext(contentDbContextId))
-            {
-                await contentDbContext.AddRangeAsync(
-                    new ReleaseFile
-                    {
-                        Release = release,
-                        File = dataFile
-                    },
-                    new ReleaseFile
-                    {
-                        Release = release,
-                        File = metaFile
-                    }
-                );
-                await contentDbContext.SaveChangesAsync();
-            }
-
             await using (var statisticsDbContext = InMemoryStatisticsDbContext(statisticsDbContextId))
             {
                 await statisticsDbContext.AddAsync(subject);
                 await statisticsDbContext.SaveChangesAsync();
+            }
+
+            var release = new Release();
+            var dataReleaseFile = new ReleaseFile
+            {
+                Name = "Test data",
+                Release = release,
+                File = new File
+                {
+                    RootPath = Guid.NewGuid(),
+                    Filename = "test-data.csv",
+                    Type = FileType.Data,
+                    SubjectId = subject.Id,
+                    Created = DateTime.UtcNow,
+                    CreatedById = _user.Id
+                }
+            };
+            var metaReleaseFile = new ReleaseFile
+            {
+                Release = release,
+                File = new File
+                {
+                    RootPath = Guid.NewGuid(),
+                    Filename = "test-data.meta.csv",
+                    Type = Metadata,
+                    SubjectId = subject.Id
+                }
+            };
+
+            var contentDbContextId = Guid.NewGuid().ToString();
+            await using (var contentDbContext = InMemoryApplicationDbContext(contentDbContextId))
+            {
+                await contentDbContext.AddRangeAsync(dataReleaseFile, metaReleaseFile);
+                await contentDbContext.SaveChangesAsync();
             }
 
             var blobStorageService = new Mock<IBlobStorageService>(MockBehavior.Strict);
@@ -895,29 +896,27 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
             await using (var statisticsDbContext = InMemoryStatisticsDbContext(statisticsDbContextId))
             {
                 blobStorageService
-                    .Setup(s => s.CheckBlobExists(PrivateReleaseFiles, dataFile.Path()))
+                    .Setup(s => s.CheckBlobExists(PrivateReleaseFiles, dataReleaseFile.Path()))
                     .ReturnsAsync(true);
 
                 blobStorageService
-                    .Setup(s => s.GetBlob(PrivateReleaseFiles, dataFile.Path()))
+                    .Setup(s => s.GetBlob(PrivateReleaseFiles, dataReleaseFile.Path()))
                     .ReturnsAsync(
                         new BlobInfo(
-                            path: dataFile.Path(),
+                            path: dataReleaseFile.Path(),
                             size: "400 B",
                             contentType: "text/csv",
                             contentLength: 400L,
                             meta: GetDataFileMetaValues(
                                 name: "Test data file name",
                                 metaFileName: "test-data.meta.csv",
-                                userName: "test@test.com",
                                 numberOfRows: 200
-                            ),
-                            created: DateTimeOffset.Parse("2020-09-16T12:00:00Z")
+                            )
                         )
                     );
 
                 dataImportService
-                    .Setup(s => s.GetStatus(dataFile.Id))
+                    .Setup(s => s.GetStatus(dataReleaseFile.File.Id))
                     .ReturnsAsync(COMPLETE);
 
                 var service = SetupReleaseDataFileService(
@@ -929,7 +928,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
 
                 var result = await service.GetInfo(
                     release.Id,
-                    dataFile.Id
+                    dataReleaseFile.File.Id
                 );
 
                 Assert.True(result.IsRight);
@@ -938,17 +937,17 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
 
                 var fileInfo = result.Right;
 
-                Assert.Equal(dataFile.Id, fileInfo.Id);
+                Assert.Equal(dataReleaseFile.File.Id, fileInfo.Id);
                 Assert.Equal("Test data", fileInfo.Name);
                 Assert.Equal("test-data.csv", fileInfo.FileName);
                 Assert.Equal("csv", fileInfo.Extension);
-                Assert.Equal(dataFile.Path(), fileInfo.Path);
-                Assert.Equal(metaFile.Id, fileInfo.MetaFileId);
+                Assert.Equal(dataReleaseFile.Path(), fileInfo.Path);
+                Assert.Equal(metaReleaseFile.File.Id, fileInfo.MetaFileId);
                 Assert.Equal("test-data.meta.csv", fileInfo.MetaFileName);
-                Assert.Equal("test@test.com", fileInfo.UserName);
+                Assert.Equal(_user.Email, fileInfo.UserName);
                 Assert.Equal(200, fileInfo.Rows);
                 Assert.Equal("400 B", fileInfo.Size);
-                Assert.Equal(DateTimeOffset.Parse("2020-09-16T12:00:00Z"), fileInfo.Created);
+                Assert.Equal(dataReleaseFile.File.Created, fileInfo.Created);
                 Assert.Equal(COMPLETE, fileInfo.Status);
             }
         }
@@ -956,53 +955,49 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
         [Fact]
         public async Task GetInfo_MixedCaseFilename()
         {
-            var release = new Release();
+            var subject = new Subject();
 
-            var subject = new Subject
-            {
-                Id = Guid.NewGuid(),
-                Name = "Test data"
-            };
-
-            var dataFile = new File
-            {
-                RootPath = Guid.NewGuid(),
-                Filename = "Test data 1.csv",
-                Type = FileType.Data,
-                SubjectId = subject.Id
-            };
-            var metaFile = new File
-            {
-                RootPath = Guid.NewGuid(),
-                Filename = "Test data 1.meta.csv",
-                Type = Metadata,
-                SubjectId = subject.Id
-            };
-
-            var contentDbContextId = Guid.NewGuid().ToString();
             var statisticsDbContextId = Guid.NewGuid().ToString();
-            
-            await using (var contentDbContext = InMemoryApplicationDbContext(contentDbContextId))
-            {
-                await contentDbContext.AddRangeAsync(
-                    new ReleaseFile
-                    {
-                        Release = release,
-                        File = dataFile
-                    },
-                    new ReleaseFile
-                    {
-                        Release = release,
-                        File = metaFile
-                    }
-                );
-                await contentDbContext.SaveChangesAsync();
-            }
-
             await using (var statisticsDbContext = InMemoryStatisticsDbContext(statisticsDbContextId))
             {
                 await statisticsDbContext.AddAsync(subject);
                 await statisticsDbContext.SaveChangesAsync();
+            }
+
+            var release = new Release();
+
+            var dataReleaseFile = new ReleaseFile
+            {
+                Release = release,
+                Name = "Test data",
+                File = new File
+                {
+                    RootPath = Guid.NewGuid(),
+                    Filename = "Test data 1.csv",
+                    Type = FileType.Data,
+                    SubjectId = subject.Id,
+                    Created = DateTime.UtcNow,
+                    CreatedById = _user.Id
+                }
+            };
+            var metaReleaseFile = new ReleaseFile
+            {
+                Release = release,
+                File = new File
+                {
+                    RootPath = Guid.NewGuid(),
+                    Filename = "Test data 1.meta.csv",
+                    Type = Metadata,
+                    SubjectId = subject.Id
+                }
+            };
+
+            
+            var contentDbContextId = Guid.NewGuid().ToString();
+            await using (var contentDbContext = InMemoryApplicationDbContext(contentDbContextId))
+            {
+                await contentDbContext.AddRangeAsync(dataReleaseFile, metaReleaseFile);
+                await contentDbContext.SaveChangesAsync();
             }
 
             var blobStorageService = new Mock<IBlobStorageService>(MockBehavior.Strict);
@@ -1012,14 +1007,14 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
             await using (var statisticsDbContext = InMemoryStatisticsDbContext(statisticsDbContextId))
             {
                 blobStorageService
-                    .Setup(s => s.CheckBlobExists(PrivateReleaseFiles, dataFile.Path()))
+                    .Setup(s => s.CheckBlobExists(PrivateReleaseFiles, dataReleaseFile.Path()))
                     .ReturnsAsync(true);
 
                 blobStorageService
-                    .Setup(s => s.GetBlob(PrivateReleaseFiles, dataFile.Path()))
+                    .Setup(s => s.GetBlob(PrivateReleaseFiles, dataReleaseFile.Path()))
                     .ReturnsAsync(
                         new BlobInfo(
-                            path: dataFile.Path(),
+                            path: dataReleaseFile.Path(),
                             size: "400 B",
                             contentType: "text/csv",
                             contentLength: 400L,
@@ -1028,15 +1023,13 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
                             {
                                 {BlobInfoExtensions.NameKey, "Test data file name"},
                                 {BlobInfoExtensions.MetaFileKey, "Test data 1.meta.csv"},
-                                {BlobInfoExtensions.UserNameKey, "test@test.com"},
                                 {BlobInfoExtensions.NumberOfRowsKey, "200"}
-                            },
-                            created: DateTimeOffset.Parse("2020-09-16T12:00:00Z")
+                            }
                         )
                     );
 
                 dataImportService
-                    .Setup(s => s.GetStatus(dataFile.Id))
+                    .Setup(s => s.GetStatus(dataReleaseFile.File.Id))
                     .ReturnsAsync(COMPLETE);
 
                 var service = SetupReleaseDataFileService(
@@ -1048,7 +1041,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
 
                 var result = await service.GetInfo(
                     release.Id,
-                    dataFile.Id
+                    dataReleaseFile.File.Id
                 );
 
                 Assert.True(result.IsRight);
@@ -1057,17 +1050,17 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
 
                 var fileInfo = result.Right;
 
-                Assert.Equal(dataFile.Id, fileInfo.Id);
+                Assert.Equal(dataReleaseFile.File.Id, fileInfo.Id);
                 Assert.Equal("Test data", fileInfo.Name);
                 Assert.Equal("Test data 1.csv", fileInfo.FileName);
                 Assert.Equal("csv", fileInfo.Extension);
-                Assert.Equal(dataFile.Path(), fileInfo.Path);
-                Assert.Equal(metaFile.Id, fileInfo.MetaFileId);
+                Assert.Equal(dataReleaseFile.Path(), fileInfo.Path);
+                Assert.Equal(metaReleaseFile.File.Id, fileInfo.MetaFileId);
                 Assert.Equal("Test data 1.meta.csv", fileInfo.MetaFileName);
-                Assert.Equal("test@test.com", fileInfo.UserName);
+                Assert.Equal(_user.Email, fileInfo.UserName);
                 Assert.Equal(200, fileInfo.Rows);
                 Assert.Equal("400 B", fileInfo.Size);
-                Assert.Equal(DateTimeOffset.Parse("2020-09-16T12:00:00Z"), fileInfo.Created);
+                Assert.Equal(dataReleaseFile.File.Created, fileInfo.Created);
                 Assert.Equal(COMPLETE, fileInfo.Status);
             }
         }
@@ -1120,7 +1113,8 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
             {
                 RootPath = Guid.NewGuid(),
                 Filename = "test-data.csv",
-                Type = FileType.Data
+                Type = FileType.Data,
+                CreatedById = _user.Id
             };
             var metaFile = new File
             {
@@ -1166,54 +1160,48 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
         [Fact]
         public async Task GetInfo_NoMatchingBlob()
         {
-            var release = new Release();
-            var subject = new Subject
-            {
-                Id = Guid.NewGuid(),
-                Name = "Test data"
-            };
-            var dataFile = new File
-            {
-                RootPath = Guid.NewGuid(),
-                SubjectId = subject.Id,
-                Filename = "test-data.csv",
-                Type = FileType.Data
-            };
-            var metaFile = new File
-            {
-                RootPath = Guid.NewGuid(),
-                SubjectId = subject.Id,
-                Filename = "test-data.meta.csv",
-                Type = Metadata
-            };
-
-            var contentDbContextId = Guid.NewGuid().ToString();
+            var subject = new Subject();
             var statisticsDbContextId = Guid.NewGuid().ToString();
-
-            await using (var contentDbContext = InMemoryApplicationDbContext(contentDbContextId))
-            {
-                await contentDbContext.AddRangeAsync(
-                    new ReleaseFile
-                    {
-                        Release = release,
-                        File = dataFile
-                    },
-                    new ReleaseFile
-                    {
-                        Release = release,
-                        File = metaFile
-                    }
-                );
-
-                await contentDbContext.SaveChangesAsync();
-            }
-            
             await using (var statisticsDbContext = InMemoryStatisticsDbContext(statisticsDbContextId))
             {
                 await statisticsDbContext.AddAsync(subject);
                 await statisticsDbContext.SaveChangesAsync();
             }
 
+            var release = new Release();
+            var dataReleaseFile = new ReleaseFile
+            {
+                Release = release,
+                Name = "Test data",
+                File = new File
+                {
+                    RootPath = Guid.NewGuid(),
+                    SubjectId = subject.Id,
+                    Filename = "test-data.csv",
+                    Type = FileType.Data,
+                    Created = DateTime.UtcNow,
+                    CreatedById = _user.Id
+                }
+            };
+            var metaReleaseFile = new ReleaseFile
+            {
+                Release = release,
+                File = new File
+                {
+                    RootPath = Guid.NewGuid(),
+                    SubjectId = subject.Id,
+                    Filename = "test-data.meta.csv",
+                    Type = Metadata
+                }
+            };
+
+            var contentDbContextId = Guid.NewGuid().ToString();
+            await using (var contentDbContext = InMemoryApplicationDbContext(contentDbContextId))
+            {
+                await contentDbContext.AddRangeAsync(dataReleaseFile, metaReleaseFile);
+                await contentDbContext.SaveChangesAsync();
+            }
+            
             var blobStorageService = new Mock<IBlobStorageService>(MockBehavior.Strict);
             var dataImportService = new Mock<IDataImportService>(MockBehavior.Strict);
 
@@ -1221,11 +1209,11 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
             await using (var statisticsDbContext = InMemoryStatisticsDbContext(statisticsDbContextId))
             {
                 blobStorageService
-                    .Setup(s => s.CheckBlobExists(PrivateReleaseFiles, dataFile.Path()))
+                    .Setup(s => s.CheckBlobExists(PrivateReleaseFiles, dataReleaseFile.Path()))
                     .ReturnsAsync(false);
 
                 dataImportService
-                    .Setup(s => s.GetStatus(dataFile.Id))
+                    .Setup(s => s.GetStatus(dataReleaseFile.File.Id))
                     .ReturnsAsync(STAGE_1);
 
                 var service = SetupReleaseDataFileService(
@@ -1237,7 +1225,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
 
                 var result = await service.GetInfo(
                     release.Id,
-                    dataFile.Id
+                    dataReleaseFile.File.Id
                 );
 
                 Assert.True(result.IsRight);
@@ -1246,16 +1234,17 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
 
                 var fileInfo = result.Right;
 
-                Assert.Equal(dataFile.Id, fileInfo.Id);
+                Assert.Equal(dataReleaseFile.File.Id, fileInfo.Id);
                 Assert.Equal("Test data", fileInfo.Name);
                 Assert.Equal("test-data.csv", fileInfo.FileName);
                 Assert.Equal("csv", fileInfo.Extension);
                 Assert.Equal("test-data.csv", fileInfo.Path);
-                Assert.Equal(metaFile.Id, fileInfo.MetaFileId);
+                Assert.Equal(metaReleaseFile.File.Id, fileInfo.MetaFileId);
                 Assert.Equal("test-data.meta.csv", fileInfo.MetaFileName);
-                Assert.Equal("", fileInfo.UserName);
+                Assert.Equal(_user.Email, fileInfo.UserName);
                 Assert.Equal(0, fileInfo.Rows);
                 Assert.Equal("0.00 B", fileInfo.Size);
+                Assert.Equal(dataReleaseFile.File.Created, fileInfo.Created);
                 Assert.Equal(STAGE_1, fileInfo.Status);
             }
         }
@@ -1269,44 +1258,41 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
             {
                 RootPath = Guid.NewGuid(),
                 Filename = "test-data-archive.zip",
-                Type = DataZip,
+                Type = DataZip
             };
-            var dataFile = new File
+            var dataReleaseFile = new ReleaseFile
             {
-                RootPath = Guid.NewGuid(),
-                Filename = "test-data.csv",
-                Type = FileType.Data,
-                Source = zipFile
+                Release = release,
+                Name = "Test data",
+                File = new File
+                {
+                    RootPath = Guid.NewGuid(),
+                    Filename = "test-data.csv",
+                    Type = FileType.Data,
+                    Source = zipFile,
+                    Created = DateTime.UtcNow,
+                    CreatedById = _user.Id
+                }
+            };
+            var metaReleaseFile = new ReleaseFile
+            {
+                Release = release,
+                File = new File
+                {
+                    RootPath = Guid.NewGuid(),
+                    Filename = "test-data.meta.csv",
+                    Type = Metadata,
+                    Source = zipFile,
+                }
             };
 
             var contentDbContextId = Guid.NewGuid().ToString();
-
             await using (var contentDbContext = InMemoryApplicationDbContext(contentDbContextId))
             {
                 await contentDbContext.AddRangeAsync(
-                    new ReleaseFile
-                    {
-                        Release = release,
-                        File = dataFile
-                    },
-                    new ReleaseFile
-                    {
-                        Release = release,
-                        File = zipFile
-                    },
-                    new ReleaseFile
-                    {
-                        Release = release,
-                        File = new File
-                        {
-                            RootPath = Guid.NewGuid(),
-                            Filename = "test-data.meta.csv",
-                            Type = Metadata,
-                            Source = zipFile
-                        }
-                    }
-                );
-
+                    zipFile,
+                    dataReleaseFile,
+                    metaReleaseFile);
                 await contentDbContext.SaveChangesAsync();
             }
 
@@ -1316,7 +1302,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
             await using (var contentDbContext = InMemoryApplicationDbContext(contentDbContextId))
             {
                 blobStorageService
-                    .Setup(s => s.CheckBlobExists(PrivateReleaseFiles, dataFile.Path()))
+                    .Setup(s => s.CheckBlobExists(PrivateReleaseFiles, dataReleaseFile.Path()))
                     .ReturnsAsync(false);
 
                 blobStorageService
@@ -1334,15 +1320,13 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
                             meta: GetDataFileMetaValues(
                                 name: "Test data",
                                 metaFileName: "test-data.meta.csv",
-                                userName: "test@test.com",
                                 numberOfRows: 0
-                            ),
-                            created: DateTimeOffset.Parse("2020-09-16T12:00:00Z")
+                            )
                         )
                     );
 
                 dataImportService
-                    .Setup(s => s.GetStatus(dataFile.Id))
+                    .Setup(s => s.GetStatus(dataReleaseFile.File.Id))
                     .ReturnsAsync(PROCESSING_ARCHIVE_FILE);
 
                 var service = SetupReleaseDataFileService(
@@ -1353,7 +1337,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
 
                 var result = await service.GetInfo(
                     release.Id,
-                    dataFile.Id
+                    dataReleaseFile.File.Id
                 );
 
                 Assert.True(result.IsRight);
@@ -1362,16 +1346,17 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
 
                 var fileInfo = result.Right;
 
-                Assert.Equal(dataFile.Id, fileInfo.Id);
+                Assert.Equal(dataReleaseFile.File.Id, fileInfo.Id);
                 Assert.Equal("Test data", fileInfo.Name);
                 Assert.Equal("test-data.csv", fileInfo.FileName);
                 Assert.Equal("csv", fileInfo.Extension);
                 Assert.Equal("test-data.csv", fileInfo.Path);
                 Assert.False(fileInfo.MetaFileId.HasValue);
                 Assert.Equal("test-data.meta.csv", fileInfo.MetaFileName);
-                Assert.Equal("test@test.com", fileInfo.UserName);
+                Assert.Equal(_user.Email, fileInfo.UserName);
                 Assert.Equal(0, fileInfo.Rows);
                 Assert.Equal(PROCESSING_ARCHIVE_FILE, fileInfo.Status);
+                Assert.Equal(dataReleaseFile.File.Created, fileInfo.Created);
                 Assert.Equal("1 Mb", fileInfo.Size);
             }
         }
@@ -1379,21 +1364,26 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
         [Fact]
         public async Task GetInfo_AmendedRelease()
         {
+            var subject = new Subject();
+
+            var statisticsDbContextId = Guid.NewGuid().ToString();
+            await using (var statisticsDbContext = InMemoryStatisticsDbContext(statisticsDbContextId))
+            {
+                await statisticsDbContext.AddAsync(subject);
+                await statisticsDbContext.SaveChangesAsync();
+            }
+
             var originalRelease = new Release();
             var amendedRelease = new Release();
-
-            var subject = new Subject
-            {
-                Id = Guid.NewGuid(),
-                Name = "Test data"
-            };
 
             var dataFile = new File
             {
                 RootPath = Guid.NewGuid(),
                 Filename = "test-data.csv",
                 Type = FileType.Data,
-                SubjectId = subject.Id
+                SubjectId = subject.Id,
+                Created = DateTime.UtcNow,
+                CreatedById = _user.Id
             };
             var metaFile = new File
             {
@@ -1403,44 +1393,39 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
                 SubjectId = subject.Id
             };
 
-            var contentDbContextId = Guid.NewGuid().ToString();
-            var statisticsDbContextId = Guid.NewGuid().ToString();
+            var dataOriginalReleaseFile = new ReleaseFile
+            {
+                Release = originalRelease,
+                Name = "Test data",
+                File = dataFile,
+            };
+            var metaOriginalReleaseFile = new ReleaseFile
+            {
+                Release = originalRelease,
+                File = metaFile,
+            };
 
+            var dataAmendedReleaseFile = new ReleaseFile
+            {
+                Release = amendedRelease,
+                Name = "Test data amended",
+                File = dataFile,
+            };
+            var metaAmendedReleaseFile = new ReleaseFile
+            {
+                Release = amendedRelease,
+                File = metaFile,
+            };
+
+            var contentDbContextId = Guid.NewGuid().ToString();
             await using (var contentDbContext = InMemoryApplicationDbContext(contentDbContextId))
             {
-                await contentDbContext.AddRangeAsync(dataFile, metaFile);
                 await contentDbContext.AddRangeAsync(
-                    new ReleaseFile
-                    {
-                        Release = originalRelease,
-                        File = dataFile
-                    },
-                    new ReleaseFile
-                    {
-                        Release = originalRelease,
-                        File = metaFile
-                    }
-                );
-                await contentDbContext.AddRangeAsync(
-                    new ReleaseFile
-                    {
-                        Release = amendedRelease,
-                        File = dataFile
-                    },
-                    new ReleaseFile
-                    {
-                        Release = amendedRelease,
-                        File = metaFile
-                    }
-                );
-
+                    dataOriginalReleaseFile,
+                    dataAmendedReleaseFile,
+                    metaOriginalReleaseFile,
+                    metaAmendedReleaseFile);
                 await contentDbContext.SaveChangesAsync();
-            }
-
-            await using (var statisticsDbContext = InMemoryStatisticsDbContext(statisticsDbContextId))
-            {
-                await statisticsDbContext.AddAsync(subject);
-                await statisticsDbContext.SaveChangesAsync();
             }
 
             var blobStorageService = new Mock<IBlobStorageService>(MockBehavior.Strict);
@@ -1464,10 +1449,8 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
                             meta: GetDataFileMetaValues(
                                 name: "Test data file name",
                                 metaFileName: "test-data.meta.csv",
-                                userName: "test@test.com",
                                 numberOfRows: 200
-                            ),
-                            created: DateTimeOffset.Parse("2020-09-16T12:00:00Z")
+                            )
                         )
                     );
 
@@ -1494,16 +1477,16 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
                 var fileInfo = result.Right;
 
                 Assert.Equal(dataFile.Id, fileInfo.Id);
-                Assert.Equal("Test data", fileInfo.Name);
+                Assert.Equal("Test data amended", fileInfo.Name);
                 Assert.Equal("test-data.csv", fileInfo.FileName);
                 Assert.Equal("csv", fileInfo.Extension);
                 Assert.Equal(dataFile.Path(), fileInfo.Path);
                 Assert.Equal(metaFile.Id, fileInfo.MetaFileId);
                 Assert.Equal("test-data.meta.csv", fileInfo.MetaFileName);
-                Assert.Equal("test@test.com", fileInfo.UserName);
+                Assert.Equal(_user.Email, fileInfo.UserName);
                 Assert.Equal(200, fileInfo.Rows);
                 Assert.Equal("400 B", fileInfo.Size);
-                Assert.Equal(DateTimeOffset.Parse("2020-09-16T12:00:00Z"), fileInfo.Created);
+                Assert.Equal(dataFile.Created, fileInfo.Created);
                 Assert.Equal(COMPLETE, fileInfo.Status);
             }
         }
@@ -1511,81 +1494,76 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
         [Fact]
         public async Task ListAll()
         {
-            var release = new Release();
-            var subject1 = new Subject
-            {
-                Id = Guid.NewGuid(),
-                Name = "Test subject 1"
-            };
-            var subject2 = new Subject
-            {
-                Id = Guid.NewGuid(),
-                Name = "Test subject 2"
-            };
-
-            var dataFile1 = new File
-            {
-                RootPath = Guid.NewGuid(),
-                Filename = "test-data-1.csv",
-                Type = FileType.Data,
-                SubjectId = subject1.Id
-            };
-            var metaFile1 = new File
-            {
-                RootPath = Guid.NewGuid(),
-                Filename = "test-data-1.meta.csv",
-                Type = Metadata,
-                SubjectId = subject1.Id
-            };
-            var dataFile2 = new File
-            {
-                RootPath = Guid.NewGuid(),
-                Filename = "Test data 2.csv",
-                Type = FileType.Data,
-                SubjectId = subject2.Id
-            };
-            var metaFile2 = new File
-            {
-                RootPath = Guid.NewGuid(),
-                Filename = "Test data 2.meta.csv",
-                Type = Metadata,
-                SubjectId = subject2.Id
-            };
-
-            var contentDbContextId = Guid.NewGuid().ToString();
+            var subject1 = new Subject();
+            var subject2 = new Subject();
             var statisticsDbContextId = Guid.NewGuid().ToString();
-
-            await using (var contentDbContext = InMemoryApplicationDbContext(contentDbContextId))
-            {
-                await contentDbContext.AddRangeAsync(
-                    new ReleaseFile
-                    {
-                        Release = release,
-                        File = dataFile1
-                    },
-                    new ReleaseFile
-                    {
-                        Release = release,
-                        File = metaFile1
-                    },
-                    new ReleaseFile
-                    {
-                        Release = release,
-                        File = dataFile2
-                    },
-                    new ReleaseFile
-                    {
-                        Release = release,
-                        File = metaFile2
-                    }
-                );
-                await contentDbContext.SaveChangesAsync();
-            }
-
             await using (var statisticsDbContext = InMemoryStatisticsDbContext(statisticsDbContextId))
             {
                 await statisticsDbContext.AddRangeAsync(subject1, subject2);
                 await statisticsDbContext.SaveChangesAsync();
+            }
+
+            var release = new Release();
+            var dataReleaseFile1 = new ReleaseFile
+            {
+                Release = release,
+                Name = "Test subject 1",
+                File = new File
+                {
+                    RootPath = Guid.NewGuid(),
+                    Filename = "test-data-1.csv",
+                    Type = FileType.Data,
+                    SubjectId = subject1.Id,
+                    Created = DateTime.UtcNow,
+                    CreatedById = _user.Id
+                }
+            };
+            var metaReleaseFile1 = new ReleaseFile
+            {
+                Release = release,
+                File = new File
+                {
+                    RootPath = Guid.NewGuid(),
+                    Filename = "test-data-1.meta.csv",
+                    Type = Metadata,
+                    SubjectId = subject1.Id
+                }
+            };
+            var dataReleaseFile2 = new ReleaseFile
+            {
+                Release = release,
+                Name = "Test subject 2",
+                File = new File
+                {
+                    RootPath = Guid.NewGuid(),
+                    Filename = "Test data 2.csv",
+                    Type = FileType.Data,
+                    SubjectId = subject2.Id,
+                    Created = DateTime.UtcNow,
+                    CreatedById = _user.Id
+                }
+            };
+            var metaReleaseFile2 = new ReleaseFile
+            {
+                Release = release,
+                File = new File
+                {
+                    RootPath = Guid.NewGuid(),
+                    Filename = "Test data 2.meta.csv",
+                    Type = Metadata,
+                    SubjectId = subject2.Id
+                }
+            };
+
+            var contentDbContextId = Guid.NewGuid().ToString();
+            await using (var contentDbContext = InMemoryApplicationDbContext(contentDbContextId))
+            {
+                await contentDbContext.AddRangeAsync(
+                    dataReleaseFile1,
+                    metaReleaseFile1,
+                    dataReleaseFile2,
+                    metaReleaseFile2);
+                await contentDbContext.SaveChangesAsync();
             }
 
             var blobStorageService = new Mock<IBlobStorageService>(MockBehavior.Strict);
@@ -1596,31 +1574,30 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
             {
                 blobStorageService
                     .Setup(s => s.CheckBlobExists(PrivateReleaseFiles, It.IsIn(
-                        dataFile1.Path(), dataFile2.Path())))
+                        dataReleaseFile1.Path(), dataReleaseFile2.Path())))
                     .ReturnsAsync(true);
 
                 blobStorageService
-                    .Setup(s => s.GetBlob(PrivateReleaseFiles, dataFile1.Path()))
+                    .Setup(s => s.GetBlob(PrivateReleaseFiles, dataReleaseFile1.Path()))
                     .ReturnsAsync(
                         new BlobInfo(
-                            path: dataFile1.Path(),
+                            path: dataReleaseFile1.Path(),
                             size: "400 B",
                             contentType: "text/csv",
                             contentLength: 400L,
                             GetDataFileMetaValues(
                                 name: "Test data file 1",
                                 metaFileName: "test-data-1.meta.csv",
-                                userName: "test1@test.com",
                                 numberOfRows: 200
                             )
                         )
                     );
 
                 blobStorageService
-                    .Setup(s => s.GetBlob(PrivateReleaseFiles, dataFile2.Path()))
+                    .Setup(s => s.GetBlob(PrivateReleaseFiles, dataReleaseFile2.Path()))
                     .ReturnsAsync(
                         new BlobInfo(
-                            path: dataFile2.Path(),
+                            path: dataReleaseFile2.Path(),
                             size: "800 B",
                             contentType: "text/csv",
                             contentLength: 800L,
@@ -1629,18 +1606,17 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
                             {
                                 {BlobInfoExtensions.NameKey, "Test data file 2"},
                                 {BlobInfoExtensions.MetaFileKey, "Test data 2.meta.csv"},
-                                {BlobInfoExtensions.UserNameKey, "test2@test.com"},
                                 {BlobInfoExtensions.NumberOfRowsKey, "400"}
                             }
                         )
                     );
 
                 dataImportService
-                    .Setup(s => s.GetStatus(dataFile1.Id))
+                    .Setup(s => s.GetStatus(dataReleaseFile1.File.Id))
                     .ReturnsAsync(COMPLETE);
 
                 dataImportService
-                    .Setup(s => s.GetStatus(dataFile2.Id))
+                    .Setup(s => s.GetStatus(dataReleaseFile2.File.Id))
                     .ReturnsAsync(STAGE_2);
 
                 var service = SetupReleaseDataFileService(
@@ -1660,28 +1636,30 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
 
                 Assert.Equal(2, files.Count);
 
-                Assert.Equal(dataFile1.Id, files[0].Id);
+                Assert.Equal(dataReleaseFile1.File.Id, files[0].Id);
                 Assert.Equal("Test subject 1", files[0].Name);
                 Assert.Equal("test-data-1.csv", files[0].FileName);
                 Assert.Equal("csv", files[0].Extension);
-                Assert.Equal(dataFile1.Path(), files[0].Path);
-                Assert.Equal(metaFile1.Id, files[0].MetaFileId);
+                Assert.Equal(dataReleaseFile1.Path(), files[0].Path);
+                Assert.Equal(metaReleaseFile1.File.Id, files[0].MetaFileId);
                 Assert.Equal("test-data-1.meta.csv", files[0].MetaFileName);
-                Assert.Equal("test1@test.com", files[0].UserName);
+                Assert.Equal(_user.Email, files[0].UserName);
                 Assert.Equal(200, files[0].Rows);
                 Assert.Equal("400 B", files[0].Size);
+                Assert.Equal(dataReleaseFile1.File.Created, files[0].Created);
                 Assert.Equal(COMPLETE, files[0].Status);
 
-                Assert.Equal(dataFile2.Id, files[1].Id);
+                Assert.Equal(dataReleaseFile2.File.Id, files[1].Id);
                 Assert.Equal("Test subject 2", files[1].Name);
                 Assert.Equal("Test data 2.csv", files[1].FileName);
                 Assert.Equal("csv", files[1].Extension);
-                Assert.Equal(dataFile2.Path(), files[1].Path);
-                Assert.Equal(metaFile2.Id, files[1].MetaFileId);
+                Assert.Equal(dataReleaseFile2.Path(), files[1].Path);
+                Assert.Equal(metaReleaseFile2.File.Id, files[1].MetaFileId);
                 Assert.Equal("Test data 2.meta.csv", files[1].MetaFileName);
-                Assert.Equal("test2@test.com", files[1].UserName);
+                Assert.Equal(_user.Email, files[1].UserName);
                 Assert.Equal(400, files[1].Rows);
                 Assert.Equal("800 B", files[1].Size);
+                Assert.Equal(dataReleaseFile2.File.Created, files[1].Created);
                 Assert.Equal(STAGE_2, files[1].Status);
             }
         }
@@ -1689,87 +1667,88 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
         [Fact]
         public async Task ListAll_FiltersCorrectly()
         {
-            var release = new Release();
-
-            var subject = new Subject
-            {
-                Id = Guid.NewGuid(),
-                Name = "Test data"
-            };
-
-            var dataFile = new File
-            {
-                RootPath = Guid.NewGuid(),
-                Filename = "test-data-1.csv",
-                Type = FileType.Data,
-                SubjectId = subject.Id
-            };
-            var metaFile = new File
-            {
-                RootPath = Guid.NewGuid(),
-                Filename = "test-data-1.meta.csv",
-                Type = Metadata,
-                SubjectId = subject.Id
-            };
-
-            var contentDbContextId = Guid.NewGuid().ToString();
+            var subject = new Subject();
             var statisticsDbContextId = Guid.NewGuid().ToString();
-
-            await using (var contentDbContext = InMemoryApplicationDbContext(contentDbContextId))
-            {
-                var otherRelease = new Release();
-
-                await contentDbContext.AddRangeAsync(
-                    new ReleaseFile
-                    {
-                        Release = release,
-                        File = dataFile
-                    },
-                    new ReleaseFile
-                    {
-                        Release = release,
-                        File = metaFile
-                    },
-                    // For other release
-                    new ReleaseFile
-                    {
-                        Release = otherRelease,
-                        File = new File
-                        {
-                            RootPath = Guid.NewGuid(),
-                            Filename = "test-data-2.csv",
-                            Type = FileType.Data
-                        }
-                    },
-                    new ReleaseFile
-                    {
-                        Release = otherRelease,
-                        File = new File
-                        {
-                            RootPath = Guid.NewGuid(),
-                            Filename = "test-data-2.meta.csv",
-                            Type = Metadata
-                        }
-                    },
-                    // Not the right type
-                    new ReleaseFile
-                    {
-                        Release = release,
-                        File = new File
-                        {
-                            RootPath = Guid.NewGuid(),
-                            Filename = "ancillary-file.pdf",
-                            Type = Ancillary
-                        }
-                    }
-                );
-                await contentDbContext.SaveChangesAsync();
-            }
-
             await using (var statisticsDbContext = InMemoryStatisticsDbContext(statisticsDbContextId))
             {
                 await statisticsDbContext.AddAsync(subject);
                 await statisticsDbContext.SaveChangesAsync();
+            }
+
+            var release1 = new Release();
+            var release2 = new Release();
+
+            var dataRelease1File = new ReleaseFile
+            {
+                Release = release1,
+                Name = "Test data",
+                File = new File
+                {
+                    RootPath = Guid.NewGuid(),
+                    Filename = "test-data-1.csv",
+                    Type = FileType.Data,
+                    SubjectId = subject.Id,
+                    Created = DateTime.UtcNow,
+                    CreatedById = _user.Id
+                }
+            };
+            var metaRelease1File = new ReleaseFile
+            {
+                Release = release1,
+                File = new File
+                {
+                    RootPath = Guid.NewGuid(),
+                    Filename = "test-data-1.meta.csv",
+                    Type = Metadata,
+                    SubjectId = subject.Id
+                }
+            };
+
+            var dataRelease2File = new ReleaseFile
+            {
+                Release = release2,
+                Name = "Test data 2",
+                File = new File
+                {
+                    RootPath = Guid.NewGuid(),
+                    Filename = "test-data-2.csv",
+                    Type = FileType.Data,
+                    CreatedById = _user.Id
+                }
+            };
+            var metaRelease2File = new ReleaseFile
+            {
+                Release = release2,
+                File = new File
+                {
+                    RootPath = Guid.NewGuid(),
+                    Filename = "test-data-2.meta.csv",
+                    Type = Metadata
+                }
+            };
+
+            var ancillaryRelease1File = new ReleaseFile
+            {
+                Release = release1,
+                File = new File
+                {
+                    RootPath = Guid.NewGuid(),
+                    Filename = "ancillary-file.pdf",
+                    Type = Ancillary
+                }
+            };
+
+            var contentDbContextId = Guid.NewGuid().ToString();
+            await using (var contentDbContext = InMemoryApplicationDbContext(contentDbContextId))
+            {
+
+                await contentDbContext.AddRangeAsync(
+                    dataRelease1File,
+                    metaRelease1File,
+                    dataRelease2File,
+                    metaRelease2File,
+                    ancillaryRelease1File); // Not FileType.Data
+                await contentDbContext.SaveChangesAsync();
             }
 
             var blobStorageService = new Mock<IBlobStorageService>();
@@ -1779,28 +1758,27 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
             await using (var statisticsDbContext = InMemoryStatisticsDbContext(statisticsDbContextId))
             {
                 blobStorageService
-                    .Setup(s => s.CheckBlobExists(PrivateReleaseFiles, dataFile.Path()))
+                    .Setup(s => s.CheckBlobExists(PrivateReleaseFiles, dataRelease1File.Path()))
                     .ReturnsAsync(true);
 
                 blobStorageService
-                    .Setup(s => s.GetBlob(PrivateReleaseFiles, dataFile.Path()))
+                    .Setup(s => s.GetBlob(PrivateReleaseFiles, dataRelease1File.Path()))
                     .ReturnsAsync(
                         new BlobInfo(
-                            path: dataFile.Path(),
+                            path: dataRelease1File.Path(),
                             size: "400 B",
                             contentType: "text/csv",
                             contentLength: 400L,
                             GetDataFileMetaValues(
                                 name: "Test data file 1",
                                 metaFileName: "test-data-1.meta.csv",
-                                userName: "test1@test.com",
                                 numberOfRows: 200
                             )
                         )
                     );
 
                 dataImportService
-                    .Setup(s => s.GetStatus(dataFile.Id))
+                    .Setup(s => s.GetStatus(dataRelease1File.File.Id))
                     .ReturnsAsync(COMPLETE);
 
                 var service = SetupReleaseDataFileService(
@@ -1810,7 +1788,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
                     dataImportService: dataImportService.Object
                 );
 
-                var result = await service.ListAll(release.Id);
+                var result = await service.ListAll(release1.Id);
 
                 Assert.True(result.IsRight);
 
@@ -1820,16 +1798,17 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
 
                 Assert.Single(files);
 
-                Assert.Equal(dataFile.Id, files[0].Id);
+                Assert.Equal(dataRelease1File.File.Id, files[0].Id);
                 Assert.Equal("Test data", files[0].Name);
                 Assert.Equal("test-data-1.csv", files[0].FileName);
                 Assert.Equal("csv", files[0].Extension);
-                Assert.Equal(dataFile.Path(), files[0].Path);
-                Assert.Equal(metaFile.Id, files[0].MetaFileId);
+                Assert.Equal(dataRelease1File.Path(), files[0].Path);
+                Assert.Equal(metaRelease1File.File.Id, files[0].MetaFileId);
                 Assert.Equal("test-data-1.meta.csv", files[0].MetaFileName);
-                Assert.Equal("test1@test.com", files[0].UserName);
+                Assert.Equal(_user.Email, files[0].UserName);
                 Assert.Equal(200, files[0].Rows);
                 Assert.Equal("400 B", files[0].Size);
+                Assert.Equal(dataRelease1File.File.Created, files[0].Created);
                 Assert.Equal(COMPLETE, files[0].Status);
             }
         }
@@ -1837,40 +1816,52 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
         [Fact]
         public async Task ListAll_AmendedRelease()
         {
+            var subject1 = new Subject();
+            var subject2 = new Subject();
+            var statisticsDbContextId = Guid.NewGuid().ToString();
+            await using (var statisticsDbContext = InMemoryStatisticsDbContext(statisticsDbContextId))
+            {
+                await statisticsDbContext.AddRangeAsync(subject1, subject2);
+                await statisticsDbContext.SaveChangesAsync();
+            }
+
             var originalRelease = new Release();
             var amendedRelease = new Release();
 
-            var subject1 = new Subject
+            var dataReleaseFile1 = new ReleaseFile
             {
-                Id = Guid.NewGuid(),
-                Name = "Test subject 1"
+                Release = originalRelease,
+                Name = "Test subject 1",
+                File = new File
+                {
+                    RootPath = Guid.NewGuid(),
+                    Filename = "test-data-1.csv",
+                    Type = FileType.Data,
+                    SubjectId = subject1.Id,
+                    Created = DateTime.UtcNow.AddDays(-1),
+                    CreatedById = _user.Id
+                }
             };
-            var subject2 = new Subject
+            var metaReleaseFile1 = new ReleaseFile
             {
-                Id = Guid.NewGuid(),
-                Name = "Test subject 2"
+                Release = originalRelease,
+                File = new File
+                {
+                    RootPath = Guid.NewGuid(),
+                    Filename = "test-data-1.meta.csv",
+                    Type = Metadata,
+                    SubjectId = subject1.Id
+                }
             };
 
-            var dataFile1 = new File
-            {
-                RootPath = Guid.NewGuid(),
-                Filename = "test-data-1.csv",
-                Type = FileType.Data,
-                SubjectId = subject1.Id
-            };
-            var metaFile1 = new File
-            {
-                RootPath = Guid.NewGuid(),
-                Filename = "test-data-1.meta.csv",
-                Type = Metadata,
-                SubjectId = subject1.Id
-            };
             var dataFile2 = new File
             {
                 RootPath = Guid.NewGuid(),
                 Filename = "test-data-2.csv",
                 Type = FileType.Data,
-                SubjectId = subject2.Id
+                SubjectId = subject2.Id,
+                Created = DateTime.UtcNow,
+                CreatedById = _user.Id
             };
             var metaFile2 = new File
             {
@@ -1879,55 +1870,42 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
                 Type = Metadata,
                 SubjectId = subject2.Id
             };
+            var dataOriginalReleaseFile2 = new ReleaseFile
+            {
+                Release = originalRelease,
+                Name = "Test subject 2",
+                File = dataFile2,
+            };
+            var metaOriginalReleaseFile2 = new ReleaseFile
+            {
+                Release = originalRelease,
+                File = metaFile2,
+            };
+            var dataAmendedReleaseFile2 = new ReleaseFile
+            {
+                Release = amendedRelease,
+                Name = "Test subject 2 name change",
+                File = dataFile2,
+            };
+            var metaAmendedReleaseFile2 = new ReleaseFile
+            {
+                Release = amendedRelease,
+                File = metaFile2,
+            };
+
 
             var contentDbContextId = Guid.NewGuid().ToString();
-            var statisticsDbContextId = Guid.NewGuid().ToString();
-
             await using (var contentDbContext = InMemoryApplicationDbContext(contentDbContextId))
             {
                 await contentDbContext.AddRangeAsync(
-                    new ReleaseFile
-                    {
-                        Release = originalRelease,
-                        File = dataFile1
-                    },
-                    new ReleaseFile
-                    {
-                        Release = originalRelease,
-                        File = metaFile1
-                    },
-                    new ReleaseFile
-                    {
-                        Release = originalRelease,
-                        File = dataFile2
-                    },
-                    new ReleaseFile
-                    {
-                        Release = originalRelease,
-                        File = metaFile2
-                    }
-                );
-                // Only second data file is attached to this release
-                await contentDbContext.AddRangeAsync(
-                    new ReleaseFile
-                    {
-                        Release = amendedRelease,
-                        File = dataFile2
-                    },
-                    new ReleaseFile
-                    {
-                        Release = amendedRelease,
-                        File = metaFile2
-                    }
-                );
-
+                    dataReleaseFile1,
+                    metaReleaseFile1,
+                    dataOriginalReleaseFile2,
+                    metaOriginalReleaseFile2,
+                    // Only second data file is attached to amended release
+                    dataAmendedReleaseFile2,
+                    metaAmendedReleaseFile2);
                 await contentDbContext.SaveChangesAsync();
-            }
-
-            await using (var statisticsDbContext = InMemoryStatisticsDbContext(statisticsDbContextId))
-            {
-                await statisticsDbContext.AddRangeAsync(subject1, subject2);
-                await statisticsDbContext.SaveChangesAsync();
             }
 
             var blobStorageService = new Mock<IBlobStorageService>(MockBehavior.Strict);
@@ -1951,7 +1929,6 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
                             GetDataFileMetaValues(
                                 name: "Test data file 2",
                                 metaFileName: "test-data-2.meta.csv",
-                                userName: "test2@test.com",
                                 numberOfRows: 400
                             )
                         )
@@ -1979,15 +1956,16 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
                 Assert.Single(files);
 
                 Assert.Equal(dataFile2.Id, files[0].Id);
-                Assert.Equal("Test subject 2", files[0].Name);
+                Assert.Equal("Test subject 2 name change", files[0].Name);
                 Assert.Equal("test-data-2.csv", files[0].FileName);
                 Assert.Equal("csv", files[0].Extension);
                 Assert.Equal(dataFile2.Path(), files[0].Path);
                 Assert.Equal(metaFile2.Id, files[0].MetaFileId);
                 Assert.Equal("test-data-2.meta.csv", files[0].MetaFileName);
-                Assert.Equal("test2@test.com", files[0].UserName);
+                Assert.Equal(_user.Email, files[0].UserName);
                 Assert.Equal(400, files[0].Rows);
                 Assert.Equal("800 B", files[0].Size);
+                Assert.Equal(dataFile2.Created, files[0].Created);
                 Assert.Equal(STAGE_2, files[0].Status);
             }
         }
@@ -1995,52 +1973,47 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
         [Fact]
         public async Task ListAll_NoMatchingBlob()
         {
-            var release = new Release();
-            var subject = new Subject
-            {
-                Id = Guid.NewGuid(),
-                Name = "Test subject name"
-            };
-            var dataFile = new File
-            {
-                RootPath = Guid.NewGuid(),
-                Filename = "test-data.csv",
-                Type = FileType.Data,
-                SubjectId = subject.Id
-            };
-            var metaFile = new File
-            {
-                RootPath = Guid.NewGuid(),
-                Filename = "test-data.meta.csv",
-                Type = Metadata,
-                SubjectId = subject.Id
-            };
-
-            var contentDbContextId = Guid.NewGuid().ToString();
+            var subject = new Subject();
             var statisticsDbContextId = Guid.NewGuid().ToString();
-
-            await using (var contentDbContext = InMemoryApplicationDbContext(contentDbContextId))
-            {
-                await contentDbContext.AddRangeAsync(
-                    new ReleaseFile
-                    {
-                        Release = release,
-                        File = dataFile
-                    },
-                    new ReleaseFile
-                    {
-                        Release = release,
-                        File = metaFile
-                    }
-                );
-
-                await contentDbContext.SaveChangesAsync();
-            }
-
             await using (var statisticsDbContext = InMemoryStatisticsDbContext(statisticsDbContextId))
             {
                 await statisticsDbContext.AddAsync(subject);
                 await statisticsDbContext.SaveChangesAsync();
+            }
+
+            var release = new Release();
+            var dataReleaseFile = new ReleaseFile
+            {
+                Release = release,
+                Name = "Test subject name",
+                File = new File
+                {
+                    RootPath = Guid.NewGuid(),
+                    Filename = "test-data.csv",
+                    Type = FileType.Data,
+                    SubjectId = subject.Id,
+                    Created = DateTime.UtcNow,
+                    CreatedById = _user.Id
+                }
+            };
+            var metaReleaseFile = new ReleaseFile
+            {
+                Release = release,
+                File = new File
+                {
+                    RootPath = Guid.NewGuid(),
+                    Filename = "test-data.meta.csv",
+                    Type = Metadata,
+                    SubjectId = subject.Id
+                }
+            };
+
+
+            var contentDbContextId = Guid.NewGuid().ToString();
+            await using (var contentDbContext = InMemoryApplicationDbContext(contentDbContextId))
+            {
+                await contentDbContext.AddRangeAsync(dataReleaseFile, metaReleaseFile);
+                await contentDbContext.SaveChangesAsync();
             }
 
             var blobStorageService = new Mock<IBlobStorageService>(MockBehavior.Strict);
@@ -2050,11 +2023,11 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
             await using (var statisticsDbContext = InMemoryStatisticsDbContext(statisticsDbContextId))
             {
                 blobStorageService
-                    .Setup(s => s.CheckBlobExists(PrivateReleaseFiles, dataFile.Path()))
+                    .Setup(s => s.CheckBlobExists(PrivateReleaseFiles, dataReleaseFile.Path()))
                     .ReturnsAsync(false);
 
                 dataImportService
-                    .Setup(s => s.GetStatus(dataFile.Id))
+                    .Setup(s => s.GetStatus(dataReleaseFile.File.Id))
                     .ReturnsAsync(STAGE_1);
 
                 var service = SetupReleaseDataFileService(
@@ -2072,16 +2045,17 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
                 var files = result.Right.ToList();
 
                 Assert.Single(files);
-                Assert.Equal(dataFile.Id, files[0].Id);
+                Assert.Equal(dataReleaseFile.File.Id, files[0].Id);
                 Assert.Equal("Test subject name", files[0].Name);
                 Assert.Equal("test-data.csv", files[0].FileName);
                 Assert.Equal("csv", files[0].Extension);
                 Assert.Equal("test-data.csv", files[0].Path);
-                Assert.Equal(metaFile.Id, files[0].MetaFileId);
+                Assert.Equal(metaReleaseFile.File.Id, files[0].MetaFileId);
                 Assert.Equal("test-data.meta.csv", files[0].MetaFileName);
-                Assert.Equal("", files[0].UserName);
+                Assert.Equal(_user.Email, files[0].UserName);
                 Assert.Equal(0, files[0].Rows);
                 Assert.Equal("0.00 B", files[0].Size);
+                Assert.Equal(dataReleaseFile.File.Created, files[0].Created);
                 Assert.Equal(STAGE_1, files[0].Status);
             }
         }
@@ -2097,12 +2071,30 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
                 Filename = "test-data-archive.zip",
                 Type = DataZip
             };
-            var dataFile = new File
+            var dataReleaseFile = new ReleaseFile
             {
-                RootPath = Guid.NewGuid(),
-                Filename = "test-data.csv",
-                Type = FileType.Data,
-                Source = zipFile
+                Release = release,
+                Name = "Test data",
+                File = new File
+                {
+                    RootPath = Guid.NewGuid(),
+                    Filename = "test-data.csv",
+                    Type = FileType.Data,
+                    Source = zipFile,
+                    Created = DateTime.UtcNow,
+                    CreatedById = _user.Id
+                }
+            };
+            var metaReleaseFile = new ReleaseFile
+            {
+                Release = release,
+                File = new File
+                {
+                    RootPath = Guid.NewGuid(),
+                    Filename = "test-data.meta.csv",
+                    Type = Metadata,
+                    Source = zipFile
+                }
             };
 
             var contentDbContextId = Guid.NewGuid().ToString();
@@ -2110,29 +2102,9 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
             await using (var contentDbContext = InMemoryApplicationDbContext(contentDbContextId))
             {
                 await contentDbContext.AddRangeAsync(
-                    new ReleaseFile
-                    {
-                        Release = release,
-                        File = dataFile
-                    },
-                    new ReleaseFile
-                    {
-                        Release = release,
-                        File = zipFile
-                    },
-                    new ReleaseFile
-                    {
-                        Release = release,
-                        File = new File
-                        {
-                            RootPath = Guid.NewGuid(),
-                            Filename = "test-data.meta.csv",
-                            Type = Metadata,
-                            Source = zipFile
-                        }
-                    }
-                );
-
+                    zipFile,
+                    dataReleaseFile,
+                    metaReleaseFile);
                 await contentDbContext.SaveChangesAsync();
             }
 
@@ -2142,7 +2114,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
             await using (var contentDbContext = InMemoryApplicationDbContext(contentDbContextId))
             {
                 blobStorageService
-                    .Setup(s => s.CheckBlobExists(PrivateReleaseFiles, dataFile.Path()))
+                    .Setup(s => s.CheckBlobExists(PrivateReleaseFiles, dataReleaseFile.Path()))
                     .ReturnsAsync(false);
 
                 blobStorageService
@@ -2160,15 +2132,13 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
                             meta: GetDataFileMetaValues(
                                 name: "Test data",
                                 metaFileName: "test-data.meta.csv",
-                                userName: "test@test.com",
                                 numberOfRows: 0
-                            ),
-                            created: DateTimeOffset.Parse("2020-09-16T12:00:00Z")
+                            )
                         )
                     );
 
                 dataImportService
-                    .Setup(s => s.GetStatus(dataFile.Id))
+                    .Setup(s => s.GetStatus(dataReleaseFile.File.Id))
                     .ReturnsAsync(PROCESSING_ARCHIVE_FILE);
 
                 var service = SetupReleaseDataFileService(
@@ -2187,16 +2157,17 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
 
                 Assert.Single(files);
 
-                Assert.Equal(dataFile.Id, files[0].Id);
+                Assert.Equal(dataReleaseFile.File.Id, files[0].Id);
                 Assert.Equal("Test data", files[0].Name);
                 Assert.Equal("test-data.csv", files[0].FileName);
                 Assert.Equal("csv", files[0].Extension);
                 Assert.Equal("test-data.csv", files[0].Path);
                 Assert.False(files[0].MetaFileId.HasValue);
                 Assert.Equal("test-data.meta.csv", files[0].MetaFileName);
-                Assert.Equal("test@test.com", files[0].UserName);
+                Assert.Equal(_user.Email, files[0].UserName);
                 Assert.Equal(0, files[0].Rows);
                 Assert.Equal("1 Mb", files[0].Size);
+                Assert.Equal(dataReleaseFile.File.Created, files[0].Created);
                 Assert.Equal(PROCESSING_ARCHIVE_FILE, files[0].Status);
             }
         }
@@ -2272,7 +2243,6 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
                         It.Is<IDictionary<string, string>>(metadata =>
                             metadata[BlobInfoExtensions.NameKey] == subjectName
                             && metadata[BlobInfoExtensions.MetaFileKey] == metaFileName
-                            && metadata[BlobInfoExtensions.UserNameKey] == "test@test.com"
                             && metadata[BlobInfoExtensions.NumberOfRowsKey] == "2")
                     )).Returns(Task.CompletedTask);
 
@@ -2297,10 +2267,8 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
                             meta: GetDataFileMetaValues(
                                 subjectName,
                                 metaFileName: metaFileName,
-                                userName: "test@test.com",
                                 numberOfRows: 0
-                            ),
-                            created: DateTimeOffset.Parse("2020-09-16T12:00:00Z")
+                            )
                         )
                     );
 
@@ -2316,7 +2284,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
                     releaseId: release.Id,
                     dataFormFile: dataFormFile,
                     metaFormFile: metaFormFile,
-                    userName: "test@test.com",
+                    userName: _user.Email,
                     subjectName: subjectName);
 
                 Assert.True(result.IsRight);
@@ -2330,9 +2298,10 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
                 Assert.Equal("data/file/path", result.Right.Path);
                 Assert.True(result.Right.MetaFileId.HasValue);
                 Assert.Equal(metaFileName, result.Right.MetaFileName);
-                Assert.Equal("test@test.com", result.Right.UserName);
+                Assert.Equal(_user.Email, result.Right.UserName);
                 Assert.Equal(0, result.Right.Rows);
                 Assert.Equal("1 Mb", result.Right.Size);
+                Assert.InRange(DateTime.UtcNow.Subtract(result.Right.Created.Value).Milliseconds, 0, 1500);
                 Assert.Equal(QUEUED, result.Right.Status);
             }
 
@@ -2390,12 +2359,12 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
             var originalSubject = new Subject
             {
                 Id = Guid.NewGuid(),
-                Name = "Test data"
             };
 
             var originalDataReleaseFile = new ReleaseFile
             {
                 Release = release,
+                Name = "Test data",
                 File = new File
                 {
                     RootPath = Guid.NewGuid(),
@@ -2408,7 +2377,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
             var contentDbContextId = Guid.NewGuid().ToString();
             await using (var contentDbContext = InMemoryApplicationDbContext(contentDbContextId))
             {
-                await contentDbContext .AddAsync(originalDataReleaseFile);
+                await contentDbContext.AddAsync(originalDataReleaseFile);
                 await contentDbContext.SaveChangesAsync();
             }
 
@@ -2456,9 +2425,8 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
                             path.Contains(FilesPath(release.Id, FileType.Data))),
                         dataFormFile,
                         It.Is<IDictionary<string, string>>(metadata =>
-                            metadata[BlobInfoExtensions.NameKey] == originalSubject.Name
+                            metadata[BlobInfoExtensions.NameKey] == originalDataReleaseFile.Name
                             && metadata[BlobInfoExtensions.MetaFileKey] == metaFileName
-                            && metadata[BlobInfoExtensions.UserNameKey] == "test@test.com"
                             && metadata[BlobInfoExtensions.NumberOfRowsKey] == "2")
                     )).Returns(Task.CompletedTask);
 
@@ -2483,10 +2451,8 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
                             meta: GetDataFileMetaValues(
                                 originalSubject.Name,
                                 metaFileName: metaFileName,
-                                userName: "test@test.com",
                                 numberOfRows: 0
-                            ),
-                            created: DateTimeOffset.Parse("2020-09-16T12:00:00Z")
+                            )
                         )
                     );
 
@@ -2502,7 +2468,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
                     releaseId: release.Id,
                     dataFormFile: dataFormFile,
                     metaFormFile: metaFormFile,
-                    userName: "test@test.com",
+                    userName: _user.Email,
                     replacingFileId: originalDataReleaseFile.File.Id);
 
                 Assert.True(result.IsRight);
@@ -2510,15 +2476,16 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
                 MockUtils.VerifyAllMocks(blobStorageService, fileUploadsValidatorService, dataImportService);
 
                 Assert.True(result.Right.Id.HasValue);
-                Assert.Equal(originalSubject.Name, result.Right.Name);
+                Assert.Equal(originalDataReleaseFile.Name, result.Right.Name);
                 Assert.Equal(dataFileName, result.Right.FileName);
                 Assert.Equal("csv", result.Right.Extension);
                 Assert.Equal("data/file/path", result.Right.Path);
                 Assert.True(result.Right.MetaFileId.HasValue);
                 Assert.Equal(metaFileName, result.Right.MetaFileName);
-                Assert.Equal("test@test.com", result.Right.UserName);
+                Assert.Equal(_user.Email, result.Right.UserName);
                 Assert.Equal(0, result.Right.Rows);
                 Assert.Equal("1 Mb", result.Right.Size);
+                Assert.InRange(DateTime.UtcNow.Subtract(result.Right.Created.Value).Milliseconds, 0, 1500);
                 Assert.Equal(QUEUED, result.Right.Status);
             }
 
@@ -2654,7 +2621,6 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
                         It.Is<IDictionary<string, string>>(metadata =>
                             metadata[BlobInfoExtensions.NameKey] == subjectName
                             && metadata[BlobInfoExtensions.MetaFileKey] == metaFileName
-                            && metadata[BlobInfoExtensions.UserNameKey] == "test@test.com"
                             && metadata[BlobInfoExtensions.NumberOfRowsKey] == "0")
                     )).Returns(Task.CompletedTask);
 
@@ -2671,10 +2637,8 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
                             meta: GetDataFileMetaValues(
                                 subjectName,
                                 metaFileName: metaFileName,
-                                userName: "test@test.com",
                                 numberOfRows: 0
-                            ),
-                            created: DateTimeOffset.Parse("2020-09-16T12:00:00Z")
+                            )
                         )
                     );
 
@@ -2690,7 +2654,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
                 var result = await service.UploadAsZip(
                     releaseId: release.Id,
                     zipFormFile: zipFormFile,
-                    userName: "test@test.com",
+                    userName: _user.Email,
                     subjectName: subjectName);
 
                 Assert.True(result.IsRight);
@@ -2707,9 +2671,10 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
                 Assert.Equal(dataFileName, result.Right.Path);
                 Assert.True(result.Right.MetaFileId.HasValue);
                 Assert.Equal(metaFileName, result.Right.MetaFileName);
-                Assert.Equal("test@test.com", result.Right.UserName);
+                Assert.Equal(_user.Email, result.Right.UserName);
                 Assert.Equal(0, result.Right.Rows);
                 Assert.Equal("1 Mb", result.Right.Size);
+                Assert.InRange(DateTime.UtcNow.Subtract(result.Right.Created.Value).Milliseconds, 0, 1500);
                 Assert.Equal(QUEUED, result.Right.Status);
             }
 
@@ -2773,12 +2738,12 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
             var originalSubject = new Subject
             {
                 Id = Guid.NewGuid(),
-                Name = "Subject name"
             };
 
             var originalDataReleaseFile = new ReleaseFile
             {
                 Release = release,
+                Name = "Subject name",
                 File = new File
                 {
                     RootPath = Guid.NewGuid(),
@@ -2842,9 +2807,8 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
                             path.Contains(FilesPath(release.Id, DataZip))),
                         zipFormFile,
                         It.Is<IDictionary<string, string>>(metadata =>
-                            metadata[BlobInfoExtensions.NameKey] == originalSubject.Name
+                            metadata[BlobInfoExtensions.NameKey] == originalDataReleaseFile.Name
                             && metadata[BlobInfoExtensions.MetaFileKey] == metaFileName
-                            && metadata[BlobInfoExtensions.UserNameKey] == "test@test.com"
                             && metadata[BlobInfoExtensions.NumberOfRowsKey] == "0")
                     )).Returns(Task.CompletedTask);
 
@@ -2859,12 +2823,10 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
                             contentType: "application/zip",
                             contentLength: 1000L,
                             meta: GetDataFileMetaValues(
-                                name: originalSubject.Name,
+                                name: originalDataReleaseFile.Name,
                                 metaFileName: metaFileName,
-                                userName: "test@test.com",
                                 numberOfRows: 0
-                            ),
-                            created: DateTimeOffset.Parse("2020-09-16T12:00:00Z")
+                            )
                         )
                     );
 
@@ -2880,7 +2842,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
                 var result = await service.UploadAsZip(
                     release.Id,
                     zipFormFile,
-                    userName: "test@test.com",
+                    userName: _user.Email,
                     replacingFileId: originalDataReleaseFile.File.Id);
 
                 Assert.True(result.IsRight);
@@ -2891,15 +2853,16 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
                     dataImportService);
 
                 Assert.True(result.Right.Id.HasValue);
-                Assert.Equal(originalSubject.Name, result.Right.Name);
+                Assert.Equal(originalDataReleaseFile.Name, result.Right.Name);
                 Assert.Equal(dataFileName, result.Right.FileName);
                 Assert.Equal("csv", result.Right.Extension);
                 Assert.Equal(dataFileName, result.Right.Path);
                 Assert.True(result.Right.MetaFileId.HasValue);
                 Assert.Equal(metaFileName, result.Right.MetaFileName);
-                Assert.Equal("test@test.com", result.Right.UserName);
+                Assert.Equal(_user.Email, result.Right.UserName);
                 Assert.Equal(0, result.Right.Rows);
                 Assert.Equal("1 Mb", result.Right.Size);
+                Assert.InRange(DateTime.UtcNow.Subtract(result.Right.Created.Value).Milliseconds, 0, 1500);
                 Assert.Equal(QUEUED, result.Right.Status);
             }
 
@@ -2994,7 +2957,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
             return dataArchiveFile;
         }
 
-        private static ReleaseDataFileService SetupReleaseDataFileService(
+        private ReleaseDataFileService SetupReleaseDataFileService(
             ContentDbContext contentDbContext,
             StatisticsDbContext statisticsDbContext = null,
             IPersistenceHelper<ContentDbContext> contentPersistenceHelper = null,
@@ -3008,20 +2971,24 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
             IDataImportService dataImportService = null,
             IUserService userService = null)
         {
+            contentDbContext.Users.Add(_user);
+            contentDbContext.SaveChanges();
+
             return new ReleaseDataFileService(
-                contentDbContext ?? new Mock<ContentDbContext>().Object,
-                statisticsDbContext ?? new Mock<StatisticsDbContext>().Object,
+                contentDbContext,
                 contentPersistenceHelper ?? new PersistenceHelper<ContentDbContext>(contentDbContext),
                 blobStorageService ?? new Mock<IBlobStorageService>().Object,
                 dataArchiveValidationService ?? new Mock<IDataArchiveValidationService>().Object,
                 fileUploadsValidatorService ?? new Mock<IFileUploadsValidatorService>().Object,
                 fileRepository ?? new FileRepository(contentDbContext),
-                releaseRepository ?? new ReleaseRepository(contentDbContext, statisticsDbContext,
+                releaseRepository ?? new ReleaseRepository(
+                    contentDbContext, 
+                    statisticsDbContext ?? new Mock<StatisticsDbContext>().Object,
                     Common.Services.MapperUtils.MapperForProfile<MappingProfiles>()),
                 releaseFileRepository ?? new ReleaseFileRepository(contentDbContext),
                 releaseDataFileRepository ?? new ReleaseDataFileRepository(contentDbContext),
                 dataImportService ?? new Mock<IDataImportService>().Object,
-                userService ?? MockUtils.AlwaysTrueUserService().Object
+                userService ?? MockUtils.AlwaysTrueUserService(_user.Id).Object
             );
         }
     }

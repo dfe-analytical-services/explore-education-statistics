@@ -3,6 +3,7 @@ CREATE OR ALTER PROCEDURE FilteredObservations
     @geographicLevel nvarchar(6) = NULL,
     @timePeriodList TimePeriodListType READONLY,
     @countriesList IdListVarcharType READONLY,
+    @englishDevolvedAreasList IdListVarcharType READONLY,
     @institutionsList IdListVarcharType READONLY,
     @localAuthorityList IdListVarcharType READONLY,
     @localAuthorityOldCodeList IdListVarcharType READONLY,
@@ -23,6 +24,7 @@ DECLARE
     @timePeriodCount INT = (SELECT count(year) FROM @timePeriodList),
     @observationalUnitExists BIT = CAST(IIF(
                 EXISTS(SELECT TOP 1 1 FROM @countriesList)
+                OR EXISTS(SELECT TOP 1 1 FROM @englishDevolvedAreasList)
                 OR EXISTS(SELECT TOP 1 1 FROM @institutionsList)
                 OR EXISTS(SELECT TOP 1 1 FROM @localAuthorityList)
                 OR EXISTS(SELECT TOP 1 1 FROM @localAuthorityOldCodeList)
@@ -56,6 +58,11 @@ DECLARE
                 BEGIN
                     SET @idsList = (SELECT CONCAT(CONCAT('''', (SELECT STRING_AGG(Id, ''',''') FROM @countriesList)), ''''))
                     SET @sqlString = @sqlString + N'(l.Country_Code IN (' + @idsList + ') AND (@geographicLevel IS NOT NULL OR o.GeographicLevel = ''NAT'')) OR '
+                END
+            IF (EXISTS(SELECT TOP 1 1 FROM @englishDevolvedAreasList))
+                BEGIN
+                    SET @idsList = (SELECT CONCAT(CONCAT('''', (SELECT STRING_AGG(Id, ''',''') FROM @englishDevolvedAreasList)), ''''))
+                    SET @sqlString = @sqlString + N'(l.EnglishDevolvedArea_Code IN (' + @idsList + ') AND (@geographicLevel IS NOT NULL OR o.GeographicLevel = ''EDA'')) OR '
                 END
             IF (EXISTS(SELECT TOP 1 1 FROM @institutionsList))
                 BEGIN
@@ -143,6 +150,7 @@ DECLARE
                            @geographicLevel nvarchar(6) = NULL,
                            @timePeriodList TimePeriodListType READONLY,
                            @countriesList IdListVarcharType READONLY,
+                           @englishDevolvedAreasList IdListVarcharType READONLY,
                            @institutionsList IdListVarcharType READONLY,
                            @localAuthorityList IdListVarcharType READONLY,
                            @localAuthorityOldCodeList IdListVarcharType READONLY,
@@ -163,6 +171,7 @@ DECLARE
          @geographicLevel = @geographicLevel,
          @timePeriodList = @timePeriodList,
          @countriesList = @countriesList,
+         @englishDevolvedAreasList = @englishDevolvedAreasList,
          @institutionsList = @institutionsList,
          @localAuthorityList = @localAuthorityList,
          @localAuthorityOldCodeList = @localAuthorityOldCodeList,
@@ -178,3 +187,4 @@ DECLARE
          @wardsList = @wardsList,
          @planningAreasList = @planningAreasList,
          @filterItemList = @filterItemList;
+

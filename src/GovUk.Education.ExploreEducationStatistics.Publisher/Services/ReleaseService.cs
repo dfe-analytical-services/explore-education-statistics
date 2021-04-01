@@ -3,8 +3,8 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
 using AutoMapper;
-using GovUk.Education.ExploreEducationStatistics.Common;
 using GovUk.Education.ExploreEducationStatistics.Common.Model;
+using GovUk.Education.ExploreEducationStatistics.Common.Services.Interfaces;
 using GovUk.Education.ExploreEducationStatistics.Content.Model;
 using GovUk.Education.ExploreEducationStatistics.Content.Model.Database;
 using GovUk.Education.ExploreEducationStatistics.Content.Model.Extensions;
@@ -14,10 +14,9 @@ using GovUk.Education.ExploreEducationStatistics.Publisher.Model.ViewModels;
 using GovUk.Education.ExploreEducationStatistics.Publisher.Models;
 using GovUk.Education.ExploreEducationStatistics.Publisher.Services.Interfaces;
 using Microsoft.EntityFrameworkCore;
-using static GovUk.Education.ExploreEducationStatistics.Common.Model.FileType;
 using Microsoft.Extensions.Logging;
+using static GovUk.Education.ExploreEducationStatistics.Common.Model.FileType;
 using static GovUk.Education.ExploreEducationStatistics.Common.BlobContainers;
-using IReleaseService = GovUk.Education.ExploreEducationStatistics.Publisher.Services.Interfaces.IReleaseService;
 using static GovUk.Education.ExploreEducationStatistics.Publisher.Extensions.PublisherExtensions;
 
 namespace GovUk.Education.ExploreEducationStatistics.Publisher.Services
@@ -26,21 +25,21 @@ namespace GovUk.Education.ExploreEducationStatistics.Publisher.Services
     {
         private readonly ContentDbContext _contentDbContext;
         private readonly StatisticsDbContext _statisticsDbContext;
-        private readonly IFileStorageService _fileStorageService;
+        private readonly IBlobStorageService _publicBlobStorageService;
         private readonly IReleaseSubjectService _releaseSubjectService;
         private readonly ILogger<ReleaseService> _logger;
         private readonly IMapper _mapper;
 
         public ReleaseService(ContentDbContext contentDbContext,
             StatisticsDbContext statisticsDbContext,
-            IFileStorageService fileStorageService,
+            IBlobStorageService publicBlobStorageService,
             IReleaseSubjectService releaseSubjectService,
             ILogger<ReleaseService> logger,
             IMapper mapper)
         {
             _contentDbContext = contentDbContext;
             _statisticsDbContext = statisticsDbContext;
-            _fileStorageService = fileStorageService;
+            _publicBlobStorageService = publicBlobStorageService;
             _releaseSubjectService = releaseSubjectService;
             _logger = logger;
             _mapper = mapper;
@@ -215,7 +214,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Publisher.Services
         {
             var path = release.AllFilesZipPath();
 
-            var exists = await _fileStorageService.CheckBlobExists(
+            var exists = await _publicBlobStorageService.CheckBlobExists(
                 containerName: PublicReleaseFiles,
                 path: path);
 
@@ -236,8 +235,8 @@ namespace GovUk.Education.ExploreEducationStatistics.Publisher.Services
                 };
             }
 
-            var blob = await _fileStorageService.GetBlob(
-                containerName: BlobContainers.PublicReleaseFiles,
+            var blob = await _publicBlobStorageService.GetBlob(
+                containerName: PublicReleaseFiles,
                 path: path);
 
             return new FileInfo
@@ -253,7 +252,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Publisher.Services
 
         private async Task<FileInfo> GetPublicFileInfo(Release release, File file)
         {
-            var exists = await _fileStorageService.CheckBlobExists(
+            var exists = await _publicBlobStorageService.CheckBlobExists(
                 containerName: PublicReleaseFiles,
                 path: file.PublicPath(release));
 
@@ -264,7 +263,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Publisher.Services
                 return file.ToFileInfoNotFound();
             }
 
-            var blob = await _fileStorageService.GetBlob(
+            var blob = await _publicBlobStorageService.GetBlob(
                 containerName: PublicReleaseFiles,
                 path: file.PublicPath(release));
 

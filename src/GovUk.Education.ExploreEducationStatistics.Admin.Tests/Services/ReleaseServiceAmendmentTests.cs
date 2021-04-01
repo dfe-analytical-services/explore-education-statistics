@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using System.Linq;
 using GovUk.Education.ExploreEducationStatistics.Admin.Services;
 using GovUk.Education.ExploreEducationStatistics.Admin.Services.Interfaces;
+using GovUk.Education.ExploreEducationStatistics.Admin.Services.Interfaces.ManageContent;
 using GovUk.Education.ExploreEducationStatistics.Common.Model;
 using GovUk.Education.ExploreEducationStatistics.Common.Services;
 using GovUk.Education.ExploreEducationStatistics.Common.Services.Interfaces;
@@ -633,6 +634,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
             IFootnoteService footnoteService = null,
             IDataBlockService dataBlockService = null,
             IReleaseSubjectService releaseSubjectService = null,
+            IContentService contentService = null,
             IReleaseChecklistService releaseChecklistService = null,
             IGuidGenerator guidGenerator = null)
         {
@@ -652,6 +654,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
                 statisticsDbContext ?? statisticsDbContext,
                 dataBlockService ?? new Mock<IDataBlockService>().Object,
                 releaseChecklistService ?? new Mock<IReleaseChecklistService>().Object,
+                contentService ?? new Mock<IContentService>().Object,
                 releaseSubjectService ?? new Mock<IReleaseSubjectService>().Object,
                 guidGenerator ?? new SequentialGuidGenerator()
             );

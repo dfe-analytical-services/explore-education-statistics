@@ -99,7 +99,7 @@ user creates release for publication
     user clicks radio   National Statistics
     user clicks radio if exists  Create new template
     user clicks button  Create new release
-    user waits until page contains element  xpath://span[text()="Edit release"]
+    user waits until page contains element  xpath://a[text()="Edit release summary"]
     user waits until h2 is visible  Release summary
 
 user adds basic release content

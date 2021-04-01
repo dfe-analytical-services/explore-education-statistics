@@ -11,7 +11,7 @@ Navigate to Find Statistics page
     [Tags]  HappyPath
     environment variable should be set   PUBLIC_URL
     user goes to url   %{PUBLIC_URL}/find-statistics
-    user waits until h1 is visible  Explore our statistics and data
+    user waits until h1 is visible  Find statistics and data
     user waits for page to finish loading
 
 # TODO: User uses search

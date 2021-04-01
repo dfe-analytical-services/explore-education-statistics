@@ -55,14 +55,12 @@ namespace GovUk.Education.ExploreEducationStatistics.Common.Services
         public static IDictionary<string, string> GetDataFileMetaValues(
             string name,
             string metaFileName,
-            string userName,
             int numberOfRows)
         {
             return new Dictionary<string, string>
             {
                 {BlobInfoExtensions.NameKey, name},
                 {BlobInfoExtensions.MetaFileKey, metaFileName.ToLower()},
-                {BlobInfoExtensions.UserNameKey, userName},
                 {BlobInfoExtensions.NumberOfRowsKey, numberOfRows.ToString()}
             };
         }
@@ -97,11 +95,6 @@ namespace GovUk.Education.ExploreEducationStatistics.Common.Services
 
                 return numberOfLines;
             }
-        }
-
-        public static int GetNumBatches(int rows, int rowsPerBatch)
-        {
-            return (int) Math.Ceiling(rows / (double) rowsPerBatch);
         }
     }
 }

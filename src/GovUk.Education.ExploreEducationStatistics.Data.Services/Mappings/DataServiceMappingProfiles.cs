@@ -35,9 +35,6 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Services.Mappings
 
             CreateMap<Publication, TopicPublicationViewModel>();
 
-            CreateMap<Subject, IdLabel>()
-                .ForMember(dest => dest.Label, opts => opts.MapFrom(subject => subject.Name));
-
             CreateMap<Theme, ThemeViewModel>()
                 .ForMember(dest => dest.Topics, opts => opts.Ignore());
 

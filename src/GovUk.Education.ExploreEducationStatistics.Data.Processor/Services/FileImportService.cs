@@ -1,4 +1,5 @@
 using System;
+using System.Diagnostics;
 using System.Linq;
 using System.Threading.Tasks;
 using GovUk.Education.ExploreEducationStatistics.Common.Services.Interfaces;
@@ -67,23 +68,15 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Processor.Services
             var metaFileStream = await _blobStorageService.StreamBlob(PrivateReleaseFiles, import.MetaFile.Path());
             var metaFileTable = DataTableUtils.CreateFromStream(metaFileStream);
 
-            await context.Database.CreateExecutionStrategy().Execute(async () =>
-            {
-                await using var transaction = await context.Database.BeginTransactionAsync();
-
-                await _importerService.ImportObservations(
-                    dataFileTable.Columns,
-                    dataFileTable.Rows,
-                    subject,
-                    _importerService.GetMeta(metaFileTable, subject, context),
-                    message.BatchNo,
-                    import.RowsPerBatch,
-                    context
-                );
-
-                await transaction.CommitAsync();
-                await context.Database.CloseConnectionAsync();
-            });
+            await _importerService.ImportObservations(
+                dataFileTable.Columns,
+                dataFileTable.Rows,
+                subject,
+                _importerService.GetMeta(metaFileTable, subject, context),
+                message.BatchNo,
+                import.RowsPerBatch,
+                context
+            );
 
             if (import.NumBatches > 1)
             {
@@ -135,6 +128,8 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Processor.Services
                 return;
             }
 
+            var stopwatch = Stopwatch.StartNew();
+
             if (import.NumBatches == 1 || await _batchService.GetNumBatchesRemaining(import.File) == 0)
             {
                 var observationCount = context.Observation.Count(o => o.SubjectId.Equals(import.SubjectId));
@@ -165,6 +160,9 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Processor.Services
 
                 await _dataImportService.UpdateStatus(message.Id, STAGE_4, percentageComplete);
             }
+            
+            _logger.LogInformation($"Took {stopwatch.Elapsed.TotalMilliseconds} millis to check if {message.ObservationsFilePath} " +
+                                   $"was complete");
         }
     }
 }

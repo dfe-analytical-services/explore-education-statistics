@@ -65,7 +65,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Publisher.Functions
                     await UpdateStage(releaseStatus, Started);
                     try
                     {
-                        await _publishingService.PublishStagedReleaseContentAsync(releaseStatus.ReleaseId);
+                        await _publishingService.PublishStagedReleaseContent(releaseStatus.ReleaseId);
 
                         published.Add(releaseStatus);
                     }

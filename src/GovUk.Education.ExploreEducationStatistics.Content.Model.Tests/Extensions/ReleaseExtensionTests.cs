@@ -114,5 +114,24 @@ namespace GovUk.Education.ExploreEducationStatistics.Content.Model.Tests.Extensi
             Assert.True(release2.IsLatestPublishedVersionOfRelease());
             Assert.False(release3.IsLatestPublishedVersionOfRelease());
         }
+
+        [Fact]
+        public void AllFilesZipPath()
+        {
+            const string releaseSlug = "release-slug";
+            const string publicationSlug = "publication-slug";
+
+            var release = new Release
+            {
+                Id = Guid.NewGuid(),
+                Slug = releaseSlug,
+                Publication = new Publication
+                {
+                    Slug = publicationSlug
+                }
+            };
+
+            Assert.Equal($"{release.Id}/ancillary/{publicationSlug}_{releaseSlug}.zip", release.AllFilesZipPath());
+        }
     }
 }

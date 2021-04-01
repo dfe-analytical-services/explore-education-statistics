@@ -6,141 +6,104 @@ using GovUk.Education.ExploreEducationStatistics.Content.Model;
 using GovUk.Education.ExploreEducationStatistics.Content.Model.Database;
 using GovUk.Education.ExploreEducationStatistics.Publisher.Models;
 using GovUk.Education.ExploreEducationStatistics.Publisher.Services;
-using Microsoft.EntityFrameworkCore;
 using Xunit;
+using static GovUk.Education.ExploreEducationStatistics.Common.Model.FileType;
 using static GovUk.Education.ExploreEducationStatistics.Common.Model.TimeIdentifier;
 using static GovUk.Education.ExploreEducationStatistics.Common.Services.MapperUtils;
+using static GovUk.Education.ExploreEducationStatistics.Content.Model.Database.ContentDbUtils;
 using static GovUk.Education.ExploreEducationStatistics.Content.Model.ReleaseStatus;
 
 namespace GovUk.Education.ExploreEducationStatistics.Publisher.Tests.Services
 {
     public class MethodologyServiceTests
     {
-        private static readonly Theme Theme = new Theme
-        {
-            Id = Guid.NewGuid(),
-            Title = "Theme A",
-            Slug = "theme-a",
-            Summary = "The first theme"
-        };
-
-        private static readonly Topic Topic = new Topic
-        {
-            Id = Guid.NewGuid(),
-            Title = "Topic A",
-            ThemeId = Theme.Id,
-            Slug = "topic-a",
-        };
-
-        private static readonly Methodology MethodologyA = new Methodology
-        {
-            Id = Guid.NewGuid(),
-            Slug = "methodology-a",
-            Title = "Methodology A",
-            Summary = "first methodology",
-            Published = new DateTime(2019, 1, 01),
-            Updated = new DateTime(2019, 1, 15),
-            Annexes = new List<ContentSection>(),
-            Content = new List<ContentSection>()
-        };
-
-        private static readonly Methodology MethodologyB = new Methodology
-        {
-            Id = Guid.NewGuid(),
-            Slug = "methodology-b",
-            Title = "Methodology B",
-            Summary = "second methodology",
-            Published = new DateTime(2019, 3, 01),
-            Updated = new DateTime(2019, 3, 15),
-            Annexes = new List<ContentSection>(),
-            Content = new List<ContentSection>()
-        };
-
-        private static readonly Methodology MethodologyC = new Methodology
-        {
-            Id = Guid.NewGuid(),
-            Slug = "methodology-c",
-            Title = "Methodology C",
-            Summary = "third methodology",
-            Published = null,
-            Updated = new DateTime(2019, 6, 15),
-            Annexes = new List<ContentSection>(),
-            Content = new List<ContentSection>()
-        };
-
-        private static readonly Publication PublicationA = new Publication
-        {
-            Id = Guid.NewGuid(),
-            Title = "Publication A",
-            TopicId = Topic.Id,
-            Slug = "publication-a",
-            Summary = "first publication",
-            MethodologyId = MethodologyA.Id
-        };
-
-        private static readonly Publication PublicationB = new Publication
-        {
-            Id = Guid.NewGuid(),
-            Title = "Publication B",
-            TopicId = Topic.Id,
-            Slug = "publication-b",
-            Summary = "second publication",
-            MethodologyId = MethodologyB.Id
-        };
-
-        private static readonly Release PublicationARelease1 = new Release
-        {
-            Id = Guid.NewGuid(),
-            PublicationId = PublicationA.Id,
-            ReleaseName = "2018",
-            TimePeriodCoverage = AcademicYearQ1,
-            Published = new DateTime(2019, 1, 01),
-            Status = Approved
-        };
-
-        private static readonly Release PublicationBRelease1 = new Release
-        {
-            Id = Guid.NewGuid(),
-            PublicationId = PublicationB.Id,
-            ReleaseName = "2018",
-            TimePeriodCoverage = AcademicYearQ1,
-            Published = null,
-            Status = Draft
-        };
-
         [Fact]
-        public void GetTree()
+        public async Task GetTree()
         {
-            var builder = new DbContextOptionsBuilder<ContentDbContext>();
-            builder.UseInMemoryDatabase("GetMethodologyTree");
-            var options = builder.Options;
-
-            using (var context = new ContentDbContext(options))
+            var topicA = new Topic
             {
-                context.AddRange(new List<Methodology>
+                Title = "Topic A",
+                Theme = new Theme
                 {
-                    MethodologyA, MethodologyB
-                });
+                    Title = "Theme A",
+                    Slug = "theme-a",
+                    Summary = "The first theme"
+                },
+                Slug = "topic-a"
+            };
 
-                context.Add(Theme);
-                context.Add(Topic);
+            var methodologyA = new Methodology
+            {
+                Slug = "methodology-a",
+                Title = "Methodology A",
+                Summary = "first methodology",
+                Published = new DateTime(2019, 1, 01),
+                Updated = new DateTime(2019, 1, 15),
+                Annexes = new List<ContentSection>(),
+                Content = new List<ContentSection>()
+            };
 
-                context.AddRange(new List<Publication>
-                {
-                    PublicationA, PublicationB
-                });
+            var methodologyB = new Methodology
+            {
+                Slug = "methodology-b",
+                Title = "Methodology B",
+                Summary = "second methodology",
+                Published = new DateTime(2019, 3, 01),
+                Updated = new DateTime(2019, 3, 15),
+                Annexes = new List<ContentSection>(),
+                Content = new List<ContentSection>()
+            };
 
-                context.AddRange(new List<Release>
-                {
-                    PublicationARelease1, PublicationBRelease1
-                });
+            var publicationA = new Publication
+            {
+                Title = "Publication A",
+                Topic = topicA,
+                Slug = "publication-a",
+                Summary = "first publication",
+                Methodology = methodologyA
+            };
 
-                context.SaveChanges();
+            var publicationB = new Publication
+            {
+                Title = "Publication B",
+                Topic = topicA,
+                Slug = "publication-b",
+                Summary = "second publication",
+                Methodology = methodologyB
+            };
+
+            var publicationARelease1 = new Release
+            {
+                Publication = publicationA,
+                ReleaseName = "2018",
+                TimePeriodCoverage = AcademicYearQ1,
+                Published = new DateTime(2019, 1, 01),
+                Status = Approved
+            };
+
+            var publicationBRelease1 = new Release
+            {
+                Publication = publicationB,
+                ReleaseName = "2018",
+                TimePeriodCoverage = AcademicYearQ1,
+                Published = null,
+                Status = Draft
+            };
+
+            var contentDbContextId = Guid.NewGuid().ToString();
+
+            await using (var contentDbContext = InMemoryContentDbContext(contentDbContextId))
+            {
+                await contentDbContext.Topics.AddAsync(topicA);
+                await contentDbContext.Methodologies.AddRangeAsync(methodologyA, methodologyB);
+                await contentDbContext.Publications.AddRangeAsync(publicationA, publicationB);
+                await contentDbContext.Releases.AddRangeAsync(publicationARelease1, publicationBRelease1);
+                await contentDbContext.SaveChangesAsync();
             }
 
-            using (var context = new ContentDbContext(options))
+            await using (var contentDbContext = InMemoryContentDbContext(contentDbContextId))
             {
-                var service = new MethodologyService(context, MapperForProfile<MappingProfiles>());
+                var service = new MethodologyService(contentDbContext, MapperForProfile<MappingProfiles>());
 
                 var result = service.GetTree(Enumerable.Empty<Guid>());
 
@@ -164,29 +127,95 @@ namespace GovUk.Education.ExploreEducationStatistics.Publisher.Tests.Services
         }
 
         [Fact]
-        public async Task GetViewModelAsync()
+        public async Task GetFiles()
         {
-            var builder = new DbContextOptionsBuilder<ContentDbContext>();
-            builder.UseInMemoryDatabase("ViewModel");
-            var options = builder.Options;
+            var methodology = new Methodology();
 
-            await using (var context = new ContentDbContext(options))
+            var imageFile1 = new MethodologyFile
             {
-                context.Add(MethodologyA);
-                await context.SaveChangesAsync();
+                Methodology = methodology,
+                File = new File
+                {
+                    Filename = "image1.png",
+                    Type = Image
+                }
+            };
+
+            var imageFile2 = new MethodologyFile
+            {
+                Methodology = methodology,
+                File = new File
+                {
+                    Filename = "image2.png",
+                    Type = Image
+                }
+            };
+
+            var otherFile = new MethodologyFile
+            {
+                Methodology = methodology,
+                File = new File
+                {
+                    Filename = "ancillary.pdf",
+                    Type = Ancillary
+                }
+            };
+
+            var contentDbContextId = Guid.NewGuid().ToString();
+
+            await using (var contentDbContext = InMemoryContentDbContext(contentDbContextId))
+            {
+                await contentDbContext.Methodologies.AddAsync(methodology);
+                await contentDbContext.MethodologyFiles.AddRangeAsync(imageFile1, imageFile2, otherFile);
+                await contentDbContext.SaveChangesAsync();
             }
 
-            await using (var contentDbContext = new ContentDbContext(options))
+            await using (var contentDbContext = InMemoryContentDbContext(contentDbContextId))
             {
-                var service = new MethodologyService(contentDbContext, MapperForProfile<MappingProfiles>());
+                var service = SetupMethodologyService(contentDbContext);
 
-                var result = await service.GetViewModelAsync(MethodologyA.Id, PublishContext());
+                var result = await service.GetFiles(methodology.Id, Image);
 
-                Assert.Equal(MethodologyA.Id, result.Id);
-                Assert.Equal("Methodology A", result.Title);
+                Assert.Equal(2, result.Count);
+                Assert.Equal(imageFile1.File.Id, result[0].Id);
+                Assert.Equal(imageFile2.File.Id, result[1].Id);
+            }
+        }
+
+        [Fact]
+        public async Task GetViewModel()
+        {
+            var methodology = new Methodology
+            {
+                Id = Guid.NewGuid(),
+                Slug = "methodology-slug",
+                Title = "Methodology",
+                Summary = "Methodology summary",
+                Published = new DateTime(2019, 1, 01),
+                Updated = new DateTime(2019, 1, 15),
+                Annexes = new List<ContentSection>(),
+                Content = new List<ContentSection>()
+            };
+            
+            var contentDbContextId = Guid.NewGuid().ToString();
+
+            await using (var contentDbContext = InMemoryContentDbContext(contentDbContextId))
+            {
+                await contentDbContext.Methodologies.AddAsync(methodology);
+                await contentDbContext.SaveChangesAsync();
+            }
+
+            await using (var contentDbContext = InMemoryContentDbContext(contentDbContextId))
+            {
+                var service = SetupMethodologyService(contentDbContext);
+
+                var result = await service.GetViewModelAsync(methodology.Id, PublishContext());
+
+                Assert.Equal(methodology.Id, result.Id);
+                Assert.Equal("Methodology", result.Title);
                 Assert.Equal(new DateTime(2019, 1, 01), result.Published);
                 Assert.Equal(new DateTime(2019, 1, 15), result.Updated);
-                Assert.Equal("first methodology", result.Summary);
+                Assert.Equal("Methodology summary", result.Summary);
 
                 var annexes = result.Annexes;
                 Assert.NotNull(annexes);
@@ -199,30 +228,39 @@ namespace GovUk.Education.ExploreEducationStatistics.Publisher.Tests.Services
         }
 
         [Fact]
-        public async Task GetViewModelAsync_NotYetPublished()
+        public async Task GetViewModel_NotYetPublished()
         {
-            var builder = new DbContextOptionsBuilder<ContentDbContext>();
-            builder.UseInMemoryDatabase("ViewModel_NotYetPublished");
-            var options = builder.Options;
-
-            await using (var context = new ContentDbContext(options))
+            var methodology = new Methodology
             {
-                context.Add(MethodologyC);
-                await context.SaveChangesAsync();
+                Slug = "methodology-slug",
+                Title = "Methodology",
+                Summary = "Methodology summary",
+                Published = null,
+                Updated = new DateTime(2019, 6, 15),
+                Annexes = new List<ContentSection>(),
+                Content = new List<ContentSection>()
+            };
+            
+            var contentDbContextId = Guid.NewGuid().ToString();
+
+            await using (var contentDbContext = InMemoryContentDbContext(contentDbContextId))
+            {
+                await contentDbContext.Methodologies.AddAsync(methodology);
+                await contentDbContext.SaveChangesAsync();
             }
 
-            await using (var contentDbContext = new ContentDbContext(options))
+            await using (var contentDbContext = InMemoryContentDbContext(contentDbContextId))
             {
-                var service = new MethodologyService(contentDbContext, MapperForProfile<MappingProfiles>());
+                var service = SetupMethodologyService(contentDbContext);
 
                 var context = PublishContext();
-                var result = await service.GetViewModelAsync(MethodologyC.Id, context);
+                var result = await service.GetViewModelAsync(methodology.Id, context);
 
-                Assert.Equal(MethodologyC.Id, result.Id);
-                Assert.Equal("Methodology C", result.Title);
+                Assert.Equal(methodology.Id, result.Id);
+                Assert.Equal("Methodology", result.Title);
                 Assert.Equal(context.Published, result.Published);
                 Assert.Equal(new DateTime(2019, 6, 15), result.Updated);
-                Assert.Equal("third methodology", result.Summary);
+                Assert.Equal("Methodology summary", result.Summary);
 
                 var annexes = result.Annexes;
                 Assert.NotNull(annexes);
@@ -234,10 +272,86 @@ namespace GovUk.Education.ExploreEducationStatistics.Publisher.Tests.Services
             }
         }
 
+        [Fact]
+        public async Task GetByRelease()
+        {
+            var methodology = new Methodology();
+
+            var release = new Release
+            {
+                Publication = new Publication
+                {
+                    Title = "Publication",
+                    Slug = "publication-slug",
+                    Methodology = methodology
+                },
+                ReleaseName = "2018",
+                TimePeriodCoverage = AcademicYearQ1,
+                Status = Approved
+            };
+
+            var contentDbContextId = Guid.NewGuid().ToString();
+        
+            await using (var contentDbContext = InMemoryContentDbContext(contentDbContextId))
+            {
+                await contentDbContext.Methodologies.AddAsync(methodology);
+                await contentDbContext.Releases.AddAsync(release);
+                await contentDbContext.SaveChangesAsync();
+            }
+            
+            await using (var contentDbContext = InMemoryContentDbContext(contentDbContextId))
+            {
+                var service = SetupMethodologyService(contentDbContext);
+
+                var result = await service.GetByRelease(release.Id);
+                Assert.Equal(methodology.Id, result.Id);
+            }
+        }
+
+        [Fact]
+        public async Task GetByRelease_PublicationHasNoMethodology()
+        {
+            var release = new Release
+            {
+                Publication = new Publication
+                {
+                    Title = "Publication",
+                    Slug = "publication-slug",
+                    Methodology = null
+                },
+                ReleaseName = "2018",
+                TimePeriodCoverage = AcademicYearQ1,
+                Status = Approved
+            };
+
+            var contentDbContextId = Guid.NewGuid().ToString();
+        
+            await using (var contentDbContext = InMemoryContentDbContext(contentDbContextId))
+            {
+                await contentDbContext.Releases.AddAsync(release);
+                await contentDbContext.SaveChangesAsync();
+            }
+            
+            await using (var contentDbContext = InMemoryContentDbContext(contentDbContextId))
+            {
+                var service = SetupMethodologyService(contentDbContext);
+
+                var result = await service.GetByRelease(release.Id);
+                Assert.Null(result);
+            }
+        }
+
         private static PublishContext PublishContext()
         {
             var published = DateTime.Today.Add(new TimeSpan(9, 30, 0));
             return new PublishContext(published, true);
+        }
+
+        private MethodologyService SetupMethodologyService(ContentDbContext contentDbContext)
+        {
+            return new MethodologyService(
+                contentDbContext,
+                MapperForProfile<MappingProfiles>());
         }
     }
 }

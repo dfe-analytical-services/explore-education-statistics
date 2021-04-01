@@ -10,6 +10,8 @@ using GovUk.Education.ExploreEducationStatistics.Common.Tests.Utils;
 using GovUk.Education.ExploreEducationStatistics.Common.Utils;
 using GovUk.Education.ExploreEducationStatistics.Content.Model;
 using GovUk.Education.ExploreEducationStatistics.Content.Model.Database;
+using GovUk.Education.ExploreEducationStatistics.Content.Model.Repository;
+using GovUk.Education.ExploreEducationStatistics.Content.Model.Repository.Interfaces;
 using GovUk.Education.ExploreEducationStatistics.Content.Security;
 using GovUk.Education.ExploreEducationStatistics.Data.Model.Database;
 using Microsoft.AspNetCore.Http;
@@ -174,13 +176,15 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
         {
             return new ReleaseDataFileService(
                 contentDbContext ?? new Mock<ContentDbContext>().Object,
-                statisticsDbContext ?? new Mock<StatisticsDbContext>().Object,
                 contentPersistenceHelper ?? DefaultPersistenceHelperMock().Object,
                 blobStorageService ?? new Mock<IBlobStorageService>().Object,
                 dataArchiveValidationService ?? new Mock<IDataArchiveValidationService>().Object,
                 fileUploadsValidatorService ?? new Mock<IFileUploadsValidatorService>().Object,
                 fileRepository ?? new FileRepository(contentDbContext),
-                releaseRepository ?? new ReleaseRepository(contentDbContext, statisticsDbContext, Common.Services.MapperUtils.MapperForProfile<MappingProfiles>()),
+                releaseRepository ?? new ReleaseRepository(
+                    contentDbContext, 
+                    statisticsDbContext ?? new Mock<StatisticsDbContext>().Object, 
+                    Common.Services.MapperUtils.MapperForProfile<MappingProfiles>()),
                 releaseFileRepository ?? new ReleaseFileRepository(contentDbContext),
                 releaseDataFileRepository ?? new ReleaseDataFileRepository(contentDbContext),
                 dataImportService ?? new Mock<IDataImportService>().Object,

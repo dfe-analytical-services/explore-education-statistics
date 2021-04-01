@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Linq;
+using static GovUk.Education.ExploreEducationStatistics.Common.Model.FileType;
 using static GovUk.Education.ExploreEducationStatistics.Common.Services.FileStoragePathUtils;
 
 namespace GovUk.Education.ExploreEducationStatistics.Content.Model.Extensions
@@ -18,7 +19,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Content.Model.Extensions
                 throw new ArgumentException("Release must be hydrated with Publication to create All Files zip path");
             }
 
-            return PublicReleaseAllFilesZipPath(release.Id, release.Publication.Slug, release.Slug);
+            return $"{FilesPath(release.Id, Ancillary)}{release.Publication.Slug}_{release.Slug}.zip";
         }
 
         /// <summary>

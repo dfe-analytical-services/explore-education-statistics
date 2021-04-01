@@ -17,7 +17,6 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
         public async Task ReleaseHierarchyCreated()
         {
             var subjectFilename = "test-data.csv";
-            var subjectName = "Subject name";
             var release = new Release
             {
                 ReleaseName = "2000",
@@ -52,10 +51,9 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
                 var releaseRepository = new ReleaseRepository(contentDbContext, statisticsDbContext,
                     Common.Services.MapperUtils.MapperForProfile<MappingProfiles>());
 
-                await releaseRepository.CreateReleaseAndSubjectHierarchy(
+                await releaseRepository.CreateStatisticsDbReleaseAndSubjectHierarchy(
                     release.Id,
-                    subjectFilename,
-                    subjectName);
+                    subjectFilename);
             }
 
             await using (var statisticsDbContext = InMemoryStatisticsDbContext(statisticsDbContextId))
@@ -88,7 +86,6 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
         public async Task ReleaseHierarchyUpdated()
         {
             var subjectFilename = "test-data.csv";
-            var subjectName = "Subject name";
             var release = new Release
             {
                 ReleaseName = "2000",
@@ -148,10 +145,9 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
                 var releaseRepository = new ReleaseRepository(contentDbContext, statisticsDbContext,
                     Common.Services.MapperUtils.MapperForProfile<MappingProfiles>());
 
-                await releaseRepository.CreateReleaseAndSubjectHierarchy(
+                await releaseRepository.CreateStatisticsDbReleaseAndSubjectHierarchy(
                     release.Id,
-                    subjectFilename,
-                    subjectName);
+                    subjectFilename);
             }
 
             await using (var statisticsDbContext = InMemoryStatisticsDbContext(statisticsDbContextId))
@@ -179,7 +175,6 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
         public async Task SubjectHierarchyCreated()
         {
             var subjectFilename = "test-data.csv";
-            var subjectName = "Subject name";
             var release = new Release
             {
                 ReleaseName = "2000",
@@ -212,10 +207,9 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
                 var releaseRepository = new ReleaseRepository(contentDbContext, statisticsDbContext,
                     Common.Services.MapperUtils.MapperForProfile<MappingProfiles>());
 
-                await releaseRepository.CreateReleaseAndSubjectHierarchy(
+                await releaseRepository.CreateStatisticsDbReleaseAndSubjectHierarchy(
                     release.Id,
-                    subjectFilename,
-                    subjectName);
+                    subjectFilename);
             }
 
             await using (var statisticsDbContext = InMemoryStatisticsDbContext(statisticsDbContextId))
@@ -223,7 +217,6 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
                 var subjects = statisticsDbContext.Subject.ToList();
                 Assert.Single(subjects);
                 Assert.Equal(subjectFilename, subjects[0].Filename);
-                Assert.Equal(subjectName, subjects[0].Name);
 
                 var releaseSubjects = statisticsDbContext.ReleaseSubject.ToList();
                 Assert.Single(releaseSubjects);

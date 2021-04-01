@@ -3,6 +3,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Services.ViewModels
     public class LocationViewModel
     {
         public CodeNameViewModel Country { get; set; }
+        public CodeNameViewModel EnglishDevolvedArea { get; set; }
         public CodeNameViewModel Institution { get; set; }
         public CodeNameViewModel LocalAuthority { get; set; }
         public CodeNameViewModel LocalAuthorityDistrict { get; set; }

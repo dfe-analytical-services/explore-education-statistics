@@ -8,7 +8,6 @@ using CsvHelper;
 using GovUk.Education.ExploreEducationStatistics.Common.Database;
 using GovUk.Education.ExploreEducationStatistics.Common.Extensions;
 using GovUk.Education.ExploreEducationStatistics.Common.Model;
-using GovUk.Education.ExploreEducationStatistics.Common.Services;
 using GovUk.Education.ExploreEducationStatistics.Common.Services.Interfaces;
 using GovUk.Education.ExploreEducationStatistics.Content.Model;
 using GovUk.Education.ExploreEducationStatistics.Content.Model.Extensions;
@@ -303,7 +302,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Processor.Services
             {
                 FilteredObservationCount = filteredRows,
                 RowsPerBatch = rowsPerBatch,
-                NumBatches = FileStorageUtils.GetNumBatches(totalRowCount, rowsPerBatch)
+                NumBatches = GetNumBatches(totalRowCount, rowsPerBatch)
             };
         }
 
@@ -338,6 +337,11 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Processor.Services
 
             var encodingStream = await _blobStorageService.StreamBlob(PrivateReleaseFiles, file.Path());
             return _fileTypeService.HasMatchingEncodingType(encodingStream, CsvEncodingTypes);
+        }
+
+        private static int GetNumBatches(int rows, int rowsPerBatch)
+        {
+            return (int) Math.Ceiling(rows / (double) rowsPerBatch);
         }
     }
 }

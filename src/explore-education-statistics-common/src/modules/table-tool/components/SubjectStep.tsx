@@ -1,5 +1,3 @@
-import Details from '@common/components/Details';
-import InsetText from '@common/components/InsetText';
 import SummaryList from '@common/components/SummaryList';
 import SummaryListItem from '@common/components/SummaryListItem';
 import Tabs from '@common/components/Tabs';
@@ -40,13 +38,7 @@ const SubjectStep = ({
   const hasHighlights = renderHighlightLink && highlights.length > 0;
 
   const heading = (
-    <WizardStepHeading
-      {...stepProps}
-      fieldsetHeading={!hasHighlights}
-      editTitle={
-        hasHighlights ? 'Change featured table or subject' : 'Change subject'
-      }
-    >
+    <WizardStepHeading {...stepProps} fieldsetHeading={!hasHighlights}>
       {hasHighlights
         ? 'View a featured table or create your own'
         : 'Choose a subject'}
@@ -55,25 +47,23 @@ const SubjectStep = ({
 
   if (isActive) {
     const form = (
-      <>
-        <SubjectForm
-          {...stepProps}
-          initialValues={{
-            subjectId,
-          }}
-          options={subjects}
-          onSubmit={onSubmit}
-          legendSize={hasHighlights ? 'm' : 'l'}
-          legend={
-            hasHighlights ? (
-              <h3 className="govuk-fieldset__heading">Choose a subject</h3>
-            ) : (
-              heading
-            )
-          }
-          legendHint="Choose a subject to create your table from, more information on the data coverage can be found by viewing more details"
-        />
-      </>
+      <SubjectForm
+        {...stepProps}
+        initialValues={{
+          subjectId,
+        }}
+        options={subjects}
+        onSubmit={onSubmit}
+        legendSize={hasHighlights ? 'm' : 'l'}
+        legend={
+          hasHighlights ? (
+            <h3 className="govuk-fieldset__heading">Choose a subject</h3>
+          ) : (
+            heading
+          )
+        }
+        legendHint="Choose a subject to create your table from, more information on the data coverage can be found by viewing more details"
+      />
     );
 
     return hasHighlights ? (
@@ -99,17 +89,10 @@ const SubjectStep = ({
               />
             )}
 
-            <InsetText>
-              <p>
-                If you can't find the table you're looking for, then you can{' '}
-              </p>
-              <a
-                className="govuk-button"
-                href={`#${subjectTabIds.createTable}`}
-              >
-                Create your own table
-              </a>
-            </InsetText>
+            <p>If you can't find the table you're looking for, then you can </p>
+            <a className="govuk-button" href={`#${subjectTabIds.createTable}`}>
+              Create your own table
+            </a>
           </TabsSection>
           <TabsSection
             title="Create your own table"
@@ -118,17 +101,9 @@ const SubjectStep = ({
             {form}
           </TabsSection>
         </Tabs>
-        <h2 className="govuk-heading-m govuk-!-margin-top-9">
-          View or edit previous step
-        </h2>
       </>
     ) : (
-      <>
-        {form}
-        <h2 className="govuk-heading-m govuk-!-margin-top-9">
-          View or edit previous step
-        </h2>
-      </>
+      form
     );
   }
 
@@ -137,16 +112,11 @@ const SubjectStep = ({
 
   return (
     <>
-      <div className="govuk-grid-row">
-        <div className="govuk-grid-column-two-thirds">
-          <SummaryList noBorder>
-            <SummaryListItem term="Subject">{subjectName}</SummaryListItem>
-          </SummaryList>
-        </div>
-        <div className="govuk-grid-column-one-third dfe-align--right">
-          {heading}
-        </div>
-      </div>
+      {heading}
+
+      <SummaryList noBorder>
+        <SummaryListItem term="Subject">{subjectName}</SummaryListItem>
+      </SummaryList>
     </>
   );
 };

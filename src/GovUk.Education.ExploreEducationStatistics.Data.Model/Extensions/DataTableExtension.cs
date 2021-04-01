@@ -15,7 +15,9 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Model.Extensions
 
             dataTable.Columns.Add(column);
 
-            var rows = values?.Select(value => new[]
+            var rows = values?
+                .OrderBy(value => value)
+                .Select(value => new[]
             {
                 new ColumnValue(column, value)
             }).ToMultidimensionalArray();
@@ -35,7 +37,9 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Model.Extensions
             dataTable.Columns.Add(yearColumn);
             dataTable.Columns.Add(timeIdentifierColumn);
 
-            var rows = values.Select(value => new[]
+            var rows = values
+                .OrderBy(value => $"{value.Year}{value.TimeIdentifier}")
+                .Select(value => new[]
             {
                 new ColumnValue(yearColumn, value.Year),
                 new ColumnValue(timeIdentifierColumn, value.TimeIdentifier.GetEnumValue())

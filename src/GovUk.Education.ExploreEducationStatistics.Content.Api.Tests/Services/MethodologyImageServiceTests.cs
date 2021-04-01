@@ -32,8 +32,6 @@ namespace GovUk.Education.ExploreEducationStatistics.Content.Api.Tests.Services
                 Methodology = methodology,
                 File = new File
                 {
-                    PrivateBlobPathMigrated = true,
-                    PublicBlobPathMigrated = true,
                     RootPath = Guid.NewGuid(),
                     Filename = "image.png",
                     Type = Image
@@ -111,8 +109,6 @@ namespace GovUk.Education.ExploreEducationStatistics.Content.Api.Tests.Services
                 Methodology = new Methodology(),
                 File = new File
                 {
-                    PrivateBlobPathMigrated = true,
-                    PublicBlobPathMigrated = true,
                     RootPath = Guid.NewGuid(),
                     Filename = "image.png",
                     Type = Image
@@ -180,8 +176,6 @@ namespace GovUk.Education.ExploreEducationStatistics.Content.Api.Tests.Services
                 Methodology = methodology,
                 File = new File
                 {
-                    PrivateBlobPathMigrated = true,
-                    PublicBlobPathMigrated = true,
                     RootPath = Guid.NewGuid(),
                     Filename = "image.png",
                     Type = Image

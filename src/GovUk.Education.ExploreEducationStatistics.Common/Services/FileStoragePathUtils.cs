@@ -102,11 +102,6 @@ namespace GovUk.Education.ExploreEducationStatistics.Common.Services
             return $"{rootPath}/{typeFolder}/";
         }
 
-        public static string PublicReleaseAllFilesZipPath(Guid releaseId, string publicationSlug, string releaseSlug)
-        {
-            return $"{FilesPath(releaseId, Ancillary)}{publicationSlug}_{releaseSlug}.zip";
-        }
-
         private static string AppendPathSeparator(string segment = null)
         {
             return segment == null ? "" : segment + "/";

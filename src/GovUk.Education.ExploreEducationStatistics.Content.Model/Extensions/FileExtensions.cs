@@ -19,23 +19,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Content.Model.Extensions
 
         public static string Path(this File file)
         {
-            return file.PrivateBlobPathMigrated
-                ? file.MigratedPath()
-                : file.LegacyPrivatePath();
-        }
-
-        public static string MigratedPath(this File file)
-        {
             return $"{FilesPath(file.RootPath, file.Type)}{file.Id}";
-        }
-
-        private static string LegacyPrivatePath(this File file)
-        {
-            var blobName = file.Type == Ancillary || file.Type == Chart
-                ? file.Id.ToString()
-                : file.Filename;
-            var typeFolder = (file.Type == Metadata ? Data : file.Type).GetEnumLabel();
-            return $"{file.RootPath}/{typeFolder}/{blobName}";
         }
 
         public static string BatchesPath(this File file)
@@ -50,6 +34,11 @@ namespace GovUk.Education.ExploreEducationStatistics.Content.Model.Extensions
 
         public static string PublicPath(this File file, Release release)
         {
+            return file.PublicPath(release.Id);
+        }
+
+        public static string PublicPath(this File file, Guid releaseId)
+        {
             if (!PublicFileTypes.Contains(file.Type))
             {
                 throw new ArgumentOutOfRangeException(nameof(file.Type), file.Type, "Cannot create public path for file type");
@@ -60,32 +49,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Content.Model.Extensions
             // This is not necessarily the same as the Release at the time of uploading,
             // if the file belongs to a Release amendment.
 
-            return file.PublicBlobPathMigrated
-                    ? file.MigratedPublicPath(release)
-                    : file.LegacyPublicPath(release);
-        }
-
-        public static string MigratedPublicPath(this File file, Release release)
-        {
-            return file.MigratedPublicPath(release.Id);
-        }
-
-        public static string MigratedPublicPath(this File file, Guid releaseId)
-        {
             return $"{FilesPath(releaseId, file.Type)}{file.Id}";
-        }
-
-        private static string LegacyPublicPath(this File file, Release release)
-        {
-            if (release.Publication == null)
-            {
-                throw new ArgumentException("Release must be hydrated with Publication to create legacy public path");
-            }
-
-            var blobName = file.Type == Ancillary || file.Type == Chart
-                ? file.Id.ToString()
-                : file.Filename;
-            return $"{release.Publication.Slug}/{release.Slug}/{file.Type.GetEnumLabel()}/{blobName}";
         }
 
         public static FileInfo ToFileInfo(this File file, BlobInfo blobInfo)

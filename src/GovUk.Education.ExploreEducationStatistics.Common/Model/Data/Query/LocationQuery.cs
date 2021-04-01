@@ -9,6 +9,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Common.Model.Data.Query
         [JsonConverter(typeof(StringEnumConverter))]
         public GeographicLevel? GeographicLevel { get; set; }
         public IEnumerable<string> Country { get; set; }
+        public IEnumerable<string> EnglishDevolvedArea { get; set; }
         public IEnumerable<string> Institution { get; set; }
         public IEnumerable<string> LocalAuthority { get; set; }
         public IEnumerable<string> LocalAuthorityDistrict { get; set; }

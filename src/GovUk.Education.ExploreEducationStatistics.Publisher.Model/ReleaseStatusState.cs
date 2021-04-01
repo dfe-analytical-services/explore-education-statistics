@@ -176,7 +176,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Publisher.Model
         Invalid,
         Scheduled,
         Started,
-        Superseded 
+        Superseded
     }
 
     public enum ReleaseStatusPublishingStage

@@ -13,7 +13,7 @@ Navigate to glossary page
     user goes to url   %{PUBLIC_URL}
     user waits until h1 is visible  Explore our statistics and data
 
-    user clicks link   Education statistics: glossary
+    user clicks link  Glossary
     user waits until h1 is visible   Glossary
     user checks url contains  %{PUBLIC_URL}/glossary
 

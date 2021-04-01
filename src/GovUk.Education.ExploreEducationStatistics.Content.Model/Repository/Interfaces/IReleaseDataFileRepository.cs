@@ -2,9 +2,8 @@
 using System.Collections.Generic;
 using System.Threading.Tasks;
 using GovUk.Education.ExploreEducationStatistics.Common.Model;
-using GovUk.Education.ExploreEducationStatistics.Content.Model;
 
-namespace GovUk.Education.ExploreEducationStatistics.Admin.Services.Interfaces
+namespace GovUk.Education.ExploreEducationStatistics.Content.Model.Repository.Interfaces
 {
     public interface IReleaseDataFileRepository
     {
@@ -13,17 +12,22 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Services.Interfaces
             Guid subjectId,
             string filename,
             FileType type,
+            Guid createdById,
+            string name = null,
             File replacingFile = null,
             File source = null);
 
         public Task<File> CreateZip(
             Guid releaseId,
-            string filename);
+            string filename,
+            Guid createdById);
 
         public Task<IList<File>> ListDataFiles(Guid releaseId);
 
         public Task<bool> HasAnyDataFiles(Guid releaseId);
 
         public Task<IList<File>> ListReplacementDataFiles(Guid releaseId);
+
+        public Task<ReleaseFile> GetBySubject(Guid releaseId, Guid subjectId);
     }
 }

@@ -2,7 +2,7 @@ import Accordion from '@common/components/Accordion';
 import AccordionSection from '@common/components/AccordionSection';
 import FormattedDate from '@common/components/FormattedDate';
 import RelatedAside from '@common/components/RelatedAside';
-import MethodologySectionBlocks from '@common/modules/methodology/components/MethodologySectionBlocks';
+import MethodologySectionBlocks from '@frontend/modules/methodologies/components/MethodologySectionBlocks';
 import methodologyService, {
   Methodology,
 } from '@common/services/methodologyService';
@@ -115,6 +115,7 @@ const MethodologyPage: NextPage<Props> = ({ data }) => {
                     id={contentId}
                     open={open}
                     content={content}
+                    methodologyId={data.id}
                   />
                 )}
               </AccordionSection>
@@ -144,7 +145,10 @@ const MethodologyPage: NextPage<Props> = ({ data }) => {
                   caption={caption}
                   key={order}
                 >
-                  <MethodologySectionBlocks blocks={content} />
+                  <MethodologySectionBlocks
+                    blocks={content}
+                    methodologyId={data.id}
+                  />
                 </AccordionSection>
               );
             })}

@@ -284,6 +284,7 @@ if args.env == 'dev':
     robotArgs += ['--exclude', 'NotAgainstDev']
 if args.env == 'test':
     robotArgs += ['--include', 'Test',
+                  '--exclude', 'NotAgainstTest',
                   '--exclude', 'AltersData']
 if args.env == 'preprod':
     robotArgs += ['--include', 'Preprod',

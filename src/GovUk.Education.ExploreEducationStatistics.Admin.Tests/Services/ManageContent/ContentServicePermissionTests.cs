@@ -1,19 +1,22 @@
 using System;
 using System.Collections.Generic;
-using System.Threading.Tasks;
-using AutoMapper;
 using GovUk.Education.ExploreEducationStatistics.Admin.Security;
 using GovUk.Education.ExploreEducationStatistics.Admin.Services.ManageContent;
 using GovUk.Education.ExploreEducationStatistics.Admin.ViewModels.ManageContent;
-using GovUk.Education.ExploreEducationStatistics.Common.Model;
 using GovUk.Education.ExploreEducationStatistics.Common.Services.Interfaces.Security;
 using GovUk.Education.ExploreEducationStatistics.Common.Tests.Utils;
 using GovUk.Education.ExploreEducationStatistics.Common.Utils;
 using GovUk.Education.ExploreEducationStatistics.Content.Model;
 using GovUk.Education.ExploreEducationStatistics.Content.Model.Database;
-using Microsoft.AspNetCore.Mvc;
+using GovUk.Education.ExploreEducationStatistics.Content.Model.Repository;
+using GovUk.Education.ExploreEducationStatistics.Content.Model.Repository.Interfaces;
+using GovUk.Education.ExploreEducationStatistics.Content.Security;
 using Moq;
 using Xunit;
+using static GovUk.Education.ExploreEducationStatistics.Admin.Security.SecurityPolicies;
+using static GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services.MapperUtils;
+using static GovUk.Education.ExploreEducationStatistics.Common.Tests.Utils.PermissionTestUtils;
+using static GovUk.Education.ExploreEducationStatistics.Content.Security.ContentSecurityPolicies;
 
 namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services.ManageContent
 {
@@ -50,184 +53,258 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services.Manage
         };
 
         [Fact]
-        public void AddCommentAsync()
+        public void AddComment()
         {
-            AssertSecurityPoliciesChecked(service =>
-                    service.AddCommentAsync(
-                        _release.Id,
-                        ContentSectionId,
-                        ContentBlockId,
-                        new CommentSaveRequest()),
-                _release,
-                SecurityPolicies.CanUpdateSpecificRelease);
+            PolicyCheckBuilder<SecurityPolicies>()
+                .ExpectResourceCheckToFail(_release, CanUpdateSpecificRelease)
+                .AssertForbidden(
+                    userService =>
+                    {
+                        var service = SetupContentService(userService: userService.Object);
+                        return service.AddCommentAsync(
+                            _release.Id,
+                            ContentSectionId,
+                            ContentBlockId,
+                            new CommentSaveRequest());
+                    }
+                );
         }
 
         [Fact]
-        public void DeleteCommentAsync()
+        public void DeleteComment()
         {
-            AssertSecurityPoliciesChecked(service =>
-                    service.DeleteCommentAsync(_comment.Id),
-                _comment,
-                SecurityPolicies.CanUpdateSpecificComment);
+            PolicyCheckBuilder<SecurityPolicies>()
+                .ExpectResourceCheckToFail(_comment, CanUpdateSpecificComment)
+                .AssertForbidden(
+                    userService =>
+                    {
+                        var service = SetupContentService(userService: userService.Object);
+                        return service.DeleteCommentAsync(
+                            _comment.Id);
+                    }
+                );
         }
 
         [Fact]
-        public void UpdateCommentAsync()
+        public void UpdateComment()
         {
-            AssertSecurityPoliciesChecked(service =>
-                    service.UpdateCommentAsync(
-                        _comment.Id,
-                        new CommentSaveRequest()),
-                _comment,
-                SecurityPolicies.CanUpdateSpecificComment);
+            PolicyCheckBuilder<SecurityPolicies>()
+                .ExpectResourceCheckToFail(_comment, CanUpdateSpecificComment)
+                .AssertForbidden(
+                    userService =>
+                    {
+                        var service = SetupContentService(userService: userService.Object);
+                        return service.UpdateCommentAsync(
+                            _comment.Id,
+                            new CommentSaveRequest());
+                    }
+                );
         }
 
         [Fact]
-        public void AddContentBlockAsync()
+        public void AddContentBlock()
         {
-            AssertSecurityPoliciesChecked(service =>
-                    service.AddContentBlockAsync(
-                        _release.Id,
-                        ContentSectionId,
-                        new ContentBlockAddRequest()),
-                _release,
-                SecurityPolicies.CanUpdateSpecificRelease);
+            PolicyCheckBuilder<SecurityPolicies>()
+                .ExpectResourceCheckToFail(_release, CanUpdateSpecificRelease)
+                .AssertForbidden(
+                    userService =>
+                    {
+                        var service = SetupContentService(userService: userService.Object);
+                        return service.AddContentBlockAsync(
+                            _release.Id,
+                            ContentSectionId,
+                            new ContentBlockAddRequest());
+                    }
+                );
         }
 
         [Fact]
-        public void AddContentSectionAsync()
+        public void AddContentSection()
         {
-            AssertSecurityPoliciesChecked(service =>
-                    service.AddContentSectionAsync(
-                        _release.Id,
-                        new ContentSectionAddRequest()),
-                _release,
-                SecurityPolicies.CanUpdateSpecificRelease);
+            PolicyCheckBuilder<SecurityPolicies>()
+                .ExpectResourceCheckToFail(_release, CanUpdateSpecificRelease)
+                .AssertForbidden(
+                    userService =>
+                    {
+                        var service = SetupContentService(userService: userService.Object);
+                        return service.AddContentSectionAsync(
+                            _release.Id,
+                            new ContentSectionAddRequest());
+                    }
+                );
         }
 
         [Fact]
         public void AttachDataBlock()
         {
-            AssertSecurityPoliciesChecked(service =>
-                    service.AttachDataBlock(
-                        _release.Id,
-                        ContentSectionId,
-                        new ContentBlockAttachRequest()),
-                _release,
-                SecurityPolicies.CanUpdateSpecificRelease);
+            PolicyCheckBuilder<SecurityPolicies>()
+                .ExpectResourceCheckToFail(_release, CanUpdateSpecificRelease)
+                .AssertForbidden(
+                    userService =>
+                    {
+                        var service = SetupContentService(userService: userService.Object);
+                        return service.AttachDataBlock(
+                            _release.Id,
+                            ContentSectionId,
+                            new ContentBlockAttachRequest());
+                    }
+                );
         }
 
         [Fact]
-        public void RemoveContentBlockAsync()
+        public void GetContentBlocks()
         {
-            AssertSecurityPoliciesChecked(service =>
-                    service.RemoveContentBlockAsync(
-                        _release.Id,
-                        ContentSectionId,
-                        ContentBlockId),
-                _release,
-                SecurityPolicies.CanUpdateSpecificRelease);
+            PolicyCheckBuilder<ContentSecurityPolicies>()
+                .ExpectResourceCheckToFail(_release, CanViewRelease)
+                .AssertForbidden(
+                    userService =>
+                    {
+                        var service = SetupContentService(userService: userService.Object);
+                        return service.GetContentBlocks<HtmlBlock>(_release.Id);
+                    }
+                );
         }
 
         [Fact]
-        public void RemoveContentSectionAsync()
+        public void RemoveContentBlock()
         {
-            AssertSecurityPoliciesChecked(service =>
-                    service.RemoveContentSectionAsync(
-                        _release.Id,
-                        ContentSectionId),
-                _release,
-                SecurityPolicies.CanUpdateSpecificRelease);
+            PolicyCheckBuilder<SecurityPolicies>()
+                .ExpectResourceCheckToFail(_release, CanUpdateSpecificRelease)
+                .AssertForbidden(
+                    userService =>
+                    {
+                        var service = SetupContentService(userService: userService.Object);
+                        return service.RemoveContentBlockAsync(
+                            _release.Id,
+                            ContentSectionId,
+                            ContentBlockId);
+                    }
+                );
         }
 
         [Fact]
-        public void ReorderContentBlocksAsync()
+        public void RemoveContentSection()
         {
-            AssertSecurityPoliciesChecked(service =>
-                    service.ReorderContentBlocksAsync(
-                        _release.Id,
-                        ContentSectionId,
-                        new Dictionary<Guid, int>()),
-                _release,
-                SecurityPolicies.CanUpdateSpecificRelease);
+            PolicyCheckBuilder<SecurityPolicies>()
+                .ExpectResourceCheckToFail(_release, CanUpdateSpecificRelease)
+                .AssertForbidden(
+                    userService =>
+                    {
+                        var service = SetupContentService(userService: userService.Object);
+                        return service.RemoveContentSectionAsync(
+                            _release.Id,
+                            ContentSectionId);
+                    }
+                );
         }
 
         [Fact]
-        public void ReorderContentSectionsAsync()
+        public void ReorderContentBlocks()
         {
-            AssertSecurityPoliciesChecked(service =>
-                    service.ReorderContentSectionsAsync(
-                        _release.Id,
-                        new Dictionary<Guid, int>()),
-                _release,
-                SecurityPolicies.CanUpdateSpecificRelease);
+            PolicyCheckBuilder<SecurityPolicies>()
+                .ExpectResourceCheckToFail(_release, CanUpdateSpecificRelease)
+                .AssertForbidden(
+                    userService =>
+                    {
+                        var service = SetupContentService(userService: userService.Object);
+                        return service.ReorderContentBlocksAsync(
+                            _release.Id,
+                            ContentSectionId,
+                            new Dictionary<Guid, int>());
+                    }
+                );
         }
 
         [Fact]
-        public void UpdateContentSectionHeadingAsync()
+        public void ReorderContentSections()
         {
-            AssertSecurityPoliciesChecked(service =>
-                    service.UpdateContentSectionHeadingAsync(
-                        _release.Id,
-                        ContentSectionId,
-                        ""),
-                _release,
-                SecurityPolicies.CanUpdateSpecificRelease);
+            PolicyCheckBuilder<SecurityPolicies>()
+                .ExpectResourceCheckToFail(_release, CanUpdateSpecificRelease)
+                .AssertForbidden(
+                    userService =>
+                    {
+                        var service = SetupContentService(userService: userService.Object);
+                        return service.ReorderContentSectionsAsync(
+                            _release.Id,
+                            new Dictionary<Guid, int>());
+                    }
+                );
         }
 
         [Fact]
-        public void UpdateTextBasedContentBlockAsync()
+        public void UpdateContentSectionHeading()
         {
-            AssertSecurityPoliciesChecked(service =>
-                    service.UpdateTextBasedContentBlockAsync(
-                        _release.Id,
-                        ContentSectionId,
-                        ContentBlockId,
-                        new ContentBlockUpdateRequest()),
-                _release,
-                SecurityPolicies.CanUpdateSpecificRelease);
+            PolicyCheckBuilder<SecurityPolicies>()
+                .ExpectResourceCheckToFail(_release, CanUpdateSpecificRelease)
+                .AssertForbidden(
+                    userService =>
+                    {
+                        var service = SetupContentService(userService: userService.Object);
+                        return service.UpdateContentSectionHeadingAsync(
+                            _release.Id,
+                            ContentSectionId,
+                            "");
+                    }
+                );
         }
 
         [Fact]
-        public void UpdateDataBlockAsync()
+        public void UpdateTextBasedContentBlock()
         {
-            AssertSecurityPoliciesChecked(service =>
-                    service.UpdateDataBlockAsync(
-                        _release.Id,
-                        ContentSectionId,
-                        ContentBlockId,
-                        new DataBlockUpdateRequest()),
-                _release,
-                SecurityPolicies.CanUpdateSpecificRelease);
+            PolicyCheckBuilder<SecurityPolicies>()
+                .ExpectResourceCheckToFail(_release, CanUpdateSpecificRelease)
+                .AssertForbidden(
+                    userService =>
+                    {
+                        var service = SetupContentService(userService: userService.Object);
+                        return service.UpdateTextBasedContentBlockAsync(
+                            _release.Id,
+                            ContentSectionId,
+                            ContentBlockId,
+                            new ContentBlockUpdateRequest());
+                    }
+                );
         }
 
-        private void AssertSecurityPoliciesChecked<T, TProtectedResource>(
-            Func<ContentService, Task<Either<ActionResult, T>>> protectedAction,
-            TProtectedResource resource,
-            params SecurityPolicies[] policies)
+        [Fact]
+        public void UpdateDataBlock()
         {
-            var (contentDbContext, persistenceHelper, mapper, userService) = Mocks();
-
-            var service = new ContentService(contentDbContext.Object, persistenceHelper.Object, mapper.Object, userService.Object);
-
-            PermissionTestUtil.AssertSecurityPoliciesChecked(protectedAction, resource, userService, service, policies);
+            PolicyCheckBuilder<SecurityPolicies>()
+                .ExpectResourceCheckToFail(_release, CanUpdateSpecificRelease)
+                .AssertForbidden(
+                    userService =>
+                    {
+                        var service = SetupContentService(userService: userService.Object);
+                        return service.UpdateDataBlockAsync(
+                            _release.Id,
+                            ContentSectionId,
+                            ContentBlockId,
+                            new DataBlockUpdateRequest());
+                    }
+                );
         }
 
-        private (
-            Mock<ContentDbContext>,
-            Mock<IPersistenceHelper<ContentDbContext>>,
-            Mock<IMapper>,
-            Mock<IUserService>) Mocks()
+        private ContentService SetupContentService(
+            ContentDbContext contentDbContext = null,
+            IPersistenceHelper<ContentDbContext> persistenceHelper = null,
+            IReleaseContentSectionRepository releaseContentSectionRepository = null,
+            IUserService userService = null)
         {
-            var persistenceHelper = MockUtils.MockPersistenceHelper<ContentDbContext>();
-            MockUtils.SetupCall(persistenceHelper, _release.Id, _release);
-            MockUtils.SetupCall(persistenceHelper, _comment.Id, _comment);
+            return new ContentService(
+                contentDbContext ?? new Mock<ContentDbContext>().Object,
+                persistenceHelper ?? DefaultPersistenceHelperMock().Object,
+                releaseContentSectionRepository ?? new ReleaseContentSectionRepository(contentDbContext),
+                userService ?? new Mock<IUserService>().Object,
+                AdminMapper()
+            );
+        }
 
-            return (
-                new Mock<ContentDbContext>(),
-                persistenceHelper,
-                new Mock<IMapper>(),
-                new Mock<IUserService>());
+        private Mock<IPersistenceHelper<ContentDbContext>> DefaultPersistenceHelperMock()
+        {
+            var mock = MockUtils.MockPersistenceHelper<ContentDbContext, Release>();
+            MockUtils.SetupCall(mock, _release.Id, _release);
+            MockUtils.SetupCall(mock, _comment.Id, _comment);
+            return mock;
         }
     }
 }

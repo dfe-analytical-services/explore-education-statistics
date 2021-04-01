@@ -4,6 +4,7 @@ using System.Linq;
 using System.Threading.Tasks;
 using AutoMapper;
 using GovUk.Education.ExploreEducationStatistics.Admin.Services.Interfaces;
+using GovUk.Education.ExploreEducationStatistics.Admin.Services.Interfaces.ManageContent;
 using GovUk.Education.ExploreEducationStatistics.Admin.Services.Interfaces.Security;
 using GovUk.Education.ExploreEducationStatistics.Admin.ViewModels;
 using GovUk.Education.ExploreEducationStatistics.Common.Model;
@@ -20,6 +21,7 @@ using Microsoft.EntityFrameworkCore;
 using Newtonsoft.Json;
 using static GovUk.Education.ExploreEducationStatistics.Admin.Validators.ValidationErrorMessages;
 using static GovUk.Education.ExploreEducationStatistics.Admin.Validators.ValidationUtils;
+using static GovUk.Education.ExploreEducationStatistics.Common.Model.FileType;
 using IReleaseRepository = GovUk.Education.ExploreEducationStatistics.Admin.Services.Interfaces.IReleaseRepository;
 using IReleaseService = GovUk.Education.ExploreEducationStatistics.Admin.Services.Interfaces.IReleaseService;
 using Publication = GovUk.Education.ExploreEducationStatistics.Content.Model.Publication;
@@ -45,6 +47,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Services
 	    private readonly IFootnoteService _footnoteService;
         private readonly IDataBlockService _dataBlockService;
         private readonly IReleaseChecklistService _releaseChecklistService;
+        private readonly IContentService _contentService;
         private readonly IReleaseSubjectService _releaseSubjectService;
         private readonly IGuidGenerator _guidGenerator;
 
@@ -66,6 +69,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Services
             StatisticsDbContext statisticsDbContext,
             IDataBlockService dataBlockService,
             IReleaseChecklistService releaseChecklistService,
+            IContentService contentService,
             IReleaseSubjectService releaseSubjectService,
             IGuidGenerator guidGenerator)
         {
@@ -84,6 +88,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Services
             _statisticsDbContext = statisticsDbContext;
             _dataBlockService = dataBlockService;
             _releaseChecklistService = releaseChecklistService;
+            _contentService = contentService;
             _releaseSubjectService = releaseSubjectService;
             _guidGenerator = guidGenerator;
         }
@@ -293,6 +298,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Services
                         : request.PublishScheduledDate;
 
                     return await ValidateReleaseWithChecklist(release)
+                        .OnSuccessDo(() => RemoveUnusedImages(release.Id))
                         .OnSuccess(async () =>
                         {
                             _context.Releases.Update(release);
@@ -477,6 +483,31 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Services
 
                             return await _releaseDataFileService.Delete(releaseId, fileId);
                         });
+                });
+        }
+
+        private async Task<Either<ActionResult, Unit>> RemoveUnusedImages(Guid releaseId)
+        {
+            return await _contentService.GetContentBlocks<HtmlBlock>(releaseId)
+                .OnSuccess(async contentBlocks =>
+                {
+                    var contentImageIds = contentBlocks.SelectMany(contentBlock =>
+                            HtmlImageUtil.GetReleaseImages(contentBlock.Body))
+                        .Distinct();
+
+                    var imageFiles = await _releaseFileRepository.GetByFileType(releaseId, Image);
+
+                    var unusedImages = imageFiles
+                        .Where(file => !contentImageIds.Contains(file.File.Id))
+                        .Select(file => file.File.Id)
+                        .ToList();
+
+                    if (unusedImages.Any())
+                    {
+                        return await _releaseFileService.Delete(releaseId, unusedImages);
+                    }
+
+                    return Unit.Instance;
                 });
         }
 
