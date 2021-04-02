@@ -1,5 +1,12 @@
-.env 
+node_modules 
+.env
+.env.*
+!.env.example
+*.js
+*.map
 test-files
 test-results 
 *.csv 
 *.zip
+./utils/*.js 
+./utils/*.map 
