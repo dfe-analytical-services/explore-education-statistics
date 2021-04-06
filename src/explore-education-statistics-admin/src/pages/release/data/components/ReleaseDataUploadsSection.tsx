@@ -226,7 +226,7 @@ const ReleaseDataUploadsSection = ({
             <FormFieldTextInput<FormValues>
               name="subjectTitle"
               label="Subject title"
-              width={20}
+              className="govuk-!-width-two-thirds"
             />
           }
         />
