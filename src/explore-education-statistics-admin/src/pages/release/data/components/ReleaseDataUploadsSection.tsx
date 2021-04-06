@@ -331,6 +331,7 @@ const ReleaseDataUploadsSection = ({
             }
           }}
         >
+          <p>Are you sure you want to delete {deleteDataFile.file.title}?</p>
           <p>This data will no longer be available for use in this release.</p>
 
           {deleteDataFile.plan.deleteDataBlockPlan.dependentDataBlocks.length >
