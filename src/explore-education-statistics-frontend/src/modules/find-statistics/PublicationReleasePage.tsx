@@ -25,6 +25,7 @@ import { logEvent } from '@frontend/services/googleAnalyticsService';
 import classNames from 'classnames';
 import { GetServerSideProps, NextPage } from 'next';
 import React from 'react';
+import orderBy from 'lodash/orderBy';
 import PublicationReleaseHeadlinesSection from './components/PublicationReleaseHeadlinesSection';
 import styles from './PublicationReleasePage.module.scss';
 
@@ -121,7 +122,7 @@ const PublicationReleasePage: NextPage<Props> = ({ data }) => {
                   summary={`See all updates (${data.updates.length})`}
                 >
                   <ol className="govuk-list">
-                    {data.updates.map(update => (
+                    {orderBy(data.updates, 'on', 'desc').map(update => (
                       <li key={update.id}>
                         <FormattedDate className="govuk-body govuk-!-font-weight-bold">
                           {update.on}
