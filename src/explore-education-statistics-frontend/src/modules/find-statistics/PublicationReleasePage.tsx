@@ -309,7 +309,7 @@ const PublicationReleasePage: NextPage<Props> = ({ data }) => {
       <PublicationReleaseHeadlinesSection release={data} />
 
       {data.downloadFiles && (
-        <div className={styles.downloadSection}>
+        <div className="dfe-download-section">
           <Accordion
             id="dataDownloads"
             showOpenAll={false}

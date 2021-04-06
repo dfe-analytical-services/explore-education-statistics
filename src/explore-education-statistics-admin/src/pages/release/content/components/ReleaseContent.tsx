@@ -28,7 +28,6 @@ import React, { useCallback, useMemo } from 'react';
 import { generatePath, useLocation } from 'react-router';
 import AccordionSection from '@common/components/AccordionSection';
 import Accordion from '@common/components/Accordion';
-import styles from './ReleaseContent.module.scss';
 
 const ReleaseContent = () => {
   const config = useConfig();
@@ -271,7 +270,7 @@ const ReleaseContent = () => {
       <ReleaseHeadlines release={release} />
 
       {(release.downloadFiles || release.hasPreReleaseAccessList) && (
-        <div className={styles.downloadSection}>
+        <div className="dfe-download-section">
           <Accordion id="dataDownloads" showOpenAll={false}>
             <AccordionSection heading="Download data and files">
               <p className="govuk-caption-m">
