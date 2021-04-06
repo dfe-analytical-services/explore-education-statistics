@@ -144,8 +144,6 @@ user creates approved methodology
 user creates methodology
     [Arguments]  ${title}
     user waits until h1 is visible  Manage methodologies
-    user waits until page contains element  id:live-methodologies-tab
-    user clicks element  id:live-methodologies-tab
     user clicks link  Create new methodology
     user waits until h1 is visible  Create new methodology
     user enters text into element  id:createMethodologyForm-title   ${title}

@@ -57,6 +57,7 @@ Go to Public Release Link
     [Tags]  HappyPath  NotAgainstLocal
     # To get around basic auth on public frontend
     user goes to url  %{PUBLIC_URL}
+    user waits until h1 is visible  Explore our statistics and data
     user goes to url  ${PUBLIC_RELEASE_LINK}
     user waits until page contains  Page not found
     user checks page does not contain  ${RELEASE_NAME}
