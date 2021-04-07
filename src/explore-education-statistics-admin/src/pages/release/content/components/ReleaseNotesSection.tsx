@@ -193,55 +193,48 @@ const ReleaseNotesSection = ({ release }: Props) => {
   return (
     releaseNotes && (
       <>
-        <dl className="dfe-meta-content">
-          <dt className="govuk-caption-m">Last updated: </dt>
-          <dd id="releaseLastUpdated">
-            <strong>
-              <FormattedDate>{releaseNotes[0]?.on}</FormattedDate>
-            </strong>
-            <Details
-              summary={`See all ${releaseNotes.length} updates`}
-              id="releaseNotes"
-            >
-              <ol className="govuk-list">
-                {releaseNotes.map(elem => (
-                  <li key={elem.id}>
-                    {isEditing &&
-                    editFormOpen &&
-                    selectedReleaseNote.id === elem.id ? (
-                      renderEditForm()
-                    ) : (
-                      <>
-                        <FormattedDate className="govuk-body govuk-!-font-weight-bold">
-                          {elem.on}
-                        </FormattedDate>
-                        <p>{elem.reason}</p>
+        <Details
+          summary={`See all updates (${releaseNotes.length})`}
+          id="releaseNotes"
+          open={isEditing}
+        >
+          <ol className="govuk-list">
+            {releaseNotes.map(elem => (
+              <li key={elem.id}>
+                {isEditing &&
+                editFormOpen &&
+                selectedReleaseNote.id === elem.id ? (
+                  renderEditForm()
+                ) : (
+                  <>
+                    <FormattedDate className="govuk-body govuk-!-font-weight-bold">
+                      {elem.on}
+                    </FormattedDate>
+                    <p>{elem.reason}</p>
 
-                        {isEditing && (
-                          <ButtonGroup>
-                            <Button
-                              variant="secondary"
-                              onClick={() => openEditForm(elem)}
-                            >
-                              Edit note
-                            </Button>
-                            <Button
-                              variant="warning"
-                              onClick={() => setDeletedReleaseNote(elem)}
-                            >
-                              Remove note
-                            </Button>
-                          </ButtonGroup>
-                        )}
-                      </>
+                    {isEditing && (
+                      <ButtonGroup>
+                        <Button
+                          variant="secondary"
+                          onClick={() => openEditForm(elem)}
+                        >
+                          Edit note
+                        </Button>
+                        <Button
+                          variant="warning"
+                          onClick={() => setDeletedReleaseNote(elem)}
+                        >
+                          Remove note
+                        </Button>
+                      </ButtonGroup>
                     )}
-                  </li>
-                ))}
-              </ol>
-            </Details>
-          </dd>
+                  </>
+                )}
+              </li>
+            ))}
+          </ol>
           {isEditing && renderAddForm()}
-        </dl>
+        </Details>
 
         <ModalConfirm
           open={deletedReleaseNote.id.length > 0}
