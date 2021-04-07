@@ -23,7 +23,8 @@ export type ChartSymbol =
   | 'square'
   | 'star'
   | 'triangle'
-  | 'wye';
+  | 'wye'
+  | 'none';
 
 export type LineStyle = 'solid' | 'dashed' | 'dotted';
 
