@@ -4,6 +4,7 @@ using System.Threading.Tasks;
 using GovUk.Education.ExploreEducationStatistics.Admin.Controllers.Api;
 using GovUk.Education.ExploreEducationStatistics.Admin.ViewModels;
 using GovUk.Education.ExploreEducationStatistics.Admin.Services.Interfaces;
+using GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services;
 using GovUk.Education.ExploreEducationStatistics.Admin.Validators;
 using GovUk.Education.ExploreEducationStatistics.Common.Model;
 using Microsoft.AspNetCore.Mvc;
@@ -67,10 +68,8 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Controllers.Api
                 TopicId = topicId
             });
 
-            var badRequestObjectResult = Assert.IsType<BadRequestObjectResult>(result.Result);
-            var value = Assert.IsType<ValidationProblemDetails>(badRequestObjectResult.Value);
-
-            Assert.Contains("SLUG_NOT_UNIQUE", value.Errors.First().Value);
+            ValidationTestUtil.AssertValidationProblem(
+                result.Result, ValidationErrorMessages.SlugNotUnique);
         }
     }
 }

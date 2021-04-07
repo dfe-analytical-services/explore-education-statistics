@@ -5,6 +5,7 @@ using System.Threading.Tasks;
 using AutoMapper;
 using GovUk.Education.ExploreEducationStatistics.Admin.Services.Interfaces.Methodologies;
 using GovUk.Education.ExploreEducationStatistics.Admin.Services.Interfaces.Security;
+using GovUk.Education.ExploreEducationStatistics.Admin.Validators;
 using GovUk.Education.ExploreEducationStatistics.Admin.ViewModels;
 using GovUk.Education.ExploreEducationStatistics.Admin.ViewModels.ManageContent;
 using GovUk.Education.ExploreEducationStatistics.Common.Model;
@@ -49,7 +50,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Services.Methodologie
             _mapper = mapper;
         }
 
-        public Task<Either<ActionResult, ManageMethodologyContentViewModel>> GetContentAsync(Guid methodologyId)
+        public Task<Either<ActionResult, ManageMethodologyContentViewModel>> GetContent(Guid methodologyId)
         {
             return _persistenceHelper
                 .CheckEntityExists<Methodology>(methodologyId)
@@ -75,7 +76,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Services.Methodologie
                 });
         }
 
-        public Task<Either<ActionResult, List<ContentSectionViewModel>>> GetContentSectionsAsync(
+        public Task<Either<ActionResult, List<ContentSectionViewModel>>> GetContentSections(
             Guid methodologyId, ContentListType contentType)
         {
             return _persistenceHelper
@@ -89,7 +90,16 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Services.Methodologie
                 });
         }
 
-        public Task<Either<ActionResult, List<ContentSectionViewModel>>> ReorderContentSectionsAsync(
+        public Task<Either<ActionResult, ContentSectionViewModel>> GetContentSection(Guid methodologyId,
+            Guid contentSectionId)
+        {
+            return
+                CheckContentSectionExists(methodologyId, contentSectionId)
+                    .OnSuccess(CheckCanViewMethodology)
+                    .OnSuccess(tuple => _mapper.Map<ContentSectionViewModel>(tuple.Item2));
+        }
+
+        public Task<Either<ActionResult, List<ContentSectionViewModel>>> ReorderContentSections(
             Guid methodologyId,
             Dictionary<Guid, int> newSectionOrder)
         {
@@ -116,7 +126,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Services.Methodologie
                 });
         }
 
-        public Task<Either<ActionResult, ContentSectionViewModel>> AddContentSectionAsync(
+        public Task<Either<ActionResult, ContentSectionViewModel>> AddContentSection(
             Guid methodologyId, ContentSectionAddRequest request, ContentListType contentType)
         {
             return _persistenceHelper
@@ -149,7 +159,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Services.Methodologie
                 });
         }
 
-        public Task<Either<ActionResult, ContentSectionViewModel>> UpdateContentSectionHeadingAsync(
+        public Task<Either<ActionResult, ContentSectionViewModel>> UpdateContentSectionHeading(
             Guid methodologyId,
             Guid contentSectionId,
             string newHeading)
@@ -169,7 +179,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Services.Methodologie
                     });
         }
 
-        public Task<Either<ActionResult, List<ContentSectionViewModel>>> RemoveContentSectionAsync(
+        public Task<Either<ActionResult, List<ContentSectionViewModel>>> RemoveContentSection(
             Guid methodologyId,
             Guid contentSectionId)
         {
@@ -196,16 +206,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Services.Methodologie
                     });
         }
 
-        public Task<Either<ActionResult, ContentSectionViewModel>> GetContentSectionAsync(Guid methodologyId,
-            Guid contentSectionId)
-        {
-            return
-                CheckContentSectionExists(methodologyId, contentSectionId)
-                    .OnSuccess(CheckCanViewMethodology)
-                    .OnSuccess(tuple => _mapper.Map<ContentSectionViewModel>(tuple.Item2));
-        }
-
-        public Task<Either<ActionResult, List<IContentBlockViewModel>>> ReorderContentBlocksAsync(Guid methodologyId,
+        public Task<Either<ActionResult, List<IContentBlockViewModel>>> ReorderContentBlocks(Guid methodologyId,
             Guid contentSectionId, Dictionary<Guid, int> newBlocksOrder)
         {
             return
@@ -228,7 +229,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Services.Methodologie
                     });
         }
 
-        public Task<Either<ActionResult, IContentBlockViewModel>> AddContentBlockAsync(Guid methodologyId,
+        public Task<Either<ActionResult, IContentBlockViewModel>> AddContentBlock(Guid methodologyId,
             Guid contentSectionId,
             ContentBlockAddRequest request)
         {
@@ -239,12 +240,12 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Services.Methodologie
                 {
                     var (methodology, section) = tuple;
                     var newContentBlock = CreateContentBlockForType(request.Type);
-                    return await AddContentBlockToContentSectionAndSaveAsync(
+                    return await AddContentBlockToContentSectionAndSave(
                         request.Order, section, newContentBlock, methodology);
                 });
         }
 
-        public Task<Either<ActionResult, List<IContentBlockViewModel>>> RemoveContentBlockAsync(
+        public Task<Either<ActionResult, List<IContentBlockViewModel>>> RemoveContentBlock(
             Guid methodologyId, Guid contentSectionId, Guid contentBlockId)
         {
             return CheckContentSectionExists(methodologyId, contentSectionId)
@@ -269,7 +270,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Services.Methodologie
                 });
         }
 
-        public Task<Either<ActionResult, IContentBlockViewModel>> UpdateTextBasedContentBlockAsync(
+        public Task<Either<ActionResult, IContentBlockViewModel>> UpdateTextBasedContentBlock(
             Guid methodologyId, Guid contentSectionId, Guid contentBlockId, ContentBlockUpdateRequest request)
         {
             return CheckContentSectionExists(methodologyId, contentSectionId)
@@ -294,7 +295,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Services.Methodologie
                 });
         }
 
-        private async Task<Either<ActionResult, IContentBlockViewModel>> AddContentBlockToContentSectionAndSaveAsync(int? order,
+        private async Task<Either<ActionResult, IContentBlockViewModel>> AddContentBlockToContentSectionAndSave(int? order,
             ContentSection section,
             ContentBlock newContentBlock, Methodology methodology)
         {
@@ -417,12 +418,24 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Services.Methodologie
 
         private Task<Either<ActionResult, Methodology>> CheckCanUpdateMethodology(Methodology methodology)
         {
+            if (methodology.Status != MethodologyStatus.Draft)
+            {
+                return Task.FromResult<Either<ActionResult, Methodology>>(
+                    ValidationActionResult(ValidationErrorMessages.MethodologyMustBeDraft));
+            }
+
             return _userService.CheckCanUpdateMethodology(methodology);
         }
 
         private Task<Either<ActionResult, Tuple<Methodology, ContentSection>>> CheckCanUpdateMethodology(
             Tuple<Methodology, ContentSection> tuple)
         {
+            if (tuple.Item1.Status != MethodologyStatus.Draft)
+            {
+                return Task.FromResult<Either<ActionResult, Tuple<Methodology, ContentSection>>>(
+                    ValidationActionResult(ValidationErrorMessages.MethodologyMustBeDraft));
+            }
+
             return _userService
                 .CheckCanUpdateMethodology(tuple.Item1)
                 .OnSuccess(_ => tuple);

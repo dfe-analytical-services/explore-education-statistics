@@ -2,12 +2,14 @@
 using System.Collections.Generic;
 using System.Threading.Tasks;
 using GovUk.Education.ExploreEducationStatistics.Admin.Services.Methodologies;
+using GovUk.Education.ExploreEducationStatistics.Admin.ViewModels.ManageContent;
 using GovUk.Education.ExploreEducationStatistics.Common.Services.Interfaces.Security;
 using GovUk.Education.ExploreEducationStatistics.Common.Tests.Utils;
 using GovUk.Education.ExploreEducationStatistics.Common.Utils;
 using GovUk.Education.ExploreEducationStatistics.Content.Model;
 using GovUk.Education.ExploreEducationStatistics.Content.Model.Database;
 using Xunit;
+using static GovUk.Education.ExploreEducationStatistics.Admin.Validators.ValidationErrorMessages;
 using static GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services.DbUtils;
 using static GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services.MapperUtils;
 
@@ -197,6 +199,62 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services.Method
                 Assert.Equal(annexHtmlBlock2.Id, contentBlocks[1].Id);
                 Assert.Equal(contentHtmlBlock1.Id, contentBlocks[2].Id);
                 Assert.Equal(contentHtmlBlock2.Id, contentBlocks[3].Id);
+            }
+        }
+
+        [Fact]
+        public async Task AddContentSection_Draft()
+        {
+            var methodology = new Methodology
+            {
+                Status = MethodologyStatus.Draft,
+            };
+            var contentDbContextId = Guid.NewGuid().ToString();
+            await using (var contentDbContext = InMemoryApplicationDbContext(contentDbContextId))
+            {
+                await contentDbContext.Methodologies.AddAsync(methodology);
+                await contentDbContext.SaveChangesAsync();
+            }
+
+            await using (var contentDbContext = InMemoryApplicationDbContext(contentDbContextId))
+            {
+                var methodologyContentService = SetupMethodologyContentService(contentDbContext);
+                var result = await methodologyContentService.AddContentSection(
+                    methodology.Id,
+                    new ContentSectionAddRequest(),
+                    MethodologyContentService.ContentListType.Content);
+
+                Assert.True(result.IsRight);
+                Assert.Equal(0, result.Right.Content.Count);
+                Assert.Equal(0, result.Right.Order);
+            }
+        }
+
+        [Fact]
+        public async Task AddContentSection_Approved()
+        {
+            var methodology = new Methodology
+            {
+                Status = MethodologyStatus.Approved,
+            };
+            var contentDbContextId = Guid.NewGuid().ToString();
+            await using (var contentDbContext = InMemoryApplicationDbContext(contentDbContextId))
+            {
+                await contentDbContext.Methodologies.AddAsync(methodology);
+                await contentDbContext.SaveChangesAsync();
+            }
+
+            await using (var contentDbContext = InMemoryApplicationDbContext(contentDbContextId))
+            {
+                var methodologyContentService = SetupMethodologyContentService(contentDbContext);
+                var result = await methodologyContentService.AddContentSection(
+                    methodology.Id,
+                    new ContentSectionAddRequest(),
+                    MethodologyContentService.ContentListType.Content);
+
+                Assert.True(result.IsLeft);
+                ValidationTestUtil.AssertValidationProblem(
+                    result.Left, MethodologyMustBeDraft);
             }
         }
 

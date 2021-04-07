@@ -10,9 +10,9 @@ using GovUk.Education.ExploreEducationStatistics.Common.Tests.Utils;
 using GovUk.Education.ExploreEducationStatistics.Common.Utils;
 using GovUk.Education.ExploreEducationStatistics.Content.Model;
 using GovUk.Education.ExploreEducationStatistics.Content.Model.Database;
-using Microsoft.AspNetCore.Mvc;
 using Moq;
 using Xunit;
+using static GovUk.Education.ExploreEducationStatistics.Admin.Validators.ValidationErrorMessages;
 using static GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services.DbUtils;
 using static GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services.MapperUtils;
 
@@ -76,10 +76,8 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
                     }
                 );
 
-                var badRequestObjectResult = Assert.IsType<BadRequestObjectResult>(result.Left);
-                var details = Assert.IsType<ValidationProblemDetails>(badRequestObjectResult.Value);
-
-                Assert.Equal("SLUG_NOT_UNIQUE", details.Errors[""].First());
+                ValidationTestUtil.AssertValidationProblem(
+                    result.Left, SlugNotUnique);
             }
         }
 
@@ -166,10 +164,9 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
                     }
                 );
 
-                var badRequestObjectResult = Assert.IsType<BadRequestObjectResult>(result.Left);
-                var details = Assert.IsType<ValidationProblemDetails>(badRequestObjectResult.Value);
-
-                Assert.Equal("SLUG_NOT_UNIQUE", details.Errors[""].First());
+                Assert.True(result.IsLeft);
+                ValidationTestUtil.AssertValidationProblem(
+                    result.Left, SlugNotUnique);
             }
         }
 
