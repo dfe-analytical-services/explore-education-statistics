@@ -8,9 +8,10 @@ interface Props {
   draggableId: string;
   index: number;
   children: ReactNode | ReactNode[];
+  modifierClass?: string;
 }
 
-const BlockDraggable = ({ draggable, draggableId, index, children }: Props) => (
+const BlockDraggable = ({ draggable, draggableId, index, children, modifierClass }: Props) => (
   <Draggable
     draggableId={draggableId}
     index={index}
@@ -26,11 +27,12 @@ const BlockDraggable = ({ draggable, draggableId, index, children }: Props) => (
         className={classNames({
           [styles.draggable]: draggable,
           [styles.isDragging]: snapshot.isDragging,
+          [styles[`${modifierClass}`]]: modifierClass
         })}
       >
         <span
           className={classNames({
-            [styles.dragHandle]: draggable,
+            [styles.dragHandle]: draggable
           })}
         />
         {children}

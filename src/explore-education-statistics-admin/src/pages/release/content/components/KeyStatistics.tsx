@@ -2,10 +2,14 @@ import EditableKeyStat from '@admin/components/editable/EditableKeyStat';
 import KeyStatSelectForm from '@admin/pages/release/content/components/KeyStatSelectForm';
 import useReleaseContentActions from '@admin/pages/release/content/contexts/useReleaseContentActions';
 import { EditableRelease } from '@admin/services/releaseContentService';
+import BlockDraggable from '@admin/components/editable/BlockDraggable';
+import BlockDroppable from '@admin/components/editable/BlockDroppable';
 import Button from '@common/components/Button';
 import WarningMessage from '@common/components/WarningMessage';
 import { KeyStatContainer } from '@common/modules/find-statistics/components/KeyStat';
+import useToggle from '@common/hooks/useToggle';
 import React, { useCallback, useState } from 'react';
+import { DragDropContext, DropResult } from 'react-beautiful-dnd';
 
 export interface KeyStatisticsProps {
   release: EditableRelease;
@@ -18,9 +22,50 @@ const KeyStatistics = ({ release, isEditing }: KeyStatisticsProps) => {
     updateContentSectionDataBlock,
   } = useReleaseContentActions();
 
+  const [isReordering, toggleReordering] = useToggle(false);
+
+  const keyStatisticsBlocks = release.keyStatisticsSection.content.filter(block => block.type === 'DataBlock');
+
+  const ReorderKeyStatistics = () => {
+    return (
+      (!isReordering ?
+        <Button 
+          variant="secondary"
+          onClick={() => {
+            console.log('click');
+            toggleReordering.on();
+          }}
+        >
+          Reorder key statistics
+        </Button>
+      : (
+        <Button 
+          variant="secondary"
+          onClick={() => {
+            console.log('save');
+            toggleReordering.off();
+          }}
+        >
+          Save order
+        </Button>
+      )
+    ))
+  }
+
+  const handleDragEnd = useCallback(
+    ({ source, destination }: DropResult) => {
+      console.log('handledragend', source, destination)
+      if (source && destination) {
+        // setSections(reorder(sections, source.index, destination.index));
+      }
+    },
+    [release.keyStatisticsSection],
+  );
+
+  
   return (
     <>
-      {isEditing && (
+      {isEditing && !isReordering && (
         <>
           <WarningMessage>
             In order to add a key statistic you first need to create a data
@@ -32,10 +77,10 @@ const KeyStatistics = ({ release, isEditing }: KeyStatisticsProps) => {
           <AddKeyStatistics release={release} />
         </>
       )}
-      <KeyStatContainer>
-        {release.keyStatisticsSection.content
-          .filter(block => block.type === 'DataBlock')
-          .map(block => (
+      {keyStatisticsBlocks.length > 1 && <ReorderKeyStatistics />}
+      {!isReordering &&
+        <KeyStatContainer>
+          {keyStatisticsBlocks.map(block => (
             <EditableKeyStat
               key={block.id}
               name={block.name}
@@ -62,7 +107,43 @@ const KeyStatistics = ({ release, isEditing }: KeyStatisticsProps) => {
               }}
             />
           ))}
-      </KeyStatContainer>
+        </KeyStatContainer>
+      }
+      {isReordering &&
+        <DragDropContext onDragEnd={handleDragEnd}>
+          <BlockDroppable droppable={isReordering} droppableId='keyStatisticsDroppable'>
+            <div className='govuk-!-margin-bottom-9'>
+              {keyStatisticsBlocks.map((block, index) => {
+                
+                return (
+                  <div
+                    key={block.id}
+                  >
+                    <BlockDraggable
+                      draggable={isReordering}
+                      draggableId={block.id}
+                      key={block.id}
+                      index={index}
+                      modifierClass='keyStats'
+                    >
+                      <EditableKeyStat
+                        key={block.id}
+                        name={block.name}
+                        releaseId={release.id}
+                        dataBlockId={block.id}
+                        summary={block.summary}
+                        isEditing={isEditing}
+                        isReordering={isReordering}
+                        onSubmit={() => {}}
+                      />
+                    </BlockDraggable>
+                  </div>
+                )
+              })}
+            </div>
+          </BlockDroppable>
+        </DragDropContext>
+      }
     </>
   );
 };

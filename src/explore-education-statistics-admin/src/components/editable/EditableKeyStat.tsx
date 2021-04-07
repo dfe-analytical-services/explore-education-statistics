@@ -28,6 +28,7 @@ export interface KeyStatsFormValues {
 
 interface EditableKeyStatProps extends KeyStatProps {
   isEditing?: boolean;
+  isReordering?: boolean;
   name: string;
   onRemove?: () => void;
   onSubmit: (values: KeyStatsFormValues) => void;
@@ -35,6 +36,7 @@ interface EditableKeyStatProps extends KeyStatProps {
 
 const EditableKeyStat = ({
   isEditing = false,
+  isReordering = false,
   name,
   releaseId,
   dataBlockId,
@@ -155,7 +157,7 @@ const EditableKeyStat = ({
           )}
         </KeyStatTile>
 
-        {summary?.dataDefinition[0] && (
+        {summary?.dataDefinition[0] && !isReordering && (
           <Details
             summary={summary?.dataDefinitionTitle[0] || 'Help'}
             className={styles.definition}
@@ -168,7 +170,7 @@ const EditableKeyStat = ({
           </Details>
         )}
 
-        {isEditing && (
+        {isEditing && !isReordering && (
           <ButtonGroup className="govuk-!-margin-top-2">
             <Button onClick={toggleShowForm.on}>Edit</Button>
 
@@ -191,7 +193,7 @@ const EditableKeyStat = ({
   };
 
   return (
-    <KeyStatColumn testId={testId}>
+    <KeyStatColumn testId={testId} isReordering={isReordering}>
       <LoadingSpinner loading={isLoading}>{renderInner()}</LoadingSpinner>
     </KeyStatColumn>
   );

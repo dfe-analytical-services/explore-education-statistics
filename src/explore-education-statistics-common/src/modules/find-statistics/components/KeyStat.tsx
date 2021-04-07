@@ -6,6 +6,7 @@ import { Summary } from '@common/services/types/blocks';
 import React, { ReactNode } from 'react';
 import ReactMarkdown from 'react-markdown';
 import styles from './KeyStat.module.scss';
+import classNames from 'classnames';
 
 interface KeyStatContainerProps {
   children: ReactNode;
@@ -18,12 +19,17 @@ export const KeyStatContainer = ({ children }: KeyStatContainerProps) => {
 interface KeyStatColumnProps {
   children: ReactNode;
   testId?: string;
+  isReordering?: boolean;
 }
 
-export const KeyStatColumn = ({ children, testId }: KeyStatColumnProps) => {
+export const KeyStatColumn = ({ children, testId, isReordering }: KeyStatColumnProps) => {
   return (
-    <div className={styles.column} data-testid={testId}>
-      {children}
+    <div 
+      className={classNames({
+        [styles.column]: !isReordering
+      })}
+      data-testid={testId}>
+        {children}
     </div>
   );
 };
