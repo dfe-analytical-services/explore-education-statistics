@@ -50,8 +50,8 @@ Validate Analyst1 can see Absence release summary
     user checks summary list contains  Release type  Official Statistics
 
 Validate Analyst1 can see Absence release summary Lead statistician
-    [Tags]  HappyPath   NotAgainstLocal
-    user checks summary list contains  Lead statistician  Sean Gibson
+    [Tags]  HappyPath
+    user checks summary list contains  Lead statistician  Data Analyst
 
 Validate Analyst1 can see 'Content' page
     [Tags]  HappyPath
