@@ -2,6 +2,7 @@ import styles from '@admin/pages/release/footnotes/components/FootnoteForm.modul
 import {
   BaseFootnote,
   FootnoteSubjectMeta,
+  SubjectSelectionType,
 } from '@admin/services/footnoteService';
 import Details from '@common/components/Details';
 import { FormCheckbox, FormFieldCheckbox } from '@common/components/form';
@@ -11,7 +12,7 @@ import React from 'react';
 
 interface Props {
   summary: string;
-  parentSelected: boolean;
+  parentSelectionType: SubjectSelectionType;
   selectAll?: boolean;
   valuePath: string;
   groupId?: number | string;
@@ -22,7 +23,7 @@ interface Props {
 
 const FilterGroupDetails = ({
   summary,
-  parentSelected = false,
+  parentSelectionType = 'All',
   selectAll = false,
   valuePath,
   groupId,
@@ -31,7 +32,7 @@ const FilterGroupDetails = ({
   form,
 }: Props) => {
   const groupPath = `${valuePath}.filters.${groupId}`;
-  const groupIsSelected = parentSelected || value;
+  const groupIsSelected = parentSelectionType === 'All' || value;
 
   return (
     <Details
@@ -42,9 +43,10 @@ const FilterGroupDetails = ({
         {selectAll && groupId && (
           <FormFieldCheckbox
             name={`${groupPath}.selected`}
-            disabled={parentSelected}
+            disabled={groupIsSelected}
             label="Select all"
             small
+            checked={groupIsSelected}
             boldLabel
             formGroup={false}
           />
@@ -92,7 +94,7 @@ const FilterGroupDetails = ({
                       className="govuk-checkboxes--small"
                       name={`${groupPath}.filterGroups[${filterGroupId}].filterItems`}
                       id={filterItem.value}
-                      disabled={groupIsSelected || groupValue}
+                      disabled={groupValue}
                       checked={checked}
                       onChange={e => {
                         form.setFieldValue(

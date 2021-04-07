@@ -13,6 +13,7 @@ export interface FormRadioProps {
   checked?: boolean;
   defaultChecked?: boolean;
   conditional?: ReactNode;
+  hiddenConditional?: boolean;
   hint?: string | ReactNode;
   id: string;
   label: string;
@@ -27,6 +28,7 @@ const FormRadio = ({
   checked,
   defaultChecked,
   conditional,
+  hiddenConditional,
   hint,
   id,
   label,
@@ -82,7 +84,7 @@ const FormRadio = ({
       {conditional && (
         <div
           className={classNames('govuk-radios__conditional', {
-            'govuk-radios__conditional--hidden': !checked,
+            'govuk-radios__conditional--hidden': !checked || hiddenConditional,
           })}
           id={`${id}-conditional`}
         >
