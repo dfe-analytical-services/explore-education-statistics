@@ -41,7 +41,6 @@ Add release note to release
     user clicks button   Add note
     user enters text into element  id:createReleaseNoteForm-reason  Test release note one
     user clicks button   Save note
-    user opens details dropdown  See all 1 updates  id:releaseLastUpdated
     ${date}=  get current datetime   %-d %B %Y
     user waits until element contains  css:#releaseNotes li:nth-of-type(1) time  ${date}
     user waits until element contains  css:#releaseNotes li:nth-of-type(1) p     Test release note one
@@ -81,24 +80,24 @@ Add accordion sections to release
 
 Add content blocks to Test section one
     [Tags]  HappyPath
-    user adds text block to editable accordion section   Test section one
-    user adds content to accordion section text block  Test section one   1    block one test text
+    user adds text block to editable accordion section   Test section one   id:releaseMainContent
+    user adds content to accordion section text block  Test section one   1    block one test text   id:releaseMainContent
 
-    user adds text block to editable accordion section   Test section one
-    user adds content to accordion section text block  Test section one   2    block two test text
+    user adds text block to editable accordion section   Test section one   id:releaseMainContent
+    user adds content to accordion section text block  Test section one   2    block two test text   id:releaseMainContent
 
-    user adds text block to editable accordion section   Test section one
-    user adds content to accordion section text block  Test section one   3    block three test text
+    user adds text block to editable accordion section   Test section one   id:releaseMainContent
+    user adds content to accordion section text block  Test section one   3    block three test text   id:releaseMainContent
 
-    user checks accordion section contains X blocks   Test section one    3
+    user checks accordion section contains X blocks   Test section one    3   id:releaseMainContent
 
 Delete second content block
     [Tags]  HappyPath
-    user deletes editable accordion section content block  Test section one   2
+    user deletes editable accordion section content block  Test section one   2    id:releaseMainContent
     user waits until page does not contain    block two test text
-    user checks accordion section contains X blocks   Test section one    2
+    user checks accordion section contains X blocks   Test section one    2    id:releaseMainContent
 
 Validate two remaining content blocks
     [Tags]  HappyPath
-    user checks accordion section text block contains   Test section one   1   block one test text
-    user checks accordion section text block contains   Test section one   2   block three test text
+    user checks accordion section text block contains   Test section one   1   block one test text    id:releaseMainContent
+    user checks accordion section text block contains   Test section one   2   block three test text    id:releaseMainContent

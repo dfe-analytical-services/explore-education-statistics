@@ -310,8 +310,7 @@ Validate prerelease has started
 
 Validate metadata guidance page
     [Tags]  HappyPath
-    user opens details dropdown  Download associated files
-    user clicks link  Metadata guidance
+    user clicks link  Metadata guidance document
 
     user waits until page contains title caption  Calendar Year 2000
     user waits until h1 is visible  ${PUBLICATION_NAME}
@@ -349,7 +348,6 @@ Go back to prerelease content page
 
 Validate public prerelease access list
     [Tags]  HappyPath
-    user opens details dropdown  Download associated files
     user clicks link  Pre-release access list
 
     user waits until page contains title caption  Calendar Year 2000
@@ -421,8 +419,7 @@ Validate prerelease has started for Analyst user
 
 Validate public metdata guidance for Analyst user
     [Tags]  HappyPath
-    user opens details dropdown  Download associated files
-    user clicks link  Metadata guidance
+    user clicks link  Metadata guidance document
 
     user waits until page contains title caption  Calendar Year 2000
     user waits until h1 is visible  ${PUBLICATION_NAME}
@@ -460,7 +457,6 @@ Go back to prerelease content page as Analyst user
 
 Validate public prerelease access list as Analyst user
     [Tags]  HappyPath
-    user opens details dropdown  Download associated files
     user clicks link  Pre-release access list
 
     user waits until page contains title caption  Calendar Year 2000

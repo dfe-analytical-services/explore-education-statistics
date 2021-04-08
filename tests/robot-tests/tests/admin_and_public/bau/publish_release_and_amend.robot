@@ -173,15 +173,15 @@ Add two accordion sections to release
 
 Add data block to first accordion section
     [Tags]  HappyPath
-    user adds data block to editable accordion section  Dates data block   ${DATABLOCK_NAME}
+    user adds data block to editable accordion section  Dates data block   ${DATABLOCK_NAME}   css:#releaseMainContent
     ${datablock}=  set variable  css:[data-testid="Data block - ${DATABLOCK_NAME}"]
     user checks chart title contains  ${datablock}  Sample title
     user checks infographic chart contains alt  ${datablock}  Sample alt text
 
 Add test text to second accordion section
     [Tags]  HappyPath
-    user adds text block to editable accordion section   Test text
-    user adds content to accordion section text block  Test text   1    Some test text!
+    user adds text block to editable accordion section   Test text   css:#releaseMainContent
+    user adds content to accordion section text block  Test text   1    Some test text!   css:#releaseMainContent
 
 Add public prerelease access list
     [Tags]  HappyPath
@@ -562,15 +562,14 @@ Navigate to 'Content' page for amendment
 
 Update second accordion section text for amendment
     [Tags]  HappyPath
-    user opens accordion section  Test text
-    user adds content to accordion section text block  Test text  1  Updated test text!
+    user opens accordion section  Test text    css:#releaseMainContent
+    user adds content to accordion section text block  Test text  1  Updated test text!   css:#releaseMainContent
 
 Add release note to amendment
     [Tags]  HappyPath
     user clicks button   Add note
     user enters text into element  id:createReleaseNoteForm-reason  Test release note one
     user clicks button   Save note
-    user opens details dropdown  See all 1 updates  id:releaseLastUpdated
     ${date}=  get current datetime   %-d %B %Y
     user waits until element contains  css:#releaseNotes li:nth-of-type(1) time  ${date}
     user waits until element contains  css:#releaseNotes li:nth-of-type(1) p     Test release note one

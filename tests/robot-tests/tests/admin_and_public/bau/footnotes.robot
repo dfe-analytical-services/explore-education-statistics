@@ -70,6 +70,7 @@ Create footnote
     user clicks link  Create footnote
     user waits until h2 is visible  Create footnote
 
+    user clicks footnote radio   UI test subject   Applies to specific data
     user opens details dropdown  Indicators
     user opens details dropdown  Date
     user clicks footnote checkbox  Number of open settings
@@ -85,6 +86,7 @@ Create another footnote
     user clicks link  Create footnote
     user waits until h2 is visible  Create footnote
 
+    user clicks footnote radio   UI test subject   Applies to specific data
     user opens details dropdown  Indicators
     user opens details dropdown  Date
     user clicks footnote checkbox  Proportion of settings open

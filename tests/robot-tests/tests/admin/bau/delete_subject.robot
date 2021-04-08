@@ -59,7 +59,7 @@ Create subject footnote for new subject
     user waits until h2 is visible  Create footnote
 
     user waits until page contains testid  footnote-subject UI test subject
-    user clicks checkbox  Select all indicators and filters for this subject
+    user clicks radio  Applies to all data
     user clicks element   id:footnoteForm-content
     user presses keys  UI tests subject footnote
     user clicks button   Save footnote
@@ -71,6 +71,7 @@ Create indicator footnote for new subject
     user waits until h2 is visible  Create footnote
 
     user waits until page contains testid  footnote-subject UI test subject
+    user clicks footnote radio  UI test subject   Applies to specific data
     user opens details dropdown  Indicators
     user clicks checkbox  Admission Numbers
     user clicks element   id:footnoteForm-content
@@ -84,6 +85,7 @@ Create Random Filter Total footnote for new subject
     user waits until h2 is visible  Create footnote
 
     user waits until page contains testid  footnote-subject UI test subject
+    user clicks footnote radio  UI test subject   Applies to specific data
     user opens details dropdown   Random Filter
     user clicks checkbox   Total
     user clicks element   id:footnoteForm-content
@@ -97,6 +99,7 @@ Create Random Filter Select all footnote for new subject
     user waits until h2 is visible  Create footnote
 
     user waits until page contains testid  footnote-subject UI test subject
+    user clicks footnote radio  UI test subject   Applies to specific data
     user opens details dropdown   Random Filter
     user clicks checkbox   Select all
     user clicks element   id:footnoteForm-content
