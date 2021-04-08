@@ -86,13 +86,14 @@ const BasicReleaseSummary = ({ release }: Props) => {
                 <time>{formatPartialDate(release.nextReleaseDate)}</time>
               </SummaryListItem>
             )}
-            {release.updates && release.updates.length > 0 && (
-              <SummaryListItem term="Last updated">
-                <FormattedDate>{release.updates[0].on}</FormattedDate>
-
-                <ReleaseNotesSection release={release} />
-              </SummaryListItem>
-            )}
+            <SummaryListItem term="Last updated">
+              {release.updates && release.updates.length > 0 ? (
+                <FormattedDate>release.updates[0].on</FormattedDate>
+              ) : (
+                'TBA'
+              )}
+              <ReleaseNotesSection release={release} />
+            </SummaryListItem>
             <SummaryListItem term="Receive updates">
               <a className="dfe-print-hidden govuk-!-font-weight-bold" href="#">
                 Sign up for email alerts
