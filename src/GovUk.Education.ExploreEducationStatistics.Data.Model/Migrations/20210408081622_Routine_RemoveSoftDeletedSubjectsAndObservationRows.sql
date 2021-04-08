@@ -1,7 +1,7 @@
 ﻿CREATE OR
-ALTER PROCEDURE RemoveSoftDeletedSubjects @TotalObservationLimit INT,
-                                          @ObservationCommitBatchSize INT,
-                                          @ObservationFilterItemCommitBatchSize INT
+ALTER PROCEDURE RemoveSoftDeletedSubjectsAndObservationRows @TotalObservationLimit INT,
+                                                            @ObservationCommitBatchSize INT,
+                                                            @ObservationFilterItemCommitBatchSize INT
 AS
 BEGIN
     -- Create a temporary table of soft-deleted Subjects
