@@ -179,7 +179,7 @@ const ChartAxisConfiguration = ({
     (values: FormValues): AxisConfiguration => {
       // Use `merge` as we want to avoid potential undefined
       // values from overwriting existing values
-      return merge({}, configuration, values, {
+      const result = merge({}, configuration, values, {
         // `configuration.type` may be incorrectly set by
         // seeded releases so we want to make sure this is
         // set using the `type` prop (which uses the axis key)
@@ -191,6 +191,9 @@ const ChartAxisConfiguration = ({
         size: parseNumber(values.size),
         tickSpacing: parseNumber(values.tickSpacing),
       });
+      // referenceLines are removable, so don't merge - update instead
+      result.referenceLines = [...(values.referenceLines ?? [])];
+      return result;
     },
     [configuration, type],
   );
@@ -511,7 +514,7 @@ const ChartAxisConfiguration = ({
                           type="button"
                           onClick={() => {
                             const newReferenceLines = [
-                              ...(form.values.referenceLines || []),
+                              ...(form.values.referenceLines ?? []),
                             ];
                             newReferenceLines.splice(idx, 1);
 
@@ -586,7 +589,7 @@ const ChartAxisConfiguration = ({
                       className="govuk-!-margin-bottom-0 dfe-float--right"
                       onClick={() => {
                         form.setFieldValue('referenceLines', [
-                          ...(form.values.referenceLines || []),
+                          ...(form.values.referenceLines ?? []),
                           referenceLine,
                         ]);
 
