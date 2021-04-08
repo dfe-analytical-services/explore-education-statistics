@@ -1,7 +1,7 @@
 ﻿CREATE OR
-ALTER PROCEDURE RemoveSoftDeletedSubjects @TotalObservationLimit INT,
-                                          @ObservationCommitBatchSize INT,
-                                          @ObservationFilterItemCommitBatchSize INT
+ALTER PROCEDURE RemoveSoftDeletedSubjectsAndObservationRows @TotalObservationLimit INT,
+                                                            @ObservationCommitBatchSize INT,
+                                                            @ObservationFilterItemCommitBatchSize INT
 AS
 BEGIN
     -- Create a temporary table of soft-deleted Subjects
@@ -26,11 +26,11 @@ BEGIN
                  SELECT Subject.Id,
                         Subject.Filename,
                         Subject.Name,
-                        COUNT(Observation.Id) AS ObservationCount,
-                        SUM(COUNT(Observation.Id))
-                            OVER (ORDER BY COUNT(Observation.Id) ROWS UNBOUNDED PRECEDING) AS RunningTotal
+                        COUNT(ObservationRow.Id) AS ObservationCount,
+                        SUM(COUNT(ObservationRow.Id))
+                            OVER (ORDER BY COUNT(ObservationRow.Id) ROWS UNBOUNDED PRECEDING) AS RunningTotal
                  FROM Subject
-                          LEFT JOIN Observation ON Subject.Id = Observation.SubjectId
+                          LEFT JOIN ObservationRow ON Subject.Id = ObservationRow.SubjectId
                  WHERE Subject.SoftDeleted = 1
                    AND NOT EXISTS(SELECT *
                                   FROM ReleaseSubject
@@ -52,21 +52,19 @@ BEGIN
                                                        FROM #SoftDeletedSubjects
                                                        ORDER BY ObservationCount
                                                        FOR JSON AUTO);
-            RAISERROR (N'Top Soft-deleted Subjects (limited to %d Observations): %s', 0, 1, @TotalObservationLimit, @SubjectListAsJson) WITH NOWAIT;
+            RAISERROR (N'Top Soft-deleted Subjects (limited to %d ObservationRows): %s', 0, 1, @TotalObservationLimit, @SubjectListAsJson) WITH NOWAIT;
 
-            -- Delete the ObservationFilterItem link rows associated with the Subjects
+            -- Delete the ObservationRowFilterItem link rows associated with the Subjects
             -- Delete in batches to prevent the transaction log file from exploding in size
-            RAISERROR (N'Deleting from ObservationFilterItem', 0, 1) WITH NOWAIT;
+            RAISERROR (N'Deleting from ObservationRowFilterItem', 0, 1) WITH NOWAIT;
             DECLARE @observationFilterItemRowsAffected INT = 1
             WHILE @observationFilterItemRowsAffected <> 0
                 BEGIN
                     BEGIN TRANSACTION
                         DELETE TOP (@ObservationFilterItemCommitBatchSize) OFI
-                        FROM ObservationFilterItem OFI
-                        WHERE EXISTS(SELECT 1
-                                     FROM Filter
-                                     WHERE Filter.Id = OFI.FilterId
-                                       AND Filter.SubjectId IN (SELECT Id FROM #SoftDeletedSubjects));
+                        FROM ObservationRowFilterItem OFI
+                        JOIN ObservationRow ON ObservationRow.Id = OFI.ObservationId
+                        AND ObservationRow.SubjectId IN (SELECT Id FROM #SoftDeletedSubjects);
 
                         SET @observationFilterItemRowsAffected = @@ROWCOUNT
                     COMMIT;
@@ -74,14 +72,14 @@ BEGIN
 
             -- Delete the Observation rows associated with the Subjects
             -- Delete in batches to prevent the transaction log file from exploding in size
-            RAISERROR (N'Deleting from Observation', 0, 1) WITH NOWAIT;
+            RAISERROR (N'Deleting from ObservationRow', 0, 1) WITH NOWAIT;
             DECLARE @observationRowsAffected INT = 1
             WHILE @observationRowsAffected <> 0
                 BEGIN
                     BEGIN TRANSACTION
                         DELETE TOP (@ObservationCommitBatchSize) O
-                        FROM Observation O
-                                 JOIN #SoftDeletedSubjects ON O.SubjectId = #SoftDeletedSubjects.Id;
+                        FROM ObservationRow O
+                        JOIN #SoftDeletedSubjects ON O.SubjectId = #SoftDeletedSubjects.Id;
 
                         SET @observationRowsAffected = @@ROWCOUNT
                     COMMIT;
@@ -92,7 +90,7 @@ BEGIN
             RAISERROR (N'Deleting from Subject', 0, 1) WITH NOWAIT;
             DELETE S
             FROM Subject S
-                     JOIN #SoftDeletedSubjects ON S.Id = #SoftDeletedSubjects.Id;
+            JOIN #SoftDeletedSubjects ON S.Id = #SoftDeletedSubjects.Id;
         END;
     ELSE
         RAISERROR (N'No soft deleted Subjects found to delete', 0, 1) WITH NOWAIT;
