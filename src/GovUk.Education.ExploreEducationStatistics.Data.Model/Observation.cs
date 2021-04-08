@@ -1,17 +1,13 @@
 using System;
 using System.Collections.Generic;
-using System.ComponentModel.DataAnnotations.Schema;
 using GovUk.Education.ExploreEducationStatistics.Common.Model;
 using GovUk.Education.ExploreEducationStatistics.Common.Model.Data;
 
 namespace GovUk.Education.ExploreEducationStatistics.Data.Model
 {
-    [Table("ObservationRow")]
     public class Observation
     {
-        [DatabaseGenerated(DatabaseGeneratedOption.Identity)]
-        public long Id { get; set; }
-        public Guid ObservationId { get; set; }
+        public Guid Id { get; set; }
         public Subject Subject { get; set; }
         public Guid SubjectId { get; set; }
         public GeographicLevel GeographicLevel { get; set; }
