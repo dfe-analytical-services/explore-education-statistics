@@ -53,6 +53,7 @@ const FootnoteForm = ({
       }
 
       return {
+        selected: false,
         selectionType,
         indicatorGroups: mapValues(indicators, () => ({
           selected: false,
@@ -90,7 +91,6 @@ const FootnoteForm = ({
           filterGroups,
           filterItems,
         } = footnoteToFlatFootnote(values);
-
         const hasNoneSelected =
           [
             ...subjects,
@@ -107,7 +107,16 @@ const FootnoteForm = ({
           );
         }
 
-        await onSubmit(values);
+        // Remove unused subjects when type is NA.
+        const newValues = {...values}
+        Object.keys(newValues.subjects).map(subjectId => {
+          if (newValues.subjects[subjectId].selectionType === 'NA') {
+            delete newValues.subjects[subjectId];
+          }
+          return subjectId;
+        });
+
+        await onSubmit(newValues);
       }}
     >
       {form => (
@@ -131,10 +140,6 @@ const FootnoteForm = ({
             subject => subject.subjectName,
           ).map(subject => {
             const { subjectId, subjectName } = subject;
-            const selectionType = get(
-              form.values,
-              `subjects.${subjectId}.selectionType`,
-            );
 
             return (
               <fieldset
@@ -159,36 +164,6 @@ const FootnoteForm = ({
                     {
                       value: `All`,
                       label: 'Applies to all data',
-                      hiddenConditional: true,
-                      conditional: (
-                        <>
-                          <IndicatorDetails
-                            summary="Indicators"
-                            parentSelectionType={selectionType}
-                            valuePath={`subjects.${subjectId}`}
-                            indicatorGroups={subject.indicators}
-                            form={form}
-                          />
-                          {Object.entries(subject.filters).map(
-                            ([filterId, filter]) => (
-                              <FilterGroupDetails
-                                key={filterId}
-                                summary={filter.legend}
-                                parentSelectionType={selectionType}
-                                valuePath={`subjects.${subjectId}`}
-                                groupId={filterId}
-                                filter={filter}
-                                selectAll
-                                value={get(
-                                  form.values,
-                                  `subjects.${subjectId}.filters.${filterId}.selected`,
-                                )}
-                                form={form}
-                              />
-                            ),
-                          )}
-                        </>
-                      ),
                     },
                     {
                       value: 'Specific',
@@ -202,7 +177,6 @@ const FootnoteForm = ({
 
                             <IndicatorDetails
                               summary="Indicators"
-                              parentSelectionType={selectionType}
                               valuePath={`subjects.${subjectId}`}
                               indicatorGroups={subject.indicators}
                               form={form}
@@ -216,12 +190,11 @@ const FootnoteForm = ({
                                   Filters
                                 </h3>
 
-                                {Object.entries(subject.filters).map(
+                                {Object.entries(subject.filters).map( 
                                   ([filterId, filter]) => (
                                     <FilterGroupDetails
                                       key={filterId}
                                       summary={filter.legend}
-                                      parentSelectionType={selectionType}
                                       valuePath={`subjects.${subjectId}`}
                                       groupId={filterId}
                                       filter={filter}
