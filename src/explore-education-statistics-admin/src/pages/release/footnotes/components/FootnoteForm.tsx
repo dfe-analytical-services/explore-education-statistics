@@ -108,7 +108,7 @@ const FootnoteForm = ({
         }
 
         // Remove unused subjects when type is NA.
-        const newValues = {...values}
+        const newValues = { ...values };
         Object.keys(newValues.subjects).map(subjectId => {
           if (newValues.subjects[subjectId].selectionType === 'NA') {
             delete newValues.subjects[subjectId];
@@ -190,7 +190,7 @@ const FootnoteForm = ({
                                   Filters
                                 </h3>
 
-                                {Object.entries(subject.filters).map( 
+                                {Object.entries(subject.filters).map(
                                   ([filterId, filter]) => (
                                     <FilterGroupDetails
                                       key={filterId}

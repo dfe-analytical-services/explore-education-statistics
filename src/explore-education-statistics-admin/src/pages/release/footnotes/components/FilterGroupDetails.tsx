@@ -1,7 +1,7 @@
 import styles from '@admin/pages/release/footnotes/components/FootnoteForm.module.scss';
 import {
   BaseFootnote,
-  FootnoteSubjectMeta
+  FootnoteSubjectMeta,
 } from '@admin/services/footnoteService';
 import Details from '@common/components/Details';
 import { FormCheckbox, FormFieldCheckbox } from '@common/components/form';
@@ -29,7 +29,7 @@ const FilterGroupDetails = ({
   form,
 }: Props) => {
   const groupPath = `${valuePath}.filters.${groupId}`;
-  const groupIsSelected = value; 
+  const groupIsSelected = value;
 
   return (
     <Details

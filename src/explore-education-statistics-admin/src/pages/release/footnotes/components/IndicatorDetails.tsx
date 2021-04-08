@@ -23,10 +23,7 @@ const IndicatorDetails = ({
   form,
 }: Props) => {
   return (
-    <Details
-      summary={summary}
-      className="govuk-!-margin-bottom-2"
-    >
+    <Details summary={summary} className="govuk-!-margin-bottom-2">
       <div className={styles.filterOverflow}>
         {Object.entries(indicatorGroups).map(
           ([indicatorGroupId, indicatorGroup]) => {
