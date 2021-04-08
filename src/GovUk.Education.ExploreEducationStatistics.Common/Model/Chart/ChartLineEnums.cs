@@ -19,6 +19,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Common.Model.Chart
         square,
         star,
         triangle,
-        wye
+        wye,
+        none
     }
 }
