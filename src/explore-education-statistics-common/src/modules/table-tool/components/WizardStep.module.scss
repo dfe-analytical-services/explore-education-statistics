@@ -49,7 +49,7 @@ $step-padding-top-mobile: govuk-spacing(7);
 }
 
 .stepActive {
-  order: -1;
+  //order: -1;
 
   &::before,
   &:last-child::after {

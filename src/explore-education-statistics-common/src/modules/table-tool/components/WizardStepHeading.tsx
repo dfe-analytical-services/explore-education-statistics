@@ -30,13 +30,14 @@ const WizardStepHeading = ({
             `govuk-heading-l`,
             `dfe-flex`,
             `dfe-align-items--center`,
+            `govuk-!-margin-top-6`,
             {
               'govuk-fieldset__heading': fieldsetHeading,
             },
           )}
         >
+          <span className="govuk-tag govuk-tag--turquoise govuk-!-margin-right-2">{`Step  ${stepNumber}`}</span>
           <span>{children}</span>
-          <span className="govuk-tag govuk-tag--turquoise govuk-!-margin-left-3">{`Step  ${stepNumber} of 6`}</span>
         </h2>
       ) : (
         <>
