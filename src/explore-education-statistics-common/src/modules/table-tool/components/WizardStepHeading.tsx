@@ -48,19 +48,21 @@ const WizardStepHeading = ({
             <span className="govuk-tag govuk-tag--grey">{`Step ${stepNumber} `}</span>
             <span className="govuk-visually-hidden">{children}</span>
           </h2>
-          <a
-            href="#"
-            data-testid={`wizardStep-${stepNumber}-goToButton`}
-            onClick={() => setCurrentStep(stepNumber)}
-            className="govuk-link govuk-!-margin-top-1"
-          >
-            {stepEnabled && (
-              <>
-                {editTitle}{' '}
-                <span className="govuk-visually-hidden">{`Step ${stepNumber}`}</span>
-              </>
-            )}
-          </a>
+          <div className="govuk-!-margin-top-2">
+            <a
+              href="#"
+              data-testid={`wizardStep-${stepNumber}-goToButton`}
+              onClick={() => setCurrentStep(stepNumber)}
+              className="govuk-link"
+            >
+              {stepEnabled && (
+                <>
+                  {editTitle}{' '}
+                  <span className="govuk-visually-hidden">{`Step ${stepNumber}`}</span>
+                </>
+              )}
+            </a>
+          </div>
         </>
       )}
     </>
