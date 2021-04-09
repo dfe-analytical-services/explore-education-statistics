@@ -1,7 +1,6 @@
 using System;
 using System.Collections.Generic;
 using System.Data;
-using System.Diagnostics;
 using System.Linq;
 using System.Threading.Tasks;
 using GovUk.Education.ExploreEducationStatistics.Common.Extensions;
@@ -167,8 +166,6 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Processor.Services
         public async Task ImportObservations(DataColumnCollection cols, DataRowCollection rows, Subject subject,
             SubjectMeta subjectMeta, int batchNo, int rowsPerBatch, StatisticsDbContext context)
         {
-            var stopwatch = Stopwatch.StartNew();
-
             _importerFilterService.ClearCache();
             _importerLocationService.ClearCache();
 
@@ -181,8 +178,6 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Processor.Services
                 batchNo,
                 rowsPerBatch).ToList();
 
-            _logger.LogDebug($"Took {stopwatch.Elapsed.TotalMilliseconds} millis to read {observations.Count} " +
-                             $"Observations from CSV");
             await InsertObservations(context, observations);
         }
 
@@ -273,7 +268,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Processor.Services
 
             return new Observation
             {
-                ObservationId = observationId,
+                Id = observationId,
                 FilterItems = GetFilterItems(context, line, headers, subjectMeta.Filters, observationId),
                 GeographicLevel = GetGeographicLevel(line, headers),
                 LocationId = GetLocationId(line, headers, context),
@@ -306,7 +301,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Processor.Services
                 var filterItemLabel = CsvUtil.Value(line, headers, filterMeta.Column);
                 var filterGroupLabel = CsvUtil.Value(line, headers, filterMeta.FilterGroupingColumn);
 
-                _importerFilterService.GetOrCreateFilterItem(filterItemLabel, filterGroupLabel, filterMeta.Filter, context);
+                _importerFilterService.Find(filterItemLabel, filterGroupLabel, filterMeta.Filter, context);
             }
         }
 
@@ -324,9 +319,10 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Processor.Services
 
                 return new ObservationFilterItem
                 {
-                    OldObservationId = observationId,
+                    ObservationId = observationId,
                     FilterItemId = _importerFilterService
-                        .GetOrCreateFilterItem(filterItemLabel, filterGroupLabel, filterMeta.Filter, context).Id
+                        .Find(filterItemLabel, filterGroupLabel, filterMeta.Filter, context).Id,
+                    FilterId = filterMeta.Filter.Id
                 };
             }).ToList();
         }
@@ -458,12 +454,10 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Processor.Services
                 new PlanningArea(values[0], values[1]));
         }
 
-        private async Task InsertObservations(StatisticsDbContext context, IEnumerable<Observation> observations)
+        private async Task InsertObservations(DbContext context, IEnumerable<Observation> observations)
         {
-            var stopwatch = Stopwatch.StartNew();
-            
             var observationsTable = new DataTable();
-            observationsTable.Columns.Add("ObservationId", typeof(Guid));
+            observationsTable.Columns.Add("Id", typeof(Guid));
             observationsTable.Columns.Add("SubjectId", typeof(Guid));
             observationsTable.Columns.Add("GeographicLevel", typeof(string));
             observationsTable.Columns.Add("LocationId", typeof(Guid));
@@ -472,10 +466,15 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Processor.Services
             observationsTable.Columns.Add("Measures", typeof(string));
             observationsTable.Columns.Add("CsvRow", typeof(long));
 
+            var observationsFilterItemsTable = new DataTable();
+            observationsFilterItemsTable.Columns.Add("ObservationId", typeof(Guid));
+            observationsFilterItemsTable.Columns.Add("FilterItemId", typeof(Guid));
+            observationsFilterItemsTable.Columns.Add("FilterId", typeof(Guid));
+
             foreach (var o in observations)
             {
                 observationsTable.Rows.Add(
-                    o.ObservationId,
+                    o.Id,
                     o.SubjectId,
                     o.GeographicLevel.GetEnumValue(),
                     o.LocationId,
@@ -484,44 +483,31 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Processor.Services
                     "{" + string.Join(",", o.Measures.Select(x => $"\"{x.Key}\":\"{x.Value}\"")) + "}",
                     o.CsvRow
                 );
-            }
 
-            _logger.LogDebug($"Took {stopwatch.Elapsed.TotalMilliseconds} to prepare {observations.Count()} Observation rows");
-            stopwatch.Restart();
-            
-            var observationsParam = new SqlParameter("@Observations", SqlDbType.Structured)
-            {
-                Value = observationsTable, TypeName = "[dbo].[ObservationRowType]"
-            };
-            
-            var observationsFilterItemsTable = new DataTable();
-            observationsFilterItemsTable.Columns.Add("CsvRow", typeof(long));
-            observationsFilterItemsTable.Columns.Add("OldObservationId", typeof(Guid));
-            observationsFilterItemsTable.Columns.Add("FilterItemId", typeof(Guid));
-
-            foreach (Observation observation in observations)
-            {
-                foreach (var item in observation.FilterItems)
+                foreach (var item in o.FilterItems)
                 {
                     observationsFilterItemsTable.Rows.Add(
-                        observation.CsvRow,
-                        item.OldObservationId,
-                        item.FilterItemId
+                        item.ObservationId,
+                        item.FilterItemId,
+                        item.FilterId
                     );
-                }    
+                }
             }
-            
-            var observationFilterItemsParam = new SqlParameter("@ObservationFilterItems", SqlDbType.Structured)
+
+            var parameter = new SqlParameter("@Observations", SqlDbType.Structured)
             {
-                Value = observationsFilterItemsTable, TypeName = "[dbo].[ObservationRowFilterItemType]"
+                Value = observationsTable, TypeName = "[dbo].[ObservationType]"
+            };
+
+            await context.Database.ExecuteSqlRawAsync("EXEC [dbo].[InsertObservations] @Observations", parameter);
+
+            parameter = new SqlParameter("@ObservationFilterItems", SqlDbType.Structured)
+            {
+                Value = observationsFilterItemsTable, TypeName = "[dbo].[ObservationFilterItemType]"
             };
 
             await context.Database.ExecuteSqlRawAsync(
-                "EXEC [dbo].[InsertObservationRows] @Observations, @ObservationFilterItems", 
-                observationsParam, 
-                observationFilterItemsParam);
-
-            _logger.LogDebug($"Took {stopwatch.Elapsed.TotalMilliseconds} to insert {observations.Count()} Observation rows");
+                "EXEC [dbo].[InsertObservationFilterItems] @ObservationFilterItems", parameter);
         }
     }
 }
