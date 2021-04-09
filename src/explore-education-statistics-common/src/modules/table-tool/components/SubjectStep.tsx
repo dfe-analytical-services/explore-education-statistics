@@ -110,7 +110,13 @@ const SubjectStep = ({
         </h2>
       </>
     ) : (
-      form
+      <>
+        {form}
+        <hr className="govuk-!-margin-top-9" />
+        <h2 className="govuk-heading-m govuk-!-margin-top-9">
+          Edit previous step
+        </h2>
+      </>
     );
   }
 
