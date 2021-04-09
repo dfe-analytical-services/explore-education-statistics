@@ -35,9 +35,9 @@
   padding: govuk-spacing(2);
   position: relative;
 
-  @include govuk-media-query($from: desktop) {
+  /*@include govuk-media-query($from: desktop) {
     flex-basis: 33%;
-  }
+  }*/
 
   &:focus {
     border: $govuk-focus-width solid #000;

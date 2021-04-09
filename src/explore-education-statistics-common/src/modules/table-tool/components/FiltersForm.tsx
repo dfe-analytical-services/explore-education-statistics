@@ -194,8 +194,9 @@ const FiltersForm = (props: Props & InjectedWizardProps) => {
                   }}
                 />
               </Form>
+              <hr className="govuk-!-margin-top-9" />
               <h2 className="govuk-heading-m govuk-!-margin-top-9">
-                View or edit previous steps
+                Edit previous steps
               </h2>
             </>
           );

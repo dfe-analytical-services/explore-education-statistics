@@ -212,16 +212,17 @@ const TableToolFinalStep = ({
         </div>
       </div>
       <div className="govuk-inset-text">
-        <p className="govuk-body">
+        <p>
           If you have a question about the data or methods used to create this
           table contact the named statistician via the relevant release page.{' '}
-          <br />
+        </p>
+        <p>
           {publication && table && (
             <Link
               to="/find-statistics/[publication]"
               as={`/find-statistics/${publication.slug}`}
             >
-              View the release for this data
+              <strong>View the release for this data</strong>
             </Link>
           )}
         </p>

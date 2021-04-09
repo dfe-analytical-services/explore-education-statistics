@@ -51,7 +51,6 @@ const WizardStepHeading = ({
           <a
             href="#"
             data-testid={`wizardStep-${stepNumber}-goToButton`}
-            type="button"
             onClick={() => setCurrentStep(stepNumber)}
             className="govuk-link govuk-!-margin-top-1"
           >

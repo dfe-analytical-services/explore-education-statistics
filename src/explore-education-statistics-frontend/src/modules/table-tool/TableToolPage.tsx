@@ -127,9 +127,13 @@ const TableToolPage: NextPage<TableToolPageProps> = ({
                     tableHeaders={response.tableHeaders}
                   />
                 )}
-                <h3 className="govuk-!-margin-top-9" id="edit-table">
+                <hr className="govuk-!-margin-top-9" />
+                <h2
+                  className="govuk-heading-m govuk-!-margin-top-9"
+                  id="edit-table"
+                >
                   Update your table by editing any of the steps below
-                </h3>
+                </h2>
               </>
             )}
           </WizardStep>
