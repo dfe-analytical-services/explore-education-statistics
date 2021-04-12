@@ -299,7 +299,6 @@
         "description": "Email addresses for receiving alerts"
       }
     },
-
     "departmentName": {
       "type": "string",
       "defaultValue": "Unknown",
@@ -517,6 +516,16 @@
     "maxDbSizeBytes": {
       "type": "int", 
       "defaultValue": 268435456000 
+    },
+    "enableAlerts": {
+      "type": "bool",
+      "defaultValue": false
+    },
+    "alertEmailReceivers": {
+      "type": "array",
+      "metadata": {
+        "description": "Emails to send alerts to"
+      }
     }
   },
   "variables": {
@@ -553,6 +562,9 @@
     "publisherStorageAccountName": "[concat(parameters('subscription'), 'saeespublisher')]",
     "publisherStorageAccountId": "[concat(resourceGroup().id,'/providers/','Microsoft.Storage/storageAccounts/', variables('publisherStorageAccountName'))]",
     "loggingStorageAccountName": "[concat(parameters('subscription'), 'saeeslogging')]",
+
+    "actionGroupEmail": "[concat(parameters('subscription'), '-ag-', parameters('environment'), '-email')]",
+    "metricAlertDummy": "[concat(parameters('subscription'), '-ma-', parameters('environment'), '-dummy')]",
 
     "vNetName": "[concat(parameters('subscription'), '-vnet-', parameters('environment'))]",
     "vNetRef": "[resourceId('Microsoft.Network/virtualNetworks', variables('vNetName'))]",
@@ -3377,6 +3389,68 @@
         "notifications": [
         ],
         "targetResourceLocation": ""
+      }
+    },
+    {
+      "type": "microsoft.insights/actionGroups",
+      "apiVersion": "2019-06-01",
+      "name": "[variables('actionGroupEmail')]",
+      "location": "Global",
+      "properties": {
+        "groupShortName": "emailAG",
+        "enabled": "[parameters('enableAlerts')]",
+        "copy": [
+          {
+            "name": "emailReceivers",
+            "count": "[length(parameters('alertEmailReceivers'))]",
+            "input": {
+              "name": "[parameters('alertEmailReceivers')[copyIndex('alertEmailReceivers')].name]",
+              "emailAddress": "[parameters('alertEmailReceivers')[copyIndex('alertEmailReceivers')].address]",
+              "useCommonAlertSchema": false
+            }
+          }
+        ]
+      }
+    },
+    {
+      "type": "microsoft.insights/metricAlerts",
+      "apiVersion": "2018-03-01",
+      "name": "[variables('metricAlertDummy')]",
+      "location": "global",
+      "dependsOn": [
+        "[resourceId('Microsoft.Sql/servers/databases', variables('sqlServerName'), 'content')]",
+        "[resourceId('microsoft.insights/actionGroups', variables('actionGroupEmail'))]"
+      ],
+      "properties": {
+        "description": "[concat(variables('metricAlertsDummy'), ' has triggered! Hurrah!')]",
+        "severity": 3,
+        "enabled": "[parameters('enableAlerts')]",
+        "scopes": [
+          "[resourceId('Microsoft.Sql/servers/databases', variables('sqlServerName'), 'content')]"
+        ],
+        "evaluationFrequency": "PT1M",
+        "windowSize": "PT5M",
+        "criteria": {
+          "allOf": [
+            {
+              "threshold": 1,
+              "name": "Metric1",
+              "metricNamespace": "microsoft.sql/servers/databases",
+              "metricName": "log_write_percent",
+              "operator": "GreaterThan",
+              "timeAggregation": "Average",
+              "criterionType": "StaticThresholdCriterion"
+            }
+          ],
+          "odata.type": "Microsoft.Azure.Monitor.MultipleResourceMultipleMetricCriteria"
+        },
+        "autoMitigate": true,
+        "targetResourceType": "microsoft.sql/servers/databases",
+        "actions": [
+          {
+            "actionGroupId": "[resourceId('microsoft.insights/actionGroups', variables('actionGroupEmail'))]",
+          }
+        ]
       }
     }
   ]
