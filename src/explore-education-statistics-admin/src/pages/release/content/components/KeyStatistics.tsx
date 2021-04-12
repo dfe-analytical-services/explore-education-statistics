@@ -2,7 +2,6 @@ import EditableKeyStat from '@admin/components/editable/EditableKeyStat';
 import KeyStatSelectForm from '@admin/pages/release/content/components/KeyStatSelectForm';
 import useReleaseContentActions from '@admin/pages/release/content/contexts/useReleaseContentActions';
 import { EditableRelease } from '@admin/services/releaseContentService';
-import BlockDraggable from '@admin/components/editable/BlockDraggable';
 import BlockDroppable from '@admin/components/editable/BlockDroppable';
 import Button from '@common/components/Button';
 import ButtonGroup from '@common/components/ButtonGroup';
@@ -11,7 +10,8 @@ import { KeyStatContainer } from '@common/modules/find-statistics/components/Key
 import styles from '@admin/pages/release/content/components/KeyStatistics.module.scss';
 import useToggle from '@common/hooks/useToggle';
 import React, { useCallback, useState, useEffect } from 'react';
-import { DragDropContext, DropResult } from 'react-beautiful-dnd';
+import { Draggable, DragDropContext, DropResult } from 'react-beautiful-dnd';
+import classNames from 'classnames';
 import reorder from '@common/utils/reorder';
 import { Dictionary } from '@admin/types';
 
@@ -46,11 +46,11 @@ const KeyStatistics = ({ release, isEditing }: KeyStatisticsProps) => {
 
   const ReorderKeyStatisticsButton = () => {
     return !isReordering ? (
-      <Button variant="secondary" onClick={() => toggleReordering.on()}>
+      <Button variant="secondary" onClick={toggleReordering.on}>
         Reorder <span className="govuk-visually-hidden">key statistics</span>
       </Button>
     ) : (
-      <Button variant="secondary" onClick={() => saveOrder()}>
+      <Button variant="secondary" onClick={saveOrder}>
         Save order
       </Button>
     );
@@ -148,26 +148,42 @@ const KeyStatistics = ({ release, isEditing }: KeyStatisticsProps) => {
             <div className="govuk-!-margin-bottom-9">
               {keyStatisticsBlocks.map((block, index) => {
                 return (
-                  <div key={block.id}>
-                    <BlockDraggable
-                      draggable={isReordering}
-                      draggableId={block.id}
-                      key={block.id}
-                      index={index}
-                      modifierClass="keyStats"
-                    >
-                      <EditableKeyStat
-                        key={block.id}
-                        name={block.name}
-                        releaseId={release.id}
-                        dataBlockId={block.id}
-                        summary={block.summary}
-                        isEditing={isEditing}
-                        isReordering={isReordering}
-                        onSubmit={() => {}}
-                      />
-                    </BlockDraggable>
-                  </div>
+                  <Draggable
+                    draggableId={block.id}
+                    index={index}
+                    isDragDisabled={!isReordering}
+                    key={block.id}
+                  >
+                    {(draggableProvided, snapshot) => (
+                      <div
+                        // eslint-disable-next-line react/jsx-props-no-spreading
+                        {...draggableProvided.draggableProps}
+                        // eslint-disable-next-line react/jsx-props-no-spreading
+                        {...draggableProvided.dragHandleProps}
+                        ref={draggableProvided.innerRef}
+                        className={classNames(styles.draggable, {
+                          // [styles.draggable]: isReordering,
+                          [styles.isDragging]: snapshot.isDragging,
+                        })}
+                      >
+                        <span
+                          className={classNames({
+                            [styles.dragHandle]: isReordering,
+                          })}
+                        />
+                        <EditableKeyStat
+                          key={block.id}
+                          name={block.name}
+                          releaseId={release.id}
+                          dataBlockId={block.id}
+                          summary={block.summary}
+                          isEditing={isEditing}
+                          isReordering={isReordering}
+                          onSubmit={() => {}}
+                        />
+                      </div>
+                    )}
+                  </Draggable>
                 );
               })}
             </div>

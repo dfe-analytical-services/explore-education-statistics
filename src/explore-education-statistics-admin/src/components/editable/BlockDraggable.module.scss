@@ -29,19 +29,7 @@
   }
 }
 
-.draggable.keyStats {
-  border-color: govuk-colour('white');
-  padding: 0;
-  &::before {
-    content: none;
-  }
-  &:focus {
-    border-color: govuk-colour('black');
-  }
-}
-
-.isDragging,
-.isDragging.keyStats {
+.isDragging {
   border: 3px solid govuk-colour('black');
 }
 
@@ -55,15 +43,5 @@
     content: '\2630';
     font-size: 2.25rem;
     height: 2.5rem;
-  }
-}
-
-.keyStats .dragHandle {
-  position: absolute;
-  right: govuk-spacing(2);
-  top: govuk-spacing(3);
-
-  &::after {
-    color: govuk-colour('white');
   }
 }
