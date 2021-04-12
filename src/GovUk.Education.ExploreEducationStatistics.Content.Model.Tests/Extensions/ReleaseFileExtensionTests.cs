@@ -103,13 +103,14 @@ namespace GovUk.Education.ExploreEducationStatistics.Content.Model.Tests.Extensi
         }
 
         [Fact]
-        // TODO EES-1815 Remove this when the name is changed to use the database Subject name
+        // TODO EES-2052
+        // As part of the subtasks of EES-1512, subject names are no longer added to and access via blob files, but 
+        // via the ReleaseFile table. At the time of writing, this hasn't been done for ancillary files, and
+        // therefore there is still some logic in BlobInfo and releaseFile.ToFileInfo() to handle getting names from
+        // blob files. Once ancillary files also add and access their names from the ReleaseFiles table, this logic 
+        // can be removed and this test removed.
         public void ToFileInfo_BlobWithNoNameKey()
         {
-            // Name is retrieved from the blob meta properties due to EES-1637 (Subject didn't exist early on and Name on Data files is Subject name persisted on blob)
-            // Chart files don't have any meta properties added to avoid duplicating data unnecessarily since nothing requires the filename or name of them
-            // Nevertheless test that we populate the name from the database File as a fallback when the blob name property is missing
-
             var result = _releaseFile.ToFileInfo(new BlobInfo
             (
                 path: "Ignored",
