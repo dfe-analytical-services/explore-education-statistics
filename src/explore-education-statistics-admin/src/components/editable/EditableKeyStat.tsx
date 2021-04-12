@@ -106,6 +106,7 @@ const EditableKeyStat = ({
                 titleTag="h4"
                 testId={testId}
                 value={keyStat.value}
+                isReordering={isReordering}
               >
                 <FormFieldTextInput<KeyStatsFormValues>
                   name="dataSummary"
@@ -149,6 +150,7 @@ const EditableKeyStat = ({
           title={keyStat.title}
           value={keyStat.value}
           testId={testId}
+          isReordering={isReordering}
         >
           {summary?.dataSummary[0] && (
             <p className="govuk-body-s" data-testid={`${testId}-summary`}>

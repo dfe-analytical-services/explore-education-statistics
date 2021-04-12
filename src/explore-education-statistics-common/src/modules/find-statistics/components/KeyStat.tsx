@@ -5,8 +5,8 @@ import useKeyStatQuery from '@common/modules/find-statistics/hooks/useKeyStatQue
 import { Summary } from '@common/services/types/blocks';
 import React, { ReactNode } from 'react';
 import ReactMarkdown from 'react-markdown';
-import styles from './KeyStat.module.scss';
 import classNames from 'classnames';
+import styles from './KeyStat.module.scss';
 
 interface KeyStatContainerProps {
   children: ReactNode;
@@ -22,14 +22,19 @@ interface KeyStatColumnProps {
   isReordering?: boolean;
 }
 
-export const KeyStatColumn = ({ children, testId, isReordering }: KeyStatColumnProps) => {
+export const KeyStatColumn = ({
+  children,
+  testId,
+  isReordering,
+}: KeyStatColumnProps) => {
   return (
-    <div 
+    <div
       className={classNames({
-        [styles.column]: !isReordering
+        [styles.column]: !isReordering,
       })}
-      data-testid={testId}>
-        {children}
+      data-testid={testId}
+    >
+      {children}
     </div>
   );
 };
