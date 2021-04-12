@@ -132,38 +132,48 @@ Navigate to 'Footnotes' page
 
 Add footnote to ${SECOND_SUBJECT}
     [Tags]  HappyPath
+    user waits until page contains link   Create footnote
     user clicks link  Create footnote
     user waits until h2 is visible  Create footnote
-    user clicks footnote checkbox  Select all indicators and filters for this subject
+    user clicks footnote radio   ${SECOND_SUBJECT}   Applies to all data
+    user clicks element  id:footnoteForm-content
     user enters text into element  id:footnoteForm-content  Footnote 1 ${SECOND_SUBJECT}
     user clicks button  Save footnote
     user waits until h2 is visible  Footnotes
 
 Add second footnote to ${SECOND_SUBJECT}
+    user waits until page contains link   Create footnote
     user clicks link  Create footnote
     user waits until h2 is visible  Create footnote
-    user opens details dropdown  Indicators   css:[data-testid="footnote-subject upload file test"]
+    user clicks footnote radio  ${SECOND_SUBJECT}   Applies to specific data
+    user opens details dropdown  Indicators   xpath://*[@data-testid="footnote-subject ${SECOND_SUBJECT}"]
     user clicks footnote checkbox  Admission Numbers
+    user clicks element  id:footnoteForm-content
     user enters text into element  id:footnoteForm-content  Footnote 2 ${SECOND_SUBJECT}
     user clicks button  Save footnote
     user waits until h2 is visible  Footnotes
 
 Add footnote to ${SUBJECT_NAME} subject
     [Tags]  HappyPath
+    user waits until page contains link   Create footnote
     user clicks link  Create footnote
     user waits until h2 is visible  Create footnote
-    user clicks element  //*[@data-testid="footnote-subject ${SUBJECT_NAME}"]//input[@type="checkbox"]
+    user clicks footnote radio   ${SUBJECT_NAME}   Applies to all data
+    user clicks element  id:footnoteForm-content
     user enters text into element  id:footnoteForm-content  Footnote 1 ${SUBJECT_NAME}
     user clicks button  Save footnote
     user waits until h2 is visible  Footnotes
 
 Add second footnote to ${SUBJECT_NAME} subject
     [Tags]  HappyPath
+    user waits until page contains link   Create footnote
     user clicks link  Create footnote
     user waits until h2 is visible  Create footnote
-    user opens details dropdown  Cheese
+    user clicks footnote radio   ${SUBJECT_NAME}   Applies to specific data
+    user opens details dropdown  Cheese    xpath://*[@data-testid="footnote-subject ${SUBJECT_NAME}"]
     user clicks footnote checkbox  Stilton
     user clicks footnote checkbox  Feta
+    user clicks element  id:footnoteForm-content
     user enters text into element  id:footnoteForm-content  Footnote 2 ${SUBJECT_NAME}
     user clicks button  Save footnote
     user waits until h2 is visible  Footnotes
@@ -440,7 +450,6 @@ Add release note to amendment
     user clicks button   Add note
     user enters text into element  id:createReleaseNoteForm-reason  Test release note one
     user clicks button   Save note
-    user opens details dropdown  See all 1 updates  id:releaseLastUpdated
     ${date}=  get current datetime   %-d %B %Y
     user waits until element contains  css:#releaseNotes li:nth-of-type(1) time  ${date}
     user waits until element contains  css:#releaseNotes li:nth-of-type(1) p     Test release note one
@@ -591,9 +600,11 @@ Navigate to 'Footnotes' Tab
 
 Add footnote to "upload file test filter" subject file
     [Tags]  HappyPath
+    user waits until page contains link   Create footnote
     user clicks link  Create footnote
     user waits until h2 is visible  Create footnote
-    user clicks element  xpath://*[@data-testid="footnote-subject ${THIRD_SUBJECT}"]//input
+    user clicks footnote radio  ${THIRD_SUBJECT}  Applies to all data
+    user clicks element  id:footnoteForm-content
     user enters text into element  id:footnoteForm-content  upload file test filter footnote
     user clicks button  Save footnote
     user waits until page contains testid  footnote upload file test filter footnote
@@ -602,6 +613,7 @@ Add footnote to "upload file test filter" subject file
 Update Seven filters footnote
     [Tags]  HappyPath
     user clicks link   Edit footnote   xpath://*[@data-testid="footnote Footnote 1 ${SUBJECT_NAME}"]
+    user clicks element  id:footnoteForm-content
     user enters text into element  id:footnoteForm-content  Updating ${SUBJECT_NAME} footnote
     textarea should contain  id:footnoteForm-content  Updating ${SUBJECT_NAME} footnote
     user clicks button  Save footnote
