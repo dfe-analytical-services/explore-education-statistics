@@ -3422,7 +3422,7 @@
         "[resourceId('microsoft.insights/actionGroups', variables('actionGroupEmail'))]"
       ],
       "properties": {
-        "description": "[concat(variables('metricAlertsDummy'), ' has triggered! Hurrah!')]",
+        "description": "[concat(variables('metricAlertDummy'), ' has triggered! Hurrah!')]",
         "severity": 3,
         "enabled": "[parameters('enableAlerts')]",
         "scopes": [
