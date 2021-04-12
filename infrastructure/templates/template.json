@@ -3448,7 +3448,7 @@
         "targetResourceType": "microsoft.sql/servers/databases",
         "actions": [
           {
-            "actionGroupId": "[resourceId('microsoft.insights/actionGroups', variables('actionGroupEmail'))]",
+            "actionGroupId": "[resourceId('microsoft.insights/actionGroups', variables('actionGroupEmail'))]"
           }
         ]
       }
