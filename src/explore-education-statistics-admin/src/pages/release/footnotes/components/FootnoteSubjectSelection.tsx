@@ -1,8 +1,5 @@
 import { FootnoteMetaGetters } from '@admin/pages/release/footnotes/utils/generateFootnoteMetaMap';
-import {
-  FootnoteSubject,
-  SubjectSelectionType,
-} from '@admin/services/footnoteService';
+import { FootnoteSubject } from '@admin/services/footnoteService';
 import React, { ReactNode } from 'react';
 
 interface Props {
@@ -17,11 +14,9 @@ interface Item {
   label: string;
   selected: boolean;
 }
+/* eslint-enable react/no-unused-prop-types */
 
-interface Selection {
-  id: string;
-  label: string;
-  selectionType: SubjectSelectionType;
+interface Selection extends Item {
   indicatorGroups: {
     id: string;
     label: string;
@@ -58,7 +53,7 @@ const FootnoteSubjectSelection = ({
   const selectedOption = { id: '-1', label: '(All)', selected: false };
 
   function getIndicatorGroups(): Selection['indicatorGroups'] {
-    if (subject.selectionType === 'All') {
+    if (subject.selected) {
       return [{ ...selectedOption, indicators: [] }];
     }
     return Object.entries(subject.indicatorGroups).map(
@@ -82,7 +77,7 @@ const FootnoteSubjectSelection = ({
   }
 
   function getFilters(): Selection['filters'] {
-    if (subject.selectionType === 'All') {
+    if (subject.selected) {
       return [{ ...selectedOption, filterGroups: [] }];
     }
     return Object.entries(subject.filters).map(([filterId, filter]) => {
@@ -117,7 +112,7 @@ const FootnoteSubjectSelection = ({
   const subjectSelect: Selection = {
     id: subjectId,
     label: getSubject(subjectId).label,
-    selectionType: subject.selectionType,
+    selected: subject.selected,
     indicatorGroups: getIndicatorGroups(),
     filters: getFilters(),
   };
@@ -131,25 +126,9 @@ const FootnoteSubjectSelection = ({
     );
   }
 
-  function renderSubjectItem(
-    { id, selectionType, label }: Selection,
-    children?: ReactNode,
-  ) {
-    return (
-      <li key={id}>
-        {selectionType === 'All' || selectionType === 'Specific' ? (
-          <strong>{label}</strong>
-        ) : (
-          label
-        )}
-        {children}
-      </li>
-    );
-  }
-
   return (
     <tr key={subjectId}>
-      <td>{renderSubjectItem(subjectSelect)}</td>
+      <td>{renderItem(subjectSelect)}</td>
       <td>
         <ul className="govuk-!-margin-top-0">
           {subjectSelect.indicatorGroups.map(indicatorGroup => {

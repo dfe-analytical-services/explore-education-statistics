@@ -5,7 +5,7 @@ export type SubjectSelectionType = 'NA' | 'All' | 'Specific';
 
 export interface FootnoteSubject {
   selectionType: SubjectSelectionType;
-  selected?: boolean;
+  selected: boolean;
   indicatorGroups: {
     [key: string]: {
       selected: boolean;

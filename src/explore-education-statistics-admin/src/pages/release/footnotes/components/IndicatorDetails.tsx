@@ -2,7 +2,6 @@ import styles from '@admin/pages/release/footnotes/components/FootnoteForm.modul
 import {
   BaseFootnote,
   FootnoteSubjectMeta,
-  SubjectSelectionType,
 } from '@admin/services/footnoteService';
 import Details from '@common/components/Details';
 import { FormCheckbox } from '@common/components/form';
@@ -12,7 +11,6 @@ import React from 'react';
 
 interface Props {
   summary: string;
-  parentSelectionType: SubjectSelectionType;
   valuePath: string;
   indicatorGroups: FootnoteSubjectMeta['indicators'];
   form: FormikProps<BaseFootnote>;
@@ -20,16 +18,12 @@ interface Props {
 
 const IndicatorDetails = ({
   summary,
-  parentSelectionType = 'Specific',
   valuePath,
   indicatorGroups,
   form,
 }: Props) => {
   return (
-    <Details
-      summary={`${summary}${parentSelectionType === 'All' ? ' (All)' : ''}`}
-      className="govuk-!-margin-bottom-2"
-    >
+    <Details summary={summary} className="govuk-!-margin-bottom-2">
       <div className={styles.filterOverflow}>
         {Object.entries(indicatorGroups).map(
           ([indicatorGroupId, indicatorGroup]) => {
@@ -81,7 +75,7 @@ const IndicatorDetails = ({
                         name={`${valuePath}.indicatorGroups.${indicatorGroupId}.indicators`}
                         id={indicatorItem.value}
                         disabled={groupValue}
-                        checked={parentSelectionType === 'All' || checked}
+                        checked={checked}
                         onChange={e => {
                           form.setFieldValue(
                             `${valuePath}.indicatorGroups.${indicatorGroupId}.selected`,
