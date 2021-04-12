@@ -1,4 +1,7 @@
-﻿namespace GovUk.Education.ExploreEducationStatistics.Content.Model.Extensions
+﻿using GovUk.Education.ExploreEducationStatistics.Common.Model;
+using GovUk.Education.ExploreEducationStatistics.Common.Extensions;
+
+namespace GovUk.Education.ExploreEducationStatistics.Content.Model.Extensions
 {
     public static class ReleaseFileExtensions
     {
@@ -15,6 +18,19 @@
         public static string PublicPath(this ReleaseFile releaseFile)
         {
             return releaseFile.File.PublicPath(releaseFile.Release);
+        }
+
+        public static FileInfo ToFileInfo(this ReleaseFile releaseFile, BlobInfo blobInfo)
+        {
+            return new FileInfo
+            {
+                Id = releaseFile.FileId,
+                FileName = releaseFile.File.Filename,
+                Name = releaseFile.Name ??
+                       (blobInfo.Name.IsNullOrEmpty() ? releaseFile.File.Filename : blobInfo.Name),
+                Size = blobInfo.Size,
+                Type = releaseFile.File.Type
+            };
         }
     }
 }
