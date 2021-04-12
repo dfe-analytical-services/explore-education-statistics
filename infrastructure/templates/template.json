@@ -3404,8 +3404,8 @@
             "name": "emailReceivers",
             "count": "[length(parameters('alertEmailReceivers'))]",
             "input": {
-              "name": "[parameters('alertEmailReceivers')[copyIndex('alertEmailReceivers')].name]",
-              "emailAddress": "[parameters('alertEmailReceivers')[copyIndex('alertEmailReceivers')].address]",
+              "name": "[parameters('alertEmailReceivers')[copyIndex('emailReceivers')].name]",
+              "emailAddress": "[parameters('alertEmailReceivers')[copyIndex('emailReceivers')].address]",
               "useCommonAlertSchema": false
             }
           }
