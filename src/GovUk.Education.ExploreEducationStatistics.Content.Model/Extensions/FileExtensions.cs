@@ -52,18 +52,6 @@ namespace GovUk.Education.ExploreEducationStatistics.Content.Model.Extensions
             return $"{FilesPath(releaseId, file.Type)}{file.Id}";
         }
 
-        public static FileInfo ToFileInfo(this MethodologyFile methodologyFile, BlobInfo blobInfo)
-        {
-            return new FileInfo
-            {
-                Id = methodologyFile.File.Id,
-                FileName = methodologyFile.File.Filename,
-                Name = null,
-                Size = blobInfo.Size,
-                Type = methodologyFile.File.Type
-            };
-        }
-
         public static FileInfo ToFileInfoNotFound(this File file)
         {
             return new FileInfo
