@@ -563,8 +563,8 @@
     "publisherStorageAccountId": "[concat(resourceGroup().id,'/providers/','Microsoft.Storage/storageAccounts/', variables('publisherStorageAccountName'))]",
     "loggingStorageAccountName": "[concat(parameters('subscription'), 'saeeslogging')]",
 
-    "actionGroupEmail": "[concat(parameters('subscription'), '-ag-', parameters('environment'), '-email')]",
-    "metricAlertDummy": "[concat(parameters('subscription'), '-ma-', parameters('environment'), '-dummy')]",
+    "actionGroupEmail": "ActionGroupEmail",
+    "metricAlertDummy": "MetricAlertDummy",
 
     "vNetName": "[concat(parameters('subscription'), '-vnet-', parameters('environment'))]",
     "vNetRef": "[resourceId('Microsoft.Network/virtualNetworks', variables('vNetName'))]",
