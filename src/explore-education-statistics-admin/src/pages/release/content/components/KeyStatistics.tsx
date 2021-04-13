@@ -14,6 +14,7 @@ import { Draggable, DragDropContext, DropResult } from 'react-beautiful-dnd';
 import classNames from 'classnames';
 import reorder from '@common/utils/reorder';
 import { Dictionary } from '@admin/types';
+import { ReleaseDataBlock } from '@admin/services/dataBlockService';
 
 export interface KeyStatisticsProps {
   release: EditableRelease;
@@ -57,9 +58,9 @@ const KeyStatistics = ({ release, isEditing }: KeyStatisticsProps) => {
   };
 
   const reorderKeyStatistics = useCallback(
-    async (ids: string[]) => {
-      const order = ids.reduce<Dictionary<number>>((acc, sectionId, index) => {
-        acc[sectionId] = index;
+    async (blocks: ReleaseDataBlock[]) => { 
+      const order = blocks.reduce<Dictionary<number>>((acc, block, index) => {
+        acc[block.id] = index;
         return acc;
       }, {});
       await updateSectionBlockOrder({
@@ -74,7 +75,7 @@ const KeyStatistics = ({ release, isEditing }: KeyStatisticsProps) => {
 
   const saveOrder = useCallback(async () => {
     if (reorderKeyStatistics) {
-      await reorderKeyStatistics(keyStatisticsBlocks.map(block => block.id));
+      await reorderKeyStatistics(keyStatisticsBlocks);
       toggleReordering.off();
     }
   }, [reorderKeyStatistics, keyStatisticsBlocks, toggleReordering]);
