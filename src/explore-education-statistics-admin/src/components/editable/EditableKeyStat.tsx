@@ -9,10 +9,7 @@ import { Form, FormFieldTextInput } from '@common/components/form';
 import LoadingSpinner from '@common/components/LoadingSpinner';
 import WarningMessage from '@common/components/WarningMessage';
 import useToggle from '@common/hooks/useToggle';
-import {
-  KeyStatColumn,
-  KeyStatProps,
-} from '@common/modules/find-statistics/components/KeyStat';
+import { KeyStatProps } from '@common/modules/find-statistics/components/KeyStat';
 import styles from '@common/modules/find-statistics/components/KeyStat.module.scss';
 import KeyStatTile from '@common/modules/find-statistics/components/KeyStatTile';
 import useKeyStatQuery from '@common/modules/find-statistics/hooks/useKeyStatQuery';
@@ -194,11 +191,7 @@ const EditableKeyStat = ({
     );
   };
 
-  return (
-    <KeyStatColumn testId={testId} isReordering={isReordering}>
-      <LoadingSpinner loading={isLoading}>{renderInner()}</LoadingSpinner>
-    </KeyStatColumn>
-  );
+  return <LoadingSpinner loading={isLoading}>{renderInner()}</LoadingSpinner>;
 };
 
 export default EditableKeyStat;

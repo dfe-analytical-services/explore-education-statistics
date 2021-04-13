@@ -58,7 +58,7 @@ const KeyStatistics = ({ release, isEditing }: KeyStatisticsProps) => {
   };
 
   const reorderKeyStatistics = useCallback(
-    async (blocks: ReleaseDataBlock[]) => { 
+    async (blocks: ReleaseDataBlock[]) => {
       const order = blocks.reduce<Dictionary<number>>((acc, block, index) => {
         acc[block.id] = index;
         return acc;
@@ -108,45 +108,13 @@ const KeyStatistics = ({ release, isEditing }: KeyStatisticsProps) => {
           </ButtonGroup>
         </>
       )}
-      {!isReordering && (
-        <KeyStatContainer>
-          {keyStatisticsBlocks.map(block => (
-            <EditableKeyStat
-              key={block.id}
-              name={block.name}
-              releaseId={release.id}
-              dataBlockId={block.id}
-              summary={block.summary}
-              isEditing={isEditing}
-              isReordering={isReordering}
-              onRemove={async () => {
-                await deleteContentSectionBlock({
-                  releaseId: release.id,
-                  sectionId: release.keyStatisticsSection.id,
-                  blockId: block.id,
-                  sectionKey: 'keyStatisticsSection',
-                });
-              }}
-              onSubmit={async values => {
-                await updateContentSectionDataBlock({
-                  releaseId: release.id,
-                  sectionId: release.keyStatisticsSection.id,
-                  blockId: block.id,
-                  sectionKey: 'keyStatisticsSection',
-                  values,
-                });
-              }}
-            />
-          ))}
-        </KeyStatContainer>
-      )}
-      {isReordering && (
-        <DragDropContext onDragEnd={handleDragEnd}>
-          <BlockDroppable
-            droppable={isReordering}
-            droppableId="keyStatisticsDroppable"
-          >
-            <div className="govuk-!-margin-bottom-9">
+      <DragDropContext onDragEnd={handleDragEnd}>
+        <BlockDroppable
+          droppable={isReordering}
+          droppableId="keyStatisticsDroppable"
+        >
+          <div className="govuk-!-margin-bottom-9">
+            <KeyStatContainer>
               {keyStatisticsBlocks.map((block, index) => {
                 return (
                   <Draggable
@@ -162,16 +130,19 @@ const KeyStatistics = ({ release, isEditing }: KeyStatisticsProps) => {
                         // eslint-disable-next-line react/jsx-props-no-spreading
                         {...draggableProvided.dragHandleProps}
                         ref={draggableProvided.innerRef}
-                        className={classNames(styles.draggable, {
-                          // [styles.draggable]: isReordering,
+                        className={classNames({
+                          [styles.draggable]: isReordering,
+                          'dfe-keyStatistics-column': !isReordering,
                           [styles.isDragging]: snapshot.isDragging,
                         })}
                       >
-                        <span
-                          className={classNames({
-                            [styles.dragHandle]: isReordering,
-                          })}
-                        />
+                        {isReordering && (
+                          <span
+                            className={classNames({
+                              [styles.dragHandle]: isReordering,
+                            })}
+                          />
+                        )}
                         <EditableKeyStat
                           key={block.id}
                           name={block.name}
@@ -180,17 +151,33 @@ const KeyStatistics = ({ release, isEditing }: KeyStatisticsProps) => {
                           summary={block.summary}
                           isEditing={isEditing}
                           isReordering={isReordering}
-                          onSubmit={() => {}}
+                          onRemove={async () => {
+                            await deleteContentSectionBlock({
+                              releaseId: release.id,
+                              sectionId: release.keyStatisticsSection.id,
+                              blockId: block.id,
+                              sectionKey: 'keyStatisticsSection',
+                            });
+                          }}
+                          onSubmit={async values => {
+                            await updateContentSectionDataBlock({
+                              releaseId: release.id,
+                              sectionId: release.keyStatisticsSection.id,
+                              blockId: block.id,
+                              sectionKey: 'keyStatisticsSection',
+                              values,
+                            });
+                          }}
                         />
                       </div>
                     )}
                   </Draggable>
                 );
               })}
-            </div>
-          </BlockDroppable>
-        </DragDropContext>
-      )}
+            </KeyStatContainer>
+          </div>
+        </BlockDroppable>
+      </DragDropContext>
     </>
   );
 };

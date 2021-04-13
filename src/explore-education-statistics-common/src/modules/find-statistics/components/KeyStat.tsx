@@ -19,21 +19,11 @@ export const KeyStatContainer = ({ children }: KeyStatContainerProps) => {
 interface KeyStatColumnProps {
   children: ReactNode;
   testId?: string;
-  isReordering?: boolean;
 }
 
-export const KeyStatColumn = ({
-  children,
-  testId,
-  isReordering,
-}: KeyStatColumnProps) => {
+export const KeyStatColumn = ({ children, testId }: KeyStatColumnProps) => {
   return (
-    <div
-      className={classNames({
-        [styles.column]: !isReordering,
-      })}
-      data-testid={testId}
-    >
+    <div className='dfe-keyStatistics-column' data-testid={testId}>
       {children}
     </div>
   );
