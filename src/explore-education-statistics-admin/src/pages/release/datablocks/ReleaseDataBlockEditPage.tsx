@@ -5,7 +5,6 @@ import DataBlockPageReadOnlyTabs from '@admin/pages/release/datablocks/component
 import DataBlockPageTabs from '@admin/pages/release/datablocks/components/DataBlockPageTabs';
 import DataBlockSelector from '@admin/pages/release/datablocks/components/DataBlockSelector';
 import {
-  releaseDataBlockCreateRoute,
   ReleaseDataBlockRouteParams,
   releaseDataBlocksRoute,
   ReleaseRouteParams,
@@ -23,8 +22,6 @@ import useAsyncHandledRetry from '@common/hooks/useAsyncHandledRetry';
 import useToggle from '@common/hooks/useToggle';
 import React, { useCallback, useRef } from 'react';
 import { generatePath, RouteComponentProps } from 'react-router';
-import ButtonLink from '@admin/components/ButtonLink';
-import FormLabel from '@common/components/form/FormLabel';
 
 interface Model {
   dataBlock: ReleaseDataBlock;
@@ -92,14 +89,6 @@ const ReleaseDataBlockEditPage = ({
 
   const { canUpdateRelease, dataBlock } = model ?? {};
 
-  const createPath = generatePath<ReleaseRouteParams>(
-    releaseDataBlockCreateRoute.path,
-    {
-      publicationId,
-      releaseId,
-    },
-  );
-
   return (
     <div ref={pageRef}>
       <Link
@@ -116,33 +105,12 @@ const ReleaseDataBlockEditPage = ({
       <LoadingSpinner loading={isLoading}>
         <h2>{canUpdateRelease ? 'Edit data block' : 'View data block'}</h2>
 
-        <FormLabel
-          id="selectedDataBlock"
-          label={
-            canUpdateRelease
-              ? 'Select a data block to edit'
-              : 'Select a data block to view'
-          }
+        <DataBlockSelector
+          canUpdate={canUpdateRelease}
+          publicationId={publicationId}
+          releaseId={releaseId}
+          dataBlockId={dataBlockId}
         />
-        <div className="dfe-flex dfe-align-items--center govuk-!-margin-top-1">
-          <DataBlockSelector
-            canUpdate={canUpdateRelease}
-            publicationId={publicationId}
-            releaseId={releaseId}
-            label={false}
-            dataBlockId={dataBlockId}
-          />
-          <p className="govuk-!-font-weight-bold govuk-!-margin-right-4 govuk-!-margin-left-4 govuk-!-margin-bottom-0">
-            or
-          </p>
-          <ButtonLink
-            className="govuk-!-margin-0"
-            to={createPath}
-            onClick={toggleDeleting.on}
-          >
-            Create another data block
-          </ButtonLink>
-        </div>
 
         <hr className="govuk-!-margin-bottom-6" />
 
