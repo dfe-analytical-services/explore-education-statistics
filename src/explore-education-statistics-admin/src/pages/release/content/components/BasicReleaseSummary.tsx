@@ -10,6 +10,9 @@ import {
 } from '@common/utils/date/partialDate';
 import { parseISO } from 'date-fns';
 import React, { useEffect, useState } from 'react';
+import SummaryList from '@common/components/SummaryList';
+import SummaryListItem from '@common/components/SummaryListItem';
+import ReleaseNotesSection from './ReleaseNotesSection';
 
 interface ReleaseTypeIcon {
   url: string;
@@ -52,43 +55,51 @@ const BasicReleaseSummary = ({ release }: Props) => {
     <>
       {releaseTypeIdsToIcons && (
         <>
-          <div className="govuk-grid-column-three-quarters">
-            <Tag>{getReleaseStatusLabel(release.status)}</Tag>
-
-            <dl className="dfe-meta-content">
-              <dt className="govuk-caption-m">Publish date: </dt>
-              <dd>
-                {release.publishScheduled && (
-                  <strong>
-                    <FormattedDate>
-                      {parseISO(release.publishScheduled)}
-                    </FormattedDate>
-                  </strong>
-                )}
-              </dd>
-              {isValidPartialDate(release.nextReleaseDate) && (
-                <div>
-                  <dt className="govuk-caption-m">Next update: </dt>
-                  <dd>
-                    <strong>
-                      <time>{formatPartialDate(release.nextReleaseDate)}</time>
-                    </strong>
-                  </dd>
-                </div>
-              )}
-            </dl>
+          <div className="dfe-flex dfe-align-items--center dfe-justify-content--space-between">
+            <div className="dfe-flex govuk-!-margin-bottom-3">
+              <Tag>{getReleaseStatusLabel(release.status)}</Tag>
+            </div>
+            {releaseTypeIdsToIcons[release.type.id] && (
+              <div className="dfe-flex">
+                <img
+                  src={releaseTypeIdsToIcons[release.type.id].url}
+                  alt={releaseTypeIdsToIcons[release.type.id].altText}
+                  height="120"
+                  width="120"
+                />
+              </div>
+            )}
           </div>
 
-          {releaseTypeIdsToIcons[release.type.id] && (
-            <div className="govuk-grid-column-one-quarter">
-              <img
-                src={releaseTypeIdsToIcons[release.type.id].url}
-                alt={releaseTypeIdsToIcons[release.type.id].altText}
-                height="120"
-                width="120"
-              />
-            </div>
-          )}
+          <SummaryList>
+            <SummaryListItem term="Publish date">
+              {release.publishScheduled ? (
+                <FormattedDate>
+                  {parseISO(release.publishScheduled)}
+                </FormattedDate>
+              ) : (
+                <p>TBA</p>
+              )}
+            </SummaryListItem>
+            {isValidPartialDate(release.nextReleaseDate) && (
+              <SummaryListItem term="Next update">
+                <time>{formatPartialDate(release.nextReleaseDate)}</time>
+              </SummaryListItem>
+            )}
+            <SummaryListItem term="Last updated">
+              {release.updates && release.updates.length > 0 ? (
+                <FormattedDate>release.updates[0].on</FormattedDate>
+              ) : (
+                'TBA'
+              )}
+              <ReleaseNotesSection release={release} />
+            </SummaryListItem>
+            <SummaryListItem term="Receive updates">
+              <a className="dfe-print-hidden govuk-!-font-weight-bold" href="#">
+                Sign up for email alerts
+              </a>
+            </SummaryListItem>
+          </SummaryList>
         </>
       )}
     </>

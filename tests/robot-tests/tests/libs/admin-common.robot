@@ -121,9 +121,9 @@ user adds basic release content
     user waits until button is enabled  Add new section
     user clicks button  Add new section
 
-    user changes accordion section title  1   Test section one
-    user adds text block to editable accordion section   Test section one
-    user adds content to accordion section text block  Test section one   1    Test content block for ${publication}
+    user changes accordion section title  1   Test section one   css:#releaseMainContent
+    user adds text block to editable accordion section   Test section one   css:#releaseMainContent
+    user adds content to accordion section text block  Test section one   1    Test content block for ${publication}   css:#releaseMainContent
 
 user creates approved methodology
     [Arguments]  ${title}
@@ -144,8 +144,6 @@ user creates approved methodology
 user creates methodology
     [Arguments]  ${title}
     user waits until h1 is visible  Manage methodologies
-    user waits until page contains element  id:live-methodologies-tab
-    user clicks element  id:live-methodologies-tab
     user clicks link  Create new methodology
     user waits until h1 is visible  Create new methodology
     user enters text into element  id:createMethodologyForm-title   ${title}
@@ -212,6 +210,10 @@ user checks scheduled releases tab publication has release
     [Arguments]   ${publication_name}   ${release_text}
     user checks page contains element   xpath://*[@id="scheduled-releases"]//*[@data-testid="releaseByStatusTab ${publication_name}"]//*[contains(@data-testid, "${release_text}")]
 
+user clicks footnote radio
+    [Arguments]  ${subject_label}  ${radio_label}
+    user clicks element  xpath://*[@data-testid="footnote-subject ${subject_label}"]//label[text()="${radio_label}"]/../input[@type="radio"]
+
 user clicks footnote checkbox
     [Arguments]  ${label}    ${parent}=css:body
     user waits until parent contains element  ${parent}   xpath://*[@id="footnoteForm"]//label[text()="${label}"]/../input
@@ -249,20 +251,20 @@ user changes accordion section title
     user waits until parent contains element  ${section}  xpath:.//h2/button[@aria-expanded and text()="${title}"]
 
 user checks accordion section contains x blocks
-    [Arguments]  ${section_name}  ${num_blocks}
-    ${section}=  user gets accordion section content element  ${section_name}
+    [Arguments]  ${section_name}  ${num_blocks}  ${parent}=css:[data-testid="accordion"]
+    ${section}=  user gets accordion section content element  ${section_name}  ${parent}
     ${blocks}=  get child elements  ${section}  css:[data-testid="editableSectionBlock"]
     length should be  ${blocks}  ${num_blocks}
 
 user adds text block to editable accordion section
-    [Arguments]  ${section_name}
-    ${section}=  user gets accordion section content element  ${section_name}
+    [Arguments]  ${section_name}   ${parent}=css:[data-testid="accordion"]
+    ${section}=  user gets accordion section content element  ${section_name}  ${parent}
     user clicks button  Add text block  ${section}
     user waits until element contains  ${section}  This section is empty
 
 user adds data block to editable accordion section
-    [Arguments]   ${section_name}   ${block_name}
-    ${section}=  user gets accordion section content element  ${section_name}
+    [Arguments]   ${section_name}   ${block_name}   ${parent}=css:[data-testid="accordion"]
+    ${section}=  user gets accordion section content element  ${section_name}   ${parent}
     user clicks button  Add data block   ${section}
     ${block_list}=  get child element  ${section}  css:select[name="selectedDataBlock"]
     user selects from list by label  ${block_list}  Dates data block name
@@ -270,8 +272,8 @@ user adds data block to editable accordion section
     user clicks button  Embed  ${section}
 
 user adds content to accordion section text block
-    [Arguments]  ${section_name}  ${block_num}  ${content}
-    ${section}=  user gets accordion section content element  ${section_name}
+    [Arguments]  ${section_name}  ${block_num}  ${content}   ${parent}=[data-testid="accordion"]
+    ${section}=  user gets accordion section content element  ${section_name}   ${parent}
     ${block}=  get child element  ${section}  css:[data-testid="editableSectionBlock"]:nth-of-type(${block_num})
     user clicks button  Edit block  ${block}
     user presses keys  CTRL+a
@@ -281,14 +283,14 @@ user adds content to accordion section text block
     user waits until element contains  ${block}  ${content}
 
 user checks accordion section text block contains
-    [Arguments]  ${section_name}  ${block_num}  ${content}
-    ${section}=  user gets accordion section content element  ${section_name}
+    [Arguments]  ${section_name}  ${block_num}  ${content}   ${parent}=[data-testid="accordion"]
+    ${section}=  user gets accordion section content element  ${section_name}  ${parent}
     ${block}=  get child element  ${section}  css:[data-testid="editableSectionBlock"]:nth-of-type(${block_num})
     user waits until element contains  ${block}  ${content}
 
 user deletes editable accordion section content block
-    [Arguments]  ${section_name}  ${block_num}
-    ${section}=  user gets accordion section content element  ${section_name}
+    [Arguments]  ${section_name}  ${block_num}  ${parent}=[data-testid="accordion"]
+    ${section}=  user gets accordion section content element  ${section_name}   ${parent}
     ${block}=  get child element  ${section}  css:[data-testid="editableSectionBlock"]:nth-of-type(${block_num})
     user clicks button  Remove block  ${block}
     user clicks button  Confirm

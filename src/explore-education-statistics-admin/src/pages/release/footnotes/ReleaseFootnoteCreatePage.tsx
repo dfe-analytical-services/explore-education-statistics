@@ -43,7 +43,6 @@ const ReleaseFootnoteCreatePage = ({
             footnoteMeta={footnoteMeta}
             onSubmit={async values => {
               await footnoteService.createFootnote(releaseId, values);
-
               history.push(footnotesPath);
             }}
             cancelButton={

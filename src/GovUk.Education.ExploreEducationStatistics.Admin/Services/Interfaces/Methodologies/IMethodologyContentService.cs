@@ -12,41 +12,41 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Services.Interfaces.M
 {
     public interface IMethodologyContentService
     {
-        Task<Either<ActionResult, ManageMethodologyContentViewModel>> GetContentAsync(Guid methodologyId);
+        Task<Either<ActionResult, ManageMethodologyContentViewModel>> GetContent(Guid methodologyId);
 
         Task<Either<ActionResult, List<T>>> GetContentBlocks<T>(Guid methodologyId) where T : ContentBlock;
 
-        Task<Either<ActionResult, List<ContentSectionViewModel>>> GetContentSectionsAsync(
+        Task<Either<ActionResult, List<ContentSectionViewModel>>> GetContentSections(
             Guid releaseId,
             MethodologyContentService.ContentListType contentType);
 
-        Task<Either<ActionResult, List<ContentSectionViewModel>>> ReorderContentSectionsAsync(
+        Task<Either<ActionResult, List<ContentSectionViewModel>>> ReorderContentSections(
             Guid releaseId, Dictionary<Guid, int> newSectionOrder);
 
-        Task<Either<ActionResult, ContentSectionViewModel>> AddContentSectionAsync(
+        Task<Either<ActionResult, ContentSectionViewModel>> AddContentSection(
             Guid releaseId, ContentSectionAddRequest request,
             MethodologyContentService.ContentListType contentType);
 
-        Task<Either<ActionResult, ContentSectionViewModel>> UpdateContentSectionHeadingAsync(
+        Task<Either<ActionResult, ContentSectionViewModel>> UpdateContentSectionHeading(
             Guid releaseId, Guid contentSectionId, string newHeading);
 
-        Task<Either<ActionResult, List<ContentSectionViewModel>>> RemoveContentSectionAsync(
+        Task<Either<ActionResult, List<ContentSectionViewModel>>> RemoveContentSection(
             Guid releaseId, Guid contentSectionId);
 
-        Task<Either<ActionResult, ContentSectionViewModel>> GetContentSectionAsync(
+        Task<Either<ActionResult, ContentSectionViewModel>> GetContentSection(
             Guid releaseId, Guid contentSectionId);
 
-        Task<Either<ActionResult, List<IContentBlockViewModel>>> ReorderContentBlocksAsync(
+        Task<Either<ActionResult, List<IContentBlockViewModel>>> ReorderContentBlocks(
             Guid releaseId, Guid contentSectionId, Dictionary<Guid, int> newBlocksOrder);
 
-        Task<Either<ActionResult, IContentBlockViewModel>> AddContentBlockAsync(
+        Task<Either<ActionResult, IContentBlockViewModel>> AddContentBlock(
             Guid releaseId, Guid contentSectionId,
             ContentBlockAddRequest request);
 
-        Task<Either<ActionResult, List<IContentBlockViewModel>>> RemoveContentBlockAsync(
+        Task<Either<ActionResult, List<IContentBlockViewModel>>> RemoveContentBlock(
             Guid releaseId, Guid contentSectionId, Guid contentBlockId);
 
-        Task<Either<ActionResult, IContentBlockViewModel>> UpdateTextBasedContentBlockAsync(
+        Task<Either<ActionResult, IContentBlockViewModel>> UpdateTextBasedContentBlock(
             Guid releaseId, Guid contentSectionId, Guid contentBlockId, ContentBlockUpdateRequest request);
     }
 }

@@ -63,7 +63,6 @@ const ReleasePageContainer = ({
   location,
 }: RouteComponentProps<MatchProps>) => {
   const { publicationId, releaseId } = match.params;
-
   const {
     value: release,
     setState: setRelease,
@@ -170,10 +169,12 @@ const ReleasePageContainer = ({
             </Switch>
           </ReleaseContextProvider>
 
-          <PreviousNextLinks
-            previousSection={previousSection}
-            nextSection={nextSection}
-          />
+          {currentRouteIndex > -1 && (
+            <PreviousNextLinks
+              previousSection={previousSection}
+              nextSection={nextSection}
+            />
+          )}
         </Page>
       )}
     </LoadingSpinner>

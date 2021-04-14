@@ -4,11 +4,12 @@ import {
   BaseFootnote,
   Footnote,
   FootnoteMeta,
+  SubjectSelectionType,
 } from '@admin/services/footnoteService';
 import footnoteToFlatFootnote from '@admin/services/utils/footnote/footnoteToFlatFootnote';
 import Button from '@common/components/Button';
 import ButtonGroup from '@common/components/ButtonGroup';
-import { Form, FormFieldCheckbox } from '@common/components/form';
+import { Form, FormFieldRadioGroup } from '@common/components/form';
 import FormFieldTextArea from '@common/components/form/FormFieldTextArea';
 import Yup from '@common/validation/yup';
 import { Formik } from 'formik';
@@ -35,10 +36,25 @@ const FootnoteForm = ({
 }: Props) => {
   const initialValues = useMemo<BaseFootnote>(() => {
     const subjects = mapValues(footnoteMeta.subjects, subject => {
-      const { indicators, filters } = subject;
+      const { indicators, filters, subjectId } = subject;
+
+      let selectionType: SubjectSelectionType = 'NA';
+
+      if (footnote && Object.keys(footnote.subjects).includes(subjectId)) {
+        const foundSubject = footnote.subjects[subjectId];
+        if (foundSubject.selected) {
+          selectionType = 'All';
+        } else if (
+          Object.keys(foundSubject.filters).length ||
+          Object.keys(foundSubject.indicatorGroups).length
+        ) {
+          selectionType = 'Specific';
+        }
+      }
 
       return {
         selected: false,
+        selectionType,
         indicatorGroups: mapValues(indicators, () => ({
           selected: false,
           indicators: [],
@@ -75,7 +91,6 @@ const FootnoteForm = ({
           filterGroups,
           filterItems,
         } = footnoteToFlatFootnote(values);
-
         const hasNoneSelected =
           [
             ...subjects,
@@ -92,24 +107,39 @@ const FootnoteForm = ({
           );
         }
 
-        await onSubmit(values);
+        // Remove unused subjects when type is NA.
+        const newValues = { ...values };
+        Object.keys(newValues.subjects).map(subjectId => {
+          if (newValues.subjects[subjectId].selectionType === 'NA') {
+            delete newValues.subjects[subjectId];
+          }
+          return subjectId;
+        });
+
+        await onSubmit(newValues);
       }}
     >
       {form => (
         <Form id={id} showSubmitError>
           <p>
-            Select filters and indicators from either one or multiple subject
-            areas and then add your footnote (shown at the bottom of the page).
+            Select which subjects, filters and indicators your footnote applies
+            to and these will appear alongside the associated data in your
+            published statistics.
           </p>
+
+          <p>
+            Footnotes should be used sparingly, and only for information that is
+            critical to understanding the data in the table or chart it refers
+            to.
+          </p>
+
+          <FormFieldTextArea<BaseFootnote> name="content" label="Footnote" />
 
           {orderBy(
             Object.values(footnoteMeta.subjects),
             subject => subject.subjectName,
           ).map(subject => {
             const { subjectId, subjectName } = subject;
-
-            const subjectSelected =
-              get(form.values, `subjects.${subjectId}.selected`) || false;
 
             return (
               <fieldset
@@ -121,58 +151,74 @@ const FootnoteForm = ({
                   Subject: {subjectName}
                 </legend>
 
-                <FormFieldCheckbox
-                  label="Select all indicators and filters for this subject"
-                  name={`subjects.${subjectId}.selected`}
+                <FormFieldRadioGroup
+                  legend="Select indicators and filters for this subject"
+                  legendHidden
                   small
-                />
+                  inline
+                  showError={false}
+                  name={`subjects.${subjectId}.selectionType`}
+                  order={[]}
+                  options={[
+                    { value: 'NA', label: 'Does not apply' },
+                    {
+                      value: `All`,
+                      label: 'Applies to all data',
+                    },
+                    {
+                      value: 'Specific',
+                      label: 'Applies to specific data',
+                      conditional: (
+                        <div className="govuk-grid-row govuk-!-margin-top-3">
+                          <div className="govuk-grid-column-one-half">
+                            <h3 className="govuk-heading-s govuk-!-margin-bottom-2 govuk-!-margin-top-0">
+                              Indicators
+                            </h3>
 
-                <div className="govuk-grid-row govuk-!-margin-top-3 ">
-                  <div className="govuk-grid-column-one-half">
-                    <h3 className="govuk-heading-s govuk-!-margin-bottom-2 govuk-!-margin-top-0">
-                      Indicators
-                    </h3>
+                            <IndicatorDetails
+                              summary="Indicators"
+                              valuePath={`subjects.${subjectId}`}
+                              indicatorGroups={subject.indicators}
+                              form={form}
+                            />
+                          </div>
 
-                    <IndicatorDetails
-                      summary="Indicators"
-                      parentSelected={subjectSelected}
-                      valuePath={`subjects.${subjectId}`}
-                      indicatorGroups={subject.indicators}
-                      form={form}
-                    />
-                  </div>
+                          <div className="govuk-grid-column-one-half">
+                            {Object.entries(subject.filters).length > 0 && (
+                              <>
+                                <h3 className="govuk-heading-s govuk-!-margin-bottom-2 govuk-!-margin-top-0">
+                                  Filters
+                                </h3>
 
-                  <div className="govuk-grid-column-one-half">
-                    <h3 className="govuk-heading-s govuk-!-margin-bottom-2 govuk-!-margin-top-0">
-                      Filters
-                    </h3>
-
-                    {Object.entries(subject.filters).map(
-                      ([filterId, filter]) => (
-                        <FilterGroupDetails
-                          key={filterId}
-                          summary={filter.legend}
-                          parentSelected={subjectSelected}
-                          valuePath={`subjects.${subjectId}`}
-                          groupId={filterId}
-                          filter={filter}
-                          selectAll
-                          value={get(
-                            form.values,
-                            `subjects.${subjectId}.filters.${filterId}.selected`,
-                          )}
-                          form={form}
-                        />
+                                {Object.entries(subject.filters).map(
+                                  ([filterId, filter]) => (
+                                    <FilterGroupDetails
+                                      key={filterId}
+                                      summary={filter.legend}
+                                      valuePath={`subjects.${subjectId}`}
+                                      groupId={filterId}
+                                      filter={filter}
+                                      selectAll
+                                      value={get(
+                                        form.values,
+                                        `subjects.${subjectId}.filters.${filterId}.selected`,
+                                      )}
+                                      form={form}
+                                    />
+                                  ),
+                                )}
+                              </>
+                            )}
+                          </div>
+                        </div>
                       ),
-                    )}
-                  </div>
-                </div>
+                    },
+                  ]}
+                />
                 <hr className="govuk-!-margin-bottom-2" />
               </fieldset>
             );
           })}
-
-          <FormFieldTextArea<BaseFootnote> name="content" label="Footnote" />
 
           <ButtonGroup>
             <Button type="submit">Save footnote</Button>

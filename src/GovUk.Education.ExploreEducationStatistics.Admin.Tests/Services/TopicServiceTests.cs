@@ -11,9 +11,9 @@ using GovUk.Education.ExploreEducationStatistics.Content.Model.Database;
 using GovUk.Education.ExploreEducationStatistics.Data.Model;
 using GovUk.Education.ExploreEducationStatistics.Data.Model.Database;
 using GovUk.Education.ExploreEducationStatistics.Data.Model.Services.Interfaces;
-using Microsoft.AspNetCore.Mvc;
 using Moq;
 using Xunit;
+using static GovUk.Education.ExploreEducationStatistics.Admin.Validators.ValidationErrorMessages;
 using static GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services.MapperUtils;
 using static GovUk.Education.ExploreEducationStatistics.Data.Model.Database.StatisticsDbUtils;
 using Theme = GovUk.Education.ExploreEducationStatistics.Content.Model.Theme;
@@ -81,10 +81,8 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
             );
 
             Assert.True(result.IsLeft);
-            var badRequestResult = Assert.IsType<BadRequestObjectResult>(result.Left);
-            var details = Assert.IsType<ValidationProblemDetails>(badRequestResult.Value);
-
-            Assert.Equal("THEME_DOES_NOT_EXIST", details.Errors[""].First());
+            ValidationTestUtil.AssertValidationProblem(
+                result.Left, ThemeDoesNotExist);
         }
 
         [Fact]
@@ -125,10 +123,8 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
                 );
 
                 Assert.True(result.IsLeft);
-                var badRequestResult = Assert.IsType<BadRequestObjectResult>(result.Left);
-                var details = Assert.IsType<ValidationProblemDetails>(badRequestResult.Value);
-
-                Assert.Equal("SLUG_NOT_UNIQUE", details.Errors[""].First());
+                ValidationTestUtil.AssertValidationProblem(
+                    result.Left, SlugNotUnique);
             }
         }
 
@@ -222,10 +218,8 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
                 );
 
                 Assert.True(result.IsLeft);
-                var badRequestResult = Assert.IsType<BadRequestObjectResult>(result.Left);
-                var details = Assert.IsType<ValidationProblemDetails>(badRequestResult.Value);
-
-                Assert.Equal("THEME_DOES_NOT_EXIST", details.Errors[""].First());
+                ValidationTestUtil.AssertValidationProblem(
+                    result.Left, ThemeDoesNotExist);
             }
         }
 
@@ -274,10 +268,8 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
                 );
 
                 Assert.True(result.IsLeft);
-                var badRequestResult = Assert.IsType<BadRequestObjectResult>(result.Left);
-                var details = Assert.IsType<ValidationProblemDetails>(badRequestResult.Value);
-
-                Assert.Equal("SLUG_NOT_UNIQUE", details.Errors[""].First());
+                ValidationTestUtil.AssertValidationProblem(
+                    result.Left, SlugNotUnique);
             }
         }
 

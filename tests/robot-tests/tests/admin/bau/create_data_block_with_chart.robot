@@ -196,12 +196,15 @@ Validate data block is in list
     user checks results table cell contains  1  3  No
     user checks results table cell contains  1  4  UI test highlight name
 
-Embed data block into release content
+Create new content section
     [Tags]  HappyPath
     user clicks link  Content
     user waits until h2 is visible  ${PUBLICATION_NAME}
     user clicks button  Add new section
     user changes accordion section title  1   ${CONTENT_SECTION_NAME}
+
+Embed data block into release content
+    [Tags]  HappyPath
     user clicks button   Add data block
     user selects from list by label  css:select[name="selectedDataBlock"]  ${DATABLOCK_NAME}
     user waits until element is visible  css:table
@@ -371,7 +374,7 @@ Validate line chart embeds correctly
     [Tags]  HappyPath
     user clicks link  Content
     user waits until h2 is visible  ${PUBLICATION_NAME}
-    user opens accordion section  ${CONTENT_SECTION_NAME}
+    user opens accordion section  ${CONTENT_SECTION_NAME}  css:#releaseMainContent
     ${datablock}=  set variable  css:[data-testid="Data block - ${DATABLOCK_NAME}"]
     # The below is to avoid React lazy-loading the chart which causes the test to fail here
     user scrolls down  400
@@ -476,7 +479,7 @@ Save and validate vertical bar chart embeds correctly
 
     user clicks link  Content
     user waits until h2 is visible  ${PUBLICATION_NAME}
-    user opens accordion section  ${CONTENT_SECTION_NAME}
+    user opens accordion section  ${CONTENT_SECTION_NAME}  css:#releaseMainContent
 
     ${datablock}=  set variable  css:[data-testid="Data block - ${DATABLOCK_NAME}"]
     user waits until element does not contain line chart  ${datablock}
@@ -573,7 +576,7 @@ Save and validate horizontal bar chart embeds correctly
 
     user clicks link  Content
     user waits until h2 is visible  ${PUBLICATION_NAME}
-    user opens accordion section  ${CONTENT_SECTION_NAME}
+    user opens accordion section  ${CONTENT_SECTION_NAME}  css:#releaseMainContent
 
     ${datablock}=  set variable  css:[data-testid="Data block - ${DATABLOCK_NAME}"]
     user waits until element contains bar chart  ${datablock}
@@ -680,7 +683,7 @@ Save and validate geographic chart embeds correctly
 
     user clicks link  Content
     user waits until h2 is visible  ${PUBLICATION_NAME}
-    user opens accordion section  ${CONTENT_SECTION_NAME}
+    user opens accordion section  ${CONTENT_SECTION_NAME}  css:#releaseMainContent
 
     ${datablock}=  set variable  css:[data-testid="Data block - ${DATABLOCK_NAME}"]
     user waits until element does not contain bar chart  ${datablock}
@@ -730,7 +733,7 @@ Save and validate infographic chart embeds correctly
 
     user clicks link  Content
     user waits until h2 is visible  ${PUBLICATION_NAME}
-    user opens accordion section  ${CONTENT_SECTION_NAME}
+    user opens accordion section  ${CONTENT_SECTION_NAME}  css:#releaseMainContent
 
     ${datablock}=  set variable  css:[data-testid="Data block - ${DATABLOCK_NAME}"]
     user checks chart title contains  ${datablock}  Test chart title

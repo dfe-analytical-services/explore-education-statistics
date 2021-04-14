@@ -27,6 +27,7 @@ export const symbols: ChartSymbol[] = [
   'star',
   'triangle',
   'wye',
+  'none',
 ];
 
 export const lineStyles: LineStyle[] = ['dashed', 'dotted', 'solid'];

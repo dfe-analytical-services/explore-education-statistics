@@ -20,6 +20,7 @@ using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Configuration;
 using Moq;
 using Xunit;
+using static GovUk.Education.ExploreEducationStatistics.Admin.Validators.ValidationErrorMessages;
 
 namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
 {
@@ -215,10 +216,8 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
                 var result = await service.AddPreReleaseUser(release.Id, "not an email");
 
                 Assert.True(result.IsLeft);
-
-                var badRequestObjectResult = Assert.IsType<BadRequestObjectResult>(result.Left);
-                var details = Assert.IsType<ValidationProblemDetails>(badRequestObjectResult.Value);
-                Assert.Equal("INVALID_EMAIL_ADDRESS", details.Errors[""].First());
+                ValidationTestUtil.AssertValidationProblem(
+                    result.Left, InvalidEmailAddress);
             }
         }
 
@@ -271,10 +270,8 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
                 var result = await service.AddPreReleaseUser(release.Id, "test@test.com");
 
                 Assert.True(result.IsLeft);
-
-                var badRequestObjectResult = Assert.IsType<BadRequestObjectResult>(result.Left);
-                var details = Assert.IsType<ValidationProblemDetails>(badRequestObjectResult.Value);
-                Assert.Equal("USER_ALREADY_EXISTS", details.Errors[""].First());
+                ValidationTestUtil.AssertValidationProblem(
+                    result.Left, UserAlreadyExists);
             }
         }
 
@@ -308,10 +305,8 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
                 var result = await service.AddPreReleaseUser(release.Id, "test@test.com");
 
                 Assert.True(result.IsLeft);
-
-                var badRequestObjectResult = Assert.IsType<BadRequestObjectResult>(result.Left);
-                var details = Assert.IsType<ValidationProblemDetails>(badRequestObjectResult.Value);
-                Assert.Equal("USER_ALREADY_EXISTS", details.Errors[""].First());
+                ValidationTestUtil.AssertValidationProblem(
+                    result.Left, UserAlreadyExists);
             }
         }
 
@@ -536,10 +531,8 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
                 var result = await service.RemovePreReleaseUser(release.Id, "not an email");
 
                 Assert.True(result.IsLeft);
-
-                var badRequestObjectResult = Assert.IsType<BadRequestObjectResult>(result.Left);
-                var details = Assert.IsType<ValidationProblemDetails>(badRequestObjectResult.Value);
-                Assert.Equal("INVALID_EMAIL_ADDRESS", details.Errors[""].First());
+                ValidationTestUtil.AssertValidationProblem(
+                    result.Left, InvalidEmailAddress);
             }
         }
 

@@ -11,7 +11,6 @@ import React from 'react';
 
 interface Props {
   summary: string;
-  parentSelected: boolean;
   selectAll?: boolean;
   valuePath: string;
   groupId?: number | string;
@@ -22,7 +21,6 @@ interface Props {
 
 const FilterGroupDetails = ({
   summary,
-  parentSelected = false,
   selectAll = false,
   valuePath,
   groupId,
@@ -31,7 +29,7 @@ const FilterGroupDetails = ({
   form,
 }: Props) => {
   const groupPath = `${valuePath}.filters.${groupId}`;
-  const groupIsSelected = parentSelected || value;
+  const groupIsSelected = value;
 
   return (
     <Details
@@ -42,9 +40,9 @@ const FilterGroupDetails = ({
         {selectAll && groupId && (
           <FormFieldCheckbox
             name={`${groupPath}.selected`}
-            disabled={parentSelected}
             label="Select all"
             small
+            checked={groupIsSelected}
             boldLabel
             formGroup={false}
           />

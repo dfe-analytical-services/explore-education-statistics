@@ -22,11 +22,14 @@ import {
 const MethodologyContentPageInternal = () => {
   const { methodology, canUpdateMethodology } = useMethodologyState();
 
+  const canUpdateContent =
+    canUpdateMethodology && methodology.status === 'Draft';
+
   return (
-    <EditingContextProvider value={{ isEditing: canUpdateMethodology }}>
+    <EditingContextProvider value={{ isEditing: canUpdateContent }}>
       {({ isEditing }) => (
         <>
-          {canUpdateMethodology && <EditablePageModeToggle />}
+          {canUpdateContent && <EditablePageModeToggle />}
 
           <div className="govuk-width-container">
             <section

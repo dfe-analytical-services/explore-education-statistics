@@ -1,7 +1,10 @@
 import client from '@admin/services/utils/service';
 import footnoteToFlatFootnote from './utils/footnote/footnoteToFlatFootnote';
 
+export type SubjectSelectionType = 'NA' | 'All' | 'Specific';
+
 export interface FootnoteSubject {
+  selectionType: SubjectSelectionType;
   selected: boolean;
   indicatorGroups: {
     [key: string]: {

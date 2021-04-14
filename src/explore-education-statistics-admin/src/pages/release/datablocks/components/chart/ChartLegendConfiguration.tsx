@@ -184,7 +184,16 @@ const ChartLegendConfiguration = ({
     if (capabilities.hasSymbols) {
       itemSchema = itemSchema.shape({
         symbol: Yup.string().oneOf<ChartSymbol>(
-          ['circle', 'cross', 'diamond', 'square', 'star', 'triangle', 'wye'],
+          [
+            'circle',
+            'cross',
+            'diamond',
+            'square',
+            'star',
+            'triangle',
+            'wye',
+            'none',
+          ],
           params =>
             `Choose a valid symbol for legend item ${getLegendItemNumber(
               params.path as string,
@@ -313,7 +322,6 @@ const ChartLegendConfiguration = ({
                               <FormFieldSelect
                                 name={`${itemName}.symbol`}
                                 label="Symbol"
-                                placeholder="None"
                                 formGroup={false}
                                 showError={false}
                                 options={symbolOptions}

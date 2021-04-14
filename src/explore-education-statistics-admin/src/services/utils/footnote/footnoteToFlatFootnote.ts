@@ -22,7 +22,7 @@ const footnoteToFlatFootnote = (footnote: BaseFootnote): FlatFootnote => {
   };
 
   Object.entries(footnote.subjects).forEach(([subjectId, subject]) => {
-    if (subject.selected) {
+    if (subject.selectionType === 'All') {
       flatFootnote.subjects.push(subjectId);
     }
 

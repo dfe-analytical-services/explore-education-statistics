@@ -77,6 +77,15 @@ for development, specifically the table storage component which is not supported
    - [SQL Server 2017+](https://www.microsoft.com/en-gb/sql-server/sql-server-downloads)
    - [Docker and Docker Compose](https://docs.docker.com/)
 
+4. **Linux only** - Add symlinks to libmagic-1
+
+   ```
+   cd /usr/lib/x86_64-linux-gnu/
+   sudo ln -s libmagic.so.1.0.0 libmagic-1.so
+   sudo ln -s libmagic.so.1.0.0 libmagic-1.so.1
+   ```
+
+   See [bug raised with the library](https://github.com/hey-red/Mime/issues/36) for more info.
 
 ### Running the backend
 

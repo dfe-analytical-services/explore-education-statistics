@@ -25,6 +25,7 @@ import { logEvent } from '@frontend/services/googleAnalyticsService';
 import classNames from 'classnames';
 import { GetServerSideProps, NextPage } from 'next';
 import React from 'react';
+import orderBy from 'lodash/orderBy';
 import PublicationReleaseHeadlinesSection from './components/PublicationReleaseHeadlinesSection';
 import styles from './PublicationReleasePage.module.scss';
 
@@ -121,7 +122,7 @@ const PublicationReleasePage: NextPage<Props> = ({ data }) => {
                   summary={`See all updates (${data.updates.length})`}
                 >
                   <ol className="govuk-list">
-                    {data.updates.map(update => (
+                    {orderBy(data.updates, 'on', 'desc').map(update => (
                       <li key={update.id}>
                         <FormattedDate className="govuk-body govuk-!-font-weight-bold">
                           {update.on}
@@ -172,6 +173,13 @@ const PublicationReleasePage: NextPage<Props> = ({ data }) => {
                   <a
                     href="#dataDownloads-1"
                     className="govuk-button govuk-!-margin-bottom-3"
+                    onClick={() => {
+                      logEvent({
+                        category: `${data.publication.title} release page`,
+                        action: `View data and files clicked`,
+                        label: window.location.pathname,
+                      });
+                    }}
                   >
                     View data and files
                   </a>
@@ -309,7 +317,7 @@ const PublicationReleasePage: NextPage<Props> = ({ data }) => {
       <PublicationReleaseHeadlinesSection release={data} />
 
       {data.downloadFiles && (
-        <div className={styles.downloadSection}>
+        <div className="dfe-download-section">
           <Accordion
             id="dataDownloads"
             showOpenAll={false}
