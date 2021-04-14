@@ -577,14 +577,14 @@
         "criterionType": "StaticThresholdCriterion"
       },
       {
-        "name": "[concat(parameters('subscription'),'BlockedByFirewallRule')]",
-        "description": "Blocked by firewall rule",
-        "resourceId": "[resourceId('Microsoft.Sql/servers/databases', variables('sqlServerName'), 'content')]",
+        "name": "[concat(parameters('subscription'),'PubStatsDBDataIOUsage')]",
+        "description": "Public Statistics DB Data IO usage",
+        "resourceId": "[resourceId('Microsoft.Sql/servers/databases', variables('sqlServerName'), 'public-statistics')]",
         "resourceType": "microsoft.sql/servers/databases",
-        "metricName": "blocked_by_firewall",
+        "metricName": "physical_data_read_percent",
         "threshold": 1,
         "operator": "GreaterThan",
-        "timeAggregation": "Total",
+        "timeAggregation": "Average",
         "criterionType": "StaticThresholdCriterion"
       }
     ],
