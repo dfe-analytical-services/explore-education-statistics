@@ -579,7 +579,7 @@
       {
         "name": "[concat(parameters('subscription'),'PubStatsDBDataIOUsage')]",
         "description": "Public Statistics DB Data IO usage",
-        "resourceId": "[resourceId('Microsoft.Sql/servers/databases', variables('sqlServerName'), 'public-statistics')]",
+        "resourceId": "[resourceId('Microsoft.Sql/servers/databases', variables('publicSqlServerName'), 'public-statistics')]",
         "resourceType": "microsoft.sql/servers/databases",
         "metricName": "physical_data_read_percent",
         "threshold": 1,
