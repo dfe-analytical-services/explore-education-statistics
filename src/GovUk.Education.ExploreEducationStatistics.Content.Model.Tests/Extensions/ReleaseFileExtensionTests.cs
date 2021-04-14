@@ -127,18 +127,5 @@ namespace GovUk.Education.ExploreEducationStatistics.Content.Model.Tests.Extensi
             Assert.Equal("400 B", result.Size);
             Assert.Equal(Ancillary, result.Type);
         }
-
-        [Fact]
-        public void ToFileInfoNotFound()
-        {
-            var result = _releaseFile.File.ToFileInfoNotFound();
-
-            Assert.Equal(_releaseFile.File.Id, result.Id);
-            Assert.Equal("pdf", result.Extension);
-            Assert.Equal("ancillary.pdf", result.FileName);
-            Assert.Equal("Unknown", result.Name);
-            Assert.Equal("0.00 B", result.Size);
-            Assert.Equal(Ancillary, result.Type);
-        }
     }
 }

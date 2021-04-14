@@ -9,6 +9,14 @@ namespace GovUk.Education.ExploreEducationStatistics.Content.Model.Tests.Extensi
 {
     public class FileExtensionTests
     {
+        private readonly File _file = new File
+        {
+            Id = Guid.NewGuid(),
+            RootPath = Guid.NewGuid(),
+            Filename = "ancillary.pdf",
+            Type = Ancillary
+        };
+
         [Fact]
         public void BatchesPath()
         {
@@ -169,6 +177,19 @@ namespace GovUk.Education.ExploreEducationStatistics.Content.Model.Tests.Extensi
                     Assert.Throws<ArgumentOutOfRangeException>(() => file.PublicPath(release));
                 }
             });
+        }
+
+        [Fact]
+        public void ToFileInfoNotFound()
+        {
+            var result = _file.ToFileInfoNotFound();
+
+            Assert.Equal(_file.Id, result.Id);
+            Assert.Equal("pdf", result.Extension);
+            Assert.Equal("ancillary.pdf", result.FileName);
+            Assert.Equal("Unknown", result.Name);
+            Assert.Equal("0.00 B", result.Size);
+            Assert.Equal(Ancillary, result.Type);
         }
     }
 }
