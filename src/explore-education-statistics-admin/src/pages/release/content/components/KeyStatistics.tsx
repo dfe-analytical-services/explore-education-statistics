@@ -8,6 +8,7 @@ import ButtonGroup from '@common/components/ButtonGroup';
 import WarningMessage from '@common/components/WarningMessage';
 import { KeyStatContainer } from '@common/modules/find-statistics/components/KeyStat';
 import styles from '@admin/pages/release/content/components/KeyStatistics.module.scss';
+import keyStatStyles from '@common/modules/find-statistics/components/KeyStat.module.scss';
 import useToggle from '@common/hooks/useToggle';
 import React, { useCallback, useState, useEffect } from 'react';
 import { Draggable, DragDropContext, DropResult } from 'react-beautiful-dnd';
@@ -132,7 +133,7 @@ const KeyStatistics = ({ release, isEditing }: KeyStatisticsProps) => {
                         ref={draggableProvided.innerRef}
                         className={classNames({
                           [styles.draggable]: isReordering,
-                          'dfe-keyStatistics-column': !isReordering,
+                          [keyStatStyles.column]: !isReordering,
                           [styles.isDragging]: snapshot.isDragging,
                         })}
                       >

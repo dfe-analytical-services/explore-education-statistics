@@ -5,8 +5,7 @@ import useKeyStatQuery from '@common/modules/find-statistics/hooks/useKeyStatQue
 import { Summary } from '@common/services/types/blocks';
 import React, { ReactNode } from 'react';
 import ReactMarkdown from 'react-markdown';
-import classNames from 'classnames';
-import styles from './KeyStat.module.scss';
+import styles from '@common/modules/find-statistics/components/KeyStat.module.scss';
 
 interface KeyStatContainerProps {
   children: ReactNode;
@@ -23,7 +22,7 @@ interface KeyStatColumnProps {
 
 export const KeyStatColumn = ({ children, testId }: KeyStatColumnProps) => {
   return (
-    <div className='dfe-keyStatistics-column' data-testid={testId}>
+    <div className={styles.column} data-testid={testId}>
       {children}
     </div>
   );
