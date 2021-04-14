@@ -575,6 +575,17 @@
         "operator": "GreaterThan",
         "timeAggregation": "Average",
         "criterionType": "StaticThresholdCriterion"
+      },
+      {
+        "name": "[concat(parameters('subscription'),'BlockedByFirewallRule')]",
+        "description": "Blocked by firewall rule",
+        "resourceId": "[resourceId('Microsoft.Sql/servers/databases', variables('sqlServerName'), 'content')]",
+        "resourceType": "microsoft.sql/servers/databases",
+        "metricName": "blocked_by_firewall",
+        "threshold": 1,
+        "operator": "GreaterThan",
+        "timeAggregation": "Total",
+        "criterionType": "StaticThresholdCriterion"
       }
     ],
 
