@@ -9,6 +9,7 @@ import TableHighlightsList from '@common/modules/table-tool/components/TableHigh
 import { InjectedWizardProps } from '@common/modules/table-tool/components/Wizard';
 import WizardStepHeading from '@common/modules/table-tool/components/WizardStepHeading';
 import { Subject, TableHighlight } from '@common/services/tableBuilderService';
+import LoadingSpinner from '@common/components/LoadingSpinner';
 import React, { ReactNode } from 'react';
 
 const subjectTabsId = 'subjectTabs';
@@ -19,6 +20,7 @@ const subjectTabIds = {
 
 interface Props {
   highlights?: TableHighlight[];
+  loadingFastTrack: boolean;
   subjects: Subject[];
   subjectId?: string;
   renderHighlightLink?: (highlight: TableHighlight) => ReactNode;
@@ -27,6 +29,7 @@ interface Props {
 
 const SubjectStep = ({
   highlights = [],
+  loadingFastTrack = false,
   subjects,
   subjectId = '',
   renderHighlightLink,
@@ -76,23 +79,30 @@ const SubjectStep = ({
             id={subjectTabIds.featuredTables}
             headingTitle="Choose a table"
           >
-            <span className="govuk-hint">
-              Use the links below to quickly select existing featured tables for
-              this publication. After viewing a table you can also adjust and
-              change filters to quickly see different results.
-            </span>
+            <LoadingSpinner loading={loadingFastTrack}>
+              <span className="govuk-hint">
+                Use the links below to quickly select existing featured tables
+                for this publication. After viewing a table you can also adjust
+                and change filters to quickly see different results.
+              </span>
 
-            {renderHighlightLink && (
-              <TableHighlightsList
-                highlights={highlights}
-                renderLink={renderHighlightLink}
-              />
-            )}
+              {renderHighlightLink && (
+                <TableHighlightsList
+                  highlights={highlights}
+                  renderLink={renderHighlightLink}
+                />
+              )}
 
-            <p>If you can't find the table you're looking for, then you can </p>
-            <a className="govuk-button" href={`#${subjectTabIds.createTable}`}>
-              Create your own table
-            </a>
+              <p>
+                If you can't find the table you're looking for, then you can{' '}
+              </p>
+              <a
+                className="govuk-button"
+                href={`#${subjectTabIds.createTable}`}
+              >
+                Create your own table
+              </a>
+            </LoadingSpinner>
           </TabsSection>
           <TabsSection
             title="Create your own table"
