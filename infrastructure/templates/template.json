@@ -522,10 +522,20 @@
       "defaultValue": false
     },
     "alertEmailReceivers": {
+      "type": "array"
+    },
+    "alertRules": {
       "type": "array",
-      "metadata": {
-        "description": "Emails to send alerts to"
-      }
+      "defaultValue": [{
+        "name": "",
+        "description": "",
+        "resourceName": "",
+        "resourceType": "microsoft.sql/servers/databases",
+        "metricName": "log_write_percent",
+        "operator": "GreaterThan",
+        "timeAggregration": "Average",
+        "criterionTyype": "StaticThresholdCriterion"
+      }]
     }
   },
   "variables": {
@@ -563,8 +573,8 @@
     "publisherStorageAccountId": "[concat(resourceGroup().id,'/providers/','Microsoft.Storage/storageAccounts/', variables('publisherStorageAccountName'))]",
     "loggingStorageAccountName": "[concat(parameters('subscription'), 'saeeslogging')]",
 
-    "actionGroupEmail": "ActionGroupEmail",
-    "metricAlertDummy": "MetricAlertDummy",
+    "actionGroupEmail": "[concat(parameters('subscription'), '-ag-', parameters('environment'), '-email')]",
+    "metricAlertDummy": "[concat(parameters('subscription'), '-ma-', parameters('environment'), '-dummy')]",
 
     "vNetName": "[concat(parameters('subscription'), '-vnet-', parameters('environment'))]",
     "vNetRef": "[resourceId('Microsoft.Network/virtualNetworks', variables('vNetName'))]",
@@ -3406,7 +3416,7 @@
             "input": {
               "name": "[parameters('alertEmailReceivers')[copyIndex('emailReceivers')].name]",
               "emailAddress": "[parameters('alertEmailReceivers')[copyIndex('emailReceivers')].address]",
-              "useCommonAlertSchema": false
+              "useCommonAlertSchema": true
             }
           }
         ]
