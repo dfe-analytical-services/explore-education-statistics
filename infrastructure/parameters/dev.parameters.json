@@ -70,9 +70,6 @@
     },
     "maxDbSizeBytes": {
       "value": 322122547200
-    },
-    "enableAlerts": {
-      "value": true
     }
   }
 }
