@@ -1,0 +1,45 @@
+@import '~govuk-frontend/govuk/base';
+
+.buttons {
+  @include govuk-media-query($from: tablet) {
+    justify-content: space-between;
+  }
+}
+
+.formContainer {
+  width: 100%;
+}
+
+.draggable {
+  border: 3px solid govuk-colour('white');
+  border-bottom: 0;
+  overflow: hidden;
+  padding: 0;
+  position: relative;
+  width: 100%;
+
+  &:focus {
+    border: 3px solid govuk-colour('black');
+    outline: none;
+  }
+}
+
+.isDragging {
+  border: 3px solid govuk-colour('black');
+}
+
+.dragHandle {
+  display: flex;
+  justify-content: flex-end;
+  margin-bottom: govuk-spacing(2);
+  position: absolute;
+  right: govuk-spacing(2);
+  top: govuk-spacing(3);
+
+  &::after {
+    color: govuk-colour('white');
+    content: '\2630';
+    font-size: 2.25rem;
+    height: 2.5rem;
+  }
+}

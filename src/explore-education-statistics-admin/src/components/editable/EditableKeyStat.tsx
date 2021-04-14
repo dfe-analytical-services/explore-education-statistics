@@ -9,10 +9,7 @@ import { Form, FormFieldTextInput } from '@common/components/form';
 import LoadingSpinner from '@common/components/LoadingSpinner';
 import WarningMessage from '@common/components/WarningMessage';
 import useToggle from '@common/hooks/useToggle';
-import {
-  KeyStatColumn,
-  KeyStatProps,
-} from '@common/modules/find-statistics/components/KeyStat';
+import { KeyStatProps } from '@common/modules/find-statistics/components/KeyStat';
 import styles from '@common/modules/find-statistics/components/KeyStat.module.scss';
 import KeyStatTile from '@common/modules/find-statistics/components/KeyStatTile';
 import useKeyStatQuery from '@common/modules/find-statistics/hooks/useKeyStatQuery';
@@ -28,6 +25,7 @@ export interface KeyStatsFormValues {
 
 interface EditableKeyStatProps extends KeyStatProps {
   isEditing?: boolean;
+  isReordering?: boolean;
   name: string;
   onRemove?: () => void;
   onSubmit: (values: KeyStatsFormValues) => void;
@@ -35,6 +33,7 @@ interface EditableKeyStatProps extends KeyStatProps {
 
 const EditableKeyStat = ({
   isEditing = false,
+  isReordering = false,
   name,
   releaseId,
   dataBlockId,
@@ -104,6 +103,7 @@ const EditableKeyStat = ({
                 titleTag="h4"
                 testId={testId}
                 value={keyStat.value}
+                isReordering={isReordering}
               >
                 <FormFieldTextInput<KeyStatsFormValues>
                   name="dataSummary"
@@ -147,6 +147,7 @@ const EditableKeyStat = ({
           title={keyStat.title}
           value={keyStat.value}
           testId={testId}
+          isReordering={isReordering}
         >
           {summary?.dataSummary[0] && (
             <p className="govuk-body-s" data-testid={`${testId}-summary`}>
@@ -155,7 +156,7 @@ const EditableKeyStat = ({
           )}
         </KeyStatTile>
 
-        {summary?.dataDefinition[0] && (
+        {summary?.dataDefinition[0] && !isReordering && (
           <Details
             summary={summary?.dataDefinitionTitle[0] || 'Help'}
             className={styles.definition}
@@ -168,7 +169,7 @@ const EditableKeyStat = ({
           </Details>
         )}
 
-        {isEditing && (
+        {isEditing && !isReordering && (
           <ButtonGroup className="govuk-!-margin-top-2">
             <Button onClick={toggleShowForm.on}>Edit</Button>
 
@@ -190,11 +191,7 @@ const EditableKeyStat = ({
     );
   };
 
-  return (
-    <KeyStatColumn testId={testId}>
-      <LoadingSpinner loading={isLoading}>{renderInner()}</LoadingSpinner>
-    </KeyStatColumn>
-  );
+  return <LoadingSpinner loading={isLoading}>{renderInner()}</LoadingSpinner>;
 };
 
 export default EditableKeyStat;
