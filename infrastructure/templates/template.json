@@ -566,7 +566,7 @@
     "actionGroupAlerts": "[concat(parameters('subscription'), '-ag-', parameters('environment'), '-alertedusers')]",
     "metricAlerts": [
       {
-        "name": "[concat('TEST ', parameters('subscription'), ' Content DB Log Write Percent greater than 1%')]",
+        "name": "[concat(parameters('subscription'),'ContentDBLogWritePercentgreaterthan1')]",
         "description": "Content DB Log Write Percent greater than 1% alert has triggered! Hurrah!",
         "resourceId": "[resourceId('Microsoft.Sql/servers/databases', variables('sqlServerName'), 'content')]",
         "resourceType": "microsoft.sql/servers/databases",
@@ -3409,7 +3409,7 @@
       "name": "[variables('actionGroupAlerts')]",
       "location": "Global",
       "properties": {
-        "groupShortName": "emailAG",
+        "groupShortName": "alertAG",
         "enabled": "[parameters('enableAlerts')]",
         "copy": [
           {
