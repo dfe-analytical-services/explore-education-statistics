@@ -53,7 +53,7 @@ const MethodologyEditableBlock = ({
         <EditableContentBlock
           editable={editable && !isBrowser('IE')}
           id={blockId}
-          label="Block content"
+          label=""
           value={block.body}
           useMarkdown={block.type === 'MarkDownBlock'}
           transformImageAttributes={transformImageAttributes}
