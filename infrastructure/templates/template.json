@@ -3427,41 +3427,41 @@
     {
       "type": "microsoft.insights/metricAlerts",
       "apiVersion": "2018-03-01",
-      "name": "[parameters('metricAlerts')[copyIndex()].name]",
+      "name": "[variables('metricAlerts')[copyIndex()].name]",
       "location": "global",
       "dependsOn": [
-        "[parameters('metricAlerts')[copyIndex()].resourceId]",
+        "[variables('metricAlerts')[copyIndex()].resourceId]",
         "[resourceId('microsoft.insights/actionGroups', variables('actionGroupAlerts'))]"
       ],
       "copy": {
         "name": "metricAlertsCopy",
-        "count": "[length(parameters('metricAlerts'))]"
+        "count": "[length(variables('metricAlerts'))]"
       },
       "properties": {
-        "description": "[parameters('metricAlerts')[copyIndex()].description]",
+        "description": "[variables('metricAlerts')[copyIndex()].description]",
         "severity": 3,
         "enabled": "[parameters('enableAlerts')]",
         "scopes": [
-          "[parameters('metricAlerts')[copyIndex()].resourceId]"
+          "[variables('metricAlerts')[copyIndex()].resourceId]"
         ],
         "evaluationFrequency": "PT1M",
         "windowSize": "PT5M",
         "criteria": {
           "allOf": [
             {
-              "threshold": "[parameters('metricAlerts')[copyIndex()].threshold]",
+              "threshold": "[variables('metricAlerts')[copyIndex()].threshold]",
               "name": "Metric1",
-              "metricNamespace": "[parameters('metricAlerts')[copyIndex()].resourceType]",
-              "metricName": "[parameters('metricAlerts')[copyIndex()].metricName]",
-              "operator": "[parameters('metricAlerts')[copyIndex()].operator]",
-              "timeAggregation": "[parameters('metricAlerts')[copyIndex()].timeAggregation]",
-              "criterionType": "[parameters('metricAlerts')[copyIndex()].criterionType]"
+              "metricNamespace": "[variables('metricAlerts')[copyIndex()].resourceType]",
+              "metricName": "[variables('metricAlerts')[copyIndex()].metricName]",
+              "operator": "[variables('metricAlerts')[copyIndex()].operator]",
+              "timeAggregation": "[variables('metricAlerts')[copyIndex()].timeAggregation]",
+              "criterionType": "[variables('metricAlerts')[copyIndex()].criterionType]"
             }
           ],
           "odata.type": "Microsoft.Azure.Monitor.MultipleResourceMultipleMetricCriteria"
         },
         "autoMitigate": true,
-        "targetResourceType": "[parameters('metricAlerts')[copyIndex()].resourceType]",
+        "targetResourceType": "[variables('metricAlerts')[copyIndex()].resourceType]",
         "actions": [
           {
             "actionGroupId": "[resourceId('microsoft.insights/actionGroups', variables('actionGroupAlerts'))]"
