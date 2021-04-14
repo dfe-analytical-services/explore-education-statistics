@@ -173,6 +173,13 @@ const PublicationReleasePage: NextPage<Props> = ({ data }) => {
                   <a
                     href="#dataDownloads-1"
                     className="govuk-button govuk-!-margin-bottom-3"
+                    onClick={() => {
+                      logEvent({
+                        category: `${data.publication.title} release page`,
+                        action: `View data and files clicked`,
+                        label: window.location.pathname,
+                      });
+                    }}
                   >
                     View data and files
                   </a>
