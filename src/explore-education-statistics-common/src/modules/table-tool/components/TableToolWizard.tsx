@@ -72,7 +72,7 @@ export interface TableToolWizardProps {
   renderHighlightLink?: (highlight: TableHighlight) => ReactNode;
   scrollOnMount?: boolean;
   onSubmit?: (table: FullTable) => void;
-  loadingFastTrack: boolean;
+  loadingFastTrack?: boolean;
 }
 
 const TableToolWizard = ({

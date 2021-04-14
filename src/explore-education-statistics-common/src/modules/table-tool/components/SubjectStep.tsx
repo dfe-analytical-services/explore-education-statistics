@@ -20,7 +20,7 @@ const subjectTabIds = {
 
 interface Props {
   highlights?: TableHighlight[];
-  loadingFastTrack: boolean;
+  loadingFastTrack?: boolean;
   subjects: Subject[];
   subjectId?: string;
   renderHighlightLink?: (highlight: TableHighlight) => ReactNode;
