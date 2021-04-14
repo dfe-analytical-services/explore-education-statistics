@@ -563,8 +563,8 @@
     "publisherStorageAccountId": "[concat(resourceGroup().id,'/providers/','Microsoft.Storage/storageAccounts/', variables('publisherStorageAccountName'))]",
     "loggingStorageAccountName": "[concat(parameters('subscription'), 'saeeslogging')]",
 
-    "actionGroupEmail": "ActionGroupEmail",
-    "metricAlertDummy": "MetricAlertDummy",
+    "actionGroupEmail": "[concat(parameters('subscription'), '-ag-', parameters('environment'), '-email')]",
+    "metricAlertDummy": "[concat(parameters('subscription'), '-ma-', parameters('environment'), '-dummy')]",
 
     "vNetName": "[concat(parameters('subscription'), '-vnet-', parameters('environment'))]",
     "vNetRef": "[resourceId('Microsoft.Network/virtualNetworks', variables('vNetName'))]",
@@ -3406,7 +3406,7 @@
             "input": {
               "name": "[parameters('alertEmailReceivers')[copyIndex('emailReceivers')].name]",
               "emailAddress": "[parameters('alertEmailReceivers')[copyIndex('emailReceivers')].address]",
-              "useCommonAlertSchema": false
+              "useCommonAlertSchema": true
             }
           }
         ]
