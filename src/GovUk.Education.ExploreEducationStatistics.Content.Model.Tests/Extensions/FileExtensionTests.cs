@@ -1,9 +1,7 @@
 ﻿using System;
-using System.Collections.Generic;
 using GovUk.Education.ExploreEducationStatistics.Common.Model;
 using GovUk.Education.ExploreEducationStatistics.Common.Services;
 using Xunit;
-using static GovUk.Education.ExploreEducationStatistics.Common.Model.BlobInfo;
 using static GovUk.Education.ExploreEducationStatistics.Common.Model.FileType;
 using static GovUk.Education.ExploreEducationStatistics.Content.Model.Extensions.FileExtensions;
 
@@ -11,9 +9,6 @@ namespace GovUk.Education.ExploreEducationStatistics.Content.Model.Tests.Extensi
 {
     public class FileExtensionTests
     {
-        private const string PublicationSlug = "publication-slug";
-        private const string ReleaseSlug = "release-slug";
-
         private readonly File _file = new File
         {
             Id = Guid.NewGuid(),
@@ -185,56 +180,6 @@ namespace GovUk.Education.ExploreEducationStatistics.Content.Model.Tests.Extensi
         }
 
         [Fact]
-        public void ToFileInfo()
-        {
-            var result = _file.ToFileInfo(new BlobInfo
-            (
-                path: "Ignored",
-                size: "400 B",
-                contentType: "Ignored",
-                contentLength: -1L,
-                meta: new Dictionary<string, string>
-                {
-                    {NameKey, "Test ancillary file"}
-                }
-            ));
-
-            Assert.Equal(_file.Id, result.Id);
-            Assert.Equal("pdf", result.Extension);
-            Assert.Equal("ancillary.pdf", result.FileName);
-            Assert.Equal("Test ancillary file", result.Name);
-            Assert.Equal(_file.Path(), result.Path);
-            Assert.Equal("400 B", result.Size);
-            Assert.Equal(Ancillary, result.Type);
-        }
-
-        [Fact]
-        // TODO EES-1815 Remove this when the name is changed to use the database Subject name
-        public void ToFileInfo_BlobWithNoNameKey()
-        {
-            // Name is retrieved from the blob meta properties due to EES-1637 (Subject didn't exist early on and Name on Data files is Subject name persisted on blob)
-            // Chart files don't have any meta properties added to avoid duplicating data unnecessarily since nothing requires the filename or name of them
-            // Nevertheless test that we populate the name from the database File as a fallback when the blob name property is missing
-
-            var result = _file.ToFileInfo(new BlobInfo
-            (
-                path: "Ignored",
-                size: "400 B",
-                contentType: "Ignored",
-                contentLength: -1L,
-                meta: new Dictionary<string, string>()
-            ));
-
-            Assert.Equal(_file.Id, result.Id);
-            Assert.Equal("pdf", result.Extension);
-            Assert.Equal("ancillary.pdf", result.FileName);
-            Assert.Equal("ancillary.pdf", result.Name);
-            Assert.Equal(_file.Path(), result.Path);
-            Assert.Equal("400 B", result.Size);
-            Assert.Equal(Ancillary, result.Type);
-        }
-
-        [Fact]
         public void ToFileInfoNotFound()
         {
             var result = _file.ToFileInfoNotFound();
@@ -243,41 +188,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Content.Model.Tests.Extensi
             Assert.Equal("pdf", result.Extension);
             Assert.Equal("ancillary.pdf", result.FileName);
             Assert.Equal("Unknown", result.Name);
-            Assert.Null(result.Path);
             Assert.Equal("0.00 B", result.Size);
-            Assert.Equal(Ancillary, result.Type);
-        }
-
-        [Fact]
-        public void ToPublicFileInfo()
-        {
-            var release = new Release
-            {
-                Publication = new Publication
-                {
-                    Slug = PublicationSlug
-                },
-                Slug = ReleaseSlug
-            };
-
-            var result = _file.ToPublicFileInfo(new BlobInfo
-            (
-                path: _file.PublicPath(release),
-                size: "400 B",
-                contentType: "Ignored",
-                contentLength: -1L,
-                meta: new Dictionary<string, string>
-                {
-                    {NameKey, "Test ancillary file"}
-                }
-            ));
-
-            Assert.Equal(_file.Id, result.Id);
-            Assert.Equal("pdf", result.Extension);
-            Assert.Equal("ancillary.pdf", result.FileName);
-            Assert.Equal("Test ancillary file", result.Name);
-            Assert.Equal(_file.PublicPath(release), result.Path);
-            Assert.Equal("400 B", result.Size);
             Assert.Equal(Ancillary, result.Type);
         }
     }

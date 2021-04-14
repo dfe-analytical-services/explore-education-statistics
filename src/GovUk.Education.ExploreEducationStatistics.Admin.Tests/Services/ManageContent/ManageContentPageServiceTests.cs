@@ -123,7 +123,6 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services.Manage
                     Id = ancillaryFileId,
                     FileName = "ancillary.pdf",
                     Name = "Ancillary File",
-                    Path = "ancillary/file/path",
                     Size = "10 Kb",
                     Type = Ancillary
                 },
@@ -132,7 +131,6 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services.Manage
                     Id = dataFileId,
                     FileName = "data.csv",
                     Name = "Subject File",
-                    Path = "data/file/path",
                     Size = "20 Kb",
                     Type = FileType.Data
                 }
@@ -249,14 +247,12 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services.Manage
                 Assert.Equal("pdf", contentDownloadFiles[0].Extension);
                 Assert.Equal("ancillary.pdf", contentDownloadFiles[0].FileName);
                 Assert.Equal("Ancillary File", contentDownloadFiles[0].Name);
-                Assert.Equal(files[0].Path, contentDownloadFiles[0].Path);
                 Assert.Equal("10 Kb", contentDownloadFiles[0].Size);
                 Assert.Equal(Ancillary, contentDownloadFiles[0].Type);
                 Assert.Equal(files[1].Id, contentDownloadFiles[1].Id);
                 Assert.Equal("csv", contentDownloadFiles[1].Extension);
                 Assert.Equal("data.csv", contentDownloadFiles[1].FileName);
                 Assert.Equal("Subject File", contentDownloadFiles[1].Name);
-                Assert.Equal(files[1].Path, contentDownloadFiles[1].Path);
                 Assert.Equal("20 Kb", contentDownloadFiles[1].Size);
                 Assert.Equal(FileType.Data, contentDownloadFiles[1].Type);
 

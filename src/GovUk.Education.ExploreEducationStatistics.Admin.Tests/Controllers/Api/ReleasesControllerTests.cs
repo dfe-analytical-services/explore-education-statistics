@@ -49,7 +49,6 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Controllers.Api
             var dataFileInfo = new DataFileInfo
             {
                 Name = "Subject name",
-                Path = "datafile.csv"
             };
 
             mocks.ReleaseDataFilesService
@@ -70,7 +69,6 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Controllers.Api
                 metaFile: metaFile);
             var dataFileInfoResult = AssertOkResult(result);
             Assert.Equal("Subject name", dataFileInfoResult.Name);
-            Assert.Equal("datafile.csv", dataFileInfoResult.Path);
         }
 
         [Fact]
@@ -109,14 +107,12 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Controllers.Api
                 {
                     FileName = "file1.csv",
                     Name = "Release a file 1",
-                    Path = "file1.csv",
                     Size = "1 Kb"
                 },
                 new DataFileInfo
                 {
                     FileName = "file2.csv",
                     Name = "Release a file 2",
-                    Path = "file2.csv",
                     Size = "1 Kb"
                 }
             };

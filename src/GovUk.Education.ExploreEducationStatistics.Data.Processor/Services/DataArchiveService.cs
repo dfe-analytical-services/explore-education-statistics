@@ -1,6 +1,5 @@
 using System.IO.Compression;
 using System.Threading.Tasks;
-using GovUk.Education.ExploreEducationStatistics.Common.Extensions;
 using GovUk.Education.ExploreEducationStatistics.Common.Services.Interfaces;
 using GovUk.Education.ExploreEducationStatistics.Content.Model;
 using GovUk.Education.ExploreEducationStatistics.Content.Model.Extensions;
@@ -22,7 +21,6 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Processor.Services
         public async Task ExtractDataFiles(DataImport import)
         {
             var path = import.ZipFile.Path();
-            var blob = await _blobStorageService.GetBlob(PrivateReleaseFiles, path);
 
             await using var zipBlobFileStream = await _blobStorageService.StreamBlob(PrivateReleaseFiles, path);
             using var archive = new ZipArchive(zipBlobFileStream);
@@ -41,7 +39,6 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Processor.Services
                     stream: stream,
                     contentType: "text/csv",
                     metadata: GetDataFileMetaValues(
-                            name: blob.Name,
                             metaFileName: metadataFile.Name,
                             numberOfRows: CalculateNumberOfRows(rowStream)
                         ));
