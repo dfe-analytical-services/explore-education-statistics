@@ -563,8 +563,20 @@
     "publisherStorageAccountId": "[concat(resourceGroup().id,'/providers/','Microsoft.Storage/storageAccounts/', variables('publisherStorageAccountName'))]",
     "loggingStorageAccountName": "[concat(parameters('subscription'), 'saeeslogging')]",
 
-    "actionGroupEmail": "[concat(parameters('subscription'), '-ag-', parameters('environment'), '-email')]",
-    "metricAlertDummy": "[concat(parameters('subscription'), '-ma-', parameters('environment'), '-dummy')]",
+    "actionGroupAlerts": "[concat(parameters('subscription'), '-ag-', parameters('environment'), '-alertedusers')]",
+    "metricAlerts": [
+      {
+        "name": "[concat('TEST ', parameters('subscription'), ' Content DB Log Write Percent greater than 1%')]",
+        "description": "Content DB Log Write Percent greater than 1% alert has triggered! Hurrah!",
+        "resourceId": "[resourceId('Microsoft.Sql/servers/databases', variables('sqlServerName'), 'content')]",
+        "resourceType": "microsoft.sql/servers/databases",
+        "metricName": "log_write_percent",
+        "threshold": 1,
+        "operator": "GreaterThan",
+        "timeAggregation": "Average",
+        "criterionType": "StaticThresholdCriterion"
+      }
+    ],
 
     "vNetName": "[concat(parameters('subscription'), '-vnet-', parameters('environment'))]",
     "vNetRef": "[resourceId('Microsoft.Network/virtualNetworks', variables('vNetName'))]",
@@ -3394,7 +3406,7 @@
     {
       "type": "microsoft.insights/actionGroups",
       "apiVersion": "2019-06-01",
-      "name": "[variables('actionGroupEmail')]",
+      "name": "[variables('actionGroupAlerts')]",
       "location": "Global",
       "properties": {
         "groupShortName": "emailAG",
@@ -3415,40 +3427,44 @@
     {
       "type": "microsoft.insights/metricAlerts",
       "apiVersion": "2018-03-01",
-      "name": "[variables('metricAlertDummy')]",
+      "name": "[parameters('metricAlerts')[copyIndex()].name]",
       "location": "global",
       "dependsOn": [
-        "[resourceId('Microsoft.Sql/servers/databases', variables('sqlServerName'), 'content')]",
-        "[resourceId('microsoft.insights/actionGroups', variables('actionGroupEmail'))]"
+        "[parameters('metricAlerts')[copyIndex()].resourceId]",
+        "[resourceId('microsoft.insights/actionGroups', variables('actionGroupAlerts'))]"
       ],
+      "copy": {
+        "name": "metricAlertsCopy",
+        "count": "[length(parameters('metricAlerts'))]"
+      },
       "properties": {
-        "description": "[concat(variables('metricAlertDummy'), ' has triggered! Hurrah!')]",
+        "description": "[parameters('metricAlerts')[copyIndex()].description]",
         "severity": 3,
         "enabled": "[parameters('enableAlerts')]",
         "scopes": [
-          "[resourceId('Microsoft.Sql/servers/databases', variables('sqlServerName'), 'content')]"
+          "[parameters('metricAlerts')[copyIndex()].resourceId]"
         ],
         "evaluationFrequency": "PT1M",
         "windowSize": "PT5M",
         "criteria": {
           "allOf": [
             {
-              "threshold": 1,
+              "threshold": "[parameters('metricAlerts')[copyIndex()].threshold]",
               "name": "Metric1",
-              "metricNamespace": "microsoft.sql/servers/databases",
-              "metricName": "log_write_percent",
-              "operator": "GreaterThan",
-              "timeAggregation": "Average",
-              "criterionType": "StaticThresholdCriterion"
+              "metricNamespace": "[parameters('metricAlerts')[copyIndex()].resourceType]",
+              "metricName": "[parameters('metricAlerts')[copyIndex()].metricName]",
+              "operator": "[parameters('metricAlerts')[copyIndex()].operator]",
+              "timeAggregation": "[parameters('metricAlerts')[copyIndex()].timeAggregation]",
+              "criterionType": "[parameters('metricAlerts')[copyIndex()].criterionType]"
             }
           ],
           "odata.type": "Microsoft.Azure.Monitor.MultipleResourceMultipleMetricCriteria"
         },
         "autoMitigate": true,
-        "targetResourceType": "microsoft.sql/servers/databases",
+        "targetResourceType": "[parameters('metricAlerts')[copyIndex()].resourceType]",
         "actions": [
           {
-            "actionGroupId": "[resourceId('microsoft.insights/actionGroups', variables('actionGroupEmail'))]"
+            "actionGroupId": "[resourceId('microsoft.insights/actionGroups', variables('actionGroupAlerts'))]"
           }
         ]
       }
