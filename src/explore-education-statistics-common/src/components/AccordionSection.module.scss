@@ -11,6 +11,7 @@
   overflow: hidden;
   padding: 0 !important;
   visibility: hidden;
+  position: relative;
 
   @media print {
     height: auto;
