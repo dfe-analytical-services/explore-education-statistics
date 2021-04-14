@@ -6,33 +6,6 @@
   margin: 0 -#{govuk-spacing(1)} govuk-spacing(2);
 }
 
-.column {
-  box-sizing: border-box;
-  display: flex;
-  flex: 1 0 100%;
-  flex-direction: column;
-  margin-bottom: govuk-spacing(2);
-  max-width: 100%;
-  padding: 0 govuk-spacing(1);
-
-  @include govuk-media-query($from: tablet, $until: desktop) {
-    flex: 0 1 50%;
-    max-width: 50%;
-  }
-
-  @include govuk-media-query($from: desktop) {
-    flex: 1 0 33.33%;
-    max-width: 33.33%;
-
-    // If there are four key stat tiles, have two per row
-    &:first-child:nth-last-child(4),
-    &:first-child:nth-last-child(4) ~ & {
-      flex: 0 1 50%;
-      max-width: 50%;
-    }
-  }
-}
-
 .definition {
   background: govuk-colour('white');
   font-size: 16px !important;
@@ -70,4 +43,31 @@
 
 .trendText {
   color: govuk-colour('white');
+}
+
+.column {
+  box-sizing: border-box;
+  display: flex;
+  flex: 1 0 100%;
+  flex-direction: column;
+  margin-bottom: govuk-spacing(2);
+  max-width: 100%;
+  padding: 0 govuk-spacing(1);
+
+  @include govuk-media-query($from: tablet, $until: desktop) {
+    flex: 0 1 50%;
+    max-width: 50%;
+  }
+
+  @include govuk-media-query($from: desktop) {
+    flex: 1 0 33.33%;
+    max-width: 33.33%;
+
+    // If there are four key stat tiles, have two per row
+    &:first-child:nth-last-child(4),
+    &:first-child:nth-last-child(4) ~ & {
+      flex: 0 1 50%;
+      max-width: 50%;
+    }
+  }
 }

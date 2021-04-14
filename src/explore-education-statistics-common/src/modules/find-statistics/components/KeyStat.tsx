@@ -5,7 +5,7 @@ import useKeyStatQuery from '@common/modules/find-statistics/hooks/useKeyStatQue
 import { Summary } from '@common/services/types/blocks';
 import React, { ReactNode } from 'react';
 import ReactMarkdown from 'react-markdown';
-import styles from './KeyStat.module.scss';
+import styles from '@common/modules/find-statistics/components/KeyStat.module.scss';
 
 interface KeyStatContainerProps {
   children: ReactNode;
