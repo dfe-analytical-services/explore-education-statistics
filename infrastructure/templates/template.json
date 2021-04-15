@@ -3505,7 +3505,10 @@
               "inputs": {
                 "subscribe": {
                   "body": {
-                    "text": "Logic app test @{triggerBody()?['data']?['essentials']?['description']}"
+                    "username": "Alertbot",
+                    "icon_emoji": ":face_with_mono",
+                    "channel": "#alerts",
+                    "text": "Alert @{triggerBody()?['data']?['essentials']?['monitorCondition']}!\n@{triggerBody()?['data']?['essentials']?['alertRule']}\n@{triggerBody()?['data']?['essentials']?['description']}"
                   },
                   "method": "POST",
                   "uri": "[parameters('slackWebhook')]"
