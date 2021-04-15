@@ -3418,7 +3418,7 @@
     {
       "type": "Microsoft.Logic/workflows",
       "apiVersion": "2017-07-01",
-      "name": "[parameters('logicAppSlackAlerts')]",
+      "name": "[variables('logicAppSlackAlerts')]",
       "location": "[resourceGroup().location]",
       "properties": {
         "state": "[parameters('enableAlerts')]",
@@ -3529,9 +3529,9 @@
         "enabled": "[parameters('enableAlerts')]",
         "logicAppReceivers": [
           {
-            "name": "[parameters('logicAppSlackAlerts')]",
-            "resourceId": "[resourceId('Microsoft.Logic/workflows', parameters('logicAppSlackAlerts'))]",
-            "callbackUrl": "[listCallbackURL(concat(resourceId('Microsoft.Logic/workflows', parameters('logicAppSlackAlerts')), '/triggers/manual'), '2017-07-01').value]",
+            "name": "[variables('logicAppSlackAlerts')]",
+            "resourceId": "[resourceId('Microsoft.Logic/workflows', variables('logicAppSlackAlerts'))]",
+            "callbackUrl": "[listCallbackURL(concat(resourceId('Microsoft.Logic/workflows', variables('logicAppSlackAlerts')), '/triggers/manual'), '2017-07-01').value]",
             "useCommonAlertSchema": true
           }
         ]
