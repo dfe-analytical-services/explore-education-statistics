@@ -1,5 +1,5 @@
 {
-  "name": "importer-testing",
+  "name": "importer-publisher-testing",
   "version": "1.0.0",
   "description": "",
   "main": "index.js",
@@ -7,7 +7,9 @@
     "watch": "tsc --watch",
     "start": "node index.js",
     "build": "tsc",
-    "clean": "rm -rf node_modules *.js  ./utils/*.js ./utils/*.zip clean-test-zip-*.zip test-files zip-files && npm i"
+    "clean": "rm -rf node_modules *.js  ./utils/*.js ./utils/*.zip clean-test-zip-*.zip test-files zip-files && npm i",
+    "test:importer": "npm run start",
+    "test:publisher": "npm run start publisher"
   },
   "keywords": [],
   "author": "",

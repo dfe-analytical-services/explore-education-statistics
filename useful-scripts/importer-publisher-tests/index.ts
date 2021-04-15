@@ -1,6 +1,4 @@
 /* eslint-disable */
-
-import ZipDirectory from './utils/ZipDirectory';
 import axios from 'axios';
 import dotenv from 'dotenv';
 import { v4 } from 'uuid';
@@ -9,19 +7,21 @@ import StreamZip from 'node-stream-zip';
 import globby from 'globby';
 import rimraf from 'rimraf';
 import FormData from 'form-data';
-import Sleep from './utils/Sleep';
 import { ReleaseDataProps, SubjectArrayT } from 'types';
+import ZipDirectory from './utils/ZipDirectory';
+import Sleep from './utils/Sleep';
 
 // disable insecure warnings
 process.env.NODE_TLS_REJECT_UNAUTHORIZED = '0';
+
 dotenv.config();
 const { JWT_TOKEN, API_URL, TOPIC_ID } = process.env;
 
 const createPublication = async () => {
-  console.time('CreatePublication time');
+  console.time('CreatePublication');
   try {
     const res = await axios({
-      method: 'POST',
+      method: 'post',
       url: `${API_URL}/api/publications`,
       data: {
         title: `importer-testing-${v4()}`,
@@ -38,17 +38,17 @@ const createPublication = async () => {
         Authorization: `Bearer ${JWT_TOKEN}`,
       },
     });
-    console.timeEnd('CreatePublication time');
-    console.log(`Created publication. Status code is ${res.status}`);
+    console.timeEnd('CreatePublication');
+    console.log(`Created publication. Status code ${res.status}`);
     const publicationId = res.data.id;
-    await createRelease(publicationId);
+    return publicationId;
   } catch (e) {
     console.error(e);
   }
 };
 
 const createRelease = async (publicationId: string) => {
-  console.time('Create-release-time');
+  console.time('createRelease');
   try {
     const res = await axios({
       method: 'POST',
@@ -65,31 +65,37 @@ const createRelease = async (publicationId: string) => {
         Authorization: `Bearer ${JWT_TOKEN}`,
       },
     });
-    console.timeEnd('Create-release-time');
+    console.timeEnd('createRelease');
     const releaseId = res.data.id;
     console.log(
       `Release URL: ${API_URL}/publication/${publicationId}/release/${releaseId}/data`,
     );
-    await FileOps(releaseId);
+    return releaseId;
   } catch (e) {
     console.error(e);
   }
 };
-const FileOps = async (releaseId: string) => {
+
+const extractZip = async () => {
   const zippedFile = await globby('*.zip');
   const cleanZipFile = zippedFile[0];
   const archive = fs.existsSync(zippedFile[0]);
+  console.log('archive', archive);
   if (archive) {
     const zip = new StreamZip.async({ file: cleanZipFile });
     const count = await zip.extract(null, './test-files');
     console.log(`Extracted ${count} entries to test-files`);
     await zip.close();
   }
+};
+
+const renameFiles = async () => {
+  // define a random id to assign to the renamed data & meta file...
+  const randomId = Math.floor(Math.random() * 1000000);
 
   // rename csv file..
   const csvGlob1 = await globby('./test-files/*.csv');
   const csvGlob2 = csvGlob1[0];
-  const randomId = Math.floor(Math.random() * 1000000);
 
   fs.rename(`${csvGlob2}`, `./test-files/testfile-${randomId}.csv`, e =>
     e ? console.error(e) : '',
@@ -99,11 +105,9 @@ const FileOps = async (releaseId: string) => {
   const metaGlob = await globby('./test-files/*.meta.csv');
   const metaGlob2 = metaGlob[0];
 
-  fs.rename(`${metaGlob2}`, `./test-files/testfile.meta.${randomId}.csv`, e =>
+  fs.rename(`${metaGlob2}`, `./test-files/testfile-${randomId}.meta.csv`, e =>
     e ? console.error(e) : '',
   );
-  await ZipDirectory('./test-files', `./zip-files/clean-test-zip-${v4()}.zip`);
-  await addSubject(releaseId);
 };
 
 const addSubject = async (releaseId: string) => {
@@ -124,23 +128,22 @@ const addSubject = async (releaseId: string) => {
       maxContentLength: Infinity,
       maxBodyLength: Infinity,
       method: 'POST',
-      url: `${API_URL}/api/release/${releaseId}/zip-data?name=importer-subject=${v4()}`,
+      url: `${API_URL}/api/release/${releaseId}/zip-data?name=importer-subject-${v4()}`,
       data: form,
       headers: {
         ...form.getHeaders(),
         Authorization: `Bearer ${JWT_TOKEN}`,
       },
     });
-    const subjectId = res.data.id;
-    await getSubjectProgress(releaseId, subjectId);
     console.log(res.data);
+    const subjectId = res.data.id;
+    return subjectId;
   } catch (e) {
     console.error(e);
   }
 };
 
 const getSubjectProgress = async (releaseId: string, subjectId: string) => {
-  console.time('import subject upload time');
   try {
     const res = await axios({
       method: 'GET',
@@ -150,14 +153,7 @@ const getSubjectProgress = async (releaseId: string, subjectId: string) => {
         'Content-Type': 'application/json',
       },
     });
-    if (res.data.status === 'COMPLETE') {
-      console.timeEnd('import subject upload time');
-      await getSubjectIdArr(releaseId);
-    } else {
-      console.log(res.data);
-      await Sleep(300);
-      await getSubjectProgress(releaseId, subjectId);
-    }
+    return res.data.status;
   } catch (e) {
     console.error(e);
   }
@@ -178,10 +174,11 @@ const getSubjectIdArr = async (releaseId: string) => {
     subjects.forEach(sub => {
       subjArr.push({ id: `${sub.id}`, content: `Hello ${v4()}` });
     });
-    await addMetaGuidance(subjArr, releaseId);
+    return subjArr;
   } catch (e) {
     console.error(e);
   }
+  return;
 };
 
 const addMetaGuidance = async (
@@ -201,7 +198,6 @@ const addMetaGuidance = async (
         subjects: subjArr,
       },
     });
-    await getFinalReleaseDetails(releaseId);
   } catch (e) {
     console.error(e);
   }
@@ -251,15 +247,16 @@ const getFinalReleaseDetails = async (releaseId: string) => {
       internalReleaseNote: 'Approved by publisher testing',
       publishMethod: 'Immediate',
     };
-    await publishRelease(obj, releaseId);
+    return obj;
   } catch (e) {
     console.error(e);
   }
+  return;
 };
 
 const publishRelease = async (obj: any, releaseId: string) => {
   try {
-    const res = await axios({
+    await axios({
       method: 'PUT',
       url: `${API_URL}/api/releases/${releaseId}`,
       headers: {
@@ -268,14 +265,12 @@ const publishRelease = async (obj: any, releaseId: string) => {
       },
       data: obj,
     });
-    await getPublicationProgress(releaseId);
   } catch (e) {
     console.error(e);
   }
 };
 
 const getPublicationProgress = async (releaseId: string) => {
-  console.time('publication elapsed time');
   try {
     const res = await axios({
       maxContentLength: Infinity,
@@ -287,21 +282,15 @@ const getPublicationProgress = async (releaseId: string) => {
         'content-Type': 'application/json',
       },
     });
-    console.log(res.data);
-    if (res.data?.overallStage !== 'Complete') {
-      console.log(res.data);
-      await Sleep(1500);
-      await getPublicationProgress(releaseId);
-    }
+    return res.data?.overallStage;
   } catch (e) {
     console.error(e);
   }
-  console.timeEnd('publication elapsed time');
 };
 
 (async () => {
   const zipGlob = await globby('*.zip');
-  if (fs.existsSync(zipGlob[0])) {
+  if (fs.existsSync(zipGlob[0]) && zipGlob[0] === 'archive.zip') {
     console.log('found zip file, continuing');
   } else {
     throw new Error(
@@ -328,13 +317,53 @@ const getPublicationProgress = async (releaseId: string) => {
     fs.mkdirSync('./zip-files');
   }
 
-  const staleZipFiles = await globby('*.zip');
-  if (staleZipFiles[1]) {
-    console.log(staleZipFiles[1]);
+  if (zipGlob[1]) {
+    console.log(zipGlob[1]);
 
-    rimraf(staleZipFiles[1], () => {
+    rimraf(zipGlob[1], () => {
       console.log('removed stale zip files');
     });
   }
-  await createPublication();
+
+  type importStages = 'STARTED' | 'QUEUED' | 'COMPLETE' | '';
+  let publicationId: string;
+  let releaseId: string;
+  let subjectId: string;
+  let importStatus: importStages = '';
+
+  publicationId = await createPublication();
+  releaseId = await createRelease(publicationId);
+  await extractZip();
+  await renameFiles();
+  await ZipDirectory('./test-files', `./zip-files/clean-test-zip-${v4()}.zip`);
+  subjectId = await addSubject(releaseId);
+  console.time('import subject upload');
+  while (importStatus !== 'COMPLETE') {
+    console.log('importStatus', importStatus);
+    await Sleep(300);
+    importStatus = await getSubjectProgress(releaseId, subjectId);
+  }
+  console.timeEnd('import subject upload');
+
+  if (process.argv[2] !== undefined && process.argv[2].includes('publisher')) {
+    try {
+      let subjArr;
+      let obj;
+      type publicationStages = 'notStarted' | 'Started' | 'Complete' | '';
+      let publicationStatus: publicationStages = '';
+      subjArr = await getSubjectIdArr(releaseId);
+      await addMetaGuidance(subjArr!, releaseId);
+      obj = await getFinalReleaseDetails(releaseId);
+      await publishRelease(obj, releaseId);
+      console.time('publication elapsed time');
+      while (publicationStatus !== 'Complete') {
+        console.log('publicationStatus', publicationStatus);
+        publicationStatus = await getPublicationProgress(releaseId);
+        await Sleep(1500);
+      }
+      console.timeEnd('publication elapsed time');
+    } catch (e) {
+      console.error(e);
+    }
+  }
 })();
