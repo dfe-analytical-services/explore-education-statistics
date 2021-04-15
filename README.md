@@ -366,7 +366,7 @@ To generate a migration for the content db:
 
 ```
 cd explore-education-statistics\src\GovUk.Education.ExploreEducationStatistics.Admin
-dotnet ef migrations add AdjustFiltersIdsPreSeed --context ContentDbContext --output-dir Migrations/ContentMigrations -v
+dotnet ef migrations add EES1234MigrationNameHere --context ContentDbContext --output-dir Migrations/ContentMigrations -v
 ```
 
 #### Statistics DB migrations
@@ -375,7 +375,7 @@ To generate a migration for the statistics db:
 
 ```
 cd explore-education-statistics\src\GovUk.Education.ExploreEducationStatistics.Data.Api
-dotnet ef migrations add Ees183Test --project ..\GovUk.Education.ExploreEducationStatistics.Data.Model -v
+dotnet ef migrations add E1234MigrationNameHere --context StatisticsDbContext --project ../GovUk.Education.ExploreEducationStatistics.Data.Model -v
 ```
 
 #### Users and Roles DB migrations
