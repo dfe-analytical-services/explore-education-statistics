@@ -180,7 +180,7 @@ Examples:
 4. Access frontend applications at:
 
    - `http://localhost:3000` for the public frontend
-   - `http://localhost:3001` for the admin frontend
+   - `http://localhost:5021` for the admin frontend
 
 ## Frontend development
 
