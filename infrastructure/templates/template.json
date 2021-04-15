@@ -3506,7 +3506,7 @@
                 "subscribe": {
                   "body": {
                     "username": "Alertbot",
-                    "icon_emoji": ":face_with_mono",
+                    "icon_emoji": ":face_with_monocle",
                     "channel": "#alerts",
                     "text": "Alert @{triggerBody()?['data']?['essentials']?['monitorCondition']}!\n@{triggerBody()?['data']?['essentials']?['alertRule']}\n@{triggerBody()?['data']?['essentials']?['description']}"
                   },
