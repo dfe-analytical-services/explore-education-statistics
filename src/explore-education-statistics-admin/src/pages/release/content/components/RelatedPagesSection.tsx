@@ -1,5 +1,4 @@
 import EditableLink from '@admin/components/editable/EditableLink';
-import Link from '@admin/components/Link';
 import { useEditingContext } from '@admin/contexts/EditingContext';
 import releaseContentRelatedInformationService from '@admin/services/releaseContentRelatedInformationService';
 import { EditableRelease } from '@admin/services/releaseContentService';
@@ -26,7 +25,7 @@ const RelatedPagesSection = ({ release }: Props) => {
   const { isEditing } = useEditingContext();
 
   const addLink = (link: Omit<BasicLink, 'id'>) => {
-    return new Promise(resolve => {
+    return new Promise<void>(resolve => {
       releaseContentRelatedInformationService
         .create(release.id, link)
         .then(newLinks => {
