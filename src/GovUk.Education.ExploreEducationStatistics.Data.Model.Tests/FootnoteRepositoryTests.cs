@@ -513,19 +513,13 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Model.Tests
             var releaseSubject = new ReleaseSubject
             {
                 Release = release,
-                Subject = new Subject
-                {
-                    Name = "Test subject for release"
-                }
+                Subject = new Subject()
             };
 
             var otherReleaseSubject = new ReleaseSubject
             {
                 Release = otherRelease,
-                Subject = new Subject
-                {
-                    Name = "Test subject for other release"
-                }
+                Subject = new Subject()
             };
 
             var footnote = new Footnote
@@ -705,50 +699,32 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Model.Tests
             var releaseSubject1 = new ReleaseSubject
             {
                 Release = release,
-                Subject = new Subject
-                {
-                    Name = "Test subject 1"
-                }
+                Subject = new Subject()
             };
             var releaseSubject2 = new ReleaseSubject
             {
                 Release = release,
-                Subject = new Subject
-                {
-                    Name = "Test subject 2"
-                }
+                Subject = new Subject()
             };
             var releaseSubject3 = new ReleaseSubject
             {
                 Release = release,
-                Subject = new Subject
-                {
-                    Name = "Test subject 3"
-                }
+                Subject = new Subject()
             };
             var releaseSubject4 = new ReleaseSubject
             {
                 Release = release,
-                Subject = new Subject
-                {
-                    Name = "Test subject 4"
-                }
+                Subject = new Subject()
             };
             var releaseSubject5 = new ReleaseSubject
             {
                 Release = release,
-                Subject = new Subject
-                {
-                    Name = "Test subject 5",
-                }
+                Subject = new Subject()
             };
             var releaseSubjectWithNoFootnotes = new ReleaseSubject
             {
                 Release = release,
-                Subject = new Subject
-                {
-                    Name = "Test subject with no footnotes"
-                }
+                Subject = new Subject()
             };
 
             var footnote1 = new Footnote
@@ -891,7 +867,6 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Model.Tests
                 Assert.Single(results);
 
                 Assert.Equal(releaseSubjectWithNoFootnotes.Subject.Id, results[0].Id);
-                Assert.Equal(releaseSubjectWithNoFootnotes.Subject.Name, results[0].Name);
             }
         }
 
@@ -903,50 +878,32 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Model.Tests
             var releaseSubject1 = new ReleaseSubject
             {
                 Release = release,
-                Subject = new Subject
-                {
-                    Name = "Test subject 1"
-                }
+                Subject = new Subject()
             };
             var releaseSubject2 = new ReleaseSubject
             {
                 Release = release,
-                Subject = new Subject
-                {
-                    Name = "Test subject 2"
-                }
+                Subject = new Subject()
             };
             var releaseSubject3 = new ReleaseSubject
             {
                 Release = release,
-                Subject = new Subject
-                {
-                    Name = "Test subject 3"
-                }
+                Subject = new Subject()
             };
             var releaseSubject4 = new ReleaseSubject
             {
                 Release = release,
-                Subject = new Subject
-                {
-                    Name = "Test subject 4"
-                }
+                Subject = new Subject()
             };
             var releaseSubject5 = new ReleaseSubject
             {
                 Release = release,
-                Subject = new Subject
-                {
-                    Name = "Test subject 5",
-                }
+                Subject = new Subject()
             };
             var releaseSubjectWithNoFootnotes = new ReleaseSubject
             {
                 Release = release,
-                Subject = new Subject
-                {
-                    Name = "Test subject with no footnotes"
-                }
+                Subject = new Subject()
             };
 
             var footnote = new Footnote
@@ -1045,7 +1002,6 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Model.Tests
                 Assert.Single(results);
 
                 Assert.Equal(releaseSubjectWithNoFootnotes.Subject.Id, results[0].Id);
-                Assert.Equal(releaseSubjectWithNoFootnotes.Subject.Name, results[0].Name);
             }
         }
 

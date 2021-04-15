@@ -311,8 +311,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
 
             var subject = new Subject
             {
-                Id = Guid.NewGuid(),
-                Name = "Test subject"
+                Id = Guid.NewGuid()
             };
 
             var file = new File
@@ -395,8 +394,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
 
             var subject = new Subject
             {
-                Id = Guid.NewGuid(),
-                Name = "Test subject"
+                Id = Guid.NewGuid()
             };
 
             var file = new File
@@ -456,14 +454,12 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
 
             var subject = new Subject
             {
-                Id = Guid.NewGuid(),
-                Name = "Test subject",
+                Id = Guid.NewGuid()
             };
 
             var replacementSubject = new Subject
             {
-                Id = Guid.NewGuid(),
-                Name = "Replacement subject"
+                Id = Guid.NewGuid()
             };
 
             var file = new File
@@ -567,14 +563,12 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
 
             var subject = new Subject
             {
-                Id = Guid.NewGuid(),
-                Name = "Test subject",
+                Id = Guid.NewGuid()
             };
 
             var replacementSubject = new Subject
             {
-                Id = Guid.NewGuid(),
-                Name = "Replacement subject"
+                Id = Guid.NewGuid()
             };
 
             var file = new File
