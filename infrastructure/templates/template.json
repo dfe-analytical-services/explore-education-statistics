@@ -3523,7 +3523,7 @@
       "type": "microsoft.insights/actionGroups",
       "apiVersion": "2019-06-01",
       "name": "[variables('actionGroupAlerts')]",
-      "location": "[resourceGroup().location]",
+      "location": "global",
       "properties": {
         "groupShortName": "alertAG",
         "enabled": "[parameters('enableAlerts')]",
@@ -3541,7 +3541,7 @@
       "type": "microsoft.insights/metricAlerts",
       "apiVersion": "2018-03-01",
       "name": "[variables('metricAlerts')[copyIndex()].name]",
-      "location": "[resourceGroup().location]",
+      "location": "global",
       "dependsOn": [
         "[variables('metricAlerts')[copyIndex()].resourceId]",
         "[resourceId('microsoft.insights/actionGroups', variables('actionGroupAlerts'))]"
