@@ -26,6 +26,7 @@ interface Props {
 
 const TableHeadersForm = ({
   onSubmit,
+  // eslint-disable-next-line @typescript-eslint/no-unused-vars
   id = 'tableHeadersForm',
   initialValues = {
     columnGroups: [],

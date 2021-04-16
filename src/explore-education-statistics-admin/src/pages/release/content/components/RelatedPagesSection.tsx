@@ -1,5 +1,4 @@
 import EditableLink from '@admin/components/editable/EditableLink';
-import Link from '@admin/components/Link';
 import { useEditingContext } from '@admin/contexts/EditingContext';
 import releaseContentRelatedInformationService from '@admin/services/releaseContentRelatedInformationService';
 import { EditableRelease } from '@admin/services/releaseContentService';
