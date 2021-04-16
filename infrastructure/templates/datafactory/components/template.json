@@ -2071,16 +2071,6 @@
                                             "name": "Filename",
                                             "type": "String"
                                         }
-                                    },
-                                    {
-                                        "source": {
-                                            "name": "Name",
-                                            "type": "String"
-                                        },
-                                        "sink": {
-                                            "name": "Name",
-                                            "type": "String"
-                                        }
                                     }
                                 ]
                             }
