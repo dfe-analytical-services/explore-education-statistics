@@ -326,8 +326,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Services.Tests
                 Release = statisticsRelease,
                 Subject = new Subject
                 {
-                    Id = Guid.NewGuid(),
-                    Name = "Subject 1"
+                    Id = Guid.NewGuid()
                 }
             };
 
@@ -336,8 +335,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Services.Tests
                 Release = statisticsRelease,
                 Subject = new Subject
                 {
-                    Id = Guid.NewGuid(),
-                    Name = "Subject 2"
+                    Id = Guid.NewGuid()
                 }
             };
 
@@ -551,8 +549,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Services.Tests
                 Release = statisticsRelease,
                 Subject = new Subject
                 {
-                    Id = Guid.NewGuid(),
-                    Name = "Subject 1"
+                    Id = Guid.NewGuid()
                 }
             };
 

@@ -373,15 +373,13 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
             var subject1 = new Subject
             {
                 Id = Guid.NewGuid(),
-                Filename = "file1.csv",
-                Name = "Subject 1"
+                Filename = "file1.csv"
             };
 
             var subject2 = new Subject
             {
                 Id = Guid.NewGuid(),
-                Filename = "file2.csv",
-                Name = "Subject 2"
+                Filename = "file2.csv"
             };
 
             var releaseFile1 = new ReleaseFile
@@ -536,15 +534,13 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
             var subject1 = new Subject
             {
                 Id = Guid.NewGuid(),
-                Filename = "file1.csv",
-                Name = "Subject 1"
+                Filename = "file1.csv"
             };
 
             var subject2 = new Subject
             {
                 Id = Guid.NewGuid(),
-                Filename = "file2.csv",
-                Name = "Subject 2"
+                Filename = "file2.csv"
             };
 
             // Version 1 has one Subject, version 2 adds another Subject

@@ -308,14 +308,12 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
 
             var subject1 = new Subject
             {
-                Id = Guid.NewGuid(),
-                Name = "Subject 1"
+                Id = Guid.NewGuid()
             };
 
             var subject2 = new Subject
             {
-                Id = Guid.NewGuid(),
-                Name = "Subject 2"
+                Id = Guid.NewGuid()
             };
 
             using (var contentDbContext = InMemoryApplicationDbContext("CreateReleaseAmendment"))

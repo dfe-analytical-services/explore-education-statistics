@@ -700,8 +700,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Services.Tests
                 Release = release,
                 Subject = new Subject
                 {
-                    Filename = "file1.csv",
-                    Name = "Subject 1"
+                    Filename = "file1.csv"
                 }
             };
 
@@ -711,8 +710,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Services.Tests
                 Release = release,
                 Subject = new Subject
                 {
-                    Filename = "file2.csv",
-                    Name = "Subject 2",
+                    Filename = "file2.csv"
                 }
             };
 
@@ -747,8 +745,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Services.Tests
                 Release = release,
                 Subject = new Subject
                 {
-                    Filename = "file1.csv",
-                    Name = "Subject 1"
+                    Filename = "file1.csv"
                 }
             };
 
@@ -759,8 +756,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Services.Tests
                 Release = release,
                 Subject = new Subject
                 {
-                    Filename = "file2.csv",
-                    Name = "Subject 2",
+                    Filename = "file2.csv"
                 }
             };
 
@@ -791,8 +787,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Services.Tests
 
             var subject = new Subject
             {
-                Filename = "file1.csv",
-                Name = "Subject 1"
+                Filename = "file1.csv"
             };
 
             var releaseSubject = new ReleaseSubject
@@ -858,8 +853,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Services.Tests
 
             var subject = new Subject
             {
-                Filename = "file1.csv",
-                Name = "Subject 1"
+                Filename = "file1.csv"
             };
 
             var releaseSubject1 = new ReleaseSubject
@@ -897,8 +891,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Services.Tests
 
             var subject = new Subject
             {
-                Filename = "file1.csv",
-                Name = "Subject 1"
+                Filename = "file1.csv"
             };
 
             var releaseSubject = new ReleaseSubject
@@ -966,8 +959,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Services.Tests
 
             var subject = new Subject
             {
-                Filename = "file1.csv",
-                Name = "Subject 1"
+                Filename = "file1.csv"
             };
 
             var releaseSubject = new ReleaseSubject

@@ -31,10 +31,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
         {
             var release = new Release();
 
-            var subject = new Subject
-            {
-                Name = "Test subject 1"
-            };
+            var subject = new Subject();
 
             var filter = new Filter
             {
@@ -282,10 +279,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
             var release = new Release();
             var amendment = new Release();
 
-            var subject = new Subject
-            {
-                Name = "Test subject 1"
-            };
+            var subject = new Subject();
 
             var filter = new Filter
             {
