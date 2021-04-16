@@ -3,7 +3,6 @@ import { render, screen, waitFor } from '@testing-library/react';
 import React from 'react';
 import _releaseService, { Release } from '@admin/services/releaseService';
 import { ReleaseContextProvider } from '@admin/pages/release/contexts/ReleaseContext';
-import noop from 'lodash/noop';
 import { MemoryRouter } from 'react-router';
 import { TestConfigContextProvider } from '@admin/contexts/ConfigContext';
 import ReleasePreReleaseAccessPage from '@admin/pages/release/pre-release/ReleasePreReleaseAccessPage';
