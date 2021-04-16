@@ -19,14 +19,13 @@ interface FormValues {
 }
 
 interface Props {
-  id?: string;
   initialValues?: TableHeadersConfig;
   onSubmit: (values: TableHeadersConfig) => void;
+  id?: string;
 }
 
 const TableHeadersForm = ({
   onSubmit,
-  // eslint-disable-next-line @typescript-eslint/no-unused-vars
   id = 'tableHeadersForm',
   initialValues = {
     columnGroups: [],
@@ -88,7 +87,7 @@ const TableHeadersForm = ({
       >
         {form => {
           return (
-            <Form>
+            <Form id={id}>
               <DragDropContext
                 onDragEnd={result => {
                   const { source, destination } = result;

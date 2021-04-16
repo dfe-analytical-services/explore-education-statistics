@@ -251,12 +251,10 @@ describe('createErrorHelper', () => {
       }>({
         errors: {
           subjects: [undefined],
-          // eslint-disable-next-line @typescript-eslint/no-explicit-any
-        } as any,
+        } as never,
         touched: {
           subjects: [true],
-          // eslint-disable-next-line @typescript-eslint/no-explicit-any
-        } as any,
+        } as never,
       });
       expect(getAllErrors()).toEqual({});
     });
@@ -271,12 +269,10 @@ describe('createErrorHelper', () => {
             { content: 'Error two' },
             { content: 'Error three' },
           ],
-          // eslint-disable-next-line @typescript-eslint/no-explicit-any
-        } as any,
+        } as never,
         touched: {
           subjects: [{ content: false }, { content: true }, { content: true }],
-          // eslint-disable-next-line @typescript-eslint/no-explicit-any
-        } as any,
+        } as never,
       });
       expect(getAllErrors()).toEqual({
         'subjects.1.content': 'Error two',
