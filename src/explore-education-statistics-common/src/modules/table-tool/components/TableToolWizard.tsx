@@ -72,6 +72,7 @@ export interface TableToolWizardProps {
   renderHighlightLink?: (highlight: TableHighlight) => ReactNode;
   scrollOnMount?: boolean;
   onSubmit?: (table: FullTable) => void;
+  loadingFastTrack?: boolean;
 }
 
 const TableToolWizard = ({
@@ -81,6 +82,7 @@ const TableToolWizard = ({
   renderHighlightLink,
   finalStep,
   onSubmit,
+  loadingFastTrack = false,
 }: TableToolWizardProps) => {
   const [state, updateState] = useImmer<TableToolState>({
     initialStep: 1,
@@ -300,6 +302,7 @@ const TableToolWizard = ({
                   subjectId={state.query.subjectId}
                   renderHighlightLink={renderHighlightLink}
                   onSubmit={handleSubjectFormSubmit}
+                  loadingFastTrack={loadingFastTrack}
                 />
               )}
             </WizardStep>
