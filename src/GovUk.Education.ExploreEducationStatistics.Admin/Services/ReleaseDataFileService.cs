@@ -212,9 +212,9 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Services
                                     // First, create with status uploading to prevent other users uploading the same datafile
                                     .OnSuccess(async () =>
                                     {
-                                        var subjectId = await _releaseRepository.CreateStatisticsDbReleaseAndSubjectHierarchy(
-                                            releaseId,
-                                            dataFormFile.FileName.ToLower());
+                                        var subjectId =
+                                            await _releaseRepository
+                                                .CreateStatisticsDbReleaseAndSubjectHierarchy(releaseId);
 
                                         var dataFile = await _releaseDataFileRepository.Create(
                                             releaseId: releaseId,
@@ -302,9 +302,8 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Services
                                                 .ValidateDataArchiveEntriesForUpload(releaseId, archiveFile)
                                                 .OnSuccess(async () =>
                                                 {
-                                                    var subjectId = await _releaseRepository.CreateStatisticsDbReleaseAndSubjectHierarchy(
-                                                        releaseId,
-                                                        archiveFile.DataFileName.ToLower());
+                                                    var subjectId = await _releaseRepository
+                                                        .CreateStatisticsDbReleaseAndSubjectHierarchy(releaseId);
 
                                                     var zipFile = await _releaseDataFileRepository.CreateZip(
                                                         filename: zipFormFile.FileName.ToLower(),
