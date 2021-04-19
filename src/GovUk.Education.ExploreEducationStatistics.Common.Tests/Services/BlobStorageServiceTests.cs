@@ -4,7 +4,6 @@ using System.Threading.Tasks;
 using Azure;
 using Azure.Storage.Blobs;
 using Azure.Storage.Blobs.Models;
-using GovUk.Education.ExploreEducationStatistics.Common.Extensions;
 using GovUk.Education.ExploreEducationStatistics.Common.Services;
 using Microsoft.Extensions.Logging;
 using Moq;
@@ -50,19 +49,12 @@ namespace GovUk.Education.ExploreEducationStatistics.Common.Tests.Services
         {
             var createdOn = DateTimeOffset.UtcNow;
 
-            var metadata = new Dictionary<string, string>
-            {
-                {
-                    BlobInfoExtensions.NameKey, "Test file"
-                }
-            };
-
             var blobClient = MockBlobClient(
                 name: "path/to/test.pdf",
                 createdOn: createdOn,
                 contentLength: 10 * 1024,
                 contentType: "application/pdf",
-                metadata: metadata
+                metadata: new Dictionary<string, string>()
             );
 
             var blobContainerClient = MockBlobContainerClient(PublicReleaseFiles.Name, blobClient);
@@ -76,8 +68,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Common.Tests.Services
             Assert.Equal(10 * 1024, result.ContentLength);
             Assert.Equal("application/pdf", result.ContentType);
             Assert.Equal("test.pdf", result.FileName);
-            Assert.Equal(metadata, result.Meta);
-            Assert.Equal("Test file", result.Name);
+            Assert.Equal(new Dictionary<string, string>(), result.Meta);
             Assert.Equal("path/to/test.pdf", result.Path);
             Assert.Equal("10 Kb", result.Size);
         }

@@ -54,8 +54,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Content.Api.Tests.Services
                 size: null,
                 contentType: "image/png",
                 contentLength: 0L,
-                meta: GetAncillaryFileMetaValues(
-                    name: null,
+                meta: GetMetaValuesReleaseDateTime(
                     releaseDateTime: DateTime.UtcNow.AddDays(-1)),
                 created: null);
 

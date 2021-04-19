@@ -16,7 +16,6 @@ using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
 using static GovUk.Education.ExploreEducationStatistics.Common.BlobContainers;
 using static GovUk.Education.ExploreEducationStatistics.Common.Model.FileType;
-using static GovUk.Education.ExploreEducationStatistics.Common.Services.FileStorageUtils;
 using FileInfo = GovUk.Education.ExploreEducationStatistics.Common.Model.FileInfo;
 
 namespace GovUk.Education.ExploreEducationStatistics.Admin.Services

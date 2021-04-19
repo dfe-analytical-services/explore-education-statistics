@@ -61,8 +61,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Content.Api.Tests.Services
                 size: null,
                 contentType: "application/pdf",
                 contentLength: 0L,
-                meta: GetAncillaryFileMetaValues(
-                    name: null,
+                meta: GetMetaValuesReleaseDateTime(
                     releaseDateTime: DateTime.UtcNow.AddDays(-1)),
                 created: null);
 
@@ -267,8 +266,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Content.Api.Tests.Services
                 size: null,
                 contentType: "application/pdf",
                 contentLength: 0L,
-                meta: GetAncillaryFileMetaValues(
-                    name: null,
+                meta: GetMetaValuesReleaseDateTime(
                     releaseDateTime: DateTime.UtcNow.AddDays(1)),
                 created: null);
 
@@ -313,8 +311,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Content.Api.Tests.Services
                 size: null,
                 contentType: "application/zip",
                 contentLength: 0L,
-                meta: GetAncillaryFileMetaValues(
-                    name: null,
+                meta: GetMetaValuesReleaseDateTime(
                     releaseDateTime: DateTime.UtcNow.AddDays(-1)),
                 created: null);
 
@@ -400,8 +397,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Content.Api.Tests.Services
                 size: null,
                 contentType: "application/pdf",
                 contentLength: 0L,
-                meta: GetAncillaryFileMetaValues(
-                    name: null,
+                meta: GetMetaValuesReleaseDateTime(
                     releaseDateTime: DateTime.UtcNow.AddDays(1)),
                 created: null);
 

@@ -50,7 +50,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Publisher.Services
                 destinationPath,
                 memoryStream,
                 contentType: "application/x-zip-compressed",
-                metadata: GetAllFilesZipMetaValues(
+                metadata: GetMetaValuesReleaseDateTime(
                     releaseDateTime: publishScheduled));
         }
     }
