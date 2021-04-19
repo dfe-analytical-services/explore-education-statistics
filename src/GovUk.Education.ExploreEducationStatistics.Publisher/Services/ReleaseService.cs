@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
 using AutoMapper;
+using GovUk.Education.ExploreEducationStatistics.Common.Extensions;
 using GovUk.Education.ExploreEducationStatistics.Common.Model;
 using GovUk.Education.ExploreEducationStatistics.Common.Services.Interfaces;
 using GovUk.Education.ExploreEducationStatistics.Content.Model;
@@ -181,9 +182,10 @@ namespace GovUk.Education.ExploreEducationStatistics.Publisher.Services
         {
             var files = await GetFiles(release.Id, Ancillary, FileType.Data);
 
-            var filesWithInfo = files.Select(async file => await GetPublicFileInfo(release, file));
+            var filesWithInfo = await files
+                .SelectAsync(async file => await GetPublicFileInfo(release, file));
 
-            var orderedFiles = (await Task.WhenAll(filesWithInfo))
+            var orderedFiles = filesWithInfo
                 .OrderBy(file => file.Name);
 
             // Prepend the "All files" zip
@@ -229,7 +231,6 @@ namespace GovUk.Education.ExploreEducationStatistics.Publisher.Services
                     Id = null,
                     FileName = null,
                     Name = "Unknown",
-                    Path = null,
                     Size = "0.00 B",
                     Type = Ancillary
                 };
@@ -243,8 +244,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Publisher.Services
             {
                 Id = null,
                 FileName = blob.FileName,
-                Name = blob.Name,
-                Path = blob.Path,
+                Name = "All files",
                 Size = blob.Size,
                 Type = Ancillary
             };
@@ -267,7 +267,13 @@ namespace GovUk.Education.ExploreEducationStatistics.Publisher.Services
                 containerName: PublicReleaseFiles,
                 path: file.PublicPath(release));
 
-            return file.ToPublicFileInfo(blob);
+            var releaseFile = await _contentDbContext.ReleaseFiles
+                .Include(rf => rf.File)
+                .FirstAsync(rf =>
+                    rf.ReleaseId == release.Id
+                    && rf.FileId == file.Id);
+
+            return releaseFile.ToFileInfo(blob);
         }
 
         private async Task RemoveStatisticalReleases(IEnumerable<Guid> releaseIds)

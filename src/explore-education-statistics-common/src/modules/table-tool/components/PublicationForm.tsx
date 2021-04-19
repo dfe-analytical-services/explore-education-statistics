@@ -12,7 +12,6 @@ import { Theme } from '@common/services/tableBuilderService';
 import createErrorHelper from '@common/validation/createErrorHelper';
 import Yup from '@common/validation/yup';
 import { Formik } from 'formik';
-import camelCase from 'lodash';
 import React, { useState } from 'react';
 import { InjectedWizardProps } from './Wizard';
 import WizardStepFormActions from './WizardStepFormActions';

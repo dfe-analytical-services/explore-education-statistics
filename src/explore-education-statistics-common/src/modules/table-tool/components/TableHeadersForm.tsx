@@ -19,9 +19,9 @@ interface FormValues {
 }
 
 interface Props {
-  id?: string;
   initialValues?: TableHeadersConfig;
   onSubmit: (values: TableHeadersConfig) => void;
+  id?: string;
 }
 
 const TableHeadersForm = ({
@@ -87,7 +87,7 @@ const TableHeadersForm = ({
       >
         {form => {
           return (
-            <Form>
+            <Form id={id}>
               <DragDropContext
                 onDragEnd={result => {
                   const { source, destination } = result;

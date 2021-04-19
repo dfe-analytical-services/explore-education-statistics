@@ -1,6 +1,8 @@
 import {
+  releaseDataBlockCreateRoute,
   releaseDataBlockEditRoute,
   ReleaseDataBlockRouteParams,
+  ReleaseRouteParams,
 } from '@admin/routes/releaseRoutes';
 import dataBlockService, {
   ReleaseDataBlockSummary,
@@ -10,6 +12,8 @@ import { SelectOption } from '@common/components/form/FormSelect';
 import useAsyncRetry from '@common/hooks/useAsyncRetry';
 import React, { useMemo } from 'react';
 import { generatePath, useHistory } from 'react-router';
+import ButtonLink from '@admin/components/ButtonLink';
+import FormLabel from '@common/components/form/FormLabel';
 
 const emptyDataBlocks: ReleaseDataBlockSummary[] = [];
 
@@ -44,33 +48,55 @@ const DataBlockSelector = ({
     return null;
   }
 
+  const releaseDataBlockPath = generatePath<ReleaseRouteParams>(
+    releaseDataBlockCreateRoute.path,
+    {
+      publicationId,
+      releaseId,
+    },
+  );
+
   return (
-    <FormSelect
-      id="selectedDataBlock"
-      name="selectedDataBlock"
-      className="govuk-!-margin-bottom-4"
-      label={
-        canUpdate
-          ? 'Select a data block to edit'
-          : 'Select a data block to view'
-      }
-      disabled={isLoading}
-      order={FormSelect.unordered}
-      value={dataBlockId}
-      options={dataBlockOptions}
-      onChange={e => {
-        history.push(
-          generatePath<ReleaseDataBlockRouteParams>(
-            releaseDataBlockEditRoute.path,
-            {
-              publicationId,
-              releaseId,
-              dataBlockId: e.target.value,
-            },
-          ),
-        );
-      }}
-    />
+    <>
+      <FormLabel
+        id="selectedDataBlock"
+        label={
+          canUpdate
+            ? 'Select a data block to edit'
+            : 'Select a data block to view'
+        }
+      />
+      <div className="dfe-flex dfe-align-items--center govuk-!-margin-top-1">
+        <FormSelect
+          hideLabel
+          label=""
+          id="selectedDataBlock"
+          name="selectedDataBlock"
+          disabled={isLoading}
+          order={FormSelect.unordered}
+          value={dataBlockId}
+          options={dataBlockOptions}
+          onChange={e => {
+            history.push(
+              generatePath<ReleaseDataBlockRouteParams>(
+                releaseDataBlockEditRoute.path,
+                {
+                  publicationId,
+                  releaseId,
+                  dataBlockId: e.target.value,
+                },
+              ),
+            );
+          }}
+        />
+        <p className="govuk-!-font-weight-bold govuk-!-margin-right-4 govuk-!-margin-left-4 govuk-!-margin-bottom-0">
+          or
+        </p>
+        <ButtonLink className="govuk-!-margin-0" to={releaseDataBlockPath}>
+          Create another data block
+        </ButtonLink>
+      </div>
+    </>
   );
 };
 

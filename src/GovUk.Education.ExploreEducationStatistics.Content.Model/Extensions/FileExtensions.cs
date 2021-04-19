@@ -52,20 +52,6 @@ namespace GovUk.Education.ExploreEducationStatistics.Content.Model.Extensions
             return $"{FilesPath(releaseId, file.Type)}{file.Id}";
         }
 
-        public static FileInfo ToFileInfo(this File file, BlobInfo blobInfo)
-        {
-            return new FileInfo
-            {
-                Id = file.Id,
-                FileName = file.Filename,
-                // EES-1815 Change to use Subject name rather than BlobInfo.Name
-                Name = blobInfo.Name.IsNullOrEmpty() ? file.Filename : blobInfo.Name,
-                Path = file.Path(),
-                Size = blobInfo.Size,
-                Type = file.Type
-            };
-        }
-
         public static FileInfo ToFileInfoNotFound(this File file)
         {
             return new FileInfo
@@ -73,21 +59,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Content.Model.Extensions
                 Id = file.Id,
                 FileName = file.Filename,
                 Name = "Unknown",
-                Path = null,
                 Size = "0.00 B",
-                Type = file.Type
-            };
-        }
-
-        public static FileInfo ToPublicFileInfo(this File file, BlobInfo blobInfo)
-        {
-            return new FileInfo
-            {
-                Id = file.Id,
-                FileName = file.Filename,
-                Name = blobInfo.Name,
-                Path = blobInfo.Path,
-                Size = blobInfo.Size,
                 Type = file.Type
             };
         }

@@ -14,7 +14,7 @@ import Tabs from '@common/components/Tabs';
 import TabsSection from '@common/components/TabsSection';
 import WarningMessage from '@common/components/WarningMessage';
 import useAsyncRetry from '@common/hooks/useAsyncRetry';
-import filterOrphanedDataSets from '@common/modules/charts/util/filterOrphanedDataSets';
+import isOrphanedDataSet from '@common/modules/charts/util/isOrphanedDataSet';
 import { InitialTableToolState } from '@common/modules/table-tool/components/TableToolWizard';
 import getInitialStepSubjectMeta from '@common/modules/table-tool/components/utils/getInitialStepSubjectMeta';
 import { TableHeadersConfig } from '@common/modules/table-tool/types/tableHeaders';
@@ -167,11 +167,19 @@ const DataBlockPageTabs = ({
     async ({ query, table, tableHeaders, details }) => {
       const charts = produce(dataBlock?.charts ?? [], draft => {
         const majorAxis = draft[0]?.axes?.major;
+        const legend = draft[0]?.legend;
+
+        // Remove data sets that are no longer applicable to a given table's subject meta.
 
         if (majorAxis?.dataSets) {
-          majorAxis.dataSets = filterOrphanedDataSets(
-            majorAxis.dataSets,
-            table.subjectMeta,
+          majorAxis.dataSets = majorAxis.dataSets.filter(
+            dataSet => !isOrphanedDataSet(dataSet, table.subjectMeta),
+          );
+        }
+
+        if (legend?.items) {
+          legend.items = legend.items.filter(
+            item => !isOrphanedDataSet(item.dataSet, table.subjectMeta),
           );
         }
       });

@@ -251,10 +251,10 @@ describe('createErrorHelper', () => {
       }>({
         errors: {
           subjects: [undefined],
-        } as any,
+        } as never,
         touched: {
           subjects: [true],
-        } as any,
+        } as never,
       });
       expect(getAllErrors()).toEqual({});
     });
@@ -269,10 +269,10 @@ describe('createErrorHelper', () => {
             { content: 'Error two' },
             { content: 'Error three' },
           ],
-        } as any,
+        } as never,
         touched: {
           subjects: [{ content: false }, { content: true }, { content: true }],
-        } as any,
+        } as never,
       });
       expect(getAllErrors()).toEqual({
         'subjects.1.content': 'Error two',

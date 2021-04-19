@@ -28,7 +28,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Services.Methodologie
             _contentDbContext = contentDbContext;
         }
 
-        public async Task<File> Create(Guid methodologyId,
+        public async Task<MethodologyFile> Create(Guid methodologyId,
             string filename,
             FileType type,
             Guid createdById)
@@ -53,7 +53,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Services.Methodologie
 
             var created = (await _contentDbContext.MethodologyFiles.AddAsync(methodologyFile)).Entity;
             await _contentDbContext.SaveChangesAsync();
-            return created.File;
+            return created;
         }
 
         public async Task<Either<ActionResult, File>> CheckFileExists(Guid methodologyId,

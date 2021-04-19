@@ -16,7 +16,7 @@ import Link from '@frontend/components/Link';
 import Page from '@frontend/components/Page';
 import { GetServerSideProps, NextPage } from 'next';
 import dynamic from 'next/dynamic';
-import React, { useMemo } from 'react';
+import React, { useEffect, useMemo, useState } from 'react';
 import { logEvent } from '@frontend/services/googleAnalyticsService';
 
 const TableToolFinalStep = dynamic(
@@ -36,6 +36,13 @@ const TableToolPage: NextPage<TableToolPageProps> = ({
   subjectMeta,
   themeMeta,
 }) => {
+  const [loadingFastTrack, setLoadingFastTrack] = useState(false);
+  useEffect(() => {
+    if (fastTrack && subjectMeta) {
+      setLoadingFastTrack(false);
+    }
+  }, [fastTrack, subjectMeta]);
+
   const initialState = useMemo<InitialTableToolState | undefined>(() => {
     if (!initialPublication) {
       return undefined;
@@ -98,11 +105,13 @@ const TableToolPage: NextPage<TableToolPageProps> = ({
         scrollOnMount
         themeMeta={themeMeta}
         initialState={initialState}
+        loadingFastTrack={loadingFastTrack}
         renderHighlightLink={highlight => (
           <Link
             to="/data-tables/fast-track/[fastTrackId]"
             as={`/data-tables/fast-track/${highlight.id}`}
             onClick={() => {
+              setLoadingFastTrack(true);
               logEvent({
                 category: 'Table tool',
                 action: 'Clicked to view Table highlight',

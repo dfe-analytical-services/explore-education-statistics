@@ -146,7 +146,6 @@ namespace GovUk.Education.ExploreEducationStatistics.Publisher.Services
             await _zipFileService.UploadZippedFiles(
                 PublicReleaseFiles,
                 destinationPath: release.AllFilesZipPath(),
-                zipFileName: "All files",
                 files: filesToZip,
                 releaseId: release.Id,
                 publishScheduled: release.PublishScheduled.Value

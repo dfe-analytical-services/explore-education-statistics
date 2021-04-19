@@ -20,14 +20,10 @@ namespace GovUk.Education.ExploreEducationStatistics.Common.Services
         }
 
         public static IDictionary<string, string> GetAllFilesZipMetaValues(
-            string name,
             DateTime releaseDateTime)
         {
             return new Dictionary<string, string>
             {
-                {
-                    BlobInfoExtensions.NameKey, name
-                },
                 {
                     BlobInfoExtensions.ReleaseDateTimeKey, releaseDateTime.ToString("o", CultureInfo.InvariantCulture)
                 }
@@ -53,13 +49,11 @@ namespace GovUk.Education.ExploreEducationStatistics.Common.Services
         }
 
         public static IDictionary<string, string> GetDataFileMetaValues(
-            string name,
             string metaFileName,
             int numberOfRows)
         {
             return new Dictionary<string, string>
             {
-                {BlobInfoExtensions.NameKey, name},
                 {BlobInfoExtensions.MetaFileKey, metaFileName.ToLower()},
                 {BlobInfoExtensions.NumberOfRowsKey, numberOfRows.ToString()}
             };

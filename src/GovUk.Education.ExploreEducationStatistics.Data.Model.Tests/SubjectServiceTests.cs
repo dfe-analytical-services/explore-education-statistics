@@ -174,10 +174,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Model.Tests
                         Title = "Test publication"
                     },
                 },
-                Subject = new Subject
-                {
-                    Name = "Test subject"
-                }
+                Subject = new Subject()
             };
 
             var contextId = Guid.NewGuid().ToString();
@@ -225,10 +222,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Model.Tests
                         Title = "Test publication"
                     },
                 },
-                Subject = new Subject
-                {
-                    Name = "Test subject"
-                }
+                Subject = new Subject()
             };
 
             var contextId = Guid.NewGuid().ToString();

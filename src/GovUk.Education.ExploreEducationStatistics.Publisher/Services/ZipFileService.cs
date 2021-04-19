@@ -23,7 +23,6 @@ namespace GovUk.Education.ExploreEducationStatistics.Publisher.Services
 
         public async Task UploadZippedFiles(IBlobContainer containerName,
             string destinationPath,
-            string zipFileName,
             IEnumerable<File> files,
             Guid releaseId,
             DateTime publishScheduled)
@@ -52,7 +51,6 @@ namespace GovUk.Education.ExploreEducationStatistics.Publisher.Services
                 memoryStream,
                 contentType: "application/x-zip-compressed",
                 metadata: GetAllFilesZipMetaValues(
-                    name: zipFileName,
                     releaseDateTime: publishScheduled));
         }
     }

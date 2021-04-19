@@ -42,14 +42,12 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
         {
             var originalSubject = new Subject
             {
-                Id = Guid.NewGuid(),
-                Name = "Original subject"
+                Id = Guid.NewGuid()
             };
 
             var replacementSubject = new Subject
             {
-                Id = Guid.NewGuid(),
-                Name = "Replacement subject"
+                Id = Guid.NewGuid()
             };
 
             var contentReleaseVersion1 = new Content.Model.Release
@@ -150,14 +148,12 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
         {
             var originalSubject = new Subject
             {
-                Id = Guid.NewGuid(),
-                Name = "Original subject"
+                Id = Guid.NewGuid()
             };
 
             var replacementSubject = new Subject
             {
-                Id = Guid.NewGuid(),
-                Name = "Replacement subject"
+                Id = Guid.NewGuid()
             };
 
             var contentRelease1Version1 = new Content.Model.Release
@@ -271,14 +267,12 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
         {
             var originalSubject = new Subject
             {
-                Id = Guid.NewGuid(),
-                Name = "Original subject"
+                Id = Guid.NewGuid()
             };
 
             var replacementSubject = new Subject
             {
-                Id = Guid.NewGuid(),
-                Name = "Replacement subject"
+                Id = Guid.NewGuid()
             };
 
             var contentReleaseVersion1 = new Content.Model.Release
@@ -385,14 +379,12 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
         {
             var originalSubject = new Subject
             {
-                Id = Guid.NewGuid(),
-                Name = "Original subject"
+                Id = Guid.NewGuid()
             };
 
             var replacementSubject = new Subject
             {
-                Id = Guid.NewGuid(),
-                Name = "Replacement subject"
+                Id = Guid.NewGuid()
             };
 
             var contentReleaseVersion1 = new Content.Model.Release
@@ -887,14 +879,12 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
         {
             var originalSubject = new Subject
             {
-                Id = Guid.NewGuid(),
-                Name = "Original subject"
+                Id = Guid.NewGuid()
             };
 
             var replacementSubject = new Subject
             {
-                Id = Guid.NewGuid(),
-                Name = "Replacement subject"
+                Id = Guid.NewGuid()
             };
 
             var contentReleaseVersion1 = new Content.Model.Release
@@ -1519,14 +1509,12 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
         {
             var originalSubject = new Subject
             {
-                Id = Guid.NewGuid(),
-                Name = "Original subject"
+                Id = Guid.NewGuid()
             };
 
             var replacementSubject = new Subject
             {
-                Id = Guid.NewGuid(),
-                Name = "Replacement subject"
+                Id = Guid.NewGuid()
             };
 
             var contentRelease = new Content.Model.Release
@@ -1671,14 +1659,12 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
         {
             var originalSubject = new Subject
             {
-                Id = Guid.NewGuid(),
-                Name = "Original subject"
+                Id = Guid.NewGuid()
             };
 
             var replacementSubject = new Subject
             {
-                Id = Guid.NewGuid(),
-                Name = "Replacement subject"
+                Id = Guid.NewGuid()
             };
 
             var contentReleaseVersion1 = new Content.Model.Release

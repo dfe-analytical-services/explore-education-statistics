@@ -299,7 +299,6 @@
         "description": "Email addresses for receiving alerts"
       }
     },
-
     "departmentName": {
       "type": "string",
       "defaultValue": "Unknown",
@@ -517,6 +516,16 @@
     "maxDbSizeBytes": {
       "type": "int", 
       "defaultValue": 268435456000 
+    },
+    "enableAlerts": {
+      "type": "bool",
+      "defaultValue": false
+    },
+    "slackWebhook": {
+      "type": "string",
+      "metadata": {
+        "description": "Slack webhook URI for alerts"
+      }
     }
   },
   "variables": {
@@ -553,6 +562,33 @@
     "publisherStorageAccountName": "[concat(parameters('subscription'), 'saeespublisher')]",
     "publisherStorageAccountId": "[concat(resourceGroup().id,'/providers/','Microsoft.Storage/storageAccounts/', variables('publisherStorageAccountName'))]",
     "loggingStorageAccountName": "[concat(parameters('subscription'), 'saeeslogging')]",
+
+    "logicAppSlackAlerts": "[concat(parameters('subscription'), '-la-', parameters('environment'), '-slackwebhook')]",
+    "actionGroupAlerts": "[concat(parameters('subscription'), '-ag-', parameters('environment'), '-alertedusers')]",
+    "metricAlerts": [
+      {
+        "name": "[concat(parameters('subscription'),'ContentDBLogWritePercentgreaterthan1')]",
+        "description": "Content DB Log Write Percent greater than 1% alert has triggered! Hurrah!",
+        "resourceId": "[resourceId('Microsoft.Sql/servers/databases', variables('sqlServerName'), 'content')]",
+        "resourceType": "microsoft.sql/servers/databases",
+        "metricName": "log_write_percent",
+        "threshold": 1,
+        "operator": "GreaterThan",
+        "timeAggregation": "Average",
+        "criterionType": "StaticThresholdCriterion"
+      },
+      {
+        "name": "[concat(parameters('subscription'),'PubStatsDBDataIOUsage')]",
+        "description": "Public Statistics DB Data IO usage",
+        "resourceId": "[resourceId('Microsoft.Sql/servers/databases', variables('publicSqlServerName'), 'public-statistics')]",
+        "resourceType": "microsoft.sql/servers/databases",
+        "metricName": "physical_data_read_percent",
+        "threshold": 1,
+        "operator": "GreaterThan",
+        "timeAggregation": "Average",
+        "criterionType": "StaticThresholdCriterion"
+      }
+    ],
 
     "vNetName": "[concat(parameters('subscription'), '-vnet-', parameters('environment'))]",
     "vNetRef": "[resourceId('Microsoft.Network/virtualNetworks', variables('vNetName'))]",
@@ -3377,6 +3413,176 @@
         "notifications": [
         ],
         "targetResourceLocation": ""
+      }
+    },
+    {
+      "type": "Microsoft.Logic/workflows",
+      "apiVersion": "2017-07-01",
+      "name": "[variables('logicAppSlackAlerts')]",
+      "location": "[resourceGroup().location]",
+      "properties": {
+        "state": "Enabled",
+        "definition": {
+          "$schema": "https://schema.management.azure.com/providers/Microsoft.Logic/schemas/2016-06-01/workflowdefinition.json#",
+          "contentVersion": "1.0.0.0",
+          "parameters": {},
+          "triggers": {
+            "manual": {
+              "type": "Request",
+              "kind": "Http",
+              "inputs": {
+                "schema": {
+                  "properties": {
+                    "data": {
+                      "properties": {
+                        "alertContext": {
+                          "properties": {},
+                          "type": "object"
+                        },
+                        "essentials": {
+                          "properties": {
+                            "alertContextVersion": {
+                              "type": "string"
+                            },
+                            "alertId": {
+                              "type": "string"
+                            },
+                            "alertRule": {
+                              "type": "string"
+                            },
+                            "alertTargetIDs": {
+                              "items": {
+                                  "type": "string"
+                              },
+                              "type": "array"
+                            },
+                            "description": {
+                              "type": "string"
+                            },
+                            "essentialsVersion": {
+                              "type": "string"
+                            },
+                            "firedDateTime": {
+                              "type": "string"
+                            },
+                            "monitorCondition": {
+                              "type": "string"
+                            },
+                            "monitoringService": {
+                              "type": "string"
+                            },
+                            "originAlertId": {
+                              "type": "string"
+                            },
+                            "resolvedDateTime": {
+                              "type": "string"
+                            },
+                            "severity": {
+                              "type": "string"
+                            },
+                            "signalType": {
+                              "type": "string"
+                            }
+                          },
+                          "type": "object"
+                        }
+                      },
+                      "type": "object"
+                    },
+                    "schemaId": {
+                        "type": "string"
+                    }
+                  },
+                  "type": "object"
+                }
+              }
+            }
+          },
+          "actions": {
+            "HTTP_Webhook": {
+              "runAfter": {},
+              "type": "HttpWebhook",
+              "inputs": {
+                "subscribe": {
+                  "body": {
+                    "username": "Alertbot",
+                    "icon_emoji": ":face_with_monocle",
+                    "channel": "#alerts",
+                    "text": "Alert @{triggerBody()?['data']?['essentials']?['monitorCondition']}!\n@{triggerBody()?['data']?['essentials']?['alertRule']}\n@{triggerBody()?['data']?['essentials']?['description']}"
+                  },
+                  "method": "POST",
+                  "uri": "[parameters('slackWebhook')]"
+                },
+                "unsubscribe": {}
+              }
+            }
+          },
+          "outputs": {}
+        },
+        "parameters": {}
+      }
+    },
+    {
+      "type": "microsoft.insights/actionGroups",
+      "apiVersion": "2019-06-01",
+      "name": "[variables('actionGroupAlerts')]",
+      "location": "global",
+      "properties": {
+        "groupShortName": "alertAG",
+        "enabled": "[parameters('enableAlerts')]",
+        "logicAppReceivers": [
+          {
+            "name": "[variables('logicAppSlackAlerts')]",
+            "resourceId": "[resourceId('Microsoft.Logic/workflows', variables('logicAppSlackAlerts'))]",
+            "callbackUrl": "[listCallbackURL(concat(resourceId('Microsoft.Logic/workflows', variables('logicAppSlackAlerts')), '/triggers/manual'), '2017-07-01').value]",
+            "useCommonAlertSchema": true
+          }
+        ]
+      }
+    },
+    {
+      "type": "microsoft.insights/metricAlerts",
+      "apiVersion": "2018-03-01",
+      "name": "[variables('metricAlerts')[copyIndex()].name]",
+      "location": "global",
+      "dependsOn": [
+        "[variables('metricAlerts')[copyIndex()].resourceId]",
+        "[resourceId('microsoft.insights/actionGroups', variables('actionGroupAlerts'))]"
+      ],
+      "copy": {
+        "name": "metricAlertsCopy",
+        "count": "[length(variables('metricAlerts'))]"
+      },
+      "properties": {
+        "description": "[variables('metricAlerts')[copyIndex()].description]",
+        "severity": 3,
+        "enabled": "[parameters('enableAlerts')]",
+        "scopes": [
+          "[variables('metricAlerts')[copyIndex()].resourceId]"
+        ],
+        "evaluationFrequency": "PT1M",
+        "windowSize": "PT5M",
+        "criteria": {
+          "allOf": [
+            {
+              "threshold": "[variables('metricAlerts')[copyIndex()].threshold]",
+              "name": "Metric1",
+              "metricNamespace": "[variables('metricAlerts')[copyIndex()].resourceType]",
+              "metricName": "[variables('metricAlerts')[copyIndex()].metricName]",
+              "operator": "[variables('metricAlerts')[copyIndex()].operator]",
+              "timeAggregation": "[variables('metricAlerts')[copyIndex()].timeAggregation]",
+              "criterionType": "[variables('metricAlerts')[copyIndex()].criterionType]"
+            }
+          ],
+          "odata.type": "Microsoft.Azure.Monitor.MultipleResourceMultipleMetricCriteria"
+        },
+        "autoMitigate": true,
+        "targetResourceType": "[variables('metricAlerts')[copyIndex()].resourceType]",
+        "actions": [
+          {
+            "actionGroupId": "[resourceId('microsoft.insights/actionGroups', variables('actionGroupAlerts'))]"
+          }
+        ]
       }
     }
   ]

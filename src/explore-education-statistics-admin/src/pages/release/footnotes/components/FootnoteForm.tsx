@@ -107,16 +107,7 @@ const FootnoteForm = ({
           );
         }
 
-        // Remove unused subjects when type is NA.
-        const newValues = { ...values };
-        Object.keys(newValues.subjects).map(subjectId => {
-          if (newValues.subjects[subjectId].selectionType === 'NA') {
-            delete newValues.subjects[subjectId];
-          }
-          return subjectId;
-        });
-
-        await onSubmit(newValues);
+        await onSubmit(values);
       }}
     >
       {form => (
