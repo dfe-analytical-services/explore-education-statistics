@@ -14,7 +14,6 @@ import generateDefaultDataSetLabel from '@common/modules/charts/util/generateDef
 import { FullTableMeta } from '@common/modules/table-tool/types/fullTable';
 import keyBy from 'lodash/keyBy';
 import omit from 'lodash/omit';
-import orderBy from 'lodash/orderBy';
 import uniqBy from 'lodash/uniqBy';
 
 export interface DataSetCategoryConfig {
@@ -77,9 +76,5 @@ export default function getDataSetCategoryConfigs(
     );
   });
 
-  return orderBy(
-    uniqBy(dataSets, dataSet => dataSet.dataKey),
-    dataSet => dataSet.config.label,
-    ['asc'],
-  );
+  return uniqBy(dataSets, dataSet => dataSet.dataKey);
 }
