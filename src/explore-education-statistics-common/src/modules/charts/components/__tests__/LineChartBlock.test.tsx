@@ -56,9 +56,9 @@ describe('LineChartBlock', () => {
       ).toBeInTheDocument();
 
       const legendItems = container.querySelectorAll('.recharts-legend-item');
-      expect(legendItems[0]).toHaveTextContent('Authorised absence rate');
+      expect(legendItems[0]).toHaveTextContent('Unauthorised absence rate');
       expect(legendItems[1]).toHaveTextContent('Overall absence rate');
-      expect(legendItems[2]).toHaveTextContent('Unauthorised absence rate');
+      expect(legendItems[2]).toHaveTextContent('Authorised absence rate');
 
       // expect there to be lines for all 3 data sets
       expect(container.querySelectorAll('.recharts-line')).toHaveLength(3);

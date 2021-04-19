@@ -418,17 +418,17 @@ describe('ChartLegendConfiguration', () => {
 
     const legendItem1 = within(legendItems[0]);
 
-    expect(legendItem1.getByLabelText('Label')).toHaveValue('Legend item 1');
-    expect(legendItem1.getByLabelText('Colour')).toHaveValue('#ff0000');
-    expect(legendItem1.getByLabelText('Symbol')).toHaveValue('square');
-    expect(legendItem1.getByLabelText('Style')).toHaveValue('dotted');
+    expect(legendItem1.getByLabelText('Label')).toHaveValue('Legend item 2');
+    expect(legendItem1.getByLabelText('Colour')).toHaveValue('#00ff00');
+    expect(legendItem1.getByLabelText('Symbol')).toHaveValue('star');
+    expect(legendItem1.getByLabelText('Style')).toHaveValue('dashed');
 
     const legendItem2 = within(legendItems[1]);
 
-    expect(legendItem2.getByLabelText('Label')).toHaveValue('Legend item 2');
-    expect(legendItem2.getByLabelText('Colour')).toHaveValue('#00ff00');
-    expect(legendItem2.getByLabelText('Symbol')).toHaveValue('star');
-    expect(legendItem2.getByLabelText('Style')).toHaveValue('dashed');
+    expect(legendItem2.getByLabelText('Label')).toHaveValue('Legend item 1');
+    expect(legendItem2.getByLabelText('Colour')).toHaveValue('#ff0000');
+    expect(legendItem2.getByLabelText('Symbol')).toHaveValue('square');
+    expect(legendItem2.getByLabelText('Style')).toHaveValue('dotted');
   });
 
   test('does not render Symbol field if chart does not have capability', () => {
