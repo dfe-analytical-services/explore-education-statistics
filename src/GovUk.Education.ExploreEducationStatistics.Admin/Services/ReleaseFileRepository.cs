@@ -53,7 +53,8 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Services
             Guid releaseId,
             string filename,
             FileType type,
-            Guid createdById)
+            Guid createdById,
+            string name = null)
         {
             if (!SupportedFileTypes.Contains(type))
             {
@@ -63,6 +64,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Services
             var releaseFile = new ReleaseFile
             {
                 ReleaseId = releaseId,
+                Name = name,
                 File = new File
                 {
                     Created = DateTime.UtcNow,

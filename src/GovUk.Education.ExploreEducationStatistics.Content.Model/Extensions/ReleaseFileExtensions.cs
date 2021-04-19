@@ -26,8 +26,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Content.Model.Extensions
             {
                 Id = releaseFile.FileId,
                 FileName = releaseFile.File.Filename,
-                Name = releaseFile.Name ??
-                       (blobInfo.Name.IsNullOrEmpty() ? releaseFile.File.Filename : blobInfo.Name),
+                Name = releaseFile.Name ?? releaseFile.File.Filename,
                 Size = blobInfo.Size,
                 Type = releaseFile.File.Type
             };
