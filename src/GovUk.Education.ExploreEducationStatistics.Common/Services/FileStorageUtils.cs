@@ -19,7 +19,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Common.Services
             Tb
         }
 
-        public static IDictionary<string, string> GetAllFilesZipMetaValues(
+        public static IDictionary<string, string> GetMetaValuesReleaseDateTime(
             DateTime releaseDateTime)
         {
             return new Dictionary<string, string>
@@ -28,24 +28,6 @@ namespace GovUk.Education.ExploreEducationStatistics.Common.Services
                     BlobInfoExtensions.ReleaseDateTimeKey, releaseDateTime.ToString("o", CultureInfo.InvariantCulture)
                 }
             };
-        }
-
-        public static IDictionary<string, string> GetAncillaryFileMetaValues(
-            string name,
-            DateTime? releaseDateTime = null)
-        {
-            var values = new Dictionary<string, string>
-            {
-                {BlobInfoExtensions.NameKey, name}
-            };
-
-            if (releaseDateTime.HasValue)
-            {
-                values.Add(BlobInfoExtensions.ReleaseDateTimeKey, 
-                    releaseDateTime.Value.ToString("o", CultureInfo.InvariantCulture));
-            }
-
-            return values;
         }
 
         public static IDictionary<string, string> GetDataFileMetaValues(

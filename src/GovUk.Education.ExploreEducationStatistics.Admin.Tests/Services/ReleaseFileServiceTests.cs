@@ -5,7 +5,6 @@ using System.Linq;
 using System.Threading.Tasks;
 using GovUk.Education.ExploreEducationStatistics.Admin.Services;
 using GovUk.Education.ExploreEducationStatistics.Admin.Services.Interfaces;
-using GovUk.Education.ExploreEducationStatistics.Common.Extensions;
 using GovUk.Education.ExploreEducationStatistics.Common.Model;
 using GovUk.Education.ExploreEducationStatistics.Common.Services.Interfaces;
 using GovUk.Education.ExploreEducationStatistics.Common.Services.Interfaces.Security;
@@ -23,7 +22,6 @@ using static GovUk.Education.ExploreEducationStatistics.Admin.Validators.Validat
 using static GovUk.Education.ExploreEducationStatistics.Common.BlobContainers;
 using static GovUk.Education.ExploreEducationStatistics.Common.Model.FileType;
 using static GovUk.Education.ExploreEducationStatistics.Common.Services.FileStoragePathUtils;
-using static GovUk.Education.ExploreEducationStatistics.Common.Services.FileStorageUtils;
 using static GovUk.Education.ExploreEducationStatistics.Common.Tests.Utils.MockFormTestUtils;
 using File = GovUk.Education.ExploreEducationStatistics.Content.Model.File;
 
@@ -1000,6 +998,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
             var ancillaryFile1 = new ReleaseFile
             {
                 Release = release,
+                Name = "Ancillary Test File 1",
                 File = new File
                 {
                     RootPath = Guid.NewGuid(),
@@ -1011,6 +1010,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
             var ancillaryFile2 = new ReleaseFile
             {
                 Release = release,
+                Name = "Ancillary Test File 2",
                 File = new File
                 {
                     RootPath = Guid.NewGuid(),
@@ -1080,8 +1080,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
                     size: "10 Kb",
                     contentType: "application/pdf",
                     contentLength: 0L,
-                    meta: GetAncillaryFileMetaValues(
-                        name: "Ancillary Test File 1"),
+                    meta: new Dictionary<string, string>(),
                     created: null));
 
             blobStorageService.Setup(mock =>
@@ -1091,8 +1090,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
                     size: "10 Kb",
                     contentType: "application/pdf",
                     contentLength: 0L,
-                    meta: GetAncillaryFileMetaValues(
-                        name: "Ancillary Test File 2"),
+                    meta: new Dictionary<string, string>(),
                     created: null));
 
             blobStorageService.Setup(mock =>
@@ -1383,7 +1381,6 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
         public async Task UploadAncillary()
         {
             const string filename = "ancillary.pdf";
-            const string uploadName = "Ancillary Test File";
 
             var release = new Release();
 
@@ -1404,8 +1401,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
                     It.Is<string>(path =>
                         path.Contains(FilesPath(release.Id, Ancillary))),
                     formFile,
-                    It.Is<IDictionary<string, string>>(metadata => 
-                        metadata[BlobInfoExtensions.NameKey] == uploadName)
+                    null
                 )).Returns(Task.CompletedTask);
 
             blobStorageService.Setup(mock =>
@@ -1417,8 +1413,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
                     size: "10 Kb",
                     contentType: "application/pdf",
                     contentLength: 0L,
-                    meta: GetAncillaryFileMetaValues(
-                        name: uploadName),
+                    meta: new Dictionary<string, string>(),
                     created: null));
 
             fileUploadsValidatorService.Setup(mock =>
@@ -1431,7 +1426,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
                     blobStorageService: blobStorageService.Object,
                     fileUploadsValidatorService: fileUploadsValidatorService.Object);
 
-                var result = await service.UploadAncillary(release.Id, formFile, uploadName);
+                var result = await service.UploadAncillary(release.Id, formFile, "Test Ancillary File");
 
                 Assert.True(result.IsRight);
 
@@ -1443,8 +1438,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
                         It.Is<string>(path =>
                             path.Contains(FilesPath(release.Id, Ancillary))),
                         formFile,
-                        It.Is<IDictionary<string, string>>(metadata =>
-                            metadata[BlobInfoExtensions.NameKey] == uploadName)
+                        null
                     ), Times.Once);
 
                 blobStorageService.Verify(mock =>
@@ -1456,7 +1450,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
                 Assert.True(result.Right.Id.HasValue);
                 Assert.Equal("pdf", result.Right.Extension);
                 Assert.Equal("ancillary.pdf", result.Right.FileName);
-                Assert.Equal("Ancillary Test File", result.Right.Name);
+                Assert.Equal("Test Ancillary File", result.Right.Name);
                 Assert.Equal("10 Kb", result.Right.Size);
                 Assert.Equal(Ancillary, result.Right.Type);
             }

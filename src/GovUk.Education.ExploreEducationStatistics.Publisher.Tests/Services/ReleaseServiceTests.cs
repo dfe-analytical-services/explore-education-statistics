@@ -502,6 +502,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Publisher.Tests.Services
         private static readonly ReleaseFile PublicationARelease2AncillaryReleaseFile = new ReleaseFile
         {
             Release = PublicationARelease2,
+            Name = "Ancillary Test File",
             File = new File
             {
                 Filename = "ancillary.pdf",
@@ -587,8 +588,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Publisher.Tests.Services
                         size: "15 Kb",
                         contentType: "application/pdf",
                         contentLength: 0L,
-                        meta: GetAncillaryFileMetaValues(
-                            name: "Ancillary Test File"),
+                        meta: new Dictionary<string, string>(),
                         created: null
                     ));
 
@@ -615,7 +615,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Publisher.Tests.Services
                         size: "3 Mb",
                         contentType: "application/x-zip-compressed",
                         contentLength: 0L,
-                        meta: GetAllFilesZipMetaValues(
+                        meta: GetMetaValuesReleaseDateTime(
                             releaseDateTime: DateTime.Now),
                         created: null
                     ));
@@ -743,8 +743,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Publisher.Tests.Services
                         size: "15 Kb",
                         contentType: "application/pdf",
                         contentLength: 0L,
-                        meta: GetAncillaryFileMetaValues(
-                            name: "Ancillary Test File"),
+                        meta: new Dictionary<string, string>(),
                         created: null
                     ));
 
@@ -771,7 +770,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Publisher.Tests.Services
                         size: "3 Mb",
                         contentType: "application/x-zip-compressed",
                         contentLength: 0L,
-                        meta: GetAllFilesZipMetaValues(
+                        meta: GetMetaValuesReleaseDateTime(
                             releaseDateTime: DateTime.Now),
                         created: null
                     ));
@@ -893,7 +892,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Publisher.Tests.Services
                     size: "0 b",
                     contentType: "application/x-zip-compressed",
                     contentLength: 0L,
-                    meta: GetAllFilesZipMetaValues(
+                    meta: GetMetaValuesReleaseDateTime(
                         releaseDateTime: DateTime.Now),
                     created: null
                 ));
@@ -1002,7 +1001,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Publisher.Tests.Services
                     size: "0 b",
                     contentType: "application/x-zip-compressed",
                     contentLength: 0L,
-                    meta: GetAllFilesZipMetaValues(
+                    meta: GetMetaValuesReleaseDateTime(
                         releaseDateTime: DateTime.Now),
                     created: null
                 ));

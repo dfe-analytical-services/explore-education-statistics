@@ -17,7 +17,8 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Services.Interfaces
             Guid releaseId,
             string filename,
             FileType type,
-            Guid createdById);
+            Guid createdById,
+            string name = null);
 
         public Task Delete(Guid releaseId, Guid fileId);
 
