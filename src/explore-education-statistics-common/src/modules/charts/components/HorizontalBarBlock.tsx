@@ -119,7 +119,7 @@ const HorizontalBarBlock = ({
             hide={!axes.minor.visible}
             unit={axes.minor.unit}
             height={xAxisHeight}
-            padding={{ right: 20 }}
+            padding={{ left: 0, right: 20 }}
             tickMargin={10}
             tickFormatter={tick => formatPretty(tick, '', minorAxisDecimals)}
           />
