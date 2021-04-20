@@ -2,8 +2,8 @@ import Link from '@admin/components/Link';
 import {
   ReleaseDataBlockRouteParams,
   releaseDataBlocksRoute,
-  releaseDataFileRoute,
-  ReleaseDataFileRouteParams,
+  releaseDataFileReplaceRoute,
+  ReleaseDataFileReplaceRouteParams,
   ReleaseFootnoteRouteParams,
 } from '@admin/routes/releaseRoutes';
 import dataReplacementService from '@admin/services/dataReplacementService';
@@ -15,7 +15,7 @@ import { generatePath, RouteComponentProps } from 'react-router';
 
 const ReleaseDataFileReplacementCompletePage = ({
   match,
-}: RouteComponentProps<ReleaseDataFileRouteParams>) => {
+}: RouteComponentProps<ReleaseDataFileReplaceRouteParams>) => {
   const { publicationId, releaseId, fileId } = match.params;
 
   // Run the replacement plan against itself so we can just get the
@@ -25,8 +25,8 @@ const ReleaseDataFileReplacementCompletePage = ({
     [releaseId, fileId],
   );
 
-  const dataFilePath = generatePath<ReleaseDataFileRouteParams>(
-    releaseDataFileRoute.path,
+  const dataFilePath = generatePath<ReleaseDataFileReplaceRouteParams>(
+    releaseDataFileReplaceRoute.path,
     {
       publicationId,
       releaseId,

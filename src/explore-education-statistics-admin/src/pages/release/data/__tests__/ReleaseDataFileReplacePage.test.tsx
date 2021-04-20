@@ -1,7 +1,7 @@
-import ReleaseDataFilePage from '@admin/pages/release/data/ReleaseDataFilePage';
+import ReleaseDataFileReplacePage from '@admin/pages/release/data/ReleaseDataFileReplacePage';
 import {
-  releaseDataFileRoute,
-  ReleaseDataFileRouteParams,
+  releaseDataFileReplaceRoute,
+  ReleaseDataFileReplaceRouteParams,
 } from '@admin/routes/releaseRoutes';
 import _dataReplacementService, {
   DataReplacementPlan,
@@ -29,7 +29,7 @@ const permissionService = _permissionService as jest.Mocked<
   typeof _permissionService
 >;
 
-describe('ReleaseDataFilePage', () => {
+describe('ReleaseDataFileReplacePage', () => {
   beforeEach(() => {
     permissionService.getDataFilePermissions.mockResolvedValue({
       canCancelImport: false,
@@ -94,7 +94,7 @@ describe('ReleaseDataFilePage', () => {
     render(
       <MemoryRouter
         initialEntries={[
-          generatePath<ReleaseDataFileRouteParams>(releaseDataFileRoute.path, {
+          generatePath<ReleaseDataFileReplaceRouteParams>(releaseDataFileReplaceRoute.path, {
             releaseId: 'release-1',
             publicationId: 'publication-1',
             fileId: 'file-1',
@@ -102,8 +102,8 @@ describe('ReleaseDataFilePage', () => {
         ]}
       >
         <Route
-          path={releaseDataFileRoute.path}
-          component={ReleaseDataFilePage}
+          path={releaseDataFileReplaceRoute.path}
+          component={ReleaseDataFileReplacePage}
         />
       </MemoryRouter>,
     );
@@ -143,7 +143,7 @@ describe('ReleaseDataFilePage', () => {
     render(
       <MemoryRouter
         initialEntries={[
-          generatePath<ReleaseDataFileRouteParams>(releaseDataFileRoute.path, {
+          generatePath<ReleaseDataFileReplaceRouteParams>(releaseDataFileReplaceRoute.path, {
             releaseId: 'release-1',
             publicationId: 'publication-1',
             fileId: 'file-1',
@@ -151,8 +151,8 @@ describe('ReleaseDataFilePage', () => {
         ]}
       >
         <Route
-          path={releaseDataFileRoute.path}
-          component={ReleaseDataFilePage}
+          path={releaseDataFileReplaceRoute.path}
+          component={ReleaseDataFileReplacePage}
         />
       </MemoryRouter>,
     );
@@ -191,7 +191,7 @@ describe('ReleaseDataFilePage', () => {
     render(
       <MemoryRouter
         initialEntries={[
-          generatePath<ReleaseDataFileRouteParams>(releaseDataFileRoute.path, {
+          generatePath<ReleaseDataFileReplaceRouteParams>(releaseDataFileReplaceRoute.path, {
             releaseId: 'release-1',
             publicationId: 'publication-1',
             fileId: 'file-1',
@@ -199,8 +199,8 @@ describe('ReleaseDataFilePage', () => {
         ]}
       >
         <Route
-          path={releaseDataFileRoute.path}
-          component={ReleaseDataFilePage}
+          path={releaseDataFileReplaceRoute.path}
+          component={ReleaseDataFileReplacePage}
         />
       </MemoryRouter>,
     );
@@ -272,7 +272,7 @@ describe('ReleaseDataFilePage', () => {
     render(
       <MemoryRouter
         initialEntries={[
-          generatePath<ReleaseDataFileRouteParams>(releaseDataFileRoute.path, {
+          generatePath<ReleaseDataFileReplaceRouteParams>(releaseDataFileReplaceRoute.path, {
             releaseId: 'release-1',
             publicationId: 'publication-1',
             fileId: 'file-1',
@@ -280,8 +280,8 @@ describe('ReleaseDataFilePage', () => {
         ]}
       >
         <Route
-          path={releaseDataFileRoute.path}
-          component={ReleaseDataFilePage}
+          path={releaseDataFileReplaceRoute.path}
+          component={ReleaseDataFileReplacePage}
         />
       </MemoryRouter>,
     );
@@ -345,7 +345,7 @@ describe('ReleaseDataFilePage', () => {
     render(
       <MemoryRouter
         initialEntries={[
-          generatePath<ReleaseDataFileRouteParams>(releaseDataFileRoute.path, {
+          generatePath<ReleaseDataFileReplaceRouteParams>(releaseDataFileReplaceRoute.path, {
             releaseId: 'release-1',
             publicationId: 'publication-1',
             fileId: 'file-1',
@@ -353,8 +353,8 @@ describe('ReleaseDataFilePage', () => {
         ]}
       >
         <Route
-          path={releaseDataFileRoute.path}
-          component={ReleaseDataFilePage}
+          path={releaseDataFileReplaceRoute.path}
+          component={ReleaseDataFileReplacePage}
         />
       </MemoryRouter>,
     );
@@ -399,7 +399,7 @@ describe('ReleaseDataFilePage', () => {
     render(
       <MemoryRouter
         initialEntries={[
-          generatePath<ReleaseDataFileRouteParams>(releaseDataFileRoute.path, {
+          generatePath<ReleaseDataFileReplaceRouteParams>(releaseDataFileReplaceRoute.path, {
             releaseId: 'release-1',
             publicationId: 'publication-1',
             fileId: 'file-1',
@@ -407,8 +407,8 @@ describe('ReleaseDataFilePage', () => {
         ]}
       >
         <Route
-          path={releaseDataFileRoute.path}
-          component={ReleaseDataFilePage}
+          path={releaseDataFileReplaceRoute.path}
+          component={ReleaseDataFileReplacePage}
         />
       </MemoryRouter>,
     );
@@ -448,7 +448,7 @@ describe('ReleaseDataFilePage', () => {
     render(
       <MemoryRouter
         initialEntries={[
-          generatePath<ReleaseDataFileRouteParams>(releaseDataFileRoute.path, {
+          generatePath<ReleaseDataFileReplaceRouteParams>(releaseDataFileReplaceRoute.path, {
             releaseId: 'release-1',
             publicationId: 'publication-1',
             fileId: 'file-1',
@@ -456,8 +456,8 @@ describe('ReleaseDataFilePage', () => {
         ]}
       >
         <Route
-          path={releaseDataFileRoute.path}
-          component={ReleaseDataFilePage}
+          path={releaseDataFileReplaceRoute.path}
+          component={ReleaseDataFileReplacePage}
         />
       </MemoryRouter>,
     );
@@ -493,7 +493,7 @@ describe('ReleaseDataFilePage', () => {
     render(
       <MemoryRouter
         initialEntries={[
-          generatePath<ReleaseDataFileRouteParams>(releaseDataFileRoute.path, {
+          generatePath<ReleaseDataFileReplaceRouteParams>(releaseDataFileReplaceRoute.path, {
             releaseId: 'release-1',
             publicationId: 'publication-1',
             fileId: 'file-1',
@@ -501,8 +501,8 @@ describe('ReleaseDataFilePage', () => {
         ]}
       >
         <Route
-          path={releaseDataFileRoute.path}
-          component={ReleaseDataFilePage}
+          path={releaseDataFileReplaceRoute.path}
+          component={ReleaseDataFileReplacePage}
         />
       </MemoryRouter>,
     );
@@ -563,7 +563,7 @@ describe('ReleaseDataFilePage', () => {
     render(
       <MemoryRouter
         initialEntries={[
-          generatePath<ReleaseDataFileRouteParams>(releaseDataFileRoute.path, {
+          generatePath<ReleaseDataFileReplaceRouteParams>(releaseDataFileReplaceRoute.path, {
             releaseId: 'release-1',
             publicationId: 'publication-1',
             fileId: 'file-1',
@@ -571,8 +571,8 @@ describe('ReleaseDataFilePage', () => {
         ]}
       >
         <Route
-          path={releaseDataFileRoute.path}
-          component={ReleaseDataFilePage}
+          path={releaseDataFileReplaceRoute.path}
+          component={ReleaseDataFileReplacePage}
         />
       </MemoryRouter>,
     );
@@ -649,7 +649,7 @@ describe('ReleaseDataFilePage', () => {
     render(
       <MemoryRouter
         initialEntries={[
-          generatePath<ReleaseDataFileRouteParams>(releaseDataFileRoute.path, {
+          generatePath<ReleaseDataFileReplaceRouteParams>(releaseDataFileReplaceRoute.path, {
             releaseId: 'release-1',
             publicationId: 'publication-1',
             fileId: 'file-1',
@@ -657,8 +657,8 @@ describe('ReleaseDataFilePage', () => {
         ]}
       >
         <Route
-          path={releaseDataFileRoute.path}
-          component={ReleaseDataFilePage}
+          path={releaseDataFileReplaceRoute.path}
+          component={ReleaseDataFileReplacePage}
         />
       </MemoryRouter>,
     );

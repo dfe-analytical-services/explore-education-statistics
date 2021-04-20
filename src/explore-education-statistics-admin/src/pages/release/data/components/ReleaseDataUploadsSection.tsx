@@ -5,8 +5,8 @@ import DataFileUploadForm, {
 } from '@admin/pages/release/data/components/DataFileUploadForm';
 import { terminalImportStatuses } from '@admin/pages/release/data/components/ImporterStatus';
 import {
-  releaseDataFileRoute,
-  ReleaseDataFileRouteParams,
+  releaseDataFileReplaceRoute,
+  ReleaseDataFileReplaceRouteParams,
 } from '@admin/routes/releaseRoutes';
 import permissionService from '@admin/services/permissionService';
 import releaseDataFileService, {
@@ -264,8 +264,8 @@ const ReleaseDataUploadsSection = ({
                           {dataFile.status === 'COMPLETE' && (
                             <Link
                               className="govuk-!-margin-right-4"
-                              to={generatePath<ReleaseDataFileRouteParams>(
-                                releaseDataFileRoute.path,
+                              to={generatePath<ReleaseDataFileReplaceRouteParams>(
+                                releaseDataFileReplaceRoute.path,
                                 {
                                   publicationId,
                                   releaseId,
