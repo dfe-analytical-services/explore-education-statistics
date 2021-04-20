@@ -13,7 +13,7 @@ import { MapBlockProps } from '@common/modules/charts/components/MapBlockInterna
 import VerticalBarBlock, {
   VerticalBarProps,
 } from '@common/modules/charts/components/VerticalBarBlock';
-import React, { memo, useMemo } from 'react';
+import React, { memo, useMemo, useEffect } from 'react';
 
 export type ChartRendererProps = {
   source?: string;
@@ -44,7 +44,8 @@ function ChartRenderer({
   id,
   ...props
 }: ChartRendererProps & ChartRendererInternalProps) {
-  const { data, meta, title } = props;
+  const { data, meta, title, type } = props;
+  const { footnotes } = meta;
 
   const chart = useMemo(() => {
     switch (props.type) {
@@ -63,20 +64,20 @@ function ChartRenderer({
     }
   }, [id, props]);
 
-  const { type } = props;
-  const { footnotes } = meta;
-  if (type === 'map') {
-    const boundaryFootnoteLabel = `The boundary data used in this map includes${meta.boundaryLevels
-      .map((value, index, array) => {
-        let separator = index === 0 ? ' ' : ', ';
-        if (array.length - 1 === index) {
-          separator = ' and ';
-        }
-        return `${separator}${value.label}`;
-      })
-      .join('')}`;
-    footnotes.push({ id: `map-footnote`, label: boundaryFootnoteLabel });
-  }
+  useEffect(() => {
+    if (type === 'map') {
+      const boundaryFootnoteLabel = `The boundary data used in this map includes${meta.boundaryLevels
+        .map((value, index, array) => {
+          let separator = index === 0 ? ' ' : ', ';
+          if (array.length - 1 === index) {
+            separator = ' and ';
+          }
+          return `${separator}${value.label}`;
+        })
+        .join('')}`;
+      footnotes.push({ id: `map-footnote`, label: boundaryFootnoteLabel });
+    }
+  }, [footnotes, meta.boundaryLevels, type]);
 
   if (data && meta && data.length > 0) {
     return (
