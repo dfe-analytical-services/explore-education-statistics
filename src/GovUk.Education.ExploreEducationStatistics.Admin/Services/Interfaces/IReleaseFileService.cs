@@ -25,6 +25,8 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Services.Interfaces
 
         Task<Either<ActionResult, FileStreamResult>> Stream(Guid releaseId, Guid id);
 
+        Task<Either<ActionResult, Unit>> UpdateName(Guid releaseId, Guid fileId, string name);
+
         Task<Either<ActionResult, FileInfo>> UploadAncillary(Guid releaseId,
             IFormFile formFile,
             string name);
