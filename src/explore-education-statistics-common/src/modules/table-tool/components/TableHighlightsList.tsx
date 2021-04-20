@@ -15,7 +15,7 @@ const TableHighlightsList = ({ highlights = [], renderLink }: Props) => {
     highlights.filter(
       highlight =>
         highlight.name.toLowerCase().includes(highlightSearch) ||
-        highlight.description.toLowerCase().includes(highlightSearch),
+        highlight.description?.toLowerCase().includes(highlightSearch),
     ),
     'name',
   );
