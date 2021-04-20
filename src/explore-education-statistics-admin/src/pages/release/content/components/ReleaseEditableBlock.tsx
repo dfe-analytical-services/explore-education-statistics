@@ -71,6 +71,7 @@ const ReleaseEditableBlock = ({
           editable={editable && !isBrowser('IE')}
           id={blockId}
           label=""
+          hideLabel
           value={block.body}
           useMarkdown={block.type === 'MarkDownBlock'}
           transformImageAttributes={transformImageAttributes}

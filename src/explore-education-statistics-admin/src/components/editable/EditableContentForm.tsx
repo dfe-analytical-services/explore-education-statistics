@@ -19,6 +19,7 @@ export interface Props {
   label: string;
   content: string;
   id: string;
+  hideLabel?: boolean;
   onImageUpload?: ImageUploadHandler;
   onImageUploadCancel?: ImageUploadCancelHandler;
   onCancel: () => void;
@@ -29,6 +30,7 @@ const EditableContentForm = ({
   id,
   content,
   label,
+  hideLabel = false,
   onImageUpload,
   onImageUploadCancel,
   onCancel,
@@ -66,6 +68,7 @@ const EditableContentForm = ({
         <FormFieldEditor<FormValues>
           name="content"
           label={label}
+          hideLabel={hideLabel}
           focusOnInit
           validateElements={validateElements}
           onImageUpload={onImageUpload}
