@@ -120,7 +120,7 @@ describe('MapBlock', () => {
       expect(select).toBeVisible();
 
       expect(select.children).toHaveLength(4);
-      expect(select.children[0]).toHaveTextContent('Select location');
+      expect(select.children[0]).toHaveTextContent('None selected');
       expect(select.children[1]).toHaveTextContent('Leeds');
       expect(select.children[2]).toHaveTextContent('Manchester');
       expect(select.children[3]).toHaveTextContent('Sheffield');
@@ -282,5 +282,26 @@ describe('MapBlock', () => {
     expect(tile3.getByTestId('mapBlock-indicatorTile-value')).toHaveTextContent(
       '4.01%',
     );
+  });
+
+  test('reseting the map when select None Selected', async () => {
+    const { container } = render(<MapBlock {...testBlockProps} />);
+
+    await waitFor(() => {
+      expect(screen.getByLabelText('2. Select a location')).toBeInTheDocument();
+    });
+
+    const select = screen.getByLabelText('2. Select a location');
+
+    userEvent.selectOptions(select, select.children[1] as HTMLElement);
+
+    const paths = container.querySelectorAll<HTMLElement>(
+      '.leaflet-container svg path',
+    );
+
+    expect(paths[3]).toHaveClass('selected');
+
+    userEvent.selectOptions(select, select.children[0] as HTMLElement);
+    expect(paths[3]).not.toHaveClass('selected');
   });
 });
