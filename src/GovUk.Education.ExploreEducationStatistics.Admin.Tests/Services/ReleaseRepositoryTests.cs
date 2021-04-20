@@ -16,7 +16,6 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
         [Fact]
         public async Task ReleaseHierarchyCreated()
         {
-            var subjectFilename = "test-data.csv";
             var release = new Release
             {
                 ReleaseName = "2000",
@@ -52,8 +51,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
                     Common.Services.MapperUtils.MapperForProfile<MappingProfiles>());
 
                 await releaseRepository.CreateStatisticsDbReleaseAndSubjectHierarchy(
-                    release.Id,
-                    subjectFilename);
+                    release.Id);
             }
 
             await using (var statisticsDbContext = InMemoryStatisticsDbContext(statisticsDbContextId))
@@ -85,7 +83,6 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
         [Fact]
         public async Task ReleaseHierarchyUpdated()
         {
-            var subjectFilename = "test-data.csv";
             var release = new Release
             {
                 ReleaseName = "2000",
@@ -146,8 +143,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
                     Common.Services.MapperUtils.MapperForProfile<MappingProfiles>());
 
                 await releaseRepository.CreateStatisticsDbReleaseAndSubjectHierarchy(
-                    release.Id,
-                    subjectFilename);
+                    release.Id);
             }
 
             await using (var statisticsDbContext = InMemoryStatisticsDbContext(statisticsDbContextId))
@@ -174,7 +170,6 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
         [Fact]
         public async Task SubjectHierarchyCreated()
         {
-            var subjectFilename = "test-data.csv";
             var release = new Release
             {
                 ReleaseName = "2000",
@@ -208,15 +203,13 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
                     Common.Services.MapperUtils.MapperForProfile<MappingProfiles>());
 
                 await releaseRepository.CreateStatisticsDbReleaseAndSubjectHierarchy(
-                    release.Id,
-                    subjectFilename);
+                    release.Id);
             }
 
             await using (var statisticsDbContext = InMemoryStatisticsDbContext(statisticsDbContextId))
             {
                 var subjects = statisticsDbContext.Subject.ToList();
                 Assert.Single(subjects);
-                Assert.Equal(subjectFilename, subjects[0].Filename);
 
                 var releaseSubjects = statisticsDbContext.ReleaseSubject.ToList();
                 Assert.Single(releaseSubjects);

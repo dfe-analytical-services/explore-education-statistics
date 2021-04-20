@@ -14,8 +14,6 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Services.Interfaces
         Task<List<MyReleaseViewModel>> GetReleasesForReleaseStatusRelatedToUserAsync(Guid userId,
             params ReleaseStatus[] releaseStatuses);
 
-        Task<Guid> CreateStatisticsDbReleaseAndSubjectHierarchy(
-            Guid releaseId,
-            string subjectFilename);
+        Task<Guid> CreateStatisticsDbReleaseAndSubjectHierarchy(Guid releaseId);
     }
 }

@@ -698,20 +698,14 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Services.Tests
             {
                 MetaGuidance = "Subject 1 Meta Guidance",
                 Release = release,
-                Subject = new Subject
-                {
-                    Filename = "file1.csv"
-                }
+                Subject = new Subject()
             };
 
             var releaseSubject2 = new ReleaseSubject
             {
                 MetaGuidance = "Subject 2 Meta Guidance",
                 Release = release,
-                Subject = new Subject
-                {
-                    Filename = "file2.csv"
-                }
+                Subject = new Subject()
             };
 
             var statisticsDbContextId = Guid.NewGuid().ToString();
@@ -743,10 +737,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Services.Tests
             {
                 MetaGuidance = "Subject 1 Meta Guidance",
                 Release = release,
-                Subject = new Subject
-                {
-                    Filename = "file1.csv"
-                }
+                Subject = new Subject()
             };
 
             // Meta guidance is not populated for Subject 2
@@ -754,10 +745,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Services.Tests
             {
                 MetaGuidance = null,
                 Release = release,
-                Subject = new Subject
-                {
-                    Filename = "file2.csv"
-                }
+                Subject = new Subject()
             };
 
             var statisticsDbContextId = Guid.NewGuid().ToString();
@@ -785,10 +773,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Services.Tests
         {
             var release = new Release();
 
-            var subject = new Subject
-            {
-                Filename = "file1.csv"
-            };
+            var subject = new Subject();
 
             var releaseSubject = new ReleaseSubject
             {
@@ -851,10 +836,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Services.Tests
         {
             var release = new Release();
 
-            var subject = new Subject
-            {
-                Filename = "file1.csv"
-            };
+            var subject = new Subject();
 
             var releaseSubject1 = new ReleaseSubject
             {
@@ -889,10 +871,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Services.Tests
         {
             var release = new Release();
 
-            var subject = new Subject
-            {
-                Filename = "file1.csv"
-            };
+            var subject = new Subject();
 
             var releaseSubject = new ReleaseSubject
             {
@@ -957,10 +936,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Services.Tests
         {
             var release = new Release();
 
-            var subject = new Subject
-            {
-                Filename = "file1.csv"
-            };
+            var subject = new Subject();
 
             var releaseSubject = new ReleaseSubject
             {
