@@ -52,6 +52,15 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Controllers.Api
                 .HandleFailures();
         }
 
+        [HttpPost("release/{releaseId}/file/{fileId}/rename")]
+        public async Task<ActionResult<Unit>> Rename(Guid releaseId, Guid fileId,
+            [FromQuery(Name = "name"), Required] string name)
+        {
+            return await _releaseFileService
+                .UpdateName(releaseId: releaseId, fileId: fileId, name: name)
+                .HandleFailuresOrOk();
+        }
+
         [HttpGet("release/{releaseId}/ancillary")]
         public async Task<ActionResult<IEnumerable<FileInfo>>> GetAncillaryFiles(Guid releaseId)
         {

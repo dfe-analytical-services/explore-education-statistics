@@ -32,5 +32,10 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Services.Interfaces
             Guid releaseId,
             Guid fileId,
             string filename);
+
+        public Task UpdateName(
+            Guid releaseId,
+            Guid fileId,
+            string name);
     }
 }

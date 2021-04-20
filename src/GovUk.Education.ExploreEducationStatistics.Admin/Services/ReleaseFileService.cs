@@ -14,6 +14,7 @@ using GovUk.Education.ExploreEducationStatistics.Content.Model.Database;
 using GovUk.Education.ExploreEducationStatistics.Content.Model.Extensions;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
+using Microsoft.EntityFrameworkCore;
 using static GovUk.Education.ExploreEducationStatistics.Common.BlobContainers;
 using static GovUk.Education.ExploreEducationStatistics.Common.Model.FileType;
 using FileInfo = GovUk.Education.ExploreEducationStatistics.Common.Model.FileInfo;
@@ -149,6 +150,18 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Services
                     {
                         FileDownloadName = file.Filename
                     };
+                });
+        }
+
+        public Task<Either<ActionResult, Unit>> UpdateName(Guid releaseId, Guid fileId, string name)
+        {
+            return _persistenceHelper
+                .CheckEntityExists<Release>(releaseId)
+                .OnSuccess(_userService.CheckCanUpdateRelease)
+                .OnSuccess(async () =>
+                {
+                    await _releaseFileRepository.UpdateName(releaseId, fileId, name);
+                    return Unit.Instance;
                 });
         }
 
