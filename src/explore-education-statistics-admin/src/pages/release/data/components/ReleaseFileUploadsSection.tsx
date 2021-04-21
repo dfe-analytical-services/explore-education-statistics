@@ -278,7 +278,10 @@ const ReleaseFileUploadsSection = ({ releaseId, canUpdateRelease }: Props) => {
             }
           }}
         >
-          <p>This file will no longer be available for use in this release</p>
+          <p>
+            This file will no longer be available for use in this release (
+            {deleteFile.filename})
+          </p>
         </ModalConfirm>
       )}
     </>
