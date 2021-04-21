@@ -12,6 +12,7 @@ import {
 } from '@testing-library/react';
 import userEvent from '@testing-library/user-event';
 import React from 'react';
+import { MemoryRouter } from 'react-router';
 
 jest.mock('@admin/services/releaseAncillaryFileService');
 
@@ -41,12 +42,22 @@ describe('ReleaseFileUploadsSection', () => {
     },
   ];
 
+  function renderPage() {
+    return render(
+      <MemoryRouter>
+        <ReleaseFileUploadsSection
+          publicationId="publication-1"
+          releaseId="release-1"
+          canUpdateRelease
+        />
+      </MemoryRouter>,
+    );
+  }
+
   test('renders list of uploaded files', async () => {
     releaseAncillaryFileService.getAncillaryFiles.mockResolvedValue(testFiles);
 
-    render(
-      <ReleaseFileUploadsSection releaseId="release-1" canUpdateRelease />,
-    );
+    renderPage();
 
     await waitFor(() => {
       expect(
@@ -82,9 +93,7 @@ describe('ReleaseFileUploadsSection', () => {
   test('renders empty message when there are no files', async () => {
     releaseAncillaryFileService.getAncillaryFiles.mockResolvedValue([]);
 
-    render(
-      <ReleaseFileUploadsSection releaseId="release-1" canUpdateRelease />,
-    );
+    renderPage();
 
     await waitFor(() => {
       const sections = screen.queryAllByTestId('accordionSection');
@@ -102,9 +111,7 @@ describe('ReleaseFileUploadsSection', () => {
         testFiles,
       );
 
-      render(
-        <ReleaseFileUploadsSection releaseId="release-1" canUpdateRelease />,
-      );
+      renderPage();
 
       let sections: HTMLElement[] = [];
 
@@ -139,9 +146,7 @@ describe('ReleaseFileUploadsSection', () => {
         testFiles,
       );
 
-      render(
-        <ReleaseFileUploadsSection releaseId="release-1" canUpdateRelease />,
-      );
+      renderPage();
 
       let sections: HTMLElement[] = [];
 
@@ -191,9 +196,7 @@ describe('ReleaseFileUploadsSection', () => {
     });
 
     test('show validation message when no subject title', async () => {
-      render(
-        <ReleaseFileUploadsSection releaseId="release-1" canUpdateRelease />,
-      );
+      renderPage();
 
       userEvent.click(screen.getByLabelText('Name'));
       userEvent.tab();
@@ -208,9 +211,7 @@ describe('ReleaseFileUploadsSection', () => {
     });
 
     test('shows validation message when non-unique name', async () => {
-      render(
-        <ReleaseFileUploadsSection releaseId="release-1" canUpdateRelease />,
-      );
+      renderPage();
 
       await userEvent.type(screen.getByLabelText('Name'), 'Test file 1');
       userEvent.tab();
@@ -225,9 +226,7 @@ describe('ReleaseFileUploadsSection', () => {
     });
 
     test('shows validation message when no file selected', async () => {
-      render(
-        <ReleaseFileUploadsSection releaseId="release-1" canUpdateRelease />,
-      );
+      renderPage();
 
       userEvent.click(screen.getByLabelText('Upload file'));
       fireEvent.change(screen.getByLabelText('Upload file'), {
@@ -247,9 +246,7 @@ describe('ReleaseFileUploadsSection', () => {
     });
 
     test('shows validation message when file is empty', async () => {
-      render(
-        <ReleaseFileUploadsSection releaseId="release-1" canUpdateRelease />,
-      );
+      renderPage();
 
       const file = new File([''], 'test.txt', {
         type: 'text/plain',
@@ -268,9 +265,7 @@ describe('ReleaseFileUploadsSection', () => {
     });
 
     test('cannot submit with invalid values', async () => {
-      render(
-        <ReleaseFileUploadsSection releaseId="release-1" canUpdateRelease />,
-      );
+      renderPage();
 
       userEvent.click(
         screen.getByRole('button', {
@@ -308,9 +303,7 @@ describe('ReleaseFileUploadsSection', () => {
         },
       });
 
-      render(
-        <ReleaseFileUploadsSection releaseId="release-1" canUpdateRelease />,
-      );
+      renderPage();
 
       const file = new File(['test'], 'test-file.txt');
 
@@ -344,9 +337,7 @@ describe('ReleaseFileUploadsSection', () => {
         },
       });
 
-      render(
-        <ReleaseFileUploadsSection releaseId="release-1" canUpdateRelease />,
-      );
+      renderPage();
 
       const file = new File(['test'], 'test-file.docx');
 

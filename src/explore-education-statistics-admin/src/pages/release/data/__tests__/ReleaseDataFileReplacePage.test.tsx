@@ -94,11 +94,14 @@ describe('ReleaseDataFileReplacePage', () => {
     render(
       <MemoryRouter
         initialEntries={[
-          generatePath<ReleaseDataFileReplaceRouteParams>(releaseDataFileReplaceRoute.path, {
-            releaseId: 'release-1',
-            publicationId: 'publication-1',
-            fileId: 'file-1',
-          }),
+          generatePath<ReleaseDataFileReplaceRouteParams>(
+            releaseDataFileReplaceRoute.path,
+            {
+              releaseId: 'release-1',
+              publicationId: 'publication-1',
+              fileId: 'file-1',
+            },
+          ),
         ]}
       >
         <Route
@@ -143,11 +146,14 @@ describe('ReleaseDataFileReplacePage', () => {
     render(
       <MemoryRouter
         initialEntries={[
-          generatePath<ReleaseDataFileReplaceRouteParams>(releaseDataFileReplaceRoute.path, {
-            releaseId: 'release-1',
-            publicationId: 'publication-1',
-            fileId: 'file-1',
-          }),
+          generatePath<ReleaseDataFileReplaceRouteParams>(
+            releaseDataFileReplaceRoute.path,
+            {
+              releaseId: 'release-1',
+              publicationId: 'publication-1',
+              fileId: 'file-1',
+            },
+          ),
         ]}
       >
         <Route
@@ -191,11 +197,14 @@ describe('ReleaseDataFileReplacePage', () => {
     render(
       <MemoryRouter
         initialEntries={[
-          generatePath<ReleaseDataFileReplaceRouteParams>(releaseDataFileReplaceRoute.path, {
-            releaseId: 'release-1',
-            publicationId: 'publication-1',
-            fileId: 'file-1',
-          }),
+          generatePath<ReleaseDataFileReplaceRouteParams>(
+            releaseDataFileReplaceRoute.path,
+            {
+              releaseId: 'release-1',
+              publicationId: 'publication-1',
+              fileId: 'file-1',
+            },
+          ),
         ]}
       >
         <Route
@@ -272,11 +281,14 @@ describe('ReleaseDataFileReplacePage', () => {
     render(
       <MemoryRouter
         initialEntries={[
-          generatePath<ReleaseDataFileReplaceRouteParams>(releaseDataFileReplaceRoute.path, {
-            releaseId: 'release-1',
-            publicationId: 'publication-1',
-            fileId: 'file-1',
-          }),
+          generatePath<ReleaseDataFileReplaceRouteParams>(
+            releaseDataFileReplaceRoute.path,
+            {
+              releaseId: 'release-1',
+              publicationId: 'publication-1',
+              fileId: 'file-1',
+            },
+          ),
         ]}
       >
         <Route
@@ -345,11 +357,14 @@ describe('ReleaseDataFileReplacePage', () => {
     render(
       <MemoryRouter
         initialEntries={[
-          generatePath<ReleaseDataFileReplaceRouteParams>(releaseDataFileReplaceRoute.path, {
-            releaseId: 'release-1',
-            publicationId: 'publication-1',
-            fileId: 'file-1',
-          }),
+          generatePath<ReleaseDataFileReplaceRouteParams>(
+            releaseDataFileReplaceRoute.path,
+            {
+              releaseId: 'release-1',
+              publicationId: 'publication-1',
+              fileId: 'file-1',
+            },
+          ),
         ]}
       >
         <Route
@@ -399,11 +414,14 @@ describe('ReleaseDataFileReplacePage', () => {
     render(
       <MemoryRouter
         initialEntries={[
-          generatePath<ReleaseDataFileReplaceRouteParams>(releaseDataFileReplaceRoute.path, {
-            releaseId: 'release-1',
-            publicationId: 'publication-1',
-            fileId: 'file-1',
-          }),
+          generatePath<ReleaseDataFileReplaceRouteParams>(
+            releaseDataFileReplaceRoute.path,
+            {
+              releaseId: 'release-1',
+              publicationId: 'publication-1',
+              fileId: 'file-1',
+            },
+          ),
         ]}
       >
         <Route
@@ -448,11 +466,14 @@ describe('ReleaseDataFileReplacePage', () => {
     render(
       <MemoryRouter
         initialEntries={[
-          generatePath<ReleaseDataFileReplaceRouteParams>(releaseDataFileReplaceRoute.path, {
-            releaseId: 'release-1',
-            publicationId: 'publication-1',
-            fileId: 'file-1',
-          }),
+          generatePath<ReleaseDataFileReplaceRouteParams>(
+            releaseDataFileReplaceRoute.path,
+            {
+              releaseId: 'release-1',
+              publicationId: 'publication-1',
+              fileId: 'file-1',
+            },
+          ),
         ]}
       >
         <Route
@@ -493,11 +514,14 @@ describe('ReleaseDataFileReplacePage', () => {
     render(
       <MemoryRouter
         initialEntries={[
-          generatePath<ReleaseDataFileReplaceRouteParams>(releaseDataFileReplaceRoute.path, {
-            releaseId: 'release-1',
-            publicationId: 'publication-1',
-            fileId: 'file-1',
-          }),
+          generatePath<ReleaseDataFileReplaceRouteParams>(
+            releaseDataFileReplaceRoute.path,
+            {
+              releaseId: 'release-1',
+              publicationId: 'publication-1',
+              fileId: 'file-1',
+            },
+          ),
         ]}
       >
         <Route
@@ -563,11 +587,14 @@ describe('ReleaseDataFileReplacePage', () => {
     render(
       <MemoryRouter
         initialEntries={[
-          generatePath<ReleaseDataFileReplaceRouteParams>(releaseDataFileReplaceRoute.path, {
-            releaseId: 'release-1',
-            publicationId: 'publication-1',
-            fileId: 'file-1',
-          }),
+          generatePath<ReleaseDataFileReplaceRouteParams>(
+            releaseDataFileReplaceRoute.path,
+            {
+              releaseId: 'release-1',
+              publicationId: 'publication-1',
+              fileId: 'file-1',
+            },
+          ),
         ]}
       >
         <Route
@@ -649,11 +676,14 @@ describe('ReleaseDataFileReplacePage', () => {
     render(
       <MemoryRouter
         initialEntries={[
-          generatePath<ReleaseDataFileReplaceRouteParams>(releaseDataFileReplaceRoute.path, {
-            releaseId: 'release-1',
-            publicationId: 'publication-1',
-            fileId: 'file-1',
-          }),
+          generatePath<ReleaseDataFileReplaceRouteParams>(
+            releaseDataFileReplaceRoute.path,
+            {
+              releaseId: 'release-1',
+              publicationId: 'publication-1',
+              fileId: 'file-1',
+            },
+          ),
         ]}
       >
         <Route
