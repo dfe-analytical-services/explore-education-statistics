@@ -132,6 +132,28 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Services
                 });
         }
 
+        public async Task<Either<ActionResult, FileInfo>> GetFile(Guid releaseId, Guid fileId)
+        {
+            return await _persistenceHelper
+                .CheckEntityExists<ReleaseFile>(
+                    q => q.Include(rf => rf.File)
+                        .Where(rf =>
+                            rf.ReleaseId == releaseId
+                            && rf.FileId == fileId))
+                .OnSuccess(async releaseFile =>
+                {
+                    var blobExists = await _blobStorageService.CheckBlobExists(
+                        PrivateReleaseFiles,
+                        releaseFile.Path());
+                    if (!blobExists)
+                    {
+                        return releaseFile.File.ToFileInfoNotFound();
+                    }
+                    var blob = await _blobStorageService.GetBlob(PrivateReleaseFiles, releaseFile.Path());
+                    return releaseFile.ToFileInfo(blob);
+                });
+        }
+
         public async Task<Either<ActionResult, FileStreamResult>> Stream(Guid releaseId, Guid id)
         {
             return await _persistenceHelper

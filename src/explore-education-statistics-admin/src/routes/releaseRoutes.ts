@@ -1,5 +1,6 @@
 import ReleaseContentPage from '@admin/pages/release/content/ReleaseContentPage';
 import ReleaseDataFilePage from '@admin/pages/release/data/ReleaseDataFilePage';
+import ReleaseAncillaryFilePage from '@admin/pages/release/data/ReleaseAncillaryFilePage';
 import ReleaseDataFileReplacePage from '@admin/pages/release/data/ReleaseDataFileReplacePage';
 import ReleaseDataFileReplacementCompletePage from '@admin/pages/release/data/ReleaseDataFileReplacementCompletePage';
 import ReleaseDataPage from '@admin/pages/release/data/ReleaseDataPage';
@@ -26,6 +27,10 @@ export type ReleaseDataBlockRouteParams = ReleaseRouteParams & {
 };
 
 export type ReleaseDataFileRouteParams = ReleaseRouteParams & {
+  fileId: string;
+};
+
+export type ReleaseAncillaryFileRouteParams = ReleaseRouteParams & {
   fileId: string;
 };
 
@@ -58,6 +63,18 @@ export const releaseDataRoute: ReleaseRouteProps = {
   path: '/publication/:publicationId/release/:releaseId/data',
   title: 'Data and files',
   component: ReleaseDataPage,
+};
+
+export const releaseDataAncillaryRoute: ReleaseRouteProps = {
+  path: '/publication/:publicationId/release/:releaseId/data#file-uploads',
+  title: 'Data and files',
+  component: ReleaseDataPage,
+};
+
+export const releaseAncillaryFileRoute: ReleaseRouteProps = {
+  path: '/publication/:publicationId/release/:releaseId/ancillary/:fileId',
+  title: 'Ancillary file',
+  component: ReleaseAncillaryFilePage,
 };
 
 export const releaseDataFileRoute: ReleaseRouteProps = {

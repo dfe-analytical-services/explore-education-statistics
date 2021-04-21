@@ -22,6 +22,12 @@ import { mapFieldErrors } from '@common/validation/serverValidations';
 import Yup from '@common/validation/yup';
 import { Formik } from 'formik';
 import React, { useState } from 'react';
+import Link from '@admin/components/Link';
+import { generatePath } from 'react-router';
+import {
+  releaseAncillaryFileRoute,
+  ReleaseDataFileRouteParams,
+} from '@admin/routes/releaseRoutes';
 
 interface FormValues {
   name: string;
@@ -49,13 +55,18 @@ const errorMappings = [
 ];
 
 interface Props {
+  publicationId: string;
   releaseId: string;
   canUpdateRelease: boolean;
 }
 
 const formId = 'fileUploadForm';
 
-const ReleaseFileUploadsSection = ({ releaseId, canUpdateRelease }: Props) => {
+const ReleaseFileUploadsSection = ({
+  publicationId,
+  releaseId,
+  canUpdateRelease,
+}: Props) => {
   const [deleteFile, setDeleteFile] = useState<AncillaryFile>();
   const [isUploading, setIsUploading] = useState(false);
 
@@ -237,9 +248,24 @@ const ReleaseFileUploadsSection = ({ releaseId, canUpdateRelease }: Props) => {
                       <SummaryListItem
                         term="Actions"
                         actions={
-                          <ButtonText onClick={() => setDeleteFile(file)}>
-                            Delete file
-                          </ButtonText>
+                          <>
+                            <Link
+                              className="govuk-!-margin-right-4"
+                              to={generatePath<ReleaseDataFileRouteParams>(
+                                releaseAncillaryFileRoute.path,
+                                {
+                                  publicationId,
+                                  releaseId,
+                                  fileId: file.id,
+                                },
+                              )}
+                            >
+                              Edit title
+                            </Link>
+                            <ButtonText onClick={() => setDeleteFile(file)}>
+                              Delete file
+                            </ButtonText>
+                          </>
                         }
                       />
                     )}

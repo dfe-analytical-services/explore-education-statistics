@@ -6,7 +6,8 @@ import DataFileUploadForm, {
 import { terminalImportStatuses } from '@admin/pages/release/data/components/ImporterStatus';
 import {
   releaseDataFileReplaceRoute,
-  ReleaseDataFileReplaceRouteParams, releaseDataFileRoute,
+  ReleaseDataFileReplaceRouteParams,
+  releaseDataFileRoute,
   ReleaseDataFileRouteParams,
 } from '@admin/routes/releaseRoutes';
 import permissionService from '@admin/services/permissionService';
