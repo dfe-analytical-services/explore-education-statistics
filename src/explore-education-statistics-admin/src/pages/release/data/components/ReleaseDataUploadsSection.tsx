@@ -6,7 +6,8 @@ import DataFileUploadForm, {
 import { terminalImportStatuses } from '@admin/pages/release/data/components/ImporterStatus';
 import {
   releaseDataFileReplaceRoute,
-  ReleaseDataFileReplaceRouteParams,
+  ReleaseDataFileReplaceRouteParams, releaseDataFileRoute,
+  ReleaseDataFileRouteParams,
 } from '@admin/routes/releaseRoutes';
 import permissionService from '@admin/services/permissionService';
 import releaseDataFileService, {
@@ -262,19 +263,33 @@ const ReleaseDataUploadsSection = ({
                       terminalImportStatuses.includes(dataFile.status) && (
                         <>
                           {dataFile.status === 'COMPLETE' && (
-                            <Link
-                              className="govuk-!-margin-right-4"
-                              to={generatePath<ReleaseDataFileReplaceRouteParams>(
-                                releaseDataFileReplaceRoute.path,
-                                {
+                            <>
+                              <Link
+                                className="govuk-!-margin-right-4"
+                                to={generatePath<ReleaseDataFileRouteParams>(
+                                  releaseDataFileRoute.path,
+                                  {
+                                    publicationId,
+                                    releaseId,
+                                    fileId: dataFile.id,
+                                  },
+                                )}
+                              >
+                                Edit title
+                              </Link>
+                              <Link
+                                className="govuk-!-margin-right-4"
+                                to={generatePath<
+                                  ReleaseDataFileReplaceRouteParams
+                                >(releaseDataFileReplaceRoute.path, {
                                   publicationId,
                                   releaseId,
                                   fileId: dataFile.id,
-                                },
-                              )}
-                            >
-                              Replace data
-                            </Link>
+                                })}
+                              >
+                                Replace data
+                              </Link>
+                            </>
                           )}
 
                           <ButtonText
