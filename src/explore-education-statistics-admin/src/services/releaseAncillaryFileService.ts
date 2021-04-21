@@ -45,6 +45,11 @@ const releaseAncillaryFileService = {
       .get<AncillaryFileInfo[]>(`/release/${releaseId}/ancillary`)
       .then(response => response.map(mapFile));
   },
+  getAncillaryFile(releaseId: string, fileId: string): Promise<AncillaryFile> {
+    return client
+      .get<AncillaryFileInfo>(`/release/${releaseId}/ancillary/${fileId}`)
+      .then(mapFile);
+  },
   async uploadAncillaryFile(
     releaseId: string,
     request: UploadAncillaryFileRequest,
@@ -73,6 +78,17 @@ const releaseAncillaryFileService = {
         responseType: 'blob',
       })
       .then(response => downloadFile(response, fileName));
+  },
+  renameFile(releaseId: string, fileId: string, name: string): Promise<void> {
+    return client.post(
+      `/release/${releaseId}/file/${fileId}/rename`,
+      {},
+      {
+        params: {
+          name,
+        },
+      },
+    );
   },
 };
 

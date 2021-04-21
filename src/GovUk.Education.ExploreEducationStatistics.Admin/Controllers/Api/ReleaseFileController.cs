@@ -69,6 +69,14 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Controllers.Api
                 .HandleFailuresOrOk();
         }
 
+        [HttpGet("release/{releaseId}/ancillary/{fileId}")]
+        public async Task<ActionResult<FileInfo>> GetFile(Guid releaseId, Guid fileId)
+        {
+            return await _releaseFileService
+                .GetFile(releaseId, fileId)
+                .HandleFailuresOrOk();
+        }
+
         [HttpPut("release/{releaseId}/chart/{id}")]
         [RequestSizeLimit(int.MaxValue)]
         [RequestFormLimits(ValueLengthLimit = int.MaxValue, MultipartBodyLengthLimit = int.MaxValue)]

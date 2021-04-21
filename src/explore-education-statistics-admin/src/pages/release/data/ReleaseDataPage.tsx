@@ -47,6 +47,7 @@ const ReleaseDataPage = () => {
           title="Ancillary file uploads"
         >
           <ReleaseFileUploadsSection
+            publicationId={release.publicationId}
             releaseId={releaseId}
             canUpdateRelease={canUpdateRelease}
           />
