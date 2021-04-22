@@ -351,7 +351,7 @@ describe('PreReleaseTableToolPage', () => {
 
       expect(
         screen.getByRole('button', {
-          name: 'Download the underlying data of this table (CSV)',
+          name: 'Download the data of this table (CSV)',
         }),
       ).toBeInTheDocument();
       expect(
