@@ -1498,6 +1498,39 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
         }
 
         [Fact]
+        public async Task UpdateName()
+        {
+            var releaseFile = new ReleaseFile
+            {
+                Release = new Release(),
+                Name = "Test PDF File",
+                File = new File()
+            };
+
+            var contentDbContextId = Guid.NewGuid().ToString();
+            await using (var contentDbContext = InMemoryApplicationDbContext(contentDbContextId))
+            {
+                await contentDbContext.AddAsync(releaseFile);
+                await contentDbContext.SaveChangesAsync();
+            }
+
+            await using (var contentDbContext = InMemoryApplicationDbContext(contentDbContextId))
+            {
+                var service = SetupReleaseFileService(contentDbContext: contentDbContext);
+
+                var result = await service.UpdateName(releaseFile.ReleaseId, releaseFile.FileId, "New file title");
+
+                Assert.True(result.IsRight);
+                Assert.IsType<Unit>(result.Right);
+
+                var updatedReleaseFile = await contentDbContext.ReleaseFiles.FirstAsync(rf =>
+                    rf.ReleaseId == releaseFile.ReleaseId
+                    && rf.FileId == releaseFile.FileId);
+                Assert.Equal("New file title", updatedReleaseFile.Name);
+            }
+        }
+
+        [Fact]
         public async Task UploadAncillary()
         {
             const string filename = "ancillary.pdf";
