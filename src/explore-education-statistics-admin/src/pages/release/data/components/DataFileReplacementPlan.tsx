@@ -59,7 +59,7 @@ const DataFileReplacementPlan = ({
     value: plan,
     isLoading,
     error,
-    setState: setPlan,
+    retry: reloadPlan,
   } = useAsyncRetry(
     () =>
       dataReplacementService.getReplacementPlan(
@@ -224,18 +224,20 @@ const DataFileReplacementPlan = ({
                   </SummaryList>
 
                   <ButtonGroup>
-                    <ButtonLink
-                      to={generatePath<ReleaseDataBlockRouteParams>(
-                        releaseDataBlockEditRoute.path,
-                        {
-                          publicationId,
-                          releaseId,
-                          dataBlockId: dataBlock.id,
-                        },
-                      )}
-                    >
-                      Edit data block
-                    </ButtonLink>
+                    {dataBlock.fixable && (
+                      <ButtonLink
+                        to={generatePath<ReleaseDataBlockRouteParams>(
+                          releaseDataBlockEditRoute.path,
+                          {
+                            publicationId,
+                            releaseId,
+                            dataBlockId: dataBlock.id,
+                          },
+                        )}
+                      >
+                        Edit data block
+                      </ButtonLink>
+                    )}
                     <Button
                       variant="warning"
                       onClick={() => {
@@ -412,16 +414,8 @@ const DataFileReplacementPlan = ({
                   releaseId,
                   deleteDataBlock.id,
                 );
-
                 setDeleteDataBlock(undefined);
-                setPlan({
-                  value: {
-                    ...plan,
-                    dataBlocks: plan?.dataBlocks.filter(
-                      block => block.id !== deleteDataBlock.id,
-                    ),
-                  },
-                });
+                reloadPlan();
               }}
             >
               <p>
@@ -440,16 +434,8 @@ const DataFileReplacementPlan = ({
                   releaseId,
                   deleteFootnote.id,
                 );
-
                 setDeleteFootnote(undefined);
-                setPlan({
-                  value: {
-                    ...plan,
-                    footnotes: plan?.footnotes.filter(
-                      block => block.id !== deleteFootnote.id,
-                    ),
-                  },
-                });
+                reloadPlan();
               }}
             >
               <p>Are you sure you want to delete the following footnote?</p>

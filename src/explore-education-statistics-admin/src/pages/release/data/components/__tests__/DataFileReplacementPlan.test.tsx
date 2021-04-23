@@ -196,6 +196,7 @@ describe('DataReplacementPlan', () => {
           valid: false,
         },
         valid: false,
+        fixable: true,
       },
       {
         id: 'block-2',
@@ -204,6 +205,7 @@ describe('DataReplacementPlan', () => {
         indicatorGroups: {},
         locations: {},
         valid: true,
+        fixable: false,
       },
     ],
     footnotes: [
@@ -331,6 +333,7 @@ describe('DataReplacementPlan', () => {
         locations: {},
         filters: {},
         valid: true,
+        fixable: false,
       },
       {
         id: 'block-2',
@@ -339,6 +342,7 @@ describe('DataReplacementPlan', () => {
         locations: {},
         filters: {},
         valid: true,
+        fixable: false,
       },
     ],
     footnotes: [
@@ -754,6 +758,42 @@ describe('DataReplacementPlan', () => {
     );
   });
 
+  test("does not render 'Edit data block' link if data block is not fixable", async () => {
+    dataReplacementService.getReplacementPlan.mockResolvedValue({
+      ...testReplacementPlan,
+      dataBlocks: [
+        {
+          ...testReplacementPlan.dataBlocks[0],
+          fixable: false,
+        },
+        testReplacementPlan.dataBlocks[1],
+      ],
+      footnotes: [],
+    });
+
+    render(
+      <MemoryRouter>
+        <DataFileReplacementPlan
+          publicationId="publication-1"
+          releaseId="release-1"
+          fileId="file-1"
+          replacementFileId="file-2"
+        />
+      </MemoryRouter>,
+    );
+
+    await waitFor(() => {
+      expect(
+        screen.getByRole('button', { name: /Data block 1/ }),
+      ).toBeInTheDocument();
+    });
+
+    userEvent.click(screen.getByRole('button', { name: /Data block 1/ }));
+    expect(
+      screen.queryByRole('link', { name: 'Edit data block' }),
+    ).not.toBeInTheDocument();
+  });
+
   test("clicking 'Delete data block' button renders confirmation modal", async () => {
     dataReplacementService.getReplacementPlan.mockResolvedValue({
       ...testReplacementPlan,
@@ -792,7 +832,7 @@ describe('DataReplacementPlan', () => {
     });
   });
 
-  test('deleting data block hides modal and removes data block from list', async () => {
+  test('deleting data block hides modal and reloads replacement plan', async () => {
     dataBlockService.deleteDataBlock.mockResolvedValue(undefined);
     dataReplacementService.getReplacementPlan.mockResolvedValue({
       ...testReplacementPlan,
@@ -826,9 +866,16 @@ describe('DataReplacementPlan', () => {
 
     expect(dataBlockService.deleteDataBlock).not.toHaveBeenCalled();
 
+    dataReplacementService.getReplacementPlan.mockResolvedValue({
+      ...testReplacementPlan,
+      dataBlocks: [testReplacementPlan.dataBlocks[1]],
+      footnotes: [],
+    });
+
     userEvent.click(screen.getByRole('button', { name: 'Confirm' }));
 
     expect(dataBlockService.deleteDataBlock).toHaveBeenCalledTimes(1);
+    expect(dataReplacementService.getReplacementPlan).toHaveBeenCalledTimes(1);
 
     await waitFor(() => {
       expect(screen.queryByRole('dialog')).not.toBeInTheDocument();
@@ -920,7 +967,7 @@ describe('DataReplacementPlan', () => {
     });
   });
 
-  test('deleting footnote hides modal and removes footnote from list', async () => {
+  test('deleting footnote hides modal and reloads replacement plan', async () => {
     footnoteService.deleteFootnote.mockResolvedValue(undefined);
     dataReplacementService.getReplacementPlan.mockResolvedValue({
       ...testReplacementPlan,
@@ -953,9 +1000,16 @@ describe('DataReplacementPlan', () => {
 
     expect(footnoteService.deleteFootnote).not.toHaveBeenCalled();
 
+    dataReplacementService.getReplacementPlan.mockResolvedValue({
+      ...testReplacementPlan,
+      dataBlocks: [],
+      footnotes: [testReplacementPlan.footnotes[1]],
+    });
+
     userEvent.click(screen.getByRole('button', { name: 'Confirm' }));
 
     expect(footnoteService.deleteFootnote).toHaveBeenCalledTimes(1);
+    expect(dataReplacementService.getReplacementPlan).toHaveBeenCalledTimes(1);
 
     await waitFor(() => {
       expect(screen.queryByRole('dialog')).not.toBeInTheDocument();

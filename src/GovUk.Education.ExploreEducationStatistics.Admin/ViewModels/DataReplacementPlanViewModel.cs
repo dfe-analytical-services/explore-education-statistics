@@ -6,6 +6,7 @@ using GovUk.Education.ExploreEducationStatistics.Common.Converters;
 using GovUk.Education.ExploreEducationStatistics.Common.Extensions;
 using GovUk.Education.ExploreEducationStatistics.Common.Model;
 using GovUk.Education.ExploreEducationStatistics.Common.Services;
+using IdentityServer4.Extensions;
 using Newtonsoft.Json;
 
 namespace GovUk.Education.ExploreEducationStatistics.Admin.ViewModels
@@ -52,30 +53,37 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.ViewModels
         public Guid Id { get; }
         public string Name { get; }
         public Dictionary<Guid, FilterReplacementViewModel> Filters { get; }
+        private List<FilterReplacementViewModel> NewlyIntroducedFilters { get; }
         public Dictionary<Guid, IndicatorGroupReplacementViewModel> IndicatorGroups { get; }
         public Dictionary<string, LocationReplacementViewModel> Locations { get; }
         public TimePeriodRangeReplacementViewModel? TimePeriods { get; }
 
-        public DataBlockReplacementPlanViewModel(
-            Guid id,
+        public DataBlockReplacementPlanViewModel(Guid id,
             string name,
-            Dictionary<Guid, FilterReplacementViewModel>? filters = null,
+            Dictionary<Guid, FilterReplacementViewModel>? originalFilters = null,
+            List<FilterReplacementViewModel>? newlyIntroducedFilters = null,
             Dictionary<Guid, IndicatorGroupReplacementViewModel>? indicators = null,
             Dictionary<string, LocationReplacementViewModel>? locations = null,
             TimePeriodRangeReplacementViewModel? timePeriods = null)
         {
             Id = id;
             Name = name;
-            Filters = filters ?? new Dictionary<Guid, FilterReplacementViewModel>();
+            Filters = originalFilters ?? new Dictionary<Guid, FilterReplacementViewModel>();
+            NewlyIntroducedFilters = newlyIntroducedFilters ?? new List<FilterReplacementViewModel>();
             IndicatorGroups = indicators ?? new Dictionary<Guid, IndicatorGroupReplacementViewModel>();
             Locations = locations ?? new Dictionary<string, LocationReplacementViewModel>();
             TimePeriods = timePeriods;
         }
 
-        public bool Valid => Filters.All(model => model.Value.Valid)
+        public bool Valid => NewlyIntroducedFilters.IsNullOrEmpty() 
+                             && Filters.All(model => model.Value.Valid)
                              && IndicatorGroups.All(model => model.Value.Valid)
                              && Locations.Values.All(model => model.Valid)
                              && (TimePeriods?.Valid ?? true);
+
+        // As of fixing EES-2087, we will prevent users from attempting to fix Data Blocks which are invalid due to
+        // new Filters being introduced in a replacement Subject.  When taking on EES-2096, we can remove this flag.
+        public bool Fixable => !Valid && NewlyIntroducedFilters.IsNullOrEmpty() && Filters.All(model => model.Value.Fixable);
 
         public DataBlockReplacementPlanViewModel ToSummary()
         {
@@ -178,7 +186,12 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.ViewModels
         public Dictionary<Guid, FilterGroupReplacementViewModel> Groups { get; }
 
         public bool Valid => Groups.All(group => group.Value.Valid);
-        
+
+        // Temporary flag to indicate that a user can potentially edit a data block to be valid during replacement
+        // so long as each Filter Group has at least one remaining candidate Filter Item to choose from in the
+        // replacement file's metadata - can be removed during work on EES-2096.
+        public bool Fixable => Groups.All(group => group.Value.Fixable);
+
         public FilterReplacementViewModel(
             Guid id,
             string label,
@@ -199,6 +212,11 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.ViewModels
         public IEnumerable<FilterItemReplacementViewModel> Filters { get; }
 
         public bool Valid => Filters.All(filter => filter.Valid);
+
+        // Temporary flag to indicate that a user can potentially edit a data block to be valid during replacement
+        // so long as each Filter Group has at least one remaining candidate Filter Item to choose from in the
+        // replacement file's metadata - can be removed during work on EES-2096.
+        public bool Fixable => !Valid && Filters.Any(filter => filter.Valid);
 
         public FilterGroupReplacementViewModel(
             Guid id,
