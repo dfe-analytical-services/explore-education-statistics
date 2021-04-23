@@ -24,7 +24,7 @@ Navigate to Absence publication
 
 Validate title
     [Tags]  HappyPath
-    user waits until h1 is visible  Pupil absence in schools in England
+    user waits until h1 is visible  Pupil absence in schools in England  90
     user waits until page contains title caption  Academic Year 2016/17
 
 Validate URL
@@ -110,16 +110,15 @@ Validate headlines -- Summary tab content
 
 Validate Key Statistics data block -- Charts tab
     [Tags]  HappyPath
+    user scrolls to element  css:#releaseHeadlines-chart 
     user clicks element   id:releaseHeadlines-charts-tab
     ${headline_chart}=  set variable  css:#releaseHeadlines-chart   # must be css selector
     user waits until element contains line chart  ${headline_chart}
-    user checks chart legend item contains  ${headline_chart}  1  Authorised absence rate (England)
+    user checks chart legend item contains  ${headline_chart}  1  Unauthorised absence rate (England)
     user checks chart legend item contains  ${headline_chart}  2  Overall absence rate (England)
-    user checks chart legend item contains  ${headline_chart}  3  Unauthorised absence rate (England)
-
+    user checks chart legend item contains  ${headline_chart}  3  Authorised absence rate (England)
     user checks chart x axis ticks  ${headline_chart}  2012/13  2013/14  2014/15  2015/16  2016/17
     user checks chart y axis ticks  ${headline_chart}  0  2  4  6
-
     user mouses over line chart point  ${headline_chart}  1  1
     user checks chart tooltip label contains  ${headline_chart}  2012/13
     user checks chart tooltip item contains  ${headline_chart}  1  Overall absence rate (England): 5.3%
