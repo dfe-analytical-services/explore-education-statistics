@@ -20,6 +20,7 @@ interface EditableContentBlockProps {
   editable?: boolean;
   id: string;
   label: string;
+  hideLabel?: boolean;
   value: string;
   onImageUpload?: ImageUploadHandler;
   onImageUploadCancel?: ImageUploadCancelHandler;
@@ -35,6 +36,7 @@ const EditableContentBlock = ({
   editable = true,
   id,
   label,
+  hideLabel = false,
   value,
   onImageUpload,
   onImageUploadCancel,
@@ -84,6 +86,7 @@ const EditableContentBlock = ({
       <EditableContentForm
         id={id}
         label={label}
+        hideLabel={hideLabel}
         content={content ? sanitizeHtml(content, sanitizeOptions) : ''} // NOTE: Sanitize to transform img src attribs
         onImageUpload={onImageUpload}
         onImageUploadCancel={onImageUploadCancel}
