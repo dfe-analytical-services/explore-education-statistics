@@ -44,7 +44,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Controllers.Api
                 .HandleFailuresOrNoContent();
         }
 
-        [HttpGet("release/{releaseId}/file/{id}")]
+        [HttpGet("release/{releaseId}/file/{id}/download")]
         public async Task<ActionResult> Stream(Guid releaseId, Guid id)
         {
             return await _releaseFileService

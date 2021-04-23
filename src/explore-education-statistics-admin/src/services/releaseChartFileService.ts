@@ -50,7 +50,7 @@ const releaseChartFileService = {
   },
 
   getChartFile(releaseId: string, id: string): Promise<Blob> {
-    return client.get<Blob>(`/release/${releaseId}/file/${id}`, {
+    return client.get<Blob>(`/release/${releaseId}/file/${id}/download`, {
       responseType: 'blob',
     });
   },

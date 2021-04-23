@@ -173,7 +173,7 @@ const releaseDataFileService = {
   },
   downloadFile(releaseId: string, id: string, fileName: string): Promise<void> {
     return client
-      .get<Blob>(`/release/${releaseId}/file/${id}`, {
+      .get<Blob>(`/release/${releaseId}/file/${id}/download`, {
         responseType: 'blob',
       })
       .then(response => downloadFile(response, fileName));
