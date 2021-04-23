@@ -136,6 +136,7 @@ const KeyStatistics = ({ release, isEditing }: KeyStatisticsProps) => {
                           [keyStatStyles.column]: !isReordering,
                           [styles.isDragging]: snapshot.isDragging,
                         })}
+                        data-testid="keyStat"
                       >
                         {isReordering && (
                           <span

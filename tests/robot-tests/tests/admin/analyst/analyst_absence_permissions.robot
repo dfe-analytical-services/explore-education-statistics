@@ -50,20 +50,21 @@ Validate Analyst1 can see Absence release summary
     user checks summary list contains  Release type  Official Statistics
 
 Validate Analyst1 can see Absence release summary Lead statistician
-    [Tags]  HappyPath
+    [Tags]  HappyPath|
     user checks summary list contains  Lead statistician  Data Analyst
 
 Validate Analyst1 can see 'Content' page
     [Tags]  HappyPath
     user clicks link  Content
-    user waits until h2 is visible   Pupil absence in schools in England
+    user waits until h2 is visible   Pupil absence in schools in England  120
+    user waits for page to finish loading
 
 Validate Analyst1 can see 'Content' page key stats
     [Tags]  HappyPath
-    user waits until page contains element  id:releaseHeadlines
+    user waits until page contains element  id:releaseHeadlines  360
+    user waits until page does not contain loading spinner
     user scrolls to element  id:releaseHeadlines
-
-    user checks key stat contents    1  Overall absence rate         4.7%   Up from 4.6% in 2015/16   90
+    user checks key stat contents    1  Overall absence rate         4.7%   Up from 4.6% in 2015/16  90
     user checks key stat definition  1  What is overall absence?  Total number of all authorised and unauthorised absences from possible school sessions for all pupils.
 
     user checks key stat contents    2  Authorised absence rate      3.4%   Similar to previous years
