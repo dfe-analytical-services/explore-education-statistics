@@ -44,6 +44,14 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Controllers.Api
                 .HandleFailuresOrNoContent();
         }
 
+        [HttpGet("release/{releaseId}/file/{fileId}")]
+        public async Task<ActionResult<FileInfo>> GetFile(Guid releaseId, Guid fileId)
+        {
+            return await _releaseFileService
+                .GetFile(releaseId, fileId)
+                .HandleFailuresOrOk();
+        }
+
         [HttpGet("release/{releaseId}/file/{id}/download")]
         public async Task<ActionResult> Stream(Guid releaseId, Guid id)
         {
@@ -66,14 +74,6 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Controllers.Api
         {
             return await _releaseFileService
                 .ListAll(releaseId, Ancillary)
-                .HandleFailuresOrOk();
-        }
-
-        [HttpGet("release/{releaseId}/ancillary/{fileId}")]
-        public async Task<ActionResult<FileInfo>> GetFile(Guid releaseId, Guid fileId)
-        {
-            return await _releaseFileService
-                .GetFile(releaseId, fileId)
                 .HandleFailuresOrOk();
         }
 

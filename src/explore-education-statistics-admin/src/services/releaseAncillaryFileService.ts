@@ -47,7 +47,7 @@ const releaseAncillaryFileService = {
   },
   getAncillaryFile(releaseId: string, fileId: string): Promise<AncillaryFile> {
     return client
-      .get<AncillaryFileInfo>(`/release/${releaseId}/ancillary/${fileId}`)
+      .get<AncillaryFileInfo>(`/release/${releaseId}/file/${fileId}`)
       .then(mapFile);
   },
   async uploadAncillaryFile(
