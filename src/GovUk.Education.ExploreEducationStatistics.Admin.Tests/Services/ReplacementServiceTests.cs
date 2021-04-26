@@ -767,6 +767,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
                 Assert.False(dataBlockPlan.TimePeriods.End.Valid);
 
                 Assert.False(dataBlockPlan.Valid);
+                Assert.False(dataBlockPlan.Fixable);
 
                 Assert.Equal(5, replacementPlan.Footnotes.Count());
 
@@ -871,6 +872,860 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
                 Assert.True(footnoteForSubjectPlan.Valid);
 
                 Assert.False(replacementPlan.Valid);
+            }
+        }
+        
+        [Fact]
+        public async Task GetReplacementPlan_SelectedFilterItemsNoLongerExistButSomeDo_ReplacementInvalidButFixable()
+        {
+            var originalSubject = new Subject
+            {
+                Id = Guid.NewGuid()
+            };
+
+            var replacementSubject = new Subject
+            {
+                Id = Guid.NewGuid()
+            };
+
+            var contentRelease = new Content.Model.Release
+            {
+                Id = Guid.NewGuid(),
+                PreviousVersionId = null
+            };
+
+            var statsRelease = new Release
+            {
+                Id = contentRelease.Id,
+                PreviousVersionId = contentRelease.PreviousVersionId
+            };
+
+            var originalFile = new File
+            {
+                Filename = "original.csv",
+                Type = FileType.Data,
+                SubjectId = originalSubject.Id
+            };
+
+            var replacementFile = new File
+            {
+                Filename = "replacement.csv",
+                Type = FileType.Data,
+                SubjectId = replacementSubject.Id
+            };
+
+            var originalReleaseFile = new ReleaseFile
+            {
+                Release = contentRelease,
+                File = originalFile
+            };
+
+            var replacementReleaseFile = new ReleaseFile
+            {
+                Release = contentRelease,
+                File = replacementFile
+            };
+
+            var originalDefaultFilterItem = new FilterItem
+            {
+                Id = Guid.NewGuid(),
+                Label = "Test filter item"
+            };
+
+            var originalDefaultFilterItem2 = new FilterItem
+            {
+                Id = Guid.NewGuid(),
+                Label = "Test filter item 2"
+            };
+
+            var replacementDefaultFilterItem = new FilterItem
+            {
+                Label = "Test filter item",
+            };
+
+            var originalDefaultFilterGroup = new FilterGroup
+            {
+                Label = "Default group - not changing",
+                FilterItems = new List<FilterItem>
+                {
+                    originalDefaultFilterItem,
+                    originalDefaultFilterItem2
+                }
+            };
+
+            var replacementDefaultFilterGroup = new FilterGroup
+            {
+                Label = "Default group - not changing",
+                FilterItems = new List<FilterItem>
+                {
+                    replacementDefaultFilterItem
+                }
+            };
+
+            var originalDefaultFilter = new Filter
+            {
+                Label = "Test filter 1 - not changing",
+                Name = "test_filter_1_not_changing",
+                Subject = originalSubject,
+                FilterGroups = new List<FilterGroup>
+                {
+                    originalDefaultFilterGroup
+                }
+            };
+
+            var replacementDefaultFilter = new Filter
+            {
+                Label = "Test filter 1 - not changing",
+                Name = "test_filter_1_not_changing",
+                Subject = replacementSubject,
+                FilterGroups = new List<FilterGroup>
+                {
+                    replacementDefaultFilterGroup
+                }
+            };
+
+            var originalIndicator = new Indicator
+            {
+                Id = Guid.NewGuid(),
+                Label = "Indicator - not changing",
+                Name = "indicator_not_changing"
+            };
+
+            var replacementIndicator = new Indicator
+            {
+                Label = "Indicator - not changing",
+                Name = "indicator_not_changing"
+            };
+
+            var originalIndicatorGroup = new IndicatorGroup
+            {
+                Label = "Default group - not changing",
+                Subject = originalSubject,
+                Indicators = new List<Indicator>
+                {
+                    originalIndicator
+                }
+            };
+
+            var replacementIndicatorGroup = new IndicatorGroup
+            {
+                Label = "Default group - not changing",
+                Subject = replacementSubject,
+                Indicators = new List<Indicator>
+                {
+                    replacementIndicator
+                }
+            };
+
+            var timePeriod = new TimePeriodQuery
+            {
+                StartYear = 2019,
+                StartCode = CalendarYear,
+                EndYear = 2020,
+                EndCode = CalendarYear
+            };
+
+            var country = new Country(CountryCodeEngland, "England");
+
+            var table = new TableBuilderConfiguration
+            {
+                TableHeaders = new TableHeaders
+                {
+                    ColumnGroups = new List<List<TableHeader>>
+                    {
+                        new List<TableHeader>
+                        {
+                            TableHeader.NewLocationHeader(GeographicLevel.Country, CountryCodeEngland)
+                        }
+                    },
+                    Columns = new List<TableHeader>
+                    {
+                        new TableHeader("2019_CY", TableHeaderType.TimePeriod),
+                        new TableHeader("2020_CY", TableHeaderType.TimePeriod)
+                    },
+                    RowGroups = new List<List<TableHeader>>
+                    {
+                        new List<TableHeader>
+                        {
+                            new TableHeader(originalDefaultFilterItem.Id.ToString(), TableHeaderType.Filter),
+                            new TableHeader(originalDefaultFilterItem2.Id.ToString(), TableHeaderType.Filter)
+                        }
+                    },
+                    Rows = new List<TableHeader>
+                    {
+                        new TableHeader(originalIndicator.Id.ToString(), TableHeaderType.Indicator)
+                    }
+                }
+            };
+
+            var dataBlock = new DataBlock
+            {
+                Name = "Test DataBlock",
+                Query = new ObservationQueryContext
+                {
+                    SubjectId = originalSubject.Id,
+                    Filters = new[]
+                    {
+                        originalDefaultFilterItem.Id,
+                        originalDefaultFilterItem2.Id
+                    },
+                    Indicators = new[] {originalIndicator.Id},
+                    Locations = new LocationQuery
+                    {
+                        Country = new[] {CountryCodeEngland}
+                    },
+                    TimePeriod = timePeriod
+                },
+                Table = table
+            };
+
+            var releaseContentBlock = new ReleaseContentBlock
+            {
+                Release = contentRelease,
+                ContentBlock = dataBlock
+            };
+
+            var mocks = Mocks();
+
+            mocks.LocationService.Setup(service => service.GetObservationalUnits(replacementSubject.Id))
+                .Returns(new Dictionary<GeographicLevel, IEnumerable<IObservationalUnit>>
+                {
+                    {
+                        GeographicLevel.Country,
+                        new List<Country>
+                        {
+                            country,
+                        }
+                    }
+                });
+
+            mocks.LocationService
+                .Setup(service => service.GetObservationalUnits(GeographicLevel.Country, new []{ CountryCodeEngland }))
+                .Returns(new List<IObservationalUnit>
+                {
+                    country
+                });
+
+            mocks.TimePeriodService.Setup(service => service.GetTimePeriods(replacementSubject.Id))
+                .Returns(new List<(int Year, TimeIdentifier TimeIdentifier)>
+                {
+                    (2019, CalendarYear),
+                    (2020, CalendarYear)
+                });
+
+            var contentDbContextId = Guid.NewGuid().ToString();
+            var statisticsDbContextId = Guid.NewGuid().ToString();
+
+            await using (var contentDbContext = InMemoryApplicationDbContext(contentDbContextId))
+            {
+                await contentDbContext.AddRangeAsync(contentRelease);
+                await contentDbContext.AddRangeAsync(originalFile, replacementFile);
+                await contentDbContext.AddRangeAsync(originalReleaseFile,
+                    replacementReleaseFile);
+                await contentDbContext.AddAsync(dataBlock);
+                await contentDbContext.AddAsync(releaseContentBlock);
+                await contentDbContext.SaveChangesAsync();
+            }
+
+            await using (var statisticsDbContext = InMemoryStatisticsDbContext(statisticsDbContextId))
+            {
+                await statisticsDbContext.AddRangeAsync(statsRelease);
+                await statisticsDbContext.AddRangeAsync(originalSubject, replacementSubject);
+                await statisticsDbContext.AddRangeAsync(originalDefaultFilter, replacementDefaultFilter);
+                await statisticsDbContext.AddRangeAsync(originalIndicatorGroup, replacementIndicatorGroup);
+                await statisticsDbContext.SaveChangesAsync();
+            }
+
+            await using (var contentDbContext = InMemoryApplicationDbContext(contentDbContextId))
+            await using (var statisticsDbContext = InMemoryStatisticsDbContext(statisticsDbContextId))
+            {
+                var replacementService = BuildReplacementService(contentDbContext, statisticsDbContext, mocks);
+
+                var result = await replacementService.GetReplacementPlan(
+                    releaseId: contentRelease.Id,
+                    originalFileId: originalFile.Id,
+                    replacementFileId: replacementFile.Id);
+
+                Assert.True(result.IsRight);
+                var replacementPlan = result.Right;
+                Assert.False(replacementPlan.Valid);
+
+                Assert.Single(replacementPlan.DataBlocks);
+                var dataBlockPlan = replacementPlan.DataBlocks.First();
+                Assert.False(dataBlockPlan.Valid);
+                Assert.True(dataBlockPlan.Fixable);
+            }
+        }
+        
+        [Fact]
+        public async Task GetReplacementPlan_AllOriginalFilterItemsNoLongerExist_ReplacementInvalidAndNotFixable()
+        {
+            var originalSubject = new Subject
+            {
+                Id = Guid.NewGuid()
+            };
+
+            var replacementSubject = new Subject
+            {
+                Id = Guid.NewGuid()
+            };
+
+            var contentRelease = new Content.Model.Release
+            {
+                Id = Guid.NewGuid(),
+                PreviousVersionId = null
+            };
+
+            var statsRelease = new Release
+            {
+                Id = contentRelease.Id,
+                PreviousVersionId = contentRelease.PreviousVersionId
+            };
+
+            var originalFile = new File
+            {
+                Filename = "original.csv",
+                Type = FileType.Data,
+                SubjectId = originalSubject.Id
+            };
+
+            var replacementFile = new File
+            {
+                Filename = "replacement.csv",
+                Type = FileType.Data,
+                SubjectId = replacementSubject.Id
+            };
+
+            var originalReleaseFile = new ReleaseFile
+            {
+                Release = contentRelease,
+                File = originalFile
+            };
+
+            var replacementReleaseFile = new ReleaseFile
+            {
+                Release = contentRelease,
+                File = replacementFile
+            };
+
+            var originalDefaultFilterItem = new FilterItem
+            {
+                Id = Guid.NewGuid(),
+                Label = "Test filter item"
+            };
+
+            var replacementDefaultFilterItem = new FilterItem
+            {
+                Label = "Test filter item - changing!",
+            };
+
+            var originalDefaultFilterGroup = new FilterGroup
+            {
+                Label = "Default group - not changing",
+                FilterItems = new List<FilterItem>
+                {
+                    originalDefaultFilterItem
+                }
+            };
+
+            var replacementDefaultFilterGroup = new FilterGroup
+            {
+                Label = "Default group - not changing",
+                FilterItems = new List<FilterItem>
+                {
+                    replacementDefaultFilterItem,
+                }
+            };
+
+            var originalDefaultFilter = new Filter
+            {
+                Label = "Test filter 1 - not changing",
+                Name = "test_filter_1_not_changing",
+                Subject = originalSubject,
+                FilterGroups = new List<FilterGroup>
+                {
+                    originalDefaultFilterGroup
+                }
+            };
+
+            var replacementDefaultFilter = new Filter
+            {
+                Label = "Test filter 1 - not changing",
+                Name = "test_filter_1_not_changing",
+                Subject = replacementSubject,
+                FilterGroups = new List<FilterGroup>
+                {
+                    replacementDefaultFilterGroup
+                }
+            };
+
+            var originalIndicator = new Indicator
+            {
+                Id = Guid.NewGuid(),
+                Label = "Indicator - not changing",
+                Name = "indicator_not_changing"
+            };
+
+            var replacementIndicator = new Indicator
+            {
+                Label = "Indicator - not changing",
+                Name = "indicator_not_changing"
+            };
+
+            var originalIndicatorGroup = new IndicatorGroup
+            {
+                Label = "Default group - not changing",
+                Subject = originalSubject,
+                Indicators = new List<Indicator>
+                {
+                    originalIndicator
+                }
+            };
+
+            var replacementIndicatorGroup = new IndicatorGroup
+            {
+                Label = "Default group - not changing",
+                Subject = replacementSubject,
+                Indicators = new List<Indicator>
+                {
+                    replacementIndicator
+                }
+            };
+
+            var timePeriod = new TimePeriodQuery
+            {
+                StartYear = 2019,
+                StartCode = CalendarYear,
+                EndYear = 2020,
+                EndCode = CalendarYear
+            };
+
+            var country = new Country(CountryCodeEngland, "England");
+
+            var table = new TableBuilderConfiguration
+            {
+                TableHeaders = new TableHeaders
+                {
+                    ColumnGroups = new List<List<TableHeader>>
+                    {
+                        new List<TableHeader>
+                        {
+                            TableHeader.NewLocationHeader(GeographicLevel.Country, CountryCodeEngland)
+                        }
+                    },
+                    Columns = new List<TableHeader>
+                    {
+                        new TableHeader("2019_CY", TableHeaderType.TimePeriod),
+                        new TableHeader("2020_CY", TableHeaderType.TimePeriod)
+                    },
+                    RowGroups = new List<List<TableHeader>>
+                    {
+                        new List<TableHeader>
+                        {
+                            new TableHeader(originalDefaultFilterItem.Id.ToString(), TableHeaderType.Filter)
+                        }
+                    },
+                    Rows = new List<TableHeader>
+                    {
+                        new TableHeader(originalIndicator.Id.ToString(), TableHeaderType.Indicator)
+                    }
+                }
+            };
+
+            var dataBlock = new DataBlock
+            {
+                Name = "Test DataBlock",
+                Query = new ObservationQueryContext
+                {
+                    SubjectId = originalSubject.Id,
+                    Filters = new[]
+                    {
+                        originalDefaultFilterItem.Id
+                    },
+                    Indicators = new[] {originalIndicator.Id},
+                    Locations = new LocationQuery
+                    {
+                        Country = new[] {CountryCodeEngland}
+                    },
+                    TimePeriod = timePeriod
+                },
+                Table = table
+            };
+
+            var releaseContentBlock = new ReleaseContentBlock
+            {
+                Release = contentRelease,
+                ContentBlock = dataBlock
+            };
+
+            var mocks = Mocks();
+
+            mocks.LocationService.Setup(service => service.GetObservationalUnits(replacementSubject.Id))
+                .Returns(new Dictionary<GeographicLevel, IEnumerable<IObservationalUnit>>
+                {
+                    {
+                        GeographicLevel.Country,
+                        new List<Country>
+                        {
+                            country,
+                        }
+                    }
+                });
+
+            mocks.LocationService
+                .Setup(service => service.GetObservationalUnits(GeographicLevel.Country, new []{ CountryCodeEngland }))
+                .Returns(new List<IObservationalUnit>
+                {
+                    country
+                });
+
+            mocks.TimePeriodService.Setup(service => service.GetTimePeriods(replacementSubject.Id))
+                .Returns(new List<(int Year, TimeIdentifier TimeIdentifier)>
+                {
+                    (2019, CalendarYear),
+                    (2020, CalendarYear)
+                });
+
+            var contentDbContextId = Guid.NewGuid().ToString();
+            var statisticsDbContextId = Guid.NewGuid().ToString();
+
+            await using (var contentDbContext = InMemoryApplicationDbContext(contentDbContextId))
+            {
+                await contentDbContext.AddRangeAsync(contentRelease);
+                await contentDbContext.AddRangeAsync(originalFile, replacementFile);
+                await contentDbContext.AddRangeAsync(originalReleaseFile,
+                    replacementReleaseFile);
+                await contentDbContext.AddAsync(dataBlock);
+                await contentDbContext.AddAsync(releaseContentBlock);
+                await contentDbContext.SaveChangesAsync();
+            }
+
+            await using (var statisticsDbContext = InMemoryStatisticsDbContext(statisticsDbContextId))
+            {
+                await statisticsDbContext.AddRangeAsync(statsRelease);
+                await statisticsDbContext.AddRangeAsync(originalSubject, replacementSubject);
+                await statisticsDbContext.AddRangeAsync(originalDefaultFilter, replacementDefaultFilter);
+                await statisticsDbContext.AddRangeAsync(originalIndicatorGroup, replacementIndicatorGroup);
+                await statisticsDbContext.SaveChangesAsync();
+            }
+
+            await using (var contentDbContext = InMemoryApplicationDbContext(contentDbContextId))
+            await using (var statisticsDbContext = InMemoryStatisticsDbContext(statisticsDbContextId))
+            {
+                var replacementService = BuildReplacementService(contentDbContext, statisticsDbContext, mocks);
+
+                var result = await replacementService.GetReplacementPlan(
+                    releaseId: contentRelease.Id,
+                    originalFileId: originalFile.Id,
+                    replacementFileId: replacementFile.Id);
+
+                Assert.True(result.IsRight);
+                var replacementPlan = result.Right;
+                Assert.False(replacementPlan.Valid);
+
+                Assert.Single(replacementPlan.DataBlocks);
+                var dataBlockPlan = replacementPlan.DataBlocks.First();
+                Assert.False(dataBlockPlan.Valid);
+                Assert.False(dataBlockPlan.Fixable);
+            }
+        }
+
+        [Fact]
+        public async Task GetReplacementPlan_NewFiltersIntroduced_ReplacementInvalidAndNotFixable()
+        {
+            var originalSubject = new Subject
+            {
+                Id = Guid.NewGuid()
+            };
+
+            var replacementSubject = new Subject
+            {
+                Id = Guid.NewGuid()
+            };
+
+            var contentRelease = new Content.Model.Release
+            {
+                Id = Guid.NewGuid(),
+                PreviousVersionId = null
+            };
+
+            var statsRelease = new Release
+            {
+                Id = contentRelease.Id,
+                PreviousVersionId = contentRelease.PreviousVersionId
+            };
+
+            var originalFile = new File
+            {
+                Filename = "original.csv",
+                Type = FileType.Data,
+                SubjectId = originalSubject.Id
+            };
+
+            var replacementFile = new File
+            {
+                Filename = "replacement.csv",
+                Type = FileType.Data,
+                SubjectId = replacementSubject.Id
+            };
+
+            var originalReleaseFile = new ReleaseFile
+            {
+                Release = contentRelease,
+                File = originalFile
+            };
+
+            var replacementReleaseFile = new ReleaseFile
+            {
+                Release = contentRelease,
+                File = replacementFile
+            };
+
+            var originalDefaultFilterItem = new FilterItem
+            {
+                Id = Guid.NewGuid(),
+                Label = "Test filter item"
+            };
+
+            var replacementDefaultFilterItem = new FilterItem
+            {
+                Label = "Test filter item"
+            };
+
+            var replacementNewlyIntroducedFiltersFilterItem = new FilterItem
+            {
+                Label = "Filter item for newly introduced Filter"
+            };
+
+            var originalDefaultFilterGroup = new FilterGroup
+            {
+                Label = "Default group - not changing",
+                FilterItems = new List<FilterItem>
+                {
+                    originalDefaultFilterItem
+                }
+            };
+
+            var replacementDefaultFilterGroup = new FilterGroup
+            {
+                Label = "Default group - not changing",
+                FilterItems = new List<FilterItem>
+                {
+                    replacementDefaultFilterItem
+                }
+            };
+
+            var replacementNewlyIntroducedFilterGroup = new FilterGroup
+            {
+                Label = "Newly introduced filter group",
+                FilterItems = new List<FilterItem>
+                {
+                    replacementNewlyIntroducedFiltersFilterItem
+                }
+            };
+
+            var originalDefaultFilter = new Filter
+            {
+                Label = "Test filter 1 - not changing",
+                Name = "test_filter_1_not_changing",
+                Subject = originalSubject,
+                FilterGroups = new List<FilterGroup>
+                {
+                    originalDefaultFilterGroup
+                }
+            };
+
+            var replacementDefaultFilter = new Filter
+            {
+                Label = "Test filter 1 - not changing",
+                Name = "test_filter_1_not_changing",
+                Subject = replacementSubject,
+                FilterGroups = new List<FilterGroup>
+                {
+                    replacementDefaultFilterGroup
+                }
+            };
+
+            var replacementNewlyIntroducedFilter = new Filter
+            {
+                Label = "Newly introduced filter",
+                Name = "newly_introduced_filter",
+                Subject = replacementSubject,
+                FilterGroups = new List<FilterGroup>
+                {
+                    replacementNewlyIntroducedFilterGroup
+                }
+            };
+
+            var originalIndicator = new Indicator
+            {
+                Id = Guid.NewGuid(),
+                Label = "Indicator - not changing",
+                Name = "indicator_not_changing"
+            };
+
+            var replacementIndicator = new Indicator
+            {
+                Label = "Indicator - not changing",
+                Name = "indicator_not_changing"
+            };
+
+            var originalIndicatorGroup = new IndicatorGroup
+            {
+                Label = "Default group - not changing",
+                Subject = originalSubject,
+                Indicators = new List<Indicator>
+                {
+                    originalIndicator
+                }
+            };
+
+            var replacementIndicatorGroup = new IndicatorGroup
+            {
+                Label = "Default group - not changing",
+                Subject = replacementSubject,
+                Indicators = new List<Indicator>
+                {
+                    replacementIndicator
+                }
+            };
+
+            var timePeriod = new TimePeriodQuery
+            {
+                StartYear = 2019,
+                StartCode = CalendarYear,
+                EndYear = 2020,
+                EndCode = CalendarYear
+            };
+
+            var country = new Country(CountryCodeEngland, "England");
+
+            var table = new TableBuilderConfiguration
+            {
+                TableHeaders = new TableHeaders
+                {
+                    ColumnGroups = new List<List<TableHeader>>
+                    {
+                        new List<TableHeader>
+                        {
+                            TableHeader.NewLocationHeader(GeographicLevel.Country, CountryCodeEngland)
+                        }
+                    },
+                    Columns = new List<TableHeader>
+                    {
+                        new TableHeader("2019_CY", TableHeaderType.TimePeriod),
+                        new TableHeader("2020_CY", TableHeaderType.TimePeriod)
+                    },
+                    RowGroups = new List<List<TableHeader>>
+                    {
+                        new List<TableHeader>
+                        {
+                            new TableHeader(originalDefaultFilterItem.Id.ToString(), TableHeaderType.Filter)
+                        }
+                    },
+                    Rows = new List<TableHeader>
+                    {
+                        new TableHeader(originalIndicator.Id.ToString(), TableHeaderType.Indicator)
+                    }
+                }
+            };
+
+            var dataBlock = new DataBlock
+            {
+                Name = "Test DataBlock",
+                Query = new ObservationQueryContext
+                {
+                    SubjectId = originalSubject.Id,
+                    Filters = new[]
+                    {
+                        originalDefaultFilterItem.Id
+                    },
+                    Indicators = new[] {originalIndicator.Id},
+                    Locations = new LocationQuery
+                    {
+                        Country = new[] {CountryCodeEngland}
+                    },
+                    TimePeriod = timePeriod
+                },
+                Table = table
+            };
+
+            var releaseContentBlock = new ReleaseContentBlock
+            {
+                Release = contentRelease,
+                ContentBlock = dataBlock
+            };
+
+            var mocks = Mocks();
+
+            mocks.LocationService.Setup(service => service.GetObservationalUnits(replacementSubject.Id))
+                .Returns(new Dictionary<GeographicLevel, IEnumerable<IObservationalUnit>>
+                {
+                    {
+                        GeographicLevel.Country,
+                        new List<Country>
+                        {
+                            country,
+                        }
+                    }
+                });
+
+            mocks.LocationService
+                .Setup(service => service.GetObservationalUnits(GeographicLevel.Country, new []{ CountryCodeEngland }))
+                .Returns(new List<IObservationalUnit>
+                {
+                    country
+                });
+
+            mocks.TimePeriodService.Setup(service => service.GetTimePeriods(replacementSubject.Id))
+                .Returns(new List<(int Year, TimeIdentifier TimeIdentifier)>
+                {
+                    (2019, CalendarYear),
+                    (2020, CalendarYear)
+                });
+
+            var contentDbContextId = Guid.NewGuid().ToString();
+            var statisticsDbContextId = Guid.NewGuid().ToString();
+
+            await using (var contentDbContext = InMemoryApplicationDbContext(contentDbContextId))
+            {
+                await contentDbContext.AddRangeAsync(contentRelease);
+                await contentDbContext.AddRangeAsync(originalFile, replacementFile);
+                await contentDbContext.AddRangeAsync(originalReleaseFile,
+                    replacementReleaseFile);
+                await contentDbContext.AddAsync(dataBlock);
+                await contentDbContext.AddAsync(releaseContentBlock);
+                await contentDbContext.SaveChangesAsync();
+            }
+
+            await using (var statisticsDbContext = InMemoryStatisticsDbContext(statisticsDbContextId))
+            {
+                await statisticsDbContext.AddRangeAsync(statsRelease);
+                await statisticsDbContext.AddRangeAsync(originalSubject, replacementSubject);
+                await statisticsDbContext.AddRangeAsync(originalDefaultFilter, 
+                    replacementDefaultFilter, replacementNewlyIntroducedFilter);
+                await statisticsDbContext.AddRangeAsync(originalIndicatorGroup, replacementIndicatorGroup);
+                await statisticsDbContext.SaveChangesAsync();
+            }
+
+            await using (var contentDbContext = InMemoryApplicationDbContext(contentDbContextId))
+            await using (var statisticsDbContext = InMemoryStatisticsDbContext(statisticsDbContextId))
+            {
+                var replacementService = BuildReplacementService(contentDbContext, statisticsDbContext, mocks);
+
+                var result = await replacementService.GetReplacementPlan(
+                    releaseId: contentRelease.Id,
+                    originalFileId: originalFile.Id,
+                    replacementFileId: replacementFile.Id);
+
+                Assert.True(result.IsRight);
+                var replacementPlan = result.Right;
+                Assert.False(replacementPlan.Valid);
+
+                Assert.Single(replacementPlan.DataBlocks);
+                var dataBlockPlan = replacementPlan.DataBlocks.First();
+                Assert.False(dataBlockPlan.Valid);
+                Assert.False(dataBlockPlan.Fixable);
             }
         }
 
@@ -1399,6 +2254,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
                 Assert.True(dataBlockPlan.TimePeriods?.End.Valid);
 
                 Assert.True(dataBlockPlan.Valid);
+                Assert.False(dataBlockPlan.Fixable);
 
                 Assert.Equal(5, replacementPlan.Footnotes.Count());
 
@@ -1756,16 +2612,19 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
 
             var originalFilterItem2 = new FilterItem
             {
+                Id = Guid.NewGuid(),
                 Label = "Test filter item - not changing"
             };
 
             var replacementFilterItem1 = new FilterItem
             {
+                Id = Guid.NewGuid(),
                 Label = "Test filter item - not changing"
             };
 
             var replacementFilterItem2 = new FilterItem
             {
+                Id = Guid.NewGuid(),
                 Label = "Test filter item - not changing"
             };
 
@@ -1896,7 +2755,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
                 Query = new ObservationQueryContext
                 {
                     SubjectId = originalSubject.Id,
-                    Filters = new[] {originalFilterItem1.Id},
+                    Filters = new[] {originalFilterItem1.Id, originalFilterItem2.Id},
                     Indicators = new[] {originalIndicator.Id},
                     Locations = new LocationQuery
                     {
@@ -1924,7 +2783,8 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
                         {
                             new List<TableHeader>
                             {
-                                new TableHeader(originalFilterItem1.Id.ToString(), TableHeaderType.Filter)
+                                new TableHeader(originalFilterItem1.Id.ToString(), TableHeaderType.Filter),
+                                new TableHeader(originalFilterItem2.Id.ToString(), TableHeaderType.Filter)
                             }
                         },
                         Rows = new List<TableHeader>
@@ -2117,8 +2977,10 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
                 Assert.Single(replacedDataBlock.Query.Indicators);
                 Assert.Equal(replacementIndicator.Id, replacedDataBlock.Query.Indicators.First());
 
-                Assert.Single(replacedDataBlock.Query.Filters);
-                Assert.Equal(replacementFilterItem1.Id, replacedDataBlock.Query.Filters.First());
+                var replacedFilterItemIds = replacedDataBlock.Query.Filters;
+                Assert.Equal(2, replacedFilterItemIds.Count());
+                Assert.Equal(replacementFilterItem1.Id, replacedFilterItemIds.ToList()[0]);
+                Assert.Equal(replacementFilterItem2.Id, replacedFilterItemIds.ToList()[1]);
 
                 Assert.NotNull(replacedDataBlock.Query.Locations);
                 Assert.Equal(dataBlock.Query.Locations, replacedDataBlock.Query.Locations);
@@ -2142,13 +3004,15 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
                 Assert.Equal(TableHeaderType.Indicator, replacedDataBlock.Table.TableHeaders.Rows.First().Type);
                 Assert.Equal(replacementIndicator.Id.ToString(),
                     replacedDataBlock.Table.TableHeaders.Rows.First().Value);
+                
                 Assert.Single(replacedDataBlock.Table.TableHeaders.RowGroups);
-                Assert.Single(replacedDataBlock.Table.TableHeaders.RowGroups.First());
-                Assert.Equal(TableHeaderType.Filter,
-                    replacedDataBlock.Table.TableHeaders.RowGroups.First().First().Type);
-                Assert.Equal(replacementFilterItem1.Id.ToString(),
-                    replacedDataBlock.Table.TableHeaders.RowGroups.First().First().Value);
-
+                var replacementRowGroup = replacedDataBlock.Table.TableHeaders.RowGroups.First().ToList();
+                Assert.Equal(2, replacementRowGroup.Count());
+                Assert.Equal(TableHeaderType.Filter, replacementRowGroup[0].Type);
+                Assert.Equal(replacementFilterItem1.Id.ToString(),replacementRowGroup[0].Value);
+                Assert.Equal(TableHeaderType.Filter, replacementRowGroup[1].Type);
+                Assert.Equal(replacementFilterItem2.Id.ToString(),replacementRowGroup[1].Value);
+                
                 var chartMajorAxis = replacedDataBlock.Charts[0].Axes?["major"];
                 Assert.NotNull(chartMajorAxis);
                 Assert.Single(chartMajorAxis.DataSets);
