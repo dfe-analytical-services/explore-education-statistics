@@ -1637,7 +1637,7 @@
                             "source": {
                                 "type": "AzureSqlSource",
                                 "sqlReaderQuery": {
-                                    "value": "SELECT * FROM dbo.Location WITH (NOLOCK) WHERE Id IN (SELECT LocationId FROM dbo.ObservationRow WHERE SubjectId in (SELECT SubjectId FROM dbo.ReleaseSubject RS WHERE ReleaseId = CONVERT(UNIQUEIDENTIFIER, '@{pipeline().parameters.releaseId}') AND NOT EXISTS (SELECT * FROM ReleaseSubject WHERE ReleaseId != RS.ReleaseId AND SubjectId = RS.SubjectId)))",
+                                    "value": "SELECT * FROM dbo.Location WITH (NOLOCK) WHERE Id IN (SELECT LocationId FROM dbo.Observation WHERE SubjectId in (SELECT SubjectId FROM dbo.ReleaseSubject RS WHERE ReleaseId = CONVERT(UNIQUEIDENTIFIER, '@{pipeline().parameters.releaseId}') AND NOT EXISTS (SELECT * FROM ReleaseSubject WHERE ReleaseId != RS.ReleaseId AND SubjectId = RS.SubjectId)))",
                                     "type": "Expression"
                                 }
                             },
@@ -2107,7 +2107,7 @@
                             "source": {
                                 "type": "AzureSqlSource",
                                 "sqlReaderQuery": {
-                                    "value": "SELECT * FROM dbo.ObservationRow WITH (NOLOCK) WHERE SubjectId IN (SELECT SubjectId FROM dbo.ReleaseSubject RS WHERE ReleaseId = CONVERT(UNIQUEIDENTIFIER, '@{pipeline().parameters.releaseId}') AND NOT EXISTS (SELECT * FROM ReleaseSubject WHERE ReleaseId != RS.ReleaseId AND SubjectId = RS.SubjectId))",
+                                    "value": "SELECT * FROM dbo.Observation WITH (NOLOCK) WHERE SubjectId IN (SELECT SubjectId FROM dbo.ReleaseSubject RS WHERE ReleaseId = CONVERT(UNIQUEIDENTIFIER, '@{pipeline().parameters.releaseId}') AND NOT EXISTS (SELECT * FROM ReleaseSubject WHERE ReleaseId != RS.ReleaseId AND SubjectId = RS.SubjectId))",
                                     "type": "Expression"
                                 }
                             },
@@ -2122,20 +2122,10 @@
                                     {
                                         "source": {
                                             "name": "Id",
-                                            "type": "Int64"
-                                        },
-                                        "sink": {
-                                            "name": "Id",
-                                            "type": "Int64"
-                                        }
-                                    },
-                                    {
-                                        "source": {
-                                            "name": "ObservationId",
                                             "type": "Guid"
                                         },
                                         "sink": {
-                                            "name": "ObservationId",
+                                            "name": "Id",
                                             "type": "Guid"
                                         }
                                     },
@@ -2217,7 +2207,7 @@
                                 "referenceName": "ds_sql_statistics",
                                 "type": "DatasetReference",
                                 "parameters": {
-                                    "cw_table": "ObservationRow"
+                                    "cw_table": "Observation"
                                 }
                             }
                         ],
@@ -2226,7 +2216,7 @@
                                 "referenceName": "ds_sql_public_statistics",
                                 "type": "DatasetReference",
                                 "parameters": {
-                                    "cw_table": "ObservationRow"
+                                    "cw_table": "Observation"
                                 }
                             }
                         ]
@@ -2254,7 +2244,7 @@
                             "source": {
                                 "type": "AzureSqlSource",
                                 "sqlReaderQuery": {
-                                    "value": "SELECT * FROM dbo.ObservationRowFilterItem WITH (NOLOCK) WHERE ObservationId IN (SELECT Id FROM ObservationRow WHERE SubjectId IN (SELECT SubjectId FROM dbo.ReleaseSubject RS WHERE ReleaseId = CONVERT(UNIQUEIDENTIFIER, '@{pipeline().parameters.releaseId}') AND NOT EXISTS (SELECT * FROM ReleaseSubject WHERE ReleaseId != RS.ReleaseId AND SubjectId = RS.SubjectId)))",
+                                    "value": "SELECT * FROM dbo.ObservationFilterItem WITH (NOLOCK) WHERE ObservationId IN (SELECT Id FROM Observation WHERE SubjectId IN (SELECT SubjectId FROM dbo.ReleaseSubject RS WHERE ReleaseId = CONVERT(UNIQUEIDENTIFIER, '@{pipeline().parameters.releaseId}') AND NOT EXISTS (SELECT * FROM ReleaseSubject WHERE ReleaseId != RS.ReleaseId AND SubjectId = RS.SubjectId)))",
                                     "type": "Expression"
                                 }
                             },
@@ -2269,11 +2259,11 @@
                                     {
                                         "source": {
                                             "name": "ObservationId",
-                                            "type": "Int64"
+                                            "type": "Guid"
                                         },
                                         "sink": {
                                             "name": "ObservationId",
-                                            "type": "Int64"
+                                            "type": "Guid"
                                         }
                                     },
                                     {
@@ -2288,11 +2278,11 @@
                                     },
                                     {
                                         "source": {
-                                            "name": "OldObservationId",
+                                            "name": "FilterId",
                                             "type": "Guid"
                                         },
                                         "sink": {
-                                            "name": "OldObservationId",
+                                            "name": "FilterId",
                                             "type": "Guid"
                                         }
                                     }
@@ -2304,7 +2294,7 @@
                                 "referenceName": "ds_sql_statistics",
                                 "type": "DatasetReference",
                                 "parameters": {
-                                    "cw_table": "ObservationRowFilterItem"
+                                    "cw_table": "ObservationFilterItem"
                                 }
                             }
                         ],
@@ -2313,7 +2303,7 @@
                                 "referenceName": "ds_sql_public_statistics",
                                 "type": "DatasetReference",
                                 "parameters": {
-                                    "cw_table": "ObservationRowFilterItem"
+                                    "cw_table": "ObservationFilterItem"
                                 }
                             }
                         ]
