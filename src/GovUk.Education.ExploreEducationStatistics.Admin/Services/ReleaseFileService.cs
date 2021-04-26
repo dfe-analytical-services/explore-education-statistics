@@ -14,6 +14,7 @@ using GovUk.Education.ExploreEducationStatistics.Content.Model.Database;
 using GovUk.Education.ExploreEducationStatistics.Content.Model.Extensions;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
+using Microsoft.EntityFrameworkCore;
 using static GovUk.Education.ExploreEducationStatistics.Common.BlobContainers;
 using static GovUk.Education.ExploreEducationStatistics.Common.Model.FileType;
 using FileInfo = GovUk.Education.ExploreEducationStatistics.Common.Model.FileInfo;
@@ -131,6 +132,28 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Services
                 });
         }
 
+        public async Task<Either<ActionResult, FileInfo>> GetFile(Guid releaseId, Guid fileId)
+        {
+            return await _persistenceHelper
+                .CheckEntityExists<ReleaseFile>(
+                    q => q.Include(rf => rf.File)
+                        .Where(rf =>
+                            rf.ReleaseId == releaseId
+                            && rf.FileId == fileId))
+                .OnSuccess(async releaseFile =>
+                {
+                    var blobExists = await _blobStorageService.CheckBlobExists(
+                        PrivateReleaseFiles,
+                        releaseFile.Path());
+                    if (!blobExists)
+                    {
+                        return releaseFile.File.ToFileInfoNotFound();
+                    }
+                    var blob = await _blobStorageService.GetBlob(PrivateReleaseFiles, releaseFile.Path());
+                    return releaseFile.ToFileInfo(blob);
+                });
+        }
+
         public async Task<Either<ActionResult, FileStreamResult>> Stream(Guid releaseId, Guid id)
         {
             return await _persistenceHelper
@@ -149,6 +172,17 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Services
                     {
                         FileDownloadName = file.Filename
                     };
+                });
+        }
+
+        public Task<Either<ActionResult, Unit>> UpdateName(Guid releaseId, Guid fileId, string name)
+        {
+            return _persistenceHelper
+                .CheckEntityExists<Release>(releaseId)
+                .OnSuccess(_userService.CheckCanUpdateRelease)
+                .OnSuccessVoid(async () =>
+                {
+                    await _releaseFileRepository.UpdateName(releaseId, fileId, name);
                 });
         }
 

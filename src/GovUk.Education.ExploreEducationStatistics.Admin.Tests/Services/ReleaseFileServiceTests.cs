@@ -14,6 +14,7 @@ using GovUk.Education.ExploreEducationStatistics.Common.Utils;
 using GovUk.Education.ExploreEducationStatistics.Content.Model;
 using GovUk.Education.ExploreEducationStatistics.Content.Model.Database;
 using GovUk.Education.ExploreEducationStatistics.Content.Model.Extensions;
+using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
 using Moq;
 using Xunit;
@@ -1172,6 +1173,125 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
         }
 
         [Fact]
+        public async Task GetFile()
+        {
+            var releaseFile = new ReleaseFile
+            {
+                Release = new Release(),
+                Name = "Test PDF File",
+                File = new File
+                {
+                    RootPath = Guid.NewGuid(),
+                    Filename = "ancillary.pdf",
+                    Type = Ancillary
+                }
+            };
+
+            var contentDbContextId = Guid.NewGuid().ToString();
+            await using (var contentDbContext = InMemoryApplicationDbContext(contentDbContextId))
+            {
+                await contentDbContext.AddAsync(releaseFile);
+                await contentDbContext.SaveChangesAsync();
+            }
+
+            var blobStorageService = new Mock<IBlobStorageService>(MockBehavior.Strict);
+            var blob = new BlobInfo(
+                path: null,
+                size: "93 Kb",
+                contentType: "application/pdf",
+                contentLength: 0L,
+                meta: null,
+                created: null);
+            blobStorageService.Setup(mock =>
+                    mock.CheckBlobExists(PrivateReleaseFiles, releaseFile.Path()))
+                .ReturnsAsync(true);
+            blobStorageService.Setup(mock =>
+                    mock.GetBlob(PrivateReleaseFiles, releaseFile.Path()))
+                .ReturnsAsync(blob);
+
+            await using (var contentDbContext = InMemoryApplicationDbContext(contentDbContextId))
+            {
+                var service = SetupReleaseFileService(contentDbContext: contentDbContext,
+                    blobStorageService: blobStorageService.Object);
+
+                var result = await service.GetFile(releaseFile.ReleaseId, releaseFile.FileId);
+                Assert.True(result.IsRight);
+
+                var fileInfo = result.Right;
+                Assert.Equal(releaseFile.Name, fileInfo.Name);
+                Assert.Equal(releaseFile.FileId, fileInfo.Id);
+                Assert.Equal("pdf", fileInfo.Extension);
+                Assert.Equal("ancillary.pdf", fileInfo.FileName);
+                Assert.Equal("93 Kb", fileInfo.Size);
+                Assert.Equal(Ancillary, fileInfo.Type);
+            }
+            MockUtils.VerifyAllMocks(blobStorageService);
+        }
+
+        [Fact]
+        public async Task GetFile_NoReleaseFile()
+        {
+            var blobStorageService = new Mock<IBlobStorageService>(MockBehavior.Strict);
+
+            await using (var contentDbContext = InMemoryApplicationDbContext())
+            {
+                var service = SetupReleaseFileService(contentDbContext: contentDbContext,
+                    blobStorageService: blobStorageService.Object);
+
+                var result = await service.GetFile(Guid.NewGuid(), Guid.NewGuid());
+                Assert.True(result.IsLeft);
+                Assert.IsType<NotFoundResult>(result.Left);
+            }
+            MockUtils.VerifyAllMocks(blobStorageService);
+        }
+
+        [Fact]
+        public async Task GetFile_NoBlob()
+        {
+            var releaseFile = new ReleaseFile
+            {
+                Release = new Release(),
+                Name = "Test PDF File",
+                File = new File
+                {
+                    RootPath = Guid.NewGuid(),
+                    Filename = "ancillary.pdf",
+                    Type = Ancillary
+                }
+            };
+
+            var contentDbContextId = Guid.NewGuid().ToString();
+            await using (var contentDbContext = InMemoryApplicationDbContext(contentDbContextId))
+            {
+                await contentDbContext.AddAsync(releaseFile);
+                await contentDbContext.SaveChangesAsync();
+            }
+
+            var blobStorageService = new Mock<IBlobStorageService>(MockBehavior.Strict);
+            blobStorageService.Setup(mock =>
+                    mock.CheckBlobExists(PrivateReleaseFiles, releaseFile.Path()))
+                .ReturnsAsync(false);
+
+            await using (var contentDbContext = InMemoryApplicationDbContext(contentDbContextId))
+            {
+                var service = SetupReleaseFileService(contentDbContext: contentDbContext,
+                    blobStorageService: blobStorageService.Object);
+
+                var result = await service.GetFile(releaseFile.ReleaseId, releaseFile.FileId);
+                Assert.True(result.IsRight);
+
+                var fileInfo = result.Right;
+                Assert.Equal("Unknown", fileInfo.Name);
+                Assert.Equal(releaseFile.FileId, fileInfo.Id);
+                Assert.Equal("pdf", fileInfo.Extension);
+                Assert.Equal(releaseFile.File.Filename, fileInfo.FileName);
+                Assert.Equal("0.00 B", fileInfo.Size);
+                Assert.Equal(releaseFile.File.Type, fileInfo.Type);
+            }
+            MockUtils.VerifyAllMocks(blobStorageService);
+        }
+
+        [Fact]
         public async Task Stream()
         {
             var release = new Release();
@@ -1375,6 +1495,42 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
             }
 
             MockUtils.VerifyAllMocks(blobStorageService);
+        }
+
+        [Fact]
+        public async Task UpdateName()
+        {
+            var releaseFile = new ReleaseFile
+            {
+                Release = new Release(),
+                Name = "Test PDF File",
+                File = new File()
+            };
+
+            var contentDbContextId = Guid.NewGuid().ToString();
+            await using (var contentDbContext = InMemoryApplicationDbContext(contentDbContextId))
+            {
+                await contentDbContext.AddAsync(releaseFile);
+                await contentDbContext.SaveChangesAsync();
+            }
+
+            await using (var contentDbContext = InMemoryApplicationDbContext(contentDbContextId))
+            {
+                var service = SetupReleaseFileService(contentDbContext);
+
+                var result = await service.UpdateName(releaseFile.ReleaseId, releaseFile.FileId, "New file title");
+
+                Assert.True(result.IsRight);
+                Assert.IsType<Unit>(result.Right);
+            }
+
+            await using (var contentDbContext = InMemoryApplicationDbContext(contentDbContextId))
+            {
+                var updatedReleaseFile = await contentDbContext.ReleaseFiles.FirstAsync(rf =>
+                    rf.ReleaseId == releaseFile.ReleaseId
+                    && rf.FileId == releaseFile.FileId);
+                Assert.Equal("New file title", updatedReleaseFile.Name);
+            }
         }
 
         [Fact]

@@ -136,5 +136,22 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Services
 
             return releaseFile;
         }
+
+        public async Task UpdateName(Guid releaseId,
+            Guid fileId,
+            string name)
+        {
+            var releaseFile = await _contentDbContext.ReleaseFiles
+                .Include(rf => rf.File)
+                .SingleAsync(rf =>
+                    rf.ReleaseId == releaseId
+                    && rf.FileId == fileId
+                    && (rf.File.Type == FileType.Data || rf.File.Type == Ancillary));
+
+            _contentDbContext.Update(releaseFile);
+            releaseFile.Name = name;
+
+            await _contentDbContext.SaveChangesAsync();
+        }
     }
 }

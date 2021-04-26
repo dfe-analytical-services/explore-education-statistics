@@ -44,12 +44,29 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Controllers.Api
                 .HandleFailuresOrNoContent();
         }
 
-        [HttpGet("release/{releaseId}/file/{id}")]
+        [HttpGet("release/{releaseId}/file/{fileId}")]
+        public async Task<ActionResult<FileInfo>> GetFile(Guid releaseId, Guid fileId)
+        {
+            return await _releaseFileService
+                .GetFile(releaseId, fileId)
+                .HandleFailuresOrOk();
+        }
+
+        [HttpGet("release/{releaseId}/file/{id}/download")]
         public async Task<ActionResult> Stream(Guid releaseId, Guid id)
         {
             return await _releaseFileService
                 .Stream(releaseId: releaseId, id: id)
                 .HandleFailures();
+        }
+
+        [HttpPost("release/{releaseId}/file/{fileId}/rename")]
+        public async Task<ActionResult<Unit>> Rename(Guid releaseId, Guid fileId,
+            [FromQuery(Name = "name"), Required] string name)
+        {
+            return await _releaseFileService
+                .UpdateName(releaseId: releaseId, fileId: fileId, name: name)
+                .HandleFailuresOrOk();
         }
 
         [HttpGet("release/{releaseId}/ancillary")]
