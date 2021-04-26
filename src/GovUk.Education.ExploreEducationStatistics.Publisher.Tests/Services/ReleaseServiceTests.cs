@@ -89,7 +89,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Publisher.Tests.Services
                 }
             },
             Slug = "2018-19-q1",
-            Published = new DateTime(2019, 1, 01),
+            Published = new DateTime(2019, 1, 1),
             Status = Approved,
             Version = 0,
             PreviousVersionId = null,
@@ -113,7 +113,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Publisher.Tests.Services
                 }
             },
             Slug = "2018-19-q1",
-            Published = new DateTime(2019, 1, 01),
+            Published = new DateTime(2019, 2, 1),
             Status = Approved,
             Version = 1,
             PreviousVersionId = new Guid("36725e6b-8682-480b-a04a-0564253b7160"),
@@ -137,11 +137,27 @@ namespace GovUk.Education.ExploreEducationStatistics.Publisher.Tests.Services
                 }
             },
             Slug = "2018-19-q1",
-            Published = new DateTime(2019, 1, 01),
+            Published = null,
             Status = Approved,
             Version = 2,
             PreviousVersionId = new Guid("de6dc6ad-dc75-435c-9cf5-1ed4fe49c0cc"),
             SoftDeleted = true
+        };
+
+        private static readonly Release PublicationARelease1V3NotPublished = new Release
+        {
+            Id = new Guid("f5cbff36-4aa8-4e59-9621-b069ae8dee3e"),
+            PublicationId = PublicationA.Id,
+            ReleaseName = "2018",
+            TimePeriodCoverage = AcademicYearQ1,
+            MetaGuidance = "Release 1 v3 Guidance",
+            RelatedInformation = new List<Link>(),
+            Slug = "2018-19-q1",
+            Published = null,
+            Status = Approved,
+            Version = 3,
+            PreviousVersionId = new Guid("de6dc6ad-dc75-435c-9cf5-1ed4fe49c0cc"),
+            SoftDeleted = false
         };
 
         private static readonly Release PublicationARelease2 = new Release
@@ -161,7 +177,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Publisher.Tests.Services
                 }
             },
             Slug = "2018-19-q2",
-            Published = new DateTime(2019, 1, 01),
+            Published = new DateTime(2019, 3, 1),
             Status = Approved,
             Version = 0,
             PreviousVersionId = null
@@ -187,6 +203,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Publisher.Tests.Services
             PublicationARelease1V0,
             PublicationARelease1V1,
             PublicationARelease1V2Deleted,
+            PublicationARelease1V3NotPublished,
             PublicationARelease2,
             PublicationARelease3,
             new Release
@@ -196,7 +213,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Publisher.Tests.Services
                 ReleaseName = "2017",
                 TimePeriodCoverage = AcademicYearQ4,
                 Slug = "2017-18-q4",
-                Published = new DateTime(2019, 1, 01),
+                Published = new DateTime(2019, 4, 1),
                 Status = Approved,
                 Version = 0,
                 PreviousVersionId = null
@@ -786,7 +803,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Publisher.Tests.Services
 
                 Assert.Equal(PublicationARelease2.Id, result.Id);
                 Assert.Equal("Academic Year Q2 2018/19", result.Title);
-                Assert.Equal(new DateTime(2019, 1, 01), result.Published);
+                Assert.Equal(PublicationARelease2.Published, result.Published);
 
                 var keyStatisticsSection = result.KeyStatisticsSection;
                 Assert.NotNull(keyStatisticsSection);
@@ -908,7 +925,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Publisher.Tests.Services
 
                 Assert.Equal(PublicationARelease1V1.Id, result.Id);
                 Assert.Equal("Academic Year Q1 2018/19", result.Title);
-                Assert.Equal(new DateTime(2019, 1, 01), result.Published);
+                Assert.Equal(PublicationARelease1V1.Published, result.Published);
 
                 var keyStatisticsSection = result.KeyStatisticsSection;
                 Assert.NotNull(keyStatisticsSection);
@@ -971,7 +988,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Publisher.Tests.Services
         }
 
         [Fact]
-        public async Task GetReleaseViewModel_NotYetPublished()
+        public async Task GetReleaseViewModel_ReleaseNotYetPublishedHasCorrectPublishedDate()
         {
             var contentDbContextId = Guid.NewGuid().ToString();
 
@@ -1018,6 +1035,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Publisher.Tests.Services
 
                 Assert.Equal(PublicationARelease3.Id, result.Id);
                 Assert.Equal("Academic Year Q3 2018/19", result.Title);
+                // Published date in the view model should match the date set up in the publishing context
                 Assert.Equal(context.Published, result.Published);
                 Assert.Null(result.KeyStatisticsSection);
                 Assert.Null(result.SummarySection);
@@ -1032,6 +1050,75 @@ namespace GovUk.Education.ExploreEducationStatistics.Publisher.Tests.Services
                 Assert.Equal(Ancillary, result.DownloadFiles[0].Type);
 
                 Assert.Equal("Release 3 Guidance", result.MetaGuidance);
+
+                Assert.Empty(result.RelatedInformation);
+            }
+        }
+
+        [Fact]
+        public async Task GetReleaseViewModel_AmendedReleaseNotYetPublishedHasPublishedDateOfPreviousVersion()
+        {
+            var contentDbContextId = Guid.NewGuid().ToString();
+
+            using (var contentDbContext = InMemoryContentDbContext(contentDbContextId))
+            {
+                await contentDbContext.AddRangeAsync(Publications);
+                await contentDbContext.AddRangeAsync(Releases);
+                await contentDbContext.AddRangeAsync(ReleaseFiles);
+                await contentDbContext.AddRangeAsync(ContentSections);
+                await contentDbContext.AddRangeAsync(ReleaseContentSections);
+                await contentDbContext.AddRangeAsync(ContentBlocks);
+                await contentDbContext.SaveChangesAsync();
+            }
+
+            var publicBlobStorageService = new Mock<IBlobStorageService>(MockBehavior.Strict);
+
+            publicBlobStorageService.Setup(s =>
+                    s.CheckBlobExists(PublicReleaseFiles,
+                        PublicationARelease1V3NotPublished.AllFilesZipPath()))
+                .ReturnsAsync(true);
+
+            publicBlobStorageService.Setup(s => s.GetBlob(PublicReleaseFiles,
+                    PublicationARelease1V3NotPublished.AllFilesZipPath()))
+                .ReturnsAsync(new BlobInfo
+                (
+                    path: PublicationARelease3.AllFilesZipPath(),
+                    size: "0 b",
+                    contentType: "application/x-zip-compressed",
+                    contentLength: 0L,
+                    meta: GetMetaValuesReleaseDateTime(
+                        releaseDateTime: DateTime.Now),
+                    created: null
+                ));
+
+            using (var contentDbContext = InMemoryContentDbContext(contentDbContextId))
+            {
+                var service = BuildReleaseService(contentDbContext: contentDbContext,
+                    publicBlobStorageService: publicBlobStorageService.Object);
+
+                var context = PublishContext();
+                var result = await service.GetReleaseViewModel(PublicationARelease1V3NotPublished.Id, context);
+
+                MockUtils.VerifyAllMocks(publicBlobStorageService);
+
+                Assert.Equal(PublicationARelease1V3NotPublished.Id, result.Id);
+                Assert.Equal("Academic Year Q1 2018/19", result.Title);
+                // Published date in the view model should match the published date of the previous version
+                Assert.Equal(PublicationARelease1V1.Published, result.Published);
+                Assert.Null(result.KeyStatisticsSection);
+                Assert.Null(result.SummarySection);
+                Assert.Empty(result.Content);
+
+                Assert.Single(result.DownloadFiles);
+                Assert.False(result.DownloadFiles[0].Id.HasValue);
+                Assert.Equal("zip", result.DownloadFiles[0].Extension);
+                Assert.Equal("publication-a_2018-19-q3.zip", result.DownloadFiles[0].FileName);
+                Assert.Equal("All files", result.DownloadFiles[0].Name);
+                Assert.Equal("0 b", result.DownloadFiles[0].Size);
+                Assert.Equal(Ancillary, result.DownloadFiles[0].Type);
+
+                Assert.Equal("Release 1 v3 Guidance", result.MetaGuidance);
+
                 Assert.Empty(result.RelatedInformation);
             }
         }
