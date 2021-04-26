@@ -1197,7 +1197,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
             var blobStorageService = new Mock<IBlobStorageService>(MockBehavior.Strict);
             var blob = new BlobInfo(
                 path: null,
-                size: "93",
+                size: "93 Kb",
                 contentType: "application/pdf",
                 contentLength: 0L,
                 meta: null,
@@ -1222,7 +1222,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
                 Assert.Equal(releaseFile.FileId, fileInfo.Id);
                 Assert.Equal("pdf", fileInfo.Extension);
                 Assert.Equal("ancillary.pdf", fileInfo.FileName);
-                Assert.Equal("93", fileInfo.Size);
+                Assert.Equal("93 Kb", fileInfo.Size);
                 Assert.Equal(Ancillary, fileInfo.Type);
             }
             MockUtils.VerifyAllMocks(blobStorageService);
@@ -1233,12 +1233,12 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
         {
             var blobStorageService = new Mock<IBlobStorageService>(MockBehavior.Strict);
 
-            await using (var contentDbContext = InMemoryApplicationDbContext(Guid.NewGuid().ToString()))
+            await using (var contentDbContext = InMemoryApplicationDbContext())
             {
                 var service = SetupReleaseFileService(contentDbContext: contentDbContext,
                     blobStorageService: blobStorageService.Object);
 
-                var result = await service.GetFile(Guid.Empty, Guid.Empty);
+                var result = await service.GetFile(Guid.NewGuid(), Guid.NewGuid());
                 Assert.True(result.IsLeft);
                 Assert.IsType<NotFoundResult>(result.Left);
             }
@@ -1516,13 +1516,16 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
 
             await using (var contentDbContext = InMemoryApplicationDbContext(contentDbContextId))
             {
-                var service = SetupReleaseFileService(contentDbContext: contentDbContext);
+                var service = SetupReleaseFileService(contentDbContext);
 
                 var result = await service.UpdateName(releaseFile.ReleaseId, releaseFile.FileId, "New file title");
 
                 Assert.True(result.IsRight);
                 Assert.IsType<Unit>(result.Right);
+            }
 
+            await using (var contentDbContext = InMemoryApplicationDbContext(contentDbContextId))
+            {
                 var updatedReleaseFile = await contentDbContext.ReleaseFiles.FirstAsync(rf =>
                     rf.ReleaseId == releaseFile.ReleaseId
                     && rf.FileId == releaseFile.FileId);
