@@ -1511,8 +1511,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
                 Label = "Default group - not changing",
                 FilterItems = new List<FilterItem>
                 {
-                    replacementDefaultFilterItem,
-                    replacementNewlyIntroducedFiltersFilterItem
+                    replacementDefaultFilterItem
                 }
             };
 
@@ -1554,7 +1553,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
                 Subject = replacementSubject,
                 FilterGroups = new List<FilterGroup>
                 {
-                    replacementNewlyIntroducedFilterGroup,
+                    replacementNewlyIntroducedFilterGroup
                 }
             };
 
