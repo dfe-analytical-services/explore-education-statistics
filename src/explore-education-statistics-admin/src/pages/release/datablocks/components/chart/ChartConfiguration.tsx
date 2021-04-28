@@ -140,10 +140,8 @@ const ChartConfiguration = ({
   );
 
   const handleChange = useCallback(
-    ({ isValid, ...values }: FormValues & { isValid: boolean }) => {
-      if (isValid) {
-        onChange(normalizeValues(values));
-      }
+    ({ ...values }: FormValues) => {
+      onChange(normalizeValues(values));
     },
     [normalizeValues, onChange],
   );
@@ -175,7 +173,6 @@ const ChartConfiguration = ({
             <Effect
               value={{
                 ...form.values,
-                isValid: form.isValid,
               }}
               onChange={handleChange}
             />
