@@ -55,6 +55,9 @@
     },
     "autoPauseDelayStatisticsDb": {
       "value": -1
+    },
+    "enableAlerts": {
+      "value": true
     }
   }
 }

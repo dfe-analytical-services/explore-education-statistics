@@ -349,13 +349,15 @@ export const MapBlockInternal = ({
   }, [dataSetCategoryConfigs]);
 
   const locationOptions = useMemo(() => {
-    return orderBy(
+    const locations = orderBy(
       dataSetCategories.map(dataSetCategory => ({
         label: dataSetCategory.filter.label,
         value: dataSetCategory.filter.id,
       })),
       ['label'],
     );
+    locations.unshift({ label: 'None selected', value: '' });
+    return locations;
   }, [dataSetCategories]);
 
   const [selectedDataSetKey, setSelectedDataSetKey] = useState<string>(
@@ -470,6 +472,22 @@ export const MapBlockInternal = ({
     [selectedFeature],
   );
 
+  const resetSelectedFeature = useCallback(() => {
+    if (selectedFeature) {
+      const element = selectedFeature?.properties.layer?.getElement();
+
+      if (element) {
+        element.classList.remove(styles.selected);
+        element.removeAttribute('data-testid');
+      }
+      if (mapRef.current) {
+        mapRef.current.leafletElement.setZoom(5);
+      }
+
+      setSelectedFeature(undefined);
+    }
+  }, [selectedFeature]);
+
   // We have to assign our `onEachFeature` callback to a ref
   // as `onEachFeature` forms an internal closure which
   // prevents us from updating the callback's dependencies.
@@ -554,17 +572,16 @@ export const MapBlockInternal = ({
               id={`${id}-selectedLocation`}
               label="2. Select a location"
               value={selectedFeature?.id?.toString()}
-              placeholder="Select location"
               options={locationOptions}
               order={FormSelect.unordered}
               onChange={e => {
                 const feature = geometry?.features.find(
                   feat => feat.id === e.currentTarget.value,
                 );
-
                 if (feature) {
-                  updateSelectedFeature(feature);
+                  return updateSelectedFeature(feature);
                 }
+                return resetSelectedFeature();
               }}
             />
           </FormGroup>
@@ -582,6 +599,7 @@ export const MapBlockInternal = ({
               }}
               className={classNames(styles.map, 'dfe-print-break-avoid')}
               center={position}
+              minZoom={5}
               zoom={5}
             >
               <GeoJSON data={ukGeometry} className={styles.uk} ref={ukRef} />

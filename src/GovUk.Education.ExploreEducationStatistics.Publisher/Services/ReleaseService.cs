@@ -86,8 +86,31 @@ namespace GovUk.Education.ExploreEducationStatistics.Publisher.Services
             var releaseViewModel = _mapper.Map<CachedReleaseViewModel>(release);
             releaseViewModel.DownloadFiles = await GetDownloadFiles(release);
 
-            // If the release isn't live yet set the published date based on what we expect it to be
-            releaseViewModel.Published ??= context.Published;
+            // If the release has no published date yet because it's not live, set the published date in the view model.
+            // This is based on what we expect it to eventually be set as in the database when publishing completes
+            if (!releaseViewModel.Published.HasValue)
+            {
+                if (release.Amendment)
+                {
+                    // For amendments this will be the published date of the previous release
+                    var previousVersion = await _contentDbContext.Releases
+                        .FindAsync(release.PreviousVersionId);
+
+                    if (!previousVersion.Published.HasValue)
+                    {
+                        throw new ArgumentException(
+                            $"Expected Release {previousVersion.Id} to have a Published date as the previous version of Release {release.Id}");
+                    }
+
+                    releaseViewModel.Published = previousVersion.Published;
+                }
+                else
+                {
+                    // Otherwise it's either the time now or the next scheduled publishing time
+                    // This date is set up by the calling function when execution begins
+                    releaseViewModel.Published = context.Published;
+                }
+            }
 
             return releaseViewModel;
         }

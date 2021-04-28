@@ -237,7 +237,7 @@ User goes to public Find Statistics page
 
 Verify newly published release is on Find Statistics page
     [Tags]  HappyPath
-    user waits until page contains accordion section   %{TEST_THEME_NAME}
+    user waits until page contains accordion section   %{TEST_THEME_NAME}  180
     user opens accordion section  %{TEST_THEME_NAME}
     user waits until accordion section contains text   %{TEST_THEME_NAME}   ${TOPIC_NAME}
 
@@ -250,7 +250,7 @@ Verify newly published release is on Find Statistics page
 Navigate to newly published release page
     [Tags]  HappyPath
     user clicks testid element  View stats link for ${PUBLICATION_NAME}
-    user waits until h1 is visible  ${PUBLICATION_NAME}  90
+    user waits until h1 is visible  ${PUBLICATION_NAME}  180
 
 Verify release URL and page caption
     [Tags]  HappyPath

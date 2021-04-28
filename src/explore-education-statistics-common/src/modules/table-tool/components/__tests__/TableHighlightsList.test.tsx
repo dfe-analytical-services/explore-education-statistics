@@ -170,6 +170,33 @@ describe('TableHighlightsList', () => {
     });
   });
 
+  test('handles search when some highlights have no description', async () => {
+    const highlightWithoutDescription = {
+      id: 'highlight-4',
+      name: '4 - no description',
+    };
+
+    render(
+      <TableHighlightsList
+        highlights={[highlightWithoutDescription, ...testHighlights]}
+        renderLink={renderLink}
+      />,
+    );
+
+    await userEvent.type(screen.getByRole('textbox'), 'unique description');
+
+    jest.runOnlyPendingTimers();
+
+    await waitFor(() => {
+      expect(screen.getByText(/Found 1 matching table/)).toBeInTheDocument();
+
+      const listItems = screen.getAllByRole('listitem');
+
+      expect(listItems).toHaveLength(1);
+      expect(listItems[0]).toHaveTextContent('10 - Unique description');
+    });
+  });
+
   test('renders empty message if no results', async () => {
     render(
       <TableHighlightsList

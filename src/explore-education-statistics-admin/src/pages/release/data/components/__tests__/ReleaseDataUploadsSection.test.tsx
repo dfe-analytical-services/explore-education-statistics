@@ -478,7 +478,7 @@ describe('ReleaseDataUploadsSection', () => {
           section2.getByRole('link', { name: 'Replace data' }),
         ).toHaveAttribute(
           'href',
-          '/publication/publication-1/release/release-1/data/data-2',
+          '/publication/publication-1/release/release-1/data/data-2/replace',
         );
       });
     });

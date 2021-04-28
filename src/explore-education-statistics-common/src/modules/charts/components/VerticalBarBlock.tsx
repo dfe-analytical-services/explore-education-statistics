@@ -102,6 +102,7 @@ const VerticalBarBlock = ({
           data={chartData}
           margin={{
             left: 30,
+            top: 20,
           }}
         >
           <CartesianGrid

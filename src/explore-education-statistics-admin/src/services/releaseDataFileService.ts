@@ -173,10 +173,21 @@ const releaseDataFileService = {
   },
   downloadFile(releaseId: string, id: string, fileName: string): Promise<void> {
     return client
-      .get<Blob>(`/release/${releaseId}/file/${id}`, {
+      .get<Blob>(`/release/${releaseId}/file/${id}/download`, {
         responseType: 'blob',
       })
       .then(response => downloadFile(response, fileName));
+  },
+  renameFile(releaseId: string, fileId: string, name: string): Promise<void> {
+    return client.post(
+      `/release/${releaseId}/file/${fileId}/rename`,
+      {},
+      {
+        params: {
+          name,
+        },
+      },
+    );
   },
   cancelImport(releaseId: string, fileId: string): Promise<void> {
     return client.post(`/release/${releaseId}/data/${fileId}/import/cancel`);

@@ -53,7 +53,8 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Services
             Guid releaseId,
             string filename,
             FileType type,
-            Guid createdById)
+            Guid createdById,
+            string name = null)
         {
             if (!SupportedFileTypes.Contains(type))
             {
@@ -63,6 +64,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Services
             var releaseFile = new ReleaseFile
             {
                 ReleaseId = releaseId,
+                Name = name,
                 File = new File
                 {
                     Created = DateTime.UtcNow,
@@ -133,6 +135,23 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Services
             await _contentDbContext.SaveChangesAsync();
 
             return releaseFile;
+        }
+
+        public async Task UpdateName(Guid releaseId,
+            Guid fileId,
+            string name)
+        {
+            var releaseFile = await _contentDbContext.ReleaseFiles
+                .Include(rf => rf.File)
+                .SingleAsync(rf =>
+                    rf.ReleaseId == releaseId
+                    && rf.FileId == fileId
+                    && (rf.File.Type == FileType.Data || rf.File.Type == Ancillary));
+
+            _contentDbContext.Update(releaseFile);
+            releaseFile.Name = name;
+
+            await _contentDbContext.SaveChangesAsync();
         }
     }
 }

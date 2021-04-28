@@ -81,9 +81,7 @@ describe('DownloadCsvButton', () => {
       />,
     );
 
-    fireEvent.click(
-      getByText('Download the underlying data of this table (CSV)'),
-    );
+    fireEvent.click(getByText('Download the data of this table (CSV)'));
 
     const mockedWriteFile = writeFile as jest.Mock;
 

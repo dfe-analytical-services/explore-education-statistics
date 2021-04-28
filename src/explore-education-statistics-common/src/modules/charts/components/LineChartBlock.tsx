@@ -133,6 +133,7 @@ const LineChartBlock = ({
           data={chartData}
           margin={{
             left: 30,
+            top: 20,
           }}
         >
           <Tooltip

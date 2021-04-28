@@ -1,5 +1,7 @@
 import ReleaseContentPage from '@admin/pages/release/content/ReleaseContentPage';
 import ReleaseDataFilePage from '@admin/pages/release/data/ReleaseDataFilePage';
+import ReleaseAncillaryFilePage from '@admin/pages/release/data/ReleaseAncillaryFilePage';
+import ReleaseDataFileReplacePage from '@admin/pages/release/data/ReleaseDataFileReplacePage';
 import ReleaseDataFileReplacementCompletePage from '@admin/pages/release/data/ReleaseDataFileReplacementCompletePage';
 import ReleaseDataPage from '@admin/pages/release/data/ReleaseDataPage';
 import ReleaseDataBlockCreatePage from '@admin/pages/release/datablocks/ReleaseDataBlockCreatePage';
@@ -25,6 +27,14 @@ export type ReleaseDataBlockRouteParams = ReleaseRouteParams & {
 };
 
 export type ReleaseDataFileRouteParams = ReleaseRouteParams & {
+  fileId: string;
+};
+
+export type ReleaseAncillaryFileRouteParams = ReleaseRouteParams & {
+  fileId: string;
+};
+
+export type ReleaseDataFileReplaceRouteParams = ReleaseRouteParams & {
   fileId: string;
 };
 
@@ -55,10 +65,28 @@ export const releaseDataRoute: ReleaseRouteProps = {
   component: ReleaseDataPage,
 };
 
+export const releaseDataAncillaryRoute: ReleaseRouteProps = {
+  path: '/publication/:publicationId/release/:releaseId/data#file-uploads',
+  title: 'Data and files',
+  component: ReleaseDataPage,
+};
+
+export const releaseAncillaryFileRoute: ReleaseRouteProps = {
+  path: '/publication/:publicationId/release/:releaseId/ancillary/:fileId',
+  title: 'Ancillary file',
+  component: ReleaseAncillaryFilePage,
+};
+
 export const releaseDataFileRoute: ReleaseRouteProps = {
   path: '/publication/:publicationId/release/:releaseId/data/:fileId',
   title: 'Data file',
   component: ReleaseDataFilePage,
+};
+
+export const releaseDataFileReplaceRoute: ReleaseRouteProps = {
+  path: '/publication/:publicationId/release/:releaseId/data/:fileId/replace',
+  title: 'Replace data file',
+  component: ReleaseDataFileReplacePage,
 };
 
 export const releaseDataFileReplacementCompleteRoute: ReleaseRouteProps = {

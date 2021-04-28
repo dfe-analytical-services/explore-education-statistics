@@ -35,8 +35,6 @@ namespace GovUk.Education.ExploreEducationStatistics.Common.Model
             Created = created;
         }
 
-        public string Name => Meta.TryGetValue(NameKey, out var name) ? name : string.Empty;
-
         public string FileName => Path.Substring(Path.LastIndexOf('/') + 1);
     }
 }

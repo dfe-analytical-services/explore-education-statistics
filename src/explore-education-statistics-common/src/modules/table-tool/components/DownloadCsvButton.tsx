@@ -107,7 +107,7 @@ const DownloadCsvButton = ({
         }
       }}
     >
-      Download the underlying data of this table (CSV)
+      Download the data of this table (CSV)
     </ButtonText>
   );
 };

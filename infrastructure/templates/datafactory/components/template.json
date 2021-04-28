@@ -2061,16 +2061,6 @@
                                             "name": "Id",
                                             "type": "Guid"
                                         }
-                                    },
-                                    {
-                                        "source": {
-                                            "name": "Filename",
-                                            "type": "String"
-                                        },
-                                        "sink": {
-                                            "name": "Filename",
-                                            "type": "String"
-                                        }
                                     }
                                 ]
                             }

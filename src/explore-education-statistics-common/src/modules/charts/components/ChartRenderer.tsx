@@ -44,7 +44,7 @@ function ChartRenderer({
   id,
   ...props
 }: ChartRendererProps & ChartRendererInternalProps) {
-  const { data, meta, title } = props;
+  const { data, meta, title, type } = props;
 
   const chart = useMemo(() => {
     switch (props.type) {
@@ -62,10 +62,13 @@ function ChartRenderer({
         return <p>Unable to render invalid chart type</p>;
     }
   }, [id, props]);
-
-  const { type } = props;
   const { footnotes } = meta;
-  if (type === 'map') {
+
+  const boundaryFootnoteId = 'map-footnote';
+  if (
+    type === 'map' &&
+    footnotes.findIndex(footnote => footnote.id === boundaryFootnoteId) === -1
+  ) {
     const boundaryFootnoteLabel = `The boundary data used in this map includes${meta.boundaryLevels
       .map((value, index, array) => {
         let separator = index === 0 ? ' ' : ', ';
@@ -75,7 +78,10 @@ function ChartRenderer({
         return `${separator}${value.label}`;
       })
       .join('')}`;
-    footnotes.push({ id: `map-footnote`, label: boundaryFootnoteLabel });
+    footnotes.push({
+      id: boundaryFootnoteId,
+      label: boundaryFootnoteLabel,
+    });
   }
 
   if (data && meta && data.length > 0) {

@@ -23,7 +23,11 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Services.Interfaces
 
         Task<Either<ActionResult, IEnumerable<FileInfo>>> ListAll(Guid releaseId, params FileType[] types);
 
+        Task<Either<ActionResult, FileInfo>> GetFile(Guid releaseId, Guid fileId);
+
         Task<Either<ActionResult, FileStreamResult>> Stream(Guid releaseId, Guid id);
+
+        Task<Either<ActionResult, Unit>> UpdateName(Guid releaseId, Guid fileId, string name);
 
         Task<Either<ActionResult, FileInfo>> UploadAncillary(Guid releaseId,
             IFormFile formFile,

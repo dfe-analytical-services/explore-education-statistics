@@ -30,6 +30,7 @@ export const defaultSanitizeOptions: SanitizeHtmlOptions = {
     'thead',
     'tbody',
     'tr',
+    'br',
     'td',
     'th',
     'img',

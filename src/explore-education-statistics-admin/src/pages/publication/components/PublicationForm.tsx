@@ -73,9 +73,14 @@ const PublicationForm = ({
   onSubmit,
 }: Props) => {
   const {
-    value: methodologies = [],
+    value: approvedMethodologies = [],
     isLoading: isMethodologiesLoading,
-  } = useAsyncHandledRetry(methodologyService.getMethodologies);
+  } = useAsyncHandledRetry(async () => {
+    const allMethodologies = await methodologyService.getMethodologies();
+    return allMethodologies.filter(
+      methodology => methodology.status !== 'Draft',
+    );
+  });
 
   const {
     value: themes = [],
@@ -94,7 +99,7 @@ const PublicationForm = ({
     }
 
     return initialValues ? 'none' : 'existing';
-  }, [initialValues]);
+  }, [initialValues, approvedMethodologies]);
 
   const validationSchema = useMemo(() => {
     const schema = Yup.object<FormValues>({
@@ -104,7 +109,12 @@ const PublicationForm = ({
         .required('Choose a methodology'),
       methodologyId: Yup.string().when('methodologyChoice', {
         is: 'existing',
-        then: Yup.string().required('Choose a methodology'),
+        then: Yup.string()
+          .oneOf(
+            approvedMethodologies.map(m => m.id),
+            'Choose a methodology',
+          )
+          .required('Choose a methodology'),
         otherwise: Yup.string(),
       }),
       externalMethodology: Yup.object<ExternalMethodology>().when(
@@ -142,7 +152,7 @@ const PublicationForm = ({
     }
 
     return schema;
-  }, [initialValues?.topicId]);
+  }, [initialValues?.topicId, approvedMethodologies]);
 
   const handleSubmit = useFormSubmit(
     async ({
@@ -222,12 +232,10 @@ const PublicationForm = ({
                     label="Select methodology"
                     placeholder="Choose a methodology"
                     options={orderBy(
-                      methodologies
-                        .filter(methodology => methodology.status !== 'Draft')
-                        .map(methodology => ({
-                          label: `${methodology.title} [${methodology.status}]`,
-                          value: methodology.id,
-                        })),
+                      approvedMethodologies.map(methodology => ({
+                        label: `${methodology.title} [${methodology.status}]`,
+                        value: methodology.id,
+                      })),
                       'label',
                     )}
                     order={[]}
@@ -263,7 +271,7 @@ const PublicationForm = ({
                   form.setValues({
                     ...form.values,
                     methodologyId: orderBy(
-                      methodologies,
+                      approvedMethodologies,
                       methodology => methodology.title,
                     )[0]?.id,
                     externalMethodology: {

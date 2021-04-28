@@ -188,14 +188,16 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Services
         private DataBlockReplacementPlanViewModel ValidateDataBlock(DataBlock dataBlock,
             ReplacementSubjectMeta replacementSubjectMeta)
         {
-            var filters = ValidateFiltersForDataBlock(dataBlock, replacementSubjectMeta);
+            var existingFilters = ValidateFiltersForDataBlock(dataBlock, replacementSubjectMeta);
+            var newlyIntroducedFilters = FindNewlyIntroducedFiltersForDataBlock(dataBlock, replacementSubjectMeta);
             var indicatorGroups = ValidateIndicatorGroupsForDataBlock(dataBlock, replacementSubjectMeta);
             var locations = ValidateLocationsForDataBlock(dataBlock, replacementSubjectMeta);
             var timePeriods = ValidateTimePeriodsForDataBlock(dataBlock, replacementSubjectMeta);
 
             return new DataBlockReplacementPlanViewModel(dataBlock.Id,
                 dataBlock.Name,
-                filters,
+                existingFilters,
+                newlyIntroducedFilters,
                 indicatorGroups,
                 locations,
                 timePeriods);
@@ -300,6 +302,44 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Services
                         indicators: group.Select(indicator => ValidateIndicatorForReplacement(indicator, replacementSubjectMeta))
                     )
                 );
+        }
+
+        private List<FilterReplacementViewModel> FindNewlyIntroducedFiltersForDataBlock(
+            DataBlock dataBlock,
+            ReplacementSubjectMeta replacementSubjectMeta)
+        {
+            var existingFilterItemIds = dataBlock
+                .Query
+                .Filters;
+
+            var existingFilterNames = _statisticsDbContext
+                .FilterItem
+                .Where(fi => existingFilterItemIds.Contains(fi.Id))
+                .Select(fi => fi.FilterGroup.Filter)
+                .Select(f => f.Name)
+                .Distinct()
+                .ToList();
+            
+            return replacementSubjectMeta
+                .Filters
+                .Select(d => d.Value)
+                .ToList()
+                .Where(f => !existingFilterNames.Contains(f.Name))
+                .Select(CreateNewlyIntroducedFilterReplacementViewModel)
+                .ToList();
+        }
+
+        private static FilterReplacementViewModel CreateNewlyIntroducedFilterReplacementViewModel(Filter filter)
+        {
+            var filterGroupReplacementViewModels = filter
+                .FilterGroups
+                .Select(fg => new FilterGroupReplacementViewModel(fg.Id, fg.Label, fg
+                    .FilterItems
+                    .Select(fi => new FilterItemReplacementViewModel(fi.Id, fi.Label, null)))
+                )
+                .ToDictionary(f => f.Id);
+            
+            return new FilterReplacementViewModel(filter.Id, filter.Label, filter.Name, filterGroupReplacementViewModels);
         }
 
         private Dictionary<Guid, FilterReplacementViewModel> ValidateFiltersForDataBlock(
