@@ -988,7 +988,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Publisher.Tests.Services
         }
 
         [Fact]
-        public async Task GetReleaseViewModel_ReleaseNotYetPublishedHasCorrectPublishedDate()
+        public async Task GetReleaseViewModel_NotYetPublished()
         {
             var contentDbContextId = Guid.NewGuid().ToString();
 
