@@ -301,6 +301,60 @@ describe('PublicationForm', () => {
     });
   });
 
+  test(
+    'cannot submit if the previously selected methodology is set back ' +
+      'to Draft and another methodology is not selected instead',
+    async () => {
+      methodologyService.getMethodologies.mockResolvedValue([
+        testMethodologies[0],
+      ]);
+
+      const handleSubmit = jest.fn();
+
+      render(
+        <PublicationForm
+          initialValues={{
+            title: 'Test title',
+            methodologyId: 'methodology-2',
+            teamName: 'Test team',
+            teamEmail: 'team@test.com',
+            contactTelNo: '0123456789',
+            contactName: 'John Smith',
+          }}
+          onSubmit={handleSubmit}
+        />,
+      );
+
+      await waitFor(() => {
+        expect(
+          screen.getByText('Methodology 1 [Approved]', {
+            selector: 'option',
+          }),
+        ).toBeInTheDocument();
+      });
+
+      await waitFor(() => {
+        expect(
+          screen.getByRole('button', { name: 'Save publication' }),
+        ).toBeInTheDocument();
+      });
+
+      userEvent.click(screen.getByRole('button', { name: 'Save publication' }));
+
+      await waitFor(() => {
+        expect(handleSubmit).not.toHaveBeenCalled();
+      });
+
+      await waitFor(() => {
+        expect(
+          screen.getByText('Choose a methodology', {
+            selector: '#publicationForm-methodologyId-error',
+          }),
+        ).toBeInTheDocument();
+      });
+    },
+  );
+
   test('can submit with valid values', async () => {
     methodologyService.getMethodologies.mockResolvedValue(testMethodologies);
 
@@ -447,6 +501,48 @@ describe('PublicationForm', () => {
         expect(screen.getByLabelText('Link title')).toHaveValue('');
         expect(screen.getByLabelText('URL')).toHaveValue('');
         expect(screen.getByLabelText('Select methodology')).toHaveValue('');
+      });
+    });
+
+    test('renders correctly when existing linked methodology has been set back to Draft', async () => {
+      methodologyService.getMethodologies.mockResolvedValue([
+        testMethodologies[0],
+        {
+          ...testMethodologies[1],
+          status: 'Draft',
+        },
+      ]);
+
+      render(
+        <PublicationForm
+          initialValues={{
+            title: 'Test title',
+            methodologyId: 'methodology-2',
+            teamName: 'Test team',
+            teamEmail: 'team@test.com',
+            contactTelNo: '0123456789',
+            contactName: 'John Smith',
+          }}
+          onSubmit={noop}
+        />,
+      );
+
+      await waitFor(() => {
+        expect(screen.getByLabelText('Publication title')).toHaveValue(
+          'Test title',
+        );
+        expect(
+          screen.getByLabelText('Choose an existing methodology'),
+        ).toBeChecked();
+        expect(screen.getByLabelText('Select methodology')).toHaveValue('');
+        expect(screen.getByLabelText('Team name')).toHaveValue('Test team');
+        expect(screen.getByLabelText('Team email address')).toHaveValue(
+          'team@test.com',
+        );
+        expect(screen.getByLabelText('Contact name')).toHaveValue('John Smith');
+        expect(screen.getByLabelText('Contact telephone number')).toHaveValue(
+          '0123456789',
+        );
       });
     });
 
