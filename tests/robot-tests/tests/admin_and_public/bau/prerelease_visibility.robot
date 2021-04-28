@@ -27,7 +27,8 @@ Verify release summary
 Upload subject
     [Tags]  HappyPath
     user clicks link  Data and files
-    user waits until h2 is visible  Add data file to release
+    user waits until h2 is visible  Add data file to release  90
+    user waits until page contains element  id:dataFileUploadForm-subjectTitle
     user enters text into element  id:dataFileUploadForm-subjectTitle   UI test subject
     user chooses file   id:dataFileUploadForm-dataFile       ${FILES_DIR}upload-file-test.csv
     user chooses file   id:dataFileUploadForm-metadataFile   ${FILES_DIR}upload-file-test.meta.csv

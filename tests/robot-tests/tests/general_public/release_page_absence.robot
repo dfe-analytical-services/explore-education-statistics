@@ -110,7 +110,7 @@ Validate headlines -- Summary tab content
 
 Validate Key Statistics data block -- Charts tab
     [Tags]  HappyPath
-    user scrolls to element  css:#releaseHeadlines-chart 
+    user scrolls down  400
     user clicks element   id:releaseHeadlines-charts-tab
     ${headline_chart}=  set variable  css:#releaseHeadlines-chart   # must be css selector
     user waits until element contains line chart  ${headline_chart}
