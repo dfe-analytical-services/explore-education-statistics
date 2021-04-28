@@ -13,7 +13,7 @@ import { MapBlockProps } from '@common/modules/charts/components/MapBlockInterna
 import VerticalBarBlock, {
   VerticalBarProps,
 } from '@common/modules/charts/components/VerticalBarBlock';
-import React, { memo, useMemo, useEffect } from 'react';
+import React, { memo, useMemo } from 'react';
 
 export type ChartRendererProps = {
   source?: string;
@@ -45,7 +45,6 @@ function ChartRenderer({
   ...props
 }: ChartRendererProps & ChartRendererInternalProps) {
   const { data, meta, title, type } = props;
-  const { footnotes } = meta;
 
   const chart = useMemo(() => {
     switch (props.type) {
@@ -63,21 +62,27 @@ function ChartRenderer({
         return <p>Unable to render invalid chart type</p>;
     }
   }, [id, props]);
+  const { footnotes } = meta;
 
-  useEffect(() => {
-    if (type === 'map') {
-      const boundaryFootnoteLabel = `The boundary data used in this map includes${meta.boundaryLevels
-        .map((value, index, array) => {
-          let separator = index === 0 ? ' ' : ', ';
-          if (array.length - 1 === index) {
-            separator = ' and ';
-          }
-          return `${separator}${value.label}`;
-        })
-        .join('')}`;
-      footnotes.push({ id: `map-footnote`, label: boundaryFootnoteLabel });
-    }
-  }, [footnotes, meta.boundaryLevels, type]);
+  const boundaryFootnoteId = 'map-footnote';
+  if (
+    type === 'map' &&
+    footnotes.findIndex(footnote => footnote.id === boundaryFootnoteId) === -1
+  ) {
+    const boundaryFootnoteLabel = `The boundary data used in this map includes${meta.boundaryLevels
+      .map((value, index, array) => {
+        let separator = index === 0 ? ' ' : ', ';
+        if (array.length - 1 === index) {
+          separator = ' and ';
+        }
+        return `${separator}${value.label}`;
+      })
+      .join('')}`;
+    footnotes.push({
+      id: boundaryFootnoteId,
+      label: boundaryFootnoteLabel,
+    });
+  }
 
   if (data && meta && data.length > 0) {
     return (
