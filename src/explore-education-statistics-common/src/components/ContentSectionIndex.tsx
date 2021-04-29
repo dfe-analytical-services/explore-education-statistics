@@ -8,7 +8,7 @@ import React, {
   useRef,
   useState,
 } from 'react';
-import Details from '@common/components/Details';
+import generateContentList from '@common/components/util/generateContentList';
 
 const TOP_MARGIN = 20;
 const BOTTOM_MARGIN = 40;
@@ -21,25 +21,34 @@ interface Props {
   visible?: boolean;
 }
 
+interface ListItem {
+  id: string;
+  tagName: string;
+  textContent: string;
+}
+
+export interface ParentListItem extends ListItem {
+  children: Array<ListItem>;
+}
+
 type ViewportPosition = 'before' | 'within' | 'after';
 
 const ContentSectionIndex = ({
   contentRef,
   id,
-  selector = 'h2, h3, h4, h5',
+  selector = 'h3, h4',
   sticky,
   visible = true,
 }: Props) => {
   const outerRef = useRef<HTMLDivElement>(null);
   const ref = useRef<HTMLDivElement>(null);
-
-  const [elements, setElements] = useState<HTMLElement[][]>([]);
+  const [headingsList, setHeadingsList] = useState<ParentListItem[]>([]);
   const [viewportPosition, setViewportPosition] = useState<ViewportPosition>();
   const [initialBounds, setInitialBounds] = useState<DOMRect>();
 
   const { isMounted } = useMounted(() => {
     if (contentRef.current) {
-      const nextElements = Array.from(
+      const headingElements = Array.from(
         contentRef.current.querySelectorAll(selector),
       ) as HTMLElement[];
 
@@ -47,23 +56,14 @@ const ContentSectionIndex = ({
         throw new Error('Prop `id` must not be empty');
       }
 
-      nextElements.forEach((element, index) => {
+      headingElements.forEach((element, index) => {
         if (!element.id) {
           // eslint-disable-next-line no-param-reassign
           element.id = `${id}-${index + 1}`;
         }
       });
 
-      const headingCollection: HTMLElement[][] = [];
-      let headingNumberSection: HTMLElement[] = [];
-      nextElements.forEach((value, index, array) => {
-        if (value.tagName === 'H3') {
-          headingCollection.push(headingNumberSection);
-          headingNumberSection = [];
-        }
-        headingNumberSection.push(value);
-      });
-      setElements(headingCollection);
+      setHeadingsList(generateContentList(headingElements));
     }
   });
 
@@ -156,10 +156,9 @@ const ContentSectionIndex = ({
     }
   };
 
-  if (!isMounted || !elements.length || !visible) {
+  if (!isMounted || !headingsList.length || !visible) {
     return null;
   }
-
   return (
     <div ref={outerRef} className="dfe-print-hidden">
       <div
@@ -181,31 +180,22 @@ const ContentSectionIndex = ({
           <h3 className="govuk-heading-s">In this section</h3>
 
           <ul className="govuk-body-s">
-            {elements.map((element, index) => {
-              if (element.length > 1) {
-                return (
-                  // eslint-disable-next-line react/no-array-index-key
-                  <Details key={index} summary={element[0].innerText}>
-                    {element.map((value, subIndex, array) => (
-                      // eslint-disable-next-line react/no-array-index-key
-                      <li key={subIndex}>
-                        <a href={`#${value.id}`}>{value.textContent}</a>
+            {headingsList.map(listItem => (
+              <li key={listItem.id}>
+                <a href={`#${listItem.id}`}>{listItem.textContent}</a>
+                {listItem.children.length > 0 && (
+                  <ul>
+                    {listItem.children.map(childListItem => (
+                      <li key={childListItem.id}>
+                        <a href={`#${childListItem.id}`}>
+                          {childListItem.textContent}
+                        </a>
                       </li>
                     ))}
-                  </Details>
-                  // // eslint-disable-next-line react/no-array-index-key
-                );
-              }
-              if (element.length === 1) {
-                return (
-                  // eslint-disable-next-line react/no-array-index-key
-                  <li key={index}>
-                    <a href={`#${element[0].id}`}>{element[0].textContent}</a>
-                  </li>
-                );
-              }
-              return null;
-            })}
+                  </ul>
+                )}
+              </li>
+            ))}
           </ul>
         </div>
       </div>
