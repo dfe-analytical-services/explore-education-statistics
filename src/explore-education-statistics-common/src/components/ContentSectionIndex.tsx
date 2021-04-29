@@ -8,6 +8,7 @@ import React, {
   useRef,
   useState,
 } from 'react';
+import Details from '@common/components/Details';
 
 const TOP_MARGIN = 20;
 const BOTTOM_MARGIN = 40;
@@ -32,7 +33,7 @@ const ContentSectionIndex = ({
   const outerRef = useRef<HTMLDivElement>(null);
   const ref = useRef<HTMLDivElement>(null);
 
-  const [elements, setElements] = useState<HTMLElement[]>([]);
+  const [elements, setElements] = useState<HTMLElement[][]>([]);
   const [viewportPosition, setViewportPosition] = useState<ViewportPosition>();
   const [initialBounds, setInitialBounds] = useState<DOMRect>();
 
@@ -53,7 +54,18 @@ const ContentSectionIndex = ({
         }
       });
 
-      setElements(nextElements);
+      const headingCollection: HTMLElement[][] = [];
+      let headingNumberSection: HTMLElement[] = [];
+      nextElements.forEach((value, index, array) => {
+        if (value.tagName === 'H3') {
+          headingNumberSection = [];
+        }
+        headingNumberSection.push(value);
+        if (value.tagName === 'H3') {
+          headingCollection.push(headingNumberSection);
+        }
+      });
+      setElements(headingCollection);
     }
   });
 
@@ -171,12 +183,31 @@ const ContentSectionIndex = ({
           <h3 className="govuk-heading-s">In this section</h3>
 
           <ul className="govuk-body-s">
-            {elements.map((element, index) => (
-              // eslint-disable-next-line react/no-array-index-key
-              <li key={index}>
-                <a href={`#${element.id}`}>{element.textContent}</a>
-              </li>
-            ))}
+            {elements.map((element, index) => {
+              if (element.length > 1) {
+                return (
+                  // eslint-disable-next-line react/no-array-index-key
+                  <Details key={index} summary={element[0].innerText}>
+                    {element.map((value, subIndex, array) => (
+                      // eslint-disable-next-line react/no-array-index-key
+                      <li key={subIndex}>
+                        <a href={`#${value.id}`}>{value.textContent}</a>
+                      </li>
+                    ))}
+                  </Details>
+                  // // eslint-disable-next-line react/no-array-index-key
+                );
+              }
+              if (element.length === 1) {
+                return (
+                  // eslint-disable-next-line react/no-array-index-key
+                  <li key={index}>
+                    <a href={`#${element[0].id}`}>{element[0].textContent}</a>
+                  </li>
+                );
+              }
+              return null;
+            })}
           </ul>
         </div>
       </div>
