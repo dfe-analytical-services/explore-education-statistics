@@ -14,9 +14,7 @@ export default function generateContentList(elements: Array<HTMLElement>) {
       });
     }
     if (element.tagName === 'H4') {
-      const lastH3 = findLast(list, el => {
-        return el.tagName === 'H3';
-      });
+      const lastH3 = findLast(list, el => el.tagName === 'H3');
       if (lastH3) {
         lastH3.children.push({
           id: element.id,
