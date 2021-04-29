@@ -58,12 +58,10 @@ const ContentSectionIndex = ({
       let headingNumberSection: HTMLElement[] = [];
       nextElements.forEach((value, index, array) => {
         if (value.tagName === 'H3') {
+          headingCollection.push(headingNumberSection);
           headingNumberSection = [];
         }
         headingNumberSection.push(value);
-        if (value.tagName === 'H3') {
-          headingCollection.push(headingNumberSection);
-        }
       });
       setElements(headingCollection);
     }
