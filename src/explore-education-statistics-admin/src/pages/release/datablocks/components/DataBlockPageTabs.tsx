@@ -186,6 +186,7 @@ const DataBlockPageTabs = ({
 
       setTableState({
         value: {
+          ...tableState,
           initialStep: 5,
           query,
           response: {
@@ -206,7 +207,7 @@ const DataBlockPageTabs = ({
         },
       });
     },
-    [handleDataBlockSave, dataBlock, setTableState],
+    [handleDataBlockSave, dataBlock, setTableState, tableState],
   );
 
   const handleTableHeadersSave = useCallback(
