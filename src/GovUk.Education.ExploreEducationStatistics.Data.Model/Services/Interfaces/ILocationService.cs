@@ -1,7 +1,6 @@
 using System;
 using System.Collections.Generic;
 using System.Linq;
-using GovUk.Education.ExploreEducationStatistics.Common.Model;
 using GovUk.Education.ExploreEducationStatistics.Common.Model.Data;
 
 namespace GovUk.Education.ExploreEducationStatistics.Data.Model.Services.Interfaces
@@ -14,5 +13,8 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Model.Services.Interfa
             IQueryable<Observation> observations);
 
         IEnumerable<IObservationalUnit> GetObservationalUnits(GeographicLevel level, IEnumerable<string> codes);
+
+        Dictionary<Guid, IObservationalUnit> BuildLocationMetaViewModel(GeographicLevel geographicLevel,
+            IEnumerable<Location> locations);
     }
 }

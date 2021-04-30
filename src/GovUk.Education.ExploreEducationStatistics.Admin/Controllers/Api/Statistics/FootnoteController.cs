@@ -5,6 +5,7 @@ using System.Threading.Tasks;
 using GovUk.Education.ExploreEducationStatistics.Admin.ViewModels.Statistics;
 using GovUk.Education.ExploreEducationStatistics.Common.Extensions;
 using GovUk.Education.ExploreEducationStatistics.Common.Model;
+using GovUk.Education.ExploreEducationStatistics.Common.Model.Data;
 using GovUk.Education.ExploreEducationStatistics.Content.Model.Repository.Interfaces;
 using GovUk.Education.ExploreEducationStatistics.Data.Model;
 using GovUk.Education.ExploreEducationStatistics.Data.Model.Database;
@@ -13,6 +14,7 @@ using GovUk.Education.ExploreEducationStatistics.Data.Services;
 using GovUk.Education.ExploreEducationStatistics.Data.Services.ViewModels.Meta;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
+using Microsoft.EntityFrameworkCore;
 using IFootnoteService = GovUk.Education.ExploreEducationStatistics.Admin.Services.Interfaces.IFootnoteService;
 using IReleaseService = GovUk.Education.ExploreEducationStatistics.Data.Services.Interfaces.IReleaseService;
 
@@ -29,6 +31,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Controllers.Api.Stati
         private readonly IReleaseService _releaseService;
         private readonly IReleaseDataFileRepository _releaseDataFileRepository;
         private readonly StatisticsDbContext _statisticsDbContext;
+        private readonly ILocationService _locationService;
         private static IComparer<string> LabelComparer { get; } = new LabelRelationalComparer();
 
         public FootnoteController(IFilterService filterService,
@@ -36,7 +39,8 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Controllers.Api.Stati
             IIndicatorGroupService indicatorGroupService,
             IReleaseService releaseService,
             IReleaseDataFileRepository releaseDataFileRepository,
-            StatisticsDbContext statisticsDbContext)
+            StatisticsDbContext statisticsDbContext,
+            ILocationService locationService)
         {
             _filterService = filterService;
             _footnoteService = footnoteService;
@@ -44,6 +48,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Controllers.Api.Stati
             _releaseService = releaseService;
             _releaseDataFileRepository = releaseDataFileRepository;
             _statisticsDbContext = statisticsDbContext;
+            _locationService = locationService;
         }
 
         [HttpPost("releases/{releaseId}/footnotes")]
@@ -120,6 +125,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Controllers.Api.Stati
                                 Filters = GetFilters(subject.Id),
                                 Indicators = GetIndicators(subject.Id),
                                 TimePeriods = GetTimePeriods(subject.Id),
+                                Locations = GetLocations(subject.Id),
                                 SubjectId = subject.Id,
                                 SubjectName = (await _releaseDataFileRepository.GetBySubject(releaseId, subject.Id)).Name,
                             }
@@ -193,6 +199,35 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Controllers.Api.Stati
                     new TimePeriodMetaViewModel(o.Year, o.TimeIdentifier)
                 )
                 .OrderBy(mv => mv.Year);
+        }
+
+        private Dictionary<GeographicLevel, FootnotesLocationsMetaViewModel> GetLocations(Guid subjectId)
+        {
+            return _statisticsDbContext.Observation
+                .Where(o => o.SubjectId == subjectId)
+                .Select(o => o.GeographicLevel)
+                .Distinct()
+                .ToList()
+                .ToDictionary(
+                    geographicLevel => geographicLevel,
+                    geographicLevel =>
+                    {
+                        var locations = _statisticsDbContext.Observation
+                            .Include(o => o.Location)
+                            .Where(o =>
+                                o.SubjectId == subjectId
+                                && o.GeographicLevel == geographicLevel)
+                            .Select(o => o.Location)
+                            .Distinct()
+                            .ToList();
+                        var locationMetaViewModel =
+                            _locationService.BuildLocationMetaViewModel(geographicLevel, locations);
+                        return new FootnotesLocationsMetaViewModel
+                        {
+                            Label = geographicLevel.GetEnumLabel(),
+                            Options = locationMetaViewModel
+                        };
+                    });
         }
 
         private static FootnotesFilterGroupsMetaViewModel BuildFilterItemsMetaViewModel(FilterGroup filterGroup,

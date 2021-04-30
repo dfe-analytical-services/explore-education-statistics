@@ -1,6 +1,8 @@
 ﻿using System;
 using System.Collections.Generic;
 using GovUk.Education.ExploreEducationStatistics.Common.Model;
+using GovUk.Education.ExploreEducationStatistics.Common.Model.Data;
+using GovUk.Education.ExploreEducationStatistics.Data.Model;
 using GovUk.Education.ExploreEducationStatistics.Data.Services.ViewModels.Meta;
 
 namespace GovUk.Education.ExploreEducationStatistics.Admin.ViewModels.Statistics
@@ -18,12 +20,15 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.ViewModels.Statistics
 
         public IEnumerable<TimePeriodMetaViewModel> TimePeriods { get; set; }
 
+        public Dictionary<GeographicLevel, FootnotesLocationsMetaViewModel> Locations { get; set; }
+
         public Guid SubjectId { get; set; }
 
         public string SubjectName { get; set; }
     }
 
-    public class FootnotesFilterMetaViewModel : LegendOptionsMetaValueModel<Dictionary<Guid, FootnotesFilterGroupsMetaViewModel>>
+    public class FootnotesFilterMetaViewModel
+        : LegendOptionsMetaValueModel<Dictionary<Guid, FootnotesFilterGroupsMetaViewModel>>
     {
     }
 
@@ -32,6 +37,11 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.ViewModels.Statistics
     }
 
     public class FootnotesIndicatorsMetaViewModel : LabelOptionsMetaValueModel<IList<IndicatorMetaViewModel>>
+    {
+    }
+
+    public class FootnotesLocationsMetaViewModel
+        : LabelOptionsMetaValueModel<Dictionary<Guid, IObservationalUnit>>
     {
     }
 }

@@ -119,6 +119,16 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Model.Services
             return query.ToList();
         }
 
+        public Dictionary<Guid, IObservationalUnit> BuildLocationMetaViewModel(
+            GeographicLevel geographicLevel,
+            IEnumerable<Location> locations)
+        {
+            return locations
+                .ToDictionary(
+                    l => l.Id,
+                    l => GetObservationalUnit(geographicLevel, l));
+        }
+
         private static Dictionary<GeographicLevel, IEnumerable<IObservationalUnit>> GetObservationalUnits(
             Dictionary<GeographicLevel, IEnumerable<Location>> locations)
         {
