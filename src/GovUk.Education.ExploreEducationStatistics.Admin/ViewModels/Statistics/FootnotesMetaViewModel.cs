@@ -16,6 +16,8 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.ViewModels.Statistics
 
         public Dictionary<Guid, FootnotesIndicatorsMetaViewModel> Indicators { get; set; }
 
+        public IEnumerable<TimePeriodMetaViewModel> TimePeriods { get; set; }
+
         public Guid SubjectId { get; set; }
 
         public string SubjectName { get; set; }

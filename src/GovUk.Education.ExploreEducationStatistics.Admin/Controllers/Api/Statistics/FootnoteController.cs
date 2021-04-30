@@ -7,6 +7,7 @@ using GovUk.Education.ExploreEducationStatistics.Common.Extensions;
 using GovUk.Education.ExploreEducationStatistics.Common.Model;
 using GovUk.Education.ExploreEducationStatistics.Content.Model.Repository.Interfaces;
 using GovUk.Education.ExploreEducationStatistics.Data.Model;
+using GovUk.Education.ExploreEducationStatistics.Data.Model.Database;
 using GovUk.Education.ExploreEducationStatistics.Data.Model.Services.Interfaces;
 using GovUk.Education.ExploreEducationStatistics.Data.Services;
 using GovUk.Education.ExploreEducationStatistics.Data.Services.ViewModels.Meta;
@@ -27,19 +28,22 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Controllers.Api.Stati
         private readonly IIndicatorGroupService _indicatorGroupService;
         private readonly IReleaseService _releaseService;
         private readonly IReleaseDataFileRepository _releaseDataFileRepository;
+        private readonly StatisticsDbContext _statisticsDbContext;
         private static IComparer<string> LabelComparer { get; } = new LabelRelationalComparer();
 
         public FootnoteController(IFilterService filterService,
             IFootnoteService footnoteService,
             IIndicatorGroupService indicatorGroupService,
             IReleaseService releaseService,
-            IReleaseDataFileRepository releaseDataFileRepository)
+            IReleaseDataFileRepository releaseDataFileRepository,
+            StatisticsDbContext statisticsDbContext)
         {
             _filterService = filterService;
             _footnoteService = footnoteService;
             _indicatorGroupService = indicatorGroupService;
             _releaseService = releaseService;
             _releaseDataFileRepository = releaseDataFileRepository;
+            _statisticsDbContext = statisticsDbContext;
         }
 
         [HttpPost("releases/{releaseId}/footnotes")]
@@ -115,6 +119,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Controllers.Api.Stati
                             {
                                 Filters = GetFilters(subject.Id),
                                 Indicators = GetIndicators(subject.Id),
+                                TimePeriods = GetTimePeriods(subject.Id),
                                 SubjectId = subject.Id,
                                 SubjectName = (await _releaseDataFileRepository.GetBySubject(releaseId, subject.Id)).Name,
                             }
@@ -172,6 +177,22 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Controllers.Api.Stati
                             filterGroup => filterGroup.Id,
                             filterGroup => BuildFilterItemsMetaViewModel(filterGroup, filterGroup.FilterItems))
                     });
+        }
+
+        private IEnumerable<TimePeriodMetaViewModel> GetTimePeriods(Guid subjectId)
+        {
+            return _statisticsDbContext.Observation
+                .Where(o => o.SubjectId == subjectId)
+                .Select(o =>
+                new {
+                    o.Year, o.TimeIdentifier
+                })
+                .Distinct()
+                .ToList()
+                .Select(o =>
+                    new TimePeriodMetaViewModel(o.Year, o.TimeIdentifier)
+                )
+                .OrderBy(mv => mv.Year);
         }
 
         private static FootnotesFilterGroupsMetaViewModel BuildFilterItemsMetaViewModel(FilterGroup filterGroup,
