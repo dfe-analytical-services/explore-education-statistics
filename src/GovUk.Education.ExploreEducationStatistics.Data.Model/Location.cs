@@ -1,4 +1,5 @@
 using System;
+using System.Collections.Generic;
 using System.ComponentModel.DataAnnotations.Schema;
 using System.Diagnostics.CodeAnalysis;
 using Newtonsoft.Json;
@@ -9,6 +10,8 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Model
     public class Location
     {
         public Guid Id { get; set; }
+
+        public ICollection<LocationFootnote> Footnotes { get; set; }
 
         [JsonIgnore] public string Country_Code { get; set; }
         [JsonIgnore] public string Country_Name { get; set; }

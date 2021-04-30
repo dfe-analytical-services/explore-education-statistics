@@ -40,6 +40,8 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Model.Database
         public DbSet<IndicatorFootnote> IndicatorFootnote { get; set; }
         public DbSet<IndicatorGroup> IndicatorGroup { get; set; }
         public DbSet<Location> Location { get; set; }
+        public DbSet<LocationFootnote> LocationFootnote { get; set; }
+        public DbSet<TimePeriodFootnote> TimePeriodFootnote { get; set; }
         public DbSet<Observation> Observation { get; set; }
         public DbSet<ObservationFilterItem> ObservationFilterItem { get; set; }
         public DbSet<Publication> Publication { get; set; }
@@ -63,6 +65,8 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Model.Database
             ConfigureFilterItemFootnote(modelBuilder);
             ConfigureIndicatorFootnote(modelBuilder);
             ConfigureLocation(modelBuilder);
+            ConfigureLocationFootnote(modelBuilder);
+            ConfigureTimePeriodFootnote(modelBuilder);
             ConfigureMeasures(modelBuilder);
             ConfigureObservation(modelBuilder);
             ConfigureObservationFilterItem(modelBuilder);
@@ -344,6 +348,29 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Model.Database
                 .WithMany(footnote => footnote.Indicators)
                 .HasForeignKey(indicatorFootnote => indicatorFootnote.FootnoteId)
                 .OnDelete(DeleteBehavior.Restrict);
+        }
+
+        private static void ConfigureLocationFootnote(ModelBuilder modelBuilder)
+        {
+            modelBuilder.Entity<LocationFootnote>()
+                .HasKey(item => new {item.LocationId, item.FootnoteId});
+
+            modelBuilder.Entity<LocationFootnote>()
+                .HasOne(locationFootnote => locationFootnote.Location)
+                .WithMany(location => location.Footnotes)
+                .HasForeignKey(locationFootnote => locationFootnote.LocationId);
+
+            modelBuilder.Entity<LocationFootnote>()
+                .HasOne(indicatorFootnote => indicatorFootnote.Footnote)
+                .WithMany(footnote => footnote.Locations)
+                .HasForeignKey(locationFootnote => locationFootnote.FootnoteId)
+                .OnDelete(DeleteBehavior.Restrict);
+        }
+
+        private static void ConfigureTimePeriodFootnote(ModelBuilder modelBuilder)
+        {
+            modelBuilder.Entity<TimePeriodFootnote>()
+                .HasKey(item => new {item.Year, item.TimeIdentifier, item.FootnoteId});
         }
 
         private static void ConfigureSubjectFootnote(ModelBuilder modelBuilder)

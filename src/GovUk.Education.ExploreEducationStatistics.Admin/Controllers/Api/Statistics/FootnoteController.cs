@@ -62,6 +62,11 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Controllers.Api.Stati
                     footnote.FilterGroups,
                     footnote.FilterItems,
                     footnote.Indicators,
+                    footnote.Locations,
+                    footnote.TimePeriods
+                        .Select(timePeriod => 
+                            (timePeriod.Year, timePeriod.TimeIdentifier))
+                        .ToList(),
                     footnote.Subjects)
                 .OnSuccess(GatherAndBuildFootnoteViewModel)
                 .HandleFailuresOrOk();
@@ -106,6 +111,8 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Controllers.Api.Stati
                     footnote.FilterGroups,
                     footnote.FilterItems,
                     footnote.Indicators,
+                    footnote.Locations,
+                    footnote.TimePeriods,
                     footnote.Subjects
                 )
                 .OnSuccess(GatherAndBuildFootnoteViewModel)
@@ -124,8 +131,8 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Controllers.Api.Stati
                             {
                                 Filters = GetFilters(subject.Id),
                                 Indicators = GetIndicators(subject.Id),
-                                TimePeriods = GetTimePeriods(subject.Id),
                                 Locations = GetLocations(subject.Id),
+                                TimePeriods = GetTimePeriods(subject.Id),
                                 SubjectId = subject.Id,
                                 SubjectName = (await _releaseDataFileRepository.GetBySubject(releaseId, subject.Id)).Name,
                             }
@@ -300,6 +307,9 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Controllers.Api.Stati
             var selectedSubjects = footnote.Subjects.Select(subjectFootnote => subjectFootnote.SubjectId).ToList();
             var selectedFilters = footnote.Filters.Select(filterFootnote => filterFootnote.FilterId);
             var selectedFilterGroups = footnote.FilterGroups.Select(groupFootnote => groupFootnote.FilterGroupId);
+
+            // TODO: Add Locations @MarkFix
+            // TODO: Add TimePeriods @MarkFix
 
             var subjectIds = selectedSubjects
                 .Concat(filtersBySubject.Keys)

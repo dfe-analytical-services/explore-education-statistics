@@ -52,6 +52,8 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Services
             IReadOnlyCollection<Guid> filterGroupIds,
             IReadOnlyCollection<Guid> filterItemIds,
             IReadOnlyCollection<Guid> indicatorIds,
+            IReadOnlyCollection<Guid> locationIds,
+            IReadOnlyCollection<(int Year, TimeIdentifier TimeIdentifier)> timePeriods,
             IReadOnlyCollection<Guid> subjectIds)
         {
             return await _contentPersistenceHelper
@@ -69,7 +71,9 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Services
                         Filters = CreateFilterLinks(newFootnoteId, filterIds),
                         FilterGroups = CreateFilterGroupLinks(newFootnoteId, filterGroupIds),
                         FilterItems = CreateFilterItemLinks(newFootnoteId, filterItemIds),
-                        Indicators = CreateIndicatorsLinks(newFootnoteId, indicatorIds)
+                        Indicators = CreateIndicatorsLinks(newFootnoteId, indicatorIds),
+                        Locations = CreateLocationLinks(newFootnoteId, locationIds),
+                        TimePeriods = CreateTimePeriodLinks(newFootnoteId, timePeriods)
                     };
 
                     await _context.Footnote.AddAsync(footnote);
@@ -99,6 +103,10 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Services
                             .Select(filterItemFootnote => filterItemFootnote.FilterItemId).ToList();
                         var indicators = footnote.Indicators
                             .Select(indicatorFootnote => indicatorFootnote.IndicatorId).ToList();
+                        var locations = footnote.Locations
+                            .Select(locationFootnote => locationFootnote.LocationId).ToList();
+                        var timePeriods = footnote.TimePeriods
+                            .Select(timePeriodFootnote => (timePeriodFootnote.Year, timePeriodFootnote.TimeIdentifier)).ToList();
                         var subjects = footnote.Subjects
                             .Select(subjectFootnote => subjectFootnote.SubjectId).ToList();
 
@@ -108,6 +116,8 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Services
                             filterGroups,
                             filterItems,
                             indicators,
+                            locations,
+                            timePeriods,
                             subjects);
                     }));
         }
@@ -134,6 +144,8 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Services
             IReadOnlyCollection<Guid> filterGroupIds,
             IReadOnlyCollection<Guid> filterItemIds,
             IReadOnlyCollection<Guid> indicatorIds,
+            IReadOnlyCollection<Guid> locationIds,
+            IReadOnlyCollection<(int Year, TimeIdentifier TimeIdentifier)> timePeriods,
             IReadOnlyCollection<Guid> subjectIds)
         {
             return await _contentPersistenceHelper
@@ -152,6 +164,8 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Services
                         UpdateFilterGroupLinks(footnote, filterGroupIds.ToList());
                         UpdateFilterItemLinks(footnote, filterItemIds.ToList());
                         UpdateIndicatorLinks(footnote, indicatorIds.ToList());
+                        UpdateLocationLinks(footnote, locationIds.ToList());
+                        UpdateTimePeriodLinks(footnote, timePeriods.ToList());
                         UpdateSubjectLinks(footnote, subjectIds.ToList());
 
                         await _context.SaveChangesAsync();
@@ -169,6 +183,8 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Services
                         filterGroupIds,
                         filterItemIds,
                         indicatorIds,
+                        locationIds,
+                        timePeriods,
                         subjectIds);
                 }));
         }
@@ -262,6 +278,31 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Services
                 .ToList();
         }
 
+        private List<LocationFootnote> CreateLocationLinks(Guid footnoteId, IReadOnlyCollection<Guid> locationIds)
+        {
+            return locationIds.Select(id => 
+                new LocationFootnote
+                {
+                    FootnoteId = footnoteId,
+                    LocationId = id
+                })
+                .ToList();
+        }
+
+        private List<TimePeriodFootnote> CreateTimePeriodLinks(
+            Guid footnoteId,
+            IReadOnlyCollection<(int Year, TimeIdentifier TimeIdentifier)> timePeriods)
+        {
+            return timePeriods.Select(timePeriod =>
+                new TimePeriodFootnote
+                {
+                    FootnoteId = footnoteId,
+                    Year = timePeriod.Year,
+                    TimeIdentifier = timePeriod.TimeIdentifier
+                })
+                .ToList();
+        }
+
         private void UpdateFilterLinks(Footnote footnote, IReadOnlyCollection<Guid> filterIds)
         {
             if (!SequencesAreEqualIgnoringOrder(
@@ -298,6 +339,26 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Services
             }
         }
 
+        private void UpdateLocationLinks(Footnote footnote, IReadOnlyCollection<Guid> locationIds)
+        {
+            if (!SequencesAreEqualIgnoringOrder(
+                footnote.Locations.Select(link => link.LocationId), locationIds))
+            {
+                footnote.Locations = CreateLocationLinks(footnote.Id, locationIds);
+            }
+        }
+
+        private void UpdateTimePeriodLinks(
+            Footnote footnote, 
+            IReadOnlyCollection<(int Year, TimeIdentifier TimeIdentifier)> timePeriods)
+        {
+            if (!TimePeriodSequencesAreEqualIgnoringOrder(
+                footnote.TimePeriods.Select(link => (link.Year, link.TimeIdentifier)), timePeriods))
+            {
+                footnote.TimePeriods = CreateTimePeriodLinks(footnote.Id, timePeriods);
+            }
+        }
+
         private void UpdateSubjectLinks(Footnote footnote, IReadOnlyCollection<Guid> subjectIds)
         {
             if (!SequencesAreEqualIgnoringOrder(
@@ -312,6 +373,11 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Services
             return left.OrderBy(id => id).SequenceEqual(right.OrderBy(id => id));
         }
 
+        private static bool TimePeriodSequencesAreEqualIgnoringOrder(IEnumerable<(int Year, TimeIdentifier TimeIdentifier)> left, IEnumerable<(int Year, TimeIdentifier TimeIdentifier)> right)
+        {
+            return left.OrderBy(id => id.Year).SequenceEqual(right.OrderBy(id => id.Year));
+        }
+
         private static IQueryable<Footnote> HydrateFootnote(IQueryable<Footnote> query)
         {
             return query
@@ -319,6 +385,8 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Services
                 .Include(f => f.FilterGroups)
                 .Include(f => f.FilterItems)
                 .Include(f => f.Indicators)
+                .Include(f => f.Locations)
+                .Include(f => f.TimePeriods)
                 .Include(f => f.Subjects);
         }
     }

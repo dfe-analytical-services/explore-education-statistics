@@ -17,6 +17,8 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Services.Interfaces
             IReadOnlyCollection<Guid> filterGroupIds,
             IReadOnlyCollection<Guid> filterItemIds,
             IReadOnlyCollection<Guid> indicatorIds,
+            IReadOnlyCollection<Guid> locationIds,
+            IReadOnlyCollection<(int Year, TimeIdentifier TimeIdentifier)> timePeriods,
             IReadOnlyCollection<Guid> subjectIds);
 
         Task<Either<ActionResult, List<Footnote>>> CopyFootnotes(Guid sourceReleaseId, Guid destinationReleaseId);
@@ -37,6 +39,8 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Services.Interfaces
             IReadOnlyCollection<Guid> filterGroupIds,
             IReadOnlyCollection<Guid> filterItemIds,
             IReadOnlyCollection<Guid> indicatorIds,
+            IReadOnlyCollection<Guid> locationIds,
+            IReadOnlyCollection<(int Year, TimeIdentifier TimeIdentifier)> timePeriods,
             IReadOnlyCollection<Guid> subjectIds);
     }
 }

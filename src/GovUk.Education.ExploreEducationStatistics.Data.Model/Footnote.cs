@@ -12,6 +12,8 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Model
         public List<FilterFootnote> Filters { get; set; }
         public List<FilterGroupFootnote> FilterGroups { get; set; }
         public List<FilterItemFootnote> FilterItems { get; set; }
+        public List<LocationFootnote> Locations { get; set; }
+        public List<TimePeriodFootnote> TimePeriods { get; set; }
         public List<SubjectFootnote> Subjects { get; set; }
         public List<ReleaseFootnote> Releases { get; set; }
     }
