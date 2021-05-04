@@ -1,8 +1,8 @@
 import findLast from 'lodash/findLast';
 import { ParentListItem } from '@common/components/ContentSectionIndex';
 
-export default function generateContentList(elements: Array<HTMLElement>) {
-  const list: Array<ParentListItem> = [];
+export default function generateContentList(elements: HTMLElement[]) {
+  const list: ParentListItem[] = [];
 
   elements.forEach((element: HTMLElement) => {
     if (element.tagName === 'H3') {

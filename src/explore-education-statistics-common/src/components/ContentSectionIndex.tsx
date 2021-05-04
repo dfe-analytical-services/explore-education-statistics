@@ -28,7 +28,7 @@ interface ListItem {
 }
 
 export interface ParentListItem extends ListItem {
-  children: Array<ListItem>;
+  children: ListItem[];
 }
 
 type ViewportPosition = 'before' | 'within' | 'after';
