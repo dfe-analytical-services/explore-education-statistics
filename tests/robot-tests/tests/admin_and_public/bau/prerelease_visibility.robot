@@ -26,15 +26,19 @@ Verify release summary
 
 Upload subject
     [Tags]  HappyPath
+    user waits for page to finish loading
+    Sleep  2
     user clicks link  Data and files
     user waits until h2 is visible  Add data file to release
+    user waits until page contains element  id:dataFileUploadForm-subjectTitle
     user enters text into element  id:dataFileUploadForm-subjectTitle   UI test subject
     user chooses file   id:dataFileUploadForm-dataFile       ${FILES_DIR}upload-file-test.csv
     user chooses file   id:dataFileUploadForm-metadataFile   ${FILES_DIR}upload-file-test.meta.csv
     user clicks button  Upload data files
 
     user waits until h2 is visible  Uploaded data files
-    user waits until page contains accordion section   UI test subject
+    user waits until element contains  id:dataFileUploadForm-subjectTitle   ${EMPTY}
+    user waits until page contains accordion section   UI test subject  60
     user opens accordion section   UI test subject
 
     ${section}=  user gets accordion section content element  UI test subject
