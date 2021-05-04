@@ -85,7 +85,7 @@
     "jest-watch-typeahead": "^0.6.1",
     "leaflet": "^1.7.1",
     "lodash": "^4.17.20",
-    "marked": "^1.2.0",
+    "marked": "^2.0.0",
     "mini-css-extract-plugin": "^0.11.3",
     "node-sass": "^4.14.1",
     "normalize.css": "^8.0.1",
