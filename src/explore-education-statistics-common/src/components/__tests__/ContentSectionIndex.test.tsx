@@ -12,7 +12,7 @@ describe('ContentSectionIndex', () => {
           <ContentSectionIndex id="content-section" contentRef={contentRef} />
 
           <div ref={contentRef}>
-            <h2 id="test-1">Test 1</h2>
+            <h3 id="test-1">Test 1</h3>
             <h3 id="test-2">Test 2</h3>
             <h4 id="test-3">Test 3</h4>
           </div>
@@ -56,7 +56,7 @@ describe('ContentSectionIndex', () => {
           />
 
           <div ref={contentRef}>
-            <h2 id="test-1">Test 1</h2>
+            <h3 id="test-1">Test 1</h3>
             <h3 id="test-2" data-test-me="true">
               Test 2
             </h3>
@@ -86,10 +86,10 @@ describe('ContentSectionIndex', () => {
           <ContentSectionIndex id="content-section" contentRef={contentRef} />
 
           <div ref={contentRef}>
-            <h2>1. Test 1</h2>
+            <h3>1. Test 1</h3>
             <h3>2.1 Test 2</h3>
             <h4>Test 3 </h4>
-            <h5>Test 4</h5>
+            <h4>Test 4</h4>
           </div>
         </div>
       );
