@@ -306,8 +306,6 @@ describe('TableToolPage', () => {
   });
 
   test('renders the Table Tool page correctly when Publication is chosen, giving the user a choice of Subjects', async () => {
-    await preloadAll();
-
     render(
       <TableToolPage publication={testPublication} themeMeta={testThemeMeta} />,
     );
@@ -316,8 +314,6 @@ describe('TableToolPage', () => {
   });
 
   test('renders the Table Tool page correctly when a Fast Track is provided, rendering a previously configured table', async () => {
-    await preloadAll();
-
     render(
       <TableToolPage
         fastTrack={testFastTrack}
