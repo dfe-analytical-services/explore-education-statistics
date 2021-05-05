@@ -43,6 +43,7 @@ export interface InitialTableToolState {
   highlights?: TableHighlight[];
   subjectMeta?: SubjectMeta;
   query?: ReleaseTableDataQuery;
+  releaseSlug?: string;
   response?: {
     table: FullTable;
     tableHeaders: TableHeadersConfig;

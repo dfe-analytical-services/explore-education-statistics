@@ -1,0 +1,76 @@
+// Jest Snapshot v1, https://goo.gl/fbAQLP
+
+exports[`TableToolFinalStep renders the final step successfully 1`] = `
+<table
+  aria-labelledby="dataTableCaption"
+  class="govuk-table table"
+  data-testid="dataTableCaption-table"
+>
+  <thead
+    class="tableHead"
+  >
+    <tr>
+      <td
+        class="borderBottom"
+        colspan="2"
+        rowspan="1"
+      />
+      <th
+        colspan="1"
+        rowspan="1"
+        scope="col"
+      >
+        02/06/2020
+      </th>
+    </tr>
+  </thead>
+  <tbody>
+    <tr>
+      <th
+        class="borderBottom"
+        colspan="1"
+        rowspan="1"
+        scope="rowgroup"
+      >
+        Number of open settings
+      </th>
+      <th
+        class=""
+        colspan="1"
+        rowspan="1"
+        scope="row"
+      >
+        2020 Week 23
+      </th>
+      <td
+        class="govuk-table__cell--numeric"
+      >
+        22,500
+      </td>
+    </tr>
+    <tr>
+      <th
+        class="borderBottom"
+        colspan="1"
+        rowspan="1"
+        scope="rowgroup"
+      >
+        Proportion of settings open
+      </th>
+      <th
+        class=""
+        colspan="1"
+        rowspan="1"
+        scope="row"
+      >
+        2020 Week 23
+      </th>
+      <td
+        class="govuk-table__cell--numeric borderBottom"
+      >
+        1%
+      </td>
+    </tr>
+  </tbody>
+</table>
+`;

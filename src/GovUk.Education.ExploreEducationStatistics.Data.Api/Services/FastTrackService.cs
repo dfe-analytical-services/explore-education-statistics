@@ -26,6 +26,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Api.Services
         private readonly IBlobStorageService _blobStorageService;
         private readonly ISubjectService _subjectService;
         private readonly ITableStorageService _tableStorageService;
+        private readonly IReleaseRepository _releaseRepository;
         private readonly IMapper _mapper;
 
         public FastTrackService(
@@ -33,12 +34,14 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Api.Services
             IBlobStorageService blobStorageService,
             ISubjectService subjectService,
             ITableStorageService tableStorageService,
+            IReleaseRepository releaseRepository,
             IMapper mapper)
         {
             _tableBuilderService = tableBuilderService;
             _blobStorageService = blobStorageService;
             _subjectService = subjectService;
             _tableStorageService = tableStorageService;
+            _releaseRepository = releaseRepository;
             _mapper = mapper;
         }
 
@@ -58,14 +61,19 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Api.Services
 
         private Task<Either<ActionResult, FastTrackViewModel>> BuildViewModel(FastTrack fastTrack)
         {
-            return _tableBuilderService.Query(fastTrack.ReleaseId, fastTrack.Query).OnSuccess(result =>
-            {
-                var viewModel = _mapper.Map<FastTrackViewModel>(fastTrack);
-                viewModel.FullTable = result;
-                viewModel.Query.PublicationId =
-                    _subjectService.GetPublicationForSubject(fastTrack.Query.SubjectId).Result.Id;
-                return viewModel;
-            });
+            return _releaseRepository
+                .FindOrNotFoundAsync(fastTrack.ReleaseId)
+                .OnSuccessCombineWith(release => _tableBuilderService.Query(fastTrack.ReleaseId, fastTrack.Query))
+                .OnSuccess(releaseAndResults =>
+                {
+                    var (release, result) = releaseAndResults;
+                    var viewModel = _mapper.Map<FastTrackViewModel>(fastTrack);
+                    viewModel.FullTable = result;
+                    viewModel.Query.PublicationId =
+                        _subjectService.GetPublicationForSubject(fastTrack.Query.SubjectId).Result.Id;
+                    viewModel.ReleaseSlug = release.Slug;
+                    return viewModel;
+                });
         }
 
         private async Task<Either<ActionResult, FastTrack>> GetFastTrack(Guid id)

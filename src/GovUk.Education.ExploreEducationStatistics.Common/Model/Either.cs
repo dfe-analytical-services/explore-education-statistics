@@ -179,6 +179,14 @@ public class Either<Tl, Tr> {
             return await task.OnSuccess(async success => await Task.FromResult(func(success)));
         }
 
+        public static async Task<Either<Tl, Tuple<Tr, T>>> OnSuccessCombineWith<Tl, Tr, T>(this Task<Either<Tl, Tr>> task, Func<Tr, Task<Either<Tl, T>>> func)
+        {
+            return await task.OnSuccess(success =>
+            {
+                return func(success).OnSuccess(combinator => new Tuple<Tr, T>(success, combinator));
+            });
+        }
+
         public static async Task<Either<Tl, T>> OnSuccess<Tl, Tr, T>(this Task<Either<Tl, Tr>> task, Func<Tr, Task<T>> func)
         {
             var firstResult = await task;

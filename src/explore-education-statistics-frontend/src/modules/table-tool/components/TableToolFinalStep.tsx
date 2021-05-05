@@ -23,6 +23,7 @@ interface TableToolFinalStepProps {
   table: FullTable;
   tableHeaders: TableHeadersConfig;
   releaseId?: string;
+  releaseSlug?: string;
 }
 
 const TableToolFinalStep = ({
@@ -31,6 +32,7 @@ const TableToolFinalStep = ({
   publication,
   query,
   releaseId,
+  releaseSlug,
 }: TableToolFinalStepProps) => {
   const dataTableRef = useRef<HTMLElement>(null);
   const [permalinkId, setPermalinkId] = useState<string>('');
@@ -141,12 +143,21 @@ const TableToolFinalStep = ({
       {publication && table && (
         <ul className="govuk-list">
           <li>
-            <Link
-              to="/find-statistics/[publication]"
-              as={`/find-statistics/${publication.slug}`}
-            >
-              View the release for this data
-            </Link>
+            {releaseSlug ? (
+              <Link
+                to="/find-statistics/[publication]/[releaseSlug]"
+                as={`/find-statistics/${publication.slug}/${releaseSlug}`}
+              >
+                View the release for this data
+              </Link>
+            ) : (
+              <Link
+                to="/find-statistics/[publication]"
+                as={`/find-statistics/${publication.slug}`}
+              >
+                View the release for this data
+              </Link>
+            )}
           </li>
           <li>
             <DownloadCsvButton
@@ -187,21 +198,23 @@ const TableToolFinalStep = ({
               }
             />
           </li>
-          <li>
-            {pubMethodology?.methodology?.slug && (
+          {pubMethodology?.methodology?.slug && (
+            <li>
               <Link
                 to="/methodology/[methodology]"
                 as={`/methodology/${pubMethodology.methodology.slug}`}
               >
                 Go to methodology
               </Link>
-            )}
-            {pubMethodology?.externalMethodology?.url && (
+            </li>
+          )}
+          {pubMethodology?.externalMethodology?.url && (
+            <li>
               <a href={pubMethodology.externalMethodology.url}>
                 Go to methodology
               </a>
-            )}
-          </li>
+            </li>
+          )}
         </ul>
       )}
       <p className="govuk-body">

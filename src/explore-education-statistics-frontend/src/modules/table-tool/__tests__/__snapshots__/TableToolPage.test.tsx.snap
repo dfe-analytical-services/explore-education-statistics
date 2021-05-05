@@ -1,0 +1,1839 @@
+// Jest Snapshot v1, https://goo.gl/fbAQLP
+
+exports[`TableToolPage renders the Table Tool page correctly when Publication is chosen, giving the user a choice of Subjects 1`] = `
+<main
+  class="govuk-main-wrapper app-main-class"
+  id="main-content"
+  role="main"
+>
+  <span
+    class="govuk-caption-xl"
+    data-testid="page-title-caption"
+  >
+    Table Tool
+  </span>
+  <h1
+    class="govuk-heading-xl"
+    data-testid="page-title Create your own tables online"
+  >
+    Create your own tables online
+  </h1>
+  <p>
+    Choose the data and area of interest you want to explore and then use filters to create your table.
+  </p>
+  <p>
+    Once you've created your table, you can download the data it contains for your own offline analysis.
+  </p>
+  <ol
+    class="stepNav"
+    id="tableToolWizard"
+  >
+    <li
+      class="step"
+      data-testid="wizardStep-1"
+      id="tableToolWizard-step-1"
+      tabindex="-1"
+    >
+      <div
+        class="content"
+      >
+        <span
+          aria-hidden="true"
+          class="number"
+        >
+          <span
+            class="numberInner"
+          >
+            1
+          </span>
+        </span>
+        <h2
+          class="govuk-heading-l stepEnabled"
+        >
+          <button
+            class="stepButton"
+            data-testid="wizardStep-1-goToButton"
+            type="button"
+          >
+            <span
+              class="govuk-visually-hidden"
+            >
+              Step 1: 
+            </span>
+            Choose a publication
+            <span
+              aria-hidden="true"
+              class="toggleText"
+            >
+              Go to this step
+            </span>
+          </button>
+        </h2>
+        <dl
+          class="govuk-summary-list govuk-summary-list--no-border"
+        >
+          <div
+            class="govuk-summary-list__row"
+            data-testid="Publication"
+          >
+            <dt
+              class="govuk-summary-list__key"
+            >
+              Publication
+            </dt>
+            <dd
+              class="govuk-summary-list__value"
+            >
+              Test publication
+            </dd>
+          </div>
+        </dl>
+      </div>
+    </li>
+    <li
+      aria-current="step"
+      class="step stepActive"
+      data-testid="wizardStep-2"
+      id="tableToolWizard-step-2"
+      tabindex="-1"
+    >
+      <div
+        class="content"
+      >
+        <span
+          aria-hidden="true"
+          class="number"
+        >
+          <span
+            class="numberInner"
+          >
+            2
+          </span>
+        </span>
+        <form
+          id="publicationSubjectForm"
+        >
+          <div
+            class="govuk-form-group"
+          >
+            <div
+              class="govuk-form-group"
+            >
+              <fieldset
+                aria-describedby="publicationSubjectForm-subjectId-hint"
+                class="govuk-fieldset"
+                id="publicationSubjectForm-subjectId"
+              >
+                <legend
+                  class="govuk-fieldset__legend govuk-fieldset__legend--l"
+                >
+                  <h2
+                    class="govuk-heading-l govuk-fieldset__heading"
+                  >
+                    <span
+                      class="govuk-visually-hidden"
+                    >
+                      Step 2 (current): 
+                    </span>
+                    Choose a subject
+                  </h2>
+                </legend>
+                <span
+                  class="govuk-hint"
+                  id="publicationSubjectForm-subjectId-hint"
+                >
+                  Choose a subject to create your table from, more information on the data coverage can be found by viewing more details
+                </span>
+                
+                <div
+                  class="govuk-radios"
+                >
+                  <div
+                    class="govuk-radios__item"
+                    data-testid="Radio item for dates"
+                  >
+                    <input
+                      aria-describedby="publicationSubjectForm-subjectId-1f1b1780-a607-454e-b331-08d9097c40f5-item-hint"
+                      class="govuk-radios__input"
+                      id="publicationSubjectForm-subjectId-1f1b1780-a607-454e-b331-08d9097c40f5"
+                      name="subjectId"
+                      type="radio"
+                      value="1f1b1780-a607-454e-b331-08d9097c40f5"
+                    />
+                    <label
+                      class="govuk-label govuk-radios__label"
+                      for="publicationSubjectForm-subjectId-1f1b1780-a607-454e-b331-08d9097c40f5"
+                    >
+                      dates
+                    </label>
+                    <span
+                      class="govuk-hint govuk-radios__hint"
+                      id="publicationSubjectForm-subjectId-1f1b1780-a607-454e-b331-08d9097c40f5-item-hint"
+                    >
+                      <details
+                        class="govuk-details govuk-!-margin-bottom-2"
+                        role="group"
+                      >
+                        <summary
+                          aria-controls="details-content-1"
+                          aria-expanded="false"
+                          class="govuk-details__summary"
+                          role="button"
+                          tabindex="0"
+                        >
+                          <span
+                            class="summaryText govuk-details__summary-text"
+                            data-testid="Expand Details Section More details"
+                          >
+                            More details
+                          </span>
+                        </summary>
+                        <div
+                          aria-hidden="true"
+                          class="govuk-details__text"
+                          id="details-content-1"
+                        >
+                          <h4>
+                            This subject includes the following data:
+                          </h4>
+                          <dl
+                            class="govuk-summary-list"
+                          >
+                            <div
+                              class="govuk-summary-list__row"
+                              data-testid="Geographic levels"
+                            >
+                              <dt
+                                class="govuk-summary-list__key"
+                              >
+                                Geographic levels
+                              </dt>
+                              <dd
+                                class="govuk-summary-list__value"
+                              >
+                                National
+                              </dd>
+                            </div>
+                            <div
+                              class="govuk-summary-list__row"
+                              data-testid="Time period"
+                            >
+                              <dt
+                                class="govuk-summary-list__key"
+                              >
+                                Time period
+                              </dt>
+                              <dd
+                                class="govuk-summary-list__value"
+                              >
+                                2020 Week 13 to 2021 Week 24
+                              </dd>
+                            </div>
+                            <div
+                              class="govuk-summary-list__row"
+                              data-testid="Content"
+                            >
+                              <dt
+                                class="govuk-summary-list__key"
+                              >
+                                Content
+                              </dt>
+                              <dd
+                                class="govuk-summary-list__value"
+                              >
+                                <div
+                                  class="dfe-content"
+                                >
+                                  <p>
+                                    ryt
+                                  </p>
+                                </div>
+                              </dd>
+                            </div>
+                          </dl>
+                        </div>
+                      </details>
+                    </span>
+                  </div>
+                </div>
+              </fieldset>
+            </div>
+          </div>
+          <div
+            class="govuk-form-group"
+          >
+            <div
+              class="group"
+            >
+              <button
+                aria-disabled="false"
+                class="govuk-button govuk-button--secondary"
+                type="button"
+              >
+                Previous step
+              </button>
+              <button
+                aria-disabled="false"
+                class="govuk-button"
+                id="publicationSubjectForm-submit"
+                type="submit"
+              >
+                Next step
+              </button>
+            </div>
+          </div>
+        </form>
+      </div>
+    </li>
+    <li
+      class="step stepHidden"
+      data-testid="wizardStep-3"
+      hidden=""
+      id="tableToolWizard-step-3"
+      tabindex="-1"
+    >
+      <div
+        class="content"
+      >
+        <span
+          aria-hidden="true"
+          class="number"
+        >
+          <span
+            class="numberInner"
+          >
+            3
+          </span>
+        </span>
+        <h2
+          class="govuk-heading-l"
+        >
+          <button
+            class="stepButton"
+            data-testid="wizardStep-3-goToButton"
+            type="button"
+          >
+            <span
+              class="govuk-visually-hidden"
+            >
+              Step 3: 
+            </span>
+            Choose locations
+          </button>
+        </h2>
+        <dl
+          class="govuk-summary-list govuk-summary-list--no-border"
+        />
+      </div>
+    </li>
+    <li
+      class="step stepHidden"
+      data-testid="wizardStep-4"
+      hidden=""
+      id="tableToolWizard-step-4"
+      tabindex="-1"
+    >
+      <div
+        class="content"
+      >
+        <span
+          aria-hidden="true"
+          class="number"
+        >
+          <span
+            class="numberInner"
+          >
+            4
+          </span>
+        </span>
+        <h2
+          class="govuk-heading-l"
+        >
+          <button
+            class="stepButton"
+            data-testid="wizardStep-4-goToButton"
+            type="button"
+          >
+            <span
+              class="govuk-visually-hidden"
+            >
+              Step 4: 
+            </span>
+            Choose time period
+          </button>
+        </h2>
+        <dl
+          class="govuk-summary-list govuk-summary-list--no-border"
+        >
+          <div
+            class="govuk-summary-list__row"
+            data-testid="Start date"
+          >
+            <dt
+              class="govuk-summary-list__key"
+            >
+              Start date
+            </dt>
+            <dd
+              class="govuk-summary-list__value"
+            />
+          </div>
+          <div
+            class="govuk-summary-list__row"
+            data-testid="End date"
+          >
+            <dt
+              class="govuk-summary-list__key"
+            >
+              End date
+            </dt>
+            <dd
+              class="govuk-summary-list__value"
+            />
+          </div>
+        </dl>
+      </div>
+    </li>
+    <li
+      class="step stepHidden"
+      data-testid="wizardStep-5"
+      hidden=""
+      id="tableToolWizard-step-5"
+      tabindex="-1"
+    >
+      <div
+        class="content"
+      >
+        <span
+          aria-hidden="true"
+          class="number"
+        >
+          <span
+            class="numberInner"
+          >
+            5
+          </span>
+        </span>
+        <h2
+          class="govuk-heading-l"
+        >
+          <button
+            class="stepButton"
+            data-testid="wizardStep-5-goToButton"
+            type="button"
+          >
+            <span
+              class="govuk-visually-hidden"
+            >
+              Step 5: 
+            </span>
+            Choose your filters
+          </button>
+        </h2>
+        <dl
+          class="govuk-summary-list govuk-summary-list--no-border"
+        >
+          <div
+            class="govuk-summary-list__row"
+            data-testid="Indicators"
+          >
+            <dt
+              class="govuk-summary-list__key"
+            >
+              Indicators
+            </dt>
+            <dd
+              class="govuk-summary-list__value"
+            >
+              <ul
+                class="govuk-list listContainer"
+              />
+            </dd>
+          </div>
+        </dl>
+      </div>
+    </li>
+    <li
+      class="step stepHidden"
+      data-testid="wizardStep-6"
+      hidden=""
+      id="tableToolWizard-step-6"
+      tabindex="-1"
+    >
+      <div
+        class="content"
+      >
+        <span
+          aria-hidden="true"
+          class="number"
+        >
+          <span
+            class="numberInner"
+          >
+            6
+          </span>
+        </span>
+        <h2
+          class="govuk-heading-l"
+        >
+          <button
+            class="stepButton"
+            data-testid="wizardStep-6-goToButton"
+            type="button"
+          >
+            <span
+              class="govuk-visually-hidden"
+            >
+              Step 6: 
+            </span>
+            Explore data
+          </button>
+        </h2>
+      </div>
+    </li>
+  </ol>
+</main>
+`;
+
+exports[`TableToolPage renders the Table Tool page correctly when a Fast Track is provided, rendering a previously configured table 1`] = `
+<main
+  class="govuk-main-wrapper app-main-class"
+  id="main-content"
+  role="main"
+>
+  <span
+    class="govuk-caption-xl"
+    data-testid="page-title-caption"
+  >
+    Table Tool
+  </span>
+  <h1
+    class="govuk-heading-xl"
+    data-testid="page-title Create your own tables online"
+  >
+    Create your own tables online
+  </h1>
+  <p>
+    Choose the data and area of interest you want to explore and then use filters to create your table.
+  </p>
+  <p>
+    Once you've created your table, you can download the data it contains for your own offline analysis.
+  </p>
+  <ol
+    class="stepNav"
+    id="tableToolWizard"
+  >
+    <li
+      class="step"
+      data-testid="wizardStep-1"
+      id="tableToolWizard-step-1"
+      tabindex="-1"
+    >
+      <div
+        class="content"
+      >
+        <span
+          aria-hidden="true"
+          class="number"
+        >
+          <span
+            class="numberInner"
+          >
+            1
+          </span>
+        </span>
+        <h2
+          class="govuk-heading-l stepEnabled"
+        >
+          <button
+            class="stepButton"
+            data-testid="wizardStep-1-goToButton"
+            type="button"
+          >
+            <span
+              class="govuk-visually-hidden"
+            >
+              Step 1: 
+            </span>
+            Choose a subject
+            <span
+              aria-hidden="true"
+              class="toggleText"
+            >
+              Go to this step
+            </span>
+          </button>
+        </h2>
+        <dl
+          class="govuk-summary-list govuk-summary-list--no-border"
+        >
+          <div
+            class="govuk-summary-list__row"
+            data-testid="Subject"
+          >
+            <dt
+              class="govuk-summary-list__key"
+            >
+              Subject
+            </dt>
+            <dd
+              class="govuk-summary-list__value"
+            >
+              None
+            </dd>
+          </div>
+        </dl>
+      </div>
+    </li>
+    <li
+      class="step"
+      data-testid="wizardStep-2"
+      id="tableToolWizard-step-2"
+      tabindex="-1"
+    >
+      <div
+        class="content"
+      >
+        <span
+          aria-hidden="true"
+          class="number"
+        >
+          <span
+            class="numberInner"
+          >
+            2
+          </span>
+        </span>
+        <h2
+          class="govuk-heading-l stepEnabled"
+        >
+          <button
+            class="stepButton"
+            data-testid="wizardStep-2-goToButton"
+            type="button"
+          >
+            <span
+              class="govuk-visually-hidden"
+            >
+              Step 2: 
+            </span>
+            Choose locations
+            <span
+              aria-hidden="true"
+              class="toggleText"
+            >
+              Go to this step
+            </span>
+          </button>
+        </h2>
+        <dl
+          class="govuk-summary-list govuk-summary-list--no-border"
+        >
+          <div
+            class="govuk-summary-list__row"
+            data-testid="National"
+          >
+            <dt
+              class="govuk-summary-list__key"
+            >
+              National
+            </dt>
+            <dd
+              class="govuk-summary-list__value"
+            >
+              <ul
+                class="govuk-list listContainer"
+              >
+                <li>
+                  Great Britain
+                </li>
+              </ul>
+            </dd>
+          </div>
+        </dl>
+      </div>
+    </li>
+    <li
+      class="step"
+      data-testid="wizardStep-3"
+      id="tableToolWizard-step-3"
+      tabindex="-1"
+    >
+      <div
+        class="content"
+      >
+        <span
+          aria-hidden="true"
+          class="number"
+        >
+          <span
+            class="numberInner"
+          >
+            3
+          </span>
+        </span>
+        <h2
+          class="govuk-heading-l stepEnabled"
+        >
+          <button
+            class="stepButton"
+            data-testid="wizardStep-3-goToButton"
+            type="button"
+          >
+            <span
+              class="govuk-visually-hidden"
+            >
+              Step 3: 
+            </span>
+            Choose time period
+            <span
+              aria-hidden="true"
+              class="toggleText"
+            >
+              Go to this step
+            </span>
+          </button>
+        </h2>
+        <dl
+          class="govuk-summary-list govuk-summary-list--no-border"
+        >
+          <div
+            class="govuk-summary-list__row"
+            data-testid="Start date"
+          >
+            <dt
+              class="govuk-summary-list__key"
+            >
+              Start date
+            </dt>
+            <dd
+              class="govuk-summary-list__value"
+            >
+              2018-19
+            </dd>
+          </div>
+          <div
+            class="govuk-summary-list__row"
+            data-testid="End date"
+          >
+            <dt
+              class="govuk-summary-list__key"
+            >
+              End date
+            </dt>
+            <dd
+              class="govuk-summary-list__value"
+            >
+              2018-19
+            </dd>
+          </div>
+        </dl>
+      </div>
+    </li>
+    <li
+      class="step"
+      data-testid="wizardStep-4"
+      id="tableToolWizard-step-4"
+      tabindex="-1"
+    >
+      <div
+        class="content"
+      >
+        <span
+          aria-hidden="true"
+          class="number"
+        >
+          <span
+            class="numberInner"
+          >
+            4
+          </span>
+        </span>
+        <h2
+          class="govuk-heading-l stepEnabled"
+        >
+          <button
+            class="stepButton"
+            data-testid="wizardStep-4-goToButton"
+            type="button"
+          >
+            <span
+              class="govuk-visually-hidden"
+            >
+              Step 4: 
+            </span>
+            Choose your filters
+            <span
+              aria-hidden="true"
+              class="toggleText"
+            >
+              Go to this step
+            </span>
+          </button>
+        </h2>
+        <dl
+          class="govuk-summary-list govuk-summary-list--no-border"
+        >
+          <div
+            class="govuk-summary-list__row"
+            data-testid="Indicators"
+          >
+            <dt
+              class="govuk-summary-list__key"
+            >
+              Indicators
+            </dt>
+            <dd
+              class="govuk-summary-list__value"
+            >
+              <ul
+                class="govuk-list listContainer"
+              >
+                <li>
+                  Gender gap
+                </li>
+                <li>
+                  Graduates included in earnings figures
+                </li>
+              </ul>
+            </dd>
+          </div>
+          <div
+            class="govuk-summary-list__row"
+            data-testid="Subject studied"
+          >
+            <dt
+              class="govuk-summary-list__key"
+            >
+              Subject studied
+            </dt>
+            <dd
+              class="govuk-summary-list__value"
+            >
+              <ul
+                class="govuk-list listContainer"
+              >
+                <li>
+                  1 .  PGCE
+                </li>
+                <li>
+                  10 .  Psychology
+                </li>
+              </ul>
+            </dd>
+          </div>
+        </dl>
+      </div>
+    </li>
+    <li
+      class="step"
+      data-testid="wizardStep-5"
+      id="tableToolWizard-step-5"
+      tabindex="-1"
+    >
+      <div
+        class="content"
+      >
+        <span
+          aria-hidden="true"
+          class="number"
+        >
+          <span
+            class="numberInner"
+          >
+            5
+          </span>
+        </span>
+        <h2
+          class="govuk-heading-l stepEnabled"
+        >
+          <button
+            class="stepButton"
+            data-testid="wizardStep-5-goToButton"
+            type="button"
+          >
+            <span
+              class="govuk-visually-hidden"
+            >
+              Step 5: 
+            </span>
+            Explore data
+            <span
+              aria-hidden="true"
+              class="toggleText"
+            >
+              Go to this step
+            </span>
+          </button>
+        </h2>
+        <div
+          class="govuk-!-margin-bottom-4"
+        >
+          <details
+            class="govuk-details"
+            role="group"
+          >
+            <summary
+              aria-controls="details-content-3"
+              aria-expanded="false"
+              class="govuk-details__summary"
+              role="button"
+              tabindex="0"
+            >
+              <span
+                class="summaryText govuk-details__summary-text"
+                data-testid="Expand Details Section Re-order table headers"
+              >
+                Re-order table headers
+              </span>
+            </summary>
+            <div
+              aria-hidden="true"
+              class="govuk-details__text"
+              id="details-content-3"
+            >
+              <p
+                class="govuk-hint"
+              >
+                Drag and drop the options below to re-order the table headers. For keyboard users, select and deselect a draggable item with space and use the arrow keys to move a selected item.
+              </p>
+              <div
+                class="govuk-visually-hidden"
+              >
+                To move a draggable item, select and deselect the item with space and use the arrow keys to move a selected item. If you are using a screen reader disable scan mode.
+              </div>
+              <form
+                action="#"
+                id="tableHeadersForm"
+              >
+                <div
+                  class="govuk-form-group"
+                >
+                  <div
+                    class="govuk-!-margin-bottom-2"
+                  >
+                    <div
+                      class="groupsFieldset"
+                      data-rbd-droppable-context-id="0"
+                      data-rbd-droppable-id="rowGroups"
+                    >
+                      <div
+                        class="govuk-form-group"
+                      >
+                        <fieldset
+                          class="govuk-fieldset"
+                          id="rowGroups"
+                        >
+                          <legend
+                            class="govuk-fieldset__legend govuk-fieldset__legend--m"
+                          >
+                            Row groups
+                          </legend>
+                          <div
+                            class="listsContainer"
+                          >
+                            <div
+                              aria-describedby="rbd-hidden-text-0-hidden-text-0"
+                              class="list"
+                              data-rbd-drag-handle-context-id="0"
+                              data-rbd-drag-handle-draggable-id="rowGroups-0"
+                              data-rbd-draggable-context-id="0"
+                              data-rbd-draggable-id="rowGroups-0"
+                              draggable="false"
+                              role="button"
+                              tabindex="0"
+                            >
+                              <div
+                                class="govuk-form-group"
+                              >
+                                <fieldset
+                                  class="govuk-fieldset"
+                                  id="rowGroups-0"
+                                >
+                                  <legend
+                                    class="govuk-fieldset__legend govuk-fieldset__legend--s"
+                                  >
+                                    Row group 1
+                                  </legend>
+                                  <div
+                                    class="list"
+                                    data-rbd-droppable-context-id="1"
+                                    data-rbd-droppable-id="rowGroups-0"
+                                  >
+                                    <div
+                                      aria-describedby="rbd-hidden-text-1-hidden-text-3"
+                                      class="optionRow"
+                                      data-rbd-drag-handle-context-id="1"
+                                      data-rbd-drag-handle-draggable-id="72303947-27a4-4ea2-a708-dfeb7bb31efb"
+                                      data-rbd-draggable-context-id="1"
+                                      data-rbd-draggable-id="72303947-27a4-4ea2-a708-dfeb7bb31efb"
+                                      draggable="false"
+                                      role="button"
+                                      tabindex="0"
+                                    >
+                                      <div
+                                        class="optionText"
+                                      >
+                                        <strong>
+                                          1 .  PGCE
+                                        </strong>
+                                        <span>
+                                          ⇅
+                                        </span>
+                                      </div>
+                                    </div>
+                                    <div
+                                      aria-describedby="rbd-hidden-text-1-hidden-text-3"
+                                      class="optionRow"
+                                      data-rbd-drag-handle-context-id="1"
+                                      data-rbd-drag-handle-draggable-id="0164a10e-c041-49f8-b44d-daa6f0c1fbfd"
+                                      data-rbd-draggable-context-id="1"
+                                      data-rbd-draggable-id="0164a10e-c041-49f8-b44d-daa6f0c1fbfd"
+                                      draggable="false"
+                                      role="button"
+                                      tabindex="0"
+                                    >
+                                      <div
+                                        class="optionText"
+                                      >
+                                        <strong>
+                                          2 .  MBA
+                                        </strong>
+                                        <span>
+                                          ⇅
+                                        </span>
+                                      </div>
+                                    </div>
+                                  </div>
+                                </fieldset>
+                              </div>
+                            </div>
+                            <div
+                              aria-describedby="rbd-hidden-text-0-hidden-text-0"
+                              class="list"
+                              data-rbd-drag-handle-context-id="0"
+                              data-rbd-drag-handle-draggable-id="rowGroups-1"
+                              data-rbd-draggable-context-id="0"
+                              data-rbd-draggable-id="rowGroups-1"
+                              draggable="false"
+                              role="button"
+                              tabindex="0"
+                            >
+                              <div
+                                class="govuk-form-group"
+                              >
+                                <fieldset
+                                  class="govuk-fieldset"
+                                  id="rowGroups-1"
+                                >
+                                  <legend
+                                    class="govuk-fieldset__legend govuk-fieldset__legend--s"
+                                  >
+                                    Row group 2
+                                  </legend>
+                                  <div
+                                    class="list"
+                                    data-rbd-droppable-context-id="3"
+                                    data-rbd-droppable-id="rowGroups-1"
+                                  >
+                                    <div
+                                      aria-describedby="rbd-hidden-text-3-hidden-text-12"
+                                      class="optionRow"
+                                      data-rbd-drag-handle-context-id="3"
+                                      data-rbd-drag-handle-draggable-id="e5174cb8-02f6-48d3-662e-08d9097c4255"
+                                      data-rbd-draggable-context-id="3"
+                                      data-rbd-draggable-id="e5174cb8-02f6-48d3-662e-08d9097c4255"
+                                      draggable="false"
+                                      role="button"
+                                      tabindex="0"
+                                    >
+                                      <div
+                                        class="optionText"
+                                      >
+                                        <strong>
+                                          Gender gap
+                                        </strong>
+                                        <span>
+                                          ⇅
+                                        </span>
+                                      </div>
+                                    </div>
+                                    <div
+                                      aria-describedby="rbd-hidden-text-3-hidden-text-12"
+                                      class="optionRow"
+                                      data-rbd-drag-handle-context-id="3"
+                                      data-rbd-drag-handle-draggable-id="0e8f9198-ce65-40ac-662a-08d9097c4255"
+                                      data-rbd-draggable-context-id="3"
+                                      data-rbd-draggable-id="0e8f9198-ce65-40ac-662a-08d9097c4255"
+                                      draggable="false"
+                                      role="button"
+                                      tabindex="0"
+                                    >
+                                      <div
+                                        class="optionText"
+                                      >
+                                        <strong>
+                                          Graduates included in earnings figures
+                                        </strong>
+                                        <span>
+                                          ⇅
+                                        </span>
+                                      </div>
+                                    </div>
+                                  </div>
+                                </fieldset>
+                              </div>
+                            </div>
+                          </div>
+                        </fieldset>
+                      </div>
+                    </div>
+                  </div>
+                  <div
+                    class="govuk-!-margin-bottom-2"
+                  >
+                    <div
+                      class="groupsFieldset"
+                      data-rbd-droppable-context-id="0"
+                      data-rbd-droppable-id="columnGroups"
+                    >
+                      <div
+                        class="govuk-form-group"
+                      >
+                        <fieldset
+                          class="govuk-fieldset"
+                          id="columnGroups"
+                        >
+                          <legend
+                            class="govuk-fieldset__legend govuk-fieldset__legend--m"
+                          >
+                            Column groups
+                          </legend>
+                          <div
+                            class="listsContainer"
+                          >
+                            <div
+                              aria-describedby="rbd-hidden-text-0-hidden-text-0"
+                              class="list"
+                              data-rbd-drag-handle-context-id="0"
+                              data-rbd-drag-handle-draggable-id="columnGroups-0"
+                              data-rbd-draggable-context-id="0"
+                              data-rbd-draggable-id="columnGroups-0"
+                              draggable="false"
+                              role="button"
+                              tabindex="0"
+                            >
+                              <div
+                                class="govuk-form-group"
+                              >
+                                <fieldset
+                                  class="govuk-fieldset"
+                                  id="columnGroups-0"
+                                >
+                                  <legend
+                                    class="govuk-fieldset__legend govuk-fieldset__legend--s"
+                                  >
+                                    Column group 1
+                                  </legend>
+                                  <div
+                                    class="list"
+                                    data-rbd-droppable-context-id="2"
+                                    data-rbd-droppable-id="columnGroups-0"
+                                  >
+                                    <div
+                                      aria-describedby="rbd-hidden-text-2-hidden-text-7"
+                                      class="optionRow"
+                                      data-rbd-drag-handle-context-id="2"
+                                      data-rbd-drag-handle-draggable-id="2018_TY"
+                                      data-rbd-draggable-context-id="2"
+                                      data-rbd-draggable-id="2018_TY"
+                                      draggable="false"
+                                      role="button"
+                                      tabindex="0"
+                                    >
+                                      <div
+                                        class="optionText"
+                                      >
+                                        <strong>
+                                          2018-19
+                                        </strong>
+                                        <span>
+                                          ⇅
+                                        </span>
+                                      </div>
+                                    </div>
+                                  </div>
+                                </fieldset>
+                              </div>
+                            </div>
+                          </div>
+                        </fieldset>
+                      </div>
+                    </div>
+                  </div>
+                </div>
+                <button
+                  aria-disabled="false"
+                  class="govuk-button"
+                  type="submit"
+                >
+                  Re-order table
+                </button>
+              </form>
+            </div>
+          </details>
+          <figure
+            class="figure"
+          >
+            <figcaption>
+              <strong
+                data-testid="dataTableCaption"
+                id="dataTableCaption"
+              >
+                Table showing 'data 1' for 1 .  PGCE and 2 .  MBA from 'Test publication' in Great Britain for 2018-19
+              </strong>
+            </figcaption>
+            <div
+              class="container"
+              role="region"
+              tabindex="0"
+            >
+              <table
+                aria-labelledby="dataTableCaption"
+                class="govuk-table table"
+                data-testid="dataTableCaption-table"
+              >
+                <thead
+                  class="tableHead"
+                >
+                  <tr>
+                    <td
+                      class="borderBottom"
+                      colspan="2"
+                      rowspan="1"
+                    />
+                    <th
+                      colspan="1"
+                      rowspan="1"
+                      scope="col"
+                    >
+                      2018-19
+                    </th>
+                  </tr>
+                </thead>
+                <tbody>
+                  <tr>
+                    <th
+                      class="borderBottom"
+                      colspan="1"
+                      rowspan="2"
+                      scope="rowgroup"
+                    >
+                      1 .  PGCE
+                    </th>
+                    <th
+                      class=""
+                      colspan="1"
+                      rowspan="1"
+                      scope="row"
+                    >
+                      Gender gap
+                    </th>
+                    <td
+                      class="govuk-table__cell--numeric"
+                    >
+                      20.00%
+                    </td>
+                  </tr>
+                  <tr>
+                    <th
+                      class=""
+                      colspan="1"
+                      rowspan="1"
+                      scope="row"
+                    >
+                      Graduates included in earnings figures
+                    </th>
+                    <td
+                      class="govuk-table__cell--numeric borderBottom"
+                    >
+                      2
+                    </td>
+                  </tr>
+                  <tr>
+                    <th
+                      class="borderBottom"
+                      colspan="1"
+                      rowspan="2"
+                      scope="rowgroup"
+                    >
+                      2 .  MBA
+                    </th>
+                    <th
+                      class=""
+                      colspan="1"
+                      rowspan="1"
+                      scope="row"
+                    >
+                      Gender gap
+                    </th>
+                    <td
+                      class="govuk-table__cell--numeric"
+                    >
+                      60.00%
+                    </td>
+                  </tr>
+                  <tr>
+                    <th
+                      class=""
+                      colspan="1"
+                      rowspan="1"
+                      scope="row"
+                    >
+                      Graduates included in earnings figures
+                    </th>
+                    <td
+                      class="govuk-table__cell--numeric borderBottom"
+                    >
+                      2
+                    </td>
+                  </tr>
+                </tbody>
+              </table>
+            </div>
+          </figure>
+          <h3>
+            Share your table
+          </h3>
+          <ul
+            class="govuk-list"
+          >
+            <li>
+              <button
+                class="button"
+                type="button"
+              >
+                Generate permanent link
+              </button>
+            </li>
+          </ul>
+          <h3>
+            Additional options
+          </h3>
+          <ul
+            class="govuk-list"
+          >
+            <li>
+              <a
+                class="govuk-link"
+                href="/find-statistics/test-publication/2000-01"
+              >
+                View the release for this data
+              </a>
+            </li>
+            <li>
+              <button
+                class="button"
+                type="button"
+              >
+                Download the data of this table (CSV)
+              </button>
+            </li>
+            <li>
+              <button
+                class="button"
+                type="button"
+              >
+                Download table as Excel spreadsheet (XLSX)
+              </button>
+            </li>
+          </ul>
+          <p
+            class="govuk-body"
+          >
+            If you have a question about the data or methods used to create this table contact the named statistician via the relevant release page.
+          </p>
+        </div>
+      </div>
+    </li>
+  </ol>
+</main>
+`;
+
+exports[`TableToolPage renders the Table Tool page correctly when a Theme is chosen, giving the user a choice of Publications 1`] = `
+<main
+  class="govuk-main-wrapper app-main-class"
+  id="main-content"
+  role="main"
+>
+  <span
+    class="govuk-caption-xl"
+    data-testid="page-title-caption"
+  >
+    Table Tool
+  </span>
+  <h1
+    class="govuk-heading-xl"
+    data-testid="page-title Create your own tables online"
+  >
+    Create your own tables online
+  </h1>
+  <p>
+    Choose the data and area of interest you want to explore and then use filters to create your table.
+  </p>
+  <p>
+    Once you've created your table, you can download the data it contains for your own offline analysis.
+  </p>
+  <ol
+    class="stepNav"
+    id="tableToolWizard"
+  >
+    <li
+      aria-current="step"
+      class="step stepActive"
+      data-testid="wizardStep-1"
+      id="tableToolWizard-step-1"
+      tabindex="-1"
+    >
+      <div
+        class="content"
+      >
+        <span
+          aria-hidden="true"
+          class="number"
+        >
+          <span
+            class="numberInner"
+          >
+            1
+          </span>
+        </span>
+        <form
+          id="publicationForm"
+        >
+          <div
+            class="govuk-form-group"
+          >
+            <fieldset
+              class="govuk-fieldset"
+              id="publicationForm-publicationId"
+            >
+              <legend
+                class="govuk-fieldset__legend govuk-fieldset__legend--l"
+              >
+                <h2
+                  class="govuk-heading-l govuk-fieldset__heading"
+                >
+                  <span
+                    class="govuk-visually-hidden"
+                  >
+                    Step 1 (current): 
+                  </span>
+                  Choose a publication
+                </h2>
+              </legend>
+              
+              <div
+                class="govuk-form-group"
+              >
+                <label
+                  class="govuk-label"
+                  for="publicationForm-publicationIdSearch"
+                >
+                  Search publications
+                </label>
+                <input
+                  class="govuk-input searchInput govuk-input--width-20"
+                  id="publicationForm-publicationIdSearch"
+                  name="publicationSearch"
+                  type="text"
+                  value=""
+                />
+              </div>
+              <div
+                class="govuk-form-group"
+              >
+                <div
+                  aria-live="assertive"
+                >
+                  <details
+                    class="govuk-details details"
+                    role="group"
+                  >
+                    <summary
+                      aria-controls="publicationForm-theme-ee1855ca-d1e1-4f04-a795-cbd61d326a1f"
+                      aria-expanded="false"
+                      class="govuk-details__summary"
+                      role="button"
+                      tabindex="0"
+                    >
+                      <span
+                        class="summaryText govuk-details__summary-text"
+                        data-testid="Expand Details Section Pupils and schools"
+                      >
+                        Pupils and schools
+                      </span>
+                    </summary>
+                    <div
+                      aria-hidden="true"
+                      class="govuk-details__text"
+                      id="publicationForm-theme-ee1855ca-d1e1-4f04-a795-cbd61d326a1f"
+                      style=""
+                    >
+                      <details
+                        class="govuk-details details"
+                        role="group"
+                      >
+                        <summary
+                          aria-controls="publicationForm-topic-c9f0b897-d58a-42b0-9d12-ca874cc7c810"
+                          aria-expanded="false"
+                          class="govuk-details__summary"
+                          role="button"
+                          tabindex="0"
+                        >
+                          <span
+                            class="summaryText govuk-details__summary-text"
+                            data-testid="Expand Details Section Admission appeals"
+                          >
+                            Admission appeals
+                          </span>
+                        </summary>
+                        <div
+                          aria-hidden="true"
+                          class="govuk-details__text"
+                          id="publicationForm-topic-c9f0b897-d58a-42b0-9d12-ca874cc7c810"
+                        >
+                          <div
+                            class="govuk-form-group"
+                          >
+                            <div
+                              class="govuk-form-group"
+                            >
+                              <fieldset
+                                class="govuk-fieldset"
+                                id="publicationForm-publicationId"
+                              >
+                                <legend
+                                  class="govuk-fieldset__legend govuk-fieldset__legend--m govuk-visually-hidden"
+                                >
+                                  Choose option from Admission appeals
+                                </legend>
+                                
+                                <div
+                                  class="govuk-radios govuk-radios--small"
+                                >
+                                  <div
+                                    class="govuk-radios__item"
+                                    data-testid="Radio item for Test publication"
+                                  >
+                                    <input
+                                      class="govuk-radios__input"
+                                      id="publicationForm-publicationId-536154f5-7f82-4dc7-060a-08d9097c1945"
+                                      name="publicationId"
+                                      type="radio"
+                                      value="536154f5-7f82-4dc7-060a-08d9097c1945"
+                                    />
+                                    <label
+                                      class="govuk-label govuk-radios__label"
+                                      for="publicationForm-publicationId-536154f5-7f82-4dc7-060a-08d9097c1945"
+                                    >
+                                      Test publication
+                                    </label>
+                                  </div>
+                                </div>
+                              </fieldset>
+                            </div>
+                          </div>
+                        </div>
+                      </details>
+                    </div>
+                  </details>
+                </div>
+              </div>
+            </fieldset>
+          </div>
+          <div
+            class="govuk-form-group"
+          >
+            <div
+              class="group"
+            >
+              <button
+                aria-disabled="false"
+                class="govuk-button"
+                id="publicationForm-submit"
+                type="submit"
+              >
+                Next step
+              </button>
+            </div>
+          </div>
+        </form>
+      </div>
+    </li>
+    <li
+      class="step stepHidden"
+      data-testid="wizardStep-2"
+      hidden=""
+      id="tableToolWizard-step-2"
+      tabindex="-1"
+    >
+      <div
+        class="content"
+      >
+        <span
+          aria-hidden="true"
+          class="number"
+        >
+          <span
+            class="numberInner"
+          >
+            2
+          </span>
+        </span>
+        <h2
+          class="govuk-heading-l"
+        >
+          <button
+            class="stepButton"
+            data-testid="wizardStep-2-goToButton"
+            type="button"
+          >
+            <span
+              class="govuk-visually-hidden"
+            >
+              Step 2: 
+            </span>
+            Choose a subject
+          </button>
+        </h2>
+        <dl
+          class="govuk-summary-list govuk-summary-list--no-border"
+        >
+          <div
+            class="govuk-summary-list__row"
+            data-testid="Subject"
+          >
+            <dt
+              class="govuk-summary-list__key"
+            >
+              Subject
+            </dt>
+            <dd
+              class="govuk-summary-list__value"
+            >
+              None
+            </dd>
+          </div>
+        </dl>
+      </div>
+    </li>
+    <li
+      class="step stepHidden"
+      data-testid="wizardStep-3"
+      hidden=""
+      id="tableToolWizard-step-3"
+      tabindex="-1"
+    >
+      <div
+        class="content"
+      >
+        <span
+          aria-hidden="true"
+          class="number"
+        >
+          <span
+            class="numberInner"
+          >
+            3
+          </span>
+        </span>
+        <h2
+          class="govuk-heading-l"
+        >
+          <button
+            class="stepButton"
+            data-testid="wizardStep-3-goToButton"
+            type="button"
+          >
+            <span
+              class="govuk-visually-hidden"
+            >
+              Step 3: 
+            </span>
+            Choose locations
+          </button>
+        </h2>
+        <dl
+          class="govuk-summary-list govuk-summary-list--no-border"
+        />
+      </div>
+    </li>
+    <li
+      class="step stepHidden"
+      data-testid="wizardStep-4"
+      hidden=""
+      id="tableToolWizard-step-4"
+      tabindex="-1"
+    >
+      <div
+        class="content"
+      >
+        <span
+          aria-hidden="true"
+          class="number"
+        >
+          <span
+            class="numberInner"
+          >
+            4
+          </span>
+        </span>
+        <h2
+          class="govuk-heading-l"
+        >
+          <button
+            class="stepButton"
+            data-testid="wizardStep-4-goToButton"
+            type="button"
+          >
+            <span
+              class="govuk-visually-hidden"
+            >
+              Step 4: 
+            </span>
+            Choose time period
+          </button>
+        </h2>
+        <dl
+          class="govuk-summary-list govuk-summary-list--no-border"
+        >
+          <div
+            class="govuk-summary-list__row"
+            data-testid="Start date"
+          >
+            <dt
+              class="govuk-summary-list__key"
+            >
+              Start date
+            </dt>
+            <dd
+              class="govuk-summary-list__value"
+            />
+          </div>
+          <div
+            class="govuk-summary-list__row"
+            data-testid="End date"
+          >
+            <dt
+              class="govuk-summary-list__key"
+            >
+              End date
+            </dt>
+            <dd
+              class="govuk-summary-list__value"
+            />
+          </div>
+        </dl>
+      </div>
+    </li>
+    <li
+      class="step stepHidden"
+      data-testid="wizardStep-5"
+      hidden=""
+      id="tableToolWizard-step-5"
+      tabindex="-1"
+    >
+      <div
+        class="content"
+      >
+        <span
+          aria-hidden="true"
+          class="number"
+        >
+          <span
+            class="numberInner"
+          >
+            5
+          </span>
+        </span>
+        <h2
+          class="govuk-heading-l"
+        >
+          <button
+            class="stepButton"
+            data-testid="wizardStep-5-goToButton"
+            type="button"
+          >
+            <span
+              class="govuk-visually-hidden"
+            >
+              Step 5: 
+            </span>
+            Choose your filters
+          </button>
+        </h2>
+        <dl
+          class="govuk-summary-list govuk-summary-list--no-border"
+        >
+          <div
+            class="govuk-summary-list__row"
+            data-testid="Indicators"
+          >
+            <dt
+              class="govuk-summary-list__key"
+            >
+              Indicators
+            </dt>
+            <dd
+              class="govuk-summary-list__value"
+            >
+              <ul
+                class="govuk-list listContainer"
+              />
+            </dd>
+          </div>
+        </dl>
+      </div>
+    </li>
+    <li
+      class="step stepHidden"
+      data-testid="wizardStep-6"
+      hidden=""
+      id="tableToolWizard-step-6"
+      tabindex="-1"
+    >
+      <div
+        class="content"
+      >
+        <span
+          aria-hidden="true"
+          class="number"
+        >
+          <span
+            class="numberInner"
+          >
+            6
+          </span>
+        </span>
+        <h2
+          class="govuk-heading-l"
+        >
+          <button
+            class="stepButton"
+            data-testid="wizardStep-6-goToButton"
+            type="button"
+          >
+            <span
+              class="govuk-visually-hidden"
+            >
+              Step 6: 
+            </span>
+            Explore data
+          </button>
+        </h2>
+      </div>
+    </li>
+  </ol>
+</main>
+`;

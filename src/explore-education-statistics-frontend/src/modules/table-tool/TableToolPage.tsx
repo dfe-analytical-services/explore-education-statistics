@@ -65,7 +65,11 @@ const TableToolPage: NextPage<TableToolPageProps> = ({
         initialStep: 6,
         subjects,
         highlights,
-        query: fastTrack.query,
+        query: {
+          ...fastTrack.query,
+          releaseId: fastTrack.releaseId,
+        },
+        releaseSlug: fastTrack.releaseSlug,
         subjectMeta,
         response: {
           table: fullTable,
@@ -136,6 +140,8 @@ const TableToolPage: NextPage<TableToolPageProps> = ({
                     query={query}
                     table={response.table}
                     tableHeaders={response.tableHeaders}
+                    releaseId={initialState?.query?.releaseId}
+                    releaseSlug={initialState?.releaseSlug}
                   />
                 )}
               </>

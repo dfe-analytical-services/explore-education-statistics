@@ -1,5 +1,5 @@
 import React from 'react';
-import { render, wait } from '@testing-library/react';
+import { render, waitFor } from '@testing-library/react';
 import ErrorSummary from '../ErrorSummary';
 
 describe('ErrorSummary', () => {
@@ -35,10 +35,10 @@ describe('ErrorSummary', () => {
       '.govuk-error-summary',
     ) as HTMLElement;
 
-    await wait();
-
-    expect(summary).not.toHaveFocus();
-    expect(summary).not.toHaveScrolledIntoView();
+    await waitFor(() => {
+      expect(summary).not.toHaveFocus();
+      expect(summary).not.toHaveScrolledIntoView();
+    });
   });
 
   test('gains focus and scrolls into view when there are errors and `focusOnError` is true', () => {
