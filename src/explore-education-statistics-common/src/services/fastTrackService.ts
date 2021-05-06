@@ -8,6 +8,8 @@ export type FastTrackTable = ConfiguredTable & {
   };
   releaseId: string;
   releaseSlug: string;
+  latestData: boolean;
+  latestReleaseTitle: string;
 };
 
 const fastTrackService = {

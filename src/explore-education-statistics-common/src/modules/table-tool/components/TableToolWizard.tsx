@@ -48,6 +48,8 @@ export interface InitialTableToolState {
     table: FullTable;
     tableHeaders: TableHeadersConfig;
   };
+  latestData?: boolean;
+  latestReleaseTitle?: string;
 }
 
 interface TableToolState extends InitialTableToolState {

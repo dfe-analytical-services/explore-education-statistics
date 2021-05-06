@@ -75,6 +75,8 @@ const TableToolPage: NextPage<TableToolPageProps> = ({
           table: fullTable,
           tableHeaders,
         },
+        latestData: fastTrack.latestData,
+        latestReleaseTitle: fastTrack.latestReleaseTitle,
       };
     }
 
@@ -142,6 +144,8 @@ const TableToolPage: NextPage<TableToolPageProps> = ({
                     tableHeaders={response.tableHeaders}
                     releaseId={initialState?.query?.releaseId}
                     releaseSlug={initialState?.releaseSlug}
+                    latestData={initialState?.latestData}
+                    latestReleaseTitle={initialState?.latestReleaseTitle}
                   />
                 )}
               </>

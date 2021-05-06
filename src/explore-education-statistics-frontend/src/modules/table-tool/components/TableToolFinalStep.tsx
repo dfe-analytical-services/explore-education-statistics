@@ -1,4 +1,5 @@
 import ButtonText from '@common/components/ButtonText';
+import Tag from '@common/components/Tag';
 import UrlContainer from '@common/components/UrlContainer';
 import LoadingSpinner from '@common/components/LoadingSpinner';
 import useAsyncRetry from '@common/hooks/useAsyncRetry';
@@ -24,6 +25,8 @@ interface TableToolFinalStepProps {
   tableHeaders: TableHeadersConfig;
   releaseId?: string;
   releaseSlug?: string;
+  latestData?: boolean;
+  latestReleaseTitle?: string;
 }
 
 const TableToolFinalStep = ({
@@ -33,6 +36,8 @@ const TableToolFinalStep = ({
   query,
   releaseId,
   releaseSlug,
+  latestData = true,
+  latestReleaseTitle,
 }: TableToolFinalStepProps) => {
   const dataTableRef = useRef<HTMLElement>(null);
   const [permalinkId, setPermalinkId] = useState<string>('');
@@ -89,11 +94,39 @@ const TableToolFinalStep = ({
         }}
       />
       {table && currentTableHeaders && (
-        <TimePeriodDataTable
-          ref={dataTableRef}
-          fullTable={table}
-          tableHeadersConfig={currentTableHeaders}
-        />
+        <>
+          <div className="govuk-!-margin-bottom-3">
+            {latestData && <Tag strong>This is the latest data</Tag>}
+
+            {!latestData && publication && latestReleaseTitle && (
+              <>
+                <div className="govuk-!-margin-bottom-3">
+                  <Tag strong colour="orange">
+                    This data is not from the latest release.
+                  </Tag>
+                </div>
+
+                <Link
+                  className="dfe-print-hidden"
+                  unvisited
+                  to="/find-statistics/[publication]"
+                  as={`/find-statistics/${publication.slug}`}
+                >
+                  View latest data:{' '}
+                  <span className="govuk-!-font-weight-bold">
+                    {latestReleaseTitle}
+                  </span>
+                </Link>
+              </>
+            )}
+          </div>
+
+          <TimePeriodDataTable
+            ref={dataTableRef}
+            fullTable={table}
+            tableHeadersConfig={currentTableHeaders}
+          />
+        </>
       )}
 
       <h3>Share your table</h3>

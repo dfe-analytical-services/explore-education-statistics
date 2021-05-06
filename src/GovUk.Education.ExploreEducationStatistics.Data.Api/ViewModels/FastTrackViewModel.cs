@@ -19,5 +19,9 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Api.ViewModels
         public Guid ReleaseId { get; set; }
 
         public string ReleaseSlug { get; set; }
+        
+        public bool LatestData { get; set; }
+        
+        public string LatestReleaseTitle { get; set; }
     }
 }
