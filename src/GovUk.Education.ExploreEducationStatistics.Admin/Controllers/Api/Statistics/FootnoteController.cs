@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Collections.ObjectModel;
 using System.Linq;
 using System.Threading.Tasks;
 using GovUk.Education.ExploreEducationStatistics.Admin.ViewModels.Statistics;
@@ -309,7 +310,27 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Controllers.Api.Stati
             var selectedFilterGroups = footnote.FilterGroups.Select(groupFootnote => groupFootnote.FilterGroupId);
 
             // TODO: Add Locations @MarkFix
+            var footnoteLocationIds = footnote.Locations.Select(l => l.LocationId);
+            var locationsByLocationType = _statisticsDbContext.Observation
+                .Where(o => footnoteLocationIds.Contains(o.LocationId))
+                .Select(o => o.GeographicLevel)
+                .Distinct()
+                .ToList()
+                .ToDictionary(
+                    geographicLevel => geographicLevel,
+                    geographicLevel =>
+                        _statisticsDbContext.Observation
+                            .Include(o => o.Location)
+                            .Where(o =>
+                                footnoteLocationIds.Contains(o.LocationId)
+                                && o.GeographicLevel == geographicLevel)
+                            .Select(o => o.LocationId)
+                            .Distinct()
+                            .ToList();
+                    );
+
             // TODO: Add TimePeriods @MarkFix
+            var timePeriods = new List<(int, TimeIdentifier)>();
 
             var subjectIds = selectedSubjects
                 .Concat(filtersBySubject.Keys)
@@ -323,6 +344,8 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Controllers.Api.Stati
                 filterItemsByFilterGroup,
                 indicatorGroupsBySubject,
                 indicatorsByIndicatorGroup,
+                locationsByLocationType,
+                timePeriods,
                 selectedSubjects,
                 selectedFilters,
                 selectedFilterGroups);
@@ -371,6 +394,8 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Controllers.Api.Stati
             IReadOnlyDictionary<Guid, List<Guid>> filterItemsByFilterGroup,
             IReadOnlyDictionary<Guid, List<Guid>> indicatorGroupsBySubject,
             IReadOnlyDictionary<Guid, List<Guid>> indicatorsByIndicatorGroup,
+            IReadOnlyDictionary<GeographicLevel, List<Guid>> locationsByLocationType,
+            IEnumerable<(int, TimeIdentifier)> timePeriods,
             IEnumerable<Guid> selectedSubjects,
             IEnumerable<Guid> selectedFilters,
             IEnumerable<Guid> selectedFilterGroups)
@@ -410,6 +435,8 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Controllers.Api.Stati
                                                           ?.Select(indicatorId => indicatorId.ToString()) ??
                                                       new List<string>()
                                               }) ?? new Dictionary<Guid, FootnoteIndicatorGroupViewModel>(),
+                        Locations = new Dictionary<GeographicLevel, FootnotesLocationsMetaViewModel>(), // @MarkFix
+                        TimePeriods = new List<(int,TimeIdentifier)>(), // @MarkFix
                         Selected = selectedSubjects.Contains(subjectId)
                     })
             };
