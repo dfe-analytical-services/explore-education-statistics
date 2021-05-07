@@ -137,6 +137,8 @@ describe('TableToolPage', () => {
     },
     releaseId: '47a39fb5-1fed-4820-8906-5b54192524d7',
     releaseSlug: '2000-01',
+    latestData: true,
+    latestReleaseTitle: 'Tax Year 2018/2019',
   };
 
   const testPublication: Publication = {
@@ -322,6 +324,61 @@ describe('TableToolPage', () => {
         subjectMeta={testSubjectMeta}
       />,
     );
+
+    expect(screen.getByRole('main')).toMatchSnapshot();
+  });
+
+  test('renders the Table Tool page correctly when this is the latest data', async () => {
+    render(
+      <TableToolPage
+        fastTrack={testFastTrack}
+        publication={testPublication}
+        themeMeta={testThemeMeta}
+        subjectMeta={testSubjectMeta}
+      />,
+    );
+
+    expect(screen.queryByText('This is the latest data')).toBeInTheDocument();
+    expect(
+      screen.queryByText('This data is not from the latest release'),
+    ).not.toBeInTheDocument();
+    expect(
+      screen.queryByTestId('View latest data link'),
+    ).not.toBeInTheDocument();
+
+    expect(screen.getByRole('main')).toMatchSnapshot();
+  });
+
+  test('renders the Table Tool page correctly when this is not the latest data', async () => {
+    render(
+      <TableToolPage
+        fastTrack={{
+          ...testFastTrack,
+          latestData: false,
+          latestReleaseTitle: 'Tax Year 2019/2020',
+        }}
+        publication={testPublication}
+        themeMeta={testThemeMeta}
+        subjectMeta={testSubjectMeta}
+      />,
+    );
+
+    expect(
+      screen.queryByText('This is the latest data'),
+    ).not.toBeInTheDocument();
+    expect(
+      screen.queryByText('This data is not from the latest release'),
+    ).toBeInTheDocument();
+
+    const latestDataLink = screen.queryByTestId(
+      'View latest data link',
+    ) as HTMLAnchorElement;
+    expect(latestDataLink).toBeInTheDocument();
+    expect(latestDataLink.href).toEqual(
+      'http://localhost/find-statistics/test-publication',
+    );
+    expect(latestDataLink.text).toContain('View latest data');
+    expect(latestDataLink.text).toContain('Tax Year 2019/2020');
 
     expect(screen.getByRole('main')).toMatchSnapshot();
   });

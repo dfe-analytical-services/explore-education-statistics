@@ -266,6 +266,10 @@ describe('TableToolFinalStep', () => {
         name: 'Download table as Excel spreadsheet (XLSX)',
       }),
     ).toBeInTheDocument();
+
+    expect(
+      screen.getByTestId('Table tool final step container'),
+    ).toMatchSnapshot();
   });
 
   test('shows and hides table header re-ordering controls successfully', async () => {
@@ -293,6 +297,10 @@ describe('TableToolFinalStep', () => {
         screen.queryByRole('button', { name: 'Re-order table' }),
       ).toBeInTheDocument(),
     );
+
+    expect(
+      screen.getByTestId('Table tool final step container'),
+    ).toMatchSnapshot();
   });
 
   test(`renders the 'View the release for this data' URL with the Release's slug, if supplied`, async () => {
@@ -310,9 +318,14 @@ describe('TableToolFinalStep', () => {
     const viewReleaseLink = screen.getByRole('link', {
       name: 'View the release for this data',
     }) as HTMLAnchorElement;
+
     expect(viewReleaseLink.href).toEqual(
       'http://localhost/find-statistics/test-publication/test-release-slug',
     );
+
+    expect(
+      screen.getByTestId('Table tool final step container'),
+    ).toMatchSnapshot();
   });
 
   test(`renders the 'View the release for this data' URL with only the Publication slug, if the Release slug is not supplied`, async () => {
@@ -328,8 +341,79 @@ describe('TableToolFinalStep', () => {
     const viewReleaseLink = screen.getByRole('link', {
       name: 'View the release for this data',
     }) as HTMLAnchorElement;
+
     expect(viewReleaseLink.href).toEqual(
       'http://localhost/find-statistics/test-publication',
     );
+
+    expect(
+      screen.getByTestId('Table tool final step container'),
+    ).toMatchSnapshot();
+  });
+
+  test('renders the Table Tool final step correctly when this is the latest data', async () => {
+    render(
+      <TableToolFinalStep
+        publication={testPublication}
+        query={testQuery}
+        table={testTable}
+        tableHeaders={testTableHeaders}
+        latestData
+      />,
+    );
+
+    expect(screen.queryByText('This is the latest data')).toBeInTheDocument();
+    expect(
+      screen.queryByText('This data is not from the latest release'),
+    ).not.toBeInTheDocument();
+    expect(
+      screen.queryByTestId('View latest data link'),
+    ).not.toBeInTheDocument();
+
+    expect(
+      screen.getByTestId('Table tool final step container'),
+    ).toMatchSnapshot();
+  });
+
+  test(`renders the Table Tool final step correctly if this is not the latest data`, async () => {
+    render(
+      <TableToolFinalStep
+        publication={testPublication}
+        query={testQuery}
+        table={testTable}
+        tableHeaders={testTableHeaders}
+        latestData={false}
+        latestReleaseTitle="Latest Release Title"
+      />,
+    );
+
+    const viewReleaseLink = screen.getByRole('link', {
+      name: 'View the release for this data',
+    }) as HTMLAnchorElement;
+
+    expect(viewReleaseLink.href).toEqual(
+      'http://localhost/find-statistics/test-publication',
+    );
+
+    expect(
+      screen.queryByText('This is the latest data'),
+    ).not.toBeInTheDocument();
+    expect(
+      screen.queryByText('This data is not from the latest release'),
+    ).toBeInTheDocument();
+
+    const latestDataLink = screen.queryByTestId(
+      'View latest data link',
+    ) as HTMLAnchorElement;
+    expect(latestDataLink).toBeInTheDocument();
+    expect(latestDataLink.href).toEqual(
+      'http://localhost/find-statistics/test-publication',
+    );
+    expect(latestDataLink.text).toContain('View latest data');
+    expect(latestDataLink.text).toContain('Latest Release Title');
+
+    expect(
+      screen.getByTestId('Table tool final step container'),
+    ).toMatchSnapshot();
   });
 });

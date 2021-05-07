@@ -79,7 +79,10 @@ const TableToolFinalStep = ({
   };
 
   return (
-    <div className="govuk-!-margin-bottom-4">
+    <div
+      className="govuk-!-margin-bottom-4"
+      data-testid="Table tool final step container"
+    >
       <TableHeadersForm
         initialValues={currentTableHeaders}
         onSubmit={tableHeaderConfig => {
@@ -102,7 +105,7 @@ const TableToolFinalStep = ({
               <>
                 <div className="govuk-!-margin-bottom-3">
                   <Tag strong colour="orange">
-                    This data is not from the latest release.
+                    This data is not from the latest release
                   </Tag>
                 </div>
 
@@ -111,6 +114,7 @@ const TableToolFinalStep = ({
                   unvisited
                   to="/find-statistics/[publication]"
                   as={`/find-statistics/${publication.slug}`}
+                  testId="View latest data link"
                 >
                   View latest data:{' '}
                   <span className="govuk-!-font-weight-bold">
@@ -164,7 +168,7 @@ const TableToolFinalStep = ({
               size="sm"
               text="Generating permanent link"
             >
-              <ButtonText onClick={() => handlePermalinkClick()}>
+              <ButtonText onClick={handlePermalinkClick}>
                 Generate permanent link
               </ButtonText>
             </LoadingSpinner>

@@ -37,7 +37,7 @@ export default {
     releaseId?: string,
   ): Promise<Permalink> {
     if (releaseId) {
-      return dataApi.post(`/release/${releaseId}/permalink`, query);
+      return dataApi.post(`/permalink/release/${releaseId}`, query);
     }
     return dataApi.post(`/permalink`, query);
   },
