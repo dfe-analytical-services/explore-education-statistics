@@ -368,15 +368,21 @@ Return to Admin
     user waits until h1 is visible   Dashboard
     user waits until page contains title caption  Welcome Bau1
 
-Edit methodology
+Change methodology status to Draft
     [Tags]  HappyPath
     user clicks link  manage methodologies
     user clicks element  //*[@id="approved-methodologies-tab"]
     user clicks link  ${METHODOLOGY_NAME}
+    user clicks link  Sign off
+    user clicks button  Edit status
+    user clicks element  //*[@id="methodologyStatusForm-status-Draft"]
+    user clicks button  Update status
+
+Edit methodology content
+    [Tags]  HappyPath
     user clicks link  Manage content
     user clicks button  ${METHODOLOGY_NAME}
-    # NOTE: scrolls to element is here to avoid selenium clicking the
-    # set page view text box on the methodology page
+
     user scrolls to element  xpath://button[text()="Add text block"]
     user waits until button is enabled  Add text block
     user clicks button  Add text block
@@ -386,6 +392,15 @@ Edit methodology
     user clicks button  Edit section title
     user enters text into element  xpath=//*[@name="heading"]  ${METHODOLOGY_NAME} New and Updated Title -
     user clicks button  Save section title
+
+
+Change methodology status to Approved
+    [Tags]  HappyPath
+    user clicks link  Sign off
+    user clicks button  Edit status
+    user clicks element  //*[@id="methodologyStatusForm-status-Approved"]
+    user enters text into element  //*[@id="methodologyStatusForm-internalReleaseNote"]  Approved by UI tests
+    user clicks button  Update status
 
 Create amendment
     [Tags]  HappyPath

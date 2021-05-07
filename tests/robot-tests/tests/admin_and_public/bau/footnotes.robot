@@ -29,8 +29,8 @@ Create new publication and release via API
 
 Upload subject
     [Tags]  HappyPath
+    user waits for page to finish loading
     user navigates to release summary from admin dashboard  ${PUBLICATION_NAME}   Academic Year 2025/26 (not Live)
-
     user clicks link  Data and files
     user waits until page contains element  id:dataFileUploadForm-subjectTitle
     user enters text into element  id:dataFileUploadForm-subjectTitle   ${SUBJECT_NAME}
@@ -269,7 +269,7 @@ User goes to public Find Statistics page
 
 Verify newly published release is on Find Statistics page
     [Tags]  HappyPath
-    user waits until page contains accordion section   %{TEST_THEME_NAME}
+    user waits until page contains accordion section   %{TEST_THEME_NAME}  120
     user opens accordion section  %{TEST_THEME_NAME}
     user waits until accordion section contains text   %{TEST_THEME_NAME}   ${TOPIC_NAME}
 
