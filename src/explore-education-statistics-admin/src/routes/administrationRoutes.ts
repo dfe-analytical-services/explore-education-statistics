@@ -3,7 +3,6 @@ import BauDashboardPage from '@admin/pages/bau/BauDashboardPage';
 import BauMethodologyPage from '@admin/pages/bau/BauMethodologyPage';
 import BauUsersPage from '@admin/pages/bau/BauUsersPage';
 import BauImportsPage from '@admin/pages/bau/BauImportsPage';
-import ContactsPage from '@admin/pages/contacts/ContactsPage';
 import InvitedUsersPage from '@admin/pages/users/InvitedUsersPage';
 import ManageUserPage from '@admin/pages/users/ManageUserPage';
 import PreReleaseUsersPage from '@admin/pages/users/PreReleaseUsersPage';
@@ -23,13 +22,6 @@ export const administrationMethodologyRoute: ProtectedRouteProps = {
   component: BauMethodologyPage,
   protectionAction: user =>
     user.permissions.canAccessMethodologyAdministrationPages,
-  exact: true,
-};
-
-export const administrationContactsRoute: ProtectedRouteProps = {
-  path: '/administration/contacts',
-  component: ContactsPage,
-  protectionAction: user => user.permissions.canAccessUserAdministrationPages,
   exact: true,
 };
 
@@ -77,7 +69,6 @@ export const administrationUserManageRoute: ProtectedRouteProps = {
 const administrationRoutes = {
   administrationIndexRoute,
   administrationMethodologyRoute,
-  administrationContactsRoute,
   administrationImportsRoute,
   administrationUsersRoute,
   administrationUserInviteRoute,
