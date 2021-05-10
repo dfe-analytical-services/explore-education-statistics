@@ -1,5 +1,5 @@
 import Gate from '@common/components/Gate';
-import { render, wait } from '@testing-library/react';
+import { render, waitFor } from '@testing-library/react';
 import React from 'react';
 
 describe('Gate', () => {
@@ -39,9 +39,9 @@ describe('Gate', () => {
       </Gate>,
     );
 
-    await wait();
-
-    expect(queryByText('children')).toBeInTheDocument();
+    await waitFor(() => {
+      expect(queryByText('children')).toBeInTheDocument();
+    });
   });
 
   test('renders `loading` whilst async `condition` is resolving', async () => {
@@ -72,10 +72,10 @@ describe('Gate', () => {
       </Gate>,
     );
 
-    await wait();
-
-    expect(queryByText('children')).toBeInTheDocument();
-    expect(queryByText('loading')).not.toBeInTheDocument();
+    await waitFor(() => {
+      expect(queryByText('children')).toBeInTheDocument();
+      expect(queryByText('loading')).not.toBeInTheDocument();
+    });
   });
 
   test('does not render `loading` when async `condition` resolves to false', async () => {
@@ -90,10 +90,10 @@ describe('Gate', () => {
       </Gate>,
     );
 
-    await wait();
-
-    expect(queryByText('children')).not.toBeInTheDocument();
-    expect(queryByText('loading')).not.toBeInTheDocument();
+    await waitFor(() => {
+      expect(queryByText('children')).not.toBeInTheDocument();
+      expect(queryByText('loading')).not.toBeInTheDocument();
+    });
   });
 
   test('renders `fallback` when `condition` is false', () => {
@@ -119,10 +119,10 @@ describe('Gate', () => {
       </Gate>,
     );
 
-    await wait();
-
-    expect(queryByText('children')).not.toBeInTheDocument();
-    expect(queryByText('fallback')).toBeInTheDocument();
+    await waitFor(() => {
+      expect(queryByText('children')).not.toBeInTheDocument();
+      expect(queryByText('fallback')).toBeInTheDocument();
+    });
   });
 
   test('renders `fallback` with `condition` error', async () => {
@@ -137,9 +137,9 @@ describe('Gate', () => {
       </Gate>,
     );
 
-    await wait();
-
-    expect(queryByText('children')).not.toBeInTheDocument();
-    expect(queryByText('something went wrong')).toBeInTheDocument();
+    await waitFor(() => {
+      expect(queryByText('children')).not.toBeInTheDocument();
+      expect(queryByText('something went wrong')).toBeInTheDocument();
+    });
   });
 });

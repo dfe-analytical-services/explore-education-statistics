@@ -5,6 +5,7 @@ import FormattedDate from '@common/components/FormattedDate';
 import RelatedAside from '@common/components/RelatedAside';
 import SummaryList from '@common/components/SummaryList';
 import SummaryListItem from '@common/components/SummaryListItem';
+import Tag from '@common/components/Tag';
 import ContentBlockRenderer from '@common/modules/find-statistics/components/ContentBlockRenderer';
 import publicationService, {
   Release,
@@ -65,9 +66,9 @@ const PublicationReleasePage: NextPage<Props> = ({ data }) => {
           <div className="dfe-flex dfe-align-items--center dfe-justify-content--space-between">
             <div className="dfe-flex govuk-!-margin-bottom-3">
               {data.latestRelease ? (
-                <strong className="govuk-tag govuk-!-margin-right-6">
+                <Tag strong className="govuk-!-margin-right-6">
                   This is the latest data
-                </strong>
+                </Tag>
               ) : (
                 <Link
                   className="dfe-print-hidden"

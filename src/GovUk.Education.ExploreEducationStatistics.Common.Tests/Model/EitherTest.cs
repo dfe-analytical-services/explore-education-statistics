@@ -2,6 +2,7 @@ using System.Threading.Tasks;
 using System;
 using GovUk.Education.ExploreEducationStatistics.Common.Model;
 using Xunit;
+using static GovUk.Education.ExploreEducationStatistics.Common.Tests.Extensions.AssertExtensions;
 
 namespace GovUk.Education.ExploreEducationStatistics.Common.Tests.Model
 {
@@ -248,6 +249,55 @@ namespace GovUk.Education.ExploreEducationStatistics.Common.Tests.Model
             Assert.True(either.IsLeft);
             Assert.Equal(nextException, either.Left);
             Assert.Throws<ArgumentException>(() => either.Right);
+        }
+
+        [Fact]
+        public async void OnSuccessCombineWith_AllSuccess()
+        {
+            var either = await Task.FromResult(new Either<int, string>("Success number one!"))
+                .OnSuccessCombineWith(firstSuccess =>
+                {
+                    Assert.Equal("Success number one!", firstSuccess);
+                    return Task.FromResult(new Either<int, string>("Success number two!"));
+                });
+
+            Assert.True(either.IsRight);
+            Assert.Equal(new Tuple<string, string>("Success number one!", "Success number two!"), either.Right);
+        }
+
+        [Fact]
+        public async void OnSuccessCombineWith_AllSuccessMixedTypes()
+        {
+            var either = await Task.FromResult(new Either<int, string>("Success number one!"))
+                .OnSuccessCombineWith(firstSuccess =>
+                {
+                    Assert.Equal("Success number one!", firstSuccess);
+                    return Task.FromResult(new Either<int, char>('2'));
+                });
+
+            Assert.True(either.IsRight);
+            Assert.Equal(new Tuple<string, char>("Success number one!", '2'), either.Right);
+        }
+
+        [Fact]
+        public async void OnSuccessCombineWith_FirstFails()
+        {
+            var either = await Task.FromResult(new Either<int, string>(500))
+                .OnSuccessCombineWith(firstSuccess => AssertFail<Task<Either<int, string>>>(
+                    "Second call should not be called if the first failed"));
+
+            Assert.True(either.IsLeft);
+            Assert.Equal(500, either.Left);
+        }
+
+        [Fact]
+        public async void OnSuccessCombineWith_SecondFails()
+        {
+            var either = await Task.FromResult(new Either<int, string>("Success number one!"))
+                .OnSuccessCombineWith(_ => Task.FromResult(new Either<int, string>(500)));
+
+            Assert.True(either.IsLeft);
+            Assert.Equal(500, either.Left);
         }
     }
 }

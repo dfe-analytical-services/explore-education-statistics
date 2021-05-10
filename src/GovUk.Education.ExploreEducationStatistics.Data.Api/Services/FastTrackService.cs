@@ -4,6 +4,7 @@ using System.Net;
 using System.Threading.Tasks;
 using AutoMapper;
 using GovUk.Education.ExploreEducationStatistics.Common.Model;
+using GovUk.Education.ExploreEducationStatistics.Common.Services;
 using GovUk.Education.ExploreEducationStatistics.Common.Services.Interfaces;
 using GovUk.Education.ExploreEducationStatistics.Data.Api.Services.Interfaces;
 using GovUk.Education.ExploreEducationStatistics.Data.Api.ViewModels;
@@ -14,6 +15,7 @@ using Microsoft.AspNetCore.Mvc;
 using Microsoft.Azure.Cosmos.Table;
 using Newtonsoft.Json;
 using static GovUk.Education.ExploreEducationStatistics.Common.BlobContainers;
+using static GovUk.Education.ExploreEducationStatistics.Common.Database.TimePeriodLabelFormat;
 using static GovUk.Education.ExploreEducationStatistics.Common.Services.FileStoragePathUtils;
 using static GovUk.Education.ExploreEducationStatistics.Common.TableStorageTableNames;
 using StorageException = Microsoft.Azure.Storage.StorageException;
@@ -24,21 +26,21 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Api.Services
     {
         private readonly ITableBuilderService _tableBuilderService;
         private readonly IBlobStorageService _blobStorageService;
-        private readonly ISubjectService _subjectService;
         private readonly ITableStorageService _tableStorageService;
+        private readonly IReleaseRepository _releaseRepository;
         private readonly IMapper _mapper;
 
         public FastTrackService(
             ITableBuilderService tableBuilderService,
             IBlobStorageService blobStorageService,
-            ISubjectService subjectService,
             ITableStorageService tableStorageService,
+            IReleaseRepository releaseRepository,
             IMapper mapper)
         {
             _tableBuilderService = tableBuilderService;
             _blobStorageService = blobStorageService;
-            _subjectService = subjectService;
             _tableStorageService = tableStorageService;
+            _releaseRepository = releaseRepository;
             _mapper = mapper;
         }
 
@@ -58,14 +60,24 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Api.Services
 
         private Task<Either<ActionResult, FastTrackViewModel>> BuildViewModel(FastTrack fastTrack)
         {
-            return _tableBuilderService.Query(fastTrack.ReleaseId, fastTrack.Query).OnSuccess(result =>
-            {
-                var viewModel = _mapper.Map<FastTrackViewModel>(fastTrack);
-                viewModel.FullTable = result;
-                viewModel.Query.PublicationId =
-                    _subjectService.GetPublicationForSubject(fastTrack.Query.SubjectId).Result.Id;
-                return viewModel;
-            });
+            return _releaseRepository
+                .FindOrNotFoundAsync(fastTrack.ReleaseId)
+                .OnSuccessCombineWith(release => _tableBuilderService.Query(fastTrack.ReleaseId, fastTrack.Query))
+                .OnSuccess(releaseAndResults =>
+                {
+                    var (release, result) = releaseAndResults;
+                    var viewModel = _mapper.Map<FastTrackViewModel>(fastTrack);
+                    viewModel.FullTable = result;
+                    viewModel.Query.PublicationId = release.PublicationId;
+                    viewModel.ReleaseSlug = release.Slug;
+
+                    var latestRelease = _releaseRepository.GetLatestPublishedRelease(release.PublicationId);
+                    viewModel.LatestData = latestRelease?.Id == release.Id;
+                    viewModel.LatestReleaseTitle = latestRelease != null
+                        ? TimePeriodLabelFormatter.Format(latestRelease.Year, latestRelease.TimeIdentifier,
+                            FullLabelBeforeYear) : null;
+                    return viewModel;
+                });
         }
 
         private async Task<Either<ActionResult, FastTrack>> GetFastTrack(Guid id)

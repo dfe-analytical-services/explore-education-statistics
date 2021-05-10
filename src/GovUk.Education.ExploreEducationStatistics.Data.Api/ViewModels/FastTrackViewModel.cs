@@ -15,5 +15,13 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Api.ViewModels
         public TableBuilderResultViewModel FullTable { get; set; }
 
         public TableBuilderQueryViewModel Query { get; set; }
+        
+        public Guid ReleaseId { get; set; }
+
+        public string ReleaseSlug { get; set; }
+        
+        public bool LatestData { get; set; }
+        
+        public string LatestReleaseTitle { get; set; }
     }
 }

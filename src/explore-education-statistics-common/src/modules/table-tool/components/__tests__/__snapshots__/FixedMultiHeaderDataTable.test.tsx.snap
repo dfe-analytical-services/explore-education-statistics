@@ -4,6 +4,7 @@ exports[`FixedMultiHeaderDataTable renders underlying table 1`] = `
 <table
   aria-labelledby="dataTableCaption"
   class="govuk-table table"
+  data-testid="dataTableCaption-table"
 >
   <thead
     class="tableHead"

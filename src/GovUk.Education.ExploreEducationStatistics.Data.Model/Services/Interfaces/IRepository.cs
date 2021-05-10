@@ -3,6 +3,8 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Linq.Expressions;
 using System.Threading.Tasks;
+using GovUk.Education.ExploreEducationStatistics.Common.Model;
+using Microsoft.AspNetCore.Mvc;
 
 namespace GovUk.Education.ExploreEducationStatistics.Data.Model.Services.Interfaces
 {
@@ -19,6 +21,10 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Model.Services.Interfa
         TEntity Find(TKey id);
 
         Task<TEntity> FindAsync(TKey id);
+        
+        Either<ActionResult, TEntity> FindOrNotFound(TKey id);
+
+        Task<Either<ActionResult, TEntity>> FindOrNotFoundAsync(TKey id);
 
         IQueryable<TEntity> Find(TKey[] ids);
 

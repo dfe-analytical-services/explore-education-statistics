@@ -6,6 +6,10 @@ export type FastTrackTable = ConfiguredTable & {
   query: TableDataQuery & {
     publicationId: string;
   };
+  releaseId: string;
+  releaseSlug: string;
+  latestData: boolean;
+  latestReleaseTitle: string;
 };
 
 const fastTrackService = {
