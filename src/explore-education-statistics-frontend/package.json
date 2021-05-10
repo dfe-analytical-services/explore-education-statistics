@@ -18,7 +18,7 @@
     "helmet": "^4.1.1",
     "immer": "^8.0.4",
     "leaflet": "^1.7.1",
-    "lodash": "^4.17.20",
+    "lodash": "^4.17.21",
     "memoizee": "^0.4.14",
     "next": "^9.5.3",
     "next-images": "^1.6.0",

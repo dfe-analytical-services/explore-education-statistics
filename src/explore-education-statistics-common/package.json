@@ -61,7 +61,7 @@
     "jest-serializer-html": "^7.0.0",
     "jest-watch-typeahead": "^0.6.1",
     "leaflet": "^1.7.1",
-    "lodash": "^4.17.20",
+    "lodash": "^4.17.21",
     "memoizee": "^0.4.14",
     "next": "^9.5.3",
     "next-server": "^9.0.5",
