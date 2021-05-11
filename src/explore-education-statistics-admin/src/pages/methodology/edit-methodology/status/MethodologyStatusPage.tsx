@@ -66,8 +66,6 @@ const MethodologyStatusPage = ({
       methodologyId,
       {
         ...model.summary,
-        // TODO: EES-899 Contact should be attached
-        contactId: model.summary?.contact?.id ?? '',
         ...values,
       },
     );

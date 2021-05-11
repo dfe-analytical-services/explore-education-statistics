@@ -1,4 +1,3 @@
-import { ContactDetails, SaveContact } from '@admin/services/contactService';
 import {
   LegacyRelease,
   UpdateLegacyRelease,
@@ -8,6 +7,21 @@ import { MyRelease } from '@admin/services/releaseService';
 import { IdTitlePair } from '@admin/services/types/common';
 import client from '@admin/services/utils/service';
 import { OmitStrict } from '@common/types';
+
+export interface PublicationContactDetails {
+  id: string;
+  contactName: string;
+  contactTelNo: string;
+  teamEmail: string;
+  teamName?: string;
+}
+
+export interface SavePublicationContact {
+  contactName: string;
+  contactTelNo: string;
+  teamEmail: string;
+  teamName?: string;
+}
 
 export interface ExternalMethodology {
   title: string;
@@ -20,7 +34,7 @@ export interface MyPublication {
   methodology?: IdTitlePair;
   externalMethodology?: ExternalMethodology;
   releases: MyRelease[];
-  contact?: ContactDetails;
+  contact?: PublicationContactDetails;
   permissions: {
     canCreateReleases: boolean;
     canUpdatePublication: boolean;
@@ -31,7 +45,7 @@ export interface BasicPublicationDetails {
   id: string;
   title: string;
   slug: string;
-  contact?: ContactDetails;
+  contact?: PublicationContactDetails;
   methodology?: BasicMethodology;
   externalMethodology?: ExternalMethodology;
   legacyReleases: LegacyRelease[];
@@ -46,7 +60,7 @@ export interface PublicationMethodologyDetails {
 
 export interface SavePublicationRequest {
   title: string;
-  contact: SaveContact;
+  contact: SavePublicationContact;
   selectedMethodologyId?: string;
   externalMethodology?: ExternalMethodology;
   topicId: string;

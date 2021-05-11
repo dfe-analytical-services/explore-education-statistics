@@ -27,7 +27,6 @@ const MethodologyCreatePage = ({ history }: RouteComponentProps) => {
           const createdMethodology = await methodologyService.createMethodology(
             {
               title: values.title,
-              contactId: values.contactId,
             },
           );
 

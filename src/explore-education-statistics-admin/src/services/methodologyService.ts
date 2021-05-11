@@ -1,4 +1,3 @@
-import { ContactDetails } from '@admin/services/contactService';
 import client from '@admin/services/utils/service';
 import { IdTitlePair } from 'src/services/types/common';
 
@@ -14,7 +13,6 @@ export interface MethodologyStatusListItem {
 
 interface SaveMethodologySummary {
   title: string;
-  contactId: string;
 }
 
 export type CreateMethodology = SaveMethodologySummary;
@@ -27,8 +25,6 @@ export interface BasicMethodology {
   title: string;
   slug: string;
   status: MethodologyStatus;
-  // TODO: EES-899 methodology should have a contact attached
-  contact?: ContactDetails;
   published?: string;
 }
 
