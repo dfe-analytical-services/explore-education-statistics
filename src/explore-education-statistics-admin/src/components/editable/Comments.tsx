@@ -15,6 +15,7 @@ import FormattedDate from '@common/components/FormattedDate';
 import Yup from '@common/validation/yup';
 import { Formik } from 'formik';
 import React, { useState } from 'react';
+import orderBy from 'lodash/orderBy';
 import styles from './Comments.module.scss';
 
 interface FormValues {
@@ -114,8 +115,9 @@ const Comments = ({
             validationSchema={Yup.object({
               content: Yup.string().required('Enter a comment'),
             })}
-            onSubmit={values => {
+            onSubmit={(values, { resetForm }) => {
               addComment(values.content);
+              resetForm();
             }}
           >
             <Form id={`${blockId}-addCommentForm`} showErrorSummary={false}>
@@ -131,7 +133,7 @@ const Comments = ({
         )}
 
         <ul className={styles.commentsContainer}>
-          {comments.map((comment, index) => {
+          {orderBy(comments, ['created'], ['desc']).map((comment, index) => {
             const { createdBy } = comment;
 
             return (
