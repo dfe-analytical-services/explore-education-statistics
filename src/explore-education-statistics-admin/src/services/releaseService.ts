@@ -1,7 +1,7 @@
-import { ContactDetails } from '@admin/services/contactService';
 import { IdTitlePair, ValueLabelPair } from '@admin/services/types/common';
 import client from '@admin/services/utils/service';
 import { ReleaseApprovalStatus } from '@common/services/publicationService';
+import { PublicationContactDetails } from '@admin/services/publicationService';
 import { PartialDate } from '@common/utils/date/partialDate';
 
 export interface Release {
@@ -18,7 +18,7 @@ export interface Release {
   timePeriodCoverage: ValueLabelPair;
   title: string;
   type: IdTitlePair;
-  contact: ContactDetails;
+  contact: PublicationContactDetails;
   publishScheduled?: string;
   published?: string;
   nextReleaseDate?: PartialDate;

@@ -25,7 +25,6 @@ const MethodologySummaryEditPage = ({
           <MethodologySummaryForm
             id="updateMethodologyForm"
             initialValues={{
-              contactId: '',
               title: methodology.title,
             }}
             submitText="Update methodology"
@@ -33,7 +32,6 @@ const MethodologySummaryEditPage = ({
               await methodologyService.updateMethodology(methodologyId, {
                 ...methodology,
                 title: values.title,
-                contactId: values.contactId,
               });
 
               history.push(`/methodologies/${methodologyId}/summary`);
