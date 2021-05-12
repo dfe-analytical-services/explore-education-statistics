@@ -92,4 +92,4 @@ BEGIN
         RAISERROR (N'No soft deleted Subjects found to delete', 0, 1) WITH NOWAIT;
     -- Drop the temporary table of soft-deleted Subjects
     DROP TABLE #SoftDeletedSubjects;
-END;
+END
