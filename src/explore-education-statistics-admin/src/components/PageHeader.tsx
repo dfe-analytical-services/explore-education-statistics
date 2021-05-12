@@ -3,7 +3,7 @@ import { useAuthContext, User } from '@admin/contexts/AuthContext';
 import loginService from '@admin/services/loginService';
 import classNames from 'classnames';
 import logo from 'govuk-frontend/govuk/assets/images/govuk-logotype-crown.png';
-import React from 'react';
+import React, { useState } from 'react';
 import styles from './PageHeader.module.scss';
 
 interface Props {
@@ -12,6 +12,7 @@ interface Props {
 
 const PageHeader = ({ wide }: Props) => {
   const { user } = useAuthContext();
+  const [menuOpen, setMenuOpen] = useState(false);
 
   const envs = {
     localhost: 'dfeEnv--local',
@@ -72,16 +73,24 @@ const PageHeader = ({ wide }: Props) => {
 
             <button
               type="button"
-              className="govuk-header__menu-button govuk-js-header-toggle"
+              className={classNames(
+                'govuk-header__menu-button',
+                'govuk-js-header-toggle',
+                { 'govuk-header__menu-button--open': menuOpen },
+              )}
               aria-controls="navigation"
+              aria-expanded={menuOpen}
               aria-label="Show or hide Top Level Navigation"
+              onClick={() => setMenuOpen(!menuOpen)}
             >
               Menu
             </button>
             <nav>
               <ul
                 id="navigation"
-                className="govuk-header__navigation "
+                className={classNames('govuk-header__navigation', {
+                  'govuk-header__navigation--open': menuOpen,
+                })}
                 aria-label="Top Level Navigation"
               >
                 {user?.validToken ? (
