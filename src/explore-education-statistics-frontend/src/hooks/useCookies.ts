@@ -5,7 +5,7 @@ import {
   enableGoogleAnalytics,
   googleAnalyticsCookies,
 } from '@frontend/services/googleAnalyticsService';
-import { addMonths, addYears } from 'date-fns';
+import { addYears } from 'date-fns';
 import {
   destroyCookie,
   parseCookies,
@@ -30,9 +30,9 @@ interface AllowedCookies {
 export const allowedCookies: AllowedCookies = {
   bannerSeen: {
     name: 'ees_banner_seen',
-    duration: '1 month',
+    duration: '1 year',
     options: {
-      expires: addMonths(new Date(), 1),
+      expires: addYears(new Date(), 1),
     },
   },
   disableGA: {

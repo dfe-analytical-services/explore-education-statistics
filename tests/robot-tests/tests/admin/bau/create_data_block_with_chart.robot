@@ -632,7 +632,7 @@ Configure basic geographic chart
 Change geographic chart legend
     [Tags]  HappyPath
     user clicks link  Legend
-    user waits until h3 is visible  Legend
+    user waits until h3 is visible  Legend  90
 
     user counts legend form item rows  5
     user checks element value should be  id:chartLegendConfigurationForm-items-0-label  Admission Numbers (2005)

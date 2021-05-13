@@ -130,6 +130,7 @@ const MultiHeaderTable = forwardRef<HTMLTableElement, MultiHeaderTableProps>(
 
     return (
       <table
+        data-testid={ariaLabelledBy && `${ariaLabelledBy}-table`}
         aria-labelledby={ariaLabelledBy}
         className={classNames('govuk-table', styles.table, className)}
         ref={ref}

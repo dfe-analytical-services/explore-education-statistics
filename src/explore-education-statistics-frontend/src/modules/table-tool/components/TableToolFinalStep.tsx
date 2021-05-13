@@ -1,4 +1,5 @@
 import ButtonText from '@common/components/ButtonText';
+import Tag from '@common/components/Tag';
 import UrlContainer from '@common/components/UrlContainer';
 import LoadingSpinner from '@common/components/LoadingSpinner';
 import useAsyncRetry from '@common/hooks/useAsyncRetry';
@@ -23,6 +24,9 @@ interface TableToolFinalStepProps {
   table: FullTable;
   tableHeaders: TableHeadersConfig;
   releaseId?: string;
+  releaseSlug?: string;
+  latestData?: boolean;
+  latestReleaseTitle?: string;
 }
 
 const TableToolFinalStep = ({
@@ -31,6 +35,9 @@ const TableToolFinalStep = ({
   publication,
   query,
   releaseId,
+  releaseSlug,
+  latestData = true,
+  latestReleaseTitle,
 }: TableToolFinalStepProps) => {
   const dataTableRef = useRef<HTMLElement>(null);
   const [permalinkId, setPermalinkId] = useState<string>('');
@@ -72,7 +79,10 @@ const TableToolFinalStep = ({
   };
 
   return (
-    <div className="govuk-!-margin-bottom-4">
+    <div
+      className="govuk-!-margin-bottom-4"
+      data-testid="Table tool final step container"
+    >
       <TableHeadersForm
         initialValues={currentTableHeaders}
         onSubmit={tableHeaderConfig => {
@@ -87,11 +97,40 @@ const TableToolFinalStep = ({
         }}
       />
       {table && currentTableHeaders && (
-        <TimePeriodDataTable
-          ref={dataTableRef}
-          fullTable={table}
-          tableHeadersConfig={currentTableHeaders}
-        />
+        <>
+          <div className="govuk-!-margin-bottom-3">
+            {latestData && <Tag strong>This is the latest data</Tag>}
+
+            {!latestData && publication && latestReleaseTitle && (
+              <>
+                <div className="govuk-!-margin-bottom-3">
+                  <Tag strong colour="orange">
+                    This data is not from the latest release
+                  </Tag>
+                </div>
+
+                <Link
+                  className="dfe-print-hidden"
+                  unvisited
+                  to="/find-statistics/[publication]"
+                  as={`/find-statistics/${publication.slug}`}
+                  testId="View latest data link"
+                >
+                  View latest data:{' '}
+                  <span className="govuk-!-font-weight-bold">
+                    {latestReleaseTitle}
+                  </span>
+                </Link>
+              </>
+            )}
+          </div>
+
+          <TimePeriodDataTable
+            ref={dataTableRef}
+            fullTable={table}
+            tableHeadersConfig={currentTableHeaders}
+          />
+        </>
       )}
 
       <h3>Share your table</h3>
@@ -129,7 +168,7 @@ const TableToolFinalStep = ({
               size="sm"
               text="Generating permanent link"
             >
-              <ButtonText onClick={() => handlePermalinkClick()}>
+              <ButtonText onClick={handlePermalinkClick}>
                 Generate permanent link
               </ButtonText>
             </LoadingSpinner>
@@ -141,12 +180,21 @@ const TableToolFinalStep = ({
       {publication && table && (
         <ul className="govuk-list">
           <li>
-            <Link
-              to="/find-statistics/[publication]"
-              as={`/find-statistics/${publication.slug}`}
-            >
-              View the release for this data
-            </Link>
+            {releaseSlug ? (
+              <Link
+                to="/find-statistics/[publication]/[releaseSlug]"
+                as={`/find-statistics/${publication.slug}/${releaseSlug}`}
+              >
+                View the release for this data
+              </Link>
+            ) : (
+              <Link
+                to="/find-statistics/[publication]"
+                as={`/find-statistics/${publication.slug}`}
+              >
+                View the release for this data
+              </Link>
+            )}
           </li>
           <li>
             <DownloadCsvButton
@@ -187,21 +235,23 @@ const TableToolFinalStep = ({
               }
             />
           </li>
-          <li>
-            {pubMethodology?.methodology?.slug && (
+          {pubMethodology?.methodology?.slug && (
+            <li>
               <Link
                 to="/methodology/[methodology]"
                 as={`/methodology/${pubMethodology.methodology.slug}`}
               >
                 Go to methodology
               </Link>
-            )}
-            {pubMethodology?.externalMethodology?.url && (
+            </li>
+          )}
+          {pubMethodology?.externalMethodology?.url && (
+            <li>
               <a href={pubMethodology.externalMethodology.url}>
                 Go to methodology
               </a>
-            )}
-          </li>
+            </li>
+          )}
         </ul>
       )}
       <p className="govuk-body">

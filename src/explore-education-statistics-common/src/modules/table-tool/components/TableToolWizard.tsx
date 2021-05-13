@@ -43,10 +43,13 @@ export interface InitialTableToolState {
   highlights?: TableHighlight[];
   subjectMeta?: SubjectMeta;
   query?: ReleaseTableDataQuery;
+  releaseSlug?: string;
   response?: {
     table: FullTable;
     tableHeaders: TableHeadersConfig;
   };
+  latestData?: boolean;
+  latestReleaseTitle?: string;
 }
 
 interface TableToolState extends InitialTableToolState {

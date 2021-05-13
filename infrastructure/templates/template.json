@@ -583,7 +583,7 @@
         "resourceId": "[resourceId('Microsoft.Web/sites', variables('dataAppName'))]",
         "resourceType": "Microsoft.Web/sites",
         "metricName": "Http5xx",
-        "threshold": 2,
+        "threshold": 5,
         "operator": "GreaterThan",
         "timeAggregation": "Total",
         "criterionType": "StaticThresholdCriterion"
@@ -594,7 +594,7 @@
         "resourceId": "[resourceId('Microsoft.Web/sites', variables('contentAppName'))]",
         "resourceType": "Microsoft.Web/sites",
         "metricName": "Http5xx",
-        "threshold": 0,
+        "threshold": 2,
         "operator": "GreaterThan",
         "timeAggregation": "Total",
         "criterionType": "StaticThresholdCriterion"
@@ -605,7 +605,7 @@
         "resourceId": "[resourceId('Microsoft.Web/sites', variables('publicAppName'))]",
         "resourceType": "Microsoft.Web/sites",
         "metricName": "Http5xx",
-        "threshold": 5,
+        "threshold": 15,
         "operator": "GreaterThan",
         "timeAggregation": "Total",
         "criterionType": "StaticThresholdCriterion"
@@ -649,7 +649,7 @@
         "resourceId": "[resourceId('Microsoft.Insights/components', variables('adminAppInsights'))]",
         "resourceType": "Microsoft.Insights/components",
         "metricName": "exceptions/count",
-        "threshold": 3,
+        "threshold": 10,
         "operator": "GreaterThan",
         "timeAggregation": "Count",
         "criterionType": "StaticThresholdCriterion"
@@ -660,7 +660,7 @@
         "resourceId": "[resourceId('Microsoft.Insights/components', variables('dataAppInsights'))]",
         "resourceType": "Microsoft.Insights/components",
         "metricName": "exceptions/count",
-        "threshold": 3,
+        "threshold": 5,
         "operator": "GreaterThan",
         "timeAggregation": "Count",
         "criterionType": "StaticThresholdCriterion"
@@ -682,7 +682,7 @@
         "resourceId": "[resourceId('Microsoft.Insights/components', variables('publicAppInsights'))]",
         "resourceType": "Microsoft.Insights/components",
         "metricName": "exceptions/count",
-        "threshold": 4,
+        "threshold": 15,
         "operator": "GreaterThan",
         "timeAggregation": "Count",
         "criterionType": "StaticThresholdCriterion"

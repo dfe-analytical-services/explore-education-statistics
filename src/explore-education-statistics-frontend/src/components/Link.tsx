@@ -10,6 +10,7 @@ export type LinkProps = {
   prefetch?: boolean;
   to: RouterLinkProps['href'];
   unvisited?: boolean;
+  testId?: string;
 } & OmitStrict<AnchorHTMLAttributes<HTMLAnchorElement>, 'href'>;
 
 const Link = ({
@@ -19,6 +20,7 @@ const Link = ({
   prefetch,
   to,
   unvisited = false,
+  testId,
   ...props
 }: LinkProps) => {
   const isAbsolute = typeof to === 'string' && to.startsWith('http');
@@ -35,6 +37,7 @@ const Link = ({
         },
         className,
       )}
+      data-testid={testId}
     >
       {children}
     </a>

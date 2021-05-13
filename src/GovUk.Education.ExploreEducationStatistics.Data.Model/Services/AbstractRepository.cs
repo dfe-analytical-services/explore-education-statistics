@@ -5,9 +5,11 @@ using System.Linq;
 using System.Linq.Expressions;
 using System.Threading.Tasks;
 using GovUk.Education.ExploreEducationStatistics.Common.Extensions;
+using GovUk.Education.ExploreEducationStatistics.Common.Model;
 using GovUk.Education.ExploreEducationStatistics.Data.Model.Database;
 using GovUk.Education.ExploreEducationStatistics.Data.Model.Extensions;
 using GovUk.Education.ExploreEducationStatistics.Data.Model.Services.Interfaces;
+using Microsoft.AspNetCore.Mvc;
 using Microsoft.Data.SqlClient;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Logging;
@@ -70,6 +72,16 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Model.Services
         public async Task<TEntity> FindAsync(TKey id)
         {
             return await DbSet().FindAsync(id);
+        }
+
+        public Either<ActionResult, TEntity> FindOrNotFound(TKey id)
+        {
+            return Find(id) ?? new Either<ActionResult, TEntity>(new NotFoundResult());
+        }
+
+        public async Task<Either<ActionResult, TEntity>> FindOrNotFoundAsync(TKey id)
+        {
+            return await FindAsync(id) ?? new Either<ActionResult, TEntity>(new NotFoundResult());
         }
 
         public IQueryable<TEntity> Find(TKey[] ids)

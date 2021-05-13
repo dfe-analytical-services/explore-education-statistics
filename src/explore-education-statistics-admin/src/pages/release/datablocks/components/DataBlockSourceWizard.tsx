@@ -13,6 +13,7 @@ import WizardStepHeading from '@common/modules/table-tool/components/WizardStepH
 import { FullTable } from '@common/modules/table-tool/types/fullTable';
 import { TableHeadersConfig } from '@common/modules/table-tool/types/tableHeaders';
 import { ReleaseTableDataQuery } from '@common/services/tableBuilderService';
+import WarningMessage from '@common/components/WarningMessage';
 import React, {
   createRef,
   memo,
@@ -130,6 +131,12 @@ const DataBlockSourceWizard = ({
   return (
     <div className="govuk-!-margin-bottom-8">
       <p>Configure data source for the data block</p>
+      {dataBlock && dataBlock.charts.length > 0 && (
+        <WarningMessage>
+          Editing the data source may change existing chart configuration for
+          this data block
+        </WarningMessage>
+      )}
 
       <TableToolWizard
         themeMeta={[]}
