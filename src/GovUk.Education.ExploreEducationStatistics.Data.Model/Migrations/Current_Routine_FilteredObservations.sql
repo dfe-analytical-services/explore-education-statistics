@@ -187,4 +187,3 @@ DECLARE
          @wardsList = @wardsList,
          @planningAreasList = @planningAreasList,
          @filterItemList = @filterItemList;
-

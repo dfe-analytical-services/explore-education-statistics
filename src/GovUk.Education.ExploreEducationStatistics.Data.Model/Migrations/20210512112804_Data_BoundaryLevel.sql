@@ -1,0 +1,11 @@
+SET IDENTITY_INSERT BoundaryLevel ON;
+INSERT INTO BoundaryLevel (Id, Level, Label, Published) VALUES (1, N'NAT', N'Countries December 2017 Ultra Generalised Clipped Boundaries in UK', N'2018-03-08 00:00:00.0000000');
+INSERT INTO BoundaryLevel (Id, Level, Label, Published) VALUES (2, N'LA', N'Counties and Unitary Authorities December 2018 Boundaries EW BUC', N'2019-05-28 00:00:00.0000000');
+INSERT INTO BoundaryLevel (Id, Level, Label, Published) VALUES (3, N'LAD', N'Local Authority Districts December 2017 Ultra Generalised Clipped Boundaries in United Kingdom WGS84', N'2018-02-05 00:00:00.0000000');
+INSERT INTO BoundaryLevel (Id, Level, Label, Published) VALUES (4, N'LEP', N'Local Enterprise Partnerships April 2017 Ultra Generalised Clipped Boundaries in England V2', N'2017-10-03 00:00:00.0000000');
+INSERT INTO BoundaryLevel (Id, Level, Label, Published) VALUES (5, N'PC', N'Westminster Parliamentary Constituencies December 2018 UK BUC', N'2019-04-12 00:00:00.0000000');
+INSERT INTO BoundaryLevel (Id, Level, Label, Published) VALUES (6, N'REG', N'Regions December 2017 Ultra Generalised Clipped Boundaries in England', N'2018-02-27 00:00:00.0000000');
+INSERT INTO BoundaryLevel (Id, Level, Label, Published) VALUES (7, N'WAR', N'Wards December 2018 Super Generalised Clipped Boundaries UK', N'2019-03-11 00:00:00.0000000');
+INSERT INTO BoundaryLevel (Id, Level, Label, Published) VALUES (8, N'LAD', N'Local Authority Districts (April 2019) Boundaries UK BUC', N'2019-03-27 00:00:00.0000000');
+INSERT INTO BoundaryLevel (Id, Level, Label, Published) VALUES (9, N'LA', N'Counties and Unitary Authorities April 2019 Boundaries EW BUC', N'2020-07-27 00:00:00.0000000');
+SET IDENTITY_INSERT BoundaryLevel OFF;

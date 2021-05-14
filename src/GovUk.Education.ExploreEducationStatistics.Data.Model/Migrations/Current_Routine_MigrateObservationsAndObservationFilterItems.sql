@@ -1,3 +1,4 @@
+-- TODO This Stored Procedure is not used but the code is retained for EES-1836
 CREATE OR
 ALTER PROCEDURE MigrateObservationsAndObservationFilterItems 
     @SubjectsBatchSize INT
@@ -99,4 +100,4 @@ BEGIN
     RAISERROR (N'No Subjects found to migrate', 0, 1) WITH NOWAIT;
     -- Drop the temporary table of Subjects to migrate
     DROP TABLE #SubjectsToMigrate;
-END;
+END

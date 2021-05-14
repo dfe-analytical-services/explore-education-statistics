@@ -3,4 +3,3 @@ AS
 BEGIN
     INSERT INTO Observation SELECT * FROM @Observations
 END
-GO

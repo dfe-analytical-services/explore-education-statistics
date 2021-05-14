@@ -2,13 +2,13 @@ CREATE OR ALTER PROCEDURE InsertObservationRows
     @Observations dbo.ObservationRowType READONLY,
     @ObservationFilterItems dbo.ObservationRowFilterItemType READONLY
 AS
-BEGIN TRANSACTION 
+    BEGIN TRANSACTION
 
     CREATE TABLE #InsertedObservations(
       Id BIGINT NOT NULL,
       CsvRow BIGINT NOT NULL
     );
-    
+
     CREATE INDEX IX_InsertedObservations_CsvRow ON #InsertedObservations (CsvRow);
 
     INSERT INTO ObservationRow
@@ -23,6 +23,6 @@ BEGIN TRANSACTION
     JOIN #InsertedObservations observation ON ofi.CsvRow = observation.CsvRow;
 
     DROP TABLE #InsertedObservations;
-    
-COMMIT
+
+    COMMIT
 GO
