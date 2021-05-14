@@ -335,8 +335,7 @@ const DocumentationCreateNewRelease = ({ location: _ }: RouteChildrenProps) => {
                         Warning
                       </span>
                       Make sure you enter any relevant notes about the current
-                      status of your release into the ‘Internal release notes’
-                      text box.
+                      status of your release into the ‘Internal notes’ text box.
                     </strong>
                   </div>
                   <img

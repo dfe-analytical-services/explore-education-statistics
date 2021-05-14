@@ -111,7 +111,7 @@ const ReleaseStatusForm = ({
         >,
         internalReleaseNote: Yup.string().when('status', {
           is: value => ['Approved', 'HigherLevelReview'].includes(value),
-          then: Yup.string().required('Enter an internal release note'),
+          then: Yup.string().required('Enter an internal note'),
         }),
         publishMethod: Yup.string().when('status', {
           is: 'Approved',
@@ -183,7 +183,8 @@ const ReleaseStatusForm = ({
           <FormFieldTextArea<ReleaseStatusFormValues>
             name="internalReleaseNote"
             className="govuk-!-width-one-half"
-            label="Internal release note"
+            label="Internal note"
+            hint="Please include your name and any relevant information"
             rows={3}
           />
 

@@ -120,9 +120,7 @@ const MethodologyStatusPage = ({
                   status: Yup.mixed().required('Choose a status'),
                   internalReleaseNote: Yup.string().when('status', {
                     is: 'Approved',
-                    then: Yup.string().required(
-                      'Enter an internal release note',
-                    ),
+                    then: Yup.string().required('Enter an internal note'),
                   }),
                 })}
               >
@@ -150,7 +148,8 @@ const MethodologyStatusPage = ({
                               <FormFieldTextArea<FormValues>
                                 name="internalReleaseNote"
                                 className="govuk-!-width-one-half"
-                                label="Internal release note"
+                                label="Internal note"
+                                hint="Please include your name and any relevant information"
                                 rows={2}
                               />
                             ),
