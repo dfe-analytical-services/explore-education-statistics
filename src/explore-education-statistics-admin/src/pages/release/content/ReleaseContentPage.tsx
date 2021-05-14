@@ -48,10 +48,13 @@ const ReleaseContentPageLoaded = () => {
 
           {canUpdateRelease && (
             <div className="govuk-form-group">
-              {unresolvedComments.length > 0 && (
+              {unresolvedComments.length > 0 &&
+              unresolvedComments.length > 1 ? (
                 <WarningMessage>
                   There are {unresolvedComments.length} unresolved comments
                 </WarningMessage>
+              ) : (
+                <WarningMessage>There is 1 unresolved comment</WarningMessage>
               )}
 
               <EditablePageModeToggle />
