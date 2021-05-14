@@ -1090,7 +1090,7 @@ const DocumentationGlossary = () => {
               <p>Lower case.</p>
               <h3 id="inset-day">inset day</h3>
               <p>Lower case.</p>
-              <h3 id="internal-release-notes">Internal release notes</h3>
+              <h3 id="internal-release-notes">Internal notes</h3>
               <p>
                 Term referring to the functionality which adds internal notes to
                 releases within the Admin system to explain how a release has
@@ -1699,8 +1699,7 @@ const DocumentationGlossary = () => {
                 Explore education statistics for transparency purposes.
               </p>
               <p>
-                See also{' '}
-                <a href="#internal-release-notes">Internal release notes</a>.
+                See also <a href="#internal-release-notes">Internal notes</a>.
               </p>
               <h3 id="release-status">Release status</h3>
               <p>
