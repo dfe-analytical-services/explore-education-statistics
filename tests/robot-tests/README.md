@@ -22,6 +22,7 @@ Currently, these tests are being maintained so they can be run on Windows. They'
 Firstly, install Python 3.8 or greater
    * For Windows, you'll need to download Python3 from here: https://www.python.org/downloads/
    * For Linux, use the package manager (i.e. On Ubuntu, `sudo apt-get install python3.8`)
+   * For Mac you can download python3 from here: https://www.python.org/downloads/mac-osx/ or alternatively you can use brew to install: `brew install python`
 
 Then ensure python and pip are included in your PATH environment variable
    * `python --version` should return a version >= 3.8. If it doesn't you can try using the commands `python3` or `python3.8`, if you have multiple versions of python installed on your machine.
@@ -88,7 +89,7 @@ After the user has been logged in by the run_tests.py script, the local storage 
 
 
 ## Webdriver
-The `webdriver` directory holds `chromedriver`, used by selenium to interact with the browser. If `chromedriver` isn't present in this directory, it is automatically downloaded when the tests are run. You can explicitly download the `chromedriver` version of your choice with `--chromedriver <version>`. Alternatively, you can manually place the `chromedriver` of your choice into the `webdriver` directory.
+The `webdriver` directory holds `chromedriver`, used by selenium to interact with the browser. If `chromedriver` isn't present in this directory, it is automatically downloaded when the tests are run. You can explicitly download the `chromedriver` version of your choice with `--chromedriver <version>`. Alternatively, you can manually place the `chromedriver` of your choice into the `webdriver` directory. 
 
 NOTE: The `run_tests.py` script only downloads `chromedriver` if it doesn't already exist. If you wish the run script to download a different version, you'll first have to delete `chromedriver` from the `webdriver` directory.
 
@@ -179,10 +180,38 @@ IntelliJ also allows you use to External Tools to right click on a file and run 
 - Working directory: `$ProjectFileDir$` (which should represent the robot-tests directory. You may have to do something like `$ProjectFileDir$/../tests/robot-tests`)
 
 
+Alternatively you can use Pycharm CE (https://www.jetbrains.com/pycharm/download/#section=windows) as an IDE and follow the above steps to enable External Tools. 
+
 # Troubleshooting
 
 ### The tests are flaky when I run them locally against the public frontend.
 Try running the frontend with `npm run build & npm run start:prod`.
+
+
+### I get the following error when trying to run a UI test 
+
+```
+    raise Exception(f"Timeout! Couldn't find element with xpath selector '{selector}'")
+Exception: Timeout! Couldn't find element with xpath selector '//div[text()="Stay signed in?"]'
+
+During handling of the above exception, another exception occurred:
+
+Traceback (most recent call last):
+  File "run_tests.py", line 253, in <module>
+    setup_authentication()
+  File "run_tests.py", line 234, in setup_authentication
+    setup_auth_variables(
+  File "C:\Users\Hive\explore-education-statistics\tests\robot-tests\tests\libs\setup_auth_variables.py", line 59, in setup_auth_variables
+    os.environ[local_storage_name], os.environ[cookie_name] = get_identity_info(
+  File "C:\Users\Hive\explore-education-statistics\tests\robot-tests\scripts\get_auth_tokens.py", line 74, in get_identity_info
+    raise AssertionError('Error when entering/submitting password')
+AssertionError: Error when entering/submitting password
+```
+This error typically occurs when the BAU user password has expired and `setup_auth_variables` fails to login as the BAU user. In order to fix this error you will need to update the password for the following users (as they usually expire around the same time).
+* BAU 
+* Analyst 
+* Pre-release
+
 
 
 # Who should I talk to?

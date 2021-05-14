@@ -66,6 +66,7 @@ You will need the following groups of dependencies to run the project successful
 
    - [Azurite](https://github.com/Azure/Azurite)
    - [Azure Storage Account](https://azure.microsoft.com/en-gb/services/storage/) 
+   - [LocalDB](https://download.microsoft.com/download/2/A/5/2A5260C3-4143-47D8-9823-E91BB0121F94/ENU/x64/SqlLocalDB.msi)
    
    You will most likely need to use Windows to run the service due to a dependency on Azure Storage Emulator
 for development, specifically the table storage component which is not supported by [Azurite](https://github.com/Azure/Azurite). However this does not apply to every component of the service.
