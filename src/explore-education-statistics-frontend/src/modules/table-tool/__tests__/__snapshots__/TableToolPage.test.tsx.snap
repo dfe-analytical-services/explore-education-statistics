@@ -1200,7 +1200,7 @@ exports[`TableToolPage renders the Table Tool page correctly when a Fast Track i
                 data-testid="dataTableCaption"
                 id="dataTableCaption"
               >
-                Table showing 'data 1' for 1 .  PGCE and 2 .  MBA from 'Test publication' in Great Britain for 2018-19
+                Table showing 'data 1' for 1 .  PGCE and 2 .  MBA in Great Britain for 2018-19
               </strong>
             </figcaption>
             <div
@@ -2570,7 +2570,7 @@ exports[`TableToolPage renders the Table Tool page correctly when this is not th
                 data-testid="dataTableCaption"
                 id="dataTableCaption"
               >
-                Table showing 'data 1' for 1 .  PGCE and 2 .  MBA from 'Test publication' in Great Britain for 2018-19
+                Table showing 'data 1' for 1 .  PGCE and 2 .  MBA in Great Britain for 2018-19
               </strong>
             </figcaption>
             <div
@@ -3445,7 +3445,7 @@ exports[`TableToolPage renders the Table Tool page correctly when this is the la
                 data-testid="dataTableCaption"
                 id="dataTableCaption"
               >
-                Table showing 'data 1' for 1 .  PGCE and 2 .  MBA from 'Test publication' in Great Britain for 2018-19
+                Table showing 'data 1' for 1 .  PGCE and 2 .  MBA in Great Britain for 2018-19
               </strong>
             </figcaption>
             <div
