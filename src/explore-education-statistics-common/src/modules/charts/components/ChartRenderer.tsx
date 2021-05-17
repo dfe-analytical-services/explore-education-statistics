@@ -72,7 +72,7 @@ function ChartRenderer({
     const boundaryFootnoteLabel = `The boundary data used in this map includes${meta.boundaryLevels
       .map((value, index, array) => {
         let separator = index === 0 ? ' ' : ', ';
-        if (array.length - 1 === index) {
+        if (array.length - 1 === index && array.length > 1) {
           separator = ' and ';
         }
         return `${separator}${value.label}`;
