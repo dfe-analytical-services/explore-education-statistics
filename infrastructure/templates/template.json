@@ -566,50 +566,50 @@
     "logicAppSlackAlerts": "[concat(parameters('subscription'), '-la-', parameters('environment'), '-slackwebhook')]",
     "actionGroupAlerts": "[concat(parameters('subscription'), '-ag-', parameters('environment'), '-alertedusers')]",
     "metricAlerts": [
-      {
-        "name": "[concat(parameters('subscription'),'AdminAppServiceHttpServiceErrors')]",
-        "description": "Admin App Service - Http Service Errors",
-        "resourceId": "[resourceId('Microsoft.Web/sites', variables('adminAppName'))]",
-        "resourceType": "Microsoft.Web/sites",
-        "metricName": "Http5xx",
-        "threshold": 0,
-        "operator": "GreaterThan",
-        "timeAggregation": "Total",
-        "criterionType": "StaticThresholdCriterion"
-      },
-      {
-        "name": "[concat(parameters('subscription'),'DataAppServiceHttpServiceErrors')]",
-        "description": "Data App Service - Http Service Errors",
-        "resourceId": "[resourceId('Microsoft.Web/sites', variables('dataAppName'))]",
-        "resourceType": "Microsoft.Web/sites",
-        "metricName": "Http5xx",
-        "threshold": 5,
-        "operator": "GreaterThan",
-        "timeAggregation": "Total",
-        "criterionType": "StaticThresholdCriterion"
-      },
-      {
-        "name": "[concat(parameters('subscription'),'ContentAppServiceHttpServiceErrors')]",
-        "description": "Content App Service - Http Service Errors",
-        "resourceId": "[resourceId('Microsoft.Web/sites', variables('contentAppName'))]",
-        "resourceType": "Microsoft.Web/sites",
-        "metricName": "Http5xx",
-        "threshold": 2,
-        "operator": "GreaterThan",
-        "timeAggregation": "Total",
-        "criterionType": "StaticThresholdCriterion"
-      },
-      {
-        "name": "[concat(parameters('subscription'),'PublicAppServiceHttpServiceErrors')]",
-        "description": "Public App Service - Http Service Errors",
-        "resourceId": "[resourceId('Microsoft.Web/sites', variables('publicAppName'))]",
-        "resourceType": "Microsoft.Web/sites",
-        "metricName": "Http5xx",
-        "threshold": 15,
-        "operator": "GreaterThan",
-        "timeAggregation": "Total",
-        "criterionType": "StaticThresholdCriterion"
-      },
+      //{
+      //  "name": "[concat(parameters('subscription'),'AdminAppServiceHttpServiceErrors')]",
+      //  "description": "Admin App Service - Http Service Errors",
+      //  "resourceId": "[resourceId('Microsoft.Web/sites', variables('adminAppName'))]",
+      //  "resourceType": "Microsoft.Web/sites",
+      //  "metricName": "Http5xx",
+      //  "threshold": 0,
+      //  "operator": "GreaterThan",
+      //  "timeAggregation": "Total",
+      //  "criterionType": "StaticThresholdCriterion"
+      //},
+      //{
+      //  "name": "[concat(parameters('subscription'),'DataAppServiceHttpServiceErrors')]",
+      //  "description": "Data App Service - Http Service Errors",
+      //  "resourceId": "[resourceId('Microsoft.Web/sites', variables('dataAppName'))]",
+      //  "resourceType": "Microsoft.Web/sites",
+      //  "metricName": "Http5xx",
+      //  "threshold": 5,
+      //  "operator": "GreaterThan",
+      //  "timeAggregation": "Total",
+      //  "criterionType": "StaticThresholdCriterion"
+      //},
+      //{
+      //  "name": "[concat(parameters('subscription'),'ContentAppServiceHttpServiceErrors')]",
+      //  "description": "Content App Service - Http Service Errors",
+      //  "resourceId": "[resourceId('Microsoft.Web/sites', variables('contentAppName'))]",
+      //  "resourceType": "Microsoft.Web/sites",
+      //  "metricName": "Http5xx",
+      //  "threshold": 2,
+      //  "operator": "GreaterThan",
+      //  "timeAggregation": "Total",
+      //  "criterionType": "StaticThresholdCriterion"
+      //},
+      //{
+      //  "name": "[concat(parameters('subscription'),'PublicAppServiceHttpServiceErrors')]",
+      //  "description": "Public App Service - Http Service Errors",
+      //  "resourceId": "[resourceId('Microsoft.Web/sites', variables('publicAppName'))]",
+      //  "resourceType": "Microsoft.Web/sites",
+      //  "metricName": "Http5xx",
+      //  "threshold": 15,
+      //  "operator": "GreaterThan",
+      //  "timeAggregation": "Total",
+      //  "criterionType": "StaticThresholdCriterion"
+      //},
       {
         "name": "[concat(parameters('subscription'),'ImporterAppServiceHttpServiceErrors')]",
         "description": "Importer App Service - Http Service Errors",
@@ -643,50 +643,50 @@
         "timeAggregation": "Total",
         "criterionType": "StaticThresholdCriterion"
       },
-      {
-        "name": "[concat(parameters('subscription'),'AdminAppInsightsExceptions')]",
-        "description": "Admin AppInsights - Exceptions",
-        "resourceId": "[resourceId('Microsoft.Insights/components', variables('adminAppInsights'))]",
-        "resourceType": "Microsoft.Insights/components",
-        "metricName": "exceptions/count",
-        "threshold": 10,
-        "operator": "GreaterThan",
-        "timeAggregation": "Count",
-        "criterionType": "StaticThresholdCriterion"
-      },
-      {
-        "name": "[concat(parameters('subscription'),'DataAppInsightsExceptions')]",
-        "description": "Data AppInsights - Exceptions",
-        "resourceId": "[resourceId('Microsoft.Insights/components', variables('dataAppInsights'))]",
-        "resourceType": "Microsoft.Insights/components",
-        "metricName": "exceptions/count",
-        "threshold": 5,
-        "operator": "GreaterThan",
-        "timeAggregation": "Count",
-        "criterionType": "StaticThresholdCriterion"
-      },
-      {
-        "name": "[concat(parameters('subscription'),'ContentAppInsightsExceptions')]",
-        "description": "Content AppInsights - Exceptions",
-        "resourceId": "[resourceId('Microsoft.Insights/components', variables('contentAppInsights'))]",
-        "resourceType": "Microsoft.Insights/components",
-        "metricName": "exceptions/count",
-        "threshold": 4,
-        "operator": "GreaterThan",
-        "timeAggregation": "Count",
-        "criterionType": "StaticThresholdCriterion"
-      },
-      {
-        "name": "[concat(parameters('subscription'),'PublicAppInsightsExceptions')]",
-        "description": "Content AppInsights - Exceptions",
-        "resourceId": "[resourceId('Microsoft.Insights/components', variables('publicAppInsights'))]",
-        "resourceType": "Microsoft.Insights/components",
-        "metricName": "exceptions/count",
-        "threshold": 15,
-        "operator": "GreaterThan",
-        "timeAggregation": "Count",
-        "criterionType": "StaticThresholdCriterion"
-      },
+      //{
+      //  "name": "[concat(parameters('subscription'),'AdminAppInsightsExceptions')]",
+      //  "description": "Admin AppInsights - Exceptions",
+      //  "resourceId": "[resourceId('Microsoft.Insights/components', variables('adminAppInsights'))]",
+      //  "resourceType": "Microsoft.Insights/components",
+      //  "metricName": "exceptions/count",
+      //  "threshold": 10,
+      //  "operator": "GreaterThan",
+      //  "timeAggregation": "Count",
+      //  "criterionType": "StaticThresholdCriterion"
+      //},
+      //{
+      //  "name": "[concat(parameters('subscription'),'DataAppInsightsExceptions')]",
+      //  "description": "Data AppInsights - Exceptions",
+      //  "resourceId": "[resourceId('Microsoft.Insights/components', variables('dataAppInsights'))]",
+      //  "resourceType": "Microsoft.Insights/components",
+      //  "metricName": "exceptions/count",
+      //  "threshold": 5,
+      //  "operator": "GreaterThan",
+      //  "timeAggregation": "Count",
+      //  "criterionType": "StaticThresholdCriterion"
+      //},
+      //{
+      //  "name": "[concat(parameters('subscription'),'ContentAppInsightsExceptions')]",
+      //  "description": "Content AppInsights - Exceptions",
+      //  "resourceId": "[resourceId('Microsoft.Insights/components', variables('contentAppInsights'))]",
+      //  "resourceType": "Microsoft.Insights/components",
+      //  "metricName": "exceptions/count",
+      //  "threshold": 4,
+      //  "operator": "GreaterThan",
+      //  "timeAggregation": "Count",
+      //  "criterionType": "StaticThresholdCriterion"
+      //},
+      //{
+      //  "name": "[concat(parameters('subscription'),'PublicAppInsightsExceptions')]",
+      //  "description": "Content AppInsights - Exceptions",
+      //  "resourceId": "[resourceId('Microsoft.Insights/components', variables('publicAppInsights'))]",
+      //  "resourceType": "Microsoft.Insights/components",
+      //  "metricName": "exceptions/count",
+      //  "threshold": 15,
+      //  "operator": "GreaterThan",
+      //  "timeAggregation": "Count",
+      //  "criterionType": "StaticThresholdCriterion"
+      //},
       {
         "name": "[concat(parameters('subscription'),'ImporterAppInsightsExceptions')]",
         "description": "Importer AppInsights - Exceptions",
@@ -720,39 +720,39 @@
         "timeAggregation": "Count",
         "criterionType": "StaticThresholdCriterion"
       },
-      {
-        "name": "[concat(parameters('subscription'),'AdminAppServiceResponseTime')]",
-        "description": "Admin App Service - Response Time",
-        "resourceId": "[resourceId('Microsoft.Web/sites', variables('adminAppName'))]",
-        "resourceType": "Microsoft.Web/sites",
-        "metricName": "HttpResponseTime",
-        "threshold": 10,
-        "operator": "GreaterThan",
-        "timeAggregation": "Average",
-        "criterionType": "StaticThresholdCriterion"
-      },
-      {
-        "name": "[concat(parameters('subscription'),'DataAppServiceResponseTime')]",
-        "description": "Data App Service - Response Time",
-        "resourceId": "[resourceId('Microsoft.Web/sites', variables('dataAppName'))]",
-        "resourceType": "Microsoft.Web/sites",
-        "metricName": "HttpResponseTime",
-        "threshold": 10,
-        "operator": "GreaterThan",
-        "timeAggregation": "Average",
-        "criterionType": "StaticThresholdCriterion"
-      },
-      {
-        "name": "[concat(parameters('subscription'),'ContentAppServiceResponseTime')]",
-        "description": "Content App Service - Response Time",
-        "resourceId": "[resourceId('Microsoft.Web/sites', variables('contentAppName'))]",
-        "resourceType": "Microsoft.Web/sites",
-        "metricName": "HttpResponseTime",
-        "threshold": 100,
-        "operator": "GreaterThan",
-        "timeAggregation": "Average",
-        "criterionType": "StaticThresholdCriterion"
-      },
+      //{
+      //  "name": "[concat(parameters('subscription'),'AdminAppServiceResponseTime')]",
+      //  "description": "Admin App Service - Response Time",
+      //  "resourceId": "[resourceId('Microsoft.Web/sites', variables('adminAppName'))]",
+      //  "resourceType": "Microsoft.Web/sites",
+      //  "metricName": "HttpResponseTime",
+      //  "threshold": 10,
+      //  "operator": "GreaterThan",
+      //  "timeAggregation": "Average",
+      //  "criterionType": "StaticThresholdCriterion"
+      //},
+      //{
+      //  "name": "[concat(parameters('subscription'),'DataAppServiceResponseTime')]",
+      //  "description": "Data App Service - Response Time",
+      //  "resourceId": "[resourceId('Microsoft.Web/sites', variables('dataAppName'))]",
+      //  "resourceType": "Microsoft.Web/sites",
+      //  "metricName": "HttpResponseTime",
+      //  "threshold": 10,
+      //  "operator": "GreaterThan",
+      //  "timeAggregation": "Average",
+      //  "criterionType": "StaticThresholdCriterion"
+      //},
+      //{
+      //  "name": "[concat(parameters('subscription'),'ContentAppServiceResponseTime')]",
+      //  "description": "Content App Service - Response Time",
+      //  "resourceId": "[resourceId('Microsoft.Web/sites', variables('contentAppName'))]",
+      //  "resourceType": "Microsoft.Web/sites",
+      //  "metricName": "HttpResponseTime",
+      //  "threshold": 100,
+      //  "operator": "GreaterThan",
+      //  "timeAggregation": "Average",
+      //  "criterionType": "StaticThresholdCriterion"
+      //},
       {
         "name": "[concat(parameters('subscription'),'PublicAppServiceResponseTime')]",
         "description": "Public App Service - Response Time",
