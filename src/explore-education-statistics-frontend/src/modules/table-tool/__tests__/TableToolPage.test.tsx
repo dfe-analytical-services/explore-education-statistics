@@ -1,6 +1,6 @@
 import { FastTrackTable } from '@common/services/fastTrackService';
 import {
-  Publication,
+  SubjectsAndHighlights,
   SubjectMeta,
   Theme,
 } from '@common/services/tableBuilderService';
@@ -12,6 +12,10 @@ import preloadAll from 'jest-next-dynamic';
 import TableToolPage from '@frontend/modules/table-tool/TableToolPage';
 
 describe('TableToolPage', () => {
+  const testPublicationId = '536154f5-7f82-4dc7-060a-08d9097c1945';
+
+  const testReleaseId = '47a39fb5-1fed-4820-8906-5b54192524d7';
+
   const testFastTrack: FastTrackTable = {
     id: 'a08bd50a-7814-4e43-b152-2f7464d566ff',
     created: '2021-04-27T15:17:05.7530941Z',
@@ -116,7 +120,7 @@ describe('TableToolPage', () => {
       ],
     },
     query: {
-      publicationId: '536154f5-7f82-4dc7-060a-08d9097c1945',
+      publicationId: testPublicationId,
       subjectId: 'ef95f53e-2b91-417e-b32f-08d9097c40f5',
       timePeriod: {
         startYear: 2018,
@@ -135,14 +139,13 @@ describe('TableToolPage', () => {
       locations: { country: ['K03000001'] },
       includeGeoJson: false,
     },
-    releaseId: '47a39fb5-1fed-4820-8906-5b54192524d7',
+    releaseId: testReleaseId,
     releaseSlug: '2000-01',
     latestData: true,
     latestReleaseTitle: 'Tax Year 2018/2019',
   };
 
-  const testPublication: Publication = {
-    id: '536154f5-7f82-4dc7-060a-08d9097c1945',
+  const testPublicationSubjectsAndHighlights: SubjectsAndHighlights = {
     highlights: [],
     subjects: [
       {
@@ -289,7 +292,7 @@ describe('TableToolPage', () => {
           slug: 'admission-appeals',
           publications: [
             {
-              id: '536154f5-7f82-4dc7-060a-08d9097c1945',
+              id: testPublicationId,
               title: 'Test publication',
               slug: 'test-publication',
             },
@@ -301,7 +304,7 @@ describe('TableToolPage', () => {
 
   beforeEach(preloadAll);
 
-  test('renders the Table Tool page correctly when a Theme is chosen, giving the user a choice of Publications', async () => {
+  test('renders the Table Tool page correctly when Theme metadata is provided, giving the user a choice of Publications', async () => {
     render(<TableToolPage themeMeta={testThemeMeta} />);
 
     expect(screen.getByRole('main')).toMatchSnapshot();
@@ -309,7 +312,19 @@ describe('TableToolPage', () => {
 
   test('renders the Table Tool page correctly when Publication is chosen, giving the user a choice of Subjects', async () => {
     render(
-      <TableToolPage publication={testPublication} themeMeta={testThemeMeta} />,
+      <TableToolPage
+        publicationId={testPublicationId}
+        initiallySelectedRelease={{
+          id: testReleaseId,
+          latestRelease: true,
+          slug: 'latest-release-slug',
+        }}
+        initialLatestRelease={{
+          title: 'Latest Release Title',
+        }}
+        subjectsAndHighlights={testPublicationSubjectsAndHighlights}
+        themeMeta={testThemeMeta}
+      />,
     );
 
     expect(screen.getByRole('main')).toMatchSnapshot();
@@ -318,23 +333,41 @@ describe('TableToolPage', () => {
   test('renders the Table Tool page correctly when a Fast Track is provided, rendering a previously configured table', async () => {
     render(
       <TableToolPage
-        fastTrack={testFastTrack}
-        publication={testPublication}
+        publicationId={testPublicationId}
+        initiallySelectedRelease={{
+          id: testReleaseId,
+          latestRelease: true,
+          slug: 'latest-release-slug',
+        }}
+        initialLatestRelease={{
+          title: 'Latest Release Title',
+        }}
+        subjectsAndHighlights={testPublicationSubjectsAndHighlights}
         themeMeta={testThemeMeta}
         subjectMeta={testSubjectMeta}
+        fastTrack={testFastTrack}
       />,
     );
 
     expect(screen.getByRole('main')).toMatchSnapshot();
   });
 
-  test('renders the Table Tool page correctly when this is the latest data', async () => {
+  test('renders the Table Tool page correctly when a Fast Track is provided and this is the latest data', async () => {
     render(
       <TableToolPage
-        fastTrack={testFastTrack}
-        publication={testPublication}
+        publicationId={testPublicationId}
+        subjectsAndHighlights={testPublicationSubjectsAndHighlights}
         themeMeta={testThemeMeta}
         subjectMeta={testSubjectMeta}
+        fastTrack={testFastTrack}
+        initiallySelectedRelease={{
+          id: testReleaseId,
+          latestRelease: true,
+          slug: 'latest-release-slug',
+        }}
+        initialLatestRelease={{
+          title: 'Latest Release Title',
+        }}
       />,
     );
 
@@ -349,17 +382,26 @@ describe('TableToolPage', () => {
     expect(screen.getByRole('main')).toMatchSnapshot();
   });
 
-  test('renders the Table Tool page correctly when this is not the latest data', async () => {
+  test('renders the Table Tool page correctly when a Fast Track is provided and this is not the latest data', async () => {
     render(
       <TableToolPage
+        publicationId={testPublicationId}
+        subjectsAndHighlights={testPublicationSubjectsAndHighlights}
+        themeMeta={testThemeMeta}
+        subjectMeta={testSubjectMeta}
         fastTrack={{
           ...testFastTrack,
           latestData: false,
           latestReleaseTitle: 'Tax Year 2019/2020',
         }}
-        publication={testPublication}
-        themeMeta={testThemeMeta}
-        subjectMeta={testSubjectMeta}
+        initiallySelectedRelease={{
+          id: testReleaseId,
+          latestRelease: false,
+          slug: 'selected-release-slug',
+        }}
+        initialLatestRelease={{
+          title: 'Tax Year 2019/2020',
+        }}
       />,
     );
 

@@ -22,7 +22,9 @@ export interface PublicationFormValues {
 }
 
 export type PublicationFormSubmitHandler = (
-  values: PublicationFormValues,
+  values: PublicationFormValues & {
+    publicationSlug: string;
+  },
 ) => void;
 
 interface Props {
@@ -63,7 +65,23 @@ const PublicationForm = (props: Props & InjectedWizardProps) => {
         publicationId: Yup.string().required('Choose publication'),
       })}
       onSubmit={async values => {
-        await onSubmit(values);
+        const { publicationId } = values;
+        const publications = options.flatMap(theme =>
+          theme.topics.flatMap(topic => topic.publications),
+        );
+        const selectedPublication = publications.find(
+          publication => publication.id === publicationId,
+        );
+
+        if (!selectedPublication) {
+          throw new Error('Selected publication not found');
+        }
+
+        await onSubmit({
+          publicationId,
+          publicationSlug: selectedPublication.slug,
+        });
+
         goToNextStep();
       }}
     >

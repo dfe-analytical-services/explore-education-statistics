@@ -21,6 +21,7 @@ import { TableHeadersConfig } from '@common/modules/table-tool/types/tableHeader
 import getDefaultTableHeaderConfig from '@common/modules/table-tool/utils/getDefaultTableHeadersConfig';
 import mapFullTable from '@common/modules/table-tool/utils/mapFullTable';
 import parseYearCodeTuple from '@common/modules/table-tool/utils/parseYearCodeTuple';
+import publicationService from '@common/services/publicationService';
 import tableBuilderService, {
   ReleaseTableDataQuery,
   Subject,
@@ -39,17 +40,22 @@ interface Publication {
 
 export interface InitialTableToolState {
   initialStep: number;
+  selectedRelease?: {
+    id: string;
+    slug: string;
+    latestRelease: boolean;
+  };
+  latestRelease?: {
+    title: string;
+  };
   subjects?: Subject[];
   highlights?: TableHighlight[];
   subjectMeta?: SubjectMeta;
   query?: ReleaseTableDataQuery;
-  releaseSlug?: string;
   response?: {
     table: FullTable;
     tableHeaders: TableHeadersConfig;
   };
-  latestData?: boolean;
-  latestReleaseTitle?: string;
 }
 
 interface TableToolState extends InitialTableToolState {
@@ -66,11 +72,20 @@ export interface FinalStepRenderProps {
     table: FullTable;
     tableHeaders: TableHeadersConfig;
   };
+  selectedRelease?: {
+    id: string;
+    slug: string;
+    latestRelease: boolean;
+  };
+  latestRelease?: {
+    title: string;
+  };
 }
 
 export interface TableToolWizardProps {
   themeMeta?: Theme[];
   initialState?: Partial<InitialTableToolState>;
+  hidePublicationSelectionStage?: boolean;
   finalStep?: (props: FinalStepRenderProps) => ReactElement;
   renderHighlightLink?: (highlight: TableHighlight) => ReactNode;
   scrollOnMount?: boolean;
@@ -82,6 +97,7 @@ const TableToolWizard = ({
   themeMeta = [],
   initialState = {},
   scrollOnMount,
+  hidePublicationSelectionStage,
   renderHighlightLink,
   finalStep,
   onSubmit,
@@ -119,16 +135,29 @@ const TableToolWizard = ({
 
   const handlePublicationFormSubmit: PublicationFormSubmitHandler = async ({
     publicationId: selectedPublicationId,
+    publicationSlug,
   }) => {
-    const publicationMeta = await tableBuilderService.getPublication(
+    const subjectsAndHighlights = await tableBuilderService.getPublicationSubjectsAndHighlights(
       selectedPublicationId,
     );
 
+    const latestRelease = await publicationService.getLatestPublicationReleaseSummary(
+      publicationSlug,
+    );
+
     updateState(draft => {
-      draft.subjects = publicationMeta.subjects;
-      draft.highlights = publicationMeta.highlights;
+      draft.subjects = subjectsAndHighlights.subjects;
+      draft.highlights = subjectsAndHighlights.highlights;
 
       draft.query.publicationId = selectedPublicationId;
+      draft.selectedRelease = {
+        id: latestRelease.id,
+        latestRelease: latestRelease.latestRelease,
+        slug: latestRelease.slug,
+      };
+      draft.latestRelease = {
+        title: latestRelease.title,
+      };
     });
   };
 
@@ -282,7 +311,7 @@ const TableToolWizard = ({
               return nextStep;
             }}
           >
-            {!state.query.releaseId && (
+            {!hidePublicationSelectionStage && (
               <WizardStep>
                 {stepProps => (
                   <PublicationForm
@@ -349,6 +378,8 @@ const TableToolWizard = ({
                 query: state.query,
                 response: state.response,
                 publication,
+                selectedRelease: state.selectedRelease,
+                latestRelease: state.latestRelease,
               })}
           </Wizard>
 

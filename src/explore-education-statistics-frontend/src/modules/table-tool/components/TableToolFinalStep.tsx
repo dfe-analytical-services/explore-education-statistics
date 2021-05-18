@@ -23,10 +23,14 @@ interface TableToolFinalStepProps {
   query: TableDataQuery;
   table: FullTable;
   tableHeaders: TableHeadersConfig;
-  releaseId?: string;
-  releaseSlug?: string;
-  latestData?: boolean;
-  latestReleaseTitle?: string;
+  selectedRelease: {
+    id: string;
+    slug: string;
+    latestRelease: boolean;
+  };
+  latestRelease: {
+    title: string;
+  };
 }
 
 const TableToolFinalStep = ({
@@ -34,10 +38,8 @@ const TableToolFinalStep = ({
   tableHeaders,
   publication,
   query,
-  releaseId,
-  releaseSlug,
-  latestData = true,
-  latestReleaseTitle,
+  selectedRelease,
+  latestRelease,
 }: TableToolFinalStepProps) => {
   const dataTableRef = useRef<HTMLElement>(null);
   const [permalinkId, setPermalinkId] = useState<string>('');
@@ -71,7 +73,7 @@ const TableToolFinalStep = ({
           tableHeaders: mapUnmappedTableHeaders(currentTableHeaders),
         },
       },
-      releaseId,
+      selectedRelease.id,
     );
 
     setPermalinkId(id);
@@ -99,30 +101,34 @@ const TableToolFinalStep = ({
       {table && currentTableHeaders && (
         <>
           <div className="govuk-!-margin-bottom-3">
-            {latestData && <Tag strong>This is the latest data</Tag>}
-
-            {!latestData && publication && latestReleaseTitle && (
-              <>
-                <div className="govuk-!-margin-bottom-3">
-                  <Tag strong colour="orange">
-                    This data is not from the latest release
-                  </Tag>
-                </div>
-
-                <Link
-                  className="dfe-print-hidden"
-                  unvisited
-                  to="/find-statistics/[publication]"
-                  as={`/find-statistics/${publication.slug}`}
-                  testId="View latest data link"
-                >
-                  View latest data:{' '}
-                  <span className="govuk-!-font-weight-bold">
-                    {latestReleaseTitle}
-                  </span>
-                </Link>
-              </>
+            {selectedRelease.latestRelease && (
+              <Tag strong>This is the latest data</Tag>
             )}
+
+            {!selectedRelease.latestRelease &&
+              publication &&
+              latestRelease.title && (
+                <>
+                  <div className="govuk-!-margin-bottom-3">
+                    <Tag strong colour="orange">
+                      This data is not from the latest release
+                    </Tag>
+                  </div>
+
+                  <Link
+                    className="dfe-print-hidden"
+                    unvisited
+                    to="/find-statistics/[publication]"
+                    as={`/find-statistics/${publication.slug}`}
+                    testId="View latest data link"
+                  >
+                    View latest data:{' '}
+                    <span className="govuk-!-font-weight-bold">
+                      {latestRelease.title}
+                    </span>
+                  </Link>
+                </>
+              )}
           </div>
 
           <TimePeriodDataTable
@@ -180,17 +186,17 @@ const TableToolFinalStep = ({
       {publication && table && (
         <ul className="govuk-list">
           <li>
-            {releaseSlug ? (
+            {selectedRelease.latestRelease ? (
               <Link
-                to="/find-statistics/[publication]/[releaseSlug]"
-                as={`/find-statistics/${publication.slug}/${releaseSlug}`}
+                to="/find-statistics/[publication]"
+                as={`/find-statistics/${publication.slug}`}
               >
                 View the release for this data
               </Link>
             ) : (
               <Link
-                to="/find-statistics/[publication]"
-                as={`/find-statistics/${publication.slug}`}
+                to="/find-statistics/[publication]/[releaseSlug]"
+                as={`/find-statistics/${publication.slug}/${selectedRelease.slug}`}
               >
                 View the release for this data
               </Link>

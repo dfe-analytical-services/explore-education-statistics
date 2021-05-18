@@ -10,7 +10,7 @@ import _publicationService, {
   BasicPublicationDetails,
 } from '@admin/services/publicationService';
 import _tableBuilderService, {
-  Release,
+  SubjectsAndHighlights,
   SubjectMeta,
   TableDataResponse,
 } from '@common/services/tableBuilderService';
@@ -188,8 +188,7 @@ describe('PreReleaseTableToolPage', () => {
     legacyReleases: [],
   };
 
-  const testRelease: Release = {
-    id: 'release-1',
+  const testRelease: SubjectsAndHighlights = {
     highlights: [
       {
         id: 'block-1',
@@ -255,7 +254,9 @@ describe('PreReleaseTableToolPage', () => {
 
   test('renders correctly on step 1 with subjects and highlights', async () => {
     publicationService.getPublication.mockResolvedValue(testPublication);
-    tableBuilderService.getRelease.mockResolvedValue(testRelease);
+    tableBuilderService.getReleaseSubjectsAndHighlights.mockResolvedValue(
+      testRelease,
+    );
 
     renderPage();
 
@@ -291,7 +292,7 @@ describe('PreReleaseTableToolPage', () => {
 
   test('renders correctly on step 1 without highlights', async () => {
     publicationService.getPublication.mockResolvedValue(testPublication);
-    tableBuilderService.getRelease.mockResolvedValue({
+    tableBuilderService.getReleaseSubjectsAndHighlights.mockResolvedValue({
       ...testRelease,
       highlights: [],
     });
@@ -320,7 +321,9 @@ describe('PreReleaseTableToolPage', () => {
     publicationService.getPublication.mockResolvedValue(testPublication);
     dataBlockService.getDataBlock.mockResolvedValue(testDataBlock);
 
-    tableBuilderService.getRelease.mockResolvedValue(testRelease);
+    tableBuilderService.getReleaseSubjectsAndHighlights.mockResolvedValue(
+      testRelease,
+    );
     tableBuilderService.getTableData.mockResolvedValue(testTableData);
     tableBuilderService.getSubjectMeta.mockResolvedValue(testSubjectMeta);
 

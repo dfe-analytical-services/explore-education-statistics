@@ -18,24 +18,37 @@ export const getServerSideProps: GetServerSideProps<TableToolPageProps> = async 
     tableBuilderService.getThemes(),
   ]);
 
-  if (!fastTrack?.query.publicationId) {
+  if (!fastTrack) {
+    throw new Error('Fast track not found');
+  }
+
+  if (!fastTrack.query.publicationId) {
     throw new Error('Fast track table does not have `query.publicationId`');
   }
 
-  if (!fastTrack?.query.subjectId) {
+  if (!fastTrack.query.subjectId) {
     throw new Error('Fast track table does not have `query.subjectId`');
   }
 
-  const [publication, subjectMeta] = await Promise.all([
-    tableBuilderService.getPublication(fastTrack.query.publicationId),
+  const [subjectsAndHighlights, subjectMeta] = await Promise.all([
+    tableBuilderService.getReleaseSubjectsAndHighlights(fastTrack.releaseId),
     tableBuilderService.getSubjectMeta(fastTrack.query.subjectId),
   ]);
 
   return {
     props: {
+      publicationId: fastTrack.query.publicationId,
       fastTrack,
+      initiallySelectedRelease: {
+        id: fastTrack.releaseId,
+        slug: fastTrack.releaseSlug,
+        latestRelease: fastTrack.latestData,
+      },
+      initialLatestRelease: {
+        title: fastTrack.latestReleaseTitle,
+      },
       subjectMeta,
-      publication,
+      subjectsAndHighlights,
       themeMeta,
     },
   };

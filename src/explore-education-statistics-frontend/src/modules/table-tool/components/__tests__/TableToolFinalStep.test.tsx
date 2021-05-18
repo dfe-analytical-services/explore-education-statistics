@@ -222,6 +222,14 @@ describe('TableToolFinalStep', () => {
         query={testQuery}
         table={testTable}
         tableHeaders={testTableHeaders}
+        selectedRelease={{
+          id: 'latest-release-id',
+          latestRelease: true,
+          slug: 'latest-release-slug',
+        }}
+        latestRelease={{
+          title: 'Latest Release Title',
+        }}
       />,
     );
 
@@ -279,6 +287,14 @@ describe('TableToolFinalStep', () => {
         query={testQuery}
         table={testTable}
         tableHeaders={testTableHeaders}
+        selectedRelease={{
+          id: 'latest-release-id',
+          latestRelease: true,
+          slug: 'latest-release-slug',
+        }}
+        latestRelease={{
+          title: 'Latest Release Title',
+        }}
       />,
     );
 
@@ -303,15 +319,21 @@ describe('TableToolFinalStep', () => {
     ).toMatchSnapshot();
   });
 
-  test(`renders the 'View the release for this data' URL with the Release's slug, if supplied`, async () => {
+  test(`renders the 'View the release for this data' URL with the Release's slug, if the selected Release is not the latest for the Publication`, async () => {
     render(
       <TableToolFinalStep
         publication={testPublication}
         query={testQuery}
         table={testTable}
         tableHeaders={testTableHeaders}
-        releaseId="test-release-id"
-        releaseSlug="test-release-slug"
+        selectedRelease={{
+          id: 'selected-release-id',
+          latestRelease: false,
+          slug: 'selected-release-slug',
+        }}
+        latestRelease={{
+          title: 'Latest Release Title',
+        }}
       />,
     );
 
@@ -320,7 +342,7 @@ describe('TableToolFinalStep', () => {
     }) as HTMLAnchorElement;
 
     expect(viewReleaseLink.href).toEqual(
-      'http://localhost/find-statistics/test-publication/test-release-slug',
+      'http://localhost/find-statistics/test-publication/selected-release-slug',
     );
 
     expect(
@@ -328,13 +350,21 @@ describe('TableToolFinalStep', () => {
     ).toMatchSnapshot();
   });
 
-  test(`renders the 'View the release for this data' URL with only the Publication slug, if the Release slug is not supplied`, async () => {
+  test(`renders the 'View the release for this data' URL with only the Publication slug, if the selected Release is the latest Release for that Publication`, async () => {
     render(
       <TableToolFinalStep
         publication={testPublication}
         query={testQuery}
         table={testTable}
         tableHeaders={testTableHeaders}
+        selectedRelease={{
+          id: 'latest-release-id',
+          latestRelease: true,
+          slug: 'latest-release-slug',
+        }}
+        latestRelease={{
+          title: 'Latest Release Title',
+        }}
       />,
     );
 
@@ -358,7 +388,14 @@ describe('TableToolFinalStep', () => {
         query={testQuery}
         table={testTable}
         tableHeaders={testTableHeaders}
-        latestData
+        selectedRelease={{
+          id: 'latest-release-id',
+          latestRelease: true,
+          slug: 'latest-release-slug',
+        }}
+        latestRelease={{
+          title: 'Latest Release Title',
+        }}
       />,
     );
 
@@ -382,8 +419,14 @@ describe('TableToolFinalStep', () => {
         query={testQuery}
         table={testTable}
         tableHeaders={testTableHeaders}
-        latestData={false}
-        latestReleaseTitle="Latest Release Title"
+        selectedRelease={{
+          id: 'selected-release-id',
+          latestRelease: false,
+          slug: 'selected-release-slug',
+        }}
+        latestRelease={{
+          title: 'Latest Release Title',
+        }}
       />,
     );
 
@@ -392,7 +435,7 @@ describe('TableToolFinalStep', () => {
     }) as HTMLAnchorElement;
 
     expect(viewReleaseLink.href).toEqual(
-      'http://localhost/find-statistics/test-publication',
+      'http://localhost/find-statistics/test-publication/selected-release-slug',
     );
 
     expect(

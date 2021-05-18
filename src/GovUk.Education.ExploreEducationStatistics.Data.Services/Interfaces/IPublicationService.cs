@@ -8,6 +8,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Services.Interfaces
 {
     public interface IPublicationService
     {
-        Task<Either<ActionResult, PublicationViewModel>> GetPublication(Guid publicationId);
+        Task<Either<ActionResult, SubjectsAndHighlightsViewModel>> GetLatestPublicationSubjectsAndHighlights(Guid publicationId);
+        Task<Either<ActionResult, SubjectsAndHighlightsViewModel>> GetReleaseSubjectsAndHighlights(Guid releaseId);
     }
 }

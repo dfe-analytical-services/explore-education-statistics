@@ -22,7 +22,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Services
             _releaseService = releaseService;
         }
 
-        public async Task<Either<ActionResult, PublicationViewModel>> GetPublication(
+        public async Task<Either<ActionResult, SubjectsAndHighlightsViewModel>> GetLatestPublicationSubjectsAndHighlights(
             Guid publicationId)
         {
             var release = _releaseRepository.GetLatestPublishedRelease(publicationId);
@@ -32,12 +32,15 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Services
                 return new NotFoundResult();
             }
 
-            return await _releaseService.GetRelease(release.Id)
-                .OnSuccess(
-                    viewModel => new PublicationViewModel
+            return await GetReleaseSubjectsAndHighlights(release.Id);
+        }
+
+        public async Task<Either<ActionResult, SubjectsAndHighlightsViewModel>> GetReleaseSubjectsAndHighlights(
+            Guid releaseId)
+        {
+            return await _releaseService.GetRelease(releaseId)
+                .OnSuccess(viewModel => new SubjectsAndHighlightsViewModel
                     {
-                        Id = publicationId,
-                        LatestReleaseId = release.Id,
                         Highlights = viewModel.Highlights,
                         Subjects = viewModel.Subjects,
                     }
