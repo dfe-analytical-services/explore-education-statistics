@@ -19,6 +19,7 @@ import getDataSetCategoryConfigs from '@common/modules/charts/util/getDataSetCat
 import getCategoryLabel from '@common/modules/charts/util/getCategoryLabel';
 import getMinorAxisDecimalPlaces from '@common/modules/charts/util/getMinorAxisDecimalPlaces';
 import parseNumber from '@common/utils/number/parseNumber';
+import getUnit from '@common/modules/charts/util/getUnit';
 import React, { memo } from 'react';
 import {
   Bar,
@@ -115,7 +116,7 @@ const VerticalBarBlock = ({
             {...minorDomainTicks}
             type="number"
             hide={!axes.minor.visible}
-            unit={axes.minor.unit}
+            unit={getUnit(axes.minor.unit, dataSetCategoryConfigs)}
             width={parseNumber(axes.minor.size)}
             tickFormatter={tick => formatPretty(tick, '', minorAxisDecimals)}
           />
