@@ -10,19 +10,19 @@ using Microsoft.AspNetCore.Mvc;
 
 namespace GovUk.Education.ExploreEducationStatistics.Admin.Controllers.Api.UserManagement
 {
-    [Route("api")]
     [ApiController]
+    [Route("api/user-management")]
     [Authorize(Policy = "CanManageUsersOnSystem")]
-    public class UsersController : ControllerBase
+    public class UserManagementController : ControllerBase
     {
         private readonly IUserManagementService _userManagementService;
 
-        public UsersController(IUserManagementService userManagementService)
+        public UserManagementController(IUserManagementService userManagementService)
         {
             _userManagementService = userManagementService;
         }
 
-        [HttpGet("user-management/users")]
+        [HttpGet("users")]
         [ProducesResponseType(200)]
         public async Task<ActionResult<List<UserViewModel>>> GetUserList()
         {
@@ -31,16 +31,16 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Controllers.Api.UserM
                 .HandleFailuresOrOk();
         }
 
-        [HttpGet("user-management/users/{userId}")]
+        [HttpGet("users/{id:guid}")]
         [ProducesResponseType(200)]
-        public async Task<ActionResult<UserViewModel>> GetUser(string userId)
+        public async Task<ActionResult<UserViewModel>> GetUser(Guid id)
         {
             return await _userManagementService
-                .GetUser(userId)
+                .GetUser(id)
                 .HandleFailuresOrOk();
         }
 
-        [HttpPut("user-management/users/{userId}")]
+        [HttpPut("users/{userId}")]
         public async Task<ActionResult<Unit>> UpdateUser(string userId, UserEditViewModel model)
         {
             return await _userManagementService
@@ -48,32 +48,62 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Controllers.Api.UserM
                 .HandleFailuresOrOk();
         }
 
-        [HttpPost("user-management/users/{userId}/release-role")]
+        [HttpPost("users/{userId:guid}/publication-role")]
         [ProducesResponseType(200)]
-        public async Task<ActionResult<Unit>> AddUserReleaseRole(Guid userId,
-            UserReleaseRoleRequest releaseRole)
+        public async Task<ActionResult<Unit>> AddPublicationRole(Guid userId, AddPublicationRole request)
         {
             return await _userManagementService
-                .AddUserReleaseRole(userId, releaseRole)
+                .AddPublicationRole(userId, request.PublicationId, request.PublicationRole)
                 .HandleFailuresOrOk();
         }
 
-        [HttpDelete("user-management/users/release-role/{userReleaseRoleId}")]
+        [HttpPost("users/{userId:guid}/release-role")]
         [ProducesResponseType(200)]
-        public async Task<ActionResult<Unit>> DeleteUserReleaseRole(Guid userReleaseRoleId)
+        public async Task<ActionResult<Unit>> AddReleaseRole(Guid userId, AddReleaseRoleViewModel request)
         {
             return await _userManagementService
-                .RemoveUserReleaseRole(userReleaseRoleId)
+                .AddReleaseRole(userId, request.ReleaseId, request.ReleaseRole)
+                .HandleFailuresOrOk();
+        }
+
+        [HttpDelete("users/publication-role/{id:guid}")]
+        [ProducesResponseType(200)]
+        public async Task<ActionResult<Unit>> DeleteUserPublicationRole(Guid id)
+        {
+            return await _userManagementService
+                .RemoveUserPublicationRole(id)
+                .HandleFailuresOrOk();
+        }
+
+        [HttpDelete("users/release-role/{id:guid}")]
+        [ProducesResponseType(200)]
+        public async Task<ActionResult<Unit>> DeleteUserReleaseRole(Guid id)
+        {
+            return await _userManagementService
+                .RemoveUserReleaseRole(id)
+                .HandleFailuresOrOk();
+        }
+
+        /// <summary>
+        /// Provides a list of publications that are available within the service
+        /// </summary>
+        /// <returns>Id and Title of the publications</returns>
+        [HttpGet("publications")]
+        [ProducesResponseType(200)]
+        public async Task<ActionResult<List<TitleAndIdViewModel>>> GetPublications()
+        {
+            return await _userManagementService
+                .ListPublications()
                 .HandleFailuresOrOk();
         }
 
         /// <summary>
         /// Provides a list of releases that are available within the service
         /// </summary>
-        /// <returns>Id and Title of the release</returns>
-        [HttpGet("user-management/releases")]
+        /// <returns>Id and Title of the releases</returns>
+        [HttpGet("releases")]
         [ProducesResponseType(200)]
-        public async Task<ActionResult<List<IdTitlePair>>> GetReleases()
+        public async Task<ActionResult<List<TitleAndIdViewModel>>> GetReleases()
         {
             return await _userManagementService
                 .ListReleases()
@@ -84,7 +114,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Controllers.Api.UserM
         /// Provides a list of release roles that are available within the service
         /// </summary>
         /// <returns>Name and value representation of role</returns>
-        [HttpGet("user-management/roles")]
+        [HttpGet("roles")]
         [ProducesResponseType(200)]
         public async Task<ActionResult<List<RoleViewModel>>> GetRoles()
         {
@@ -97,12 +127,26 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Controllers.Api.UserM
         /// Provides a list of release roles that are available within the service
         /// </summary>
         /// <returns>Name and value representation of the release role</returns>
-        [HttpGet("user-management/release-roles")]
+        [HttpGet("release-roles")]
         [ProducesResponseType(200)]
         public Task<ActionResult<List<EnumExtensions.EnumValue>>> GetReleaseRoles()
         {
+            // TODO EES-2131 Remove me
             return _userManagementService
                 .ListReleaseRoles()
+                .HandleFailuresOrOk();
+        }
+
+        /// <summary>
+        /// Provides a list of resource roles that are available within the service
+        /// </summary>
+        /// <returns>Name and value representation of the release role</returns>
+        [HttpGet("resource-roles")]
+        [ProducesResponseType(200)]
+        public Task<ActionResult<Dictionary<string, List<string>>>> GetResourceRoles()
+        {
+            return _userManagementService
+                .GetResourceRoles()
                 .HandleFailuresOrOk();
         }
     }

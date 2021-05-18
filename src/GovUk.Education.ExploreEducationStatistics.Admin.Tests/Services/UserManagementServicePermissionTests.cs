@@ -4,7 +4,7 @@ using GovUk.Education.ExploreEducationStatistics.Admin.Areas.Identity.Data.Model
 using GovUk.Education.ExploreEducationStatistics.Admin.Models;
 using GovUk.Education.ExploreEducationStatistics.Admin.Security;
 using GovUk.Education.ExploreEducationStatistics.Admin.Services;
-using GovUk.Education.ExploreEducationStatistics.Admin.ViewModels;
+using GovUk.Education.ExploreEducationStatistics.Admin.Services.Interfaces;
 using GovUk.Education.ExploreEducationStatistics.Common.Model;
 using GovUk.Education.ExploreEducationStatistics.Common.Services.Interfaces.Security;
 using GovUk.Education.ExploreEducationStatistics.Common.Utils;
@@ -18,6 +18,7 @@ using static GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services.DbU
 using static GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services.PermissionTestUtil;
 using static GovUk.Education.ExploreEducationStatistics.Admin.Tests.Utils.AdminMockUtils;
 using static GovUk.Education.ExploreEducationStatistics.Common.Tests.Utils.MockUtils;
+using static GovUk.Education.ExploreEducationStatistics.Content.Model.ReleaseRole;
 
 namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
 {
@@ -33,7 +34,9 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
                         await using (var userAndRolesDbContext = InMemoryUserAndRolesDbContext())
                         {
                             var userManagementService =
-                                BuildUserManagementService(userAndRolesDbContext, userService.Object);
+                                BuildUserManagementService(
+                                    usersAndRolesDbContext: userAndRolesDbContext,
+                                    userService: userService.Object);
                             return await userManagementService.ListAllUsers();
                         }
                     }
@@ -47,10 +50,11 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
                 .ExpectCheck(SecurityPolicies.CanManageUsersOnSystem)
                 .AssertSuccess(async userService =>
                     {
+                        var userId = Guid.NewGuid();
                         var userAndRolesContextId = Guid.NewGuid().ToString();
                         var applicationUser = new ApplicationUser
                         {
-                            Id = Guid.NewGuid().ToString(),
+                            Id = userId.ToString(),
                             FirstName = "TestFirstName",
                             LastName = "TestLastName"
                         };
@@ -87,7 +91,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
                         };
                         var user = new User
                         {
-                            Id = Guid.Parse(role.Id),
+                            Id = userId,
                             FirstName = applicationUser.FirstName,
                             LastName = applicationUser.LastName,
                             Email = "test@test.com"
@@ -99,7 +103,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
                             UserId = user.Id,
                             Release = release,
                             ReleaseId = release.Id,
-                            Role = ReleaseRole.Lead,
+                            Role = Lead,
                         };
                         await using (var contentDbContext = InMemoryApplicationDbContext(contentDbContextId))
                         {
@@ -115,10 +119,10 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
                         {
                             var userManagementService =
                                 BuildUserManagementService(
-                                    userAndRolesDbContext,
-                                    userService.Object,
-                                    contentDbContext);
-                            return await userManagementService.GetUser(applicationUser.Id);
+                                    contentDbContext: contentDbContext,
+                                    usersAndRolesDbContext: userAndRolesDbContext,
+                                    userService: userService.Object);
+                            return await userManagementService.GetUser(user.Id);
                         }
                     }
                 );
@@ -168,8 +172,9 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
                         await using (var userAndRolesDbContext =
                             InMemoryUserAndRolesDbContext(userAndRolesContextId))
                         {
-                            var userManagementService =
-                                BuildUserManagementService(userAndRolesDbContext, userService.Object);
+                            var userManagementService = BuildUserManagementService(
+                                usersAndRolesDbContext: userAndRolesDbContext,
+                                userService: userService.Object);
                             return await userManagementService.UpdateUser(userId, roleNew.Id);
                         }
                     }
@@ -177,7 +182,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
         }
 
         [Fact]
-        public void AddUserReleaseRole()
+        public void AddReleaseRole()
         {
             PolicyCheckBuilder()
                 .ExpectCheck(SecurityPolicies.CanManageUsersOnSystem)
@@ -203,11 +208,6 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
                         FirstName = "TestFirstName",
                         LastName = "TestLastName",
                         Email = "test@test.com"
-                    };
-                    var userReleaseRoleRequest = new UserReleaseRoleRequest
-                    {
-                        ReleaseId = release.Id,
-                        ReleaseRole = ReleaseRole.Approver
                     };
                     await using (var contentDbContext = InMemoryApplicationDbContext(contentDbContextId))
                     {
@@ -238,12 +238,12 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
                         var persistenceHelper = MockPersistenceHelper<ContentDbContext>();
                         SetupCall(persistenceHelper, release.Id, release);
                         var userManagementService = BuildUserManagementService(
-                            usersAndRolesDbContext,
-                            userService.Object,
-                            contentDbContext,
-                            persistenceHelper: persistenceHelper.Object
+                            contentDbContext: contentDbContext,
+                            usersAndRolesDbContext: usersAndRolesDbContext,
+                            contentPersistenceHelper: persistenceHelper.Object,
+                            userService: userService.Object
                         );
-                        return await userManagementService.AddUserReleaseRole(user.Id, userReleaseRoleRequest);
+                        return await userManagementService.AddReleaseRole(user.Id, release.Id, Approver);
                     }
                 });
         }
@@ -283,7 +283,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
                         UserId = user.Id,
                         Release = release,
                         ReleaseId = release.Id,
-                        Role = ReleaseRole.Viewer,
+                        Role = Viewer,
                     };
                     await using (var contentDbContext = InMemoryApplicationDbContext(contentDbContextId))
                     {
@@ -295,10 +295,11 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
                     {
                         var persistenceHelper = MockPersistenceHelper<ContentDbContext>();
                         SetupCall(persistenceHelper, userReleaseRole.Id, userReleaseRole);
+
                         var userManagementService = BuildUserManagementService(
                             contentDbContext: contentDbContext,
-                            userService: userService.Object,
-                            persistenceHelper: persistenceHelper.Object
+                            contentPersistenceHelper: persistenceHelper.Object,
+                            userService: userService.Object
                         );
                         return await userManagementService.RemoveUserReleaseRole(userReleaseRole.Id);
                     }
@@ -312,7 +313,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
                 .ExpectCheck(SecurityPolicies.CanManageUsersOnSystem)
                 .AssertSuccess(async userService =>
                 {
-                    await using (var contentDbContext = InMemoryApplicationDbContext(Guid.NewGuid().ToString()))
+                    await using (var contentDbContext = InMemoryApplicationDbContext())
                     {
                         var userManagementService = BuildUserManagementService(
                             contentDbContext: contentDbContext,
@@ -330,11 +331,11 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
                 .ExpectCheck(SecurityPolicies.CanManageUsersOnSystem)
                 .AssertSuccess(async userService =>
                 {
-                    await using (var usersAndRolesDbContext = InMemoryUserAndRolesDbContext(Guid.NewGuid().ToString()))
+                    await using (var usersAndRolesDbContext = InMemoryUserAndRolesDbContext())
                     {
                         var userManagementService = BuildUserManagementService(
-                            usersAndRolesDbContext,
-                            userService.Object
+                            usersAndRolesDbContext: usersAndRolesDbContext,
+                            userService: userService.Object
                         );
                         return await userManagementService.ListRoles();
                     }
@@ -363,12 +364,11 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
                 .AssertSuccess(
                     async userService =>
                     {
-                        await using (var userAndRolesDbContext =
-                            InMemoryUserAndRolesDbContext())
+                        await using (var userAndRolesDbContext = InMemoryUserAndRolesDbContext())
                         {
                             var userManagementService = BuildUserManagementService(
-                                userAndRolesDbContext,
-                                userService.Object);
+                                usersAndRolesDbContext: userAndRolesDbContext,
+                                userService: userService.Object);
                             return await userManagementService.ListPendingInvites();
                         }
                     });
@@ -400,12 +400,11 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
                             await userAndRolesDbContext.SaveChangesAsync();
                         }
 
-                        await using (var userAndRolesDbContext =
-                            InMemoryUserAndRolesDbContext(userAndRolesContextId))
+                        await using (var userAndRolesDbContext = InMemoryUserAndRolesDbContext(userAndRolesContextId))
                         {
                             var userManagementService = BuildUserManagementService(
-                                userAndRolesDbContext,
-                                userService.Object);
+                                usersAndRolesDbContext: userAndRolesDbContext,
+                                userService: userService.Object);
                             return await userManagementService.InviteUser(
                                 "test@test.com",
                                 "Test User",
@@ -433,18 +432,18 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
                         };
 
                         var userAndRolesContextId = Guid.NewGuid().ToString();
-                        await using (var userAndRolesDbContext =
-                            InMemoryUserAndRolesDbContext(userAndRolesContextId))
+                        await using (var userAndRolesDbContext = InMemoryUserAndRolesDbContext(userAndRolesContextId))
                         {
                             await userAndRolesDbContext.AddAsync(userInvite);
                             await userAndRolesDbContext.SaveChangesAsync();
                         }
 
-                        await using (var userAndRolesDbContext =
-                            InMemoryUserAndRolesDbContext(userAndRolesContextId))
+                        await using (var userAndRolesDbContext = InMemoryUserAndRolesDbContext(userAndRolesContextId))
                         {
                             var userManagementService =
-                                BuildUserManagementService(userAndRolesDbContext, userService.Object);
+                                BuildUserManagementService(
+                                    usersAndRolesDbContext: userAndRolesDbContext,
+                                    userService: userService.Object);
                             return await userManagementService.CancelInvite(userInvite.Email);
                         }
                     });
@@ -482,22 +481,32 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
         }
 
         private static UserManagementService BuildUserManagementService(
-            UsersAndRolesDbContext usersAndRolesDbContext = null,
-            IUserService userService = null,
             ContentDbContext contentDbContext = null,
+            UsersAndRolesDbContext usersAndRolesDbContext = null,
+            IPersistenceHelper<ContentDbContext> contentPersistenceHelper = null,
+            IPersistenceHelper<UsersAndRolesDbContext> usersAndRolesPersistenceHelper = null,
             IEmailService emailService = null,
-            IConfiguration configuration = null,
+            IUserPublicationRoleRepository userPublicationRoleRepository = null,
+            IUserReleaseRoleRepository userReleaseRoleRepository = null,
             UserManager<ApplicationUser> userManager = null,
-            IPersistenceHelper<ContentDbContext> persistenceHelper = null)
+            IUserService userService = null,
+            IConfiguration configuration = null)
         {
+            contentDbContext ??= InMemoryApplicationDbContext();
+            usersAndRolesDbContext ??= InMemoryUserAndRolesDbContext();
+
             return new UserManagementService(
-                usersAndRolesDbContext,
+                usersAndRolesDbContext ?? InMemoryUserAndRolesDbContext(),
                 userService ?? AlwaysTrueUserService().Object,
-                contentDbContext ?? new Mock<ContentDbContext>().Object,
+                contentDbContext,
                 emailService ?? new Mock<IEmailService>().Object,
                 configuration ?? ConfigurationMock().Object,
+                userPublicationRoleRepository ?? new Mock<IUserPublicationRoleRepository>().Object,
+                userReleaseRoleRepository ?? new Mock<IUserReleaseRoleRepository>().Object,
                 userManager ?? MockUserManager().Object,
-                persistenceHelper ?? new Mock<IPersistenceHelper<ContentDbContext>>().Object);
+                contentPersistenceHelper ?? new PersistenceHelper<ContentDbContext>(contentDbContext),
+                usersAndRolesPersistenceHelper ?? new PersistenceHelper<UsersAndRolesDbContext>(usersAndRolesDbContext)
+            );
         }
     }
 }
