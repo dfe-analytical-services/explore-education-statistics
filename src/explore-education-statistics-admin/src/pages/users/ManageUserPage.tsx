@@ -2,28 +2,27 @@ import Link from '@admin/components/Link';
 import Page from '@admin/components/Page';
 import userService, {
   User,
+  UserPublicationRole,
+  UserPublicationRoleSubmission,
+  UserReleaseRole,
   UserReleaseRoleSubmission,
   UserUpdate,
 } from '@admin/services/userService';
-import Button from '@common/components/Button';
-import ButtonText from '@common/components/ButtonText';
-import { FormFieldSelect, FormFieldset } from '@common/components/form';
-import Form from '@common/components/form/Form';
 import LoadingSpinner from '@common/components/LoadingSpinner';
-import SummaryList from '@common/components/SummaryList';
-import SummaryListItem from '@common/components/SummaryListItem';
 import useAsyncRetry from '@common/hooks/useAsyncRetry';
 import useFormSubmit from '@common/hooks/useFormSubmit';
 import { mapFieldErrors } from '@common/validation/serverValidations';
-import Yup from '@common/validation/yup';
-import { Formik } from 'formik';
-import orderBy from 'lodash/orderBy';
 import React, { useCallback, useEffect, useState } from 'react';
 import { RouteComponentProps } from 'react-router';
-
-interface UpdateRoleFormValues {
-  selectedRoleId: string;
-}
+import RoleForm, {
+  UpdateRoleFormValues,
+} from '@admin/pages/users/components/RoleForm';
+import ReleaseAccessForm, {
+  AddReleaseRoleFormValues,
+} from '@admin/pages/users/components/ReleaseAccessForm';
+import PublicationAccessForm, {
+  AddPublicationRoleFormValues,
+} from '@admin/pages/users/components/PublicationAccessForm';
 
 const updateRoleFormErrorMappings = [
   mapFieldErrors<UpdateRoleFormValues>({
@@ -34,16 +33,21 @@ const updateRoleFormErrorMappings = [
   }),
 ];
 
-interface AddReleaseRoleFormValues {
-  selectedReleaseId: string;
-  selectedReleaseRoleId: string;
-}
-
 const addReleaseFormErrorMappings = [
   mapFieldErrors<AddReleaseRoleFormValues>({
-    target: 'selectedReleaseRoleId',
+    target: 'selectedReleaseRole',
     messages: {
       USER_ALREADY_HAS_RELEASE_ROLE: 'The user already has this release role',
+    },
+  }),
+];
+
+const addPublicationFormErrorMappings = [
+  mapFieldErrors<AddPublicationRoleFormValues>({
+    target: 'selectedPublicationRole',
+    messages: {
+      USER_ALREADY_HAS_PUBLICATION_ROLE:
+        'The user already has this publication role',
     },
   }),
 ];
@@ -58,7 +62,6 @@ const ManageUserPage = ({ match }: RouteComponentProps<{ userId: string }>) => {
   const [, setErrorStatus] = useState<number>();
 
   const { userId } = match.params;
-  const formId = userId;
 
   const getUser = useCallback(() => {
     setIsLoading(true);
@@ -77,24 +80,30 @@ const ManageUserPage = ({ match }: RouteComponentProps<{ userId: string }>) => {
 
   const { value: roles } = useAsyncRetry(() => userService.getRoles());
   const { value: releases } = useAsyncRetry(() => userService.getReleases());
-  const { value: releaseRoles } = useAsyncRetry(() =>
-    userService.getReleaseRoles(),
+  const { value: publications } = useAsyncRetry(() =>
+    userService.getPublications(),
+  );
+  const { value: resourceRoles } = useAsyncRetry(() =>
+    userService.getResourceRoles(),
   );
 
-  const handleSubmit = useFormSubmit<UpdateRoleFormValues>(async values => {
-    const submission: UserUpdate = {
-      roleId: values.selectedRoleId,
-    };
+  const handleUpdateRoleFormSubmit = useFormSubmit<UpdateRoleFormValues>(
+    async values => {
+      const submission: UserUpdate = {
+        roleId: values.selectedRoleId,
+      };
 
-    await userService.updateUser(userId, submission);
-    getUser();
-  }, updateRoleFormErrorMappings);
+      await userService.updateUser(userId, submission);
+      getUser();
+    },
+    updateRoleFormErrorMappings,
+  );
 
-  const addReleaseRole = useFormSubmit<AddReleaseRoleFormValues>(
+  const handleAddReleaseRole = useFormSubmit<AddReleaseRoleFormValues>(
     async values => {
       const submission: UserReleaseRoleSubmission = {
         releaseId: values.selectedReleaseId,
-        releaseRole: values.selectedReleaseRoleId,
+        releaseRole: values.selectedReleaseRole,
       };
 
       await userService.addUserReleaseRole(userId, submission);
@@ -103,6 +112,34 @@ const ManageUserPage = ({ match }: RouteComponentProps<{ userId: string }>) => {
     },
     addReleaseFormErrorMappings,
   );
+
+  const handleRemoveReleaseAccess = (userReleaseRole: UserReleaseRole) => {
+    userService
+      .removeUserReleaseRole(userId, userReleaseRole)
+      .then(() => getUser());
+  };
+
+  const handleAddPublicationRole = useFormSubmit<AddPublicationRoleFormValues>(
+    async values => {
+      const submission: UserPublicationRoleSubmission = {
+        releaseId: values.selectedPublicationId,
+        releaseRole: values.selectedPublicationRole,
+      };
+
+      await userService.addUserPublicationRole(userId, submission);
+
+      getUser();
+    },
+    addPublicationFormErrorMappings,
+  );
+
+  const handleRemovePublicationAccess = (
+    userPublicationRole: UserPublicationRole,
+  ) => {
+    userService
+      .removeUserPublicationRole(userId, userPublicationRole)
+      .then(() => getUser());
+  };
 
   useEffect(() => {
     getUser();
@@ -125,174 +162,27 @@ const ManageUserPage = ({ match }: RouteComponentProps<{ userId: string }>) => {
       <LoadingSpinner loading={isLoading} text="Loading user details">
         {model && (
           <>
-            <Formik<UpdateRoleFormValues>
-              enableReinitialize
-              initialValues={{
-                selectedRoleId: model.user.role ?? '',
-              }}
-              validationSchema={Yup.object<UpdateRoleFormValues>({
-                selectedRoleId: Yup.string().required(
-                  'Choose role for the user',
-                ),
-              })}
-              onSubmit={handleSubmit}
-            >
-              {() => {
-                return (
-                  <Form id={formId}>
-                    <FormFieldset id="user" legend="Details" legendSize="m">
-                      <SummaryList>
-                        <SummaryListItem term="Name">
-                          {model.user.name}
-                        </SummaryListItem>
-                        <SummaryListItem term="Email">
-                          <a href={`mailto:${model.user.email}`}>
-                            {model.user.email}
-                          </a>
-                        </SummaryListItem>
-                        <SummaryListItem term="Phone">-</SummaryListItem>
-                      </SummaryList>
-                    </FormFieldset>
-                    <FormFieldset
-                      id="role"
-                      legend="Role"
-                      legendSize="m"
-                      hint="The users role within the service."
-                    >
-                      <div className="govuk-grid-row">
-                        <div className="govuk-grid-column-one-quarter">
-                          <FormFieldSelect<UpdateRoleFormValues>
-                            label="Role"
-                            name="selectedRoleId"
-                            options={roles?.map(role => ({
-                              label: role.name,
-                              value: role.id,
-                            }))}
-                          />
-                        </div>
-                        <div className="govuk-grid-column-one-quarter">
-                          <Button
-                            type="submit"
-                            className="govuk-!-margin-top-6"
-                          >
-                            Update role
-                          </Button>
-                        </div>
-                      </div>
-                    </FormFieldset>
-                  </Form>
-                );
-              }}
-            </Formik>
-            <Formik<AddReleaseRoleFormValues>
-              initialValues={{
-                selectedReleaseId:
-                  orderBy(releases, release => release)?.[0]?.id ?? '',
-                selectedReleaseRoleId:
-                  orderBy(releaseRoles, releaseRole => releaseRole)?.[0]
-                    ?.value ?? '',
-              }}
-              enableReinitialize
-              onSubmit={addReleaseRole}
-            >
-              {() => {
-                return (
-                  <Form id={`${formId}-releaseRole`}>
-                    <FormFieldset
-                      id="role"
-                      legend="Release access"
-                      legendSize="m"
-                      hint="The releases a user can access within the service."
-                    >
-                      <div className="govuk-grid-row">
-                        <div className="govuk-grid-column-one-half">
-                          <FormFieldSelect<AddReleaseRoleFormValues>
-                            label="Release"
-                            name="selectedReleaseId"
-                            options={releases?.map(release => ({
-                              label: release.title,
-                              value: release.id,
-                            }))}
-                          />
-                        </div>
+            <RoleForm
+              roles={roles}
+              user={model.user}
+              onSubmit={handleUpdateRoleFormSubmit}
+            />
 
-                        <div className="govuk-grid-column-one-quarter">
-                          <FormFieldSelect<AddReleaseRoleFormValues>
-                            label="Release role"
-                            name="selectedReleaseRoleId"
-                            options={releaseRoles?.map(releaseRole => ({
-                              label: releaseRole.name,
-                              value: releaseRole.value,
-                            }))}
-                          />
-                        </div>
-                        <div className="govuk-grid-column-one-quarter">
-                          {model?.user && (
-                            <Button
-                              type="submit"
-                              className="govuk-!-margin-top-6"
-                            >
-                              Add release access
-                            </Button>
-                          )}
-                        </div>
-                      </div>
-                    </FormFieldset>
-                    <table className="govuk-table">
-                      <thead className="govuk-table__head">
-                        <tr className="govuk-table__row">
-                          <th scope="col" className="govuk-table__header">
-                            Publication
-                          </th>
-                          <th scope="col" className="govuk-table__header">
-                            Release
-                          </th>
-                          <th scope="col" className="govuk-table__header">
-                            Role
-                          </th>
-                          <th scope="col" className="govuk-table__header">
-                            Actions
-                          </th>
-                        </tr>
-                      </thead>
+            <ReleaseAccessForm
+              releases={releases}
+              releaseRoles={resourceRoles?.Release}
+              user={model.user}
+              onRemove={handleRemoveReleaseAccess}
+              onSubmit={handleAddReleaseRole}
+            />
 
-                      <tbody className="govuk-table__body">
-                        {model.user.userReleaseRoles.map(userReleaseRole => (
-                          <tr
-                            className="govuk-table__row"
-                            key={userReleaseRole.id}
-                          >
-                            <td className="govuk-table__cell">
-                              {userReleaseRole.publication}
-                            </td>
-                            <td className="govuk-table__cell">
-                              {userReleaseRole.release}
-                            </td>
-                            <td className="govuk-table__cell">
-                              {userReleaseRole.role}
-                            </td>
-                            <td className="govuk-table__cell">
-                              <ButtonText
-                                onClick={() => {
-                                  userService
-                                    .removeUserReleaseRole(
-                                      userId,
-                                      userReleaseRole,
-                                    )
-                                    .then(() => getUser());
-                                }}
-                              >
-                                Remove
-                              </ButtonText>
-                            </td>
-                          </tr>
-                        ))}
-                      </tbody>
-                    </table>
-                  </Form>
-                );
-              }}
-            </Formik>
+            <PublicationAccessForm
+              publications={publications}
+              publicationRoles={resourceRoles?.Publication}
+              user={model.user}
+              onRemove={handleRemovePublicationAccess}
+              onSubmit={handleAddPublicationRole}
+            />
           </>
         )}
       </LoadingSpinner>

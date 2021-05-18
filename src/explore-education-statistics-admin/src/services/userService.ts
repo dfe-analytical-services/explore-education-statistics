@@ -13,6 +13,7 @@ export interface User {
   name: string;
   email: string;
   role: string;
+  userPublicationRoles: UserPublicationRole[];
   userReleaseRoles: UserReleaseRole[];
 }
 
@@ -23,7 +24,18 @@ export interface UserReleaseRole {
   role: string;
 }
 
+export interface UserPublicationRole {
+  id: string;
+  publication: string;
+  role: string;
+}
+
 export interface UserReleaseRoleSubmission {
+  releaseId: string;
+  releaseRole: string;
+}
+
+export interface UserPublicationRoleSubmission {
   releaseId: string;
   releaseRole: string;
 }
@@ -43,18 +55,17 @@ export interface Role {
   normalizedName: string;
 }
 
-export interface ReleaseRole {
-  name: string;
-  value: string;
+export interface ResourceRoles {
+  Publication: [] | undefined;
+  Release: [] | undefined;
 }
 
 export interface UsersService {
   getRoles(): Promise<Role[]>;
-  getReleaseRoles(): Promise<ReleaseRole[]>;
   getReleases(): Promise<IdTitlePair[]>;
-
+  getPublications(): Promise<IdTitlePair[]>;
+  getResourceRoles(): Promise<ResourceRoles>;
   getUser(userId: string): Promise<User>;
-
   addUserReleaseRole: (
     userId: string,
     userReleaseRole: UserReleaseRoleSubmission,
@@ -62,6 +73,15 @@ export interface UsersService {
   removeUserReleaseRole: (
     userId: string,
     userReleaseRole: UserReleaseRole,
+  ) => Promise<boolean>;
+
+  addUserPublicationRole: (
+    userId: string,
+    userPublicationRole: UserPublicationRoleSubmission,
+  ) => Promise<boolean>;
+  removeUserPublicationRole: (
+    userId: string,
+    userPublicationRole: UserPublicationRole,
   ) => Promise<boolean>;
 
   getUsers(): Promise<UserStatus[]>;
@@ -76,13 +96,17 @@ const userService: UsersService = {
   getRoles(): Promise<Role[]> {
     return client.get<Role[]>('/user-management/roles');
   },
-  getReleaseRoles(): Promise<ReleaseRole[]> {
-    return client.get<ReleaseRole[]>('/user-management/release-roles');
+  getResourceRoles(): Promise<ResourceRoles> {
+    return client.get<ResourceRoles>('/user-management/resource-roles');
   },
   getReleases(): Promise<IdTitlePair[]> {
     return client.get<IdTitlePair[]>('/user-management/releases');
   },
   // user-management/releases (ID,Title)
+
+  getPublications(): Promise<IdTitlePair[]> {
+    return client.get<IdTitlePair[]>('/user-management/publications');
+  },
 
   getUsers(): Promise<UserStatus[]> {
     return client.get<UserStatus[]>('/user-management/users');
@@ -109,6 +133,24 @@ const userService: UsersService = {
   ): Promise<boolean> {
     return client.delete(
       `/user-management/users/release-role/${userReleaseRole.id}`,
+    );
+  },
+
+  addUserPublicationRole(
+    userId: string,
+    userPublicationRole: UserPublicationRoleSubmission,
+  ): Promise<boolean> {
+    return client.post(
+      `/user-management/users/${userId}/publication-role`,
+      userPublicationRole,
+    );
+  },
+  removeUserPublicationRole(
+    userId: string,
+    userPublicationRole: UserPublicationRole,
+  ): Promise<boolean> {
+    return client.delete(
+      `/user-management/users/publication-role/${userPublicationRole.id}`,
     );
   },
 
