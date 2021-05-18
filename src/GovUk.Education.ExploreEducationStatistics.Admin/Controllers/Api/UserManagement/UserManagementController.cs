@@ -16,10 +16,13 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Controllers.Api.UserM
     public class UserManagementController : ControllerBase
     {
         private readonly IUserManagementService _userManagementService;
+        private readonly IUserRoleService _userRoleService;
 
-        public UserManagementController(IUserManagementService userManagementService)
+        public UserManagementController(IUserManagementService userManagementService,
+            IUserRoleService userRoleService)
         {
             _userManagementService = userManagementService;
+            _userRoleService = userRoleService;
         }
 
         [HttpGet("users")]
@@ -50,9 +53,9 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Controllers.Api.UserM
 
         [HttpPost("users/{userId:guid}/publication-role")]
         [ProducesResponseType(200)]
-        public async Task<ActionResult<Unit>> AddPublicationRole(Guid userId, AddPublicationRole request)
+        public async Task<ActionResult<Unit>> AddPublicationRole(Guid userId, AddPublicationRoleViewModel request)
         {
-            return await _userManagementService
+            return await _userRoleService
                 .AddPublicationRole(userId, request.PublicationId, request.PublicationRole)
                 .HandleFailuresOrOk();
         }
@@ -61,7 +64,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Controllers.Api.UserM
         [ProducesResponseType(200)]
         public async Task<ActionResult<Unit>> AddReleaseRole(Guid userId, AddReleaseRoleViewModel request)
         {
-            return await _userManagementService
+            return await _userRoleService
                 .AddReleaseRole(userId, request.ReleaseId, request.ReleaseRole)
                 .HandleFailuresOrOk();
         }
@@ -70,7 +73,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Controllers.Api.UserM
         [ProducesResponseType(200)]
         public async Task<ActionResult<Unit>> DeleteUserPublicationRole(Guid id)
         {
-            return await _userManagementService
+            return await _userRoleService
                 .RemoveUserPublicationRole(id)
                 .HandleFailuresOrOk();
         }
@@ -79,7 +82,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Controllers.Api.UserM
         [ProducesResponseType(200)]
         public async Task<ActionResult<Unit>> DeleteUserReleaseRole(Guid id)
         {
-            return await _userManagementService
+            return await _userRoleService
                 .RemoveUserReleaseRole(id)
                 .HandleFailuresOrOk();
         }
@@ -111,29 +114,15 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Controllers.Api.UserM
         }
 
         /// <summary>
-        /// Provides a list of release roles that are available within the service
+        /// Provides a list of global roles that are available within the service
         /// </summary>
         /// <returns>Name and value representation of role</returns>
         [HttpGet("roles")]
         [ProducesResponseType(200)]
-        public async Task<ActionResult<List<RoleViewModel>>> GetRoles()
+        public async Task<ActionResult<List<RoleViewModel>>> GetGlobalRoles()
         {
-            return await _userManagementService
-                .ListRoles()
-                .HandleFailuresOrOk();
-        }
-
-        /// <summary>
-        /// Provides a list of release roles that are available within the service
-        /// </summary>
-        /// <returns>Name and value representation of the release role</returns>
-        [HttpGet("release-roles")]
-        [ProducesResponseType(200)]
-        public Task<ActionResult<List<EnumExtensions.EnumValue>>> GetReleaseRoles()
-        {
-            // TODO EES-2131 Remove me
-            return _userManagementService
-                .ListReleaseRoles()
+            return await _userRoleService
+                .GetAllGlobalRoles()
                 .HandleFailuresOrOk();
         }
 
@@ -145,8 +134,8 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Controllers.Api.UserM
         [ProducesResponseType(200)]
         public Task<ActionResult<Dictionary<string, List<string>>>> GetResourceRoles()
         {
-            return _userManagementService
-                .GetResourceRoles()
+            return _userRoleService
+                .GetAllResourceRoles()
                 .HandleFailuresOrOk();
         }
     }

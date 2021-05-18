@@ -11,12 +11,10 @@ using GovUk.Education.ExploreEducationStatistics.Common.Utils;
 using GovUk.Education.ExploreEducationStatistics.Content.Model;
 using GovUk.Education.ExploreEducationStatistics.Content.Model.Database;
 using Microsoft.AspNetCore.Identity;
-using Microsoft.Extensions.Configuration;
 using Moq;
 using Xunit;
 using static GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services.DbUtils;
 using static GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services.PermissionTestUtil;
-using static GovUk.Education.ExploreEducationStatistics.Admin.Tests.Utils.AdminMockUtils;
 using static GovUk.Education.ExploreEducationStatistics.Common.Tests.Utils.MockUtils;
 using static GovUk.Education.ExploreEducationStatistics.Content.Model.ReleaseRole;
 
@@ -182,128 +180,9 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
         }
 
         [Fact]
-        public void AddReleaseRole()
+        public void ListPublications()
         {
-            PolicyCheckBuilder()
-                .ExpectCheck(SecurityPolicies.CanManageUsersOnSystem)
-                .AssertSuccess(async userService =>
-                {
-                    var contentDbContextId = Guid.NewGuid().ToString();
-                    var publication = new Publication
-                    {
-                        Id = Guid.NewGuid(),
-                        Title = "Test Publication"
-                    };
-                    var release = new Release
-                    {
-                        Id = Guid.NewGuid(),
-                        TimePeriodCoverage = TimeIdentifier.CalendarYear,
-                        ReleaseName = "2000",
-                        PublicationId = publication.Id,
-                        Publication = publication
-                    };
-                    var user = new User
-                    {
-                        Id = Guid.NewGuid(),
-                        FirstName = "TestFirstName",
-                        LastName = "TestLastName",
-                        Email = "test@test.com"
-                    };
-                    await using (var contentDbContext = InMemoryApplicationDbContext(contentDbContextId))
-                    {
-                        await contentDbContext.AddAsync(publication);
-                        await contentDbContext.AddAsync(release);
-                        await contentDbContext.AddAsync(user);
-                        await contentDbContext.SaveChangesAsync();
-                    }
-
-                    var userAndRolesContextId = Guid.NewGuid().ToString();
-                    var appUser = new ApplicationUser
-                    {
-                        Id = user.Id.ToString(),
-                        FirstName = user.FirstName,
-                        LastName = user.LastName,
-                        Email = user.Email
-                    };
-                    await using (var userAndRolesDbContext =
-                        InMemoryUserAndRolesDbContext(userAndRolesContextId))
-                    {
-                        await userAndRolesDbContext.AddAsync(appUser);
-                        await userAndRolesDbContext.SaveChangesAsync();
-                    }
-
-                    await using (var contentDbContext = InMemoryApplicationDbContext(contentDbContextId))
-                    await using (var usersAndRolesDbContext = InMemoryUserAndRolesDbContext(userAndRolesContextId))
-                    {
-                        var persistenceHelper = MockPersistenceHelper<ContentDbContext>();
-                        SetupCall(persistenceHelper, release.Id, release);
-                        var userManagementService = BuildUserManagementService(
-                            contentDbContext: contentDbContext,
-                            usersAndRolesDbContext: usersAndRolesDbContext,
-                            contentPersistenceHelper: persistenceHelper.Object,
-                            userService: userService.Object
-                        );
-                        return await userManagementService.AddReleaseRole(user.Id, release.Id, Approver);
-                    }
-                });
-        }
-
-        [Fact]
-        public void RemoveUserReleaseRole()
-        {
-            PolicyCheckBuilder()
-                .ExpectCheck(SecurityPolicies.CanManageUsersOnSystem)
-                .AssertSuccess(async userService =>
-                {
-                    var contentDbContextId = Guid.NewGuid().ToString();
-                    var publication = new Publication
-                    {
-                        Id = Guid.NewGuid(),
-                        Title = "Test Publication"
-                    };
-                    var release = new Release
-                    {
-                        Id = Guid.NewGuid(),
-                        TimePeriodCoverage = TimeIdentifier.CalendarYear,
-                        ReleaseName = "2000",
-                        PublicationId = publication.Id,
-                        Publication = publication
-                    };
-                    var user = new User
-                    {
-                        Id = Guid.NewGuid(),
-                        FirstName = "TestFirstName",
-                        LastName = "TestLastName",
-                        Email = "test@test.com"
-                    };
-                    var userReleaseRole = new UserReleaseRole
-                    {
-                        Id = Guid.NewGuid(),
-                        User = user,
-                        UserId = user.Id,
-                        Release = release,
-                        ReleaseId = release.Id,
-                        Role = Viewer,
-                    };
-                    await using (var contentDbContext = InMemoryApplicationDbContext(contentDbContextId))
-                    {
-                        await contentDbContext.AddAsync(userReleaseRole);
-                        await contentDbContext.SaveChangesAsync();
-                    }
-
-                    await using (var contentDbContext = InMemoryApplicationDbContext(contentDbContextId))
-                    {
-                        var persistenceHelper = MockPersistenceHelper<ContentDbContext>();
-                        SetupCall(persistenceHelper, userReleaseRole.Id, userReleaseRole);
-
-                        var userManagementService = BuildUserManagementService(
-                            contentDbContext: contentDbContext,
-                            contentPersistenceHelper: persistenceHelper.Object,
-                            userService: userService.Object
-                        );
-                        return await userManagementService.RemoveUserReleaseRole(userReleaseRole.Id);
-                    }
-                });
+            // TODO EES-2131
         }
 
         [Fact]
@@ -339,20 +218,6 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
                         );
                         return await userManagementService.ListRoles();
                     }
-                });
-        }
-
-        [Fact]
-        public void ListReleaseRoles()
-        {
-            PolicyCheckBuilder()
-                .ExpectCheck(SecurityPolicies.CanManageUsersOnSystem)
-                .AssertSuccess(async userService =>
-                {
-                    var userManagementService = BuildUserManagementService(
-                        userService: userService.Object
-                    );
-                    return await userManagementService.ListReleaseRoles();
                 });
         }
 
@@ -449,63 +314,24 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
                     });
         }
 
-        private static Mock<IConfiguration> ConfigurationMock()
-        {
-            var notifyInviteTemplateSection = new Mock<IConfigurationSection>();
-            var releaseRoleTemplateSection = new Mock<IConfigurationSection>();
-            var adminUriSection = new Mock<IConfigurationSection>();
-            var configuration = new Mock<IConfiguration>();
-
-            notifyInviteTemplateSection.Setup(m => m.Value)
-                .Returns("the-template-id");
-
-            releaseRoleTemplateSection.Setup(m => m.Value)
-                .Returns("notify-release-role-template-id");
-
-            adminUriSection.Setup(m => m.Value)
-                .Returns("admin-uri");
-
-            configuration
-                .Setup(m => m.GetSection("NotifyInviteTemplateId"))
-                .Returns(notifyInviteTemplateSection.Object);
-
-            configuration
-                .Setup(m => m.GetSection("NotifyReleaseRoleTemplateId"))
-                .Returns(releaseRoleTemplateSection.Object);
-
-            configuration
-                .Setup(m => m.GetSection("AdminUri"))
-                .Returns(adminUriSection.Object);
-
-            return configuration;
-        }
-
         private static UserManagementService BuildUserManagementService(
             ContentDbContext contentDbContext = null,
             UsersAndRolesDbContext usersAndRolesDbContext = null,
-            IPersistenceHelper<ContentDbContext> contentPersistenceHelper = null,
             IPersistenceHelper<UsersAndRolesDbContext> usersAndRolesPersistenceHelper = null,
-            IEmailService emailService = null,
-            IUserPublicationRoleRepository userPublicationRoleRepository = null,
-            IUserReleaseRoleRepository userReleaseRoleRepository = null,
-            UserManager<ApplicationUser> userManager = null,
+            IEmailTemplateService emailTemplateService = null,
             IUserService userService = null,
-            IConfiguration configuration = null)
+            IUserRoleService userRoleService = null)
         {
             contentDbContext ??= InMemoryApplicationDbContext();
             usersAndRolesDbContext ??= InMemoryUserAndRolesDbContext();
 
             return new UserManagementService(
                 usersAndRolesDbContext ?? InMemoryUserAndRolesDbContext(),
-                userService ?? AlwaysTrueUserService().Object,
                 contentDbContext,
-                emailService ?? new Mock<IEmailService>().Object,
-                configuration ?? ConfigurationMock().Object,
-                userPublicationRoleRepository ?? new Mock<IUserPublicationRoleRepository>().Object,
-                userReleaseRoleRepository ?? new Mock<IUserReleaseRoleRepository>().Object,
-                userManager ?? MockUserManager().Object,
-                contentPersistenceHelper ?? new PersistenceHelper<ContentDbContext>(contentDbContext),
-                usersAndRolesPersistenceHelper ?? new PersistenceHelper<UsersAndRolesDbContext>(usersAndRolesDbContext)
+                usersAndRolesPersistenceHelper ?? new PersistenceHelper<UsersAndRolesDbContext>(usersAndRolesDbContext),
+                emailTemplateService ?? new Mock<IEmailTemplateService>().Object,
+                userRoleService ?? new Mock<IUserRoleService>().Object,
+                userService ?? AlwaysTrueUserService().Object
             );
         }
     }

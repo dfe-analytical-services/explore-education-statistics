@@ -87,7 +87,6 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Validators
 
         // User Management
         UserAlreadyExists,
-        UserDoesNotExist,
         UserAlreadyHasResourceRole,
 
         // Invite

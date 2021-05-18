@@ -16,6 +16,20 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Services
             _contentDbContext = contentDbContext;
         }
 
+        public async Task<UserReleaseRole> Create(Guid userId, Guid releaseId, ReleaseRole role)
+        {
+            var userReleaseRole = new UserReleaseRole
+            {
+                UserId = userId,
+                ReleaseId = releaseId,
+                Role = role
+            };
+
+            var created = (await _contentDbContext.UserReleaseRoles.AddAsync(userReleaseRole)).Entity;
+            await _contentDbContext.SaveChangesAsync();
+            return created;
+        }
+
         public async Task<UserReleaseRole> GetByRole(Guid userId, Guid releaseId, ReleaseRole role)
         {
             return await _contentDbContext.UserReleaseRoles.FirstOrDefaultAsync(r =>

@@ -264,6 +264,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin
             services.AddTransient<IContentService, ContentService>();
             services.AddTransient<IRelatedInformationService, RelatedInformationService>();
             services.AddTransient<IReplacementService, ReplacementService>();
+            services.AddTransient<IUserRoleService, UserRoleService>();
             services.AddTransient<IUserPublicationRoleRepository, UserPublicationRoleRepository>();
             services.AddTransient<IUserReleaseRoleRepository, UserReleaseRoleRepository>();
 
@@ -287,6 +288,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin
             services.AddTransient<IEmailService, EmailService>();
 
             services.AddTransient<IBoundaryLevelService, BoundaryLevelService>();
+            services.AddTransient<IEmailTemplateService, EmailTemplateService>();
             services.AddTransient<ITableBuilderService, TableBuilderService>();
             services.AddTransient<IFilterService, FilterService>();
             services.AddTransient<IFilterItemService, FilterItemService>();
