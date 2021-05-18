@@ -401,7 +401,7 @@ exports[`TableToolFinalStep renders the 'View the release for this data' URL wit
         data-testid="dataTableCaption"
         id="dataTableCaption"
       >
-        Table showing 'dates' for 02/06/2020 and 02/04/2021 from 'Test publication' in England between 2020 Week 23 and 2020 Week 26
+        Table showing 'dates' for 02/06/2020 and 02/04/2021 in England between 2020 Week 23 and 2020 Week 26
       </strong>
     </figcaption>
     <div
@@ -938,7 +938,7 @@ exports[`TableToolFinalStep renders the 'View the release for this data' URL wit
         data-testid="dataTableCaption"
         id="dataTableCaption"
       >
-        Table showing 'dates' for 02/06/2020 and 02/04/2021 from 'Test publication' in England between 2020 Week 23 and 2020 Week 26
+        Table showing 'dates' for 02/06/2020 and 02/04/2021 in England between 2020 Week 23 and 2020 Week 26
       </strong>
     </figcaption>
     <div
@@ -1492,7 +1492,7 @@ exports[`TableToolFinalStep renders the Table Tool final step correctly if this 
         data-testid="dataTableCaption"
         id="dataTableCaption"
       >
-        Table showing 'dates' for 02/06/2020 and 02/04/2021 from 'Test publication' in England between 2020 Week 23 and 2020 Week 26
+        Table showing 'dates' for 02/06/2020 and 02/04/2021 in England between 2020 Week 23 and 2020 Week 26
       </strong>
     </figcaption>
     <div
@@ -2029,7 +2029,7 @@ exports[`TableToolFinalStep renders the Table Tool final step correctly when thi
         data-testid="dataTableCaption"
         id="dataTableCaption"
       >
-        Table showing 'dates' for 02/06/2020 and 02/04/2021 from 'Test publication' in England between 2020 Week 23 and 2020 Week 26
+        Table showing 'dates' for 02/06/2020 and 02/04/2021 in England between 2020 Week 23 and 2020 Week 26
       </strong>
     </figcaption>
     <div
@@ -2641,7 +2641,7 @@ exports[`TableToolFinalStep renders the final step successfully 2`] = `
         data-testid="dataTableCaption"
         id="dataTableCaption"
       >
-        Table showing 'dates' for 02/06/2020 and 02/04/2021 from 'Test publication' in England between 2020 Week 23 and 2020 Week 26
+        Table showing 'dates' for 02/06/2020 and 02/04/2021 in England between 2020 Week 23 and 2020 Week 26
       </strong>
     </figcaption>
     <div
@@ -3179,7 +3179,7 @@ exports[`TableToolFinalStep shows and hides table header re-ordering controls su
         data-testid="dataTableCaption"
         id="dataTableCaption"
       >
-        Table showing 'dates' for 02/06/2020 and 02/04/2021 from 'Test publication' in England between 2020 Week 23 and 2020 Week 26
+        Table showing 'dates' for 02/06/2020 and 02/04/2021 in England between 2020 Week 23 and 2020 Week 26
       </strong>
     </figcaption>
     <div
