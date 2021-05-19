@@ -45,7 +45,8 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Services
                         Name = itemsGroupedByFilter.Key.Name,
                         Options = itemsGroupedByFilter
                             .GroupBy(item => item.FilterGroup, item => item, FilterGroup.IdComparer)
-                            .OrderBy(items => items.Key.Label, LabelComparer)
+                            .OrderBy(items => items.Key.Label.ToLower() != "total")
+                            .ThenBy(items => items.Key.Label, LabelComparer)
                             .ToDictionary(
                                 itemsGroupedByFilterGroup => itemsGroupedByFilterGroup.Key.Label.PascalCase(),
                                 itemsGroupedByFilterGroup => BuildFilterItemsViewModel(itemsGroupedByFilterGroup.Key,
@@ -119,7 +120,8 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Services
             {
                 Label = filterGroup.Label,
                 Options = filterItems
-                    .OrderBy(item => item.Label, LabelComparer)
+                    .OrderBy(item => item.Label.ToLower() != "total")
+                    .ThenBy(item => item.Label, LabelComparer)
                     .Select(item => new LabelValue
                 {
                     Label = item.Label,
