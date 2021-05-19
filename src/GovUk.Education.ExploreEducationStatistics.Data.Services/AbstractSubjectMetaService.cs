@@ -120,7 +120,8 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Services
             {
                 Label = filterGroup.Label,
                 Options = filterItems
-                    .OrderBy(item => item.Label.ToLower() != "total").ThenBy(item => item.Label, LabelComparer)
+                    .OrderBy(item => item.Label.ToLower() != "total")
+                    .ThenBy(item => item.Label, LabelComparer)
                     .Select(item => new LabelValue
                 {
                     Label = item.Label,
