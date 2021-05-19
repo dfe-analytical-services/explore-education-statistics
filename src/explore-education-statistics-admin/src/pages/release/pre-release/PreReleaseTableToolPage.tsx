@@ -109,9 +109,9 @@ const PreReleaseTableToolPage = ({
       <LoadingSpinner loading={isLoading}>
         {tableToolState && (
           <TableToolWizard
-            scrollOnMount
-            hidePublicationSelectionStage
             themeMeta={[]}
+            hidePublicationSelectionStage
+            scrollOnMount
             initialState={tableToolState}
             renderHighlightLink={highlight => (
               <Link
