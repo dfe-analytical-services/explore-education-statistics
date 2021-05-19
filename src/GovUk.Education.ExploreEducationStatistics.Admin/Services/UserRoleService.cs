@@ -188,6 +188,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Services
                     return await _contentDbContext.UserPublicationRoles
                         .Include(userPublicationRole => userPublicationRole.Publication)
                         .Where(userPublicationRole => userPublicationRole.UserId == userId)
+                        .OrderBy(userPublicationRole => userPublicationRole.Publication.Title)
                         .Select(userPublicationRole => new UserPublicationRoleViewModel
                         {
                             Id = userPublicationRole.Id,
@@ -214,6 +215,9 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Services
                     var latestReleaseRoles = allReleaseRoles
                         .Where(userReleaseRole => userReleaseRole.Release.Publication.IsLatestVersionOfRelease(
                             userReleaseRole.Release.Id))
+                        .OrderBy(userReleaseRole => userReleaseRole.Release.Publication.Title)
+                        .ThenBy(userReleaseRole => userReleaseRole.Release.Year)
+                        .ThenBy(userReleaseRole => userReleaseRole.Release.TimePeriodCoverage)
                         .ToList();
                         
                     return latestReleaseRoles.Select(userReleaseRole => new UserReleaseRoleViewModel 
@@ -223,8 +227,6 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Services
                             Release = userReleaseRole.Release.Title,
                             Role = userReleaseRole.Role
                         })
-                        .OrderBy(viewModel => viewModel.Publication)
-                        .ThenBy(viewModel => viewModel.Release)
                         .ToList();
                 });
         }
@@ -235,12 +237,6 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Services
                 .CheckCanManageAllUsers()
                 .OnSuccess(async () =>
                 {
-                    var x = await _usersAndRolesPersistenceHelper
-                        .CheckEntityExists<ApplicationUser, string>(userId);
-
-                    var y = await _usersAndRolesPersistenceHelper
-                        .CheckEntityExists<IdentityRole, string>(roleId);
-
                     return await _usersAndRolesPersistenceHelper
                         .CheckEntityExists<ApplicationUser, string>(userId)
                         .OnSuccessCombineWith(user =>_usersAndRolesPersistenceHelper

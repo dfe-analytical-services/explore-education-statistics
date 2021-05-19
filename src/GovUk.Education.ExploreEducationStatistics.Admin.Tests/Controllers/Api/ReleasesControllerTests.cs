@@ -263,11 +263,17 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Controllers.Api
             Mock<UserManager<ApplicationUser>> UserManager,
             Mock<IDataImportService> ImportService) Mocks()
         {
+            var user = new ApplicationUser
+            {
+                Id = Guid.NewGuid().ToString(),
+                Email = "test@example.com"
+            };
+
             return (new Mock<IReleaseService>(),
                     new Mock<IReleaseDataFileService>(),
                     new Mock<IReleaseStatusService>(),
                     new Mock<IReleaseChecklistService>(),
-                    MockUserManager(),
+                    MockUserManager(user),
                     new Mock<IDataImportService>()
                 );
         }

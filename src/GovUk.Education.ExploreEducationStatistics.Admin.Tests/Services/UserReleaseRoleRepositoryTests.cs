@@ -1,9 +1,9 @@
 ﻿using System;
-using System.Linq;
 using System.Threading.Tasks;
 using GovUk.Education.ExploreEducationStatistics.Admin.Services;
 using GovUk.Education.ExploreEducationStatistics.Content.Model;
 using GovUk.Education.ExploreEducationStatistics.Content.Model.Database;
+using Microsoft.EntityFrameworkCore;
 using Xunit;
 using static GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services.DbUtils;
 using static GovUk.Education.ExploreEducationStatistics.Content.Model.ReleaseRole;
@@ -34,7 +34,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
 
             await using (var contentDbContext = InMemoryApplicationDbContext(contentDbContextId))
             {
-                var userReleaseRoles = contentDbContext.UserReleaseRoles.ToList();
+                var userReleaseRoles = await contentDbContext.UserReleaseRoles.ToListAsync();
                 Assert.Single(userReleaseRoles);
 
                 Assert.NotEqual(Guid.Empty, userReleaseRoles[0].Id);
