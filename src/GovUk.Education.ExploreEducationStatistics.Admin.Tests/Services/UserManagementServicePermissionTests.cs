@@ -1,4 +1,5 @@
 using System;
+using System.Threading.Tasks;
 using GovUk.Education.ExploreEducationStatistics.Admin.Areas.Identity.Data;
 using GovUk.Education.ExploreEducationStatistics.Admin.Security;
 using GovUk.Education.ExploreEducationStatistics.Admin.Services;
@@ -17,9 +18,9 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
     public class UserManagementServicePermissionTest
     {
         [Fact]
-        public void ListAllUsers()
+        public async Task ListAllUsers()
         {
-            PolicyCheckBuilder<SecurityPolicies>()
+            await PolicyCheckBuilder<SecurityPolicies>()
                 .ExpectCheckToFail(CanManageUsersOnSystem)
                 .AssertForbidden(async userService =>
                 {
@@ -29,9 +30,9 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
         }
 
         [Fact]
-        public void ListPublications()
+        public async Task ListPublications()
         {
-            PolicyCheckBuilder<SecurityPolicies>()
+            await PolicyCheckBuilder<SecurityPolicies>()
                 .ExpectCheckToFail(CanManageUsersOnSystem)
                 .AssertForbidden(async userService =>
                 {
@@ -41,9 +42,9 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
         }
 
         [Fact]
-        public void ListReleases()
+        public async Task ListReleases()
         {
-            PolicyCheckBuilder<SecurityPolicies>()
+            await PolicyCheckBuilder<SecurityPolicies>()
                 .ExpectCheckToFail(CanManageUsersOnSystem)
                 .AssertForbidden(async userService =>
                 {
@@ -53,9 +54,9 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
         }
 
         [Fact]
-        public void ListRoles()
+        public async Task ListRoles()
         {
-            PolicyCheckBuilder<SecurityPolicies>()
+            await PolicyCheckBuilder<SecurityPolicies>()
                 .ExpectCheckToFail(CanManageUsersOnSystem)
                 .AssertForbidden(async userService =>
                 {
@@ -65,9 +66,9 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
         }
 
         [Fact]
-        public void GetUser()
+        public async Task GetUser()
         {
-            PolicyCheckBuilder<SecurityPolicies>()
+            await PolicyCheckBuilder<SecurityPolicies>()
                 .ExpectCheckToFail(CanManageUsersOnSystem)
                 .AssertForbidden(async userService =>
                     {
@@ -78,9 +79,9 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
         }
 
         [Fact]
-        public void ListPendingInvites()
+        public async Task ListPendingInvites()
         {
-            PolicyCheckBuilder<SecurityPolicies>()
+            await PolicyCheckBuilder<SecurityPolicies>()
                 .ExpectCheckToFail(CanManageUsersOnSystem)
                 .AssertForbidden(async userService =>
                 {
@@ -90,9 +91,9 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
         }
 
         [Fact]
-        public void InviteUser()
+        public async Task InviteUser()
         {
-            PolicyCheckBuilder<SecurityPolicies>()
+            await PolicyCheckBuilder<SecurityPolicies>()
                 .ExpectCheckToFail(CanManageUsersOnSystem)
                 .AssertForbidden(async userService =>
                 {
@@ -105,9 +106,9 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
         }
 
         [Fact]
-        public void CancelInvite()
+        public async Task CancelInvite()
         {
-            PolicyCheckBuilder<SecurityPolicies>()
+            await PolicyCheckBuilder<SecurityPolicies>()
                 .ExpectCheckToFail(CanManageUsersOnSystem)
                 .AssertForbidden(async userService =>
                 {
@@ -117,9 +118,9 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
         }
 
         [Fact]
-        public void UpdateUser()
+        public async Task UpdateUser()
         {
-            PolicyCheckBuilder<SecurityPolicies>()
+            await PolicyCheckBuilder<SecurityPolicies>()
                 .ExpectCheckToFail(CanManageUsersOnSystem)
                 .AssertForbidden(async userService =>
                     {
