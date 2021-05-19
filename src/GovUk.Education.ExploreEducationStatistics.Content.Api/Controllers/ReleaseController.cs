@@ -1,3 +1,4 @@
+using System;
 using System.Net.Mime;
 using System.Threading.Tasks;
 using GovUk.Education.ExploreEducationStatistics.Content.Api.Services.Interfaces;
@@ -55,26 +56,26 @@ namespace GovUk.Education.ExploreEducationStatistics.Content.Api.Controllers
             );
         }
 
-        private async Task<ActionResult<ReleaseViewModel>> GetReleaseViewModel(
+        private Task<ActionResult<ReleaseViewModel>> GetReleaseViewModel(
             string publicationPath,
             string releasePath)
         {
-            var publicationTask = _fileStorageService.GetDeserialized<CachedPublicationViewModel>(publicationPath);
-            var releaseTask = _fileStorageService.GetDeserialized<CachedReleaseViewModel>(releasePath);
-
-            await Task.WhenAll(publicationTask, releaseTask);
-
-            if (releaseTask.Result.IsRight && publicationTask.Result.IsRight)
-            {
-                return new ReleaseViewModel(releaseTask.Result.Right, publicationTask.Result.Right);
-            }
-
-            return NotFound();
+            return CreateFromCachedPublicationAndRelease(publicationPath, releasePath, 
+                (publication, release) => new ReleaseViewModel(release, publication));
         }
         
-        private async Task<ActionResult<ReleaseSummaryViewModel>> GetReleaseSummaryViewModel(
+        private Task<ActionResult<ReleaseSummaryViewModel>> GetReleaseSummaryViewModel(
             string publicationPath,
             string releasePath)
+        {
+            return CreateFromCachedPublicationAndRelease(publicationPath, releasePath, 
+                (publication, release) => new ReleaseSummaryViewModel(release, publication));
+        }
+        
+        private async Task<ActionResult<T>> CreateFromCachedPublicationAndRelease<T>(
+            string publicationPath,
+            string releasePath,
+            Func<CachedPublicationViewModel, CachedReleaseViewModel, T> func)
         {
             var publicationTask = _fileStorageService.GetDeserialized<CachedPublicationViewModel>(publicationPath);
             var releaseTask = _fileStorageService.GetDeserialized<CachedReleaseViewModel>(releasePath);
@@ -83,7 +84,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Content.Api.Controllers
 
             if (releaseTask.Result.IsRight && publicationTask.Result.IsRight)
             {
-                return new ReleaseSummaryViewModel(releaseTask.Result.Right, publicationTask.Result.Right);
+                return func.Invoke(publicationTask.Result.Right, releaseTask.Result.Right);
             }
 
             return NotFound();
