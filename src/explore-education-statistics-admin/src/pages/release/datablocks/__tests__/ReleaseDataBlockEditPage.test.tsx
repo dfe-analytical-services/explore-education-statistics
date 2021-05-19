@@ -171,16 +171,16 @@ describe('ReleaseDataBlockEditPage', () => {
     renderPage();
 
     await waitFor(() => {
-      // expect(
-      //   screen.getByRole('heading', { name: 'Edit data block' }),
-      // ).toBeInTheDocument();
-      //
-      // const tabs = screen.getAllByRole('tab');
-      //
-      // expect(tabs).toHaveLength(3);
-      // expect(tabs[0]).toHaveTextContent('Data source');
-      // expect(tabs[1]).toHaveTextContent('Table');
-      // expect(tabs[2]).toHaveTextContent('Chart');
+      expect(
+        screen.getByRole('heading', { name: 'Edit data block' }),
+      ).toBeInTheDocument();
+
+      const tabs = screen.getAllByRole('tab');
+
+      expect(tabs).toHaveLength(3);
+      expect(tabs[0]).toHaveTextContent('Data source');
+      expect(tabs[1]).toHaveTextContent('Table');
+      expect(tabs[2]).toHaveTextContent('Chart');
     });
   });
 
