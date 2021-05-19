@@ -24,6 +24,7 @@ import parseYearCodeTuple from '@common/modules/table-tool/utils/parseYearCodeTu
 import publicationService from '@common/services/publicationService';
 import tableBuilderService, {
   ReleaseTableDataQuery,
+  SelectedPublication,
   Subject,
   SubjectMeta,
   TableHighlight,
@@ -40,14 +41,7 @@ interface Publication {
 
 export interface InitialTableToolState {
   initialStep: number;
-  selectedRelease?: {
-    id: string;
-    slug: string;
-    latestRelease: boolean;
-  };
-  latestRelease?: {
-    title: string;
-  };
+  selectedPublication?: SelectedPublication;
   subjects?: Subject[];
   highlights?: TableHighlight[];
   subjectMeta?: SubjectMeta;
@@ -72,14 +66,7 @@ export interface FinalStepRenderProps {
     table: FullTable;
     tableHeaders: TableHeadersConfig;
   };
-  selectedRelease?: {
-    id: string;
-    slug: string;
-    latestRelease: boolean;
-  };
-  latestRelease?: {
-    title: string;
-  };
+  selectedPublication?: SelectedPublication;
 }
 
 export interface TableToolWizardProps {
@@ -150,13 +137,16 @@ const TableToolWizard = ({
       draft.highlights = subjectsAndHighlights.highlights;
 
       draft.query.publicationId = selectedPublicationId;
-      draft.selectedRelease = {
-        id: latestRelease.id,
-        latestRelease: latestRelease.latestRelease,
-        slug: latestRelease.slug,
-      };
-      draft.latestRelease = {
-        title: latestRelease.title,
+      draft.selectedPublication = {
+        id: selectedPublicationId,
+        selectedRelease: {
+          id: latestRelease.id,
+          latestData: latestRelease.latestRelease,
+          slug: latestRelease.slug,
+        },
+        latestRelease: {
+          title: latestRelease.title,
+        },
       };
     });
   };
@@ -378,8 +368,7 @@ const TableToolWizard = ({
                 query: state.query,
                 response: state.response,
                 publication,
-                selectedRelease: state.selectedRelease,
-                latestRelease: state.latestRelease,
+                selectedPublication: state.selectedPublication,
               })}
           </Wizard>
 

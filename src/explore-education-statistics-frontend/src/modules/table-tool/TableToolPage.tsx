@@ -8,6 +8,7 @@ import mapTableHeadersConfig from '@common/modules/table-tool/utils/mapTableHead
 import { FastTrackTable } from '@common/services/fastTrackService';
 import publicationService from '@common/services/publicationService';
 import tableBuilderService, {
+  SelectedPublication,
   SubjectMeta,
   SubjectsAndHighlights,
   Theme,
@@ -25,15 +26,7 @@ const TableToolFinalStep = dynamic(
 );
 
 export interface TableToolPageProps {
-  publicationId?: string;
-  initiallySelectedRelease?: {
-    id: string;
-    slug: string;
-    latestRelease: boolean;
-  };
-  initialLatestRelease?: {
-    title: string;
-  };
+  selectedPublication?: SelectedPublication;
   subjectsAndHighlights?: SubjectsAndHighlights;
   fastTrack?: FastTrackTable;
   subjectMeta?: SubjectMeta;
@@ -41,9 +34,7 @@ export interface TableToolPageProps {
 }
 
 const TableToolPage: NextPage<TableToolPageProps> = ({
-  publicationId,
-  initiallySelectedRelease,
-  initialLatestRelease,
+  selectedPublication,
   subjectsAndHighlights: initialSubjectsAndHighlights,
   fastTrack,
   subjectMeta,
@@ -80,10 +71,9 @@ const TableToolPage: NextPage<TableToolPageProps> = ({
         highlights,
         query: {
           ...fastTrack.query,
-          releaseId: fastTrack.releaseId,
+          releaseId: selectedPublication?.selectedRelease.id,
         },
-        selectedRelease: initiallySelectedRelease,
-        latestRelease: initialLatestRelease,
+        selectedPublication,
         subjectMeta,
         response: {
           table: fullTable,
@@ -97,20 +87,17 @@ const TableToolPage: NextPage<TableToolPageProps> = ({
       subjects,
       highlights,
       query: {
-        publicationId,
-        releaseId: initiallySelectedRelease?.id,
+        publicationId: selectedPublication?.id,
+        releaseId: selectedPublication?.selectedRelease.id,
         subjectId: '',
         indicators: [],
         filters: [],
         locations: {},
       },
-      selectedRelease: initiallySelectedRelease,
-      latestRelease: initialLatestRelease,
+      selectedPublication,
     };
   }, [
-    publicationId,
-    initiallySelectedRelease,
-    initialLatestRelease,
+    selectedPublication,
     fastTrack,
     initialSubjectsAndHighlights,
     subjectMeta,
@@ -155,8 +142,7 @@ const TableToolPage: NextPage<TableToolPageProps> = ({
           publication,
           query,
           response,
-          selectedRelease,
-          latestRelease,
+          selectedPublication: selectedPublicationDetails,
         }) => (
           <WizardStep>
             {wizardStepProps => (
@@ -165,14 +151,13 @@ const TableToolPage: NextPage<TableToolPageProps> = ({
                   Explore data
                 </WizardStepHeading>
 
-                {response && query && selectedRelease && latestRelease && (
+                {response && query && selectedPublicationDetails && (
                   <TableToolFinalStep
                     publication={publication}
                     query={query}
                     table={response.table}
                     tableHeaders={response.tableHeaders}
-                    selectedRelease={selectedRelease}
-                    latestRelease={latestRelease}
+                    selectedPublication={selectedPublicationDetails}
                   />
                 )}
               </>
@@ -238,14 +223,16 @@ export const getServerSideProps: GetServerSideProps<TableToolPageProps> = async 
   return {
     props: {
       themeMeta,
-      publicationId,
-      initiallySelectedRelease: {
-        id: selectedRelease.id,
-        latestRelease: selectedRelease.latestRelease,
-        slug: selectedRelease.slug,
-      },
-      initialLatestRelease: {
-        title: latestRelease.title,
+      selectedPublication: {
+        id: publicationId,
+        selectedRelease: {
+          id: selectedRelease.id,
+          latestData: selectedRelease.latestRelease,
+          slug: selectedRelease.slug,
+        },
+        latestRelease: {
+          title: latestRelease.title,
+        },
       },
       subjectsAndHighlights,
     },

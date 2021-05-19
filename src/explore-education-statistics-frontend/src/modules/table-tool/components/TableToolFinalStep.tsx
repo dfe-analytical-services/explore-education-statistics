@@ -11,7 +11,10 @@ import { TableHeadersConfig } from '@common/modules/table-tool/types/tableHeader
 import mapUnmappedTableHeaders from '@common/modules/table-tool/utils/mapUnmappedTableHeaders';
 import permalinkService from '@common/services/permalinkService';
 import publicationService from '@common/services/publicationService';
-import { TableDataQuery } from '@common/services/tableBuilderService';
+import {
+  SelectedPublication,
+  TableDataQuery,
+} from '@common/services/tableBuilderService';
 import Link from '@frontend/components/Link';
 import React, { memo, useEffect, useRef, useState } from 'react';
 import DownloadCsvButton from '@common/modules/table-tool/components/DownloadCsvButton';
@@ -23,14 +26,7 @@ interface TableToolFinalStepProps {
   query: TableDataQuery;
   table: FullTable;
   tableHeaders: TableHeadersConfig;
-  selectedRelease: {
-    id: string;
-    slug: string;
-    latestRelease: boolean;
-  };
-  latestRelease: {
-    title: string;
-  };
+  selectedPublication: SelectedPublication;
 }
 
 const TableToolFinalStep = ({
@@ -38,8 +34,7 @@ const TableToolFinalStep = ({
   tableHeaders,
   publication,
   query,
-  selectedRelease,
-  latestRelease,
+  selectedPublication,
 }: TableToolFinalStepProps) => {
   const dataTableRef = useRef<HTMLElement>(null);
   const [permalinkId, setPermalinkId] = useState<string>('');
@@ -73,7 +68,7 @@ const TableToolFinalStep = ({
           tableHeaders: mapUnmappedTableHeaders(currentTableHeaders),
         },
       },
-      selectedRelease.id,
+      selectedPublication.selectedRelease.id,
     );
 
     setPermalinkId(id);
@@ -101,34 +96,32 @@ const TableToolFinalStep = ({
       {table && currentTableHeaders && (
         <>
           <div className="govuk-!-margin-bottom-3">
-            {selectedRelease.latestRelease && (
+            {selectedPublication.selectedRelease.latestData && (
               <Tag strong>This is the latest data</Tag>
             )}
 
-            {!selectedRelease.latestRelease &&
-              publication &&
-              latestRelease.title && (
-                <>
-                  <div className="govuk-!-margin-bottom-3">
-                    <Tag strong colour="orange">
-                      This data is not from the latest release
-                    </Tag>
-                  </div>
+            {!selectedPublication.selectedRelease.latestData && publication && (
+              <>
+                <div className="govuk-!-margin-bottom-3">
+                  <Tag strong colour="orange">
+                    This data is not from the latest release
+                  </Tag>
+                </div>
 
-                  <Link
-                    className="dfe-print-hidden"
-                    unvisited
-                    to="/find-statistics/[publication]"
-                    as={`/find-statistics/${publication.slug}`}
-                    testId="View latest data link"
-                  >
-                    View latest data:{' '}
-                    <span className="govuk-!-font-weight-bold">
-                      {latestRelease.title}
-                    </span>
-                  </Link>
-                </>
-              )}
+                <Link
+                  className="dfe-print-hidden"
+                  unvisited
+                  to="/find-statistics/[publication]"
+                  as={`/find-statistics/${publication.slug}`}
+                  testId="View latest data link"
+                >
+                  View latest data:{' '}
+                  <span className="govuk-!-font-weight-bold">
+                    {selectedPublication.latestRelease.title}
+                  </span>
+                </Link>
+              </>
+            )}
           </div>
 
           <TimePeriodDataTable
@@ -186,7 +179,7 @@ const TableToolFinalStep = ({
       {publication && table && (
         <ul className="govuk-list">
           <li>
-            {selectedRelease.latestRelease ? (
+            {selectedPublication.selectedRelease.latestData ? (
               <Link
                 to="/find-statistics/[publication]"
                 as={`/find-statistics/${publication.slug}`}
@@ -196,7 +189,7 @@ const TableToolFinalStep = ({
             ) : (
               <Link
                 to="/find-statistics/[publication]/[releaseSlug]"
-                as={`/find-statistics/${publication.slug}/${selectedRelease.slug}`}
+                as={`/find-statistics/${publication.slug}/${selectedPublication.selectedRelease.slug}`}
               >
                 View the release for this data
               </Link>

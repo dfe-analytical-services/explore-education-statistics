@@ -6,6 +6,9 @@ export type FastTrackTable = ConfiguredTable & {
   query: TableDataQuery & {
     publicationId: string;
   };
+};
+
+export type FastTrackTableAndReleaseMeta = FastTrackTable & {
   releaseId: string;
   releaseSlug: string;
   latestData: boolean;
@@ -13,7 +16,9 @@ export type FastTrackTable = ConfiguredTable & {
 };
 
 const fastTrackService = {
-  getFastTrackTable(id: string): Promise<FastTrackTable> {
+  getFastTrackTableAndReleaseMeta(
+    id: string,
+  ): Promise<FastTrackTableAndReleaseMeta> {
     return dataApi.get(`/fasttrack/${id}`);
   },
 };

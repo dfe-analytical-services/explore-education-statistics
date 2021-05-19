@@ -14,7 +14,7 @@ export const getServerSideProps: GetServerSideProps<TableToolPageProps> = async 
   const { fastTrackId } = query as Dictionary<string>;
 
   const [fastTrack, themeMeta] = await Promise.all([
-    fastTrackService.getFastTrackTable(fastTrackId),
+    fastTrackService.getFastTrackTableAndReleaseMeta(fastTrackId),
     tableBuilderService.getThemes(),
   ]);
 
@@ -37,15 +37,17 @@ export const getServerSideProps: GetServerSideProps<TableToolPageProps> = async 
 
   return {
     props: {
-      publicationId: fastTrack.query.publicationId,
       fastTrack,
-      initiallySelectedRelease: {
-        id: fastTrack.releaseId,
-        slug: fastTrack.releaseSlug,
-        latestRelease: fastTrack.latestData,
-      },
-      initialLatestRelease: {
-        title: fastTrack.latestReleaseTitle,
+      selectedPublication: {
+        id: fastTrack.query.publicationId,
+        selectedRelease: {
+          id: fastTrack.releaseId,
+          slug: fastTrack.releaseSlug,
+          latestData: fastTrack.latestData,
+        },
+        latestRelease: {
+          title: fastTrack.latestReleaseTitle,
+        },
       },
       subjectMeta,
       subjectsAndHighlights,

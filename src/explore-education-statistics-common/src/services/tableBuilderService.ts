@@ -180,6 +180,18 @@ export interface TableDataResponse {
   subjectMeta: TableDataSubjectMeta;
 }
 
+export interface SelectedPublication {
+  id: string;
+  selectedRelease: {
+    id: string;
+    slug: string;
+    latestData: boolean;
+  };
+  latestRelease: {
+    title: string;
+  };
+}
+
 const tableBuilderService = {
   getThemes(): Promise<Theme[]> {
     return dataApi.get('/themes');

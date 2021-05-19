@@ -215,6 +215,30 @@ describe('TableToolFinalStep', () => {
     ],
   };
 
+  const testSelectedPublicationWithLatestRelease = {
+    id: testPublication.id,
+    selectedRelease: {
+      id: 'latest-release-id',
+      latestData: true,
+      slug: 'latest-release-slug',
+    },
+    latestRelease: {
+      title: 'Latest Release Title',
+    },
+  };
+
+  const testSelectedPublicationWithNonLatestRelease = {
+    id: testPublication.id,
+    selectedRelease: {
+      id: 'selected-release-id',
+      latestData: false,
+      slug: 'selected-release-slug',
+    },
+    latestRelease: {
+      title: 'Latest Release Title',
+    },
+  };
+
   test('renders the final step successfully', async () => {
     render(
       <TableToolFinalStep
@@ -222,13 +246,16 @@ describe('TableToolFinalStep', () => {
         query={testQuery}
         table={testTable}
         tableHeaders={testTableHeaders}
-        selectedRelease={{
-          id: 'latest-release-id',
-          latestRelease: true,
-          slug: 'latest-release-slug',
-        }}
-        latestRelease={{
-          title: 'Latest Release Title',
+        selectedPublication={{
+          id: testPublication.id,
+          selectedRelease: {
+            id: 'latest-release-id',
+            latestData: true,
+            slug: 'latest-release-slug',
+          },
+          latestRelease: {
+            title: 'Latest Release Title',
+          },
         }}
       />,
     );
@@ -287,14 +314,7 @@ describe('TableToolFinalStep', () => {
         query={testQuery}
         table={testTable}
         tableHeaders={testTableHeaders}
-        selectedRelease={{
-          id: 'latest-release-id',
-          latestRelease: true,
-          slug: 'latest-release-slug',
-        }}
-        latestRelease={{
-          title: 'Latest Release Title',
-        }}
+        selectedPublication={testSelectedPublicationWithLatestRelease}
       />,
     );
 
@@ -326,14 +346,7 @@ describe('TableToolFinalStep', () => {
         query={testQuery}
         table={testTable}
         tableHeaders={testTableHeaders}
-        selectedRelease={{
-          id: 'selected-release-id',
-          latestRelease: false,
-          slug: 'selected-release-slug',
-        }}
-        latestRelease={{
-          title: 'Latest Release Title',
-        }}
+        selectedPublication={testSelectedPublicationWithNonLatestRelease}
       />,
     );
 
@@ -357,14 +370,7 @@ describe('TableToolFinalStep', () => {
         query={testQuery}
         table={testTable}
         tableHeaders={testTableHeaders}
-        selectedRelease={{
-          id: 'latest-release-id',
-          latestRelease: true,
-          slug: 'latest-release-slug',
-        }}
-        latestRelease={{
-          title: 'Latest Release Title',
-        }}
+        selectedPublication={testSelectedPublicationWithLatestRelease}
       />,
     );
 
@@ -388,14 +394,7 @@ describe('TableToolFinalStep', () => {
         query={testQuery}
         table={testTable}
         tableHeaders={testTableHeaders}
-        selectedRelease={{
-          id: 'latest-release-id',
-          latestRelease: true,
-          slug: 'latest-release-slug',
-        }}
-        latestRelease={{
-          title: 'Latest Release Title',
-        }}
+        selectedPublication={testSelectedPublicationWithLatestRelease}
       />,
     );
 
@@ -419,14 +418,7 @@ describe('TableToolFinalStep', () => {
         query={testQuery}
         table={testTable}
         tableHeaders={testTableHeaders}
-        selectedRelease={{
-          id: 'selected-release-id',
-          latestRelease: false,
-          slug: 'selected-release-slug',
-        }}
-        latestRelease={{
-          title: 'Latest Release Title',
-        }}
+        selectedPublication={testSelectedPublicationWithNonLatestRelease}
       />,
     );
 

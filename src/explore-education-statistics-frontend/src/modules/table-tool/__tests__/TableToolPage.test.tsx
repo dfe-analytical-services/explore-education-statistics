@@ -139,10 +139,6 @@ describe('TableToolPage', () => {
       locations: { country: ['K03000001'] },
       includeGeoJson: false,
     },
-    releaseId: testReleaseId,
-    releaseSlug: '2000-01',
-    latestData: true,
-    latestReleaseTitle: 'Tax Year 2018/2019',
   };
 
   const testPublicationSubjectsAndHighlights: SubjectsAndHighlights = {
@@ -302,6 +298,30 @@ describe('TableToolPage', () => {
     },
   ];
 
+  const testSelectedPublicationWithLatestRelease = {
+    id: testPublicationId,
+    selectedRelease: {
+      id: 'latest-release-id',
+      latestData: true,
+      slug: 'latest-release-slug',
+    },
+    latestRelease: {
+      title: 'Latest Release Title',
+    },
+  };
+
+  const testSelectedPublicationWithNonLatestRelease = {
+    id: testPublicationId,
+    selectedRelease: {
+      id: 'selected-release-id',
+      latestData: false,
+      slug: 'selected-release-slug',
+    },
+    latestRelease: {
+      title: 'Latest Release Title',
+    },
+  };
+
   beforeEach(preloadAll);
 
   test('renders the Table Tool page correctly when Theme metadata is provided, giving the user a choice of Publications', async () => {
@@ -313,15 +333,7 @@ describe('TableToolPage', () => {
   test('renders the Table Tool page correctly when Publication is chosen, giving the user a choice of Subjects', async () => {
     render(
       <TableToolPage
-        publicationId={testPublicationId}
-        initiallySelectedRelease={{
-          id: testReleaseId,
-          latestRelease: true,
-          slug: 'latest-release-slug',
-        }}
-        initialLatestRelease={{
-          title: 'Latest Release Title',
-        }}
+        selectedPublication={testSelectedPublicationWithLatestRelease}
         subjectsAndHighlights={testPublicationSubjectsAndHighlights}
         themeMeta={testThemeMeta}
       />,
@@ -333,15 +345,7 @@ describe('TableToolPage', () => {
   test('renders the Table Tool page correctly when a Fast Track is provided, rendering a previously configured table', async () => {
     render(
       <TableToolPage
-        publicationId={testPublicationId}
-        initiallySelectedRelease={{
-          id: testReleaseId,
-          latestRelease: true,
-          slug: 'latest-release-slug',
-        }}
-        initialLatestRelease={{
-          title: 'Latest Release Title',
-        }}
+        selectedPublication={testSelectedPublicationWithLatestRelease}
         subjectsAndHighlights={testPublicationSubjectsAndHighlights}
         themeMeta={testThemeMeta}
         subjectMeta={testSubjectMeta}
@@ -355,19 +359,11 @@ describe('TableToolPage', () => {
   test('renders the Table Tool page correctly when a Fast Track is provided and this is the latest data', async () => {
     render(
       <TableToolPage
-        publicationId={testPublicationId}
+        selectedPublication={testSelectedPublicationWithLatestRelease}
         subjectsAndHighlights={testPublicationSubjectsAndHighlights}
         themeMeta={testThemeMeta}
         subjectMeta={testSubjectMeta}
         fastTrack={testFastTrack}
-        initiallySelectedRelease={{
-          id: testReleaseId,
-          latestRelease: true,
-          slug: 'latest-release-slug',
-        }}
-        initialLatestRelease={{
-          title: 'Latest Release Title',
-        }}
       />,
     );
 
@@ -385,23 +381,11 @@ describe('TableToolPage', () => {
   test('renders the Table Tool page correctly when a Fast Track is provided and this is not the latest data', async () => {
     render(
       <TableToolPage
-        publicationId={testPublicationId}
+        selectedPublication={testSelectedPublicationWithNonLatestRelease}
         subjectsAndHighlights={testPublicationSubjectsAndHighlights}
         themeMeta={testThemeMeta}
         subjectMeta={testSubjectMeta}
-        fastTrack={{
-          ...testFastTrack,
-          latestData: false,
-          latestReleaseTitle: 'Tax Year 2019/2020',
-        }}
-        initiallySelectedRelease={{
-          id: testReleaseId,
-          latestRelease: false,
-          slug: 'selected-release-slug',
-        }}
-        initialLatestRelease={{
-          title: 'Tax Year 2019/2020',
-        }}
+        fastTrack={testFastTrack}
       />,
     );
 
@@ -420,7 +404,7 @@ describe('TableToolPage', () => {
       'http://localhost/find-statistics/test-publication',
     );
     expect(latestDataLink.text).toContain('View latest data');
-    expect(latestDataLink.text).toContain('Tax Year 2019/2020');
+    expect(latestDataLink.text).toContain('Latest Release Title');
 
     expect(screen.getByRole('main')).toMatchSnapshot();
   });
