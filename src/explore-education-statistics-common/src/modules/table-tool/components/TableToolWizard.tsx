@@ -33,12 +33,6 @@ import tableBuilderService, {
 import React, { ReactElement, ReactNode, useMemo } from 'react';
 import { useImmer } from 'use-immer';
 
-interface Publication {
-  id: string;
-  title: string;
-  slug: string;
-}
-
 export interface InitialTableToolState {
   initialStep: number;
   selectedPublication?: SelectedPublication;
@@ -60,7 +54,6 @@ interface TableToolState extends InitialTableToolState {
 }
 
 export interface FinalStepRenderProps {
-  publication?: Publication;
   query?: ReleaseTableDataQuery;
   response?: {
     table: FullTable;
@@ -113,16 +106,10 @@ const TableToolWizard = ({
     ...initialState,
   });
 
-  const publication = useMemo<Publication | undefined>(() => {
-    return themeMeta
-      .flatMap(option => option.topics)
-      .flatMap(option => option.publications)
-      .find(option => option.id === state.query.publicationId);
-  }, [state.query.publicationId, themeMeta]);
-
   const handlePublicationFormSubmit: PublicationFormSubmitHandler = async ({
     publicationId: selectedPublicationId,
     publicationSlug,
+    publicationTitle,
   }) => {
     const subjectsAndHighlights = await tableBuilderService.getPublicationSubjectsAndHighlights(
       selectedPublicationId,
@@ -139,6 +126,8 @@ const TableToolWizard = ({
       draft.query.publicationId = selectedPublicationId;
       draft.selectedPublication = {
         id: selectedPublicationId,
+        slug: publicationSlug,
+        title: publicationTitle,
         selectedRelease: {
           id: latestRelease.id,
           latestData: latestRelease.latestRelease,
@@ -367,7 +356,6 @@ const TableToolWizard = ({
               finalStep({
                 query: state.query,
                 response: state.response,
-                publication,
                 selectedPublication: state.selectedPublication,
               })}
           </Wizard>

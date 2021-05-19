@@ -1,20 +1,18 @@
 import { FastTrackTable } from '@common/services/fastTrackService';
 import {
-  SubjectsAndHighlights,
   SubjectMeta,
+  SubjectsAndHighlights,
   Theme,
 } from '@common/services/tableBuilderService';
 import { render, screen } from '@testing-library/react';
-import React from 'react';
 // eslint-disable-next-line @typescript-eslint/ban-ts-comment
 // @ts-ignore
 import preloadAll from 'jest-next-dynamic';
 import TableToolPage from '@frontend/modules/table-tool/TableToolPage';
+import React from 'react';
 
 describe('TableToolPage', () => {
   const testPublicationId = '536154f5-7f82-4dc7-060a-08d9097c1945';
-
-  const testReleaseId = '47a39fb5-1fed-4820-8906-5b54192524d7';
 
   const testFastTrack: FastTrackTable = {
     id: 'a08bd50a-7814-4e43-b152-2f7464d566ff',
@@ -300,6 +298,8 @@ describe('TableToolPage', () => {
 
   const testSelectedPublicationWithLatestRelease = {
     id: testPublicationId,
+    title: 'Test Publication',
+    slug: 'test-publication',
     selectedRelease: {
       id: 'latest-release-id',
       latestData: true,
@@ -312,6 +312,8 @@ describe('TableToolPage', () => {
 
   const testSelectedPublicationWithNonLatestRelease = {
     id: testPublicationId,
+    title: 'Test Publication',
+    slug: 'test-publication',
     selectedRelease: {
       id: 'selected-release-id',
       latestData: false,

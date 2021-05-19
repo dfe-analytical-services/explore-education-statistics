@@ -182,6 +182,8 @@ export interface TableDataResponse {
 
 export interface SelectedPublication {
   id: string;
+  title: string;
+  slug: string;
   selectedRelease: {
     id: string;
     slug: string;

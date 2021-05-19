@@ -398,9 +398,11 @@ describe('PublicationForm', () => {
 
     const expected: PublicationFormValues & {
       publicationSlug: string;
+      publicationTitle: string;
     } = {
       publicationId: 'publication-5',
       publicationSlug: 'pupil-absence-in-schools-in-england',
+      publicationTitle: 'Pupil absence in schools in England',
     };
 
     await waitFor(() => {

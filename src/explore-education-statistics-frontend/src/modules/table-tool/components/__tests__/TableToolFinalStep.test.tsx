@@ -15,12 +15,6 @@ import React from 'react';
 import userEvent from '@testing-library/user-event';
 
 describe('TableToolFinalStep', () => {
-  const testPublication: FinalStepRenderProps['publication'] = {
-    id: '536154f5-7f82-4dc7-060a-08d9097c1945',
-    title: 'Test publication',
-    slug: 'test-publication',
-  };
-
   const testQuery: TableDataQuery = {
     publicationId: '536154f5-7f82-4dc7-060a-08d9097c1945',
     subjectId: '1f1b1780-a607-454e-b331-08d9097c40f5',
@@ -216,7 +210,9 @@ describe('TableToolFinalStep', () => {
   };
 
   const testSelectedPublicationWithLatestRelease = {
-    id: testPublication.id,
+    id: '536154f5-7f82-4dc7-060a-08d9097c1945',
+    title: 'Test publication',
+    slug: 'test-publication',
     selectedRelease: {
       id: 'latest-release-id',
       latestData: true,
@@ -228,7 +224,9 @@ describe('TableToolFinalStep', () => {
   };
 
   const testSelectedPublicationWithNonLatestRelease = {
-    id: testPublication.id,
+    id: '536154f5-7f82-4dc7-060a-08d9097c1945',
+    title: 'Test publication',
+    slug: 'test-publication',
     selectedRelease: {
       id: 'selected-release-id',
       latestData: false,
@@ -242,21 +240,10 @@ describe('TableToolFinalStep', () => {
   test('renders the final step successfully', async () => {
     render(
       <TableToolFinalStep
-        publication={testPublication}
         query={testQuery}
         table={testTable}
         tableHeaders={testTableHeaders}
-        selectedPublication={{
-          id: testPublication.id,
-          selectedRelease: {
-            id: 'latest-release-id',
-            latestData: true,
-            slug: 'latest-release-slug',
-          },
-          latestRelease: {
-            title: 'Latest Release Title',
-          },
-        }}
+        selectedPublication={testSelectedPublicationWithLatestRelease}
       />,
     );
 
@@ -310,7 +297,6 @@ describe('TableToolFinalStep', () => {
   test('shows and hides table header re-ordering controls successfully', async () => {
     render(
       <TableToolFinalStep
-        publication={testPublication}
         query={testQuery}
         table={testTable}
         tableHeaders={testTableHeaders}
@@ -342,7 +328,6 @@ describe('TableToolFinalStep', () => {
   test(`renders the 'View the release for this data' URL with the Release's slug, if the selected Release is not the latest for the Publication`, async () => {
     render(
       <TableToolFinalStep
-        publication={testPublication}
         query={testQuery}
         table={testTable}
         tableHeaders={testTableHeaders}
@@ -366,7 +351,6 @@ describe('TableToolFinalStep', () => {
   test(`renders the 'View the release for this data' URL with only the Publication slug, if the selected Release is the latest Release for that Publication`, async () => {
     render(
       <TableToolFinalStep
-        publication={testPublication}
         query={testQuery}
         table={testTable}
         tableHeaders={testTableHeaders}
@@ -390,7 +374,6 @@ describe('TableToolFinalStep', () => {
   test('renders the Table Tool final step correctly when this is the latest data', async () => {
     render(
       <TableToolFinalStep
-        publication={testPublication}
         query={testQuery}
         table={testTable}
         tableHeaders={testTableHeaders}
@@ -414,7 +397,6 @@ describe('TableToolFinalStep', () => {
   test(`renders the Table Tool final step correctly if this is not the latest data`, async () => {
     render(
       <TableToolFinalStep
-        publication={testPublication}
         query={testQuery}
         table={testTable}
         tableHeaders={testTableHeaders}

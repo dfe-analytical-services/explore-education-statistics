@@ -139,7 +139,6 @@ const TableToolPage: NextPage<TableToolPageProps> = ({
           </Link>
         )}
         finalStep={({
-          publication,
           query,
           response,
           selectedPublication: selectedPublicationDetails,
@@ -153,7 +152,6 @@ const TableToolPage: NextPage<TableToolPageProps> = ({
 
                 {response && query && selectedPublicationDetails && (
                   <TableToolFinalStep
-                    publication={publication}
                     query={query}
                     table={response.table}
                     tableHeaders={response.tableHeaders}
@@ -190,13 +188,12 @@ export const getServerSideProps: GetServerSideProps<TableToolPageProps> = async 
 
   const themeMeta = await tableBuilderService.getThemes();
 
-  const publicationId =
-    themeMeta
-      .flatMap(option => option.topics)
-      .flatMap(option => option.publications)
-      .find(option => option.slug === publicationSlug)?.id ?? '';
+  const selectedPublication = themeMeta
+    .flatMap(option => option.topics)
+    .flatMap(option => option.publications)
+    .find(option => option.slug === publicationSlug);
 
-  if (!publicationId) {
+  if (!selectedPublication) {
     return {
       props: {
         themeMeta,
@@ -224,7 +221,9 @@ export const getServerSideProps: GetServerSideProps<TableToolPageProps> = async 
     props: {
       themeMeta,
       selectedPublication: {
-        id: publicationId,
+        id: selectedPublication.id,
+        slug: selectedPublication.slug,
+        title: selectedPublication.title,
         selectedRelease: {
           id: selectedRelease.id,
           latestData: selectedRelease.latestRelease,

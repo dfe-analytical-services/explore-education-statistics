@@ -24,6 +24,7 @@ export interface PublicationFormValues {
 export type PublicationFormSubmitHandler = (
   values: PublicationFormValues & {
     publicationSlug: string;
+    publicationTitle: string;
   },
 ) => void;
 
@@ -80,6 +81,7 @@ const PublicationForm = (props: Props & InjectedWizardProps) => {
         await onSubmit({
           publicationId,
           publicationSlug: selectedPublication.slug,
+          publicationTitle: selectedPublication.title,
         });
 
         goToNextStep();

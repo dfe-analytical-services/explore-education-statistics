@@ -1,10 +1,11 @@
 import ButtonText from '@common/components/ButtonText';
+import LoadingSpinner from '@common/components/LoadingSpinner';
 import Tag from '@common/components/Tag';
 import UrlContainer from '@common/components/UrlContainer';
-import LoadingSpinner from '@common/components/LoadingSpinner';
 import useAsyncRetry from '@common/hooks/useAsyncRetry';
+import DownloadCsvButton from '@common/modules/table-tool/components/DownloadCsvButton';
+import DownloadExcelButton from '@common/modules/table-tool/components/DownloadExcelButton';
 import TableHeadersForm from '@common/modules/table-tool/components/TableHeadersForm';
-import { FinalStepRenderProps } from '@common/modules/table-tool/components/TableToolWizard';
 import TimePeriodDataTable from '@common/modules/table-tool/components/TimePeriodDataTable';
 import { FullTable } from '@common/modules/table-tool/types/fullTable';
 import { TableHeadersConfig } from '@common/modules/table-tool/types/tableHeaders';
@@ -16,13 +17,10 @@ import {
   TableDataQuery,
 } from '@common/services/tableBuilderService';
 import Link from '@frontend/components/Link';
-import React, { memo, useEffect, useRef, useState } from 'react';
-import DownloadCsvButton from '@common/modules/table-tool/components/DownloadCsvButton';
 import { logEvent } from '@frontend/services/googleAnalyticsService';
-import DownloadExcelButton from '@common/modules/table-tool/components/DownloadExcelButton';
+import React, { memo, useEffect, useRef, useState } from 'react';
 
 interface TableToolFinalStepProps {
-  publication: FinalStepRenderProps['publication'];
   query: TableDataQuery;
   table: FullTable;
   tableHeaders: TableHeadersConfig;
@@ -32,7 +30,6 @@ interface TableToolFinalStepProps {
 const TableToolFinalStep = ({
   table,
   tableHeaders,
-  publication,
   query,
   selectedPublication,
 }: TableToolFinalStepProps) => {
@@ -48,12 +45,11 @@ const TableToolFinalStep = ({
     setPermalinkId('');
   }, [tableHeaders]);
 
-  const { value: pubMethodology } = useAsyncRetry(async () => {
-    if (publication) {
-      return publicationService.getPublicationMethodology(publication.slug);
-    }
-    return undefined;
-  }, [publication]);
+  const { value: pubMethodology } = useAsyncRetry(
+    async () =>
+      publicationService.getPublicationMethodology(selectedPublication.slug),
+    [selectedPublication],
+  );
 
   const handlePermalinkClick = async () => {
     if (!currentTableHeaders) {
@@ -100,7 +96,7 @@ const TableToolFinalStep = ({
               <Tag strong>This is the latest data</Tag>
             )}
 
-            {!selectedPublication.selectedRelease.latestData && publication && (
+            {!selectedPublication.selectedRelease.latestData && (
               <>
                 <div className="govuk-!-margin-bottom-3">
                   <Tag strong colour="orange">
@@ -112,7 +108,7 @@ const TableToolFinalStep = ({
                   className="dfe-print-hidden"
                   unvisited
                   to="/find-statistics/[publication]"
-                  as={`/find-statistics/${publication.slug}`}
+                  as={`/find-statistics/${selectedPublication.slug}`}
                   testId="View latest data link"
                 >
                   View latest data:{' '}
@@ -176,20 +172,20 @@ const TableToolFinalStep = ({
       </ul>
 
       <h3>Additional options</h3>
-      {publication && table && (
+      {table && (
         <ul className="govuk-list">
           <li>
             {selectedPublication.selectedRelease.latestData ? (
               <Link
                 to="/find-statistics/[publication]"
-                as={`/find-statistics/${publication.slug}`}
+                as={`/find-statistics/${selectedPublication.slug}`}
               >
                 View the release for this data
               </Link>
             ) : (
               <Link
                 to="/find-statistics/[publication]/[releaseSlug]"
-                as={`/find-statistics/${publication.slug}/${selectedPublication.selectedRelease.slug}`}
+                as={`/find-statistics/${selectedPublication.slug}/${selectedPublication.selectedRelease.slug}`}
               >
                 View the release for this data
               </Link>
@@ -197,7 +193,7 @@ const TableToolFinalStep = ({
           </li>
           <li>
             <DownloadCsvButton
-              fileName={`data-${publication.slug}`}
+              fileName={`data-${selectedPublication.slug}`}
               fullTable={table}
               onClick={() =>
                 logEvent({
@@ -216,7 +212,7 @@ const TableToolFinalStep = ({
           </li>
           <li>
             <DownloadExcelButton
-              fileName={`data-${publication.slug}`}
+              fileName={`data-${selectedPublication.slug}`}
               tableRef={dataTableRef}
               subjectMeta={table.subjectMeta}
               onClick={() =>

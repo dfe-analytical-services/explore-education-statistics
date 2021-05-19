@@ -30,6 +30,17 @@ export const getServerSideProps: GetServerSideProps<TableToolPageProps> = async 
     throw new Error('Fast track table does not have `query.subjectId`');
   }
 
+  const selectedPublication = themeMeta
+    .flatMap(option => option.topics)
+    .flatMap(option => option.publications)
+    .find(option => option.id === fastTrack.query.publicationId);
+
+  if (!selectedPublication) {
+    throw new Error(
+      'Fast track `query.publicationId` is not found in the themeMeta list',
+    );
+  }
+
   const [subjectsAndHighlights, subjectMeta] = await Promise.all([
     tableBuilderService.getReleaseSubjectsAndHighlights(fastTrack.releaseId),
     tableBuilderService.getSubjectMeta(fastTrack.query.subjectId),
@@ -39,7 +50,9 @@ export const getServerSideProps: GetServerSideProps<TableToolPageProps> = async 
     props: {
       fastTrack,
       selectedPublication: {
-        id: fastTrack.query.publicationId,
+        id: selectedPublication.id,
+        title: selectedPublication.title,
+        slug: selectedPublication.slug,
         selectedRelease: {
           id: fastTrack.releaseId,
           slug: fastTrack.releaseSlug,
