@@ -15,7 +15,9 @@ using Microsoft.EntityFrameworkCore;
 using Moq;
 using Xunit;
 using static GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services.DbUtils;
+using static GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services.ValidationTestUtil;
 using static GovUk.Education.ExploreEducationStatistics.Admin.Tests.Utils.AdminMockUtils;
+using static GovUk.Education.ExploreEducationStatistics.Admin.Validators.ValidationErrorMessages;
 using static GovUk.Education.ExploreEducationStatistics.Common.Model.TimeIdentifier;
 using static GovUk.Education.ExploreEducationStatistics.Common.Tests.Utils.MockUtils;
 using static GovUk.Education.ExploreEducationStatistics.Content.Model.PublicationRole;
@@ -149,8 +151,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
 
             var user = new ApplicationUser
             {
-                Id = userId.ToString(),
-                Email = "test@test.com"
+                Id = userId.ToString()
             };
 
             var publication = new Publication();
@@ -209,6 +210,65 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
         }
 
         [Fact]
+        public async Task AddPublicationRole_UserAlreadyHasRole()
+        {
+            var userId = Guid.NewGuid();
+
+            var user = new ApplicationUser
+            {
+                Id = userId.ToString()
+            };
+
+            var publication = new Publication();
+
+            var userPublicationRole = new UserPublicationRole
+            {
+                UserId = userId,
+                Publication = publication,
+                Role = Owner
+            };
+
+            var userAndRolesDbContextId = Guid.NewGuid().ToString();
+            var contentDbContextId = Guid.NewGuid().ToString();
+
+            await using (var userAndRolesDbContext = InMemoryUserAndRolesDbContext(userAndRolesDbContextId))
+            await using (var contentDbContext = InMemoryApplicationDbContext(contentDbContextId))
+            {
+                await userAndRolesDbContext.AddAsync(user);
+                await userAndRolesDbContext.SaveChangesAsync();
+
+                await contentDbContext.Publications.AddAsync(publication);
+                await contentDbContext.UserPublicationRoles.AddAsync(userPublicationRole);
+                await contentDbContext.SaveChangesAsync();
+            }
+
+            var emailTemplateService = new Mock<IEmailTemplateService>(MockBehavior.Strict);
+
+            await using (var userAndRolesDbContext = InMemoryUserAndRolesDbContext(userAndRolesDbContextId))
+            await using (var contentDbContext = InMemoryApplicationDbContext(contentDbContextId))
+            {
+                var service = SetupUserRoleService(usersAndRolesDbContext: userAndRolesDbContext,
+                    contentDbContext: contentDbContext,
+                    emailTemplateService: emailTemplateService.Object);
+
+                var result = await service.AddPublicationRole(userId, publication.Id, Owner);
+
+                Assert.True(result.IsLeft);
+                AssertValidationProblem(result.Left, UserAlreadyHasResourceRole);
+            }
+
+            await using (var contentDbContext = InMemoryApplicationDbContext(contentDbContextId))
+            {
+                var userPublicationRoles = await contentDbContext.UserPublicationRoles.ToListAsync();
+                Assert.Single(userPublicationRoles);
+
+                Assert.Equal(userPublicationRole.Id, userPublicationRoles[0].Id);
+            }
+
+            VerifyAllMocks(emailTemplateService);
+        }
+
+        [Fact]
         public async Task AddPublicationRole_NoUser()
         {
             var publication = new Publication();
@@ -252,8 +312,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
 
             var user = new ApplicationUser
             {
-                Id = userId.ToString(),
-                Email = "test@test.com"
+                Id = userId.ToString()
             };
 
             var userAndRolesDbContextId = Guid.NewGuid().ToString();
@@ -295,8 +354,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
 
             var user = new ApplicationUser
             {
-                Id = userId.ToString(),
-                Email = "test@test.com"
+                Id = userId.ToString()
             };
 
             var release = new Release
@@ -358,6 +416,68 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
         }
 
         [Fact]
+        public async Task AddReleaseRole_UserAlreadyHasRole()
+        {
+            var userId = Guid.NewGuid();
+
+            var user = new ApplicationUser
+            {
+                Id = userId.ToString()
+            };
+
+            var release = new Release
+            {
+                Publication = new Publication()
+            };
+
+            var userReleaseRole = new UserReleaseRole
+            {
+                UserId = userId,
+                Release = release,
+                Role = Contributor
+            };
+
+            var userAndRolesDbContextId = Guid.NewGuid().ToString();
+            var contentDbContextId = Guid.NewGuid().ToString();
+
+            await using (var userAndRolesDbContext = InMemoryUserAndRolesDbContext(userAndRolesDbContextId))
+            await using (var contentDbContext = InMemoryApplicationDbContext(contentDbContextId))
+            {
+                await userAndRolesDbContext.AddAsync(user);
+                await userAndRolesDbContext.SaveChangesAsync();
+
+                await contentDbContext.Releases.AddAsync(release);
+                await contentDbContext.UserReleaseRoles.AddAsync(userReleaseRole);
+                await contentDbContext.SaveChangesAsync();
+            }
+
+            var emailTemplateService = new Mock<IEmailTemplateService>(MockBehavior.Strict);
+
+            await using (var userAndRolesDbContext = InMemoryUserAndRolesDbContext(userAndRolesDbContextId))
+            await using (var contentDbContext = InMemoryApplicationDbContext(contentDbContextId))
+            {
+                var service = SetupUserRoleService(usersAndRolesDbContext: userAndRolesDbContext,
+                    contentDbContext: contentDbContext,
+                    emailTemplateService: emailTemplateService.Object);
+
+                var result = await service.AddReleaseRole(userId, release.Id, Contributor);
+
+                Assert.True(result.IsLeft);
+                AssertValidationProblem(result.Left, UserAlreadyHasResourceRole);
+            }
+
+            await using (var contentDbContext = InMemoryApplicationDbContext(contentDbContextId))
+            {
+                var userReleaseRoles = await contentDbContext.UserReleaseRoles.ToListAsync();
+                Assert.Single(userReleaseRoles);
+
+                Assert.Equal(userReleaseRole.Id, userReleaseRoles[0].Id);
+            }
+
+            VerifyAllMocks(emailTemplateService);
+        }
+
+        [Fact]
         public async Task AddReleaseRole_NoUser()
         {
             var release = new Release
@@ -404,8 +524,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
 
             var user = new ApplicationUser
             {
-                Id = userId.ToString(),
-                Email = "test@test.com"
+                Id = userId.ToString()
             };
 
             var userAndRolesDbContextId = Guid.NewGuid().ToString();
