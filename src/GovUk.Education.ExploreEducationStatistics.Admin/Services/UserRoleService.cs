@@ -85,7 +85,11 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Services
                         {
                             var (userAndPublication, _) = tuple;
                             var (user, publication) = userAndPublication;
-                            await _userPublicationRoleRepository.Create(userId, publication.Id, role);
+                            await _userPublicationRoleRepository.Create(
+                                userId: userId,
+                                publicationId: publication.Id,
+                                role: role,
+                                createdById: _userService.GetUserId());
                             _emailTemplateService.SendPublicationRoleEmail(user.Email, publication, role);
                         });
                 });
@@ -106,7 +110,10 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Services
                         {
                             var (userAndRelease, _) = tuple;
                             var (user, release) = userAndRelease;
-                            await _userReleaseRoleRepository.Create(userId, release.Id, role);
+                            await _userReleaseRoleRepository.Create(
+                                userId: userId,
+                                releaseId: release.Id,
+                                role: role);
                             _emailTemplateService.SendReleaseRoleEmail(user.Email, release, role);
                         });
                 });

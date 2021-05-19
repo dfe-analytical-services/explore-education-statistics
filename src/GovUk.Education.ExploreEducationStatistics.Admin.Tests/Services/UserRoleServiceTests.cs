@@ -27,6 +27,12 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
 {
     public class UserRoleServiceTests
     {
+        private readonly User _user = new User
+        {
+            Id = Guid.NewGuid(),
+            Email = "test@test.com"
+        };
+
         [Fact]
         public async Task AddGlobalRole()
         {
@@ -204,6 +210,8 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
                 Assert.Equal(userId, userPublicationRoles[0].UserId);
                 Assert.Equal(publication.Id, userPublicationRoles[0].PublicationId);
                 Assert.Equal(Owner, userPublicationRoles[0].Role);
+                Assert.InRange(DateTime.UtcNow.Subtract(userPublicationRoles[0].Created).Milliseconds, 0, 1500);
+                Assert.Equal(_user.Id, userPublicationRoles[0].CreatedById);
             }
 
             VerifyAllMocks(emailTemplateService);
@@ -1094,7 +1102,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
             }
         }
 
-        private static UserRoleService SetupUserRoleService(
+        private UserRoleService SetupUserRoleService(
             ContentDbContext contentDbContext = null,
             UsersAndRolesDbContext usersAndRolesDbContext = null,
             IPersistenceHelper<ContentDbContext> contentPersistenceHelper = null,
@@ -1108,13 +1116,16 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
             contentDbContext ??= InMemoryApplicationDbContext();
             usersAndRolesDbContext ??= InMemoryUserAndRolesDbContext();
 
+            contentDbContext.Users.Add(_user);
+            contentDbContext.SaveChanges();
+
             return new UserRoleService(
                 usersAndRolesDbContext ?? InMemoryUserAndRolesDbContext(),
                 contentDbContext,
                 contentPersistenceHelper ?? new PersistenceHelper<ContentDbContext>(contentDbContext),
                 usersAndRolesPersistenceHelper ?? new PersistenceHelper<UsersAndRolesDbContext>(usersAndRolesDbContext),
                 emailTemplateService ?? new Mock<IEmailTemplateService>().Object,
-                userService ?? AlwaysTrueUserService().Object,
+                userService ?? AlwaysTrueUserService(_user.Id).Object,
                 userPublicationRoleRepository ?? new UserPublicationRoleRepository(contentDbContext),
                 userReleaseRoleRepository ?? new UserReleaseRoleRepository(contentDbContext),
                 userManager ?? MockUserManager().Object);

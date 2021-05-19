@@ -15,20 +15,28 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
         [Fact]
         public async Task Create()
         {
-            var userId = Guid.NewGuid();
-            var releaseId = Guid.NewGuid();
+            var user = new User();
+
+            var release = new Release();
 
             var contentDbContextId = Guid.NewGuid().ToString();
 
             await using (var contentDbContext = InMemoryApplicationDbContext(contentDbContextId))
             {
+                await contentDbContext.Users.AddAsync(user);
+                await contentDbContext.Releases.AddAsync(release);
+                await contentDbContext.SaveChangesAsync();
+            }
+
+            await using (var contentDbContext = InMemoryApplicationDbContext(contentDbContextId))
+            {
                 var service = SetupUserReleaseRoleRepository(contentDbContext);
 
-                var result = await service.Create(userId, releaseId, Contributor);
+                var result = await service.Create(user.Id, release.Id, Contributor);
 
                 Assert.NotEqual(Guid.Empty, result.Id);
-                Assert.Equal(userId, result.UserId);
-                Assert.Equal(releaseId, result.ReleaseId);
+                Assert.Equal(user.Id, result.UserId);
+                Assert.Equal(release.Id, result.ReleaseId);
                 Assert.Equal(Contributor, result.Role);
             }
 
@@ -38,8 +46,8 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
                 Assert.Single(userReleaseRoles);
 
                 Assert.NotEqual(Guid.Empty, userReleaseRoles[0].Id);
-                Assert.Equal(userId, userReleaseRoles[0].UserId);
-                Assert.Equal(releaseId, userReleaseRoles[0].ReleaseId);
+                Assert.Equal(user.Id, userReleaseRoles[0].UserId);
+                Assert.Equal(release.Id, userReleaseRoles[0].ReleaseId);
                 Assert.Equal(Contributor, userReleaseRoles[0].Role);
             }
         }

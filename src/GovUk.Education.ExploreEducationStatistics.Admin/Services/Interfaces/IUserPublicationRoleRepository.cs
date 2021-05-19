@@ -6,8 +6,13 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Services.Interfaces
 {
     public interface IUserPublicationRoleRepository
     {
-        public Task<UserPublicationRole> Create(Guid userId, Guid publicationId, PublicationRole role);
+        public Task<UserPublicationRole> Create(Guid userId,
+            Guid publicationId,
+            PublicationRole role,
+            Guid createdById);
 
-        public Task<UserPublicationRole> GetByRole(Guid userId, Guid publicationId, PublicationRole role);
+        public Task<UserPublicationRole> GetByRole(Guid userId,
+            Guid publicationId,
+            PublicationRole role);
     }
 }

@@ -16,13 +16,18 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Services
             _contentDbContext = contentDbContext;
         }
 
-        public async Task<UserPublicationRole> Create(Guid userId, Guid publicationId, PublicationRole role)
+        public async Task<UserPublicationRole> Create(Guid userId,
+            Guid publicationId,
+            PublicationRole role,
+            Guid createdById)
         {
             var userPublicationRole = new UserPublicationRole
             {
                 UserId = userId,
                 PublicationId = publicationId,
-                Role = role
+                Role = role,
+                Created = DateTime.UtcNow,
+                CreatedById = createdById
             };
 
             var created = (await _contentDbContext.UserPublicationRoles.AddAsync(userPublicationRole)).Entity;
