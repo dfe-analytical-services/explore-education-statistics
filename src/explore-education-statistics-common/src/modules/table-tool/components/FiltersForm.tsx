@@ -155,6 +155,7 @@ const FiltersForm = (props: Props & InjectedWizardProps) => {
                                 legend={filterGroup.legend}
                                 hint={filterGroup.hint}
                                 disabled={form.isSubmitting}
+                                order={[]}
                                 options={Object.values(filterGroup.options).map(
                                   group => ({
                                     legend: group.label,
